@@ -304,16 +304,10 @@ test("Group K audit coverage: every mechanic tile id has a CITATIONS entry", asy
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupKBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 13, "expected 13 Group K tile ids, got " + ids.length);
+  assert.ok(ids.length === 12, "expected 12 Group K tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group K tile '" + id + "' missing CITATIONS entry");
   }
-});
-
-test("Group K aviation tile uses aviation governance and cites FAA AC 91-23A", () => {
-  const c = CITATIONS["weight-balance"];
-  assert.equal(c.governance, GOVERNANCE.aviation);
-  assert.match(c.edition, /FAA AC 91-23A/);
 });
 
 test("Group K marine tile uses marine governance and cites ABYC P-17", () => {

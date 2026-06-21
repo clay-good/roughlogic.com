@@ -41,7 +41,6 @@ const ALIGNED = new Set([
   "hos-math",
   "motor-fla",
   "refrigerant-pt",
-  "weight-balance",
   "wire-ampacity", // aligned 2026-05-10: dropped degree symbol, made and -> /
   "bridge-formula", // aligned 2026-05-10: × -> nothing, ≥ -> >=
   "combustion-air", // aligned 2026-05-10: ft³/in² -> ft^3/in^2

@@ -7067,39 +7067,6 @@
       }
     },
     {
-      "tile_id": "statute-of-limitations",
-      "source_publisher": "California (Cal. Civ. Proc. Code 337)",
-      "source_title": "Statute of limitations: written contract claims accrue at breach; CA = 4 years",
-      "source_edition_or_year": "Cal. Civ. Proc. Code 337 (written contract limitations period; bundled per-state table)",
-      "source_section_or_page": "CA / contract_written -> 4 years, accrual 'breach'; exercises the string-equality path on the accrual enum",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "state": "CA",
-        "claim_type": "contract_written"
-      },
-      "outputs": {
-        "years": {
-          "value": 4,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "accrual": {
-          "value": "breach",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "state": {
-          "value": "CA",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
       "tile_id": "macrs-depreciation",
       "source_publisher": "IRS Pub. 946",
       "source_title": "MACRS Half-Year Convention 5-year property: 20 / 32 / 19.2 / 11.52 / 11.52 / 5.76 percent",
@@ -7560,77 +7527,6 @@
           "value": 70,
           "tolerance": {
             "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "weight-balance",
-      "source_publisher": "Project (first-principles) over FAA W&B chapter (PHAK / AC 91-23A)",
-      "source_title": "Aircraft W&B: CG = sum(weight * arm) / sum(weight); pass when within CG and gross-weight envelopes",
-      "source_edition_or_year": "FAA W&B handbook (cited by formula; %MAC = (CG - mac_le) / mac_chord * 100)",
-      "source_section_or_page": "BEW 1500 @ 38 / fuel 300 @ 42 / pilot 170 @ 36 / fwd 35 / aft 46 / max 2300 / MAC le 30 chord 40 -> total 1970 lb / CG 38.44 in / 21.09 %MAC / pass",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "stations": [
-          {
-            "label": "BEW",
-            "weight_lb": 1500,
-            "arm_in": 38
-          },
-          {
-            "label": "fuel",
-            "weight_lb": 300,
-            "arm_in": 42
-          },
-          {
-            "label": "pilot",
-            "weight_lb": 170,
-            "arm_in": 36
-          }
-        ],
-        "fwd_cg_limit_in": 35,
-        "aft_cg_limit_in": 46,
-        "max_gross_lb": 2300,
-        "mac_le_in": 30,
-        "mac_chord_in": 40
-      },
-      "outputs": {
-        "total_weight_lb": {
-          "value": 1970,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "cg_in": {
-          "value": 38.44,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "cg_pct_mac": {
-          "value": 21.09,
-          "tolerance": {
-            "abs": 0.05
-          }
-        },
-        "within_cg": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "within_gross": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "pass": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
           }
         }
       }
@@ -9389,89 +9285,6 @@
           "value": 72,
           "tolerance": {
             "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "small-claims-reference",
-      "source_publisher": "Texas (Tex. Gov't Code 27.031, justice court small-claims jurisdiction)",
-      "source_title": "Per-state small-claims jurisdictional limit lookup; attorney-allowed flag; fee-range string",
-      "source_edition_or_year": "Tex. Gov't Code 27.031 (justice court / $20,000 cap; attorneys allowed; $54-$124 filing fee)",
-      "source_section_or_page": "TX -> $20,000 max / attorneys allowed / $54-$124 fee range; exercises the string-equality path on the fee_range and citation strings",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "state": "TX"
-      },
-      "outputs": {
-        "max_dollars": {
-          "value": 20000,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "attorney_allowed": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "fee_range": {
-          "value": "$54 - $124",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "state": {
-          "value": "TX",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "tenant-notice",
-      "source_publisher": "California (Cal. Civ. Proc. Code 1161(2), three-day pay-or-quit)",
-      "source_title": "Per-state tenant-notice schedule; notice_days count; business-days flag; cure-allowed flag",
-      "source_edition_or_year": "Cal. Civ. Proc. Code 1161(2) (3 business days for nonpayment, cure allowed)",
-      "source_section_or_page": "CA / nonpayment -> 3 days / business_days 1 / cure_allowed 1; exercises the string-equality path on the citation string and the boolean-coerce path on the two flags",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "state": "CA",
-        "notice_type": "nonpayment"
-      },
-      "outputs": {
-        "notice_days": {
-          "value": 3,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "business_days": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "cure_allowed": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "state": {
-          "value": "CA",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "notice_type": {
-          "value": "nonpayment",
-          "tolerance": {
-            "abs": 0
           }
         }
       }
@@ -11540,307 +11353,6 @@
       }
     },
     {
-      "tile_id": "judgment-interest",
-      "source_publisher": "California (Cal. Civ. Proc. Code 685.010, post-judgment 10% simple)",
-      "source_title": "Per-state judgment interest: simple or compound at the bundled rate; U.S. Rule applies partial payments",
-      "source_edition_or_year": "Cal. Civ. Proc. Code 685.010 (10% simple; 366 days in 2024 leap year)",
-      "source_section_or_page": "$10,000 / CA / 2024-01-01 to 2025-01-01 / no payments -> 366 days at 10% simple = $1,002.74 interest, $11,002.74 total owed, $2.74/day at end",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "principal": 10000,
-        "state": "CA",
-        "judgment_date": "2024-01-01",
-        "accrual_date": "2025-01-01",
-        "partial_payments": []
-      },
-      "outputs": {
-        "principal_remaining": {
-          "value": 10000,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "accrued_interest": {
-          "value": 1002.74,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "total_owed": {
-          "value": 11002.74,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "per_day_accrual_at_end": {
-          "value": 2.74,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "rate_pct": {
-          "value": 10,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "accrual": {
-          "value": "simple",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "state": {
-          "value": "CA",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "court-deadline",
-      "source_publisher": "Fed. R. Civ. P. 6 (calendar-day and court-day computation)",
-      "source_title": "Calendar-day deadline = trigger + days, rolled forward off weekend / federal holiday",
-      "source_edition_or_year": "Fed. R. Civ. P. 6(a)(1)",
-      "source_section_or_page": "2026-04-01 trigger + 30 calendar days / FED -> 2026-05-01 (no weekend / holiday rollover)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "trigger_date": "2026-04-01",
-        "days": 30,
-        "day_type": "calendar",
-        "jurisdiction": "FED"
-      },
-      "outputs": {
-        "deadline": {
-          "value": "2026-05-01",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "citation": {
-          "value": "Fed. R. Civ. P. 6(a)(1); jurisdiction FED",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "wage-garnishment",
-      "source_publisher": "U.S. DOL Wage and Hour Division",
-      "source_title": "Wage garnishment cap: $600 weekly disposable, consumer debt, federal minimum wage",
-      "source_edition_or_year": "15 USC 1673 (CCPA Title III); DOL Fact Sheet 30",
-      "source_section_or_page": "floor = 30 x $7.25 = $217.50; 25% x 600 = $150; 600 - 217.50 = $382.50; max = min(150, 382.50) = $150; protected = $450",
-      "verified_by": "rl",
-      "verified_on": "2026-06-05",
-      "inputs": {
-        "disposable_earnings": 600,
-        "pay_period": "weekly",
-        "garnishment_type": "consumer"
-      },
-      "outputs": {
-        "protected_floor": {
-          "value": 217.5,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "title_iii_max": {
-          "value": 150,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "max_garnishment": {
-          "value": 150,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "protected_amount": {
-          "value": 450,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "wage-hour",
-      "source_publisher": "Cal. Lab. Code 1182.12 (state minimum) + 29 USC 207 (FLSA OT)",
-      "source_title": "OT split: regular 40 hr at rate, OT (40-50) at 1.5x; CA daily-OT not modeled in this entry",
-      "source_edition_or_year": "CA $16.50/hr 2025 minimum + FLSA 1.5x OT identity",
-      "source_section_or_page": "CA / $20/hr / 50 hr -> 40 reg + 10 OT -> $800 reg + $300 OT = $1,100 gross",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "hourly_rate": 20,
-        "hours_worked": 50,
-        "state": "CA",
-        "is_tipped": false
-      },
-      "outputs": {
-        "regular_hours": {
-          "value": 40,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "overtime_hours": {
-          "value": 10,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "regular_pay": {
-          "value": 800,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "overtime_pay": {
-          "value": 300,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "gross_pay": {
-          "value": 1100,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "applicable_minimum": {
-          "value": 16.5,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "contractor-vs-employee",
-      "source_publisher": "IRS Rev. Rul. 87-41 (20-factor test); IRS Pub 15-A",
-      "source_title": "IRS 20-factor checklist; result = employee if employer_control_count > independent_count",
-      "source_edition_or_year": "IRS Rev. Rul. 87-41; Pub 15-A current edition",
-      "source_section_or_page": "IRS test / 11 employer factors + 3 worker factors -> employee classification (employer control 11 > worker 3)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "test": "irs",
-        "state": "FED",
-        "checklist": {
-          "instructions": "employer",
-          "training": "employer",
-          "integration": "employer",
-          "personal_service": "employer",
-          "set_hours": "employer",
-          "work_on_premises": "employer",
-          "full_time": "employer",
-          "tools_and_materials": "employer",
-          "expenses_paid": "employer",
-          "profit_or_loss": "employer",
-          "right_to_discharge": "employer",
-          "available_to_public": "worker",
-          "works_for_more_than_one": "worker",
-          "investment": "worker"
-        }
-      },
-      "outputs": {
-        "employer_control_count": {
-          "value": 11,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "independent_count": {
-          "value": 3,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "total_answered": {
-          "value": 14,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "result": {
-          "value": "employee",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "test": {
-          "value": "irs",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "state": {
-          "value": "FED",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "contract-clause-reference",
-      "source_publisher": "Project bundled per-clause definitions (plain English what / look-for)",
-      "source_title": "computeContractClauseReference({clause}) -> {clause, what, look_for}",
-      "source_edition_or_year": "Project bundled CONTRACT_CLAUSES table (indemnification, LoL, choice of law, arbitration, etc.)",
-      "source_section_or_page": "indemnification clause -> what + look_for definitions; pure data lookup",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "clause": "indemnification"
-      },
-      "outputs": {
-        "clause": {
-          "value": "indemnification",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "what": {
-          "value": "One side promises to cover the other's losses from listed events.",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "lease-term-reference",
-      "source_publisher": "Project bundled per-term definitions (plain English what / look-for)",
-      "source_title": "computeLeaseTermReference({term}) -> {term, what, look_for}",
-      "source_edition_or_year": "Project bundled LEASE_TERMS table (rent, security_deposit, CAM, holdover, etc.)",
-      "source_section_or_page": "security_deposit term -> what + look_for definitions; pure data lookup",
-      "verified_by": "rl",
-      "verified_on": "2026-05-11",
-      "inputs": {
-        "term": "security_deposit"
-      },
-      "outputs": {
-        "term": {
-          "value": "security_deposit",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "what": {
-          "value": "Refundable deposit against damage and unpaid rent.",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
       "tile_id": "irs-form-index",
       "source_publisher": "IRS form library reference (project bundled)",
       "source_title": "Common IRS forms and their purposes (1040, W-2, 1099, etc.)",
@@ -11912,400 +11424,6 @@
       "outputs": {}
     },
     {
-      "tile_id": "vet-ett-sizing",
-      "source_publisher": "BSAVA / Plumb's / standard veterinary anesthesia reference",
-      "source_title": "Banded ETT and IV catheter sizing by species + weight",
-      "source_edition_or_year": "BSAVA Manual of Canine and Feline Anaesthesia and Analgesia (3rd ed.)",
-      "source_section_or_page": "Worked example: 20 kg dog -> 15-25 kg band -> 8.0 mm ETT, 20-ga IVC",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "species": "dog",
-        "weight_kg": 20
-      },
-      "outputs": {
-        "ett_mm_id": {
-          "value": 8,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "ivc_gauge": {
-          "value": 20,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-anesthesia-vitals",
-      "source_publisher": "BSAVA / Plumb's / ACVAA monitoring guidelines",
-      "source_title": "Normal ranges for inhalant anesthesia vitals by species",
-      "source_edition_or_year": "Current ACVAA / BSAVA",
-      "source_section_or_page": "Dog HR 60-140, RR 10-20, MAP >= 60 (ideal 70-100), SpO2 >= 95, ETCO2 35-45",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "species": "dog"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "vet-asa-classification",
-      "source_publisher": "ASA / AVMA / ACVAA",
-      "source_title": "ASA Physical Status I-V with E modifier",
-      "source_edition_or_year": "Current ASA / AVMA Guidelines for Anesthesia",
-      "source_section_or_page": "6 entries (I-V plus E modifier)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {},
-      "outputs": {}
-    },
-    {
-      "tile_id": "vet-bloodwork-ranges",
-      "source_publisher": "IDEXX / Antech / VetScan / Merck Veterinary Manual",
-      "source_title": "Adult CBC and chemistry reference bands by species",
-      "source_edition_or_year": "Merck Veterinary Manual 10th ed.",
-      "source_section_or_page": "Dog: 5 CBC analytes + 9 chemistry analytes returned",
-      "verified_by": "rl",
-      "verified_on": "2026-05-15",
-      "inputs": {
-        "species": "dog"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "vet-urine-sg",
-      "source_publisher": "Stockham + Scott / IRIS / Merck Veterinary Manual",
-      "source_title": "Urine specific gravity bands by species",
-      "source_edition_or_year": "Stockham + Scott 2nd ed. / IRIS CKD staging",
-      "source_section_or_page": "Dog well-concentrated >= 1.030; isosthenuric 1.008 - 1.012",
-      "verified_by": "rl",
-      "verified_on": "2026-05-15",
-      "inputs": {
-        "species": "dog"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "vet-target-weight-loss",
-      "source_publisher": "AAHA Weight Management Guidelines",
-      "source_title": "Reverse-RER target caloric plan for weight loss",
-      "source_edition_or_year": "AAHA 2014; WSAVA Global Nutrition 2021 update",
-      "source_section_or_page": "Worked example: 30 kg dog -> 25 kg target -> target RER ~ 783 kcal/day; 11.1 weeks at 1.5% per-week loss",
-      "verified_by": "rl",
-      "verified_on": "2026-05-15",
-      "inputs": {
-        "current_weight": 30,
-        "target_weight": 25,
-        "weight_unit": "kg",
-        "species": "dog",
-        "kcal_per_cup": 300
-      },
-      "outputs": {
-        "target_RER_kcal_per_day": {
-          "value": 782.62,
-          "tolerance": {
-            "abs": 0.5
-          }
-        },
-        "deficit_kg": {
-          "value": 5,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-toxicity",
-      "source_publisher": "ASPCA APCC / Plumb's Veterinary Drug Handbook (10th ed.)",
-      "source_title": "Toxicity dose-by-weight screening estimator",
-      "source_edition_or_year": "Current ASPCA / Plumb's 10th ed.",
-      "source_section_or_page": "Worked example: 10 kg dog ingests 50 g dark chocolate -> ~26.46 mg/kg theobromine (mild GI signs band)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "toxin": "chocolate",
-        "weight": 10,
-        "weight_unit": "kg",
-        "choc_type": "dark",
-        "choc_grams": 50
-      },
-      "outputs": {
-        "theobromine_mg_per_kg": {
-          "value": 26.455,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-breed-predispositions",
-      "source_publisher": "AKC CHF / OFA CHIC / AAHA / Ettinger + Feldman / Nelson + Couto",
-      "source_title": "Breed-specific predisposition lookup",
-      "source_edition_or_year": "Current references",
-      "source_section_or_page": "Query 'doberman' returns 1 row (DCM / vWD / Wobbler)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "query": "doberman"
-      },
-      "outputs": {
-        "count": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-plasma-css",
-      "source_publisher": "Riviere + Papich (10th ed.) / Plumb's (10th ed.)",
-      "source_title": "Steady-state plasma drug concentration",
-      "source_edition_or_year": "Current",
-      "source_section_or_page": "Css = (100 mg * 1) / (50 mL/min * 480 min) = 4.167 ug/mL for 10 kg patient, CL 5 mL/kg/min, tau 8 hr",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "dose_mg": 100,
-        "bioavailability_F": 1,
-        "clearance_mL_per_kg_per_min": 5,
-        "tau_hr": 8,
-        "weight": 10,
-        "weight_unit": "kg"
-      },
-      "outputs": {
-        "Css_ug_per_mL": {
-          "value": 4.167,
-          "tolerance": {
-            "abs": 0.005
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-vaccine-schedule",
-      "source_publisher": "AAHA Canine Vaccination Guidelines (2022 update)",
-      "source_title": "AAHA / AAFP core + non-core vaccine reference",
-      "source_edition_or_year": "AAHA 2022 / AAFP 2020",
-      "source_section_or_page": "Dog: 2 core (DAP + Rabies); 5 non-core (Lepto / Bordetella / Lyme / influenza / Crotalus)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "species": "dog"
-      },
-      "outputs": {
-        "core_count": {
-          "value": 2,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "non_core_count": {
-          "value": 5,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-heartworm-dose",
-      "source_publisher": "FDA-approved labeling via DailyMed",
-      "source_title": "Heartgard Plus (ivermectin + pyrantel) weight-band lookup",
-      "source_edition_or_year": "Current FDA label",
-      "source_section_or_page": "20 kg = 44.09 lb -> Green tablet (26-50 lb band): 136 mcg ivermectin + 114 mg pyrantel",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "weight": 20,
-        "weight_unit": "kg",
-        "active_ingredient": "ivermectin"
-      },
-      "outputs": {
-        "weight_lb": {
-          "value": 44.09,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-crystalloid-plan",
-      "source_publisher": "DiBartola, Fluid / Electrolyte / Acid-Base Disorders in Small Animal Practice (4th ed.)",
-      "source_title": "Consolidated crystalloid plan (maintenance + replacement + losses)",
-      "source_edition_or_year": "4th ed.",
-      "source_section_or_page": "20 kg dog / 5% dehydration / 50 mL/hr vomiting / 24 hr window -> maintenance 50 mL/hr + replacement 41.667 mL/hr + losses 50 mL/hr = 141.667 mL/hr total",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "weight": 20,
-        "weight_unit": "kg",
-        "species": "dog",
-        "dehydration_percent": 5,
-        "vomiting_mL_per_hr": 50,
-        "diarrhea_mL_per_hr": 0,
-        "blood_loss_mL_per_hr": 0,
-        "surgical_loss_mL_per_hr": 0,
-        "rehydration_window_hr": 24
-      },
-      "outputs": {
-        "maintenance_mL_per_hr": {
-          "value": 50,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "total_rate_mL_per_hr": {
-          "value": 141.667,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-cri",
-      "source_publisher": "Plumb's Veterinary Drug Handbook (10th ed.) / AVECCT CRI worksheets",
-      "source_title": "CRI bag method: total drug = mg/hr * duration; rate = bag / duration",
-      "source_edition_or_year": "10th ed.",
-      "source_section_or_page": "0.5 mcg/kg/min fentanyl, 15 kg dog, 24 hr, 250 mL bag -> 0.45 mg/hr, 10.8 mg total, 10.4167 mL/hr",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "stock_conc_mg_per_mL": 0.05,
-        "dose": 0.5,
-        "dose_unit": "mcg_kg_min",
-        "weight": 15,
-        "weight_unit": "kg",
-        "bag_volume_mL": 250,
-        "duration_hr": 24,
-        "drip_set": "60"
-      },
-      "outputs": {
-        "mg_per_hr": {
-          "value": 0.45,
-          "tolerance": {
-            "abs": 0.0001
-          }
-        },
-        "total_drug_mg": {
-          "value": 10.8,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "infusion_rate_mL_per_hr": {
-          "value": 10.4167,
-          "tolerance": {
-            "pct": 0.1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-transfusion",
-      "source_publisher": "ACVIM Transfusion Medicine Consensus Statement (2021)",
-      "source_title": "volume = BV_per_kg * weight * (PCV_target - PCV_current) / PCV_donor",
-      "source_edition_or_year": "2021",
-      "source_section_or_page": "Dog 20 kg, PCV 15 -> 25, donor 40, dog BV 90 -> 90*20*10/40 = 450 mL; at 5 mL/kg/hr -> 4.5 hr",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "species": "dog",
-        "weight": 20,
-        "weight_unit": "kg",
-        "pcv_current": 15,
-        "pcv_target": 25,
-        "pcv_donor": 40,
-        "rate_mL_per_kg_per_hr": 5
-      },
-      "outputs": {
-        "volume_mL": {
-          "value": 450,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "duration_hr": {
-          "value": 4.5,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "equine-weight",
-      "source_publisher": "Carroll C.L. & Huntington P.J., Equine Vet J 20(1) (1988)",
-      "source_title": "BW_lb = girth_in^2 * length_in / 330 (horse)",
-      "source_edition_or_year": "1988",
-      "source_section_or_page": "Horse, girth 75 in, length 65 in -> 75^2 * 65 / 330 = 1107.95 lb (502.56 kg)",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "girth_in": 75,
-        "length_in": 65,
-        "animal": "horse"
-      },
-      "outputs": {
-        "bw_lb": {
-          "value": 1107.95,
-          "tolerance": {
-            "pct": 0.1
-          }
-        },
-        "bw_kg": {
-          "value": 502.56,
-          "tolerance": {
-            "pct": 0.1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "holding-fuel",
-      "source_publisher": "14 CFR 91.151 / 91.167 (fuel reserves)",
-      "source_title": "fuel for hold = burn * min/60; remaining = tank - hold fuel; max hold = (tank - reserve fuel)/burn",
-      "source_edition_or_year": "14 CFR",
-      "source_section_or_page": "12 gph, 30 min hold, 40 gal, 45-min reserve -> 6 gal burned, 34 gal left, max hold (40-9)/12*60 = 155 min",
-      "verified_by": "rl",
-      "verified_on": "2026-06-08",
-      "inputs": {
-        "burn_gph": 12,
-        "hold_min": 30,
-        "tank_gal": 40,
-        "reserve_min": 45,
-        "fuel_type": "avgas",
-        "hold_speed_kt": 90
-      },
-      "outputs": {
-        "fuel_for_hold_gal": {
-          "value": 6,
-          "tolerance": {
-            "abs": 0.0001
-          }
-        },
-        "fuel_remaining_gal": {
-          "value": 34,
-          "tolerance": {
-            "abs": 0.0001
-          }
-        },
-        "max_hold_min": {
-          "value": 155,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
       "tile_id": "rent-vs-buy",
       "source_publisher": "New York Times rent-vs-buy methodology (first-principles DCF)",
       "source_title": "PV_buy = down + PV(ownership) - PV(net sale); PV_rent = PV(inflating rent)",
@@ -12346,1223 +11464,6 @@
           "value": -7496.47,
           "tolerance": {
             "pct": 0.5
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-bcs-reference",
-      "source_publisher": "AAHA / AAFP / WSAVA",
-      "source_title": "BCS 1-9 scale reference per species",
-      "source_edition_or_year": "AAHA 2019 / AAFP 2021 / WSAVA",
-      "source_section_or_page": "Render returns the 9 verbal-anchor bands for the chosen species and the named scale",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "species": "dog"
-      },
-      "outputs": {
-        "scale": {
-          "value": "1-9 (AAHA / WSAVA / AAFP)",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-pet-age",
-      "source_publisher": "AAHA / AAFP life-stage guidelines",
-      "source_title": "Piecewise scheme: 15 in year 1, 24 by year 2, then +size-band per year",
-      "source_edition_or_year": "AAHA 2019 / AAFP 2021",
-      "source_section_or_page": "Worked example: 5-year medium dog -> 15 + 9 + 3*5 = 39 human-equivalent years",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "species": "dog",
-        "pet_age_years": 5,
-        "size_band": "medium"
-      },
-      "outputs": {
-        "human_age_equivalent_years": {
-          "value": 39,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-gestation",
-      "source_publisher": "Standard veterinary reproductive physiology (textbook)",
-      "source_title": "due_date = breeding_date + species_mean_gestation_days",
-      "source_edition_or_year": "Universal",
-      "source_section_or_page": "Worked example: dog bred 2026-03-01 -> due 2026-05-03 (range 04-28 to 05-08)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "species": "dog",
-        "breeding_date_iso": "2026-03-01"
-      },
-      "outputs": {
-        "estimated_due_date_iso": {
-          "value": "2026-05-03",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "gestation_days_mean": {
-          "value": 63,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-weight-based-dose",
-      "source_publisher": "Standard veterinary pharmacology arithmetic",
-      "source_title": "total_mg = dose_mg_per_kg * weight_kg; volume_mL = total_mg / concentration_mg_per_mL",
-      "source_edition_or_year": "Universal",
-      "source_section_or_page": "Worked example: 20 kg dog, 5 mg/kg dose, 50 mg/mL stock -> 100 mg total, 2.0 mL to draw",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "weight": 20,
-        "weight_unit": "kg",
-        "dose_mg_per_kg": 5,
-        "concentration_mg_per_mL": 50
-      },
-      "outputs": {
-        "weight_kg": {
-          "value": 20,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "total_dose_mg": {
-          "value": 100,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "volume_mL": {
-          "value": 2,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-maintenance-fluid",
-      "source_publisher": "Holliday-Segar adapted; DiBartola 4th ed.",
-      "source_title": "maintenance + replacement + losses; small-animal basis 60 mL/kg/day",
-      "source_edition_or_year": "DiBartola (2012)",
-      "source_section_or_page": "Worked example: 20 kg dog, 5% dehydration, no losses, 24 hr window -> 50 mL/hr maintenance + 41.67 mL/hr replacement = 91.67 mL/hr total",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "weight": 20,
-        "weight_unit": "kg",
-        "species": "dog",
-        "dehydration_percent": 5,
-        "ongoing_losses_mL_per_hr": 0,
-        "rehydration_window_hr": 24
-      },
-      "outputs": {
-        "maintenance_mL_per_hr": {
-          "value": 50,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "replacement_total_mL": {
-          "value": 1000,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "total_rate_mL_per_hr": {
-          "value": 91.67,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-energy-requirement",
-      "source_publisher": "AAHA / AAFP life-stage guidelines + Kleiber 1947",
-      "source_title": "RER = 70 * weight_kg^0.75; MER = RER * activity factor",
-      "source_edition_or_year": "AAHA 2019 / AAFP 2021",
-      "source_section_or_page": "Worked example: 10 kg active dog, 400 kcal/cup diet -> RER 393.64, MER 629.83, cups 1.57",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "weight": 10,
-        "weight_unit": "kg",
-        "species": "dog",
-        "activity": "active",
-        "kcal_per_cup": 400
-      },
-      "outputs": {
-        "RER_kcal_per_day": {
-          "value": 393.64,
-          "tolerance": {
-            "abs": 0.5
-          }
-        },
-        "MER_kcal_per_day": {
-          "value": 629.83,
-          "tolerance": {
-            "abs": 0.5
-          }
-        },
-        "activity_factor": {
-          "value": 1.6,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "pediatric-weight-estimate",
-      "source_publisher": "APLS 6th ed.",
-      "source_title": "Pediatric weight-by-age estimators",
-      "source_edition_or_year": "6th ed.",
-      "source_section_or_page": "Worked example: 5-year-old -> (2 * 5) + 8 = 18 kg",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "age_years": 5
-      },
-      "outputs": {
-        "apls_kg": {
-          "value": 18,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "shock-index",
-      "source_publisher": "Allgower & Buri 1967 / Vandromme 2011 / Mutschler 2013 (public)",
-      "source_title": "shock_index = HR / SBP with field-EMS bands",
-      "source_edition_or_year": "1967 / modern field bands",
-      "source_section_or_page": "Worked example HR 120 / SBP 100 -> SI 1.20 (occult shock band)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "hr_bpm": 120,
-        "sbp_mmHg": 100
-      },
-      "outputs": {
-        "shock_index": {
-          "value": 1.2,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "mean-arterial-pressure",
-      "source_publisher": "Standard cuff approximation / Surviving Sepsis 2021",
-      "source_title": "MAP = (SBP + 2*DBP) / 3",
-      "source_edition_or_year": "Universal",
-      "source_section_or_page": "Worked example 120/80 -> MAP = (120 + 160) / 3 = 93.33; pulse pressure 40",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "sbp_mmHg": 120,
-        "dbp_mmHg": 80
-      },
-      "outputs": {
-        "map_mmHg": {
-          "value": 93.33,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "pulse_pressure_mmHg": {
-          "value": 40,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "anion-gap",
-      "source_publisher": "Standard chemistry-panel arithmetic",
-      "source_title": "AG = Na - (Cl + HCO3); reference 8-12 mEq/L",
-      "source_edition_or_year": "Universal",
-      "source_section_or_page": "Worked example Na 140 / Cl 104 / HCO3 24 -> AG 12 (high-normal)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-14",
-      "inputs": {
-        "na": 140,
-        "cl": 104,
-        "hco3": 24
-      },
-      "outputs": {
-        "anion_gap": {
-          "value": 12,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "corrected-calcium",
-      "source_publisher": "Payne et al., BMJ 4:5893 (1973), open-access",
-      "source_title": "Ca_corrected = Ca_measured + 0.8 * (4.0 - albumin)",
-      "source_edition_or_year": "1973",
-      "source_section_or_page": "Worked example Ca 8.0 / albumin 2.0 -> 8.0 + 0.8*(4.0-2.0) = 9.6 mg/dL",
-      "verified_by": "rl",
-      "verified_on": "2026-05-14",
-      "inputs": {
-        "ca_measured": 8,
-        "albumin_g_dL": 2
-      },
-      "outputs": {
-        "ca_corrected_mg_dL": {
-          "value": 9.6,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "cha2ds2-vasc",
-      "source_publisher": "Lip et al., Chest 137:2 (2010), open-access",
-      "source_title": "CHA2DS2-VASc atrial-fibrillation stroke-risk score",
-      "source_edition_or_year": "2010 (Lip) / 2019 AHA/ACC/HRS thresholds",
-      "source_section_or_page": "Worked example: H + A(65-74) + D = 3 (male, hypertensive, age 70, diabetic)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-14",
-      "inputs": {
-        "chf": false,
-        "htn": true,
-        "age": 70,
-        "diabetes": true,
-        "stroke_history": false,
-        "vascular": false,
-        "sex": "male"
-      },
-      "outputs": {
-        "score": {
-          "value": 3,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "wells-dvt",
-      "source_publisher": "Wells et al., Lancet 350:9094 (1997); NEJM 349:13 (2003)",
-      "source_title": "Wells DVT score (with 2003 modification)",
-      "source_edition_or_year": "1997 / 2003",
-      "source_section_or_page": "Worked example: active cancer (+1) + calf swelling >= 3 cm (+1) + prior DVT (+1) = 3",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "active_cancer": true,
-        "calf_swelling_3cm": true,
-        "prior_dvt": true,
-        "entire_leg_swollen": false,
-        "alternative_diagnosis_likely": false
-      },
-      "outputs": {
-        "score": {
-          "value": 3,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "wells-pe",
-      "source_publisher": "Wells et al., Thrombosis and Haemostasis 83:3 (2000)",
-      "source_title": "Wells PE score",
-      "source_edition_or_year": "2000",
-      "source_section_or_page": "Worked example: clinical signs DVT (+3) + alt dx less likely (+3) + HR > 100 (+1.5) = 7.5",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "clinical_signs_dvt": true,
-        "alternative_diagnosis_less_likely": true,
-        "hr_over_100": true,
-        "immobilization_or_surgery": false,
-        "prior_dvt_pe": false,
-        "hemoptysis": false,
-        "malignancy": false
-      },
-      "outputs": {
-        "score": {
-          "value": 7.5,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "perc-rule",
-      "source_publisher": "Kline et al., J Thromb Haemost 2:8 (2004); Ann Emerg Med 52:5 (2008)",
-      "source_title": "PERC rule (PE Rule-Out Criteria)",
-      "source_edition_or_year": "2004 / 2008",
-      "source_section_or_page": "Worked example: all 8 criteria satisfied -> PERC negative (rules out PE in a low-pretest population)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "age_under_50": true,
-        "hr_under_100": true,
-        "spo2_ge_95": true,
-        "no_hemoptysis": true,
-        "no_estrogen": true,
-        "no_prior_dvt_pe": true,
-        "no_recent_surgery_or_trauma": true,
-        "no_unilateral_leg_swelling": true
-      },
-      "outputs": {
-        "satisfied": {
-          "value": 8,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "rule-of-9s",
-      "source_publisher": "Pulaski & Tennison (1947); Lund & Browder, Surg Gynecol Obstet 79:3 (1944)",
-      "source_title": "Rule of 9s / Lund-Browder TBSA",
-      "source_edition_or_year": "1947 / 1944",
-      "source_section_or_page": "Worked example (adult Rule of 9s): left arm both surfaces (4.5 + 4.5) + anterior trunk (18) = 27% TBSA",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "method": "rule_of_9s",
-        "age_band": "adult",
-        "arm_l_front": true,
-        "arm_l_back": true,
-        "trunk_front": true
-      },
-      "outputs": {
-        "total": {
-          "value": 27,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "pediatric-vitals",
-      "source_publisher": "American Heart Association, PALS Provider Manual (2020)",
-      "source_title": "Pediatric vital-signs reference (age-banded)",
-      "source_edition_or_year": "2020",
-      "source_section_or_page": "Worked example: preschool (3-5 yr) band returns the preschool-band reference row",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "age_band": "preschool"
-      },
-      "outputs": {
-        "band": {
-          "value": "preschool",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "nihss",
-      "source_publisher": "Brott et al., Stroke 20:7 (1989); NIH NINDS public-domain instrument",
-      "source_title": "NIH Stroke Scale (15-item sum)",
-      "source_edition_or_year": "1989 / current",
-      "source_section_or_page": "Worked example: 1a=1, 1b=1, 1c=0, 2=1, 3=2, 4=2, 5a=0, 5b=2, 6a=0, 6b=1, 7=0, 8=1, 9=2, 10=1, 11=1 -> total 15 (moderate stroke)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "loc_consciousness": 1,
-        "loc_questions": 1,
-        "loc_commands": 0,
-        "best_gaze": 1,
-        "visual": 2,
-        "facial_palsy": 2,
-        "motor_arm_l": 0,
-        "motor_arm_r": 2,
-        "motor_leg_l": 0,
-        "motor_leg_r": 1,
-        "limb_ataxia": 0,
-        "sensory": 1,
-        "best_language": 2,
-        "dysarthria": 1,
-        "extinction_inattention": 1
-      },
-      "outputs": {
-        "total": {
-          "value": 15,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "start-triage",
-      "source_publisher": "Newport Beach FD / Hoag Hospital (1983); CDC Field Triage Guidelines (2021)",
-      "source_title": "START / JumpSTART mass-casualty triage decision tree",
-      "source_edition_or_year": "1983 / 2021 summary",
-      "source_section_or_page": "Worked example (adult START): not walking, breathing on own, RR 24, perfusion OK, obeys commands -> YELLOW (delayed)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "pediatric": false,
-        "walking": false,
-        "breathing": "yes",
-        "resp_rate_per_min": 24,
-        "perfusion_ok": true,
-        "obeys_commands": true
-      },
-      "outputs": {
-        "tag": {
-          "value": "YELLOW",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "drug-concentration",
-      "source_publisher": "First-principles arithmetic; USP General Notices",
-      "source_title": "Drug concentration to volume",
-      "source_edition_or_year": "Current",
-      "source_section_or_page": "Worked example: 25 mg ordered dose / 50 mg/mL stock concentration -> 0.5 mL draw",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "ordered_dose_mg": 25,
-        "stock_concentration_mg_per_mL": 50
-      },
-      "outputs": {
-        "volume_mL": {
-          "value": 0.5,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "ideal-body-weight",
-      "source_publisher": "Devine BJ, Drug Intell Clin Pharm 8 (1974); Hume R, J Clin Pathol 19:4 (1966)",
-      "source_title": "IBW_male = 50 + 2.3*(height_in - 60); AdjBW = IBW + 0.4*(ABW - IBW)",
-      "source_edition_or_year": "1974 / 1966",
-      "source_section_or_page": "Worked example: male, 70 in -> IBW = 50 + 2.3*(70-60) = 73.0 kg",
-      "verified_by": "rl",
-      "verified_on": "2026-06-05",
-      "inputs": {
-        "height": 70,
-        "height_unit": "in",
-        "sex": "male",
-        "abw_kg": 100
-      },
-      "outputs": {
-        "ibw_kg": {
-          "value": 73,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "adj_kg": {
-          "value": 83.8,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "corrected-qt",
-      "source_publisher": "Bazett HC, Heart 7 (1920); Sagie et al., Am J Cardiol 70:7 (1992)",
-      "source_title": "RR = 60/HR; QTcB = QT/sqrt(RR); QTcFram = QT + 154*(1 - RR)",
-      "source_edition_or_year": "1920 / 1992",
-      "source_section_or_page": "Worked example: QT 400 ms at HR 75 -> RR 0.8 s -> QTcB = 400/sqrt(0.8) = 447.21 ms",
-      "verified_by": "rl",
-      "verified_on": "2026-06-05",
-      "inputs": {
-        "qt_ms": 400,
-        "hr_bpm": 75
-      },
-      "outputs": {
-        "qtc_bazett_ms": {
-          "value": 447.2136,
-          "tolerance": {
-            "pct": 0.5
-          }
-        },
-        "qtc_framingham_ms": {
-          "value": 430.8,
-          "tolerance": {
-            "abs": 0.1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "apgar-score",
-      "source_publisher": "Apgar, Anesthesia & Analgesia 32 (1953), open-access",
-      "source_title": "APGAR newborn score: A + P + G + A + R, each 0-2",
-      "source_edition_or_year": "1953",
-      "source_section_or_page": "Worked example: A=2, P=2, G=1, A=2, R=2 -> total 9 (vigorous)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "appearance": 2,
-        "pulse": 2,
-        "grimace": 1,
-        "activity": 2,
-        "respiration": 2
-      },
-      "outputs": {
-        "total": {
-          "value": 9,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "band": {
-          "value": "vigorous (7-10)",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "iv-drip-rate",
-      "source_publisher": "Universal nursing / EMS reference",
-      "source_title": "gtts/min = (volume * drop_factor) / time_min",
-      "source_edition_or_year": "n/a",
-      "source_section_or_page": "Worked example: 1000 mL over 480 min at 15 gtt/mL -> 125 mL/hr, 31.25 gtts/min",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "volume_mL": 1000,
-        "time_min": 480,
-        "drop_factor_gtt_per_mL": 15
-      },
-      "outputs": {
-        "rate_mL_per_hr": {
-          "value": 125,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "gtts_per_min": {
-          "value": 31.25,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "o2-cylinder-duration",
-      "source_publisher": "AARC clinical practice (public)",
-      "source_title": "minutes = ((pressure - reserve) * tank_factor) / flow",
-      "source_edition_or_year": "Current AARC convention",
-      "source_section_or_page": "Worked example: D-cylinder, 2000 psi, reserve 200, flow 4 LPM -> (1800 * 0.16) / 4 = 72 min",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "cylinder": "D",
-        "pressure_psi": 2000,
-        "reserve_psi": 200,
-        "flow_lpm": 4
-      },
-      "outputs": {
-        "minutes_to_reserve": {
-          "value": 72,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "tank_factor": {
-          "value": 0.16,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "glasgow-coma-scale",
-      "source_publisher": "Teasdale & Jennett, Lancet 304:7872 (1974), open-access",
-      "source_title": "GCS = E + V + M; mild 13-15, moderate 9-12, severe 3-8",
-      "source_edition_or_year": "1974",
-      "source_section_or_page": "Worked example: E=3, V=4, M=5 -> total 12 (moderate band)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "eye": 3,
-        "verbal": 4,
-        "motor": 5,
-        "intubated": false
-      },
-      "outputs": {
-        "total": {
-          "value": 12,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "severity": {
-          "value": "moderate",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "parkland-formula",
-      "source_publisher": "Baxter & Shires (1974) / ABA ABLS (public materials)",
-      "source_title": "24-hr LR = 4 mL/kg/%TBSA; half over first 8 hr from burn",
-      "source_edition_or_year": "1974 / current ABLS",
-      "source_section_or_page": "Worked example: 75 kg adult, 30% TBSA, at time of burn -> 9000 mL total, 4500 first 8 hr, 562.5 mL/hr",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "weight_kg": 75,
-        "tbsa_percent": 30,
-        "hours_since_burn": 0
-      },
-      "outputs": {
-        "total_24hr_mL": {
-          "value": 9000,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "first_8hr_mL": {
-          "value": 4500,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "current_rate_mL_per_hr": {
-          "value": 562.5,
-          "tolerance": {
-            "abs": 0.1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "cincinnati-stroke-scale",
-      "source_publisher": "Kothari et al. (1999), open-access",
-      "source_title": "CPSS: three binary findings (facial droop / arm drift / abnormal speech)",
-      "source_edition_or_year": "1999",
-      "source_section_or_page": "Worked example: facial droop + arm drift abnormal, speech normal -> 2 of 3 abnormal, positive screen",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "facial_droop": true,
-        "arm_drift": true,
-        "abnormal_speech": false
-      },
-      "outputs": {
-        "abnormal_count": {
-          "value": 2,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "positive": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "density-altitude",
-      "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (public domain)",
-      "source_title": "DA = PA + 120 * (OAT_C - ISA_C); ISA_C = 15 - 1.98 * (PA/1000)",
-      "source_edition_or_year": "FAA-H-8083-25C",
-      "source_section_or_page": "Worked example: PA 5000 ft, OAT 25 C -> ISA at 5000 = 5.1 C, deviation 19.9 C, DA = 5000 + 120*19.9 = 7388 ft",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "pressure_altitude_ft": 5000,
-        "oat_c": 25
-      },
-      "outputs": {
-        "density_altitude_ft": {
-          "value": 7388,
-          "tolerance": {
-            "abs": 1
-          }
-        },
-        "isa_temp_c": {
-          "value": 5.1,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "crosswind-component",
-      "source_publisher": "Pure geometry (aviation training reference)",
-      "source_title": "HW = ws * cos(angle); CW = ws * sin(angle)",
-      "source_edition_or_year": "Universal",
-      "source_section_or_page": "Worked example: runway 090, wind from 130 at 20 kt -> 40 deg off runway -> HW ~15.32, CW ~12.86",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "runway_heading_deg": 90,
-        "wind_direction_deg": 130,
-        "wind_speed_kt": 20,
-        "demonstrated_crosswind_kt": 15
-      },
-      "outputs": {
-        "wind_angle_off_runway_deg": {
-          "value": 40,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "headwind_kt": {
-          "value": 15.32,
-          "tolerance": {
-            "abs": 0.05
-          }
-        },
-        "crosswind_kt": {
-          "value": 12.86,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "hypoxia-altitude",
-      "source_publisher": "14 CFR §91.211 (eCFR, public)",
-      "source_title": "Supplemental-oxygen cabin-altitude thresholds",
-      "source_edition_or_year": "Current Title 14 CFR",
-      "source_section_or_page": "Worked example cabin 13,000 ft -> 12,500-14,000 band, crew O2 required after 30 min",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "cabin_altitude_ft": 13000
-      },
-      "outputs": {
-        "crew_o2_required": {
-          "value": 1,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "all_occupants_o2_required": {
-          "value": 0,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "band": {
-          "value": "12,500 to 14,000 ft",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "pressure-altitude",
-      "source_publisher": "FAA PHAK (FAA-H-8083-25C, public)",
-      "source_title": "PA = field_elevation + 1000 * (29.92 - altimeter_inHg)",
-      "source_edition_or_year": "Current FAA-H-8083-25C",
-      "source_section_or_page": "Worked example KBJC (5,430 ft) with altimeter 30.12 -> PA 5,230 ft (-200 ft from field)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "field_elevation_ft": 5430,
-        "altimeter_setting_inHg": 30.12
-      },
-      "outputs": {
-        "pressure_altitude_ft": {
-          "value": 5230,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "isa_deviation_inHg": {
-          "value": -0.2,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "phonetic-alphabet",
-      "source_publisher": "ICAO Annex 10 Volume II Chapter 5 / FAA AIM §4-2-7 (public)",
-      "source_title": "ICAO / NATO phonetic alphabet A-Z plus a translator",
-      "source_edition_or_year": "Current ICAO Annex 10",
-      "source_section_or_page": "Worked example: 'N12345' -> translation contains 'November', table has 26 letters",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "text": "N12345"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "ete-eta",
-      "source_publisher": "First-principles arithmetic",
-      "source_title": "ETE = distance / GS; ETA = departure + ETE",
-      "source_edition_or_year": "n/a",
-      "source_section_or_page": "Worked example: 250 nm at 120 kt = 2.0833 hr = 2:05; departure 08:30 + 2:05 = 10:35",
-      "verified_by": "rl",
-      "verified_on": "2026-05-12",
-      "inputs": {
-        "distance_nm": 250,
-        "groundspeed_kt": 120,
-        "departure_time_local": "08:30"
-      },
-      "outputs": {
-        "ete_hours": {
-          "value": 2.0833,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "ete_hhmm": {
-          "value": "02:05",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "eta_local_hhmm": {
-          "value": "10:35",
-          "tolerance": {
-            "abs": 0
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "fuel-planning",
-      "source_publisher": "14 CFR §91.151 / §91.167 (eCFR, public); FAA TCDS fuel-density convention",
-      "source_title": "required = (flight_time + reserve) * burn; lb = gal * 6.0 (avgas) / 6.7 (jet-A)",
-      "source_edition_or_year": "Current Title 14 CFR",
-      "source_section_or_page": "Worked example: 3.0 hr at 10.5 gph + 45 min reserve in avgas -> 31.5 + 7.875 = 39.375 gal = 236.25 lb; meets 91.167 IFR/night-VFR reserve",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "flight_time_hr": 3,
-        "burn_gph": 10.5,
-        "reserve_min": 45,
-        "fuel_type": "avgas",
-        "tank_capacity_gal": 50
-      },
-      "outputs": {
-        "trip_fuel_gal": {
-          "value": 31.5,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "reserve_fuel_gal": {
-          "value": 7.875,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "required_fuel_gal": {
-          "value": 39.375,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "required_fuel_lb": {
-          "value": 236.25,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "wind-triangle",
-      "source_publisher": "FAA PHAK (FAA-H-8083-25C, public) Chapter 16",
-      "source_title": "WCA = asin(crosswind/TAS); GS = TAS*cos(WCA) - headwind",
-      "source_edition_or_year": "Current FAA-H-8083-25C",
-      "source_section_or_page": "Worked example: TC 090, TAS 120 kt, wind 040 at 25 kt -> 50 deg off (left), crosswind -19.15, headwind 16.07, WCA -9.18, TH 080.82, GS 102.39",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "true_course_deg": 90,
-        "true_airspeed_kt": 120,
-        "wind_direction_deg": 40,
-        "wind_speed_kt": 25
-      },
-      "outputs": {
-        "wca_deg": {
-          "value": -9.18,
-          "tolerance": {
-            "abs": 0.05
-          }
-        },
-        "true_heading_deg": {
-          "value": 80.82,
-          "tolerance": {
-            "abs": 0.05
-          }
-        },
-        "ground_speed_kt": {
-          "value": 102.39,
-          "tolerance": {
-            "abs": 0.1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "top-of-descent",
-      "source_publisher": "FAA Instrument Flying Handbook (FAA-H-8083-15B, public)",
-      "source_title": "3-to-1 rule: nm to start = (ft to lose / 1000) * 3; fpm = GS * 5.556",
-      "source_edition_or_year": "Current FAA-H-8083-15B",
-      "source_section_or_page": "Worked example: FL350 -> 5,000 ft at 240 kt GS -> 30,000 ft to lose, 90 nm, 1333 fpm, 22.5 min",
-      "verified_by": "rl",
-      "verified_on": "2026-05-13",
-      "inputs": {
-        "cruise_altitude_ft": 35000,
-        "target_altitude_ft": 5000,
-        "ground_speed_kt": 240
-      },
-      "outputs": {
-        "altitude_to_lose_ft": {
-          "value": 30000,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "distance_to_start_nm": {
-          "value": 90,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "descent_rate_fpm": {
-          "value": 1333.33,
-          "tolerance": {
-            "abs": 0.1
-          }
-        },
-        "time_to_descend_min": {
-          "value": 22.5,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "weather-phrasing",
-      "source_publisher": "FAA AC 00-45H Change 2 / NWS Instruction 10-813",
-      "source_title": "METAR / TAF phrasing reference (cloud cover / intensity / descriptor / phenomena / RVR)",
-      "source_edition_or_year": "Current FAA / NWS",
-      "source_section_or_page": "Returns 7 cloud-cover, 4 intensity, 8 descriptor, 19 phenomena entries plus RVR note",
-      "verified_by": "rl",
-      "verified_on": "2026-05-15",
-      "inputs": {},
-      "outputs": {}
-    },
-    {
-      "tile_id": "transponder-codes",
-      "source_publisher": "FAA AIM §4-1-20 / §6-2-2 / 14 CFR §91.215",
-      "source_title": "Reserved squawk codes and lookup",
-      "source_edition_or_year": "Current AIM",
-      "source_section_or_page": "Lookup 7700 -> EMERGENCY: any in-flight emergency",
-      "verified_by": "rl",
-      "verified_on": "2026-05-15",
-      "inputs": {
-        "code": "7700"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "standard-turn-rate",
-      "source_publisher": "FAA Instrument Flying Handbook (FAA-H-8083-15B, public)",
-      "source_title": "Standard rate turn, rule-of-thumb bank, time to turn through, climb / descent fpm",
-      "source_edition_or_year": "Current FAA-H-8083-15B",
-      "source_section_or_page": "Worked example: TAS 120 kt -> 19 deg bank; turn 90 deg -> 30 sec; 3000 ft over 10 nm at 120 kt GS -> 600 fpm",
-      "verified_by": "rl",
-      "verified_on": "2026-05-15",
-      "inputs": {
-        "true_airspeed_kt": 120,
-        "ground_speed_kt": 120,
-        "altitude_change_ft": 3000,
-        "distance_nm": 10,
-        "turn_through_deg": 90
-      },
-      "outputs": {
-        "bank_rule_of_thumb_deg": {
-          "value": 19,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "time_to_turn_through_sec": {
-          "value": 30,
-          "tolerance": {
-            "abs": 0.001
-          }
-        },
-        "rate_fpm": {
-          "value": 600,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "true-airspeed",
-      "source_publisher": "ICAO Standard Atmosphere / FAA PHAK (FAA-H-8083-25C, public)",
-      "source_title": "TAS = CAS / sqrt(rho/rho_sl) via ISA density-altitude model",
-      "source_edition_or_year": "Current ICAO ISA / FAA-H-8083-25C",
-      "source_section_or_page": "Worked example: CAS 110 kt at PA 8000 / OAT 0 C -> TAS ~ 124.3 kt",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "cas_kt": 110,
-        "pressure_altitude_ft": 8000,
-        "oat_c": 0
-      },
-      "outputs": {
-        "tas_kt": {
-          "value": 124.27,
-          "tolerance": {
-            "abs": 0.5
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "sectional-symbols",
-      "source_publisher": "FAA Aeronautical Chart User's Guide (public)",
-      "source_title": "VFR sectional / TAC chart symbology reference",
-      "source_edition_or_year": "Current FAA chart cycle",
-      "source_section_or_page": "Airspace category surfaces 7 symbol entries (Class B / C / D / E variants / G)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "category": "Airspace"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "aircraft-category",
-      "source_publisher": "14 CFR §1.1 / §61.5 / Parts 23 / 25 (public)",
-      "source_title": "Pilot- and airworthiness-certification category reference",
-      "source_edition_or_year": "Current 14 CFR",
-      "source_section_or_page": "Pilot certification sense returns 7 categories (airplane / rotorcraft / powered-lift / glider / lighter-than-air / weight-shift / powered parachute)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "sense": "pilot_certification"
-      },
-      "outputs": {}
-    },
-    {
-      "tile_id": "magnetic-variation",
-      "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C)",
-      "source_title": "TVMDC: True heading +/- variation = Magnetic heading",
-      "source_edition_or_year": "Chapter 16",
-      "source_section_or_page": "Worked example: True 090 with 7 deg E variation -> 083 magnetic ('East is least')",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "variation_deg": 7,
-        "direction_ew": "east",
-        "heading_deg": 90,
-        "sense": "true_to_magnetic"
-      },
-      "outputs": {
-        "result_heading": {
-          "value": 83,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "metar-decoder",
-      "source_publisher": "FAA AC 00-45H Change 2; NWS FMH-1",
-      "source_title": "METAR field decoder",
-      "source_edition_or_year": "AC 00-45H Change 2",
-      "source_section_or_page": "Canonical example: KJFK 17/15 A2987 -> temperature 17 C, altimeter 29.87 inHg",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "metar": "METAR KJFK 011351Z 18015G25KT 3SM -RA BR BKN015 OVC025 17/15 A2987 RMK AO2 SLP115"
-      },
-      "outputs": {
-        "station": {
-          "value": "KJFK",
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "temperature_c": {
-          "value": 17,
-          "tolerance": {
-            "abs": 0
-          }
-        },
-        "altimeter_inhg": {
-          "value": 29.87,
-          "tolerance": {
-            "abs": 0.001
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "taf-decoder",
-      "source_publisher": "FAA AC 00-45H Change 2; NWS FMH-1; WMO-306",
-      "source_title": "TAF group decoder (prevailing + FM / BECMG / TEMPO / PROB)",
-      "source_edition_or_year": "AC 00-45H Change 2",
-      "source_section_or_page": "Canonical example: KSFO TAF parses to KSFO station and >= 2 groups (prevailing + FM01...)",
-      "verified_by": "rl",
-      "verified_on": "2026-05-16",
-      "inputs": {
-        "taf": "TAF KSFO 011130Z 0112/0218 27012KT P6SM FEW015 FM011600 28015G25KT P6SM SCT020 BKN040 TEMPO 0118/0122 4SM -RA BR BKN015"
-      },
-      "outputs": {
-        "station": {
-          "value": "KSFO",
-          "tolerance": {
-            "abs": 0
           }
         }
       }
@@ -16070,67 +13971,6 @@
       }
     },
     {
-      "tile_id": "pediatric-tube-depth",
-      "source_publisher": "AHA PALS / Broselow",
-      "source_title": "Uncuffed ID = age/4 + 4; depth = ID x 3",
-      "source_edition_or_year": "AHA PALS age-based airway formulas",
-      "source_section_or_page": "4 yr uncuffed -> ID 5.0 mm, depth 15 cm",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "age_years": 4,
-        "cuff": "uncuffed"
-      },
-      "outputs": {
-        "id_mm": {
-          "value": 5,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "depth_cm": {
-          "value": 15,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "weight-shift-fuel-burn",
-      "source_publisher": "FAA Weight & Balance Handbook (FAA-H-8083-1)",
-      "source_title": "weight(t) and CG(t) as fuel burns from a fixed-arm tank",
-      "source_edition_or_year": "FAA-H-8083-1 moment/arm method",
-      "source_section_or_page": "ZFW 1800 lb / mom 158400, 40 gal @ 95 in, 10 gph, 2 hr -> 1920 lb, CG 88.44 in",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "zfw_lb": 1800,
-        "zfw_moment_lbin": 158400,
-        "fuel_gal": 40,
-        "fuel_arm_in": 95,
-        "burn_gph": 10,
-        "elapsed_hr": 2,
-        "lb_per_gal": 6,
-        "fwd_limit_in": 82,
-        "aft_limit_in": 93
-      },
-      "outputs": {
-        "weight_lb": {
-          "value": 1920,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "cg_in": {
-          "value": 88.4375,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
       "tile_id": "depreciation-recapture",
       "source_publisher": "IRS Pub 544 / IRC §1245 / §1250",
       "source_title": "§1250 unrecaptured = min(gain, straight-line) at the 25% max",
@@ -18079,63 +15919,6 @@
       }
     },
     {
-      "tile_id": "federal-post-judgment-interest",
-      "source_publisher": "28 USC 1961 (federal post-judgment interest)",
-      "source_title": "accrued = principal*((1+r)^years - 1), annual compounding",
-      "source_edition_or_year": "28 USC 1961(b)",
-      "source_section_or_page": "$100,000 at 5.00% over 2 yr -> $10,250 accrued, $110,250 owed",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "principal": 100000,
-        "rate_pct": 5,
-        "days_elapsed": 730
-      },
-      "outputs": {
-        "accrued_interest": {
-          "value": 10250,
-          "tolerance": {
-            "abs": 1
-          }
-        },
-        "total_owed": {
-          "value": 110250,
-          "tolerance": {
-            "abs": 1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "lease-rent-proration",
-      "source_publisher": "Lease / state landlord-tenant law + RESPA/CFPB proration conventions",
-      "source_title": "actual-days: prorated = rent/days_in_month * occupied_days",
-      "source_edition_or_year": "12 CFR 1024",
-      "source_section_or_page": "$1,500 rent, March (31 days), 17 occupied -> $822.58 (actual-days)",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "monthly_rent": 1500,
-        "method": "actual",
-        "days_in_month": 31,
-        "occupied_days": 17
-      },
-      "outputs": {
-        "daily_rate": {
-          "value": 48.387,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "prorated_amount": {
-          "value": 822.58,
-          "tolerance": {
-            "abs": 0.05
-          }
-        }
-      }
-    },
-    {
       "tile_id": "primer-tm",
       "source_publisher": "Wallace 1979 / Marmur & Doty 1962 (primer Tm)",
       "source_title": "Wallace Tm = 2(A+T) + 4(G+C)",
@@ -18180,210 +15963,6 @@
           "value": 150000000,
           "tolerance": {
             "pct": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-body-surface-area",
-      "source_publisher": "Meeh formula (Plumb's veterinary K constants)",
-      "source_title": "BSA = K * W_g^(2/3) / 1e4",
-      "source_edition_or_year": "Plumb's",
-      "source_section_or_page": "dog 20 kg -> BSA 0.744 m2",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "species": "dog",
-        "weight_kg": 20,
-        "dose_mg_m2": 0
-      },
-      "outputs": {
-        "bsa_m2": {
-          "value": 0.744,
-          "tolerance": {
-            "abs": 0.005
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-corrected-reticulocyte",
-      "source_publisher": "Schalm's Veterinary Hematology / ASVCP",
-      "source_title": "corrected% = retic% * PCV / normal_PCV",
-      "source_edition_or_year": "Schalm's",
-      "source_section_or_page": "dog 5% retic, PCV 20%, normal 45%, RBC 3e6 -> corrected 2.22%, absolute 150,000/uL",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "retic_pct": 5,
-        "patient_pcv": 20,
-        "normal_pcv": 45,
-        "species": "dog",
-        "rbc": 3000000
-      },
-      "outputs": {
-        "corrected_pct": {
-          "value": 2.222,
-          "tolerance": {
-            "abs": 0.01
-          }
-        },
-        "absolute_ul": {
-          "value": 150000,
-          "tolerance": {
-            "abs": 1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-fluid-deficit",
-      "source_publisher": "DiBartola small-animal fluid therapy + AAHA/AAFP",
-      "source_title": "deficit = %dehy/100 * kg * 1000; rate = total_24h / hours",
-      "source_edition_or_year": "DiBartola",
-      "source_section_or_page": "10 kg, 8% dehydrated, 60 mL/kg/day -> 1400 mL/day, 58 mL/hr",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "weight_kg": 10,
-        "dehydration_pct": 8,
-        "maintenance_ml_kg_day": 60,
-        "ongoing_ml_day": 0,
-        "hours": 24
-      },
-      "outputs": {
-        "total_24h_ml": {
-          "value": 1400,
-          "tolerance": {
-            "abs": 1
-          }
-        },
-        "rate_ml_hr": {
-          "value": 58.33,
-          "tolerance": {
-            "abs": 0.5
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "vet-anion-gap",
-      "source_publisher": "DiBartola / Schalm's (veterinary anion gap)",
-      "source_title": "AG = (Na+K) - (Cl+HCO3)",
-      "source_edition_or_year": "DiBartola",
-      "source_section_or_page": "dog Na 145, K 4.0, Cl 110, HCO3 20 -> AG 19 mEq/L",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "na": 145,
-        "k": 4,
-        "cl": 110,
-        "hco3": 20,
-        "species": "dog"
-      },
-      "outputs": {
-        "anion_gap": {
-          "value": 19,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "cockcroft-gault-crcl",
-      "source_publisher": "Cockcroft & Gault, Nephron 16 (1976)",
-      "source_title": "CrCl = (140-age)*weight*(0.85 if F)/(72*SCr)",
-      "source_edition_or_year": "Nephron 16 (1976)",
-      "source_section_or_page": "70 yr, 72 kg, male, SCr 1.2 -> CrCl 58.3 mL/min",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "age_yr": 70,
-        "weight_kg": 72,
-        "sex": "male",
-        "scr_mgdl": 1.2,
-        "round_scr": false
-      },
-      "outputs": {
-        "crcl_ml_min": {
-          "value": 58.33,
-          "tolerance": {
-            "abs": 0.1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "winters-expected-pco2",
-      "source_publisher": "Albert, Dell & Winters, Ann Intern Med 66 (1967)",
-      "source_title": "expected pCO2 = 1.5 * HCO3 + 8",
-      "source_edition_or_year": "Ann Intern Med 66 (1967)",
-      "source_section_or_page": "HCO3 12 -> expected 26 +/- 2 mmHg",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "hco3": 12,
-        "measured_pco2": 0
-      },
-      "outputs": {
-        "expected_pco2": {
-          "value": 26,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "aa-gradient",
-      "source_publisher": "Alveolar gas equation (West, Respiratory Physiology)",
-      "source_title": "PAO2 = FiO2*(Patm-47) - PaCO2/0.8; A-a = PAO2 - PaO2",
-      "source_edition_or_year": "West",
-      "source_section_or_page": "FiO2 0.21, PaO2 70, PaCO2 40, age 40 -> A-a ~29.7, expected 14",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "fio2": 0.21,
-        "pao2": 70,
-        "paco2": 40,
-        "patm": 760,
-        "age_yr": 40
-      },
-      "outputs": {
-        "aa_gradient": {
-          "value": 29.73,
-          "tolerance": {
-            "abs": 0.1
-          }
-        },
-        "expected_normal": {
-          "value": 14,
-          "tolerance": {
-            "abs": 0.01
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "fena",
-      "source_publisher": "Espinel, JAMA 236 (1976)",
-      "source_title": "FENa% = (UNa*SCr)/(SNa*UCr)*100",
-      "source_edition_or_year": "JAMA 236 (1976)",
-      "source_section_or_page": "SNa 140, UNa 10, SCr 3.0, UCr 100 -> FENa 0.21% (pre-renal)",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "serum_na": 140,
-        "urine_na": 10,
-        "serum_cr": 3,
-        "urine_cr": 100
-      },
-      "outputs": {
-        "fena_pct": {
-          "value": 0.214,
-          "tolerance": {
-            "abs": 0.005
           }
         }
       }
@@ -18573,108 +16152,6 @@
           "value": 0.043,
           "tolerance": {
             "abs": 0.005
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "isa-temp-correction",
-      "source_publisher": "FAA AIM cold-temperature altimetry + ICAO Doc 8168",
-      "source_title": "correction = H * (ISA_station - OAT) * 4 / 1000",
-      "source_edition_or_year": "FAA AIM",
-      "source_section_or_page": "MDA 1000 ft above station, OAT -20 C -> ~140 ft correction",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "oat_c": -20,
-        "station_elev_ft": 0,
-        "published_alt_ft": 1000
-      },
-      "outputs": {
-        "correction_ft": {
-          "value": 140,
-          "tolerance": {
-            "abs": 1
-          }
-        },
-        "corrected_alt_ft": {
-          "value": 1140,
-          "tolerance": {
-            "abs": 1
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "weight-shift-cg",
-      "source_publisher": "FAA Aircraft Weight and Balance Handbook (FAA-H-8083-1)",
-      "source_title": "CG = sum(weight*arm) / sum(weight)",
-      "source_edition_or_year": "FAA-H-8083-1",
-      "source_section_or_page": "empty 1500 lb @36 in + 340/37 + 50/70 + 228/48 -> 2118 lb @ CG 38.25 in, in envelope",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "empty_weight_lb": 1500,
-        "empty_arm_in": 36,
-        "stations": [
-          {
-            "weight": 340,
-            "arm": 37
-          },
-          {
-            "weight": 50,
-            "arm": 70
-          },
-          {
-            "weight": 228,
-            "arm": 48
-          }
-        ],
-        "fwd_limit_in": 35,
-        "aft_limit_in": 47,
-        "max_gross_lb": 2550
-      },
-      "outputs": {
-        "total_weight_lb": {
-          "value": 2118,
-          "tolerance": {
-            "abs": 0.5
-          }
-        },
-        "cg_in": {
-          "value": 38.25,
-          "tolerance": {
-            "abs": 0.02
-          }
-        }
-      }
-    },
-    {
-      "tile_id": "landing-takeoff-da-correction",
-      "source_publisher": "FAA Pilot's Handbook of Aeronautical Knowledge (performance)",
-      "source_title": "DA = PA + 120*(OAT - ISA); corrected = ref*(1 + 0.10*DA/1000)",
-      "source_edition_or_year": "FAA PHAK",
-      "source_section_or_page": "1000-ft roll, PA 5000 ft, OAT +25 C -> DA ~7388 ft, roll ~1739 ft",
-      "verified_by": "rl",
-      "verified_on": "2026-06-06",
-      "inputs": {
-        "ref_roll_ft": 1000,
-        "pressure_alt_ft": 5000,
-        "oat_c": 25,
-        "headwind_kt": 0,
-        "grass": false
-      },
-      "outputs": {
-        "density_alt_ft": {
-          "value": 7388,
-          "tolerance": {
-            "abs": 2
-          }
-        },
-        "corrected_roll_ft": {
-          "value": 1739,
-          "tolerance": {
-            "abs": 2
           }
         }
       }
@@ -23111,12 +20588,36 @@
       "source_section_or_page": "spec-v101 section 2.1 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "pull_type": "straight", "largest_raceway_in": 3, "other_raceways_in": 0 },
+      "inputs": {
+        "pull_type": "straight",
+        "largest_raceway_in": 3,
+        "other_raceways_in": 0
+      },
       "outputs": {
-        "governing": { "value": 24, "tolerance": { "abs": 0 } },
-        "straight_min": { "value": 24, "tolerance": { "abs": 0 } },
-        "angle_min": { "value": 18, "tolerance": { "abs": 0 } },
-        "between": { "value": 18, "tolerance": { "abs": 0 } }
+        "governing": {
+          "value": 24,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "straight_min": {
+          "value": 24,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "angle_min": {
+          "value": 18,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "between": {
+          "value": 18,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23127,11 +20628,30 @@
       "source_section_or_page": "spec-v101 section 2.1 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "pull_type": "angle", "largest_raceway_in": 3, "other_raceways_in": 4 },
+      "inputs": {
+        "pull_type": "angle",
+        "largest_raceway_in": 3,
+        "other_raceways_in": 4
+      },
       "outputs": {
-        "governing": { "value": 22, "tolerance": { "abs": 0 } },
-        "angle_min": { "value": 22, "tolerance": { "abs": 0 } },
-        "between": { "value": 18, "tolerance": { "abs": 0 } }
+        "governing": {
+          "value": 22,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "angle_min": {
+          "value": 22,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "between": {
+          "value": 18,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23142,12 +20662,38 @@
       "source_section_or_page": "spec-v101 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "target_fc": 50, "area_sqft": 1200, "lumens_per_lum": 5000, "cu": 0.7, "llf": 0.8 },
+      "inputs": {
+        "target_fc": 50,
+        "area_sqft": 1200,
+        "lumens_per_lum": 5000,
+        "cu": 0.7,
+        "llf": 0.8
+      },
       "outputs": {
-        "count": { "value": 22, "tolerance": { "abs": 0 } },
-        "count_raw": { "value": 21.43, "tolerance": { "abs": 0.01 } },
-        "achieved_fc": { "value": 51.33, "tolerance": { "abs": 0.1 } },
-        "total_lumens": { "value": 110000, "tolerance": { "abs": 1 } }
+        "count": {
+          "value": 22,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "count_raw": {
+          "value": 21.43,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "achieved_fc": {
+          "value": 51.33,
+          "tolerance": {
+            "abs": 0.1
+          }
+        },
+        "total_lumens": {
+          "value": 110000,
+          "tolerance": {
+            "abs": 1
+          }
+        }
       }
     },
     {
@@ -23158,11 +20704,32 @@
       "source_section_or_page": "spec-v101 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "target_fc": 30, "area_sqft": 5000, "lumens_per_lum": 20000, "cu": 0.8, "llf": 0.85 },
+      "inputs": {
+        "target_fc": 30,
+        "area_sqft": 5000,
+        "lumens_per_lum": 20000,
+        "cu": 0.8,
+        "llf": 0.85
+      },
       "outputs": {
-        "count": { "value": 12, "tolerance": { "abs": 0 } },
-        "count_raw": { "value": 11.03, "tolerance": { "abs": 0.01 } },
-        "achieved_fc": { "value": 32.6, "tolerance": { "abs": 0.1 } }
+        "count": {
+          "value": 12,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "count_raw": {
+          "value": 11.03,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "achieved_fc": {
+          "value": 32.6,
+          "tolerance": {
+            "abs": 0.1
+          }
+        }
       }
     },
     {
@@ -23173,12 +20740,37 @@
       "source_section_or_page": "spec-v102 section 2.1 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "tons": 3, "pints_per_ton_hr": 3, "run_ft": 20, "slope_in_per_ft": 0.125 },
+      "inputs": {
+        "tons": 3,
+        "pints_per_ton_hr": 3,
+        "run_ft": 20,
+        "slope_in_per_ft": 0.125
+      },
       "outputs": {
-        "rate_pints_hr": { "value": 9, "tolerance": { "abs": 0 } },
-        "rate_gph": { "value": 1.125, "tolerance": { "abs": 0.001 } },
-        "min_size_in": { "value": 0.75, "tolerance": { "abs": 0 } },
-        "fall_in": { "value": 2.5, "tolerance": { "abs": 0.001 } }
+        "rate_pints_hr": {
+          "value": 9,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "rate_gph": {
+          "value": 1.125,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "min_size_in": {
+          "value": 0.75,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "fall_in": {
+          "value": 2.5,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23189,10 +20781,25 @@
       "source_section_or_page": "spec-v102 section 2.1 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "tons": 30, "pints_per_ton_hr": 3, "run_ft": 0, "slope_in_per_ft": 0.125 },
+      "inputs": {
+        "tons": 30,
+        "pints_per_ton_hr": 3,
+        "run_ft": 0,
+        "slope_in_per_ft": 0.125
+      },
       "outputs": {
-        "rate_gph": { "value": 11.25, "tolerance": { "abs": 0.001 } },
-        "min_size_in": { "value": 1.0, "tolerance": { "abs": 0 } }
+        "rate_gph": {
+          "value": 11.25,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "min_size_in": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23203,12 +20810,37 @@
       "source_section_or_page": "spec-v102 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "water_capacity_lb": 50, "refrig_density_lb_gal": 9.0, "current_net_lb": 30, "fill_fraction": 0.8 },
+      "inputs": {
+        "water_capacity_lb": 50,
+        "refrig_density_lb_gal": 9,
+        "current_net_lb": 30,
+        "fill_fraction": 0.8
+      },
       "outputs": {
-        "specific_gravity": { "value": 1.079, "tolerance": { "abs": 0.01 } },
-        "max_net_lb": { "value": 43.2, "tolerance": { "abs": 0.1 } },
-        "remaining_lb": { "value": 13.2, "tolerance": { "abs": 0.1 } },
-        "pct_full": { "value": 69.5, "tolerance": { "abs": 0.5 } }
+        "specific_gravity": {
+          "value": 1.079,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "max_net_lb": {
+          "value": 43.2,
+          "tolerance": {
+            "abs": 0.1
+          }
+        },
+        "remaining_lb": {
+          "value": 13.2,
+          "tolerance": {
+            "abs": 0.1
+          }
+        },
+        "pct_full": {
+          "value": 69.5,
+          "tolerance": {
+            "abs": 0.5
+          }
+        }
       }
     },
     {
@@ -23219,9 +20851,19 @@
       "source_section_or_page": "spec-v102 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "water_capacity_lb": 50, "refrig_density_lb_gal": 12.0, "current_net_lb": 0, "fill_fraction": 0.8 },
+      "inputs": {
+        "water_capacity_lb": 50,
+        "refrig_density_lb_gal": 12,
+        "current_net_lb": 0,
+        "fill_fraction": 0.8
+      },
       "outputs": {
-        "max_net_lb": { "value": 57.6, "tolerance": { "abs": 0.1 } }
+        "max_net_lb": {
+          "value": 57.6,
+          "tolerance": {
+            "abs": 0.1
+          }
+        }
       }
     },
     {
@@ -23232,9 +20874,19 @@
       "source_section_or_page": "spec-v102 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "water_capacity_lb": 50, "refrig_density_lb_gal": 9.0, "current_net_lb": 45, "fill_fraction": 0.8 },
+      "inputs": {
+        "water_capacity_lb": 50,
+        "refrig_density_lb_gal": 9,
+        "current_net_lb": 45,
+        "fill_fraction": 0.8
+      },
       "outputs": {
-        "remaining_lb": { "value": 0, "tolerance": { "abs": 0 } }
+        "remaining_lb": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23245,12 +20897,37 @@
       "source_section_or_page": "spec-v104 section 2.1 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "compressor_rla_A": 20, "fan_fla_A": 1.5, "other_load_A": 0, "installed_breaker_A": 35 },
+      "inputs": {
+        "compressor_rla_A": 20,
+        "fan_fla_A": 1.5,
+        "other_load_A": 0,
+        "installed_breaker_A": 35
+      },
       "outputs": {
-        "mca_A": { "value": 26.5, "tolerance": { "abs": 0 } },
-        "mocp_A": { "value": 35, "tolerance": { "abs": 0 } },
-        "mocp_max_A": { "value": 45, "tolerance": { "abs": 0 } },
-        "min_conductor_A": { "value": 26.5, "tolerance": { "abs": 0 } }
+        "mca_A": {
+          "value": 26.5,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "mocp_A": {
+          "value": 35,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "mocp_max_A": {
+          "value": 45,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "min_conductor_A": {
+          "value": 26.5,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23261,11 +20938,31 @@
       "source_section_or_page": "spec-v104 section 2.1 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "compressor_rla_A": 32, "fan_fla_A": 2.3, "other_load_A": 0, "installed_breaker_A": 0 },
+      "inputs": {
+        "compressor_rla_A": 32,
+        "fan_fla_A": 2.3,
+        "other_load_A": 0,
+        "installed_breaker_A": 0
+      },
       "outputs": {
-        "mca_A": { "value": 42.3, "tolerance": { "abs": 0 } },
-        "mocp_A": { "value": 50, "tolerance": { "abs": 0 } },
-        "mocp_max_A": { "value": 70, "tolerance": { "abs": 0 } }
+        "mca_A": {
+          "value": 42.3,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "mocp_A": {
+          "value": 50,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "mocp_max_A": {
+          "value": 70,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23276,12 +20973,37 @@
       "source_section_or_page": "spec-v104 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "rated_uf": 45, "measured_volts_V": 370, "measured_amps_A": 6.2, "tolerance_pct": 6 },
+      "inputs": {
+        "rated_uf": 45,
+        "measured_volts_V": 370,
+        "measured_amps_A": 6.2,
+        "tolerance_pct": 6
+      },
       "outputs": {
-        "measured_uf": { "value": 44.45, "tolerance": { "abs": 0.05 } },
-        "pct_of_rated": { "value": 98.8, "tolerance": { "abs": 0.5 } },
-        "low_uf": { "value": 42.3, "tolerance": { "abs": 0.001 } },
-        "high_uf": { "value": 47.7, "tolerance": { "abs": 0.001 } }
+        "measured_uf": {
+          "value": 44.45,
+          "tolerance": {
+            "abs": 0.05
+          }
+        },
+        "pct_of_rated": {
+          "value": 98.8,
+          "tolerance": {
+            "abs": 0.5
+          }
+        },
+        "low_uf": {
+          "value": 42.3,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "high_uf": {
+          "value": 47.7,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23292,9 +21014,19 @@
       "source_section_or_page": "spec-v104 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "rated_uf": 45, "measured_volts_V": 370, "measured_amps_A": 3.0, "tolerance_pct": 6 },
+      "inputs": {
+        "rated_uf": 45,
+        "measured_volts_V": 370,
+        "measured_amps_A": 3,
+        "tolerance_pct": 6
+      },
       "outputs": {
-        "measured_uf": { "value": 21.51, "tolerance": { "abs": 0.05 } }
+        "measured_uf": {
+          "value": 21.51,
+          "tolerance": {
+            "abs": 0.05
+          }
+        }
       }
     },
     {
@@ -23305,10 +21037,25 @@
       "source_section_or_page": "spec-v105 section 2.1 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "start_micron": 300, "end_micron": 450, "hold_min": 15, "pass_ceiling_micron": 500 },
+      "inputs": {
+        "start_micron": 300,
+        "end_micron": 450,
+        "hold_min": 15,
+        "pass_ceiling_micron": 500
+      },
       "outputs": {
-        "rise_micron": { "value": 150, "tolerance": { "abs": 0 } },
-        "rate_micron_per_min": { "value": 10, "tolerance": { "abs": 0 } }
+        "rise_micron": {
+          "value": 150,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "rate_micron_per_min": {
+          "value": 10,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23319,10 +21066,25 @@
       "source_section_or_page": "spec-v105 section 2.1 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "start_micron": 500, "end_micron": 1200, "hold_min": 15, "pass_ceiling_micron": 500 },
+      "inputs": {
+        "start_micron": 500,
+        "end_micron": 1200,
+        "hold_min": 15,
+        "pass_ceiling_micron": 500
+      },
       "outputs": {
-        "rise_micron": { "value": 700, "tolerance": { "abs": 0 } },
-        "rate_micron_per_min": { "value": 46.6667, "tolerance": { "abs": 0.001 } }
+        "rise_micron": {
+          "value": 700,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "rate_micron_per_min": {
+          "value": 46.6667,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23333,11 +21095,33 @@
       "source_section_or_page": "spec-v105 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "start_psig": 150, "start_temp_F": 70, "end_temp_F": 50, "end_psig": 144, "atm_psi": 14.7, "tolerance_psi": 1 },
+      "inputs": {
+        "start_psig": 150,
+        "start_temp_F": 70,
+        "end_temp_F": 50,
+        "end_psig": 144,
+        "atm_psi": 14.7,
+        "tolerance_psi": 1
+      },
       "outputs": {
-        "expected_psig": { "value": 143.781, "tolerance": { "abs": 0.01 } },
-        "leak_drop_psi": { "value": -0.219, "tolerance": { "abs": 0.01 } },
-        "gauge_change_psi": { "value": -6, "tolerance": { "abs": 0 } }
+        "expected_psig": {
+          "value": 143.781,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "leak_drop_psi": {
+          "value": -0.219,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "gauge_change_psi": {
+          "value": -6,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23348,10 +21132,27 @@
       "source_section_or_page": "spec-v105 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "start_psig": 150, "start_temp_F": 70, "end_temp_F": 50, "end_psig": 138, "atm_psi": 14.7, "tolerance_psi": 1 },
+      "inputs": {
+        "start_psig": 150,
+        "start_temp_F": 70,
+        "end_temp_F": 50,
+        "end_psig": 138,
+        "atm_psi": 14.7,
+        "tolerance_psi": 1
+      },
       "outputs": {
-        "expected_psig": { "value": 143.781, "tolerance": { "abs": 0.01 } },
-        "leak_drop_psi": { "value": 5.781, "tolerance": { "abs": 0.01 } }
+        "expected_psig": {
+          "value": 143.781,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "leak_drop_psi": {
+          "value": 5.781,
+          "tolerance": {
+            "abs": 0.01
+          }
+        }
       }
     },
     {
@@ -23362,11 +21163,31 @@
       "source_section_or_page": "spec-v103 section 2.1 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "diameter_in": 8, "length_ft": 1000, "dose_mg_l": 25, "product_pct": 65 },
+      "inputs": {
+        "diameter_in": 8,
+        "length_ft": 1000,
+        "dose_mg_l": 25,
+        "product_pct": 65
+      },
       "outputs": {
-        "volume_gal": { "value": 2611, "tolerance": { "abs": 1 } },
-        "available_cl_lb": { "value": 0.544, "tolerance": { "abs": 0.005 } },
-        "product_lb": { "value": 0.837, "tolerance": { "abs": 0.005 } }
+        "volume_gal": {
+          "value": 2611,
+          "tolerance": {
+            "abs": 1
+          }
+        },
+        "available_cl_lb": {
+          "value": 0.544,
+          "tolerance": {
+            "abs": 0.005
+          }
+        },
+        "product_lb": {
+          "value": 0.837,
+          "tolerance": {
+            "abs": 0.005
+          }
+        }
       }
     },
     {
@@ -23377,11 +21198,31 @@
       "source_section_or_page": "spec-v103 section 2.1 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "diameter_in": 6, "length_ft": 500, "dose_mg_l": 50, "product_pct": 12.5 },
+      "inputs": {
+        "diameter_in": 6,
+        "length_ft": 500,
+        "dose_mg_l": 50,
+        "product_pct": 12.5
+      },
       "outputs": {
-        "volume_gal": { "value": 734, "tolerance": { "abs": 1 } },
-        "available_cl_lb": { "value": 0.306, "tolerance": { "abs": 0.005 } },
-        "product_lb": { "value": 2.45, "tolerance": { "abs": 0.01 } }
+        "volume_gal": {
+          "value": 734,
+          "tolerance": {
+            "abs": 1
+          }
+        },
+        "available_cl_lb": {
+          "value": 0.306,
+          "tolerance": {
+            "abs": 0.005
+          }
+        },
+        "product_lb": {
+          "value": 2.45,
+          "tolerance": {
+            "abs": 0.01
+          }
+        }
       }
     },
     {
@@ -23392,11 +21233,31 @@
       "source_section_or_page": "spec-v103 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "casing_diameter_in": 6, "water_column_ft": 100, "target_ppm": 100, "bleach_pct": 6 },
+      "inputs": {
+        "casing_diameter_in": 6,
+        "water_column_ft": 100,
+        "target_ppm": 100,
+        "bleach_pct": 6
+      },
       "outputs": {
-        "well_volume_gal": { "value": 147, "tolerance": { "abs": 1 } },
-        "available_cl_lb": { "value": 0.122, "tolerance": { "abs": 0.005 } },
-        "bleach_gal": { "value": 0.245, "tolerance": { "abs": 0.005 } }
+        "well_volume_gal": {
+          "value": 147,
+          "tolerance": {
+            "abs": 1
+          }
+        },
+        "available_cl_lb": {
+          "value": 0.122,
+          "tolerance": {
+            "abs": 0.005
+          }
+        },
+        "bleach_gal": {
+          "value": 0.245,
+          "tolerance": {
+            "abs": 0.005
+          }
+        }
       }
     },
     {
@@ -23407,10 +21268,25 @@
       "source_section_or_page": "spec-v103 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-19",
-      "inputs": { "casing_diameter_in": 4, "water_column_ft": 60, "target_ppm": 200, "bleach_pct": 8.25 },
+      "inputs": {
+        "casing_diameter_in": 4,
+        "water_column_ft": 60,
+        "target_ppm": 200,
+        "bleach_pct": 8.25
+      },
       "outputs": {
-        "well_volume_gal": { "value": 39.2, "tolerance": { "abs": 0.5 } },
-        "bleach_gal": { "value": 0.095, "tolerance": { "abs": 0.005 } }
+        "well_volume_gal": {
+          "value": 39.2,
+          "tolerance": {
+            "abs": 0.5
+          }
+        },
+        "bleach_gal": {
+          "value": 0.095,
+          "tolerance": {
+            "abs": 0.005
+          }
+        }
       }
     },
     {
@@ -23421,10 +21297,24 @@
       "source_section_or_page": "spec-v109 section 2.1 pinned example (250 kcmil Cu service to a ground rod -> 6 AWG)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "service_kcmil": 250, "material": "copper", "electrode_type": "rod-pipe-plate" },
+      "inputs": {
+        "service_kcmil": 250,
+        "material": "copper",
+        "electrode_type": "rod-pipe-plate"
+      },
       "outputs": {
-        "required_gec": { "value": "6", "tolerance": { "abs": 0 } },
-        "base_gec": { "value": "2", "tolerance": { "abs": 0 } }
+        "required_gec": {
+          "value": "6",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "base_gec": {
+          "value": "2",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23435,9 +21325,18 @@
       "source_section_or_page": "spec-v109 section 2.1 cross-check (250 kcmil Cu to a Ufer -> 4 AWG)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "service_kcmil": 250, "material": "copper", "electrode_type": "concrete-encased" },
+      "inputs": {
+        "service_kcmil": 250,
+        "material": "copper",
+        "electrode_type": "concrete-encased"
+      },
       "outputs": {
-        "required_gec": { "value": "4", "tolerance": { "abs": 0 } }
+        "required_gec": {
+          "value": "4",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23448,9 +21347,18 @@
       "source_section_or_page": "spec-v109 section 2.1 cross-check (250 kcmil Cu to water pipe / steel -> 2 AWG)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "service_kcmil": 250, "material": "copper", "electrode_type": "water-pipe-or-steel" },
+      "inputs": {
+        "service_kcmil": 250,
+        "material": "copper",
+        "electrode_type": "water-pipe-or-steel"
+      },
       "outputs": {
-        "required_gec": { "value": "2", "tolerance": { "abs": 0 } }
+        "required_gec": {
+          "value": "2",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23461,9 +21369,18 @@
       "source_section_or_page": "spec-v109 section 2.2 pinned example (350 kcmil Cu service -> 2 AWG)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "mode": "supply-side", "material": "copper", "service_kcmil": 350 },
+      "inputs": {
+        "mode": "supply-side",
+        "material": "copper",
+        "service_kcmil": 350
+      },
       "outputs": {
-        "required_jumper": { "value": "2", "tolerance": { "abs": 0 } }
+        "required_jumper": {
+          "value": "2",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23474,9 +21391,18 @@
       "source_section_or_page": "spec-v109 section 2.2 cross-check (1500 kcmil Cu phase -> 0.125 x 1500 = 187.5 kcmil -> 4/0)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "mode": "supply-side", "material": "copper", "service_kcmil": 1500 },
+      "inputs": {
+        "mode": "supply-side",
+        "material": "copper",
+        "service_kcmil": 1500
+      },
       "outputs": {
-        "required_jumper": { "value": "4/0", "tolerance": { "abs": 0 } }
+        "required_jumper": {
+          "value": "4/0",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23487,9 +21413,19 @@
       "source_section_or_page": "spec-v109 section 2.2 cross-check (400 A OCPD -> 3 AWG Cu, one per raceway)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "mode": "equipment", "material": "copper", "ocpd_A": 400, "parallel_sets": 3 },
+      "inputs": {
+        "mode": "equipment",
+        "material": "copper",
+        "ocpd_A": 400,
+        "parallel_sets": 3
+      },
       "outputs": {
-        "required_jumper": { "value": "3", "tolerance": { "abs": 0 } }
+        "required_jumper": {
+          "value": "3",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23500,12 +21436,39 @@
       "source_section_or_page": "spec-v109 section 2.3 (20 A, 150 ft one-way, 120 V, 3 percent -> 6 AWG Cu, ~2.46 percent; corrects the spec prose, which omitted the single-phase factor of 2)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "phase": "single", "material": "copper", "current_A": 20, "length_ft": 150, "source_voltage_V": 120, "target_percent": 3 },
+      "inputs": {
+        "phase": "single",
+        "material": "copper",
+        "current_A": 20,
+        "length_ft": 150,
+        "source_voltage_V": 120,
+        "target_percent": 3
+      },
       "outputs": {
-        "min_awg_copper": { "value": "6", "tolerance": { "abs": 0 } },
-        "min_awg_aluminum": { "value": "4", "tolerance": { "abs": 0 } },
-        "resulting_drop_V": { "value": 2.948, "tolerance": { "abs": 0.01 } },
-        "resulting_percent": { "value": 2.457, "tolerance": { "abs": 0.01 } }
+        "min_awg_copper": {
+          "value": "6",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "min_awg_aluminum": {
+          "value": "4",
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "resulting_drop_V": {
+          "value": 2.948,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "resulting_percent": {
+          "value": 2.457,
+          "tolerance": {
+            "abs": 0.01
+          }
+        }
       }
     },
     {
@@ -23516,9 +21479,21 @@
       "source_section_or_page": "spec-v109 section 2.3 cross-check (20 A, 150 ft, 120 V, 5 percent -> 8 AWG Cu)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "phase": "single", "material": "copper", "current_A": 20, "length_ft": 150, "source_voltage_V": 120, "target_percent": 5 },
+      "inputs": {
+        "phase": "single",
+        "material": "copper",
+        "current_A": 20,
+        "length_ft": 150,
+        "source_voltage_V": 120,
+        "target_percent": 5
+      },
       "outputs": {
-        "min_awg_copper": { "value": "8", "tolerance": { "abs": 0 } }
+        "min_awg_copper": {
+          "value": "8",
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23529,10 +21504,25 @@
       "source_section_or_page": "spec-v110 section 2.1 pinned example (1 cf dial, 37 sec, 1030 BTU/cf -> 97.30 cfh, ~100,216 BTU/hr)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "sec_per_rev": 37, "dial_size_cf": 1, "heating_value_btu_cf": 1030, "nameplate_input_btuh": 100000 },
+      "inputs": {
+        "sec_per_rev": 37,
+        "dial_size_cf": 1,
+        "heating_value_btu_cf": 1030,
+        "nameplate_input_btuh": 100000
+      },
       "outputs": {
-        "cfh": { "value": 97.297, "tolerance": { "abs": 0.01 } },
-        "actual_input_btuh": { "value": 100216.2, "tolerance": { "abs": 1 } }
+        "cfh": {
+          "value": 97.297,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "actual_input_btuh": {
+          "value": 100216.2,
+          "tolerance": {
+            "abs": 1
+          }
+        }
       }
     },
     {
@@ -23543,10 +21533,24 @@
       "source_section_or_page": "spec-v110 section 2.1 cross-check (160 cfh, 160,000 BTU/hr)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "sec_per_rev": 45, "dial_size_cf": 2, "heating_value_btu_cf": 1000 },
+      "inputs": {
+        "sec_per_rev": 45,
+        "dial_size_cf": 2,
+        "heating_value_btu_cf": 1000
+      },
       "outputs": {
-        "cfh": { "value": 160, "tolerance": { "abs": 0.001 } },
-        "actual_input_btuh": { "value": 160000, "tolerance": { "abs": 1 } }
+        "cfh": {
+          "value": 160,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "actual_input_btuh": {
+          "value": 160000,
+          "tolerance": {
+            "abs": 1
+          }
+        }
       }
     },
     {
@@ -23557,11 +21561,33 @@
       "source_section_or_page": "spec-v110 section 2.2 pinned example (70->120 F, 100k input at 80 percent -> 50 F rise, 1,481 CFM)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "return_air_F": 70, "supply_air_F": 120, "input_btuh": 100000, "efficiency_pct": 80, "rise_min_F": 40, "rise_max_F": 70 },
+      "inputs": {
+        "return_air_F": 70,
+        "supply_air_F": 120,
+        "input_btuh": 100000,
+        "efficiency_pct": 80,
+        "rise_min_F": 40,
+        "rise_max_F": 70
+      },
       "outputs": {
-        "delta_T_F": { "value": 50, "tolerance": { "abs": 0 } },
-        "output_btuh": { "value": 80000, "tolerance": { "abs": 1 } },
-        "cfm": { "value": 1481.48, "tolerance": { "abs": 0.5 } }
+        "delta_T_F": {
+          "value": 50,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "output_btuh": {
+          "value": 80000,
+          "tolerance": {
+            "abs": 1
+          }
+        },
+        "cfm": {
+          "value": 1481.48,
+          "tolerance": {
+            "abs": 0.5
+          }
+        }
       }
     },
     {
@@ -23572,10 +21598,27 @@
       "source_section_or_page": "spec-v110 section 2.2 cross-check (80 F rise, above the 70 max -> rise high, 926 CFM)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "return_air_F": 70, "supply_air_F": 150, "input_btuh": 100000, "efficiency_pct": 80, "rise_min_F": 40, "rise_max_F": 70 },
+      "inputs": {
+        "return_air_F": 70,
+        "supply_air_F": 150,
+        "input_btuh": 100000,
+        "efficiency_pct": 80,
+        "rise_min_F": 40,
+        "rise_max_F": 70
+      },
       "outputs": {
-        "delta_T_F": { "value": 80, "tolerance": { "abs": 0 } },
-        "cfm": { "value": 925.93, "tolerance": { "abs": 0.5 } }
+        "delta_T_F": {
+          "value": 80,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "cfm": {
+          "value": 925.93,
+          "tolerance": {
+            "abs": 0.5
+          }
+        }
       }
     },
     {
@@ -23586,11 +21629,31 @@
       "source_section_or_page": "spec-v111 section 2.1 pinned example (100k at 6,000 ft -> 0.84 factor, 84,000 BTU/hr, kit flag)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "nameplate_input_btuh": 100000, "elevation_ft": 6000, "derate_pct_per_1000": 4, "threshold_ft": 2000 },
+      "inputs": {
+        "nameplate_input_btuh": 100000,
+        "elevation_ft": 6000,
+        "derate_pct_per_1000": 4,
+        "threshold_ft": 2000
+      },
       "outputs": {
-        "steps_1000": { "value": 4, "tolerance": { "abs": 0 } },
-        "factor": { "value": 0.84, "tolerance": { "abs": 0.0001 } },
-        "derated_input_btuh": { "value": 84000, "tolerance": { "abs": 1 } }
+        "steps_1000": {
+          "value": 4,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "factor": {
+          "value": 0.84,
+          "tolerance": {
+            "abs": 0.0001
+          }
+        },
+        "derated_input_btuh": {
+          "value": 84000,
+          "tolerance": {
+            "abs": 1
+          }
+        }
       }
     },
     {
@@ -23601,11 +21664,31 @@
       "source_section_or_page": "spec-v111 section 2.1 cross-check (100k at 2,000 ft -> factor 1.0, 100,000 BTU/hr, no kit)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "nameplate_input_btuh": 100000, "elevation_ft": 2000, "derate_pct_per_1000": 4, "threshold_ft": 2000 },
+      "inputs": {
+        "nameplate_input_btuh": 100000,
+        "elevation_ft": 2000,
+        "derate_pct_per_1000": 4,
+        "threshold_ft": 2000
+      },
       "outputs": {
-        "steps_1000": { "value": 0, "tolerance": { "abs": 0 } },
-        "factor": { "value": 1, "tolerance": { "abs": 0 } },
-        "derated_input_btuh": { "value": 100000, "tolerance": { "abs": 0 } }
+        "steps_1000": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "factor": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "derated_input_btuh": {
+          "value": 100000,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23616,11 +21699,34 @@
       "source_section_or_page": "spec-v111 section 2.2 pinned example (100k NG->LP -> 97.09 / 40.00 cfh, area ratio 0.370)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "appliance_input_btuh": 100000, "hv_from": 1030, "hv_to": 2500, "sg_from": 0.60, "sg_to": 1.52, "p_from": 3.5, "p_to": 11.0 },
+      "inputs": {
+        "appliance_input_btuh": 100000,
+        "hv_from": 1030,
+        "hv_to": 2500,
+        "sg_from": 0.6,
+        "sg_to": 1.52,
+        "p_from": 3.5,
+        "p_to": 11
+      },
       "outputs": {
-        "cfh_from": { "value": 97.087, "tolerance": { "abs": 0.01 } },
-        "cfh_to": { "value": 40, "tolerance": { "abs": 0.01 } },
-        "area_ratio": { "value": 0.3699, "tolerance": { "abs": 0.001 } }
+        "cfh_from": {
+          "value": 97.087,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "cfh_to": {
+          "value": 40,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "area_ratio": {
+          "value": 0.3699,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23631,9 +21737,22 @@
       "source_section_or_page": "spec-v111 section 2.2 cross-check (LP->NG -> area ratio 2.70)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "appliance_input_btuh": 100000, "hv_from": 2500, "hv_to": 1030, "sg_from": 1.52, "sg_to": 0.60, "p_from": 11.0, "p_to": 3.5 },
+      "inputs": {
+        "appliance_input_btuh": 100000,
+        "hv_from": 2500,
+        "hv_to": 1030,
+        "sg_from": 1.52,
+        "sg_to": 0.6,
+        "p_from": 11,
+        "p_to": 3.5
+      },
       "outputs": {
-        "area_ratio": { "value": 2.7035, "tolerance": { "abs": 0.001 } }
+        "area_ratio": {
+          "value": 2.7035,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23644,9 +21763,22 @@
       "source_section_or_page": "spec-v111 section 2.2 sanity (cfh_to = cfh_from, area ratio 1.000)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "appliance_input_btuh": 100000, "hv_from": 1030, "hv_to": 1030, "sg_from": 0.60, "sg_to": 0.60, "p_from": 3.5, "p_to": 3.5 },
+      "inputs": {
+        "appliance_input_btuh": 100000,
+        "hv_from": 1030,
+        "hv_to": 1030,
+        "sg_from": 0.6,
+        "sg_to": 0.6,
+        "p_from": 3.5,
+        "p_to": 3.5
+      },
       "outputs": {
-        "area_ratio": { "value": 1, "tolerance": { "abs": 0.000001 } }
+        "area_ratio": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0.000001
+          }
+        }
       }
     },
     {
@@ -23657,11 +21789,33 @@
       "source_section_or_page": "spec-v112 section 2.1 pinned example (50 gal / 40k / 80% / 90 F / 0.70 -> 42.7 gph recovery, 77.7 gph FHR, short by 2.3)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "tank_gal": 50, "input_btuh": 40000, "efficiency_pct": 80, "rise_F": 90, "usable_fraction": 0.70, "peak_hour_gal": 80 },
+      "inputs": {
+        "tank_gal": 50,
+        "input_btuh": 40000,
+        "efficiency_pct": 80,
+        "rise_F": 90,
+        "usable_fraction": 0.7,
+        "peak_hour_gal": 80
+      },
       "outputs": {
-        "recovery_gph": { "value": 42.6837, "tolerance": { "abs": 0.001 } },
-        "fhr_gph": { "value": 77.6837, "tolerance": { "abs": 0.001 } },
-        "short_by_gph": { "value": 2.3163, "tolerance": { "abs": 0.001 } }
+        "recovery_gph": {
+          "value": 42.6837,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "fhr_gph": {
+          "value": 77.6837,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "short_by_gph": {
+          "value": 2.3163,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23672,11 +21826,33 @@
       "source_section_or_page": "spec-v112 section 2.1 cross-check (50 gal / 50k / 80% / 90 F / 0.70 -> 53.4 gph recovery, 88.4 gph FHR, adequate)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "tank_gal": 50, "input_btuh": 50000, "efficiency_pct": 80, "rise_F": 90, "usable_fraction": 0.70, "peak_hour_gal": 80 },
+      "inputs": {
+        "tank_gal": 50,
+        "input_btuh": 50000,
+        "efficiency_pct": 80,
+        "rise_F": 90,
+        "usable_fraction": 0.7,
+        "peak_hour_gal": 80
+      },
       "outputs": {
-        "recovery_gph": { "value": 53.3547, "tolerance": { "abs": 0.001 } },
-        "fhr_gph": { "value": 88.3547, "tolerance": { "abs": 0.001 } },
-        "short_by_gph": { "value": 0, "tolerance": { "abs": 0 } }
+        "recovery_gph": {
+          "value": 53.3547,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "fhr_gph": {
+          "value": 88.3547,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "short_by_gph": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23687,14 +21863,51 @@
       "source_section_or_page": "spec-v113 section 2.1 pinned example (48 in surface, 36 in guard, 3.5 in infill, level run -> all pass)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "occupancy": "residential", "surface_height_in": 48, "measured_guard_in": 36, "measured_infill_gap_in": 3.5, "at_stairs": "no", "measured_handrail_in": 36 },
+      "inputs": {
+        "occupancy": "residential",
+        "surface_height_in": 48,
+        "measured_guard_in": 36,
+        "measured_infill_gap_in": 3.5,
+        "at_stairs": "no",
+        "measured_handrail_in": 36
+      },
       "outputs": {
-        "guard_required": { "value": 1, "tolerance": { "abs": 0 } },
-        "min_guard": { "value": 36, "tolerance": { "abs": 0 } },
-        "max_infill": { "value": 4.0, "tolerance": { "abs": 0 } },
-        "guard_ok": { "value": 1, "tolerance": { "abs": 0 } },
-        "infill_ok": { "value": 1, "tolerance": { "abs": 0 } },
-        "all_pass": { "value": 1, "tolerance": { "abs": 0 } }
+        "guard_required": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "min_guard": {
+          "value": 36,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "max_infill": {
+          "value": 4,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "guard_ok": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "infill_ok": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "all_pass": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23705,11 +21918,33 @@
       "source_section_or_page": "spec-v113 section 2.1 cross-check (34 in guard, 4.5 in infill -> guard and infill fail)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "occupancy": "residential", "surface_height_in": 48, "measured_guard_in": 34, "measured_infill_gap_in": 4.5, "at_stairs": "no", "measured_handrail_in": 36 },
+      "inputs": {
+        "occupancy": "residential",
+        "surface_height_in": 48,
+        "measured_guard_in": 34,
+        "measured_infill_gap_in": 4.5,
+        "at_stairs": "no",
+        "measured_handrail_in": 36
+      },
       "outputs": {
-        "guard_ok": { "value": 0, "tolerance": { "abs": 0 } },
-        "infill_ok": { "value": 0, "tolerance": { "abs": 0 } },
-        "all_pass": { "value": 0, "tolerance": { "abs": 0 } }
+        "guard_ok": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "infill_ok": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "all_pass": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23720,10 +21955,23 @@
       "source_section_or_page": "spec-v114 section 2.1 pinned example (1.125 in, 50 psi -> 266 gpm)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "bore_in": 1.125, "nozzle_pressure_psi": 50 },
+      "inputs": {
+        "bore_in": 1.125,
+        "nozzle_pressure_psi": 50
+      },
       "outputs": {
-        "gpm": { "value": 265.7948, "tolerance": { "abs": 0.01 } },
-        "reaction_lb": { "value": 99.3516, "tolerance": { "abs": 0.01 } }
+        "gpm": {
+          "value": 265.7948,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "reaction_lb": {
+          "value": 99.3516,
+          "tolerance": {
+            "abs": 0.01
+          }
+        }
       }
     },
     {
@@ -23734,9 +21982,17 @@
       "source_section_or_page": "spec-v114 section 2.1 cross-check (1.5 in, 80 psi -> 598 gpm)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "bore_in": 1.5, "nozzle_pressure_psi": 80 },
+      "inputs": {
+        "bore_in": 1.5,
+        "nozzle_pressure_psi": 80
+      },
       "outputs": {
-        "gpm": { "value": 597.7010, "tolerance": { "abs": 0.01 } }
+        "gpm": {
+          "value": 597.701,
+          "tolerance": {
+            "abs": 0.01
+          }
+        }
       }
     },
     {
@@ -23747,12 +22003,37 @@
       "source_section_or_page": "spec-v115 section 2.1 pinned example (18k + 60k = 78k, +2k margins -> ok)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "gcwr_lb": 80000, "tractor_weight_lb": 18000, "trailer_weight_lb": 60000, "federal_max_lb": 80000 },
+      "inputs": {
+        "gcwr_lb": 80000,
+        "tractor_weight_lb": 18000,
+        "trailer_weight_lb": 60000,
+        "federal_max_lb": 80000
+      },
       "outputs": {
-        "combined_lb": { "value": 78000, "tolerance": { "abs": 0 } },
-        "margin_gcwr": { "value": 2000, "tolerance": { "abs": 0 } },
-        "margin_fed": { "value": 2000, "tolerance": { "abs": 0 } },
-        "ok": { "value": 1, "tolerance": { "abs": 0 } }
+        "combined_lb": {
+          "value": 78000,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "margin_gcwr": {
+          "value": 2000,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "margin_fed": {
+          "value": 2000,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "ok": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23763,11 +22044,31 @@
       "source_section_or_page": "spec-v115 section 2.1 cross-check (18k + 65k = 83k -> over by 3,000)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "gcwr_lb": 80000, "tractor_weight_lb": 18000, "trailer_weight_lb": 65000, "federal_max_lb": 80000 },
+      "inputs": {
+        "gcwr_lb": 80000,
+        "tractor_weight_lb": 18000,
+        "trailer_weight_lb": 65000,
+        "federal_max_lb": 80000
+      },
       "outputs": {
-        "combined_lb": { "value": 83000, "tolerance": { "abs": 0 } },
-        "over_by": { "value": 3000, "tolerance": { "abs": 0 } },
-        "ok": { "value": 0, "tolerance": { "abs": 0 } }
+        "combined_lb": {
+          "value": 83000,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "over_by": {
+          "value": 3000,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "ok": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23778,11 +22079,30 @@
       "source_section_or_page": "spec-v115 section 2.2 pinned example (capacity 12,350, util 97.2% -> ok)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "axle_weight_lb": 12000, "tires_on_axle": 2, "tire_max_load_lb": 6175 },
+      "inputs": {
+        "axle_weight_lb": 12000,
+        "tires_on_axle": 2,
+        "tire_max_load_lb": 6175
+      },
       "outputs": {
-        "axle_capacity_lb": { "value": 12350, "tolerance": { "abs": 0 } },
-        "utilization_pct": { "value": 97.166, "tolerance": { "abs": 0.01 } },
-        "ok": { "value": 1, "tolerance": { "abs": 0 } }
+        "axle_capacity_lb": {
+          "value": 12350,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "utilization_pct": {
+          "value": 97.166,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "ok": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23793,10 +22113,24 @@
       "source_section_or_page": "spec-v115 section 2.2 cross-check (12,500 vs 12,350 -> over by 150)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "axle_weight_lb": 12500, "tires_on_axle": 2, "tire_max_load_lb": 6175 },
+      "inputs": {
+        "axle_weight_lb": 12500,
+        "tires_on_axle": 2,
+        "tire_max_load_lb": 6175
+      },
       "outputs": {
-        "over_by": { "value": 150, "tolerance": { "abs": 0 } },
-        "ok": { "value": 0, "tolerance": { "abs": 0 } }
+        "over_by": {
+          "value": 150,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "ok": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23807,11 +22141,30 @@
       "source_section_or_page": "spec-v116 section 2.1 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "applied_mg_l": 3.0, "measured_residual_mg_l": 0.8, "target_residual_mg_l": 1.0 },
+      "inputs": {
+        "applied_mg_l": 3,
+        "measured_residual_mg_l": 0.8,
+        "target_residual_mg_l": 1
+      },
       "outputs": {
-        "demand_mg_l": { "value": 2.2, "tolerance": { "abs": 0.001 } },
-        "dose_for_target_mg_l": { "value": 3.2, "tolerance": { "abs": 0.001 } },
-        "high_demand": { "value": 0, "tolerance": { "abs": 0 } }
+        "demand_mg_l": {
+          "value": 2.2,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "dose_for_target_mg_l": {
+          "value": 3.2,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "high_demand": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23822,11 +22175,30 @@
       "source_section_or_page": "spec-v116 section 2.1 cross-check (high demand flag)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "applied_mg_l": 5.0, "measured_residual_mg_l": 0.5, "target_residual_mg_l": 1.0 },
+      "inputs": {
+        "applied_mg_l": 5,
+        "measured_residual_mg_l": 0.5,
+        "target_residual_mg_l": 1
+      },
       "outputs": {
-        "demand_mg_l": { "value": 4.5, "tolerance": { "abs": 0.001 } },
-        "dose_for_target_mg_l": { "value": 5.5, "tolerance": { "abs": 0.001 } },
-        "high_demand": { "value": 1, "tolerance": { "abs": 0 } }
+        "demand_mg_l": {
+          "value": 4.5,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "dose_for_target_mg_l": {
+          "value": 5.5,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "high_demand": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23837,10 +22209,24 @@
       "source_section_or_page": "spec-v116 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "intensity_mw_cm2": 10, "exposure_time_s": 5, "target_dose_mj_cm2": 40 },
+      "inputs": {
+        "intensity_mw_cm2": 10,
+        "exposure_time_s": 5,
+        "target_dose_mj_cm2": 40
+      },
       "outputs": {
-        "dose_mj_cm2": { "value": 50, "tolerance": { "abs": 0.001 } },
-        "meets": { "value": 1, "tolerance": { "abs": 0 } }
+        "dose_mj_cm2": {
+          "value": 50,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "meets": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23851,10 +22237,24 @@
       "source_section_or_page": "spec-v116 section 2.2 cross-check (short dose)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "intensity_mw_cm2": 6, "exposure_time_s": 5, "target_dose_mj_cm2": 40 },
+      "inputs": {
+        "intensity_mw_cm2": 6,
+        "exposure_time_s": 5,
+        "target_dose_mj_cm2": 40
+      },
       "outputs": {
-        "dose_mj_cm2": { "value": 30, "tolerance": { "abs": 0.001 } },
-        "meets": { "value": 0, "tolerance": { "abs": 0 } }
+        "dose_mj_cm2": {
+          "value": 30,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "meets": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23865,12 +22265,36 @@
       "source_section_or_page": "spec-v117 section 2.1 pinned example (4,619 lb/leg, 2,309 equal-share, factor 1.155)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "total_load_lb": 8000, "num_legs": 4, "horizontal_angle_deg": 60 },
+      "inputs": {
+        "total_load_lb": 8000,
+        "num_legs": 4,
+        "horizontal_angle_deg": 60
+      },
       "outputs": {
-        "tension_per_leg_lb": { "value": 4618.802, "tolerance": { "abs": 0.01 } },
-        "equal_share_lb": { "value": 2309.401, "tolerance": { "abs": 0.01 } },
-        "load_factor": { "value": 1.1547, "tolerance": { "abs": 0.0001 } },
-        "share_legs": { "value": 2, "tolerance": { "abs": 0 } }
+        "tension_per_leg_lb": {
+          "value": 4618.802,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "equal_share_lb": {
+          "value": 2309.401,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "load_factor": {
+          "value": 1.1547,
+          "tolerance": {
+            "abs": 0.0001
+          }
+        },
+        "share_legs": {
+          "value": 2,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23881,10 +22305,24 @@
       "source_section_or_page": "spec-v117 section 2.1 cross-check (5,657 lb/leg, factor 1.414)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "total_load_lb": 8000, "num_legs": 4, "horizontal_angle_deg": 45 },
+      "inputs": {
+        "total_load_lb": 8000,
+        "num_legs": 4,
+        "horizontal_angle_deg": 45
+      },
       "outputs": {
-        "tension_per_leg_lb": { "value": 5656.854, "tolerance": { "abs": 0.01 } },
-        "load_factor": { "value": 1.41421, "tolerance": { "abs": 0.0001 } }
+        "tension_per_leg_lb": {
+          "value": 5656.854,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "load_factor": {
+          "value": 1.41421,
+          "tolerance": {
+            "abs": 0.0001
+          }
+        }
       }
     },
     {
@@ -23895,10 +22333,24 @@
       "source_section_or_page": "spec-v117 section 2.2 pinned example",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "diameter_in": 0.5, "construction_factor": 46, "design_factor": 5 },
+      "inputs": {
+        "diameter_in": 0.5,
+        "construction_factor": 46,
+        "design_factor": 5
+      },
       "outputs": {
-        "mbs_tons": { "value": 11.5, "tolerance": { "abs": 0.001 } },
-        "wll_tons": { "value": 2.3, "tolerance": { "abs": 0.001 } }
+        "mbs_tons": {
+          "value": 11.5,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "wll_tons": {
+          "value": 2.3,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23909,10 +22361,24 @@
       "source_section_or_page": "spec-v117 section 2.2 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "diameter_in": 0.75, "construction_factor": 46, "design_factor": 5 },
+      "inputs": {
+        "diameter_in": 0.75,
+        "construction_factor": 46,
+        "design_factor": 5
+      },
       "outputs": {
-        "mbs_tons": { "value": 25.875, "tolerance": { "abs": 0.001 } },
-        "wll_tons": { "value": 5.175, "tolerance": { "abs": 0.001 } }
+        "mbs_tons": {
+          "value": 25.875,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "wll_tons": {
+          "value": 5.175,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
       }
     },
     {
@@ -23923,11 +22389,31 @@
       "source_section_or_page": "spec-v118 section 2.1 pinned example (over the 18% ceiling)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "bale_weight_lb": 1200, "moisture_pct": 22, "target_moisture_pct": 15, "safe_threshold_pct": 18 },
+      "inputs": {
+        "bale_weight_lb": 1200,
+        "moisture_pct": 22,
+        "target_moisture_pct": 15,
+        "safe_threshold_pct": 18
+      },
       "outputs": {
-        "dry_matter_lb": { "value": 936, "tolerance": { "abs": 0.01 } },
-        "weight_at_target_lb": { "value": 1101.176, "tolerance": { "abs": 0.01 } },
-        "over_threshold": { "value": 1, "tolerance": { "abs": 0 } }
+        "dry_matter_lb": {
+          "value": 936,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "weight_at_target_lb": {
+          "value": 1101.176,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "over_threshold": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23938,10 +22424,25 @@
       "source_section_or_page": "spec-v118 section 2.1 cross-check (under the ceiling)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "bale_weight_lb": 1200, "moisture_pct": 14, "target_moisture_pct": 15, "safe_threshold_pct": 18 },
+      "inputs": {
+        "bale_weight_lb": 1200,
+        "moisture_pct": 14,
+        "target_moisture_pct": 15,
+        "safe_threshold_pct": 18
+      },
       "outputs": {
-        "dry_matter_lb": { "value": 1032, "tolerance": { "abs": 0.01 } },
-        "over_threshold": { "value": 0, "tolerance": { "abs": 0 } }
+        "dry_matter_lb": {
+          "value": 1032,
+          "tolerance": {
+            "abs": 0.01
+          }
+        },
+        "over_threshold": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
       }
     },
     {
@@ -23952,9 +22453,17 @@
       "source_section_or_page": "spec-v119 section 2.1 pinned example (textbook ~9.1%)",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "temperature_F": 70, "rh_pct": 50 },
+      "inputs": {
+        "temperature_F": 70,
+        "rh_pct": 50
+      },
       "outputs": {
-        "emc_pct": { "value": 9.246, "tolerance": { "abs": 0.05 } }
+        "emc_pct": {
+          "value": 9.246,
+          "tolerance": {
+            "abs": 0.05
+          }
+        }
       }
     },
     {
@@ -23965,9 +22474,17 @@
       "source_section_or_page": "spec-v119 section 2.1 cross-check",
       "verified_by": "rl",
       "verified_on": "2026-06-20",
-      "inputs": { "temperature_F": 70, "rh_pct": 30 },
+      "inputs": {
+        "temperature_F": 70,
+        "rh_pct": 30
+      },
       "outputs": {
-        "emc_pct": { "value": 6.172, "tolerance": { "abs": 0.05 } }
+        "emc_pct": {
+          "value": 6.172,
+          "tolerance": {
+            "abs": 0.05
+          }
+        }
       }
     }
   ]

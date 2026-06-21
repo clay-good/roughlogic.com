@@ -168,8 +168,6 @@ import { computeDryingChamberCO2 } from "../../calc-restoration.js";
 import { computePesticideReiPhi } from "../../calc-agriculture.js";
 import { computeBackflowTestPSI } from "../../calc-water.js";
 import { computeGelPercentAgarose } from "../../calc-lab.js";
-import { computePediatricTubeDepth } from "../../calc-ems.js";
-import { computeWeightShiftFuelBurn } from "../../calc-aviation.js";
 import { computeDepreciationRecapture, computeRentRollVacancy } from "../../calc-realestate.js";
 
 // E.1 wall-bracing-length
@@ -317,32 +315,6 @@ test("gel-percent-agarose: override percent used; clamped to band; no size/perce
   assert.strictEqual(computeGelPercentAgarose({ gel_percent: 5, buffer_volume_ml: 100 }).used_percent, 3);
   assert.ok("error" in computeGelPercentAgarose({ buffer_volume_ml: 100 }));
   assert.ok("error" in computeGelPercentAgarose({ target_bp_high: 10000, buffer_volume_ml: 0 }));
-});
-
-// V.1 pediatric-tube-depth
-test("pediatric-tube-depth: 4 yr uncuffed -> ID 5.0 mm, depth 15 cm; cuffed lowers by 0.5", () => {
-  const r = computePediatricTubeDepth({ age_years: 4, cuff: "uncuffed" });
-  assert.ok(Math.abs(r.id_mm - 5) < 1e-9);
-  assert.ok(Math.abs(r.depth_cm - 15) < 1e-9);
-  assert.ok(Math.abs(computePediatricTubeDepth({ age_years: 4, cuff: "cuffed" }).id_mm - 4.5) < 1e-9);
-});
-test("pediatric-tube-depth: neonate flagged below 1 yr; negative age rejected", () => {
-  assert.strictEqual(computePediatricTubeDepth({ age_years: 0.5 }).neonate, true);
-  assert.ok("error" in computePediatricTubeDepth({ age_years: -1 }));
-});
-
-// W.1 weight-shift-fuel-burn
-test("weight-shift-fuel-burn: 40 gal @ 95 in, 10 gph, 2 hr -> 1920 lb, CG 88.44 in within envelope", () => {
-  const r = computeWeightShiftFuelBurn({ zfw_lb: 1800, zfw_moment_lbin: 158400, fuel_gal: 40, fuel_arm_in: 95, burn_gph: 10, elapsed_hr: 2, lb_per_gal: 6, fwd_limit_in: 82, aft_limit_in: 93 });
-  assert.ok(Math.abs(r.weight_lb - 1920) < 1e-9);
-  assert.ok(Math.abs(r.cg_in - 88.4375) < 1e-6);
-  assert.strictEqual(r.within_limits, true);
-});
-test("weight-shift-fuel-burn: a forward fuel arm drives CG aft to the limit; ZFW <= 0 rejected", () => {
-  // fuel arm 40 in (forward of the ~80 in CG): burning fuel moves CG aft.
-  const r = computeWeightShiftFuelBurn({ zfw_lb: 1800, zfw_moment_lbin: 144000, fuel_gal: 40, fuel_arm_in: 40, burn_gph: 10, elapsed_hr: 0, lb_per_gal: 6, fwd_limit_in: 70, aft_limit_in: 79 });
-  assert.ok(r.fuel_to_aft_gal !== null && Number.isFinite(r.fuel_to_aft_gal));
-  assert.ok("error" in computeWeightShiftFuelBurn({ zfw_lb: 0, fuel_gal: 40 }));
 });
 
 // X.1 depreciation-recapture

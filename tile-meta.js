@@ -38,52 +38,8 @@ const SIMPLIFIED = new Set([
   "sous-vide-pasteurization",
   // v12 Group V (EMS / Pre-hospital): every tile carries the
   // medical-director-governs limitation banner per spec-v12 §6.
-  "glasgow-coma-scale",
-  "parkland-formula",
-  "cincinnati-stroke-scale",
-  "apgar-score",
-  "iv-drip-rate",
-  "o2-cylinder-duration",
-  "pediatric-weight-estimate",
-  "shock-index",
-  "mean-arterial-pressure",
-  "anion-gap",
-  "corrected-calcium",
-  "cha2ds2-vasc",
-  "wells-dvt",
-  "wells-pe",
-  "perc-rule",
-  "rule-of-9s",
-  "pediatric-vitals",
-  "nihss",
-  "start-triage",
-  "pediatric-tube-depth",
-  "drug-concentration",
-  "ideal-body-weight",
-  "corrected-qt",
   // v12 Group U (Veterinary): every tile carries the veterinarian-
   // governs limitation banner per spec-v12 §5.
-  "vet-weight-based-dose",
-  "vet-maintenance-fluid",
-  "vet-energy-requirement",
-  "vet-bcs-reference",
-  "vet-pet-age",
-  "vet-gestation",
-  "vet-ett-sizing",
-  "vet-anesthesia-vitals",
-  "vet-asa-classification",
-  "vet-bloodwork-ranges",
-  "vet-urine-sg",
-  "vet-target-weight-loss",
-  "vet-toxicity",
-  "vet-breed-predispositions",
-  "vet-plasma-css",
-  "vet-vaccine-schedule",
-  "vet-heartworm-dose",
-  "vet-crystalloid-plan",
-  "vet-cri",
-  "vet-transfusion",
-  "equine-weight",
 ]);
 
 // Tiles whose answer is the meter reading, not the calculation. The
@@ -104,27 +60,14 @@ const FIELD_METER = new Set([
 // Every tile id + its group. Source of truth: TOOLS in app.js.
 // Lint check-tile-meta.mjs verifies this stays in sync.
 const _TILES = [
-  ["isa-temp-correction", "W"],
-  ["weight-shift-cg", "W"],
-  ["landing-takeoff-da-correction", "W"],
   ["final-grade-needed", "Y"],
   ["category-weighted-grade", "Y"],
   ["two-sample-t-test", "Y"],
   ["gross-rent-multiplier", "X"],
   ["pmi-cancellation-date", "X"],
   ["seller-net-sheet", "X"],
-  ["cockcroft-gault-crcl", "V"],
-  ["winters-expected-pco2", "V"],
-  ["aa-gradient", "V"],
-  ["fena", "V"],
-  ["vet-body-surface-area", "U"],
-  ["vet-corrected-reticulocyte", "U"],
-  ["vet-fluid-deficit", "U"],
-  ["vet-anion-gap", "U"],
   ["primer-tm", "T"],
   ["cfu-plate-count", "T"],
-  ["federal-post-judgment-interest", "S"],
-  ["lease-rent-proration", "S"],
   ["declining-balance-depreciation", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],
@@ -266,7 +209,7 @@ const _TILES = [
   ["hos-math", "J"], ["bridge-formula", "J"], ["reefer-burn", "J"],
   ["incoterm-decoder", "J"], ["stopping-sight-distance", "J"],
 
-  ["weight-balance", "K"], ["prop-slip", "K"], ["displacement-cr", "K"],
+  ["prop-slip", "K"], ["displacement-cr", "K"],
   ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["fuel-range", "K"],
   ["tire-gearing", "K"], ["brake-pad-life", "K"],
   ["valve-flow-coefficient", "K"],
@@ -310,10 +253,6 @@ const _TILES = [
   ["inventory-turnover", "R"], ["cash-conversion-cycle", "R"], ["mileage-rollup", "R"],
   ["home-office", "R"],
 
-  ["judgment-interest", "S"], ["court-deadline", "S"], ["statute-of-limitations", "S"],
-  ["small-claims-reference", "S"], ["tenant-notice", "S"], ["wage-hour", "S"],
-  ["contractor-vs-employee", "S"], ["contract-clause-reference", "S"], ["lease-term-reference", "S"],
-  ["wage-garnishment", "S"],
 
   ["molarity-dilution", "T"], ["serial-dilution", "T"], ["molecular-weight", "T"],
   ["mass-moles", "T"], ["rcf-rpm", "T"], ["resuspension-volume", "T"],
@@ -321,32 +260,10 @@ const _TILES = [
   ["hemocytometer", "T"], ["od600-cell-count", "T"],
 
   // v12 Group U: Veterinary.
-  ["vet-weight-based-dose", "U"], ["vet-maintenance-fluid", "U"], ["vet-energy-requirement", "U"],
-  ["vet-bcs-reference", "U"], ["vet-pet-age", "U"], ["vet-gestation", "U"],
-  ["vet-ett-sizing", "U"], ["vet-anesthesia-vitals", "U"], ["vet-asa-classification", "U"],
-  ["vet-bloodwork-ranges", "U"], ["vet-urine-sg", "U"], ["vet-target-weight-loss", "U"],
-  ["vet-toxicity", "U"], ["vet-breed-predispositions", "U"], ["vet-plasma-css", "U"],
-  ["vet-vaccine-schedule", "U"], ["vet-heartworm-dose", "U"], ["vet-crystalloid-plan", "U"],
-  ["vet-cri", "U"], ["vet-transfusion", "U"], ["equine-weight", "U"],
 
   // v12 Group V: EMS / Pre-hospital.
-  ["glasgow-coma-scale", "V"], ["parkland-formula", "V"], ["cincinnati-stroke-scale", "V"],
-  ["apgar-score", "V"], ["iv-drip-rate", "V"], ["o2-cylinder-duration", "V"],
-  ["pediatric-weight-estimate", "V"], ["shock-index", "V"], ["mean-arterial-pressure", "V"],
-  ["anion-gap", "V"], ["corrected-calcium", "V"], ["cha2ds2-vasc", "V"],
-  ["wells-dvt", "V"], ["wells-pe", "V"], ["perc-rule", "V"],
-  ["rule-of-9s", "V"], ["pediatric-vitals", "V"], ["nihss", "V"],
-  ["start-triage", "V"], ["drug-concentration", "V"],
-  ["ideal-body-weight", "V"], ["corrected-qt", "V"],
 
   // v12 Group W: Pilots / Aviation.
-  ["density-altitude", "W"], ["crosswind-component", "W"], ["ete-eta", "W"],
-  ["hypoxia-altitude", "W"], ["pressure-altitude", "W"], ["phonetic-alphabet", "W"],
-  ["fuel-planning", "W"], ["wind-triangle", "W"], ["top-of-descent", "W"],
-  ["weather-phrasing", "W"], ["transponder-codes", "W"], ["standard-turn-rate", "W"],
-  ["true-airspeed", "W"], ["sectional-symbols", "W"], ["aircraft-category", "W"],
-  ["magnetic-variation", "W"], ["metar-decoder", "W"], ["taf-decoder", "W"],
-  ["holding-fuel", "W"],
 
   // v12 Group X: Real Estate.
   ["ltv", "X"], ["dti", "X"], ["piti", "X"],
@@ -386,8 +303,6 @@ const _TILES = [
   ["pesticide-rei-phi", "L"],
   ["backflow-test-psi", "M"],
   ["gel-percent-agarose", "T"],
-  ["pediatric-tube-depth", "V"],
-  ["weight-shift-fuel-burn", "W"],
   ["depreciation-recapture", "X"], ["rent-roll-vacancy", "X"],
 
   // v26 electrician / plumber / pipefitter (Groups A, B, G)

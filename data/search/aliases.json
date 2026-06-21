@@ -4,51 +4,6 @@
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
     {
-      "term": "cold temperature correction",
-      "target": "isa-temp-correction",
-      "kind": "industry"
-    },
-    {
-      "term": "altimeter cold weather",
-      "target": "isa-temp-correction",
-      "kind": "redirect"
-    },
-    {
-      "term": "isa deviation altitude",
-      "target": "isa-temp-correction",
-      "kind": "adjacent"
-    },
-    {
-      "term": "weight and balance",
-      "target": "weight-shift-cg",
-      "kind": "industry"
-    },
-    {
-      "term": "cg calculation",
-      "target": "weight-shift-cg",
-      "kind": "redirect"
-    },
-    {
-      "term": "center of gravity aircraft",
-      "target": "weight-shift-cg",
-      "kind": "adjacent"
-    },
-    {
-      "term": "density altitude correction",
-      "target": "landing-takeoff-da-correction",
-      "kind": "industry"
-    },
-    {
-      "term": "ground roll correction",
-      "target": "landing-takeoff-da-correction",
-      "kind": "redirect"
-    },
-    {
-      "term": "takeoff distance da",
-      "target": "landing-takeoff-da-correction",
-      "kind": "adjacent"
-    },
-    {
       "term": "final grade needed",
       "target": "final-grade-needed",
       "kind": "industry"
@@ -129,121 +84,6 @@
       "kind": "adjacent"
     },
     {
-      "term": "creatinine clearance",
-      "target": "cockcroft-gault-crcl",
-      "kind": "industry"
-    },
-    {
-      "term": "cockcroft gault",
-      "target": "cockcroft-gault-crcl",
-      "kind": "redirect"
-    },
-    {
-      "term": "crcl estimate",
-      "target": "cockcroft-gault-crcl",
-      "kind": "adjacent"
-    },
-    {
-      "term": "winters formula",
-      "target": "winters-expected-pco2",
-      "kind": "industry"
-    },
-    {
-      "term": "expected pco2",
-      "target": "winters-expected-pco2",
-      "kind": "redirect"
-    },
-    {
-      "term": "respiratory compensation",
-      "target": "winters-expected-pco2",
-      "kind": "adjacent"
-    },
-    {
-      "term": "a-a gradient",
-      "target": "aa-gradient",
-      "kind": "industry"
-    },
-    {
-      "term": "alveolar gas equation",
-      "target": "aa-gradient",
-      "kind": "redirect"
-    },
-    {
-      "term": "aa oxygen gradient",
-      "target": "aa-gradient",
-      "kind": "adjacent"
-    },
-    {
-      "term": "fractional excretion sodium",
-      "target": "fena",
-      "kind": "redirect"
-    },
-    {
-      "term": "prerenal azotemia",
-      "target": "fena",
-      "kind": "adjacent"
-    },
-    {
-      "term": "body surface area dog",
-      "target": "vet-body-surface-area",
-      "kind": "industry"
-    },
-    {
-      "term": "meeh formula",
-      "target": "vet-body-surface-area",
-      "kind": "redirect"
-    },
-    {
-      "term": "bsa chemo dose",
-      "target": "vet-body-surface-area",
-      "kind": "adjacent"
-    },
-    {
-      "term": "corrected reticulocyte",
-      "target": "vet-corrected-reticulocyte",
-      "kind": "industry"
-    },
-    {
-      "term": "regenerative anemia",
-      "target": "vet-corrected-reticulocyte",
-      "kind": "redirect"
-    },
-    {
-      "term": "reticulocyte index",
-      "target": "vet-corrected-reticulocyte",
-      "kind": "adjacent"
-    },
-    {
-      "term": "fluid deficit",
-      "target": "vet-fluid-deficit",
-      "kind": "industry"
-    },
-    {
-      "term": "dehydration fluid",
-      "target": "vet-fluid-deficit",
-      "kind": "redirect"
-    },
-    {
-      "term": "rehydration rate",
-      "target": "vet-fluid-deficit",
-      "kind": "adjacent"
-    },
-    {
-      "term": "anion gap dog",
-      "target": "vet-anion-gap",
-      "kind": "industry"
-    },
-    {
-      "term": "vet anion gap",
-      "target": "vet-anion-gap",
-      "kind": "redirect"
-    },
-    {
-      "term": "acid base anion gap",
-      "target": "vet-anion-gap",
-      "kind": "adjacent"
-    },
-    {
       "term": "primer tm",
       "target": "primer-tm",
       "kind": "industry"
@@ -271,36 +111,6 @@
     {
       "term": "viable count",
       "target": "cfu-plate-count",
-      "kind": "adjacent"
-    },
-    {
-      "term": "post judgment interest",
-      "target": "federal-post-judgment-interest",
-      "kind": "industry"
-    },
-    {
-      "term": "28 usc 1961",
-      "target": "federal-post-judgment-interest",
-      "kind": "redirect"
-    },
-    {
-      "term": "federal judgment interest",
-      "target": "federal-post-judgment-interest",
-      "kind": "adjacent"
-    },
-    {
-      "term": "rent proration",
-      "target": "lease-rent-proration",
-      "kind": "industry"
-    },
-    {
-      "term": "prorated rent",
-      "target": "lease-rent-proration",
-      "kind": "redirect"
-    },
-    {
-      "term": "partial month rent",
-      "target": "lease-rent-proration",
       "kind": "adjacent"
     },
     {
@@ -3294,66 +3104,6 @@
       "kind": "redirect"
     },
     {
-      "term": "wage garnishment",
-      "target": "wage-garnishment",
-      "kind": "industry"
-    },
-    {
-      "term": "garnishment cap",
-      "target": "wage-garnishment",
-      "kind": "industry"
-    },
-    {
-      "term": "disposable earnings garnishment",
-      "target": "wage-garnishment",
-      "kind": "adjacent"
-    },
-    {
-      "term": "how much can be garnished from my paycheck",
-      "target": "wage-garnishment",
-      "kind": "redirect"
-    },
-    {
-      "term": "devine formula",
-      "target": "ideal-body-weight",
-      "kind": "industry"
-    },
-    {
-      "term": "dosing weight",
-      "target": "ideal-body-weight",
-      "kind": "adjacent"
-    },
-    {
-      "term": "lean body mass",
-      "target": "ideal-body-weight",
-      "kind": "adjacent"
-    },
-    {
-      "term": "adjusted body weight",
-      "target": "ideal-body-weight",
-      "kind": "redirect"
-    },
-    {
-      "term": "qtc",
-      "target": "corrected-qt",
-      "kind": "industry"
-    },
-    {
-      "term": "bazett",
-      "target": "corrected-qt",
-      "kind": "industry"
-    },
-    {
-      "term": "fridericia",
-      "target": "corrected-qt",
-      "kind": "adjacent"
-    },
-    {
-      "term": "qt prolongation",
-      "target": "corrected-qt",
-      "kind": "redirect"
-    },
-    {
       "term": "discount points",
       "target": "mortgage-point-breakeven",
       "kind": "industry"
@@ -3396,66 +3146,6 @@
     {
       "term": "cash reserves to qualify",
       "target": "mortgage-reserves",
-      "kind": "redirect"
-    },
-    {
-      "term": "constant rate infusion",
-      "target": "vet-cri",
-      "kind": "industry"
-    },
-    {
-      "term": "cri drip",
-      "target": "vet-cri",
-      "kind": "adjacent"
-    },
-    {
-      "term": "fentanyl drip rate",
-      "target": "vet-cri",
-      "kind": "redirect"
-    },
-    {
-      "term": "blood transfusion volume",
-      "target": "vet-transfusion",
-      "kind": "industry"
-    },
-    {
-      "term": "pcv transfusion",
-      "target": "vet-transfusion",
-      "kind": "adjacent"
-    },
-    {
-      "term": "how much blood to transfuse",
-      "target": "vet-transfusion",
-      "kind": "redirect"
-    },
-    {
-      "term": "weight tape",
-      "target": "equine-weight",
-      "kind": "industry"
-    },
-    {
-      "term": "heart girth weight",
-      "target": "equine-weight",
-      "kind": "adjacent"
-    },
-    {
-      "term": "how much does my horse weigh",
-      "target": "equine-weight",
-      "kind": "redirect"
-    },
-    {
-      "term": "holding pattern fuel",
-      "target": "holding-fuel",
-      "kind": "industry"
-    },
-    {
-      "term": "how long can i hold",
-      "target": "holding-fuel",
-      "kind": "adjacent"
-    },
-    {
-      "term": "endurance remaining",
-      "target": "holding-fuel",
       "kind": "redirect"
     },
     {
@@ -3651,36 +3341,6 @@
     {
       "term": "how much agarose",
       "target": "gel-percent-agarose",
-      "kind": "adjacent"
-    },
-    {
-      "term": "ett size",
-      "target": "pediatric-tube-depth",
-      "kind": "industry"
-    },
-    {
-      "term": "pediatric tube depth",
-      "target": "pediatric-tube-depth",
-      "kind": "redirect"
-    },
-    {
-      "term": "broselow tube",
-      "target": "pediatric-tube-depth",
-      "kind": "adjacent"
-    },
-    {
-      "term": "cg as fuel burns",
-      "target": "weight-shift-fuel-burn",
-      "kind": "industry"
-    },
-    {
-      "term": "in flight cg",
-      "target": "weight-shift-fuel-burn",
-      "kind": "redirect"
-    },
-    {
-      "term": "fuel burn cg shift",
-      "target": "weight-shift-fuel-burn",
       "kind": "adjacent"
     },
     {
@@ -5168,141 +4828,685 @@
       "target": "cutting-fluid-concentration",
       "kind": "adjacent"
     },
-    { "term": "pull box", "target": "pull-box-sizing", "kind": "industry" },
-    { "term": "junction box size", "target": "pull-box-sizing", "kind": "industry" },
-    { "term": "314.28", "target": "pull-box-sizing", "kind": "industry" },
-    { "term": "angle pull", "target": "pull-box-sizing", "kind": "adjacent" },
-    { "term": "straight pull", "target": "pull-box-sizing", "kind": "adjacent" },
-    { "term": "luminaire count", "target": "lumen-method", "kind": "industry" },
-    { "term": "number of fixtures", "target": "lumen-method", "kind": "adjacent" },
-    { "term": "how many lights", "target": "lumen-method", "kind": "redirect" },
-    { "term": "fixture count", "target": "lumen-method", "kind": "adjacent" },
-    { "term": "coefficient of utilization", "target": "lumen-method", "kind": "industry" },
-    { "term": "condensate", "target": "condensate-drain", "kind": "industry" },
-    { "term": "drain pan", "target": "condensate-drain", "kind": "adjacent" },
-    { "term": "condensate line size", "target": "condensate-drain", "kind": "industry" },
-    { "term": "drain slope", "target": "condensate-drain", "kind": "adjacent" },
-    { "term": "ac drain", "target": "condensate-drain", "kind": "redirect" },
-    { "term": "recovery cylinder", "target": "recovery-cylinder", "kind": "industry" },
-    { "term": "80 percent fill", "target": "recovery-cylinder", "kind": "industry" },
-    { "term": "recovery tank", "target": "recovery-cylinder", "kind": "adjacent" },
-    { "term": "refrigerant recovery", "target": "recovery-cylinder", "kind": "adjacent" },
-    { "term": "do not overfill", "target": "recovery-cylinder", "kind": "redirect" },
-    { "term": "mca", "target": "hvac-equipment-circuit", "kind": "industry" },
-    { "term": "mocp", "target": "hvac-equipment-circuit", "kind": "industry" },
-    { "term": "minimum circuit ampacity", "target": "hvac-equipment-circuit", "kind": "industry" },
-    { "term": "max overcurrent protection", "target": "hvac-equipment-circuit", "kind": "industry" },
-    { "term": "condenser breaker size", "target": "hvac-equipment-circuit", "kind": "adjacent" },
-    { "term": "nec 440 nameplate", "target": "hvac-equipment-circuit", "kind": "industry" },
-    { "term": "run capacitor", "target": "run-capacitor-microfarad", "kind": "industry" },
-    { "term": "microfarad test", "target": "run-capacitor-microfarad", "kind": "industry" },
-    { "term": "capacitor check", "target": "run-capacitor-microfarad", "kind": "industry" },
-    { "term": "weak capacitor", "target": "run-capacitor-microfarad", "kind": "adjacent" },
-    { "term": "dual run capacitor", "target": "run-capacitor-microfarad", "kind": "redirect" },
-    { "term": "vacuum decay test", "target": "vacuum-decay-test", "kind": "industry" },
-    { "term": "micron decay", "target": "vacuum-decay-test", "kind": "industry" },
-    { "term": "blank off test", "target": "vacuum-decay-test", "kind": "industry" },
-    { "term": "evacuation standing test", "target": "vacuum-decay-test", "kind": "adjacent" },
-    { "term": "500 micron", "target": "vacuum-decay-test", "kind": "adjacent" },
-    { "term": "nitrogen pressure test", "target": "nitrogen-pressure-test", "kind": "industry" },
-    { "term": "standing pressure test", "target": "nitrogen-pressure-test", "kind": "industry" },
-    { "term": "temperature corrected pressure", "target": "nitrogen-pressure-test", "kind": "adjacent" },
-    { "term": "nitrogen leak check", "target": "nitrogen-pressure-test", "kind": "adjacent" },
-    { "term": "gay-lussac", "target": "nitrogen-pressure-test", "kind": "redirect" },
-    { "term": "disinfect water main", "target": "main-disinfection-chlorine", "kind": "industry" },
-    { "term": "chlorinate pipe", "target": "main-disinfection-chlorine", "kind": "adjacent" },
-    { "term": "awwa c651", "target": "main-disinfection-chlorine", "kind": "industry" },
-    { "term": "new main chlorination", "target": "main-disinfection-chlorine", "kind": "industry" },
-    { "term": "hypochlorite dose", "target": "main-disinfection-chlorine", "kind": "adjacent" },
-    { "term": "shock chlorinate well", "target": "well-shock-chlorination", "kind": "industry" },
-    { "term": "shock a well", "target": "well-shock-chlorination", "kind": "redirect" },
-    { "term": "bleach in well", "target": "well-shock-chlorination", "kind": "adjacent" },
-    { "term": "well disinfection", "target": "well-shock-chlorination", "kind": "industry" },
-    { "term": "shock chlorination", "target": "well-shock-chlorination", "kind": "industry" },
-    { "term": "grounding electrode conductor", "target": "grounding-electrode-conductor", "kind": "industry" },
-    { "term": "gec size", "target": "grounding-electrode-conductor", "kind": "industry" },
-    { "term": "250.66", "target": "grounding-electrode-conductor", "kind": "redirect" },
-    { "term": "ground rod wire size", "target": "grounding-electrode-conductor", "kind": "adjacent" },
-    { "term": "ufer wire", "target": "grounding-electrode-conductor", "kind": "adjacent" },
-    { "term": "bonding jumper", "target": "bonding-jumper", "kind": "industry" },
-    { "term": "main bonding jumper", "target": "bonding-jumper", "kind": "industry" },
-    { "term": "supply side bonding", "target": "bonding-jumper", "kind": "adjacent" },
-    { "term": "250.102", "target": "bonding-jumper", "kind": "redirect" },
-    { "term": "system bonding jumper", "target": "bonding-jumper", "kind": "industry" },
-    { "term": "wire size for voltage drop", "target": "min-conductor-for-vd", "kind": "industry" },
-    { "term": "what size wire", "target": "min-conductor-for-vd", "kind": "redirect" },
-    { "term": "3 percent drop wire", "target": "min-conductor-for-vd", "kind": "adjacent" },
-    { "term": "size conductor for drop", "target": "min-conductor-for-vd", "kind": "adjacent" },
-    { "term": "clock the meter", "target": "gas-meter-clock", "kind": "industry" },
-    { "term": "gas meter clocking", "target": "gas-meter-clock", "kind": "industry" },
-    { "term": "firing rate", "target": "gas-meter-clock", "kind": "adjacent" },
-    { "term": "actual input btu", "target": "gas-meter-clock", "kind": "adjacent" },
-    { "term": "check gas input", "target": "gas-meter-clock", "kind": "adjacent" },
-    { "term": "temperature rise", "target": "furnace-temp-rise", "kind": "industry" },
-    { "term": "temp rise", "target": "furnace-temp-rise", "kind": "industry" },
-    { "term": "furnace delta t", "target": "furnace-temp-rise", "kind": "adjacent" },
-    { "term": "airflow from rise", "target": "furnace-temp-rise", "kind": "adjacent" },
-    { "term": "rise range", "target": "furnace-temp-rise", "kind": "adjacent" },
-    { "term": "high altitude derate", "target": "gas-altitude-derate", "kind": "industry" },
-    { "term": "altitude derating", "target": "gas-altitude-derate", "kind": "industry" },
-    { "term": "furnace at altitude", "target": "gas-altitude-derate", "kind": "adjacent" },
-    { "term": "nfpa 54 altitude", "target": "gas-altitude-derate", "kind": "redirect" },
-    { "term": "4 percent per 1000", "target": "gas-altitude-derate", "kind": "adjacent" },
-    { "term": "natural gas to propane", "target": "gas-fuel-conversion", "kind": "industry" },
-    { "term": "lp conversion", "target": "gas-fuel-conversion", "kind": "industry" },
-    { "term": "fuel conversion", "target": "gas-fuel-conversion", "kind": "adjacent" },
-    { "term": "orifice conversion", "target": "gas-fuel-conversion", "kind": "adjacent" },
-    { "term": "ng to lp", "target": "gas-fuel-conversion", "kind": "redirect" },
-    { "term": "water heater first hour", "target": "water-heater-storage-sizing", "kind": "industry" },
-    { "term": "fhr", "target": "water-heater-storage-sizing", "kind": "industry" },
-    { "term": "size water heater", "target": "water-heater-storage-sizing", "kind": "adjacent" },
-    { "term": "peak hour demand", "target": "water-heater-storage-sizing", "kind": "adjacent" },
-    { "term": "storage heater sizing", "target": "water-heater-storage-sizing", "kind": "redirect" },
-    { "term": "guard rail height", "target": "guard-handrail-check", "kind": "industry" },
-    { "term": "guardrail code", "target": "guard-handrail-check", "kind": "industry" },
-    { "term": "baluster gap", "target": "guard-handrail-check", "kind": "adjacent" },
-    { "term": "handrail height", "target": "guard-handrail-check", "kind": "adjacent" },
-    { "term": "4 inch sphere", "target": "guard-handrail-check", "kind": "adjacent" },
-    { "term": "r312", "target": "guard-handrail-check", "kind": "redirect" },
-    { "term": "smooth bore gpm", "target": "smooth-bore-flow", "kind": "industry" },
-    { "term": "solid stream flow", "target": "smooth-bore-flow", "kind": "industry" },
-    { "term": "tip flow", "target": "smooth-bore-flow", "kind": "adjacent" },
-    { "term": "gpm from nozzle pressure", "target": "smooth-bore-flow", "kind": "adjacent" },
-    { "term": "fire stream flow", "target": "smooth-bore-flow", "kind": "redirect" },
-    { "term": "gcwr", "target": "gcwr-check", "kind": "industry" },
-    { "term": "combination weight", "target": "gcwr-check", "kind": "industry" },
-    { "term": "combined gross weight", "target": "gcwr-check", "kind": "adjacent" },
-    { "term": "tractor trailer weight", "target": "gcwr-check", "kind": "adjacent" },
-    { "term": "tire load rating", "target": "tire-load-check", "kind": "industry" },
-    { "term": "tire load index", "target": "tire-load-check", "kind": "adjacent" },
-    { "term": "axle tire capacity", "target": "tire-load-check", "kind": "adjacent" },
-    { "term": "overloaded tires", "target": "tire-load-check", "kind": "redirect" },
-    { "term": "chlorine demand dose", "target": "chlorine-demand", "kind": "industry" },
-    { "term": "applied minus residual", "target": "chlorine-demand", "kind": "adjacent" },
-    { "term": "breakpoint chlorination", "target": "chlorine-demand", "kind": "adjacent" },
-    { "term": "dose for residual", "target": "chlorine-demand", "kind": "adjacent" },
-    { "term": "uv dose", "target": "uv-dose", "kind": "industry" },
-    { "term": "ultraviolet disinfection", "target": "uv-dose", "kind": "industry" },
-    { "term": "uv intensity time", "target": "uv-dose", "kind": "adjacent" },
-    { "term": "mj/cm2", "target": "uv-dose", "kind": "redirect" },
-    { "term": "multi leg sling", "target": "multi-leg-sling", "kind": "industry" },
-    { "term": "4 leg sling", "target": "multi-leg-sling", "kind": "industry" },
-    { "term": "3 leg sling", "target": "multi-leg-sling", "kind": "adjacent" },
-    { "term": "load per leg", "target": "multi-leg-sling", "kind": "adjacent" },
-    { "term": "sling leg tension", "target": "multi-leg-sling", "kind": "adjacent" },
-    { "term": "wire rope breaking strength", "target": "wire-rope-strength", "kind": "industry" },
-    { "term": "wire rope mbs", "target": "wire-rope-strength", "kind": "adjacent" },
-    { "term": "rope wll", "target": "wire-rope-strength", "kind": "adjacent" },
-    { "term": "cable strength", "target": "wire-rope-strength", "kind": "redirect" },
-    { "term": "hay moisture", "target": "hay-dry-matter", "kind": "industry" },
-    { "term": "dry matter", "target": "hay-dry-matter", "kind": "industry" },
-    { "term": "bale weight moisture", "target": "hay-dry-matter", "kind": "adjacent" },
-    { "term": "safe storage hay", "target": "hay-dry-matter", "kind": "adjacent" },
-    { "term": "forage dry matter", "target": "hay-dry-matter", "kind": "redirect" },
-    { "term": "equilibrium moisture content", "target": "wood-emc", "kind": "industry" },
-    { "term": "emc", "target": "wood-emc", "kind": "industry" },
-    { "term": "wood moisture target", "target": "wood-emc", "kind": "adjacent" },
-    { "term": "wood dry standard", "target": "wood-emc", "kind": "adjacent" },
-    { "term": "sorption", "target": "wood-emc", "kind": "redirect" }
+    {
+      "term": "pull box",
+      "target": "pull-box-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "junction box size",
+      "target": "pull-box-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "314.28",
+      "target": "pull-box-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "angle pull",
+      "target": "pull-box-sizing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "straight pull",
+      "target": "pull-box-sizing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "luminaire count",
+      "target": "lumen-method",
+      "kind": "industry"
+    },
+    {
+      "term": "number of fixtures",
+      "target": "lumen-method",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how many lights",
+      "target": "lumen-method",
+      "kind": "redirect"
+    },
+    {
+      "term": "fixture count",
+      "target": "lumen-method",
+      "kind": "adjacent"
+    },
+    {
+      "term": "coefficient of utilization",
+      "target": "lumen-method",
+      "kind": "industry"
+    },
+    {
+      "term": "condensate",
+      "target": "condensate-drain",
+      "kind": "industry"
+    },
+    {
+      "term": "drain pan",
+      "target": "condensate-drain",
+      "kind": "adjacent"
+    },
+    {
+      "term": "condensate line size",
+      "target": "condensate-drain",
+      "kind": "industry"
+    },
+    {
+      "term": "drain slope",
+      "target": "condensate-drain",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ac drain",
+      "target": "condensate-drain",
+      "kind": "redirect"
+    },
+    {
+      "term": "recovery cylinder",
+      "target": "recovery-cylinder",
+      "kind": "industry"
+    },
+    {
+      "term": "80 percent fill",
+      "target": "recovery-cylinder",
+      "kind": "industry"
+    },
+    {
+      "term": "recovery tank",
+      "target": "recovery-cylinder",
+      "kind": "adjacent"
+    },
+    {
+      "term": "refrigerant recovery",
+      "target": "recovery-cylinder",
+      "kind": "adjacent"
+    },
+    {
+      "term": "do not overfill",
+      "target": "recovery-cylinder",
+      "kind": "redirect"
+    },
+    {
+      "term": "mca",
+      "target": "hvac-equipment-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "mocp",
+      "target": "hvac-equipment-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum circuit ampacity",
+      "target": "hvac-equipment-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "max overcurrent protection",
+      "target": "hvac-equipment-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "condenser breaker size",
+      "target": "hvac-equipment-circuit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nec 440 nameplate",
+      "target": "hvac-equipment-circuit",
+      "kind": "industry"
+    },
+    {
+      "term": "run capacitor",
+      "target": "run-capacitor-microfarad",
+      "kind": "industry"
+    },
+    {
+      "term": "microfarad test",
+      "target": "run-capacitor-microfarad",
+      "kind": "industry"
+    },
+    {
+      "term": "capacitor check",
+      "target": "run-capacitor-microfarad",
+      "kind": "industry"
+    },
+    {
+      "term": "weak capacitor",
+      "target": "run-capacitor-microfarad",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dual run capacitor",
+      "target": "run-capacitor-microfarad",
+      "kind": "redirect"
+    },
+    {
+      "term": "vacuum decay test",
+      "target": "vacuum-decay-test",
+      "kind": "industry"
+    },
+    {
+      "term": "micron decay",
+      "target": "vacuum-decay-test",
+      "kind": "industry"
+    },
+    {
+      "term": "blank off test",
+      "target": "vacuum-decay-test",
+      "kind": "industry"
+    },
+    {
+      "term": "evacuation standing test",
+      "target": "vacuum-decay-test",
+      "kind": "adjacent"
+    },
+    {
+      "term": "500 micron",
+      "target": "vacuum-decay-test",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nitrogen pressure test",
+      "target": "nitrogen-pressure-test",
+      "kind": "industry"
+    },
+    {
+      "term": "standing pressure test",
+      "target": "nitrogen-pressure-test",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature corrected pressure",
+      "target": "nitrogen-pressure-test",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nitrogen leak check",
+      "target": "nitrogen-pressure-test",
+      "kind": "adjacent"
+    },
+    {
+      "term": "gay-lussac",
+      "target": "nitrogen-pressure-test",
+      "kind": "redirect"
+    },
+    {
+      "term": "disinfect water main",
+      "target": "main-disinfection-chlorine",
+      "kind": "industry"
+    },
+    {
+      "term": "chlorinate pipe",
+      "target": "main-disinfection-chlorine",
+      "kind": "adjacent"
+    },
+    {
+      "term": "awwa c651",
+      "target": "main-disinfection-chlorine",
+      "kind": "industry"
+    },
+    {
+      "term": "new main chlorination",
+      "target": "main-disinfection-chlorine",
+      "kind": "industry"
+    },
+    {
+      "term": "hypochlorite dose",
+      "target": "main-disinfection-chlorine",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shock chlorinate well",
+      "target": "well-shock-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "shock a well",
+      "target": "well-shock-chlorination",
+      "kind": "redirect"
+    },
+    {
+      "term": "bleach in well",
+      "target": "well-shock-chlorination",
+      "kind": "adjacent"
+    },
+    {
+      "term": "well disinfection",
+      "target": "well-shock-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "shock chlorination",
+      "target": "well-shock-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "grounding electrode conductor",
+      "target": "grounding-electrode-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "gec size",
+      "target": "grounding-electrode-conductor",
+      "kind": "industry"
+    },
+    {
+      "term": "250.66",
+      "target": "grounding-electrode-conductor",
+      "kind": "redirect"
+    },
+    {
+      "term": "ground rod wire size",
+      "target": "grounding-electrode-conductor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ufer wire",
+      "target": "grounding-electrode-conductor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bonding jumper",
+      "target": "bonding-jumper",
+      "kind": "industry"
+    },
+    {
+      "term": "main bonding jumper",
+      "target": "bonding-jumper",
+      "kind": "industry"
+    },
+    {
+      "term": "supply side bonding",
+      "target": "bonding-jumper",
+      "kind": "adjacent"
+    },
+    {
+      "term": "250.102",
+      "target": "bonding-jumper",
+      "kind": "redirect"
+    },
+    {
+      "term": "system bonding jumper",
+      "target": "bonding-jumper",
+      "kind": "industry"
+    },
+    {
+      "term": "wire size for voltage drop",
+      "target": "min-conductor-for-vd",
+      "kind": "industry"
+    },
+    {
+      "term": "what size wire",
+      "target": "min-conductor-for-vd",
+      "kind": "redirect"
+    },
+    {
+      "term": "3 percent drop wire",
+      "target": "min-conductor-for-vd",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size conductor for drop",
+      "target": "min-conductor-for-vd",
+      "kind": "adjacent"
+    },
+    {
+      "term": "clock the meter",
+      "target": "gas-meter-clock",
+      "kind": "industry"
+    },
+    {
+      "term": "gas meter clocking",
+      "target": "gas-meter-clock",
+      "kind": "industry"
+    },
+    {
+      "term": "firing rate",
+      "target": "gas-meter-clock",
+      "kind": "adjacent"
+    },
+    {
+      "term": "actual input btu",
+      "target": "gas-meter-clock",
+      "kind": "adjacent"
+    },
+    {
+      "term": "check gas input",
+      "target": "gas-meter-clock",
+      "kind": "adjacent"
+    },
+    {
+      "term": "temperature rise",
+      "target": "furnace-temp-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "temp rise",
+      "target": "furnace-temp-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "furnace delta t",
+      "target": "furnace-temp-rise",
+      "kind": "adjacent"
+    },
+    {
+      "term": "airflow from rise",
+      "target": "furnace-temp-rise",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rise range",
+      "target": "furnace-temp-rise",
+      "kind": "adjacent"
+    },
+    {
+      "term": "high altitude derate",
+      "target": "gas-altitude-derate",
+      "kind": "industry"
+    },
+    {
+      "term": "altitude derating",
+      "target": "gas-altitude-derate",
+      "kind": "industry"
+    },
+    {
+      "term": "furnace at altitude",
+      "target": "gas-altitude-derate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nfpa 54 altitude",
+      "target": "gas-altitude-derate",
+      "kind": "redirect"
+    },
+    {
+      "term": "4 percent per 1000",
+      "target": "gas-altitude-derate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "natural gas to propane",
+      "target": "gas-fuel-conversion",
+      "kind": "industry"
+    },
+    {
+      "term": "lp conversion",
+      "target": "gas-fuel-conversion",
+      "kind": "industry"
+    },
+    {
+      "term": "fuel conversion",
+      "target": "gas-fuel-conversion",
+      "kind": "adjacent"
+    },
+    {
+      "term": "orifice conversion",
+      "target": "gas-fuel-conversion",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ng to lp",
+      "target": "gas-fuel-conversion",
+      "kind": "redirect"
+    },
+    {
+      "term": "water heater first hour",
+      "target": "water-heater-storage-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "fhr",
+      "target": "water-heater-storage-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "size water heater",
+      "target": "water-heater-storage-sizing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "peak hour demand",
+      "target": "water-heater-storage-sizing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "storage heater sizing",
+      "target": "water-heater-storage-sizing",
+      "kind": "redirect"
+    },
+    {
+      "term": "guard rail height",
+      "target": "guard-handrail-check",
+      "kind": "industry"
+    },
+    {
+      "term": "guardrail code",
+      "target": "guard-handrail-check",
+      "kind": "industry"
+    },
+    {
+      "term": "baluster gap",
+      "target": "guard-handrail-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "handrail height",
+      "target": "guard-handrail-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "4 inch sphere",
+      "target": "guard-handrail-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "r312",
+      "target": "guard-handrail-check",
+      "kind": "redirect"
+    },
+    {
+      "term": "smooth bore gpm",
+      "target": "smooth-bore-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "solid stream flow",
+      "target": "smooth-bore-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "tip flow",
+      "target": "smooth-bore-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "gpm from nozzle pressure",
+      "target": "smooth-bore-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fire stream flow",
+      "target": "smooth-bore-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "gcwr",
+      "target": "gcwr-check",
+      "kind": "industry"
+    },
+    {
+      "term": "combination weight",
+      "target": "gcwr-check",
+      "kind": "industry"
+    },
+    {
+      "term": "combined gross weight",
+      "target": "gcwr-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tractor trailer weight",
+      "target": "gcwr-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tire load rating",
+      "target": "tire-load-check",
+      "kind": "industry"
+    },
+    {
+      "term": "tire load index",
+      "target": "tire-load-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "axle tire capacity",
+      "target": "tire-load-check",
+      "kind": "adjacent"
+    },
+    {
+      "term": "overloaded tires",
+      "target": "tire-load-check",
+      "kind": "redirect"
+    },
+    {
+      "term": "chlorine demand dose",
+      "target": "chlorine-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "applied minus residual",
+      "target": "chlorine-demand",
+      "kind": "adjacent"
+    },
+    {
+      "term": "breakpoint chlorination",
+      "target": "chlorine-demand",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dose for residual",
+      "target": "chlorine-demand",
+      "kind": "adjacent"
+    },
+    {
+      "term": "uv dose",
+      "target": "uv-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "ultraviolet disinfection",
+      "target": "uv-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "uv intensity time",
+      "target": "uv-dose",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mj/cm2",
+      "target": "uv-dose",
+      "kind": "redirect"
+    },
+    {
+      "term": "multi leg sling",
+      "target": "multi-leg-sling",
+      "kind": "industry"
+    },
+    {
+      "term": "4 leg sling",
+      "target": "multi-leg-sling",
+      "kind": "industry"
+    },
+    {
+      "term": "3 leg sling",
+      "target": "multi-leg-sling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "load per leg",
+      "target": "multi-leg-sling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sling leg tension",
+      "target": "multi-leg-sling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wire rope breaking strength",
+      "target": "wire-rope-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "wire rope mbs",
+      "target": "wire-rope-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rope wll",
+      "target": "wire-rope-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cable strength",
+      "target": "wire-rope-strength",
+      "kind": "redirect"
+    },
+    {
+      "term": "hay moisture",
+      "target": "hay-dry-matter",
+      "kind": "industry"
+    },
+    {
+      "term": "dry matter",
+      "target": "hay-dry-matter",
+      "kind": "industry"
+    },
+    {
+      "term": "bale weight moisture",
+      "target": "hay-dry-matter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "safe storage hay",
+      "target": "hay-dry-matter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "forage dry matter",
+      "target": "hay-dry-matter",
+      "kind": "redirect"
+    },
+    {
+      "term": "equilibrium moisture content",
+      "target": "wood-emc",
+      "kind": "industry"
+    },
+    {
+      "term": "emc",
+      "target": "wood-emc",
+      "kind": "industry"
+    },
+    {
+      "term": "wood moisture target",
+      "target": "wood-emc",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wood dry standard",
+      "target": "wood-emc",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sorption",
+      "target": "wood-emc",
+      "kind": "redirect"
+    }
   ]
 }

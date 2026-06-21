@@ -2,7 +2,7 @@
   "_comment": "v10 Phase A.3 generated artifact. DO NOT EDIT BY HAND. Source of truth is docs/citation-discipline.md; regenerate via `npm run docs:citation-strings`. Per spec-v10 §3.3 the runtime citations.js will eventually import these strings; the in-sync unit test holds the contract until then.",
   "_generated_from": "docs/citation-discipline.md",
   "_generator": "scripts/build-citation-strings.mjs",
-  "_row_count": 95,
+  "_row_count": 70,
   "_duplicates": [],
   "strings": {
     "alternate-readability": {
@@ -12,10 +12,6 @@
     "amortization-schedule": {
       "group": "calc-realestate.js (Group X, v12 §8)",
       "stamp": "Citation: Standard period-by-period amortization. Total interest = total paid - principal. Extra principal accelerates payoff. Lender governs. No copyrighted source."
-    },
-    "apgar-score": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: Per Apgar, 'A Proposal for a New Method of Evaluation of the Newborn Infant,' Anesthesia and Analgesia 32:4 (1953). AAP and ACOG govern interpretation. Free at journals.lww.com for the historical reprint."
     },
     "arc-flash-screen": {
       "group": "calc-electrical.js (Group A)",
@@ -41,10 +37,6 @@
       "group": "calc-realestate.js (Group X, v12 §8)",
       "stamp": "Citation: Cap rate = NOI / value; DSCR = NOI / annual debt service. Standard CRE underwriting ratios. Appraiser and lender govern. No copyrighted source."
     },
-    "cincinnati-stroke-scale": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: Per Kothari, Pancioli, Liu, Brott, and Broderick, 'Cincinnati Prehospital Stroke Scale: reproducibility and validity,' Annals of Emergency Medicine 33:4 (1999). CDC public materials reference. Receiving stroke-center physician governs. Free at cdc.gov/stroke."
-    },
     "codon-table": {
       "group": "calc-edu.js (Group Y, v12 §9)",
       "stamp": "Citation: Per the IUPAC-IUBMB standard genetic code (Table 1 of the NCBI Taxonomy database genetic-code reference). Free at ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi."
@@ -64,14 +56,6 @@
     "confined-space-vent": {
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: Per OSHA 29 CFR 1910.146 (Permit-Required Confined Spaces) and NIOSH 80-106 (Working in Confined Spaces). Pre-entry atmospheric monitoring with a calibrated 4-gas meter is required by 1910.146(d)(5); ventilation does not substitute for the meter. AHJ governs. Free at ecfr.gov and at cdc.gov/niosh."
-    },
-    "crosswind-component": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Pure planar geometry over runway heading and wind direction. AFM / POH demonstrated-crosswind value is an aircraft-specific tested value, not a limitation; PIC governs. No copyrighted source."
-    },
-    "density-altitude": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 4. DA = PA + 120 * (OAT_C - ISA_C). PIC governs final go / no-go. Free at faa.gov/regulations_policies/handbooks_manuals/aviation."
     },
     "disinfection-ct": {
       "group": "calc-electrical.js (Group A)",
@@ -109,10 +93,6 @@
       "group": "calc-plumbing.js (Group B)",
       "stamp": "Citation: Hazen-Williams (1905, public domain). IPC 2021 referenced for application."
     },
-    "fuel-planning": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Per 14 CFR 91.151 (day VFR fuel reserve) and 91.167 (IFR fuel reserve). Density per ASTM D1655 (jet-A 6.7 lb/gal at 15 C) and avgas spec (6.0 lb/gal). PIC governs flight planning. Free at ecfr.gov."
-    },
     "gas-pipe-sizing": {
       "group": "calc-plumbing.js (Group B)",
       "stamp": "Citation: per IFGC 2021 Table 402.4 (NFPA 54). Spitzglass low-pressure gas formula Q = 3550 * sqrt(d^5 * dP / (SG * L)). AHJ governs. Free at codes.iccsafe.org."
@@ -120,10 +100,6 @@
     "gfci-afci-reference": {
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: per NEC 2023 §210.8 (GFCI), §210.12 (AFCI), §406.4 (receptacle requirements). Original plain-English summaries by the project author; no code text reproduced. AHJ governs. Free at nfpa.org/freeaccess."
-    },
-    "glasgow-coma-scale": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: Per Teasdale and Jennett, 'Assessment of coma and impaired consciousness,' Lancet 304:7872 (1974). Adopted by ACEP, ACS Committee on Trauma, and NAEMT. Receiving facility's neurosurgeon governs final disposition. Free at thelancet.com for the abstract."
     },
     "gpa-calculator": {
       "group": "calc-edu.js (Group Y, v12 §9)",
@@ -149,14 +125,6 @@
       "group": "calc-realestate.js (Group X, v12 §8)",
       "stamp": "Citation: Per HUD PD&R Fair Market Rents (federal fiscal year, effective each October 1). Free at huduser.gov/portal/datasets/fmr.html."
     },
-    "hypoxia-altitude": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Per 14 CFR 91.211. PIC governs cabin oxygen plan. Free at ecfr.gov."
-    },
-    "iv-drip-rate": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: First-principles arithmetic over drop-factor specified on the IV-set label. Nurse / paramedic governs the bedside rate adjustment. No copyrighted source."
-    },
     "lexile-band": {
       "group": "calc-edu.js (Group Y, v12 §9)",
       "stamp": "Notice: 'Lexile' is a registered trademark of MetaMetrics. The grade-band targets here are summarized from publicly published state-DOE bulletins implementing the post-2012 CCSS stretch ranges. Teacher governs final text selection."
@@ -181,10 +149,6 @@
       "group": "calc-construction.js (Group E)",
       "stamp": "Citation: per IRC 2021 Tables R502.5, R602.5 (joist / header / framing spans); AWC NDS-2018 governs by reference. M = w*L^2/8; sigma = Mc/I; delta = 5wL^4/(384*E*I). AHJ governs. Free at codes.iccsafe.org and awc.org."
     },
-    "magnetic-variation": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: TVMDC convention per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. The continental-scale model is in the magnetic-declination tile (NOAA NCEI WMM 2025). PIC must cross-check against the sectional chart. Free at faa.gov and ncei.noaa.gov/products/world-magnetic-model."
-    },
     "manual-j-cooling": {
       "group": "calc-hvac.js (Group C)",
       "stamp": "Citation: Simplified screening estimate from envelope conductance, infiltration, internal gains, solar, and latent loads. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references."
@@ -192,10 +156,6 @@
     "manual-j-heating": {
       "group": "calc-hvac.js (Group C)",
       "stamp": "Citation: Simplified screening estimate from envelope conductance and infiltration. Code-compliant load calc requires ACCA Manual J (8th ed.). Licensed HVAC designer and AHJ govern. Free at codes.iccsafe.org for IMC references."
-    },
-    "metar-decoder": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Per FAA Aviation Weather Services (AC 00-45H Change 2) and NWS Federal Meteorological Handbook 1 (FMH-1). PIC governs. Free at faa.gov/regulations_policies/advisory_circulars and weather.gov."
     },
     "motor-branch-from-nameplate": {
       "group": "calc-electrical.js (Group A)",
@@ -209,10 +169,6 @@
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: Per NFPA 1142-2022 (Standard on Water Supplies for Suburban and Rural Firefighting) §5. AHJ governs final water-supply requirement. Free at nfpa.org/freeaccess."
     },
-    "nihss": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: Per Brott et al., 'Measurements of acute cerebral infarction: a clinical examination scale,' Stroke 20:7 (1989). Instrument distributed by NIH NINDS in the public domain. AHA / ASA severity bands. Receiving stroke-center neurologist governs tPA / EVT decision. Free at ninds.nih.gov/health-information/stroke."
-    },
     "noise-dose": {
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: Per OSHA 29 CFR 1910.95(b) Appendix A and Table G-16a. NIOSH 98-126 recommends a 3 dB exchange rate; this calculator implements the OSHA 5 dB rule because OSHA is the regulatory record. AHJ governs. Free at ecfr.gov and at cdc.gov/niosh."
@@ -220,10 +176,6 @@
     "outdoor-air-ventilation": {
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: Per ASHRAE 62.1-2022 §6.2.2.1 (single-zone breathing-zone procedure). Rp and Ra values per Table 6-1 of the AHJ-adopted edition; the tile does not bundle the table. AHJ governs adopted edition. Free at ashrae.org for TOC."
-    },
-    "parkland-formula": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: Per Baxter, 'Fluid Volume and Electrolyte Changes in the Early Post-burn Period,' Clinics in Plastic Surgery 1:4 (1974). Adopted by American Burn Association and ATLS (Student Course Manual 10th ed. Ch. 9). Receiving burn-center physician governs. Free at ameriburn.org for ABA referral criteria."
     },
     "pdp": {
       "group": "calc-fire.js (Group F)",
@@ -264,10 +216,6 @@
     "required-fire-flow": {
       "group": "calc-fire.js (Group F)",
       "stamp": "Citation: per IFC 2021 Table B105.1 (ISO needed-fire-flow method). NFF = C * O * X * P; C = 18 * F * sqrt(A). AHJ governs. Free at codes.iccsafe.org."
-    },
-    "rule-of-9s": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: Rule of 9s per Pulaski and Tennison, Surgery (1947). Lund-Browder per Lund and Browder, Surgery, Gynecology and Obstetrics 79 (1944). Both adopted by ABA. ABA major-burn band at >= 20 percent TBSA. Receiving burn-center physician governs. Free at ameriburn.org for ABA referral criteria."
     },
     "scba-cylinder-time": {
       "group": "calc-electrical.js (Group A)",
@@ -313,10 +261,6 @@
       "group": "calc-fire.js (Group F)",
       "stamp": "Citation: per NFPA 14-2022 (standpipes). Elevation 0.434 psi/ft of water; CQ^2L friction per outlet hose section. AHJ governs. Free at nfpa.org/freeaccess."
     },
-    "start-triage": {
-      "group": "calc-ems.js (Group V, v12 §6)",
-      "stamp": "Citation: START per Newport Beach Fire Department and Hoag Hospital (1983). JumpSTART per Romig, JEMS (2002). CDC Field Triage Guidelines for Injured Patients (2021), public domain. Incident commander governs. Free at cdc.gov/mmwr."
-    },
     "statistics-quickread": {
       "group": "calc-edu.js (Group Y, v12 §9)",
       "stamp": "Citation: Standard descriptive statistics (mean / median / mode / variance / standard deviation). Sample SD uses Bessel correction (n-1); population SD uses n. No copyrighted source."
@@ -329,10 +273,6 @@
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: Per USEPA Wastewater Operator Training (public domain) and WEF Manual of Practice No. 11 by name. State primacy agency NPDES permit governs effluent limits. Companion F:M ratio in the srt-fm-ratio tile. Free at epa.gov."
     },
-    "taf-decoder": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Per FAA AC 00-45H Change 2 and WMO Manual on Codes (WMO-No. 306). PIC governs. Free at faa.gov and library.wmo.int."
-    },
     "thi-livestock": {
       "group": "calc-electrical.js (Group A)",
       "stamp": "Citation: Per USDA-ARS livestock heat-stress research publications and Kansas State University Cooperative Extension. Public domain. Free at usda.gov and at K-State Research and Extension."
@@ -340,46 +280,6 @@
     "trap-arm": {
       "group": "calc-plumbing.js (Group B)",
       "stamp": "Citation: Standard trap-arm length table (public plumbing engineering practice). The trap weir must not drain through the vent; total fall limited to one pipe diameter."
-    },
-    "true-airspeed": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) and the ICAO Standard Atmosphere (ISO 2533:1975). AFM / POH governs. Free at faa.gov and iso.org for TOC."
-    },
-    "vet-energy-requirement": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Citation: RER = 70 * BW_kg^0.75 per the AAHA-AAFP Life Stage Guidelines (2019 canine / 2021 feline). Activity multipliers per AAHA published table. Veterinarian governs in chronic disease states. Free at aaha.org and catvets.com."
-    },
-    "vet-heartworm-dose": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Citation: Per FDA-approved labeling via DailyMed (Heartgard Plus, Interceptor Plus, Revolution). Negative heartworm test required before initiation; MDR1 / contraindication note governed by attending veterinarian. Free at dailymed.nlm.nih.gov."
-    },
-    "vet-maintenance-fluid": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Notice: Math aid; veterinarian governs adjustments for cardiac / renal / hepatic disease. Citation: Per Holliday and Segar, Pediatrics 19:5 (1957), adapted for veterinary use per DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice (4th ed.). Free at ncbi.nlm.nih.gov/pmc for the Holliday-Segar reprint."
-    },
-    "vet-plasma-css": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Citation: Css = (Dose * F) / (CL * tau) per Riviere and Papich, Veterinary Pharmacology and Therapeutics (10th ed.) Ch. 3. Veterinarian governs final dosing. Free at wiley.com for TOC; standard pharmacokinetic identity, no copyrighted content reproduced."
-    },
-    "vet-toxicity": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Notice: Screening estimate. Call ASPCA Animal Poison Control Center at 888-426-4435 (consult fee applies) for any suspected ingestion. Citation: Per ASPCA APCC published thresholds and Plumb's Veterinary Drug Handbook 10th ed. Veterinarian governs. Free at aspca.org/pet-care/animal-poison-control."
-    },
-    "vet-vaccine-schedule": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Citation: Per AAHA Canine Vaccination Guidelines (2022 update) and AAFP Feline Vaccination Advisory Panel Report (2020 update). Rabies cadence defers to state-AHJ statute, not encoded here. Veterinarian and state-AHJ govern. Free at aaha.org and catvets.com."
-    },
-    "vet-weight-based-dose": {
-      "group": "calc-vet.js (Group U, v12 §5)",
-      "stamp": "Notice: Math aid; verify against the current drug formulary. Citation: First-principles arithmetic over user-supplied dose and concentration. No drug table is bundled; reference formularies named in the limitation banner (Plumb's Veterinary Drug Handbook 10th ed.; USP Compendium; FDA-approved labeling). Veterinarian governs."
-    },
-    "weight-balance": {
-      "group": "calc-kitchen.js, calc-trucking.js, calc-mechanic.js (Groups O, J, K)",
-      "stamp": "Notice: Pilot-in-command and the airplane flight manual govern. Math aid only; verify against the AFM loading graph or table. Citation: per FAA AC 91-23A (Pilot's Weight and Balance Handbook). Free at faa.gov/regulations_policies/advisory_circulars."
-    },
-    "wind-triangle": {
-      "group": "calc-aviation.js (Group W, v12 §7)",
-      "stamp": "Citation: Pure planar vector identity (E6B). AFM / POH groundspeed table is the cross-check. No copyrighted source."
     },
     "wire-ampacity": {
       "group": "calc-electrical.js (Group A)",

@@ -6,7 +6,6 @@ import { computeConduitFill } from "../../calc-electrical.js";
 import { computeSuperheatSubcool as _hvacSh } from "../../calc-refrigerant.js";
 import { computeLumberSpan } from "../../calc-construction.js";
 import { computePalletLoadout, computeReeferBurn } from "../../calc-trucking.js";
-import { computeWeightBalance } from "../../calc-mechanic.js";
 import { computeHEPALife } from "../../calc-restoration.js";
 
 const close = (a, b, tol) => Math.abs(a - b) <= tol;
@@ -100,26 +99,6 @@ test("C.5 reefer-burn haul_miles override drives haul_hr_effective", () => {
   assert.equal(r.haul_hr_effective, 10);
   // fuel_burned_effective at 0.65 gph × 1.0 ambient × 10 hr = 6.5 gal.
   assert.ok(close(r.fuel_burned_effective, 6.5, 0.5));
-});
-
-// --- C.5 weight-balance %MAC ---
-
-test("C.5 weight-balance %MAC = (cg - LE_MAC) / chord × 100", () => {
-  // CG at 40 in, LE MAC at 33 in, chord 60 in → %MAC = (40-33)/60 × 100 = 11.67%
-  const r = computeWeightBalance({
-    stations: [{ name: "A", weight_lb: 1000, arm_in: 40 }],
-    fwd_cg_limit_in: 35, aft_cg_limit_in: 50, max_gross_lb: 2000,
-    mac_le_in: 33, mac_chord_in: 60,
-  });
-  assert.ok(close(r.cg_pct_mac, ((40 - 33) / 60) * 100, 0.001));
-  assert.ok(close(r.fwd_pct_mac, ((35 - 33) / 60) * 100, 0.001));
-  assert.ok(close(r.aft_pct_mac, ((50 - 33) / 60) * 100, 0.001));
-});
-
-test("C.5 weight-balance %MAC null when MAC inputs not supplied", () => {
-  const r = computeWeightBalance({ stations: [{ name: "A", weight_lb: 1000, arm_in: 40 }], fwd_cg_limit_in: 35, aft_cg_limit_in: 50, max_gross_lb: 2000 });
-  assert.equal(r.cg_pct_mac, null);
-  assert.equal(r.fwd_pct_mac, null);
 });
 
 // --- C.6 hepa-filter-life full-job filters + cost ---

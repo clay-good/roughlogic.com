@@ -30,14 +30,6 @@ test("renderer brake-pad-life surfaces cost-per-100k row + pad-set cost input", 
   assert.match(t, /Cost per 100k mi/);
 });
 
-test("renderer weight-balance surfaces %MAC row + MAC inputs", async () => {
-  const t = await readCalc("calc-mechanic.js");
-  assert.match(t, /wb-out-mac/);
-  assert.match(t, /MAC leading-edge/);
-  assert.match(t, /MAC chord/);
-  assert.match(t, /% MAC \(envelope/);
-});
-
 test("renderer pallet-loadout surfaces binding margin + slack utilization rows", async () => {
   const t = await readCalc("calc-trucking.js");
   assert.match(t, /pl-out-bm/);

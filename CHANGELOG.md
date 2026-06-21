@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(catalog)!: land spec-v107 -- retire four non-trade groups (CUT); -88 tiles (688 -> 600); stamps 0.72.0, 2026-06-21
+
+**Breaking change to public URLs.** Executes the spec-v106 trades-only charter's first *subtractive* disposition: removes the four liability-bearing non-trade groups recorded as NOT DOING -- **S (Legal)**, **U (Veterinary)**, **V (EMS and Pre-hospital)**, and **W (Pilots and General Aviation)** -- plus one stray flight-ops tile (`weight-balance`, Aircraft Weight and Balance) that had been filed under Group K (Mechanic). Each fails the inclusion test on gate 1 (not a trade) and gate 4 (failure mode is patient / animal harm, safety-of-life, or unauthorized practice of law). Adds nothing; changes no surviving tile's output.
+
+Catalog: **688 -> 600** (-88: 87 group tiles + 1 stray), **25 -> 21 groups**, **53 -> 49 modules**, **715 -> 623 sitemap URLs**, **206 -> 162 tracked sources**. The modules `calc-legal.js`, `calc-vet.js`, `calc-ems.js`, and `calc-aviation.js` are deleted; `calc-mechanic.js` survives with `weight-balance` removed tile-level. Retired group letters leave gaps in A..Z (never renumbered, spec-v106 §5); aircraft *maintenance* content stays under K.
+
+Touchpoints cleared and gated: `tools-data.js` rows; the four `declare()` blocks, `GROUPS`, and `GROUP_NAMES` in `app.js`; `tile-meta.js` rows + 44 `SIMPLIFIED` entries + their `limitation-banner.js` copy; 88 `citations.js` entries; `data/search/aliases.json` blocks; `scripts/related-tiles.mjs` keys (and 7 inbound refs from surviving tiles, repointed); `sw.js` precache (cache version `dev-0003` -> `dev-0004`); `scripts/build.mjs` file list; all test fixtures and the bounds-fuzzer / numerical-stability / cross-tile-invariants blocks; the four per-module unit tests (deleted); and the regenerated v14 corpus, tile-index, and `docs/citation-strings.generated.json`. URL retirement: 88 tile deep-links + 4 group-hub URLs stop resolving; they drop from `sitemap.xml` on rebuild and the SPA router lands an unknown `#<id>` on home.
+
+Verified green: full lint (every gate, check-readme-counts now 600 tiles / 49 modules / 623 sitemap URLs, em-dash / n-gram / grep guards), **4,895** unit tests (from 5,563), build (600 tile + 21 group shells, 623 sitemap URLs), data:verify, the worked-examples runner (657 fixtures), and the Chromium + WebKit render-no-nan + responsive-stress sweeps (zero NaN / Infinity / undefined outputs; zero page-level horizontal scroll at 320px on all 600 live tile views). See [specs/spec-v107.md](specs/spec-v107.md).
+
 ### docs: append v105..v120 close note to the mobile-responsive sweep record (667 -> 688 tiles)
 
 Housekeeping on the append-only "current state" running record in [docs/mobile-responsive.md](docs/mobile-responsive.md) §3, which is updated once per spec window but had stalled at the v104 close (**667 tiles, 2026-06-20**) while the live catalog grew to **688** through spec-v120. Same drift class as the README ungated-figure resyncs below: §3's running record is not anchored by any CI gate, so it ages silently between manual sweeps.

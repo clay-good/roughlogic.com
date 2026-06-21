@@ -15,7 +15,7 @@
 // This file is the Phase E pin for every spec-v14 §9.1 iterative method:
 // the pure-math.js primitives (Colebrook, psychrometric, refrigerant P-T,
 // interpLinear), the calc-specific iteratives (Group F computePDP +
-// computeStandpipeFriction, Group W computeDensityAltitude, Group C
+// computeStandpipeFriction, Group C
 // manualJCooling + manualJHeating + computeDuctSize), and the
 // manual-j-worker.js dispatcher that fronts the Group C primitives.
 
@@ -32,7 +32,6 @@ import {
   interpLinear,
 } from "../../pure-math.js";
 import { computePDP, computeStandpipeFriction } from "../../calc-fire.js";
-import { computeDensityAltitude } from "../../calc-aviation.js";
 import { manualJCooling, manualJHeating, computeDuctSize } from "../../calc-hvac.js";
 
 // Encode a double's bit pattern as a hex string. The test asserts the
@@ -443,62 +442,6 @@ test("computeStandpipeFriction: bit-stable for the spec-v14 §9.2 pinned input (
   assert.equal(bits(r.total_psi), "404bf33333333333", `total_psi=${r.total_psi}`);
 });
 
-// --- Group W density altitude (calc-aviation computeDensityAltitude) ----
-
-test("computeDensityAltitude: ISA standard day at sea level returns DA = PA", () => {
-  // PA=0, OAT=15C is ISA; DA must equal PA exactly.
-  const r = computeDensityAltitude({ pressure_altitude_ft: 0, oat_c: 15 });
-  assert.equal(r.density_altitude_ft, 0);
-  assert.equal(r.isa_deviation_c, 0);
-});
-
-test("computeDensityAltitude: monotonic-increasing in OAT at fixed pressure altitude", () => {
-  let prev = -Infinity;
-  for (const oat_c of [-20, 0, 15, 25, 35]) {
-    const r = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c });
-    assert.ok(r.density_altitude_ft > prev, `OAT=${oat_c}: DA=${r.density_altitude_ft}`);
-    prev = r.density_altitude_ft;
-  }
-});
-
-test("computeDensityAltitude: pinned worked example matches the densityAltitudeExample fixture", () => {
-  // FAA worked example: PA=5000 ft, OAT=25C -> DA = 5000 + 120*(25 - 5.1) = 7388 ft.
-  // Pins the formula transcription per spec-v14 §10.
-  const r = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
-  assert.equal(r.density_altitude_ft, 7388);
-});
-
-test("computeDensityAltitude: rejects out-of-domain inputs (no silent fall-through)", () => {
-  // Per spec-v14 §8.3 the function returns a documented error object;
-  // it must not return a numeric DA for an out-of-domain input.
-  const tooHigh = computeDensityAltitude({ pressure_altitude_ft: 100000, oat_c: 15 });
-  assert.ok("error" in tooHigh, `expected error, got ${JSON.stringify(tooHigh)}`);
-  const tooCold = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: -100 });
-  assert.ok("error" in tooCold);
-});
-
-test("computeDensityAltitude: NaN-poisoning returns the documented error, not NaN", () => {
-  const r = computeDensityAltitude({ pressure_altitude_ft: NaN, oat_c: 15 });
-  assert.ok("error" in r, `expected error on NaN PA, got ${JSON.stringify(r)}`);
-  const r2 = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: NaN });
-  assert.ok("error" in r2, `expected error on NaN OAT, got ${JSON.stringify(r2)}`);
-});
-
-test("computeDensityAltitude: deterministic across repeated calls", () => {
-  const a = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
-  const b = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
-  assert.equal(bits(a.density_altitude_ft), bits(b.density_altitude_ft));
-});
-
-test("computeDensityAltitude: bit-stable for the spec-v14 §9.2 pinned FAA worked example", () => {
-  // DA = 5000 + 120 * (25 - 5.1) = 7388 exactly for integer ft inputs.
-  // The bit pattern is the IEEE 754 encoding of 7388.0; a coefficient
-  // drift (120 -> 118, or the ISA-deviation reference 5.1 -> 5.0) moves
-  // the result and the pattern.
-  const r = computeDensityAltitude({ pressure_altitude_ft: 5000, oat_c: 25 });
-  assert.equal(bits(r.density_altitude_ft), "40bcdc0000000000", `DA=${r.density_altitude_ft}`);
-});
-
 // --- Group C Manual J cooling / heating (calc-hvac) ----------------------
 
 const MANUAL_J_REF = {
@@ -695,7 +638,6 @@ test("manual-j-worker: dispatch dispatches cooling / heating / duct / unknown to
 import { voltageDrop, conductorResistance } from "../../pure-math.js";
 import { computeBeamLoading } from "../../calc-construction.js";
 import { computeAmortizationSchedule } from "../../calc-realestate.js";
-import { computeParkland } from "../../calc-ems.js";
 
 test("voltageDrop: bit-stable at the spec-v2 example (single-phase, copper, AWG 12, 100 ft, 20 A)", () => {
   // The reference example in voltageDropExample (calc-electrical.js).
@@ -730,17 +672,6 @@ test("computeAmortizationSchedule: bit-stable monthly payment at $300k / 6.5%% /
   const r = computeAmortizationSchedule({ principal: 300000, apr_percent: 6.5, term_years: 30, extra_monthly_principal: 0 });
   assert.equal(bits(r.monthly_principal_and_interest), "409da0d0f7da03bf",
     `monthly_principal_and_interest=${r.monthly_principal_and_interest} bits=${bits(r.monthly_principal_and_interest)}`);
-});
-
-test("computeParkland: bit-stable at the spec example (80 kg, 30%% TBSA, 0 hr since burn)", () => {
-  // Group V. Total_24hr_mL = 4 * weight * TBSA% = 4 * 80 * 30 = 9600.
-  // Integer output -> exact IEEE-754 representation. Pin all three
-  // outputs (total, first 8 hr, second 16 hr) so a future edit that
-  // broke the 4 mL coefficient or the 50/50 split surfaces.
-  const r = computeParkland({ weight_kg: 80, tbsa_percent: 30, hours_since_burn: 0 });
-  assert.equal(bits(r.total_24hr_mL), "40c2c00000000000", `total_24hr_mL=${r.total_24hr_mL}`);
-  assert.equal(bits(r.first_8hr_mL), "40b2c00000000000", `first_8hr_mL=${r.first_8hr_mL}`);
-  assert.equal(bits(r.second_16hr_mL), "40b2c00000000000", `second_16hr_mL=${r.second_16hr_mL}`);
 });
 
 // --- Phase E ratchet 2026-05-25: five more closed-form bit-stable pins ----
@@ -815,7 +746,6 @@ import { computeFrictionLoss } from "../../calc-plumbing.js";
 import { computeMileageCost } from "../../calc-cross.js";
 import { computeBridgeFormula } from "../../calc-trucking.js";
 import { computeGPA } from "../../calc-agriculture.js";
-import { computeJudgmentInterest } from "../../calc-legal.js";
 
 test("computeFrictionLoss: bit-stable Hazen-Williams pressureLoss_psi at the spec example (1 in PVC, 100 ft, 10 gpm)", () => {
   // Group B. Hazen-Williams head-loss formula h = 10.67 * L * (Q/C)^1.852 / D^4.87
@@ -858,16 +788,6 @@ test("computeGPA: bit-stable boom-sprayer GPA at the spec example (0.4 gpm, 20 i
   assert.equal(bits(r.required_gpm), "3fdaef9f76166929", `required_gpm=${r.required_gpm}`);
 });
 
-test("computeJudgmentInterest: bit-stable accrued_interest at the CA 10% simple example ($10k principal, 366 days)", () => {
-  // Group S. Cal. Civ. Proc. Code 685.010 statutory 10% simple interest.
-  // Accrued = principal * rate * days/365 = 10000 * 0.10 * 366/365 =
-  // 1002.7397260273974. Pins the day-count and the 10% statutory rate.
-  const r = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01" });
-  assert.equal(bits(r.accrued_interest), "408f55eaf57abd60", `accrued_interest=${r.accrued_interest}`);
-  assert.equal(bits(r.total_owed), "40c57d5eaf57abd6", `total_owed=${r.total_owed}`);
-  assert.equal(bits(r.per_day_accrual_at_end), "4005eaf57abd5eaf", `per_day_accrual_at_end=${r.per_day_accrual_at_end}`);
-});
-
 // --- Phase E ratchet 2026-05-25 (fourth batch): five more closed-form pins ---
 //
 // Extends bit-stable pin coverage to five more catalog groups (D
@@ -879,7 +799,6 @@ import { computeStandingWater } from "../../calc-restoration.js";
 import { computeFuelRange } from "../../calc-mechanic.js";
 import { computeSPL } from "../../calc-stage.js";
 import { computeRecipeScale, recipeScaleExample } from "../../calc-kitchen.js";
-import { computeEnergyRequirement } from "../../calc-vet.js";
 
 test("computeStandingWater: bit-stable at the spec example (500 ft^2 / 1 in depth)", () => {
   // Group D. 500 ft^2 * (1/12) ft = 41.666... ft^3; 41.666 * 7.4805 =
@@ -922,31 +841,19 @@ test("computeRecipeScale: bit-stable factor + first-row scaled quantity at the s
   assert.equal(r.rows[0].alt_quantity, 625, `alt_quantity=${r.rows[0].alt_quantity}`);
 });
 
-test("computeEnergyRequirement: bit-stable RER + MER at the spec example (10 kg dog, active)", () => {
-  // Group U. RER = 70 * 10^0.75 = 393.6389276332444 (`40789a390c2e94ba`).
-  // MER = RER * activity_factor (1.6 for an active dog) = 629.8222... Pins
-  // both the 70 coefficient and the 0.75 Kleiber-allometric exponent
-  // against a future drift toward the 1.0 linear or 0.67 Brody variant.
-  const r = computeEnergyRequirement({ weight: 10, weight_unit: "kg", species: "dog", activity: "active", kcal_per_cup: 400 });
-  assert.equal(bits(r.RER_kcal_per_day), "40789a390c2e94ba", `RER=${r.RER_kcal_per_day}`);
-  assert.equal(bits(r.MER_kcal_per_day), "4083ae9409bedd62", `MER=${r.MER_kcal_per_day}`);
-});
-
-// --- Phase E ratchet 2026-05-25 (fifth batch): five within-group depth pins --
+// --- Phase E ratchet 2026-05-25 (fifth batch): within-group depth pins --
 //
 // The first four batches achieved breadth (twenty of twenty-two non-exempt
 // catalog groups carry at least one §9 bit-stable pin). This batch deepens
-// coverage by pinning a second canonical compute function in five groups
+// coverage by pinning a second canonical compute function in groups
 // that previously carried only a single pin: A Electrical (computeThreePhase
 // on top of voltageDrop / conductorResistance), E Construction
 // (computeWindPressure on top of computeBeamLoading), F Fire (computeHydrantFlow
 // on top of computeFireFriction + the iterative computePDP / standpipe pins),
-// W Aviation (computeTopOfDescent on top of the iterative computeDensityAltitude
-// pin), and X Real Estate (computePITI on top of computeAmortizationSchedule).
+// and X Real Estate (computePITI on top of computeAmortizationSchedule).
 
 import { computeThreePhase, threePhaseExample } from "../../calc-electrical.js";
 import { computeWindPressure, windPressureExample } from "../../calc-construction.js";
-import { computeTopOfDescent, topOfDescentExample } from "../../calc-aviation.js";
 import { computePITI, pitiExample } from "../../calc-realestate.js";
 import { computeHydrantFlow, hydrantFlowExample } from "../../calc-fire.js";
 
@@ -971,18 +878,6 @@ test("computeWindPressure: bit-stable q_psf + windward pressure at the ASCE 7 sp
   assert.equal(bits(r.q_psf), "403999999999999a", `q_psf=${r.q_psf}`);
   assert.equal(bits(r.qz_at_30ft_psf), "4035c28f5c28f5c3", `qz_at_30ft_psf=${r.qz_at_30ft_psf}`);
   assert.equal(bits(r.pressure_windward_psf), "40316872b020c49c", `pressure_windward=${r.pressure_windward_psf}`);
-});
-
-test("computeTopOfDescent: bit-stable descent_rate + time + distance at the spec example (FL350->5000, 240 kt)", () => {
-  // Group W. altitude_to_lose = 30000 (exact integer); standard 3-degree
-  // approach distance = 30000/333.33 = 90 nm (exact at integer math);
-  // descent_rate = 30000/22.5 = 1333.33... fpm. Pins both the
-  // 333.33 ft/nm slope conversion and the time-from-distance arithmetic.
-  const r = computeTopOfDescent(topOfDescentExample.inputs);
-  assert.equal(bits(r.altitude_to_lose_ft), "40dd4c0000000000", `altitude_to_lose=${r.altitude_to_lose_ft}`);
-  assert.equal(bits(r.distance_to_start_nm), "4056800000000000", `distance=${r.distance_to_start_nm}`);
-  assert.equal(bits(r.descent_rate_fpm), "4094d55555555555", `descent_rate=${r.descent_rate_fpm}`);
-  assert.equal(bits(r.time_to_descend_min), "4036800000000000", `time=${r.time_to_descend_min}`);
 });
 
 test("computePITI: bit-stable PI + escrow + total at the spec example ($320k / 6.5% / 30 yr, $4800 tax, $1800 ins)", () => {
@@ -1012,9 +907,7 @@ test("computeHydrantFlow: bit-stable flow_gpm at the spec example (10 psi pitot,
 
 import { computePumpSize } from "../../calc-plumbing.js";
 import { computeDetentionTime, detentionTimeExample } from "../../calc-water.js";
-import { computeWageHour } from "../../calc-legal.js";
 import { computeHendersonHasselbalch, hhExample } from "../../calc-lab.js";
-import { computeAnionGap, anionGapExample } from "../../calc-ems.js";
 
 test("computePumpSize: bit-stable hydraulic_hp + shaft_hp at the Hydraulic Institute canonical input (100 gpm, 80 ft, 65% eff)", () => {
   // Group B. hydraulic_hp = Q * H * SG / 3960 = 100 * 80 / 3960 =
@@ -1038,17 +931,6 @@ test("computeDetentionTime: bit-stable minutes + hours at the spec example (5000
   assert.equal(bits(r.hours), "40030c30c30c30c3", `hours=${r.hours}`);
 });
 
-test("computeWageHour: bit-stable regular + overtime + gross at the CA spec example ($15/hr, 45 hrs)", () => {
-  // Group S. FLSA 40-hr OT split: 40 hrs at $15 = $600 regular (exact);
-  // 5 hrs at 1.5 * $15 = $22.50 -> $112.50 OT; gross = $712.50. Pins the
-  // FLSA piecewise-linear arithmetic at the OT threshold; complements
-  // the §10.3 40-hr-boundary monotonicity pin already in place.
-  const r = computeWageHour({ hourly_rate: 15, hours_worked: 45, state: "CA" });
-  assert.equal(bits(r.regular_pay), "4082c00000000000", `regular_pay=${r.regular_pay}`);
-  assert.equal(bits(r.overtime_pay), "405c200000000000", `overtime_pay=${r.overtime_pay}`);
-  assert.equal(bits(r.gross_pay), "4086440000000000", `gross_pay=${r.gross_pay}`);
-});
-
 test("computeHendersonHasselbalch: bit-stable ratio + fraction_base + moles_base at the spec example (pKa=7.20, pH=7.40, 0.1 M, 1 L)", () => {
   // Group T. ratio = 10^(pH-pKa) = 10^0.2 = 1.5849... fraction_base =
   // ratio/(ratio+1) = 0.6131... moles_base = fraction * total_conc *
@@ -1061,15 +943,6 @@ test("computeHendersonHasselbalch: bit-stable ratio + fraction_base + moles_base
   assertNearBits(r.ratio_base_acid, "3ff95bb8f6d46055", "ratio");
   assertNearBits(r.fraction_base, "3fe39ed11bd0ff75", "fraction_base");
   assertNearBits(r.moles_base, "3faf6481c61b3255", "moles_base");
-});
-
-test("computeAnionGap: bit-stable anion_gap at the spec example (Na=140, Cl=104, HCO3=24)", () => {
-  // Group V. AG = Na - (Cl + HCO3) = 140 - 128 = 12 (integer, exact).
-  // Pins the subtraction order against a future refactor that swapped
-  // arguments. The 8-12 normal-band classifier is text and not bit-
-  // pinned here.
-  const r = computeAnionGap(anionGapExample.inputs);
-  assert.equal(bits(r.anion_gap), "4028000000000000", `anion_gap=${r.anion_gap}`);
 });
 
 // --- Phase E ratchet 2026-05-25 (seventh batch): five more depth pins ----
@@ -1146,7 +1019,6 @@ import { computePropSlip, propSlipExample } from "../../calc-mechanic.js";
 import { computeDrawbarPower, drawbarPowerExample } from "../../calc-agriculture.js";
 import { computeRiggingCheck, riggingExample } from "../../calc-stage.js";
 import { computeYieldEP, yieldEPExample } from "../../calc-kitchen.js";
-import { computeVetDose, vetDoseExample } from "../../calc-vet.js";
 
 test("computePropSlip: bit-stable theoretical_kt + slip_percent at the spec example (4500 rpm, 1.85:1, 19 in pitch, 35 kt GPS)", () => {
   // Group K. Theoretical boat speed = (rpm / gear_ratio) * pitch / (12 *
@@ -1188,15 +1060,6 @@ test("computeYieldEP: bit-stable yield_pct + ep_weight + ep_cost_per_lb at the s
   assert.equal(bits(r.yield_pct), "40520fffffffffff", `yield_pct=${r.yield_pct}`);
   assert.equal(bits(r.ep_weight), "401ce66666666666", `ep_weight=${r.ep_weight}`);
   assert.equal(bits(r.ep_cost_per_lb), "4027878787878789", `ep_cost_per_lb=${r.ep_cost_per_lb}`);
-});
-
-test("computeVetDose: bit-stable total_dose_mg + volume_mL at the spec example (20 kg, 5 mg/kg, 50 mg/mL)", () => {
-  // Group U. total_dose = weight * dose_mg_per_kg = 100 mg (exact);
-  // volume_mL = total / concentration = 2 mL (exact integer). Pins the
-  // dose * weight / concentration chain.
-  const r = computeVetDose(vetDoseExample.inputs);
-  assert.equal(bits(r.total_dose_mg), "4059000000000000", `total_dose_mg=${r.total_dose_mg}`);
-  assert.equal(bits(r.volume_mL), "4000000000000000", `volume_mL=${r.volume_mL}`);
 });
 
 // --- Phase E ratchet 2026-05-25 (ninth batch): five third-pin depth tests --
@@ -1333,8 +1196,6 @@ test("computeLTV: bit-stable ltv_percent at the spec example ($320k loan, $400k 
 
 import { computeMacrs, macrsExample } from "../../calc-accounting.js";
 import { computeMolecularWeight, mwExample } from "../../calc-lab.js";
-import { computeMAP, mapExample } from "../../calc-ems.js";
-import { computeFuelPlanning, fuelPlanningExample } from "../../calc-aviation.js";
 import { computeQuadratic, quadraticExample } from "../../calc-edu.js";
 
 test("computeMacrs: bit-stable year_depreciation + book_value at the spec example ($10k, 5-year, half-year, year 1)", () => {
@@ -1356,25 +1217,6 @@ test("computeMolecularWeight: bit-stable mw at the spec example ((NH4)2SO4)", ()
   assert.equal(bits(r.molecular_weight), "40608449ba5e3540", `mw=${r.molecular_weight}`);
 });
 
-test("computeMAP: bit-stable map_mmHg + pulse_pressure at the spec example (SBP=120, DBP=80)", () => {
-  // Group V. MAP = (SBP + 2*DBP)/3 = (120 + 160)/3 = 93.333... Pins the
-  // weighted-average form against a future swap to the (SBP+DBP)/2
-  // arithmetic mean. Pulse pressure = SBP - DBP = 40 (exact).
-  const r = computeMAP(mapExample.inputs);
-  assert.equal(bits(r.map_mmHg), "4057555555555555", `map_mmHg=${r.map_mmHg}`);
-  assert.equal(bits(r.pulse_pressure_mmHg), "4044000000000000", `pulse_pressure=${r.pulse_pressure_mmHg}`);
-});
-
-test("computeFuelPlanning: bit-stable required_fuel_gal + required_fuel_lb at the spec example (3 hr, 10.5 gph, 45 min reserve, avgas)", () => {
-  // Group W. trip = 3*10.5 = 31.5 gal; reserve = 0.75*10.5 = 7.875 gal;
-  // required = 39.375 gal (exact); required_lb = 39.375 * 6.0 = 236.25
-  // (exact). Pins the FAA-published avgas weight 6.0 lb/gal and the
-  // reserve-in-hours conversion (45 min / 60 = 0.75).
-  const r = computeFuelPlanning(fuelPlanningExample.inputs);
-  assert.equal(bits(r.required_fuel_gal), "4043b00000000000", `required_fuel_gal=${r.required_fuel_gal}`);
-  assert.equal(bits(r.required_fuel_lb), "406d880000000000", `required_fuel_lb=${r.required_fuel_lb}`);
-});
-
 test("computeQuadratic: bit-stable discriminant + roots + vertex at the spec example", () => {
   // Group Y. Discriminant b^2 - 4ac and roots (-b +- sqrt(D))/(2a).
   // Pins the standard quadratic-formula arithmetic and the vertex
@@ -1388,20 +1230,16 @@ test("computeQuadratic: bit-stable discriminant + roots + vertex at the spec exa
   assert.equal(bits(r.vertex_y), "bfd0000000000000", `vertex_y=${r.vertex_y}`);
 });
 
-// --- Phase E ratchet 2026-05-25 (twelfth batch): five more third-pin tests
+// --- Phase E ratchet 2026-05-25 (twelfth batch): more third-pin tests
 //
-// Continues the third-pin depth campaign for five more catalog groups (K
-// Mechanic, L Agriculture, N Stage, O Kitchen, U Veterinary). After this
-// batch nineteen of twenty breadth-covered groups carry three or more
-// closed-form §9 pins; only S Legal remains at two-pin depth (computeContractor
-// / computeStatuteOfLimitations / etc. all return categorical labels rather
-// than numerical outputs, so the third-pin candidate is narrow there).
+// Continues the third-pin depth campaign for four more catalog groups (K
+// Mechanic, L Agriculture, N Stage, O Kitchen), deepening each from two
+// closed-form §9 pins to three or more.
 
 import { computeBoltStretch, boltStretchExample } from "../../calc-mechanic.js";
 import { computeSeedRate, seedRateExample } from "../../calc-agriculture.js";
 import { computeTrussCapacity, trussExample } from "../../calc-stage.js";
 import { computePanConversion, panConversionExample } from "../../calc-kitchen.js";
-import { computeMaintenanceFluid, maintenanceFluidExample } from "../../calc-vet.js";
 
 test("computeBoltStretch: bit-stable clamp_load + cross_check_torque at the spec example (0.5 in, 4 in grip, 5 thou stretch, steel, k=0.18)", () => {
   // Group K. clamp_load = stretch_in * E * area / grip_length; torque
@@ -1442,18 +1280,6 @@ test("computePanConversion: bit-stable total_qt + capacity_qt + servings_per_pan
   assert.equal(bits(r.total_qt), "4019000000000000", `total_qt=${r.total_qt}`);
   assert.equal(bits(r.capacity_qt), "402b000000000000", `capacity_qt=${r.capacity_qt}`);
   assert.equal(bits(r.servings_per_pan), "405b000000000000", `servings_per_pan=${r.servings_per_pan}`);
-});
-
-test("computeMaintenanceFluid: bit-stable maintenance_mL_per_hr + per_day + replacement at the spec example (20 kg dog, 5% dehydration, 24 hr rehydration window)", () => {
-  // Group U. Plumb's / AAHA: dog maintenance = 60 mL/kg/day -> 1200
-  // mL/day at 20 kg (exact), /24 = 50 mL/hr (exact). Replacement =
-  // 20 * 5% * 1000 = 1000 mL (exact integer). Pins the 60 mL/kg/day
-  // dog-maintenance constant and the dehydration-pct-to-mL chain.
-  const r = computeMaintenanceFluid(maintenanceFluidExample.inputs);
-  assert.equal(bits(r.maintenance_mL_per_hr), "4049000000000000", `maint_per_hr=${r.maintenance_mL_per_hr}`);
-  assert.equal(bits(r.maintenance_mL_per_day), "4092c00000000000", `maint_per_day=${r.maintenance_mL_per_day}`);
-  assert.equal(bits(r.replacement_total_mL), "408f400000000000", `replacement=${r.replacement_total_mL}`);
-  assert.equal(bits(r.total_rate_mL_per_hr), "4056eaaaaaaaaaaa", `total_rate=${r.total_rate_mL_per_hr}`);
 });
 
 test("determinism: pure-math calculators return identical bit patterns on repeat", () => {

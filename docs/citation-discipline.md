@@ -115,7 +115,6 @@ The structured §3 reference block in `citations.js` is the deeper source - this
 | --- | --- |
 | hos-math | "Notice: Math aid for personal verification. The ELD on the truck is the legal record. Citation: per FMCSA 49 CFR 395 (Hours of Service). Free at ecfr.gov." |
 | bridge-formula | "Citation: per 23 CFR 658.17 (Federal Bridge Formula). W = 500 (LN/(N-1) + 12N + 36) for any consecutive axle group N >= 2. State limits may be lower than federal. Free at ecfr.gov." |
-| weight-balance | "Notice: Pilot-in-command and the airplane flight manual govern. Math aid only; verify against the AFM loading graph or table. Citation: per FAA AC 91-23A (Pilot's Weight and Balance Handbook). Free at faa.gov/regulations_policies/advisory_circulars." |
 
 ### calc-vet.js (Group U, v12 §5)
 
@@ -123,13 +122,6 @@ Per spec-v12 §13.1 every Group U tile renders the v10 §B.1 limitation banner n
 
 | Tile | Source-stamp |
 | --- | --- |
-| vet-weight-based-dose | "Notice: Math aid; verify against the current drug formulary. Citation: First-principles arithmetic over user-supplied dose and concentration. No drug table is bundled; reference formularies named in the limitation banner (Plumb's Veterinary Drug Handbook 10th ed.; USP Compendium; FDA-approved labeling). Veterinarian governs." |
-| vet-maintenance-fluid | "Notice: Math aid; veterinarian governs adjustments for cardiac / renal / hepatic disease. Citation: Per Holliday and Segar, Pediatrics 19:5 (1957), adapted for veterinary use per DiBartola, Fluid, Electrolyte, and Acid-Base Disorders in Small Animal Practice (4th ed.). Free at ncbi.nlm.nih.gov/pmc for the Holliday-Segar reprint." |
-| vet-energy-requirement | "Citation: RER = 70 * BW_kg^0.75 per the AAHA-AAFP Life Stage Guidelines (2019 canine / 2021 feline). Activity multipliers per AAHA published table. Veterinarian governs in chronic disease states. Free at aaha.org and catvets.com." |
-| vet-toxicity | "Notice: Screening estimate. Call ASPCA Animal Poison Control Center at 888-426-4435 (consult fee applies) for any suspected ingestion. Citation: Per ASPCA APCC published thresholds and Plumb's Veterinary Drug Handbook 10th ed. Veterinarian governs. Free at aspca.org/pet-care/animal-poison-control." |
-| vet-plasma-css | "Citation: Css = (Dose * F) / (CL * tau) per Riviere and Papich, Veterinary Pharmacology and Therapeutics (10th ed.) Ch. 3. Veterinarian governs final dosing. Free at wiley.com for TOC; standard pharmacokinetic identity, no copyrighted content reproduced." |
-| vet-vaccine-schedule | "Citation: Per AAHA Canine Vaccination Guidelines (2022 update) and AAFP Feline Vaccination Advisory Panel Report (2020 update). Rabies cadence defers to state-AHJ statute, not encoded here. Veterinarian and state-AHJ govern. Free at aaha.org and catvets.com." |
-| vet-heartworm-dose | "Citation: Per FDA-approved labeling via DailyMed (Heartgard Plus, Interceptor Plus, Revolution). Negative heartworm test required before initiation; MDR1 / contraindication note governed by attending veterinarian. Free at dailymed.nlm.nih.gov." |
 
 ### calc-ems.js (Group V, v12 §6)
 
@@ -137,14 +129,6 @@ Per spec-v12 §13.1 every Group V tile renders the v10 §B.1 limitation banner n
 
 | Tile | Source-stamp |
 | --- | --- |
-| glasgow-coma-scale | "Citation: Per Teasdale and Jennett, 'Assessment of coma and impaired consciousness,' Lancet 304:7872 (1974). Adopted by ACEP, ACS Committee on Trauma, and NAEMT. Receiving facility's neurosurgeon governs final disposition. Free at thelancet.com for the abstract." |
-| parkland-formula | "Citation: Per Baxter, 'Fluid Volume and Electrolyte Changes in the Early Post-burn Period,' Clinics in Plastic Surgery 1:4 (1974). Adopted by American Burn Association and ATLS (Student Course Manual 10th ed. Ch. 9). Receiving burn-center physician governs. Free at ameriburn.org for ABA referral criteria." |
-| rule-of-9s | "Citation: Rule of 9s per Pulaski and Tennison, Surgery (1947). Lund-Browder per Lund and Browder, Surgery, Gynecology and Obstetrics 79 (1944). Both adopted by ABA. ABA major-burn band at >= 20 percent TBSA. Receiving burn-center physician governs. Free at ameriburn.org for ABA referral criteria." |
-| apgar-score | "Citation: Per Apgar, 'A Proposal for a New Method of Evaluation of the Newborn Infant,' Anesthesia and Analgesia 32:4 (1953). AAP and ACOG govern interpretation. Free at journals.lww.com for the historical reprint." |
-| cincinnati-stroke-scale | "Citation: Per Kothari, Pancioli, Liu, Brott, and Broderick, 'Cincinnati Prehospital Stroke Scale: reproducibility and validity,' Annals of Emergency Medicine 33:4 (1999). CDC public materials reference. Receiving stroke-center physician governs. Free at cdc.gov/stroke." |
-| start-triage | "Citation: START per Newport Beach Fire Department and Hoag Hospital (1983). JumpSTART per Romig, JEMS (2002). CDC Field Triage Guidelines for Injured Patients (2021), public domain. Incident commander governs. Free at cdc.gov/mmwr." |
-| iv-drip-rate | "Citation: First-principles arithmetic over drop-factor specified on the IV-set label. Nurse / paramedic governs the bedside rate adjustment. No copyrighted source." |
-| nihss | "Citation: Per Brott et al., 'Measurements of acute cerebral infarction: a clinical examination scale,' Stroke 20:7 (1989). Instrument distributed by NIH NINDS in the public domain. AHA / ASA severity bands. Receiving stroke-center neurologist governs tPA / EVT decision. Free at ninds.nih.gov/health-information/stroke." |
 
 ### calc-aviation.js (Group W, v12 §7)
 
@@ -152,15 +136,6 @@ Group W does not render the §B.1 limitation banner; the cite-strong aviation go
 
 | Tile | Source-stamp |
 | --- | --- |
-| density-altitude | "Citation: Per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 4. DA = PA + 120 * (OAT_C - ISA_C). PIC governs final go / no-go. Free at faa.gov/regulations_policies/handbooks_manuals/aviation." |
-| true-airspeed | "Citation: Per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) and the ICAO Standard Atmosphere (ISO 2533:1975). AFM / POH governs. Free at faa.gov and iso.org for TOC." |
-| crosswind-component | "Citation: Pure planar geometry over runway heading and wind direction. AFM / POH demonstrated-crosswind value is an aircraft-specific tested value, not a limitation; PIC governs. No copyrighted source." |
-| magnetic-variation | "Citation: TVMDC convention per FAA Pilot's Handbook of Aeronautical Knowledge (FAA-H-8083-25C) Chapter 16. The continental-scale model is in the magnetic-declination tile (NOAA NCEI WMM 2025). PIC must cross-check against the sectional chart. Free at faa.gov and ncei.noaa.gov/products/world-magnetic-model." |
-| metar-decoder | "Citation: Per FAA Aviation Weather Services (AC 00-45H Change 2) and NWS Federal Meteorological Handbook 1 (FMH-1). PIC governs. Free at faa.gov/regulations_policies/advisory_circulars and weather.gov." |
-| taf-decoder | "Citation: Per FAA AC 00-45H Change 2 and WMO Manual on Codes (WMO-No. 306). PIC governs. Free at faa.gov and library.wmo.int." |
-| hypoxia-altitude | "Citation: Per 14 CFR 91.211. PIC governs cabin oxygen plan. Free at ecfr.gov." |
-| fuel-planning | "Citation: Per 14 CFR 91.151 (day VFR fuel reserve) and 91.167 (IFR fuel reserve). Density per ASTM D1655 (jet-A 6.7 lb/gal at 15 C) and avgas spec (6.0 lb/gal). PIC governs flight planning. Free at ecfr.gov." |
-| wind-triangle | "Citation: Pure planar vector identity (E6B). AFM / POH groundspeed table is the cross-check. No copyrighted source." |
 
 ### calc-realestate.js (Group X, v12 §8)
 

@@ -461,7 +461,7 @@ const TOOL_MODULES = (() => {
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
-    "weight-balance", "prop-slip", "displacement-cr", "bolt-stretch",
+    "prop-slip", "displacement-cr", "bolt-stretch",
     "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
     // v23
     "valve-flow-coefficient", "screw-conveyor",
@@ -599,16 +599,6 @@ const TOOL_MODULES = (() => {
     // v20
     "declining-balance-depreciation", "markup-vs-margin", "employer-payroll-tax",
   ]);
-  // v5 Group S: Legal Plain-English and Statutory Math (utilities 246-254).
-  declare("./calc-legal.js", "LEGAL_RENDERERS", [
-    "judgment-interest", "court-deadline", "statute-of-limitations",
-    "small-claims-reference", "tenant-notice", "wage-hour",
-    "contractor-vs-employee", "contract-clause-reference", "lease-term-reference",
-    "wage-garnishment",
-  
-    // v20
-    "federal-post-judgment-interest", "lease-rent-proration",
-  ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [
     "molarity-dilution", "serial-dilution", "molecular-weight", "mass-moles",
@@ -619,53 +609,6 @@ const TOOL_MODULES = (() => {
   
     // v20
     "primer-tm", "cfu-plate-count",
-  ]);
-  // v12 Group U: Veterinary (spec-v12.md §5).
-  declare("./calc-vet.js", "VET_RENDERERS", [
-    "vet-weight-based-dose", "vet-maintenance-fluid", "vet-energy-requirement",
-    "vet-bcs-reference", "vet-pet-age", "vet-gestation",
-    "vet-ett-sizing", "vet-anesthesia-vitals", "vet-asa-classification",
-    "vet-bloodwork-ranges", "vet-urine-sg", "vet-target-weight-loss",
-    "vet-toxicity", "vet-breed-predispositions", "vet-plasma-css",
-    "vet-vaccine-schedule", "vet-heartworm-dose", "vet-crystalloid-plan",
-    // v17
-    "vet-cri", "vet-transfusion", "equine-weight",
-  
-    // v20
-    "vet-body-surface-area", "vet-corrected-reticulocyte", "vet-fluid-deficit", "vet-anion-gap",
-  ]);
-  // v12 Group V: EMS / Pre-hospital (spec-v12.md §6).
-  declare("./calc-ems.js", "EMS_RENDERERS", [
-    "glasgow-coma-scale", "parkland-formula", "cincinnati-stroke-scale",
-    "apgar-score", "iv-drip-rate", "o2-cylinder-duration",
-    "pediatric-weight-estimate", "shock-index", "mean-arterial-pressure",
-    "anion-gap", "corrected-calcium", "cha2ds2-vasc",
-    "wells-dvt", "wells-pe", "perc-rule",
-    "rule-of-9s", "pediatric-vitals", "nihss",
-    "start-triage", "drug-concentration",
-    // v17
-    "ideal-body-weight", "corrected-qt",
-    // v23
-    "pediatric-tube-depth",
-  
-    // v20
-    "cockcroft-gault-crcl", "winters-expected-pco2", "aa-gradient", "fena",
-  ]);
-  // v12 Group W: Pilots / Aviation (spec-v12.md §7).
-  declare("./calc-aviation.js", "AVIATION_RENDERERS", [
-    "density-altitude", "crosswind-component", "ete-eta",
-    "hypoxia-altitude", "pressure-altitude", "phonetic-alphabet",
-    "fuel-planning", "wind-triangle", "top-of-descent",
-    "weather-phrasing", "transponder-codes", "standard-turn-rate",
-    "true-airspeed", "sectional-symbols", "aircraft-category",
-    "magnetic-variation", "metar-decoder", "taf-decoder",
-    // v17
-    "holding-fuel",
-    // v23
-    "weight-shift-fuel-burn",
-  
-    // v20
-    "isa-temp-correction", "weight-shift-cg", "landing-takeoff-da-correction",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [
@@ -855,7 +798,9 @@ const TOOL_DATA_SOURCES = {
 };
 
 const TRADES = ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire", "trucking", "mechanic", "agriculture", "water", "stage", "kitchen", "field", "reference", "accounting", "small-business", "tax", "legal", "lab", "compliance"];
-const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+// spec-v107: groups S (Legal), U (Veterinary), V (EMS), W (Aviation) retired.
+// Gaps in the letter sequence are expected and allowed (spec-v106 §5).
+const GROUPS = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "T", "X", "Y", "Z"];
 
 // Display names for each group used as section headers on the home page.
 const GROUP_NAMES = {
@@ -876,11 +821,7 @@ const GROUP_NAMES = {
   P: "Field, Backcountry, and SAR",
   Q: "Historical Reference Data",
   R: "Accounting, Tax, and Small-Business",
-  S: "Legal Plain-English and Statutory Math",
   T: "Bench Science and Laboratory Math",
-  U: "Veterinary",
-  V: "EMS and Pre-hospital",
-  W: "Pilots and General Aviation",
   X: "Real Estate",
   Y: "Educators and K-12",
   Z: "Rigging and Heavy Lift",

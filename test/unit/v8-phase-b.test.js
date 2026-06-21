@@ -162,10 +162,6 @@ test("B.6 bridge-formula cites 23 CFR 658.17 + state-limits caveat", async () =>
   const t = await readCalc("calc-trucking.js");
   assertCitationContains(t, ["23 CFR 658.17", "State limits may be lower", "ecfr.gov"], "bridge-formula");
 });
-test("B.6 weight-balance cites FAA AC 91-23A + AFM governs", async () => {
-  const t = await readCalc("calc-mechanic.js");
-  assertCitationContains(t, ["FAA AC 91-23A", "airplane flight manual", "faa.gov"], "weight-balance");
-});
 
 // --- Free-access host coverage roll-up ---
 

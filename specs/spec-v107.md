@@ -1,5 +1,14 @@
 # roughlogic.com Specification v107 -- Retire Four Non-Trade Groups (CUT): Complete Removal of Legal (S), Veterinary (U), EMS / Pre-hospital (V), and Pilots / Aviation (W), plus one stray flight-ops tile (catalog 669 -> 581; 25 -> 21 groups; 53 -> 49 modules)
 
+> **Status: LANDED 2026-06-21 (package 0.72.0).** Executed against the live catalog, which had
+> grown to 688 tiles since this spec was drafted, so the as-landed anchored counts differ from the
+> 669-tile baseline in the title and body below: the cut took the catalog **688 -> 600** (not
+> 669 -> 581), **25 -> 21 groups**, **53 -> 49 modules**, and **715 -> 623 sitemap URLs**. The
+> removal set is identical to what this spec specifies (the 87 group S/U/V/W tiles plus the stray
+> `weight-balance`); only the surviving-catalog totals are larger because v109-v120 added tiles to
+> surviving groups in the interim. Unit-test green bar re-pinned at 4,895 (from 5,563). All gates
+> green; see the README v107 changelog entry. Original spec text preserved below.
+>
 > **Status: SPECIFIED 2026-06-20, awaiting an execution pass.** v107 is the **CUT** pass of the
 > three dispositions (spec-v106 §5.1): it removes the four liability-bearing non-trade groups
 > recorded in **spec-v106.md §6**, plus one stray flight-ops tile filed under Mechanic. It is a

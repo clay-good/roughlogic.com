@@ -16,12 +16,8 @@ import {
 import { computeStaticPressureLossPiping } from "../../calc-plumbing.js";
 import { computeAmortization, computeInventoryTurnover } from "../../calc-accounting.js";
 import { computePerDiemInterest } from "../../calc-realestate.js";
-import { computeJudgmentInterest } from "../../calc-legal.js";
-import { computeDrugConcentration } from "../../calc-ems.js";
-import { computeMaintenanceFluid } from "../../calc-vet.js";
 import { computeDilution as computeLabDilution } from "../../calc-lab.js";
 import { computeSRTandFM, computeDilution as computeWaterDilution } from "../../calc-water.js";
-import { computeStandardTurn } from "../../calc-aviation.js";
 import { computeLinearRegression, computePearson, computeBaseConvert } from "../../calc-edu.js";
 import { computeTimeAndMaterials, computeMaterialCost } from "../../calc-cross.js";
 import { computePercentileBands } from "../../calc-historical.js";
@@ -108,27 +104,6 @@ test("DR-12 (D-5/C-1): computePerDiemInterest 30/360 close on the 31st accrues 1
   assert.equal(r.days_to_eom, 1);
 });
 
-test("DR-13 (D-5/C-8): computeJudgmentInterest declares its Actual/365-Fixed basis", () => {
-  const r = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01" });
-  assert.equal(r.day_count_basis, "Actual/365-Fixed");
-  assert.match(r.notice, /365/);
-});
-
-// --- 3.4 allied health ---
-
-test("DR-14 (D-2/C-3): computeDrugConcentration zero ordered dose -> { error }", () => {
-  const r = computeDrugConcentration({ ordered_dose_mg: 0, stock_concentration_mg_per_mL: 50 });
-  assert.ok(r.error);
-});
-
-test("DR-15 (D-2/C-3): computeMaintenanceFluid non-numeric dehydration -> { error }", () => {
-  const r = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: "5o" });
-  assert.ok(r.error);
-  // Absent (undefined) still defaults cleanly.
-  const ok = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog" });
-  assert.ok(!ok.error);
-});
-
 test("DR-16 (D-3/C-1): lab computeDilution v1 > v2 -> flagged, no negative diluent", () => {
   const r = computeLabDilution({ c1: 1, v1: 10, c2: 2, v2: 5 });
   assert.equal(r.diluent_volume, null);
@@ -148,14 +123,6 @@ test("DR-18 (D-7/C-3): water computeDilution all-positive -> { error }; one blan
   const solved = computeWaterDilution({ c1: 1000, v1: 0, c2: 50, v2: 100, mode: "single" });
   assert.ok(!solved.error);
   assert.ok(Math.abs(solved.v1 - 5) < 1e-9);
-});
-
-test("DR-19 (D-4/C-7): aviation computeStandardTurn TAS>600 keeps valid outputs", () => {
-  const r = computeStandardTurn({ true_airspeed_kt: 700, turn_through_deg: 90 });
-  assert.ok(!r.error);
-  assert.equal(r.time_to_turn_through_sec, 30);
-  assert.equal(r.bank_rule_of_thumb_deg, undefined);
-  assert.ok(r.flags.length >= 1);
 });
 
 test("DR-20 (D-1/C-1): computeLinearRegression perfect fit -> t null + perfect_fit flag", () => {

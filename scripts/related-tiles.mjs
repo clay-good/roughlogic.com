@@ -24,27 +24,14 @@
 // better match".
 
 const RELATED = {
-  "isa-temp-correction": ["density-altitude", "pressure-altitude", "true-airspeed"],
-  "weight-shift-cg": ["weight-shift-fuel-burn", "density-altitude", "fuel-planning"],
-  "landing-takeoff-da-correction": ["density-altitude", "isa-temp-correction", "pressure-altitude"],
   "final-grade-needed": ["category-weighted-grade", "standards-based-grade", "gpa-calculator"],
   "category-weighted-grade": ["final-grade-needed", "standards-based-grade", "gpa-calculator"],
   "two-sample-t-test": ["pearson-correlation", "linear-regression", "confidence-interval"],
   "gross-rent-multiplier": ["cap-rate-dscr", "cash-on-cash", "rental-worksheet"],
   "pmi-cancellation-date": ["amortization-schedule", "ltv", "piti"],
   "seller-net-sheet": ["closing-costs", "commission-split", "per-diem-interest"],
-  "cockcroft-gault-crcl": ["ideal-body-weight", "drug-concentration", "mean-arterial-pressure"],
-  "winters-expected-pco2": ["anion-gap", "corrected-calcium", "mean-arterial-pressure"],
-  "aa-gradient": ["winters-expected-pco2", "shock-index", "o2-cylinder-duration"],
-  "fena": ["cockcroft-gault-crcl", "anion-gap", "corrected-calcium"],
-  "vet-body-surface-area": ["vet-weight-based-dose", "vet-energy-requirement", "vet-cri"],
-  "vet-corrected-reticulocyte": ["vet-bloodwork-ranges", "vet-transfusion", "vet-target-weight-loss"],
-  "vet-fluid-deficit": ["vet-maintenance-fluid", "vet-crystalloid-plan", "vet-cri"],
-  "vet-anion-gap": ["vet-bloodwork-ranges", "vet-crystalloid-plan", "vet-urine-sg"],
   "primer-tm": ["pcr-master-mix", "molecular-weight", "serial-dilution"],
   "cfu-plate-count": ["serial-dilution", "hemocytometer", "od600-cell-count"],
-  "federal-post-judgment-interest": ["judgment-interest", "loan-amortization", "statute-of-limitations"],
-  "lease-rent-proration": ["tenant-notice", "lease-term-reference", "judgment-interest"],
   "declining-balance-depreciation": ["macrs-depreciation", "straight-line-depreciation", "section-179"],
   "markup-vs-margin": ["breakeven", "inventory-turnover", "sales-tax-compound"],
   "employer-payroll-tax": ["payroll-withholding", "se-tax", "estimated-tax"],
@@ -199,10 +186,9 @@ const RELATED = {
 
   // Group K: Mechanic. weight-balance + prop-slip for marine /
   // aviation; displacement-cr + driveshaft-crit + fuel-range for auto.
-  "weight-balance": ["fuel-range", "prop-slip"],
-  "prop-slip": ["weight-balance", "displacement-cr"],
+  "prop-slip": ["displacement-cr"],
   "displacement-cr": ["bolt-stretch", "driveshaft-crit"],
-  "fuel-range": ["weight-balance", "mileage-cost"],
+  "fuel-range": ["mileage-cost"],
 
   // Group L: Agriculture. gpa-rate -> sprayer-calibration -> seed-rate
   // is the field-prep workflow; thi-livestock + crop-yield support the
@@ -231,16 +217,8 @@ const RELATED = {
 
   // Group U / V: Vet + EMS. The most-asked cross-references in the
   // worked-example fixtures.
-  "vet-weight-based-dose": ["vet-maintenance-fluid", "vet-energy-requirement", "vet-toxicity"],
-  "vet-maintenance-fluid": ["vet-weight-based-dose", "vet-crystalloid-plan", "vet-energy-requirement"],
-  "parkland-formula": ["rule-of-9s", "iv-drip-rate"],
-  "glasgow-coma-scale": ["nihss", "cincinnati-stroke-scale"],
-  "rule-of-9s": ["parkland-formula", "iv-drip-rate"],
 
   // Group W / X / Y: Aviation, Real Estate, Educators.
-  "density-altitude": ["pressure-altitude", "true-airspeed", "hypoxia-altitude"],
-  "true-airspeed": ["density-altitude", "pressure-altitude", "wind-triangle"],
-  "wind-triangle": ["crosswind-component", "true-airspeed", "ete-eta"],
   "piti": ["ltv", "dti", "amortization-schedule"],
   "ltv": ["piti", "dti", "loan-limits"],
   "dti": ["piti", "ltv"],
@@ -260,7 +238,7 @@ const RELATED = {
   "irs-form-index": ["sales-tax-nexus", "se-tax", "estimated-tax"],
   "sales-tax-nexus": ["sales-tax-compound", "sales-tax", "irs-form-index"],
   "lab-safety-quickread": ["molarity-dilution", "serial-dilution", "ppe"],
-  "triage-quickread": ["start-triage", "glasgow-coma-scale", "parkland-formula"],
+  "triage-quickread": [],
 
   // Group N: Stage and Live Production. The audio cluster
   // (spl-distance, spl-atmospheric, time-alignment) pairs with the
@@ -321,16 +299,6 @@ const RELATED = {
   // + lease-term-reference + wage-hour pair the landlord-tenant and
   // employment references; contractor-vs-employee pairs with the
   // Group R payroll cluster.
-  "court-deadline": ["statute-of-limitations", "small-claims-reference"],
-  "statute-of-limitations": ["court-deadline", "small-claims-reference"],
-  "small-claims-reference": ["court-deadline", "statute-of-limitations"],
-  "tenant-notice": ["lease-term-reference", "wage-hour"],
-  "lease-term-reference": ["tenant-notice", "contract-clause-reference"],
-  "wage-hour": ["contractor-vs-employee", "payroll-withholding", "tenant-notice"],
-  "contractor-vs-employee": ["wage-hour", "payroll-withholding", "se-tax"],
-  "contract-clause-reference": ["lease-term-reference", "tenant-notice"],
-  "judgment-interest": ["statute-of-limitations", "loan-amortization"],
-  "wage-garnishment": ["wage-hour", "payroll-withholding", "judgment-interest"],
 
   // Group T: Bench Science. molarity-dilution -> serial-dilution ->
   // resuspension-volume is the wet-lab workflow; molecular-weight +
@@ -352,67 +320,17 @@ const RELATED = {
   // ladder is vet-weight-based-dose -> vet-toxicity -> vet-
   // heartworm-dose; the anesthesia cluster is vet-asa-classification
   // -> vet-anesthesia-vitals -> vet-ett-sizing.
-  "vet-energy-requirement": ["vet-weight-based-dose", "vet-maintenance-fluid", "vet-target-weight-loss"],
-  "vet-bcs-reference": ["vet-target-weight-loss", "vet-energy-requirement"],
-  "vet-target-weight-loss": ["vet-bcs-reference", "vet-energy-requirement"],
-  "vet-toxicity": ["vet-weight-based-dose", "vet-maintenance-fluid"],
-  "vet-ett-sizing": ["vet-anesthesia-vitals", "vet-asa-classification"],
-  "vet-anesthesia-vitals": ["vet-ett-sizing", "vet-asa-classification"],
-  "vet-asa-classification": ["vet-anesthesia-vitals", "vet-ett-sizing"],
-  "vet-crystalloid-plan": ["vet-maintenance-fluid", "vet-weight-based-dose", "vet-cri"],
-  "vet-heartworm-dose": ["vet-weight-based-dose", "vet-vaccine-schedule"],
-  "vet-vaccine-schedule": ["vet-pet-age", "vet-heartworm-dose"],
-  "vet-cri": ["vet-weight-based-dose", "vet-crystalloid-plan", "vet-plasma-css"],
-  "vet-transfusion": ["vet-crystalloid-plan", "vet-bloodwork-ranges", "vet-maintenance-fluid"],
-  "equine-weight": ["vet-energy-requirement", "vet-weight-based-dose", "vet-bcs-reference"],
-  "vet-pet-age": ["vet-bcs-reference", "vet-vaccine-schedule"],
-  "vet-bloodwork-ranges": ["vet-urine-sg", "vet-plasma-css"],
 
   // Group V: EMS (fill-in). The cardiac-risk trio (cha2ds2-vasc,
   // wells-dvt, wells-pe) pair through perc-rule; the pediatric cluster
   // (pediatric-vitals, pediatric-weight-estimate, apgar-score) pair
   // through iv-drip-rate; shock-index + mean-arterial-pressure +
   // anion-gap are the bedside-math trio.
-  "shock-index": ["mean-arterial-pressure", "anion-gap"],
-  "mean-arterial-pressure": ["shock-index", "anion-gap"],
-  "anion-gap": ["mean-arterial-pressure", "corrected-calcium"],
-  "corrected-calcium": ["anion-gap"],
-  "cha2ds2-vasc": ["wells-dvt", "wells-pe", "perc-rule"],
-  "wells-dvt": ["wells-pe", "perc-rule", "cha2ds2-vasc"],
-  "wells-pe": ["wells-dvt", "perc-rule", "cha2ds2-vasc"],
-  "perc-rule": ["wells-pe", "wells-dvt"],
-  "pediatric-vitals": ["pediatric-weight-estimate", "apgar-score"],
-  "pediatric-weight-estimate": ["pediatric-vitals", "drug-concentration"],
-  "apgar-score": ["pediatric-vitals", "pediatric-weight-estimate"],
-  "iv-drip-rate": ["drug-concentration", "o2-cylinder-duration"],
-  "drug-concentration": ["iv-drip-rate", "pediatric-weight-estimate"],
-  "o2-cylinder-duration": ["iv-drip-rate", "scba-cylinder-time"],
-  "start-triage": ["triage-quickread", "glasgow-coma-scale"],
-  "nihss": ["cincinnati-stroke-scale", "glasgow-coma-scale"],
-  "cincinnati-stroke-scale": ["nihss", "glasgow-coma-scale"],
-  "ideal-body-weight": ["drug-concentration", "iv-drip-rate", "pediatric-weight-estimate"],
-  "corrected-qt": ["cha2ds2-vasc", "anion-gap", "mean-arterial-pressure"],
 
   // Group W: Aviation (fill-in). The weather cluster (metar-decoder,
   // taf-decoder, weather-phrasing) pairs through hypoxia-altitude and
   // pressure-altitude; the cross-country planning cluster (fuel-
   // planning, ete-eta, top-of-descent) pairs through wind-triangle.
-  "pressure-altitude": ["density-altitude", "true-airspeed", "hypoxia-altitude"],
-  "crosswind-component": ["wind-triangle", "true-airspeed"],
-  "hypoxia-altitude": ["density-altitude", "pressure-altitude"],
-  "metar-decoder": ["taf-decoder", "weather-phrasing"],
-  "taf-decoder": ["metar-decoder", "weather-phrasing"],
-  "weather-phrasing": ["metar-decoder", "taf-decoder"],
-  "fuel-planning": ["ete-eta", "top-of-descent", "wind-triangle"],
-  "ete-eta": ["fuel-planning", "wind-triangle", "top-of-descent"],
-  "top-of-descent": ["ete-eta", "fuel-planning", "standard-turn-rate"],
-  "holding-fuel": ["fuel-planning", "ete-eta", "wind-triangle"],
-  "magnetic-variation": ["bearing-conversion", "wind-triangle"],
-  "phonetic-alphabet": ["transponder-codes", "weather-phrasing"],
-  "transponder-codes": ["phonetic-alphabet", "weather-phrasing"],
-  "standard-turn-rate": ["top-of-descent", "wind-triangle"],
-  "aircraft-category": ["sectional-symbols", "transponder-codes"],
-  "sectional-symbols": ["aircraft-category", "metar-decoder"],
 
   // Group X: Real Estate (fill-in). The investment trio (cap-rate-dscr,
   // cash-on-cash, rental-worksheet) pair through closing-costs;
@@ -650,7 +568,7 @@ const RELATED = {
   "confined-space-purge": ["confined-space-vent", "smoke-reading"],
   "sling-angle": ["rope-ma", "rigging-check", "ladder-angle"],
   "iso-nff": ["required-fire-flow", "hydrant-flow", "nfpa-1142-water-supply"],
-  "scba-cylinder-time": ["o2-cylinder-duration", "confined-space-vent"],
+  "scba-cylinder-time": ["confined-space-vent"],
   "nfpa-1142-water-supply": ["required-fire-flow", "iso-nff", "hydrant-flow"],
   "confined-space-vent": ["confined-space-purge", "smoke-reading", "scba-cylinder-time"],
 
@@ -706,7 +624,7 @@ const RELATED = {
   "drawbar-power": ["sprayer-calibration", "gpa-rate"],
   "bulk-density": ["seed-rate", "crop-yield"],
   "crop-yield": ["seed-rate", "bulk-density", "timber-cruise"],
-  "thi-livestock": ["heat-stress", "vet-energy-requirement"],
+  "thi-livestock": ["heat-stress"],
   "irrigation-requirement": ["irrigation-uniformity", "gpa-rate", "crop-yield"],
   "cattle-stocking-rate": ["crop-yield", "thi-livestock", "seed-rate"],
   "grain-bin-capacity": ["crop-yield", "seed-rate", "timber-cruise"],
@@ -726,10 +644,6 @@ const RELATED = {
   "historical-pricing": ["sales-tax", "loan-payment"],
 
   // Group U: Veterinary (fill-in continued).
-  "vet-gestation": ["vet-pet-age", "vet-vaccine-schedule"],
-  "vet-urine-sg": ["vet-bloodwork-ranges", "vet-plasma-css"],
-  "vet-breed-predispositions": ["vet-bloodwork-ranges", "vet-asa-classification"],
-  "vet-plasma-css": ["vet-bloodwork-ranges", "vet-urine-sg"],
 
   // v23 Part II batch 2 (15 new tiles).
   "trap-seal-loss": ["trap-arm", "backflow", "sanitary-dfu"],
@@ -743,8 +657,6 @@ const RELATED = {
   "pesticide-rei-phi": ["tank-mix", "sprayer-calibration", "gpa-rate"],
   "backflow-test-psi": ["backflow", "backflow-sizing", "backflow-loss"],
   "gel-percent-agarose": ["pcr-master-mix", "molarity-dilution", "serial-dilution"],
-  "pediatric-tube-depth": ["pediatric-weight-estimate", "pediatric-vitals", "vet-ett-sizing"],
-  "weight-shift-fuel-burn": ["fuel-planning", "weight-balance", "density-altitude"],
   "depreciation-recapture": ["macrs-depreciation", "section-179", "cap-rate-dscr"],
   "rent-roll-vacancy": ["cap-rate-dscr", "rental-worksheet", "cash-on-cash"],
 

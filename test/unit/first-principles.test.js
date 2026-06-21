@@ -231,7 +231,6 @@ test("first-principles: haversine antipodal points = pi * R", () => {
 // === v5 first-principles ===
 
 import { computeAmortization, computeStraightLine, computeMacrs, computeSETax, computeBreakeven, computeCashConversionCycle } from "../../calc-accounting.js";
-import { computeJudgmentInterest, computeDeadline } from "../../calc-legal.js";
 import { computeBeerLambert, computeHendersonHasselbalch, computeRcf, computeHemocytometer, computeMolecularWeight } from "../../calc-lab.js";
 
 // --- Straight-line depreciation (docs/derivations.md section 52) ---
@@ -297,27 +296,6 @@ test("first-principles: breakeven units = fixed_costs / contribution_margin", ()
 test("first-principles: CCC = DIO + DSO - DPO with negative case preserved", () => {
   const r = computeCashConversionCycle({ dso: 10, dio: 20, dpo: 60 });
   within(r.ccc_days, 20 + 10 - 60, 0.001, "CCC negative");
-});
-
-// --- Judgment interest, simple (docs/derivations.md section 60) ---
-//
-// CA at 10% simple on $10k for one year. End balance $11,000 with no
-// payments. The actual computation uses 366/365 days for the leap window
-// 2024-01-01 to 2025-01-01; tolerance accommodates that.
-
-test("first-principles: judgment interest CA simple 10% on $10k ~$1000 over 1y", () => {
-  const r = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01" });
-  within(r.accrued_interest, 1000, 0.5, "JI CA simple 1y");
-});
-
-// --- Court-day deadline (docs/derivations.md section 61) ---
-//
-// Fed. R. Civ. P. 6(a)(1) trigger-day exclusion + weekend rollover.
-// 2025-12-26 (Fri) + 1 calendar day = Sat 12-27 -> Mon 12-29.
-
-test("first-principles: FRCP 6(a)(1) calendar weekend rollover", () => {
-  const r = computeDeadline({ trigger_date: "2025-12-26", days: 1, day_type: "calendar" });
-  assert.equal(r.deadline, "2025-12-29");
 });
 
 // --- Beer-Lambert (docs/derivations.md section 64) ---

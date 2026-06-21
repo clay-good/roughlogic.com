@@ -1457,48 +1457,6 @@ cross-check.
 | calc-arborist.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-arborist.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeRiggingShock` | `{ static_weight_lb, drop_ft, rope_length_ft, elong_pct = 5 } = {}` | _ | _ | _ |
-| calc-aviation.js | `computeAircraftCategory` | `{ sense }` | _ | _ | _ |
-| calc-aviation.js | `computeCrosswind` | `{ runway_heading_deg, wind_direction_deg, wind_speed_kt, demonstrated_crosswi...` | _ | _ | _ |
-| calc-aviation.js | `computeDensityAltitude` | `{ pressure_altitude_ft, oat_c }` | _ | _ | _ |
-| calc-aviation.js | `computeETE` | `{ distance_nm, groundspeed_kt, departure_time_local }` | _ | _ | _ |
-| calc-aviation.js | `computeFuelPlanning` | `{ flight_time_hr, burn_gph, reserve_min, fuel_type, tank_capacity_gal }` | _ | _ | _ |
-| calc-aviation.js | `computeHoldingFuel` | `{ burn_gph, hold_min, tank_gal, reserve_min, fuel_type, hold_speed_kt }` | _ | _ | _ |
-| calc-aviation.js | `computeHypoxiaAltitude` | `{ cabin_altitude_ft }` | _ | _ | _ |
-| calc-aviation.js | `computeIsaTempCorrection` | `{ oat_c = 0, station_elev_ft = 0, published_alt_ft = 0 } = {}` | _ | _ | _ |
-| calc-aviation.js | `computeLandingTakeoffDaCorrection` | `{ ref_roll_ft = 0, pressure_alt_ft = 0, oat_c = 0, headwind_kt = 0, grass = f...` | _ | _ | _ |
-| calc-aviation.js | `computeMagneticVariation` | `{ variation_deg, direction_ew, heading_deg, sense }` | _ | _ | _ |
-| calc-aviation.js | `computePhoneticAlphabet` | `{ text }` | _ | _ | _ |
-| calc-aviation.js | `computePressureAltitude` | `{ field_elevation_ft, altimeter_setting_inHg }` | _ | _ | _ |
-| calc-aviation.js | `computeSectionalSymbols` | `{ category }` | _ | _ | _ |
-| calc-aviation.js | `computeStandardTurn` | `{ true_airspeed_kt, ground_speed_kt, altitude_change_ft, distance_nm, turn_th...` | _ | _ | _ |
-| calc-aviation.js | `computeTopOfDescent` | `{ cruise_altitude_ft, target_altitude_ft, ground_speed_kt }` | _ | _ | _ |
-| calc-aviation.js | `computeTransponderCodes` | `{ code }` | _ | _ | _ |
-| calc-aviation.js | `computeTrueAirspeed` | `{ cas_kt, pressure_altitude_ft, oat_c }` | _ | _ | _ |
-| calc-aviation.js | `computeWeatherPhrasing` | `` | _ | _ | _ |
-| calc-aviation.js | `computeWeightShiftCg` | `{ empty_weight_lb = 0, empty_arm_in = 0, stations = [], fwd_limit_in = 0, aft...` | _ | _ | _ |
-| calc-aviation.js | `computeWeightShiftFuelBurn` | `{ zfw_lb = 0, zfw_moment_lbin = 0, fuel_gal = 0, fuel_arm_in = 0, burn_gph = ...` | _ | _ | _ |
-| calc-aviation.js | `computeWindTriangle` | `{ true_course_deg, true_airspeed_kt, wind_direction_deg, wind_speed_kt }` | _ | _ | _ |
-| calc-aviation.js | `decodeMetar` | `input` | _ | _ | _ |
-| calc-aviation.js | `decodeTaf` | `input` | _ | _ | _ |
-| calc-aviation.js | `renderAircraftCategory` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderCrosswind` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderDensityAltitude` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderETE` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderFuelPlanning` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderHoldingFuel` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderHypoxiaAltitude` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderMETAR` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderMagneticVariation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderPhoneticAlphabet` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderPressureAltitude` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderSectionalSymbols` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderStandardTurn` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderTAF` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderTopOfDescent` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderTransponderCodes` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderTrueAirspeed` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderWeatherPhrasing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-aviation.js | `renderWindTriangle` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-civil.js | `computeEarthworkEndArea` | `{ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}` | _ | _ | _ |
 | calc-civil.js | `computeHorizontalCurve` | `{ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, conven...` | _ | _ | _ |
@@ -1756,55 +1714,6 @@ cross-check.
 | calc-electrical.js | `renderVoltageDropReactance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-electrical.js | `renderVoltageImbalance` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-electrical.js | `renderWireAmpacity` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
-| calc-ems.js | `computeAPGAR` | `{ appearance, pulse, grimace, activity, respiration }` | _ | _ | _ |
-| calc-ems.js | `computeAaGradient` | `{ fio2 = 0.21, pao2 = 0, paco2 = 0, patm = 760, age_yr = 0 } = {}` | _ | _ | _ |
-| calc-ems.js | `computeAnionGap` | `{ na, cl, hco3, k, albumin_g_dL }` | _ | _ | _ |
-| calc-ems.js | `computeCHA2DS2VASc` | `{ chf, htn, age, diabetes, stroke_history, vascular, sex }` | _ | _ | _ |
-| calc-ems.js | `computeCPSS` | `{ facial_droop, arm_drift, abnormal_speech }` | _ | _ | _ |
-| calc-ems.js | `computeCockcroftGaultCrcl` | `{ age_yr = 0, weight_kg = 0, sex = "male", scr_mgdl = 0, round_scr = false } ...` | _ | _ | _ |
-| calc-ems.js | `computeCorrectedCalcium` | `{ ca_measured, albumin_g_dL }` | _ | _ | _ |
-| calc-ems.js | `computeCorrectedQT` | `{ qt_ms, hr_bpm }` | _ | _ | _ |
-| calc-ems.js | `computeDrugConcentration` | `input` | _ | _ | _ |
-| calc-ems.js | `computeFena` | `{ serum_na = 0, urine_na = 0, serum_cr = 0, urine_cr = 0 } = {}` | _ | _ | _ |
-| calc-ems.js | `computeGCS` | `{ eye, verbal, motor, intubated }` | _ | _ | _ |
-| calc-ems.js | `computeIdealBodyWeight` | `{ height, height_unit, sex, abw_kg }` | _ | _ | _ |
-| calc-ems.js | `computeIvDripRate` | `{ volume_mL, time_min, drop_factor_gtt_per_mL }` | _ | _ | _ |
-| calc-ems.js | `computeMAP` | `{ sbp_mmHg, dbp_mmHg }` | _ | _ | _ |
-| calc-ems.js | `computeNIHSS` | `input` | _ | _ | _ |
-| calc-ems.js | `computeO2CylinderTime` | `{ cylinder, pressure_psi, reserve_psi, flow_lpm }` | _ | _ | _ |
-| calc-ems.js | `computePERC` | `input` | _ | _ | _ |
-| calc-ems.js | `computeParkland` | `{ weight_kg, tbsa_percent, hours_since_burn }` | _ | _ | _ |
-| calc-ems.js | `computePediatricTubeDepth` | `{ age_years = 0, cuff = "uncuffed" } = {}` | _ | _ | _ |
-| calc-ems.js | `computePediatricWeight` | `{ age_years, age_months }` | _ | _ | _ |
-| calc-ems.js | `computePedsVitals` | `input` | _ | _ | _ |
-| calc-ems.js | `computeRuleOf9s` | `input` | _ | _ | _ |
-| calc-ems.js | `computeSTART` | `input` | _ | _ | _ |
-| calc-ems.js | `computeShockIndex` | `{ hr_bpm, sbp_mmHg }` | _ | _ | _ |
-| calc-ems.js | `computeWellsDVT` | `input` | _ | _ | _ |
-| calc-ems.js | `computeWellsPE` | `input` | _ | _ | _ |
-| calc-ems.js | `computeWintersExpectedPco2` | `{ hco3 = 0, measured_pco2 = 0 } = {}` | _ | _ | _ |
-| calc-ems.js | `renderAPGAR` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderAnionGap` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderCHA2DS2VASc` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderCPSS` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderCorrectedCalcium` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderCorrectedQT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderDrugConcentration` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderGCS` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderIdealBodyWeight` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderIvDripRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderMAP` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderNIHSS` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderO2CylinderTime` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderPERC` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderParkland` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderPediatricWeight` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderPedsVitals` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderRuleOf9s` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderSTART` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderShockIndex` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderWellsDVT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-ems.js | `renderWellsPE` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fab.js | `computeConduit90Stub` | `{ mode = "stub-up", height_in = 0, deduct_in = 0, back_to_back_in = 0, radius...` | _ | _ | _ |
 | calc-fab.js | `computeConduitOffset` | `{ offset_in = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeConduitSaddle` | `{ mode = "three-point", depth_in = 0, preset = "45/22.5", width_in = 0 } = {}` | _ | _ | _ |
@@ -1994,18 +1903,6 @@ cross-check.
 | calc-layout.js | `computePolygonMiter` | `{ sides = 0, size_mode = "side", size_in = 0 } = {}` | _ | _ | _ |
 | calc-layout.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
 | calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
-| calc-legal.js | `computeContractClauseReference` | `{ clause }` | _ | _ | _ |
-| calc-legal.js | `computeContractorVsEmployee` | `{ test = "irs", checklist = {}, state = "FED", }` | _ | _ | _ |
-| calc-legal.js | `computeDeadline` | `{ trigger_date, days = 0, day_type = "calendar", jurisdiction = "FED", }` | _ | _ | _ |
-| calc-legal.js | `computeFederalPostJudgmentInterest` | `{ principal = 0, rate_pct = 0, days_elapsed = 0 } = {}` | _ | _ | _ |
-| calc-legal.js | `computeJudgmentInterest` | `{ principal = 0, state = "CA", judgment_date, accrual_date, partial_payments ...` | _ | _ | _ |
-| calc-legal.js | `computeLeaseRentProration` | `{ monthly_rent = 0, method = "actual", days_in_month = 30, occupied_days = 0 ...` | _ | _ | _ |
-| calc-legal.js | `computeLeaseTermReference` | `{ term }` | _ | _ | _ |
-| calc-legal.js | `computeSmallClaimsReference` | `{ state = "CA" }` | _ | _ | _ |
-| calc-legal.js | `computeStatuteOfLimitations` | `{ state = "CA", claim_type = "contract_written" }` | _ | _ | _ |
-| calc-legal.js | `computeTenantNotice` | `{ state = "CA", notice_type = "nonpayment" }` | _ | _ | _ |
-| calc-legal.js | `computeWageGarnishment` | `{ disposable_earnings = 0, pay_period = "weekly", garnishment_type = "consume...` | _ | _ | _ |
-| calc-legal.js | `computeWageHour` | `{ hourly_rate = 0, hours_worked = 0, state = "FED", is_tipped = false, cash_t...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableTrayFill` | `{ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCctvStorage` | `{ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_d...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCoaxRgLoss` | `{ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, t...` | _ | _ | _ |
@@ -2028,7 +1925,6 @@ cross-check.
 | calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
 | calc-mechanic.js | `computeValveFlowCoefficient` | `{ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gp...` | _ | _ | _ |
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
-| calc-mechanic.js | `computeWeightBalance` | `{ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, ...` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
 | calc-metalair.js | `computeCompressionRatio` | `{ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeDuctStaticTotal` | `{ components = [], rated_esp_in_wc = 0 } = {}` | _ | _ | _ |
@@ -2306,52 +2202,6 @@ cross-check.
 | calc-velocity.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `computeASAReference` | `` | _ | _ | _ |
-| calc-vet.js | `computeAnesthesiaVitals` | `{ species }` | _ | _ | _ |
-| calc-vet.js | `computeBCSReference` | `{ species }` | _ | _ | _ |
-| calc-vet.js | `computeBloodworkRanges` | `{ species }` | _ | _ | _ |
-| calc-vet.js | `computeBreedPredispositions` | `{ query }` | _ | _ | _ |
-| calc-vet.js | `computeCrystalloidPlan` | `{ weight, weight_unit, species, dehydration_percent, vomiting_mL_per_hr, diar...` | _ | _ | _ |
-| calc-vet.js | `computeETTSizing` | `{ species, weight_kg, weight, weight_unit }` | _ | _ | _ |
-| calc-vet.js | `computeEnergyRequirement` | `{ weight, weight_unit, species, activity, kcal_per_cup }` | _ | _ | _ |
-| calc-vet.js | `computeEquineWeight` | `{ girth_in, length_in, animal }` | _ | _ | _ |
-| calc-vet.js | `computeGestation` | `{ species, breeding_date_iso }` | _ | _ | _ |
-| calc-vet.js | `computeHeartwormDose` | `{ weight, weight_unit, active_ingredient }` | _ | _ | _ |
-| calc-vet.js | `computeMaintenanceFluid` | `{ weight, weight_unit, species, dehydration_percent, ongoing_losses_mL_per_hr...` | _ | _ | _ |
-| calc-vet.js | `computePetAge` | `{ species, pet_age_years, size_band }` | _ | _ | _ |
-| calc-vet.js | `computeSteadyStateConcentration` | `{ dose_mg, bioavailability_F, clearance_mL_per_kg_per_min, tau_hr, weight, we...` | _ | _ | _ |
-| calc-vet.js | `computeTargetWeightLoss` | `{ current_weight, target_weight, weight_unit, species, kcal_per_cup }` | _ | _ | _ |
-| calc-vet.js | `computeToxicity` | `{ toxin, weight, weight_unit, species, choc_type, choc_grams, xylitol_grams, ...` | _ | _ | _ |
-| calc-vet.js | `computeUrineSG` | `{ species }` | _ | _ | _ |
-| calc-vet.js | `computeVaccineSchedule` | `{ species }` | _ | _ | _ |
-| calc-vet.js | `computeVetAnionGap` | `{ na = 0, k = 0, cl = 0, hco3 = 0, species = "dog" } = {}` | _ | _ | _ |
-| calc-vet.js | `computeVetBodySurfaceArea` | `{ species = "dog", weight_kg = 0, dose_mg_m2 = 0 } = {}` | _ | _ | _ |
-| calc-vet.js | `computeVetCRI` | `{ stock_conc_mg_per_mL, dose, dose_unit, weight, weight_unit, bag_volume_mL, ...` | _ | _ | _ |
-| calc-vet.js | `computeVetCorrectedReticulocyte` | `{ retic_pct = 0, patient_pcv = 0, normal_pcv = 0, species = "dog", rbc = 0 } ...` | _ | _ | _ |
-| calc-vet.js | `computeVetDose` | `{ weight, weight_unit, dose_mg_per_kg, concentration_mg_per_mL }` | _ | _ | _ |
-| calc-vet.js | `computeVetFluidDeficit` | `{ weight_kg = 0, dehydration_pct = 0, maintenance_ml_kg_day = 60, ongoing_ml_...` | _ | _ | _ |
-| calc-vet.js | `computeVetTransfusion` | `{ species, weight, weight_unit, pcv_current, pcv_target, pcv_donor, rate_mL_p...` | _ | _ | _ |
-| calc-vet.js | `renderASAReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderAnesthesiaVitals` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderBCSReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderBloodworkRanges` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderBreedPredispositions` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderCrystalloidPlan` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderETTSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderEnergyRequirement` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderEquineWeight` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderGestation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderHeartwormDose` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderMaintenanceFluid` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderPetAge` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderSteadyStateConcentration` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderTargetWeightLoss` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderToxicity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderUrineSG` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderVaccineSchedule` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderVetCRI` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderVetDose` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-vet.js | `renderVetTransfusion` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDemand` | `{ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}` | _ | _ | _ |
@@ -2406,7 +2256,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 992.
+Row count: 842.
 
 <!-- END function-corpus-v14 -->
 
@@ -2930,7 +2780,7 @@ per spec-v14 §13.1 second paragraph.
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (23 tiles)
+### Group K Mechanic (22 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2956,7 +2806,6 @@ per spec-v14 §13.1 second paragraph.
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `weight-balance` | Aircraft Weight and Balance | Project (first-principles) over FAA W...; BEW 1500 @ 38 / fuel 300 @ 42 / pilot 170 @ 36 / fwd 35 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group L Agriculture (28 tiles)
 
@@ -3098,23 +2947,6 @@ per spec-v14 §13.1 second paragraph.
 | `section-179` | Section 179 and Bonus Depreciation | IRC sec. 179 (annual indexed limits; ...; $50,000 cost / 100% business use / $200k taxable income /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `straight-line-depreciation` | Straight-Line Depreciation | Project (first-principles); annual = (cost - salvage) / life | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group S Legal (12 tiles)
-
-| tile_id | name | citation source | fixture |
-| --- | --- | --- | --- |
-| `contract-clause-reference` | Plain-English Contract Clause Reference | Project bundled per-clause definition...; indemnification clause -> what + look_for definitions; pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `contractor-vs-employee` | Contractor vs. Employee | IRS Rev. Rul. 87-41 (20-factor test);...; IRS test / 11 employer factors + 3 worker factors -> empl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `court-deadline` | Court-Day and Calendar-Day Deadline | Fed. R. Civ. P. 6 (calendar-day and c...; 2026-04-01 trigger + 30 calendar days / FED -> 2026-05-01... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `federal-post-judgment-interest` | Federal Post-Judgment Interest | 28 USC 1961 (federal post-judgment in...; $100,000 at 5.00% over 2 yr -> $10,250 accrued, $110,250 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `judgment-interest` | Statutory Judgment Interest | California (Cal. Civ. Proc. Code 685....; $10,000 / CA / 2024-01-01 to 2025-01-01 / no payments -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `lease-rent-proration` | Lease / Rent Proration | Lease / state landlord-tenant law + R...; $1,500 rent, March (31 days), 17 occupied -> $822.58 (act... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `lease-term-reference` | Plain-English Lease Term Reference | Project bundled per-term definitions ...; security_deposit term -> what + look_for definitions; pur... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `small-claims-reference` | Small Claims Court Reference | Texas (Tex. Gov't Code 27.031, justic...; TX -> $20,000 max / attorneys allowed / $54-$124 fee rang... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `statute-of-limitations` | Statute of Limitations Quick-Read | California (Cal. Civ. Proc. Code 337); CA / contract_written -> 4 years, accrual 'breach'; exerc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `tenant-notice` | Tenant Notice and Cure-Period | California (Cal. Civ. Proc. Code 1161...; CA / nonpayment -> 3 days / business_days 1 / cure_allowe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `wage-garnishment` | Wage Garnishment Cap (Federal Title III) | U.S. DOL Wage and Hour Division; floor = 30 x $7.25 = $217.50; 25% x 600 = $150; 600 - 217... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `wage-hour` | Wage and Hour (FLSA, Tipped, State Min) | Cal. Lab. Code 1182.12 (state minimum...; CA / $20/hr / 50 hr -> 40 reg + 10 OT -> $800 reg + $300 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-
 ### Group T Lab (14 tiles)
 
 | tile_id | name | citation source | fixture |
@@ -3133,96 +2965,6 @@ per spec-v14 §13.1 second paragraph.
 | `rcf-rpm` | Centrifuge RPM and RCF | Project (first-principles); Centrifuge G-force identity (r in cm, rpm in revolutions/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-
-### Group U Veterinary (25 tiles)
-
-| tile_id | name | citation source | fixture |
-| --- | --- | --- | --- |
-| `equine-weight` | Equine Body Weight from Heart-Girth Tape | Carroll C.L. & Huntington P.J., Equin...; Horse, girth 75 in, length 65 in -> 75^2 * 65 / 330 = 110... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-anesthesia-vitals` | Vet Anesthesia Monitoring Vitals | BSAVA / Plumb's / ACVAA monitoring gu...; Dog HR 60-140, RR 10-20, MAP >= 60 (ideal 70-100), SpO2 >... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-anion-gap` | Veterinary Anion Gap | DiBartola / Schalm's (veterinary anio...; dog Na 145, K 4.0, Cl 110, HCO3 20 -> AG 19 mEq/L | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-asa-classification` | Vet ASA Physical Status (I-V) | ASA / AVMA / ACVAA; 6 entries (I-V plus E modifier) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-bcs-reference` | Vet Body Condition Score Reference (1-9) | AAHA / AAFP / WSAVA; Render returns the 9 verbal-anchor bands for the chosen s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-bloodwork-ranges` | Vet Bloodwork Reference Ranges | IDEXX / Antech / VetScan / Merck Vete...; Dog: 5 CBC analytes + 9 chemistry analytes returned | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-body-surface-area` | Veterinary Body Surface Area | Meeh formula (Plumb's veterinary K co...; dog 20 kg -> BSA 0.744 m2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-breed-predispositions` | Vet Breed Predispositions Reference | AKC CHF / OFA CHIC / AAHA / Ettinger ...; Query 'doberman' returns 1 row (DCM / vWD / Wobbler) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-corrected-reticulocyte` | Corrected Reticulocyte / Production Index | Schalm's Veterinary Hematology / ASVCP; dog 5% retic, PCV 20%, normal 45%, RBC 3e6 -> corrected 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-cri` | Vet Constant-Rate Infusion (CRI) Drip Rate | Plumb's Veterinary Drug Handbook (10t...; 0.5 mcg/kg/min fentanyl, 15 kg dog, 24 hr, 250 mL bag -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-crystalloid-plan` | Vet Crystalloid Replacement Plan (Maintenance + Losses) | DiBartola, Fluid / Electrolyte / Acid...; 20 kg dog / 5% dehydration / 50 mL/hr vomiting / 24 hr wi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-energy-requirement` | Vet RER / MER (Caloric Need) | AAHA / AAFP life-stage guidelines + K...; Worked example: 10 kg active dog, 400 kcal/cup diet -> RE... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-ett-sizing` | Vet ETT and IV Catheter Sizing | BSAVA / Plumb's / standard veterinary...; Worked example: 20 kg dog -> 15-25 kg band -> 8.0 mm ETT,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-fluid-deficit` | Veterinary Dehydration Fluid Deficit | DiBartola small-animal fluid therapy ...; 10 kg, 8% dehydrated, 60 mL/kg/day -> 1400 mL/day, 58 mL/hr | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-gestation` | Vet Pregnancy Gestation | Standard veterinary reproductive phys...; Worked example: dog bred 2026-03-01 -> due 2026-05-03 (ra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-heartworm-dose` | Vet Heartworm Preventive Dose (FDA Weight-Band Lookup) | FDA-approved labeling via DailyMed; 20 kg = 44.09 lb -> Green tablet (26-50 lb band): 136 mcg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-maintenance-fluid` | Vet Maintenance Fluid Rate | Holliday-Segar adapted; DiBartola 4th...; Worked example: 20 kg dog, 5% dehydration, no losses, 24 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-pet-age` | Vet Pet Age to Human-Equivalent | AAHA / AAFP life-stage guidelines; Worked example: 5-year medium dog -> 15 + 9 + 3*5 = 39 hu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-plasma-css` | Vet Steady-State Plasma Concentration (Css) | Riviere + Papich (10th ed.) / Plumb's...; Css = (100 mg * 1) / (50 mL/min * 480 min) = 4.167 ug/mL ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-target-weight-loss` | Vet Target Weight-Loss Plan (Reverse RER) | AAHA Weight Management Guidelines; Worked example: 30 kg dog -> 25 kg target -> target RER ~... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-toxicity` | Vet Toxicity Dose-by-Weight (Chocolate / Xylitol / Raisin / Antifreeze) | ASPCA APCC / Plumb's Veterinary Drug ...; Worked example: 10 kg dog ingests 50 g dark chocolate -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-transfusion` | Vet Blood Transfusion Volume | ACVIM Transfusion Medicine Consensus ...; Dog 20 kg, PCV 15 -> 25, donor 40, dog BV 90 -> 90*20*10/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-urine-sg` | Vet Urine Specific Gravity Bands | Stockham + Scott / IRIS / Merck Veter...; Dog well-concentrated >= 1.030; isosthenuric 1.008 - 1.012 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-vaccine-schedule` | Vet Vaccine Schedule Reference (AAHA Dog / AAFP Cat) | AAHA Canine Vaccination Guidelines (2...; Dog: 2 core (DAP + Rabies); 5 non-core (Lepto / Bordetell... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `vet-weight-based-dose` | Vet Weight-Based Dose | Standard veterinary pharmacology arit...; Worked example: 20 kg dog, 5 mg/kg dose, 50 mg/mL stock -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-
-### Group V EMS (27 tiles)
-
-| tile_id | name | citation source | fixture |
-| --- | --- | --- | --- |
-| `aa-gradient` | Alveolar-Arterial Oxygen Gradient | Alveolar gas equation (West, Respirat...; FiO2 0.21, PaO2 70, PaCO2 40, age 40 -> A-a ~29.7, expect... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `anion-gap` | Anion Gap (with K and Albumin variants) | Standard chemistry-panel arithmetic; Worked example Na 140 / Cl 104 / HCO3 24 -> AG 12 (high-n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `apgar-score` | APGAR Newborn Score | Apgar, Anesthesia & Analgesia 32 (195...; Worked example: A=2, P=2, G=1, A=2, R=2 -> total 9 (vigor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `cha2ds2-vasc` | CHA2DS2-VASc (AF Stroke Risk) | Lip et al., Chest 137:2 (2010), open-...; Worked example: H + A(65-74) + D = 3 (male, hypertensive,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `cincinnati-stroke-scale` | Cincinnati Prehospital Stroke Scale | Kothari et al. (1999), open-access; Worked example: facial droop + arm drift abnormal, speech... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `cockcroft-gault-crcl` | Cockcroft-Gault Creatinine Clearance | Cockcroft & Gault, Nephron 16 (1976); 70 yr, 72 kg, male, SCr 1.2 -> CrCl 58.3 mL/min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `corrected-calcium` | Corrected Calcium (Payne) | Payne et al., BMJ 4:5893 (1973), open...; Worked example Ca 8.0 / albumin 2.0 -> 8.0 + 0.8*(4.0-2.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `corrected-qt` | Corrected QT (QTc) | Bazett HC, Heart 7 (1920); Sagie et a...; Worked example: QT 400 ms at HR 75 -> RR 0.8 s -> QTcB = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `drug-concentration` | Drug Concentration to Volume | First-principles arithmetic; USP Gene...; Worked example: 25 mg ordered dose / 50 mg/mL stock conce... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `fena` | Fractional Excretion of Sodium | Espinel, JAMA 236 (1976); SNa 140, UNa 10, SCr 3.0, UCr 100 -> FENa 0.21% (pre-renal) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `glasgow-coma-scale` | Glasgow Coma Scale (GCS) | Teasdale & Jennett, Lancet 304:7872 (...; Worked example: E=3, V=4, M=5 -> total 12 (moderate band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `ideal-body-weight` | Ideal / Lean / Adjusted Body Weight | Devine BJ, Drug Intell Clin Pharm 8 (...; Worked example: male, 70 in -> IBW = 50 + 2.3*(70-60) = 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `iv-drip-rate` | IV Drip Rate | Universal nursing / EMS reference; Worked example: 1000 mL over 480 min at 15 gtt/mL -> 125 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `mean-arterial-pressure` | Mean Arterial Pressure (MAP) | Standard cuff approximation / Survivi...; Worked example 120/80 -> MAP = (120 + 160) / 3 = 93.33; p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `nihss` | NIH Stroke Scale (NIHSS) | Brott et al., Stroke 20:7 (1989); NIH...; Worked example: 1a=1, 1b=1, 1c=0, 2=1, 3=2, 4=2, 5a=0, 5b... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `o2-cylinder-duration` | O2 Cylinder Duration | AARC clinical practice (public); Worked example: D-cylinder, 2000 psi, reserve 200, flow 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `parkland-formula` | Parkland Burn-Fluid Formula | Baxter & Shires (1974) / ABA ABLS (pu...; Worked example: 75 kg adult, 30% TBSA, at time of burn ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `pediatric-tube-depth` | Pediatric ET-Tube Size and Depth | AHA PALS / Broselow; 4 yr uncuffed -> ID 5.0 mm, depth 15 cm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `pediatric-vitals` | Pediatric Vital Signs Reference (PALS) | American Heart Association, PALS Prov...; Worked example: preschool (3-5 yr) band returns the presc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `pediatric-weight-estimate` | Pediatric Weight Estimate (APLS) | APLS 6th ed.; Worked example: 5-year-old -> (2 * 5) + 8 = 18 kg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `perc-rule` | PERC Rule (PE Rule-Out Criteria) | Kline et al., J Thromb Haemost 2:8 (2...; Worked example: all 8 criteria satisfied -> PERC negative... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `rule-of-9s` | Rule of 9s / Lund-Browder TBSA | Pulaski & Tennison (1947); Lund & Bro...; Worked example (adult Rule of 9s): left arm both surfaces... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `shock-index` | Shock Index (HR / SBP) | Allgower & Buri 1967 / Vandromme 2011...; Worked example HR 120 / SBP 100 -> SI 1.20 (occult shock ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `start-triage` | START / JumpSTART Mass-Casualty Triage | Newport Beach FD / Hoag Hospital (198...; Worked example (adult START): not walking, breathing on o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `wells-dvt` | Wells DVT Score | Wells et al., Lancet 350:9094 (1997);...; Worked example: active cancer (+1) + calf swelling >= 3 c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `wells-pe` | Wells PE Score | Wells et al., Thrombosis and Haemosta...; Worked example: clinical signs DVT (+3) + alt dx less lik... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `winters-expected-pco2` | Winters' Formula Expected pCO2 | Albert, Dell & Winters, Ann Intern Me...; HCO3 12 -> expected 26 +/- 2 mmHg | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-
-### Group W Aviation (23 tiles)
-
-| tile_id | name | citation source | fixture |
-| --- | --- | --- | --- |
-| `aircraft-category` | Aircraft Category and Class (14 CFR 1.1) | 14 CFR §1.1 / §61.5 / Parts 23 / 25 (...; Pilot certification sense returns 7 categories (airplane ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `crosswind-component` | Crosswind / Headwind Component | Pure geometry (aviation training refe...; Worked example: runway 090, wind from 130 at 20 kt -> 40 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `density-altitude` | Density Altitude | FAA Pilot's Handbook of Aeronautical ...; Worked example: PA 5000 ft, OAT 25 C -> ISA at 5000 = 5.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `ete-eta` | ETE / ETA from Distance and Groundspeed | First-principles arithmetic; Worked example: 250 nm at 120 kt = 2.0833 hr = 2:05; depa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `fuel-planning` | Fuel Planning (Trip + Reserve) | 14 CFR §91.151 / §91.167 (eCFR, publi...; Worked example: 3.0 hr at 10.5 gph + 45 min reserve in av... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `holding-fuel` | Holding Pattern Fuel and Time | 14 CFR 91.151 / 91.167 (fuel reserves); 12 gph, 30 min hold, 40 gal, 45-min reserve -> 6 gal burn... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `hypoxia-altitude` | Supplemental-Oxygen Altitude (14 CFR §91.211) | 14 CFR §91.211 (eCFR, public); Worked example cabin 13,000 ft -> 12,500-14,000 band, cre... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `isa-temp-correction` | Cold-Temperature Altitude Correction | FAA AIM cold-temperature altimetry + ...; MDA 1000 ft above station, OAT -20 C -> ~140 ft correction | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `landing-takeoff-da-correction` | Takeoff/Landing Density-Altitude Correction | FAA Pilot's Handbook of Aeronautical ...; 1000-ft roll, PA 5000 ft, OAT +25 C -> DA ~7388 ft, roll ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `magnetic-variation` | Magnetic Variation (TVMDC) | FAA Pilot's Handbook of Aeronautical ...; Worked example: True 090 with 7 deg E variation -> 083 ma... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `metar-decoder` | METAR Decoder | FAA AC 00-45H Change 2; NWS FMH-1; Canonical example: KJFK 17/15 A2987 -> temperature 17 C, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `phonetic-alphabet` | ICAO Phonetic Alphabet | ICAO Annex 10 Volume II Chapter 5 / F...; Worked example: 'N12345' -> translation contains 'Novembe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `pressure-altitude` | Pressure Altitude from Altimeter Setting | FAA PHAK (FAA-H-8083-25C, public); Worked example KBJC (5,430 ft) with altimeter 30.12 -> PA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `sectional-symbols` | Sectional Chart Symbology Reference | FAA Aeronautical Chart User's Guide (...; Airspace category surfaces 7 symbol entries (Class B / C ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `standard-turn-rate` | Standard Turn Rate / Climb / Descent Rate | FAA Instrument Flying Handbook (FAA-H...; Worked example: TAS 120 kt -> 19 deg bank; turn 90 deg ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `taf-decoder` | TAF Decoder | FAA AC 00-45H Change 2; NWS FMH-1; WM...; Canonical example: KSFO TAF parses to KSFO station and >=... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `top-of-descent` | Top-of-Descent (3-to-1 Rule) | FAA Instrument Flying Handbook (FAA-H...; Worked example: FL350 -> 5,000 ft at 240 kt GS -> 30,000 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `transponder-codes` | Transponder Code Reference (Squawks) | FAA AIM §4-1-20 / §6-2-2 / 14 CFR §91...; Lookup 7700 -> EMERGENCY: any in-flight emergency | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `true-airspeed` | True Airspeed from CAS / PA / OAT | ICAO Standard Atmosphere / FAA PHAK (...; Worked example: CAS 110 kt at PA 8000 / OAT 0 C -> TAS ~ ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `weather-phrasing` | METAR / TAF Weather Phrasing Reference | FAA AC 00-45H Change 2 / NWS Instruct...; Returns 7 cloud-cover, 4 intensity, 8 descriptor, 19 phen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `weight-shift-cg` | Weight-and-Balance CG Shift | FAA Aircraft Weight and Balance Handb...; empty 1500 lb @36 in + 340/37 + 50/70 + 228/48 -> 2118 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `weight-shift-fuel-burn` | In-Flight CG Migration as Fuel Burns | FAA Weight & Balance Handbook (FAA-H-...; ZFW 1800 lb / mom 158400, 40 gal @ 95 in, 10 gph, 2 hr ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
-| `wind-triangle` | Wind Triangle / Wind Correction Angle | FAA PHAK (FAA-H-8083-25C, public) Cha...; Worked example: TC 090, TAS 120 kt, wind 040 at 25 kt -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group X Real Estate (24 tiles)
 
@@ -3300,6 +3042,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 688. Fixture-covered or reference-cadence: 688 / 688.
+Tile count: 600. Fixture-covered or reference-cadence: 600 / 600.
 
 <!-- END tile-index-v14 -->

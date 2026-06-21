@@ -12,7 +12,7 @@
 // app.js - silently breaking the home search/picker. Atomicity matters more
 // than shaving one reload off an unchanged-hash refresh.
 
-const BUILD_HASH = "dev-0003";
+const BUILD_HASH = "dev-0004";
 const SHELL_CACHE = "roughlogic-shell-" + BUILD_HASH;
 const DATA_CACHE = "roughlogic-data-" + BUILD_HASH;
 
@@ -89,10 +89,6 @@ const SHELL_ASSETS = [
   "./calc-historical.js",
   "./calc-lab.js",
   "./calc-accounting.js",
-  "./calc-legal.js",
-  "./calc-vet.js",
-  "./calc-ems.js",
-  "./calc-aviation.js",
   "./calc-realestate.js",
   "./calc-edu.js",
   "./calc-rigging.js",

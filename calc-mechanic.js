@@ -26,67 +26,6 @@ const _finiteGuard = (o) => {
 };
 
 
-// --- 195: Aircraft Weight and Balance ---
-//
-// CG = total moment / total weight, both expressed in inches aft of datum.
-// Pass/fail against user-supplied forward and aft CG limits and max gross.
-
-// dims: in { stations: dimensionless, fwd_cg_limit_in: L, aft_cg_limit_in: L, max_gross_lb: M, mac_le_in: L, mac_chord_in: L }
-//        out: { total_weight_lb: M, total_moment_lbin: M L, cg_in: L, within_cg: dimensionless, within_gross: dimensionless, pass: dimensionless, cg_pct_mac: dimensionless, fwd_pct_mac: dimensionless, aft_pct_mac: dimensionless }
-// (Weights in lb here are treated as mass `M` (pilot mass / fuel
-// mass arithmetic); CG arms in inches are `L`; %MAC is a percentage
-// and dimensionless. Stations is a caller-typed array, dimensionless.)
-export function computeWeightBalance({ stations = [], fwd_cg_limit_in = 0, aft_cg_limit_in = 0, max_gross_lb = 0, mac_le_in = 0, mac_chord_in = 0 }) {
-  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  if (!Array.isArray(stations) || stations.length === 0) return { error: "Provide at least one station." };
-  let total_w = 0;
-  let total_m = 0;
-  for (const s of stations) {
-    const w = Number(s.weight_lb) || 0;
-    const a = Number(s.arm_in) || 0;
-    if (w < 0) return { error: "Station weight must be non-negative." };
-    total_w += w;
-    total_m += w * a;
-  }
-  if (total_w <= 0) return { error: "Total weight must be positive." };
-  const cg_in = total_m / total_w;
-  const within_cg = (fwd_cg_limit_in <= 0 || aft_cg_limit_in <= 0)
-    ? null
-    : (cg_in >= fwd_cg_limit_in && cg_in <= aft_cg_limit_in);
-  const within_gross = max_gross_lb > 0 ? total_w <= max_gross_lb : null;
-  let pass;
-  if (within_cg === null && within_gross === null) pass = null;
-  else pass = (within_cg !== false) && (within_gross !== false);
-  // v8 §C.5: CG as percent of MAC (mean aerodynamic chord). Pilots read CG
-  // as %MAC on the published loading graph. %MAC = (cg - LE_MAC) / chord × 100.
-  let cg_pct_mac = null;
-  let fwd_pct_mac = null;
-  let aft_pct_mac = null;
-  if (mac_le_in > 0 && mac_chord_in > 0) {
-    cg_pct_mac = ((cg_in - mac_le_in) / mac_chord_in) * 100;
-    if (fwd_cg_limit_in > 0) fwd_pct_mac = ((fwd_cg_limit_in - mac_le_in) / mac_chord_in) * 100;
-    if (aft_cg_limit_in > 0) aft_pct_mac = ((aft_cg_limit_in - mac_le_in) / mac_chord_in) * 100;
-  }
-  return {
-    total_weight_lb: total_w, total_moment_lbin: total_m, cg_in,
-    within_cg, within_gross, pass,
-    cg_pct_mac, fwd_pct_mac, aft_pct_mac,
-  };
-}
-
-export const weightBalanceExample = {
-  inputs: {
-    stations: [
-      { name: "Empty", weight_lb: 1500, arm_in: 36 },
-      { name: "Pilot", weight_lb: 170, arm_in: 38 },
-      { name: "Passenger front", weight_lb: 170, arm_in: 38 },
-      { name: "Fuel", weight_lb: 240, arm_in: 48 },
-      { name: "Baggage", weight_lb: 50, arm_in: 95 },
-    ],
-    fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400,
-  },
-};
-
 // --- 196: Marine Prop Slip ---
 
 // dims: in { rpm: T^-1, gear_ratio: dimensionless, pitch_in: L, gps_speed_kt: L T^-1 }
@@ -483,67 +422,6 @@ function _simpleRenderer(spec) {
   };
 }
 
-function renderWeightBalance(inputRegion, outputRegion, citationEl) {
-  citationEl.textContent = "Notice: Pilot-in-command and the airplane flight manual govern. Math aid only; verify against the AFM loading graph or table. Citation: per FAA AC 91-23A (Pilot's Weight and Balance Handbook). Free at faa.gov/regulations_policies/advisory_circulars.";
-  attachExampleButton(inputRegion, () => fillExample(weightBalanceExample.inputs));
-  const list = document.createElement("div"); inputRegion.appendChild(list);
-  const rows = [];
-  for (let i = 0; i < 6; i++) {
-    const wrap = document.createElement("div"); wrap.className = "field";
-    const w = document.createElement("input"); w.type = "number"; w.step = "any"; w.inputMode = "decimal"; w.placeholder = "Weight (lb)"; w.setAttribute("aria-label", "Station " + (i + 1) + " weight (lb)");
-    const a = document.createElement("input"); a.type = "number"; a.step = "any"; a.inputMode = "decimal"; a.placeholder = "Arm (in)"; a.setAttribute("aria-label", "Station " + (i + 1) + " arm (in)");
-    wrap.appendChild(w); wrap.appendChild(a); list.appendChild(wrap);
-    w.addEventListener("input", update); a.addEventListener("input", update);
-    rows.push({ w, a });
-  }
-  const fwd = makeNumber("Forward CG limit (in)", "wb-fwd", { step: "any", min: "0" });
-  const aft = makeNumber("Aft CG limit (in)", "wb-aft", { step: "any", min: "0" });
-  const mg = makeNumber("Max gross (lb)", "wb-mg", { step: "any", min: "0" });
-  // v8 §C.5: optional MAC LE + chord so the result also reports CG as %MAC,
-  // which is how pilots read CG on the published loading graph.
-  const macLe = makeNumber("MAC leading-edge (in, optional)", "wb-macle", { step: "any", min: "0" });
-  const macCh = makeNumber("MAC chord (in, optional)", "wb-macch", { step: "any", min: "0" });
-  for (const f of [fwd, aft, mg, macLe, macCh]) inputRegion.appendChild(f.wrap);
-  const oW = makeOutputLine(outputRegion, "Total weight", "wb-out-w");
-  const oM = makeOutputLine(outputRegion, "Total moment", "wb-out-m");
-  const oCG = makeOutputLine(outputRegion, "CG (in aft of datum)", "wb-out-cg");
-  const oMAC = makeOutputLine(outputRegion, "CG as %MAC (if MAC supplied)", "wb-out-mac");
-  const oP = makeOutputLine(outputRegion, "Pass / fail", "wb-out-p");
-  function fillExample(v) {
-    for (let i = 0; i < rows.length; i++) {
-      if (v.stations[i]) { rows[i].w.value = v.stations[i].weight_lb; rows[i].a.value = v.stations[i].arm_in; }
-    }
-    fwd.input.value = v.fwd_cg_limit_in; aft.input.value = v.aft_cg_limit_in; mg.input.value = v.max_gross_lb;
-    if (v.mac_le_in !== undefined) macLe.input.value = v.mac_le_in;
-    if (v.mac_chord_in !== undefined) macCh.input.value = v.mac_chord_in;
-    update();
-  }
-  function update() {
-    const stations = rows.map((r) => ({ weight_lb: Number(r.w.value) || 0, arm_in: Number(r.a.value) || 0 })).filter((s) => s.weight_lb > 0);
-    if (stations.length === 0) { for (const o of [oW, oM, oCG, oMAC, oP]) o.textContent = "-"; return; }
-    const r = computeWeightBalance({
-      stations,
-      fwd_cg_limit_in: Number(fwd.input.value) || 0,
-      aft_cg_limit_in: Number(aft.input.value) || 0,
-      max_gross_lb: Number(mg.input.value) || 0,
-      mac_le_in: Number(macLe.input.value) || 0,
-      mac_chord_in: Number(macCh.input.value) || 0,
-    });
-    if (r.error) { oW.textContent = r.error; oM.textContent = "-"; oCG.textContent = "-"; oMAC.textContent = "-"; oP.textContent = "-"; return; }
-    oW.textContent = fmt(r.total_weight_lb, 1) + " lb";
-    oM.textContent = fmt(r.total_moment_lbin, 1) + " lb-in";
-    oCG.textContent = fmt(r.cg_in, 2) + " in";
-    if (r.cg_pct_mac === null) oMAC.textContent = "-";
-    else {
-      const fwdStr = r.fwd_pct_mac !== null ? fmt(r.fwd_pct_mac, 1) + "% MAC" : "-";
-      const aftStr = r.aft_pct_mac !== null ? fmt(r.aft_pct_mac, 1) + "% MAC" : "-";
-      oMAC.textContent = fmt(r.cg_pct_mac, 1) + "% MAC (envelope " + fwdStr + " to " + aftStr + ")";
-    }
-    oP.textContent = r.pass === null ? "(set CG / gross limits)" : (r.pass ? "PASS" : "FAIL - outside CG / gross envelope");
-  }
-  for (const el of [fwd.input, aft.input, mg.input, macLe.input, macCh.input]) el.addEventListener("input", update);
-}
-
 const renderPropSlip = _simpleRenderer({
   citation: "Citation: Public marine engineering practice. Theoretical kt = (RPM/gear) * pitch / 1056. Slip percent = (theoretical - actual) / theoretical * 100.",
   example: propSlipExample.inputs,
@@ -697,7 +575,6 @@ const renderBrakePadLife = _simpleRenderer({
 });
 
 export const MECHANIC_RENDERERS = {
-  "weight-balance":   renderWeightBalance,
   "prop-slip":        renderPropSlip,
   "displacement-cr":  renderDisplacementCR,
   "bolt-stretch":     renderBoltStretch,

@@ -11,14 +11,6 @@ import {
   computeInventoryTurnover, computeCashConversionCycle, computeMileageRollup,
 } from "../../calc-accounting.js";
 import {
-  computeJudgmentInterest, JUDGMENT_INTEREST_RATES,
-  computeDeadline, computeStatuteOfLimitations, STATUTE_OF_LIMITATIONS,
-  computeSmallClaimsReference, SMALL_CLAIMS_THRESHOLDS,
-  computeTenantNotice, LANDLORD_TENANT_NOTICE,
-  computeWageHour, STATE_MINIMUM_WAGE,
-  computeContractorVsEmployee,
-} from "../../calc-legal.js";
-import {
   computeDilution, computeSerialDilution, computeMolecularWeight,
   computeMassMoles, computeRcf, computeResuspension, computePcrMix,
   computeBeerLambert, computeHendersonHasselbalch, computeHemocytometer,
@@ -68,49 +60,6 @@ test("IT: zero COGS gives zero turnover", () => { const r = computeInventoryTurn
 test("Mileage: empty trips array returns zero deductible", () => { const r = computeMileageRollup({ trips: [], tax_year: 2025 }); assert.equal(r.business_miles, 0); assert.equal(r.deductible_amount, 0); });
 test("Mileage: non-array errors", () => { assert.ok(computeMileageRollup({ trips: "x" }).error); });
 
-// --- Legal ---
-
-test("JI: all 50 states + DC bundled", () => { assert.ok(Object.keys(JUDGMENT_INTEREST_RATES).length >= 51); });
-test("JI: AZ at 10% simple", () => { const r = JUDGMENT_INTEREST_RATES.AZ; assert.equal(r.rate_pct, 10); assert.equal(r.accrual, "simple"); });
-test("JI: MI is compound", () => { assert.equal(JUDGMENT_INTEREST_RATES.MI.accrual, "compound"); });
-test("JI: payment exceeding interest reduces principal", () => { const r = computeJudgmentInterest({ principal: 1000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2024-04-01", partial_payments: [{ date: "2024-02-15", amount: 100 }] }); assert.ok(r.principal_remaining < 1000); });
-test("JI: per_day_accrual_at_end is zero when fully paid", () => { const r = computeJudgmentInterest({ principal: 100, state: "CA", judgment_date: "2024-01-01", accrual_date: "2024-12-31", partial_payments: [{ date: "2024-01-02", amount: 100000 }] }); assert.equal(r.per_day_accrual_at_end, 0); });
-
-test("DL: trigger date with weekend rollover", () => { const r = computeDeadline({ trigger_date: "2025-12-26", days: 1, day_type: "calendar" }); assert.equal(r.deadline, "2025-12-29"); }); // Sat 12/27, Sun 12/28, Mon 12/29
-test("DL: New Year holiday rollover", () => { const r = computeDeadline({ trigger_date: "2024-12-31", days: 1, day_type: "calendar" }); assert.equal(r.deadline, "2025-01-02"); });
-test("DL: court-day count of 1 lands on next business day", () => { const r = computeDeadline({ trigger_date: "2025-01-02", days: 1, day_type: "court" }); assert.equal(r.deadline, "2025-01-03"); });
-
-test("SOTL: 15+ states bundled (post-expansion)", () => { assert.ok(Object.keys(STATUTE_OF_LIMITATIONS).length >= 15); });
-test("SOTL: IL contract-written = 10 years", () => { const r = computeStatuteOfLimitations({ state: "IL", claim_type: "contract_written" }); assert.equal(r.years, 10); });
-test("SOTL: PA personal_injury = 2 years", () => { const r = computeStatuteOfLimitations({ state: "PA", claim_type: "personal_injury" }); assert.equal(r.years, 2); });
-test("SOTL: every (state, claim) has citation", () => {
-  for (const st of Object.keys(STATUTE_OF_LIMITATIONS)) {
-    for (const ct of Object.keys(STATUTE_OF_LIMITATIONS[st])) {
-      assert.ok(STATUTE_OF_LIMITATIONS[st][ct].citation, st + "/" + ct + " missing citation");
-    }
-  }
-});
-
-test("SC: all 50 states + DC bundled", () => { assert.ok(Object.keys(SMALL_CLAIMS_THRESHOLDS).length >= 51); });
-test("SC: WA disallows attorneys", () => { assert.equal(SMALL_CLAIMS_THRESHOLDS.WA.attorney_allowed, false); });
-test("SC: TX max is at least $20k", () => { assert.ok(SMALL_CLAIMS_THRESHOLDS.TX.max_dollars >= 20000); });
-
-test("TN: 12+ states bundled (post-expansion)", () => { assert.ok(Object.keys(LANDLORD_TENANT_NOTICE).length >= 12); });
-test("TN: WA nonpayment 14-day cure (post-2019)", () => { const r = computeTenantNotice({ state: "WA", notice_type: "nonpayment" }); assert.equal(r.notice_days, 14); assert.equal(r.cure_allowed, true); });
-test("TN: GA nonpayment is immediate (0 days)", () => { const r = computeTenantNotice({ state: "GA", notice_type: "nonpayment" }); assert.equal(r.notice_days, 0); });
-
-test("WH: all 50 states + FED + DC bundled", () => { assert.ok(Object.keys(STATE_MINIMUM_WAGE).length >= 52); });
-test("WH: NV / OR / MN have no tip credit (cash = minimum)", () => {
-  for (const j of ["NV", "OR", "MN"]) {
-    const v = STATE_MINIMUM_WAGE[j];
-    assert.equal(v.tipped_minimum_cash, v.minimum_wage, j + " should have no tip credit");
-  }
-});
-test("WH: 60-hour week = 40 reg + 20 OT", () => { const r = computeWageHour({ hourly_rate: 20, hours_worked: 60, state: "FED" }); assert.equal(r.regular_hours, 40); assert.equal(r.overtime_hours, 20); });
-
-test("CvE: ABC partially-true = employee", () => { const r = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: true, C: false } }); assert.equal(r.result, "employee"); });
-test("CvE: IRS empty checklist = independent_contractor (default)", () => { const r = computeContractorVsEmployee({ test: "irs", checklist: {} }); assert.equal(r.result, "independent_contractor"); });
-
 // --- Lab ---
 
 test("Dilution: solving C1 from V1V2C2", () => { const r = computeDilution({ c1: 0, v1: 0.001, c2: 0.1, v2: 0.010 }); assert.ok(close(r.c1, 1.0)); });
@@ -157,74 +106,6 @@ test("Hemo: dilution scales linearly", () => {
   assert.ok(close(b.cells_per_mL / a.cells_per_mL, 5, 0.001));
 });
 
-// --- Coverage of newly added states / jurisdictions ---
-
-test("JI: KY, LA, SC, IA, OK, KS, AR, MS, UT, NM, NE, HI, CT all bundled", () => {
-  for (const st of ["KY", "LA", "SC", "IA", "OK", "KS", "AR", "MS", "UT", "NM", "NE", "HI", "CT"]) {
-    assert.ok(JUDGMENT_INTEREST_RATES[st], "missing JI " + st);
-  }
-});
-test("JI: every state has citation + verified_on", () => {
-  for (const [st, v] of Object.entries(JUDGMENT_INTEREST_RATES)) {
-    assert.ok(v.citation && v.citation.length > 0, st + " missing citation");
-    assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(v.verified_on), st + " bad verified_on");
-  }
-});
-test("JI: rate_pct in plausible range (1-15%) for every state", () => {
-  for (const [st, v] of Object.entries(JUDGMENT_INTEREST_RATES)) {
-    assert.ok(v.rate_pct >= 1 && v.rate_pct <= 15, st + " rate " + v.rate_pct + " out of range");
-  }
-});
-
-test("SOTL: NJ contract-written = 6 years", () => { assert.equal(computeStatuteOfLimitations({ state: "NJ", claim_type: "contract_written" }).years, 6); });
-test("SOTL: NC personal_injury = 3 years (non-standard)", () => { assert.equal(computeStatuteOfLimitations({ state: "NC", claim_type: "personal_injury" }).years, 3); });
-test("SOTL: VA fraud has discovery rule", () => { assert.match(computeStatuteOfLimitations({ state: "VA", claim_type: "fraud" }).accrual, /discovery/); });
-
-test("TN-notice: NJ nonpayment 0 days (no statutory cure)", () => { const r = computeTenantNotice({ state: "NJ", notice_type: "nonpayment" }); assert.equal(r.notice_days, 0); });
-test("TN-notice: AZ nonpayment has cure", () => { assert.equal(computeTenantNotice({ state: "AZ", notice_type: "nonpayment" }).cure_allowed, true); });
-
-test("WH: Alabama is federal floor ($7.25)", () => { assert.equal(computeWageHour({ hourly_rate: 7.25, hours_worked: 40, state: "AL" }).applicable_minimum, 7.25); });
-test("WH: AK / VT / RI added with valid minimums", () => {
-  for (const j of ["AK", "VT", "RI"]) assert.ok(STATE_MINIMUM_WAGE[j].minimum_wage > 7.25, j + " unexpectedly at federal floor");
-});
-
-test("SC: TN max $25k is highest in bundled set", () => { let max = 0; for (const v of Object.values(SMALL_CLAIMS_THRESHOLDS)) if (v.max_dollars > max) max = v.max_dollars; assert.equal(max, 25000); });
-test("SC: KY max is lowest at $2500", () => { let min = Infinity; for (const v of Object.values(SMALL_CLAIMS_THRESHOLDS)) if (v.max_dollars < min) min = v.max_dollars; assert.equal(min, 2500); });
-
 // --- 50-state coverage assertions ---
 
 const ALL_50 = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
-
-test("JI: every one of the 50 states present", () => {
-  for (const st of ALL_50) assert.ok(JUDGMENT_INTEREST_RATES[st], "JI missing " + st);
-});
-test("WH: every one of the 50 states + FED present", () => {
-  for (const st of ["FED", ...ALL_50]) assert.ok(STATE_MINIMUM_WAGE[st], "WH missing " + st);
-});
-test("SC: every one of the 50 states present", () => {
-  for (const st of ALL_50) assert.ok(SMALL_CLAIMS_THRESHOLDS[st], "SC missing " + st);
-});
-
-test("WH: every state has citation + verified_on", () => {
-  for (const [j, v] of Object.entries(STATE_MINIMUM_WAGE)) {
-    assert.ok(v.citation && v.citation.length > 0, j + " missing citation");
-    assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(v.verified_on), j + " bad verified_on");
-  }
-});
-test("WH: every state minimum is at least the federal floor", () => {
-  for (const [j, v] of Object.entries(STATE_MINIMUM_WAGE)) {
-    assert.ok(v.minimum_wage >= 7.25, j + " (" + v.minimum_wage + ") below federal floor");
-  }
-});
-test("SC: every state has citation + fee_range", () => {
-  for (const [st, v] of Object.entries(SMALL_CLAIMS_THRESHOLDS)) {
-    if (st === "verifiedOn") continue;
-    assert.ok(v.citation && v.fee_range, st + " missing fields");
-    assert.ok(v.max_dollars > 0);
-  }
-});
-test("JI: rate plausibility holds across all 50 + DC", () => {
-  for (const [st, v] of Object.entries(JUDGMENT_INTEREST_RATES)) {
-    assert.ok(v.rate_pct >= 4 && v.rate_pct <= 13, st + " rate " + v.rate_pct + " outside 4-13% band");
-  }
-});

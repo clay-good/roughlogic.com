@@ -22,7 +22,6 @@ import { computeUpgradeROI } from "../../calc-cross.js";
 import { computeAmortization, computeMacrs } from "../../calc-accounting.js";
 import { computeSerialDilution } from "../../calc-lab.js";
 import { computeHipValleyRafter } from "../../calc-construction.js";
-import { computeDeadline } from "../../calc-legal.js";
 import { computeSolarTimes } from "../../calc-field.js";
 
 test("tile contract: no Tier-1 (crasher) violations over the registered fixtures", async () => {
@@ -73,12 +72,6 @@ test("hip-valley-rafter: run_ft = Infinity and non-positive spacing error instea
   assert.ok(computeHipValleyRafter({ run_ft: Infinity, pitch: 6 }).error, "expected an error for non-finite run");
   assert.ok(computeHipValleyRafter({ run_ft: 14, pitch: 6, jack_oc_in: -1 }).error, "expected an error for non-positive jack spacing");
   assert.ok(!computeHipValleyRafter({ run_ft: 14, pitch: 6, jack_oc_in: 16 }).error);
-});
-
-test("court-deadline: days = Infinity errors instead of throwing/looping", () => {
-  assert.ok(computeDeadline({ trigger_date: "2025-07-01", days: Infinity, day_type: "calendar" }).error);
-  assert.ok(computeDeadline({ trigger_date: "2025-07-01", days: Infinity, day_type: "court" }).error);
-  assert.ok(!computeDeadline({ trigger_date: "2025-07-01", days: 30, day_type: "calendar" }).error);
 });
 
 test("solar-times: tz_offset_hours = Infinity errors instead of looping forever", () => {

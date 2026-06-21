@@ -3,7 +3,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  computeWeightBalance, weightBalanceExample,
   computePropSlip, propSlipExample,
   computeDisplacementCR, displacementCRExample,
   computeBoltStretch, boltStretchExample, FASTENER_MODULUS_PSI,
@@ -21,18 +20,6 @@ import {
 } from "../../calc-machining.js";
 
 const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
-
-// 195 W&B
-test("W&B: example total + CG within envelope", () => { const r = computeWeightBalance(weightBalanceExample.inputs); assert.ok(r.total_weight_lb > 2000 && r.total_weight_lb < 2400); assert.ok(r.cg_in > 35 && r.cg_in < 47); });
-test("W&B: empty list errors", () => { const r = computeWeightBalance({ stations: [], fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400 }); assert.ok(r.error); });
-test("W&B: zero total weight errors", () => { const r = computeWeightBalance({ stations: [{ weight_lb: 0, arm_in: 38 }], fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400 }); assert.ok(r.error); });
-test("W&B: negative weight errors", () => { const r = computeWeightBalance({ stations: [{ weight_lb: -10, arm_in: 38 }], fwd_cg_limit_in: 0, aft_cg_limit_in: 0, max_gross_lb: 0 }); assert.ok(r.error); });
-test("W&B: CG = moment / weight", () => { const r = computeWeightBalance({ stations: [{ weight_lb: 100, arm_in: 40 }, { weight_lb: 100, arm_in: 50 }], fwd_cg_limit_in: 0, aft_cg_limit_in: 0, max_gross_lb: 0 }); assert.equal(r.cg_in, 45); });
-test("W&B: outside aft CG fails", () => { const r = computeWeightBalance({ stations: [{ weight_lb: 1000, arm_in: 100 }], fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400 }); assert.equal(r.pass, false); });
-test("W&B: over gross fails", () => { const r = computeWeightBalance({ stations: [{ weight_lb: 3000, arm_in: 40 }], fwd_cg_limit_in: 35, aft_cg_limit_in: 47, max_gross_lb: 2400 }); assert.equal(r.pass, false); });
-test("W&B: pass null when no limits set", () => { const r = computeWeightBalance({ stations: [{ weight_lb: 1000, arm_in: 40 }], fwd_cg_limit_in: 0, aft_cg_limit_in: 0, max_gross_lb: 0 }); assert.equal(r.pass, null); });
-test("W&B: only gross supplied", () => { const r = computeWeightBalance({ stations: [{ weight_lb: 100, arm_in: 40 }], fwd_cg_limit_in: 0, aft_cg_limit_in: 0, max_gross_lb: 200 }); assert.equal(r.pass, true); });
-test("W&B: example pass true", () => { const r = computeWeightBalance(weightBalanceExample.inputs); assert.equal(r.pass, true); });
 
 // 196 Prop slip
 test("Prop slip: example planing-typical", () => { const r = computePropSlip(propSlipExample.inputs); assert.ok(r.theoretical_kt > 0); assert.ok(typeof r.category === "string"); });
@@ -136,5 +123,5 @@ test("drill-point: zero diameter and out-of-range angle error", () => { assert.o
 test("drill-point: non-finite input errors", () => { assert.ok(computeDrillPointDepth({ diameter_in: 0.5, point_angle_deg: 118, full_depth_in: Infinity }).error); });
 
 // Renderers
-test("MECHANIC_RENDERERS: 8 ids", () => { for (const id of ["weight-balance","prop-slip","displacement-cr","bolt-stretch","driveshaft-crit","fuel-range","tire-gearing","brake-pad-life"]) assert.equal(typeof MECHANIC_RENDERERS[id], "function", id); });
+test("MECHANIC_RENDERERS: 7 ids", () => { for (const id of ["prop-slip","displacement-cr","bolt-stretch","driveshaft-crit","fuel-range","tire-gearing","brake-pad-life"]) assert.equal(typeof MECHANIC_RENDERERS[id], "function", id); });
 test("MACHINING_RENDERERS: cutting-speed-rpm + drill-point-depth present", () => { assert.equal(typeof MACHINING_RENDERERS["cutting-speed-rpm"], "function"); assert.equal(typeof MACHINING_RENDERERS["drill-point-depth"], "function"); });

@@ -76,14 +76,7 @@ const FILES = [
   "calc-survey.js",
   "calc-historical.js",
   "calc-accounting.js",
-  "calc-legal.js",
   "calc-lab.js",
-  // v12 Group U: Veterinary.
-  "calc-vet.js",
-  // v12 Group V: EMS / Pre-hospital.
-  "calc-ems.js",
-  // v12 Group W: Pilots / Aviation.
-  "calc-aviation.js",
   // v12 Group X: Real Estate.
   "calc-realestate.js",
   // v12 Group Y: Educators / K-12.

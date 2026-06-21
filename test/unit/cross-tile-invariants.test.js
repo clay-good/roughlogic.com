@@ -54,10 +54,7 @@ import {
 } from "../../calc-fire.js";
 import { computeFrictionLoss, computeRecircPumpHead } from "../../calc-plumbing.js";
 import { computeBeamLoading } from "../../calc-construction.js";
-import { computeDensityAltitude } from "../../calc-aviation.js";
 import { computePITI } from "../../calc-realestate.js";
-import { computeParkland, computeMAP } from "../../calc-ems.js";
-import { computeEnergyRequirement, computeMaintenanceFluid } from "../../calc-vet.js";
 import { computeBoltStretch, computePropSlip } from "../../calc-mechanic.js";
 import { computeBridgeFormula } from "../../calc-trucking.js";
 import { computePanConversion } from "../../calc-kitchen.js";
@@ -65,26 +62,19 @@ import { computeBeerLambert, computeMassMoles } from "../../calc-lab.js";
 import { computeOhmsLaw, computeTransformerSize, computeLVDCDrop, computeBreakerSize, computeBendRadius } from "../../calc-electrical.js";
 import { computeAsphaltTonnage, computeConcreteVolume } from "../../calc-construction.js";
 import { computePipeVolume } from "../../calc-plumbing.js";
-import { computeETTSizing } from "../../calc-vet.js";
 import { computeAmortizationSchedule } from "../../calc-realestate.js";
 import { computeFoam, computeAerialLadderReach } from "../../calc-fire.js";
 import { computeSHR } from "../../calc-hvac.js";
 import { computeDisplacementCR, displacementCRExample } from "../../calc-mechanic.js";
-import { computeCrosswind } from "../../calc-aviation.js";
 import { computeBreakeven } from "../../calc-accounting.js";
 import { computeMarkup } from "../../calc-cross.js";
 import { computeHEPALife } from "../../calc-restoration.js";
-import { computeTargetWeightLoss } from "../../calc-vet.js";
-import { computePressureAltitude } from "../../calc-aviation.js";
 import { computeFilterLoading } from "../../calc-water.js";
 import { computeTileCount } from "../../calc-construction.js";
 import { computeSETax } from "../../calc-accounting.js";
-import { computeTrueAirspeed } from "../../calc-aviation.js";
 import { computeServiceLoad, serviceLoadExample } from "../../calc-electrical.js";
 import { computeNAMSizing } from "../../calc-restoration.js";
 import { computeMaterialCost } from "../../calc-cross.js";
-import { computeETE } from "../../calc-aviation.js";
-import { computeShockIndex } from "../../calc-ems.js";
 import { computeWindPressure, computeSnowLoad } from "../../calc-construction.js";
 import { computeWindChill, computeLoanPayment, computeOvertime } from "../../calc-cross.js";
 import { manualJCooling, computeAirReceiver } from "../../calc-hvac.js";
@@ -100,14 +90,12 @@ import { computeNoiseDose } from "../../calc-cross.js";
 import { computeBrakePadLife } from "../../calc-mechanic.js";
 import { computeBoxFill } from "../../calc-electrical.js";
 import { computeCfmPerTon } from "../../calc-hvac.js";
-import { computeIvDripRate } from "../../calc-ems.js";
 import { computeCropYield } from "../../calc-agriculture.js";
 import { computeRcf } from "../../calc-lab.js";
 import { computeGasPipeSizing } from "../../calc-gas.js";
 import { computeRequiredFireFlow } from "../../calc-fire.js";
 import { computeNeutralImbalance } from "../../calc-stage.js";
 import { computeStatistics } from "../../calc-edu.js";
-import { computeVetDose } from "../../calc-vet.js";
 import { computePlateCost } from "../../calc-kitchen.js";
 import { computeDehumidifierSize } from "../../calc-restoration.js";
 import { readFileSync } from "node:fs";
@@ -860,22 +848,6 @@ test("monotonicity: computeBeamLoading deflection is strictly increasing in span
   }
 });
 
-test("monotonicity: computeDensityAltitude is strictly increasing in OAT at fixed pressure altitude", () => {
-  // DA = PA + 120 * (OAT - ISA(PA)). Linear and strictly increasing
-  // in OAT. The 120 ft/C coefficient is FAA-published.
-  let prev = -Infinity;
-  for (const oat_c of [-10, 0, 10, 20, 30, 40]) {
-    const r = computeDensityAltitude({ pressure_altitude_ft: 3000, oat_c });
-    const da = r.density_altitude_ft;
-    assert.ok(Number.isFinite(da), `error at OAT=${oat_c}: ${JSON.stringify(r)}`);
-    assert.ok(
-      da > prev,
-      `DA at OAT=${oat_c} = ${da} not greater than prev=${prev}`,
-    );
-    prev = da;
-  }
-});
-
 test("monotonicity: computePITI piti is strictly increasing in principal at fixed rate/term", () => {
   // Mortgage payment is linear in principal at fixed rate/term.
   // Adding fixed escrow keeps strict monotonicity.
@@ -918,65 +890,6 @@ test("monotonicity: computePITI piti is strictly increasing in apr at fixed prin
       `piti at apr=${apr_percent} = ${r.piti} not greater than prev=${prev}`,
     );
     prev = r.piti;
-  }
-});
-
-// --- More monotonicity sweeps (spec-v14 §10.3, second batch) ------------
-//
-// Groups V (EMS), U (Veterinary), T (Lab / bench science), A (Electrical
-// Ohm's law) -- compute-function-level strict monotonicity across the
-// canonical input the formula is linear / power-law in. A non-monotonic
-// result for any of these is a transcription error per spec-v14 §10.3.
-
-test("monotonicity: computeParkland total_24hr_mL is strictly increasing in weight_kg at fixed TBSA", () => {
-  // Parkland formula: total = 4 * weight_kg * tbsa_percent. Linear in
-  // weight; strictly increasing for any positive TBSA.
-  let prev = -Infinity;
-  for (const weight_kg of [40, 60, 80, 100, 120]) {
-    const r = computeParkland({ weight_kg, tbsa_percent: 30, hours_since_burn: 0 });
-    assert.ok(Number.isFinite(r.total_24hr_mL), `error at wt=${weight_kg}: ${JSON.stringify(r)}`);
-    assert.ok(
-      r.total_24hr_mL > prev,
-      `Parkland at wt=${weight_kg} = ${r.total_24hr_mL} not greater than prev=${prev}`,
-    );
-    prev = r.total_24hr_mL;
-  }
-});
-
-test("monotonicity: computeParkland total_24hr_mL is strictly increasing in TBSA at fixed weight", () => {
-  // Linear in TBSA at fixed weight.
-  let prev = -Infinity;
-  for (const tbsa_percent of [10, 20, 30, 40, 50, 60]) {
-    const r = computeParkland({ weight_kg: 70, tbsa_percent, hours_since_burn: 0 });
-    assert.ok(Number.isFinite(r.total_24hr_mL), `error at TBSA=${tbsa_percent}: ${JSON.stringify(r)}`);
-    assert.ok(
-      r.total_24hr_mL > prev,
-      `Parkland at TBSA=${tbsa_percent}% = ${r.total_24hr_mL} not greater than prev=${prev}`,
-    );
-    prev = r.total_24hr_mL;
-  }
-});
-
-test("monotonicity: computeEnergyRequirement RER is strictly increasing in weight_kg (W^0.75 law)", () => {
-  // RER = 70 * weight_kg^0.75. Strictly increasing in weight; the
-  // exponent 0.75 is the allometric Kleiber pin per AAHA/AAFP. A
-  // refactor that swapped the exponent for 1.0 (linear) or 0.67
-  // (Brody) would still be monotonic but the bit-pattern is asserted
-  // separately in calc-vet's RER worked-example fixture.
-  let prev = -Infinity;
-  for (const weight_kg of [2, 5, 10, 20, 40, 60]) {
-    const r = computeEnergyRequirement({
-      weight: weight_kg,
-      weight_unit: "kg",
-      species: "dog",
-      activity: "sedentary",
-    });
-    assert.ok(Number.isFinite(r.RER_kcal_per_day), `error at wt=${weight_kg}: ${JSON.stringify(r)}`);
-    assert.ok(
-      r.RER_kcal_per_day > prev,
-      `RER at wt=${weight_kg} = ${r.RER_kcal_per_day} not greater than prev=${prev}`,
-    );
-    prev = r.RER_kcal_per_day;
   }
 });
 
@@ -1360,65 +1273,9 @@ test("monotonicity: computeAmortization monthly_payment is strictly increasing i
   assert.ok(Math.abs(b.payment - 2 * a.payment) < 1e-6,
     `payment(200k) = ${b.payment} != 2 * payment(100k) = ${2 * a.payment}`);
 });
-
-// --- Phase F §10.3 tenth monotonicity batch 2026-05-22 ------------------
-//
-// Closes §10.3 coverage to twenty-three catalog groups by adding sweeps
-// for Group S Legal (computeJudgmentInterest linear-in-principal +
-// monotone-in-accrual-window; computeWageHour monotone-in-hours_worked
-// with the FLSA 40 hr regular/OT threshold pin), plus three more
-// compute functions in Group A Electrical / E Construction / X Real
-// Estate that haven't been pinned at the consumer level yet
-// (computeMotorFLA / computeBoardFootage / computePropertyTax).
-
-import { computeJudgmentInterest, computeWageHour } from "../../calc-legal.js";
 import { computeMotorFLA } from "../../calc-electrical.js";
 import { computeBoardFootage } from "../../calc-construction.js";
 import { computePropertyTax } from "../../calc-realestate.js";
-
-test("monotonicity: computeJudgmentInterest accrued_interest is strictly increasing in principal (Group S linear pin)", () => {
-  // Group S. Simple-interest accrual is linear in principal; doubling
-  // principal doubles accrued interest at the same dates and state.
-  let prev = -Infinity;
-  for (const principal of [1000, 5000, 10000, 50000, 100000]) {
-    const r = computeJudgmentInterest({
-      principal, state: "CA",
-      judgment_date: "2024-01-01", accrual_date: "2025-01-01",
-      partial_payments: [],
-    });
-    assert.ok(Number.isFinite(r.accrued_interest), `error at P=${principal}: ${JSON.stringify(r)}`);
-    assert.ok(r.accrued_interest > prev, `accrued at P=${principal} = ${r.accrued_interest} not greater than prev=${prev}`);
-    prev = r.accrued_interest;
-  }
-  // Doubling identity: at fixed dates and state, 2x principal -> 2x accrued.
-  const a = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01", partial_payments: [] });
-  const b = computeJudgmentInterest({ principal: 20000, state: "CA", judgment_date: "2024-01-01", accrual_date: "2025-01-01", partial_payments: [] });
-  assert.ok(Math.abs(b.accrued_interest - 2 * a.accrued_interest) < 1e-9,
-    `accrued(20k) = ${b.accrued_interest} != 2 * accrued(10k) = ${2 * a.accrued_interest}`);
-});
-
-test("monotonicity: computeWageHour gross_pay is strictly increasing in hours_worked with the FLSA 40 hr OT threshold (Group S piecewise-linear pin)", () => {
-  // Group S. Below 40 hrs: gross = hours * rate (slope = rate). Above
-  // 40 hrs: gross = 40 * rate + (hours - 40) * rate * 1.5 (slope = 1.5x).
-  // Strictly increasing; the slope changes at 40 hrs. Pin both monotone
-  // behavior and the exact threshold (39 / 40 / 41 hrs).
-  let prev = -Infinity;
-  for (const hours_worked of [10, 25, 40, 50, 60]) {
-    const r = computeWageHour({ hourly_rate: 20, hours_worked, state: "FED", is_tipped: false });
-    assert.ok(Number.isFinite(r.gross_pay), `error at h=${hours_worked}: ${JSON.stringify(r)}`);
-    assert.ok(r.gross_pay > prev, `gross at h=${hours_worked} = ${r.gross_pay} not greater than prev=${prev}`);
-    prev = r.gross_pay;
-  }
-  // FLSA threshold pin: 40 hrs at $20/hr -> $800 (no OT); 41 hrs -> $800 + 1.5 * 20 = $830.
-  const at40 = computeWageHour({ hourly_rate: 20, hours_worked: 40, state: "FED", is_tipped: false });
-  const at41 = computeWageHour({ hourly_rate: 20, hours_worked: 41, state: "FED", is_tipped: false });
-  assert.equal(at40.regular_hours, 40);
-  assert.equal(at40.overtime_hours, 0);
-  assert.equal(at40.gross_pay, 800);
-  assert.equal(at41.regular_hours, 40);
-  assert.equal(at41.overtime_hours, 1);
-  assert.ok(Math.abs(at41.gross_pay - 830) < 1e-9, `gross_pay at 41 hrs = ${at41.gross_pay} != 830`);
-});
 
 test("monotonicity: computeMotorFLA fla is strictly increasing in hp at fixed voltage and phase (Group A NEC table pin)", () => {
   // Group A. The NEC Table 430 motor FLA values are tabulated; sweep
@@ -1685,13 +1542,12 @@ test("monotonicity: computePumpEfficiency water_hp is strictly increasing in flo
 // Closes more compute-function consumer-level pins across catalog groups
 // that had primitive-level pins but missing direct compute-function
 // monotonicity tests: Group A (computeThreePhase three-input linear pin),
-// Group W (computeFuelPlanning linear-in-time + linear-in-burn), Group X
+// Group X
 // (computeLTV linear-in-loan_amount + inverse-in-value with PMI-flag pin
 // at the 80% threshold, computeCapRateDSCR linear-in-noi and inverse-in-
 // value), Group P (computeBackcountryNeeds linear scaling pins).
 
 import { computeThreePhase } from "../../calc-electrical.js";
-import { computeFuelPlanning } from "../../calc-aviation.js";
 import { computeLTV, computeCapRateDSCR } from "../../calc-realestate.js";
 import { computeBackcountryNeeds } from "../../calc-field.js";
 
@@ -1724,29 +1580,6 @@ test("monotonicity: computeThreePhase kW is strictly increasing in V_LL, I_L, an
   const b = computeThreePhase({ V_LL: 480, I_L: 100, pf: 0.9 });
   assert.ok(Math.abs(b.kW - 2 * a.kW) < 1e-9,
     `kW(480) = ${b.kW} != 2 * kW(240) = ${2 * a.kW}`);
-});
-
-test("monotonicity: computeFuelPlanning required_fuel_gal is strictly increasing in flight_time_hr and burn_gph (linear pins)", () => {
-  // Group W. required_fuel_gal = (flight + reserve) * burn; linear in both
-  // flight time and burn rate. Pin both dimensions.
-  let prev = -Infinity;
-  for (const flight_time_hr of [0.5, 1, 2, 4, 8]) {
-    const r = computeFuelPlanning({ flight_time_hr, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 100 });
-    assert.ok(Number.isFinite(r.required_fuel_gal), `error at t=${flight_time_hr}: ${JSON.stringify(r)}`);
-    assert.ok(r.required_fuel_gal > prev, `required_fuel_gal at t=${flight_time_hr} = ${r.required_fuel_gal} not greater than prev=${prev}`);
-    prev = r.required_fuel_gal;
-  }
-  prev = -Infinity;
-  for (const burn_gph of [5, 10, 20, 40, 80]) {
-    const r = computeFuelPlanning({ flight_time_hr: 2, burn_gph, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 500 });
-    assert.ok(r.required_fuel_gal > prev, `required_fuel_gal at burn=${burn_gph} = ${r.required_fuel_gal} not greater than prev=${prev}`);
-    prev = r.required_fuel_gal;
-  }
-  // Doubling-in-burn pin: at fixed times, doubling burn doubles required gallons.
-  const a = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 500 });
-  const b = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 20, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 500 });
-  assert.ok(Math.abs(b.required_fuel_gal - 2 * a.required_fuel_gal) < 1e-9,
-    `required_fuel_gal(20 gph) = ${b.required_fuel_gal} != 2 * required_fuel_gal(10 gph) = ${2 * a.required_fuel_gal}`);
 });
 
 test("monotonicity: computeLTV is strictly increasing in loan_amount at fixed value (Group X linear pin)", () => {
@@ -1967,29 +1800,6 @@ test("monotonicity: computeSPL L2_dB is strictly decreasing in d2 at fixed L1/d1
     `L2(20) - L2(10) = ${drop} != -6.0206 dB (inverse-square per-doubling)`);
 });
 
-// --- §10.3 Phase F eleventh monotonicity batch 2026-05-25 ------------------
-//
-// Five more strict-monotonicity sweeps covering compute functions newly
-// bit-pinned in the §9 ratchet that lacked a §10.3 sweep: computeMaintenanceFluid
-// (Group U), computeBoltStretch (Group K), computeSeedRate (Group L),
-// computeOvertime (Group G), computeMAP (Group V).
-
-test("monotonicity: computeMaintenanceFluid maintenance_mL_per_day is strictly increasing in weight_kg (linear, dog basis)", () => {
-  // Group U. Plumb's / AAHA dog maintenance = 60 mL/kg/day; doubling
-  // weight should double the daily fluid requirement (linear pin).
-  let prev = -Infinity;
-  for (const w of [2, 5, 10, 20, 40, 80]) {
-    const r = computeMaintenanceFluid({ weight: w, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 0, rehydration_window_hr: 24 });
-    assert.ok(Number.isFinite(r.maintenance_mL_per_day), `expected mL/day at w=${w}: ${JSON.stringify(r)}`);
-    assert.ok(r.maintenance_mL_per_day > prev, `mL/day at w=${w} = ${r.maintenance_mL_per_day} not greater than prev=${prev}`);
-    prev = r.maintenance_mL_per_day;
-  }
-  const a = computeMaintenanceFluid({ weight: 10, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 0, rehydration_window_hr: 24 });
-  const b = computeMaintenanceFluid({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 0, ongoing_losses_mL_per_hr: 0, rehydration_window_hr: 24 });
-  assert.ok(Math.abs(b.maintenance_mL_per_day - 2 * a.maintenance_mL_per_day) < 1e-9,
-    `mL/day(20kg) = ${b.maintenance_mL_per_day} != 2 * mL/day(10kg) = ${2 * a.maintenance_mL_per_day}`);
-});
-
 test("monotonicity: computeBoltStretch clamp_load_lb is strictly increasing in stretch_thou (Hooke's-Law linear pin)", () => {
   // Group K. clamp_load = stretch_in * E * area / grip_length; doubling
   // stretch should double clamp load at fixed bolt geometry.
@@ -2047,22 +1857,6 @@ test("monotonicity: computeOvertime gross_pay is strictly increasing in total_ho
   const at61 = computeOvertime({ total_hours: 61, regular_rate: 30, overtime_multiplier: 1.5, double_time_multiplier: 2, double_time_threshold_hr: 60 });
   assert.equal(at60.gross_pay, 2100);
   assert.equal(at61.gross_pay, 2160);
-});
-
-test("monotonicity: computeMAP map_mmHg is strictly increasing in DBP at fixed SBP (weighted-average pin)", () => {
-  // Group V. MAP = (SBP + 2*DBP)/3; linear-in-DBP. Pins the weight-on-
-  // DBP factor (2/3) against a future swap to (SBP+DBP)/2 (arithmetic
-  // mean with weight 1/2).
-  let prev = -Infinity;
-  for (const d of [40, 60, 70, 80, 90, 100]) {
-    const r = computeMAP({ sbp_mmHg: 120, dbp_mmHg: d });
-    assert.ok(Number.isFinite(r.map_mmHg), `expected map at DBP=${d}: ${JSON.stringify(r)}`);
-    assert.ok(r.map_mmHg > prev, `map at DBP=${d} = ${r.map_mmHg} not greater than prev=${prev}`);
-    prev = r.map_mmHg;
-  }
-  // Weighted-average pin: MAP(SBP=120, DBP=60) = (120 + 120) / 3 = 80 exactly.
-  const r = computeMAP({ sbp_mmHg: 120, dbp_mmHg: 60 });
-  assert.equal(r.map_mmHg, 80);
 });
 
 // --- §10.3 Phase F twelfth monotonicity batch 2026-05-25 -------------------
@@ -2455,10 +2249,9 @@ test("monotonicity: computeHydrantFlow flow_gpm is strictly increasing in outlet
 
 // --- §10.3 Phase F fifteenth monotonicity batch 2026-05-26 ---------------
 //
-// Five more strict-monotonicity sweeps covering compute functions across
-// five different catalog groups: computeBendRadius (Group A), computeAsphaltTonnage
-// (Group E), computeMaterialCost (Group G), computeETE (Group W),
-// computeShockIndex (Group V).
+// Strict-monotonicity sweeps covering compute functions across
+// three different catalog groups: computeBendRadius (Group A), computeAsphaltTonnage
+// (Group E), computeMaterialCost (Group G).
 
 test("monotonicity: computeBendRadius min_radius_in is strictly increasing in cable_od_in (Southwire 8x-multiplier linear pin)", () => {
   // Group A. min_radius = multiple * cable_od; at THHN single-conductor
@@ -2513,44 +2306,11 @@ test("monotonicity: computeMaterialCost subtotal is strictly increasing in quant
   assert.equal(b.subtotal, 2 * a.subtotal);
 });
 
-test("monotonicity: computeETE ete_minutes is strictly decreasing in groundspeed_kt at fixed distance (inverse pin)", () => {
-  // Group W. ete = distance / groundspeed; doubling speed halves ETE.
-  // Inverse-proportional pin.
-  let prev = Infinity;
-  for (const gs of [50, 75, 100, 150, 200, 300]) {
-    const r = computeETE({ distance_nm: 300, groundspeed_kt: gs, departure_time_local: "08:00" });
-    assert.ok(Number.isFinite(r.ete_minutes), `expected ete at gs=${gs}: ${JSON.stringify(r)}`);
-    assert.ok(r.ete_minutes < prev, `ete at gs=${gs} = ${r.ete_minutes} not less than prev=${prev}`);
-    prev = r.ete_minutes;
-  }
-  // Halving-speed pin: doubling gs halves ete_minutes.
-  const a = computeETE({ distance_nm: 300, groundspeed_kt: 100, departure_time_local: "08:00" });
-  const b = computeETE({ distance_nm: 300, groundspeed_kt: 200, departure_time_local: "08:00" });
-  assert.ok(Math.abs(b.ete_minutes - 0.5 * a.ete_minutes) < 1e-9,
-    `ete(200 kt) = ${b.ete_minutes} != 0.5 * ete(100 kt) = ${0.5 * a.ete_minutes}`);
-});
-
-test("monotonicity: computeShockIndex shock_index is strictly increasing in hr_bpm at fixed sbp (linear pin)", () => {
-  // Group V. SI = HR / SBP; linear in HR at fixed SBP. Doubling HR
-  // doubles SI.
-  let prev = -Infinity;
-  for (const hr of [40, 60, 80, 100, 120, 140, 180]) {
-    const r = computeShockIndex({ hr_bpm: hr, sbp_mmHg: 120 });
-    assert.ok(Number.isFinite(r.shock_index), `expected SI at HR=${hr}: ${JSON.stringify(r)}`);
-    assert.ok(r.shock_index > prev, `SI at HR=${hr} = ${r.shock_index} not greater than prev=${prev}`);
-    prev = r.shock_index;
-  }
-  const a = computeShockIndex({ hr_bpm: 60, sbp_mmHg: 120 });
-  const b = computeShockIndex({ hr_bpm: 120, sbp_mmHg: 120 });
-  assert.ok(Math.abs(b.shock_index - 2 * a.shock_index) < 1e-9,
-    `SI(HR=120) = ${b.shock_index} != 2 * SI(HR=60) = ${2 * a.shock_index}`);
-});
-
 // --- §10.3 Phase F sixteenth monotonicity batch 2026-05-26 ---------------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeConcreteVolume (E), computePipeVolume (B), computeETTSizing
-// (U), computeAmortizationSchedule total_interest (X / R), computeFoam (F).
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeConcreteVolume (E), computePipeVolume (B),
+// computeAmortizationSchedule total_interest (X / R), computeFoam (F).
 
 test("monotonicity: computeConcreteVolume cubic_yards is strictly increasing in thickness_in (linear pin)", () => {
   // Group E. cubic_yards = (L * W * t/12) / 27; linear in thickness at
@@ -2582,24 +2342,6 @@ test("monotonicity: computePipeVolume gallons is strictly increasing in length_f
   const b = computePipeVolume({ internal_diameter_in: 1.0, length_ft: 100, nominal_size: "1" });
   assert.ok(Math.abs(b.gallons - 2 * a.gallons) < 1e-12,
     `gal(100 ft) = ${b.gallons} != 2 * gal(50 ft) = ${2 * a.gallons}`);
-});
-
-test("monotonicity: computeETTSizing ett_mm_id is monotone non-decreasing in weight_kg (Plumb's dog band step-function pin)", () => {
-  // Group U. ETT size is a table lookup binned by weight band. Pin
-  // monotone non-decreasing AND specific Plumb's-published boundary
-  // values: at 5 kg ETT=5.0 mm; at 10 kg ETT=6.5 mm; at 20 kg ETT=8.0;
-  // at 40 kg ETT=9.0; at 60 kg ETT=10.0. Catches a future swap in the
-  // dog-weight-band table.
-  let prev = -Infinity;
-  for (const w of [1, 3, 5, 10, 15, 20, 30, 40, 60, 80]) {
-    const r = computeETTSizing({ species: "dog", weight_kg: w });
-    assert.ok(Number.isFinite(r.ett_mm_id), `expected ETT at w=${w}: ${JSON.stringify(r)}`);
-    assert.ok(r.ett_mm_id >= prev, `ETT at w=${w} = ${r.ett_mm_id} not >= prev=${prev}`);
-    prev = r.ett_mm_id;
-  }
-  assert.equal(computeETTSizing({ species: "dog", weight_kg: 5 }).ett_mm_id, 5.0);
-  assert.equal(computeETTSizing({ species: "dog", weight_kg: 10 }).ett_mm_id, 6.5);
-  assert.equal(computeETTSizing({ species: "dog", weight_kg: 40 }).ett_mm_id, 9.0);
 });
 
 test("monotonicity: computeAmortizationSchedule total_interest is strictly increasing in principal at fixed rate / term (linear pin)", () => {
@@ -2641,8 +2383,8 @@ test("monotonicity: computeFoam total_concentrate_gallons + total_solution_gallo
 
 // --- §10.3 Phase F seventeenth monotonicity batch 2026-05-26 ------------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeSHR (C), computeDisplacementCR (K), computeCrosswind (W),
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeSHR (C), computeDisplacementCR (K),
 // computeBreakeven (R), computeAerialLadderReach (F).
 
 test("monotonicity: computeSHR SHR is strictly increasing in sensible_btu_hr at fixed total_btu_hr (linear pin)", () => {
@@ -2677,22 +2419,6 @@ test("monotonicity: computeDisplacementCR displacement_in3 is strictly increasin
   const b = computeDisplacementCR({ ...base, cylinders: 8 });
   assert.ok(Math.abs(b.displacement_in3 - 2 * a.displacement_in3) < 1e-9,
     `disp(8 cyl) = ${b.displacement_in3} != 2 * disp(4 cyl) = ${2 * a.displacement_in3}`);
-});
-
-test("monotonicity: computeCrosswind crosswind_kt is strictly increasing in wind_speed_kt at fixed angle (linear pin)", () => {
-  // Group W. crosswind = wind_speed * sin(angle); linear in wind_speed
-  // at fixed runway/wind heading. Doubling wind speed doubles crosswind.
-  let prev = -Infinity;
-  for (const ws of [5, 10, 15, 20, 30, 40, 60]) {
-    const r = computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 120, wind_speed_kt: ws, demonstrated_crosswind_kt: 15 });
-    assert.ok(Number.isFinite(r.crosswind_kt), `expected cw at ws=${ws}: ${JSON.stringify(r)}`);
-    assert.ok(r.crosswind_kt > prev, `crosswind at ws=${ws} = ${r.crosswind_kt} not greater than prev=${prev}`);
-    prev = r.crosswind_kt;
-  }
-  // sin(30) = 0.5 exactly, so crosswind = 0.5 * wind_speed at 30 deg off runway.
-  const at20 = computeCrosswind({ runway_heading_deg: 90, wind_direction_deg: 120, wind_speed_kt: 20, demonstrated_crosswind_kt: 15 });
-  assert.ok(Math.abs(at20.crosswind_kt - 10) < 1e-9,
-    `crosswind(20 kt at 30 deg) = ${at20.crosswind_kt}, expected ~10 (sin(30)=0.5 pin)`);
 });
 
 test("monotonicity: computeBreakeven breakeven_units is strictly increasing in fixed_costs at fixed margin (linear pin)", () => {
@@ -2736,9 +2462,9 @@ test("monotonicity: computeAerialLadderReach horizontal_reach + vertical_reach a
 
 // --- §10.3 Phase F eighteenth monotonicity batch 2026-05-26 -------------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeMarkup (G), computeHEPALife (D), computeTargetWeightLoss
-// (U), computePressureAltitude (W), computeFilterLoading (M).
+// Strict-monotonicity sweeps spanning three different catalog
+// groups: computeMarkup (G), computeHEPALife (D),
+// computeFilterLoading (M).
 
 test("monotonicity: computeMarkup selling_price is strictly increasing in cost at fixed markup_percent (linear pin)", () => {
   // Group G. selling_price = cost * (1 + markup_pct/100); linear in cost.
@@ -2775,39 +2501,6 @@ test("monotonicity: computeHEPALife filters_for_job + total_cost_usd are strictl
   assert.equal(b.total_cost_usd, 2 * a.total_cost_usd);
 });
 
-test("monotonicity: computeTargetWeightLoss deficit_kg is strictly increasing in current_weight at fixed target (linear pin)", () => {
-  // Group U. deficit = current - target; linear in current at fixed
-  // target. At target=10 kg, deficit at current=12 should be 2 (exact).
-  let prev = -Infinity;
-  for (const cur of [10.5, 12, 15, 20, 25, 30]) {
-    const r = computeTargetWeightLoss({ current_weight: cur, target_weight: 10, weight_unit: "kg", species: "dog", kcal_per_cup: 400 });
-    assert.ok(Number.isFinite(r.deficit_kg), `expected deficit at cur=${cur}: ${JSON.stringify(r)}`);
-    assert.ok(r.deficit_kg > prev, `deficit at cur=${cur} = ${r.deficit_kg} not greater than prev=${prev}`);
-    prev = r.deficit_kg;
-  }
-  // Exact subtraction pin.
-  const r12 = computeTargetWeightLoss({ current_weight: 12, target_weight: 10, weight_unit: "kg", species: "dog", kcal_per_cup: 400 });
-  assert.equal(r12.deficit_kg, 2);
-});
-
-test("monotonicity: computePressureAltitude pressure_altitude_ft is strictly decreasing in altimeter_setting_inHg (inverse-in-setting pin)", () => {
-  // Group W. PA = field_elev + (29.92 - setting) * 1000. Strictly
-  // decreasing in altimeter setting. Pin the 1000 ft/inHg coefficient
-  // exactly: PA(29.42) - PA(29.92) = 500 ft (0.5 inHg = 500 ft).
-  let prev = Infinity;
-  for (const set of [28.92, 29.42, 29.62, 29.92, 30.22, 30.42, 30.92]) {
-    const r = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: set });
-    assert.ok(Number.isFinite(r.pressure_altitude_ft), `expected PA at set=${set}: ${JSON.stringify(r)}`);
-    assert.ok(r.pressure_altitude_ft < prev, `PA at set=${set} = ${r.pressure_altitude_ft} not less than prev=${prev}`);
-    prev = r.pressure_altitude_ft;
-  }
-  // 1000 ft/inHg coefficient pin.
-  const at2942 = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 29.42 });
-  const at2992 = computePressureAltitude({ field_elevation_ft: 1000, altimeter_setting_inHg: 29.92 });
-  assert.ok(Math.abs((at2942.pressure_altitude_ft - at2992.pressure_altitude_ft) - 500) < 1e-9,
-    `PA(29.42) - PA(29.92) = ${at2942.pressure_altitude_ft - at2992.pressure_altitude_ft}, expected 500 (1000 ft/inHg pin)`);
-});
-
 test("monotonicity: computeFilterLoading loading_gpm_per_ft2 is strictly decreasing in filter_area_ft2 + backwash_gpm strictly increasing (inverse + linear pin)", () => {
   // Group M. loading = flow / area (inverse in area at fixed flow);
   // backwash_gpm = backwash_rate * area (linear in area at fixed rate).
@@ -2832,8 +2525,8 @@ test("monotonicity: computeFilterLoading loading_gpm_per_ft2 is strictly decreas
 
 // --- §10.3 Phase F nineteenth monotonicity batch 2026-05-26 -------------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeTileCount (E), computeSETax (R), computeTrueAirspeed (W),
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeTileCount (E), computeSETax (R),
 // computeServiceLoad (A), computeNAMSizing (D). Brings §10.3 surface
 // past the 100-sweep mark.
 
@@ -2872,23 +2565,6 @@ test("monotonicity: computeSETax se_tax is strictly increasing in net_se_earning
   const b = computeSETax({ net_se_earnings: 100000, w2_ss_wages: 0, tax_year: 2025, filing_status: "single" });
   assert.ok(Math.abs(b.se_tax - 2 * a.se_tax) < 1e-6,
     `se_tax(100k) = ${b.se_tax} != 2 * se_tax(50k) = ${2 * a.se_tax}`);
-});
-
-test("monotonicity: computeTrueAirspeed tas_kt is strictly increasing in pressure_altitude_ft at fixed CAS (density-altitude pin)", () => {
-  // Group W. At fixed CAS / OAT, increasing PA decreases air density
-  // which increases TAS. Pin strict monotonicity. At sea-level standard
-  // day (PA=0, OAT=15 C), TAS ~ CAS within 1%.
-  let prev = -Infinity;
-  for (const pa of [0, 1000, 3000, 5000, 8000, 10000, 15000]) {
-    const r = computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: pa, oat_c: 15 });
-    assert.ok(Number.isFinite(r.tas_kt), `expected tas at pa=${pa}: ${JSON.stringify(r)}`);
-    assert.ok(r.tas_kt > prev, `tas at pa=${pa} = ${r.tas_kt} not greater than prev=${prev}`);
-    prev = r.tas_kt;
-  }
-  // ISA sea level pin: TAS ~ CAS at PA=0 / OAT=15 C.
-  const slStd = computeTrueAirspeed({ cas_kt: 120, pressure_altitude_ft: 0, oat_c: 15 });
-  assert.ok(Math.abs(slStd.tas_kt - 120) / 120 < 0.01,
-    `TAS at ISA sea level = ${slStd.tas_kt}, expected ~120 (CAS) within 1%`);
 });
 
 test("monotonicity: computeServiceLoad total_demand_W is strictly increasing in fixed_appliances_W (linear pin)", () => {
@@ -3048,10 +2724,10 @@ test("monotonicity: computeBoxFill fill_in3 is strictly increasing in conductor 
 
 // --- §10.3 Phase F twenty-first monotonicity batch 2026-05-26 ------------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeCfmPerTon (C), computeIvDripRate (V), computeCropYield
-// (L), computeRcf (T), computeDetentionTime (M). Five fresh consumers,
-// five fresh groups; brings §10.3 surface to 110+ sweeps with each row
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeCfmPerTon (C), computeCropYield
+// (L), computeRcf (T), computeDetentionTime (M). Four fresh consumers,
+// four fresh groups; brings §10.3 surface to 110+ sweeps with each row
 // pinning either a published constant or a closed-form identity.
 
 test("monotonicity: computeCfmPerTon total_cfm is strictly increasing in tons at fixed climate (ACCA Manual S 400 CFM/ton pin)", () => {
@@ -3077,32 +2753,6 @@ test("monotonicity: computeCfmPerTon total_cfm is strictly increasing in tons at
   // Climate-band pins: dry=450, standard=400, humid=350 per Manual S.
   assert.equal(computeCfmPerTon({ tons: 1, climate: "dry" }).total_cfm, 450);
   assert.equal(computeCfmPerTon({ tons: 1, climate: "humid" }).total_cfm, 350);
-});
-
-test("monotonicity: computeIvDripRate gtts_per_min is strictly increasing in volume_mL at fixed time / drop factor (linear pin)", () => {
-  // Group V. gtts/min = V * F / T; linear in volume at fixed time and
-  // drop factor. Doubling volume doubles gtts/min. Pin both strict
-  // monotonicity AND the published worked example (1000 mL / 480 min /
-  // 15 gtt-per-mL -> 31.25 gtts/min, 125 mL/hr).
-  let prev = -Infinity;
-  for (const v of [100, 250, 500, 1000, 2000, 3000]) {
-    const r = computeIvDripRate({ volume_mL: v, time_min: 480, drop_factor_gtt_per_mL: 15 });
-    assert.ok(Number.isFinite(r.gtts_per_min), `expected gtts at V=${v}: ${JSON.stringify(r)}`);
-    assert.ok(r.gtts_per_min > prev, `gtts at V=${v} = ${r.gtts_per_min} not greater than prev=${prev}`);
-    prev = r.gtts_per_min;
-  }
-  // Worked-example pin: 1000 mL over 480 min with 15 gtt/mL -> 31.25
-  // gtts/min and 125 mL/hr (cross-check against ivDripExample).
-  const ex = computeIvDripRate({ volume_mL: 1000, time_min: 480, drop_factor_gtt_per_mL: 15 });
-  assert.ok(Math.abs(ex.gtts_per_min - 31.25) < 1e-9,
-    `gtts(1000 mL / 480 min / 15) = ${ex.gtts_per_min}, expected 31.25`);
-  assert.ok(Math.abs(ex.rate_mL_per_hr - 125) < 1e-9,
-    `mL/hr(1000 mL / 480 min) = ${ex.rate_mL_per_hr}, expected 125`);
-  // Doubling identity.
-  const a = computeIvDripRate({ volume_mL: 500, time_min: 480, drop_factor_gtt_per_mL: 15 });
-  const b = computeIvDripRate({ volume_mL: 1000, time_min: 480, drop_factor_gtt_per_mL: 15 });
-  assert.ok(Math.abs(b.gtts_per_min - 2 * a.gtts_per_min) < 1e-9,
-    `gtts(1000) = ${b.gtts_per_min} != 2 * gtts(500) = ${2 * a.gtts_per_min}`);
 });
 
 test("monotonicity: computeCropYield yield_bu_per_acre is strictly increasing in weight_in_strip_lb at fixed strip geometry / moisture (linear pin)", () => {
@@ -3183,11 +2833,11 @@ test("monotonicity: computeDetentionTime minutes is strictly increasing in tank_
 
 // --- §10.3 Phase F twenty-second monotonicity batch 2026-05-26 ----------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
+// Strict-monotonicity sweeps spanning four different catalog
 // groups: computeGasPipeSizing (B), computeRequiredFireFlow (F),
-// computeNeutralImbalance (N), computeJudgmentInterest (S),
-// computeBackcountryNeeds (P). Five fresh consumers, five fresh groups
-// (B / F / N / S / P had no §10.3 sweeps in the prior twenty-one
+// computeNeutralImbalance (N),
+// computeBackcountryNeeds (P). Four fresh consumers, four fresh groups
+// (B / F / N / P had no §10.3 sweeps in the prior twenty-one
 // batches); brings §10.3 surface to 115+ sweeps.
 
 test("monotonicity: computeGasPipeSizing required_cfh is strictly increasing in btu_load at fixed gas (linear pin)", () => {
@@ -3261,35 +2911,6 @@ test("monotonicity: computeNeutralImbalance neutral_A degenerates to I_A when I_
   assert.equal(bal.imbalance_percent, 0);
 });
 
-test("monotonicity: computeJudgmentInterest accrued_interest is strictly increasing in principal at fixed dates / simple rate (linear pin)", () => {
-  // Group S. Simple-interest state (CA 10% per Cal. Civ. Proc. Code
-  // 685.010): accrued_interest = principal * rate * (days / 365);
-  // linear in principal at fixed dates. Doubling principal doubles
-  // interest. Pin both strict monotonicity AND the closed-form CA
-  // 10%-of-principal-per-year identity.
-  const j = "2024-01-01";
-  const a = "2025-01-01";  // 366 days (2024 is a leap year)
-  let prev = -Infinity;
-  for (const p of [1000, 5000, 10000, 25000, 50000, 100000]) {
-    const r = computeJudgmentInterest({ principal: p, state: "CA", judgment_date: j, accrual_date: a });
-    assert.ok(Number.isFinite(r.accrued_interest), `expected interest at P=${p}: ${JSON.stringify(r)}`);
-    assert.ok(r.accrued_interest > prev, `interest at P=${p} = ${r.accrued_interest} not greater than prev=${prev}`);
-    prev = r.accrued_interest;
-  }
-  // Doubling identity (linear in principal).
-  const half = computeJudgmentInterest({ principal: 10000, state: "CA", judgment_date: j, accrual_date: a });
-  const full = computeJudgmentInterest({ principal: 20000, state: "CA", judgment_date: j, accrual_date: a });
-  assert.ok(Math.abs(full.accrued_interest - 2 * half.accrued_interest) / half.accrued_interest < 1e-12,
-    `interest($20k) = ${full.accrued_interest} != 2 * interest($10k) = ${2 * half.accrued_interest}`);
-  // CA rate-pct pin: 10.0 per Cal. Civ. Proc. Code 685.010.
-  assert.equal(half.rate_pct, 10.0);
-  assert.equal(half.accrual, "simple");
-  // Closed-form pin: principal * 0.10 * (366 / 365) for the 2024 leap year.
-  const expected = 10000 * 0.10 * (366 / 365);
-  assert.ok(Math.abs(half.accrued_interest - expected) < 1e-6,
-    `interest($10k, 366 days, 10% simple) = ${half.accrued_interest}, expected ${expected}`);
-});
-
 test("monotonicity: computeBackcountryNeeds trip_water_l + trip_kcal are strictly increasing in trip_days at fixed weight / band / exertion (linear pin)", () => {
   // Group P. trip_water_l = water_per_day * trip_days * group_size;
   // trip_kcal = kcal_per_day * trip_days * group_size; both linear in
@@ -3322,8 +2943,8 @@ test("monotonicity: computeBackcountryNeeds trip_water_l + trip_kcal are strictl
 
 // --- §10.3 Phase F twenty-third monotonicity batch 2026-05-26 -----------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeLTV (X), computeStatistics (Y), computeVetDose (U),
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeLTV (X), computeStatistics (Y),
 // computePlateCost (O), computeDehumidifierSize (D). Brings §10.3
 // surface to 120+ sweeps with each row pinning either a published
 // constant or a closed-form linear / inverse identity.
@@ -3384,32 +3005,6 @@ test("monotonicity: computeStatistics sum + mean are strictly increasing as a po
   assert.equal(four.mean, 27.5);
 });
 
-test("monotonicity: computeVetDose total_dose_mg is strictly increasing in weight at fixed dose / concentration (linear pin)", () => {
-  // Group U. total_dose_mg = dose_mg_per_kg * weight_kg; volume_mL =
-  // total_dose_mg / concentration_mg_per_mL. Both linear in weight at
-  // fixed dose / concentration. Pin both strict monotonicity AND the
-  // closed-form doubling identity AND the weight-unit conversion:
-  // 22.0462 lb = 10 kg (toKg conversion).
-  let prev = -Infinity;
-  for (const w of [2, 5, 10, 20, 40, 60]) {
-    const r = computeVetDose({ weight: w, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
-    assert.ok(Number.isFinite(r.total_dose_mg), `expected dose at W=${w}: ${JSON.stringify(r)}`);
-    assert.ok(r.total_dose_mg > prev, `total at W=${w} = ${r.total_dose_mg} not greater than prev=${prev}`);
-    prev = r.total_dose_mg;
-  }
-  // Doubling identity at fixed dose / concentration.
-  const a = computeVetDose({ weight: 10, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
-  const b = computeVetDose({ weight: 20, weight_unit: "kg", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
-  assert.equal(a.total_dose_mg, 50);  // 5 mg/kg * 10 kg = 50 mg exact.
-  assert.equal(a.volume_mL, 5);       // 50 mg / 10 mg/mL = 5 mL exact.
-  assert.ok(Math.abs(b.total_dose_mg - 2 * a.total_dose_mg) < 1e-12,
-    `dose(20 kg) = ${b.total_dose_mg} != 2 * dose(10 kg) = ${2 * a.total_dose_mg}`);
-  // weight-unit conversion pin: 22.0462 lb -> 10 kg (within 0.01%).
-  const lb = computeVetDose({ weight: 22.0462, weight_unit: "lb", dose_mg_per_kg: 5, concentration_mg_per_mL: 10 });
-  assert.ok(Math.abs(lb.weight_kg - 10) / 10 < 1e-4,
-    `weight_kg(22.0462 lb) = ${lb.weight_kg}, expected 10 within 0.01%`);
-});
-
 test("monotonicity: computePlateCost plate_cost is strictly increasing in single ingredient lbs at fixed price; suggested_price strictly decreasing in target_food_cost_pct (linear + inverse pin)", () => {
   // Group O. plate_cost = sum(lbs * cost_per_lb); linear in lbs at
   // fixed cost. suggested_price = plate_cost / (target_food_cost_pct
@@ -3467,51 +3062,22 @@ test("monotonicity: computeDehumidifierSize aham_pints_per_day + field_pints_per
 
 // --- §10.3 Phase F twenty-fourth monotonicity batch 2026-05-26 ----------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeFuelPlanning (W), computeSlope (B), computeWeldUsage
-// (E), computeFuelRange (K), computeRampSlope (G). Five §9-pinned
-// closed-form compute functions, five distinct groups; brings §10.3
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeSlope (B), computeWeldUsage
+// (E), computeFuelRange (K), computeRampSlope (G). Four §9-pinned
+// closed-form compute functions, four distinct groups; brings §10.3
 // surface to 125+ sweeps.
 
 import { computeSlope } from "../../calc-plumbing.js";
 import { computeWeldUsage } from "../../calc-construction.js";
 import { computeRampSlope } from "../../calc-cross.js";
 import { computeConductorResistance } from "../../calc-electrical.js";
-import { computeAnionGap } from "../../calc-ems.js";
 import { computeDilution as computeDilutionLab } from "../../calc-lab.js";
 import { computeBulkDensity } from "../../calc-agriculture.js";
 import { computeCombustionAir } from "../../calc-hvac.js";
 import { computeContainmentAirBalance } from "../../calc-restoration.js";
 import { computeRebar } from "../../calc-construction.js";
 import { computeBrakingDistance } from "../../calc-fire.js";
-import { computeWeightBalance } from "../../calc-mechanic.js";
-
-test("monotonicity: computeFuelPlanning required_fuel_lb is strictly increasing in flight_time_hr at fixed burn / reserve / fuel (avgas 6.0 lb/gal pin)", () => {
-  // Group W. required_fuel_gal = (flight + reserve_hr) * burn;
-  // required_fuel_lb = required_fuel_gal * lb_per_gal. Linear in
-  // flight_time_hr at fixed burn / reserve / fuel. Pin both strict
-  // monotonicity AND the FAA-published avgas 6.0 lb/gal density pin
-  // (catches a future regression in FUEL_TYPE_WEIGHTS_LB_PER_GAL).
-  let prev = -Infinity;
-  for (const ft of [1, 2, 3, 4, 6, 8, 10]) {
-    const r = computeFuelPlanning({ flight_time_hr: ft, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 200 });
-    assert.ok(Number.isFinite(r.required_fuel_lb), `expected lb at ft=${ft}: ${JSON.stringify(r)}`);
-    assert.ok(r.required_fuel_lb > prev, `lb at ft=${ft} = ${r.required_fuel_lb} not greater than prev=${prev}`);
-    prev = r.required_fuel_lb;
-  }
-  // avgas density pin: lb_per_gal = 6.0 (FAA AC 60-22 standard).
-  // At ft=2 / burn=10 / reserve=45 min: gal = (2 + 0.75) * 10 = 27.5;
-  // lb = 27.5 * 6.0 = 165.0 exact.
-  const ref = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "avgas", tank_capacity_gal: 200 });
-  assert.ok(Math.abs(ref.required_fuel_gal - 27.5) < 1e-9,
-    `required_fuel_gal(2 hr, 10 gph, 45 min) = ${ref.required_fuel_gal}, expected 27.5`);
-  assert.ok(Math.abs(ref.required_fuel_lb - 165.0) < 1e-9,
-    `required_fuel_lb = ${ref.required_fuel_lb}, expected 165.0 at 6.0 lb/gal avgas`);
-  // jet_a density pin: 6.7 lb/gal (catches a future regression).
-  const jet = computeFuelPlanning({ flight_time_hr: 2, burn_gph: 10, reserve_min: 45, fuel_type: "jet_a", tank_capacity_gal: 200 });
-  assert.ok(Math.abs(jet.required_fuel_lb - 27.5 * 6.7) < 1e-9,
-    `jet_a required_fuel_lb = ${jet.required_fuel_lb}, expected ${27.5 * 6.7} at 6.7 lb/gal`);
-});
 
 test("monotonicity: computeSlope in_per_ft is strictly increasing in rise at fixed run (rise_run linear pin) + 1/4-in/ft DWV pin", () => {
   // Group B. In rise_run mode: in_per_ft = (rise / run) * 12; linear in
@@ -3613,11 +3179,11 @@ test("monotonicity: computeRampSlope percent is strictly increasing in rise_in a
 
 // --- §10.3 Phase F twenty-fifth monotonicity batch 2026-05-26 -----------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
-// groups: computeConductorResistance (A), computeAnionGap (V),
+// Strict-monotonicity sweeps spanning four different catalog
+// groups: computeConductorResistance (A),
 // computeDilution (T) [calc-lab variant], computePropertyTax (X),
-// computeBulkDensity (L). Five §9-pinned closed-form compute functions,
-// five distinct groups; brings §10.3 surface to 130+ sweeps.
+// computeBulkDensity (L). Four §9-pinned closed-form compute functions,
+// four distinct groups; brings §10.3 surface to 130+ sweeps.
 
 test("monotonicity: computeConductorResistance resistance_ohm is strictly increasing in length_ft and in temperature_C (linear-in-length + positive-temp-coefficient pin)", () => {
   // Group A. R = rho * length / area; positive temp coefficient for
@@ -3644,37 +3210,6 @@ test("monotonicity: computeConductorResistance resistance_ohm is strictly increa
     const r = computeConductorResistance({ material: "copper", awg: "12", length_ft: 1000, temperature_C: T });
     assert.ok(r.resistance_ohm > prevT, `R at T=${T}C = ${r.resistance_ohm} not greater than prev=${prevT}`);
     prevT = r.resistance_ohm;
-  }
-});
-
-test("monotonicity: computeAnionGap anion_gap is strictly increasing in na and strictly decreasing in cl + hco3 (linear pin)", () => {
-  // Group V. anion_gap = Na - (Cl + HCO3). Strictly increasing in Na
-  // at fixed Cl/HCO3; strictly decreasing in Cl and in HCO3 at fixed
-  // Na/other. Pin all three monotonicities AND the worked-example
-  // identity: 140 - (104 + 24) = 12 exact (the anionGapExample pin).
-  let prevNa = -Infinity;
-  for (const na of [125, 130, 135, 140, 145, 150]) {
-    const r = computeAnionGap({ na, cl: 104, hco3: 24 });
-    assert.ok(Number.isFinite(r.anion_gap), `expected AG at Na=${na}: ${JSON.stringify(r)}`);
-    assert.ok(r.anion_gap > prevNa, `AG at Na=${na} = ${r.anion_gap} not greater than prev=${prevNa}`);
-    prevNa = r.anion_gap;
-  }
-  // Worked-example exact pin: Na=140 / Cl=104 / HCO3=24 -> AG = 12.
-  const ex = computeAnionGap({ na: 140, cl: 104, hco3: 24 });
-  assert.equal(ex.anion_gap, 12);
-  // Strictly-decreasing in Cl at fixed Na/HCO3.
-  let prevCl = Infinity;
-  for (const cl of [95, 100, 104, 108, 112]) {
-    const r = computeAnionGap({ na: 140, cl, hco3: 24 });
-    assert.ok(r.anion_gap < prevCl, `AG at Cl=${cl} = ${r.anion_gap} not less than prev=${prevCl}`);
-    prevCl = r.anion_gap;
-  }
-  // Strictly-decreasing in HCO3 at fixed Na/Cl.
-  let prevH = Infinity;
-  for (const h of [10, 15, 20, 24, 28, 35]) {
-    const r = computeAnionGap({ na: 140, cl: 104, hco3: h });
-    assert.ok(r.anion_gap < prevH, `AG at HCO3=${h} = ${r.anion_gap} not less than prev=${prevH}`);
-    prevH = r.anion_gap;
   }
 });
 
@@ -3759,11 +3294,11 @@ test("monotonicity: computeBulkDensity bulk_density is strictly increasing in dr
 
 // --- §10.3 Phase F twenty-sixth monotonicity batch 2026-05-26 -----------
 //
-// Five more strict-monotonicity sweeps spanning five different catalog
+// Strict-monotonicity sweeps spanning four different catalog
 // groups: computeCombustionAir (C), computeContainmentAirBalance (D),
-// computeRebar (E), computeBrakingDistance (F), computeWeightBalance
-// (K). Five §9-pinned closed-form compute functions, five distinct
-// groups; brings §10.3 surface to 135+ sweeps.
+// computeRebar (E), computeBrakingDistance (F). Four §9-pinned
+// closed-form compute functions, four distinct groups; brings §10.3
+// surface to 135+ sweeps.
 
 test("monotonicity: computeCombustionAir required_volume_ft3 + opening_outdoor_in2 are strictly increasing in btu_input (NFGC 50-ft^3-per-1000-BTU + 1-in^2-per-1000-BTU pins)", () => {
   // Group C. required_volume_ft3 = (btu / 1000) * 50; opening_outdoor_in2 =
@@ -3870,46 +3405,6 @@ test("monotonicity: computeBrakingDistance braking_distance_ft is strictly incre
     `reaction_distance = ${rx.reaction_distance_ft}, expected ${55 * 1.467 * 1.5} (1.467 ft/s per mph)`);
 });
 
-test("monotonicity: computeWeightBalance total_weight_lb is strictly increasing as one station's weight increases at fixed arms (linear-sum pin)", () => {
-  // Group K. total_weight_lb = sum_i (weight_i); strictly increasing in
-  // any single station's weight at fixed arms. cg_in = total_moment /
-  // total_weight; with one moveable station's weight increasing at a
-  // larger-than-others arm, cg moves toward that arm. Pin strict
-  // monotonicity of total_weight AND the linear-sum identity:
-  // total_weight = w1 + w2 + w3.
-  const fixedStations = [
-    { weight_lb: 2000, arm_in: 80 },   // empty weight at fwd station
-    { weight_lb: 340, arm_in: 95 },    // crew
-  ];
-  let prev = -Infinity;
-  for (const wfuel of [0, 100, 200, 300, 400, 600, 800]) {
-    const r = computeWeightBalance({
-      stations: [...fixedStations, { weight_lb: wfuel, arm_in: 90 }],
-      fwd_cg_limit_in: 85, aft_cg_limit_in: 95, max_gross_lb: 4000,
-    });
-    assert.ok(Number.isFinite(r.total_weight_lb), `expected total at wf=${wfuel}: ${JSON.stringify(r)}`);
-    if (wfuel > 0) {
-      assert.ok(r.total_weight_lb > prev, `total at wf=${wfuel} = ${r.total_weight_lb} not greater than prev=${prev}`);
-    }
-    prev = r.total_weight_lb;
-  }
-  // Linear-sum closed-form pin: 2000 + 340 + 400 = 2740 lb exact.
-  const ref = computeWeightBalance({
-    stations: [
-      { weight_lb: 2000, arm_in: 80 },
-      { weight_lb: 340, arm_in: 95 },
-      { weight_lb: 400, arm_in: 90 },
-    ],
-    fwd_cg_limit_in: 85, aft_cg_limit_in: 95, max_gross_lb: 4000,
-  });
-  assert.equal(ref.total_weight_lb, 2740);
-  // cg_in closed-form pin: moment = 2000*80 + 340*95 + 400*90 =
-  // 160000 + 32300 + 36000 = 228300; cg = 228300 / 2740.
-  assert.equal(ref.total_moment_lbin, 228300);
-  assert.ok(Math.abs(ref.cg_in - 228300 / 2740) < 1e-9,
-    `cg_in = ${ref.cg_in}, expected ${228300 / 2740}`);
-});
-
 // --- spec-v14 §10.3 Phase F twenty-seventh monotonicity batch ----------
 // Five new sweeps across five distinct catalog groups (L / E / G / W / N).
 // Each pins one compute function's monotonic relationship plus a small
@@ -3919,7 +3414,6 @@ test("monotonicity: computeWeightBalance total_weight_lb is strictly increasing 
 import { computeTHI } from "../../calc-agriculture.js";
 import { computeAggregate } from "../../calc-construction.js";
 import { computeRainwaterYield } from "../../calc-cross.js";
-import { computeStandardTurn } from "../../calc-aviation.js";
 import { computeTimeAlignment } from "../../calc-stage.js";
 
 test("monotonicity: computeTHI THI is strictly increasing in temperature at fixed RH (USDA-ARS T_F - (0.55 - 0.0055*RH) * (T_F - 58) linear-in-T pin)", () => {
@@ -4004,40 +3498,6 @@ test("monotonicity: computeRainwaterYield annual_gal is strictly increasing in c
     `monthly-path annual = ${monthly.annual_gal}, expected ${expectedMonthlyAnnual}`);
 });
 
-test("monotonicity: computeStandardTurn bank_exact_deg is strictly increasing in true_airspeed_kt; time_to_turn_through_sec is strictly increasing in turn_through_deg (tan(bank) = V*omega/g + 3 deg/s pin)", () => {
-  // Group W. Two pins in one test.
-  // Pin 1: bank_exact = atan(V_fps * omega / g) * 180/PI. Strictly
-  // increasing in TAS for omega > 0. Also pin the rule-of-thumb linear
-  // relation: bank ~= TAS/10 + 7.
-  let prevBank = -Infinity;
-  let prevRule = -Infinity;
-  for (const tas of [60, 90, 120, 150, 180, 210, 240]) {
-    const r = computeStandardTurn({ true_airspeed_kt: tas, turn_through_deg: 90 });
-    assert.ok(Number.isFinite(r.bank_exact_deg), `bank_exact at TAS=${tas}: ${JSON.stringify(r)}`);
-    assert.ok(r.bank_exact_deg > prevBank, `bank_exact at TAS=${tas} = ${r.bank_exact_deg} not greater than prev=${prevBank}`);
-    assert.ok(r.bank_rule_of_thumb_deg > prevRule, `bank_rule at TAS=${tas} = ${r.bank_rule_of_thumb_deg} not greater than prev=${prevRule}`);
-    prevBank = r.bank_exact_deg;
-    prevRule = r.bank_rule_of_thumb_deg;
-  }
-  // Pin 2: time_to_turn_through_sec = turn / 3 deg/sec. Strictly increasing
-  // in turn_through_deg.
-  let prevT = -Infinity;
-  for (const turn of [30, 60, 90, 180, 270, 360]) {
-    const r = computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: turn });
-    assert.ok(Math.abs(r.time_to_turn_through_sec - turn / 3) < 1e-12,
-      `time_to_turn at turn=${turn} = ${r.time_to_turn_through_sec}, expected ${turn / 3}`);
-    assert.ok(r.time_to_turn_through_sec > prevT, `time_to_turn at turn=${turn} not greater than prev`);
-    prevT = r.time_to_turn_through_sec;
-  }
-  // Closed-form pin from standardTurnExample: TAS 120 -> rule = 19 deg;
-  // turn 90 deg -> 30 sec; standard rate = 3 deg/sec; 360 deg in 2 min.
-  const ref = computeStandardTurn({ true_airspeed_kt: 120, turn_through_deg: 90 });
-  assert.equal(ref.standard_turn_rate_deg_per_sec, 3);
-  assert.equal(ref.bank_rule_of_thumb_deg, 19);
-  assert.equal(ref.time_to_turn_through_sec, 30);
-  assert.equal(ref.time_for_360_min, 2);
-});
-
 test("monotonicity: computeTimeAlignment c_m_s is strictly increasing in ambient_C (Bohn 331.3 + 0.606 * C linear pin)", () => {
   // Group N. c_m_s = 331.3 + 0.606 * ambient_C. Strictly increasing in
   // ambient_C; the constants are the published Bohn / handbook values.
@@ -4073,7 +3533,6 @@ test("monotonicity: computeTimeAlignment c_m_s is strictly increasing in ambient
 import { computeManningSlope } from "../../calc-plumbing.js";
 import { computeAffinityLaws } from "../../calc-hvac.js";
 import { computeSerialDilution } from "../../calc-lab.js";
-import { computeCorrectedCalcium } from "../../calc-ems.js";
 import { computeDTI } from "../../calc-realestate.js";
 
 test("monotonicity: computeManningSlope slope_for_flow is strictly increasing in target_flow_gpm at fixed pipe diameter / material (Manning V^2 / R^(4/3) pin)", () => {
@@ -4170,39 +3629,6 @@ test("monotonicity: computeSerialDilution tube concentration is strictly decreas
   }
 });
 
-test("monotonicity: computeCorrectedCalcium ca_corrected_mg_dL is strictly decreasing in albumin_g_dL at fixed measured Ca (Payne 1973 0.8*(4-Alb) pin)", () => {
-  // Group V. corrected = Ca + 0.8 * (4 - Alb). Strictly decreasing in Alb.
-  let prev = Infinity;
-  for (const albumin_g_dL of [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]) {
-    const r = computeCorrectedCalcium({ ca_measured: 8.0, albumin_g_dL });
-    assert.ok(Number.isFinite(r.ca_corrected_mg_dL), `Ca at Alb=${albumin_g_dL}: ${JSON.stringify(r)}`);
-    assert.ok(r.ca_corrected_mg_dL < prev,
-      `Ca at Alb=${albumin_g_dL} = ${r.ca_corrected_mg_dL} not less than prev=${prev}`);
-    prev = r.ca_corrected_mg_dL;
-  }
-  // Closed-form pin from correctedCalciumExample: 8.0 + 0.8 * (4.0 - 2.0)
-  // = 9.6 exact.
-  const ref = computeCorrectedCalcium({ ca_measured: 8.0, albumin_g_dL: 2.0 });
-  assert.ok(Math.abs(ref.ca_corrected_mg_dL - 9.6) < 1e-12,
-    `ca_corrected = ${ref.ca_corrected_mg_dL}, expected 9.6`);
-  assert.ok(Math.abs(ref.adjustment - 1.6) < 1e-12,
-    `adjustment = ${ref.adjustment}, expected 1.6`);
-  // Identity pin at Alb=4.0 (normal): correction collapses to zero.
-  const ident = computeCorrectedCalcium({ ca_measured: 9.0, albumin_g_dL: 4.0 });
-  assert.ok(Math.abs(ident.ca_corrected_mg_dL - 9.0) < 1e-12,
-    `ca_corrected at Alb=4.0 = ${ident.ca_corrected_mg_dL}, expected 9.0`);
-  assert.ok(Math.abs(ident.adjustment - 0) < 1e-12,
-    `adjustment at Alb=4.0 = ${ident.adjustment}, expected 0`);
-  // Strict monotonicity in ca_measured at fixed Alb (linear-in-Ca pin).
-  let prevCa = -Infinity;
-  for (const ca_measured of [6, 7, 8, 9, 10, 11, 12]) {
-    const r = computeCorrectedCalcium({ ca_measured, albumin_g_dL: 3.0 });
-    assert.ok(r.ca_corrected_mg_dL > prevCa,
-      `Ca at measured=${ca_measured} = ${r.ca_corrected_mg_dL} not greater than prev=${prevCa}`);
-    prevCa = r.ca_corrected_mg_dL;
-  }
-});
-
 test("monotonicity: computeDTI back_end_dti_percent is strictly increasing in other_monthly_debts at fixed income / housing (FNMA back-end linear pin)", () => {
   // Group X. back = (H + D) / I * 100. Strictly increasing in D at fixed
   // I, H; front_end_dti_percent is unchanged because it only depends on H.
@@ -4242,7 +3668,6 @@ import { computeShortCircuitPP } from "../../calc-electrical.js";
 import { computeScbaCylinderTime } from "../../calc-fire.js";
 import { computeTireGearing } from "../../calc-mechanic.js";
 import { computeSousVidePasteurization } from "../../calc-kitchen.js";
-import { computeSteadyStateConcentration } from "../../calc-vet.js";
 
 test("monotonicity: computeShortCircuitPP I_sca_panel_A is strictly decreasing in length_ft at fixed conductor / utility (Bussmann point-to-point M = 1/(1+f) pin)", () => {
   // Group A. f grows linearly with length_ft; M = 1/(1+f) is strictly
@@ -4372,52 +3797,6 @@ test("monotonicity: computeSousVidePasteurization come_up_minutes is strictly in
   // total = come_up + hold pin.
   assert.ok(Math.abs(ref.total_minutes - (ref.come_up_minutes + ref.hold_minutes)) < 1e-12,
     `total = ${ref.total_minutes} != come_up + hold = ${ref.come_up_minutes + ref.hold_minutes}`);
-});
-
-test("monotonicity: computeSteadyStateConcentration Css_ug_per_mL is strictly increasing in dose_mg; strictly decreasing in clearance and tau (Css = D*F / (CL*tau) pin)", () => {
-  // Group U. Css = (Dose * F) / (CL_per_kg * wt_kg * tau_min). Strictly
-  // increasing in dose_mg; strictly decreasing in clearance_mL_per_kg_per_min
-  // and in tau_hr at fixed F / wt / others.
-  const baseline = { bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" };
-  let prev = -Infinity;
-  for (const dose_mg of [25, 50, 100, 200, 400, 800]) {
-    const r = computeSteadyStateConcentration({ ...baseline, dose_mg });
-    assert.ok(Number.isFinite(r.Css_ug_per_mL) && r.Css_ug_per_mL > 0,
-      `Css at D=${dose_mg}: ${JSON.stringify(r)}`);
-    assert.ok(r.Css_ug_per_mL > prev,
-      `Css at D=${dose_mg} = ${r.Css_ug_per_mL} not greater than prev=${prev}`);
-    prev = r.Css_ug_per_mL;
-  }
-  // Doubling-dose pin: 2x dose -> 2x Css exactly (linear).
-  const a = computeSteadyStateConcentration({ ...baseline, dose_mg: 100 });
-  const b = computeSteadyStateConcentration({ ...baseline, dose_mg: 200 });
-  assert.ok(Math.abs(b.Css_ug_per_mL - 2 * a.Css_ug_per_mL) < 1e-12,
-    `2x dose: Css = ${b.Css_ug_per_mL} != 2 * ${a.Css_ug_per_mL}`);
-  // Strictly decreasing in clearance.
-  let prevDecr = Infinity;
-  for (const clearance_mL_per_kg_per_min of [2, 5, 10, 20, 40]) {
-    const r = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min, tau_hr: 8, weight: 10, weight_unit: "kg" });
-    assert.ok(r.Css_ug_per_mL < prevDecr,
-      `Css at CL=${clearance_mL_per_kg_per_min} = ${r.Css_ug_per_mL} not less than prev=${prevDecr}`);
-    prevDecr = r.Css_ug_per_mL;
-  }
-  // Strictly decreasing in tau.
-  let prevTau = Infinity;
-  for (const tau_hr of [4, 6, 8, 12, 24]) {
-    const r = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr, weight: 10, weight_unit: "kg" });
-    assert.ok(r.Css_ug_per_mL < prevTau,
-      `Css at tau=${tau_hr} = ${r.Css_ug_per_mL} not less than prev=${prevTau}`);
-    prevTau = r.Css_ug_per_mL;
-  }
-  // Closed-form pin from steadyStateExample: CL = 5 * 10 = 50 mL/min;
-  // tau = 8 * 60 = 480 min; Css = (100 * 1) / (50 * 480) = 1/240 mg/mL =
-  // 4.166... ug/mL.
-  const ref = computeSteadyStateConcentration({ dose_mg: 100, bioavailability_F: 1, clearance_mL_per_kg_per_min: 5, tau_hr: 8, weight: 10, weight_unit: "kg" });
-  const expected = (100 * 1) / (50 * 480) * 1000;
-  assert.ok(Math.abs(ref.Css_ug_per_mL - expected) < 1e-9,
-    `Css = ${ref.Css_ug_per_mL}, expected ${expected}`);
-  assert.equal(ref.CL_mL_per_min, 50);
-  assert.equal(ref.tau_min, 480);
 });
 
 // --- spec-v14 §10.3 Phase F thirtieth monotonicity batch ---------------
@@ -4585,8 +3964,6 @@ test("monotonicity: computeInventoryTurnover turnover is strictly increasing in 
 // Five new sweeps across five distinct catalog groups (Y / S / W / C / A).
 
 import { computeQuadratic } from "../../calc-edu.js";
-import { computeContractorVsEmployee } from "../../calc-legal.js";
-import { computeTopOfDescent } from "../../calc-aviation.js";
 import { computeExpansionTank } from "../../calc-plumbing.js";
 import { computeConduitFill } from "../../calc-electrical.js";
 
@@ -4625,80 +4002,6 @@ test("monotonicity: computeQuadratic discriminant is strictly decreasing in c at
   const cplx = computeQuadratic({ a: 1, b: 0, c: 1 });
   assert.equal(cplx.kind, "complex");
   assert.equal(cplx.discriminant, -4);
-});
-
-test("monotonicity: computeContractorVsEmployee employer_control_count is strictly monotone non-decreasing as more factors are marked 'employer' (IRS Rev. Rul. 87-41 20-factor pin) + ABC all-three boundary pin", () => {
-  // Group S. employer_control_count counts checklist entries equal to
-  // "employer"; strictly non-decreasing as more factors flip to employer.
-  const factors = [
-    "instructions", "training", "integration", "personal_service", "hiring_assistants",
-    "continuing_relationship", "set_hours", "full_time", "work_on_premises", "order_of_work",
-    "reports", "payment_method", "expenses_paid", "tools_and_materials", "investment",
-    "profit_or_loss", "works_for_more_than_one", "available_to_public", "right_to_discharge", "right_to_terminate",
-  ];
-  let prev = -1;
-  let checklist = {};
-  for (let i = 0; i <= factors.length; i++) {
-    const r = computeContractorVsEmployee({ test: "irs", checklist });
-    assert.equal(r.employer_control_count, i, `count at i=${i}: ${r.employer_control_count}`);
-    assert.ok(r.employer_control_count >= prev,
-      `count at i=${i} = ${r.employer_control_count} not >= prev=${prev}`);
-    prev = r.employer_control_count;
-    if (i < factors.length) checklist[factors[i]] = "employer";
-  }
-  // Boundary pin: 10 vs 10 -> tie classifies as independent (the
-  // "employer > independent" comparator is strict).
-  const tie = computeContractorVsEmployee({
-    test: "irs",
-    checklist: Object.fromEntries(factors.map((f, i) => [f, i < 10 ? "employer" : "worker"])),
-  });
-  assert.equal(tie.employer_control_count, 10);
-  assert.equal(tie.independent_count, 10);
-  assert.equal(tie.result, "independent_contractor");
-  // 11 employer vs 9 worker -> tips to employee.
-  const tip = computeContractorVsEmployee({
-    test: "irs",
-    checklist: Object.fromEntries(factors.map((f, i) => [f, i < 11 ? "employer" : "worker"])),
-  });
-  assert.equal(tip.result, "employee");
-  // ABC all-three pin: A && B && C is required for contractor; any false
-  // tips to employee (Cal. Lab. Code 2775 / Dynamex / AB 5).
-  const abcAll = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: true, C: true }, state: "CA" });
-  assert.equal(abcAll.result, "independent_contractor");
-  const abcBFail = computeContractorVsEmployee({ test: "abc", checklist: { A: true, B: false, C: true }, state: "CA" });
-  assert.equal(abcBFail.result, "employee");
-});
-
-test("monotonicity: computeTopOfDescent distance_to_start_nm is strictly increasing in cruise_altitude_ft at fixed target; descent_rate_fpm strictly increasing in ground_speed_kt (3-to-1 rule pin)", () => {
-  // Group W. distance_nm = (cruise - target) / 1000 * 3; strictly
-  // increasing in cruise at fixed target / GS.
-  let prev = -Infinity;
-  for (const cruise_altitude_ft of [8000, 12000, 18000, 24000, 30000, 35000, 41000]) {
-    const r = computeTopOfDescent({ cruise_altitude_ft, target_altitude_ft: 5000, ground_speed_kt: 240 });
-    assert.ok(Number.isFinite(r.distance_to_start_nm) && r.distance_to_start_nm > 0,
-      `dist at cruise=${cruise_altitude_ft}: ${JSON.stringify(r)}`);
-    assert.ok(r.distance_to_start_nm > prev,
-      `dist at cruise=${cruise_altitude_ft} = ${r.distance_to_start_nm} not greater than prev=${prev}`);
-    prev = r.distance_to_start_nm;
-  }
-  // Strict monotonicity of descent_rate_fpm in ground_speed_kt.
-  let prevRate = -Infinity;
-  for (const ground_speed_kt of [80, 120, 180, 240, 300, 360, 480]) {
-    const r = computeTopOfDescent({ cruise_altitude_ft: 35000, target_altitude_ft: 5000, ground_speed_kt });
-    assert.ok(r.descent_rate_fpm > prevRate,
-      `rate at GS=${ground_speed_kt} = ${r.descent_rate_fpm} not greater than prev=${prevRate}`);
-    prevRate = r.descent_rate_fpm;
-  }
-  // Closed-form pin from topOfDescentExample: FL350 -> 5000 ft target at
-  // 240 kt -> 30000 ft / 1000 * 3 = 90 nm distance; rate = 240 * 5.5556 =
-  // 1333.33 fpm; time = 30000 / 1333.33 = 22.5 min.
-  const ref = computeTopOfDescent({ cruise_altitude_ft: 35000, target_altitude_ft: 5000, ground_speed_kt: 240 });
-  assert.equal(ref.altitude_to_lose_ft, 30000);
-  assert.equal(ref.distance_to_start_nm, 90);
-  assert.ok(Math.abs(ref.descent_rate_fpm - 1333.3333333333) < 1e-6,
-    `rate = ${ref.descent_rate_fpm}, expected 1333.33`);
-  assert.ok(Math.abs(ref.time_to_descend_min - 22.5) < 1e-6,
-    `time = ${ref.time_to_descend_min}, expected 22.5`);
 });
 
 test("monotonicity: computeExpansionTank tank_volume_gal is strictly increasing in system_volume_gal at fixed temperatures / pressures (ASHRAE expansion-tank linear pin)", () => {
@@ -4766,7 +4069,6 @@ test("monotonicity: computeConduitFill fill_percent is strictly increasing in co
 // Five new sweeps across five distinct catalog groups (T / V / E / F / G).
 
 import { computeMolecularWeight } from "../../calc-lab.js";
-import { computeAPGAR } from "../../calc-ems.js";
 import { computeDrywall } from "../../calc-construction.js";
 import { computeSprinklerDensity } from "../../calc-fire.js";
 import { computeLadderAngle } from "../../calc-cross.js";
@@ -4796,44 +4098,6 @@ test("monotonicity: computeMolecularWeight molecular_weight is strictly increasi
   const o2 = computeMolecularWeight({ formula: "O2" });
   assert.ok(Math.abs(o2.molecular_weight - 2 * o.molecular_weight) < 1e-9,
     `MW(O2) = ${o2.molecular_weight} != 2 * MW(O) = ${2 * o.molecular_weight}`);
-});
-
-test("monotonicity: computeAPGAR total is strictly non-decreasing as any single component rises 0 -> 1 -> 2; band tips at 4 and 7 (Apgar 1953 5-component pin)", () => {
-  // Group V. total = sum of five 0/1/2 components; non-decreasing in
-  // each component. Sweep pulse 0->2 at fixed other components and pin
-  // the band-transition thresholds at 4 and 7.
-  let prev = -Infinity;
-  for (const pulse of [0, 1, 2]) {
-    const r = computeAPGAR({ appearance: 2, pulse, grimace: 1, activity: 2, respiration: 2 });
-    assert.ok(Number.isFinite(r.total), `total at pulse=${pulse}: ${JSON.stringify(r)}`);
-    assert.ok(r.total > prev,
-      `total at pulse=${pulse} = ${r.total} not greater than prev=${prev}`);
-    prev = r.total;
-  }
-  // Closed-form pin from apgarExample: 2+2+1+2+2 = 9 -> vigorous (7-10).
-  const ref = computeAPGAR({ appearance: 2, pulse: 2, grimace: 1, activity: 2, respiration: 2 });
-  assert.equal(ref.total, 9);
-  assert.equal(ref.band, "vigorous (7-10)");
-  // Band-boundary pin at 7: total=7 -> vigorous; total=6 -> moderately
-  // depressed (4-6).
-  const at7 = computeAPGAR({ appearance: 2, pulse: 2, grimace: 1, activity: 1, respiration: 1 });
-  assert.equal(at7.total, 7);
-  assert.equal(at7.band, "vigorous (7-10)");
-  const at6 = computeAPGAR({ appearance: 2, pulse: 1, grimace: 1, activity: 1, respiration: 1 });
-  assert.equal(at6.total, 6);
-  assert.equal(at6.band, "moderately depressed (4-6)");
-  // Band-boundary pin at 4: total=4 -> moderately depressed; total=3 ->
-  // severely depressed (0-3).
-  const at4 = computeAPGAR({ appearance: 1, pulse: 1, grimace: 1, activity: 1, respiration: 0 });
-  assert.equal(at4.total, 4);
-  assert.equal(at4.band, "moderately depressed (4-6)");
-  const at3 = computeAPGAR({ appearance: 1, pulse: 1, grimace: 1, activity: 0, respiration: 0 });
-  assert.equal(at3.total, 3);
-  assert.equal(at3.band, "severely depressed (0-3)");
-  // Zero pin: all 0 -> total 0 -> severely depressed.
-  const allZero = computeAPGAR({ appearance: 0, pulse: 0, grimace: 0, activity: 0, respiration: 0 });
-  assert.equal(allZero.total, 0);
-  assert.equal(allZero.band, "severely depressed (0-3)");
 });
 
 test("monotonicity: computeDrywall mud_gal + tape_lf + total_ft2 are strictly increasing in wall_area_ft2 at fixed ceiling / sheet (0.053 gal/ft^2 + 1.0 lf/ft^2 linear pin)", () => {
@@ -4931,7 +4195,6 @@ test("monotonicity: computeLadderAngle set_angle_deg is strictly increasing in w
 
 import { computeDriveshaftCritical } from "../../calc-mechanic.js";
 import { computeCoolingCurve } from "../../calc-kitchen.js";
-import { computeHeartwormDose } from "../../calc-vet.js";
 import { computeCashOnCash } from "../../calc-realestate.js";
 import { computeSVI } from "../../calc-water.js";
 
@@ -5003,35 +4266,6 @@ test("monotonicity: computeCoolingCurve phase1_minutes and phase2_minutes are st
   assert.ok(Math.abs(hot100.phase1_minutes - 1.6 * ref.phase1_minutes) < 1e-12,
     `hot-clamp: phase1 at 100 F = ${hot100.phase1_minutes} != 1.6 * base = ${1.6 * ref.phase1_minutes}`);
   assert.equal(hot100.phase1_minutes, hot110.phase1_minutes);
-});
-
-test("monotonicity: computeHeartwormDose weight_lb is strictly increasing in weight (linear LB_PER_KG conversion pin); band_label monotone non-decreasing as weight rises through Heartgard Plus labeled bands", () => {
-  // Group U. weight_lb = wt_kg * LB_PER_KG; strictly increasing.
-  let prev = -Infinity;
-  for (const weight of [1, 2, 5, 10, 20, 40, 80]) {
-    const r = computeHeartwormDose({ weight, weight_unit: "kg", active_ingredient: "ivermectin" });
-    assert.ok(Number.isFinite(r.weight_lb) && r.weight_lb > 0,
-      `weight_lb at w=${weight}: ${JSON.stringify(r)}`);
-    assert.ok(r.weight_lb > prev,
-      `weight_lb at w=${weight} = ${r.weight_lb} not greater than prev=${prev}`);
-    prev = r.weight_lb;
-  }
-  // Closed-form pin from heartwormExample: 20 kg -> ~44.09 lb; Heartgard
-  // Plus green-tablet band covers 26-50 lb.
-  const ref = computeHeartwormDose({ weight: 20, weight_unit: "kg", active_ingredient: "ivermectin" });
-  assert.ok(Math.abs(ref.weight_lb - 20 * 2.20462) < 0.01,
-    `weight_lb = ${ref.weight_lb}, expected ~44.0924`);
-  assert.ok(/Green/.test(ref.band_label),
-    `band_label at 20 kg = ${ref.band_label}, expected to contain 'Green'`);
-  // kg<->lb unit-conversion identity pin: same patient via kg or lb path
-  // produces the same band.
-  const fromLb = computeHeartwormDose({ weight: 44.09, weight_unit: "lb", active_ingredient: "ivermectin" });
-  assert.equal(fromLb.band_label, ref.band_label);
-  // Band-step pin: low weight resolves to the lightest band; high weight
-  // resolves to a heavier band (band_label strictly differs).
-  const tiny = computeHeartwormDose({ weight: 3, weight_unit: "kg", active_ingredient: "ivermectin" });
-  const big = computeHeartwormDose({ weight: 40, weight_unit: "kg", active_ingredient: "ivermectin" });
-  assert.notEqual(tiny.band_label, big.band_label);
 });
 
 test("monotonicity: computeCashOnCash cash_on_cash_percent is strictly increasing in annual_pretax_cashflow at fixed cash_invested; payback_years strictly decreasing in cashflow (CoC = CF / Inv linear pin)", () => {
@@ -5311,54 +4545,10 @@ test("monotonicity: computeSalesTaxCompound tax is strictly increasing in pre_ta
   assert.ok(Math.abs(b.tax - 2 * a.tax) < 1e-12,
     `2x pre: tax = ${b.tax} != 2 * ${a.tax}`);
 });
-
-// --- spec-v14 §10.3 Phase F thirty-fifth monotonicity batch ------------
-// Five new sweeps across five distinct catalog groups (W / Y / E / J / N).
-
-import { computeWindTriangle } from "../../calc-aviation.js";
 import { computeConfidenceInterval } from "../../calc-edu.js";
 import { computeRafter } from "../../calc-construction.js";
 import { computePalletLoadout } from "../../calc-trucking.js";
 import { computeSPLAtmospheric } from "../../calc-stage.js";
-
-test("monotonicity: computeWindTriangle ground_speed_kt is strictly increasing in true_airspeed_kt at fixed wind triangle (FAA-H-8083-25C wind-triangle pin)", () => {
-  // Group W. At fixed wind triangle, GS = TAS*cos(WCA) - headwind;
-  // strictly increasing in TAS (and decreasing the WCA magnitude as TAS
-  // rises means the cos(WCA) term grows). Use a fixed quartering wind
-  // and sweep TAS.
-  let prev = -Infinity;
-  for (const true_airspeed_kt of [80, 100, 120, 150, 200, 250, 300]) {
-    const r = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt, wind_direction_deg: 40, wind_speed_kt: 25 });
-    assert.ok(Number.isFinite(r.ground_speed_kt),
-      `GS at TAS=${true_airspeed_kt}: ${JSON.stringify(r)}`);
-    assert.ok(r.ground_speed_kt > prev,
-      `GS at TAS=${true_airspeed_kt} = ${r.ground_speed_kt} not greater than prev=${prev}`);
-    prev = r.ground_speed_kt;
-  }
-  // Closed-form pin from windTriangleExample: TC=090 / TAS=120 / wind
-  // from 040 at 25 kt -> WCA = -9.18 deg / TH = 80.82 / GS = 102.39.
-  const ref = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 40, wind_speed_kt: 25 });
-  assert.ok(Math.abs(ref.wca_deg - (-9.18)) < 0.01,
-    `WCA = ${ref.wca_deg}, expected -9.18`);
-  assert.ok(Math.abs(ref.true_heading_deg - 80.82) < 0.01,
-    `TH = ${ref.true_heading_deg}, expected 80.82`);
-  assert.ok(Math.abs(ref.ground_speed_kt - 102.39) < 0.01,
-    `GS = ${ref.ground_speed_kt}, expected 102.39`);
-  // Pure-tailwind identity: wind direction = course + 180 -> headwind = -WS;
-  // crosswind = 0; WCA = 0; GS = TAS + WS.
-  const tail = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 270, wind_speed_kt: 25 });
-  assert.ok(Math.abs(tail.crosswind_component_kt) < 1e-9,
-    `pure-tail crosswind = ${tail.crosswind_component_kt}, expected 0`);
-  assert.ok(Math.abs(tail.wca_deg) < 1e-9,
-    `pure-tail WCA = ${tail.wca_deg}, expected 0`);
-  assert.ok(Math.abs(tail.ground_speed_kt - 145) < 1e-9,
-    `pure-tail GS = ${tail.ground_speed_kt}, expected 145`);
-  // Pure-headwind identity: wind direction = course -> headwind = +WS;
-  // crosswind = 0; WCA = 0; GS = TAS - WS = 120 - 25 = 95.
-  const head = computeWindTriangle({ true_course_deg: 90, true_airspeed_kt: 120, wind_direction_deg: 90, wind_speed_kt: 25 });
-  assert.ok(Math.abs(head.ground_speed_kt - 95) < 1e-9,
-    `pure-head GS = ${head.ground_speed_kt}, expected 95`);
-});
 
 test("monotonicity: computeConfidenceInterval margin_of_error is strictly decreasing in n (sqrt-n pin) and strictly increasing in confidence_pct (z critical pin)", () => {
   // Group Y. MOE = z * sqrt(p*(1-p)/n); strictly decreasing in n at
@@ -5538,7 +4728,6 @@ import { computeMultiLoadVoltageDrop } from "../../calc-electrical.js";
 import { computeHendersonHasselbalch } from "../../calc-lab.js";
 import { computeOutdoorAirVentilation } from "../../calc-hvac.js";
 import { computeCommissionSplit } from "../../calc-realestate.js";
-import { computeGCS } from "../../calc-ems.js";
 
 test("monotonicity: computeMultiLoadVoltageDrop worst_drop_V is strictly increasing in the current of the farthest load at fixed AWG / distances (Ohm's-law per-segment cumulative-current pin)", () => {
   // Group A. The far-segment drop is I_seg * 2*R/kft * seg_ft/1000;
@@ -5705,64 +4894,12 @@ test("monotonicity: computeCommissionSplit gross_commission + agent_net are stri
   assert.equal(fullSide.other_side_share, 0);
 });
 
-test("monotonicity: computeGCS total is strictly non-decreasing as any single component (eye / verbal / motor) rises; severity tips at 8/9 and 12/13 (Teasdale-Jennett 1974 pin)", () => {
-  // Group V. total = eye + verbal + motor; strictly non-decreasing as
-  // any single component rises through its valid range.
-  let prev = -Infinity;
-  for (const motor of [1, 2, 3, 4, 5, 6]) {
-    const r = computeGCS({ eye: 3, verbal: 4, motor, intubated: false });
-    assert.ok(Number.isFinite(r.total), `total at motor=${motor}: ${JSON.stringify(r)}`);
-    assert.ok(r.total > prev,
-      `total at motor=${motor} = ${r.total} not greater than prev=${prev}`);
-    prev = r.total;
-  }
-  // Verbal component sweep at fixed eye / motor.
-  let prevV = -Infinity;
-  for (const verbal of [1, 2, 3, 4, 5]) {
-    const r = computeGCS({ eye: 3, verbal, motor: 5, intubated: false });
-    assert.ok(r.total > prevV, `total at verbal=${verbal} = ${r.total} not greater than prev=${prevV}`);
-    prevV = r.total;
-  }
-  // Closed-form pin from gcsExample: 3 + 4 + 5 = 12 -> moderate (9-12).
-  const ref = computeGCS({ eye: 3, verbal: 4, motor: 5, intubated: false });
-  assert.equal(ref.total, 12);
-  assert.equal(ref.severity, "moderate");
-  // Boundary pin at 13/12 (mild/moderate tip): total=13 -> mild;
-  // total=12 -> moderate.
-  const mild13 = computeGCS({ eye: 3, verbal: 4, motor: 6, intubated: false });
-  assert.equal(mild13.total, 13);
-  assert.equal(mild13.severity, "mild");
-  // Boundary pin at 9/8 (moderate/severe tip): total=9 -> moderate;
-  // total=8 -> severe.
-  const mod9 = computeGCS({ eye: 2, verbal: 3, motor: 4, intubated: false });
-  assert.equal(mod9.total, 9);
-  assert.equal(mod9.severity, "moderate");
-  const sev8 = computeGCS({ eye: 2, verbal: 2, motor: 4, intubated: false });
-  assert.equal(sev8.total, 8);
-  assert.equal(sev8.severity, "severe");
-  // Minimum-score pin: 1+1+1 = 3 -> severe (the floor of the scale).
-  const min = computeGCS({ eye: 1, verbal: 1, motor: 1, intubated: false });
-  assert.equal(min.total, 3);
-  assert.equal(min.severity, "severe");
-  // Maximum-score pin: 4+5+6 = 15 -> mild (the ceiling of the scale).
-  const max = computeGCS({ eye: 4, verbal: 5, motor: 6, intubated: false });
-  assert.equal(max.total, 15);
-  assert.equal(max.severity, "mild");
-  // Intubated pin: verbal is not interpretable; total = null and
-  // total_label encodes the standard "E__T M__" notation.
-  const intub = computeGCS({ eye: 3, verbal: 1, motor: 5, intubated: true });
-  assert.equal(intub.total, null);
-  assert.ok(/3T5/.test(intub.total_label),
-    `intubated label = ${intub.total_label}, expected to contain '3T5'`);
-});
-
 // --- spec-v14 §10.3 Phase F thirty-seventh monotonicity batch ----------
 // Five new sweeps across five distinct catalog groups (F / L / P / U / Y).
 
 import { computeMasterStreamReach } from "../../calc-fire.js";
 import { computeUniformity } from "../../calc-agriculture.js";
 import { computeBearingConversion } from "../../calc-field.js";
-import { computeToxicity } from "../../calc-vet.js";
 import { computeSigFigs } from "../../calc-edu.js";
 
 test("monotonicity: computeMasterStreamReach typical_reach_ft is strictly increasing in nozzle_pressure_psi at fixed nozzle (NFPA sqrt-pressure pin)", () => {
@@ -5853,46 +4990,6 @@ test("monotonicity: computeBearingConversion result_deg is strictly increasing i
     `magnetic_to_true memo = ${m2t.memo}, expected to mention east`);
 });
 
-test("monotonicity: computeToxicity theobromine_mg_per_kg is strictly increasing in choc_grams at fixed type / weight; strictly decreasing in patient weight at fixed dose (ASPCA APCC 20 mg/kg mild-threshold pin)", () => {
-  // Group U. dose_mg_per_kg = (g / 28.3495) * mg_per_oz / wt_kg;
-  // strictly increasing in g and strictly decreasing in wt_kg.
-  let prev = -Infinity;
-  for (const choc_grams of [5, 10, 25, 50, 100, 200, 500]) {
-    const r = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams });
-    assert.ok(Number.isFinite(r.theobromine_mg_per_kg),
-      `dose at g=${choc_grams}: ${JSON.stringify(r)}`);
-    assert.ok(r.theobromine_mg_per_kg > prev,
-      `dose at g=${choc_grams} = ${r.theobromine_mg_per_kg} not greater than prev=${prev}`);
-    prev = r.theobromine_mg_per_kg;
-  }
-  // Strictly decreasing in patient weight at fixed dose.
-  let prevDecr = Infinity;
-  for (const weight of [2, 5, 10, 20, 40, 80]) {
-    const r = computeToxicity({ toxin: "chocolate", weight, weight_unit: "kg", choc_type: "dark", choc_grams: 50 });
-    assert.ok(r.theobromine_mg_per_kg < prevDecr,
-      `dose at wt=${weight} = ${r.theobromine_mg_per_kg} not less than prev=${prevDecr}`);
-    prevDecr = r.theobromine_mg_per_kg;
-  }
-  // Closed-form pin from toxicityExample: 10 kg / dark / 50 g ->
-  // 50/28.3495 = 1.7637 oz; 1.7637 * 150 = 264.55 mg total;
-  // 26.455 mg/kg -> exceeded_mild_threshold = true (>= 20 ASPCA APCC band).
-  const ref = computeToxicity({ toxin: "chocolate", weight: 10, weight_unit: "kg", choc_type: "dark", choc_grams: 50 });
-  const expectedOz = 50 / 28.3495;
-  assert.ok(Math.abs(ref.chocolate_oz - expectedOz) < 1e-9,
-    `oz = ${ref.chocolate_oz}, expected ${expectedOz}`);
-  const expectedTotal = expectedOz * 150;
-  assert.ok(Math.abs(ref.theobromine_mg_total - expectedTotal) < 1e-9,
-    `total = ${ref.theobromine_mg_total}, expected ${expectedTotal}`);
-  assert.ok(Math.abs(ref.theobromine_mg_per_kg - expectedTotal / 10) < 1e-9,
-    `dose = ${ref.theobromine_mg_per_kg}, expected ${expectedTotal / 10}`);
-  assert.equal(ref.exceeded_mild_threshold, true);
-  // 20 mg/kg boundary pin: doses below threshold tip the flag false.
-  const below = computeToxicity({ toxin: "chocolate", weight: 50, weight_unit: "kg", choc_type: "milk", choc_grams: 50 });
-  assert.ok(below.theobromine_mg_per_kg < 20,
-    `below-threshold dose = ${below.theobromine_mg_per_kg}, expected < 20`);
-  assert.equal(below.exceeded_mild_threshold, false);
-});
-
 test("monotonicity: computeSigFigs round-trip identity (input_sig_figs counts leading-zero-stripped digits); rounded_value at N sig figs (NIST SP 811 sig-fig pin)", () => {
   // Group Y. The compute function exposes:
   //   input_sig_figs: count of significant digits in the input string
@@ -5938,7 +5035,6 @@ test("monotonicity: computeSigFigs round-trip identity (input_sig_figs counts le
 import { computePsychrometric } from "../../calc-restoration.js";
 import { computeHaversineDistance } from "../../calc-cross.js";
 import { computeHOS } from "../../calc-trucking.js";
-import { computeDeadline } from "../../calc-legal.js";
 import { computeHemocytometer } from "../../calc-lab.js";
 
 test("monotonicity: computePsychrometric GPP + saturation_pressure_hPa are strictly increasing in temperature_F at fixed RH; GPP strictly increasing in RH_percent at fixed T (Magnus saturation-vapor pin)", () => {
@@ -6067,42 +5163,6 @@ test("monotonicity: computeHOS drive_remaining is strictly non-increasing as mor
   assert.equal(ref.weekly_remaining, 30.5);
   assert.equal(ref.break_taken, true);
   assert.equal(ref.needs_break, false);
-});
-
-test("monotonicity: computeDeadline deadline is strictly non-decreasing in days at fixed trigger_date (FRCP 6(a)(1) + weekend / federal-holiday roll-off pins)", () => {
-  // Group S. The deadline date is non-decreasing in `days` at fixed
-  // trigger_date. Compare ISO strings lexicographically (correct for
-  // YYYY-MM-DD format).
-  let prev = "0000-00-00";
-  for (const days of [1, 3, 7, 14, 30, 60, 90]) {
-    const r = computeDeadline({ trigger_date: "2025-07-01", days, day_type: "calendar", jurisdiction: "FED" });
-    assert.ok(typeof r.deadline === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r.deadline),
-      `deadline at days=${days}: ${JSON.stringify(r)}`);
-    assert.ok(r.deadline > prev,
-      `deadline at days=${days} = ${r.deadline} not > prev=${prev}`);
-    prev = r.deadline;
-  }
-  // Closed-form pin from deadlineExample: 2025-07-01 + 30 calendar days
-  // = 2025-07-31. (July 31 2025 is a Thursday; no weekend / holiday
-  // roll-off applies.)
-  const ref = computeDeadline({ trigger_date: "2025-07-01", days: 30, day_type: "calendar", jurisdiction: "FED" });
-  assert.equal(ref.deadline, "2025-07-31");
-  assert.equal(ref.skipped.length, 0);
-  // Weekend roll-off pin: 2025-07-01 (Tue) + 4 calendar days = 2025-07-05
-  // (Saturday) -> rolls to 2025-07-07 (Monday).
-  const wkRoll = computeDeadline({ trigger_date: "2025-07-01", days: 4, day_type: "calendar", jurisdiction: "FED" });
-  assert.equal(wkRoll.deadline, "2025-07-07");
-  assert.ok(wkRoll.skipped.length >= 1,
-    `weekend roll-off skipped[]: ${JSON.stringify(wkRoll.skipped)}`);
-  // Federal-holiday roll-off pin: 2025-12-22 (Mon) + 3 days = Christmas
-  // (2025-12-25 Thu) -> rolls to 2025-12-26 (Friday).
-  const holRoll = computeDeadline({ trigger_date: "2025-12-22", days: 3, day_type: "calendar", jurisdiction: "FED" });
-  assert.equal(holRoll.deadline, "2025-12-26");
-  assert.ok(holRoll.skipped.some((s) => /holiday/.test(s.reason)),
-    `holiday roll-off skipped[]: ${JSON.stringify(holRoll.skipped)}`);
-  // Citation pin: must mention FRCP 6(a)(1).
-  assert.ok(/6\(a\)\(1\)/.test(ref.citation),
-    `citation = ${ref.citation}, expected to mention 6(a)(1)`);
 });
 
 test("monotonicity: computeHemocytometer cells_per_mL is strictly increasing in total_cells_counted at fixed squares / dilution; doubling-dilution pin (Neubauer 1e4 conversion pin)", () => {
@@ -6363,8 +5423,6 @@ test("monotonicity: computeRentalWorksheet gross_rent_annual + NOI are strictly 
 import { computePipeExpansion } from "../../calc-plumbing.js";
 import { computeNIOSHLifting } from "../../calc-cross.js";
 import { computeMacrs } from "../../calc-accounting.js";
-import { computePediatricWeight } from "../../calc-ems.js";
-import { computeMagneticVariation } from "../../calc-aviation.js";
 
 test("monotonicity: computePipeExpansion delta_L_in is strictly increasing in length_ft AND in delta_T_F (alpha * L * 12 * dT linear pin)", () => {
   // Group B. dL = alpha * L * 12 * dT; strictly increasing in length
@@ -6496,81 +5554,6 @@ test("monotonicity: computeMacrs year_depreciation is strictly increasing in cos
   assert.ok(totalDep >= 0);
 });
 
-test("monotonicity: computePediatricWeight apls_kg is strictly increasing across the APLS age bands (months -> 0-5 yr -> 6-12 yr piecewise-linear pin)", () => {
-  // Group V. APLS pediatric weight formulas (Advanced Paediatric Life
-  // Support):
-  //   0-12 months: (months / 2) + 4
-  //   1-5 years:   (2 * years) + 8
-  //   6-12 years:  (3 * years) + 7
-  // All three are linear in age and produce a monotone-non-decreasing
-  // estimate across the bundled age range.
-  let prev = -Infinity;
-  // 6 month checkpoints from infancy through early childhood.
-  for (const age_months of [0, 3, 6, 9, 12]) {
-    const r = computePediatricWeight({ age_months });
-    assert.ok(Number.isFinite(r.apls_kg) && r.apls_kg > 0,
-      `apls at mo=${age_months}: ${JSON.stringify(r)}`);
-    assert.ok(r.apls_kg > prev,
-      `apls at mo=${age_months} = ${r.apls_kg} not greater than prev=${prev}`);
-    prev = r.apls_kg;
-  }
-  // Years sweep across both age formulas.
-  let prevYr = -Infinity;
-  for (const age_years of [1, 2, 3, 5, 6, 8, 10, 12]) {
-    const r = computePediatricWeight({ age_years });
-    assert.ok(Number.isFinite(r.apls_kg),
-      `apls at yr=${age_years}: ${JSON.stringify(r)}`);
-    assert.ok(r.apls_kg > prevYr,
-      `apls at yr=${age_years} = ${r.apls_kg} not greater than prev=${prevYr}`);
-    prevYr = r.apls_kg;
-  }
-  // Closed-form pin: 6 mo -> 6/2 + 4 = 7 kg; 1 yr -> 2*1 + 8 = 10 kg;
-  // 5 yr -> 2*5 + 8 = 18 kg; 6 yr -> 3*6 + 7 = 25 kg; 12 yr -> 3*12 + 7 = 43 kg.
-  assert.equal(computePediatricWeight({ age_months: 6 }).apls_kg, 7);
-  assert.equal(computePediatricWeight({ age_years: 1 }).apls_kg, 10);
-  assert.equal(computePediatricWeight({ age_years: 5 }).apls_kg, 18);
-  assert.equal(computePediatricWeight({ age_years: 6 }).apls_kg, 25);
-  assert.equal(computePediatricWeight({ age_years: 12 }).apls_kg, 43);
-  // kg/lb pin: pounds = apls_kg * 2.2046226218.
-  const r6mo = computePediatricWeight({ age_months: 6 });
-  assert.ok(Math.abs(r6mo.pounds - 7 * 2.2046226218) < 1e-9,
-    `pounds at 6 mo = ${r6mo.pounds}, expected ${7 * 2.2046226218}`);
-});
-
-test("monotonicity: computeMagneticVariation result_heading reflects 'east is least; west is best' (signed-variation linear pin) + round-trip identity + 0-360 wrap pin", () => {
-  // Group W. True -> Magnetic: magnetic = true + west - east; the result
-  // is strictly monotone in heading_deg over a range that does not wrap.
-  let prev = -Infinity;
-  for (const heading_deg of [10, 60, 120, 180, 240, 300, 350]) {
-    const r = computeMagneticVariation({ variation_deg: 5, direction_ew: "west", heading_deg, sense: "true_to_magnetic" });
-    assert.ok(Number.isFinite(r.result_heading),
-      `result at h=${heading_deg}: ${JSON.stringify(r)}`);
-    assert.ok(r.result_heading > prev,
-      `result at h=${heading_deg} = ${r.result_heading} not greater than prev=${prev}`);
-    prev = r.result_heading;
-  }
-  // Closed-form pin from magneticVariationExample: variation 7 deg E /
-  // heading 090 / true_to_magnetic -> 090 - 7 = 083.
-  const ref = computeMagneticVariation({ variation_deg: 7, direction_ew: "east", heading_deg: 90, sense: "true_to_magnetic" });
-  assert.equal(ref.result_heading, 83);
-  // "East is least; West is best" pin: easterly variation SUBTRACTS from
-  // true to give magnetic; westerly variation ADDS.
-  const east = computeMagneticVariation({ variation_deg: 10, direction_ew: "east", heading_deg: 180, sense: "true_to_magnetic" });
-  assert.equal(east.result_heading, 170);
-  const west = computeMagneticVariation({ variation_deg: 10, direction_ew: "west", heading_deg: 180, sense: "true_to_magnetic" });
-  assert.equal(west.result_heading, 190);
-  // Round-trip identity pin: true -> magnetic -> true returns the input.
-  const t2m = computeMagneticVariation({ variation_deg: 12, direction_ew: "west", heading_deg: 270, sense: "true_to_magnetic" });
-  const m2t = computeMagneticVariation({ variation_deg: 12, direction_ew: "west", heading_deg: t2m.result_heading, sense: "magnetic_to_true" });
-  assert.equal(m2t.result_heading, 270);
-  // 0-360 wrap pin: heading 355 + 10 deg W -> 365 -> 5 (wraps to start).
-  const wrap = computeMagneticVariation({ variation_deg: 10, direction_ew: "west", heading_deg: 355, sense: "true_to_magnetic" });
-  assert.equal(wrap.result_heading, 5);
-  // Heading 005 - 10 deg E -> -5 -> 355 (wraps via normalize).
-  const wrapNeg = computeMagneticVariation({ variation_deg: 10, direction_ew: "east", heading_deg: 5, sense: "true_to_magnetic" });
-  assert.equal(wrapNeg.result_heading, 355);
-});
-
 // --- spec-v14 §10.3 Phase F forty-first monotonicity batch -------------
 // Five new sweeps across five distinct catalog groups (D / L / M / N / U).
 
@@ -6578,7 +5561,6 @@ import { computeMoldRisk } from "../../calc-restoration.js";
 import { computeSprayerCalibration } from "../../calc-agriculture.js";
 import { computeDisinfectionCT } from "../../calc-water.js";
 import { computeDMX } from "../../calc-stage.js";
-import { computeCrystalloidPlan } from "../../calc-vet.js";
 
 test("monotonicity: computeMoldRisk risk tips at RH 60 / 70 thresholds and 24 / 48 hour-elevation thresholds; temperature window 40-100 F resets to low (IICRC mold-growth band pin)", () => {
   // Group D. Bands:
@@ -6744,74 +5726,6 @@ test("monotonicity: computeDMX utilization is strictly increasing as channels ac
     ],
   });
   assert.equal(multi.max_universe, 3);
-});
-
-test("monotonicity: computeCrystalloidPlan total_rate_mL_per_hr is strictly increasing in patient weight (linear-in-kg pin) AND in dehydration_percent AND in any loss rate (DiBartola crystalloid-plan additive pin)", () => {
-  // Group U. total_rate = maintenance + replacement + sum(losses);
-  // strictly increasing in weight (maintenance linear in kg), in
-  // dehydration_percent (replacement linear in dh), and in each
-  // loss-rate component.
-  let prev = -Infinity;
-  for (const weight of [2, 5, 10, 20, 40, 60]) {
-    const r = computeCrystalloidPlan({
-      weight, weight_unit: "kg", species: "dog", dehydration_percent: 5,
-      vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
-      rehydration_window_hr: 24,
-    });
-    assert.ok(Number.isFinite(r.total_rate_mL_per_hr) && r.total_rate_mL_per_hr > 0,
-      `total at wt=${weight}: ${JSON.stringify(r)}`);
-    assert.ok(r.total_rate_mL_per_hr > prev,
-      `total at wt=${weight} = ${r.total_rate_mL_per_hr} not greater than prev=${prev}`);
-    prev = r.total_rate_mL_per_hr;
-  }
-  // Strictly increasing in dehydration_percent at fixed weight / losses.
-  let prevDh = -Infinity;
-  for (const dh of [0, 2, 5, 8, 10, 12]) {
-    const r = computeCrystalloidPlan({
-      weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: dh,
-      vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
-      rehydration_window_hr: 24,
-    });
-    assert.ok(r.total_rate_mL_per_hr > prevDh,
-      `total at dh=${dh} = ${r.total_rate_mL_per_hr} not greater than prev=${prevDh}`);
-    prevDh = r.total_rate_mL_per_hr;
-  }
-  // Closed-form pin: 20 kg dog / 5% dehydration / 24-hr window:
-  //   maintenance_mL_per_day = 60 * 20 = 1200 -> 50 mL/hr
-  //   replacement_total      = 20 * 0.05 * 1000 = 1000 -> 41.667 mL/hr
-  //   total (no losses)      = 91.667 mL/hr.
-  const ref = computeCrystalloidPlan({
-    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5,
-    vomiting_mL_per_hr: 0, diarrhea_mL_per_hr: 0, blood_loss_mL_per_hr: 0, surgical_loss_mL_per_hr: 0,
-    rehydration_window_hr: 24,
-  });
-  assert.equal(ref.maintenance_mL_per_hr, 50);
-  assert.equal(ref.replacement_total_mL, 1000);
-  assert.ok(Math.abs(ref.replacement_rate_mL_per_hr - (1000 / 24)) < 1e-9,
-    `replacement rate = ${ref.replacement_rate_mL_per_hr}, expected ${1000 / 24}`);
-  assert.ok(Math.abs(ref.total_rate_mL_per_hr - (50 + 1000 / 24)) < 1e-9,
-    `total = ${ref.total_rate_mL_per_hr}, expected ${50 + 1000 / 24}`);
-  // Loss-rate additivity pin: 10 mL/hr in each of four loss buckets ->
-  // total grows by 40 mL/hr exactly.
-  const withLoss = computeCrystalloidPlan({
-    weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 5,
-    vomiting_mL_per_hr: 10, diarrhea_mL_per_hr: 10, blood_loss_mL_per_hr: 10, surgical_loss_mL_per_hr: 10,
-    rehydration_window_hr: 24,
-  });
-  assert.ok(Math.abs(withLoss.losses_total_mL_per_hr - 40) < 1e-12,
-    `losses_total = ${withLoss.losses_total_mL_per_hr}, expected 40`);
-  assert.ok(Math.abs(withLoss.total_rate_mL_per_hr - (ref.total_rate_mL_per_hr + 40)) < 1e-9,
-    `total with losses = ${withLoss.total_rate_mL_per_hr}, expected ${ref.total_rate_mL_per_hr + 40}`);
-  // gtt-set pins: 10 gtts/mL adult set = total/6; 60 gtts/mL pediatric set = total.
-  assert.ok(Math.abs(ref.gtts_per_min_10_set - ref.total_rate_mL_per_hr / 6) < 1e-9,
-    `10-gtt set = ${ref.gtts_per_min_10_set}, expected ${ref.total_rate_mL_per_hr / 6}`);
-  assert.ok(Math.abs(ref.gtts_per_min_60_set - ref.total_rate_mL_per_hr) < 1e-9,
-    `60-gtt set = ${ref.gtts_per_min_60_set}, expected ${ref.total_rate_mL_per_hr}`);
-  // severe_dehydration_flag tips at > 8%.
-  const mild = computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 8, rehydration_window_hr: 24 });
-  assert.equal(mild.severe_dehydration_flag, false);
-  const severe = computeCrystalloidPlan({ weight: 20, weight_unit: "kg", species: "dog", dehydration_percent: 9, rehydration_window_hr: 24 });
-  assert.equal(severe.severe_dehydration_flag, true);
 });
 
 // --- spec-v14 §10.3 Phase F forty-second monotonicity batch ------------
@@ -7271,7 +6185,6 @@ import { computeAnchorEmbedment } from "../../calc-construction.js";
 import { computeUpgradeROI } from "../../calc-cross.js";
 import { computeSection121 } from "../../calc-realestate.js";
 import { computeLightningCountdown } from "../../calc-field.js";
-import { computeWellsPE } from "../../calc-ems.js";
 
 test("monotonicity: computeAnchorEmbedment embedment_in is strictly increasing in uplift_lb (linear pin); strictly decreasing in bolt_diameter_in at fixed uplift / fc (inverse-in-d pin); strictly decreasing in fc_psi at fixed uplift / d (inverse-sqrt-fc pin); embedment_ft = embedment_in / 12 exact", () => {
   // Group E. ld_in = T / (0.7 * sqrt(fc) * pi * d). Strictly increasing in
@@ -7483,64 +6396,12 @@ test("monotonicity: computeLightningCountdown distance_miles is strictly increas
   assert.ok(bad.error, `expected error for s=0, got ${JSON.stringify(bad)}`);
 });
 
-test("monotonicity: computeWellsPE score is strictly non-decreasing as additional criteria flip true (point-additive pin); score = sum of component points; band thresholds at 2 (low/moderate) and 6 (moderate/high) (three-band pin) + 4.5 (two-band pin)", () => {
-  // Group V. score = sum over flipped-true criteria of their point values.
-  // Strictly non-decreasing as criteria are added cumulatively.
-  const allKeys = ["clinical_signs_dvt", "alternative_diagnosis_less_likely", "hr_over_100", "immobilization_or_surgery", "prior_dvt_pe", "hemoptysis", "malignancy"];
-  let prev = -Infinity;
-  let active = {};
-  for (const key of allKeys) {
-    active = { ...active, [key]: true };
-    const r = computeWellsPE(active);
-    assert.ok(Number.isFinite(r.score) && r.score >= 0,
-      `score with ${Object.keys(active).length}: ${JSON.stringify(r)}`);
-    assert.ok(r.score > prev,
-      `score with ${Object.keys(active).length} = ${r.score} not greater than prev=${prev}`);
-    prev = r.score;
-  }
-  // All-false pin: score = 0, low band (three-band) / unlikely (two-band).
-  const none = computeWellsPE({});
-  assert.equal(none.score, 0);
-  assert.ok(/Low/.test(none.band_three), `band_three at 0: ${none.band_three}`);
-  assert.ok(/unlikely/.test(none.band_two), `band_two at 0: ${none.band_two}`);
-  // wellsPEExample closed-form pin: clinical_signs_dvt (3) + alt_dx (3) +
-  // hr_over_100 (1.5) = 7.5 -> high (three-band), likely (two-band).
-  const ref = computeWellsPE({ clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hr_over_100: true });
-  assert.ok(Math.abs(ref.score - 7.5) < 1e-12, `score = ${ref.score}, expected 7.5`);
-  assert.ok(/High/.test(ref.band_three), `band_three at 7.5: ${ref.band_three}`);
-  assert.ok(/likely/.test(ref.band_two), `band_two at 7.5: ${ref.band_two}`);
-  // Three-band threshold pins: < 2 = Low; 2..6 = Moderate; > 6 = High.
-  const low = computeWellsPE({ hemoptysis: true }); // 1 point
-  assert.equal(low.score, 1);
-  assert.ok(/Low/.test(low.band_three), `band at 1: ${low.band_three}`);
-  const mod = computeWellsPE({ clinical_signs_dvt: true }); // 3 points
-  assert.equal(mod.score, 3);
-  assert.ok(/Moderate/.test(mod.band_three), `band at 3: ${mod.band_three}`);
-  const high = computeWellsPE({ clinical_signs_dvt: true, alternative_diagnosis_less_likely: true, hr_over_100: true }); // 7.5
-  assert.ok(/High/.test(high.band_three), `band at 7.5: ${high.band_three}`);
-  // Two-band threshold pin: >= 4.5 = likely; < 4.5 = unlikely.
-  const justUnder = computeWellsPE({ clinical_signs_dvt: true, hr_over_100: true }); // 4.5
-  assert.equal(justUnder.score, 4.5);
-  assert.ok(/likely/.test(justUnder.band_two) && !/unlikely/.test(justUnder.band_two),
-    `band_two at 4.5: ${justUnder.band_two}`);
-  // Component-count pin: components array length equals number of flipped-true.
-  assert.equal(ref.components.length, 3);
-  // Strict-equality input-form pin: string "true" treated as true (form input).
-  const formInput = computeWellsPE({ clinical_signs_dvt: "true" });
-  assert.equal(formInput.score, 3);
-  // Recommendation pin: likely -> CT pulmonary angiogram; unlikely -> D-dimer.
-  assert.ok(/CT pulmonary angiogram/.test(ref.recommendation), `rec: ${ref.recommendation}`);
-  assert.ok(/D-dimer/.test(none.recommendation), `rec: ${none.recommendation}`);
-});
-
 // --- spec-v14 §10.3 Phase F forty-fifth monotonicity batch -------------
 // Five new sweeps across five distinct catalog groups (A / B / C / V / W).
 
 import { computePFCorrection } from "../../calc-electrical.js";
 import { computeHydrostaticTest } from "../../calc-plumbing.js";
 import { computeEvaporativeCooling } from "../../calc-hvac.js";
-import { computeO2CylinderTime } from "../../calc-ems.js";
-import { computeHypoxiaAltitude } from "../../calc-aviation.js";
 
 test("monotonicity: computePFCorrection kVAR is strictly increasing in kW at fixed pf1/pf2 (linear-in-kW pin); kVAR strictly increasing as target pf2 rises toward 1 at fixed kW/pf1 (Q = kW * (tan(acos(pf1)) - tan(acos(pf2))) pin); 3-phase capacitance pin", () => {
   // Group A. kVAR = kW * (tan(acos(pf1)) - tan(acos(pf2))). Strictly
@@ -7694,137 +6555,12 @@ test("monotonicity: computeEvaporativeCooling cooling_btu_hr is strictly increas
   assert.ok(bad.error, `expected error for m=0, got ${JSON.stringify(bad)}`);
 });
 
-test("monotonicity: computeO2CylinderTime minutes_to_reserve is strictly increasing in (pressure_psi - reserve_psi) at fixed cylinder/flow; strictly decreasing in flow_lpm at fixed delta-P; tank_factor pin per cylinder (D 0.16 / E 0.28 / M 1.56 / G 2.41 / H 3.14)", () => {
-  // Group V. minutes_to_reserve = ((P - R) * tank_factor) / F. Strictly
-  // increasing in P at fixed R/F; strictly decreasing in F at fixed P/R.
-  let prev = -Infinity;
-  for (const pressure_psi of [500, 1000, 1500, 1800, 2000, 2200]) {
-    const r = computeO2CylinderTime({ cylinder: "E", pressure_psi, reserve_psi: 200, flow_lpm: 4 });
-    assert.ok(Number.isFinite(r.minutes_to_reserve) && r.minutes_to_reserve > 0,
-      `min at P=${pressure_psi}: ${JSON.stringify(r)}`);
-    assert.ok(r.minutes_to_reserve > prev,
-      `min at P=${pressure_psi} = ${r.minutes_to_reserve} not greater than prev=${prev}`);
-    prev = r.minutes_to_reserve;
-  }
-  // Strictly decreasing in flow_lpm at fixed P/R/cylinder (1/F pin).
-  let prevFlow = Infinity;
-  for (const flow_lpm of [0.5, 1, 2, 4, 8, 15, 25]) {
-    const r = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm });
-    assert.ok(r.minutes_to_reserve < prevFlow,
-      `min at F=${flow_lpm} = ${r.minutes_to_reserve} not less than prev=${prevFlow}`);
-    prevFlow = r.minutes_to_reserve;
-  }
-  // Strictly decreasing in reserve_psi at fixed P/cylinder/flow (-(R) pin).
-  let prevR = Infinity;
-  for (const reserve_psi of [0, 100, 200, 300, 500, 1000]) {
-    const r = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi, flow_lpm: 4 });
-    assert.ok(r.minutes_to_reserve < prevR,
-      `min at R=${reserve_psi} = ${r.minutes_to_reserve} not less than prev=${prevR}`);
-    prevR = r.minutes_to_reserve;
-  }
-  // tank_factor pin per cylinder size.
-  assert.equal(computeO2CylinderTime({ cylinder: "D", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 0.16);
-  assert.equal(computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 0.28);
-  assert.equal(computeO2CylinderTime({ cylinder: "M", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 1.56);
-  assert.equal(computeO2CylinderTime({ cylinder: "G", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 2.41);
-  assert.equal(computeO2CylinderTime({ cylinder: "H", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 }).tank_factor, 3.14);
-  // Cylinder-size monotonicity pin: D < E < M < G < H at fixed P/R/F.
-  const sizes = ["D", "E", "M", "G", "H"];
-  let prevSize = -Infinity;
-  for (const cylinder of sizes) {
-    const r = computeO2CylinderTime({ cylinder, pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
-    assert.ok(r.minutes_to_reserve > prevSize,
-      `min at cyl=${cylinder} = ${r.minutes_to_reserve} not greater than prev=${prevSize}`);
-    prevSize = r.minutes_to_reserve;
-  }
-  // Closed-form pin: E cylinder, P=2000, R=200, F=4 -> min = (1800 * 0.28) / 4 = 126.
-  const ref = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
-  const expectedMin = ((2000 - 200) * 0.28) / 4;
-  assert.ok(Math.abs(ref.minutes_to_reserve - expectedMin) < 1e-9,
-    `min = ${ref.minutes_to_reserve}, expected ${expectedMin}`);
-  assert.equal(ref.cylinder, "E");
-  // minutes_to_empty pin: (P * factor) / F (no reserve subtracted).
-  assert.ok(Math.abs(ref.minutes_to_empty - (2000 * 0.28) / 4) < 1e-9,
-    `min_empty = ${ref.minutes_to_empty}, expected ${(2000 * 0.28) / 4}`);
-  // minutes_to_empty > minutes_to_reserve invariant.
-  assert.ok(ref.minutes_to_empty > ref.minutes_to_reserve,
-    `empty (${ref.minutes_to_empty}) should exceed reserve (${ref.minutes_to_reserve})`);
-  // Reserve-warning pin: R < 200 psi tips a warning.
-  const lowR = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 100, flow_lpm: 4 });
-  assert.ok(/very little safety margin/.test(lowR.reserve_warning),
-    `warning: ${lowR.reserve_warning}`);
-  const okR = computeO2CylinderTime({ cylinder: "E", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
-  assert.equal(okR.reserve_warning, null);
-  // hh:mm formatting pin.
-  assert.ok(/^\d{2}:\d{2}$/.test(ref.hhmm_to_reserve),
-    `hh:mm format: ${ref.hhmm_to_reserve}`);
-  // Bounds pin: unknown cylinder -> error; R > P -> error.
-  const badCyl = computeO2CylinderTime({ cylinder: "X", pressure_psi: 2000, reserve_psi: 200, flow_lpm: 4 });
-  assert.ok(badCyl.error, `expected error for cyl=X, got ${JSON.stringify(badCyl)}`);
-  const badR = computeO2CylinderTime({ cylinder: "E", pressure_psi: 200, reserve_psi: 500, flow_lpm: 4 });
-  assert.ok(badR.error, `expected error for R>P, got ${JSON.stringify(badR)}`);
-});
-
-test("monotonicity: computeHypoxiaAltitude crew_o2_required and all_occupants_o2_required are monotone non-decreasing as cabin_altitude_ft rises (false -> crew-only -> all); regulatory band thresholds at 12500 / 14000 / 15000 ft (14 CFR §91.211 pin)", () => {
-  // Group W. crew_o2_required false below 12500, true above. all_occupants
-  // false below 15000, true above. Both monotone non-decreasing in altitude.
-  let prevCrew = -1;
-  let prevAll = -1;
-  for (const cabin_altitude_ft of [5000, 10000, 12000, 12500, 13000, 13999, 14000, 14500, 14999, 15000, 16000, 18000, 25000]) {
-    const r = computeHypoxiaAltitude({ cabin_altitude_ft });
-    const crew = r.crew_o2_required ? 1 : 0;
-    const all = r.all_occupants_o2_required ? 1 : 0;
-    assert.ok(crew >= prevCrew,
-      `crew at ${cabin_altitude_ft} = ${crew} not >= prev=${prevCrew}`);
-    assert.ok(all >= prevAll,
-      `all at ${cabin_altitude_ft} = ${all} not >= prev=${prevAll}`);
-    prevCrew = crew;
-    prevAll = all;
-  }
-  // Boundary pins at the regulatory thresholds.
-  const below = computeHypoxiaAltitude({ cabin_altitude_ft: 12499 });
-  assert.equal(below.crew_o2_required, false);
-  assert.equal(below.all_occupants_o2_required, false);
-  assert.equal(below.band, "below 12,500 ft");
-  const at12500 = computeHypoxiaAltitude({ cabin_altitude_ft: 12500 });
-  assert.equal(at12500.crew_o2_required, true);
-  assert.equal(at12500.all_occupants_o2_required, false);
-  assert.equal(at12500.band, "12,500 to 14,000 ft");
-  const at14000 = computeHypoxiaAltitude({ cabin_altitude_ft: 14000 });
-  assert.equal(at14000.crew_o2_required, true);
-  assert.equal(at14000.all_occupants_o2_required, false);
-  assert.equal(at14000.band, "14,000 to 15,000 ft");
-  const at15000 = computeHypoxiaAltitude({ cabin_altitude_ft: 15000 });
-  assert.equal(at15000.crew_o2_required, true);
-  assert.equal(at15000.all_occupants_o2_required, true);
-  assert.equal(at15000.band, "above 15,000 ft");
-  // hypoxiaExample closed-form pin: 13000 ft -> 12,500 to 14,000 band.
-  const ref = computeHypoxiaAltitude({ cabin_altitude_ft: 13000 });
-  assert.equal(ref.band, "12,500 to 14,000 ft");
-  assert.equal(ref.crew_o2_required, true);
-  assert.equal(ref.all_occupants_o2_required, false);
-  assert.ok(/91\.211\(a\)\(1\)/.test(ref.regulation),
-    `regulation: ${ref.regulation}`);
-  // Regulation-citation pins at each band.
-  assert.ok(/None required/.test(below.regulation), `below reg: ${below.regulation}`);
-  assert.ok(/91\.211\(a\)\(2\)/.test(at14000.regulation), `14k reg: ${at14000.regulation}`);
-  assert.ok(/91\.211\(a\)\(3\)/.test(at15000.regulation), `15k reg: ${at15000.regulation}`);
-  // cabin_altitude_ft round-trip identity pin.
-  assert.equal(ref.cabin_altitude_ft, 13000);
-  // Bounds pin: altitude outside [-2000, 50000] -> error.
-  const badLo = computeHypoxiaAltitude({ cabin_altitude_ft: -3000 });
-  assert.ok(badLo.error, `expected error for alt=-3000, got ${JSON.stringify(badLo)}`);
-  const badHi = computeHypoxiaAltitude({ cabin_altitude_ft: 60000 });
-  assert.ok(badHi.error, `expected error for alt=60000, got ${JSON.stringify(badHi)}`);
-});
-
 // --- spec-v14 §10.3 Phase F forty-sixth monotonicity batch ------------
 // Five new sweeps across five distinct catalog groups (E / F / N / P / U).
 
 import { computeBendAllowance } from "../../calc-construction.js";
 import { computeNFPA1142WaterSupply } from "../../calc-fire.js";
 import { computeTrussCapacity } from "../../calc-stage.js";
-import { computePetAge } from "../../calc-vet.js";
 
 test("monotonicity: computeBendAllowance bend_allowance_in is strictly increasing in bend_angle_deg at fixed thickness/radius/k (linear-in-angle pin); strictly increasing in inside_radius_in (linear pin); strictly increasing in thickness_in via k*t (linear-in-t pin); doubling angle -> 2x bend_allowance exact", () => {
   // Group E. BA = (pi/180) * angle * (R + k * t). Strictly increasing in
@@ -8069,64 +6805,6 @@ test("monotonicity: computeCashConversionCycle ccc_days is strictly increasing i
   // Bounds pin: negative-day input -> error.
   const bad = computeCashConversionCycle({ dso: -5, dio: 60, dpo: 30 });
   assert.ok(bad.error, `expected error for dso=-5, got ${JSON.stringify(bad)}`);
-});
-
-test("monotonicity: computePetAge human_age_equivalent_years is strictly increasing in pet_age_years for dogs and cats (piecewise AAHA scheme pin); strictly increasing in size_band (small < medium < large < giant DOG_SIZE_FACTOR pin); year 1 = 15, year 2 = 24 boundary pins", () => {
-  // Group U. Dog: y<=1 -> 15*y; 1<y<=2 -> 15 + (y-1)*9; y>2 -> 24 + (y-2)*factor.
-  // Cat: y<=1 -> 15*y; 1<y<=2 -> 15 + (y-1)*9; y>2 -> 24 + (y-2)*4.
-  // Strictly increasing in age for both species across the full piecewise.
-  let prev = -Infinity;
-  for (const pet_age_years of [0.25, 0.5, 1, 1.25, 1.5, 2, 3, 5, 8, 12, 18]) {
-    const r = computePetAge({ species: "dog", pet_age_years, size_band: "medium" });
-    assert.ok(Number.isFinite(r.human_age_equivalent_years),
-      `human at y=${pet_age_years}: ${JSON.stringify(r)}`);
-    assert.ok(r.human_age_equivalent_years > prev,
-      `human at y=${pet_age_years} = ${r.human_age_equivalent_years} not greater than prev=${prev}`);
-    prev = r.human_age_equivalent_years;
-  }
-  // Strictly increasing for cats too.
-  let prevCat = -Infinity;
-  for (const pet_age_years of [0.25, 1, 2, 4, 8, 14, 20]) {
-    const r = computePetAge({ species: "cat", pet_age_years });
-    assert.ok(r.human_age_equivalent_years > prevCat,
-      `cat human at y=${pet_age_years} = ${r.human_age_equivalent_years} not greater than prev=${prevCat}`);
-    prevCat = r.human_age_equivalent_years;
-  }
-  // DOG_SIZE_FACTOR ordering pin at fixed age > 2: small (4) < medium (5)
-  // < large (6) < giant (7).
-  const bands = ["small", "medium", "large", "giant"];
-  let prevBand = -Infinity;
-  for (const size_band of bands) {
-    const r = computePetAge({ species: "dog", pet_age_years: 10, size_band });
-    assert.ok(r.human_age_equivalent_years > prevBand,
-      `human at band=${size_band} = ${r.human_age_equivalent_years} not greater than prev=${prevBand}`);
-    prevBand = r.human_age_equivalent_years;
-  }
-  // Year-1 boundary pin: age=1 -> human = 15 (any species, any band).
-  assert.equal(computePetAge({ species: "dog", pet_age_years: 1, size_band: "medium" }).human_age_equivalent_years, 15);
-  assert.equal(computePetAge({ species: "cat", pet_age_years: 1 }).human_age_equivalent_years, 15);
-  // Year-2 boundary pin: age=2 -> human = 24.
-  assert.equal(computePetAge({ species: "dog", pet_age_years: 2, size_band: "medium" }).human_age_equivalent_years, 24);
-  assert.equal(computePetAge({ species: "cat", pet_age_years: 2 }).human_age_equivalent_years, 24);
-  // Closed-form pin: dog medium @ 5 yr -> 24 + (5-2)*5 = 39.
-  const ref = computePetAge({ species: "dog", pet_age_years: 5, size_band: "medium" });
-  assert.equal(ref.human_age_equivalent_years, 39);
-  // Closed-form pin: dog giant @ 5 yr -> 24 + (5-2)*7 = 45.
-  const giant = computePetAge({ species: "dog", pet_age_years: 5, size_band: "giant" });
-  assert.equal(giant.human_age_equivalent_years, 45);
-  // Closed-form pin: cat @ 10 yr -> 24 + (10-2)*4 = 56.
-  const cat10 = computePetAge({ species: "cat", pet_age_years: 10 });
-  assert.equal(cat10.human_age_equivalent_years, 56);
-  // Boundary pin: age <= 0 ok at 0; age > 30 -> error.
-  const zero = computePetAge({ species: "dog", pet_age_years: 0, size_band: "medium" });
-  assert.equal(zero.human_age_equivalent_years, 0);
-  const tooOld = computePetAge({ species: "dog", pet_age_years: 35, size_band: "medium" });
-  assert.ok(tooOld.error, `expected error for age=35, got ${JSON.stringify(tooOld)}`);
-  // Bounds pin: bad species / bad size_band -> error.
-  const badSp = computePetAge({ species: "iguana", pet_age_years: 5 });
-  assert.ok(badSp.error, `expected error for iguana, got ${JSON.stringify(badSp)}`);
-  const badBand = computePetAge({ species: "dog", pet_age_years: 5, size_band: "tiny" });
-  assert.ok(badBand.error, `expected error for tiny, got ${JSON.stringify(badBand)}`);
 });
 
 // --- spec-v14 §10.3 Phase F forty-seventh monotonicity batch -----------
@@ -8414,7 +7092,6 @@ test("monotonicity: computeLexileBand selected_typical band lower bound is monot
 import { computeMortarMix } from "../../calc-construction.js";
 import { computeTimeAndMaterials } from "../../calc-cross.js";
 import { computeCostOfWaiting } from "../../calc-realestate.js";
-import { computePERC } from "../../calc-ems.js";
 
 test("monotonicity: computeMortarMix bags is strictly non-decreasing in unit_count at fixed unit_kind / joint / type (linear ceiling pin); strictly non-decreasing in joint_in (joint_factor = joint_in / 0.375 linear pin); cmu_8 vs brick demand ratio pin (1/10 vs 1/30)", () => {
   let prev = -Infinity;
@@ -8611,45 +7288,6 @@ test("monotonicity: computeCostOfWaiting monthly_pi_now is strictly increasing i
   assert.ok(badT.error, `expected error for term=60, got ${JSON.stringify(badT)}`);
 });
 
-test("monotonicity: computePERC satisfied count is strictly non-decreasing as additional criteria flip true (point-additive pin); all_satisfied flips false -> true exactly at satisfied = 8 / 8 (PERC 8-of-8 rule pin); band tips at all_satisfied boundary", () => {
-  const allKeys = ["age_under_50", "hr_under_100", "spo2_ge_95", "no_hemoptysis", "no_estrogen", "no_prior_dvt_pe", "no_recent_surgery_or_trauma", "no_unilateral_leg_swelling"];
-  let prev = -Infinity;
-  let active = {};
-  for (const key of allKeys) {
-    active = { ...active, [key]: true };
-    const r = computePERC(active);
-    assert.ok(Number.isFinite(r.satisfied),
-      `satisfied at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
-    assert.ok(r.satisfied > prev,
-      `satisfied at ${Object.keys(active).length} = ${r.satisfied} not greater than prev=${prev}`);
-    prev = r.satisfied;
-  }
-  const ref = computePERC({});
-  assert.equal(ref.total, 8);
-  assert.equal(ref.satisfied, 0);
-  assert.equal(ref.all_satisfied, false);
-  assert.equal(ref.failures.length, 8);
-  assert.ok(/PERC positive/.test(ref.band), `band at 0: ${ref.band}`);
-  const allTrue = computePERC({ age_under_50: true, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true, no_unilateral_leg_swelling: true });
-  assert.equal(allTrue.satisfied, 8);
-  assert.equal(allTrue.all_satisfied, true);
-  assert.equal(allTrue.failures.length, 0);
-  assert.ok(/PERC negative/.test(allTrue.band), `band at 8: ${allTrue.band}`);
-  const sevenOf8 = computePERC({ age_under_50: true, hr_under_100: true, spo2_ge_95: true, no_hemoptysis: true, no_estrogen: true, no_prior_dvt_pe: true, no_recent_surgery_or_trauma: true });
-  assert.equal(sevenOf8.satisfied, 7);
-  assert.equal(sevenOf8.all_satisfied, false);
-  assert.equal(sevenOf8.failures.length, 1);
-  assert.ok(/unilateral leg swelling/.test(sevenOf8.failures[0]),
-    `failure: ${sevenOf8.failures[0]}`);
-  const formStr = computePERC({ age_under_50: "true", hr_under_100: "true", spo2_ge_95: "true", no_hemoptysis: "true", no_estrogen: "true", no_prior_dvt_pe: "true", no_recent_surgery_or_trauma: "true", no_unilateral_leg_swelling: "true" });
-  assert.equal(formStr.satisfied, 8);
-  assert.equal(formStr.all_satisfied, true);
-  assert.ok(/low pretest probability/.test(ref.pretest_caveat),
-    `caveat: ${ref.pretest_caveat}`);
-  assert.ok(/low pretest probability/.test(allTrue.pretest_caveat),
-    `caveat all-true: ${allTrue.pretest_caveat}`);
-});
-
 // --- spec-v14 §10.3 Phase F forty-ninth monotonicity batch -------------
 // Five new sweeps across five distinct catalog groups (A / B / C / D / U).
 
@@ -8657,7 +7295,6 @@ import { computePhaseBalance } from "../../calc-electrical.js";
 import { computeGasLeakRate } from "../../calc-gas.js";
 import { computeSuperheatSubcool } from "../../calc-refrigerant.js";
 import { computeStormwaterRational } from "../../calc-plumbing.js";
-import { computeGestation } from "../../calc-vet.js";
 
 test("monotonicity: computePhaseBalance imbalance_percent = (max-min)/avg * 100 closed-form pin; strictly increasing as one phase load grows above the others at fixed average; greedy-swap final_imbalance_percent <= initial imbalance pin", () => {
   // Group A. imbalance_percent = (max - min) / avg * 100 across A/B/C phases.
@@ -8909,68 +7546,12 @@ test("monotonicity: computeStormwaterRational peak_flow_cfs is strictly increasi
   assert.ok(badSurf.error, `expected error for moon, got ${JSON.stringify(badSurf)}`);
 });
 
-test("monotonicity: computeGestation estimated_due_date_iso is strictly later as breeding_date_iso advances at fixed species (date arithmetic pin); species ordering pin: cat (65) > dog (63) > cow (283) > horse (340) gestation_days_mean", () => {
-  // Group U. due_date = breeding_date + species.mean days. Strictly later
-  // as breeding_date advances at fixed species (date arithmetic pin).
-  const breedingDates = ["2026-01-01", "2026-03-01", "2026-06-01", "2026-09-01", "2026-12-01"];
-  let prevDue = "0000-00-00";
-  for (const breeding_date_iso of breedingDates) {
-    const r = computeGestation({ species: "dog", breeding_date_iso });
-    assert.ok(typeof r.estimated_due_date_iso === "string",
-      `due at ${breeding_date_iso}: ${JSON.stringify(r)}`);
-    assert.ok(r.estimated_due_date_iso > prevDue,
-      `due at ${breeding_date_iso} = ${r.estimated_due_date_iso} not > prev=${prevDue}`);
-    prevDue = r.estimated_due_date_iso;
-  }
-  // Closed-form pin from gestationExample: dog @ 2026-03-01 + 63 = 2026-05-03.
-  const ref = computeGestation({ species: "dog", breeding_date_iso: "2026-03-01" });
-  assert.equal(ref.estimated_due_date_iso, "2026-05-03");
-  assert.equal(ref.range_low_iso, "2026-04-28");
-  assert.equal(ref.range_high_iso, "2026-05-08");
-  assert.equal(ref.gestation_days_mean, 63);
-  assert.equal(ref.gestation_days_range, "58-68");
-  assert.equal(ref.species, "dog");
-  assert.equal(ref.breeding_date_iso, "2026-03-01");
-  // Species-mean ordering pin: dog 63 < cat 65 < cow 283 < horse 340.
-  const dog = computeGestation({ species: "dog", breeding_date_iso: "2026-01-01" });
-  const cat = computeGestation({ species: "cat", breeding_date_iso: "2026-01-01" });
-  const cow = computeGestation({ species: "cow", breeding_date_iso: "2026-01-01" });
-  const horse = computeGestation({ species: "horse", breeding_date_iso: "2026-01-01" });
-  assert.equal(dog.gestation_days_mean, 63);
-  assert.equal(cat.gestation_days_mean, 65);
-  assert.equal(cow.gestation_days_mean, 283);
-  assert.equal(horse.gestation_days_mean, 340);
-  assert.ok(dog.estimated_due_date_iso < cat.estimated_due_date_iso,
-    `dog due (${dog.estimated_due_date_iso}) >= cat due (${cat.estimated_due_date_iso})`);
-  assert.ok(cat.estimated_due_date_iso < cow.estimated_due_date_iso,
-    `cat due (${cat.estimated_due_date_iso}) >= cow due (${cow.estimated_due_date_iso})`);
-  assert.ok(cow.estimated_due_date_iso < horse.estimated_due_date_iso,
-    `cow due (${cow.estimated_due_date_iso}) >= horse due (${horse.estimated_due_date_iso})`);
-  // range_low < estimated_due < range_high invariant per species.
-  for (const r of [dog, cat, cow, horse]) {
-    assert.ok(r.range_low_iso < r.estimated_due_date_iso && r.estimated_due_date_iso < r.range_high_iso,
-      `range invariant violated: ${r.range_low_iso} < ${r.estimated_due_date_iso} < ${r.range_high_iso}`);
-  }
-  // Case-insensitive species pin: "DOG" -> "dog".
-  const upperCase = computeGestation({ species: "DOG", breeding_date_iso: "2026-03-01" });
-  assert.equal(upperCase.species, "dog");
-  assert.equal(upperCase.estimated_due_date_iso, "2026-05-03");
-  // Bounds pin: unknown species / malformed date -> error.
-  const badSp = computeGestation({ species: "elephant", breeding_date_iso: "2026-03-01" });
-  assert.ok(badSp.error, `expected error for elephant, got ${JSON.stringify(badSp)}`);
-  const badDate = computeGestation({ species: "dog", breeding_date_iso: "03/01/2026" });
-  assert.ok(badDate.error, `expected error for non-ISO date, got ${JSON.stringify(badDate)}`);
-  const badFormat = computeGestation({ species: "dog", breeding_date_iso: "2026-3-1" });
-  assert.ok(badFormat.error, `expected error for short ISO, got ${JSON.stringify(badFormat)}`);
-});
-
 // --- spec-v14 §10.3 Phase F fiftieth monotonicity batch ----------------
 // Five new sweeps across five distinct catalog groups (A / F / N / T / V).
 // Milestone: 50 batches across §10.3.
 
 import { computeVoltageImbalance } from "../../calc-electrical.js";
 import { computeUTM } from "../../calc-field.js";
-import { computeRuleOf9s } from "../../calc-ems.js";
 
 test("monotonicity: computeVoltageImbalance imbalance_percent = max(|V - avg|) / avg * 100 closed-form pin; strictly increasing as one phase voltage drifts further from the average; derate_factor = 1 - 2*(imbalance/100)^2 (NEMA MG-1 pin); nema_hp_derate_pct monotone non-decreasing in imbalance_pct", () => {
   // Group A. imbalance = max-deviation / avg * 100. Strictly increasing as
@@ -9195,74 +7776,6 @@ test("monotonicity: computeUTM round-trip identity (latlon -> UTM -> latlon retu
   assert.ok(badZone.error, `expected error for zone=99, got ${JSON.stringify(badZone)}`);
   const badHem = computeUTM({ direction: "utm_to_latlon", zone: 13, hemisphere: "X", easting: 500000, northing: 4400000 });
   assert.ok(badHem.error, `expected error for hemisphere=X, got ${JSON.stringify(badHem)}`);
-});
-
-test("monotonicity: computeRuleOf9s total TBSA is strictly non-decreasing as additional body regions flip true (additive percent pin); rule-of-9s adult totals: head 9 (4.5+4.5), each arm 9 (4.5+4.5), trunk 36 (18+18), each leg 18 (9+9), perineum 1 -> 100% sum invariant; band thresholds at 10% and 20% TBSA (ABA pin)", () => {
-  // Group V. total TBSA is additive sum of selected regions' percent fields.
-  // Strictly non-decreasing as more regions are toggled true.
-  const regionKeys = [
-    "head_front", "head_back",
-    "arm_l_front", "arm_l_back", "arm_r_front", "arm_r_back",
-    "trunk_front", "trunk_back",
-    "leg_l_front", "leg_l_back", "leg_r_front", "leg_r_back",
-    "perineum",
-  ];
-  let prev = -Infinity;
-  let active = {};
-  for (const key of regionKeys) {
-    active = { ...active, [key]: true };
-    const r = computeRuleOf9s(active);
-    assert.ok(Number.isFinite(r.total),
-      `total at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
-    assert.ok(r.total > prev,
-      `total at ${Object.keys(active).length} = ${r.total} not greater than prev=${prev}`);
-    prev = r.total;
-  }
-  // 100% TBSA invariant pin: all 13 regions selected -> exactly 100% adult.
-  const allRegions = {};
-  for (const k of regionKeys) allRegions[k] = true;
-  const full = computeRuleOf9s(allRegions);
-  assert.equal(full.total, 100);
-  // Adult region-pct pins per published Rule of 9s.
-  const headOnly = computeRuleOf9s({ head_front: true, head_back: true });
-  assert.equal(headOnly.total, 9);
-  const armOnly = computeRuleOf9s({ arm_l_front: true, arm_l_back: true });
-  assert.equal(armOnly.total, 9);
-  const trunkOnly = computeRuleOf9s({ trunk_front: true, trunk_back: true });
-  assert.equal(trunkOnly.total, 36);
-  const legOnly = computeRuleOf9s({ leg_l_front: true, leg_l_back: true });
-  assert.equal(legOnly.total, 18);
-  const perineum = computeRuleOf9s({ perineum: true });
-  assert.equal(perineum.total, 1);
-  // ABA-band threshold pins: < 10 minor; 10-19 moderate; >= 20 major.
-  const minor = computeRuleOf9s({ arm_l_front: true });  // 4.5%
-  assert.ok(/Minor/.test(minor.band), `band at 4.5: ${minor.band}`);
-  const moderate = computeRuleOf9s({ trunk_front: true });  // 18%
-  assert.ok(/Moderate/.test(moderate.band), `band at 18: ${moderate.band}`);
-  const major = computeRuleOf9s({ trunk_front: true, trunk_back: true });  // 36%
-  assert.ok(/Major burn/.test(major.band), `band at 36: ${major.band}`);
-  // Boundary pin: at exactly 10% -> Moderate; at exactly 20% -> Major.
-  const at10 = computeRuleOf9s({ trunk_front: true, perineum: true });  // 18 + 1 = 19 (no exact 10 from single regions; use combos)
-  // Use head (9) + 1 (perineum) = 10
-  const at10b = computeRuleOf9s({ head_front: true, head_back: true, perineum: true });  // 4.5 + 4.5 + 1 = 10
-  assert.equal(at10b.total, 10);
-  assert.ok(/Moderate/.test(at10b.band), `band at exact 10: ${at10b.band}`);
-  // Lund-Browder method pin: total uses lb_a / lb_c / lb_i columns per age.
-  const lbAdult = computeRuleOf9s({ head_front: true, head_back: true, method: "lund_browder", age_band: "adult" });
-  assert.equal(lbAdult.total, 7);    // 3.5 + 3.5
-  const lbChild = computeRuleOf9s({ head_front: true, head_back: true, method: "lund_browder", age_band: "child" });
-  assert.equal(lbChild.total, 13);   // 6.5 + 6.5
-  const lbInfant = computeRuleOf9s({ head_front: true, head_back: true, method: "lund_browder", age_band: "infant" });
-  assert.equal(lbInfant.total, 17);  // 8.5 + 8.5
-  // Lund-Browder head-percent ordering pin: infant > child > adult.
-  assert.ok(lbInfant.total > lbChild.total && lbChild.total > lbAdult.total,
-    `head ordering: infant ${lbInfant.total} > child ${lbChild.total} > adult ${lbAdult.total}`);
-  // components array length pin: equals number of toggled regions.
-  const three = computeRuleOf9s({ head_front: true, arm_l_front: true, trunk_front: true });
-  assert.equal(three.components.length, 3);
-  // method default pin: rule_of_9s when unspecified.
-  assert.equal(headOnly.method, "rule_of_9s");
-  assert.equal(headOnly.age_band, "adult");
 });
 
 // --- spec-v14 §10.3 Phase F fifty-first monotonicity batch -------------
@@ -9906,7 +8419,6 @@ test("monotonicity: computeSlingAngle tension_per_leg_lb is strictly increasing 
 import { computeArcFlashScreen } from "../../calc-electrical.js";
 import { computeWaterHammerArrestor } from "../../calc-plumbing.js";
 import { computeNPSHa } from "../../calc-hvac.js";
-import { computeWellsDVT } from "../../calc-ems.js";
 
 test("monotonicity: computeArcFlashScreen incident_energy_cal_cm2 is strictly increasing in voltage_V, bolted_fault_A, AND clearing_time_s (Lee 1982 numerator pin); strictly decreasing in working_distance_in (1/D^2 pin); 2x current -> 2x energy exact; 4x distance -> 1/16 energy exact", () => {
   // Group A. E = (2.142e6 * V * I * t) / D^2. Strictly increasing in V, I, t;
@@ -10163,69 +8675,6 @@ test("monotonicity: computeMileageRollup deductible_amount is strictly increasin
   assert.ok(badTrips.error, `expected error for non-array trips, got ${JSON.stringify(badTrips)}`);
 });
 
-test("monotonicity: computeWellsDVT score is strictly non-decreasing as positive Wells criteria flip true (point-additive pin); alternative_diagnosis_likely subtracts 2 points (Wells -2 pin); two-band threshold at score >= 2; three-band thresholds at 0 / >2", () => {
-  // Group V. score sums points across criteria; +1 each except alternative
-  // diagnosis = -2. Strictly non-decreasing as positive criteria flip true.
-  const positiveKeys = [
-    "active_cancer", "paralysis_paresis", "bedridden_or_surgery", "tenderness_deep_venous_system",
-    "entire_leg_swollen", "calf_swelling_3cm", "pitting_edema_symptomatic_leg",
-    "collateral_superficial_veins", "prior_dvt",
-  ];
-  let prev = -Infinity;
-  let active = {};
-  for (const key of positiveKeys) {
-    active = { ...active, [key]: true };
-    const r = computeWellsDVT(active);
-    assert.ok(Number.isFinite(r.score),
-      `score at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
-    assert.ok(r.score > prev,
-      `score at ${Object.keys(active).length} = ${r.score} not greater than prev=${prev}`);
-    prev = r.score;
-  }
-  // Empty input pin: score = 0; band_three = Low; band_two = DVT unlikely.
-  const none = computeWellsDVT({});
-  assert.equal(none.score, 0);
-  assert.ok(/Low/.test(none.band_three), `band at 0: ${none.band_three}`);
-  assert.ok(/unlikely/.test(none.band_two), `band_two at 0: ${none.band_two}`);
-  // All-positive pin: 9 positive criteria, all +1 -> score = 9.
-  const allPos = {};
-  for (const k of positiveKeys) allPos[k] = true;
-  const all = computeWellsDVT(allPos);
-  assert.equal(all.score, 9);
-  // Negative-modifier pin: alternative_diagnosis_likely subtracts 2 points.
-  const altOnly = computeWellsDVT({ alternative_diagnosis_likely: true });
-  assert.equal(altOnly.score, -2);
-  // Combined pin: all positive + alt diagnosis = 9 - 2 = 7.
-  const combined = computeWellsDVT({ ...allPos, alternative_diagnosis_likely: true });
-  assert.equal(combined.score, 7);
-  // Two-band threshold pin: score >= 2 -> DVT likely.
-  const score1 = computeWellsDVT({ active_cancer: true });
-  assert.equal(score1.score, 1);
-  assert.ok(/unlikely/.test(score1.band_two), `band_two at 1: ${score1.band_two}`);
-  const score2 = computeWellsDVT({ active_cancer: true, prior_dvt: true });
-  assert.equal(score2.score, 2);
-  assert.ok(/likely/.test(score2.band_two) && !/unlikely/.test(score2.band_two),
-    `band_two at 2: ${score2.band_two}`);
-  // Three-band threshold pins: <= 0 Low; 1-2 Moderate; > 2 High.
-  assert.ok(/Low/.test(none.band_three), `band at 0: ${none.band_three}`);
-  assert.ok(/Moderate/.test(score1.band_three), `band at 1: ${score1.band_three}`);
-  assert.ok(/Moderate/.test(score2.band_three), `band at 2: ${score2.band_three}`);
-  const score3 = computeWellsDVT({ active_cancer: true, prior_dvt: true, entire_leg_swollen: true });
-  assert.equal(score3.score, 3);
-  assert.ok(/High/.test(score3.band_three), `band at 3: ${score3.band_three}`);
-  // Recommendation pin: likely -> ultrasound; unlikely -> D-dimer.
-  assert.ok(/compression ultrasound/.test(score2.recommendation), `rec at 2: ${score2.recommendation}`);
-  assert.ok(/D-dimer/.test(none.recommendation), `rec at 0: ${none.recommendation}`);
-  // wellsDVTExample closed-form pin: active_cancer + calf_swelling + prior_dvt = 3.
-  const ref = computeWellsDVT({ active_cancer: true, calf_swelling_3cm: true, entire_leg_swollen: false, prior_dvt: true, alternative_diagnosis_likely: false });
-  assert.equal(ref.score, 3);
-  // components array carries only the flipped-true criteria.
-  assert.equal(ref.components.length, 3);
-  // String "true" form-input pin: treated as boolean true.
-  const strForm = computeWellsDVT({ active_cancer: "true", prior_dvt: "true" });
-  assert.equal(strForm.score, 2);
-});
-
 // --- spec-v14 §10.3 Phase F fifty-fourth monotonicity batch ------------
 // Five new sweeps across five distinct catalog groups (B / E / P / T / V).
 
@@ -10233,7 +8682,6 @@ import { computeBackflowLoss } from "../../calc-plumbing.js";
 import { computeExcavationVolume } from "../../calc-construction.js";
 import { computeSection179 } from "../../calc-accounting.js";
 import { computeSolarTimes } from "../../calc-field.js";
-import { computeCHA2DS2VASc } from "../../calc-ems.js";
 
 test("monotonicity: computeBackflowLoss pressure_loss_psi is monotone non-decreasing in flow_gpm at fixed device/pipe (interpolated published curve pin); device-class ordering at the same pipe and flow: RP > PVB > DCV (relief-valve pressure-drop pin); larger pipe size at the same gpm yields lower pressure loss (cross-section pin)", () => {
   // Group B. The Watts published curves are monotone non-decreasing in
@@ -10472,62 +8920,12 @@ test("monotonicity: computeSolarTimes sunrise/sunset HH:MM strings are well-form
   assert.ok(badDate.error, `expected error for bad date, got ${JSON.stringify(badDate)}`);
 });
 
-test("monotonicity: computeCHA2DS2VASc score is monotone non-decreasing as risk factors flip true (point-additive pin); age tiers: 0 pts <65 / 1 pt 65-74 / 2 pts >=75 (A vs A2 pin); stroke history adds 2 (S2 pin); female-sex adds 1 (Sc pin); recommendation tips at score >= 2 for men, >= 3 for women (2019 AHA/ACC/HRS)", () => {
-  // Group V. CHA2DS2-VASc components: C/H/D/V (+1 each), A 65-74 (+1) or
-  // A2 >=75 (+2), S2 stroke (+2), Sc female (+1).
-  // Strictly non-decreasing in age across the tier thresholds.
-  let prev = -Infinity;
-  for (const age of [50, 64, 65, 70, 74, 75, 80, 90]) {
-    const r = computeCHA2DS2VASc({ age, sex: "male" });
-    assert.ok(Number.isFinite(r.score),
-      `score at age=${age}: ${JSON.stringify(r)}`);
-    assert.ok(r.score >= prev,
-      `score at age=${age} = ${r.score} not >= prev=${prev}`);
-    prev = r.score;
-  }
-  // Age-tier pins: <65 -> 0; 65-74 -> 1 (A); >=75 -> 2 (A2).
-  assert.equal(computeCHA2DS2VASc({ age: 64, sex: "male" }).score, 0);
-  assert.equal(computeCHA2DS2VASc({ age: 65, sex: "male" }).score, 1);
-  assert.equal(computeCHA2DS2VASc({ age: 74, sex: "male" }).score, 1);
-  assert.equal(computeCHA2DS2VASc({ age: 75, sex: "male" }).score, 2);
-  // Female-sex pin: adds 1 point regardless of other factors.
-  const male50 = computeCHA2DS2VASc({ age: 50, sex: "male" });
-  const female50 = computeCHA2DS2VASc({ age: 50, sex: "female" });
-  assert.equal(male50.score, 0);
-  assert.equal(female50.score, 1);
-  // Stroke pin: stroke_history adds 2 (S2 component).
-  const withStroke = computeCHA2DS2VASc({ age: 50, sex: "male", stroke_history: true });
-  assert.equal(withStroke.score, 2);
-  // CHF + HTN + diabetes + vascular pin: +1 each.
-  const cumulative = computeCHA2DS2VASc({ age: 50, sex: "male", chf: true, htn: true, diabetes: true, vascular: true });
-  assert.equal(cumulative.score, 4);
-  // All-positive 80yo female pin: A2 (2) + S2 (2) + chf/htn/d/v (4) + Sc (1) = 9.
-  const max = computeCHA2DS2VASc({ age: 80, sex: "female", chf: true, htn: true, diabetes: true, vascular: true, stroke_history: true });
-  assert.equal(max.score, 9);
-  // Recommendation pin: male score >= 2 -> anticoagulation recommended.
-  const malePos = computeCHA2DS2VASc({ age: 80, sex: "male" });  // A2 = 2
-  assert.ok(/anticoagulation recommended/.test(malePos.recommendation),
-    `rec at male 80: ${malePos.recommendation}`);
-  const maleEq1 = computeCHA2DS2VASc({ age: 70, sex: "male" });  // A = 1
-  assert.ok(/consider/.test(maleEq1.recommendation),
-    `rec at male 70: ${maleEq1.recommendation}`);
-  // String "true" form-input pin: treated as boolean true.
-  const formStr = computeCHA2DS2VASc({ age: 50, sex: "male", chf: "true", htn: "true" });
-  assert.equal(formStr.score, 2);
-  // Bounds pin: age out of 18-120 / unknown sex -> error.
-  const badAge = computeCHA2DS2VASc({ age: 17, sex: "male" });
-  assert.ok(badAge.error, `expected error for age=17, got ${JSON.stringify(badAge)}`);
-  const badSex = computeCHA2DS2VASc({ age: 50, sex: "other" });
-  assert.ok(badSex.error, `expected error for sex=other, got ${JSON.stringify(badSex)}`);
-});
-
 // --- spec-v14 §10.3 Phase F fifty-fifth monotonicity batch -------------
 // Five new sweeps across five distinct catalog groups (B / C / F / V / Y).
 
 import { computePipeExpansionLoop } from "../../calc-plumbing.js";
 import { computeWetBulbPsychrometer } from "../../calc-hvac.js";
 import { computeLinearSystem2x2 } from "../../calc-edu.js";
-import { computeNIHSS } from "../../calc-ems.js";
 
 test("monotonicity: computePDP pdp_psi is strictly increasing in nozzle_pressure_psi, friction_loss_psi, elevation_ft, AND appliance_loss_psi (linear-sum pin); elevation_psi = elevation_ft * 0.5 exact (NFPA 0.5 psi/ft head pin); negative elevation subtracts from PDP", () => {
   // Group F. PDP = NP + FL + 0.5*elev + AL. Strictly increasing in each.
@@ -10757,68 +9155,6 @@ test("monotonicity: computeLinearSystem2x2 unique-solution determinant > 0 yield
   assert.ok(nan.error, `expected error for non-numeric c1, got ${JSON.stringify(nan)}`);
 });
 
-test("monotonicity: computeNIHSS total is strictly non-decreasing as additional item scores are added (point-additive pin); '9' code for amputation / dysarthria untestable does NOT add to total (scored=false flag pin); band thresholds 0 None / 1-4 Minor / 5-15 Moderate / 16-20 Mod-Severe / 21+ Severe; max_possible = 42 invariant", () => {
-  // Group V. Strictly non-decreasing in cumulative item scores.
-  const items = ["loc_consciousness", "loc_questions", "loc_commands", "best_gaze",
-                 "visual", "facial_palsy", "motor_arm_l", "motor_arm_r",
-                 "motor_leg_l", "motor_leg_r", "limb_ataxia", "sensory",
-                 "best_language", "dysarthria", "extinction_inattention"];
-  let prev = -Infinity;
-  let active = {};
-  for (const key of items) {
-    active = { ...active, [key]: 1 };
-    const r = computeNIHSS(active);
-    assert.ok(Number.isFinite(r.total),
-      `total at ${Object.keys(active).length}: ${JSON.stringify(r)}`);
-    assert.ok(r.total >= prev,
-      `total at ${Object.keys(active).length} = ${r.total} not >= prev=${prev}`);
-    prev = r.total;
-  }
-  // Empty input pin: total = 0, band = "No stroke symptoms".
-  const none = computeNIHSS({});
-  assert.equal(none.total, 0);
-  assert.ok(/No stroke symptoms/.test(none.band), `band at 0: ${none.band}`);
-  assert.equal(none.max_possible, 42);
-  // Band-threshold pins.
-  const minor = computeNIHSS({ loc_consciousness: 1, best_gaze: 1, visual: 1, facial_palsy: 1 });
-  assert.equal(minor.total, 4);
-  assert.ok(/Minor/.test(minor.band), `band at 4: ${minor.band}`);
-  const moderate = computeNIHSS({ loc_consciousness: 2, best_gaze: 1, visual: 2, facial_palsy: 2 });
-  assert.equal(moderate.total, 7);
-  assert.ok(/Moderate/.test(moderate.band), `band at 7: ${moderate.band}`);
-  // nihssExample closed-form pin: total = 15 (moderate left MCA syndrome).
-  const ref = computeNIHSS({
-    loc_consciousness: 1, loc_questions: 1, loc_commands: 0,
-    best_gaze: 1, visual: 2, facial_palsy: 2,
-    motor_arm_l: 0, motor_arm_r: 2, motor_leg_l: 0, motor_leg_r: 1,
-    limb_ataxia: 0, sensory: 1, best_language: 2, dysarthria: 1,
-    extinction_inattention: 1,
-  });
-  assert.equal(ref.total, 15);
-  // Untestable-'9' pin: 9 in motor or dysarthria does NOT add to total.
-  const with9 = computeNIHSS({ motor_arm_l: 9, dysarthria: 9, loc_consciousness: 1 });
-  assert.equal(with9.total, 1);
-  // scored=false on the 9-coded items.
-  const motor9Item = with9.items.find((i) => /arm/i.test(i.label) && i.score === 9);
-  assert.ok(motor9Item && motor9Item.scored === false,
-    `motor 9 should be scored=false: ${JSON.stringify(motor9Item)}`);
-  const dys9Item = with9.items.find((i) => /[Dd]ysarthria/.test(i.label) && i.score === 9);
-  assert.ok(dys9Item && dys9Item.scored === false,
-    `dysarthria 9 should be scored=false: ${JSON.stringify(dys9Item)}`);
-  // Severe-band threshold pin: total > 20 -> Severe. Use 2 per item (safely
-  // within every item's max) -> 15 items × 2 = 30 > 20.
-  const severeAll = {};
-  for (const key of items) severeAll[key] = 2;
-  const severe = computeNIHSS(severeAll);
-  assert.ok(severe.total > 20, `severe total: ${severe.total}`);
-  assert.ok(/Severe/.test(severe.band), `band at high: ${severe.band}`);
-  // Bounds pin: out-of-range item score (above item max) -> error.
-  const bad = computeNIHSS({ loc_consciousness: 99 });
-  assert.ok(bad.error, `expected error for loc=99, got ${JSON.stringify(bad)}`);
-  const nan = computeNIHSS({ loc_consciousness: "abc" });
-  assert.ok(nan.error, `expected error for non-numeric, got ${JSON.stringify(nan)}`);
-});
-
 // --- spec-v14 §10.3 Phase F fifty-sixth monotonicity batch -------------
 // Five new sweeps across five distinct catalog groups (A / C / E / F / V).
 
@@ -10826,7 +9162,6 @@ import { computeGeneratorSize } from "../../calc-electrical.js";
 import { computeCoolingTower } from "../../calc-hvac.js";
 import { computeFormworkPressure } from "../../calc-construction.js";
 import { computeConfinedSpacePurge } from "../../calc-rescue.js";
-import { computeSTART } from "../../calc-ems.js";
 
 test("monotonicity: computeGeneratorSize running_W is strictly non-decreasing as items accumulate (sum-of-running pin); surge_W = running_total + max(starting - running) per item (worst-case-single-start pin); doubling-load pin; closed-form sample 3 appliances", () => {
   // Group A. running_total = sum(running_watts). surge_total = running_total
@@ -11063,64 +9398,6 @@ test("monotonicity: computeConfinedSpacePurge minutes is strictly increasing in 
   assert.ok(badB.error, `expected error for B=0, got ${JSON.stringify(badB)}`);
   const badN = computeConfinedSpacePurge({ volume_ft3: 1000, blower_cfm: 200, target_purges: 0 });
   assert.ok(badN.error, `expected error for N=0, got ${JSON.stringify(badN)}`);
-});
-
-test("monotonicity: computeSTART triage tag follows a fixed decision tree; walking -> GREEN; apneic + no breath restoration -> BLACK; apneic restored -> RED; RR > 30 (adult) or outside 15-45 (peds) -> RED; perfusion bad -> RED; mental status not following commands -> RED; otherwise YELLOW", () => {
-  // Group V. Standard adult SALT/START decision tree.
-  // Walking -> GREEN regardless of other vitals.
-  const walking = computeSTART({ walking: true });
-  assert.equal(walking.tag, "GREEN");
-  // Apneic (not walking, no breathing, no restoration after airway) -> BLACK.
-  const apneicAdult = computeSTART({ walking: false, breathing: "no" });
-  assert.equal(apneicAdult.tag, "BLACK");
-  // Apneic, restored after airway repositioning -> RED.
-  const restored = computeSTART({ walking: false, breathing: "no_now_yes_after_position" });
-  assert.equal(restored.tag, "RED");
-  // Adult RR > 30 -> RED.
-  const tachypnea = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 35, perfusion_ok: true, obeys_commands: true });
-  assert.equal(tachypnea.tag, "RED");
-  // Adult RR <= 30 + bad perfusion -> RED.
-  const noPerf = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 20, perfusion_ok: false, obeys_commands: true });
-  assert.equal(noPerf.tag, "RED");
-  // Adult RR <= 30 + good perfusion + doesn't follow commands -> RED.
-  const altered = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 20, perfusion_ok: true, obeys_commands: false });
-  assert.equal(altered.tag, "RED");
-  // Adult RR <= 30 + good perfusion + follows commands -> YELLOW.
-  const yellow = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 20, perfusion_ok: true, obeys_commands: true });
-  assert.equal(yellow.tag, "YELLOW");
-  // RR boundary pin: exactly 30 in adult -> YELLOW (not >30).
-  const at30 = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 30, perfusion_ok: true, obeys_commands: true });
-  assert.equal(at30.tag, "YELLOW");
-  // RR 31 -> RED.
-  const at31 = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 31, perfusion_ok: true, obeys_commands: true });
-  assert.equal(at31.tag, "RED");
-  // Pediatric (JumpSTART) RR bounds: 15-45 -> normal; outside -> RED.
-  const pedTachy = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 50, perfusion_ok: true, avpu: "A", pediatric: true });
-  assert.equal(pedTachy.tag, "RED");
-  const pedBrady = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 10, perfusion_ok: true, avpu: "A", pediatric: true });
-  assert.equal(pedBrady.tag, "RED");
-  const pedNormal = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 25, perfusion_ok: true, avpu: "A", pediatric: true });
-  assert.equal(pedNormal.tag, "YELLOW");
-  // Pediatric AVPU U -> RED.
-  const pedAvpuU = computeSTART({ walking: false, breathing: "yes", resp_rate_per_min: 25, perfusion_ok: true, avpu: "U", pediatric: true });
-  assert.equal(pedAvpuU.tag, "RED");
-  // Pediatric apneic + pulse + restored after 5 breaths -> RED (JumpSTART rule).
-  const jumpSt = computeSTART({ walking: false, breathing: "no", pediatric: true, has_pulse: true, breaths_restored_after_5: true });
-  assert.equal(jumpSt.tag, "RED");
-  // Pediatric apneic + no pulse -> BLACK.
-  const jumpStBlack = computeSTART({ walking: false, breathing: "no", pediatric: true, has_pulse: false });
-  assert.equal(jumpStBlack.tag, "BLACK");
-  // Path-array invariant: each result includes a path explanation.
-  assert.ok(Array.isArray(walking.path) && walking.path.length > 0,
-    `walking path: ${JSON.stringify(walking.path)}`);
-  assert.ok(Array.isArray(tachypnea.path) && tachypnea.path.length > 0,
-    `tachypnea path: ${JSON.stringify(tachypnea.path)}`);
-  // pediatric pin: returned in output regardless of branch.
-  assert.equal(walking.pediatric, false);
-  assert.equal(pedNormal.pediatric, true);
-  // Missing-RR error pin: breathing on own without RR -> error.
-  const noRR = computeSTART({ walking: false, breathing: "yes" });
-  assert.ok(noRR.error, `expected error for missing RR, got ${JSON.stringify(noRR)}`);
 });
 
 // --- spec-v14 §10.3 Phase F fifty-seventh monotonicity batch -----------
@@ -11439,7 +9716,6 @@ import { computeSRTandFM } from "../../calc-water.js";
 import { computeMaterialQuantity } from "../../calc-construction.js";
 import { computeTipOut } from "../../calc-cross.js";
 import { computePayrollWithholding } from "../../calc-accounting.js";
-import { computeDrugConcentration } from "../../calc-ems.js";
 
 test("monotonicity: computeSRTandFM srt_days = MLSS-lb / (WAS-lb + EFF-lb) (sludge-age pin); strictly increasing in aeration_volume_gal at fixed solids out; strictly decreasing in WAS or effluent solids out at fixed inventory; F/M = BOD-load-lb-per-day / MLVSS-lb (linear-in-load pin); 8.34 lb/gal water-density conversion exact", () => {
   // Group D. mlss_lb = aeration_vol_gal/1e6 * mlss_mg_l * 8.34.
@@ -11687,63 +9963,6 @@ test("monotonicity: computePayrollWithholding net_per_period is strictly decreas
   assert.ok(badG.error, `expected error for negative gross, got ${JSON.stringify(badG)}`);
   const badF = computePayrollWithholding({ gross_per_period: 1000, pay_frequency: "yearly", filing_status: "single" });
   assert.ok(badF.error, `expected error for unknown frequency, got ${JSON.stringify(badF)}`);
-});
-
-test("monotonicity: computeDrugConcentration volume_mL = dose_mg / concentration_mg_per_mL exact (linear-in-dose pin); strictly increasing in ordered_dose_mg; strictly decreasing in stock_concentration_mg_per_mL (1/c inverse pin); weight-based derivation: dose = weight_kg * dose_mg_per_kg; flag tips at < 0.05 mL or > 50 mL", () => {
-  // Group V. volume = dose / conc. Strictly increasing in dose at fixed conc.
-  let prev = -Infinity;
-  for (const ordered_dose_mg of [1, 5, 10, 25, 50, 100, 500]) {
-    const r = computeDrugConcentration({ ordered_dose_mg, stock_concentration_mg_per_mL: 50 });
-    assert.ok(Number.isFinite(r.volume_mL) && r.volume_mL > 0,
-      `vol at dose=${ordered_dose_mg}: ${JSON.stringify(r)}`);
-    assert.ok(r.volume_mL > prev,
-      `vol at dose=${ordered_dose_mg} = ${r.volume_mL} not greater than prev=${prev}`);
-    prev = r.volume_mL;
-  }
-  // Strictly decreasing in stock_concentration at fixed dose.
-  let prevC = Infinity;
-  for (const stock_concentration_mg_per_mL of [10, 25, 50, 100, 250, 500]) {
-    const r = computeDrugConcentration({ ordered_dose_mg: 50, stock_concentration_mg_per_mL });
-    assert.ok(r.volume_mL < prevC,
-      `vol at c=${stock_concentration_mg_per_mL} = ${r.volume_mL} not less than prev=${prevC}`);
-    prevC = r.volume_mL;
-  }
-  // Closed-form pin from drugConcentrationExample: 25 mg / 50 mg/mL -> 0.5 mL.
-  const ref = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
-  assert.equal(ref.volume_mL, 0.5);
-  assert.equal(ref.dose_mg, 25);
-  assert.equal(ref.concentration_mg_per_mL, 50);
-  // Doubling-dose pin: 2x dose -> 2x volume exactly.
-  const a = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
-  const b = computeDrugConcentration({ ordered_dose_mg: 50, stock_concentration_mg_per_mL: 50 });
-  assert.ok(Math.abs(b.volume_mL - 2 * a.volume_mL) < 1e-12,
-    `2x dose: vol = ${b.volume_mL} != 2 * ${a.volume_mL}`);
-  // Halving-concentration pin: 1/2 c -> 2x volume exactly.
-  const c1 = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 100 });
-  const c2 = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 50 });
-  assert.ok(Math.abs(c2.volume_mL - 2 * c1.volume_mL) < 1e-12,
-    `1/2 c: vol = ${c2.volume_mL} != 2 * ${c1.volume_mL}`);
-  // Weight-based derivation pin: dose = weight_kg * dose_mg_per_kg.
-  const ped = computeDrugConcentration({ weight_kg: 10, dose_mg_per_kg: 0.5, stock_concentration_mg_per_mL: 50 });
-  assert.equal(ped.dose_mg, 5);
-  assert.equal(ped.volume_mL, 5 / 50);
-  assert.ok(ped.derivation && /5 mg/.test(ped.derivation),
-    `derivation message: ${ped.derivation}`);
-  // Large-volume flag pin: > 50 mL -> flag.
-  const big = computeDrugConcentration({ ordered_dose_mg: 6000, stock_concentration_mg_per_mL: 100 });
-  assert.equal(big.volume_mL, 60);
-  assert.ok(big.flags.some((f) => />\s*50\s*mL/.test(f)),
-    `big-volume flag: ${JSON.stringify(big.flags)}`);
-  // Tiny-volume flag pin: < 0.05 mL -> flag.
-  const small = computeDrugConcentration({ ordered_dose_mg: 1, stock_concentration_mg_per_mL: 100 });
-  assert.equal(small.volume_mL, 0.01);
-  assert.ok(small.flags.some((f) => /<\s*0\.05\s*mL/.test(f)),
-    `small-volume flag: ${JSON.stringify(small.flags)}`);
-  // Bounds pin: non-positive concentration -> error.
-  const bad = computeDrugConcentration({ ordered_dose_mg: 25, stock_concentration_mg_per_mL: 0 });
-  assert.ok(bad.error, `expected error for c=0, got ${JSON.stringify(bad)}`);
-  const noDose = computeDrugConcentration({ stock_concentration_mg_per_mL: 50 });
-  assert.ok(noDose.error, `expected error for missing dose, got ${JSON.stringify(noDose)}`);
 });
 
 // --- spec-v14 §10.3 Phase F fifty-ninth monotonicity batch -------------
@@ -12048,7 +10267,6 @@ test("monotonicity: computeAlternateReadability smog and gunning_fog grow with p
 import { computePullout } from "../../calc-construction.js";
 import { computeGlycolMix } from "../../calc-plumbing.js";
 import { computeStairStringer } from "../../calc-construction.js";
-import { computePedsVitals } from "../../calc-ems.js";
 import { computeCodonTable } from "../../calc-edu.js";
 
 test("monotonicity: computePullout total_withdrawal_lb is strictly increasing in penetration_in at fixed species/fastener (linear pin); strictly increasing in fastener diameter D (D-linear pin); strictly increasing in species G^2.5 (NDS withdrawal pin); screws have ~1.85x the withdrawal capacity of comparable nails (NDS published factor)", () => {
@@ -12217,80 +10435,6 @@ test("monotonicity: computeStairStringer stringer_in = sqrt(rise^2 + run^2) (Pyt
   assert.ok(bad.error, `expected error for rise=0, got ${JSON.stringify(bad)}`);
   const badR = computeStairStringer({ total_rise_in: 108, total_run_in: 0 });
   assert.ok(badR.error, `expected error for run=0, got ${JSON.stringify(badR)}`);
-});
-
-test("monotonicity: computePedsVitals heart-rate, respiratory-rate, and SBP age-band ordering reflects PALS-published reference tables; bands progress neonate -> infant -> toddler -> preschool -> school -> adolescent; hypotension_sbp threshold ordering: 60 (neonate) < 70 (infant) < 70+2*age (toddler/preschool/school) < 90 (adolescent)", () => {
-  // Group V. PEDS_VITALS table-driven; bands in fixed order.
-  const bands = ["neonate", "infant", "toddler", "preschool", "school", "adolescent"];
-  // Each band returns a well-formed object with hr/rr/sbp range strings.
-  for (const age_band of bands) {
-    const r = computePedsVitals({ age_band });
-    assert.ok(typeof r.label === "string" && r.label.length > 0,
-      `label at ${age_band}: ${JSON.stringify(r)}`);
-    assert.ok(typeof r.hr_range === "string", `hr at ${age_band}: ${r.hr_range}`);
-    assert.ok(typeof r.rr_range === "string", `rr at ${age_band}: ${r.rr_range}`);
-    assert.ok(typeof r.sbp_range === "string", `sbp at ${age_band}: ${r.sbp_range}`);
-    assert.ok(typeof r.hypotension_sbp === "string",
-      `hypotension at ${age_band}: ${r.hypotension_sbp}`);
-    assert.equal(r.band, age_band);
-  }
-  // Hypotension-SBP threshold ordering pin.
-  const neonate = computePedsVitals({ age_band: "neonate" });
-  const infant = computePedsVitals({ age_band: "infant" });
-  const toddler = computePedsVitals({ age_band: "toddler" });
-  const school = computePedsVitals({ age_band: "school" });
-  const adolescent = computePedsVitals({ age_band: "adolescent" });
-  assert.ok(/SBP < 60/.test(neonate.hypotension_sbp),
-    `neonate hypotension: ${neonate.hypotension_sbp}`);
-  assert.ok(/SBP < 70 mmHg/.test(infant.hypotension_sbp),
-    `infant hypotension: ${infant.hypotension_sbp}`);
-  assert.ok(/70 \+ 2\*age/.test(toddler.hypotension_sbp),
-    `toddler hypotension: ${toddler.hypotension_sbp}`);
-  assert.ok(/70 \+ 2\*age/.test(school.hypotension_sbp),
-    `school hypotension: ${school.hypotension_sbp}`);
-  assert.ok(/SBP < 90/.test(adolescent.hypotension_sbp),
-    `adolescent hypotension: ${adolescent.hypotension_sbp}`);
-  // Specific band labels pin.
-  assert.ok(/Neonate/.test(neonate.label), `neonate label: ${neonate.label}`);
-  assert.ok(/Infant/.test(infant.label), `infant label: ${infant.label}`);
-  assert.ok(/Toddler/.test(toddler.label), `toddler label: ${toddler.label}`);
-  assert.ok(/Preschool/.test(computePedsVitals({ age_band: "preschool" }).label),
-    `preschool label`);
-  assert.ok(/School age/.test(school.label), `school label: ${school.label}`);
-  assert.ok(/Adolescent/.test(adolescent.label), `adolescent label: ${adolescent.label}`);
-  // Heart-rate ranges pin (PALS): neonate 100-205 / infant 100-180 / toddler 98-140
-  // / preschool 80-120 / school 75-118 / adolescent 60-100 — upper bounds decline.
-  function parseHigh(rangeStr) {
-    // e.g. "100-205 (awake) / 90-160 (asleep)" -> 205.
-    const m = rangeStr.match(/-(\d+)/);
-    return m ? Number(m[1]) : NaN;
-  }
-  const neonateHR = parseHigh(neonate.hr_range);
-  const infantHR = parseHigh(infant.hr_range);
-  const toddlerHR = parseHigh(toddler.hr_range);
-  const adolescentHR = parseHigh(adolescent.hr_range);
-  assert.ok(neonateHR >= infantHR && infantHR >= toddlerHR && toddlerHR > adolescentHR,
-    `HR upper-bound monotone: neonate ${neonateHR} >= infant ${infantHR} >= toddler ${toddlerHR} > adolescent ${adolescentHR}`);
-  // Respiratory-rate ranges pin: similar decline with age.
-  const neonateRR = parseHigh(neonate.rr_range);
-  const adolescentRR = parseHigh(adolescent.rr_range);
-  assert.ok(neonateRR > adolescentRR,
-    `RR neonate ${neonateRR} not > adolescent ${adolescentRR}`);
-  // SBP ranges pin: low bound generally rises with age.
-  function parseLow(rangeStr) {
-    const m = rangeStr.match(/^(\d+)/);
-    return m ? Number(m[1]) : NaN;
-  }
-  const neonateSBPLow = parseLow(neonate.sbp_range);
-  const adolescentSBPLow = parseLow(adolescent.sbp_range);
-  assert.ok(adolescentSBPLow > neonateSBPLow,
-    `SBP low: adolescent ${adolescentSBPLow} not > neonate ${neonateSBPLow}`);
-  // Default age_band pin: omitted -> neonate.
-  const def = computePedsVitals({});
-  assert.equal(def.band, "neonate");
-  // Bounds pin: unknown band -> error.
-  const bad = computePedsVitals({ age_band: "toddler_extreme" });
-  assert.ok(bad.error, `expected error for unknown band, got ${JSON.stringify(bad)}`);
 });
 
 test("monotonicity: computeCodonTable amino_acid_sequence length is monotone non-decreasing in input rna_sequence length (in-frame triplet count); DNA -> RNA T→U pin; codon -> amino-acid map identity (AUG -> Met / UAA UAG UGA -> Stop / GGG -> Gly); invalid alphabet -> error", () => {
