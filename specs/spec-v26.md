@@ -1,5 +1,17 @@
 # roughlogic.com Specification v26 — Trade-Floor Deepening IX: Electrician, Plumber, and Pipefitter (9 New Tiles, No New Group)
 
+> **As-landed note (2026-06-09):** landed as drafted -- all **9 net-new tiles**
+> across Groups **A**, **B**, and **G**, taking the catalog **531 -> 540**;
+> package stamped **0.27.0**. Unlike the v27 draft, no concept-overlap
+> reconciliation was needed: every proposed tile was genuinely net-new. Two of
+> the tiles were later relocated by cap-relief module splits (group letters,
+> ids, citations, worked examples, and behavior all byte-for-byte unchanged):
+> the Group A pair (`motor-feeder-multiple`, `transformer-conductor-protection`)
+> moved to `calc-feeder.js` (spec-v72), and the four Group G fabrication tiles
+> (`pipe-fitting-takeout`, `pipe-miter-cut`, `pipe-template-wrap`,
+> `flange-bolt-torque`) moved to `calc-fab.js` (spec-v36). The original draft
+> header is preserved below for the record.
+>
 > **Implementation status: DRAFT 2026-06-09 (targets package 0.27.0).** v26 is
 > a catalog-growth spec in the lineage of v15/v16/v17/v20/v23/v24. It inherits
 > everything from spec.md through spec-v25.md and changes none of it.
