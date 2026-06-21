@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: resync the lone stale app.js size in README prose (~70 -> ~72 KB)
+
+Follow-up to the ungated-figure resync below. That pass corrected the architecture file-tree line (line 197: "~72 KB raw / ~23 KB gz") but left one prose mention in the Lighthouse-budget paragraph still reading "the SPA home view, which loads the ~70 KB `app.js`". Same drift class the README-count gate does not anchor (only tile / module / group / sitemap totals are gated; byte sizes drift silently). Reverified against live: `app.js` is 73,814 bytes = 72.1 KB raw, so both mentions now read ~72 KB.
+
+No code or catalog change. Verified green: full lint (incl. check-readme-counts, em-dash / n-gram guards), 5,563 unit tests, build (688 tile + 25 group shells, 715 sitemap URLs), data:verify, check:dist / shells / shell-mobile (715 routes, zero horizontal scroll at 320px), and the full Chromium + WebKit integration suite (1,494 e2e checks: per-tile a11y + render-no-nan + responsive-stress + perf + print + CSV).
+
 ### docs: resync 4 README current-state counts the prior ungated sweep missed (665 -> 688, 5,549 -> 5,563)
 
 Follow-up housekeeping to the resync below. That pass caught the byte-size and correctness-phase drift but left four current-state count figures stale at the pre-v104 catalog -- none of them anchored by the `check-readme-counts` gate (which only validates the catalog cheat-sheet table, the labeled tile/module/group/sitemap totals, and the Mermaid nodes, not free prose or the "Building and testing" command table). All four reverified against live `npm run build` / `npm run test:unit` output:
