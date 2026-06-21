@@ -441,7 +441,7 @@ Retired platform affordances: Recents and Big Buttons mode (v11), Project Bundle
 
 ## Discoverable surface (prerendered shells)
 
-The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 665 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
+The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 688 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
 
 ```mermaid
 flowchart LR
@@ -511,8 +511,8 @@ The site has no command-line interface of its own. The repository ships these np
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start a local development server. |
-| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 665 tile + 25 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,549 tests). |
+| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 688 tile + 25 group shells, regenerates `sitemap.xml`). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,563 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 26-gate lint chain (below). |
@@ -606,7 +606,7 @@ Three overflow sources can push a page wider than the viewport. Each has a struc
 | A wide multi-column table | the 5-column loan-amortization / MACRS schedule (~440 px intrinsic) | the table lives in a `<div class="tabular-tool">` that owns the horizontal scroll, so only the table scrolls and the page never does |
 | A rigid intrinsic-width element | an SVG phasor diagram, a wide form row | `max-width: 100%` on media; inputs are `width: 100%` flex blocks that shrink to fit |
 
-The table case is the subtle one. The CSS protects the *wrapper class*, not the table -- a `<table>` dropped into a bare `<div>` re-introduces the bug one tile at a time. A 2026-06-08 full-catalog audit (route to all live tile ids at 320 px, populate via the example button, assert no page-level scroll) caught exactly one such escapee, `macrs-depreciation`, whose schedule `<div>` had been built without the `.tabular-tool` class; adding the class fixed it. That one-off audit is now a **standing CI gate** -- the `responsive-stress.test.js` "every live tile view" case drives all **665** live tile views (input grid + populated example output) at the 320 px floor on every push, so a new tile that ships a bare-`<div>` table fails the build rather than escaping to production. Current run: **665 / 665 tiles clean**.
+The table case is the subtle one. The CSS protects the *wrapper class*, not the table -- a `<table>` dropped into a bare `<div>` re-introduces the bug one tile at a time. A 2026-06-08 full-catalog audit (route to all live tile ids at 320 px, populate via the example button, assert no page-level scroll) caught exactly one such escapee, `macrs-depreciation`, whose schedule `<div>` had been built without the `.tabular-tool` class; adding the class fixed it. That one-off audit is now a **standing CI gate** -- the `responsive-stress.test.js` "every live tile view" case drives all **688** live tile views (input grid + populated example output) at the 320 px floor on every push, so a new tile that ships a bare-`<div>` table fails the build rather than escaping to production. Current run: **688 / 688 tiles clean**.
 
 ```mermaid
 flowchart TB

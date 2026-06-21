@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: resync 4 README current-state counts the prior ungated sweep missed (665 -> 688, 5,549 -> 5,563)
+
+Follow-up housekeeping to the resync below. That pass caught the byte-size and correctness-phase drift but left four current-state count figures stale at the pre-v104 catalog -- none of them anchored by the `check-readme-counts` gate (which only validates the catalog cheat-sheet table, the labeled tile/module/group/sitemap totals, and the Mermaid nodes, not free prose or the "Building and testing" command table). All four reverified against live `npm run build` / `npm run test:unit` output:
+
+- "Discoverable surface" intro: "cited reference content of **665** tiles" -> **688**.
+- "Building and testing" command table: `npm run build` prerenders "**665** tile + 25 group shells" -> **688**; `test:unit` runs "(**5,549** tests)" -> **5,563**.
+- "Responsive design model": the `responsive-stress.test.js` gate "drives all **665** live tile views ... Current run: **665 / 665** tiles clean" -> **688 / 688**.
+
+No code or catalog change. Verified green: full lint (incl. check-readme-counts), 5,563 unit tests, build (688 tile + 25 group shells, 715 sitemap URLs), data:verify, check:dist / shells / shell-mobile (715 routes, zero horizontal scroll at 320px), and the Chromium + WebKit render-no-nan + responsive-stress sweep.
+
 ### docs: backfill CHANGELOG for spec-v106..v120 + resync 4 README ungated current-state figures
 
 Housekeeping after the v109..v120 catalog growth (688 tiles). Two parts, no code or catalog change:
