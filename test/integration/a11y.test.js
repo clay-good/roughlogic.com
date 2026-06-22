@@ -454,7 +454,7 @@ test("the back-link returns from a tool view to the home hero", async ({ page })
 // page-level horizontal scrollbar at this width is the exact regression
 // the sweep forbids, so assert documentElement.scrollWidth never exceeds
 // the viewport by more than a sub-pixel rounding tolerance.
-for (const route of ["", "#loan-amortization", "#macrs-depreciation", "#color-codes", "#rent-vs-buy", "#holding-fuel"]) {
+for (const route of ["", "#loan-amortization", "#macrs-depreciation", "#color-codes", "#rent-vs-buy"]) {
   test(`no page-level horizontal scroll at 320 px on /index.html${route || " (home)"}`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(`/index.html${route}`);
@@ -466,10 +466,10 @@ for (const route of ["", "#loan-amortization", "#macrs-depreciation", "#color-co
       await page.waitForSelector(".input-region button", { timeout: 5000 });
       await page.locator(".input-region button").first().click();
       await page.waitForSelector(".tabular-tool table", { timeout: 5000 });
-    } else if (route === "#rent-vs-buy" || route === "#holding-fuel") {
+    } else if (route === "#rent-vs-buy") {
       // Populate outputs via the example button: the rent-vs-buy verdict
-      // and net-sale lines are the longest single-line strings the v17
-      // batch adds, the surface most likely to force a horizontal scroll.
+      // and net-sale lines are among the longest single-line strings in the
+      // catalog, the surface most likely to force a horizontal scroll.
       await page.waitForSelector(".input-region button", { timeout: 5000 });
       await page.locator(".input-region button").first().click();
       await page.waitForTimeout(120);

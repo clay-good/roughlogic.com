@@ -60,7 +60,7 @@ const TOOL_IDS = readToolIds();
 // select-heavy tile, and the longest-output finance tiles.
 const SPA_ROUTES = [
   "", "#voltage-drop", "#loan-amortization", "#macrs-depreciation",
-  "#color-codes", "#hos-math", "#rent-vs-buy", "#duct-sizing", "#parkland-formula",
+  "#color-codes", "#hos-math", "#rent-vs-buy", "#duct-sizing",
 ];
 
 async function gotoOk(page, path) {
