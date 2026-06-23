@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(build): split the motor bench into calc-motor.js -- calc-electrical.js was 0.1% over its gzip cap after v121..v128; 49 -> 50 modules, 2026-06-23
+
+The spec-v121..v128 batch landed eight tiles in `calc-electrical.js` and pushed its built gzip size to **60031 B against the 60000 B cap (100.1%, over)** -- `check-module-sizes.mjs` FAILs on that, so push CI would have gone red. (The v121..v128 entry's "no module cap moved, ~53.4 KB gz / 89%" line was measured before the batch's own additions; the as-built module was over.)
+
+Fix follows the module's own established remediation -- the same per-bench split that produced `calc-feeder.js` (v72), `calc-powerquality.js` (v79), `calc-solar.js` (v88), and `calc-elecdesign.js` (v101). The cohesive four-tile motor bench -- `motor-synchronous-speed-slip`, `motor-shaft-torque`, `motor-operating-cost`, `multi-motor-feeder` -- moves verbatim out of `calc-electrical.js` into a new `calc-motor.js` (`MOTOR_RENDERERS`). All four **keep `group: "A"`** (a tile's group letter is independent of its module, the v79/v88/v101 precedent); their ids, citations, worked examples, dimensional annotations, and rendered DOM are byte-for-byte unchanged, so no catalog, sitemap, or visual output changes (608 tiles, 631 sitemap URLs hold). The non-exported `_finiteGuard` and the `multi-motor-feeder`-only `_OCPD_STANDARD_SIZES` / `_standardOcpdAtOrBelow` helpers move with the bench. After the split `calc-electrical.js` builds to **~56.9 KB gz (94.8%)** and `calc-motor.js` to **~4.7 KB gz** (cap 6000, lazy-loaded, not in the home-view payload).
+
+Every touchpoint repointed and gated: the `app.js` declare lists (new `calc-motor.js` MOTOR_RENDERERS block), `scripts/build.mjs` `FILES`, `sw.js` precache, `scripts/check-module-sizes.mjs` (new cap + dated note), `test/fixtures/compute-map.js`, `test/unit/bounds-fuzzer.test.js` (the four motor imports + their `calc-motor` test labels), the README module count (49 -> 50), and the regenerated v14 corpus (the four functions re-attributed to `calc-motor.js`).
+
+Verified green: full lint (every gate; wiring lint reporting 50 renderer modules / 608 tile-id entries; README-count agreeing at 608 tiles / 50 modules / 631 sitemap URLs), 4,900 unit tests, data:verify (117 hashes), build (608 tile + 21 group shells, 631 sitemap URLs), check:dist / check:shells / check:shell-mobile (727 checks / 631 shells, zero horizontal scroll at 320px portrait + landscape + 200% zoom).
+
 ### feat(electrical): land spec-v121..v128 -- 8 Group A tiles (motors, feeders, fault, raceway, grounding, three-phase); 600 -> 608 tiles, 0.73.0, 2026-06-23
 
 The electrician second-pass batch: eight evidence-driven, in-scope tiles under the spec-v106 trades-only charter, all added to Group A / `calc-electrical.js` with no new module, group, or dependency. Catalog **600 -> 608**, package **0.72.0 -> 0.73.0** (a minor).

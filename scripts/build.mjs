@@ -32,6 +32,7 @@ const FILES = [
   "ui-validity.js",
   "integrity.js",
   "calc-electrical.js",
+  "calc-motor.js",
   "calc-solar.js",
   "calc-powerquality.js",
   "calc-feeder.js",

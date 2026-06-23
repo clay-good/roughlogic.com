@@ -5744,10 +5744,6 @@ import {
   computeAmbientAmpacityAdjust,
   computeServiceLoadOptional,
   computeLuxFootcandle,
-  computeMotorSyncSlip,
-  computeMotorShaftTorque,
-  computeMotorOperatingCost,
-  computeMultiMotorFeeder,
   computeConductorShortCircuitWithstand,
   computeConduitThermalExpansion,
   computeEgcUpsizeProportional,
@@ -5778,6 +5774,14 @@ import {
   renderServiceLoadOptional,
   renderLuxFootcandle,
 } from "../../calc-electrical.js";
+// spec-v129 cap-relief split: the spec-v121..v124 motor bench
+// moved to calc-motor.js (calc-electrical.js was over its gzip cap at 100.1%).
+import {
+  computeMotorSyncSlip,
+  computeMotorShaftTorque,
+  computeMotorOperatingCost,
+  computeMultiMotorFeeder,
+} from "../../calc-motor.js";
 // spec-v88 cap-relief split: the solar-PV / battery-storage / EV-charging bench
 // moved to calc-solar.js (calc-electrical.js was the tightest renderer module at 94.7%).
 import {
@@ -10495,7 +10499,7 @@ test("bounds: spec-v119 equilibrium moisture content of wood (USDA FPL sorption)
 
 // --- spec-v121..v128 electrical motors / feeders / fault / raceway / grounding / three-phase ---
 
-test("bounds: calc-electrical computeMotorSyncSlip pins Ns = 120 f / P, slip, and rotor frequency + rejects bad poles/freq", () => {
+test("bounds: calc-motor computeMotorSyncSlip pins Ns = 120 f / P, slip, and rotor frequency + rejects bad poles/freq", () => {
   const r = computeMotorSyncSlip({ line_freq_hz: 60, poles: 4, rated_rpm: 1750 });
   assert.ok(Math.abs(r.sync_rpm - 1800) < 1e-9);
   assert.ok(Math.abs(r.slip_pct - 2.77778) < 1e-3);
@@ -10511,7 +10515,7 @@ test("bounds: calc-electrical computeMotorSyncSlip pins Ns = 120 f / P, slip, an
   assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: 60, poles: 4, rated_rpm: -10 }));
 });
 
-test("bounds: calc-electrical computeMotorShaftTorque solves both directions + rejects both/neither and bad rpm", () => {
+test("bounds: calc-motor computeMotorShaftTorque solves both directions + rejects both/neither and bad rpm", () => {
   const r = computeMotorShaftTorque({ rpm: 1750, hp: 10 });
   assert.ok(Math.abs(r.torque_lbft - 30.011) < 0.05);
   const inv = computeMotorShaftTorque({ rpm: 3500, torque_lbft: 30 });
@@ -10523,7 +10527,7 @@ test("bounds: calc-electrical computeMotorShaftTorque solves both directions + r
   assert.ok("error" in computeMotorShaftTorque({ rpm: Infinity, hp: 10 }));
 });
 
-test("bounds: calc-electrical computeMotorOperatingCost pins input kW, annual kWh, cost + the efficiency band", () => {
+test("bounds: calc-motor computeMotorOperatingCost pins input kW, annual kWh, cost + the efficiency band", () => {
   const r = computeMotorOperatingCost({ hp: 25, efficiency_pct: 93, load_factor_pct: 100, hours_per_year: 4000, rate_usd_per_kwh: 0.12 });
   assert.ok(Math.abs(r.input_kw - 20.054) < 0.05);
   assert.ok(Math.abs(r.annual_kwh - 80215) < 50);
@@ -10539,7 +10543,7 @@ test("bounds: calc-electrical computeMotorOperatingCost pins input kW, annual kW
   assert.ok("error" in computeMotorOperatingCost({ hp: Infinity, hours_per_year: 4000 }));
 });
 
-test("bounds: calc-electrical computeMultiMotorFeeder pins 430.24 ampacity, 430.62 ceiling, and round-down sizing", () => {
+test("bounds: calc-motor computeMultiMotorFeeder pins 430.24 ampacity, 430.62 ceiling, and round-down sizing", () => {
   const r = computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 });
   assert.ok(Math.abs(r.min_feeder_ampacity_a - 61) < 1e-9);
   assert.ok(Math.abs(r.max_feeder_ocpd_a - 96) < 1e-9);

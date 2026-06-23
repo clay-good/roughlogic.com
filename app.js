@@ -40,10 +40,20 @@ const TOOL_MODULES = (() => {
     "lux-to-footcandle",
     // spec-v109 service grounding, bonding, and inverse voltage-drop sizing.
     "grounding-electrode-conductor", "bonding-jumper", "min-conductor-for-vd",
-    // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
-    "motor-synchronous-speed-slip", "motor-shaft-torque", "motor-operating-cost",
-    "multi-motor-feeder", "conductor-short-circuit-withstand", "conduit-thermal-expansion",
+    // spec-v121..v128 fault / raceway / grounding / three-phase
+    "conductor-short-circuit-withstand", "conduit-thermal-expansion",
     "egc-upsize-proportional", "delta-wye-line-phase",
+  ]);
+  // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
+  // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,
+  // multi-motor-feeder) relocated out of calc-electrical.js (which the
+  // v121..v128 batch had pushed to 100.1% of cap -- the tightest renderer
+  // module) into calc-motor.js. All four keep group "A" (group letter
+  // independent of module, the v79/v88/v101 precedent); ids, citations,
+  // examples, and behavior unchanged.
+  declare("./calc-motor.js", "MOTOR_RENDERERS", [
+    "motor-synchronous-speed-slip", "motor-shaft-torque", "motor-operating-cost",
+    "multi-motor-feeder",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which
