@@ -4,6 +4,42 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(ci): repair the data-refresh GITHUB_OUTPUT heredoc; add a regression guard; 4,889 -> 4,892 tests, 2026-06-23
+
+The weekly Data Refresh workflow (and its monthly twin) died at the "Generate data change analysis" step with "Invalid value. Matching delimiter not found 'EOF'" on the 2026-06-22 scheduled run. Root cause: `scripts/analyze-data-changes.mjs` wrote its markdown body with `out.join("\n")` and no trailing newline. The workflows pipe that body into a `body<<EOF ... EOF` heredoc for `$GITHUB_OUTPUT`, so without the trailing newline the last content line is glued onto the delimiter (`...rate.EOF`), Actions never finds a standalone `EOF` line, and the step fails before `create-pull-request` can read `steps.analysis.outputs.body`. The push CI does not run the data pipeline, so it stayed green; only the cron broke.
+
+Fix: terminate the body with a newline (one line at the source), which repairs both workflows and makes the output a well-formed text file. Added a regression guard in `test/unit/analyze-data-changes.test.js` asserting the body is non-empty, ends with a newline, and contains no standalone `EOF` line (the two ways the heredoc can break), and resynced the README's ungated unit-test count 4,889 -> 4,892 for the three new tests (headline + commands table).
+
+Verified green: full 26-gate lint, 4,892 unit tests, data:verify, build, check:dist / check:shells / check:shell-mobile, render-no-nan (600/600 tiles), and responsive-stress (66/66, Chromium + WebKit, full 600-tile 320px sweep).
+
+### docs: resync 2 ungated README figures to the post-v107 live build, 2026-06-22
+
+Verification pass (catalog unchanged at 600 tiles) found two ungated current-state figures, both outside the check-readme-counts label-anchored set, had drifted. The home-view payload (measured by `check-home-payload.mjs`) is 25,856 B JS / 39,047 B total = 38.1% of the 100 KB budget; resynced "~26.4 KB gz; 39.3%" -> "~25.3 KB gz; 38.1%". The mean gzipped group prerendered-shell size grew to 4.4 KB over all 21 group shells as their `ItemList` absorbed added tiles; resynced "~3.9 KB gz each" -> "~4.4 KB gz each" (tile-shell "~1.9 KB" still accurate, live mean 1.95 KB over 600 shells).
+
+Sweeps green at HEAD: lint (26 gates), 4,889 unit tests, data:verify (117 hashes), responsive-stress 66/66 on Chromium + WebKit, check:shell-mobile (717 checks / 623 shells), render-no-nan 600/600. No horizontal scroll on any view at 320 px.
+
+### docs(mobile): re-anchor the responsive running record to the post-v107 600-tile catalog, 2026-06-22
+
+The §9-§11 figures in `docs/mobile-responsive.md` (437/555 tiles, 581 shells, 24 group hubs) were the running record as of the 2026-06-08/09 audits. Added a dated §12 re-verification reflecting the current post-v107 size: 600 tiles / 21 groups, 600 tile + 21 group shells (623 sitemap URLs). The 2026-06-22 re-run confirms the no-horizontal-scroll guarantee holds at the new size with no layout fix: responsive-stress 66/66 on Chromium and webkit-responsive (the full-catalog 320px case swept all 600 live tile views clean on both engines), check:shell-mobile 717 checks across 623 shells, and render-no-nan with no NaN/Infinity/undefined leak. Historical entries left intact; the §11 harnesses read `TOOLS`/`dist` at run time, so they auto-scaled across the intervening landings with no edits.
+
+### fix(test): repair CI red since v107 -- drop 2 dead cut-tile test routes, 2026-06-21
+
+The spec-v107 cut (405f084) retired groups S/U/V/W but missed two hardcoded tile-id routes in the integration tests, leaving CI red on main for every commit since. `a11y.test.js` routed `#holding-fuel` (W.5, Aviation, cut); the dead route renders the home view, so `waitForSelector('.input-region button')` timed out, a deterministic failure (3 CI retries, all timeout) that failed the integration job's full-suite step (1317 passed, 1 failed). `responsive-stress.test.js` listed `#parkland-formula` (V, EMS, cut) in `SPA_ROUTES`; a dead route renders the scroll-free home view, so the 200%-zoom assertion passed silently, a latent false-pass giving false coverage confidence. Dropped both routes (their surviving siblings rent-vs-buy and duct-sizing already cover the same long-output / select-heavy surfaces) and resynced the two current-tense gate descriptions in README.md and docs/mobile-responsive.md that still named `#holding-fuel`. Historical changelog/spec references left intact.
+
+Verified: a11y 320px h-scroll block 5/5, responsive 200%-zoom 16/16 (both engines), full render-no-nan + responsive-stress catalog sweep 668/668, lint + 4,889 unit tests + data:verify all green.
+
+### fix(docs): resync 2 ungated v107-cut artifacts -- index.html group-count comment 24 -> 21; regenerate the stale home screenshot, 2026-06-21
+
+The spec-v107 cut (25 -> 21 groups) updated the gated surfaces but left two ungated artifacts stale. `index.html`'s browse-by-trade HTML comment still said "24 trade groups" (already off-by-one pre-cut; the live list has 21 `<li>` links). `docs/img/home-mobile.png` was captured 2026-06-09 showing 25 group hubs, while the live home view and the image's own alt text say 21; regenerated at the established 390x900 @2x (780x1800) light-theme framing. No code/output change.
+
+Verified green: lint, 4,889 unit tests, data:verify, build (600 tile + 21 group shells), check:dist/shells/shell-mobile, render-no-nan (600/600), and responsive-stress (34/34, incl. the all-600-tile 320px no-h-scroll sweep).
+
+### docs: resync post-v107 ungated drift -- shard hashes 123 -> 117, app.js ~72 -> ~70 KB; drop a dead calc-legal test comment, 2026-06-21
+
+Hand-resync of ungated current-state figures the v107 cut moved but no gate anchors. `expected-hashes.json` now pins 117 hashes (data:verify reports "117 entries"; the v107 data-layer cut dropped 6 orphaned shards, 123 -> 117); fixed all three README references (the data-integrity diagram's two boxes and the prose). `app.js` is 68.7 KB raw / 22 KB gz post-cut, but the Lighthouse-budget prose still said ~72 KB; resynced to ~70 KB to match the repository-map line. `v5-edge-cases.test.js`'s header still named calc-legal, a module the cut deleted (the file now imports only calc-accounting and calc-lab); trimmed the stale name (no test behavior change).
+
+Verified green before commit: lint (exit 0), 4,889 unit tests, data:verify (117 entries), responsive-stress 34/34 (no horizontal scroll on any SPA view down to 320px), render-no-nan 600/600 (zero NaN/Infinity/undefined leaks). All gate-anchored catalog counts (600 tiles / 49 modules / 623 sitemap URLs) and discipline figures (845 dimensional, 842 corpus+fuzzer, 162 sources) confirmed already current.
+
 ### fix(data): complete the spec-v107 legal cut -- remove 6 orphaned shards, repair the broken build-data import, drop dead notice code; 4,895 -> 4,889 tests, 2026-06-21
 
 Follow-up that finishes what the spec-v107 cut left half-done. Retiring Group S deleted `calc-legal.js` but did **not** update the data pipeline or the runtime that referenced it, leaving three latent defects:
