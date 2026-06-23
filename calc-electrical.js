@@ -4084,3 +4084,376 @@ function renderMinConductorForVd(inputRegion, outputRegion, citationEl) {
   for (const el of [phase.select, mat.select, cur.input, len.input, volt.input, target.input]) el.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["min-conductor-for-vd"] = renderMinConductorForVd;
+
+// --- spec-v121..v128 (2026-06-23): motors / feeders / fault / raceway /
+// grounding / three-phase fundamentals. Eight Group "A" tiles. Constants
+// (120, 5252, 0.746, root-3, the Onderdonk K/B pairs, the PVC coefficient)
+// are first-principles unit bridges documented in citations.js; only the
+// PVC coefficient and the 1/4-inch trigger (v126) are exposed as editable
+// fields per their spec. ---
+
+// dims: in { line_freq_hz: T^-1, poles: dimensionless, rated_rpm: T^-1 } out: { sync_rpm: T^-1, slip: dimensionless, slip_pct: dimensionless, rotor_freq_hz: T^-1 }
+export function computeMotorSyncSlip({ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(line_freq_hz > 0)) return { error: "Line frequency must be positive (Hz)." };
+  if (!(poles > 0)) return { error: "Pole count must be a positive even integer." };
+  if (!Number.isInteger(poles) || poles % 2 !== 0) return { error: "Pole count must be an even integer (2, 4, 6, 8, ...)." };
+  if (!(rated_rpm >= 0)) return { error: "Rated speed cannot be negative (rpm)." };
+  const sync_rpm = (120 * line_freq_hz) / poles; // poles > 0 forces this positive
+  const slip = (sync_rpm - rated_rpm) / sync_rpm;
+  const slip_pct = slip * 100;
+  const rotor_freq_hz = slip * line_freq_hz;
+  return {
+    sync_rpm, slip, slip_pct, rotor_freq_hz,
+    note: "Synchronous speed Ns = 120 x f / P (the 120 carries the 60 s/min x 2 poles-per-pole-pair bridge). Slip = (Ns - nameplate rpm) / Ns; the nameplate full-load speed governs. A speed near synchronous indicates a lightly loaded machine; rising slip indicates loading or a rotor fault.",
+  };
+}
+export const motorSyncSlipExample = { inputs: { line_freq_hz: 60, poles: 4, rated_rpm: 1750 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderMotorSyncSlip(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles AC-machine relation Ns = 120 x f / P and slip = (Ns - rpm) / Ns; rotor (slip) frequency = slip x f. The motor nameplate and the manufacturer govern the rated full-load speed.";
+  const freq = makeNumber("Line frequency (Hz)", "mss-freq", { step: "any", min: "0", value: "60" });
+  freq.input.value = "60";
+  const poles = makeNumber("Poles (even integer)", "mss-poles", { step: "2", min: "2", value: "4" });
+  poles.input.value = "4";
+  const rpm = makeNumber("Nameplate full-load speed (rpm)", "mss-rpm", { step: "any", min: "0" });
+  for (const f of [freq, poles, rpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { freq.input.value = "60"; poles.input.value = "4"; rpm.input.value = "1750"; update(); });
+  const oSync = makeOutputLine(outputRegion, "Synchronous speed", "mss-out-sync");
+  const oSlip = makeOutputLine(outputRegion, "Slip", "mss-out-slip");
+  const oRotor = makeOutputLine(outputRegion, "Rotor (slip) frequency", "mss-out-rotor");
+  const oNote = makeOutputLine(outputRegion, "Note", "mss-out-note");
+  const update = debounce(() => {
+    const r = computeMotorSyncSlip({ line_freq_hz: Number(freq.input.value) || 0, poles: Number(poles.input.value) || 0, rated_rpm: Number(rpm.input.value) || 0 });
+    if (r.error) { oSync.textContent = r.error; oSlip.textContent = "-"; oRotor.textContent = "-"; oNote.textContent = "-"; return; }
+    oSync.textContent = fmt(r.sync_rpm, 0) + " rpm";
+    oSlip.textContent = fmt(r.slip_pct, 2) + " % (slip " + fmt(r.slip, 4) + ")";
+    oRotor.textContent = fmt(r.rotor_freq_hz, 2) + " Hz";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [freq.input, poles.input, rpm.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["motor-synchronous-speed-slip"] = renderMotorSyncSlip;
+
+// dims: in { rpm: T^-1, hp: M L^2 T^-3, torque_lbft: M L^2 T^-2 } out: { hp: M L^2 T^-3, torque_lbft: M L^2 T^-2, rpm: T^-1 }
+export function computeMotorShaftTorque({ rpm = 0, hp = null, torque_lbft = null } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const num = (v) => (v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+  const HP = num(hp), TQ = num(torque_lbft);
+  if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
+  if ((HP === null) === (TQ === null)) return { error: "Supply exactly one of horsepower or torque; the tile solves for the other." };
+  let out_hp, out_torque;
+  if (HP !== null) {
+    if (!(HP > 0)) return { error: "Horsepower must be positive." };
+    out_hp = HP; out_torque = (5252 * HP) / rpm;
+  } else {
+    if (!(TQ > 0)) return { error: "Torque must be positive (lb-ft)." };
+    out_torque = TQ; out_hp = (TQ * rpm) / 5252;
+  }
+  return {
+    hp: out_hp, torque_lbft: out_torque, rpm,
+    note: "T = 5252 x HP / RPM (the 5252 = 33,000 ft-lb/min per HP divided by 2 pi, the rev/min-to-rad/s bridge); equivalently HP = T x RPM / 5252. The nameplate and the driven load govern the service-factor margin.",
+  };
+}
+export const motorShaftTorqueExample = { inputs: { rpm: 1750, hp: 10 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderMotorShaftTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles rotational-power identity T = 5252 x HP / RPM (5252 = 33,000 / 2 pi); supply HP to solve torque or torque to solve HP. The motor nameplate and the driven-load data govern the design torque.";
+  const rpm = makeNumber("Shaft speed (rpm)", "mst-rpm", { step: "any", min: "0" });
+  const hp = makeNumber("Horsepower (blank to solve from torque)", "mst-hp", { step: "any", min: "0" });
+  const torque = makeNumber("Torque (lb-ft; blank to solve from HP)", "mst-torque", { step: "any", min: "0" });
+  for (const f of [rpm, hp, torque]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rpm.input.value = "1750"; hp.input.value = "10"; torque.input.value = ""; update(); });
+  const oTorque = makeOutputLine(outputRegion, "Shaft torque", "mst-out-torque");
+  const oHp = makeOutputLine(outputRegion, "Horsepower", "mst-out-hp");
+  const oNote = makeOutputLine(outputRegion, "Note", "mst-out-note");
+  const readNum = (input) => (input.value === "" ? null : (Number.isFinite(Number(input.value)) ? Number(input.value) : null));
+  const update = debounce(() => {
+    const r = computeMotorShaftTorque({ rpm: Number(rpm.input.value) || 0, hp: readNum(hp.input), torque_lbft: readNum(torque.input) });
+    if (r.error) { oTorque.textContent = r.error; oHp.textContent = "-"; oNote.textContent = "-"; return; }
+    oTorque.textContent = fmt(r.torque_lbft, 2) + " lb-ft";
+    oHp.textContent = fmt(r.hp, 2) + " HP";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [rpm.input, hp.input, torque.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["motor-shaft-torque"] = renderMotorShaftTorque;
+
+// dims: in { hp: M L^2 T^-3, efficiency_pct: dimensionless, load_factor_pct: dimensionless, hours_per_year: T, rate_usd_per_kwh: dimensionless } out: { input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless }
+export function computeMotorOperatingCost({ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rate_usd_per_kwh = 0.12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hp > 0)) return { error: "Horsepower must be positive." };
+  if (!(hours_per_year > 0)) return { error: "Annual run hours must be positive." };
+  if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
+  if (!(load_factor_pct >= 0)) return { error: "Load factor cannot be negative (percent)." };
+  if (!(rate_usd_per_kwh >= 0)) return { error: "Energy rate cannot be negative ($/kWh)." };
+  const input_kw = (hp * 0.746 * (load_factor_pct / 100)) / (efficiency_pct / 100);
+  const annual_kwh = input_kw * hours_per_year;
+  const annual_cost = annual_kwh * rate_usd_per_kwh;
+  return {
+    input_kw, annual_kwh, annual_cost,
+    note: "input_kW = HP x 0.746 x load / efficiency; annual_kWh = input_kW x run-hours; cost = kWh x rate. This is the energy charge only -- the utility tariff (demand charges, time-of-use, power-factor penalties) governs the full bill.",
+  };
+}
+export const motorOperatingCostExample = { inputs: { hp: 25, efficiency_pct: 93, load_factor_pct: 100, hours_per_year: 4000, rate_usd_per_kwh: 0.12 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderMotorOperatingCost(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles input_kW = HP x 0.746 x load / efficiency, then annual kWh x rate. The 0.746 kW/HP is the mechanical-to-electrical conversion; the result is the energy-charge component only and excludes demand / time-of-use / power-factor penalties. The utility tariff governs the bill.";
+  const hp = makeNumber("Rated horsepower", "moc-hp", { step: "any", min: "0" });
+  const eff = makeNumber("Full-load efficiency (%)", "moc-eff", { step: "any", min: "0", max: "100", value: "93" });
+  eff.input.value = "93";
+  const load = makeNumber("Average load (% of rated)", "moc-load", { step: "any", min: "0", value: "100" });
+  load.input.value = "100";
+  const hours = makeNumber("Run hours per year", "moc-hours", { step: "any", min: "0" });
+  const rate = makeNumber("Energy rate ($/kWh)", "moc-rate", { step: "any", min: "0", value: "0.12" });
+  rate.input.value = "0.12";
+  for (const f of [hp, eff, load, hours, rate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hp.input.value = "25"; eff.input.value = "93"; load.input.value = "100"; hours.input.value = "4000"; rate.input.value = "0.12"; update(); });
+  const oKw = makeOutputLine(outputRegion, "Input power", "moc-out-kw");
+  const oKwh = makeOutputLine(outputRegion, "Annual energy", "moc-out-kwh");
+  const oCost = makeOutputLine(outputRegion, "Annual energy cost", "moc-out-cost");
+  const oNote = makeOutputLine(outputRegion, "Note", "moc-out-note");
+  const update = debounce(() => {
+    const r = computeMotorOperatingCost({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, hours_per_year: Number(hours.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0 });
+    if (r.error) { oKw.textContent = r.error; oKwh.textContent = "-"; oCost.textContent = "-"; oNote.textContent = "-"; return; }
+    oKw.textContent = fmt(r.input_kw, 2) + " kW";
+    oKwh.textContent = fmt(r.annual_kwh, 0) + " kWh/yr";
+    oCost.textContent = "$" + fmt(r.annual_cost, 0) + "/yr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [hp.input, eff.input, load.input, hours.input, rate.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["motor-operating-cost"] = renderMotorOperatingCost;
+
+const _OCPD_STANDARD_SIZES = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
+function _standardOcpdAtOrBelow(a) {
+  let chosen = null;
+  for (const s of _OCPD_STANDARD_SIZES) { if (s <= a) chosen = s; else break; }
+  return chosen; // null if below the smallest standard size
+}
+
+// dims: in { largest_flc_a: I, sum_other_flc_a: I, largest_branch_ocpd_a: I } out: { min_feeder_ampacity_a: I, max_feeder_ocpd_a: I, standard_feeder_ocpd_a: I }
+export function computeMultiMotorFeeder({ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(largest_flc_a >= 0)) return { error: "Largest motor full-load current cannot be negative (A)." };
+  if (!(sum_other_flc_a >= 0)) return { error: "Sum of other motor full-load currents cannot be negative (A)." };
+  if (!(largest_branch_ocpd_a >= 0)) return { error: "Largest branch overcurrent device rating cannot be negative (A)." };
+  const min_feeder_ampacity_a = 1.25 * largest_flc_a + sum_other_flc_a; // 430.24
+  const max_feeder_ocpd_a = largest_branch_ocpd_a + sum_other_flc_a; // 430.62 ceiling
+  const standard_feeder_ocpd_a = _standardOcpdAtOrBelow(max_feeder_ocpd_a); // round DOWN, cannot exceed
+  return {
+    min_feeder_ampacity_a, max_feeder_ocpd_a, standard_feeder_ocpd_a,
+    note: "430.24: feeder conductors >= 125% of the largest motor FLC + the sum of the other motor FLCs. 430.62: feeder OCPD <= the largest motor's branch OCPD + the sum of the other FLCs, then the NEXT STANDARD SIZE DOWN (it may not exceed the limit). Use the NEC FLC table value (430.248/430.250), not the nameplate amps. The AHJ governs.",
+  };
+}
+export const multiMotorFeederExample = { inputs: { largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderMultiMotorFeeder(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 430.24 (feeder conductor = 1.25 x largest FLC + sum of others) and 430.62 (feeder OCPD <= largest branch OCPD + sum of others, next standard size down). Full-load currents are the NEC table values (430.248/430.250), user-supplied; the tile bundles no FLC table. The AHJ governs. Free read-only at nfpa.org/freeaccess.";
+  const largest = makeNumber("Largest motor FLC (A, table value)", "mmf-largest", { step: "any", min: "0" });
+  const others = makeNumber("Sum of other motor FLCs (A)", "mmf-others", { step: "any", min: "0" });
+  const ocpd = makeNumber("Largest motor branch OCPD (A)", "mmf-ocpd", { step: "any", min: "0" });
+  for (const f of [largest, others, ocpd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { largest.input.value = "28"; others.input.value = "26"; ocpd.input.value = "70"; update(); });
+  const oAmp = makeOutputLine(outputRegion, "Min feeder ampacity (430.24)", "mmf-out-amp");
+  const oMax = makeOutputLine(outputRegion, "Max feeder OCPD (430.62)", "mmf-out-max");
+  const oStd = makeOutputLine(outputRegion, "Standard OCPD (round down)", "mmf-out-std");
+  const oNote = makeOutputLine(outputRegion, "Note", "mmf-out-note");
+  const update = debounce(() => {
+    const r = computeMultiMotorFeeder({ largest_flc_a: Number(largest.input.value) || 0, sum_other_flc_a: Number(others.input.value) || 0, largest_branch_ocpd_a: Number(ocpd.input.value) || 0 });
+    if (r.error) { oAmp.textContent = r.error; oMax.textContent = "-"; oStd.textContent = "-"; oNote.textContent = "-"; return; }
+    oAmp.textContent = fmt(r.min_feeder_ampacity_a, 1) + " A (size conductors at 75 C >= this)";
+    oMax.textContent = fmt(r.max_feeder_ocpd_a, 1) + " A ceiling";
+    oStd.textContent = r.standard_feeder_ocpd_a === null ? "(below the smallest standard size; review)" : r.standard_feeder_ocpd_a + " A standard";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [largest.input, others.input, ocpd.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["multi-motor-feeder"] = renderMultiMotorFeeder;
+
+const _ONDERDONK = { copper: { K: 0.0297, B: 234 }, aluminum: { K: 0.0125, B: 228 } };
+
+// dims: in { area_cmil: L^2, fault_current_a: I, clearing_time_s: T, material: dimensionless, t_initial_c: T, t_final_c: T } out: { withstand_a: I, min_cmil: L^2, adequate: dimensionless }
+export function computeConductorShortCircuitWithstand({ area_cmil = 0, fault_current_a = 0, clearing_time_s = 0, material = "copper", t_initial_c = 75, t_final_c = 250 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const m = _ONDERDONK[material];
+  if (!m) return { error: "Material must be copper or aluminum." };
+  if (!(area_cmil > 0)) return { error: "Conductor area must be positive (circular mils)." };
+  if (!(fault_current_a > 0)) return { error: "Fault current must be positive (A)." };
+  if (!(clearing_time_s > 0)) return { error: "Clearing time must be positive (s)." };
+  if (!(t_final_c > t_initial_c)) return { error: "Final temperature must exceed the initial temperature (deg C)." };
+  const C = m.K * Math.log10((t_final_c + m.B) / (t_initial_c + m.B)); // > 0 since t_final > t_initial
+  const withstand_a = area_cmil * Math.sqrt(C / clearing_time_s);
+  const min_cmil = fault_current_a * Math.sqrt(clearing_time_s / C);
+  const adequate = withstand_a >= fault_current_a;
+  return {
+    C, withstand_a, min_cmil, adequate,
+    note: "ICEA / Onderdonk adiabatic relation (I/A)^2 t = K log10((T2 + B)/(T1 + B)); copper K=0.0297 B=234, aluminum K=0.0125 B=228. withstand = area x sqrt(C / t); min size = fault x sqrt(t / C). A thermal-withstand SCREEN -- the protective-device clearing curve and an engineered study govern.",
+  };
+}
+export const conductorShortCircuitWithstandExample = { inputs: { area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, material: "copper", t_initial_c: 75, t_final_c: 250 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderConductorShortCircuitWithstand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ICEA P-32-382 / Onderdonk adiabatic short-circuit withstand (public-domain): (I/A)^2 t = K log10((T2+B)/(T1+B)); copper K=0.0297/B=234, aluminum K=0.0125/B=228. A thermal-withstand screen, not a substitute for the device time-current curve or an engineered study.";
+  const area = makeNumber("Conductor area (circular mils)", "csw-area", { step: "any", min: "0" });
+  const fault = makeNumber("Available fault current (A, symmetrical)", "csw-fault", { step: "any", min: "0" });
+  const time = makeNumber("Clearing time (s)", "csw-time", { step: "any", min: "0", value: "0.1" });
+  time.input.value = "0.1";
+  const mat = makeSelect("Material", "csw-mat", [{ value: "copper", label: "Copper (K=0.0297, B=234)" }, { value: "aluminum", label: "Aluminum (K=0.0125, B=228)" }]);
+  const ti = makeNumber("Initial temperature (deg C)", "csw-ti", { step: "any", value: "75" });
+  ti.input.value = "75";
+  const tf = makeNumber("Insulation short-circuit limit (deg C)", "csw-tf", { step: "any", value: "250" });
+  tf.input.value = "250";
+  for (const f of [area, fault, time, mat, ti, tf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "26240"; fault.input.value = "10000"; time.input.value = "0.1"; mat.select.value = "copper"; ti.input.value = "75"; tf.input.value = "250"; update(); });
+  const oWith = makeOutputLine(outputRegion, "Withstand of this size", "csw-out-with");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "csw-out-verdict");
+  const oMin = makeOutputLine(outputRegion, "Minimum size for the fault", "csw-out-min");
+  const oNote = makeOutputLine(outputRegion, "Note", "csw-out-note");
+  const update = debounce(() => {
+    const r = computeConductorShortCircuitWithstand({ area_cmil: Number(area.input.value) || 0, fault_current_a: Number(fault.input.value) || 0, clearing_time_s: Number(time.input.value) || 0, material: mat.select.value, t_initial_c: Number(ti.input.value) || 0, t_final_c: Number(tf.input.value) || 0 });
+    if (r.error) { oWith.textContent = r.error; oVerdict.textContent = "-"; oMin.textContent = "-"; oNote.textContent = "-"; return; }
+    oWith.textContent = fmt(r.withstand_a, 0) + " A";
+    oVerdict.textContent = r.adequate ? "Adequate (withstand >= fault)" : "UNDERSIZED -- size up to the minimum below";
+    oMin.textContent = fmt(r.min_cmil, 0) + " circular mils minimum";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, fault.input, time.input, mat.select, ti.input, tf.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["conductor-short-circuit-withstand"] = renderConductorShortCircuitWithstand;
+
+// dims: in { run_length_ft: L, temp_change_f: T, coeff_in_per_in_f: dimensionless, trigger_in: L } out: { delta_l_in: L, fitting_required: dimensionless }
+export function computeConduitThermalExpansion({ run_length_ft = 0, temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigger_in = 0.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(run_length_ft > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(coeff_in_per_in_f > 0)) return { error: "Coefficient of expansion must be positive (in/in/deg-F)." };
+  if (!(trigger_in > 0)) return { error: "Trigger length must be positive (in)." };
+  // A zero or negative temperature swing yields zero longitudinal expansion to absorb.
+  const delta_l_in = Math.max(0, coeff_in_per_in_f * (run_length_ft * 12) * temp_change_f);
+  const fitting_required = delta_l_in >= trigger_in;
+  return {
+    delta_l_in, fitting_required,
+    note: "delta_L = coefficient x (run-length x 12 in/ft) x temperature swing; the bundled PVC coefficient 3.38e-5 in/in/deg-F is the public physical property underlying NEC Table 352.44. An expansion fitting is required once movement reaches the 1/4-inch trigger, sized for that travel. The AHJ and the conduit manufacturer govern.",
+  };
+}
+export const conduitThermalExpansionExample = { inputs: { run_length_ft: 100, temp_change_f: 50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderConduitThermalExpansion(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 352.44 (expansion fittings for rigid PVC conduit). delta_L = coefficient x length x temperature swing; the bundled 3.38e-5 in/in/deg-F PVC coefficient underlies NEC Table 352.44. A fitting is required at the 1/4-inch trigger. The AHJ and the manufacturer govern. Free read-only at nfpa.org/freeaccess.";
+  const len = makeNumber("Straight run between anchors (ft)", "cte-len", { step: "any", min: "0" });
+  const dt = makeNumber("Temperature swing (deg F)", "cte-dt", { step: "any" });
+  const coeff = makeNumber("PVC coefficient (in/in/deg-F)", "cte-coeff", { step: "any", min: "0", value: "0.0000338" });
+  coeff.input.value = "0.0000338";
+  const trig = makeNumber("Fitting trigger (in)", "cte-trig", { step: "any", min: "0", value: "0.25" });
+  trig.input.value = "0.25";
+  for (const f of [len, dt, coeff, trig]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { len.input.value = "100"; dt.input.value = "50"; coeff.input.value = "0.0000338"; trig.input.value = "0.25"; update(); });
+  const oDelta = makeOutputLine(outputRegion, "Length change", "cte-out-delta");
+  const oVerdict = makeOutputLine(outputRegion, "Expansion fitting", "cte-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Note", "cte-out-note");
+  const update = debounce(() => {
+    const r = computeConduitThermalExpansion({ run_length_ft: Number(len.input.value) || 0, temp_change_f: Number(dt.input.value) || 0, coeff_in_per_in_f: Number(coeff.input.value) || 0, trigger_in: Number(trig.input.value) || 0 });
+    if (r.error) { oDelta.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = "-"; return; }
+    oDelta.textContent = fmt(r.delta_l_in, 3) + " in";
+    oVerdict.textContent = r.fitting_required ? "Required (sized for ~" + fmt(r.delta_l_in, 2) + " in of travel)" : "Not required (below the trigger)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [len.input, dt.input, coeff.input, trig.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["conduit-thermal-expansion"] = renderConduitThermalExpansion;
+
+// dims: in { base_egc_cmil: L^2, base_phase_cmil: L^2, installed_phase_cmil: L^2 } out: { ratio: dimensionless, upsized_egc_cmil: L^2 }
+export function computeEgcUpsizeProportional({ base_egc_cmil = 0, base_phase_cmil = 0, installed_phase_cmil = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(base_egc_cmil > 0)) return { error: "Base EGC area must be positive (circular mils)." };
+  if (!(base_phase_cmil > 0)) return { error: "Base phase-conductor area must be positive (circular mils)." };
+  if (!(installed_phase_cmil > 0)) return { error: "Installed phase-conductor area must be positive (circular mils)." };
+  const ratio = Math.max(1, installed_phase_cmil / base_phase_cmil); // never reduce the EGC below its table size
+  const upsized_egc_cmil = base_egc_cmil * ratio;
+  return {
+    ratio, upsized_egc_cmil,
+    note: "NEC 250.122(B): when ungrounded conductors are increased in size, the EGC increases in the same circular-mil proportion. ratio = max(1, installed phase / base phase); upsized EGC = base EGC x ratio, then select the next standard AWG/kcmil at or above this. The base EGC (250.122 table) and base phase area are user-supplied; the EGC need not exceed the ungrounded conductors. The AHJ governs.",
+  };
+}
+export const egcUpsizeProportionalExample = { inputs: { base_egc_cmil: 26240, base_phase_cmil: 167800, installed_phase_cmil: 250000 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderEgcUpsizeProportional(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 250.122(B) (increase in size of equipment grounding conductors). ratio = max(1, installed phase cmil / base phase cmil); upsized EGC = base EGC x ratio. Base EGC (250.122 table) and base phase area are user-supplied; the EGC need not exceed the ungrounded conductors. The AHJ governs. Free read-only at nfpa.org/freeaccess.";
+  const egc = makeNumber("Base EGC area (cmil, per 250.122)", "egu-egc", { step: "any", min: "0" });
+  const basep = makeNumber("Base (minimum) phase area (cmil)", "egu-base", { step: "any", min: "0" });
+  const inst = makeNumber("Installed phase area (cmil)", "egu-inst", { step: "any", min: "0" });
+  for (const f of [egc, basep, inst]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { egc.input.value = "26240"; basep.input.value = "167800"; inst.input.value = "250000"; update(); });
+  const oRatio = makeOutputLine(outputRegion, "Upsize ratio", "egu-out-ratio");
+  const oEgc = makeOutputLine(outputRegion, "Upsized EGC", "egu-out-egc");
+  const oNote = makeOutputLine(outputRegion, "Note", "egu-out-note");
+  const update = debounce(() => {
+    const r = computeEgcUpsizeProportional({ base_egc_cmil: Number(egc.input.value) || 0, base_phase_cmil: Number(basep.input.value) || 0, installed_phase_cmil: Number(inst.input.value) || 0 });
+    if (r.error) { oRatio.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = "-"; return; }
+    oRatio.textContent = fmt(r.ratio, 3) + (r.ratio <= 1 ? " (no upsize -- EGC stays at table size)" : "");
+    oEgc.textContent = fmt(r.upsized_egc_cmil, 0) + " cmil (select the next standard size up)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [egc.input, basep.input, inst.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["egc-upsize-proportional"] = renderEgcUpsizeProportional;
+
+// dims: in { configuration: dimensionless, line_voltage_v: M L^2 T^-3 I^-1, line_current_a: I, power_factor: dimensionless } out: { phase_voltage_v: M L^2 T^-3 I^-1, phase_current_a: I, power_va: M L^2 T^-3, power_w: M L^2 T^-3 }
+export function computeDeltaWyeLinePhase({ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (configuration !== "wye" && configuration !== "delta") return { error: "Configuration must be wye or delta." };
+  if (!(line_voltage_v >= 0)) return { error: "Line voltage cannot be negative (V)." };
+  if (!(line_current_a >= 0)) return { error: "Line current cannot be negative (A)." };
+  if (!(power_factor >= 0 && power_factor <= 1)) return { error: "Power factor must be in [0, 1]." };
+  const root3 = Math.sqrt(3);
+  let phase_voltage_v, phase_current_a;
+  if (configuration === "wye") {
+    phase_voltage_v = line_voltage_v / root3;
+    phase_current_a = line_current_a;
+  } else {
+    phase_voltage_v = line_voltage_v;
+    phase_current_a = line_current_a / root3;
+  }
+  const power_va = root3 * line_voltage_v * line_current_a;
+  const power_w = power_va * power_factor;
+  return {
+    configuration, phase_voltage_v, phase_current_a, power_va, power_w,
+    note: "Wye: V_line = root-3 x V_phase, I_line = I_phase. Delta: V_line = V_phase, I_line = root-3 x I_phase. Connection-independent S = root-3 x V_line x I_line; P = S x PF. The equipment nameplate governs the actual connection.",
+  };
+}
+export const deltaWyeLinePhaseExample = { inputs: { configuration: "wye", line_voltage_v: 208, line_current_a: 10, power_factor: 1 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderDeltaWyeLinePhase(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles three-phase winding relations. Wye: V_line = root-3 x V_phase, I_line = I_phase. Delta: V_line = V_phase, I_line = root-3 x I_phase. S = root-3 x V_line x I_line. The equipment nameplate governs the connection.";
+  const config = makeSelect("Connection", "dwl-config", [{ value: "wye", label: "Wye (star)" }, { value: "delta", label: "Delta" }]);
+  const volt = makeNumber("Line-to-line voltage (V)", "dwl-volt", { step: "any", min: "0" });
+  const cur = makeNumber("Line current (A)", "dwl-cur", { step: "any", min: "0" });
+  const pf = makeNumber("Power factor (0-1)", "dwl-pf", { step: "any", min: "0", max: "1", value: "1" });
+  pf.input.value = "1";
+  for (const f of [config, volt, cur, pf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { config.select.value = "wye"; volt.input.value = "208"; cur.input.value = "10"; pf.input.value = "1"; update(); });
+  const oPv = makeOutputLine(outputRegion, "Phase (winding) voltage", "dwl-out-pv");
+  const oPi = makeOutputLine(outputRegion, "Phase (winding) current", "dwl-out-pi");
+  const oVa = makeOutputLine(outputRegion, "Apparent power", "dwl-out-va");
+  const oW = makeOutputLine(outputRegion, "Real power", "dwl-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "dwl-out-note");
+  const update = debounce(() => {
+    const r = computeDeltaWyeLinePhase({ configuration: config.select.value, line_voltage_v: Number(volt.input.value) || 0, line_current_a: Number(cur.input.value) || 0, power_factor: Number(pf.input.value) || 0 });
+    if (r.error) { oPv.textContent = r.error; oPi.textContent = "-"; oVa.textContent = "-"; oW.textContent = "-"; oNote.textContent = "-"; return; }
+    oPv.textContent = fmt(r.phase_voltage_v, 1) + " V";
+    oPi.textContent = fmt(r.phase_current_a, 1) + " A";
+    oVa.textContent = fmt(r.power_va, 0) + " VA";
+    oW.textContent = fmt(r.power_w, 0) + " W";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [config.select, volt.input, cur.input, pf.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["delta-wye-line-phase"] = renderDeltaWyeLinePhase;

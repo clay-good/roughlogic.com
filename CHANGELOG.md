@@ -4,6 +4,23 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): land spec-v121..v128 -- 8 Group A tiles (motors, feeders, fault, raceway, grounding, three-phase); 600 -> 608 tiles, 0.73.0, 2026-06-23
+
+The electrician second-pass batch: eight evidence-driven, in-scope tiles under the spec-v106 trades-only charter, all added to Group A / `calc-electrical.js` with no new module, group, or dependency. Catalog **600 -> 608**, package **0.72.0 -> 0.73.0** (a minor).
+
+- `motor-synchronous-speed-slip` (v121) -- `Ns = 120 f / P`, slip from nameplate rpm, rotor frequency. 60 Hz / 4-pole / 1750 rpm -> 1800 rpm sync, 2.78% slip, 1.67 Hz rotor.
+- `motor-shaft-torque` (v122) -- two-way `T = 5252 x HP / RPM`. 10 HP at 1750 rpm -> 30.0 lb-ft; inverse 30 lb-ft at 3500 rpm -> 20.0 HP.
+- `motor-operating-cost` (v123) -- `input_kW = HP x 0.746 x load / efficiency`, annual kWh, energy cost. 25 HP / 93% / 4000 hr / $0.12 -> 20.05 kW, 80,215 kWh, $9,626; premium-motor delta.
+- `multi-motor-feeder` (v124) -- NEC 430.24 feeder ampacity (1.25 x largest FLC + sum of others) and 430.62 OCPD ceiling rounded down to a standard size. 28 / 26 / 70 -> 61 A conductor, 90 A OCPD.
+- `conductor-short-circuit-withstand` (v125) -- public-domain ICEA P-32-382 / Onderdonk adiabatic `(I/A)^2 t = K log10((T2+B)/(T1+B))`. Cu #6 at 0.1 s -> 6,313 A withstand (inadequate vs 10,000 A), 41,560 cmil minimum. A screen, not an engineered study.
+- `conduit-thermal-expansion` (v126) -- NEC 352.44 PVC length change vs the 1/4-inch fitting trigger. 100 ft / 50 F -> 2.03 in, fitting required (PVC coefficient 3.38e-5 in/in/F, editable).
+- `egc-upsize-proportional` (v127) -- NEC 250.122(B) circular-mil proportion when ungrounded conductors are upsized. 26,240 cmil EGC, 167,800 -> 250,000 cmil phase -> ratio 1.49, 39,094 cmil (#4 Cu); clamped so the EGC never drops below table size.
+- `delta-wye-line-phase` (v128) -- wye/delta line-to-phase voltage and current with `S = root-3 x V_line x I_line`. 208 V wye -> 120.1 V phase, 3,602 VA; 240 V delta / 30 A -> 17.3 A winding current.
+
+All eight carry the full v14 dimensional annotation, a pinned worked example verified to the digit with a cross-check, a bounds-fuzzer block exercising the error seams, and the v18/v21 output contract (non-finite or out-of-domain inputs return `{error}`; divisions are guarded-positive only). Citation discipline (v19/v22): the three NEC tiles cite NEC 2023 by section with the `NEC_DISCLOSURE` note and nfpa.org/freeaccess; the Onderdonk tile cites ICEA P-32-382 as a public-domain relation; the four first-principles tiles carry single-edition notes. Wired across `tools-data.js`, `tile-meta.js`, the `app.js` ELECTRICAL_RENDERERS declare, `citations.js` (+8), `scripts/related-tiles.mjs`, `data/search/aliases.json` (+45 terms), `test/fixtures/compute-map.js`, `test/fixtures/worked-examples.json` (+16 rows), `test/unit/bounds-fuzzer.test.js` (+8 blocks), and the regenerated v14 corpus + tile-index.
+
+Verified green: full lint (every gate, README-count agreeing at 608 tiles / 49 modules / 631 sitemap URLs; citation-coverage 608/608; derivation + fuzzer coverage complete), 4,900 unit tests, data:verify (117 hashes), build (608 tile + 21 group shells, 631 sitemap URLs), check:dist / check:shells / check:shell-mobile (727 checks / 631 shells, zero horizontal scroll at 320px portrait + landscape + 200% zoom), render-no-nan, and responsive-stress (Chromium + WebKit). No module cap moved (`calc-electrical.js` ~53.4 KB gz, 89% of 60 KB; `tools-data.js` ~52.5 KB gz, 85% of 62 KB). The remaining proposed specs v129-v206 (78 tiles across fabrication, restoration, pipefitting, plumbing, solar, gas) stay as tracked backlog. See specs [v121](specs/spec-v121.md) through [v128](specs/spec-v128.md).
+
 ### fix(ci): repair the data-refresh GITHUB_OUTPUT heredoc; add a regression guard; 4,889 -> 4,892 tests, 2026-06-23
 
 The weekly Data Refresh workflow (and its monthly twin) died at the "Generate data change analysis" step with "Invalid value. Matching delimiter not found 'EOF'" on the 2026-06-22 scheduled run. Root cause: `scripts/analyze-data-changes.mjs` wrote its markdown body with `out.join("\n")` and no trailing newline. The workflows pipe that body into a `body<<EOF ... EOF` heredoc for `$GITHUB_OUTPUT`, so without the trailing newline the last content line is glued onto the delimiter (`...rate.EOF`), Actions never finds a standalone `EOF` line, and the step fails before `create-pull-request` can read `steps.analysis.outputs.body`. The push CI does not run the data pipeline, so it stayed green; only the cron broke.

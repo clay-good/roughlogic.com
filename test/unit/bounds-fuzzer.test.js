@@ -5744,6 +5744,14 @@ import {
   computeAmbientAmpacityAdjust,
   computeServiceLoadOptional,
   computeLuxFootcandle,
+  computeMotorSyncSlip,
+  computeMotorShaftTorque,
+  computeMotorOperatingCost,
+  computeMultiMotorFeeder,
+  computeConductorShortCircuitWithstand,
+  computeConduitThermalExpansion,
+  computeEgcUpsizeProportional,
+  computeDeltaWyeLinePhase,
   parseConductorShorthand,
   renderArcFlashScreen,
   renderBoxFill,
@@ -10483,4 +10491,126 @@ test("bounds: spec-v119 equilibrium moisture content of wood (USDA FPL sorption)
   // RH 0 -> EMC 0.
   assert.ok(Math.abs(_v119({ temperature_F: 70, rh_pct: 0 }).emc_pct) < 1e-9);
   assert.ok("error" in _v119({ temperature_F: 70, rh_pct: -5 }) && "error" in _v119({ temperature_F: 70, rh_pct: 150 }) && "error" in _v119({ temperature_F: Infinity, rh_pct: 50 }));
+});
+
+// --- spec-v121..v128 electrical motors / feeders / fault / raceway / grounding / three-phase ---
+
+test("bounds: calc-electrical computeMotorSyncSlip pins Ns = 120 f / P, slip, and rotor frequency + rejects bad poles/freq", () => {
+  const r = computeMotorSyncSlip({ line_freq_hz: 60, poles: 4, rated_rpm: 1750 });
+  assert.ok(Math.abs(r.sync_rpm - 1800) < 1e-9);
+  assert.ok(Math.abs(r.slip_pct - 2.77778) < 1e-3);
+  assert.ok(Math.abs(r.rotor_freq_hz - 1.66667) < 1e-3);
+  // 6-pole cross-check.
+  const c = computeMotorSyncSlip({ line_freq_hz: 60, poles: 6, rated_rpm: 1140 });
+  assert.ok(Math.abs(c.sync_rpm - 1200) < 1e-9 && Math.abs(c.slip_pct - 5) < 1e-6);
+  // Error seams: non-finite, odd / non-positive poles, non-positive freq, negative rated rpm.
+  assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: Infinity, poles: 4, rated_rpm: 1750 }));
+  assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: 60, poles: 5, rated_rpm: 1750 }));
+  assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: 60, poles: 0, rated_rpm: 1750 }));
+  assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: 0, poles: 4, rated_rpm: 1750 }));
+  assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: 60, poles: 4, rated_rpm: -10 }));
+});
+
+test("bounds: calc-electrical computeMotorShaftTorque solves both directions + rejects both/neither and bad rpm", () => {
+  const r = computeMotorShaftTorque({ rpm: 1750, hp: 10 });
+  assert.ok(Math.abs(r.torque_lbft - 30.011) < 0.05);
+  const inv = computeMotorShaftTorque({ rpm: 3500, torque_lbft: 30 });
+  assert.ok(Math.abs(inv.hp - 19.992) < 0.05);
+  // Both or neither supplied -> error; rpm <= 0 -> error; non-finite -> error.
+  assert.ok("error" in computeMotorShaftTorque({ rpm: 1750, hp: 10, torque_lbft: 30 }));
+  assert.ok("error" in computeMotorShaftTorque({ rpm: 1750 }));
+  assert.ok("error" in computeMotorShaftTorque({ rpm: 0, hp: 10 }));
+  assert.ok("error" in computeMotorShaftTorque({ rpm: Infinity, hp: 10 }));
+});
+
+test("bounds: calc-electrical computeMotorOperatingCost pins input kW, annual kWh, cost + the efficiency band", () => {
+  const r = computeMotorOperatingCost({ hp: 25, efficiency_pct: 93, load_factor_pct: 100, hours_per_year: 4000, rate_usd_per_kwh: 0.12 });
+  assert.ok(Math.abs(r.input_kw - 20.054) < 0.05);
+  assert.ok(Math.abs(r.annual_kwh - 80215) < 50);
+  assert.ok(Math.abs(r.annual_cost - 9625.8) < 10);
+  // A premium (95%) motor draws less and costs less.
+  const p = computeMotorOperatingCost({ hp: 25, efficiency_pct: 95, load_factor_pct: 100, hours_per_year: 4000, rate_usd_per_kwh: 0.12 });
+  assert.ok(p.input_kw < r.input_kw && p.annual_cost < r.annual_cost);
+  // Error seams: hp <= 0, hours <= 0, efficiency outside (0,100], non-finite.
+  assert.ok("error" in computeMotorOperatingCost({ hp: 0, hours_per_year: 4000 }));
+  assert.ok("error" in computeMotorOperatingCost({ hp: 25, hours_per_year: 0 }));
+  assert.ok("error" in computeMotorOperatingCost({ hp: 25, efficiency_pct: 0, hours_per_year: 4000 }));
+  assert.ok("error" in computeMotorOperatingCost({ hp: 25, efficiency_pct: 101, hours_per_year: 4000 }));
+  assert.ok("error" in computeMotorOperatingCost({ hp: Infinity, hours_per_year: 4000 }));
+});
+
+test("bounds: calc-electrical computeMultiMotorFeeder pins 430.24 ampacity, 430.62 ceiling, and round-down sizing", () => {
+  const r = computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 });
+  assert.ok(Math.abs(r.min_feeder_ampacity_a - 61) < 1e-9);
+  assert.ok(Math.abs(r.max_feeder_ocpd_a - 96) < 1e-9);
+  assert.strictEqual(r.standard_feeder_ocpd_a, 90);
+  // Cross-check: 110 is itself a standard size.
+  const c = computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 40, largest_branch_ocpd_a: 70 });
+  assert.ok(Math.abs(c.min_feeder_ampacity_a - 75) < 1e-9);
+  assert.strictEqual(c.standard_feeder_ocpd_a, 110);
+  // Negative current / device rating -> error; non-finite -> error.
+  assert.ok("error" in computeMultiMotorFeeder({ largest_flc_a: -1, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 }));
+  assert.ok("error" in computeMultiMotorFeeder({ largest_flc_a: 28, sum_other_flc_a: 26, largest_branch_ocpd_a: -1 }));
+  assert.ok("error" in computeMultiMotorFeeder({ largest_flc_a: Infinity, sum_other_flc_a: 26, largest_branch_ocpd_a: 70 }));
+});
+
+test("bounds: calc-electrical computeConductorShortCircuitWithstand pins Onderdonk withstand + min size + rejects bad temps", () => {
+  const r = computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, material: "copper", t_initial_c: 75, t_final_c: 250 });
+  assert.ok(Math.abs(r.withstand_a - 6313) < 30);
+  assert.ok(Math.abs(r.min_cmil - 41562) < 200);
+  assert.strictEqual(r.adequate, false); // 6,313 A < 10,000 A fault
+  // Aluminum has a lower constant -> lower withstand for the same area.
+  const al = computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, material: "aluminum", t_initial_c: 75, t_final_c: 250 });
+  assert.ok(al.withstand_a < r.withstand_a && Math.abs(al.withstand_a - 4129) < 30);
+  // Error seams: bad material, non-positive area/current/time, t_final <= t_initial, non-finite.
+  assert.ok("error" in computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, material: "steel", t_initial_c: 75, t_final_c: 250 }));
+  assert.ok("error" in computeConductorShortCircuitWithstand({ area_cmil: 0, fault_current_a: 10000, clearing_time_s: 0.1, material: "copper", t_initial_c: 75, t_final_c: 250 }));
+  assert.ok("error" in computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0, material: "copper", t_initial_c: 75, t_final_c: 250 }));
+  assert.ok("error" in computeConductorShortCircuitWithstand({ area_cmil: 26240, fault_current_a: 10000, clearing_time_s: 0.1, material: "copper", t_initial_c: 250, t_final_c: 250 }));
+  assert.ok("error" in computeConductorShortCircuitWithstand({ area_cmil: Infinity, fault_current_a: 10000, clearing_time_s: 0.1, material: "copper", t_initial_c: 75, t_final_c: 250 }));
+});
+
+test("bounds: calc-electrical computeConduitThermalExpansion pins delta_L, the 1/4-inch trigger, and the zero-swing floor", () => {
+  const r = computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: 50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 });
+  assert.ok(Math.abs(r.delta_l_in - 2.028) < 1e-3);
+  assert.strictEqual(r.fitting_required, true);
+  const c = computeConduitThermalExpansion({ run_length_ft: 20, temp_change_f: 30, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 });
+  assert.ok(Math.abs(c.delta_l_in - 0.2434) < 1e-3 && c.fitting_required === false);
+  // A zero or negative swing yields zero movement (no fitting).
+  assert.ok(computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: 0, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 }).delta_l_in === 0);
+  assert.ok(computeConduitThermalExpansion({ run_length_ft: 100, temp_change_f: -50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 }).delta_l_in === 0);
+  // Error seams: run length <= 0, non-finite.
+  assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: 0, temp_change_f: 50 }));
+  assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: Infinity, temp_change_f: 50 }));
+});
+
+test("bounds: calc-electrical computeEgcUpsizeProportional pins the 250.122(B) ratio, the clamp, and the upsized size", () => {
+  const r = computeEgcUpsizeProportional({ base_egc_cmil: 26240, base_phase_cmil: 167800, installed_phase_cmil: 250000 });
+  assert.ok(Math.abs(r.ratio - 1.4899) < 1e-3);
+  assert.ok(Math.abs(r.upsized_egc_cmil - 39094) < 5);
+  // No upsize -> ratio clamps to 1, EGC stays at table size.
+  const c = computeEgcUpsizeProportional({ base_egc_cmil: 26240, base_phase_cmil: 167800, installed_phase_cmil: 167800 });
+  assert.ok(Math.abs(c.ratio - 1) < 1e-9 && Math.abs(c.upsized_egc_cmil - 26240) < 1e-9);
+  // A smaller installed phase still clamps to ratio 1 (the EGC is never reduced).
+  assert.ok(Math.abs(computeEgcUpsizeProportional({ base_egc_cmil: 26240, base_phase_cmil: 167800, installed_phase_cmil: 100000 }).ratio - 1) < 1e-9);
+  // Error seams: any area <= 0, non-finite.
+  assert.ok("error" in computeEgcUpsizeProportional({ base_egc_cmil: 0, base_phase_cmil: 167800, installed_phase_cmil: 250000 }));
+  assert.ok("error" in computeEgcUpsizeProportional({ base_egc_cmil: 26240, base_phase_cmil: 0, installed_phase_cmil: 250000 }));
+  assert.ok("error" in computeEgcUpsizeProportional({ base_egc_cmil: 26240, base_phase_cmil: 167800, installed_phase_cmil: Infinity }));
+});
+
+test("bounds: calc-electrical computeDeltaWyeLinePhase pins the wye and delta line/phase splits + the root-3 power", () => {
+  const wye = computeDeltaWyeLinePhase({ configuration: "wye", line_voltage_v: 208, line_current_a: 10, power_factor: 1 });
+  assert.ok(Math.abs(wye.phase_voltage_v - 120.089) < 0.05);
+  assert.ok(Math.abs(wye.phase_current_a - 10) < 1e-9);
+  assert.ok(Math.abs(wye.power_va - 3602.67) < 1);
+  const delta = computeDeltaWyeLinePhase({ configuration: "delta", line_voltage_v: 240, line_current_a: 30, power_factor: 1 });
+  assert.ok(Math.abs(delta.phase_voltage_v - 240) < 1e-9);
+  assert.ok(Math.abs(delta.phase_current_a - 17.3205) < 1e-3);
+  assert.ok(Math.abs(delta.power_va - 12470.77) < 1);
+  // Error seams: bad config, negative voltage/current, PF outside [0,1], non-finite.
+  assert.ok("error" in computeDeltaWyeLinePhase({ configuration: "open", line_voltage_v: 208, line_current_a: 10 }));
+  assert.ok("error" in computeDeltaWyeLinePhase({ configuration: "wye", line_voltage_v: -1, line_current_a: 10 }));
+  assert.ok("error" in computeDeltaWyeLinePhase({ configuration: "wye", line_voltage_v: 208, line_current_a: 10, power_factor: 1.5 }));
+  assert.ok("error" in computeDeltaWyeLinePhase({ configuration: "wye", line_voltage_v: Infinity, line_current_a: 10 }));
 });

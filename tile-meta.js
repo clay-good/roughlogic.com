@@ -417,6 +417,10 @@ const _TILES = [
   ["grounding-electrode-conductor", "A"],
   ["bonding-jumper", "A"],
   ["min-conductor-for-vd", "A"],
+  // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
+  ["motor-synchronous-speed-slip", "A"], ["motor-shaft-torque", "A"], ["motor-operating-cost", "A"],
+  ["multi-motor-feeder", "A"], ["conductor-short-circuit-withstand", "A"], ["conduit-thermal-expansion", "A"],
+  ["egc-upsize-proportional", "A"], ["delta-wye-line-phase", "A"],
   // spec-v110 HVAC gas-heat start-up (Group C)
   ["gas-meter-clock", "C"],
   ["furnace-temp-rise", "C"],

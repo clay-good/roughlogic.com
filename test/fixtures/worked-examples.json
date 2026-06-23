@@ -22486,6 +22486,234 @@
           }
         }
       }
+    },
+    {
+      "tile_id": "motor-synchronous-speed-slip",
+      "source_publisher": "First-principles AC-machine theory",
+      "source_title": "60 Hz 4-pole motor, nameplate 1750 rpm -> 1800 rpm sync, 2.78% slip, 1.67 Hz rotor",
+      "source_edition_or_year": "n/a; Ns = 120 f / P, slip = (Ns - rpm) / Ns",
+      "source_section_or_page": "spec-v121 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "line_freq_hz": 60, "poles": 4, "rated_rpm": 1750 },
+      "outputs": {
+        "sync_rpm": { "value": 1800, "tolerance": { "abs": 0.01 } },
+        "slip_pct": { "value": 2.7778, "tolerance": { "pct": 0.5 } },
+        "rotor_freq_hz": { "value": 1.6667, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "motor-synchronous-speed-slip",
+      "source_publisher": "First-principles AC-machine theory",
+      "source_title": "60 Hz 6-pole motor, nameplate 1140 rpm -> 1200 rpm sync, 5.0% slip",
+      "source_edition_or_year": "n/a; Ns = 120 f / P, slip = (Ns - rpm) / Ns",
+      "source_section_or_page": "spec-v121 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "line_freq_hz": 60, "poles": 6, "rated_rpm": 1140 },
+      "outputs": {
+        "sync_rpm": { "value": 1200, "tolerance": { "abs": 0.01 } },
+        "slip_pct": { "value": 5.0, "tolerance": { "pct": 0.5 } },
+        "rotor_freq_hz": { "value": 3.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "motor-shaft-torque",
+      "source_publisher": "First-principles rotational-power identity",
+      "source_title": "10 HP at 1750 rpm -> 30.0 lb-ft",
+      "source_edition_or_year": "n/a; T = 5252 HP / RPM",
+      "source_section_or_page": "spec-v122 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "rpm": 1750, "hp": 10 },
+      "outputs": {
+        "torque_lbft": { "value": 30.01, "tolerance": { "pct": 0.5 } },
+        "hp": { "value": 10, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "motor-shaft-torque",
+      "source_publisher": "First-principles rotational-power identity",
+      "source_title": "30 lb-ft at 3500 rpm -> 20.0 HP (inverse path)",
+      "source_edition_or_year": "n/a; HP = T x RPM / 5252",
+      "source_section_or_page": "spec-v122 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "rpm": 3500, "torque_lbft": 30 },
+      "outputs": {
+        "hp": { "value": 19.99, "tolerance": { "pct": 0.5 } },
+        "torque_lbft": { "value": 30, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "motor-operating-cost",
+      "source_publisher": "First-principles motor input power",
+      "source_title": "25 HP, 93% eff, 100% load, 4000 hr, $0.12/kWh -> 20.05 kW, 80,215 kWh, $9,626",
+      "source_edition_or_year": "n/a; input_kW = HP x 0.746 x load / eff",
+      "source_section_or_page": "spec-v123 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "hp": 25, "efficiency_pct": 93, "load_factor_pct": 100, "hours_per_year": 4000, "rate_usd_per_kwh": 0.12 },
+      "outputs": {
+        "input_kw": { "value": 20.054, "tolerance": { "pct": 0.5 } },
+        "annual_kwh": { "value": 80215, "tolerance": { "pct": 0.5 } },
+        "annual_cost": { "value": 9625.8, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "motor-operating-cost",
+      "source_publisher": "First-principles motor input power",
+      "source_title": "Premium motor: same duty at 95% eff -> 19.63 kW, $9,423",
+      "source_edition_or_year": "n/a; input_kW = HP x 0.746 x load / eff",
+      "source_section_or_page": "spec-v123 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "hp": 25, "efficiency_pct": 95, "load_factor_pct": 100, "hours_per_year": 4000, "rate_usd_per_kwh": 0.12 },
+      "outputs": {
+        "input_kw": { "value": 19.632, "tolerance": { "pct": 0.5 } },
+        "annual_cost": { "value": 9423.2, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "multi-motor-feeder",
+      "source_publisher": "NFPA",
+      "source_title": "Largest FLC 28 A, others 26 A, branch OCPD 70 A -> 61 A conductor, 90 A standard OCPD",
+      "source_edition_or_year": "NEC 2023 430.24 / 430.62",
+      "source_section_or_page": "spec-v124 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "largest_flc_a": 28, "sum_other_flc_a": 26, "largest_branch_ocpd_a": 70 },
+      "outputs": {
+        "min_feeder_ampacity_a": { "value": 61, "tolerance": { "abs": 0.01 } },
+        "max_feeder_ocpd_a": { "value": 96, "tolerance": { "abs": 0.01 } },
+        "standard_feeder_ocpd_a": { "value": 90, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "multi-motor-feeder",
+      "source_publisher": "NFPA",
+      "source_title": "Largest FLC 28 A, others 40 A, branch OCPD 70 A -> 75 A conductor, 110 A standard OCPD",
+      "source_edition_or_year": "NEC 2023 430.24 / 430.62",
+      "source_section_or_page": "spec-v124 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "largest_flc_a": 28, "sum_other_flc_a": 40, "largest_branch_ocpd_a": 70 },
+      "outputs": {
+        "min_feeder_ampacity_a": { "value": 75, "tolerance": { "abs": 0.01 } },
+        "max_feeder_ocpd_a": { "value": 110, "tolerance": { "abs": 0.01 } },
+        "standard_feeder_ocpd_a": { "value": 110, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "conductor-short-circuit-withstand",
+      "source_publisher": "ICEA / Onderdonk",
+      "source_title": "Cu #6 (26,240 cmil), 75-250 C, 0.1 s -> 6,313 A withstand, 41,560 cmil minimum vs 10,000 A",
+      "source_edition_or_year": "ICEA P-32-382 / Onderdonk adiabatic equation",
+      "source_section_or_page": "spec-v125 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "area_cmil": 26240, "fault_current_a": 10000, "clearing_time_s": 0.1, "material": "copper", "t_initial_c": 75, "t_final_c": 250 },
+      "outputs": {
+        "withstand_a": { "value": 6313, "tolerance": { "pct": 1 } },
+        "min_cmil": { "value": 41562, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "conductor-short-circuit-withstand",
+      "source_publisher": "ICEA / Onderdonk",
+      "source_title": "Al (26,240 cmil), 75-250 C, 0.1 s -> 4,129 A withstand (lower constant than copper)",
+      "source_edition_or_year": "ICEA P-32-382 / Onderdonk adiabatic equation",
+      "source_section_or_page": "spec-v125 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "area_cmil": 26240, "fault_current_a": 10000, "clearing_time_s": 0.1, "material": "aluminum", "t_initial_c": 75, "t_final_c": 250 },
+      "outputs": {
+        "withstand_a": { "value": 4129, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "conduit-thermal-expansion",
+      "source_publisher": "NFPA",
+      "source_title": "100 ft PVC, 50 F swing -> 2.03 in, expansion fitting required",
+      "source_edition_or_year": "NEC 2023 352.44; PVC coefficient 3.38e-5 in/in/F",
+      "source_section_or_page": "spec-v126 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "run_length_ft": 100, "temp_change_f": 50, "coeff_in_per_in_f": 0.0000338, "trigger_in": 0.25 },
+      "outputs": {
+        "delta_l_in": { "value": 2.028, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "conduit-thermal-expansion",
+      "source_publisher": "NFPA",
+      "source_title": "20 ft PVC, 30 F swing -> 0.243 in, just below the 1/4-inch trigger",
+      "source_edition_or_year": "NEC 2023 352.44; PVC coefficient 3.38e-5 in/in/F",
+      "source_section_or_page": "spec-v126 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "run_length_ft": 20, "temp_change_f": 30, "coeff_in_per_in_f": 0.0000338, "trigger_in": 0.25 },
+      "outputs": {
+        "delta_l_in": { "value": 0.2434, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "egc-upsize-proportional",
+      "source_publisher": "NFPA",
+      "source_title": "Base EGC 26,240 cmil, phase 167,800 -> 250,000 cmil -> ratio 1.49, 39,094 cmil",
+      "source_edition_or_year": "NEC 2023 250.122(B)",
+      "source_section_or_page": "spec-v127 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "base_egc_cmil": 26240, "base_phase_cmil": 167800, "installed_phase_cmil": 250000 },
+      "outputs": {
+        "ratio": { "value": 1.4899, "tolerance": { "pct": 0.5 } },
+        "upsized_egc_cmil": { "value": 39094, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "egc-upsize-proportional",
+      "source_publisher": "NFPA",
+      "source_title": "No upsize: installed phase equals base phase -> ratio 1.0, EGC stays 26,240 cmil",
+      "source_edition_or_year": "NEC 2023 250.122(B)",
+      "source_section_or_page": "spec-v127 section 2.1 cross-check (clamp path)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "base_egc_cmil": 26240, "base_phase_cmil": 167800, "installed_phase_cmil": 167800 },
+      "outputs": {
+        "ratio": { "value": 1.0, "tolerance": { "abs": 0.0001 } },
+        "upsized_egc_cmil": { "value": 26240, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "delta-wye-line-phase",
+      "source_publisher": "First-principles three-phase theory",
+      "source_title": "208 V wye, 10 A line -> 120.1 V phase, 10 A phase, 3,602 VA",
+      "source_edition_or_year": "n/a; V_line = root-3 x V_phase (wye)",
+      "source_section_or_page": "spec-v128 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "configuration": "wye", "line_voltage_v": 208, "line_current_a": 10, "power_factor": 1 },
+      "outputs": {
+        "phase_voltage_v": { "value": 120.09, "tolerance": { "pct": 0.5 } },
+        "phase_current_a": { "value": 10, "tolerance": { "abs": 0.001 } },
+        "power_va": { "value": 3602.7, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "delta-wye-line-phase",
+      "source_publisher": "First-principles three-phase theory",
+      "source_title": "240 V delta, 30 A line -> 240 V phase, 17.3 A phase, 12,471 VA",
+      "source_edition_or_year": "n/a; I_line = root-3 x I_phase (delta)",
+      "source_section_or_page": "spec-v128 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "configuration": "delta", "line_voltage_v": 240, "line_current_a": 30, "power_factor": 1 },
+      "outputs": {
+        "phase_voltage_v": { "value": 240, "tolerance": { "abs": 0.01 } },
+        "phase_current_a": { "value": 17.32, "tolerance": { "pct": 0.5 } },
+        "power_va": { "value": 12470.8, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

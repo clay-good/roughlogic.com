@@ -40,6 +40,10 @@ const TOOL_MODULES = (() => {
     "lux-to-footcandle",
     // spec-v109 service grounding, bonding, and inverse voltage-drop sizing.
     "grounding-electrode-conductor", "bonding-jumper", "min-conductor-for-vd",
+    // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
+    "motor-synchronous-speed-slip", "motor-shaft-torque", "motor-operating-cost",
+    "multi-motor-feeder", "conductor-short-circuit-withstand", "conduit-thermal-expansion",
+    "egc-upsize-proportional", "delta-wye-line-phase",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which

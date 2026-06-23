@@ -1657,8 +1657,12 @@ cross-check.
 | calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
 | calc-electrical.js | `computeConductorResistance` | `{ material, awg, length_ft, temperature_C }` | _ | _ | _ |
+| calc-electrical.js | `computeConductorShortCircuitWithstand` | `{ area_cmil = 0, fault_current_a = 0, clearing_time_s = 0, material = "copper...` | _ | _ | _ |
 | calc-electrical.js | `computeConduitFill` | `{ conduit, trade_size, conductors }` | _ | _ | _ |
+| calc-electrical.js | `computeConduitThermalExpansion` | `{ run_length_ft = 0, temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigge...` | _ | _ | _ |
+| calc-electrical.js | `computeDeltaWyeLinePhase` | `{ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor...` | _ | _ | _ |
 | calc-electrical.js | `computeEGCSize` | `{ ocpd_A, material }` | _ | _ | _ |
+| calc-electrical.js | `computeEgcUpsizeProportional` | `{ base_egc_cmil = 0, base_phase_cmil = 0, installed_phase_cmil = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeGFCIReference` | `` | _ | _ | _ |
 | calc-electrical.js | `computeGeneratorMotorStarting` | `{ motors = [], non_motor_kW = 0, dip_factor = 0.30, starts_per_hour = "occasi...` | _ | _ | _ |
 | calc-electrical.js | `computeGeneratorSize` | `{ items = [] }` | _ | _ | _ |
@@ -1670,7 +1674,11 @@ cross-check.
 | calc-electrical.js | `computeMinConductorForVd` | `{ phase = "single", material = "copper", current_A = 0, length_ft = 0, source...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
+| calc-electrical.js | `computeMotorOperatingCost` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rat...` | _ | _ | _ |
+| calc-electrical.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
+| calc-electrical.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
 | calc-electrical.js | `computePFCorrection` | `{ kW, pf1, pf2, system_V, phase = "single" }` | _ | _ | _ |
 | calc-electrical.js | `computePanelRebalance` | `{ circuits = [], swappable_pairs = null, } = {}` | _ | _ | _ |
@@ -2256,7 +2264,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 842.
+Row count: 850.
 
 <!-- END function-corpus-v14 -->
 
@@ -2337,7 +2345,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (61 tiles)
+### Group A Electrical (69 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2351,12 +2359,16 @@ per spec-v14 §13.1 second paragraph.
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conductor-short-circuit-withstand` | Conductor Short-Circuit Thermal Withstand (Onderdonk / ICEA) | ICEA / Onderdonk; spec-v125 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-90-stub` | Conduit 90 Stub and Back-to-Back | Ugly's Electrical References (by name); 3/4 in EMT, 8 in stub, 6 in deduct -> 2 in mark | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-offset` | Conduit Offset Bend | Ugly's Electrical References / NECA b...; 6 in offset at 30 deg -> 12 in mark spacing, multiplier 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-saddle` | Conduit Saddle Bend | Ugly's Electrical References (by name); 3 in obstruction, 45/22.5 preset -> 7.5 in outer-mark spa... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conduit-thermal-expansion` | PVC Conduit Thermal Expansion (NEC 352.44) | NFPA; spec-v126 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egc-sizing` | Equipment Grounding Conductor Sizing | NFPA; Table 250.122 (60 A OCPD -> 10 AWG copper EGC) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `egc-upsize-proportional` | EGC Proportional Upsize for Increased Conductors (NEC 250.122(B)) | NFPA; spec-v127 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-charger-load` | EV Charger Continuous Load and Panel Impact | NFPA; I_circuit = I_charger*1.25; new_load = existing + I_circuit | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fiber-loss-budget` | Fiber Optic Loss Budget | TIA-568 / TIA-526 / IEEE 802.3 (by name); 300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `generator-motor-starting` | Generator Sizing for Motor Starting | NEC 430.110 + manufacturer locked-rot...; 25 hp / 480 V / Code F single motor on 100 kVA generator ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2372,8 +2384,12 @@ per spec-v14 §13.1 second paragraph.
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-feeder-multiple` | Feeder Sizing for Multiple Motors | NEC Articles 430.24 / 430.62 (by name); FLC 28/16/10 A, largest device 40 A -> conductor 1.25*28+... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `motor-operating-cost` | Motor Input Power, Annual Energy, and Cost | First-principles motor input power; spec-v123 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-shaft-torque` | Motor Shaft Torque, Horsepower, and Speed | First-principles rotational-power ide...; spec-v122 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-synchronous-speed-slip` | Motor Synchronous Speed, Slip, and Rotor Frequency | First-principles AC-machine theory; spec-v121 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-vd-starting` | Motor Starting Voltage Dip | Ohm's-law voltage-drop method (first ...; 480 V 3ph, LRC 180 A, 250 ft, 250 kcmil Cu -> V_drop 4.02... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-load-vd` | Branch Voltage Drop With Multiple Loads | Project (first-principles); 12 AWG copper feeder at 120 V with 5 A @ 50 ft and 10 A @... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `multi-motor-feeder` | Feeder for a Group of Motors (NEC 430.24 / 430.62) | NFPA; spec-v124 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-current-3ph` | Three-Phase Neutral Current | Phasor sum of three 120-degree-displa...; Ia=100, Ib=80, Ic=60 -> I_N = sqrt(1200) = 34.641 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `off-grid-battery` | Off-Grid Battery Bank Sizing | IEEE; nameplate_Wh = daily_Wh * days / (DoD * efficiency); Ah =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ohms-law` | Ohm's Law | Project (first-principles); Ohm's law definition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3042,6 +3058,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 600. Fixture-covered or reference-cadence: 600 / 600.
+Tile count: 608. Fixture-covered or reference-cadence: 608 / 608.
 
 <!-- END tile-index-v14 -->

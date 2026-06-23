@@ -746,6 +746,15 @@ const RELATED = {
   "grounding-electrode-conductor": ["bonding-jumper","egc-sizing","grounding-electrode"],
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],
   "min-conductor-for-vd": ["voltage-drop","wire-ampacity","copper-resistance"],
+  // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
+  "motor-synchronous-speed-slip": ["motor-fla", "motor-vd-starting", "motor-branch-from-nameplate"],
+  "motor-shaft-torque": ["motor-synchronous-speed-slip", "motor-fla", "motor-operating-cost"],
+  "motor-operating-cost": ["motor-shaft-torque", "motor-fla", "pf-correction"],
+  "multi-motor-feeder": ["motor-branch-from-nameplate", "motor-fla", "breaker-sizing"],
+  "conductor-short-circuit-withstand": ["short-circuit-pp", "egc-sizing", "copper-resistance"],
+  "conduit-thermal-expansion": ["conduit-fill", "cable-bend-radius", "copper-resistance"],
+  "egc-upsize-proportional": ["egc-sizing", "voltage-drop", "parallel-conductor-derate"],
+  "delta-wye-line-phase": ["three-phase", "power-triangle", "transformer-kva-sizing"],
   // spec-v110 HVAC gas-heat start-up (Group C)
   "gas-meter-clock": ["furnace-temp-rise","combustion-air","gas-altitude-derate"],
   "furnace-temp-rise": ["gas-meter-clock","cfm-per-ton","duct-static-pressure-total"],

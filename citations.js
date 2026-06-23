@@ -1411,6 +1411,103 @@ export const CITATIONS = {
     ],
   },
 
+  // spec-v121..v128 (2026-06-23): motors / feeders / fault / raceway / grounding / three-phase fundamentals.
+  "motor-synchronous-speed-slip": {
+    formula: "Ns = 120 x f / P (the 120 carries the 60 s/min x 2 poles-per-pole-pair bridge); slip = (Ns - rated_rpm) / Ns; slip_pct = slip x 100; rotor (slip) frequency = slip x f.",
+    edition: "First-principles AC-machine speed relation; classical induction-machine theory.",
+    freeAccess: "First-principles physics; no licensed source required.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the synchronous-speed relation and slip definition are physical identities; the 120 constant is a fixed unit bridge).",
+    assumptions: [
+      { name: "Rated speed", value: "the nameplate full-load speed governs the slip; a speed near synchronous indicates a lightly loaded machine, rising slip indicates loading or a rotor fault", source: "motor nameplate / manufacturer" },
+      { name: "Pole count", value: "the stator pole count is an even integer (2, 4, 6, 8, ...)", source: "AC-machine construction" },
+    ],
+  },
+
+  "motor-shaft-torque": {
+    formula: "T = 5252 x HP / RPM (5252 = 33,000 ft-lb/min per HP divided by 2 pi, the rev/min-to-rad/s bridge); inverse HP = T x RPM / 5252. Supply exactly one of HP or torque; the tile solves for the other.",
+    edition: "First-principles rotational-power identity (power = torque x angular speed).",
+    freeAccess: "First-principles physics; no licensed source required.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the horsepower-speed-torque identity is a physical relation; the 5252 constant is a fixed unit bridge).",
+    assumptions: [
+      { name: "Mechanical horsepower", value: "horsepower here is mechanical shaft horsepower at the stated speed", source: "first-principles rotational power" },
+      { name: "Service factor", value: "the nameplate and the driven load govern the service-factor margin; this is the rated-point torque", source: "motor nameplate / driven load" },
+    ],
+  },
+
+  "motor-operating-cost": {
+    formula: "input_kW = HP x 0.746 x (load_factor/100) / (efficiency/100); annual_kWh = input_kW x run_hours; annual_cost = annual_kWh x rate. The 0.746 kW/HP is the mechanical-to-electrical conversion.",
+    edition: "First-principles electrical-input power and the 0.746 kW-per-HP identity.",
+    freeAccess: "First-principles physics; no licensed source required.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (input power and energy cost are physical relations; the 0.746 constant is a fixed unit bridge).",
+    assumptions: [
+      { name: "Energy charge only", value: "the result is the energy-charge component only and excludes demand charges, time-of-use rates, and power-factor penalties", source: "utility tariff governs the full bill" },
+      { name: "Efficiency basis", value: "efficiency is the full-load efficiency; partial-load efficiency differs and the load factor scales the input power linearly as a first approximation", source: "motor nameplate / manufacturer curve" },
+    ],
+  },
+
+  "multi-motor-feeder": {
+    formula: "min_feeder_ampacity = 1.25 x largest_FLC + sum_other_FLC (430.24); max_feeder_OCPD = largest_branch_OCPD + sum_other_FLC (430.62), then the next standard size down (it may not exceed the limit).",
+    edition: NEC_2023 + " 430.24 (feeder conductors) and 430.62 (feeder overcurrent protection).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "FLC table value", value: "each motor full-load current must be the NEC table value (430.248 / 430.250), user-supplied; the tile does not bundle the motor FLC tables", source: "NEC 2023 430.6 / 430.248 / 430.250" },
+      { name: "Standard sizes", value: "the feeder OCPD is rounded down to a 240.6(A) standard size because 430.62 sets a ceiling that may not be exceeded", source: "NEC 2023 240.6(A) / 430.62; the AHJ governs" },
+    ],
+  },
+
+  "conductor-short-circuit-withstand": {
+    formula: "(I/A)^2 x t = K x log10((T2 + B)/(T1 + B)); withstand = area x sqrt(C / t), min size = fault x sqrt(t / C), where C = K log10((T2+B)/(T1+B)). Copper K=0.0297 B=234; aluminum K=0.0125 B=228.",
+    edition: "ICEA P-32-382 / Onderdonk adiabatic short-circuit heating equation (public-domain form), by name.",
+    freeAccess: "Public-domain engineering relation; the ICEA P-32-382 standard itself is licensed.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the Onderdonk / ICEA P-32-382 adiabatic relation is a public-domain engineering equation). A thermal-withstand SCREEN, not a substitute for the protective-device time-current curve or an engineered study.",
+    assumptions: [
+      { name: "Adiabatic", value: "the equation assumes all fault energy heats the conductor with no heat loss, valid for short clearing times", source: "Onderdonk / ICEA P-32-382" },
+      { name: "Scope", value: "the protective-device clearing curve and an engineered study govern the final determination; this is a screen", source: "engineered short-circuit study" },
+    ],
+  },
+
+  "conduit-thermal-expansion": {
+    formula: "delta_L = coefficient x (run_length_ft x 12) x temperature_change; an expansion fitting is required once delta_L reaches the 1/4-inch (0.25 in) trigger, sized for that travel. PVC coefficient 3.38e-5 in/in/deg-F.",
+    edition: NEC_2023 + " 352.44 (expansion fittings for rigid PVC conduit).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "PVC coefficient", value: "the bundled 3.38e-5 in/in/deg-F coefficient is the public PVC physical property underlying NEC Table 352.44; the manufacturer's published coefficient governs", source: "NEC 2023 Table 352.44 / PVC manufacturer" },
+      { name: "Temperature swing", value: "the temperature change is the maximum-minus-minimum the conduit will see; a zero or negative swing yields zero expansion to absorb", source: "site temperature extremes; the AHJ governs" },
+    ],
+  },
+
+  "egc-upsize-proportional": {
+    formula: "ratio = max(1, installed_phase_cmil / base_phase_cmil); upsized_EGC_cmil = base_EGC_cmil x ratio, then select the next standard AWG/kcmil at or above this. A ratio below 1 is clamped to 1 (the EGC is never reduced below its table size).",
+    edition: NEC_2023 + " 250.122(B) (increase in size of equipment grounding conductors).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "User-supplied tables", value: "the base EGC size (from the 250.122 table for the OCPD) and the minimum-required phase area are user-supplied; the tile bundles neither table", source: "NEC 2023 Table 250.122" },
+      { name: "Upper bound", value: "the EGC need never exceed the ungrounded conductors it runs with; the AHJ governs the final size", source: "NEC 2023 250.122(B); the AHJ governs" },
+    ],
+  },
+
+  "delta-wye-line-phase": {
+    formula: "Wye: V_line = root-3 x V_phase, I_line = I_phase. Delta: V_line = V_phase, I_line = root-3 x I_phase. Connection-independent S = root-3 x V_line x I_line; P = S x PF. root-3 = 1.73205.",
+    edition: "First-principles three-phase winding relations; classical balanced three-phase theory.",
+    freeAccess: "First-principles physics; no licensed source required.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the wye and delta line/phase relations and the root-3 power identity are physical relations).",
+    assumptions: [
+      { name: "Balanced system", value: "the relations assume a balanced three-phase system; the root-3 factor is exact for balanced sinusoidal quantities", source: "balanced three-phase theory" },
+      { name: "Connection", value: "the equipment nameplate governs the actual connection (wye/star or delta)", source: "equipment nameplate" },
+    ],
+  },
+
   "ev-charger-load": {
     formula: "I_circuit = I_charger * 1.25 (continuous); recommended breaker = next standard size >= I_circuit; new_panel_load = existing_load + I_circuit; headroom = main - new_panel_load.",
     edition: NEC_2023 + " Article 625 (625.41/625.42 continuous-load and load-management); 220.83/220.87 panel load; 310.16 conductor.",
