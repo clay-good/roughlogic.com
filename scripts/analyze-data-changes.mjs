@@ -236,4 +236,10 @@ out.push("- Refrigerant P-T data updates require the manufacturer attribution to
 out.push("- NOAA climate data updates monthly; deltas in design temperatures are expected.");
 out.push("- State sales tax rate changes should be cross-checked against each state revenue department's published rate.");
 
-process.stdout.write(out.join("\n"));
+// Terminate with a newline so the body is a well-formed text file. The
+// data-refresh workflows pipe this into a `body<<EOF ... EOF` heredoc for
+// $GITHUB_OUTPUT; without the trailing newline `cat body; echo EOF` glues
+// the last line onto the delimiter (`...rate.EOF`), so Actions never finds
+// a standalone `EOF` and the step dies with "Matching delimiter not found"
+// (observed: the 2026-06-22 weekly Data Refresh run).
+process.stdout.write(out.join("\n") + "\n");
