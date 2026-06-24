@@ -529,3 +529,128 @@ function _v169renderNeutralDemand(inputRegion, outputRegion, citationEl) {
   excl.select.addEventListener("input", update);
 }
 SERVICE_RENDERERS["neutral-demand-220-61"] = _v169renderNeutralDemand;
+
+// =====================================================================
+// spec-v180 - Group A: Electrical (1 tile)
+// Commercial general-lighting + receptacle demand (NEC 220.12 / 220.14(I)
+// / 220.44).
+// =====================================================================
+
+// dims: in { floor_area_ft2: L^2, unit_load_va_ft2: dimensionless, receptacle_count: dimensionless, supply_v: dimensionless } out: { lighting_va: dimensionless, recep_va: dimensionless, recep_demand_va: dimensionless, total_va: dimensionless, total_a: I }
+export function computeCommercialLightingLoad({ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = 208 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(floor_area_ft2) || 0;
+  if (!(area >= 0)) return { error: "Floor area must be non-negative (ft^2)." };
+  const unit = Number(unit_load_va_ft2) || 0;
+  if (!(unit >= 0)) return { error: "Unit load must be non-negative (VA/ft^2)." };
+  const count = Number(receptacle_count) || 0;
+  if (!(count >= 0)) return { error: "Receptacle count must be non-negative." };
+  const v = Number(supply_v) || 0;
+  if (!(v > 0)) return { error: "Supply voltage must be positive (V)." };
+  const lighting_va = area * unit;
+  const recep_va = count * 180;
+  // NEC 220.44: receptacle load >10 kVA is 100% of the first 10 kVA + 50% of
+  // the remainder.
+  const recep_demand_va = recep_va <= 10000 ? recep_va : 10000 + 0.50 * (recep_va - 10000);
+  const total_va = lighting_va + recep_demand_va;
+  const total_a = total_va / v;
+  return {
+    lighting_va,
+    recep_va,
+    recep_demand_va,
+    total_va,
+    total_a,
+    note: "NEC 220.12 sets the general-lighting unit load by occupancy (Table 220.12); 220.14(I) counts each general-use receptacle strap at 180 VA; 220.44 applies a 100%/50% demand to the receptacle load above 10 kVA. The continuous-lighting 125% factor (210.20(A)) is applied at the OCPD, not here, and the energy code may set the lighting unit load. The AHJ governs.",
+  };
+}
+export const commercialLightingLoadExample = { inputs: { floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 60, supply_v: 208 } };
+
+function _v180renderCommercialLightingLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Table 220.12 (general-lighting unit load), 220.14(I) (180 VA per receptacle strap), and 220.44 (receptacle demand factor over 10 kVA). The 125% continuous factor is applied at the OCPD; the energy code may set the lighting load. The AHJ governs. Free at nfpa.org/freeaccess.";
+  const area = makeNumber("Gross floor area (ft^2)", "cll-area", { step: "any", min: "0", value: "5000" });
+  area.input.value = "5000";
+  const unit = makeNumber("Unit load (VA/ft^2, Table 220.12)", "cll-unit", { step: "any", min: "0", value: "3" });
+  unit.input.value = "3";
+  const count = makeNumber("General-use receptacle straps", "cll-count", { step: "1", min: "0", value: "60" });
+  count.input.value = "60";
+  const volt = makeNumber("Supply voltage (V)", "cll-v", { step: "any", min: "0", value: "208" });
+  volt.input.value = "208";
+  for (const f of [area, unit, count, volt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "5000"; unit.input.value = "3"; count.input.value = "60"; volt.input.value = "208"; update(); });
+
+  const oLight = makeOutputLine(outputRegion, "Lighting load (VA)", "cll-out-light");
+  const oRecep = makeOutputLine(outputRegion, "Receptacle connected (VA)", "cll-out-recep");
+  const oDemand = makeOutputLine(outputRegion, "Receptacle demand (220.44)", "cll-out-demand");
+  const oTotal = makeOutputLine(outputRegion, "Total demand (VA)", "cll-out-total");
+  const oAmps = makeOutputLine(outputRegion, "Total current (A)", "cll-out-amps");
+  const oNote = makeOutputLine(outputRegion, "Note", "cll-out-note");
+
+  const update = debounce(() => {
+    const r = computeCommercialLightingLoad({
+      floor_area_ft2: Number(area.input.value) || 0, unit_load_va_ft2: Number(unit.input.value) || 0,
+      receptacle_count: Number(count.input.value) || 0, supply_v: Number(volt.input.value) || 0,
+    });
+    if (r.error) { oLight.textContent = r.error; oRecep.textContent = "-"; oDemand.textContent = "-"; oTotal.textContent = "-"; oAmps.textContent = "-"; oNote.textContent = ""; return; }
+    oLight.textContent = fmt(r.lighting_va, 0) + " VA";
+    oRecep.textContent = fmt(r.recep_va, 0) + " VA";
+    oDemand.textContent = fmt(r.recep_demand_va, 0) + " VA";
+    oTotal.textContent = fmt(r.total_va, 0) + " VA";
+    oAmps.textContent = fmt(r.total_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [area, unit, count, volt]) f.input.addEventListener("input", update);
+}
+SERVICE_RENDERERS["commercial-lighting-load"] = _v180renderCommercialLightingLoad;
+
+// =====================================================================
+// spec-v181 - Group A: Electrical (1 tile)
+// Noncoincident loads: larger of heating vs air-conditioning (NEC 220.60).
+// =====================================================================
+
+// dims: in { load_a_va: dimensionless, load_b_va: dimensionless, both_can_run: dimensionless } out: { counted_va: dimensionless, omitted_va: dimensionless }
+export function computeNoncoincidentLoad({ load_a_va = 0, load_b_va = 0, both_can_run = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(load_a_va) || 0;
+  const b = Number(load_b_va) || 0;
+  if (a < 0 || b < 0) return { error: "Loads must be non-negative (VA)." };
+  const both = (Number(both_can_run) || 0) === 1;
+  const counted_va = both ? a + b : Math.max(a, b);
+  const omitted_va = both ? 0 : Math.min(a, b);
+  return {
+    counted_va,
+    omitted_va,
+    both_can_run: both,
+    note: both
+      ? "NEC 220.60 exception: the two loads operate simultaneously (e.g. a heat-pump compressor with supplemental strip heat that energizes with it), so both are counted -- nothing is omitted."
+      : "NEC 220.60: where two loads are unlikely to operate at the same time (electric heat vs air-conditioning), the service calc carries only the larger and omits the smaller. The AHJ judges noncoincidence; set both-can-run when the loads are coincident.",
+  };
+}
+export const noncoincidentLoadExample = { inputs: { load_a_va: 9000, load_b_va: 6000, both_can_run: 0 } };
+
+function _v181renderNoncoincidentLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 220.60 (noncoincident loads) - where two loads are unlikely to be in use at the same time, the larger is counted and the smaller omitted; the exception adds both where they operate simultaneously. The AHJ judges noncoincidence. Free at nfpa.org/freeaccess.";
+  const a = makeNumber("Load A - e.g. electric heat (VA)", "ncl-a", { step: "any", min: "0", value: "9000" });
+  a.input.value = "9000";
+  const b = makeNumber("Load B - e.g. air-conditioning (VA)", "ncl-b", { step: "any", min: "0", value: "6000" });
+  b.input.value = "6000";
+  const both = makeSelect("Can both run at the same time?", "ncl-both", [
+    { value: "0", label: "No - noncoincident (count the larger)" },
+    { value: "1", label: "Yes - simultaneous (add both, exception)" },
+  ]);
+  for (const f of [a, b, both]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "9000"; b.input.value = "6000"; both.select.value = "0"; update(); });
+
+  const oCounted = makeOutputLine(outputRegion, "Counted load (VA)", "ncl-out-counted");
+  const oOmitted = makeOutputLine(outputRegion, "Omitted load (VA)", "ncl-out-omitted");
+  const oNote = makeOutputLine(outputRegion, "Note", "ncl-out-note");
+
+  const update = debounce(() => {
+    const r = computeNoncoincidentLoad({ load_a_va: Number(a.input.value) || 0, load_b_va: Number(b.input.value) || 0, both_can_run: Number(both.select.value) || 0 });
+    if (r.error) { oCounted.textContent = r.error; oOmitted.textContent = "-"; oNote.textContent = ""; return; }
+    oCounted.textContent = fmt(r.counted_va, 0) + " VA";
+    oOmitted.textContent = fmt(r.omitted_va, 0) + " VA";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [a.input, b.input, both.select]) el.addEventListener("input", update);
+}
+SERVICE_RENDERERS["noncoincident-load"] = _v181renderNoncoincidentLoad;

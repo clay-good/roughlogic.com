@@ -1,6 +1,6 @@
 # roughlogic.com Specification v186 -- Shock Approach Boundaries Reference (NFPA 70E Table 130.4) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter: one reference tile returning the
 > limited-approach and restricted-approach *shock* boundaries by nominal AC voltage from NFPA 70E
 > Table 130.4. Adds one tile to **`calc-electrical.js`** (Group A); no new module, group, or

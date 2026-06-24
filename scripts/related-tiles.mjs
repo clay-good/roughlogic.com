@@ -113,6 +113,16 @@ const RELATED = {
   "working-space-110-26": ["gfci-afci-reference", "pull-box-sizing", "service-load"],
   "burial-depth-300-5": ["working-space-110-26", "conduit-fill", "cable-bend-radius"],
   "support-spacing": ["working-space-110-26", "burial-depth-300-5", "conduit-fill"],
+  // spec-v179..v187 electrician second-pass batch
+  "motor-branch-protection": ["motor-branch-from-nameplate", "motor-fla", "breaker-sizing"],
+  "commercial-lighting-load": ["service-load-standard", "lighting-density", "range-demand-220-55"],
+  "noncoincident-load": ["service-load", "commercial-lighting-load", "range-demand-220-55"],
+  "pv-circuit-ampacity": ["pv-string-sizing", "pv-interconnection-busbar", "rooftop-temp-adder"],
+  "transformer-k-factor": ["neutral-current-3ph", "transformer-kva-sizing", "motor-unbalance-derate"],
+  "motor-capacitor-max": ["pf-correction", "power-triangle", "motor-fla"],
+  "bends-between-pulls": ["pull-box-sizing", "conduit-offset", "conduit-saddle"],
+  "shock-approach-boundary": ["arc-flash-screen", "loto-steps", "gfci-afci-reference"],
+  "pool-bonding-680-26": ["bonding-jumper", "egc-sizing", "gfci-afci-reference"],
 
   // Group B: Plumbing core loop. The hydraulics ladder runs
   // pipe-sizing -> friction-loss -> pump-sizing -> npsh-a; the spec.md

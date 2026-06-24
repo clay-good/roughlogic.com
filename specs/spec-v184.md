@@ -1,6 +1,6 @@
 # roughlogic.com Specification v184 -- Maximum Capacitor kVAR at Motor Terminals (Self-Excitation Limit) (calc-powerquality.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter: one tile computing the maximum
 > power-factor-correction capacitor kVAR that may be connected directly at an induction motor's
 > terminals without risking self-excitation overvoltage on shutdown (NEMA MG-1 / IEEE 18 practice).

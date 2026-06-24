@@ -1654,6 +1654,7 @@ cross-check.
 | calc-electrical.js | `computeAmbientAmpacityAdjust` | `{ base_ampacity_a = 0, temp_column = 75, ambient_c = 30, conductor_count = 3,...` | _ | _ | _ |
 | calc-electrical.js | `computeArcFlashScreen` | `{ voltage_V = 0, bolted_fault_A = 0, clearing_time_s = 0, working_distance_in...` | _ | _ | _ |
 | calc-electrical.js | `computeBendRadius` | `{ cable_type, cable_od_in }` | _ | _ | _ |
+| calc-electrical.js | `computeBendsBetweenPulls` | `{ bend1_deg = 0, bend2_deg = 0, bend3_deg = 0, bend4_deg = 0, bend5_deg = 0, ...` | _ | _ | _ |
 | calc-electrical.js | `computeBondingJumper` | `{ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, p...` | _ | _ | _ |
 | calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
@@ -1675,6 +1676,7 @@ cross-check.
 | calc-electrical.js | `computeLuxFootcandle` | `{ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMinConductorForVd` | `{ phase = "single", material = "copper", current_A = 0, length_ft = 0, source...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
+| calc-electrical.js | `computeMotorBranchProtection` | `{ flc_a = 0, device_type = "inverse-time breaker" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
@@ -1688,6 +1690,7 @@ cross-check.
 | calc-electrical.js | `computeServiceLoad` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadOptional` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuits = 1, fixed_app...` | _ | _ | _ |
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
+| calc-electrical.js | `computeShockApproachBoundary` | `{ nominal_v_ac = "151-750 V" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
 | calc-electrical.js | `computeThreePhase` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerKvaSizing` | `{ loads = [], primary_V = 480, secondary_V = 208, phase = "three", growth_res...` | _ | _ | _ |
@@ -2022,10 +2025,12 @@ cross-check.
 | calc-plumbing.js | `renderTanklessGPM` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-powerquality.js | `computeMotorCapacitorMax` | `{ v_ll = 0, i_noload_a = 0, safety_factor = 0.90 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeMotorUnbalanceDerate` | `{ v_ab = 0, v_bc = 0, v_ca = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeMotorVdStarting` | `{ source_voltage_V = 0, length_ft = 0, cmils = 0, lrc_A = 0, phase = "three",...` | _ | _ | _ |
 | calc-powerquality.js | `computeNeutralCurrent3ph` | `{ ia_A = 0, ib_A = 0, ic_A = 0, triplen_pct = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeParallelConductorDerate` | `{ i_single_A = 0, n_sets = 1, total_ccc = 0, ambient_factor = 1, i_load_A = 0...` | _ | _ | _ |
+| calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |
@@ -2081,6 +2086,7 @@ cross-check.
 | calc-references.js | `computeLabSafety` | `` | _ | _ | _ |
 | calc-references.js | `computeOSHATop10` | `` | _ | _ | _ |
 | calc-references.js | `computeOshaRecordkeeping` | `` | _ | _ | _ |
+| calc-references.js | `computePoolBonding68026` | `{ pool_type = "permanent pool/spa" } = {}` | _ | _ | _ |
 | calc-references.js | `computeSalesTaxNexus` | `{ state = "CA" } = {}` | _ | _ | _ |
 | calc-references.js | `computeStormShelter` | `` | _ | _ | _ |
 | calc-references.js | `computeSupportSpacing` | `{ wiring_method = "EMT", trade_size_in = 0 } = {}` | _ | _ | _ |
@@ -2165,9 +2171,11 @@ cross-check.
 | calc-septic.js | `computeSepticPumpoutInterval` | `{ tank_gal, people, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}` | _ | _ | _ |
 | calc-septic.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
 | calc-septic.js | `renderSepticTank` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-service.js | `computeCommercialLightingLoad` | `{ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = ...` | _ | _ | _ |
 | calc-service.js | `computeDryerDemand22054` | `{ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}` | _ | _ | _ |
 | calc-service.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
 | calc-service.js | `computeNeutralDemand22061` | `{ max_unbalanced_a = 0, nonlinear_excluded = 0 } = {}` | _ | _ | _ |
+| calc-service.js | `computeNoncoincidentLoad` | `{ load_a_va = 0, load_b_va = 0, both_can_run = 0 } = {}` | _ | _ | _ |
 | calc-service.js | `computePipeSupportSpacing` | `{ material = "copper", pipe_size, run_length, orientation = "horizontal", tab...` | _ | _ | _ |
 | calc-service.js | `computeRangeDemand22055` | `{ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}` | _ | _ | _ |
 | calc-service.js | `computeSoftenerSizing` | `{ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_re...` | _ | _ | _ |
@@ -2189,6 +2197,7 @@ cross-check.
 | calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, charger_voltage = 240, main_breaker_a = 0, existing_load_...` | _ | _ | _ |
 | calc-solar.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-solar.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
+| calc-solar.js | `computePvCircuitAmpacity` | `{ module_isc_a = 0, parallel_strings = 1, ocpd_a = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvInterconnectionBusbar` | `{ main_breaker_a = 0, busbar_rating_a = 0, pv_existing_a = 0, pv_proposed_a =...` | _ | _ | _ |
 | calc-solar.js | `renderBatteryRuntime` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-solar.js | `renderEvChargerLoad` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2296,7 +2305,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 882.
+Row count: 891.
 
 <!-- END function-corpus-v14 -->
 
@@ -2377,13 +2386,14 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (81 tiles)
+### Group A Electrical (90 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `ambient-ampacity-adjust` | Conductor Ambient and Fill Ampacity Adjustment | NFPA; adjusted = base * ambient_factor * fill_factor = 75 * 0.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `arc-flash-screen` | Arc-Flash Incident-Energy Screen (Lee 1982) | Lee 1982 / NFPA; Closed-form Lee equation; NFPA 70E-2024 §130.5 governs th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `battery-runtime` | Battery Runtime | Project (first-principles); 100 Ah * 0.80 * 12 V = 960 Wh; 960 Wh / 120 W = 8 h | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bends-between-pulls` | Conduit Bends Between Pull Points (360-Degree Rule) | NEC 2023 (NFPA 70); 90 + 90 + 45 + 45 = 270 deg; 270/90 = 3.0 quarter bends, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bonding-jumper` | Bonding Jumper Sizing (Supply-Side and Equipment) | NFPA; spec-v109 section 2.2 pinned example (350 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `box-fill` | Box Fill | NFPA; 12 AWG = 2.25 in^3 each; 6 conductors = 13.5; clamps +2.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `breaker-sizing` | Breaker Sizing | NFPA; NEC §210.20(A), §240.6 standard sizes | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2393,6 +2403,7 @@ per spec-v14 §13.1 second paragraph.
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.44) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conductor-short-circuit-withstand` | Conductor Short-Circuit Thermal Withstand (Onderdonk / ICEA) | ICEA / Onderdonk; spec-v125 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conduit-90-stub` | Conduit 90 Stub and Back-to-Back | Ugly's Electrical References (by name); 3/4 in EMT, 8 in stub, 6 in deduct -> 2 in mark | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `conduit-fill` | Conduit Fill | NFPA; Chapter 9 Tables 1, 4, 5; 4 conductors -> 40% fill thresh... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2418,6 +2429,8 @@ per spec-v14 §13.1 second paragraph.
 | `lv-dc-drop` | Low-Voltage DC Drop | Project (first-principles); 12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `min-conductor-for-vd` | Minimum Conductor Size for a Voltage-Drop Target | First-principles I x R voltage drop (...; spec-v109 section 2.3 (20 A, 150 ft one-way, 120 V, 3 per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `motor-branch-protection` | Motor Branch-Circuit Protection and Disconnect (NEC 430.52 / 430.110) | NEC 2023 (NFPA 70); 10 HP 230 V 3ph FLC 28 A x 250% = 70 A (standard); discon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-capacitor-max` | Max Capacitor kVAR at Motor Terminals (Self-Excitation Limit) | NEMA MG-1 / IEEE 18; 480 V, 8 A no-load: sqrt(3) x 480 x 8 / 1000 = 6.65 kVAR;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-feeder-multiple` | Feeder Sizing for Multiple Motors | NEC Articles 430.24 / 430.62 (by name); FLC 28/16/10 A, largest device 40 A -> conductor 1.25*28+... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-operating-cost` | Motor Input Power, Annual Energy, and Cost | First-principles motor input power; spec-v123 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2429,6 +2442,7 @@ per spec-v14 §13.1 second paragraph.
 | `multi-motor-feeder` | Feeder for a Group of Motors (NEC 430.24 / 430.62) | NFPA; spec-v124 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-current-3ph` | Three-Phase Neutral Current | Phasor sum of three 120-degree-displa...; Ia=100, Ib=80, Ic=60 -> I_N = sqrt(1200) = 34.641 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-demand-220-61` | Feeder/Service Neutral Demand Load (NEC 220.61) | NEC 2023 (NFPA 70); 200 A at 100% + 50 A at 70% = 200 + 35 = 235 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `noncoincident-load` | Noncoincident Loads: Larger of Heating vs A/C (NEC 220.60) | NEC 2023 (NFPA 70); heat 9,000 VA vs A/C 6,000 VA, not simultaneous -> count ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `off-grid-battery` | Off-Grid Battery Bank Sizing | IEEE; nameplate_Wh = daily_Wh * days / (DoD * efficiency); Ah =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ohms-law` | Ohm's Law | Project (first-principles); Ohm's law definition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `panel-rebalance` | Panel Loading and Phase Rebalance | Project (first-principles); Six-circuit panel skewed onto A (65 A) vs B (22 A) vs C (... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2437,9 +2451,11 @@ per spec-v14 §13.1 second paragraph.
 | `phase-balance` | Phase Balance Across Panels | Project (first-principles); Four circuits {A:1500, A:800, B:600, C:700} -> 141.67% in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `poe-budget` | PoE Budget and Run Distance | IEEE; Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-illuminance` | Point-Method Illuminance (Inverse-Square + Cosine) | IES Lighting Handbook (point method); angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pool-bonding-680-26` | Swimming-Pool Equipotential Bonding Checklist (NEC 680.26) | NEC 2023 (NFPA 70); permanent pool/spa -> full 8-component 680.26(B)/(C) bond... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-triangle` | Power Triangle Solver (kW / kVA / kVAR / PF) | IEEE; kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pull-box-sizing` | NEC Pull and Junction Box Sizing | NEC (NFPA 70) 314.28(A)(1) and (A)(2)...; spec-v101 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pulling-tension` | Conductor Pulling Tension | NECA / cable-pulling engineering prac...; 1.5 lb/ft cable / 100 ft straight / one 90-deg bend at 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pv-circuit-ampacity` | PV Circuit Maximum Current and Ampacity (NEC 690.8, the 156% Rule) | NEC 2023 (NFPA 70); 2 strings x Isc 10 A x 1.25 = 25 A; x 1.25 = 31.25 A (10 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-interconnection-busbar` | PV Interconnection 120% Busbar Rule | NFPA; 705.12(B)(3)(2): sum = main + PV <= 1.20 * busbar | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-string-sizing` | Solar PV String Sizing | NFPA; Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `raceway-expansion-fitting` | PVC Raceway Expansion Fitting | NEC Article 352.44 / Table 352.44 (by...; 100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2448,12 +2464,14 @@ per spec-v14 §13.1 second paragraph.
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-optional` | Service Load Calculation (NEC 220.82 Optional Method) | NFPA; general demand = 10kVA + 40%*(general-10kVA); + larger HV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-standard` | Service Entrance Demand Load (Standard Method) | NFPA; 2500 ft^2 dwelling + 2 small-appliance + 1 laundry + 5 fi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `shock-approach-boundary` | Shock Approach Boundaries (NFPA 70E Table 130.4) | NFPA 70E-2024; 151-750 V: limited fixed 3 ft 6 in, limited movable 10 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `short-circuit-pp` | Short-Circuit Current at Panel (Point-to-Point) | NEMA / Bussmann (Cooper); 1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standby-battery-sizing` | Fire-Alarm / Security Standby Battery | NFPA 72 §10.6 (by name); 0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `transformer-k-factor` | Transformer K-Factor From the Harmonic Spectrum (UL 1561) | UL 1561 / IEEE C57.110; K = sum(Ih^2 h^2)/sum(Ih^2) = 5.455/1.183 = 4.61 -> K-9 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-kva-sizing` | Transformer kVA Sizing and FLA | NFPA / ANSI/IEEE C57; Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3121,6 +3139,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 639. Fixture-covered or reference-cadence: 639 / 639.
+Tile count: 648. Fixture-covered or reference-cadence: 648 / 648.
 
 <!-- END tile-index-v14 -->

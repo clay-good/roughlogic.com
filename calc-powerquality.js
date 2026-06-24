@@ -314,3 +314,118 @@ function _v172renderMotorUnbalanceDerate(inputRegion, outputRegion, citationEl) 
   for (const f of [ab.input, bc.input, ca.input]) f.addEventListener("input", update);
 }
 POWERQUALITY_RENDERERS["motor-unbalance-derate"] = _v172renderMotorUnbalanceDerate;
+
+// =====================================================================
+// spec-v183 - Group A: Electrical (1 tile)
+// Transformer K-factor from a harmonic current spectrum (UL 1561 /
+// IEEE C57.110), with the standard K-rating round-up.
+// =====================================================================
+
+// Standard UL 1561 K-ratings. K-1 is a general-purpose (linear-load)
+// transformer; K-4 and up are the K-rated units.
+const _K_RATINGS = [1, 4, 9, 13, 20, 30, 40];
+
+// dims: in { i1: dimensionless, i3: dimensionless, i5: dimensionless, i7: dimensionless, i9: dimensionless, i11: dimensionless, i13: dimensionless } out: { k_factor: dimensionless, recommended_k_rating: dimensionless }
+export function computeTransformerKFactor({ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}) {
+  const harmonics = [[1, i1], [3, i3], [5, i5], [7, i7], [9, i9], [11, i11], [13, i13]];
+  for (const [, v] of harmonics) {
+    if (!Number.isFinite(Number(v))) return { error: "Harmonic currents must be finite (per-unit of fundamental)." };
+    if (Number(v) < 0) return { error: "Harmonic currents must be non-negative (per-unit)." };
+  }
+  if (!((Number(i1) || 0) > 0)) return { error: "Fundamental current (I1) must be positive (per-unit)." };
+  let num = 0, den = 0;
+  for (const [h, v] of harmonics) {
+    const ih = Number(v) || 0;
+    num += ih * ih * h * h;
+    den += ih * ih;
+  }
+  const k_factor = num / den;
+  const recommended_k_rating = _K_RATINGS.find((r) => r >= k_factor) ?? _K_RATINGS[_K_RATINGS.length - 1];
+  return {
+    k_factor,
+    recommended_k_rating,
+    note: "UL 1561 / IEEE C57.110: K-factor = sum(Ih^2 x h^2) / sum(Ih^2), with the harmonic currents entered as per-unit of the fundamental. Round up to the next standard K-rating (K-1 standard, then K-4 / K-9 / K-13 / K-20 / K-30 / K-40). A near-linear load (K close to 1) needs no K-rated transformer. The measured spectrum and the manufacturer govern the final selection.",
+  };
+}
+export const transformerKFactorExample = { inputs: { i1: 1.0, i3: 0.33, i5: 0.20, i7: 0.14, i9: 0.09, i11: 0.06, i13: 0.05 } };
+
+function _v183renderTransformerKFactor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: UL 1561 / IEEE C57.110 K-factor = sum(Ih^2 x h^2) / sum(Ih^2), harmonics in per-unit of the fundamental; round up to the next standard K-rating (K-1/K-4/K-9/K-13/K-20/K-30/K-40). The measured spectrum and the manufacturer govern.";
+  const defs = { i1: "1.0", i3: "0.33", i5: "0.20", i7: "0.14", i9: "0.09", i11: "0.06", i13: "0.05" };
+  const fields = {};
+  for (const h of ["i1", "i3", "i5", "i7", "i9", "i11", "i13"]) {
+    const f = makeNumber("Harmonic " + h.slice(1) + " (per-unit of fundamental)", "tkf-" + h, { step: "any", min: "0", value: defs[h] });
+    f.input.value = defs[h];
+    fields[h] = f;
+    inputRegion.appendChild(f.wrap);
+  }
+  attachExampleButton(inputRegion, () => { for (const h in defs) fields[h].input.value = defs[h]; update(); });
+
+  const oK = makeOutputLine(outputRegion, "K-factor", "tkf-out-k");
+  const oRating = makeOutputLine(outputRegion, "Recommended K-rating", "tkf-out-rating");
+  const oNote = makeOutputLine(outputRegion, "Note", "tkf-out-note");
+
+  const update = debounce(() => {
+    const r = computeTransformerKFactor({
+      i1: Number(fields.i1.input.value) || 0, i3: Number(fields.i3.input.value) || 0,
+      i5: Number(fields.i5.input.value) || 0, i7: Number(fields.i7.input.value) || 0,
+      i9: Number(fields.i9.input.value) || 0, i11: Number(fields.i11.input.value) || 0,
+      i13: Number(fields.i13.input.value) || 0,
+    });
+    if (r.error) { oK.textContent = r.error; oRating.textContent = "-"; oNote.textContent = ""; return; }
+    oK.textContent = fmt(r.k_factor, 2);
+    oRating.textContent = r.recommended_k_rating === 1 ? "K-1 (standard transformer)" : "K-" + r.recommended_k_rating;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const h in fields) fields[h].input.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["transformer-k-factor"] = _v183renderTransformerKFactor;
+
+// =====================================================================
+// spec-v184 - Group A: Electrical (1 tile)
+// Maximum capacitor kVAR at motor terminals before self-excitation
+// (NEMA MG-1 / IEEE 18 magnetizing-kVAR limit).
+// =====================================================================
+
+// dims: in { v_ll: dimensionless, i_noload_a: I, safety_factor: dimensionless } out: { magnetizing_kvar: dimensionless, max_capacitor_kvar: dimensionless }
+export function computeMotorCapacitorMax({ v_ll = 0, i_noload_a = 0, safety_factor = 0.90 } = {}) {
+  const v = Number(v_ll) || 0, i = Number(i_noload_a) || 0, sf = Number(safety_factor);
+  if (!Number.isFinite(v) || !Number.isFinite(i) || !Number.isFinite(sf)) return { error: "Voltage, current, and safety factor must be finite numbers." };
+  if (!(v > 0)) return { error: "Motor line-to-line voltage must be positive (V)." };
+  if (i < 0) return { error: "No-load current must be non-negative (A)." };
+  if (!(sf > 0)) return { error: "Safety factor must be positive." };
+  const magnetizing_kvar = Math.sqrt(3) * v * i / 1000;
+  const max_capacitor_kvar = sf * magnetizing_kvar;
+  return {
+    magnetizing_kvar,
+    max_capacitor_kvar,
+    note: "NEMA MG-1 / IEEE 18: a capacitor switched with a motor must not exceed the motor's magnetizing (no-load) kVAR, or the motor can self-excite into a damaging overvoltage when it coasts down. magnetizing_kvar = sqrt(3) x V x I_no-load / 1000; the maximum terminal capacitor is the safety factor (default 0.90) times that. The manufacturer's maximum-kVAR table by HP and speed governs the final selection; pair with pf-correction for the target-PF size and keep the smaller value.",
+  };
+}
+export const motorCapacitorMaxExample = { inputs: { v_ll: 480, i_noload_a: 8, safety_factor: 0.90 } };
+
+function _v184renderMotorCapacitorMax(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEMA MG-1 / IEEE 18 - a motor-terminal capacitor must stay below the magnetizing (no-load) kVAR = sqrt(3) x V x I_no-load / 1000, with a safety margin (default 0.90), to avoid self-excitation overvoltage. The manufacturer's max-kVAR table governs.";
+  const v = makeNumber("Motor line-to-line voltage (V)", "mcm-v", { step: "any", min: "0", value: "480" });
+  v.input.value = "480";
+  const i = makeNumber("No-load (magnetizing) current (A)", "mcm-i", { step: "any", min: "0", value: "8" });
+  i.input.value = "8";
+  const sf = makeNumber("Safety factor (default 0.90)", "mcm-sf", { step: "any", min: "0", value: "0.90" });
+  sf.input.value = "0.90";
+  for (const f of [v, i, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { v.input.value = "480"; i.input.value = "8"; sf.input.value = "0.90"; update(); });
+
+  const oMag = makeOutputLine(outputRegion, "Magnetizing kVAR", "mcm-out-mag");
+  const oMax = makeOutputLine(outputRegion, "Max terminal capacitor kVAR", "mcm-out-max");
+  const oNote = makeOutputLine(outputRegion, "Note", "mcm-out-note");
+
+  const update = debounce(() => {
+    const r = computeMotorCapacitorMax({ v_ll: Number(v.input.value) || 0, i_noload_a: Number(i.input.value) || 0, safety_factor: Number(sf.input.value) });
+    if (r.error) { oMag.textContent = r.error; oMax.textContent = "-"; oNote.textContent = ""; return; }
+    oMag.textContent = fmt(r.magnetizing_kvar, 2) + " kVAR";
+    oMax.textContent = fmt(r.max_capacitor_kvar, 2) + " kVAR";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [v, i, sf]) f.input.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["motor-capacitor-max"] = _v184renderMotorCapacitorMax;

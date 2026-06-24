@@ -4558,3 +4558,203 @@ function _v176renderWorkingSpace11026(inputRegion, outputRegion, citationEl) {
   for (const el of [band.select, cond.select, w.input]) el.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["working-space-110-26"] = _v176renderWorkingSpace11026;
+
+// =====================================================================
+// spec-v179 - Group A: Electrical (1 tile)
+// Motor branch-circuit short-circuit / ground-fault protective device
+// maximum (NEC 430.52, Table 430.52) and disconnect rating (430.110).
+// =====================================================================
+
+// NEC 240.6(A) standard overcurrent-device ampere ratings (used for the
+// 430.52(C)(1) Exception 1 round-up to the next standard size).
+const _STD_OCPD_240_6 = [
+  15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200,
+  225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000,
+  2500, 3000, 4000, 5000, 6000,
+];
+// NEC Table 430.52 max % of FLC by device type (squirrel-cage / synchronous,
+// other than Design B energy-efficient).
+const _MOTOR_OCPD_MULT = {
+  "inverse-time breaker": 2.50,
+  "dual-element/time-delay fuse": 1.75,
+  "nontime-delay fuse": 3.00,
+  "instantaneous-trip breaker": 8.00,
+};
+
+// dims: in { flc_a: I, device_type: dimensionless } out: { multiplier: dimensionless, max_ocpd_a: I, max_ocpd_std_a: I, min_disconnect_a: I }
+export function computeMotorBranchProtection({ flc_a = 0, device_type = "inverse-time breaker" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const flc = Number(flc_a) || 0;
+  if (!(flc > 0)) return { error: "Motor full-load current must be positive (A)." };
+  const multiplier = _MOTOR_OCPD_MULT[device_type];
+  if (multiplier === undefined) return { error: "Device type must be inverse-time breaker, dual-element/time-delay fuse, nontime-delay fuse, or instantaneous-trip breaker." };
+  const max_ocpd_a = flc * multiplier;
+  // 430.52(C)(1) Exception 1: where the calculated value does not correspond
+  // to a standard rating, the next higher standard size (240.6) is permitted.
+  const next_std = _STD_OCPD_240_6.find((s) => s >= max_ocpd_a);
+  const is_standard = _STD_OCPD_240_6.some((s) => Math.abs(s - max_ocpd_a) < 1e-9);
+  const max_ocpd_std_a = next_std ?? max_ocpd_a;
+  const min_disconnect_a = 1.15 * flc;
+  return {
+    multiplier,
+    max_ocpd_a,
+    max_ocpd_std_a,
+    rounded_up: !is_standard,
+    min_disconnect_a,
+    note: "NEC 430.52 / Table 430.52: the figure is the maximum branch-circuit short-circuit and ground-fault device, sized on the table FLC (430.6(A)), not nameplate; it protects against short-circuit/ground-fault only -- motor overload is sized separately (430.32, see motor-branch-from-nameplate). Exception 1 permits rounding up to the next standard size (240.6); Exception 2 permits a further increase if the motor will not start. The disconnect (430.110(A)) is rated at least 115% of FLC and carries an HP rating at or above the motor HP. The shown values are squirrel-cage/induction; the AHJ and the table govern.",
+  };
+}
+export const motorBranchProtectionExample = { inputs: { flc_a: 28, device_type: "inverse-time breaker" } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v179renderMotorBranchProtection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 430.52 and Table 430.52 (branch-circuit short-circuit and ground-fault protection) with 430.110 (disconnect ampere rating). Sized on the table FLC (430.6(A)); overload is separate (430.32). The AHJ governs. Free at nfpa.org/freeaccess.";
+  const flc = makeNumber("Motor full-load current FLC (A, from Table 430.247-250)", "mbp-flc", { step: "any", min: "0", value: "28" });
+  flc.input.value = "28";
+  const dev = makeSelect("Protective device type", "mbp-dev", [
+    { value: "inverse-time breaker", label: "Inverse-time breaker (250%)" },
+    { value: "dual-element/time-delay fuse", label: "Dual-element / time-delay fuse (175%)" },
+    { value: "nontime-delay fuse", label: "Nontime-delay fuse (300%)" },
+    { value: "instantaneous-trip breaker", label: "Instantaneous-trip breaker (800%)" },
+  ]);
+  for (const f of [flc, dev]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flc.input.value = "28"; dev.select.value = "inverse-time breaker"; update(); });
+
+  const oMult = makeOutputLine(outputRegion, "Table 430.52 multiplier", "mbp-out-mult");
+  const oMax = makeOutputLine(outputRegion, "Max OCPD (calculated)", "mbp-out-max");
+  const oStd = makeOutputLine(outputRegion, "Max standard size (240.6)", "mbp-out-std");
+  const oDisc = makeOutputLine(outputRegion, "Min disconnect (115% FLC)", "mbp-out-disc");
+  const oNote = makeOutputLine(outputRegion, "Note", "mbp-out-note");
+
+  const update = debounce(() => {
+    const r = computeMotorBranchProtection({ flc_a: Number(flc.input.value) || 0, device_type: dev.select.value });
+    if (r.error) { oMult.textContent = r.error; oMax.textContent = "-"; oStd.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
+    oMult.textContent = fmt(r.multiplier * 100, 0) + "% of FLC";
+    oMax.textContent = fmt(r.max_ocpd_a, 1) + " A";
+    oStd.textContent = fmt(r.max_ocpd_std_a, 0) + " A" + (r.rounded_up ? " (rounded up, Exc. 1)" : " (standard)");
+    oDisc.textContent = fmt(r.min_disconnect_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [flc.input, dev.select]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["motor-branch-protection"] = _v179renderMotorBranchProtection;
+
+// =====================================================================
+// spec-v185 - Group A: Electrical (1 tile)
+// Cumulative conduit bend degrees vs the 360-degree limit between pull
+// points (NEC 358.26 and the matching Chapter 3 .26 sections).
+// =====================================================================
+
+// dims: in { bend1_deg: dimensionless, bend2_deg: dimensionless, bend3_deg: dimensionless, bend4_deg: dimensionless, bend5_deg: dimensionless, bend6_deg: dimensionless } out: { total_deg: dimensionless, quarter_bends_eq: dimensionless }
+export function computeBendsBetweenPulls({ bend1_deg = 0, bend2_deg = 0, bend3_deg = 0, bend4_deg = 0, bend5_deg = 0, bend6_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bends = [bend1_deg, bend2_deg, bend3_deg, bend4_deg, bend5_deg, bend6_deg].map((b) => Number(b) || 0);
+  if (bends.some((b) => b < 0)) return { error: "Bend angles must be non-negative (deg)." };
+  const total_deg = bends.reduce((a, b) => a + b, 0);
+  const quarter_bends_eq = total_deg / 90;
+  const within = total_deg <= 360;
+  return {
+    total_deg,
+    quarter_bends_eq,
+    within_limit: within,
+    verdict: within ? "Within the 360-degree limit; no intervening pull point required by this rule." : "Over 360 degrees; insert a pull point (box or conduit body) to break the run.",
+    note: "NEC 358.26 (EMT) and the matching .26 sections of the other Chapter 3 raceway articles: no run between pull points (boxes, conduit bodies, fittings) may contain more than 360 degrees total bend (four quarter bends). An offset counts both of its bends; a saddle counts all three. Equivalent quarter bends = total / 90. The AHJ governs.",
+  };
+}
+export const bendsBetweenPullsExample = { inputs: { bend1_deg: 90, bend2_deg: 90, bend3_deg: 45, bend4_deg: 45, bend5_deg: 0, bend6_deg: 0 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v185renderBendsBetweenPulls(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 358.26 (EMT) and the matching .26 sections of the Chapter 3 raceway articles - no more than 360 degrees of total bend (four quarter bends) between pull points. Offsets and saddles count every bend they contain. The AHJ governs. Free at nfpa.org/freeaccess.";
+  const fields = [];
+  const defaults = ["90", "90", "45", "45", "0", "0"];
+  for (let i = 0; i < 6; i++) {
+    const f = makeNumber("Bend " + (i + 1) + " (deg)", "bbp-" + i, { step: "any", min: "0", value: defaults[i] });
+    f.input.value = defaults[i];
+    fields.push(f);
+    inputRegion.appendChild(f.wrap);
+  }
+  attachExampleButton(inputRegion, () => { fields.forEach((f, i) => { f.input.value = defaults[i]; }); update(); });
+
+  const oTotal = makeOutputLine(outputRegion, "Total bend (deg)", "bbp-out-total");
+  const oQuarter = makeOutputLine(outputRegion, "Equivalent quarter bends", "bbp-out-quarter");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "bbp-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Note", "bbp-out-note");
+
+  const update = debounce(() => {
+    const r = computeBendsBetweenPulls({
+      bend1_deg: Number(fields[0].input.value) || 0, bend2_deg: Number(fields[1].input.value) || 0,
+      bend3_deg: Number(fields[2].input.value) || 0, bend4_deg: Number(fields[3].input.value) || 0,
+      bend5_deg: Number(fields[4].input.value) || 0, bend6_deg: Number(fields[5].input.value) || 0,
+    });
+    if (r.error) { oTotal.textContent = r.error; oQuarter.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
+    oTotal.textContent = fmt(r.total_deg, 0) + " deg";
+    oQuarter.textContent = fmt(r.quarter_bends_eq, 2);
+    oVerdict.textContent = r.verdict;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["bends-between-pulls"] = _v185renderBendsBetweenPulls;
+
+// =====================================================================
+// spec-v186 - Group A: Electrical (1 tile)
+// NFPA 70E Table 130.4 shock approach boundary reference (AC).
+// =====================================================================
+
+// NFPA 70E Table 130.4 (AC) shock approach boundaries, by nominal
+// phase-to-phase voltage band. Values as ft-in text; "N/A" where the
+// table specifies no boundary.
+const _SHOCK_BOUNDARIES = {
+  "<50 V": { limited_movable: "N/A", limited_fixed: "N/A", restricted: "N/A" },
+  "50-150 V": { limited_movable: "10 ft 0 in", limited_fixed: "3 ft 6 in", restricted: "Avoid contact" },
+  "151-750 V": { limited_movable: "10 ft 0 in", limited_fixed: "3 ft 6 in", restricted: "1 ft 0 in" },
+  "751-15,000 V": { limited_movable: "10 ft 0 in", limited_fixed: "5 ft 0 in", restricted: "2 ft 2 in" },
+};
+
+// dims: in { nominal_v_ac: dimensionless } out: { restricted: dimensionless }
+export function computeShockApproachBoundary({ nominal_v_ac = "151-750 V" } = {}) {
+  const row = _SHOCK_BOUNDARIES[nominal_v_ac];
+  if (!row) return { error: "Voltage band must be \"<50 V\", \"50-150 V\", \"151-750 V\", or \"751-15,000 V\"." };
+  const no_boundary = nominal_v_ac === "<50 V";
+  return {
+    limited_movable: row.limited_movable,
+    limited_fixed: row.limited_fixed,
+    restricted: row.restricted,
+    no_boundary,
+    note: no_boundary
+      ? "NFPA 70E Table 130.4: below 50 V (AC) no shock approach boundary is specified, though a risk assessment still applies."
+      : "NFPA 70E Table 130.4 (AC): the limited approach boundary protects unqualified persons (the larger distance applies to an exposed movable conductor). Crossing the restricted approach boundary requires a qualified person, an energized-work permit, and shock PPE. These are shock boundaries only -- the arc-flash boundary is a separate determination (see arc-flash-screen). The employer's safety program and 70E govern.",
+  };
+}
+export const shockApproachBoundaryExample = { inputs: { nominal_v_ac: "151-750 V" } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v186renderShockApproachBoundary(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NFPA 70E-2024 Table 130.4 (AC shock approach boundaries) - limited approach (movable vs fixed) and restricted approach by nominal voltage. Shock boundaries only; the arc-flash boundary is separate. The employer's electrical safety program and 70E govern. Free at nfpa.org/freeaccess.";
+  const band = makeSelect("Nominal voltage (phase-to-phase, AC)", "sab-band", [
+    { value: "<50 V", label: "<50 V" },
+    { value: "50-150 V", label: "50-150 V" },
+    { value: "151-750 V", label: "151-750 V (e.g. 480 V)" },
+    { value: "751-15,000 V", label: "751 V - 15 kV" },
+  ]);
+  band.select.value = "151-750 V";
+  inputRegion.appendChild(band.wrap);
+  attachExampleButton(inputRegion, () => { band.select.value = "151-750 V"; refresh(); });
+
+  const oMov = makeOutputLine(outputRegion, "Limited approach - movable conductor", "sab-out-mov");
+  const oFix = makeOutputLine(outputRegion, "Limited approach - fixed circuit part", "sab-out-fix");
+  const oRes = makeOutputLine(outputRegion, "Restricted approach", "sab-out-res");
+  const oNote = makeOutputLine(outputRegion, "Note", "sab-out-note");
+
+  function refresh() {
+    const r = computeShockApproachBoundary({ nominal_v_ac: band.select.value });
+    if (r.error) { oMov.textContent = r.error; oFix.textContent = "-"; oRes.textContent = "-"; oNote.textContent = ""; return; }
+    oMov.textContent = r.limited_movable;
+    oFix.textContent = r.limited_fixed;
+    oRes.textContent = r.restricted;
+    oNote.textContent = r.note;
+  }
+  band.select.addEventListener("change", refresh);
+}
+ELECTRICAL_RENDERERS["shock-approach-boundary"] = _v186renderShockApproachBoundary;

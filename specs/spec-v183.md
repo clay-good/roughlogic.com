@@ -1,6 +1,6 @@
 # roughlogic.com Specification v183 -- Transformer K-Factor From the Harmonic Spectrum (UL 1561 / IEEE C57.110) (calc-powerquality.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter: one tile computing a transformer K-factor
 > from a measured harmonic current spectrum, so an electrician can select a K-rated transformer (K-4,
 > K-13, K-20) for a nonlinear load. Adds one tile to **`calc-powerquality.js`** (Group A); no new
@@ -51,6 +51,14 @@ I3 = 0.33, I5 = 0.20, I7 = 0.14, I9 = 0.09, I11 = 0.06, I13 = 0.05.
 I3 = 0.05, I5 = 0.03: `num = 1 + 0.0025x9 + 0.0009x25 = 1.045`; `den = 1 + 0.0025 + 0.0009 = 1.0034`;
 `k_factor = 1.04` -> a standard **K-1** transformer is adequate. The measured spectrum and the
 manufacturer govern.
+
+> **As-landed note (2026-06-24).** The landed tile applies the same strict round-up that produces the
+> K-9 result above: `recommended_k_rating` is the smallest tabulated rating `>= k_factor` from the
+> ladder `[1, 4, 9, 13, 20, 30, 40]`. K = 1.04 therefore rounds up to **K-4** (the smallest *K-rated*
+> unit), not K-1 -- K-1 is returned only for a perfectly linear load (K = 1.0). The cross-check fixture
+> pins `recommended_k_rating = 4`; the prose's "K-1 (standard) is adequate" remains true in practice
+> (a near-linear load needs no K-rated transformer), it is just not the strict-round-up output. The
+> distinction is cosmetic and recorded here per the v161 land-the-correct-value discipline.
 
 ## 3. Wiring
 

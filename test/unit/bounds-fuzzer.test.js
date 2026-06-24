@@ -10997,6 +10997,22 @@ import {
   computeBurialDepth3005 as _cv177, computeSupportSpacing as _cv178,
 } from "../../calc-references.js";
 
+// ---------------------------------------------------------------------------
+// spec-v179..v187 electrician second-pass batch (9 tiles).
+// ---------------------------------------------------------------------------
+import {
+  computeMotorBranchProtection as _cv179, computeBendsBetweenPulls as _cv185,
+  computeShockApproachBoundary as _cv186,
+} from "../../calc-electrical.js";
+import {
+  computeCommercialLightingLoad as _cv180, computeNoncoincidentLoad as _cv181,
+} from "../../calc-service.js";
+import { computePvCircuitAmpacity as _cv182 } from "../../calc-solar.js";
+import {
+  computeTransformerKFactor as _cv183, computeMotorCapacitorMax as _cv184,
+} from "../../calc-powerquality.js";
+import { computePoolBonding68026 as _cv187 } from "../../calc-references.js";
+
 test("bounds: spec-v165 buck-boost-sizing pins boost/buck paths and error seams", () => {
   const ex = _cv165({ supply_v: 208, desired_v: 230, load_a: 50 });
   assert.ok(Math.abs(ex.boost_v - 22) < 1e-9 && Math.abs(ex.load_kva - 11.5) < 1e-9 && Math.abs(ex.xfmr_kva - 1.10) < 1e-9);
@@ -11119,4 +11135,107 @@ test("bounds: spec-v178 support-spacing pins the EMT/NM lookups, the size-depend
   assert.strictEqual(_cv178({ wiring_method: "RMC/IMC", trade_size_in: 2 }).max_interval_ft, 16);
   assert.ok(Number.isFinite(_cv178({ wiring_method: "PVC (rigid nonmetallic)", trade_size_in: 0 }).max_interval_ft));
   assert.ok("error" in _cv178({ wiring_method: "bad", trade_size_in: 1 }));
+});
+
+test("bounds: spec-v179 motor-branch-protection pins the breaker example, the fuse round-up, the disconnect, and error seams", () => {
+  const brk = _cv179({ flc_a: 28, device_type: "inverse-time breaker" });
+  assert.ok(Math.abs(brk.multiplier - 2.5) < 1e-9);
+  assert.ok(Math.abs(brk.max_ocpd_a - 70) < 1e-9 && Math.abs(brk.max_ocpd_std_a - 70) < 1e-9);
+  assert.ok(brk.rounded_up === false);
+  assert.ok(Math.abs(brk.min_disconnect_a - 32.2) < 1e-9);
+  const fuse = _cv179({ flc_a: 28, device_type: "dual-element/time-delay fuse" });
+  assert.ok(Math.abs(fuse.max_ocpd_a - 49) < 1e-9 && fuse.max_ocpd_std_a === 50 && fuse.rounded_up === true);
+  assert.strictEqual(_cv179({ flc_a: 28, device_type: "nontime-delay fuse" }).max_ocpd_std_a, 90);
+  assert.ok("error" in _cv179({ flc_a: 28, device_type: "bad" }));
+  assert.ok("error" in _cv179({ flc_a: 0, device_type: "inverse-time breaker" }));
+  assert.ok("error" in _cv179({ flc_a: Infinity, device_type: "inverse-time breaker" }));
+});
+
+test("bounds: spec-v180 commercial-lighting-load pins the over-10kVA demand, the under-breakpoint path, and error seams", () => {
+  const ex = _cv180({ floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 60, supply_v: 208 });
+  assert.ok(Math.abs(ex.lighting_va - 15000) < 1e-9);
+  assert.ok(Math.abs(ex.recep_demand_va - 10400) < 1e-9 && Math.abs(ex.total_va - 25400) < 1e-9);
+  assert.ok(Math.abs(ex.total_a - 25400 / 208) < 1e-9);
+  const under = _cv180({ floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 40, supply_v: 208 });
+  assert.ok(Math.abs(under.recep_va - 7200) < 1e-9 && Math.abs(under.recep_demand_va - 7200) < 1e-9);
+  assert.ok("error" in _cv180({ floor_area_ft2: -1, unit_load_va_ft2: 3, receptacle_count: 10, supply_v: 208 }));
+  assert.ok("error" in _cv180({ floor_area_ft2: 5000, unit_load_va_ft2: 3, receptacle_count: 10, supply_v: 0 }));
+  assert.ok("error" in _cv180({ floor_area_ft2: Infinity, unit_load_va_ft2: 3, receptacle_count: 10, supply_v: 208 }));
+});
+
+test("bounds: spec-v181 noncoincident-load pins the larger-of rule, the simultaneous exception, and error seams", () => {
+  const ex = _cv181({ load_a_va: 9000, load_b_va: 6000, both_can_run: 0 });
+  assert.ok(Math.abs(ex.counted_va - 9000) < 1e-9 && Math.abs(ex.omitted_va - 6000) < 1e-9);
+  const both = _cv181({ load_a_va: 9000, load_b_va: 6000, both_can_run: 1 });
+  assert.ok(Math.abs(both.counted_va - 15000) < 1e-9 && both.omitted_va === 0);
+  assert.ok("error" in _cv181({ load_a_va: -1, load_b_va: 6000, both_can_run: 0 }));
+  assert.ok("error" in _cv181({ load_a_va: Infinity, load_b_va: 6000, both_can_run: 0 }));
+});
+
+test("bounds: spec-v182 pv-circuit-ampacity pins the two-string 156% example, the single-string path, and error seams", () => {
+  const ex = _cv182({ module_isc_a: 10, parallel_strings: 2 });
+  assert.ok(Math.abs(ex.max_current_a - 25) < 1e-9 && Math.abs(ex.min_ampacity_a - 31.25) < 1e-9);
+  assert.ok(Math.abs(ex.stacked_factor - 1.5625) < 1e-12);
+  const one = _cv182({ module_isc_a: 10, parallel_strings: 1 });
+  assert.ok(Math.abs(one.max_current_a - 12.5) < 1e-9 && Math.abs(one.min_ampacity_a - 15.625) < 1e-9);
+  assert.ok("error" in _cv182({ module_isc_a: 0, parallel_strings: 2 }));
+  assert.ok("error" in _cv182({ module_isc_a: 10, parallel_strings: 0 }));
+  assert.ok("error" in _cv182({ module_isc_a: Infinity, parallel_strings: 2 }));
+});
+
+test("bounds: spec-v183 transformer-k-factor pins the receptacle spectrum, the near-linear path, and error seams", () => {
+  const ex = _cv183({ i1: 1.0, i3: 0.33, i5: 0.20, i7: 0.14, i9: 0.09, i11: 0.06, i13: 0.05 });
+  assert.ok(Math.abs(ex.k_factor - 4.61) < 0.02 && ex.recommended_k_rating === 9);
+  const lin = _cv183({ i1: 1.0, i3: 0.05, i5: 0.03 });
+  assert.ok(Math.abs(lin.k_factor - 1.04) < 0.01 && lin.recommended_k_rating === 4);
+  // pure fundamental -> K exactly 1 -> standard
+  assert.strictEqual(_cv183({ i1: 1.0 }).recommended_k_rating, 1);
+  assert.ok("error" in _cv183({ i1: 0 }));
+  assert.ok("error" in _cv183({ i1: 1.0, i3: -0.1 }));
+  assert.ok("error" in _cv183({ i1: 1.0, i3: Infinity }));
+});
+
+test("bounds: spec-v184 motor-capacitor-max pins both examples and error seams", () => {
+  const ex = _cv184({ v_ll: 480, i_noload_a: 8, safety_factor: 0.90 });
+  assert.ok(Math.abs(ex.magnetizing_kvar - 6.65) < 0.02 && Math.abs(ex.max_capacitor_kvar - 5.99) < 0.02);
+  const sm = _cv184({ v_ll: 480, i_noload_a: 3, safety_factor: 0.90 });
+  assert.ok(Math.abs(sm.magnetizing_kvar - 2.49) < 0.02 && Math.abs(sm.max_capacitor_kvar - 2.24) < 0.02);
+  assert.ok("error" in _cv184({ v_ll: 0, i_noload_a: 8, safety_factor: 0.90 }));
+  assert.ok("error" in _cv184({ v_ll: 480, i_noload_a: -1, safety_factor: 0.90 }));
+  assert.ok("error" in _cv184({ v_ll: 480, i_noload_a: 8, safety_factor: 0 }));
+  assert.ok("error" in _cv184({ v_ll: Infinity, i_noload_a: 8, safety_factor: 0.90 }));
+});
+
+test("bounds: spec-v185 bends-between-pulls pins the within-limit example, the over-limit path, and error seams", () => {
+  const ex = _cv185({ bend1_deg: 90, bend2_deg: 90, bend3_deg: 45, bend4_deg: 45 });
+  assert.ok(Math.abs(ex.total_deg - 270) < 1e-9 && Math.abs(ex.quarter_bends_eq - 3) < 1e-9 && ex.within_limit === true);
+  const over = _cv185({ bend1_deg: 90, bend2_deg: 90, bend3_deg: 45, bend4_deg: 45, bend5_deg: 90, bend6_deg: 45 });
+  assert.ok(Math.abs(over.total_deg - 405) < 1e-9 && Math.abs(over.quarter_bends_eq - 4.5) < 1e-9 && over.within_limit === false);
+  // exactly 360 is within
+  assert.ok(_cv185({ bend1_deg: 90, bend2_deg: 90, bend3_deg: 90, bend4_deg: 90 }).within_limit === true);
+  assert.ok("error" in _cv185({ bend1_deg: -1 }));
+  assert.ok("error" in _cv185({ bend1_deg: Infinity }));
+});
+
+test("bounds: spec-v186 shock-approach-boundary pins the 480 V lookup, the <50 V no-boundary case, and the error seam", () => {
+  const v480 = _cv186({ nominal_v_ac: "151-750 V" });
+  assert.strictEqual(v480.limited_fixed, "3 ft 6 in");
+  assert.strictEqual(v480.limited_movable, "10 ft 0 in");
+  assert.strictEqual(v480.restricted, "1 ft 0 in");
+  assert.strictEqual(v480.no_boundary, false);
+  const low = _cv186({ nominal_v_ac: "<50 V" });
+  assert.strictEqual(low.no_boundary, true);
+  assert.strictEqual(low.restricted, "N/A");
+  assert.ok("error" in _cv186({ nominal_v_ac: "bad" }));
+});
+
+test("bounds: spec-v187 pool-bonding-680-26 pins the permanent-pool checklist, the storable cross-check, and the error seam", () => {
+  const perm = _cv187({ pool_type: "permanent pool/spa" });
+  assert.strictEqual(perm.item_count, 8);
+  assert.ok(/680\.26\(B\)\(1\)/.test(perm.items[0]));
+  const spa = _cv187({ pool_type: "permanently installed spa/hot tub" });
+  assert.strictEqual(spa.item_count, 8);
+  const stor = _cv187({ pool_type: "storable pool (limited)" });
+  assert.strictEqual(stor.item_count, 2);
+  assert.ok("error" in _cv187({ pool_type: "bad" }));
 });

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v179 -- Motor Branch-Circuit Protective Device Maximum and Disconnect Rating (NEC 430.52 / 430.110) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter, completing the second tier of electrician
 > gaps after the v164..v178 batch: one tile sizing the motor branch-circuit short-circuit and
 > ground-fault protective device (NEC 430.52, Table 430.52) and the motor disconnect (430.110), both

@@ -773,6 +773,71 @@ function renderSupportSpacing(inputRegion, outputRegion, citationEl) {
   refresh();
 }
 
+// =====================================================================
+// spec-v187 - Group A: NEC 680.26 swimming-pool equipotential-bonding
+// checklist reference.
+// =====================================================================
+
+// The 680.26(B) bonded-component list, each with its citation. A permanent
+// pool/spa bonds the full grid; a permanently installed spa/hot tub follows
+// the same way for its conductive parts; a storable pool narrows the list.
+const _POOL_TYPES = [
+  "permanent pool/spa",
+  "permanently installed spa/hot tub",
+  "storable pool (limited)",
+];
+const _POOL_BOND_ITEMS = [
+  "Conductive pool shell / structural reinforcing steel (or a listed equivalent) -- 680.26(B)(1)",
+  "Perimeter surfaces within 3 ft horizontally, paved and unpaved -- 680.26(B)(2)",
+  "Metallic components of the pool structure -- 680.26(B)(3)",
+  "Underwater metal forming shells, luminaire, niche -- 680.26(B)(4)",
+  "Metal fittings (ladders, rails, diving stands) 1 in and larger -- 680.26(B)(5)",
+  "Electrical equipment: pump motor and others (double-insulated note) -- 680.26(B)(6)",
+  "Metal piping and metal awnings/fences within 5 ft -- 680.26(B)(7)",
+  "Pool water via a listed water-bond fitting (>= 9 sq in) -- 680.26(C)",
+];
+
+// dims: in { pool_type: dimensionless } out: { items: dimensionless }
+export function computePoolBonding68026({ pool_type = "permanent pool/spa" } = {}) {
+  if (!_POOL_TYPES.includes(pool_type)) return { error: "Pool type not recognized." };
+  let items;
+  if (pool_type === "storable pool (limited)") {
+    items = [
+      "Storable pools are not built with an equipotential bonding grid; bonding narrows to listed cord-and-plug equipment and any required GFCI protection -- 680.31/680.32.",
+      "No 680.26(B) grid is required for a storable pool; the AHJ governs.",
+    ];
+  } else {
+    items = _POOL_BOND_ITEMS.slice();
+  }
+  return {
+    pool_type,
+    items,
+    item_count: items.length,
+    conductor: "Solid copper, #8 AWG minimum; connections listed and irreversible (exothermic, listed pressure connectors, or listed clamps).",
+    note: "NEC 680.26: the equipotential bonding grid ties the listed conductive parts together so they sit at the same potential; the grid is equipotential and need not run to a remote grounding electrode. A permanently installed spa/hot tub follows 680.26 for its conductive parts (a listed self-contained spa carries the manufacturer's bonding provisions). The AHJ governs the final inspection.",
+  };
+}
+export const poolBonding68026Example = { inputs: { pool_type: "permanent pool/spa" } };
+
+function renderPoolBonding68026(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 680.26 (equipotential bonding) - the 680.26(B) bonded-component list, the 3 ft perimeter, the listed water bond (680.26(C)), and the #8 AWG solid copper minimum. The grid is equipotential; the AHJ governs the inspection. Free at nfpa.org/freeaccess.";
+  const type = makeSelect("Pool / spa type", "pb-type", _POOL_TYPES.map((t) => ({ value: t, label: t })));
+  inputRegion.appendChild(type.wrap);
+  attachExampleButton(inputRegion, () => { type.select.value = "permanent pool/spa"; refresh(); });
+  const oItems = makeOutputLine(outputRegion, "Bond these components", "pb-out-items");
+  const oCond = makeOutputLine(outputRegion, "Bonding conductor", "pb-out-cond");
+  const oNote = makeOutputLine(outputRegion, "Note", "pb-out-note");
+  function refresh() {
+    const r = computePoolBonding68026({ pool_type: type.select.value });
+    if (r.error) { oItems.textContent = r.error; oCond.textContent = "-"; oNote.textContent = ""; return; }
+    oItems.textContent = r.items.join("  •  ");
+    oCond.textContent = r.conductor;
+    oNote.textContent = r.note;
+  }
+  type.select.addEventListener("change", refresh);
+  refresh();
+}
+
 export const REFERENCE_RENDERERS = {
   "color-codes": renderColorCodes,
   "knot-reference": renderKnotReference,
@@ -794,4 +859,6 @@ export const REFERENCE_RENDERERS = {
   // spec-v177/v178 electrician reference lookups
   "burial-depth-300-5": renderBurialDepth3005,
   "support-spacing": renderSupportSpacing,
+  // spec-v187 swimming-pool equipotential bonding
+  "pool-bonding-680-26": renderPoolBonding68026,
 };

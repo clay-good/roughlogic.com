@@ -590,7 +590,67 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
   for (const f of [ch.input, volt.select, main.input, existing.input, busbar.input, managed.input]) f.addEventListener("input", update);
 }
 
-// Renderer registry keyed by tool id. All five tiles keep group: "A"; this
+// =====================================================================
+// spec-v182 - Group A: Electrical (1 tile)
+// PV source/output circuit maximum current and minimum conductor
+// ampacity (NEC 690.8(A)/(B), the stacked-125% "156%" rule).
+// =====================================================================
+
+// dims: in { module_isc_a: I, parallel_strings: dimensionless, ocpd_a: I } out: { max_current_a: I, min_ampacity_a: I, stacked_factor: dimensionless }
+export function computePvCircuitAmpacity({ module_isc_a = 0, parallel_strings = 1, ocpd_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const isc = Number(module_isc_a) || 0;
+  if (!(isc > 0)) return { error: "Module short-circuit current must be positive (A)." };
+  const strings = Number(parallel_strings) || 0;
+  if (!(strings >= 1)) return { error: "Parallel strings must be at least 1." };
+  // 690.8(A)(1): maximum current = Isc x strings x 125%.
+  const max_current_a = isc * strings * 1.25;
+  // 690.8(B)(1): minimum conductor ampacity = max current x 125% (before any
+  // temperature / conduit conditions-of-use adjustment under (B)(2)).
+  const min_ampacity_a = max_current_a * 1.25;
+  const stacked_factor = 1.25 * 1.25; // 1.5625 -> the "156%" of Isc
+  const ocpd = Number(ocpd_a) || 0;
+  const ocpd_ok = ocpd > 0 ? ocpd >= max_current_a : null;
+  return {
+    max_current_a,
+    min_ampacity_a,
+    stacked_factor,
+    ocpd_a: ocpd,
+    ocpd_ok,
+    note: "NEC 690.8(A)(1): the maximum PV source/output-circuit current is the rated Isc times the number of paralleled strings times 125%. 690.8(B)(1): the conductor ampacity is at least that maximum current times another 125% (the two factors stack to 156% of Isc) before any temperature/conduit conditions-of-use derate; the conductor must also satisfy 690.8(B)(2) after conditions of use, and the greater governs. The engineer governs.",
+  };
+}
+export const pvCircuitAmpacityExample = { inputs: { module_isc_a: 10, parallel_strings: 2, ocpd_a: 0 } };
+
+function renderPvCircuitAmpacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 690.8(A)(1) (max current = Isc x strings x 125%) and 690.8(B)(1) (min ampacity = max current x 125%; the factors stack to 156% of Isc). Also size for 690.8(B)(2) after conditions of use and take the greater. The engineer governs. Free at nfpa.org/freeaccess.";
+  const isc = makeNumber("Module Isc per source circuit (A)", "pca-isc", { step: "any", min: "0", value: "10" });
+  isc.input.value = "10";
+  const strings = makeNumber("Parallel source circuits (strings)", "pca-strings", { step: "1", min: "1", value: "2" });
+  strings.input.value = "2";
+  const ocpd = makeNumber("Series fuse / OCPD rating to check (A, optional)", "pca-ocpd", { step: "any", min: "0", value: "0" });
+  for (const f of [isc, strings, ocpd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { isc.input.value = "10"; strings.input.value = "2"; ocpd.input.value = "0"; update(); });
+
+  const oMax = makeOutputLine(outputRegion, "Maximum current (690.8(A))", "pca-out-max");
+  const oMin = makeOutputLine(outputRegion, "Min conductor ampacity (690.8(B))", "pca-out-min");
+  const oFactor = makeOutputLine(outputRegion, "Stacked factor on Isc", "pca-out-factor");
+  const oOcpd = makeOutputLine(outputRegion, "OCPD check", "pca-out-ocpd");
+  const oNote = makeOutputLine(outputRegion, "Note", "pca-out-note");
+
+  const update = debounce(() => {
+    const r = computePvCircuitAmpacity({ module_isc_a: Number(isc.input.value) || 0, parallel_strings: Number(strings.input.value) || 0, ocpd_a: Number(ocpd.input.value) || 0 });
+    if (r.error) { oMax.textContent = r.error; oMin.textContent = "-"; oFactor.textContent = "-"; oOcpd.textContent = "-"; oNote.textContent = ""; return; }
+    oMax.textContent = fmt(r.max_current_a, 2) + " A";
+    oMin.textContent = fmt(r.min_ampacity_a, 2) + " A";
+    oFactor.textContent = fmt(r.stacked_factor, 4) + " (156%)";
+    oOcpd.textContent = r.ocpd_ok === null ? "-" : (r.ocpd_ok ? "OCPD " + fmt(r.ocpd_a, 0) + " A >= max current, OK" : "OCPD " + fmt(r.ocpd_a, 0) + " A below max current");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [isc, strings, ocpd]) f.input.addEventListener("input", update);
+}
+
+// Renderer registry keyed by tool id. All tiles keep group: "A"; this
 // registry is merged into the Group A renderer set by app.js (spec-v88).
 export const SOLAR_RENDERERS = {
   "pv-string-sizing": renderPVStringSizing,
@@ -598,4 +658,5 @@ export const SOLAR_RENDERERS = {
   "pv-interconnection-busbar": renderPvInterconnectionBusbar,
   "off-grid-battery": renderOffGridBattery,
   "ev-charger-load": renderEvChargerLoad,
+  "pv-circuit-ampacity": renderPvCircuitAmpacity,
 };

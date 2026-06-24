@@ -1,6 +1,6 @@
 # roughlogic.com Specification v182 -- PV Source/Output Circuit Ampacity (NEC 690.8, the 156% Rule) (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter: one tile computing the PV source- and
 > output-circuit maximum current and the minimum conductor ampacity under NEC 690.8(A)/(B) -- the
 > stacked 125% factors that yield the familiar 156% of module Isc. Adds one tile to **`calc-solar.js`**

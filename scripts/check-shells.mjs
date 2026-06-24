@@ -35,7 +35,11 @@ const DIST = resolve(ROOT, "dist");
 const TITLE_CAP = 70;
 const DESCRIPTION_CAP = 220;
 const TILE_GZIP_CAP = 6 * 1024;
-const GROUP_GZIP_CAP = 12 * 1024;
+// spec-v13 §8.3 group-shell cap. Bumped 12 -> 14 KB on 2026-06-24: the
+// spec-v179..v187 electrician batch took Group A (Electrical) to 90 tiles, and
+// the group hub lists every tile, taking electrical/index.html to ~12.6 KB gz
+// (the largest group hub); 14 KB restores ~10% headroom for further Group A growth.
+const GROUP_GZIP_CAP = 14 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

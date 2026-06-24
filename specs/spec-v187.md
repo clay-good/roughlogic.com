@@ -1,6 +1,6 @@
 # roughlogic.com Specification v187 -- Swimming-Pool Equipotential Bonding Reference (NEC 680.26) (calc-references.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter, and the closing tile of the second pass:
 > one reference tile listing the components that NEC 680.26 requires to be connected to the
 > equipotential bonding grid, and the minimum #8 AWG solid copper bonding conductor. Adds one tile to

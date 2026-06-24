@@ -45,6 +45,8 @@ const TOOL_MODULES = (() => {
     "egc-upsize-proportional", "delta-wye-line-phase",
     // spec-v165/v170/v174/v176 electrician batch
     "buck-boost-sizing", "wireway-fill", "rooftop-temp-adder", "working-space-110-26",
+    // spec-v179/v185/v186 electrician second-pass batch
+    "motor-branch-protection", "bends-between-pulls", "shock-approach-boundary",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,
@@ -68,6 +70,8 @@ const TOOL_MODULES = (() => {
     "pv-string-sizing", "battery-runtime",
     // v15
     "pv-interconnection-busbar", "off-grid-battery", "ev-charger-load",
+    // spec-v182 electrician second-pass batch
+    "pv-circuit-ampacity",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)
@@ -78,6 +82,8 @@ const TOOL_MODULES = (() => {
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
     // spec-v172 electrician batch
     "motor-unbalance-derate",
+    // spec-v183/v184 electrician second-pass batch
+    "transformer-k-factor", "motor-capacitor-max",
   ]);
   // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
   // relocated from calc-electrical.js at spec-v72 to relieve that module's
@@ -164,6 +170,8 @@ const TOOL_MODULES = (() => {
     "pipe-support-spacing", "softener-sizing",
     // spec-v167/v168/v169 electrician dwelling demand-factor trio
     "range-demand-220-55", "dryer-demand-220-54", "neutral-demand-220-61",
+    // spec-v180/v181 electrician second-pass batch
+    "commercial-lighting-load", "noncoincident-load",
   ]);
   // spec-v73 cap-relief split: the two spec-v62 storm-drainage tiles relocated
   // out of calc-plumbing.js (which had reached 96.2% of cap -- the tightest
@@ -402,6 +410,8 @@ const TOOL_MODULES = (() => {
     "irs-form-index", "sales-tax-nexus", "osha-recordkeeping", "lab-safety-quickread",
     // spec-v177/v178 electrician reference lookups
     "burial-depth-300-5", "support-spacing",
+    // spec-v187 swimming-pool equipotential bonding
+    "pool-bonding-680-26",
   ]);
   declare("./calc-cross.js", "CROSS_RENDERERS", [
     "unit-converter", "material-cost", "markup", "time-and-materials",

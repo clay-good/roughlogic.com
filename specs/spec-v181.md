@@ -1,6 +1,6 @@
 # roughlogic.com Specification v181 -- Noncoincident Loads: Larger of Heating vs Air-Conditioning (NEC 220.60) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter: one tile applying NEC 220.60, which lets a
 > service/feeder load calculation omit the smaller of two loads that cannot operate at the same time --
 > most commonly electric heat versus air-conditioning. Adds one tile to **`calc-service.js`** (Group

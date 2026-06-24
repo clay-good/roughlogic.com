@@ -471,6 +471,12 @@ const _TILES = [
   ["range-demand-220-55", "A"], ["dryer-demand-220-54", "A"], ["neutral-demand-220-61", "A"],
   ["motor-unbalance-derate", "A"], ["point-illuminance", "A"],
   ["burial-depth-300-5", "A"], ["support-spacing", "A"],
+  // spec-v179..v187 electrician second-pass batch (9 tiles)
+  ["motor-branch-protection", "A"], ["commercial-lighting-load", "A"],
+  ["noncoincident-load", "A"], ["pv-circuit-ampacity", "A"],
+  ["transformer-k-factor", "A"], ["motor-capacitor-max", "A"],
+  ["bends-between-pulls", "A"], ["shock-approach-boundary", "A"],
+  ["pool-bonding-680-26", "A"],
 ];
 
 

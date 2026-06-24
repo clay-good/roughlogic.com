@@ -679,6 +679,16 @@ export const COMPUTE_MAP = {
   "point-illuminance": { module: "../../calc-elecdesign.js", fn: "computePointIlluminance" },
   "burial-depth-300-5": { module: "../../calc-references.js", fn: "computeBurialDepth3005" },
   "support-spacing": { module: "../../calc-references.js", fn: "computeSupportSpacing" },
+  // spec-v179..v187 electrician second-pass batch
+  "motor-branch-protection": { module: "../../calc-electrical.js", fn: "computeMotorBranchProtection" },
+  "commercial-lighting-load": { module: "../../calc-service.js", fn: "computeCommercialLightingLoad" },
+  "noncoincident-load": { module: "../../calc-service.js", fn: "computeNoncoincidentLoad" },
+  "pv-circuit-ampacity": { module: "../../calc-solar.js", fn: "computePvCircuitAmpacity" },
+  "transformer-k-factor": { module: "../../calc-powerquality.js", fn: "computeTransformerKFactor" },
+  "motor-capacitor-max": { module: "../../calc-powerquality.js", fn: "computeMotorCapacitorMax" },
+  "bends-between-pulls": { module: "../../calc-electrical.js", fn: "computeBendsBetweenPulls" },
+  "shock-approach-boundary": { module: "../../calc-electrical.js", fn: "computeShockApproachBoundary" },
+  "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

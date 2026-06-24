@@ -23678,6 +23678,267 @@
         "secure_within_in": { "value": 12.0, "tolerance": { "abs": 0.001 } },
         "max_interval_ft": { "value": 4.5, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "motor-branch-protection",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Motor branch-circuit protection Table 430.52, inverse-time breaker",
+      "source_edition_or_year": "NEC 2023 Section 430.52, 430.110",
+      "source_section_or_page": "10 HP 230 V 3ph FLC 28 A x 250% = 70 A (standard); disconnect 1.15 x 28 = 32.2 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "flc_a": 28, "device_type": "inverse-time breaker" },
+      "outputs": {
+        "multiplier": { "value": 2.5, "tolerance": { "abs": 0.001 } },
+        "max_ocpd_a": { "value": 70.0, "tolerance": { "abs": 0.01 } },
+        "max_ocpd_std_a": { "value": 70.0, "tolerance": { "abs": 0.01 } },
+        "min_disconnect_a": { "value": 32.2, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "motor-branch-protection",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: dual-element fuse with 430.52(C)(1) Exception 1 round-up",
+      "source_edition_or_year": "NEC 2023 Table 430.52",
+      "source_section_or_page": "28 A x 175% = 49 A -> next standard 50 A (240.6)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "flc_a": 28, "device_type": "dual-element/time-delay fuse" },
+      "outputs": {
+        "multiplier": { "value": 1.75, "tolerance": { "abs": 0.001 } },
+        "max_ocpd_a": { "value": 49.0, "tolerance": { "abs": 0.01 } },
+        "max_ocpd_std_a": { "value": 50.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "commercial-lighting-load",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Commercial general-lighting + receptacle load, 220.12/220.14(I)/220.44",
+      "source_edition_or_year": "NEC 2023 Section 220.12, 220.14(I), 220.44",
+      "source_section_or_page": "5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 VA -> 10,400 VA demand; total 25,400 VA; 122 A at 208 V",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "floor_area_ft2": 5000, "unit_load_va_ft2": 3, "receptacle_count": 60, "supply_v": 208 },
+      "outputs": {
+        "lighting_va": { "value": 15000.0, "tolerance": { "abs": 0.01 } },
+        "recep_demand_va": { "value": 10400.0, "tolerance": { "abs": 0.01 } },
+        "total_va": { "value": 25400.0, "tolerance": { "abs": 0.01 } },
+        "total_a": { "value": 122.12, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "commercial-lighting-load",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: receptacle load under the 10 kVA breakpoint (all at 100%)",
+      "source_edition_or_year": "NEC 2023 Section 220.44",
+      "source_section_or_page": "40 x 180 = 7,200 VA <= 10 kVA -> 100%; total 15,000 + 7,200 = 22,200 VA",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "floor_area_ft2": 5000, "unit_load_va_ft2": 3, "receptacle_count": 40, "supply_v": 208 },
+      "outputs": {
+        "recep_va": { "value": 7200.0, "tolerance": { "abs": 0.01 } },
+        "recep_demand_va": { "value": 7200.0, "tolerance": { "abs": 0.01 } },
+        "total_va": { "value": 22200.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "noncoincident-load",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Noncoincident loads, larger-of rule, 220.60",
+      "source_edition_or_year": "NEC 2023 Section 220.60",
+      "source_section_or_page": "heat 9,000 VA vs A/C 6,000 VA, not simultaneous -> count 9,000, omit 6,000",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "load_a_va": 9000, "load_b_va": 6000, "both_can_run": 0 },
+      "outputs": {
+        "counted_va": { "value": 9000.0, "tolerance": { "abs": 0.01 } },
+        "omitted_va": { "value": 6000.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "noncoincident-load",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: simultaneous-operation exception (add both)",
+      "source_edition_or_year": "NEC 2023 Section 220.60 exception",
+      "source_section_or_page": "heat-pump compressor 6,000 VA + supplemental strip heat 9,000 VA, coincident -> count 15,000, omit 0",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "load_a_va": 9000, "load_b_va": 6000, "both_can_run": 1 },
+      "outputs": {
+        "counted_va": { "value": 15000.0, "tolerance": { "abs": 0.01 } },
+        "omitted_va": { "value": 0.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "pv-circuit-ampacity",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "PV circuit max current + min ampacity, 690.8(A)/(B) the 156% rule",
+      "source_edition_or_year": "NEC 2023 Section 690.8(A)(1), 690.8(B)(1)",
+      "source_section_or_page": "2 strings x Isc 10 A x 1.25 = 25 A; x 1.25 = 31.25 A (10 x 2 x 1.5625)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "module_isc_a": 10, "parallel_strings": 2, "ocpd_a": 0 },
+      "outputs": {
+        "max_current_a": { "value": 25.0, "tolerance": { "abs": 0.01 } },
+        "min_ampacity_a": { "value": 31.25, "tolerance": { "abs": 0.01 } },
+        "stacked_factor": { "value": 1.5625, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
+      "tile_id": "pv-circuit-ampacity",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: single string",
+      "source_edition_or_year": "NEC 2023 Section 690.8",
+      "source_section_or_page": "1 string x Isc 10 A x 1.25 = 12.5 A; x 1.25 = 15.625 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "module_isc_a": 10, "parallel_strings": 1, "ocpd_a": 0 },
+      "outputs": {
+        "max_current_a": { "value": 12.5, "tolerance": { "abs": 0.01 } },
+        "min_ampacity_a": { "value": 15.625, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "transformer-k-factor",
+      "source_publisher": "UL 1561 / IEEE C57.110",
+      "source_title": "Transformer K-factor from a receptacle-heavy harmonic spectrum",
+      "source_edition_or_year": "UL 1561 / IEEE C57.110",
+      "source_section_or_page": "K = sum(Ih^2 h^2)/sum(Ih^2) = 5.455/1.183 = 4.61 -> K-9",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "i1": 1.0, "i3": 0.33, "i5": 0.20, "i7": 0.14, "i9": 0.09, "i11": 0.06, "i13": 0.05 },
+      "outputs": {
+        "k_factor": { "value": 4.61, "tolerance": { "abs": 0.02 } },
+        "recommended_k_rating": { "value": 9.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "transformer-k-factor",
+      "source_publisher": "UL 1561 / IEEE C57.110",
+      "source_title": "cross-check: near-linear load (rounds up to the smallest tabulated K-rated unit)",
+      "source_edition_or_year": "UL 1561 / IEEE C57.110",
+      "source_section_or_page": "I1 1.0, I3 0.05, I5 0.03 -> K = 1.045/1.0034 = 1.04 -> next tabulated rating K-4",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "i1": 1.0, "i3": 0.05, "i5": 0.03 },
+      "outputs": {
+        "k_factor": { "value": 1.04, "tolerance": { "abs": 0.01 } },
+        "recommended_k_rating": { "value": 4.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "motor-capacitor-max",
+      "source_publisher": "NEMA MG-1 / IEEE 18",
+      "source_title": "Max motor-terminal capacitor before self-excitation",
+      "source_edition_or_year": "NEMA MG-1 / IEEE 18",
+      "source_section_or_page": "480 V, 8 A no-load: sqrt(3) x 480 x 8 / 1000 = 6.65 kVAR; x 0.90 = 5.99 kVAR",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "v_ll": 480, "i_noload_a": 8, "safety_factor": 0.90 },
+      "outputs": {
+        "magnetizing_kvar": { "value": 6.65, "tolerance": { "abs": 0.02 } },
+        "max_capacitor_kvar": { "value": 5.99, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "motor-capacitor-max",
+      "source_publisher": "NEMA MG-1 / IEEE 18",
+      "source_title": "cross-check: smaller no-load current",
+      "source_edition_or_year": "NEMA MG-1 / IEEE 18",
+      "source_section_or_page": "480 V, 3 A: sqrt(3) x 480 x 3 / 1000 = 2.49 kVAR; x 0.90 = 2.24 kVAR",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "v_ll": 480, "i_noload_a": 3, "safety_factor": 0.90 },
+      "outputs": {
+        "magnetizing_kvar": { "value": 2.49, "tolerance": { "abs": 0.02 } },
+        "max_capacitor_kvar": { "value": 2.24, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "bends-between-pulls",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Bends between pull points, within the 360-degree limit",
+      "source_edition_or_year": "NEC 2023 Section 358.26",
+      "source_section_or_page": "90 + 90 + 45 + 45 = 270 deg; 270/90 = 3.0 quarter bends, within 360",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "bend1_deg": 90, "bend2_deg": 90, "bend3_deg": 45, "bend4_deg": 45, "bend5_deg": 0, "bend6_deg": 0 },
+      "outputs": {
+        "total_deg": { "value": 270.0, "tolerance": { "abs": 0.001 } },
+        "quarter_bends_eq": { "value": 3.0, "tolerance": { "abs": 0.001 } },
+        "within_limit": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "bends-between-pulls",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: over the 360-degree limit (add a pull point)",
+      "source_edition_or_year": "NEC 2023 Section 358.26",
+      "source_section_or_page": "add 90 + 45 -> 405 deg; 405/90 = 4.5, over 360",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "bend1_deg": 90, "bend2_deg": 90, "bend3_deg": 45, "bend4_deg": 45, "bend5_deg": 90, "bend6_deg": 45 },
+      "outputs": {
+        "total_deg": { "value": 405.0, "tolerance": { "abs": 0.001 } },
+        "quarter_bends_eq": { "value": 4.5, "tolerance": { "abs": 0.001 } },
+        "within_limit": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "shock-approach-boundary",
+      "source_publisher": "NFPA 70E-2024",
+      "source_title": "Shock approach boundaries, 480 V band, Table 130.4",
+      "source_edition_or_year": "NFPA 70E-2024 Table 130.4",
+      "source_section_or_page": "151-750 V: limited fixed 3 ft 6 in, limited movable 10 ft 0 in, restricted 1 ft 0 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "nominal_v_ac": "151-750 V" },
+      "outputs": {
+        "limited_fixed": { "value": "3 ft 6 in", "tolerance": { "abs": 0 } },
+        "restricted": { "value": "1 ft 0 in", "tolerance": { "abs": 0 } },
+        "no_boundary": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "shock-approach-boundary",
+      "source_publisher": "NFPA 70E-2024",
+      "source_title": "cross-check: below 50 V, no boundary specified",
+      "source_edition_or_year": "NFPA 70E-2024 Table 130.4",
+      "source_section_or_page": "<50 V: no shock approach boundary specified (risk assessment still applies)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "nominal_v_ac": "<50 V" },
+      "outputs": {
+        "restricted": { "value": "N/A", "tolerance": { "abs": 0 } },
+        "no_boundary": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pool-bonding-680-26",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Permanent pool equipotential bonding checklist, 680.26(B)",
+      "source_edition_or_year": "NEC 2023 Section 680.26",
+      "source_section_or_page": "permanent pool/spa -> full 8-component 680.26(B)/(C) bonded list",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "pool_type": "permanent pool/spa" },
+      "outputs": {
+        "item_count": { "value": 8.0, "tolerance": { "abs": 0 } },
+        "pool_type": { "value": "permanent pool/spa", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pool-bonding-680-26",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: storable pool (no equipotential grid)",
+      "source_edition_or_year": "NEC 2023 Section 680.31/680.32",
+      "source_section_or_page": "storable pool -> no 680.26(B) grid; narrowed list",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "pool_type": "storable pool (limited)" },
+      "outputs": {
+        "item_count": { "value": 2.0, "tolerance": { "abs": 0 } }
+      }
     }
   ]
 }

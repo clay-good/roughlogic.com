@@ -1,6 +1,6 @@
 # roughlogic.com Specification v180 -- Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.14 / 220.44) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v179..v187 (electrician trade, second pass).** In-scope
+> **Status: LANDED 2026-06-24 (package 0.80.0; part of catalog 639 -> 648). Batch spec-v179..v187 (electrician trade, second pass).** In-scope
 > catalog expansion under the spec-v106 trades-only charter: one tile computing the commercial
 > general-lighting load by occupancy unit load (NEC Table 220.12) and the receptacle-outlet load at
 > 180 VA per strap (220.14(I)) with the 220.44 demand factor. Adds one tile to **`calc-service.js`**
