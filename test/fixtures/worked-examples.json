@@ -22488,6 +22488,191 @@
       }
     },
     {
+      "tile_id": "flood-cut-takeoff",
+      "source_publisher": "ANSI/IICRC S500 flood-cut demolition practice (by name)",
+      "source_title": "60 ft wall run, 24 in flood cut, 1 face -> 120 ft^2 board, 4 sheets, 120 ft^2 insulation, 60 lf base",
+      "source_edition_or_year": "spec-v136 worked example (machine-verified, pure wall geometry)",
+      "source_section_or_page": "spec-v136 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "wall_perimeter_ft": 60,
+        "cut_height_in": 24,
+        "removed_faces": 1,
+        "has_insulation": 1,
+        "has_baseboard": 1
+      },
+      "outputs": {
+        "drywall_sf": { "value": 120, "tolerance": { "abs": 0.1 } },
+        "drywall_sheets": { "value": 4, "tolerance": { "abs": 0.1 } },
+        "baseboard_lf": { "value": 60, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "flood-cut-takeoff",
+      "source_publisher": "ANSI/IICRC S500 flood-cut demolition practice (by name)",
+      "source_title": "Same 60 ft wall cut at the 12 in line -> 60 ft^2 board, 2 sheets (half the cut, half the dumpster)",
+      "source_edition_or_year": "spec-v136 worked example (machine-verified, pure wall geometry)",
+      "source_section_or_page": "spec-v136 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "wall_perimeter_ft": 60,
+        "cut_height_in": 12,
+        "removed_faces": 1,
+        "has_insulation": 1,
+        "has_baseboard": 1
+      },
+      "outputs": {
+        "drywall_sf": { "value": 60, "tolerance": { "abs": 0.1 } },
+        "drywall_sheets": { "value": 2, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "ceiling-water-load",
+      "source_publisher": "ANSI/IICRC S500 safety practice; water density (by name)",
+      "source_title": "20 ft^2 bulge, 2 in deep -> 10.4 psf, 208 lb, drain-first true",
+      "source_edition_or_year": "spec-v137 worked example (machine-verified, hydrostatic load)",
+      "source_section_or_page": "spec-v137 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "pooled_area_ft2": 20,
+        "avg_depth_in": 2,
+        "threshold_psf": 5
+      },
+      "outputs": {
+        "load_psf": { "value": 10.4, "tolerance": { "abs": 0.05 } },
+        "water_weight_lb": { "value": 208, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "ceiling-water-load",
+      "source_publisher": "ANSI/IICRC S500 safety practice; water density (by name)",
+      "source_title": "Gallons path agrees: 24.9 gal x 8.34 = 208 lb (constants check)",
+      "source_edition_or_year": "spec-v137 worked example (machine-verified, hydrostatic load)",
+      "source_section_or_page": "spec-v137 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "pooled_area_ft2": 20,
+        "avg_depth_in": 2,
+        "threshold_psf": 5
+      },
+      "outputs": {
+        "water_volume_gal": { "value": 24.9, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "dehumidifier-derate",
+      "source_publisher": "ANSI/IICRC S500 AHAM-overstates-field caution (by name)",
+      "source_title": "130 ppd nameplate, derate 0.5, 300 ppd demand -> 65 ppd field, 3 vs 5 units, shortfall 2",
+      "source_edition_or_year": "spec-v138 worked example (machine-verified, derate arithmetic)",
+      "source_section_or_page": "spec-v138 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "aham_pints_per_day": 130,
+        "derate_factor": 0.5,
+        "required_pints_per_day": 300
+      },
+      "outputs": {
+        "effective_pints": { "value": 65, "tolerance": { "abs": 0.1 } },
+        "units_by_field": { "value": 5, "tolerance": { "abs": 0.1 } },
+        "shortfall_units": { "value": 2, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "dehumidifier-derate",
+      "source_publisher": "ANSI/IICRC S500 AHAM-overstates-field caution (by name)",
+      "source_title": "Late stage, derate 0.3 -> 39 ppd field, 8 units, shortfall 5 (the plateau deepens as it dries)",
+      "source_edition_or_year": "spec-v138 worked example (machine-verified, derate arithmetic)",
+      "source_section_or_page": "spec-v138 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "aham_pints_per_day": 130,
+        "derate_factor": 0.3,
+        "required_pints_per_day": 300
+      },
+      "outputs": {
+        "units_by_field": { "value": 8, "tolerance": { "abs": 0.1 } },
+        "shortfall_units": { "value": 5, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "class-of-loss-screen",
+      "source_publisher": "ANSI/IICRC S500 Class-of-loss definitions (by name)",
+      "source_title": "Whole floor, 30% wall, 1.5 ft wick, ordinary materials -> Class 2",
+      "source_edition_or_year": "spec-v139 worked example (machine-verified, deterministic screen)",
+      "source_section_or_page": "spec-v139 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "floor_wet_fraction": 1.0,
+        "wall_wet_fraction": 0.30,
+        "wick_height_ft": 1.5,
+        "low_evap_materials": 0
+      },
+      "outputs": {
+        "water_class": { "value": 2, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "class-of-loss-screen",
+      "source_publisher": "ANSI/IICRC S500 Class-of-loss definitions (by name)",
+      "source_title": "Raise the wick to 3.0 ft (> 24 in) -> Class 3 (height escalates)",
+      "source_edition_or_year": "spec-v139 worked example (machine-verified, deterministic screen)",
+      "source_section_or_page": "spec-v139 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "floor_wet_fraction": 1.0,
+        "wall_wet_fraction": 0.30,
+        "wick_height_ft": 3.0,
+        "low_evap_materials": 0
+      },
+      "outputs": {
+        "water_class": { "value": 3, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "desiccant-airflow-sizing",
+      "source_publisher": "Psychrometric mass balance; ANSI/IICRC S500 (by name)",
+      "source_title": "300 ppd at a 60-grain depression, 2000 cfm unit -> 13.04 lb/hr, 338 cfm, 1 unit",
+      "source_edition_or_year": "spec-v140 worked example (machine-verified, mass balance)",
+      "source_section_or_page": "spec-v140 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "required_pints_per_day": 300,
+        "design_grain_depression": 60,
+        "nameplate_process_cfm": 2000
+      },
+      "outputs": {
+        "lb_per_hr": { "value": 13.04, "tolerance": { "abs": 0.02 } },
+        "process_cfm": { "value": 338, "tolerance": { "abs": 1 } },
+        "units_needed": { "value": 1, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "desiccant-airflow-sizing",
+      "source_publisher": "Psychrometric mass balance; ANSI/IICRC S500 (by name)",
+      "source_title": "Shallower 30-grain depression -> 676 cfm (double the air for the same pints)",
+      "source_edition_or_year": "spec-v140 worked example (machine-verified, mass balance)",
+      "source_section_or_page": "spec-v140 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "required_pints_per_day": 300,
+        "design_grain_depression": 30,
+        "nameplate_process_cfm": 2000
+      },
+      "outputs": {
+        "process_cfm": { "value": 676, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
       "tile_id": "motor-synchronous-speed-slip",
       "source_publisher": "First-principles AC-machine theory",
       "source_title": "60 Hz 4-pole motor, nameplate 1750 rpm -> 1800 rpm sync, 2.78% slip, 1.67 Hz rotor",

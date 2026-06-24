@@ -1662,3 +1662,290 @@ function renderWoodEmc(inputRegion, outputRegion, citationEl) {
   for (const el of [temp.input, rh.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["wood-emc"] = renderWoodEmc;
+
+// =====================================================================
+// spec-v136..v140 (Group D) - the on-arrival water-loss bench: the
+// flood-cut demolition takeoff, the overhead collapse screen, the
+// dehumidifier field derate, the S500 class-of-loss screen, and the
+// desiccant process-airflow sizing. All lazy-loaded, absent from home
+// first paint. IICRC S500 referenced by name; the meter, the inspector,
+// and the manufacturer's performance map govern, not these screens.
+// =====================================================================
+
+// --- spec-v136: flood-cut-takeoff (Group D) ---
+// Wicking-height flood cut turned into the demolition takeoff a tech
+// writes on the wall before the saw comes out. Pure wall geometry; the
+// moisture meter sets the cut line, not a round number.
+// dims: in { wall_perimeter_ft: L, cut_height_in: L, removed_faces: dimensionless, has_insulation: dimensionless, has_baseboard: dimensionless }
+//        out: { cut_line_lf: L, drywall_sf: L^2, drywall_sheets: dimensionless, insulation_sf: L^2, baseboard_lf: L }
+export function computeFloodCutTakeoff({ wall_perimeter_ft = 0, cut_height_in = 24, removed_faces = 1, has_insulation = 1, has_baseboard = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const perim = Number(wall_perimeter_ft) || 0;
+  const cut = Number(cut_height_in) || 0;
+  const faces = Number(removed_faces) || 0;
+  if (!(perim > 0)) return { error: "Wall perimeter must be positive (ft)." };
+  if (!(cut > 0)) return { error: "Cut height must be positive (in)." };
+  if (!(faces >= 1)) return { error: "Removed faces must be at least 1." };
+  const ins = has_insulation ? 1 : 0;
+  const base = has_baseboard ? 1 : 0;
+  const cut_height_ft = cut / 12;
+  const cut_line_lf = perim;
+  const drywall_sf = perim * cut_height_ft * faces;
+  const drywall_sheets = Math.ceil(drywall_sf / 32); // standard 4x8 sheet = 32 ft^2
+  const insulation_sf = ins ? perim * cut_height_ft : 0;
+  const baseboard_lf = base ? perim : 0;
+  return { cut_line_lf, drywall_sf, drywall_sheets, insulation_sf, baseboard_lf };
+}
+export const floodCutTakeoffExample = { inputs: { wall_perimeter_ft: 60, cut_height_in: 24, removed_faces: 1, has_insulation: 1, has_baseboard: 1 } };
+
+function renderFloodCutTakeoff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Flood-cut demolition takeoff geometry per IICRC S500 practice, by name (not reproduced): cut a few inches above the highest moisture-meter reading. drywall_sf = perimeter * (cut_height_in/12) * faces; standard 4x8 board = 32 ft^2. The moisture meter governs the cut line, not a round number.";
+  const perim = makeNumber("Affected wall run / perimeter (ft)", "fct-p", { step: "any", min: "0" });
+  const cut = makeNumber("Flood-cut height above floor (in)", "fct-h", { step: "any", min: "0", value: "24" });
+  cut.input.value = "24";
+  const faces = makeNumber("Board faces opened (1, or 2 for a wet partition)", "fct-f", { step: "1", min: "1", value: "1" });
+  faces.input.value = "1";
+  const ins = makeCheckbox("Cavity insulation present", "fct-i", true);
+  const base = makeCheckbox("Baseboard / trim to pull", "fct-b", true);
+  for (const f of [perim, cut, faces, ins, base]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { perim.input.value = "60"; cut.input.value = "24"; faces.input.value = "1"; ins.input.checked = true; base.input.checked = true; update(); });
+  const oCut = makeOutputLine(outputRegion, "Score-cut line", "fct-out-cut");
+  const oBoard = makeOutputLine(outputRegion, "Drywall removed", "fct-out-board");
+  const oSheets = makeOutputLine(outputRegion, "Replacement 4x8 sheets", "fct-out-sheets");
+  const oIns = makeOutputLine(outputRegion, "Cavity insulation removed", "fct-out-ins");
+  const oBase = makeOutputLine(outputRegion, "Baseboard to pull", "fct-out-base");
+  const update = debounce(() => {
+    const r = computeFloodCutTakeoff({
+      wall_perimeter_ft: Number(perim.input.value) || 0,
+      cut_height_in: Number(cut.input.value) || 0,
+      removed_faces: Number(faces.input.value) || 0,
+      has_insulation: ins.input.checked ? 1 : 0,
+      has_baseboard: base.input.checked ? 1 : 0,
+    });
+    if (r.error) { oCut.textContent = r.error; oBoard.textContent = "-"; oSheets.textContent = "-"; oIns.textContent = "-"; oBase.textContent = "-"; return; }
+    oCut.textContent = fmt(r.cut_line_lf, 0) + " lf";
+    oBoard.textContent = fmt(r.drywall_sf, 0) + " ft^2";
+    oSheets.textContent = r.drywall_sheets + " sheet(s)";
+    oIns.textContent = r.insulation_sf > 0 ? fmt(r.insulation_sf, 0) + " ft^2" : "none";
+    oBase.textContent = r.baseboard_lf > 0 ? fmt(r.baseboard_lf, 0) + " lf" : "none";
+  }, DEBOUNCE_MS);
+  for (const el of [perim.input, cut.input, faces.input, ins.input, base.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["flood-cut-takeoff"] = renderFloodCutTakeoff;
+
+// --- spec-v137: ceiling-water-load (Group D) ---
+// Trapped overhead water turned into the distributed load and the
+// drain-before-entry call. A foot of water is 62.4 psf; wet gypsum lets
+// go well below any structural rating. The threshold is an editable
+// screen, not a code capacity.
+// dims: in { pooled_area_ft2: L^2, avg_depth_in: L, threshold_psf: M L^-2 }
+//        out: { water_volume_gal: L^3, water_weight_lb: M, load_psf: M L^-2, drain_first: dimensionless }
+export function computeCeilingWaterLoad({ pooled_area_ft2 = 0, avg_depth_in = 0, threshold_psf = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(pooled_area_ft2) || 0;
+  const depth = Number(avg_depth_in) || 0;
+  const thr = Number(threshold_psf) || 0;
+  if (!(area > 0)) return { error: "Pooled area must be positive (ft2)." };
+  if (!(depth > 0)) return { error: "Average depth must be positive (in)." };
+  const depth_ft = depth / 12;
+  const water_volume_gal = area * depth_ft * 7.48052; // 1 ft^3 = 7.48052 gal
+  const water_weight_lb = area * depth_ft * 62.4;      // water ~ 62.4 lb/ft^3
+  const load_psf = depth_ft * 62.4;                    // distributed load, depth-only
+  const drain_first = load_psf > thr;
+  return { water_volume_gal, water_weight_lb, load_psf, drain_first };
+}
+export const ceilingWaterLoadExample = { inputs: { pooled_area_ft2: 20, avg_depth_in: 2, threshold_psf: 5 } };
+
+function renderCeilingWaterLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Hydrostatic load load_psf = (depth_in/12) * 62.4, with water at ~62.4 lb/ft^3 and 7.48052 gal/ft^3. IICRC S500 safety practice, by name. The threshold is an editable drain-first screen, NOT a code capacity - the fastening, span, and a structural engineer govern.";
+  const area = makeNumber("Bulging / saturated ceiling area (ft^2)", "cwl-a", { step: "any", min: "0" });
+  const depth = makeNumber("Average trapped water depth (in)", "cwl-d", { step: "any", min: "0" });
+  const thr = makeNumber("Drain-first screen load (psf, editable)", "cwl-t", { step: "any", min: "0", value: "5" });
+  thr.input.value = "5";
+  for (const f of [area, depth, thr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "20"; depth.input.value = "2"; thr.input.value = "5"; update(); });
+  const oLoad = makeOutputLine(outputRegion, "Distributed load", "cwl-out-load");
+  const oWt = makeOutputLine(outputRegion, "Total trapped weight", "cwl-out-wt");
+  const oVol = makeOutputLine(outputRegion, "Trapped water volume", "cwl-out-vol");
+  const oFlag = makeOutputLine(outputRegion, "Drain before working beneath?", "cwl-out-flag");
+  const update = debounce(() => {
+    const r = computeCeilingWaterLoad({
+      pooled_area_ft2: Number(area.input.value) || 0,
+      avg_depth_in: Number(depth.input.value) || 0,
+      threshold_psf: Number(thr.input.value) || 0,
+    });
+    if (r.error) { oLoad.textContent = r.error; oWt.textContent = "-"; oVol.textContent = "-"; oFlag.textContent = "-"; return; }
+    oLoad.textContent = fmt(r.load_psf, 1) + " lb/ft^2";
+    oWt.textContent = fmt(r.water_weight_lb, 0) + " lb";
+    oVol.textContent = fmt(r.water_volume_gal, 1) + " gal";
+    oFlag.textContent = r.drain_first ? "YES - punch-drain from a safe distance first" : "below screen - still verify the fastening";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, depth.input, thr.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["ceiling-water-load"] = renderCeilingWaterLoad;
+
+// --- spec-v138: dehumidifier-derate (Group D) ---
+// Nameplate AHAM pints derated to field output at the current chamber
+// grain depression, and the honest unit count that follows - which goes
+// UP, not down, as the chamber dries (the classic drying plateau). The
+// operator reads the derate off the unit's own performance curve.
+// dims: in { aham_pints_per_day: M T^-1, derate_factor: dimensionless, required_pints_per_day: M T^-1 }
+//        out: { effective_pints: M T^-1, units_by_nameplate: dimensionless, units_by_field: dimensionless, shortfall_units: dimensionless }
+export function computeDehumidifierDerate({ aham_pints_per_day = 0, derate_factor = 0.5, required_pints_per_day = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const aham = Number(aham_pints_per_day) || 0;
+  const derate = Number(derate_factor) || 0;
+  const demand = Number(required_pints_per_day) || 0;
+  if (!(aham > 0)) return { error: "AHAM nameplate rating must be positive (pints/day)." };
+  if (!(demand > 0)) return { error: "Required removal must be positive (pints/day)." };
+  if (!(derate > 0 && derate <= 1)) return { error: "Derate factor must be in (0, 1]." };
+  const effective_pints = aham * derate;
+  const units_by_nameplate = Math.ceil(demand / aham);
+  const units_by_field = Math.ceil(demand / effective_pints);
+  const shortfall_units = units_by_field - units_by_nameplate;
+  return { effective_pints, units_by_nameplate, units_by_field, shortfall_units };
+}
+export const dehumidifierDerateExample = { inputs: { aham_pints_per_day: 130, derate_factor: 0.5, required_pints_per_day: 300 } };
+
+function renderDehumidifierDerate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IICRC S500 cautions that the AHAM nameplate (a high-grain-depression test condition) overstates field output as the chamber dries, by name. effective = nameplate * derate; the derate is read off the unit's published performance curve at the measured chamber GPP. The curve and psychrometric reality govern; this carries the multiplication and the count.";
+  const aham = makeNumber("Nameplate AHAM rating (pints/day)", "ddr-a", { step: "any", min: "0", value: "130" });
+  aham.input.value = "130";
+  const derate = makeNumber("Derate factor (0-1, off the unit's curve)", "ddr-d", { step: "any", min: "0", max: "1", value: "0.5" });
+  derate.input.value = "0.5";
+  const demand = makeNumber("Required removal (pints/day)", "ddr-r", { step: "any", min: "0" });
+  for (const f of [aham, derate, demand]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { aham.input.value = "130"; derate.input.value = "0.5"; demand.input.value = "300"; update(); });
+  const oEff = makeOutputLine(outputRegion, "Field-effective output per unit", "ddr-out-eff");
+  const oNom = makeOutputLine(outputRegion, "Units by nameplate (optimistic)", "ddr-out-nom");
+  const oField = makeOutputLine(outputRegion, "Units by field output (honest)", "ddr-out-field");
+  const oShort = makeOutputLine(outputRegion, "Shortfall the nameplate hides", "ddr-out-short");
+  const update = debounce(() => {
+    const r = computeDehumidifierDerate({
+      aham_pints_per_day: Number(aham.input.value) || 0,
+      derate_factor: Number(derate.input.value) || 0,
+      required_pints_per_day: Number(demand.input.value) || 0,
+    });
+    if (r.error) { oEff.textContent = r.error; oNom.textContent = "-"; oField.textContent = "-"; oShort.textContent = "-"; return; }
+    oEff.textContent = fmt(r.effective_pints, 0) + " pints/day";
+    oNom.textContent = r.units_by_nameplate + " unit(s)";
+    oField.textContent = r.units_by_field + " unit(s)";
+    oShort.textContent = (r.shortfall_units > 0 ? "+" : "") + r.shortfall_units + " unit(s)";
+  }, DEBOUNCE_MS);
+  for (const el of [aham.input, derate.input, demand.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["dehumidifier-derate"] = renderDehumidifierDerate;
+
+// --- spec-v139: class-of-loss-screen (Group D) ---
+// Wetted-surface field read turned into a candidate S500 Class of water
+// intrusion - the input every drying-load tile already assumes - plus
+// the matching per-class evaporation factor to feed evaporation-load.
+// A deterministic screen, not a verdict; the inspector and the moisture
+// map govern the classification.
+// dims: in { floor_wet_fraction: dimensionless, wall_wet_fraction: dimensionless, wick_height_ft: L, low_evap_materials: dimensionless }
+//        out: { water_class: dimensionless, rationale: dimensionless, evap_factor_gal_ft2: dimensionless }
+export function computeWaterClassScreen({ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap_materials = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const floor = Number(floor_wet_fraction);
+  const wall = Number(wall_wet_fraction);
+  const wick = Number(wick_height_ft);
+  if (!(floor >= 0 && floor <= 1)) return { error: "Floor wet fraction must be in [0, 1]." };
+  if (!(wall >= 0 && wall <= 1)) return { error: "Wall wet fraction must be in [0, 1]." };
+  if (!(wick >= 0)) return { error: "Wick height must be non-negative (ft)." };
+  const lowEvap = low_evap_materials ? 1 : 0;
+  let water_class, rationale;
+  if (lowEvap) {
+    water_class = 4;
+    rationale = "Low-evaporation materials wet (hardwood, plaster, lightweight concrete, masonry) - specialty Class 4 drying regardless of the wetted fractions.";
+  } else if (wick > 2.0 || wall >= 0.40) {
+    water_class = 3;
+    rationale = "Wicking above 24 in or much of the wall wet (overhead / saturated walls) - Class 3, the greatest absorption and evaporation load.";
+  } else if (floor >= 0.40) {
+    water_class = 2;
+    rationale = "Entire floor and pad wet, wicking under 24 in - Class 2, significant absorption.";
+  } else {
+    water_class = 1;
+    rationale = "Small affected area, low porosity, minimal wicking - Class 1, least absorption.";
+  }
+  const evap_factor_gal_ft2 = WATER_CLASS_LOAD_GAL_FT2[water_class];
+  return { water_class, rationale, evap_factor_gal_ft2 };
+}
+export const waterClassScreenExample = { inputs: { floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 1.5, low_evap_materials: 0 } };
+
+function renderWaterClassScreen(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IICRC S500 Class-of-loss definitions and the 24 in (2 ft) wick threshold, by name (not reproduced). A deterministic screen evaluated top-down: low-evaporation materials -> Class 4; wick > 2 ft or wall >= 40% -> Class 3; floor >= 40% -> Class 2; else Class 1. The inspector's classification and a moisture map govern; this proposes a Class and states the rationale.";
+  const floor = makeNumber("Floor area wet (fraction 0-1)", "cls-floor", { step: "any", min: "0", max: "1" });
+  const wall = makeNumber("Wall area wet (fraction 0-1)", "cls-wall", { step: "any", min: "0", max: "1" });
+  const wick = makeNumber("Highest wicking up the walls (ft)", "cls-wick", { step: "any", min: "0" });
+  const lowEvap = makeCheckbox("Low-evaporation materials wet (hardwood / plaster / masonry)", "cls-le", false);
+  for (const f of [floor, wall, wick, lowEvap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { floor.input.value = "1.0"; wall.input.value = "0.30"; wick.input.value = "1.5"; lowEvap.input.checked = false; update(); });
+  const oClass = makeOutputLine(outputRegion, "Candidate water class", "cls-out-class");
+  const oWhy = makeOutputLine(outputRegion, "Rationale", "cls-out-why");
+  const oFactor = makeOutputLine(outputRegion, "Evaporation load factor (feeds evaporation-load)", "cls-out-factor");
+  const update = debounce(() => {
+    const r = computeWaterClassScreen({
+      floor_wet_fraction: Number(floor.input.value) || 0,
+      wall_wet_fraction: Number(wall.input.value) || 0,
+      wick_height_ft: Number(wick.input.value) || 0,
+      low_evap_materials: lowEvap.input.checked ? 1 : 0,
+    });
+    if (r.error) { oClass.textContent = r.error; oWhy.textContent = "-"; oFactor.textContent = "-"; return; }
+    oClass.textContent = "Class " + r.water_class;
+    oWhy.textContent = r.rationale;
+    oFactor.textContent = r.evap_factor_gal_ft2 + " gal/ft^2";
+  }, DEBOUNCE_MS);
+  for (const el of [floor.input, wall.input, wick.input, lowEvap.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["class-of-loss-screen"] = renderWaterClassScreen;
+
+// --- spec-v140: desiccant-airflow-sizing (Group D) ---
+// Desiccant dehumidifier sized by process airflow - the deep / low-temp
+// drying path the refrigerant sizing never covers, from the same
+// psychrometric mass balance grains-removed uses in reverse. The
+// performance map governs the achievable depression; reactivation air
+// ducts outside.
+// dims: in { required_pints_per_day: M T^-1, design_grain_depression: dimensionless, nameplate_process_cfm: L^3 T^-1 }
+//        out: { lb_per_hr: M T^-1, process_cfm: L^3 T^-1, units_needed: dimensionless }
+export function computeDesiccantAirflow({ required_pints_per_day = 0, design_grain_depression = 60, nameplate_process_cfm = 2000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const demand = Number(required_pints_per_day) || 0;
+  const depression = Number(design_grain_depression) || 0;
+  const nameplate = Number(nameplate_process_cfm) || 0;
+  if (!(demand > 0)) return { error: "Required removal must be positive (pints/day)." };
+  if (!(depression > 0)) return { error: "Design grain depression must be positive." };
+  if (!(nameplate > 0)) return { error: "Nameplate process airflow must be positive (cfm)." };
+  // 1.043 lb/pint water; 4.5 = 60 min/hr * 0.075 lb/ft^3 standard air; 7000 grains/lb.
+  const lb_per_hr = (demand * 1.043) / 24;
+  const process_cfm = (lb_per_hr * 7000) / (4.5 * depression);
+  const units_needed = Math.ceil(process_cfm / nameplate);
+  return { lb_per_hr, process_cfm, units_needed };
+}
+export const desiccantAirflowExample = { inputs: { required_pints_per_day: 300, design_grain_depression: 60, nameplate_process_cfm: 2000 } };
+
+function renderDesiccantAirflow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Psychrometric mass balance, desiccant process-airflow method, by name (IICRC S500). process_cfm = lb/hr * 7000 / (4.5 * depression), with 4.5 = 60 min/hr * 0.075 lb/ft^3 standard air, 7000 grains/lb, 1.043 lb/pint. The manufacturer's performance map and chamber conditions govern the achievable depression; reactivation exhaust air must be ducted outside.";
+  const demand = makeNumber("Water-removal demand (pints/day)", "des-r", { step: "any", min: "0" });
+  const depression = makeNumber("Design grain depression (grains/lb across the wheel)", "des-g", { step: "any", min: "0", value: "60" });
+  depression.input.value = "60";
+  const nameplate = makeNumber("Candidate unit process airflow (cfm)", "des-n", { step: "any", min: "0", value: "2000" });
+  nameplate.input.value = "2000";
+  for (const f of [demand, depression, nameplate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { demand.input.value = "300"; depression.input.value = "60"; nameplate.input.value = "2000"; update(); });
+  const oRate = makeOutputLine(outputRegion, "Removal rate", "des-out-rate");
+  const oCfm = makeOutputLine(outputRegion, "Required process airflow", "des-out-cfm");
+  const oUnits = makeOutputLine(outputRegion, "Desiccant units needed", "des-out-units");
+  const update = debounce(() => {
+    const r = computeDesiccantAirflow({
+      required_pints_per_day: Number(demand.input.value) || 0,
+      design_grain_depression: Number(depression.input.value) || 0,
+      nameplate_process_cfm: Number(nameplate.input.value) || 0,
+    });
+    if (r.error) { oRate.textContent = r.error; oCfm.textContent = "-"; oUnits.textContent = "-"; return; }
+    oRate.textContent = fmt(r.lb_per_hr, 2) + " lb/hr";
+    oCfm.textContent = fmt(r.process_cfm, 0) + " cfm";
+    oUnits.textContent = r.units_needed + " unit(s)";
+  }, DEBOUNCE_MS);
+  for (const el of [demand.input, depression.input, nameplate.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["desiccant-airflow-sizing"] = renderDesiccantAirflow;

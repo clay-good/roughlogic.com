@@ -154,7 +154,7 @@ const CAPS = {
   // its inline nameplate-amps table and DOM-mount renderer; built module
   // ~16.0 KB gzipped). Per spec-v10 §H.1 the per-tile split stays the
   // preferred long-term remediation.
-  "calc-restoration.js": 30500, // spec-v119 2026-06-20 (26000->30500): +1 wood-emc tile -> ~25.2 KB gz (97.1%); +~20% headroom. v77 2026-06-15 (was 29000 at 95.2%): demolition/abatement bench (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated to calc-demo.js (27.6->24.4 KB gz), lowered cap locks in the freed space; v69 2026-06-13 (27000->29000): +1 abatement-containment tile; v60 (22000->24000->26500->27000); lazy-loaded
+  "calc-restoration.js": 36000, // spec-v136..v140 2026-06-23 (30500->36000): +5 on-arrival water-loss tiles (flood-cut-takeoff, ceiling-water-load, dehumidifier-derate, class-of-loss-screen, desiccant-airflow-sizing) -> ~29.3 KB gz (98.3% of old cap); +~20% headroom. spec-v119 2026-06-20 (26000->30500): +1 wood-emc tile -> ~25.2 KB gz (97.1%); +~20% headroom. v77 2026-06-15 (was 29000 at 95.2%): demolition/abatement bench (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated to calc-demo.js (27.6->24.4 KB gz), lowered cap locks in the freed space; v69 2026-06-13 (27000->29000): +1 abatement-containment tile; v60 (22000->24000->26500->27000); lazy-loaded
   "calc-demo.js": 5500, // v77 2026-06-15 new demolition/abatement take-off bench split out of calc-restoration.js (3 tiles: moisture-dry-goal, flood-cut-quantity, abatement-containment; ~4.8 KB gz, lazy-loaded, fits with headroom)
   // Bumped 13500 -> 16000 when v9 §C.1 nfpa-1142-water-supply added
   // the occupancy / construction factor tables and §C.3 scba-cylinder-

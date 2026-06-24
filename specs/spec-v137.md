@@ -1,6 +1,6 @@
 # roughlogic.com Specification v137 -- Trapped Ceiling-Cavity Water Load and Collapse Screen (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v136..v140.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (catalog 620, package 0.75.0). Batch spec-v136..v140.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration safety screen for the bulging, water-filled
 > ceiling a tech meets before any drying starts. Adds one tile to **`calc-restoration.js`** (Group
 > D); no new module, group, or dependency. Inherits spec.md through spec-v136.md.

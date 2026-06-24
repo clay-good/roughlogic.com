@@ -788,6 +788,12 @@ const RELATED = {
   "hay-dry-matter": ["pearson-square-ration","grain-bin-capacity","livestock-water-requirement"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
+  // spec-v136..v140 on-arrival water-loss bench (Group D)
+  "flood-cut-takeoff": ["standing-water","evaporation-load","air-movers"],
+  "ceiling-water-load": ["standing-water","flood-cut-takeoff","evaporation-load"],
+  "dehumidifier-derate": ["dehumidifier","grains-removed","evaporation-load"],
+  "class-of-loss-screen": ["water-classes","evaporation-load","air-movers"],
+  "desiccant-airflow-sizing": ["dehumidifier","grains-removed","evaporation-load"],
 };
 
 export { RELATED };

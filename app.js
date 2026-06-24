@@ -246,6 +246,9 @@ const TOOL_MODULES = (() => {
     "grains-removed", "evaporation-load",
     // spec-v119 equilibrium moisture content of wood (USDA FPL sorption).
     "wood-emc",
+    // spec-v136..v140 on-arrival water-loss bench.
+    "flood-cut-takeoff", "ceiling-water-load", "dehumidifier-derate",
+    "class-of-loss-screen", "desiccant-airflow-sizing",
   ]);
   // spec-v77 cap-relief split: the cohesive demolition / abatement bench
   // (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated out

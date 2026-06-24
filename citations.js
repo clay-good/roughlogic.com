@@ -6874,6 +6874,66 @@ export const CITATIONS = {
       { name: "Dry standard", value: "the IICRC S500 dry standard and the dry, unaffected reference reading - not a single computed number - define 'dry'", source: "IICRC S500" },
     ],
   },
+  "flood-cut-takeoff": {
+    formula: "cut_line_lf = perimeter_ft; drywall_sf = perimeter_ft x (cut_height_in/12) x faces; sheets = ceil(drywall_sf / 32); insulation_sf = perimeter_ft x (cut_height_in/12) when present; baseboard_lf = perimeter_ft when present.",
+    edition: "ANSI/IICRC S500 flood-cut demolition practice by name; the geometry and the 32 ft^2 standard 4x8 sheet are not edition-bound.",
+    freeAccess: "The flood-cut takeoff is pure wall geometry; the standard 4x8 board is 32 ft^2. The moisture meter governs the cut line.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the wall geometry and the 32 ft^2 sheet do not roll). Cut a few inches above the highest moisture-meter reading - the meter governs the line, not a round number; the 12 / 24 / 48 in heights are common screens. ANSI/IICRC S500 names the flood-cut practice.",
+    assumptions: [
+      { name: "Cut line", value: "the cut height is a screen; cut a few inches above the highest moisture-meter reading, not at a round number", source: "ANSI/IICRC S500" },
+      { name: "Sheet area", value: "standard 4x8 drywall = 32 ft^2 per sheet", source: "standard-sizes.js convention" },
+      { name: "Scope", value: "linear and area takeoff only; the moisture map and the inspector govern how much wall comes out", source: "ANSI/IICRC S500" },
+    ],
+  },
+  "ceiling-water-load": {
+    formula: "load_psf = (avg_depth_in/12) x 62.4; weight_lb = pooled_area_ft2 x (avg_depth_in/12) x 62.4 = volume_gal x 8.34; volume_gal = pooled_area_ft2 x (avg_depth_in/12) x 7.48052; drain_first = load_psf > threshold_psf.",
+    edition: "Hydrostatic load and water density (62.4 lb/ft^3, 8.34 lb/gal, 7.48052 gal/ft^3) by name; ANSI/IICRC S500 safety practice. Not edition-bound.",
+    freeAccess: "Water is ~62.4 lb/ft^3, so a foot of depth is 62.4 psf and an inch is 5.2 psf. The densities are public constants.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the water densities and the hydrostatic load do not roll). The drain-first threshold is an EDITABLE screen value, NOT a code capacity - the actual fastening, span, and a structural engineer govern. This screens whether to punch-drain from a safe distance before working beneath the bulge.",
+    assumptions: [
+      { name: "Water density", value: "~62.4 lb/ft^3, 8.34 lb/gal, 7.48052 gal/ft^3", source: "pure-math.js convention" },
+      { name: "Threshold", value: "the drain-first load (default 5 psf) is an editable, conservative screen, not a structural rating", source: "ANSI/IICRC S500 safety practice" },
+      { name: "Scope", value: "a safety screen for trapped overhead water; the wet gypsum's fastening and a structural engineer govern collapse", source: "ANSI/IICRC S500" },
+    ],
+  },
+  "dehumidifier-derate": {
+    formula: "effective_pints = aham_pints_per_day x derate_factor; units_by_nameplate = ceil(demand / aham); units_by_field = ceil(demand / effective_pints); shortfall = units_by_field - units_by_nameplate.",
+    edition: "ANSI/IICRC S500 caution that the AHAM rating overstates field output at low grain depression, by name; the linear derate is a working-band screen.",
+    freeAccess: "The AHAM rating is taken at a high-grain-depression test condition and overstates what a unit removes as the chamber dries. The multiplication is arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the arithmetic does not roll). The derate factor is read by the operator off the unit's published performance curve at the measured chamber GPP - the curve and psychrometric reality govern; this tile carries the multiplication and the honest count, which rises as the chamber dries (the drying plateau). ANSI/IICRC S500 names the caution.",
+    assumptions: [
+      { name: "Derate source", value: "the operator reads the derate factor off the unit's performance curve at the current chamber grain depression", source: "manufacturer performance curve" },
+      { name: "AHAM overstates field", value: "the AHAM nameplate (high-grain-depression test) overstates field output as the chamber dries", source: "ANSI/IICRC S500" },
+      { name: "Linear screen", value: "a linear derate is the working-band approximation manufacturers' curves support; not a curve fit", source: "manufacturer performance curve" },
+    ],
+  },
+  "class-of-loss-screen": {
+    formula: "top-down (first match wins): Class 4 if low-evaporation materials wet; else Class 3 if wick_height_ft > 2.0 or wall_wet_fraction >= 0.40; else Class 2 if floor_wet_fraction >= 0.40; else Class 1. Output carries the matching per-class evaporation factor (gal/ft^2).",
+    edition: "ANSI/IICRC S500 Class-of-loss definitions and the 24 in (2 ft) wick threshold, by name; thresholds are deterministic where S500 leaves a judgment band.",
+    freeAccess: "S500 keys the Class to affected surface area, the wick height above 24 in, and the presence of low-evaporation assemblies. The four Class definitions are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the Class definitions and the 24 in threshold are stable). The inspector's classification GOVERNS and a moisture map must confirm it - this is a screen that proposes a Class and states the rationale, it does not certify one. ANSI/IICRC S500 names the framework.",
+    assumptions: [
+      { name: "Class framework", value: "the four S500 Classes keyed to wetted surface, the 24 in wick threshold, and low-evaporation materials (hardwood / plaster / lightweight concrete / masonry -> Class 4)", source: "ANSI/IICRC S500" },
+      { name: "Thresholds", value: "the 40% surface fractions are deterministic, editable screens where S500 leaves a judgment band", source: "ANSI/IICRC S500" },
+      { name: "Scope", value: "a screen that proposes a Class and feeds the per-class evaporation factor; the inspector and a moisture map govern", source: "ANSI/IICRC S500" },
+    ],
+  },
+  "desiccant-airflow-sizing": {
+    formula: "lb_per_hr = required_pints_per_day x 1.043 / 24; process_cfm = lb_per_hr x 7000 / (4.5 x design_grain_depression); units_needed = ceil(process_cfm / nameplate_process_cfm). 4.5 = 60 min/hr x 0.075 lb/ft^3 standard air; 7000 grains/lb; 1.043 lb/pint.",
+    edition: "Psychrometric mass balance and the desiccant process-airflow method, by name; ANSI/IICRC S500. The 4.5 / 7000 / 1.043 constants are not edition-bound.",
+    freeAccess: "The same psychrometric mass balance the grains-removed tile uses, in reverse: process airflow carries the water-removal rate across the wheel at the design depression.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the mass balance and the constants do not roll). The manufacturer's performance map, reactivation exhaust ducting, and chamber conditions GOVERN the achievable grain depression - this is a sizing screen, and desiccant reactivation air must be ducted outside. ANSI/IICRC S500 names the deep-drying method.",
+    assumptions: [
+      { name: "Standard air", value: "4.5 lb/hr per cfm per (grains/lb/7000) = 60 min/hr x 0.075 lb/ft^3 standard air density", source: "pure-math.js convention" },
+      { name: "Constants", value: "7000 grains/lb, 1.043 lb/pint water density", source: "pure-math.js convention" },
+      { name: "Achievable depression", value: "the manufacturer's performance map governs the inlet->outlet grain depression; reactivation exhaust air must duct outside", source: "manufacturer performance map" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

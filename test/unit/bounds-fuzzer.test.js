@@ -10497,6 +10497,100 @@ test("bounds: spec-v119 equilibrium moisture content of wood (USDA FPL sorption)
   assert.ok("error" in _v119({ temperature_F: 70, rh_pct: -5 }) && "error" in _v119({ temperature_F: 70, rh_pct: 150 }) && "error" in _v119({ temperature_F: Infinity, rh_pct: 50 }));
 });
 
+// --- spec-v136..v140 on-arrival water-loss bench (calc-restoration.js) ---
+
+import {
+  computeFloodCutTakeoff as _v136, computeCeilingWaterLoad as _v137,
+  computeDehumidifierDerate as _v138, computeWaterClassScreen as _v139,
+  computeDesiccantAirflow as _v140,
+} from "../../calc-restoration.js";
+
+test("bounds: spec-v136 flood-cut-takeoff pins the wall geometry + halves with the cut line + rejects bad inputs", () => {
+  const a = _v136({ wall_perimeter_ft: 60, cut_height_in: 24, removed_faces: 1, has_insulation: 1, has_baseboard: 1 });
+  assert.equal(a.cut_line_lf, 60);
+  assert.equal(a.drywall_sf, 120);
+  assert.equal(a.drywall_sheets, 4);
+  assert.equal(a.insulation_sf, 120);
+  assert.equal(a.baseboard_lf, 60);
+  // cross-check: the 12 in line halves the board and the sheet count.
+  const b = _v136({ wall_perimeter_ft: 60, cut_height_in: 12, removed_faces: 1 });
+  assert.equal(b.drywall_sf, 60);
+  assert.equal(b.drywall_sheets, 2);
+  // flags zero out their lines.
+  const c = _v136({ wall_perimeter_ft: 60, cut_height_in: 24, removed_faces: 1, has_insulation: 0, has_baseboard: 0 });
+  assert.equal(c.insulation_sf, 0);
+  assert.equal(c.baseboard_lf, 0);
+  // error seams: non-finite, non-positive perimeter/cut, removed_faces < 1.
+  assert.ok("error" in _v136({ wall_perimeter_ft: Infinity, cut_height_in: 24, removed_faces: 1 }));
+  assert.ok("error" in _v136({ wall_perimeter_ft: 0, cut_height_in: 24, removed_faces: 1 }));
+  assert.ok("error" in _v136({ wall_perimeter_ft: 60, cut_height_in: 0, removed_faces: 1 }));
+  assert.ok("error" in _v136({ wall_perimeter_ft: 60, cut_height_in: 24, removed_faces: 0 }));
+});
+
+test("bounds: spec-v137 ceiling-water-load pins the hydrostatic load + gallons cross-check + drain flag + rejects bad inputs", () => {
+  const a = _v137({ pooled_area_ft2: 20, avg_depth_in: 2, threshold_psf: 5 });
+  assert.ok(Math.abs(a.load_psf - 10.4) < 0.01);
+  assert.ok(Math.abs(a.water_weight_lb - 208) < 0.5);
+  // gallons path agrees with the depth-only weight path (volume_gal x 8.34).
+  assert.ok(Math.abs(a.water_volume_gal * 8.34 - a.water_weight_lb) < 1);
+  assert.equal(a.drain_first, true);
+  // below the screen at 0.5 in depth.
+  const b = _v137({ pooled_area_ft2: 20, avg_depth_in: 0.5, threshold_psf: 5 });
+  assert.ok(b.load_psf < 5 && b.drain_first === false);
+  assert.ok("error" in _v137({ pooled_area_ft2: 0, avg_depth_in: 2 }));
+  assert.ok("error" in _v137({ pooled_area_ft2: 20, avg_depth_in: 0 }));
+  assert.ok("error" in _v137({ pooled_area_ft2: Infinity, avg_depth_in: 2 }));
+});
+
+test("bounds: spec-v138 dehumidifier-derate pins the field count rising as the chamber dries + rejects bad inputs", () => {
+  const a = _v138({ aham_pints_per_day: 130, derate_factor: 0.5, required_pints_per_day: 300 });
+  assert.equal(a.effective_pints, 65);
+  assert.equal(a.units_by_nameplate, 3);
+  assert.equal(a.units_by_field, 5);
+  assert.equal(a.shortfall_units, 2);
+  // the plateau deepens as it dries: lower derate -> more field units.
+  const b = _v138({ aham_pints_per_day: 130, derate_factor: 0.3, required_pints_per_day: 300 });
+  assert.equal(b.units_by_field, 8);
+  assert.equal(b.shortfall_units, 5);
+  assert.ok(b.units_by_field > a.units_by_field);
+  assert.ok("error" in _v138({ aham_pints_per_day: 0, required_pints_per_day: 300 }));
+  assert.ok("error" in _v138({ aham_pints_per_day: 130, required_pints_per_day: 0 }));
+  assert.ok("error" in _v138({ aham_pints_per_day: 130, derate_factor: 0, required_pints_per_day: 300 }));
+  assert.ok("error" in _v138({ aham_pints_per_day: 130, derate_factor: 1.5, required_pints_per_day: 300 }));
+  assert.ok("error" in _v138({ aham_pints_per_day: Infinity, required_pints_per_day: 300 }));
+});
+
+test("bounds: spec-v139 class-of-loss-screen exercises all four branches + the per-class factor + rejects bad inputs", () => {
+  const a = _v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 1.5, low_evap_materials: 0 });
+  assert.equal(a.water_class, 2);
+  assert.ok(a.evap_factor_gal_ft2 > 0);
+  // height escalates to Class 3; material escalates to Class 4 regardless of fractions.
+  assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 3.0, low_evap_materials: 0 }).water_class, 3);
+  assert.equal(_v139({ floor_wet_fraction: 1.0, wall_wet_fraction: 0.30, wick_height_ft: 1.5, low_evap_materials: 1 }).water_class, 4);
+  // small affected area, low porosity -> Class 1.
+  assert.equal(_v139({ floor_wet_fraction: 0.2, wall_wet_fraction: 0.1, wick_height_ft: 0.5, low_evap_materials: 0 }).water_class, 1);
+  // wall fraction alone escalates to Class 3.
+  assert.equal(_v139({ floor_wet_fraction: 0.5, wall_wet_fraction: 0.40, wick_height_ft: 1.0, low_evap_materials: 0 }).water_class, 3);
+  assert.ok("error" in _v139({ floor_wet_fraction: 1.5, wall_wet_fraction: 0.3, wick_height_ft: 1 }));
+  assert.ok("error" in _v139({ floor_wet_fraction: 0.5, wall_wet_fraction: -0.1, wick_height_ft: 1 }));
+  assert.ok("error" in _v139({ floor_wet_fraction: 0.5, wall_wet_fraction: 0.3, wick_height_ft: -1 }));
+  assert.ok("error" in _v139({ floor_wet_fraction: Infinity, wall_wet_fraction: 0.3, wick_height_ft: 1 }));
+});
+
+test("bounds: spec-v140 desiccant-airflow-sizing pins the mass balance + inverse-with-depression + rejects bad inputs", () => {
+  const a = _v140({ required_pints_per_day: 300, design_grain_depression: 60, nameplate_process_cfm: 2000 });
+  assert.ok(Math.abs(a.lb_per_hr - 13.04) < 0.02);
+  assert.ok(Math.abs(a.process_cfm - 338) < 1);
+  assert.equal(a.units_needed, 1);
+  // shallower depression demands more air (double at half the depression).
+  const b = _v140({ required_pints_per_day: 300, design_grain_depression: 30, nameplate_process_cfm: 2000 });
+  assert.ok(Math.abs(b.process_cfm - 2 * a.process_cfm) < 1);
+  assert.ok("error" in _v140({ required_pints_per_day: 0, design_grain_depression: 60, nameplate_process_cfm: 2000 }));
+  assert.ok("error" in _v140({ required_pints_per_day: 300, design_grain_depression: 0, nameplate_process_cfm: 2000 }));
+  assert.ok("error" in _v140({ required_pints_per_day: 300, design_grain_depression: 60, nameplate_process_cfm: 0 }));
+  assert.ok("error" in _v140({ required_pints_per_day: Infinity, design_grain_depression: 60, nameplate_process_cfm: 2000 }));
+});
+
 // --- spec-v121..v128 electrical motors / feeders / fault / raceway / grounding / three-phase ---
 
 test("bounds: calc-motor computeMotorSyncSlip pins Ns = 120 f / P, slip, and rotor frequency + rejects bad poles/freq", () => {

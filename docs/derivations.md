@@ -2089,15 +2089,19 @@ cross-check.
 | calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2" }` | _ | _ | _ |
 | calc-restoration.js | `computeAirSampleVolume` | `{ flow_rate_lpm, target_volume_L, sample_count = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeAntimicrobialDilution` | `{ affected_area_ft2, coverage_ft2_per_gal, tank_size_gal, mode = "oz_per_gal"...` | _ | _ | _ |
+| calc-restoration.js | `computeCeilingWaterLoad` | `{ pooled_area_ft2 = 0, avg_depth_in = 0, threshold_psf = 5 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeChamberTurnover` | `{ chamber_volume_ft3 = 0, target_ach = 60, air_mover_total_cfm = 0, dehu_cfm ...` | _ | _ | _ |
 | calc-restoration.js | `computeContainmentAirBalance` | `{ containment_volume_ft3 = 0, target_dp_in_wc = 0.02, leakage_area_in2 = 0, }` | _ | _ | _ |
+| calc-restoration.js | `computeDehumidifierDerate` | `{ aham_pints_per_day = 0, derate_factor = 0.5, required_pints_per_day = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeDehumidifierSize` | `{ room_cubic_feet, water_class = "2", expected_pints_per_day = null }` | _ | _ | _ |
+| calc-restoration.js | `computeDesiccantAirflow` | `{ required_pints_per_day = 0, design_grain_depression = 60, nameplate_process...` | _ | _ | _ |
 | calc-restoration.js | `computeDryingChamberCO2` | `{ containment_volume_ft3 = 0, co2_generation_cfm = 0, target_indoor_ppm = 100...` | _ | _ | _ |
 | calc-restoration.js | `computeDryingGoal` | `{ outdoor_temperature_F, outdoor_RH_percent, indoor_temperature_F = 70, margi...` | _ | _ | _ |
 | calc-restoration.js | `computeDryingLog` | `{ readings = [], drying_target_GPP = null, } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeDryingTime` | `{ material }` | _ | _ | _ |
 | calc-restoration.js | `computeEquipmentCircuitLoad` | `{ qty_lgr_dehu = 0, qty_air_mover = 0, qty_hepa_500 = 0, qty_heat_dryer = 0, ...` | _ | _ | _ |
 | calc-restoration.js | `computeEvaporationLoad` | `{ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fra...` | _ | _ | _ |
+| calc-restoration.js | `computeFloodCutTakeoff` | `{ wall_perimeter_ft = 0, cut_height_in = 24, removed_faces = 1, has_insulatio...` | _ | _ | _ |
 | calc-restoration.js | `computeGrainsRemoved` | `{ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldConditions` | `` | _ | _ | _ |
@@ -2108,6 +2112,7 @@ cross-check.
 | calc-restoration.js | `computePsychrometric` | `{ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }` | _ | _ | _ |
 | calc-restoration.js | `computeStandingWater` | `{ area_ft2, depth_in }` | _ | _ | _ |
 | calc-restoration.js | `computeThermalDeltaTReference` | `` | _ | _ | _ |
+| calc-restoration.js | `computeWaterClassScreen` | `{ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap...` | _ | _ | _ |
 | calc-restoration.js | `computeWaterReference` | `` | _ | _ | _ |
 | calc-restoration.js | `computeWoodEmc` | `{ temperature_F = 0, rh_pct = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `renderAirMovers` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2271,7 +2276,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 857.
+Row count: 862.
 
 <!-- END function-corpus-v14 -->
 
@@ -2552,7 +2557,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-decay-test` | Vacuum Decay (Blank-Off) Test | First-principles standing-decay (blan...; spec-v105 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group D Restoration (27 tiles)
+### Group D Restoration (32 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2560,9 +2565,13 @@ per spec-v14 §13.1 second paragraph.
 | `air-movers` | Air Mover Placement | IICRC S500-2021 air-mover sizing tabl...; 600 ft^2 / Class 2 -> 6 air movers / 15,000 total cfm / c... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-sample-volume` | Air Sample Run Time and Volume | ASTM D7391 spore-trap method; cassett...; 15 L/min, 75 L, 3 cassettes -> 5.0 min (300 s) each, 225 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `antimicrobial-dilution` | Antimicrobial Mix and Coverage | FIFRA / EPA-registered product label;...; 400 ft2 at 200 ft2/gal, 4 oz/gal, 1.5 gal tank -> 2.0 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ceiling-water-load` | Trapped Ceiling-Cavity Water Load and Collapse Screen | ANSI/IICRC S500 safety practice; wate...; spec-v137 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chamber-turnover` | Drying Chamber Air Turnover | IICRC; actual_ACH = 1450 * 60 / 1500 = 58; required_CFM = 60 * 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `class-of-loss-screen` | S500 Class-of-Loss Screen by Wetted-Surface Fraction | ANSI/IICRC S500 Class-of-loss definit...; spec-v139 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `containment-air-balance` | Containment Air Balance | IICRC S520 negative-pressure-containm...; 5400 ft^3 / 0.02 in WC target / 8 in^2 leakage -> 2952.88... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dehumidifier` | Dehumidifier Sizing | AHAM DH-1 / IICRC S500 dehumidificati...; 6000 ft^3 / Class 2 -> 240 pints/day AHAM, 372 pints/day ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dehumidifier-derate` | Field-Effective Dehumidifier Capacity at Chamber Grain Depression | ANSI/IICRC S500 AHAM-overstates-field...; spec-v138 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `desiccant-airflow-sizing` | Desiccant Process-Airflow Sizing for Deep and Low-Temperature Drying | Psychrometric mass balance; ANSI/IICR...; spec-v140 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drying-chamber-co2` | Drying-Chamber Fresh-Air / CO2 Buildup | ASHRAE 62.1 (mass balance); 0.06 cfm CO2, 1000-400 ppm, 2000 ft^3 -> 100 cfm, 3.0 ACH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drying-goal` | Drying Goal | IICRC; outdoor_GPP ~ 108 grains; target = outdoor - 10 = 98 grai... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drying-log` | Drying Log (IICRC S500 Boundary Test) | IICRC; Boundary-humidity test: chamber GPP < ambient GPP per day... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2570,6 +2579,7 @@ per spec-v14 §13.1 second paragraph.
 | `equipment-power-draw` | Equipment Power Draw vs Circuit Capacity | NFPA (NEC); total = 4*2.5 + 1*8.5 = 18.5 A; continuous limit = 0.8*20... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporation-load` | Evaporation Load / Dehu Demand | IICRC S500 water-class evaporation-lo...; 800 ft2, Class 3 (0.08 gal/ft2) -> 64 gal initial load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flood-cut-quantity` | Flood-Cut Demolition Take-Off | IICRC S500-2021 structural-removal pr...; 60 LF, 24 in, one side, insulated -> 120 ft2 drywall, 4 s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `flood-cut-takeoff` | Wicking-Height Flood Cut and Demolition Takeoff | ANSI/IICRC S500 flood-cut demolition ...; spec-v136 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grains-removed` | Moisture Removed by Grain Depression | Psychrometric mass balance + IICRC S5...; 250 CFM, dG 40 GPP, 24 hr -> ~6.43 lb/hr, ~18.5 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hepa-filter-life` | HEPA Scrubber Filter Life | EPA / IICRC S520 HEPA loading practic...; 1000 cfm / 8 hr/day / medium / 5-day job / $80 filter -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `moisture-dry-goal` | Dry Standard vs Affected Reading | IICRC S500-2021 dry-standard concept; reference 12, affected 35, delta-allow 4 -> delta 23, con... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3072,6 +3082,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 615. Fixture-covered or reference-cadence: 615 / 615.
+Tile count: 620. Fixture-covered or reference-cadence: 620 / 620.
 
 <!-- END tile-index-v14 -->

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v136 -- Wicking-Height Flood Cut and Demolition Takeoff (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v136..v140.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (catalog 620, package 0.75.0). Batch spec-v136..v140.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration tile turning a measured wicking line into the
 > flood-cut demolition takeoff a tech writes on the wall before the saw comes out. Adds one tile to
 > **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits spec.md through

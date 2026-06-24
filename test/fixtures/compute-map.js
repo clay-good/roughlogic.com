@@ -654,6 +654,11 @@ export const COMPUTE_MAP = {
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
+  "flood-cut-takeoff": { module: "../../calc-restoration.js", fn: "computeFloodCutTakeoff" },
+  "ceiling-water-load": { module: "../../calc-restoration.js", fn: "computeCeilingWaterLoad" },
+  "dehumidifier-derate": { module: "../../calc-restoration.js", fn: "computeDehumidifierDerate" },
+  "class-of-loss-screen": { module: "../../calc-restoration.js", fn: "computeWaterClassScreen" },
+  "desiccant-airflow-sizing": { module: "../../calc-restoration.js", fn: "computeDesiccantAirflow" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

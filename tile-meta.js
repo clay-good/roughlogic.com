@@ -452,6 +452,12 @@ const _TILES = [
   ["hay-dry-matter", "L"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
+  // spec-v136..v140 on-arrival water-loss bench (Group D)
+  ["flood-cut-takeoff", "D"],
+  ["ceiling-water-load", "D"],
+  ["dehumidifier-derate", "D"],
+  ["class-of-loss-screen", "D"],
+  ["desiccant-airflow-sizing", "D"],
 ];
 
 

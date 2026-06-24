@@ -1,6 +1,6 @@
 # roughlogic.com Specification v139 -- S500 Class-of-Loss Screen by Wetted-Surface Fraction (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v136..v140.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (catalog 620, package 0.75.0). Batch spec-v136..v140.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration tile that turns the wetted-surface read of a
 > room into a candidate S500 Class of water intrusion, the input every drying-load tile already
 > assumes. Adds one tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency.

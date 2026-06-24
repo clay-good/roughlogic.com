@@ -1,6 +1,6 @@
 # roughlogic.com Specification v138 -- Field-Effective Dehumidifier Capacity at Chamber Grain Depression (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v136..v140.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (catalog 620, package 0.75.0). Batch spec-v136..v140.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration tile that derates a nameplate AHAM pint rating
 > to its field output as the chamber dries, and turns the derate into the unit-count consequence. Adds
 > one tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits
