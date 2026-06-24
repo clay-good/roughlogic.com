@@ -416,6 +416,9 @@ const TOOL_MODULES = (() => {
     "conduit-offset", "conduit-saddle", "conduit-90-stub",
     // v85 welding gas / cutting / consumable cost (group E)
     "shielding-gas-runtime", "oxyfuel-cutting-gas", "weld-preheat-fuel", "weld-cost-per-foot",
+    // v129..v134 metal-trades batch: weld estimating + plate forming (group E), shrink fit (group G)
+    "weld-metal-volume", "wire-feed-deposition", "weld-transverse-shrinkage",
+    "weld-group-eccentric", "min-bend-radius", "shrink-fit",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its
@@ -495,6 +498,8 @@ const TOOL_MODULES = (() => {
     "cutting-speed-rpm", "drill-point-depth",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
+    // v135 cutting power and spindle torque from MRR
+    "spindle-power-torque",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [

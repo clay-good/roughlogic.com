@@ -22714,6 +22714,209 @@
         "phase_current_a": { "value": 17.32, "tolerance": { "pct": 0.5 } },
         "power_va": { "value": 12470.8, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "weld-metal-volume",
+      "source_publisher": "first-principles joint geometry and steel density",
+      "source_title": "deposit = (leg2/2) x length x 0.2836; filler = deposit / efficiency; passes = ceil(area / max pass)",
+      "source_edition_or_year": "first-principles (public domain)",
+      "source_section_or_page": "5/16 in fillet, 120 in, 0.90 eff -> 0.0488 in2, 1.66 lb deposit, 1.85 lb filler, 1 pass",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "joint_type": "fillet", "fillet_leg_in": 0.3125, "length_in": 120, "deposition_eff": 0.90, "max_pass_area_in2": 0.05 },
+      "outputs": {
+        "weld_area_in2": { "value": 0.048828, "tolerance": { "abs": 0.0005 } },
+        "deposit_lb": { "value": 1.6617, "tolerance": { "abs": 0.01 } },
+        "filler_lb": { "value": 1.8464, "tolerance": { "abs": 0.01 } },
+        "passes": { "value": 1, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-metal-volume",
+      "source_publisher": "first-principles joint geometry and steel density",
+      "source_title": "cross-check: heavy 1/2 in SMAW fillet with 0.65 stick efficiency takes 3 passes",
+      "source_edition_or_year": "first-principles (public domain)",
+      "source_section_or_page": "1/2 in fillet, 120 in, 0.65 eff -> 0.125 in2, 4.25 lb deposit, 6.55 lb filler, 3 passes",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "joint_type": "fillet", "fillet_leg_in": 0.5, "length_in": 120, "deposition_eff": 0.65, "max_pass_area_in2": 0.05 },
+      "outputs": {
+        "weld_area_in2": { "value": 0.125, "tolerance": { "abs": 0.0005 } },
+        "deposit_lb": { "value": 4.254, "tolerance": { "abs": 0.01 } },
+        "filler_lb": { "value": 6.5446, "tolerance": { "abs": 0.02 } },
+        "passes": { "value": 3, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "wire-feed-deposition",
+      "source_publisher": "first-principles wire-volume geometry and steel density",
+      "source_title": "melt = WFS x 60 x (pi/4 dia2) x 0.2836; deposit = melt x efficiency",
+      "source_edition_or_year": "first-principles (public domain)",
+      "source_section_or_page": "0.035 in wire, 300 in/min, 0.92 eff -> 4.91 lb/hr melt, 4.52 lb/hr deposit",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "wfs_in_min": 300, "wire_dia_in": 0.035, "deposition_eff": 0.92 },
+      "outputs": {
+        "melt_lb_hr": { "value": 4.9114, "tolerance": { "abs": 0.02 } },
+        "deposit_lb_hr": { "value": 4.5185, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "wire-feed-deposition",
+      "source_publisher": "first-principles wire-volume geometry and steel density",
+      "source_title": "cross-check: bigger 0.045 in wire deposits more even at a lower feed",
+      "source_edition_or_year": "first-principles (public domain)",
+      "source_section_or_page": "0.045 in wire, 250 in/min, 0.92 eff -> 6.77 lb/hr melt, 6.22 lb/hr deposit",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "wfs_in_min": 250, "wire_dia_in": 0.045, "deposition_eff": 0.92 },
+      "outputs": {
+        "melt_lb_hr": { "value": 6.7657, "tolerance": { "abs": 0.02 } },
+        "deposit_lb_hr": { "value": 6.2244, "tolerance": { "abs": 0.02 } }
+      }
+    },
+    {
+      "tile_id": "weld-transverse-shrinkage",
+      "source_publisher": "Blodgett, Design of Welded Structures",
+      "source_title": "transverse shrink = 0.2 x weld area / thickness; total = per-weld x count",
+      "source_edition_or_year": "James F. Lincoln Arc Welding Foundation",
+      "source_section_or_page": "0.10 in2 weld in 1/2 in plate, 3 welds -> 0.040 in per weld, 0.120 in total",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "weld_area_in2": 0.10, "thickness_in": 0.5, "weld_count": 3 },
+      "outputs": {
+        "shrink_per_weld_in": { "value": 0.04, "tolerance": { "abs": 0.001 } },
+        "total_shrink_in": { "value": 0.12, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "weld-transverse-shrinkage",
+      "source_publisher": "Blodgett, Design of Welded Structures",
+      "source_title": "cross-check: the thicker, stiffer section halves the shrinkage",
+      "source_edition_or_year": "James F. Lincoln Arc Welding Foundation",
+      "source_section_or_page": "0.10 in2 weld in 1 in plate, 1 weld -> 0.020 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "weld_area_in2": 0.10, "thickness_in": 1.0, "weld_count": 1 },
+      "outputs": {
+        "shrink_per_weld_in": { "value": 0.02, "tolerance": { "abs": 0.001 } },
+        "total_shrink_in": { "value": 0.02, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "weld-group-eccentric",
+      "source_publisher": "AISC 360 / Steel Construction Manual Part 8",
+      "source_title": "elastic (vector) method: J = D3/6 + D B2/2; f_r = sqrt(f_tx2 + (f_d + f_ty)2); leg = ceil(f_r / allow)",
+      "source_edition_or_year": "AISC elastic (vector) method",
+      "source_section_or_page": "12 kip at 6 in, two 10 in welds 4 in apart -> J 246.7 in3, 1879 lb/in, 3/16 in fillet",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "load_lb": 12000, "ecc_in": 6, "weld_len_in": 10, "separation_in": 4, "allow_per_16": 928 },
+      "outputs": {
+        "polar_moment_in3": { "value": 246.6667, "tolerance": { "abs": 0.1 } },
+        "direct_shear_lb_in": { "value": 600, "tolerance": { "abs": 1 } },
+        "resultant_lb_in": { "value": 1879.19, "tolerance": { "abs": 2 } },
+        "req_leg_16": { "value": 3, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "weld-group-eccentric",
+      "source_publisher": "AISC 360 / Steel Construction Manual Part 8",
+      "source_title": "cross-check: concentric (e=0) drops the torsional term, leaving direct shear",
+      "source_edition_or_year": "AISC elastic (vector) method",
+      "source_section_or_page": "same welds, e=0 -> 600 lb/in, 1/16 in (governed by minimum fillet)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "load_lb": 12000, "ecc_in": 0, "weld_len_in": 10, "separation_in": 4, "allow_per_16": 928 },
+      "outputs": {
+        "resultant_lb_in": { "value": 600, "tolerance": { "abs": 1 } },
+        "req_leg_16": { "value": 1, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "min-bend-radius",
+      "source_publisher": "published forming-limit relation",
+      "source_title": "R/T = 50 / %elongation - 1; R_min = thickness x R/T",
+      "source_edition_or_year": "first-principles / published relation (public domain)",
+      "source_section_or_page": "1/4 in A36 at 20% elongation -> 1.5 T, 0.375 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "thickness_in": 0.25, "elongation_pct": 20 },
+      "outputs": {
+        "r_over_t": { "value": 1.5, "tolerance": { "abs": 0.01 } },
+        "r_min_in": { "value": 0.375, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "min-bend-radius",
+      "source_publisher": "published forming-limit relation",
+      "source_title": "cross-check: low-ductility (10% elongation) steel needs a far larger radius",
+      "source_edition_or_year": "first-principles / published relation (public domain)",
+      "source_section_or_page": "1/4 in at 10% elongation -> 4 T, 1.0 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "thickness_in": 0.25, "elongation_pct": 10 },
+      "outputs": {
+        "r_over_t": { "value": 4, "tolerance": { "abs": 0.01 } },
+        "r_min_in": { "value": 1.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "shrink-fit",
+      "source_publisher": "first-principles thermal-expansion relation",
+      "source_title": "delta_T = (interference + clearance) / (alpha x dia); heat_to = ambient + delta_T",
+      "source_edition_or_year": "first-principles (public domain)",
+      "source_section_or_page": "4 in fit, 0.004 in interference, 0.002 in clearance, steel alpha -> 231 degF rise, heat to 301 degF",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "nominal_dia_in": 4.0, "interference_in": 0.004, "clearance_in": 0.002, "alpha_per_f": 0.0000065, "ambient_f": 70 },
+      "outputs": {
+        "delta_t_f": { "value": 230.77, "tolerance": { "abs": 1 } },
+        "heat_to_f": { "value": 300.77, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "shrink-fit",
+      "source_publisher": "first-principles thermal-expansion relation",
+      "source_title": "cross-check: the same drop as a chill falls below dry ice, so it needs liquid nitrogen",
+      "source_edition_or_year": "first-principles (public domain)",
+      "source_section_or_page": "same fit, chill the shaft instead -> -161 degF",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "nominal_dia_in": 4.0, "interference_in": 0.004, "clearance_in": 0.002, "alpha_per_f": 0.0000065, "ambient_f": 70 },
+      "outputs": {
+        "chill_to_f": { "value": -160.77, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "spindle-power-torque",
+      "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
+      "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",
+      "source_edition_or_year": "Machinery's Handbook (Industrial Press)",
+      "source_section_or_page": "3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.75 motor hp, 19.7 lb-ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "mrr_in3_min": 3.0, "unit_power_hp": 1.0, "efficiency_pct": 80, "rpm": 800 },
+      "outputs": {
+        "cutting_hp": { "value": 3.0, "tolerance": { "abs": 0.01 } },
+        "motor_hp": { "value": 3.75, "tolerance": { "abs": 0.01 } },
+        "spindle_torque_lbft": { "value": 19.695, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "spindle-power-torque",
+      "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
+      "source_title": "cross-check: aluminum (unit power 0.33) draws about a third the power and torque",
+      "source_edition_or_year": "Machinery's Handbook (Industrial Press)",
+      "source_section_or_page": "3.0 in3/min aluminum, 80% eff, 800 rpm -> 0.99 cutting hp, 1.24 motor hp, 6.5 lb-ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "mrr_in3_min": 3.0, "unit_power_hp": 0.33, "efficiency_pct": 80, "rpm": 800 },
+      "outputs": {
+        "cutting_hp": { "value": 0.99, "tolerance": { "abs": 0.01 } },
+        "motor_hp": { "value": 1.2375, "tolerance": { "abs": 0.01 } },
+        "spindle_torque_lbft": { "value": 6.4993, "tolerance": { "abs": 0.05 } }
+      }
     }
   ]
 }

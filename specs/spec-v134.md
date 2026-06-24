@@ -1,6 +1,6 @@
 # roughlogic.com Specification v134 -- Interference Shrink-Fit Heating and Chilling Temperature (calc-fab.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v129..v135.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (catalog 615, package 0.74.0). Batch spec-v129..v135.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one fabrication tile from the first-principles thermal-expansion
 > relation for an interference fit, fabricator-and-engineer governed, redo-not-harm. Adds one tile
 > to **`calc-fab.js`** (Group G); no new module, group, or dependency. Inherits spec.md through

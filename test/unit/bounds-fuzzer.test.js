@@ -10618,3 +10618,113 @@ test("bounds: calc-electrical computeDeltaWyeLinePhase pins the wye and delta li
   assert.ok("error" in computeDeltaWyeLinePhase({ configuration: "wye", line_voltage_v: 208, line_current_a: 10, power_factor: 1.5 }));
   assert.ok("error" in computeDeltaWyeLinePhase({ configuration: "wye", line_voltage_v: Infinity, line_current_a: 10 }));
 });
+
+// --- spec-v129..v134 metal-trades batch (calc-fab.js): weld estimating, plate forming, shrink fit ---
+
+import {
+  computeWeldMetalVolume as _v129,
+  computeWireFeedDeposition as _v130,
+  computeWeldTransverseShrinkage as _v131,
+  computeWeldGroupEccentric as _v132,
+  computeMinBendRadius as _v133,
+  computeShrinkFit as _v134,
+} from "../../calc-fab.js";
+
+test("bounds: calc-fab computeWeldMetalVolume pins deposit/filler/passes for a 5/16 fillet + heavy SMAW cross-check + error seams", () => {
+  const r = _v129({ joint_type: "fillet", fillet_leg_in: 0.3125, length_in: 120, deposition_eff: 0.90, max_pass_area_in2: 0.05 });
+  assert.ok(Math.abs(r.weld_area_in2 - 0.048828) < 5e-4);
+  assert.ok(Math.abs(r.deposit_lb - 1.6617) < 0.01 && Math.abs(r.filler_lb - 1.8464) < 0.01 && r.passes === 1);
+  // Heavy 1/2 in SMAW cross-check: lower efficiency buys far more rod, 3 passes.
+  const c = _v129({ joint_type: "fillet", fillet_leg_in: 0.5, length_in: 120, deposition_eff: 0.65, max_pass_area_in2: 0.05 });
+  assert.ok(Math.abs(c.weld_area_in2 - 0.125) < 5e-4 && Math.abs(c.filler_lb - 6.5446) < 0.02 && c.passes === 3);
+  // Groove mode reads the entered area.
+  assert.ok(Math.abs(_v129({ joint_type: "groove", groove_area_in2: 0.2, length_in: 10 }).weld_area_in2 - 0.2) < 1e-9);
+  // Error seams: non-finite, leg/area/length <= 0, efficiency outside (0,1].
+  assert.ok("error" in _v129({ joint_type: "fillet", fillet_leg_in: Infinity, length_in: 120 }));
+  assert.ok("error" in _v129({ joint_type: "fillet", fillet_leg_in: -1, length_in: 120 }));
+  assert.ok("error" in _v129({ joint_type: "fillet", fillet_leg_in: 0.3, length_in: 0 }));
+  assert.ok("error" in _v129({ joint_type: "fillet", fillet_leg_in: 0.3, length_in: 120, deposition_eff: 1.5 }));
+  assert.ok("error" in _v129({ joint_type: "groove", groove_area_in2: 0, length_in: 120 }));
+});
+
+test("bounds: calc-fab computeWireFeedDeposition pins melt-off/deposition for 0.035 wire + larger-wire cross-check + error seams", () => {
+  const r = _v130({ wfs_in_min: 300, wire_dia_in: 0.035, deposition_eff: 0.92 });
+  assert.ok(Math.abs(r.melt_lb_hr - 4.9114) < 0.02 && Math.abs(r.deposit_lb_hr - 4.5185) < 0.02);
+  const c = _v130({ wfs_in_min: 250, wire_dia_in: 0.045, deposition_eff: 0.92 });
+  assert.ok(Math.abs(c.melt_lb_hr - 6.7657) < 0.02 && c.deposit_lb_hr > r.deposit_lb_hr);
+  // Error seams: non-finite, wfs/dia <= 0, efficiency outside (0,1].
+  assert.ok("error" in _v130({ wfs_in_min: Infinity, wire_dia_in: 0.035 }));
+  assert.ok("error" in _v130({ wfs_in_min: 0, wire_dia_in: 0.035 }));
+  assert.ok("error" in _v130({ wfs_in_min: 300, wire_dia_in: -0.035 }));
+  assert.ok("error" in _v130({ wfs_in_min: 300, wire_dia_in: 0.035, deposition_eff: 0 }));
+});
+
+test("bounds: calc-fab computeWeldTransverseShrinkage pins Blodgett shrink + thicker-plate cross-check + error seams", () => {
+  const r = _v131({ weld_area_in2: 0.10, thickness_in: 0.5, weld_count: 3 });
+  assert.ok(Math.abs(r.shrink_per_weld_in - 0.04) < 1e-6 && Math.abs(r.total_shrink_in - 0.12) < 1e-6);
+  assert.ok(Math.abs(r.recommended_preset_in - r.total_shrink_in) < 1e-12);
+  // Thicker plate restrains: half the shrinkage.
+  assert.ok(Math.abs(_v131({ weld_area_in2: 0.10, thickness_in: 1.0, weld_count: 1 }).shrink_per_weld_in - 0.02) < 1e-6);
+  // Error seams: non-finite, area/thickness <= 0, weld_count < 1.
+  assert.ok("error" in _v131({ weld_area_in2: Infinity, thickness_in: 0.5 }));
+  assert.ok("error" in _v131({ weld_area_in2: 0, thickness_in: 0.5 }));
+  assert.ok("error" in _v131({ weld_area_in2: 0.10, thickness_in: 0 }));
+  assert.ok("error" in _v131({ weld_area_in2: 0.10, thickness_in: 0.5, weld_count: 0 }));
+});
+
+test("bounds: calc-fab computeWeldGroupEccentric pins the elastic-method resultant + concentric (e=0) cross-check + error seams", () => {
+  const r = _v132({ load_lb: 12000, ecc_in: 6, weld_len_in: 10, separation_in: 4, allow_per_16: 928 });
+  assert.ok(Math.abs(r.polar_moment_in3 - 246.6667) < 0.1 && Math.abs(r.direct_shear_lb_in - 600) < 1);
+  assert.ok(Math.abs(r.resultant_lb_in - 1879.19) < 2 && r.req_leg_16 === 3);
+  // Concentric: torsion vanishes, resultant is the direct shear, leg governed by minimum fillet.
+  const c = _v132({ load_lb: 12000, ecc_in: 0, weld_len_in: 10, separation_in: 4, allow_per_16: 928 });
+  assert.ok(Math.abs(c.resultant_lb_in - 600) < 1 && c.req_leg_16 === 1);
+  // Error seams: non-finite, length/separation <= 0, non-positive load.
+  assert.ok("error" in _v132({ load_lb: Infinity, ecc_in: 6, weld_len_in: 10, separation_in: 4 }));
+  assert.ok("error" in _v132({ load_lb: 12000, ecc_in: 6, weld_len_in: 0, separation_in: 4 }));
+  assert.ok("error" in _v132({ load_lb: 12000, ecc_in: 6, weld_len_in: 10, separation_in: 0 }));
+  assert.ok("error" in _v132({ load_lb: 0, ecc_in: 6, weld_len_in: 10, separation_in: 4 }));
+});
+
+test("bounds: calc-fab computeMinBendRadius pins R/T and r_min + low-ductility cross-check + error seams", () => {
+  const r = _v133({ thickness_in: 0.25, elongation_pct: 20 });
+  assert.ok(Math.abs(r.r_over_t - 1.5) < 1e-9 && Math.abs(r.r_min_in - 0.375) < 1e-9);
+  // Less ductile steel needs a far larger radius.
+  assert.ok(Math.abs(_v133({ thickness_in: 0.25, elongation_pct: 10 }).r_min_in - 1.0) < 1e-9);
+  // Error seams: non-finite, thickness <= 0, elongation outside (0,50].
+  assert.ok("error" in _v133({ thickness_in: Infinity, elongation_pct: 20 }));
+  assert.ok("error" in _v133({ thickness_in: 0, elongation_pct: 20 }));
+  assert.ok("error" in _v133({ thickness_in: 0.25, elongation_pct: 0 }));
+  assert.ok("error" in _v133({ thickness_in: 0.25, elongation_pct: 60 }));
+});
+
+test("bounds: calc-fab computeShrinkFit pins heat-to/chill-to for a 4 in fit + error seams", () => {
+  const r = _v134({ nominal_dia_in: 4.0, interference_in: 0.004, clearance_in: 0.002, alpha_per_f: 0.0000065, ambient_f: 70 });
+  assert.ok(Math.abs(r.delta_t_f - 230.77) < 1 && Math.abs(r.heat_to_f - 300.77) < 1 && Math.abs(r.chill_to_f - (-160.77)) < 1);
+  // Zero interference + zero clearance => no temperature change.
+  assert.ok(Math.abs(_v134({ nominal_dia_in: 4.0, interference_in: 0, clearance_in: 0 }).delta_t_f) < 1e-9);
+  // Error seams: non-finite, dia/alpha <= 0, negative interference.
+  assert.ok("error" in _v134({ nominal_dia_in: Infinity, interference_in: 0.004 }));
+  assert.ok("error" in _v134({ nominal_dia_in: 0, interference_in: 0.004 }));
+  assert.ok("error" in _v134({ nominal_dia_in: 4.0, interference_in: 0.004, alpha_per_f: 0 }));
+  assert.ok("error" in _v134({ nominal_dia_in: 4.0, interference_in: -0.004 }));
+});
+
+// --- spec-v135 (calc-machining.js): cutting power and spindle torque from MRR ---
+
+import { computeSpindlePowerTorque as _v135 } from "../../calc-machining.js";
+
+test("bounds: calc-machining computeSpindlePowerTorque pins cutting/motor hp + torque for steel + aluminum cross-check + error seams", () => {
+  const r = _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 80, rpm: 800 });
+  assert.ok(Math.abs(r.cutting_hp - 3.0) < 0.01 && Math.abs(r.motor_hp - 3.75) < 0.01 && Math.abs(r.spindle_torque_lbft - 19.695) < 0.05);
+  // Aluminum (unit power 0.33) draws about a third the power and torque.
+  const c = _v135({ mrr_in3_min: 3.0, unit_power_hp: 0.33, efficiency_pct: 80, rpm: 800 });
+  assert.ok(Math.abs(c.cutting_hp - 0.99) < 0.01 && Math.abs(c.spindle_torque_lbft - 6.4993) < 0.05);
+  // Error seams: non-finite, mrr/unit_power/rpm <= 0, efficiency outside (0,100].
+  assert.ok("error" in _v135({ mrr_in3_min: Infinity, unit_power_hp: 1.0, rpm: 800 }));
+  assert.ok("error" in _v135({ mrr_in3_min: 0, unit_power_hp: 1.0, rpm: 800 }));
+  assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 0, rpm: 800 }));
+  assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, rpm: 0 }));
+  assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 0, rpm: 800 }));
+  assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 120, rpm: 800 }));
+});

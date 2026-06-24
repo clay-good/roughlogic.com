@@ -1,6 +1,6 @@
 # roughlogic.com Specification v130 -- Wire Feed Speed to Melt-Off and Deposition Rate (calc-fab.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v129..v135.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (catalog 615, package 0.74.0). Batch spec-v129..v135.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one fabrication tile from first-principles wire-volume geometry and
 > steel density, WPS-and-fabricator governed, redo-not-harm. Adds one tile to **`calc-fab.js`**
 > (Group E); no new module, group, or dependency. Inherits spec.md through spec-v129.md.

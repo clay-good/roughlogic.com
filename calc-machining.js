@@ -171,3 +171,58 @@ function renderCuttingFluidConcentration(inputRegion, outputRegion, citationEl) 
   for (const f of [brix.input, factor.input, sump.input, target.input]) f.addEventListener("input", update);
 }
 MACHINING_RENDERERS["cutting-fluid-concentration"] = renderCuttingFluidConcentration;
+
+// --- spec-v135 K: Cutting Power and Spindle Torque from Material Removal Rate ---
+// cutting_hp = MRR x unit_power; motor_hp = cutting_hp / efficiency;
+// torque_lbft = 5252 x cutting_hp / rpm (the 5252 constant reused from v122).
+// dims: in { mrr_in3_min: L^3 T^-1, unit_power_hp: dimensionless, efficiency_pct: dimensionless, rpm: T^-1 } out: { cutting_hp: M L^2 T^-3, motor_hp: M L^2 T^-3, spindle_torque_lbft: M L^2 T^-2 }
+export function computeSpindlePowerTorque({ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}) {
+  const _g = _finiteGuard({ mrr_in3_min, unit_power_hp, efficiency_pct, rpm }); if (_g) return _g;
+  const mrr = Number(mrr_in3_min);
+  const unitPower = Number(unit_power_hp);
+  const eff = Number(efficiency_pct);
+  const rpmVal = Number(rpm);
+  if (!(mrr > 0)) return { error: "Material removal rate must be positive (in3/min)." };
+  if (!(unitPower > 0)) return { error: "Unit power must be positive (hp per in3/min)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
+  if (!(rpmVal > 0)) return { error: "Spindle speed must be positive (rpm)." };
+  const cuttingHp = mrr * unitPower;
+  const motorHp = cuttingHp / (eff / 100);
+  const spindleTorque = 5252 * cuttingHp / rpmVal;
+  return {
+    cutting_hp: cuttingHp,
+    motor_hp: motorHp,
+    spindle_torque_lbft: spindleTorque,
+    note: "Specific cutting energy turns removal rate into power: cutting hp = MRR x unit power (about 1.0 hp per in3/min for carbon steel, 0.33 aluminum, 1.5 stainless/titanium); motor hp = cutting hp / drive efficiency; spindle torque = 5252 x cutting hp / rpm. The unit-power values are Machinery's Handbook tabular references; the tool, sharpness, and machine govern the real draw -- this is the check before committing a heavy cut.",
+  };
+}
+export const spindlePowerTorqueExample = { inputs: { mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 80, rpm: 800 } };
+
+function renderSpindlePowerTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles specific-cutting-energy relation with Machinery's Handbook unit-power values (tabular reference), by name. Cutting hp = MRR x unit power; motor hp = cutting hp / efficiency; torque = 5252 x cutting hp / rpm. The tool, sharpness, and machine govern the real cut.";
+  const mrr = makeNumber("Material removal rate (in3/min)", "spt-mrr", { step: "any", min: "0" });
+  const unitPower = makeNumber("Unit power (hp per in3/min)", "spt-up", { step: "any", min: "0", value: "1.0" });
+  unitPower.input.value = "1.0";
+  const eff = makeNumber("Spindle drive efficiency (%)", "spt-eff", { step: "any", min: "0", value: "80" });
+  eff.input.value = "80";
+  const rpm = makeNumber("Spindle speed (rpm)", "spt-rpm", { step: "any", min: "0" });
+  for (const f of [mrr, unitPower, eff, rpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mrr.input.value = "3.0"; unitPower.input.value = "1.0"; eff.input.value = "80"; rpm.input.value = "800"; update(); });
+  const oCut = makeOutputLine(outputRegion, "Cutting horsepower", "spt-out-cut");
+  const oMotor = makeOutputLine(outputRegion, "Motor horsepower needed", "spt-out-motor");
+  const oTorque = makeOutputLine(outputRegion, "Spindle torque", "spt-out-torque");
+  const update = debounce(() => {
+    const r = computeSpindlePowerTorque({
+      mrr_in3_min: Number(mrr.input.value) || 0,
+      unit_power_hp: unitPower.input.value === "" ? 1.0 : Number(unitPower.input.value),
+      efficiency_pct: eff.input.value === "" ? 80 : Number(eff.input.value),
+      rpm: Number(rpm.input.value) || 0,
+    });
+    if (r.error) { oCut.textContent = r.error; for (const o of [oMotor, oTorque]) o.textContent = "-"; return; }
+    oCut.textContent = fmt(r.cutting_hp, 2) + " hp";
+    oMotor.textContent = fmt(r.motor_hp, 2) + " hp";
+    oTorque.textContent = fmt(r.spindle_torque_lbft, 1) + " lb-ft";
+  }, DEBOUNCE_MS);
+  for (const f of [mrr, unitPower, eff, rpm]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["spindle-power-torque"] = renderSpindlePowerTorque;

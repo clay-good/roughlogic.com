@@ -5972,6 +5972,75 @@ export const CITATIONS = {
     ],
   },
 
+  // ---- spec-v129..v134 metal-trades batch (calc-fab.js; groups E/G) ----
+  "weld-metal-volume": {
+    formula: "Fillet area = leg2 / 2 (equal-leg) or user-entered groove area; deposit volume = area x length; deposit weight = volume x 0.2836 lb/in3; filler purchased = deposit / deposition efficiency; passes = ceil(area / max single-pass area).",
+    edition: "Weld deposit weight and filler consumed - first-principles joint geometry and steel density (0.2836 lb/in3, matching metal-weight), by name; public domain.",
+    freeAccess: "Pure area-volume-weight geometry, public; the joint dimensions, deposition efficiency, and max single-pass area are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles joint geometry and steel density. Deposition efficiency is the deposited/purchased ratio (solid wire about 0.90, SMAW about 0.60 to 0.65); the WPS and the shop's measured efficiency govern the purchase, and pass count is a planning estimate.",
+    assumptions: [
+      { name: "Steel density", value: "0.2836 lb/in3 (carbon steel, matching metal-weight); editable", source: "metal-weight" },
+      { name: "Deposition efficiency", value: "deposited / filler purchased; default 0.90 solid wire", source: "WPS / shop measurement" },
+      { name: "Max single-pass area", value: "default 0.05 in2; passes = ceil(weld area / max pass area)", source: "welding practice" },
+    ],
+  },
+  "wire-feed-deposition": {
+    formula: "Wire cross-section = pi/4 x diameter2; melt-off rate (lb/hr) = wire feed speed (in/min) x 60 x area x 0.2836 lb/in3; deposition rate = melt-off x deposition efficiency.",
+    edition: "Melt-off and deposition rate from wire feed speed - first-principles wire-volume geometry and steel density (0.2836 lb/in3), by name; public domain.",
+    freeAccess: "Pure volume-rate geometry, public; the wire feed speed, diameter, and deposition efficiency are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles wire-volume geometry and steel density. Deposition efficiency (solid wire about 0.92, FCAW about 0.85) is the melted/deposited ratio; the WPS and the process (spray vs short-circuit, gas, electrode extension) govern the real efficiency.",
+    assumptions: [
+      { name: "Steel density", value: "0.2836 lb/in3 (carbon steel); editable", source: "first-principles" },
+      { name: "Deposition efficiency", value: "deposited / melted; default 0.92 solid wire", source: "WPS / process" },
+    ],
+  },
+  "weld-transverse-shrinkage": {
+    formula: "Transverse shrinkage per weld = 0.2 x weld area / thickness (the 0.2 coefficient is dimensionless; the area-over-thickness ratio carries the length); total = per-weld x weld count; recommended pre-set = total.",
+    edition: "Transverse weld shrinkage - the Blodgett weld-area-over-thickness relation from Blodgett, Design of Welded Structures (James F. Lincoln Arc Welding Foundation), by name.",
+    freeAccess: "The published Blodgett relation; the weld area, thickness, and weld count are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Blodgett transverse-shrinkage relation shrink = 0.2 x A_w / t. This is a screen: joint restraint, fixturing, sequence, and a mock-up govern the actual movement, and longitudinal and angular distortion (restraint-dominated) are out of scope.",
+    assumptions: [
+      { name: "Blodgett coefficient", value: "0.2 (dimensionless); editable", source: "Blodgett, Design of Welded Structures" },
+      { name: "Scope", value: "transverse component only; longitudinal and angular distortion not estimated", source: "screen scope" },
+    ],
+  },
+  "weld-group-eccentric": {
+    formula: "Two vertical welds length D, separation B: L_w = 2D; Ix = D3/6; Iy = D B2/2; J = Ix + Iy; direct shear f_d = P/L_w; torque T = P x e; f_tx = T(D/2)/J; f_ty = T(B/2)/J; resultant f_r = sqrt(f_tx2 + (f_d + f_ty)2); required leg (sixteenths) = ceil(f_r / allowable per 1/16 in).",
+    edition: "Eccentrically loaded fillet weld group, elastic (vector) method, per AISC 360 and the AISC Steel Construction Manual Part 8, by name.",
+    freeAccess: "First-principles weld-line mechanics (the elastic method); the load, eccentricity, weld geometry, and the E70 allowable (about 928 lb/in per 1/16 in, ASD) are user-supplied.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "AISC 360 / Manual Part 8 elastic (vector) method. This is the conservative elastic method (not the instantaneous-center tables), a screen; AISC edition cycles update the tabulated allowables, and the engineer of record governs the connection (then check the AISC minimum fillet for the plate thickness).",
+    assumptions: [
+      { name: "Fillet allowable", value: "E70 ASD about 928 lb/in per 1/16 in of leg; editable", source: "AISC 360 §J2" },
+      { name: "Method", value: "elastic (vector) method, conservative vs instantaneous-center", source: "AISC Manual Part 8" },
+    ],
+  },
+  "min-bend-radius": {
+    formula: "Radius-to-thickness multiple R/T = 50 / %elongation - 1; minimum inside radius R_min = thickness x R/T.",
+    edition: "Minimum inside bend radius from ductility - the published forming-limit relation R_min = T x (50 / %elongation - 1), by name; public domain.",
+    freeAccess: "The published forming-limit relation; the thickness and mill-cert elongation are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Published forming-limit relation tying bend radius to thickness and total elongation. This is a screen: the mill certificate, the bend orientation relative to the rolling direction (a bend across the grain tolerates a tighter radius than one along it), the fabricator's press experience, and a test bend govern.",
+    assumptions: [
+      { name: "Elongation", value: "total percent in 2 in from the mill cert (A36 about 20); domain (0, 50]", source: "mill certificate" },
+      { name: "Grain direction", value: "transverse bends tolerate tighter radii than longitudinal; screen only", source: "forming practice" },
+    ],
+  },
+  "shrink-fit": {
+    formula: "Required temperature change delta_T = (interference + assembly clearance) / (alpha x nominal diameter); heat the outer/bore part to ambient + delta_T, or chill the inner/shaft part to ambient - delta_T. From delta_dia = alpha x dia x delta_T.",
+    edition: "Interference shrink-fit assembly temperature - first-principles thermal-expansion relation delta_dia = alpha x dia x delta_T (steel alpha 6.5e-6 per degF), by name; public domain.",
+    freeAccess: "Pure thermal-expansion arithmetic, public; the diameter, interference, clearance, coefficient, and ambient are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles thermal-growth relation. The alloy's published coefficient governs the number (steel about 6.5e-6 per degF; aluminum and others differ); the interference contact pressure (a separate Lame thick-cylinder analysis) and the engineer govern the joint's holding capacity -- this tile sizes only the assembly temperature.",
+    assumptions: [
+      { name: "Coefficient of thermal expansion", value: "default 6.5e-6 per degF (steel); editable for the alloy", source: "published material data" },
+      { name: "Ambient", value: "default 70 degF; a chill below dry ice (-109 degF) needs liquid nitrogen", source: "first-principles" },
+    ],
+  },
+
   // ---- spec-v41 Machine Shop & Fab bench, batch 2 (calc-shop.js; groups K/G) ----
   "tap-drill-size": {
     formula: "60-degree thread: percent of full thread = 76.98 x (D_major - D_drill) x TPI, so D_drill = D_major - % / (76.98 x TPI). The 76.98 constant is 1 / 0.012990; nearest 1/64 in fraction reported.",
@@ -6456,6 +6525,17 @@ export const CITATIONS = {
     editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
     assumptions: [
       { name: "Maintenance range", value: "often ~6-10% for general machining; factor usually 1-4 (off the data sheet)", source: "coolant data sheet" },
+    ],
+  },
+  "spindle-power-torque": {
+    formula: "Cutting horsepower = MRR (in3/min) x unit power (hp per in3/min); motor horsepower = cutting hp / (efficiency / 100); spindle torque (lb-ft) = 5252 x cutting hp / rpm.",
+    edition: "Cutting power and spindle torque - first-principles specific-cutting-energy relation with Machinery's Handbook (Industrial Press) unit-power values, by name; the 5252 torque constant is universal.",
+    freeAccess: "The specific-cutting-energy arithmetic is public; the material removal rate, unit power, efficiency, and rpm are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles specific-cutting-energy relation. The unit-power (specific cutting energy) values are Machinery's Handbook tabular references (about 1.0 hp per in3/min carbon steel, 0.33 aluminum, 1.5 stainless/titanium); the tool, sharpness, and machine govern the real draw -- this is the stall / motor-size check before a heavy cut.",
+    assumptions: [
+      { name: "Unit power", value: "specific cutting energy, hp per in3/min: ~1.0 carbon steel, ~0.33 aluminum, ~1.5 stainless/titanium; default 1.0", source: "Machinery's Handbook" },
+      { name: "Drive efficiency", value: "spindle drive efficiency; default 80%", source: "machine data" },
     ],
   },
   "pull-box-sizing": {

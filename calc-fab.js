@@ -831,3 +831,342 @@ function _v85renderWeldCostPerFoot(inputRegion, outputRegion, citationEl) {
   for (const f of [deposit, eff, fillerCost, depRate, opFactor, laborRate, gas]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["weld-cost-per-foot"] = _v85renderWeldCostPerFoot;
+
+// =====================================================================
+// spec-v129..v134 metal-trades batch: weld estimating (deposit volume,
+// deposition rate, transverse shrinkage, eccentric weld group), plate
+// forming (minimum bend radius), and shop assembly (shrink fit). Group E
+// (welding / fabrication / sheet-metal) except shrink-fit, Group G
+// (cross-trade fab). First-principles + published-relation tiles; pure
+// compute functions, the v18/v21 {error} contract, full v14 dims.
+// =====================================================================
+
+// v129 weld-metal-volume (Group E): weld deposit weight, filler consumed, pass count.
+// dims: in { joint_type: dimensionless, fillet_leg_in: L, groove_area_in2: L^2, length_in: L, deposition_eff: dimensionless, max_pass_area_in2: L^2 } out: { weld_area_in2: L^2, deposit_in3: L^3, deposit_lb: M, filler_lb: M, passes: dimensionless }
+export function computeWeldMetalVolume({ joint_type = "fillet", fillet_leg_in = 0, groove_area_in2 = 0, length_in = 0, deposition_eff = 0.90, max_pass_area_in2 = 0.05 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const leg = Number(fillet_leg_in);
+  const grooveArea = Number(groove_area_in2);
+  const length = Number(length_in);
+  const eff = Number(deposition_eff);
+  const maxPass = Number(max_pass_area_in2);
+  if (!(length > 0)) return { error: "Weld length must be positive (in)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Deposition efficiency must be in (0, 1]." };
+  if (!(maxPass > 0)) return { error: "Max single-pass area must be positive (in2)." };
+  if (joint_type === "groove") {
+    if (!(grooveArea > 0)) return { error: "Groove area must be positive (in2)." };
+  } else if (!(leg > 0)) {
+    return { error: "Fillet leg must be positive (in)." };
+  }
+  const weldArea = joint_type === "groove" ? grooveArea : (leg * leg) / 2;
+  const depositIn3 = weldArea * length;
+  const depositLb = depositIn3 * 0.2836;
+  const fillerLb = depositLb / eff;
+  const passes = Math.ceil(weldArea / maxPass);
+  return {
+    weld_area_in2: weldArea,
+    deposit_in3: depositIn3,
+    deposit_lb: depositLb,
+    filler_lb: fillerLb,
+    passes,
+    note: "Filler purchased = deposit weight / deposition efficiency -- solid wire runs about 0.90, stick (SMAW) about 0.60 to 0.65, so a stick joint buys far more rod than it deposits; the steel density is 0.2836 lb/in3 (matching metal-weight); pass count is a planning estimate (weld area / max single-pass area, default 0.05 in2). The WPS and the shop's measured deposition efficiency govern the purchase.",
+  };
+}
+export const weldMetalVolumeExample = { inputs: { joint_type: "fillet", fillet_leg_in: 0.3125, length_in: 120, deposition_eff: 0.90, max_pass_area_in2: 0.05 } };
+
+function _v129renderWeldMetalVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles joint geometry and steel density (0.2836 lb/in3), by name. Deposit volume = weld area x length; equal-leg fillet area = leg2 / 2; filler purchased = deposit / deposition efficiency. The WPS and the fabricator's measured deposition efficiency govern.";
+  const joint = makeSelect("Joint type", "wmv-joint", [
+    { value: "fillet", label: "Fillet (by leg)", selected: true },
+    { value: "groove", label: "Groove (by area)" },
+  ]);
+  const leg = makeNumber("Fillet leg (in, fillet mode)", "wmv-leg", { step: "any", min: "0" });
+  const grooveArea = makeNumber("Weld area (in2, groove mode)", "wmv-area", { step: "any", min: "0" });
+  const length = makeNumber("Total weld length (in)", "wmv-len", { step: "any", min: "0" });
+  const eff = makeNumber("Deposition efficiency (0-1)", "wmv-eff", { step: "any", min: "0", value: "0.90" });
+  eff.input.value = "0.90";
+  const maxPass = makeNumber("Max single-pass area (in2)", "wmv-pass", { step: "any", min: "0", value: "0.05" });
+  maxPass.input.value = "0.05";
+  for (const f of [joint, leg, grooveArea, length, eff, maxPass]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { joint.select.value = "fillet"; leg.input.value = "0.3125"; grooveArea.input.value = ""; length.input.value = "120"; eff.input.value = "0.90"; maxPass.input.value = "0.05"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Weld cross-section", "wmv-out-area");
+  const oDep = makeOutputLine(outputRegion, "Deposit weight", "wmv-out-dep");
+  const oFill = makeOutputLine(outputRegion, "Filler purchased", "wmv-out-fill");
+  const oPass = makeOutputLine(outputRegion, "Passes (estimate)", "wmv-out-pass");
+  const update = debounce(() => {
+    const r = computeWeldMetalVolume({
+      joint_type: joint.select.value,
+      fillet_leg_in: Number(leg.input.value) || 0,
+      groove_area_in2: Number(grooveArea.input.value) || 0,
+      length_in: Number(length.input.value) || 0,
+      deposition_eff: eff.input.value === "" ? 0.90 : Number(eff.input.value),
+      max_pass_area_in2: maxPass.input.value === "" ? 0.05 : Number(maxPass.input.value),
+    });
+    if (r.error) { oArea.textContent = r.error; for (const o of [oDep, oFill, oPass]) o.textContent = "-"; return; }
+    oArea.textContent = fmt(r.weld_area_in2, 4) + " in2";
+    oDep.textContent = fmt(r.deposit_lb, 2) + " lb (" + fmt(r.deposit_in3, 2) + " in3)";
+    oFill.textContent = fmt(r.filler_lb, 2) + " lb";
+    oPass.textContent = r.passes + " pass(es)";
+  }, DEBOUNCE_MS);
+  for (const f of [leg, grooveArea, length, eff, maxPass]) f.input.addEventListener("input", update);
+  for (const f of [joint]) f.select.addEventListener("change", update);
+}
+FAB_RENDERERS["weld-metal-volume"] = _v129renderWeldMetalVolume;
+
+// v130 wire-feed-deposition (Group E): melt-off and deposition rate from wire feed speed.
+// dims: in { wfs_in_min: L T^-1, wire_dia_in: L, deposition_eff: dimensionless } out: { wire_area_in2: L^2, melt_lb_hr: M T^-1, deposit_lb_hr: M T^-1 }
+export function computeWireFeedDeposition({ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const wfs = Number(wfs_in_min);
+  const dia = Number(wire_dia_in);
+  const eff = Number(deposition_eff);
+  if (!(wfs > 0)) return { error: "Wire feed speed must be positive (in/min)." };
+  if (!(dia > 0)) return { error: "Wire diameter must be positive (in)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Deposition efficiency must be in (0, 1]." };
+  const wireArea = (Math.PI / 4) * dia * dia;
+  const meltLbHr = wfs * 60 * wireArea * 0.2836;
+  const depositLbHr = meltLbHr * eff;
+  return {
+    wire_area_in2: wireArea,
+    melt_lb_hr: meltLbHr,
+    deposit_lb_hr: depositLbHr,
+    note: "Melt-off rate = wire feed speed x 60 x wire cross-section x steel density (0.2836 lb/in3); deposition rate after spatter/loss = melt-off x efficiency (solid wire about 0.92, FCAW about 0.85). Pair with weld-metal-volume: deposit weight / deposition rate = arc time. The WPS governs the qualified parameters (process, gas, electrode extension).",
+  };
+}
+export const wireFeedDepositionExample = { inputs: { wfs_in_min: 300, wire_dia_in: 0.035, deposition_eff: 0.92 } };
+
+function _v130renderWireFeedDeposition(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles wire-volume geometry and steel density (0.2836 lb/in3), by name. Melt-off = WFS x 60 x area x density; deposition = melt-off x efficiency. The WPS and the process (spray vs short-circuit, gas, electrode extension) govern the real efficiency.";
+  const wfs = makeNumber("Wire feed speed (in/min)", "wfd-wfs", { step: "any", min: "0" });
+  const dia = makeNumber("Wire diameter (in)", "wfd-dia", { step: "any", min: "0" });
+  const eff = makeNumber("Deposition efficiency (0-1)", "wfd-eff", { step: "any", min: "0", value: "0.92" });
+  eff.input.value = "0.92";
+  for (const f of [wfs, dia, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wfs.input.value = "300"; dia.input.value = "0.035"; eff.input.value = "0.92"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Wire cross-section", "wfd-out-area");
+  const oMelt = makeOutputLine(outputRegion, "Melt-off rate", "wfd-out-melt");
+  const oDep = makeOutputLine(outputRegion, "Deposition rate", "wfd-out-dep");
+  const update = debounce(() => {
+    const r = computeWireFeedDeposition({
+      wfs_in_min: Number(wfs.input.value) || 0,
+      wire_dia_in: Number(dia.input.value) || 0,
+      deposition_eff: eff.input.value === "" ? 0.92 : Number(eff.input.value),
+    });
+    if (r.error) { oArea.textContent = r.error; for (const o of [oMelt, oDep]) o.textContent = "-"; return; }
+    oArea.textContent = fmt(r.wire_area_in2, 6) + " in2";
+    oMelt.textContent = fmt(r.melt_lb_hr, 2) + " lb/hr";
+    oDep.textContent = fmt(r.deposit_lb_hr, 2) + " lb/hr";
+  }, DEBOUNCE_MS);
+  for (const f of [wfs, dia, eff]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["wire-feed-deposition"] = _v130renderWireFeedDeposition;
+
+// v131 weld-transverse-shrinkage (Group E): Blodgett transverse shrinkage and pre-set.
+// dims: in { weld_area_in2: L^2, thickness_in: L, weld_count: dimensionless } out: { shrink_per_weld_in: L, total_shrink_in: L, recommended_preset_in: L }
+export function computeWeldTransverseShrinkage({ weld_area_in2 = 0, thickness_in = 0, weld_count = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(weld_area_in2);
+  const thickness = Number(thickness_in);
+  const count = Number(weld_count);
+  if (!(area > 0)) return { error: "Weld area must be positive (in2)." };
+  if (!(thickness > 0)) return { error: "Plate thickness must be positive (in)." };
+  if (!(count >= 1)) return { error: "Weld count must be at least 1." };
+  const shrinkPerWeld = 0.2 * area / thickness;
+  const totalShrink = shrinkPerWeld * count;
+  return {
+    shrink_per_weld_in: shrinkPerWeld,
+    total_shrink_in: totalShrink,
+    recommended_preset_in: totalShrink,
+    note: "Blodgett transverse-shrinkage screen: shrink = 0.2 x weld area / thickness (the 0.2 coefficient is dimensionless; the weld-area-over-thickness ratio carries the length). Set the parts apart / pre-bow by the total so the assembly cools to size. Restraint, fixturing, sequence, and a mock-up govern the real movement; longitudinal and angular distortion are NOT estimated here.",
+  };
+}
+export const weldTransverseShrinkageExample = { inputs: { weld_area_in2: 0.10, thickness_in: 0.5, weld_count: 3 } };
+
+function _v131renderWeldTransverseShrinkage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Blodgett, Design of Welded Structures, transverse-shrinkage relation (shrink = 0.2 x A_w / t), by name. This is a screen; restraint, sequence, and a mock-up govern the actual movement, and longitudinal and angular distortion are out of scope.";
+  const area = makeNumber("Weld cross-section (in2)", "wts-area", { step: "any", min: "0" });
+  const thickness = makeNumber("Plate thickness (in)", "wts-thk", { step: "any", min: "0" });
+  const count = makeNumber("Parallel welds pulling the dimension", "wts-count", { step: "1", min: "1", value: "1" });
+  count.input.value = "1";
+  for (const f of [area, thickness, count]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "0.10"; thickness.input.value = "0.5"; count.input.value = "3"; update(); });
+  const oPer = makeOutputLine(outputRegion, "Shrinkage per weld", "wts-out-per");
+  const oTotal = makeOutputLine(outputRegion, "Total transverse shrinkage", "wts-out-total");
+  const oPreset = makeOutputLine(outputRegion, "Recommended pre-set", "wts-out-preset");
+  const update = debounce(() => {
+    const r = computeWeldTransverseShrinkage({
+      weld_area_in2: Number(area.input.value) || 0,
+      thickness_in: Number(thickness.input.value) || 0,
+      weld_count: count.input.value === "" ? 1 : Number(count.input.value),
+    });
+    if (r.error) { oPer.textContent = r.error; for (const o of [oTotal, oPreset]) o.textContent = "-"; return; }
+    oPer.textContent = fmt(r.shrink_per_weld_in, 3) + " in";
+    oTotal.textContent = fmt(r.total_shrink_in, 3) + " in";
+    oPreset.textContent = "lay parts " + fmt(r.recommended_preset_in, 3) + " in wide";
+  }, DEBOUNCE_MS);
+  for (const f of [area, thickness, count]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-transverse-shrinkage"] = _v131renderWeldTransverseShrinkage;
+
+// v132 weld-group-eccentric (Group E): eccentrically loaded fillet weld group, elastic method.
+// dims: in { load_lb: M L T^-2, ecc_in: L, weld_len_in: L, separation_in: L, allow_per_16: M T^-2 } out: { total_weld_len_in: L, polar_moment_in3: L^3, direct_shear_lb_in: M T^-2, torsion_x_lb_in: M T^-2, torsion_y_lb_in: M T^-2, resultant_lb_in: M T^-2, req_leg_16: dimensionless }
+export function computeWeldGroupEccentric({ load_lb = 0, ecc_in = 0, weld_len_in = 0, separation_in = 0, allow_per_16 = 928 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(load_lb);
+  const ecc = Number(ecc_in);
+  const D = Number(weld_len_in);
+  const B = Number(separation_in);
+  const allow = Number(allow_per_16);
+  if (!(P > 0)) return { error: "Load must be positive (lb)." };
+  if (!(ecc >= 0)) return { error: "Eccentricity must be zero or positive (in)." };
+  if (!(D > 0)) return { error: "Weld length must be positive (in)." };
+  if (!(B > 0)) return { error: "Weld separation must be positive (in)." };
+  if (!(allow > 0)) return { error: "Allowable per 1/16 in must be positive (lb/in)." };
+  const Lw = 2 * D;
+  const Ix = (D * D * D) / 6;
+  const Iy = (D * B * B) / 2;
+  const J = Ix + Iy;
+  const fd = P / Lw;
+  const T = P * ecc;
+  const ftx = T * (D / 2) / J;
+  const fty = T * (B / 2) / J;
+  const fr = Math.sqrt(ftx * ftx + (fd + fty) * (fd + fty));
+  const reqLeg16 = Math.ceil(fr / allow);
+  return {
+    total_weld_len_in: Lw,
+    polar_moment_in3: J,
+    direct_shear_lb_in: fd,
+    torsion_x_lb_in: ftx,
+    torsion_y_lb_in: fty,
+    resultant_lb_in: fr,
+    req_leg_16: reqLeg16,
+    note: "Elastic (vector) method for two vertical fillet welds under in-plane eccentric load: the resultant unit force combines direct shear with the torsional components at the critical corner, and the required leg is the resultant / allowable (E70 ASD about 928 lb/in per 1/16 in). This is the conservative elastic method, not the AISC instantaneous-center tables; then check the AISC minimum fillet for the plate thickness. The engineer of record governs the connection.",
+  };
+}
+export const weldGroupEccentricExample = { inputs: { load_lb: 12000, ecc_in: 6, weld_len_in: 10, separation_in: 4, allow_per_16: 928 } };
+
+function _v132renderWeldGroupEccentric(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AISC 360 / Steel Construction Manual Part 8 elastic (vector) method for eccentric weld groups, by name. Resultant = sqrt(f_tx2 + (f_d + f_ty)2); required leg = resultant / allowable. This is the conservative elastic method (not instantaneous-center), a screen; the engineer of record governs.";
+  const load = makeNumber("In-plane load P (lb)", "wge-load", { step: "any", min: "0" });
+  const ecc = makeNumber("Eccentricity from centroid (in)", "wge-ecc", { step: "any", min: "0" });
+  const len = makeNumber("Length of each vertical weld (in)", "wge-len", { step: "any", min: "0" });
+  const sep = makeNumber("Separation between welds (in)", "wge-sep", { step: "any", min: "0" });
+  const allow = makeNumber("Allowable per 1/16 in leg (lb/in)", "wge-allow", { step: "any", min: "0", value: "928" });
+  allow.input.value = "928";
+  for (const f of [load, ecc, len, sep, allow]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "12000"; ecc.input.value = "6"; len.input.value = "10"; sep.input.value = "4"; allow.input.value = "928"; update(); });
+  const oJ = makeOutputLine(outputRegion, "Line polar moment J", "wge-out-j");
+  const oFd = makeOutputLine(outputRegion, "Direct shear", "wge-out-fd");
+  const oFr = makeOutputLine(outputRegion, "Resultant at critical corner", "wge-out-fr");
+  const oLeg = makeOutputLine(outputRegion, "Required fillet leg", "wge-out-leg");
+  const update = debounce(() => {
+    const r = computeWeldGroupEccentric({
+      load_lb: Number(load.input.value) || 0,
+      ecc_in: ecc.input.value === "" ? 0 : Number(ecc.input.value),
+      weld_len_in: Number(len.input.value) || 0,
+      separation_in: Number(sep.input.value) || 0,
+      allow_per_16: allow.input.value === "" ? 928 : Number(allow.input.value),
+    });
+    if (r.error) { oJ.textContent = r.error; for (const o of [oFd, oFr, oLeg]) o.textContent = "-"; return; }
+    oJ.textContent = fmt(r.polar_moment_in3, 1) + " in3";
+    oFd.textContent = fmt(r.direct_shear_lb_in, 0) + " lb/in";
+    oFr.textContent = fmt(r.resultant_lb_in, 0) + " lb/in";
+    oLeg.textContent = r.req_leg_16 + "/16 in (" + fmt(r.req_leg_16 / 16, 3) + " in)";
+  }, DEBOUNCE_MS);
+  for (const f of [load, ecc, len, sep, allow]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-group-eccentric"] = _v132renderWeldGroupEccentric;
+
+// v133 min-bend-radius (Group E): minimum inside bend radius from ductility.
+// dims: in { thickness_in: L, elongation_pct: dimensionless } out: { r_over_t: dimensionless, r_min_in: L }
+export function computeMinBendRadius({ thickness_in = 0, elongation_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const thickness = Number(thickness_in);
+  const elong = Number(elongation_pct);
+  if (!(thickness > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(elong > 0 && elong <= 50)) return { error: "Elongation must be in (0, 50] percent." };
+  const rOverT = 50 / elong - 1;
+  const rMin = thickness * rOverT;
+  return {
+    r_over_t: rOverT,
+    r_min_in: rMin,
+    note: "Published forming-limit screen: minimum inside radius = thickness x (50 / %elongation - 1), with elongation the total percent in 2 in from the mill cert (A36 about 20). A bend across (transverse to) the rolling direction tolerates a tighter radius than one along it. The mill certificate, grain direction, the fabricator's press experience, and a test bend govern.",
+  };
+}
+export const minBendRadiusExample = { inputs: { thickness_in: 0.25, elongation_pct: 20 } };
+
+function _v133renderMinBendRadius(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: published forming-limit relation R_min = T x (50 / %elongation - 1), by name. The mill certificate, the bend orientation relative to the rolling direction, and a test bend govern; this is a screen.";
+  const thickness = makeNumber("Plate / sheet thickness (in)", "mbr-thk", { step: "any", min: "0" });
+  const elong = makeNumber("Elongation in 2 in (%)", "mbr-elong", { step: "any", min: "0" });
+  for (const f of [thickness, elong]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { thickness.input.value = "0.25"; elong.input.value = "20"; update(); });
+  const oRt = makeOutputLine(outputRegion, "Radius-to-thickness (R/T)", "mbr-out-rt");
+  const oR = makeOutputLine(outputRegion, "Minimum inside radius", "mbr-out-r");
+  const update = debounce(() => {
+    const r = computeMinBendRadius({
+      thickness_in: Number(thickness.input.value) || 0,
+      elongation_pct: Number(elong.input.value) || 0,
+    });
+    if (r.error) { oRt.textContent = r.error; oR.textContent = "-"; return; }
+    oRt.textContent = fmt(r.r_over_t, 2) + " T";
+    oR.textContent = fmt(r.r_min_in, 3) + " in";
+  }, DEBOUNCE_MS);
+  for (const f of [thickness, elong]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["min-bend-radius"] = _v133renderMinBendRadius;
+
+// v134 shrink-fit (Group G): interference shrink-fit heating / chilling temperature.
+// dims: in { nominal_dia_in: L, interference_in: L, clearance_in: L, alpha_per_f: T^-1, ambient_f: T } out: { delta_t_f: T, heat_to_f: T, chill_to_f: T }
+export function computeShrinkFit({ nominal_dia_in = 0, interference_in = 0, clearance_in = 0, alpha_per_f = 0.0000065, ambient_f = 70 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dia = Number(nominal_dia_in);
+  const interference = Number(interference_in);
+  const clearance = Number(clearance_in);
+  const alpha = Number(alpha_per_f);
+  const ambient = Number(ambient_f);
+  if (!(dia > 0)) return { error: "Nominal diameter must be positive (in)." };
+  if (!(alpha > 0)) return { error: "Coefficient of thermal expansion must be positive (per degF)." };
+  if (!(interference >= 0)) return { error: "Interference must be zero or positive (in)." };
+  if (!(clearance >= 0)) return { error: "Assembly clearance must be zero or positive (in)." };
+  const deltaT = (interference + clearance) / (alpha * dia);
+  return {
+    delta_t_f: deltaT,
+    heat_to_f: ambient + deltaT,
+    chill_to_f: ambient - deltaT,
+    note: "Thermal-growth relation delta_dia = alpha x dia x delta_T (steel alpha about 6.5e-6 per degF). Heat the outer/bore part to heat_to, or chill the inner/shaft part to chill_to, to open the fit enough to assemble by hand. A chill below dry ice (-109 degF) needs liquid nitrogen. The alloy's published coefficient governs the number; the interference contact pressure (a separate Lame thick-cylinder check) and the engineer govern the joint's holding capacity -- this tile sizes only the assembly temperature.",
+  };
+}
+export const shrinkFitExample = { inputs: { nominal_dia_in: 4.0, interference_in: 0.004, clearance_in: 0.002, alpha_per_f: 0.0000065, ambient_f: 70 } };
+
+function _v134renderShrinkFit(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles thermal-expansion relation delta_dia = alpha x dia x delta_T, with steel alpha about 6.5e-6 per degF, by name. The published alloy coefficient and a separate interference-pressure (Lame) check govern; this tile sizes only the assembly temperature.";
+  const dia = makeNumber("Nominal fit diameter (in)", "shf-dia", { step: "any", min: "0" });
+  const interference = makeNumber("Diametral interference (in)", "shf-int", { step: "any", min: "0" });
+  const clearance = makeNumber("Assembly clearance (in)", "shf-clr", { step: "any", min: "0", value: "0.002" });
+  clearance.input.value = "0.002";
+  const alpha = makeNumber("CTE (per degF)", "shf-alpha", { step: "any", min: "0", value: "0.0000065" });
+  alpha.input.value = "0.0000065";
+  const ambient = makeNumber("Ambient temperature (degF)", "shf-amb", { step: "any", value: "70" });
+  ambient.input.value = "70";
+  for (const f of [dia, interference, clearance, alpha, ambient]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "4.0"; interference.input.value = "0.004"; clearance.input.value = "0.002"; alpha.input.value = "0.0000065"; ambient.input.value = "70"; update(); });
+  const oDt = makeOutputLine(outputRegion, "Required temperature change", "shf-out-dt");
+  const oHeat = makeOutputLine(outputRegion, "Heat outer part to", "shf-out-heat");
+  const oChill = makeOutputLine(outputRegion, "Or chill inner part to", "shf-out-chill");
+  const update = debounce(() => {
+    const r = computeShrinkFit({
+      nominal_dia_in: Number(dia.input.value) || 0,
+      interference_in: Number(interference.input.value) || 0,
+      clearance_in: clearance.input.value === "" ? 0 : Number(clearance.input.value),
+      alpha_per_f: alpha.input.value === "" ? 0.0000065 : Number(alpha.input.value),
+      ambient_f: ambient.input.value === "" ? 70 : Number(ambient.input.value),
+    });
+    if (r.error) { oDt.textContent = r.error; for (const o of [oHeat, oChill]) o.textContent = "-"; return; }
+    oDt.textContent = fmt(r.delta_t_f, 0) + " degF";
+    oHeat.textContent = fmt(r.heat_to_f, 0) + " degF";
+    oChill.textContent = fmt(r.chill_to_f, 0) + " degF" + (r.chill_to_f < -109 ? " (needs liquid nitrogen)" : "");
+  }, DEBOUNCE_MS);
+  for (const f of [dia, interference, clearance, alpha, ambient]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["shrink-fit"] = _v134renderShrinkFit;

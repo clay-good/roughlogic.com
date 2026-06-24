@@ -1,6 +1,6 @@
 # roughlogic.com Specification v135 -- Cutting Power and Spindle Torque from Material Removal Rate (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v129..v135 (final).** In-scope catalog expansion under
+> **Status: LANDED 2026-06-23 (catalog 615, package 0.74.0). Batch spec-v129..v135 (final).** In-scope catalog expansion under
 > the spec-v106 trades-only charter: one machining tile from the first-principles specific-cutting-
 > energy relation, machinist-and-tooling governed, redo-not-harm. Adds one tile to
 > **`calc-machining.js`** (Group K); no new module, group, or dependency. Inherits spec.md through

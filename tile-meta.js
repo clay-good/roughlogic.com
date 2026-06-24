@@ -329,6 +329,12 @@ const _TILES = [
   ["press-brake-tonnage", "E"], ["weld-duty-cycle", "E"], ["carbon-equivalent", "E"],
   ["shielding-gas-runtime", "E"], ["oxyfuel-cutting-gas", "E"], ["weld-preheat-fuel", "E"], ["weld-cost-per-foot", "E"],
 
+  // v129..v134 metal-trades batch (calc-fab.js): weld estimating + plate forming (E) + shrink fit (G)
+  ["weld-metal-volume", "E"], ["wire-feed-deposition", "E"], ["weld-transverse-shrinkage", "E"],
+  ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["shrink-fit", "G"],
+  // v135 machining cut-planning (calc-machining.js)
+  ["spindle-power-torque", "K"],
+
   // v41 machine-shop & fab bench batch 2 (calc-shop.js; natural group letters K/G)
   ["tap-drill-size", "K"], ["rolled-blank", "G"],
 
