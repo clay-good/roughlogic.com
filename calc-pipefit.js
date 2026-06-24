@@ -26,6 +26,27 @@ import {
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
+// Nominal Schedule 40 steel pipe inside diameters (in), keyed by NPS, for
+// the steam-main velocity sizing (v158). Standard mill dimensions (ASME
+// B36.10M); the same 3.068 / 4.026 figures the calc-plumbing / calc-gas
+// sizing tiles already bundle.
+const _SCH40_ID_IN = [
+  ["1/2", 0.622], ["3/4", 0.824], ["1", 1.049], ["1-1/4", 1.380],
+  ["1-1/2", 1.610], ["2", 2.067], ["2-1/2", 2.469], ["3", 3.068],
+  ["3-1/2", 3.548], ["4", 4.026], ["5", 5.047], ["6", 6.065],
+  ["8", 7.981], ["10", 10.020], ["12", 11.938],
+];
+
+// MSS SP-58 carbon-steel threaded-rod maximum safe loads (lb) at or below
+// 650F, keyed by rod diameter (in), for the hanger-rod sizing (v162).
+// Standard threaded-rod allowable loads (root area x ~allowable stress);
+// the same values published across MSS SP-58 and every hanger catalog.
+const _MSS_SP58_ROD_LB = [
+  ["3/8", 610], ["1/2", 1130], ["5/8", 1810], ["3/4", 2710],
+  ["7/8", 3770], ["1", 4960], ["1-1/8", 6230], ["1-1/4", 8000],
+  ["1-3/8", 9510], ["1-1/2", 11630],
+];
+
 const _finiteGuard = (o) => {
   if (o && typeof o === "object" && !Array.isArray(o)) {
     for (const v of Object.values(o)) {
@@ -207,3 +228,306 @@ function _renderPipeSpacingRack(inputRegion, outputRegion, citationEl) {
   for (const f of [od.input, ins.input, gap.input, n.input, rack.input]) f.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["pipe-spacing-rack"] = _renderPipeSpacingRack;
+
+// =====================================================================
+// spec-v157..v162 (Group B) - the steamfitting / pressure-piping / pipe-
+// support bench: flash steam, steam-main velocity sizing, steam-trap
+// load, ASME B31.1 pressure rating, filled-pipe support load, and MSS
+// SP-58 hanger-rod sizing. All lazy-loaded, absent from home first paint.
+// First-principles relations; the steam tables, the code allowable-stress
+// tables, and the engineer of record govern the field selection.
+// =====================================================================
+
+// ---------------------------------------------------------------------
+// v157 Flash steam percentage (flash-steam-pct)
+// ---------------------------------------------------------------------
+// dims: in { hf_high: L^2 T^-2, hf_low: L^2 T^-2, hfg_low: L^2 T^-2 } out: { flash_fraction: dimensionless, flash_pct: dimensionless }
+export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hfH = Number(hf_high);
+  const hfL = Number(hf_low);
+  const hfg = Number(hfg_low);
+  if (!(hfg > 0)) return { error: "Low-side latent heat must be positive (Btu/lb)." };
+  if (!(hfH > hfL)) return { error: "High-side enthalpy must exceed the low-side enthalpy (no flash otherwise)." };
+  const flash_fraction = (hfH - hfL) / hfg;
+  return { flash_fraction, flash_pct: flash_fraction * 100 };
+}
+export const flashSteamPctExample = { inputs: { hf_high: 309, hf_low: 180, hfg_low: 970 } };
+
+function _renderFlashSteamPct(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Flash steam fraction = (hf_high - hf_low) / hfg_low - the sensible-heat surplus a condensate carries across a pressure drop re-boils a fraction back to steam - first-principles steam thermodynamics, by name. Enthalpies are read from the ASME saturated-water steam tables at the two pressures. This is the thermodynamic-ideal fraction; trap subcooling and line losses move the field value, and a flash-recovery vessel is sized from the manufacturer's data.";
+  const hfH = makeNumber("Liquid enthalpy hf at high pressure (Btu/lb)", "fs-hfh", { step: "any", min: "0" });
+  const hfL = makeNumber("Liquid enthalpy hf at low pressure (Btu/lb)", "fs-hfl", { step: "any", min: "0" });
+  const hfg = makeNumber("Latent heat hfg at low pressure (Btu/lb)", "fs-hfg", { step: "any", min: "0" });
+  for (const f of [hfH, hfL, hfg]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hfH.input.value = "309"; hfL.input.value = "180"; hfg.input.value = "970"; update(); });
+  const oPct = makeOutputLine(outputRegion, "Flash steam", "fs-out-pct");
+  const update = debounce(() => {
+    const r = computeFlashSteamPct({ hf_high: Number(hfH.input.value) || 0, hf_low: Number(hfL.input.value) || 0, hfg_low: Number(hfg.input.value) || 0 });
+    if (r.error) { oPct.textContent = r.error; return; }
+    oPct.textContent = fmt(r.flash_pct, 1) + "% of the condensate flashes to steam";
+  }, DEBOUNCE_MS);
+  for (const f of [hfH.input, hfL.input, hfg.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["flash-steam-pct"] = _renderFlashSteamPct;
+
+// ---------------------------------------------------------------------
+// v158 Steam main size from flow and velocity (steam-pipe-velocity)
+// ---------------------------------------------------------------------
+// dims: in { steam_flow_lbhr: M T^-1, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1 } out: { req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L, actual_fpm: L T^-1 }
+export function computeSteamPipeVelocity({ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const flow = Number(steam_flow_lbhr);
+  const sv = Number(spec_vol_ft3lb);
+  const vc = Number(vel_ceiling_fpm);
+  if (!(flow > 0)) return { error: "Steam flow must be positive (lb/hr)." };
+  if (!(sv > 0)) return { error: "Specific volume must be positive (ft3/lb)." };
+  if (!(vc > 0)) return { error: "Velocity ceiling must be positive (ft/min)." };
+  const req_area_ft2 = (flow * sv) / (vc * 60);
+  const req_area_in2 = req_area_ft2 * 144;
+  const req_dia_in = Math.sqrt(4 * req_area_ft2 / Math.PI) * 12;
+  let chosen = null;
+  for (const [nps, id] of _SCH40_ID_IN) { if (id >= req_dia_in) { chosen = [nps, id]; break; } }
+  if (!chosen) return { error: "Required diameter exceeds the bundled 12 in Sch 40 table; size a larger main from the schedule." };
+  const chosen_area_ft2 = (Math.PI / 4) * Math.pow(chosen[1] / 12, 2);
+  const actual_fpm = (flow * sv) / (chosen_area_ft2 * 60);
+  return { req_area_in2, req_dia_in, chosen_nps: chosen[0], chosen_id_in: chosen[1], actual_fpm };
+}
+export const steamPipeVelocityExample = { inputs: { steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 } };
+
+function _renderSteamPipeVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Steam main sizing by continuity - req_area = (flow x specific_volume) / (velocity x 60), then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure. The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
+  const flow = makeNumber("Steam mass flow (lb/hr)", "sv-flow", { step: "any", min: "0" });
+  const sv = makeNumber("Steam specific volume at pressure (ft3/lb)", "sv-sv", { step: "any", min: "0" });
+  const vc = makeNumber("Allowable velocity (ft/min)", "sv-vc", { step: "any", min: "0", value: "6000" });
+  vc.input.value = "6000";
+  for (const f of [flow, sv, vc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "1000"; sv.input.value = "13.7"; vc.input.value = "6000"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required internal area / diameter", "sv-out-req");
+  const oSize = makeOutputLine(outputRegion, "Smallest Sch 40 main", "sv-out-size");
+  const oVel = makeOutputLine(outputRegion, "Actual velocity in it", "sv-out-vel");
+  const update = debounce(() => {
+    const r = computeSteamPipeVelocity({ steam_flow_lbhr: Number(flow.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0 });
+    if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oVel.textContent = "-"; return; }
+    oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
+    oSize.textContent = r.chosen_nps + " in (ID " + fmt(r.chosen_id_in, 3) + " in)";
+    oVel.textContent = fmt(r.actual_fpm, 0) + " ft/min";
+  }, DEBOUNCE_MS);
+  for (const f of [flow.input, sv.input, vc.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["steam-pipe-velocity"] = _renderSteamPipeVelocity;
+
+// ---------------------------------------------------------------------
+// v159 Steam trap condensate load and required capacity (steam-trap-sizing)
+// ---------------------------------------------------------------------
+// dims: in { heat_duty_btuhr: M L^2 T^-3, hfg_btulb: L^2 T^-2, safety_factor: dimensionless } out: { condensate_lbhr: M T^-1, req_capacity_lbhr: M T^-1 }
+export function computeSteamTrapSizing({ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(heat_duty_btuhr);
+  const hfg = Number(hfg_btulb);
+  const sf = Number(safety_factor);
+  if (!(q > 0)) return { error: "Heat duty must be positive (Btu/hr)." };
+  if (!(hfg > 0)) return { error: "Latent heat must be positive (Btu/lb)." };
+  if (!(sf >= 1)) return { error: "Safety factor must be at least 1." };
+  const condensate_lbhr = q / hfg;
+  const req_capacity_lbhr = condensate_lbhr * sf;
+  return { condensate_lbhr, req_capacity_lbhr };
+}
+export const steamTrapSizingExample = { inputs: { heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 } };
+
+function _renderSteamTrapSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Condensate load = heat duty / latent heat; required trap capacity = load x safety factor (2x typical, 3x warm-up / modulating) - first-principles steam thermodynamics and the safety-factor practice, by name. The latent heat is read from the saturated-steam table at the operating pressure. The trap is selected from the manufacturer's capacity chart at the actual differential pressure the installation develops; warm-up, modulating, and stall conditions can demand a larger factor or a different trap type.";
+  const q = makeNumber("Heat duty served (Btu/hr)", "st-q", { step: "any", min: "0" });
+  const hfg = makeNumber("Latent heat hfg at pressure (Btu/lb)", "st-hfg", { step: "any", min: "0" });
+  const sf = makeNumber("Safety factor (2 typical, 3 warm-up)", "st-sf", { step: "any", min: "1", value: "2" });
+  sf.input.value = "2";
+  for (const f of [q, hfg, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "400000"; hfg.input.value = "945"; sf.input.value = "2"; update(); });
+  const oLoad = makeOutputLine(outputRegion, "Running condensate load", "st-out-load");
+  const oCap = makeOutputLine(outputRegion, "Required trap capacity", "st-out-cap");
+  const update = debounce(() => {
+    const r = computeSteamTrapSizing({ heat_duty_btuhr: Number(q.input.value) || 0, hfg_btulb: Number(hfg.input.value) || 0, safety_factor: Number(sf.input.value) || 0 });
+    if (r.error) { oLoad.textContent = r.error; oCap.textContent = "-"; return; }
+    oLoad.textContent = fmt(r.condensate_lbhr, 0) + " lb/hr";
+    oCap.textContent = fmt(r.req_capacity_lbhr, 0) + " lb/hr at the operating differential";
+  }, DEBOUNCE_MS);
+  for (const f of [q.input, hfg.input, sf.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["steam-trap-sizing"] = _renderSteamTrapSizing;
+
+// ---------------------------------------------------------------------
+// v160 ASME B31.1 pipe pressure rating / required wall (pipe-pressure-rating)
+// ---------------------------------------------------------------------
+// dims: in { od_in: L, wall_in: L, allow_stress: M L^-1 T^-2, joint_factor: dimensionless, y_coeff: dimensionless, mill_tol_frac: dimensionless, allowance_in: L, design_p: M L^-1 T^-2, mode: dimensionless } out: { p_allow: M L^-1 T^-2, t_min: L, t_avail: L }
+export function computePipePressureRating({ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, mill_tol_frac = 0.125, allowance_in = 0, design_p = 0, mode = "allowable_pressure" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const od = Number(od_in);
+  const S = Number(allow_stress);
+  const E = Number(joint_factor);
+  const y = Number(y_coeff);
+  const mt = Number(mill_tol_frac);
+  const A = Number(allowance_in) || 0;
+  if (!(od > 0)) return { error: "Outside diameter must be positive (in)." };
+  if (!(S > 0)) return { error: "Allowable stress must be positive (psi)." };
+  if (!(E > 0 && E <= 1)) return { error: "Joint factor E must be in (0, 1]." };
+  if (!(mt >= 0 && mt < 1)) return { error: "Mill-tolerance fraction must be in [0, 1)." };
+  if (A < 0) return { error: "Allowance must be non-negative (in)." };
+  if (mode === "required_wall") {
+    const dp = Number(design_p);
+    if (!(dp > 0)) return { error: "Design pressure must be positive (psi)." };
+    const t_min = (dp * od) / (2 * (S * E + dp * y)) + A;
+    return { mode, t_min };
+  }
+  // allowable-pressure mode
+  const wall = Number(wall_in);
+  if (!(wall > 0)) return { error: "Wall thickness must be positive (in)." };
+  const t_avail = wall * (1 - mt);
+  const denom = od - 2 * y * (t_avail - A);
+  if (!(denom > 0)) return { error: "Degenerate geometry: D - 2y(t - A) is not positive." };
+  if (!(t_avail - A > 0)) return { error: "Allowance exceeds the available wall." };
+  const p_allow = (2 * S * E * (t_avail - A)) / denom;
+  return { mode, t_avail, p_allow };
+}
+export const pipePressureRatingExample = { inputs: { od_in: 4.5, wall_in: 0.237, allow_stress: 17100, joint_factor: 1, y_coeff: 0.4, mill_tol_frac: 0.125, allowance_in: 0, mode: "allowable_pressure" } };
+
+function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B31.1 Power Piping internal-pressure design - allowable pressure P = 2 S E (t - A) / (D - 2 y (t - A)); minimum wall t = P D / (2 (S E + P y)) + A - by name (B31.3 Process Piping uses the same form with its own allowables). The allowable stress S, joint efficiency E, and y-coefficient are read from the applicable code edition's tables for the specific material and temperature. This is a design screen, not a stamped calculation; the engineer of record and the AHJ govern.";
+  const mode = makeSelect("Mode", "pp-mode", [
+    { value: "allowable_pressure", label: "Allowable pressure from wall", selected: true },
+    { value: "required_wall", label: "Required wall from pressure" },
+  ]);
+  const od = makeNumber("Outside diameter (in)", "pp-od", { step: "any", min: "0" });
+  const wall = makeNumber("Nominal wall (in)", "pp-wall", { step: "any", min: "0" });
+  const dp = makeNumber("Design pressure (psi, required-wall mode)", "pp-dp", { step: "any", min: "0" });
+  const S = makeNumber("Allowable stress S at temperature (psi)", "pp-s", { step: "any", min: "0" });
+  const E = makeNumber("Joint factor E (seamless = 1.0)", "pp-e", { step: "any", min: "0", max: "1", value: "1" });
+  E.input.value = "1";
+  const y = makeNumber("y-coefficient (ferritic <= 900F = 0.4)", "pp-y", { step: "any", value: "0.4" });
+  y.input.value = "0.4";
+  const mt = makeNumber("Mill under-tolerance fraction", "pp-mt", { step: "any", min: "0", value: "0.125" });
+  mt.input.value = "0.125";
+  const A = makeNumber("Corrosion + threading allowance A (in)", "pp-a", { step: "any", min: "0", value: "0" });
+  for (const f of [mode, od, wall, dp, S, E, y, mt, A]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mode.select.value = "allowable_pressure"; od.input.value = "4.5"; wall.input.value = "0.237"; dp.input.value = ""; S.input.value = "17100"; E.input.value = "1"; y.input.value = "0.4"; mt.input.value = "0.125"; A.input.value = "0"; update(); });
+  const oOut = makeOutputLine(outputRegion, "Result", "pp-out");
+  const oWall = makeOutputLine(outputRegion, "Available wall after mill tolerance", "pp-out-wall");
+  const update = debounce(() => {
+    const r = computePipePressureRating({
+      od_in: Number(od.input.value) || 0, wall_in: Number(wall.input.value) || 0,
+      allow_stress: Number(S.input.value) || 0, joint_factor: Number(E.input.value) || 0,
+      y_coeff: Number(y.input.value) || 0, mill_tol_frac: Number(mt.input.value) || 0,
+      allowance_in: Number(A.input.value) || 0, design_p: Number(dp.input.value) || 0,
+      mode: mode.select.value,
+    });
+    if (r.error) { oOut.textContent = r.error; oWall.textContent = "-"; return; }
+    if (r.mode === "required_wall") {
+      oOut.textContent = "Minimum wall " + fmt(r.t_min, 4) + " in";
+      oWall.textContent = "-";
+    } else {
+      oOut.textContent = "Maximum allowable pressure " + fmt(r.p_allow, 0) + " psi";
+      oWall.textContent = fmt(r.t_avail, 4) + " in";
+    }
+  }, DEBOUNCE_MS);
+  for (const f of [od.input, wall.input, dp.input, S.input, E.input, y.input, mt.input, A.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+PIPEFIT_RENDERERS["pipe-pressure-rating"] = _renderPipePressureRating;
+
+// ---------------------------------------------------------------------
+// v161 Filled pipe support load (pipe-filled-support-load)
+// ---------------------------------------------------------------------
+// dims: in { od_in: L, wall_in: L, pipe_density: M L^-3, fluid_density: M L^-3, insul_thk_in: L, insul_density: M L^-3, spacing_ft: L } out: { empty_lbft: M L^-1, fluid_lbft: M L^-1, insul_lbft: M L^-1, filled_lbft: M L^-1, per_hanger_lb: M }
+export function computePipeFilledSupportLoad({ od_in = 0, wall_in = 0, pipe_density = 490, fluid_density = 62.4, insul_thk_in = 0, insul_density = 6, spacing_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const od = Number(od_in);
+  const wall = Number(wall_in);
+  const pd = Number(pipe_density);
+  const fd = Number(fluid_density);
+  const thk = Math.max(0, Number(insul_thk_in) || 0);
+  const idns = Number(insul_density);
+  const spacing = Number(spacing_ft);
+  if (!(od > 0)) return { error: "Outside diameter must be positive (in)." };
+  if (!(wall > 0)) return { error: "Wall thickness must be positive (in)." };
+  if (!(wall < od / 2)) return { error: "Wall must be less than half the OD (degenerate bore)." };
+  if (!(spacing > 0)) return { error: "Hanger spacing must be positive (ft)." };
+  if (pd < 0 || fd < 0 || idns < 0) return { error: "Densities must be non-negative." };
+  const id = od - 2 * wall;
+  const empty_lbft = (Math.PI / 4) * (od * od - id * id) / 144 * pd;
+  const fluid_lbft = (Math.PI / 4) * (id * id) / 144 * fd;
+  const insul_lbft = thk > 0 ? (Math.PI / 4) * (Math.pow(od + 2 * thk, 2) - od * od) / 144 * idns : 0;
+  const filled_lbft = empty_lbft + fluid_lbft + insul_lbft;
+  const per_hanger_lb = filled_lbft * spacing;
+  return { id_in: id, empty_lbft, fluid_lbft, insul_lbft, filled_lbft, per_hanger_lb };
+}
+export const pipeFilledSupportLoadExample = { inputs: { od_in: 4.5, wall_in: 0.237, pipe_density: 490, fluid_density: 62.4, insul_thk_in: 0, insul_density: 6, spacing_ft: 14 } };
+
+function _renderPipeFilledSupportLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Operating support load = (empty pipe + contained fluid + insulation) weight per foot x hanger spacing - first-principles cross-section x density, the MSS SP-58 operating support load, by name. Bundled pipe weights are nominal mill values and water is taken at 62.4 lb/ft^3; a hot or dense fluid changes the contents weight, and concentrated loads (valves, flanges) are added separately. Feeds the hanger-rod sizing.";
+  const od = makeNumber("Outside diameter (in)", "fl-od", { step: "any", min: "0" });
+  const wall = makeNumber("Wall thickness (in)", "fl-wall", { step: "any", min: "0" });
+  const pd = makeNumber("Pipe material density (lb/ft3; steel 490)", "fl-pd", { step: "any", min: "0", value: "490" });
+  pd.input.value = "490";
+  const fd = makeNumber("Fluid density (lb/ft3; water 62.4)", "fl-fd", { step: "any", min: "0", value: "62.4" });
+  fd.input.value = "62.4";
+  const thk = makeNumber("Insulation thickness (in)", "fl-thk", { step: "any", min: "0", value: "0" });
+  const idns = makeNumber("Insulation density (lb/ft3)", "fl-idns", { step: "any", min: "0", value: "6" });
+  idns.input.value = "6";
+  const spacing = makeNumber("Hanger spacing (ft)", "fl-sp", { step: "any", min: "0" });
+  for (const f of [od, wall, pd, fd, thk, idns, spacing]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "4.5"; wall.input.value = "0.237"; pd.input.value = "490"; fd.input.value = "62.4"; thk.input.value = "0"; idns.input.value = "6"; spacing.input.value = "14"; update(); });
+  const oFt = makeOutputLine(outputRegion, "Filled weight per foot", "fl-out-ft");
+  const oBreak = makeOutputLine(outputRegion, "Empty / fluid / insulation", "fl-out-break");
+  const oHanger = makeOutputLine(outputRegion, "Load per hanger", "fl-out-hanger");
+  const update = debounce(() => {
+    const r = computePipeFilledSupportLoad({
+      od_in: Number(od.input.value) || 0, wall_in: Number(wall.input.value) || 0,
+      pipe_density: Number(pd.input.value) || 0, fluid_density: Number(fd.input.value) || 0,
+      insul_thk_in: Number(thk.input.value) || 0, insul_density: Number(idns.input.value) || 0,
+      spacing_ft: Number(spacing.input.value) || 0,
+    });
+    if (r.error) { oFt.textContent = r.error; oBreak.textContent = "-"; oHanger.textContent = "-"; return; }
+    oFt.textContent = fmt(r.filled_lbft, 2) + " lb/ft";
+    oBreak.textContent = fmt(r.empty_lbft, 2) + " / " + fmt(r.fluid_lbft, 2) + " / " + fmt(r.insul_lbft, 2) + " lb/ft";
+    oHanger.textContent = fmt(r.per_hanger_lb, 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [od.input, wall.input, pd.input, fd.input, thk.input, idns.input, spacing.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["pipe-filled-support-load"] = _renderPipeFilledSupportLoad;
+
+// ---------------------------------------------------------------------
+// v162 Hanger rod load and diameter (hanger-rod-sizing) - MSS SP-58
+// ---------------------------------------------------------------------
+// dims: in { load_lb: M, temp_derate: dimensionless } out: { rod_dia: dimensionless, rated_lb: M, utilization_pct: dimensionless }
+export function computeHangerRodSizing({ load_lb = 0, temp_derate = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(load_lb);
+  const derate = Number(temp_derate);
+  if (!(load > 0)) return { error: "Load must be positive (lb)." };
+  if (!(derate > 0 && derate <= 1)) return { error: "Temperature derate must be in (0, 1]." };
+  let chosen = null;
+  for (const [dia, cap] of _MSS_SP58_ROD_LB) {
+    if (cap * derate >= load) { chosen = [dia, cap * derate]; break; }
+  }
+  if (!chosen) return { error: "Load exceeds the largest tabulated rod (1-1/2 in) after derate; engineer the support." };
+  return { rod_dia: chosen[0], rated_lb: chosen[1], utilization_pct: (load / chosen[1]) * 100 };
+}
+export const hangerRodSizingExample = { inputs: { load_lb: 228, temp_derate: 1 } };
+
+function _renderHangerRodSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Minimum hanger rod = smallest carbon-steel threaded rod whose MSS SP-58 maximum safe load (at or below 650F) clears the applied load after the temperature derate - by name. The bundled loads (3/8 in 610 lb, 1/2 in 1130 lb, ...) are the standard's carbon-steel values; above 650F apply the standard's derate curve (user factor for an off-table temperature). The engineer of record and the standard's current edition govern the final selection.";
+  const load = makeNumber("Operating load per hanger (lb)", "hr-load", { step: "any", min: "0" });
+  const derate = makeNumber("Temperature derate factor (1.0 at ambient)", "hr-derate", { step: "any", min: "0", max: "1", value: "1" });
+  derate.input.value = "1";
+  for (const f of [load, derate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "228"; derate.input.value = "1"; update(); });
+  const oRod = makeOutputLine(outputRegion, "Minimum rod diameter", "hr-out-rod");
+  const oUtil = makeOutputLine(outputRegion, "Rated load / utilization", "hr-out-util");
+  const update = debounce(() => {
+    const r = computeHangerRodSizing({ load_lb: Number(load.input.value) || 0, temp_derate: Number(derate.input.value) || 0 });
+    if (r.error) { oRod.textContent = r.error; oUtil.textContent = "-"; return; }
+    oRod.textContent = r.rod_dia + " in";
+    oUtil.textContent = fmt(r.rated_lb, 0) + " lb rated, " + fmt(r.utilization_pct, 0) + "% utilized";
+  }, DEBOUNCE_MS);
+  for (const f of [load.input, derate.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["hanger-rod-sizing"] = _renderHangerRodSizing;

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v161 -- Filled Pipe Support Load (calc-pipefit.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v157..v163 (plumbing/pipefitting -- steamfitting, pressure
+> **Status: LANDED 2026-06-23 (catalog 626, package 0.76.0; v157-v162 of the batch). Batch spec-v157..v163 (plumbing/pipefitting -- steamfitting, pressure
 > piping, and pipe support).** In-scope catalog expansion under the spec-v106 trades-only charter: the
 > load half of a support pair completed by the hanger-rod tile (v162). Adds one tile to
 > **`calc-pipefit.js`** (Group B); no new module, group, or dependency. Inherits spec.md through
@@ -55,9 +55,13 @@ per_hanger   = filled_lbft x spacing_ft
 **Pinned worked example.** 4 in Sch 40 steel (OD 4.5 in, wall 0.237 in, ID 4.026 in), water-filled, no
 insulation, 14 ft spacing: `empty = 10.79 lb/ft` (nominal), `fluid = (pi/4)(4.026^2)/144 x 62.4 = 5.52
 lb/ft`, `filled = 16.31 lb/ft`; `per_hanger = 16.31 x 14 = ` **228 lb**.
-**Cross-check (add insulation).** Same pipe with 1 in mineral-wool insulation (~ +2.0 lb/ft) -> filled
-18.3 lb/ft -> `per_hanger = 18.3 x 14 = 256 lb`. The contents and insulation are additive; the spacing is
-the lever that turns lb/ft into the load a single hanger carries.
+**Cross-check (add insulation).** Same pipe with 1 in mineral-wool insulation. **As-landed correction:**
+the spec draft stated "~ +2.0 lb/ft -> filled 18.3 -> 256 lb," but the insulation formula at the spec's
+own default 6 lb/ft^3 mineral-wool density gives `insul = (pi/4)((4.5 + 2)^2 - 4.5^2)/144 x 6 = 0.72
+lb/ft` -> filled `17.04 lb/ft` -> `per_hanger = 17.04 x 14 = 239 lb`. The landed tile and its pinned
+fixtures use the correct computed value (239 lb), per the catalog-correctness discipline (hand-verify
+every worked example against compute output before pinning). The contents and insulation are additive;
+the spacing is the lever that turns lb/ft into the load a single hanger carries.
 
 ## 3. Wiring
 

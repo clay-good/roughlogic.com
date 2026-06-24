@@ -672,6 +672,13 @@ const RELATED = {
   "pipe-cold-spring": ["pipe-expansion-loop", "raceway-expansion-fitting", "pipe-spacing-rack"],
   "raceway-expansion-fitting": ["pipe-cold-spring", "conduit-fill", "pipe-expansion-loop"],
   "pipe-spacing-rack": ["pipe-cold-spring", "pipe-expansion-loop", "pipe-fitting-takeout"],
+  // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench
+  "flash-steam-pct": ["steam-pipe-velocity", "steam-trap-sizing", "tankless-gpm"],
+  "steam-pipe-velocity": ["flash-steam-pct", "steam-trap-sizing", "boiler-pipe-sizing"],
+  "steam-trap-sizing": ["flash-steam-pct", "steam-pipe-velocity", "boiler-pipe-sizing"],
+  "pipe-pressure-rating": ["hydrostatic-test", "pipe-velocity", "flange-bolt-torque"],
+  "pipe-filled-support-load": ["hanger-rod-sizing", "pipe-support-spacing", "pipe-volume"],
+  "hanger-rod-sizing": ["pipe-filled-support-load", "pipe-support-spacing", "flange-bolt-torque"],
 
   // spec-v30 metal / air / refrigerant bench
   "groove-weld-strength": ["fillet-weld-strength", "weld-heat-input", "metal-weight"],

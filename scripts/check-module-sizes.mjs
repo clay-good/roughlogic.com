@@ -182,7 +182,7 @@ const CAPS = {
   "calc-layout.js": 13500, // v56 2026-06-13 new layout & shop-geometry bench (8 tiles: center-of-gravity-2point, bolt-circle, decimal-to-fraction, sine-bar, thread-pitch, circular-arc, circle-from-3-points, polygon-miter; ~10.6 KB), split out of calc-fab.js once it reached 96% of its cap
   "calc-shop.js": 16000, // v40 2026-06-11 new machine-shop & fab bench (10 tiles: machining-time, material-removal-rate, turning-surface-finish, taper-calc, dividing-head, thread-measure-wire, press-brake-tonnage, punch-force, weld-duty-cycle, carbon-equivalent; first-principles, fits with headroom)
   "calc-lowvoltage.js": 11000, // v28 2026-06-09 new low-voltage/data/security module (6 tiles, ~8.9 KB gzipped; cap = current + 20% headroom)
-  "calc-pipefit.js": 5000, // v29 2026-06-09 new pipe/raceway field-layout module (3 tiles: cold-spring, raceway-expansion-fitting, pipe-spacing-rack; cap = current + ~20% headroom)
+  "calc-pipefit.js": 12700, // spec-v157..v162 2026-06-23 (5000->12700): +6 steamfitting / pressure-piping / pipe-support tiles (flash-steam-pct, steam-pipe-velocity, steam-trap-sizing, pipe-pressure-rating, pipe-filled-support-load, hanger-rod-sizing) -> ~10.3 KB gz; +~20% headroom; lazy-loaded, absent from home payload. v29 2026-06-09 new pipe/raceway field-layout module (3 tiles: cold-spring, raceway-expansion-fitting, pipe-spacing-rack; cap = current + ~20% headroom)
   "calc-metalair.js": 6000, // v30 2026-06-09 new metal/air/refrigerant module (3 tiles: groove-weld-strength, duct-static-pressure-total, compression-ratio-refrig; cap = current + ~20% headroom)
   // Bumped 31500 -> 42000 for the spec-v16 Group B batch (water-heater
   // recovery, thermal expansion tank, sanitary DFU sizing, trap primer);

@@ -94,6 +94,9 @@ const TOOL_MODULES = (() => {
   // and calc-plumbing are at their size caps).
   declare("./calc-pipefit.js", "PIPEFIT_RENDERERS", [
     "pipe-cold-spring", "raceway-expansion-fitting", "pipe-spacing-rack",
+    // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench.
+    "flash-steam-pct", "steam-pipe-velocity", "steam-trap-sizing",
+    "pipe-pressure-rating", "pipe-filled-support-load", "hanger-rod-sizing",
   ]);
   // spec-v30 metal / air / refrigerant bench (deepens Groups E, C per the
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are

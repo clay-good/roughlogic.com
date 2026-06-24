@@ -10591,6 +10591,99 @@ test("bounds: spec-v140 desiccant-airflow-sizing pins the mass balance + inverse
   assert.ok("error" in _v140({ required_pints_per_day: Infinity, design_grain_depression: 60, nameplate_process_cfm: 2000 }));
 });
 
+// --- spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (calc-pipefit.js) ---
+
+import {
+  computeFlashSteamPct as _v157, computeSteamPipeVelocity as _v158,
+  computeSteamTrapSizing as _v159, computePipePressureRating as _v160,
+  computePipeFilledSupportLoad as _v161, computeHangerRodSizing as _v162,
+} from "../../calc-pipefit.js";
+
+test("bounds: spec-v157 flash-steam-pct pins the flash fraction + scales with the drop + rejects bad inputs", () => {
+  assert.ok(Math.abs(_v157({ hf_high: 309, hf_low: 180, hfg_low: 970 }).flash_pct - 13.3) < 0.1);
+  // smaller drop, less flash.
+  assert.ok(Math.abs(_v157({ hf_high: 267, hf_low: 180, hfg_low: 970 }).flash_pct - 9.0) < 0.1);
+  // error seams: non-finite, hf_low >= hf_high (no flash), hfg_low <= 0.
+  assert.ok("error" in _v157({ hf_high: 180, hf_low: 180, hfg_low: 970 }));
+  assert.ok("error" in _v157({ hf_high: 150, hf_low: 180, hfg_low: 970 }));
+  assert.ok("error" in _v157({ hf_high: 309, hf_low: 180, hfg_low: 0 }));
+  assert.ok("error" in _v157({ hf_high: Infinity, hf_low: 180, hfg_low: 970 }));
+});
+
+test("bounds: spec-v158 steam-pipe-velocity pins the size + actual velocity + flow scales the area + rejects bad inputs", () => {
+  const a = _v158({ steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 });
+  assert.ok(Math.abs(a.req_area_in2 - 5.48) < 0.05);
+  assert.equal(a.chosen_nps, "3");
+  assert.ok(Math.abs(a.actual_fpm - 4450) < 10 && a.actual_fpm < 6000);
+  // double the flow steps up one nominal.
+  assert.equal(_v158({ steam_flow_lbhr: 2000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 }).chosen_nps, "4");
+  assert.ok("error" in _v158({ steam_flow_lbhr: 0, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 }));
+  assert.ok("error" in _v158({ steam_flow_lbhr: 1000, spec_vol_ft3lb: 0, vel_ceiling_fpm: 6000 }));
+  assert.ok("error" in _v158({ steam_flow_lbhr: 1000, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 0 }));
+  assert.ok("error" in _v158({ steam_flow_lbhr: Infinity, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 }));
+});
+
+test("bounds: spec-v159 steam-trap-sizing pins the load + capacity + the factor sets the target + rejects bad inputs", () => {
+  const a = _v159({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 });
+  assert.ok(Math.abs(a.condensate_lbhr - 423) < 1);
+  assert.ok(Math.abs(a.req_capacity_lbhr - 847) < 1);
+  // the factor sets the capacity target; the load is unchanged.
+  assert.ok(Math.abs(_v159({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 3 }).req_capacity_lbhr - 1270) < 1);
+  assert.ok("error" in _v159({ heat_duty_btuhr: 0, hfg_btulb: 945, safety_factor: 2 }));
+  assert.ok("error" in _v159({ heat_duty_btuhr: 400000, hfg_btulb: 0, safety_factor: 2 }));
+  assert.ok("error" in _v159({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 0.5 }));
+  assert.ok("error" in _v159({ heat_duty_btuhr: Infinity, hfg_btulb: 945, safety_factor: 2 }));
+});
+
+test("bounds: spec-v160 pipe-pressure-rating pins both modes + the inverse relation + rejects bad inputs", () => {
+  const a = _v160({ od_in: 4.5, wall_in: 0.237, allow_stress: 17100, joint_factor: 1, y_coeff: 0.4, mill_tol_frac: 0.125, mode: "allowable_pressure" });
+  assert.ok(Math.abs(a.p_allow - 1637) < 3);
+  const b = _v160({ od_in: 4.5, allow_stress: 17100, joint_factor: 1, y_coeff: 0.4, design_p: 300, mode: "required_wall" });
+  assert.ok(Math.abs(b.t_min - 0.0392) < 0.0005);
+  // the required wall is far below the available wall (Sch 40 is ample).
+  assert.ok(b.t_min < a.t_avail);
+  assert.ok("error" in _v160({ od_in: 0, wall_in: 0.237, allow_stress: 17100, mode: "allowable_pressure" }));
+  assert.ok("error" in _v160({ od_in: 4.5, wall_in: 0.237, allow_stress: 0, mode: "allowable_pressure" }));
+  assert.ok("error" in _v160({ od_in: 4.5, wall_in: 0, allow_stress: 17100, mode: "allowable_pressure" }));
+  assert.ok("error" in _v160({ od_in: 4.5, wall_in: 0.237, allow_stress: 17100, joint_factor: 1.5, mode: "allowable_pressure" }));
+  assert.ok("error" in _v160({ od_in: 4.5, allow_stress: 17100, design_p: 0, mode: "required_wall" }));
+  assert.ok("error" in _v160({ od_in: Infinity, wall_in: 0.237, allow_stress: 17100, mode: "allowable_pressure" }));
+});
+
+test("bounds: spec-v161 pipe-filled-support-load pins the buildup + insulation adds + spacing scales + rejects bad inputs", () => {
+  // NOTE: the spec-v161 insulation cross-check (~+2.0 lb/ft -> 18.3 -> 256 lb) is wrong for its own
+  // default 6 lb/ft^3 mineral wool; the formula gives +0.72 lb/ft -> 17.04 lb/ft -> 239 lb. Pinned to
+  // the correct computed values per [[catalog-correctness-audit]].
+  const a = _v161({ od_in: 4.5, wall_in: 0.237, pipe_density: 490, fluid_density: 62.4, insul_thk_in: 0, spacing_ft: 14 });
+  assert.ok(Math.abs(a.empty_lbft - 10.80) < 0.05);
+  assert.ok(Math.abs(a.fluid_lbft - 5.52) < 0.05);
+  assert.ok(Math.abs(a.filled_lbft - 16.32) < 0.05);
+  assert.ok(Math.abs(a.per_hanger_lb - 228) < 1);
+  // insulation is additive; spacing turns lb/ft into the per-hanger load.
+  const b = _v161({ od_in: 4.5, wall_in: 0.237, insul_thk_in: 1, insul_density: 6, spacing_ft: 14 });
+  assert.ok(b.insul_lbft > 0 && b.filled_lbft > a.filled_lbft);
+  assert.ok(Math.abs(b.per_hanger_lb - 239) < 1);
+  assert.ok("error" in _v161({ od_in: 0, wall_in: 0.237, spacing_ft: 14 }));
+  assert.ok("error" in _v161({ od_in: 4.5, wall_in: 0, spacing_ft: 14 }));
+  assert.ok("error" in _v161({ od_in: 4.5, wall_in: 2.3, spacing_ft: 14 })); // wall >= od/2
+  assert.ok("error" in _v161({ od_in: 4.5, wall_in: 0.237, spacing_ft: 0 }));
+  assert.ok("error" in _v161({ od_in: Infinity, wall_in: 0.237, spacing_ft: 14 }));
+});
+
+test("bounds: spec-v162 hanger-rod-sizing pins the rod pick + steps up with load + exceeds-table + rejects bad inputs", () => {
+  const a = _v162({ load_lb: 228, temp_derate: 1 });
+  assert.equal(a.rod_dia, "3/8");
+  assert.ok(Math.abs(a.utilization_pct - 37) < 1);
+  // heavier load steps up two sizes.
+  assert.equal(_v162({ load_lb: 1200, temp_derate: 1 }).rod_dia, "5/8");
+  // exceeds the largest tabulated rod -> error.
+  assert.ok("error" in _v162({ load_lb: 99999, temp_derate: 1 }));
+  assert.ok("error" in _v162({ load_lb: 0, temp_derate: 1 }));
+  assert.ok("error" in _v162({ load_lb: 228, temp_derate: 0 }));
+  assert.ok("error" in _v162({ load_lb: 228, temp_derate: 1.5 }));
+  assert.ok("error" in _v162({ load_lb: Infinity, temp_derate: 1 }));
+});
+
 // --- spec-v121..v128 electrical motors / feeders / fault / raceway / grounding / three-phase ---
 
 test("bounds: calc-motor computeMotorSyncSlip pins Ns = 120 f / P, slip, and rotor frequency + rejects bad poles/freq", () => {

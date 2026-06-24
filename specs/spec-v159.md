@@ -1,6 +1,6 @@
 # roughlogic.com Specification v159 -- Steam Trap Sizing (Condensate Load and Safety Factor) (calc-pipefit.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v157..v163 (plumbing/pipefitting -- steamfitting, pressure
+> **Status: LANDED 2026-06-23 (catalog 626, package 0.76.0; v157-v162 of the batch). Batch spec-v157..v163 (plumbing/pipefitting -- steamfitting, pressure
 > piping, and pipe support).** In-scope catalog expansion under the spec-v106 trades-only charter: the
 > third of the steam-and-condensate cluster. Adds one tile to **`calc-pipefit.js`** (Group B); no new
 > module, group, or dependency. Inherits spec.md through spec-v158.md.

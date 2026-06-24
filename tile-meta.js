@@ -458,6 +458,13 @@ const _TILES = [
   ["dehumidifier-derate", "D"],
   ["class-of-loss-screen", "D"],
   ["desiccant-airflow-sizing", "D"],
+  // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (Group B)
+  ["flash-steam-pct", "B"],
+  ["steam-pipe-velocity", "B"],
+  ["steam-trap-sizing", "B"],
+  ["pipe-pressure-rating", "B"],
+  ["pipe-filled-support-load", "B"],
+  ["hanger-rod-sizing", "B"],
 ];
 
 

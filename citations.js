@@ -6934,6 +6934,77 @@ export const CITATIONS = {
       { name: "Achievable depression", value: "the manufacturer's performance map governs the inlet->outlet grain depression; reactivation exhaust air must duct outside", source: "manufacturer performance map" },
     ],
   },
+  "flash-steam-pct": {
+    formula: "flash_fraction = (hf_high - hf_low) / hfg_low; flash_pct = flash_fraction x 100. hf and hfg are saturated-water enthalpies (Btu/lb) at the two pressures.",
+    edition: "First-principles steam thermodynamics; the bundled saturated-water enthalpy points are from the ASME steam tables, by name. Not edition-bound.",
+    freeAccess: "The flash relation is public thermodynamics; the enthalpies come from the published ASME / IAPWS saturated-water steam tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the flash relation and the steam-table enthalpies do not roll). This is the THERMODYNAMIC-IDEAL flash fraction - real trap behavior, subcooling, and line losses move the field number, and a flash-recovery vessel is sized from the manufacturer's data. The ASME steam tables supply the enthalpy points.",
+    assumptions: [
+      { name: "Enthalpies", value: "saturated-liquid enthalpies hf and latent heat hfg from the ASME steam tables at the two pressures (user-supplied for an off-table pressure)", source: "ASME steam tables" },
+      { name: "Ideal flash", value: "the fraction is the thermodynamic ideal; trap subcooling and line losses lower the field value", source: "steam thermodynamics" },
+    ],
+  },
+  "steam-pipe-velocity": {
+    formula: "req_area_ft2 = (steam_flow_lbhr x spec_vol_ft3lb) / (vel_ceiling_fpm x 60); req_dia_in = sqrt(4 x req_area_ft2 / pi) x 12; then the smallest Sch 40 nominal whose ID >= req_dia_in, and actual_fpm = (flow x spec_vol) / (chosen_area_ft2 x 60).",
+    edition: "First-principles continuity; the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) and the saturated-steam specific volumes are from ASHRAE Fundamentals / Systems, by name. Sch 40 IDs are ASME B36.10M nominal mill dimensions.",
+    freeAccess: "Continuity (mass flow x specific volume = volumetric flow) is public; the steam specific volume comes from the published saturated-steam table at the line pressure.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The velocity band is a RECOMMENDATION, not a code limit - noise, erosion, and the condensate-loading reverse-flow case at low velocity all bear on the final choice, which the engineer of record governs. ASHRAE supplies the band and specific volumes.",
+    assumptions: [
+      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (user-supplied for an off-table pressure)", source: "ASHRAE Fundamentals" },
+      { name: "Velocity band", value: "supply mains ~6,000 to 12,000 ft/min is a recommendation, not a code limit", source: "ASHRAE Systems" },
+      { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
+    ],
+  },
+  "steam-trap-sizing": {
+    formula: "condensate_lbhr = heat_duty_btuhr / hfg_btulb; req_capacity_lbhr = condensate_lbhr x safety_factor (2x typical, 3x warm-up / modulating).",
+    edition: "First-principles condensate-load relation and the safety-factor practice, by name; the latent heat is from the ASME steam tables. Not edition-bound.",
+    freeAccess: "The condensate load is the heat duty divided by the published latent heat at the operating pressure; the safety factor is standard practice.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the relation and the safety-factor practice do not roll). The trap is SELECTED FROM THE MANUFACTURER'S CAPACITY CHART at the actual differential pressure the installation develops - this tile gives the load and the capacity target, not a trap model, and modulating, warm-up, and stall conditions can demand a larger factor or a different trap type.",
+    assumptions: [
+      { name: "Latent heat", value: "hfg from the saturated-steam table at the operating pressure (user-supplied for an off-table pressure)", source: "ASME steam tables" },
+      { name: "Safety factor", value: "2x typical, 3x on warm-up / modulating service; higher factors for stall conditions", source: "steam-trap selection practice" },
+      { name: "Selection", value: "the trap is sized from the manufacturer's capacity chart at the actual differential pressure", source: "manufacturer capacity chart" },
+    ],
+  },
+  "pipe-pressure-rating": {
+    formula: "allowable: P = 2 S E (t_avail - A) / (D - 2 y (t_avail - A)), t_avail = wall x (1 - mill_tol). required wall: t = P D / (2 (S E + P y)) + A. ASME B31.1 internal-pressure design.",
+    edition: "ASME B31.1 Power Piping pressure-design relation, by name (B31.3 Process Piping uses the same form with its own allowables). The allowable stress S, joint factor E, and y-coefficient are read from the code edition's tables.",
+    freeAccess: "The internal-pressure design equation (Barlow for the first cut, the B31.1 form for the real one) is public; the material allowable stress, joint factor, and y-coefficient are read from the applicable code tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "The allowable stress S, the joint factor E, and the y-coefficient are read from the applicable ASME B31.1 (or B31.3) edition's tables for the SPECIFIC MATERIAL AND TEMPERATURE, and entered by the user. This is a design SCREEN, not a stamped calculation - the engineer of record and the AHJ govern. Named editions roll the allowable-stress tables; this tile carries the relation, not the tables.",
+    assumptions: [
+      { name: "Allowable stress", value: "S is read from the applicable code edition's allowable-stress table for the material at temperature (user-supplied)", source: "ASME B31.1" },
+      { name: "Joint factor", value: "weld-joint efficiency E (seamless = 1.0) from the code", source: "ASME B31.1" },
+      { name: "y-coefficient", value: "temperature coefficient y (ferritic <= 900F = 0.4) from the code table", source: "ASME B31.1" },
+    ],
+  },
+  "pipe-filled-support-load": {
+    formula: "empty_lbft = (pi/4)(OD^2 - ID^2)/144 x pipe_density; fluid_lbft = (pi/4)(ID^2)/144 x fluid_density; insul_lbft = (pi/4)((OD + 2 thk)^2 - OD^2)/144 x insul_density; filled = empty + fluid + insul; per_hanger = filled x spacing.",
+    edition: "First-principles cross-section x density; the MSS SP-58 operating support load the result feeds, by name. Not edition-bound.",
+    freeAccess: "The support load is a pure cross-section-times-density buildup; the standard pipe weights and water density are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the geometry does not roll). Bundled pipe weights are NOMINAL MILL VALUES and the water density is taken at 62.4 lb/ft^3 - a hot or dense fluid changes the contents weight, and concentrated loads (valves, flanges) are added separately. MSS SP-58 names the operating support load this feeds.",
+    assumptions: [
+      { name: "Pipe weight", value: "computed from the entered OD/wall and material density (steel 490, copper 558 lb/ft^3); nominal mill values", source: "first-principles / mill dimensions" },
+      { name: "Water density", value: "contents taken at 62.4 lb/ft^3 unless a different fluid density is entered", source: "first-principles" },
+      { name: "Concentrated loads", value: "valves, flanges, and other point loads are added to the per-hanger load separately", source: "MSS SP-58" },
+    ],
+  },
+  "hanger-rod-sizing": {
+    formula: "rated(d) = MSS_SP58_table[d] x temp_derate; required_rod = smallest d such that rated(d) >= load_lb; utilization = load_lb / rated(required_rod) x 100. Table: 3/8 in 610 | 1/2 in 1130 | 5/8 in 1810 | 3/4 in 2710 | 7/8 in 3770 | 1 in 4960 | 1-1/8 in 6230 | 1-1/4 in 8000 | 1-3/8 in 9510 | 1-1/2 in 11630 lb.",
+    edition: "MSS SP-58 carbon-steel threaded-rod maximum safe loads (at or below 650F), by name; the rod-selection logic is first-principles. The values are the standard's published carbon-steel allowable loads.",
+    freeAccess: "The maximum safe loads are the MSS SP-58 carbon-steel threaded-rod values, published across the standard and every hanger catalog; the selection is a simple table lookup.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bundled maximum safe loads are the MSS SP-58 carbon-steel threaded-rod values at or below 650F. Above 650F the temperature derate is applied from the standard's curve (user factor for an off-table temperature). The engineer of record and the standard's current edition govern the final selection.",
+    assumptions: [
+      { name: "Rod loads", value: "MSS SP-58 carbon-steel threaded-rod maximum safe loads at or below 650F", source: "MSS SP-58" },
+      { name: "Temperature derate", value: "above 650F apply the standard's derate curve; the default 1.0 is the at-ambient value", source: "MSS SP-58" },
+      { name: "Exceeds table", value: "a load above the largest tabulated rod (1-1/2 in) after derate returns an engineer-the-support error", source: "MSS SP-58" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

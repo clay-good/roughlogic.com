@@ -22673,6 +22673,157 @@
       }
     },
     {
+      "tile_id": "flash-steam-pct",
+      "source_publisher": "Steam thermodynamics; ASME steam tables (by name)",
+      "source_title": "100 psig (hf 309) to 0 psig (hf 180, hfg 970) -> 13.3% flash",
+      "source_edition_or_year": "spec-v157 worked example (machine-verified, flash relation)",
+      "source_section_or_page": "spec-v157 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "hf_high": 309, "hf_low": 180, "hfg_low": 970 },
+      "outputs": { "flash_pct": { "value": 13.3, "tolerance": { "abs": 0.1 } } }
+    },
+    {
+      "tile_id": "flash-steam-pct",
+      "source_publisher": "Steam thermodynamics; ASME steam tables (by name)",
+      "source_title": "Smaller drop: 50 psig (hf 267) to 0 psig -> 9.0% flash",
+      "source_edition_or_year": "spec-v157 worked example (machine-verified, flash relation)",
+      "source_section_or_page": "spec-v157 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "hf_high": 267, "hf_low": 180, "hfg_low": 970 },
+      "outputs": { "flash_pct": { "value": 9.0, "tolerance": { "abs": 0.1 } } }
+    },
+    {
+      "tile_id": "steam-pipe-velocity",
+      "source_publisher": "Continuity; ASHRAE Fundamentals / Systems (by name)",
+      "source_title": "1,000 lb/hr of 15 psig steam (13.7 ft3/lb), 6,000 ft/min -> 3 in main at ~4,450 ft/min",
+      "source_edition_or_year": "spec-v158 worked example (machine-verified, continuity)",
+      "source_section_or_page": "spec-v158 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "steam_flow_lbhr": 1000, "spec_vol_ft3lb": 13.7, "vel_ceiling_fpm": 6000 },
+      "outputs": {
+        "req_area_in2": { "value": 5.48, "tolerance": { "abs": 0.05 } },
+        "chosen_nps": { "value": "3", "tolerance": { "abs": 0 } },
+        "actual_fpm": { "value": 4448, "tolerance": { "abs": 5 } }
+      }
+    },
+    {
+      "tile_id": "steam-pipe-velocity",
+      "source_publisher": "Continuity; ASHRAE Fundamentals / Systems (by name)",
+      "source_title": "Double the flow (2,000 lb/hr) steps up one nominal -> 4 in",
+      "source_edition_or_year": "spec-v158 worked example (machine-verified, continuity)",
+      "source_section_or_page": "spec-v158 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "steam_flow_lbhr": 2000, "spec_vol_ft3lb": 13.7, "vel_ceiling_fpm": 6000 },
+      "outputs": { "chosen_nps": { "value": "4", "tolerance": { "abs": 0 } } }
+    },
+    {
+      "tile_id": "steam-trap-sizing",
+      "source_publisher": "Steam thermodynamics; safety-factor practice (by name)",
+      "source_title": "400,000 Btu/hr on 15 psig steam (hfg 945), 2x -> 423 lb/hr load, 847 lb/hr capacity",
+      "source_edition_or_year": "spec-v159 worked example (machine-verified, condensate load)",
+      "source_section_or_page": "spec-v159 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "heat_duty_btuhr": 400000, "hfg_btulb": 945, "safety_factor": 2 },
+      "outputs": {
+        "condensate_lbhr": { "value": 423, "tolerance": { "abs": 1 } },
+        "req_capacity_lbhr": { "value": 847, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "steam-trap-sizing",
+      "source_publisher": "Steam thermodynamics; safety-factor practice (by name)",
+      "source_title": "Warm-up 3x factor -> 1,270 lb/hr capacity (load unchanged)",
+      "source_edition_or_year": "spec-v159 worked example (machine-verified, condensate load)",
+      "source_section_or_page": "spec-v159 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "heat_duty_btuhr": 400000, "hfg_btulb": 945, "safety_factor": 3 },
+      "outputs": { "req_capacity_lbhr": { "value": 1270, "tolerance": { "abs": 1 } } }
+    },
+    {
+      "tile_id": "pipe-pressure-rating",
+      "source_publisher": "ASME B31.1 Power Piping (by name)",
+      "source_title": "4 in Sch 40 A106-B (OD 4.5, wall 0.237), S 17,100, E 1.0, y 0.4 -> ~1,636 psi allowable",
+      "source_edition_or_year": "spec-v160 worked example (machine-verified, B31.1 pressure design)",
+      "source_section_or_page": "spec-v160 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "od_in": 4.5, "wall_in": 0.237, "allow_stress": 17100, "joint_factor": 1, "y_coeff": 0.4, "mill_tol_frac": 0.125, "allowance_in": 0, "mode": "allowable_pressure" },
+      "outputs": { "p_allow": { "value": 1636.4, "tolerance": { "abs": 3 } } }
+    },
+    {
+      "tile_id": "pipe-pressure-rating",
+      "source_publisher": "ASME B31.1 Power Piping (by name)",
+      "source_title": "Required wall the other direction: 300 psi design -> 0.0392 in (Sch 40 ample)",
+      "source_edition_or_year": "spec-v160 worked example (machine-verified, B31.1 pressure design)",
+      "source_section_or_page": "spec-v160 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "od_in": 4.5, "allow_stress": 17100, "joint_factor": 1, "y_coeff": 0.4, "design_p": 300, "allowance_in": 0, "mode": "required_wall" },
+      "outputs": { "t_min": { "value": 0.0392, "tolerance": { "abs": 0.0005 } } }
+    },
+    {
+      "tile_id": "pipe-filled-support-load",
+      "source_publisher": "First-principles cross-section x density; MSS SP-58 (by name)",
+      "source_title": "4 in Sch 40 steel, water-filled, 14 ft spacing -> 16.32 lb/ft, 228 lb/hanger",
+      "source_edition_or_year": "spec-v161 worked example (machine-verified, additive load buildup)",
+      "source_section_or_page": "spec-v161 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "od_in": 4.5, "wall_in": 0.237, "pipe_density": 490, "fluid_density": 62.4, "insul_thk_in": 0, "insul_density": 6, "spacing_ft": 14 },
+      "outputs": {
+        "filled_lbft": { "value": 16.32, "tolerance": { "abs": 0.05 } },
+        "per_hanger_lb": { "value": 228, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "pipe-filled-support-load",
+      "source_publisher": "First-principles cross-section x density; MSS SP-58 (by name)",
+      "source_title": "Add 1 in mineral wool (6 lb/ft3): +0.72 lb/ft -> 17.04 lb/ft, 239 lb/hanger (corrects the spec's arithmetic)",
+      "source_edition_or_year": "spec-v161 worked example (machine-verified; spec cross-check arithmetic corrected)",
+      "source_section_or_page": "spec-v161 section 2.1 cross-check (recomputed)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "od_in": 4.5, "wall_in": 0.237, "pipe_density": 490, "fluid_density": 62.4, "insul_thk_in": 1, "insul_density": 6, "spacing_ft": 14 },
+      "outputs": {
+        "filled_lbft": { "value": 17.04, "tolerance": { "abs": 0.05 } },
+        "per_hanger_lb": { "value": 239, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "hanger-rod-sizing",
+      "source_publisher": "MSS SP-58 carbon-steel threaded-rod loads (by name)",
+      "source_title": "228 lb per hanger, ambient -> 3/8 in rod (610 lb) at 37% utilization",
+      "source_edition_or_year": "spec-v162 worked example (machine-verified, table lookup)",
+      "source_section_or_page": "spec-v162 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "load_lb": 228, "temp_derate": 1 },
+      "outputs": {
+        "rod_dia": { "value": "3/8", "tolerance": { "abs": 0 } },
+        "utilization_pct": { "value": 37, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "hanger-rod-sizing",
+      "source_publisher": "MSS SP-58 carbon-steel threaded-rod loads (by name)",
+      "source_title": "Heavier 1,200 lb load steps up two sizes -> 5/8 in (1,810 lb) at 66%",
+      "source_edition_or_year": "spec-v162 worked example (machine-verified, table lookup)",
+      "source_section_or_page": "spec-v162 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "load_lb": 1200, "temp_derate": 1 },
+      "outputs": {
+        "rod_dia": { "value": "5/8", "tolerance": { "abs": 0 } },
+        "utilization_pct": { "value": 66, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
       "tile_id": "motor-synchronous-speed-slip",
       "source_publisher": "First-principles AC-machine theory",
       "source_title": "60 Hz 4-pole motor, nameplate 1750 rpm -> 1800 rpm sync, 2.78% slip, 1.67 Hz rotor",
