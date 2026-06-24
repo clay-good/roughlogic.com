@@ -149,3 +149,15 @@ A full re-run on 2026-06-24 confirms the no-horizontal-scroll guarantee holds at
 - **Runtime leak guard.** `render-no-nan.test.js` passed all **648** registered tile views (exit 0) with no NaN / Infinity / undefined leak.
 
 No layout fix was required: the fluid `clamp()` type, `ch` / `vw` measures, the lone 760 px breakpoint, and the `.tabular-tool` scroll-owner (§8 / §9) all carry the 648-tile catalog without change.
+
+## 14. Re-verification at 656 tiles (2026-06-24)
+
+§13 re-anchored the running record to 648 tiles. The catalog has since grown to **656 tiles across 21 groups** (the spec-v199..v206 hydronic / pipefitting / process-piping / medical-gas landings), and the build emits **656 tile shells + 21 group shells** (sitemap **679 URLs**). The §11 harnesses still read the live `TOOLS` array and `dist/` tree at run time, so they auto-scaled across those landings with no test edits; this entry re-anchors the record again to the current size.
+
+A full re-run on 2026-06-24 confirms the no-horizontal-scroll guarantee holds at the new size on both engines:
+
+- **SPA, both engines.** `responsive-stress.test.js` passed **71 / 71** on Chromium and `webkit-responsive` (serial, one worker). The full-catalog case ("every live tile view: no page-level horizontal scroll at 320 px") swept all **656** live tile views -- each with its example output populated -- clean on both Chromium and WebKit, alongside the 200% text-zoom and landscape/tablet route subsets.
+- **Prerendered shells.** `check:shell-mobile` reported **775 checks across 679 shells** (656 tool + 21 group + changelog + home) clean at 320 px portrait, with 48 sampled at 568x320 landscape and 200% text zoom.
+- **Runtime leak guard.** `render-no-nan.test.js` passed all **656** registered tile views (exit 0, 13.4 min serial) with no NaN / Infinity / undefined leak.
+
+No layout fix was required: the fluid `clamp()` type, `ch` / `vw` measures, the lone 760 px breakpoint, and the `.tabular-tool` scroll-owner (§8 / §9) all carry the 656-tile catalog without change.
