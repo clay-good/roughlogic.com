@@ -541,6 +541,7 @@ import {
   computeBackflowSizing,
   computeExpansionTank,
   computeFrictionLoss,
+  computeDrainageInvert,
   computeGlycolMix,
   computeGreaseTrap,
   computeHydrostaticTest,
@@ -569,6 +570,7 @@ import {
   renderBackflow,
   renderBackflowLoss,
   renderExpansionTank,
+  renderDrainageInvert,
   renderFrictionLoss,
   renderGlycolMix,
   renderGreaseTrap,
@@ -7115,6 +7117,35 @@ test("bounds: calc-plumbing computeManningSlope pins half-full Manning slope wit
   assert.ok("error" in computeManningSlope({ pipe_diameter_in: 4, target_flow_gpm: 50, material: "stone" }));
 });
 
+test("bounds: calc-plumbing computeDrainageInvert pins fall/invert-out/cover on the 100 ft / 1/4 in-per-ft / 80 ft example", () => {
+  const r = computeDrainageInvert({ invert_in_ft: 100, slope: 0.25, slope_units: "in_per_ft", run_ft: 80, pipe_od_in: 4.5, surface_out_ft: 102, min_cover_ft: 2 });
+  assert.ok(Math.abs(r.total_fall_ft - 1.6666667) < 1e-6);
+  assert.ok(Math.abs(r.invert_out_ft - 98.3333333) < 1e-6);
+  assert.ok(Math.abs(r.top_of_pipe_ft - 98.7083333) < 1e-6);
+  assert.ok(Math.abs(r.cover_out_ft - 3.2916667) < 1e-6);
+  assert.strictEqual(r.cover_flag, false);
+  // Cross-check: half the slope -> half the fall (linear in slope).
+  const half = computeDrainageInvert({ invert_in_ft: 100, slope: 0.125, slope_units: "in_per_ft", run_ft: 80, pipe_od_in: 4.5 });
+  assert.ok(Math.abs(half.total_fall_ft - 0.8333333) < 1e-6);
+  assert.ok(Math.abs(half.invert_out_ft - 99.1666667) < 1e-6);
+  assert.strictEqual(half.cover_out_ft, null); // no surface given -> cover not computed
+  // Percent units normalize to ft/ft directly: 2% over 80 ft = 1.6 ft fall.
+  const pct = computeDrainageInvert({ invert_in_ft: 100, slope: 2, slope_units: "percent", run_ft: 80, pipe_od_in: 4.5, surface_out_ft: 100, min_cover_ft: 3 });
+  assert.ok(Math.abs(pct.total_fall_ft - 1.6) < 1e-9);
+  // Under-cover flag: shallow run, surface barely above the crown.
+  const shallow = computeDrainageInvert({ invert_in_ft: 100, slope: 0.25, slope_units: "in_per_ft", run_ft: 10, pipe_od_in: 4.5, surface_out_ft: 100.5, min_cover_ft: 2 });
+  assert.strictEqual(shallow.cover_flag, true);
+  // Negative cover (pipe crown above grade) is a flag, not an error, even with no minimum given.
+  const above = computeDrainageInvert({ invert_in_ft: 100, slope: 0.25, slope_units: "in_per_ft", run_ft: 10, pipe_od_in: 4.5, surface_out_ft: 99 });
+  assert.ok(above.cover_out_ft < 0);
+  assert.strictEqual(above.cover_flag, true);
+  // Error seams: non-finite input, non-positive run, negative slope.
+  assert.ok("error" in computeDrainageInvert({ invert_in_ft: Infinity, slope: 0.25, run_ft: 80 }));
+  assert.ok("error" in computeDrainageInvert({ invert_in_ft: 100, slope: 0.25, run_ft: 0 }));
+  assert.ok("error" in computeDrainageInvert({ invert_in_ft: 100, slope: 0.25, run_ft: -5 }));
+  assert.ok("error" in computeDrainageInvert({ invert_in_ft: 100, slope: -0.25, run_ft: 80 }));
+});
+
 test("bounds: calc-plumbing computeHydrostaticTest pins 1.5x water / 1.25x gas multipliers and the hold-time ladder", () => {
   const r = computeHydrostaticTest({ working_pressure_psi: 80, system_volume_gal: 200, material: "water" });
   assert.strictEqual(r.test_pressure_psi, 120);
@@ -7388,6 +7419,7 @@ test("bounds: calc-plumbing render* sentinels - every exported renderer is a cal
   // smoke tests live in the Playwright suite. This sentinel keeps the
   // render symbols pinned and asserts each is wired.
   for (const fn of [
+    renderDrainageInvert,
     renderBackflow, renderBackflowLoss, renderExpansionTank, renderFrictionLoss,
     renderGasLeakRate, renderGasPipeSizing, renderGlycolMix, renderGreaseTrap,
     renderHydrostaticTest, renderManningSlope, renderPipeExpansion, renderPipeSizing,

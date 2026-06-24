@@ -3532,6 +3532,80 @@ function renderWaterHeaterStorageSizing(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["water-heater-storage-sizing"] = renderWaterHeaterStorageSizing;
 
+// --- spec-v163 Drainage Invert Elevation, Drop, and Cover ---
+// Carries a gravity run from its slope to the field elevations: total fall over
+// the run, the downstream invert-out, the top-of-pipe, and the resulting cover
+// against the governing minimum. Slope minimums per IPC 2021 Section 704; the
+// minimum cover, frost depth, and live-load bury are set by the adopted code and
+// the engineer/survey of record (the minimum-cover compared against is supplied
+// by the user). A non-finite input, a non-positive run, or a negative slope
+// returns { error }; a negative cover (pipe above grade) is a flag, not an error.
+
+// dims: in { invert_in_ft: L, slope: dimensionless, slope_units: dimensionless, run_ft: L, pipe_od_in: L, surface_out_ft: L, min_cover_ft: L } out: { slope_ftft: dimensionless, total_fall_ft: L, invert_out_ft: L, top_of_pipe_ft: L, cover_out_ft: L, cover_flag: dimensionless }
+export function computeDrainageInvert({ invert_in_ft = 0, slope = 0, slope_units = "in_per_ft", run_ft = 0, pipe_od_in = 0, surface_out_ft = null, min_cover_ft = null }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(run_ft > 0)) return { error: "Run length must be positive." };
+  if (!(slope >= 0)) return { error: "Slope must be non-negative." };
+  const slope_ftft = slope_units === "percent" ? slope / 100 : slope / 12;
+  const total_fall_ft = slope_ftft * run_ft;
+  const invert_out_ft = invert_in_ft - total_fall_ft;
+  const top_of_pipe_ft = invert_out_ft + pipe_od_in / 12;
+  let cover_out_ft = null;
+  let cover_flag = false;
+  if (Number.isFinite(surface_out_ft)) {
+    cover_out_ft = surface_out_ft - top_of_pipe_ft;
+    // Under-cover when below the supplied minimum; with no minimum given, a
+    // negative cover (pipe crown above grade) is itself the flag.
+    cover_flag = Number.isFinite(min_cover_ft) ? cover_out_ft < min_cover_ft : cover_out_ft < 0;
+  }
+  return { slope_ftft, total_fall_ft, invert_out_ft, top_of_pipe_ft, cover_out_ft, cover_flag };
+}
+
+export const drainageInvertExample = {
+  inputs: { invert_in_ft: 100, slope: 0.25, slope_units: "in_per_ft", run_ft: 80, pipe_od_in: 4.5, surface_out_ft: 102, min_cover_ft: 2 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderDrainageInvert(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: invert-out = invert-in - slope x run; cover = surface - (invert-out + OD). Slope minimums per IPC 2021 Section 704; minimum cover, frost depth, and live-load bury are set by the adopted code and the engineer/survey of record.";
+  const invIn = makeNumber("Invert-in elevation (ft)", "di-in", { step: "any" });
+  const slope = makeNumber("Slope", "di-s", { step: "any", min: "0" });
+  const units = makeSelect("Slope units", "di-u", [{ value: "in_per_ft", label: "in/ft" }, { value: "percent", label: "%" }]);
+  const run = makeNumber("Run length (ft)", "di-r", { step: "any", min: "0" });
+  const od = makeNumber("Pipe OD (in)", "di-od", { step: "any", min: "0" });
+  const surf = makeNumber("Downstream surface elevation (ft, optional)", "di-surf", { step: "any" });
+  const minCov = makeNumber("Minimum cover (ft, optional)", "di-mc", { step: "any", min: "0" });
+  for (const f of [invIn, slope, units, run, od, surf, minCov]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    invIn.input.value = "100"; slope.input.value = "0.25"; units.select.value = "in_per_ft";
+    run.input.value = "80"; od.input.value = "4.5"; surf.input.value = "102"; minCov.input.value = "2"; update();
+  });
+  const oFall = makeOutputLine(outputRegion, "Total fall", "di-out-fall");
+  const oInv = makeOutputLine(outputRegion, "Invert-out", "di-out-inv");
+  const oTop = makeOutputLine(outputRegion, "Top of pipe", "di-out-top");
+  const oCov = makeOutputLine(outputRegion, "Cover", "di-out-cov");
+  const update = debounce(() => {
+    const r = computeDrainageInvert({
+      invert_in_ft: Number(invIn.input.value) || 0,
+      slope: Number(slope.input.value) || 0,
+      slope_units: units.select.value,
+      run_ft: Number(run.input.value) || 0,
+      pipe_od_in: Number(od.input.value) || 0,
+      surface_out_ft: surf.input.value === "" ? null : Number(surf.input.value),
+      min_cover_ft: minCov.input.value === "" ? null : Number(minCov.input.value),
+    });
+    if (r.error) { oFall.textContent = r.error; oInv.textContent = "-"; oTop.textContent = "-"; oCov.textContent = "-"; return; }
+    oFall.textContent = fmt(r.total_fall_ft, 2) + " ft";
+    oInv.textContent = fmt(r.invert_out_ft, 2) + " ft";
+    oTop.textContent = fmt(r.top_of_pipe_ft, 2) + " ft";
+    oCov.textContent = r.cover_out_ft === null
+      ? "- (enter surface elevation)"
+      : fmt(r.cover_out_ft, 2) + " ft" + (r.cover_flag ? " - UNDER minimum cover" : "");
+  }, DEBOUNCE_MS);
+  for (const el of [invIn.input, slope.input, units.select, run.input, od.input, surf.input, minCov.input]) el.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["drainage-invert"] = renderDrainageInvert;
+
 // --- spec-v62 roof-drain-sizing / sump-basin-sizing -> relocated to calc-drainage.js (spec-v73 split) ---
 
 // --- spec-v63 gas-appliance-demand / tpr-discharge + spec-v64 pipe-support-spacing / softener-sizing -> relocated to calc-service.js (spec-v78 split) ---

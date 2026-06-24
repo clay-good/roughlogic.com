@@ -3981,6 +3981,88 @@
       }
     },
     {
+      "tile_id": "drainage-invert",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Invert-out, fall, and cover for a gravity run (spec-v163 pinned example)",
+      "source_edition_or_year": "2026",
+      "source_section_or_page": "slope = 0.25/12 = 0.020833 ft/ft; total_fall = 0.020833 x 80 = 1.6667 ft; invert_out = 100 - 1.6667 = 98.333 ft; top = 98.333 + 0.375 = 98.708 ft; cover = 102 - 98.708 = 3.292 ft (> 2.0 min, no flag)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "invert_in_ft": 100,
+        "slope": 0.25,
+        "slope_units": "in_per_ft",
+        "run_ft": 80,
+        "pipe_od_in": 4.5,
+        "surface_out_ft": 102,
+        "min_cover_ft": 2
+      },
+      "outputs": {
+        "total_fall_ft": {
+          "value": 1.66667,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "invert_out_ft": {
+          "value": 98.33333,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "top_of_pipe_ft": {
+          "value": 98.70833,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "cover_out_ft": {
+          "value": 3.29167,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "cover_flag": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "drainage-invert",
+      "source_publisher": "Project (first-principles)",
+      "source_title": "Cross-check: half the slope yields half the fall (spec-v163)",
+      "source_edition_or_year": "2026",
+      "source_section_or_page": "Same 80 ft run at 1/8 in/ft: total_fall = 0.010417 x 80 = 0.8333 ft; invert_out = 100 - 0.8333 = 99.167 ft. Fall scales linearly with slope; cover follows the invert.",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": {
+        "invert_in_ft": 100,
+        "slope": 0.125,
+        "slope_units": "in_per_ft",
+        "run_ft": 80,
+        "pipe_od_in": 4.5,
+        "surface_out_ft": 102,
+        "min_cover_ft": 2
+      },
+      "outputs": {
+        "total_fall_ft": {
+          "value": 0.83333,
+          "tolerance": {
+            "abs": 0.001
+          }
+        },
+        "invert_out_ft": {
+          "value": 99.16667,
+          "tolerance": {
+            "abs": 0.001
+          }
+        }
+      }
+    },
+    {
       "tile_id": "pipe-expansion",
       "source_publisher": "ASHRAE / ASTM",
       "source_title": "Linear thermal expansion: dL = alpha * L * dT",

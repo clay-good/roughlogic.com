@@ -443,6 +443,7 @@ const RELATED = {
   "gas-leak-rate": ["gas-pipe-sizing", "hydrostatic-test"],
   "stormwater-rational": ["manning-slope", "rainwater-yield"],
   "manning-slope": ["slope", "stormwater-rational", "trap-arm"],
+  "drainage-invert": ["slope", "manning-slope", "trench-slope"],
   "hydrostatic-test": ["gas-leak-rate", "pressure-conversion"],
   "grease-trap": ["septic-tank", "septic-drainfield"],
   "glycol-mix": ["expansion-tank", "geothermal-loop"],

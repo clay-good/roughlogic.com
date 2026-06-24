@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. The shard is lazy-loaded on the first keystroke into the home-view search bar (bindSearch / ensureAliases in app.js); on exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Per spec-v10 §13.3 the data file is bounded at 5 KB gzipped. Industry vocabulary, misspellings, abbreviations, and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js); app.js currently inlines the equivalent exact-term lookup for the simple case.",
-  "_updated": "2026-06-18",
+  "_updated": "2026-06-23",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
     {
@@ -5659,6 +5659,13 @@
     { "term": "all thread", "target": "hanger-rod-sizing", "kind": "industry" },
     { "term": "threaded rod load", "target": "hanger-rod-sizing", "kind": "adjacent" },
     { "term": "mss sp-58", "target": "hanger-rod-sizing", "kind": "redirect" },
-    { "term": "hanger rod diameter", "target": "hanger-rod-sizing", "kind": "adjacent" }
+    { "term": "hanger rod diameter", "target": "hanger-rod-sizing", "kind": "adjacent" },
+    { "term": "invert elevation", "target": "drainage-invert", "kind": "industry" },
+    { "term": "pipe invert", "target": "drainage-invert", "kind": "industry" },
+    { "term": "invert out", "target": "drainage-invert", "kind": "industry" },
+    { "term": "fall", "target": "drainage-invert", "kind": "industry" },
+    { "term": "sewer slope", "target": "drainage-invert", "kind": "adjacent" },
+    { "term": "pipe cover", "target": "drainage-invert", "kind": "industry" },
+    { "term": "trench depth", "target": "drainage-invert", "kind": "adjacent" }
   ]
 }

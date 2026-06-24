@@ -2362,6 +2362,17 @@ export const CITATIONS = {
       { name: "Self-cleansing velocity", value: "2 ft/s for sanitary sewers", source: "public engineering practice" },
     ],
   },
+  "drainage-invert": {
+    formula: "Total fall = slope x run; invert-out = invert-in - fall; top of pipe = invert-out + OD; cover = surface - top of pipe. Slope entered as in/ft or percent, normalized to ft/ft.",
+    edition: IPC_2021 + " Section 704 (drainage piping slope minimums).",
+    freeAccess: ICC_FREE,
+    governance: GOVERNANCE.general,
+    editionNote: IPC_DISCLOSURE + " The minimum-cover and maximum-depth limits, the local frost depth, and the live-load bury requirement are set by the adopted code and the engineer/survey of record; the minimum cover compared against is the user-supplied governing value.",
+    assumptions: [
+      { name: "Cover datum", value: "cover measured from finished grade to the top of the pipe (invert-out + OD / 12)", source: "standard trench-section geometry" },
+      { name: "Sign convention", value: "a negative cover (pipe crown above grade) is flagged, not rejected", source: "spec-v163 output contract" },
+    ],
+  },
   "hydrostatic-test": {
     formula: "Test pressure: 1.5× working pressure for water systems (IPC 2021 Section 312), 1.25× for fuel-gas systems (IFGC 2021 Section 406.4); recommended hold time scales with system volume.",
     edition: IPC_2021 + " Section 312; " + IFGC_2021 + " Section 406.4.",

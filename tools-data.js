@@ -79,6 +79,7 @@ export const TOOLS = [
   { id: "gas-leak-rate", name: "Gas Leak Rate (Orifice)", group: "B", trades: ["plumbing"], desc: "Estimated leak rate from orifice diameter and upstream pressure." },
   { id: "stormwater-rational", name: "Stormwater Rational Method", group: "B", trades: ["plumbing"], desc: "Q = C * i * A peak runoff in cfs and gpm with bundled C values." },
   { id: "manning-slope", name: "Manning's Equation Drainage Slope", group: "B", trades: ["plumbing"], desc: "Self-cleansing slope and slope to carry target flow at half-full." },
+  { id: "drainage-invert", name: "Drainage Invert Elevation, Drop, and Cover", group: "B", trades: ["plumbing"], desc: "Invert-out, total fall, and cover over a gravity run from its slope and length." },
   { id: "hydrostatic-test", name: "Hydrostatic Test Pressure and Hold", group: "B", trades: ["plumbing"], desc: "Test pressure (1.5x water / 1.25x gas) and recommended hold time." },
   { id: "grease-trap", name: "Grease Trap Sizing", group: "B", trades: ["plumbing"], desc: "Volume from peak flow, retention, and loading factor; PDI G101 cited." },
   { id: "glycol-mix", name: "Glycol Freeze Protection Mix", group: "B", trades: ["plumbing", "hvac"], desc: "Glycol percent and concentrate gallons from manufacturer freeze-point curves." },

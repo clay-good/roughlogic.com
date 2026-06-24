@@ -132,6 +132,8 @@ const TOOL_MODULES = (() => {
     "wsfu-demand", "supply-pressure-budget",
     // spec-v112 storage water-heater sizing (first-hour rating vs peak demand).
     "water-heater-storage-sizing",
+    // spec-v163 drainage invert-out, fall, and cover for a gravity run.
+    "drainage-invert",
   ]);
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-
