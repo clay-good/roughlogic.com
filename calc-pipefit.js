@@ -762,3 +762,122 @@ function _renderFlangeRating(inputRegion, outputRegion, citationEl) {
   cls.select.addEventListener("change", update);
 }
 PIPEFIT_RENDERERS["flange-rating"] = _renderFlangeRating;
+
+// ---------------------------------------------------------------------
+// v204 Branch connection reinforcement - area replacement (branch-reinforcement)
+// ---------------------------------------------------------------------
+// ASME B31.1 para 104.3.1 (and B31.3 304.3 for process): when a branch
+// opening is cut into a pressurized run, the metal removed must be made up
+// nearby. The required-replacement area A_required = t_rh x d1 x (2 - sin b)
+// is supplied by the excess wall in the run (A1) and the branch (A2) within
+// the reinforcement zone; any shortfall is the reinforcing-pad area to add.
+// Required walls come from the pressure design (pipe-pressure-rating); the
+// engineer of record and the AHJ govern - this is the area balance, not a
+// stamped branch-connection design.
+// dims: in { run_od_in: L, run_wall_in: L, run_treq_in: L, branch_od_in: L, branch_wall_in: L, branch_treq_in: L, beta_deg: dimensionless } out: { d1_in: L, a_required_in2: L^2, a_run_in2: L^2, a_branch_in2: L^2, a_available_in2: L^2, pad_area_in2: L^2 }
+export function computeBranchReinforcement({ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_wall_in = 0, branch_treq_in = 0, beta_deg = 90 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rod = Number(run_od_in), bod = Number(branch_od_in);
+  const Th = Number(run_wall_in), trh = Number(run_treq_in);
+  const Tb = Number(branch_wall_in), trb = Number(branch_treq_in);
+  const beta = Number(beta_deg);
+  if (!(rod > 0)) return { error: "Run OD must be positive (in)." };
+  if (!(bod > 0)) return { error: "Branch OD must be positive (in)." };
+  if (!(Th > 0) || !(Tb > 0)) return { error: "Nominal walls must be positive (in)." };
+  if (!(trh >= 0) || !(trb >= 0)) return { error: "Required walls must be non-negative (in)." };
+  if (!(trh < Th)) return { error: "Run required wall must be less than the nominal wall (no excess to credit)." };
+  if (!(beta > 0 && beta <= 90)) return { error: "Branch angle must be in (0, 90] degrees." };
+  const sinB = Math.sin((beta * Math.PI) / 180);
+  const d1 = (bod - 2 * Tb) / sinB;                      // effective opening in the run
+  if (!(d1 > 0)) return { error: "Branch bore must be positive (check the branch OD and wall)." };
+  const a_required = trh * d1 * (2 - sinB);
+  const d2 = Math.max(d1, Tb + Th + d1 / 2);             // reinforcement zone half-width
+  const L4 = Math.min(2.5 * Th, 2.5 * Tb);               // zone height up the branch (no pad)
+  const a1 = (2 * d2 - d1) * (Th - trh);                 // excess metal in the run
+  const a2 = 2 * L4 * (Tb - trb);                        // excess metal in the branch
+  const a_available = a1 + a2;
+  const adequate = a_available >= a_required;
+  const pad_area = Math.max(0, a_required - a_available);
+  return { d1_in: d1, a_required_in2: a_required, a_run_in2: a1, a_branch_in2: a2, a_available_in2: a_available, adequate, pad_area_in2: pad_area };
+}
+export const branchReinforcementExample = { inputs: { run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 } };
+
+function _renderBranchReinforcement(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Branch-opening area replacement - A_required = t_rh x d1 x (2 - sin beta) made up by the excess wall in the run (A1) and the branch (A2) within the reinforcement zone, per ASME B31.1 para 104.3.1 (and B31.3 304.3 for process), by name. The required wall thicknesses come from the pressure design (see pipe-pressure-rating), the reinforcement zone limits and the weld/pad area follow the code's figure, and the engineer of record and the AHJ govern. This is the area balance, not a stamped branch-connection design.";
+  const rod = makeNumber("Run (header) OD (in)", "br-rod", { step: "any", min: "0" });
+  const rwall = makeNumber("Run nominal wall (in)", "br-rwall", { step: "any", min: "0" });
+  const rtreq = makeNumber("Run required wall t_rh (in)", "br-rtreq", { step: "any", min: "0" });
+  const bod = makeNumber("Branch OD (in)", "br-bod", { step: "any", min: "0" });
+  const bwall = makeNumber("Branch nominal wall (in)", "br-bwall", { step: "any", min: "0" });
+  const btreq = makeNumber("Branch required wall t_rb (in)", "br-btreq", { step: "any", min: "0" });
+  const beta = makeNumber("Branch angle to the run (deg, 90 = perpendicular)", "br-beta", { step: "any", min: "0", max: "90", value: "90" });
+  beta.input.value = "90";
+  for (const f of [rod, rwall, rtreq, bod, bwall, btreq, beta]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    rod.input.value = "6.625"; rwall.input.value = "0.280"; rtreq.input.value = "0.10";
+    bod.input.value = "2.375"; bwall.input.value = "0.154"; btreq.input.value = "0.034"; beta.input.value = "90"; update();
+  });
+  const oReq = makeOutputLine(outputRegion, "Area required (replacement)", "br-out-req");
+  const oAvail = makeOutputLine(outputRegion, "Area available (run + branch)", "br-out-avail");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "br-out-verdict");
+  const update = debounce(() => {
+    const r = computeBranchReinforcement({
+      run_od_in: Number(rod.input.value) || 0, run_wall_in: Number(rwall.input.value) || 0, run_treq_in: Number(rtreq.input.value) || 0,
+      branch_od_in: Number(bod.input.value) || 0, branch_wall_in: Number(bwall.input.value) || 0, branch_treq_in: Number(btreq.input.value) || 0,
+      beta_deg: Number(beta.input.value) || 0,
+    });
+    if (r.error) { oReq.textContent = r.error; oAvail.textContent = "-"; oVerdict.textContent = "-"; return; }
+    oReq.textContent = fmt(r.a_required_in2, 3) + " in^2 (opening d1 " + fmt(r.d1_in, 3) + " in)";
+    oAvail.textContent = fmt(r.a_available_in2, 3) + " in^2 (run " + fmt(r.a_run_in2, 3) + " + branch " + fmt(r.a_branch_in2, 3) + ")";
+    oVerdict.textContent = r.adequate ? "Adequate - excess wall covers it, no pad" : "Pad required - add " + fmt(r.pad_area_in2, 3) + " in^2 of reinforcement";
+  }, DEBOUNCE_MS);
+  for (const f of [rod.input, rwall.input, rtreq.input, bod.input, bwall.input, btreq.input, beta.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["branch-reinforcement"] = _renderBranchReinforcement;
+
+// ---------------------------------------------------------------------
+// v205 Expansion joint / loop guide spacing - EJMA 4D/14D (expansion-guide-spacing)
+// ---------------------------------------------------------------------
+// An expansion joint or loop needs guides to keep the pipe a straight
+// column feeding into it. The Expansion Joint Manufacturers Association
+// (EJMA) rule places the first two: the first guide within four pipe
+// diameters of the joint, the second within fourteen diameters of the
+// first. Beyond guide 2, intermediate spacing comes from the EJMA table or
+// the pipe-column stability calc; the anchor and joint selection govern.
+// dims: in { pipe_od_in: L, d1_mult: dimensionless, d2_mult: dimensionless } out: { first_guide_in: L, second_guide_in: L, guide2_from_joint_in: L }
+export function computeExpansionGuideSpacing({ pipe_od_in = 0, d1_mult = 4, d2_mult = 14 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const od = Number(pipe_od_in);
+  const m1 = Number(d1_mult), m2 = Number(d2_mult);
+  if (!(od > 0)) return { error: "Pipe OD must be positive (in)." };
+  if (!(m1 > 0)) return { error: "First-guide multiplier must be positive." };
+  if (!(m2 > 0)) return { error: "Second-guide multiplier must be positive." };
+  const first_guide_in = m1 * od;
+  const second_guide_in = m2 * od;
+  const guide2_from_joint_in = first_guide_in + second_guide_in;
+  return {
+    first_guide_in, second_guide_in, guide2_from_joint_in,
+    first_guide_ft: first_guide_in / 12, second_guide_ft: second_guide_in / 12, guide2_from_joint_ft: guide2_from_joint_in / 12,
+  };
+}
+export const expansionGuideSpacingExample = { inputs: { pipe_od_in: 4.5, d1_mult: 4, d2_mult: 14 } };
+
+function _renderExpansionGuideSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Expansion-joint guide placement - the first guide within d1_mult (4) pipe diameters of the joint, the second within d2_mult (14) diameters of the first, per the Expansion Joint Manufacturers Association (EJMA) standard and the manufacturer installation guides, by name. The 4D/14D rule places the first two guides; intermediate guide spacing beyond the second comes from the EJMA table or the pipe-column stability calc (user-supplied / manufacturer). This places the planning guides, it does not design the anchor loads; the anchor and joint selection govern.";
+  const od = makeNumber("Pipe OD (in)", "eg-od", { step: "any", min: "0" });
+  const m1 = makeNumber("First-guide multiplier (D)", "eg-m1", { step: "any", min: "0", value: "4" });
+  const m2 = makeNumber("Second-guide multiplier (D)", "eg-m2", { step: "any", min: "0", value: "14" });
+  m1.input.value = "4"; m2.input.value = "14";
+  for (const f of [od, m1, m2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "4.5"; m1.input.value = "4"; m2.input.value = "14"; update(); });
+  const oFirst = makeOutputLine(outputRegion, "First guide (from the joint)", "eg-out-first");
+  const oSecond = makeOutputLine(outputRegion, "Second guide (past the first)", "eg-out-second");
+  const update = debounce(() => {
+    const r = computeExpansionGuideSpacing({ pipe_od_in: Number(od.input.value) || 0, d1_mult: Number(m1.input.value) || 0, d2_mult: Number(m2.input.value) || 0 });
+    if (r.error) { oFirst.textContent = r.error; oSecond.textContent = "-"; return; }
+    oFirst.textContent = fmt(r.first_guide_in, 1) + " in (" + fmt(r.first_guide_ft, 2) + " ft)";
+    oSecond.textContent = fmt(r.second_guide_in, 1) + " in (" + fmt(r.second_guide_ft, 2) + " ft) - " + fmt(r.guide2_from_joint_in, 1) + " in from the joint";
+  }, DEBOUNCE_MS);
+  for (const f of [od.input, m1.input, m2.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["expansion-guide-spacing"] = _renderExpansionGuideSpacing;

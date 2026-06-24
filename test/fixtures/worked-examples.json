@@ -23055,6 +23055,92 @@
       }
     },
     {
+      "tile_id": "branch-reinforcement",
+      "source_publisher": "ASME B31.1 para 104.3.1 area replacement (B31.3 304.3 for process) (by name)",
+      "source_title": "NPS 6 Sch 40 run, NPS 2 Sch 40 branch at 90 deg, t_rh 0.10 -> A_req 0.207 in^2, run excess A1 0.372 alone covers it, no pad",
+      "source_edition_or_year": "spec-v204 worked example (machine-verified, area balance)",
+      "source_section_or_page": "spec-v204 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "run_od_in": 6.625, "run_wall_in": 0.280, "run_treq_in": 0.10, "branch_od_in": 2.375, "branch_wall_in": 0.154, "branch_treq_in": 0.034, "beta_deg": 90 },
+      "outputs": {
+        "a_required_in2": { "value": 0.2067, "tolerance": { "abs": 0.001 } },
+        "a_run_in2": { "value": 0.37206, "tolerance": { "abs": 0.001 } },
+        "pad_area_in2": { "value": 0, "tolerance": { "abs": 0.0005 } }
+      }
+    },
+    {
+      "tile_id": "branch-reinforcement",
+      "source_publisher": "ASME B31.1 para 104.3.1 area replacement (B31.3 304.3 for process) (by name)",
+      "source_title": "Same fitting at a higher required wall t_rh 0.25 -> A_req 0.517 in^2, excess falls short, pad ~0.362 in^2 required",
+      "source_edition_or_year": "spec-v204 worked example (machine-verified, area balance)",
+      "source_section_or_page": "spec-v204 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "run_od_in": 6.625, "run_wall_in": 0.280, "run_treq_in": 0.25, "branch_od_in": 2.375, "branch_wall_in": 0.154, "branch_treq_in": 0.034, "beta_deg": 90 },
+      "outputs": {
+        "a_required_in2": { "value": 0.51675, "tolerance": { "abs": 0.001 } },
+        "pad_area_in2": { "value": 0.36234, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "expansion-guide-spacing",
+      "source_publisher": "EJMA 4-diameter / 14-diameter guide-placement rule (by name)",
+      "source_title": "4 in line (OD 4.5) into an axial expansion joint -> first guide 18 in, second 63 in past it (81 in from the joint)",
+      "source_edition_or_year": "spec-v205 worked example (machine-verified)",
+      "source_section_or_page": "spec-v205 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "pipe_od_in": 4.5, "d1_mult": 4, "d2_mult": 14 },
+      "outputs": {
+        "first_guide_in": { "value": 18, "tolerance": { "abs": 0.01 } },
+        "second_guide_in": { "value": 63, "tolerance": { "abs": 0.01 } },
+        "guide2_from_joint_in": { "value": 81, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "expansion-guide-spacing",
+      "source_publisher": "EJMA 4-diameter / 14-diameter guide-placement rule (by name)",
+      "source_title": "2 in line (OD 2.375) -> first guide 9.5 in, second 33.25 in; the distances scale directly with the diameter",
+      "source_edition_or_year": "spec-v205 worked example (machine-verified)",
+      "source_section_or_page": "spec-v205 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "pipe_od_in": 2.375, "d1_mult": 4, "d2_mult": 14 },
+      "outputs": {
+        "first_guide_in": { "value": 9.5, "tolerance": { "abs": 0.01 } },
+        "second_guide_in": { "value": 33.25, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "medgas-demand",
+      "source_publisher": "NFPA 99 Health Care Facilities Code demand and diversity; ASSE 6010 installer (by name)",
+      "source_title": "20 oxygen outlets at 1.0 scfm, diversity 0.25 -> 20 scfm connected, 5.0 scfm design",
+      "source_edition_or_year": "spec-v206 worked example (machine-verified)",
+      "source_section_or_page": "spec-v206 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "stations": 20, "per_station_scfm": 1.0, "diversity": 0.25 },
+      "outputs": {
+        "connected_scfm": { "value": 20, "tolerance": { "abs": 0.01 } },
+        "design_scfm": { "value": 5.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "medgas-demand",
+      "source_publisher": "NFPA 99 Health Care Facilities Code demand and diversity; ASSE 6010 installer (by name)",
+      "source_title": "30 medical-surgical vacuum inlets at 1.0 scfm, diversity 0.50 -> 30 scfm connected, 15 scfm design",
+      "source_edition_or_year": "spec-v206 worked example (machine-verified)",
+      "source_section_or_page": "spec-v206 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "stations": 30, "per_station_scfm": 1.0, "diversity": 0.50 },
+      "outputs": {
+        "connected_scfm": { "value": 30, "tolerance": { "abs": 0.01 } },
+        "design_scfm": { "value": 15, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "motor-synchronous-speed-slip",
       "source_publisher": "First-principles AC-machine theory",
       "source_title": "60 Hz 4-pole motor, nameplate 1750 rpm -> 1800 rpm sync, 2.78% slip, 1.67 Hz rotor",

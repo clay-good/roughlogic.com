@@ -1815,6 +1815,7 @@ cross-check.
 | calc-gas.js | `computeGasLeakRate` | `{ orifice_diameter_in, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
 | calc-gas.js | `computeGasPipePressureDrop` | `{ flow_cfh = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasPipeSizing` | `{ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75",...` | _ | _ | _ |
+| calc-gas.js | `computeMedgasDemand` | `{ stations = 0, per_station_scfm = 0, diversity = 1 } = {}` | _ | _ | _ |
 | calc-gas.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
@@ -1953,9 +1954,11 @@ cross-check.
 | calc-motor.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
+| calc-pipefit.js | `computeBranchReinforcement` | `{ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_w...` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchSaddleCutback` | `{ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeColdSpring` | `{ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f...` | _ | _ | _ |
 | calc-pipefit.js | `computeCondensateReturnSizing` | `{ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fp...` | _ | _ | _ |
+| calc-pipefit.js | `computeExpansionGuideSpacing` | `{ pipe_od_in = 0, d1_mult = 4, d2_mult = 14 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeFlangeRating` | `{ flange_class = 150, temp_f = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeFlashSteamPct` | `{ hf_high = 0, hf_low = 0, hfg_low = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeHangerRodSizing` | `{ load_lb = 0, temp_derate = 1 } = {}` | _ | _ | _ |
@@ -2310,7 +2313,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 896.
+Row count: 899.
 
 <!-- END function-corpus-v14 -->
 
@@ -2486,16 +2489,18 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (70 tiles)
+### Group B Plumbing (73 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `backflow` | Backflow Reference | IPC 2024 + project bundled backflow-p...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-loss` | Backflow Preventer Pressure Loss | Watts Regulator; 1 in RP at 30 gpm -> ~8.5 psi typical loss across the ass... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-sizing` | Backflow Assembly Sizing Screen | IPC / AWWA / EPA; high hazard -> RP required (override from DC); RP 2 in at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `branch-reinforcement` | Branch Connection Reinforcement (Area Replacement, ASME B31.1) | ASME B31.1 para 104.3.1 area replacem...; spec-v204 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `branch-saddle-cutback` | Branch Saddle Cutback Template (Pipe-on-Pipe) | Cylinder-intersection geometry; Pipe ...; spec-v201 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-return-sizing` | Condensate Return Line Size From the Flash Steam | Continuity; ASHRAE / Spirax Sarco ret...; spec-v200 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-invert` | Drainage Invert Elevation, Drop, and Cover | Project (first-principles); slope = 0.25/12 = 0.020833 ft/ft; total_fall = 0.020833 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `expansion-guide-spacing` | Expansion Joint / Loop Guide Spacing (EJMA 4D/14D) | EJMA 4-diameter / 14-diameter guide-p...; spec-v205 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `expansion-tank` | Hydronic Expansion Tank | ASHRAE Handbook (HVAC Systems and Equ...; 100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig reli... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flange-rating` | Flange Pressure-Temperature Rating (ASME B16.5) | ASME B16.5 pressure-temperature ratin...; spec-v203 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `flash-steam-pct` | Flash Steam Percentage Across a Pressure Drop | Steam thermodynamics; ASME steam tabl...; spec-v157 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2512,6 +2517,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `main-disinfection-chlorine` | Water Main Chlorination Dose | AWWA C651 Disinfecting Water Mains (b...; spec-v103 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manning-slope` | Manning's Equation Drainage Slope | Project (first-principles); 4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `medgas-demand` | Medical Gas System Demand and Diversity (NFPA 99) | NFPA 99 Health Care Facilities Code d...; spec-v206 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mixed-water-temp` | Mixing / Tempering Valve Blend Temperature | First-principles mixing energy balanc...; 140 F hot + 60 F cold at equal flow -> 100 F, 50% hot | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-cold-spring` | Pipe Cold Spring (Cut-Short) | ASME B31.1 §119 / B31.9 (by name); 100 ft carbon steel (alpha 6.5e-6), 50 F to 250 F (dT 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3149,6 +3155,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 653. Fixture-covered or reference-cadence: 653 / 653.
+Tile count: 656. Fixture-covered or reference-cadence: 656 / 656.
 
 <!-- END tile-index-v14 -->

@@ -7307,6 +7307,42 @@ export const CITATIONS = {
       { name: "Weakest component", value: "the flange rating is not the joint rating; gasket, bolting, and the mating pipe can govern", source: "ASME B16.5" },
     ],
   },
+  "branch-reinforcement": {
+    formula: "d1 = (branch_od - 2 x branch_wall) / sin(beta); A_required = run_treq x d1 x (2 - sin beta); d2 = max(d1, branch_wall + run_wall + d1/2); L4 = min(2.5 x run_wall, 2.5 x branch_wall); A1 = (2 d2 - d1)(run_wall - run_treq); A2 = 2 L4 (branch_wall - branch_treq); adequate when A1 + A2 >= A_required, else pad_area = A_required - (A1 + A2).",
+    edition: "ASME B31.1 para 104.3.1 branch-connection reinforcement (and B31.3 304.3 for process piping), by name; the area-replacement relations are read from the code's figure.",
+    freeAccess: "The area-replacement relations are the standard branch-reinforcement balance, widely republished in piping-design texts; the required wall thicknesses come from the pressure design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The required thicknesses come from the pressure design (see pipe-pressure-rating), the reinforcement-zone limits and the weld/pad area follow the code's figure, and the engineer of record and the AHJ govern. This is the area balance, NOT a stamped branch-connection design. ASME B31.1 104.3.1 governs power piping; B31.3 304.3 governs process.",
+    assumptions: [
+      { name: "Required walls", value: "run and branch required walls come from the pressure design (pipe-pressure-rating), not assumed here", source: "ASME B31.1 / B31.3" },
+      { name: "Reinforcement zone", value: "half-width d2 = max(d1, T_b + T_h + d1/2); height L4 = min(2.5 T_h, 2.5 T_b) (no pad)", source: "ASME B31.1 104.3.1" },
+      { name: "Governance", value: "the area balance is a screening check; the engineer of record and the AHJ govern the branch-connection design", source: "ASME B31.1" },
+    ],
+  },
+  "expansion-guide-spacing": {
+    formula: "first_guide = d1_mult x pipe_od (default 4 diameters from the joint); second_guide = d2_mult x pipe_od (default 14 diameters past the first guide); guide 2 is first_guide + second_guide from the joint.",
+    edition: "The Expansion Joint Manufacturers Association (EJMA) 4-diameter / 14-diameter guide-placement rule and the manufacturer installation guides, by name.",
+    freeAccess: "The 4D/14D first-and-second-guide rule is the EJMA published placement standard, republished in every manufacturer's installation guide.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 4D/14D rule places the first TWO guides; intermediate guide spacing beyond the second guide comes from the EJMA table or the pipe-column stability calc (user-supplied / manufacturer), and the anchor and joint selection govern. This places the planning guides, it does NOT design the anchor loads.",
+    assumptions: [
+      { name: "First two guides", value: "first guide within 4 pipe diameters of the joint, second within 14 diameters of the first", source: "EJMA" },
+      { name: "Beyond guide 2", value: "intermediate guide spacing comes from the EJMA table or a pipe-column stability calc (user-supplied)", source: "EJMA" },
+      { name: "Anchors", value: "the anchor loads and joint selection are a separate design and govern", source: "EJMA / manufacturer" },
+    ],
+  },
+  "medgas-demand": {
+    formula: "connected_scfm = stations x per_station_scfm; design_scfm = connected_scfm x diversity, the diversity (simultaneous-use) factor in (0, 1] falling as the station count rises.",
+    edition: "NFPA 99 Health Care Facilities Code (medical gas and vacuum systems) demand and diversity, with ASSE 6010 for the installer qualification, by name.",
+    freeAccess: "The connected-times-diversity demand relation is the NFPA 99 sizing method; the per-station flows and diversity factors are read from the adopted edition and the facility equipment list.",
+    governance: GOVERNANCE.general,
+    editionNote: "The per-station design flows and the diversity (simultaneous-use) factors are read from the adopted NFPA 99 edition and the facility's equipment list (user-supplied here); medical-gas piping is installed and certified by brazing-qualified plumbers and pipefitters (ASSE 6010), and a medical-gas verifier and the AHJ govern. This tile gives the DESIGN FLOW that feeds pipe sizing, not the system design itself - a demand aggregation, not a med-gas system stamp.",
+    assumptions: [
+      { name: "Per-station flow", value: "the per-station design flow is read from NFPA 99 / the equipment list (user-supplied)", source: "NFPA 99" },
+      { name: "Diversity", value: "the simultaneous-use factor falls as station count rises and is read from the adopted table (user-supplied)", source: "NFPA 99" },
+      { name: "Installer", value: "medical-gas piping is brazed and certified by ASSE 6010-qualified plumbers/pipefitters; a verifier and the AHJ govern", source: "ASSE 6010 / NFPA 99" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

@@ -111,6 +111,8 @@ const TOOL_MODULES = (() => {
     // spec-v200..v203 condensate return + fabrication/process layout tiles.
     "condensate-return-sizing", "branch-saddle-cutback", "reducer-offset",
     "flange-rating",
+    // spec-v204..v205 process-piping branch reinforcement + expansion guide spacing.
+    "branch-reinforcement", "expansion-guide-spacing",
   ]);
   // spec-v30 metal / air / refrigerant bench (deepens Groups E, C per the
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are
@@ -192,6 +194,8 @@ const TOOL_MODULES = (() => {
     "gas-pipe-sizing", "gas-leak-rate", "gas-pipe-pressure-drop",
     // spec-v111 high-altitude derate and NG/LP fuel conversion (same module).
     "gas-altitude-derate", "gas-fuel-conversion",
+    // spec-v206 medical-gas system demand and diversity (NFPA 99).
+    "medgas-demand",
   ]);
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",

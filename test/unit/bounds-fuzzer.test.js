@@ -10752,7 +10752,9 @@ import { computeRadiantLoopSizing as _v199r } from "../../calc-plumbing.js";
 import {
   computeCondensateReturnSizing as _v200, computeBranchSaddleCutback as _v201,
   computeReducerOffset as _v202, computeFlangeRating as _v203,
+  computeBranchReinforcement as _v204, computeExpansionGuideSpacing as _v205,
 } from "../../calc-pipefit.js";
+import { computeMedgasDemand as _v206 } from "../../calc-gas.js";
 
 test("bounds: spec-v199 radiant-loop-sizing pins footage/loops/flow + wider spacing drops to one loop + rejects bad inputs", () => {
   const a = _v199r({ floor_area_ft2: 300, spacing_in: 6, load_btuhr: 9000, max_loop_ft: 300, design_dt: 20 });
@@ -10826,6 +10828,52 @@ test("bounds: spec-v203 flange-rating pins the table + interpolation + higher cl
   assert.ok("error" in _v203({ flange_class: 150, temp_f: 800 })); // out of table range
   assert.ok("error" in _v203({ flange_class: 150, temp_f: 50 }));
   assert.ok("error" in _v203({ flange_class: 150, temp_f: Infinity }));
+});
+
+test("bounds: spec-v204 branch-reinforcement pins the adequate example + the pad flip + rejects bad inputs", () => {
+  const a = _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 });
+  assert.ok(Math.abs(a.d1_in - 2.067) < 0.001);
+  assert.ok(Math.abs(a.a_required_in2 - 0.2067) < 0.001);
+  assert.ok(Math.abs(a.a_run_in2 - 0.37206) < 0.001);
+  assert.equal(a.adequate, true);
+  assert.ok(Math.abs(a.pad_area_in2) < 1e-9);
+  // raise the run required wall and the same opening flips to needing a pad.
+  const b = _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.25, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 90 });
+  assert.equal(b.adequate, false);
+  assert.ok(Math.abs(b.a_required_in2 - 0.51675) < 0.001 && Math.abs(b.pad_area_in2 - 0.36234) < 0.001);
+  assert.ok("error" in _v204({ run_od_in: 0, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
+  assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
+  assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.30, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 })); // treq >= wall
+  assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 120 })); // beta > 90
+  assert.ok("error" in _v204({ run_od_in: 6.625, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034, beta_deg: 0 }));
+  assert.ok("error" in _v204({ run_od_in: Infinity, run_wall_in: 0.280, run_treq_in: 0.10, branch_od_in: 2.375, branch_wall_in: 0.154, branch_treq_in: 0.034 }));
+});
+
+test("bounds: spec-v205 expansion-guide-spacing pins 4D/14D + scales with diameter + rejects bad inputs", () => {
+  const a = _v205({ pipe_od_in: 4.5, d1_mult: 4, d2_mult: 14 });
+  assert.ok(Math.abs(a.first_guide_in - 18) < 1e-9);
+  assert.ok(Math.abs(a.second_guide_in - 63) < 1e-9);
+  assert.ok(Math.abs(a.guide2_from_joint_in - 81) < 1e-9);
+  // the distances scale directly with the diameter; the multipliers are the fixed rule.
+  const b = _v205({ pipe_od_in: 2.375 });
+  assert.ok(Math.abs(b.first_guide_in - 9.5) < 1e-9 && Math.abs(b.second_guide_in - 33.25) < 1e-9);
+  assert.ok("error" in _v205({ pipe_od_in: 0 }));
+  assert.ok("error" in _v205({ pipe_od_in: 4.5, d1_mult: 0 }));
+  assert.ok("error" in _v205({ pipe_od_in: 4.5, d2_mult: -1 }));
+  assert.ok("error" in _v205({ pipe_od_in: Infinity }));
+});
+
+test("bounds: spec-v206 medgas-demand pins connected x diversity + higher diversity drives more + rejects bad inputs", () => {
+  const a = _v206({ stations: 20, per_station_scfm: 1.0, diversity: 0.25 });
+  assert.ok(Math.abs(a.connected_scfm - 20) < 1e-9 && Math.abs(a.design_scfm - 5) < 1e-9);
+  // vacuum's higher simultaneous use drives a larger design flow per inlet.
+  const b = _v206({ stations: 30, per_station_scfm: 1.0, diversity: 0.50 });
+  assert.ok(Math.abs(b.connected_scfm - 30) < 1e-9 && Math.abs(b.design_scfm - 15) < 1e-9);
+  assert.ok("error" in _v206({ stations: 0, per_station_scfm: 1.0, diversity: 0.25 }));
+  assert.ok("error" in _v206({ stations: 20, per_station_scfm: 0, diversity: 0.25 }));
+  assert.ok("error" in _v206({ stations: 20, per_station_scfm: 1.0, diversity: 0 }));
+  assert.ok("error" in _v206({ stations: 20, per_station_scfm: 1.0, diversity: 1.5 }));
+  assert.ok("error" in _v206({ stations: Infinity, per_station_scfm: 1.0, diversity: 0.25 }));
 });
 
 // --- spec-v121..v128 electrical motors / feeders / fault / raceway / grounding / three-phase ---

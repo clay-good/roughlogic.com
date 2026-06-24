@@ -1,6 +1,6 @@
 # roughlogic.com Specification v205 -- Expansion Joint / Loop Guide Spacing (EJMA 4D/14D) (calc-pipefit.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v204..v206 (plumbing/pipefitting -- the deferred
+> **Status: LANDED 2026-06-24 (package 0.82.0; part of catalog 653 -> 656). Batch spec-v204..v206 (plumbing/pipefitting -- the deferred
 > process/specialized cluster: branch reinforcement, expansion guide spacing, medical gas demand).**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Adds one tile to
 > **`calc-pipefit.js`** (Group B); no new module, group, or dependency. Inherits spec.md through

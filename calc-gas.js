@@ -387,3 +387,50 @@ function renderGasFuelConversion(inputRegion, outputRegion, citationEl) {
   for (const el of [inp.input, hvFrom.input, hvTo.input, sgFrom.input, sgTo.input, pFrom.input, pTo.input]) el.addEventListener("input", update);
 }
 GAS_RENDERERS["gas-fuel-conversion"] = renderGasFuelConversion;
+
+// =====================================================================
+// spec-v206: medgas-demand (Group B) - Medical Gas System Demand and
+// Diversity (NFPA 99). Medical-gas piping is installed and certified by
+// brazing-qualified plumbers and pipefitters (ASSE 6010). The first sizing
+// step for an oxygen, medical-air, nitrous, or vacuum main is the demand:
+// connected flow = station count x per-station design flow, and the system
+// design flow = connected x a diversity (simultaneous-use) factor that
+// falls as the station count rises. The per-station flows and diversity
+// factors are read from the adopted NFPA 99 edition and the facility's
+// equipment list (user-supplied here); a medical-gas verifier and the AHJ
+// govern. This gives the design flow that feeds pipe sizing, not the
+// system design itself.
+// =====================================================================
+
+// dims: in { stations: dimensionless, per_station_scfm: L^3 T^-1, diversity: dimensionless } out: { connected_scfm: L^3 T^-1, design_scfm: L^3 T^-1 }
+export function computeMedgasDemand({ stations = 0, per_station_scfm = 0, diversity = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(stations), q = Number(per_station_scfm), d = Number(diversity);
+  if (!(n > 0)) return { error: "Station count must be positive." };
+  if (!(q > 0)) return { error: "Per-station flow must be positive (scfm)." };
+  if (!(d > 0 && d <= 1)) return { error: "Diversity factor must be in (0, 1]." };
+  const connected_scfm = n * q;
+  const design_scfm = connected_scfm * d;
+  return { connected_scfm, design_scfm };
+}
+export const medgasDemandExample = { inputs: { stations: 20, per_station_scfm: 1.0, diversity: 0.25 } };
+
+function renderMedgasDemand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Medical-gas demand - connected flow = stations x per-station design flow, system design flow = connected x diversity (simultaneous-use) factor, per NFPA 99 Health Care Facilities Code (medical gas and vacuum systems), with ASSE 6010 for the installer qualification, by name. The per-station design flows and diversity factors are read from the adopted NFPA 99 edition and the facility's equipment list (user-supplied here); a medical-gas verifier and the AHJ govern. This gives the design flow that feeds pipe sizing, not the system design itself - a demand aggregation, not a med-gas system stamp.";
+  const st = makeNumber("Stations (outlets / inlets)", "mg-st", { step: "1", min: "0" });
+  const q = makeNumber("Per-station design flow (scfm)", "mg-q", { step: "any", min: "0" });
+  const div = makeNumber("Diversity (simultaneous-use) factor, 0-1", "mg-div", { step: "any", min: "0", max: "1", value: "0.25" });
+  div.input.value = "0.25";
+  for (const f of [st, q, div]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { st.input.value = "20"; q.input.value = "1.0"; div.input.value = "0.25"; update(); });
+  const oConn = makeOutputLine(outputRegion, "Connected flow (all stations)", "mg-out-conn");
+  const oDesign = makeOutputLine(outputRegion, "System design flow (sized for)", "mg-out-design");
+  const update = debounce(() => {
+    const r = computeMedgasDemand({ stations: Number(st.input.value) || 0, per_station_scfm: Number(q.input.value) || 0, diversity: Number(div.input.value) || 0 });
+    if (r.error) { oConn.textContent = r.error; oDesign.textContent = "-"; return; }
+    oConn.textContent = fmt(r.connected_scfm, 2) + " scfm";
+    oDesign.textContent = fmt(r.design_scfm, 2) + " scfm";
+  }, DEBOUNCE_MS);
+  for (const f of [st.input, q.input, div.input]) f.addEventListener("input", update);
+}
+GAS_RENDERERS["medgas-demand"] = renderMedgasDemand;

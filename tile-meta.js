@@ -472,6 +472,10 @@ const _TILES = [
   ["branch-saddle-cutback", "B"],
   ["reducer-offset", "B"],
   ["flange-rating", "B"],
+  // spec-v204..v205 pipefit process-piping (calc-pipefit.js); spec-v206 med-gas (calc-gas.js)
+  ["branch-reinforcement", "B"],
+  ["expansion-guide-spacing", "B"],
+  ["medgas-demand", "B"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   ["buck-boost-sizing", "A"], ["wireway-fill", "A"], ["rooftop-temp-adder", "A"], ["working-space-110-26", "A"],
   ["range-demand-220-55", "A"], ["dryer-demand-220-54", "A"], ["neutral-demand-220-61", "A"],
