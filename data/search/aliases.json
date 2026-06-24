@@ -5666,6 +5666,13 @@
     { "term": "fall", "target": "drainage-invert", "kind": "industry" },
     { "term": "sewer slope", "target": "drainage-invert", "kind": "adjacent" },
     { "term": "pipe cover", "target": "drainage-invert", "kind": "industry" },
-    { "term": "trench depth", "target": "drainage-invert", "kind": "adjacent" }
+    { "term": "trench depth", "target": "drainage-invert", "kind": "adjacent" },
+    { "term": "feeder tap", "target": "feeder-tap-rule", "kind": "industry" },
+    { "term": "tap rule", "target": "feeder-tap-rule", "kind": "industry" },
+    { "term": "10 foot tap", "target": "feeder-tap-rule", "kind": "industry" },
+    { "term": "25 foot tap", "target": "feeder-tap-rule", "kind": "industry" },
+    { "term": "tap conductor", "target": "feeder-tap-rule", "kind": "industry" },
+    { "term": "240.21", "target": "feeder-tap-rule", "kind": "redirect" },
+    { "term": "tap conductor sizing", "target": "feeder-tap-rule", "kind": "adjacent" }
   ]
 }

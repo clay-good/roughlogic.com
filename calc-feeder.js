@@ -251,3 +251,88 @@ function _v26renderTransformerConductorProtection(inputRegion, outputRegion, cit
   for (const f of [ph.select, sp.select]) f.addEventListener("change", update);
 }
 FEEDER_RENDERERS["transformer-conductor-protection"] = _v26renderTransformerConductorProtection;
+
+// =====================================================================
+// spec-v164 - Group A: Electrical (1 tile)
+// Feeder tap conductor 10-ft / 25-ft rule (NEC 240.21(B)(1)/(B)(2)).
+// =====================================================================
+
+// dims: in { feeder_ocpd_a: I, tap_length_ft: L, tap_ampacity_a: I } out: { min_tap_ampacity_a: I, margin_a: I }
+export function computeFeederTapRule({ feeder_ocpd_a = 0, tap_length_ft = 0, tap_ampacity_a = 0 } = {}) {
+  const _g = _finiteGuard({ feeder_ocpd_a, tap_length_ft, tap_ampacity_a }); if (_g) return _g;
+  const ocpd = Number(feeder_ocpd_a) || 0;
+  const len = Number(tap_length_ft) || 0;
+  const amp = Number(tap_ampacity_a) || 0;
+  if (!(ocpd > 0)) return { error: "Feeder OCPD rating must be positive." };
+  if (!(len > 0)) return { error: "Tap length must be positive." };
+  if (!(amp > 0)) return { error: "Tap conductor ampacity must be positive." };
+
+  let rule, min_fraction, within;
+  if (len <= 10) { rule = "10-ft tap (240.21(B)(1))"; min_fraction = 0.10; within = true; }
+  else if (len <= 25) { rule = "25-ft tap (240.21(B)(2))"; min_fraction = 1 / 3; within = true; }
+  else { rule = "neither short-tap rule applies"; min_fraction = null; within = false; }
+
+  const notes = [];
+  if (within) {
+    notes.push("240.21(B) also requires: the tap conductor is protected from physical damage; for the 25-ft rule it terminates in a single OCPD rated no more than the tap ampacity; and the tap is rated at least the load it supplies.");
+  } else {
+    notes.push("The tap is longer than 25 ft, so neither short-tap rule (B)(1)/(B)(2) applies. Use 240.21(B)(3) (feeder tap, transformer), (B)(5) (outside taps), or protect the tap at its supply end.");
+  }
+  notes.push("Tap ampacity is the 75 C column value for the conductor. A computational aid for the <= 1000 V case; the AHJ-adopted NEC edition and the design engineer govern.");
+
+  if (!within) {
+    return {
+      rule, within_short_tap_rule: false, min_fraction: null,
+      min_tap_ampacity_a: null, tap_ampacity_a: amp, margin_a: null,
+      acceptable: false, notes,
+    };
+  }
+  const min_tap_ampacity_a = ocpd * min_fraction;
+  const margin_a = amp - min_tap_ampacity_a;
+  const acceptable = amp >= min_tap_ampacity_a;
+  return {
+    rule, within_short_tap_rule: true, min_fraction,
+    min_tap_ampacity_a, tap_ampacity_a: amp, margin_a, acceptable, notes,
+  };
+}
+
+export const feederTapRuleExample = {
+  inputs: { feeder_ocpd_a: 400, tap_length_ft: 22, tap_ampacity_a: 150 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v164renderFeederTapRule(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Minimum feeder tap conductor ampacity under the 10-ft and 25-ft tap rules of NEC 240.21(B)(1) and (B)(2), by name: the tap must carry at least 1/10 (10 ft) or 1/3 (25 ft) of the feeder overcurrent device rating. A computational aid for the <= 1000 V case; the AHJ-adopted NEC edition and the design engineer govern, and the other conditions of 240.21(B) apply. Free at nfpa.org/freeaccess.";
+  const ocpd = _v26makeNumber("Feeder OCPD rating (A)", "ftr-ocpd", { step: "any", min: "0" });
+  const len = _v26makeNumber("Tap length (ft)", "ftr-len", { step: "any", min: "0" });
+  const amp = _v26makeNumber("Proposed tap conductor ampacity (A, 75 C)", "ftr-amp", { step: "any", min: "0" });
+  for (const f of [ocpd, len, amp]) inputRegion.appendChild(f.wrap);
+  _v26attachEx(inputRegion, () => { ocpd.input.value = "400"; len.input.value = "22"; amp.input.value = "150"; update(); });
+
+  const oRule = _v26makeOut(outputRegion, "Applicable rule", "ftr-out-rule");
+  const oMin = _v26makeOut(outputRegion, "Minimum tap ampacity (A)", "ftr-out-min");
+  const oVerdict = _v26makeOut(outputRegion, "Verdict", "ftr-out-verdict");
+  const oNote = _v26makeOut(outputRegion, "Notes", "ftr-out-note");
+
+  const update = _v26debounce(() => {
+    const r = computeFeederTapRule({
+      feeder_ocpd_a: Number(ocpd.input.value) || 0,
+      tap_length_ft: Number(len.input.value) || 0,
+      tap_ampacity_a: Number(amp.input.value) || 0,
+    });
+    if (r.error) { oRule.textContent = r.error; oMin.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
+    oRule.textContent = r.rule;
+    if (!r.within_short_tap_rule) {
+      oMin.textContent = "(no short-tap minimum applies)";
+      oVerdict.textContent = "Outside the 10-ft and 25-ft rules - re-route, shorten, or protect the tap.";
+    } else {
+      oMin.textContent = _v26fmt(r.min_tap_ampacity_a, 1) + " A (feeder OCPD x " + (r.min_fraction === 0.1 ? "1/10" : "1/3") + ")";
+      oVerdict.textContent = r.acceptable
+        ? "Acceptable: tap " + _v26fmt(r.tap_ampacity_a, 0) + " A clears the " + _v26fmt(r.min_tap_ampacity_a, 1) + " A minimum (margin " + _v26fmt(r.margin_a, 1) + " A)."
+        : "Undersized: tap " + _v26fmt(r.tap_ampacity_a, 0) + " A is below the " + _v26fmt(r.min_tap_ampacity_a, 1) + " A minimum (short " + _v26fmt(-r.margin_a, 1) + " A).";
+    }
+    oNote.textContent = r.notes.join(" ");
+  }, _V26_DEB);
+  for (const f of [ocpd.input, len.input, amp.input]) f.addEventListener("input", update);
+}
+FEEDER_RENDERERS["feeder-tap-rule"] = _v164renderFeederTapRule;

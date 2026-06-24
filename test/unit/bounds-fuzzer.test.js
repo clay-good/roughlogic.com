@@ -9127,6 +9127,7 @@ test("bounds: spec-v24/v25 conduit, civil, audio, and surveying tiles pin consta
 // ---------------------------------------------------------------------------
 import {
   computeMotorFeederMultiple as _cv26a1, computeTransformerConductorProtection as _cv26a2,
+  computeFeederTapRule as _cv164a1,
 } from "../../calc-feeder.js";
 import {
   computeMixedWaterTemp as _cv26b1, computePressureTankDrawdown as _cv26b2, computePipeVelocity as _cv26b3,
@@ -9675,6 +9676,36 @@ test("bounds: calc v69 coatings, blast, and abatement pin coverage, nozzle air/a
   assert.strictEqual(_v69c({ room_len_ft: 40, room_wid_ft: 30, room_ht_ft: 12, ach_target: 6, nam_cfm: 1000, debris_cy: 0 }).nam_count, 2); // two machines
   assert.ok("error" in _v69c({ room_len_ft: 0, room_wid_ft: 15, room_ht_ft: 9 }));
   assert.ok("error" in _v69c({ room_len_ft: 20, room_wid_ft: 15, room_ht_ft: 9, ach_target: 0 }));
+});
+
+test("bounds: spec-v164 feeder-tap-rule pins both short-tap branches, the out-of-rule branch, and the error seams", () => {
+  // 25-ft rule: 400 A feeder, 22 ft tap -> min 133.3 A; a 150 A tap clears it (margin 16.7)
+  const ex = _cv164a1({ feeder_ocpd_a: 400, tap_length_ft: 22, tap_ampacity_a: 150 });
+  assert.ok(Math.abs(ex.min_tap_ampacity_a - 133.3333) < 1e-2);
+  assert.ok(Math.abs(ex.margin_a - 16.6667) < 1e-2);
+  assert.strictEqual(ex.within_short_tap_rule, true);
+  assert.strictEqual(ex.acceptable, true);
+  // 10-ft rule cross-check: 400 A feeder, 9 ft tap -> min 40 A; a 50 A tap clears it (margin 10)
+  const cc = _cv164a1({ feeder_ocpd_a: 400, tap_length_ft: 9, tap_ampacity_a: 50 });
+  assert.ok(Math.abs(cc.min_tap_ampacity_a - 40) < 1e-9);
+  assert.strictEqual(cc.acceptable, true);
+  // boundary: exactly 25 ft is still the 25-ft rule; exactly 10 ft is the 10-ft rule
+  assert.ok(Math.abs(_cv164a1({ feeder_ocpd_a: 300, tap_length_ft: 25, tap_ampacity_a: 100 }).min_tap_ampacity_a - 100) < 1e-9);
+  assert.ok(Math.abs(_cv164a1({ feeder_ocpd_a: 300, tap_length_ft: 10, tap_ampacity_a: 100 }).min_tap_ampacity_a - 30) < 1e-9);
+  // undersized: 400 A feeder, 22 ft, only 100 A tap -> not acceptable, negative margin
+  const us = _cv164a1({ feeder_ocpd_a: 400, tap_length_ft: 22, tap_ampacity_a: 100 });
+  assert.strictEqual(us.acceptable, false);
+  assert.ok(us.margin_a < 0);
+  // >25 ft: neither short-tap rule applies; no numeric minimum, never NaN
+  const out = _cv164a1({ feeder_ocpd_a: 400, tap_length_ft: 35, tap_ampacity_a: 150 });
+  assert.strictEqual(out.within_short_tap_rule, false);
+  assert.strictEqual(out.min_tap_ampacity_a, null);
+  assert.strictEqual(out.acceptable, false);
+  // error seams: non-finite, non-positive OCPD, non-positive length, non-positive ampacity
+  assert.ok("error" in _cv164a1({ feeder_ocpd_a: Infinity, tap_length_ft: 22, tap_ampacity_a: 150 }));
+  assert.ok("error" in _cv164a1({ feeder_ocpd_a: 0, tap_length_ft: 22, tap_ampacity_a: 150 }));
+  assert.ok("error" in _cv164a1({ feeder_ocpd_a: 400, tap_length_ft: 0, tap_ampacity_a: 150 }));
+  assert.ok("error" in _cv164a1({ feeder_ocpd_a: 400, tap_length_ft: 22, tap_ampacity_a: 0 }));
 });
 
 test("bounds: spec-v26 motor feeder, transformer, plumbing, and pipefitter tiles pin constants + reject non-finite", () => {

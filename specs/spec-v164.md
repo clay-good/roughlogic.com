@@ -1,6 +1,6 @@
 # roughlogic.com Specification v164 -- Feeder Tap Conductor Rule (10-ft and 25-ft) (NEC 240.21(B)) (calc-feeder.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-23 (package 0.78.0; catalog 627 -> 628). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: a fifteen-tile electrician batch closing NEC- and
 > standards-anchored gaps confirmed absent from the 92-tile electrical catalog. This spec adds one tile
 > sizing a feeder *tap* conductor against the 10-foot and 25-foot rules of NEC 240.21(B), AHJ governed,

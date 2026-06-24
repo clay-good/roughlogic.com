@@ -5295,6 +5295,17 @@ export const CITATIONS = {
       { name: "Protection method", value: "primary-only vs primary-and-secondary changes the permitted percentage; a labeled toggle, never silently mixed", source: "NEC 450.3(B)" },
     ],
   },
+  "feeder-tap-rule": {
+    formula: "min_tap_ampacity = feeder_OCPD x 1/10 (tap <= 10 ft, 240.21(B)(1)) or x 1/3 (tap <= 25 ft, 240.21(B)(2)); a tap longer than 25 ft falls under neither short-tap rule. The proposed tap conductor's 75 C ampacity must equal or exceed that minimum.",
+    edition: "Minimum feeder tap conductor ampacity under the 10-ft and 25-ft tap rules of NEC 2023 240.21(B)(1) and (B)(2), by name. A computational aid for the <= 1000 V case; the AHJ-adopted NEC edition and the design engineer govern.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The supplemental 240.21(B) conditions (physical protection, single-OCPD termination for the 25-ft rule, the rating of the supplied device) are stated, not modeled.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Rule fractions", value: "1/10 for the 10-ft tap, 1/3 for the 25-ft tap; the 10 ft and 25 ft boundaries are the exact code lengths", source: "NEC 240.21(B)(1) and (B)(2)" },
+      { name: "Tap ampacity basis", value: "the 75 C termination column ampacity of the proposed tap conductor", source: "NEC 110.14(C) / 310.16" },
+    ],
+  },
   "mixed-water-temp": {
     formula: "T_blend = (Qh*Th + Qc*Tc)/(Qh+Qc); inverse hot fraction = (T_target - Tc)/(Th - Tc); hot:cold ratio = (T_target - Tc)/(Th - T_target).",
     edition: "First-principles mixing energy balance for blending hot and cold potable water; the delivery-temperature limits follow the ASSE 1017 (master tempering) and ASSE 1016/1070 (point-of-use scald-guard) device standards and the IPC/UPC scald provisions, by name.",

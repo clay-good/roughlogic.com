@@ -23335,6 +23335,34 @@
         "motor_hp": { "value": 1.2375, "tolerance": { "abs": 0.01 } },
         "spindle_torque_lbft": { "value": 6.4993, "tolerance": { "abs": 0.05 } }
       }
+    },
+    {
+      "tile_id": "feeder-tap-rule",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "240.21(B)(2) 25-ft feeder tap: tap ampacity must be at least 1/3 of the feeder OCPD",
+      "source_edition_or_year": "NEC 2023 Section 240.21(B)",
+      "source_section_or_page": "400 A feeder, 22 ft tap -> 25-ft rule, min = 400/3 = 133.3 A; a 150 A (1/0 Cu) tap clears it, margin 16.7 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "feeder_ocpd_a": 400, "tap_length_ft": 22, "tap_ampacity_a": 150 },
+      "outputs": {
+        "min_tap_ampacity_a": { "value": 133.333, "tolerance": { "abs": 0.01 } },
+        "margin_a": { "value": 16.667, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "feeder-tap-rule",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: 240.21(B)(1) 10-ft feeder tap requires at least 1/10 of the feeder OCPD",
+      "source_edition_or_year": "NEC 2023 Section 240.21(B)",
+      "source_section_or_page": "400 A feeder, 9 ft tap -> 10-ft rule, min = 400 x 0.10 = 40 A; a 50 A tap clears it, margin 10 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-23",
+      "inputs": { "feeder_ocpd_a": 400, "tap_length_ft": 9, "tap_ampacity_a": 50 },
+      "outputs": {
+        "min_tap_ampacity_a": { "value": 40.0, "tolerance": { "abs": 0.01 } },
+        "margin_a": { "value": 10.0, "tolerance": { "abs": 0.01 } }
+      }
     }
   ]
 }

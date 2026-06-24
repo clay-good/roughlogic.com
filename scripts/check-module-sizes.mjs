@@ -129,7 +129,7 @@ const CAPS = {
   // overcurrent bench (motor-feeder-multiple, transformer-conductor-protection)
   // split out of calc-electrical.js. ~4.5 KB; cap 6000 (current + headroom).
   // Lazy-loaded, so not in the home-view first-paint payload.
-  "calc-feeder.js": 6000,
+  "calc-feeder.js": 7000, // v164 2026-06-23 (6000->7000): +feeder-tap-rule took the built copy to 5721 B (95.3%, WARN); +~17% locks in headroom for the v164..v178 electrician batch. Lazy-loaded, absent from the home payload.
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.

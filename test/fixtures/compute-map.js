@@ -495,6 +495,7 @@ export const COMPUTE_MAP = {
   // spec-v26 electrician feeder/transformer, plumber blend/tank/velocity, pipefitter's bench.
   "motor-feeder-multiple": { module: "../../calc-feeder.js", fn: "computeMotorFeederMultiple" },
   "transformer-conductor-protection": { module: "../../calc-feeder.js", fn: "computeTransformerConductorProtection" },
+  "feeder-tap-rule": { module: "../../calc-feeder.js", fn: "computeFeederTapRule" },
   "mixed-water-temp": { module: "../../calc-plumbing.js", fn: "computeMixedWaterTemp" },
   "pressure-tank-drawdown": { module: "../../calc-plumbing.js", fn: "computePressureTankDrawdown" },
   "pipe-velocity": { module: "../../calc-plumbing.js", fn: "computePipeVelocity" },

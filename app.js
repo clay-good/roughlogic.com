@@ -81,6 +81,7 @@ const TOOL_MODULES = (() => {
   // its module, the v28/v36/v39/v70/v71 precedent).
   declare("./calc-feeder.js", "FEEDER_RENDERERS", [
     "motor-feeder-multiple", "transformer-conductor-protection",
+    "feeder-tap-rule",
   ]);
   // spec-v28 low-voltage / data / security cabling (own module; registered
   // under Group A pending the Group-Z maintainer signoff, per the spec's

@@ -100,6 +100,7 @@ const RELATED = {
   "conduit-fill": ["box-fill", "wire-ampacity", "cable-bend-radius"],
   "breaker-sizing": ["wire-ampacity", "motor-fla", "service-load"],
   "motor-fla": ["wire-ampacity", "breaker-sizing", "three-phase", "voltage-imbalance"],
+  "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
 
   // Group B: Plumbing core loop. The hydraulics ladder runs
   // pipe-sizing -> friction-loss -> pump-sizing -> npsh-a; the spec.md

@@ -307,7 +307,7 @@ const _TILES = [
   ["depreciation-recapture", "X"], ["rent-roll-vacancy", "X"],
 
   // v26 electrician / plumber / pipefitter (Groups A, B, G)
-  ["motor-feeder-multiple", "A"], ["transformer-conductor-protection", "A"],
+  ["motor-feeder-multiple", "A"], ["transformer-conductor-protection", "A"], ["feeder-tap-rule", "A"],
   ["mixed-water-temp", "B"], ["pressure-tank-drawdown", "B"], ["pipe-velocity", "B"],
   ["wsfu-demand", "B"], ["supply-pressure-budget", "B"],
   ["roof-drain-sizing", "B"], ["sump-basin-sizing", "B"],
