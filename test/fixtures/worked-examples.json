@@ -22906,6 +22906,155 @@
       }
     },
     {
+      "tile_id": "radiant-loop-sizing",
+      "source_publisher": "First-principles; ASHRAE HVAC Systems and Equipment / Radiant Panel Association (by name)",
+      "source_title": "300 ft^2 at 6 in o.c., 9,000 Btu/hr, 1/2 in PEX (300 ft), 20 F dT -> 600 ft, 2 loops, 0.45 GPM/loop",
+      "source_edition_or_year": "spec-v199 worked example (machine-verified, footage/loop/flow)",
+      "source_section_or_page": "spec-v199 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "floor_area_ft2": 300, "spacing_in": 6, "load_btuhr": 9000, "max_loop_ft": 300, "design_dt": 20 },
+      "outputs": {
+        "tube_ft": { "value": 600, "tolerance": { "abs": 0.5 } },
+        "loops": { "value": 2, "tolerance": { "abs": 0 } },
+        "total_gpm": { "value": 0.9, "tolerance": { "abs": 0.01 } },
+        "per_loop_gpm": { "value": 0.45, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "radiant-loop-sizing",
+      "source_publisher": "First-principles; ASHRAE HVAC Systems and Equipment / Radiant Panel Association (by name)",
+      "source_title": "Same room at 12 in o.c. -> 300 ft, one loop, the full 0.90 GPM",
+      "source_edition_or_year": "spec-v199 worked example (machine-verified, footage/loop/flow)",
+      "source_section_or_page": "spec-v199 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "floor_area_ft2": 300, "spacing_in": 12, "load_btuhr": 9000, "max_loop_ft": 300, "design_dt": 20 },
+      "outputs": {
+        "tube_ft": { "value": 300, "tolerance": { "abs": 0.5 } },
+        "loops": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "condensate-return-sizing",
+      "source_publisher": "Continuity; ASHRAE / Spirax Sarco return practice (by name)",
+      "source_title": "800 lb/hr at 13% flash to a 0 psig return (26.8 ft3/lb), 4,000 ft/min -> 1-1/2 in return",
+      "source_edition_or_year": "spec-v200 worked example (machine-verified, flash continuity)",
+      "source_section_or_page": "spec-v200 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "condensate_lbhr": 800, "flash_fraction": 0.13, "spec_vol_ft3lb": 26.8, "vel_ceiling_fpm": 4000 },
+      "outputs": {
+        "flash_lbhr": { "value": 104, "tolerance": { "abs": 0.5 } },
+        "req_area_in2": { "value": 1.67, "tolerance": { "abs": 0.05 } },
+        "chosen_nps": { "value": "1-1/2", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "condensate-return-sizing",
+      "source_publisher": "Continuity; ASHRAE / Spirax Sarco return practice (by name)",
+      "source_title": "Same load but a cooler 7% flash -> 1-1/4 in; the flash, not the gallons, sets the size",
+      "source_edition_or_year": "spec-v200 worked example (machine-verified, flash continuity)",
+      "source_section_or_page": "spec-v200 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "condensate_lbhr": 800, "flash_fraction": 0.07, "spec_vol_ft3lb": 26.8, "vel_ceiling_fpm": 4000 },
+      "outputs": {
+        "chosen_nps": { "value": "1-1/4", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "branch-saddle-cutback",
+      "source_publisher": "Cylinder-intersection geometry; Pipe Fabrication Institute layout (by name)",
+      "source_title": "2 in branch (OD 2.375) on a 6 in run (OD 6.625), 90 deg -> 0.22 in max cutback",
+      "source_edition_or_year": "spec-v201 worked example (machine-verified, geometry)",
+      "source_section_or_page": "spec-v201 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "branch_od_in": 2.375, "run_od_in": 6.625, "stations": 6 },
+      "outputs": {
+        "max_cutback_in": { "value": 0.22, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "branch-saddle-cutback",
+      "source_publisher": "Cylinder-intersection geometry; Pipe Fabrication Institute layout (by name)",
+      "source_title": "Same 2 in branch on a 12 in run -> 0.11 in; a larger run is flatter, the saddle shallower",
+      "source_edition_or_year": "spec-v201 worked example (machine-verified, geometry)",
+      "source_section_or_page": "spec-v201 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "branch_od_in": 2.375, "run_od_in": 12.625, "stations": 6 },
+      "outputs": {
+        "max_cutback_in": { "value": 0.11, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "reducer-offset",
+      "source_publisher": "Geometry; ASME B16.9 lay lengths (by name)",
+      "source_title": "6 x 4 reducer (OD 6.625 -> 4.5) -> 1.0625 in centerline offset; flat-on-bottom holds the invert",
+      "source_edition_or_year": "spec-v202 worked example (machine-verified, geometry)",
+      "source_section_or_page": "spec-v202 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "large_od_in": 6.625, "small_od_in": 4.5, "lay_length_in": 7, "type": "eccentric-flat-bottom" },
+      "outputs": {
+        "centerline_offset_in": { "value": 1.0625, "tolerance": { "abs": 0.0005 } }
+      }
+    },
+    {
+      "tile_id": "reducer-offset",
+      "source_publisher": "Geometry; ASME B16.9 lay lengths (by name)",
+      "source_title": "4 x 3 reducer (OD 4.5 -> 3.5) -> 0.50 in offset; the offset is always half the OD difference",
+      "source_edition_or_year": "spec-v202 worked example (machine-verified, geometry)",
+      "source_section_or_page": "spec-v202 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "large_od_in": 4.5, "small_od_in": 3.5, "lay_length_in": 5, "type": "concentric" },
+      "outputs": {
+        "centerline_offset_in": { "value": 0.5, "tolerance": { "abs": 0.0005 } }
+      }
+    },
+    {
+      "tile_id": "flange-rating",
+      "source_publisher": "ASME B16.5 pressure-temperature ratings, Group 1.1 (by name)",
+      "source_title": "Class 150 A105 flange at 400 F -> 200 psig (285 psig cold)",
+      "source_edition_or_year": "spec-v203 worked example (machine-verified, table lookup)",
+      "source_section_or_page": "spec-v203 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "flange_class": 150, "temp_f": 400 },
+      "outputs": {
+        "mawp_psig": { "value": 200, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "flange-rating",
+      "source_publisher": "ASME B16.5 pressure-temperature ratings, Group 1.1 (by name)",
+      "source_title": "Class 300 A105 flange at 400 F -> 635 psig; Class 150 at 350 F interpolates to 215 psig",
+      "source_edition_or_year": "spec-v203 worked example (machine-verified, table lookup + interpolation)",
+      "source_section_or_page": "spec-v203 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "flange_class": 300, "temp_f": 400 },
+      "outputs": {
+        "mawp_psig": { "value": 635, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "flange-rating",
+      "source_publisher": "ASME B16.5 pressure-temperature ratings, Group 1.1 (by name)",
+      "source_title": "Class 150 at 350 F interpolates linearly between 230 (300 F) and 200 (400 F) -> 215 psig",
+      "source_edition_or_year": "spec-v203 worked example (machine-verified, interpolation)",
+      "source_section_or_page": "spec-v203 section 2.1 interpolated point",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "flange_class": 150, "temp_f": 350 },
+      "outputs": {
+        "mawp_psig": { "value": 215, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
       "tile_id": "motor-synchronous-speed-slip",
       "source_publisher": "First-principles AC-machine theory",
       "source_title": "60 Hz 4-pole motor, nameplate 1750 rpm -> 1800 rpm sync, 2.78% slip, 1.67 Hz rotor",

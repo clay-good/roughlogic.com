@@ -108,6 +108,9 @@ const TOOL_MODULES = (() => {
     // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench.
     "flash-steam-pct", "steam-pipe-velocity", "steam-trap-sizing",
     "pipe-pressure-rating", "pipe-filled-support-load", "hanger-rod-sizing",
+    // spec-v200..v203 condensate return + fabrication/process layout tiles.
+    "condensate-return-sizing", "branch-saddle-cutback", "reducer-offset",
+    "flange-rating",
   ]);
   // spec-v30 metal / air / refrigerant bench (deepens Groups E, C per the
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are
@@ -145,6 +148,8 @@ const TOOL_MODULES = (() => {
     "water-heater-storage-sizing",
     // spec-v163 drainage invert-out, fall, and cover for a gravity run.
     "drainage-invert",
+    // spec-v199 hydronic radiant floor loop sizing.
+    "radiant-loop-sizing",
   ]);
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-

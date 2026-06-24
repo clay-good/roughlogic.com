@@ -1,6 +1,6 @@
 # roughlogic.com Specification v202 -- Reducer Centerline Offset and Invert Continuity (calc-pipefit.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v199..v203 (plumbing/pipefitting -- hydronic radiant,
+> **Status: LANDED 2026-06-24 (package 0.81.0; part of catalog 648 -> 653). Batch spec-v199..v203 (plumbing/pipefitting -- hydronic radiant,
 > condensate return, and three fabrication/process layout tiles).** In-scope catalog expansion under the
 > spec-v106 trades-only charter: the reducer-layout tile that decides whether the invert or the centerline
 > stays continuous through a size change. Adds one tile to **`calc-pipefit.js`** (Group B); no new module,

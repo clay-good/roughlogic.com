@@ -466,6 +466,12 @@ const _TILES = [
   ["pipe-pressure-rating", "B"],
   ["pipe-filled-support-load", "B"],
   ["hanger-rod-sizing", "B"],
+  // spec-v199 radiant (calc-plumbing.js); spec-v200..v203 pipefit (calc-pipefit.js)
+  ["radiant-loop-sizing", "B"],
+  ["condensate-return-sizing", "B"],
+  ["branch-saddle-cutback", "B"],
+  ["reducer-offset", "B"],
+  ["flange-rating", "B"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   ["buck-boost-sizing", "A"], ["wireway-fill", "A"], ["rooftop-temp-adder", "A"], ["working-space-110-26", "A"],
   ["range-demand-220-55", "A"], ["dryer-demand-220-54", "A"], ["neutral-demand-220-61", "A"],

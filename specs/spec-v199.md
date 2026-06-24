@@ -1,6 +1,6 @@
 # roughlogic.com Specification v199 -- Hydronic Radiant Floor Loop Sizing (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v199..v203 (plumbing/pipefitting -- hydronic radiant,
+> **Status: LANDED 2026-06-24 (package 0.81.0; part of catalog 648 -> 653). Batch spec-v199..v203 (plumbing/pipefitting -- hydronic radiant,
 > condensate return, and three fabrication/process layout tiles).** In-scope catalog expansion under the
 > spec-v106 trades-only charter: the radiant side of hydronic, which the catalog does not touch. Adds one
 > tile to **`calc-plumbing.js`** (Group B); no new module, group, or dependency. Inherits spec.md through

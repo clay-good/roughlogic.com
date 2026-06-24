@@ -10747,6 +10747,87 @@ test("bounds: spec-v162 hanger-rod-sizing pins the rod pick + steps up with load
   assert.ok("error" in _v162({ load_lb: Infinity, temp_derate: 1 }));
 });
 
+// --- spec-v199 radiant (calc-plumbing.js); spec-v200..v203 pipefit (calc-pipefit.js) ---
+import { computeRadiantLoopSizing as _v199r } from "../../calc-plumbing.js";
+import {
+  computeCondensateReturnSizing as _v200, computeBranchSaddleCutback as _v201,
+  computeReducerOffset as _v202, computeFlangeRating as _v203,
+} from "../../calc-pipefit.js";
+
+test("bounds: spec-v199 radiant-loop-sizing pins footage/loops/flow + wider spacing drops to one loop + rejects bad inputs", () => {
+  const a = _v199r({ floor_area_ft2: 300, spacing_in: 6, load_btuhr: 9000, max_loop_ft: 300, design_dt: 20 });
+  assert.ok(Math.abs(a.tube_ft - 600) < 0.5);
+  assert.equal(a.loops, 2);
+  assert.ok(Math.abs(a.total_gpm - 0.9) < 0.01 && Math.abs(a.per_loop_gpm - 0.45) < 0.01);
+  // wider spacing -> fewer feet -> a single loop carrying the full flow.
+  const b = _v199r({ floor_area_ft2: 300, spacing_in: 12, load_btuhr: 9000, max_loop_ft: 300, design_dt: 20 });
+  assert.ok(Math.abs(b.tube_ft - 300) < 0.5 && b.loops === 1);
+  assert.ok("error" in _v199r({ floor_area_ft2: 0, spacing_in: 6, load_btuhr: 9000 }));
+  assert.ok("error" in _v199r({ floor_area_ft2: 300, spacing_in: 0, load_btuhr: 9000 }));
+  assert.ok("error" in _v199r({ floor_area_ft2: 300, spacing_in: 6, load_btuhr: 0 }));
+  assert.ok("error" in _v199r({ floor_area_ft2: 300, spacing_in: 6, load_btuhr: 9000, max_loop_ft: 0 }));
+  assert.ok("error" in _v199r({ floor_area_ft2: 300, spacing_in: 6, load_btuhr: 9000, design_dt: 0 }));
+  assert.ok("error" in _v199r({ floor_area_ft2: Infinity, spacing_in: 6, load_btuhr: 9000 }));
+});
+
+test("bounds: spec-v200 condensate-return-sizing pins the flash + size + flash (not gallons) drives it + rejects bad inputs", () => {
+  const a = _v200({ condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 });
+  assert.ok(Math.abs(a.flash_lbhr - 104) < 0.5);
+  assert.ok(Math.abs(a.req_area_in2 - 1.67) < 0.05);
+  assert.equal(a.chosen_nps, "1-1/2");
+  // less flash -> smaller return; the flash fraction, not the load, sets the size.
+  assert.equal(_v200({ condensate_lbhr: 800, flash_fraction: 0.07, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 }).chosen_nps, "1-1/4");
+  assert.ok("error" in _v200({ condensate_lbhr: 0, flash_fraction: 0.13, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 }));
+  assert.ok("error" in _v200({ condensate_lbhr: 800, flash_fraction: 1, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 }));
+  assert.ok("error" in _v200({ condensate_lbhr: 800, flash_fraction: -0.1, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 }));
+  assert.ok("error" in _v200({ condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 0, vel_ceiling_fpm: 4000 }));
+  assert.ok("error" in _v200({ condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 0 }));
+  assert.ok("error" in _v200({ condensate_lbhr: Infinity, flash_fraction: 0.13, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 }));
+});
+
+test("bounds: spec-v201 branch-saddle-cutback pins the max cutback + flatter on a bigger run + rejects bad inputs", () => {
+  const a = _v201({ branch_od_in: 2.375, run_od_in: 6.625, stations: 6 });
+  assert.ok(Math.abs(a.max_cutback_in - 0.22) < 0.005);
+  assert.ok(Math.abs(a.ordinates[0].cutback_in) < 1e-9); // heel/toe (theta 0) is zero
+  // a larger run is a flatter surface, so the saddle is shallower.
+  assert.ok(_v201({ branch_od_in: 2.375, run_od_in: 12.625, stations: 6 }).max_cutback_in < a.max_cutback_in);
+  assert.ok(Math.abs(_v201({ branch_od_in: 2.375, run_od_in: 12.625, stations: 6 }).max_cutback_in - 0.11) < 0.005);
+  assert.ok("error" in _v201({ branch_od_in: 0, run_od_in: 6.625 }));
+  assert.ok("error" in _v201({ branch_od_in: 2.375, run_od_in: 0 }));
+  assert.ok("error" in _v201({ branch_od_in: 8, run_od_in: 6.625 })); // branch OD > run OD
+  assert.ok("error" in _v201({ branch_od_in: Infinity, run_od_in: 6.625 }));
+});
+
+test("bounds: spec-v202 reducer-offset pins the offset + all three type branches + rejects bad inputs", () => {
+  const a = _v202({ large_od_in: 6.625, small_od_in: 4.5, lay_length_in: 7, type: "eccentric-flat-bottom" });
+  assert.ok(Math.abs(a.centerline_offset_in - 1.0625) < 0.0005);
+  assert.equal(a.continuous_surface, "invert (bottom)");
+  assert.ok(Math.abs(a.bop_shift_in) < 1e-9); // invert continuous
+  assert.equal(_v202({ large_od_in: 6.625, small_od_in: 4.5, type: "concentric" }).continuous_surface, "centerline");
+  assert.equal(_v202({ large_od_in: 6.625, small_od_in: 4.5, type: "eccentric-flat-top" }).continuous_surface, "crown (top)");
+  assert.ok(Math.abs(_v202({ large_od_in: 4.5, small_od_in: 3.5, type: "concentric" }).centerline_offset_in - 0.5) < 0.0005);
+  assert.ok("error" in _v202({ large_od_in: 0, small_od_in: 4.5 }));
+  assert.ok("error" in _v202({ large_od_in: 6.625, small_od_in: 0 }));
+  assert.ok("error" in _v202({ large_od_in: 4.5, small_od_in: 4.5 })); // small >= large
+  assert.ok("error" in _v202({ large_od_in: 4.5, small_od_in: 6.625 }));
+  assert.ok("error" in _v202({ large_od_in: 6.625, small_od_in: 4.5, type: "bogus" }));
+  assert.ok("error" in _v202({ large_od_in: Infinity, small_od_in: 4.5 }));
+});
+
+test("bounds: spec-v203 flange-rating pins the table + interpolation + higher class higher curve + rejects bad inputs", () => {
+  assert.ok(Math.abs(_v203({ flange_class: 150, temp_f: 400 }).mawp_psig - 200) < 0.5);
+  assert.ok(Math.abs(_v203({ flange_class: 150, temp_f: 100 }).mawp_psig - 285) < 0.5); // cold
+  assert.ok(Math.abs(_v203({ flange_class: 300, temp_f: 400 }).mawp_psig - 635) < 0.5);
+  // a value between table temperatures interpolates linearly.
+  assert.ok(Math.abs(_v203({ flange_class: 150, temp_f: 350 }).mawp_psig - 215) < 0.5);
+  // 900 scales from the 600 column by the class ratio (1480 x 1.5 cold).
+  assert.ok(Math.abs(_v203({ flange_class: 900, temp_f: 100 }).mawp_psig - 2220) < 1);
+  assert.ok("error" in _v203({ flange_class: 250, temp_f: 400 })); // unlisted class
+  assert.ok("error" in _v203({ flange_class: 150, temp_f: 800 })); // out of table range
+  assert.ok("error" in _v203({ flange_class: 150, temp_f: 50 }));
+  assert.ok("error" in _v203({ flange_class: 150, temp_f: Infinity }));
+});
+
 // --- spec-v121..v128 electrical motors / feeders / fault / raceway / grounding / three-phase ---
 
 test("bounds: calc-motor computeMotorSyncSlip pins Ns = 120 f / P, slip, and rotor frequency + rejects bad poles/freq", () => {

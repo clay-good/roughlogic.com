@@ -3606,6 +3606,60 @@ export function renderDrainageInvert(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["drainage-invert"] = renderDrainageInvert;
 
+// ---------------------------------------------------------------------
+// v199 Hydronic radiant floor loop sizing (radiant-loop-sizing)
+// ---------------------------------------------------------------------
+// Tube footage from the area and on-center spacing, the loop count against
+// the per-loop length limit (so no loop exceeds the head the manifold can
+// push), and the design flow per loop from the room load: a four-line calc
+// on every radiant job, between the boiler and the expansion tank.
+// dims: in { floor_area_ft2: L^2, spacing_in: L, load_btuhr: M L^2 T^-3, max_loop_ft: L, design_dt: T } out: { tube_ft: L, loops: dimensionless, per_loop_ft: L, total_gpm: L^3 T^-1, per_loop_gpm: L^3 T^-1 }
+export function computeRadiantLoopSizing({ floor_area_ft2 = 0, spacing_in = 0, load_btuhr = 0, max_loop_ft = 300, design_dt = 20 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(floor_area_ft2);
+  const spacing = Number(spacing_in);
+  const load = Number(load_btuhr);
+  const maxLoop = Number(max_loop_ft);
+  const dt = Number(design_dt);
+  if (!(area > 0)) return { error: "Floor area must be positive (ft^2)." };
+  if (!(spacing > 0)) return { error: "Tube spacing must be positive (in)." };
+  if (!(load > 0)) return { error: "Design heat load must be positive (Btu/hr)." };
+  if (!(maxLoop > 0)) return { error: "Maximum loop length must be positive (ft)." };
+  if (!(dt > 0)) return { error: "Design delta-T must be positive (F)." };
+  const tube_ft = (area * 12) / spacing;
+  const loops = Math.ceil(tube_ft / maxLoop);
+  const per_loop_ft = tube_ft / loops;
+  const total_gpm = load / (500 * dt);
+  const per_loop_gpm = total_gpm / loops;
+  return { tube_ft, loops, per_loop_ft, total_gpm, per_loop_gpm };
+}
+export const radiantLoopSizingExample = { inputs: { floor_area_ft2: 300, spacing_in: 6, load_btuhr: 9000, max_loop_ft: 300, design_dt: 20 } };
+
+function renderRadiantLoopSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Radiant floor loop sizing - tube footage = area x 12 / spacing; loops = ceil(footage / max loop length); flow GPM = Q / (500 x delta-T), split across the loops - first-principles, with the radiant-panel practice per ASHRAE HVAC Systems and Equipment (radiant panel chapter) and the Radiant Panel Association, by name. The manufacturer's tubing tables and the room-by-room heat loss govern the final layout; this sizes footage, loops, and flow from a uniform load, not the panel surface-temperature or downward-loss design.";
+  const area = makeNumber("Heated floor area (ft^2)", "rl-area", { step: "any", min: "0" });
+  const spacing = makeNumber("Tube on-center spacing (in)", "rl-sp", { step: "any", min: "0", value: "9" });
+  const load = makeNumber("Design heat load (Btu/hr)", "rl-load", { step: "any", min: "0" });
+  const maxLoop = makeNumber("Max loop length (ft)", "rl-ml", { step: "any", min: "0", value: "300" });
+  maxLoop.input.value = "300";
+  const dt = makeNumber("Supply-to-return delta-T (F)", "rl-dt", { step: "any", min: "0", value: "20" });
+  dt.input.value = "20";
+  for (const f of [area, spacing, load, maxLoop, dt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "300"; spacing.input.value = "6"; load.input.value = "9000"; maxLoop.input.value = "300"; dt.input.value = "20"; update(); });
+  const oTube = makeOutputLine(outputRegion, "Total tube footage", "rl-out-tube");
+  const oLoops = makeOutputLine(outputRegion, "Loops / length each", "rl-out-loops");
+  const oFlow = makeOutputLine(outputRegion, "Total flow / per loop", "rl-out-flow");
+  const update = debounce(() => {
+    const r = computeRadiantLoopSizing({ floor_area_ft2: Number(area.input.value) || 0, spacing_in: Number(spacing.input.value) || 0, load_btuhr: Number(load.input.value) || 0, max_loop_ft: Number(maxLoop.input.value) || 0, design_dt: Number(dt.input.value) || 0 });
+    if (r.error) { oTube.textContent = r.error; oLoops.textContent = "-"; oFlow.textContent = "-"; return; }
+    oTube.textContent = fmt(r.tube_ft, 0) + " ft";
+    oLoops.textContent = fmt(r.loops, 0) + " loop(s), " + fmt(r.per_loop_ft, 0) + " ft each";
+    oFlow.textContent = fmt(r.total_gpm, 2) + " GPM total, " + fmt(r.per_loop_gpm, 2) + " GPM per loop";
+  }, DEBOUNCE_MS);
+  for (const f of [area.input, spacing.input, load.input, maxLoop.input, dt.input]) f.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["radiant-loop-sizing"] = renderRadiantLoopSizing;
+
 // --- spec-v62 roof-drain-sizing / sump-basin-sizing -> relocated to calc-drainage.js (spec-v73 split) ---
 
 // --- spec-v63 gas-appliance-demand / tpr-discharge + spec-v64 pipe-support-spacing / softener-sizing -> relocated to calc-service.js (spec-v78 split) ---

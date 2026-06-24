@@ -1,6 +1,6 @@
 # roughlogic.com Specification v200 -- Condensate Return Line Sizing (calc-pipefit.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v199..v203 (plumbing/pipefitting -- hydronic radiant,
+> **Status: LANDED 2026-06-24 (package 0.81.0; part of catalog 648 -> 653). Batch spec-v199..v203 (plumbing/pipefitting -- hydronic radiant,
 > condensate return, and three fabrication/process layout tiles).** In-scope catalog expansion under the
 > spec-v106 trades-only charter: the closing tile of the steam-and-condensate cluster opened at v157. Adds
 > one tile to **`calc-pipefit.js`** (Group B); no new module, group, or dependency. Inherits spec.md

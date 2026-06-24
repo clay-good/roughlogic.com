@@ -7247,6 +7247,66 @@ export const CITATIONS = {
       { name: "Exceeds table", value: "a load above the largest tabulated rod (1-1/2 in) after derate returns an engineer-the-support error", source: "MSS SP-58" },
     ],
   },
+  "radiant-loop-sizing": {
+    formula: "tube_ft = floor_area_ft2 x 12 / spacing_in; loops = ceil(tube_ft / max_loop_ft); per_loop_ft = tube_ft / loops; total_gpm = load_btuhr / (500 x design_dt); per_loop_gpm = total_gpm / loops.",
+    edition: "First-principles tube-footage, loop-count, and the GPM = Q / (500 x delta-T) hydronic flow relation, by name; the radiant-panel practice per ASHRAE HVAC Systems and Equipment (radiant panel chapter) and the Radiant Panel Association. Not edition-bound.",
+    freeAccess: "The footage is area over the on-center spacing, the loop count is the footage over the loop limit, and the 500 x delta-T flow constant is the standard water-side relation; all public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the geometry and the 500-constant flow relation do not roll). The MANUFACTURER'S TUBING TABLES and the room-by-room heat loss govern the final layout - this sizes footage, loops, and flow from a uniform load, not the panel surface-temperature or downward-loss design. ASHRAE and the Radiant Panel Association name the practice.",
+    assumptions: [
+      { name: "Footage", value: "one foot of tube per (spacing / 12) ft^2 of floor, a uniform serpentine layout", source: "radiant-panel practice" },
+      { name: "Loop limit", value: "max loop length default 300 ft for 1/2 in PEX; the manufacturer's table governs the actual limit by tube size", source: "ASHRAE HVAC Systems and Equipment" },
+      { name: "Flow constant", value: "GPM = Btu/hr / (500 x delta-T), the standard water-side sensible-heat relation", source: "ASHRAE Fundamentals" },
+    ],
+  },
+  "condensate-return-sizing": {
+    formula: "flash_lbhr = condensate_lbhr x flash_fraction; vol_cfm = flash_lbhr x spec_vol_ft3lb / 60; req_area_ft2 = vol_cfm / vel_ceiling_fpm; req_dia_in = sqrt(4 x req_area_ft2 / pi) x 12; then the smallest Sch 40 nominal whose ID >= req_dia_in.",
+    edition: "First-principles continuity on the FLASH steam; the return-velocity ceiling (~4,000 to 5,000 ft/min, lower than a supply main) per ASHRAE / Spirax Sarco return-sizing practice, by name. Sch 40 IDs are ASME B36.10M nominal mill dimensions.",
+    freeAccess: "Continuity (mass flow x specific volume = volumetric flow) is public; the flash fraction comes from flash-steam-pct and the flash-steam specific volume from the saturated-steam table at the return pressure.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The return is sized for the FLASH STEAM, not the liquid - a return sized for the gallons floods and water-hammers. The velocity ceiling is a RECOMMENDATION lower than a supply main; a wet, dry, or vacuum return and any lift each change the scheme, which the engineer of record governs. ASHRAE / Spirax Sarco supply the return-sizing practice.",
+    assumptions: [
+      { name: "Flash fraction", value: "the fraction that re-boils at the return pressure, from flash-steam-pct (user-supplied)", source: "flash-steam-pct" },
+      { name: "Specific volume", value: "flash-steam specific volume from the saturated-steam table at the return pressure", source: "ASME steam tables" },
+      { name: "Velocity ceiling", value: "~4,000 to 5,000 ft/min return ceiling, lower than a supply main; a recommendation, not a code limit", source: "ASHRAE / Spirax Sarco" },
+    ],
+  },
+  "branch-saddle-cutback": {
+    formula: "r = branch_od_in / 2; R = run_od_in / 2; cutback(theta) = R - sqrt(R^2 - (r sin theta)^2), theta around the branch from the run-axis line; max_cutback = R - sqrt(R^2 - r^2) at theta = 90; zero at theta = 0 (heel/toe).",
+    edition: "The cylinder-intersection contour geometry, by name; the Pipe Fabrication Institute branch-layout practice. Not edition-bound.",
+    freeAccess: "The saddle contour is the intersection of two cylinders, a closed-form square-root expression in the two radii; the geometry is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the geometry does not roll). This is the geometric contour for a 90-DEGREE, SAME-CENTERLINE branch; the weld bevel, gap, and root face are added per the WPS, and a reducing or angled branch shifts the contour. A fit-up aid, not a weld procedure. PFI names the layout practice.",
+    assumptions: [
+      { name: "Geometry", value: "a 90-degree, same-centerline branch on the run; branch OD <= run OD", source: "cylinder-intersection geometry" },
+      { name: "Weld prep", value: "the bevel, gap, and root face are added to the geometric contour per the WPS", source: "Pipe Fabrication Institute" },
+      { name: "Stations", value: "marks per quarter (default 6 = every 15 degrees) set the ordinate spacing", source: "layout practice" },
+    ],
+  },
+  "reducer-offset": {
+    formula: "centerline_offset = (large_od_in - small_od_in) / 2. concentric: centerline continuous, invert rises and crown drops by the offset. eccentric-flat-bottom: invert continuous, centerline and crown drop. eccentric-flat-top: crown continuous, centerline and invert rise.",
+    edition: "First-principles geometry; the standard lay lengths per ASME B16.9 (bundled value entered by the user; a non-standard reducer overrides), and the flat-on-bottom-holds-invert / flat-on-top-holds-crown practice, by name. Not edition-bound for the offset.",
+    freeAccess: "The offset is half the OD difference, a one-line geometric relation; which surface stays continuous follows from the reducer type. All public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The offset and continuity are geometry; ASME B16.9 names the standard LAY LENGTHS (the bundled value, a user override allowed for a non-standard reducer). Flat-on-bottom holds the invert (keeps a drain self-cleaning) and flat-on-top holds the crown (keeps a pump suction free of air). The lay length is a fitting dimension, not a code minimum.",
+    assumptions: [
+      { name: "Offset", value: "centerline offset = (large OD - small OD) / 2, independent of the reducer type", source: "geometry" },
+      { name: "Lay length", value: "standard end-to-end lay length per ASME B16.9 by size pair (user-entered; override for a non-standard reducer)", source: "ASME B16.9" },
+      { name: "Continuity", value: "flat-on-bottom holds the invert; flat-on-top holds the crown; concentric holds the centerline", source: "fitting practice" },
+    ],
+  },
+  "flange-rating": {
+    formula: "mawp = interpolate(B16.5 Group 1.1 table[flange_class], temp_f), linear between the table temperatures (100, 200, 300, 400, 500, 600, 650 F). Class 150: 285, 260, 230, 200, 170, 140, 125; Class 300: 740, 680, 655, 635, 605, 570, 550; Class 600: 1480, 1360, 1310, 1265, 1205, 1135, 1100 psig; Class 900, 1500, 2500 scale from the 600 column by 1.5, 2.5, 4.17.",
+    edition: "ASME B16.5 Pipe Flanges and Flanged Fittings pressure-temperature ratings, Material Group 1.1 (carbon steel, e.g. A105), by name. The ratings are read from the standard's table with linear interpolation.",
+    freeAccess: "The pressure-temperature rating is a fixed published table lookup; the Group 1.1 ratings are the standard's carbon-steel values, widely republished.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bundled ratings are MATERIAL GROUP 1.1 (carbon steel, e.g. A105); other material groups (stainless 2.x, low-alloy 1.x variants) have their OWN B16.5 tables. The value is the FLANGE'S rating - the weakest component (gasket, bolting, the mating pipe) can still govern the joint. A temperature outside the bundled 100 to 650 F range interpolates from the governing edition. The AHJ and the engineer of record govern.",
+    assumptions: [
+      { name: "Material group", value: "bundled ratings are B16.5 Material Group 1.1 (carbon steel, e.g. A105); other groups have their own tables", source: "ASME B16.5" },
+      { name: "Interpolation", value: "linear between the table temperatures (100 to 650 F)", source: "ASME B16.5" },
+      { name: "Weakest component", value: "the flange rating is not the joint rating; gasket, bolting, and the mating pipe can govern", source: "ASME B16.5" },
+    ],
+  },
 };
 
 // --- Citation linkifier ---

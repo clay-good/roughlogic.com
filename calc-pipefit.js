@@ -531,3 +531,234 @@ function _renderHangerRodSizing(inputRegion, outputRegion, citationEl) {
   for (const f of [load.input, derate.input]) f.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["hanger-rod-sizing"] = _renderHangerRodSizing;
+
+// ---------------------------------------------------------------------
+// v200 Condensate return line sizing (condensate-return-sizing)
+// ---------------------------------------------------------------------
+// A condensate return is sized for the FLASH steam that re-boils off the
+// condensate at the lower return pressure (hundreds of times the water
+// volume), not for the liquid - size for the liquid and it floods and
+// water-hammers. Flash mass x specific volume / continuity, then the
+// smallest Sch 40 nominal at a return-velocity ceiling.
+// dims: in { condensate_lbhr: M T^-1, flash_fraction: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1 } out: { flash_lbhr: M T^-1, vol_cfm: L^3 T^-1, req_area_in2: L^2, req_dia_in: L, chosen_nps: dimensionless, chosen_id_in: L }
+export function computeCondensateReturnSizing({ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 4000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(condensate_lbhr);
+  const ff = Number(flash_fraction);
+  const sv = Number(spec_vol_ft3lb);
+  const vc = Number(vel_ceiling_fpm);
+  if (!(load > 0)) return { error: "Condensate load must be positive (lb/hr)." };
+  if (!(ff >= 0 && ff < 1)) return { error: "Flash fraction must be 0 to <1 (use flash-steam-pct)." };
+  if (!(sv > 0)) return { error: "Flash-steam specific volume must be positive (ft3/lb)." };
+  if (!(vc > 0)) return { error: "Velocity ceiling must be positive (ft/min)." };
+  const flash_lbhr = load * ff;
+  const vol_cfm = (flash_lbhr * sv) / 60;
+  const req_area_ft2 = vol_cfm / vc;
+  const req_area_in2 = req_area_ft2 * 144;
+  const req_dia_in = Math.sqrt(4 * req_area_ft2 / Math.PI) * 12;
+  let chosen = null;
+  for (const [nps, id] of _SCH40_ID_IN) { if (id >= req_dia_in) { chosen = [nps, id]; break; } }
+  if (!chosen) return { error: "Required diameter exceeds the bundled 12 in Sch 40 table; size a larger return from the schedule." };
+  return { flash_lbhr, vol_cfm, req_area_in2, req_dia_in, chosen_nps: chosen[0], chosen_id_in: chosen[1] };
+}
+export const condensateReturnSizingExample = { inputs: { condensate_lbhr: 800, flash_fraction: 0.13, spec_vol_ft3lb: 26.8, vel_ceiling_fpm: 4000 } };
+
+function _renderCondensateReturnSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Condensate return sized for the flash steam - flash = load x flash_fraction; volumetric flow = flash x specific_volume / 60; required area = flow / velocity ceiling, then the smallest Sch 40 nominal whose ID clears the required diameter - first-principles continuity, with the return-velocity ceiling (~4,000 to 5,000 ft/min, lower than a supply main) per ASHRAE / Spirax Sarco return-sizing practice, by name. The return is sized for the flash, not the liquid; a wet, dry, or vacuum return and any lift each change the scheme, which the engineer of record governs.";
+  const load = makeNumber("Condensate load to the return (lb/hr)", "cr-load", { step: "any", min: "0" });
+  const ff = makeNumber("Flash fraction at return pressure (0-1)", "cr-ff", { step: "any", min: "0", max: "1" });
+  const sv = makeNumber("Flash-steam specific volume at return pressure (ft3/lb)", "cr-sv", { step: "any", min: "0" });
+  const vc = makeNumber("Return velocity ceiling (ft/min)", "cr-vc", { step: "any", min: "0", value: "4000" });
+  vc.input.value = "4000";
+  for (const f of [load, ff, sv, vc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "800"; ff.input.value = "0.13"; sv.input.value = "26.8"; vc.input.value = "4000"; update(); });
+  const oFlash = makeOutputLine(outputRegion, "Flash steam / volume", "cr-out-flash");
+  const oReq = makeOutputLine(outputRegion, "Required internal area / diameter", "cr-out-req");
+  const oSize = makeOutputLine(outputRegion, "Smallest Sch 40 return", "cr-out-size");
+  const update = debounce(() => {
+    const r = computeCondensateReturnSizing({ condensate_lbhr: Number(load.input.value) || 0, flash_fraction: Number(ff.input.value) || 0, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0 });
+    if (r.error) { oFlash.textContent = r.error; oReq.textContent = "-"; oSize.textContent = "-"; return; }
+    oFlash.textContent = fmt(r.flash_lbhr, 0) + " lb/hr flash (" + fmt(r.vol_cfm, 1) + " cfm)";
+    oReq.textContent = fmt(r.req_area_in2, 2) + " in^2 (" + fmt(r.req_dia_in, 2) + " in dia)";
+    oSize.textContent = r.chosen_nps + " in (ID " + fmt(r.chosen_id_in, 3) + " in)";
+  }, DEBOUNCE_MS);
+  for (const f of [load.input, ff.input, sv.input, vc.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["condensate-return-sizing"] = _renderCondensateReturnSizing;
+
+// ---------------------------------------------------------------------
+// v201 Branch saddle cutback template (branch-saddle-cutback)
+// ---------------------------------------------------------------------
+// The saddle is the branch pipe notched to sit on the curved side of a run
+// pipe for a welded branch connection. The cutback contour around the
+// branch end is a fixed function of the two diameters: the cylinder
+// intersection cutback(theta) = R - sqrt(R^2 - (r sin theta)^2).
+// dims: in { branch_od_in: L, run_od_in: L, stations: dimensionless } out: { r_in: L, R_in: L, max_cutback_in: L }
+export function computeBranchSaddleCutback({ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bod = Number(branch_od_in);
+  const rod = Number(run_od_in);
+  if (!(bod > 0)) return { error: "Branch OD must be positive (in)." };
+  if (!(rod > 0)) return { error: "Run OD must be positive (in)." };
+  if (bod > rod) return { error: "Branch OD must be <= run OD (no saddle geometry for an equal-or-larger branch by this method)." };
+  let n = Math.round(Number(stations));
+  if (!(n >= 1 && n <= 24)) n = 6;
+  const r = bod / 2;
+  const R = rod / 2;
+  const max_cutback_in = R - Math.sqrt(R * R - r * r);
+  const ordinates = [];
+  for (let i = 0; i <= n; i++) {
+    const deg = (90 * i) / n;
+    const s = Math.sin((deg * Math.PI) / 180);
+    const cb = R - Math.sqrt(Math.max(0, R * R - (r * s) * (r * s)));
+    ordinates.push({ angle_deg: deg, cutback_in: cb });
+  }
+  return { r_in: r, R_in: R, max_cutback_in, stations: n, ordinates };
+}
+export const branchSaddleCutbackExample = { inputs: { branch_od_in: 2.375, run_od_in: 6.625, stations: 6 } };
+
+function _renderBranchSaddleCutback(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Branch saddle contour - cutback(theta) = R - sqrt(R^2 - (r sin theta)^2) around the branch end, theta measured from the line of the run axis (heel/toe = 0, sides = 90, where the cutback is maximum) - the cylinder-intersection geometry per Pipe Fabrication Institute layout practice, by name. This is the geometric contour for a 90-degree, same-centerline branch; the weld bevel, gap, and root face are added per the WPS, and a reducing or angled branch shifts the contour. A fit-up aid, not a weld procedure.";
+  const bod = makeNumber("Branch pipe OD (in)", "bs-bod", { step: "any", min: "0" });
+  const rod = makeNumber("Run pipe OD (in)", "bs-rod", { step: "any", min: "0" });
+  const st = makeNumber("Marks per quarter (default 6 = every 15 deg)", "bs-st", { step: "1", min: "1", max: "24", value: "6" });
+  st.input.value = "6";
+  for (const f of [bod, rod, st]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bod.input.value = "2.375"; rod.input.value = "6.625"; st.input.value = "6"; update(); });
+  const oMax = makeOutputLine(outputRegion, "Maximum cutback (at the sides)", "bs-out-max");
+  const oTab = makeOutputLine(outputRegion, "Ordinates (angle: cutback, in)", "bs-out-tab");
+  const update = debounce(() => {
+    const r = computeBranchSaddleCutback({ branch_od_in: Number(bod.input.value) || 0, run_od_in: Number(rod.input.value) || 0, stations: Number(st.input.value) || 6 });
+    if (r.error) { oMax.textContent = r.error; oTab.textContent = "-"; return; }
+    oMax.textContent = fmt(r.max_cutback_in, 3) + " in (r " + fmt(r.r_in, 3) + ", R " + fmt(r.R_in, 3) + ")";
+    oTab.textContent = r.ordinates.map((o) => fmt(o.angle_deg, 0) + "°: " + fmt(o.cutback_in, 3)).join(", ");
+  }, DEBOUNCE_MS);
+  for (const f of [bod.input, rod.input, st.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["branch-saddle-cutback"] = _renderBranchSaddleCutback;
+
+// ---------------------------------------------------------------------
+// v202 Reducer centerline offset and invert continuity (reducer-offset)
+// ---------------------------------------------------------------------
+// A concentric reducer keeps the centerlines aligned but drops the invert
+// by half the diameter change (a dam on a gravity drain, an air pocket on
+// a pump suction). An eccentric reducer keeps one side flat: flat-on-bottom
+// holds the invert continuous, flat-on-top holds the crown continuous.
+// dims: in { large_od_in: L, small_od_in: L, lay_length_in: L, type: dimensionless } out: { centerline_offset_in: L, bop_shift_in: L, top_shift_in: L }
+export function computeReducerOffset({ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } = {}) {
+  const _g = _finiteGuard({ large_od_in, small_od_in, lay_length_in }); if (_g) return _g;
+  const D = Number(large_od_in);
+  const d = Number(small_od_in);
+  if (!(D > 0)) return { error: "Large-end OD must be positive (in)." };
+  if (!(d > 0)) return { error: "Small-end OD must be positive (in)." };
+  if (!(d < D)) return { error: "Small-end OD must be less than the large-end OD." };
+  const TYPES = { "concentric": 1, "eccentric-flat-bottom": 1, "eccentric-flat-top": 1 };
+  if (!TYPES[type]) return { error: "Type must be concentric, eccentric-flat-bottom, or eccentric-flat-top." };
+  const centerline_offset_in = (D - d) / 2;
+  let continuous_surface, bop_shift_in, top_shift_in, note;
+  if (type === "concentric") {
+    continuous_surface = "centerline";
+    bop_shift_in = centerline_offset_in;   // invert rises at the small end
+    top_shift_in = -centerline_offset_in;  // crown drops at the small end
+    note = "Centerline continuous; the invert rises and the crown drops by the offset at the small end - a dam on a gravity drain and an air pocket on a pump suction.";
+  } else if (type === "eccentric-flat-bottom") {
+    continuous_surface = "invert (bottom)";
+    bop_shift_in = 0;
+    top_shift_in = -2 * centerline_offset_in;
+    note = "Invert (bottom) continuous; the centerline and crown drop - correct on a gravity drain so the run stays self-cleaning.";
+  } else {
+    continuous_surface = "crown (top)";
+    bop_shift_in = 2 * centerline_offset_in;
+    top_shift_in = 0;
+    note = "Crown (top) continuous; the centerline and invert rise - correct on a pump suction so air clears.";
+  }
+  return { centerline_offset_in, continuous_surface, bop_shift_in, top_shift_in, lay_length_in: Number(lay_length_in) || 0, type, note };
+}
+export const reducerOffsetExample = { inputs: { large_od_in: 6.625, small_od_in: 4.5, lay_length_in: 7, type: "eccentric-flat-bottom" } };
+
+function _renderReducerOffset(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Reducer centerline offset = (large OD - small OD) / 2, and which surface stays continuous by type - concentric holds the centerline, eccentric flat-on-bottom holds the invert, eccentric flat-on-top holds the crown - first-principles geometry, with the standard lay lengths per ASME B16.9 (bundled value entered by the user; a non-standard reducer overrides). Flat-on-bottom keeps a drain self-cleaning and flat-on-top keeps a pump suction free of air. The lay length is a fitting dimension, not a code minimum.";
+  const D = makeNumber("Large-end OD (in)", "ro-D", { step: "any", min: "0" });
+  const d = makeNumber("Small-end OD (in)", "ro-d", { step: "any", min: "0" });
+  const lay = makeNumber("Lay length (in, B16.9 / fitting)", "ro-lay", { step: "any", min: "0" });
+  const type = makeSelect("Reducer type", "ro-type", [
+    { value: "concentric", label: "Concentric (centerline)", selected: true },
+    { value: "eccentric-flat-bottom", label: "Eccentric flat-on-bottom (invert)" },
+    { value: "eccentric-flat-top", label: "Eccentric flat-on-top (crown)" },
+  ]);
+  for (const f of [D, d, lay, type]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "6.625"; d.input.value = "4.5"; lay.input.value = "7"; type.select.value = "eccentric-flat-bottom"; update(); });
+  const oOff = makeOutputLine(outputRegion, "Centerline offset", "ro-out-off");
+  const oCont = makeOutputLine(outputRegion, "Continuous surface", "ro-out-cont");
+  const oNote = makeOutputLine(outputRegion, "Note", "ro-out-note");
+  const update = debounce(() => {
+    const r = computeReducerOffset({ large_od_in: Number(D.input.value) || 0, small_od_in: Number(d.input.value) || 0, lay_length_in: Number(lay.input.value) || 0, type: type.select.value });
+    if (r.error) { oOff.textContent = r.error; oCont.textContent = "-"; oNote.textContent = ""; return; }
+    oOff.textContent = fmt(r.centerline_offset_in, 4) + " in" + (r.lay_length_in > 0 ? " (lay " + fmt(r.lay_length_in, 2) + " in)" : "");
+    oCont.textContent = r.continuous_surface;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D.input, d.input, lay.input]) f.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+PIPEFIT_RENDERERS["reducer-offset"] = _renderReducerOffset;
+
+// ---------------------------------------------------------------------
+// v203 Flange pressure-temperature rating (flange-rating) - ASME B16.5
+// ---------------------------------------------------------------------
+// The maximum allowable working pressure of a flange CLASS drops with
+// temperature on a fixed ASME B16.5 table. Bundled ratings are Material
+// Group 1.1 (carbon steel, e.g. A105); other material groups have their own
+// tables. Linear interpolation between the table temperatures.
+const _B16_5_TEMPS_F = [100, 200, 300, 400, 500, 600, 650];
+const _B16_5_GROUP_1_1 = {
+  150: [285, 260, 230, 200, 170, 140, 125],
+  300: [740, 680, 655, 635, 605, 570, 550],
+  600: [1480, 1360, 1310, 1265, 1205, 1135, 1100],
+};
+// 900 / 1500 / 2500 scale from the 600 column by the class ratio.
+const _B16_5_SCALE = { 900: 1.5, 1500: 2.5, 2500: 4.17 };
+// dims: in { flange_class: dimensionless, temp_f: T } out: { mawp_psig: M L^-1 T^-2 }
+export function computeFlangeRating({ flange_class = 150, temp_f = 0 } = {}) {
+  const _g = _finiteGuard({ flange_class, temp_f }); if (_g) return _g;
+  const cls = Number(flange_class);
+  const t = Number(temp_f);
+  let row = _B16_5_GROUP_1_1[cls];
+  if (!row && _B16_5_SCALE[cls]) row = _B16_5_GROUP_1_1[600].map((v) => v * _B16_5_SCALE[cls]);
+  if (!row) return { error: "Flange class must be 150, 300, 600, 900, 1500, or 2500." };
+  const tMin = _B16_5_TEMPS_F[0];
+  const tMax = _B16_5_TEMPS_F[_B16_5_TEMPS_F.length - 1];
+  if (!(t >= tMin && t <= tMax)) return { error: "Temperature " + tMin + " to " + tMax + " F (interpolate from the governing edition outside the bundled range)." };
+  let mawp;
+  for (let i = 0; i < _B16_5_TEMPS_F.length - 1; i++) {
+    const t0 = _B16_5_TEMPS_F[i], t1 = _B16_5_TEMPS_F[i + 1];
+    if (t >= t0 && t <= t1) {
+      const frac = t1 === t0 ? 0 : (t - t0) / (t1 - t0);
+      mawp = row[i] + frac * (row[i + 1] - row[i]);
+      break;
+    }
+  }
+  return { flange_class: cls, temp_f: t, mawp_psig: mawp };
+}
+export const flangeRatingExample = { inputs: { flange_class: 150, temp_f: 400 } };
+
+function _renderFlangeRating(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Flange pressure-temperature rating - the maximum allowable working pressure read from the ASME B16.5 table for the flange class, linearly interpolated between table temperatures, by name. The bundled ratings are Material Group 1.1 (carbon steel, e.g. A105); other material groups have their own tables. The value is the flange's rating - the weakest component (gasket, bolting, the mating pipe) can still govern the joint. The AHJ and the engineer of record govern.";
+  const cls = makeSelect("Flange class (pound)", "fr-cls", [
+    { value: "150", label: "Class 150", selected: true }, { value: "300", label: "Class 300" },
+    { value: "600", label: "Class 600" }, { value: "900", label: "Class 900" },
+    { value: "1500", label: "Class 1500" }, { value: "2500", label: "Class 2500" },
+  ]);
+  const t = makeNumber("Service temperature (F)", "fr-t", { step: "any", value: "100" });
+  for (const f of [cls, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cls.select.value = "150"; t.input.value = "400"; update(); });
+  const oRate = makeOutputLine(outputRegion, "Max allowable working pressure", "fr-out-rate");
+  const update = debounce(() => {
+    const r = computeFlangeRating({ flange_class: Number(cls.select.value), temp_f: Number(t.input.value) || 0 });
+    if (r.error) { oRate.textContent = r.error; return; }
+    oRate.textContent = fmt(r.mawp_psig, 0) + " psig (Class " + r.flange_class + ", Group 1.1, at " + fmt(r.temp_f, 0) + " F)";
+  }, DEBOUNCE_MS);
+  t.input.addEventListener("input", update);
+  cls.select.addEventListener("change", update);
+}
+PIPEFIT_RENDERERS["flange-rating"] = _renderFlangeRating;

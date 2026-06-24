@@ -1953,13 +1953,17 @@ cross-check.
 | calc-motor.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
+| calc-pipefit.js | `computeBranchSaddleCutback` | `{ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeColdSpring` | `{ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f...` | _ | _ | _ |
+| calc-pipefit.js | `computeCondensateReturnSizing` | `{ condensate_lbhr = 0, flash_fraction = 0, spec_vol_ft3lb = 0, vel_ceiling_fp...` | _ | _ | _ |
+| calc-pipefit.js | `computeFlangeRating` | `{ flange_class = 150, temp_f = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeFlashSteamPct` | `{ hf_high = 0, hf_low = 0, hfg_low = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeHangerRodSizing` | `{ load_lb = 0, temp_derate = 1 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computePipeFilledSupportLoad` | `{ od_in = 0, wall_in = 0, pipe_density = 490, fluid_density = 62.4, insul_thk...` | _ | _ | _ |
 | calc-pipefit.js | `computePipePressureRating` | `{ od_in = 0, wall_in = 0, allow_stress = 0, joint_factor = 1, y_coeff = 0.4, ...` | _ | _ | _ |
 | calc-pipefit.js | `computePipeSpacingRack` | `{ pipe_od_in = 0, insulation_thickness_in = 0, clearance_in = 1, pipe_count =...` | _ | _ | _ |
 | calc-pipefit.js | `computeRacewayExpansion` | `{ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_trave...` | _ | _ | _ |
+| calc-pipefit.js | `computeReducerOffset` | `{ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } ...` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamPipeVelocity` | `{ steam_flow_lbhr = 0, spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeSteamTrapSizing` | `{ heat_duty_btuhr = 0, hfg_btulb = 0, safety_factor = 2 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeBackflow` | `` | _ | _ | _ |
@@ -1981,6 +1985,7 @@ cross-check.
 | calc-plumbing.js | `computePressureTankDrawdown` | `{ mode = "find-drawdown", tank_volume_gal = 0, cut_in_psi = 0, cut_out_psi = ...` | _ | _ | _ |
 | calc-plumbing.js | `computePumpOperatingPoint` | `{ pump = "small_centrifugal_60Hz", static_head_ft = 0, k_friction = 0, } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computePumpSize` | `{ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity ...` | _ | _ | _ |
+| calc-plumbing.js | `computeRadiantLoopSizing` | `{ floor_area_ft2 = 0, spacing_in = 0, load_btuhr = 0, max_loop_ft = 300, desi...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircLoopSizing` | `{ loop_length_ft = 0, nominal_size_in = "0.75", insulation_in = 1, hot_supply...` | _ | _ | _ |
 | calc-plumbing.js | `computeRecircPumpHead` | `{ pipe_length_ft, fittings_count = 0, target_flow_gpm, internal_diameter_in, ...` | _ | _ | _ |
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
@@ -2305,7 +2310,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 891.
+Row count: 896.
 
 <!-- END function-corpus-v14 -->
 
@@ -2481,15 +2486,18 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (65 tiles)
+### Group B Plumbing (70 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `backflow` | Backflow Reference | IPC 2024 + project bundled backflow-p...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-loss` | Backflow Preventer Pressure Loss | Watts Regulator; 1 in RP at 30 gpm -> ~8.5 psi typical loss across the ass... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `backflow-sizing` | Backflow Assembly Sizing Screen | IPC / AWWA / EPA; high hazard -> RP required (override from DC); RP 2 in at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `branch-saddle-cutback` | Branch Saddle Cutback Template (Pipe-on-Pipe) | Cylinder-intersection geometry; Pipe ...; spec-v201 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `condensate-return-sizing` | Condensate Return Line Size From the Flash Steam | Continuity; ASHRAE / Spirax Sarco ret...; spec-v200 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-invert` | Drainage Invert Elevation, Drop, and Cover | Project (first-principles); slope = 0.25/12 = 0.020833 ft/ft; total_fall = 0.020833 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `expansion-tank` | Hydronic Expansion Tank | ASHRAE Handbook (HVAC Systems and Equ...; 100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig reli... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `flange-rating` | Flange Pressure-Temperature Rating (ASME B16.5) | ASME B16.5 pressure-temperature ratin...; spec-v203 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `flash-steam-pct` | Flash Steam Percentage Across a Pressure Drop | Steam thermodynamics; ASME steam tabl...; spec-v157 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `friction-loss` | Friction Loss | Project (first-principles); 10 gpm through 100 ft of 1 in SCH40 PVC -> ~2.38 ft head ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-altitude-derate` | High-Altitude Appliance Input Derate | NFPA 54 (National Fuel Gas Code) / IF...; spec-v111 section 2.1 pinned example (100k at 6,000 ft ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2518,8 +2526,10 @@ per spec-v14 §13.1 second paragraph.
 | `pressure-tank-drawdown` | Well Pressure-Tank Drawdown and Sizing | Boyle's law on the diaphragm air char...; 44 gal at 40/60 psi (38 psi precharge) -> 11.35 gal drawd... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-operating-point` | Pump Operating Point | Project (engineering composite); Static head 30 ft / friction k = 0.003 / small centrifuga... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-sizing` | Pump Sizing | Project (first-principles); Standard centrifugal-pump identity (US customary, gpm and... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `radiant-loop-sizing` | Hydronic Radiant Floor Loop Sizing | First-principles; ASHRAE HVAC Systems...; spec-v199 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `recirc-loop-sizing` | Hot Water Recirc Loop Sizing (ASPE) | ASPE; U=0.17 Btu/hr/ft/F at 3/4-in / 1-in insulation; dT_pipe =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `recirc-pump-head` | Hot Water Recirc Pump Head | Project (first-principles); 100 ft of 0.75 in copper / 8 fittings (eq. ~16 ft) / 4 gp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `reducer-offset` | Reducer Centerline Offset and Invert Continuity | Geometry; ASME B16.9 lay lengths (by ...; spec-v202 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-drain-sizing` | Roof Drain and Leader Sizing | IPC 2021 Section 1106 (Tables 1106.2 ...; 5000 ft^2 roof, 4 in/hr design rainfall -> 208 GPM, 6 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sanitary-dfu` | Sanitary Drain DFU Sizing | ICC; DFU = 3 + 1 + 2 = 6; 2 in horizontal branch (max 6 DFU) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-dose-tank` | Septic Pump / Dose Tank Volume | USEPA Onsite Wastewater Treatment Sys...; 600 gpd, 4 doses, 5 gal drainback -> 150 net, 155 per cyc... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -3139,6 +3149,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 648. Fixture-covered or reference-cadence: 648 / 648.
+Tile count: 653. Fixture-covered or reference-cadence: 653 / 653.
 
 <!-- END tile-index-v14 -->
