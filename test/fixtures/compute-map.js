@@ -667,6 +667,18 @@ export const COMPUTE_MAP = {
   "dehumidifier-derate": { module: "../../calc-restoration.js", fn: "computeDehumidifierDerate" },
   "class-of-loss-screen": { module: "../../calc-restoration.js", fn: "computeWaterClassScreen" },
   "desiccant-airflow-sizing": { module: "../../calc-restoration.js", fn: "computeDesiccantAirflow" },
+  // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
+  "buck-boost-sizing": { module: "../../calc-electrical.js", fn: "computeBuckBoostSizing" },
+  "wireway-fill": { module: "../../calc-electrical.js", fn: "computeWirewayFill" },
+  "rooftop-temp-adder": { module: "../../calc-electrical.js", fn: "computeRooftopTempAdder" },
+  "working-space-110-26": { module: "../../calc-electrical.js", fn: "computeWorkingSpace11026" },
+  "range-demand-220-55": { module: "../../calc-service.js", fn: "computeRangeDemand22055" },
+  "dryer-demand-220-54": { module: "../../calc-service.js", fn: "computeDryerDemand22054" },
+  "neutral-demand-220-61": { module: "../../calc-service.js", fn: "computeNeutralDemand22061" },
+  "motor-unbalance-derate": { module: "../../calc-powerquality.js", fn: "computeMotorUnbalanceDerate" },
+  "point-illuminance": { module: "../../calc-elecdesign.js", fn: "computePointIlluminance" },
+  "burial-depth-300-5": { module: "../../calc-references.js", fn: "computeBurialDepth3005" },
+  "support-spacing": { module: "../../calc-references.js", fn: "computeSupportSpacing" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v178 -- Raceway and Cable Support / Securing Spacing Reference (NEC Chapter 3) (calc-references.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter, and the closing tile of the electrician batch: one
 > reference tile returning the support-interval and box-proximity securing rules for the common wiring
 > methods (EMT, RMC, PVC, NM, MC, AC) from their NEC Chapter 3 .30 sections. Adds one tile to

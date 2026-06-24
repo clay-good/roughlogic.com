@@ -101,6 +101,18 @@ const RELATED = {
   "breaker-sizing": ["wire-ampacity", "motor-fla", "service-load"],
   "motor-fla": ["wire-ampacity", "breaker-sizing", "three-phase", "voltage-imbalance"],
   "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
+  // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
+  "buck-boost-sizing": ["transformer-kva-sizing", "transformer-conductor-protection", "three-phase"],
+  "range-demand-220-55": ["service-load", "dryer-demand-220-54", "neutral-demand-220-61"],
+  "dryer-demand-220-54": ["range-demand-220-55", "service-load", "neutral-demand-220-61"],
+  "neutral-demand-220-61": ["service-load", "range-demand-220-55", "neutral-current-3ph"],
+  "wireway-fill": ["conduit-fill", "cable-tray-fill", "ambient-ampacity-adjust"],
+  "motor-unbalance-derate": ["voltage-imbalance", "motor-fla", "motor-vd-starting"],
+  "rooftop-temp-adder": ["ambient-ampacity-adjust", "wire-ampacity", "pv-string-sizing"],
+  "point-illuminance": ["lumen-method", "lux-to-footcandle", "lighting-density"],
+  "working-space-110-26": ["gfci-afci-reference", "pull-box-sizing", "service-load"],
+  "burial-depth-300-5": ["working-space-110-26", "conduit-fill", "cable-bend-radius"],
+  "support-spacing": ["working-space-110-26", "burial-depth-300-5", "conduit-fill"],
 
   // Group B: Plumbing core loop. The hydraulics ladder runs
   // pipe-sizing -> friction-loss -> pump-sizing -> npsh-a; the spec.md

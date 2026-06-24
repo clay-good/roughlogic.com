@@ -24,7 +24,7 @@ Tradespeople do quick math constantly: voltage drop, friction loss, conduit fill
 
 ## The solution
 
-One static page with 628 small calculators and reference tools, organized into 21 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+One static page with 639 small calculators and reference tools, organized into 21 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 The design constraints are the product:
 
@@ -195,7 +195,7 @@ roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
   app.js                SPA entry: hash router, renderers, lazy loaders (~70 KB raw / ~22 KB gz)
-  tools-data.js         catalog registry (TOOLS, 628 tiles); lazy-loaded (~170 KB raw / ~56 KB gz)
+  tools-data.js         catalog registry (TOOLS, 639 tiles); lazy-loaded (~176 KB raw / ~58 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       50 per-group calculator modules (electrical, hvac, ...,
                         calc-fab.js is the pipe & conduit fabrication bench split
@@ -260,11 +260,11 @@ roughlogic.com/
 
 ## The catalog (cheat sheet)
 
-628 tiles across 21 active group letters. The letters are stable identifiers; new groups append, retired groups (S / U / V / W, retired in spec-v107) leave a gap rather than renumbering, and retired tiles keep their IDs.
+639 tiles across 21 active group letters. The letters are stable identifiers; new groups append, retired groups (S / U / V / W, retired in spec-v107) leave a gap rather than renumbering, and retired tiles keep their IDs.
 
 | Letter | Group | Tiles | Representative tools |
 |---|---|--:|---|
-| A | Electrical | 70 | voltage drop (with reactance), power triangle, EV charger load, service load (220.82), PV interconnection busbar, conduit offset / saddle / 90-stub bending, **motor-feeder sizing (430.24/430.62)**, **transformer conductor/protection (450.3(B))**, **fiber loss budget**, **cable-tray fill (392.22)**, **CCTV/NVR storage**, **70 V speaker line**, **fire-alarm standby battery (NFPA 72)**, **coax attenuation**, **NEC pull / junction box sizing (314.28)**, **lumen-method luminaire count (IES)**, **grounding electrode conductor (250.66)**, **bonding jumper (250.28/250.102)**, **min conductor for voltage-drop target (inverse VD)**, **motor synchronous speed / slip**, **motor shaft torque (5252)**, **motor operating cost**, **conductor short-circuit withstand (Onderdonk)**, **conduit thermal expansion (352.44)**, **EGC upsize proportional (250.122(B))**, **delta-wye line / phase**, **feeder tap conductor 10-ft / 25-ft rule (240.21(B))** |
+| A | Electrical | 81 | voltage drop (with reactance), power triangle, EV charger load, service load (220.82), PV interconnection busbar, conduit offset / saddle / 90-stub bending, **motor-feeder sizing (430.24/430.62)**, **transformer conductor/protection (450.3(B))**, **fiber loss budget**, **cable-tray fill (392.22)**, **CCTV/NVR storage**, **70 V speaker line**, **fire-alarm standby battery (NFPA 72)**, **coax attenuation**, **NEC pull / junction box sizing (314.28)**, **lumen-method luminaire count (IES)**, **grounding electrode conductor (250.66)**, **bonding jumper (250.28/250.102)**, **min conductor for voltage-drop target (inverse VD)**, **motor synchronous speed / slip**, **motor shaft torque (5252)**, **motor operating cost**, **conductor short-circuit withstand (Onderdonk)**, **conduit thermal expansion (352.44)**, **EGC upsize proportional (250.122(B))**, **delta-wye line / phase**, **feeder tap conductor 10-ft / 25-ft rule (240.21(B))**, **buck-boost transformer sizing (Art. 450)**, **wireway / gutter 20% fill (376.22)**, **rooftop sunlight ambient adder (310.15(B)(2))**, **working-space clearance (110.26)**, **range demand (Table 220.55 Col. C)**, **dryer demand (220.54)**, **feeder/service neutral demand (220.61)**, **motor derating for voltage unbalance (NEMA MG-1)**, **point-method illuminance (inverse-square + cosine)**, **underground burial cover depth (Table 300.5)**, **raceway / cable support spacing (Ch. 3 .30)** |
 | B | Plumbing and Gas | 65 | friction loss, pipe sizing, water hammer, water-heater recovery, sanitary DFU, Spitzglass gas pressure drop, **mixing-valve blend temp (ASSE)**, **well pressure-tank drawdown**, **pipe velocity / copper erosion**, **WSFU probable demand (Hunter)**, **supply pressure budget**, **roof drain / leader sizing (IPC 1106)**, **sump / ejector basin cycle (IPC 712)**, **gas appliance demand / CFH (IFGC 402)**, **T&P relief discharge (IPC 504)**, **pipe hanger spacing (IPC 308.5)**, **water softener sizing (NSF 44)**, **septic pump / dose tank cycle (EPA 625)**, **septic pump-out interval**, **low-pressure-pipe orifice flow / squirt height**, **new-main chlorination dose (AWWA C651)**, **well shock-chlorination dose**, **high-altitude appliance derate (NFPA 54 / IFGC)**, **natural-gas / propane conversion (orifice)**, **storage water-heater first-hour rating (FHR / peak-hour demand)**, **flash steam % across a pressure drop**, **steam main velocity sizing**, **steam trap load / capacity**, **pipe pressure rating (ASME B31.1)**, **filled pipe support load per hanger**, **hanger rod sizing (MSS SP-58)**, **drainage invert / fall / cover (IPC 704)** |
 | C | HVAC | 58 | duct sizing, Manual J (simplified), refrigerant P-T, chiller tonnage, LMTD/NTU, superheat/subcool charge verdict, economizer free-cooling hours, round-to-rectangular duct equivalent (ASHRAE), **total external static pressure (Manual D)**, **refrigeration compression ratio (ASHRAE)**, **framed-wall assembly R-value (parallel path)**, **blown insulation coverage**, **condensate drain rate / size / slope (IMC 307.2)**, **recovery-cylinder 80% fill (EPA 608)**, **HVAC equipment circuit MCA / MOCP (NEC 440.33 / 440.22)**, **run-capacitor microfarad check (2652 x A / V)**, **vacuum decay / blank-off test (ACCA Std 4)**, **nitrogen pressure test (Gay-Lussac)**, **gas-meter clocking (firing rate)**, **furnace temperature rise / derived airflow** |
 | D | Water Damage and Mold Restoration | 32 | air movers, dehumidifier sizing, drying log, circuit-capacity check, drying-chamber CO2, **grain-depression water removal**, **evaporation load / dehu demand**, **mold remediation scope (EPA / NYC DOHMH)**, **IICRC S520 Condition reference**, **antimicrobial mix / coverage**, **spore-trap air sample volume**, **dry-standard verdict**, **flood-cut take-off**, **asbestos / lead abatement containment (EPA NESHAP / OSHA)**, **wood equilibrium moisture content (EMC)**, **ceiling water load / drain-before-entry**, **dehumidifier field derate**, **IICRC S500 class-of-loss screen**, **desiccant airflow sizing** |
@@ -445,22 +445,22 @@ Retired platform affordances: Recents and Big Buttons mode (v11), Project Bundle
 
 ## Discoverable surface (prerendered shells)
 
-The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 628 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
+The home document renders the SPA, and per-tile state lives in the URL hash. But fragments are not part of URL canonicalization, and most non-Google crawlers do not execute JavaScript, so the cited reference content of 639 tiles would otherwise be invisible to general web search. Spec-v13 fixes this with a build-time prerender step.
 
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n628 static shells\n~1.9 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n639 static shells\n~1.9 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n21 static shells\n~4.4 KB gz each"]
-    BUILD --> MAP["sitemap.xml\n651 URLs"]
+    BUILD --> MAP["sitemap.xml\n662 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
     TILE -->|Run the calculator| SPA[("/#&lt;id&gt;\ninteractive SPA")]
     style BUILD fill:#1a3a5a,color:#fff
 ```
 
-- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (628). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, a canonical link, a **Formula and source block** (the cited formula and the source-stamp, prerendered from `CITATIONS` so the actual reference content -- the math and its authority -- is crawlable and readable offline, not just the tile name; spec-v45), an Audience block, a curated related-tiles list, a Posture block, and a "Run the calculator" anchor to the SPA hash route (628 shells). The `check-shells` gate (wired into CI as of spec-v45) fails the build on any tile shell missing the formula/source block, an over-cap title or description, an off-allowlist JSON-LD type, or an over-budget gzip size.
+- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (639). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, a canonical link, a **Formula and source block** (the cited formula and the source-stamp, prerendered from `CITATIONS` so the actual reference content -- the math and its authority -- is crawlable and readable offline, not just the tile name; spec-v45), an Audience block, a curated related-tiles list, a Posture block, and a "Run the calculator" anchor to the SPA hash route (639 shells). The `check-shells` gate (wired into CI as of spec-v45) fails the build on any tile shell missing the formula/source block, an over-cap title or description, an off-allowlist JSON-LD type, or an over-budget gzip size.
 - **`/groups/<slug>/index.html`** is one shell per active group (21), listing every tile with a one-line description and an internal link, plus JSON-LD `CollectionPage` + `BreadcrumbList` + `ItemList`.
-- **`sitemap.xml`** carries 651 URLs (home + changelog + 21 groups + 628 tiles), regenerated at every build.
+- **`sitemap.xml`** carries 662 URLs (home + changelog + 21 groups + 639 tiles), regenerated at every build.
 - **SPA-side canonical emission**: when the SPA opens a tile it sets `<link rel="canonical" href="https://roughlogic.com/tools/<id>/">` so a crawler that lands on a hash URL still reads the canonical shell.
 
 Measurement is source-side only (Cloudflare edge metrics, Google Search Console, Bing Webmaster Tools); there is no client telemetry. See [docs/seo.md](docs/seo.md) for the shell model, authoring rules, and JSON-LD allowlist.
@@ -473,13 +473,13 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n871 functions extracted]
-    F --> C[Phase C: dimensional analysis\n874/874 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n871/871 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n882 functions extracted]
+    F --> C[Phase C: dimensional analysis\n885/885 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n882/882 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n341 tests / 66 monotonicity batches]
-    F --> I[Phase I: derivation index\n628/628 tiles]
-    F --> G[Phase G: source-coverage map\n628/628 tiles, 162 sources]
+    F --> I[Phase I: derivation index\n639/639 tiles]
+    F --> G[Phase G: source-coverage map\n639/639 tiles, 163 sources]
     F -.pending.-> B[Phase B: independent worked-example source]
     F -.pending.-> H[Phase H: per-group reviewer signoff]
     style C fill:#14532d,color:#fff
@@ -494,10 +494,10 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (871 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (882 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (874/874) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (871/871) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (885/885) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (882/882) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 341 tests) |
 | G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (628/628 tiles classified, 100%; 162 tracked sources) |
@@ -516,7 +516,7 @@ The site has no command-line interface of its own. The repository ships these np
 |---|---|
 | `npm run dev` | Start a local development server. |
 | `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 628 tile + 21 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,920 tests). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,931 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
 | `npm run lint` | Run the 26-gate lint chain (below). |

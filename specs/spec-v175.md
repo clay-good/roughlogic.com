@@ -1,6 +1,6 @@
 # roughlogic.com Specification v175 -- Point-Method Illuminance (Inverse-Square + Cosine Law) (calc-elecdesign.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile computing horizontal illuminance at a
 > point from a luminaire of known candlepower using the inverse-square and cosine laws -- the
 > point-by-point method, complementing the existing zonal-cavity lumen method. Adds one tile to

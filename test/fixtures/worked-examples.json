@@ -23363,6 +23363,321 @@
         "min_tap_ampacity_a": { "value": 40.0, "tolerance": { "abs": 0.01 } },
         "margin_a": { "value": 10.0, "tolerance": { "abs": 0.01 } }
       }
+    },
+    {
+      "tile_id": "buck-boost-sizing",
+      "source_publisher": "NEC 2023 (NFPA 70) Article 450; manufacturer buck-boost tables",
+      "source_title": "Buck-boost autotransformer sized for the boost voltage times the load current",
+      "source_edition_or_year": "NEC 2023 Article 450",
+      "source_section_or_page": "208 V to 230 V at 50 A -> boost 22 V; xfmr = 22 x 50 / 1000 = 1.10 kVA supports an 11.5 kVA load",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "supply_v": 208, "desired_v": 230, "load_a": 50 },
+      "outputs": {
+        "boost_v": { "value": 22.0, "tolerance": { "abs": 0.001 } },
+        "load_kva": { "value": 11.5, "tolerance": { "abs": 0.001 } },
+        "xfmr_kva": { "value": 1.1, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "buck-boost-sizing",
+      "source_publisher": "NEC 2023 (NFPA 70) Article 450; manufacturer buck-boost tables",
+      "source_title": "cross-check (buck): 240 V trimmed to 208 V at 20 A",
+      "source_edition_or_year": "NEC 2023 Article 450",
+      "source_section_or_page": "240 V to 208 V at 20 A -> boost -32 V; xfmr = 32 x 20 / 1000 = 0.64 kVA",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "supply_v": 240, "desired_v": 208, "load_a": 20 },
+      "outputs": {
+        "boost_v": { "value": -32.0, "tolerance": { "abs": 0.001 } },
+        "xfmr_kva": { "value": 0.64, "tolerance": { "abs": 0.001 } },
+        "load_kva": { "value": 4.16, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wireway-fill",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Metal wireway 20% fill, 376.22",
+      "source_edition_or_year": "NEC 2023 Section 376.22",
+      "source_section_or_page": "4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.5 in^2 used = 15.6%",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "width_in": 4, "height_in": 4, "conductor_area_in2": 2.5, "ccc_count": 18 },
+      "outputs": {
+        "interior_in2": { "value": 16.0, "tolerance": { "abs": 0.001 } },
+        "allowed_in2": { "value": 3.2, "tolerance": { "abs": 0.001 } },
+        "used_pct": { "value": 15.625, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "wireway-fill",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: over the 20% fill",
+      "source_edition_or_year": "NEC 2023 Section 376.22",
+      "source_section_or_page": "4x4 in, 3.5 in^2 used = 21.9% exceeds the 3.2 in^2 (20%) allowance",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "width_in": 4, "height_in": 4, "conductor_area_in2": 3.5, "ccc_count": 34 },
+      "outputs": {
+        "used_pct": { "value": 21.875, "tolerance": { "abs": 0.01 } },
+        "allowed_in2": { "value": 3.2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rooftop-temp-adder",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Rooftop sunlight adder 310.15(B)(2) then 90 C-column correction",
+      "source_edition_or_year": "NEC 2023 Section 310.15(B)(2)",
+      "source_section_or_page": "95 F on the roof (<7/8 in) + 60 F adder = 155 F (~68 C) -> 90 C factor 0.58; 55 A x 0.58 = 31.9 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "measured_ambient_f": 95, "height_above_roof_in": 0, "base_ampacity_a": 55 },
+      "outputs": {
+        "design_ambient_f": { "value": 155.0, "tolerance": { "abs": 0.01 } },
+        "correction": { "value": 0.58, "tolerance": { "abs": 0.001 } },
+        "corrected_a": { "value": 31.9, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "rooftop-temp-adder",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: raised onto standoffs (>= 7/8 in), no adder",
+      "source_edition_or_year": "NEC 2023 Section 310.15(B)(2)",
+      "source_section_or_page": "95 F at 1 in above roof -> no adder, 95 F (~35 C) -> 90 C factor 0.96; 55 A x 0.96 = 52.8 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "measured_ambient_f": 95, "height_above_roof_in": 1, "base_ampacity_a": 55 },
+      "outputs": {
+        "design_ambient_f": { "value": 95.0, "tolerance": { "abs": 0.01 } },
+        "correction": { "value": 0.96, "tolerance": { "abs": 0.001 } },
+        "corrected_a": { "value": 52.8, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "working-space-110-26",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Working space depth Table 110.26(A)(1), 151-600 V Condition 2",
+      "source_edition_or_year": "NEC 2023 Section 110.26(A)",
+      "source_section_or_page": "480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width max(30, 24) = 30 in; 6.5 ft headroom",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "nominal_v_to_ground": "151-600 V", "condition": 2, "equipment_width_in": 24 },
+      "outputs": {
+        "depth_ft": { "value": 3.5, "tolerance": { "abs": 0.001 } },
+        "width_in": { "value": 30.0, "tolerance": { "abs": 0.001 } },
+        "height_ft": { "value": 6.5, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "working-space-110-26",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: 0-150 V Condition 1, equipment width override",
+      "source_edition_or_year": "NEC 2023 Section 110.26(A)",
+      "source_section_or_page": "208Y/120 V (0-150 V) Condition 1 -> 3.0 ft depth; width max(30, 40) = 40 in",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "nominal_v_to_ground": "0-150 V", "condition": 1, "equipment_width_in": 40 },
+      "outputs": {
+        "depth_ft": { "value": 3.0, "tolerance": { "abs": 0.001 } },
+        "width_in": { "value": 40.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "range-demand-220-55",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Range demand Table 220.55 Column C, one 12 kW range",
+      "source_edition_or_year": "NEC 2023 Table 220.55",
+      "source_section_or_page": "1 range Column C = 8 kW (not 12); demand 8 kW = 33.3 A at 240 V",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "num_ranges": 1, "nameplate_kw": 12, "supply_v": 240 },
+      "outputs": {
+        "col_c_kw": { "value": 8.0, "tolerance": { "abs": 0.001 } },
+        "demand_kw": { "value": 8.0, "tolerance": { "abs": 0.001 } },
+        "demand_a": { "value": 33.333, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "range-demand-220-55",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check (Note 1): one 16 kW range, over-12 kW increase",
+      "source_edition_or_year": "NEC 2023 Table 220.55 Note 1",
+      "source_section_or_page": "16 - 12 = 4 kW over -> +20%; 8 x 1.20 = 9.6 kW = 40 A at 240 V",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "num_ranges": 1, "nameplate_kw": 16, "supply_v": 240 },
+      "outputs": {
+        "demand_kw": { "value": 9.6, "tolerance": { "abs": 0.001 } },
+        "demand_a": { "value": 40.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "dryer-demand-220-54",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Dryer demand 220.54, four 4.5 kW dryers at the 5000 W floor",
+      "source_edition_or_year": "NEC 2023 Section 220.54",
+      "source_section_or_page": "each at 5000 W floor; 4 x 5000 = 20000 W at 100% = 83.3 A at 240 V",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "num_dryers": 4, "nameplate_w": 4500, "supply_v": 240 },
+      "outputs": {
+        "per_dryer_w": { "value": 5000.0, "tolerance": { "abs": 0.001 } },
+        "demand_w": { "value": 20000.0, "tolerance": { "abs": 0.01 } },
+        "demand_a": { "value": 83.333, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "dryer-demand-220-54",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check (Table 220.54): five 5 kW dryers at 85%",
+      "source_edition_or_year": "NEC 2023 Table 220.54",
+      "source_section_or_page": "5 x 5000 = 25000 W x 0.85 = 21250 W = 88.5 A at 240 V",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "num_dryers": 5, "nameplate_w": 5000, "supply_v": 240 },
+      "outputs": {
+        "demand_w": { "value": 21250.0, "tolerance": { "abs": 0.01 } },
+        "demand_a": { "value": 88.542, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "neutral-demand-220-61",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Neutral demand 220.61(B), 250 A unbalanced load",
+      "source_edition_or_year": "NEC 2023 Section 220.61",
+      "source_section_or_page": "200 A at 100% + 50 A at 70% = 200 + 35 = 235 A",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "max_unbalanced_a": 250, "nonlinear_excluded": 0 },
+      "outputs": {
+        "neutral_demand_a": { "value": 235.0, "tolerance": { "abs": 0.01 } },
+        "first_200_a": { "value": 200.0, "tolerance": { "abs": 0.01 } },
+        "excess_a": { "value": 50.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "neutral-demand-220-61",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check (220.61(C)): 250 A nonlinear -> no reduction",
+      "source_edition_or_year": "NEC 2023 Section 220.61(C)",
+      "source_section_or_page": "nonlinear load stays at the full 250 A (no 70% reduction)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "max_unbalanced_a": 250, "nonlinear_excluded": 1 },
+      "outputs": {
+        "neutral_demand_a": { "value": 250.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "motor-unbalance-derate",
+      "source_publisher": "NEMA MG-1",
+      "source_title": "Motor derating for voltage unbalance, 460/455/450 V",
+      "source_edition_or_year": "NEMA MG-1",
+      "source_section_or_page": "avg 455, max dev 5 -> 1.10% unbalance -> derate ~0.977",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "v_ab": 460, "v_bc": 455, "v_ca": 450 },
+      "outputs": {
+        "unbalance_pct": { "value": 1.0989, "tolerance": { "abs": 0.001 } },
+        "derate_factor": { "value": 0.977, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "motor-unbalance-derate",
+      "source_publisher": "NEMA MG-1",
+      "source_title": "cross-check: 480/456/456 V, 3.45% unbalance",
+      "source_edition_or_year": "NEMA MG-1",
+      "source_section_or_page": "avg 464, max dev 16 -> 3.45% -> derate ~0.853",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "v_ab": 480, "v_bc": 456, "v_ca": 456 },
+      "outputs": {
+        "unbalance_pct": { "value": 3.4483, "tolerance": { "abs": 0.001 } },
+        "derate_factor": { "value": 0.8531, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "point-illuminance",
+      "source_publisher": "IES Lighting Handbook (point method)",
+      "source_title": "Point illuminance directly below a 1000 cd source 10 ft up",
+      "source_edition_or_year": "IES point method",
+      "source_section_or_page": "angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "intensity_cd": 1000, "mount_height_ft": 10, "angle_deg": 0 },
+      "outputs": {
+        "e_fc": { "value": 10.0, "tolerance": { "abs": 0.01 } },
+        "e_lux": { "value": 107.64, "tolerance": { "abs": 0.1 } },
+        "distance_ft": { "value": 10.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "point-illuminance",
+      "source_publisher": "IES Lighting Handbook (point method)",
+      "source_title": "cross-check (off-axis): same source at 30 deg off nadir",
+      "source_edition_or_year": "IES point method",
+      "source_section_or_page": "angle 30: d = 10/cos30 = 11.55 ft; E = 1000 x cos30 / 11.55^2 = 6.50 fc (69.9 lux)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "intensity_cd": 1000, "mount_height_ft": 10, "angle_deg": 30 },
+      "outputs": {
+        "e_fc": { "value": 6.4952, "tolerance": { "abs": 0.01 } },
+        "e_lux": { "value": 69.914, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "burial-depth-300-5",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Minimum cover Table 300.5, PVC in general earth",
+      "source_edition_or_year": "NEC 2023 Table 300.5",
+      "source_section_or_page": "nonmetallic raceway (PVC), general earth -> 18 in cover",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "wiring_method": "nonmetallic raceway (PVC etc.)", "location": "general earth" },
+      "outputs": {
+        "min_cover_in": { "value": 18.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "burial-depth-300-5",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: direct-burial cable in general earth",
+      "source_edition_or_year": "NEC 2023 Table 300.5",
+      "source_section_or_page": "direct burial cable, general earth -> 24 in cover",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "wiring_method": "direct burial cable/conductors", "location": "general earth" },
+      "outputs": {
+        "min_cover_in": { "value": 24.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "support-spacing",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "Support spacing 358.30, EMT",
+      "source_edition_or_year": "NEC 2023 Section 358.30",
+      "source_section_or_page": "EMT secure within 36 in of each box; support every 10 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "wiring_method": "EMT", "trade_size_in": 0 },
+      "outputs": {
+        "secure_within_in": { "value": 36.0, "tolerance": { "abs": 0.001 } },
+        "max_interval_ft": { "value": 10.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "support-spacing",
+      "source_publisher": "NEC 2023 (NFPA 70)",
+      "source_title": "cross-check: NM cable (Romex), 334.30",
+      "source_edition_or_year": "NEC 2023 Section 334.30",
+      "source_section_or_page": "NM secure within 12 in of each box/fitting; support every 4.5 ft",
+      "verified_by": "rl",
+      "verified_on": "2026-06-24",
+      "inputs": { "wiring_method": "NM cable (Romex)", "trade_size_in": 0 },
+      "outputs": {
+        "secure_within_in": { "value": 12.0, "tolerance": { "abs": 0.001 } },
+        "max_interval_ft": { "value": 4.5, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

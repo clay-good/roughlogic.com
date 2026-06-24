@@ -1,6 +1,6 @@
 # roughlogic.com Specification v176 -- Working-Space Clearance Reference (NEC 110.26) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one reference tile returning the required working
 > space in front of electrical equipment per NEC 110.26 -- the depth by voltage and condition, the 30
 > in width, and the 6.5 ft headroom. Adds one tile to **`calc-electrical.js`** (Group A); no new

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v167 -- Household Electric Range Demand Load (NEC Table 220.55, Column C) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile computing the demand load for household
 > electric ranges and cooking appliances using NEC Table 220.55 Column C, including the >12 kW
 > adjustment. Adds one tile to **`calc-service.js`** (Group A); no new module, group, or dependency.

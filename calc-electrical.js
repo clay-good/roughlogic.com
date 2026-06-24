@@ -4278,3 +4278,283 @@ function renderDeltaWyeLinePhase(inputRegion, outputRegion, citationEl) {
   for (const el of [config.select, volt.input, cur.input, pf.input]) el.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["delta-wye-line-phase"] = renderDeltaWyeLinePhase;
+
+// =====================================================================
+// spec-v165 - Group A: Electrical (1 tile)
+// Buck-boost (autotransformer) sizing from a voltage correction and load.
+// =====================================================================
+
+// dims: in { supply_v: M L^2 T^-3 I^-1, desired_v: M L^2 T^-3 I^-1, load_a: I } out: { boost_v: M L^2 T^-3 I^-1, load_kva: M L^2 T^-3, xfmr_kva: M L^2 T^-3, ratio_pct: dimensionless }
+export function computeBuckBoostSizing({ supply_v = 0, desired_v = 0, load_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sup = Number(supply_v) || 0;
+  const des = Number(desired_v) || 0;
+  const amp = Number(load_a) || 0;
+  if (!(sup > 0)) return { error: "Supply voltage must be positive." };
+  if (!(des > 0)) return { error: "Desired (load) voltage must be positive." };
+  if (!(amp > 0)) return { error: "Load current must be positive." };
+
+  const boost_v = des - sup;                 // + = boost, - = buck
+  const load_kva = des * amp / 1000;         // full load, for reference
+  const xfmr_kva = Math.abs(boost_v) * amp / 1000;  // the autotransformer rating
+  const ratio_pct = load_kva > 0 ? xfmr_kva / load_kva * 100 : null;
+  const direction = boost_v > 0 ? "boost" : boost_v < 0 ? "buck" : "none";
+
+  const notes = [];
+  if (boost_v === 0) {
+    notes.push("The supply already equals the desired voltage; no buck-boost transformer is needed.");
+  } else {
+    notes.push("The autotransformer is rated only for the " + direction + " voltage times the load current, a fraction of the full load kVA - that is the point of the connection. Select the next standard catalog kVA at or above this figure.");
+  }
+  notes.push("Buck-boost selection, the connection diagram, and the overcurrent protection are the manufacturer's and the AHJ's. This sizes the required kVA; it does not select a catalog unit or its protection. NEC Article 450 governs.");
+
+  return {
+    boost_v: Number.isFinite(boost_v) ? boost_v : null,
+    direction,
+    load_kva: Number.isFinite(load_kva) ? load_kva : null,
+    xfmr_kva: Number.isFinite(xfmr_kva) ? xfmr_kva : null,
+    ratio_pct: Number.isFinite(ratio_pct) ? ratio_pct : null,
+    notes,
+  };
+}
+export const buckBoostSizingExample = { inputs: { supply_v: 208, desired_v: 230, load_a: 50 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v165renderBuckBoostSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Single-phase buck-boost (autotransformer) sizing - the unit is rated for the boost/buck voltage (desired minus supply) times the load current, a fraction of the full load kVA. NEC 2023 Article 450 (transformers); the autotransformer connection, taps, and overcurrent protection are the manufacturer's and the AHJ's. Free at nfpa.org/freeaccess.";
+  const sup = makeNumber("Supply (line) voltage (V)", "bb-sup", { step: "any", min: "0" });
+  const des = makeNumber("Desired (load) voltage (V)", "bb-des", { step: "any", min: "0" });
+  const amp = makeNumber("Load current (A)", "bb-amp", { step: "any", min: "0" });
+  for (const f of [sup, des, amp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sup.input.value = "208"; des.input.value = "230"; amp.input.value = "50"; update(); });
+
+  const oBoost = makeOutputLine(outputRegion, "Boost / buck amount (V)", "bb-out-boost");
+  const oXfmr = makeOutputLine(outputRegion, "Autotransformer rating (kVA)", "bb-out-xfmr");
+  const oLoad = makeOutputLine(outputRegion, "Full load (kVA, reference)", "bb-out-load");
+  const oNote = makeOutputLine(outputRegion, "Notes", "bb-out-note");
+
+  const update = debounce(() => {
+    const r = computeBuckBoostSizing({
+      supply_v: Number(sup.input.value) || 0,
+      desired_v: Number(des.input.value) || 0,
+      load_a: Number(amp.input.value) || 0,
+    });
+    if (r.error) { oBoost.textContent = r.error; oXfmr.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = ""; return; }
+    oBoost.textContent = fmt(r.boost_v, 1) + " V (" + r.direction + ")";
+    oXfmr.textContent = fmt(r.xfmr_kva, 2) + " kVA (" + fmt(r.ratio_pct, 1) + "% of full load)";
+    oLoad.textContent = fmt(r.load_kva, 2) + " kVA";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [sup.input, des.input, amp.input]) f.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["buck-boost-sizing"] = _v165renderBuckBoostSizing;
+
+// =====================================================================
+// spec-v170 - Group A: Electrical (1 tile)
+// Metal wireway / auxiliary gutter 20% fill and 30-conductor count (376.22).
+// =====================================================================
+
+// dims: in { width_in: L, height_in: L, conductor_area_in2: L^2, ccc_count: dimensionless } out: { interior_in2: L^2, allowed_in2: L^2, used_pct: dimensionless }
+export function computeWirewayFill({ width_in = 0, height_in = 0, conductor_area_in2 = 0, ccc_count = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(width_in) || 0;
+  const h = Number(height_in) || 0;
+  const ca = Number(conductor_area_in2) || 0;
+  const n = Number(ccc_count) || 0;
+  if (!(w > 0)) return { error: "Wireway interior width must be positive." };
+  if (!(h > 0)) return { error: "Wireway interior height must be positive." };
+  if (ca < 0) return { error: "Conductor area must be non-negative." };
+
+  const interior_in2 = w * h;
+  const allowed_in2 = 0.20 * interior_in2;
+  const used_pct = interior_in2 > 0 ? ca / interior_in2 * 100 : null;
+  const area_ok = ca <= allowed_in2;
+  const over_30 = n > 30;
+  const count_note = over_30
+    ? "Over 30 current-carrying conductors: apply the 310.15(C)(1) ampacity adjustment (this is an adjustment trigger, not a prohibition)."
+    : "At or under 30 current-carrying conductors: no ampacity adjustment from the wireway count.";
+  return {
+    interior_in2,
+    allowed_in2,
+    used_pct: Number.isFinite(used_pct) ? used_pct : null,
+    area_ok,
+    over_30,
+    count_note,
+    note: "NEC 376.22: conductor cross-section no more than 20% of the wireway interior; the same 20% rule applies to auxiliary gutters (366.22). The 30-conductor limit excludes signal and certain conductors per the article exceptions. The AHJ governs.",
+  };
+}
+export const wirewayFillExample = { inputs: { width_in: 4, height_in: 4, conductor_area_in2: 2.5, ccc_count: 18 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v170renderWirewayFill(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 376.22 (metal wireways) - conductor fill no more than 20% of the interior cross-section, and the 30 current-carrying conductor threshold for 310.15(C)(1) ampacity adjustment. The same 20% rule applies to auxiliary gutters (366.22). The AHJ governs. Free at nfpa.org/freeaccess.";
+  const w = makeNumber("Interior width (in)", "ww-w", { step: "any", min: "0" });
+  const h = makeNumber("Interior height (in)", "ww-h", { step: "any", min: "0" });
+  const ca = makeNumber("Total conductor area (in^2, Ch.9 Table 5)", "ww-ca", { step: "any", min: "0" });
+  const n = makeNumber("Current-carrying conductors", "ww-n", { step: "1", min: "0" });
+  for (const f of [w, h, ca, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "4"; h.input.value = "4"; ca.input.value = "2.5"; n.input.value = "18"; update(); });
+
+  const oInt = makeOutputLine(outputRegion, "Interior area (in^2)", "ww-out-int");
+  const oAllow = makeOutputLine(outputRegion, "Allowed fill (20%, in^2)", "ww-out-allow");
+  const oUsed = makeOutputLine(outputRegion, "Used fill", "ww-out-used");
+  const oCount = makeOutputLine(outputRegion, "Conductor count", "ww-out-count");
+  const oNote = makeOutputLine(outputRegion, "Note", "ww-out-note");
+
+  const update = debounce(() => {
+    const r = computeWirewayFill({
+      width_in: Number(w.input.value) || 0,
+      height_in: Number(h.input.value) || 0,
+      conductor_area_in2: Number(ca.input.value) || 0,
+      ccc_count: Number(n.input.value) || 0,
+    });
+    if (r.error) { oInt.textContent = r.error; oAllow.textContent = "-"; oUsed.textContent = "-"; oCount.textContent = "-"; oNote.textContent = ""; return; }
+    oInt.textContent = fmt(r.interior_in2, 2) + " in^2";
+    oAllow.textContent = fmt(r.allowed_in2, 2) + " in^2";
+    oUsed.textContent = fmt(r.used_pct, 1) + "% - " + (r.area_ok ? "within the 20% fill" : "OVER the 20% fill, increase the wireway");
+    oCount.textContent = r.count_note;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [w.input, h.input, ca.input, n.input]) f.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["wireway-fill"] = _v170renderWirewayFill;
+
+// =====================================================================
+// spec-v174 - Group A: Electrical (1 tile)
+// Rooftop conduit sunlight ambient adder (310.15(B)(2)) + corrected ampacity.
+// Reuses the module-level _AMBIENT_FACTORS[90] correction table.
+// =====================================================================
+
+// dims: in { measured_ambient_f: T, height_above_roof_in: L, base_ampacity_a: I } out: { adder_f: T, design_ambient_f: T, correction: dimensionless, corrected_a: I }
+export function computeRooftopTempAdder({ measured_ambient_f = 0, height_above_roof_in = 0, base_ampacity_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ambF = Number(measured_ambient_f);
+  const ht = Number(height_above_roof_in);
+  const base = Number(base_ampacity_a) || 0;
+  if (!Number.isFinite(ambF)) return { error: "Measured ambient is required (deg-F)." };
+  if (!(ht >= 0)) return { error: "Height above roof must be non-negative (in)." };
+  if (!(base > 0)) return { error: "Base ampacity (90 C column) must be positive." };
+
+  const adder_f = ht < 0.875 ? 60 : 0;             // 7/8 in = 0.875 in threshold; 60 deg-F = 33 deg-C
+  const design_ambient_f = ambF + adder_f;
+  const design_ambient_c = (design_ambient_f - 32) * 5 / 9;
+  // 90 C-column ambient correction factor (310.15(B)(1)), step table on the C value.
+  let correction = null;
+  for (const [maxC, f] of _AMBIENT_FACTORS[90]) { if (design_ambient_c <= maxC) { correction = f; break; } }
+  if (correction === null) {
+    const topBound = _AMBIENT_FACTORS[90][_AMBIENT_FACTORS[90].length - 1][0];
+    return { error: "Design ambient " + Math.round(design_ambient_c) + " C exceeds the 90 C column's bundled range (top " + topBound + " C); a hotter rooftop ambient leaves no usable ampacity in this column." };
+  }
+  const corrected_a = base * correction;
+  return {
+    adder_f,
+    design_ambient_f: Number.isFinite(design_ambient_f) ? design_ambient_f : null,
+    design_ambient_c: Number.isFinite(design_ambient_c) ? design_ambient_c : null,
+    correction,
+    corrected_a: Number.isFinite(corrected_a) ? corrected_a : null,
+    note: "NEC 310.15(B)(2): where a raceway or cable is exposed to sunlight on or above a rooftop and is less than 7/8 in (0.875 in) above the roof, add 33 deg-C (60 deg-F) to the outdoor ambient before the temperature-correction step. Standoffs raising the raceway at or above 7/8 in remove the adder. The corrected ampacity feeds the rest of the sizing (see ambient-ampacity-adjust). The AHJ-adopted edition governs.",
+  };
+}
+export const rooftopTempAdderExample = { inputs: { measured_ambient_f: 95, height_above_roof_in: 0, base_ampacity_a: 55 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v174renderRooftopTempAdder(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 310.15(B)(2) (raceways and cables exposed to sunlight on or above rooftops) - a 33 deg-C (60 deg-F) adder to the ambient where the raceway is less than 7/8 in above the roof, then the 90 C-column temperature correction. The AHJ-adopted NEC edition governs. Free at nfpa.org/freeaccess.";
+  const amb = makeNumber("Measured outdoor ambient (deg-F)", "rt-amb", { step: "any" });
+  const ht = makeNumber("Height above roof (in)", "rt-ht", { step: "any", min: "0" });
+  const base = makeNumber("Base ampacity (A, 90 C column)", "rt-base", { step: "any", min: "0" });
+  for (const f of [amb, ht, base]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { amb.input.value = "95"; ht.input.value = "0"; base.input.value = "55"; update(); });
+
+  const oAdder = makeOutputLine(outputRegion, "Sunlight adder", "rt-out-adder");
+  const oDesign = makeOutputLine(outputRegion, "Design ambient", "rt-out-design");
+  const oCorr = makeOutputLine(outputRegion, "90 C correction factor", "rt-out-corr");
+  const oCorrected = makeOutputLine(outputRegion, "Corrected ampacity (A)", "rt-out-corrected");
+  const oNote = makeOutputLine(outputRegion, "Note", "rt-out-note");
+
+  const update = debounce(() => {
+    const r = computeRooftopTempAdder({
+      measured_ambient_f: amb.input.value === "" ? NaN : Number(amb.input.value),
+      height_above_roof_in: Number(ht.input.value) || 0,
+      base_ampacity_a: Number(base.input.value) || 0,
+    });
+    if (r.error) { oAdder.textContent = r.error; oDesign.textContent = "-"; oCorr.textContent = "-"; oCorrected.textContent = "-"; oNote.textContent = ""; return; }
+    oAdder.textContent = r.adder_f === 0 ? "0 deg-F (on standoffs, >= 7/8 in)" : "+" + fmt(r.adder_f, 0) + " deg-F (within 7/8 in of the roof)";
+    oDesign.textContent = fmt(r.design_ambient_f, 0) + " deg-F (~" + fmt(r.design_ambient_c, 0) + " deg-C)";
+    oCorr.textContent = fmt(r.correction, 2);
+    oCorrected.textContent = fmt(r.corrected_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [amb.input, ht.input, base.input]) f.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["rooftop-temp-adder"] = _v174renderRooftopTempAdder;
+
+// =====================================================================
+// spec-v176 - Group A: Electrical (1 tile)
+// NEC 110.26(A) working-space clearance reference lookup.
+// =====================================================================
+
+const _WORKING_SPACE_DEPTH = {
+  "0-150 V": { 1: 3.0, 2: 3.0, 3: 3.0 },
+  "151-600 V": { 1: 3.0, 2: 3.5, 3: 4.0 },
+};
+
+// dims: in { nominal_v_to_ground: dimensionless, condition: dimensionless, equipment_width_in: L } out: { depth_ft: L, width_in: L, height_ft: L }
+export function computeWorkingSpace11026({ nominal_v_to_ground = "0-150 V", condition = 1, equipment_width_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const band = _WORKING_SPACE_DEPTH[nominal_v_to_ground];
+  if (!band) return { error: "Voltage band must be \"0-150 V\" or \"151-600 V\"." };
+  const cond = Number(condition) || 0;
+  const depth_ft = band[cond];
+  if (depth_ft === undefined) return { error: "Condition must be 1, 2, or 3." };
+  const w = Number(equipment_width_in) || 0;
+  if (w < 0) return { error: "Equipment width must be non-negative (in)." };
+  const width_in = Math.max(30, w);
+  const height_ft = 6.5;
+  return {
+    depth_ft,
+    width_in,
+    height_ft,
+    width_governed_by: width_in > 30 ? "equipment width" : "30 in minimum",
+    note: "NEC 110.26(A): the depth is measured from the live parts; Condition 1 = no grounded or exposed-live parts opposite, Condition 2 = a grounded surface opposite (concrete, brick, tile), Condition 3 = exposed live parts on both sides. The width is the greater of 30 in or the equipment width, the headroom is 6.5 ft (or equipment height if greater), and the space must allow a 90-degree door swing. 110.26(E) adds the dedicated equipment space. The AHJ governs.",
+  };
+}
+export const workingSpace11026Example = { inputs: { nominal_v_to_ground: "151-600 V", condition: 2, equipment_width_in: 24 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v176renderWorkingSpace11026(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 110.26(A) (working space) and 110.26(E) (dedicated equipment space) - the depth by voltage-to-ground and condition, the 30 in (or equipment-width) clearance, and the 6.5 ft headroom, with a required 90-degree door swing. The AHJ governs. Free at nfpa.org/freeaccess.";
+  const band = makeSelect("Nominal voltage to ground", "ws-band", [
+    { value: "0-150 V", label: "0-150 V (e.g. 120/208Y)" },
+    { value: "151-600 V", label: "151-600 V (e.g. 277/480Y)" },
+  ]);
+  const cond = makeSelect("Condition (what is opposite the live parts)", "ws-cond", [
+    { value: "1", label: "Condition 1 - nothing live/grounded opposite" },
+    { value: "2", label: "Condition 2 - grounded surface opposite" },
+    { value: "3", label: "Condition 3 - live parts both sides" },
+  ]);
+  const w = makeNumber("Equipment width (in)", "ws-w", { step: "any", min: "0", value: "24" });
+  w.input.value = "24";
+  for (const f of [band, cond, w]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { band.select.value = "151-600 V"; cond.select.value = "2"; w.input.value = "24"; update(); });
+
+  const oDepth = makeOutputLine(outputRegion, "Working depth (ft)", "ws-out-depth");
+  const oWidth = makeOutputLine(outputRegion, "Working width (in)", "ws-out-width");
+  const oHeight = makeOutputLine(outputRegion, "Headroom (ft)", "ws-out-height");
+  const oNote = makeOutputLine(outputRegion, "Note", "ws-out-note");
+
+  const update = debounce(() => {
+    const r = computeWorkingSpace11026({
+      nominal_v_to_ground: band.select.value,
+      condition: Number(cond.select.value),
+      equipment_width_in: Number(w.input.value) || 0,
+    });
+    if (r.error) { oDepth.textContent = r.error; oWidth.textContent = "-"; oHeight.textContent = "-"; oNote.textContent = ""; return; }
+    oDepth.textContent = fmt(r.depth_ft, 1) + " ft";
+    oWidth.textContent = fmt(r.width_in, 0) + " in (" + r.width_governed_by + ")";
+    oHeight.textContent = fmt(r.height_ft, 1) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [band.select, cond.select, w.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["working-space-110-26"] = _v176renderWorkingSpace11026;

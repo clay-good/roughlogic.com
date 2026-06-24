@@ -1,6 +1,6 @@
 # roughlogic.com Specification v169 -- Feeder/Service Neutral Demand Load (NEC 220.61) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile computing the feeder/service neutral
 > (grounded conductor) demand load under NEC 220.61 -- the maximum unbalanced load with the 70%
 > reduction permitted above 200 A for the qualifying portion. Adds one tile to **`calc-service.js`**

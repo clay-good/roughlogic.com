@@ -10978,3 +10978,145 @@ test("bounds: calc-machining computeSpindlePowerTorque pins cutting/motor hp + t
   assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 0, rpm: 800 }));
   assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 120, rpm: 800 }));
 });
+
+// ---------------------------------------------------------------------------
+// spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates
+// of egc-upsize-proportional / conductor-short-circuit-withstand / neutral-current-3ph).
+// ---------------------------------------------------------------------------
+import {
+  computeBuckBoostSizing as _cv165, computeWirewayFill as _cv170,
+  computeRooftopTempAdder as _cv174, computeWorkingSpace11026 as _cv176,
+} from "../../calc-electrical.js";
+import {
+  computeRangeDemand22055 as _cv167, computeDryerDemand22054 as _cv168,
+  computeNeutralDemand22061 as _cv169,
+} from "../../calc-service.js";
+import { computeMotorUnbalanceDerate as _cv172 } from "../../calc-powerquality.js";
+import { computePointIlluminance as _cv175 } from "../../calc-elecdesign.js";
+import {
+  computeBurialDepth3005 as _cv177, computeSupportSpacing as _cv178,
+} from "../../calc-references.js";
+
+test("bounds: spec-v165 buck-boost-sizing pins boost/buck paths and error seams", () => {
+  const ex = _cv165({ supply_v: 208, desired_v: 230, load_a: 50 });
+  assert.ok(Math.abs(ex.boost_v - 22) < 1e-9 && Math.abs(ex.load_kva - 11.5) < 1e-9 && Math.abs(ex.xfmr_kva - 1.10) < 1e-9);
+  assert.strictEqual(ex.direction, "boost");
+  const buck = _cv165({ supply_v: 240, desired_v: 208, load_a: 20 });
+  assert.ok(Math.abs(buck.boost_v + 32) < 1e-9 && Math.abs(buck.xfmr_kva - 0.64) < 1e-9);
+  assert.strictEqual(buck.direction, "buck");
+  // zero boost: supply equals desired -> zero rating, no transformer needed
+  const zero = _cv165({ supply_v: 240, desired_v: 240, load_a: 20 });
+  assert.strictEqual(zero.xfmr_kva, 0);
+  assert.ok("error" in _cv165({ supply_v: Infinity, desired_v: 230, load_a: 50 }));
+  assert.ok("error" in _cv165({ supply_v: 0, desired_v: 230, load_a: 50 }));
+  assert.ok("error" in _cv165({ supply_v: 208, desired_v: 230, load_a: 0 }));
+});
+
+test("bounds: spec-v167 range-demand-220-55 pins Column C, the Note 1 increase, and error seams", () => {
+  const ex = _cv167({ num_ranges: 1, nameplate_kw: 12, supply_v: 240 });
+  assert.ok(Math.abs(ex.col_c_kw - 8) < 1e-9 && Math.abs(ex.demand_kw - 8) < 1e-9 && Math.abs(ex.demand_a - 33.3333) < 1e-2);
+  const big = _cv167({ num_ranges: 1, nameplate_kw: 16, supply_v: 240 });
+  assert.ok(Math.abs(big.demand_kw - 9.6) < 1e-9 && Math.abs(big.demand_a - 40) < 1e-9);
+  // multi-range reads Column C directly (4 ranges -> 17 kW)
+  assert.ok(Math.abs(_cv167({ num_ranges: 4, nameplate_kw: 12, supply_v: 240 }).col_c_kw - 17) < 1e-9);
+  assert.ok("error" in _cv167({ num_ranges: 1, nameplate_kw: 0, supply_v: 240 }));
+  assert.ok("error" in _cv167({ num_ranges: 0, nameplate_kw: 12, supply_v: 240 }));
+  assert.ok("error" in _cv167({ num_ranges: 1, nameplate_kw: Infinity, supply_v: 240 }));
+});
+
+test("bounds: spec-v168 dryer-demand-220-54 pins the 5000 W floor, the demand factor, and error seams", () => {
+  const ex = _cv168({ num_dryers: 4, nameplate_w: 4500, supply_v: 240 });
+  assert.ok(Math.abs(ex.per_dryer_w - 5000) < 1e-9 && Math.abs(ex.demand_w - 20000) < 1e-9 && Math.abs(ex.demand_a - 83.3333) < 1e-2);
+  const five = _cv168({ num_dryers: 5, nameplate_w: 5000, supply_v: 240 });
+  assert.ok(Math.abs(five.demand_factor - 0.85) < 1e-9 && Math.abs(five.demand_w - 21250) < 1e-9);
+  assert.ok("error" in _cv168({ num_dryers: 0, nameplate_w: 5000, supply_v: 240 }));
+  assert.ok("error" in _cv168({ num_dryers: 4, nameplate_w: 0, supply_v: 240 }));
+  assert.ok("error" in _cv168({ num_dryers: 4, nameplate_w: Infinity, supply_v: 240 }));
+});
+
+test("bounds: spec-v169 neutral-demand-220-61 pins the 70% break, the under-200 path, and the exclusion", () => {
+  assert.ok(Math.abs(_cv169({ max_unbalanced_a: 250, nonlinear_excluded: 0 }).neutral_demand_a - 235) < 1e-9);
+  assert.ok(Math.abs(_cv169({ max_unbalanced_a: 150, nonlinear_excluded: 0 }).neutral_demand_a - 150) < 1e-9);
+  assert.ok(Math.abs(_cv169({ max_unbalanced_a: 250, nonlinear_excluded: 1 }).neutral_demand_a - 250) < 1e-9);
+  assert.ok("error" in _cv169({ max_unbalanced_a: -5 }));
+  assert.ok("error" in _cv169({ max_unbalanced_a: Infinity }));
+});
+
+test("bounds: spec-v170 wireway-fill pins the 20% fill, the over-30 count, and error seams", () => {
+  const ex = _cv170({ width_in: 4, height_in: 4, conductor_area_in2: 2.5, ccc_count: 18 });
+  assert.ok(Math.abs(ex.interior_in2 - 16) < 1e-9 && Math.abs(ex.allowed_in2 - 3.2) < 1e-9 && Math.abs(ex.used_pct - 15.625) < 1e-6);
+  assert.strictEqual(ex.area_ok, true);
+  const over = _cv170({ width_in: 4, height_in: 4, conductor_area_in2: 3.5, ccc_count: 34 });
+  assert.strictEqual(over.area_ok, false);
+  assert.strictEqual(over.over_30, true);
+  assert.ok("error" in _cv170({ width_in: 0, height_in: 4, conductor_area_in2: 2.5, ccc_count: 18 }));
+  assert.ok("error" in _cv170({ width_in: 4, height_in: 0, conductor_area_in2: 2.5, ccc_count: 18 }));
+  assert.ok("error" in _cv170({ width_in: 4, height_in: 4, conductor_area_in2: -1, ccc_count: 18 }));
+  assert.ok("error" in _cv170({ width_in: Infinity, height_in: 4, conductor_area_in2: 2.5, ccc_count: 18 }));
+});
+
+test("bounds: spec-v172 motor-unbalance-derate pins the curve, the >5% flag, and error seams", () => {
+  const ex = _cv172({ v_ab: 460, v_bc: 455, v_ca: 450 });
+  assert.ok(Math.abs(ex.unbalance_pct - 1.0989) < 1e-3 && Math.abs(ex.derate_factor - 0.977) < 1e-3);
+  assert.strictEqual(ex.do_not_operate, false);
+  const cc = _cv172({ v_ab: 480, v_bc: 456, v_ca: 456 });
+  assert.ok(Math.abs(cc.unbalance_pct - 3.4483) < 1e-3 && Math.abs(cc.derate_factor - 0.8531) < 1e-3);
+  // over 5%: do-not-operate
+  assert.strictEqual(_cv172({ v_ab: 490, v_bc: 450, v_ca: 450 }).do_not_operate, true);
+  assert.ok("error" in _cv172({ v_ab: 0, v_bc: 455, v_ca: 450 }));
+  assert.ok("error" in _cv172({ v_ab: Infinity, v_bc: 455, v_ca: 450 }));
+});
+
+test("bounds: spec-v174 rooftop-temp-adder pins the on-roof adder, the standoff path, and error seams", () => {
+  const roof = _cv174({ measured_ambient_f: 95, height_above_roof_in: 0, base_ampacity_a: 55 });
+  assert.ok(Math.abs(roof.adder_f - 60) < 1e-9 && Math.abs(roof.design_ambient_f - 155) < 1e-9 && Math.abs(roof.correction - 0.58) < 1e-9 && Math.abs(roof.corrected_a - 31.9) < 1e-9);
+  const standoff = _cv174({ measured_ambient_f: 95, height_above_roof_in: 1, base_ampacity_a: 55 });
+  assert.ok(Math.abs(standoff.adder_f - 0) < 1e-9 && Math.abs(standoff.correction - 0.96) < 1e-9 && Math.abs(standoff.corrected_a - 52.8) < 1e-9);
+  // exactly 7/8 in removes the adder
+  assert.strictEqual(_cv174({ measured_ambient_f: 95, height_above_roof_in: 0.875, base_ampacity_a: 55 }).adder_f, 0);
+  assert.ok("error" in _cv174({ measured_ambient_f: 95, height_above_roof_in: -1, base_ampacity_a: 55 }));
+  assert.ok("error" in _cv174({ measured_ambient_f: 95, height_above_roof_in: 0, base_ampacity_a: 0 }));
+  assert.ok("error" in _cv174({ measured_ambient_f: Infinity, height_above_roof_in: 0, base_ampacity_a: 55 }));
+});
+
+test("bounds: spec-v175 point-illuminance pins the nadir, the off-axis cosine, and error seams", () => {
+  const nadir = _cv175({ intensity_cd: 1000, mount_height_ft: 10, angle_deg: 0 });
+  assert.ok(Math.abs(nadir.e_fc - 10) < 1e-9 && Math.abs(nadir.e_lux - 107.64) < 1e-2 && Math.abs(nadir.distance_ft - 10) < 1e-9);
+  const off = _cv175({ intensity_cd: 1000, mount_height_ft: 10, angle_deg: 30 });
+  assert.ok(Math.abs(off.e_fc - 6.4952) < 1e-3 && Math.abs(off.distance_ft - 11.547) < 1e-3);
+  assert.ok("error" in _cv175({ intensity_cd: 0, mount_height_ft: 10, angle_deg: 0 }));
+  assert.ok("error" in _cv175({ intensity_cd: 1000, mount_height_ft: 0, angle_deg: 0 }));
+  assert.ok("error" in _cv175({ intensity_cd: 1000, mount_height_ft: 10, angle_deg: 90 }));
+  assert.ok("error" in _cv175({ intensity_cd: Infinity, mount_height_ft: 10, angle_deg: 0 }));
+});
+
+test("bounds: spec-v176 working-space-110-26 pins the depth table, the width override, and the error seam", () => {
+  const ex = _cv176({ nominal_v_to_ground: "151-600 V", condition: 2, equipment_width_in: 24 });
+  assert.ok(Math.abs(ex.depth_ft - 3.5) < 1e-9 && Math.abs(ex.width_in - 30) < 1e-9 && Math.abs(ex.height_ft - 6.5) < 1e-9);
+  const wide = _cv176({ nominal_v_to_ground: "0-150 V", condition: 1, equipment_width_in: 40 });
+  assert.ok(Math.abs(wide.depth_ft - 3.0) < 1e-9 && Math.abs(wide.width_in - 40) < 1e-9);
+  assert.ok("error" in _cv176({ nominal_v_to_ground: "bad", condition: 1, equipment_width_in: 24 }));
+  assert.ok("error" in _cv176({ nominal_v_to_ground: "0-150 V", condition: 9, equipment_width_in: 24 }));
+});
+
+test("bounds: spec-v177 burial-depth-300-5 pins the table cells and the error seam", () => {
+  assert.strictEqual(_cv177({ wiring_method: "nonmetallic raceway (PVC etc.)", location: "general earth" }).min_cover_in, 18);
+  assert.strictEqual(_cv177({ wiring_method: "direct burial cable/conductors", location: "general earth" }).min_cover_in, 24);
+  assert.strictEqual(_cv177({ wiring_method: "RMC or IMC", location: "general earth" }).min_cover_in, 6);
+  assert.strictEqual(_cv177({ wiring_method: "nonmetallic raceway (PVC etc.)", location: "under streets/roads/driveways(public)" }).min_cover_in, 24);
+  assert.ok("error" in _cv177({ wiring_method: "bad", location: "general earth" }));
+  assert.ok("error" in _cv177({ wiring_method: "RMC or IMC", location: "bad" }));
+});
+
+test("bounds: spec-v178 support-spacing pins the EMT/NM lookups, the size-dependent path, and the error seam", () => {
+  const emt = _cv178({ wiring_method: "EMT", trade_size_in: 0 });
+  assert.strictEqual(emt.secure_within_in, 36);
+  assert.strictEqual(emt.max_interval_ft, 10);
+  const nm = _cv178({ wiring_method: "NM cable (Romex)", trade_size_in: 0 });
+  assert.strictEqual(nm.secure_within_in, 12);
+  assert.strictEqual(nm.max_interval_ft, 4.5);
+  // RMC interval grows with trade size; always finite
+  assert.strictEqual(_cv178({ wiring_method: "RMC/IMC", trade_size_in: 2 }).max_interval_ft, 16);
+  assert.ok(Number.isFinite(_cv178({ wiring_method: "PVC (rigid nonmetallic)", trade_size_in: 0 }).max_interval_ft));
+  assert.ok("error" in _cv178({ wiring_method: "bad", trade_size_in: 1 }));
+});

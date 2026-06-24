@@ -1,6 +1,6 @@
 # roughlogic.com Specification v170 -- Wireway / Auxiliary Gutter Sizing and 20% Fill (NEC 376.22) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile sizing a metal wireway (and, by the same
 > rule, an auxiliary gutter) against the NEC 376.22 limits -- conductor cross-section no more than 20%
 > of the wireway interior, and no more than 30 current-carrying conductors before ampacity adjustment.

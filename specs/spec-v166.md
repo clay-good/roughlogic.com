@@ -1,6 +1,14 @@
 # roughlogic.com Specification v166 -- Equipment Grounding Conductor Proportional Upsize (NEC 250.122(B)) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: CUT 2026-06-24 (duplicate of an existing tile). Batch spec-v164..v178 (electrician trade).** During the
+> v164..v178 landing pass the catalog was found to ALREADY contain `egc-upsize-proportional` ("EGC Proportional
+> Upsize for Increased Conductors (NEC 250.122(B))", `computeEgcUpsizeProportional` in calc-electrical.js), which
+> implements exactly this 250.122(B) circular-mil-proportion rule (ratio = max(1, installed phase / base phase);
+> upsized EGC = base EGC x ratio). The proposed `egc-upsize` is the same calculation under a different id, so it is
+> cut rather than shipped as a duplicate. The "gap" claimed below was already closed by a prior batch. Original
+> proposal preserved below for the audit trail.
+>
+> **Status (superseded): PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile applying the NEC 250.122(B) requirement
 > that an equipment grounding conductor be increased in size, proportionally by circular-mil area,
 > whenever the ungrounded conductors are upsized above their minimum. Adds one tile to

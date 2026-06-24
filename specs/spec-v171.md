@@ -1,6 +1,14 @@
 # roughlogic.com Specification v171 -- Conductor Short-Circuit Withstand / Minimum Size (ICEA P-32-382) (calc-elecdesign.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: CUT 2026-06-24 (duplicate of an existing tile). Batch spec-v164..v178 (electrician trade).** During the
+> v164..v178 landing pass the catalog was found to ALREADY contain `conductor-short-circuit-withstand` ("Conductor
+> Short-Circuit Thermal Withstand (Onderdonk / ICEA)", `computeConductorShortCircuitWithstand` in calc-electrical.js),
+> which implements exactly this adiabatic withstand: (I/A)^2 t = K log10[(Tf+B)/(Ti+B)] with copper K=0.0297 B=234,
+> aluminum K=0.0125 B=228, and already returns `min_cmil = fault x sqrt(t / C)` -- the same minimum-area answer this
+> proposal computes. The proposed `conductor-withstand` is the same calculation under a different id, so it is cut
+> rather than shipped as a duplicate. Original proposal preserved below for the audit trail.
+>
+> **Status (superseded): PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile computing the minimum conductor size that
 > can survive a short-circuit for a given clearing time, using the ICEA P-32-382 adiabatic
 > (Onderdonk-form) withstand equation. Adds one tile to **`calc-elecdesign.js`** (Group A); no new

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v177 -- Underground Burial Cover-Depth Reference (NEC Table 300.5) (calc-references.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one reference tile returning the minimum cover
 > depth for underground wiring by method and location per NEC Table 300.5 (the <= 1000 V columns).
 > Adds one tile to **`calc-references.js`** (Group A); no new module, group, or dependency. Inherits

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v168 -- Household Clothes Dryer Demand Load (NEC 220.54) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile computing the household clothes dryer
 > demand load under NEC 220.54 -- the 5,000 W (or nameplate, whichever is larger) per-dryer floor and
 > the Table 220.54 demand factors for five or more dryers. Adds one tile to **`calc-service.js`**

@@ -1,6 +1,14 @@
 # roughlogic.com Specification v173 -- Triplen-Harmonic Neutral Current (Three-Phase, Four-Wire) (calc-powerquality.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: CUT 2026-06-24 (duplicate of an existing tile). Batch spec-v164..v178 (electrician trade).** During the
+> v164..v178 landing pass the existing `neutral-current-3ph` (`computeNeutralCurrent3ph` in calc-powerquality.js) was
+> found to ALREADY take a per-phase triplen percentage and compute `harmonic_neutral_A = 3 x (avg phase x triplen%)`
+> -- the identical 3 x (fraction x phase) triplen-addition this proposal models -- and to already flag the neutral as
+> a current-carrying conductor when that harmonic neutral exceeds the phase current (the same CCC verdict). The
+> proposed `triplen-neutral` adds only a balanced-load input convenience over an already-covered calculation, so it is
+> cut rather than shipped as a near-duplicate. Original proposal preserved below for the audit trail.
+>
+> **Status (superseded): PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile computing the neutral current produced by
 > third-harmonic (triplen) load on a three-phase, four-wire system, where the per-phase third harmonics
 > add arithmetically in the neutral and can exceed the phase current. Adds one tile to

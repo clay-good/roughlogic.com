@@ -1,6 +1,6 @@
 # roughlogic.com Specification v172 -- Motor Derating for Voltage Unbalance (NEMA MG-1) (calc-powerquality.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile turning a measured three-phase voltage
 > unbalance into a NEMA MG-1 motor derating factor and the do-not-operate flag above 5%. Adds one tile
 > to **`calc-powerquality.js`** (Group A); no new module, group, or dependency. Inherits spec.md through

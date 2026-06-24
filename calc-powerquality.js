@@ -243,3 +243,74 @@ function renderMotorVdStarting(inputRegion, outputRegion, citationEl) {
   for (const f of [v.input, phase.select, len.input, cm.input, lrc.input, k.select, limit.input]) f.addEventListener("input", update);
 }
 POWERQUALITY_RENDERERS["motor-vd-starting"] = renderMotorVdStarting;
+
+// =====================================================================
+// spec-v172 - Group A: motor derating for voltage unbalance (NEMA MG-1).
+// =====================================================================
+
+// NEMA MG-1 derating curve: [unbalance %, derating factor], linearly
+// interpolated between the published points. Above 5% the motor should
+// not be operated.
+const _MG1_DERATE = [[0, 1.00], [1, 0.98], [2, 0.95], [3, 0.88], [4, 0.82], [5, 0.75]];
+function _mg1Derate(pct) {
+  if (pct <= 0) return 1.0;
+  if (pct >= 5) return 0.75;
+  for (let i = 1; i < _MG1_DERATE.length; i++) {
+    const [x0, y0] = _MG1_DERATE[i - 1];
+    const [x1, y1] = _MG1_DERATE[i];
+    if (pct <= x1) return y0 + (pct - x0) * (y1 - y0) / (x1 - x0);
+  }
+  return 0.75;
+}
+
+// dims: in { v_ab: M L^2 T^-3 I^-1, v_bc: M L^2 T^-3 I^-1, v_ca: M L^2 T^-3 I^-1 } out: { unbalance_pct: dimensionless, derate_factor: dimensionless }
+export function computeMotorUnbalanceDerate({ v_ab = 0, v_bc = 0, v_ca = 0 } = {}) {
+  const ab = Number(v_ab) || 0, bc = Number(v_bc) || 0, ca = Number(v_ca) || 0;
+  if (!Number.isFinite(ab) || !Number.isFinite(bc) || !Number.isFinite(ca)) return { error: "Line voltages must be finite numbers." };
+  if (!(ab > 0) || !(bc > 0) || !(ca > 0)) return { error: "All three line-to-line voltages must be positive (V)." };
+
+  const v_avg = (ab + bc + ca) / 3;
+  const max_dev = Math.max(Math.abs(ab - v_avg), Math.abs(bc - v_avg), Math.abs(ca - v_avg));
+  const unbalance_pct = v_avg > 0 ? max_dev / v_avg * 100 : null;
+  const derate_factor = _mg1Derate(unbalance_pct);
+  const do_not_operate = unbalance_pct > 5;
+  return {
+    v_avg,
+    max_dev,
+    unbalance_pct: Number.isFinite(unbalance_pct) ? unbalance_pct : null,
+    derate_factor: Number.isFinite(derate_factor) ? derate_factor : null,
+    allowable_pct: Number.isFinite(derate_factor) ? derate_factor * 100 : null,
+    do_not_operate,
+    note: do_not_operate
+      ? "Over 5% voltage unbalance: NEMA MG-1 says the motor SHOULD NOT BE OPERATED. Correct the unbalance source (loading, connections, the supply) before running."
+      : "NEMA MG-1: unbalance = max deviation from the average / the average. The derating factor is read off the MG-1 curve (interpolated). Correct the unbalance source first; the manufacturer and MG-1 govern the final figure.",
+  };
+}
+export const motorUnbalanceDerateExample = { inputs: { v_ab: 460, v_bc: 455, v_ca: 450 } };
+
+function _v172renderMotorUnbalanceDerate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEMA MG-1 motor derating for voltage unbalance, by name - unbalance = max deviation from the average voltage divided by the average; the derate factor is read off the MG-1 curve (1% -> ~0.98, 5% -> ~0.75). Above 5% the motor should not be operated. The manufacturer and MG-1 govern.";
+  const ab = makeNumber("Line voltage A-B (V)", "mu-ab", { step: "any", min: "0", value: "460" });
+  ab.input.value = "460";
+  const bc = makeNumber("Line voltage B-C (V)", "mu-bc", { step: "any", min: "0", value: "455" });
+  bc.input.value = "455";
+  const ca = makeNumber("Line voltage C-A (V)", "mu-ca", { step: "any", min: "0", value: "450" });
+  ca.input.value = "450";
+  for (const f of [ab, bc, ca]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ab.input.value = "460"; bc.input.value = "455"; ca.input.value = "450"; update(); });
+
+  const oUb = makeOutputLine(outputRegion, "Voltage unbalance", "mu-out-ub");
+  const oDerate = makeOutputLine(outputRegion, "MG-1 derating factor", "mu-out-derate");
+  const oFlag = makeOutputLine(outputRegion, "Status", "mu-out-flag");
+  const oNote = makeOutputLine(outputRegion, "Note", "mu-out-note");
+  const update = debounce(() => {
+    const r = computeMotorUnbalanceDerate({ v_ab: Number(ab.input.value) || 0, v_bc: Number(bc.input.value) || 0, v_ca: Number(ca.input.value) || 0 });
+    if (r.error) { oUb.textContent = r.error; oDerate.textContent = "-"; oFlag.textContent = "-"; oNote.textContent = ""; return; }
+    oUb.textContent = fmt(r.unbalance_pct, 2) + "% (avg " + fmt(r.v_avg, 1) + " V, max dev " + fmt(r.max_dev, 1) + " V)";
+    oDerate.textContent = fmt(r.derate_factor, 3) + " (load to ~" + fmt(r.allowable_pct, 0) + "% of nameplate)";
+    oFlag.textContent = r.do_not_operate ? "DO NOT OPERATE (over 5% unbalance)" : "Derate and run; correct the unbalance source";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ab.input, bc.input, ca.input]) f.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["motor-unbalance-derate"] = _v172renderMotorUnbalanceDerate;

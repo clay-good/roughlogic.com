@@ -1,6 +1,6 @@
 # roughlogic.com Specification v174 -- Rooftop Conduit Sunlight Ambient Temperature Adder (NEC 310.15(B)(2)) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v164..v178 (electrician trade).** In-scope catalog
+> **Status: LANDED 2026-06-24 (package 0.79.0; part of catalog 628 -> 639). Batch spec-v164..v178 (electrician trade).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile applying the NEC 310.15(B)(2) rooftop
 > sunlight temperature adder (33 deg-C / 60 deg-F where the raceway is less than 7/8 in above the roof)
 > to a measured ambient before ampacity correction. Adds one tile to **`calc-electrical.js`** (Group

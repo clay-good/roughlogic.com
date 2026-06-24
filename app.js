@@ -43,6 +43,8 @@ const TOOL_MODULES = (() => {
     // spec-v121..v128 fault / raceway / grounding / three-phase
     "conductor-short-circuit-withstand", "conduit-thermal-expansion",
     "egc-upsize-proportional", "delta-wye-line-phase",
+    // spec-v165/v170/v174/v176 electrician batch
+    "buck-boost-sizing", "wireway-fill", "rooftop-temp-adder", "working-space-110-26",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,
@@ -74,6 +76,8 @@ const TOOL_MODULES = (() => {
   // group: "A" (group letter independent of module, the v72/v78 precedent).
   declare("./calc-powerquality.js", "POWERQUALITY_RENDERERS", [
     "parallel-conductor-derate", "neutral-current-3ph", "motor-vd-starting",
+    // spec-v172 electrician batch
+    "motor-unbalance-derate",
   ]);
   // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
   // relocated from calc-electrical.js at spec-v72 to relieve that module's
@@ -158,6 +162,8 @@ const TOOL_MODULES = (() => {
     "gas-appliance-demand", "tpr-discharge",
     // v64
     "pipe-support-spacing", "softener-sizing",
+    // spec-v167/v168/v169 electrician dwelling demand-factor trio
+    "range-demand-220-55", "dryer-demand-220-54", "neutral-demand-220-61",
   ]);
   // spec-v73 cap-relief split: the two spec-v62 storm-drainage tiles relocated
   // out of calc-plumbing.js (which had reached 96.2% of cap -- the tightest
@@ -320,6 +326,8 @@ const TOOL_MODULES = (() => {
   // calc-electrical.js cap watch. Both tiles keep group "A".
   declare("./calc-elecdesign.js", "ELECDESIGN_RENDERERS", [
     "pull-box-sizing", "lumen-method",
+    // spec-v175 electrician batch
+    "point-illuminance",
   ]);
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".
@@ -392,6 +400,8 @@ const TOOL_MODULES = (() => {
     "storm-shelter", "triage-quickread",
     // v5 Step 61
     "irs-form-index", "sales-tax-nexus", "osha-recordkeeping", "lab-safety-quickread",
+    // spec-v177/v178 electrician reference lookups
+    "burial-depth-300-5", "support-spacing",
   ]);
   declare("./calc-cross.js", "CROSS_RENDERERS", [
     "unit-converter", "material-cost", "markup", "time-and-materials",

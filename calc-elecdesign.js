@@ -151,3 +151,43 @@ ELECDESIGN_RENDERERS["lumen-method"] = _simpleRenderer({
   ],
   compute: computeLumenMethod,
 });
+
+// ===================== spec-v175: point-method horizontal illuminance =====================
+
+// dims: in { intensity_cd: J, mount_height_ft: L, angle_deg: dimensionless } out: { distance_ft: L, e_fc: L^-2, e_lux: L^-2 }
+export function computePointIlluminance({ intensity_cd = 0, mount_height_ft = 0, angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cd = Number(intensity_cd) || 0;
+  const h = Number(mount_height_ft) || 0;
+  const ang = Number(angle_deg) || 0;
+  if (!(cd > 0)) return { error: "Luminous intensity must be positive (candela)." };
+  if (!(h > 0)) return { error: "Mounting height must be positive (ft)." };
+  if (ang < 0 || ang >= 90) return { error: "Angle from nadir must be in [0, 90) degrees." };
+
+  const cosA = Math.cos(ang * Math.PI / 180);
+  const distance_ft = h / cosA;                        // slant distance source-to-point
+  const e_fc = cd * cosA / (distance_ft * distance_ft); // = cd * cos^3 / h^2
+  const e_lux = e_fc * 10.764;
+  return {
+    distance_ft: Number.isFinite(distance_ft) ? distance_ft : null,
+    e_fc: Number.isFinite(e_fc) ? e_fc : null,
+    e_lux: Number.isFinite(e_lux) ? e_lux : null,
+    note: "IES point method (inverse-square + cosine law): E = I x cos(angle) / d^2, with d = mounting height / cos(angle), so E = I x cos^3(angle) / h^2. This is the DIRECT horizontal illuminance from one source, ignoring interreflection; lux = fc x 10.764. A design relies on the manufacturer's photometric file and the IES target level.",
+  };
+}
+const pointIlluminanceExample = { inputs: { intensity_cd: 1000, mount_height_ft: 10, angle_deg: 0 } };
+ELECDESIGN_RENDERERS["point-illuminance"] = _simpleRenderer({
+  citation: "Citation: IES point method (by name) - horizontal illuminance at a point from a source of known candlepower by the inverse-square and cosine laws: E_fc = I x cos^3(angle) / height^2. Direct illuminance from one source, ignoring interreflection; lux = fc x 10.764. The photometric file and the IES target govern.",
+  example: pointIlluminanceExample.inputs,
+  fields: [
+    { key: "intensity_cd", label: "Luminous intensity toward point (candela)", kind: "number" },
+    { key: "mount_height_ft", label: "Mounting height above work plane (ft)", kind: "number" },
+    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" }, default: 0 },
+  ],
+  outputs: [
+    { key: "e", id: "pi-out-e", label: "Horizontal illuminance", value: (r) => fmt(r.e_fc, 2) + " fc (" + fmt(r.e_lux, 1) + " lux)" },
+    { key: "d", id: "pi-out-d", label: "Slant distance to point", value: (r) => fmt(r.distance_ft, 2) + " ft" },
+    { key: "n", id: "pi-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePointIlluminance,
+});

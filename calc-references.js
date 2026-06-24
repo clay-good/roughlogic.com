@@ -637,6 +637,142 @@ function renderLabSafety(inputRegion, outputRegion, citationEl) {
   outputRegion.appendChild(ol);
 }
 
+// =====================================================================
+// spec-v177 - Group A: NEC Table 300.5 minimum cover-depth reference.
+// =====================================================================
+
+// Minimum cover (in) by wiring method (rows) and location (cols), the
+// <= 1000 V columns of NEC Table 300.5. "Cover" is measured to the top of
+// the raceway/cable. Table footnotes modify specific cells; the AHJ governs.
+const _BURIAL_METHODS = [
+  "direct burial cable/conductors",
+  "RMC or IMC",
+  "nonmetallic raceway (PVC etc.)",
+  "residential 120V/20A GFCI branch",
+  "low-voltage <=30V (irrigation/landscape)",
+];
+const _BURIAL_LOCATIONS = [
+  "general earth",
+  "under a building",
+  "under 4in concrete in trench",
+  "under streets/roads/driveways(public)",
+  "one/two-family driveway/parking",
+];
+// [direct, RMC/IMC, PVC, residential-GFCI, low-voltage] cover in inches.
+const _BURIAL_COVER = {
+  "general earth": [24, 6, 18, 12, 6],
+  "under a building": [0, 0, 0, 0, 0],
+  "under 4in concrete in trench": [18, 4, 4, 6, 6],
+  "under streets/roads/driveways(public)": [24, 24, 24, 24, 24],
+  "one/two-family driveway/parking": [18, 18, 18, 12, 18],
+};
+
+// dims: in { wiring_method: dimensionless, location: dimensionless } out: { min_cover_in: L }
+export function computeBurialDepth3005({ wiring_method = "direct burial cable/conductors", location = "general earth" } = {}) {
+  const mi = _BURIAL_METHODS.indexOf(wiring_method);
+  if (mi < 0) return { error: "Wiring method not recognized." };
+  const row = _BURIAL_COVER[location];
+  if (!row) return { error: "Location not recognized." };
+  const min_cover_in = row[mi];
+  return {
+    min_cover_in,
+    wiring_method,
+    location,
+    note: "NEC Table 300.5 (0-1000 V): cover is measured to the top of the raceway or cable. Under a building, wiring in a raceway is permitted at 0 in cover. The table footnotes (raceways under buildings, in/under concrete, supplemental protection for the residential GFCI branch) modify specific cells; the AHJ governs.",
+  };
+}
+export const burialDepth3005Example = { inputs: { wiring_method: "nonmetallic raceway (PVC etc.)", location: "general earth" } };
+
+function renderBurialDepth3005(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Table 300.5 (minimum cover requirements, 0 to 1000 volts), by name. Cover is measured to the top of the raceway/cable; the footnotes modify specific cells. The AHJ governs. Free at nfpa.org/freeaccess.";
+  const method = makeSelect("Wiring method", "bd-method", _BURIAL_METHODS.map((m) => ({ value: m, label: m })));
+  const loc = makeSelect("Location", "bd-loc", _BURIAL_LOCATIONS.map((l) => ({ value: l, label: l })));
+  for (const f of [method, loc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { method.select.value = "nonmetallic raceway (PVC etc.)"; loc.select.value = "general earth"; refresh(); });
+  const oCover = makeOutputLine(outputRegion, "Minimum cover", "bd-out-cover");
+  const oNote = makeOutputLine(outputRegion, "Note", "bd-out-note");
+  function refresh() {
+    const r = computeBurialDepth3005({ wiring_method: method.select.value, location: loc.select.value });
+    if (r.error) { oCover.textContent = r.error; oNote.textContent = ""; return; }
+    oCover.textContent = fmt(r.min_cover_in, 0) + " in";
+    oNote.textContent = r.note;
+  }
+  method.select.addEventListener("change", refresh);
+  loc.select.addEventListener("change", refresh);
+  refresh();
+}
+
+// =====================================================================
+// spec-v178 - Group A: NEC Chapter 3 raceway/cable support-spacing reference.
+// =====================================================================
+
+// Per-method securing rule: box-proximity distance (in) and the maximum
+// support interval (ft). RMC and PVC intervals vary by trade size; the
+// returned interval is computed from the trade size when given.
+const _SUPPORT_METHODS = ["EMT", "RMC/IMC", "PVC (rigid nonmetallic)", "NM cable (Romex)", "MC cable", "AC cable (BX)"];
+// RMC Table 344.30(B)(2): max support interval (ft) by trade size (in).
+function _rmcInterval(size) {
+  if (size <= 0) return 10;            // conservative default when size unknown
+  if (size <= 0.75) return 10;
+  if (size <= 1) return 12;
+  if (size <= 1.5) return 14;
+  if (size <= 2.5) return 16;
+  return 20;                            // 3 in and larger
+}
+// PVC Table 352.30: max support interval (ft) by trade size (in).
+function _pvcInterval(size) {
+  if (size <= 0) return 3;             // conservative default when size unknown
+  if (size <= 1) return 3;
+  if (size <= 2) return 5;
+  if (size <= 3) return 6;
+  if (size <= 5) return 7;
+  return 8;                            // 6 in and larger
+}
+
+// dims: in { wiring_method: dimensionless, trade_size_in: L } out: { secure_within_in: L, max_interval_ft: L }
+export function computeSupportSpacing({ wiring_method = "EMT", trade_size_in = 0 } = {}) {
+  if (!_SUPPORT_METHODS.includes(wiring_method)) return { error: "Wiring method not recognized." };
+  const size = Number(trade_size_in) || 0;
+  let secure_within_in, max_interval_ft, size_dependent = false, code;
+  switch (wiring_method) {
+    case "EMT": secure_within_in = 36; max_interval_ft = 10; code = "358.30"; break;
+    case "RMC/IMC": secure_within_in = 36; max_interval_ft = _rmcInterval(size); size_dependent = true; code = "344.30"; break;
+    case "PVC (rigid nonmetallic)": secure_within_in = 36; max_interval_ft = _pvcInterval(size); size_dependent = true; code = "352.30"; break;
+    case "NM cable (Romex)": secure_within_in = 12; max_interval_ft = 4.5; code = "334.30"; break;
+    case "MC cable": secure_within_in = 12; max_interval_ft = 6; code = "330.30"; break;
+    case "AC cable (BX)": secure_within_in = 12; max_interval_ft = 4.5; code = "320.30"; break;
+  }
+  return {
+    secure_within_in,
+    max_interval_ft,
+    size_dependent,
+    code,
+    note: "NEC " + code + ": secure within " + secure_within_in + " in of each box/fitting and support at least every " + max_interval_ft + " ft." + (size_dependent ? " RMC and PVC intervals vary with trade size (larger conduit spans farther; the size-specific tables govern)." : "") + " Some methods have securing exceptions (EMT/NM fishing in finished walls, MC at terminations). The AHJ governs.",
+  };
+}
+export const supportSpacingExample = { inputs: { wiring_method: "EMT", trade_size_in: 0 } };
+
+function renderSupportSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Chapter 3 securing-and-supporting sections (320.30, 330.30, 334.30, 344.30, 352.30, 358.30), by name. RMC/PVC maximum intervals vary with trade size (the size-specific tables govern). The AHJ governs. Free at nfpa.org/freeaccess.";
+  const method = makeSelect("Wiring method", "ss-method", _SUPPORT_METHODS.map((m) => ({ value: m, label: m })));
+  const size = makeNumber("Trade size (in, for RMC/PVC)", "ss-size", { step: "any", min: "0" });
+  for (const f of [method, size]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { method.select.value = "EMT"; size.input.value = ""; refresh(); });
+  const oSecure = makeOutputLine(outputRegion, "Secure within (of each box)", "ss-out-secure");
+  const oInterval = makeOutputLine(outputRegion, "Maximum support interval", "ss-out-interval");
+  const oNote = makeOutputLine(outputRegion, "Note", "ss-out-note");
+  function refresh() {
+    const r = computeSupportSpacing({ wiring_method: method.select.value, trade_size_in: Number(size.input.value) || 0 });
+    if (r.error) { oSecure.textContent = r.error; oInterval.textContent = ""; oNote.textContent = ""; return; }
+    oSecure.textContent = fmt(r.secure_within_in, 0) + " in";
+    oInterval.textContent = fmt(r.max_interval_ft, 1) + " ft" + (r.size_dependent ? " (at this trade size)" : "");
+    oNote.textContent = r.note;
+  }
+  method.select.addEventListener("change", refresh);
+  size.input.addEventListener("input", refresh);
+  refresh();
+}
+
 export const REFERENCE_RENDERERS = {
   "color-codes": renderColorCodes,
   "knot-reference": renderKnotReference,
@@ -655,4 +791,7 @@ export const REFERENCE_RENDERERS = {
   "sales-tax-nexus": renderSalesTaxNexus,
   "osha-recordkeeping": renderOshaRecordkeeping,
   "lab-safety-quickread": renderLabSafety,
+  // spec-v177/v178 electrician reference lookups
+  "burial-depth-300-5": renderBurialDepth3005,
+  "support-spacing": renderSupportSpacing,
 };

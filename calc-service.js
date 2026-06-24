@@ -345,3 +345,187 @@ function renderSoftenerSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [people.input, use.input, hardness.input, iron.input, cap.input, salt.input]) el.addEventListener("input", update);
 }
 SERVICE_RENDERERS["softener-sizing"] = renderSoftenerSizing;
+
+// =====================================================================
+// spec-v167..v169 - Group A: dwelling demand-factor trio (NEC 220.xx).
+// =====================================================================
+
+// NEC Table 220.55 Column C demand (kW) for equal-rated household ranges,
+// indexed by range count (1..). Past the bundled count, the table's
+// published continuation governs; the AHJ decides large counts.
+const _RANGE_COL_C_KW = {
+  1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 21, 7: 22, 8: 23, 9: 24, 10: 25,
+  11: 26, 12: 27, 13: 28, 14: 29, 15: 30, 16: 31,
+};
+
+// dims: in { num_ranges: dimensionless, nameplate_kw: dimensionless, supply_v: M L^2 T^-3 I^-1 } out: { col_c_kw: dimensionless, demand_kw: dimensionless, demand_a: I }
+export function computeRangeDemand22055({ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Math.round(Number(num_ranges) || 0);
+  const kw = Number(nameplate_kw) || 0;
+  const v = Number(supply_v) || 0;
+  if (!(kw > 0)) return { error: "Range nameplate rating must be positive (kW)." };
+  if (!(n >= 1)) return { error: "Number of ranges must be at least 1." };
+  if (!(v > 0)) return { error: "Service voltage must be positive (V)." };
+
+  const maxCount = 16;
+  const col_c_kw = n <= maxCount ? _RANGE_COL_C_KW[n] : _RANGE_COL_C_KW[maxCount];
+  const over_table = n > maxCount;
+  // Note 1: ranges over 12 kW add 5% to Column C per kW (or major fraction) over 12.
+  const increase = kw > 12 ? Math.ceil(kw - 12) * 0.05 : 0;
+  const demand_kw = col_c_kw * (1 + increase);
+  const demand_a = demand_kw * 1000 / v;
+  return {
+    col_c_kw,
+    increase_pct: increase * 100,
+    demand_kw: Number.isFinite(demand_kw) ? demand_kw : null,
+    demand_a: Number.isFinite(demand_a) ? demand_a : null,
+    over_table,
+    note: "NEC Table 220.55 Column C (equal-rating ranges 8.75-27 kW). Note 1: a range over 12 kW adds 5% to Column C per kW (or major fraction) above 12 kW. This is the common equal-rating Column C path; Notes 2-4 (the under-3.5 kW and 3.5-8.75 kW Columns A/B, and unequal-rating averaging) and the AHJ govern the other cases." + (over_table ? " Range count exceeds the bundled table; the published Column C continuation governs." : ""),
+  };
+}
+export const rangeDemand22055Example = { inputs: { num_ranges: 1, nameplate_kw: 12, supply_v: 240 } };
+
+function _v167renderRangeDemand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Table 220.55 Column C and its Notes (household electric ranges, wall ovens, counter cooktops). One 12 kW range demands 8 kW, not 12; a range over 12 kW gets a 5%-per-kW Column C increase (Note 1). The AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
+  const n = makeNumber("Number of ranges (equal rating)", "rd-n", { step: "1", min: "1", value: "1" });
+  n.input.value = "1";
+  const kw = makeNumber("Each range nameplate (kW)", "rd-kw", { step: "any", min: "0", value: "12" });
+  kw.input.value = "12";
+  const v = makeNumber("Service voltage (V)", "rd-v", { step: "any", min: "0", value: "240" });
+  v.input.value = "240";
+  for (const f of [n, kw, v]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "1"; kw.input.value = "12"; v.input.value = "240"; update(); });
+
+  const oCol = makeOutputLine(outputRegion, "Column C demand (kW)", "rd-out-col");
+  const oDemand = makeOutputLine(outputRegion, "Demand load", "rd-out-demand");
+  const oNote = makeOutputLine(outputRegion, "Note", "rd-out-note");
+  const update = debounce(() => {
+    const r = computeRangeDemand22055({ num_ranges: Number(n.input.value) || 0, nameplate_kw: Number(kw.input.value) || 0, supply_v: Number(v.input.value) || 0 });
+    if (r.error) { oCol.textContent = r.error; oDemand.textContent = "-"; oNote.textContent = ""; return; }
+    oCol.textContent = fmt(r.col_c_kw, 0) + " kW" + (r.increase_pct > 0 ? " (+" + fmt(r.increase_pct, 0) + "% over-12 kW adder)" : "");
+    oDemand.textContent = fmt(r.demand_kw, 2) + " kW = " + fmt(r.demand_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n.input, kw.input, v.input]) f.addEventListener("input", update);
+}
+SERVICE_RENDERERS["range-demand-220-55"] = _v167renderRangeDemand;
+
+// Table 220.54 demand factors for household electric clothes dryers, by count.
+const _DRYER_DEMAND_FACTOR = {
+  1: 1.00, 2: 1.00, 3: 1.00, 4: 1.00, 5: 0.85, 6: 0.75, 7: 0.65, 8: 0.60,
+  9: 0.55, 10: 0.50, 11: 0.47, 12: 0.45, 13: 0.43, 14: 0.41, 15: 0.40,
+};
+
+// dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I }
+export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Math.round(Number(num_dryers) || 0);
+  const w = Number(nameplate_w) || 0;
+  const v = Number(supply_v) || 0;
+  if (!(w > 0)) return { error: "Dryer nameplate rating must be positive (W)." };
+  if (!(n >= 1)) return { error: "Number of dryers must be at least 1." };
+  if (!(v > 0)) return { error: "Service voltage must be positive (V)." };
+
+  const per_dryer_w = Math.max(w, 5000);          // 220.54: 5000 W or nameplate, larger
+  const connected_w = per_dryer_w * n;
+  const maxCount = 15;
+  // Past the bundled table the standard's continuation declines further; the
+  // 15-dryer 40% factor is held as a conservative floor for larger counts.
+  const demand_factor = n <= maxCount ? _DRYER_DEMAND_FACTOR[n] : _DRYER_DEMAND_FACTOR[maxCount];
+  const over_table = n > maxCount;
+  const demand_w = connected_w * demand_factor;
+  const demand_a = demand_w / v;
+  return {
+    per_dryer_w,
+    connected_w,
+    demand_factor,
+    demand_w: Number.isFinite(demand_w) ? demand_w : null,
+    demand_a: Number.isFinite(demand_a) ? demand_a : null,
+    over_table,
+    note: "NEC 220.54 and Table 220.54: each dryer counts at the larger of 5,000 W or its nameplate; the demand factor is 100% for 1-4 dryers, then declines (5 -> 85%, 6 -> 75%, ...). Past the bundled table the published continuation governs; the AHJ decides large counts." + (over_table ? " Dryer count exceeds the bundled table; the 40% floor is applied." : ""),
+  };
+}
+export const dryerDemand22054Example = { inputs: { num_dryers: 4, nameplate_w: 4500, supply_v: 240 } };
+
+function _v168renderDryerDemand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 220.54 and Table 220.54 (household electric clothes dryers). Each dryer counts at the larger of 5,000 W or nameplate; the Table 220.54 demand factor applies once there are five or more. The AHJ-adopted edition governs. Free at nfpa.org/freeaccess.";
+  const n = makeNumber("Number of dryers", "dd-n", { step: "1", min: "1", value: "4" });
+  n.input.value = "4";
+  const w = makeNumber("Each dryer nameplate (W)", "dd-w", { step: "any", min: "0", value: "4500" });
+  w.input.value = "4500";
+  const v = makeNumber("Service voltage (V)", "dd-v", { step: "any", min: "0", value: "240" });
+  v.input.value = "240";
+  for (const f of [n, w, v]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "4"; w.input.value = "4500"; v.input.value = "240"; update(); });
+
+  const oPer = makeOutputLine(outputRegion, "Per-dryer load (5000 W floor)", "dd-out-per");
+  const oFactor = makeOutputLine(outputRegion, "Demand factor", "dd-out-factor");
+  const oDemand = makeOutputLine(outputRegion, "Demand load", "dd-out-demand");
+  const oNote = makeOutputLine(outputRegion, "Note", "dd-out-note");
+  const update = debounce(() => {
+    const r = computeDryerDemand22054({ num_dryers: Number(n.input.value) || 0, nameplate_w: Number(w.input.value) || 0, supply_v: Number(v.input.value) || 0 });
+    if (r.error) { oPer.textContent = r.error; oFactor.textContent = "-"; oDemand.textContent = "-"; oNote.textContent = ""; return; }
+    oPer.textContent = fmt(r.per_dryer_w, 0) + " W x " + Math.round(r.connected_w / r.per_dryer_w) + " = " + fmt(r.connected_w, 0) + " W connected";
+    oFactor.textContent = fmt(r.demand_factor * 100, 0) + "%";
+    oDemand.textContent = fmt(r.demand_w, 0) + " W = " + fmt(r.demand_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n.input, w.input, v.input]) f.addEventListener("input", update);
+}
+SERVICE_RENDERERS["dryer-demand-220-54"] = _v168renderDryerDemand;
+
+// dims: in { max_unbalanced_a: I, nonlinear_excluded: dimensionless } out: { neutral_demand_a: I, first_200_a: I, excess_a: I }
+export function computeNeutralDemand22061({ max_unbalanced_a = 0, nonlinear_excluded = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(max_unbalanced_a) || 0;
+  const excluded = Number(nonlinear_excluded) ? 1 : 0;
+  if (load < 0) return { error: "Maximum unbalanced load must be non-negative (A)." };
+
+  let neutral_demand_a, first_200_a, excess_a;
+  if (excluded) {
+    first_200_a = load;
+    excess_a = 0;
+    neutral_demand_a = load;                      // 220.61(C): no reduction permitted
+  } else {
+    first_200_a = Math.min(load, 200);            // first 200 A at 100%
+    excess_a = Math.max(load - 200, 0);           // portion over 200 A at 70%
+    neutral_demand_a = first_200_a + 0.70 * excess_a;
+  }
+  return {
+    neutral_demand_a: Number.isFinite(neutral_demand_a) ? neutral_demand_a : null,
+    first_200_a,
+    excess_a,
+    nonlinear_excluded: !!excluded,
+    note: excluded
+      ? "NEC 220.61(C): the unbalanced load is nonlinear (electric-discharge lighting, data/electronic loads), so NO 70% reduction is permitted - the neutral carries the full unbalanced load."
+      : "NEC 220.61(B)(1): the neutral carries the maximum unbalanced load; the first 200 A at 100%, the portion over 200 A at 70%. 220.61(C) prohibits the reduction for nonlinear-load portions (set the load type to nonlinear). The AHJ and the load classification govern.",
+  };
+}
+export const neutralDemand22061Example = { inputs: { max_unbalanced_a: 250, nonlinear_excluded: 0 } };
+
+function _v169renderNeutralDemand(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 220.61 (feeder and service neutral load). The neutral carries the maximum unbalanced load; 220.61(B) permits 70% on the portion over 200 A, and 220.61(C) prohibits any reduction for nonlinear-load portions. The AHJ governs. Free at nfpa.org/freeaccess.";
+  const load = makeNumber("Maximum unbalanced load (A)", "nd-load", { step: "any", min: "0", value: "250" });
+  load.input.value = "250";
+  const excl = makeSelect("Load type", "nd-excl", [
+    { value: "0", label: "Ordinary (70% on the part over 200 A)" },
+    { value: "1", label: "Nonlinear (220.61(C) - no reduction)" },
+  ]);
+  for (const f of [load, excl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "250"; excl.select.value = "0"; update(); });
+
+  const oFirst = makeOutputLine(outputRegion, "First 200 A / excess split", "nd-out-first");
+  const oDemand = makeOutputLine(outputRegion, "Neutral demand (A)", "nd-out-demand");
+  const oNote = makeOutputLine(outputRegion, "Note", "nd-out-note");
+  const update = debounce(() => {
+    const r = computeNeutralDemand22061({ max_unbalanced_a: Number(load.input.value) || 0, nonlinear_excluded: Number(excl.select.value) });
+    if (r.error) { oFirst.textContent = r.error; oDemand.textContent = "-"; oNote.textContent = ""; return; }
+    oFirst.textContent = r.nonlinear_excluded ? "(no reduction - full load)" : fmt(r.first_200_a, 0) + " A at 100% + " + fmt(r.excess_a, 0) + " A at 70%";
+    oDemand.textContent = fmt(r.neutral_demand_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  load.input.addEventListener("input", update);
+  excl.select.addEventListener("input", update);
+}
+SERVICE_RENDERERS["neutral-demand-220-61"] = _v169renderNeutralDemand;
