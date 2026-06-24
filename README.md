@@ -119,7 +119,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 648-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~25.9 KB gz; total home payload 38.8% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 648-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~26.1 KB gz; total home payload 38.9% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 The component diagram above shows *what* loads; the sequence below shows *when*. Opening a tile is a chain of cached dynamic imports behind a crash-safe boundary, so the bytes a given calculator needs arrive only on first use and the home view ships none of them:
@@ -195,7 +195,7 @@ roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
   app.js                SPA entry: hash router, renderers, lazy loaders (~71 KB raw / ~23 KB gz)
-  tools-data.js         catalog registry (TOOLS, 648 tiles); lazy-loaded (~176 KB raw / ~58 KB gz)
+  tools-data.js         catalog registry (TOOLS, 648 tiles); lazy-loaded (~180 KB raw / ~60 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       50 per-group calculator modules (electrical, hvac, ...,
                         calc-fab.js is the pipe & conduit fabrication bench split
@@ -473,11 +473,11 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n882 functions extracted]
+    F[Exported calculator function] --> A[Phase A: corpus row\n891 functions extracted]
     F --> C[Phase C: dimensional analysis\n894/894 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n892/892 covered]
+    F --> D[Phase D: bounds fuzzer\n891/891 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
-    F --> Fa[Phase F: cross-tile invariants\n341 tests / 66 monotonicity batches]
+    F --> Fa[Phase F: cross-tile invariants\n341 tests / 285 monotonicity batches]
     F --> I[Phase I: derivation index\n648/648 tiles]
     F --> G[Phase G: source-coverage map\n648/648 tiles, 163 sources]
     F -.pending.-> B[Phase B: independent worked-example source]
@@ -494,12 +494,12 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (892 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (891 rows; lint fails on a stale section) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
 | C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (894/894) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (892/892) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (891/891) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
-| F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 66 monotonicity batches, 341 tests) |
+| F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 285 monotonicity batches, 341 tests) |
 | G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (648/648 tiles classified, 100%; 163 tracked sources) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
 | I | One derivation-index row per tile | Complete (648/648) |
