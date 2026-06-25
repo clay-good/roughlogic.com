@@ -32,8 +32,8 @@ async function liveCounts() {
   const groups = new Set([...toolsData.matchAll(/group: "([A-Z])"/g)].map((m) => m[1])).size;
   const files = await readdir(ROOT);
   const modules = files.filter((f) => /^calc-.*\.js$/.test(f)).length;
-  // sitemap = one URL per tile + one per active group + home + changelog.
-  const sitemap = tiles + groups + 2;
+  // sitemap = one URL per tile + one per active group + home.
+  const sitemap = tiles + groups + 1;
   return { tiles, groups, modules, sitemap };
 }
 

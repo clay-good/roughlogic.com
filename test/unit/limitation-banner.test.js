@@ -108,7 +108,7 @@ test("renderLimitationBanner inserts an aside with the expected text", async () 
   assert.equal(host.children[0], aside);
   assert.equal(aside.tagName, "ASIDE");
   assert.equal(aside.getAttribute("role"), "note");
-  assert.equal(aside.getAttribute("aria-label"), "Tile limitations");
+  assert.equal(aside.getAttribute("aria-label"), "Tool limitations");
   assert.ok(aside.classList.has("inline-notice"));
   assert.ok(aside.classList.has("limitation-banner"));
 

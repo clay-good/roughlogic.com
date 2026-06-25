@@ -345,8 +345,6 @@ const EXCLUDE = new Set([
   "integrity.js",
   "routing.js",
   "sw.js",
-  "changelog.js",
-  "changelog.html",
 ]);
 
 async function main() {

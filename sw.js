@@ -19,19 +19,6 @@ const DATA_CACHE = "roughlogic-data-" + BUILD_HASH;
 const SHELL_ASSETS = [
   "./",
   "./index.html",
-  "./changelog.html",
-  "./changelog.js",
-  // CHANGELOG.md is intentionally NOT eagerly precached. It is an
-  // append-only document that grows every release (currently ~1.28 MB,
-  // roughly 10x the rest of the entire shell combined), and the changelog
-  // is the least safety-critical view to have offline. Eager-precaching it
-  // would make every visitor pay a >1 MB download on SW install for a page
-  // most never open. It is instead cached-on-access: the fetch handler
-  // below `cache.put`s any successful same-origin GET, so the first
-  // changelog visit (online) populates the cache and subsequent visits work
-  // offline. changelog.js fails gracefully ("Could not load changelog") if
-  // a never-visited install goes offline. The page chrome (changelog.html /
-  // changelog.js) stays precached so the view itself always renders.
   "./styles.css",
   "./app.js",
   "./tools-data.js",

@@ -168,13 +168,11 @@ async function main() {
   // manifest icons, etc.).
   const ORPHAN_EXEMPT = new Set([
     "index.html",
-    "changelog.html",
     "sw.js",
     "_headers",
     "robots.txt",
     "sitemap.xml",
     "LICENSE",
-    "CHANGELOG.md",
     "build-info.json",
     "favicon.svg",
     "site.webmanifest",

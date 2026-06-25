@@ -30,7 +30,6 @@ const TARGETS = [
   "ui-fields.js",
   "ui-validity.js",
   "integrity.js",
-  "changelog.js",
   "calc-electrical.js",
   "calc-plumbing.js",
   "calc-hvac.js",

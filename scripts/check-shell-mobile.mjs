@@ -49,7 +49,7 @@ async function main() {
       .filter((d) => d.isDirectory()).map((d) => `/tools/${d.name}/`);
     const groups = (await readdir("dist/groups", { withFileTypes: true }))
       .filter((d) => d.isDirectory()).map((d) => `/groups/${d.name}/`);
-    const routes = [...tools, ...groups, "/changelog.html", "/"];
+    const routes = [...tools, ...groups, "/"];
 
     // The prerendered shells are generated from one template, so the 320px
     // portrait floor over EVERY shell already proves the template handles every
@@ -57,7 +57,7 @@ async function main() {
     // shared overflow-wrap rule absorbs). The two secondary axes a single
     // viewport misses -- landscape (short height) and 200% text-only zoom
     // (WCAG 1.4.4) -- are template-driven in exactly the same way, so they audit
-    // a representative sample: every group hub, the changelog, the home shell,
+    // a representative sample: every group hub, the home shell,
     // and an evenly-strided slice of tool shells. (320px portrait is also the
     // WCAG 1.4.10 reflow guarantee: 400% page zoom resolves to a 320px viewport.)
     const meta = routes.filter((r) => !r.startsWith("/tools/"));
@@ -88,12 +88,8 @@ async function main() {
         checks++;
         const resp = await page.goto(BASE + route, { waitUntil: "load" });
         if (!resp || !resp.ok()) { offenders.push(`[${cond.label}] ${route} (HTTP ${resp ? resp.status() : "null"})`); continue; }
-        // Only changelog.html renders client-side (it fetches CHANGELOG.md after
-        // load); wait for the network to settle so we measure rendered content,
-        // not the empty "Loading..." shell. The static tool/group shells are
-        // fully painted at the load event, so measure them immediately -- the
-        // networkidle 500ms quiet-window per route would otherwise dominate.
-        if (route === "/changelog.html") await page.waitForLoadState("networkidle");
+        // The static tool/group shells are fully painted at the load event, so
+        // measure them immediately.
         const o = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
         if (o.sw > o.cw + 1) offenders.push(`[${cond.label}] ${route} (${o.sw} > ${o.cw})`);
       }

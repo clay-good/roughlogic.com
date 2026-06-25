@@ -417,8 +417,8 @@ function tileShell(tool, tools, groupNames, relatedMap) {
     `    <p>This tile is built for ${escapeHtml(professionNoun.toLowerCase())} and the adjacent professions in the ${escapeHtml(groupLabel)} group. The interactive calculator runs entirely in your browser. No account, no fee, no advertising, no tracking.</p>`,
     '  </section>',
     relatedItems ? [
-      '  <section class="shell-section" aria-label="Related tiles">',
-      '    <h2>Related tiles</h2>',
+      '  <section class="shell-section" aria-label="Related tools">',
+      '    <h2>Related tools</h2>',
       '    <ul class="shell-related">',
       relatedItems,
       '    </ul>',
@@ -444,7 +444,7 @@ function groupShell(group, tools, groupNames) {
   if (tilesInGroup.length === 0) return null;
   const title = `${groupLabel} Calculators - Rough Logic`;
   const sample = tilesInGroup.slice(0, 3).map((t) => t.name).join(", ");
-  let description = `Calculators and reference tiles for ${groupLabel.toLowerCase()}: ${sample}, and more. Free, client-side, ad-free, account-free reference for the trades and adjacent professions.`;
+  let description = `Calculators and reference tools for ${groupLabel.toLowerCase()}: ${sample}, and more. Free, client-side, ad-free, account-free reference for the trades and adjacent professions.`;
   if (description.length > 220) description = description.slice(0, 217) + "...";
   const canonical = `${SITE_URL}/groups/${groupSlug}/`;
   const head = shellHead({
@@ -471,10 +471,10 @@ function groupShell(group, tools, groupNames) {
     '    </ol>',
     '  </nav>',
     `  <h1 class="shell-h1">${escapeHtml(groupLabel)}</h1>`,
-    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} calculators and reference tiles for ${escapeHtml(groupLabel.toLowerCase())}. Every tile runs entirely in your browser. No account. No fee. No advertising. No tracking.</p>`,
+    `  <p class="shell-lead">${escapeHtml(tilesInGroup.length)} calculators and reference tools for ${escapeHtml(groupLabel.toLowerCase())}. Every tool runs entirely in your browser. No account. No fee. No advertising. No tracking.</p>`,
     `  <p class="shell-run"><a class="shell-run-link" href="../../#group=${escapeHtml(group)}">Open the live group view</a></p>`,
-    '  <section class="shell-section" aria-label="Tiles in this group">',
-    '    <h2>Tiles in this group</h2>',
+    '  <section class="shell-section" aria-label="Tools in this group">',
+    '    <h2>Tools in this group</h2>',
     '    <ul class="shell-related">',
     items,
     '    </ul>',
@@ -498,13 +498,6 @@ function buildSitemap(tools, groups, builtIso) {
   lines.push(`    <lastmod>${lastmod}</lastmod>`);
   lines.push('    <changefreq>weekly</changefreq>');
   lines.push('    <priority>1.0</priority>');
-  lines.push('  </url>');
-  // Changelog.
-  lines.push('  <url>');
-  lines.push(`    <loc>${SITE_URL}/changelog.html</loc>`);
-  lines.push(`    <lastmod>${lastmod}</lastmod>`);
-  lines.push('    <changefreq>weekly</changefreq>');
-  lines.push('    <priority>0.5</priority>');
   lines.push('  </url>');
   // Groups.
   for (const g of groups) {

@@ -307,27 +307,6 @@ test("clicking a search result routes to that tool", async ({ page }) => {
   expect(await page.locator("#view-region").isVisible()).toBe(true);
 });
 
-test("changelog.html renders headings and list items from CHANGELOG.md", async ({ page }) => {
-  // The static viewer at /changelog.html fetches CHANGELOG.md and renders
-  // it with deterministic Markdown-lite parsing (heading-only logic, no
-  // innerHTML, no library). Smoke test ensures the parse succeeds and
-  // produces visible structure - if a future change breaks the fetch or
-  // the parser, this test catches it before deploy.
-  const errs = [];
-  page.on("pageerror", (e) => errs.push("PAGEERROR: " + e.message));
-  await page.goto("/changelog.html", { waitUntil: "networkidle" });
-  await page.waitForSelector("#changelog-content h2, #changelog-content h3", { timeout: 5000 });
-  // At minimum we expect both v0.2.0 and v0.1.0 release h2 headings, plus
-  // assorted ### subheadings for the build-progress sections.
-  const headers = await page.locator("#changelog-content h2, #changelog-content h3").count();
-  expect(headers).toBeGreaterThan(2);
-  const items = await page.locator("#changelog-content li").count();
-  expect(items).toBeGreaterThan(20);
-  // Theme toggle still works on the changelog page.
-  expect(await page.locator("#theme-toggle").count()).toBe(1);
-  expect(errs).toEqual([]);
-});
-
 test("noscript notice renders and is visible when JavaScript is disabled", async ({ browser }) => {
   // Static-site / progressive-enhancement contract: with JS off, the page
   // must visibly tell the user the calculators won't load (rather than

@@ -20,7 +20,7 @@
 // markup):
 //
 //   <aside class="inline-notice limitation-banner" role="note"
-//          aria-label="Tile limitations">
+//          aria-label="Tool limitations">
 //     <strong class="limitation-headline">Not a Manual J load calculation.</strong>
 //     <p class="limitation-replacement">A code-compliant load calc
 //        requires ACCA Manual J 8th ed.</p>
@@ -59,7 +59,7 @@ export function renderLimitationBanner(host, opts) {
   const aside = doc.createElement("aside");
   aside.className = "inline-notice limitation-banner";
   aside.setAttribute("role", "note");
-  aside.setAttribute("aria-label", "Tile limitations");
+  aside.setAttribute("aria-label", "Tool limitations");
 
   const h = doc.createElement("strong");
   h.className = "limitation-headline";
@@ -105,14 +105,14 @@ const CANONICAL = {
   "manual-j-cooling": {
     headline: "Not a Manual J load calculation.",
     replacement:
-      "A code-compliant load calculation requires ACCA Manual J 8th ed. This tile is a simplified screen.",
+      "A code-compliant load calculation requires ACCA Manual J 8th ed. This is a simplified screen.",
     who_governs: "The AHJ and the licensed mechanical designer govern.",
     link: "acca.org",
   },
   "manual-j-heating": {
     headline: "Not a Manual J load calculation.",
     replacement:
-      "A code-compliant load calculation requires ACCA Manual J 8th ed. This tile is a simplified screen.",
+      "A code-compliant load calculation requires ACCA Manual J 8th ed. This is a simplified screen.",
     who_governs: "The AHJ and the licensed mechanical designer govern.",
     link: "acca.org",
   },
@@ -133,7 +133,7 @@ const CANONICAL = {
   "outdoor-air-ventilation": {
     headline: "Not an ASHRAE 62.1 design.",
     replacement:
-      "Rp and Ra are user-supplied. ASHRAE 62.1 Table 6-1 governs the per-occupancy values for the AHJ-adopted edition. The tile does not bundle the table.",
+      "Rp and Ra are user-supplied. ASHRAE 62.1 Table 6-1 governs the per-occupancy values for the AHJ-adopted edition. This tool does not bundle the table.",
     who_governs: "The AHJ and the design engineer govern.",
     link: "ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
   },

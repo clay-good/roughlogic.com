@@ -908,7 +908,7 @@ const FIRE_GROUND_TRADE = "fire";
 // Inline notices.
 const NOTICE_DEFAULT = "This is a math aid for verification. Local codes, manufacturer specifications, and the authority having jurisdiction govern all installations and inspections.";
 const NOTICE_FIRE = "This is a math aid for verification. Departmental SOPs and incident command govern all fireground operations.";
-const NOTICE_HISTORICAL = "Reference only. Bundled at build time. Ask your supplier for a current quote.";
+const NOTICE_HISTORICAL = "Reference only. Prices change; ask your supplier for a current quote.";
 const NOTICE_TAX_LAW = "Estimate only. Tax law changes. Confirm with the current IRS publication or a licensed CPA before filing.";
 const NOTICE_LEGAL = "This is legal information, not legal advice. Statutes and court rules change. Verify with current state code and a licensed attorney before relying on this for a filing or a deadline.";
 const NOTICE_LAB = "Verify protocol against your lab's SOP before pipetting. A miscalculated dilution can ruin a run or a sample.";
@@ -1023,8 +1023,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "600+ deterministic field-math tools for electricians, plumbers, HVAC, restoration, carpentry, and fire-ground engineering. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 600+ Field-Math Tools, No Signup · Rough Logic";
+const HOME_DESC = "600+ free calculators for electricians, plumbers, HVAC, restoration, carpentry, and fire crews. Everything runs in your browser. No signup, no tracking, no AI.";
+const HOME_TITLE = "Free Trade Calculators - 600+ Tools, No Signup · Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative
@@ -1136,7 +1136,7 @@ function renderToolView(id, params) {
   sources.setAttribute("aria-label", "Sources");
   const sourcesNote = document.createElement("p");
   sourcesNote.className = "citation";
-  sourcesNote.textContent = "Sources and derivation notes are linked from docs/derivations.md and docs/data-sources.md.";
+  sourcesNote.textContent = "Every formula is drawn from published standards and engineering references.";
   sources.appendChild(sourcesNote);
   view.appendChild(sources);
 

@@ -2,7 +2,7 @@
 // Static site build for Cloudflare Pages.
 //
 // Copies the runtime files (HTML, CSS, JS, sw.js, _headers, manifest, icons,
-// robots.txt, sitemap.xml, data/, CHANGELOG.md, LICENSE) into ./dist.
+// robots.txt, sitemap.xml, data/, LICENSE) into ./dist.
 // No bundler. No transpiler. No minifier. The shipped files are the source.
 
 import { readdir, mkdir, copyFile, stat, readFile, writeFile, rm } from "node:fs/promises";
@@ -16,8 +16,6 @@ const DIST = resolve(ROOT, "dist");
 // Top-level files copied verbatim.
 const FILES = [
   "index.html",
-  "changelog.html",
-  "changelog.js",
   "styles.css",
   "app.js",
   "tools-data.js",
@@ -106,7 +104,6 @@ const FILES = [
   "sitemap.xml",
   "site.webmanifest",
   "favicon.svg",
-  "CHANGELOG.md",
   "LICENSE",
 ];
 
@@ -143,7 +140,6 @@ async function checkRuntimeFilesEnumerated() {
   const skip = new Set([
     "package.json", "package-lock.json",
     "wrangler.jsonc", "lighthouserc.json",
-    // changelog.js is in FILES; this list covers things never shipped.
   ]);
   const missing = [];
   for (const name of await readdir(ROOT)) {
