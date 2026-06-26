@@ -1,6 +1,6 @@
 # roughlogic.com Specification v193 -- Disinfectant / Antimicrobial Contact (Dwell) Time Reference (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one reference tile returning the label contact
 > (dwell) time required for common EPA-registered antimicrobial classes and the keep-wet rule that
 > governs whether a disinfection claim is actually achieved. Adds one tile to **`calc-restoration.js`**

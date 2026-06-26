@@ -1,6 +1,6 @@
 # roughlogic.com Specification v198 -- Drying Completion Projection: Days to Goal From Monitored Moisture Drop (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v197..v198 (water-damage restoration, second pass), closing
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v197..v198 (water-damage restoration, second pass), closing
 > tile.** In-scope catalog expansion under the spec-v106 trades-only charter: one tile projecting how
 > many days a material needs to reach its dry goal from the moisture-content drop observed between
 > readings -- the completion forecast that turns the drying log into a schedule. Adds one tile to

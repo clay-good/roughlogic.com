@@ -1,6 +1,6 @@
 # roughlogic.com Specification v197 -- Injection / Wall-Cavity Drying System Sizing (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v197..v198 (water-damage restoration, second pass).**
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v197..v198 (water-damage restoration, second pass).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: one specialty-drying tile sizing
 > an injection / wall-cavity drying system -- the port count across affected stud bays and the number
 > of air-delivery systems needed to dry enclosed cavities without removing the wall. Adds one tile to

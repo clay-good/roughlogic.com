@@ -1,6 +1,6 @@
 # roughlogic.com Specification v190 -- Bound Water in Wet Materials: Pounds and Gallons to Evaporate (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile estimating the weight and volume of water
 > held in affected materials that drying must evaporate, from the material volume, dry density, and the
 > moisture-content drop to the dry goal. Adds one tile to **`calc-restoration.js`** (Group D); no new

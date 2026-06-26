@@ -1963,3 +1963,439 @@ function renderDesiccantAirflow(inputRegion, outputRegion, citationEl) {
   for (const el of [demand.input, depression.input, nameplate.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["desiccant-airflow-sizing"] = renderDesiccantAirflow;
+
+// =====================================================================
+// spec-v189..v198: water-damage restoration second/third pass (Group D).
+// Closes the structural-drying loop (balance, bound water, completion
+// projection), the antimicrobial dwell/keep-wet reference, the S500
+// carpet and category decisions, occupied-space hydroxyl deodorization,
+// and injection wall-cavity drying. All lazy-loaded; absent from the
+// home first paint. ANSI/IICRC S500/S520/S700 govern.
+// =====================================================================
+
+// --- spec-v189: Drying-system balance (`drying-balance`) ---
+// balance_ppd = installed - evap; ratio = installed / evap; verdict from
+// the ratio against the target margin (default 1.2).
+// dims: in { evap_load_ppd: L^3 T^-1, installed_ppd: L^3 T^-1, target_margin: dimensionless } out: { balance_ppd: L^3 T^-1, ratio: dimensionless }
+export function computeDryingBalance({ evap_load_ppd = 0, installed_ppd = 0, target_margin = 1.2 } = {}) {
+  const evap = Number(evap_load_ppd);
+  const installed = Number(installed_ppd);
+  let margin = Number(target_margin);
+  if (!Number.isFinite(evap) || !Number.isFinite(installed) || !Number.isFinite(margin)) return { error: "Inputs must be finite numbers." };
+  if (!(evap > 0)) return { error: "Evaporation load must be positive (pints/day)." };
+  if (!(installed > 0)) return { error: "Installed dehumidification capacity must be positive (pints/day)." };
+  if (!(margin > 0)) margin = 1.2;
+  const balance = installed - evap;
+  const ratio = installed / evap;
+  let verdict;
+  let add_ppd = 0;
+  if (ratio >= margin) {
+    verdict = "Balanced with margin.";
+  } else if (ratio >= 1) {
+    verdict = "Meeting the load with no margin - add capacity or improve airflow.";
+    add_ppd = margin * evap - installed;
+  } else {
+    verdict = "Deficit - chamber over-humidifying; add capacity.";
+    add_ppd = margin * evap - installed;
+  }
+  return {
+    balance_ppd: Number.isFinite(balance) ? balance : null,
+    ratio: Number.isFinite(ratio) ? ratio : null,
+    verdict,
+    add_ppd: add_ppd > 0 ? add_ppd : 0,
+    note: "Field dehumidification capacity falls below the AHAM nameplate as the air dries. The restorer's daily monitoring governs. IICRC S500 governs.",
+  };
+}
+export const dryingBalanceExample = { inputs: { evap_load_ppd: 200, installed_ppd: 260, target_margin: 1.2 } };
+
+function renderDryingBalance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Balanced-drying-system principle (ANSI/IICRC S500), by name. A balanced system keeps installed dehumidification at or above the evaporation load with margin. Field capacity is below the AHAM nameplate as grain depression falls; the restorer's daily monitoring governs equipment adjustments.";
+  const evap = makeNumber("Evaporation load (pints/day, from evaporation-load)", "db-evap", { step: "any", min: "0", value: "200" });
+  evap.input.value = "200";
+  const installed = makeNumber("Installed dehu capacity (pints/day; field, not AHAM)", "db-inst", { step: "any", min: "0", value: "260" });
+  installed.input.value = "260";
+  const margin = makeNumber("Target capacity-to-load ratio", "db-margin", { step: "any", min: "0", value: "1.2" });
+  margin.input.value = "1.2";
+  for (const f of [evap, installed, margin]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { evap.input.value = "200"; installed.input.value = "260"; margin.input.value = "1.2"; update(); });
+  const oBal = makeOutputLine(outputRegion, "Balance", "db-out-bal");
+  const oRatio = makeOutputLine(outputRegion, "Capacity-to-load ratio", "db-out-ratio");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "db-out-verdict");
+  const update = debounce(() => {
+    const r = computeDryingBalance({ evap_load_ppd: Number(evap.input.value) || 0, installed_ppd: Number(installed.input.value) || 0, target_margin: margin.input.value === "" ? 1.2 : Number(margin.input.value) });
+    if (r.error) { oBal.textContent = r.error; oRatio.textContent = "-"; oVerdict.textContent = "-"; return; }
+    oBal.textContent = fmt(r.balance_ppd, 0) + " ppd";
+    oRatio.textContent = fmt(r.ratio, 2);
+    oVerdict.textContent = r.verdict + (r.add_ppd > 0 ? " Add about " + fmt(r.add_ppd, 0) + " ppd." : "");
+  }, DEBOUNCE_MS);
+  for (const el of [evap.input, installed.input, margin.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["drying-balance"] = renderDryingBalance;
+
+// --- spec-v190: Bound water in wet materials (`bound-water`) ---
+// dry_mass = volume * dry_density; water_lb = dry_mass * (mc_cur - mc_goal)/100;
+// water_gal = water_lb / 8.34 (lb/gal).
+// dims: in { material_volume_ft3: L^3, dry_density_lb_ft3: M L^-3, mc_current_pct: dimensionless, mc_goal_pct: dimensionless } out: { dry_mass_lb: M, water_lb: M, water_gal: L^3 }
+export function computeBoundWater({ material_volume_ft3 = 0, dry_density_lb_ft3 = 0, mc_current_pct = 0, mc_goal_pct = 0 } = {}) {
+  const vol = Number(material_volume_ft3);
+  const density = Number(dry_density_lb_ft3);
+  const cur = Number(mc_current_pct);
+  const goal = Number(mc_goal_pct);
+  if (![vol, density, cur, goal].every(Number.isFinite)) return { error: "Inputs must be finite numbers." };
+  if (!(vol > 0)) return { error: "Material volume must be positive (ft^3)." };
+  if (!(density > 0)) return { error: "Dry density must be positive (lb/ft^3)." };
+  if (!(cur > goal)) return { error: "Current moisture content must be above the goal." };
+  const dryMass = vol * density;
+  const waterLb = dryMass * (cur - goal) / 100;
+  const waterGal = waterLb / 8.34;
+  return {
+    dry_mass_lb: Number.isFinite(dryMass) ? dryMass : null,
+    water_lb: Number.isFinite(waterLb) ? waterLb : null,
+    water_gal: Number.isFinite(waterGal) ? waterGal : null,
+    note: "Moisture content is on a dry-weight basis (consistent with wood-emc). Dry density and material moisture vary by species and product; this is a planning estimate, not a gravimetric measurement. In-situ meter readings and IICRC S500 govern.",
+  };
+}
+export const boundWaterExample = { inputs: { material_volume_ft3: 10, dry_density_lb_ft3: 32, mc_current_pct: 40, mc_goal_pct: 12 } };
+
+function renderBoundWater(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Gravimetric water-mass relation (ANSI/IICRC S500), by name. Moisture content is dry-weight basis (consistent with wood-emc). Dry density and material moisture vary by species and product; meter readings and the restorer's judgment govern. This is a planning estimate, not a gravimetric measurement.";
+  const vol = makeNumber("Material volume (ft^3, area x thickness)", "bw-vol", { step: "any", min: "0", value: "10" });
+  vol.input.value = "10";
+  const density = makeNumber("Oven-dry density (lb/ft^3; softwood ~32, gypsum ~40)", "bw-den", { step: "any", min: "0", value: "32" });
+  density.input.value = "32";
+  const cur = makeNumber("Current moisture content (percent)", "bw-cur", { step: "any", min: "0", value: "40" });
+  cur.input.value = "40";
+  const goal = makeNumber("Goal moisture content (percent)", "bw-goal", { step: "any", min: "0", value: "12" });
+  goal.input.value = "12";
+  for (const f of [vol, density, cur, goal]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "10"; density.input.value = "32"; cur.input.value = "40"; goal.input.value = "12"; update(); });
+  const oMass = makeOutputLine(outputRegion, "Oven-dry mass", "bw-out-mass");
+  const oLb = makeOutputLine(outputRegion, "Water to evaporate", "bw-out-lb");
+  const oGal = makeOutputLine(outputRegion, "Water volume", "bw-out-gal");
+  const update = debounce(() => {
+    const r = computeBoundWater({ material_volume_ft3: Number(vol.input.value) || 0, dry_density_lb_ft3: Number(density.input.value) || 0, mc_current_pct: Number(cur.input.value) || 0, mc_goal_pct: Number(goal.input.value) || 0 });
+    if (r.error) { oMass.textContent = r.error; oLb.textContent = "-"; oGal.textContent = "-"; return; }
+    oMass.textContent = fmt(r.dry_mass_lb, 0) + " lb";
+    oLb.textContent = fmt(r.water_lb, 1) + " lb";
+    oGal.textContent = fmt(r.water_gal, 1) + " gal";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, density.input, cur.input, goal.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["bound-water"] = renderBoundWater;
+
+// --- spec-v193: Disinfectant contact (dwell) time reference (`disinfectant-dwell`) ---
+const DISINFECTANT_DWELL = {
+  quat: { label: "quaternary ammonium (quat)", contact: "10 min" },
+  ahp: { label: "accelerated hydrogen peroxide (AHP)", contact: "1-5 min" },
+  bleach: { label: "sodium hypochlorite (bleach solution)", contact: "10 min" },
+  phenolic: { label: "phenolic", contact: "10 min" },
+  botanical: { label: "botanical / thymol", contact: "10 min" },
+};
+// dims: in { product_class: dimensionless } out: { typical_contact_min: dimensionless, keep_wet_rule: dimensionless, pre_clean_rule: dimensionless, authority: dimensionless }
+export function computeDisinfectantDwell({ product_class = "quat" } = {}) {
+  const row = DISINFECTANT_DWELL[product_class];
+  if (!row) return { error: "Unknown product class." };
+  return {
+    product_class: row.label,
+    typical_contact_min: row.contact,
+    keep_wet_rule: "Keep the surface visibly wet for the full contact time; re-apply if it dries.",
+    pre_clean_rule: "Pre-clean to remove soil first; disinfectant cannot penetrate organic load.",
+    authority: "The EPA-registered product label governs the exact dwell (FIFRA).",
+  };
+}
+export const disinfectantDwellExample = { inputs: { product_class: "quat" } };
+
+function renderDisinfectantDwell(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Antimicrobial contact-time principle (ANSI/IICRC S500 and S520), by name. Antimicrobials are EPA-registered pesticides whose label is the legal authority (FIFRA); the ranges shown are guidance and the specific product label governs the exact dwell. The surface must stay visibly wet for the full contact time, and disinfection requires pre-cleaning because product cannot penetrate soil.";
+  const cls = makeSelect("Product class", "dd-cls", [
+    { value: "quat", label: "Quaternary ammonium (quat)", selected: true },
+    { value: "ahp", label: "Accelerated hydrogen peroxide (AHP)" },
+    { value: "bleach", label: "Sodium hypochlorite (bleach solution)" },
+    { value: "phenolic", label: "Phenolic" },
+    { value: "botanical", label: "Botanical / thymol" },
+  ]);
+  inputRegion.appendChild(cls.wrap);
+  attachExampleButton(inputRegion, () => { cls.select.value = "quat"; update(); });
+  const oContact = makeOutputLine(outputRegion, "Typical wet contact time", "dd-out-contact");
+  const oWet = makeOutputLine(outputRegion, "Keep-wet rule", "dd-out-wet");
+  const oClean = makeOutputLine(outputRegion, "Pre-clean rule", "dd-out-clean");
+  const oAuth = makeOutputLine(outputRegion, "Authority", "dd-out-auth");
+  const update = debounce(() => {
+    const r = computeDisinfectantDwell({ product_class: cls.select.value });
+    if (r.error) { oContact.textContent = r.error; oWet.textContent = "-"; oClean.textContent = "-"; oAuth.textContent = "-"; return; }
+    oContact.textContent = r.typical_contact_min;
+    oWet.textContent = r.keep_wet_rule;
+    oClean.textContent = r.pre_clean_rule;
+    oAuth.textContent = r.authority;
+  }, DEBOUNCE_MS);
+  cls.select.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["disinfectant-dwell"] = renderDisinfectantDwell;
+
+// --- spec-v194: Carpet / cushion restore-vs-replace reference (`carpet-restore-replace`) ---
+const WATER_CATEGORY_LABELS = {
+  cat1: "Category 1 (clean)",
+  cat2: "Category 2 (gray)",
+  cat3: "Category 3 (black)",
+};
+// dims: in { water_category: dimensionless, component: dimensionless, delaminated: dimensionless } out: { decision: dimensionless, rationale: dimensionless }
+export function computeCarpetRestoreReplace({ water_category = "cat1", component = "carpet", delaminated = 0 } = {}) {
+  const cat = WATER_CATEGORY_LABELS[water_category];
+  if (!cat) return { error: "Unknown water category." };
+  if (component !== "carpet" && component !== "cushion") return { error: "Component must be carpet or cushion." };
+  const delam = Number(delaminated) ? 1 : 0;
+  let decision;
+  let rationale;
+  if (component === "carpet" && delam === 1) {
+    decision = "Replace (delamination).";
+    rationale = "Delaminated carpet is replaced regardless of category.";
+  } else if (water_category === "cat3") {
+    decision = "Remove and dispose (not restorable).";
+    rationale = "Category 3 porous flooring is generally removed and disposed.";
+  } else if (component === "cushion") {
+    decision = "Typically remove and replace.";
+    rationale = "Saturated cushion (pad) is usually removed; replacement costs less than drying.";
+  } else if (water_category === "cat2") {
+    decision = "Restorable case-by-case after cleaning and sanitizing.";
+    rationale = "Category 2 carpet may be restored after cleaning; the cushion is removed.";
+  } else {
+    decision = "May be dried in place or floated and restored.";
+    rationale = "Category 1 carpet that is not delaminated can usually be dried and saved.";
+  }
+  return {
+    water_category: cat,
+    decision,
+    rationale,
+    note: "A professional determination case by case: age, condition, contamination, customer agreement, and the AHJ all bear on it. IICRC S500 governs.",
+  };
+}
+export const carpetRestoreReplaceExample = { inputs: { water_category: "cat1", component: "carpet", delaminated: 0 } };
+
+function renderCarpetRestoreReplace(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Carpet and cushion restore-vs-replace mapping (ANSI/IICRC S500), by name. The decision is a professional determination case by case (age, condition, contamination, customer agreement, and the AHJ all bear on it). Delaminated carpet is replaced; saturated cushion in any category is typically removed; Category 3 porous flooring is generally removed and disposed.";
+  const cat = makeSelect("Water category", "cr-cat", [
+    { value: "cat1", label: "Category 1 (clean)", selected: true },
+    { value: "cat2", label: "Category 2 (gray)" },
+    { value: "cat3", label: "Category 3 (black)" },
+  ]);
+  const comp = makeSelect("Component", "cr-comp", [
+    { value: "carpet", label: "Carpet", selected: true },
+    { value: "cushion", label: "Cushion / pad" },
+  ]);
+  const delam = makeCheckbox("Carpet delamination present", "cr-delam");
+  for (const f of [cat, comp, delam]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cat.select.value = "cat1"; comp.select.value = "carpet"; delam.input.checked = false; update(); });
+  const oDec = makeOutputLine(outputRegion, "Decision", "cr-out-dec");
+  const oWhy = makeOutputLine(outputRegion, "Rationale", "cr-out-why");
+  const update = debounce(() => {
+    const r = computeCarpetRestoreReplace({ water_category: cat.select.value, component: comp.select.value, delaminated: delam.input.checked ? 1 : 0 });
+    if (r.error) { oDec.textContent = r.error; oWhy.textContent = "-"; return; }
+    oDec.textContent = r.decision;
+    oWhy.textContent = r.rationale;
+  }, DEBOUNCE_MS);
+  for (const el of [cat.select, comp.select, delam.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["carpet-restore-replace"] = renderCarpetRestoreReplace;
+
+// --- spec-v195: Water category deterioration over time (`category-deterioration`) ---
+// dims: in { origin_category: dimensionless, elapsed_hours: T, warm_environment: dimensionless, contacted_contaminant: dimensionless } out: { likely_category: dimensionless }
+export function computeCategoryDeterioration({ origin_category = "cat1", elapsed_hours = 0, warm_environment = 0, contacted_contaminant = 0 } = {}) {
+  const origin = WATER_CATEGORY_LABELS[origin_category];
+  if (!origin) return { error: "Unknown origin category." };
+  const hours = Number(elapsed_hours);
+  if (!Number.isFinite(hours) || hours < 0) return { error: "Elapsed time must be a finite, non-negative number of hours." };
+  const warm = Number(warm_environment) ? 1 : 0;
+  const contaminant = Number(contacted_contaminant) ? 1 : 0;
+  const threshold = warm ? 24 : 48;
+  let likely = origin_category;
+  let rationale;
+  if (contaminant === 1) {
+    likely = "cat3";
+    rationale = "Contact with soil, sewage, or contaminated materials escalates toward Category 3 regardless of the clock.";
+  } else if (origin_category === "cat1" && hours >= threshold) {
+    likely = "cat2";
+    rationale = "Standing time and temperature have driven microbial amplification; clean water reclassifies to Category 2.";
+  } else if (origin_category === "cat2" && warm === 1 && hours >= threshold) {
+    likely = "cat3";
+    rationale = "Category 2 left wet and warm may degrade to Category 3.";
+  } else {
+    rationale = "Within the amplification window for the conditions; remains at the origin category. When in doubt, assume the higher category.";
+  }
+  return {
+    origin_category: origin,
+    likely_category: WATER_CATEGORY_LABELS[likely],
+    rationale,
+    note: "Category is a professional determination made at the time of restoration, not by the source alone. The amplification window commonly cited is on the order of 48-72 hours under favorable conditions. When in doubt, the higher category is assumed. IICRC S500 governs.",
+  };
+}
+export const categoryDeteriorationExample = { inputs: { origin_category: "cat1", elapsed_hours: 72, warm_environment: 1, contacted_contaminant: 0 } };
+
+function renderCategoryDeterioration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Category-at-time-of-remediation principle (ANSI/IICRC S500), by name. Category is a professional determination made at the time of restoration, not by the source alone; elevated temperature and contact with contaminated materials accelerate the shift. The amplification window commonly cited is 48-72 hours under favorable conditions. When in doubt, the higher category is assumed.";
+  const cat = makeSelect("Origin category", "cd-cat", [
+    { value: "cat1", label: "Category 1 (clean)", selected: true },
+    { value: "cat2", label: "Category 2 (gray)" },
+    { value: "cat3", label: "Category 3 (black)" },
+  ]);
+  const hours = makeNumber("Elapsed wet time (hours)", "cd-hours", { step: "any", min: "0", value: "72" });
+  hours.input.value = "72";
+  const warm = makeCheckbox("Warm environment (favors microbial amplification)", "cd-warm");
+  warm.input.checked = true;
+  const contaminant = makeCheckbox("Contacted soil / sewage / contaminated materials", "cd-contam");
+  for (const f of [cat, hours, warm, contaminant]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cat.select.value = "cat1"; hours.input.value = "72"; warm.input.checked = true; contaminant.input.checked = false; update(); });
+  const oLikely = makeOutputLine(outputRegion, "Likely current category", "cd-out-likely");
+  const oWhy = makeOutputLine(outputRegion, "Rationale", "cd-out-why");
+  const update = debounce(() => {
+    const r = computeCategoryDeterioration({ origin_category: cat.select.value, elapsed_hours: Number(hours.input.value) || 0, warm_environment: warm.input.checked ? 1 : 0, contacted_contaminant: contaminant.input.checked ? 1 : 0 });
+    if (r.error) { oLikely.textContent = r.error; oWhy.textContent = "-"; return; }
+    oLikely.textContent = r.likely_category;
+    oWhy.textContent = r.rationale;
+  }, DEBOUNCE_MS);
+  for (const el of [cat.select, hours.input, warm.input, contaminant.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["category-deterioration"] = renderCategoryDeterioration;
+
+// --- spec-v196: Hydroxyl generator sizing (`hydroxyl-sizing`) ---
+// units = ceil(structure_volume / unit_coverage); occupied-safe; run continuously.
+// dims: in { structure_volume_ft3: L^3, unit_coverage_ft3: L^3, expected_days: T } out: { units: dimensionless, expected_days: T }
+export function computeHydroxylSizing({ structure_volume_ft3 = 0, unit_coverage_ft3 = 0, expected_days = 3 } = {}) {
+  const vol = Number(structure_volume_ft3);
+  const coverage = Number(unit_coverage_ft3);
+  const days = Number(expected_days);
+  if (!Number.isFinite(vol) || !Number.isFinite(coverage) || !Number.isFinite(days)) return { error: "Inputs must be finite numbers." };
+  if (!(vol > 0)) return { error: "Structure volume must be positive (ft^3)." };
+  if (!(coverage > 0)) return { error: "Unit coverage rating must be positive (ft^3/unit)." };
+  const units = Math.ceil(vol / coverage);
+  return {
+    units,
+    expected_days: days > 0 ? days : null,
+    note: "Hydroxyl generators are safe for occupied spaces (unlike ozone, which requires an evacuated, sealed structure) but work more slowly, commonly running continuously for several days. Coverage and run times are manufacturer-specific. Remove the odor source and clean smoke residue first. The manufacturer and IICRC S700 govern.",
+  };
+}
+export const hydroxylSizingExample = { inputs: { structure_volume_ft3: 12000, unit_coverage_ft3: 6000, expected_days: 3 } };
+
+function renderHydroxylSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Volume-and-coverage sizing (ANSI/IICRC S700), by name. Hydroxyl generators are safe for occupied spaces but work more slowly than ozone, commonly running continuously for several days. Coverage ratings and run times are manufacturer-specific. Severe odor still requires source removal and cleaning first. The manufacturer and S700 govern.";
+  const vol = makeNumber("Structure volume (ft^3)", "hx-vol", { step: "any", min: "0", value: "12000" });
+  vol.input.value = "12000";
+  const coverage = makeNumber("Coverage per generator (ft^3/unit)", "hx-cov", { step: "any", min: "0", value: "6000" });
+  coverage.input.value = "6000";
+  const days = makeNumber("Anticipated continuous run time (days)", "hx-days", { step: "any", min: "0", value: "3" });
+  days.input.value = "3";
+  for (const f of [vol, coverage, days]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "12000"; coverage.input.value = "6000"; days.input.value = "3"; update(); });
+  const oUnits = makeOutputLine(outputRegion, "Hydroxyl generators needed", "hx-out-units");
+  const oRun = makeOutputLine(outputRegion, "Run time", "hx-out-run");
+  const update = debounce(() => {
+    const r = computeHydroxylSizing({ structure_volume_ft3: Number(vol.input.value) || 0, unit_coverage_ft3: Number(coverage.input.value) || 0, expected_days: days.input.value === "" ? 3 : Number(days.input.value) });
+    if (r.error) { oUnits.textContent = r.error; oRun.textContent = "-"; return; }
+    oUnits.textContent = r.units + " unit(s)";
+    oRun.textContent = (r.expected_days ? fmt(r.expected_days, 0) + " day(s), " : "") + "run continuously; occupied-safe.";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, coverage.input, days.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["hydroxyl-sizing"] = renderHydroxylSizing;
+
+// --- spec-v197: Injection / wall-cavity drying system sizing (`cavity-drying-system`) ---
+// bays = ceil(wall_ft * 12 / stud_spacing_in); ports = bays * ports_per_bay;
+// systems = ceil(ports / ports_per_system).
+// dims: in { affected_wall_ft: L, stud_spacing_in: L, ports_per_bay: dimensionless, ports_per_system: dimensionless } out: { bays: dimensionless, ports: dimensionless, systems: dimensionless }
+export function computeCavityDryingSystem({ affected_wall_ft = 0, stud_spacing_in = 16, ports_per_bay = 1, ports_per_system = 12 } = {}) {
+  const wall = Number(affected_wall_ft);
+  const spacing = Number(stud_spacing_in);
+  const perBay = Number(ports_per_bay);
+  const perSystem = Number(ports_per_system);
+  if (![wall, spacing, perBay, perSystem].every(Number.isFinite)) return { error: "Inputs must be finite numbers." };
+  if (!(wall > 0)) return { error: "Affected wall length must be positive (ft)." };
+  if (!(spacing > 0)) return { error: "Stud spacing must be positive (in)." };
+  if (!(perBay > 0)) return { error: "Ports per bay must be positive." };
+  if (!(perSystem > 0)) return { error: "Ports per system must be positive." };
+  const bays = Math.ceil(wall * 12 / spacing);
+  const ports = bays * perBay;
+  const systems = Math.ceil(ports / perSystem);
+  return {
+    bays,
+    ports,
+    systems,
+    note: "Port count, airflow per port, and ports per system are equipment-manufacturer specific (the bundled defaults are typical, not prescriptive). Respect cavity contamination: do not push Category 2/3 cavity air into clean spaces. The cavity-drying decision versus a flood cut and access drilling follow IICRC S500.",
+  };
+}
+export const cavityDryingSystemExample = { inputs: { affected_wall_ft: 32, stud_spacing_in: 16, ports_per_bay: 1, ports_per_system: 12 } };
+
+function renderCavityDryingSystem(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Bays-from-length geometry (ANSI/IICRC S500), by name. Port count, airflow per port, and ports per system are equipment-manufacturer specific; the bundled defaults are typical, not prescriptive. Respect cavity air-pressure direction and contamination - do not push Category 2/3 cavity air into clean spaces. The cavity-drying decision versus a flood cut follows S500.";
+  const wall = makeNumber("Affected wall length (ft)", "cs-wall", { step: "any", min: "0", value: "32" });
+  wall.input.value = "32";
+  const spacing = makeNumber("Stud spacing (in, on-center)", "cs-spacing", { step: "any", min: "0", value: "16" });
+  spacing.input.value = "16";
+  const perBay = makeNumber("Injection ports per stud bay", "cs-perbay", { step: "any", min: "0", value: "1" });
+  perBay.input.value = "1";
+  const perSystem = makeNumber("Ports a single air system serves", "cs-persys", { step: "any", min: "0", value: "12" });
+  perSystem.input.value = "12";
+  for (const f of [wall, spacing, perBay, perSystem]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wall.input.value = "32"; spacing.input.value = "16"; perBay.input.value = "1"; perSystem.input.value = "12"; update(); });
+  const oBays = makeOutputLine(outputRegion, "Stud bays", "cs-out-bays");
+  const oPorts = makeOutputLine(outputRegion, "Injection ports", "cs-out-ports");
+  const oSystems = makeOutputLine(outputRegion, "Air systems", "cs-out-sys");
+  const update = debounce(() => {
+    const r = computeCavityDryingSystem({ affected_wall_ft: Number(wall.input.value) || 0, stud_spacing_in: spacing.input.value === "" ? 16 : Number(spacing.input.value), ports_per_bay: perBay.input.value === "" ? 1 : Number(perBay.input.value), ports_per_system: perSystem.input.value === "" ? 12 : Number(perSystem.input.value) });
+    if (r.error) { oBays.textContent = r.error; oPorts.textContent = "-"; oSystems.textContent = "-"; return; }
+    oBays.textContent = r.bays + " bays";
+    oPorts.textContent = r.ports + " ports";
+    oSystems.textContent = r.systems + " system(s)";
+  }, DEBOUNCE_MS);
+  for (const el of [wall.input, spacing.input, perBay.input, perSystem.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["cavity-drying-system"] = renderCavityDryingSystem;
+
+// --- spec-v198: Drying completion projection (`dry-time-projection`) ---
+// remaining = current - goal; days = remaining / daily_drop (constant-rate,
+// optimistic near goal). A non-positive daily drop reports "not progressing".
+// dims: in { current_mc_pct: dimensionless, goal_mc_pct: dimensionless, daily_drop_pct: dimensionless } out: { remaining_pts: dimensionless, days_to_goal: T }
+export function computeDryTimeProjection({ current_mc_pct = 0, goal_mc_pct = 0, daily_drop_pct = 0 } = {}) {
+  const cur = Number(current_mc_pct);
+  const goal = Number(goal_mc_pct);
+  const drop = Number(daily_drop_pct);
+  if (![cur, goal, drop].every(Number.isFinite)) return { error: "Inputs must be finite numbers." };
+  if (!(cur > goal)) return { error: "Current reading must be above the goal." };
+  const remaining = cur - goal;
+  if (!(drop > 0)) {
+    return {
+      remaining_pts: remaining,
+      days_to_goal: null,
+      progressing: false,
+      note: "Not progressing - reassess airflow, dehumidification, and access.",
+    };
+  }
+  const days = remaining / drop;
+  return {
+    remaining_pts: remaining,
+    days_to_goal: Number.isFinite(days) ? days : null,
+    progressing: true,
+    note: "Drying is non-linear and slows near the goal, so this constant-rate projection runs optimistic at the end. The drying-log boundary readings and the restorer's daily monitoring govern the actual endpoint. The dry standard is the unaffected reference. IICRC S500 governs.",
+  };
+}
+export const dryTimeProjectionExample = { inputs: { current_mc_pct: 28, goal_mc_pct: 12, daily_drop_pct: 4 } };
+
+function renderDryTimeProjection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Linear-trend completion projection (ANSI/IICRC S500), by name. Drying is non-linear and slows as it approaches the goal, so a constant-rate projection is a planning estimate that runs optimistic near the end. The drying-log boundary readings and the restorer's daily monitoring govern the actual endpoint; the dry standard is the unaffected reference, not an absolute number.";
+  const cur = makeNumber("Current moisture content (percent)", "dt-cur", { step: "any", min: "0", value: "28" });
+  cur.input.value = "28";
+  const goal = makeNumber("Goal moisture content (percent)", "dt-goal", { step: "any", min: "0", value: "12" });
+  goal.input.value = "12";
+  const drop = makeNumber("Drop over the last 24 hours (points)", "dt-drop", { step: "any", value: "4" });
+  drop.input.value = "4";
+  for (const f of [cur, goal, drop]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cur.input.value = "28"; goal.input.value = "12"; drop.input.value = "4"; update(); });
+  const oRem = makeOutputLine(outputRegion, "Remaining to goal", "dt-out-rem");
+  const oDays = makeOutputLine(outputRegion, "Projected days to goal", "dt-out-days");
+  const update = debounce(() => {
+    const r = computeDryTimeProjection({ current_mc_pct: Number(cur.input.value) || 0, goal_mc_pct: Number(goal.input.value) || 0, daily_drop_pct: Number(drop.input.value) || 0 });
+    if (r.error) { oRem.textContent = r.error; oDays.textContent = "-"; return; }
+    oRem.textContent = fmt(r.remaining_pts, 1) + " points";
+    oDays.textContent = r.progressing ? fmt(r.days_to_goal, 1) + " days (optimistic near goal)" : r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [cur.input, goal.input, drop.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["dry-time-projection"] = renderDryTimeProjection;

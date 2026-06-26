@@ -1,6 +1,6 @@
 # roughlogic.com Specification v189 -- Drying-System Balance: Evaporation Load vs Installed Dehumidification (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one tile checking whether the dehumidification
 > actually installed on a job can keep up with the estimated evaporation load -- the balanced-drying
 > verification that ties the `evaporation-load` and `dehumidifier` tiles together. Adds one tile to

@@ -834,6 +834,17 @@ const RELATED = {
   "dehumidifier-derate": ["dehumidifier","grains-removed","evaporation-load"],
   "class-of-loss-screen": ["water-classes","evaporation-load","air-movers"],
   "desiccant-airflow-sizing": ["dehumidifier","grains-removed","evaporation-load"],
+  // spec-v189..v198 water-damage restoration second/third pass (Group D).
+  // Substituted real ids where the spec named never-landed tiles
+  // (thermal-fog-deodorization, hardwood-floor-drying-mat, dry-standard-mc).
+  "drying-balance": ["evaporation-load","dehumidifier","grains-removed"],
+  "bound-water": ["evaporation-load","drying-goal","wood-emc"],
+  "disinfectant-dwell": ["antimicrobial-dilution","dilution","mold-conditions"],
+  "carpet-restore-replace": ["water-classes","flood-cut-quantity","mold-conditions"],
+  "category-deterioration": ["water-classes","mold-conditions","ppe"],
+  "hydroxyl-sizing": ["smoke-ejector-cfm","hepa-filter-life","chamber-turnover"],
+  "cavity-drying-system": ["flood-cut-takeoff","desiccant-airflow-sizing","air-movers"],
+  "dry-time-projection": ["drying-log","moisture-dry-goal","drying-times"],
 };
 
 export { RELATED };

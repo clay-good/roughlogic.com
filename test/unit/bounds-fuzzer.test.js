@@ -11368,3 +11368,98 @@ test("bounds: spec-v187 pool-bonding-680-26 pins the permanent-pool checklist, t
   assert.strictEqual(stor.item_count, 2);
   assert.ok("error" in _cv187({ pool_type: "bad" }));
 });
+
+// spec-v189..v198 water-damage restoration second/third pass (Group D).
+import {
+  computeDryingBalance as _vr189, computeBoundWater as _vr190,
+  computeDisinfectantDwell as _vr193, computeCarpetRestoreReplace as _vr194,
+  computeCategoryDeterioration as _vr195, computeHydroxylSizing as _vr196,
+  computeCavityDryingSystem as _vr197, computeDryTimeProjection as _vr198,
+} from "../../calc-restoration.js";
+
+test("bounds: spec-v189 drying-balance pins balance/ratio/verdict and error seams", () => {
+  const ok = _vr189({ evap_load_ppd: 200, installed_ppd: 260, target_margin: 1.2 });
+  assert.strictEqual(ok.balance_ppd, 60);
+  assert.ok(Math.abs(ok.ratio - 1.3) < 1e-9);
+  assert.ok(/Balanced/.test(ok.verdict) && ok.add_ppd === 0);
+  const def = _vr189({ evap_load_ppd: 200, installed_ppd: 150, target_margin: 1.2 });
+  assert.strictEqual(def.balance_ppd, -50);
+  assert.ok(Math.abs(def.ratio - 0.75) < 1e-9);
+  assert.ok(/Deficit/.test(def.verdict) && Math.abs(def.add_ppd - 90) < 1e-9);
+  const nomargin = _vr189({ evap_load_ppd: 200, installed_ppd: 210, target_margin: 1.2 });
+  assert.ok(/no margin/.test(nomargin.verdict) && nomargin.add_ppd > 0);
+  assert.ok("error" in _vr189({ evap_load_ppd: Infinity, installed_ppd: 260 }));
+  assert.ok("error" in _vr189({ evap_load_ppd: 0, installed_ppd: 260 }));
+  assert.ok("error" in _vr189({ evap_load_ppd: 200, installed_ppd: 0 }));
+});
+
+test("bounds: spec-v190 bound-water pins water mass / volume and error seams", () => {
+  const r = _vr190({ material_volume_ft3: 10, dry_density_lb_ft3: 32, mc_current_pct: 40, mc_goal_pct: 12 });
+  assert.strictEqual(r.dry_mass_lb, 320);
+  assert.ok(Math.abs(r.water_lb - 89.6) < 1e-9);
+  assert.ok(Math.abs(r.water_gal - 89.6 / 8.34) < 1e-9);
+  const cross = _vr190({ material_volume_ft3: 10, dry_density_lb_ft3: 32, mc_current_pct: 40, mc_goal_pct: 19 });
+  assert.ok(Math.abs(cross.water_lb - 67.2) < 1e-9);
+  assert.ok("error" in _vr190({ material_volume_ft3: Infinity, dry_density_lb_ft3: 32, mc_current_pct: 40, mc_goal_pct: 12 }));
+  assert.ok("error" in _vr190({ material_volume_ft3: 0, dry_density_lb_ft3: 32, mc_current_pct: 40, mc_goal_pct: 12 }));
+  assert.ok("error" in _vr190({ material_volume_ft3: 10, dry_density_lb_ft3: 0, mc_current_pct: 40, mc_goal_pct: 12 }));
+  assert.ok("error" in _vr190({ material_volume_ft3: 10, dry_density_lb_ft3: 32, mc_current_pct: 12, mc_goal_pct: 40 }));
+});
+
+test("bounds: spec-v193 disinfectant-dwell pins the quat lookup, AHP/bleach cross-checks, and the unknown-class seam", () => {
+  assert.strictEqual(_vr193({ product_class: "quat" }).typical_contact_min, "10 min");
+  assert.strictEqual(_vr193({ product_class: "ahp" }).typical_contact_min, "1-5 min");
+  assert.strictEqual(_vr193({ product_class: "bleach" }).typical_contact_min, "10 min");
+  assert.ok(/visibly wet/.test(_vr193({ product_class: "quat" }).keep_wet_rule));
+  assert.ok(/FIFRA/.test(_vr193({ product_class: "quat" }).authority));
+  assert.ok("error" in _vr193({ product_class: "nope" }));
+});
+
+test("bounds: spec-v194 carpet-restore-replace pins the matrix, the Cat-3 and delamination overrides, and the error seam", () => {
+  assert.ok(/dried in place/.test(_vr194({ water_category: "cat1", component: "carpet", delaminated: 0 }).decision));
+  assert.ok(/remove and replace/i.test(_vr194({ water_category: "cat1", component: "cushion", delaminated: 0 }).decision));
+  assert.ok(/Remove and dispose/.test(_vr194({ water_category: "cat3", component: "carpet", delaminated: 0 }).decision));
+  assert.ok(/Replace \(delamination\)/.test(_vr194({ water_category: "cat1", component: "carpet", delaminated: 1 }).decision));
+  assert.ok("error" in _vr194({ water_category: "bad", component: "carpet" }));
+  assert.ok("error" in _vr194({ water_category: "cat1", component: "bad" }));
+});
+
+test("bounds: spec-v195 category-deterioration pins the time/temperature/contaminant escalation and error seams", () => {
+  assert.strictEqual(_vr195({ origin_category: "cat1", elapsed_hours: 72, warm_environment: 1, contacted_contaminant: 0 }).likely_category, "Category 2 (gray)");
+  assert.strictEqual(_vr195({ origin_category: "cat1", elapsed_hours: 12, warm_environment: 0, contacted_contaminant: 0 }).likely_category, "Category 1 (clean)");
+  assert.strictEqual(_vr195({ origin_category: "cat1", elapsed_hours: 1, warm_environment: 0, contacted_contaminant: 1 }).likely_category, "Category 3 (black)");
+  assert.ok("error" in _vr195({ origin_category: "bad", elapsed_hours: 10 }));
+  assert.ok("error" in _vr195({ origin_category: "cat1", elapsed_hours: -1 }));
+});
+
+test("bounds: spec-v196 hydroxyl-sizing pins ceil(volume/coverage) and error seams", () => {
+  assert.strictEqual(_vr196({ structure_volume_ft3: 12000, unit_coverage_ft3: 6000, expected_days: 3 }).units, 2);
+  assert.strictEqual(_vr196({ structure_volume_ft3: 5000, unit_coverage_ft3: 6000, expected_days: 3 }).units, 1);
+  assert.ok("error" in _vr196({ structure_volume_ft3: Infinity, unit_coverage_ft3: 6000 }));
+  assert.ok("error" in _vr196({ structure_volume_ft3: 0, unit_coverage_ft3: 6000 }));
+  assert.ok("error" in _vr196({ structure_volume_ft3: 12000, unit_coverage_ft3: 0 }));
+});
+
+test("bounds: spec-v197 cavity-drying-system pins bays/ports/systems round-up and error seams", () => {
+  const r = _vr197({ affected_wall_ft: 32, stud_spacing_in: 16, ports_per_bay: 1, ports_per_system: 12 });
+  assert.deepStrictEqual([r.bays, r.ports, r.systems], [24, 24, 2]);
+  const c = _vr197({ affected_wall_ft: 16, stud_spacing_in: 16, ports_per_bay: 1, ports_per_system: 12 });
+  assert.deepStrictEqual([c.bays, c.ports, c.systems], [12, 12, 1]);
+  assert.ok("error" in _vr197({ affected_wall_ft: Infinity, stud_spacing_in: 16 }));
+  assert.ok("error" in _vr197({ affected_wall_ft: 0, stud_spacing_in: 16 }));
+  assert.ok("error" in _vr197({ affected_wall_ft: 32, stud_spacing_in: 0 }));
+  assert.ok("error" in _vr197({ affected_wall_ft: 32, stud_spacing_in: 16, ports_per_system: 0 }));
+});
+
+test("bounds: spec-v198 dry-time-projection pins days-to-goal, the not-progressing branch, and error seams", () => {
+  const r = _vr198({ current_mc_pct: 28, goal_mc_pct: 12, daily_drop_pct: 4 });
+  assert.strictEqual(r.remaining_pts, 16);
+  assert.strictEqual(r.days_to_goal, 4);
+  assert.strictEqual(_vr198({ current_mc_pct: 28, goal_mc_pct: 12, daily_drop_pct: 2 }).days_to_goal, 8);
+  const stall = _vr198({ current_mc_pct: 28, goal_mc_pct: 12, daily_drop_pct: 0 });
+  assert.strictEqual(stall.days_to_goal, null);
+  assert.strictEqual(stall.progressing, false);
+  assert.ok(/not progressing/i.test(stall.note));
+  assert.ok("error" in _vr198({ current_mc_pct: Infinity, goal_mc_pct: 12, daily_drop_pct: 4 }));
+  assert.ok("error" in _vr198({ current_mc_pct: 12, goal_mc_pct: 28, daily_drop_pct: 4 }));
+});

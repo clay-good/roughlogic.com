@@ -1,6 +1,6 @@
 # roughlogic.com Specification v196 -- Hydroxyl Generator Sizing by Volume and Dwell (IICRC S700) (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v188..v196 (water-damage restoration), closing tile.**
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v188..v196 (water-damage restoration), closing tile.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: one fire-damage deodorization
 > tile sizing hydroxyl generators by structure volume against a per-unit coverage rating -- the
 > occupied-safe counterpart to ozone shock and thermal fogging. Adds one tile to

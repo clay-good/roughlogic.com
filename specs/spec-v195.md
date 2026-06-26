@@ -1,6 +1,6 @@
 # roughlogic.com Specification v195 -- Water Category Deterioration Timeline Reference (IICRC S500) (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
+> **Status: LANDED 2026-06-26 (package 0.83.0; part of catalog 656 -> 664). Batch spec-v188..v196 (water-damage restoration).** In-scope catalog
 > expansion under the spec-v106 trades-only charter: one reference tile applying the IICRC S500
 > principle that water category is determined at the time of remediation -- not fixed by its source --
 > so clean water left wet over time and temperature reclassifies to a higher category. Adds one tile to

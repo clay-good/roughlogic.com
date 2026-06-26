@@ -278,6 +278,10 @@ const TOOL_MODULES = (() => {
     // spec-v136..v140 on-arrival water-loss bench.
     "flood-cut-takeoff", "ceiling-water-load", "dehumidifier-derate",
     "class-of-loss-screen", "desiccant-airflow-sizing",
+    // spec-v189..v198 water-damage restoration second/third pass.
+    "drying-balance", "bound-water", "disinfectant-dwell",
+    "carpet-restore-replace", "category-deterioration", "hydroxyl-sizing",
+    "cavity-drying-system", "dry-time-projection",
   ]);
   // spec-v77 cap-relief split: the cohesive demolition / abatement bench
   // (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated out

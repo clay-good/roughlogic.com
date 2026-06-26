@@ -459,6 +459,15 @@ const _TILES = [
   ["dehumidifier-derate", "D"],
   ["class-of-loss-screen", "D"],
   ["desiccant-airflow-sizing", "D"],
+  // spec-v189..v198 water-damage restoration second/third pass (Group D)
+  ["drying-balance", "D"],
+  ["bound-water", "D"],
+  ["disinfectant-dwell", "D"],
+  ["carpet-restore-replace", "D"],
+  ["category-deterioration", "D"],
+  ["hydroxyl-sizing", "D"],
+  ["cavity-drying-system", "D"],
+  ["dry-time-projection", "D"],
   // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (Group B)
   ["flash-steam-pct", "B"],
   ["steam-pipe-velocity", "B"],

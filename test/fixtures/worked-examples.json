@@ -24174,6 +24174,225 @@
       "outputs": {
         "item_count": { "value": 2.0, "tolerance": { "abs": 0 } }
       }
+    },
+    {
+      "tile_id": "drying-balance",
+      "source_publisher": "ANSI/IICRC S500 balanced-drying-system principle",
+      "source_title": "balance = installed - evap; ratio = installed / evap",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "200 ppd load vs 260 ppd installed at 1.2 target -> +60 ppd, ratio 1.30, balanced",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "evap_load_ppd": 200, "installed_ppd": 260, "target_margin": 1.2 },
+      "outputs": {
+        "balance_ppd": { "value": 60, "tolerance": { "abs": 0.01 } },
+        "ratio": { "value": 1.3, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "drying-balance",
+      "source_publisher": "ANSI/IICRC S500 balanced-drying-system principle",
+      "source_title": "cross-check: deficit (installed below load)",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "200 ppd load vs 150 ppd installed -> -50 ppd, ratio 0.75, deficit; add 90 ppd",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "evap_load_ppd": 200, "installed_ppd": 150, "target_margin": 1.2 },
+      "outputs": {
+        "balance_ppd": { "value": -50, "tolerance": { "abs": 0.01 } },
+        "ratio": { "value": 0.75, "tolerance": { "abs": 0.01 } },
+        "add_ppd": { "value": 90, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "bound-water",
+      "source_publisher": "ANSI/IICRC S500 gravimetric water-mass relation",
+      "source_title": "water_lb = volume * dry_density * (mc_cur - mc_goal)/100",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "10 ft^3 softwood at 32 lb/ft^3, 40%->12% -> 320 lb dry mass, 89.6 lb water, 10.7 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "material_volume_ft3": 10, "dry_density_lb_ft3": 32, "mc_current_pct": 40, "mc_goal_pct": 12 },
+      "outputs": {
+        "dry_mass_lb": { "value": 320, "tolerance": { "abs": 0.01 } },
+        "water_lb": { "value": 89.6, "tolerance": { "abs": 0.01 } },
+        "water_gal": { "value": 10.7434, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "bound-water",
+      "source_publisher": "ANSI/IICRC S500 gravimetric water-mass relation",
+      "source_title": "cross-check: smaller moisture drop (40%->19%)",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "10 ft^3 at 32 lb/ft^3, 40%->19% -> 67.2 lb water, 8.1 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "material_volume_ft3": 10, "dry_density_lb_ft3": 32, "mc_current_pct": 40, "mc_goal_pct": 19 },
+      "outputs": {
+        "water_lb": { "value": 67.2, "tolerance": { "abs": 0.01 } },
+        "water_gal": { "value": 8.0576, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "disinfectant-dwell",
+      "source_publisher": "ANSI/IICRC S500 / S520 antimicrobial contact-time principle",
+      "source_title": "label-typical wet contact time by product class (FIFRA label governs)",
+      "source_edition_or_year": "IICRC S500-2021 / S520-2015",
+      "source_section_or_page": "quaternary ammonium (quat) -> ~10 min wet contact",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "product_class": "quat" },
+      "outputs": {
+        "typical_contact_min": { "value": "10 min", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "disinfectant-dwell",
+      "source_publisher": "ANSI/IICRC S500 / S520 antimicrobial contact-time principle",
+      "source_title": "cross-check: accelerated hydrogen peroxide (faster chemistry)",
+      "source_edition_or_year": "IICRC S500-2021 / S520-2015",
+      "source_section_or_page": "accelerated hydrogen peroxide (AHP) -> ~1-5 min label contact",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "product_class": "ahp" },
+      "outputs": {
+        "typical_contact_min": { "value": "1-5 min", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "carpet-restore-replace",
+      "source_publisher": "ANSI/IICRC S500 carpet/cushion restore-vs-replace matrix",
+      "source_title": "category + component + delamination -> decision",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "Category 1 carpet, not delaminated -> dry in place / float and restore",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "water_category": "cat1", "component": "carpet", "delaminated": 0 },
+      "outputs": {
+        "decision": { "value": "May be dried in place or floated and restored.", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "carpet-restore-replace",
+      "source_publisher": "ANSI/IICRC S500 carpet/cushion restore-vs-replace matrix",
+      "source_title": "cross-check: Category 3 (black water) carpet",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "Category 3 carpet -> remove and dispose (not restorable)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "water_category": "cat3", "component": "carpet", "delaminated": 0 },
+      "outputs": {
+        "decision": { "value": "Remove and dispose (not restorable).", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "category-deterioration",
+      "source_publisher": "ANSI/IICRC S500 category-at-time-of-remediation principle",
+      "source_title": "origin category + elapsed time + temperature + contaminant -> likely category",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "Category 1, 72 h, warm -> reclassified to Category 2 (gray)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "origin_category": "cat1", "elapsed_hours": 72, "warm_environment": 1, "contacted_contaminant": 0 },
+      "outputs": {
+        "likely_category": { "value": "Category 2 (gray)", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "category-deterioration",
+      "source_publisher": "ANSI/IICRC S500 category-at-time-of-remediation principle",
+      "source_title": "cross-check: contaminant contact escalates regardless of the clock",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "Category 1 + contaminant contact -> Category 3 (black)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "origin_category": "cat1", "elapsed_hours": 1, "warm_environment": 0, "contacted_contaminant": 1 },
+      "outputs": {
+        "likely_category": { "value": "Category 3 (black)", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hydroxyl-sizing",
+      "source_publisher": "ANSI/IICRC S700 volume-and-coverage sizing",
+      "source_title": "units = ceil(structure_volume / unit_coverage)",
+      "source_edition_or_year": "IICRC S700-2021",
+      "source_section_or_page": "12,000 ft^3 / 6,000 ft^3 per unit -> 2 generators",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "structure_volume_ft3": 12000, "unit_coverage_ft3": 6000, "expected_days": 3 },
+      "outputs": {
+        "units": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hydroxyl-sizing",
+      "source_publisher": "ANSI/IICRC S700 volume-and-coverage sizing",
+      "source_title": "cross-check: small job rounds up to one unit",
+      "source_edition_or_year": "IICRC S700-2021",
+      "source_section_or_page": "5,000 ft^3 / 6,000 ft^3 per unit -> 1 generator",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "structure_volume_ft3": 5000, "unit_coverage_ft3": 6000, "expected_days": 3 },
+      "outputs": {
+        "units": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "cavity-drying-system",
+      "source_publisher": "ANSI/IICRC S500 bays-from-length geometry",
+      "source_title": "bays = ceil(wall_ft * 12 / spacing_in); ports = bays * per_bay; systems = ceil(ports / per_system)",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "32 ft on 16 in centers, 1 port/bay, 12 ports/system -> 24 bays, 24 ports, 2 systems",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "affected_wall_ft": 32, "stud_spacing_in": 16, "ports_per_bay": 1, "ports_per_system": 12 },
+      "outputs": {
+        "bays": { "value": 24, "tolerance": { "abs": 0 } },
+        "ports": { "value": 24, "tolerance": { "abs": 0 } },
+        "systems": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "cavity-drying-system",
+      "source_publisher": "ANSI/IICRC S500 bays-from-length geometry",
+      "source_title": "cross-check: smaller run",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "16 ft on 16 in centers -> 12 bays, 12 ports, 1 system",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "affected_wall_ft": 16, "stud_spacing_in": 16, "ports_per_bay": 1, "ports_per_system": 12 },
+      "outputs": {
+        "bays": { "value": 12, "tolerance": { "abs": 0 } },
+        "ports": { "value": 12, "tolerance": { "abs": 0 } },
+        "systems": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "dry-time-projection",
+      "source_publisher": "ANSI/IICRC S500 linear-trend completion projection",
+      "source_title": "days_to_goal = (current - goal) / daily_drop",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "28% to 12% goal at 4 points/day -> 16 remaining, 4 days",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "current_mc_pct": 28, "goal_mc_pct": 12, "daily_drop_pct": 4 },
+      "outputs": {
+        "remaining_pts": { "value": 16, "tolerance": { "abs": 0.01 } },
+        "days_to_goal": { "value": 4, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "dry-time-projection",
+      "source_publisher": "ANSI/IICRC S500 linear-trend completion projection",
+      "source_title": "cross-check: slowing rate extends the projection",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "28% to 12% goal at 2 points/day -> 8 days",
+      "verified_by": "rl",
+      "verified_on": "2026-06-26",
+      "inputs": { "current_mc_pct": 28, "goal_mc_pct": 12, "daily_drop_pct": 2 },
+      "outputs": {
+        "days_to_goal": { "value": 8, "tolerance": { "abs": 0.01 } }
+      }
     }
   ]
 }
