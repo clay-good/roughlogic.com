@@ -644,7 +644,6 @@ The site is honest about what it is and is not.
 - It is **not a code authority** and does not interpret code requirements. The authority having jurisdiction governs all installations and inspections.
 - It **does not reproduce any licensed code text or table.** NEC, IPC, IRC, ASHRAE Fundamentals, ACCA Manual J, NFPA standards, and AWC span tables are not bundled. Where a first-principles calculator matches a code table for the same inputs, it is because both compute the same physics, not because the table was copied.
 - The **Manual J** cooling and heating estimators are simplified; a code-compliant load calculation requires full Manual J, and every Manual J view says so.
-- The clinical and veterinary tiles (Groups U, V) are **math aids, never a substitute** for the licensed provider's protocol or an in-person exam. See [docs/profession-overrides.md](docs/profession-overrides.md).
 - The site does not generate code-compliant designs. The user is the judgment.
 
 ## Stability commitments

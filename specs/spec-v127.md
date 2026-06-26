@@ -1,6 +1,6 @@
 # roughlogic.com Specification v127 -- Proportional EGC Upsize for Increased Conductors (NEC 250.122(B)) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v121..v128.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (package 0.73.0; part of catalog 600 -> 608). Batch spec-v121..v128.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one electrical tile from the public NEC 250.122(B) circular-mil
 > proportion rule (numeric method, no copyrighted table reproduced), AHJ governed, redo-not-harm.
 > Adds one tile to **`calc-electrical.js`** (Group A); no new module, group, or dependency. Inherits

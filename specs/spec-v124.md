@@ -1,6 +1,6 @@
 # roughlogic.com Specification v124 -- Feeder for a Group of Motors (NEC 430.24 / 430.62) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v121..v128.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (package 0.73.0; part of catalog 600 -> 608). Batch spec-v121..v128.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one electrical tile from the public NEC Article 430 grouped-motor
 > feeder method (numeric rules, no copyrighted table reproduced), AHJ governed, redo-not-harm. Adds
 > one tile to **`calc-electrical.js`** (Group A); no new module, group, or dependency. Inherits

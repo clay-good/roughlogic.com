@@ -1,6 +1,6 @@
 # roughlogic.com Specification v123 -- Motor Input Power and Annual Operating Cost (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v121..v128.** In-scope catalog expansion under the
+> **Status: LANDED 2026-06-23 (package 0.73.0; part of catalog 600 -> 608). Batch spec-v121..v128.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one electrical tile from first-principles electrical-input power
 > and the 0.746 kW-per-HP identity, public physics, utility-tariff governed, redo-not-harm. Adds one
 > tile to **`calc-electrical.js`** (Group A); no new module, group, or dependency. Inherits spec.md

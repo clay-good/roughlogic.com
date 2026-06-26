@@ -1,6 +1,6 @@
 # roughlogic.com Specification v128 -- Wye / Delta Line-to-Phase Voltage and Current (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v121..v128 (final).** In-scope catalog expansion under
+> **Status: LANDED 2026-06-23 (package 0.73.0; part of catalog 600 -> 608). Batch spec-v121..v128 (final).** In-scope catalog expansion under
 > the spec-v106 trades-only charter: one electrical tile from the first-principles three-phase
 > winding relations, public physics, redo-not-harm. Adds one tile to **`calc-electrical.js`** (Group
 > A); no new module, group, or dependency. Inherits spec.md through spec-v127.md.
