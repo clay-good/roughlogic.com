@@ -276,7 +276,7 @@ export function computePPE({ category }) {
 // --- Renderers ---
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
+  DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -966,19 +966,23 @@ export const dryingLogExample = {
 function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per IICRC S500-2021 (Standard for Professional Water Damage Restoration). IICRC certification governs. Boundary-humidity test - chamber GPP must trend below ambient GPP for drying to be in progress - is the public method; the standard governs acceptance. Free at iicrc.org for TOC; full standard is licensed.";
 
+  const exampleText = dryingLogExample.inputs.readings
+    .map((r) => [r.ambient_T_F, r.ambient_RH, r.chamber_T_F, r.chamber_RH].join(", "))
+    .join("\n");
+
   const help = document.createElement("p");
   help.className = "tile-help";
-  help.textContent = "Enter daily readings as JSON: array of { day_index, ambient_T_F, ambient_RH, chamber_T_F, chamber_RH }. Up to 14 rows.";
+  help.textContent = "One line per day, in drying order. Each line is four numbers separated by commas: outside air temp (F), outside RH (%), drying-chamber temp (F), chamber RH (%). Up to 14 days.";
   inputRegion.appendChild(help);
 
-  const log = makeText("Drying log (JSON array)", "dl-log", { rows: "6" });
-  log.input.value = JSON.stringify(dryingLogExample.inputs.readings, null, 2);
+  const log = makeTextarea("Daily readings (one line per day: outside F, outside RH, chamber F, chamber RH)", "dl-log", { rows: "8" });
+  log.input.value = exampleText;
   inputRegion.appendChild(log.wrap);
-  const target = makeNumber("Drying target (grains/lb; blank = ambient GPP minus 5)", "dl-target", { step: "any", min: "0" });
+  const target = makeNumber("Drying target (grains/lb; blank = outside GPP minus 5)", "dl-target", { step: "any", min: "0" });
   inputRegion.appendChild(target.wrap);
 
   attachExampleButton(inputRegion, () => {
-    log.input.value = JSON.stringify(dryingLogExample.inputs.readings, null, 2);
+    log.input.value = exampleText;
     target.input.value = "";
     update();
   });
@@ -990,12 +994,22 @@ function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
   const oTbl = makeOutputLine(outputRegion, "Per-day rows", "dl-out-tbl");
   const oW = makeOutputLine(outputRegion, "Notes", "dl-out-w");
 
+  function parseReadings(text) {
+    const out = [];
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim();
+      if (!line) continue;
+      const parts = line.split(",").map((s) => Number(s.trim()));
+      if (parts.length < 4 || parts.some((n) => !Number.isFinite(n))) return null;
+      out.push({ ambient_T_F: parts[0], ambient_RH: parts[1], chamber_T_F: parts[2], chamber_RH: parts[3] });
+    }
+    return out;
+  }
+
   const update = debounce(() => {
-    let readings;
-    try {
-      readings = JSON.parse(log.input.value);
-    } catch {
-      oBP.textContent = "Drying log must be valid JSON.";
+    const readings = parseReadings(log.input.value);
+    if (readings === null) {
+      oBP.textContent = "Each line needs four numbers separated by commas: outside F, outside RH, chamber F, chamber RH.";
       oSL.textContent = ""; oTG.textContent = ""; oDT.textContent = ""; oTbl.textContent = ""; oW.textContent = "";
       return;
     }
@@ -1012,7 +1026,7 @@ function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
     oSL.textContent = fmt(r.trend_GPP_per_day, 2) + " GPP / day";
     oTG.textContent = fmt(r.target_GPP, 1) + " GPP";
     oDT.textContent = r.days_to_target == null ? "n/a (trend not negative)" : fmt(r.days_to_target, 1) + " day(s)";
-    oTbl.textContent = r.rows.map((row) => "day " + row.day_index + ": amb " + fmt(row.ambient_GPP, 1) + " / chmb " + fmt(row.chamber_GPP, 1) + (row.boundary_pass ? " (pass)" : " (FAIL)")).join("; ");
+    oTbl.textContent = r.rows.map((row, i) => "Day " + (i + 1) + ": outside " + fmt(row.ambient_GPP, 1) + " GPP / chamber " + fmt(row.chamber_GPP, 1) + " GPP" + (row.boundary_pass ? " (pass)" : " (FAIL)")).join("; ");
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);
   log.input.addEventListener("input", update);
