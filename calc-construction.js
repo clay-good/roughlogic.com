@@ -1279,7 +1279,7 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
     oL.textContent = fmt(r.pressure_leeward_psf, 2) + " psf (Cp " + r.Cp_leeward + ")";
     oD.textContent = "q_design " + fmt(r.q_design_psf, 2) + " psf -> windward " + fmt(r.p_design_windward_psf, 2) + " psf (Kz " + fmt(r.Kz_used, 2) + ")";
   }, DEBOUNCE_MS);
-  for (const el of [V.input, exp.select, roof.select, kz.input, kzt.input, kd.input, g.input]) el.addEventListener("input", update);
+  for (const el of [V.input, exp.select, kz.input, kzt.input, kd.input, g.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
