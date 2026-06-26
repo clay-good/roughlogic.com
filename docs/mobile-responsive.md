@@ -161,3 +161,15 @@ A full re-run on 2026-06-24 confirms the no-horizontal-scroll guarantee holds at
 - **Runtime leak guard.** `render-no-nan.test.js` passed all **656** registered tile views (exit 0, 13.4 min serial) with no NaN / Infinity / undefined leak.
 
 No layout fix was required: the fluid `clamp()` type, `ch` / `vw` measures, the lone 760 px breakpoint, and the `.tabular-tool` scroll-owner (§8 / §9) all carry the 656-tile catalog without change.
+
+## 15. Re-verification at 664 tiles (2026-06-26)
+
+§14 re-anchored the running record to 656 tiles. The catalog has since grown to **664 tiles across 21 groups** (the spec-v189..v198 water-damage / mold-restoration landings), and the build emits **664 tile shells + 21 group shells** (sitemap **686 URLs**). The §11 harnesses still read the live `TOOLS` array and `dist/` tree at run time, so they auto-scaled across those landings with no test edits; this entry re-anchors the record again to the current size.
+
+A full re-run on 2026-06-26 confirms the no-horizontal-scroll guarantee holds at the new size on both engines:
+
+- **SPA, both engines.** `responsive-stress.test.js` passed **66 / 66** on Chromium and `webkit-responsive` (serial, one worker, exit 0). The full-catalog case ("every live tile view: no page-level horizontal scroll at 320 px") swept all **664** live tile views -- each with its example output populated -- clean on both Chromium and WebKit, alongside the 200% text-zoom and landscape/tablet route subsets.
+- **Prerendered shells.** `check:shell-mobile` reported **780 checks across 686 shells** (664 tool + 21 group + the home shell) clean at 320 px portrait, with 47 sampled at 568x320 landscape and 200% text zoom.
+- **Runtime leak guard.** `render-no-nan.test.js` passed all **664** registered tile views (exit 0, 12.0 min serial) with no NaN / Infinity / undefined leak.
+
+No layout fix was required: the fluid `clamp()` type, `ch` / `vw` measures, the lone 760 px breakpoint, and the `.tabular-tool` scroll-owner (§8 / §9) all carry the 664-tile catalog without change.

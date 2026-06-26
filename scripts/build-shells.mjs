@@ -584,7 +584,7 @@ async function main() {
   console.log(
     "build-shells: " + shellCount + " tile shells, " +
     groupCount + " group shells, sitemap with " +
-    (2 + groups.length + tools.length) + " URLs."
+    (1 + groups.length + tools.length) + " URLs."
   );
 }
 
