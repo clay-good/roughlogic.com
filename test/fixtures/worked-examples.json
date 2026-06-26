@@ -491,7 +491,6 @@
       "inputs": {
         "T_F": 95,
         "RH_percent": 60,
-        "wind_mph": 5,
         "solar": false
       },
       "outputs": {
@@ -3297,7 +3296,6 @@
       "verified_on": "2026-06-01",
       "inputs": {
         "charger_amps": 48,
-        "charger_voltage": 240,
         "main_breaker_a": 200,
         "existing_load_a": 130,
         "busbar_rating_a": 200,
@@ -4355,8 +4353,7 @@
       "verified_on": "2026-05-11",
       "inputs": {
         "V_mph": 100,
-        "exposure": "C",
-        "roof_type": "gable"
+        "exposure": "C"
       },
       "outputs": {
         "q_psf": {
@@ -10925,8 +10922,6 @@
       "inputs": {
         "aeration_volume_gal": 1000000,
         "mlss_mg_l": 2500,
-        "ras_flow_mgd": 0.5,
-        "ras_tss_mg_l": 8000,
         "was_flow_mgd": 0.05,
         "was_tss_mg_l": 8000,
         "eff_tss_mg_l": 10,
@@ -13925,8 +13920,7 @@
       "inputs": {
         "peak_demand_gpm": 30,
         "normal_rating_gpm": 50,
-        "peak_rating_gpm": 100,
-        "available_loss_psi": 5
+        "peak_rating_gpm": 100
       },
       "outputs": {
         "percent_used": {

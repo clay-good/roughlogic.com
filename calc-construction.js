@@ -965,8 +965,8 @@ export const WIND_PRESSURE_CP = {
   side: -0.7,
 };
 
-// dims: in { V_mph: L T^-1, exposure: dimensionless, roof_type: dimensionless, Kz: dimensionless, Kzt: dimensionless, Kd: dimensionless, G: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2, q_design_psf: M L^-1 T^-2 }
-export function computeWindPressure({ V_mph, exposure = "C", roof_type = "gable", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }) {
+// dims: in { V_mph: L T^-1, exposure: dimensionless, Kz: dimensionless, Kzt: dimensionless, Kd: dimensionless, G: dimensionless } out: { q_psf: M L^-1 T^-2, windward_psf: M L^-1 T^-2, leeward_psf: M L^-1 T^-2, q_design_psf: M L^-1 T^-2 }
+export function computeWindPressure({ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
@@ -999,7 +999,7 @@ export function computeWindPressure({ V_mph, exposure = "C", roof_type = "gable"
 }
 
 export const windPressureExample = {
-  inputs: { V_mph: 100, exposure: "C", roof_type: "gable" },
+  inputs: { V_mph: 100, exposure: "C" },
   expectedRange: { q_psf: { min: 25, max: 26 } },
 };
 
@@ -1254,16 +1254,13 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
   const exp = makeSelect("Exposure", "wp-e", [
     { value: "B", label: "B" }, { value: "C", label: "C", selected: true }, { value: "D", label: "D" },
   ]);
-  const roof = makeSelect("Roof type", "wp-r", [
-    { value: "gable", label: "Gable" }, { value: "hip", label: "Hip" }, { value: "flat", label: "Flat" },
-  ]);
   // v23 EN.8: ASCE 7 design-pressure coefficients exposed (blank Kz = exposure default).
   const kz = makeNumber("Kz (blank = exposure default)", "wp-kz", { step: "any", min: "0" });
   const kzt = makeNumber("Kzt (topographic)", "wp-kzt", { step: "any", min: "0", value: "1.0" }); kzt.input.value = "1.0";
   const kd = makeNumber("Kd (directionality)", "wp-kd", { step: "any", min: "0", value: "0.85" }); kd.input.value = "0.85";
   const g = makeNumber("G (gust factor)", "wp-g", { step: "any", min: "0", value: "0.85" }); g.input.value = "0.85";
-  for (const f of [V, exp, roof, kz, kzt, kd, g]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { V.input.value = "100"; exp.select.value = "C"; roof.select.value = "gable"; kz.input.value = ""; kzt.input.value = "1.0"; kd.input.value = "0.85"; g.input.value = "0.85"; update(); });
+  for (const f of [V, exp, kz, kzt, kd, g]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { V.input.value = "100"; exp.select.value = "C"; kz.input.value = ""; kzt.input.value = "1.0"; kd.input.value = "0.85"; g.input.value = "0.85"; update(); });
   const oQ = makeOutputLine(outputRegion, "Velocity pressure q", "wp-out-q");
   const oZ = makeOutputLine(outputRegion, "qz at 30 ft", "wp-out-z");
   const oW = makeOutputLine(outputRegion, "Windward pressure", "wp-out-w");
@@ -1272,7 +1269,7 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeWindPressure({
       V_mph: Number(V.input.value) || 0,
-      exposure: exp.select.value, roof_type: roof.select.value,
+      exposure: exp.select.value,
       Kz: Number(kz.input.value) || 0, Kzt: Number(kzt.input.value) || 1, Kd: Number(kd.input.value) || 0.85, G: Number(g.input.value) || 0.85,
     });
     if (r.error) { oQ.textContent = r.error; oZ.textContent = "-"; oW.textContent = "-"; oL.textContent = "-"; oD.textContent = "-"; return; }

@@ -1459,7 +1459,7 @@ cross-check.
 | calc-arborist.js | `computeTreeRiggingShock` | `{ static_weight_lb, drop_ft, rope_length_ft, elong_pct = 5 } = {}` | _ | _ | _ |
 | calc-civil.js | `computeEarthworkEndArea` | `{ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}` | _ | _ | _ |
 | calc-civil.js | `computeHorizontalCurve` | `{ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}` | _ | _ | _ |
-| calc-civil.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, conven...` | _ | _ | _ |
+| calc-civil.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
@@ -1519,7 +1519,7 @@ cross-check.
 | calc-construction.js | `computeWallBracingLength` | `{ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, metho...` | _ | _ | _ |
 | calc-construction.js | `computeWeldHeatInput` | `{ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wp...` | _ | _ | _ |
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
-| calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", roof_type = "gable", Kz = 0, Kzt = 1.0, Kd = 0.85, G...` | _ | _ | _ |
+| calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `renderAnchorEmbedment` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderArea` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderBeamLoading` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -1546,7 +1546,7 @@ cross-check.
 | calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
 | calc-cross.js | `computeGeometry` | `{ shape, ...args }` | _ | _ | _ |
 | calc-cross.js | `computeHaversineDistance` | `{ lat1, lon1, lat2, lon2 }` | _ | _ | _ |
-| calc-cross.js | `computeHeatStress` | `{ T_F = 0, RH_percent = 0, wind_mph = 0, solar = false }` | _ | _ | _ |
+| calc-cross.js | `computeHeatStress` | `{ T_F = 0, RH_percent = 0, solar = false }` | _ | _ | _ |
 | calc-cross.js | `computeHydraulicCylinder` | `{ bore_in = 0, rod_in = 0, pressure_psi = 0, flow_gpm = 0, direction = "exten...` | _ | _ | _ |
 | calc-cross.js | `computeLadderAngle` | `{ ladder_length_ft = 0, working_height_ft = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeLinearInterpolation` | `{ x1 = 0, y1 = 0, x2 = 0, y2 = 0, x = 0 } = {}` | _ | _ | _ |
@@ -1837,7 +1837,7 @@ cross-check.
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
-| calc-hvac.js | `computeEconomizerSavingsHours` | `{ cfm = 0, delta_t_f = 0, hours = 0, changeover_db_f = 0, supply_temp_f = 0 }...` | _ | _ | _ |
+| calc-hvac.js | `computeEconomizerSavingsHours` | `{ cfm = 0, delta_t_f = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
@@ -2006,7 +2006,7 @@ cross-check.
 | calc-plumbing.js | `computeWaterHammerSurge` | `{ material = "copper", pipe_size = "1", velocity_fps = 0, closure_time_s = 0,...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHeaterRecovery` | `{ heater_type = "gas_atmospheric", input_btu_hr = 0, input_kw = 0, efficiency...` | _ | _ | _ |
 | calc-plumbing.js | `computeWaterHeaterStorageSizing` | `{ tank_gal = 0, input_btuh = 0, efficiency_pct = 80, rise_F = 90, usable_frac...` | _ | _ | _ |
-| calc-plumbing.js | `computeWaterMeterSizing` | `{ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0, available_...` | _ | _ | _ |
+| calc-plumbing.js | `computeWaterMeterSizing` | `{ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeWhExpansionTank` | `{ water_heater_vol_gal = 0, incoming_psi = 60, relief_psi = 150, incoming_F =...` | _ | _ | _ |
 | calc-plumbing.js | `computeWsfuDemand` | `{ wsfu, system_type = "flush_tank", curve = null } = {}` | _ | _ | _ |
 | calc-plumbing.js | `pressureConvert` | `{ value, from, to }` | _ | _ | _ |
@@ -2138,7 +2138,7 @@ cross-check.
 | calc-restoration.js | `computeDryingLog` | `{ readings = [], drying_target_GPP = null, } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeDryingTime` | `{ material }` | _ | _ | _ |
 | calc-restoration.js | `computeEquipmentCircuitLoad` | `{ qty_lgr_dehu = 0, qty_air_mover = 0, qty_hepa_500 = 0, qty_heat_dryer = 0, ...` | _ | _ | _ |
-| calc-restoration.js | `computeEvaporationLoad` | `{ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fra...` | _ | _ | _ |
+| calc-restoration.js | `computeEvaporationLoad` | `{ area_ft2 = 0, water_class = 3, load_factor = 0, first24_fraction = 0.4, der...` | _ | _ | _ |
 | calc-restoration.js | `computeFloodCutTakeoff` | `{ wall_perimeter_ft = 0, cut_height_in = 24, removed_faces = 1, has_insulatio...` | _ | _ | _ |
 | calc-restoration.js | `computeGrainsRemoved` | `{ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
@@ -2210,7 +2210,7 @@ cross-check.
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }` | _ | _ | _ |
-| calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, charger_voltage = 240, main_breaker_a = 0, existing_load_...` | _ | _ | _ |
+| calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, main_breaker_a = 0, existing_load_a = 0, busbar_rating_a ...` | _ | _ | _ |
 | calc-solar.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-solar.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
 | calc-solar.js | `computePvCircuitAmpacity` | `{ module_isc_a = 0, parallel_strings = 1, ocpd_a = 0 } = {}` | _ | _ | _ |
@@ -2279,7 +2279,7 @@ cross-check.
 | calc-water.js | `computePoolTurnover` | `{ pool_volume_gal = 0, turnover_hr = 6, chlorine_ppm = 2, chlorine_type = "ca...` | _ | _ | _ |
 | calc-water.js | `computePoundsFormula` | `{ flow_mgd = 0, dose_mg_l = 0, chemical = "chlorine_gas" }` | _ | _ | _ |
 | calc-water.js | `computePumpEfficiency` | `{ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, motor_eff = 0.92, drive_eff = 1.0 }` | _ | _ | _ |
-| calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, ras_flow_mgd = 0, r...` | _ | _ | _ |
+| calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, was_flow_mgd = 0, w...` | _ | _ | _ |
 | calc-water.js | `computeSVI` | `{ sv30_ml_per_l = 0, mlss_mg_per_l = 0, } = {}` | _ | _ | _ |
 | calc-water.js | `computeUvDose` | `{ intensity_mw_cm2 = 0, exposure_time_s = 0, target_dose_mj_cm2 = 40 } = {}` | _ | _ | _ |
 | calc-water.js | `computeWellDrawdown` | `{ static_level_ft = 0, pumping_level_ft = 0, discharge_gpm = 0, pump_offset_f...` | _ | _ | _ |

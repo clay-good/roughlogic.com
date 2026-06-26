@@ -187,14 +187,13 @@ export const pumpEfficiencyExample = { inputs: { flow_gpm: 1500, tdh_ft: 100, mo
 
 // --- 215: Solids Retention Time and F/M Ratio ---
 
-// dims: in { aeration_volume_gal: L^3, mlss_mg_l: M L^-3, mlvss_mg_l: M L^-3, ras_flow_mgd: L^3 T^-1, ras_tss_mg_l: M L^-3, was_flow_mgd: L^3 T^-1, was_tss_mg_l: M L^-3, bod_load_lb_day: M T^-1, effluent_tss_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1 }
+// dims: in { aeration_volume_gal: L^3, mlss_mg_l: M L^-3, mlvss_mg_l: M L^-3, was_flow_mgd: L^3 T^-1, was_tss_mg_l: M L^-3, bod_load_lb_day: M T^-1, effluent_tss_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1 }
 //        out: { mlss_lb: M, mlvss_lb: M, srt_days: T, fm_ratio: T^-1, cas_flag: dimensionless }
 // (Tank volume is `L^3`; suspended-solids concentrations are mass /
 // volume; flows are volume / time; BOD load is mass / time; SRT is
 // time; F/M ratio is (mass / time) / mass = `T^-1`.)
 export function computeSRTandFM({
   aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0,
-  ras_flow_mgd = 0, ras_tss_mg_l = 0,
   was_flow_mgd = 0, was_tss_mg_l = 0,
   bod_load_lb_day = 0, effluent_tss_mg_l = 0, effluent_flow_mgd = 0,
 }) {
@@ -223,7 +222,7 @@ export function computeSRTandFM({
   return { mlss_lb, mlvss_lb, srt_days, srt_note, fm_ratio, cas_flag };
 }
 
-export const srtFMExample = { inputs: { aeration_volume_gal: 1500000, mlss_mg_l: 2500, mlvss_mg_l: 1900, ras_flow_mgd: 2.0, ras_tss_mg_l: 8000, was_flow_mgd: 0.05, was_tss_mg_l: 7500, bod_load_lb_day: 6000, effluent_tss_mg_l: 12, effluent_flow_mgd: 5.0 } };
+export const srtFMExample = { inputs: { aeration_volume_gal: 1500000, mlss_mg_l: 2500, mlvss_mg_l: 1900, was_flow_mgd: 0.05, was_tss_mg_l: 7500, bod_load_lb_day: 6000, effluent_tss_mg_l: 12, effluent_flow_mgd: 5.0 } };
 
 // --- Renderers ---
 
@@ -389,8 +388,6 @@ const renderSRTFM = _r({
     { key: "aeration_volume_gal", label: "Aeration volume (gal)", kind: "number" },
     { key: "mlss_mg_l",           label: "MLSS (mg/L)", kind: "number" },
     { key: "mlvss_mg_l",          label: "MLVSS (mg/L)", kind: "number" },
-    { key: "ras_flow_mgd",        label: "RAS flow (MGD)", kind: "number" },
-    { key: "ras_tss_mg_l",        label: "RAS TSS (mg/L)", kind: "number" },
     { key: "was_flow_mgd",        label: "WAS flow (MGD)", kind: "number" },
     { key: "was_tss_mg_l",        label: "WAS TSS (mg/L)", kind: "number" },
     { key: "bod_load_lb_day",     label: "BOD load (lb/day)", kind: "number" },

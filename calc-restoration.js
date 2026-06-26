@@ -1310,8 +1310,8 @@ RESTORATION_RENDERERS["grains-removed"] = renderGrainsRemoved;
 // load_gal = area * load_factor(class); lb = gal * 8.345; first-24h pints =
 // load_gal * 8 * fraction; suggested AHAM pints = target / derating.
 const WATER_CLASS_LOAD_GAL_FT2 = { 1: 0.02, 2: 0.04, 3: 0.08, 4: 0.1 };
-// dims: in { area_ft2: L^2, water_class: dimensionless, ceiling_ft: L, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless }
-export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, ceiling_ft = 8, load_factor = 0, first24_fraction = 0.4, derating = 0.5 } = {}) {
+// dims: in { area_ft2: L^2, water_class: dimensionless, load_factor: dimensionless, first24_fraction: dimensionless, derating: dimensionless } out: { load_gal: L^3, aham_pints: dimensionless }
+export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, load_factor = 0, first24_fraction = 0.4, derating = 0.5 } = {}) {
   const area = Number(area_ft2) || 0;
   const cls = Math.round(Number(water_class) || 0);
   let lf = Number(load_factor) || 0;
@@ -1336,7 +1336,7 @@ export function computeEvaporationLoad({ area_ft2 = 0, water_class = 3, ceiling_
     note: "Per-class load factors are editable field estimates - the output is only as good as the class assessment. Class 4 (bound water) is non-linear in area. Ignores HVAC / open-air contribution. IICRC S500 governs.",
   };
 }
-export const evaporationLoadExample = { inputs: { area_ft2: 800, water_class: 3, ceiling_ft: 8, load_factor: 0.08, first24_fraction: 0.4, derating: 0.5 } };
+export const evaporationLoadExample = { inputs: { area_ft2: 800, water_class: 3, load_factor: 0.08, first24_fraction: 0.4, derating: 0.5 } };
 
 function renderEvaporationLoad(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Per the IICRC S500 water-class framework and evaporation-load drying principle, by name (not reproduced); per-class load factors are editable field defaults the user tunes to the standard and the job. Class 4 (bound water) is non-linear in area. IICRC S500 governs.";

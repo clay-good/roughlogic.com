@@ -528,7 +528,7 @@ The site has no command-line interface of its own. The repository ships these np
 
 ### The lint chain
 
-`npm run lint` runs 26 gates in sequence. They are the project's executable spec: a violation fails CI.
+`npm run lint` runs 27 gates in sequence. They are the project's executable spec: a violation fails CI.
 
 | Gate | Guards |
 |---|---|
@@ -546,6 +546,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `check-related-tiles` | Every tile has a curated related-tiles entry. |
 | `check-wiring` | Renderer imports/exports and dist-vs-runtime parity. |
 | `check-multiline-inputs` | A renderer that parses newline-delimited input (one row per line) builds it with `makeTextarea`, not single-line `makeText` (a text `<input>` strips newlines). |
+| `check-dead-inputs` | No compute function destructures an input it never references in its body -- a control the user can set that the math silently ignores (the static cousin of the trench-slope `surcharge ? 1.0 : 1.0` no-op; invisible to the render-leak and dimensions gates because the answer stays finite and dimensionally valid). |
 | `check-sw-precache` | The service-worker precache list matches shipped files. |
 | `check-module-sizes` | Per-module gzip caps (tile shell 6 KB, group shell 12 KB). |
 | `check-home-payload` | Home-view payload under the 100 KB budget. |

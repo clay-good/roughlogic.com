@@ -2491,8 +2491,8 @@ HVAC_RENDERERS["shr-latent"] = renderSHRLatent;
 
 // --- v20 C.1: Air-side economizer free-cooling hours (`economizer-savings-hours`) ---
 // Q_sens = 1.08 * CFM * dT; ton-hours = Q_sens * hours / 12,000.
-// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: dimensionless, changeover_db_f: T, supply_temp_f: T } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless }
-export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 0, changeover_db_f = 0, supply_temp_f = 0 } = {}) {
+// dims: in { cfm: L^3*T^-1, delta_t_f: T, hours: dimensionless } out: { q_sens_btuh: M*L^2*T^-3, ton_hours: dimensionless }
+export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 0 } = {}) {
   const CFM = Number(cfm) || 0;
   const dT = Number(delta_t_f) || 0;
   const hrs = Number(hours) || 0;
@@ -2513,7 +2513,7 @@ export function computeEconomizerSavingsHours({ cfm = 0, delta_t_f = 0, hours = 
     note: "Sensible free-cooling capacity at the mix-to-supply delta-T. The 1.08 factor is sea-level standard air (apply a density correction at altitude). ASHRAE 90.1 economizer changeover governs eligibility.",
   };
 }
-export const economizerSavingsHoursExample = { inputs: { cfm: 4000, delta_t_f: 20, hours: 1500, changeover_db_f: 65, supply_temp_f: 55 } };
+export const economizerSavingsHoursExample = { inputs: { cfm: 4000, delta_t_f: 20, hours: 1500 } };
 
 function renderEconomizerSavingsHours(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASHRAE sensible-heat relation Q = 1.08 * CFM * dT (public); air-side economizer changeover per ASHRAE Standard 90.1, by name. Estimate; design conditions govern. The 1.08 factor is sea-level standard air. ASHRAE 90.1 free read-only at ashrae.org.";

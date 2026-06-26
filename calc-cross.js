@@ -1179,8 +1179,8 @@ export const nioshLiftingExample = {
 
 // --- Utility 164: Heat Stress (NWS Rothfusz heat index + WBGT approx + work/rest) ---
 
-// dims: in { T_F: T, RH_percent: dimensionless, wind_mph: L T^-1, solar: dimensionless } out: { heat_index_F: T, band: dimensionless }
-export function computeHeatStress({ T_F = 0, RH_percent = 0, wind_mph = 0, solar = false }) {
+// dims: in { T_F: T, RH_percent: dimensionless, solar: dimensionless } out: { heat_index_F: T, band: dimensionless }
+export function computeHeatStress({ T_F = 0, RH_percent = 0, solar = false }) {
   if (!(T_F >= -50 && T_F <= 200)) return { error: "Temperature out of range." };
   if (!(RH_percent >= 0 && RH_percent <= 100)) return { error: "RH must be 0-100." };
   // Rothfusz simple form (US units), valid for T >= 80 F.
@@ -1205,7 +1205,7 @@ export function computeHeatStress({ T_F = 0, RH_percent = 0, wind_mph = 0, solar
   return { heat_index_F: HI, WBGT_F, work_min_per_hr: work_min, rest_min_per_hr: rest_min };
 }
 
-export const heatStressExample = { inputs: { T_F: 92, RH_percent: 70, wind_mph: 5, solar: true } };
+export const heatStressExample = { inputs: { T_F: 92, RH_percent: 70, solar: true } };
 
 // --- Utility 165: Wind Chill Exposure ---
 
@@ -1479,7 +1479,6 @@ const renderHeatStress = _simpleRendererG({
   fields: [
     { key: "T_F", label: "Dry-bulb temp (F)", kind: "number" },
     { key: "RH_percent", label: "Relative humidity (%)", kind: "number" },
-    { key: "wind_mph", label: "Wind (mph)", kind: "number" },
     { key: "solar", label: "Direct sun exposure", kind: "checkbox" },
   ],
   outputs: [

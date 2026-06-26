@@ -468,7 +468,6 @@ const _EV_CU_AWG = ["14", "12", "10", "8", "6", "4", "3", "2", "1", "1/0", "2/0"
 // dims: in { args: dimensionless } out: { continuous_circuit_a: I, recommended_breaker_a: I, new_panel_load_a: I, headroom_a: I }
 export function computeEvChargerLoad({
   charger_amps = 0,
-  charger_voltage = 240,
   main_breaker_a = 0,
   existing_load_a = 0,
   busbar_rating_a = 0,
@@ -522,7 +521,6 @@ export const evChargerLoadExample = {
   // headroom = 10 A (5%, flagged marginal). (Mike Holt EV-charger article.)
   inputs: {
     charger_amps: 48,
-    charger_voltage: 240,
     main_breaker_a: 200,
     existing_load_a: 130,
     busbar_rating_a: 200,
@@ -536,10 +534,6 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
 
   const ch = makeNumber("Charger nameplate (A)", "ev-ch", { step: "any", min: "0", value: "48" });
   ch.input.value = "48";
-  const volt = makeSelect("Charger voltage", "ev-v", [
-    { value: "240", label: "240 V (Level 2 residential)", selected: true },
-    { value: "208", label: "208 V (commercial wye)" },
-  ]);
   const main = makeNumber("Panel main breaker (A)", "ev-main", { step: "any", min: "0", value: "200" });
   main.input.value = "200";
   const existing = makeNumber("Existing service load (A)", "ev-exist", { step: "any", min: "0", value: "130" });
@@ -547,10 +541,10 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
   const busbar = makeNumber("Panel busbar rating (A; 0 if unknown)", "ev-busbar", { step: "any", min: "0", value: "200" });
   busbar.input.value = "200";
   const managed = makeCheckbox("Load-managed (NEC 625.42(A) EMS)", "ev-managed");
-  for (const f of [ch, volt, main, existing, busbar, managed]) inputRegion.appendChild(f.wrap);
+  for (const f of [ch, main, existing, busbar, managed]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    ch.input.value = "48"; volt.select.value = "240"; main.input.value = "200";
+    ch.input.value = "48"; main.input.value = "200";
     existing.input.value = "130"; busbar.input.value = "200"; managed.input.checked = false;
     update();
   });
@@ -570,7 +564,6 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeEvChargerLoad({
       charger_amps: readNum(ch.input),
-      charger_voltage: Number(volt.select.value),
       main_breaker_a: readNum(main.input),
       existing_load_a: readNum(existing.input),
       busbar_rating_a: readNum(busbar.input),
@@ -587,7 +580,7 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
     oHead.textContent = fmt(r.headroom_a, 1) + " A (" + fmt(r.headroom_pct, 1) + "%)";
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within panel headroom. Verify the conductor against NEC 310.16; AHJ governs.";
   }, DEBOUNCE_MS);
-  for (const f of [ch.input, volt.select, main.input, existing.input, busbar.input, managed.input]) f.addEventListener("input", update);
+  for (const f of [ch.input, main.input, existing.input, busbar.input, managed.input]) f.addEventListener("input", update);
 }
 
 // =====================================================================

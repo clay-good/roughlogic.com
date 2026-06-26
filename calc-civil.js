@@ -323,7 +323,7 @@ CIVIL_RENDERERS["earthwork-end-area"] = renderEarthworkEndArea;
 // catch_offset = offset_at_hinge + slope_ratio_h * |cut_fill|, where slope_ratio_h
 // is the H in an H:V slope. Equal elevations report on-grade with magnitude 0.
 // dims: in { existing_elev_ft: L, design_elev_ft: L, slope_ratio_h: dimensionless, offset_at_hinge_ft: L } out: { cut_fill_ft: L, magnitude_ft: L, catch_offset_ft: L }
-export function computeSlopeStakeCutFill({ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft, convention } = {}) {
+export function computeSlopeStakeCutFill({ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const existing = Number(existing_elev_ft) || 0;
   const design = Number(design_elev_ft) || 0;

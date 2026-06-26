@@ -2858,8 +2858,8 @@ PLUMBING_RENDERERS["trap-seal-loss"] = renderTrapSealLoss;
 // =====================================================================
 // v23 B.2: Water meter sizing from peak demand (AWWA M22)
 // =====================================================================
-// dims: in { peak_demand_gpm: dimensionless, normal_rating_gpm: dimensionless, peak_rating_gpm: dimensionless, available_loss_psi: dimensionless } out: { percent_used: dimensionless, headroom_gpm: dimensionless, adequate: dimensionless, above_peak_rating: dimensionless }
-export function computeWaterMeterSizing({ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0, available_loss_psi = 0 } = {}) {
+// dims: in { peak_demand_gpm: dimensionless, normal_rating_gpm: dimensionless, peak_rating_gpm: dimensionless } out: { percent_used: dimensionless, headroom_gpm: dimensionless, adequate: dimensionless, above_peak_rating: dimensionless }
+export function computeWaterMeterSizing({ peak_demand_gpm = 0, normal_rating_gpm = 0, peak_rating_gpm = 0 } = {}) {
   const peak = Number(peak_demand_gpm) || 0;
   const normal = Number(normal_rating_gpm) || 0;
   let peakRating = Number(peak_rating_gpm); if (!Number.isFinite(peakRating) || peakRating < 0) peakRating = 0;
@@ -2871,15 +2871,14 @@ export function computeWaterMeterSizing({ peak_demand_gpm = 0, normal_rating_gpm
   const above_peak_rating = peakRating > 0 ? peak > peakRating : false;
   return { percent_used, headroom_gpm, adequate, above_peak_rating };
 }
-export const waterMeterSizingExample = { inputs: { peak_demand_gpm: 30, normal_rating_gpm: 50, peak_rating_gpm: 100, available_loss_psi: 5 } };
+export const waterMeterSizingExample = { inputs: { peak_demand_gpm: 30, normal_rating_gpm: 50, peak_rating_gpm: 100 } };
 const renderWaterMeterSizing = _v23SimpleRenderer({
-  citation: "Citation: Per AWWA M22 (Sizing Water Service Lines and Meters) and the AWWA C700-series meter standards. Meter flow ranges are user-supplied for the candidate size; the available pressure loss must be the drop across the meter, not the static pressure. Free guidance summaries at awwa.org.",
+  citation: "Citation: Per AWWA M22 (Sizing Water Service Lines and Meters) and the AWWA C700-series meter standards. Meter flow ranges are user-supplied for the candidate size. Free guidance summaries at awwa.org.",
   example: waterMeterSizingExample.inputs,
   fields: [
     { key: "peak_demand_gpm", label: "Peak demand (gpm)", kind: "number" },
     { key: "normal_rating_gpm", label: "Meter normal-flow rating (gpm)", kind: "number" },
     { key: "peak_rating_gpm", label: "Meter peak-flow rating (gpm, optional)", kind: "number" },
-    { key: "available_loss_psi", label: "Available pressure loss across meter (psi)", kind: "number" },
   ],
   outputs: [
     { key: "verdict", id: "wms-out-v", label: "Verdict", value: (r) => r.above_peak_rating ? "UNDERSIZED - demand exceeds peak rating; go a size up" : (r.adequate ? "Adequate at the normal-flow rating" : "Undersized at the normal-flow rating") },
