@@ -1127,7 +1127,8 @@ export function computeTrenchSlope({ depth_ft = 0, soil_class = "B", surcharge =
   if (!sc) return { error: "Unknown soil class." };
   if (!(depth_ft > 0)) return { error: "Depth must be positive." };
   if (depth_ft > 20) return { error: "Trenches deeper than 20 ft require a registered professional engineer's design." };
-  const max_horizontal_ft = depth_ft * sc.H_to_V * (surcharge ? 1.0 : 1.0);
+  if (surcharge) return { error: "Surcharge loads near the trench void the simple slope tables (29 CFR 1926 Subpart P, Appendix B); a registered professional engineer must design the protective system." };
+  const max_horizontal_ft = depth_ft * sc.H_to_V;
   const top_width_ft = 2 * max_horizontal_ft + 2; // 2 ft baseline trench bottom width
   // Benching geometry: vertical bench of 4 ft max in Type A/B with sloped portion above.
   const bench_height_ft = soil_class === "C" ? 0 : Math.min(4, depth_ft);

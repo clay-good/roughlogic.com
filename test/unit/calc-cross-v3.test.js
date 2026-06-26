@@ -22,6 +22,7 @@ test("Trench: example yields slope and setback", () => { const r = computeTrench
 test("Trench: A is steepest, C flattest", () => { const a = computeTrenchSlope({ depth_ft: 8, soil_class: "A" }); const c = computeTrenchSlope({ depth_ft: 8, soil_class: "C" }); assert.ok(c.max_horizontal_ft > a.max_horizontal_ft); });
 test("Trench: zero depth errors", () => { const r = computeTrenchSlope({ depth_ft: 0, soil_class: "B" }); assert.ok(r.error); });
 test("Trench: depth > 20 ft errors (engineer needed)", () => { const r = computeTrenchSlope({ depth_ft: 25, soil_class: "B" }); assert.ok(r.error); });
+test("Trench: surcharge near trench errors (simple slope tables void, PE needed)", () => { const r = computeTrenchSlope({ depth_ft: 8, soil_class: "B", surcharge: true }); assert.ok(r.error); });
 test("Trench: unknown class errors", () => { const r = computeTrenchSlope({ depth_ft: 8, soil_class: "X" }); assert.ok(r.error); });
 test("Trench: top width = 2 + 2*horizontal", () => { const r = computeTrenchSlope({ depth_ft: 6, soil_class: "B" }); assert.ok(close(r.top_width_ft, 2 + 2 * r.max_horizontal_ft, 0.001)); });
 test("Trench: bench height capped at 4 ft for A/B", () => { const r = computeTrenchSlope({ depth_ft: 10, soil_class: "A" }); assert.equal(r.bench_height_ft, 4); });
