@@ -1656,7 +1656,7 @@ export function computePoEBudget({ poe_class = "at", category = "Cat6", run_leng
   const tempFactor = 1 + 0.00393 * (ambient_C - 20);
   const loopOhms = (ohmsPer100m * (length_m / 100)) * tempFactor;
   // Source voltage per class (PSE port voltage minimums per IEEE):
-  const v_source = poe_class === "af" ? 44 : (poe_class === "at" ? 50 : 50);
+  const v_source = poe_class === "af" ? 44 : 50;
   // Power-out budget at PSE = pse_W; current at PSE = pse_W / v_source.
   const I = cls.pse_W / v_source;
   const drop_V = I * loopOhms;
