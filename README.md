@@ -496,7 +496,7 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (907 rows; lint fails on a stale section) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (907 rows) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
 | C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (910/910) |
 | D | Every function passes the bounds-and-edge-case fuzzer | Complete (907/907) |
