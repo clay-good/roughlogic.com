@@ -98,6 +98,20 @@ for (const id of TOOL_IDS) {
       await page.waitForTimeout(70); // clear the 50ms input debounce
       const filled = (await out.textContent()) || "";
       expect(filled, `${id} leaked after example: "${filled.trim()}"`).not.toMatch(BAD);
+      // The "Test with example" button is the catalog's primary worked-case
+      // CTA, so its output region must actually be painted. An empty result is
+      // not a NaN/Infinity/undefined leak (it matches none of BAD), produces no
+      // axe violation, and does not scroll, so a renderer whose example branch
+      // silently paints nothing -- a no-op button, an unwired example, a guard
+      // that swallows the whole output -- would otherwise pass every gate. The
+      // worked-examples unit runner proves the compute fn returns a result for
+      // the fixture inputs, but not that the live button's renderer paints it.
+      // Assert a non-empty populated output to close that gap (every example
+      // tile paints >= a one-line result today; this guards future regressions).
+      expect(
+        filled.trim().length,
+        `${id} painted an empty output region after clicking "Test with example"`,
+      ).toBeGreaterThan(0);
 
       // (c) degenerate-input-after-interaction. The example populates a
       // valid state, but a real user can type a value and then CLEAR a
