@@ -282,6 +282,10 @@ const TOOL_MODULES = (() => {
     "drying-balance", "bound-water", "disinfectant-dwell",
     "carpet-restore-replace", "category-deterioration", "hydroxyl-sizing",
     "cavity-drying-system", "dry-time-projection",
+    // spec-v141 + v146..v148 + v152..v154 fire & smoke restoration batch.
+    "equipment-heat-load", "char-depth-capacity", "soot-cleaning-takeoff",
+    "ozone-shock-treatment", "smoke-residue-method", "thermal-fog-deodorization",
+    "contents-packout-inventory",
   ]);
   // spec-v77 cap-relief split: the cohesive demolition / abatement bench
   // (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated out

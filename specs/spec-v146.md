@@ -1,6 +1,6 @@
 # roughlogic.com Specification v146 -- Fire-Exposed Wood Member Char Depth and Residual Capacity (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v146..v150.** In-scope catalog expansion under the
+> **Status: LANDED (2026-06-29, package 0.85.0; was PROPOSED 2026-06-23). Vetted-novel subset of the fire & smoke restoration batch. Batch spec-v146..v150.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: the first fire-*damage* restoration tile (the existing `calc-fire.js`
 > family is firefighting hydraulics, not damage assessment), screening whether a charred wood member
 > kept enough sound section to carry load. Adds one tile to **`calc-restoration.js`** (Group D); no new

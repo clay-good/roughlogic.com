@@ -855,6 +855,13 @@ const RELATED = {
   "hydroxyl-sizing": ["smoke-ejector-cfm","hepa-filter-life","chamber-turnover"],
   "cavity-drying-system": ["flood-cut-takeoff","desiccant-airflow-sizing","air-movers"],
   "dry-time-projection": ["drying-log","moisture-dry-goal","drying-times"],
+  "equipment-heat-load": ["equipment-power-draw","thermal-delta-t","chamber-turnover"],
+  "char-depth-capacity": ["soot-cleaning-takeoff","flood-cut-takeoff","ppe"],
+  "soot-cleaning-takeoff": ["char-depth-capacity","smoke-residue-method","ppe"],
+  "ozone-shock-treatment": ["smoke-ejector-cfm","soot-cleaning-takeoff","ppe"],
+  "smoke-residue-method": ["soot-cleaning-takeoff","ozone-shock-treatment","ppe"],
+  "thermal-fog-deodorization": ["ozone-shock-treatment","soot-cleaning-takeoff","smoke-ejector-cfm"],
+  "contents-packout-inventory": ["soot-cleaning-takeoff","flood-cut-takeoff","ppe"],
 };
 
 export { RELATED };

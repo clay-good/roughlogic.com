@@ -1,6 +1,6 @@
 # roughlogic.com Specification v152 -- Smoke Residue Type and Cleaning Method Screen (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v151..v156.** In-scope catalog expansion under the
+> **Status: LANDED (2026-06-29, package 0.85.0; was PROPOSED 2026-06-23). Vetted-novel subset of the fire & smoke restoration batch. Batch spec-v151..v156.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: the reference screen that maps an observed smoke residue to its
 > cleaning method, the decision every fire job turns on before a sponge or solvent is chosen. Adds one
 > tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits spec.md

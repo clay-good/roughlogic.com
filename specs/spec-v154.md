@@ -1,6 +1,6 @@
 # roughlogic.com Specification v154 -- Contents Pack-Out Volume, Boxes, and Storage (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v151..v156.** In-scope catalog expansion under the
+> **Status: LANDED (2026-06-29, package 0.85.0; was PROPOSED 2026-06-23). Vetted-novel subset of the fire & smoke restoration batch. Batch spec-v151..v156.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one restoration estimating tile turning an affected room's contents
 > into the boxes, storage volume, and truck loads a pack-out requires. Adds one tile to
 > **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits spec.md through

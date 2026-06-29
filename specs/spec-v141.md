@@ -1,6 +1,6 @@
 # roughlogic.com Specification v141 -- Drying-Equipment Sensible Heat Load and Chamber Ventilation (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v141..v145.** In-scope catalog expansion under the
+> **Status: LANDED (2026-06-29, package 0.85.0; was PROPOSED 2026-06-23). Vetted-novel subset of the fire & smoke restoration batch. Batch spec-v141..v145.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration tile turning the chamber's electrical draw into
 > the heat it dumps and the ventilation needed to hold the efficient-evaporation band. Adds one tile to
 > **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits spec.md through

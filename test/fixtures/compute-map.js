@@ -691,6 +691,14 @@ export const COMPUTE_MAP = {
   "hydroxyl-sizing": { module: "../../calc-restoration.js", fn: "computeHydroxylSizing" },
   "cavity-drying-system": { module: "../../calc-restoration.js", fn: "computeCavityDryingSystem" },
   "dry-time-projection": { module: "../../calc-restoration.js", fn: "computeDryTimeProjection" },
+  // spec-v141 + v146..v148 + v152..v154 fire & smoke restoration batch (7 tiles)
+  "equipment-heat-load": { module: "../../calc-restoration.js", fn: "computeEquipmentHeatLoad" },
+  "char-depth-capacity": { module: "../../calc-restoration.js", fn: "computeCharDepthCapacity" },
+  "soot-cleaning-takeoff": { module: "../../calc-restoration.js", fn: "computeSootCleaningTakeoff" },
+  "ozone-shock-treatment": { module: "../../calc-restoration.js", fn: "computeOzoneShockTreatment" },
+  "smoke-residue-method": { module: "../../calc-restoration.js", fn: "computeSmokeResidueMethod" },
+  "thermal-fog-deodorization": { module: "../../calc-restoration.js", fn: "computeThermalFogDeodorization" },
+  "contents-packout-inventory": { module: "../../calc-restoration.js", fn: "computeContentsPackoutInventory" },
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   "buck-boost-sizing": { module: "../../calc-electrical.js", fn: "computeBuckBoostSizing" },
   "wireway-fill": { module: "../../calc-electrical.js", fn: "computeWirewayFill" },

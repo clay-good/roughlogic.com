@@ -478,6 +478,14 @@ const _TILES = [
   ["hydroxyl-sizing", "D"],
   ["cavity-drying-system", "D"],
   ["dry-time-projection", "D"],
+  // spec-v141 + v146..v148 + v152..v154 fire & smoke restoration batch
+  ["equipment-heat-load", "D"],
+  ["char-depth-capacity", "D"],
+  ["soot-cleaning-takeoff", "D"],
+  ["ozone-shock-treatment", "D"],
+  ["smoke-residue-method", "D"],
+  ["thermal-fog-deodorization", "D"],
+  ["contents-packout-inventory", "D"],
   // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (Group B)
   ["flash-steam-pct", "B"],
   ["steam-pipe-velocity", "B"],

@@ -11464,6 +11464,102 @@ test("bounds: spec-v198 dry-time-projection pins days-to-goal, the not-progressi
   assert.ok("error" in _vr198({ current_mc_pct: 12, goal_mc_pct: 28, daily_drop_pct: 4 }));
 });
 
+// --- spec-v141 + v146..v148 + v152..v154 fire & smoke restoration batch (calc-restoration.js) ---
+import {
+  computeEquipmentHeatLoad as _vf141, computeCharDepthCapacity as _vf146,
+  computeSootCleaningTakeoff as _vf147, computeOzoneShockTreatment as _vf148,
+  computeSmokeResidueMethod as _vf152, computeThermalFogDeodorization as _vf153,
+  computeContentsPackoutInventory as _vf154,
+} from "../../calc-restoration.js";
+
+test("bounds: spec-v141 equipment-heat-load pins sensible heat, required cfm, sealed-null rise, and error seams", () => {
+  const r = _vf141({ total_equipment_watts: 4000, target_temp_rise_f: 10, exhaust_cfm: 600 });
+  assert.ok(Math.abs(r.sensible_btu_hr - 13648) < 1e-6);
+  assert.ok(Math.abs(r.required_cfm - 1263.7037037) < 1e-3);
+  assert.ok(Math.abs(r.temp_rise_at_exhaust - 21.0617284) < 1e-4);
+  assert.strictEqual(_vf141({ total_equipment_watts: 4000, target_temp_rise_f: 10, exhaust_cfm: 0 }).temp_rise_at_exhaust, null);
+  assert.ok("error" in _vf141({ total_equipment_watts: 0, target_temp_rise_f: 10, exhaust_cfm: 600 }));
+  assert.ok("error" in _vf141({ total_equipment_watts: 4000, target_temp_rise_f: 0, exhaust_cfm: 600 }));
+  assert.ok("error" in _vf141({ total_equipment_watts: Infinity, target_temp_rise_f: 10, exhaust_cfm: 600 }));
+});
+
+test("bounds: spec-v146 char-depth-capacity pins section ratio, the consumed branch, and error seams", () => {
+  const r = _vf146({ exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0.2 });
+  assert.ok(Math.abs(r.effective_char_in - 0.95) < 1e-9);
+  assert.ok(Math.abs(r.residual_width_in - 3.6) < 1e-9);
+  assert.ok(Math.abs(r.section_modulus_ratio - 0.5301818) < 1e-5);
+  assert.strictEqual(r.consumed, false);
+  const cc = _vf146({ exposure_min: 60, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0.2 });
+  assert.ok(Math.abs(cc.section_modulus_ratio - 0.2573941) < 1e-5);
+  const gone = _vf146({ exposure_min: 240, nominal_width_in: 3.5, nominal_depth_in: 3.5, faces_across_width: 2, faces_across_depth: 2, char_rate_in_hr: 1.5, zero_strength_in: 0.2 });
+  assert.strictEqual(gone.consumed, true);
+  assert.strictEqual(gone.section_modulus_ratio, 0);
+  assert.ok(gone.residual_width_in >= 0 && gone.residual_depth_in >= 0);
+  assert.ok("error" in _vf146({ exposure_min: 0, nominal_width_in: 5.5, nominal_depth_in: 9.5 }));
+  assert.ok("error" in _vf146({ exposure_min: 30, nominal_width_in: -1, nominal_depth_in: 9.5 }));
+  assert.ok("error" in _vf146({ exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, char_rate_in_hr: 0 }));
+  assert.ok("error" in _vf146({ exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: -1 }));
+});
+
+test("bounds: spec-v147 soot-cleaning-takeoff pins sponges/labor/sealer, the no-seal branch, and error seams", () => {
+  const r = _vf147({ affected_sf: 1200, sponge_coverage_sf: 100, production_sf_per_hr: 150, seal_coat: 1, primer_sf_per_gal: 300 });
+  assert.strictEqual(r.dry_sponges, 12);
+  assert.ok(Math.abs(r.labor_hours - 8) < 1e-9);
+  assert.ok(Math.abs(r.sealer_gal - 4) < 1e-9);
+  const cc = _vf147({ affected_sf: 1200, sponge_coverage_sf: 60, production_sf_per_hr: 100, seal_coat: 1, primer_sf_per_gal: 300 });
+  assert.strictEqual(cc.dry_sponges, 20);
+  assert.ok(Math.abs(cc.labor_hours - 12) < 1e-9);
+  assert.strictEqual(_vf147({ affected_sf: 1200, sponge_coverage_sf: 100, production_sf_per_hr: 150, seal_coat: 0 }).sealer_gal, 0);
+  assert.ok("error" in _vf147({ affected_sf: 0, sponge_coverage_sf: 100, production_sf_per_hr: 150 }));
+  assert.ok("error" in _vf147({ affected_sf: 1200, sponge_coverage_sf: 0, production_sf_per_hr: 150 }));
+  assert.ok("error" in _vf147({ affected_sf: 1200, sponge_coverage_sf: 100, production_sf_per_hr: 0 }));
+});
+
+test("bounds: spec-v148 ozone-shock-treatment pins generator count, the constant lockout, and error seams", () => {
+  const r = _vf148({ structure_volume_ft3: 8000, rated_volume_per_unit: 2000, treatment_time_hr: 24, aeration_min: 120 });
+  assert.strictEqual(r.generators_needed, 4);
+  assert.strictEqual(r.lockout_required, true);
+  assert.strictEqual(_vf148({ structure_volume_ft3: 4000, rated_volume_per_unit: 2000, treatment_time_hr: 12, aeration_min: 120 }).generators_needed, 2);
+  assert.strictEqual(_vf148({ structure_volume_ft3: 100, rated_volume_per_unit: 2000, treatment_time_hr: 24, aeration_min: 0 }).lockout_required, true);
+  assert.ok("error" in _vf148({ structure_volume_ft3: 0, rated_volume_per_unit: 2000, treatment_time_hr: 24 }));
+  assert.ok("error" in _vf148({ structure_volume_ft3: 8000, rated_volume_per_unit: 0, treatment_time_hr: 24 }));
+  assert.ok("error" in _vf148({ structure_volume_ft3: 8000, rated_volume_per_unit: 2000, treatment_time_hr: 0 }));
+});
+
+test("bounds: spec-v152 smoke-residue-method pins each of the five selectors and the unknown-selector seam", () => {
+  assert.strictEqual(_vf152({ residue_type: "dry" }).method, "dry-sponge first, then dry/wet cleaning");
+  assert.strictEqual(_vf152({ residue_type: "wet" }).method, "wet clean with solvents, agitate");
+  assert.strictEqual(_vf152({ residue_type: "protein" }).method, "degrease and deodorize aggressively");
+  assert.strictEqual(_vf152({ residue_type: "fueloil" }).method, "specialty petroleum solvents");
+  assert.strictEqual(_vf152({ residue_type: "synthetic" }).method, "wet clean, neutralize, corrosion check");
+  assert.ok(/do NOT dry-sponge/i.test(_vf152({ residue_type: "protein" }).caution));
+  assert.ok("error" in _vf152({ residue_type: "mystery" }));
+});
+
+test("bounds: spec-v153 thermal-fog-deodorization pins dosage, the second-pass scale, and error seams", () => {
+  const r = _vf153({ structure_volume_ft3: 8000, dose_oz_per_1000ft3: 5, treatments: 1 });
+  assert.ok(Math.abs(r.deodorant_oz - 40) < 1e-9);
+  assert.ok(Math.abs(r.deodorant_gal - 0.3125) < 1e-9);
+  assert.ok(Math.abs(_vf153({ structure_volume_ft3: 8000, dose_oz_per_1000ft3: 5, treatments: 2 }).deodorant_oz - 80) < 1e-9);
+  assert.ok("error" in _vf153({ structure_volume_ft3: 0, dose_oz_per_1000ft3: 5, treatments: 1 }));
+  assert.ok("error" in _vf153({ structure_volume_ft3: 8000, dose_oz_per_1000ft3: 0, treatments: 1 }));
+  assert.ok("error" in _vf153({ structure_volume_ft3: 8000, dose_oz_per_1000ft3: 5, treatments: 0 }));
+});
+
+test("bounds: spec-v154 contents-packout-inventory pins boxes/storage/truck round-up and error seams", () => {
+  const r = _vf154({ floor_area_ft2: 200, contents_ft3_per_ft2: 2, box_volume_ft3: 3, stacking_factor: 1.5, truck_volume_ft3: 1000 });
+  assert.strictEqual(r.contents_volume_ft3, 400);
+  assert.strictEqual(r.boxes, 134);
+  assert.strictEqual(r.storage_volume_ft3, 600);
+  assert.strictEqual(r.truck_loads, 1);
+  const cc = _vf154({ floor_area_ft2: 1500, contents_ft3_per_ft2: 2, box_volume_ft3: 3, stacking_factor: 1.5, truck_volume_ft3: 1000 });
+  assert.strictEqual(cc.boxes, 1000);
+  assert.strictEqual(cc.truck_loads, 5);
+  assert.ok("error" in _vf154({ floor_area_ft2: 0, contents_ft3_per_ft2: 2, box_volume_ft3: 3 }));
+  assert.ok("error" in _vf154({ floor_area_ft2: 200, contents_ft3_per_ft2: 2, box_volume_ft3: 0 }));
+  assert.ok("error" in _vf154({ floor_area_ft2: 200, contents_ft3_per_ft2: 2, box_volume_ft3: 3, truck_volume_ft3: 0 }));
+});
+
 // --- spec-v207..v211 landscape irrigation and planting install cluster (calc-agriculture.js) ---
 
 import {

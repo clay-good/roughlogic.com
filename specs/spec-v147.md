@@ -1,6 +1,6 @@
 # roughlogic.com Specification v147 -- Dry-Sponge Soot Cleaning Takeoff and Seal Coat (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v146..v150.** In-scope catalog expansion under the
+> **Status: LANDED (2026-06-29, package 0.85.0; was PROPOSED 2026-06-23). Vetted-novel subset of the fire & smoke restoration batch. Batch spec-v146..v150.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one fire-damage restoration tile turning soot-affected surface area
 > into the dry-chem sponges, labor hours, and odor-seal primer the cleaning phase consumes. Adds one
 > tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits spec.md

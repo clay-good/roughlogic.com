@@ -1,6 +1,6 @@
 # roughlogic.com Specification v153 -- Thermal/ULV Fog Deodorizer Dosage (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v151..v156.** In-scope catalog expansion under the
+> **Status: LANDED (2026-06-29, package 0.85.0; was PROPOSED 2026-06-23). Vetted-novel subset of the fire & smoke restoration batch. Batch spec-v151..v156.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one fire-damage restoration tile sizing the deodorant a thermal or ULV
 > fogging pass consumes, the counterpart to the ozone shock tile for odor that fogging reaches better.
 > Adds one tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits

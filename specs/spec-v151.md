@@ -1,6 +1,6 @@
 # roughlogic.com Specification v151 -- Material Moisture-Content Dry Standard and Drying Goal (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v151..v156.** In-scope catalog expansion under the
+> **Status: PROPOSED 2026-06-23 (DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v151..v156.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: the daily monitoring metric the catalog still lacks -- whether a
 > material's moisture reading has reached its drying goal relative to an unaffected dry standard. Adds
 > one tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits

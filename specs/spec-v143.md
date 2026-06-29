@@ -1,6 +1,6 @@
 # roughlogic.com Specification v143 -- Surface Condensation Risk and Dew-Point Margin (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v141..v145.** In-scope catalog expansion under the
+> **Status: PROPOSED 2026-06-23 (DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v141..v145.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration tile that compares the chamber air's dew point
 > to a cold-surface temperature and flags where the drying setup will make new water by condensation.
 > Adds one tile to **`calc-restoration.js`** (Group D); no new module, group, or dependency. Inherits

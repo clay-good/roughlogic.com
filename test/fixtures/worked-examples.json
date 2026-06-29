@@ -24628,6 +24628,201 @@
       "outputs": {
         "days_to_goal": { "value": 8, "tolerance": { "abs": 0.01 } }
       }
+    },
+    {
+      "tile_id": "equipment-heat-load",
+      "source_publisher": "ANSI/IICRC S500 drying-equipment sensible heat load",
+      "source_title": "sensible_btu_hr = watts x 3.412; required_cfm = sensible / (1.08 x rise)",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "4000 W at a 10 degF target rise -> 13,648 BTU/hr, ~1,264 cfm",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "total_equipment_watts": 4000, "target_temp_rise_f": 10, "exhaust_cfm": 600 },
+      "outputs": {
+        "sensible_btu_hr": { "value": 13648, "tolerance": { "abs": 0.01 } },
+        "required_cfm": { "value": 1263.7, "tolerance": { "abs": 0.5 } },
+        "temp_rise_at_exhaust": { "value": 21.06, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "equipment-heat-load",
+      "source_publisher": "ANSI/IICRC S500 drying-equipment sensible heat load",
+      "source_title": "cross-check: undersized exhaust overheats the chamber",
+      "source_edition_or_year": "IICRC S500-2021",
+      "source_section_or_page": "8000 W at 600 cfm exhaust -> 42.1 degF rise (out of band)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "total_equipment_watts": 8000, "target_temp_rise_f": 10, "exhaust_cfm": 600 },
+      "outputs": {
+        "temp_rise_at_exhaust": { "value": 42.12, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "char-depth-capacity",
+      "source_publisher": "AWC National Design Specification char model",
+      "source_title": "char = rate x hr; residual section -> bending-capacity ratio",
+      "source_edition_or_year": "AWC NDS (char provisions)",
+      "source_section_or_page": "6x10 (5.5x9.5) 30 min, 2 width + 1 depth faces -> 0.53 S-ratio",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "exposure_min": 30, "nominal_width_in": 5.5, "nominal_depth_in": 9.5, "faces_across_width": 2, "faces_across_depth": 1, "char_rate_in_hr": 1.5, "zero_strength_in": 0.2 },
+      "outputs": {
+        "effective_char_in": { "value": 0.95, "tolerance": { "abs": 0.001 } },
+        "residual_width_in": { "value": 3.6, "tolerance": { "abs": 0.01 } },
+        "section_modulus_ratio": { "value": 0.5302, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "char-depth-capacity",
+      "source_publisher": "AWC National Design Specification char model",
+      "source_title": "cross-check: doubling exposure halves remaining capacity",
+      "source_edition_or_year": "AWC NDS (char provisions)",
+      "source_section_or_page": "same member at 60 min -> 0.26 S-ratio",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "exposure_min": 60, "nominal_width_in": 5.5, "nominal_depth_in": 9.5, "faces_across_width": 2, "faces_across_depth": 1, "char_rate_in_hr": 1.5, "zero_strength_in": 0.2 },
+      "outputs": {
+        "section_modulus_ratio": { "value": 0.2574, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "soot-cleaning-takeoff",
+      "source_publisher": "ANSI/IICRC S700 fire and smoke restoration",
+      "source_title": "dry_sponges = ceil(area / coverage); labor = area / production",
+      "source_edition_or_year": "IICRC S700",
+      "source_section_or_page": "1200 ft^2 at 100 ft^2/sponge, 150 ft^2/hr, seal -> 12, 8.0 hr, 4.0 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "affected_sf": 1200, "sponge_coverage_sf": 100, "production_sf_per_hr": 150, "seal_coat": 1, "primer_sf_per_gal": 300 },
+      "outputs": {
+        "dry_sponges": { "value": 12, "tolerance": { "abs": 0 } },
+        "labor_hours": { "value": 8, "tolerance": { "abs": 0.01 } },
+        "sealer_gal": { "value": 4, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "soot-cleaning-takeoff",
+      "source_publisher": "ANSI/IICRC S700 fire and smoke restoration",
+      "source_title": "cross-check: heavier soot fouls sponges and slows production",
+      "source_edition_or_year": "IICRC S700",
+      "source_section_or_page": "1200 ft^2 at 60 ft^2/sponge, 100 ft^2/hr -> 20 sponges, 12.0 hr",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "affected_sf": 1200, "sponge_coverage_sf": 60, "production_sf_per_hr": 100, "seal_coat": 1, "primer_sf_per_gal": 300 },
+      "outputs": {
+        "dry_sponges": { "value": 20, "tolerance": { "abs": 0 } },
+        "labor_hours": { "value": 12, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "ozone-shock-treatment",
+      "source_publisher": "ANSI/IICRC S700 deodorization",
+      "source_title": "generators_needed = ceil(volume / rated treatable volume)",
+      "source_edition_or_year": "IICRC S700; OSHA 0.1 ppm ozone limit",
+      "source_section_or_page": "8000 ft^3 at 2000 ft^3/unit -> 4 generators, lockout required",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "structure_volume_ft3": 8000, "rated_volume_per_unit": 2000, "treatment_time_hr": 24, "aeration_min": 120 },
+      "outputs": {
+        "generators_needed": { "value": 4, "tolerance": { "abs": 0 } },
+        "lockout_required": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "ozone-shock-treatment",
+      "source_publisher": "ANSI/IICRC S700 deodorization",
+      "source_title": "cross-check: smaller job, same lockout discipline",
+      "source_edition_or_year": "IICRC S700; OSHA 0.1 ppm ozone limit",
+      "source_section_or_page": "4000 ft^3 garage -> 2 generators",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "structure_volume_ft3": 4000, "rated_volume_per_unit": 2000, "treatment_time_hr": 12, "aeration_min": 120 },
+      "outputs": {
+        "generators_needed": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "smoke-residue-method",
+      "source_publisher": "ANSI/IICRC S700 residue-method mapping",
+      "source_title": "residue selector -> cleaning method",
+      "source_edition_or_year": "IICRC S700",
+      "source_section_or_page": "dry residue -> dry-sponge then dry/wet cleaning",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "residue_type": "dry" },
+      "outputs": {
+        "method": { "value": "dry-sponge first, then dry/wet cleaning", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "smoke-residue-method",
+      "source_publisher": "ANSI/IICRC S700 residue-method mapping",
+      "source_title": "cross-check: a residue that breaks the dry-sponge default",
+      "source_edition_or_year": "IICRC S700",
+      "source_section_or_page": "protein residue -> degrease and deodorize, do not dry-sponge",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "residue_type": "protein" },
+      "outputs": {
+        "method": { "value": "degrease and deodorize aggressively", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "thermal-fog-deodorization",
+      "source_publisher": "ANSI/IICRC S700 deodorization",
+      "source_title": "deodorant_oz = (volume / 1000) x dose x treatments",
+      "source_edition_or_year": "IICRC S700",
+      "source_section_or_page": "8000 ft^3 at 5 oz/1000 ft^3, 1 pass -> 40 oz, 0.31 gal",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "structure_volume_ft3": 8000, "dose_oz_per_1000ft3": 5, "treatments": 1 },
+      "outputs": {
+        "deodorant_oz": { "value": 40, "tolerance": { "abs": 0.01 } },
+        "deodorant_gal": { "value": 0.3125, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "thermal-fog-deodorization",
+      "source_publisher": "ANSI/IICRC S700 deodorization",
+      "source_title": "cross-check: a second pass doubles the mix",
+      "source_edition_or_year": "IICRC S700",
+      "source_section_or_page": "8000 ft^3, 2 passes -> 80 oz",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "structure_volume_ft3": 8000, "dose_oz_per_1000ft3": 5, "treatments": 2 },
+      "outputs": {
+        "deodorant_oz": { "value": 80, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "contents-packout-inventory",
+      "source_publisher": "Restoration estimating practice (ANSI/IICRC S500/S700)",
+      "source_title": "contents = area x density; boxes = ceil(contents / box volume)",
+      "source_edition_or_year": "IICRC S500/S700",
+      "source_section_or_page": "200 ft^2 at 2 ft^3/ft^2 -> 400 ft^3, 134 boxes, 600 ft^3, 1 truck",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "floor_area_ft2": 200, "contents_ft3_per_ft2": 2, "box_volume_ft3": 3, "stacking_factor": 1.5, "truck_volume_ft3": 1000 },
+      "outputs": {
+        "contents_volume_ft3": { "value": 400, "tolerance": { "abs": 0.01 } },
+        "boxes": { "value": 134, "tolerance": { "abs": 0 } },
+        "storage_volume_ft3": { "value": 600, "tolerance": { "abs": 0.01 } },
+        "truck_loads": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "contents-packout-inventory",
+      "source_publisher": "Restoration estimating practice (ANSI/IICRC S500/S700)",
+      "source_title": "cross-check: scales to a whole house",
+      "source_edition_or_year": "IICRC S500/S700",
+      "source_section_or_page": "1500 ft^2 -> 3000 ft^3, 1000 boxes, 5 truck loads",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "floor_area_ft2": 1500, "contents_ft3_per_ft2": 2, "box_volume_ft3": 3, "stacking_factor": 1.5, "truck_volume_ft3": 1000 },
+      "outputs": {
+        "boxes": { "value": 1000, "tolerance": { "abs": 0 } },
+        "truck_loads": { "value": 5, "tolerance": { "abs": 0 } }
+      }
     }
   ]
 }

@@ -2399,3 +2399,365 @@ function renderDryTimeProjection(inputRegion, outputRegion, citationEl) {
   for (const el of [cur.input, goal.input, drop.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["dry-time-projection"] = renderDryTimeProjection;
+
+// --- spec-v141: Drying-equipment sensible heat load + ventilation (`equipment-heat-load`) ---
+// Every watt the air movers / dehus / scrubbers draw lands in the chamber as
+// sensible heat (3.412 BTU/hr per watt); required_cfm holds a target rise via
+// the 1.08 sensible relation (60 min x 0.075 lb/ft^3 x 0.24 BTU/lb-degF). A
+// sealed chamber (exhaust_cfm 0) reports a null rise rather than dividing.
+// dims: in { total_equipment_watts: M L^2 T^-3, target_temp_rise_f: T, exhaust_cfm: L^3 T^-1 } out: { sensible_btu_hr: M L^2 T^-3, required_cfm: L^3 T^-1, temp_rise_at_exhaust: T }
+export function computeEquipmentHeatLoad({ total_equipment_watts = 0, target_temp_rise_f = 10, exhaust_cfm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const watts = Number(total_equipment_watts);
+  const rise = Number(target_temp_rise_f);
+  const exhaust = Number(exhaust_cfm);
+  if (!(watts > 0)) return { error: "Equipment draw must be a positive number of watts." };
+  if (!(rise > 0)) return { error: "Target temperature rise must be positive." };
+  const sensible = watts * 3.412;
+  const requiredCfm = sensible / (1.08 * rise);
+  const tempRiseAtExhaust = exhaust > 0 ? sensible / (1.08 * exhaust) : null;
+  return {
+    sensible_btu_hr: sensible,
+    required_cfm: requiredCfm,
+    temp_rise_at_exhaust: tempRiseAtExhaust,
+    note: "Every watt the chamber draws becomes sensible heat (3.412 BTU/hr per watt); the 1.08 factor is standard-air sensible (60 min x 0.075 lb/ft^3 x 0.24 BTU/lb-degF). An overheated chamber leaves the efficient-evaporation band and drives secondary damage. Envelope losses and the building HVAC govern the real number; this is a screen. ANSI/IICRC S500 names the efficient-evaporation band.",
+  };
+}
+export const equipmentHeatLoadExample = { inputs: { total_equipment_watts: 4000, target_temp_rise_f: 10, exhaust_cfm: 600 } };
+
+function renderEquipmentHeatLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Watt-to-heat conversion (3.412 BTU/hr per watt) and the 1.08 standard-air sensible-heat relation (ANSI/IICRC S500), by name. Every watt of equipment draw becomes sensible heat in the chamber; an overheated chamber leaves the efficient-evaporation band. Envelope losses and the building HVAC govern; this is a screen.";
+  const watts = makeNumber("Total equipment draw (watts)", "eh-watts", { step: "any", min: "0", value: "4000" });
+  watts.input.value = "4000";
+  const rise = makeNumber("Acceptable temperature rise (degF)", "eh-rise", { step: "any", min: "0", value: "10" });
+  rise.input.value = "10";
+  const exhaust = makeNumber("Ventilation / AC airflow (cfm, 0 = sealed)", "eh-exhaust", { step: "any", min: "0", value: "600" });
+  exhaust.input.value = "600";
+  for (const f of [watts, rise, exhaust]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { watts.input.value = "4000"; rise.input.value = "10"; exhaust.input.value = "600"; update(); });
+  const oHeat = makeOutputLine(outputRegion, "Sensible heat load", "eh-out-heat");
+  const oCfm = makeOutputLine(outputRegion, "Ventilation to hold the rise", "eh-out-cfm");
+  const oRise = makeOutputLine(outputRegion, "Rise at the entered airflow", "eh-out-rise");
+  const update = debounce(() => {
+    const r = computeEquipmentHeatLoad({ total_equipment_watts: Number(watts.input.value) || 0, target_temp_rise_f: rise.input.value === "" ? 10 : Number(rise.input.value), exhaust_cfm: Number(exhaust.input.value) || 0 });
+    if (r.error) { oHeat.textContent = r.error; oCfm.textContent = "-"; oRise.textContent = "-"; return; }
+    oHeat.textContent = fmt(r.sensible_btu_hr, 0) + " BTU/hr";
+    oCfm.textContent = fmt(r.required_cfm, 0) + " cfm";
+    oRise.textContent = r.temp_rise_at_exhaust === null ? "Sealed (no exhaust airflow entered)" : fmt(r.temp_rise_at_exhaust, 1) + " degF rise";
+  }, DEBOUNCE_MS);
+  for (const el of [watts.input, rise.input, exhaust.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["equipment-heat-load"] = renderEquipmentHeatLoad;
+
+// --- spec-v146: Fire-exposed wood char depth + residual bending capacity (`char-depth-capacity`) ---
+// AWC/NDS one-dimensional char model: char_depth = rate x hours; an effective
+// char adds the heat-degraded zero-strength layer; the residual section drives
+// the bending-capacity (section-modulus) fraction. A residual dimension at or
+// below zero reports `consumed` with zero capacity, never a negative number.
+// dims: in { exposure_min: T, nominal_width_in: L, nominal_depth_in: L, faces_across_width: dimensionless, faces_across_depth: dimensionless, char_rate_in_hr: L T^-1, zero_strength_in: L } out: { char_depth_in: L, effective_char_in: L, residual_width_in: L, residual_depth_in: L, residual_area_in2: L^2, section_modulus_ratio: dimensionless }
+export function computeCharDepthCapacity({ exposure_min = 0, nominal_width_in = 0, nominal_depth_in = 0, faces_across_width = 2, faces_across_depth = 1, char_rate_in_hr = 1.5, zero_strength_in = 0.2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(exposure_min), b = Number(nominal_width_in), d = Number(nominal_depth_in);
+  const fw = Number(faces_across_width), fd = Number(faces_across_depth);
+  const rate = Number(char_rate_in_hr), zs = Number(zero_strength_in);
+  if (!(t > 0)) return { error: "Exposure time must be a positive number of minutes." };
+  if (!(b > 0) || !(d > 0)) return { error: "Member width and depth must be positive." };
+  if (!(rate > 0)) return { error: "Char rate must be positive." };
+  if (fw < 0 || fd < 0) return { error: "Face counts cannot be negative." };
+  if (zs < 0) return { error: "Zero-strength layer cannot be negative." };
+  const charDepth = rate * (t / 60);
+  const effective = charDepth + zs;
+  let residualWidth = b - effective * fw;
+  let residualDepth = d - effective * fd;
+  const consumed = residualWidth <= 0 || residualDepth <= 0;
+  if (residualWidth < 0) residualWidth = 0;
+  if (residualDepth < 0) residualDepth = 0;
+  const residualArea = residualWidth * residualDepth;
+  const sRatio = consumed ? 0 : (residualWidth * residualDepth * residualDepth) / (b * d * d);
+  return {
+    char_depth_in: charDepth,
+    effective_char_in: effective,
+    residual_width_in: residualWidth,
+    residual_depth_in: residualDepth,
+    residual_area_in2: residualArea,
+    section_modulus_ratio: sRatio,
+    consumed,
+    note: "AWC/NDS one-dimensional char model with a heat-degraded zero-strength layer; screens the residual BENDING section only. A structural engineer governs - connections, splitting, char-line judgment, and the load path are out of scope. The engineer of record makes the keep-or-replace call.",
+  };
+}
+export const charDepthCapacityExample = { inputs: { exposure_min: 30, nominal_width_in: 5.5, nominal_depth_in: 9.5, faces_across_width: 2, faces_across_depth: 1, char_rate_in_hr: 1.5, zero_strength_in: 0.2 } };
+
+function renderCharDepthCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AWC National Design Specification one-dimensional char model (about 1.5 in/hr nominal) plus a heat-degraded zero-strength layer, by name. Screens the residual BENDING section only; a structural engineer governs connections, splitting, char-line judgment, and the load path. This is a keep-or-replace screen, not a stamped calculation.";
+  const t = makeNumber("Fire exposure (minutes)", "ch-t", { step: "any", min: "0", value: "30" });
+  t.input.value = "30";
+  const b = makeNumber("Member width b (in, actual)", "ch-b", { step: "any", min: "0", value: "5.5" });
+  b.input.value = "5.5";
+  const d = makeNumber("Member depth d (in, actual)", "ch-d", { step: "any", min: "0", value: "9.5" });
+  d.input.value = "9.5";
+  const fw = makeNumber("Charred faces across the width", "ch-fw", { step: "any", min: "0", value: "2" });
+  fw.input.value = "2";
+  const fd = makeNumber("Charred faces across the depth", "ch-fd", { step: "any", min: "0", value: "1" });
+  fd.input.value = "1";
+  const rate = makeNumber("Nominal char rate (in/hr)", "ch-rate", { step: "any", min: "0", value: "1.5" });
+  rate.input.value = "1.5";
+  const zs = makeNumber("Zero-strength layer (in)", "ch-zs", { step: "any", min: "0", value: "0.2" });
+  zs.input.value = "0.2";
+  for (const f of [t, b, d, fw, fd, rate, zs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "30"; b.input.value = "5.5"; d.input.value = "9.5"; fw.input.value = "2"; fd.input.value = "1"; rate.input.value = "1.5"; zs.input.value = "0.2"; update(); });
+  const oChar = makeOutputLine(outputRegion, "Effective char depth", "ch-out-char");
+  const oRes = makeOutputLine(outputRegion, "Residual section", "ch-out-res");
+  const oRatio = makeOutputLine(outputRegion, "Bending capacity remaining", "ch-out-ratio");
+  const update = debounce(() => {
+    const r = computeCharDepthCapacity({
+      exposure_min: Number(t.input.value) || 0, nominal_width_in: Number(b.input.value) || 0, nominal_depth_in: Number(d.input.value) || 0,
+      faces_across_width: fw.input.value === "" ? 2 : Number(fw.input.value), faces_across_depth: fd.input.value === "" ? 1 : Number(fd.input.value),
+      char_rate_in_hr: rate.input.value === "" ? 1.5 : Number(rate.input.value), zero_strength_in: zs.input.value === "" ? 0.2 : Number(zs.input.value),
+    });
+    if (r.error) { oChar.textContent = r.error; oRes.textContent = "-"; oRatio.textContent = "-"; return; }
+    oChar.textContent = fmt(r.effective_char_in, 2) + " in (char " + fmt(r.char_depth_in, 2) + " in + zero-strength)";
+    oRes.textContent = r.consumed ? "Consumed - no sound section remains" : fmt(r.residual_width_in, 2) + " x " + fmt(r.residual_depth_in, 2) + " in (" + fmt(r.residual_area_in2, 1) + " in^2)";
+    oRatio.textContent = r.consumed ? "0% (engineer governs)" : fmt(r.section_modulus_ratio * 100, 0) + "% of bending capacity";
+  }, DEBOUNCE_MS);
+  for (const el of [t.input, b.input, d.input, fw.input, fd.input, rate.input, zs.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["char-depth-capacity"] = renderCharDepthCapacity;
+
+// --- spec-v147: Dry-sponge soot cleaning takeoff + seal coat (`soot-cleaning-takeoff`) ---
+// Affected area / per-sponge coverage -> chemical sponges; area / production
+// rate -> labor hours; an optional odor-seal primer is area / coverage gallons.
+// dims: in { affected_sf: L^2, sponge_coverage_sf: L^2, production_sf_per_hr: L^2 T^-1, seal_coat: dimensionless, primer_sf_per_gal: L^-1 } out: { dry_sponges: dimensionless, labor_hours: T, sealer_gal: L^3 }
+export function computeSootCleaningTakeoff({ affected_sf = 0, sponge_coverage_sf = 100, production_sf_per_hr = 150, seal_coat = 1, primer_sf_per_gal = 300 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(affected_sf), cov = Number(sponge_coverage_sf), prod = Number(production_sf_per_hr), primer = Number(primer_sf_per_gal);
+  const seal = Number(seal_coat) ? 1 : 0;
+  if (!(area > 0)) return { error: "Affected area must be positive." };
+  if (!(cov > 0)) return { error: "Sponge coverage must be positive." };
+  if (!(prod > 0)) return { error: "Production rate must be positive." };
+  if (seal && !(primer > 0)) return { error: "Primer coverage must be positive when a seal coat is included." };
+  const sponges = Math.ceil(area / cov);
+  const labor = area / prod;
+  const sealer = seal ? area / primer : 0;
+  return {
+    dry_sponges: sponges,
+    labor_hours: labor,
+    sealer_gal: sealer,
+    seal_coat: seal,
+    note: "Dry sponging lifts DRY smoke residue only; protein, wet, fuel-oil/puffback, and synthetic residues need wet cleaning or solvents (see the residue-method screen). A quantity screen, not a cleaning protocol. ANSI/IICRC S700 governs.",
+  };
+}
+export const sootCleaningTakeoffExample = { inputs: { affected_sf: 1200, sponge_coverage_sf: 100, production_sf_per_hr: 150, seal_coat: 1, primer_sf_per_gal: 300 } };
+
+function renderSootCleaningTakeoff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Dry-sponge soot cleaning takeoff and the 300 ft^2/gal primer coverage (ANSI/IICRC S700 fire and smoke restoration), by name. The RESIDUE TYPE governs the method - dry sponging is for dry smoke; protein, wet, and fuel-oil residues need wet cleaning instead. A quantity screen, not a cleaning protocol.";
+  const area = makeNumber("Soot-affected wall + ceiling area (ft^2)", "st-area", { step: "any", min: "0", value: "1200" });
+  area.input.value = "1200";
+  const cov = makeNumber("Area per chem sponge before fouling (ft^2)", "st-cov", { step: "any", min: "0", value: "100" });
+  cov.input.value = "100";
+  const prod = makeNumber("Dry-sponging production rate (ft^2/hr)", "st-prod", { step: "any", min: "0", value: "150" });
+  prod.input.value = "150";
+  const seal = makeCheckbox("Odor-seal primer to follow", "st-seal");
+  seal.input.checked = true;
+  const primer = makeNumber("Primer coverage (ft^2/gal)", "st-primer", { step: "any", min: "0", value: "300" });
+  primer.input.value = "300";
+  for (const f of [area, cov, prod, seal, primer]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "1200"; cov.input.value = "100"; prod.input.value = "150"; seal.input.checked = true; primer.input.value = "300"; update(); });
+  const oSponges = makeOutputLine(outputRegion, "Chem sponges", "st-out-sponges");
+  const oLabor = makeOutputLine(outputRegion, "Dry-sponging labor", "st-out-labor");
+  const oSealer = makeOutputLine(outputRegion, "Odor-seal primer", "st-out-sealer");
+  const update = debounce(() => {
+    const r = computeSootCleaningTakeoff({ affected_sf: Number(area.input.value) || 0, sponge_coverage_sf: cov.input.value === "" ? 100 : Number(cov.input.value), production_sf_per_hr: prod.input.value === "" ? 150 : Number(prod.input.value), seal_coat: seal.input.checked ? 1 : 0, primer_sf_per_gal: primer.input.value === "" ? 300 : Number(primer.input.value) });
+    if (r.error) { oSponges.textContent = r.error; oLabor.textContent = "-"; oSealer.textContent = "-"; return; }
+    oSponges.textContent = r.dry_sponges + " sponges";
+    oLabor.textContent = fmt(r.labor_hours, 1) + " hr";
+    oSealer.textContent = r.seal_coat ? fmt(r.sealer_gal, 1) + " gal" : "No seal coat";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, cov.input, prod.input, seal.input, primer.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["soot-cleaning-takeoff"] = renderSootCleaningTakeoff;
+
+// --- spec-v148: Ozone deodorization sizing, time, and lockout (`ozone-shock-treatment`) ---
+// Generators = ceil(volume / rated treatable volume). The lockout is a CONSTANT
+// precondition, never computed off: the space is unoccupied and sealed, then
+// aired below the 0.1 ppm OSHA limit before reentry.
+// dims: in { structure_volume_ft3: L^3, rated_volume_per_unit: L^3, treatment_time_hr: T, aeration_min: T } out: { generators_needed: dimensionless }
+export function computeOzoneShockTreatment({ structure_volume_ft3 = 0, rated_volume_per_unit = 2000, treatment_time_hr = 24, aeration_min = 120 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vol = Number(structure_volume_ft3), rated = Number(rated_volume_per_unit), time = Number(treatment_time_hr), aer = Number(aeration_min);
+  if (!(vol > 0)) return { error: "Structure volume must be positive." };
+  if (!(rated > 0)) return { error: "Rated treatable volume must be positive." };
+  if (!(time > 0)) return { error: "Treatment time must be positive." };
+  const generators = Math.ceil(vol / rated);
+  return {
+    generators_needed: generators,
+    treatment_time_hr: time,
+    aeration_min: Number.isFinite(aer) && aer > 0 ? aer : 120,
+    lockout_required: true,
+    reentry_note: "Ventilate at least the aeration minimum and verify ozone is below 0.1 ppm (OSHA) before anyone reenters.",
+    note: "DANGER: ozone is a strong oxidizer and respiratory toxin. The space MUST be unoccupied and sealed during treatment - people, pets, and plants out - then aired below the 0.1 ppm OSHA limit before reentry. Use a hydroxyl generator where the space must stay occupied. This sizes equipment; it is not authority to run ozone in an occupied space. ANSI/IICRC S700 governs.",
+  };
+}
+export const ozoneShockTreatmentExample = { inputs: { structure_volume_ft3: 8000, rated_volume_per_unit: 2000, treatment_time_hr: 24, aeration_min: 120 } };
+
+function renderOzoneShockTreatment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Volume-based ozone deodorization sizing (ANSI/IICRC S700) and the 0.1 ppm OSHA ozone limit, by name. DANGER: ozone is a respiratory toxin - the space must be unoccupied, sealed, and aired below 0.1 ppm before reentry; a hydroxyl generator is the occupied-space alternative. This sizes equipment; it is not authority to run ozone in an occupied space.";
+  const vol = makeNumber("Volume to deodorize (ft^3 = area x ceiling height)", "oz-vol", { step: "any", min: "0", value: "8000" });
+  vol.input.value = "8000";
+  const rated = makeNumber("Generator rated treatable volume (ft^3)", "oz-rated", { step: "any", min: "0", value: "2000" });
+  rated.input.value = "2000";
+  const time = makeNumber("Shock duration (hours)", "oz-time", { step: "any", min: "0", value: "24" });
+  time.input.value = "24";
+  const aer = makeNumber("Minimum ventilate-before-reentry (minutes)", "oz-aer", { step: "any", min: "0", value: "120" });
+  aer.input.value = "120";
+  for (const f of [vol, rated, time, aer]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "8000"; rated.input.value = "2000"; time.input.value = "24"; aer.input.value = "120"; update(); });
+  const oGen = makeOutputLine(outputRegion, "Ozone generators", "oz-out-gen");
+  const oLock = makeOutputLine(outputRegion, "Lockout", "oz-out-lock");
+  const oReentry = makeOutputLine(outputRegion, "Before reentry", "oz-out-re");
+  const update = debounce(() => {
+    const r = computeOzoneShockTreatment({ structure_volume_ft3: Number(vol.input.value) || 0, rated_volume_per_unit: rated.input.value === "" ? 2000 : Number(rated.input.value), treatment_time_hr: time.input.value === "" ? 24 : Number(time.input.value), aeration_min: aer.input.value === "" ? 120 : Number(aer.input.value) });
+    if (r.error) { oGen.textContent = r.error; oLock.textContent = "-"; oReentry.textContent = "-"; return; }
+    oGen.textContent = r.generators_needed + " unit(s) for " + fmt(r.treatment_time_hr, 0) + " hr";
+    oLock.textContent = "Required: unoccupied + sealed (people, pets, plants out)";
+    oReentry.textContent = "Ventilate >= " + fmt(r.aeration_min, 0) + " min and verify < 0.1 ppm (OSHA)";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, rated.input, time.input, aer.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["ozone-shock-treatment"] = renderOzoneShockTreatment;
+
+// --- spec-v152: Smoke residue type -> cleaning method screen (`smoke-residue-method`) ---
+// A reference/screen tile (family of water-classes): a residue selector maps to
+// descriptive guidance strings; no arithmetic. An unknown selector errors.
+const SMOKE_RESIDUE_TABLE = {
+  dry: { source: "fast, hot fire", appearance: "dry, powdery residue", method: "dry-sponge first, then dry/wet cleaning", deodorization_note: "lightest residue to remove", caution: "test-clean an inconspicuous area first" },
+  wet: { source: "slow, smoldering fire", appearance: "smeary, sticky residue", method: "wet clean with solvents, agitate", deodorization_note: "heavier deodorization", caution: "sets if rubbed dry - do not dry-sponge" },
+  protein: { source: "kitchen / stovetop", appearance: "near-invisible greasy film, intense odor", method: "degrease and deodorize aggressively", deodorization_note: "heavy deodorization required", caution: "do NOT dry-sponge - it smears the film" },
+  fueloil: { source: "furnace puffback", appearance: "oily black residue", method: "specialty petroleum solvents", deodorization_note: "ventilate and deodorize", caution: "ventilate and use PPE for petroleum residue" },
+  synthetic: { source: "burning plastics", appearance: "smeary black, acidic residue", method: "wet clean, neutralize, corrosion check", deodorization_note: "deodorize after neutralizing", caution: "time-sensitive on metals - acidic residue corrodes" },
+};
+// dims: in { residue_type: dimensionless } out: { method: dimensionless }
+export function computeSmokeResidueMethod({ residue_type = "dry" } = {}) {
+  const row = SMOKE_RESIDUE_TABLE[residue_type];
+  if (!row) return { error: "Unknown residue type." };
+  return { ...row, note: "A test-clean of an inconspicuous area GOVERNS the final method; solvent selection and substrate compatibility are the cleaner's call. This screen narrows the method, it is not a procedure. ANSI/IICRC S700 governs." };
+}
+export const smokeResidueMethodExample = { inputs: { residue_type: "dry" } };
+
+function renderSmokeResidueMethod(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Smoke residue type to cleaning method mapping (ANSI/IICRC S700), by name. A test-clean of an inconspicuous area GOVERNS the final method; solvent selection and substrate compatibility are the cleaner's call. This screen narrows the method, it is not a procedure.";
+  const sel = makeSelect("Observed smoke residue", "sr-sel", [
+    { value: "dry", label: "Dry (fast, hot fire)", selected: true },
+    { value: "wet", label: "Wet (slow, smoldering)" },
+    { value: "protein", label: "Protein (kitchen)" },
+    { value: "fueloil", label: "Fuel oil / puffback" },
+    { value: "synthetic", label: "Synthetic (plastics)" },
+  ]);
+  inputRegion.appendChild(sel.wrap);
+  attachExampleButton(inputRegion, () => { sel.select.value = "dry"; update(); });
+  const oMethod = makeOutputLine(outputRegion, "Cleaning method", "sr-out-method");
+  const oAppear = makeOutputLine(outputRegion, "Appearance", "sr-out-appear");
+  const oCaution = makeOutputLine(outputRegion, "Caution", "sr-out-caution");
+  const update = debounce(() => {
+    const r = computeSmokeResidueMethod({ residue_type: sel.select.value });
+    if (r.error) { oMethod.textContent = r.error; oAppear.textContent = "-"; oCaution.textContent = "-"; return; }
+    oMethod.textContent = r.method;
+    oAppear.textContent = r.source + "; " + r.appearance;
+    oCaution.textContent = r.caution;
+  }, DEBOUNCE_MS);
+  sel.select.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["smoke-residue-method"] = renderSmokeResidueMethod;
+
+// --- spec-v153: Thermal/ULV fog deodorizer dosage (`thermal-fog-deodorization`) ---
+// deodorant_oz = (volume / 1000) x label dose rate x treatments; gallons via the
+// 128 fl oz/gal constant. ULV is the cold alternative to a hot thermal fog.
+// dims: in { structure_volume_ft3: L^3, dose_oz_per_1000ft3: dimensionless, treatments: dimensionless } out: { deodorant_oz: L^3, deodorant_gal: L^3 }
+export function computeThermalFogDeodorization({ structure_volume_ft3 = 0, dose_oz_per_1000ft3 = 5, treatments = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vol = Number(structure_volume_ft3), dose = Number(dose_oz_per_1000ft3), passes = Number(treatments);
+  if (!(vol > 0)) return { error: "Structure volume must be positive." };
+  if (!(dose > 0)) return { error: "Dose rate must be positive." };
+  if (!(passes >= 1)) return { error: "Treatment count must be at least 1." };
+  const oz = (vol / 1000) * dose * passes;
+  const gal = oz / 128;
+  return { deodorant_oz: oz, deodorant_gal: gal, note: "The product LABEL rate and dwell govern. A thermal fogger produces a HOT fog from an open flame - the space is unoccupied, smoke detectors are managed, and a fire watch applies; ULV is the cold alternative. Sizes quantity only. ANSI/IICRC S700 governs." };
+}
+export const thermalFogDeodorizationExample = { inputs: { structure_volume_ft3: 8000, dose_oz_per_1000ft3: 5, treatments: 1 } };
+
+function renderThermalFogDeodorization(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Volume-based fogging dosage (ANSI/IICRC S700) and the 128 fl oz/gal constant, by name. The product LABEL rate and dwell govern. A thermal fogger produces a HOT fog - the space is unoccupied and a fire watch applies; ULV is the cold alternative. Sizes quantity only.";
+  const vol = makeNumber("Volume to treat (ft^3 = area x ceiling height)", "tf-vol", { step: "any", min: "0", value: "8000" });
+  vol.input.value = "8000";
+  const dose = makeNumber("Label dose rate (oz per 1,000 ft^3)", "tf-dose", { step: "any", min: "0", value: "5" });
+  dose.input.value = "5";
+  const passes = makeNumber("Fogging passes", "tf-passes", { step: "any", min: "1", value: "1" });
+  passes.input.value = "1";
+  for (const f of [vol, dose, passes]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "8000"; dose.input.value = "5"; passes.input.value = "1"; update(); });
+  const oOz = makeOutputLine(outputRegion, "Deodorant to mix", "tf-out-oz");
+  const oGal = makeOutputLine(outputRegion, "Deodorant (gallons)", "tf-out-gal");
+  const update = debounce(() => {
+    const r = computeThermalFogDeodorization({ structure_volume_ft3: Number(vol.input.value) || 0, dose_oz_per_1000ft3: dose.input.value === "" ? 5 : Number(dose.input.value), treatments: passes.input.value === "" ? 1 : Number(passes.input.value) });
+    if (r.error) { oOz.textContent = r.error; oGal.textContent = "-"; return; }
+    oOz.textContent = fmt(r.deodorant_oz, 1) + " oz (unoccupied, fire watch)";
+    oGal.textContent = fmt(r.deodorant_gal, 2) + " gal";
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, dose.input, passes.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["thermal-fog-deodorization"] = renderThermalFogDeodorization;
+
+// --- spec-v154: Contents pack-out volume, boxes, and storage (`contents-packout-inventory`) ---
+// contents = floor area x density; boxes = ceil(contents / box volume); storage
+// = contents x stacking; truck loads = ceil(storage / truck volume).
+// dims: in { floor_area_ft2: L^2, contents_ft3_per_ft2: L, box_volume_ft3: L^3, stacking_factor: dimensionless, truck_volume_ft3: L^3 } out: { contents_volume_ft3: L^3, boxes: dimensionless, storage_volume_ft3: L^3, truck_loads: dimensionless }
+export function computeContentsPackoutInventory({ floor_area_ft2 = 0, contents_ft3_per_ft2 = 2, box_volume_ft3 = 3, stacking_factor = 1.5, truck_volume_ft3 = 1000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(floor_area_ft2), density = Number(contents_ft3_per_ft2), box = Number(box_volume_ft3), stack = Number(stacking_factor), truck = Number(truck_volume_ft3);
+  if (!(area > 0)) return { error: "Floor area must be positive." };
+  if (!(density > 0)) return { error: "Contents density must be positive." };
+  if (!(box > 0)) return { error: "Box volume must be positive." };
+  if (!(stack > 0)) return { error: "Stacking factor must be positive." };
+  if (!(truck > 0)) return { error: "Truck volume must be positive." };
+  const contents = area * density;
+  const boxes = Math.ceil(contents / box);
+  const storage = contents * stack;
+  const truckLoads = Math.ceil(storage / truck);
+  return {
+    contents_volume_ft3: contents,
+    boxes,
+    storage_volume_ft3: storage,
+    truck_loads: truckLoads,
+    note: "The actual inventory and the box mix GOVERN; the densities are starting rules of thumb. An estimating screen for the contents side of the loss. Restoration estimating practice and ANSI/IICRC S500/S700 govern.",
+  };
+}
+export const contentsPackoutInventoryExample = { inputs: { floor_area_ft2: 200, contents_ft3_per_ft2: 2, box_volume_ft3: 3, stacking_factor: 1.5, truck_volume_ft3: 1000 } };
+
+function renderContentsPackoutInventory(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Volume-based pack-out estimating method (restoration estimating practice; ANSI/IICRC S500/S700), by name. The actual inventory and the box mix GOVERN; the densities are starting rules of thumb. This is an estimating screen.";
+  const area = makeNumber("Affected floor area (ft^2)", "pk-area", { step: "any", min: "0", value: "200" });
+  area.input.value = "200";
+  const density = makeNumber("Contents volume per floor area (ft^3/ft^2)", "pk-density", { step: "any", min: "0", value: "2" });
+  density.input.value = "2";
+  const box = makeNumber("Usable volume per box (ft^3)", "pk-box", { step: "any", min: "0", value: "3" });
+  box.input.value = "3";
+  const stack = makeNumber("Warehouse stacking allowance", "pk-stack", { step: "any", min: "0", value: "1.5" });
+  stack.input.value = "1.5";
+  const truck = makeNumber("Box-truck cargo volume (ft^3)", "pk-truck", { step: "any", min: "0", value: "1000" });
+  truck.input.value = "1000";
+  for (const f of [area, density, box, stack, truck]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "200"; density.input.value = "2"; box.input.value = "3"; stack.input.value = "1.5"; truck.input.value = "1000"; update(); });
+  const oContents = makeOutputLine(outputRegion, "Contents volume", "pk-out-contents");
+  const oBoxes = makeOutputLine(outputRegion, "Boxes", "pk-out-boxes");
+  const oStorage = makeOutputLine(outputRegion, "Storage volume", "pk-out-storage");
+  const oTruck = makeOutputLine(outputRegion, "Truck loads", "pk-out-truck");
+  const update = debounce(() => {
+    const r = computeContentsPackoutInventory({ floor_area_ft2: Number(area.input.value) || 0, contents_ft3_per_ft2: density.input.value === "" ? 2 : Number(density.input.value), box_volume_ft3: box.input.value === "" ? 3 : Number(box.input.value), stacking_factor: stack.input.value === "" ? 1.5 : Number(stack.input.value), truck_volume_ft3: truck.input.value === "" ? 1000 : Number(truck.input.value) });
+    if (r.error) { oContents.textContent = r.error; oBoxes.textContent = "-"; oStorage.textContent = "-"; oTruck.textContent = "-"; return; }
+    oContents.textContent = fmt(r.contents_volume_ft3, 0) + " ft^3";
+    oBoxes.textContent = r.boxes + " boxes";
+    oStorage.textContent = fmt(r.storage_volume_ft3, 0) + " ft^3";
+    oTruck.textContent = r.truck_loads + " load(s)";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, density.input, box.input, stack.input, truck.input]) el.addEventListener("input", update);
+}
+RESTORATION_RENDERERS["contents-packout-inventory"] = renderContentsPackoutInventory;

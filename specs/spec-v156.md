@@ -1,6 +1,6 @@
 # roughlogic.com Specification v156 -- Mold Surface Remediation Labor and HEPA Vacuuming (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23. Batch spec-v151..v156.** In-scope catalog expansion under the
+> **Status: PROPOSED 2026-06-23 (DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v151..v156.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one mold-remediation tile sizing the labor to clean a remediated
 > surface area, the multi-pass HEPA-vacuum and damp-wipe work that the existing scope and chemistry
 > tiles never quantify. Adds one tile to **`calc-restoration.js`** (Group D); no new module, group, or
