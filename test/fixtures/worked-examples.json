@@ -22522,6 +22522,247 @@
       }
     },
     {
+      "tile_id": "sprinkler-precip-rate",
+      "source_publisher": "Irrigation Association / Rain Bird / Hunter design manuals",
+      "source_title": "6 rotors at 2.5 gpm (15 gpm) over 1,200 ft^2 -> 1.20 in/hr",
+      "source_edition_or_year": "spec-v207 worked example (machine-verified)",
+      "source_section_or_page": "spec-v207 section 2.1 pinned example (rotor lawn zone)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "zone_gpm": 15, "zone_ft2": 1200 },
+      "outputs": {
+        "precip_in_hr": { "value": 1.20375, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sprinkler-precip-rate",
+      "source_publisher": "Irrigation Association / Rain Bird / Hunter design manuals",
+      "source_title": "6 sprays at 2.0 gpm (12 gpm) over 300 ft^2 -> 3.85 in/hr",
+      "source_edition_or_year": "spec-v207 worked example (machine-verified)",
+      "source_section_or_page": "spec-v207 section 2.1 cross-check (spray zone, why you never mix them)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "zone_gpm": 12, "zone_ft2": 300 },
+      "outputs": {
+        "precip_in_hr": { "value": 3.852, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "irrigation-zone-runtime",
+      "source_publisher": "Irrigation Association scheduling references",
+      "source_title": "0.75 in at 1.20 in/hr, DU 0.75, 10 min cycle -> 50 min, 5 cycles",
+      "source_edition_or_year": "spec-v208 worked example (machine-verified)",
+      "source_section_or_page": "spec-v208 section 2.1 pinned example (clay lawn zone)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "target_in": 0.75, "precip_in_hr": 1.20, "du": 0.75, "max_cycle_min": 10 },
+      "outputs": {
+        "net_min": { "value": 37.5, "tolerance": { "abs": 0.01 } },
+        "gross_min": { "value": 50.0, "tolerance": { "abs": 0.01 } },
+        "cycles": { "value": 5, "tolerance": { "abs": 0 } },
+        "per_cycle_min": { "value": 10.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "irrigation-zone-runtime",
+      "source_publisher": "Irrigation Association scheduling references",
+      "source_title": "0.75 in at 3.85 in/hr, DU 0.75, 30 min cycle -> 15.6 min, 1 cycle",
+      "source_edition_or_year": "spec-v208 worked example (machine-verified)",
+      "source_section_or_page": "spec-v208 section 2.1 cross-check (sandy soil, one run)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "target_in": 0.75, "precip_in_hr": 3.85, "du": 0.75, "max_cycle_min": 30 },
+      "outputs": {
+        "net_min": { "value": 11.688, "tolerance": { "abs": 0.01 } },
+        "gross_min": { "value": 15.584, "tolerance": { "abs": 0.01 } },
+        "cycles": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "drip-zone-flow",
+      "source_publisher": "Irrigation Association low-volume / manufacturer drip design data",
+      "source_title": "300 ft of 0.9 gph dripline at 18 in on a 12 gpm valve -> 3.0 gpm, 25%",
+      "source_edition_or_year": "spec-v209 worked example (machine-verified)",
+      "source_section_or_page": "spec-v209 section 2.1 pinned example (inline dripline)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "mode": "inline", "tubing_ft": 300, "spacing_in": 18, "emitter_gph": 0.9, "valve_gpm": 12 },
+      "outputs": {
+        "emitters": { "value": 200, "tolerance": { "abs": 0 } },
+        "zone_gph": { "value": 180, "tolerance": { "abs": 0.01 } },
+        "zone_gpm": { "value": 3.0, "tolerance": { "abs": 0.01 } },
+        "utilization": { "value": 25, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "drip-zone-flow",
+      "source_publisher": "Irrigation Association low-volume / manufacturer drip design data",
+      "source_title": "120 point-source 1.0 gph emitters on a 12 gpm valve -> 2.0 gpm, 16.7%",
+      "source_edition_or_year": "spec-v209 worked example (machine-verified)",
+      "source_section_or_page": "spec-v209 section 2.1 cross-check (point-source emitters)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "mode": "point", "emitter_count": 120, "emitter_gph": 1.0, "valve_gpm": 12 },
+      "outputs": {
+        "emitters": { "value": 120, "tolerance": { "abs": 0 } },
+        "zone_gpm": { "value": 2.0, "tolerance": { "abs": 0.01 } },
+        "utilization": { "value": 16.667, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "plant-spacing-count",
+      "source_publisher": "Nursery / landscape estimating references",
+      "source_title": "200 ft^2 bed at 12 in on center -> 200 square, 231 triangular",
+      "source_edition_or_year": "spec-v210 worked example (machine-verified)",
+      "source_section_or_page": "spec-v210 section 2.1 pinned example (1 ft on center)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "bed_ft2": 200, "spacing_in": 12 },
+      "outputs": {
+        "square_n": { "value": 200, "tolerance": { "abs": 0 } },
+        "triangular_n": { "value": 231, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "plant-spacing-count",
+      "source_publisher": "Nursery / landscape estimating references",
+      "source_title": "500 ft^2 bed at 18 in on center -> 223 square, 257 triangular",
+      "source_edition_or_year": "spec-v210 worked example (machine-verified)",
+      "source_section_or_page": "spec-v210 section 2.1 cross-check (18 in groundcover)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "bed_ft2": 500, "spacing_in": 18 },
+      "outputs": {
+        "square_n": { "value": 223, "tolerance": { "abs": 0 } },
+        "triangular_n": { "value": 257, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "sod-takeoff",
+      "source_publisher": "Turfgrass producer / landscape estimating references",
+      "source_title": "2,500 ft^2 lawn at 5% waste -> 263 slabs, 6 pallets",
+      "source_edition_or_year": "spec-v211 worked example (machine-verified)",
+      "source_section_or_page": "spec-v211 section 2.1 pinned example (residential lawn)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "lawn_ft2": 2500, "waste_pct": 5, "slab_ft2": 10, "pallet_ft2": 450 },
+      "outputs": {
+        "order_ft2": { "value": 2625, "tolerance": { "abs": 0.01 } },
+        "order_syd": { "value": 291.667, "tolerance": { "abs": 0.01 } },
+        "slabs": { "value": 263, "tolerance": { "abs": 0 } },
+        "pallets": { "value": 6, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "sod-takeoff",
+      "source_publisher": "Turfgrass producer / landscape estimating references",
+      "source_title": "900 ft^2 irregular yard at 12% waste -> 101 slabs, 3 pallets",
+      "source_edition_or_year": "spec-v211 worked example (machine-verified)",
+      "source_section_or_page": "spec-v211 section 2.1 cross-check (small irregular yard, higher waste)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "lawn_ft2": 900, "waste_pct": 12, "slab_ft2": 10, "pallet_ft2": 450 },
+      "outputs": {
+        "order_ft2": { "value": 1008, "tolerance": { "abs": 0.01 } },
+        "slabs": { "value": 101, "tolerance": { "abs": 0 } },
+        "pallets": { "value": 3, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "cmu-grout-volume",
+      "source_publisher": "TMS 602 / ACI 530.1, NCMA TEK",
+      "source_title": "20x8 wall, 24 in oc, 24 in^2 cores, 30 in^2 bond -> 0.70 yd^3",
+      "source_edition_or_year": "spec-v212 worked example (machine-verified)",
+      "source_section_or_page": "spec-v212 section 2.1 pinned example (partial grout, 24 in oc)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "wall_len_ft": 20, "wall_ht_ft": 8, "core_spacing_in": 24, "core_area_in2": 24, "bond_area_in2": 30 },
+      "outputs": {
+        "cores": { "value": 11, "tolerance": { "abs": 0 } },
+        "vert_ft3": { "value": 14.667, "tolerance": { "abs": 0.01 } },
+        "bond_ft3": { "value": 4.167, "tolerance": { "abs": 0.01 } },
+        "total_ft3": { "value": 18.833, "tolerance": { "abs": 0.01 } },
+        "total_yd3": { "value": 0.698, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "cmu-grout-volume",
+      "source_publisher": "TMS 602 / ACI 530.1, NCMA TEK",
+      "source_title": "same wall fully grouted at 16 in oc -> 0.94 yd^3",
+      "source_edition_or_year": "spec-v212 worked example (machine-verified)",
+      "source_section_or_page": "spec-v212 section 2.1 cross-check (full grout, every cell)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "wall_len_ft": 20, "wall_ht_ft": 8, "core_spacing_in": 16, "core_area_in2": 24, "bond_area_in2": 30 },
+      "outputs": {
+        "cores": { "value": 16, "tolerance": { "abs": 0 } },
+        "total_ft3": { "value": 25.5, "tolerance": { "abs": 0.01 } },
+        "total_yd3": { "value": 0.944, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "masonry-coursing",
+      "source_publisher": "BIA Technical Notes / NCMA TEK",
+      "source_title": "96 in with 7.625 in block + 3/8 joint -> 12 courses, on module",
+      "source_edition_or_year": "spec-v213 worked example (machine-verified)",
+      "source_section_or_page": "spec-v213 section 2.1 pinned example (CMU wall on module)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "target_in": 96, "unit_in": 7.625, "joint_in": 0.375 },
+      "outputs": {
+        "course_in": { "value": 8.0, "tolerance": { "abs": 0.0001 } },
+        "courses": { "value": 12, "tolerance": { "abs": 0 } },
+        "built_in": { "value": 96, "tolerance": { "abs": 0.001 } },
+        "off_in": { "value": 0, "tolerance": { "abs": 0.001 } },
+        "on_module": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "masonry-coursing",
+      "source_publisher": "BIA Technical Notes / NCMA TEK",
+      "source_title": "50 in brick head with 2.25 in brick + 0.4167 joint -> 19 courses, off module",
+      "source_edition_or_year": "spec-v213 worked example (machine-verified)",
+      "source_section_or_page": "spec-v213 section 2.1 cross-check (brick opening off module)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "target_in": 50, "unit_in": 2.25, "joint_in": 0.4167 },
+      "outputs": {
+        "courses": { "value": 19, "tolerance": { "abs": 0 } },
+        "off_in": { "value": -0.667, "tolerance": { "abs": 0.01 } },
+        "on_module": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "wallpaper-rolls",
+      "source_publisher": "Wallcovering industry estimating practice",
+      "source_title": "624 in perimeter, 108 in walls, 20.5x396 roll, 19 in repeat -> 11 rolls",
+      "source_edition_or_year": "spec-v214 worked example (machine-verified)",
+      "source_section_or_page": "spec-v214 section 2.1 pinned example (Euro roll, modest repeat)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "perimeter_in": 624, "height_in": 108, "roll_width_in": 20.5, "roll_len_in": 396, "repeat_in": 19 },
+      "outputs": {
+        "strips_needed": { "value": 31, "tolerance": { "abs": 0 } },
+        "strips_per_roll": { "value": 3, "tolerance": { "abs": 0 } },
+        "rolls": { "value": 11, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "wallpaper-rolls",
+      "source_publisher": "Wallcovering industry estimating practice",
+      "source_title": "same room and roll with a 25 in drop-match repeat -> 16 rolls",
+      "source_edition_or_year": "spec-v214 worked example (machine-verified)",
+      "source_section_or_page": "spec-v214 section 2.1 cross-check (large drop-match repeat)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-29",
+      "inputs": { "perimeter_in": 624, "height_in": 108, "roll_width_in": 20.5, "roll_len_in": 396, "repeat_in": 25 },
+      "outputs": {
+        "strips_needed": { "value": 31, "tolerance": { "abs": 0 } },
+        "strips_per_roll": { "value": 2, "tolerance": { "abs": 0 } },
+        "rolls": { "value": 16, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "wood-emc",
       "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
       "source_title": "70 F, 50% RH -> EMC ~9.2% (standard interior conditions)",

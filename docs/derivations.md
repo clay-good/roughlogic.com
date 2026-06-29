@@ -1432,20 +1432,25 @@ cross-check.
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft =...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
+| calc-agriculture.js | `computeDripZoneFlow` | `{ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_co...` | _ | _ | _ |
 | calc-agriculture.js | `computeGPA` | `{ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainBin` | `{ diameter_ft = 0, eave_height_ft = 0, peak_height_ft = 0, grain = "corn", pa...` | _ | _ | _ |
 | calc-agriculture.js | `computeGrowingDegreeDays` | `{ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeHayDryMatter` | `{ bale_weight_lb = 0, moisture_pct = 0, target_moisture_pct = 15, safe_thresh...` | _ | _ | _ |
 | calc-agriculture.js | `computeIrrigationRequirement` | `{ crop = "corn", et_ref_in_per_day = 0, period_days = 0, area_acres = 0, effi...` | _ | _ | _ |
+| calc-agriculture.js | `computeIrrigationZoneRuntime` | `{ target_in = 0, precip_in_hr = 0, du = 1.0, max_cycle_min = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockWaterRequirement` | `{ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f ...` | _ | _ | _ |
 | calc-agriculture.js | `computeNozzleFlowPressure` | `{ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeNpkBlend` | `{ crop = "corn", soil_n_lb_per_acre = 0, soil_p_lb_per_acre = 0, soil_k_lb_pe...` | _ | _ | _ |
 | calc-agriculture.js | `computePearsonSquareRation` | `{ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computePesticideReiPhi` | `{ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_applic...` | _ | _ | _ |
+| calc-agriculture.js | `computePlantSpacingCount` | `{ bed_ft2 = 0, spacing_in = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSeedRate` | `{ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per...` | _ | _ | _ |
+| calc-agriculture.js | `computeSodTakeoff` | `{ lawn_ft2 = 0, waste_pct = 0, slab_ft2 = 10, pallet_ft2 = 450 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayDriftBuffer` | `{ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20...` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayerCalibration` | `{ boom_width_ft = 0, oz_per_nozzle = 0, time_s = 0, target_gpa = 0, field_acr...` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayerFieldCapacity` | `{ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal,...` | _ | _ | _ |
+| calc-agriculture.js | `computeSprinklerPrecipRate` | `{ zone_gpm = 0, zone_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeStockingRate` | `{ area_acres = 0, forage_lb_per_acre = 0, utilization_pct = 40, animal_class ...` | _ | _ | _ |
 | calc-agriculture.js | `computeTHI` | `{ temperature = 0, unit = "F", rh_percent = 0, animal = "dairy-cow", ventilat...` | _ | _ | _ |
 | calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
@@ -1471,6 +1476,7 @@ cross-check.
 | calc-construction.js | `computeBendAllowance` | `{ thickness_in = 0, bend_angle_deg = 0, inside_radius_in = 0, k_factor = 0.44...` | _ | _ | _ |
 | calc-construction.js | `computeBoardFootage` | `{ thickness_in, width_in, length_ft, count = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeBoltTorque` | `{ grade = "SAE_5", diameter_in = 0.5, lubrication = "dry", preload_fraction =...` | _ | _ | _ |
+| calc-construction.js | `computeCmuGroutVolume` | `{ wall_len_ft = 0, wall_ht_ft = 0, core_spacing_in = 0, core_area_in2 = 24, b...` | _ | _ | _ |
 | calc-construction.js | `computeCoatingCoverageDft` | `{ vol_solids_pct, dft_mils, area_ft2, loss_pct = 35 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeColumnBucklingWood` | `{ b_in = 0, d_in = 0, le_in = 0, fc_star_psi = 0, emin_psi = 0, ke = 1 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeConcreteMixDesign` | `{ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in ...` | _ | _ | _ |
@@ -1495,6 +1501,7 @@ cross-check.
 | calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }` | _ | _ | _ |
+| calc-construction.js | `computeMasonryCoursing` | `{ target_in = 0, unit_in = 7.625, joint_in = 0.375 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
@@ -1517,6 +1524,7 @@ cross-check.
 | calc-construction.js | `computeStairs` | `{ total_rise_in, preferred_riser_height_in = 7.5 }` | _ | _ | _ |
 | calc-construction.js | `computeTileCount` | `{ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile...` | _ | _ | _ |
 | calc-construction.js | `computeWallBracingLength` | `{ wall_line_length_ft = 0, bracing_percent = 0, provided_length_ft = 0, metho...` | _ | _ | _ |
+| calc-construction.js | `computeWallpaperRolls` | `{ perimeter_in = 0, height_in = 0, roll_width_in = 0, roll_len_in = 0, repeat...` | _ | _ | _ |
 | calc-construction.js | `computeWeldHeatInput` | `{ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wp...` | _ | _ | _ |
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
@@ -2321,7 +2329,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 907.
+Row count: 915.
 
 <!-- END function-corpus-v14 -->
 
@@ -2683,7 +2691,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (88 tiles)
+### Group E Construction (91 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2698,6 +2706,7 @@ per spec-v14 §13.1 second paragraph.
 | `board-footage` | Lumber Board Footage | Project (first-principles); Standard lumber-yard board-foot identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cmu-grout-volume` | CMU Grout Volume (Partial and Full Grout) | TMS 602 / ACI 530.1, NCMA TEK; spec-v212 section 2.1 pinned example (partial grout, 24 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compound-miter` | Compound Miter (Crown Molding) | First-principles compound-miter trigo...; 38 deg spring crown at a 90 deg corner -> 31.62 deg miter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2731,6 +2740,7 @@ per spec-v14 §13.1 second paragraph.
 | `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `masonry-coursing` | Masonry Coursing and Course-Out Check | BIA Technical Notes / NCMA TEK; spec-v213 section 2.1 pinned example (CMU wall on module) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `material-quantity` | Material Quantity | Project (industry coverage rules); 1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `min-bend-radius` | Minimum Plate Bend Radius | published forming-limit relation; 1/4 in A36 at 20% elongation -> 1.5 T, 0.375 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2765,6 +2775,7 @@ per spec-v14 §13.1 second paragraph.
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vertical-curve` | Vertical Curve Elevations | AASHTO Green Book / FM 5-233 (by name); g1 +3, g2 -2, L 400, PVI sta 5000 elev 100 -> BVC 94.00, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wall-bracing-length` | Braced-Wall-Panel Length (IRC R602.10) | IRC R602.10 (wall bracing); 40 ft line at 20% -> 8 ft required; 9 ft provided -> pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wallpaper-rolls` | Wallcovering Roll Takeoff With Pattern Repeat | Wallcovering industry estimating prac...; spec-v214 section 2.1 pinned example (Euro roll, modest r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-cost-per-foot` | All-In Welding Cost per Foot | AWS welding cost and consumable refer...; 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-duty-cycle` | Welder Duty Cycle | NEMA EW-1 inverse-square duty-cycle r...; 250 A at 60% -> at 300 A: 41.67%, A100 193.6 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-group-eccentric` | Eccentric Fillet Weld Group (Elastic Method) | AISC 360 / Steel Construction Manual ...; 12 kip at 6 in, two 10 in welds 4 in apart -> J 246.7 in3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2936,7 +2947,7 @@ per spec-v14 §13.1 second paragraph.
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group L Agriculture (28 tiles)
+### Group L Agriculture (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2945,6 +2956,7 @@ per spec-v14 §13.1 second paragraph.
 | `chipper-debris` | Brush Chip Volume and Haul Loads | First-principles green-weight to chip...; 4,400 lb of green wood, 550 lb/lcy, 15 cy box -> 8.0 loos... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drawbar-power` | Tractor Drawbar Power | ASABE; DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `drip-zone-flow` | Drip Zone Flow and Valve Capacity | Irrigation Association low-volume / m...; spec-v209 section 2.1 pinned example (inline dripline) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-rate` | Chemical Application Rate (GPA) | Project (first-principles); Standard agricultural-sprayer calibration identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grain-bin-capacity` | Grain Bin Capacity (Bushels) | USDA FGIS; area = pi*15^2 = 706.86; cyl = 14,137.2 ft^3; cone = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2952,17 +2964,21 @@ per spec-v14 §13.1 second paragraph.
 | `hay-dry-matter` | Hay Dry-Matter and Safe-Storage Weight | First-principles dry-matter balance +...; spec-v118 section 2.1 pinned example (over the 18% ceiling) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `irrigation-requirement` | Irrigation Requirement (ET-based, acre-feet) | FAO / USDA NRCS; ET_crop = 1.20*0.25*30 = 9.0 in; net = 9.0-1.0 = 8.0; gro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `irrigation-uniformity` | Irrigation Sprinkler Uniformity | Irrigation Association / ANSI / ASABE...; 8 catch volumes around 100 mL -> mean 99.625 / CU 97.62 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `irrigation-zone-runtime` | Irrigation Zone Runtime and Cycle-and-Soak | Irrigation Association scheduling ref...; spec-v208 section 2.1 pinned example (clay lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nozzle-flow-pressure` | Nozzle Flow vs Pressure and Tip Selection | Spray-nozzle hydraulics / USDA land-g...; 0.4 gpm tip at 40 psi run at 60 psi -> 0.49 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `npk-blend` | NPK Fertilizer Blend from Soil Test | USDA NRCS; rec = 130 N / 50 P2O5 / 25 K2O; DAP = 50/0.46 = 108.70 (N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pearson-square-ration` | Pearson-Square Feed Ration | Pearson square (land-grant animal sci...; corn 9% / SBM 44% to 16% CP -> 80% corn, 20% SBM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pesticide-rei-phi` | Pesticide REI / PHI Clock | EPA WPS 40 CFR 170 + product label; REI 12 hr, 4 hr elapsed -> 8 hr remaining; PHI 7 d, 2 d e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `plant-spacing-count` | Plant Spacing Count (Square and Triangular) | Nursery / landscape estimating refere...; spec-v210 section 2.1 pinned example (1 ft on center) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `porta-wrap-friction` | Friction-Device Hold Force by Wraps | Capstan (Euler-Eytelwein) / ANSI Z133...; 800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sod-takeoff` | Sod Takeoff (Slabs and Pallets) | Turfgrass producer / landscape estima...; spec-v211 section 2.1 pinned example (residential lawn) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spray-drift-buffer` | Downwind Spray Drift Buffer | USDA land-grant extension drift-manag...; Medium droplets (base 20 ft), 15 mph, 30 in boom, 20 in r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sprayer-calibration` | Sprayer 1/128-Acre Calibration | USDA Cooperative Extension Service; travel_distance_ft = 43560/128 / boom_width; gpa = oz_per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprayer-field-capacity` | Sprayer Field Capacity and Spray Time | USDA land-grant extension sprayer fie...; 30 ft boom, 6 mph, 70% eff, 80 acres, 300 gal tank, 15 GP... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `sprinkler-precip-rate` | Sprinkler Precipitation Rate | Irrigation Association / Rain Bird / ...; spec-v207 section 2.1 pinned example (rotor lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tank-mix` | Pesticide Tank-Mix and Acres per Tank | EPA / USDA NRCS; acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `timber-cruise` | Timber Cruise (Doyle / Scribner / International 1/4) | Project (first-principles); Doyle rule (public-domain timber-cruising convention) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3171,6 +3187,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 664. Fixture-covered or reference-cadence: 664 / 664.
+Tile count: 672. Fixture-covered or reference-cadence: 672 / 672.
 
 <!-- END tile-index-v14 -->

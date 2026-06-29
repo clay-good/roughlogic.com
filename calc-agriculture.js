@@ -2010,3 +2010,189 @@ function renderHayDryMatter(inputRegion, outputRegion, citationEl) {
   for (const el of [wt.input, moist.input, tgt.input, safe.input]) el.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["hay-dry-matter"] = renderHayDryMatter;
+
+// =====================================================================
+// spec-v207..v211 (Group L) - landscape irrigation and planting install
+// cluster: precipitation rate, zone runtime, drip flow, plant spacing,
+// sod takeoff. First-principles design relations; the Irrigation
+// Association and major-manufacturer design references govern by name.
+// =====================================================================
+
+// --- spec-v207: sprinkler-precip-rate ---
+// dims: in { zone_gpm: L^3 T^-1, zone_ft2: L^2 } out: { precip_in_hr: L T^-1 }
+export function computeSprinklerPrecipRate({ zone_gpm = 0, zone_ft2 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(zone_gpm > 0)) return { error: "Zone flow must be positive (gpm)." };
+  if (!(zone_ft2 > 0)) return { error: "Zone area must be positive (ft^2)." };
+  const precip_in_hr = 96.3 * zone_gpm / zone_ft2;
+  return {
+    precip_in_hr,
+    note: "Precipitation rate = 96.3 x zone gpm / zone area (ft^2): how fast a valve zone puts water on the ground, in in/hr. The 96.3 constant spreads 1 gpm over 1 ft^2 (231 in^3/gal / 144 in^2/ft^2 x 60 min/hr). This is the number that sets the zone's runtime, and the reason spray heads (~1.5-2 in/hr) and rotors (~0.4-0.8 in/hr) never share a valve - the same gpm applies water roughly three times faster from sprays. The head flows come from the manufacturer's nozzle chart at the operating pressure, the zone area is the area the heads actually cover, and this is a design-rate estimate, not a system audit (irrigation-uniformity audits the installed result).",
+  };
+}
+export const sprinklerPrecipRateExample = { inputs: { zone_gpm: 15, zone_ft2: 1200 } };
+const renderSprinklerPrecipRate = _v23SimpleRenderer({
+  citation: "Citation: first-principles precipitation-rate relation with the Irrigation Association design references and the Rain Bird / Hunter design manuals (by name). PR = 96.3 x zone gpm / zone area (ft^2), in in/hr. The 96.3 constant is the standard irrigation conversion. Head flows come from the nozzle chart at the operating pressure; this is a design-rate estimate, not a system audit.",
+  example: sprinklerPrecipRateExample.inputs,
+  fields: [
+    { key: "zone_gpm", label: "Zone flow, all heads (gpm)", kind: "number" },
+    { key: "zone_ft2", label: "Zone area covered (ft^2)", kind: "number" },
+  ],
+  outputs: [
+    { key: "pr", id: "spr-out-pr", label: "Precipitation rate", value: (r) => fmt(r.precip_in_hr, 2) + " in/hr" },
+    { key: "n", id: "spr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprinklerPrecipRate,
+});
+AGRICULTURE_RENDERERS["sprinkler-precip-rate"] = renderSprinklerPrecipRate;
+
+// --- spec-v208: irrigation-zone-runtime ---
+// dims: in { target_in: L, precip_in_hr: L T^-1, du: dimensionless, max_cycle_min: T } out: { net_min: T, gross_min: T, cycles: dimensionless, per_cycle_min: T }
+export function computeIrrigationZoneRuntime({ target_in = 0, precip_in_hr = 0, du = 1.0, max_cycle_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_in > 0)) return { error: "Target depth must be positive (in)." };
+  if (!(precip_in_hr > 0)) return { error: "Precipitation rate must be positive (in/hr)." };
+  if (!(max_cycle_min > 0)) return { error: "Maximum cycle length must be positive (min)." };
+  if (!(du > 0 && du <= 1)) return { error: "Distribution uniformity must be in (0, 1]." };
+  const net_min = target_in / precip_in_hr * 60;
+  const gross_min = net_min / du;
+  const cycles = Math.ceil(gross_min / max_cycle_min);
+  const per_cycle_min = gross_min / cycles;
+  return {
+    net_min, gross_min, cycles, per_cycle_min,
+    note: "Net runtime = target depth / precipitation rate x 60. Gross runtime = net / distribution uniformity - the lower quarter needs the extra water so the dry corners get the target. Cycle-and-soak splits the gross time into runs no longer than the soil/slope's runoff limit (cycles = ceil(gross / max-cycle), each run = gross / cycles), with soak gaps between them so water infiltrates instead of running off. The DU comes from a catch-can audit (irrigation-uniformity), the soil intake rate that caps the cycle length comes from the soil type, and this is a scheduling estimate the controller and the site's actual runoff govern.",
+  };
+}
+export const irrigationZoneRuntimeExample = { inputs: { target_in: 0.75, precip_in_hr: 1.20, du: 0.75, max_cycle_min: 10 } };
+const renderIrrigationZoneRuntime = _v23SimpleRenderer({
+  citation: "Citation: first-principles runtime and cycle-and-soak relations with the Irrigation Association scheduling references (by name). Net = depth / rate x 60; gross = net / DU; cycles = ceil(gross / max-cycle); per cycle = gross / cycles. DU from a catch-can audit, the max-cycle from the soil; this is a program aid, not a guaranteed schedule.",
+  example: irrigationZoneRuntimeExample.inputs,
+  fields: [
+    { key: "target_in", label: "Target depth this run (in)", kind: "number" },
+    { key: "precip_in_hr", label: "Precipitation rate (in/hr)", kind: "number" },
+    { key: "du", label: "Distribution uniformity (0-1)", kind: "number", default: 1.0 },
+    { key: "max_cycle_min", label: "Max cycle before runoff (min)", kind: "number" },
+  ],
+  outputs: [
+    { key: "net", id: "izr-out-net", label: "Net runtime", value: (r) => fmt(r.net_min, 1) + " min" },
+    { key: "gross", id: "izr-out-gross", label: "Gross runtime (DU adjusted)", value: (r) => fmt(r.gross_min, 1) + " min" },
+    { key: "prog", id: "izr-out-prog", label: "Program", value: (r) => r.cycles + (r.cycles === 1 ? " cycle of " : " cycles of ") + fmt(r.per_cycle_min, 1) + " min" },
+    { key: "n", id: "izr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeIrrigationZoneRuntime,
+});
+AGRICULTURE_RENDERERS["irrigation-zone-runtime"] = renderIrrigationZoneRuntime;
+
+// --- spec-v209: drip-zone-flow ---
+// dims: in { mode: dimensionless, tubing_ft: L, spacing_in: L, emitter_gph: L^3 T^-1, emitter_count: dimensionless, valve_gpm: L^3 T^-1 } out: { emitters: dimensionless, zone_gph: L^3 T^-1, zone_gpm: L^3 T^-1, utilization: dimensionless }
+export function computeDripZoneFlow({ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_count = 0, valve_gpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(emitter_gph > 0)) return { error: "Per-emitter flow must be positive (gph)." };
+  if (!(valve_gpm > 0)) return { error: "Valve flow limit must be positive (gpm)." };
+  let emitters;
+  if (mode === "point") {
+    if (!(emitter_count > 0)) return { error: "Emitter count must be positive." };
+    emitters = Math.floor(emitter_count);
+  } else {
+    if (!(tubing_ft > 0)) return { error: "Tubing length must be positive (ft)." };
+    if (!(spacing_in > 0)) return { error: "Emitter spacing must be positive (in)." };
+    emitters = Math.floor(tubing_ft * 12 / spacing_in);
+  }
+  const zone_gph = emitters * emitter_gph;
+  const zone_gpm = zone_gph / 60;
+  const utilization = zone_gpm / valve_gpm * 100;
+  return {
+    emitters, zone_gph, zone_gpm, utilization,
+    over_limit: utilization > 100,
+    note: "Total emitter flow = emitters x rated gph; convert to gpm (/60) and check it against the valve's and lateral tubing's flow limit. Inline mode derives the emitter count from the dripline length and emitter spacing (emitters = floor(length x 12 / spacing)); point-source mode takes the count directly. Keep utilization under 100% - over the valve or lateral limit, the far emitters starve. The per-emitter flow is the manufacturer's rated gph at the design pressure, the valve and lateral limits come from the product's published maximum flow, and this is a flow-budget check, not a hydraulic pressure-loss model.",
+  };
+}
+export const dripZoneFlowExample = { inputs: { mode: "inline", tubing_ft: 300, spacing_in: 18, emitter_gph: 0.9, emitter_count: 0, valve_gpm: 12 } };
+const renderDripZoneFlow = _v23SimpleRenderer({
+  citation: "Citation: first-principles total-flow and utilization relations with the Irrigation Association low-volume references and the major-manufacturer drip design data (by name). zone gph = emitters x rated gph; zone gpm = gph / 60; utilization = zone gpm / valve gpm x 100. Per-emitter flow is the rated gph at the design pressure; this is a flow-budget check, not a full lateral-line hydraulic analysis.",
+  example: dripZoneFlowExample.inputs,
+  fields: [
+    { key: "mode", label: "Input mode", kind: "select", options: [{ value: "inline", label: "Inline (length + spacing)" }, { value: "point", label: "Point-source (emitter count)" }] },
+    { key: "tubing_ft", label: "Dripline length (ft, inline)", kind: "number" },
+    { key: "spacing_in", label: "Emitter spacing (in, inline)", kind: "number" },
+    { key: "emitter_count", label: "Emitter count (point-source)", kind: "number" },
+    { key: "emitter_gph", label: "Rated flow per emitter (gph)", kind: "number" },
+    { key: "valve_gpm", label: "Valve / lateral limit (gpm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "e", id: "dzf-out-e", label: "Emitters", value: (r) => String(r.emitters) },
+    { key: "f", id: "dzf-out-f", label: "Zone flow", value: (r) => fmt(r.zone_gph, 0) + " gph (" + fmt(r.zone_gpm, 2) + " gpm)" },
+    { key: "u", id: "dzf-out-u", label: "Valve utilization", value: (r) => fmt(r.utilization, 1) + "%" + (r.over_limit ? " - OVER limit, far emitters starve" : " - within limit") },
+    { key: "n", id: "dzf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDripZoneFlow,
+});
+AGRICULTURE_RENDERERS["drip-zone-flow"] = renderDripZoneFlow;
+
+// --- spec-v210: plant-spacing-count ---
+// dims: in { bed_ft2: L^2, spacing_in: L } out: { square_n: dimensionless, triangular_n: dimensionless }
+export function computePlantSpacingCount({ bed_ft2 = 0, spacing_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bed_ft2 > 0)) return { error: "Bed area must be positive (ft^2)." };
+  if (!(spacing_in > 0)) return { error: "On-center spacing must be positive (in)." };
+  const s_ft = spacing_in / 12;
+  const square_n = Math.ceil(bed_ft2 / (s_ft * s_ft));
+  const triangular_n = Math.ceil(bed_ft2 / (0.866 * s_ft * s_ft));
+  return {
+    square_n, triangular_n,
+    note: "Square grid: plants = bed area / spacing^2 (rows and columns square). Triangular (staggered 60-degree) grid: plants = bed area / (0.866 x spacing^2) - the 0.866 = sqrt(3)/2 row offset packs about 15% more plants into the same bed because the offset rows sit closer, the way groundcover is actually planted. The spacing comes from the plant's mature spread or the planting plan, edge plants are rounded up so the bed is covered, and this is a planting-density count, not a horticultural plan.",
+  };
+}
+export const plantSpacingCountExample = { inputs: { bed_ft2: 200, spacing_in: 12 } };
+const renderPlantSpacingCount = _v23SimpleRenderer({
+  citation: "Citation: first-principles square- and triangular-grid relations with nursery / landscape estimating references for the staggered-grid 0.866 = sqrt(3)/2 factor (by name). square = area / spacing^2; triangular = area / (0.866 x spacing^2), about 15% more. Spacing from the mature spread or planting plan; this is a takeoff aid, not a horticultural plan.",
+  example: plantSpacingCountExample.inputs,
+  fields: [
+    { key: "bed_ft2", label: "Bed area to plant (ft^2)", kind: "number" },
+    { key: "spacing_in", label: "On-center spacing (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "sq", id: "psc-out-sq", label: "Square grid", value: (r) => String(r.square_n) + " plants" },
+    { key: "tri", id: "psc-out-tri", label: "Triangular grid", value: (r) => String(r.triangular_n) + " plants (staggered, ~15% more)" },
+    { key: "n", id: "psc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePlantSpacingCount,
+});
+AGRICULTURE_RENDERERS["plant-spacing-count"] = renderPlantSpacingCount;
+
+// --- spec-v211: sod-takeoff ---
+// dims: in { lawn_ft2: L^2, waste_pct: dimensionless, slab_ft2: L^2, pallet_ft2: L^2 } out: { order_ft2: L^2, order_syd: L^2, slabs: dimensionless, pallets: dimensionless }
+export function computeSodTakeoff({ lawn_ft2 = 0, waste_pct = 0, slab_ft2 = 10, pallet_ft2 = 450 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(lawn_ft2 > 0)) return { error: "Lawn area must be positive (ft^2)." };
+  if (waste_pct < 0) return { error: "Waste allowance must be zero or positive (percent)." };
+  if (!(slab_ft2 > 0)) return { error: "Slab coverage must be positive (ft^2)." };
+  if (!(pallet_ft2 > 0)) return { error: "Pallet coverage must be positive (ft^2)." };
+  const order_ft2 = lawn_ft2 * (1 + waste_pct / 100);
+  const order_syd = order_ft2 / 9;
+  const slabs = Math.ceil(order_ft2 / slab_ft2);
+  const pallets = Math.ceil(order_ft2 / pallet_ft2);
+  return {
+    order_ft2, order_syd, slabs, pallets,
+    note: "Ordered area = lawn area x (1 + waste/100), restated in square yards (/9); slabs = ceil(order / slab coverage); pallets = ceil(order / pallet coverage). The waste allowance covers the cuts and edges of a curvy lawn. Slab and pallet sizes vary by farm and grass (defaults ~10 ft^2 per slab, ~450 ft^2 per pallet, both editable); the supplier's published piece and skid sizes govern. This is a material takeoff, not a site-prep or establishment plan.",
+  };
+}
+export const sodTakeoffExample = { inputs: { lawn_ft2: 2500, waste_pct: 5, slab_ft2: 10, pallet_ft2: 450 } };
+const renderSodTakeoff = _v23SimpleRenderer({
+  citation: "Citation: first-principles area-plus-waste takeoff relation with turfgrass producer / landscape estimating references (by name). order = lawn x (1 + waste/100); slabs = ceil(order / slab); pallets = ceil(order / pallet). Slab/pallet coverage vary by farm (defaults ~10 / ~450 ft^2, editable); this is an ordering aid, not an agronomic spec.",
+  example: sodTakeoffExample.inputs,
+  fields: [
+    { key: "lawn_ft2", label: "Lawn area to sod (ft^2)", kind: "number" },
+    { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number", default: 5 },
+    { key: "slab_ft2", label: "Slab coverage (ft^2)", kind: "number", default: 10 },
+    { key: "pallet_ft2", label: "Pallet coverage (ft^2)", kind: "number", default: 450 },
+  ],
+  outputs: [
+    { key: "o", id: "sod-out-o", label: "Order area", value: (r) => fmt(r.order_ft2, 0) + " ft^2 (" + fmt(r.order_syd, 1) + " syd)" },
+    { key: "s", id: "sod-out-s", label: "Slabs", value: (r) => String(r.slabs) },
+    { key: "p", id: "sod-out-p", label: "Pallets", value: (r) => String(r.pallets) },
+    { key: "n", id: "sod-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSodTakeoff,
+});
+AGRICULTURE_RENDERERS["sod-takeoff"] = renderSodTakeoff;

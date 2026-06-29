@@ -826,6 +826,16 @@ const RELATED = {
   "wire-rope-strength": ["sling-d-d-efficiency","shackle-eyebolt-wll"],
   // spec-v118 hay dry-matter (Group L)
   "hay-dry-matter": ["pearson-square-ration","grain-bin-capacity","livestock-water-requirement"],
+  // spec-v207..v211 landscape irrigation and planting install cluster (Group L)
+  "sprinkler-precip-rate": ["irrigation-zone-runtime","irrigation-uniformity","drip-zone-flow"],
+  "irrigation-zone-runtime": ["sprinkler-precip-rate","irrigation-requirement","irrigation-uniformity"],
+  "drip-zone-flow": ["sprinkler-precip-rate","irrigation-zone-runtime","nozzle-flow-pressure"],
+  "plant-spacing-count": ["sod-takeoff","square-footage","material-quantity"],
+  "sod-takeoff": ["plant-spacing-count","square-footage","sprinkler-precip-rate"],
+  // spec-v212..v214 masonry grout / coursing and wallcovering (Group E)
+  "cmu-grout-volume": ["masonry-count","mortar-mix","rebar-schedule"],
+  "masonry-coursing": ["masonry-count","cmu-grout-volume","mortar-mix"],
+  "wallpaper-rolls": ["paint-coverage","square-footage","flooring-takeoff"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

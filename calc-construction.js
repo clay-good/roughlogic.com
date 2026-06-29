@@ -4301,3 +4301,129 @@ const renderGuardHandrailCheck = _simpleRenderer({
   compute: computeGuardHandrailCheck,
 });
 CONSTRUCTION_RENDERERS["guard-handrail-check"] = renderGuardHandrailCheck;
+
+// =====================================================================
+// spec-v212..v214 (Group E) - masonry and finish takeoffs the two-tile
+// masonry shelf left open: grouted-cell volume, modular coursing,
+// wallcovering rolls. First-principles takeoff relations; TMS 602 /
+// ACI 530.1, NCMA TEK, BIA Technical Notes, and wallcovering estimating
+// practice govern by name.
+// =====================================================================
+
+// --- spec-v212: cmu-grout-volume ---
+// dims: in { wall_len_ft: L, wall_ht_ft: L, core_spacing_in: L, core_area_in2: L^2, bond_area_in2: L^2 } out: { cores: dimensionless, vert_ft3: L^3, bond_ft3: L^3, total_ft3: L^3, total_yd3: L^3 }
+export function computeCmuGroutVolume({ wall_len_ft = 0, wall_ht_ft = 0, core_spacing_in = 0, core_area_in2 = 24, bond_area_in2 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wall_len_ft > 0)) return { error: "Wall length must be positive (ft)." };
+  if (!(wall_ht_ft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(core_spacing_in > 0)) return { error: "Core spacing must be positive (in)." };
+  if (!(core_area_in2 > 0)) return { error: "Core cross-section must be positive (in^2)." };
+  if (bond_area_in2 < 0) return { error: "Bond-beam cross-section must be zero or positive (in^2)." };
+  const cores = Math.floor(wall_len_ft * 12 / core_spacing_in) + 1;
+  const vert_ft3 = cores * wall_ht_ft * (core_area_in2 / 144);
+  const bond_ft3 = wall_len_ft * (bond_area_in2 / 144);
+  const total_ft3 = vert_ft3 + bond_ft3;
+  const total_yd3 = total_ft3 / 27;
+  return {
+    cores, vert_ft3, bond_ft3, total_ft3, total_yd3,
+    note: "Grouted cores = floor(wall length x 12 / core spacing) + 1 (both ends grouted). Vertical grout = cores x wall height x core cross-section / 144 (in^2 to ft^2). Bond-beam grout = wall length x bond cross-section / 144, one continuous top course (0 for none). Total in ft^3 and cubic yards (/27); order grout with a waste and pump allowance on top. The grouted-cell spacing and the cross-section areas come from the structural drawings and the unit data, and the engineer of record governs the reinforcement - this is a material takeoff, not a structural design.",
+  };
+}
+const cmuGroutVolumeExample = { inputs: { wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 24, bond_area_in2: 30 } };
+const renderCmuGroutVolume = _simpleRenderer({
+  citation: "Citation: first-principles core-count and grout-volume relations with TMS 602 / ACI 530.1 (Specification for Masonry Structures) and the NCMA TEK grout references (by name). cores = floor(len x 12 / spacing) + 1; vert = cores x ht x area/144; bond = len x area/144; total/27 = yd^3. The EOR governs the reinforcement; this is a material takeoff, not a structural design.",
+  example: cmuGroutVolumeExample.inputs,
+  fields: [
+    { key: "wall_len_ft", label: "Wall length (ft)", kind: "number" },
+    { key: "wall_ht_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "core_spacing_in", label: "Grouted-core spacing oc (in)", kind: "number" },
+    { key: "core_area_in2", label: "Core cross-section (in^2, ~24 for 8 in)", kind: "number", default: 24 },
+    { key: "bond_area_in2", label: "Bond-beam cross-section (in^2, 0 = none)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "c", id: "cgv-out-c", label: "Grouted cores", value: (r) => String(r.cores) },
+    { key: "v", id: "cgv-out-v", label: "Vertical grout", value: (r) => _fmtC(r.vert_ft3, 2) + " ft^3" },
+    { key: "b", id: "cgv-out-b", label: "Bond-beam grout", value: (r) => _fmtC(r.bond_ft3, 2) + " ft^3" },
+    { key: "t", id: "cgv-out-t", label: "Total grout", value: (r) => _fmtC(r.total_ft3, 2) + " ft^3 (" + _fmtC(r.total_yd3, 2) + " yd^3)" },
+    { key: "n", id: "cgv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCmuGroutVolume,
+});
+CONSTRUCTION_RENDERERS["cmu-grout-volume"] = renderCmuGroutVolume;
+
+// --- spec-v213: masonry-coursing ---
+// dims: in { target_in: L, unit_in: L, joint_in: L } out: { course_in: L, courses: dimensionless, built_in: L, off_in: L }
+export function computeMasonryCoursing({ target_in = 0, unit_in = 7.625, joint_in = 0.375 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_in > 0)) return { error: "Target height must be positive (in)." };
+  if (!(unit_in > 0)) return { error: "Unit height must be positive (in)." };
+  if (!(joint_in > 0)) return { error: "Bed joint must be positive (in)." };
+  const course_in = unit_in + joint_in;
+  const courses = Math.round(target_in / course_in);
+  const built_in = courses * course_in;
+  const off_in = target_in - built_in;
+  const on_module = Math.abs(off_in) < 0.0625;
+  return {
+    course_in, courses, built_in, off_in, on_module,
+    note: "Course height = unit height + one bed joint (modular defaults: CMU 7.625 + 0.375 = 8.0 in; modular brick 2.25 + 0.4167 = 2.6667 in, so three courses = 8 in). Courses = round(target / course); built height = courses x course; off-module = target minus built (+ means the target sits above the nearest course). On module when |off| < 1/16 in. Off module, the wall top or opening forces a cut course or a fudged joint. The unit and joint dimensions are nominal/modular and the actual product and the mason's joint govern - this is a layout aid, not a stamped elevation.",
+  };
+}
+const masonryCoursingExample = { inputs: { target_in: 96, unit_in: 7.625, joint_in: 0.375 } };
+const renderMasonryCoursing = _simpleRenderer({
+  citation: "Citation: first-principles coursing relation with the Brick Industry Association (BIA) Technical Notes on modular masonry and the NCMA TEK dimensioning references (by name). course = unit + joint; courses = round(target / course); off = target - courses x course; on module when |off| < 1/16 in. Nominal dimensions; the actual product and the mason's joint govern - a coursing check, not a stamped elevation.",
+  example: masonryCoursingExample.inputs,
+  fields: [
+    { key: "target_in", label: "Height to reach (in)", kind: "number" },
+    { key: "unit_in", label: "Unit height (in, CMU 7.625 / brick 2.25)", kind: "number", default: 7.625 },
+    { key: "joint_in", label: "Bed joint (in, typ 0.375 / brick 0.4167)", kind: "number", default: 0.375 },
+  ],
+  outputs: [
+    { key: "ci", id: "mco-out-ci", label: "Course height", value: (r) => _fmtC(r.course_in, 4) + " in" },
+    { key: "co", id: "mco-out-co", label: "Courses", value: (r) => String(r.courses) },
+    { key: "bi", id: "mco-out-bi", label: "Built height", value: (r) => _fmtC(r.built_in, 3) + " in" },
+    { key: "m", id: "mco-out-m", label: "Course-out", value: (r) => r.on_module ? "on module (lands on a course)" : "NOT on module - off by " + _fmtC(r.off_in, 3) + " in (cut course or fattened joints)" },
+    { key: "n", id: "mco-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryCoursing,
+});
+CONSTRUCTION_RENDERERS["masonry-coursing"] = renderMasonryCoursing;
+
+// --- spec-v214: wallpaper-rolls ---
+// dims: in { perimeter_in: L, height_in: L, roll_width_in: L, roll_len_in: L, repeat_in: L } out: { strips_needed: dimensionless, strip_len_in: L, strips_per_roll: dimensionless, rolls: dimensionless }
+export function computeWallpaperRolls({ perimeter_in = 0, height_in = 0, roll_width_in = 0, roll_len_in = 0, repeat_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(perimeter_in > 0)) return { error: "Wall perimeter must be positive (in)." };
+  if (!(height_in > 0)) return { error: "Wall height must be positive (in)." };
+  if (!(roll_width_in > 0)) return { error: "Roll width must be positive (in)." };
+  if (!(roll_len_in > 0)) return { error: "Roll length must be positive (in)." };
+  if (repeat_in < 0) return { error: "Pattern repeat must be zero or positive (in)." };
+  const strip_len_in = height_in + repeat_in;
+  if (strip_len_in > roll_len_in) return { error: "Pattern repeat plus wall height exceeds the roll length - no full strip fits this roll." };
+  const strips_needed = Math.ceil(perimeter_in / roll_width_in);
+  const strips_per_roll = Math.floor(roll_len_in / strip_len_in);
+  const rolls = Math.ceil(strips_needed / strips_per_roll);
+  return {
+    strips_needed, strip_len_in, strips_per_roll, rolls,
+    note: "Strips needed = ceil(perimeter / roll width). Strip length = wall height + one pattern repeat (one repeat wasted per strip to match the run). Strips per roll = floor(roll length / strip length). Rolls = ceil(strips needed / strips per roll). A large repeat drops the strips-per-roll yield and can nearly double the order for the same wall area - the area is identical, the repeat is what costs. The roll dimensions are the product's stated bolt size (single/double/Euro rolls vary), door and window openings are a manual strip credit on the perimeter, and this is a material takeoff, not a hang plan.",
+  };
+}
+const wallpaperRollsExample = { inputs: { perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 396, repeat_in: 19 } };
+const renderWallpaperRolls = _simpleRenderer({
+  citation: "Citation: first-principles strips-and-rolls relations with wallcovering industry estimating practice (the strip method and the one-repeat-per-strip waste rule, by name). strips = ceil(perimeter / width); strip length = height + repeat; strips/roll = floor(roll length / strip length); rolls = ceil(strips / strips per roll). Roll dimensions are the product's bolt size; openings are a manual credit - an ordering aid, not an installation layout.",
+  example: wallpaperRollsExample.inputs,
+  fields: [
+    { key: "perimeter_in", label: "Wall run to cover (in, less openings)", kind: "number" },
+    { key: "height_in", label: "Wall height (in)", kind: "number" },
+    { key: "roll_width_in", label: "Roll width (in, Euro ~20.5 / US ~27)", kind: "number", default: 20.5 },
+    { key: "roll_len_in", label: "Roll length (in, Euro single ~396)", kind: "number", default: 396 },
+    { key: "repeat_in", label: "Pattern repeat (in, 0 = random)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "wpr-out-s", label: "Strips needed", value: (r) => String(r.strips_needed) },
+    { key: "p", id: "wpr-out-p", label: "Strips per roll", value: (r) => String(r.strips_per_roll) + " (strip " + _fmtC(r.strip_len_in, 0) + " in)" },
+    { key: "r", id: "wpr-out-r", label: "Rolls", value: (r) => String(r.rolls) },
+    { key: "n", id: "wpr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWallpaperRolls,
+});
+CONSTRUCTION_RENDERERS["wallpaper-rolls"] = renderWallpaperRolls;

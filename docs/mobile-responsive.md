@@ -173,3 +173,9 @@ A full re-run on 2026-06-26 confirms the no-horizontal-scroll guarantee holds at
 - **Runtime leak guard.** `render-no-nan.test.js` passed all **664** registered tile views (exit 0, 12.0 min serial) with no NaN / Infinity / undefined leak.
 
 No layout fix was required: the fluid `clamp()` type, `ch` / `vw` measures, the lone 760 px breakpoint, and the `.tabular-tool` scroll-owner (§8 / §9) all carry the 664-tile catalog without change.
+
+## 16. Re-verification at 672 tiles (2026-06-29)
+
+§15 re-anchored the running record to 664 tiles. The catalog has since grown to **672 tiles across 21 groups** (the spec-v207..v214 landscape-irrigation and masonry/finish landings -- five Group L tiles in `calc-agriculture.js` and three Group E tiles in `calc-construction.js`), and the build emits **672 tile shells + 21 group shells** (sitemap **694 URLs**). The §11 harnesses read the live `TOOLS` array and `dist/` tree at run time, so they auto-scale across these landings with no test edits; this entry re-anchors the record again to the current size.
+
+Each of the eight new tiles was born into the §8-§11 responsive gates rather than retrofitted -- the five agriculture tiles render stacked `ui-fields.js` output lines through the shared `_v23SimpleRenderer`, and the three construction tiles through `_simpleRenderer`, so every output is a wrapping single-column line with no table and no fixed-width element. A targeted 2026-06-29 sweep of the eight new routes at the 320 px floor (each populated via its example button) confirms **zero page-level horizontal scroll and no NaN / Infinity / undefined leak** on all eight, and each renders its pinned worked-example output to the value (e.g. `sprinkler-precip-rate` -> 1.20 in/hr, `cmu-grout-volume` -> 0.70 yd^3, `wallpaper-rolls` -> 11 rolls). The standing full-catalog `responsive-stress` (§11), `check:shell-mobile` (§10), and `render-no-nan` gates carry the 672-tile catalog on every push; no layout fix was required.

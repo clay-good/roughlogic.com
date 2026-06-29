@@ -11463,3 +11463,111 @@ test("bounds: spec-v198 dry-time-projection pins days-to-goal, the not-progressi
   assert.ok("error" in _vr198({ current_mc_pct: Infinity, goal_mc_pct: 12, daily_drop_pct: 4 }));
   assert.ok("error" in _vr198({ current_mc_pct: 12, goal_mc_pct: 28, daily_drop_pct: 4 }));
 });
+
+// --- spec-v207..v211 landscape irrigation and planting install cluster (calc-agriculture.js) ---
+
+import {
+  computeSprinklerPrecipRate as _v207, computeIrrigationZoneRuntime as _v208,
+  computeDripZoneFlow as _v209, computePlantSpacingCount as _v210, computeSodTakeoff as _v211,
+} from "../../calc-agriculture.js";
+
+test("bounds: spec-v207 sprinkler-precip-rate pins PR = 96.3 x gpm / area + rejects bad inputs", () => {
+  const a = _v207({ zone_gpm: 15, zone_ft2: 1200 });
+  assert.ok(Math.abs(a.precip_in_hr - 1.20375) < 1e-6);
+  // sprays apply water ~3x faster than rotors for the same gpm band.
+  const b = _v207({ zone_gpm: 12, zone_ft2: 300 });
+  assert.ok(Math.abs(b.precip_in_hr - 3.852) < 1e-6 && b.precip_in_hr > a.precip_in_hr * 3);
+  assert.ok("error" in _v207({ zone_gpm: 0, zone_ft2: 1200 }));
+  assert.ok("error" in _v207({ zone_gpm: 15, zone_ft2: 0 }));
+  assert.ok("error" in _v207({ zone_gpm: Infinity, zone_ft2: 1200 }));
+});
+
+test("bounds: spec-v208 irrigation-zone-runtime pins net/gross/cycles, the single-cycle path, and DU/error seams", () => {
+  const a = _v208({ target_in: 0.75, precip_in_hr: 1.20, du: 0.75, max_cycle_min: 10 });
+  assert.ok(Math.abs(a.net_min - 37.5) < 1e-9 && Math.abs(a.gross_min - 50) < 1e-9 && a.cycles === 5 && Math.abs(a.per_cycle_min - 10) < 1e-9);
+  // high rate + forgiving soil collapses to a single run.
+  const b = _v208({ target_in: 0.75, precip_in_hr: 3.85, du: 0.75, max_cycle_min: 30 });
+  assert.ok(Math.abs(b.net_min - 11.688) < 0.01 && Math.abs(b.gross_min - 15.584) < 0.01 && b.cycles === 1);
+  assert.ok("error" in _v208({ target_in: 0, precip_in_hr: 1.2, max_cycle_min: 10 }));
+  assert.ok("error" in _v208({ target_in: 0.75, precip_in_hr: 0, max_cycle_min: 10 }));
+  assert.ok("error" in _v208({ target_in: 0.75, precip_in_hr: 1.2, max_cycle_min: 0 }));
+  assert.ok("error" in _v208({ target_in: 0.75, precip_in_hr: 1.2, du: 0, max_cycle_min: 10 }) && "error" in _v208({ target_in: 0.75, precip_in_hr: 1.2, du: 1.5, max_cycle_min: 10 }));
+});
+
+test("bounds: spec-v209 drip-zone-flow pins both input modes, utilization, and error seams", () => {
+  const a = _v209({ mode: "inline", tubing_ft: 300, spacing_in: 18, emitter_gph: 0.9, valve_gpm: 12 });
+  assert.ok(a.emitters === 200 && Math.abs(a.zone_gph - 180) < 1e-9 && Math.abs(a.zone_gpm - 3) < 1e-9 && Math.abs(a.utilization - 25) < 1e-9);
+  const b = _v209({ mode: "point", emitter_count: 120, emitter_gph: 1.0, valve_gpm: 12 });
+  assert.ok(b.emitters === 120 && Math.abs(b.zone_gpm - 2) < 1e-9 && Math.abs(b.utilization - 16.667) < 0.01);
+  // over the valve limit flags.
+  assert.ok(_v209({ mode: "point", emitter_count: 1000, emitter_gph: 1.0, valve_gpm: 12 }).over_limit === true);
+  assert.ok("error" in _v209({ mode: "inline", tubing_ft: 0, spacing_in: 18, emitter_gph: 0.9, valve_gpm: 12 }));
+  assert.ok("error" in _v209({ mode: "inline", tubing_ft: 300, spacing_in: 0, emitter_gph: 0.9, valve_gpm: 12 }));
+  assert.ok("error" in _v209({ mode: "point", emitter_count: 0, emitter_gph: 1.0, valve_gpm: 12 }));
+  assert.ok("error" in _v209({ mode: "inline", tubing_ft: 300, spacing_in: 18, emitter_gph: 0, valve_gpm: 12 }));
+  assert.ok("error" in _v209({ mode: "inline", tubing_ft: 300, spacing_in: 18, emitter_gph: 0.9, valve_gpm: 0 }));
+});
+
+test("bounds: spec-v210 plant-spacing-count pins square + triangular (~15% more) and error seams", () => {
+  const a = _v210({ bed_ft2: 200, spacing_in: 12 });
+  assert.ok(a.square_n === 200 && a.triangular_n === 231 && a.triangular_n > a.square_n);
+  const b = _v210({ bed_ft2: 500, spacing_in: 18 });
+  assert.ok(b.square_n === 223 && b.triangular_n === 257);
+  assert.ok("error" in _v210({ bed_ft2: 0, spacing_in: 12 }));
+  assert.ok("error" in _v210({ bed_ft2: 200, spacing_in: 0 }));
+  assert.ok("error" in _v210({ bed_ft2: Infinity, spacing_in: 12 }));
+});
+
+test("bounds: spec-v211 sod-takeoff pins order/slabs/pallets, the partial-pallet round-up, and error seams", () => {
+  const a = _v211({ lawn_ft2: 2500, waste_pct: 5, slab_ft2: 10, pallet_ft2: 450 });
+  assert.ok(Math.abs(a.order_ft2 - 2625) < 1e-9 && Math.abs(a.order_syd - 291.667) < 0.01 && a.slabs === 263 && a.pallets === 6);
+  const b = _v211({ lawn_ft2: 900, waste_pct: 12, slab_ft2: 10, pallet_ft2: 450 });
+  assert.ok(b.slabs === 101 && b.pallets === 3);
+  assert.ok("error" in _v211({ lawn_ft2: 0, waste_pct: 5 }));
+  assert.ok("error" in _v211({ lawn_ft2: 2500, waste_pct: -1 }));
+  assert.ok("error" in _v211({ lawn_ft2: 2500, waste_pct: 5, slab_ft2: 0 }));
+  assert.ok("error" in _v211({ lawn_ft2: 2500, waste_pct: 5, pallet_ft2: 0 }));
+});
+
+// --- spec-v212..v214 masonry grout / coursing and wallcovering (calc-construction.js) ---
+
+import {
+  computeCmuGroutVolume as _v212, computeMasonryCoursing as _v213, computeWallpaperRolls as _v214,
+} from "../../calc-construction.js";
+
+test("bounds: spec-v212 cmu-grout-volume pins cores/volume, the no-bond-beam path, and error seams", () => {
+  const a = _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 24, bond_area_in2: 30 });
+  assert.ok(a.cores === 11 && Math.abs(a.vert_ft3 - 14.667) < 0.01 && Math.abs(a.bond_ft3 - 4.167) < 0.01 && Math.abs(a.total_yd3 - 0.698) < 0.01);
+  const b = _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 16, core_area_in2: 24, bond_area_in2: 30 });
+  assert.ok(b.cores === 16 && Math.abs(b.total_ft3 - 25.5) < 0.01);
+  // no bond beam: bond grout is zero.
+  const c = _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 24, bond_area_in2: 0 });
+  assert.ok(c.bond_ft3 === 0);
+  assert.ok("error" in _v212({ wall_len_ft: 0, wall_ht_ft: 8, core_spacing_in: 24 }));
+  assert.ok("error" in _v212({ wall_len_ft: 20, wall_ht_ft: 0, core_spacing_in: 24 }));
+  assert.ok("error" in _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 0 }));
+  assert.ok("error" in _v212({ wall_len_ft: 20, wall_ht_ft: 8, core_spacing_in: 24, core_area_in2: 0 }));
+});
+
+test("bounds: spec-v213 masonry-coursing pins on-module and off-module both ways + error seams", () => {
+  const a = _v213({ target_in: 96, unit_in: 7.625, joint_in: 0.375 });
+  assert.ok(Math.abs(a.course_in - 8) < 1e-9 && a.courses === 12 && Math.abs(a.built_in - 96) < 1e-9 && Math.abs(a.off_in) < 1e-9 && a.on_module === true);
+  const b = _v213({ target_in: 50, unit_in: 2.25, joint_in: 0.4167 });
+  assert.ok(b.courses === 19 && Math.abs(b.off_in - (-0.667)) < 0.01 && b.on_module === false);
+  assert.ok("error" in _v213({ target_in: 0, unit_in: 7.625, joint_in: 0.375 }));
+  assert.ok("error" in _v213({ target_in: 96, unit_in: 0, joint_in: 0.375 }));
+  assert.ok("error" in _v213({ target_in: 96, unit_in: 7.625, joint_in: 0 }));
+});
+
+test("bounds: spec-v214 wallpaper-rolls pins the repeat-driven yield drop, the no-fit error, and error seams", () => {
+  const a = _v214({ perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 396, repeat_in: 19 });
+  assert.ok(a.strips_needed === 31 && a.strips_per_roll === 3 && a.rolls === 11);
+  // a bigger repeat drops the strips-per-roll yield and pushes the order up.
+  const b = _v214({ perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 396, repeat_in: 25 });
+  assert.ok(b.strips_per_roll === 2 && b.rolls === 16 && b.rolls > a.rolls);
+  assert.ok("error" in _v214({ perimeter_in: 0, height_in: 108, roll_width_in: 20.5, roll_len_in: 396 }));
+  assert.ok("error" in _v214({ perimeter_in: 624, height_in: 0, roll_width_in: 20.5, roll_len_in: 396 }));
+  assert.ok("error" in _v214({ perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 396, repeat_in: -1 }));
+  // repeat + height exceeds the roll length: no full strip fits.
+  assert.ok("error" in _v214({ perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 120, repeat_in: 19 }));
+});

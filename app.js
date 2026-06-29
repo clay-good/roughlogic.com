@@ -331,6 +331,8 @@ const TOOL_MODULES = (() => {
     "control-joint-spacing", "rebar-lap-splice",
     // spec-v113 guard and handrail code check (IRC R312 / R311.7.8).
     "guard-handrail-check",
+    // spec-v212..v214 masonry grout / coursing and wallcovering takeoffs.
+    "cmu-grout-volume", "masonry-coursing", "wallpaper-rolls",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.
@@ -563,6 +565,9 @@ const TOOL_MODULES = (() => {
     "nozzle-flow-pressure", "spray-drift-buffer", "sprayer-field-capacity",
     // spec-v118 hay dry-matter and safe-storage weight.
     "hay-dry-matter",
+    // spec-v207..v211 landscape irrigation and planting install cluster.
+    "sprinkler-precip-rate", "irrigation-zone-runtime", "drip-zone-flow",
+    "plant-spacing-count", "sod-takeoff",
   ]);
   // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out
   // of calc-agriculture.js (95.1% of cap) into calc-arborist.js. All five KEEP

@@ -451,6 +451,16 @@ const _TILES = [
   ["wire-rope-strength", "Z"],
   // spec-v118 hay dry-matter (Group L)
   ["hay-dry-matter", "L"],
+  // spec-v207..v211 landscape irrigation and planting install cluster (Group L)
+  ["sprinkler-precip-rate", "L"],
+  ["irrigation-zone-runtime", "L"],
+  ["drip-zone-flow", "L"],
+  ["plant-spacing-count", "L"],
+  ["sod-takeoff", "L"],
+  // spec-v212..v214 masonry grout / coursing and wallcovering (Group E)
+  ["cmu-grout-volume", "E"],
+  ["masonry-coursing", "E"],
+  ["wallpaper-rolls", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)
