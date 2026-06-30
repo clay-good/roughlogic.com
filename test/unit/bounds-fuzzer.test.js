@@ -618,10 +618,12 @@ import {
   computeFormworkPressure,
   computeHelicalPile,
   computeHipValleyRafter,
+  computeIceBarrierCoverage,
   computeJoistDeflection,
   computeLumberSpan,
   computeMasonryCount,
   computeMaterialQuantity,
+  computeMetalRoofPanels,
   computeMortarMix,
   computePaintCoverage,
   computePlywoodSpan,
@@ -630,6 +632,7 @@ import {
   computeRebar,
   computeRebarSchedule,
   computeResidentialFraming,
+  computeRidgeCapFasteners,
   computeRoofPitch,
   computeRoofingSquares,
   computeSnowLoad,
@@ -7757,6 +7760,77 @@ test("bounds: calc-construction computeRoofingSquares pins pitch-tiered waste la
   assert.ok("error" in computeRoofingSquares({ roof_area_ft2: 0, pitch_rise: 6 }));
   assert.ok("error" in computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 25 }));
   assert.ok("error" in computeRoofingSquares({ roof_area_ft2: 100, pitch_rise: 6, shingle_product: "moon" }));
+});
+
+test("bounds: spec-v215 computeIceBarrierCoverage pins slope-factor coverage, courses, rolls, and error seams", () => {
+  // Pinned 4/12 example: 40 ft eave, 12 in overhang -> 2 courses, 2 rolls.
+  const r = computeIceBarrierCoverage({ eave_length_ft: 40, overhang_in: 12, pitch_rise: 4, roll_width_in: 36, roll_len_ft: 66.7, side_lap_in: 6 });
+  assert.ok(Math.abs(r.slope_factor - Math.sqrt(160) / 12) < 1e-9);
+  assert.ok(Math.abs(r.coverage_in - 37.94733192) < 1e-6);
+  assert.strictEqual(r.courses, 2);
+  assert.strictEqual(r.roll_lf, 80);
+  assert.strictEqual(r.rolls, 2);
+  // Cross-check steep-and-deep: 24 in overhang, 12/12 -> a third course.
+  const r2 = computeIceBarrierCoverage({ eave_length_ft: 40, overhang_in: 24, pitch_rise: 12 });
+  assert.strictEqual(r2.courses, 3);
+  assert.strictEqual(r2.roll_lf, 120);
+  assert.strictEqual(r2.rolls, 2);
+  // Single-course path: coverage within one roll width -> 1 course.
+  assert.strictEqual(computeIceBarrierCoverage({ eave_length_ft: 20, overhang_in: 6, pitch_rise: 0 }).courses, 1);
+  // Error seams.
+  assert.ok("error" in computeIceBarrierCoverage({ eave_length_ft: 0, overhang_in: 12, pitch_rise: 4 }));
+  assert.ok("error" in computeIceBarrierCoverage({ eave_length_ft: 40, overhang_in: -1, pitch_rise: 4 }));
+  assert.ok("error" in computeIceBarrierCoverage({ eave_length_ft: 40, overhang_in: 12, pitch_rise: 25 }));
+  assert.ok("error" in computeIceBarrierCoverage({ eave_length_ft: 40, overhang_in: 12, pitch_rise: 4, roll_width_in: 36, side_lap_in: 36 }));
+  assert.ok("error" in computeIceBarrierCoverage({ eave_length_ft: 40, overhang_in: 12, pitch_rise: 4, roll_len_ft: 0 }));
+  assert.ok("error" in computeIceBarrierCoverage({ eave_length_ft: Infinity, overhang_in: 12, pitch_rise: 4 }));
+});
+
+test("bounds: spec-v216 computeMetalRoofPanels pins net-width panel count, lf, squares, fasteners, and error seams", () => {
+  // Pinned exposed-fastener example: 40 ft x 18 ft plane, 36 in net.
+  const r = computeMetalRoofPanels({ eave_width_ft: 40, panel_length_ft: 18, panel_net_in: 36, fasteners_per_sq: 80 });
+  assert.strictEqual(r.panels, 14);
+  assert.strictEqual(r.total_panel_lf, 252);
+  assert.strictEqual(r.plane_area_ft2, 720);
+  assert.ok(Math.abs(r.squares - 7.2) < 1e-9);
+  assert.strictEqual(r.fasteners, 576);
+  // Cross-check standing seam, 16 in net -> the panel count nearly doubles.
+  const r2 = computeMetalRoofPanels({ eave_width_ft: 40, panel_length_ft: 18, panel_net_in: 16 });
+  assert.strictEqual(r2.panels, 30);
+  assert.strictEqual(r2.total_panel_lf, 540);
+  // Error seams.
+  assert.ok("error" in computeMetalRoofPanels({ eave_width_ft: 0, panel_length_ft: 18, panel_net_in: 36 }));
+  assert.ok("error" in computeMetalRoofPanels({ eave_width_ft: 40, panel_length_ft: 0, panel_net_in: 36 }));
+  assert.ok("error" in computeMetalRoofPanels({ eave_width_ft: 40, panel_length_ft: 18, panel_net_in: 0 }));
+  assert.ok("error" in computeMetalRoofPanels({ eave_width_ft: 40, panel_length_ft: 18, panel_net_in: 36, fasteners_per_sq: 0 }));
+  assert.ok("error" in computeMetalRoofPanels({ eave_width_ft: Infinity, panel_length_ft: 18, panel_net_in: 36 }));
+});
+
+test("bounds: spec-v217 computeRidgeCapFasteners pins cap bundles, six-nail field count, nails by the pound, and error seams", () => {
+  // Pinned 24-square example: 40 ft ridge, no hip, 4-nail -> 2 bundles, 43 lb.
+  const r = computeRidgeCapFasteners({ ridge_lf: 40, hip_lf: 0, cap_lf_per_bundle: 20, cap_exposure_in: 5, squares: 24, shingles_per_sq: 64, nails_per_shingle: 4, nails_per_lb: 150 });
+  assert.strictEqual(r.cap_len_lf, 40);
+  assert.strictEqual(r.cap_bundles, 2);
+  assert.strictEqual(r.field_nails, 6144);
+  assert.strictEqual(r.cap_pieces, 96);
+  assert.strictEqual(r.cap_nails, 192);
+  assert.strictEqual(r.total_nails, 6336);
+  assert.strictEqual(r.nail_lbs, 43);
+  // Cross-check high-wind 6-nail with hips -> 5 bundles, 65 lb.
+  const r2 = computeRidgeCapFasteners({ ridge_lf: 30, hip_lf: 60, cap_lf_per_bundle: 20, cap_exposure_in: 5, squares: 24, shingles_per_sq: 64, nails_per_shingle: 6, nails_per_lb: 150 });
+  assert.strictEqual(r2.cap_bundles, 5);
+  assert.strictEqual(r2.field_nails, 9216);
+  assert.strictEqual(r2.nail_lbs, 65);
+  // No-hip / field-only path: cap length 0 but squares present is allowed.
+  assert.ok(!("error" in computeRidgeCapFasteners({ ridge_lf: 0, hip_lf: 0, squares: 10 })));
+  // Error seams.
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: -1, hip_lf: 0, squares: 24 }));
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: 40, hip_lf: 0, squares: 24, cap_lf_per_bundle: 0 }));
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: 40, hip_lf: 0, squares: 24, cap_exposure_in: 0 }));
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: 40, hip_lf: 0, squares: 24, nails_per_shingle: 1 }));
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: 40, hip_lf: 0, squares: 24, nails_per_shingle: 9 }));
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: 0, hip_lf: 0, squares: 0 }));
+  assert.ok("error" in computeRidgeCapFasteners({ ridge_lf: Infinity, hip_lf: 0, squares: 24 }));
 });
 
 test("bounds: calc-construction computeAsphaltTonnage pins tons = (area*depth_ft*density)/2000 and 20T truck rollup", () => {

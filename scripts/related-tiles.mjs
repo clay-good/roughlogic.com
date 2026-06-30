@@ -836,6 +836,10 @@ const RELATED = {
   "cmu-grout-volume": ["masonry-count","mortar-mix","rebar-schedule"],
   "masonry-coursing": ["masonry-count","cmu-grout-volume","mortar-mix"],
   "wallpaper-rolls": ["paint-coverage","square-footage","flooring-takeoff"],
+  // spec-v215..v217 roofing material-takeoff batch
+  "ice-barrier-coverage": ["roofing-squares","roof-pitch","gutter-downspout"],
+  "metal-roof-panels": ["roofing-squares","roof-pitch","hip-valley-rafter"],
+  "ridge-cap-fasteners": ["roofing-squares","hip-valley-rafter","ice-barrier-coverage"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

@@ -664,6 +664,10 @@ export const COMPUTE_MAP = {
   "cmu-grout-volume": { module: "../../calc-construction.js", fn: "computeCmuGroutVolume" },
   "masonry-coursing": { module: "../../calc-construction.js", fn: "computeMasonryCoursing" },
   "wallpaper-rolls": { module: "../../calc-construction.js", fn: "computeWallpaperRolls" },
+  // spec-v215..v217 roofing material-takeoff batch (3 tiles)
+  "ice-barrier-coverage": { module: "../../calc-construction.js", fn: "computeIceBarrierCoverage" },
+  "metal-roof-panels": { module: "../../calc-construction.js", fn: "computeMetalRoofPanels" },
+  "ridge-cap-fasteners": { module: "../../calc-construction.js", fn: "computeRidgeCapFasteners" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },

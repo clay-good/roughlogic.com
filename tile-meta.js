@@ -461,6 +461,10 @@ const _TILES = [
   ["cmu-grout-volume", "E"],
   ["masonry-coursing", "E"],
   ["wallpaper-rolls", "E"],
+  // spec-v215..v217 roofing material-takeoff batch
+  ["ice-barrier-coverage", "E"],
+  ["metal-roof-panels", "E"],
+  ["ridge-cap-fasteners", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v217 -- Ridge / Hip Cap and Roofing-Nail Takeoff (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-30. Batch spec-v215..v217 (roofing material takeoff -- the install-side gaps the
+> **Status: LANDED (2026-06-30, package 0.86.0; was PROPOSED 2026-06-30). Batch spec-v215..v217 (roofing material takeoff -- the install-side gaps the
 > catalog's shingle-only `roofing-squares` left: the eave ice barrier, the metal-panel alternative, and the
 > ridge-cap-and-fastener accessories). This closes the v215..v217 roofing batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: cap shingles and fastening are set by

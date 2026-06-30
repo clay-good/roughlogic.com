@@ -1,6 +1,6 @@
 # roughlogic.com Specification v216 -- Metal Roof Panel and Fastener Takeoff (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-30. Batch spec-v215..v217 (roofing material takeoff -- the install-side gaps the
+> **Status: LANDED (2026-06-30, package 0.86.0; was PROPOSED 2026-06-30). Batch spec-v215..v217 (roofing material takeoff -- the install-side gaps the
 > catalog's shingle-only `roofing-squares` left: the eave ice barrier, the metal-panel alternative, and the
 > ridge-cap-and-fastener accessories).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: metal roofing is installed by roofers.

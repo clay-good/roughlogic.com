@@ -7200,6 +7200,42 @@ export const CITATIONS = {
       { name: "Rolls", value: "strips per roll = floor(roll length / strip length); rolls = ceil(strips needed / strips per roll)", source: "first principles" },
     ],
   },
+  "ice-barrier-coverage": {
+    formula: "slope_factor = sqrt(pitch_rise^2 + 144) / 12; coverage_in = (overhang_in + 24) x slope_factor; courses = coverage_in <= roll_width_in ? 1 : 1 + ceil((coverage_in - roll_width_in) / (roll_width_in - side_lap_in)); roll_lf = courses x eave_length_ft; rolls = ceil(roll_lf / roll_len_ft).",
+    edition: "IRC R905.1.2 (the ice-barrier extent: from the eave to 24 in inside the exterior wall line) and ASTM D1970 (self-adhering polymer-modified membrane), by name; the coverage-and-roll relations are first-principles geometry.",
+    freeAccess: "The ice-barrier extent is stated in the published IRC R905.1.2; the slope-factor and roll relations are public roofing-takeoff arithmetic. The membrane standard is ASTM D1970.",
+    governance: GOVERNANCE.general,
+    editionNote: "IRC R905.1.2 sets the ice-barrier extent (from the lowest roof edge to 24 in inside the exterior wall line, measured up the slope); ASTM D1970 is the self-adhering polymer-modified membrane standard. The ice barrier is required only where the AHJ has adopted it (a history of ice forming at the eaves); the 24 in is measured to the inside of the exterior wall line; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not an installation detail.",
+    assumptions: [
+      { name: "Coverage extent", value: "coverage = (overhang + 24 in) measured up the slope: the slope factor sqrt(rise^2 + 144)/12 converts the horizontal run to the on-slope distance", source: "IRC R905.1.2" },
+      { name: "Courses", value: "the first roll covers one roll width; each later course nets (roll width - side lap), so courses = 1 + ceil((coverage - roll width) / (roll width - side lap)) once coverage exceeds one width", source: "first principles" },
+      { name: "Rolls", value: "roll_lf = courses x eave length; rolls = ceil(roll_lf / roll length); the roll dimensions are the product's stated size", source: "first principles" },
+    ],
+  },
+  "metal-roof-panels": {
+    formula: "panels = ceil(eave_width_ft x 12 / panel_net_in); total_panel_lf = panels x panel_length_ft; plane_area_ft2 = eave_width_ft x panel_length_ft; squares = plane_area_ft2 / 100; fasteners = ceil(squares x fasteners_per_sq).",
+    edition: "Metal Construction Association (MCA) and Metal Roofing Alliance (MRA) installation references and the manufacturer panel-coverage and fastening charts, by name; the panel-count and fastener relations are first-principles arithmetic.",
+    freeAccess: "The panel-count and fastener relations are public roofing-takeoff arithmetic; the net coverage width and the wind-zone fastening pattern are the manufacturer's published values.",
+    governance: GOVERNANCE.general,
+    editionNote: "The MCA and MRA installation references and the manufacturer panel-coverage and fastening charts govern. The net coverage width is the product's published value (not the overall sheet width); the fastener density is the manufacturer's pattern for the wind zone (a standing-seam system substitutes concealed clips for exposed screws); the panel length is the finished eave-to-ridge length on the slope including the overhang; the result is per roof plane (double it for a symmetric gable). A material takeoff, not a fastening or wind-uplift design.",
+    assumptions: [
+      { name: "Panel count", value: "panels = ceil(eave width in inches / net coverage width): the net coverage width, not the overall sheet width, sets the count", source: "MCA / MRA + manufacturer charts" },
+      { name: "Slope area", value: "panel length is the on-slope eave-to-ridge length, so eave width x panel length is the plane (slope) area; squares = area / 100", source: "first principles" },
+      { name: "Fasteners", value: "fasteners = ceil(squares x fasteners per square): the per-square count is the manufacturer's wind-zone pattern (clips replace exposed screws on standing seam)", source: "manufacturer fastening charts" },
+    ],
+  },
+  "ridge-cap-fasteners": {
+    formula: "cap_len_lf = ridge_lf + hip_lf; cap_bundles = ceil(cap_len_lf / cap_lf_per_bundle); field_nails = squares x shingles_per_sq x nails_per_shingle; cap_pieces = ceil(cap_len_lf x 12 / cap_exposure_in); cap_nails = cap_pieces x 2; total_nails = field_nails + cap_nails; nail_lbs = ceil(total_nails / nails_per_lb).",
+    edition: "IRC R905.2.6 (the asphalt-shingle fastening pattern: four nails standard, six in the high-wind / steep-slope rows) and the shingle manufacturer's application instructions, by name; the cap-bundle and nail relations are first-principles arithmetic.",
+    freeAccess: "The fastening pattern is stated in the published IRC R905.2.6; the cap-bundle and nail relations are public roofing-takeoff arithmetic. The cap coverage and nails-per-shingle are the product wrapper's values.",
+    governance: GOVERNANCE.general,
+    editionNote: "IRC R905.2.6 sets the asphalt-shingle fastening pattern (four nails standard, six in the high-wind / steep-slope rows); the shingle manufacturer's application instructions govern the product. The nails-per-shingle and the cap coverage per bundle come from the product's wrapper and the adopted wind zone (a pre-formed hip-and-ridge product covers far less per bundle than field-cut three-tab caps); the shingles-per-square is the product's count. A material takeoff, not a fastening approval.",
+    assumptions: [
+      { name: "Cap bundles", value: "cap length = ridge + hip; cap bundles = ceil(cap length / lf per bundle): a pre-formed hip/ridge product (~20 lf) covers far less per bundle than field-cut 3-tab (~35 lf)", source: "manufacturer wrapper" },
+      { name: "Field nails", value: "field nails = squares x shingles per square x nails per shingle: IRC R905.2.6 steps the pattern from four nails to six in the high-wind / steep rows", source: "IRC R905.2.6" },
+      { name: "Nails by the pound", value: "cap pieces = ceil(cap length x 12 / exposure), two nails each; nail lbs = ceil(total nails / nails per pound): roofers order nails by the pound, not the each", source: "first principles" },
+    ],
+  },
   "wood-emc": {
     formula: "EMC% = (1800/W)[Kh/(1-Kh) + (K1 K h + 2 K1 K2 K^2 h^2)/(1 + K1 K h + K1 K2 K^2 h^2)], h = RH/100, with W, K, K1, K2 temperature polynomials in degrees F (USDA FPL / Hailwood-Horrobin).",
     edition: "USDA Forest Products Laboratory Wood Handbook (Hailwood-Horrobin sorption equation) by name; the four temperature polynomials are bundled, no edition cycle.",

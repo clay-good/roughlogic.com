@@ -1497,12 +1497,14 @@ cross-check.
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
+| calc-construction.js | `computeIceBarrierCoverage` | `{ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, ro...` | _ | _ | _ |
 | calc-construction.js | `computeJoistDeflection` | `{ uniform_load_plf, span_ft, E_psi, I_in4 }` | _ | _ | _ |
 | calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCoursing` | `{ target_in = 0, unit_in = 7.625, joint_in = 0.375 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |
+| calc-construction.js | `computeMetalRoofPanels` | `{ eave_width_ft = 0, panel_length_ft = 0, panel_net_in = 36, fasteners_per_sq...` | _ | _ | _ |
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }` | _ | _ | _ |
@@ -1515,6 +1517,7 @@ cross-check.
 | calc-construction.js | `computeRebarLapSplice` | `{ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRebarSchedule` | `{ rows = [] } = {}` | _ | _ | _ |
 | calc-construction.js | `computeResidentialFraming` | `{ footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8, stud_oc_in = 16, j...` | _ | _ | _ |
+| calc-construction.js | `computeRidgeCapFasteners` | `{ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squa...` | _ | _ | _ |
 | calc-construction.js | `computeRoofPitch` | `{ rise = null, run = 12, mode = "rise_run" }` | _ | _ | _ |
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
@@ -2336,7 +2339,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 922.
+Row count: 925.
 
 <!-- END function-corpus-v14 -->
 
@@ -2705,7 +2708,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (91 tiles)
+### Group E Construction (94 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2750,12 +2753,14 @@ per spec-v14 §13.1 second paragraph.
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ice-barrier-coverage` | Eave Ice-Barrier Membrane Courses and Rolls | IRC R905.1.2 eave ice-barrier extent ...; spec-v215 section 2.1 pinned example (typical 4/12, 12 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `joist-deflection` | Joist Mid-Span Deflection | Project (first-principles); 50 plf / 12 ft span / E 1.6e6 psi / I 47.6 in^4 (typical ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-coursing` | Masonry Coursing and Course-Out Check | BIA Technical Notes / NCMA TEK; spec-v213 section 2.1 pinned example (CMU wall on module) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `material-quantity` | Material Quantity | Project (industry coverage rules); 1000 ft^2 / drywall 4x8 (32 ft^2 per sheet, 10% waste) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `metal-roof-panels` | Metal Roof Panels, Linear Feet, and Fasteners | MCA / MRA install references + manufa...; spec-v216 section 2.1 pinned example (exposed-fastener ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `min-bend-radius` | Minimum Plate Bend Radius | published forming-limit relation; 1/4 in A36 at 20% elongation -> 1.5 T, 0.375 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mortar-mix` | Mortar Mix and Yield | PCA; 600 modular bricks at 3/8 in joints, Type N -> 20 bags (6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2773,6 +2778,7 @@ per spec-v14 §13.1 second paragraph.
 | `rebar-schedule` | Rebar Bend and Weight Schedule | ACI Detailing Manual / CRSI (project ...; 12 #5 @ 20 ft + 2x 90 + 30 #4 @ 16 ft + 1 stirrup + 8 #6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `residential-framing` | Residential Framing Package | IRC framing practice + AWC NDS (proje...; 1500 ft^2 / 160 ft perim / 9 ft walls / 2x4 / 2x10 joists... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retaining-wall-block` | Segmental Retaining Wall Takeoff | Segmental retaining-wall maker guidan...; spec-v97 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ridge-cap-fasteners` | Hip / Ridge Cap Bundles and Roofing Nails by the Pound | IRC R905.2.6 asphalt-shingle fastenin...; spec-v217 section 2.1 pinned example (24-square, 40 ft ri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shielding-gas-runtime` | Shielding-Gas Cylinder Runtime and Cost | Torch / regulator maker's flow charts...; 35 cfh, 120 min arc-on, 251 ft3 cylinder, $60/cylinder ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -3201,6 +3207,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 679. Fixture-covered or reference-cadence: 679 / 679.
+Tile count: 682. Fixture-covered or reference-cadence: 682 / 682.
 
 <!-- END tile-index-v14 -->

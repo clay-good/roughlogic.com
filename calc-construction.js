@@ -4427,3 +4427,156 @@ const renderWallpaperRolls = _simpleRenderer({
   compute: computeWallpaperRolls,
 });
 CONSTRUCTION_RENDERERS["wallpaper-rolls"] = renderWallpaperRolls;
+
+// --- spec-v215..v217 roofing material-takeoff batch (Group E) ---
+// The install-side gaps the shingle-only roofing-squares left: the eave ice
+// barrier (v215), the metal-panel alternative (v216), and the ridge-cap and
+// fastener accessories (v217). Each is a material takeoff, not an installation
+// detail. Lazy-loaded, absent from the home first paint.
+
+// --- Utility: Eave Ice-Barrier Membrane Coverage and Rolls (spec-v215) ---
+
+// dims: in { eave_length_ft: L, overhang_in: L, pitch_rise: L, roll_width_in: L, roll_len_ft: L, side_lap_in: L } out: { slope_factor: dimensionless, coverage_in: L, courses: dimensionless, roll_lf: L, rolls: dimensionless }
+export function computeIceBarrierCoverage({ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, roll_len_ft = 66.7, side_lap_in = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(eave_length_ft > 0)) return { error: "Eave length must be positive." };
+  if (!(roll_width_in > 0)) return { error: "Roll width must be positive." };
+  if (!(roll_len_ft > 0)) return { error: "Roll length must be positive." };
+  if (overhang_in < 0) return { error: "Overhang cannot be negative." };
+  if (side_lap_in < 0) return { error: "Side lap cannot be negative." };
+  if (!(pitch_rise >= 0 && pitch_rise <= 24)) return { error: "Pitch rise must be 0-24 inches per 12." };
+  if (side_lap_in >= roll_width_in) return { error: "Side lap must be less than the roll width (no net coverage per course)." };
+  // IRC R905.1.2: ice barrier from the eave to 24 in inside the exterior wall
+  // line, measured up the slope -> multiply the run by the slope factor.
+  const slope_factor = Math.sqrt(pitch_rise * pitch_rise + 144) / 12;
+  const coverage_in = (overhang_in + 24) * slope_factor;
+  const effective_course = roll_width_in - side_lap_in; // net width each course beyond the first adds
+  const courses = coverage_in <= roll_width_in
+    ? 1
+    : 1 + Math.ceil((coverage_in - roll_width_in) / effective_course);
+  const roll_lf = courses * eave_length_ft;
+  const rolls = Math.ceil(roll_lf / roll_len_ft);
+  return { slope_factor, coverage_in, courses, roll_lf, rolls };
+}
+
+export const iceBarrierCoverageExample = {
+  inputs: { eave_length_ft: 40, overhang_in: 12, pitch_rise: 4, roll_width_in: 36, roll_len_ft: 66.7, side_lap_in: 6 },
+};
+
+const renderIceBarrierCoverage = _simpleRenderer({
+  citation: "Citation: IRC R905.1.2 (ice barrier from the eave to 24 in inside the exterior wall line, measured up the slope) and ASTM D1970 self-adhering membrane. slope_factor = sqrt(rise^2 + 144) / 12; coverage = (overhang + 24) * slope_factor; courses = coverage <= roll width ? 1 : 1 + ceil((coverage - roll width) / (roll width - side lap)); rolls = ceil(courses * eave / roll length). Required only where the AHJ has adopted it; valley and low-slope-transition coverage is a separate manual add. A material takeoff, not a flashing plan.",
+  example: iceBarrierCoverageExample.inputs,
+  fields: [
+    { key: "eave_length_ft", label: "Eave run to protect (ft, all eaves)", kind: "number" },
+    { key: "overhang_in", label: "Overhang from wall line (in)", kind: "number" },
+    { key: "pitch_rise", label: "Pitch rise (in / 12)", kind: "number" },
+    { key: "roll_width_in", label: "Roll width (in)", kind: "number", default: 36 },
+    { key: "roll_len_ft", label: "Roll length (ft)", kind: "number", default: 66.7 },
+    { key: "side_lap_in", label: "Course side lap (in)", kind: "number", default: 6 },
+  ],
+  outputs: [
+    { key: "sf", id: "ibc-out-sf", label: "Slope factor", value: (r) => _fmtC(r.slope_factor, 3) },
+    { key: "cov", id: "ibc-out-cov", label: "Coverage up slope (in)", value: (r) => _fmtC(r.coverage_in, 1) },
+    { key: "c", id: "ibc-out-c", label: "Courses", value: (r) => String(r.courses) },
+    { key: "lf", id: "ibc-out-lf", label: "Membrane (lf)", value: (r) => _fmtC(r.roll_lf, 0) },
+    { key: "r", id: "ibc-out-r", label: "Rolls", value: (r) => String(r.rolls) },
+  ],
+  compute: computeIceBarrierCoverage,
+});
+CONSTRUCTION_RENDERERS["ice-barrier-coverage"] = renderIceBarrierCoverage;
+
+// --- Utility: Metal Roof Panel and Fastener Takeoff (spec-v216) ---
+
+// dims: in { eave_width_ft: L, panel_length_ft: L, panel_net_in: L, fasteners_per_sq: dimensionless } out: { panels: dimensionless, total_panel_lf: L, plane_area_ft2: L^2, squares: dimensionless, fasteners: dimensionless }
+export function computeMetalRoofPanels({ eave_width_ft = 0, panel_length_ft = 0, panel_net_in = 36, fasteners_per_sq = 80 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(eave_width_ft > 0)) return { error: "Eave width must be positive." };
+  if (!(panel_length_ft > 0)) return { error: "Panel length must be positive." };
+  if (!(panel_net_in > 0)) return { error: "Panel net coverage width must be positive." };
+  if (!(fasteners_per_sq > 0)) return { error: "Fasteners per square must be positive." };
+  // Panel count turns on the product's net coverage width, not the sheet width.
+  const panels = Math.ceil((eave_width_ft * 12) / panel_net_in);
+  const total_panel_lf = panels * panel_length_ft;
+  // panel_length is the on-slope length, so width x length is slope (plane) area.
+  const plane_area_ft2 = eave_width_ft * panel_length_ft;
+  const squares = plane_area_ft2 / 100;
+  const fasteners = Math.ceil(squares * fasteners_per_sq);
+  return { panels, total_panel_lf, plane_area_ft2, squares, fasteners };
+}
+
+export const metalRoofPanelsExample = {
+  inputs: { eave_width_ft: 40, panel_length_ft: 18, panel_net_in: 36, fasteners_per_sq: 80 },
+};
+
+const renderMetalRoofPanels = _simpleRenderer({
+  citation: "Citation: Metal Construction Association (MCA) / Metal Roofing Alliance (MRA) install references and manufacturer panel-coverage and fastening charts. panels = ceil(eave width x 12 / net coverage in); plane area = eave width x panel length (on-slope); squares = area / 100; fasteners = ceil(squares x fasteners per square). The net coverage width is the published value (not the overall sheet width); fastener density is the manufacturer's wind-zone pattern (standing seam substitutes concealed clips for exposed screws); per roof plane (double for a symmetric gable). A material takeoff, not a wind-uplift design.",
+  example: metalRoofPanelsExample.inputs,
+  fields: [
+    { key: "eave_width_ft", label: "Eave width, one plane (ft)", kind: "number" },
+    { key: "panel_length_ft", label: "Panel length eave-to-ridge (ft)", kind: "number" },
+    { key: "panel_net_in", label: "Panel net coverage (in)", kind: "number", default: 36 },
+    { key: "fasteners_per_sq", label: "Fasteners / clips per square", kind: "number", default: 80 },
+  ],
+  outputs: [
+    { key: "p", id: "mrp-out-p", label: "Panels", value: (r) => String(r.panels) },
+    { key: "lf", id: "mrp-out-lf", label: "Total panel (lf)", value: (r) => _fmtC(r.total_panel_lf, 0) },
+    { key: "a", id: "mrp-out-a", label: "Plane area (ft^2)", value: (r) => _fmtC(r.plane_area_ft2, 0) },
+    { key: "sq", id: "mrp-out-sq", label: "Squares", value: (r) => _fmtC(r.squares, 1) },
+    { key: "f", id: "mrp-out-f", label: "Fasteners", value: (r) => String(r.fasteners) },
+  ],
+  compute: computeMetalRoofPanels,
+});
+CONSTRUCTION_RENDERERS["metal-roof-panels"] = renderMetalRoofPanels;
+
+// --- Utility: Ridge / Hip Cap and Roofing-Nail Takeoff (spec-v217) ---
+
+// dims: in { ridge_lf: L, hip_lf: L, cap_lf_per_bundle: L, cap_exposure_in: L, squares: dimensionless, shingles_per_sq: dimensionless, nails_per_shingle: dimensionless, nails_per_lb: dimensionless } out: { cap_len_lf: L, cap_bundles: dimensionless, field_nails: dimensionless, cap_pieces: dimensionless, cap_nails: dimensionless, total_nails: dimensionless, nail_lbs: dimensionless }
+export function computeRidgeCapFasteners({ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squares = 0, shingles_per_sq = 64, nails_per_shingle = 4, nails_per_lb = 150 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (ridge_lf < 0) return { error: "Ridge length cannot be negative." };
+  if (hip_lf < 0) return { error: "Hip length cannot be negative." };
+  if (!(cap_lf_per_bundle > 0)) return { error: "Cap coverage per bundle must be positive." };
+  if (!(cap_exposure_in > 0)) return { error: "Cap exposure must be positive." };
+  if (!(shingles_per_sq > 0)) return { error: "Shingles per square must be positive." };
+  if (!(nails_per_lb > 0)) return { error: "Nails per pound must be positive." };
+  if (!(nails_per_shingle >= 2 && nails_per_shingle <= 8)) return { error: "Nails per shingle must be 2-8." };
+  if (!(squares >= 0)) return { error: "Squares cannot be negative." };
+  const cap_len_lf = ridge_lf + hip_lf;
+  if (cap_len_lf === 0 && squares === 0) return { error: "Nothing to order: cap length and field squares are both zero." };
+  const cap_bundles = Math.ceil(cap_len_lf / cap_lf_per_bundle);
+  // IRC R905.2.6: four nails standard, six in the high-wind / steep rows.
+  const field_nails = squares * shingles_per_sq * nails_per_shingle;
+  const cap_pieces = Math.ceil((cap_len_lf * 12) / cap_exposure_in);
+  const cap_nails = cap_pieces * 2; // two nails per cap piece
+  const total_nails = field_nails + cap_nails;
+  const nail_lbs = Math.ceil(total_nails / nails_per_lb);
+  return { cap_len_lf, cap_bundles, field_nails, cap_pieces, cap_nails, total_nails, nail_lbs };
+}
+
+export const ridgeCapFastenersExample = {
+  inputs: { ridge_lf: 40, hip_lf: 0, cap_lf_per_bundle: 20, cap_exposure_in: 5, squares: 24, shingles_per_sq: 64, nails_per_shingle: 4, nails_per_lb: 150 },
+};
+
+const renderRidgeCapFasteners = _simpleRenderer({
+  citation: "Citation: IRC R905.2.6 (asphalt-shingle fastening: four nails standard, six in the high-wind / steep-slope rows) and the manufacturer's application instructions. cap length = ridge + hip; cap bundles = ceil(cap length / lf per bundle); field nails = squares x shingles per square x nails per shingle; cap pieces = ceil(cap length x 12 / exposure); cap nails = 2 per piece; nail lbs = ceil(total nails / nails per pound). The nails-per-shingle and cap coverage per bundle come from the product wrapper and the adopted wind zone (a pre-formed hip/ridge product covers far less than field-cut 3-tab). A material takeoff, not a nailing schedule.",
+  example: ridgeCapFastenersExample.inputs,
+  fields: [
+    { key: "ridge_lf", label: "Ridge length (ft)", kind: "number" },
+    { key: "hip_lf", label: "Hip length (ft)", kind: "number" },
+    { key: "cap_lf_per_bundle", label: "Cap coverage per bundle (lf)", kind: "number", default: 20 },
+    { key: "cap_exposure_in", label: "Cap exposure (in)", kind: "number", default: 5 },
+    { key: "squares", label: "Field squares", kind: "number" },
+    { key: "shingles_per_sq", label: "Field shingles per square", kind: "number", default: 64 },
+    { key: "nails_per_shingle", label: "Nails per shingle (4 / 6 high-wind)", kind: "number", default: 4 },
+    { key: "nails_per_lb", label: "Roofing nails per pound", kind: "number", default: 150 },
+  ],
+  outputs: [
+    { key: "cb", id: "rcf-out-cb", label: "Cap bundles", value: (r) => String(r.cap_bundles) },
+    { key: "fn", id: "rcf-out-fn", label: "Field nails", value: (r) => String(r.field_nails) },
+    { key: "cn", id: "rcf-out-cn", label: "Cap nails", value: (r) => String(r.cap_nails) },
+    { key: "tn", id: "rcf-out-tn", label: "Total nails", value: (r) => String(r.total_nails) },
+    { key: "lb", id: "rcf-out-lb", label: "Nail weight (lb)", value: (r) => String(r.nail_lbs) },
+  ],
+  compute: computeRidgeCapFasteners,
+});
+CONSTRUCTION_RENDERERS["ridge-cap-fasteners"] = renderRidgeCapFasteners;

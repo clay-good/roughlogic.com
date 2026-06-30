@@ -337,6 +337,8 @@ const TOOL_MODULES = (() => {
     "guard-handrail-check",
     // spec-v212..v214 masonry grout / coursing and wallcovering takeoffs.
     "cmu-grout-volume", "masonry-coursing", "wallpaper-rolls",
+    // spec-v215..v217 roofing material-takeoff batch.
+    "ice-barrier-coverage", "metal-roof-panels", "ridge-cap-fasteners",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.
