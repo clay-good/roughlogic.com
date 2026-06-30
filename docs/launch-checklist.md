@@ -153,7 +153,7 @@ have passed against the deployed environment.
   - Group I extensions (utilities 269-271, 3 platform features: CSV export, print-table CSS, glossary tooltip).
 - **Tests**: 2,377 -> 2,695 unit tests passing. New v5-specific suites:
   - [test/unit/calc-accounting.test.js](../test/unit/calc-accounting.test.js) (67 tests)
-  - [test/unit/calc-legal.test.js](../test/unit/calc-legal.test.js) (50 tests)
+  - `test/unit/calc-legal.test.js` (50 tests; suite retired with the Legal group in spec-v107)
   - [test/unit/calc-lab.test.js](../test/unit/calc-lab.test.js) (44 tests)
   - [test/unit/calc-references-v5.test.js](../test/unit/calc-references-v5.test.js) (22 tests)
   - [test/unit/v5-platform.test.js](../test/unit/v5-platform.test.js) (26 tests)
@@ -273,7 +273,7 @@ Spec-v12 broadens the catalog across five new groups (U Veterinary, V EMS / Pre-
 
 | Gate | Status | Notes |
 | --- | --- | --- |
-| 1. Every Phase A through Y tile passes its unit tests | pass | 3,435 unit tests across 102 suites; `npm test` clean. New Group U / V / W / X / Y suites under [test/unit/calc-vet.test.js](../test/unit/calc-vet.test.js), [calc-ems.test.js](../test/unit/calc-ems.test.js), [calc-aviation.test.js](../test/unit/calc-aviation.test.js), [calc-realestate.test.js](../test/unit/calc-realestate.test.js), [calc-edu.test.js](../test/unit/calc-edu.test.js). |
+| 1. Every Phase A through Y tile passes its unit tests | pass | 3,435 unit tests across 102 suites; `npm test` clean. New Group U / V / W / X / Y suites under `test/unit/calc-vet.test.js`, `calc-ems.test.js`, `calc-aviation.test.js` (Groups U / V / W retired in spec-v107), [test/unit/calc-realestate.test.js](../test/unit/calc-realestate.test.js), and [test/unit/calc-edu.test.js](../test/unit/calc-edu.test.js). |
 | 2. Every Phase A through Y tile renders without console error | gate | Verified locally in Chrome 124 + Mobile Safari 17 against the home view and each new-group tile. Cross-browser spot-check against the deployed environment remains the production gate. |
 | 3. axe-core: zero violations across default / light / dark / high-contrast on every new tile | pass | The spec-v10 §E.3 parameterized loop iterates over the live `TOOLS` array; new v12 tile_ids are picked up automatically. |
 | 4. Mobile-responsive sweep at 320 / 375 / 414 / 760 px on every new tile | pass | Per the Phase F.2 checklist in [docs/mobile-responsive.md](mobile-responsive.md). Groups U / V / W / X / Y signed off 2026-05-16; the F.1 reference-block fix from commit f57ca6e governs all new tiles. |

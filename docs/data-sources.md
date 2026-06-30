@@ -493,13 +493,14 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shards: `macrs-tables.json` (per-class-life percentages), `section-179-limits.json` (per-year cap / phase-out / bonus pct), `se-tax-parameters.json` (per-year SS wage base + Additional Medicare threshold by filing status), `estimated-tax-due-dates.json` (per-year four ISO dates), `standard-mileage-rates.json` (per-year business / medical / charitable rates), `inventory-benchmarks.json` (per-industry turnover median), `pub-15-t-tables.json` (single-filer annualized brackets).
 - Privacy: No runtime fetch. All shards bundled at build time.
 
-### data/legal/*.json (v5, utilities 246-254)
+### data/legal/*.json (utility 266)
 
-- Source: Per-state code sections (judgment-interest statute, statutes of limitations, landlord-tenant code, minimum-wage statute). Federal Rules of Civil Procedure 6(a) and 5 USC 6103 for federal court holidays. Per-state department of revenue guidance for post-Wayfair sales-tax-nexus thresholds. Each entry cites the section number only; no statute text reproduced.
+- Post-v107 scope. Spec-v107 retired the Legal group (S) under the trades-only charter, and the follow-up data cut removed the six Legal-only shards (judgment-interest, court-holidays, state-minimum-wage, statute-of-limitations, landlord-tenant-notice, small-claims). Only the post-Wayfair sales-tax shard survives, because its tile moved to the reference group (Group H) rather than being cut: `sales-tax-nexus` in `calc-references.js`. The folder is kept (rather than renamed) so existing shard hashes and the `data/integrity.json` manifest entry stay stable.
+- Source: Per-state department of revenue guidance for post-Wayfair economic-nexus thresholds (sales and transaction counts). Each entry links the state's published guidance by URL and stamps a `verified_on` date; no statute text reproduced.
 - License: U.S. and state government publications, public domain. Original plain-English summaries authored by the project (MIT licensed).
-- Cadence: Quarterly recheck against the state source page (oldest `verified_on` first). Court-holidays roll forward annually each January.
-- Shards: `judgment-interest-rates.json`, `court-holidays.json`, `state-minimum-wage.json`, `sales-tax-nexus.json`, `statute-of-limitations.json`, `landlord-tenant-notice.json`, `small-claims.json`. Eight shards in total; all 50 states + DC covered on the per-state shards. The build pipeline (`scripts/build-data.mjs`) reads the canonical inlined `const` exports in [calc-legal.js](../calc-legal.js) and writes the shards as derivative artifacts (the inline exports stay the source of truth so the renderer can run synchronously without a network hop on first calculation).
-- Privacy: No runtime fetch. Group S tiles carry the legal-information variant inline notice.
+- Cadence: Quarterly recheck against the state source page (oldest `verified_on` first).
+- Shards: `sales-tax-nexus.json` (the sole surviving shard; all 50 states + DC). The build pipeline (`scripts/build-data.mjs`) writes it as a derivative artifact from the in-tree constant in [calc-references.js](../calc-references.js), which stays the source of truth so the renderer runs synchronously without a network hop on first calculation.
+- Privacy: No runtime fetch. The reference tile carries the standard inline limitation notice (verify the current threshold with the state department of revenue before relying on it for filing).
 
 ### data/lab/*.json (v5, utilities 255-264)
 
@@ -548,24 +549,24 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Shard layout: `{ source, edition, fetched, verified_on, free_access, fiscal_year, areas: [{ name, state, fips, fmr_0br, fmr_1br, fmr_2br, fmr_3br, fmr_4br }, ...], unknown_area_message }`. Bundled snapshot covers ~19 representative HUD Metro FMR Areas / MSAs; canonical per-county lookup is at huduser.gov. The 40th-percentile rent of recent-mover units in the HUD-defined FMR Area, used as the program payment standard for the Housing Choice Voucher (Section 8) program and several HUD subsidies.
 - Privacy: No runtime fetch of upstream data. The bundle is same-origin and loads once per session on first open of the hud-fmr tile.
 
-## v12 pure-math groups (Veterinary, EMS, Aviation, Educators)
+## v12 pure-math groups (Educators)
 
 Spec-v12 §5 / §6 / §7 / §9 added Groups U / V / W / Y as pure-math /
-reference tiles. These groups deliberately ship **no `data/<folder>/`
-shards**; every bundled table (ASPCA APCC thresholds, Lund-Browder
-age bands, AAHA life-stage activity factors, ICAO Standard Atmosphere
-coefficients, AHA PALS vital-sign ranges, IUPAC atomic data, the
-Kincaid / SMOG / Coleman-Liau readability constants, the Abramowitz-
-Stegun standard-normal CDF coefficients) lives inline in the renderer
-module ([calc-vet.js](../calc-vet.js), [calc-ems.js](../calc-ems.js),
-[calc-aviation.js](../calc-aviation.js), [calc-edu.js](../calc-edu.js)).
-This keeps the integrity-check surface limited to the existing
-sharded folders (`physical-constants`, `historical`, `accounting`,
-`legal`, `lab`, `realestate`, etc.) while still letting the v12
-pure-math tiles cite a primary public-domain source per the v6 §3
-discipline. Group X (Real Estate) is the one v12 group that ships
-shards (the FHFA / HUD-FMR rows above) because the county / MSA
-lookup is keyed data, not a formula.
+reference tiles. Spec-v107 later retired three of them under the
+trades-only charter -- U (Veterinary), V (EMS), and W (Aviation), along
+with their `calc-vet.js` / `calc-ems.js` / `calc-aviation.js` modules --
+so Group Y (Educators) is the one v12 pure-math group still live. These
+groups deliberately ship **no `data/<folder>/` shards**; every bundled
+table the surviving Educators tiles use (IUPAC atomic data, the Kincaid /
+SMOG / Coleman-Liau readability constants, the Abramowitz-Stegun
+standard-normal CDF coefficients) lives inline in the renderer module
+([calc-edu.js](../calc-edu.js)). This keeps the integrity-check surface
+limited to the existing sharded folders (`physical-constants`,
+`historical`, `accounting`, `legal`, `lab`, `realestate`, etc.) while
+still letting the pure-math tiles cite a primary public-domain source
+per the v6 §3 discipline. Group X (Real Estate) is the one v12 group
+that ships shards (the FHFA / HUD-FMR rows above) because the county /
+MSA lookup is keyed data, not a formula.
 
 ## Manifest format
 

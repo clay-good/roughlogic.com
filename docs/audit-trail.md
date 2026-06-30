@@ -2009,18 +2009,24 @@ the spec-v12 §13.1 clinical-utility override scope, and the
 override renewal clause in [profession-overrides.md](profession-overrides.md)
 gates on these reviews landing.
 
+> **Superseded by spec-v107 (2026-06-21).** Both groups below were
+> retired under the trades-only charter -- their modules (`calc-vet.js`,
+> `calc-ems.js`) and tiles no longer ship -- so these solicitations are
+> closed and no longer gate any release. The historical text is kept for
+> the audit record.
+
 - **Group U (Veterinary).** Sought reviewer: a working DVM or RVT
   with current Plumb's / AAHA / AAFP familiarity. Scope: the
-  eighteen U.* tiles in [../calc-vet.js](../calc-vet.js), the
+  eighteen U.* tiles in `calc-vet.js`, the
   professional-governs limitation banners, and the worked-example
   fixtures (RER, fluid maintenance, toxicity thresholds in
   particular).
 - **Group V (EMS / Pre-hospital).** Sought reviewer: a current
   paramedic or EMS medical director with PALS / ATLS protocol
   familiarity. Scope: the twenty V.* tiles in
-  [../calc-ems.js](../calc-ems.js), the receiving-facility
-  governance verbiage, and the worked-example fixtures (Parkland,
-  GCS, NIHSS, START / JumpSTART in particular).
+  `calc-ems.js`, the receiving-facility
+  governance verbiage, and the worked-example
+  fixtures (Parkland, GCS, NIHSS, START / JumpSTART in particular).
 
 Append the review under a new dated heading per the template
 below when the signoff arrives.
@@ -2100,11 +2106,11 @@ until every non-exempt row reaches **signed-off**.
 | Field | P | PE or equivalent trade certification | open | — | — | 9 tiles in [../calc-field.js](../calc-field.js). |
 | Historical | Q | (exempt per §12.1) | exempt | — | — | 1 reference tile; v6 source-stamp recheck cadence applies. |
 | Accounting | R | CPA | open | — | — | 16 tiles in [../calc-accounting.js](../calc-accounting.js); IRS + AICPA primary sources. |
-| Legal | S | JD | open | — | — | 12 tiles in [../calc-legal.js](../calc-legal.js); FRCP + state-keyed shards primary sources. |
+| Legal | S | JD | retired (spec-v107) | — | — | 12 tiles in `calc-legal.js`, retired in spec-v107 under the trades-only charter; the post-Wayfair sales-tax-nexus tile survived by moving to Group H (`calc-references.js`). |
 | Lab | T | PhD / MS in the relevant discipline | open | — | — | 14 tiles in [../calc-lab.js](../calc-lab.js); CRC Handbook + Numerical Recipes primary sources. |
-| Veterinary | U | DVM or RVT / LVT (v12 §13.1 override scope) | open | — | — | 25 tiles in [../calc-vet.js](../calc-vet.js); Plumb's + AAHA + AAFP primary sources. v12 solicitation seed (see above). |
-| EMS | V | RN, MD, or paramedic with current protocol familiarity (v12 §13.1 override scope) | open | — | — | 27 tiles in [../calc-ems.js](../calc-ems.js); AHA / ACLS + NIH + ACEP primary sources. v12 solicitation seed (see above). |
-| Aviation | W | ATP or CFI | open | — | — | 23 tiles in [../calc-aviation.js](../calc-aviation.js); FAA H-8083 + 14 CFR primary sources. |
+| Veterinary | U | DVM or RVT / LVT (v12 §13.1 override scope) | retired (spec-v107) | — | — | 25 tiles in `calc-vet.js`, retired in spec-v107 under the trades-only charter (failure mode is animal harm; out of charter). |
+| EMS | V | RN, MD, or paramedic with current protocol familiarity (v12 §13.1 override scope) | retired (spec-v107) | — | — | 27 tiles in `calc-ems.js`, retired in spec-v107 under the trades-only charter (safety-of-life; out of charter). |
+| Aviation | W | ATP or CFI | retired (spec-v107) | — | — | 23 tiles in `calc-aviation.js`, retired in spec-v107 under the trades-only charter (out of charter). |
 | Real Estate | X | Licensed broker, appraiser, or lender | open | — | — | 24 tiles in [../calc-realestate.js](../calc-realestate.js); FNMA / FHFA / HUD / CFPB primary sources. |
 | Educators | Y | Working classroom teacher or curriculum specialist | open | — | — | 22 tiles in [../calc-edu.js](../calc-edu.js); OpenIntro Stats + NIST + IUPAC primary sources. |
 

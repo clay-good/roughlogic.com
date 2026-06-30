@@ -176,11 +176,13 @@ the same `v=1` encoding rules above. Specifically:
 - No new timer-state grammar. The lightning-countdown
   `lc-timer` remains the sole tile that uses the `<state>:<value>`
   shape.
-- Every new v12 select input uses project-controlled stable
-  identifiers (e.g. species values `dog` / `cat` / `horse`
-  in [../calc-vet.js](../calc-vet.js), runway-condition codes in
-  [../calc-aviation.js](../calc-aviation.js)) per the existing
-  90-day deprecation rule.
+- Every select input uses project-controlled stable
+  identifiers (e.g. the conductor-material values `copper` /
+  `aluminum` on the `wa-mat` select in
+  [../calc-electrical.js](../calc-electrical.js)) per the existing
+  90-day deprecation rule. (The v12 Veterinary / EMS / Aviation
+  example groups this note originally cited were retired in
+  spec-v107; the grammar rule is unchanged.)
 
 The hash-schema regression suite in
 [../test/unit/hash-state-schema.test.js](../test/unit/hash-state-schema.test.js)
