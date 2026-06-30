@@ -47,6 +47,49 @@ Calculator state is encoded in the URL hash, so you can bookmark or share a calc
 
 ---
 
+## Use it from an AI agent (MCP server)
+
+The whole catalog is also available to AI agents through a local [Model Context Protocol](https://modelcontextprotocol.io) server in [`mcp/`](mcp/). It is zero-dependency and runs entirely on your machine over stdio: no hosting, no network, no install step. An agent (Claude Code, Claude Desktop, Cursor, and the like) can search the catalog, read a calculator's inputs and worked example, and run it with real numbers.
+
+Rather than register all 679 calculators as separate tools (which would swamp a client's tool list), the server exposes three meta-tools over the catalog:
+
+| Tool | Purpose |
+| --- | --- |
+| `search_calculators` | Find calculators by keyword and/or trade. No arguments returns a trade overview with counts. |
+| `describe_calculator` | Input fields (with defaults), a publisher-verified worked example, and the cited source for one calculator. |
+| `run_calculator` | Evaluate a calculator with your own inputs. With no inputs, the worked example is run. |
+
+The server reads the same data the site does (`tools-data.js`, the tile-to-compute wiring in `test/fixtures/compute-map.js`, and the verified examples in `test/fixtures/worked-examples.json`) and calls the real `calc-*.js` compute functions, so the agent surface can never drift from the site.
+
+Run it directly:
+
+```sh
+node mcp/server.mjs
+```
+
+Wire it into a client by pointing at the script with an absolute path. For Claude Code:
+
+```sh
+claude mcp add roughlogic -- node /absolute/path/to/roughlogic.com/mcp/server.mjs
+```
+
+For a config-file client (Claude Desktop, Cursor):
+
+```json
+{
+  "mcpServers": {
+    "roughlogic": {
+      "command": "node",
+      "args": ["/absolute/path/to/roughlogic.com/mcp/server.mjs"]
+    }
+  }
+}
+```
+
+Because it is all local, anyone can use it by cloning this repo and pointing their MCP client at `mcp/server.mjs`. See [`mcp/README.md`](mcp/README.md) for client setup, the tool reference, and a smoke test.
+
+---
+
 ## How it works
 
 The home view is a single centered hero: an elevator-pitch headline, a one-paragraph description, one search bar, and a static "browse by trade" index of the 21 group hubs. The search bar is a combobox: free text filters the catalog by tool name, description, or industry-term alias, and a results dropdown shows matches with their category; focusing the empty field lists every tool. Selecting a result routes to that calculator.
