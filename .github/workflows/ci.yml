@@ -94,8 +94,8 @@ jobs:
   # Full integration suite: per-tile axe-core loop + smoke + layout +
   # theme + viewer + print + CSV + perf (spec-v10 §E.1 / §E.2 / §E.3 /
   # §H.3). Catches regressions in the search auto-route, theme persistence,
-  # mobile header layout, Group H reference views, the bundle round-trip,
-  # and the static changelog viewer. Runs in parallel with `accessibility`.
+  # mobile header layout, Group H reference views, and the bundle
+  # round-trip. Runs in parallel with `accessibility`.
   integration:
     runs-on: ubuntu-latest
     needs: test
@@ -117,7 +117,7 @@ jobs:
       # spec-v18 §6: prerendered-shell 320px horizontal-scroll gate. Needs a
       # built dist/ and a headless browser; the integration job already has
       # Playwright + chromium, so build dist/ and run the audit here. Fails
-      # if any /tools/, /groups/, changelog, or home shell scrolls sideways
+      # if any /tools/, /groups/, or home shell scrolls sideways
       # on a 320px phone viewport.
       - name: Build site
         run: npm run build

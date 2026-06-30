@@ -237,7 +237,7 @@ The split is deliberate. `expected-hashes.json` covers **every** shard (117 file
 roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
-  app.js                SPA entry: hash router, renderers, lazy loaders (~72 KB raw / ~23 KB gz)
+  app.js                SPA entry: hash router, renderers, lazy loaders (~73 KB raw / ~23 KB gz)
   tools-data.js         catalog registry (TOOLS, 682 tiles); lazy-loaded (~201 KB raw / ~67 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       50 per-group calculator modules (electrical, hvac, ...,
@@ -292,9 +292,9 @@ roughlogic.com/
   sw.js                 service worker (offline + stale-while-revalidate)
   manual-j-worker.js    Web Worker for Manual J + duct sizing
   data/                 sharded, hashed reference JSON (per group)
-  specs/                spec.md .. spec-v214.md (inheriting build specs)
+  specs/                spec.md .. spec-v217.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
-  scripts/              build + 26 lint/audit gates + data pipeline
+  scripts/              build + 27 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
   dist/                 build output: prerendered shells + sitemap (generated)
 ```
@@ -561,14 +561,14 @@ The site has no command-line interface of its own. The repository ships these np
 |---|---|
 | `npm run dev` | Start a local development server. |
 | `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 682 tile + 21 group shells, regenerates `sitemap.xml`). |
-| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,957 tests). |
+| `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (4,975 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
-| `npm run lint` | Run the 26-gate lint chain (below). |
+| `npm run lint` | Run the 27-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
-| `npm run check:shell-mobile` | Audit every prerendered shell (682 tools + 21 groups + changelog + home) for zero horizontal scroll: all at the 320px floor, plus a representative sample at 568x320 landscape and 200% text zoom (needs a built `dist/` + Playwright; skips cleanly otherwise). |
+| `npm run check:shell-mobile` | Audit every prerendered shell (682 tools + 21 groups + home) for zero horizontal scroll: all at the 320px floor, plus a representative sample at 568x320 landscape and 200% text zoom (needs a built `dist/` + Playwright; skips cleanly otherwise). |
 | `npm run clean` | Remove `dist/`. |
 
 ### The lint chain
@@ -618,9 +618,9 @@ flowchart LR
     style TEST fill:#1a3a5a,color:#fff
 ```
 
-The `integration` job also builds `dist/` and runs two shell gates. **`check-shells`** (the spec-v13 content gate, wired into CI as of spec-v45) asserts every prerendered shell carries a within-cap title and meta description, a canonical link, Open Graph + Twitter blocks, a JSON-LD block whose every `@type` is on the closed allowlist, the spec-v45 formula/source citation block (tile shells), and a within-budget gzip size (6 KB tile / 12 KB group). **`check-shell-mobile`** (spec-v18 §6): every prerendered `/tools/`, `/groups/`, and `changelog` shell is loaded at a 320 px viewport and fails the build if `scrollWidth` exceeds `clientWidth` (a page-level horizontal scroll on a phone), with a representative sample re-checked at landscape and 200% text zoom. The Playwright suite additionally runs the spec-v18 §5.4 **render-leak gate** (`render-no-nan.test.js`): every tile is loaded at the real-Chromium DOM across its finite-result, empty-first-render, degenerate-after-interaction (each input blanked, each select cycled), and checkbox/radio toggle states, and fails if the user-visible output ever contains a raw `NaN`, `Infinity`, `$NaN`, or `undefined`; and the **`responsive-stress.test.js`** SPA gate re-checks the interactive views at 200% text zoom and across landscape / tablet widths.
+The `integration` job also builds `dist/` and runs two shell gates. **`check-shells`** (the spec-v13 content gate, wired into CI as of spec-v45) asserts every prerendered shell carries a within-cap title and meta description, a canonical link, Open Graph + Twitter blocks, a JSON-LD block whose every `@type` is on the closed allowlist, the spec-v45 formula/source citation block (tile shells), and a within-budget gzip size (6 KB tile / 12 KB group). **`check-shell-mobile`** (spec-v18 §6): every prerendered `/tools/` and `/groups/` shell plus the SPA home shell is loaded at a 320 px viewport and fails the build if `scrollWidth` exceeds `clientWidth` (a page-level horizontal scroll on a phone), with a representative sample re-checked at landscape and 200% text zoom. The Playwright suite additionally runs the spec-v18 §5.4 **render-leak gate** (`render-no-nan.test.js`): every tile is loaded at the real-Chromium DOM across its finite-result, empty-first-render, degenerate-after-interaction (each input blanked, each select cycled), and checkbox/radio toggle states, and fails if the user-visible output ever contains a raw `NaN`, `Infinity`, `$NaN`, or `undefined`; and the **`responsive-stress.test.js`** SPA gate re-checks the interactive views at 200% text zoom and across landscape / tablet widths.
 
-The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~70 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
+The Lighthouse budgets are tiered: the prerendered `/tools/` and `/groups/` shells carry the strict budget (performance >= 0.95, FCP <= 1 s, LCP <= 1.5 s) because they ship only `styles.css`; the SPA home view, which loads the ~73 KB `app.js` (the catalog registry is deferred to `tools-data.js`, lazy-loaded on first interaction), is gated on the stable paint metrics (FCP, LCP, CLS) and the accessibility / best-practices / SEO scores rather than the high-variance total-blocking-time the shared 2-core runner produces under CPU throttle.
 
 ---
 
@@ -669,9 +669,9 @@ flowchart TB
     style TBL fill:#1f1f1f,color:#fff
 ```
 
-**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px. Two layers run the assertion: the `a11y.test.js` block spot-checks the highest-risk routes (home, both wide-table tiles `loan-amortization` / `macrs-depreciation`, the longest reference list `color-codes`, and the longest-output finance tile `rent-vs-buy`), and the `responsive-stress.test.js` "every live tile view" case sweeps the **full catalog** -- all 682 live tile views, each with its example output populated -- so the guarantee holds for every tile, not just the representative sample. The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`, `changelog.html`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **705** routes (682 tools + 21 groups + changelog + home) at 320 px (last run: 705/705 clean).
+**Verified viewports.** The sweep targets four widths -- 320 px (iPhone SE 1st gen, the floor), 375 px (modern SE / 12 mini), 414 px (Plus), and 760 px (the layout breakpoint) -- plus the 48 px touch-target floor, `inputmode` on every numeric field so the soft keyboard surfaces the right pad, and `input`-event compute (not `change`) so voice dictation updates the result without a trailing keystroke. A Playwright guard asserts `documentElement.scrollWidth <= clientWidth + 1` at 320 px. Two layers run the assertion: the `a11y.test.js` block spot-checks the highest-risk routes (home, both wide-table tiles `loan-amortization` / `macrs-depreciation`, the longest reference list `color-codes`, and the longest-output finance tile `rent-vs-buy`), and the `responsive-stress.test.js` "every live tile view" case sweeps the **full catalog** -- all 682 live tile views, each with its example output populated -- so the guarantee holds for every tile, not just the representative sample. The interactive SPA is one surface; the prerendered static shells (`/tools/<id>/`, `/groups/<slug>/`) plus the SPA home are another, and `npm run check:shell-mobile` audits all **704** routes (682 tools + 21 groups + home) at 320 px (last run: 704/704 clean).
 
-Because a single-viewport sweep covers only one of the three responsive axes, two standing gates extend the no-horizontal-scroll guarantee to the other two -- **WCAG 1.4.4 resize text** (200% text-only zoom, emulated by doubling the root font-size so every rem-based size grows the way Firefox text-zoom does) and **landscape phones + tablet portraits** (568x320, 667x375, 768, 834, and both sides of the 760 px breakpoint) -- each over the surface it can actually reach. The **`responsive-stress.test.js`** integration test drives the interactive **SPA** (the integration server serves the repo root, so it asserts a 2xx before measuring and never touches the prerendered shells, which live only in `dist/`). It carries three checks: the full-catalog 320 px portrait sweep (all 682 live tile views), the 200% text-zoom sweep over a diverse route sample, and the landscape/tablet-width sweep. The **`check:shell-mobile`** auditor serves `dist/` and covers the **prerendered shells** on the same three axes (every shell at the 320 px floor; a representative tool sample plus every group hub, the changelog, and the home shell at landscape + text-zoom). (WCAG 1.4.10 reflow at 400% page zoom is already covered: it resolves to the 320 px viewport both gates test.) The whole sweep runs on **two browser engines**: Chromium drives the full integration suite, and **WebKit** (the iOS Safari engine, where flexbox `min-width` and sub-pixel rounding diverge from Chromium and where roughly half of US mobile traffic lives) re-runs `responsive-stress` via a dedicated `webkit-responsive` Playwright project, so the no-horizontal-scroll guarantee is CI-enforced on the engine behind every iOS browser, not just Chromium. See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
+Because a single-viewport sweep covers only one of the three responsive axes, two standing gates extend the no-horizontal-scroll guarantee to the other two -- **WCAG 1.4.4 resize text** (200% text-only zoom, emulated by doubling the root font-size so every rem-based size grows the way Firefox text-zoom does) and **landscape phones + tablet portraits** (568x320, 667x375, 768, 834, and both sides of the 760 px breakpoint) -- each over the surface it can actually reach. The **`responsive-stress.test.js`** integration test drives the interactive **SPA** (the integration server serves the repo root, so it asserts a 2xx before measuring and never touches the prerendered shells, which live only in `dist/`). It carries three checks: the full-catalog 320 px portrait sweep (all 682 live tile views), the 200% text-zoom sweep over a diverse route sample, and the landscape/tablet-width sweep. The **`check:shell-mobile`** auditor serves `dist/` and covers the **prerendered shells** on the same three axes (every shell at the 320 px floor; a representative tool sample plus every group hub and the home shell at landscape + text-zoom). (WCAG 1.4.10 reflow at 400% page zoom is already covered: it resolves to the 320 px viewport both gates test.) The whole sweep runs on **two browser engines**: Chromium drives the full integration suite, and **WebKit** (the iOS Safari engine, where flexbox `min-width` and sub-pixel rounding diverge from Chromium and where roughly half of US mobile traffic lives) re-runs `responsive-stress` via a dedicated `webkit-responsive` Playwright project, so the no-horizontal-scroll guarantee is CI-enforced on the engine behind every iOS browser, not just Chromium. See [docs/accessibility.md](docs/accessibility.md) and [docs/mobile-responsive.md](docs/mobile-responsive.md).
 
 ---
 
@@ -695,7 +695,7 @@ The site is honest about what it is and is not.
 ## Stability commitments
 
 - No A/B testing, ever. No user-visible feature flags. No tracking, no email capture, no notifications.
-- Public changelog at [CHANGELOG.md](CHANGELOG.md), also rendered at `/changelog.html`.
+- Public changelog at [CHANGELOG.md](CHANGELOG.md) (developer-facing in-repo; the public `/changelog.html` page was retired in the search-first home refactor).
 - A 90-day deprecation notice for any tool removed or any formula changed.
 - Semantic versioning.
 

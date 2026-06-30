@@ -193,7 +193,7 @@ needed.
 ## Why versioning the hash, not the URL path
 
 The site is a single-page static bundle with no server-side
-routing. The path stays at `/` (or `/changelog.html`) for every
+routing. The path stays at `/` for every
 tile; the hash carries the rest. Adding a path-level version
 (`/v1/#...`) would require a redirect layer the site doesn't have.
 The hash version is the simplest forward-compatible pin.

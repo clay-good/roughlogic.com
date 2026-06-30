@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: retire-changelog drift sweep + resync ungated figures, 2026-06-30
+
+A documentation- and comment-only accuracy pass; no tile, code-path, or version change. Two runtime sweeps confirmed the catalog is clean first: `render-no-nan` (562/562 tiles, zero NaN/Infinity/undefined leak) and `responsive-stress` (66 cases across Chromium + WebKit, full 682-tile catalog at the 320px floor plus the 200% text-zoom and landscape/tablet axes, zero page-level horizontal scroll). No bug was found.
+
+The substantive fix is a **retired-changelog drift class**: the public `/changelog.html` page was removed in the search-first home refactor (commit `f1eae3b`), but seven surfaces still described it as a live shell/route. Corrected to match the build (the prerendered surface is **704** routes = 682 tool shells + 21 group shells + the SPA home, no changelog) in: `README.md` (the `check:shell-mobile` table row, the CI shell-gate description, the "verified viewports" route count `705 -> 704`, the responsive-axes paragraph, and the documentation-section line), `docs/architecture.md` (the sitemap enumeration), `docs/seo.md` (the sitemap bullet, changefreq, and priority), `docs/hash-state.md` (the path-routing note), `scripts/check-shell-mobile.mjs` (the header comment), and `.github/workflows/ci.yml` (two job comments). The auditor code already enumerated the correct 704 routes; only the prose lagged.
+
+Also resynced the ungated figures the count gates do not anchor: the repo-map spec range (`spec-v214 -> spec-v217`), the `app.js` raw size (`~72 KB -> ~73 KB`, now 74,415 bytes, in both the repo map and the Lighthouse note), the lint-chain gate count (`26 -> 27`, the `check-dead-inputs` gate added in 0.83.2), and the `npm test` unit-test count in the Building-and-testing table (`4,957 -> 4,975`). All gates stay green: lint (27 checks), 4,975 unit tests, build, data:verify (117 hashes), `check-shells`, `check-dist`, and `check-shell-mobile` (798 checks across 704 shells, zero horizontal scroll).
+
 ### feat(roofing): land spec-v215..v217 -- 3 roofing material-takeoff tiles; 679 -> 682 tiles, 0.86.0, 2026-06-30
 
 Three install-side roofing tiles (PROPOSED 2026-06-30, landed same day) that close the gaps the shingle-only `roofing-squares` left: the eave ice barrier, the metal-panel alternative, and the ridge-cap-and-fastener accessories. Catalog **679 -> 682**, package **0.85.0 -> 0.86.0** (a minor), with **no new module, group, or dependency** (all three land in the existing Group E / `calc-construction.js`).

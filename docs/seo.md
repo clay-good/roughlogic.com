@@ -135,14 +135,14 @@ reference, no duplicates, cap 6 per §9.1).
 the shell builder. It enumerates:
 
 - The home URL (`/`).
-- The changelog (`/changelog.html`).
 - One URL per group shell.
 - One URL per tile shell.
 
 Each URL carries `<lastmod>` from `dist/build-info.json`,
-`<changefreq>` of `weekly` for home and changelog and `monthly`
-for groups and tiles, and `<priority>` of 1.0 home / 0.5 changelog /
-0.8 group / 0.7 tile.
+`<changefreq>` of `weekly` for home and `monthly`
+for groups and tiles, and `<priority>` of 1.0 home /
+0.8 group / 0.7 tile. (The changelog page that earlier carried its
+own sitemap entry was retired in the search-first home refactor.)
 
 [../robots.txt](../robots.txt) is unchanged from pre-v13: it allows
 all crawlers and points at the sitemap. No `Disallow` directive,

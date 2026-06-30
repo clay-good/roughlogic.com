@@ -2,8 +2,8 @@
 //
 // The SPA 320px sweep in test/integration/a11y.test.js guards the
 // interactive `#hash` tile views. The prerendered static shells under
-// dist/tools/<id>/ and dist/groups/<slug>/ (plus changelog.html) are a
-// SEPARATE, zero-JS surface that crawlers and direct visitors hit, and
+// dist/tools/<id>/ and dist/groups/<slug>/ (plus the dist/ home shell) are
+// a SEPARATE, zero-JS surface that crawlers and direct visitors hit, and
 // the always-on integration job serves the repo root (not dist/), so it
 // cannot reach them. This script closes that gap: it serves dist/ and
 // asserts no page-level horizontal scroll on every shell at 320px.
