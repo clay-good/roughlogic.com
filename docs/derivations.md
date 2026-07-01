@@ -2171,7 +2171,9 @@ cross-check.
 | calc-restoration.js | `computeFloodCutTakeoff` | `{ wall_perimeter_ft = 0, cut_height_in = 24, removed_faces = 1, has_insulatio...` | _ | _ | _ |
 | calc-restoration.js | `computeGrainsRemoved` | `{ cfm = 0, inlet_gpp = 0, outlet_gpp = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHEPALife` | `{ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_...` | _ | _ | _ |
+| calc-restoration.js | `computeHardwoodFloorDryingMat` | `{ floor_area_ft2 = 0, mat_coverage_ft2 = 6, mats_per_unit = 16 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeHydroxylSizing` | `{ structure_volume_ft3 = 0, unit_coverage_ft3 = 0, expected_days = 3 } = {}` | _ | _ | _ |
+| calc-restoration.js | `computeMoldCleaningLabor` | `{ affected_sf = 0, production_sf_per_hr = 100, passes = 2, crew_size = 2 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeMoldConditions` | `` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRemediationLevel` | `{ affected_area_ft2, porous = false, hvac_involved = false, vulnerable_occupa...` | _ | _ | _ |
 | calc-restoration.js | `computeMoldRisk` | `{ rh_percent, temperature_F, hours_elevated }` | _ | _ | _ |
@@ -2181,7 +2183,9 @@ cross-check.
 | calc-restoration.js | `computePsychrometric` | `{ temperature_F, RH_percent, atmospheric_pressure_hPa = 1013.25 }` | _ | _ | _ |
 | calc-restoration.js | `computeSmokeResidueMethod` | `{ residue_type = "dry" } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeSootCleaningTakeoff` | `{ affected_sf = 0, sponge_coverage_sf = 100, production_sf_per_hr = 150, seal...` | _ | _ | _ |
+| calc-restoration.js | `computeSporeIoRatio` | `{ indoor_spores_m3 = 0, outdoor_spores_m3 = 0, indoor_marker = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeStandingWater` | `{ area_ft2, depth_in }` | _ | _ | _ |
+| calc-restoration.js | `computeSurfaceCondensationRisk` | `{ air_temp_f = 0, air_rh_pct = 0, surface_temp_f = 0 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeThermalDeltaTReference` | `` | _ | _ | _ |
 | calc-restoration.js | `computeThermalFogDeodorization` | `{ structure_volume_ft3 = 0, dose_oz_per_1000ft3 = 5, treatments = 1 } = {}` | _ | _ | _ |
 | calc-restoration.js | `computeWaterClassScreen` | `{ floor_wet_fraction = 0, wall_wet_fraction = 0, wick_height_ft = 0, low_evap...` | _ | _ | _ |
@@ -2363,7 +2367,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 949.
+Row count: 953.
 
 <!-- END function-corpus-v14 -->
 
@@ -2701,7 +2705,7 @@ per spec-v14 §13.1 second paragraph.
 | `wet-bulb-psychrometer` | Wet-Bulb Sling Psychrometer | ASHRAE Handbook (Fundamentals); 80 F dry-bulb / 67 F wet-bulb at 1013.25 hPa -> ~50.7% RH... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `window-solar-heat-gain` | Window Solar Heat Gain and Conduction Cooling Load | ASHRAE / ACCA Manual J fenestration; spec-v227 section 2.1 pinned example (west window) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group D Restoration (47 tiles)
+### Group D Restoration (51 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2735,10 +2739,12 @@ per spec-v14 §13.1 second paragraph.
 | `flood-cut-quantity` | Flood-Cut Demolition Take-Off | IICRC S500-2021 structural-removal pr...; 60 LF, 24 in, one side, insulated -> 120 ft2 drywall, 4 s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flood-cut-takeoff` | Wicking-Height Flood Cut and Demolition Takeoff | ANSI/IICRC S500 flood-cut demolition ...; spec-v136 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grains-removed` | Moisture Removed by Grain Depression | Psychrometric mass balance + IICRC S5...; 250 CFM, dG 40 GPP, 24 hr -> ~6.43 lb/hr, ~18.5 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hardwood-floor-drying-mat` | Hardwood Floor Drying-Mat System Sizing | ANSI/IICRC S500 Class 4 specialty drying; 120 ft^2 at 6 ft^2/mat, 16 mats/unit -> 20 mats, 2 units | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hepa-filter-life` | HEPA Scrubber Filter Life | EPA / IICRC S520 HEPA loading practic...; 1000 cfm / 8 hr/day / medium / 5-day job / $80 filter -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydroxyl-sizing` | Hydroxyl Generator Sizing by Volume (IICRC S700) | ANSI/IICRC S700 volume-and-coverage s...; 12,000 ft^3 / 6,000 ft^3 per unit -> 2 generators | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `moisture-dry-goal` | Dry Standard vs Affected Reading | IICRC S500-2021 dry-standard concept; reference 12, affected 35, delta-allow 4 -> delta 23, con... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold` | Mold Growth Conditions | EPA / IICRC S520-2024 mold-risk practice; 80% RH / 75 F / 60 hr elevated -> high risk; exercises th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `mold-cleaning-labor` | Mold Surface Remediation Labor and HEPA Vacuuming | ANSI/IICRC S520 source removal; 500 ft^2 at 100 ft^2/hr, 2 passes, crew 2 -> 10.0 labor-h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mold-conditions` | IICRC S520 Condition Reference | IICRC S520-2024 Condition framework; Reference compute returns the three Conditions + remediat... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mold-remediation-level` | Mold Remediation Scope by Area | EPA 402-K-01-001 / NYC DOHMH / IICRC ...; 45 ft2 porous, no HVAC, healthy occupant -> medium band, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `nam-sizing` | Negative Air Machine Sizing | IICRC; 8000 ft^3 chamber at 6 ACH -> 800 cfm required; one 1000-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2747,7 +2753,9 @@ per spec-v14 §13.1 second paragraph.
 | `psychrometric` | Psychrometric Calculator | ASHRAE Handbook (Fundamentals); 75 F @ 50% RH -> dew point ~55.1 F, ~64.5 GPP (grains per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-residue-method` | Smoke Residue Type and Cleaning Method Screen | ANSI/IICRC S700 residue-method mapping; dry residue -> dry-sponge then dry/wet cleaning | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soot-cleaning-takeoff` | Dry-Sponge Soot Cleaning Takeoff and Seal Coat | ANSI/IICRC S700 fire and smoke restor...; 1200 ft^2 at 100 ft^2/sponge, 150 ft^2/hr, seal -> 12, 8.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `spore-io-ratio` | Indoor/Outdoor Spore Ratio Clearance Screen | ANSI/IICRC S520 (indoor/outdoor clear...; 800 vs 1,500 spores/m^3, no marker -> 0.53 ratio, support... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `standing-water` | Standing Water Volume | Project (first-principles); 500 ft^2 of standing water 1 in deep -> 41.67 ft^3 / 311.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `surface-condensation-risk` | Surface Condensation Risk and Dew-Point Margin | ANSI/IICRC S500 (Magnus-Tetens dew-po...; 80 degF / 50% RH vs a 50 degF single-pane window -> 59.7 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermal-delta-t` | Thermal Imager Delta-T Reference | IICRC S500 + ASHRAE-bundled thermal-d...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-fog-deodorization` | Thermal/ULV Fog Deodorizer Dosage | ANSI/IICRC S700 deodorization; 8000 ft^3 at 5 oz/1000 ft^3, 1 pass -> 40 oz, 0.31 gal | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3255,6 +3263,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 706. Fixture-covered or reference-cadence: 706 / 706.
+Tile count: 710. Fixture-covered or reference-cadence: 710 / 710.
 
 <!-- END tile-index-v14 -->

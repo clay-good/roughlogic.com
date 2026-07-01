@@ -2761,3 +2761,191 @@ function renderContentsPackoutInventory(inputRegion, outputRegion, citationEl) {
   for (const el of [area.input, density.input, box.input, stack.input, truck.input]) el.addEventListener("input", update);
 }
 RESTORATION_RENDERERS["contents-packout-inventory"] = renderContentsPackoutInventory;
+
+// --- Utility (spec-v143): Surface Condensation Risk and Dew-Point Margin ---
+//
+// The failure mode psychrometric never screens: warm, humid drying air meeting
+// a cold single-pane window, uninsulated wall, or slab edge and condensing
+// there -- secondary water the tech did not extract, in the worst place for
+// mold. The dew point follows the Magnus relation from air temperature and RH;
+// the risk is whether the surface sits below it and by what margin.
+// dims: in { air_temp_f: T, air_rh_pct: dimensionless, surface_temp_f: T }
+//        out: { dew_point_f: T, margin_f: T, condensing: dimensionless }
+// (The Magnus coefficients 17.625 and 243.04 degC and the degF/degC conversion
+//  are dimensioned constants; the dew point is a temperature `T`, the margin is
+//  a temperature difference `T`, and the condensing flag is dimensionless.)
+export function computeSurfaceCondensationRisk({ air_temp_f = 0, air_rh_pct = 0, surface_temp_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tf = Number(air_temp_f), rh = Number(air_rh_pct), sf = Number(surface_temp_f);
+  if (!(rh > 0 && rh <= 100)) return { error: "Relative humidity must be between 0 and 100 percent." };
+  const tc = (tf - 32) * 5 / 9;
+  const g = Math.log(rh / 100) + (17.625 * tc) / (243.04 + tc);
+  const dewC = (243.04 * g) / (17.625 - g);
+  const dewF = dewC * 9 / 5 + 32;
+  const margin = sf - dewF;
+  return {
+    dew_point_f: dewF,
+    margin_f: margin,
+    condensing: margin <= 0 ? 1 : 0,
+    note: "Magnus dew-point approximation; the IR-read surface temperature GOVERNS. Keep surfaces above the dew point (ANSI/IICRC S500) -- lower the humidity or warm the surface to clear the risk. A screen, not the psychrometric chamber reference.",
+  };
+}
+
+function renderSurfaceCondensationRisk(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Magnus dew-point relation and the keep-surfaces-above-dew-point rule (ANSI/IICRC S500), by name. The Magnus form is an approximation and the IR-read surface temperature GOVERNS; psychrometric is the chamber reference. A screen.";
+  const at = makeNumber("Chamber air temp (degF)", "scr-at", { step: "any", value: "80" });
+  const rh = makeNumber("Chamber relative humidity (%)", "scr-rh", { step: "any", min: "0", max: "100", value: "50" });
+  const st = makeNumber("Coldest surface temp (degF, IR read)", "scr-st", { step: "any", value: "50" });
+  for (const f of [at, rh, st]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { at.input.value = "80"; rh.input.value = "50"; st.input.value = "50"; update(); });
+  const oDew = makeOutputLine(outputRegion, "Dew point", "scr-out-dew");
+  const oMargin = makeOutputLine(outputRegion, "Surface margin", "scr-out-margin");
+  const oFlag = makeOutputLine(outputRegion, "Condensation", "scr-out-flag");
+  const update = debounce(() => {
+    const r = computeSurfaceCondensationRisk({ air_temp_f: Number(at.input.value) || 0, air_rh_pct: Number(rh.input.value) || 0, surface_temp_f: Number(st.input.value) || 0 });
+    if (r.error) { oDew.textContent = r.error; oMargin.textContent = "-"; oFlag.textContent = "-"; return; }
+    oDew.textContent = fmt(r.dew_point_f, 1) + " degF";
+    oMargin.textContent = fmt(r.margin_f, 1) + " degF";
+    oFlag.textContent = r.condensing ? "Condensing -- surface at/below dew point" : "Clear -- surface above dew point";
+  }, DEBOUNCE_MS);
+  for (const el of [at.input, rh.input, st.input]) el.addEventListener("input", update);
+  update();
+}
+RESTORATION_RENDERERS["surface-condensation-risk"] = renderSurfaceCondensationRisk;
+
+// --- Utility (spec-v150): Indoor/Outdoor Spore Ratio and Marker Screen ---
+//
+// The everyday clearance read: post-remediation indoor airborne spore
+// concentration should be at or below the outdoor control (ratio <= 1), and the
+// genera should resemble outdoor with no indoor-dominant water-damage markers
+// (Stachybotrys, Chaetomium) elevated inside.
+// dims: in { indoor_spores_m3: L^-3, outdoor_spores_m3: L^-3, indoor_marker: dimensionless }
+//        out: { io_ratio: dimensionless, pass: dimensionless }
+// (Spore concentrations are a count per volume `L^-3`; their ratio and the
+//  marker/pass flags are dimensionless.)
+export function computeSporeIoRatio({ indoor_spores_m3 = 0, outdoor_spores_m3 = 0, indoor_marker = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ind = Number(indoor_spores_m3), out = Number(outdoor_spores_m3), marker = Number(indoor_marker) ? 1 : 0;
+  if (!(ind >= 0)) return { error: "Indoor concentration must be zero or positive." };
+  if (!(out > 0)) return { error: "Outdoor control concentration must be positive." };
+  const ratio = ind / out;
+  return {
+    io_ratio: ratio,
+    pass: ratio <= 1 && marker === 0 ? 1 : 0,
+    note: "A screen, not a clearance certificate. An independent environmental professional (IEP/CIH) interprets the genera and the full criteria (ANSI/IICRC S520); a ratio at or under 1 alone does not clear a project.",
+  };
+}
+
+function renderSporeIoRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Indoor/outdoor spore ratio and the marker-genera principle (ANSI/IICRC S520), by name. An independent environmental professional interprets clearance; a ratio at or under 1 alone does not clear a project. A screen, not a certificate.";
+  const ind = makeNumber("Indoor spore concentration (spores/m^3)", "sio-ind", { step: "any", min: "0", value: "800" });
+  const out = makeNumber("Outdoor control (spores/m^3)", "sio-out", { step: "any", min: "0", value: "1500" });
+  const mark = makeCheckbox("Water-damage marker (Stachybotrys / Chaetomium) elevated indoors", "sio-mark", false);
+  for (const f of [ind, out]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(mark.wrap);
+  attachExampleButton(inputRegion, () => { ind.input.value = "800"; out.input.value = "1500"; mark.input.checked = false; update(); });
+  const oRatio = makeOutputLine(outputRegion, "Indoor/outdoor ratio", "sio-out-ratio");
+  const oPass = makeOutputLine(outputRegion, "Clearance screen", "sio-out-pass");
+  const update = debounce(() => {
+    const r = computeSporeIoRatio({ indoor_spores_m3: Number(ind.input.value) || 0, outdoor_spores_m3: Number(out.input.value) || 0, indoor_marker: mark.input.checked ? 1 : 0 });
+    if (r.error) { oRatio.textContent = r.error; oPass.textContent = "-"; return; }
+    oRatio.textContent = fmt(r.io_ratio, 2);
+    oPass.textContent = r.pass ? "Supportable -- indoor at/below outdoor, no marker" : "Not supportable -- see ratio / marker";
+  }, DEBOUNCE_MS);
+  for (const el of [ind.input, out.input]) el.addEventListener("input", update);
+  mark.input.addEventListener("change", update);
+  update();
+}
+RESTORATION_RENDERERS["spore-io-ratio"] = renderSporeIoRatio;
+
+// --- Utility (spec-v155): Hardwood Floor Drying-Mat System Sizing ---
+//
+// The Class 4 specialty method for saving a wet wood floor without tearing it
+// out: panels laid on the floor and pulled by a suction unit that draws
+// moisture up through the boards. Sized by floor area against per-mat coverage
+// and the mats a suction unit can drive.
+// dims: in { floor_area_ft2: L^2, mat_coverage_ft2: L^2, mats_per_unit: dimensionless }
+//        out: { mats_needed: dimensionless, suction_units: dimensionless }
+// (Area over per-mat area is a dimensionless count; the unit count divides one
+//  dimensionless count by another.)
+export function computeHardwoodFloorDryingMat({ floor_area_ft2 = 0, mat_coverage_ft2 = 6, mats_per_unit = 16 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(floor_area_ft2), cov = Number(mat_coverage_ft2), per = Number(mats_per_unit);
+  if (!(area > 0)) return { error: "Floor area must be positive." };
+  if (!(cov > 0)) return { error: "Mat coverage must be positive." };
+  if (!(per > 0)) return { error: "Mats per unit must be positive." };
+  const mats = Math.ceil(area / cov);
+  const units = Math.ceil(mats / per);
+  return {
+    mats_needed: mats,
+    suction_units: units,
+    note: "The mat-system manufacturer's coverage and unit ratings GOVERN; subfloor construction and finish affect feasibility (ANSI/IICRC S500 Class 4 specialty drying). A sizing screen.",
+  };
+}
+
+function renderHardwoodFloorDryingMat(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Hardwood floor drying-mat system sizing (ANSI/IICRC S500 Class 4 specialty drying), by name. The mat-system manufacturer's coverage and unit ratings GOVERN; subfloor construction and finish affect feasibility. A sizing screen.";
+  const area = makeNumber("Wet hardwood floor area (ft^2)", "hfm-area", { step: "any", min: "0", value: "120" });
+  const cov = makeNumber("Coverage per mat (ft^2)", "hfm-cov", { step: "any", min: "0", value: "6" });
+  const per = makeNumber("Mats per suction unit", "hfm-per", { step: "any", min: "0", value: "16" });
+  for (const f of [area, cov, per]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "120"; cov.input.value = "6"; per.input.value = "16"; update(); });
+  const oMats = makeOutputLine(outputRegion, "Mats needed", "hfm-out-mats");
+  const oUnits = makeOutputLine(outputRegion, "Suction units", "hfm-out-units");
+  const update = debounce(() => {
+    const r = computeHardwoodFloorDryingMat({ floor_area_ft2: Number(area.input.value) || 0, mat_coverage_ft2: cov.input.value === "" ? 6 : Number(cov.input.value), mats_per_unit: per.input.value === "" ? 16 : Number(per.input.value) });
+    if (r.error) { oMats.textContent = r.error; oUnits.textContent = "-"; return; }
+    oMats.textContent = r.mats_needed + " mats";
+    oUnits.textContent = r.suction_units + " unit(s)";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, cov.input, per.input]) el.addEventListener("input", update);
+  update();
+}
+RESTORATION_RENDERERS["hardwood-floor-drying-mat"] = renderHardwoodFloorDryingMat;
+
+// --- Utility (spec-v156): Mold Surface Remediation Labor and HEPA Vacuuming ---
+//
+// The cost driver between the scope tier and the chemistry: the labor to
+// physically clean the surfaces. S520 source removal is a multi-pass operation
+// (HEPA vacuum, damp wipe, HEPA vacuum again) at a production rate the substrate
+// and access set, split across the crew.
+// dims: in { affected_sf: L^2, production_sf_per_hr: L^2 T^-1, passes: dimensionless, crew_size: dimensionless }
+//        out: { labor_hours: T, crew_hours: T }
+// (Area `L^2` times a dimensionless pass count over a production rate
+//  `L^2 T^-1` is a time `T`; dividing by the dimensionless crew size keeps `T`.)
+export function computeMoldCleaningLabor({ affected_sf = 0, production_sf_per_hr = 100, passes = 2, crew_size = 2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(affected_sf), prod = Number(production_sf_per_hr), pass = Number(passes), crew = Number(crew_size);
+  if (!(area > 0)) return { error: "Affected area must be positive." };
+  if (!(prod > 0)) return { error: "Production rate must be positive." };
+  if (!(pass >= 1)) return { error: "Passes must be at least 1." };
+  if (!(crew > 0)) return { error: "Crew size must be positive." };
+  const laborHours = (area * pass) / prod;
+  const crewHours = laborHours / crew;
+  return {
+    labor_hours: laborHours,
+    crew_hours: crewHours,
+    note: "The Condition, substrate, and access GOVERN the production rate (ANSI/IICRC S520 source removal); non-cleanable porous materials are removed, not cleaned. A labor screen, not a remediation protocol.",
+  };
+}
+
+function renderMoldCleaningLabor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Source-removal multi-pass cleaning labor method (ANSI/IICRC S520), by name. The Condition, substrate, and access GOVERN the production rate; non-cleanable porous materials are removed, not cleaned. A labor screen.";
+  const area = makeNumber("Cleanable affected surface (ft^2)", "mcl-area", { step: "any", min: "0", value: "500" });
+  const prod = makeNumber("Production rate (ft^2/hr per pass)", "mcl-prod", { step: "any", min: "0", value: "100" });
+  const pass = makeNumber("Cleaning passes (vac / wipe / vac)", "mcl-pass", { step: "any", min: "1", value: "2" });
+  const crew = makeNumber("Crew size", "mcl-crew", { step: "any", min: "0", value: "2" });
+  for (const f of [area, prod, pass, crew]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "500"; prod.input.value = "100"; pass.input.value = "2"; crew.input.value = "2"; update(); });
+  const oLabor = makeOutputLine(outputRegion, "Labor", "mcl-out-labor");
+  const oCrew = makeOutputLine(outputRegion, "Crew calendar time", "mcl-out-crew");
+  const update = debounce(() => {
+    const r = computeMoldCleaningLabor({ affected_sf: Number(area.input.value) || 0, production_sf_per_hr: prod.input.value === "" ? 100 : Number(prod.input.value), passes: pass.input.value === "" ? 2 : Number(pass.input.value), crew_size: crew.input.value === "" ? 2 : Number(crew.input.value) });
+    if (r.error) { oLabor.textContent = r.error; oCrew.textContent = "-"; return; }
+    oLabor.textContent = fmt(r.labor_hours, 1) + " labor-hr";
+    oCrew.textContent = fmt(r.crew_hours, 1) + " hr on the clock";
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, prod.input, pass.input, crew.input]) el.addEventListener("input", update);
+  update();
+}
+RESTORATION_RENDERERS["mold-cleaning-labor"] = renderMoldCleaningLabor;

@@ -898,6 +898,13 @@ const RELATED = {
   "smoke-residue-method": ["soot-cleaning-takeoff","ozone-shock-treatment","ppe"],
   "thermal-fog-deodorization": ["ozone-shock-treatment","soot-cleaning-takeoff","smoke-ejector-cfm"],
   "contents-packout-inventory": ["soot-cleaning-takeoff","flood-cut-takeoff","ppe"],
+  // spec-v143 / v150 / v155 / v156 restoration novelty batch. Spec related-ids
+  // that pointed at un-landed tiles (mold-clearance-sampling-plan,
+  // antimicrobial-coverage) are substituted with live neighbors.
+  "surface-condensation-risk": ["psychrometric","drying-goal","mold-conditions"],
+  "spore-io-ratio": ["air-sample-volume","mold-conditions","mold-remediation-level"],
+  "hardwood-floor-drying-mat": ["class-of-loss-screen","desiccant-airflow-sizing","wood-emc"],
+  "mold-cleaning-labor": ["mold-remediation-level","ppe","antimicrobial-dilution"],
 };
 
 export { RELATED };

@@ -7766,6 +7766,50 @@ export const CITATIONS = {
       { name: "Stacking allowance", value: "a 1.5 factor reserves warehouse aisle and stacking space beyond the raw contents volume", source: "restoration estimating practice" },
     ],
   },
+  "surface-condensation-risk": {
+    formula: "T_c = (air_temp_f - 32) x 5/9; g = ln(air_rh_pct/100) + 17.625 x T_c / (243.04 + T_c); dew_pt_c = 243.04 x g / (17.625 - g); dew_point_f = dew_pt_c x 9/5 + 32; margin_f = surface_temp_f - dew_point_f; condensing when margin_f <= 0.",
+    edition: "Magnus-Tetens dew-point relation (17.625 / 243.04 degC coefficients) and the keep-surfaces-above-the-dew-point rule of ANSI/IICRC S500, by name. Not edition-bound.",
+    freeAccess: "The Magnus dew-point relation is public psychrometrics; the surface-above-dew-point practice is named in the published ANSI/IICRC S500.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the Magnus relation does not roll). The Magnus form is an APPROXIMATION and the IR-read surface temperature GOVERNS; psychrometric is the chamber reference. This is a screen for where a drying setup will make secondary water by condensation, not a psychrometric certificate. ANSI/IICRC S500 names the rule.",
+    assumptions: [
+      { name: "Magnus coefficients", value: "17.625 and 243.04 degC are the standard Magnus-Tetens constants for dew point over water", source: "psychrometric convention" },
+      { name: "Surface temperature", value: "the coldest surface is read with an IR thermometer and governs; a single value screens one surface at a time", source: "ANSI/IICRC S500" },
+    ],
+  },
+  "spore-io-ratio": {
+    formula: "io_ratio = indoor_spores_m3 / outdoor_spores_m3; pass when io_ratio <= 1 and no indoor-elevated water-damage marker (indoor_marker == 0).",
+    edition: "Indoor/outdoor airborne-spore comparison and the marker-genera (Stachybotrys / Chaetomium) principle of ANSI/IICRC S520, by name. Not edition-bound.",
+    freeAccess: "The indoor/outdoor ratio is public arithmetic; the comparison and marker-genera principle are named in the published ANSI/IICRC S520.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the ratio arithmetic does not roll). This is a SCREEN, not a clearance certificate: an independent environmental professional (IEP/CIH) interprets the genera and the full visual / moisture criteria, and a ratio at or under 1 alone does not clear a project. ANSI/IICRC S520 names the principle.",
+    assumptions: [
+      { name: "Outdoor control", value: "the outdoor sample establishes the baseline genera and concentration for the comparison and must be positive", source: "ANSI/IICRC S520" },
+      { name: "Marker genera", value: "indoor-dominant water-damage markers (Stachybotrys, Chaetomium) elevated inside fail the screen regardless of the ratio", source: "ANSI/IICRC S520" },
+    ],
+  },
+  "hardwood-floor-drying-mat": {
+    formula: "mats_needed = ceil(floor_area_ft2 / mat_coverage_ft2); suction_units = ceil(mats_needed / mats_per_unit).",
+    edition: "Hardwood-floor drying-mat system sizing under ANSI/IICRC S500 Class 4 specialty drying, by name. Field-sizing arithmetic, not edition-bound.",
+    freeAccess: "The mat and unit counts are public estimating arithmetic; the Class 4 specialty-drying method is named in the published ANSI/IICRC S500.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the sizing arithmetic does not roll). The mat-system manufacturer's coverage and unit ratings GOVERN, and subfloor construction and finish affect feasibility. This sizes the system for the Class 4 specialty job the class screen identifies; it is not a drying protocol. ANSI/IICRC S500 names Class 4 specialty drying.",
+    assumptions: [
+      { name: "Per-mat coverage", value: "6 ft^2 per mat is a starting rate; the mat-system manufacturer's rating governs", source: "manufacturer rating" },
+      { name: "Mats per unit", value: "16 mats per suction unit is a starting rate; the unit's rated capacity governs", source: "manufacturer rating" },
+    ],
+  },
+  "mold-cleaning-labor": {
+    formula: "labor_hours = affected_sf x passes / production_sf_per_hr; crew_hours = labor_hours / crew_size.",
+    edition: "Source-removal multi-pass cleaning labor method (HEPA vacuum / damp wipe / HEPA vacuum) under ANSI/IICRC S520, by name. Field-labor arithmetic, not edition-bound.",
+    freeAccess: "The labor roll-up is public estimating arithmetic; the multi-pass source-removal method is named in the published ANSI/IICRC S520.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the labor arithmetic does not roll). The Condition, substrate, and access GOVERN the production rate, and non-cleanable porous materials are removed (not counted here), not cleaned. This is a labor screen, not a remediation protocol. ANSI/IICRC S520 names the source-removal method.",
+    assumptions: [
+      { name: "Production rate", value: "100 ft^2/hr per pass is a starting rate; the Condition, substrate, and access govern the real rate", source: "ANSI/IICRC S520" },
+      { name: "Passes", value: "a default of 2 (vac / wipe, or vac / vac) with a third pass common; the field method governs", source: "ANSI/IICRC S520" },
+    ],
+  },
   "flash-steam-pct": {
     formula: "flash_fraction = (hf_high - hf_low) / hfg_low; flash_pct = flash_fraction x 100. hf and hfg are saturated-water enthalpies (Btu/lb) at the two pressures.",
     edition: "First-principles steam thermodynamics; the bundled saturated-water enthalpy points are from the ASME steam tables, by name. Not edition-bound.",

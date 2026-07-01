@@ -11634,6 +11634,62 @@ test("bounds: spec-v154 contents-packout-inventory pins boxes/storage/truck roun
   assert.ok("error" in _vf154({ floor_area_ft2: 200, contents_ft3_per_ft2: 2, box_volume_ft3: 3, truck_volume_ft3: 0 }));
 });
 
+// --- spec-v143 / v150 / v155 / v156 restoration novelty batch (calc-restoration.js) ---
+import {
+  computeSurfaceCondensationRisk as _vf143, computeSporeIoRatio as _vf150,
+  computeHardwoodFloorDryingMat as _vf155, computeMoldCleaningLabor as _vf156,
+} from "../../calc-restoration.js";
+
+test("bounds: spec-v143 surface-condensation-risk pins the Magnus dew point, the condensing/clear boundary, and error seams", () => {
+  const r = _vf143({ air_temp_f: 80, air_rh_pct: 50, surface_temp_f: 50 });
+  assert.ok(Math.abs(r.dew_point_f - 59.6987554) < 1e-4);
+  assert.ok(Math.abs(r.margin_f - -9.6987554) < 1e-4);
+  assert.strictEqual(r.condensing, 1);
+  const cc = _vf143({ air_temp_f: 80, air_rh_pct: 30, surface_temp_f: 50 });
+  assert.ok(Math.abs(cc.dew_point_f - 45.7916719) < 1e-4);
+  assert.ok(Math.abs(cc.margin_f - 4.2083281) < 1e-4);
+  assert.strictEqual(cc.condensing, 0);
+  assert.ok("error" in _vf143({ air_temp_f: 80, air_rh_pct: 0, surface_temp_f: 50 }));
+  assert.ok("error" in _vf143({ air_temp_f: 80, air_rh_pct: 101, surface_temp_f: 50 }));
+  assert.ok("error" in _vf143({ air_temp_f: Infinity, air_rh_pct: 50, surface_temp_f: 50 }));
+});
+
+test("bounds: spec-v150 spore-io-ratio pins the ratio, both failure paths, and error seams", () => {
+  const r = _vf150({ indoor_spores_m3: 800, outdoor_spores_m3: 1500, indoor_marker: 0 });
+  assert.ok(Math.abs(r.io_ratio - 0.5333333) < 1e-6);
+  assert.strictEqual(r.pass, 1);
+  assert.strictEqual(_vf150({ indoor_spores_m3: 2400, outdoor_spores_m3: 1500, indoor_marker: 0 }).pass, 0);
+  assert.strictEqual(_vf150({ indoor_spores_m3: 750, outdoor_spores_m3: 1500, indoor_marker: 1 }).pass, 0);
+  assert.ok("error" in _vf150({ indoor_spores_m3: -1, outdoor_spores_m3: 1500 }));
+  assert.ok("error" in _vf150({ indoor_spores_m3: 800, outdoor_spores_m3: 0 }));
+  assert.ok("error" in _vf150({ indoor_spores_m3: Infinity, outdoor_spores_m3: 1500 }));
+});
+
+test("bounds: spec-v155 hardwood-floor-drying-mat pins the ceil round-ups and error seams", () => {
+  const r = _vf155({ floor_area_ft2: 120, mat_coverage_ft2: 6, mats_per_unit: 16 });
+  assert.strictEqual(r.mats_needed, 20);
+  assert.strictEqual(r.suction_units, 2);
+  const cc = _vf155({ floor_area_ft2: 60, mat_coverage_ft2: 6, mats_per_unit: 16 });
+  assert.strictEqual(cc.mats_needed, 10);
+  assert.strictEqual(cc.suction_units, 1);
+  assert.ok("error" in _vf155({ floor_area_ft2: 0, mat_coverage_ft2: 6, mats_per_unit: 16 }));
+  assert.ok("error" in _vf155({ floor_area_ft2: 120, mat_coverage_ft2: 0, mats_per_unit: 16 }));
+  assert.ok("error" in _vf155({ floor_area_ft2: 120, mat_coverage_ft2: 6, mats_per_unit: 0 }));
+});
+
+test("bounds: spec-v156 mold-cleaning-labor pins labor/crew hours, the third-pass scale, and error seams", () => {
+  const r = _vf156({ affected_sf: 500, production_sf_per_hr: 100, passes: 2, crew_size: 2 });
+  assert.ok(Math.abs(r.labor_hours - 10) < 1e-9);
+  assert.ok(Math.abs(r.crew_hours - 5) < 1e-9);
+  const cc = _vf156({ affected_sf: 500, production_sf_per_hr: 100, passes: 3, crew_size: 2 });
+  assert.ok(Math.abs(cc.labor_hours - 15) < 1e-9);
+  assert.ok(Math.abs(cc.crew_hours - 7.5) < 1e-9);
+  assert.ok("error" in _vf156({ affected_sf: 0, production_sf_per_hr: 100, passes: 2, crew_size: 2 }));
+  assert.ok("error" in _vf156({ affected_sf: 500, production_sf_per_hr: 0, passes: 2, crew_size: 2 }));
+  assert.ok("error" in _vf156({ affected_sf: 500, production_sf_per_hr: 100, passes: 0, crew_size: 2 }));
+  assert.ok("error" in _vf156({ affected_sf: 500, production_sf_per_hr: 100, passes: 2, crew_size: 0 }));
+});
+
 // --- spec-v207..v211 landscape irrigation and planting install cluster (calc-agriculture.js) ---
 
 import {

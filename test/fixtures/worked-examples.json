@@ -25704,6 +25704,120 @@
       }
     },
     {
+      "tile_id": "surface-condensation-risk",
+      "source_publisher": "ANSI/IICRC S500 (Magnus-Tetens dew-point relation)",
+      "source_title": "dew point via Magnus; margin = surface - dew point",
+      "source_edition_or_year": "IICRC S500",
+      "source_section_or_page": "80 degF / 50% RH vs a 50 degF single-pane window -> 59.7 degF dew point, -9.7 degF margin, condensing",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "air_temp_f": 80, "air_rh_pct": 50, "surface_temp_f": 50 },
+      "outputs": {
+        "dew_point_f": { "value": 59.7, "tolerance": { "abs": 0.1 } },
+        "margin_f": { "value": -9.7, "tolerance": { "abs": 0.1 } },
+        "condensing": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "surface-condensation-risk",
+      "source_publisher": "ANSI/IICRC S500 (Magnus-Tetens dew-point relation)",
+      "source_title": "cross-check: drying the air clears the risk",
+      "source_edition_or_year": "IICRC S500",
+      "source_section_or_page": "80 degF / 30% RH vs the same 50 degF surface -> 45.8 degF dew point, +4.2 degF margin, clear",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "air_temp_f": 80, "air_rh_pct": 30, "surface_temp_f": 50 },
+      "outputs": {
+        "dew_point_f": { "value": 45.8, "tolerance": { "abs": 0.1 } },
+        "margin_f": { "value": 4.2, "tolerance": { "abs": 0.1 } },
+        "condensing": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "spore-io-ratio",
+      "source_publisher": "ANSI/IICRC S520 (indoor/outdoor clearance comparison)",
+      "source_title": "io_ratio = indoor / outdoor; pass when <= 1 and no marker",
+      "source_edition_or_year": "IICRC S520",
+      "source_section_or_page": "800 vs 1,500 spores/m^3, no marker -> 0.53 ratio, supportable",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "indoor_spores_m3": 800, "outdoor_spores_m3": 1500, "indoor_marker": 0 },
+      "outputs": {
+        "io_ratio": { "value": 0.5333, "tolerance": { "abs": 0.01 } },
+        "pass": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "spore-io-ratio",
+      "source_publisher": "ANSI/IICRC S520 (indoor/outdoor clearance comparison)",
+      "source_title": "cross-check: indoor above outdoor fails the screen",
+      "source_edition_or_year": "IICRC S520",
+      "source_section_or_page": "2,400 vs 1,500 spores/m^3 -> 1.6 ratio, not supportable",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "indoor_spores_m3": 2400, "outdoor_spores_m3": 1500, "indoor_marker": 0 },
+      "outputs": {
+        "io_ratio": { "value": 1.6, "tolerance": { "abs": 0.01 } },
+        "pass": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hardwood-floor-drying-mat",
+      "source_publisher": "ANSI/IICRC S500 Class 4 specialty drying",
+      "source_title": "mats = ceil(area / coverage); units = ceil(mats / per unit)",
+      "source_edition_or_year": "IICRC S500",
+      "source_section_or_page": "120 ft^2 at 6 ft^2/mat, 16 mats/unit -> 20 mats, 2 units",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "floor_area_ft2": 120, "mat_coverage_ft2": 6, "mats_per_unit": 16 },
+      "outputs": {
+        "mats_needed": { "value": 20, "tolerance": { "abs": 0 } },
+        "suction_units": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "hardwood-floor-drying-mat",
+      "source_publisher": "ANSI/IICRC S500 Class 4 specialty drying",
+      "source_title": "cross-check: a small room fits one unit",
+      "source_edition_or_year": "IICRC S500",
+      "source_section_or_page": "60 ft^2 at 6 ft^2/mat, 16 mats/unit -> 10 mats, 1 unit",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "floor_area_ft2": 60, "mat_coverage_ft2": 6, "mats_per_unit": 16 },
+      "outputs": {
+        "mats_needed": { "value": 10, "tolerance": { "abs": 0 } },
+        "suction_units": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "mold-cleaning-labor",
+      "source_publisher": "ANSI/IICRC S520 source removal",
+      "source_title": "labor = area x passes / production; crew = labor / crew size",
+      "source_edition_or_year": "IICRC S520",
+      "source_section_or_page": "500 ft^2 at 100 ft^2/hr, 2 passes, crew 2 -> 10.0 labor-hr, 5.0 crew-hr",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "affected_sf": 500, "production_sf_per_hr": 100, "passes": 2, "crew_size": 2 },
+      "outputs": {
+        "labor_hours": { "value": 10, "tolerance": { "abs": 0.01 } },
+        "crew_hours": { "value": 5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "mold-cleaning-labor",
+      "source_publisher": "ANSI/IICRC S520 source removal",
+      "source_title": "cross-check: a third pass adds half again",
+      "source_edition_or_year": "IICRC S520",
+      "source_section_or_page": "500 ft^2 at 100 ft^2/hr, 3 passes, crew 2 -> 15.0 labor-hr, 7.5 crew-hr",
+      "verified_by": "rl",
+      "verified_on": "2026-07-01",
+      "inputs": { "affected_sf": 500, "production_sf_per_hr": 100, "passes": 3, "crew_size": 2 },
+      "outputs": {
+        "labor_hours": { "value": 15, "tolerance": { "abs": 0.01 } },
+        "crew_hours": { "value": 7.5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
       "tile_id": "vfd-energy-savings",
       "source_publisher": "US DOE motor/pump-system energy method",
       "source_title": "20 kW pump, three-bin duty -> 60,640 kWh, $7,277/yr saved",

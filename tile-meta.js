@@ -500,6 +500,11 @@ const _TILES = [
   ["smoke-residue-method", "D"],
   ["thermal-fog-deodorization", "D"],
   ["contents-packout-inventory", "D"],
+  // spec-v143 / v150 / v155 / v156 restoration novelty batch (Group D)
+  ["surface-condensation-risk", "D"],
+  ["spore-io-ratio", "D"],
+  ["hardwood-floor-drying-mat", "D"],
+  ["mold-cleaning-labor", "D"],
   // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (Group B)
   ["flash-steam-pct", "B"],
   ["steam-pipe-velocity", "B"],

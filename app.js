@@ -298,6 +298,10 @@ const TOOL_MODULES = (() => {
     "equipment-heat-load", "char-depth-capacity", "soot-cleaning-takeoff",
     "ozone-shock-treatment", "smoke-residue-method", "thermal-fog-deodorization",
     "contents-packout-inventory",
+    // spec-v143 / v150 / v155 / v156 restoration novelty batch (condensation,
+    // spore clearance ratio, hardwood mat sizing, mold cleaning labor).
+    "surface-condensation-risk", "spore-io-ratio", "hardwood-floor-drying-mat",
+    "mold-cleaning-labor",
   ]);
   // spec-v77 cap-relief split: the cohesive demolition / abatement bench
   // (moisture-dry-goal, flood-cut-quantity, abatement-containment) relocated out

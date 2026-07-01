@@ -723,6 +723,11 @@ export const COMPUTE_MAP = {
   "smoke-residue-method": { module: "../../calc-restoration.js", fn: "computeSmokeResidueMethod" },
   "thermal-fog-deodorization": { module: "../../calc-restoration.js", fn: "computeThermalFogDeodorization" },
   "contents-packout-inventory": { module: "../../calc-restoration.js", fn: "computeContentsPackoutInventory" },
+  // spec-v143 / v150 / v155 / v156 restoration novelty batch
+  "surface-condensation-risk": { module: "../../calc-restoration.js", fn: "computeSurfaceCondensationRisk" },
+  "spore-io-ratio": { module: "../../calc-restoration.js", fn: "computeSporeIoRatio" },
+  "hardwood-floor-drying-mat": { module: "../../calc-restoration.js", fn: "computeHardwoodFloorDryingMat" },
+  "mold-cleaning-labor": { module: "../../calc-restoration.js", fn: "computeMoldCleaningLabor" },
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   "buck-boost-sizing": { module: "../../calc-electrical.js", fn: "computeBuckBoostSizing" },
   "wireway-fill": { module: "../../calc-electrical.js", fn: "computeWirewayFill" },
