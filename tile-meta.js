@@ -410,6 +410,10 @@ const _TILES = [
   ["gutter-downspout", "E"],
   ["assembly-r-value", "C"],
   ["blown-insulation-coverage", "C"],
+  // spec-v233..v235 heat-pump heating-mode batch
+  ["heat-pump-seasonal-energy", "C"], ["dual-fuel-balance-point", "C"], ["heat-pump-cold-capacity", "C"],
+  // spec-v239..v241 compressed-air energy batch
+  ["air-leak-cost", "C"], ["compressed-air-power", "C"], ["air-pressure-setpoint-savings", "C"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
@@ -523,6 +527,10 @@ const _TILES = [
   ["noncoincident-load", "A"], ["pv-circuit-ampacity", "A"],
   // spec-v221..v223 PV system-design batch
   ["pv-energy-yield", "A"], ["pv-row-spacing", "A"], ["pv-inverter-ratio", "A"],
+  // spec-v236..v238 grid-tied battery-economics batch
+  ["battery-tou-arbitrage", "A"], ["battery-peak-shaving", "A"], ["battery-c-rate", "A"],
+  // spec-v230..v232 electrical energy-cost-savings batch
+  ["vfd-energy-savings", "A"], ["lighting-retrofit-savings", "A"], ["power-factor-billing-savings", "A"],
   ["transformer-k-factor", "A"], ["motor-capacitor-max", "A"],
   ["bends-between-pulls", "A"], ["shock-approach-boundary", "A"],
   ["pool-bonding-680-26", "A"],

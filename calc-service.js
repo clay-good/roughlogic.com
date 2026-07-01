@@ -654,3 +654,195 @@ function _v181renderNoncoincidentLoad(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, b.input, both.select]) el.addEventListener("input", update);
 }
 SERVICE_RENDERERS["noncoincident-load"] = _v181renderNoncoincidentLoad;
+
+// =====================================================================
+// spec-v230..v232: electrical energy-cost-savings batch (Group A). The
+// three retrofit business cases an electrician or energy auditor sells:
+// a VFD on a centrifugal load, an LED lighting swap, and power-factor
+// correction against a demand bill. Currency and rate figures are
+// carried as dimensionless per the v14 economic-tile convention.
+// =====================================================================
+
+// --- spec-v230: vfd-energy-savings -- VFD retrofit energy and cost savings ---
+//
+// A centrifugal pump or fan throttled to part flow keeps drawing near-full
+// power; slowed by a VFD it draws the cube of the speed ratio (the affinity
+// law). The saving is that gap integrated over a three-bin duty cycle.
+// dims: in { full_load_kw: M L^2 T^-3, frac_a: dimensionless, hours_a: T, frac_b: dimensionless, hours_b: T, frac_c: dimensionless, hours_c: T, rate_kwh: dimensionless } out: { vfd_kwh: M L^2 T^-2, full_kwh: M L^2 T^-2, saved_kwh: M L^2 T^-2, saved_usd: dimensionless }
+export function computeVfdEnergySavings({ full_load_kw = 0, frac_a = 1.0, hours_a = 0, frac_b = 0.75, hours_b = 0, frac_c = 0.5, hours_c = 0, rate_kwh = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(full_load_kw > 0)) return { error: "Full-load motor power must be positive (kW)." };
+  if (hours_a < 0 || hours_b < 0 || hours_c < 0) return { error: "Hours per bin must be non-negative." };
+  for (const f of [frac_a, frac_b, frac_c]) if (!(f >= 0 && f <= 1)) return { error: "Each flow fraction must be between 0 and 1." };
+  if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
+  const vfd_kwh = full_load_kw * (frac_a ** 3 * hours_a + frac_b ** 3 * hours_b + frac_c ** 3 * hours_c);
+  const full_kwh = full_load_kw * (hours_a + hours_b + hours_c);
+  const saved_kwh = full_kwh - vfd_kwh;
+  const saved_usd = saved_kwh * rate_kwh;
+  const saved_pct = full_kwh > 0 ? saved_kwh / full_kwh * 100 : 0;
+  return {
+    vfd_kwh, full_kwh, saved_kwh, saved_usd, saved_pct,
+    note: "Centrifugal affinity laws (P/P_full = (Q/Q_full)^3 for a fixed system curve) and the US DOE motor/pump-system energy method. The cube law holds for a centrifugal pump or fan on a friction-dominated system - a large static-head component flattens the curve and reduces the savings. The baseline here is full-speed operation for the same hours (a throttled or dampered constant-speed device already saves a little, so the VFD delta versus a throttle is smaller than versus full speed), and VFD and motor losses at low speed trim a few points off the ideal. A screening estimate, not a metered measurement-and-verification.",
+  };
+}
+function renderVfdEnergySavings(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: centrifugal affinity cube law P/P_full = (Q/Q_full)^3 and the US DOE motor/pump-system energy method (by name). The cube law holds on a friction-dominated system; the baseline is full-speed operation for the same hours. A screening estimate, not a metered M&V.";
+  const kw = makeNumber("Full-load motor input power (kW)", "vfd-kw", { step: "any", min: "0", value: "20" });
+  kw.input.value = "20";
+  const fa = makeNumber("Bin A flow fraction (0-1)", "vfd-fa", { step: "any", min: "0", value: "1" });
+  fa.input.value = "1";
+  const ha = makeNumber("Bin A hours/yr", "vfd-ha", { step: "any", min: "0", value: "2000" });
+  ha.input.value = "2000";
+  const fb = makeNumber("Bin B flow fraction (0-1)", "vfd-fb", { step: "any", min: "0", value: "0.8" });
+  fb.input.value = "0.8";
+  const hb = makeNumber("Bin B hours/yr", "vfd-hb", { step: "any", min: "0", value: "3000" });
+  hb.input.value = "3000";
+  const fc = makeNumber("Bin C flow fraction (0-1)", "vfd-fc", { step: "any", min: "0", value: "0.6" });
+  fc.input.value = "0.6";
+  const hc = makeNumber("Bin C hours/yr", "vfd-hc", { step: "any", min: "0", value: "2000" });
+  hc.input.value = "2000";
+  const rate = makeNumber("Energy rate ($/kWh)", "vfd-rate", { step: "any", min: "0", value: "0.12" });
+  rate.input.value = "0.12";
+  for (const f of [kw, fa, ha, fb, hb, fc, hc, rate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kw.input.value = "20"; fa.input.value = "1"; ha.input.value = "2000"; fb.input.value = "0.8"; hb.input.value = "3000"; fc.input.value = "0.6"; hc.input.value = "2000"; rate.input.value = "0.12"; update(); });
+  const oFull = makeOutputLine(outputRegion, "Full-speed energy", "vfd-out-full");
+  const oVfd = makeOutputLine(outputRegion, "VFD energy", "vfd-out-vfd");
+  const oSaved = makeOutputLine(outputRegion, "Energy saved", "vfd-out-saved");
+  const oUsd = makeOutputLine(outputRegion, "Dollars saved", "vfd-out-usd");
+  const oNote = makeOutputLine(outputRegion, "Note", "vfd-out-note");
+  const update = debounce(() => {
+    const r = computeVfdEnergySavings({ full_load_kw: Number(kw.input.value) || 0, frac_a: Number(fa.input.value) || 0, hours_a: Number(ha.input.value) || 0, frac_b: Number(fb.input.value) || 0, hours_b: Number(hb.input.value) || 0, frac_c: Number(fc.input.value) || 0, hours_c: Number(hc.input.value) || 0, rate_kwh: Number(rate.input.value) || 0 });
+    if (r.error) { oFull.textContent = r.error; oVfd.textContent = "-"; oSaved.textContent = "-"; oUsd.textContent = "-"; oNote.textContent = ""; return; }
+    oFull.textContent = fmt(r.full_kwh, 0) + " kWh/yr";
+    oVfd.textContent = fmt(r.vfd_kwh, 0) + " kWh/yr";
+    oSaved.textContent = fmt(r.saved_kwh, 0) + " kWh/yr (" + fmt(r.saved_pct, 0) + "%)";
+    oUsd.textContent = "$" + fmt(r.saved_usd, 0) + "/yr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kw, fa, ha, fb, hb, fc, hc, rate]) f.input.addEventListener("input", update);
+}
+SERVICE_RENDERERS["vfd-energy-savings"] = renderVfdEnergySavings;
+
+// --- spec-v231: lighting-retrofit-savings -- LED retrofit energy, demand, payback ---
+//
+// A fixture swap trades installed watts for fewer; the value is the wattage
+// reduction times burn hours times the energy rate, plus the demand-charge
+// reduction, and the simple payback against install cost.
+// dims: in { fixtures: dimensionless, watts_existing: M L^2 T^-3, watts_new: M L^2 T^-3, annual_hours: T, rate_kwh: dimensionless, demand_per_kw_mo: dimensionless, install_cost: dimensionless } out: { kw_saved: M L^2 T^-3, kwh_saved: M L^2 T^-2, energy_usd: dimensionless, demand_usd: dimensionless, annual_usd: dimensionless, payback_years: T }
+export function computeLightingRetrofitSavings({ fixtures = 0, watts_existing = 0, watts_new = 0, annual_hours = 0, rate_kwh = 0, demand_per_kw_mo = 0, install_cost = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fixtures > 0)) return { error: "Fixture count must be positive." };
+  if (!(annual_hours > 0)) return { error: "Annual operating hours must be positive." };
+  if (watts_existing < 0 || watts_new < 0) return { error: "Wattages must be non-negative." };
+  if (rate_kwh < 0 || demand_per_kw_mo < 0 || install_cost < 0) return { error: "Rate, demand charge, and cost must be non-negative." };
+  if (!(watts_new < watts_existing)) return { error: "New wattage must be below existing wattage (no saving otherwise)." };
+  const kw_saved = fixtures * (watts_existing - watts_new) / 1000;
+  const kwh_saved = kw_saved * annual_hours;
+  const energy_usd = kwh_saved * rate_kwh;
+  const demand_usd = kw_saved * demand_per_kw_mo * 12;
+  const annual_usd = energy_usd + demand_usd;
+  const payback_years = install_cost > 0 && annual_usd > 0 ? install_cost / annual_usd : null;
+  return {
+    kw_saved, kwh_saved, energy_usd, demand_usd, annual_usd, payback_years,
+    note: "Standard energy-and-demand savings method: kWh saved = fixtures x (W_old - W_new)/1000 x hours, demand savings at the utility's $/kW-month over twelve months, simple payback = cost / annual savings. The burn hours are the actual annual operating hours (a controls or occupancy-sensor retrofit changes them and is a separate credit); the demand savings apply only to the reduction coincident with the billed peak. An air-conditioned space also gains a cooling-energy credit (and a heated space a small heating penalty) not included here, and utility rebates are additive. A simple payback, not a discounted life-cycle analysis.",
+  };
+}
+function renderLightingRetrofitSavings(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: energy-and-demand lighting-savings method kWh_saved = fixtures x (W_old - W_new)/1000 x hours, demand savings at $/kW-month x 12, simple payback = cost / annual savings (by name). Burn hours are the actual operating hours; demand savings apply only to the peak-coincident reduction. A simple payback, not a life-cycle analysis.";
+  const fixtures = makeNumber("Fixtures retrofitted", "lrs-fix", { step: "any", min: "0", value: "100" });
+  fixtures.input.value = "100";
+  const we = makeNumber("Existing watts/fixture", "lrs-we", { step: "any", min: "0", value: "128" });
+  we.input.value = "128";
+  const wn = makeNumber("New watts/fixture", "lrs-wn", { step: "any", min: "0", value: "44" });
+  wn.input.value = "44";
+  const hours = makeNumber("Annual operating hours", "lrs-hours", { step: "any", min: "0", value: "4000" });
+  hours.input.value = "4000";
+  const rate = makeNumber("Energy rate ($/kWh)", "lrs-rate", { step: "any", min: "0", value: "0.12" });
+  rate.input.value = "0.12";
+  const demand = makeNumber("Demand charge ($/kW-month, optional)", "lrs-demand", { step: "any", min: "0", value: "12" });
+  demand.input.value = "12";
+  const cost = makeNumber("Installed cost ($, optional)", "lrs-cost", { step: "any", min: "0", value: "8000" });
+  cost.input.value = "8000";
+  for (const f of [fixtures, we, wn, hours, rate, demand, cost]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fixtures.input.value = "100"; we.input.value = "128"; wn.input.value = "44"; hours.input.value = "4000"; rate.input.value = "0.12"; demand.input.value = "12"; cost.input.value = "8000"; update(); });
+  const oKw = makeOutputLine(outputRegion, "Connected load saved", "lrs-out-kw");
+  const oKwh = makeOutputLine(outputRegion, "Energy saved", "lrs-out-kwh");
+  const oEnergy = makeOutputLine(outputRegion, "Energy savings", "lrs-out-energy");
+  const oDemand = makeOutputLine(outputRegion, "Demand savings", "lrs-out-demand");
+  const oAnnual = makeOutputLine(outputRegion, "Total annual savings", "lrs-out-annual");
+  const oPayback = makeOutputLine(outputRegion, "Simple payback", "lrs-out-payback");
+  const oNote = makeOutputLine(outputRegion, "Note", "lrs-out-note");
+  const update = debounce(() => {
+    const r = computeLightingRetrofitSavings({ fixtures: Number(fixtures.input.value) || 0, watts_existing: Number(we.input.value) || 0, watts_new: Number(wn.input.value) || 0, annual_hours: Number(hours.input.value) || 0, rate_kwh: Number(rate.input.value) || 0, demand_per_kw_mo: Number(demand.input.value) || 0, install_cost: Number(cost.input.value) || 0 });
+    if (r.error) { oKw.textContent = r.error; for (const o of [oKwh, oEnergy, oDemand, oAnnual, oPayback]) o.textContent = "-"; oNote.textContent = ""; return; }
+    oKw.textContent = fmt(r.kw_saved, 2) + " kW";
+    oKwh.textContent = fmt(r.kwh_saved, 0) + " kWh/yr";
+    oEnergy.textContent = "$" + fmt(r.energy_usd, 0) + "/yr";
+    oDemand.textContent = "$" + fmt(r.demand_usd, 0) + "/yr";
+    oAnnual.textContent = "$" + fmt(r.annual_usd, 0) + "/yr";
+    oPayback.textContent = r.payback_years === null ? "(enter cost)" : fmt(r.payback_years, 2) + " years";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fixtures, we, wn, hours, rate, demand, cost]) f.input.addEventListener("input", update);
+}
+SERVICE_RENDERERS["lighting-retrofit-savings"] = renderLightingRetrofitSavings;
+
+// --- spec-v232: power-factor-billing-savings -- demand savings and payback from PF correction ---
+//
+// A low power factor draws more apparent power (kVA) than real power (kW),
+// and the utility bills the demand in kVA (or adds a PF penalty). Correcting
+// cuts the billed demand every month and releases service capacity.
+// dims: in { real_power_kw: M L^2 T^-3, pf_existing: dimensionless, pf_target: dimensionless, demand_per_kva_mo: dimensionless, capacitor_cost: dimensionless } out: { kva_existing: M L^2 T^-3, kva_target: M L^2 T^-3, kva_reduction: M L^2 T^-3, kvar_needed: M L^2 T^-3, annual_usd: dimensionless, payback_years: T }
+export function computePowerFactorBillingSavings({ real_power_kw = 0, pf_existing = 0, pf_target = 0.95, demand_per_kva_mo = 0, capacitor_cost = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(real_power_kw > 0)) return { error: "Real power must be positive (kW)." };
+  if (!(pf_existing > 0 && pf_existing <= 1)) return { error: "Existing power factor must be over 0 and up to 1." };
+  if (!(pf_target > 0 && pf_target <= 1)) return { error: "Target power factor must be over 0 and up to 1." };
+  if (!(pf_target > pf_existing)) return { error: "Target power factor must exceed the existing power factor." };
+  if (demand_per_kva_mo < 0 || capacitor_cost < 0) return { error: "Demand charge and cost must be non-negative." };
+  const kva_existing = real_power_kw / pf_existing;
+  const kva_target = real_power_kw / pf_target;
+  const kva_reduction = kva_existing - kva_target;
+  const kvar_needed = real_power_kw * (Math.tan(Math.acos(pf_existing)) - Math.tan(Math.acos(pf_target)));
+  const annual_usd = kva_reduction * demand_per_kva_mo * 12;
+  const payback_years = capacitor_cost > 0 && annual_usd > 0 ? capacitor_cost / annual_usd : null;
+  return {
+    kva_existing, kva_target, kva_reduction, kvar_needed, annual_usd, payback_years,
+    note: "Power-triangle demand-billing method: kVA = kW / pf, correcting capacitor kVAR = kW x (tan(acos pf_old) - tan(acos pf_new)), demand savings = kVA reduction x $/kVA-month x 12. The utility rate structure governs - some bill demand directly in kVA, some in kW with a separate low-power-factor penalty clause, so enter the effective $/kVA-month. The kVA reduction also releases that much transformer and feeder capacity (deferring a service upgrade, a benefit beyond the demand line). Harmonics and switching transients require a detuned or filtered bank the sizing here does not address. A billing estimate, not a rate-tariff analysis.",
+  };
+}
+function renderPowerFactorBillingSavings(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: power-triangle demand-billing method kVA = kW / pf, kVAR = kW x (tan(acos pf_old) - tan(acos pf_new)), demand savings = kVA reduction x $/kVA-month x 12 (by name). Enter the effective $/kVA-month for the tariff. Diminishing returns above ~0.9; a billing estimate, not a rate-tariff analysis.";
+  const kw = makeNumber("Billed real power (kW)", "pfb-kw", { step: "any", min: "0", value: "400" });
+  kw.input.value = "400";
+  const pfe = makeNumber("Existing power factor (0-1)", "pfb-pfe", { step: "any", min: "0", value: "0.78" });
+  pfe.input.value = "0.78";
+  const pft = makeNumber("Target power factor (0-1)", "pfb-pft", { step: "any", min: "0", value: "0.95" });
+  pft.input.value = "0.95";
+  const demand = makeNumber("Demand charge ($/kVA-month)", "pfb-demand", { step: "any", min: "0", value: "8" });
+  demand.input.value = "8";
+  const cost = makeNumber("Capacitor-bank cost ($, optional)", "pfb-cost", { step: "any", min: "0", value: "5685" });
+  cost.input.value = "5685";
+  for (const f of [kw, pfe, pft, demand, cost]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kw.input.value = "400"; pfe.input.value = "0.78"; pft.input.value = "0.95"; demand.input.value = "8"; cost.input.value = "5685"; update(); });
+  const oBefore = makeOutputLine(outputRegion, "Apparent power before", "pfb-out-before");
+  const oAfter = makeOutputLine(outputRegion, "Apparent power after", "pfb-out-after");
+  const oRed = makeOutputLine(outputRegion, "kVA reduction (capacity freed)", "pfb-out-red");
+  const oKvar = makeOutputLine(outputRegion, "Capacitor size needed", "pfb-out-kvar");
+  const oAnnual = makeOutputLine(outputRegion, "Annual demand savings", "pfb-out-annual");
+  const oPayback = makeOutputLine(outputRegion, "Simple payback", "pfb-out-payback");
+  const oNote = makeOutputLine(outputRegion, "Note", "pfb-out-note");
+  const update = debounce(() => {
+    const r = computePowerFactorBillingSavings({ real_power_kw: Number(kw.input.value) || 0, pf_existing: Number(pfe.input.value) || 0, pf_target: Number(pft.input.value) || 0, demand_per_kva_mo: Number(demand.input.value) || 0, capacitor_cost: Number(cost.input.value) || 0 });
+    if (r.error) { oBefore.textContent = r.error; for (const o of [oAfter, oRed, oKvar, oAnnual, oPayback]) o.textContent = "-"; oNote.textContent = ""; return; }
+    oBefore.textContent = fmt(r.kva_existing, 1) + " kVA";
+    oAfter.textContent = fmt(r.kva_target, 1) + " kVA";
+    oRed.textContent = fmt(r.kva_reduction, 1) + " kVA";
+    oKvar.textContent = fmt(r.kvar_needed, 1) + " kVAR";
+    oAnnual.textContent = "$" + fmt(r.annual_usd, 0) + "/yr";
+    oPayback.textContent = r.payback_years === null ? "(enter cost)" : fmt(r.payback_years, 2) + " years";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kw, pfe, pft, demand, cost]) f.input.addEventListener("input", update);
+}
+SERVICE_RENDERERS["power-factor-billing-savings"] = renderPowerFactorBillingSavings;

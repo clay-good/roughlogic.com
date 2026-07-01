@@ -1,6 +1,6 @@
 # roughlogic.com Specification v231 -- LED Lighting Retrofit Savings and Payback (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v230..v232 (the electrical energy-cost-savings trio -- VFD retrofit, LED
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v230..v232 (the electrical energy-cost-savings trio -- VFD retrofit, LED
 > lighting retrofit, and power-factor demand billing). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the lighting retrofit is quoted and installed by
 > the electrician. Adds one tile to **`calc-service.js`** (Group A); no new module, group, or dependency. Inherits

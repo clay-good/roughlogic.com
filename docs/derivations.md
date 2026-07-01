@@ -1838,6 +1838,8 @@ cross-check.
 | calc-historical.js | `quantile` | `values, p` | _ | _ | _ |
 | calc-hvac.js | `bandLabel` | `value, low, high` | _ | _ | _ |
 | calc-hvac.js | `computeAffinityLaws` | `{ baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,...` | _ | _ | _ |
+| calc-hvac.js | `computeAirLeakCost` | `{ compressor_cfm = 0, load_min = 0, unload_min = 0, specific_power = 22, run_...` | _ | _ | _ |
+| calc-hvac.js | `computeAirPressureSetpointSavings` | `{ current_psig = 0, reduced_psig = 0, inlet_psia = 14.7, input_kw = 0, run_ho...` | _ | _ | _ |
 | calc-hvac.js | `computeAirReceiver` | `{ tools = [], pump_scfm = 0, p_high_psi = 0, p_low_psi = 0, drawdown_minutes ...` | _ | _ | _ |
 | calc-hvac.js | `computeApproachDeltaT` | `{ outdoor_F, condenser_saturation_F, supply_F, return_F, approach_normal_low ...` | _ | _ | _ |
 | calc-hvac.js | `computeAssemblyRValue` | `{ cavity_r = 0, continuous_r = 0, stud_depth_in = 0, framing_factor = 0.25, a...` | _ | _ | _ |
@@ -1847,7 +1849,9 @@ cross-check.
 | calc-hvac.js | `computeBlownInsulationCoverage` | `{ area_sqft = 0, bags_per_1000 = 0, r_per_inch = 3.5, target_r = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCfmPerTon` | `{ tons, climate = "standard" }` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
+| calc-hvac.js | `computeCompressedAirPower` | `{ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75...` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeDualFuelBalancePoint` | `{ rate_kwh = 0, rate_therm = 0, afue = 0.95, cop_now = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
@@ -1856,6 +1860,8 @@ cross-check.
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
+| calc-hvac.js | `computeHeatPumpColdCapacity` | `{ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = 0, design_load_btuh = 0 }...` | _ | _ | _ |
+| calc-hvac.js | `computeHeatPumpSeasonalEnergy` | `{ seasonal_load_mmbtu = 0, hspf = 0, rate_kwh = 0, afue = 0.95, rate_therm = ...` | _ | _ | _ |
 | calc-hvac.js | `computeHoodExhaust` | `{ hood_type = "wall-canopy", hood_class = "I", duty = "medium", length_ft = 0...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
@@ -2217,12 +2223,15 @@ cross-check.
 | calc-service.js | `computeCommercialLightingLoad` | `{ floor_area_ft2 = 0, unit_load_va_ft2 = 0, receptacle_count = 0, supply_v = ...` | _ | _ | _ |
 | calc-service.js | `computeDryerDemand22054` | `{ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}` | _ | _ | _ |
 | calc-service.js | `computeGasApplianceDemand` | `{ appliances = [], fuel = "natural_gas", heating_value = null } = {}` | _ | _ | _ |
+| calc-service.js | `computeLightingRetrofitSavings` | `{ fixtures = 0, watts_existing = 0, watts_new = 0, annual_hours = 0, rate_kwh...` | _ | _ | _ |
 | calc-service.js | `computeNeutralDemand22061` | `{ max_unbalanced_a = 0, nonlinear_excluded = 0 } = {}` | _ | _ | _ |
 | calc-service.js | `computeNoncoincidentLoad` | `{ load_a_va = 0, load_b_va = 0, both_can_run = 0 } = {}` | _ | _ | _ |
 | calc-service.js | `computePipeSupportSpacing` | `{ material = "copper", pipe_size, run_length, orientation = "horizontal", tab...` | _ | _ | _ |
+| calc-service.js | `computePowerFactorBillingSavings` | `{ real_power_kw = 0, pf_existing = 0, pf_target = 0.95, demand_per_kva_mo = 0...` | _ | _ | _ |
 | calc-service.js | `computeRangeDemand22055` | `{ num_ranges = 1, nameplate_kw = 0, supply_v = 240 } = {}` | _ | _ | _ |
 | calc-service.js | `computeSoftenerSizing` | `{ people, use_per_cap = 75, hardness_gpg, iron_ppm = 0, capacity, salt_per_re...` | _ | _ | _ |
 | calc-service.js | `computeTprDischarge` | `{ heater_input, valve_rating, outlet_size = 0.75 } = {}` | _ | _ | _ |
+| calc-service.js | `computeVfdEnergySavings` | `{ full_load_kw = 0, frac_a = 1.0, hours_a = 0, frac_b = 0.75, hours_b = 0, fr...` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
@@ -2236,7 +2245,10 @@ cross-check.
 | calc-shop.js | `computeThreadMeasureWire` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wir...` | _ | _ | _ |
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
+| calc-solar.js | `computeBatteryCRate` | `{ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}` | _ | _ | _ |
+| calc-solar.js | `computeBatteryPeakShaving` | `{ nameplate_kwh = 0, dod = 0.90, event_duration_h = 0, target_shave_kw = 0, d...` | _ | _ | _ |
 | calc-solar.js | `computeBatteryRuntime` | `{ amp_hours, system_V, dod_percent = 100, load_W, peukert_k = 1 }` | _ | _ | _ |
+| calc-solar.js | `computeBatteryTouArbitrage` | `{ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = ...` | _ | _ | _ |
 | calc-solar.js | `computeEvChargerLoad` | `{ charger_amps = 0, main_breaker_a = 0, existing_load_a = 0, busbar_rating_a ...` | _ | _ | _ |
 | calc-solar.js | `computeOffGridBattery` | `{ daily_load_wh = 0, days_autonomy = 3, dod_limit = 0.5, system_voltage_v = 4...` | _ | _ | _ |
 | calc-solar.js | `computePVStringSizing` | `{ module_voc_V, module_vmp_V, voc_temp_coeff_pct_per_C, record_low_C, record_...` | _ | _ | _ |
@@ -2351,7 +2363,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 937.
+Row count: 949.
 
 <!-- END function-corpus-v14 -->
 
@@ -2432,13 +2444,16 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (93 tiles)
+### Group A Electrical (99 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `ambient-ampacity-adjust` | Conductor Ambient and Fill Ampacity Adjustment | NFPA; adjusted = base * ambient_factor * fill_factor = 75 * 0.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `arc-flash-screen` | Arc-Flash Incident-Energy Screen (Lee 1982) | Lee 1982 / NFPA; Closed-form Lee equation; NFPA 70E-2024 §130.5 governs th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `battery-c-rate` | Battery C-Rate: Deliverable Power and Discharge Duration | Battery C-rate definition; spec-v238 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `battery-peak-shaving` | Battery Peak-Shaving Demand-Charge Savings | Demand-charge peak-shaving method; spec-v237 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-runtime` | Battery Runtime | Project (first-principles); 100 Ah * 0.80 * 12 V = 960 Wh; 960 Wh / 120 W = 8 h | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `battery-tou-arbitrage` | Battery Time-of-Use Arbitrage Value | NREL battery round-trip / arbitrage v...; spec-v236 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bends-between-pulls` | Conduit Bends Between Pull Points (360-Degree Rule) | NEC 2023 (NFPA 70); 90 + 90 + 45 + 45 = 270 deg; 270/90 = 3.0 quarter bends, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bonding-jumper` | Bonding Jumper Sizing (Supply-Side and Equipment) | NFPA; spec-v109 section 2.2 pinned example (350 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `box-fill` | Box Fill | NFPA; 12 AWG = 2.25 in^3 each; 6 conductors = 13.5; clamps +2.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2470,6 +2485,7 @@ per spec-v14 §13.1 second paragraph.
 | `grounding-electrode` | Grounding Electrode Resistance (Dwight / IEEE 142) | IEEE / Dwight; R = (rho / (2*pi*L)) * (ln(8L/d) - 1) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grounding-electrode-conductor` | Grounding Electrode Conductor Sizing | NFPA; spec-v109 section 2.1 pinned example (250 kcmil Cu servic... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `lighting-density` | Lighting Power Density | ASHRAE / IECC; 1000 ft^2 office @ 1.0 W/ft^2 -> 1000 W target lighting load | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lighting-retrofit-savings` | LED Lighting Retrofit Savings and Payback | Energy-and-demand lighting-savings me...; spec-v231 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumen-method` | Lumen-Method Luminaire Count | IES lumen method (by name).; spec-v101 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lux-to-footcandle` | Lux / Footcandle Converter and Lumen Method | IES Lighting Handbook (lumen method) ...; convert mode: 100 fc -> 1076.4 lux (100 * 10.764) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lv-dc-drop` | Low-Voltage DC Drop | Project (first-principles); 12 V / 10 AWG Cu / 20 ft / 10 A LED lighting -> ~0.407 V ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2498,6 +2514,7 @@ per spec-v14 §13.1 second paragraph.
 | `poe-budget` | PoE Budget and Run Distance | IEEE; Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-illuminance` | Point-Method Illuminance (Inverse-Square + Cosine) | IES Lighting Handbook (point method); angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-bonding-680-26` | Swimming-Pool Equipotential Bonding Checklist (NEC 680.26) | NEC 2023 (NFPA 70); permanent pool/spa -> full 8-component 680.26(B)/(C) bond... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `power-factor-billing-savings` | Power-Factor Correction Demand-Billing Savings | Power-triangle demand-billing method; spec-v232 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-triangle` | Power Triangle Solver (kW / kVA / kVAR / PF) | IEEE; kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pull-box-sizing` | NEC Pull and Junction Box Sizing | NEC (NFPA 70) 314.28(A)(1) and (A)(2)...; spec-v101 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pulling-tension` | Conductor Pulling Tension | NECA / cable-pulling engineering prac...; 1.5 lb/ft cable / 100 ft straight / one 90-deg bend at 2 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2523,6 +2540,7 @@ per spec-v14 §13.1 second paragraph.
 | `transformer-k-factor` | Transformer K-Factor From the Harmonic Spectrum (UL 1561) | UL 1561 / IEEE C57.110; K = sum(Ih^2 h^2)/sum(Ih^2) = 5.455/1.183 = 4.61 -> K-9 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-kva-sizing` | Transformer kVA Sizing and FLA | NFPA / ANSI/IEEE C57; Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-drop-reactance` | Voltage Drop With Reactance | NFPA; Vd = sqrt(3)*I*(R*cos(theta)+X*sin(theta))*L/1000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `voltage-imbalance` | Voltage Imbalance | NEMA; V_a=480 / V_b=475 / V_c=470 -> avg 475 / max deviation 5 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2608,12 +2626,14 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (64 tiles)
+### Group C HVAC (70 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `affinity-laws` | Fan Affinity Laws | ASHRAE; ratio = 1500/1750 = 0.857; CFM = 5000 * r = 4285.7; SP = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-changes-hour` | Air Changes per Hour (ACH) | ASHRAE; ACH = 1000*60/10000 = 6.0, within the 4-6 classroom target | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `air-leak-cost` | Compressed-Air Leak Load and Annual Cost (Load/Unload Test) | US DOE Compressed Air Challenge load/...; spec-v239 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `air-pressure-setpoint-savings` | Compressed-Air Discharge-Pressure Setpoint Savings | Isentropic compression-power ratio (D...; spec-v241 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `air-receiver` | Compressed Air Receiver Sizing | Compressed Air & Gas Institute (CAGI)...; Two tools (5 cfm @ 0.4 + 3 cfm @ 0.5) / 8 scfm pump / 175... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `approach-delta-t` | Approach and Delta-T Diagnostics | ACCA / manufacturer commissioning bul...; Outdoor 90 F / condenser sat 105 F -> approach 15 F (norm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ashrae-622-ventilation` | ASHRAE 62.2 Whole-House Mechanical Ventilation Rate | ASHRAE 62.2-2019 §4.1; spec-v219 section 2.1 pinned example (no credit) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2628,10 +2648,12 @@ per spec-v14 §13.1 second paragraph.
 | `chiller-tons` | Chiller Tonnage (Delta-T and GPM) | ASHRAE; Q = 240*500*10 = 1,200,000 BTU/hr; tons = 1,200,000/12000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combustion-air` | Combustion Air | ICC; required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compare-refrigerants` | Compare Two Refrigerants | Chemours / Honeywell / Daikin publish...; R-410A vs R-32 at 118 psig -> 40 F vs 43.2 F sat-temp; pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `compressed-air-power` | Compressed-Air Compression Power (Isentropic) and Energy Cost | Single-stage adiabatic (isentropic) c...; spec-v240 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `compression-ratio-refrig` | Refrigeration Compression Ratio | ASHRAE Handbook Refrigeration (by name); suction 70 psig, discharge 260 psig, atm 14.696 -> 274.69... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condensate-drain` | Condensate Rate and Drain Size | IMC 307.2.2 (drain size by capacity) ...; spec-v102 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `dual-fuel-balance-point` | Dual-Fuel Economic Switchover (Heat Pump vs Gas Balance Point) | Delivered-Btu fuel-cost comparison; spec-v234 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 10 in round / 400 cfm / 30 ft / no fittings -> 733.39 fpm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-leakage` | Duct Leakage Test-and-Balance | ACCA Manual D + SMACNA HVAC Duct Cons...; 1000 design cfm / 60 measured / 300 ft^2 / 1.0 in WC -> n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2646,6 +2668,8 @@ per spec-v14 §13.1 second paragraph.
 | `furnace-temp-rise` | Furnace Temperature Rise and Derived Airflow | First-principles sensible-heat relati...; spec-v110 section 2.2 pinned example (70->120 F, 100k inp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-meter-clock` | Gas-Meter Clocking (Actual Firing Rate) | First-principles meter-clocking arith...; spec-v110 section 2.1 pinned example (1 cf dial, 37 sec, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `geothermal-loop` | Geothermal Loop Length | IGSHPA / ASHRAE Handbook (Applications); 60,000 BTU/hr heating (governs over 48,000 BTU/hr cooling... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `heat-pump-cold-capacity` | Heat-Pump Cold-Temperature Capacity and Auxiliary Heat | AHRI 210/240 low-temperature rating p...; spec-v235 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `heat-pump-seasonal-energy` | Heat-Pump Seasonal Heating Energy and Cost vs Gas and Resistance | AHRI 210/240 HSPF / fuel-cost comparison; spec-v233 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hood-exhaust` | Commercial Kitchen Hood Exhaust (IMC 507) | ICC; §507.13: 400 cfm/ft heavy-duty wall-canopy x 8 ft = 3200 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `humidifier-capacity` | Humidifier Capacity (RH Target) | ASHRAE; W 0.00308 -> 0.00620 lb/lb; rho 0.0749 lb/ft^3; m_dot 449... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hvac-equipment-circuit` | HVAC Equipment Circuit (MCA / MOCP) | NEC 2023 (NFPA 70) 440.33 / 440.22(A)...; spec-v104 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3231,6 +3255,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 694. Fixture-covered or reference-cadence: 694 / 694.
+Tile count: 706. Fixture-covered or reference-cadence: 706 / 706.
 
 <!-- END tile-index-v14 -->

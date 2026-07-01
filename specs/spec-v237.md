@@ -1,6 +1,6 @@
 # roughlogic.com Specification v237 -- Battery Peak Shaving Demand-Charge Savings (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v236..v238 (the grid-tied battery-economics trio -- TOU arbitrage, peak
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v236..v238 (the grid-tied battery-economics trio -- TOU arbitrage, peak
 > shaving, and the C-rate power limit). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: sizing a battery to shave a demand peak is the
 > commercial-storage design the solar and electrical trade sells. Adds one tile to **`calc-solar.js`** (Group A); no new

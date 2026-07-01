@@ -74,6 +74,8 @@ const TOOL_MODULES = (() => {
     "pv-circuit-ampacity",
     // spec-v221..v223 PV system-design batch
     "pv-energy-yield", "pv-row-spacing", "pv-inverter-ratio",
+    // spec-v236..v238 grid-tied battery-economics batch
+    "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)
@@ -181,6 +183,8 @@ const TOOL_MODULES = (() => {
     "range-demand-220-55", "dryer-demand-220-54", "neutral-demand-220-61",
     // spec-v180/v181 electrician second-pass batch
     "commercial-lighting-load", "noncoincident-load",
+    // spec-v230..v232 electrical energy-cost-savings batch
+    "vfd-energy-savings", "lighting-retrofit-savings", "power-factor-billing-savings",
   ]);
   // spec-v73 cap-relief split: the two spec-v62 storm-drainage tiles relocated
   // out of calc-plumbing.js (which had reached 96.2% of cap -- the tightest
@@ -223,6 +227,10 @@ const TOOL_MODULES = (() => {
     "round-to-rect-duct",
     // v99 building-envelope insulation
     "assembly-r-value", "blown-insulation-coverage",
+    // spec-v233..v235 heat-pump heating-mode batch
+    "heat-pump-seasonal-energy", "dual-fuel-balance-point", "heat-pump-cold-capacity",
+    // spec-v239..v241 compressed-air energy batch
+    "air-leak-cost", "compressed-air-power", "air-pressure-setpoint-savings",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

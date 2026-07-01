@@ -25702,6 +25702,1014 @@
         "boxes": { "value": 1000, "tolerance": { "abs": 0 } },
         "truck_loads": { "value": 5, "tolerance": { "abs": 0 } }
       }
+    },
+    {
+      "tile_id": "vfd-energy-savings",
+      "source_publisher": "US DOE motor/pump-system energy method",
+      "source_title": "20 kW pump, three-bin duty -> 60,640 kWh, $7,277/yr saved",
+      "source_edition_or_year": "spec-v230 worked example (machine-verified)",
+      "source_section_or_page": "spec-v230 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "full_load_kw": 20,
+        "frac_a": 1,
+        "hours_a": 2000,
+        "frac_b": 0.8,
+        "hours_b": 3000,
+        "frac_c": 0.6,
+        "hours_c": 2000,
+        "rate_kwh": 0.12
+      },
+      "outputs": {
+        "full_kwh": {
+          "value": 140000,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "vfd_kwh": {
+          "value": 79360,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "saved_kwh": {
+          "value": 60640,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "saved_usd": {
+          "value": 7276.8,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "vfd-energy-savings",
+      "source_publisher": "US DOE motor/pump-system energy method",
+      "source_title": "Same pump mostly at full flow -> $1,171/yr (6x less)",
+      "source_edition_or_year": "spec-v230 worked example (machine-verified)",
+      "source_section_or_page": "spec-v230 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "full_load_kw": 20,
+        "frac_a": 1,
+        "hours_a": 6000,
+        "frac_b": 0.8,
+        "hours_b": 1000,
+        "frac_c": 0.6,
+        "hours_c": 0,
+        "rate_kwh": 0.12
+      },
+      "outputs": {
+        "full_kwh": {
+          "value": 140000,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "vfd_kwh": {
+          "value": 130240,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "saved_kwh": {
+          "value": 9760,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "saved_usd": {
+          "value": 1171.2,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "lighting-retrofit-savings",
+      "source_publisher": "Energy-and-demand lighting-savings method",
+      "source_title": "100 fixtures 128->44 W -> $5,242/yr, 1.53 yr payback",
+      "source_edition_or_year": "spec-v231 worked example (machine-verified)",
+      "source_section_or_page": "spec-v231 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "fixtures": 100,
+        "watts_existing": 128,
+        "watts_new": 44,
+        "annual_hours": 4000,
+        "rate_kwh": 0.12,
+        "demand_per_kw_mo": 12,
+        "install_cost": 8000
+      },
+      "outputs": {
+        "kw_saved": {
+          "value": 8.4,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kwh_saved": {
+          "value": 33600,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "energy_usd": {
+          "value": 4032,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "demand_usd": {
+          "value": 1209.6,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_usd": {
+          "value": 5241.6,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "payback_years": {
+          "value": 1.526251526,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "lighting-retrofit-savings",
+      "source_publisher": "Energy-and-demand lighting-savings method",
+      "source_title": "No demand charge -> $4,032/yr, 1.98 yr payback",
+      "source_edition_or_year": "spec-v231 worked example (machine-verified)",
+      "source_section_or_page": "spec-v231 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "fixtures": 100,
+        "watts_existing": 128,
+        "watts_new": 44,
+        "annual_hours": 4000,
+        "rate_kwh": 0.12,
+        "demand_per_kw_mo": 0,
+        "install_cost": 8000
+      },
+      "outputs": {
+        "annual_usd": {
+          "value": 4032,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "payback_years": {
+          "value": 1.984126984,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "power-factor-billing-savings",
+      "source_publisher": "Power-triangle demand-billing method",
+      "source_title": "400 kW 0.78->0.95 -> 91.8 kVA, $8,810/yr, 0.65 yr",
+      "source_edition_or_year": "spec-v232 worked example (machine-verified)",
+      "source_section_or_page": "spec-v232 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "real_power_kw": 400,
+        "pf_existing": 0.78,
+        "pf_target": 0.95,
+        "demand_per_kva_mo": 8,
+        "capacitor_cost": 5685
+      },
+      "outputs": {
+        "kva_existing": {
+          "value": 512.8205128,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kva_target": {
+          "value": 421.0526316,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kva_reduction": {
+          "value": 91.76788124,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kvar_needed": {
+          "value": 189.4389292,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_usd": {
+          "value": 8809.716599,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "payback_years": {
+          "value": 0.6453102022,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "power-factor-billing-savings",
+      "source_publisher": "Power-triangle demand-billing method",
+      "source_title": "Already 0.90->0.95 -> 23.4 kVA, $2,246/yr",
+      "source_edition_or_year": "spec-v232 worked example (machine-verified)",
+      "source_section_or_page": "spec-v232 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "real_power_kw": 400,
+        "pf_existing": 0.9,
+        "pf_target": 0.95,
+        "demand_per_kva_mo": 8,
+        "capacitor_cost": 5685
+      },
+      "outputs": {
+        "kva_existing": {
+          "value": 444.4444444,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kva_reduction": {
+          "value": 23.39181287,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_usd": {
+          "value": 2245.614035,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "heat-pump-seasonal-energy",
+      "source_publisher": "AHRI 210/240 HSPF / fuel-cost comparison",
+      "source_title": "60 MMBtu HSPF 9 -> 6,667 kWh, $1,000 (vs $2,638 resistance, $947 gas)",
+      "source_edition_or_year": "spec-v233 worked example (machine-verified)",
+      "source_section_or_page": "spec-v233 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "seasonal_load_mmbtu": 60,
+        "hspf": 9,
+        "rate_kwh": 0.15,
+        "afue": 0.95,
+        "rate_therm": 1.5
+      },
+      "outputs": {
+        "hp_kwh": {
+          "value": 6666.666667,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "hp_cost": {
+          "value": 1000,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "resistance_cost": {
+          "value": 2637.749121,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "gas_therms": {
+          "value": 631.5789474,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "gas_cost": {
+          "value": 947.3684211,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "heat-pump-seasonal-energy",
+      "source_publisher": "AHRI 210/240 HSPF / fuel-cost comparison",
+      "source_title": "Cheap gas expensive power -> $1,600 HP vs $568 gas",
+      "source_edition_or_year": "spec-v233 worked example (machine-verified)",
+      "source_section_or_page": "spec-v233 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "seasonal_load_mmbtu": 60,
+        "hspf": 9,
+        "rate_kwh": 0.24,
+        "afue": 0.95,
+        "rate_therm": 0.9
+      },
+      "outputs": {
+        "hp_cost": {
+          "value": 1600,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "gas_cost": {
+          "value": 568.4210526,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "dual-fuel-balance-point",
+      "source_publisher": "Delivered-Btu fuel-cost comparison",
+      "source_title": "COP 2.5 -> $17.58 HP vs $15.79 gas, switchover 2.78, switch to gas",
+      "source_edition_or_year": "spec-v234 worked example (machine-verified)",
+      "source_section_or_page": "spec-v234 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "rate_kwh": 0.15,
+        "rate_therm": 1.5,
+        "afue": 0.95,
+        "cop_now": 2.5
+      },
+      "outputs": {
+        "gas_per_mmbtu": {
+          "value": 15.78947368,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "hp_per_mmbtu": {
+          "value": 17.5842,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "cop_switch": {
+          "value": 2.784165,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "run_hp": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "verdict": {
+          "value": "Switch to gas - below the economic switchover COP the furnace is cheaper",
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "dual-fuel-balance-point",
+      "source_publisher": "Delivered-Btu fuel-cost comparison",
+      "source_title": "COP 3.2 -> $13.74 HP, run the heat pump",
+      "source_edition_or_year": "spec-v234 worked example (machine-verified)",
+      "source_section_or_page": "spec-v234 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "rate_kwh": 0.15,
+        "rate_therm": 1.5,
+        "afue": 0.95,
+        "cop_now": 3.2
+      },
+      "outputs": {
+        "hp_per_mmbtu": {
+          "value": 13.73765625,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "cop_switch": {
+          "value": 2.784165,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "run_hp": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "heat-pump-cold-capacity",
+      "source_publisher": "AHRI 210/240 low-temperature rating points",
+      "source_title": "36k/22k at 5 F, 30k load -> 16,400 Btu/h, 3.99 kW aux",
+      "source_edition_or_year": "spec-v235 worked example (machine-verified)",
+      "source_section_or_page": "spec-v235 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "cap_47_btuh": 36000,
+        "cap_17_btuh": 22000,
+        "design_temp_f": 5,
+        "design_load_btuh": 30000
+      },
+      "outputs": {
+        "slope": {
+          "value": 466.6666667,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "cap_design": {
+          "value": 16400,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "shortfall": {
+          "value": 13600,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "aux_kw": {
+          "value": 3.985932005,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "covers": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "heat-pump-cold-capacity",
+      "source_publisher": "AHRI 210/240 low-temperature rating points",
+      "source_title": "Same unit at 30 F -> 28,067 Btu/h, 0.57 kW aux",
+      "source_edition_or_year": "spec-v235 worked example (machine-verified)",
+      "source_section_or_page": "spec-v235 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "cap_47_btuh": 36000,
+        "cap_17_btuh": 22000,
+        "design_temp_f": 30,
+        "design_load_btuh": 30000
+      },
+      "outputs": {
+        "cap_design": {
+          "value": 28066.66667,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "shortfall": {
+          "value": 1933.333333,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "aux_kw": {
+          "value": 0.5666275889,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "battery-tou-arbitrage",
+      "source_publisher": "NREL battery round-trip / arbitrage value",
+      "source_title": "13.5 kWh strong spread -> $3.44/day, $1,257/yr",
+      "source_edition_or_year": "spec-v236 worked example (machine-verified)",
+      "source_section_or_page": "spec-v236 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "nameplate_kwh": 13.5,
+        "dod": 0.9,
+        "rte": 0.9,
+        "peak_price": 0.45,
+        "offpeak_price": 0.15,
+        "cycles_per_year": 365
+      },
+      "outputs": {
+        "usable_kwh": {
+          "value": 12.15,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "charge_kwh": {
+          "value": 13.5,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "daily_value": {
+          "value": 3.4425,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_value": {
+          "value": 1256.5125,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "breakeven_ratio": {
+          "value": 1.111111111,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "battery-tou-arbitrage",
+      "source_publisher": "NREL battery round-trip / arbitrage value",
+      "source_title": "Flat spread -> $0.97/day, $355/yr",
+      "source_edition_or_year": "spec-v236 worked example (machine-verified)",
+      "source_section_or_page": "spec-v236 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "nameplate_kwh": 13.5,
+        "dod": 0.9,
+        "rte": 0.9,
+        "peak_price": 0.28,
+        "offpeak_price": 0.18,
+        "cycles_per_year": 365
+      },
+      "outputs": {
+        "daily_value": {
+          "value": 0.972,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_value": {
+          "value": 354.78,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "battery-peak-shaving",
+      "source_publisher": "Demand-charge peak-shaving method",
+      "source_title": "100 kWh 3-h peak -> 30 kW shave, $6,480/yr",
+      "source_edition_or_year": "spec-v237 worked example (machine-verified)",
+      "source_section_or_page": "spec-v237 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "nameplate_kwh": 100,
+        "dod": 0.9,
+        "event_duration_h": 3,
+        "target_shave_kw": 40,
+        "demand_per_kw_mo": 18
+      },
+      "outputs": {
+        "usable_kwh": {
+          "value": 90,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "sustainable_kw": {
+          "value": 30,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "actual_shave_kw": {
+          "value": 30,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_savings": {
+          "value": 6480,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "energy_limited": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "battery-peak-shaving",
+      "source_publisher": "Demand-charge peak-shaving method",
+      "source_title": "Same battery 1-h peak -> 40 kW shave, $8,640/yr",
+      "source_edition_or_year": "spec-v237 worked example (machine-verified)",
+      "source_section_or_page": "spec-v237 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "nameplate_kwh": 100,
+        "dod": 0.9,
+        "event_duration_h": 1,
+        "target_shave_kw": 40,
+        "demand_per_kw_mo": 18
+      },
+      "outputs": {
+        "sustainable_kw": {
+          "value": 90,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "actual_shave_kw": {
+          "value": 40,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_savings": {
+          "value": 8640,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "energy_limited": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "battery-c-rate",
+      "source_publisher": "Battery C-rate definition",
+      "source_title": "40 kWh 0.5C 15 kW inverter -> 15 kW deliverable, 2.4 h",
+      "source_edition_or_year": "spec-v238 worked example (machine-verified)",
+      "source_section_or_page": "spec-v238 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "nameplate_kwh": 40,
+        "c_rate": 0.5,
+        "dod": 0.9,
+        "inverter_kw": 15
+      },
+      "outputs": {
+        "c_rate_power_kw": {
+          "value": 20,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "deliverable_kw": {
+          "value": 15,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "usable_kwh": {
+          "value": 36,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "discharge_time_h": {
+          "value": 2.4,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "inverter_limited": {
+          "value": 1,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "battery-c-rate",
+      "source_publisher": "Battery C-rate definition",
+      "source_title": "1C no inverter limit -> 40 kW, 0.9 h",
+      "source_edition_or_year": "spec-v238 worked example (machine-verified)",
+      "source_section_or_page": "spec-v238 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "nameplate_kwh": 40,
+        "c_rate": 1,
+        "dod": 0.9,
+        "inverter_kw": 0
+      },
+      "outputs": {
+        "c_rate_power_kw": {
+          "value": 40,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "deliverable_kw": {
+          "value": 40,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "discharge_time_h": {
+          "value": 0.9,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "inverter_limited": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "air-leak-cost",
+      "source_publisher": "US DOE Compressed Air Challenge load/unload test",
+      "source_title": "500 cfm 3-of-15 min -> 100 cfm, 22 kW, $19,272/yr",
+      "source_edition_or_year": "spec-v239 worked example (machine-verified)",
+      "source_section_or_page": "spec-v239 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "compressor_cfm": 500,
+        "load_min": 3,
+        "unload_min": 12,
+        "specific_power": 22,
+        "run_hours": 8760,
+        "rate_kwh": 0.1
+      },
+      "outputs": {
+        "leak_fraction": {
+          "value": 0.2,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "leak_cfm": {
+          "value": 100,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "leak_kw": {
+          "value": 22,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_kwh": {
+          "value": 192720,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_cost": {
+          "value": 19272,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "air-leak-cost",
+      "source_publisher": "US DOE Compressed Air Challenge load/unload test",
+      "source_title": "After repair 1-of-15 min -> 33.3 cfm, $6,424/yr",
+      "source_edition_or_year": "spec-v239 worked example (machine-verified)",
+      "source_section_or_page": "spec-v239 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "compressor_cfm": 500,
+        "load_min": 1,
+        "unload_min": 14,
+        "specific_power": 22,
+        "run_hours": 8760,
+        "rate_kwh": 0.1
+      },
+      "outputs": {
+        "leak_fraction": {
+          "value": 0.06666666667,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "leak_cfm": {
+          "value": 33.33333333,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_cost": {
+          "value": 6424,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "compressed-air-power",
+      "source_publisher": "Single-stage adiabatic (isentropic) compression power",
+      "source_title": "100 cfm at 100 psig -> 17.9 hp, $7,134/yr",
+      "source_edition_or_year": "spec-v240 worked example (machine-verified)",
+      "source_section_or_page": "spec-v240 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "free_air_cfm": 100,
+        "inlet_psia": 14.7,
+        "discharge_psig": 100,
+        "overall_eff": 0.75,
+        "run_hours": 4000,
+        "rate_kwh": 0.1
+      },
+      "outputs": {
+        "theo_hp": {
+          "value": 17.93012649,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "input_kw": {
+          "value": 17.83449915,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_kwh": {
+          "value": 71337.9966,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_cost": {
+          "value": 7133.79966,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "compressed-air-power",
+      "source_publisher": "Single-stage adiabatic (isentropic) compression power",
+      "source_title": "Same flow at 125 psig -> 20.3 hp, $8,065/yr",
+      "source_edition_or_year": "spec-v240 worked example (machine-verified)",
+      "source_section_or_page": "spec-v240 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "free_air_cfm": 100,
+        "inlet_psia": 14.7,
+        "discharge_psig": 125,
+        "overall_eff": 0.75,
+        "run_hours": 4000,
+        "rate_kwh": 0.1
+      },
+      "outputs": {
+        "theo_hp": {
+          "value": 20.27045612,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_cost": {
+          "value": 8064.938809,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "air-pressure-setpoint-savings",
+      "source_publisher": "Isentropic compression-power ratio (DOE per-psi rule)",
+      "source_title": "120->105 psig on 50 kW -> 7.07%, $2,122/yr",
+      "source_edition_or_year": "spec-v241 worked example (machine-verified)",
+      "source_section_or_page": "spec-v241 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "current_psig": 120,
+        "reduced_psig": 105,
+        "inlet_psia": 14.7,
+        "input_kw": 50,
+        "run_hours": 6000,
+        "rate_kwh": 0.1
+      },
+      "outputs": {
+        "pct_saved": {
+          "value": 0.07072966232,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kw_saved": {
+          "value": 3.536483116,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_kwh": {
+          "value": 21218.8987,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_savings": {
+          "value": 2121.88987,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "air-pressure-setpoint-savings",
+      "source_publisher": "Isentropic compression-power ratio (DOE per-psi rule)",
+      "source_title": "120->115 psig -> 2.29%, $688/yr",
+      "source_edition_or_year": "spec-v241 worked example (machine-verified)",
+      "source_section_or_page": "spec-v241 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "current_psig": 120,
+        "reduced_psig": 115,
+        "inlet_psia": 14.7,
+        "input_kw": 50,
+        "run_hours": 6000,
+        "rate_kwh": 0.1
+      },
+      "outputs": {
+        "pct_saved": {
+          "value": 0.02292150986,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "kw_saved": {
+          "value": 1.146075493,
+          "tolerance": {
+            "pct": 0.1
+          }
+        },
+        "annual_savings": {
+          "value": 687.6452958,
+          "tolerance": {
+            "pct": 0.1
+          }
+        }
+      }
     }
   ]
 }

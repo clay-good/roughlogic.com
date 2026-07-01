@@ -782,6 +782,158 @@ function renderPvInverterRatio(inputRegion, outputRegion, citationEl) {
   for (const f of [dc, ac, eff]) f.input.addEventListener("input", update);
 }
 
+// ===================== spec-v236: battery time-of-use arbitrage value =====================
+
+// dims: in { nameplate_kwh: M L^2 T^-2, dod: dimensionless, rte: dimensionless, peak_price: dimensionless, offpeak_price: dimensionless, cycles_per_year: dimensionless } out: { usable_kwh: M L^2 T^-2, charge_kwh: M L^2 T^-2, daily_value: dimensionless, annual_value: dimensionless, breakeven_ratio: dimensionless }
+export function computeBatteryTouArbitrage({ nameplate_kwh = 0, dod = 0.90, rte = 0.86, peak_price = 0, offpeak_price = 0, cycles_per_year = 365 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(nameplate_kwh > 0)) return { error: "Battery nameplate energy must be positive (kWh)." };
+  if (!(dod > 0 && dod <= 1)) return { error: "Depth of discharge must be over 0 and up to 1." };
+  if (!(rte > 0 && rte <= 1)) return { error: "Round-trip efficiency must be over 0 and up to 1." };
+  if (peak_price < 0 || offpeak_price < 0) return { error: "Prices must be non-negative." };
+  if (!(cycles_per_year > 0)) return { error: "Cycles per year must be positive." };
+  const usable_kwh = nameplate_kwh * dod;
+  const charge_kwh = usable_kwh / rte;
+  const daily_value = usable_kwh * peak_price - charge_kwh * offpeak_price;
+  const annual_value = daily_value * cycles_per_year;
+  const breakeven_ratio = 1 / rte;
+  return {
+    usable_kwh, charge_kwh, daily_value, annual_value, breakeven_ratio,
+    note: "Energy-arbitrage value: daily = usable x peak - (usable / RTE) x offpeak, usable = nameplate x DoD, break-even when peak > offpeak / RTE (the NREL battery round-trip framing). The round-trip efficiency is the AC-to-AC value (inverter plus cells; a DC-coupled solar charge avoids one conversion), and the depth of discharge is the warranty-usable fraction. One cycle per day is the common assumption, but a battery cannot capture two non-overlapping peaks it lacks the energy for; throughput degrades the cells, a cost this gross value does not net out. A spread-value aid, not a financed payback.",
+  };
+}
+function renderBatteryTouArbitrage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: energy-arbitrage value daily = usable x peak - (usable / RTE) x offpeak, break-even when peak > offpeak / RTE, and the NREL battery round-trip / degradation framing (by name). RTE is AC-to-AC; DoD is the warranty-usable fraction. A gross spread-value aid, not a financed payback.";
+  const kwh = makeNumber("Battery nameplate (kWh)", "bta-kwh", { step: "any", min: "0", value: "13.5" });
+  kwh.input.value = "13.5";
+  const dod = makeNumber("Depth of discharge (0-1)", "bta-dod", { step: "any", min: "0", value: "0.9" });
+  dod.input.value = "0.9";
+  const rte = makeNumber("Round-trip efficiency (0-1)", "bta-rte", { step: "any", min: "0", value: "0.9" });
+  rte.input.value = "0.9";
+  const peak = makeNumber("On-peak price ($/kWh)", "bta-peak", { step: "any", min: "0", value: "0.45" });
+  peak.input.value = "0.45";
+  const off = makeNumber("Off-peak price ($/kWh)", "bta-off", { step: "any", min: "0", value: "0.15" });
+  off.input.value = "0.15";
+  const cyc = makeNumber("Cycles per year", "bta-cyc", { step: "any", min: "0", value: "365" });
+  cyc.input.value = "365";
+  for (const f of [kwh, dod, rte, peak, off, cyc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kwh.input.value = "13.5"; dod.input.value = "0.9"; rte.input.value = "0.9"; peak.input.value = "0.45"; off.input.value = "0.15"; cyc.input.value = "365"; update(); });
+  const oUsable = makeOutputLine(outputRegion, "Usable energy per cycle", "bta-out-usable");
+  const oDaily = makeOutputLine(outputRegion, "Daily arbitrage value", "bta-out-daily");
+  const oAnnual = makeOutputLine(outputRegion, "Annual value", "bta-out-annual");
+  const oBreak = makeOutputLine(outputRegion, "Break-even price ratio", "bta-out-break");
+  const oNote = makeOutputLine(outputRegion, "Note", "bta-out-note");
+  const update = debounce(() => {
+    const r = computeBatteryTouArbitrage({ nameplate_kwh: Number(kwh.input.value) || 0, dod: Number(dod.input.value) || 0, rte: Number(rte.input.value) || 0, peak_price: Number(peak.input.value) || 0, offpeak_price: Number(off.input.value) || 0, cycles_per_year: Number(cyc.input.value) || 0 });
+    if (r.error) { oUsable.textContent = r.error; oDaily.textContent = "-"; oAnnual.textContent = "-"; oBreak.textContent = "-"; oNote.textContent = ""; return; }
+    oUsable.textContent = fmt(r.usable_kwh, 2) + " kWh";
+    oDaily.textContent = "$" + fmt(r.daily_value, 2) + "/day";
+    oAnnual.textContent = "$" + fmt(r.annual_value, 0) + "/yr";
+    oBreak.textContent = fmt(r.breakeven_ratio, 3) + "x (peak must beat off-peak by this)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kwh, dod, rte, peak, off, cyc]) f.input.addEventListener("input", update);
+}
+
+// ===================== spec-v237: battery peak-shaving demand-charge savings =====================
+
+// dims: in { nameplate_kwh: M L^2 T^-2, dod: dimensionless, event_duration_h: T, target_shave_kw: M L^2 T^-3, demand_per_kw_mo: dimensionless } out: { usable_kwh: M L^2 T^-2, sustainable_kw: M L^2 T^-3, actual_shave_kw: M L^2 T^-3, annual_savings: dimensionless }
+export function computeBatteryPeakShaving({ nameplate_kwh = 0, dod = 0.90, event_duration_h = 0, target_shave_kw = 0, demand_per_kw_mo = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(nameplate_kwh > 0)) return { error: "Battery nameplate energy must be positive (kWh)." };
+  if (!(dod > 0 && dod <= 1)) return { error: "Depth of discharge must be over 0 and up to 1." };
+  if (!(event_duration_h > 0)) return { error: "Peak-event duration must be positive (h)." };
+  if (!(target_shave_kw > 0)) return { error: "Target shave must be positive (kW)." };
+  if (!(demand_per_kw_mo > 0)) return { error: "Demand charge must be positive ($/kW-month)." };
+  const usable_kwh = nameplate_kwh * dod;
+  const sustainable_kw = usable_kwh / event_duration_h;
+  const actual_shave_kw = Math.min(target_shave_kw, sustainable_kw);
+  const annual_savings = actual_shave_kw * demand_per_kw_mo * 12;
+  const energy_limited = sustainable_kw < target_shave_kw;
+  return {
+    usable_kwh, sustainable_kw, actual_shave_kw, annual_savings, energy_limited,
+    note: "Demand-charge peak-shaving method: sustainable shave = usable / duration, actual shave = min(target, sustainable), savings = actual shave x $/kW-month x 12. The peak-event duration is how long the facility's demand stays above the shave target (from an interval-meter load profile). The actual reduction depends on the battery discharging on exactly the right intervals (a controls problem this sizing does not solve), and a coincident-peak or ratchet tariff changes the billing. A demand-savings estimate, not a metered bill.",
+  };
+}
+function renderBatteryPeakShaving(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: demand-charge peak-shaving method sustainable shave = usable / duration, actual = min(target, sustainable), savings = actual x $/kW-month x 12 (by name). The shave is energy-limited when the peak outlasts the usable energy. A demand-savings estimate, not a metered bill.";
+  const kwh = makeNumber("Battery nameplate (kWh)", "bps-kwh", { step: "any", min: "0", value: "100" });
+  kwh.input.value = "100";
+  const dod = makeNumber("Depth of discharge (0-1)", "bps-dod", { step: "any", min: "0", value: "0.9" });
+  dod.input.value = "0.9";
+  const dur = makeNumber("Peak-event duration (h)", "bps-dur", { step: "any", min: "0", value: "3" });
+  dur.input.value = "3";
+  const tgt = makeNumber("Target demand reduction (kW)", "bps-tgt", { step: "any", min: "0", value: "40" });
+  tgt.input.value = "40";
+  const demand = makeNumber("Demand charge ($/kW-month)", "bps-demand", { step: "any", min: "0", value: "18" });
+  demand.input.value = "18";
+  for (const f of [kwh, dod, dur, tgt, demand]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kwh.input.value = "100"; dod.input.value = "0.9"; dur.input.value = "3"; tgt.input.value = "40"; demand.input.value = "18"; update(); });
+  const oUsable = makeOutputLine(outputRegion, "Usable energy", "bps-out-usable");
+  const oSust = makeOutputLine(outputRegion, "Sustainable shave", "bps-out-sust");
+  const oActual = makeOutputLine(outputRegion, "Actual shave", "bps-out-actual");
+  const oAnnual = makeOutputLine(outputRegion, "Annual demand savings", "bps-out-annual");
+  const oNote = makeOutputLine(outputRegion, "Note", "bps-out-note");
+  const update = debounce(() => {
+    const r = computeBatteryPeakShaving({ nameplate_kwh: Number(kwh.input.value) || 0, dod: Number(dod.input.value) || 0, event_duration_h: Number(dur.input.value) || 0, target_shave_kw: Number(tgt.input.value) || 0, demand_per_kw_mo: Number(demand.input.value) || 0 });
+    if (r.error) { oUsable.textContent = r.error; oSust.textContent = "-"; oActual.textContent = "-"; oAnnual.textContent = "-"; oNote.textContent = ""; return; }
+    oUsable.textContent = fmt(r.usable_kwh, 1) + " kWh";
+    oSust.textContent = fmt(r.sustainable_kw, 1) + " kW";
+    oActual.textContent = fmt(r.actual_shave_kw, 1) + " kW" + (r.energy_limited ? " (energy-limited)" : "");
+    oAnnual.textContent = "$" + fmt(r.annual_savings, 0) + "/yr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kwh, dod, dur, tgt, demand]) f.input.addEventListener("input", update);
+}
+
+// ===================== spec-v238: battery C-rate deliverable power and duration =====================
+
+// dims: in { nameplate_kwh: M L^2 T^-2, c_rate: T^-1, dod: dimensionless, inverter_kw: M L^2 T^-3 } out: { c_rate_power_kw: M L^2 T^-3, deliverable_kw: M L^2 T^-3, usable_kwh: M L^2 T^-2, discharge_time_h: T }
+export function computeBatteryCRate({ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(nameplate_kwh > 0)) return { error: "Battery nameplate energy must be positive (kWh)." };
+  if (!(c_rate > 0)) return { error: "C-rate must be positive." };
+  if (!(dod > 0 && dod <= 1)) return { error: "Depth of discharge must be over 0 and up to 1." };
+  if (inverter_kw < 0) return { error: "Inverter rating must be non-negative (0 = no inverter limit)." };
+  const c_rate_power_kw = nameplate_kwh * c_rate;
+  const deliverable_kw = inverter_kw > 0 ? Math.min(c_rate_power_kw, inverter_kw) : c_rate_power_kw;
+  const usable_kwh = nameplate_kwh * dod;
+  const discharge_time_h = usable_kwh / deliverable_kw;
+  const inverter_limited = inverter_kw > 0 && inverter_kw < c_rate_power_kw;
+  return {
+    c_rate_power_kw, deliverable_kw, usable_kwh, discharge_time_h, inverter_limited,
+    note: "Battery C-rate definition: power = nameplate x C, full discharge time = 1 / C, and the deliverable power is the lesser of the C-rate power and the inverter rating (0 = no inverter limit). The continuous C-rate is the sustained rating not the brief surge (a pack delivers more for seconds than for an hour); the usable energy uses the depth of discharge; high discharge rates lose a few points of capacity and add heat. A nameplate power check, not a cell-level thermal model.",
+  };
+}
+function renderBatteryCRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: battery C-rate definition power = nameplate x C, discharge time = 1 / C, deliverable = min(C-rate power, inverter rating) (by name). Continuous, not surge; usable uses DoD. A nameplate power check, not a cell-level thermal model.";
+  const kwh = makeNumber("Battery nameplate (kWh)", "bcr-kwh", { step: "any", min: "0", value: "40" });
+  kwh.input.value = "40";
+  const c = makeNumber("Continuous C-rate (0.5 = 0.5C)", "bcr-c", { step: "any", min: "0", value: "0.5" });
+  c.input.value = "0.5";
+  const dod = makeNumber("Depth of discharge (0-1)", "bcr-dod", { step: "any", min: "0", value: "0.9" });
+  dod.input.value = "0.9";
+  const inv = makeNumber("Inverter rating (kW, 0 = no limit)", "bcr-inv", { step: "any", min: "0", value: "15" });
+  inv.input.value = "15";
+  for (const f of [kwh, c, dod, inv]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kwh.input.value = "40"; c.input.value = "0.5"; dod.input.value = "0.9"; inv.input.value = "15"; update(); });
+  const oCPower = makeOutputLine(outputRegion, "C-rate power (cells)", "bcr-out-cpower");
+  const oDeliv = makeOutputLine(outputRegion, "Deliverable power", "bcr-out-deliv");
+  const oUsable = makeOutputLine(outputRegion, "Usable energy", "bcr-out-usable");
+  const oTime = makeOutputLine(outputRegion, "Discharge time at deliverable", "bcr-out-time");
+  const oNote = makeOutputLine(outputRegion, "Note", "bcr-out-note");
+  const update = debounce(() => {
+    const r = computeBatteryCRate({ nameplate_kwh: Number(kwh.input.value) || 0, c_rate: Number(c.input.value) || 0, dod: Number(dod.input.value) || 0, inverter_kw: Number(inv.input.value) || 0 });
+    if (r.error) { oCPower.textContent = r.error; oDeliv.textContent = "-"; oUsable.textContent = "-"; oTime.textContent = "-"; oNote.textContent = ""; return; }
+    oCPower.textContent = fmt(r.c_rate_power_kw, 1) + " kW";
+    oDeliv.textContent = fmt(r.deliverable_kw, 1) + " kW" + (r.inverter_limited ? " (inverter-limited)" : "");
+    oUsable.textContent = fmt(r.usable_kwh, 1) + " kWh";
+    oTime.textContent = fmt(r.discharge_time_h, 2) + " h";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kwh, c, dod, inv]) f.input.addEventListener("input", update);
+}
+
 // Renderer registry keyed by tool id. All tiles keep group: "A"; this
 // registry is merged into the Group A renderer set by app.js (spec-v88).
 export const SOLAR_RENDERERS = {
@@ -795,4 +947,8 @@ export const SOLAR_RENDERERS = {
   "pv-energy-yield": renderPvEnergyYield,
   "pv-row-spacing": renderPvRowSpacing,
   "pv-inverter-ratio": renderPvInverterRatio,
+  // spec-v236..v238 grid-tied battery-economics batch
+  "battery-tou-arbitrage": renderBatteryTouArbitrage,
+  "battery-peak-shaving": renderBatteryPeakShaving,
+  "battery-c-rate": renderBatteryCRate,
 };

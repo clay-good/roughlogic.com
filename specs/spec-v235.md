@@ -1,6 +1,6 @@
 # roughlogic.com Specification v235 -- Heat-Pump Cold-Temperature Capacity and Auxiliary Heat (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v233..v235 (the heat-pump heating-mode trio -- seasonal energy, dual-fuel
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v233..v235 (the heat-pump heating-mode trio -- seasonal energy, dual-fuel
 > switchover, and cold-temperature capacity). This closes the v233..v235 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the cold-weather capacity check and the auxiliary
 > heat sizing are what the HVAC tech does to keep a heat-pump conversion from freezing the customer out on the design

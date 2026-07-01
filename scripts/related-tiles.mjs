@@ -856,6 +856,22 @@ const RELATED = {
   "window-solar-heat-gain": ["manual-j-cooling","internal-heat-gains","envelope-conduction-load"],
   "internal-heat-gains": ["manual-j-cooling","window-solar-heat-gain","shr"],
   "envelope-conduction-load": ["assembly-r-value","window-solar-heat-gain","manual-j-cooling"],
+  // spec-v230..v232 electrical energy-cost-savings batch (Group A)
+  "vfd-energy-savings": ["affinity-laws","motor-operating-cost","fan-motor-bhp"],
+  "lighting-retrofit-savings": ["commercial-lighting-load","lumen-method","vfd-energy-savings"],
+  "power-factor-billing-savings": ["pf-correction","power-triangle","motor-capacitor-max"],
+  // spec-v233..v235 heat-pump heating-mode batch (Group C)
+  "heat-pump-seasonal-energy": ["balance-point","dual-fuel-balance-point","heat-pump-cold-capacity"],
+  "dual-fuel-balance-point": ["heat-pump-seasonal-energy","balance-point","heat-pump-cold-capacity"],
+  "heat-pump-cold-capacity": ["balance-point","heat-pump-seasonal-energy","dual-fuel-balance-point"],
+  // spec-v236..v238 grid-tied battery-economics batch (Group A)
+  "battery-tou-arbitrage": ["battery-peak-shaving","off-grid-battery","pv-energy-yield"],
+  "battery-peak-shaving": ["battery-tou-arbitrage","battery-c-rate","off-grid-battery"],
+  "battery-c-rate": ["battery-peak-shaving","battery-runtime","battery-tou-arbitrage"],
+  // spec-v239..v241 compressed-air energy batch (Group C)
+  "air-leak-cost": ["air-receiver","compressed-air-power","air-pressure-setpoint-savings"],
+  "compressed-air-power": ["air-leak-cost","air-pressure-setpoint-savings","air-receiver"],
+  "air-pressure-setpoint-savings": ["compressed-air-power","air-leak-cost","air-receiver"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v239 -- Compressed-Air Leak Load and Cost (Load/Unload Test) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v239..v241 (the compressed-air energy trio -- the three levers of the
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v239..v241 (the compressed-air energy trio -- the three levers of the
 > plant's most expensive utility: the cost of its leaks, the power to make the air, and the savings from dropping the
 > discharge pressure). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the leak survey and its cost are the maintenance

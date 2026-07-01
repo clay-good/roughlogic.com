@@ -1,6 +1,6 @@
 # roughlogic.com Specification v240 -- Compressed-Air Compression Power (Isentropic) and Energy Cost (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v239..v241 (the compressed-air energy trio -- leak cost, compression
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v239..v241 (the compressed-air energy trio -- leak cost, compression
 > power, and setpoint savings). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: knowing the horsepower and the running cost to
 > make a given airflow is what sizes the compressor and prices the plant air. Adds one tile to **`calc-hvac.js`**

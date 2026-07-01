@@ -1,6 +1,6 @@
 # roughlogic.com Specification v238 -- Battery C-Rate: Deliverable Power and Discharge Duration (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v236..v238 (the grid-tied battery-economics trio -- TOU arbitrage, peak
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v236..v238 (the grid-tied battery-economics trio -- TOU arbitrage, peak
 > shaving, and the C-rate power limit). This closes the v236..v238 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: matching the battery's power to the inverter and
 > the load is the sizing check the solar and electrical trade makes on every storage job. Adds one tile to

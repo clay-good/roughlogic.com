@@ -1,6 +1,6 @@
 # roughlogic.com Specification v241 -- Compressed-Air Discharge-Pressure Setpoint Savings (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v239..v241 (the compressed-air energy trio -- leak cost, compression
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v239..v241 (the compressed-air energy trio -- leak cost, compression
 > power, and setpoint savings). This closes the v239..v241 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: turning the compressor's pressure down is the
 > cheapest energy conservation measure a maintenance tech has, and pricing it is what justifies the change. Adds one tile

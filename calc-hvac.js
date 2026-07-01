@@ -2859,3 +2859,263 @@ HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
   ],
   compute: computeBlownInsulationCoverage,
 });
+
+// =====================================================================
+// spec-v233..v235: heat-pump heating-mode batch (Group C). Seasonal
+// operating cost vs gas and resistance, the economic dual-fuel switchover,
+// and the cold-temperature capacity / auxiliary-heat check. Currency and
+// rate figures are carried as dimensionless per the v14 economic-tile
+// convention. Named unit constants: 1 MMBtu = 293.07 kWh; 3,412 Btu per
+// kWh (resistance, COP 1); 100,000 Btu per therm (10 therms per MMBtu).
+// =====================================================================
+const _MMBTU_TO_KWH = 293.07;
+const _BTU_PER_KWH = 3412;
+const _THERMS_PER_MMBTU = 10;
+
+// dims: in { seasonal_load_mmbtu: M L^2 T^-2, hspf: dimensionless, rate_kwh: dimensionless, afue: dimensionless, rate_therm: dimensionless } out: { hp_kwh: M L^2 T^-2, hp_cost: dimensionless, resistance_kwh: M L^2 T^-2, resistance_cost: dimensionless, gas_therms: M L^2 T^-2, gas_cost: dimensionless }
+export function computeHeatPumpSeasonalEnergy({ seasonal_load_mmbtu = 0, hspf = 0, rate_kwh = 0, afue = 0.95, rate_therm = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(seasonal_load_mmbtu > 0)) return { error: "Seasonal heating load must be positive (MMBtu)." };
+  if (!(hspf > 0)) return { error: "HSPF must be positive." };
+  if (!(afue > 0 && afue <= 1)) return { error: "AFUE must be over 0 and up to 1." };
+  if (rate_kwh < 0 || rate_therm < 0) return { error: "Rates must be non-negative." };
+  const hp_kwh = seasonal_load_mmbtu * 1000 / hspf; // HSPF is Btu/Wh = kBtu/kWh, 1 MMBtu = 1000 kBtu
+  const hp_cost = hp_kwh * rate_kwh;
+  const resistance_kwh = seasonal_load_mmbtu * 1e6 / _BTU_PER_KWH;
+  const resistance_cost = resistance_kwh * rate_kwh;
+  const gas_therms = rate_therm > 0 ? seasonal_load_mmbtu * _THERMS_PER_MMBTU / afue : null;
+  const gas_cost = rate_therm > 0 ? gas_therms * rate_therm : null;
+  return {
+    hp_kwh, hp_cost, resistance_kwh, resistance_cost, gas_therms, gas_cost,
+    note: "AHRI 210/240 HSPF (season Btu delivered per Wh input) and the standard fuel-cost comparison (gas therms = load / AFUE, resistance at COP 1). The HSPF is the rated regional value (Region IV; a colder region delivers less, and the field seasonal COP depends on the actual climate and controls). The seasonal heating load comes from a Manual J plus degree-days or metered history, and the gas comparison uses the delivered efficiency AFUE, not the steady-state efficiency. An operating-cost estimate, not a metered bill.",
+  };
+}
+const heatPumpSeasonalEnergyExample = { inputs: { seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.15, afue: 0.95, rate_therm: 1.50 } };
+HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
+  citation: "Citation: AHRI 210/240 HSPF (season Btu delivered per Wh) and the standard fuel-cost comparison gas therms = load / AFUE, resistance at COP 1 (by name). HSPF is the rated regional value; the gas side uses the delivered AFUE. An operating-cost estimate, not a metered bill.",
+  example: heatPumpSeasonalEnergyExample.inputs,
+  fields: [
+    { key: "seasonal_load_mmbtu", label: "Seasonal heating load (MMBtu)", kind: "number" },
+    { key: "hspf", label: "Heat-pump HSPF", kind: "number" },
+    { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", default: 0.95 },
+    { key: "rate_therm", label: "Gas rate ($/therm, 0 = skip gas)", kind: "number" },
+  ],
+  outputs: [
+    { key: "hp", id: "hpse-out-hp", label: "Heat pump", value: (r) => fmt(r.hp_kwh, 0) + " kWh = $" + fmt(r.hp_cost, 0) + "/season" },
+    { key: "res", id: "hpse-out-res", label: "Resistance heat", value: (r) => fmt(r.resistance_kwh, 0) + " kWh = $" + fmt(r.resistance_cost, 0) + "/season" },
+    { key: "gas", id: "hpse-out-gas", label: "Gas furnace", value: (r) => r.gas_cost === null ? "(enter gas rate)" : fmt(r.gas_therms, 0) + " therms = $" + fmt(r.gas_cost, 0) + "/season" },
+    { key: "n", id: "hpse-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHeatPumpSeasonalEnergy,
+});
+
+// dims: in { rate_kwh: dimensionless, rate_therm: dimensionless, afue: dimensionless, cop_now: dimensionless } out: { gas_per_mmbtu: dimensionless, hp_per_mmbtu: dimensionless, cop_switch: dimensionless }
+export function computeDualFuelBalancePoint({ rate_kwh = 0, rate_therm = 0, afue = 0.95, cop_now = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(rate_kwh > 0)) return { error: "Electric rate must be positive ($/kWh)." };
+  if (!(rate_therm > 0)) return { error: "Gas rate must be positive ($/therm)." };
+  if (!(afue > 0 && afue <= 1)) return { error: "AFUE must be over 0 and up to 1." };
+  if (!(cop_now > 0)) return { error: "Heat-pump COP must be positive." };
+  const gas_per_mmbtu = _THERMS_PER_MMBTU / afue * rate_therm;
+  const hp_per_mmbtu = _MMBTU_TO_KWH / cop_now * rate_kwh;
+  const cop_switch = _MMBTU_TO_KWH * rate_kwh / gas_per_mmbtu;
+  const run_hp = hp_per_mmbtu <= gas_per_mmbtu;
+  const verdict = run_hp
+    ? "Run the heat pump - it is the cheaper source at this COP"
+    : "Switch to gas - below the economic switchover COP the furnace is cheaper";
+  return {
+    gas_per_mmbtu, hp_per_mmbtu, cop_switch, run_hp, verdict,
+    note: "Delivered-Btu fuel-cost comparison: heat-pump $/MMBtu = 293.07 / COP x rate_kwh, gas $/MMBtu = 10 / AFUE x rate_therm, switchover COP where the two are equal. The switchover COP maps to an outdoor temperature only through the specific unit's COP-vs-temperature curve (from AHRI ratings or the heat-pump-cold-capacity tile). The comparison is on operating cost only (it ignores equipment wear, defrost, and comfort), and the gas side uses the delivered AFUE. An economic setpoint aid, not a controls-commissioning procedure.",
+  };
+}
+const dualFuelBalancePointExample = { inputs: { rate_kwh: 0.15, rate_therm: 1.50, afue: 0.95, cop_now: 2.5 } };
+HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
+  citation: "Citation: delivered-Btu fuel-cost comparison heat-pump $/MMBtu = 293.07 / COP x rate_kwh, gas $/MMBtu = 10 / AFUE x rate_therm, switchover COP where equal (by name). The switchover COP maps to a temperature only through the unit's COP curve. An economic setpoint aid, not a controls procedure.",
+  example: dualFuelBalancePointExample.inputs,
+  fields: [
+    { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
+    { key: "rate_therm", label: "Gas rate ($/therm)", kind: "number" },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", default: 0.95 },
+    { key: "cop_now", label: "Heat-pump COP at current temp", kind: "number" },
+  ],
+  outputs: [
+    { key: "gas", id: "dfbp-out-gas", label: "Gas delivered cost", value: (r) => "$" + fmt(r.gas_per_mmbtu, 2) + "/MMBtu" },
+    { key: "hp", id: "dfbp-out-hp", label: "Heat-pump delivered cost", value: (r) => "$" + fmt(r.hp_per_mmbtu, 2) + "/MMBtu" },
+    { key: "cop", id: "dfbp-out-cop", label: "Economic switchover COP", value: (r) => fmt(r.cop_switch, 2) },
+    { key: "v", id: "dfbp-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "dfbp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDualFuelBalancePoint,
+});
+
+// dims: in { cap_47_btuh: M L^2 T^-3, cap_17_btuh: M L^2 T^-3, design_temp_f: T, design_load_btuh: M L^2 T^-3 } out: { slope: M L^2 T^-3, cap_design: M L^2 T^-3, shortfall: M L^2 T^-3, aux_kw: M L^2 T^-3 }
+export function computeHeatPumpColdCapacity({ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = 0, design_load_btuh = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(cap_47_btuh > 0) || !(cap_17_btuh > 0)) return { error: "Rated capacities must be positive (Btu/h)." };
+  if (!(design_load_btuh > 0)) return { error: "Design heating load must be positive (Btu/h)." };
+  const slope = (cap_47_btuh - cap_17_btuh) / (47 - 17); // 47 and 17 are the fixed AHRI rating points
+  const cap_design = Math.max(0, cap_17_btuh + slope * (design_temp_f - 17));
+  const clamped = cap_17_btuh + slope * (design_temp_f - 17) < 0;
+  const shortfall = Math.max(0, design_load_btuh - cap_design);
+  const aux_kw = shortfall / _BTU_PER_KWH;
+  const covers = shortfall === 0;
+  return {
+    slope, cap_design, shortfall, aux_kw, covers, clamped,
+    note: "AHRI 210/240 low-temperature rating points (the 47 F and 17 F integrated heating capacities) with a linear capacity-versus-temperature interpolation. The two rated points come from the manufacturer's expanded performance data - a cold-climate / variable-capacity unit holds capacity far better than a linear extrapolation of a single-speed unit suggests, so prefer a published low-temperature data point over extrapolation when a conversion hinges on it. The design load and design temperature come from a Manual J; defrost and cycling trim the field capacity. A sizing check, not a performance guarantee.",
+  };
+}
+const heatPumpColdCapacityExample = { inputs: { cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 30000 } };
+HVAC_RENDERERS["heat-pump-cold-capacity"] = _rEnv({
+  citation: "Citation: AHRI 210/240 low-temperature rating points (47 F and 17 F integrated heating capacities) and a linear capacity-versus-temperature interpolation (by name). Prefer a published low-temperature data point over extrapolation. A sizing check, not a performance guarantee.",
+  example: heatPumpColdCapacityExample.inputs,
+  fields: [
+    { key: "cap_47_btuh", label: "Rated capacity at 47 F (Btu/h)", kind: "number" },
+    { key: "cap_17_btuh", label: "Rated capacity at 17 F (Btu/h)", kind: "number" },
+    { key: "design_temp_f", label: "Outdoor design temp (F)", kind: "number" },
+    { key: "design_load_btuh", label: "Design heating load (Btu/h)", kind: "number" },
+  ],
+  outputs: [
+    { key: "cap", id: "hpcc-out-cap", label: "Delivered capacity at design", value: (r) => fmt(r.cap_design, 0) + " Btu/h" + (r.clamped ? " (clamped to 0)" : "") },
+    { key: "short", id: "hpcc-out-short", label: "Shortfall vs design load", value: (r) => fmt(r.shortfall, 0) + " Btu/h" },
+    { key: "aux", id: "hpcc-out-aux", label: "Auxiliary heat needed", value: (r) => r.covers ? "None (heat pump covers the load)" : fmt(r.aux_kw, 2) + " kW" },
+    { key: "n", id: "hpcc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHeatPumpColdCapacity,
+});
+
+// =====================================================================
+// spec-v239..v241: compressed-air energy batch (Group C). The three levers
+// of a plant's most expensive utility: the cost of its leaks (DOE load/unload
+// test), the isentropic power to make the air, and the savings from dropping
+// the discharge pressure. Named constants: k = 1.4 (air); 0.004364 =
+// 144/33,000 unit constant; 0.746 kW/hp.
+// =====================================================================
+const _K_AIR = 1.4;
+const _HP_UNIT_CONST = 0.004364; // 144 in^2/ft^2 over 33,000 ft-lb/min/hp
+const _KW_PER_HP = 0.746;
+
+// dims: in { compressor_cfm: L^3 T^-1, load_min: T, unload_min: T, specific_power: M L^2 T^-3, run_hours: T, rate_kwh: dimensionless } out: { leak_fraction: dimensionless, leak_cfm: L^3 T^-1, leak_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless }
+export function computeAirLeakCost({ compressor_cfm = 0, load_min = 0, unload_min = 0, specific_power = 22, run_hours = 8760, rate_kwh = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(compressor_cfm > 0)) return { error: "Compressor capacity must be positive (cfm)." };
+  if (!(specific_power > 0)) return { error: "Specific power must be positive (kW/100cfm)." };
+  if (!(run_hours > 0)) return { error: "Run hours must be positive." };
+  if (load_min < 0 || unload_min < 0) return { error: "Loaded and unloaded times must be non-negative." };
+  if (!(load_min + unload_min > 0)) return { error: "Total cycle time must be positive." };
+  if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
+  const leak_fraction = load_min / (load_min + unload_min);
+  const leak_cfm = compressor_cfm * leak_fraction;
+  const leak_kw = leak_cfm * specific_power / 100;
+  const annual_kwh = leak_kw * run_hours;
+  const annual_cost = annual_kwh * rate_kwh;
+  return {
+    leak_fraction, leak_cfm, leak_kw, annual_kwh, annual_cost,
+    note: "US DOE Compressed Air Challenge load/unload leak test: leak fraction = t_load / (t_load + t_unload), leak flow = fraction x compressor cfm, with the compressed-air specific-power convention (18-22 kW per 100 cfm at 100 psig for a rotary-screw system). The test is run with all production draw off so the only demand is the leaks; the loaded capacity is the compressor's actual delivered cfm at the operating pressure (not the nameplate); the specific power is the whole system's wire-to-air figure at its pressure; the run hours are the hours the compressor is energized. An estimate from a stopwatch test, not a metered audit.",
+  };
+}
+const airLeakCostExample = { inputs: { compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 } };
+HVAC_RENDERERS["air-leak-cost"] = _rEnv({
+  citation: "Citation: US DOE Compressed Air Challenge load/unload leak test (leak fraction = t_load / (t_load + t_unload), leak flow = fraction x cfm) and the 18-22 kW per 100 cfm specific-power convention (by name). Run with production off. An estimate from a stopwatch test, not a metered audit.",
+  example: airLeakCostExample.inputs,
+  fields: [
+    { key: "compressor_cfm", label: "Compressor delivered capacity (cfm)", kind: "number" },
+    { key: "load_min", label: "Loaded time over test cycles (min)", kind: "number" },
+    { key: "unload_min", label: "Unloaded time over test cycles (min)", kind: "number" },
+    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number", default: 22 },
+    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number", default: 8760 },
+    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+  ],
+  outputs: [
+    { key: "frac", id: "alc-out-frac", label: "Leak fraction", value: (r) => fmt(r.leak_fraction * 100, 1) + "%" },
+    { key: "cfm", id: "alc-out-cfm", label: "Leak flow", value: (r) => fmt(r.leak_cfm, 1) + " cfm = " + fmt(r.leak_kw, 1) + " kW" },
+    { key: "kwh", id: "alc-out-kwh", label: "Annual leak energy", value: (r) => fmt(r.annual_kwh, 0) + " kWh/yr" },
+    { key: "cost", id: "alc-out-cost", label: "Annual leak cost", value: (r) => "$" + fmt(r.annual_cost, 0) + "/yr" },
+    { key: "n", id: "alc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAirLeakCost,
+});
+
+// dims: in { free_air_cfm: L^3 T^-1, inlet_psia: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, overall_eff: dimensionless, run_hours: T, rate_kwh: dimensionless } out: { theo_hp: M L^2 T^-3, input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless }
+export function computeCompressedAirPower({ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75, run_hours = 4000, rate_kwh = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(free_air_cfm > 0)) return { error: "Free-air flow must be positive (cfm)." };
+  if (!(inlet_psia > 0)) return { error: "Inlet pressure must be positive (psia)." };
+  if (!(run_hours > 0)) return { error: "Run hours must be positive." };
+  const p2_abs = discharge_psig + 14.7;
+  if (!(p2_abs > inlet_psia)) return { error: "Discharge pressure must be above the inlet." };
+  if (!(overall_eff > 0 && overall_eff <= 1)) return { error: "Overall efficiency must be over 0 and up to 1." };
+  if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
+  const theo_hp = _HP_UNIT_CONST * inlet_psia * free_air_cfm * (_K_AIR / (_K_AIR - 1)) * ((p2_abs / inlet_psia) ** ((_K_AIR - 1) / _K_AIR) - 1);
+  const input_kw = theo_hp * _KW_PER_HP / overall_eff;
+  const annual_kwh = input_kw * run_hours;
+  const annual_cost = annual_kwh * rate_kwh;
+  return {
+    p2_abs, theo_hp, input_kw, annual_kwh, annual_cost,
+    note: "Single-stage adiabatic (isentropic) compression power: hp = 0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1], with P in psia, Q in cfm free air, k = 1.4. This is the ideal single-stage isentropic work - a real compressor needs more, so the overall efficiency divides the ideal down to the wire, and multi-staging with intercooling beats single stage above roughly 100 psig. The free-air flow is referenced to intake conditions and the discharge is the absolute pressure at the compressor. A sizing and cost estimate, not a compressor selection.",
+  };
+}
+const compressedAirPowerExample = { inputs: { free_air_cfm: 100, inlet_psia: 14.7, discharge_psig: 100, overall_eff: 0.75, run_hours: 4000, rate_kwh: 0.10 } };
+HVAC_RENDERERS["compressed-air-power"] = _rEnv({
+  citation: "Citation: single-stage adiabatic (isentropic) compression power hp = 0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1], P in psia, Q in cfm free air, k = 1.4 (by name). Ideal work divided by the overall efficiency; multi-stage beats single stage above ~100 psig. A sizing and cost estimate, not a compressor selection.",
+  example: compressedAirPowerExample.inputs,
+  fields: [
+    { key: "free_air_cfm", label: "Free-air flow at intake (cfm)", kind: "number" },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", default: 14.7 },
+    { key: "discharge_psig", label: "Discharge pressure (psig)", kind: "number" },
+    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number", default: 0.75 },
+    { key: "run_hours", label: "Run hours/yr", kind: "number", default: 4000 },
+    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+  ],
+  outputs: [
+    { key: "hp", id: "cap-out-hp", label: "Theoretical power", value: (r) => fmt(r.theo_hp, 1) + " hp" },
+    { key: "kw", id: "cap-out-kw", label: "Input power (wire)", value: (r) => fmt(r.input_kw, 1) + " kW" },
+    { key: "kwh", id: "cap-out-kwh", label: "Annual energy", value: (r) => fmt(r.annual_kwh, 0) + " kWh/yr" },
+    { key: "cost", id: "cap-out-cost", label: "Annual cost", value: (r) => "$" + fmt(r.annual_cost, 0) + "/yr" },
+    { key: "n", id: "cap-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCompressedAirPower,
+});
+
+// dims: in { current_psig: M L^-1 T^-2, reduced_psig: M L^-1 T^-2, inlet_psia: M L^-1 T^-2, input_kw: M L^2 T^-3, run_hours: T, rate_kwh: dimensionless } out: { pct_saved: dimensionless, kw_saved: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_savings: dimensionless }
+export function computeAirPressureSetpointSavings({ current_psig = 0, reduced_psig = 0, inlet_psia = 14.7, input_kw = 0, run_hours = 6000, rate_kwh = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(inlet_psia > 0)) return { error: "Inlet pressure must be positive (psia)." };
+  if (!(input_kw > 0)) return { error: "Current input power must be positive (kW)." };
+  if (!(run_hours > 0)) return { error: "Run hours must be positive." };
+  if (!(reduced_psig > 0)) return { error: "Reduced discharge must be above zero gauge." };
+  if (!(reduced_psig < current_psig)) return { error: "Reduced pressure must be below the current pressure." };
+  if (rate_kwh < 0) return { error: "Energy rate must be non-negative." };
+  const exp = (_K_AIR - 1) / _K_AIR;
+  const work_current = ((current_psig + 14.7) / inlet_psia) ** exp - 1;
+  const work_reduced = ((reduced_psig + 14.7) / inlet_psia) ** exp - 1;
+  const pct_saved = 1 - work_reduced / work_current;
+  const kw_saved = input_kw * pct_saved;
+  const annual_kwh = kw_saved * run_hours;
+  const annual_savings = annual_kwh * rate_kwh;
+  return {
+    pct_saved, kw_saved, annual_kwh, annual_savings,
+    note: "Isentropic compression-power ratio: percent saved = 1 - [(P_reduced/P1)^((k-1)/k) - 1] / [(P_current/P1)^((k-1)/k) - 1], which reproduces the DOE rule of roughly 0.5 percent of compressor energy per psi of reduction. The reduced setpoint must still hold the minimum pressure the tools need after system pressure drop (the point of a leak and piping fix is to allow the drop). The saving is on the compression energy that actually falls with pressure (an unloaded or modulating compressor may not capture all of it), and the ratio assumes single-stage isentropic behavior. An energy-savings estimate, not a metered result.",
+  };
+}
+const airPressureSetpointSavingsExample = { inputs: { current_psig: 120, reduced_psig: 105, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 } };
+HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
+  citation: "Citation: isentropic compression-power ratio percent saved = 1 - [(P_reduced/P1)^((k-1)/k) - 1] / [(P_current/P1)^((k-1)/k) - 1], reproducing the DOE ~0.5 percent per psi rule (by name). The reduced setpoint must still hold the minimum tool pressure. An energy-savings estimate, not a metered result.",
+  example: airPressureSetpointSavingsExample.inputs,
+  fields: [
+    { key: "current_psig", label: "Current discharge setpoint (psig)", kind: "number" },
+    { key: "reduced_psig", label: "Proposed lower setpoint (psig)", kind: "number" },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", default: 14.7 },
+    { key: "input_kw", label: "Current compressor input (kW)", kind: "number" },
+    { key: "run_hours", label: "Run hours/yr", kind: "number", default: 6000 },
+    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+  ],
+  outputs: [
+    { key: "pct", id: "apss-out-pct", label: "Percent energy saved", value: (r) => fmt(r.pct_saved * 100, 2) + "%" },
+    { key: "kw", id: "apss-out-kw", label: "Power saved", value: (r) => fmt(r.kw_saved, 2) + " kW" },
+    { key: "kwh", id: "apss-out-kwh", label: "Annual energy saved", value: (r) => fmt(r.annual_kwh, 0) + " kWh/yr" },
+    { key: "save", id: "apss-out-save", label: "Annual savings", value: (r) => "$" + fmt(r.annual_savings, 0) + "/yr" },
+    { key: "n", id: "apss-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAirPressureSetpointSavings,
+});

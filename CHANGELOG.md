@@ -4,6 +4,34 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: land spec-v230..v241 -- 12 energy-cost-savings / equipment-sizing tiles; 694 -> 706 tiles, 0.88.0, 2026-06-30
+
+Twelve tiles in four trios (PROPOSED 2026-06-30, landed same day) that turn physics the catalog already carried into the retrofit and operating-cost numbers a trade actually quotes. Catalog **694 -> 706**, package **0.87.0 -> 0.88.0** (a minor), with **no new module, group, or dependency** (all twelve land in existing modules and groups).
+
+**Electrical energy-cost-savings trio (`calc-service.js`, Group A):**
+- **`vfd-energy-savings`** (v230) -- the annual kWh and dollars a variable-frequency drive saves on a centrifugal pump or fan, integrating the affinity cube law `P/P_full = (Q/Q_full)^3` over a three-bin duty cycle. The load profile, not the horsepower, is the business case. A screening estimate, not a metered M&V.
+- **`lighting-retrofit-savings`** (v231) -- the energy `fixtures x (W_old - W_new)/1000 x hours x rate` plus demand-charge savings `kW x $/kW-mo x 12` and simple payback of an LED fixture swap. The demand term often shortens the payback by a third. A simple payback, not a life-cycle analysis.
+- **`power-factor-billing-savings`** (v232) -- the kVA demand a capacitor bank frees (`kVA = kW/pf`), the correcting `kVAR = kW x (tan(acos pf_old) - tan(acos pf_new))`, and the payback against a $/kVA-month tariff. Sharply diminishing returns above 0.9. A billing estimate, not a rate-tariff analysis.
+
+**Heat-pump heating-mode trio (`calc-hvac.js`, Group C):**
+- **`heat-pump-seasonal-energy`** (v233) -- the seasonal operating cost of a heat pump (`load x 1000 / HSPF x rate`) set beside gas (`load / AFUE`) and resistance (COP 1) at the local rates. The AHRI 210/240 HSPF; the same unit is a bargain in one utility territory and a premium in another. An operating-cost estimate, not a metered bill.
+- **`dual-fuel-balance-point`** (v234) -- the economic switchover COP where a dual-fuel thermostat should hand off to gas (`hp $/MMBtu = 293.07/COP x rate_kwh` vs `gas $/MMBtu = 10/AFUE x rate_therm`). An economic setpoint aid, not a controls-commissioning procedure.
+- **`heat-pump-cold-capacity`** (v235) -- the AHRI 47 F / 17 F capacity interpolation to the outdoor design temperature and the auxiliary strip heat (`shortfall / 3412`) a cold-climate conversion needs. A unit sized on its 47 F nameplate is badly undersized at 5 F. A sizing check, not a performance guarantee.
+
+**Grid-tied battery-economics trio (`calc-solar.js`, Group A):**
+- **`battery-tou-arbitrage`** (v236) -- the time-of-use spread value `usable x peak - usable/RTE x offpeak` net of the round-trip loss, and the break-even ratio `1/RTE` the peak must beat. A gross spread-value aid, not a financed payback.
+- **`battery-peak-shaving`** (v237) -- the demand-charge savings and the energy-limited actual shave `min(target, usable/duration)` a battery can hold across a peak. A wide plateau demands far more storage per kW than a spike. A demand-savings estimate, not a metered bill.
+- **`battery-c-rate`** (v238) -- the deliverable power bounded by the C-rate (`nameplate x C`) and the inverter, and the discharge duration `usable / deliverable`. A pack's power is not its energy. A nameplate power check, not a cell-level thermal model.
+
+**Compressed-air energy trio (`calc-hvac.js`, Group C):**
+- **`air-leak-cost`** (v239) -- the US DOE Compressed Air Challenge load/unload leak-test flow (`t_load / (t_load + t_unload) x cfm`) and annual cost at the system specific power. A neglected system loses 20-30% of its air. An estimate from a stopwatch test, not a metered audit.
+- **`compressed-air-power`** (v240) -- the single-stage adiabatic (isentropic) compression horsepower `0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1]` and running cost. Multi-staging beats single stage above ~100 psig. A sizing and cost estimate, not a compressor selection.
+- **`air-pressure-setpoint-savings`** (v241) -- the isentropic power-ratio savings from dropping the discharge pressure, reproducing the DOE rule of ~0.5% of compressor energy per psi. An energy-savings estimate, not a metered result.
+
+Each compute matches its pinned worked example to the digit and carries the v14 `// dims:` annotation, the v18/v21 `{error}` contract (non-finite and out-of-domain inputs return `{ error }`; the two payback fields return `null` rather than a divide-by-zero when annual savings are zero), and v19/v22 citation discipline naming the US DOE motor/pump-system / Compressed Air Challenge / AHRI 210/240 HSPF / NREL battery round-trip / power-triangle authority that governs. Full wiring: `tools-data`, `tile-meta`, `citations` (editionNote + assumptions), `compute-map`, 24 worked-example rows, 96 collision-checked search aliases, related-tiles, `app.js` declares, dims annotations, 12 bounds-fuzzer blocks; corpus + tile-index regenerated.
+
+Housekeeping: raised five module-size caps with dated notes (`calc-service` 13k->18.5k, `calc-hvac` 43.5k->55k, `calc-solar` 14k->18k, `tools-data` 77k->84k, `citations` 212k->224k) and the group-shell cap (14k->17k, the Group A electrical hub grew with six tiles); bumped the live home-page count (`694 -> 706`, index.html title/meta/OG/Twitter/JSON-LD/lede) and resynced the README figures (tile / sitemap / route counts, the unit-test count, and the catalog-state narrative with a new batch entry). All gates green: lint (27 checks at **706 tiles / 50 modules / 728 sitemap URLs**), **4,999** unit tests, build (706 tile + 21 group shells, 728 sitemap URLs), data:verify (117 hashes), `check-shells`, `check-dist`, `check-shell-mobile` (822 checks across 728 shells), render-no-nan (12/12 new tiles), and the full-catalog responsive-stress sweep (706 live tile views at 320px on Chromium + WebKit, zero horizontal scroll).
+
 ### feat: land spec-v218..v229 -- 12 energy / structural / solar building-science tiles; 682 -> 694 tiles, 0.87.0, 2026-06-30
 
 Twelve tiles in four trios (PROPOSED 2026-06-30, landed same day) that deepen the residential-energy, structural-load, PV-design, and cooling-load corners of the catalog. Catalog **682 -> 694**, package **0.86.0 -> 0.87.0** (a minor), with **no new module, group, or dependency** (all twelve land in existing modules and groups).

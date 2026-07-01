@@ -1,6 +1,6 @@
 # roughlogic.com Specification v233 -- Heat-Pump Seasonal Heating Energy and Cost vs Gas and Resistance (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v233..v235 (the heat-pump heating-mode trio -- the electrification
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v233..v235 (the heat-pump heating-mode trio -- the electrification
 > questions the trade fields every day: what a heat pump costs to run for a season, when a dual-fuel system should hand
 > off to gas, and whether the heat pump keeps up in the cold). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the seasonal operating cost is what the HVAC tech

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v230 -- VFD Energy Savings on a Centrifugal Load (Affinity Cube Law) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v230..v232 (the electrical energy-cost-savings trio -- the retrofit
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v230..v232 (the electrical energy-cost-savings trio -- the retrofit
 > business cases an electrician or energy auditor sells: a variable-frequency drive on a pump or fan, an LED lighting
 > retrofit, and power-factor correction against a demand bill). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the VFD retrofit is scoped, sold, and installed by

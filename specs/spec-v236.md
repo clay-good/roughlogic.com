@@ -1,6 +1,6 @@
 # roughlogic.com Specification v236 -- Battery Time-of-Use Arbitrage Value (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v236..v238 (the grid-tied battery-economics trio -- the value a storage
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v236..v238 (the grid-tied battery-economics trio -- the value a storage
 > system returns and the power it can actually deliver: time-of-use energy arbitrage, demand-charge peak shaving, and the
 > C-rate power-and-duration limit that bounds both). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the storage business case is scoped and installed

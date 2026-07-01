@@ -11969,3 +11969,266 @@ test("bounds: spec-v229 computeEnvelopeConductionLoad pins the conduction load, 
   assert.ok("error" in _v229({ area_ft2: 1000, u_factor: 0, cltd_f: 70 }));
   assert.ok("error" in _v229({ area_ft2: Infinity, u_factor: 0.05, cltd_f: 70 }));
 });
+
+// ===================== spec-v230..v232 electrical energy-cost-savings batch =====================
+import { computeVfdEnergySavings as _v230, computeLightingRetrofitSavings as _v231, computePowerFactorBillingSavings as _v232 } from "../../calc-service.js";
+
+test("bounds: spec-v230 computeVfdEnergySavings pins the three-bin savings, the runs-full case, and error seams", () => {
+  const r = _v230({ full_load_kw: 20, frac_a: 1, hours_a: 2000, frac_b: 0.8, hours_b: 3000, frac_c: 0.6, hours_c: 2000, rate_kwh: 0.12 });
+  assert.strictEqual(r.full_kwh, 140000);
+  assert.ok(Math.abs(r.vfd_kwh - 79360) < 1e-6);
+  assert.ok(Math.abs(r.saved_kwh - 60640) < 1e-6);
+  assert.ok(Math.abs(r.saved_usd - 7276.8) < 1e-6);
+  // A pump that mostly runs full saves ~6x less.
+  const r2 = _v230({ full_load_kw: 20, frac_a: 1, hours_a: 6000, frac_b: 0.8, hours_b: 1000, frac_c: 0.6, hours_c: 0, rate_kwh: 0.12 });
+  assert.strictEqual(r2.vfd_kwh, 130240);
+  assert.strictEqual(r2.saved_kwh, 9760);
+  assert.ok(Math.abs(r2.saved_usd - 1171.2) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v230({ full_load_kw: 0, hours_a: 2000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v230({ full_load_kw: 20, hours_a: -1, rate_kwh: 0.12 }));
+  assert.ok("error" in _v230({ full_load_kw: 20, frac_a: 1.5, hours_a: 2000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v230({ full_load_kw: 20, hours_a: 2000, rate_kwh: -1 }));
+  assert.ok("error" in _v230({ full_load_kw: Infinity, hours_a: 2000, rate_kwh: 0.12 }));
+});
+
+test("bounds: spec-v231 computeLightingRetrofitSavings pins the demand-charge case, the no-demand and null-payback paths, and error seams", () => {
+  const r = _v231({ fixtures: 100, watts_existing: 128, watts_new: 44, annual_hours: 4000, rate_kwh: 0.12, demand_per_kw_mo: 12, install_cost: 8000 });
+  assert.ok(Math.abs(r.kw_saved - 8.4) < 1e-9);
+  assert.strictEqual(r.kwh_saved, 33600);
+  assert.ok(Math.abs(r.energy_usd - 4032) < 1e-9);
+  assert.ok(Math.abs(r.demand_usd - 1209.6) < 1e-9);
+  assert.ok(Math.abs(r.annual_usd - 5241.6) < 1e-9);
+  assert.ok(Math.abs(r.payback_years - 1.5262515262515262) < 1e-9);
+  // No demand charge.
+  const r2 = _v231({ fixtures: 100, watts_existing: 128, watts_new: 44, annual_hours: 4000, rate_kwh: 0.12, demand_per_kw_mo: 0, install_cost: 8000 });
+  assert.ok(Math.abs(r2.annual_usd - 4032) < 1e-9);
+  assert.ok(Math.abs(r2.payback_years - 1.9841269841269842) < 1e-9);
+  // Null-payback path (no cost entered).
+  assert.strictEqual(_v231({ fixtures: 100, watts_existing: 128, watts_new: 44, annual_hours: 4000, rate_kwh: 0.12 }).payback_years, null);
+  // Error seams.
+  assert.ok("error" in _v231({ fixtures: 0, watts_existing: 128, watts_new: 44, annual_hours: 4000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v231({ fixtures: 100, watts_existing: 128, watts_new: 44, annual_hours: 0, rate_kwh: 0.12 }));
+  assert.ok("error" in _v231({ fixtures: 100, watts_existing: 44, watts_new: 128, annual_hours: 4000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v231({ fixtures: 100, watts_existing: 128, watts_new: 44, annual_hours: 4000, rate_kwh: -1 }));
+  assert.ok("error" in _v231({ fixtures: Infinity, watts_existing: 128, watts_new: 44, annual_hours: 4000, rate_kwh: 0.12 }));
+});
+
+test("bounds: spec-v232 computePowerFactorBillingSavings pins the 0.78 case, the 0.90 diminishing-returns case, and error seams", () => {
+  const r = _v232({ real_power_kw: 400, pf_existing: 0.78, pf_target: 0.95, demand_per_kva_mo: 8, capacitor_cost: 5685 });
+  assert.ok(Math.abs(r.kva_existing - 512.8205128205128) < 1e-6);
+  assert.ok(Math.abs(r.kva_target - 421.05263157894734) < 1e-6);
+  assert.ok(Math.abs(r.kva_reduction - 91.76788124156542) < 1e-6);
+  assert.ok(Math.abs(r.kvar_needed - 189.4389291522909) < 1e-6);
+  assert.ok(Math.abs(r.annual_usd - 8809.71659919028) < 1e-6);
+  assert.ok(Math.abs(r.payback_years - 0.6453102022058825) < 1e-9);
+  // Already-decent 0.90 returns a quarter of the first fix.
+  const r2 = _v232({ real_power_kw: 400, pf_existing: 0.90, pf_target: 0.95, demand_per_kva_mo: 8, capacitor_cost: 5685 });
+  assert.ok(Math.abs(r2.kva_reduction - 23.39181286549706) < 1e-6);
+  assert.ok(Math.abs(r2.annual_usd - 2245.6140350877176) < 1e-6);
+  // Null-payback path.
+  assert.strictEqual(_v232({ real_power_kw: 400, pf_existing: 0.78, pf_target: 0.95, demand_per_kva_mo: 8 }).payback_years, null);
+  // Error seams.
+  assert.ok("error" in _v232({ real_power_kw: 0, pf_existing: 0.78, demand_per_kva_mo: 8 }));
+  assert.ok("error" in _v232({ real_power_kw: 400, pf_existing: 1.2, demand_per_kva_mo: 8 }));
+  assert.ok("error" in _v232({ real_power_kw: 400, pf_existing: 0.95, pf_target: 0.90, demand_per_kva_mo: 8 }));
+  assert.ok("error" in _v232({ real_power_kw: 400, pf_existing: 0.78, demand_per_kva_mo: -1 }));
+  assert.ok("error" in _v232({ real_power_kw: Infinity, pf_existing: 0.78, demand_per_kva_mo: 8 }));
+});
+
+// ===================== spec-v233..v235 heat-pump heating-mode batch =====================
+import { computeHeatPumpSeasonalEnergy as _v233, computeDualFuelBalancePoint as _v234, computeHeatPumpColdCapacity as _v235 } from "../../calc-hvac.js";
+
+test("bounds: spec-v233 computeHeatPumpSeasonalEnergy pins the three-way comparison, the gas-skip path, and error seams", () => {
+  const r = _v233({ seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.15, afue: 0.95, rate_therm: 1.50 });
+  assert.ok(Math.abs(r.hp_kwh - 6666.666666666667) < 1e-6);
+  assert.ok(Math.abs(r.hp_cost - 1000) < 1e-6);
+  assert.ok(Math.abs(r.resistance_kwh - 17584.99413833529) < 1e-4);
+  assert.ok(Math.abs(r.resistance_cost - 2637.749120750293) < 1e-4);
+  assert.ok(Math.abs(r.gas_therms - 631.578947368421) < 1e-6);
+  assert.ok(Math.abs(r.gas_cost - 947.3684210526316) < 1e-6);
+  // Cheap gas, expensive power.
+  const r2 = _v233({ seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.24, afue: 0.95, rate_therm: 0.90 });
+  assert.ok(Math.abs(r2.hp_cost - 1600) < 1e-6);
+  assert.ok(Math.abs(r2.gas_cost - 568.421052631579) < 1e-6);
+  // Gas-skip path.
+  assert.strictEqual(_v233({ seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.15 }).gas_cost, null);
+  // Error seams.
+  assert.ok("error" in _v233({ seasonal_load_mmbtu: 0, hspf: 9, rate_kwh: 0.15 }));
+  assert.ok("error" in _v233({ seasonal_load_mmbtu: 60, hspf: 0, rate_kwh: 0.15 }));
+  assert.ok("error" in _v233({ seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: 0.15, afue: 1.2 }));
+  assert.ok("error" in _v233({ seasonal_load_mmbtu: 60, hspf: 9, rate_kwh: -1 }));
+  assert.ok("error" in _v233({ seasonal_load_mmbtu: Infinity, hspf: 9, rate_kwh: 0.15 }));
+});
+
+test("bounds: spec-v234 computeDualFuelBalancePoint pins both verdict paths, the switchover COP, and error seams", () => {
+  const r = _v234({ rate_kwh: 0.15, rate_therm: 1.50, afue: 0.95, cop_now: 2.5 });
+  assert.ok(Math.abs(r.gas_per_mmbtu - 15.789473684210527) < 1e-6);
+  assert.ok(Math.abs(r.hp_per_mmbtu - 17.5842) < 1e-4);
+  assert.ok(Math.abs(r.cop_switch - 2.784165) < 1e-5);
+  assert.strictEqual(r.run_hp, false);
+  assert.ok(/[Ss]witch to gas/.test(r.verdict));
+  // Milder day, higher COP -> run the heat pump.
+  const r2 = _v234({ rate_kwh: 0.15, rate_therm: 1.50, afue: 0.95, cop_now: 3.2 });
+  assert.ok(Math.abs(r2.hp_per_mmbtu - 13.737656249999999) < 1e-6);
+  assert.strictEqual(r2.run_hp, true);
+  assert.ok(/[Rr]un the heat pump/.test(r2.verdict));
+  // Error seams.
+  assert.ok("error" in _v234({ rate_kwh: 0, rate_therm: 1.50, cop_now: 2.5 }));
+  assert.ok("error" in _v234({ rate_kwh: 0.15, rate_therm: 0, cop_now: 2.5 }));
+  assert.ok("error" in _v234({ rate_kwh: 0.15, rate_therm: 1.50, afue: 1.2, cop_now: 2.5 }));
+  assert.ok("error" in _v234({ rate_kwh: 0.15, rate_therm: 1.50, cop_now: 0 }));
+  assert.ok("error" in _v234({ rate_kwh: Infinity, rate_therm: 1.50, cop_now: 2.5 }));
+});
+
+test("bounds: spec-v235 computeHeatPumpColdCapacity pins the cold-design aux, the covers case, the clamp path, and error seams", () => {
+  const r = _v235({ cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 30000 });
+  assert.ok(Math.abs(r.slope - 466.6666666666667) < 1e-6);
+  assert.ok(Math.abs(r.cap_design - 16400) < 1e-6);
+  assert.ok(Math.abs(r.shortfall - 13600) < 1e-6);
+  assert.ok(Math.abs(r.aux_kw - 3.9859320046893316) < 1e-6);
+  assert.strictEqual(r.covers, false);
+  // Milder climate -> almost no backup.
+  const r2 = _v235({ cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 30, design_load_btuh: 30000 });
+  assert.ok(Math.abs(r2.cap_design - 28066.666666666668) < 1e-6);
+  assert.ok(Math.abs(r2.aux_kw - 0.5666275889019144) < 1e-6);
+  // Covers-with-no-shortfall path (small load).
+  const r3 = _v235({ cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 30, design_load_btuh: 20000 });
+  assert.strictEqual(r3.shortfall, 0);
+  assert.strictEqual(r3.covers, true);
+  // Clamp-to-zero deep-cold path.
+  const r4 = _v235({ cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: -60, design_load_btuh: 30000 });
+  assert.strictEqual(r4.cap_design, 0);
+  assert.strictEqual(r4.clamped, true);
+  // Error seams.
+  assert.ok("error" in _v235({ cap_47_btuh: 0, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 30000 }));
+  assert.ok("error" in _v235({ cap_47_btuh: 36000, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 0 }));
+  assert.ok("error" in _v235({ cap_47_btuh: Infinity, cap_17_btuh: 22000, design_temp_f: 5, design_load_btuh: 30000 }));
+});
+
+// ===================== spec-v236..v238 grid-tied battery-economics batch =====================
+import { computeBatteryTouArbitrage as _v236, computeBatteryPeakShaving as _v237, computeBatteryCRate as _v238 } from "../../calc-solar.js";
+
+test("bounds: spec-v236 computeBatteryTouArbitrage pins the strong spread, the flat spread, the break-even ratio, and error seams", () => {
+  const r = _v236({ nameplate_kwh: 13.5, dod: 0.90, rte: 0.90, peak_price: 0.45, offpeak_price: 0.15, cycles_per_year: 365 });
+  assert.ok(Math.abs(r.usable_kwh - 12.15) < 1e-9);
+  assert.ok(Math.abs(r.charge_kwh - 13.5) < 1e-9);
+  assert.ok(Math.abs(r.daily_value - 3.4425) < 1e-9);
+  assert.ok(Math.abs(r.annual_value - 1256.5125) < 1e-6);
+  assert.ok(Math.abs(r.breakeven_ratio - 1.1111111111111112) < 1e-9);
+  // Flat spread nets almost nothing.
+  const r2 = _v236({ nameplate_kwh: 13.5, dod: 0.90, rte: 0.90, peak_price: 0.28, offpeak_price: 0.18, cycles_per_year: 365 });
+  assert.ok(Math.abs(r2.daily_value - 0.972) < 1e-9);
+  assert.ok(Math.abs(r2.annual_value - 354.78) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v236({ nameplate_kwh: 0, peak_price: 0.45, offpeak_price: 0.15 }));
+  assert.ok("error" in _v236({ nameplate_kwh: 13.5, dod: 1.2, peak_price: 0.45, offpeak_price: 0.15 }));
+  assert.ok("error" in _v236({ nameplate_kwh: 13.5, rte: 0, peak_price: 0.45, offpeak_price: 0.15 }));
+  assert.ok("error" in _v236({ nameplate_kwh: 13.5, peak_price: -1, offpeak_price: 0.15 }));
+  assert.ok("error" in _v236({ nameplate_kwh: 13.5, peak_price: 0.45, offpeak_price: 0.15, cycles_per_year: 0 }));
+  assert.ok("error" in _v236({ nameplate_kwh: Infinity, peak_price: 0.45, offpeak_price: 0.15 }));
+});
+
+test("bounds: spec-v237 computeBatteryPeakShaving pins the energy-limited and target-limited cases, and error seams", () => {
+  const r = _v237({ nameplate_kwh: 100, dod: 0.90, event_duration_h: 3, target_shave_kw: 40, demand_per_kw_mo: 18 });
+  assert.strictEqual(r.usable_kwh, 90);
+  assert.strictEqual(r.sustainable_kw, 30);
+  assert.strictEqual(r.actual_shave_kw, 30);
+  assert.strictEqual(r.annual_savings, 6480);
+  assert.strictEqual(r.energy_limited, true);
+  // Short peak -> full target shaved.
+  const r2 = _v237({ nameplate_kwh: 100, dod: 0.90, event_duration_h: 1, target_shave_kw: 40, demand_per_kw_mo: 18 });
+  assert.strictEqual(r2.sustainable_kw, 90);
+  assert.strictEqual(r2.actual_shave_kw, 40);
+  assert.strictEqual(r2.annual_savings, 8640);
+  assert.strictEqual(r2.energy_limited, false);
+  // Error seams.
+  assert.ok("error" in _v237({ nameplate_kwh: 0, event_duration_h: 3, target_shave_kw: 40, demand_per_kw_mo: 18 }));
+  assert.ok("error" in _v237({ nameplate_kwh: 100, event_duration_h: 0, target_shave_kw: 40, demand_per_kw_mo: 18 }));
+  assert.ok("error" in _v237({ nameplate_kwh: 100, event_duration_h: 3, target_shave_kw: 0, demand_per_kw_mo: 18 }));
+  assert.ok("error" in _v237({ nameplate_kwh: 100, event_duration_h: 3, target_shave_kw: 40, demand_per_kw_mo: 0 }));
+  assert.ok("error" in _v237({ nameplate_kwh: 100, dod: 1.2, event_duration_h: 3, target_shave_kw: 40, demand_per_kw_mo: 18 }));
+  assert.ok("error" in _v237({ nameplate_kwh: Infinity, event_duration_h: 3, target_shave_kw: 40, demand_per_kw_mo: 18 }));
+});
+
+test("bounds: spec-v238 computeBatteryCRate pins the inverter-limited and no-limit cases, and error seams", () => {
+  const r = _v238({ nameplate_kwh: 40, c_rate: 0.5, dod: 0.90, inverter_kw: 15 });
+  assert.strictEqual(r.c_rate_power_kw, 20);
+  assert.strictEqual(r.deliverable_kw, 15);
+  assert.strictEqual(r.usable_kwh, 36);
+  assert.ok(Math.abs(r.discharge_time_h - 2.4) < 1e-9);
+  assert.strictEqual(r.inverter_limited, true);
+  // 1C, no inverter limit.
+  const r2 = _v238({ nameplate_kwh: 40, c_rate: 1.0, dod: 0.90, inverter_kw: 0 });
+  assert.strictEqual(r2.c_rate_power_kw, 40);
+  assert.strictEqual(r2.deliverable_kw, 40);
+  assert.ok(Math.abs(r2.discharge_time_h - 0.9) < 1e-9);
+  assert.strictEqual(r2.inverter_limited, false);
+  // Error seams.
+  assert.ok("error" in _v238({ nameplate_kwh: 0, c_rate: 0.5 }));
+  assert.ok("error" in _v238({ nameplate_kwh: 40, c_rate: 0 }));
+  assert.ok("error" in _v238({ nameplate_kwh: 40, c_rate: 0.5, dod: 1.2 }));
+  assert.ok("error" in _v238({ nameplate_kwh: 40, c_rate: 0.5, inverter_kw: -1 }));
+  assert.ok("error" in _v238({ nameplate_kwh: Infinity, c_rate: 0.5 }));
+});
+
+// ===================== spec-v239..v241 compressed-air energy batch =====================
+import { computeAirLeakCost as _v239, computeCompressedAirPower as _v240, computeAirPressureSetpointSavings as _v241 } from "../../calc-hvac.js";
+
+test("bounds: spec-v239 computeAirLeakCost pins the neglected system, the post-repair case, and error seams", () => {
+  const r = _v239({ compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 });
+  assert.ok(Math.abs(r.leak_fraction - 0.2) < 1e-9);
+  assert.strictEqual(r.leak_cfm, 100);
+  assert.ok(Math.abs(r.leak_kw - 22) < 1e-9);
+  assert.ok(Math.abs(r.annual_kwh - 192720) < 1e-6);
+  assert.ok(Math.abs(r.annual_cost - 19272) < 1e-6);
+  // After a leak-repair program.
+  const r2 = _v239({ compressor_cfm: 500, load_min: 1, unload_min: 14, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 });
+  assert.ok(Math.abs(r2.leak_fraction - 1 / 15) < 1e-9);
+  assert.ok(Math.abs(r2.annual_cost - 6424) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v239({ compressor_cfm: 0, load_min: 3, unload_min: 12, rate_kwh: 0.10 }));
+  assert.ok("error" in _v239({ compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 0, rate_kwh: 0.10 }));
+  assert.ok("error" in _v239({ compressor_cfm: 500, load_min: 3, unload_min: 12, run_hours: 0, rate_kwh: 0.10 }));
+  assert.ok("error" in _v239({ compressor_cfm: 500, load_min: -1, unload_min: 12, rate_kwh: 0.10 }));
+  assert.ok("error" in _v239({ compressor_cfm: 500, load_min: 0, unload_min: 0, rate_kwh: 0.10 }));
+  assert.ok("error" in _v239({ compressor_cfm: Infinity, load_min: 3, unload_min: 12, rate_kwh: 0.10 }));
+});
+
+test("bounds: spec-v240 computeCompressedAirPower pins the 100-psig case, the 125-psig case, and error seams", () => {
+  const r = _v240({ free_air_cfm: 100, inlet_psia: 14.7, discharge_psig: 100, overall_eff: 0.75, run_hours: 4000, rate_kwh: 0.10 });
+  assert.ok(Math.abs(r.theo_hp - 17.930126491475697) < 1e-6);
+  assert.ok(Math.abs(r.input_kw - 17.834499150187828) < 1e-6);
+  assert.ok(Math.abs(r.annual_kwh - 71337.99660075131) < 1e-3);
+  assert.ok(Math.abs(r.annual_cost - 7133.799660075132) < 1e-4);
+  // Same flow at 125 psig costs more.
+  const r2 = _v240({ free_air_cfm: 100, inlet_psia: 14.7, discharge_psig: 125, overall_eff: 0.75, run_hours: 4000, rate_kwh: 0.10 });
+  assert.ok(Math.abs(r2.theo_hp - 20.27045612100899) < 1e-6);
+  assert.ok(Math.abs(r2.annual_cost - 8064.938808678777) < 1e-4);
+  // Error seams.
+  assert.ok("error" in _v240({ free_air_cfm: 0, discharge_psig: 100, rate_kwh: 0.10 }));
+  assert.ok("error" in _v240({ free_air_cfm: 100, inlet_psia: 0, discharge_psig: 100, rate_kwh: 0.10 }));
+  assert.ok("error" in _v240({ free_air_cfm: 100, discharge_psig: 100, run_hours: 0, rate_kwh: 0.10 }));
+  assert.ok("error" in _v240({ free_air_cfm: 100, inlet_psia: 14.7, discharge_psig: -14, rate_kwh: 0.10 }));
+  assert.ok("error" in _v240({ free_air_cfm: 100, discharge_psig: 100, overall_eff: 1.2, rate_kwh: 0.10 }));
+  assert.ok("error" in _v240({ free_air_cfm: Infinity, discharge_psig: 100, rate_kwh: 0.10 }));
+});
+
+test("bounds: spec-v241 computeAirPressureSetpointSavings pins the 15-psi drop, the 5-psi trim, and error seams", () => {
+  const r = _v241({ current_psig: 120, reduced_psig: 105, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 });
+  assert.ok(Math.abs(r.pct_saved - 0.07072966232122269) < 1e-9);
+  assert.ok(Math.abs(r.kw_saved - 3.5364831160611345) < 1e-6);
+  assert.ok(Math.abs(r.annual_kwh - 21218.898696366807) < 1e-3);
+  assert.ok(Math.abs(r.annual_savings - 2121.889869636681) < 1e-4);
+  // A modest 5 psi trim.
+  const r2 = _v241({ current_psig: 120, reduced_psig: 115, inlet_psia: 14.7, input_kw: 50, run_hours: 6000, rate_kwh: 0.10 });
+  assert.ok(Math.abs(r2.pct_saved - 0.022921509860722944) < 1e-9);
+  assert.ok(Math.abs(r2.annual_savings - 687.6452958216884) < 1e-4);
+  // Error seams.
+  assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 105, inlet_psia: 0, input_kw: 50, rate_kwh: 0.10 }));
+  assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 105, input_kw: 0, rate_kwh: 0.10 }));
+  assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 105, input_kw: 50, run_hours: 0, rate_kwh: 0.10 }));
+  assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 125, input_kw: 50, rate_kwh: 0.10 }));
+  assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 0, input_kw: 50, rate_kwh: 0.10 }));
+  assert.ok("error" in _v241({ current_psig: Infinity, reduced_psig: 105, input_kw: 50, rate_kwh: 0.10 }));
+});

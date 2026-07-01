@@ -623,6 +623,14 @@ export const COMPUTE_MAP = {
   "gutter-downspout": { module: "../../calc-finish.js", fn: "computeGutterDownspout" },
   "assembly-r-value": { module: "../../calc-hvac.js", fn: "computeAssemblyRValue" },
   "blown-insulation-coverage": { module: "../../calc-hvac.js", fn: "computeBlownInsulationCoverage" },
+  // spec-v233..v235 heat-pump heating-mode batch (3 tiles)
+  "heat-pump-seasonal-energy": { module: "../../calc-hvac.js", fn: "computeHeatPumpSeasonalEnergy" },
+  "dual-fuel-balance-point": { module: "../../calc-hvac.js", fn: "computeDualFuelBalancePoint" },
+  "heat-pump-cold-capacity": { module: "../../calc-hvac.js", fn: "computeHeatPumpColdCapacity" },
+  // spec-v239..v241 compressed-air energy batch (3 tiles)
+  "air-leak-cost": { module: "../../calc-hvac.js", fn: "computeAirLeakCost" },
+  "compressed-air-power": { module: "../../calc-hvac.js", fn: "computeCompressedAirPower" },
+  "air-pressure-setpoint-savings": { module: "../../calc-hvac.js", fn: "computeAirPressureSetpointSavings" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },
@@ -731,11 +739,19 @@ export const COMPUTE_MAP = {
   "motor-branch-protection": { module: "../../calc-electrical.js", fn: "computeMotorBranchProtection" },
   "commercial-lighting-load": { module: "../../calc-service.js", fn: "computeCommercialLightingLoad" },
   "noncoincident-load": { module: "../../calc-service.js", fn: "computeNoncoincidentLoad" },
+  // spec-v230..v232 electrical energy-cost-savings batch (3 tiles)
+  "vfd-energy-savings": { module: "../../calc-service.js", fn: "computeVfdEnergySavings" },
+  "lighting-retrofit-savings": { module: "../../calc-service.js", fn: "computeLightingRetrofitSavings" },
+  "power-factor-billing-savings": { module: "../../calc-service.js", fn: "computePowerFactorBillingSavings" },
   "pv-circuit-ampacity": { module: "../../calc-solar.js", fn: "computePvCircuitAmpacity" },
   // spec-v221..v223 PV system-design batch (3 tiles)
   "pv-energy-yield": { module: "../../calc-solar.js", fn: "computePvEnergyYield" },
   "pv-row-spacing": { module: "../../calc-solar.js", fn: "computePvRowSpacing" },
   "pv-inverter-ratio": { module: "../../calc-solar.js", fn: "computePvInverterRatio" },
+  // spec-v236..v238 grid-tied battery-economics batch (3 tiles)
+  "battery-tou-arbitrage": { module: "../../calc-solar.js", fn: "computeBatteryTouArbitrage" },
+  "battery-peak-shaving": { module: "../../calc-solar.js", fn: "computeBatteryPeakShaving" },
+  "battery-c-rate": { module: "../../calc-solar.js", fn: "computeBatteryCRate" },
   "transformer-k-factor": { module: "../../calc-powerquality.js", fn: "computeTransformerKFactor" },
   "motor-capacitor-max": { module: "../../calc-powerquality.js", fn: "computeMotorCapacitorMax" },
   "bends-between-pulls": { module: "../../calc-electrical.js", fn: "computeBendsBetweenPulls" },

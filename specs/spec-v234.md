@@ -1,6 +1,6 @@
 # roughlogic.com Specification v234 -- Dual-Fuel Economic Switchover (Heat Pump vs Gas Balance Point) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v233..v235 (the heat-pump heating-mode trio -- seasonal energy, dual-fuel
+> **Status: LANDED (2026-06-30, package 0.88.0; was PROPOSED 2026-06-30). Batch spec-v233..v235 (the heat-pump heating-mode trio -- seasonal energy, dual-fuel
 > switchover, and cold-temperature capacity). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the switchover setpoint is what the HVAC tech
 > programs into a dual-fuel thermostat. Adds one tile to **`calc-hvac.js`** (Group C); no new module, group, or
