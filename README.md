@@ -209,7 +209,7 @@ flowchart TB
         SRC[in-tree dataset constants]
         SRC --> MAN["per-folder manifest.json\nversion, edition, refresh cadence,\nper-shard SHA-256"]
         SRC --> EXP[("scripts/expected-hashes.json\n117 shard + manifest hashes")]
-        MAN --> SIDE[("data/integrity.json\n18 per-folder manifest hashes")]
+        MAN --> SIDE[("data/integrity.json\n17 per-folder manifest hashes")]
     end
     subgraph CI["Boundary 1: build / CI tripwire (Node)"]
         VER["npm run data:verify\nverify-integrity.mjs\nrehashes all 117 shards"]
@@ -229,7 +229,7 @@ flowchart TB
     style RUNTIME fill:#1f1f1f,color:#fff
 ```
 
-The split is deliberate. `expected-hashes.json` covers **every** shard (117 files, the full data surface) and is the strict gate -- a single byte changed in any `data/**.json` without re-running the pipeline turns `data:verify` red in CI, so unreviewed data never reaches `main`. `data/integrity.json` covers only the **18 per-folder manifests** (each of which already pins its own shards' hashes), keeping the runtime fetch tiny; the browser recomputes those 18 over SubtleCrypto and shows a banner on any mismatch, but **fails open** -- an insecure context with no SubtleCrypto skips the check rather than blocking the calculators -- because a missing crypto API is the user's environment, not a data-trust failure. The build boundary fails closed; the runtime boundary fails open.
+The split is deliberate. `expected-hashes.json` covers **every** shard (117 files, the full data surface) and is the strict gate -- a single byte changed in any `data/**.json` without re-running the pipeline turns `data:verify` red in CI, so unreviewed data never reaches `main`. `data/integrity.json` covers only the **17 per-folder manifests** (each of which already pins its own shards' hashes; the `search/` manifest is a build-time index artifact, not a data source, so it is excluded from the runtime chain), keeping the runtime fetch tiny; the browser recomputes those 17 over SubtleCrypto and shows a banner on any mismatch, but **fails open** -- an insecure context with no SubtleCrypto skips the check rather than blocking the calculators -- because a missing crypto API is the user's environment, not a data-trust failure. The build boundary fails closed; the runtime boundary fails open.
 
 ### Repository map
 
@@ -707,7 +707,7 @@ roughlogic uses zero LLM and zero AI. Every output is the result of a determinis
 
 ## Documentation
 
-- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v206.md`); each carries an implementation-status banner.
+- [specs/](specs/) - the inheriting build specifications (`spec.md` through `spec-v241.md`); each carries an implementation-status banner.
 - [docs/architecture.md](docs/architecture.md) - runtime architecture and ASCII diagram.
 - [docs/correctness.md](docs/correctness.md) - the spec-v14 correctness pass (corpus, cross-check, dimensions, bounds, stability, invariants, signoffs).
 - [docs/data-sources.md](docs/data-sources.md) - every dataset with source, license, cadence, and shard layout.
