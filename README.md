@@ -518,9 +518,9 @@ The site is a calculator; the unit of value is the answer it returns. Spec-v14 a
 
 ```mermaid
 flowchart TB
-    F[Exported calculator function] --> A[Phase A: corpus row\n907 functions extracted]
-    F --> C[Phase C: dimensional analysis\n910/910 annotated, balanced]
-    F --> D[Phase D: bounds fuzzer\n907/907 covered]
+    F[Exported calculator function] --> A[Phase A: corpus row\n949 functions extracted]
+    F --> C[Phase C: dimensional analysis\n952/952 annotated, balanced]
+    F --> D[Phase D: bounds fuzzer\n949/949 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n341 tests / 285 monotonicity batches]
     F --> I[Phase I: derivation index\n706/706 tiles]
@@ -539,10 +539,10 @@ Status as of this writing:
 
 | Phase | What it guarantees | State |
 |---|---|---|
-| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (907 rows) |
+| A | Every exported function has a formula-corpus row in `docs/derivations.md` | Complete (949 rows) |
 | B | Every fixture comes from a published worked example independent of the primary citation | Pending the per-group review pass |
-| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (910/910) |
-| D | Every function passes the bounds-and-edge-case fuzzer | Complete (907/907) |
+| C | Every function carries a dimensional-analysis annotation that parses and balances | Complete (952/952) |
+| D | Every function passes the bounds-and-edge-case fuzzer | Complete (949/949) |
 | E | Every iterative method has a numerical-stability (bit-pattern) pin | Complete |
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 285 monotonicity batches, 341 tests) |
 | G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (706/706 tiles classified, 100%; 163 tracked sources) |
