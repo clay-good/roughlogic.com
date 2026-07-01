@@ -1847,8 +1847,30 @@ async function buildAll() {
     expected[ds.folder + "/manifest.json"] = sha256Hex(manifestText);
   }
 
-  // Top-level expected-hashes for verify-integrity.mjs.
   const expectedPath = resolve(ROOT, "scripts", "expected-hashes.json");
+
+  // Preserve integrity coverage for hand-authored data folders this script does
+  // not generate. `field/` (WMM coefficients) and `realestate/` (HUD FMR / loan
+  // limits) carry static shards maintained outside DATASETS. Without this, the
+  // top-level expected-hashes rebuild above would silently drop their entries and
+  // verify-integrity.mjs would stop checking them -- the coverage regression a
+  // scheduled refresh would otherwise introduce on first merge. Carry forward
+  // exactly the shards the previously-committed expected-hashes.json already
+  // covered but this run did not regenerate: re-hash each from its current
+  // on-disk bytes (so a legitimate static-file edit is picked up) using the same
+  // sha256(file-text) verify-integrity.mjs applies. This preserves prior coverage
+  // without newly enrolling other folders (e.g. search/), which is a separate
+  // decision, not a refresh side effect.
+  if (existsSync(expectedPath)) {
+    const prior = JSON.parse(readFileSync(expectedPath, "utf8")).hashes || {};
+    for (const rel of Object.keys(prior)) {
+      if (rel in expected) continue;
+      const abs = resolve(DATA, rel);
+      if (existsSync(abs)) expected[rel] = sha256Hex(readFileSync(abs, "utf8"));
+    }
+  }
+
+  // Top-level expected-hashes for verify-integrity.mjs.
   await writeFile(expectedPath, formatJson({ generated: TODAY, hashes: expected }), "utf8");
 
   // Runtime integrity sidecar: only manifest hashes (used by integrity.js
