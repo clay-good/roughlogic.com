@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: resync ungated repo-map figures to the 706-tile catalog, 2026-07-01
+
+A documentation-only accuracy pass; no tile, code-path, or version change. Two runtime sweeps confirmed the catalog is clean first: `render-no-nan` (701 tiles, zero NaN / Infinity / undefined leak in the user-visible output) and the `responsive-stress` every-live-tile walk (706 SPA tile views at the 320 px floor on Chromium, zero page-level horizontal scroll), alongside the static `check-shell-mobile` gate (822 checks across 728 prerendered shells, zero horizontal scroll). No bug was found.
+
+The fix resyncs the four ungated figures in the README repository map that the count gates do not anchor and that drifted as the catalog grew to 706 tiles: the `app.js` raw / gzip size (`~73 KB / ~23 KB` -> `~74 KB / ~24 KB`, now 75,479 B raw / 24,255 B gz), the `tools-data.js` raw / gzip size (`~201 KB / ~67 KB` -> `~219 KB / ~74 KB`, now 224,163 B raw / 75,316 B gz, the registry having grown with 106 tiles since the figure was last set), the specs-directory range (`spec-v217.md` -> `spec-v241.md`, the latest inheriting build spec), and the matching `app.js` size in the Lighthouse-budget note. All other README figures were re-audited against live values and confirmed current: 949 corpus rows, 952/952 dimensional annotations, 949/949 bounds-fuzzer coverage, 341 invariant tests / 285 monotonicity batches, 706/706 derivation-index and source-classification, 163 tracked sources, 4,999 unit tests. All gates green: lint (27 checks at **706 tiles / 50 modules / 728 sitemap URLs**), 4,999 unit tests, `check-shell-mobile`, `render-no-nan`, and the Chromium responsive-stress every-live-tile sweep.
+
 ### feat: land spec-v230..v241 -- 12 energy-cost-savings / equipment-sizing tiles; 694 -> 706 tiles, 0.88.0, 2026-06-30
 
 Twelve tiles in four trios (PROPOSED 2026-06-30, landed same day) that turn physics the catalog already carried into the retrofit and operating-cost numbers a trade actually quotes. Catalog **694 -> 706**, package **0.87.0 -> 0.88.0** (a minor), with **no new module, group, or dependency** (all twelve land in existing modules and groups).
