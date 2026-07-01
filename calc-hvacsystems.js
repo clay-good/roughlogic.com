@@ -995,3 +995,126 @@ function _v16h_renderFilterPressureDrop(inputRegion, outputRegion, citationEl) {
   type.select.addEventListener("change", update);
 }
 HVACSYSTEMS_RENDERERS["filter-pressure-drop"] = _v16h_renderFilterPressureDrop;
+
+// ===================== spec-v227: window solar heat gain + conduction cooling load =====================
+
+// dims: in { area_ft2: L^2, shgc: dimensionless, psf: M T^-3, u_factor: M T^-4, cltd_f: T } out: { q_solar: M L^2 T^-3, q_cond: M L^2 T^-3, q_total: M L^2 T^-3 }
+export function computeWindowSolarHeatGain({ area_ft2 = 0, shgc = 0, psf = 0, u_factor = 0, cltd_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_ft2 > 0)) return { error: "Glazing area must be positive (ft^2)." };
+  if (shgc < 0 || shgc > 1) return { error: "SHGC must be 0 to 1." };
+  if (psf < 0) return { error: "Peak solar factor cannot be negative." };
+  if (u_factor < 0) return { error: "U-factor cannot be negative." };
+  const q_solar = area_ft2 * shgc * psf;
+  const q_cond = area_ft2 * u_factor * cltd_f;
+  const q_total = q_solar + q_cond;
+  return {
+    q_solar, q_cond, q_total,
+    note: "ASHRAE / ACCA Manual J fenestration cooling load: solar Q = A x SHGC x PSF and conduction Q = A x U x CLTD. The peak solar factor (PSF / SHGF) is read from the ASHRAE/ACCA table for the window's orientation and the site latitude (a west or east wall in summer runs far higher than a north wall; entered, not a bundled chart). The SHGC and U come from the NFRC label; the glass CLTD is the design temperature difference adjusted for the daily cycle. Interior shades and overhangs reduce the solar term by a separate shade factor. One cooling-load component, not a Manual J.",
+  };
+}
+function _v16h_renderWindowSolarHeatGain(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE / ACCA Manual J fenestration cooling load Q_solar = A x SHGC x PSF and Q_cond = A x U x CLTD (by name). The peak solar factor is from the ASHRAE/ACCA table for the orientation and latitude; SHGC and U come from the NFRC label; interior shades reduce the solar term by a separate shade factor. One cooling-load component, not a Manual J.";
+  const area = makeNumber("Glazing area (ft^2)", "wsh-area", { step: "any", min: "0", value: "40" });
+  const shgc = makeNumber("SHGC (NFRC label, 0-1)", "wsh-shgc", { step: "any", min: "0", value: "0.30" });
+  const psf = makeNumber("Peak solar factor (Btu/h/ft^2)", "wsh-psf", { step: "any", min: "0", value: "200" });
+  const u = makeNumber("U-factor (Btu/h/ft^2/F)", "wsh-u", { step: "any", min: "0", value: "0.30" });
+  const cltd = makeNumber("Glass CLTD (F)", "wsh-cltd", { step: "any", value: "14" });
+  for (const f of [area, shgc, psf, u, cltd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "40"; shgc.input.value = "0.30"; psf.input.value = "200"; u.input.value = "0.30"; cltd.input.value = "14"; update(); });
+  const oSolar = makeOutputLine(outputRegion, "Solar gain", "wsh-out-solar");
+  const oCond = makeOutputLine(outputRegion, "Conduction", "wsh-out-cond");
+  const oTotal = makeOutputLine(outputRegion, "Total cooling load", "wsh-out-total");
+  const oNote = makeOutputLine(outputRegion, "Note", "wsh-out-note");
+  const update = debounce(() => {
+    const r = computeWindowSolarHeatGain({ area_ft2: Number(area.input.value) || 0, shgc: Number(shgc.input.value) || 0, psf: Number(psf.input.value) || 0, u_factor: Number(u.input.value) || 0, cltd_f: Number(cltd.input.value) || 0 });
+    if (r.error) { oSolar.textContent = r.error; oCond.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    oSolar.textContent = fmt(r.q_solar, 0) + " Btu/h";
+    oCond.textContent = fmt(r.q_cond, 0) + " Btu/h";
+    oTotal.textContent = fmt(r.q_total, 0) + " Btu/h";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, shgc.input, psf.input, u.input, cltd.input]) el.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["window-solar-heat-gain"] = _v16h_renderWindowSolarHeatGain;
+
+// ===================== spec-v228: internal heat gains (people, lighting, equipment) =====================
+
+// dims: in { occupants: dimensionless, sens_per_person: M L^2 T^-3, lat_per_person: M L^2 T^-3, lighting_w: M L^2 T^-3, equipment_w: M L^2 T^-3, use_factor: dimensionless } out: { q_sensible: M L^2 T^-3, q_latent: M L^2 T^-3, q_total: M L^2 T^-3 }
+export function computeInternalHeatGains({ occupants = 0, sens_per_person = 245, lat_per_person = 200, lighting_w = 0, equipment_w = 0, use_factor = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (occupants < 0) return { error: "Occupant count cannot be negative." };
+  if (sens_per_person < 0 || lat_per_person < 0) return { error: "Per-person gain cannot be negative (Btu/h)." };
+  if (lighting_w < 0 || equipment_w < 0) return { error: "Lighting / equipment power cannot be negative (W)." };
+  if (!(use_factor >= 0 && use_factor <= 1)) return { error: "Use factor must be 0 to 1." };
+  const q_people_sensible = occupants * sens_per_person;
+  const q_people_latent = occupants * lat_per_person;
+  const q_lighting = lighting_w * 3.412 * use_factor;
+  const q_equipment = equipment_w * 3.412 * use_factor;
+  const q_sensible = q_people_sensible + q_lighting + q_equipment;
+  const q_latent = q_people_latent;
+  const q_total = q_sensible + q_latent;
+  return {
+    q_people_sensible, q_people_latent, q_lighting, q_equipment, q_sensible, q_latent, q_total,
+    note: "ASHRAE / ACCA Manual J internal-gain method: occupant sensible and latent from the activity table (a seated office occupant is roughly 245 Btu/h sensible and 200 latent; heavier activity is far higher), and lighting and equipment at 3.412 Btu/h per watt. The use factor accounts for the fraction actually on (and a ballast factor for the fixture type). Recessed lighting vented to a return plenum delivers part of its heat to the plenum rather than the room. The latent term is moisture a sensible-only 'more airflow' fix never removes. One cooling-load component, not a Manual J.",
+  };
+}
+function _v16h_renderInternalHeatGains(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE / ACCA Manual J internal-gain method (by name): occupant sensible and latent from the activity table, lighting and equipment at 3.412 Btu/h per watt, scaled by the use factor. Recessed lighting on a return plenum delivers part of its heat to the plenum. One cooling-load component, not a Manual J.";
+  const occ = makeNumber("Occupants", "ihg-occ", { step: "any", min: "0", value: "6" });
+  const sens = makeNumber("Sensible per person (Btu/h)", "ihg-sens", { step: "any", min: "0", value: "245" });
+  const lat = makeNumber("Latent per person (Btu/h)", "ihg-lat", { step: "any", min: "0", value: "200" });
+  const light = makeNumber("Lighting power (W)", "ihg-light", { step: "any", min: "0", value: "800" });
+  const equip = makeNumber("Equipment power (W)", "ihg-equip", { step: "any", min: "0", value: "1200" });
+  const use = makeNumber("Use factor (0-1)", "ihg-use", { step: "any", min: "0", value: "1.0" });
+  for (const f of [occ, sens, lat, light, equip, use]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { occ.input.value = "6"; sens.input.value = "245"; lat.input.value = "200"; light.input.value = "800"; equip.input.value = "1200"; use.input.value = "1.0"; update(); });
+  const oSensible = makeOutputLine(outputRegion, "Sensible load", "ihg-out-sensible");
+  const oLatent = makeOutputLine(outputRegion, "Latent load", "ihg-out-latent");
+  const oTotal = makeOutputLine(outputRegion, "Total cooling load", "ihg-out-total");
+  const oBreak = makeOutputLine(outputRegion, "People / lighting / equipment", "ihg-out-break");
+  const oNote = makeOutputLine(outputRegion, "Note", "ihg-out-note");
+  const update = debounce(() => {
+    const r = computeInternalHeatGains({ occupants: Number(occ.input.value) || 0, sens_per_person: Number(sens.input.value) || 0, lat_per_person: Number(lat.input.value) || 0, lighting_w: Number(light.input.value) || 0, equipment_w: Number(equip.input.value) || 0, use_factor: Number(use.input.value) || 0 });
+    if (r.error) { oSensible.textContent = r.error; oLatent.textContent = "-"; oTotal.textContent = "-"; oBreak.textContent = "-"; oNote.textContent = ""; return; }
+    oSensible.textContent = fmt(r.q_sensible, 0) + " Btu/h";
+    oLatent.textContent = fmt(r.q_latent, 0) + " Btu/h";
+    oTotal.textContent = fmt(r.q_total, 0) + " Btu/h";
+    oBreak.textContent = fmt(r.q_people_sensible + r.q_people_latent, 0) + " / " + fmt(r.q_lighting, 0) + " / " + fmt(r.q_equipment, 0) + " Btu/h";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [occ.input, sens.input, lat.input, light.input, equip.input, use.input]) el.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["internal-heat-gains"] = _v16h_renderInternalHeatGains;
+
+// ===================== spec-v229: opaque-envelope conduction cooling load (sol-air CLTD) =====================
+
+// dims: in { area_ft2: L^2, u_factor: M T^-4, cltd_f: T } out: { q_cond: M L^2 T^-3 }
+export function computeEnvelopeConductionLoad({ area_ft2 = 0, u_factor = 0, cltd_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(area_ft2 > 0)) return { error: "Surface area must be positive (ft^2)." };
+  if (!(u_factor > 0)) return { error: "U-factor must be positive (Btu/h/ft^2/F)." };
+  const q_cond = u_factor * area_ft2 * cltd_f;
+  return {
+    q_cond,
+    note: "ASHRAE / ACCA Manual J opaque-envelope cooling load: Q = U x A x CLTD, where the CLTD is the sol-air cooling-load temperature difference for the surface. The CLTD comes from the ASHRAE/ACCA table for the surface type, color, orientation, and design day (a dark, sunlit roof runs far above the air temperature difference because of solar absorptance and mass lag; a light or shaded surface runs near it; entered, not a bundled chart). The U-factor is the whole-assembly value from assembly-r-value or the construction. One cooling-load component, not a Manual J.",
+  };
+}
+function _v16h_renderEnvelopeConductionLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE / ACCA Manual J opaque-envelope cooling load Q = U x A x CLTD, the CLTD being the sol-air cooling-load temperature difference (by name). The sol-air CLTD comes from the ASHRAE/ACCA table for the surface type, color, orientation, and design day; the U-factor is the whole-assembly value. One cooling-load component, not a Manual J.";
+  const area = makeNumber("Opaque surface area (ft^2)", "ecl-area", { step: "any", min: "0", value: "1000" });
+  const u = makeNumber("Assembly U-factor (Btu/h/ft^2/F)", "ecl-u", { step: "any", min: "0", value: "0.05" });
+  const cltd = makeNumber("Sol-air CLTD (F)", "ecl-cltd", { step: "any", value: "70" });
+  for (const f of [area, u, cltd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "1000"; u.input.value = "0.05"; cltd.input.value = "70"; update(); });
+  const oCond = makeOutputLine(outputRegion, "Conduction cooling load", "ecl-out-cond");
+  const oNote = makeOutputLine(outputRegion, "Note", "ecl-out-note");
+  const update = debounce(() => {
+    const r = computeEnvelopeConductionLoad({ area_ft2: Number(area.input.value) || 0, u_factor: Number(u.input.value) || 0, cltd_f: Number(cltd.input.value) || 0 });
+    if (r.error) { oCond.textContent = r.error; oNote.textContent = ""; return; }
+    oCond.textContent = fmt(r.q_cond, 0) + " Btu/h";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [area.input, u.input, cltd.input]) el.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["envelope-conduction-load"] = _v16h_renderEnvelopeConductionLoad;

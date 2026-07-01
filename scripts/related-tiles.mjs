@@ -840,6 +840,22 @@ const RELATED = {
   "ice-barrier-coverage": ["roofing-squares","roof-pitch","gutter-downspout"],
   "metal-roof-panels": ["roofing-squares","roof-pitch","hip-valley-rafter"],
   "ridge-cap-fasteners": ["roofing-squares","hip-valley-rafter","ice-barrier-coverage"],
+  // spec-v218..v220 residential air-tightness and ventilation batch (Group C)
+  "blower-door-ach50": ["air-changes-hour","ashrae-622-ventilation","infiltration-load"],
+  "ashrae-622-ventilation": ["blower-door-ach50","outdoor-air-ventilation","air-changes-hour"],
+  "infiltration-load": ["blower-door-ach50","manual-j-heating","manual-j-cooling"],
+  // spec-v221..v223 PV system-design batch (Group A)
+  "pv-energy-yield": ["pv-string-sizing","pv-inverter-ratio","solar-times"],
+  "pv-row-spacing": ["solar-times","pv-energy-yield","pv-string-sizing"],
+  "pv-inverter-ratio": ["pv-string-sizing","pv-energy-yield","pv-circuit-ampacity"],
+  // spec-v224..v226 ASCE 7 structural design-loads batch (Group E)
+  "rain-load-ponding": ["snow-load","roof-drain-sizing","gutter-downspout"],
+  "asce7-load-combinations": ["snow-load","wind-pressure","rain-load-ponding"],
+  "seismic-base-shear": ["wind-pressure","asce7-load-combinations","snow-load"],
+  // spec-v227..v229 cooling-load-components batch (Group C)
+  "window-solar-heat-gain": ["manual-j-cooling","internal-heat-gains","envelope-conduction-load"],
+  "internal-heat-gains": ["manual-j-cooling","window-solar-heat-gain","shr"],
+  "envelope-conduction-load": ["assembly-r-value","window-solar-heat-gain","manual-j-cooling"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

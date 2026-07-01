@@ -1,6 +1,6 @@
 # roughlogic.com Specification v222 -- PV Inter-Row Spacing and Ground-Coverage Ratio (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v221..v223 (the PV system-design trio -- production, row spacing, and
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v221..v223 (the PV system-design trio -- production, row spacing, and
 > inverter match). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the row layout is set in the field by the solar
 > crew laying out a ground mount or a flat-roof ballasted array. Adds one tile to **`calc-solar.js`** (Group A); no new

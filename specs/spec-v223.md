@@ -1,6 +1,6 @@
 # roughlogic.com Specification v223 -- PV Inverter Loading Ratio (DC:AC) and Clipping Onset (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v221..v223 (the PV system-design trio -- production, row spacing, and
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v221..v223 (the PV system-design trio -- production, row spacing, and
 > inverter match). This closes the v221..v223 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: matching the array to the inverter is the
 > designer's and installer's call. Adds one tile to **`calc-solar.js`** (Group A); no new module, group, or dependency.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v228 -- Internal Heat Gains: People, Lighting, Equipment (calc-hvacsystems.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v227..v229 (the cooling-load-components trio -- fenestration, internal
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v227..v229 (the cooling-load-components trio -- fenestration, internal
 > gains, and opaque-envelope conduction). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the internal gain is the cooling-load line the HVAC
 > tech adds for occupants and plug load, and the one that explains why a packed conference room or a server closet runs

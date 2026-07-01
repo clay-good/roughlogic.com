@@ -4580,3 +4580,127 @@ const renderRidgeCapFasteners = _simpleRenderer({
   compute: computeRidgeCapFasteners,
 });
 CONSTRUCTION_RENDERERS["ridge-cap-fasteners"] = renderRidgeCapFasteners;
+
+// ===================== spec-v224: roof rain load and ponding head (ASCE 7 Ch. 8) =====================
+
+// dims: in { static_head_in: L, hydraulic_head_in: L, roof_area_ft2: L^2, rainfall_in_hr: L T^-1 } out: { rain_load_psf: M L^-1 T^-2, design_flow_gpm: L^3 T^-1 }
+export function computeRainLoadPonding({ static_head_in = 0, hydraulic_head_in = 0, roof_area_ft2 = 0, rainfall_in_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (static_head_in < 0 || hydraulic_head_in < 0) return { error: "Head cannot be negative (in)." };
+  if (roof_area_ft2 < 0) return { error: "Roof area cannot be negative (ft^2)." };
+  if (rainfall_in_hr < 0) return { error: "Rainfall cannot be negative (in/hr)." };
+  const rain_load_psf = 5.2 * (static_head_in + hydraulic_head_in);
+  const design_flow_gpm = roof_area_ft2 > 0 && rainfall_in_hr > 0
+    ? 0.0104 * roof_area_ft2 * rainfall_in_hr
+    : null;
+  return {
+    rain_load_psf, design_flow_gpm,
+    note: "ASCE 7 Ch. 8: rain load R = 5.2 x (ds + dh), where ds is the static head to the secondary (overflow) inlet and dh is the hydraulic head above it at design flow (5.2 psf per inch of water). The hydraulic head dh comes from the secondary drain or scupper's flow capacity at the design flow (a manufacturer or weir relation, entered here, not a bundled chart). The optional design flow Q = 0.0104 x area x rainfall (IPC) uses the 100-year hourly intensity for the site. A roof too flexible to shed the water must also pass the ASCE 7 §8.4 ponding-instability check. A load and flow aid, not a stamped roof-drainage design.",
+  };
+}
+const rainLoadPondingExample = { inputs: { static_head_in: 2, hydraulic_head_in: 1, roof_area_ft2: 2000, rainfall_in_hr: 3 } };
+CONSTRUCTION_RENDERERS["rain-load-ponding"] = _simpleRenderer({
+  citation: "Citation: ASCE 7 Ch. 8 rain load R = 5.2 x (ds + dh), the static head ds to the secondary inlet plus the hydraulic head dh above it at design flow, and the IPC roof-drainage design flow Q = 0.0104 x area x rainfall (by name). The hydraulic head comes from the secondary drain/scupper capacity; the design rainfall is the 100-year hourly intensity. A flat roof must also pass the §8.4 ponding-instability check. A load and flow aid, not a stamped design.",
+  example: rainLoadPondingExample.inputs,
+  fields: [
+    { key: "static_head_in", label: "Static head to secondary inlet ds (in)", kind: "number" },
+    { key: "hydraulic_head_in", label: "Hydraulic head at design flow dh (in)", kind: "number" },
+    { key: "roof_area_ft2", label: "Tributary roof area (ft^2, optional)", kind: "number", default: 0 },
+    { key: "rainfall_in_hr", label: "Design rainfall (in/hr, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "r", id: "rlp-out-r", label: "Rain load", value: (r) => _fmtC(r.rain_load_psf, 1) + " psf" },
+    { key: "q", id: "rlp-out-q", label: "Design flow to secondary", value: (r) => r.design_flow_gpm === null ? "enter roof area + rainfall" : _fmtC(r.design_flow_gpm, 1) + " gpm" },
+    { key: "n", id: "rlp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRainLoadPonding,
+});
+
+// ===================== spec-v225: ASCE 7 ASD load combinations =====================
+
+// dims: in { dead_psf: M L^-1 T^-2, live_psf: M L^-1 T^-2, snow_psf: M L^-1 T^-2, wind_psf: M L^-1 T^-2 } out: { governing_gravity_psf: M L^-1 T^-2, controlling_case_psf: M L^-1 T^-2, net_uplift_psf: M L^-1 T^-2 }
+export function computeAsce7LoadCombinations({ dead_psf = 0, live_psf = 0, snow_psf = 0, wind_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (dead_psf < 0) return { error: "Dead load cannot be negative (psf)." };
+  if (live_psf < 0) return { error: "Live load cannot be negative (psf)." };
+  if (snow_psf < 0) return { error: "Roof (snow/rain) load cannot be negative (psf)." };
+  const combos = [
+    dead_psf,
+    dead_psf + live_psf,
+    dead_psf + snow_psf,
+    dead_psf + 0.75 * live_psf + 0.75 * snow_psf,
+    dead_psf + 0.6 * wind_psf,
+    dead_psf + 0.75 * live_psf + 0.75 * 0.6 * wind_psf + 0.75 * snow_psf,
+    0.6 * dead_psf + 0.6 * wind_psf,
+  ];
+  const governing_gravity_psf = Math.max(...combos);
+  const controlling_case_psf = Math.min(...combos);
+  const net_uplift_psf = controlling_case_psf < 0 ? -controlling_case_psf : 0;
+  return {
+    combos, governing_gravity_psf, controlling_case_psf, net_uplift_psf,
+    note: "ASCE 7 §2.4.1 basic ASD load combinations: D; D+L; D+(Lr or S or R); D+0.75L+0.75(Lr or S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or S or R); 0.6D+0.6W. The governing gravity demand is the largest (it sizes the member); a controlling case below zero is a net uplift the connection must resist. Wind is signed: positive downward, negative uplift. The roof load entered as snow stands in for the governing of roof-live / snow / rain; the dead in the 0.6D combinations is the reliably-present dead only. The basic ASD set (seismic E and the LRFD strength set are separate). A load-combination aid, not a member design.",
+  };
+}
+const asce7LoadCombinationsExample = { inputs: { dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25 } };
+CONSTRUCTION_RENDERERS["asce7-load-combinations"] = _simpleRenderer({
+  citation: "Citation: ASCE 7 §2.4.1 basic ASD load combinations (D; D+L; D+(Lr or S or R); D+0.75L+0.75(Lr or S or R); D+0.6W; D+0.75L+0.75(0.6W)+0.75(Lr or S or R); 0.6D+0.6W), by name. The governing gravity demand sizes the member; a controlling case below zero is a net uplift. Wind is signed (+ down, - uplift). Basic ASD set only. A load-combination aid, not a member design.",
+  example: asce7LoadCombinationsExample.inputs,
+  fields: [
+    { key: "dead_psf", label: "Dead load D (psf)", kind: "number" },
+    { key: "live_psf", label: "Floor live load L (psf)", kind: "number", default: 0 },
+    { key: "snow_psf", label: "Roof load Lr/S/R (psf)", kind: "number", default: 0 },
+    { key: "wind_psf", label: "Wind load W (psf, + down / - uplift)", kind: "number", default: 0, attrs: { step: "any" } },
+  ],
+  outputs: [
+    { key: "g", id: "alc-out-g", label: "Governing gravity demand", value: (r) => _fmtC(r.governing_gravity_psf, 2) + " psf" },
+    { key: "u", id: "alc-out-u", label: "Net uplift", value: (r) => r.net_uplift_psf > 0 ? _fmtC(r.net_uplift_psf, 2) + " psf (resist)" : "none" },
+    { key: "m", id: "alc-out-m", label: "Controlling (min) case", value: (r) => _fmtC(r.controlling_case_psf, 2) + " psf" },
+    { key: "c", id: "alc-out-c", label: "All 7 combinations (psf)", value: (r) => r.combos.map((c) => _fmtC(c, 2)).join(", ") },
+    { key: "n", id: "alc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAsce7LoadCombinations,
+});
+
+// ===================== spec-v226: seismic base shear (ASCE 7 §12.8 ELF) =====================
+
+// dims: in { weight_kip: M L T^-2, sds: dimensionless, sd1: dimensionless, r_factor: dimensionless, ie: dimensionless, period_s: T } out: { cs: dimensionless, base_shear_kip: M L T^-2 }
+export function computeSeismicBaseShear({ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(weight_kip > 0)) return { error: "Seismic weight must be positive (kips)." };
+  if (!(sds > 0)) return { error: "SDS must be positive (g)." };
+  if (!(r_factor > 0)) return { error: "Response-modification factor R must be positive." };
+  if (!(period_s > 0)) return { error: "Fundamental period must be positive (s)." };
+  if (!(ie >= 1.0 && ie <= 1.5)) return { error: "Importance factor Ie must be 1.0 to 1.5." };
+  const r_over_ie = r_factor / ie;
+  const cs_basic = sds / r_over_ie;
+  const cs_cap = sd1 / (period_s * r_over_ie);
+  const cs_min = Math.max(0.044 * sds * ie, 0.01);
+  const cs = Math.max(cs_min, Math.min(cs_basic, cs_cap));
+  const base_shear_kip = cs * weight_kip;
+  const governing = cs === cs_min ? "code minimum" : (cs_cap < cs_basic ? "period cap (T <= TL)" : "basic Cs");
+  return {
+    cs_basic, cs_cap, cs_min, cs, base_shear_kip, governing,
+    note: "ASCE 7 §12.8 equivalent lateral force: Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, with the minimum max(0.044 x SDS x Ie, 0.01); the base shear V = Cs x W. SDS and SD1 are the site's design spectral accelerations from the USGS seismic design maps (entered, not a bundled hazard map); R is from ASCE 7 Table 12.2-1 for the chosen lateral system; the long-period transition TL is assumed not to govern. The equivalent-lateral-force base shear for a regular building, not a modal or response-history analysis and not the vertical distribution. A licensed engineer governs.",
+  };
+}
+const seismicBaseShearExample = { inputs: { weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 0.3 } };
+CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
+  citation: "Citation: ASCE 7 §12.8 equivalent lateral force Cs = SDS / (R / Ie), capped at SD1 / (T x (R / Ie)) for T <= TL, minimum max(0.044 x SDS x Ie, 0.01), base shear V = Cs x W (by name). SDS / SD1 are from the USGS seismic design maps; R is from Table 12.2-1. The ELF base shear for a regular building, not a modal analysis. A licensed engineer governs.",
+  example: seismicBaseShearExample.inputs,
+  fields: [
+    { key: "weight_kip", label: "Seismic weight W (kips)", kind: "number" },
+    { key: "sds", label: "SDS, short-period (g)", kind: "number" },
+    { key: "sd1", label: "SD1, 1-second (g)", kind: "number" },
+    { key: "r_factor", label: "Response-modification factor R", kind: "number" },
+    { key: "ie", label: "Importance factor Ie (1.0-1.5)", kind: "number", default: 1.0 },
+    { key: "period_s", label: "Fundamental period Ta (s)", kind: "number" },
+  ],
+  outputs: [
+    { key: "cs", id: "sbs-out-cs", label: "Seismic response coefficient Cs", value: (r) => _fmtC(r.cs, 4) },
+    { key: "v", id: "sbs-out-v", label: "Base shear V", value: (r) => _fmtC(r.base_shear_kip, 1) + " kips" },
+    { key: "g", id: "sbs-out-g", label: "Governed by", value: (r) => r.governing },
+    { key: "d", id: "sbs-out-d", label: "Cs basic / cap / min", value: (r) => _fmtC(r.cs_basic, 4) + " / " + _fmtC(r.cs_cap, 4) + " / " + _fmtC(r.cs_min, 4) },
+    { key: "n", id: "sbs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeismicBaseShear,
+});

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v220 -- Infiltration Heating / Cooling Load (Sensible + Latent) (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v218..v220 (the residential air-tightness and ventilation trio -- the
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v218..v220 (the residential air-tightness and ventilation trio -- the
 > blower-door result, the ASHRAE 62.2 whole-house ventilation, and the infiltration load this spec adds). This closes
 > the v218..v220 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the infiltration component of the design load is

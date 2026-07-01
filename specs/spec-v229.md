@@ -1,6 +1,6 @@
 # roughlogic.com Specification v229 -- Opaque-Envelope Conduction Cooling Load (Sol-Air CLTD) (calc-hvacsystems.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v227..v229 (the cooling-load-components trio -- fenestration, internal
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v227..v229 (the cooling-load-components trio -- fenestration, internal
 > gains, and opaque-envelope conduction). This closes the v227..v229 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the envelope conduction load is what the HVAC tech
 > sizes against and what a cool-roof or insulation upgrade is justified by. Adds one tile to **`calc-hvacsystems.js`**

@@ -22866,6 +22866,782 @@
       }
     },
     {
+      "tile_id": "blower-door-ach50",
+      "source_publisher": "IECC R402.4.1.2 + LBL infiltration model",
+      "source_title": "1,600 ft2 two-story, 960 cfm50, 12,800 ft3 -> 4.5 ACH50 FAIL, 56.5 cfm natural",
+      "source_edition_or_year": "spec-v218 worked example (machine-verified)",
+      "source_section_or_page": "spec-v218 section 2.1 pinned example (first test, FAIL)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "cfm50": 960,
+        "volume_ft3": 12800,
+        "n_factor": 17,
+        "target_ach50": 3
+      },
+      "outputs": {
+        "ach50": {
+          "value": 4.5,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "ach_nat": {
+          "value": 0.264706,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "cfm_nat": {
+          "value": 56.470588,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "blower-door-ach50",
+      "source_publisher": "IECC R402.4.1.2 + LBL infiltration model",
+      "source_title": "cross-check: after air sealing, 600 cfm50 -> 2.81 ACH50 PASS, 35.3 cfm",
+      "source_edition_or_year": "spec-v218 worked example (machine-verified)",
+      "source_section_or_page": "spec-v218 section 2.1 cross-check (post-sealing, PASS)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "cfm50": 600,
+        "volume_ft3": 12800,
+        "n_factor": 17,
+        "target_ach50": 3
+      },
+      "outputs": {
+        "ach50": {
+          "value": 2.8125,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "ach_nat": {
+          "value": 0.165441,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "cfm_nat": {
+          "value": 35.294118,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "ashrae-622-ventilation",
+      "source_publisher": "ASHRAE 62.2-2019 §4.1",
+      "source_title": "2,000 ft2 3-bedroom, no credit -> 90 cfm Qtot and fan",
+      "source_edition_or_year": "spec-v219 worked example (machine-verified)",
+      "source_section_or_page": "spec-v219 section 2.1 pinned example (no credit)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "floor_area_ft2": 2000,
+        "bedrooms": 3,
+        "infil_credit_cfm": 0
+      },
+      "outputs": {
+        "q_tot": {
+          "value": 90,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_fan": {
+          "value": 90,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "ashrae-622-ventilation",
+      "source_publisher": "ASHRAE 62.2-2019 §4.1",
+      "source_title": "cross-check: same house, 35.3 cfm credit -> 54.7 cfm fan",
+      "source_edition_or_year": "spec-v219 worked example (machine-verified)",
+      "source_section_or_page": "spec-v219 section 2.1 cross-check (with blower-door credit)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "floor_area_ft2": 2000,
+        "bedrooms": 3,
+        "infil_credit_cfm": 35.3
+      },
+      "outputs": {
+        "q_tot": {
+          "value": 90,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_fan": {
+          "value": 54.7,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "infiltration-load",
+      "source_publisher": "ASHRAE Handbook of Fundamentals (air-side)",
+      "source_title": "56.5 cfm at 70 F heating, no latent -> 4,271 Btu/h sensible",
+      "source_edition_or_year": "spec-v220 worked example (machine-verified)",
+      "source_section_or_page": "spec-v220 section 2.1 pinned example (winter heating)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "cfm": 56.5,
+        "delta_t_f": 70,
+        "delta_gr": 0
+      },
+      "outputs": {
+        "q_sensible": {
+          "value": 4271.4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "q_latent": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_total": {
+          "value": 4271.4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "infiltration-load",
+      "source_publisher": "ASHRAE Handbook of Fundamentals (air-side)",
+      "source_title": "cross-check: 56.5 cfm at 20 F + 30 gr cooling -> 2,373 Btu/h total",
+      "source_edition_or_year": "spec-v220 worked example (machine-verified)",
+      "source_section_or_page": "spec-v220 section 2.1 cross-check (summer cooling)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "cfm": 56.5,
+        "delta_t_f": 20,
+        "delta_gr": 30
+      },
+      "outputs": {
+        "q_sensible": {
+          "value": 1220.4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "q_latent": {
+          "value": 1152.6,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "q_total": {
+          "value": 2373,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "pv-energy-yield",
+      "source_publisher": "NREL PVWatts energy model",
+      "source_title": "8 kW, 5.0 PSH, 0.77 PR -> 11,242 kWh, 1,405 kWh/kWp, 16.0%",
+      "source_edition_or_year": "spec-v221 worked example (machine-verified)",
+      "source_section_or_page": "spec-v221 section 2.1 pinned example (average US site)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "dc_kw": 8,
+        "psh": 5,
+        "perf_ratio": 0.77
+      },
+      "outputs": {
+        "annual_kwh": {
+          "value": 11242,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "specific_yield": {
+          "value": 1405.25,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "capacity_factor": {
+          "value": 0.160417,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "monthly_kwh_avg": {
+          "value": 936.833333,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "pv-energy-yield",
+      "source_publisher": "NREL PVWatts energy model",
+      "source_title": "cross-check: 8 kW, 6.5 PSH desert, 0.75 PR -> 14,235 kWh, 1,779 kWh/kWp",
+      "source_edition_or_year": "spec-v221 worked example (machine-verified)",
+      "source_section_or_page": "spec-v221 section 2.1 cross-check (high-irradiance site)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "dc_kw": 8,
+        "psh": 6.5,
+        "perf_ratio": 0.75
+      },
+      "outputs": {
+        "annual_kwh": {
+          "value": 14235,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "specific_yield": {
+          "value": 1779.375,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "pv-row-spacing",
+      "source_publisher": "NREL / Sandia row-spacing geometry",
+      "source_title": "6.5 ft module, 30 deg tilt, 22 deg sun -> 13.67 ft pitch, 0.475 GCR",
+      "source_edition_or_year": "spec-v222 worked example (machine-verified)",
+      "source_section_or_page": "spec-v222 section 2.1 pinned example (30-degree ground mount)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "module_length_ft": 6.5,
+        "tilt_deg": 30,
+        "profile_angle_deg": 22
+      },
+      "outputs": {
+        "rise_ft": {
+          "value": 3.25,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "base_ft": {
+          "value": 5.629165,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "shadow_ft": {
+          "value": 8.044032,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "pitch_ft": {
+          "value": 13.673197,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "gcr": {
+          "value": 0.475383,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "pv-row-spacing",
+      "source_publisher": "NREL / Sandia row-spacing geometry",
+      "source_title": "cross-check: shallow 10 deg tilt -> 9.19 ft pitch, 0.707 GCR",
+      "source_edition_or_year": "spec-v222 worked example (machine-verified)",
+      "source_section_or_page": "spec-v222 section 2.1 cross-check (shallow tilt)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "module_length_ft": 6.5,
+        "tilt_deg": 10,
+        "profile_angle_deg": 22
+      },
+      "outputs": {
+        "pitch_ft": {
+          "value": 9.194913,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "gcr": {
+          "value": 0.706913,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "pv-inverter-ratio",
+      "source_publisher": "Inverter loading ratio + NREL guidance",
+      "source_title": "8 kW on 6.6 kW inverter -> 1.21 ILR, clips above 85.9%",
+      "source_edition_or_year": "spec-v223 worked example (machine-verified)",
+      "source_section_or_page": "spec-v223 section 2.1 pinned example (in-band)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "dc_kw": 8,
+        "ac_kw": 6.6,
+        "inv_eff": 0.96
+      },
+      "outputs": {
+        "ilr": {
+          "value": 1.212121,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "clip_dc_kw": {
+          "value": 6.875,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "clip_fraction": {
+          "value": 0.859375,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "pv-inverter-ratio",
+      "source_publisher": "Inverter loading ratio + NREL guidance",
+      "source_title": "cross-check: 10 kW on same 6.6 kW -> 1.52 ILR, clips above 68.8%",
+      "source_edition_or_year": "spec-v223 worked example (machine-verified)",
+      "source_section_or_page": "spec-v223 section 2.1 cross-check (undersized)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "dc_kw": 10,
+        "ac_kw": 6.6,
+        "inv_eff": 0.96
+      },
+      "outputs": {
+        "ilr": {
+          "value": 1.515152,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "clip_dc_kw": {
+          "value": 6.875,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "clip_fraction": {
+          "value": 0.6875,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "rain-load-ponding",
+      "source_publisher": "ASCE 7 Ch. 8 + IPC drainage",
+      "source_title": "2 in + 1 in head, 2,000 ft2, 3 in/hr -> 15.6 psf, 62.4 gpm",
+      "source_edition_or_year": "spec-v224 worked example (machine-verified)",
+      "source_section_or_page": "spec-v224 section 2.1 pinned example (typical scupper)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "static_head_in": 2,
+        "hydraulic_head_in": 1,
+        "roof_area_ft2": 2000,
+        "rainfall_in_hr": 3
+      },
+      "outputs": {
+        "rain_load_psf": {
+          "value": 15.6,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "design_flow_gpm": {
+          "value": 62.4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "rain-load-ponding",
+      "source_publisher": "ASCE 7 Ch. 8 + IPC drainage",
+      "source_title": "cross-check: 4 in + 2 in head -> 31.2 psf",
+      "source_edition_or_year": "spec-v224 worked example (machine-verified)",
+      "source_section_or_page": "spec-v224 section 2.1 cross-check (deep static head)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "static_head_in": 4,
+        "hydraulic_head_in": 2
+      },
+      "outputs": {
+        "rain_load_psf": {
+          "value": 31.2,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "asce7-load-combinations",
+      "source_publisher": "ASCE 7 §2.4.1 basic ASD combinations",
+      "source_title": "roof D15/S30/W-25 -> 45 psf governing, 6 psf net uplift",
+      "source_edition_or_year": "spec-v225 worked example (machine-verified)",
+      "source_section_or_page": "spec-v225 section 2.1 pinned example (roof uplift)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "dead_psf": 15,
+        "live_psf": 0,
+        "snow_psf": 30,
+        "wind_psf": -25
+      },
+      "outputs": {
+        "governing_gravity_psf": {
+          "value": 45,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "controlling_case_psf": {
+          "value": -6,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "net_uplift_psf": {
+          "value": 6,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "asce7-load-combinations",
+      "source_publisher": "ASCE 7 §2.4.1 basic ASD combinations",
+      "source_title": "cross-check: floor D20/L40/W30 -> 63.5 psf governing, no uplift",
+      "source_edition_or_year": "spec-v225 worked example (machine-verified)",
+      "source_section_or_page": "spec-v225 section 2.1 cross-check (floor, no uplift)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "dead_psf": 20,
+        "live_psf": 40,
+        "snow_psf": 0,
+        "wind_psf": 30
+      },
+      "outputs": {
+        "governing_gravity_psf": {
+          "value": 63.5,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "controlling_case_psf": {
+          "value": 20,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "net_uplift_psf": {
+          "value": 0,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "seismic-base-shear",
+      "source_publisher": "ASCE 7 §12.8 equivalent lateral force",
+      "source_title": "200 kip, SDS 1.0, R 6.5, 0.3 s -> Cs 0.154, 30.8 kips",
+      "source_edition_or_year": "spec-v226 worked example (machine-verified)",
+      "source_section_or_page": "spec-v226 section 2.1 pinned example (short period)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "weight_kip": 200,
+        "sds": 1,
+        "sd1": 0.6,
+        "r_factor": 6.5,
+        "ie": 1,
+        "period_s": 0.3
+      },
+      "outputs": {
+        "cs": {
+          "value": 0.153846,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "base_shear_kip": {
+          "value": 30.769231,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "seismic-base-shear",
+      "source_publisher": "ASCE 7 §12.8 equivalent lateral force",
+      "source_title": "cross-check: same building, 1.0 s period cap governs -> Cs 0.092, 18.5 kips",
+      "source_edition_or_year": "spec-v226 worked example (machine-verified)",
+      "source_section_or_page": "spec-v226 section 2.1 cross-check (period cap)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "weight_kip": 200,
+        "sds": 1,
+        "sd1": 0.6,
+        "r_factor": 6.5,
+        "ie": 1,
+        "period_s": 1
+      },
+      "outputs": {
+        "cs": {
+          "value": 0.092308,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "base_shear_kip": {
+          "value": 18.461538,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "window-solar-heat-gain",
+      "source_publisher": "ASHRAE / ACCA Manual J fenestration",
+      "source_title": "40 ft2 west window, SHGC 0.30, PSF 200 -> 2,400 solar, 2,568 total",
+      "source_edition_or_year": "spec-v227 worked example (machine-verified)",
+      "source_section_or_page": "spec-v227 section 2.1 pinned example (west window)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "area_ft2": 40,
+        "shgc": 0.3,
+        "psf": 200,
+        "u_factor": 0.3,
+        "cltd_f": 14
+      },
+      "outputs": {
+        "q_solar": {
+          "value": 2400,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_cond": {
+          "value": 168,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_total": {
+          "value": 2568,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "window-solar-heat-gain",
+      "source_publisher": "ASHRAE / ACCA Manual J fenestration",
+      "source_title": "cross-check: same window north, PSF 40 -> 480 solar, 648 total",
+      "source_edition_or_year": "spec-v227 worked example (machine-verified)",
+      "source_section_or_page": "spec-v227 section 2.1 cross-check (north wall)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "area_ft2": 40,
+        "shgc": 0.3,
+        "psf": 40,
+        "u_factor": 0.3,
+        "cltd_f": 14
+      },
+      "outputs": {
+        "q_solar": {
+          "value": 480,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_cond": {
+          "value": 168,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_total": {
+          "value": 648,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "internal-heat-gains",
+      "source_publisher": "ASHRAE / ACCA Manual J internal gains",
+      "source_title": "6 people, 800 W light, 1,200 W equip -> 8,294 sensible, 9,494 total",
+      "source_edition_or_year": "spec-v228 worked example (machine-verified)",
+      "source_section_or_page": "spec-v228 section 2.1 pinned example (small office)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "occupants": 6,
+        "sens_per_person": 245,
+        "lat_per_person": 200,
+        "lighting_w": 800,
+        "equipment_w": 1200,
+        "use_factor": 1
+      },
+      "outputs": {
+        "q_sensible": {
+          "value": 8294,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_latent": {
+          "value": 1200,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_total": {
+          "value": 9494,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "internal-heat-gains",
+      "source_publisher": "ASHRAE / ACCA Manual J internal gains",
+      "source_title": "cross-check: 20 people, 600 W + 300 W -> 7,971 sensible, 11,971 total",
+      "source_edition_or_year": "spec-v228 worked example (machine-verified)",
+      "source_section_or_page": "spec-v228 section 2.1 cross-check (packed conference room)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "occupants": 20,
+        "sens_per_person": 245,
+        "lat_per_person": 200,
+        "lighting_w": 600,
+        "equipment_w": 300,
+        "use_factor": 1
+      },
+      "outputs": {
+        "q_sensible": {
+          "value": 7970.8,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "q_latent": {
+          "value": 4000,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "q_total": {
+          "value": 11970.8,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "envelope-conduction-load",
+      "source_publisher": "ASHRAE / ACCA Manual J opaque envelope",
+      "source_title": "1,000 ft2 dark roof, U 0.05, CLTD 70 -> 3,500 Btu/h",
+      "source_edition_or_year": "spec-v229 worked example (machine-verified)",
+      "source_section_or_page": "spec-v229 section 2.1 pinned example (dark roof)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "area_ft2": 1000,
+        "u_factor": 0.05,
+        "cltd_f": 70
+      },
+      "outputs": {
+        "q_cond": {
+          "value": 3500,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "envelope-conduction-load",
+      "source_publisher": "ASHRAE / ACCA Manual J opaque envelope",
+      "source_title": "cross-check: cool roof CLTD 40 -> 2,000 Btu/h (43% cut)",
+      "source_edition_or_year": "spec-v229 worked example (machine-verified)",
+      "source_section_or_page": "spec-v229 section 2.1 cross-check (cool roof)",
+      "verified_by": "rl",
+      "verified_on": "2026-06-30",
+      "inputs": {
+        "area_ft2": 1000,
+        "u_factor": 0.05,
+        "cltd_f": 40
+      },
+      "outputs": {
+        "q_cond": {
+          "value": 2000,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
       "tile_id": "wood-emc",
       "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
       "source_title": "70 F, 50% RH -> EMC ~9.2% (standard interior conditions)",

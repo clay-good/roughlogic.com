@@ -1,6 +1,6 @@
 # roughlogic.com Specification v218 -- Blower-Door Air-Tightness: ACH50, Natural Infiltration, Code Check (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v218..v220 (the residential air-tightness and ventilation trio -- the
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v218..v220 (the residential air-tightness and ventilation trio -- the
 > blower-door result the catalog never carried, the ASHRAE 62.2 whole-house ventilation the tight house then needs,
 > and the heating/cooling load that infiltration drives). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the blower-door test is run by the HVAC tech,

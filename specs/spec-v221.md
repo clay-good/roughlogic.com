@@ -1,6 +1,6 @@
 # roughlogic.com Specification v221 -- PV Annual Energy Yield: Production, Specific Yield, Capacity Factor (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v221..v223 (the PV system-design trio -- the three questions every solar
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v221..v223 (the PV system-design trio -- the three questions every solar
 > designer answers before a quote: how much energy the array makes, how to space the rows so they do not shade each
 > other, and how to match the array to the inverter). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the production estimate is the number the solar

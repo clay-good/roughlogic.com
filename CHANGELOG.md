@@ -4,6 +4,34 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat: land spec-v218..v229 -- 12 energy / structural / solar building-science tiles; 682 -> 694 tiles, 0.87.0, 2026-06-30
+
+Twelve tiles in four trios (PROPOSED 2026-06-30, landed same day) that deepen the residential-energy, structural-load, PV-design, and cooling-load corners of the catalog. Catalog **682 -> 694**, package **0.86.0 -> 0.87.0** (a minor), with **no new module, group, or dependency** (all twelve land in existing modules and groups).
+
+**Air-tightness and ventilation trio (`calc-hvacservice.js`, Group C):**
+- **`blower-door-ach50`** (v218) -- turns a blower-door reading into ACH50 = CFM50 x 60 / conditioned volume, checked against the IECC R402.4.1.2 limit (<= 3 ACH50 in CZ 3-8, <= 5 in CZ 1-2), plus the LBL natural infiltration (ACH and cfm) the next two tiles consume. ASTM E779 / E1827 are the test methods; the N-factor varies with climate, height, and shielding. A field normalization, not a rater's signed report.
+- **`ashrae-622-ventilation`** (v219) -- the ASHRAE 62.2-2019 whole-house ventilation `Qtot = 0.03 x CFA + 7.5 x (Nbr + 1)` and the continuous fan `Qfan = max(0, Qtot - Qinf)` a tightened house then needs. The conservative default is zero infiltration credit. A sizing aid, not a compliance certificate.
+- **`infiltration-load`** (v220) -- the sensible `1.08 x cfm x dT` and latent `0.68 x cfm x grains` heating/cooling load the leaked air drives, from the blower-door natural-infiltration cfm. The infiltration component only, not a stamped Manual J.
+
+**PV system-design trio (`calc-solar.js`, Group A):**
+- **`pv-energy-yield`** (v221) -- the NREL PVWatts annual energy `Pdc x PSH x 365 x PR`, plus specific yield (kWh/kWp) and capacity factor. The performance ratio (default 0.77) is the single biggest lever. A pre-design estimate, not a bankable model.
+- **`pv-row-spacing`** (v222) -- the inter-row pitch `L cos(tilt) + L sin(tilt)/tan(profile_angle)` and ground-coverage ratio `L / pitch` from tilt and the winter-sun profile angle. A layout geometry, not an annual shading-loss model.
+- **`pv-inverter-ratio`** (v223) -- the inverter loading ratio (DC:AC), the clipping onset as a fraction of nameplate, and the cost-optimal 1.1-1.3 band verdict. A sizing sanity check, not a clipping-loss model.
+
+**ASCE 7 structural design-loads trio (`calc-construction.js`, Group E):**
+- **`rain-load-ponding`** (v224) -- the ASCE 7 Ch. 8 rain load `R = 5.2 x (ds + dh)` at the blocked-primary case plus the optional IPC secondary-drainage flow `Q = 0.0104 x A x i`. A flat roof must also pass the §8.4 ponding-instability check. A load and flow aid, not a stamped design.
+- **`asce7-load-combinations`** (v225) -- the seven §2.4.1 basic ASD combinations reduced to the governing gravity demand (sizes the member) and the net uplift (`0.6D + 0.6W < 0`, sizes the hold-down). Wind is signed. A load-combination aid, not a member design.
+- **`seismic-base-shear`** (v226) -- the §12.8 equivalent-lateral-force `Cs = SDS / (R/Ie)`, capped at `SD1 / (T (R/Ie))` for T <= TL and floored at the code minimum, times the seismic weight. SDS / SD1 from the USGS maps; R from Table 12.2-1. A lateral-demand estimate, not a stamped seismic design.
+
+**Cooling-load-components trio (`calc-hvacsystems.js`, Group C):**
+- **`window-solar-heat-gain`** (v227) -- the fenestration solar `A x SHGC x PSF` and conduction `A x U x CLTD` cooling load; on a west wall the solar term dwarfs conduction by an order of magnitude. One Manual J component.
+- **`internal-heat-gains`** (v228) -- the people (sensible + latent), lighting, and equipment (`3.412 x W x use factor`) gains and the sensible/latent split that flips a packed room latent-heavy. One Manual J component.
+- **`envelope-conduction-load`** (v229) -- the opaque `U x A x sol-air CLTD` conduction load that makes the cool-roof case (cutting solar absorptance drops the load far more than the air temperature would suggest). One Manual J component.
+
+Each compute matches its pinned worked example to the digit and carries the v14 `// dims:` annotation, the v18/v21 `{error}` contract (non-finite and out-of-domain inputs return `{ error }`), and v19/v22 citation discipline naming the ASHRAE 62.2 / IECC R402.4.1.2 / ASTM E779 / NREL PVWatts / NREL-Sandia / ASCE 7 Ch. 8 / §2.4.1 / §12.8 / ASHRAE-ACCA Manual J authority that governs. Full wiring: `tools-data`, `tile-meta`, `citations` (editionNote + assumptions), `compute-map`, 24 worked-example rows, 96 collision-checked search aliases, related-tiles, `app.js` declares, dims annotations, 12 bounds-fuzzer blocks; corpus + tile-index regenerated.
+
+Housekeeping: bumped the live home-page count (`682 -> 694`, index.html title/meta/OG/Twitter/JSON-LD/lede) and resynced the README figures (tile / sitemap / route counts, the unit-test count, and the catalog-state narrative with a new batch entry). All gates green: lint (27 checks at **694 tiles / 50 modules / 716 sitemap URLs**), **4,987** unit tests, build (694 tile + 21 group shells, 716 sitemap URLs), data:verify (117 hashes), `check-shells`, `check-dist`, `check-shell-mobile` (810 checks across 716 shells), render-no-nan (12/12 new tiles), and the full-catalog responsive-stress sweep (694 live tile views at 320px on Chromium + WebKit, zero horizontal scroll).
+
 ### docs: retire-changelog drift sweep + resync ungated figures, 2026-06-30
 
 A documentation- and comment-only accuracy pass; no tile, code-path, or version change. Two runtime sweeps confirmed the catalog is clean first: `render-no-nan` (562/562 tiles, zero NaN/Infinity/undefined leak) and `responsive-stress` (66 cases across Chromium + WebKit, full 682-tile catalog at the 320px floor plus the 200% text-zoom and landscape/tablet axes, zero page-level horizontal scroll). No bug was found.

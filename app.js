@@ -72,6 +72,8 @@ const TOOL_MODULES = (() => {
     "pv-interconnection-busbar", "off-grid-battery", "ev-charger-load",
     // spec-v182 electrician second-pass batch
     "pv-circuit-ampacity",
+    // spec-v221..v223 PV system-design batch
+    "pv-energy-yield", "pv-row-spacing", "pv-inverter-ratio",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)
@@ -245,6 +247,8 @@ const TOOL_MODULES = (() => {
     "chiller-tons", "hx-lmtd-ntu", "air-changes-hour",
     "boiler-pipe-sizing", "compressor-short-cycle", "humidifier-capacity",
     "filter-pressure-drop",
+    // spec-v227..v229 cooling-load-components batch
+    "window-solar-heat-gain", "internal-heat-gains", "envelope-conduction-load",
   ]);
   // spec-v74 cap-relief split: the two spec-v23 velocity tiles relocated out of
   // calc-hvac.js (which had reached 95.9% of cap -- the tightest remaining calc
@@ -339,6 +343,8 @@ const TOOL_MODULES = (() => {
     "cmu-grout-volume", "masonry-coursing", "wallpaper-rolls",
     // spec-v215..v217 roofing material-takeoff batch.
     "ice-barrier-coverage", "metal-roof-panels", "ridge-cap-fasteners",
+    // spec-v224..v226 ASCE 7 structural design-loads batch.
+    "rain-load-ponding", "asce7-load-combinations", "seismic-base-shear",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.
@@ -368,6 +374,8 @@ const TOOL_MODULES = (() => {
     "vacuum-decay-test", "nitrogen-pressure-test",
     // spec-v110 gas-heat start-up diagnostics (same module).
     "gas-meter-clock", "furnace-temp-rise",
+    // spec-v218..v220 residential air-tightness and ventilation batch.
+    "blower-door-ach50", "ashrae-622-ventilation", "infiltration-load",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

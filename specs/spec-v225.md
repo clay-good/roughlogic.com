@@ -1,6 +1,6 @@
 # roughlogic.com Specification v225 -- ASCE 7 ASD Load Combinations: Governing Demand and Net Uplift (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v224..v226 (the ASCE 7 structural design-loads trio -- rain/ponding, load
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v224..v226 (the ASCE 7 structural design-loads trio -- rain/ponding, load
 > combinations, and seismic base shear). This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: combining the loads to find the governing case is
 > the first step of every member and connection check a builder or their engineer does for a permit. Adds one tile to

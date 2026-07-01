@@ -643,6 +643,145 @@ function renderPvCircuitAmpacity(inputRegion, outputRegion, citationEl) {
   for (const f of [isc, strings, ocpd]) f.input.addEventListener("input", update);
 }
 
+// ===================== spec-v221: PV annual energy yield =====================
+
+// dims: in { dc_kw: M L^2 T^-3, psh: T, perf_ratio: dimensionless } out: { annual_kwh: M L^2 T^-2, specific_yield: T, capacity_factor: dimensionless, monthly_kwh_avg: M L^2 T^-2 }
+export function computePvEnergyYield({ dc_kw = 0, psh = 5.0, perf_ratio = 0.77 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(dc_kw > 0)) return { error: "DC nameplate must be positive (kW)." };
+  if (!(psh > 0)) return { error: "Peak-sun-hours must be positive." };
+  if (!(perf_ratio > 0 && perf_ratio <= 1)) return { error: "Performance ratio must be in (0, 1]." };
+  const annual_kwh = dc_kw * psh * 365 * perf_ratio;
+  const specific_yield = annual_kwh / dc_kw;
+  const capacity_factor = annual_kwh / (dc_kw * 8760);
+  const monthly_kwh_avg = annual_kwh / 12;
+  return {
+    annual_kwh, specific_yield, capacity_factor, monthly_kwh_avg,
+    note: "NREL PVWatts energy model: annual energy = DC nameplate x peak-sun-hours x 365 x performance ratio. The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth (not a fixed 5). The performance ratio (default 0.77, the PVWatts all-loss default) rolls up soiling, shading, mismatch, wiring, inverter, and availability losses and is the single biggest lever; the first-year figure degrades roughly half a percent a year. A pre-design estimate, not a bankable production model.",
+  };
+}
+function renderPvEnergyYield(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NREL PVWatts energy model E = Pdc x PSH x 365 x PR, with specific yield = E / Pdc and capacity factor = E / (Pdc x 8760) (by name). The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth; the performance ratio (default 0.77, the PVWatts all-loss default) is the single biggest lever. A pre-design estimate, not a bankable production model.";
+  const dc = makeNumber("Array DC nameplate (kW)", "pey-dc", { step: "any", min: "0", value: "8" });
+  dc.input.value = "8";
+  const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pey-psh", { step: "any", min: "0", value: "5" });
+  psh.input.value = "5";
+  const pr = makeNumber("Performance ratio (0-1)", "pey-pr", { step: "any", min: "0", value: "0.77" });
+  pr.input.value = "0.77";
+  for (const f of [dc, psh, pr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dc.input.value = "8"; psh.input.value = "5"; pr.input.value = "0.77"; update(); });
+  const oAnnual = makeOutputLine(outputRegion, "Annual energy", "pey-out-annual");
+  const oYield = makeOutputLine(outputRegion, "Specific yield", "pey-out-yield");
+  const oCf = makeOutputLine(outputRegion, "Capacity factor", "pey-out-cf");
+  const oMonthly = makeOutputLine(outputRegion, "Monthly average", "pey-out-monthly");
+  const oNote = makeOutputLine(outputRegion, "Note", "pey-out-note");
+  const update = debounce(() => {
+    const r = computePvEnergyYield({ dc_kw: Number(dc.input.value) || 0, psh: Number(psh.input.value) || 0, perf_ratio: Number(pr.input.value) || 0 });
+    if (r.error) { oAnnual.textContent = r.error; oYield.textContent = "-"; oCf.textContent = "-"; oMonthly.textContent = "-"; oNote.textContent = ""; return; }
+    oAnnual.textContent = fmt(r.annual_kwh, 0) + " kWh/yr";
+    oYield.textContent = fmt(r.specific_yield, 0) + " kWh/kWp";
+    oCf.textContent = fmt(r.capacity_factor * 100, 1) + "%";
+    oMonthly.textContent = fmt(r.monthly_kwh_avg, 0) + " kWh/month";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dc, psh, pr]) f.input.addEventListener("input", update);
+}
+
+// ===================== spec-v222: PV inter-row spacing and GCR =====================
+
+// dims: in { module_length_ft: L, tilt_deg: dimensionless, profile_angle_deg: dimensionless } out: { rise_ft: L, base_ft: L, shadow_ft: L, pitch_ft: L, gap_ft: L, gcr: dimensionless }
+export function computePvRowSpacing({ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(module_length_ft > 0)) return { error: "Module slope length must be positive (ft)." };
+  if (!(tilt_deg >= 0 && tilt_deg <= 90)) return { error: "Tilt must be 0 to 90 degrees." };
+  if (!(profile_angle_deg > 0 && profile_angle_deg <= 90)) return { error: "Profile angle must be over 0 and up to 90 degrees (a sun on the horizon throws an infinite shadow)." };
+  const rad = Math.PI / 180;
+  const rise_ft = module_length_ft * Math.sin(tilt_deg * rad);
+  const base_ft = module_length_ft * Math.cos(tilt_deg * rad);
+  const shadow_ft = rise_ft / Math.tan(profile_angle_deg * rad);
+  const pitch_ft = base_ft + shadow_ft;
+  const gap_ft = shadow_ft;
+  const gcr = module_length_ft / pitch_ft;
+  return {
+    rise_ft, base_ft, shadow_ft, pitch_ft, gap_ft, gcr,
+    note: "NREL / Sandia row-spacing geometry: pitch = L x cos(tilt) + L x sin(tilt) / tan(profile angle), GCR = L / pitch. The minimum solar profile angle is the winter-design sun elevation at the site (commonly the solar altitude at 9 a.m. to 3 p.m. on the winter solstice, read from latitude or from solar-times). The relation assumes due-south rows and a level field; an azimuth offset or a graded slope is a separate correction. A no-shadow layout geometry, not an annual inter-row shading-loss model.",
+  };
+}
+function renderPvRowSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NREL / Sandia PV array row-spacing geometry pitch = L x cos(tilt) + L x sin(tilt) / tan(profile angle), GCR = L / pitch (by name). The minimum profile angle is the winter-design sun elevation (from latitude or solar-times). Assumes due-south rows and a level field. A layout geometry, not an annual shading-loss model.";
+  const len = makeNumber("Module slope length (ft)", "prs-len", { step: "any", min: "0", value: "6.5" });
+  len.input.value = "6.5";
+  const tilt = makeNumber("Array tilt (degrees)", "prs-tilt", { step: "any", min: "0", value: "30" });
+  tilt.input.value = "30";
+  const prof = makeNumber("Min solar profile angle (degrees)", "prs-prof", { step: "any", min: "0", value: "22" });
+  prof.input.value = "22";
+  for (const f of [len, tilt, prof]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { len.input.value = "6.5"; tilt.input.value = "30"; prof.input.value = "22"; update(); });
+  const oPitch = makeOutputLine(outputRegion, "Row pitch (front to front)", "prs-out-pitch");
+  const oGap = makeOutputLine(outputRegion, "Clear gap between rows", "prs-out-gap");
+  const oGcr = makeOutputLine(outputRegion, "Ground-coverage ratio", "prs-out-gcr");
+  const oRiseBase = makeOutputLine(outputRegion, "Rise / footprint", "prs-out-rb");
+  const oNote = makeOutputLine(outputRegion, "Note", "prs-out-note");
+  const update = debounce(() => {
+    const r = computePvRowSpacing({ module_length_ft: Number(len.input.value) || 0, tilt_deg: Number(tilt.input.value) || 0, profile_angle_deg: Number(prof.input.value) || 0 });
+    if (r.error) { oPitch.textContent = r.error; oGap.textContent = "-"; oGcr.textContent = "-"; oRiseBase.textContent = "-"; oNote.textContent = ""; return; }
+    oPitch.textContent = fmt(r.pitch_ft, 2) + " ft";
+    oGap.textContent = fmt(r.gap_ft, 2) + " ft";
+    oGcr.textContent = fmt(r.gcr, 3);
+    oRiseBase.textContent = fmt(r.rise_ft, 2) + " ft rise / " + fmt(r.base_ft, 2) + " ft footprint";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [len, tilt, prof]) f.input.addEventListener("input", update);
+}
+
+// ===================== spec-v223: PV inverter loading ratio (DC:AC) =====================
+
+// dims: in { dc_kw: M L^2 T^-3, ac_kw: M L^2 T^-3, inv_eff: dimensionless } out: { ilr: dimensionless, clip_dc_kw: M L^2 T^-3, clip_fraction: dimensionless }
+export function computePvInverterRatio({ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(dc_kw > 0)) return { error: "DC nameplate must be positive (kW)." };
+  if (!(ac_kw > 0)) return { error: "Inverter AC rating must be positive (kW)." };
+  if (!(inv_eff > 0 && inv_eff <= 1)) return { error: "Inverter efficiency must be in (0, 1]." };
+  const ilr = dc_kw / ac_kw;
+  const clip_dc_kw = ac_kw / inv_eff;
+  const clip_fraction = clip_dc_kw / dc_kw;
+  const verdict = ilr < 1.1
+    ? "Inverter oversized - ratio below the typical 1.1-1.3 band; it rarely fills"
+    : ilr <= 1.3
+      ? "In the typical cost-optimal 1.1-1.3 band"
+      : "Inverter undersized - ratio above 1.3; expect frequent clipping of array peaks";
+  return {
+    ilr, clip_dc_kw, clip_fraction, verdict,
+    note: "Inverter loading ratio ILR = DC nameplate / AC rating; clipping begins where the array's DC output exceeds AC / inverter efficiency, which as a fraction of STC nameplate is the clipping-onset fraction. The cost-optimal band (commonly 1.1 to 1.3) shifts with the site's irradiance distribution, the module-to-inverter price ratio, and the energy value. The clipping-onset fraction is a screening threshold (the array clips only when its instantaneous DC output rises above that fraction of STC, near peak on cool clear days); an accurate annual clipping loss needs an 8760-hour simulation. A sizing sanity check, not a clipping-loss model.",
+  };
+}
+function renderPvInverterRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: inverter loading ratio ILR = Pdc / Pac and NREL inverter-sizing guidance; clipping begins where the array DC output exceeds Pac / inverter efficiency (by name). The cost-optimal 1.1-1.3 band shifts with irradiance, equipment price, and energy value; an accurate annual clipping loss needs an 8760-hour simulation. A sizing sanity check, not a clipping-loss model.";
+  const dc = makeNumber("Array DC nameplate (kW)", "pir-dc", { step: "any", min: "0", value: "8" });
+  dc.input.value = "8";
+  const ac = makeNumber("Inverter AC rating (kW)", "pir-ac", { step: "any", min: "0", value: "6.6" });
+  ac.input.value = "6.6";
+  const eff = makeNumber("Inverter peak efficiency (0-1)", "pir-eff", { step: "any", min: "0", value: "0.96" });
+  eff.input.value = "0.96";
+  for (const f of [dc, ac, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dc.input.value = "8"; ac.input.value = "6.6"; eff.input.value = "0.96"; update(); });
+  const oIlr = makeOutputLine(outputRegion, "Loading ratio (DC:AC)", "pir-out-ilr");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "pir-out-verdict");
+  const oClip = makeOutputLine(outputRegion, "Clipping onset (DC power)", "pir-out-clip");
+  const oFrac = makeOutputLine(outputRegion, "Clipping onset (% of nameplate)", "pir-out-frac");
+  const oNote = makeOutputLine(outputRegion, "Note", "pir-out-note");
+  const update = debounce(() => {
+    const r = computePvInverterRatio({ dc_kw: Number(dc.input.value) || 0, ac_kw: Number(ac.input.value) || 0, inv_eff: Number(eff.input.value) || 0 });
+    if (r.error) { oIlr.textContent = r.error; oVerdict.textContent = "-"; oClip.textContent = "-"; oFrac.textContent = "-"; oNote.textContent = ""; return; }
+    oIlr.textContent = fmt(r.ilr, 2);
+    oVerdict.textContent = r.verdict;
+    oClip.textContent = fmt(r.clip_dc_kw, 3) + " kW";
+    oFrac.textContent = fmt(r.clip_fraction * 100, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dc, ac, eff]) f.input.addEventListener("input", update);
+}
+
 // Renderer registry keyed by tool id. All tiles keep group: "A"; this
 // registry is merged into the Group A renderer set by app.js (spec-v88).
 export const SOLAR_RENDERERS = {
@@ -652,4 +791,8 @@ export const SOLAR_RENDERERS = {
   "off-grid-battery": renderOffGridBattery,
   "ev-charger-load": renderEvChargerLoad,
   "pv-circuit-ampacity": renderPvCircuitAmpacity,
+  // spec-v221..v223 PV system-design batch
+  "pv-energy-yield": renderPvEnergyYield,
+  "pv-row-spacing": renderPvRowSpacing,
+  "pv-inverter-ratio": renderPvInverterRatio,
 };

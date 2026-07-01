@@ -1,6 +1,6 @@
 # roughlogic.com Specification v226 -- Seismic Base Shear (ASCE 7 §12.8 Equivalent Lateral Force) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v224..v226 (the ASCE 7 structural design-loads trio -- rain/ponding, load
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v224..v226 (the ASCE 7 structural design-loads trio -- rain/ponding, load
 > combinations, and seismic base shear). This closes the v224..v226 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the seismic base shear sets the lateral bracing,
 > hold-downs, and anchorage a builder installs in a seismic region and that a solar or equipment installer checks for

@@ -453,3 +453,113 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
   ],
   compute: computeFurnaceTempRise,
 });
+
+// ===================== spec-v218: blower-door air-tightness (ACH50) =====================
+
+// dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1 }
+export function computeBlowerDoorAch50({ cfm50 = 0, volume_ft3 = 0, n_factor = 17, target_ach50 = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cfm50 > 0)) return { error: "Measured CFM50 must be positive (cfm)." };
+  if (!(volume_ft3 > 0)) return { error: "Conditioned volume must be positive (ft^3)." };
+  if (!(n_factor > 0)) return { error: "N-factor must be positive." };
+  if (!(target_ach50 > 0)) return { error: "Target ACH50 must be positive." };
+  const ach50 = cfm50 * 60 / volume_ft3;
+  const pass = ach50 <= target_ach50;
+  const verdict = pass
+    ? "PASS - meets the " + fmt(target_ach50, 1) + " ACH50 target"
+    : "FAIL - exceeds the " + fmt(target_ach50, 1) + " ACH50 target; air-seal and retest";
+  const ach_nat = ach50 / n_factor;
+  const cfm_nat = ach_nat * volume_ft3 / 60;
+  return {
+    ach50, pass, verdict, ach_nat, cfm_nat,
+    note: "ACH50 = CFM50 x 60 / conditioned volume normalizes the blower-door reading to air changes per hour at 50 Pa; the IECC R402.4.1.2 limit is <= 3 ACH50 in climate zones 3-8 and <= 5 in zones 1-2 (the editable target). The natural air change divides ACH50 by the LBL N-factor (default 17), which depends on climate zone, building height, and wind shielding - a sheltered one-story and an exposed three-story differ by roughly a factor of two. Volume is the conditioned volume, not the floor area. A field normalization, not a rater's signed test report. ASTM E779 / E1827 are the test methods.",
+  };
+}
+const blowerDoorAch50Example = { inputs: { cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3 } };
+HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
+  citation: "Citation: ACH50 = CFM50 x 60 / conditioned volume (the blower-door normalization) and the LBL natural-infiltration divide-by-N rule (by name); IECC R402.4.1.2 sets the air-leakage limit in ACH50 (<= 3 in CZ 3-8, <= 5 in CZ 1-2); ASTM E779 / E1827 are the test methods. The N-factor varies with climate zone, building height, and wind shielding. A field normalization, not a rater's signed report.",
+  example: blowerDoorAch50Example.inputs,
+  fields: [
+    { key: "cfm50", label: "Blower-door reading CFM50 (cfm)", kind: "number" },
+    { key: "volume_ft3", label: "Conditioned volume (ft^3)", kind: "number" },
+    { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number", default: 17 },
+    { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "a", id: "bda-out-a", label: "ACH50", value: (r) => fmt(r.ach50, 2) + " ACH50" },
+    { key: "v", id: "bda-out-v", label: "Code check", value: (r) => r.verdict },
+    { key: "n", id: "bda-out-n", label: "Natural air change", value: (r) => fmt(r.ach_nat, 3) + " ACH" },
+    { key: "c", id: "bda-out-c", label: "Natural infiltration", value: (r) => fmt(r.cfm_nat, 1) + " cfm" },
+    { key: "z", id: "bda-out-z", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBlowerDoorAch50,
+});
+
+// ===================== spec-v219: ASHRAE 62.2 whole-house ventilation =====================
+
+// dims: in { floor_area_ft2: L^2, bedrooms: dimensionless, infil_credit_cfm: L^3 T^-1 } out: { q_tot: L^3 T^-1, q_fan: L^3 T^-1 }
+export function computeAshrae622Ventilation({ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(floor_area_ft2 > 0)) return { error: "Conditioned floor area must be positive (ft^2)." };
+  if (bedrooms < 0) return { error: "Bedroom count cannot be negative." };
+  if (infil_credit_cfm < 0) return { error: "Infiltration credit cannot be negative (cfm)." };
+  const q_tot = 0.03 * floor_area_ft2 + 7.5 * (bedrooms + 1);
+  const q_fan = Math.max(0, q_tot - infil_credit_cfm);
+  const verdict = q_fan > 0
+    ? "Continuous whole-house fan required: " + fmt(q_fan, 0) + " cfm"
+    : "Infiltration credit meets Qtot - no continuous fan required by 62.2";
+  return {
+    q_tot, q_fan, verdict,
+    note: "ASHRAE 62.2-2019 Eq. 4.1a: Qtot = 0.03 x CFA + 7.5 x (Nbr + 1) sets the total required ventilation from floor area and bedrooms only (occupants assumed Nbr + 1); the fan flow is Qtot minus the infiltration credit. The conservative default is zero credit - size the fan to the full Qtot. The credit comes from the measured air-tightness (the blower-door natural infiltration) per the 62.2 infiltration method. Local kitchen and bath exhaust is a separate 62.2 requirement this tile does not cover. A sizing aid, not a 62.2 compliance certificate.",
+  };
+}
+const ashrae622VentilationExample = { inputs: { floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 0 } };
+HVACSERVICE_RENDERERS["ashrae-622-ventilation"] = _simpleRenderer({
+  citation: "Citation: ASHRAE 62.2-2019 §4.1 whole-house ventilation Qtot = 0.03 x Afloor + 7.5 x (Nbr + 1), and the fan flow Qfan = Qtot - Qinf (by name). The infiltration credit comes from the measured air-tightness; the conservative default is zero credit. Local kitchen/bath exhaust is a separate 62.2 requirement. A sizing aid, not a compliance certificate.",
+  example: ashrae622VentilationExample.inputs,
+  fields: [
+    { key: "floor_area_ft2", label: "Conditioned floor area (ft^2)", kind: "number" },
+    { key: "bedrooms", label: "Bedrooms (Nbr)", kind: "number" },
+    { key: "infil_credit_cfm", label: "Infiltration credit Qinf (cfm)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "t", id: "a62-out-t", label: "Total required Qtot", value: (r) => fmt(r.q_tot, 1) + " cfm" },
+    { key: "f", id: "a62-out-f", label: "Continuous fan Qfan", value: (r) => fmt(r.q_fan, 1) + " cfm" },
+    { key: "v", id: "a62-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "a62-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAshrae622Ventilation,
+});
+
+// ===================== spec-v220: infiltration heating / cooling load =====================
+
+// dims: in { cfm: L^3 T^-1, delta_t_f: T, delta_gr: dimensionless } out: { q_sensible: M L^2 T^-3, q_latent: M L^2 T^-3, q_total: M L^2 T^-3 }
+export function computeInfiltrationLoad({ cfm = 0, delta_t_f = 0, delta_gr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cfm > 0)) return { error: "Infiltration airflow must be positive (cfm)." };
+  if (delta_gr < 0) return { error: "Humidity-ratio difference cannot be negative (grains/lb)." };
+  const q_sensible = 1.08 * cfm * delta_t_f;
+  const q_latent = 0.68 * cfm * delta_gr;
+  const q_total = q_sensible + q_latent;
+  return {
+    q_sensible, q_latent, q_total,
+    note: "ASHRAE air-side equations: sensible Qs = 1.08 x CFM x delta-T and latent Ql = 0.68 x CFM x delta-grains. The 1.08 and 0.68 are sea-level standard-air constants (an altitude correction is a separate adjustment). The airflow is the natural infiltration from a blower-door test or a design estimate; enter the design dry-bulb difference and, for cooling, the indoor-outdoor humidity-ratio difference in grains/lb (zero for a heating load, so the latent term drops out). This is the infiltration component only - envelope conduction, solar, and internal gains are separate Manual J line items. A design-load aid, not a stamped Manual J.",
+  };
+}
+const infiltrationLoadExample = { inputs: { cfm: 56.5, delta_t_f: 70, delta_gr: 0 } };
+HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
+  citation: "Citation: ASHRAE Handbook of Fundamentals air-side sensible Qs = 1.08 x CFM x delta-T and latent Ql = 0.68 x CFM x delta-grains (by name). The 1.08 and 0.68 are sea-level standard-air constants. The airflow is the natural infiltration from a blower-door test or a design estimate. The infiltration component of the load only, not a stamped Manual J.",
+  example: infiltrationLoadExample.inputs,
+  fields: [
+    { key: "cfm", label: "Infiltration airflow (cfm)", kind: "number" },
+    { key: "delta_t_f", label: "Design indoor-outdoor delta-T (F)", kind: "number" },
+    { key: "delta_gr", label: "Humidity-ratio diff (grains/lb)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "s", id: "ifl-out-s", label: "Sensible load", value: (r) => fmt(r.q_sensible, 0) + " Btu/h" },
+    { key: "l", id: "ifl-out-l", label: "Latent load", value: (r) => fmt(r.q_latent, 0) + " Btu/h" },
+    { key: "t", id: "ifl-out-t", label: "Total infiltration load", value: (r) => fmt(r.q_total, 0) + " Btu/h" },
+    { key: "n", id: "ifl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInfiltrationLoad,
+});

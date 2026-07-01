@@ -11741,3 +11741,231 @@ test("bounds: spec-v214 wallpaper-rolls pins the repeat-driven yield drop, the n
   // repeat + height exceeds the roll length: no full strip fits.
   assert.ok("error" in _v214({ perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 120, repeat_in: 19 }));
 });
+
+// ===================== spec-v218..v220 residential air-tightness and ventilation =====================
+import { computeBlowerDoorAch50 as _v218, computeAshrae622Ventilation as _v219, computeInfiltrationLoad as _v220 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v218 computeBlowerDoorAch50 pins ACH50, code verdict, natural infiltration, and error seams", () => {
+  const r = _v218({ cfm50: 960, volume_ft3: 12800, n_factor: 17, target_ach50: 3 });
+  assert.ok(Math.abs(r.ach50 - 4.5) < 1e-9);
+  assert.strictEqual(r.pass, false);
+  assert.ok(Math.abs(r.ach_nat - 4.5 / 17) < 1e-9);
+  assert.ok(Math.abs(r.cfm_nat - 56.47058823529412) < 1e-6);
+  // Post-sealing retest crosses the code line.
+  const r2 = _v218({ cfm50: 600, volume_ft3: 12800 });
+  assert.ok(Math.abs(r2.ach50 - 2.8125) < 1e-9);
+  assert.strictEqual(r2.pass, true);
+  assert.ok(Math.abs(r2.cfm_nat - 35.294117647) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v218({ cfm50: 0, volume_ft3: 12800 }));
+  assert.ok("error" in _v218({ cfm50: 960, volume_ft3: 0 }));
+  assert.ok("error" in _v218({ cfm50: 960, volume_ft3: 12800, n_factor: 0 }));
+  assert.ok("error" in _v218({ cfm50: 960, volume_ft3: 12800, target_ach50: 0 }));
+  assert.ok("error" in _v218({ cfm50: Infinity, volume_ft3: 12800 }));
+});
+
+test("bounds: spec-v219 computeAshrae622Ventilation pins Qtot, fan flow, the zero-fan path, and error seams", () => {
+  const r = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 0 });
+  assert.strictEqual(r.q_tot, 90);
+  assert.strictEqual(r.q_fan, 90);
+  // Infiltration credit shrinks the fan but not Qtot.
+  const r2 = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 35.3 });
+  assert.strictEqual(r2.q_tot, 90);
+  assert.ok(Math.abs(r2.q_fan - 54.7) < 1e-9);
+  // Credit meets Qtot -> zero-fan path.
+  const r3 = _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: 200 });
+  assert.strictEqual(r3.q_fan, 0);
+  // Error seams.
+  assert.ok("error" in _v219({ floor_area_ft2: 0, bedrooms: 3 }));
+  assert.ok("error" in _v219({ floor_area_ft2: 2000, bedrooms: -1 }));
+  assert.ok("error" in _v219({ floor_area_ft2: 2000, bedrooms: 3, infil_credit_cfm: -1 }));
+  assert.ok("error" in _v219({ floor_area_ft2: Infinity, bedrooms: 3 }));
+});
+
+test("bounds: spec-v220 computeInfiltrationLoad pins sensible/latent loads, the heating path, and error seams", () => {
+  const r = _v220({ cfm: 56.5, delta_t_f: 70, delta_gr: 0 });
+  assert.ok(Math.abs(r.q_sensible - 4271.4) < 1e-6);
+  assert.strictEqual(r.q_latent, 0);
+  assert.ok(Math.abs(r.q_total - 4271.4) < 1e-6);
+  // Cooling: latent term is nearly as large as sensible.
+  const r2 = _v220({ cfm: 56.5, delta_t_f: 20, delta_gr: 30 });
+  assert.ok(Math.abs(r2.q_sensible - 1220.4) < 1e-6);
+  assert.ok(Math.abs(r2.q_latent - 1152.6) < 1e-6);
+  assert.ok(Math.abs(r2.q_total - 2373) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v220({ cfm: 0, delta_t_f: 70 }));
+  assert.ok("error" in _v220({ cfm: 56.5, delta_t_f: 70, delta_gr: -1 }));
+  assert.ok("error" in _v220({ cfm: Infinity, delta_t_f: 70 }));
+});
+
+// ===================== spec-v221..v223 PV system-design batch =====================
+import { computePvEnergyYield as _v221, computePvRowSpacing as _v222, computePvInverterRatio as _v223 } from "../../calc-solar.js";
+
+test("bounds: spec-v221 computePvEnergyYield pins annual energy, specific yield, capacity factor, and error seams", () => {
+  const r = _v221({ dc_kw: 8, psh: 5.0, perf_ratio: 0.77 });
+  assert.strictEqual(r.annual_kwh, 11242);
+  assert.ok(Math.abs(r.specific_yield - 1405.25) < 1e-9);
+  assert.ok(Math.abs(r.capacity_factor - 0.16041666666666668) < 1e-9);
+  assert.ok(Math.abs(r.monthly_kwh_avg - 11242 / 12) < 1e-9);
+  const r2 = _v221({ dc_kw: 8, psh: 6.5, perf_ratio: 0.75 });
+  assert.strictEqual(r2.annual_kwh, 14235);
+  assert.ok(Math.abs(r2.specific_yield - 1779.375) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v221({ dc_kw: 0, psh: 5 }));
+  assert.ok("error" in _v221({ dc_kw: 8, psh: 0 }));
+  assert.ok("error" in _v221({ dc_kw: 8, psh: 5, perf_ratio: 0 }));
+  assert.ok("error" in _v221({ dc_kw: 8, psh: 5, perf_ratio: 1.1 }));
+  assert.ok("error" in _v221({ dc_kw: Infinity, psh: 5 }));
+});
+
+test("bounds: spec-v222 computePvRowSpacing pins pitch, GCR, the shallow-tilt case, and error seams", () => {
+  const r = _v222({ module_length_ft: 6.5, tilt_deg: 30, profile_angle_deg: 22 });
+  assert.ok(Math.abs(r.rise_ft - 3.25) < 1e-9);
+  assert.ok(Math.abs(r.pitch_ft - 13.673197398) < 1e-6);
+  assert.ok(Math.abs(r.gcr - 0.47538259) < 1e-6);
+  const r2 = _v222({ module_length_ft: 6.5, tilt_deg: 10, profile_angle_deg: 22 });
+  assert.ok(Math.abs(r2.pitch_ft - 9.194913485) < 1e-6);
+  assert.ok(Math.abs(r2.gcr - 0.706912578) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v222({ module_length_ft: 0, tilt_deg: 30, profile_angle_deg: 22 }));
+  assert.ok("error" in _v222({ module_length_ft: 6.5, tilt_deg: 91, profile_angle_deg: 22 }));
+  assert.ok("error" in _v222({ module_length_ft: 6.5, tilt_deg: 30, profile_angle_deg: 0 }));
+  assert.ok("error" in _v222({ module_length_ft: 6.5, tilt_deg: 30, profile_angle_deg: 91 }));
+  assert.ok("error" in _v222({ module_length_ft: Infinity, tilt_deg: 30, profile_angle_deg: 22 }));
+});
+
+test("bounds: spec-v223 computePvInverterRatio pins ILR, clipping onset, the three verdict bands, and error seams", () => {
+  const r = _v223({ dc_kw: 8, ac_kw: 6.6, inv_eff: 0.96 });
+  assert.ok(Math.abs(r.ilr - 1.212121212) < 1e-6);
+  assert.ok(Math.abs(r.clip_dc_kw - 6.875) < 1e-9);
+  assert.ok(Math.abs(r.clip_fraction - 0.859375) < 1e-9);
+  assert.ok(/optimal/.test(r.verdict));
+  // Undersized band.
+  const r2 = _v223({ dc_kw: 10, ac_kw: 6.6 });
+  assert.ok(Math.abs(r2.ilr - 1.515151515) < 1e-6);
+  assert.ok(/undersized/.test(r2.verdict));
+  // Oversized band.
+  const r3 = _v223({ dc_kw: 6, ac_kw: 6.6 });
+  assert.ok(/oversized/.test(r3.verdict));
+  // Error seams.
+  assert.ok("error" in _v223({ dc_kw: 0, ac_kw: 6.6 }));
+  assert.ok("error" in _v223({ dc_kw: 8, ac_kw: 0 }));
+  assert.ok("error" in _v223({ dc_kw: 8, ac_kw: 6.6, inv_eff: 0 }));
+  assert.ok("error" in _v223({ dc_kw: 8, ac_kw: 6.6, inv_eff: 1.1 }));
+  assert.ok("error" in _v223({ dc_kw: Infinity, ac_kw: 6.6 }));
+});
+
+// ===================== spec-v224..v226 ASCE 7 structural design-loads batch =====================
+import { computeRainLoadPonding as _v224, computeAsce7LoadCombinations as _v225, computeSeismicBaseShear as _v226 } from "../../calc-construction.js";
+
+test("bounds: spec-v224 computeRainLoadPonding pins rain load, design flow, the no-flow skip, and error seams", () => {
+  const r = _v224({ static_head_in: 2, hydraulic_head_in: 1, roof_area_ft2: 2000, rainfall_in_hr: 3 });
+  assert.ok(Math.abs(r.rain_load_psf - 15.6) < 1e-9);
+  assert.ok(Math.abs(r.design_flow_gpm - 62.4) < 1e-9);
+  // Deep static head, no area/rainfall -> flow skipped.
+  const r2 = _v224({ static_head_in: 4, hydraulic_head_in: 2 });
+  assert.ok(Math.abs(r2.rain_load_psf - 31.2) < 1e-9);
+  assert.strictEqual(r2.design_flow_gpm, null);
+  // Zero total head is allowed.
+  assert.strictEqual(_v224({ static_head_in: 0, hydraulic_head_in: 0 }).rain_load_psf, 0);
+  // Error seams.
+  assert.ok("error" in _v224({ static_head_in: -1, hydraulic_head_in: 1 }));
+  assert.ok("error" in _v224({ static_head_in: 2, hydraulic_head_in: -1 }));
+  assert.ok("error" in _v224({ static_head_in: 2, hydraulic_head_in: 1, roof_area_ft2: -1 }));
+  assert.ok("error" in _v224({ static_head_in: 2, hydraulic_head_in: 1, rainfall_in_hr: -1 }));
+  assert.ok("error" in _v224({ static_head_in: Infinity, hydraulic_head_in: 1 }));
+});
+
+test("bounds: spec-v225 computeAsce7LoadCombinations pins governing demand, net uplift, the no-uplift path, and error seams", () => {
+  const r = _v225({ dead_psf: 15, live_psf: 0, snow_psf: 30, wind_psf: -25 });
+  assert.deepStrictEqual(r.combos, [15, 15, 45, 37.5, 0, 26.25, -6]);
+  assert.strictEqual(r.governing_gravity_psf, 45);
+  assert.strictEqual(r.controlling_case_psf, -6);
+  assert.strictEqual(r.net_uplift_psf, 6);
+  // Floor case: no uplift.
+  const r2 = _v225({ dead_psf: 20, live_psf: 40, snow_psf: 0, wind_psf: 30 });
+  assert.strictEqual(r2.governing_gravity_psf, 63.5);
+  assert.strictEqual(r2.net_uplift_psf, 0);
+  // Error seams.
+  assert.ok("error" in _v225({ dead_psf: -1 }));
+  assert.ok("error" in _v225({ dead_psf: 15, live_psf: -1 }));
+  assert.ok("error" in _v225({ dead_psf: 15, snow_psf: -1 }));
+  assert.ok("error" in _v225({ dead_psf: 15, wind_psf: Infinity }));
+});
+
+test("bounds: spec-v226 computeSeismicBaseShear pins Cs, base shear, the cap/min paths, and error seams", () => {
+  const r = _v226({ weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 0.3 });
+  assert.ok(Math.abs(r.cs - 0.153846154) < 1e-6);
+  assert.ok(Math.abs(r.base_shear_kip - 30.769230769) < 1e-6);
+  // Longer period: the cap governs.
+  const r2 = _v226({ weight_kip: 200, sds: 1.0, sd1: 0.6, r_factor: 6.5, ie: 1.0, period_s: 1.0 });
+  assert.ok(Math.abs(r2.cs - 0.092307692) < 1e-6);
+  assert.ok(/cap/.test(r2.governing));
+  // Very long period drives Cs to the code minimum.
+  const r3 = _v226({ weight_kip: 200, sds: 0.2, sd1: 0.05, r_factor: 6.5, ie: 1.0, period_s: 4.0 });
+  assert.ok(r3.cs >= 0.01 - 1e-12);
+  // Error seams.
+  assert.ok("error" in _v226({ weight_kip: 0, sds: 1.0, r_factor: 6.5, period_s: 0.3 }));
+  assert.ok("error" in _v226({ weight_kip: 200, sds: 0, r_factor: 6.5, period_s: 0.3 }));
+  assert.ok("error" in _v226({ weight_kip: 200, sds: 1.0, r_factor: 0, period_s: 0.3 }));
+  assert.ok("error" in _v226({ weight_kip: 200, sds: 1.0, r_factor: 6.5, period_s: 0 }));
+  assert.ok("error" in _v226({ weight_kip: 200, sds: 1.0, r_factor: 6.5, period_s: 0.3, ie: 1.6 }));
+  assert.ok("error" in _v226({ weight_kip: Infinity, sds: 1.0, r_factor: 6.5, period_s: 0.3 }));
+});
+
+// ===================== spec-v227..v229 cooling-load-components batch =====================
+import { computeWindowSolarHeatGain as _v227, computeInternalHeatGains as _v228, computeEnvelopeConductionLoad as _v229 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v227 computeWindowSolarHeatGain pins solar/conduction loads, the orientation case, and error seams", () => {
+  const r = _v227({ area_ft2: 40, shgc: 0.30, psf: 200, u_factor: 0.30, cltd_f: 14 });
+  assert.strictEqual(r.q_solar, 2400);
+  assert.ok(Math.abs(r.q_cond - 168) < 1e-9);
+  assert.ok(Math.abs(r.q_total - 2568) < 1e-9);
+  // North wall: solar collapses, conduction unchanged.
+  const r2 = _v227({ area_ft2: 40, shgc: 0.30, psf: 40, u_factor: 0.30, cltd_f: 14 });
+  assert.ok(Math.abs(r2.q_solar - 480) < 1e-9);
+  assert.ok(Math.abs(r2.q_total - 648) < 1e-9);
+  // Zero CLTD is allowed.
+  assert.strictEqual(_v227({ area_ft2: 40, shgc: 0.30, psf: 200, u_factor: 0.30, cltd_f: 0 }).q_cond, 0);
+  // Error seams.
+  assert.ok("error" in _v227({ area_ft2: 0, shgc: 0.3, psf: 200 }));
+  assert.ok("error" in _v227({ area_ft2: 40, shgc: -0.1, psf: 200 }));
+  assert.ok("error" in _v227({ area_ft2: 40, shgc: 1.1, psf: 200 }));
+  assert.ok("error" in _v227({ area_ft2: 40, shgc: 0.3, psf: -1 }));
+  assert.ok("error" in _v227({ area_ft2: 40, shgc: 0.3, psf: 200, u_factor: -1 }));
+  assert.ok("error" in _v227({ area_ft2: Infinity, shgc: 0.3, psf: 200 }));
+});
+
+test("bounds: spec-v228 computeInternalHeatGains pins sensible/latent split, the dense-occupancy case, and error seams", () => {
+  const r = _v228({ occupants: 6, sens_per_person: 245, lat_per_person: 200, lighting_w: 800, equipment_w: 1200, use_factor: 1.0 });
+  assert.strictEqual(r.q_sensible, 8294);
+  assert.strictEqual(r.q_latent, 1200);
+  assert.strictEqual(r.q_total, 9494);
+  // Packed room flips to latent-heavy.
+  const r2 = _v228({ occupants: 20, sens_per_person: 245, lat_per_person: 200, lighting_w: 600, equipment_w: 300, use_factor: 1.0 });
+  assert.ok(Math.abs(r2.q_sensible - 7970.8) < 1e-6);
+  assert.strictEqual(r2.q_latent, 4000);
+  assert.ok(Math.abs(r2.q_total - 11970.8) < 1e-6);
+  // Use factor scales lighting + equipment.
+  const r3 = _v228({ occupants: 0, lighting_w: 1000, equipment_w: 0, use_factor: 0.5 });
+  assert.ok(Math.abs(r3.q_lighting - 1000 * 3.412 * 0.5) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v228({ occupants: -1 }));
+  assert.ok("error" in _v228({ occupants: 6, lighting_w: -1 }));
+  assert.ok("error" in _v228({ occupants: 6, sens_per_person: -1 }));
+  assert.ok("error" in _v228({ occupants: 6, use_factor: 1.1 }));
+  assert.ok("error" in _v228({ occupants: Infinity }));
+});
+
+test("bounds: spec-v229 computeEnvelopeConductionLoad pins the conduction load, the cool-roof case, and error seams", () => {
+  const r = _v229({ area_ft2: 1000, u_factor: 0.05, cltd_f: 70 });
+  assert.strictEqual(r.q_cond, 3500);
+  // Cool roof drops the sol-air CLTD and the load.
+  assert.strictEqual(_v229({ area_ft2: 1000, u_factor: 0.05, cltd_f: 40 }).q_cond, 2000);
+  // Zero CLTD is allowed.
+  assert.strictEqual(_v229({ area_ft2: 1000, u_factor: 0.05, cltd_f: 0 }).q_cond, 0);
+  // Error seams.
+  assert.ok("error" in _v229({ area_ft2: 0, u_factor: 0.05, cltd_f: 70 }));
+  assert.ok("error" in _v229({ area_ft2: 1000, u_factor: 0, cltd_f: 70 }));
+  assert.ok("error" in _v229({ area_ft2: Infinity, u_factor: 0.05, cltd_f: 70 }));
+});

@@ -150,6 +150,8 @@ const _TILES = [
   ["chiller-tons", "C"], ["hx-lmtd-ntu", "C"], ["air-changes-hour", "C"],
   ["boiler-pipe-sizing", "C"], ["compressor-short-cycle", "C"],
   ["humidifier-capacity", "C"], ["filter-pressure-drop", "C"],
+  // spec-v227..v229 cooling-load-components batch
+  ["window-solar-heat-gain", "C"], ["internal-heat-gains", "C"], ["envelope-conduction-load", "C"],
   ["duct-velocity-pressure", "C"], ["refrigerant-velocity", "C"],
 
   ["psychrometric", "D"], ["drying-goal", "D"], ["dehumidifier", "D"],
@@ -431,6 +433,8 @@ const _TILES = [
   // spec-v110 HVAC gas-heat start-up (Group C)
   ["gas-meter-clock", "C"],
   ["furnace-temp-rise", "C"],
+  // spec-v218..v220 residential air-tightness and ventilation batch
+  ["blower-door-ach50", "C"], ["ashrae-622-ventilation", "C"], ["infiltration-load", "C"],
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   ["gas-altitude-derate", "B"],
   ["gas-fuel-conversion", "B"],
@@ -465,6 +469,8 @@ const _TILES = [
   ["ice-barrier-coverage", "E"],
   ["metal-roof-panels", "E"],
   ["ridge-cap-fasteners", "E"],
+  // spec-v224..v226 ASCE 7 structural design-loads batch
+  ["rain-load-ponding", "E"], ["asce7-load-combinations", "E"], ["seismic-base-shear", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)
@@ -515,6 +521,8 @@ const _TILES = [
   // spec-v179..v187 electrician second-pass batch (9 tiles)
   ["motor-branch-protection", "A"], ["commercial-lighting-load", "A"],
   ["noncoincident-load", "A"], ["pv-circuit-ampacity", "A"],
+  // spec-v221..v223 PV system-design batch
+  ["pv-energy-yield", "A"], ["pv-row-spacing", "A"], ["pv-inverter-ratio", "A"],
   ["transformer-k-factor", "A"], ["motor-capacitor-max", "A"],
   ["bends-between-pulls", "A"], ["shock-approach-boundary", "A"],
   ["pool-bonding-680-26", "A"],

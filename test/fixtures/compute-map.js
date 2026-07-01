@@ -404,6 +404,10 @@ export const COMPUTE_MAP = {
   "compressor-short-cycle": { module: "../../calc-hvacsystems.js", fn: "computeCompressorShortCycle" },
   "humidifier-capacity": { module: "../../calc-hvacsystems.js", fn: "computeHumidifierCapacity" },
   "filter-pressure-drop": { module: "../../calc-hvacsystems.js", fn: "computeFilterPressureDrop" },
+  // spec-v227..v229 cooling-load-components batch (3 tiles)
+  "window-solar-heat-gain": { module: "../../calc-hvacsystems.js", fn: "computeWindowSolarHeatGain" },
+  "internal-heat-gains": { module: "../../calc-hvacsystems.js", fn: "computeInternalHeatGains" },
+  "envelope-conduction-load": { module: "../../calc-hvacsystems.js", fn: "computeEnvelopeConductionLoad" },
   "duct-velocity-pressure": { module: "../../calc-velocity.js", fn: "computeDuctVelocityPressure" },
   "refrigerant-velocity": { module: "../../calc-velocity.js", fn: "computeRefrigerantVelocity" },
   "equipment-power-draw": { module: "../../calc-restoration.js", fn: "computeEquipmentCircuitLoad" },
@@ -644,6 +648,10 @@ export const COMPUTE_MAP = {
   "delta-wye-line-phase": { module: "../../calc-electrical.js", fn: "computeDeltaWyeLinePhase" },
   "gas-meter-clock": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClock" },
   "furnace-temp-rise": { module: "../../calc-hvacservice.js", fn: "computeFurnaceTempRise" },
+  // spec-v218..v220 residential air-tightness and ventilation batch (3 tiles)
+  "blower-door-ach50": { module: "../../calc-hvacservice.js", fn: "computeBlowerDoorAch50" },
+  "ashrae-622-ventilation": { module: "../../calc-hvacservice.js", fn: "computeAshrae622Ventilation" },
+  "infiltration-load": { module: "../../calc-hvacservice.js", fn: "computeInfiltrationLoad" },
   "gas-altitude-derate": { module: "../../calc-gas.js", fn: "computeGasAltitudeDerate" },
   "gas-fuel-conversion": { module: "../../calc-gas.js", fn: "computeGasFuelConversion" },
   "water-heater-storage-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterStorageSizing" },
@@ -668,6 +676,10 @@ export const COMPUTE_MAP = {
   "ice-barrier-coverage": { module: "../../calc-construction.js", fn: "computeIceBarrierCoverage" },
   "metal-roof-panels": { module: "../../calc-construction.js", fn: "computeMetalRoofPanels" },
   "ridge-cap-fasteners": { module: "../../calc-construction.js", fn: "computeRidgeCapFasteners" },
+  // spec-v224..v226 ASCE 7 structural design-loads batch (3 tiles)
+  "rain-load-ponding": { module: "../../calc-construction.js", fn: "computeRainLoadPonding" },
+  "asce7-load-combinations": { module: "../../calc-construction.js", fn: "computeAsce7LoadCombinations" },
+  "seismic-base-shear": { module: "../../calc-construction.js", fn: "computeSeismicBaseShear" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },
@@ -720,6 +732,10 @@ export const COMPUTE_MAP = {
   "commercial-lighting-load": { module: "../../calc-service.js", fn: "computeCommercialLightingLoad" },
   "noncoincident-load": { module: "../../calc-service.js", fn: "computeNoncoincidentLoad" },
   "pv-circuit-ampacity": { module: "../../calc-solar.js", fn: "computePvCircuitAmpacity" },
+  // spec-v221..v223 PV system-design batch (3 tiles)
+  "pv-energy-yield": { module: "../../calc-solar.js", fn: "computePvEnergyYield" },
+  "pv-row-spacing": { module: "../../calc-solar.js", fn: "computePvRowSpacing" },
+  "pv-inverter-ratio": { module: "../../calc-solar.js", fn: "computePvInverterRatio" },
   "transformer-k-factor": { module: "../../calc-powerquality.js", fn: "computeTransformerKFactor" },
   "motor-capacitor-max": { module: "../../calc-powerquality.js", fn: "computeMotorCapacitorMax" },
   "bends-between-pulls": { module: "../../calc-electrical.js", fn: "computeBendsBetweenPulls" },

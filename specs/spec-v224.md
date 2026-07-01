@@ -1,6 +1,6 @@
 # roughlogic.com Specification v224 -- Roof Rain Load and Ponding Head (ASCE 7 Ch. 8) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v224..v226 (the ASCE 7 structural design-loads trio that completes the
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v224..v226 (the ASCE 7 structural design-loads trio that completes the
 > roof and lateral load picture the catalog started with `wind-pressure` and `snow-load`: the rain/ponding load, the
 > load-combination governing case, and the seismic base shear). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the rain load and the secondary-drainage head are

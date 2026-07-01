@@ -1,6 +1,6 @@
 # roughlogic.com Specification v219 -- ASHRAE 62.2 Whole-House Mechanical Ventilation Rate (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v218..v220 (the residential air-tightness and ventilation trio -- the
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v218..v220 (the residential air-tightness and ventilation trio -- the
 > blower-door result, the ASHRAE 62.2 whole-house ventilation the tight house then needs, and the infiltration load).
 > This spec is the middle of the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the whole-house ventilation fan is sized and

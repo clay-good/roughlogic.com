@@ -1,6 +1,6 @@
 # roughlogic.com Specification v227 -- Window Solar Heat Gain and Conduction Cooling Load (calc-hvacsystems.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-06-30). Batch spec-v227..v229 (the cooling-load-components trio -- the three distinct
+> **Status: LANDED (2026-06-30, package 0.87.0; was PROPOSED 2026-06-30). Batch spec-v227..v229 (the cooling-load-components trio -- the three distinct
 > mechanisms a Manual J sums into a cooling load: solar and conduction through glass, internal gains from people and
 > equipment, and conduction through the opaque envelope). This spec opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the cooling load is what the HVAC tech sizes the
