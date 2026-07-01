@@ -1,8 +1,8 @@
 {
   "source": "IUPAC Standard Atomic Weights 2021 (Pure and Applied Chemistry).",
   "edition": "2021",
-  "fetched": "2026-05-08",
-  "verified_on": "2026-05-08",
+  "fetched": "2026-07-01",
+  "verified_on": "2026-07-01",
   "free_access": "iupac.org/publications/journals/pac/.",
   "weights_g_per_mol": {
     "H": 1.008,

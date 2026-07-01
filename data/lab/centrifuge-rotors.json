@@ -1,8 +1,8 @@
 {
   "source": "Manufacturer-published rotor specifications. Each entry attributes the publishing manufacturer.",
   "edition": "current",
-  "fetched": "2026-05-08",
-  "verified_on": "2026-05-08",
+  "fetched": "2026-07-01",
+  "verified_on": "2026-07-01",
   "free_access": "Each manufacturer publishes the rotor catalog free on its website (eppendorf.com, beckman.com, thermofisher.com).",
   "rotors": {
     "eppendorf_5424_FA453011": {
