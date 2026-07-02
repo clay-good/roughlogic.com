@@ -1,6 +1,6 @@
 # roughlogic.com Specification v254 -- Steel Beam Flexural Capacity, Compact and Braced (AISC 360 Ch. F) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v254..v256 (the AISC 360 steel-member trio -- the three capacity checks an
+> **Status: LANDED (2026-07-02, package 0.92.0; was PROPOSED 2026-07-01). Batch spec-v254..v256 (the AISC 360 steel-member trio -- the three capacity checks an
 > erector, fabricator, or general contractor runs on a rolled W-shape: does it carry the moment, the shear, and the axial
 > load. This spec opens the batch with the flexural check.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog already sizes wood beams and columns

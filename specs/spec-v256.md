@@ -1,6 +1,6 @@
 # roughlogic.com Specification v256 -- Steel Column Compressive Capacity, Flexural Buckling (AISC 360 Ch. E) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v254..v256 (the AISC 360 steel-member trio -- moment, shear, and axial
+> **Status: LANDED (2026-07-02, package 0.92.0; was PROPOSED 2026-07-01). Batch spec-v254..v256 (the AISC 360 steel-member trio -- moment, shear, and axial
 > capacity of a rolled W-shape). This spec closes the batch with the column check.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: after the beam is sized, the load it delivers has to
 > come down a column, and the column's capacity is set by its slenderness, not its area alone -- a tall, lightly-braced

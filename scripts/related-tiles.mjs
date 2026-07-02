@@ -856,6 +856,13 @@ const RELATED = {
   "wood-beam-bending": ["column-buckling-wood","lumber-spans","beam-loading"],
   "wood-beam-shear": ["wood-beam-bending","joist-deflection","lumber-spans"],
   "wood-bolt-connection": ["fastener-pullout","wood-beam-shear","deck-ledger-fasteners"],
+  // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (Group E)
+  "steel-beam-flexure": ["steel-beam-shear","steel-column-capacity","beam-loading"],
+  "steel-beam-shear": ["steel-beam-flexure","steel-column-capacity","fillet-weld-strength"],
+  "steel-column-capacity": ["steel-beam-flexure","steel-beam-shear","column-buckling-wood"],
+  "bolt-group-eccentric": ["weld-group-eccentric","bolt-shear-bearing","steel-column-capacity"],
+  "bolt-shear-bearing": ["bolt-group-eccentric","fillet-weld-strength","steel-beam-shear"],
+  "column-base-plate": ["steel-column-capacity","anchor-embedment","bolt-shear-bearing"],
   // spec-v218..v220 residential air-tightness and ventilation batch (Group C)
   "blower-door-ach50": ["air-changes-hour","ashrae-622-ventilation","infiltration-load"],
   "ashrae-622-ventilation": ["blower-door-ach50","outdoor-air-ventilation","air-changes-hour"],

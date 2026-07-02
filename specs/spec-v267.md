@@ -1,6 +1,6 @@
 # roughlogic.com Specification v267 -- Bolted Joint Design Strength: Bolt Shear + Bearing/Tearout (AISC 360 §J3) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v266..v268 (the AISC 360 steel-connection trio). This spec is the middle
+> **Status: LANDED (2026-07-02, package 0.92.0; was PROPOSED 2026-07-02). Batch spec-v266..v268 (the AISC 360 steel-connection trio). This spec is the middle
 > limit state: the design strength of a *single bolt in a single hole* -- the smaller of the bolt shearing off (§J3.6) and
 > the plate tearing or crushing at the hole (§J3.10). It is the number the eccentric-group resultant of v266 gets checked
 > against, and the per-bolt value a joint's total capacity is built from.)**

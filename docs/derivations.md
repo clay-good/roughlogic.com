@@ -2294,6 +2294,12 @@ cross-check.
 | calc-stage.js | `computeSpeakerImpedance` | `{ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }` | _ | _ | _ |
 | calc-stage.js | `computeTimeAlignment` | `{ d_main_ft = 0, d_delay_ft = 0, ambient_C = 20, haas_offset_ms = 15 }` | _ | _ | _ |
 | calc-stage.js | `computeTrussCapacity` | `{ truss_model = "16in_box", span_ft = 0, point_loads = [] }` | _ | _ | _ |
+| calc-steel.js | `computeBoltGroupEccentric` | `{ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 }...` | _ | _ | _ |
+| calc-steel.js | `computeBoltShearBearing` | `{ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi = 54, nplanes = 1, t_in = 0.5, fu_ksi...` | _ | _ | _ |
+| calc-steel.js | `computeColumnBasePlate` | `{ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_in = 0, bf_in = 0, b_in = 0, n_in = ...` | _ | _ | _ |
+| calc-steel.js | `computeSteelBeamFlexure` | `{ fy = 50, zx = 0, mu = 0 } = {}` | _ | _ | _ |
+| calc-steel.js | `computeSteelBeamShear` | `{ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}` | _ | _ | _ |
+| calc-steel.js | `computeSteelColumnCapacity` | `{ fy = 50, e_mod = 29000, k = 1.0, l_ft = 0, r_in = 0, ag = 0, pu = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
@@ -2379,7 +2385,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 965.
+Row count: 971.
 
 <!-- END function-corpus-v14 -->
 
@@ -2773,7 +2779,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (109 tiles)
+### Group E Construction (115 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2788,10 +2794,13 @@ per spec-v14 §13.1 second paragraph.
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bend-allowance` | Sheet Metal Bend Allowance | Project (first-principles); BA = (pi/180) * 90 * (0.125 + 0.44 * 0.06) = 0.2378; setb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `board-footage` | Lumber Board Footage | Project (first-principles); Standard lumber-yard board-foot identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bolt-group-eccentric` | Eccentric Bolt Group in Shear (Elastic Vector Method) | AISC Manual Part 7 (elastic vector me...; spec-v266 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `bolt-shear-bearing` | Bolt Shear + Bearing / Tearout Strength (AISC 360 J3) | AISC 360-22 J3.6 / J3.10; spec-v267 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cmu-grout-volume` | CMU Grout Volume (Partial and Full Grout) | TMS 602 / ACI 530.1, NCMA TEK; spec-v212 section 2.1 pinned example (partial grout, 24 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `column-base-plate` | Column Base Plate under Axial Load (AISC Design Guide 1) | AISC Design Guide 1 §3.1 / AISC 360-2...; spec-v268 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compound-miter` | Compound Miter (Crown Molding) | First-principles compound-miter trigo...; 38 deg spring crown at a 90 deg corner -> 31.62 deg miter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2868,6 +2877,9 @@ per spec-v14 §13.1 second paragraph.
 | `stair-stringer` | Stair Stringer Length | Project (first-principles); 9 ft rise / 12 ft run -> 180 in stringer (15 ft); 21.09 B... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stair-stringer-layout` | Stair Stringer Layout (with code check) | IRC R311 (residential stair geometry;...; 108 in rise / 144 in run / 14-riser preference -> 16 rise... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stairs` | Stair Calculator | Project (first-principles); IRC R311.7 stair geometry; 7.5 in preferred riser | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `steel-beam-flexure` | Steel Beam Flexural Capacity (AISC 360 Ch. F, Compact + Braced) | AISC 360-22 Chapter F / Steel Constru...; spec-v254 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `steel-beam-shear` | Steel Beam Web Shear Capacity (AISC 360 Ch. G) | AISC 360-22 Chapter G / Steel Constru...; spec-v255 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `steel-column-capacity` | Steel Column Compressive Capacity (AISC 360 Ch. E, Flexural Buckling) | AISC 360-22 Chapter E / Steel Constru...; spec-v256 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thinset-coverage` | Thin-Set Mortar Coverage | Manufacturer thin-set coverage charts...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tile-count` | Tile Count and Grout Volume | Project (first-principles); 100 ft^2 with 12x12 tiles, default 1/8 in grout, 10% wast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vertical-curve` | Vertical Curve Elevations | AASHTO Green Book / FM 5-233 (by name); g1 +3, g2 -2, L 400, PVI sta 5000 elev 100 -> BVC 94.00, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3287,6 +3299,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 722. Fixture-covered or reference-cadence: 722 / 722.
+Tile count: 728. Fixture-covered or reference-cadence: 728 / 728.
 
 <!-- END tile-index-v14 -->

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v255 -- Steel Beam Web Shear Capacity (AISC 360 Ch. G) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v254..v256 (the AISC 360 steel-member trio -- moment, shear, and axial
+> **Status: LANDED (2026-07-02, package 0.92.0; was PROPOSED 2026-07-01). Batch spec-v254..v256 (the AISC 360 steel-member trio -- moment, shear, and axial
 > capacity of a rolled W-shape). This spec continues the batch with the shear check.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: a beam that passes the moment check can still fail in
 > shear at the ends, where the reaction is highest and the moment is zero -- short heavily-loaded spans and coped or

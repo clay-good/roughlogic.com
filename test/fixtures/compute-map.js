@@ -704,6 +704,13 @@ export const COMPUTE_MAP = {
   "wood-beam-bending": { module: "../../calc-construction.js", fn: "computeWoodBeamBending" },
   "wood-beam-shear": { module: "../../calc-construction.js", fn: "computeWoodBeamShear" },
   "wood-bolt-connection": { module: "../../calc-construction.js", fn: "computeWoodBoltConnection" },
+  // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (6 tiles, new calc-steel.js)
+  "steel-beam-flexure": { module: "../../calc-steel.js", fn: "computeSteelBeamFlexure" },
+  "steel-beam-shear": { module: "../../calc-steel.js", fn: "computeSteelBeamShear" },
+  "steel-column-capacity": { module: "../../calc-steel.js", fn: "computeSteelColumnCapacity" },
+  "bolt-group-eccentric": { module: "../../calc-steel.js", fn: "computeBoltGroupEccentric" },
+  "bolt-shear-bearing": { module: "../../calc-steel.js", fn: "computeBoltShearBearing" },
+  "column-base-plate": { module: "../../calc-steel.js", fn: "computeColumnBasePlate" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },

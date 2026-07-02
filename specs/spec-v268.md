@@ -1,6 +1,6 @@
 # roughlogic.com Specification v268 -- Column Base Plate under Axial Load (AISC Design Guide 1) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v266..v268 (the AISC 360 steel-connection trio). This spec closes the batch
+> **Status: LANDED (2026-07-02, package 0.92.0; was PROPOSED 2026-07-02). Batch spec-v266..v268 (the AISC 360 steel-connection trio). This spec closes the batch
 > at the bottom of the column: the base plate that spreads a concentric axial load onto the concrete pier or footing --
 > the required bearing area, the cantilever geometry, and the plate thickness. It is the crown of the trio: the member trio
 > (v254..v256) sized the column, the bolt tiles (v266, v267) joined the framing, and this is how the whole load path finally

@@ -12568,3 +12568,151 @@ test("bounds: spec-v265 computeWoodBoltConnection pins all six modes, the govern
   assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, theta_deg: 91 }));
   assert.ok("error" in _v265({ d_in: Infinity, lm_in: 3.5, ls_in: 1.5 }));
 });
+
+// ===================== spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio =====================
+import {
+  computeSteelBeamFlexure as _v254, computeSteelBeamShear as _v255, computeSteelColumnCapacity as _v256,
+  computeBoltGroupEccentric as _v266, computeBoltShearBearing as _v267, computeColumnBasePlate as _v268,
+} from "../../calc-steel.js";
+
+test("bounds: spec-v254 computeSteelBeamFlexure pins Mn/Ma/phi_b Mn/util and error seams", () => {
+  const r = _v254({ fy: 50, zx: 101, mu: 200 });
+  assert.ok(Math.abs(r.mn_kipft - 420.8333) < 1e-3);
+  assert.ok(Math.abs(r.ma_kipft - 251.996) < 1e-3);
+  assert.ok(Math.abs(r.phi_mn - 378.75) < 1e-6);
+  assert.ok(Math.abs(r.util_asd - 0.7936634) < 1e-6);
+  // Cross-check W12x26.
+  const r2 = _v254({ fy: 50, zx: 37.2 });
+  assert.ok(Math.abs(r2.mn_kipft - 155.0) < 1e-6);
+  assert.ok(Math.abs(r2.ma_kipft - 92.8144) < 1e-3);
+  assert.ok(Math.abs(r2.phi_mn - 139.5) < 1e-6);
+  assert.strictEqual(r2.util_asd, null);
+  // Error seams.
+  assert.ok("error" in _v254({ fy: 0, zx: 101 }));
+  assert.ok("error" in _v254({ fy: 50, zx: 0 }));
+  assert.ok("error" in _v254({ fy: 50, zx: 101, mu: -1 }));
+  assert.ok("error" in _v254({ fy: Infinity, zx: 101 }));
+});
+
+test("bounds: spec-v255 computeSteelBeamShear pins Aw/Vn/Va, the Omega->phi pairing, and error seams", () => {
+  const r = _v255({ fy: 50, d: 17.99, tw: 0.355, cv1: 1.0, omega_v: 1.50, vu: 0 });
+  assert.ok(Math.abs(r.aw - 6.38645) < 1e-4);
+  assert.ok(Math.abs(r.vn - 191.5935) < 1e-3);
+  assert.ok(Math.abs(r.va - 127.729) < 1e-3);
+  assert.ok(Math.abs(r.phi_vn - 191.5935) < 1e-3);
+  assert.strictEqual(r.phi_v, 1.00); // Omega 1.50 pairs phi 1.00
+  // Cross-check W12x26.
+  const r2 = _v255({ fy: 50, d: 12.22, tw: 0.230 });
+  assert.ok(Math.abs(r2.aw - 2.8106) < 1e-4);
+  assert.ok(Math.abs(r2.vn - 84.318) < 1e-3);
+  assert.ok(Math.abs(r2.va - 56.212) < 1e-3);
+  // Omega 1.67 pairs phi 0.90.
+  assert.strictEqual(_v255({ fy: 50, d: 17.99, tw: 0.355, omega_v: 1.67 }).phi_v, 0.90);
+  // Error seams.
+  assert.ok("error" in _v255({ fy: 0, d: 17.99, tw: 0.355 }));
+  assert.ok("error" in _v255({ fy: 50, d: 0, tw: 0.355 }));
+  assert.ok("error" in _v255({ fy: 50, d: 17.99, tw: 0 }));
+  assert.ok("error" in _v255({ fy: 50, d: 17.99, tw: 0.355, vu: -1 }));
+  assert.ok("error" in _v255({ fy: Infinity, d: 17.99, tw: 0.355 }));
+});
+
+test("bounds: spec-v256 computeSteelColumnCapacity pins the two branches, the transition, and error seams", () => {
+  const r = _v256({ fy: 50, e_mod: 29000, k: 1.0, l_ft: 14, r_in: 2.01, ag: 13.3 });
+  assert.ok(Math.abs(r.slender - 83.5821) < 1e-3);
+  assert.ok(Math.abs(r.fcr - 30.0009) < 1e-3);
+  assert.ok(Math.abs(r.pn - 399.0123) < 1e-2);
+  assert.ok(Math.abs(r.pa - 238.9295) < 1e-2);
+  assert.ok(Math.abs(r.phi_pn - 359.1111) < 1e-2);
+  assert.strictEqual(r.elastic, false); // inelastic branch below the transition
+  // Cross-check 24 ft: elastic branch.
+  const r2 = _v256({ fy: 50, e_mod: 29000, k: 1.0, l_ft: 24, r_in: 2.01, ag: 13.3 });
+  assert.ok(Math.abs(r2.slender - 143.2836) < 1e-3);
+  assert.ok(Math.abs(r2.fcr - 12.2266) < 1e-3);
+  assert.ok(Math.abs(r2.pa - 97.3732) < 1e-2);
+  assert.strictEqual(r2.elastic, true);
+  // The transition slenderness is 4.71 sqrt(E/Fy) ~ 113.4 at Fy 50.
+  assert.ok(Math.abs(r.limit - 113.4318) < 1e-2);
+  // Error seams.
+  assert.ok("error" in _v256({ fy: 0, e_mod: 29000, k: 1, l_ft: 14, r_in: 2.01, ag: 13.3 }));
+  assert.ok("error" in _v256({ fy: 50, e_mod: 29000, k: 1, l_ft: 0, r_in: 2.01, ag: 13.3 }));
+  assert.ok("error" in _v256({ fy: 50, e_mod: 29000, k: 1, l_ft: 14, r_in: 0, ag: 13.3 }));
+  assert.ok("error" in _v256({ fy: 50, e_mod: 29000, k: 1, l_ft: 14, r_in: 2.01, ag: 0 }));
+  assert.ok("error" in _v256({ fy: 50, e_mod: 29000, k: 1, l_ft: Infinity, r_in: 2.01, ag: 13.3 }));
+});
+
+test("bounds: spec-v266 computeBoltGroupEccentric pins Ip/direct/resultant, the single-bolt R=P path, and error seams", () => {
+  const r = _v266({ load_kip: 30, ecc_in: 6, ncols: 2, nrows: 3, gage_in: 3, pitch_in: 3 });
+  assert.strictEqual(r.n, 6);
+  assert.ok(Math.abs(r.ix - 36) < 1e-9);
+  assert.ok(Math.abs(r.iy - 13.5) < 1e-9);
+  assert.ok(Math.abs(r.ip - 49.5) < 1e-9);
+  assert.ok(Math.abs(r.direct_kip - 5.0) < 1e-9);
+  assert.ok(Math.abs(r.resultant_kip - 15.1098) < 1e-3);
+  // Cross-check e = 12: torsion dominates.
+  assert.ok(Math.abs(_v266({ load_kip: 30, ecc_in: 12, ncols: 2, nrows: 3, gage_in: 3, pitch_in: 3 }).resultant_kip - 27.0024) < 1e-3);
+  // Single bolt: Ip = 0, R = P.
+  const rs = _v266({ load_kip: 30, ecc_in: 6, ncols: 1, nrows: 1, gage_in: 3, pitch_in: 3 });
+  assert.strictEqual(rs.ip, 0);
+  assert.ok(Math.abs(rs.resultant_kip - 30) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v266({ load_kip: 0, ecc_in: 6 }));
+  assert.ok("error" in _v266({ load_kip: 30, ecc_in: -1 }));
+  assert.ok("error" in _v266({ load_kip: 30, ecc_in: 6, ncols: 0 }));
+  assert.ok("error" in _v266({ load_kip: 30, ecc_in: 6, nrows: 0 }));
+  assert.ok("error" in _v266({ load_kip: 30, ecc_in: 6, gage_in: 0 }));
+  assert.ok("error" in _v266({ load_kip: 30, ecc_in: 6, pitch_in: 0 }));
+  assert.ok("error" in _v266({ load_kip: Infinity, ecc_in: 6 }));
+});
+
+test("bounds: spec-v267 computeBoltShearBearing pins shear/bearing/tearout, the governing flip, and error seams", () => {
+  const r = _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, nplanes: 1, t_in: 0.5, fu_ksi: 58, le_in: 1.5, dh_in: 0.8125, s_in: 3 });
+  assert.ok(Math.abs(r.rn_shear - 23.8572) < 1e-3);
+  assert.ok(Math.abs(r.bearing_cap - 52.2) < 1e-3);
+  assert.ok(Math.abs(r.rn_edge - 38.0625) < 1e-3);
+  assert.ok(Math.abs(r.rn_int - 52.2) < 1e-3); // interior clear distance caps at bearing
+  assert.ok(Math.abs(r.rn_gov - 23.8572) < 1e-3);
+  assert.strictEqual(r.governed_by, "bolt shear");
+  assert.ok(Math.abs(r.phi_rn - 17.8929) < 1e-3);
+  assert.ok(Math.abs(r.rn_asd - 11.9286) < 1e-3);
+  // Cross-check: thin the plate to 1/4 in -> tearout governs.
+  const r2 = _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, nplanes: 1, t_in: 0.25, fu_ksi: 58, le_in: 1.5, dh_in: 0.8125, s_in: 3 });
+  assert.ok(Math.abs(r2.rn_gov - 19.03125) < 1e-3);
+  assert.strictEqual(r2.governed_by, "edge tearout/bearing");
+  assert.ok(Math.abs(r2.phi_rn - 14.2734) < 1e-3);
+  // dh defaults to d + 1/16 when 0.
+  assert.ok(Math.abs(_v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0.5, fu_ksi: 58, le_in: 1.5, dh_in: 0 }).rn_edge - 38.0625) < 1e-3);
+  // Error seams.
+  assert.ok("error" in _v267({ d_in: 0, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0.5, fu_ksi: 58 }));
+  assert.ok("error" in _v267({ d_in: 0.75, ab_in2: 0, fnv_ksi: 54, t_in: 0.5, fu_ksi: 58 }));
+  assert.ok("error" in _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 0, t_in: 0.5, fu_ksi: 58 }));
+  assert.ok("error" in _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0, fu_ksi: 58 }));
+  assert.ok("error" in _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0.5, fu_ksi: 0 }));
+  assert.ok("error" in _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0.5, fu_ksi: 58, le_in: -1 }));
+  assert.ok("error" in _v267({ d_in: 0.75, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0.5, fu_ksi: 58, dh_in: 0.5 })); // dh <= d
+  assert.ok("error" in _v267({ d_in: Infinity, ab_in2: 0.4418, fnv_ksi: 54, t_in: 0.5, fu_ksi: 58 }));
+});
+
+test("bounds: spec-v268 computeColumnBasePlate pins A1_req/m/n/n'/l/tp, the bearing flag, and error seams", () => {
+  const r = _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10.0, b_in: 14, n_in: 14 });
+  assert.ok(Math.abs(r.a1_req - 180.9955) < 1e-3);
+  assert.ok(Math.abs(r.m - 2.2595) < 1e-4);
+  assert.ok(Math.abs(r.n - 3.0) < 1e-9);
+  assert.ok(Math.abs(r.np - 2.4975) < 1e-3);
+  assert.ok(Math.abs(r.l - 3.0) < 1e-9);
+  assert.ok(Math.abs(r.tp - 1.0648) < 1e-3);
+  assert.strictEqual(r.area_ok, true);
+  // Cross-check 700 kip: bearing flagged, thickness grows with sqrt(Pu).
+  const r2 = _v268({ pu_kip: 700, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10.0, b_in: 14, n_in: 14 });
+  assert.ok(Math.abs(r2.a1_req - 316.7421) < 1e-3);
+  assert.strictEqual(r2.area_ok, false);
+  assert.ok(Math.abs(r2.tp - 1.4086) < 1e-3);
+  // Error seams.
+  assert.ok("error" in _v268({ pu_kip: 0, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 14, n_in: 14 }));
+  assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 0, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 14, n_in: 14 }));
+  assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 0, d_in: 9.98, bf_in: 10, b_in: 14, n_in: 14 }));
+  assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 36, d_in: 0, bf_in: 10, b_in: 14, n_in: 14 }));
+  assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 0, b_in: 14, n_in: 14 }));
+  assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 14, n_in: 9 })); // N < 0.95 d
+  assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 7, n_in: 14 })); // B < 0.80 bf
+  assert.ok("error" in _v268({ pu_kip: Infinity, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 14, n_in: 14 }));
+});

@@ -27191,6 +27191,191 @@
         "ktheta": { "value": 1.25, "tolerance": { "abs": 0.001 } },
         "z_lb": { "value": 330.9764, "tolerance": { "abs": 0.5 } }
       }
+    },
+    {
+      "tile_id": "steel-beam-flexure",
+      "source_publisher": "AISC 360-22 Chapter F / Steel Construction Manual Table 3-2",
+      "source_title": "W18x50 A992 (Fy 50, Zx 101) -> Mn 421, Ma 252, phi_b Mn 379 kip-ft, util 0.79 at Mu 200",
+      "source_edition_or_year": "spec-v254 worked example (machine-verified)",
+      "source_section_or_page": "spec-v254 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fy": 50, "zx": 101, "mu": 200 },
+      "outputs": {
+        "mn_kipft": { "value": 420.8333, "tolerance": { "abs": 0.05 } },
+        "ma_kipft": { "value": 251.9960, "tolerance": { "abs": 0.05 } },
+        "phi_mn": { "value": 378.75, "tolerance": { "abs": 0.05 } },
+        "util_asd": { "value": 0.7936634, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "steel-beam-flexure",
+      "source_publisher": "AISC 360-22 Chapter F / Steel Construction Manual Table 3-2",
+      "source_title": "cross-check: lighter W12x26 (Zx 37.2) -> Mn 155, Ma 92.8, phi_b Mn 139.5 kip-ft",
+      "source_edition_or_year": "spec-v254 worked example (machine-verified)",
+      "source_section_or_page": "spec-v254 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fy": 50, "zx": 37.2, "mu": 0 },
+      "outputs": {
+        "mn_kipft": { "value": 155.0, "tolerance": { "abs": 0.05 } },
+        "ma_kipft": { "value": 92.8144, "tolerance": { "abs": 0.05 } },
+        "phi_mn": { "value": 139.5, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "steel-beam-shear",
+      "source_publisher": "AISC 360-22 Chapter G / Steel Construction Manual Table 3-2",
+      "source_title": "W18x50 A992 (d 17.99, tw 0.355) -> Aw 6.39, Vn 191.6, Va 128 kips",
+      "source_edition_or_year": "spec-v255 worked example (machine-verified)",
+      "source_section_or_page": "spec-v255 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fy": 50, "d": 17.99, "tw": 0.355, "cv1": 1.0, "omega_v": 1.50, "vu": 0 },
+      "outputs": {
+        "aw": { "value": 6.38645, "tolerance": { "abs": 0.001 } },
+        "vn": { "value": 191.5935, "tolerance": { "abs": 0.05 } },
+        "va": { "value": 127.729, "tolerance": { "abs": 0.05 } },
+        "phi_vn": { "value": 191.5935, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "steel-beam-shear",
+      "source_publisher": "AISC 360-22 Chapter G / Steel Construction Manual Table 3-2",
+      "source_title": "cross-check: W12x26 (d 12.22, tw 0.230) -> Aw 2.81, Vn 84.3, Va 56.2 kips",
+      "source_edition_or_year": "spec-v255 worked example (machine-verified)",
+      "source_section_or_page": "spec-v255 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fy": 50, "d": 12.22, "tw": 0.230, "cv1": 1.0, "omega_v": 1.50, "vu": 0 },
+      "outputs": {
+        "aw": { "value": 2.8106, "tolerance": { "abs": 0.001 } },
+        "vn": { "value": 84.318, "tolerance": { "abs": 0.05 } },
+        "va": { "value": 56.212, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "steel-column-capacity",
+      "source_publisher": "AISC 360-22 Chapter E / Steel Construction Manual Table 4-1",
+      "source_title": "W10x45 A992, 14 ft pinned (r 2.01, Ag 13.3) -> KL/r 83.6, Fcr 30.0, Pn 399, Pa 239 kips (inelastic)",
+      "source_edition_or_year": "spec-v256 worked example (machine-verified)",
+      "source_section_or_page": "spec-v256 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fy": 50, "e_mod": 29000, "k": 1.0, "l_ft": 14, "r_in": 2.01, "ag": 13.3, "pu": 0 },
+      "outputs": {
+        "slender": { "value": 83.5821, "tolerance": { "abs": 0.01 } },
+        "fcr": { "value": 30.0009, "tolerance": { "abs": 0.05 } },
+        "pn": { "value": 399.0123, "tolerance": { "abs": 0.5 } },
+        "pa": { "value": 238.9295, "tolerance": { "abs": 0.5 } },
+        "phi_pn": { "value": 359.1111, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "steel-column-capacity",
+      "source_publisher": "AISC 360-22 Chapter E / Steel Construction Manual Table 4-1",
+      "source_title": "cross-check: same column at 24 ft -> KL/r 143.3, Fcr 12.2, Pa 97.4 kips (elastic branch)",
+      "source_edition_or_year": "spec-v256 worked example (machine-verified)",
+      "source_section_or_page": "spec-v256 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fy": 50, "e_mod": 29000, "k": 1.0, "l_ft": 24, "r_in": 2.01, "ag": 13.3, "pu": 0 },
+      "outputs": {
+        "slender": { "value": 143.2836, "tolerance": { "abs": 0.01 } },
+        "fcr": { "value": 12.2266, "tolerance": { "abs": 0.05 } },
+        "pa": { "value": 97.3732, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "bolt-group-eccentric",
+      "source_publisher": "AISC Manual Part 7 (elastic vector method)",
+      "source_title": "2x3 group, 3 in spacing, 30 kip at 6 in -> Ip 49.5, direct 5.0, R 15.1 kip on the corner bolt",
+      "source_edition_or_year": "spec-v266 worked example (machine-verified)",
+      "source_section_or_page": "spec-v266 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "load_kip": 30, "ecc_in": 6, "ncols": 2, "nrows": 3, "gage_in": 3, "pitch_in": 3 },
+      "outputs": {
+        "ip": { "value": 49.5, "tolerance": { "abs": 0.01 } },
+        "direct_kip": { "value": 5.0, "tolerance": { "abs": 0.001 } },
+        "resultant_kip": { "value": 15.1098, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "bolt-group-eccentric",
+      "source_publisher": "AISC Manual Part 7 (elastic vector method)",
+      "source_title": "cross-check: move the load out to 12 in -> R 27.0 kip (torsion dominates)",
+      "source_edition_or_year": "spec-v266 worked example (machine-verified)",
+      "source_section_or_page": "spec-v266 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "load_kip": 30, "ecc_in": 12, "ncols": 2, "nrows": 3, "gage_in": 3, "pitch_in": 3 },
+      "outputs": {
+        "resultant_kip": { "value": 27.0024, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "bolt-shear-bearing",
+      "source_publisher": "AISC 360-22 J3.6 / J3.10",
+      "source_title": "3/4 in A325-N, 1/2 in A36, single shear, 1.5 in edge -> shear 23.9, gov 23.9, phi 17.9, ASD 11.9 kip",
+      "source_edition_or_year": "spec-v267 worked example (machine-verified)",
+      "source_section_or_page": "spec-v267 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "d_in": 0.75, "ab_in2": 0.4418, "fnv_ksi": 54, "nplanes": 1, "t_in": 0.5, "fu_ksi": 58, "le_in": 1.5, "dh_in": 0.8125, "s_in": 3 },
+      "outputs": {
+        "rn_shear": { "value": 23.8572, "tolerance": { "abs": 0.005 } },
+        "rn_edge": { "value": 38.0625, "tolerance": { "abs": 0.005 } },
+        "rn_gov": { "value": 23.8572, "tolerance": { "abs": 0.005 } },
+        "phi_rn": { "value": 17.8929, "tolerance": { "abs": 0.005 } },
+        "rn_asd": { "value": 11.9286, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "bolt-shear-bearing",
+      "source_publisher": "AISC 360-22 J3.6 / J3.10",
+      "source_title": "cross-check: thin the plate to 1/4 in A36 -> tearout governs at 19.0 kip, phi 14.3 kip",
+      "source_edition_or_year": "spec-v267 worked example (machine-verified)",
+      "source_section_or_page": "spec-v267 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "d_in": 0.75, "ab_in2": 0.4418, "fnv_ksi": 54, "nplanes": 1, "t_in": 0.25, "fu_ksi": 58, "le_in": 1.5, "dh_in": 0.8125, "s_in": 3 },
+      "outputs": {
+        "rn_gov": { "value": 19.03125, "tolerance": { "abs": 0.005 } },
+        "phi_rn": { "value": 14.2734, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "column-base-plate",
+      "source_publisher": "AISC Design Guide 1 §3.1 / AISC 360-22 J8",
+      "source_title": "W10x49, 400 kip, 14 in square A36 plate, 4 ksi concrete -> A1_req 181, l 3.0, tp 1.06 in",
+      "source_edition_or_year": "spec-v268 worked example (machine-verified)",
+      "source_section_or_page": "spec-v268 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "pu_kip": 400, "fc_ksi": 4, "fy_ksi": 36, "d_in": 9.98, "bf_in": 10.0, "b_in": 14, "n_in": 14 },
+      "outputs": {
+        "a1_req": { "value": 180.9955, "tolerance": { "abs": 0.05 } },
+        "m": { "value": 2.2595, "tolerance": { "abs": 0.001 } },
+        "n": { "value": 3.0, "tolerance": { "abs": 0.001 } },
+        "np": { "value": 2.4975, "tolerance": { "abs": 0.001 } },
+        "l": { "value": 3.0, "tolerance": { "abs": 0.001 } },
+        "tp": { "value": 1.0648, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "column-base-plate",
+      "source_publisher": "AISC Design Guide 1 §3.1 / AISC 360-22 J8",
+      "source_title": "cross-check: raise the load to 700 kip -> A1_req 317 > 196 (plate flagged too small), tp 1.41 in",
+      "source_edition_or_year": "spec-v268 worked example (machine-verified)",
+      "source_section_or_page": "spec-v268 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "pu_kip": 700, "fc_ksi": 4, "fy_ksi": 36, "d_in": 9.98, "bf_in": 10.0, "b_in": 14, "n_in": 14 },
+      "outputs": {
+        "a1_req": { "value": 316.7421, "tolerance": { "abs": 0.05 } },
+        "tp": { "value": 1.4086, "tolerance": { "abs": 0.005 } }
+      }
     }
   ]
 }

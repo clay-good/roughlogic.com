@@ -1,6 +1,6 @@
 # roughlogic.com Specification v266 -- Eccentric Bolt Group in Shear (Elastic Vector Method) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v266..v268 (the AISC 360 steel-connection trio -- how the member trio
+> **Status: LANDED (2026-07-02, package 0.92.0; was PROPOSED 2026-07-02). Batch spec-v266..v268 (the AISC 360 steel-connection trio -- how the member trio
 > v254..v256 actually gets bolted together: the eccentrically loaded bolt group at a bracket or shear tab (this spec), the
 > single-bolt shear/bearing/tearout limit that caps each hole (v267), and the column base plate that lands the whole thing
 > on concrete (v268). The catalog already does the *welded* eccentric group by the elastic method (`weld-group-eccentric`,

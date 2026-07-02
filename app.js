@@ -410,6 +410,13 @@ const TOOL_MODULES = (() => {
   declare("./calc-civil.js", "CIVIL_RENDERERS", [
     "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
   ]);
+  // spec-v254..v256 AISC 360 steel-member trio + spec-v266..v268 steel-connection
+  // trio: a new lazy Group E cluster (the steel-member companion to the wood-framing
+  // and steel-weld tiles). All six KEEP group "E" (module independent of group letter).
+  declare("./calc-steel.js", "STEEL_RENDERERS", [
+    "steel-beam-flexure", "steel-beam-shear", "steel-column-capacity",
+    "bolt-group-eccentric", "bolt-shear-bearing", "column-base-plate",
+  ]);
   // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
   // moved out of calc-construction.js (it sat at 97.6% of its size cap) into
   // its own module. All five tiles KEEP group "E" (the module is independent
