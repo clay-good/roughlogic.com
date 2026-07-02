@@ -456,6 +456,13 @@ const TOOL_MODULES = (() => {
   declare("./calc-rescue.js", "RESCUE_RENDERERS", [
     "confined-space-purge", "rope-ma", "sling-angle",
   ]);
+  // spec-v248..v250 fire-sprinkler system-design trio: a new lazy Group F
+  // cluster split off beside calc-fire.js exactly as calc-rescue.js was (the
+  // fire module sits near its size cap). All three KEEP group "F" (module
+  // independent of group letter, per the v28/v30/v36/v39/v70..v82 precedent).
+  declare("./calc-firesprinkler.js", "FIRESPRINKLER_RENDERERS", [
+    "fire-pump-curve", "sprinkler-system-demand", "sprinkler-head-layout",
+  ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",
     "emergency-contacts", "tool-maintenance",

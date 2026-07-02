@@ -27376,6 +27376,118 @@
         "a1_req": { "value": 316.7421, "tolerance": { "abs": 0.05 } },
         "tp": { "value": 1.4086, "tolerance": { "abs": 0.005 } }
       }
+    },
+    {
+      "tile_id": "fire-pump-curve",
+      "source_publisher": "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection)",
+      "source_title": "500 gpm at 100 psi pump, 128 psi churn / 72 psi at 750 gpm -> limit 140, floor 65, both pass (12% / 7% margins)",
+      "source_edition_or_year": "spec-v248 worked example (machine-verified)",
+      "source_section_or_page": "spec-v248 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "rated_gpm": 500, "rated_psi": 100, "churn_psi": 128, "overload_psi": 72 },
+      "outputs": {
+        "churn_limit_psi": { "value": 140.0, "tolerance": { "abs": 0.001 } },
+        "overload_flow_gpm": { "value": 750.0, "tolerance": { "abs": 0.001 } },
+        "overload_min_psi": { "value": 65.0, "tolerance": { "abs": 0.001 } },
+        "churn_margin_pct": { "value": 12.0, "tolerance": { "abs": 0.001 } },
+        "overload_margin_pct": { "value": 7.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "fire-pump-curve",
+      "source_publisher": "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection)",
+      "source_title": "cross-check: flat, high-shutoff pump at 148 psi churn -> churn fails by 8 psi (relief valve required)",
+      "source_edition_or_year": "spec-v248 worked example (machine-verified)",
+      "source_section_or_page": "spec-v248 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "rated_gpm": 500, "rated_psi": 100, "churn_psi": 148, "overload_psi": 0 },
+      "outputs": {
+        "churn_limit_psi": { "value": 140.0, "tolerance": { "abs": 0.001 } },
+        "churn_margin_pct": { "value": -8.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "fire-pump-curve",
+      "source_publisher": "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection)",
+      "source_title": "cross-check: only 60 psi at 750 gpm -> overload fails by 5 psi (no reserve for the demand)",
+      "source_edition_or_year": "spec-v248 worked example (machine-verified)",
+      "source_section_or_page": "spec-v248 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "rated_gpm": 500, "rated_psi": 100, "churn_psi": 0, "overload_psi": 60 },
+      "outputs": {
+        "overload_flow_gpm": { "value": 750.0, "tolerance": { "abs": 0.001 } },
+        "overload_min_psi": { "value": 65.0, "tolerance": { "abs": 0.001 } },
+        "overload_margin_pct": { "value": -5.0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sprinkler-system-demand",
+      "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+      "source_title": "Ordinary Hazard Group 2: 0.20 gpm/ft^2 x 1,500 ft^2 + 250 gpm hose over 90 min -> 550 gpm, 49,500 gal",
+      "source_edition_or_year": "spec-v249 worked example (machine-verified)",
+      "source_section_or_page": "spec-v249 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "density": 0.20, "design_area": 1500, "hose_gpm": 250, "duration_min": 90 },
+      "outputs": {
+        "sprinkler_gpm": { "value": 300.0, "tolerance": { "abs": 0.001 } },
+        "total_gpm": { "value": 550.0, "tolerance": { "abs": 0.001 } },
+        "volume_gal": { "value": 49500.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "sprinkler-system-demand",
+      "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+      "source_title": "cross-check: Light Hazard office 0.10 / 1,500 / 100 gpm / 30 min -> 250 gpm, 7,500 gal (6x less stored supply)",
+      "source_edition_or_year": "spec-v249 worked example (machine-verified)",
+      "source_section_or_page": "spec-v249 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "density": 0.10, "design_area": 1500, "hose_gpm": 100, "duration_min": 30 },
+      "outputs": {
+        "sprinkler_gpm": { "value": 150.0, "tolerance": { "abs": 0.001 } },
+        "total_gpm": { "value": 250.0, "tolerance": { "abs": 0.001 } },
+        "volume_gal": { "value": 7500.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "sprinkler-head-layout",
+      "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+      "source_title": "ordinary-hazard 40 x 30 ft room (130 ft^2 / 15 ft caps) -> 11.40 ft spacing, 4 x 3 = 12 heads, 100 ft^2 each",
+      "source_edition_or_year": "spec-v250 worked example (machine-verified)",
+      "source_section_or_page": "spec-v250 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "room_length": 40, "room_width": 30, "area_per_head": 130, "max_spacing": 15 },
+      "outputs": {
+        "spacing": { "value": 11.4018, "tolerance": { "abs": 0.001 } },
+        "heads_per_line": { "value": 4, "tolerance": { "abs": 0.001 } },
+        "num_lines": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "total_heads": { "value": 12, "tolerance": { "abs": 0.001 } },
+        "achieved_area_per_head": { "value": 100.0, "tolerance": { "abs": 0.001 } },
+        "max_wall_distance": { "value": 5.7009, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "sprinkler-head-layout",
+      "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+      "source_title": "cross-check: same room at light hazard (225 ft^2 / 15 ft) -> 15 ft linear cap binds, 3 x 2 = 6 heads, 200 ft^2 each",
+      "source_edition_or_year": "spec-v250 worked example (machine-verified)",
+      "source_section_or_page": "spec-v250 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "room_length": 40, "room_width": 30, "area_per_head": 225, "max_spacing": 15 },
+      "outputs": {
+        "spacing": { "value": 15.0, "tolerance": { "abs": 0.001 } },
+        "heads_per_line": { "value": 3, "tolerance": { "abs": 0.001 } },
+        "num_lines": { "value": 2, "tolerance": { "abs": 0.001 } },
+        "total_heads": { "value": 6, "tolerance": { "abs": 0.001 } },
+        "achieved_area_per_head": { "value": 200.0, "tolerance": { "abs": 0.001 } },
+        "max_wall_distance": { "value": 7.5, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

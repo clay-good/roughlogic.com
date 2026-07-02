@@ -1836,6 +1836,9 @@ cross-check.
 | calc-fire.js | `renderSprinklerDensity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderSprinklerKFactor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-fire.js | `renderStandpipeFriction` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-firesprinkler.js | `computeFirePumpCurve` | `{ rated_gpm = 0, rated_psi = 0, churn_psi = 0, overload_psi = 0 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeSprinklerHeadLayout` | `{ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}` | _ | _ | _ |
+| calc-firesprinkler.js | `computeSprinklerSystemDemand` | `{ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |
 | calc-gas.js | `computeGasLeakRate` | `{ orifice_diameter_in, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
@@ -2385,7 +2388,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 971.
+Row count: 974.
 
 <!-- END function-corpus-v14 -->
 
@@ -2899,7 +2902,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-beam-shear` | Wood Bending Member Shear (fv and the NDS Tension-Side End-Notch Reduction) | NDS 3.4.2 / 3.4.3.2 (National Design ...; spec-v264 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-bolt-connection` | Single-Shear Bolted / Dowel Lateral Design Value (NDS Yield-Limit Z) | NDS Table 12.3.1A (National Design Sp...; spec-v265 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (27 tiles)
+### Group F Fire-ground (30 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2909,6 +2912,7 @@ per spec-v14 §13.1 second paragraph.
 | `confined-space-vent` | Confined-Space Pre-Entry Ventilation (OSHA 1910.146) | OSHA / NIOSH; V=1000 ft^3; minutes_to_purge = 1000 * 7 / 200 = 35 min; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `elevation-pressure-loss` | Elevation Pressure Loss / Gain | Hydrostatic head 0.434 psi/ft + IFSTA...; 9 floors above pump -> exact ~39.06 psi, rule 45 psi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-friction` | Fire Hose Friction Loss | National Fire Academy; FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fire-pump-curve` | Fire Pump Rated / Churn / Overload Curve Check (NFPA 20) | NFPA 20 (Standard for the Installatio...; spec-v248 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `fire-stream-reaction` | Nozzle / Fire-Stream Reaction Force | IFSTA Pumping Apparatus Driver/Operat...; 1.0 in smooth bore @ 50 psi -> NR = 1.57 * 1 * 50 = 78.5 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam` | Foam Concentrate | NFPA; 1500 ft^2 fire / 0.10 gpm/ft^2 application / 3% concentra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2926,7 +2930,9 @@ per spec-v14 §13.1 second paragraph.
 | `smoke-reading` | Smoke Reading Reference | IFSTA Building Construction for the F...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smooth-bore-flow` | Smooth-Bore Nozzle Flow (GPM) | IFSTA Pumping Apparatus Driver/Operat...; spec-v114 section 2.1 pinned example (1.125 in, 50 psi ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprinkler-density` | Sprinkler GPM Density | NFPA; Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 15... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sprinkler-head-layout` | Sprinkler Head Count and Spacing (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v250 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprinkler-k-factor` | Sprinkler K-Factor Solver | NFPA 13 (sprinkler discharge relation); K 5.6 @ 7 psi -> Q = 5.6 * sqrt(7) = 14.816 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sprinkler-system-demand` | Sprinkler System Demand and Water Supply (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v249 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3299,6 +3305,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 728. Fixture-covered or reference-cadence: 728 / 728.
+Tile count: 731. Fixture-covered or reference-cadence: 731 / 731.
 
 <!-- END tile-index-v14 -->

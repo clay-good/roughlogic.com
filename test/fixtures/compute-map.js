@@ -711,6 +711,10 @@ export const COMPUTE_MAP = {
   "bolt-group-eccentric": { module: "../../calc-steel.js", fn: "computeBoltGroupEccentric" },
   "bolt-shear-bearing": { module: "../../calc-steel.js", fn: "computeBoltShearBearing" },
   "column-base-plate": { module: "../../calc-steel.js", fn: "computeColumnBasePlate" },
+  // spec-v248..v250 fire-sprinkler system-design trio (3 tiles, new calc-firesprinkler.js)
+  "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
+  "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },
+  "sprinkler-head-layout": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerHeadLayout" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },

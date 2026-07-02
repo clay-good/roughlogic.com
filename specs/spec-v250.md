@@ -1,6 +1,6 @@
 # roughlogic.com Specification v250 -- Sprinkler Head Count and Spacing (NFPA 13) (calc-firesprinkler.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v248..v250 (the fire-sprinkler system-design trio). This spec closes the
+> **Status: LANDED (2026-07-02, package 0.93.0; was PROPOSED 2026-07-01). Batch spec-v248..v250 (the fire-sprinkler system-design trio). This spec closes the
 > batch: from the system demand to the heads that put it on the floor.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: laying out sprinkler heads to a maximum protection
 > area and a maximum spacing is the sprinkler fitter's takeoff -- how many heads a room needs, how far apart, and how far

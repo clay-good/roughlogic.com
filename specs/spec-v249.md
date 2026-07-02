@@ -1,6 +1,6 @@
 # roughlogic.com Specification v249 -- Sprinkler System Demand and Water Supply (NFPA 13) (calc-firesprinkler.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v248..v250 (the fire-sprinkler system-design trio). This spec is the
+> **Status: LANDED (2026-07-02, package 0.93.0; was PROPOSED 2026-07-01). Batch spec-v248..v250 (the fire-sprinkler system-design trio). This spec is the
 > middle: from the discharge density on the floor to the flow the pump must feed and the volume the tank must store.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the design-area demand plus the hose allowance,
 > held for the required duration, is the single water-supply requirement a sprinkler system is designed around. Adds one

@@ -7708,6 +7708,42 @@ export const CITATIONS = {
       { name: "Concentric only", value: "concentric axial compression; moment / uplift, the anchor rods, and concrete breakout are separate checks", source: "AISC Design Guide 1" },
     ],
   },
+  "fire-pump-curve": {
+    formula: "churn_limit = 1.40 x rated_psi; overload_flow = 1.50 x rated_gpm; overload_min = 0.65 x rated_psi; churn_ok = churn <= churn_limit; overload_ok = measured >= overload_min; margins as % of rated pressure.",
+    edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022, by name; the 140% churn ceiling and the 65%-of-rated-at-150%-flow overload point are the listed centrifugal fire pump curve limits.",
+    freeAccess: "NFPA 20 is viewable free of charge through NFPA's online free-access reader; the 1.40 / 1.50 / 0.65 envelope arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022: a listed centrifugal fire pump must not shut off (churn) at more than 140% of its rated total pressure (churn ceiling = 1.40 x rated pressure), and it must deliver at least 65% of rated pressure at 150% of rated flow (overload flow = 1.50 x rated flow, overload floor = 0.65 x rated pressure). The churn and 150%-flow points come from the field acceptance test with a calibrated flow-measuring device; a churn pressure that would push the system above its component rating requires a listed pressure-relief valve (NFPA 20 does not by itself waive that requirement); and the rated point and net pressure must still meet the system demand computed separately (see sprinkler-system-demand). A design and acceptance-check aid, not a stamped fire-pump submittal - a qualified fire-protection engineer and the AHJ govern.",
+    assumptions: [
+      { name: "Curve envelope", value: "churn <= 140% of rated pressure and >= 65% of rated pressure at 150% of rated flow, the two ends of the listed-pump acceptance curve", source: "NFPA 20 (2022)" },
+      { name: "Field test points", value: "the churn and 150%-flow pressures come from the field acceptance test with a calibrated flow-measuring device; leave 0 to skip either check", source: "NFPA 20 (2022)" },
+      { name: "Relief valve separate", value: "a churn pressure over the system component rating requires a listed pressure-relief valve; NFPA 20 does not by itself waive that", source: "NFPA 20 (2022)" },
+    ],
+  },
+  "sprinkler-system-demand": {
+    formula: "sprinkler_gpm = density x design_area; total_gpm = sprinkler_gpm + hose_gpm; volume_gal = total_gpm x duration_min.",
+    edition: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022, by name; the density / design-area / hose / duration levers come from the hazard classification and the density-area curves.",
+    freeAccess: "NFPA 13 is viewable free of charge through NFPA's online free-access reader; the density x area + hose x duration arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022: sprinkler demand = density x design area, total demand = sprinkler demand + inside/outside hose-stream allowance, stored volume = total demand x duration. The hazard-class defaults are editable: Light 0.10 gpm/ft^2 over 1,500 ft^2 with 100 gpm hose for 30 min; Ordinary Group 1 0.15 / 1,500 / 250 / 60-90; Ordinary Group 2 0.20 / 1,500 / 250 / 60-90. This is the area/density (pipe-schedule-style) screening demand - a full hydraulic calculation to the most-remote area including friction and elevation yields the governing demand and is a separate analysis; the density / area / duration come from the applicable NFPA 13 density-area curve for the actual commodity and storage arrangement; storage and special occupancies (ESFR, high-piled, in-rack) use their own criteria. A design aid, not a stamped hydraulic submittal - a qualified fire-protection engineer and the AHJ govern.",
+    assumptions: [
+      { name: "Hazard-class levers", value: "the density, design area, hose allowance, and duration all come from the hazard classification (Light 0.10/1,500/100/30; OH1 0.15/1,500/250/60-90; OH2 0.20/1,500/250/60-90), editable defaults", source: "NFPA 13 (2022)" },
+      { name: "Screening demand", value: "the area/density product is the pipe-schedule-style screening demand; the governing demand comes from a full most-remote-area hydraulic calculation with friction and elevation", source: "NFPA 13 (2022)" },
+      { name: "Ordinary occupancies", value: "storage and special occupancies (ESFR, high-piled, in-rack) use their own density / area / duration criteria, not these defaults", source: "NFPA 13 (2022)" },
+    ],
+  },
+  "sprinkler-head-layout": {
+    formula: "spacing = min(max_spacing, sqrt(area_per_head)); heads_per_line = ceil(length / spacing); lines = ceil(width / spacing); total = heads_per_line x lines; achieved = room_area / total; wall_max = spacing / 2.",
+    edition: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022, by name; the protection-area and linear-spacing caps by hazard class for standard-spray upright / pendent heads.",
+    freeAccess: "NFPA 13 is viewable free of charge through NFPA's online free-access reader; the min / sqrt / ceil layout arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022 protection-area and spacing caps for standard-spray upright / pendent heads: governing spacing = min(max spacing, sqrt(area per head)), heads per line = ceil(length / spacing), lines = ceil(width / spacing), total = heads per line x lines, achieved area per head = room area / total, max wall distance = spacing / 2. The hazard-class caps are editable: Light 225 ft^2 / 15 ft, Ordinary 130 ft^2 / 15 ft, Extra 100 ft^2 / 12 ft (hydraulically calculated). A rectangular-bay standard-spray estimate - obstructions, beams and the beam rule, sloped or high ceilings, small rooms, extended-coverage and residential heads, and ESFR / storage layouts each have their own spacing and clearance rules, and the minimum spacing between heads (typically 6 ft, to prevent cold-soldering) is a separate check. A takeoff aid, not a stamped sprinkler layout - a qualified fire-protection designer and the AHJ govern.",
+    assumptions: [
+      { name: "Hazard-class caps", value: "Light 225 ft^2 / 15 ft, Ordinary 130 ft^2 / 15 ft, Extra 100 ft^2 / 12 ft (hydraulically calculated), editable; whichever of the area or linear cap binds first governs the spacing", source: "NFPA 13 (2022)" },
+      { name: "Rectangular bay", value: "a flat-ceiling rectangular-bay estimate for standard-spray heads; obstructions, the beam rule, sloped ceilings, small rooms, and EC / ESFR heads have their own rules", source: "NFPA 13 (2022)" },
+      { name: "Minimum spacing separate", value: "the minimum distance between heads (typically 6 ft, preventing cold-soldering) is a separate check this tile does not perform", source: "NFPA 13 (2022)" },
+    ],
+  },
   "window-solar-heat-gain": {
     formula: "q_solar = area_ft2 x shgc x psf; q_cond = area_ft2 x u_factor x cltd_f; q_total = q_solar + q_cond.",
     edition: "ASHRAE / ACCA Manual J fenestration cooling load (Q_solar = A x SHGC x PSF, Q_cond = A x U x CLTD), by name; the relations are public.",

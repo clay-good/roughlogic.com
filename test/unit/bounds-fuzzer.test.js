@@ -12716,3 +12716,85 @@ test("bounds: spec-v268 computeColumnBasePlate pins A1_req/m/n/n'/l/tp, the bear
   assert.ok("error" in _v268({ pu_kip: 400, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 7, n_in: 14 })); // B < 0.80 bf
   assert.ok("error" in _v268({ pu_kip: Infinity, fc_ksi: 4, fy_ksi: 36, d_in: 9.98, bf_in: 10, b_in: 14, n_in: 14 }));
 });
+
+// ===================== spec-v248..v250 NFPA 13/20 fire-sprinkler system-design trio =====================
+import {
+  computeFirePumpCurve as _v248, computeSprinklerSystemDemand as _v249, computeSprinklerHeadLayout as _v250,
+} from "../../calc-firesprinkler.js";
+
+test("bounds: spec-v248 computeFirePumpCurve pins the envelope, the pass/fail flags, the null path, and error seams", () => {
+  const r = _v248({ rated_gpm: 500, rated_psi: 100, churn_psi: 128, overload_psi: 72 });
+  assert.ok(Math.abs(r.churn_limit_psi - 140) < 1e-9);
+  assert.ok(Math.abs(r.overload_flow_gpm - 750) < 1e-9);
+  assert.ok(Math.abs(r.overload_min_psi - 65) < 1e-9);
+  assert.strictEqual(r.churn_ok, true);
+  assert.strictEqual(r.overload_ok, true);
+  assert.ok(Math.abs(r.churn_margin_pct - 12) < 1e-9);
+  assert.ok(Math.abs(r.overload_margin_pct - 7) < 1e-9);
+  // Cross-check: flat, high-shutoff pump fails churn by 8 psi.
+  const r2 = _v248({ rated_gpm: 500, rated_psi: 100, churn_psi: 148, overload_psi: 0 });
+  assert.strictEqual(r2.churn_ok, false);
+  assert.ok(Math.abs(r2.churn_margin_pct - -8) < 1e-9);
+  // Cross-check: 60 psi at 750 gpm fails the overload floor by 5 psi.
+  const r3 = _v248({ rated_gpm: 500, rated_psi: 100, churn_psi: 0, overload_psi: 60 });
+  assert.strictEqual(r3.overload_ok, false);
+  assert.ok(Math.abs(r3.overload_margin_pct - -5) < 1e-9);
+  // Null path: churn / overload left blank (0) return null flags and margins.
+  const rn = _v248({ rated_gpm: 500, rated_psi: 100, churn_psi: 0, overload_psi: 0 });
+  assert.strictEqual(rn.churn_ok, null);
+  assert.strictEqual(rn.overload_ok, null);
+  assert.strictEqual(rn.churn_margin_pct, null);
+  assert.strictEqual(rn.overload_margin_pct, null);
+  // Error seams.
+  assert.ok("error" in _v248({ rated_gpm: 0, rated_psi: 100 }));
+  assert.ok("error" in _v248({ rated_gpm: 500, rated_psi: 0 }));
+  assert.ok("error" in _v248({ rated_gpm: 500, rated_psi: 100, churn_psi: -1 }));
+  assert.ok("error" in _v248({ rated_gpm: 500, rated_psi: 100, overload_psi: -1 }));
+  assert.ok("error" in _v248({ rated_gpm: Infinity, rated_psi: 100 }));
+});
+
+test("bounds: spec-v249 computeSprinklerSystemDemand pins demand/total/volume for both hazard classes and error seams", () => {
+  const r = _v249({ density: 0.20, design_area: 1500, hose_gpm: 250, duration_min: 90 });
+  assert.ok(Math.abs(r.sprinkler_gpm - 300) < 1e-9);
+  assert.ok(Math.abs(r.total_gpm - 550) < 1e-9);
+  assert.ok(Math.abs(r.volume_gal - 49500) < 1e-9);
+  // Cross-check: Light Hazard office (0.10 / 1500 / 100 / 30).
+  const r2 = _v249({ density: 0.10, design_area: 1500, hose_gpm: 100, duration_min: 30 });
+  assert.ok(Math.abs(r2.sprinkler_gpm - 150) < 1e-9);
+  assert.ok(Math.abs(r2.total_gpm - 250) < 1e-9);
+  assert.ok(Math.abs(r2.volume_gal - 7500) < 1e-9);
+  // Zero hose allowance is legal (sprinkler-only demand).
+  assert.ok(Math.abs(_v249({ density: 0.20, design_area: 1500, hose_gpm: 0, duration_min: 90 }).total_gpm - 300) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v249({ density: 0, design_area: 1500, hose_gpm: 250, duration_min: 90 }));
+  assert.ok("error" in _v249({ density: 0.20, design_area: 0, hose_gpm: 250, duration_min: 90 }));
+  assert.ok("error" in _v249({ density: 0.20, design_area: 1500, hose_gpm: -1, duration_min: 90 }));
+  assert.ok("error" in _v249({ density: 0.20, design_area: 1500, hose_gpm: 250, duration_min: 0 }));
+  assert.ok("error" in _v249({ density: Infinity, design_area: 1500, hose_gpm: 250, duration_min: 90 }));
+});
+
+test("bounds: spec-v250 computeSprinklerHeadLayout pins the binding-cap flip, the coverage flag, and error seams", () => {
+  const r = _v250({ room_length: 40, room_width: 30, area_per_head: 130, max_spacing: 15 });
+  assert.ok(Math.abs(r.spacing - 11.40175425099138) < 1e-9); // area cap binds: sqrt(130) < 15
+  assert.strictEqual(r.heads_per_line, 4);
+  assert.strictEqual(r.num_lines, 3);
+  assert.strictEqual(r.total_heads, 12);
+  assert.ok(Math.abs(r.achieved_area_per_head - 100) < 1e-9);
+  assert.ok(Math.abs(r.max_wall_distance - 5.70087712549569) < 1e-9);
+  assert.strictEqual(r.coverage_ok, true);
+  // Cross-check: light hazard flips to the 15 ft linear cap.
+  const r2 = _v250({ room_length: 40, room_width: 30, area_per_head: 225, max_spacing: 15 });
+  assert.ok(Math.abs(r2.spacing - 15) < 1e-9); // sqrt(225) = 15: linear cap binds
+  assert.strictEqual(r2.total_heads, 6);
+  assert.ok(Math.abs(r2.achieved_area_per_head - 200) < 1e-9);
+  assert.strictEqual(r2.coverage_ok, true);
+  // The ceil() grid always achieves <= area_per_head, so coverage_ok holds
+  // even on a sliver room (the flag is a belt-and-suspenders invariant).
+  assert.strictEqual(_v250({ room_length: 1, room_width: 1, area_per_head: 130, max_spacing: 15 }).coverage_ok, true);
+  // Error seams.
+  assert.ok("error" in _v250({ room_length: 0, room_width: 30 }));
+  assert.ok("error" in _v250({ room_length: 40, room_width: 0 }));
+  assert.ok("error" in _v250({ room_length: 40, room_width: 30, area_per_head: 0 }));
+  assert.ok("error" in _v250({ room_length: 40, room_width: 30, max_spacing: 0 }));
+  assert.ok("error" in _v250({ room_length: Infinity, room_width: 30 }));
+});

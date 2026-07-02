@@ -1,6 +1,6 @@
 # roughlogic.com Specification v248 -- Fire Pump Rated / Churn / Overload Curve Check (NFPA 20) (calc-firesprinkler.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v248..v250 (the fire-sprinkler system-design trio -- the three numbers a
+> **Status: LANDED (2026-07-02, package 0.93.0; was PROPOSED 2026-07-01). Batch spec-v248..v250 (the fire-sprinkler system-design trio -- the three numbers a
 > sprinkler fitter or fire-protection designer sets before a single head goes up: the pump that has to feed the system,
 > the water demand and stored supply that pump must sustain, and the head layout that puts the density on the floor. This
 > spec opens the batch.**
