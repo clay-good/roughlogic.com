@@ -1,6 +1,6 @@
 # roughlogic.com Specification v251 -- Allowable Building Area per Story with Frontage and Sprinkler Increase (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v251..v253 (the IBC plan-review trio -- the three code gates every
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v251..v253 (the IBC plan-review trio -- the three code gates every
 > commercial permit set clears: how big the building may be (allowable area), how far it is to an exit (travel
 > distance), and how much glass the exterior wall may hold near a lot line (opening protection)). This spec opens the
 > batch.**

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v253 -- Exterior Wall Opening Protection by Fire Separation Distance (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v251..v253 (the IBC plan-review trio -- allowable area, egress travel
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v251..v253 (the IBC plan-review trio -- allowable area, egress travel
 > distance, and exterior opening protection). This spec closes the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: how much of an exterior wall may be windows and
 > doors depends entirely on how close that wall is to the property line, and that limit -- the maximum unprotected /

@@ -475,6 +475,12 @@ const _TILES = [
   ["ridge-cap-fasteners", "E"],
   // spec-v224..v226 ASCE 7 structural design-loads batch
   ["rain-load-ponding", "E"], ["asce7-load-combinations", "E"], ["seismic-base-shear", "E"],
+  // spec-v242..v244 IBC/IPC occupancy trio
+  ["occupant-load", "E"], ["egress-capacity", "E"], ["plumbing-fixture-count", "E"],
+  // spec-v245..v247 cast-in-place placing-and-curing trio
+  ["shore-post-load", "E"], ["concrete-evaporation-rate", "E"], ["concrete-strength-gain", "E"],
+  // spec-v251..v253 IBC plan-review trio
+  ["allowable-area", "E"], ["egress-travel-distance", "E"], ["exterior-opening-protection", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

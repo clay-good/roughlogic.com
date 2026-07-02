@@ -1,6 +1,6 @@
 # roughlogic.com Specification v243 -- Egress Capacity, Exit Count, and Required Width (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v242..v244 (the IBC/IPC occupancy trio -- occupant load, egress capacity,
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v242..v244 (the IBC/IPC occupancy trio -- occupant load, egress capacity,
 > and fixture count). This spec continues the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: once the occupant load is known, the number of
 > exits and the width of every door, stair, and corridor on the egress path is a direct code calculation the contractor

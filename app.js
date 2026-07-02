@@ -357,6 +357,12 @@ const TOOL_MODULES = (() => {
     "ice-barrier-coverage", "metal-roof-panels", "ridge-cap-fasteners",
     // spec-v224..v226 ASCE 7 structural design-loads batch.
     "rain-load-ponding", "asce7-load-combinations", "seismic-base-shear",
+    // spec-v242..v244 IBC/IPC occupancy trio.
+    "occupant-load", "egress-capacity", "plumbing-fixture-count",
+    // spec-v245..v247 cast-in-place placing-and-curing trio.
+    "shore-post-load", "concrete-evaporation-rate", "concrete-strength-gain",
+    // spec-v251..v253 IBC plan-review trio.
+    "allowable-area", "egress-travel-distance", "exterior-opening-protection",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.

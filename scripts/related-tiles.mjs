@@ -840,6 +840,18 @@ const RELATED = {
   "ice-barrier-coverage": ["roofing-squares","roof-pitch","gutter-downspout"],
   "metal-roof-panels": ["roofing-squares","roof-pitch","hip-valley-rafter"],
   "ridge-cap-fasteners": ["roofing-squares","hip-valley-rafter","ice-barrier-coverage"],
+  // spec-v242..v244 IBC/IPC occupancy trio
+  "occupant-load": ["egress-capacity","plumbing-fixture-count","ashrae-622-ventilation"],
+  "egress-capacity": ["occupant-load","plumbing-fixture-count","stair-stringer"],
+  "plumbing-fixture-count": ["occupant-load","sanitary-dfu","wsfu-demand"],
+  // spec-v245..v247 cast-in-place placing-and-curing trio
+  "shore-post-load": ["formwork-pressure","concrete-strength-gain","footing-area"],
+  "concrete-evaporation-rate": ["concrete-mix-design","control-joint-spacing","concrete-strength-gain"],
+  "concrete-strength-gain": ["shore-post-load","concrete-mix-design","concrete-evaporation-rate"],
+  // spec-v251..v253 IBC plan-review trio
+  "allowable-area": ["occupant-load","egress-capacity","exterior-opening-protection"],
+  "egress-travel-distance": ["egress-capacity","occupant-load","allowable-area"],
+  "exterior-opening-protection": ["allowable-area","egress-travel-distance","occupant-load"],
   // spec-v218..v220 residential air-tightness and ventilation batch (Group C)
   "blower-door-ach50": ["air-changes-hour","ashrae-622-ventilation","infiltration-load"],
   "ashrae-622-ventilation": ["blower-door-ach50","outdoor-air-ventilation","air-changes-hour"],

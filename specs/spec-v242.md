@@ -1,6 +1,6 @@
 # roughlogic.com Specification v242 -- Building Occupant Load from Area and Use (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v242..v244 (the IBC/IPC occupancy trio -- the one number the whole code
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v242..v244 (the IBC/IPC occupancy trio -- the one number the whole code
 > path hangs on (the occupant load), and the two demands it drives: the egress width and the fixture count). This spec
 > opens the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the occupant load is the first calculation a

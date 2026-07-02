@@ -1,6 +1,6 @@
 # roughlogic.com Specification v252 -- Egress Travel Distance, Common Path, and Dead-End Check (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v251..v253 (the IBC plan-review trio -- allowable area, egress travel
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v251..v253 (the IBC plan-review trio -- allowable area, egress travel
 > distance, and exterior opening protection). This spec continues the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: once a floor is laid out, the three distances that
 > decide whether the exits are close enough -- travel distance to the nearest exit, the common path before the occupant

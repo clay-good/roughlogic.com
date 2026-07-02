@@ -12288,3 +12288,196 @@ test("bounds: spec-v241 computeAirPressureSetpointSavings pins the 15-psi drop, 
   assert.ok("error" in _v241({ current_psig: 120, reduced_psig: 0, input_kw: 50, rate_kwh: 0.10 }));
   assert.ok("error" in _v241({ current_psig: Infinity, reduced_psig: 105, input_kw: 50, rate_kwh: 0.10 }));
 });
+
+// ===================== spec-v242..v247 + v251..v253 construction batches =====================
+import {
+  computeOccupantLoad as _v242, computeEgressCapacity as _v243, computePlumbingFixtureCount as _v244,
+  computeShorePostLoad as _v245, computeConcreteEvaporationRate as _v246, computeConcreteStrengthGain as _v247,
+  computeAllowableArea as _v251, computeEgressTravelDistance as _v252, computeExteriorOpeningProtection as _v253,
+} from "../../calc-construction.js";
+
+test("bounds: spec-v242 computeOccupantLoad pins the summed occupant load, per-space round-up, and error seams", () => {
+  const r = _v242({ spaces: [{ area: 3000, olf: 150 }, { area: 600, olf: 15 }] });
+  assert.strictEqual(r.total_load, 60);
+  assert.strictEqual(r.space_count, 2);
+  assert.deepStrictEqual(r.per_space.map((s) => s.load), [20, 40]);
+  // Cross-check dining room.
+  assert.strictEqual(_v242({ spaces: [{ area: 2400, olf: 15 }] }).total_load, 160);
+  // Round-up: a fraction of a person is a whole person.
+  assert.strictEqual(_v242({ spaces: [{ area: 151, olf: 150 }] }).total_load, 2);
+  // Error seams.
+  assert.ok("error" in _v242({ spaces: [] }));
+  assert.ok("error" in _v242({ spaces: [{ area: 0, olf: 150 }] }));
+  assert.ok("error" in _v242({ spaces: [{ area: 3000, olf: 0 }] }));
+  assert.ok("error" in _v242({ spaces: [{ area: Infinity, olf: 150 }] }));
+});
+
+test("bounds: spec-v243 computeEgressCapacity pins factor/exit-count/width, the door minimum, thresholds, and error seams", () => {
+  const r = _v243({ occupant_load: 160, sprinklered: true, path: "level", min_door_in: 32 });
+  assert.strictEqual(r.factor, 0.15);
+  assert.strictEqual(r.exits_required, 2);
+  assert.strictEqual(r.total_width_in, 24);
+  assert.strictEqual(r.per_exit_in, 32); // the door minimum governs
+  // Stairs, 1,000 occupants: the width governs.
+  const r2 = _v243({ occupant_load: 1000, sprinklered: true, path: "stair" });
+  assert.strictEqual(r2.exits_required, 3);
+  assert.strictEqual(r2.total_width_in, 200);
+  assert.ok(Math.abs(r2.per_exit_in - 66.6666667) < 1e-4);
+  // Non-sprinklered doubles the stair factor.
+  assert.strictEqual(_v243({ occupant_load: 1000, sprinklered: false, path: "stair" }).factor, 0.3);
+  // Exit-count thresholds at 49 / 500 / 1000.
+  assert.strictEqual(_v243({ occupant_load: 49 }).exits_required, 1);
+  assert.strictEqual(_v243({ occupant_load: 50 }).exits_required, 2);
+  assert.strictEqual(_v243({ occupant_load: 500 }).exits_required, 2);
+  assert.strictEqual(_v243({ occupant_load: 501 }).exits_required, 3);
+  assert.strictEqual(_v243({ occupant_load: 1000 }).exits_required, 3);
+  assert.strictEqual(_v243({ occupant_load: 1001 }).exits_required, 4);
+  // Error seams.
+  assert.ok("error" in _v243({ occupant_load: 0 }));
+  assert.ok("error" in _v243({ occupant_load: 160, min_door_in: 0 }));
+  assert.ok("error" in _v243({ occupant_load: Infinity }));
+});
+
+test("bounds: spec-v244 computePlumbingFixtureCount pins the two-tier WC schedule, round-up, and error seams", () => {
+  const r = _v244({ occupant_load: 100, wc_ratio: 25, wc_ratio_over: 50, wc_tier: 50, lav_ratio: 40, fountain_ratio: 100, distribution: 0.5 });
+  assert.strictEqual(r.wc_total, 4);
+  assert.strictEqual(r.lav_total, 4);
+  assert.strictEqual(r.fountains, 1);
+  assert.strictEqual(r.service_sinks, 1);
+  // A-2 restaurant single-tier 1:75 (ceil(80/75) = 2 per sex, 4 total).
+  const r2 = _v244({ occupant_load: 160, wc_ratio: 75, wc_ratio_over: 75, wc_tier: 0, lav_ratio: 200, fountain_ratio: 500 });
+  assert.strictEqual(r2.wc_total, 4);
+  assert.strictEqual(r2.lav_total, 2);
+  // Same 160 as an office needs the two-tier six.
+  assert.strictEqual(_v244({ occupant_load: 160 }).wc_total, 6);
+  // Error seams.
+  assert.ok("error" in _v244({ occupant_load: 0 }));
+  assert.ok("error" in _v244({ occupant_load: 100, wc_ratio: 0 }));
+  assert.ok("error" in _v244({ occupant_load: 100, lav_ratio: 0 }));
+  assert.ok("error" in _v244({ occupant_load: 100, fountain_ratio: 0 }));
+  assert.ok("error" in _v244({ occupant_load: 100, distribution: 1.5 }));
+  assert.ok("error" in _v244({ occupant_load: Infinity }));
+});
+
+test("bounds: spec-v245 computeShorePostLoad pins the design pressure, per-shore load, floor, and error seams", () => {
+  const r = _v245({ slab_in: 8, unit_weight: 150, form_load: 10, live_load: 50, spacing_x: 4, spacing_y: 4, shore_capacity: 6000, min_design_psf: 100 });
+  assert.strictEqual(r.slab_load, 100);
+  assert.strictEqual(r.design_psf, 160);
+  assert.strictEqual(r.shore_load, 2560);
+  assert.ok(Math.abs(r.utilization - 0.4266667) < 1e-4);
+  // Buggy live load 75, floor 125 (both under 185, so the sum governs).
+  assert.strictEqual(_v245({ slab_in: 8, live_load: 75, spacing_x: 4, spacing_y: 4, shore_capacity: 6000, min_design_psf: 125 }).shore_load, 2960);
+  // The 100 psf floor binds for a thin slab.
+  assert.strictEqual(_v245({ slab_in: 2, form_load: 0, live_load: 0, spacing_x: 4, spacing_y: 4, shore_capacity: 6000 }).design_psf, 100);
+  // Error seams.
+  assert.ok("error" in _v245({ slab_in: 0, spacing_x: 4, spacing_y: 4, shore_capacity: 6000 }));
+  assert.ok("error" in _v245({ slab_in: 8, spacing_x: 0, spacing_y: 4, shore_capacity: 6000 }));
+  assert.ok("error" in _v245({ slab_in: 8, spacing_x: 4, spacing_y: 4, shore_capacity: 0 }));
+  assert.ok("error" in _v245({ slab_in: 8, unit_weight: 0, spacing_x: 4, spacing_y: 4, shore_capacity: 6000 }));
+  assert.ok("error" in _v245({ slab_in: Infinity, spacing_x: 4, spacing_y: 4, shore_capacity: 6000 }));
+});
+
+test("bounds: spec-v246 computeConcreteEvaporationRate pins the metric/US rates, the flag, and error seams", () => {
+  const r = _v246({ air_temp_f: 90, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 });
+  assert.ok(Math.abs(r.E_metric - 1.5087177) < 1e-4);
+  assert.ok(Math.abs(r.E_us - 0.3089854) < 1e-5);
+  assert.strictEqual(r.flag, "precautions");
+  // Mild morning: no precautions.
+  const r2 = _v246({ air_temp_f: 70, concrete_temp_f: 70, rh_pct: 70, wind_mph: 10 });
+  assert.ok(Math.abs(r2.E_us - 0.0590407) < 1e-5);
+  assert.strictEqual(r2.flag, "ok");
+  // Concrete temp defaults to air temp.
+  assert.ok(Math.abs(_v246({ air_temp_f: 90, rh_pct: 40, wind_mph: 15 }).E_us - 0.3089854) < 1e-5);
+  // Error seams.
+  assert.ok("error" in _v246({ air_temp_f: 90, rh_pct: 101, wind_mph: 15 }));
+  assert.ok("error" in _v246({ air_temp_f: 90, rh_pct: -1, wind_mph: 15 }));
+  assert.ok("error" in _v246({ air_temp_f: 90, rh_pct: 40, wind_mph: -1 }));
+  assert.ok("error" in _v246({ air_temp_f: -50, rh_pct: 40, wind_mph: 15 }));
+  assert.ok("error" in _v246({ air_temp_f: Infinity, rh_pct: 40, wind_mph: 15 }));
+});
+
+test("bounds: spec-v247 computeConcreteStrengthGain pins the fraction, developed strength, inverse solve, and error seams", () => {
+  const r = _v247({ fc28: 4000, age_days: 7, a: 4.0, b: 0.85, target_pct: 75 });
+  assert.ok(Math.abs(r.fraction - 0.7035176) < 1e-6);
+  assert.ok(Math.abs(r.fc_t - 2814.0704) < 1e-2);
+  assert.ok(Math.abs(r.target_age - 8.2758621) < 1e-4);
+  // 3 days, no target.
+  const r2 = _v247({ fc28: 4000, age_days: 3 });
+  assert.ok(Math.abs(r2.fraction - 0.4580153) < 1e-6);
+  assert.ok(Math.abs(r2.fc_t - 1832.0611) < 1e-2);
+  assert.strictEqual(r2.target_age, null);
+  // Error seams.
+  assert.ok("error" in _v247({ fc28: 0, age_days: 7 }));
+  assert.ok("error" in _v247({ fc28: 4000, age_days: 0 }));
+  assert.ok("error" in _v247({ fc28: 4000, age_days: 7, a: 0 }));
+  assert.ok("error" in _v247({ fc28: 4000, age_days: 7, b: 0 }));
+  // Target at or above the 1/b asymptote (b = 0.85 -> asymptote ~117.6%).
+  assert.ok("error" in _v247({ fc28: 4000, age_days: 7, target_pct: 120 }));
+  assert.ok("error" in _v247({ fc28: Infinity, age_days: 7 }));
+});
+
+test("bounds: spec-v251 computeAllowableArea pins the frontage factor, allowable, boundaries, and error seams", () => {
+  const r = _v251({ tabular_area: 27000, ns_area: 9000, frontage_ft: 200, perimeter_ft: 400, open_width_ft: 30, actual_area: 25000 });
+  assert.ok(Math.abs(r.frontage_if - 0.25) < 1e-9);
+  assert.strictEqual(r.allowable, 29250);
+  assert.strictEqual(r.pass, true);
+  // Interior lot below the 25% frontage floor -> no increase, fails.
+  const r2 = _v251({ tabular_area: 9500, ns_area: 9500, frontage_ft: 50, perimeter_ft: 400, actual_area: 12000 });
+  assert.strictEqual(r2.frontage_if, 0);
+  assert.strictEqual(r2.allowable, 9500);
+  assert.strictEqual(r2.pass, false);
+  // F/P exactly 0.25 -> still no increase.
+  assert.strictEqual(_v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 100, perimeter_ft: 400 }).frontage_if, 0);
+  // W capped at 30 ft.
+  const rw = _v251({ tabular_area: 10000, ns_area: 10000, frontage_ft: 200, perimeter_ft: 400, open_width_ft: 60 });
+  assert.ok(Math.abs(rw.frontage_if - 0.25) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v251({ tabular_area: 0, perimeter_ft: 400 }));
+  assert.ok("error" in _v251({ tabular_area: 27000, perimeter_ft: 0 }));
+  assert.ok("error" in _v251({ tabular_area: 27000, frontage_ft: 500, perimeter_ft: 400 }));
+  assert.ok("error" in _v251({ tabular_area: Infinity, perimeter_ft: 400 }));
+});
+
+test("bounds: spec-v252 computeEgressTravelDistance pins the three checks, the conjunction, and error seams", () => {
+  const r = _v252({ travel_ft: 240, common_path_ft: 68, dead_end_ft: 18 });
+  assert.strictEqual(r.pass, true);
+  assert.strictEqual(r.margin_travel, 60);
+  assert.strictEqual(r.margin_common, 32);
+  assert.strictEqual(r.margin_deadend, 32);
+  // A single fail fails the floor (travel over the 200 ft S-1 limit).
+  const r2 = _v252({ travel_ft: 260, travel_limit_ft: 200, common_path_ft: 60, common_path_limit_ft: 75, dead_end_ft: 15, dead_end_limit_ft: 20 });
+  assert.strictEqual(r2.pass_travel, false);
+  assert.strictEqual(r2.pass_common, true);
+  assert.strictEqual(r2.pass_deadend, true);
+  assert.strictEqual(r2.pass, false);
+  // Exactly at the limit passes.
+  assert.strictEqual(_v252({ travel_ft: 300, common_path_ft: 100, dead_end_ft: 50 }).pass, true);
+  // Error seams.
+  assert.ok("error" in _v252({ travel_ft: -1, common_path_ft: 68, dead_end_ft: 18 }));
+  assert.ok("error" in _v252({ travel_ft: 240, travel_limit_ft: 0, common_path_ft: 68, dead_end_ft: 18 }));
+  assert.ok("error" in _v252({ travel_ft: Infinity, common_path_ft: 68, dead_end_ft: 18 }));
+});
+
+test("bounds: spec-v253 computeExteriorOpeningProtection pins the FSD bands, the no-limit crossover, and error seams", () => {
+  const r = _v253({ fsd_ft: 8, wall_area: 1200, protected: true, actual_opening: 240 });
+  assert.strictEqual(r.allowable_pct, 25);
+  assert.strictEqual(r.allowable_area, 300);
+  assert.strictEqual(r.pass, true);
+  // Nonsprinklered, too close: not permitted.
+  const r2 = _v253({ fsd_ft: 4, wall_area: 1000, protected: false, actual_opening: 100 });
+  assert.strictEqual(r2.allowable_pct, 0);
+  assert.strictEqual(r2.pass, false);
+  // Band boundaries.
+  assert.strictEqual(_v253({ fsd_ft: 2, wall_area: 1000 }).allowable_pct, 0);
+  assert.strictEqual(_v253({ fsd_ft: 4, wall_area: 1000, protected: true }).allowable_pct, 15);
+  assert.strictEqual(_v253({ fsd_ft: 22, wall_area: 1000, protected: false }).allowable_pct, 45);
+  // No-limit crossover.
+  const r3 = _v253({ fsd_ft: 35, wall_area: 1000, protected: false, actual_opening: 900 });
+  assert.strictEqual(r3.no_limit, true);
+  assert.strictEqual(r3.pass, true);
+  assert.strictEqual(_v253({ fsd_ft: 22, wall_area: 1000, protected: true }).no_limit, true);
+  // Error seams.
+  assert.ok("error" in _v253({ fsd_ft: -1, wall_area: 1000 }));
+  assert.ok("error" in _v253({ fsd_ft: 8, wall_area: 0 }));
+  assert.ok("error" in _v253({ fsd_ft: Infinity, wall_area: 1000 }));
+});

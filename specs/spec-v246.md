@@ -1,6 +1,6 @@
 # roughlogic.com Specification v246 -- Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v245..v247 (the cast-in-place placing-and-curing trio -- shore load,
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v245..v247 (the cast-in-place placing-and-curing trio -- shore load,
 > evaporation rate, and strength gain). This spec continues the batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: reading the evaporation rate off the day's weather
 > before the pour is the concrete finisher's go / no-go on plastic-shrinkage precautions, and it is a single ACI 305

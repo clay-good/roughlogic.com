@@ -688,6 +688,18 @@ export const COMPUTE_MAP = {
   "rain-load-ponding": { module: "../../calc-construction.js", fn: "computeRainLoadPonding" },
   "asce7-load-combinations": { module: "../../calc-construction.js", fn: "computeAsce7LoadCombinations" },
   "seismic-base-shear": { module: "../../calc-construction.js", fn: "computeSeismicBaseShear" },
+  // spec-v242..v244 IBC/IPC occupancy trio (3 tiles)
+  "occupant-load": { module: "../../calc-construction.js", fn: "computeOccupantLoad" },
+  "egress-capacity": { module: "../../calc-construction.js", fn: "computeEgressCapacity" },
+  "plumbing-fixture-count": { module: "../../calc-construction.js", fn: "computePlumbingFixtureCount" },
+  // spec-v245..v247 cast-in-place placing-and-curing trio (3 tiles)
+  "shore-post-load": { module: "../../calc-construction.js", fn: "computeShorePostLoad" },
+  "concrete-evaporation-rate": { module: "../../calc-construction.js", fn: "computeConcreteEvaporationRate" },
+  "concrete-strength-gain": { module: "../../calc-construction.js", fn: "computeConcreteStrengthGain" },
+  // spec-v251..v253 IBC plan-review trio (3 tiles)
+  "allowable-area": { module: "../../calc-construction.js", fn: "computeAllowableArea" },
+  "egress-travel-distance": { module: "../../calc-construction.js", fn: "computeEgressTravelDistance" },
+  "exterior-opening-protection": { module: "../../calc-construction.js", fn: "computeExteriorOpeningProtection" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },

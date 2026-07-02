@@ -26824,6 +26824,276 @@
           }
         }
       }
+    },
+    {
+      "tile_id": "occupant-load",
+      "source_publisher": "IBC 2021 Table 1004.5 occupant-load factors",
+      "source_title": "3,000 ft^2 office (150) + 600 ft^2 conference (15) -> 60 occupants",
+      "source_edition_or_year": "spec-v242 worked example (machine-verified)",
+      "source_section_or_page": "spec-v242 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "spaces": [{ "area": 3000, "olf": 150 }, { "area": 600, "olf": 15 }] },
+      "outputs": {
+        "total_load": { "value": 60, "tolerance": { "abs": 0 } },
+        "space_count": { "value": 2, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "occupant-load",
+      "source_publisher": "IBC 2021 Table 1004.5 occupant-load factors",
+      "source_title": "cross-check: 2,400 ft^2 dining at 15 net -> 160 occupants",
+      "source_edition_or_year": "spec-v242 worked example (machine-verified)",
+      "source_section_or_page": "spec-v242 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "spaces": [{ "area": 2400, "olf": 15 }] },
+      "outputs": {
+        "total_load": { "value": 160, "tolerance": { "abs": 0 } },
+        "space_count": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "egress-capacity",
+      "source_publisher": "IBC 2021 §1005.3 / §1006.2 / §1010.1.1",
+      "source_title": "160-occupant sprinklered restaurant, level egress -> 2 exits, 32 in per door",
+      "source_edition_or_year": "spec-v243 worked example (machine-verified)",
+      "source_section_or_page": "spec-v243 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "occupant_load": 160, "sprinklered": true, "path": "level", "min_door_in": 32 },
+      "outputs": {
+        "exits_required": { "value": 2, "tolerance": { "abs": 0 } },
+        "total_width_in": { "value": 24, "tolerance": { "abs": 0.01 } },
+        "per_exit_in": { "value": 32, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "egress-capacity",
+      "source_publisher": "IBC 2021 §1005.3 / §1006.2 / §1010.1.1",
+      "source_title": "cross-check: 1,000-occupant sprinklered assembly, stairs -> 3 stairs, 66.7 in each",
+      "source_edition_or_year": "spec-v243 worked example (machine-verified)",
+      "source_section_or_page": "spec-v243 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "occupant_load": 1000, "sprinklered": true, "path": "stair", "min_door_in": 32 },
+      "outputs": {
+        "exits_required": { "value": 3, "tolerance": { "abs": 0 } },
+        "total_width_in": { "value": 200, "tolerance": { "abs": 0.01 } },
+        "per_exit_in": { "value": 66.6666667, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "plumbing-fixture-count",
+      "source_publisher": "IBC 2021 Table 2902.1 (mirrored in IPC Table 403.1)",
+      "source_title": "100-occupant business office -> 4 water closets, 4 lavatories, 1 fountain",
+      "source_edition_or_year": "spec-v244 worked example (machine-verified)",
+      "source_section_or_page": "spec-v244 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "occupant_load": 100, "wc_ratio": 25, "wc_ratio_over": 50, "wc_tier": 50, "lav_ratio": 40, "fountain_ratio": 100, "distribution": 0.5 },
+      "outputs": {
+        "wc_total": { "value": 4, "tolerance": { "abs": 0 } },
+        "lav_total": { "value": 4, "tolerance": { "abs": 0 } },
+        "fountains": { "value": 1, "tolerance": { "abs": 0 } },
+        "service_sinks": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "plumbing-fixture-count",
+      "source_publisher": "IBC 2021 Table 2902.1 (mirrored in IPC Table 403.1)",
+      "source_title": "cross-check: 160-occupant A-2 restaurant (1:75 / 1:200) -> 4 water closets, 2 lavatories",
+      "source_edition_or_year": "spec-v244 worked example (machine-verified; corrects the spec cross-check ceil arithmetic)",
+      "source_section_or_page": "spec-v244 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "occupant_load": 160, "wc_ratio": 75, "wc_ratio_over": 75, "wc_tier": 0, "lav_ratio": 200, "fountain_ratio": 500, "distribution": 0.5 },
+      "outputs": {
+        "wc_total": { "value": 4, "tolerance": { "abs": 0 } },
+        "lav_total": { "value": 2, "tolerance": { "abs": 0 } },
+        "fountains": { "value": 1, "tolerance": { "abs": 0 } },
+        "service_sinks": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "shore-post-load",
+      "source_publisher": "ACI 347 Guide to Formwork for Concrete",
+      "source_title": "8 in slab on a 4 ft shore grid -> 2,560 lb per shore, 0.43 utilization",
+      "source_edition_or_year": "spec-v245 worked example (machine-verified)",
+      "source_section_or_page": "spec-v245 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "slab_in": 8, "unit_weight": 150, "form_load": 10, "live_load": 50, "spacing_x": 4, "spacing_y": 4, "shore_capacity": 6000, "min_design_psf": 100 },
+      "outputs": {
+        "slab_load": { "value": 100, "tolerance": { "abs": 0.01 } },
+        "design_psf": { "value": 160, "tolerance": { "abs": 0.01 } },
+        "shore_load": { "value": 2560, "tolerance": { "abs": 0.01 } },
+        "utilization": { "value": 0.4266667, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "shore-post-load",
+      "source_publisher": "ACI 347 Guide to Formwork for Concrete",
+      "source_title": "cross-check: motorized buggies (75 psf live, 125 psf floor) -> 2,960 lb per shore",
+      "source_edition_or_year": "spec-v245 worked example (machine-verified)",
+      "source_section_or_page": "spec-v245 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "slab_in": 8, "unit_weight": 150, "form_load": 10, "live_load": 75, "spacing_x": 4, "spacing_y": 4, "shore_capacity": 6000, "min_design_psf": 125 },
+      "outputs": {
+        "design_psf": { "value": 185, "tolerance": { "abs": 0.01 } },
+        "shore_load": { "value": 2960, "tolerance": { "abs": 0.01 } },
+        "utilization": { "value": 0.4933333, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "concrete-evaporation-rate",
+      "source_publisher": "ACI 305 Hot Weather Concreting / Menzel-NRMCA equation",
+      "source_title": "90 F, 40% RH, 15 mph pour -> 0.31 lb/ft^2/hr, precautions",
+      "source_edition_or_year": "spec-v246 worked example (machine-verified)",
+      "source_section_or_page": "spec-v246 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "air_temp_f": 90, "concrete_temp_f": 90, "rh_pct": 40, "wind_mph": 15 },
+      "outputs": {
+        "E_metric": { "value": 1.5087177, "tolerance": { "abs": 0.001 } },
+        "E_us": { "value": 0.3089854, "tolerance": { "abs": 0.001 } },
+        "flag": { "value": "precautions", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "concrete-evaporation-rate",
+      "source_publisher": "ACI 305 Hot Weather Concreting / Menzel-NRMCA equation",
+      "source_title": "cross-check: mild 70 F, 70% RH, 10 mph -> 0.059 lb/ft^2/hr, ok",
+      "source_edition_or_year": "spec-v246 worked example (machine-verified)",
+      "source_section_or_page": "spec-v246 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "air_temp_f": 70, "concrete_temp_f": 70, "rh_pct": 70, "wind_mph": 10 },
+      "outputs": {
+        "E_metric": { "value": 0.2882847, "tolerance": { "abs": 0.001 } },
+        "E_us": { "value": 0.0590407, "tolerance": { "abs": 0.001 } },
+        "flag": { "value": "ok", "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "concrete-strength-gain",
+      "source_publisher": "ACI 209R strength-development model",
+      "source_title": "4,000 psi slab at 7 days -> 2,814 psi (70%), 8.3 days to 75%",
+      "source_edition_or_year": "spec-v247 worked example (machine-verified)",
+      "source_section_or_page": "spec-v247 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc28": 4000, "age_days": 7, "a": 4.0, "b": 0.85, "target_pct": 75 },
+      "outputs": {
+        "fraction": { "value": 0.7035176, "tolerance": { "abs": 0.0001 } },
+        "fc_t": { "value": 2814.0704, "tolerance": { "abs": 0.5 } },
+        "target_age": { "value": 8.2758621, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "concrete-strength-gain",
+      "source_publisher": "ACI 209R strength-development model",
+      "source_title": "cross-check: same mix at 3 days -> 1,832 psi (46%)",
+      "source_edition_or_year": "spec-v247 worked example (machine-verified)",
+      "source_section_or_page": "spec-v247 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc28": 4000, "age_days": 3, "a": 4.0, "b": 0.85 },
+      "outputs": {
+        "fraction": { "value": 0.4580153, "tolerance": { "abs": 0.0001 } },
+        "fc_t": { "value": 1832.0611, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "allowable-area",
+      "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
+      "source_title": "VB / B corner-lot office, sprinklered -> 29,250 ft^2 allowable, 25,000 passes",
+      "source_edition_or_year": "spec-v251 worked example (machine-verified)",
+      "source_section_or_page": "spec-v251 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "tabular_area": 27000, "ns_area": 9000, "frontage_ft": 200, "perimeter_ft": 400, "open_width_ft": 30, "actual_area": 25000 },
+      "outputs": {
+        "frontage_if": { "value": 0.25, "tolerance": { "abs": 0.0001 } },
+        "allowable": { "value": 29250, "tolerance": { "abs": 0.01 } },
+        "pass": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "allowable-area",
+      "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
+      "source_title": "cross-check: IIB / A-2 nonsprinklered restaurant, interior lot -> 9,500 ft^2, 12,000 fails",
+      "source_edition_or_year": "spec-v251 worked example (machine-verified)",
+      "source_section_or_page": "spec-v251 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "tabular_area": 9500, "ns_area": 9500, "frontage_ft": 50, "perimeter_ft": 400, "open_width_ft": 30, "actual_area": 12000 },
+      "outputs": {
+        "frontage_if": { "value": 0, "tolerance": { "abs": 0.0001 } },
+        "allowable": { "value": 9500, "tolerance": { "abs": 0.01 } },
+        "pass": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "egress-travel-distance",
+      "source_publisher": "IBC 2021 §1017 / §1006.2.1 / §1020.5",
+      "source_title": "sprinklered Group B floor 240 / 68 / 18 vs 300 / 100 / 50 -> all pass",
+      "source_edition_or_year": "spec-v252 worked example (machine-verified)",
+      "source_section_or_page": "spec-v252 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "travel_ft": 240, "travel_limit_ft": 300, "common_path_ft": 68, "common_path_limit_ft": 100, "dead_end_ft": 18, "dead_end_limit_ft": 50 },
+      "outputs": {
+        "pass": { "value": 1, "tolerance": { "abs": 0 } },
+        "pass_travel": { "value": 1, "tolerance": { "abs": 0 } },
+        "margin_travel": { "value": 60, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "egress-travel-distance",
+      "source_publisher": "IBC 2021 §1017 / §1006.2.1 / §1020.5",
+      "source_title": "cross-check: nonsprinklered S-1 warehouse 260 vs 200 travel limit -> fails",
+      "source_edition_or_year": "spec-v252 worked example (machine-verified)",
+      "source_section_or_page": "spec-v252 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "travel_ft": 260, "travel_limit_ft": 200, "common_path_ft": 60, "common_path_limit_ft": 75, "dead_end_ft": 15, "dead_end_limit_ft": 20 },
+      "outputs": {
+        "pass": { "value": 0, "tolerance": { "abs": 0 } },
+        "pass_travel": { "value": 0, "tolerance": { "abs": 0 } },
+        "pass_common": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "exterior-opening-protection",
+      "source_publisher": "IBC 2021 Table 705.8",
+      "source_title": "sprinklered wall 8 ft from the line, 1,200 ft^2 -> 25%, 300 ft^2 allowed, 240 passes",
+      "source_edition_or_year": "spec-v253 worked example (machine-verified)",
+      "source_section_or_page": "spec-v253 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fsd_ft": 8, "wall_area": 1200, "protected": true, "actual_opening": 240 },
+      "outputs": {
+        "allowable_pct": { "value": 25, "tolerance": { "abs": 0.01 } },
+        "allowable_area": { "value": 300, "tolerance": { "abs": 0.01 } },
+        "pass": { "value": 1, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "exterior-opening-protection",
+      "source_publisher": "IBC 2021 Table 705.8",
+      "source_title": "cross-check: nonsprinklered wall 4 ft from the line -> not permitted, any window fails",
+      "source_edition_or_year": "spec-v253 worked example (machine-verified)",
+      "source_section_or_page": "spec-v253 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fsd_ft": 4, "wall_area": 1000, "protected": false, "actual_opening": 100 },
+      "outputs": {
+        "allowable_pct": { "value": 0, "tolerance": { "abs": 0.01 } },
+        "allowable_area": { "value": 0, "tolerance": { "abs": 0.01 } },
+        "pass": { "value": 0, "tolerance": { "abs": 0 } }
+      }
     }
   ]
 }

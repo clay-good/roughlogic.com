@@ -4704,3 +4704,447 @@ CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
   ],
   compute: computeSeismicBaseShear,
 });
+
+// ===================================================================================
+// spec-v242..v244 IBC/IPC occupancy trio + spec-v245..v247 cast-in-place concrete
+// trio + spec-v251..v253 IBC plan-review trio (Group E). The three code numbers a
+// tenant-improvement clears (occupant load -> egress -> fixtures), the three a
+// concrete super manages between the takeoff and the finished slab (shore load,
+// evaporation, strength gain), and the three every commercial permit set clears
+// (allowable area, travel distance, opening protection). Each is a design/takeoff
+// aid, not a code-official determination. Lazy-loaded, absent from the home paint.
+// ===================================================================================
+
+// ----- spec-v242: Building Occupant Load from Area and Use (IBC 2021 §1004.5) -----
+
+// dims: in { spaces: dimensionless } out: { total_load: dimensionless, space_count: dimensionless }
+export function computeOccupantLoad({ spaces = [] } = {}) {
+  if (!Array.isArray(spaces) || spaces.length === 0) return { error: "Provide at least one space (area + occupant-load factor)." };
+  let total_load = 0;
+  const per_space = [];
+  for (const s of spaces) {
+    const area = Number(s.area);
+    const olf = Number(s.olf);
+    if (!Number.isFinite(area) || !Number.isFinite(olf)) return { error: "All space inputs must be finite numbers." };
+    if (!(area > 0)) return { error: "Each space area must be positive (ft^2)." };
+    if (!(olf > 0)) return { error: "Each occupant-load factor must be positive (ft^2/occupant)." };
+    // IBC §1004.2: a fraction of a person is counted as a whole person.
+    const load = Math.ceil(area / olf);
+    per_space.push({ area, olf, load });
+    total_load += load;
+  }
+  return { per_space, total_load, space_count: spaces.length };
+}
+
+export const occupantLoadExample = {
+  inputs: { spaces: [{ area: 3000, olf: 150 }, { area: 600, olf: 15 }] },
+};
+
+// Custom renderer: three space rows (area + occupant-load factor), summed.
+function _renderOccupantLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IBC 2021 §1004.5 and Table 1004.5 (occupant load = sum over spaces of ceil(area / occupant-load factor)); §1004.2 (round each space up to a whole person). Representative factors (ft^2/occ): assembly standing 5 net, chairs-only 7 net, tables-and-chairs 15 net, business 150 gross, mercantile 60 gross, classroom 20 net, commercial kitchen 200 gross, industrial 100 gross, storage 500 gross, residential 200 gross. The factor and its net-vs-gross basis come from the AHJ-adopted code edition and the actual use, not the tenant's label; a mezzanine or accessory use is its own line. A design aid, not a code-official determination.";
+  _aeC(inputRegion, () => fillExample(occupantLoadExample.inputs));
+  const rows = [];
+  for (let i = 1; i <= 3; i++) {
+    const a = _mnC("Space " + i + " area (ft^2)", "ocl-a" + i, { step: "any", min: "0" });
+    const o = _mnC("Space " + i + " factor (ft^2/occ)", "ocl-o" + i, { step: "any", min: "0" });
+    inputRegion.appendChild(a.wrap); inputRegion.appendChild(o.wrap);
+    rows.push({ a, o });
+  }
+  const oT = _moC(outputRegion, "Total occupant load", "ocl-out-t");
+  const oB = _moC(outputRegion, "By space", "ocl-out-b");
+  function fillExample(x) {
+    const sp = x.spaces || [];
+    for (let i = 0; i < 3; i++) {
+      rows[i].a.input.value = sp[i] ? sp[i].area : "";
+      rows[i].o.input.value = sp[i] ? sp[i].olf : "";
+    }
+    update();
+  }
+  const update = _debC(() => {
+    const spaces = [];
+    for (const r of rows) {
+      const area = Number(r.a.input.value) || 0;
+      const olf = Number(r.o.input.value) || 0;
+      if (area > 0 && olf > 0) spaces.push({ area, olf });
+    }
+    if (spaces.length === 0) { oT.textContent = "Enter at least one space."; oB.textContent = "-"; return; }
+    const r = computeOccupantLoad({ spaces });
+    if (r.error) { oT.textContent = r.error; oB.textContent = "-"; return; }
+    oT.textContent = r.total_load + " occupants";
+    oB.textContent = r.per_space.map((s) => s.load).join(" + ") + " = " + r.total_load;
+  }, _DC);
+  for (const r of rows) { r.a.input.addEventListener("input", update); r.o.input.addEventListener("input", update); }
+}
+CONSTRUCTION_RENDERERS["occupant-load"] = _renderOccupantLoad;
+
+// ----- spec-v243: Egress Capacity, Exit Count, and Required Width (IBC 2021 §1005.3 / §1006.2 / §1010.1.1) -----
+
+// dims: in { occupant_load: dimensionless, min_door_in: L } out: { total_width_in: L, per_exit_in: L, exits_required: dimensionless }
+export function computeEgressCapacity({ occupant_load = 0, sprinklered = true, path = "level", min_door_in = 32 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
+  if (!(min_door_in > 0)) return { error: "Minimum door clear width must be positive (in)." };
+  const sprk = sprinklered === true || sprinklered === "yes" || sprinklered === "true";
+  const isStair = path === "stair";
+  const factor = isStair ? (sprk ? 0.2 : 0.3) : (sprk ? 0.15 : 0.2);
+  const exits_required = occupant_load <= 49 ? 1 : occupant_load <= 500 ? 2 : occupant_load <= 1000 ? 3 : 4;
+  const total_width_in = occupant_load * factor;
+  const per_exit_in = Math.max(total_width_in / exits_required, min_door_in);
+  const governed = per_exit_in === min_door_in ? "door/leaf minimum" : "required width";
+  return { factor, exits_required, total_width_in, per_exit_in, governed, sprinklered: sprk, path: isStair ? "stair" : "level" };
+}
+
+export const egressCapacityExample = {
+  inputs: { occupant_load: 160, sprinklered: true, path: "level", min_door_in: 32 },
+};
+
+function _renderEgressCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IBC 2021 §1005.3 (egress width = occupant load x capacity factor), §1006.2 / Table 1006.3.4 (exit-count thresholds: 1 up to 49, 2 to 500, 3 to 1000, 4 beyond), §1010.1.1 (32 in minimum door clear width). Capacity factors: sprinklered-with-alarm 0.2 in/occ stairs, 0.15 in/occ level; non-sprinklered 0.3 / 0.2. The reduced factors require the §1005.3.1/.2 sprinkler and emergency-communication conditions; the width is divided among the required exits; the door-leaf minimum and §1005.7 projections can govern. A design aid, not a code-official determination.";
+  _aeC(inputRegion, () => fillExample(egressCapacityExample.inputs));
+  const ol = _mnC("Occupant load (persons)", "egc-ol", { step: "any", min: "0" });
+  const sp = _msC("Sprinklered + alarm (1005.3.1/.2)", "egc-sp", [{ value: "yes", label: "Yes" }, { value: "no", label: "No" }]);
+  const pa = _msC("Egress component", "egc-pa", [{ value: "level", label: "Level (doors, corridors, ramps)" }, { value: "stair", label: "Stairway" }]);
+  const md = _mnC("Minimum door clear width (in)", "egc-md", { step: "any", min: "0" });
+  md.input.value = "32";
+  for (const f of [ol, sp, pa, md]) inputRegion.appendChild(f.wrap);
+  const oE = _moC(outputRegion, "Exits required", "egc-out-e");
+  const oT = _moC(outputRegion, "Total egress width", "egc-out-t");
+  const oP = _moC(outputRegion, "Width per exit", "egc-out-p");
+  const oG = _moC(outputRegion, "Governed by", "egc-out-g");
+  function fillExample(x) { ol.input.value = x.occupant_load; sp.select.value = x.sprinklered ? "yes" : "no"; pa.select.value = x.path; md.input.value = x.min_door_in; update(); }
+  const update = _debC(() => {
+    const r = computeEgressCapacity({ occupant_load: Number(ol.input.value) || 0, sprinklered: sp.select.value, path: pa.select.value, min_door_in: Number(md.input.value) || 0 });
+    if (r.error) { oE.textContent = r.error; oT.textContent = "-"; oP.textContent = "-"; oG.textContent = "-"; return; }
+    oE.textContent = String(r.exits_required);
+    oT.textContent = _fmtC(r.total_width_in, 1) + " in";
+    oP.textContent = _fmtC(r.per_exit_in, 1) + " in";
+    oG.textContent = r.governed;
+  }, _DC);
+  for (const f of [ol.input, sp.select, pa.select, md.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["egress-capacity"] = _renderEgressCapacity;
+
+// ----- spec-v244: Required Plumbing Fixture Count by Occupancy (IBC 2021 §2902 / Table 2902.1) -----
+
+// dims: in { occupant_load: dimensionless, wc_ratio: dimensionless, wc_ratio_over: dimensionless, wc_tier: dimensionless, lav_ratio: dimensionless, fountain_ratio: dimensionless, distribution: dimensionless } out: { wc_total: dimensionless, lav_total: dimensionless, fountains: dimensionless, service_sinks: dimensionless }
+export function computePlumbingFixtureCount({ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_ratio = 40, fountain_ratio = 100, distribution = 0.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(occupant_load > 0)) return { error: "Occupant load must be positive." };
+  if (!(wc_ratio > 0)) return { error: "Water-closet ratio must be positive." };
+  if (!(lav_ratio > 0)) return { error: "Lavatory ratio must be positive." };
+  if (!(fountain_ratio > 0)) return { error: "Drinking-fountain ratio must be positive." };
+  if (!(distribution >= 0 && distribution <= 1)) return { error: "Distribution must be between 0 and 1." };
+  // Per sex, per IBC §2902.1.1 each ratio rounds up. The water closet uses a
+  // two-tier schedule (wc_ratio for the first wc_tier occupants, wc_ratio_over
+  // beyond); set wc_tier = 0 for a single-tier ratio.
+  const wcFor = (n) => {
+    const tierN = Math.min(n, wc_tier);
+    const over = Math.max(n - wc_tier, 0);
+    return Math.ceil(tierN / wc_ratio) + (wc_ratio_over > 0 ? Math.ceil(over / wc_ratio_over) : 0);
+  };
+  const per_sex_a = occupant_load * distribution;
+  const per_sex_b = occupant_load * (1 - distribution);
+  const wc_a = wcFor(per_sex_a);
+  const wc_b = wcFor(per_sex_b);
+  const lav_a = Math.ceil(per_sex_a / lav_ratio);
+  const lav_b = Math.ceil(per_sex_b / lav_ratio);
+  const wc_total = wc_a + wc_b;
+  const lav_total = lav_a + lav_b;
+  const fountains = Math.ceil(occupant_load / fountain_ratio);
+  return { per_sex_a, per_sex_b, wc_a, wc_b, lav_a, lav_b, wc_total, lav_total, fountains, service_sinks: 1 };
+}
+
+export const plumbingFixtureCountExample = {
+  inputs: { occupant_load: 100, wc_ratio: 25, wc_ratio_over: 50, wc_tier: 50, lav_ratio: 40, fountain_ratio: 100, distribution: 0.5 },
+};
+
+const _renderPlumbingFixtureCount = _simpleRenderer({
+  citation: "Citation: IBC 2021 §2902 and Table 2902.1 (mirrored in IPC Table 403.1): fixtures = ceil(occupants-per-sex / ratio), each rounded up per §2902.1.1; the load splits evenly between two sexes unless a distribution override is given. Representative ratios: business water closet 1:25 first-50 then 1:50, lavatory 1:40; restaurant (A-2) water closet 1:75, lavatory 1:200; drinking fountain 1:100 business / 1:500 assembly; service sink minimum 1. The ratios, net-vs-gross basis, even-split assumption, and any single-user/family-restroom reductions come from the AHJ-adopted code edition and the actual occupancy. A design aid, not a code-official determination.",
+  example: plumbingFixtureCountExample.inputs,
+  fields: [
+    { key: "occupant_load", label: "Occupant load (persons)", kind: "number" },
+    { key: "wc_ratio", label: "WC ratio, first tier (occ/WC)", kind: "number", default: 25 },
+    { key: "wc_ratio_over", label: "WC ratio above tier (0 = n/a)", kind: "number", default: 50 },
+    { key: "wc_tier", label: "First-tier size per sex (0 = single)", kind: "number", default: 50 },
+    { key: "lav_ratio", label: "Lavatory ratio (occ/lav)", kind: "number", default: 40 },
+    { key: "fountain_ratio", label: "Fountain ratio (occ/DF)", kind: "number", default: 100 },
+    { key: "distribution", label: "Share as one sex (0-1)", kind: "number", default: 0.5 },
+  ],
+  outputs: [
+    { key: "wc", id: "pfc-out-wc", label: "Water closets (total)", value: (r) => String(r.wc_total) },
+    { key: "lav", id: "pfc-out-lav", label: "Lavatories (total)", value: (r) => String(r.lav_total) },
+    { key: "df", id: "pfc-out-df", label: "Drinking fountains", value: (r) => String(r.fountains) },
+    { key: "ss", id: "pfc-out-ss", label: "Service sinks", value: (r) => String(r.service_sinks) },
+    { key: "sx", id: "pfc-out-sx", label: "Per sex (WC / lav)", value: (r) => r.wc_a + " / " + r.lav_a + " each" },
+  ],
+  compute: computePlumbingFixtureCount,
+});
+CONSTRUCTION_RENDERERS["plumbing-fixture-count"] = _renderPlumbingFixtureCount;
+
+// ----- spec-v245: Formwork Shore Post Load and Spacing (ACI 347) -----
+
+// dims: in { slab_in: L, unit_weight: M L^-3, form_load: M L^-1 T^-2, live_load: M L^-1 T^-2, spacing_x: L, spacing_y: L, shore_capacity: M L T^-2, min_design_psf: M L^-1 T^-2 } out: { slab_load: M L^-1 T^-2, design_psf: M L^-1 T^-2, shore_load: M L T^-2, utilization: dimensionless }
+export function computeShorePostLoad({ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x = 0, spacing_y = 0, shore_capacity = 0, min_design_psf = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(slab_in > 0)) return { error: "Slab thickness must be positive (in)." };
+  if (!(unit_weight > 0)) return { error: "Unit weight must be positive (pcf)." };
+  if (!(spacing_x > 0) || !(spacing_y > 0)) return { error: "Shore spacing must be positive (ft)." };
+  if (!(shore_capacity > 0)) return { error: "Rated shore capacity must be positive (lb)." };
+  if (form_load < 0 || live_load < 0 || min_design_psf < 0) return { error: "Loads cannot be negative (psf)." };
+  const slab_load = slab_in / 12 * unit_weight;
+  // ACI 347: combined design load not less than 100 psf (125 with buggies).
+  const design_psf = Math.max(slab_load + form_load + live_load, min_design_psf);
+  const trib_area = spacing_x * spacing_y;
+  const shore_load = design_psf * trib_area;
+  const utilization = shore_load / shore_capacity;
+  return { slab_load, design_psf, trib_area, shore_load, utilization };
+}
+
+export const shorePostLoadExample = {
+  inputs: { slab_in: 8, unit_weight: 150, form_load: 10, live_load: 50, spacing_x: 4, spacing_y: 4, shore_capacity: 6000, min_design_psf: 100 },
+};
+
+const _renderShorePostLoad = _simpleRenderer({
+  citation: "Citation: ACI 347 (Guide to Formwork for Concrete): design pressure = max(slab_in/12 x unit weight + form load + construction live load, 100 psf minimum); load per shore = design pressure x tributary area (spacing_x x spacing_y). Construction live load rises to 75 psf and the floor to 125 psf where motorized buggies run. The rated shore capacity is the manufacturer's allowable for the extended height and bracing (a taller or unbraced post rates far lower); reshoring and multi-level load distribution (ACI 347.2R) and the strength of the slab below are separate analyses. A design aid, not a stamped shoring plan.",
+  example: shorePostLoadExample.inputs,
+  fields: [
+    { key: "slab_in", label: "Slab / pour thickness (in)", kind: "number" },
+    { key: "unit_weight", label: "Concrete unit weight (pcf)", kind: "number", default: 150 },
+    { key: "form_load", label: "Formwork dead load (psf)", kind: "number", default: 10 },
+    { key: "live_load", label: "Construction live load (psf)", kind: "number", default: 50 },
+    { key: "spacing_x", label: "Shore spacing one way (ft)", kind: "number" },
+    { key: "spacing_y", label: "Shore spacing other way (ft)", kind: "number" },
+    { key: "shore_capacity", label: "Rated shore capacity (lb)", kind: "number" },
+    { key: "min_design_psf", label: "Combined-load floor (psf)", kind: "number", default: 100 },
+  ],
+  outputs: [
+    { key: "sl", id: "spl-out-sl", label: "Slab dead load", value: (r) => _fmtC(r.slab_load, 1) + " psf" },
+    { key: "dp", id: "spl-out-dp", label: "Design pressure", value: (r) => _fmtC(r.design_psf, 1) + " psf" },
+    { key: "sh", id: "spl-out-sh", label: "Load per shore", value: (r) => _fmtC(r.shore_load, 0) + " lb" },
+    { key: "ut", id: "spl-out-ut", label: "Utilization", value: (r) => _fmtC(r.utilization, 2) + (r.utilization > 1 ? " (OVER capacity)" : "") },
+  ],
+  compute: computeShorePostLoad,
+});
+CONSTRUCTION_RENDERERS["shore-post-load"] = _renderShorePostLoad;
+
+// ----- spec-v246: Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) -----
+
+// dims: in { air_temp_f: T, concrete_temp_f: T, rh_pct: dimensionless, wind_mph: L T^-1 } out: { E_metric: M L^-2 T^-1, E_us: M L^-2 T^-1 }
+export function computeConcreteEvaporationRate({ air_temp_f = 70, concrete_temp_f = null, rh_pct = 50, wind_mph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ct = (concrete_temp_f === null || concrete_temp_f === undefined || concrete_temp_f === "") ? air_temp_f : concrete_temp_f;
+  if (!(rh_pct >= 0 && rh_pct <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
+  if (wind_mph < 0) return { error: "Wind speed cannot be negative (mph)." };
+  const Tc = (ct - 32) / 1.8;
+  const Ta = (air_temp_f - 32) / 1.8;
+  // The Menzel/NRMCA form needs (T + 18) > 0 (i.e. T > -18 C, ~ 0 F).
+  if (Tc <= -18 || Ta <= -18) return { error: "Temperature is below the model's valid range (about 0 F)." };
+  const V = wind_mph * 1.609;
+  const E_metric = 5 * (Math.pow(Tc + 18, 2.5) - (rh_pct / 100) * Math.pow(Ta + 18, 2.5)) * (V + 4) * 1e-6;
+  const E_us = E_metric * 0.2048;
+  const flag = E_us >= 0.2 ? "precautions" : E_us >= 0.1 ? "caution" : "ok";
+  return { Tc, Ta, E_metric, E_us, flag };
+}
+
+export const concreteEvaporationRateExample = {
+  inputs: { air_temp_f: 90, concrete_temp_f: 90, rh_pct: 40, wind_mph: 15 },
+};
+
+const _renderConcreteEvaporationRate = _simpleRenderer({
+  citation: "Citation: ACI 305 (Hot Weather Concreting) nomograph and the Menzel/NRMCA evaporation equation: E [kg/m^2/hr] = 5 x [(Tc + 18)^2.5 - (RH/100)(Ta + 18)^2.5](V + 4) x 10^-6, with Tc, Ta in C and V in km/h (converted from F and mph; 1 kg/m^2/hr = 0.2048 lb/ft^2/hr). Take precautions above 0.2 lb/ft^2/hr (~1.0 kg/m^2/hr); use the lower 0.1 lb/ft^2/hr caution for low-bleed mixes (low w/c, silica fume, high-early cement). The concrete temperature, not the air, drives the vapor term; a low-bleed mix cracks below the nominal threshold. A field screen, not a curing specification (curing follows ACI 308).",
+  example: concreteEvaporationRateExample.inputs,
+  fields: [
+    { key: "air_temp_f", label: "Air temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "concrete_temp_f", label: "Concrete temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "rh_pct", label: "Relative humidity (%)", kind: "number" },
+    { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
+  ],
+  outputs: [
+    { key: "us", id: "cer-out-us", label: "Evaporation rate", value: (r) => _fmtC(r.E_us, 3) + " lb/ft^2/hr" },
+    { key: "me", id: "cer-out-me", label: "Metric rate", value: (r) => _fmtC(r.E_metric, 3) + " kg/m^2/hr" },
+    { key: "fl", id: "cer-out-fl", label: "Plastic-shrinkage risk", value: (r) => r.flag === "precautions" ? "TAKE PRECAUTIONS" : r.flag === "caution" ? "Caution (low-bleed mix)" : "OK" },
+  ],
+  compute: computeConcreteEvaporationRate,
+});
+CONSTRUCTION_RENDERERS["concrete-evaporation-rate"] = _renderConcreteEvaporationRate;
+
+// ----- spec-v247: Concrete Age-Strength Gain for Form Stripping and Loading (ACI 209) -----
+
+// dims: in { fc28: M L^-1 T^-2, age_days: T, a: T, b: dimensionless, target_pct: dimensionless } out: { fraction: dimensionless, fc_t: M L^-1 T^-2 }
+export function computeConcreteStrengthGain({ fc28 = 0, age_days = 0, a = 4.0, b = 0.85, target_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fc28 > 0)) return { error: "Specified 28-day strength must be positive (psi)." };
+  if (!(age_days > 0)) return { error: "Age must be positive (days)." };
+  if (!(a > 0) || !(b > 0)) return { error: "ACI 209 constants a and b must be positive." };
+  const fraction = age_days / (a + b * age_days);
+  const fc_t = fraction * fc28;
+  let target_age = null;
+  if (target_pct > 0) {
+    const f = target_pct / 100;
+    // The model's asymptote is 1/b; a target at or above it never occurs.
+    if (b * f >= 1) return { error: "Target percent is at or above the model asymptote (1/b)." };
+    target_age = (a * f) / (1 - b * f);
+  }
+  return { fraction, fc_t, target_age, pct: fraction * 100 };
+}
+
+export const concreteStrengthGainExample = {
+  inputs: { fc28: 4000, age_days: 7, a: 4.0, b: 0.85, target_pct: 75 },
+};
+
+const _renderConcreteStrengthGain = _simpleRenderer({
+  citation: "Citation: ACI 209R strength-development model: f'c(t) = [t / (a + b x t)] x f'c(28), with the developed fraction relative to the 28-day strength. Bundled constants (editable): Type I/II moist-cured a = 4.0, b = 0.85 (steam-cured and Type III mixes take different pairs). The constants are for the cement type and curing named; other cements or accelerators shift the curve. An estimate of the mean strength trend, not a substitute for field-cured cylinder breaks or the maturity method (ASTM C1074); the engineer of record and the project specification set the actual strip / shore-removal / stressing strengths (commonly ~75% of f'c to remove shores), and cold weather slows the gain the model does not see. A scheduling estimate, not a strength acceptance.",
+  example: concreteStrengthGainExample.inputs,
+  fields: [
+    { key: "fc28", label: "Specified 28-day strength f'c (psi)", kind: "number" },
+    { key: "age_days", label: "Concrete age (days)", kind: "number" },
+    { key: "a", label: "ACI 209 constant a", kind: "number", default: 4.0 },
+    { key: "b", label: "ACI 209 constant b", kind: "number", default: 0.85 },
+    { key: "target_pct", label: "Target % of f'c (0 = none)", kind: "number", default: 75 },
+  ],
+  outputs: [
+    { key: "fr", id: "csg-out-fr", label: "Developed fraction", value: (r) => _fmtC(r.pct, 1) + "% of f'c" },
+    { key: "fc", id: "csg-out-fc", label: "Developed strength", value: (r) => _fmtC(r.fc_t, 0) + " psi" },
+    { key: "ta", id: "csg-out-ta", label: "Age to reach target", value: (r) => r.target_age === null ? "(no target set)" : _fmtC(r.target_age, 1) + " days" },
+  ],
+  compute: computeConcreteStrengthGain,
+});
+CONSTRUCTION_RENDERERS["concrete-strength-gain"] = _renderConcreteStrengthGain;
+
+// ----- spec-v251: Allowable Building Area per Story (IBC 2021 Chapter 5) -----
+
+// dims: in { tabular_area: L^2, ns_area: L^2, frontage_ft: L, perimeter_ft: L, open_width_ft: L, actual_area: L^2 } out: { frontage_if: dimensionless, allowable: L^2 }
+export function computeAllowableArea({ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_width_ft = 30, actual_area = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tabular_area > 0)) return { error: "Tabular area At must be positive (ft^2)." };
+  if (!(perimeter_ft > 0)) return { error: "Building perimeter must be positive (ft)." };
+  if (ns_area < 0 || frontage_ft < 0 || open_width_ft < 0 || actual_area < 0) return { error: "Area, frontage, and width cannot be negative." };
+  if (frontage_ft > perimeter_ft) return { error: "Frontage F cannot exceed the perimeter P." };
+  const w_eff = Math.min(open_width_ft, 30);
+  const ratio = frontage_ft / perimeter_ft;
+  // §506.3.1: no increase unless 25% or more of the perimeter fronts open space.
+  const frontage_if = ratio < 0.25 ? 0 : (ratio - 0.25) * (w_eff / 30);
+  const allowable = tabular_area + ns_area * frontage_if;
+  return { w_eff, ratio, frontage_if, allowable, pass: actual_area <= allowable, margin: allowable - actual_area };
+}
+
+export const allowableAreaExample = {
+  inputs: { tabular_area: 27000, ns_area: 9000, frontage_ft: 200, perimeter_ft: 400, open_width_ft: 30, actual_area: 25000 },
+};
+
+const _renderAllowableArea = _simpleRenderer({
+  citation: "Citation: IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1 (If = 0 unless F/P >= 0.25 on open space 20 ft or wider), §506.3.2 (If = [F/P - 0.25] x W/30), §506.3.3 (W capped at 30 ft in the equation). At and NS come from Table 506.2 for the actual occupancy group and construction type in the correct sprinkler column (NS nonsprinklered, S1 single-story sprinklered, SM multistory). A mixed-occupancy or multistory building uses the §506.2.2 / §508.4 sum-of-ratios and the §506.2.3 story multiplier instead of this single-occupancy single-story form. A feasibility aid, not a code-official determination.",
+  example: allowableAreaExample.inputs,
+  fields: [
+    { key: "tabular_area", label: "Tabular area At (ft^2, correct column)", kind: "number" },
+    { key: "ns_area", label: "Nonsprinklered area NS (ft^2)", kind: "number" },
+    { key: "frontage_ft", label: "Open-frontage length F (ft)", kind: "number" },
+    { key: "perimeter_ft", label: "Total perimeter P (ft)", kind: "number" },
+    { key: "open_width_ft", label: "Open-space width W (ft)", kind: "number", default: 30 },
+    { key: "actual_area", label: "Proposed story area (ft^2)", kind: "number" },
+  ],
+  outputs: [
+    { key: "if", id: "ala-out-if", label: "Frontage factor If", value: (r) => _fmtC(r.frontage_if, 3) },
+    { key: "aa", id: "ala-out-aa", label: "Allowable area / story", value: (r) => _fmtC(r.allowable, 0) + " ft^2" },
+    { key: "pf", id: "ala-out-pf", label: "Proposed area", value: (r) => r.pass ? "PASS (" + _fmtC(r.margin, 0) + " ft^2 to spare)" : "FAIL (over by " + _fmtC(-r.margin, 0) + " ft^2)" },
+  ],
+  compute: computeAllowableArea,
+});
+CONSTRUCTION_RENDERERS["allowable-area"] = _renderAllowableArea;
+
+// ----- spec-v252: Egress Travel Distance, Common Path, and Dead-End Check (IBC 2021 Chapter 10) -----
+
+// dims: in { travel_ft: L, travel_limit_ft: L, common_path_ft: L, common_path_limit_ft: L, dead_end_ft: L, dead_end_limit_ft: L } out: { margin_travel: L, margin_common: L, margin_deadend: L }
+export function computeEgressTravelDistance({ travel_ft = 0, travel_limit_ft = 300, common_path_ft = 0, common_path_limit_ft = 100, dead_end_ft = 0, dead_end_limit_ft = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (travel_ft < 0 || common_path_ft < 0 || dead_end_ft < 0) return { error: "Measured distances cannot be negative (ft)." };
+  if (!(travel_limit_ft > 0) || !(common_path_limit_ft > 0) || !(dead_end_limit_ft > 0)) return { error: "Limits must be positive (ft)." };
+  const pass_travel = travel_ft <= travel_limit_ft;
+  const pass_common = common_path_ft <= common_path_limit_ft;
+  const pass_deadend = dead_end_ft <= dead_end_limit_ft;
+  return {
+    pass_travel, pass_common, pass_deadend,
+    pass: pass_travel && pass_common && pass_deadend,
+    margin_travel: travel_limit_ft - travel_ft,
+    margin_common: common_path_limit_ft - common_path_ft,
+    margin_deadend: dead_end_limit_ft - dead_end_ft,
+  };
+}
+
+export const egressTravelDistanceExample = {
+  inputs: { travel_ft: 240, travel_limit_ft: 300, common_path_ft: 68, common_path_limit_ft: 100, dead_end_ft: 18, dead_end_limit_ft: 50 },
+};
+
+const _renderEgressTravelDistance = _simpleRenderer({
+  citation: "Citation: IBC 2021 §1017 / Table 1017.2 (maximum exit-access travel distance), §1006.2.1 / Table 1006.2.1 (common path of egress travel), §1020.5 (dead-end corridor). Defaults are a sprinklered Group B floor (travel 300 ft, common path 100 ft, dead-end 50 ft). Each limit depends on the occupancy group and whether the building is sprinklered per §903.3.1.1; travel distance is measured along the natural path of travel around obstructions, not in a straight line; common-path and dead-end limits tighten for higher-hazard uses and above the §1006.2.1 occupant-load thresholds. A design aid, not a code-official determination.",
+  example: egressTravelDistanceExample.inputs,
+  fields: [
+    { key: "travel_ft", label: "Measured travel distance (ft)", kind: "number" },
+    { key: "travel_limit_ft", label: "Travel limit, Table 1017.2 (ft)", kind: "number", default: 300 },
+    { key: "common_path_ft", label: "Measured common path (ft)", kind: "number" },
+    { key: "common_path_limit_ft", label: "Common-path limit (ft)", kind: "number", default: 100 },
+    { key: "dead_end_ft", label: "Longest dead-end corridor (ft)", kind: "number" },
+    { key: "dead_end_limit_ft", label: "Dead-end limit, §1020.5 (ft)", kind: "number", default: 50 },
+  ],
+  outputs: [
+    { key: "t", id: "etd-out-t", label: "Travel distance", value: (r) => (r.pass_travel ? "PASS" : "FAIL") + " (" + _fmtC(r.margin_travel, 0) + " ft margin)" },
+    { key: "c", id: "etd-out-c", label: "Common path", value: (r) => (r.pass_common ? "PASS" : "FAIL") + " (" + _fmtC(r.margin_common, 0) + " ft margin)" },
+    { key: "d", id: "etd-out-d", label: "Dead-end corridor", value: (r) => (r.pass_deadend ? "PASS" : "FAIL") + " (" + _fmtC(r.margin_deadend, 0) + " ft margin)" },
+    { key: "o", id: "etd-out-o", label: "Overall", value: (r) => r.pass ? "PASS (all three)" : "FAIL" },
+  ],
+  compute: computeEgressTravelDistance,
+});
+CONSTRUCTION_RENDERERS["egress-travel-distance"] = _renderEgressTravelDistance;
+
+// ----- spec-v253: Exterior Wall Opening Protection by Fire Separation Distance (IBC 2021 Table 705.8) -----
+
+// dims: in { fsd_ft: L, wall_area: L^2, actual_opening: L^2 } out: { allowable_pct: dimensionless, allowable_area: L^2 }
+export function computeExteriorOpeningProtection({ fsd_ft = 0, wall_area = 0, protected: prot = false, actual_opening = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (fsd_ft < 0) return { error: "Fire separation distance cannot be negative (ft)." };
+  if (!(wall_area > 0)) return { error: "Wall area must be positive (ft^2)." };
+  if (actual_opening < 0) return { error: "Opening area cannot be negative (ft^2)." };
+  const p = prot === true || prot === "yes" || prot === "true";
+  let band;
+  if (fsd_ft < 3) band = 0;
+  else if (fsd_ft < 5) band = p ? 0.15 : 0;
+  else if (fsd_ft < 10) band = p ? 0.25 : 0.10;
+  else if (fsd_ft < 15) band = p ? 0.45 : 0.15;
+  else if (fsd_ft < 20) band = p ? 0.75 : 0.25;
+  else if (fsd_ft < 25) band = p ? Infinity : 0.45;
+  else if (fsd_ft < 30) band = p ? Infinity : 0.70;
+  else band = Infinity;
+  const no_limit = band === Infinity;
+  const allowable_pct = no_limit ? Infinity : band * 100;
+  const allowable_area = no_limit ? Infinity : band * wall_area;
+  const pass = no_limit ? true : actual_opening <= allowable_area;
+  return { protected: p, no_limit, allowable_pct, allowable_area, pass };
+}
+
+export const exteriorOpeningProtectionExample = {
+  inputs: { fsd_ft: 8, wall_area: 1200, protected: true, actual_opening: 240 },
+};
+
+function _renderExteriorOpeningProtection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IBC 2021 Table 705.8 (maximum area of exterior wall openings), keyed by fire separation distance and by protection / sprinkler status: <3 ft none; 3 to <5 ft 15% protected else none; 5 to <10 ft 25% / 10%; 10 to <15 ft 45% / 15%; 15 to <20 ft 75% / 25%; 20 to <25 ft no limit / 45%; 25 to <30 ft no limit / 70%; >=30 ft no limit. The FSD is measured per §705.3 to the lot line, the centerline of a public way, or an imaginary line between buildings; unprotected openings in a sprinklered building take the protected allowance (Note a). The §705.8.5 vertical-separation and §705.8.6 rules can further govern. A design aid, not a code-official determination.";
+  _aeC(inputRegion, () => fillExample(exteriorOpeningProtectionExample.inputs));
+  const fsd = _mnC("Fire separation distance (ft)", "eop-fsd", { step: "any", min: "0" });
+  const wa = _mnC("Exterior wall area (ft^2)", "eop-wa", { step: "any", min: "0" });
+  const pr = _msC("Protected openings / sprinklered", "eop-pr", [{ value: "no", label: "No (unprotected, nonsprinklered)" }, { value: "yes", label: "Yes (protected or sprinklered)" }]);
+  const ao = _mnC("Proposed opening area (ft^2)", "eop-ao", { step: "any", min: "0" });
+  for (const f of [fsd, wa, pr, ao]) inputRegion.appendChild(f.wrap);
+  const oP = _moC(outputRegion, "Allowable opening %", "eop-out-p");
+  const oA = _moC(outputRegion, "Allowable opening area", "eop-out-a");
+  const oR = _moC(outputRegion, "Proposed openings", "eop-out-r");
+  function fillExample(x) { fsd.input.value = x.fsd_ft; wa.input.value = x.wall_area; pr.select.value = x.protected ? "yes" : "no"; ao.input.value = x.actual_opening; update(); }
+  const update = _debC(() => {
+    const r = computeExteriorOpeningProtection({ fsd_ft: Number(fsd.input.value) || 0, wall_area: Number(wa.input.value) || 0, protected: pr.select.value, actual_opening: Number(ao.input.value) || 0 });
+    if (r.error) { oP.textContent = r.error; oA.textContent = "-"; oR.textContent = "-"; return; }
+    oP.textContent = r.no_limit ? "no limit" : _fmtC(r.allowable_pct, 0) + "%";
+    oA.textContent = r.no_limit ? "no limit" : _fmtC(r.allowable_area, 0) + " ft^2";
+    oR.textContent = r.pass ? "PASS" : "FAIL (exceeds allowance)";
+  }, _DC);
+  for (const f of [fsd.input, wa.input, pr.select, ao.input]) f.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["exterior-opening-protection"] = _renderExteriorOpeningProtection;

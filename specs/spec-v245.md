@@ -1,6 +1,6 @@
 # roughlogic.com Specification v245 -- Formwork Shore Post Load and Spacing (ACI 347) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v245..v247 (the cast-in-place placing-and-curing trio -- the three things a
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v245..v247 (the cast-in-place placing-and-curing trio -- the three things a
 > concrete super manages between the takeoff and the finished slab: the shores that hold the fresh pour up, the
 > evaporation that cracks its surface, and the strength gain that says when the forms and shores can come off). This spec
 > opens the batch.**

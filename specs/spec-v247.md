@@ -1,6 +1,6 @@
 # roughlogic.com Specification v247 -- Concrete Age-Strength Gain for Form Stripping and Loading (ACI 209) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v245..v247 (the cast-in-place placing-and-curing trio -- shore load,
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v245..v247 (the cast-in-place placing-and-curing trio -- shore load,
 > evaporation rate, and strength gain). This closes the v245..v247 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: estimating how much of its 28-day strength a slab
 > has reached at a given age is the schedule decision behind every form-strip and shore-removal, and it is one ACI 209

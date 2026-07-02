@@ -1,6 +1,6 @@
 # roughlogic.com Specification v244 -- Required Plumbing Fixture Count by Occupancy (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-01). Batch spec-v242..v244 (the IBC/IPC occupancy trio -- occupant load, egress capacity,
+> **Status: LANDED (2026-07-02, package 0.90.0; was PROPOSED 2026-07-01). Batch spec-v242..v244 (the IBC/IPC occupancy trio -- occupant load, egress capacity,
 > and fixture count). This closes the v242..v244 batch.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the minimum number of toilets, lavatories, and
 > drinking fountains a building must provide is the plumbing contractor's and the plans examiner's occupancy calculation,
