@@ -1,6 +1,6 @@
 # roughlogic.com Specification v265 -- Single-Shear Bolted/Dowel Connection Lateral Design Value (NDS Yield-Limit Equations) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v263..v265 (the sawn-lumber design trio). This spec closes the batch with
+> **Status: LANDED (2026-07-02, package 0.91.0; was PROPOSED 2026-07-02). Batch spec-v263..v265 (the sawn-lumber design trio). This spec closes the batch with
 > the connection -- the NDS yield-limit ("European Yield Model") equations that give the lateral reference design value Z
 > of a single bolt or dowel in single shear. It is the crown of the trio: the member checks (v263 bending, v264 shear)
 > size the wood, and this is how load actually gets from one piece of wood into the next.)**

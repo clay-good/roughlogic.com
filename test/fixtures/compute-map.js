@@ -700,6 +700,10 @@ export const COMPUTE_MAP = {
   "allowable-area": { module: "../../calc-construction.js", fn: "computeAllowableArea" },
   "egress-travel-distance": { module: "../../calc-construction.js", fn: "computeEgressTravelDistance" },
   "exterior-opening-protection": { module: "../../calc-construction.js", fn: "computeExteriorOpeningProtection" },
+  // spec-v263..v265 NDS sawn-lumber design trio (3 tiles)
+  "wood-beam-bending": { module: "../../calc-construction.js", fn: "computeWoodBeamBending" },
+  "wood-beam-shear": { module: "../../calc-construction.js", fn: "computeWoodBeamShear" },
+  "wood-bolt-connection": { module: "../../calc-construction.js", fn: "computeWoodBoltConnection" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },

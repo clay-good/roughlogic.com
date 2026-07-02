@@ -852,6 +852,10 @@ const RELATED = {
   "allowable-area": ["occupant-load","egress-capacity","exterior-opening-protection"],
   "egress-travel-distance": ["egress-capacity","occupant-load","allowable-area"],
   "exterior-opening-protection": ["allowable-area","egress-travel-distance","occupant-load"],
+  // spec-v263..v265 NDS sawn-lumber design trio (Group E)
+  "wood-beam-bending": ["column-buckling-wood","lumber-spans","beam-loading"],
+  "wood-beam-shear": ["wood-beam-bending","joist-deflection","lumber-spans"],
+  "wood-bolt-connection": ["fastener-pullout","wood-beam-shear","deck-ledger-fasteners"],
   // spec-v218..v220 residential air-tightness and ventilation batch (Group C)
   "blower-door-ach50": ["air-changes-hour","ashrae-622-ventilation","infiltration-load"],
   "ashrae-622-ventilation": ["blower-door-ach50","outdoor-air-ventilation","air-changes-hour"],

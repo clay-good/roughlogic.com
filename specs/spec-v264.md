@@ -1,6 +1,6 @@
 # roughlogic.com Specification v264 -- Wood Bending Member Shear and Notched-End Reduction (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v263..v265 (the sawn-lumber design trio). This spec is the middle limit
+> **Status: LANDED (2026-07-02, package 0.91.0; was PROPOSED 2026-07-02). Batch spec-v263..v265 (the sawn-lumber design trio). This spec is the middle limit
 > state: horizontal (rolling) shear near the supports, and the collapse in allowable shear the moment someone notches the
 > beam over a bearing -- the single most common field detail that quietly halves a joist's end capacity.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter. `wood-beam-bending` (v263) sizes the beam for moment

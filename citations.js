@@ -7600,6 +7600,42 @@ export const CITATIONS = {
       { name: "Measurement", value: "the fire separation distance is measured per §705.3 to the lot line, public-way centerline, or an assumed line between buildings", source: "IBC 2021 §705.3" },
     ],
   },
+  "wood-beam-bending": {
+    formula: "RB = sqrt(le x d / b^2); FbE = 1.20 x Emin' / RB^2; r = FbE/Fb*; CL = (1 + r)/1.9 - sqrt(((1 + r)/1.9)^2 - r/0.95) (clamped to 1.0); Fb' = Fb* x CL; S = b d^2 / 6; M' = Fb' x S.",
+    edition: "NDS 3.3.3 beam stability factor CL and the slenderness / critical-buckling relations, by name; the reference bending value and its adjustment factors come from the NDS Supplement.",
+    freeAccess: "The CL, RB, and FbE equations are stated in NDS 3.3.3, published free read-only by AWC at awc.org; the section-modulus and moment arithmetic is public statics.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS beam stability factor CL with RB = sqrt(le d / b^2) (capped at 50), FbE = 1.20 Emin' / RB^2, and CL = (1 + FbE/Fb*)/1.9 - sqrt(((1 + FbE/Fb*)/1.9)^2 - (FbE/Fb*)/0.95) (NDS 3.3.3), and the effective-length le from the loading / bracing conditions of NDS Table 3.3.3. Emin' default 620,000 psi (a common visually-graded Douglas Fir-Larch reference minimum modulus). Fb* is the reference bending value already multiplied by every applicable adjustment factor except CL - the user supplies it, and the reference values and the factors CD, CM, Ct, CF, Cfu, Ci, Cr come from the NDS Supplement for the actual species, grade, and service condition; le is the effective unbraced length from NDS Table 3.3.3 (not the clear span) for the actual bracing and loading. This checks lateral-torsional buckling of a solid rectangular sawn-lumber bending member bent about its strong axis only, and does not cover the volume factor CV or curvature / interaction of glulam, biaxial bending, or combined bending-plus-axial. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Beam slenderness", value: "RB = sqrt(le d / b^2), capped at 50; geometry more slender than that is not a bending member", source: "NDS 3.3.3" },
+      { name: "Fb* user-supplied", value: "Fb* is the reference bending value times every applicable factor except CL; the reference and CD/CM/Ct/CF/Cfu/Ci/Cr come from the NDS Supplement", source: "NDS Supplement" },
+      { name: "Effective length", value: "le is the effective unbraced length of the compression edge from NDS Table 3.3.3, not the clear span", source: "NDS Table 3.3.3" },
+    ],
+  },
+  "wood-beam-shear": {
+    formula: "Vr = (2/3) Fv' b d; ratio = dn/d; Vr' = (2/3) Fv' b dn (dn/d)^2; fv = 3V / (2 b dn); dcr = V / Vr'.",
+    edition: "NDS 3.4.2 rectangular-section shear stress and the NDS 3.4.3.2 tension-side end-notch reduction, by name; the adjusted shear value comes from the NDS Supplement.",
+    freeAccess: "The fv = 3V/(2bd) stress and the notched-member rule are stated in NDS 3.4, published free read-only by AWC at awc.org; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rectangular-section shear stress fv = 3V / (2 b d) (NDS 3.4.2) and the notched-bending-member rule V' = (2/3) Fv' b dn (dn/d)^2 for a notch on the tension side at the end of a bending member (NDS 3.4.3.2). Fv' is the reference shear value already multiplied by every applicable adjustment factor - the user supplies it, and the reference Fv and the factors come from the NDS Supplement for the actual species, grade, and service condition. This is the tension-side end-notch case only, and does not cover notches on the compression side (a different rule), notches away from the support, the special provisions for sloped or bevel-cut notches, round notches, or the Cvr shear-reduction factor for members with connections in the shear zone; loads within a distance d of the support may be neglected in V per NDS 3.4.3.1, which the user applies to the input. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Notch penalty", value: "the (dn/d)^2 factor squares the depth ratio, so a tension-side notch cuts the allowable end shear far faster than the depth loss alone", source: "NDS 3.4.3.2" },
+      { name: "Fv' user-supplied", value: "Fv' is the reference shear value times every applicable factor; the reference and factors come from the NDS Supplement", source: "NDS Supplement" },
+      { name: "Loads near support", value: "loads within a distance d of the support may be neglected in V per NDS 3.4.3.1; the user applies that to the input", source: "NDS 3.4.3.1" },
+    ],
+  },
+  "wood-bolt-connection": {
+    formula: "Fe|| = 11,200 G; Fe_perp = 6,100 G^1.45 / sqrt(D); Hankinson blend to theta; Re = Fem/Fes; Rt = lm/ls; Ktheta = 1 + 0.25(theta/90); the six single-shear yield modes Z_Im..Z_IV of Table 12.3.1A; Z = min of the six.",
+    edition: "NDS Table 12.3.1A single-shear yield-limit equations, the 12.3.3 dowel bearing strengths, and the Table 12.3.1B reduction terms, by name.",
+    freeAccess: "The yield-limit equations, dowel bearing strengths, and reduction terms are published in NDS Chapter 12 (AWC, free read-only at awc.org); the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The single-shear yield-limit equations of NDS Table 12.3.1A (modes Im, Is, II, IIIm, IIIs, IV with coefficients k1, k2, k3), the dowel bearing strengths Fe|| = 11,200 G and Fe_perp = 6,100 G^1.45 / sqrt(D) (NDS 12.3.3) blended by the Hankinson formula, and the reduction terms Rd = (4, 3.6, 3.2) x Ktheta with Ktheta = 1 + 0.25 (theta/90) for 1/4 in <= D <= 1 in bolts (NDS Table 12.3.1B). Defaults (editable): Fyb 45,000 psi (a common bolt bending-yield strength), Gm = Gs = 0.50 (Douglas Fir-Larch / Southern Pine band), theta = 0 (load parallel to grain). This is the reference lateral design value Z of a single fastener in single shear (two members) before the adjustment factors of NDS Table 11.3.1 (CD, CM, Ct, group action Cg, geometry C_delta, end grain Ceg) and before any group / row multiplication - the user applies those; the 1/4..1 in diameter band selects the bolt reduction terms and excludes small-dowel nails / screws and the local-stress / spacing / end-and-edge-distance geometry checks. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Governing mode", value: "Z is the smallest of the six single-shear yield modes; a bolt into a thin side member usually governs in mode IIIs", source: "NDS Table 12.3.1A" },
+      { name: "Reference value only", value: "Z is before the CD / CM / Ct / Cg / C_delta / Ceg adjustment factors and any group / row multiplication; the user applies those", source: "NDS Table 11.3.1" },
+      { name: "Bolt band", value: "the 1/4 to 1 in diameter band selects the (4, 3.6, 3.2) bolt reduction terms and excludes small-dowel nails / screws and the geometry / spacing checks", source: "NDS Table 12.3.1B" },
+    ],
+  },
   "window-solar-heat-gain": {
     formula: "q_solar = area_ft2 x shgc x psf; q_cond = area_ft2 x u_factor x cltd_f; q_total = q_solar + q_cond.",
     edition: "ASHRAE / ACCA Manual J fenestration cooling load (Q_solar = A x SHGC x PSF, Q_cond = A x U x CLTD), by name; the relations are public.",

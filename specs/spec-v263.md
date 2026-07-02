@@ -1,6 +1,6 @@
 # roughlogic.com Specification v263 -- Wood Bending Member (NDS Adjusted Bending Value and Beam Stability Factor CL) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v263..v265 (the sawn-lumber design trio -- the three limit states a wood
+> **Status: LANDED (2026-07-02, package 0.91.0; was PROPOSED 2026-07-02). Batch spec-v263..v265 (the sawn-lumber design trio -- the three limit states a wood
 > member and its connection have to pass once the steel batch (v254..v256) and the reinforced-concrete batch (v257..v259)
 > covered the other two structural materials: does the beam bend without buckling sideways (this spec), does it carry the
 > end shear once someone notches it (v264), and does the bolt through it transfer the load (v265). This spec opens the

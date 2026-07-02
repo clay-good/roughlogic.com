@@ -5148,3 +5148,162 @@ function _renderExteriorOpeningProtection(inputRegion, outputRegion, citationEl)
   for (const f of [fsd.input, wa.input, pr.select, ao.input]) f.addEventListener("input", update);
 }
 CONSTRUCTION_RENDERERS["exterior-opening-protection"] = _renderExteriorOpeningProtection;
+
+// ----- spec-v263: Wood Bending Member (NDS Adjusted Bending Value Fb' and Beam Stability Factor CL) -----
+
+// dims: in { fb_star_psi: M L^-1 T^-2, emin_psi: M L^-1 T^-2, b_in: L, d_in: L, le_in: L } out: { rb: dimensionless, fbe_psi: M L^-1 T^-2, cl: dimensionless, fb_prime_psi: M L^-1 T^-2, s_in3: L^3, m_prime_inlb: M L^2 T^-2, m_prime_ftlb: M L^2 T^-2 }
+export function computeWoodBeamBending({ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fb_star_psi > 0)) return { error: "Fb* must be positive (psi)." };
+  if (!(emin_psi > 0)) return { error: "Emin' must be positive (psi)." };
+  if (!(b_in > 0)) return { error: "Breadth b must be positive (in)." };
+  if (!(d_in > 0)) return { error: "Depth d must be positive (in)." };
+  if (!(le_in > 0)) return { error: "Effective unbraced length le must be positive (in)." };
+  const rb = Math.sqrt(le_in * d_in / (b_in * b_in));
+  if (rb > 50) return { error: "RB exceeds the NDS slenderness limit of 50 - too slender to be a bending member." };
+  const fbe = 1.20 * emin_psi / (rb * rb);
+  const ratio = fbe / fb_star_psi;
+  const term = (1 + ratio) / 1.9;
+  let cl = term - Math.sqrt(term * term - ratio / 0.95);
+  if (cl > 1) cl = 1; // the physical stability factor never exceeds 1.0
+  const fb_prime = fb_star_psi * cl;
+  const s_in3 = b_in * d_in * d_in / 6;
+  const m_prime_inlb = fb_prime * s_in3;
+  return { rb, fbe_psi: fbe, ratio, cl, fb_prime_psi: fb_prime, s_in3, m_prime_inlb, m_prime_ftlb: m_prime_inlb / 12 };
+}
+
+export const woodBeamBendingExample = {
+  inputs: { fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 144 },
+};
+
+const _renderWoodBeamBending = _simpleRenderer({
+  citation: "Citation: NDS 3.3.3 beam stability factor CL for a solid rectangular sawn-lumber bending member bent about its strong axis: RB = sqrt(le x d / b^2) (<= 50), FbE = 1.20 x Emin' / RB^2, CL = (1 + FbE/Fb*)/1.9 - sqrt(((1 + FbE/Fb*)/1.9)^2 - (FbE/Fb*)/0.95), Fb' = Fb* x CL, M' = Fb' x S with S = b d^2 / 6. Fb* is the reference bending value already multiplied by every applicable adjustment factor except CL itself (the user supplies it; the reference values and CD, CM, Ct, CF, Cfu, Ci, Cr come from the NDS Supplement for the actual species, grade, and service condition); le is the effective unbraced length of the compression edge from NDS Table 3.3.3 (not the clear span). Emin' default 620,000 psi (a common visually-graded Douglas Fir-Larch reference minimum modulus). Strong-axis bending only; does not cover the glulam volume factor CV, biaxial bending, or combined bending-plus-axial. A design aid, not a substitute for the engineer of record.",
+  example: woodBeamBendingExample.inputs,
+  fields: [
+    { key: "fb_star_psi", label: "Fb* (reference bending x factors except CL) (psi)", kind: "number" },
+    { key: "emin_psi", label: "Emin' (psi)", kind: "number", default: 620000 },
+    { key: "b_in", label: "Breadth b (in)", kind: "number" },
+    { key: "d_in", label: "Depth d (in)", kind: "number" },
+    { key: "le_in", label: "Effective unbraced length le (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "rb", id: "wbb-out-rb", label: "Slenderness RB", value: (r) => _fmtC(r.rb, 2) },
+    { key: "fbe", id: "wbb-out-fbe", label: "Critical FbE", value: (r) => _fmtC(r.fbe_psi, 0) + " psi" },
+    { key: "cl", id: "wbb-out-cl", label: "Stability factor CL", value: (r) => _fmtC(r.cl, 3) },
+    { key: "fbp", id: "wbb-out-fbp", label: "Adjusted Fb'", value: (r) => _fmtC(r.fb_prime_psi, 0) + " psi" },
+    { key: "mp", id: "wbb-out-mp", label: "Allowable moment M'", value: (r) => _fmtC(r.m_prime_ftlb, 0) + " ft-lb (" + _fmtC(r.m_prime_inlb, 0) + " in-lb)" },
+  ],
+  compute: computeWoodBeamBending,
+});
+CONSTRUCTION_RENDERERS["wood-beam-bending"] = _renderWoodBeamBending;
+
+// ----- spec-v264: Wood Bending Member Shear (Rectangular fv and the NDS Tension-Side End-Notch Reduction) -----
+
+// dims: in { fv_prime_psi: M L^-1 T^-2, b_in: L, d_in: L, dn_in: L, v_applied_lb: M L T^-2 } out: { vr_lb: M L T^-2, ratio: dimensionless, vr_notch_lb: M L T^-2, fv_psi: M L^-1 T^-2, dcr: dimensionless }
+export function computeWoodBeamShear({ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, v_applied_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fv_prime_psi > 0)) return { error: "Fv' must be positive (psi)." };
+  if (!(b_in > 0)) return { error: "Breadth b must be positive (in)." };
+  if (!(d_in > 0)) return { error: "Full depth d must be positive (in)." };
+  if (!(dn_in > 0)) return { error: "Net depth dn must be positive (in)." };
+  if (dn_in > d_in) return { error: "Net depth dn cannot exceed the full depth d (a notch cannot be deeper than the beam)." };
+  if (v_applied_lb < 0) return { error: "Applied shear cannot be negative (lb)." };
+  const vr = (2 / 3) * fv_prime_psi * b_in * d_in;
+  const ratio = dn_in / d_in;
+  const vr_notch = (2 / 3) * fv_prime_psi * b_in * dn_in * ratio * ratio;
+  const fv = v_applied_lb > 0 ? 3 * v_applied_lb / (2 * b_in * dn_in) : null;
+  const dcr = v_applied_lb > 0 ? v_applied_lb / vr_notch : null;
+  return { vr_lb: vr, ratio, vr_notch_lb: vr_notch, fv_psi: fv, dcr };
+}
+
+export const woodBeamShearExample = {
+  inputs: { fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, v_applied_lb: 2000 },
+};
+
+const _renderWoodBeamShear = _simpleRenderer({
+  citation: "Citation: NDS 3.4.2 rectangular-section shear stress fv = 3V / (2 b d), and the NDS 3.4.3.2 tension-side end-notch rule V' = (2/3) Fv' b dn (dn/d)^2 for a notch on the tension side at the end of a bending member. Fv' is the reference shear value already multiplied by every applicable adjustment factor (the user supplies it; the reference Fv and the factors come from the NDS Supplement for the actual species, grade, and service condition). Tension-side end-notch case only; does not cover compression-side notches (a different rule), notches away from the support, sloped / bevel / round notches, or the Cvr shear-reduction factor for members with connections in the shear zone. Loads within a distance d of the support may be neglected in V per NDS 3.4.3.1 (the user applies that to the input). A design aid, not a substitute for the engineer of record.",
+  example: woodBeamShearExample.inputs,
+  fields: [
+    { key: "fv_prime_psi", label: "Adjusted shear value Fv' (psi)", kind: "number" },
+    { key: "b_in", label: "Breadth b (in)", kind: "number" },
+    { key: "d_in", label: "Full depth d (in)", kind: "number" },
+    { key: "dn_in", label: "Net depth at notch dn (dn = d if un-notched) (in)", kind: "number" },
+    { key: "v_applied_lb", label: "Applied end shear V (lb, 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "vr", id: "wbs-out-vr", label: "Un-notched allowable Vr", value: (r) => _fmtC(r.vr_lb, 0) + " lb" },
+    { key: "ra", id: "wbs-out-ra", label: "Depth ratio dn/d", value: (r) => _fmtC(r.ratio, 3) },
+    { key: "vn", id: "wbs-out-vn", label: "Notched allowable Vr'", value: (r) => _fmtC(r.vr_notch_lb, 0) + " lb" },
+    { key: "fv", id: "wbs-out-fv", label: "Actual stress fv", value: (r) => r.fv_psi === null ? "-" : _fmtC(r.fv_psi, 1) + " psi" },
+    { key: "dc", id: "wbs-out-dc", label: "Demand / capacity", value: (r) => r.dcr === null ? "-" : _fmtC(r.dcr, 2) + (r.dcr > 1 ? " (OVERSTRESS)" : "") },
+  ],
+  compute: computeWoodBeamShear,
+});
+CONSTRUCTION_RENDERERS["wood-beam-shear"] = _renderWoodBeamShear;
+
+// ----- spec-v265: Single-Shear Bolted/Dowel Lateral Design Value (NDS Yield-Limit Z) -----
+
+// dims: in { d_in: L, lm_in: L, ls_in: L, gm: dimensionless, gs: dimensionless, fyb_psi: M L^-1 T^-2, theta_deg: dimensionless } out: { fem_psi: M L^-1 T^-2, fes_psi: M L^-1 T^-2, re: dimensionless, rt: dimensionless, ktheta: dimensionless, k1: dimensionless, k2: dimensionless, k3: dimensionless, z_im: M L T^-2, z_is: M L T^-2, z_ii: M L T^-2, z_iiim: M L T^-2, z_iiis: M L T^-2, z_iv: M L T^-2, z_lb: M L T^-2 }
+export function computeWoodBoltConnection({ d_in = 0, lm_in = 0, ls_in = 0, gm = 0.50, gs = 0.50, fyb_psi = 45000, theta_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0)) return { error: "Bolt diameter D must be positive (in)." };
+  if (!(lm_in > 0)) return { error: "Main-member bearing length lm must be positive (in)." };
+  if (!(ls_in > 0)) return { error: "Side-member bearing length ls must be positive (in)." };
+  if (!(gm > 0 && gm < 1)) return { error: "Main-member specific gravity Gm must be between 0 and 1." };
+  if (!(gs > 0 && gs < 1)) return { error: "Side-member specific gravity Gs must be between 0 and 1." };
+  if (!(fyb_psi > 0)) return { error: "Bolt bending yield Fyb must be positive (psi)." };
+  if (!(theta_deg >= 0 && theta_deg <= 90)) return { error: "Angle to grain must be between 0 and 90 degrees." };
+  const t = theta_deg * Math.PI / 180;
+  const feAt = (G) => {
+    const fpar = 11200 * G;
+    const fperp = 6100 * Math.pow(G, 1.45) / Math.sqrt(d_in);
+    return fpar * fperp / (fpar * Math.sin(t) ** 2 + fperp * Math.cos(t) ** 2);
+  };
+  const fem = feAt(gm);
+  const fes = feAt(gs);
+  const re = fem / fes;
+  const rt = lm_in / ls_in;
+  const ktheta = 1 + 0.25 * (theta_deg / 90);
+  const k1 = (Math.sqrt(re + 2 * re * re * (1 + rt + rt * rt) + rt * rt * re * re * re) - re * (1 + rt)) / (1 + re);
+  const k2 = -1 + Math.sqrt(2 * (1 + re) + (2 * fyb_psi * (1 + 2 * re) * d_in * d_in) / (3 * fem * lm_in * lm_in));
+  const k3 = -1 + Math.sqrt(2 * (1 + re) / re + (2 * fyb_psi * (2 + re) * d_in * d_in) / (3 * fem * ls_in * ls_in));
+  const z_im = d_in * lm_in * fem / (4.0 * ktheta);
+  const z_is = d_in * ls_in * fes / (4.0 * ktheta);
+  const z_ii = k1 * d_in * ls_in * fes / (3.6 * ktheta);
+  const z_iiim = k2 * d_in * lm_in * fem / ((1 + 2 * re) * 3.2 * ktheta);
+  const z_iiis = k3 * d_in * ls_in * fem / ((2 + re) * 3.2 * ktheta);
+  const z_iv = (d_in * d_in / (3.2 * ktheta)) * Math.sqrt(2 * fem * fyb_psi / (3 * (1 + re)));
+  const modes = [["Im", z_im], ["Is", z_is], ["II", z_ii], ["IIIm", z_iiim], ["IIIs", z_iiis], ["IV", z_iv]];
+  let z = Infinity, gov = null;
+  for (const [name, val] of modes) { if (val < z) { z = val; gov = name; } }
+  return { fem_psi: fem, fes_psi: fes, re, rt, ktheta, k1, k2, k3, z_im, z_is, z_ii, z_iiim, z_iiis, z_iv, z_lb: z, governing_mode: gov };
+}
+
+export const woodBoltConnectionExample = {
+  inputs: { d_in: 0.5, lm_in: 3.5, ls_in: 1.5, gm: 0.50, gs: 0.50, fyb_psi: 45000, theta_deg: 0 },
+};
+
+const _renderWoodBoltConnection = _simpleRenderer({
+  citation: "Citation: NDS Table 12.3.1A single-shear yield-limit equations (modes Im, Is, II, IIIm, IIIs, IV with coefficients k1, k2, k3), the dowel bearing strengths Fe|| = 11,200 G and Fe_perp = 6,100 G^1.45 / sqrt(D) (NDS 12.3.3) blended by the Hankinson formula, and the reduction terms Rd = (4, 3.6, 3.2) x Ktheta with Ktheta = 1 + 0.25(theta/90) for 1/4 in <= D <= 1 in bolts (NDS Table 12.3.1B). Defaults (editable): Fyb 45,000 psi, Gm = Gs = 0.50 (Douglas Fir-Larch / Southern Pine band), theta = 0 (load parallel to grain). This is the reference lateral design value Z of a single fastener in single shear (two members) before the adjustment factors of NDS Table 11.3.1 (CD, CM, Ct, group action Cg, geometry C_delta, end grain Ceg) and before any group / row multiplication (the user applies those). The 1/4..1 in band selects the bolt reduction terms and excludes small-dowel nails / screws and the spacing / end-and-edge-distance geometry checks. A design aid, not a substitute for the engineer of record.",
+  example: woodBoltConnectionExample.inputs,
+  fields: [
+    { key: "d_in", label: "Bolt diameter D (1/4 to 1 in) (in)", kind: "number" },
+    { key: "lm_in", label: "Main-member bearing length lm (in)", kind: "number" },
+    { key: "ls_in", label: "Side-member bearing length ls (in)", kind: "number" },
+    { key: "gm", label: "Main-member specific gravity Gm", kind: "number", default: 0.50 },
+    { key: "gs", label: "Side-member specific gravity Gs", kind: "number", default: 0.50 },
+    { key: "fyb_psi", label: "Bolt bending yield Fyb (psi)", kind: "number", default: 45000 },
+    { key: "theta_deg", label: "Angle of load to grain theta (0 to 90 deg)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "im", id: "wbc-out-im", label: "Mode Im", value: (r) => _fmtC(r.z_im, 0) + " lb" },
+    { key: "is", id: "wbc-out-is", label: "Mode Is", value: (r) => _fmtC(r.z_is, 0) + " lb" },
+    { key: "ii", id: "wbc-out-ii", label: "Mode II", value: (r) => _fmtC(r.z_ii, 0) + " lb" },
+    { key: "iiim", id: "wbc-out-iiim", label: "Mode IIIm", value: (r) => _fmtC(r.z_iiim, 0) + " lb" },
+    { key: "iiis", id: "wbc-out-iiis", label: "Mode IIIs", value: (r) => _fmtC(r.z_iiis, 0) + " lb" },
+    { key: "iv", id: "wbc-out-iv", label: "Mode IV", value: (r) => _fmtC(r.z_iv, 0) + " lb" },
+    { key: "z", id: "wbc-out-z", label: "Governing Z", value: (r) => _fmtC(r.z_lb, 0) + " lb (mode " + r.governing_mode + ")" },
+  ],
+  compute: computeWoodBoltConnection,
+});
+CONSTRUCTION_RENDERERS["wood-bolt-connection"] = _renderWoodBoltConnection;

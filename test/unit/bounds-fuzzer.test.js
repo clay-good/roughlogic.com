@@ -12481,3 +12481,90 @@ test("bounds: spec-v253 computeExteriorOpeningProtection pins the FSD bands, the
   assert.ok("error" in _v253({ fsd_ft: 8, wall_area: 0 }));
   assert.ok("error" in _v253({ fsd_ft: Infinity, wall_area: 1000 }));
 });
+
+// ===================== spec-v263..v265 NDS sawn-lumber design trio =====================
+import {
+  computeWoodBeamBending as _v263, computeWoodBeamShear as _v264, computeWoodBoltConnection as _v265,
+} from "../../calc-construction.js";
+
+test("bounds: spec-v263 computeWoodBeamBending pins RB/FbE/CL/Fb'/M', the buckling seam, and error/clamp seams", () => {
+  const r = _v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 144 });
+  assert.ok(Math.abs(r.rb - 11.4997782) < 1e-4);
+  assert.ok(Math.abs(r.fbe_psi - 5625.9259) < 1e-2);
+  assert.ok(Math.abs(r.cl - 0.9847646) < 1e-5);
+  assert.ok(Math.abs(r.fb_prime_psi - 1329.4322) < 1e-2);
+  assert.ok(Math.abs(r.s_in3 - 73.828125) < 1e-4);
+  assert.ok(Math.abs(r.m_prime_ftlb - 8179.1238) < 1e-2);
+  // Cross-check: the same section unbraced over 50 ft drops CL off a cliff.
+  const r2 = _v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 600 });
+  assert.ok(Math.abs(r2.cl - 0.8173233) < 1e-5);
+  assert.ok(Math.abs(r2.fb_prime_psi - 1103.3864) < 1e-2);
+  // CL is ceiling-clamped: a very stocky, well-braced member never exceeds 1.0.
+  assert.ok(_v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 5.5, d_in: 5.5, le_in: 1 }).cl <= 1);
+  // Error seams.
+  assert.ok("error" in _v263({ fb_star_psi: 0, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 144 }));
+  assert.ok("error" in _v263({ fb_star_psi: 1350, emin_psi: 0, b_in: 3.5, d_in: 11.25, le_in: 144 }));
+  assert.ok("error" in _v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 0, d_in: 11.25, le_in: 144 }));
+  assert.ok("error" in _v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 0, le_in: 144 }));
+  assert.ok("error" in _v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 0 }));
+  // RB > 50 is not a beam.
+  assert.ok("error" in _v263({ fb_star_psi: 1350, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 3000 }));
+  assert.ok("error" in _v263({ fb_star_psi: Infinity, emin_psi: 620000, b_in: 3.5, d_in: 11.25, le_in: 144 }));
+});
+
+test("bounds: spec-v264 computeWoodBeamShear pins Vr/ratio/Vr'/fv/dcr, the no-notch identity, and error seams", () => {
+  const r = _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, v_applied_lb: 2000 });
+  assert.strictEqual(r.vr_lb, 4725);
+  assert.ok(Math.abs(r.ratio - 0.8222222) < 1e-6);
+  assert.ok(Math.abs(r.vr_notch_lb - 2626.4519) < 1e-3);
+  assert.ok(Math.abs(r.fv_psi - 92.6640927) < 1e-4);
+  assert.ok(Math.abs(r.dcr - 0.7614836) < 1e-6);
+  // A deeper 3 in notch pushes the demand/capacity past 1.0.
+  assert.ok(_v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 8.25, v_applied_lb: 2000 }).dcr > 1);
+  // No-notch continuity seam: dn = d collapses Vr' onto Vr.
+  const r2 = _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 11.25, v_applied_lb: 2000 });
+  assert.strictEqual(r2.ratio, 1);
+  assert.ok(Math.abs(r2.vr_notch_lb - r2.vr_lb) < 1e-9);
+  // No applied shear -> stress/dcr are null, not NaN.
+  assert.strictEqual(_v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, v_applied_lb: 0 }).fv_psi, null);
+  // Error seams.
+  assert.ok("error" in _v264({ fv_prime_psi: 0, b_in: 3.5, d_in: 11.25, dn_in: 9.25 }));
+  assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 0, d_in: 11.25, dn_in: 9.25 }));
+  assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 0, dn_in: 9.25 }));
+  assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 0 }));
+  assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 12 })); // dn > d
+  assert.ok("error" in _v264({ fv_prime_psi: 180, b_in: 3.5, d_in: 11.25, dn_in: 9.25, v_applied_lb: -1 }));
+  assert.ok("error" in _v264({ fv_prime_psi: Infinity, b_in: 3.5, d_in: 11.25, dn_in: 9.25 }));
+});
+
+test("bounds: spec-v265 computeWoodBoltConnection pins all six modes, the governing selection, and the Hankinson/error seams", () => {
+  const r = _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, gm: 0.50, gs: 0.50, fyb_psi: 45000, theta_deg: 0 });
+  assert.ok(Math.abs(r.z_im - 2450) < 1e-6);
+  assert.ok(Math.abs(r.z_is - 1050) < 1e-6);
+  assert.ok(Math.abs(r.z_ii - 913.2936) < 1e-3);
+  assert.ok(Math.abs(r.z_iiim - 1102.8897) < 1e-3);
+  assert.ok(Math.abs(r.z_iiis - 614.8411) < 1e-3);
+  assert.ok(Math.abs(r.z_iv - 716.0275) < 1e-3);
+  assert.ok(Math.abs(r.z_lb - 614.8411) < 1e-3);
+  assert.strictEqual(r.governing_mode, "IIIs");
+  // Parallel to grain returns the parallel bearing strength (no Fperp), Ktheta = 1.
+  assert.ok(Math.abs(r.fem_psi - 5600) < 1e-6);
+  assert.strictEqual(r.ktheta, 1);
+  // Cross-check: load perpendicular to grain returns Fperp and Ktheta = 1.25, Z falls.
+  const r2 = _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, gm: 0.50, gs: 0.50, fyb_psi: 45000, theta_deg: 90 });
+  assert.ok(Math.abs(r2.fem_psi - 3157.5580) < 1e-3);
+  assert.strictEqual(r2.ktheta, 1.25);
+  assert.ok(Math.abs(r2.z_lb - 330.9764) < 1e-3);
+  assert.strictEqual(r2.governing_mode, "IIIs");
+  // Error seams.
+  assert.ok("error" in _v265({ d_in: 0, lm_in: 3.5, ls_in: 1.5 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 0, ls_in: 1.5 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 0 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, gm: 0 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, gm: 1 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, gs: 1.2 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, fyb_psi: 0 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, theta_deg: -1 }));
+  assert.ok("error" in _v265({ d_in: 0.5, lm_in: 3.5, ls_in: 1.5, theta_deg: 91 }));
+  assert.ok("error" in _v265({ d_in: Infinity, lm_in: 3.5, ls_in: 1.5 }));
+});

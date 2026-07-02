@@ -27094,6 +27094,103 @@
         "allowable_area": { "value": 0, "tolerance": { "abs": 0.01 } },
         "pass": { "value": 0, "tolerance": { "abs": 0 } }
       }
+    },
+    {
+      "tile_id": "wood-beam-bending",
+      "source_publisher": "NDS 3.3.3 (National Design Specification for Wood Construction)",
+      "source_title": "4x12 header (Fb* 1350, Emin' 620k), braced only at ends over 12 ft -> CL 0.985, Fb' 1,329 psi, M' 8,179 ft-lb",
+      "source_edition_or_year": "spec-v263 worked example (machine-verified)",
+      "source_section_or_page": "spec-v263 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fb_star_psi": 1350, "emin_psi": 620000, "b_in": 3.5, "d_in": 11.25, "le_in": 144 },
+      "outputs": {
+        "rb": { "value": 11.4997782, "tolerance": { "abs": 0.001 } },
+        "fbe_psi": { "value": 5625.9259, "tolerance": { "abs": 0.1 } },
+        "cl": { "value": 0.9847646, "tolerance": { "abs": 0.0001 } },
+        "fb_prime_psi": { "value": 1329.4322, "tolerance": { "abs": 0.1 } },
+        "s_in3": { "value": 73.828125, "tolerance": { "abs": 0.001 } },
+        "m_prime_ftlb": { "value": 8179.1238, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wood-beam-bending",
+      "source_publisher": "NDS 3.3.3 (National Design Specification for Wood Construction)",
+      "source_title": "cross-check: same section left unbraced over 50 ft -> CL 0.817, Fb' 1,103 psi (the buckling seam)",
+      "source_edition_or_year": "spec-v263 worked example (machine-verified)",
+      "source_section_or_page": "spec-v263 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fb_star_psi": 1350, "emin_psi": 620000, "b_in": 3.5, "d_in": 11.25, "le_in": 600 },
+      "outputs": {
+        "cl": { "value": 0.8173233, "tolerance": { "abs": 0.0001 } },
+        "fb_prime_psi": { "value": 1103.3864, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "wood-beam-shear",
+      "source_publisher": "NDS 3.4.2 / 3.4.3.2 (National Design Specification for Wood Construction)",
+      "source_title": "4x12 notched 2 in at the end (Fv' 180), V 2,000 lb -> Vr 4,725 lb, Vr' 2,626 lb, dcr 0.76",
+      "source_edition_or_year": "spec-v264 worked example (machine-verified)",
+      "source_section_or_page": "spec-v264 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fv_prime_psi": 180, "b_in": 3.5, "d_in": 11.25, "dn_in": 9.25, "v_applied_lb": 2000 },
+      "outputs": {
+        "vr_lb": { "value": 4725, "tolerance": { "abs": 0.5 } },
+        "ratio": { "value": 0.8222222, "tolerance": { "abs": 0.0001 } },
+        "vr_notch_lb": { "value": 2626.4519, "tolerance": { "abs": 0.5 } },
+        "fv_psi": { "value": 92.6640927, "tolerance": { "abs": 0.05 } },
+        "dcr": { "value": 0.7614836, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wood-beam-shear",
+      "source_publisher": "NDS 3.4.2 / 3.4.3.2 (National Design Specification for Wood Construction)",
+      "source_title": "cross-check: no notch (dn = d = 11.25) -> Vr' equals Vr 4,725 lb (continuity seam)",
+      "source_edition_or_year": "spec-v264 worked example (machine-verified)",
+      "source_section_or_page": "spec-v264 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fv_prime_psi": 180, "b_in": 3.5, "d_in": 11.25, "dn_in": 11.25, "v_applied_lb": 2000 },
+      "outputs": {
+        "ratio": { "value": 1, "tolerance": { "abs": 0.0001 } },
+        "vr_notch_lb": { "value": 4725, "tolerance": { "abs": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wood-bolt-connection",
+      "source_publisher": "NDS Table 12.3.1A (National Design Specification for Wood Construction)",
+      "source_title": "1/2 in bolt, 4x main into 2x side, DF-L, parallel -> six modes, governing Z 615 lb (mode IIIs)",
+      "source_edition_or_year": "spec-v265 worked example (machine-verified)",
+      "source_section_or_page": "spec-v265 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "d_in": 0.5, "lm_in": 3.5, "ls_in": 1.5, "gm": 0.50, "gs": 0.50, "fyb_psi": 45000, "theta_deg": 0 },
+      "outputs": {
+        "z_im": { "value": 2450, "tolerance": { "abs": 1 } },
+        "z_is": { "value": 1050, "tolerance": { "abs": 1 } },
+        "z_ii": { "value": 913.2936, "tolerance": { "abs": 1 } },
+        "z_iiim": { "value": 1102.8897, "tolerance": { "abs": 1 } },
+        "z_iiis": { "value": 614.8411, "tolerance": { "abs": 1 } },
+        "z_iv": { "value": 716.0275, "tolerance": { "abs": 1 } },
+        "z_lb": { "value": 614.8411, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "wood-bolt-connection",
+      "source_publisher": "NDS 12.3.3 / Table 12.3.1B (National Design Specification for Wood Construction)",
+      "source_title": "cross-check: load perpendicular to grain (theta 90) -> Fem 3,158 psi, Ktheta 1.25, Z 331 lb",
+      "source_edition_or_year": "spec-v265 worked example (machine-verified)",
+      "source_section_or_page": "spec-v265 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "d_in": 0.5, "lm_in": 3.5, "ls_in": 1.5, "gm": 0.50, "gs": 0.50, "fyb_psi": 45000, "theta_deg": 90 },
+      "outputs": {
+        "fem_psi": { "value": 3157.5580, "tolerance": { "abs": 0.5 } },
+        "ktheta": { "value": 1.25, "tolerance": { "abs": 0.001 } },
+        "z_lb": { "value": 330.9764, "tolerance": { "abs": 0.5 } }
+      }
     }
   ]
 }

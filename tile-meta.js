@@ -481,6 +481,8 @@ const _TILES = [
   ["shore-post-load", "E"], ["concrete-evaporation-rate", "E"], ["concrete-strength-gain", "E"],
   // spec-v251..v253 IBC plan-review trio
   ["allowable-area", "E"], ["egress-travel-distance", "E"], ["exterior-opening-protection", "E"],
+  // spec-v263..v265 NDS sawn-lumber design trio
+  ["wood-beam-bending", "E"], ["wood-beam-shear", "E"], ["wood-bolt-connection", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)
