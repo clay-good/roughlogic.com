@@ -1,6 +1,6 @@
 # roughlogic.com Specification v271 -- Reinforced CMU Wall Allowable Axial Compression (TMS 402 ASD, Slenderness-Reduced Pa) (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v269..v271 (the TMS 402-16 reinforced-masonry member trio -- flexure /
+> **Status: LANDED (2026-07-02, package 0.96.0; was PROPOSED 2026-07-02). Batch spec-v269..v271 (the TMS 402-16 reinforced-masonry member trio -- flexure /
 > shear / axial for a reinforced CMU wall). This spec closes the trio with the third limit state: after the out-of-plane
 > moment (v269) and the in-plane shear (v270), the gravity question -- how much vertical load the wall stands up under
 > before it either crushes or buckles.)**

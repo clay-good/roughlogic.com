@@ -1980,6 +1980,9 @@ cross-check.
 | calc-machining.js | `computeCuttingSpeed` | `{ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } ...` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointDepth` | `{ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindlePowerTorque` | `{ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
+| calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
+| calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickne...` | _ | _ | _ |
 | calc-mechanic.js | `computeDisplacementCR` | `{ bore_in = 0, stroke_in = 0, cylinders = 0, chamber_cc = 0, gasket_bore_in =...` | _ | _ | _ |
@@ -2394,7 +2397,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 980.
+Row count: 983.
 
 <!-- END function-corpus-v14 -->
 
@@ -2788,7 +2791,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (121 tiles)
+### Group E Construction (124 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2808,6 +2811,9 @@ per spec-v14 §13.1 second paragraph.
 | `bolt-torque` | Bolt Torque to Clamp Load | Project (first-principles); F = 85000 * 0.1419 * 0.75 = 9046 lb; T_in_lb = 0.20 * 0.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `carbon-equivalent` | Carbon Equivalent and Preheat Screen | IIW / AWS D1.1 carbon-equivalent formula; A36-type C 0.25, Mn 0.80 -> CE 0.38333 (0.35-0.55 band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cmu-grout-volume` | CMU Grout Volume (Partial and Full Grout) | TMS 602 / ACI 530.1, NCMA TEK; spec-v212 section 2.1 pinned example (partial grout, 24 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cmu-shear-wall` | Reinforced CMU Shear Wall In-Plane Shear (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v270 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cmu-wall-axial` | Reinforced CMU Wall Axial Compression (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v271 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cmu-wall-flexure` | Reinforced CMU Wall Out-of-Plane Flexure (TMS 402 ASD) | TMS 402-16 (ACI 530 / ASCE 5) via Mas...; spec-v269 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coating-coverage-dft` | Coating Coverage from Volume-Solids and DFT | SSPC / AMPP PA 2; 60% volume-solids, 5.0 mil DFT, 2,000 ft^2, 35% loss -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `column-base-plate` | Column Base Plate under Axial Load (AISC Design Guide 1) | AISC Design Guide 1 §3.1 / AISC 360-2...; spec-v268 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3317,6 +3323,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 737. Fixture-covered or reference-cadence: 737 / 737.
+Tile count: 740. Fixture-covered or reference-cadence: 740 / 740.
 
 <!-- END tile-index-v14 -->

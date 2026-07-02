@@ -719,6 +719,10 @@ export const COMPUTE_MAP = {
   "soil-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSoilBearingCapacity" },
   "lateral-earth-pressure": { module: "../../calc-geotech.js", fn: "computeLateralEarthPressure" },
   "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
+  // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (3 tiles, new calc-masonry.js)
+  "cmu-wall-flexure": { module: "../../calc-masonry.js", fn: "computeCmuWallFlexure" },
+  "cmu-shear-wall": { module: "../../calc-masonry.js", fn: "computeCmuShearWall" },
+  "cmu-wall-axial": { module: "../../calc-masonry.js", fn: "computeCmuWallAxial" },
   // spec-v248..v250 fire-sprinkler system-design trio (3 tiles, new calc-firesprinkler.js)
   "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
   "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },

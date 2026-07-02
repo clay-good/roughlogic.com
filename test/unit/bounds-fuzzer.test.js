@@ -12969,3 +12969,94 @@ test("bounds: spec-v262 computeRetainingWallStability pins the three checks, the
   assert.ok("error" in _v262({ h_ft: 0.5, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 })); // height <= base thickness
   assert.ok("error" in _v262({ h_ft: Infinity, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 }));
 });
+// ===================== spec-v269..v271 TMS 402-16 reinforced-masonry member trio =====================
+import {
+  computeCmuWallFlexure as _v269, computeCmuShearWall as _v270, computeCmuWallAxial as _v271,
+} from "../../calc-masonry.js";
+
+test("bounds: spec-v269 computeCmuWallFlexure pins n/k/j, both governing branches, and error seams", () => {
+  const r = _v269({ fm_psi: 2000, as_in2: 0.155, d_in: 3.81, b_in: 12, fs_psi: 32000 });
+  assert.ok(Math.abs(r.n_ratio - 16.11111111111111) < 1e-9);
+  assert.ok(Math.abs(r.k - 0.2803773326541681) < 1e-9);
+  assert.ok(Math.abs(r.j - 0.9065408891152773) < 1e-9);
+  assert.ok(Math.abs(r.ms_ftlb - 1427.6205921787387) < 1e-6);
+  assert.ok(Math.abs(r.mm_ftlb - 1660.3236818458684) < 1e-6);
+  assert.ok(Math.abs(r.ma_ftlb - 1427.6205921787387) < 1e-6);
+  assert.strictEqual(r.steel_governs, true);
+  // Cross-check: #5 at 16 in flips the governing mode to masonry.
+  const r2 = _v269({ fm_psi: 2000, as_in2: 0.2325, d_in: 3.81, b_in: 12, fs_psi: 32000 });
+  assert.ok(Math.abs(r2.k - 0.33107404541084406) < 1e-9);
+  assert.ok(Math.abs(r2.ma_ftlb - 1923.990268348173) < 1e-6);
+  assert.strictEqual(r2.steel_governs, false);
+  // Error seams.
+  assert.ok("error" in _v269({ fm_psi: 0, as_in2: 0.155, d_in: 3.81, b_in: 12 }));
+  assert.ok("error" in _v269({ fm_psi: 2000, as_in2: 0, d_in: 3.81, b_in: 12 }));
+  assert.ok("error" in _v269({ fm_psi: 2000, as_in2: 0.155, d_in: 0, b_in: 12 }));
+  assert.ok("error" in _v269({ fm_psi: 2000, as_in2: 0.155, d_in: 3.81, b_in: 0 }));
+  assert.ok("error" in _v269({ fm_psi: 2000, as_in2: 0.155, d_in: 3.81, b_in: 12, fs_psi: 0 }));
+  assert.ok("error" in _v269({ fm_psi: NaN, as_in2: 0.155, d_in: 3.81, b_in: 12 }));
+});
+
+test("bounds: spec-v270 computeCmuShearWall pins Fvm/Fvs/Fv/cap, the mvd clamp, the capped branch, and error seams", () => {
+  const r = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 20000, mvd: 0.5, av_in2: 0.20, s_in: 48, fs_psi: 32000 });
+  assert.ok(Math.abs(r.an_in2 - 732) < 1e-12);
+  assert.ok(Math.abs(r.fvm - 67.34596587738706) < 1e-9);
+  assert.ok(Math.abs(r.fvs - 8.743169398907105) < 1e-9);
+  assert.ok(Math.abs(r.fv - 76.08913527629416) < 1e-9);
+  assert.ok(Math.abs(r.fv_max - 103.27955589886444) < 1e-9);
+  assert.ok(Math.abs(r.va_kip - 55.69724702224732) < 1e-9);
+  assert.strictEqual(r.capped, false);
+  // Cross-check: no axial, slender M/(Vdv) = 1.0.
+  const r2 = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 0, mvd: 1.0, av_in2: 0.20, s_in: 48, fs_psi: 32000 });
+  assert.ok(Math.abs(r2.fvm - 43.57106264483344) < 1e-9);
+  assert.ok(Math.abs(r2.fv_max - 2 * Math.sqrt(1500)) < 1e-12);
+  assert.ok(Math.abs(r2.va_kip - 38.29401785601808) < 1e-9);
+  // The mvd clamp inside Fvm: mvd = 2 uses 1.0 in the masonry term (same Fvm as mvd = 1).
+  const r3 = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 0, mvd: 2.0, av_in2: 0, s_in: 48 });
+  assert.ok(Math.abs(r3.fvm - r2.fvm) < 1e-12);
+  // The capped branch: heavy Av pushes Fv past Fv_max and the cap governs.
+  const r4 = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 0, mvd: 1.0, av_in2: 2.0, s_in: 8, fs_psi: 32000 });
+  assert.strictEqual(r4.capped, true);
+  assert.ok(Math.abs(r4.va_kip - r4.fv_max * 732 / 1000) < 1e-9);
+  // The squat cap: mvd <= 0.25 uses 3 sqrt(f'm).
+  const r5 = _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: 0, mvd: 0.25, av_in2: 0, s_in: 48 });
+  assert.ok(Math.abs(r5.fv_max - 3 * Math.sqrt(1500)) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v270({ fm_psi: 0, b_in: 7.625, dv_in: 96 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 0, dv_in: 96 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 0 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, s_in: 0 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, p_lb: -1 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, av_in2: -1 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, mvd: -0.1 }));
+  assert.ok("error" in _v270({ fm_psi: 1500, b_in: 7.625, dv_in: 96, fs_psi: 0 }));
+  assert.ok("error" in _v270({ fm_psi: Infinity, b_in: 7.625, dv_in: 96 }));
+});
+
+test("bounds: spec-v271 computeCmuWallAxial pins both slenderness branches, the h/r = 99 continuity, and error seams", () => {
+  const r = _v271({ fm_psi: 2000, an_in2: 91.5, ast_in2: 0.155, h_in: 144, r_in: 2.201, fs_psi: 32000 });
+  assert.ok(Math.abs(r.hr - 65.42480690595184) < 1e-9);
+  assert.ok(Math.abs(r.p0_lb - 48974) < 1e-9);
+  assert.ok(Math.abs(r.r_factor - 0.781611971495863) < 1e-12);
+  assert.ok(Math.abs(r.pa_kip - 38.27866469203839) < 1e-9);
+  assert.strictEqual(r.slender, false);
+  // Cross-check: 24 ft flips to the slender branch and more than halves Pa.
+  const r2 = _v271({ fm_psi: 2000, an_in2: 91.5, ast_in2: 0.155, h_in: 288, r_in: 2.201, fs_psi: 32000 });
+  assert.ok(Math.abs(r2.hr - 130.84961381190368) < 1e-9);
+  assert.ok(Math.abs(r2.r_factor - 0.28618784842785494) < 1e-12);
+  assert.ok(Math.abs(r2.pa_kip - 14.015763688905768) < 1e-9);
+  assert.strictEqual(r2.slender, true);
+  // Continuity at h/r = 99: the two branch forms agree to ~1e-4.
+  const ra = _v271({ fm_psi: 2000, an_in2: 91.5, ast_in2: 0, h_in: 99, r_in: 1, fs_psi: 32000 });
+  const rb = _v271({ fm_psi: 2000, an_in2: 91.5, ast_in2: 0, h_in: 99.000001, r_in: 1, fs_psi: 32000 });
+  assert.ok(Math.abs(ra.r_factor - rb.r_factor) < 1e-4);
+  // Untied wall: Ast = 0 drops the steel term.
+  assert.ok(Math.abs(ra.p0_lb - 0.25 * 2000 * 91.5) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v271({ fm_psi: 0, an_in2: 91.5, h_in: 144, r_in: 2.201 }));
+  assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 0, h_in: 144, r_in: 2.201 }));
+  assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 91.5, h_in: 0, r_in: 2.201 }));
+  assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 91.5, h_in: 144, r_in: 0 }));
+  assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 91.5, ast_in2: -1, h_in: 144, r_in: 2.201 }));
+  assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 91.5, h_in: NaN, r_in: 2.201 }));
+});

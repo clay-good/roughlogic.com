@@ -492,6 +492,8 @@ const _TILES = [
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)
   ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["retaining-wall-stability", "E"],
+  // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (calc-masonry.js)
+  ["cmu-wall-flexure", "E"], ["cmu-shear-wall", "E"], ["cmu-wall-axial", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

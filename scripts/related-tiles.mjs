@@ -871,6 +871,10 @@ const RELATED = {
   "soil-bearing-capacity": ["footing-area","retaining-wall-stability","helical-pile"],
   "lateral-earth-pressure": ["retaining-wall-stability","soil-bearing-capacity","spoil-setback"],
   "retaining-wall-stability": ["lateral-earth-pressure","soil-bearing-capacity","retaining-wall-block"],
+  // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (Group E, calc-masonry.js)
+  "cmu-wall-flexure": ["cmu-shear-wall","cmu-wall-axial","cmu-grout-volume","rc-beam-flexure"],
+  "cmu-shear-wall": ["cmu-wall-flexure","cmu-wall-axial","seismic-base-shear","cmu-grout-volume"],
+  "cmu-wall-axial": ["cmu-wall-flexure","cmu-shear-wall","steel-column-capacity","cmu-grout-volume"],
   // spec-v248..v250 fire-sprinkler system-design trio (Group F, calc-firesprinkler.js)
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],

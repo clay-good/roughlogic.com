@@ -429,6 +429,12 @@ const TOOL_MODULES = (() => {
   declare("./calc-geotech.js", "GEOTECH_RENDERERS", [
     "soil-bearing-capacity", "lateral-earth-pressure", "retaining-wall-stability",
   ]);
+  // spec-v269..v271 TMS 402-16 reinforced-masonry member trio: a new lazy
+  // Group E cluster, the masonry counterpart to the steel / RC member benches;
+  // masonry's first structural (not takeoff) tiles. All three KEEP group "E".
+  declare("./calc-masonry.js", "MASONRY_RENDERERS", [
+    "cmu-wall-flexure", "cmu-shear-wall", "cmu-wall-axial",
+  ]);
   // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
   // moved out of calc-construction.js (it sat at 97.6% of its size cap) into
   // its own module. All five tiles KEEP group "E" (the module is independent

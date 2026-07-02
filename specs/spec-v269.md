@@ -1,6 +1,6 @@
 # roughlogic.com Specification v269 -- Reinforced CMU Wall Out-of-Plane Flexure (TMS 402 ASD, Cracked Transformed Section) (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v269..v271 (the TMS 402-16 reinforced-masonry member trio -- the three
+> **Status: LANDED (2026-07-02, package 0.96.0; was PROPOSED 2026-07-02). Batch spec-v269..v271 (the TMS 402-16 reinforced-masonry member trio -- the three
 > limit states a masonry wall answers once the concrete and steel batches have sized their members: how much moment the
 > wall takes bending out-of-plane under wind or seismic (this spec), how much in-plane shear the same wall carries as a
 > shear wall (v270), and how much axial load it stands up under (v271). Flexure / shear / axial, the exact triad the AISC

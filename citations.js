@@ -7780,6 +7780,42 @@ export const CITATIONS = {
       { name: "Member design separate", value: "the stem and base are reinforced-concrete members with their own flexure / shear / development checks (see the ACI 318-19 tiles)", source: "ACI 318-19" },
     ],
   },
+  "cmu-wall-flexure": {
+    formula: "n = Es/Em (Em = 900 f'm); rho = As/(b d); k = sqrt(2 rho n + (rho n)^2) - rho n; j = 1 - k/3; Ms = As Fs j d; Mm = 0.5 Fb k j b d^2 (Fb = 0.45 f'm); Ma = min(Ms, Mm).",
+    edition: "TMS 402-16 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress-design cracked transformed-section flexure, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",
+    freeAccess: "CMHA TEK 14-07C (Allowable Stress Design of Concrete Masonry) is a free public CMHA technical note; the k / j working-stress arithmetic is public and printed in every masonry-design text.",
+    governance: GOVERNANCE.general,
+    editionNote: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress-design cracked transformed-section flexure: n = Es/Em with Es = 29,000,000 psi and Em = 900 f'm for concrete masonry, rho = As/(b d), k = sqrt(2 rho n + (rho n)^2) - rho n, j = 1 - k/3, the steel-governed allowable moment Ms = As Fs j d and the masonry-governed Mm = 0.5 Fb k j b d^2, with Fs = 32,000 psi for Grade 60 reinforcement and Fb = 0.45 f'm, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level bending moment of a singly reinforced, fully grouted masonry section by the working-stress method: the section is assumed cracked, the reinforcement developed and in tension, the axial compression negligible (a wall in near-pure flexure), and one layer of steel at the reported effective depth. The axial term and the one-third stress increase are not applied, and this is not the strength-design (LRFD) moment. Take f'm, the bar size, and the spacing from the structural drawings. A design aid, not a substitute for the engineer of record's stamped design - the structural engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Cracked working-stress section", value: "singly reinforced, fully grouted, cracked transformed section in near-pure flexure; the axial interaction and the slender-wall P-delta method are separate analyses", source: "TMS 402-16 / CMHA TEK 14-07C" },
+      { name: "Allowable stresses", value: "Fs = 32,000 psi (Grade 60) and Fb = 0.45 f'm, with Em = 900 f'm for concrete masonry; editable for other grades and materials", source: "TMS 402-16" },
+      { name: "Governing mode reported", value: "the lesser of the steel- and masonry-governed moments governs; adding steel past the balance point stops paying off once Mm < Ms", source: "Masonry Designers' Guide" },
+    ],
+  },
+  "cmu-shear-wall": {
+    formula: "Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An); Fvs = 0.5 x (Av Fs dv)/(An s); Fv = Fvm + Fvs, capped at 3 sqrt(f'm) (M/(V dv) <= 0.25) grading to 2 sqrt(f'm) (>= 1.0); Va = Fv An.",
+    edition: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress in-plane shear provisions, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",
+    freeAccess: "CMHA TEK notes on shear-wall allowable-stress design are free public CMHA technical notes; the Fvm / Fvs arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress in-plane shear: Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An) with the shear-span ratio taken positive and not greater than 1.0 inside the masonry term, Fvs = 0.5 x (Av Fs dv)/(An s) for horizontal shear reinforcement, the combined Fv = Fvm + Fvs, and the maximum-Fv cap of 3 sqrt(f'm) at M/(V dv) <= 0.25 grading linearly to 2 sqrt(f'm) at M/(V dv) >= 1.0, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level in-plane shear of a reinforced, fully grouted masonry shear wall. P is the sustained gravity compression (a larger P raises the masonry term, so use the load combination that actually acts with the shear); M/(V dv) is the shear-span ratio the designer supplies from the wall's height and length; the special-reinforced detailing and minimum-reinforcement rules are the engineer's to satisfy separately. A design aid, not a substitute for the engineer of record's stamped lateral design - the structural engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Two contributions plus a cap", value: "the masonry diagonal-tension term (raised by axial compression, lowered by slenderness) plus the horizontal-steel term, with the combined stress capped on the shear-span-graded 3-to-2 sqrt(f'm) line", source: "TMS 402-16" },
+      { name: "Sustained axial only", value: "P is the sustained compression acting with the shear; do not count live load that may be absent when the lateral force arrives", source: "TMS 402-16 / Masonry Designers' Guide" },
+      { name: "Detailing separate", value: "special-reinforced shear-wall detailing, minimum reinforcement ratios, and the shear-friction base check are separate code requirements", source: "TMS 402-16" },
+    ],
+  },
+  "cmu-wall-axial": {
+    formula: "Pa = (0.25 f'm An + 0.65 Ast Fs) x R; R = 1 - (h/(140 r))^2 for h/r <= 99, R = (70 r / h)^2 for h/r > 99 (branches meet at h/r = 99).",
+    edition: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress axial-compression provisions for reinforced masonry, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",
+    freeAccess: "CMHA TEK notes on ASD axial design are free public CMHA technical notes; the two-branch slenderness arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress axial compression for reinforced masonry: Pa = (0.25 f'm An + 0.65 Ast Fs) x (1 - (h/(140 r))^2) for a slenderness ratio h/r <= 99, and Pa = (0.25 f'm An + 0.65 Ast Fs) x (70 r / h)^2 for h/r > 99 (the two branches meet at h/r = 99, so the curve is continuous), with Fs the allowable compressive stress in the reinforcement, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level concentric axial compression of a reinforced, fully grouted masonry wall or column. The 0.65 Ast Fs reinforcement term applies where the vertical bars are laterally tied per the code's column provisions - for an untied wall the conservative practice is to drop that term (enter Ast = 0). Pure axial only: the moment interaction is separate (combine with cmu-wall-flexure through the unity check). The radius of gyration r and effective height h come from the section and the wall's actual bracing. A design aid, not a substitute for the engineer of record's stamped design - the structural engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Two-branch slenderness", value: "the 1 - (h/140r)^2 short/intermediate parabola and the (70r/h)^2 slender (Euler-type) branch meet continuously at h/r = 99", source: "TMS 402-16" },
+      { name: "Tied bars for the steel term", value: "0.65 Ast Fs counts only laterally tied vertical reinforcement; an untied wall conservatively takes 0.25 f'm An x R alone", source: "TMS 402-16 / Masonry Designers' Guide" },
+      { name: "Concentric only", value: "pure axial with no moment interaction; eccentric or combined loading runs through the unity check with the flexure tile", source: "TMS 402-16" },
+    ],
+  },
   "fire-pump-curve": {
     formula: "churn_limit = 1.40 x rated_psi; overload_flow = 1.50 x rated_gpm; overload_min = 0.65 x rated_psi; churn_ok = churn <= churn_limit; overload_ok = measured >= overload_min; margins as % of rated pressure.",
     edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022, by name; the 140% churn ceiling and the 65%-of-rated-at-150%-flow overload point are the listed centrifugal fire pump curve limits.",

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v270 -- Reinforced CMU Shear Wall In-Plane Allowable Shear (TMS 402 ASD, Fvm + Fvs) (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v269..v271 (the TMS 402-16 reinforced-masonry member trio -- flexure /
+> **Status: LANDED (2026-07-02, package 0.96.0; was PROPOSED 2026-07-02). Batch spec-v269..v271 (the TMS 402-16 reinforced-masonry member trio -- flexure /
 > shear / axial for a reinforced CMU wall). This spec is the middle limit state: the same wall the flexure tile (v269)
 > bends out-of-plane is, in the building's lateral system, a shear wall taking wind or seismic in-plane, and this tile
 > resolves how much of that in-plane shear it carries.)**

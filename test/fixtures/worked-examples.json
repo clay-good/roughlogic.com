@@ -27687,6 +27687,106 @@
         "fs_ot": { "value": 2.2828, "tolerance": { "abs": 0.001 } },
         "fs_sl": { "value": 1.3076, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "cmu-wall-flexure",
+      "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
+      "source_title": "8 in fully grouted wall, #5 at 24 in, f'm 2,000 psi -> k 0.280 / j 0.907, Ma 1,428 lb-ft per foot, steel-governed",
+      "source_edition_or_year": "spec-v269 worked example (machine-verified)",
+      "source_section_or_page": "spec-v269 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fm_psi": 2000, "as_in2": 0.155, "d_in": 3.81, "b_in": 12, "fs_psi": 32000 },
+      "outputs": {
+        "n_ratio": { "value": 16.1111, "tolerance": { "abs": 0.001 } },
+        "k": { "value": 0.2804, "tolerance": { "abs": 0.0001 } },
+        "j": { "value": 0.9065, "tolerance": { "abs": 0.0001 } },
+        "ms_ftlb": { "value": 1427.62, "tolerance": { "abs": 0.05 } },
+        "mm_ftlb": { "value": 1660.32, "tolerance": { "abs": 0.05 } },
+        "ma_ftlb": { "value": 1427.62, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "cmu-wall-flexure",
+      "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
+      "source_title": "cross-check: tighten to #5 at 16 in -> Mm 1,924 < Ms 2,102, the governing mode flips to masonry",
+      "source_edition_or_year": "spec-v269 worked example (machine-verified)",
+      "source_section_or_page": "spec-v269 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fm_psi": 2000, "as_in2": 0.2325, "d_in": 3.81, "b_in": 12, "fs_psi": 32000 },
+      "outputs": {
+        "k": { "value": 0.3311, "tolerance": { "abs": 0.0001 } },
+        "j": { "value": 0.8896, "tolerance": { "abs": 0.0001 } },
+        "ms_ftlb": { "value": 2101.51, "tolerance": { "abs": 0.05 } },
+        "mm_ftlb": { "value": 1923.99, "tolerance": { "abs": 0.05 } },
+        "ma_ftlb": { "value": 1923.99, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "cmu-shear-wall",
+      "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
+      "source_title": "8 in x 8 ft wall, f'm 1,500, 20 kip axial, M/(Vdv) 0.5, #4 at 48 in -> Fvm 67.3 + Fvs 8.7 = 76.1 psi, Va 55.7 kip",
+      "source_edition_or_year": "spec-v270 worked example (machine-verified)",
+      "source_section_or_page": "spec-v270 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fm_psi": 1500, "b_in": 7.625, "dv_in": 96, "p_lb": 20000, "mvd": 0.5, "av_in2": 0.2, "s_in": 48, "fs_psi": 32000 },
+      "outputs": {
+        "an_in2": { "value": 732.0, "tolerance": { "abs": 0.001 } },
+        "fvm": { "value": 67.346, "tolerance": { "abs": 0.005 } },
+        "fvs": { "value": 8.7432, "tolerance": { "abs": 0.001 } },
+        "fv": { "value": 76.0891, "tolerance": { "abs": 0.005 } },
+        "fv_max": { "value": 103.2796, "tolerance": { "abs": 0.005 } },
+        "va_kip": { "value": 55.6972, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "cmu-shear-wall",
+      "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
+      "source_title": "cross-check: no axial, slender M/(Vdv) = 1.0 -> Fvm falls to 43.6 psi, Va 38.3 kip, cap 2 sqrt(f'm)",
+      "source_edition_or_year": "spec-v270 worked example (machine-verified)",
+      "source_section_or_page": "spec-v270 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fm_psi": 1500, "b_in": 7.625, "dv_in": 96, "p_lb": 0, "mvd": 1.0, "av_in2": 0.2, "s_in": 48, "fs_psi": 32000 },
+      "outputs": {
+        "fvm": { "value": 43.5711, "tolerance": { "abs": 0.005 } },
+        "fv": { "value": 52.3142, "tolerance": { "abs": 0.005 } },
+        "fv_max": { "value": 77.4597, "tolerance": { "abs": 0.005 } },
+        "va_kip": { "value": 38.294, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "cmu-wall-axial",
+      "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
+      "source_title": "8 in grouted wall, 12 ft tall, #5 at 24 in, f'm 2,000 -> h/r 65.4, R 0.782, Pa 38.3 kip per foot",
+      "source_edition_or_year": "spec-v271 worked example (machine-verified)",
+      "source_section_or_page": "spec-v271 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fm_psi": 2000, "an_in2": 91.5, "ast_in2": 0.155, "h_in": 144, "r_in": 2.201, "fs_psi": 32000 },
+      "outputs": {
+        "hr": { "value": 65.4248, "tolerance": { "abs": 0.001 } },
+        "p0_lb": { "value": 48974.0, "tolerance": { "abs": 0.5 } },
+        "r_factor": { "value": 0.7816, "tolerance": { "abs": 0.0001 } },
+        "pa_kip": { "value": 38.2787, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "cmu-wall-axial",
+      "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
+      "source_title": "cross-check: stretch the wall to 24 ft -> h/r 130.8 slender branch, R = (70r/h)^2 = 0.286, Pa 14.0 kip",
+      "source_edition_or_year": "spec-v271 worked example (machine-verified)",
+      "source_section_or_page": "spec-v271 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fm_psi": 2000, "an_in2": 91.5, "ast_in2": 0.155, "h_in": 288, "r_in": 2.201, "fs_psi": 32000 },
+      "outputs": {
+        "hr": { "value": 130.8496, "tolerance": { "abs": 0.001 } },
+        "r_factor": { "value": 0.2862, "tolerance": { "abs": 0.0001 } },
+        "pa_kip": { "value": 14.0158, "tolerance": { "abs": 0.005 } }
+      }
     }
   ]
 }
