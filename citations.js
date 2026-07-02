@@ -7744,6 +7744,42 @@ export const CITATIONS = {
       { name: "Straight tension bars only", value: "hooked-bar (ldh, §25.4.3), headed-bar, compression (§25.4.9), and lap-splice (§25.5) lengths are separate calculations", source: "ACI 318-19 §25.4" },
     ],
   },
+  "soil-bearing-capacity": {
+    formula: "qu = c Nc sc + q Nq sq + 0.5 gamma B Ngamma sgamma; Nq = e^(pi tan phi) x tan^2(45 + phi/2); Nc = (Nq - 1) x cot phi (5.14 at phi = 0); Ngamma = 2 x (Nq + 1) x tan phi; q_all = qu / FS.",
+    edition: "The general bearing-capacity equation with the Vesic (1973) factors and De Beer / Vesic shape factors, as compiled in Das, Principles of Foundation Engineering, and FHWA-NHI-16-009 (GEC 6, Shallow Foundations), by name.",
+    freeAccess: "FHWA GEC 6 (FHWA-NHI-16-009) is a free public FHWA publication; the Vesic factor arithmetic is public and printed in every foundation-engineering text.",
+    governance: GOVERNANCE.general,
+    editionNote: "The general bearing-capacity equation qu = c Nc sc + q Nq sq + 0.5 gamma B Ngamma sgamma with the Vesic (1973) bearing-capacity factors Nq = e^(pi tan phi) tan^2(45 + phi/2), Nc = (Nq - 1) cot phi (the Prandtl 5.14 at phi = 0), Ngamma = 2 (Nq + 1) tan phi, and the De Beer / Vesic shape factors, as compiled in Das, Principles of Foundation Engineering, and FHWA-NHI-16-009 (GEC 6, Shallow Foundations). FS defaults to 3.0 (the customary factor of safety on gross bearing for a shallow foundation under static load); gamma defaults to 120 pcf. Returns the gross ultimate and allowable pressure for a general-shear failure of a level, concentrically loaded footing with a level ground surface and the water table at or below one footing width beneath the base - the net-bearing, groundwater, load-inclination, eccentricity, local- or punching-shear, and settlement corrections are not applied, and settlement (not this strength check) usually governs the design of a footing on sand. Take c, phi, and gamma from the geotechnical report for the actual site. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's stamped recommendation governs.",
+    assumptions: [
+      { name: "General shear, level and concentric", value: "a level, concentrically loaded footing failing in general shear with level ground; eccentric / inclined loads, sloping ground, and local or punching shear are separate corrections", source: "Das / FHWA GEC 6" },
+      { name: "Groundwater below the failure zone", value: "the water table is at or below one footing width beneath the base; a higher water table requires buoyant unit weights", source: "Das / FHWA GEC 6" },
+      { name: "Settlement separate", value: "the allowable is a strength check only; settlement usually governs a footing on sand and is a separate analysis", source: "Das / FHWA GEC 6" },
+    ],
+  },
+  "lateral-earth-pressure": {
+    formula: "Ka = tan^2(45 - phi/2) = (1 - sin phi) / (1 + sin phi); Kp = 1/Ka; Pa = 0.5 Ka gamma H^2 at H/3, plus surcharge Ka q H at H/2; Pp = 0.5 Kp gamma H^2.",
+    edition: "Rankine (1857) lateral earth pressure, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures), by name.",
+    freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual; the Rankine coefficient arithmetic is public and printed in every soil-mechanics text.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rankine (1857) lateral earth pressure - Ka = tan^2(45 - phi/2) = (1 - sin phi)/(1 + sin phi), Kp = 1/Ka = tan^2(45 + phi/2), resultant Pa = 0.5 Ka gamma H^2 at H/3 plus a uniform-surcharge term Ka q H at H/2 - as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). gamma defaults to 120 pcf, q to 0. The Rankine case only: a cohesionless soil (the 2c sqrt(Ka) tension-crack reduction of a cohesive backfill is not applied), a vertical wall face with no wall friction (Coulomb theory is required for an inclined or rough face and gives a lower active thrust), a dry level backfill with no water table (a submerged zone must be run with buoyant unit weight plus a separate hydrostatic pressure), and the fully-mobilized active and passive limit states (the wall must move enough to reach them). Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
+    assumptions: [
+      { name: "Rankine conditions", value: "cohesionless backfill, vertical frictionless wall face, level dry backfill; Coulomb / cohesive / submerged / sloped cases need their own analysis", source: "Rankine 1857 / Das / NAVFAC DM-7.02" },
+      { name: "Limit states mobilized", value: "active and passive values require enough wall movement to mobilize them; a braced non-yielding wall sees the higher at-rest K0 = 1 - sin phi", source: "Das / NAVFAC DM-7.02" },
+      { name: "Passive used cautiously", value: "the passive thrust is an upper bound needing large movement to develop; designs commonly reduce or neglect it", source: "NAVFAC DM-7.02" },
+    ],
+  },
+  "retaining-wall-stability": {
+    formula: "FS_ot = Mr / Mo; FS_sl = mu x sum(V) / Pa; e = B/2 - (Mr - Mo)/sum(V); q_max,min = (sum(V)/B) x (1 +/- 6e/B); Rankine Pa = 0.5 Ka gamma H^2 + Ka q H.",
+    edition: "The standard cantilever-retaining-wall global-stability checks as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for sliding and overturning, by name.",
+    freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual and the IBC is viewable through ICC's free online reader; the moment-ratio arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The standard cantilever-retaining-wall global-stability checks - overturning FS = Mr / Mo (restoring moments of the stem, base, heel soil, and surcharge about the toe over the Rankine thrust moment), sliding FS = mu x sum(V) / Pa, and toe bearing q = (sum(V)/B)(1 +/- 6e/B) - as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for both sliding and overturning (standard practice designs overturning to 2.0). gamma_c defaults to 150 pcf (reinforced concrete); mu defaults to 0.5 (a common base-friction value; use tan of the base friction angle or the geotechnical report). A global-stability check of a level, cohesionless, dry backfill on a level base with the stem, base, and heel soil idealized as rectangles: the internal reinforced-concrete design of the stem and base is separate (see rc-beam-flexure / rc-beam-shear), passive resistance at the toe is conservatively neglected, seismic (Mononobe-Okabe) pressure and sloped or submerged backfills are not applied, and the reported gross toe pressure must be compared against the allowable bearing from soil-bearing-capacity. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "IBC 1807.2.3 targets", value: "minimum FS 1.5 against sliding and overturning (0.7 x seismic-included alternative not modeled); practice designs overturning to 2.0", source: "IBC 1807.2.3" },
+      { name: "Rectangular idealization", value: "stem, base, and heel soil are rectangles; a tapered stem, a shear key, and passive toe credit are refinements the tool omits (conservative for passive)", source: "Das / NAVFAC DM-7.02" },
+      { name: "Member design separate", value: "the stem and base are reinforced-concrete members with their own flexure / shear / development checks (see the ACI 318-19 tiles)", source: "ACI 318-19" },
+    ],
+  },
   "fire-pump-curve": {
     formula: "churn_limit = 1.40 x rated_psi; overload_flow = 1.50 x rated_gpm; overload_min = 0.65 x rated_psi; churn_ok = churn <= churn_limit; overload_ok = measured >= overload_min; margins as % of rated pressure.",
     edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022, by name; the 140% churn ceiling and the 65%-of-rated-at-150%-flow overload point are the listed centrifugal fire pump curve limits.",

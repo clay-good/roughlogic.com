@@ -490,6 +490,8 @@ const _TILES = [
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (calc-concrete.js)
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
+  // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)
+  ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["retaining-wall-stability", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

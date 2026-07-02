@@ -867,6 +867,10 @@ const RELATED = {
   "rc-beam-flexure": ["rc-beam-shear","rc-development-length","steel-beam-flexure"],
   "rc-beam-shear": ["rc-beam-flexure","rc-development-length","steel-beam-shear"],
   "rc-development-length": ["rebar-lap-splice","rc-beam-flexure","rebar-schedule"],
+  // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (Group E, calc-geotech.js)
+  "soil-bearing-capacity": ["footing-area","retaining-wall-stability","helical-pile"],
+  "lateral-earth-pressure": ["retaining-wall-stability","soil-bearing-capacity","spoil-setback"],
+  "retaining-wall-stability": ["lateral-earth-pressure","soil-bearing-capacity","retaining-wall-block"],
   // spec-v248..v250 fire-sprinkler system-design trio (Group F, calc-firesprinkler.js)
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],

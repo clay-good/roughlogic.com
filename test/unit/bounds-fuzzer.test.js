@@ -12877,3 +12877,95 @@ test("bounds: spec-v259 computeRcDevelopmentLength pins ld, the 1.7 and 2.5 caps
   assert.ok("error" in _v259({ fc: 4000, fy: 60000, db: 1, lambda: -1 }));
   assert.ok("error" in _v259({ fc: Infinity, fy: 60000, db: 1 }));
 });
+// ===================== spec-v260..v262 geotechnical foundation-and-earth-retaining trio =====================
+import {
+  computeSoilBearingCapacity as _v260, computeLateralEarthPressure as _v261, computeRetainingWallStability as _v262,
+} from "../../calc-geotech.js";
+
+test("bounds: spec-v260 computeSoilBearingCapacity pins the Vesic factors, the phi=0 identities, and error seams", () => {
+  const r = _v260({ c: 0, phi: 32, gamma: 120, b_ft: 6, df_ft: 4, shape: "strip", fs: 3 });
+  assert.ok(Math.abs(r.nq - 23.176776207012633) < 1e-9);
+  assert.ok(Math.abs(r.nc - 35.49026070689833) < 1e-9);
+  assert.ok(Math.abs(r.ngamma - 30.214652959465663) < 1e-9);
+  assert.ok(Math.abs(r.q_surch - 480) < 1e-12);
+  assert.ok(Math.abs(r.qu - 22002.127644773704) < 1e-6);
+  assert.ok(Math.abs(r.q_all - 7334.042548257901) < 1e-6);
+  // Strip shape factors are all 1.
+  assert.ok(Math.abs(r.sc - 1) < 1e-12 && Math.abs(r.sq - 1) < 1e-12 && Math.abs(r.sgamma - 1) < 1e-12);
+  // Cross-check: the phi = 0 undrained-clay branch pins Nq = 1, Nc = 5.14 (Prandtl), Ngamma = 0.
+  const r2 = _v260({ c: 2000, phi: 0, gamma: 115, b_ft: 5, df_ft: 3, shape: "square", fs: 3 });
+  assert.ok(Math.abs(r2.nq - 1) < 1e-9);
+  assert.ok(Math.abs(r2.nc - (2 + Math.PI)) < 1e-12);
+  assert.ok(Math.abs(r2.ngamma - 0) < 1e-9);
+  assert.ok(Math.abs(r2.sc - 1.1944922648241714) < 1e-9);
+  assert.ok(Math.abs(r2.sgamma - 0.6) < 1e-12);
+  assert.ok(Math.abs(r2.qu - 12628.185307179587) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v260({ c: 0, phi: 32, gamma: 0, b_ft: 6, df_ft: 4 }));
+  assert.ok("error" in _v260({ c: 0, phi: 32, gamma: 120, b_ft: 0, df_ft: 4 }));
+  assert.ok("error" in _v260({ c: 0, phi: 32, gamma: 120, b_ft: 6, df_ft: 4, fs: 0 }));
+  assert.ok("error" in _v260({ c: -1, phi: 32, gamma: 120, b_ft: 6, df_ft: 4 }));
+  assert.ok("error" in _v260({ c: 0, phi: 32, gamma: 120, b_ft: 6, df_ft: -1 }));
+  assert.ok("error" in _v260({ c: 0, phi: -1, gamma: 120, b_ft: 6, df_ft: 4 }));
+  assert.ok("error" in _v260({ c: 0, phi: 50, gamma: 120, b_ft: 6, df_ft: 4 }));
+  assert.ok("error" in _v260({ c: 0, phi: Infinity, gamma: 120, b_ft: 6, df_ft: 4 }));
+});
+
+test("bounds: spec-v261 computeLateralEarthPressure pins Ka/Kp, the thrusts, the Ka x Kp = 1 identity, and error seams", () => {
+  const r = _v261({ phi: 30, gamma: 120, h_ft: 10, q: 0 });
+  assert.ok(Math.abs(r.ka - 1 / 3) < 1e-12);
+  assert.ok(Math.abs(r.kp - 3) < 1e-12);
+  assert.ok(Math.abs(r.ka * r.kp - 1) < 1e-12);
+  assert.ok(Math.abs(r.pa_base - 400) < 1e-9);
+  assert.ok(Math.abs(r.pa_tot - 2000) < 1e-9);
+  assert.ok(Math.abs(r.y_bar - 10 / 3) < 1e-12);
+  assert.ok(Math.abs(r.pp - 18000) < 1e-9);
+  // Cross-check: a 250 psf surcharge adds 833 lb/ft at mid-height and lifts the resultant.
+  const r2 = _v261({ phi: 30, gamma: 120, h_ft: 10, q: 250 });
+  assert.ok(Math.abs(r2.pa_surch - 833.3333333333333) < 1e-9);
+  assert.ok(Math.abs(r2.pa_tot - 2833.333333333333) < 1e-9);
+  assert.ok(Math.abs(r2.y_bar - 3.823529411764706) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v261({ phi: 30, gamma: 0, h_ft: 10 }));
+  assert.ok("error" in _v261({ phi: 30, gamma: 120, h_ft: 0 }));
+  assert.ok("error" in _v261({ phi: 30, gamma: 120, h_ft: 10, q: -1 }));
+  assert.ok("error" in _v261({ phi: 0, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v261({ phi: 50, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v261({ phi: NaN, gamma: 120, h_ft: 10 }));
+});
+
+test("bounds: spec-v262 computeRetainingWallStability pins the three checks, the surcharge sliding flip, and error seams", () => {
+  const r = _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, gamma_s: 110, gamma_c: 150, phi: 30, mu: 0.5, q: 0 });
+  assert.ok(Math.abs(r.sum_v - 6210) < 1e-9);
+  assert.ok(Math.abs(r.mr - 20565) < 1e-9);
+  assert.ok(Math.abs(r.mo - 6111.11111111111) < 1e-6);
+  assert.ok(Math.abs(r.fs_ot - 3.3651818181818185) < 1e-9);
+  assert.ok(Math.abs(r.fs_sl - 1.6936363636363638) < 1e-9);
+  assert.ok(Math.abs(r.ecc - 0.6724816604043653) < 1e-9);
+  assert.ok(Math.abs(r.q_max - 1731.018518518518) < 1e-6);
+  assert.ok(Math.abs(r.q_min - 338.9814814814819) < 1e-6);
+  assert.strictEqual(r.middle_third, true);
+  // Cross-check: a 300 psf surcharge drops sliding below the IBC 1.5 minimum and pushes
+  // the resultant outside the middle third (heel uplift).
+  const r2 = _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, gamma_s: 110, gamma_c: 150, phi: 30, mu: 0.5, q: 300 });
+  assert.ok(Math.abs(r2.fs_ot - 2.2828500000000003) < 1e-9);
+  assert.ok(Math.abs(r2.fs_sl - 1.3076470588235296) < 1e-9);
+  assert.ok(r2.fs_sl < 1.5);
+  assert.strictEqual(r2.middle_third, false);
+  assert.ok(r2.q_min < 0);
+  // Error seams, including the no-heel geometry guard.
+  assert.ok("error" in _v262({ h_ft: 0, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 0, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 0, t_stem: 1, toe_ft: 1, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 0, toe_ft: 1, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: -1, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, gamma_s: 0, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, gamma_c: 0, phi: 30 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30, mu: 0 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30, q: -1 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 0 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 55 }));
+  assert.ok("error" in _v262({ h_ft: 10, b_ft: 6, t_base: 1, t_stem: 4, toe_ft: 2, phi: 30 })); // no heel
+  assert.ok("error" in _v262({ h_ft: 0.5, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 })); // height <= base thickness
+  assert.ok("error" in _v262({ h_ft: Infinity, b_ft: 6, t_base: 1, t_stem: 1, toe_ft: 1, phi: 30 }));
+});

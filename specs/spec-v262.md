@@ -1,6 +1,6 @@
 # roughlogic.com Specification v262 -- Cantilever Retaining Wall Stability: Overturning, Sliding, and Bearing (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v260..v262 (the geotechnical foundation-and-earth-retaining trio). This spec
+> **Status: LANDED (2026-07-02, package 0.95.0; was PROPOSED 2026-07-02). Batch spec-v260..v262 (the geotechnical foundation-and-earth-retaining trio). This spec
 > closes the batch: it takes the Rankine thrust of v261 and the toe-bearing check of v260 and runs the three global-
 > stability limit states a cantilever retaining wall must pass.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog counts a segmental wall's blocks

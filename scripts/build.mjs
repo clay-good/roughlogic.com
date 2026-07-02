@@ -56,6 +56,7 @@ const FILES = [
   "calc-civil.js",
   "calc-steel.js",
   "calc-concrete.js",
+  "calc-geotech.js",
   "calc-earthwork.js",
   "calc-fire.js",
   "calc-rescue.js",

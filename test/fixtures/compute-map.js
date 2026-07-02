@@ -715,6 +715,10 @@ export const COMPUTE_MAP = {
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },
   "rc-beam-shear": { module: "../../calc-concrete.js", fn: "computeRcBeamShear" },
   "rc-development-length": { module: "../../calc-concrete.js", fn: "computeRcDevelopmentLength" },
+  // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (3 tiles, new calc-geotech.js)
+  "soil-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSoilBearingCapacity" },
+  "lateral-earth-pressure": { module: "../../calc-geotech.js", fn: "computeLateralEarthPressure" },
+  "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
   // spec-v248..v250 fire-sprinkler system-design trio (3 tiles, new calc-firesprinkler.js)
   "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
   "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v260 -- Shallow Foundation Bearing Capacity (General Bearing-Capacity Equation) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v260..v262 (the geotechnical foundation-and-earth-retaining trio -- the
+> **Status: LANDED (2026-07-02, package 0.95.0; was PROPOSED 2026-07-02). Batch spec-v260..v262 (the geotechnical foundation-and-earth-retaining trio -- the
 > three questions the ground poses once the structural batches have sized the member: will the soil carry the footing
 > (bearing), how hard does the retained soil push (lateral earth pressure), and does the wall that holds it back stay put
 > (overturning and sliding). This spec opens the batch with the vertical bearing check.)**

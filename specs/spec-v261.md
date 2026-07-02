@@ -1,6 +1,6 @@
 # roughlogic.com Specification v261 -- Rankine Lateral Earth Pressure and Thrust (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v260..v262 (the geotechnical foundation-and-earth-retaining trio). This spec
+> **Status: LANDED (2026-07-02, package 0.95.0; was PROPOSED 2026-07-02). Batch spec-v260..v262 (the geotechnical foundation-and-earth-retaining trio). This spec
 > is the middle tile -- the lateral load the retained soil applies, which the bearing tile (v260) sits beneath and the
 > stability tile (v262) resists.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog counts the blocks in a segmental wall

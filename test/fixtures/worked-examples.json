@@ -27583,6 +27583,110 @@
         "ld_in": { "value": 36.9986, "tolerance": { "abs": 0.001 } },
         "ld_db": { "value": 36.9986, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "soil-bearing-capacity",
+      "source_publisher": "Das, Principles of Foundation Engineering / FHWA-NHI-16-009 (GEC 6)",
+      "source_title": "6 ft strip footing, 4 ft deep, phi 32 sand at 120 pcf -> Nq 23.18 / Nc 35.49 / Ngamma 30.21, qu 22.0 ksf, 7.3 ksf allowable at FS 3",
+      "source_edition_or_year": "spec-v260 worked example (machine-verified)",
+      "source_section_or_page": "spec-v260 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "c": 0, "phi": 32, "gamma": 120, "b_ft": 6, "df_ft": 4, "shape": "strip", "fs": 3 },
+      "outputs": {
+        "nq": { "value": 23.1768, "tolerance": { "abs": 0.001 } },
+        "nc": { "value": 35.4903, "tolerance": { "abs": 0.001 } },
+        "ngamma": { "value": 30.2147, "tolerance": { "abs": 0.001 } },
+        "q_surch": { "value": 480.0, "tolerance": { "abs": 0.001 } },
+        "qu": { "value": 22002.13, "tolerance": { "abs": 0.05 } },
+        "q_all": { "value": 7334.04, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "soil-bearing-capacity",
+      "source_publisher": "Das, Principles of Foundation Engineering / FHWA-NHI-16-009 (GEC 6)",
+      "source_title": "cross-check: 5 ft square footing on phi = 0 stiff clay (c 2,000 psf) -> Nc 5.14 Prandtl branch, Ngamma 0, qu 12,628 psf",
+      "source_edition_or_year": "spec-v260 worked example (machine-verified)",
+      "source_section_or_page": "spec-v260 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "c": 2000, "phi": 0, "gamma": 115, "b_ft": 5, "df_ft": 3, "shape": "square", "fs": 3 },
+      "outputs": {
+        "nc": { "value": 5.1416, "tolerance": { "abs": 0.001 } },
+        "nq": { "value": 1.0, "tolerance": { "abs": 0.001 } },
+        "ngamma": { "value": 0.0, "tolerance": { "abs": 0.0001 } },
+        "qu": { "value": 12628.19, "tolerance": { "abs": 0.05 } },
+        "q_all": { "value": 4209.4, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "lateral-earth-pressure",
+      "source_publisher": "Rankine (1857) as compiled in Das / NAVFAC DM-7.02",
+      "source_title": "10 ft wall, phi 30 sand at 120 pcf, no surcharge -> Ka 1/3, Pa 2,000 lb/ft at H/3, Pp 18,000 lb/ft (the 9:1 ratio)",
+      "source_edition_or_year": "spec-v261 worked example (machine-verified)",
+      "source_section_or_page": "spec-v261 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "phi": 30, "gamma": 120, "h_ft": 10, "q": 0 },
+      "outputs": {
+        "ka": { "value": 0.3333, "tolerance": { "abs": 0.0001 } },
+        "kp": { "value": 3.0, "tolerance": { "abs": 0.0001 } },
+        "pa_base": { "value": 400.0, "tolerance": { "abs": 0.01 } },
+        "pa_tot": { "value": 2000.0, "tolerance": { "abs": 0.01 } },
+        "y_bar": { "value": 3.3333, "tolerance": { "abs": 0.001 } },
+        "pp": { "value": 18000.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "lateral-earth-pressure",
+      "source_publisher": "Rankine (1857) as compiled in Das / NAVFAC DM-7.02",
+      "source_title": "cross-check: same wall with a 250 psf surcharge -> +833 lb/ft at mid-height, total 2,833 lb/ft, resultant rises to 3.82 ft",
+      "source_edition_or_year": "spec-v261 worked example (machine-verified)",
+      "source_section_or_page": "spec-v261 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "phi": 30, "gamma": 120, "h_ft": 10, "q": 250 },
+      "outputs": {
+        "pa_surch": { "value": 833.33, "tolerance": { "abs": 0.01 } },
+        "pa_tot": { "value": 2833.33, "tolerance": { "abs": 0.01 } },
+        "y_bar": { "value": 3.8235, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "retaining-wall-stability",
+      "source_publisher": "Das / NAVFAC DM-7.02 stability checks vs IBC 1807.2.3",
+      "source_title": "10 ft cantilever wall, 6 ft base, phi 30 at 110 pcf, dry -> FS overturning 3.37, FS sliding 1.69, toe 1,731 psf, all pass",
+      "source_edition_or_year": "spec-v262 worked example (machine-verified)",
+      "source_section_or_page": "spec-v262 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "h_ft": 10, "b_ft": 6, "t_base": 1, "t_stem": 1, "toe_ft": 1, "gamma_s": 110, "gamma_c": 150, "phi": 30, "mu": 0.5, "q": 0 },
+      "outputs": {
+        "sum_v": { "value": 6210.0, "tolerance": { "abs": 0.01 } },
+        "mr": { "value": 20565.0, "tolerance": { "abs": 0.01 } },
+        "mo": { "value": 6111.11, "tolerance": { "abs": 0.01 } },
+        "fs_ot": { "value": 3.3652, "tolerance": { "abs": 0.001 } },
+        "fs_sl": { "value": 1.6936, "tolerance": { "abs": 0.001 } },
+        "ecc": { "value": 0.6725, "tolerance": { "abs": 0.001 } },
+        "q_max": { "value": 1731.02, "tolerance": { "abs": 0.05 } },
+        "q_min": { "value": 338.98, "tolerance": { "abs": 0.05 } }
+      }
+    },
+    {
+      "tile_id": "retaining-wall-stability",
+      "source_publisher": "Das / NAVFAC DM-7.02 stability checks vs IBC 1807.2.3",
+      "source_title": "cross-check: the same wall with a 300 psf surcharge -> FS overturning 2.28, FS sliding 1.31 FAILS the 1.5 minimum",
+      "source_edition_or_year": "spec-v262 worked example (machine-verified)",
+      "source_section_or_page": "spec-v262 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "h_ft": 10, "b_ft": 6, "t_base": 1, "t_stem": 1, "toe_ft": 1, "gamma_s": 110, "gamma_c": 150, "phi": 30, "mu": 0.5, "q": 300 },
+      "outputs": {
+        "sum_v": { "value": 7410.0, "tolerance": { "abs": 0.01 } },
+        "mo": { "value": 11111.11, "tolerance": { "abs": 0.01 } },
+        "fs_ot": { "value": 2.2828, "tolerance": { "abs": 0.001 } },
+        "fs_sl": { "value": 1.3076, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }
