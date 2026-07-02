@@ -27488,6 +27488,101 @@
         "achieved_area_per_head": { "value": 200.0, "tolerance": { "abs": 0.001 } },
         "max_wall_distance": { "value": 7.5, "tolerance": { "abs": 0.001 } }
       }
+    },
+    {
+      "tile_id": "rc-beam-flexure",
+      "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
+      "source_title": "12x24 beam, three #9 Grade 60 bars on 4,000 psi concrete -> a 4.41 in, phi Mn 260 kip-ft, 0.77 utilization at Mu 200",
+      "source_edition_or_year": "spec-v257 worked example (machine-verified)",
+      "source_section_or_page": "spec-v257 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc": 4000, "fy": 60000, "as_in2": 3.0, "b": 12, "d": 21.5, "mu": 200 },
+      "outputs": {
+        "a_in": { "value": 4.4118, "tolerance": { "abs": 0.001 } },
+        "mn_kipft": { "value": 289.4118, "tolerance": { "abs": 0.005 } },
+        "phi_mn": { "value": 260.4706, "tolerance": { "abs": 0.005 } },
+        "util": { "value": 0.7678, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rc-beam-flexure",
+      "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
+      "source_title": "cross-check: lighter 10x18 beam, two #9 bars -> phi Mn 128 kip-ft, barely half the moment (depth dominates)",
+      "source_edition_or_year": "spec-v257 worked example (machine-verified)",
+      "source_section_or_page": "spec-v257 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc": 4000, "fy": 60000, "as_in2": 2.0, "b": 10, "d": 16 },
+      "outputs": {
+        "a_in": { "value": 3.5294, "tolerance": { "abs": 0.001 } },
+        "mn_kipft": { "value": 142.3529, "tolerance": { "abs": 0.005 } },
+        "phi_mn": { "value": 128.1176, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "rc-beam-shear",
+      "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
+      "source_title": "12x21.5 beam on 4,000 psi, Vu 40 kip -> phi Vc 24.5 kip, stirrups required, #3 at 13.7 in computed, d/2 = 10.75 in governs",
+      "source_edition_or_year": "spec-v258 worked example (machine-verified)",
+      "source_section_or_page": "spec-v258 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc": 4000, "fyt": 60000, "bw": 12, "d": 21.5, "av_in2": 0.22, "vu": 40, "lambda": 1.0 },
+      "outputs": {
+        "vc_kip": { "value": 32.6347, "tolerance": { "abs": 0.001 } },
+        "phi_vc": { "value": 24.476, "tolerance": { "abs": 0.001 } },
+        "vs_req_kip": { "value": 20.6986, "tolerance": { "abs": 0.001 } },
+        "s_req_in": { "value": 13.7111, "tolerance": { "abs": 0.001 } },
+        "s_max_in": { "value": 10.75, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rc-beam-shear",
+      "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
+      "source_title": "cross-check: Vu 20 kip < phi Vc 24.5 kip -> concrete carries the shear, stirrups become a detailing minimum",
+      "source_edition_or_year": "spec-v258 worked example (machine-verified)",
+      "source_section_or_page": "spec-v258 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc": 4000, "fyt": 60000, "bw": 12, "d": 21.5, "av_in2": 0.22, "vu": 20, "lambda": 1.0 },
+      "outputs": {
+        "vc_kip": { "value": 32.6347, "tolerance": { "abs": 0.001 } },
+        "phi_vc": { "value": 24.476, "tolerance": { "abs": 0.001 } },
+        "vs_req_kip": { "value": 0.0, "tolerance": { "abs": 0.0001 } },
+        "s_max_in": { "value": 10.75, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rc-development-length",
+      "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
+      "source_title": "#8 Grade 60 uncoated bottom bar, 4,000 psi, well confined -> ld 28.5 in (about 28 bar diameters)",
+      "source_edition_or_year": "spec-v259 worked example (machine-verified)",
+      "source_section_or_page": "spec-v259 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc": 4000, "fy": 60000, "db": 1.0, "psi_t": 1.0, "psi_e": 1.0, "psi_s": 1.0, "psi_g": 1.0, "lambda": 1.0, "conf": 2.5 },
+      "outputs": {
+        "te": { "value": 1.0, "tolerance": { "abs": 0.0001 } },
+        "conf_eff": { "value": 2.5, "tolerance": { "abs": 0.0001 } },
+        "ld_in": { "value": 28.4605, "tolerance": { "abs": 0.001 } },
+        "ld_db": { "value": 28.4605, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rc-development-length",
+      "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
+      "source_title": "cross-check: the same #8 cast as a top bar -> psi_t 1.3, ld 37.0 in (the casting-position penalty)",
+      "source_edition_or_year": "spec-v259 worked example (machine-verified)",
+      "source_section_or_page": "spec-v259 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "fc": 4000, "fy": 60000, "db": 1.0, "psi_t": 1.3, "psi_e": 1.0, "psi_s": 1.0, "psi_g": 1.0, "lambda": 1.0, "conf": 2.5 },
+      "outputs": {
+        "te": { "value": 1.3, "tolerance": { "abs": 0.0001 } },
+        "ld_in": { "value": 36.9986, "tolerance": { "abs": 0.001 } },
+        "ld_db": { "value": 36.9986, "tolerance": { "abs": 0.001 } }
+      }
     }
   ]
 }

@@ -42,7 +42,11 @@ const TILE_GZIP_CAP = 6 * 1024;
 // Bumped 14 -> 17 KB on 2026-06-30: the spec-v230..v232 + v236..v238 energy-cost
 // batch added 6 more Group A tiles, taking electrical/index.html to ~15.2 KB gz;
 // 17 KB restores ~12% headroom for further Group A growth.
-const GROUP_GZIP_CAP = 17 * 1024;
+// Bumped 17 -> 20 KB on 2026-07-02: the spec-v242..v268 building-code / steel /
+// concrete batches grew Group E (Construction) past Group A as the largest hub;
+// the v257..v259 reinforced-concrete trio took construction/index.html to
+// ~17.8 KB gz; 20 KB restores ~12% headroom for further Group E growth.
+const GROUP_GZIP_CAP = 20 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

@@ -7708,6 +7708,42 @@ export const CITATIONS = {
       { name: "Concentric only", value: "concentric axial compression; moment / uplift, the anchor rods, and concrete breakout are separate checks", source: "AISC Design Guide 1" },
     ],
   },
+  "rc-beam-flexure": {
+    formula: "a = As x fy / (0.85 x f'c x b); Mn = As x fy x (d - a/2); phi Mn = 0.90 x Mn (tension-controlled); util = Mu / phi Mn.",
+    edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.2.2.4.1 (equivalent rectangular stress block), §22.2 (nominal flexural strength), §21.2.2 (phi = 0.90 tension-controlled).",
+    freeAccess: "ACI 318-19 is viewable through ACI's online public-access reader; the stress-block and moment-arm arithmetic is public and printed in every reinforced-concrete text.",
+    governance: GOVERNANCE.general,
+    editionNote: "ACI 318-19 §22.2.2.4.1 (equivalent rectangular stress block, a = As x fy / (0.85 x f'c x b)), §22.2 (Mn = As x fy x (d - a/2)), and §21.2.2 (the strength-reduction factor phi = 0.90 for a tension-controlled section). fy defaults to 60,000 psi (Grade 60, the standard deformed-bar grade). Covers only a singly-reinforced rectangular section assumed tension-controlled - the user must confirm the net tensile strain epsilon_t is at least 0.005 (§21.2.2), and compression reinforcement, T-beam flange action, minimum steel (§9.6.1.2), and shear (see rc-beam-shear) are not checked here. Take As and d from the reinforcement schedule for the actual section. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Section basis", value: "singly-reinforced rectangular section, tension-controlled (epsilon_t >= 0.005, phi = 0.90); confirm the strain, and use a doubly-reinforced or T-beam analysis where the section calls for it", source: "ACI 318-19 §21.2.2 / §22.2" },
+      { name: "Grade 60 default", value: "fy defaults to 60,000 psi (Grade 60 deformed bar), editable for Gr 40 / Gr 80", source: "ACI 318-19" },
+      { name: "Companion checks separate", value: "minimum steel (§9.6.1.2), shear (rc-beam-shear), deflection, and development (rc-development-length) are separate checks", source: "ACI 318-19" },
+    ],
+  },
+  "rc-beam-shear": {
+    formula: "Vc = 2 x lambda x sqrt(f'c) x bw x d; phi Vc = 0.75 x Vc; Vs,req = Vu/0.75 - Vc when Vu > phi Vc; s = Av x fyt x d / Vs; s_max = d/2.",
+    edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.5.5.1 (simplified Vc), §22.5.10.5.3 (vertical-stirrup Vs), §21.2.1 (phi = 0.75 shear), §9.7.6.2.2 (d/2 max spacing).",
+    freeAccess: "ACI 318-19 is viewable through ACI's online public-access reader; the 2 x sqrt(f'c) x bw x d and Av x fyt x d / s arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ACI 318-19 §22.5.5.1 (Vc = 2 x lambda x sqrt(f'c) x bw x d, the simplified concrete shear for a non-prestressed member without axial load, psi units), §22.5.10.5.3 (Vs = Av x fyt x d / s for vertical stirrups), §21.2.1 (phi = 0.75 for shear), and §9.7.6.2.2 (the d/2 maximum stirrup spacing, halved to d/4 when Vs exceeds 4 x sqrt(f'c) x bw x d). fyt defaults to 60,000 psi (Grade 60); lambda defaults to 1.0 (normalweight; 0.75 lightweight, §19.2.4). Uses the simplified Vc, not the detailed §22.5.5.1 expression with the reinforcement-ratio and size-effect terms; covers vertical stirrups on a member without significant axial load; and does not check the §22.5.1.2 upper limit Vs <= 8 x sqrt(f'c) x bw x d on the section size, the §9.6.3 minimum shear reinforcement, or deep-beam action. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Simplified Vc", value: "the traditional 2 x lambda x sqrt(f'c) x bw x d concrete term for a member without axial load, not the detailed 318-19 expression with rho_w and size-effect terms", source: "ACI 318-19 §22.5.5.1" },
+      { name: "Vertical stirrups", value: "Vs = Av x fyt x d / s assumes stirrups perpendicular to the axis; Av is the total area crossing the crack (both legs)", source: "ACI 318-19 §22.5.10.5.3" },
+      { name: "Limits separate", value: "the §22.5.1.2 section upper limit, §9.6.3 minimum shear reinforcement, and the d/4 tightening when Vs is high are separate checks the detailer applies", source: "ACI 318-19" },
+    ],
+  },
+  "rc-development-length": {
+    formula: "ld = (3/40) x fy x psi_t x psi_e x psi_s x psi_g / (lambda x sqrt(f'c) x (cb + Ktr)/db) x db; (cb + Ktr)/db capped at 2.5; psi_t x psi_e capped at 1.7; ld >= 12 in.",
+    edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §25.4.2.3 (general tension development equation), §25.4.2.4 (confinement cap), Table 25.4.2.5 (modification factors), §25.4.2.1 (12 in minimum).",
+    freeAccess: "ACI 318-19 is viewable through ACI's online public-access reader; the (3/40) x fy / (lambda sqrt(f'c)) x db arithmetic and the psi-factor table values are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ACI 318-19 §25.4.2.3 (the general tension development-length equation), §25.4.2.4 (the (cb + Ktr)/db confinement term, capped at 2.5), §25.4.2.5 / Table 25.4.2.5 (the modification factors: psi_t casting position 1.3 top bar / 1.0 other, psi_e coating 1.5 or 1.2 epoxy / 1.0 uncoated, psi_s size 0.8 for #6 and smaller / 1.0 for #7 and larger, psi_g grade 1.0 Gr 60 / 1.15 Gr 80 / 1.3 Gr 100, with the psi_t x psi_e product capped at 1.7), and §25.4.2.1 (the 12 in minimum). fy defaults to 60,000 psi (Grade 60, psi_g = 1.0); lambda defaults to 1.0 (normalweight; 0.75 lightweight); the confinement term defaults to 2.5 (the well-confined maximum). The psi factors are user-selected inputs, not derived here - the tool does not read cover, spacing, or transverse reinforcement to compute cb or Ktr. Straight-bar tension development only: not a standard hook (§25.4.3), a compression bar (§25.4.9), or a lap splice (§25.5, see rebar-lap-splice). A design aid, not a substitute for a licensed engineer's design - the engineer of record's detailing governs.",
+    assumptions: [
+      { name: "Psi factors user-selected", value: "psi_t / psi_e / psi_s / psi_g and the confinement term are entered from Table 25.4.2.5 and the actual detailing; the tool does not compute cb or Ktr from cover and stirrups", source: "ACI 318-19 Table 25.4.2.5" },
+      { name: "Caps and floor", value: "(cb + Ktr)/db is capped at 2.5, psi_t x psi_e at 1.7, and ld is never less than 12 in", source: "ACI 318-19 §25.4.2.1 / .4 / .5" },
+      { name: "Straight tension bars only", value: "hooked-bar (ldh, §25.4.3), headed-bar, compression (§25.4.9), and lap-splice (§25.5) lengths are separate calculations", source: "ACI 318-19 §25.4" },
+    ],
+  },
   "fire-pump-curve": {
     formula: "churn_limit = 1.40 x rated_psi; overload_flow = 1.50 x rated_gpm; overload_min = 0.65 x rated_psi; churn_ok = churn <= churn_limit; overload_ok = measured >= overload_min; margins as % of rated pressure.",
     edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022, by name; the 140% churn ceiling and the 65%-of-rated-at-150%-flow overload point are the listed centrifugal fire pump curve limits.",

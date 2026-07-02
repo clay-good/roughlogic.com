@@ -863,6 +863,10 @@ const RELATED = {
   "bolt-group-eccentric": ["weld-group-eccentric","bolt-shear-bearing","steel-column-capacity"],
   "bolt-shear-bearing": ["bolt-group-eccentric","fillet-weld-strength","steel-beam-shear"],
   "column-base-plate": ["steel-column-capacity","anchor-embedment","bolt-shear-bearing"],
+  // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (Group E, calc-concrete.js)
+  "rc-beam-flexure": ["rc-beam-shear","rc-development-length","steel-beam-flexure"],
+  "rc-beam-shear": ["rc-beam-flexure","rc-development-length","steel-beam-shear"],
+  "rc-development-length": ["rebar-lap-splice","rc-beam-flexure","rebar-schedule"],
   // spec-v248..v250 fire-sprinkler system-design trio (Group F, calc-firesprinkler.js)
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],

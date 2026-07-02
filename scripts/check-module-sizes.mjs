@@ -227,6 +227,7 @@ const CAPS = {
   "calc-civil.js": 8000, // v80 2026-06-16 new site-civil / roadway-geometry bench split out of calc-construction.js (4 tiles: horizontal-curve, vertical-curve, earthwork-end-area, slope-stake-cut-fill; ~6.6 KB gz, lazy-loaded, fits with headroom)
   "calc-steel.js": 9000, // spec-v254..v256 + v266..v268 2026-07-02 new AISC 360 steel member+connection bench (6 tiles: steel-beam-flexure, steel-beam-shear, steel-column-capacity, bolt-group-eccentric, bolt-shear-bearing, column-base-plate; built ~7.1 KB gz, lazy-loaded, not in home-view payload; cap = current + ~25% headroom)
   "calc-firesprinkler.js": 6000, // spec-v248..v250 2026-07-02 new NFPA 13/20 fire-sprinkler system-design bench split off beside calc-fire.js (3 tiles: fire-pump-curve, sprinkler-system-demand, sprinkler-head-layout; lazy-loaded, not in home-view payload; cap = current + ~25% headroom)
+  "calc-concrete.js": 6000, // spec-v257..v259 2026-07-02 new ACI 318-19 reinforced-concrete member bench, the RC companion to calc-steel.js (3 tiles: rc-beam-flexure, rc-beam-shear, rc-development-length; built ~4.5 KB gz, lazy-loaded, not in home-view payload; cap = current + ~25% headroom)
   "calc-earthwork.js": 8500, // v70 2026-06-15 new earthwork/excavation module (5 tiles split out of calc-construction.js: soil-swell-shrink, haul-cycle-production, dewatering-rate, spoil-setback, pipe-bedding-backfill; built ~7.0 KB; cap = current + ~20% headroom); lazy-loaded, not in the home-view payload
 
   // calc-electrical cap raised 39000 -> 42000 when v9 §A.3 + §A.4 landed.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v259 -- Rebar Tension Development Length (ACI 318-19 §25.4.2) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v257..v259 (the ACI 318-19 reinforced-concrete member trio). This spec
+> **Status: LANDED (2026-07-02, package 0.94.0; was PROPOSED 2026-07-02). Batch spec-v257..v259 (the ACI 318-19 reinforced-concrete member trio). This spec
 > closes the batch with the bar-development check -- the length of embedment that lets a bar reach its yield stress, which
 > is what makes the flexural and shear steel of v257 and v258 actually work.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog has `rebar-lap-splice`, but that tile is

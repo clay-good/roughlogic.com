@@ -1,6 +1,6 @@
 # roughlogic.com Specification v257 -- Reinforced Concrete Beam Flexural Capacity (ACI 318-19 Ch. 22) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v257..v259 (the ACI 318-19 reinforced-concrete member trio -- the three
+> **Status: LANDED (2026-07-02, package 0.94.0; was PROPOSED 2026-07-02). Batch spec-v257..v259 (the ACI 318-19 reinforced-concrete member trio -- the three
 > strength checks a general contractor, precaster, or engineer runs on a rectangular RC beam: does it carry the moment,
 > does it carry the shear, and does the rebar develop the bar force. This spec opens the batch with the flexural check.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog already places and cures the concrete

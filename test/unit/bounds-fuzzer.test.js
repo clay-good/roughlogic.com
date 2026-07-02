@@ -12798,3 +12798,82 @@ test("bounds: spec-v250 computeSprinklerHeadLayout pins the binding-cap flip, th
   assert.ok("error" in _v250({ room_length: 40, room_width: 30, max_spacing: 0 }));
   assert.ok("error" in _v250({ room_length: Infinity, room_width: 30 }));
 });
+
+// ===================== spec-v257..v259 ACI 318-19 reinforced-concrete member trio =====================
+import {
+  computeRcBeamFlexure as _v257, computeRcBeamShear as _v258, computeRcDevelopmentLength as _v259,
+} from "../../calc-concrete.js";
+
+test("bounds: spec-v257 computeRcBeamFlexure pins a/Mn/phiMn/util, the capacity-only null, and error seams", () => {
+  const r = _v257({ fc: 4000, fy: 60000, as_in2: 3.00, b: 12, d: 21.5, mu: 200 });
+  assert.ok(Math.abs(r.a_in - 4.411764705882353) < 1e-9);
+  assert.ok(Math.abs(r.mn_kipft - 289.4117647058823) < 1e-6);
+  assert.ok(Math.abs(r.phi_mn - 260.4705882352941) < 1e-6);
+  assert.ok(Math.abs(r.util - 200 / 260.4705882352941) < 1e-9);
+  // Cross-check: the lighter 10x18 two-#9 section carries barely half the moment.
+  const r2 = _v257({ fc: 4000, fy: 60000, as_in2: 2.00, b: 10, d: 16 });
+  assert.ok(Math.abs(r2.a_in - 3.5294117647058822) < 1e-9);
+  assert.ok(Math.abs(r2.phi_mn - 128.11764705882354) < 1e-6);
+  // Capacity-only: mu left at 0 returns a null utilization.
+  assert.strictEqual(r2.util, null);
+  // Error seams.
+  assert.ok("error" in _v257({ fc: 0, fy: 60000, as_in2: 3, b: 12, d: 21.5 }));
+  assert.ok("error" in _v257({ fc: 4000, fy: 0, as_in2: 3, b: 12, d: 21.5 }));
+  assert.ok("error" in _v257({ fc: 4000, fy: 60000, as_in2: 0, b: 12, d: 21.5 }));
+  assert.ok("error" in _v257({ fc: 4000, fy: 60000, as_in2: 3, b: 0, d: 21.5 }));
+  assert.ok("error" in _v257({ fc: 4000, fy: 60000, as_in2: 3, b: 12, d: 0 }));
+  assert.ok("error" in _v257({ fc: Infinity, fy: 60000, as_in2: 3, b: 12, d: 21.5 }));
+});
+
+test("bounds: spec-v258 computeRcBeamShear pins Vc/phiVc/Vs/spacing, the no-stirrups boundary, and error seams", () => {
+  const r = _v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 40, lambda: 1.0 });
+  assert.ok(Math.abs(r.vc_kip - 32.63470545293767) < 1e-9);
+  assert.ok(Math.abs(r.phi_vc - 24.476029089703253) < 1e-9);
+  assert.ok(Math.abs(r.vs_req_kip - 20.698627880395662) < 1e-9);
+  assert.ok(Math.abs(r.s_req_in - 13.711053778052415) < 1e-9);
+  assert.ok(Math.abs(r.s_max_in - 10.75) < 1e-12);
+  assert.strictEqual(r.stirrups, true);
+  // Cross-check: a 20 kip demand under phi Vc needs no stirrups by strength.
+  const r2 = _v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, vu: 20, lambda: 1.0 });
+  assert.strictEqual(r2.stirrups, false);
+  assert.strictEqual(r2.vs_req_kip, 0);
+  assert.strictEqual(r2.s_req_in, null);
+  // Error seams.
+  assert.ok("error" in _v258({ fc: 0, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22 }));
+  assert.ok("error" in _v258({ fc: 4000, fyt: 0, bw: 12, d: 21.5, av_in2: 0.22 }));
+  assert.ok("error" in _v258({ fc: 4000, fyt: 60000, bw: 0, d: 21.5, av_in2: 0.22 }));
+  assert.ok("error" in _v258({ fc: 4000, fyt: 60000, bw: 12, d: 0, av_in2: 0.22 }));
+  assert.ok("error" in _v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0 }));
+  assert.ok("error" in _v258({ fc: 4000, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22, lambda: 0 }));
+  assert.ok("error" in _v258({ fc: NaN, fyt: 60000, bw: 12, d: 21.5, av_in2: 0.22 }));
+});
+
+test("bounds: spec-v259 computeRcDevelopmentLength pins ld, the 1.7 and 2.5 caps, the 12 in floor, and error seams", () => {
+  const r = _v259({ fc: 4000, fy: 60000, db: 1.00, psi_t: 1.0, psi_e: 1.0, psi_s: 1.0, psi_g: 1.0, lambda: 1.0, conf: 2.5 });
+  assert.ok(Math.abs(r.te - 1.0) < 1e-12);
+  assert.ok(Math.abs(r.conf_eff - 2.5) < 1e-12);
+  assert.ok(Math.abs(r.ld_in - 28.460498941515418) < 1e-9);
+  assert.ok(Math.abs(r.ld_db - 28.460498941515418) < 1e-9);
+  // Cross-check: the same bar cast on top takes the 1.3 casting penalty.
+  const r2 = _v259({ fc: 4000, fy: 60000, db: 1.00, psi_t: 1.3, lambda: 1.0, conf: 2.5 });
+  assert.ok(Math.abs(r2.te - 1.3) < 1e-12);
+  assert.ok(Math.abs(r2.ld_in - 36.99864862397004) < 1e-9);
+  // The psi_t x psi_e product caps at 1.7 (1.3 top x 1.5 epoxy = 1.95 -> 1.7).
+  const rc = _v259({ fc: 4000, fy: 60000, db: 1.00, psi_t: 1.3, psi_e: 1.5 });
+  assert.ok(Math.abs(rc.te - 1.7) < 1e-12);
+  // The confinement term caps at 2.5 even when a larger value is entered.
+  const rk = _v259({ fc: 4000, fy: 60000, db: 1.00, conf: 4.0 });
+  assert.ok(Math.abs(rk.conf_eff - 2.5) < 1e-12);
+  assert.ok(Math.abs(rk.ld_in - 28.460498941515418) < 1e-9);
+  // The 12 in floor: a #3 (0.375 in) well-confined bottom bar computes under 12 in and floors.
+  const rf = _v259({ fc: 4000, fy: 60000, db: 0.375, psi_s: 0.8 });
+  assert.ok(rf.ld_in === 12);
+  // Error seams.
+  assert.ok("error" in _v259({ fc: 0, fy: 60000, db: 1 }));
+  assert.ok("error" in _v259({ fc: 4000, fy: 0, db: 1 }));
+  assert.ok("error" in _v259({ fc: 4000, fy: 60000, db: 0 }));
+  assert.ok("error" in _v259({ fc: 4000, fy: 60000, db: 1, conf: 0 }));
+  assert.ok("error" in _v259({ fc: 4000, fy: 60000, db: 1, psi_t: 0 }));
+  assert.ok("error" in _v259({ fc: 4000, fy: 60000, db: 1, lambda: -1 }));
+  assert.ok("error" in _v259({ fc: Infinity, fy: 60000, db: 1 }));
+});

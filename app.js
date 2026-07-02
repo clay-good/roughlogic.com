@@ -417,6 +417,12 @@ const TOOL_MODULES = (() => {
     "steel-beam-flexure", "steel-beam-shear", "steel-column-capacity",
     "bolt-group-eccentric", "bolt-shear-bearing", "column-base-plate",
   ]);
+  // spec-v257..v259 ACI 318-19 reinforced-concrete member trio: a new lazy
+  // Group E cluster, the RC companion to calc-steel.js one material over.
+  // All three KEEP group "E" (module independent of group letter).
+  declare("./calc-concrete.js", "CONCRETE_RENDERERS", [
+    "rc-beam-flexure", "rc-beam-shear", "rc-development-length",
+  ]);
   // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
   // moved out of calc-construction.js (it sat at 97.6% of its size cap) into
   // its own module. All five tiles KEEP group "E" (the module is independent

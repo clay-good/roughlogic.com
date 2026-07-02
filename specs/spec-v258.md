@@ -1,6 +1,6 @@
 # roughlogic.com Specification v258 -- Reinforced Concrete Beam Shear Capacity and Stirrup Spacing (ACI 318-19 §22.5) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v257..v259 (the ACI 318-19 reinforced-concrete member trio). This spec adds
+> **Status: LANDED (2026-07-02, package 0.94.0; was PROPOSED 2026-07-02). Batch spec-v257..v259 (the ACI 318-19 reinforced-concrete member trio). This spec adds
 > the shear check -- the second of the two limit states that size an RC beam, and the one whose failure is brittle.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: with `rc-beam-flexure` (v257) the catalog checks the
 > moment on a rectangular section but not the shear, and shear failure in concrete is sudden and without warning, so it is

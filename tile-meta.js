@@ -488,6 +488,8 @@ const _TILES = [
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (calc-steel.js)
   ["steel-beam-flexure", "E"], ["steel-beam-shear", "E"], ["steel-column-capacity", "E"],
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],
+  // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (calc-concrete.js)
+  ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)
