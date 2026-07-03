@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "superelevation": ["horizontal-curve", "vertical-curve-sight-distance", "horizontal-sightline-offset", "stopping-sight-distance"],
+  "vertical-curve-sight-distance": ["vertical-curve", "stopping-sight-distance", "superelevation", "horizontal-sightline-offset"],
+  "horizontal-sightline-offset": ["horizontal-curve", "stopping-sight-distance", "superelevation", "vertical-curve-sight-distance"],
   "final-grade-needed": ["category-weighted-grade", "standards-based-grade", "gpa-calculator"],
   "category-weighted-grade": ["final-grade-needed", "standards-based-grade", "gpa-calculator"],
   "two-sample-t-test": ["pearson-correlation", "linear-regression", "confidence-interval"],

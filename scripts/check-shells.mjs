@@ -53,7 +53,10 @@ const TILE_GZIP_CAP = 6 * 1024;
 // trios (steel v281/v293, concrete v284, geotech v287, wood v290) took
 // construction/index.html to ~24.7 KB gz; 30 KB restores ~21% headroom for
 // the campaign's remaining Group E batches.
-const GROUP_GZIP_CAP = 30 * 1024;
+// Bumped 30 -> 34 KB on 2026-07-03: the wood-fastener withdrawal (v332..v334)
+// and roadway geometric-design (v335..v337) Group E trios took
+// construction/index.html to ~30.2 KB gz; 34 KB restores ~13% headroom.
+const GROUP_GZIP_CAP = 34 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

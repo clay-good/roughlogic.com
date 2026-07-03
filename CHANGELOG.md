@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(civil): land spec-v335..v337 -- 3 roadway geometric-design tiles in calc-civil.js; 803 -> 806 tiles, 0.118.0, 2026-07-03
+
+The roadway geometric-design trio, twenty-first batch of the v275-v374 campaign: the sight-and-safety numbers the curve-layout tiles never give, all in the existing lazy `calc-civil.js` (Group E); no new module, group, or dependency. Catalog **803 -> 806**, package **0.117.0 -> 0.118.0** (a minor). Proposed 2026-07-02.
+
+- **`superelevation` (spec-v335).** AASHTO point-mass e + f = V^2/(15 R): required superelevation e = V^2/(15 R) - f, or the minimum radius R_min = V^2/(15(e_max + f)). Pinned: a 60 mph curve at R 1,500 ft, f 0.12 -> e 0.04 (a 4% bank); the sharpest curve at e_max 0.08 -> R_min 1,200 ft. A flatter R 3,000 ft curve returns a negative e, reported as "no superelevation required" (side friction alone holds it).
+- **`vertical-curve-sight-distance` (spec-v336).** AASHTO crest minimum L = A S^2 / C for S <= L, else 2 S - C/A, with C = 2158 (SSD crest) and K = L/A. Pinned: a +2%/-3% crest (A 5) at 570 ft SSD -> L 753 ft, K 151 (S<=L branch); a gentler A 3 flips to the S>L branch -> L 421 ft.
+- **`horizontal-sightline-offset` (spec-v337).** AASHTO middle ordinate M = R(1 - cos(28.65 S/R)) with the inverse S = (R/28.65) arccos(1 - M/R), R to the inside-lane centerline. Pinned: a 1,000 ft radius, 570 ft SSD -> M 40.3 ft; a tighter 600 ft radius drives the clear-zone to 66.4 ft.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering both modes/branches, the forward/inverse round-trip, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the AASHTO Green Book point-mass, crest-curve, and middle-ordinate relations. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module caps bumped with dated comments: calc-civil.js 8000 -> 11000, and the construction group-shell cap 30 -> 34 KB. Housekeeping: home count 803 -> 806, README resynced (counts, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 50 appended. All gates green at the new state: lint, unit tests (**5,099**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(construction): land spec-v332..v334 -- 3 wood-fastener withdrawal tiles in calc-construction.js; 800 -> 803 tiles, 0.117.0, 2026-07-03
 
 The wood-fastener withdrawal trio, twentieth batch of the v275-v374 campaign: the axial (pull-out) design values the NDS lateral-connection tiles never cover, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **800 -> 803**, package **0.116.0 -> 0.117.0** (a minor). Proposed 2026-07-02.

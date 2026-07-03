@@ -1,6 +1,6 @@
 # roughlogic.com Specification v335 -- Roadway Superelevation and Minimum Curve Radius (AASHTO) (calc-civil.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v335..v337 (the roadway geometric-design trio -- the sight-
+> **Status: LANDED (2026-07-03, package 0.118.0). Batch spec-v335..v337 (the roadway geometric-design trio -- the sight-
 > and-safety numbers the curve-layout tiles never give: the superelevation and minimum radius of a horizontal curve (this
 > spec), the minimum vertical-curve length for stopping sight distance (v336), and the horizontal sightline offset to see
 > around a curve (v337).)**

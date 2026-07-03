@@ -5145,6 +5145,42 @@ export const CITATIONS = {
   },
 
   // ---- spec-v25 civil curve / earthwork / grading (Group E) ----
+  "superelevation": {
+    formula: "e + f = V^2/(15 R); required e = V^2/(15 R) - f; minimum radius R_min = V^2/(15(e_max + f)). V in mph, R in ft.",
+    edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) point-mass curve model, by name.",
+    freeAccess: "The AASHTO point-mass relation is published in the Green Book; the side-friction design factors are in its speed table. AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AASHTO Green Book point-mass relation e + f = V^2/(15 R), the required superelevation e = V^2/(15 R) - f, the minimum radius R_min = V^2/(15(e_max + f)), and that the side-friction factor f decreases with design speed (about 0.16 at 30 mph to 0.08 at 80 mph). This returns the point-mass superelevation and minimum radius: it uses the entered design side-friction factor (from the AASHTO speed table), does not distribute e and f by an AASHTO method (1 through 5) over the speed range, and does not size the superelevation transition/runoff length or the spiral. A negative required e (a curve flat enough that side friction alone holds it) is reported as no superelevation required. A design aid, not a substitute for a licensed civil engineer's geometric design.",
+    assumptions: [
+      { name: "Point-mass model", value: "e + f = V^2/(15 R), V in mph and R in ft", source: "AASHTO Green Book" },
+      { name: "Side-friction factor", value: "f is the AASHTO design value at the design speed (about 0.16 at 30 mph to 0.08 at 80 mph)", source: "AASHTO Green Book speed table" },
+      { name: "Not a runoff/spiral design", value: "no e/f distribution method, no transition or spiral length", source: "scope of this tile" },
+    ],
+  },
+  "vertical-curve-sight-distance": {
+    formula: "L = A S^2 / C for S <= L; L = 2 S - C/A for S > L; C = 2158 (SSD crest) or 2800 (passing); K = L/A.",
+    edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) crest vertical-curve sight-distance minimums, by name.",
+    freeAccess: "The AASHTO crest-curve length equations are published in the Green Book. AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AASHTO Green Book crest vertical-curve minimums L = A S^2 / 2158 for S <= L and L = 2 S - 2158/A for S > L, the 2158 constant embedding a 3.5 ft driver eye and 2.0 ft object height, the K = L/A rate-of-vertical-curvature form, and that sag curves use headlight/comfort/drainage controls as separate cases. This returns the minimum crest vertical-curve length for the entered stopping sight distance: it is the crest SSD control (passing sight distance uses the larger 2800 constant, and sag curves use headlight/comfort/drainage criteria), takes the SSD as entered, and does not check the drainage-maximum K = 167 or the appearance minimum. A design aid, not a substitute for a licensed civil engineer's design.",
+    assumptions: [
+      { name: "Branch selection", value: "L = A S^2 / C when S <= L, else L = 2 S - C/A; the governing branch is chosen by the S vs L comparison", source: "AASHTO Green Book" },
+      { name: "Sight constant", value: "C = 2158 for the SSD crest (3.5 ft eye, 2.0 ft object); 2800 for passing sight distance", source: "AASHTO Green Book" },
+      { name: "Crest SSD only", value: "sag curves use headlight/comfort/drainage criteria, not this relation", source: "scope of this tile" },
+    ],
+  },
+  "horizontal-sightline-offset": {
+    formula: "M = R (1 - cos(28.65 S / R)) [half-angle in degrees]; inverse S = (R/28.65) arccos(1 - M/R); R to the inside-lane centerline.",
+    edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) horizontal sightline offset (middle ordinate), by name.",
+    freeAccess: "The AASHTO middle-ordinate relation is published in the Green Book. AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AASHTO Green Book middle-ordinate M = R (1 - cos(28.65 S / R)) with R to the inside-lane centerline (the vehicle's path), the inverse S = (R/28.65) arccos(1 - M/R), and that the offset is measured from the sightline to the sight obstruction. This returns the horizontal sightline offset (clear-zone width) for the entered sight distance and radius: it uses R to the vehicle's path (inside-lane centerline, not the curve centerline), assumes the sight obstruction is continuous along the curve, and does not account for the driver-to-obstruction geometry at the curve ends or a variable offset. A design aid, not a substitute for a licensed civil engineer's design.",
+    assumptions: [
+      { name: "Middle-ordinate model", value: "M = R (1 - cos(28.65 S / R)), the 28.65 = 90/pi putting the half-angle in degrees", source: "AASHTO Green Book" },
+      { name: "Radius basis", value: "R is to the inside-lane centerline (the vehicle's path), not the curve centerline", source: "AASHTO Green Book" },
+      { name: "Continuous obstruction", value: "assumes the sight obstruction runs continuously along the curve; no end geometry", source: "scope of this tile" },
+    ],
+  },
   "horizontal-curve": {
     formula: "T = R*tan(delta/2); L = R*delta_rad (arc definition); E = R*(sec(delta/2)-1); M = R*(1-cos(delta/2)); LC = 2*R*sin(delta/2); arc-definition D = 5729.58/R; PC = PI - T, PT = PC + L.",
     edition: "Simple circular-curve geometry per the AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) and FM 5-233 Construction Surveying, by name; first-principles trig.",

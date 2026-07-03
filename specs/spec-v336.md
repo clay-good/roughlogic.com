@@ -1,6 +1,6 @@
 # roughlogic.com Specification v336 -- Minimum Crest Vertical Curve Length for Stopping Sight Distance (AASHTO) (calc-civil.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v335..v337 (the roadway geometric-design trio -- superelevation
+> **Status: LANDED (2026-07-03, package 0.118.0). Batch spec-v335..v337 (the roadway geometric-design trio -- superelevation
 > (v335), the minimum vertical-curve length for sight distance (this spec), the horizontal sightline offset (v337)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `vertical-curve` computes elevations along a parabolic
 > curve and its high/low point, but not the minimum curve length a crest needs so a driver can see far enough to stop -- the

@@ -373,3 +373,176 @@ function renderSlopeStakeCutFill(inputRegion, outputRegion, citationEl) {
   for (const f of [existing.input, design.input, slope.input, offset.input]) f.addEventListener("input", update);
 }
 CIVIL_RENDERERS["slope-stake-cut-fill"] = renderSlopeStakeCutFill;
+
+// --- v335 E.x: Roadway superelevation & minimum curve radius (`superelevation`) ---
+// AASHTO point-mass model: e + f = V^2/(15 R). Mode "e" solves the required
+// superelevation e = V^2/(15 R) - f for a curve radius; mode "rmin" solves the
+// minimum radius R_min = V^2/(15(e_max + f)) at a maximum bank. V in mph, R in ft.
+// dims: in { V_mph: dimensionless, R_ft: L, e_max: dimensionless, f: dimensionless } out: { e_req: dimensionless, R_min_ft: L }
+export function computeSuperelevation({ mode, V_mph, R_ft, e_max, f } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(V_mph) || 0;
+  if (!(V > 0)) return { error: "Design speed must be greater than zero." };
+  const ff = Number(f) || 0;
+  if (mode === "rmin") {
+    const em = Number(e_max) || 0;
+    if (!(em + ff > 0)) return { error: "e_max + f must be greater than zero." };
+    const Rmin = (V * V) / (15 * (em + ff));
+    if (!Number.isFinite(Rmin)) return { error: "Minimum radius is not valid." };
+    return { mode: "rmin", R_min_ft: Rmin, e_req: null };
+  }
+  const R = Number(R_ft) || 0;
+  if (!(R > 0)) return { error: "Curve radius must be greater than zero." };
+  const e = (V * V) / (15 * R) - ff;
+  if (!Number.isFinite(e)) return { error: "Required superelevation is not valid." };
+  return { mode: "e", e_req: e, no_bank: e <= 0, R_min_ft: null };
+}
+export const superelevationExample = { inputs: { mode: "e", V_mph: 60, R_ft: 1500, f: 0.12 } };
+
+function renderSuperelevation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO point-mass curve model e + f = V^2/(15 R) per A Policy on Geometric Design of Highways and Streets (the Green Book): required superelevation e = V^2/(15 R) - f, minimum radius R_min = V^2/(15(e_max + f)); the side-friction factor f is from the AASHTO design-speed table and decreases with speed. A design aid, not a substitute for a licensed civil engineer's geometric design.";
+  const mode = makeSelect("Solve for", "se-mode", [
+    { value: "e", label: "Required superelevation e (from radius)" },
+    { value: "rmin", label: "Minimum radius R_min (from max bank)" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const V = makeNumber("Design speed V (mph)", "se-v", { step: "any", min: "0", value: "60" });
+  V.input.value = "60";
+  const R = makeNumber("Curve radius R (ft)", "se-r", { step: "any", min: "0", value: "1500" });
+  R.input.value = "1500";
+  const em = makeNumber("Max superelevation e_max (e.g. 0.08)", "se-emax", { step: "any", min: "0" });
+  const f = makeNumber("Side-friction factor f", "se-f", { step: "any", min: "0", value: "0.12" });
+  f.input.value = "0.12";
+  for (const fld of [V, R, em, f]) inputRegion.appendChild(fld.wrap);
+  const oOut = makeOutputLine(outputRegion, "Result", "se-out");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() {
+    const isRmin = mode.select.value === "rmin";
+    R.wrap.style.display = isRmin ? "none" : "";
+    em.wrap.style.display = isRmin ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computeSuperelevation({
+      mode: mode.select.value,
+      V_mph: readNum(V.input),
+      R_ft: readNum(R.input),
+      e_max: readNum(em.input),
+      f: readNum(f.input),
+    });
+    if (r.error) { oOut.textContent = r.error; return; }
+    if (r.mode === "rmin") { oOut.textContent = "R_min " + fmt(r.R_min_ft, 1) + " ft (sharpest curve at this speed and bank)"; return; }
+    oOut.textContent = r.no_bank
+      ? "e = " + fmt(r.e_req, 4) + " -- no superelevation required (side friction alone holds the curve; a normal crown suffices)"
+      : "e = " + fmt(r.e_req, 4) + " (" + fmt(r.e_req * 100, 1) + "% superelevation)";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "e"; syncFields(); V.input.value = "60"; R.input.value = "1500"; em.input.value = ""; f.input.value = "0.12"; update(); });
+  mode.select.addEventListener("input", () => { syncFields(); update(); });
+  for (const fld of [V.input, R.input, em.input, f.input]) fld.addEventListener("input", update);
+  syncFields();
+}
+CIVIL_RENDERERS["superelevation"] = renderSuperelevation;
+
+// --- v336 E.x: Minimum crest vertical-curve length for SSD (`vertical-curve-sight-distance`) ---
+// AASHTO crest curve: L = A S^2 / C when S <= L, else L = 2 S - C/A, where C is
+// the sight constant (2158 SSD crest, 2800 passing) embedding a 3.5 ft eye and
+// 2.0 ft object height. K = L / A is the rate of vertical curvature.
+// dims: in { A_pct: dimensionless, S_ft: L, C: dimensionless } out: { L_ft: L, K_ft_per_pct: L }
+export function computeVerticalCurveSightDistance({ A_pct, S_ft, C } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(A_pct) || 0;
+  if (!(A > 0)) return { error: "Algebraic grade difference A must be greater than zero." };
+  const S = Number(S_ft) || 0;
+  if (!(S > 0)) return { error: "Sight distance S must be greater than zero." };
+  const c = Number(C) > 0 ? Number(C) : 2158;
+  const L1 = (A * S * S) / c;
+  const L = S <= L1 ? L1 : 2 * S - c / A;
+  if (!Number.isFinite(L) || !(L > 0)) return { error: "Minimum curve length is not valid for these inputs." };
+  const K = L / A;
+  return { L_ft: L, K_ft_per_pct: K, branch: S <= L1 ? "S <= L" : "S > L", constant: c };
+}
+export const verticalCurveSightDistanceExample = { inputs: { A_pct: 5, S_ft: 570, C: 2158 } };
+
+function renderVerticalCurveSightDistance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO crest vertical-curve minimums per A Policy on Geometric Design of Highways and Streets (the Green Book): L = A S^2 / C for S <= L and L = 2 S - C/A for S > L, with C = 2158 (SSD crest; a 3.5 ft eye and 2.0 ft object height) or 2800 (passing); K = L/A. This is the crest SSD control -- sag curves use headlight/comfort/drainage criteria. A design aid, not a substitute for a licensed civil engineer's design.";
+  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "vcs-a", { step: "any", min: "0", value: "5" });
+  A.input.value = "5";
+  const S = makeNumber("Stopping sight distance S (ft)", "vcs-s", { step: "any", min: "0", value: "570" });
+  S.input.value = "570";
+  const C = makeNumber("Sight constant C (2158 SSD, 2800 passing)", "vcs-c", { step: "any", min: "0", value: "2158" });
+  C.input.value = "2158";
+  for (const fld of [A, S, C]) inputRegion.appendChild(fld.wrap);
+  const oL = makeOutputLine(outputRegion, "Minimum curve length L", "vcs-out-l");
+  const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "vcs-out-k");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVerticalCurveSightDistance({ A_pct: readNum(A.input), S_ft: readNum(S.input), C: readNum(C.input) });
+    if (r.error) { oL.textContent = r.error; oK.textContent = ""; return; }
+    oL.textContent = fmt(r.L_ft, 0) + " ft (" + r.branch + " branch governs)";
+    oK.textContent = fmt(r.K_ft_per_pct, 0) + " ft/% (K = L/A)";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { A.input.value = "5"; S.input.value = "570"; C.input.value = "2158"; update(); });
+  for (const fld of [A.input, S.input, C.input]) fld.addEventListener("input", update);
+}
+CIVIL_RENDERERS["vertical-curve-sight-distance"] = renderVerticalCurveSightDistance;
+
+// --- v337 E.x: Horizontal sightline offset for SSD on a curve (`horizontal-sightline-offset`) ---
+// AASHTO middle ordinate: M = R (1 - cos(28.65 S / R)) with the half-angle in
+// degrees (28.65 = 90/pi). Inverse mode: S = (R/28.65) arccos(1 - M/R). R is to
+// the inside-lane centerline (the vehicle's path).
+// dims: in { R_ft: L, S_ft: L, M_ft: L } out: { M_ft: L, S_ft: L }
+export function computeHorizontalSightlineOffset({ mode, R_ft, S_ft, M_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(R_ft) || 0;
+  if (!(R > 0)) return { error: "Curve radius must be greater than zero." };
+  if (mode === "maxS") {
+    const M = Number(M_ft) || 0;
+    if (!(M > 0)) return { error: "Cleared offset M must be greater than zero." };
+    const ratio = 1 - M / R;
+    if (!(ratio >= -1 && ratio <= 1)) return { error: "Cleared offset exceeds the curve radius." };
+    const S = (R / 28.6479) * (Math.acos(ratio) * 180 / Math.PI);
+    if (!Number.isFinite(S)) return { error: "Sight distance is not valid." };
+    return { mode: "maxS", S_ft: S, M_ft: null };
+  }
+  const S = Number(S_ft) || 0;
+  if (!(S > 0)) return { error: "Sight distance must be greater than zero." };
+  const M = R * (1 - Math.cos((28.6479 * S / R) * Math.PI / 180));
+  if (!Number.isFinite(M)) return { error: "Sightline offset is not valid." };
+  return { mode: "M", M_ft: M, S_ft: null };
+}
+export const horizontalSightlineOffsetExample = { inputs: { mode: "M", R_ft: 1000, S_ft: 570 } };
+
+function renderHorizontalSightlineOffset(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO horizontal sightline offset (middle ordinate) per A Policy on Geometric Design of Highways and Streets (the Green Book): M = R (1 - cos(28.65 S / R)) with R to the inside-lane centerline (the vehicle's path); the inverse S = (R/28.65) arccos(1 - M/R). Assumes a continuous obstruction along the curve. A design aid, not a substitute for a licensed civil engineer's design.";
+  const mode = makeSelect("Solve for", "hso-mode", [
+    { value: "M", label: "Sightline offset M (from sight distance)" },
+    { value: "maxS", label: "Max sight distance S (from cleared offset)" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const R = makeNumber("Curve radius R to inside-lane CL (ft)", "hso-r", { step: "any", min: "0", value: "1000" });
+  R.input.value = "1000";
+  const S = makeNumber("Sight distance S (ft)", "hso-s", { step: "any", min: "0", value: "570" });
+  S.input.value = "570";
+  const M = makeNumber("Cleared offset M (ft)", "hso-m", { step: "any", min: "0" });
+  for (const fld of [R, S, M]) inputRegion.appendChild(fld.wrap);
+  const oOut = makeOutputLine(outputRegion, "Result", "hso-out");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() {
+    const isMaxS = mode.select.value === "maxS";
+    S.wrap.style.display = isMaxS ? "none" : "";
+    M.wrap.style.display = isMaxS ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computeHorizontalSightlineOffset({
+      mode: mode.select.value, R_ft: readNum(R.input), S_ft: readNum(S.input), M_ft: readNum(M.input),
+    });
+    if (r.error) { oOut.textContent = r.error; return; }
+    oOut.textContent = r.mode === "maxS"
+      ? "S = " + fmt(r.S_ft, 1) + " ft available at this cleared offset"
+      : "M = " + fmt(r.M_ft, 1) + " ft -- inside clear-zone width the curve needs";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "M"; syncFields(); R.input.value = "1000"; S.input.value = "570"; M.input.value = ""; update(); });
+  mode.select.addEventListener("input", () => { syncFields(); update(); });
+  for (const fld of [R.input, S.input, M.input]) fld.addEventListener("input", update);
+  syncFields();
+}
+CIVIL_RENDERERS["horizontal-sightline-offset"] = renderHorizontalSightlineOffset;

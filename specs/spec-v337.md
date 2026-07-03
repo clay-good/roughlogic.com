@@ -1,6 +1,6 @@
 # roughlogic.com Specification v337 -- Horizontal Sightline Offset for Stopping Sight Distance on a Curve (AASHTO) (calc-civil.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v335..v337 (the roadway geometric-design trio -- superelevation
+> **Status: LANDED (2026-07-03, package 0.118.0). Batch spec-v335..v337 (the roadway geometric-design trio -- superelevation
 > (v335), vertical-curve sight distance (v336), the horizontal sightline offset (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: on a horizontal curve, a wall, cut slope, barrier, or
 > guardrail on the inside can block the driver's sightline; AASHTO gives the horizontal sightline offset (the middle

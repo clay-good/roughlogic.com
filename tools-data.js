@@ -547,6 +547,9 @@ export const TOOLS = [
   { id: "vertical-curve", name: "Vertical Curve Elevations", group: "E", trades: ["carpentry", "surveying"], desc: "Equal-tangent parabolic elevations and the high or low point of a vertical curve." },
   { id: "earthwork-end-area", name: "Earthwork Volume (End-Area)", group: "E", trades: ["carpentry", "surveying"], desc: "Average-end-area and prismoidal earthwork volume in cubic feet and yards." },
   { id: "slope-stake-cut-fill", name: "Slope-Stake Cut and Fill", group: "E", trades: ["carpentry", "surveying"], desc: "Cut or fill depth and the catch-point offset for a planar design slope." },
+  { id: "superelevation", name: "Superelevation / Min Curve Radius (AASHTO)", group: "E", trades: ["surveying", "civil"], desc: "AASHTO point-mass e + f = V^2/(15 R): required superelevation for a radius, or the minimum radius at a maximum bank." },
+  { id: "vertical-curve-sight-distance", name: "Crest Vertical Curve Length for SSD (AASHTO)", group: "E", trades: ["surveying", "civil"], desc: "AASHTO minimum crest vertical-curve length L for a stopping sight distance, both S<=L and S>L branches, with the K rate." },
+  { id: "horizontal-sightline-offset", name: "Horizontal Sightline Offset on a Curve (AASHTO)", group: "E", trades: ["surveying", "civil"], desc: "AASHTO middle-ordinate clear-zone M = R(1 - cos(28.65 S/R)) an inside obstruction must clear for stopping sight distance." },
   // Group G: cross-trade rolling offset (spec-v24 §5).
   { id: "rolling-offset", name: "Rolling Offset", group: "G", trades: ["plumbing", "electrical"], desc: "True offset, travel, and run advance for a pipe or conduit rolling offset." },
   // spec-v26: electrician feeder/transformer (A), plumber blend/tank/velocity (B), pipefitter's bench (G).

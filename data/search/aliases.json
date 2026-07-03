@@ -1,5 +1,5 @@
 {
-  "_comment": "v10 Phase D.1 search aliases (spec-v10 \u00a76.1). One row per alias mapping a free-text term to a tile id. The shard is lazy-loaded on the first keystroke into the home-view search bar (bindSearch / ensureAliases in app.js); on exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Per spec-v10 \u00a713.3 the data file is bounded at 5 KB gzipped. Industry vocabulary, misspellings, abbreviations, and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js); app.js currently inlines the equivalent exact-term lookup for the simple case.",
+  "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. The shard is lazy-loaded on the first keystroke into the home-view search bar (bindSearch / ensureAliases in app.js); on exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Per spec-v10 §13.3 the data file is bounded at 5 KB gzipped. Industry vocabulary, misspellings, abbreviations, and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js); app.js currently inlines the equivalent exact-term lookup for the simple case.",
   "_updated": "2026-06-30",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
@@ -12912,6 +12912,126 @@
       "term": "screw specific gravity",
       "target": "wood-screw-withdrawal",
       "kind": "adjacent"
+    },
+    {
+      "term": "road banking",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum curve radius",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "aashto curve",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "e plus f",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "side friction factor",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "curve design speed",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "banking a curve",
+      "target": "superelevation",
+      "kind": "industry"
+    },
+    {
+      "term": "vertical curve length",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "crest curve sight distance",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "k value",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "aashto vertical curve",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum curve length",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "sight distance crest",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "rate of vertical curvature",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "hill crest sight",
+      "target": "vertical-curve-sight-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "horizontal sightline offset",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "hso",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "sight distance around curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "clear zone curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "middle ordinate sight",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "aashto horizontal sight",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "curve sight obstruction",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "barrier sight distance",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
+    },
+    {
+      "term": "cut slope sight distance",
+      "target": "horizontal-sightline-offset",
+      "kind": "industry"
     }
   ]
 }

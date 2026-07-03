@@ -14416,3 +14416,57 @@ test("bounds: spec-v334 computeWoodScrewWithdrawal pins the G^2 law and error se
   assert.ok("error" in _v334({ g: 0.5, d_in: 0.190, p_in: 1.0, cd: 0 }));
   assert.ok("error" in _v334({ g: Infinity, d_in: 0.190, p_in: 1.0 }));
 });
+
+// ===================== spec-v335..v337 roadway geometric-design batch =====================
+import { computeSuperelevation as _v335, computeVerticalCurveSightDistance as _v336, computeHorizontalSightlineOffset as _v337 } from "../../calc-civil.js";
+
+test("bounds: spec-v335 computeSuperelevation pins both modes, the no-bank case, and error seams", () => {
+  const e = _v335({ mode: "e", V_mph: 60, R_ft: 1500, f: 0.12 });
+  assert.ok(Math.abs(e.e_req - 0.04) < 1e-9);
+  assert.strictEqual(e.no_bank, false);
+  const rm = _v335({ mode: "rmin", V_mph: 60, e_max: 0.08, f: 0.12 });
+  assert.ok(Math.abs(rm.R_min_ft - 1200) < 1e-6);
+  // A flatter curve needs no bank (negative required e).
+  const nb = _v335({ mode: "e", V_mph: 60, R_ft: 3000, f: 0.12 });
+  assert.ok(nb.e_req < 0 && nb.no_bank === true);
+  // Error seams.
+  assert.ok("error" in _v335({ mode: "e", V_mph: 0, R_ft: 1500, f: 0.12 }));
+  assert.ok("error" in _v335({ mode: "e", V_mph: 60, R_ft: 0, f: 0.12 }));
+  assert.ok("error" in _v335({ mode: "rmin", V_mph: 60, e_max: 0, f: 0 }));
+  assert.ok("error" in _v335({ mode: "e", V_mph: Infinity, R_ft: 1500, f: 0.12 }));
+});
+
+test("bounds: spec-v336 computeVerticalCurveSightDistance pins the branch switch, K, and error seams", () => {
+  const a = _v336({ A_pct: 5, S_ft: 570, C: 2158 });
+  assert.ok(Math.abs(a.L_ft - 752.8) < 1);
+  assert.strictEqual(a.branch, "S <= L");
+  assert.ok(Math.abs(a.K_ft_per_pct - a.L_ft / 5) < 1e-9);
+  // A gentler grade change flips to the S > L branch and a shorter length.
+  const b = _v336({ A_pct: 3, S_ft: 570, C: 2158 });
+  assert.strictEqual(b.branch, "S > L");
+  assert.ok(Math.abs(b.L_ft - 420.7) < 1);
+  assert.ok(b.L_ft < a.L_ft);
+  // Default constant is 2158 when C omitted.
+  assert.ok(Math.abs(_v336({ A_pct: 5, S_ft: 570 }).L_ft - a.L_ft) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v336({ A_pct: 0, S_ft: 570 }));
+  assert.ok("error" in _v336({ A_pct: 5, S_ft: 0 }));
+  assert.ok("error" in _v336({ A_pct: NaN, S_ft: 570 }));
+});
+
+test("bounds: spec-v337 computeHorizontalSightlineOffset pins the forward/inverse round-trip, sensitivity, and error seams", () => {
+  const m = _v337({ mode: "M", R_ft: 1000, S_ft: 570 });
+  assert.ok(Math.abs(m.M_ft - 40.3) < 0.1);
+  // Inverse recovers S from M (round-trip).
+  const s = _v337({ mode: "maxS", R_ft: 1000, M_ft: m.M_ft });
+  assert.ok(Math.abs(s.S_ft - 570) < 0.1);
+  // A tighter radius drives the clear-zone wider.
+  const m2 = _v337({ mode: "M", R_ft: 600, S_ft: 570 });
+  assert.ok(m2.M_ft > m.M_ft && Math.abs(m2.M_ft - 66.4) < 0.1);
+  // Error seams.
+  assert.ok("error" in _v337({ mode: "M", R_ft: 0, S_ft: 570 }));
+  assert.ok("error" in _v337({ mode: "M", R_ft: 1000, S_ft: 0 }));
+  assert.ok("error" in _v337({ mode: "maxS", R_ft: 1000, M_ft: 0 }));
+  assert.ok("error" in _v337({ mode: "maxS", R_ft: 1000, M_ft: 2500 }));
+  assert.ok("error" in _v337({ mode: "M", R_ft: Infinity, S_ft: 570 }));
+});
