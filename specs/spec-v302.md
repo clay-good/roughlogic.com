@@ -1,6 +1,6 @@
 # roughlogic.com Specification v302 -- Time of Concentration (Kirpich) (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v302..v304 (the site-hydraulics depth trio -- the pieces the
+> **Status: LANDED (2026-07-03, package 0.107.0; proposed 2026-07-02). Batch spec-v302..v304 (the site-hydraulics depth trio -- the pieces the
 > rational-method and open-channel tiles need but do not compute: the watershed time of concentration (this spec, the `tc`
 > that sets the rainfall intensity `stormwater-rational` demands), the orifice discharge of a detention outlet or tank
 > drain (v303), and the open-channel flow regime by Froude number (v304).)**

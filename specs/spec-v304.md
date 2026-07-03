@@ -1,6 +1,6 @@
 # roughlogic.com Specification v304 -- Open-Channel Froude Number, Flow Regime, and Critical Depth (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v302..v304 (the site-hydraulics depth trio -- time of
+> **Status: LANDED (2026-07-03, package 0.107.0; proposed 2026-07-02). Batch spec-v302..v304 (the site-hydraulics depth trio -- time of
 > concentration (v302), orifice discharge (v303), the open-channel flow regime (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `manning-slope` sizes a channel slope and `weir-flow`
 > measures flow over a crest, but neither tells you whether the flow is subcritical or supercritical -- the Froude-number

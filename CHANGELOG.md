@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hydraulics): land spec-v302..v304 -- 3 site-hydraulics depth tiles in calc-plumbing.js; 770 -> 773 tiles, 0.107.0, 2026-07-03
+
+The site-hydraulics depth trio, tenth batch of the v275-v374 campaign: the pieces the rational-method and open-channel tiles need but do not compute, all in the existing lazy `calc-plumbing.js` (Group B); no new module, group, or dependency. Catalog **770 -> 773**, package **0.106.0 -> 0.107.0** (a minor). Proposed 2026-07-02.
+
+- **`time-of-concentration` (spec-v302).** The Kirpich tc = 0.0078 L^0.77 S^(-0.385) that sets the storm duration `stormwater-rational` reads its intensity at. Pinned: a 1,000 ft flow path at 2% slope -> 7.2 min; flattening to 0.5% stretches it to 12.3 min (a lower intensity and smaller peak).
+- **`orifice-flow` (spec-v303).** The detention-outlet discharge Q = Cd A sqrt(2 g h). Pinned: a 6 in sharp-edged orifice under a 4 ft head -> 1.89 cfs (849 gpm); the fuzzer pins the exact sqrt-of-head 1.5x scaling for a 2.25x head.
+- **`channel-froude-number` (spec-v304).** The open-channel regime Fr = V/sqrt(g y) and the rectangular critical depth yc = (q^2/g)^(1/3). Pinned: a 4 ft channel at 50 cfs and 2 ft deep -> Fr 0.78 subcritical (yc 1.69 ft, consistent); dropping to 1 ft crosses to Fr 2.20 supercritical, the setup for a hydraulic jump.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the slope exponent, the sqrt-of-head scaling, the regime boundary and yc consistency, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming Kirpich/TR-55, the orifice equation, and Chow's open-channel hydraulics. These three compute functions are exported (adding corpus/dims/fuzzer rows); the renderers are non-exported. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 25 collision-checked aliases (the "orifice flow" term already lived on septic-lpp-orifice and was skipped), `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bumps (calc-plumbing at 90.7%). Housekeeping: home count 770 -> 773, README resynced (counts, correctness figures 1016/1019/1016, Group B cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 39 appended. All gates green at the new state: lint (**773 tiles / 56 modules / 795 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(concrete): land spec-v299..v301 -- 3 reinforced-concrete depth-2 tiles in calc-concrete.js; 767 -> 770 tiles, 0.106.0, 2026-07-03
 
 The reinforced-concrete depth-2 trio, ninth batch of the v275-v374 campaign: the ACI checks the strength tiles never make, all in the existing lazy `calc-concrete.js` (Group E); no new module, group, or dependency. Catalog **767 -> 770**, package **0.105.0 -> 0.106.0** (a minor). Proposed 2026-07-02.

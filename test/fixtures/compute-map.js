@@ -667,6 +667,10 @@ export const COMPUTE_MAP = {
   "rc-slab-min-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMinThickness" },
   "rc-doubly-reinforced": { module: "../../calc-concrete.js", fn: "computeRcDoublyReinforced" },
   "rc-shear-friction": { module: "../../calc-concrete.js", fn: "computeRcShearFriction" },
+  // spec-v302..v304 site-hydraulics depth batch (3 tiles)
+  "time-of-concentration": { module: "../../calc-plumbing.js", fn: "computeTimeOfConcentration" },
+  "orifice-flow": { module: "../../calc-plumbing.js", fn: "computeOrificeFlow" },
+  "channel-froude-number": { module: "../../calc-plumbing.js", fn: "computeChannelFroudeNumber" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

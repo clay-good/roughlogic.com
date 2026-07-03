@@ -951,6 +951,10 @@ const RELATED = {
   "rc-slab-min-thickness": ["rc-beam-flexure","rc-beam-shear","joist-deflection"],
   "rc-doubly-reinforced": ["rc-beam-flexure","rc-beam-shear","rc-column-axial"],
   "rc-shear-friction": ["rc-beam-shear","rebar-lap-splice","anchor-embedment"],
+  // spec-v302..v304 site-hydraulics depth batch (Group B)
+  "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
+  "orifice-flow": ["weir-flow","time-of-concentration","pipe-velocity"],
+  "channel-froude-number": ["manning-slope","weir-flow","orifice-flow"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

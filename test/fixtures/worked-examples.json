@@ -28709,6 +28709,89 @@
         "vn_kip": { "value": 153.6, "tolerance": { "pct": 0.1 } },
         "phi_vn_kip": { "value": 115.2, "tolerance": { "pct": 0.1 } }
       }
+    },
+    {
+      "tile_id": "time-of-concentration",
+      "source_publisher": "Kirpich (1940) / USDA TR-55",
+      "source_title": "1,000 ft flow path at 2% slope -> 7.2 min",
+      "source_edition_or_year": "spec-v302 worked example (machine-verified)",
+      "source_section_or_page": "spec-v302 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_ft": 1000, "s_slope": 0.02 },
+      "outputs": {
+        "tc_min": { "value": 7.18, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "time-of-concentration",
+      "source_publisher": "Kirpich (1940) / USDA TR-55",
+      "source_title": "cross-check: flatten to 0.5% slope -> 12.25 min",
+      "source_edition_or_year": "spec-v302 worked example (machine-verified)",
+      "source_section_or_page": "spec-v302 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_ft": 1000, "s_slope": 0.005 },
+      "outputs": {
+        "tc_min": { "value": 12.25, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "orifice-flow",
+      "source_publisher": "Orifice discharge Q = Cd A sqrt(2 g h)",
+      "source_title": "6 in sharp-edged orifice under a 4 ft head -> 1.89 cfs (849 gpm)",
+      "source_edition_or_year": "spec-v303 worked example (machine-verified)",
+      "source_section_or_page": "spec-v303 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "d_in": 6, "h_ft": 4, "cd": 0.60 },
+      "outputs": {
+        "a_ft2": { "value": 0.196, "tolerance": { "pct": 0.5 } },
+        "q_cfs": { "value": 1.89, "tolerance": { "pct": 0.5 } },
+        "q_gpm": { "value": 849, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "orifice-flow",
+      "source_publisher": "Orifice discharge Q = Cd A sqrt(2 g h)",
+      "source_title": "cross-check: raise the head to 9 ft -> 2.84 cfs (1.5x, = sqrt(9/4))",
+      "source_edition_or_year": "spec-v303 worked example (machine-verified)",
+      "source_section_or_page": "spec-v303 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "d_in": 6, "h_ft": 9, "cd": 0.60 },
+      "outputs": {
+        "q_cfs": { "value": 2.84, "tolerance": { "pct": 0.5 } },
+        "q_gpm": { "value": 1273, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "channel-froude-number",
+      "source_publisher": "Chow, Open-Channel Hydraulics",
+      "source_title": "4 ft channel, 50 cfs, 2 ft deep -> V 6.25 ft/s, Fr 0.78 subcritical, yc 1.69 ft",
+      "source_edition_or_year": "spec-v304 worked example (machine-verified)",
+      "source_section_or_page": "spec-v304 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "b_ft": 4, "q_cfs": 50, "y_ft": 2 },
+      "outputs": {
+        "v_fps": { "value": 6.25, "tolerance": { "pct": 0.2 } },
+        "fr": { "value": 0.78, "tolerance": { "pct": 0.5 } },
+        "yc_ft": { "value": 1.69, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "channel-froude-number",
+      "source_publisher": "Chow, Open-Channel Hydraulics",
+      "source_title": "cross-check: drop the depth to 1 ft -> Fr 2.20 supercritical",
+      "source_edition_or_year": "spec-v304 worked example (machine-verified)",
+      "source_section_or_page": "spec-v304 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "b_ft": 4, "q_cfs": 50, "y_ft": 1 },
+      "outputs": {
+        "fr": { "value": 2.20, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

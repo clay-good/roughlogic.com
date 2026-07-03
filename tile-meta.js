@@ -432,6 +432,8 @@ const _TILES = [
   ["wind-cc-pressure", "E"], ["snow-drift-load", "E"], ["wind-mwfrs-pressure", "E"],
   // spec-v299..v301 reinforced-concrete depth-2 batch
   ["rc-slab-min-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
+  // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
+  ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

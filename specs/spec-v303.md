@@ -1,6 +1,6 @@
 # roughlogic.com Specification v303 -- Orifice Discharge Flow (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v302..v304 (the site-hydraulics depth trio -- time of
+> **Status: LANDED (2026-07-03, package 0.107.0; proposed 2026-07-02). Batch spec-v302..v304 (the site-hydraulics depth trio -- time of
 > concentration (v302), the orifice discharge (this spec), the open-channel Froude regime (v304)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog has weir flow (`weir-flow`) and pipe
 > velocity (`pipe-velocity`) but no orifice discharge -- the flow through a sharp-edged hole under a head, the equation that

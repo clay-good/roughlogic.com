@@ -11527,6 +11527,126 @@
       "term": "construction joint shear",
       "target": "rc-shear-friction",
       "kind": "adjacent"
+    },
+    {
+      "term": "time of concentration",
+      "target": "time-of-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "kirpich",
+      "target": "time-of-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "watershed travel time",
+      "target": "time-of-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "tr-55 tc",
+      "target": "time-of-concentration",
+      "kind": "industry"
+    },
+    {
+      "term": "rational method time",
+      "target": "time-of-concentration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "storm duration",
+      "target": "time-of-concentration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "runoff travel time",
+      "target": "time-of-concentration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "concentration time",
+      "target": "time-of-concentration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "orifice discharge",
+      "target": "orifice-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "detention outlet",
+      "target": "orifice-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "tank drain flow",
+      "target": "orifice-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "flow through a hole",
+      "target": "orifice-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "restrictor plate",
+      "target": "orifice-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pond outlet sizing",
+      "target": "orifice-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "orifice equation",
+      "target": "orifice-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "froude number",
+      "target": "channel-froude-number",
+      "kind": "industry"
+    },
+    {
+      "term": "subcritical supercritical",
+      "target": "channel-froude-number",
+      "kind": "industry"
+    },
+    {
+      "term": "critical depth",
+      "target": "channel-froude-number",
+      "kind": "industry"
+    },
+    {
+      "term": "open channel regime",
+      "target": "channel-froude-number",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic jump",
+      "target": "channel-froude-number",
+      "kind": "adjacent"
+    },
+    {
+      "term": "channel flow regime",
+      "target": "channel-froude-number",
+      "kind": "adjacent"
+    },
+    {
+      "term": "yc critical depth",
+      "target": "channel-froude-number",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tranquil rapid flow",
+      "target": "channel-froude-number",
+      "kind": "adjacent"
+    },
+    {
+      "term": "channel froude",
+      "target": "channel-froude-number",
+      "kind": "industry"
     }
   ]
 }

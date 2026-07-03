@@ -7635,6 +7635,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "time-of-concentration": {
+    formula: "tc_min = 0.0078 L^0.77 S^(-0.385) (tc minutes, L feet, S ft/ft); tc_hr = tc_min / 60.",
+    edition: "The Kirpich (1940) time-of-concentration equation tc = 0.0078 L^0.77 S^(-0.385), as compiled in the USDA TR-55 and NRCS drainage references, by name.",
+    freeAccess: "TR-55 (Urban Hydrology for Small Watersheds) is a free USDA NRCS publication; the Kirpich equation is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Kirpich (1940) time of concentration tc = 0.0078 L^0.77 S^(-0.385) (tc minutes, L feet, S ft/ft), as compiled in the TR-55 and NRCS drainage references. Kirpich was calibrated on small rural channelized watersheds, and overland/sheet flow on a paved surface is often taken at about 0.4x the Kirpich value. This returns a single-segment Kirpich estimate - it is not the TR-55 three-segment (sheet + shallow concentrated + channel) travel-time sum, does not apply the paved/overland adjustment factor automatically, and is an estimate for setting the design storm duration, not a routed hydrograph. A design aid, not a substitute for a licensed civil engineer's drainage report; the engineer of record and the local drainage manual govern.",
+    assumptions: [
+      { name: "Kirpich equation", value: "tc = 0.0078 L^0.77 S^(-0.385) on the longest flow path, single segment", source: "Kirpich (1940) / TR-55" },
+      { name: "Calibration", value: "small rural channelized watersheds; a paved surface is often taken at about 0.4x", source: "NRCS drainage guidance" },
+      { name: "Use", value: "sets the design storm duration read off the local IDF curve, not a routed hydrograph", source: "rational-method practice" },
+    ],
+  },
+  "orifice-flow": {
+    formula: "A = pi/4 (d/12)^2; Q_cfs = Cd A sqrt(2 g h) (g = 32.2 ft/s^2); Q_gpm = 448.831 Q_cfs.",
+    edition: "The orifice discharge equation Q = Cd A sqrt(2 g h) with g = 32.2 ft/s^2 and the sharp-edged discharge coefficient (~0.6), a standard hydraulics result, by name.",
+    freeAccess: "The orifice equation is a public closed-form hydraulics result; the discharge coefficients are in the standard references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The orifice discharge Q = Cd A sqrt(2 g h) with g = 32.2 ft/s^2, Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded), and the head measured to the orifice centroid. This returns the free/submerged orifice discharge for a small orifice under a steady head - it assumes the orifice is small relative to the head (uniform velocity across it), uses the entered Cd, and does not integrate the falling head of a draining tank (the time-to-drain is a follow-on) or account for a partially submerged or gated outlet. A design aid, not a substitute for a licensed engineer's drainage design; the engineer of record governs.",
+    assumptions: [
+      { name: "Discharge", value: "Q = Cd A sqrt(2 g h) at the head to the orifice centroid", source: "orifice hydraulics" },
+      { name: "Coefficient", value: "Cd about 0.6 sharp-edged (0.8 short tube, 0.98 rounded), entered", source: "standard hydraulics tables" },
+      { name: "Steady head", value: "small orifice under a steady head; the falling-head drain time is separate", source: "scope of this tile" },
+    ],
+  },
+  "channel-froude-number": {
+    formula: "V = Q/(b y); Fr = V/sqrt(g y) (g = 32.2, D = y rectangular); regime by Fr vs 1; q = Q/b; yc = (q^2/g)^(1/3).",
+    edition: "The open-channel Froude-number regime classification Fr = V/sqrt(g D) and the rectangular critical depth yc = (q^2/g)^(1/3), as compiled in Chow's Open-Channel Hydraulics, by name.",
+    freeAccess: "The Froude-number classification and the rectangular critical-depth relation are public results in the standard open-channel-hydraulics references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Froude number Fr = V/sqrt(g D) (g = 32.2 ft/s^2, D = A/T the hydraulic depth, equal to y for a wide/rectangular section), the subcritical/critical/supercritical regimes at Fr <> 1, and the rectangular critical depth yc = (q^2/g)^(1/3) with q = Q/b, as compiled in Chow's open-channel-hydraulics reference. This returns the regime and rectangular critical depth for a prismatic rectangular channel - it uses D = y (rectangular), does not compute the normal depth (that is Manning), the hydraulic-jump conjugate depth, or a trapezoidal/irregular section's critical depth. A design aid, not a substitute for a licensed engineer's hydraulic design; the engineer of record governs.",
+    assumptions: [
+      { name: "Froude number", value: "Fr = V/sqrt(g y) for a rectangular section; Fr < 1 subcritical, > 1 supercritical", source: "Chow open-channel hydraulics" },
+      { name: "Critical depth", value: "yc = (q^2/g)^(1/3) with q = Q/b; flow is subcritical when y > yc", source: "Chow open-channel hydraulics" },
+      { name: "Scope", value: "prismatic rectangular channel; normal depth (Manning) and the hydraulic jump are separate", source: "scope of this tile" },
+    ],
+  },
   "rc-slab-min-thickness": {
     formula: "denom = {simply:20, one-end:24, both-ends:28, cantilever:10}; base = 12 l / denom; kfy = (fy == 60,000) ? 1 : 0.4 + fy/100,000; klw = (wc >= 145) ? 1 : max(1.65 - 0.005 wc, 1.09); hmin = base kfy klw.",
     edition: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) minimum thickness for deflection control, with the (0.4 + fy/100,000) non-Grade-60 modifier and the lightweight-concrete factor, by name.",

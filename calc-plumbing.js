@@ -3664,3 +3664,121 @@ PLUMBING_RENDERERS["radiant-loop-sizing"] = renderRadiantLoopSizing;
 // --- spec-v63 gas-appliance-demand / tpr-discharge + spec-v64 pipe-support-spacing / softener-sizing -> relocated to calc-service.js (spec-v78 split) ---
 
 // --- spec-v83 onsite-septic pressure-distribution bench (septic-dose-tank, septic-pumpout-interval, septic-lpp-orifice) -> relocated to calc-septic.js (spec-v86 split) ---
+
+// ===================== spec-v302..v304: site-hydraulics depth batch =====================
+// The pieces the rational-method and open-channel tiles need but do not
+// compute: the watershed time of concentration (Kirpich) that sets the design
+// storm duration, the orifice discharge of a detention outlet, and the
+// open-channel flow regime by Froude number.
+
+// dims: in { l_ft: L, s_slope: dimensionless } out: { tc_min: T, tc_hr: T }
+export function computeTimeOfConcentration({ l_ft = 0, s_slope = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(l_ft > 0)) return { error: "Flow-path length must be positive (ft)." };
+  if (!(s_slope > 0)) return { error: "Slope must be positive (ft/ft)." };
+  const tc_min = 0.0078 * Math.pow(l_ft, 0.77) * Math.pow(s_slope, -0.385);
+  const tc_hr = tc_min / 60;
+  return {
+    tc_min, tc_hr,
+    note: "Kirpich (1940) time of concentration tc = 0.0078 L^0.77 S^(-0.385) (tc minutes, L feet, S ft/ft), as compiled in the TR-55 and NRCS drainage references - the time for runoff to travel from the hydraulically most distant point to the outlet, which sets the design storm duration read off the local IDF curve. Kirpich was calibrated on small rural channelized watersheds; overland/sheet flow on a paved surface is often taken at about 0.4x the Kirpich value. A single-segment estimate, not the TR-55 three-segment (sheet + shallow concentrated + channel) travel-time sum, and not a routed hydrograph. A design aid; the engineer of record and the local drainage manual govern.",
+  };
+}
+export const timeOfConcentrationExample = { inputs: { l_ft: 1000, s_slope: 0.02 } };
+
+function _v302renderTimeOfConcentration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Kirpich (1940) time of concentration tc = 0.0078 L^0.77 S^(-0.385) (tc min, L ft, S ft/ft), as compiled in TR-55 / NRCS, by name. Single-segment estimate for the design storm duration; the paved/overland factor and the TR-55 three-segment sum are separate. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { l.input.value = "1000"; s.input.value = "0.02"; update(); });
+  const l = makeNumber("Flow-path length L (ft)", "toc-l", { step: "any", min: "0" });
+  const s = makeNumber("Average slope S (ft/ft)", "toc-s", { step: "any", min: "0" });
+  for (const f of [l, s]) inputRegion.appendChild(f.wrap);
+  const oTc = makeOutputLine(outputRegion, "Time of concentration", "toc-out-tc");
+  const oNote = makeOutputLine(outputRegion, "Note", "toc-out-n");
+  const update = debounce(() => {
+    const r = computeTimeOfConcentration({ l_ft: Number(l.input.value) || 0, s_slope: Number(s.input.value) || 0 });
+    if (r.error) { oTc.textContent = r.error; oNote.textContent = "-"; return; }
+    oTc.textContent = fmt(r.tc_min, 1) + " min (" + fmt(r.tc_hr, 3) + " hr)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [l, s]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["time-of-concentration"] = _v302renderTimeOfConcentration;
+
+// dims: in { d_in: L, h_ft: L, cd: dimensionless } out: { a_ft2: L^2, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1 }
+export function computeOrificeFlow({ d_in = 0, h_ft = 0, cd = 0.60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0)) return { error: "Orifice diameter must be positive (in)." };
+  if (!(h_ft > 0)) return { error: "Head must be positive (ft)." };
+  if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
+  const a_ft2 = (Math.PI / 4) * Math.pow(d_in / 12, 2);
+  const q_cfs = cd * a_ft2 * Math.sqrt(2 * 32.2 * h_ft);
+  const q_gpm = q_cfs * 448.831;
+  return {
+    a_ft2, q_cfs, q_gpm,
+    note: "Orifice discharge Q = Cd A sqrt(2 g h) with g = 32.2 ft/s^2, Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded), and the head measured to the orifice centroid. The flow scales with the square root of the head, which makes an orifice a gentle stage-discharge control for a detention outlet. Free/submerged discharge under a steady head for a small orifice (uniform velocity across it) - it does not integrate the falling head of a draining tank (the time-to-drain is a follow-on) or a partially submerged/gated outlet. A design aid; the engineer of record governs.",
+  };
+}
+export const orificeFlowExample = { inputs: { d_in: 6, h_ft: 4, cd: 0.60 } };
+
+function _v303renderOrificeFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: orifice discharge Q = Cd A sqrt(2 g h), g = 32.2 ft/s^2, Cd ~ 0.6 sharp-edged, head to the centroid, by name. Small orifice, steady head; the falling-head time-to-drain is separate. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { d.input.value = "6"; h.input.value = "4"; cd.input.value = "0.60"; update(); });
+  const d = makeNumber("Orifice diameter (in)", "orf-d", { step: "any", min: "0" });
+  const h = makeNumber("Head to orifice center (ft)", "orf-h", { step: "any", min: "0" });
+  const cd = makeNumber("Discharge coefficient Cd", "orf-cd", { step: "any", min: "0" });
+  cd.input.value = "0.60";
+  for (const f of [d, h, cd]) inputRegion.appendChild(f.wrap);
+  const oA = makeOutputLine(outputRegion, "Orifice area", "orf-out-a");
+  const oQ = makeOutputLine(outputRegion, "Discharge", "orf-out-q");
+  const oNote = makeOutputLine(outputRegion, "Note", "orf-out-n");
+  const update = debounce(() => {
+    const r = computeOrificeFlow({ d_in: Number(d.input.value) || 0, h_ft: Number(h.input.value) || 0, cd: Number(cd.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oQ.textContent = "-"; oNote.textContent = "-"; return; }
+    oA.textContent = fmt(r.a_ft2, 3) + " ft^2";
+    oQ.textContent = fmt(r.q_cfs, 2) + " cfs (" + fmt(r.q_gpm, 0) + " gpm)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, h, cd]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["orifice-flow"] = _v303renderOrificeFlow;
+
+// dims: in { b_ft: L, q_cfs: L^3 T^-1, y_ft: L } out: { v_fps: L T^-1, fr: dimensionless, q_unit: L^2 T^-1, yc_ft: L }
+export function computeChannelFroudeNumber({ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_ft > 0)) return { error: "Channel width must be positive (ft)." };
+  if (!(q_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(y_ft > 0)) return { error: "Flow depth must be positive (ft)." };
+  const v_fps = q_cfs / (b_ft * y_ft);
+  const fr = v_fps / Math.sqrt(32.2 * y_ft);
+  const regime = fr < 0.995 ? "subcritical (tranquil, downstream-controlled)" : (fr > 1.005 ? "supercritical (rapid, upstream-controlled)" : "critical (Fr = 1)");
+  const q_unit = q_cfs / b_ft;
+  const yc_ft = Math.cbrt((q_unit * q_unit) / 32.2);
+  const yc_consistent = (y_ft > yc_ft && fr < 1) || (y_ft < yc_ft && fr > 1) || Math.abs(fr - 1) < 0.01;
+  return {
+    v_fps, fr, regime, q_unit, yc_ft, yc_consistent,
+    note: "Open-channel Froude number Fr = V/sqrt(g D) (g = 32.2 ft/s^2, D = A/T the hydraulic depth, equal to y for a rectangular section) classifies the regime: Fr < 1 subcritical (tranquil, downstream-controlled), Fr = 1 critical, Fr > 1 supercritical (rapid, upstream-controlled); the rectangular critical depth is yc = (q^2/g)^(1/3) with q = Q/b, and the flow is subcritical when y > yc. Prismatic rectangular channel with D = y - it does not compute the normal depth (that is Manning), the hydraulic-jump conjugate depth, or a trapezoidal/irregular section's critical depth. A design aid; the engineer of record governs.",
+  };
+}
+export const channelFroudeNumberExample = { inputs: { b_ft: 4, q_cfs: 50, y_ft: 2 } };
+
+function _v304renderChannelFroudeNumber(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: open-channel Froude number Fr = V/sqrt(g D) (g = 32.2, D = y rectangular), the subcritical/critical/supercritical regimes, and the rectangular critical depth yc = (q^2/g)^(1/3), as compiled in Chow, by name. Rectangular section; normal depth and hydraulic jump are separate. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { b.input.value = "4"; q.input.value = "50"; y.input.value = "2"; update(); });
+  const b = makeNumber("Channel width b (ft)", "cfn-b", { step: "any", min: "0" });
+  const q = makeNumber("Discharge Q (cfs)", "cfn-q", { step: "any", min: "0" });
+  const y = makeNumber("Flow depth y (ft)", "cfn-y", { step: "any", min: "0" });
+  for (const f of [b, q, y]) inputRegion.appendChild(f.wrap);
+  const oV = makeOutputLine(outputRegion, "Mean velocity", "cfn-out-v");
+  const oFr = makeOutputLine(outputRegion, "Froude number / regime", "cfn-out-fr");
+  const oYc = makeOutputLine(outputRegion, "Critical depth yc", "cfn-out-yc");
+  const oNote = makeOutputLine(outputRegion, "Note", "cfn-out-n");
+  const update = debounce(() => {
+    const r = computeChannelFroudeNumber({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y_ft: Number(y.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oFr.textContent = "-"; oYc.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = fmt(r.v_fps, 2) + " ft/s";
+    oFr.textContent = fmt(r.fr, 2) + " - " + r.regime;
+    oYc.textContent = fmt(r.yc_ft, 2) + " ft (flow depth is " + (r.yc_consistent ? "consistent with the regime" : "inconsistent - check inputs") + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b, q, y]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["channel-froude-number"] = _v304renderChannelFroudeNumber;

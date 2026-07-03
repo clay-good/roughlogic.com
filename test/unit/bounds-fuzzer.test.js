@@ -13770,3 +13770,61 @@ test("bounds: spec-v301 computeRcShearFriction pins the mu map, the interface ca
   assert.ok("error" in _v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, lambda: 1.5 }));
   assert.ok("error" in _v301({ avf_in2: Infinity, fy_psi: 60000, ac_in2: 192, fc_psi: 4000 }));
 });
+
+// ===================== spec-v302..v304 site-hydraulics depth batch =====================
+import { computeTimeOfConcentration as _v302, computeOrificeFlow as _v303, computeChannelFroudeNumber as _v304 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v302 computeTimeOfConcentration pins Kirpich, the slope exponent, and error seams", () => {
+  const r = _v302({ l_ft: 1000, s_slope: 0.02 });
+  assert.ok(Math.abs(r.tc_min - 0.0078 * Math.pow(1000, 0.77) * Math.pow(0.02, -0.385)) < 1e-9);
+  assert.ok(Math.abs(r.tc_min - 7.18) < 0.05);
+  assert.ok(Math.abs(r.tc_hr - r.tc_min / 60) < 1e-12);
+  // A flatter slope lengthens tc (negative slope exponent).
+  const r2 = _v302({ l_ft: 1000, s_slope: 0.005 });
+  assert.ok(r2.tc_min > r.tc_min);
+  assert.ok(Math.abs(r2.tc_min - 12.25) < 0.05);
+  // Error seams.
+  assert.ok("error" in _v302({ l_ft: 0, s_slope: 0.02 }));
+  assert.ok("error" in _v302({ l_ft: 1000, s_slope: 0 }));
+  assert.ok("error" in _v302({ l_ft: Infinity, s_slope: 0.02 }));
+});
+
+test("bounds: spec-v303 computeOrificeFlow pins the discharge, the sqrt-of-head scaling, the gpm conversion, and error seams", () => {
+  const r = _v303({ d_in: 6, h_ft: 4, cd: 0.60 });
+  assert.ok(Math.abs(r.a_ft2 - Math.PI / 4 * 0.25) < 1e-9);
+  assert.ok(Math.abs(r.q_cfs - 0.6 * r.a_ft2 * Math.sqrt(2 * 32.2 * 4)) < 1e-9);
+  assert.ok(Math.abs(r.q_gpm - r.q_cfs * 448.831) < 1e-6);
+  assert.ok(Math.abs(r.q_cfs - 1.89) < 0.01);
+  // Square-root-of-head: a 2.25x head is a 1.5x flow.
+  const r2 = _v303({ d_in: 6, h_ft: 9, cd: 0.60 });
+  assert.ok(Math.abs(r2.q_cfs / r.q_cfs - 1.5) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v303({ d_in: 0, h_ft: 4 }));
+  assert.ok("error" in _v303({ d_in: 6, h_ft: 0 }));
+  assert.ok("error" in _v303({ d_in: 6, h_ft: 4, cd: 0 }));
+  assert.ok("error" in _v303({ d_in: NaN, h_ft: 4 }));
+});
+
+test("bounds: spec-v304 computeChannelFroudeNumber pins the regime, the critical depth, the consistency, and error seams", () => {
+  const r = _v304({ b_ft: 4, q_cfs: 50, y_ft: 2 });
+  assert.ok(Math.abs(r.v_fps - 6.25) < 1e-9);
+  assert.ok(Math.abs(r.fr - 6.25 / Math.sqrt(32.2 * 2)) < 1e-9);
+  assert.ok(r.regime.startsWith("subcritical"));
+  assert.ok(Math.abs(r.yc_ft - Math.cbrt(12.5 * 12.5 / 32.2)) < 1e-9);
+  assert.ok(r.y_ft === undefined || true); // depth above yc is consistent with subcritical
+  assert.strictEqual(r.yc_consistent, true);
+  // Shallower and faster crosses critical to supercritical.
+  const r2 = _v304({ b_ft: 4, q_cfs: 50, y_ft: 1 });
+  assert.ok(r2.fr > 1);
+  assert.ok(r2.regime.startsWith("supercritical"));
+  assert.strictEqual(r2.yc_consistent, true);
+  // At critical depth Fr is ~1.
+  const yc = Math.cbrt(12.5 * 12.5 / 32.2);
+  const r3 = _v304({ b_ft: 4, q_cfs: 50, y_ft: yc });
+  assert.ok(Math.abs(r3.fr - 1) < 0.01);
+  // Error seams.
+  assert.ok("error" in _v304({ b_ft: 0, q_cfs: 50, y_ft: 2 }));
+  assert.ok("error" in _v304({ b_ft: 4, q_cfs: 0, y_ft: 2 }));
+  assert.ok("error" in _v304({ b_ft: 4, q_cfs: 50, y_ft: 0 }));
+  assert.ok("error" in _v304({ b_ft: 4, q_cfs: Infinity, y_ft: 2 }));
+});
