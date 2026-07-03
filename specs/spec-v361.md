@@ -1,6 +1,6 @@
 # roughlogic.com Specification v361 -- Thin-Wall Pressure Vessel Hoop and Longitudinal Stress (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v359..v361 (the mechanics-of-materials-2 trio -- shaft torsion
+> **Status: LANDED (2026-07-03, package 0.126.0). Batch spec-v359..v361 (the mechanics-of-materials-2 trio -- shaft torsion
 > (v359), restrained thermal stress (v360), thin-wall hoop stress (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pipe-pressure-rating` gives the ASME B31.1 code
 > allowable pressure and wall for pipe, but the underlying membrane stresses -- the hoop and longitudinal stress in the wall

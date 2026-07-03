@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): land spec-v359..v361 -- 3 applied-mechanics tiles in calc-construction.js; 827 -> 830 tiles, 0.126.0, 2026-07-03
+
+The applied-mechanics trio, twenty-ninth batch of the v275-v374 campaign: the machine- and pressure-element mechanics the structural-member tiles never give, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **827 -> 830**, package **0.125.0 -> 0.126.0** (a minor). Proposed 2026-07-02.
+
+- **`shaft-torsion` (spec-v359).** J = pi(d^4-di^4)/32, tau = T r/J, theta = T L/(J G). Pinned: a 1.5 in solid steel shaft, 1,000 lb-ft over 24 in -> 18,100 psi, 2.9 deg; a 2 in shaft cuts stress 58% and twist to a third (the d^3/d^4 leverage).
+- **`thermal-stress-restrained` (spec-v360).** sigma = E alpha dT x restraint (length-independent), F = sigma A. Pinned: structural steel +100 F fully restrained -> 18,850 psi, 94,250 lb on 5 in^2; aluminum nets a lower 13,000 psi. Heating = compression, cooling = tension.
+- **`hoop-stress-thin-wall` (spec-v361).** sigma_h = P D/(2t), sigma_l = P D/(4t) = half the hoop, D/t thin-wall flag. Pinned: a 12 in tank, 0.25 in wall, 150 psi -> 3,600/1,800 psi, D/t 48, DCR 0.24; a 10 in, 0.5 in receiver sits at D/t 20, the thin-wall boundary.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the diameter leverage, the length-independent stress and sign, the hoop = 2x longitudinal and D/t flag, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the torsion relations, the restrained thermal-stress relation, and the thin-wall (Barlow) membrane-stress formulas. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bump needed. Housekeeping: home count 827 -> 830, README resynced (counts, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 58 appended. All gates green at the new state: lint, unit tests (**5,123**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(fab): land spec-v356..v358 -- 3 welding process tiles in calc-fab.js; 824 -> 827 tiles, 0.125.0, 2026-07-03
 
 The welding process trio, twenty-eighth batch of the v275-v374 campaign: the process-planning numbers the weld-strength and cost tiles never give, all in the existing lazy `calc-fab.js` (Group E); no new module, group, or dependency. Catalog **824 -> 827**, package **0.124.0 -> 0.125.0** (a minor). Proposed 2026-07-02.

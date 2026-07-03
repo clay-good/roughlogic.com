@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "shaft-torsion": ["driveshaft-crit", "section-properties", "motor-shaft-torque", "hp-from-torque"],
+  "thermal-stress-restrained": ["pipe-expansion", "pipe-expansion-loop", "thermal-expansion-volume", "conduit-thermal-expansion"],
+  "hoop-stress-thin-wall": ["pipe-pressure-rating", "tank-volume", "metal-weight", "combined-stress-axial-bending"],
   "weld-dilution": ["weld-metal-volume", "weld-heat-input", "carbon-equivalent", "weld-passes-arc-time"],
   "weld-passes-arc-time": ["weld-metal-volume", "wire-feed-deposition", "weld-cost-per-foot", "weld-dilution"],
   "weld-travel-speed": ["weld-heat-input", "weld-passes-arc-time", "weld-preheat-fuel", "carbon-equivalent"],

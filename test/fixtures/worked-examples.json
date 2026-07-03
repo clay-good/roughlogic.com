@@ -30287,6 +30287,90 @@
       "outputs": {
         "travel_speed_ipm": { "value": 9.22, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "shaft-torsion",
+      "source_publisher": "mechanics of materials",
+      "source_title": "1.5 in solid steel shaft, 1,000 lb-ft, 24 in, G 11.5e6 -> 18,100 psi, 2.9 deg",
+      "source_edition_or_year": "spec-v359 worked example (machine-verified)",
+      "source_section_or_page": "spec-v359 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "T_lbin": 12000, "d_in": 1.5, "di_in": 0, "L_in": 24, "G_psi": 11500000 },
+      "outputs": {
+        "tau_psi": { "value": 18100, "tolerance": { "pct": 0.5 } },
+        "theta_deg": { "value": 2.9, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "shaft-torsion",
+      "source_publisher": "mechanics of materials",
+      "source_title": "cross-check: a 2 in shaft drops stress 58% and twist to a third -> 7,640 psi, 0.91 deg",
+      "source_edition_or_year": "spec-v359 worked example (machine-verified)",
+      "source_section_or_page": "spec-v359 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "T_lbin": 12000, "d_in": 2, "di_in": 0, "L_in": 24, "G_psi": 11500000 },
+      "outputs": {
+        "tau_psi": { "value": 7640, "tolerance": { "pct": 0.5 } },
+        "theta_deg": { "value": 0.91, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "thermal-stress-restrained",
+      "source_publisher": "mechanics of materials",
+      "source_title": "structural steel, +100 F, fully restrained, A 5 in^2 -> 18,850 psi, 94,250 lb",
+      "source_edition_or_year": "spec-v360 worked example (machine-verified)",
+      "source_section_or_page": "spec-v360 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "E_psi": 29000000, "alpha": 0.0000065, "dT_F": 100, "A_in2": 5, "L_in": 240, "restraint": 1 },
+      "outputs": {
+        "sigma_psi": { "value": 18850, "tolerance": { "pct": 0.5 } },
+        "F_lb": { "value": 94250, "tolerance": { "pct": 0.5 } },
+        "free_delta_in": { "value": 0.156, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "thermal-stress-restrained",
+      "source_publisher": "mechanics of materials",
+      "source_title": "cross-check: aluminum at the same rise nets a lower thermal stress -> 13,000 psi",
+      "source_edition_or_year": "spec-v360 worked example (machine-verified)",
+      "source_section_or_page": "spec-v360 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "E_psi": 10000000, "alpha": 0.000013, "dT_F": 100, "A_in2": 0, "L_in": 0, "restraint": 1 },
+      "outputs": {
+        "sigma_psi": { "value": 13000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hoop-stress-thin-wall",
+      "source_publisher": "thin-wall / Barlow",
+      "source_title": "12 in tank, 0.25 in wall, 150 psi -> 3,600 psi hoop, 1,800 psi long, D/t 48, DCR 0.24",
+      "source_edition_or_year": "spec-v361 worked example (machine-verified)",
+      "source_section_or_page": "spec-v361 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "P_psi": 150, "D_in": 12, "t_in": 0.25, "S_allow": 15000 },
+      "outputs": {
+        "sigma_h_psi": { "value": 3600, "tolerance": { "abs": 1 } },
+        "sigma_l_psi": { "value": 1800, "tolerance": { "abs": 1 } },
+        "DCR": { "value": 0.24, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "hoop-stress-thin-wall",
+      "source_publisher": "thin-wall / Barlow",
+      "source_title": "cross-check: a 10 in, 0.5 in wall receiver at 200 psi sits at D/t 20, the thin-wall boundary -> 2,000 psi",
+      "source_edition_or_year": "spec-v361 worked example (machine-verified)",
+      "source_section_or_page": "spec-v361 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "P_psi": 200, "D_in": 10, "t_in": 0.5, "S_allow": 0 },
+      "outputs": {
+        "sigma_h_psi": { "value": 2000, "tolerance": { "abs": 1 } }
+      }
     }
   ]
 }

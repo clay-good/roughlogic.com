@@ -5847,3 +5847,140 @@ const _renderCombinedStressAxialBending = _simpleRenderer({
   compute: computeCombinedStressAxialBending,
 });
 CONSTRUCTION_RENDERERS["combined-stress-axial-bending"] = _renderCombinedStressAxialBending;
+
+// ===================== spec-v359..v361: applied-mechanics batch =====================
+// The machine- and pressure-element mechanics the structural-member tiles never
+// give: a shaft's torsional shear stress and angle of twist (v359), the stress
+// and force from a restrained temperature change (v360), and a thin-wall
+// pressure vessel's hoop and longitudinal stress (v361).
+
+// dims: in { T_lbin: M L^2 T^-2, d_in: L, di_in: L, L_in: L, G_psi: M L^-1 T^-2 } out: { J_in4: L^4, tau_psi: M L^-1 T^-2, theta_deg: dimensionless }
+export function computeShaftTorsion({ T_lbin = 0, d_in = 0, di_in = 0, L_in = 0, G_psi = 11.5e6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(T_lbin) || 0;
+  const d = Number(d_in) || 0;
+  const di = Number(di_in) || 0;
+  const L = Number(L_in) || 0;
+  const G = Number(G_psi) || 0;
+  if (!(T > 0)) return { error: "Torque must be positive (lb-in)." };
+  if (!(d > 0)) return { error: "Outer diameter must be positive (in)." };
+  if (!(di >= 0 && di < d)) return { error: "Inner diameter must be zero or positive and less than the outer." };
+  const J = Math.PI * (Math.pow(d, 4) - Math.pow(di, 4)) / 32;
+  if (!(J > 0)) return { error: "Polar moment is not valid." };
+  const tau_psi = T * (d / 2) / J;
+  let theta_rad = null, theta_deg = null;
+  if (L > 0 && G > 0) { theta_rad = T * L / (J * G); theta_deg = theta_rad * 180 / Math.PI; }
+  return {
+    J_in4: J, tau_psi, theta_rad, theta_deg,
+    note: "Circular-shaft torsion: polar moment J = pi(d^4 - di^4)/32, max surface shear stress tau = T r / J (= 16T/(pi d^3) for a solid shaft), and the angle of twist theta = T L / (J G). Stress falls with the cube of diameter and twist with the fourth power, so a modest diameter increase pays off fast. Elastic, prismatic, circular cross-section, pure torsion (no bending or axial load, no stress concentration at keyways or shoulders). A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const shaftTorsionExample = { inputs: { T_lbin: 12000, d_in: 1.5, di_in: 0, L_in: 24, G_psi: 11.5e6 } };
+
+const _renderShaftTorsion = _simpleRenderer({
+  citation: "Citation: circular-shaft torsion first-principles (mechanics of materials): J = pi(d^4 - di^4)/32, tau = T r / J, theta = T L / (J G). Elastic prismatic circular section, pure torsion (no keyway stress concentration). A design aid, not a substitute for the engineer of record.",
+  example: shaftTorsionExample.inputs,
+  fields: [
+    { key: "T_lbin", label: "Torque T (lb-in)", kind: "number" },
+    { key: "d_in", label: "Outer diameter d (in)", kind: "number" },
+    { key: "di_in", label: "Inner diameter (in; 0 = solid)", kind: "number" },
+    { key: "L_in", label: "Length for twist L (in, optional)", kind: "number" },
+    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11500000 },
+  ],
+  outputs: [
+    { key: "tau", id: "st-out-tau", label: "Max shear stress", value: (r) => fmt(r.tau_psi, 0) + " psi" },
+    { key: "j", id: "st-out-j", label: "Polar moment J", value: (r) => fmt(r.J_in4, 4) + " in^4" },
+    { key: "th", id: "st-out-th", label: "Angle of twist", value: (r) => r.theta_deg == null ? "(enter length and G)" : fmt(r.theta_deg, 2) + " deg (" + fmt(r.theta_rad, 4) + " rad)" },
+    { key: "n", id: "st-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShaftTorsion,
+});
+CONSTRUCTION_RENDERERS["shaft-torsion"] = _renderShaftTorsion;
+
+// dims: in { E_psi: M L^-1 T^-2, alpha: dimensionless, dT_F: T, A_in2: L^2, L_in: L, restraint: dimensionless } out: { sigma_psi: M L^-1 T^-2, F_lb: M L T^-2, free_delta_in: L }
+export function computeThermalStressRestrained({ E_psi = 0, alpha = 0, dT_F = 0, A_in2 = 0, L_in = 0, restraint = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const E = Number(E_psi) || 0;
+  const a = Number(alpha) || 0;
+  const dT = Number(dT_F) || 0;
+  const A = Number(A_in2) || 0;
+  const L = Number(L_in) || 0;
+  let r = Number(restraint);
+  if (!Number.isFinite(r) || r === 0) r = 1;
+  if (!(E > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
+  if (!(a > 0)) return { error: "Thermal expansion coefficient must be positive (/F)." };
+  if (dT === 0) return { error: "Temperature change must be non-zero (F)." };
+  if (!(r > 0 && r <= 1)) return { error: "Restraint factor must be over 0 and up to 1." };
+  const sigma_psi = E * a * dT * r;
+  const F_lb = A > 0 ? sigma_psi * A : null;
+  const free_delta_in = L > 0 ? a * L * dT : null;
+  return {
+    sigma_psi, F_lb, free_delta_in,
+    compression: dT > 0,
+    note: "Restrained thermal stress: a member blocked from expanding develops sigma = E x alpha x dT x restraint (independent of length), and the restraint force F = sigma x A. Heating a restrained member puts it in compression; cooling puts it in tension. The free (unrestrained) expansion alpha x L x dT is the movement the restraint blocks. Aluminum's larger expansion coefficient but lower modulus can net a lower thermal stress than steel. Fully restrained is the worst case; real supports give partial restraint. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const thermalStressRestrainedExample = { inputs: { E_psi: 29e6, alpha: 6.5e-6, dT_F: 100, A_in2: 5, L_in: 240, restraint: 1 } };
+
+const _renderThermalStressRestrained = _simpleRenderer({
+  citation: "Citation: restrained thermal stress first-principles: sigma = E alpha dT x restraint, F = sigma A, free expansion = alpha L dT. Fully restrained is the worst case; real supports give partial restraint. A design aid, not a substitute for the engineer of record.",
+  example: thermalStressRestrainedExample.inputs,
+  fields: [
+    { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 10e6 alum)", kind: "number", default: 29000000 },
+    { key: "alpha", label: "Thermal expansion alpha (/F; 6.5e-6 steel)", kind: "number" },
+    { key: "dT_F", label: "Temperature change dT (F, + heating)", kind: "number" },
+    { key: "A_in2", label: "Cross-section area A (in^2, for force)", kind: "number" },
+    { key: "L_in", label: "Length L (in, for free expansion)", kind: "number" },
+    { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "s", id: "tsr-out-s", label: "Thermal stress", value: (r) => fmt(r.sigma_psi, 0) + " psi (" + (r.compression ? "compression" : "tension") + ")" },
+    { key: "f", id: "tsr-out-f", label: "Restraint force", value: (r) => r.F_lb == null ? "(enter area)" : fmt(r.F_lb, 0) + " lb" },
+    { key: "d", id: "tsr-out-d", label: "Free (blocked) expansion", value: (r) => r.free_delta_in == null ? "(enter length)" : fmt(r.free_delta_in, 3) + " in" },
+    { key: "n", id: "tsr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeThermalStressRestrained,
+});
+CONSTRUCTION_RENDERERS["thermal-stress-restrained"] = _renderThermalStressRestrained;
+
+// dims: in { P_psi: M L^-1 T^-2, D_in: L, t_in: L, S_allow: M L^-1 T^-2 } out: { sigma_h_psi: M L^-1 T^-2, sigma_l_psi: M L^-1 T^-2, Dt: dimensionless, DCR: dimensionless }
+export function computeHoopStressThinWall({ P_psi = 0, D_in = 0, t_in = 0, S_allow = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(P_psi) || 0;
+  const D = Number(D_in) || 0;
+  const t = Number(t_in) || 0;
+  const S = Number(S_allow) || 0;
+  if (!(P > 0)) return { error: "Internal pressure must be positive (psi)." };
+  if (!(D > 0)) return { error: "Diameter must be positive (in)." };
+  if (!(t > 0)) return { error: "Wall thickness must be positive (in)." };
+  const sigma_h_psi = P * D / (2 * t);
+  const sigma_l_psi = P * D / (4 * t);
+  const Dt = D / t;
+  const thin_wall_ok = Dt >= 20;
+  const DCR = S > 0 ? sigma_h_psi / S : null;
+  return {
+    sigma_h_psi, sigma_l_psi, Dt, thin_wall_ok, DCR,
+    note: "Thin-wall pressure vessel: hoop (circumferential) stress sigma_h = P D / (2 t) and longitudinal stress sigma_l = P D / (4 t) = half the hoop, which is why a cylinder splits along its length, not around. The thin-wall formula assumes D/t >= 20; below that the wall is 'thick' and the simple PD/2t under-reports the higher inner-surface stress (use a Lame thick-wall check). D is the mean/inner diameter. Static internal pressure, no external pressure, discontinuity, or nozzle stress. A design aid, not a substitute for a pressure-vessel code (ASME BPVC) or the engineer of record.",
+  };
+}
+export const hoopStressThinWallExample = { inputs: { P_psi: 150, D_in: 12, t_in: 0.25, S_allow: 15000 } };
+
+const _renderHoopStressThinWall = _simpleRenderer({
+  citation: "Citation: thin-wall pressure-vessel stress first-principles: hoop sigma_h = P D / (2 t), longitudinal sigma_l = P D / (4 t), valid for D/t >= 20. Not a substitute for the ASME BPVC or the engineer of record.",
+  example: hoopStressThinWallExample.inputs,
+  fields: [
+    { key: "P_psi", label: "Internal pressure P (psi)", kind: "number" },
+    { key: "D_in", label: "Diameter D (in, mean/inner)", kind: "number" },
+    { key: "t_in", label: "Wall thickness t (in)", kind: "number" },
+    { key: "S_allow", label: "Allowable stress S (psi, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "h", id: "hs-out-h", label: "Hoop (circumferential) stress", value: (r) => fmt(r.sigma_h_psi, 0) + " psi" },
+    { key: "l", id: "hs-out-l", label: "Longitudinal stress", value: (r) => fmt(r.sigma_l_psi, 0) + " psi (half the hoop)" },
+    { key: "dt", id: "hs-out-dt", label: "D/t (thin-wall if >= 20)", value: (r) => fmt(r.Dt, 1) + (r.thin_wall_ok ? " (thin-wall valid)" : " -- thick wall; a Lame check is advisable") },
+    { key: "dcr", id: "hs-out-dcr", label: "Demand/capacity (hoop)", value: (r) => r.DCR == null ? "(enter an allowable stress)" : fmt(r.DCR, 2) },
+    { key: "n", id: "hs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHoopStressThinWall,
+});
+CONSTRUCTION_RENDERERS["hoop-stress-thin-wall"] = _renderHoopStressThinWall;

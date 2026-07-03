@@ -1,6 +1,6 @@
 # roughlogic.com Specification v359 -- Shaft Torsional Shear Stress and Angle of Twist (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v359..v361 (the mechanics-of-materials-2 trio -- the stress
+> **Status: LANDED (2026-07-03, package 0.126.0). Batch spec-v359..v361 (the mechanics-of-materials-2 trio -- the stress
 > cases the beam tiles never cover: shaft torsion (this spec), restrained thermal stress (v360), and thin-wall hoop stress
 > (v361).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `driveshaft-crit` finds a shaft's critical whirl

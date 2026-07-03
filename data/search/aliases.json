@@ -13967,6 +13967,141 @@
       "term": "arc travel speed",
       "target": "weld-travel-speed",
       "kind": "industry"
+    },
+    {
+      "term": "shaft torsion",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "torsional shear stress",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "angle of twist",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "shaft torque stress",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "polar moment of inertia",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "tr over j",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "torsion bar",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "twist calculator",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "shaft stress",
+      "target": "shaft-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "thermal stress",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "restrained thermal stress",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "e alpha delta t",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "fixed pipe thermal stress",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "thermal expansion stress",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "rail thermal stress",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "restrained expansion",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature stress",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "thermal force",
+      "target": "thermal-stress-restrained",
+      "kind": "industry"
+    },
+    {
+      "term": "hoop stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "thin wall pressure vessel",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "circumferential stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "longitudinal stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "pd over 2t",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "cylinder stress pressure",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "tank wall stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "pressure vessel stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "membrane stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "industry"
     }
   ]
 }

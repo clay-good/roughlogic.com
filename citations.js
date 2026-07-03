@@ -7839,6 +7839,42 @@ export const CITATIONS = {
       { name: "Actual dimensions", value: "uses the entered actual (dressed) dimensions, not nominal", source: "scope of this tile" },
     ],
   },
+  "shaft-torsion": {
+    formula: "J = pi(d^4 - di^4)/32; tau = T (d/2)/J (= 16T/(pi d^3) solid); theta = T L/(J G).",
+    edition: "The standard circular-shaft torsion relations (mechanics of materials), by name.",
+    freeAccess: "The torsion formulas are published free in any mechanics-of-materials reference. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "Circular-shaft torsion: polar moment J = pi(d^4 - di^4)/32, maximum surface shear stress tau = T r / J (= 16T/(pi d^3) for a solid shaft), and the angle of twist theta = T L / (J G). Stress falls with the cube of the diameter and twist with the fourth power. This returns the elastic shear stress and twist for a prismatic circular (solid or hollow) shaft under pure torsion: it does not include a bending or axial load, and does not apply the stress-concentration factor at a keyway, shoulder, or hole (which can multiply the local stress). A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Circular section", value: "J = pi(d^4 - di^4)/32; tau = T r/J; theta = T L/(J G)", source: "mechanics of materials" },
+      { name: "Pure torsion", value: "no bending or axial load; elastic and prismatic", source: "mechanics of materials" },
+      { name: "No stress concentration", value: "keyways, shoulders, and holes raise the local stress; not included", source: "scope of this tile" },
+    ],
+  },
+  "thermal-stress-restrained": {
+    formula: "sigma = E alpha dT x restraint; F = sigma A; free_delta = alpha L dT.",
+    edition: "The standard restrained thermal-stress relation (mechanics of materials), by name.",
+    freeAccess: "The restrained thermal-stress relation is published free in any mechanics-of-materials reference. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "Restrained thermal stress: a member blocked from expanding develops sigma = E x alpha x dT x restraint (independent of length), and the restraint force F = sigma x A. Heating a restrained member puts it in compression; cooling puts it in tension. The free (unrestrained) expansion alpha x L x dT is the movement the restraint blocks. Aluminum's larger expansion coefficient but lower modulus can net a lower thermal stress than steel. This returns the stress and force for the entered restraint factor: fully restrained (factor 1) is the worst case, and real supports give partial restraint; it does not check member buckling under the induced compression. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Restrained stress", value: "sigma = E alpha dT x restraint, independent of length", source: "mechanics of materials" },
+      { name: "Sign", value: "heating a restrained member -> compression; cooling -> tension", source: "mechanics of materials" },
+      { name: "No buckling check", value: "fully restrained is the worst case; buckling under the compression is not checked", source: "scope of this tile" },
+    ],
+  },
+  "hoop-stress-thin-wall": {
+    formula: "sigma_h = P D/(2 t); sigma_l = P D/(4 t); D/t (thin-wall if >= 20); DCR = sigma_h / S_allow.",
+    edition: "The thin-wall pressure-vessel membrane-stress relations (Barlow / mechanics of materials), by name.",
+    freeAccess: "The thin-wall hoop and longitudinal stress formulas (Barlow's) are published free in any mechanics-of-materials reference. The ASME BPVC and the engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Thin-wall pressure vessel: hoop (circumferential) stress sigma_h = P D / (2 t) and longitudinal stress sigma_l = P D / (4 t) = half the hoop, which is why a cylinder splits along its length rather than around. The thin-wall (membrane) formula assumes D/t >= 20; below that the wall is thick and PD/2t under-reports the higher inner-surface stress (use a Lame thick-wall check). This returns the membrane stresses and the D/t check for static internal pressure: it does not cover external pressure/buckling, discontinuity or nozzle stresses, or a code-required joint efficiency and corrosion allowance. A design aid, not a substitute for a pressure-vessel code (ASME BPVC) or the engineer of record.",
+    assumptions: [
+      { name: "Membrane stress", value: "sigma_h = P D/(2 t), sigma_l = P D/(4 t) = half the hoop", source: "thin-wall / Barlow" },
+      { name: "Thin-wall validity", value: "valid for D/t >= 20; below that use a Lame thick-wall check", source: "mechanics of materials" },
+      { name: "Not a code check", value: "no external pressure, discontinuity/nozzle stress, joint efficiency, or corrosion allowance", source: "scope of this tile" },
+    ],
+  },
   "combined-stress-axial-bending": {
     formula: "sigma_axial = P/A; sigma_bend = M c/I; sigma_max = P/A + M c/I; sigma_min = P/A - M c/I; optional M = P e; no tension while M c/I <= P/A (kern e <= r^2/c).",
     edition: "The standard combined axial-plus-bending stress superposition (mechanics of materials), by name.",

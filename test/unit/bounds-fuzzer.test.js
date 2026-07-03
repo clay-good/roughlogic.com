@@ -14848,3 +14848,61 @@ test("bounds: spec-v358 computeWeldTravelSpeed pins the inverse relation, the ro
   assert.ok("error" in _v358({ V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 0 }));
   assert.ok("error" in _v358({ V_volts: Infinity, I_amps: 200, eta: 0.80, HI_kjin: 40 }));
 });
+
+// ===================== spec-v359..v361 applied-mechanics batch =====================
+import { computeShaftTorsion as _v359, computeThermalStressRestrained as _v360, computeHoopStressThinWall as _v361 } from "../../calc-construction.js";
+
+test("bounds: spec-v359 computeShaftTorsion pins J/tau/theta, the d^3/d^4 leverage, and error seams", () => {
+  const r = _v359({ T_lbin: 12000, d_in: 1.5, di_in: 0, L_in: 24, G_psi: 11.5e6 });
+  assert.ok(Math.abs(r.J_in4 - Math.PI * Math.pow(1.5, 4) / 32) < 1e-9);
+  assert.ok(Math.abs(r.tau_psi - 18108) < 5);
+  assert.ok(Math.abs(r.theta_deg - 2.9) < 0.05);
+  // A bigger diameter cuts stress (d^3) and twist (d^4) sharply.
+  const big = _v359({ T_lbin: 12000, d_in: 2, di_in: 0, L_in: 24, G_psi: 11.5e6 });
+  assert.ok(big.tau_psi < r.tau_psi && Math.abs(big.tau_psi - 7639) < 5);
+  assert.ok(big.theta_deg < r.theta_deg);
+  // Twist is null without length and G.
+  assert.strictEqual(_v359({ T_lbin: 12000, d_in: 1.5 }).theta_deg, null);
+  // Error seams.
+  assert.ok("error" in _v359({ T_lbin: 0, d_in: 1.5 }));
+  assert.ok("error" in _v359({ T_lbin: 12000, d_in: 0 }));
+  assert.ok("error" in _v359({ T_lbin: 12000, d_in: 1.5, di_in: 2 })); // inner >= outer
+  assert.ok("error" in _v359({ T_lbin: Infinity, d_in: 1.5 }));
+});
+
+test("bounds: spec-v360 computeThermalStressRestrained pins the length-independent stress, the sign, and error seams", () => {
+  const r = _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 100, A_in2: 5, L_in: 240, restraint: 1 });
+  assert.ok(Math.abs(r.sigma_psi - 18850) < 1);
+  assert.ok(Math.abs(r.F_lb - 94250) < 5);
+  assert.ok(Math.abs(r.free_delta_in - 0.156) < 0.001);
+  assert.strictEqual(r.compression, true);
+  // Stress is independent of length.
+  const short = _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 100, A_in2: 5, L_in: 10, restraint: 1 });
+  assert.ok(Math.abs(short.sigma_psi - r.sigma_psi) < 1e-9);
+  // Cooling puts it in tension.
+  assert.strictEqual(_v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: -100 }).compression, false);
+  // Error seams.
+  assert.ok("error" in _v360({ E_psi: 0, alpha: 6.5e-6, dT_F: 100 }));
+  assert.ok("error" in _v360({ E_psi: 29e6, alpha: 0, dT_F: 100 }));
+  assert.ok("error" in _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 0 }));
+  assert.ok("error" in _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 100, restraint: 1.5 }));
+});
+
+test("bounds: spec-v361 computeHoopStressThinWall pins hoop = 2x longitudinal, the D/t flag, and error seams", () => {
+  const r = _v361({ P_psi: 150, D_in: 12, t_in: 0.25, S_allow: 15000 });
+  assert.strictEqual(r.sigma_h_psi, 3600);
+  assert.strictEqual(r.sigma_l_psi, 1800);
+  assert.ok(Math.abs(r.sigma_h_psi - 2 * r.sigma_l_psi) < 1e-9);
+  assert.strictEqual(r.Dt, 48);
+  assert.ok(Math.abs(r.DCR - 0.24) < 0.001 && r.thin_wall_ok === true);
+  // At D/t = 20 the thin-wall flag is still true (boundary), below it turns false.
+  assert.strictEqual(_v361({ P_psi: 200, D_in: 10, t_in: 0.5 }).thin_wall_ok, true);
+  assert.strictEqual(_v361({ P_psi: 200, D_in: 10, t_in: 1 }).thin_wall_ok, false);
+  // DCR null without an allowable.
+  assert.strictEqual(_v361({ P_psi: 150, D_in: 12, t_in: 0.25 }).DCR, null);
+  // Error seams.
+  assert.ok("error" in _v361({ P_psi: 0, D_in: 12, t_in: 0.25 }));
+  assert.ok("error" in _v361({ P_psi: 150, D_in: 0, t_in: 0.25 }));
+  assert.ok("error" in _v361({ P_psi: 150, D_in: 12, t_in: 0 }));
+  assert.ok("error" in _v361({ P_psi: Infinity, D_in: 12, t_in: 0.25 }));
+});
