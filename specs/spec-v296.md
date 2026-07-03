@@ -1,6 +1,6 @@
 # roughlogic.com Specification v296 -- Wind Components and Cladding Pressure (ASCE 7 Ch. 30) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v296..v298 (the ASCE 7 wind-and-snow load depth trio -- the
+> **Status: LANDED (2026-07-03, package 0.105.0; proposed 2026-07-02). Batch spec-v296..v298 (the ASCE 7 wind-and-snow load depth trio -- the
 > load cases the single velocity-pressure and flat-snow tiles never build: the components-and-cladding suction on a roof or
 > wall zone (this spec), the snow drift surcharge at a step or parapet (v297), and the main-wind-force design pressure on
 > the building (v298).)**

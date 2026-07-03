@@ -1,6 +1,6 @@
 # roughlogic.com Specification v298 -- Main Wind-Force-Resisting-System Wall Pressure (ASCE 7 Ch. 27) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v296..v298 (the ASCE 7 wind-and-snow load depth trio -- C&C
+> **Status: LANDED (2026-07-03, package 0.105.0; proposed 2026-07-02; as-landed correction: the net horizontal pressure cancels the internal pressure -- the section-2.1 pinned net of 37.9 psf double-counted GCpi; the landed net is 28.6 psf, and the cross-check net of 32.8 psf matches this spec's own stated cancels-in-the-net principle). Batch spec-v296..v298 (the ASCE 7 wind-and-snow load depth trio -- C&C
 > pressure (v296), snow drift (v297), the MWFRS pressure (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `wind-pressure` gives the velocity pressure and
 > `wind-cc-pressure` (v296) gives the local cladding suction, but the lateral force the whole building must resist -- the

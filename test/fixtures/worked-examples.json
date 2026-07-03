@@ -28529,6 +28529,94 @@
         "min_leg_in": { "value": 0.125, "tolerance": { "abs": 0.0001 } },
         "max_leg_in": { "value": 0.1875, "tolerance": { "abs": 0.0001 } }
       }
+    },
+    {
+      "tile_id": "wind-cc-pressure",
+      "source_publisher": "ASCE 7-22 Chapter 30",
+      "source_title": "115 mph Exp C, 20 ft roof corner Zone 3 (GCp -1.8) -> qh 25.9 psf, -51.3 psf suction",
+      "source_edition_or_year": "spec-v296 worked example (machine-verified)",
+      "source_section_or_page": "spec-v296 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "v_mph": 115, "kz": 0.90, "gcp": -1.8, "kzt": 1.0, "kd": 0.85, "ke": 1.0, "gcpi": 0.18 },
+      "outputs": {
+        "qh_psf": { "value": 25.9, "tolerance": { "pct": 0.2 } },
+        "p_a_psf": { "value": -51.3, "tolerance": { "pct": 0.2 } },
+        "p_gov_psf": { "value": -51.3, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "wind-cc-pressure",
+      "source_publisher": "ASCE 7-22 Chapter 30",
+      "source_title": "cross-check: a wall Zone 5 corner (GCp -1.4) draws -40.9 psf, less than the roof corner",
+      "source_edition_or_year": "spec-v296 worked example (machine-verified)",
+      "source_section_or_page": "spec-v296 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "v_mph": 115, "kz": 0.90, "gcp": -1.4, "kzt": 1.0, "kd": 0.85, "ke": 1.0, "gcpi": 0.18 },
+      "outputs": {
+        "p_gov_psf": { "value": -40.9, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "snow-drift-load",
+      "source_publisher": "ASCE 7-22 Chapter 7",
+      "source_title": "leeward drift, 100 ft upwind roof, pg 30 psf -> gamma 17.9, hd 3.52 ft, pd 63 psf",
+      "source_edition_or_year": "spec-v297 worked example (machine-verified)",
+      "source_section_or_page": "spec-v297 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "lu_ft": 100, "pg_psf": 30, "hc_ft": 0 },
+      "outputs": {
+        "gamma_pcf": { "value": 17.9, "tolerance": { "abs": 0.05 } },
+        "hd_ft": { "value": 3.52, "tolerance": { "abs": 0.02 } },
+        "w_ft": { "value": 14.1, "tolerance": { "pct": 0.5 } },
+        "pd_psf": { "value": 63.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "snow-drift-load",
+      "source_publisher": "ASCE 7-22 Chapter 7",
+      "source_title": "cross-check: a heavier pg 50 psf drives gamma 20.5, hd 4.05 ft, pd 83.1 psf",
+      "source_edition_or_year": "spec-v297 worked example (machine-verified)",
+      "source_section_or_page": "spec-v297 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "lu_ft": 100, "pg_psf": 50, "hc_ft": 0 },
+      "outputs": {
+        "gamma_pcf": { "value": 20.5, "tolerance": { "abs": 0.05 } },
+        "hd_ft": { "value": 4.05, "tolerance": { "abs": 0.02 } },
+        "pd_psf": { "value": 83.1, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wind-mwfrs-pressure",
+      "source_publisher": "ASCE 7-22 Chapter 27",
+      "source_title": "115 mph, qz = qh = 25.9 psf, enclosed -> +22.3 / -15.7 walls, net 28.6 psf (internal cancels)",
+      "source_edition_or_year": "spec-v298 worked example (machine-verified; as-landed net corrects the spec prose double-count)",
+      "source_section_or_page": "spec-v298 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "qz_psf": 25.9, "qh_psf": 25.9, "cp_ww": 0.8, "cp_lw": -0.5, "g_f": 0.85, "gcpi": 0.18 },
+      "outputs": {
+        "p_ww_psf": { "value": 22.3, "tolerance": { "pct": 0.5 } },
+        "p_lw_psf": { "value": -15.7, "tolerance": { "pct": 0.5 } },
+        "p_net_psf": { "value": 28.6, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wind-mwfrs-pressure",
+      "source_publisher": "ASCE 7-22 Chapter 27",
+      "source_title": "cross-check: a taller windward wall (qz 32) -> windward 26.4 psf, net 32.8 psf (matches the spec's stated net principle)",
+      "source_edition_or_year": "spec-v298 worked example (machine-verified)",
+      "source_section_or_page": "spec-v298 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "qz_psf": 32, "qh_psf": 25.9, "cp_ww": 0.8, "cp_lw": -0.5, "g_f": 0.85, "gcpi": 0.18 },
+      "outputs": {
+        "p_ww_psf": { "value": 26.4, "tolerance": { "pct": 0.5 } },
+        "p_net_psf": { "value": 32.8, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

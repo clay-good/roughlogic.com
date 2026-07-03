@@ -7491,6 +7491,42 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "wind-cc-pressure": {
+    formula: "qh = 0.00256 Kz Kzt Kd Ke V^2; p_a = qh (GCp - GCpi); p_b = qh (GCp + GCpi); governing = the larger magnitude of p_a, p_b.",
+    edition: "The ASCE 7-22 Chapter 30 components-and-cladding design pressure p = qh [(GCp) - (GCpi)], with the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85, V in mph) and GCpi = +/-0.18 for an enclosed building, by name; GCp is read from the Chapter 30 zone figures.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the Chapter 30 C&C provisions and the 0.00256 velocity-pressure constant are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7-22 Chapter 30 C&C design pressure p = qh [(GCp) - (GCpi)], the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 with Kd = 0.85 and GCpi = +/-0.18 (enclosed), and GCp read from the Chapter 30 figures for the zone and effective wind area. This returns the C&C design pressure for an entered GCp and the computed qh - it does not read the zone figures for the user (enter GCp for the roof/wall zone and effective wind area), assumes an enclosed building unless GCpi is changed, and does not cover the MWFRS pressures (wind-mwfrs-pressure) or the parapet/overhang special cases. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Velocity pressure", value: "qh = 0.00256 Kz Kzt Kd Ke V^2 at mean roof height (Kd = 0.85, V in mph)", source: "ASCE 7-22 26.10" },
+      { name: "Design pressure", value: "p = qh (GCp - GCpi); both internal signs evaluated, the larger magnitude governs", source: "ASCE 7-22 30.3" },
+      { name: "GCp", value: "read from the Chapter 30 zone figures by roof/wall zone and effective wind area (entered)", source: "ASCE 7-22 Ch. 30 figures" },
+    ],
+  },
+  "snow-drift-load": {
+    formula: "gamma = min(0.13 pg + 14, 30) pcf; hd = max(0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5, 0) ft; w = 4 hd (hd <= hc) else min(4 hd^2/hc, 8 hc); pd = hd gamma psf.",
+    edition: "The ASCE 7-22 Chapter 7 leeward snow-drift provisions -- the drift height 7.7.1, the snow density 7.7.1, the surcharge pd = hd gamma, and the drift width -- by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the Chapter 7 drift relations are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7-22 Chapter 7 leeward drift height hd = 0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5 (lu the upwind fetch in ft, pg the ground snow in psf), the density gamma = 0.13 pg + 14 <= 30 pcf, the surcharge pd = hd gamma, and the drift width w = 4 hd when hd <= hc (w = 4 hd^2/hc <= 8 hc when the drift reaches the upper roof). This returns the leeward-drift surcharge height, width, and peak load at a roof step or wall - it uses the leeward form (the windward drift uses 0.75 hd and a different fetch), and does not add the balanced load beneath it (snow-load), the sliding-snow surcharge (7.9), or the unbalanced-gable case (7.6.1). A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Drift height", value: "hd = 0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5, floored at zero for a short fetch", source: "ASCE 7-22 7.7.1" },
+      { name: "Density", value: "gamma = 0.13 pg + 14, capped at 30 pcf", source: "ASCE 7-22 7.7.1" },
+      { name: "Surcharge and width", value: "pd = hd gamma at the step over a 4 hd width (full-height triangle, hd <= hc)", source: "ASCE 7-22 7.7.1" },
+    ],
+  },
+  "wind-mwfrs-pressure": {
+    formula: "p_ww = qz G Cp_ww +/- qh GCpi (worst sign); p_lw = qh G Cp_lw +/- qh GCpi (worst sign); p_net = qz G Cp_ww - qh G Cp_lw (internal cancels).",
+    edition: "The ASCE 7-22 Chapter 27 MWFRS design wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid), the wall Cp (+0.8 windward, -0.5 leeward for L/B <= 1), and GCpi = +/-0.18 (enclosed), by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the Chapter 27 Directional-Procedure MWFRS provisions are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASCE 7-22 Chapter 27 (27.3.1) MWFRS wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid building), the wall Cp (+0.8 windward, -0.5 leeward for L/B <= 1), and GCpi = +/-0.18 (enclosed). This returns the windward and leeward wall MWFRS pressures (each at the internal-pressure sign that maximizes its magnitude) and the net horizontal design pressure for a rectangular enclosed building; the internal pressure cancels in the net, so the net uses the external difference. It uses the entered qz/qh (from wind-pressure) and wall Cp, G = 0.85 (not the flexible-building Gf), and does not compute the roof MWFRS pressures, the internal-pressure effect on the roof diaphragm, or the torsional (Case 2-4) load patterns. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Wall pressure", value: "p = q G Cp - qi (GCpi); q = qz windward, qh leeward; G = 0.85 rigid", source: "ASCE 7-22 27.3.1" },
+      { name: "Wall coefficients", value: "Cp = +0.8 windward, -0.5 leeward for a building with L/B <= 1", source: "ASCE 7-22 Fig. 27.3-1" },
+      { name: "Net cancels internal", value: "the internal pressure acts equally outward on both walls, so the net horizontal pressure is the external difference", source: "ASCE 7-22 Ch. 27 commentary" },
+    ],
+  },
   "steel-web-local-strength": {
     formula: "WLY Rn = Fy tw (5k + lb) interior, Fy tw (2.5k + lb) end (Omega 1.50 / phi 1.00); WC Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (Omega 2.00 / phi 0.75); governing = min of the factored pair. (E = 29,000 ksi)",
     edition: "The AISC 360-22 J10.2 web local yielding and J10.3 web crippling limit states under a concentrated transverse force, with the interior/end coefficients and their differing resistance/safety factors, by name.",

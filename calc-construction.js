@@ -5452,3 +5452,137 @@ const _renderWoodCombinedBendingAxial = _simpleRenderer({
   compute: computeWoodCombinedBendingAxial,
 });
 CONSTRUCTION_RENDERERS["wood-combined-bending-axial"] = _renderWoodCombinedBendingAxial;
+
+// ===================== spec-v296..v298: ASCE 7 wind-and-snow load depth batch =====================
+// The load cases the single velocity-pressure and flat-snow tiles never build:
+// the components-and-cladding suction (Ch 30), the snow drift surcharge at a
+// step or parapet (Ch 7), and the main-wind-force wall pressure (Ch 27).
+
+// dims: in { v_mph: L T^-1, kz: dimensionless, gcp: dimensionless, kzt: dimensionless, kd: dimensionless, ke: dimensionless, gcpi: dimensionless } out: { qh_psf: M L^-1 T^-2, p_a_psf: M L^-1 T^-2, p_b_psf: M L^-1 T^-2, p_gov_psf: M L^-1 T^-2 }
+export function computeWindCcPressure({ v_mph = 0, kz = 0, gcp = 0, kzt = 1.0, kd = 0.85, ke = 1.0, gcpi = 0.18 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(v_mph > 0)) return { error: "Basic wind speed must be positive (mph)." };
+  if (!(kz > 0)) return { error: "The exposure coefficient Kz must be positive." };
+  if (!(kzt > 0) || !(kd > 0) || !(ke > 0)) return { error: "Kzt, Kd, and Ke must be positive." };
+  if (gcpi < 0) return { error: "Enter the internal pressure magnitude GCpi as a positive number (0.18 enclosed)." };
+  const qh_psf = 0.00256 * kz * kzt * kd * ke * v_mph * v_mph;
+  const p_a_psf = qh_psf * (gcp - gcpi);
+  const p_b_psf = qh_psf * (gcp + gcpi);
+  const p_gov_psf = Math.abs(p_a_psf) >= Math.abs(p_b_psf) ? p_a_psf : p_b_psf;
+  return {
+    qh_psf, p_a_psf, p_b_psf, p_gov_psf,
+    note: "ASCE 7-22 Chapter 30 components-and-cladding design pressure p = qh [(GCp) - (GCpi)], with the velocity pressure qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85, V in mph) and GCpi = +/-0.18 for an enclosed building; both internal-pressure signs are evaluated and the larger-magnitude one governs. GCp is read from the Chapter 30 figures for the roof/wall zone and effective wind area (enter it) - a roof corner (Zone 3) draws the worst suction. This is the local cladding/fastener pressure, not the MWFRS whole-building pressure (wind-mwfrs-pressure), and it excludes the parapet/overhang special cases. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const windCcPressureExample = { inputs: { v_mph: 115, kz: 0.90, gcp: -1.8, kzt: 1.0, kd: 0.85, ke: 1.0, gcpi: 0.18 } };
+
+const _renderWindCcPressure = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Chapter 30 C&C pressure p = qh [(GCp) - (GCpi)] with qh = 0.00256 Kz Kzt Kd Ke V^2 (Kd = 0.85) and GCpi = +/-0.18 (enclosed), by name. GCp from the Ch. 30 zone figures. Local cladding pressure, not MWFRS. A design aid, not a substitute for the engineer of record.",
+  example: windCcPressureExample.inputs,
+  fields: [
+    { key: "v_mph", label: "Basic wind speed V (mph)", kind: "number" },
+    { key: "kz", label: "Exposure coefficient Kz (mean roof ht)", kind: "number" },
+    { key: "gcp", label: "External coefficient GCp (signed, zone)", kind: "number" },
+    { key: "kzt", label: "Topographic factor Kzt", kind: "number", default: 1.0 },
+    { key: "kd", label: "Directionality factor Kd", kind: "number", default: 0.85 },
+    { key: "ke", label: "Ground-elevation factor Ke", kind: "number", default: 1.0 },
+    { key: "gcpi", label: "Internal GCpi magnitude", kind: "number", default: 0.18 },
+  ],
+  outputs: [
+    { key: "qh", id: "wcc-out-qh", label: "Velocity pressure qh", value: (r) => fmt(r.qh_psf, 1) + " psf" },
+    { key: "pa", id: "wcc-out-pa", label: "With +GCpi / -GCpi", value: (r) => fmt(r.p_a_psf, 1) + " / " + fmt(r.p_b_psf, 1) + " psf" },
+    { key: "pg", id: "wcc-out-pg", label: "Governing design pressure", value: (r) => fmt(r.p_gov_psf, 1) + " psf" },
+    { key: "n", id: "wcc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindCcPressure,
+});
+CONSTRUCTION_RENDERERS["wind-cc-pressure"] = _renderWindCcPressure;
+
+// dims: in { lu_ft: L, pg_psf: M L^-1 T^-2, hc_ft: L } out: { gamma_pcf: M L^-2 T^-2, hd_ft: L, w_ft: L, pd_psf: M L^-1 T^-2 }
+export function computeSnowDriftLoad({ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(lu_ft > 0)) return { error: "Upwind fetch must be positive (ft)." };
+  if (!(pg_psf > 0)) return { error: "Ground snow load must be positive (psf)." };
+  if (hc_ft < 0) return { error: "Clear height cannot be negative (ft)." };
+  const gamma_pcf = Math.min(0.13 * pg_psf + 14, 30);
+  const hd_ft = Math.max(0.43 * Math.cbrt(lu_ft) * Math.pow(pg_psf + 10, 0.25) - 1.5, 0);
+  let w_ft;
+  if (hc_ft > 0 && hd_ft > hc_ft) {
+    w_ft = Math.min((4 * hd_ft * hd_ft) / hc_ft, 8 * hc_ft);
+  } else {
+    w_ft = 4 * hd_ft;
+  }
+  const pd_psf = hd_ft * gamma_pcf;
+  return {
+    gamma_pcf, hd_ft, w_ft, pd_psf,
+    note: "ASCE 7-22 Chapter 7 leeward snow drift: hd = 0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5 (lu upwind fetch ft, pg ground snow psf), the density gamma = 0.13 pg + 14 <= 30 pcf, the peak surcharge pd = hd gamma at the step, and the width w = 4 hd for a full-height triangle (hd <= hc; when the drift reaches the upper roof, w = 4 hd^2/hc <= 8 hc). This is the drift surcharge riding ON TOP OF the balanced load (snow-load) - it uses the leeward form (the windward drift uses 0.75 hd and a different fetch), and excludes the sliding-snow surcharge (7.9) and the unbalanced-gable case (7.6.1). A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const snowDriftLoadExample = { inputs: { lu_ft: 100, pg_psf: 30, hc_ft: 0 } };
+
+const _renderSnowDriftLoad = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Chapter 7 leeward snow drift hd = 0.43 (lu)^(1/3) (pg + 10)^(1/4) - 1.5, density gamma = 0.13 pg + 14 <= 30 pcf, surcharge pd = hd gamma, width w = 4 hd (hd <= hc), by name. The drift on top of the balanced snow-load. A design aid, not a substitute for the engineer of record.",
+  example: snowDriftLoadExample.inputs,
+  fields: [
+    { key: "lu_ft", label: "Upwind fetch lu (ft)", kind: "number" },
+    { key: "pg_psf", label: "Ground snow load pg (psf)", kind: "number" },
+    { key: "hc_ft", label: "Clear height hc to the step (ft, 0 = full triangle)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "g", id: "sdl-out-g", label: "Snow density gamma", value: (r) => fmt(r.gamma_pcf, 1) + " pcf" },
+    { key: "hd", id: "sdl-out-hd", label: "Drift height hd", value: (r) => fmt(r.hd_ft, 2) + " ft" },
+    { key: "w", id: "sdl-out-w", label: "Drift width w", value: (r) => fmt(r.w_ft, 1) + " ft" },
+    { key: "pd", id: "sdl-out-pd", label: "Peak drift surcharge pd", value: (r) => fmt(r.pd_psf, 1) + " psf (at the step, tapering to 0)" },
+    { key: "n", id: "sdl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSnowDriftLoad,
+});
+CONSTRUCTION_RENDERERS["snow-drift-load"] = _renderSnowDriftLoad;
+
+// dims: in { qz_psf: M L^-1 T^-2, qh_psf: M L^-1 T^-2, cp_ww: dimensionless, cp_lw: dimensionless, g_f: dimensionless, gcpi: dimensionless } out: { p_ww_psf: M L^-1 T^-2, p_lw_psf: M L^-1 T^-2, p_net_psf: M L^-1 T^-2 }
+export function computeWindMwfrsPressure({ qz_psf = 0, qh_psf = 0, cp_ww = 0.8, cp_lw = -0.5, g_f = 0.85, gcpi = 0.18 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(qz_psf > 0) || !(qh_psf > 0)) return { error: "The windward and leeward velocity pressures must be positive (psf)." };
+  if (!(g_f > 0)) return { error: "The gust-effect factor G must be positive (0.85 rigid)." };
+  if (gcpi < 0) return { error: "Enter the internal pressure magnitude GCpi as a positive number (0.18 enclosed)." };
+  // Each wall is designed for the external pressure plus the internal-pressure
+  // case that maximizes its magnitude: the inward-pushing windward wall is
+  // worst with internal suction (-GCpi), the outward leeward suction is worst
+  // with internal pressurization (+GCpi). The NET horizontal pressure the
+  // lateral system resists is the external difference -- the internal term acts
+  // equally outward on both walls and cancels in the net (ASCE 7 Ch. 27
+  // commentary), so the story force is insensitive to enclosure while the
+  // individual walls are not.
+  const ext_ww = qz_psf * g_f * cp_ww;
+  const ext_lw = qh_psf * g_f * cp_lw;
+  const internal = qh_psf * gcpi;
+  const p_ww_psf = ext_ww + (ext_ww >= 0 ? internal : -internal);
+  const p_lw_psf = ext_lw + (ext_lw >= 0 ? internal : -internal);
+  const p_net_psf = ext_ww - ext_lw;
+  return {
+    p_ww_psf, p_lw_psf, p_net_psf,
+    note: "ASCE 7-22 Chapter 27 MWFRS wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid building), the wall Cp = +0.8 windward / -0.5 leeward (for L/B <= 1), and GCpi = +/-0.18 (enclosed). Each wall is reported at the internal-pressure sign that maximizes its magnitude; the net horizontal pressure the diaphragm, shear walls, and overturning anchors resist is the external difference, because the internal pressure pushes equally outward on both walls and cancels in the net (so the story force is insensitive to enclosure while the individual walls are not). Enter qz/qh from wind-pressure. Walls only - it does not compute the roof MWFRS pressures, the flexible-building Gf, or the torsional (Case 2-4) patterns. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const windMwfrsPressureExample = { inputs: { qz_psf: 25.9, qh_psf: 25.9, cp_ww: 0.8, cp_lw: -0.5, g_f: 0.85, gcpi: 0.18 } };
+
+const _renderWindMwfrsPressure = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Chapter 27 MWFRS wall pressure p = q G Cp - qi (GCpi), G = 0.85 (rigid), Cp = +0.8 windward / -0.5 leeward, GCpi = +/-0.18 (enclosed), by name. Walls only; enter qz/qh from wind-pressure. A design aid, not a substitute for the engineer of record.",
+  example: windMwfrsPressureExample.inputs,
+  fields: [
+    { key: "qz_psf", label: "Windward velocity pressure qz (psf)", kind: "number" },
+    { key: "qh_psf", label: "Leeward velocity pressure qh (psf)", kind: "number" },
+    { key: "cp_ww", label: "Windward wall Cp", kind: "number", default: 0.8 },
+    { key: "cp_lw", label: "Leeward wall Cp", kind: "number", default: -0.5 },
+    { key: "g_f", label: "Gust-effect factor G", kind: "number", default: 0.85 },
+    { key: "gcpi", label: "Internal GCpi magnitude", kind: "number", default: 0.18 },
+  ],
+  outputs: [
+    { key: "ww", id: "wmw-out-ww", label: "Windward wall pressure", value: (r) => fmt(r.p_ww_psf, 1) + " psf (pushing in)" },
+    { key: "lw", id: "wmw-out-lw", label: "Leeward wall pressure", value: (r) => fmt(r.p_lw_psf, 1) + " psf (suction)" },
+    { key: "net", id: "wmw-out-net", label: "Net horizontal design pressure", value: (r) => fmt(r.p_net_psf, 1) + " psf" },
+    { key: "n", id: "wmw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindMwfrsPressure,
+});
+CONSTRUCTION_RENDERERS["wind-mwfrs-pressure"] = _renderWindMwfrsPressure;

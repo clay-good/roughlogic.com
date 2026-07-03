@@ -428,6 +428,8 @@ const _TILES = [
   ["wood-bearing-perpendicular", "E"], ["wood-tension-member", "E"], ["wood-combined-bending-axial", "E"],
   // spec-v293..v295 steel connection/detailing depth batch
   ["steel-web-local-strength", "E"], ["steel-bolt-slip-critical", "E"], ["steel-fillet-weld-size", "E"],
+  // spec-v296..v298 ASCE 7 wind-and-snow load depth batch
+  ["wind-cc-pressure", "E"], ["snow-drift-load", "E"], ["wind-mwfrs-pressure", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

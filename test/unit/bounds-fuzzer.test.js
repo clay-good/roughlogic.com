@@ -13623,3 +13623,73 @@ test("bounds: spec-v295 computeSteelFilletWeldSize pins the J2.4 brackets, the e
   assert.ok("error" in _v295({ t1_in: 0.5, t2_in: 0.375, w_in: -1 }));
   assert.ok("error" in _v295({ t1_in: NaN, t2_in: 0.375 }));
 });
+
+// ===================== spec-v296..v298 ASCE 7 wind-and-snow load depth batch =====================
+import { computeWindCcPressure as _v296, computeSnowDriftLoad as _v297, computeWindMwfrsPressure as _v298 } from "../../calc-construction.js";
+
+test("bounds: spec-v296 computeWindCcPressure pins the roof corner, the governing-sign selection, and error seams", () => {
+  const r = _v296({ v_mph: 115, kz: 0.90, gcp: -1.8, kzt: 1, kd: 0.85, ke: 1, gcpi: 0.18 });
+  assert.ok(Math.abs(r.qh_psf - 0.00256 * 0.90 * 0.85 * 115 * 115) < 1e-9);
+  assert.ok(Math.abs(r.p_a_psf - r.qh_psf * (-1.8 - 0.18)) < 1e-9);
+  assert.ok(Math.abs(r.p_gov_psf - r.p_a_psf) < 1e-12); // the more-negative sign governs
+  assert.ok(Math.abs(r.p_gov_psf + 51.3) < 0.1);
+  // A wall corner draws less than the roof corner.
+  const r2 = _v296({ v_mph: 115, kz: 0.90, gcp: -1.4, kzt: 1, kd: 0.85, ke: 1, gcpi: 0.18 });
+  assert.ok(Math.abs(r2.p_gov_psf) < Math.abs(r.p_gov_psf));
+  // A positive GCp (internal zone) makes the +GCpi case govern.
+  const r3 = _v296({ v_mph: 115, kz: 0.90, gcp: 0.7, gcpi: 0.18 });
+  assert.ok(Math.abs(r3.p_gov_psf - r3.p_b_psf) < 1e-12);
+  // V^2 scaling.
+  assert.ok(Math.abs(_v296({ v_mph: 230, kz: 0.9, gcp: -1.8 }).qh_psf - 4 * r.qh_psf) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v296({ v_mph: 0, kz: 0.9, gcp: -1.8 }));
+  assert.ok("error" in _v296({ v_mph: 115, kz: 0, gcp: -1.8 }));
+  assert.ok("error" in _v296({ v_mph: 115, kz: 0.9, gcp: -1.8, gcpi: -0.1 }));
+  assert.ok("error" in _v296({ v_mph: Infinity, kz: 0.9, gcp: -1.8 }));
+});
+
+test("bounds: spec-v297 computeSnowDriftLoad pins the drift, the gamma cap, the hd floor, and error seams", () => {
+  const r = _v297({ lu_ft: 100, pg_psf: 30 });
+  assert.ok(Math.abs(r.gamma_pcf - 17.9) < 1e-9);
+  assert.ok(Math.abs(r.hd_ft - (0.43 * Math.cbrt(100) * Math.pow(40, 0.25) - 1.5)) < 1e-9);
+  assert.ok(Math.abs(r.w_ft - 4 * r.hd_ft) < 1e-9);
+  assert.ok(Math.abs(r.pd_psf - r.hd_ft * r.gamma_pcf) < 1e-9);
+  // A heavier ground snow raises both gamma and hd.
+  const r2 = _v297({ lu_ft: 100, pg_psf: 50 });
+  assert.ok(r2.pd_psf > r.pd_psf);
+  // gamma caps at 30 pcf for very deep ground snow.
+  assert.strictEqual(_v297({ lu_ft: 100, pg_psf: 200 }).gamma_pcf, 30);
+  // A very short fetch floors hd at zero (no drift) via the -1.5 term.
+  assert.strictEqual(_v297({ lu_ft: 3, pg_psf: 5 }).hd_ft, 0);
+  // The two-branch width: a drift that overtops the step uses the reduced-width form.
+  const r3 = _v297({ lu_ft: 100, pg_psf: 30, hc_ft: 2 });
+  assert.ok(r3.hd_ft > 2);
+  assert.ok(Math.abs(r3.w_ft - Math.min(4 * r3.hd_ft * r3.hd_ft / 2, 8 * 2)) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v297({ lu_ft: 0, pg_psf: 30 }));
+  assert.ok("error" in _v297({ lu_ft: 100, pg_psf: 0 }));
+  assert.ok("error" in _v297({ lu_ft: 100, pg_psf: 30, hc_ft: -1 }));
+  assert.ok("error" in _v297({ lu_ft: NaN, pg_psf: 30 }));
+});
+
+test("bounds: spec-v298 computeWindMwfrsPressure pins the walls, the internal-cancelling net, and error seams", () => {
+  const r = _v298({ qz_psf: 25.9, qh_psf: 25.9, cp_ww: 0.8, cp_lw: -0.5, g_f: 0.85, gcpi: 0.18 });
+  assert.ok(Math.abs(r.p_ww_psf - 22.3) < 0.1);
+  assert.ok(Math.abs(r.p_lw_psf + 15.7) < 0.1);
+  // The net is the EXTERNAL difference -- the internal pressure cancels.
+  assert.ok(Math.abs(r.p_net_psf - (25.9 * 0.85 * 0.8 - 25.9 * 0.85 * -0.5)) < 1e-9);
+  assert.ok(Math.abs(r.p_net_psf - 28.6) < 0.1);
+  // Net independence from GCpi: doubling the enclosure factor leaves the net unchanged.
+  const r2 = _v298({ qz_psf: 25.9, qh_psf: 25.9, cp_ww: 0.8, cp_lw: -0.5, g_f: 0.85, gcpi: 0.36 });
+  assert.ok(Math.abs(r2.p_net_psf - r.p_net_psf) < 1e-12);
+  assert.ok(Math.abs(r2.p_ww_psf) > Math.abs(r.p_ww_psf)); // but the individual wall grows
+  // A taller windward wall raises the net (matching the spec's stated 32.8 principle).
+  const r3 = _v298({ qz_psf: 32, qh_psf: 25.9, cp_ww: 0.8, cp_lw: -0.5, g_f: 0.85, gcpi: 0.18 });
+  assert.ok(Math.abs(r3.p_net_psf - 32.8) < 0.1);
+  // Error seams.
+  assert.ok("error" in _v298({ qz_psf: 0, qh_psf: 25.9 }));
+  assert.ok("error" in _v298({ qz_psf: 25.9, qh_psf: 0 }));
+  assert.ok("error" in _v298({ qz_psf: 25.9, qh_psf: 25.9, g_f: 0 }));
+  assert.ok("error" in _v298({ qz_psf: 25.9, qh_psf: 25.9, gcpi: -0.1 }));
+  assert.ok("error" in _v298({ qz_psf: Infinity, qh_psf: 25.9 }));
+});

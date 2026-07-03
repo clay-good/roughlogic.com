@@ -1,6 +1,6 @@
 # roughlogic.com Specification v297 -- Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v296..v298 (the ASCE 7 wind-and-snow load depth trio -- C&C
+> **Status: LANDED (2026-07-03, package 0.105.0; proposed 2026-07-02). Batch spec-v296..v298 (the ASCE 7 wind-and-snow load depth trio -- C&C
 > pressure (v296), the snow drift surcharge (this spec), the MWFRS pressure (v298)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `snow-load` returns the balanced flat-roof load `Pf`,
 > but drifting snow piling against a higher roof, a parapet, or a rooftop unit adds a triangular surcharge that routinely

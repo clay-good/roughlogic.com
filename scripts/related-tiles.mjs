@@ -943,6 +943,10 @@ const RELATED = {
   "steel-web-local-strength": ["steel-beam-shear","steel-beam-ltb","column-base-plate"],
   "steel-bolt-slip-critical": ["bolt-shear-bearing","bolt-group-eccentric","bolt-torque"],
   "steel-fillet-weld-size": ["fillet-weld-strength","groove-weld-strength","weld-metal-volume"],
+  // spec-v296..v298 ASCE 7 wind-and-snow load depth batch (Group E)
+  "wind-cc-pressure": ["wind-pressure","wind-mwfrs-pressure","asce7-load-combinations"],
+  "snow-drift-load": ["snow-load","rain-load-ponding","asce7-load-combinations"],
+  "wind-mwfrs-pressure": ["wind-pressure","wind-cc-pressure","diaphragm-shear"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

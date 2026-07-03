@@ -659,6 +659,10 @@ export const COMPUTE_MAP = {
   "steel-web-local-strength": { module: "../../calc-steel.js", fn: "computeSteelWebLocalStrength" },
   "steel-bolt-slip-critical": { module: "../../calc-steel.js", fn: "computeSteelBoltSlipCritical" },
   "steel-fillet-weld-size": { module: "../../calc-steel.js", fn: "computeSteelFilletWeldSize" },
+  // spec-v296..v298 ASCE 7 wind-and-snow load depth batch (3 tiles)
+  "wind-cc-pressure": { module: "../../calc-construction.js", fn: "computeWindCcPressure" },
+  "snow-drift-load": { module: "../../calc-construction.js", fn: "computeSnowDriftLoad" },
+  "wind-mwfrs-pressure": { module: "../../calc-construction.js", fn: "computeWindMwfrsPressure" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

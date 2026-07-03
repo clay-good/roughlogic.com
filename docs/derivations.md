@@ -1538,6 +1538,7 @@ cross-check.
 | calc-construction.js | `computeRoofingSquares` | `{ roof_area_ft2 = 0, pitch_rise = 0, shingle_product = "architectural", perim...` | _ | _ | _ |
 | calc-construction.js | `computeSeismicBaseShear` | `{ weight_kip = 0, sds = 0, sd1 = 0, r_factor = 0, ie = 1.0, period_s = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShorePostLoad` | `{ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x =...` | _ | _ | _ |
+| calc-construction.js | `computeSnowDriftLoad` | `{ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
 | calc-construction.js | `computeStairStringer` | `{ total_rise_in, total_run_in, tread_cut_depth_in = 1 }` | _ | _ | _ |
@@ -1548,6 +1549,8 @@ cross-check.
 | calc-construction.js | `computeWallpaperRolls` | `{ perimeter_in = 0, height_in = 0, roll_width_in = 0, roll_len_in = 0, repeat...` | _ | _ | _ |
 | calc-construction.js | `computeWeldHeatInput` | `{ process, voltage_V, current_A, travel_in_min, efficiency, wps_min_kj_in, wp...` | _ | _ | _ |
 | calc-construction.js | `computeWeldUsage` | `{ process = "GMAW", weld_cross_section_in2 = 0, weld_length_in = 0, depositio...` | _ | _ | _ |
+| calc-construction.js | `computeWindCcPressure` | `{ v_mph = 0, kz = 0, gcp = 0, kzt = 1.0, kd = 0.85, ke = 1.0, gcpi = 0.18 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWindMwfrsPressure` | `{ qz_psf = 0, qh_psf = 0, cp_ww = 0.8, cp_lw = -0.5, g_f = 0.85, gcpi = 0.18 ...` | _ | _ | _ |
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamBending` | `{ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamShear` | `{ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, v_applied_lb = 0 } = {}` | _ | _ | _ |
@@ -2421,7 +2424,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1007.
+Row count: 1010.
 
 <!-- END function-corpus-v14 -->
 
@@ -2821,7 +2824,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (142 tiles)
+### Group E Construction (145 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2927,6 +2930,7 @@ per spec-v14 §13.1 second paragraph.
 | `shore-post-load` | Formwork Shore Post Load and Spacing (ACI 347) | ACI 347 Guide to Formwork for Concrete; spec-v245 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stability-infinite` | Infinite Slope Stability Factor of Safety | Infinite-slope stability (Das / NAVFA...; spec-v289 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stake-cut-fill` | Slope-Stake Cut and Fill | FM 5-233 / FHWA construction-survey g...; existing 104.5, design 100.0 -> 4.5 ft cut; 2:1 slope, of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `snow-drift-load` | Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) | ASCE 7-22 Chapter 7; spec-v297 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `soil-bearing-capacity` | Shallow Foundation Bearing Capacity (Vesic) | Das, Principles of Foundation Enginee...; spec-v260 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-settlement-elastic` | Shallow Foundation Elastic (Immediate) Settlement | Theory-of-elasticity immediate settle...; spec-v287 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2959,6 +2963,8 @@ per spec-v14 §13.1 second paragraph.
 | `weld-preheat-fuel` | Weld Preheat Energy and Fuel | Carbon-steel specific heat / propane ...; 200 lb, 70 to 300 degF, 25% efficiency -> 5,060 Btu, 20,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-transverse-shrinkage` | Weld Transverse Shrinkage and Pre-Set | Blodgett, Design of Welded Structures; 0.10 in2 weld in 1/2 in plate, 3 welds -> 0.040 in per we... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wind-cc-pressure` | Wind Components and Cladding Pressure (ASCE 7 Ch. 30) | ASCE 7-22 Chapter 30; spec-v296 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wind-mwfrs-pressure` | MWFRS Wall Pressure (ASCE 7 Ch. 27) | ASCE 7-22 Chapter 27; spec-v298 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-pressure` | Wind Velocity Pressure | ASCE; 100 mph basic wind, Exposure C (Kz=0.85), gable roof -> q... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-feed-deposition` | Wire Feed Speed to Deposition Rate | first-principles wire-volume geometry...; 0.035 in wire, 300 in/min, 0.92 eff -> 4.91 lb/hr melt, 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-beam-bending` | Wood Bending Member (NDS Beam Stability Factor CL and Adjusted Fb') | NDS 3.3.3 (National Design Specificat...; spec-v263 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3371,6 +3377,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 764. Fixture-covered or reference-cadence: 764 / 764.
+Tile count: 767. Fixture-covered or reference-cadence: 767 / 767.
 
 <!-- END tile-index-v14 -->

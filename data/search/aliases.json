@@ -11272,6 +11272,141 @@
       "term": "what size weld",
       "target": "steel-fillet-weld-size",
       "kind": "adjacent"
+    },
+    {
+      "term": "components and cladding",
+      "target": "wind-cc-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "c&c wind",
+      "target": "wind-cc-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "gcp",
+      "target": "wind-cc-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "roof uplift pressure",
+      "target": "wind-cc-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 chapter 30",
+      "target": "wind-cc-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "cladding pressure",
+      "target": "wind-cc-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "corner zone suction",
+      "target": "wind-cc-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "window design pressure",
+      "target": "wind-cc-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fastener wind uplift",
+      "target": "wind-cc-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "snow drift",
+      "target": "snow-drift-load",
+      "kind": "industry"
+    },
+    {
+      "term": "drift surcharge",
+      "target": "snow-drift-load",
+      "kind": "industry"
+    },
+    {
+      "term": "roof step snow",
+      "target": "snow-drift-load",
+      "kind": "industry"
+    },
+    {
+      "term": "parapet snow drift",
+      "target": "snow-drift-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "asce 7 chapter 7",
+      "target": "snow-drift-load",
+      "kind": "industry"
+    },
+    {
+      "term": "leeward drift",
+      "target": "snow-drift-load",
+      "kind": "industry"
+    },
+    {
+      "term": "hd drift height",
+      "target": "snow-drift-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "snow pile lower roof",
+      "target": "snow-drift-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drift load",
+      "target": "snow-drift-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mwfrs",
+      "target": "wind-mwfrs-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "main wind force resisting system",
+      "target": "wind-mwfrs-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "wind wall pressure",
+      "target": "wind-mwfrs-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 chapter 27",
+      "target": "wind-mwfrs-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "windward leeward pressure",
+      "target": "wind-mwfrs-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "gust factor g",
+      "target": "wind-mwfrs-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "net wind pressure",
+      "target": "wind-mwfrs-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lateral wind load",
+      "target": "wind-mwfrs-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wind story force",
+      "target": "wind-mwfrs-pressure",
+      "kind": "adjacent"
     }
   ]
 }
