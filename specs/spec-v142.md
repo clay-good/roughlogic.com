@@ -1,6 +1,6 @@
 # roughlogic.com Specification v142 -- Extraction-vs-Dehumidification Trade and Extraction Time (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23 (DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v141..v145.** In-scope catalog expansion under the
+> **Status: CUT as overlapping (2026-07-01, the 0.89.0 dupe vet: covered by the live evaporation-load plus dry-time-projection tiles; will not be built; was PROPOSED 2026-06-23, DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v141..v145.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one water-restoration tile that quantifies the S500 first principle --
 > extract water, do not evaporate it -- by converting gallons pulled by the wand into the
 > dehumidifier-days they save and the time the extraction takes. Adds one tile to

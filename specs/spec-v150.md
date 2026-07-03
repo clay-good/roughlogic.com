@@ -1,6 +1,6 @@
 # roughlogic.com Specification v150 -- Indoor/Outdoor Spore Ratio Clearance Screen (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23 (DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v146..v150.** In-scope catalog expansion under the
+> **Status: LANDED (2026-07-01, package 0.89.0; was PROPOSED 2026-06-23, DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v146..v150.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one mold-remediation tile screening clearance air results against the
 > outdoor baseline -- the indoor/outdoor ratio and the water-damage marker check that decide whether a
 > clearance is supportable. Adds one tile to **`calc-restoration.js`** (Group D); no new module, group,

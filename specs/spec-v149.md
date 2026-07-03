@@ -1,6 +1,6 @@
 # roughlogic.com Specification v149 -- Mold Post-Remediation Clearance Sampling Plan (calc-restoration.js, Group D, 1 New Tile)
 
-> **Status: PROPOSED 2026-06-23 (DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v146..v150.** In-scope catalog expansion under the
+> **Status: CUT as a duplicate (2026-07-01, the 0.89.0 dupe vet: the live air-sample-volume tile already computes total pump time; will not be built; was PROPOSED 2026-06-23, DEFERRED 2026-06-29: held back as conceptually adjacent to live water and mold tiles when the fire and smoke subset v141/v146-v148/v152-v154 landed at 0.85.0). Batch spec-v146..v150.** In-scope catalog expansion under the
 > spec-v106 trades-only charter: one mold-remediation tile sizing the post-remediation clearance air
 > sampling plan -- how many samples and how long the pump runs -- the complement to the existing
 > single-sample volume tile. Adds one tile to **`calc-restoration.js`** (Group D); no new module,
