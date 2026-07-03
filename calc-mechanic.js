@@ -907,3 +907,116 @@ const renderPaintMixRatio = _simpleRenderer({
   compute: computePaintMixRatio,
 });
 MECHANIC_RENDERERS["paint-mix-ratio"] = renderPaintMixRatio;
+
+// ===================== spec-v323..v325: engine-build performance batch =====================
+// The sizing and durability numbers the displacement/horsepower tiles never
+// give: the fuel injector flow a power target needs, the mean piston speed and
+// its rpm-limit reading, and the horsepower a car makes from its trap speed.
+
+// dims: in { hp: M L^2 T^-3, bsfc: T^2 L^-2, n_cyl: dimensionless, duty: dimensionless } out: { total_lbh: M T^-1, inj_lbh: M T^-1, inj_ccmin: L^3 T^-1 }
+export function computeInjectorSize({ hp = 0, bsfc = 0.50, n_cyl = 0, duty = 0.80 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hp > 0)) return { error: "Target horsepower must be positive (hp)." };
+  if (!(bsfc > 0)) return { error: "BSFC must be positive (lb/hp-h; ~0.50 NA, 0.55-0.65 boosted)." };
+  if (!(n_cyl >= 1) || !Number.isInteger(n_cyl)) return { error: "Injector count must be a whole number of at least 1." };
+  if (!(duty > 0 && duty <= 1)) return { error: "The duty cycle must be over 0 and up to 1 (0.80 typical)." };
+  const total_lbh = hp * bsfc;
+  const inj_lbh = total_lbh / (n_cyl * duty);
+  const inj_ccmin = inj_lbh * 10.5;
+  return {
+    total_lbh, inj_lbh, inj_ccmin,
+    note: "Fuel injector flow lb/h = HP x BSFC / (n_cyl x duty), the total fuel demand divided across the injectors at a safe maximum duty cycle. BSFC (brake-specific fuel consumption) runs about 0.45-0.50 for a naturally-aspirated gas engine and 0.55-0.65 boosted (it rises with boost and richer tuning), the customary maximum duty cycle is 80%, and lb/h x 10.5 = cc/min for gasoline (specific gravity ~0.72). Evenly-distributed port injection with one injector per cylinder - it does not cover a return-versus-returnless fuel system, the rail pressure that sets the injector's static flow, or direct injection. A tuning aid; the engine's measured fueling and the tuner's judgment govern.",
+  };
+}
+export const injectorSizeExample = { inputs: { hp: 400, bsfc: 0.50, n_cyl: 8, duty: 0.80 } };
+
+function renderInjectorSize(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fuel injector flow lb/h = HP x BSFC / (n_cyl x duty), BSFC ~0.50 NA / 0.55-0.65 boosted, the 80% maximum duty cycle, and lb/h x 10.5 = cc/min for gasoline, by name. Port injection, entered BSFC. A tuning aid; the measured fueling governs.";
+  const hp = makeNumber("Target horsepower (hp)", "inj-hp", { step: "any", min: "0" });
+  const bsfc = makeNumber("BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", "inj-bsfc", { step: "any", min: "0" }); bsfc.input.value = "0.50";
+  const n = makeNumber("Number of injectors", "inj-n", { step: "1", min: "1" });
+  const duty = makeNumber("Maximum duty cycle (0-1)", "inj-duty", { step: "any", min: "0" }); duty.input.value = "0.80";
+  for (const f of [hp, bsfc, n, duty]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hp.input.value = "400"; bsfc.input.value = "0.50"; n.input.value = "8"; duty.input.value = "0.80"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total fuel demand", "inj-out-total");
+  const oInj = makeOutputLine(outputRegion, "Per-injector flow", "inj-out-inj");
+  const oNote = makeOutputLine(outputRegion, "Note", "inj-out-note");
+  const update = debounce(() => {
+    const r = computeInjectorSize({ hp: Number(hp.input.value) || 0, bsfc: Number(bsfc.input.value) || 0, n_cyl: Number(n.input.value) || 0, duty: Number(duty.input.value) || 0 });
+    if (r.error) { oTotal.textContent = r.error; oInj.textContent = "-"; oNote.textContent = "-"; return; }
+    oTotal.textContent = fmt(r.total_lbh, 1) + " lb/h";
+    oInj.textContent = fmt(r.inj_lbh, 1) + " lb/h (" + fmt(r.inj_ccmin, 0) + " cc/min)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [hp, bsfc, n, duty]) f.input.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["injector-size"] = renderInjectorSize;
+
+// dims: in { stroke_in: L, rpm: T^-1 } out: { mps_fpm: L T^-1, mps_ms: L T^-1 }
+export function computeMeanPistonSpeed({ stroke_in = 0, rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(stroke_in > 0)) return { error: "Stroke must be positive (in)." };
+  if (!(rpm > 0)) return { error: "Engine speed must be positive (rpm)." };
+  const mps_fpm = (stroke_in * rpm) / 6;
+  const mps_ms = mps_fpm * 0.00508;
+  const regime = mps_fpm < 4000 ? "street / endurance (under ~4,000 ft/min)" : (mps_fpm < 4500 ? "performance (4,000-4,500 ft/min)" : "race-only (over 4,500 ft/min; needs exotic parts)");
+  return {
+    mps_fpm, mps_ms, regime,
+    note: "Mean piston speed MPS = 2 x stroke x RPM = stroke_in x RPM / 6 (ft/min), the average speed the piston travels over a stroke. It sets the inertial load on the rods, pins, and bearings independent of bore, so it is the single best predictor of whether an rpm is safe for the stroke: street and endurance builds stay under ~3,500-4,000 ft/min, well-built performance engines run 4,000-4,500, and only race engines with exotic parts exceed 4,500. This is the AVERAGE (not peak, which is roughly pi/2 higher and offset by the rod ratio) speed; the bands are guidance for typical materials, and a specific assembly's limit depends on the rods, pistons, and pins. A shop aid; the component makers' rpm ratings govern.",
+  };
+}
+export const meanPistonSpeedExample = { inputs: { stroke_in: 3.48, rpm: 6000 } };
+
+function renderMeanPistonSpeed(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: mean piston speed MPS = 2 x stroke x RPM (= stroke_in x RPM / 6 ft/min) and the practical regime bands (street/endurance under ~4,000, performance 4,000-4,500, race over 4,500 ft/min), per the engine-building references, by name. Average, not peak. A shop aid; the component ratings govern.";
+  const stroke = makeNumber("Crankshaft stroke (in)", "mps-stroke", { step: "any", min: "0" });
+  const rpm = makeNumber("Engine speed (rpm)", "mps-rpm", { step: "any", min: "0" });
+  for (const f of [stroke, rpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { stroke.input.value = "3.48"; rpm.input.value = "6000"; update(); });
+  const oMps = makeOutputLine(outputRegion, "Mean piston speed", "mps-out-mps");
+  const oReg = makeOutputLine(outputRegion, "Regime reading", "mps-out-reg");
+  const oNote = makeOutputLine(outputRegion, "Note", "mps-out-note");
+  const update = debounce(() => {
+    const r = computeMeanPistonSpeed({ stroke_in: Number(stroke.input.value) || 0, rpm: Number(rpm.input.value) || 0 });
+    if (r.error) { oMps.textContent = r.error; oReg.textContent = "-"; oNote.textContent = "-"; return; }
+    oMps.textContent = fmt(r.mps_fpm, 0) + " ft/min (" + fmt(r.mps_ms, 1) + " m/s)";
+    oReg.textContent = r.regime;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [stroke, rpm]) f.input.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["mean-piston-speed"] = renderMeanPistonSpeed;
+
+// dims: in { weight_lb: M L T^-2, trap_mph: L T^-1 } out: { hp: M L^2 T^-3, et_s: T }
+export function computeTrapSpeedHorsepower({ weight_lb = 0, trap_mph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(weight_lb > 0)) return { error: "Vehicle weight must be positive (lb)." };
+  if (!(trap_mph > 0)) return { error: "Trap speed must be positive (mph)." };
+  const hp = weight_lb * Math.pow(trap_mph / 234, 3);
+  const et_s = 5.825 * Math.pow(weight_lb / hp, 1 / 3);
+  return {
+    hp, et_s,
+    note: "Hale's empirical quarter-mile relations HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), with weight the race weight including driver (lb) and mph the trap speed. Trap speed depends on power by a CUBE law, so a small trap gain implies a large power gain (7 mph on a 108 mph run is ~20% more power), which makes trap speed - not ET, which traction and launch corrupt - the cleaner power indicator. A statistical fit to typical cars (the 234 constant averages out aerodynamics, driveline loss, and traction; a very slippery or very draggy car deviates); it reflects the power reaching the wheels at the traps and is not a substitute for a dyno. A hobbyist estimate; the actual dyno measurement governs.",
+  };
+}
+export const trapSpeedHorsepowerExample = { inputs: { weight_lb: 3200, trap_mph: 108 } };
+
+function renderTrapSpeedHorsepower(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Hale's quarter-mile HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), weight including driver (lb), mph the trap speed, per the drag-racing references, by name. Empirical fit, wheel power, not a dyno. A hobbyist estimate; the dyno governs.";
+  const w = makeNumber("Vehicle weight incl. driver (lb)", "tsh-w", { step: "any", min: "0" });
+  const trap = makeNumber("Quarter-mile trap speed (mph)", "tsh-trap", { step: "any", min: "0" });
+  for (const f of [w, trap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "3200"; trap.input.value = "108"; update(); });
+  const oHp = makeOutputLine(outputRegion, "Estimated horsepower", "tsh-out-hp");
+  const oEt = makeOutputLine(outputRegion, "Companion 1/4-mile ET", "tsh-out-et");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsh-out-note");
+  const update = debounce(() => {
+    const r = computeTrapSpeedHorsepower({ weight_lb: Number(w.input.value) || 0, trap_mph: Number(trap.input.value) || 0 });
+    if (r.error) { oHp.textContent = r.error; oEt.textContent = "-"; oNote.textContent = "-"; return; }
+    oHp.textContent = fmt(r.hp, 0) + " hp (at the wheels)";
+    oEt.textContent = fmt(r.et_s, 1) + " s";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [w, trap]) f.input.addEventListener("input", update);
+}
+MECHANIC_RENDERERS["trap-speed-horsepower"] = renderTrapSpeedHorsepower;

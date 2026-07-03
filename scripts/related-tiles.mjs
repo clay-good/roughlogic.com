@@ -979,6 +979,10 @@ const RELATED = {
   "refrigerant-mass-flow": ["refrigerant-velocity","refrigeration-cop","condenser-heat-rejection"],
   "refrigeration-cop": ["refrigerant-mass-flow","condenser-heat-rejection","seer-eer"],
   "condenser-heat-rejection": ["refrigeration-cop","refrigerant-mass-flow","cooling-tower"],
+  // spec-v323..v325 engine-build performance batch (Group K)
+  "injector-size": ["volumetric-efficiency","displacement-cr","hp-from-torque"],
+  "mean-piston-speed": ["displacement-cr","hp-from-torque","injector-size"],
+  "trap-speed-horsepower": ["hp-from-torque","injector-size","mean-piston-speed"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v323 -- Fuel Injector Size from Horsepower, BSFC, and Duty Cycle (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v323..v325 (the engine-build performance trio -- the sizing
+> **Status: LANDED (2026-07-03, package 0.114.0; proposed 2026-07-02). Batch spec-v323..v325 (the engine-build performance trio -- the sizing
 > and durability numbers the displacement and horsepower tiles never give: the fuel injector flow a power target needs
 > (this spec), the mean piston speed and its rpm-limit reading (v324), and the horsepower a car makes from its trap speed
 > (v325).)**

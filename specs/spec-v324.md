@@ -1,6 +1,6 @@
 # roughlogic.com Specification v324 -- Mean Piston Speed and RPM-Limit Reading (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v323..v325 (the engine-build performance trio -- injector
+> **Status: LANDED (2026-07-03, package 0.114.0; proposed 2026-07-02). Batch spec-v323..v325 (the engine-build performance trio -- injector
 > size (v323), mean piston speed (this spec), trap-speed horsepower (v325)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog gives displacement, compression ratio,
 > and horsepower, but nothing tells a builder whether an rpm target is safe for the stroke -- the mean piston speed, the

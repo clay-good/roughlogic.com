@@ -29293,6 +29293,88 @@
         "thr_btuh": { "value": 100000, "tolerance": { "pct": 0.2 } },
         "thr_tons": { "value": 8.33, "tolerance": { "pct": 0.2 } }
       }
+    },
+    {
+      "tile_id": "injector-size",
+      "source_publisher": "Fuel injector sizing (HP x BSFC / (n x duty))",
+      "source_title": "400 hp V8, NA gas (BSFC 0.50), 80% duty -> 31.3 lb/h (328 cc/min) per injector",
+      "source_edition_or_year": "spec-v323 worked example (machine-verified)",
+      "source_section_or_page": "spec-v323 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "hp": 400, "bsfc": 0.50, "n_cyl": 8, "duty": 0.80 },
+      "outputs": {
+        "total_lbh": { "value": 200, "tolerance": { "abs": 0.1 } },
+        "inj_lbh": { "value": 31.25, "tolerance": { "pct": 0.2 } },
+        "inj_ccmin": { "value": 328, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "injector-size",
+      "source_publisher": "Fuel injector sizing (HP x BSFC / (n x duty))",
+      "source_title": "cross-check: add boost (BSFC 0.60) -> 37.5 lb/h, a 20% bigger injector for the same power",
+      "source_edition_or_year": "spec-v323 worked example (machine-verified)",
+      "source_section_or_page": "spec-v323 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "hp": 400, "bsfc": 0.60, "n_cyl": 8, "duty": 0.80 },
+      "outputs": {
+        "inj_lbh": { "value": 37.5, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "mean-piston-speed",
+      "source_publisher": "Mean piston speed (engine building)",
+      "source_title": "3.48 in stroke at 6,000 rpm -> 3,480 ft/min (17.7 m/s), street/endurance",
+      "source_edition_or_year": "spec-v324 worked example (machine-verified)",
+      "source_section_or_page": "spec-v324 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "stroke_in": 3.48, "rpm": 6000 },
+      "outputs": {
+        "mps_fpm": { "value": 3480, "tolerance": { "pct": 0.2 } },
+        "mps_ms": { "value": 17.68, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "mean-piston-speed",
+      "source_publisher": "Mean piston speed (engine building)",
+      "source_title": "cross-check: rev to 7,000 rpm -> 4,060 ft/min, into the performance band",
+      "source_edition_or_year": "spec-v324 worked example (machine-verified)",
+      "source_section_or_page": "spec-v324 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "stroke_in": 3.48, "rpm": 7000 },
+      "outputs": {
+        "mps_fpm": { "value": 4060, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "trap-speed-horsepower",
+      "source_publisher": "Hale quarter-mile trap-speed relation",
+      "source_title": "3,200 lb car trapping 108 mph -> 315 hp (companion ET 12.6 s)",
+      "source_edition_or_year": "spec-v325 worked example (machine-verified)",
+      "source_section_or_page": "spec-v325 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "weight_lb": 3200, "trap_mph": 108 },
+      "outputs": {
+        "hp": { "value": 315, "tolerance": { "pct": 0.5 } },
+        "et_s": { "value": 12.6, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "trap-speed-horsepower",
+      "source_publisher": "Hale quarter-mile trap-speed relation",
+      "source_title": "cross-check: a 7 mph faster trap (115 mph) implies 380 hp (the cube law)",
+      "source_edition_or_year": "spec-v325 worked example (machine-verified)",
+      "source_section_or_page": "spec-v325 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "weight_lb": 3200, "trap_mph": 115 },
+      "outputs": {
+        "hp": { "value": 380, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

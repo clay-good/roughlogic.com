@@ -1,6 +1,6 @@
 # roughlogic.com Specification v325 -- Horsepower from Quarter-Mile Trap Speed (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v323..v325 (the engine-build performance trio -- injector
+> **Status: LANDED (2026-07-03, package 0.114.0; proposed 2026-07-02). Batch spec-v323..v325 (the engine-build performance trio -- injector
 > size (v323), mean piston speed (v324), trap-speed horsepower (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog computes horsepower from torque and rpm
 > on a dyno, but a racer's real-world power check is the drag strip -- the horsepower a car makes inferred from its

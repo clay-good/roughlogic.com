@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): land spec-v323..v325 -- 3 engine-build performance tiles in calc-mechanic.js; 791 -> 794 tiles, 0.114.0, 2026-07-03
+
+The engine-build performance trio, seventeenth batch of the v275-v374 campaign: the sizing and durability numbers the displacement and horsepower tiles never give, all in the existing lazy `calc-mechanic.js` (Group K); no new module, group, or dependency. Catalog **791 -> 794**, package **0.113.0 -> 0.114.0** (a minor). Proposed 2026-07-02.
+
+- **`injector-size` (spec-v323).** lb/h = HP x BSFC / (n_cyl x duty). Pinned: a 400 hp V8 at BSFC 0.50, 80% duty -> 31.3 lb/h (328 cc/min) per injector; boost (BSFC 0.60) demands 20% more. The fuzzer pins the cc/min conversion and BSFC scaling.
+- **`mean-piston-speed` (spec-v324).** MPS = stroke_in x RPM / 6 (ft/min) with the street/performance/race verdict bands. Pinned: a 3.48 in stroke at 6,000 rpm -> 3,480 ft/min (street); 7,000 rpm crosses to performance. The fuzzer pins the m/s conversion and all three bands.
+- **`trap-speed-horsepower` (spec-v325).** Hale's HP = weight x (mph/234)^3 with the ET companion. Pinned: a 3,200 lb car at 108 mph -> 315 hp (ET 12.6 s); 115 mph implies 380 hp (the cube law). The fuzzer pins the cube-law ratio.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the BSFC scaling, the regime bands, the cube law and ET companion, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the injector-sizing relation, the mean-piston-speed bands, and Hale's quarter-mile relations. These three compute functions are exported (adding corpus/dims/fuzzer rows); the renderers are non-exported. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 26 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bumps (calc-mechanic at 94.8%). Housekeeping: home count 791 -> 794, README resynced (counts, correctness figures 1037/1040/1037, Group K cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 46 appended. All gates green at the new state: lint (**794 tiles / 56 modules / 816 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(refrigerant): land spec-v320..v322 -- 3 refrigeration-cycle tiles in calc-refrigerant.js; 788 -> 791 tiles, 0.113.0, 2026-07-03
 
 The refrigeration-cycle trio, sixteenth batch of the v275-v374 campaign: the P-h-diagram quantities the catalog uses but never computes, all in the existing lazy `calc-refrigerant.js` (Group C); no new module, group, or dependency. Catalog **788 -> 791**, package **0.112.0 -> 0.113.0** (a minor). Proposed 2026-07-02.

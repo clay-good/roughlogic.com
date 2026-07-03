@@ -636,6 +636,8 @@ const TOOL_MODULES = (() => {
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
     // v100 auto-body 2K paint mix
     "paint-mix-ratio",
+    // spec-v323..v325 engine-build performance batch
+    "injector-size", "mean-piston-speed", "trap-speed-horsepower",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

@@ -446,6 +446,8 @@ const _TILES = [
   ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["ballnose-scallop-height", "K"],
   // spec-v320..v322 refrigeration-cycle batch (calc-refrigerant.js Group C)
   ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"],
+  // spec-v323..v325 engine-build performance batch (calc-mechanic.js Group K)
+  ["injector-size", "K"], ["mean-piston-speed", "K"], ["trap-speed-horsepower", "K"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

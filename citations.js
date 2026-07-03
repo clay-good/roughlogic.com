@@ -7707,6 +7707,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "injector-size": {
+    formula: "total_lbh = HP x BSFC; inj_lbh = total_lbh / (n_cyl x duty); inj_ccmin = inj_lbh x 10.5.",
+    edition: "The fuel-injector-sizing relation lb/h = HP x BSFC / (n_cyl x duty), with the BSFC ranges, the customary 80% duty cycle, and the gasoline cc/min conversion, a standard tuning-reference result, by name.",
+    freeAccess: "The injector-sizing relation and the BSFC ranges are public results in the engine-tuning references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The injector flow lb/h = HP x BSFC / (n_cyl x duty), the BSFC ranges (~0.45 to 0.50 NA gas, ~0.55 to 0.65 boosted), the customary 80% maximum duty cycle, and the lb/h x 10.5 = cc/min conversion for gasoline (specific gravity ~0.72). This returns the per-injector flow at the stated duty - it uses the entered BSFC (which rises with boost and richer tuning), assumes evenly-distributed port injection with one injector per cylinder, and does not cover a return-versus-returnless fuel system, the rail pressure that sets the injector's static flow, or direct injection. A tuning aid; the engine's measured fueling and the tuner's judgment govern.",
+    assumptions: [
+      { name: "Injector flow", value: "HP x BSFC divided across the injectors at the maximum duty cycle", source: "engine-tuning practice" },
+      { name: "BSFC", value: "~0.50 naturally-aspirated gas, 0.55-0.65 boosted; entered by the user", source: "tuning references" },
+      { name: "Conversion", value: "lb/h x 10.5 = cc/min for gasoline (SG ~0.72)", source: "unit conversion" },
+    ],
+  },
+  "mean-piston-speed": {
+    formula: "mps_fpm = stroke_in x RPM / 6 (= 2 x stroke x RPM); mps_ms = mps_fpm x 0.00508; regime by ft/min band.",
+    edition: "The mean-piston-speed relation MPS = 2 x stroke x RPM and the practical rpm-limit bands, as compiled in the engine-building references, by name.",
+    freeAccess: "The mean-piston-speed relation is a public engine-building result; the regime bands are standard builder guidance.",
+    governance: GOVERNANCE.general,
+    editionNote: "The mean piston speed MPS = 2 x stroke x RPM (= stroke_in x RPM / 6 in ft/min), and the practical bands (~under 3,500-4,000 ft/min street/endurance, 4,000-4,500 performance, over 4,500 race), as compiled in the engine-building references. This returns the mean piston speed and its regime reading - it is the average (not peak, which is roughly pi/2 higher and offset by the rod ratio) speed, the bands are guidance for typical materials (a specific assembly's limit depends on the rods, pistons, and pins), and it does not compute the peak acceleration or the inertial bearing load. A shop aid; the component makers' rpm ratings govern.",
+    assumptions: [
+      { name: "Mean speed", value: "MPS = stroke_in x RPM / 6, the average piston speed over a stroke", source: "engine-building references" },
+      { name: "Regime bands", value: "street/endurance under ~4,000, performance 4,000-4,500, race over 4,500 ft/min", source: "builder guidance" },
+      { name: "Average not peak", value: "peak is roughly pi/2 higher and rod-ratio-dependent; not computed here", source: "kinematics" },
+    ],
+  },
+  "trap-speed-horsepower": {
+    formula: "HP = weight x (mph/234)^3; ET = 5.825 x (weight/HP)^(1/3).",
+    edition: "Hale's empirical quarter-mile relations HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), as compiled in the drag-racing references, by name.",
+    freeAccess: "Hale's quarter-mile relations are public empirical results widely used in the drag-racing community.",
+    governance: GOVERNANCE.general,
+    editionNote: "Hale's empirical quarter-mile relations HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), with weight the race weight including driver (lb) and mph the trap speed. This returns an empirical horsepower estimate from the timeslip - it is a statistical fit to typical cars (the 234 constant and the cube law average out aerodynamics, driveline loss, and traction; a very slippery or very draggy car deviates), reflects the power actually reaching the wheels at the traps, and is not a substitute for a dyno. A hobbyist estimate; the actual dyno measurement governs.",
+    assumptions: [
+      { name: "Trap-speed power", value: "HP = weight x (mph/234)^3, a cube-law fit to the power-to-weight ratio", source: "Hale quarter-mile relation" },
+      { name: "ET companion", value: "ET = 5.825 x (weight/HP)^(1/3) cross-checks the estimate", source: "Hale quarter-mile relation" },
+      { name: "Empirical", value: "a statistical fit reflecting wheel power at the traps; not a dyno measurement", source: "drag-racing practice" },
+    ],
+  },
   "refrigerant-mass-flow": {
     formula: "Q_btumin = (unit == tons) ? Q x 200 : Q/60; RE = h1 - h4; m_dot = Q_btumin / RE; m_dot_lbh = 60 m_dot.",
     edition: "The refrigerant mass-flow-from-capacity relation m_dot = Q / (h1 - h4) with the refrigeration effect off the pressure-enthalpy diagram, a standard refrigeration-cycle result, by name.",

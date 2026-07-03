@@ -14198,3 +14198,52 @@ test("bounds: spec-v322 computeCondenserHeatRejection pins the 1 + 1/COP factor,
   assert.ok("error" in _v322({ q_evap: 5, unit_tons: 1, cop: 0 }));
   assert.ok("error" in _v322({ q_evap: Infinity, cop: 2.4 }));
 });
+
+// ===================== spec-v323..v325 engine-build performance batch =====================
+import { computeInjectorSize as _v323, computeMeanPistonSpeed as _v324, computeTrapSpeedHorsepower as _v325 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v323 computeInjectorSize pins the injector flow, the BSFC scaling, the cc/min conversion, and error seams", () => {
+  const r = _v323({ hp: 400, bsfc: 0.50, n_cyl: 8, duty: 0.80 });
+  assert.strictEqual(r.total_lbh, 200);
+  assert.ok(Math.abs(r.inj_lbh - 200 / (8 * 0.8)) < 1e-9);
+  assert.ok(Math.abs(r.inj_ccmin - r.inj_lbh * 10.5) < 1e-9);
+  // A 20% higher BSFC demands a 20% bigger injector.
+  const r2 = _v323({ hp: 400, bsfc: 0.60, n_cyl: 8, duty: 0.80 });
+  assert.ok(Math.abs(r2.inj_lbh / r.inj_lbh - 1.2) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v323({ hp: 0, bsfc: 0.5, n_cyl: 8, duty: 0.8 }));
+  assert.ok("error" in _v323({ hp: 400, bsfc: 0, n_cyl: 8, duty: 0.8 }));
+  assert.ok("error" in _v323({ hp: 400, bsfc: 0.5, n_cyl: 0, duty: 0.8 }));
+  assert.ok("error" in _v323({ hp: 400, bsfc: 0.5, n_cyl: 8, duty: 1.5 }));
+  assert.ok("error" in _v323({ hp: Infinity, bsfc: 0.5, n_cyl: 8, duty: 0.8 }));
+});
+
+test("bounds: spec-v324 computeMeanPistonSpeed pins the ft/min, the m/s conversion, the regime bands, and error seams", () => {
+  const r = _v324({ stroke_in: 3.48, rpm: 6000 });
+  assert.ok(Math.abs(r.mps_fpm - 3.48 * 6000 / 6) < 1e-9);
+  assert.ok(Math.abs(r.mps_ms - r.mps_fpm * 0.00508) < 1e-9);
+  assert.ok(r.regime.startsWith("street"));
+  // Revving crosses into performance.
+  assert.ok(_v324({ stroke_in: 3.48, rpm: 7000 }).regime.startsWith("performance"));
+  // A high speed crosses into race-only.
+  assert.ok(_v324({ stroke_in: 4.0, rpm: 8000 }).regime.startsWith("race"));
+  // Error seams.
+  assert.ok("error" in _v324({ stroke_in: 0, rpm: 6000 }));
+  assert.ok("error" in _v324({ stroke_in: 3.48, rpm: 0 }));
+  assert.ok("error" in _v324({ stroke_in: NaN, rpm: 6000 }));
+});
+
+test("bounds: spec-v325 computeTrapSpeedHorsepower pins the cube law, the ET companion, and error seams", () => {
+  const r = _v325({ weight_lb: 3200, trap_mph: 108 });
+  assert.ok(Math.abs(r.hp - 3200 * Math.pow(108 / 234, 3)) < 1e-9);
+  assert.ok(Math.abs(r.hp - 315) < 1);
+  assert.ok(Math.abs(r.et_s - 5.825 * Math.pow(3200 / r.hp, 1 / 3)) < 1e-9);
+  // The cube law: a 6.5% faster trap is ~20% more power.
+  const r2 = _v325({ weight_lb: 3200, trap_mph: 115 });
+  assert.ok(Math.abs(r2.hp - 380) < 1);
+  assert.ok(Math.abs(r2.hp / r.hp - Math.pow(115 / 108, 3)) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v325({ weight_lb: 0, trap_mph: 108 }));
+  assert.ok("error" in _v325({ weight_lb: 3200, trap_mph: 0 }));
+  assert.ok("error" in _v325({ weight_lb: Infinity, trap_mph: 108 }));
+});

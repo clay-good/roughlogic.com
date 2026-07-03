@@ -12412,6 +12412,136 @@
       "term": "reject heat refrigeration",
       "target": "condenser-heat-rejection",
       "kind": "adjacent"
+    },
+    {
+      "term": "injector size",
+      "target": "injector-size",
+      "kind": "industry"
+    },
+    {
+      "term": "injector flow rate",
+      "target": "injector-size",
+      "kind": "industry"
+    },
+    {
+      "term": "cc/min injector",
+      "target": "injector-size",
+      "kind": "industry"
+    },
+    {
+      "term": "lb/hr injector",
+      "target": "injector-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fuel injector sizing",
+      "target": "injector-size",
+      "kind": "industry"
+    },
+    {
+      "term": "bsfc injector",
+      "target": "injector-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "duty cycle injector",
+      "target": "injector-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how big injectors",
+      "target": "injector-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "injector calculator",
+      "target": "injector-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mean piston speed",
+      "target": "mean-piston-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "piston speed",
+      "target": "mean-piston-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "rpm limit stroke",
+      "target": "mean-piston-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mps engine",
+      "target": "mean-piston-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "safe rpm",
+      "target": "mean-piston-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "reciprocating stress",
+      "target": "mean-piston-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stroke rpm",
+      "target": "mean-piston-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "piston speed limit",
+      "target": "mean-piston-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "engine rpm ceiling",
+      "target": "mean-piston-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "trap speed horsepower",
+      "target": "trap-speed-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "quarter mile hp",
+      "target": "trap-speed-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "horsepower from mph",
+      "target": "trap-speed-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "drag strip hp",
+      "target": "trap-speed-horsepower",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hale formula",
+      "target": "trap-speed-horsepower",
+      "kind": "adjacent"
+    },
+    {
+      "term": "1/4 mile power",
+      "target": "trap-speed-horsepower",
+      "kind": "adjacent"
+    },
+    {
+      "term": "trap speed calculator",
+      "target": "trap-speed-horsepower",
+      "kind": "adjacent"
+    },
+    {
+      "term": "timeslip horsepower",
+      "target": "trap-speed-horsepower",
+      "kind": "adjacent"
     }
   ]
 }
