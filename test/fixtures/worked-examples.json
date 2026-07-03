@@ -30041,6 +30041,89 @@
       "outputs": {
         "DF": { "value": 0.914, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "pv-cell-temperature-power",
+      "source_publisher": "PV design practice / NREL",
+      "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",
+      "source_edition_or_year": "spec-v350 worked example (machine-verified)",
+      "source_section_or_page": "spec-v350 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "T_amb_C": 30, "G_wm2": 800, "NOCT_C": 45, "P_stc_W": 400, "gamma": -0.35 },
+      "outputs": {
+        "T_cell_C": { "value": 55, "tolerance": { "abs": 0.1 } },
+        "P_W": { "value": 358, "tolerance": { "pct": 0.3 } },
+        "loss_pct": { "value": 10.5, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "pv-cell-temperature-power",
+      "source_publisher": "PV design practice / NREL",
+      "source_title": "cross-check: a cool 10 C morning -> 35 C cell, 386 W (3.5% loss)",
+      "source_edition_or_year": "spec-v350 worked example (machine-verified)",
+      "source_section_or_page": "spec-v350 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "T_amb_C": 10, "G_wm2": 800, "NOCT_C": 45, "P_stc_W": 400, "gamma": -0.35 },
+      "outputs": {
+        "T_cell_C": { "value": 35, "tolerance": { "abs": 0.1 } },
+        "P_W": { "value": 386, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "pv-performance-ratio",
+      "source_publisher": "NREL PVWatts",
+      "source_title": "typical rooftop stack (soiling 2, temp 8, wiring 2, inverter 4, mismatch 2, shading 3) -> PR 0.806, 19.4% loss",
+      "source_edition_or_year": "spec-v351 worked example (machine-verified)",
+      "source_section_or_page": "spec-v351 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "soiling": 2, "temperature": 8, "wiring_dc": 2, "inverter": 4, "mismatch": 2, "shading": 3 },
+      "outputs": {
+        "pr": { "value": 0.806, "tolerance": { "pct": 0.3 } },
+        "total_loss_pct": { "value": 19.4, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "pv-performance-ratio",
+      "source_publisher": "NREL PVWatts",
+      "source_title": "cross-check: cutting temperature to 5% and inverter to 2% lifts PR to 0.850 (the spec's 0.833 is an arithmetic slip; landed value is the exact product)",
+      "source_edition_or_year": "spec-v351 worked example (machine-verified)",
+      "source_section_or_page": "spec-v351 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "soiling": 2, "temperature": 5, "wiring_dc": 2, "inverter": 2, "mismatch": 2, "shading": 3 },
+      "outputs": {
+        "pr": { "value": 0.850, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "pv-string-fusing",
+      "source_publisher": "NEC 690.9",
+      "source_title": "Isc 10 A, 20 A module max, 4 strings -> 15.6 A required, a 20 A fuse, compliant, fuses required",
+      "source_edition_or_year": "spec-v352 worked example (machine-verified)",
+      "source_section_or_page": "spec-v352 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "Isc_A": 10, "max_fuse_A": 20, "n_strings": 4 },
+      "outputs": {
+        "req_A": { "value": 15.6, "tolerance": { "pct": 0.5 } },
+        "fuse_A": { "value": 20, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "pv-string-fusing",
+      "source_publisher": "NEC 690.9",
+      "source_title": "cross-check: Isc 14 A, 25 A module max -> 21.8 A required, a 25 A fuse, within the label maximum",
+      "source_edition_or_year": "spec-v352 worked example (machine-verified)",
+      "source_section_or_page": "spec-v352 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "Isc_A": 14, "max_fuse_A": 25, "n_strings": 3 },
+      "outputs": {
+        "fuse_A": { "value": 25, "tolerance": { "abs": 0 } }
+      }
     }
   ]
 }

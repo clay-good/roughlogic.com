@@ -13572,6 +13572,141 @@
       "term": "temperature air density",
       "target": "air-density-correction",
       "kind": "industry"
+    },
+    {
+      "term": "cell temperature pv",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "module temperature power",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "noct",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature coefficient solar",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "pv power derate",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "hot panel loss",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "gamma temperature power",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "pv temperature loss",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "operating cell temperature",
+      "target": "pv-cell-temperature-power",
+      "kind": "industry"
+    },
+    {
+      "term": "performance ratio",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pv derate",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pvwatts losses",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pr solar",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "system losses pv",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "soiling loss",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pv loss stack",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "derate factor solar",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "performance ratio calculator",
+      "target": "pv-performance-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pv string fuse",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "source circuit fuse",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "nec 690.9",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "156 percent isc",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "pv overcurrent",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "module series fuse",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "combiner fuse",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "string fuse sizing",
+      "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "solar fuse",
+      "target": "pv-string-fusing",
+      "kind": "industry"
     }
   ]
 }

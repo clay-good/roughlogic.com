@@ -1,6 +1,6 @@
 # roughlogic.com Specification v351 -- PV Performance Ratio from Stacked Losses (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v350..v352 (the PV design trio -- cell-temperature power
+> **Status: LANDED (2026-07-03, package 0.123.0). Batch spec-v350..v352 (the PV design trio -- cell-temperature power
 > (v350), the performance ratio from stacked losses (this spec), source-circuit fusing (v352)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pv-energy-yield` takes the performance ratio as a
 > single default (0.77) that "rolls up soiling, shading, mismatch, wiring, and inverter losses," but never lets a designer
@@ -17,6 +17,8 @@
 > consumes the PR; this tile builds it.
 
 Repository: github.com/clay-good/roughlogic.com -- US standards only.
+
+> **As-landed correction (2026-07-03):** the section 2.1 cross-check states PR = 0.833, but the exact product 0.98 x 0.95 x 0.98 x 0.98 x 0.98 x 0.97 = **0.850**. The tile computes and the fixtures pin the exact 0.850; the point (attacking the two largest losses lifts the PR most) stands.
 
 ## 1. Inheritance and conventions
 

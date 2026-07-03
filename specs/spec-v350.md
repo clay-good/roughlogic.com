@@ -1,6 +1,6 @@
 # roughlogic.com Specification v350 -- PV Cell Temperature and Temperature-Derated Power (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v350..v352 (the PV design trio -- the module-performance and
+> **Status: LANDED (2026-07-03, package 0.123.0). Batch spec-v350..v352 (the PV design trio -- the module-performance and
 > protection numbers the string-sizing and energy tiles never compute: the cell temperature and its power derate (this
 > spec), the performance ratio from stacked losses (v351), and the PV source-circuit fuse sizing (v352).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pv-string-sizing` corrects voltage for cold and

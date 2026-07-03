@@ -14690,3 +14690,56 @@ test("bounds: spec-v349 computeAirDensityCorrection pins the altitude/temperatur
   assert.ok("error" in _v349({ elev_ft: 0, T_F: -500 })); // below absolute zero
   assert.ok("error" in _v349({ elev_ft: Infinity, T_F: 70 }));
 });
+
+// ===================== spec-v350..v352 PV performance & protection batch =====================
+import { computePvCellTemperaturePower as _v350, computePvPerformanceRatio as _v351, computePvStringFusing as _v352 } from "../../calc-solar.js";
+
+test("bounds: spec-v350 computePvCellTemperaturePower pins the NOCT model, the derate, and error seams", () => {
+  const r = _v350({ T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 });
+  assert.ok(Math.abs(r.T_cell_C - 55) < 1e-9);
+  assert.ok(Math.abs(r.P_W - 358) < 0.5);
+  assert.ok(Math.abs(r.loss_pct - 10.5) < 0.1);
+  // A cooler morning makes more power (less loss).
+  const cool = _v350({ T_amb_C: 10, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 });
+  assert.ok(cool.P_W > r.P_W && Math.abs(cool.T_cell_C - 35) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v350({ T_amb_C: 30, G_wm2: 0, NOCT_C: 45, P_stc_W: 400 }));
+  assert.ok("error" in _v350({ T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 0 }));
+  assert.ok("error" in _v350({ T_amb_C: Infinity, G_wm2: 800, NOCT_C: 45, P_stc_W: 400 }));
+});
+
+test("bounds: spec-v351 computePvPerformanceRatio pins the multiplicative product, the leverage, and error seams", () => {
+  const r = _v351({ soiling: 2, temperature: 8, wiring_dc: 2, inverter: 4, mismatch: 2, shading: 3 });
+  assert.ok(Math.abs(r.pr - 0.98 * 0.92 * 0.98 * 0.96 * 0.98 * 0.97) < 1e-12);
+  assert.ok(Math.abs(r.pr - 0.806) < 0.001);
+  assert.ok(Math.abs(r.total_loss_pct - (1 - r.pr) * 100) < 1e-9);
+  // Cutting the two biggest losses lifts the PR (the exact product is 0.850; the spec's 0.833 is an arithmetic slip).
+  const r2 = _v351({ soiling: 2, temperature: 5, wiring_dc: 2, inverter: 2, mismatch: 2, shading: 3 });
+  assert.ok(r2.pr > r.pr && Math.abs(r2.pr - 0.850) < 0.001);
+  // Error seams.
+  assert.ok("error" in _v351({}));
+  assert.ok("error" in _v351({ soiling: 100 }));
+  assert.ok("error" in _v351({ temperature: Infinity }));
+});
+
+test("bounds: spec-v352 computePvStringFusing pins the 1.56 Isc round-up, the label check, the three-string rule, and error seams", () => {
+  const r = _v352({ Isc_A: 10, max_fuse_A: 20, n_strings: 4 });
+  assert.ok(Math.abs(r.req_A - 15.6) < 1e-9);
+  assert.strictEqual(r.fuse_A, 20);
+  assert.strictEqual(r.compliant, true);
+  assert.strictEqual(r.fuse_required, true);
+  // A higher-current module rounds up to 25 A.
+  const r2 = _v352({ Isc_A: 14, max_fuse_A: 25, n_strings: 3 });
+  assert.strictEqual(r2.fuse_A, 25);
+  assert.strictEqual(r2.compliant, true);
+  // Same required fuse over a 20 A module maximum is non-compliant.
+  const r3 = _v352({ Isc_A: 14, max_fuse_A: 20, n_strings: 3 });
+  assert.strictEqual(r3.fuse_A, 25);
+  assert.strictEqual(r3.compliant, false);
+  // Two strings: no fuse required.
+  assert.strictEqual(_v352({ Isc_A: 10, max_fuse_A: 20, n_strings: 2 }).fuse_required, false);
+  // Error seams.
+  assert.ok("error" in _v352({ Isc_A: 0, max_fuse_A: 20, n_strings: 4 }));
+  assert.ok("error" in _v352({ Isc_A: 10, max_fuse_A: 0, n_strings: 4 }));
+  assert.ok("error" in _v352({ Isc_A: Infinity, max_fuse_A: 20, n_strings: 4 }));
+});

@@ -7404,6 +7404,42 @@ export const CITATIONS = {
       { name: "Ground-coverage ratio", value: "GCR = collector length / pitch drives both the land area and the inter-row shading", source: "first principles" },
     ],
   },
+  "pv-cell-temperature-power": {
+    formula: "T_cell = T_amb + (NOCT - 20) x G/800; P = P_stc x (1 + (gamma/100)(T_cell - 25)); loss = (1 - P/P_stc) x 100.",
+    edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name.",
+    freeAccess: "The NOCT model and temperature-coefficient derate are standard PV design relations (NREL / module datasheets). The module datasheet governs the coefficients.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cell temperature T_cell = T_amb + (NOCT - 20) x G/800 (NOCT the datasheet nominal operating cell temperature, default 45 C) and the temperature-derated power P = P_stc x (1 + gamma/100 x (T_cell - 25)) with gamma the datasheet power coefficient (about -0.35%/C for crystalline silicon). Cells run well above air temperature in sun, so a hot midsummer module makes less than its cool-morning nameplate. This is the temperature derate only: it uses the entered NOCT and gamma, does not scale power for irradiance below STC, and does not include soiling, wiring, inverter, or shading losses (see the performance-ratio tile). A design aid; the module datasheet governs.",
+    assumptions: [
+      { name: "NOCT model", value: "T_cell = T_amb + (NOCT - 20) x G/800", source: "PV design practice / NREL" },
+      { name: "Power derate", value: "P = P_stc x (1 + gamma/100 x (T_cell - 25)); gamma ~ -0.35%/C silicon", source: "module datasheet" },
+      { name: "Temperature only", value: "no irradiance scaling and no soiling/wiring/inverter/shading losses", source: "scope of this tile" },
+    ],
+  },
+  "pv-performance-ratio": {
+    formula: "PR = product over entered losses of (1 - loss_i/100); total_loss = (1 - PR) x 100.",
+    edition: "The PV performance-ratio derate stack (PVWatts-style loss categories), by name.",
+    freeAccess: "The PVWatts loss categories and the multiplicative derate stack are published free by NREL. A screening stack, not a metered performance ratio.",
+    governance: GOVERNANCE.general,
+    editionNote: "The performance ratio PR = product of (1 - loss_i) over the entered PVWatts-style derate factors (soiling, temperature, wiring DC/AC, inverter, mismatch, shading, availability, nameplate tolerance, LID, connections). Because the losses compound multiplicatively, attacking the two or three largest factors moves the PR far more than trimming an already-small loss. A typical rooftop stack lands near 0.75-0.82, and this PR feeds the energy-yield estimate. This is an annual-average screening stack, not a metered performance ratio (which comes from measured production vs. modeled irradiance). A design aid.",
+    assumptions: [
+      { name: "Multiplicative stack", value: "PR = product of (1 - loss_i); losses compound, not add", source: "NREL PVWatts" },
+      { name: "Loss categories", value: "soiling, temperature, wiring, inverter, mismatch, shading, availability, nameplate, LID, connections", source: "PVWatts" },
+      { name: "Screening, annual", value: "an annual-average screen; not a metered performance ratio", source: "scope of this tile" },
+    ],
+  },
+  "pv-string-fusing": {
+    formula: "req = 1.56 x Isc (1.25 x 1.25); fuse = smallest NEC 240.6(A) standard rating >= req; compliant if fuse <= module max; fuses required when >= 3 paralleled source circuits.",
+    edition: "NEC 690.9 (PV source-circuit overcurrent protection) and 240.6(A) standard ratings, by name.",
+    freeAccess: "NEC 690.9 and 240.6 are in NFPA 70; many jurisdictions publish the code free to read. The NEC and the AHJ govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "PV source-circuit overcurrent per NEC 690.9(B): the fuse must be at least 1.56 x Isc (1.25 continuous x 1.25 PV), rounded UP to the next NEC 240.6(A) standard rating, then checked against the module label's maximum series fuse rating. Overcurrent protection is required only where three or more source circuits are paralleled (690.9(A)). This returns the required and selected fuse and the compliance flags: it sizes the source-circuit OCPD only (not the conductor ampacity, the combiner output, or the inverter DC OCPD), and a selected fuse above the module maximum means fewer strings per combiner or a different module. The NEC and the AHJ govern.",
+    assumptions: [
+      { name: "1.56 x Isc", value: "OCPD >= 1.25 x 1.25 x Isc, rounded up to a 240.6(A) standard rating", source: "NEC 690.9(B)" },
+      { name: "Module maximum", value: "the selected fuse must not exceed the module label's maximum series fuse", source: "module label / NEC 690.9(B)" },
+      { name: "Three-string threshold", value: "fuses required only with 3+ paralleled source circuits (690.9(A))", source: "NEC 690.9(A)" },
+    ],
+  },
   "pv-inverter-ratio": {
     formula: "ilr = dc_kw / ac_kw; clip_dc_kw = ac_kw / inv_eff; clip_fraction = clip_dc_kw / dc_kw; verdict by band (< 1.1 oversized, 1.1-1.3 optimal, > 1.3 undersized).",
     edition: "The inverter loading ratio (ILR / DC:AC ratio) and NREL inverter-sizing guidance (clipping begins where the array DC output exceeds P_ac / eta_inv), by name; the relations are public.",

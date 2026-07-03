@@ -952,3 +952,167 @@ export const SOLAR_RENDERERS = {
   "battery-peak-shaving": renderBatteryPeakShaving,
   "battery-c-rate": renderBatteryCRate,
 };
+
+// ===================== spec-v350..v352: PV performance & protection batch (Group A) =====================
+// The field-condition and code numbers the STC-nameplate PV tiles never give:
+// the cell temperature and its power derate (v350), the multiplicative loss
+// stack that becomes the performance ratio (v351), and the NEC 690.9 source-
+// circuit fuse selection with the module-label check (v352).
+
+// dims: in { T_amb_C: T, G_wm2: M T^-3, NOCT_C: T, P_stc_W: M L^2 T^-3, gamma: dimensionless } out: { T_cell_C: T, P_W: M L^2 T^-3, loss_pct: dimensionless }
+export function computePvCellTemperaturePower({ T_amb_C = 0, G_wm2 = 0, NOCT_C = 45, P_stc_W = 0, gamma = -0.35 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Ta = Number(T_amb_C);
+  const G = Number(G_wm2) || 0;
+  const noct = Number(NOCT_C) || 0;
+  const Pstc = Number(P_stc_W) || 0;
+  const g = Number(gamma);
+  if (!Number.isFinite(Ta)) return { error: "Enter a valid ambient temperature (C)." };
+  if (!(G > 0)) return { error: "Plane-of-array irradiance must be positive (W/m^2)." };
+  if (!(noct > 0)) return { error: "NOCT must be positive (C)." };
+  if (!(Pstc > 0)) return { error: "Module STC power must be positive (W)." };
+  if (!Number.isFinite(g)) return { error: "Enter a valid power temperature coefficient (%/C)." };
+  const T_cell_C = Ta + (noct - 20) * G / 800;
+  const P_W = Pstc * (1 + (g / 100) * (T_cell_C - 25));
+  const loss_pct = (1 - P_W / Pstc) * 100;
+  return {
+    T_cell_C, P_W, loss_pct,
+    note: "PV cell temperature from the NOCT model T_cell = T_amb + (NOCT - 20) x G/800, and the temperature-derated power P = P_stc x (1 + gamma/100 x (T_cell - 25)) with gamma the datasheet power coefficient (about -0.35%/C for silicon). Cells run well above air temperature in sun, so a hot midsummer module makes less than its cool-morning nameplate - the reason spring often out-produces a hotter summer. This is the temperature derate only; it does not include soiling, wiring, inverter, or shading losses (see the performance-ratio tile). A design aid; the module datasheet governs.",
+  };
+}
+const pvCellTemperaturePowerExample = { inputs: { T_amb_C: 30, G_wm2: 800, NOCT_C: 45, P_stc_W: 400, gamma: -0.35 } };
+function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: PV NOCT cell-temperature model T_cell = T_amb + (NOCT - 20) x G/800 and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
+  const Ta = makeNumber("Ambient temperature (C)", "pctp-ta", { step: "any", value: "30" }); Ta.input.value = "30";
+  const G = makeNumber("Plane-of-array irradiance (W/m^2)", "pctp-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
+  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pctp-noct", { step: "any", min: "0", value: "45" }); noct.input.value = "45";
+  const Pstc = makeNumber("Module STC power (W)", "pctp-p", { step: "any", min: "0", value: "400" }); Pstc.input.value = "400";
+  const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pctp-gamma", { step: "any", value: "-0.35" }); g.input.value = "-0.35";
+  for (const f of [Ta, G, noct, Pstc, g]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Ta.input.value = "30"; G.input.value = "800"; noct.input.value = "45"; Pstc.input.value = "400"; g.input.value = "-0.35"; update(); });
+  const oTc = makeOutputLine(outputRegion, "Cell temperature", "pctp-out-tc");
+  const oP = makeOutputLine(outputRegion, "Power at cell temperature", "pctp-out-p");
+  const oLoss = makeOutputLine(outputRegion, "Temperature loss", "pctp-out-loss");
+  const oNote = makeOutputLine(outputRegion, "Note", "pctp-out-note");
+  const update = debounce(() => {
+    const r = computePvCellTemperaturePower({ T_amb_C: Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) });
+    if (r.error) { oTc.textContent = r.error; oP.textContent = "-"; oLoss.textContent = "-"; oNote.textContent = ""; return; }
+    oTc.textContent = fmt(r.T_cell_C, 1) + " C";
+    oP.textContent = fmt(r.P_W, 0) + " W";
+    oLoss.textContent = fmt(r.loss_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Ta, G, noct, Pstc, g]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["pv-cell-temperature-power"] = renderPvCellTemperaturePower;
+
+// dims: in { soiling: dimensionless, temperature: dimensionless, wiring_dc: dimensionless, wiring_ac: dimensionless, inverter: dimensionless, mismatch: dimensionless, shading: dimensionless, availability: dimensionless, nameplate: dimensionless, lid: dimensionless, connections: dimensionless } out: { pr: dimensionless, total_loss_pct: dimensionless }
+export function computePvPerformanceRatio(inputs = {}) {
+  const _g = _finiteGuard(inputs); if (_g) return _g;
+  const keys = ["soiling", "temperature", "wiring_dc", "wiring_ac", "inverter", "mismatch", "shading", "availability", "nameplate", "lid", "connections"];
+  let pr = 1;
+  let anyEntered = false;
+  for (const k of keys) {
+    const v = Number(inputs[k]) || 0;
+    if (v === 0) continue;
+    if (!(v > 0 && v < 100)) return { error: "Each loss must be at least 0 and under 100 percent (" + k + ")." };
+    pr *= (1 - v / 100);
+    anyEntered = true;
+  }
+  if (!anyEntered) return { error: "Enter at least one loss percentage." };
+  const total_loss_pct = (1 - pr) * 100;
+  return {
+    pr, total_loss_pct,
+    note: "Performance ratio PR = product of (1 - loss_i) over the entered derate factors (soiling, temperature, wiring, inverter, mismatch, shading, availability, nameplate tolerance, LID, connections). Because the losses compound multiplicatively, attacking the two or three largest factors moves the PR far more than trimming an already-small loss. This PR feeds the energy-yield estimate; a typical rooftop stack lands near 0.75-0.82. A screening stack, not a measured performance ratio (which comes from metered production vs. modeled irradiance). A design aid.",
+  };
+}
+const pvPerformanceRatioExample = { inputs: { soiling: 2, temperature: 8, wiring_dc: 2, inverter: 4, mismatch: 2, shading: 3 } };
+function renderPvPerformanceRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: PV performance ratio as the product of (1 - loss) over the NREL/PVWatts-style derate stack (soiling, temperature, wiring, inverter, mismatch, shading, availability, nameplate, LID, connections), by name. A screening stack, not a metered performance ratio. A design aid.";
+  const fields = [
+    ["soiling", "Soiling loss (%)", "2"],
+    ["temperature", "Temperature loss (%)", "8"],
+    ["wiring_dc", "DC wiring loss (%)", "2"],
+    ["wiring_ac", "AC wiring loss (%)", ""],
+    ["inverter", "Inverter loss (%)", "4"],
+    ["mismatch", "Mismatch loss (%)", "2"],
+    ["shading", "Shading loss (%)", "3"],
+    ["availability", "Availability loss (%)", ""],
+    ["nameplate", "Nameplate tolerance loss (%)", ""],
+    ["lid", "Light-induced degradation loss (%)", ""],
+    ["connections", "Connections loss (%)", ""],
+  ];
+  const inp = {};
+  for (const [key, label, val] of fields) {
+    const f = makeNumber(label, "ppr-" + key, { step: "any", min: "0", max: "100" });
+    if (val) f.input.value = val;
+    inp[key] = f;
+    inputRegion.appendChild(f.wrap);
+  }
+  attachExampleButton(inputRegion, () => {
+    for (const [key, , val] of fields) inp[key].input.value = val;
+    update();
+  });
+  const oPR = makeOutputLine(outputRegion, "Performance ratio (PR)", "ppr-out-pr");
+  const oLoss = makeOutputLine(outputRegion, "Total loss", "ppr-out-loss");
+  const oNote = makeOutputLine(outputRegion, "Note", "ppr-out-note");
+  const update = debounce(() => {
+    const params = {};
+    for (const [key] of fields) params[key] = Number(inp[key].input.value) || 0;
+    const r = computePvPerformanceRatio(params);
+    if (r.error) { oPR.textContent = r.error; oLoss.textContent = "-"; oNote.textContent = ""; return; }
+    oPR.textContent = fmt(r.pr, 3);
+    oLoss.textContent = fmt(r.total_loss_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const [key] of fields) inp[key].input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["pv-performance-ratio"] = renderPvPerformanceRatio;
+
+// NEC 240.6(A) standard overcurrent-device ampere ratings (the range PV source circuits use).
+const _PV_STD_OCPD_A = [1, 3, 6, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200];
+// dims: in { Isc_A: I, max_fuse_A: I, n_strings: dimensionless } out: { req_A: I, fuse_A: I }
+export function computePvStringFusing({ Isc_A = 0, max_fuse_A = 0, n_strings = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const isc = Number(Isc_A) || 0;
+  const maxf = Number(max_fuse_A) || 0;
+  const n = Number(n_strings) || 0;
+  if (!(isc > 0)) return { error: "Module short-circuit current Isc must be positive (A)." };
+  if (!(maxf > 0)) return { error: "Module maximum series fuse rating must be positive (A)." };
+  if (!(n >= 1)) return { error: "Number of source circuits must be at least 1." };
+  const req_A = 1.56 * isc; // NEC 690.9(B): 1.25 x 1.25 x Isc
+  let fuse_A = null;
+  for (const s of _PV_STD_OCPD_A) { if (s >= req_A) { fuse_A = s; break; } }
+  if (fuse_A === null) return { error: "Required fuse exceeds the standard ratings table (check the design)." };
+  const compliant = fuse_A <= maxf;
+  const fuse_required = n >= 3; // 690.9(A): fuses required with 3+ paralleled source circuits
+  return {
+    req_A, fuse_A, compliant, fuse_required, n,
+    note: "PV source-circuit overcurrent per NEC 690.9(B): the fuse must be at least 1.56 x Isc (1.25 continuous x 1.25 PV) and is rounded UP to the next NEC 240.6(A) standard rating, then checked against the module label's maximum series fuse rating. Overcurrent protection is required only where three or more source circuits are paralleled (690.9(A)); with one or two, a fault has no back-feed path large enough to require a fuse. If the selected fuse exceeds the module maximum, fewer strings per combiner or a different module is needed. A design aid; the NEC and the AHJ govern.",
+  };
+}
+const pvStringFusingExample = { inputs: { Isc_A: 10, max_fuse_A: 20, n_strings: 4 } };
+function renderPvStringFusing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 690.9(B) PV source-circuit overcurrent: OCPD >= 1.56 x Isc (1.25 x 1.25), rounded up to a 240.6(A) standard rating, checked against the module label maximum series fuse; fuses required with 3+ paralleled source circuits (690.9(A)), by name. A design aid; the NEC and the AHJ govern.";
+  const isc = makeNumber("Module Isc (A)", "psf-isc", { step: "any", min: "0", value: "10" }); isc.input.value = "10";
+  const maxf = makeNumber("Module max series fuse (A, from label)", "psf-max", { step: "any", min: "0", value: "20" }); maxf.input.value = "20";
+  const n = makeNumber("Paralleled source circuits", "psf-n", { step: "1", min: "1", value: "4" }); n.input.value = "4";
+  for (const f of [isc, maxf, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { isc.input.value = "10"; maxf.input.value = "20"; n.input.value = "4"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Minimum OCPD (1.56 x Isc)", "psf-out-req");
+  const oFuse = makeOutputLine(outputRegion, "Selected standard fuse", "psf-out-fuse");
+  const oComp = makeOutputLine(outputRegion, "Within module maximum?", "psf-out-comp");
+  const oReqd = makeOutputLine(outputRegion, "Fuses required?", "psf-out-reqd");
+  const oNote = makeOutputLine(outputRegion, "Note", "psf-out-note");
+  const update = debounce(() => {
+    const r = computePvStringFusing({ Isc_A: Number(isc.input.value) || 0, max_fuse_A: Number(maxf.input.value) || 0, n_strings: Number(n.input.value) || 0 });
+    if (r.error) { oReq.textContent = r.error; oFuse.textContent = "-"; oComp.textContent = "-"; oReqd.textContent = "-"; oNote.textContent = ""; return; }
+    oReq.textContent = fmt(r.req_A, 2) + " A";
+    oFuse.textContent = fmt(r.fuse_A, 0) + " A";
+    oComp.textContent = r.compliant ? "yes (" + fmt(r.fuse_A, 0) + " <= " + fmt(Number(maxf.input.value) || 0, 0) + " A module max)" : "NO -- fuse exceeds the module maximum; use fewer strings or a different module";
+    oReqd.textContent = r.fuse_required ? "yes (3+ paralleled source circuits)" : "no (only " + r.n + " source circuit(s); 690.9(A) requires fuses at 3+)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [isc, maxf, n]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["pv-string-fusing"] = renderPvStringFusing;

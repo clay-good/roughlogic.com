@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "pv-cell-temperature-power": ["pv-string-sizing", "pv-energy-yield", "pv-performance-ratio", "pv-inverter-ratio"],
+  "pv-performance-ratio": ["pv-energy-yield", "pv-cell-temperature-power", "pv-string-sizing", "voltage-drop"],
+  "pv-string-fusing": ["pv-circuit-ampacity", "pv-interconnection-busbar", "pv-string-sizing", "continuous-load-ocpd"],
   "duct-heat-gain": ["duct-sizing", "duct-leakage", "insulation-heat-loss", "grille-face-velocity"],
   "grille-face-velocity": ["duct-sizing", "duct-heat-gain", "air-changes-hour", "outdoor-air-ventilation"],
   "air-density-correction": ["gas-altitude-derate", "duct-heat-gain", "fan-motor-bhp", "manual-j-cooling"],

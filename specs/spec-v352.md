@@ -1,6 +1,6 @@
 # roughlogic.com Specification v352 -- PV Source-Circuit Fuse Sizing (NEC 690.9) (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v350..v352 (the PV design trio -- cell-temperature power
+> **Status: LANDED (2026-07-03, package 0.123.0). Batch spec-v350..v352 (the PV design trio -- cell-temperature power
 > (v350), performance ratio (v351), the source-circuit fuse sizing (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pv-circuit-ampacity` sizes the PV conductor and
 > `pv-interconnection-busbar` handles the 120% interconnection rule, but the series overcurrent fuse that protects each PV

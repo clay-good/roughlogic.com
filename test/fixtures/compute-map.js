@@ -891,6 +891,9 @@ export const COMPUTE_MAP = {
   "pv-energy-yield": { module: "../../calc-solar.js", fn: "computePvEnergyYield" },
   "pv-row-spacing": { module: "../../calc-solar.js", fn: "computePvRowSpacing" },
   "pv-inverter-ratio": { module: "../../calc-solar.js", fn: "computePvInverterRatio" },
+  "pv-cell-temperature-power": { module: "../../calc-solar.js", fn: "computePvCellTemperaturePower" },
+  "pv-performance-ratio": { module: "../../calc-solar.js", fn: "computePvPerformanceRatio" },
+  "pv-string-fusing": { module: "../../calc-solar.js", fn: "computePvStringFusing" },
   // spec-v236..v238 grid-tied battery-economics batch (3 tiles)
   "battery-tou-arbitrage": { module: "../../calc-solar.js", fn: "computeBatteryTouArbitrage" },
   "battery-peak-shaving": { module: "../../calc-solar.js", fn: "computeBatteryPeakShaving" },

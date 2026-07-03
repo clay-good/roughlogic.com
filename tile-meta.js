@@ -598,6 +598,7 @@ const _TILES = [
   ["noncoincident-load", "A"], ["pv-circuit-ampacity", "A"],
   // spec-v221..v223 PV system-design batch
   ["pv-energy-yield", "A"], ["pv-row-spacing", "A"], ["pv-inverter-ratio", "A"],
+  ["pv-cell-temperature-power", "A"], ["pv-performance-ratio", "A"], ["pv-string-fusing", "A"],
   // spec-v236..v238 grid-tied battery-economics batch
   ["battery-tou-arbitrage", "A"], ["battery-peak-shaving", "A"], ["battery-c-rate", "A"],
   // spec-v230..v232 electrical energy-cost-savings batch

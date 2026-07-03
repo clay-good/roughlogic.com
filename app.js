@@ -76,6 +76,7 @@ const TOOL_MODULES = (() => {
     "pv-circuit-ampacity",
     // spec-v221..v223 PV system-design batch
     "pv-energy-yield", "pv-row-spacing", "pv-inverter-ratio",
+    "pv-cell-temperature-power", "pv-performance-ratio", "pv-string-fusing",
     // spec-v236..v238 grid-tied battery-economics batch
     "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",
   ]);

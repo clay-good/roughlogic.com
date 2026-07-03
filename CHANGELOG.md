@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): land spec-v350..v352 -- 3 PV performance / protection tiles in calc-solar.js; 818 -> 821 tiles, 0.123.0, 2026-07-03
+
+The PV performance / protection trio, twenty-sixth batch of the v275-v374 campaign: the field-condition and code numbers the STC-nameplate PV tiles never give, all in the existing lazy `calc-solar.js` (Group A); no new module, group, or dependency. Catalog **818 -> 821**, package **0.122.0 -> 0.123.0** (a minor). Proposed 2026-07-02.
+
+- **`pv-cell-temperature-power` (spec-v350).** T_cell = T_amb + (NOCT-20) G/800, P = P_stc(1 + gamma(T_cell-25)). Pinned: a 400 W module at 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss); a cool 10 C morning makes 386 W (3.5% loss), the spring-peak behavior.
+- **`pv-performance-ratio` (spec-v351).** PR = product of (1 - loss) over the PVWatts derate stack. Pinned: a typical rooftop stack (soiling 2, temp 8, wiring 2, inverter 4, mismatch 2, shading 3) -> PR 0.806, 19.4% loss; cutting the two biggest losses lifts the PR to **0.850** (the spec's cross-check stated 0.833; the exact multiplicative product is 0.850, landed with a correction note).
+- **`pv-string-fusing` (spec-v352).** Fuse >= 1.56 x Isc, rounded up to a NEC 240.6(A) rating, checked against the module label maximum; fuses required with 3+ paralleled strings. Pinned: Isc 10 A, 20 A module max, 4 strings -> a 20 A fuse, compliant; a 25 A requirement on a 20 A module max is non-compliant.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the NOCT model, the multiplicative stack, the 1.56-Isc round-up and label check, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the NOCT cell-temperature model, the PVWatts derate stack, and NEC 690.9. **As-landed correction:** spec-v351's cross-check arithmetic (0.833) was a slip; the landed value is the exact product 0.850. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-solar.js 18000 -> 23000. Housekeeping: home count 818 -> 821, README resynced (counts, Group A cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 55 appended. All gates green at the new state: lint, unit tests (**5,114**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(hvac): land spec-v347..v349 -- 3 air-distribution / air-property tiles in calc-hvac.js; 815 -> 818 tiles, 0.122.0, 2026-07-03
 
 The air-distribution / air-property trio, twenty-fifth batch of the v275-v374 campaign: the duct-and-grille field numbers the load and friction tiles never give, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **815 -> 818**, package **0.121.0 -> 0.122.0** (a minor). Proposed 2026-07-02.
