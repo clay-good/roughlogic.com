@@ -3240,3 +3240,102 @@ HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
   ],
   compute: computeDcvCo2Ventilation,
 });
+
+// =====================================================================
+// spec-v305..v307: pump-and-fluid fundamentals batch (Group C). The
+// pieces the friction and pump tiles use internally but never expose:
+// the Reynolds number and regime, the hydronic system flow from load and
+// delta-T, and the pump specific speed and impeller type.
+// =====================================================================
+
+// dims: in { v_fps: L T^-1, d_in: L, nu: L^2 T^-1 } out: { re: dimensionless }
+export function computeReynoldsNumberPipe({ v_fps = 0, d_in = 0, nu = 1.21e-5 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(v_fps > 0)) return { error: "Velocity must be positive (ft/s)." };
+  if (!(d_in > 0)) return { error: "Diameter must be positive (in)." };
+  if (!(nu > 0)) return { error: "Kinematic viscosity must be positive (ft^2/s)." };
+  const re = (v_fps * (d_in / 12)) / nu;
+  const regime = re < 2300 ? "laminar (Re < 2,300; f = 64/Re, loss linear in velocity)" : (re <= 4000 ? "transitional (2,300-4,000; unstable, avoid designing here)" : "turbulent (Re > 4,000; the regime the Hazen-Williams / Colebrook friction tiles assume)");
+  return {
+    re, regime,
+    note: "Reynolds number Re = V D / nu (= rho V D / mu), the velocity times diameter over kinematic viscosity, sorting full pipe flow into laminar (below ~2,300), transitional (~2,300 to 4,000), and turbulent (above ~4,000). Nearly all trade piping is turbulent, which is why the friction tiles' Hazen-Williams and Colebrook forms apply. A 60 degF water kinematic viscosity is about 1.21e-5 ft^2/s (1.13 centistokes); the value is temperature- and fluid-dependent, so provide it for the fluid and temperature at hand. Circular full pipe; this does not itself compute the friction factor or head loss. An engineering aid; the fluid property data at the operating condition govern.",
+  };
+}
+const reynoldsNumberPipeExample = { inputs: { v_fps: 6, d_in: 2, nu: 1.21e-5 } };
+HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
+  citation: "Citation: Reynolds number Re = V D / nu, the pipe-flow transition bands (laminar below ~2,300, turbulent above ~4,000), and a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, by name. Full circular pipe; the friction factor is separate. An engineering aid; the fluid property data govern.",
+  example: reynoldsNumberPipeExample.inputs,
+  fields: [
+    { key: "v_fps", label: "Mean flow velocity (ft/s)", kind: "number" },
+    { key: "d_in", label: "Inside diameter (in)", kind: "number" },
+    { key: "nu", label: "Kinematic viscosity (ft^2/s)", kind: "number", default: 1.21e-5 },
+  ],
+  outputs: [
+    { key: "re", id: "rnp-out-re", label: "Reynolds number", value: (r) => fmt(r.re, 0) },
+    { key: "rg", id: "rnp-out-rg", label: "Flow regime", value: (r) => r.regime },
+    { key: "n", id: "rnp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeReynoldsNumberPipe,
+});
+
+// dims: in { load: M L^2 T^-3, unit_tons: dimensionless, dt_f: T, factor: dimensionless } out: { q_btuh: M L^2 T^-3, gpm: L^3 T^-1 }
+export function computeHydronicGpmDeltat({ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(load > 0)) return { error: "Load must be positive." };
+  if (!(dt_f > 0)) return { error: "Design delta-T must be positive (degF)." };
+  if (!(factor > 0)) return { error: "The fluid factor must be positive (500 water, ~485 at 30% PG)." };
+  const is_tons = unit_tons === 1;
+  const q_btuh = is_tons ? load * 12000 : load;
+  const gpm = q_btuh / (factor * dt_f);
+  return {
+    q_btuh, gpm,
+    note: "Water-side heat transport Q = 500 x GPM x dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), rearranged to the design flow GPM = Q / (500 dT); for chilled water the shortcut is GPM = 24 tons/dT (12,000/500 = 24). The delta-T is the lever: a wide design delta-T shrinks the flow, pump, and pipe for the same load. Pure water at the sea-level factor (adjust for glycol via the fluid factor, about 485 at 30% propylene glycol); assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head, the pipe, or the coil. A design aid; the mechanical engineer of record's design governs.",
+  };
+}
+const hydronicGpmDeltatExample = { inputs: { load: 10, unit_tons: 1, dt_f: 10, factor: 500 } };
+HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
+  citation: "Citation: hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 x 60 x 1.0 for water), the chilled-water form GPM = 24 tons/dT, and the glycol-lowered factor, by name. Pure water, full load on the delta-T; the pump head is separate. A design aid; the mechanical engineer of record governs.",
+  example: hydronicGpmDeltatExample.inputs,
+  fields: [
+    { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" },
+    { key: "unit_tons", label: "Load unit (0 = Btu/h, 1 = tons)", kind: "number", default: 0 },
+    { key: "dt_f", label: "Design delta-T (degF)", kind: "number" },
+    { key: "factor", label: "Fluid factor (500 water, ~485 30% PG)", kind: "number", default: 500 },
+  ],
+  outputs: [
+    { key: "q", id: "hgd-out-q", label: "Load", value: (r) => fmt(r.q_btuh, 0) + " Btu/h" },
+    { key: "gpm", id: "hgd-out-gpm", label: "Design system flow", value: (r) => fmt(r.gpm, 1) + " gpm" },
+    { key: "n", id: "hgd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydronicGpmDeltat,
+});
+
+// dims: in { n_rpm: T^-1, q_gpm: L^3 T^-1, h_ft: L } out: { ns: dimensionless }
+export function computePumpSpecificSpeed({ n_rpm = 0, q_gpm = 0, h_ft = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(n_rpm > 0)) return { error: "Pump speed must be positive (rpm)." };
+  if (!(q_gpm > 0)) return { error: "Flow at BEP must be positive (gpm)." };
+  if (!(h_ft > 0)) return { error: "Head per stage must be positive (ft)." };
+  const ns = (n_rpm * Math.sqrt(q_gpm)) / Math.pow(h_ft, 0.75);
+  const impeller = ns < 2000 ? "radial (high head, low flow; the building-service centrifugal norm)" : (ns <= 4500 ? "mixed flow (moderate head and flow)" : "axial (low head, high flow)");
+  return {
+    ns, impeller,
+    note: "US pump specific speed Ns = N sqrt(Q) / H^(3/4) (N rpm, Q gpm at the best-efficiency point, H ft per stage - divide total head by the number of stages), the dimensionless-in-practice index that classifies the impeller geometry a duty calls for: roughly radial below ~2,000, mixed flow ~2,000 to 4,500, axial above ~4,500. The head-to-flow ratio, not the size, sets the wheel type; the H^(3/4) denominator makes a low-head high-flow duty jump families. The customary dimensional US form (not the dimensionless or metric nq); this does not compute the suction specific speed Nss (a separate NPSH-margin index) or select a specific pump. An engineering aid; the pump manufacturer's curves govern.",
+  };
+}
+const pumpSpecificSpeedExample = { inputs: { n_rpm: 1750, q_gpm: 500, h_ft: 100 } };
+HVAC_RENDERERS["pump-specific-speed"] = _rEnv({
+  citation: "Citation: US pump specific speed Ns = N sqrt(Q) / H^(3/4) (rpm, gpm at BEP, ft/stage) and the impeller-type bands (radial below ~2,000, mixed ~2,000-4,500, axial above ~4,500), Hydraulic Institute convention, by name. US dimensional form; the suction specific speed Nss is separate. An engineering aid; the manufacturer's curves govern.",
+  example: pumpSpecificSpeedExample.inputs,
+  fields: [
+    { key: "n_rpm", label: "Pump speed N (rpm)", kind: "number" },
+    { key: "q_gpm", label: "Flow at BEP Q (gpm)", kind: "number" },
+    { key: "h_ft", label: "Head per stage H (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ns", id: "pss-out-ns", label: "Specific speed Ns", value: (r) => fmt(r.ns, 0) },
+    { key: "imp", id: "pss-out-imp", label: "Indicative impeller type", value: (r) => r.impeller },
+    { key: "n", id: "pss-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePumpSpecificSpeed,
+});

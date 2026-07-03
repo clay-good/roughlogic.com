@@ -434,6 +434,8 @@ const _TILES = [
   ["rc-slab-min-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
   ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
+  // spec-v305..v307 pump-and-fluid fundamentals batch (calc-hvac.js Group C)
+  ["reynolds-number-pipe", "C"], ["hydronic-gpm-deltat", "C"], ["pump-specific-speed", "C"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

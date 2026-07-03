@@ -28792,6 +28792,85 @@
       "outputs": {
         "fr": { "value": 2.20, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "reynolds-number-pipe",
+      "source_publisher": "Reynolds number Re = V D / nu",
+      "source_title": "60 F water, 6 ft/s, 2 in line -> Re 82,600 turbulent",
+      "source_edition_or_year": "spec-v305 worked example (machine-verified)",
+      "source_section_or_page": "spec-v305 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "v_fps": 6, "d_in": 2, "nu": 1.21e-5 },
+      "outputs": {
+        "re": { "value": 82645, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "reynolds-number-pipe",
+      "source_publisher": "Reynolds number Re = V D / nu",
+      "source_title": "cross-check: nearly still water (0.02 ft/s) -> Re 275 laminar",
+      "source_edition_or_year": "spec-v305 worked example (machine-verified)",
+      "source_section_or_page": "spec-v305 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "v_fps": 0.02, "d_in": 2, "nu": 1.21e-5 },
+      "outputs": {
+        "re": { "value": 275, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydronic-gpm-deltat",
+      "source_publisher": "Water-side heat transport Q = 500 GPM dT",
+      "source_title": "10-ton chilled-water coil, 10 F delta-T, water -> 24 GPM",
+      "source_edition_or_year": "spec-v306 worked example (machine-verified)",
+      "source_section_or_page": "spec-v306 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "load": 10, "unit_tons": 1, "dt_f": 10, "factor": 500 },
+      "outputs": {
+        "q_btuh": { "value": 120000, "tolerance": { "pct": 0.1 } },
+        "gpm": { "value": 24, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "hydronic-gpm-deltat",
+      "source_publisher": "Water-side heat transport Q = 500 GPM dT",
+      "source_title": "cross-check: 100,000 Btu/h boiler at a wide 20 F delta-T -> 10 GPM",
+      "source_edition_or_year": "spec-v306 worked example (machine-verified)",
+      "source_section_or_page": "spec-v306 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "load": 100000, "unit_tons": 0, "dt_f": 20, "factor": 500 },
+      "outputs": {
+        "gpm": { "value": 10, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "pump-specific-speed",
+      "source_publisher": "Hydraulic Institute specific speed",
+      "source_title": "1,750 rpm, 500 gpm, 100 ft/stage -> Ns 1,237 radial",
+      "source_edition_or_year": "spec-v307 worked example (machine-verified)",
+      "source_section_or_page": "spec-v307 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "n_rpm": 1750, "q_gpm": 500, "h_ft": 100 },
+      "outputs": {
+        "ns": { "value": 1237, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "pump-specific-speed",
+      "source_publisher": "Hydraulic Institute specific speed",
+      "source_title": "cross-check: same speed/flow at 25 ft head -> Ns 3,500 mixed flow (H^3/4 lever)",
+      "source_edition_or_year": "spec-v307 worked example (machine-verified)",
+      "source_section_or_page": "spec-v307 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "n_rpm": 1750, "q_gpm": 500, "h_ft": 25 },
+      "outputs": {
+        "ns": { "value": 3500, "tolerance": { "pct": 0.2 } }
+      }
     }
   ]
 }

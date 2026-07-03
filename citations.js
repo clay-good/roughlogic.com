@@ -7635,6 +7635,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "reynolds-number-pipe": {
+    formula: "Re = V (D/12) / nu; regime = Re < 2,300 laminar, <= 4,000 transitional, else turbulent.",
+    edition: "The Reynolds number Re = V D / nu (= rho V D / mu) and the standard pipe-flow transition bands, with a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, a standard fluid-mechanics result, by name.",
+    freeAccess: "The Reynolds-number definition and the pipe-flow transition bands are public results in any fluid-mechanics reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Reynolds number Re = V D / nu (= rho V D / mu), the pipe-flow transition bands (laminar below ~2,300, turbulent above ~4,000, transitional between), and a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s (1.13 centistokes). This returns the Reynolds number and regime for full pipe flow - it uses the entered kinematic viscosity (temperature- and fluid-dependent; provide the value for the fluid and temperature at hand), assumes a circular full pipe, and does not itself compute the friction factor or head loss. An engineering aid; the fluid property data at the operating condition govern.",
+    assumptions: [
+      { name: "Reynolds number", value: "Re = V D / nu, velocity times diameter over kinematic viscosity", source: "fluid mechanics" },
+      { name: "Regime bands", value: "laminar below ~2,300, transitional ~2,300 to 4,000, turbulent above ~4,000", source: "pipe-flow convention" },
+      { name: "Viscosity", value: "entered per fluid and temperature; ~1.21e-5 ft^2/s for 60 degF water", source: "fluid property tables" },
+    ],
+  },
+  "hydronic-gpm-deltat": {
+    formula: "Q_btuh = (unit == tons) ? load x 12,000 : load; GPM = Q_btuh / (factor x dT); chilled-water shortcut GPM = 24 tons/dT (water).",
+    edition: "The water-side sensible-heat transport Q = 500 x GPM x dT and its rearrangement to the design flow, with the chilled-water 24 tons/dT shortcut and the glycol-lowered factor, a standard hydronic relation, by name.",
+    freeAccess: "The water-side heat-transport equation and its 500 factor are public hydronic-design results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 lb/gal x 60 min/h x 1.0 Btu/lb-degF for water), the chilled-water form GPM = 24 tons/dT (12,000/500 = 24), and the note that a propylene-glycol mix lowers the 500 factor (about 485 at 30% PG) via its density and specific heat. This returns the design system flow for pure water at the sea-level factor - it uses 500 (adjust for glycol or a different fluid via the fluid factor), assumes the full load is carried by the entered delta-T (no bypass or primary/secondary decoupling), and does not size the pump head, the pipe, or the coil. A design aid, not a substitute for the mechanical engineer of record's design.",
+    assumptions: [
+      { name: "Heat transport", value: "GPM = Q / (500 dT) for water; 500 = 8.33 x 60 x 1.0", source: "water-side sensible heat" },
+      { name: "Chilled-water shortcut", value: "GPM = 24 tons/dT (12,000/500 = 24)", source: "hydronic design practice" },
+      { name: "Fluid factor", value: "about 485 at 30% propylene glycol; adjust for a non-water fluid", source: "glycol property data" },
+    ],
+  },
+  "pump-specific-speed": {
+    formula: "Ns = N sqrt(Q) / H^(3/4) (N rpm, Q gpm at BEP, H ft per stage); class = radial < 2,000, mixed <= 4,500, else axial.",
+    edition: "The US pump specific speed Ns = N sqrt(Q) / H^(3/4) and the customary impeller-type bands, as compiled in the Hydraulic Institute and pump-handbook references, by name.",
+    freeAccess: "The specific-speed definition and the impeller-type bands are public results in the standard pump references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The US specific speed Ns = N sqrt(Q) / H^(3/4) (rpm, gpm, ft/stage, at the best-efficiency point), and the customary impeller-type bands (radial below ~2,000, mixed ~2,000 to 4,500, axial above ~4,500) as compiled in the Hydraulic Institute and pump-handbook references. This returns the US-unit specific speed and the indicative impeller class - it uses the flow and head at the best-efficiency point per stage (divide total head by the number of stages), is the customary dimensional US form (not the dimensionless or metric nq), and does not compute the suction specific speed Nss (a separate NPSH-margin index) or select a specific pump. An engineering aid; the pump manufacturer's curves govern.",
+    assumptions: [
+      { name: "Specific speed", value: "Ns = N sqrt(Q) / H^(3/4) at BEP, per stage (US dimensional form)", source: "Hydraulic Institute" },
+      { name: "Impeller bands", value: "radial below ~2,000, mixed flow ~2,000 to 4,500, axial above ~4,500", source: "pump-handbook convention" },
+      { name: "Per stage", value: "divide total head by the number of stages before applying", source: "pump design practice" },
+    ],
+  },
   "time-of-concentration": {
     formula: "tc_min = 0.0078 L^0.77 S^(-0.385) (tc minutes, L feet, S ft/ft); tc_hr = tc_min / 60.",
     edition: "The Kirpich (1940) time-of-concentration equation tc = 0.0078 L^0.77 S^(-0.385), as compiled in the USDA TR-55 and NRCS drainage references, by name.",

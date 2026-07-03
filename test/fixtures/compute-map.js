@@ -671,6 +671,10 @@ export const COMPUTE_MAP = {
   "time-of-concentration": { module: "../../calc-plumbing.js", fn: "computeTimeOfConcentration" },
   "orifice-flow": { module: "../../calc-plumbing.js", fn: "computeOrificeFlow" },
   "channel-froude-number": { module: "../../calc-plumbing.js", fn: "computeChannelFroudeNumber" },
+  // spec-v305..v307 pump-and-fluid fundamentals batch (3 tiles)
+  "reynolds-number-pipe": { module: "../../calc-hvac.js", fn: "computeReynoldsNumberPipe" },
+  "hydronic-gpm-deltat": { module: "../../calc-hvac.js", fn: "computeHydronicGpmDeltat" },
+  "pump-specific-speed": { module: "../../calc-hvac.js", fn: "computePumpSpecificSpeed" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

@@ -13828,3 +13828,62 @@ test("bounds: spec-v304 computeChannelFroudeNumber pins the regime, the critical
   assert.ok("error" in _v304({ b_ft: 4, q_cfs: 50, y_ft: 0 }));
   assert.ok("error" in _v304({ b_ft: 4, q_cfs: Infinity, y_ft: 2 }));
 });
+
+// ===================== spec-v305..v307 pump-and-fluid fundamentals batch =====================
+import { computeReynoldsNumberPipe as _v305, computeHydronicGpmDeltat as _v306, computePumpSpecificSpeed as _v307 } from "../../calc-hvac.js";
+
+test("bounds: spec-v305 computeReynoldsNumberPipe pins the turbulent case, the regime boundaries, and error seams", () => {
+  const r = _v305({ v_fps: 6, d_in: 2, nu: 1.21e-5 });
+  assert.ok(Math.abs(r.re - 6 * (2 / 12) / 1.21e-5) < 1e-3);
+  assert.ok(r.regime.startsWith("turbulent"));
+  // Laminar at a crawl.
+  assert.ok(_v305({ v_fps: 0.02, d_in: 2, nu: 1.21e-5 }).regime.startsWith("laminar"));
+  // Regime boundaries at 2,300 and 4,000 (pick V so Re lands each side).
+  const nu = 1.0, D = 12; // D/12 = 1 ft, so Re = V/nu = V
+  assert.ok(_v305({ v_fps: 2200, d_in: D, nu }).regime.startsWith("laminar"));
+  assert.ok(_v305({ v_fps: 3000, d_in: D, nu }).regime.startsWith("transitional"));
+  assert.ok(_v305({ v_fps: 5000, d_in: D, nu }).regime.startsWith("turbulent"));
+  // Error seams.
+  assert.ok("error" in _v305({ v_fps: 0, d_in: 2 }));
+  assert.ok("error" in _v305({ v_fps: 6, d_in: 0 }));
+  assert.ok("error" in _v305({ v_fps: 6, d_in: 2, nu: 0 }));
+  assert.ok("error" in _v305({ v_fps: Infinity, d_in: 2 }));
+});
+
+test("bounds: spec-v306 computeHydronicGpmDeltat pins the tons path, the 24-tons identity, and error seams", () => {
+  const r = _v306({ load: 10, unit_tons: 1, dt_f: 10, factor: 500 });
+  assert.strictEqual(r.q_btuh, 120000);
+  assert.ok(Math.abs(r.gpm - 24) < 1e-9);
+  // The 24 tons/dT chilled-water identity.
+  assert.ok(Math.abs(r.gpm - 24 * 10 / 10) < 1e-9);
+  // Btu/h path and the wide-delta-T lever.
+  const r2 = _v306({ load: 100000, unit_tons: 0, dt_f: 20, factor: 500 });
+  assert.ok(Math.abs(r2.gpm - 10) < 1e-9);
+  // Half the delta-T doubles the flow.
+  const r3 = _v306({ load: 100000, unit_tons: 0, dt_f: 10, factor: 500 });
+  assert.ok(Math.abs(r3.gpm - 2 * r2.gpm) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v306({ load: 0, dt_f: 10 }));
+  assert.ok("error" in _v306({ load: 120000, dt_f: 0 }));
+  assert.ok("error" in _v306({ load: 120000, dt_f: 10, factor: 0 }));
+  assert.ok("error" in _v306({ load: Infinity, dt_f: 10 }));
+});
+
+test("bounds: spec-v307 computePumpSpecificSpeed pins the radial case, the H^3/4 lever, the class boundaries, and error seams", () => {
+  const r = _v307({ n_rpm: 1750, q_gpm: 500, h_ft: 100 });
+  assert.ok(Math.abs(r.ns - 1750 * Math.sqrt(500) / Math.pow(100, 0.75)) < 1e-6);
+  assert.ok(Math.abs(r.ns - 1237) < 1);
+  assert.ok(r.impeller.startsWith("radial"));
+  // Lowering the head raises Ns via the H^(3/4) denominator.
+  const r2 = _v307({ n_rpm: 1750, q_gpm: 500, h_ft: 25 });
+  assert.ok(Math.abs(r2.ns - 3500) < 2);
+  assert.ok(r2.impeller.startsWith("mixed flow"));
+  // The class boundaries at 2,000 and 4,500 (choose H to land each side).
+  assert.ok(_v307({ n_rpm: 1750, q_gpm: 500, h_ft: 70 }).impeller.startsWith("radial")); // Ns ~1600
+  assert.ok(_v307({ n_rpm: 1750, q_gpm: 500, h_ft: 18 }).impeller.startsWith("axial") === false); // Ns ~4400 mixed
+  // Error seams.
+  assert.ok("error" in _v307({ n_rpm: 0, q_gpm: 500, h_ft: 100 }));
+  assert.ok("error" in _v307({ n_rpm: 1750, q_gpm: 0, h_ft: 100 }));
+  assert.ok("error" in _v307({ n_rpm: 1750, q_gpm: 500, h_ft: 0 }));
+  assert.ok("error" in _v307({ n_rpm: NaN, q_gpm: 500, h_ft: 100 }));
+});

@@ -955,6 +955,10 @@ const RELATED = {
   "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
   "orifice-flow": ["weir-flow","time-of-concentration","pipe-velocity"],
   "channel-froude-number": ["manning-slope","weir-flow","orifice-flow"],
+  // spec-v305..v307 pump-and-fluid fundamentals batch (Group C)
+  "reynolds-number-pipe": ["friction-loss","pipe-velocity","refrigerant-velocity"],
+  "hydronic-gpm-deltat": ["radiant-loop-sizing","pump-tdh","chiller-tons"],
+  "pump-specific-speed": ["pump-tdh","pump-operating-point","affinity-laws"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

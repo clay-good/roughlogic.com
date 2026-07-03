@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v305..v307 -- 3 pump-and-fluid fundamentals tiles in calc-hvac.js; 773 -> 776 tiles, 0.108.0, 2026-07-03
+
+The pump-and-fluid fundamentals trio, eleventh batch of the v275-v374 campaign: the pieces the friction and pump tiles use internally but never expose, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **773 -> 776**, package **0.107.0 -> 0.108.0** (a minor). Proposed 2026-07-02.
+
+- **`reynolds-number-pipe` (spec-v305).** Re = V D / nu and the laminar (< 2,300) / transitional / turbulent (> 4,000) regime. Pinned: 60 F water at 6 ft/s in a 2 in line -> Re 82,600 turbulent; a crawl -> Re 275 laminar. The fuzzer pins both regime boundaries.
+- **`hydronic-gpm-deltat` (spec-v306).** GPM = Q / (500 dT) with a selectable tons unit (x 12,000) and the chilled-water 24 tons/dT shortcut. Pinned: a 10-ton coil at 10 F -> 24 GPM; a 100,000 Btu/h boiler at 20 F -> 10 GPM (the wide-delta-T lever).
+- **`pump-specific-speed` (spec-v307).** Ns = N sqrt(Q) / H^(3/4) and the radial (< 2,000) / mixed (< 4,500) / axial impeller bands. Pinned: 1,750 rpm, 500 gpm, 100 ft -> Ns 1,237 radial; dropping the head to 25 ft jumps it to 3,500 mixed flow (the H^3/4 lever).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the regime and class boundaries, the tons unit path and 24-tons identity, the H^3/4 lever, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the Reynolds definition, the water-side heat-transport equation, and the Hydraulic Institute specific-speed convention. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 24 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bumps (calc-hvac at 91.2%). Housekeeping: home count 773 -> 776, README resynced (counts, correctness figures 1019/1022/1019, Group C cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 40 appended. All gates green at the new state: lint (**776 tiles / 56 modules / 798 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(hydraulics): land spec-v302..v304 -- 3 site-hydraulics depth tiles in calc-plumbing.js; 770 -> 773 tiles, 0.107.0, 2026-07-03
 
 The site-hydraulics depth trio, tenth batch of the v275-v374 campaign: the pieces the rational-method and open-channel tiles need but do not compute, all in the existing lazy `calc-plumbing.js` (Group B); no new module, group, or dependency. Catalog **770 -> 773**, package **0.106.0 -> 0.107.0** (a minor). Proposed 2026-07-02.

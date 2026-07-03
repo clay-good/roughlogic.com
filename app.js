@@ -241,6 +241,8 @@ const TOOL_MODULES = (() => {
     "air-leak-cost", "compressed-air-power", "air-pressure-setpoint-savings",
     // spec-v275..v277 ventilation-and-recovery batch
     "erv-sensible-recovery", "mua-tempering-load", "dcv-co2-ventilation",
+    // spec-v305..v307 pump-and-fluid fundamentals batch
+    "reynolds-number-pipe", "hydronic-gpm-deltat", "pump-specific-speed",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

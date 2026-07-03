@@ -1,6 +1,6 @@
 # roughlogic.com Specification v306 -- Hydronic System Flow from Load and Delta-T (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v305..v307 (the pump-and-fluid fundamentals trio -- Reynolds
+> **Status: LANDED (2026-07-03, package 0.108.0; proposed 2026-07-02). Batch spec-v305..v307 (the pump-and-fluid fundamentals trio -- Reynolds
 > number (v305), the hydronic flow from load and delta-T (this spec), pump specific speed (v307)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog sizes radiant loops (`radiant-loop-sizing`)
 > and DHW recirculation (`recirc-loop-sizing`) but has no tile for the single most fundamental hydronic relationship -- the

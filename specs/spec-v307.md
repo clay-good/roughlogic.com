@@ -1,6 +1,6 @@
 # roughlogic.com Specification v307 -- Pump Specific Speed and Impeller Type (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v305..v307 (the pump-and-fluid fundamentals trio -- Reynolds
+> **Status: LANDED (2026-07-03, package 0.108.0; proposed 2026-07-02). Batch spec-v305..v307 (the pump-and-fluid fundamentals trio -- Reynolds
 > number (v305), hydronic flow (v306), pump specific speed (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog sizes pump head and operating point
 > (`pump-tdh`, `pump-operating-point`) but has no tile for specific speed -- the dimensionless index that says whether a duty

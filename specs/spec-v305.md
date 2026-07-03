@@ -1,6 +1,6 @@
 # roughlogic.com Specification v305 -- Pipe Flow Reynolds Number and Regime (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v305..v307 (the pump-and-fluid fundamentals trio -- the pieces
+> **Status: LANDED (2026-07-03, package 0.108.0; proposed 2026-07-02). Batch spec-v305..v307 (the pump-and-fluid fundamentals trio -- the pieces
 > the friction and pump tiles use internally but never expose: the Reynolds number and laminar/turbulent regime (this spec),
 > the hydronic system flow from load and delta-T (v306), and the pump specific speed and impeller type (v307).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog computes friction loss (`friction-loss`,
