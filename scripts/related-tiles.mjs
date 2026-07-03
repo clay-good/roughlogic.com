@@ -923,6 +923,10 @@ const RELATED = {
   "motor-overload-sizing": ["motor-branch-protection","motor-fla","motor-feeder-multiple"],
   "service-conductor-sizing": ["service-load-standard","service-load-optional","ambient-ampacity-adjust"],
   "continuous-load-ocpd": ["service-conductor-sizing","commercial-lighting-load","wire-ampacity"],
+  // spec-v281..v283 steel members-and-connections depth batch (Group E)
+  "steel-beam-ltb": ["steel-beam-flexure","steel-beam-shear","steel-column-capacity"],
+  "steel-block-shear": ["steel-beam-shear","bolt-shear-bearing","steel-tension-member"],
+  "steel-tension-member": ["steel-block-shear","steel-column-capacity","bolt-shear-bearing"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

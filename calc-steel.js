@@ -359,3 +359,190 @@ STEEL_RENDERERS["column-base-plate"] = _simpleRenderer({
   ],
   compute: computeColumnBasePlate,
 });
+
+// ===================== spec-v281..v283: steel members-and-connections depth batch =====================
+// The checks the v254..v256 member trio explicitly defers: lateral-torsional
+// buckling of an unbraced beam (F2), block-shear rupture at a bolted/coped
+// end (J4.3), and the tension member's yield/rupture with shear lag (D2/D3).
+const _E_STEEL = 29000; // ksi
+
+// dims: in { fy: M L^-1 T^-2, zx: L^3, sx: L^3, ry: L, rts: L, j: L^4, ho: L, lb_ft: L, cb: dimensionless } out: { mp_kipft: M L^2 T^-2, lp_ft: L, lr_ft: L, mn_kipft: M L^2 T^-2, ma_kipft: M L^2 T^-2, phi_mn: M L^2 T^-2 }
+export function computeSteelBeamLtb({ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
+  for (const [k, v] of [["Zx", zx], ["Sx", sx], ["ry", ry], ["rts", rts], ["J", j], ["ho", ho]]) {
+    if (!(v > 0)) return { error: "Section property " + k + " must be positive." };
+  }
+  if (!(lb_ft > 0)) return { error: "Unbraced length Lb must be positive (ft)." };
+  if (!(cb > 0)) return { error: "Cb must be positive (1.0 is conservative)." };
+  const c = 1; // doubly symmetric
+  const mp = fy * zx; // kip-in
+  const mr = 0.7 * fy * sx; // kip-in
+  const lp_ft = 1.76 * ry * Math.sqrt(_E_STEEL / fy) / 12;
+  const t1 = (j * c) / (sx * ho);
+  const lr_ft = (1.95 * rts / 12) * (_E_STEEL / (0.7 * fy)) * Math.sqrt(t1) * Math.sqrt(1 + Math.sqrt(1 + 6.76 * Math.pow((0.7 * fy / _E_STEEL) / t1, 2)));
+  let mn, zone, fcr_ksi = null;
+  if (lb_ft <= lp_ft) {
+    zone = "plastic (Lb <= Lp): full Mp, no LTB reduction";
+    mn = mp;
+  } else if (lb_ft <= lr_ft) {
+    zone = "inelastic LTB (Lp < Lb <= Lr): linear interpolation";
+    mn = Math.min(cb * (mp - (mp - mr) * (lb_ft - lp_ft) / (lr_ft - lp_ft)), mp);
+  } else {
+    zone = "elastic LTB (Lb > Lr): Fcr governs";
+    const slr = (12 * lb_ft) / rts;
+    fcr_ksi = (cb * Math.PI * Math.PI * _E_STEEL) / (slr * slr) * Math.sqrt(1 + 0.078 * t1 * slr * slr);
+    mn = Math.min(fcr_ksi * sx, mp);
+  }
+  const mp_kipft = mp / 12;
+  const mn_kipft = mn / 12;
+  const ma_kipft = mn_kipft / 1.67;
+  const phi_mn = 0.90 * mn_kipft;
+  return {
+    mp_kipft, lp_ft, lr_ft, zone, fcr_ksi, mn_kipft, ma_kipft, phi_mn,
+    note: "AISC 360-22 F2 for a doubly-symmetric compact I-shape about the strong axis: Lp = 1.76 ry sqrt(E/Fy); Lr from the F2-6 closed form (c = 1); between them Mn = Cb[Mp - (Mp - 0.7 Fy Sx)(Lb - Lp)/(Lr - Lp)] <= Mp, and beyond Lr the elastic Fcr = Cb pi^2 E/(Lb/rts)^2 sqrt(1 + 0.078 Jc/(Sx ho) (Lb/rts)^2). E = 29,000 ksi. Section properties from the AISC Manual; Cb must match the moment diagram (1.0 is conservative). Noncompact/slender shapes (F3-F5) and channels are outside this tile. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelBeamLtbExample = { inputs: { fy: 50, zx: 101, sx: 88.9, ry: 1.65, rts: 1.98, j: 1.24, ho: 17.4, lb_ft: 10, cb: 1.0 } };
+
+STEEL_RENDERERS["steel-beam-ltb"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 Section F2 lateral-torsional buckling of a doubly-symmetric compact I-shape: Lp = 1.76 ry sqrt(E/Fy), Lr per Eq. F2-6, inelastic Mn = Cb[Mp - (Mp - 0.7 Fy Sx)(Lb-Lp)/(Lr-Lp)] <= Mp, elastic Fcr per Eq. F2-4 (E = 29,000 ksi, c = 1). ASD Omega_b = 1.67, LRFD phi_b = 0.90. Cb must match the moment diagram. A design aid, not a substitute for the engineer of record.",
+  example: steelBeamLtbExample.inputs,
+  fields: [
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 50 },
+    { key: "zx", label: "Plastic section modulus Zx (in^3)", kind: "number" },
+    { key: "sx", label: "Elastic section modulus Sx (in^3)", kind: "number" },
+    { key: "ry", label: "Weak-axis radius of gyration ry (in)", kind: "number" },
+    { key: "rts", label: "Effective radius for LTB rts (in)", kind: "number" },
+    { key: "j", label: "Torsional constant J (in^4)", kind: "number" },
+    { key: "ho", label: "Distance between flange centroids ho (in)", kind: "number" },
+    { key: "lb_ft", label: "Unbraced length Lb (ft)", kind: "number" },
+    { key: "cb", label: "LTB modification factor Cb", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "lims", id: "sbl-out-lims", label: "Lp / Lr", value: (r) => fmt(r.lp_ft, 2) + " ft / " + fmt(r.lr_ft, 2) + " ft" },
+    { key: "zone", id: "sbl-out-zone", label: "Governing zone", value: (r) => r.zone },
+    { key: "mn", id: "sbl-out-mn", label: "Nominal Mn (vs braced Mp)", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft (Mp " + fmt(r.mp_kipft, 1) + ")" },
+    { key: "ma", id: "sbl-out-ma", label: "ASD allowable Mn/Omega", value: (r) => fmt(r.ma_kipft, 1) + " kip-ft" },
+    { key: "pm", id: "sbl-out-pm", label: "LRFD design phi_b*Mn", value: (r) => fmt(r.phi_mn, 1) + " kip-ft" },
+    { key: "n", id: "sbl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelBeamLtb,
+});
+
+// dims: in { t_in: L, fy: M L^-1 T^-2, fu: M L^-1 T^-2, n: dimensionless, s_in: L, end_in: L, edge_in: L, dh_in: L, ubs: dimensionless } out: { agv: L^2, anv: L^2, ant: L^2, rn_kip: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2 }
+export function computeSteelBlockShear({ t_in = 0, fy = 36, fu = 58, n = 0, s_in = 3, end_in = 0, edge_in = 0, dh_in = 0.875, ubs = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(t_in > 0)) return { error: "Element thickness must be positive (in)." };
+  if (!(fy > 0) || !(fu > 0)) return { error: "Fy and Fu must be positive (ksi)." };
+  if (!(n >= 1)) return { error: "The shear line needs at least one bolt." };
+  if (!Number.isInteger(n)) return { error: "Bolt count must be a whole number." };
+  if (n > 1 && !(s_in > 0)) return { error: "Bolt spacing must be positive (in)." };
+  if (!(end_in > 0) || !(edge_in > 0)) return { error: "End and edge distances must be positive (in)." };
+  if (!(dh_in > 0)) return { error: "Hole diameter must be positive (in)." };
+  if (!(ubs === 1.0 || ubs === 0.5)) return { error: "Ubs is 1.0 (uniform tension) or 0.5 (nonuniform)." };
+  const lgv = end_in + (n - 1) * s_in;
+  const agv = lgv * t_in;
+  const anv = (lgv - (n - 0.5) * dh_in) * t_in;
+  const ant = (edge_in - 0.5 * dh_in) * t_in;
+  if (!(anv > 0)) return { error: "The net shear path is fully consumed by the holes - lengthen the end distance or spacing." };
+  if (!(ant > 0)) return { error: "The net tension path is fully consumed by the half hole - widen the tension edge distance." };
+  const rupture = 0.6 * fu * anv + ubs * fu * ant;
+  const cap = 0.6 * fy * agv + ubs * fu * ant;
+  const rn_kip = Math.min(rupture, cap);
+  const governs = cap < rupture ? "gross-shear-yield cap governs" : "net-rupture path governs";
+  const asd_kip = rn_kip / 2.00;
+  const lrfd_kip = 0.75 * rn_kip;
+  return {
+    lgv, agv, anv, ant, rupture, cap, rn_kip, governs, asd_kip, lrfd_kip,
+    note: "AISC 360-22 J4.3 block shear: Rn = 0.6 Fu Anv + Ubs Fu Ant, capped by 0.6 Fy Agv + Ubs Fu Ant (Omega = 2.00, phi = 0.75); Ubs = 1.0 for uniform tension. Net areas deduct (n - 0.5) holes on the shear tear and a half hole on the tension plane, standard holes at bolt diameter + 1/8 in unless entered. One bolt row, one tension plane - chain multi-row or re-entrant coped-beam blocks by hand, and check bolt shear/bearing and the tension member separately. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelBlockShearExample = { inputs: { t_in: 0.5, fy: 36, fu: 58, n: 3, s_in: 3, end_in: 1.5, edge_in: 1.5, dh_in: 0.875, ubs: 1.0 } };
+
+STEEL_RENDERERS["steel-block-shear"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 Section J4.3 block-shear rupture Rn = 0.6 Fu Anv + Ubs Fu Ant <= 0.6 Fy Agv + Ubs Fu Ant (Omega = 2.00 / phi = 0.75; Ubs = 1.0 uniform), with the (n - 0.5)-hole shear-path and half-hole tension-path deductions, by name. Single row, standard holes. Bolt shear/bearing is the separate bolt-shear-bearing tile. A design aid, not a substitute for the engineer of record.",
+  example: steelBlockShearExample.inputs,
+  fields: [
+    { key: "t_in", label: "Element thickness (in)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 36 },
+    { key: "fu", label: "Tensile stress Fu (ksi)", kind: "number", default: 58 },
+    { key: "n", label: "Bolts in the shear line", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "s_in", label: "Bolt spacing / pitch (in)", kind: "number", default: 3 },
+    { key: "end_in", label: "End distance (in)", kind: "number" },
+    { key: "edge_in", label: "Tension edge distance (in)", kind: "number" },
+    { key: "dh_in", label: "Hole diameter (in, bolt + 1/8)", kind: "number", default: 0.875 },
+    { key: "ubs", label: "Ubs (1.0 uniform, 0.5 nonuniform)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "areas", id: "sbs-out-areas", label: "Agv / Anv / Ant", value: (r) => fmt(r.agv, 3) + " / " + fmt(r.anv, 3) + " / " + fmt(r.ant, 3) + " in^2" },
+    { key: "paths", id: "sbs-out-paths", label: "Rupture path vs yield cap", value: (r) => fmt(r.rupture, 1) + " / " + fmt(r.cap, 1) + " kip (" + r.governs + ")" },
+    { key: "rn", id: "sbs-out-rn", label: "Nominal Rn", value: (r) => fmt(r.rn_kip, 1) + " kip" },
+    { key: "asd", id: "sbs-out-asd", label: "ASD allowable Rn/Omega", value: (r) => fmt(r.asd_kip, 1) + " kip" },
+    { key: "lrfd", id: "sbs-out-lrfd", label: "LRFD design phi*Rn", value: (r) => fmt(r.lrfd_kip, 1) + " kip" },
+    { key: "n", id: "sbs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelBlockShear,
+});
+
+// dims: in { ag_in2: L^2, fy: M L^-1 T^-2, fu: M L^-1 T^-2, t_in: L, dh_in: L, nh: dimensionless, xbar_in: L, l_in: L, u_in: dimensionless } out: { an_in2: L^2, ae_in2: L^2, pn_yield_kip: M L T^-2, pn_rupt_kip: M L T^-2, p_asd_kip: M L T^-2, p_lrfd_kip: M L T^-2 }
+export function computeSteelTensionMember({ ag_in2 = 0, fy = 36, fu = 58, t_in = 0, dh_in = 0.875, nh = 0, xbar_in = 0, l_in = 0, u_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ag_in2 > 0)) return { error: "Gross area must be positive (in^2)." };
+  if (!(fy > 0) || !(fu > 0)) return { error: "Fy and Fu must be positive (ksi)." };
+  if (nh < 0 || !Number.isInteger(nh)) return { error: "Hole lines across the section must be a whole number (0 for a welded member)." };
+  if (nh > 0 && !(t_in > 0)) return { error: "Thickness at the holes must be positive (in) when holes are deducted." };
+  if (nh > 0 && !(dh_in > 0)) return { error: "Hole diameter must be positive (in) when holes are deducted." };
+  if (xbar_in < 0 || l_in < 0 || u_in < 0) return { error: "Eccentricity, connection length, and U cannot be negative." };
+  const an_in2 = ag_in2 - nh * dh_in * t_in;
+  if (!(an_in2 > 0)) return { error: "The holes consume the whole section - the net area must be positive." };
+  let u;
+  if (u_in > 0) {
+    u = Math.min(u_in, 1.0);
+  } else if (xbar_in > 0) {
+    if (!(l_in > 0)) return { error: "The shear-lag connection length must be positive (in) when an eccentricity is entered." };
+    if (xbar_in >= l_in) return { error: "The connection eccentricity must be less than the connection length for U = 1 - xbar/L." };
+    u = Math.min(1 - xbar_in / l_in, 1.0);
+  } else {
+    u = 1.0;
+  }
+  const ae_in2 = u * an_in2;
+  const pn_yield_kip = fy * ag_in2;
+  const pn_rupt_kip = fu * ae_in2;
+  const asd_yield = pn_yield_kip / 1.67;
+  const asd_rupt = pn_rupt_kip / 2.00;
+  const p_asd_kip = Math.min(asd_yield, asd_rupt);
+  const lrfd_yield = 0.90 * pn_yield_kip;
+  const lrfd_rupt = 0.75 * pn_rupt_kip;
+  const p_lrfd_kip = Math.min(lrfd_yield, lrfd_rupt);
+  const governs = asd_rupt < asd_yield ? "net-section rupture governs (shear lag)" : "gross-section yielding governs";
+  return {
+    an_in2, u, ae_in2, pn_yield_kip, pn_rupt_kip, asd_yield, asd_rupt, p_asd_kip, p_lrfd_kip, governs,
+    note: "AISC 360-22 Chapter D tension member: gross yielding Pn = Fy Ag (Omega = 1.67, phi = 0.90) against net rupture Pn = Fu Ae with Ae = U An (Omega = 2.00, phi = 0.75); An deducts nh holes at the entered diameter, and U = 1 - xbar/L (Table D3.1 Case 2) unless overridden. Single transverse hole line (no staggered s^2/4g chain); block shear and the bolts are the separate steel-block-shear and bolt-shear-bearing tiles; L/r slenderness is serviceability guidance. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelTensionMemberExample = { inputs: { ag_in2: 3.75, fy: 36, fu: 58, t_in: 0.5, dh_in: 0.875, nh: 1, xbar_in: 1.18, l_in: 6, u_in: 0 } };
+
+STEEL_RENDERERS["steel-tension-member"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 D2 gross yielding Pn = Fy Ag (Omega = 1.67 / phi = 0.90) and D3 net rupture Pn = Fu Ae, Ae = U An, with U = 1 - xbar/L (Table D3.1 Case 2) and An = Ag - nh dh t, by name. Single hole line, entered or Case-2 U. Block shear and bolt checks are separate tiles. A design aid, not a substitute for the engineer of record.",
+  example: steelTensionMemberExample.inputs,
+  fields: [
+    { key: "ag_in2", label: "Gross area Ag (in^2)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 36 },
+    { key: "fu", label: "Tensile stress Fu (ksi)", kind: "number", default: 58 },
+    { key: "nh", label: "Hole lines across the section (0 if welded)", kind: "number", attrs: { step: "1", min: "0" } },
+    { key: "t_in", label: "Thickness at the holes (in)", kind: "number" },
+    { key: "dh_in", label: "Hole diameter (in, bolt + 1/8)", kind: "number", default: 0.875 },
+    { key: "xbar_in", label: "Connection eccentricity xbar (in, 0 => U = 1)", kind: "number", default: 0 },
+    { key: "l_in", label: "Connection length L (in)", kind: "number", default: 0 },
+    { key: "u_in", label: "Shear-lag U override (blank = compute)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "areas", id: "stm-out-areas", label: "An / U / Ae", value: (r) => fmt(r.an_in2, 3) + " in^2 / " + fmt(r.u, 3) + " / " + fmt(r.ae_in2, 3) + " in^2" },
+    { key: "yield", id: "stm-out-yield", label: "Gross yielding (ASD)", value: (r) => fmt(r.pn_yield_kip, 1) + " kip nominal, " + fmt(r.asd_yield, 1) + " kip allowable" },
+    { key: "rupt", id: "stm-out-rupt", label: "Net rupture (ASD)", value: (r) => fmt(r.pn_rupt_kip, 1) + " kip nominal, " + fmt(r.asd_rupt, 1) + " kip allowable" },
+    { key: "gov", id: "stm-out-gov", label: "Governing capacity", value: (r) => fmt(r.p_asd_kip, 1) + " kip ASD / " + fmt(r.p_lrfd_kip, 1) + " kip LRFD (" + r.governs + ")" },
+    { key: "n", id: "stm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelTensionMember,
+});

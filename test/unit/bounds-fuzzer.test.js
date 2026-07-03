@@ -13271,3 +13271,86 @@ test("bounds: spec-v280 computeContinuousLoadOcpd pins the 125% rule, the 100%-r
   assert.ok("error" in _v280({ l_cont_A: 1e6, l_noncont_A: 0 })); // beyond the carried 240.6(A) set
   assert.ok("error" in _v280({ l_cont_A: Infinity, l_noncont_A: 20 }));
 });
+
+// ===================== spec-v281..v283 steel members-and-connections depth batch =====================
+import { computeSteelBeamLtb as _v281, computeSteelBlockShear as _v282, computeSteelTensionMember as _v283 } from "../../calc-steel.js";
+
+test("bounds: spec-v281 computeSteelBeamLtb pins the three F2 zones, the Cb cap, and error seams", () => {
+  const P = { fy: 50, zx: 101, sx: 88.9, ry: 1.65, rts: 1.98, j: 1.24, ho: 17.4, cb: 1.0 };
+  // Inelastic zone (Lp < 10 < Lr) -- the W18x50 at 10 ft.
+  const r = _v281({ ...P, lb_ft: 10 });
+  assert.ok(Math.abs(r.lp_ft - 5.8281) < 1e-3);
+  assert.ok(Math.abs(r.lr_ft - 16.9456) < 1e-2);
+  assert.ok(Math.abs(r.mn_kipft - 360.21) < 0.05);
+  assert.ok(Math.abs(r.ma_kipft - 215.70) < 0.05);
+  assert.ok(Math.abs(r.phi_mn - 324.19) < 0.05);
+  assert.ok(r.zone.startsWith("inelastic"));
+  // Plastic zone (Lb <= Lp): the full braced Mp.
+  const rp = _v281({ ...P, lb_ft: 4 });
+  assert.ok(Math.abs(rp.mn_kipft - 5050 / 12) < 1e-9);
+  assert.ok(rp.zone.startsWith("plastic"));
+  // Elastic zone (Lb > Lr): Fcr governs.
+  const re = _v281({ ...P, lb_ft: 20 });
+  assert.ok(Math.abs(re.fcr_ksi - 26.9839) < 1e-3);
+  assert.ok(Math.abs(re.mn_kipft - 199.906) < 0.05);
+  assert.ok(re.zone.startsWith("elastic"));
+  // Cb scales the inelastic moment but never past Mp.
+  const rc = _v281({ ...P, lb_ft: 10, cb: 3 });
+  assert.ok(Math.abs(rc.mn_kipft - 5050 / 12) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v281({ ...P, lb_ft: 0 }));
+  assert.ok("error" in _v281({ ...P, zx: 0, lb_ft: 10 }));
+  assert.ok("error" in _v281({ ...P, rts: 0, lb_ft: 10 }));
+  assert.ok("error" in _v281({ ...P, lb_ft: 10, cb: 0 }));
+  assert.ok("error" in _v281({ ...P, lb_ft: Infinity }));
+});
+
+test("bounds: spec-v282 computeSteelBlockShear pins the governing-path min(), the end-distance sensitivity, and error seams", () => {
+  const P = { t_in: 0.5, fy: 36, fu: 58, n: 3, s_in: 3, end_in: 1.5, edge_in: 1.5, dh_in: 0.875, ubs: 1.0 };
+  const r = _v282(P);
+  assert.ok(Math.abs(r.agv - 3.75) < 1e-9);
+  assert.ok(Math.abs(r.anv - 2.65625) < 1e-9);
+  assert.ok(Math.abs(r.ant - 0.53125) < 1e-9);
+  assert.ok(Math.abs(r.rupture - 123.25) < 1e-2);
+  assert.ok(Math.abs(r.cap - 111.8125) < 1e-9);
+  assert.ok(Math.abs(r.rn_kip - 111.8125) < 1e-9); // the yield cap governs
+  assert.ok(Math.abs(r.asd_kip - 55.90625) < 1e-9);
+  assert.ok(Math.abs(r.lrfd_kip - 83.859375) < 1e-9);
+  // Shorter end distance drops the capacity.
+  const r2 = _v282({ ...P, end_in: 1.25 });
+  assert.ok(Math.abs(r2.rn_kip - 109.1125) < 1e-3);
+  assert.ok(r2.rn_kip < r.rn_kip);
+  // A high-Fy element can make the rupture path govern instead of the cap.
+  const r3 = _v282({ ...P, fy: 50 });
+  assert.ok(r3.governs.startsWith("net-rupture"));
+  // Error seams.
+  assert.ok("error" in _v282({ ...P, t_in: 0 }));
+  assert.ok("error" in _v282({ ...P, n: 0 }));
+  assert.ok("error" in _v282({ ...P, n: 2.5 }));
+  assert.ok("error" in _v282({ ...P, edge_in: 0.4 })); // half hole consumes the tension path
+  assert.ok("error" in _v282({ ...P, ubs: 0.8 }));
+  assert.ok("error" in _v282({ ...P, fu: Infinity }));
+});
+
+test("bounds: spec-v283 computeSteelTensionMember pins the limit-state flip, the U cap and override, and error seams", () => {
+  // Bolted single leg: shear lag makes rupture govern.
+  const r = _v283({ ag_in2: 3.75, fy: 36, fu: 58, t_in: 0.5, dh_in: 0.875, nh: 1, xbar_in: 1.18, l_in: 6 });
+  assert.ok(Math.abs(r.an_in2 - 3.3125) < 1e-9);
+  assert.ok(Math.abs(r.u - (1 - 1.18 / 6)) < 1e-9);
+  assert.ok(Math.abs(r.p_asd_kip - 77.170) < 5e-3);
+  assert.ok(Math.abs(r.p_lrfd_kip - 115.756) < 5e-3);
+  assert.ok(r.governs.startsWith("net-section rupture"));
+  // Welded full section (U = 1, no holes): yielding governs again.
+  const r2 = _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 0, u_in: 1.0 });
+  assert.ok(Math.abs(r2.p_asd_kip - 135 / 1.67) < 1e-9);
+  assert.ok(r2.governs.startsWith("gross-section yielding"));
+  // The U override is capped at 1.0.
+  const r3 = _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 0, u_in: 1.4 });
+  assert.strictEqual(r3.u, 1.0);
+  // Error seams.
+  assert.ok("error" in _v283({ ag_in2: 0, fy: 36, fu: 58 }));
+  assert.ok("error" in _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 1, t_in: 0 }));
+  assert.ok("error" in _v283({ ag_in2: 3.75, fy: 36, fu: 58, nh: 10, t_in: 0.5, dh_in: 0.875 })); // holes consume the section
+  assert.ok("error" in _v283({ ag_in2: 3.75, fy: 36, fu: 58, xbar_in: 8, l_in: 6 })); // xbar >= L
+  assert.ok("error" in _v283({ ag_in2: NaN, fy: 36, fu: 58 }));
+});

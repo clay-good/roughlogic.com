@@ -1,6 +1,6 @@
 # roughlogic.com Specification v283 -- Steel Tension Member Yield and Rupture with Shear Lag (AISC 360 D2/D3) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v281..v283 (the steel members-and-connections depth trio --
+> **Status: LANDED (2026-07-03, package 0.100.0; proposed 2026-07-02). Batch spec-v281..v283 (the steel members-and-connections depth trio --
 > LTB (v281), block shear (v282), the tension member (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog checks steel in bending
 > (`steel-beam-flexure`, `steel-beam-ltb`), shear (`steel-beam-shear`), and compression (`steel-column-capacity`), but has

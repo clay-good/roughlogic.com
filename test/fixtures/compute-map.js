@@ -639,6 +639,10 @@ export const COMPUTE_MAP = {
   "motor-overload-sizing": { module: "../../calc-motor.js", fn: "computeMotorOverloadSizing" },
   "service-conductor-sizing": { module: "../../calc-service.js", fn: "computeServiceConductorSizing" },
   "continuous-load-ocpd": { module: "../../calc-feeder.js", fn: "computeContinuousLoadOcpd" },
+  // spec-v281..v283 steel members-and-connections depth batch (3 tiles)
+  "steel-beam-ltb": { module: "../../calc-steel.js", fn: "computeSteelBeamLtb" },
+  "steel-block-shear": { module: "../../calc-steel.js", fn: "computeSteelBlockShear" },
+  "steel-tension-member": { module: "../../calc-steel.js", fn: "computeSteelTensionMember" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

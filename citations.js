@@ -7491,6 +7491,42 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "steel-beam-ltb": {
+    formula: "Mp = Fy Zx; Lp = 1.76 ry sqrt(E/Fy); Lr per AISC Eq. F2-6 (c = 1); Lb <= Lp: Mn = Mp; Lp < Lb <= Lr: Mn = Cb[Mp - (Mp - 0.7 Fy Sx)(Lb - Lp)/(Lr - Lp)] <= Mp; Lb > Lr: Fcr = Cb pi^2 E/(Lb/rts)^2 sqrt(1 + 0.078 Jc/(Sx ho)(Lb/rts)^2), Mn = Fcr Sx <= Mp. ASD = Mn/1.67; LRFD = 0.90 Mn. (E = 29,000 ksi)",
+    edition: "The AISC 360-22 Section F2 lateral-torsional buckling provisions for a doubly-symmetric compact I-shape bending about its strong axis (Lp, the Eq. F2-6 Lr, the linear inelastic branch, and the Eq. F2-4 elastic critical stress with c = 1), by name; E = 29,000 ksi and the Omega_b = 1.67 / phi_b = 0.90 factors are named constants.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the shape properties are in the AISC Steel Construction Manual tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Section F2 limits Lp = 1.76 ry sqrt(E/Fy) and Lr (Eq. F2-6, computed with c = 1), the inelastic Mn = Cb[Mp - (Mp - 0.7 Fy Sx)(Lb - Lp)/(Lr - Lp)] <= Mp, and the elastic Fcr = Cb pi^2 E/(Lb/rts)^2 sqrt(1 + 0.078 (Jc/(Sx ho))(Lb/rts)^2), with E = 29,000 ksi. This covers doubly-symmetric compact I-shapes bending about the strong axis (the F2 case) - it does not cover noncompact or slender flanges/webs (F3-F5) or channels and singly-symmetric shapes, and it assumes the entered Cb matches the moment diagram (1.0 is conservative). A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Bracing limits", value: "Lp = 1.76 ry sqrt(E/Fy); Lr from the Eq. F2-6 closed form with c = 1 for a doubly-symmetric shape", source: "AISC 360-22 F2.2" },
+      { name: "Three zones", value: "full Mp below Lp, linear interpolation to 0.7 Fy Sx at Lr, elastic Fcr Sx beyond, all capped at Mp and scaled by Cb", source: "AISC 360-22 Eq. F2-1..F2-4" },
+      { name: "Scope", value: "compact doubly-symmetric I-shapes about the strong axis; section properties from the AISC Manual", source: "AISC 360-22 F2 user note" },
+    ],
+  },
+  "steel-block-shear": {
+    formula: "Lgv = end + (n - 1) s; Agv = Lgv t; Anv = (Lgv - (n - 0.5) dh) t; Ant = (edge - 0.5 dh) t; Rn = min(0.6 Fu Anv + Ubs Fu Ant, 0.6 Fy Agv + Ubs Fu Ant); ASD = Rn/2.00; LRFD = 0.75 Rn.",
+    edition: "The AISC 360-22 Section J4.3 block-shear rupture strength (shear rupture plus tension rupture, capped by shear yielding plus tension rupture, Ubs = 1.0 for uniform tension) with the standard-hole net-area deductions, by name; Omega = 2.00 / phi = 0.75 are named factors.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J4.3 provision and the hole-deduction convention are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Section J4.3 block-shear strength Rn = 0.6 Fu Anv + Ubs Fu Ant capped by 0.6 Fy Agv + Ubs Fu Ant, with Ubs = 1.0 for uniform tension and phi = 0.75 / Omega = 2.00, and the net-area deduction of one hole diameter per bolt on the shear plane (the last hole counted as a half on the shear tear) and a half hole on the tension plane. This covers a single tension-plane, single shear-line block (one bolt row) - it assumes standard holes at the bolt diameter + 1/8 in unless entered, does not chain multiple rows or a re-entrant coped-beam geometry (enter the governing block by hand), and does not check the bolt shear/bearing or the net-section tension member (separate tiles). A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Two paths", value: "net-shear + net-tension rupture, capped by gross-shear yielding + net-tension rupture; the lesser governs", source: "AISC 360-22 Eq. J4-5" },
+      { name: "Hole deduction", value: "(n - 0.5) holes off the shear path, a half hole off the tension path, standard holes at bolt + 1/8 in", source: "AISC 360-22 B4.3b / J4.3" },
+      { name: "Ubs", value: "1.0 for uniform tension stress (single row); 0.5 for the nonuniform multi-row case", source: "AISC 360-22 J4.3 commentary" },
+    ],
+  },
+  "steel-tension-member": {
+    formula: "An = Ag - nh dh t; U = U_override or 1 - xbar/L (capped at 1.0); Ae = U An; Pn_yield = Fy Ag (ASD /1.67, LRFD x0.90); Pn_rupture = Fu Ae (ASD /2.00, LRFD x0.75); capacity = min of the two limit states.",
+    edition: "The AISC 360-22 Chapter D tension-member provisions -- D2 yielding on the gross section and rupture on the effective net area, with the D3 shear-lag factor U = 1 - xbar/L (Table D3.1 Case 2) and the net-area hole deduction -- by name; the paired resistance/safety factors are named constants.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); Table D3.1 and the Chapter D provisions are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 D2 gross yielding Pn = Fy Ag (phi = 0.90 / Omega = 1.67), D3 net rupture Pn = Fu Ae with Ae = U An (phi = 0.75 / Omega = 2.00), the shear-lag factor U = 1 - xbar/L (Table D3.1 Case 2), and the net area An = Ag - nh dh t. This covers the axial-tension yield and rupture limit states - it uses the entered or 1 - xbar/L shear-lag factor (not the tabulated element-specific cases), assumes standard holes in a single transverse line (no staggered s^2/4g chain), and does not check block shear, the bolt/weld connection, or L/r slenderness serviceability (separate tiles and guidance). A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Two limit states", value: "gross-section yielding (Fy Ag) and effective-net-section rupture (Fu U An); the lower factored capacity governs", source: "AISC 360-22 D2" },
+      { name: "Shear lag", value: "U = 1 - xbar/L for a member connected through only some elements (Case 2); entered U overrides; capped at 1.0", source: "AISC 360-22 Table D3.1" },
+      { name: "Net area", value: "Ag minus nh holes at the entered diameter and thickness, one transverse line, no stagger", source: "AISC 360-22 B4.3 / D3" },
+    ],
+  },
   "erv-sensible-recovery": {
     formula: "dT_F = t_ra_F - t_oa_F; t_leave_F = t_oa_F + eps_s x dT_F; Q_s_btuh = 1.08 x cfm x eps_s x dT_F; Q_noerv_btuh = 1.08 x cfm x dT_F; Q_resid_btuh = Q_noerv_btuh - Q_s_btuh.",
     edition: "The ASHRAE Standard 84 / AHRI Standard 1060 sensible-effectiveness definition (eps_s = (T_leaving - T_oa) / (T_ra - T_oa)) and the recovered sensible load Q_s = 1.08 x CFM x eps_s x (T_ra - T_oa), by name; the sea-level sensible constant 1.08 = 60 x 0.075 x 0.24 is a named constant.",

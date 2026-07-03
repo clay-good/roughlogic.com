@@ -28078,6 +28078,103 @@
         "A_min": { "value": 65, "tolerance": { "abs": 0.001 } },
         "ocpd_A": { "value": 70, "tolerance": { "abs": 0 } }
       }
+    },
+    {
+      "tile_id": "steel-beam-ltb",
+      "source_publisher": "AISC 360-22 Section F2 (AISC Manual W18x50 properties)",
+      "source_title": "W18x50 A992 braced at 10 ft, Cb 1.0 -> inelastic zone, Mn 360.2 kip-ft (ASD 215.7)",
+      "source_edition_or_year": "spec-v281 worked example (machine-verified)",
+      "source_section_or_page": "spec-v281 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fy": 50, "zx": 101, "sx": 88.9, "ry": 1.65, "rts": 1.98, "j": 1.24, "ho": 17.4, "lb_ft": 10, "cb": 1.0 },
+      "outputs": {
+        "lp_ft": { "value": 5.828, "tolerance": { "abs": 0.005 } },
+        "lr_ft": { "value": 16.946, "tolerance": { "abs": 0.05 } },
+        "mn_kipft": { "value": 360.2, "tolerance": { "pct": 0.2 } },
+        "ma_kipft": { "value": 215.7, "tolerance": { "pct": 0.2 } },
+        "phi_mn": { "value": 324.2, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "steel-beam-ltb",
+      "source_publisher": "AISC 360-22 Section F2 (Eq. F2-3/F2-4 elastic branch)",
+      "source_title": "cross-check: stretch bracing to 20 ft > Lr -> elastic, Fcr 27.0 ksi, Mn 199.9 kip-ft",
+      "source_edition_or_year": "spec-v281 worked example (machine-verified)",
+      "source_section_or_page": "spec-v281 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fy": 50, "zx": 101, "sx": 88.9, "ry": 1.65, "rts": 1.98, "j": 1.24, "ho": 17.4, "lb_ft": 20, "cb": 1.0 },
+      "outputs": {
+        "fcr_ksi": { "value": 26.98, "tolerance": { "pct": 0.2 } },
+        "mn_kipft": { "value": 199.9, "tolerance": { "pct": 0.2 } },
+        "ma_kipft": { "value": 119.7, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "steel-block-shear",
+      "source_publisher": "AISC 360-22 Section J4.3",
+      "source_title": "1/2 in A36 plate, three 3/4 in bolts -> gross-shear-yield cap governs, Rn 111.8 kip (ASD 55.9)",
+      "source_edition_or_year": "spec-v282 worked example (machine-verified)",
+      "source_section_or_page": "spec-v282 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_in": 0.5, "fy": 36, "fu": 58, "n": 3, "s_in": 3, "end_in": 1.5, "edge_in": 1.5, "dh_in": 0.875, "ubs": 1.0 },
+      "outputs": {
+        "agv": { "value": 3.75, "tolerance": { "abs": 0.001 } },
+        "anv": { "value": 2.65625, "tolerance": { "abs": 0.001 } },
+        "ant": { "value": 0.53125, "tolerance": { "abs": 0.001 } },
+        "rn_kip": { "value": 111.81, "tolerance": { "pct": 0.1 } },
+        "asd_kip": { "value": 55.91, "tolerance": { "pct": 0.1 } },
+        "lrfd_kip": { "value": 83.86, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "steel-block-shear",
+      "source_publisher": "AISC 360-22 Section J4.3",
+      "source_title": "cross-check: end distance 1.5 -> 1.25 in drops Rn to 109.1 kip",
+      "source_edition_or_year": "spec-v282 worked example (machine-verified)",
+      "source_section_or_page": "spec-v282 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_in": 0.5, "fy": 36, "fu": 58, "n": 3, "s_in": 3, "end_in": 1.25, "edge_in": 1.5, "dh_in": 0.875, "ubs": 1.0 },
+      "outputs": {
+        "rn_kip": { "value": 109.11, "tolerance": { "pct": 0.1 } },
+        "asd_kip": { "value": 54.56, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "steel-tension-member",
+      "source_publisher": "AISC 360-22 Chapter D (D2 / D3, Table D3.1 Case 2)",
+      "source_title": "L4x4x1/2 A36 bolted one leg, three bolts -> U 0.803, rupture governs, 77.2 kip ASD",
+      "source_edition_or_year": "spec-v283 worked example (machine-verified)",
+      "source_section_or_page": "spec-v283 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ag_in2": 3.75, "fy": 36, "fu": 58, "t_in": 0.5, "dh_in": 0.875, "nh": 1, "xbar_in": 1.18, "l_in": 6, "u_in": 0 },
+      "outputs": {
+        "an_in2": { "value": 3.3125, "tolerance": { "abs": 0.001 } },
+        "u": { "value": 0.8033, "tolerance": { "abs": 0.001 } },
+        "ae_in2": { "value": 2.661, "tolerance": { "abs": 0.005 } },
+        "p_asd_kip": { "value": 77.17, "tolerance": { "pct": 0.1 } },
+        "p_lrfd_kip": { "value": 115.76, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "steel-tension-member",
+      "source_publisher": "AISC 360-22 Chapter D (D2 / D3)",
+      "source_title": "cross-check: welded full section (U 1.0, no holes) flips governing to gross yielding, 80.8 kip ASD",
+      "source_edition_or_year": "spec-v283 worked example (machine-verified)",
+      "source_section_or_page": "spec-v283 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ag_in2": 3.75, "fy": 36, "fu": 58, "t_in": 0.5, "dh_in": 0.875, "nh": 0, "xbar_in": 0, "l_in": 0, "u_in": 1.0 },
+      "outputs": {
+        "an_in2": { "value": 3.75, "tolerance": { "abs": 0.001 } },
+        "ae_in2": { "value": 3.75, "tolerance": { "abs": 0.001 } },
+        "p_asd_kip": { "value": 80.84, "tolerance": { "pct": 0.1 } },
+        "p_lrfd_kip": { "value": 121.5, "tolerance": { "pct": 0.1 } }
+      }
     }
   ]
 }

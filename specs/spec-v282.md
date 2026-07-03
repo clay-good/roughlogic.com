@@ -1,6 +1,6 @@
 # roughlogic.com Specification v282 -- Steel Block Shear Rupture at a Bolted/Coped End (AISC 360 J4.3) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v281..v283 (the steel members-and-connections depth trio --
+> **Status: LANDED (2026-07-03, package 0.100.0; proposed 2026-07-02). Batch spec-v281..v283 (the steel members-and-connections depth trio --
 > LTB (v281), block shear (this spec, the "separate check" `steel-beam-shear` names), the tension member (v283)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `steel-beam-shear` ends "Block shear at a coped end
 > is a separate check" -- that check is this gap. Block shear is the rupture failure that pulls a tab of steel out of a

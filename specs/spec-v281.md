@@ -1,6 +1,6 @@
 # roughlogic.com Specification v281 -- Steel Beam Lateral-Torsional Buckling Capacity (AISC 360 Ch. F2) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v281..v283 (the steel members-and-connections depth trio --
+> **Status: LANDED (2026-07-03, package 0.100.0; proposed 2026-07-02). Batch spec-v281..v283 (the steel members-and-connections depth trio --
 > the checks the compact-braced flexure tile and the shear tile explicitly defer: lateral-torsional buckling of an
 > unbraced beam (this spec, the LTB the `steel-beam-flexure` tile says it excludes), block-shear rupture at a coped or
 > bolted end (v282, the check `steel-beam-shear` names as separate), and the tension member's yield/rupture with shear lag
