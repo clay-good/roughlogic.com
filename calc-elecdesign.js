@@ -10,7 +10,7 @@
 // standard govern, and the AHJ is the law). See spec-v101.md.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -190,4 +190,145 @@ ELECDESIGN_RENDERERS["point-illuminance"] = _simpleRenderer({
     { key: "n", id: "pi-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePointIlluminance,
+});
+
+// ===================== spec-v365..v367: lighting light-loss & compliance batch (Group A) =====================
+// The maintained-light and code numbers the lumen-method tile assumes: the
+// light-loss factor stack that turns initial into maintained lumens (v365), the
+// illuminance uniformity ratio a grid of readings gives (v366), and the egress
+// lighting compliance check against NFPA 101 / IBC minimums (v367).
+
+// dims: in { LLD: dimensionless, LDD: dimensionless, BF: dimensionless, LBO: dimensionless, RSDD: dimensionless, other: dimensionless, initial_lm: dimensionless } out: { LLF: dimensionless, maintained_lm: dimensionless }
+export function computeLightingLightLossFactor({ LLD = 0, LDD = 0, BF = 0, LBO = 0, RSDD = 0, other = 0, initial_lm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const keys = { LLD, LDD, BF, LBO, RSDD, other };
+  let LLF = 1;
+  let anyEntered = false;
+  for (const [k, v] of Object.entries(keys)) {
+    const val = Number(v) || 0;
+    if (val === 0) continue;
+    if (!(val > 0 && val <= 1)) return { error: "Each light-loss factor must be over 0 and at most 1 (" + k + ")." };
+    LLF *= val;
+    anyEntered = true;
+  }
+  if (!anyEntered) return { error: "Enter at least one light-loss factor (0 to 1)." };
+  const init = Number(initial_lm) || 0;
+  const maintained_lm = init > 0 ? init * LLF : null;
+  return {
+    LLF, maintained_lm,
+    note: "Light-loss factor LLF = the product of the entered depreciation factors: lamp lumen depreciation (LLD), luminaire dirt depreciation (LDD), ballast/driver factor (BF), lamp burnout (LBO), room-surface dirt (RSDD), and temperature/voltage/tilt. Maintained lumens = initial x LLF, the output the design must hit at the end of the cleaning/relamp cycle, not day one. A cleaner room and a better lamp raise the LLF, so the same footcandle target needs fewer fixtures - the payoff a lumped 0.8 guess hides. A design aid; the IES recovery-factor tables and the maintenance schedule govern.",
+  };
+}
+const lightingLightLossFactorExample = { inputs: { LLD: 0.85, LDD: 0.90, BF: 0.95, LBO: 0, RSDD: 0, other: 0, initial_lm: 4000 } };
+ELECDESIGN_RENDERERS["lighting-light-loss-factor"] = _simpleRenderer({
+  citation: "Citation: light-loss factor LLF = product of the IES recovery factors (LLD, LDD, BF, LBO, RSDD, temperature/voltage/tilt); maintained lumens = initial x LLF. The IES recovery-factor tables and the maintenance schedule govern.",
+  example: lightingLightLossFactorExample.inputs,
+  fields: [
+    { key: "LLD", label: "Lamp lumen depreciation LLD (0-1)", kind: "number" },
+    { key: "LDD", label: "Luminaire dirt depreciation LDD (0-1)", kind: "number" },
+    { key: "BF", label: "Ballast/driver factor BF (0-1)", kind: "number" },
+    { key: "LBO", label: "Lamp burnout LBO (0-1, optional)", kind: "number" },
+    { key: "RSDD", label: "Room-surface dirt RSDD (0-1, optional)", kind: "number" },
+    { key: "other", label: "Other (temp/voltage/tilt) (0-1, optional)", kind: "number" },
+    { key: "initial_lm", label: "Initial lumens (optional, for maintained)", kind: "number" },
+  ],
+  outputs: [
+    { key: "llf", id: "llf-out-llf", label: "Light-loss factor (LLF)", value: (r) => fmt(r.LLF, 3) },
+    { key: "m", id: "llf-out-m", label: "Maintained lumens", value: (r) => r.maintained_lm == null ? "(enter initial lumens)" : fmt(r.maintained_lm, 0) + " lm" },
+    { key: "n", id: "llf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLightingLightLossFactor,
+});
+
+// dims: in { readings: dimensionless, target_avgmin: dimensionless, target_maxmin: dimensionless } out: { avg: dimensionless, min: dimensionless, max: dimensionless, avg_min: dimensionless, max_min: dimensionless, U0: dimensionless }
+export function computeLightingUniformityRatio({ readings = [], target_avgmin = 0, target_maxmin = 0 } = {}) {
+  let vals;
+  if (Array.isArray(readings)) vals = readings.map(Number);
+  else if (typeof readings === "string") vals = readings.split(/[\s,]+/).map((x) => x.trim()).filter((x) => x !== "").map(Number);
+  else return { error: "Enter a grid of illuminance readings." };
+  if (!vals.length) return { error: "Enter at least one illuminance reading." };
+  for (const v of vals) if (!Number.isFinite(v)) return { error: "All readings must be finite numbers." };
+  const min = Math.min(...vals);
+  if (!(min > 0)) return { error: "The minimum reading must be positive." };
+  const max = Math.max(...vals);
+  const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+  const avg_min = avg / min;
+  const max_min = max / min;
+  const U0 = min / avg;
+  const ta = Number(target_avgmin) || 0;
+  const tm = Number(target_maxmin) || 0;
+  let pass = null;
+  if (ta > 0 || tm > 0) {
+    pass = (ta <= 0 || avg_min <= ta) && (tm <= 0 || max_min <= tm);
+  }
+  return {
+    avg, min, max, avg_min, max_min, U0, pass, n: vals.length,
+    note: "Illuminance uniformity from a grid of readings: average-to-minimum (avg/min), maximum-to-minimum (max/min), and the minimum-to-average uniformity U0 = min/avg. Common targets run 3:1 max/min for offices and tighter for tasks. The same rough average can hide a patchy layout - a bright-under, dark-between-fixtures pattern that only the ratio reveals - which is why a uniformity check catches what an average number never does. A design aid; the IES recommended practice for the space type governs the target.",
+  };
+}
+const lightingUniformityRatioExample = { inputs: { readings: "50, 45, 60, 55, 40", target_maxmin: 3 } };
+function _v366renderLightingUniformityRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: illuminance uniformity ratios (avg/min, max/min) and U0 = min/avg from a reading grid, per IES measurement/recommended practice. Common target ~3:1 max/min for offices. The IES RP for the space type governs.";
+  const readings = makeTextarea("Illuminance readings (fc or lux, comma or space separated)", "lur-readings", { rows: "3" });
+  readings.input.value = "50, 45, 60, 55, 40";
+  const ta = makeNumber("Target avg/min (optional)", "lur-ta", { step: "any", min: "0" });
+  const tm = makeNumber("Target max/min (optional, e.g. 3)", "lur-tm", { step: "any", min: "0" });
+  tm.input.value = "3";
+  for (const f of [readings, ta, tm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { readings.input.value = "50, 45, 60, 55, 40"; ta.input.value = ""; tm.input.value = "3"; update(); });
+  const oStats = makeOutputLine(outputRegion, "Avg / min / max", "lur-out-stats");
+  const oRatios = makeOutputLine(outputRegion, "avg/min, max/min, U0", "lur-out-ratios");
+  const oPass = makeOutputLine(outputRegion, "Against target", "lur-out-pass");
+  const update = debounce(() => {
+    const r = computeLightingUniformityRatio({ readings: readings.input.value, target_avgmin: Number(ta.input.value) || 0, target_maxmin: Number(tm.input.value) || 0 });
+    if (r.error) { oStats.textContent = r.error; oRatios.textContent = "-"; oPass.textContent = "-"; return; }
+    oStats.textContent = fmt(r.avg, 1) + " / " + fmt(r.min, 1) + " / " + fmt(r.max, 1) + " (" + r.n + " readings)";
+    oRatios.textContent = fmt(r.avg_min, 2) + " avg/min, " + fmt(r.max_min, 2) + " max/min, U0 " + fmt(r.U0, 2);
+    oPass.textContent = r.pass == null ? "(enter a target ratio)" : (r.pass ? "PASS" : "FAIL -- exceeds the target ratio");
+  }, DEBOUNCE_MS);
+  for (const f of [readings, ta, tm]) f.input.addEventListener("input", update);
+}
+ELECDESIGN_RENDERERS["lighting-uniformity-ratio"] = _v366renderLightingUniformityRatio;
+
+// dims: in { avg_fc: dimensionless, min_fc: dimensionless, max_fc: dimensionless, mode: dimensionless } out: { max_min: dimensionless, pass: dimensionless }
+export function computeEgressLightingCheck({ avg_fc = 0, min_fc = 0, max_fc = 0, mode = "normal" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const avg = Number(avg_fc) || 0;
+  const min = Number(min_fc) || 0;
+  const max = Number(max_fc) || 0;
+  if (!(avg > 0)) return { error: "Average illuminance must be positive (fc)." };
+  if (!(min > 0)) return { error: "Minimum illuminance must be positive (fc)." };
+  if (!(max >= min)) return { error: "Maximum must be at least the minimum (fc)." };
+  const emergency = mode === "emergency-90min-end";
+  const avg_thr = emergency ? 0.6 : 1.0;
+  const min_thr = emergency ? 0.06 : 0.1;
+  const max_min = max / min;
+  const avg_ok = avg >= avg_thr;
+  const min_ok = min >= min_thr;
+  const ratio_ok = max_min <= 40;
+  const pass = avg_ok && min_ok && ratio_ok;
+  return {
+    max_min, avg_thr, min_thr, avg_ok, min_ok, ratio_ok, pass, emergency,
+    note: "Egress/means-of-egress lighting check per NFPA 101 / IBC: normally the path averages at least 1.0 fc with a minimum of 0.1 fc; at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1 (no over-bright spot beside a dark one). A single dark spot below the minimum fails the path even when the average holds - the reason a spot check, not just an average, is required. A design aid; the adopted NFPA 101 / IBC edition and the AHJ govern.",
+  };
+}
+const egressLightingCheckExample = { inputs: { avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" } };
+ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
+  citation: "Citation: egress lighting minimums per NFPA 101 / IBC: normal 1.0 fc avg / 0.1 fc min; emergency 90-min end 0.6 fc avg / 0.06 fc min; max/min <= 40:1. The adopted NFPA 101 / IBC edition and the AHJ govern.",
+  example: egressLightingCheckExample.inputs,
+  fields: [
+    { key: "avg_fc", label: "Average illuminance (fc)", kind: "number" },
+    { key: "min_fc", label: "Minimum illuminance (fc)", kind: "number" },
+    { key: "max_fc", label: "Maximum illuminance (fc)", kind: "number" },
+    { key: "mode", label: "Mode", kind: "select", options: [
+      { value: "normal", label: "Normal (1.0 fc avg / 0.1 fc min)" },
+      { value: "emergency-90min-end", label: "Emergency, 90-min end (0.6 / 0.06)" },
+    ] },
+  ],
+  outputs: [
+    { key: "res", id: "elc-out-res", label: "Result", value: (r) => r.pass ? "COMPLIANT" : "NON-COMPLIANT" },
+    { key: "det", id: "elc-out-det", label: "Checks", value: (r) => "avg " + (r.avg_ok ? "OK" : "FAIL") + " (>=" + r.avg_thr + "), min " + (r.min_ok ? "OK" : "FAIL") + " (>=" + r.min_thr + "), max/min " + fmt(r.max_min, 0) + " (" + (r.ratio_ok ? "OK" : "FAIL") + ", <=40)" },
+    { key: "n", id: "elc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEgressLightingCheck,
 });

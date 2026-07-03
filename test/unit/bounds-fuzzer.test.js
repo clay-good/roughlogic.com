@@ -14961,3 +14961,56 @@ test("bounds: spec-v364 computeOverheadRecoveryRate pins both bases and error se
   assert.ok("error" in _v364({ annual_overhead: 200000, basis: "markup", annual_direct: 0 }));
   assert.ok("error" in _v364({ annual_overhead: Infinity, basis: "per-hour", billable_hours: 8000 }));
 });
+
+// ===================== spec-v365..v367 lighting light-loss & compliance batch =====================
+import { computeLightingLightLossFactor as _v365, computeLightingUniformityRatio as _v366, computeEgressLightingCheck as _v367 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v365 computeLightingLightLossFactor pins the product, maintained lumens, and error seams", () => {
+  const r = _v365({ LLD: 0.85, LDD: 0.90, BF: 0.95, initial_lm: 4000 });
+  assert.ok(Math.abs(r.LLF - 0.85 * 0.90 * 0.95) < 1e-12);
+  assert.ok(Math.abs(r.LLF - 0.727) < 0.001);
+  assert.ok(Math.abs(r.maintained_lm - 4000 * r.LLF) < 1e-9);
+  // A cleaner system has a higher LLF.
+  const clean = _v365({ LLD: 0.95, LDD: 0.95, BF: 0.98 });
+  assert.ok(clean.LLF > r.LLF && Math.abs(clean.LLF - 0.884) < 0.001 && clean.maintained_lm === null);
+  // Error seams.
+  assert.ok("error" in _v365({})); // none entered
+  assert.ok("error" in _v365({ LLD: 1.5 })); // out of range
+  assert.ok("error" in _v365({ LLD: Infinity }));
+});
+
+test("bounds: spec-v366 computeLightingUniformityRatio pins the ratios, the pass/fail, and error seams", () => {
+  const r = _v366({ readings: [50, 45, 60, 55, 40], target_maxmin: 3 });
+  assert.strictEqual(r.avg, 50);
+  assert.strictEqual(r.min, 40);
+  assert.strictEqual(r.max, 60);
+  assert.ok(Math.abs(r.avg_min - 1.25) < 1e-9 && Math.abs(r.max_min - 1.5) < 1e-9 && Math.abs(r.U0 - 0.8) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  // A patchy grid fails a 3:1 target.
+  const patchy = _v366({ readings: [70, 20, 65, 25, 30], target_maxmin: 3 });
+  assert.ok(Math.abs(patchy.max_min - 3.5) < 1e-9 && patchy.pass === false);
+  // Accepts a string of readings.
+  assert.ok(Math.abs(_v366({ readings: "50 45 60 55 40" }).avg - 50) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v366({ readings: [] }));
+  assert.ok("error" in _v366({ readings: [0, 0] })); // min <= 0
+  assert.ok("error" in _v366({ readings: [10, NaN] }));
+});
+
+test("bounds: spec-v367 computeEgressLightingCheck pins the mode thresholds and error seams", () => {
+  const r = _v367({ avg_fc: 1.2, min_fc: 0.15, max_fc: 3.0, mode: "normal" });
+  assert.strictEqual(r.pass, true);
+  assert.strictEqual(r.max_min, 20);
+  assert.strictEqual(r.avg_thr, 1.0);
+  // A dark spot at the emergency end fails the minimum even at a passing average.
+  const em = _v367({ avg_fc: 0.7, min_fc: 0.05, max_fc: 2.5, mode: "emergency-90min-end" });
+  assert.strictEqual(em.avg_ok, true);
+  assert.strictEqual(em.min_ok, false);
+  assert.strictEqual(em.pass, false);
+  assert.strictEqual(em.min_thr, 0.06);
+  // Error seams.
+  assert.ok("error" in _v367({ avg_fc: 0, min_fc: 0.1, max_fc: 3 }));
+  assert.ok("error" in _v367({ avg_fc: 1.2, min_fc: 0, max_fc: 3 }));
+  assert.ok("error" in _v367({ avg_fc: 1.2, min_fc: 0.5, max_fc: 0.3 })); // max < min
+  assert.ok("error" in _v367({ avg_fc: Infinity, min_fc: 0.1, max_fc: 3 }));
+});

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v365 -- Lighting Light-Loss Factor (Maintained/Initial) (calc-elecdesign.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v365..v367 (the lighting-design trio -- the maintenance and
+> **Status: LANDED (2026-07-03, package 0.128.0). Batch spec-v365..v367 (the lighting-design trio -- the maintenance and
 > quality numbers the lumen-method tiles take as a given: the light-loss factor built from its components (this spec), the
 > illuminance uniformity ratio (v366), and the egress-lighting compliance check (v367).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `lumen-method` and `lux-to-footcandle` both take the

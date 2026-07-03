@@ -14232,6 +14232,141 @@
       "term": "recover overhead",
       "target": "overhead-recovery-rate",
       "kind": "industry"
+    },
+    {
+      "term": "light loss factor",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "llf",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "maintained lumens",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "lamp lumen depreciation",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "luminaire dirt depreciation",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "ballast factor",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "maintenance factor lighting",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "llf calculator",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "initial vs maintained",
+      "target": "lighting-light-loss-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "lighting uniformity",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "uniformity ratio",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "avg min ratio",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "max min ratio",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "illuminance uniformity",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "footcandle uniformity",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "lighting evenness",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "u0 uniformity",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "uniformity lighting design",
+      "target": "lighting-uniformity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "egress lighting",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "means of egress illumination",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "emergency lighting fc",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "1 footcandle egress",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "nfpa 101 lighting",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "egress lighting check",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "0.1 footcandle minimum",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "40 to 1 ratio",
+      "target": "egress-lighting-check",
+      "kind": "industry"
+    },
+    {
+      "term": "exit lighting level",
+      "target": "egress-lighting-check",
+      "kind": "industry"
     }
   ]
 }

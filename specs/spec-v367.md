@@ -1,6 +1,6 @@
 # roughlogic.com Specification v367 -- Egress Lighting Illuminance Compliance Check (NFPA 101 / IBC) (calc-elecdesign.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v365..v367 (the lighting-design trio -- light-loss factor
+> **Status: LANDED (2026-07-03, package 0.128.0). Batch spec-v365..v367 (the lighting-design trio -- light-loss factor
 > (v365), uniformity ratio (v366), the egress-lighting compliance check (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog designs general lighting, but the means-
 > of-egress lighting has hard code minimums -- an average and a minimum illuminance on the egress floor, and a maximum-to-

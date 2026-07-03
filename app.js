@@ -409,6 +409,7 @@ const TOOL_MODULES = (() => {
     "pull-box-sizing", "lumen-method",
     // spec-v175 electrician batch
     "point-illuminance",
+    "lighting-light-loss-factor", "lighting-uniformity-ratio", "egress-lighting-check",
   ]);
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".

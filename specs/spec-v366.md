@@ -1,6 +1,6 @@
 # roughlogic.com Specification v366 -- Lighting Illuminance Uniformity Ratio (calc-elecdesign.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v365..v367 (the lighting-design trio -- light-loss factor
+> **Status: LANDED (2026-07-03, package 0.128.0). Batch spec-v365..v367 (the lighting-design trio -- light-loss factor
 > (v365), the illuminance uniformity ratio (this spec), the egress-lighting check (v367)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `lumen-method` gives an average maintained footcandle
 > level, but a space with the right average can still fail if the light is patchy -- bright under fixtures, dark between.

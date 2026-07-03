@@ -30453,6 +30453,87 @@
         "overhead_pct": { "value": 40, "tolerance": { "abs": 0.1 } },
         "job_overhead": { "value": 4000, "tolerance": { "abs": 1 } }
       }
+    },
+    {
+      "tile_id": "lighting-light-loss-factor",
+      "source_publisher": "IES Lighting Handbook",
+      "source_title": "LLD 0.85 x LDD 0.90 x BF 0.95 -> LLF 0.727; a 4,000 lm fixture holds 2,908 maintained",
+      "source_edition_or_year": "spec-v365 worked example (machine-verified)",
+      "source_section_or_page": "spec-v365 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "LLD": 0.85, "LDD": 0.90, "BF": 0.95, "LBO": 0, "RSDD": 0, "other": 0, "initial_lm": 4000 },
+      "outputs": {
+        "LLF": { "value": 0.727, "tolerance": { "pct": 0.5 } },
+        "maintained_lm": { "value": 2908, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "lighting-light-loss-factor",
+      "source_publisher": "IES Lighting Handbook",
+      "source_title": "cross-check: a clean office with a good LED (0.95 x 0.95 x 0.98) -> LLF 0.884",
+      "source_edition_or_year": "spec-v365 worked example (machine-verified)",
+      "source_section_or_page": "spec-v365 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "LLD": 0.95, "LDD": 0.95, "BF": 0.98, "LBO": 0, "RSDD": 0, "other": 0, "initial_lm": 0 },
+      "outputs": {
+        "LLF": { "value": 0.884, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "lighting-uniformity-ratio",
+      "source_publisher": "IES recommended practice",
+      "source_title": "readings 50/45/60/55/40 fc -> 1.25 avg/min, 1.50 max/min, U0 0.80",
+      "source_edition_or_year": "spec-v366 worked example (machine-verified)",
+      "source_section_or_page": "spec-v366 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "readings": [50, 45, 60, 55, 40], "target_maxmin": 3 },
+      "outputs": {
+        "avg_min": { "value": 1.25, "tolerance": { "pct": 0.5 } },
+        "max_min": { "value": 1.5, "tolerance": { "pct": 0.5 } },
+        "U0": { "value": 0.8, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "lighting-uniformity-ratio",
+      "source_publisher": "IES recommended practice",
+      "source_title": "cross-check: a patchy 70/20/65/25/30 fc grid fails a 3:1 target at 3.5 max/min",
+      "source_edition_or_year": "spec-v366 worked example (machine-verified)",
+      "source_section_or_page": "spec-v366 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "readings": [70, 20, 65, 25, 30], "target_maxmin": 3 },
+      "outputs": {
+        "max_min": { "value": 3.5, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "egress-lighting-check",
+      "source_publisher": "NFPA 101 / IBC",
+      "source_title": "corridor 1.2 fc avg, 0.15 fc min, 3.0 fc max, normal -> max/min 20, compliant",
+      "source_edition_or_year": "spec-v367 worked example (machine-verified)",
+      "source_section_or_page": "spec-v367 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "avg_fc": 1.2, "min_fc": 0.15, "max_fc": 3.0, "mode": "normal" },
+      "outputs": {
+        "max_min": { "value": 20, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "egress-lighting-check",
+      "source_publisher": "NFPA 101 / IBC",
+      "source_title": "cross-check: a 0.05 fc dark spot at the 90-min emergency end (avg 0.7) fails the minimum -> max/min 50",
+      "source_edition_or_year": "spec-v367 worked example (machine-verified)",
+      "source_section_or_page": "spec-v367 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "avg_fc": 0.7, "min_fc": 0.05, "max_fc": 2.5, "mode": "emergency-90min-end" },
+      "outputs": {
+        "max_min": { "value": 50, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

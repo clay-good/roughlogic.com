@@ -5538,6 +5538,42 @@ export const CITATIONS = {
       { name: "Derate curve", value: "the bundled MG-1 derating points (1/2/3/4/5% -> ~0.98/0.95/0.88/0.82/0.75), linearly interpolated", source: "NEMA MG-1" },
     ],
   },
+  "lighting-light-loss-factor": {
+    formula: "LLF = product of the entered recovery factors (LLD, LDD, BF, LBO, RSDD, temp/voltage/tilt); maintained_lm = initial_lm x LLF.",
+    edition: "The IES light-loss-factor (recovery-factor) method, by name.",
+    freeAccess: "The light-loss-factor method and its recovery-factor categories are published in the IES Lighting Handbook. The IES recovery-factor tables and the maintenance schedule govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The light-loss factor LLF = the product of the entered depreciation factors: lamp lumen depreciation (LLD), luminaire dirt depreciation (LDD), ballast/driver factor (BF), lamp burnout (LBO), room-surface dirt (RSDD), and temperature/voltage/tilt. Maintained lumens = initial x LLF, the output the design must hit at the end of the cleaning/relamp cycle, not day one. This returns the combined factor and maintained lumens for the entered factors: it multiplies only the factors provided (a cleaner room and a better lamp raise the LLF), and does not itself look up the IES recovery-factor tables. A design aid; the IES tables and the maintenance schedule govern.",
+    assumptions: [
+      { name: "Multiplicative", value: "LLF = product of (LLD, LDD, BF, LBO, RSDD, temp/voltage/tilt) entered", source: "IES Lighting Handbook" },
+      { name: "Maintained lumens", value: "maintained = initial x LLF, the end-of-cycle output", source: "IES" },
+      { name: "Enter the factors", value: "uses the entered factors; does not look up the recovery-factor tables", source: "scope of this tile" },
+    ],
+  },
+  "lighting-uniformity-ratio": {
+    formula: "avg/min, max/min, U0 = min/avg over a grid of readings; pass if avg/min <= target and max/min <= target.",
+    edition: "The IES illuminance uniformity ratios (avg/min, max/min, U0), by name.",
+    freeAccess: "The uniformity ratios and target values are published in the IES recommended practices for each space type. The IES RP governs the target.",
+    governance: GOVERNANCE.general,
+    editionNote: "Illuminance uniformity from a grid of readings: average-to-minimum (avg/min), maximum-to-minimum (max/min), and the minimum-to-average uniformity U0 = min/avg. Common targets run about 3:1 max/min for offices and tighter for tasks. The same rough average can hide a patchy layout - a bright-under, dark-between-fixtures pattern that only the ratio reveals. This returns the ratios and an optional pass/fail against the entered targets: it treats the readings as an equal-weight grid and does not verify the measurement grid spacing or the meter calibration. A design aid; the IES recommended practice for the space type governs the target.",
+    assumptions: [
+      { name: "Ratios", value: "avg/min, max/min, U0 = min/avg over the reading grid", source: "IES recommended practice" },
+      { name: "Targets", value: "~3:1 max/min for offices; tighter for task areas", source: "IES RP" },
+      { name: "Equal-weight grid", value: "treats readings as an equal-weight grid; grid spacing/meter not verified", source: "scope of this tile" },
+    ],
+  },
+  "egress-lighting-check": {
+    formula: "normal: avg >= 1.0 fc, min >= 0.1 fc; emergency 90-min end: avg >= 0.6 fc, min >= 0.06 fc; max/min <= 40:1; pass = all.",
+    edition: "The NFPA 101 Life Safety Code / IBC means-of-egress illumination requirements, by name.",
+    freeAccess: "The egress illumination minimums are in NFPA 101 and the IBC (NFPA publishes free-to-read access; many jurisdictions post the adopted IBC). The adopted edition and the AHJ govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Means-of-egress lighting check per NFPA 101 / IBC: normally the path averages at least 1.0 fc with a minimum of 0.1 fc; at the end of the 90-minute emergency (battery/generator) period the floor drops to 0.6 fc average and 0.06 fc minimum, and the maximum-to-minimum ratio must not exceed 40:1. A single dark spot below the minimum fails the path even when the average holds. This returns the pass/fail against the entered readings: the exact values and any local amendments depend on the adopted NFPA 101 / IBC edition and occupancy, and it does not size the emergency battery/inverter (a separate calc). A design aid; the adopted code edition and the AHJ govern.",
+    assumptions: [
+      { name: "Normal minimums", value: "1.0 fc average, 0.1 fc minimum along the egress path", source: "NFPA 101 / IBC" },
+      { name: "Emergency 90-min", value: "0.6 fc average, 0.06 fc minimum at the end of the 90-minute period", source: "NFPA 101 / IBC" },
+      { name: "40:1 ratio", value: "maximum-to-minimum must not exceed 40:1; verify the adopted edition", source: "scope of this tile" },
+    ],
+  },
   "point-illuminance": {
     formula: "distance = mount_height / cos(angle); E_fc = intensity_cd x cos(angle) / distance^2 = intensity_cd x cos(angle)^3 / mount_height^2; E_lux = E_fc x 10.764.",
     edition: "Point-by-point (inverse-square and cosine) method for horizontal illuminance from a source of known candlepower, IES Lighting Handbook / IESNA point method, by name.",

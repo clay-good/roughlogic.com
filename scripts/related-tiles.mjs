@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "lighting-light-loss-factor": ["lumen-method", "lux-to-footcandle", "lighting-uniformity-ratio", "lighting-density"],
+  "lighting-uniformity-ratio": ["lumen-method", "point-illuminance", "lighting-light-loss-factor", "egress-lighting-check"],
+  "egress-lighting-check": ["lumen-method", "lighting-uniformity-ratio", "standby-battery-sizing", "egress-capacity"],
   "labor-burden-rate": ["employer-payroll-tax", "equipment-hourly-rate", "overhead-recovery-rate", "time-and-materials"],
   "equipment-hourly-rate": ["cost-per-mile", "labor-burden-rate", "straight-line-depreciation", "overhead-recovery-rate"],
   "overhead-recovery-rate": ["labor-burden-rate", "equipment-hourly-rate", "markup", "markup-vs-margin"],

@@ -888,6 +888,9 @@ export const COMPUTE_MAP = {
   "neutral-demand-220-61": { module: "../../calc-service.js", fn: "computeNeutralDemand22061" },
   "motor-unbalance-derate": { module: "../../calc-powerquality.js", fn: "computeMotorUnbalanceDerate" },
   "point-illuminance": { module: "../../calc-elecdesign.js", fn: "computePointIlluminance" },
+  "lighting-light-loss-factor": { module: "../../calc-elecdesign.js", fn: "computeLightingLightLossFactor" },
+  "lighting-uniformity-ratio": { module: "../../calc-elecdesign.js", fn: "computeLightingUniformityRatio" },
+  "egress-lighting-check": { module: "../../calc-elecdesign.js", fn: "computeEgressLightingCheck" },
   "burial-depth-300-5": { module: "../../calc-references.js", fn: "computeBurialDepth3005" },
   "support-spacing": { module: "../../calc-references.js", fn: "computeSupportSpacing" },
   // spec-v179..v187 electrician second-pass batch

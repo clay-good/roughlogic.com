@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(elecdesign): land spec-v365..v367 -- 3 lighting light-loss / compliance tiles in calc-elecdesign.js; 833 -> 836 tiles, 0.128.0, 2026-07-03
+
+The lighting light-loss / compliance trio, thirty-first batch of the v275-v374 campaign: the maintained-light and code numbers the lumen-method tile assumes, all in the existing lazy `calc-elecdesign.js` (Group A); no new module, group, or dependency. Catalog **833 -> 836**, package **0.127.0 -> 0.128.0** (a minor). Proposed 2026-07-02.
+
+- **`lighting-light-loss-factor` (spec-v365).** LLF = product of the entered IES recovery factors, maintained = initial x LLF. Pinned: LLD 0.85 x LDD 0.90 x BF 0.95 -> 0.727, a 4,000 lm fixture holds 2,908 maintained; a clean LED system -> 0.884, a 22% higher output.
+- **`lighting-uniformity-ratio` (spec-v366).** avg/min, max/min, U0 = min/avg from a reading grid, against a target. Pinned: readings 50/45/60/55/40 fc -> 1.25/1.50, U0 0.80 (passes 3:1); a patchy 70/20/65/25/30 grid fails at 3.5 max/min the average hides. Takes the grid via `makeTextarea` (the multiline-inputs gate passes).
+- **`egress-lighting-check` (spec-v367).** NFPA 101 / IBC minimums: normal 1.0/0.1 fc, emergency 90-min end 0.6/0.06 fc, max/min <= 40:1. Pinned: a 1.2/0.15/3.0 fc corridor is compliant; a 0.05 fc dark spot at the emergency end fails the minimum even at a passing average.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the multiplicative stack, the ratios and pass/fail, the mode thresholds, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the IES light-loss and uniformity methods and the NFPA 101 / IBC egress minimums. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (`lighting-uniformity-ratio` hand-writes its renderer for the reading-grid `makeTextarea`; the other two use the `_simpleRenderer` factory, and `makeTextarea` joined the calc-elecdesign import); corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-elecdesign.js 5000 -> 8500. Housekeeping: home count 833 -> 836, README resynced (counts, Group A cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 60 appended. All gates green at the new state: lint, unit tests (**5,129**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(accounting): land spec-v362..v364 -- 3 contractor cost-recovery tiles in calc-accounting.js; 830 -> 833 tiles, 0.127.0, 2026-07-03
 
 The contractor cost-recovery trio, thirtieth batch of the v275-v374 campaign: the bid-rate numbers a contractor builds from wages, iron, and overhead, all in the existing lazy `calc-accounting.js` (Group R); no new module, group, or dependency. Catalog **830 -> 833**, package **0.126.0 -> 0.127.0** (a minor). Proposed 2026-07-02.
