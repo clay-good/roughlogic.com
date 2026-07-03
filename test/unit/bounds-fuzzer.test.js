@@ -13887,3 +13887,66 @@ test("bounds: spec-v307 computePumpSpecificSpeed pins the radial case, the H^3/4
   assert.ok("error" in _v307({ n_rpm: 1750, q_gpm: 500, h_ft: 0 }));
   assert.ok("error" in _v307({ n_rpm: NaN, q_gpm: 500, h_ft: 100 }));
 });
+
+// ===================== spec-v308..v310 geotechnical depth-2 batch =====================
+import { computeSoilConsolidationSettlement as _v308, computeFootingEccentricPressure as _v309, computeBoussinesqSurchargeWall as _v310 } from "../../calc-geotech.js";
+
+test("bounds: spec-v308 computeSoilConsolidationSettlement pins the settlement, the log-ratio behavior, and error seams", () => {
+  const r = _v308({ cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: 1000 });
+  assert.ok(Math.abs(r.sc_in - 0.25 * 10 / 1.90 * Math.log10(3000 / 2000) * 12) < 1e-6);
+  assert.ok(Math.abs(r.sc_in - 2.78) < 0.02);
+  // Doubling the increment is NOT double the settlement (log of the ratio).
+  const r2 = _v308({ cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: 2000 });
+  assert.ok(r2.sc_in < 2 * r.sc_in);
+  assert.ok(Math.abs(r2.sc_in - 4.75) < 0.02);
+  // Error seams.
+  assert.ok("error" in _v308({ cc: 0, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
+  assert.ok("error" in _v308({ cc: 0.25, h_ft: 0, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
+  assert.ok("error" in _v308({ cc: 0.25, h_ft: 10, e0: -1, sig0_psf: 2000, dsig_psf: 1000 }));
+  assert.ok("error" in _v308({ cc: 0.25, h_ft: 10, e0: 0.9, sig0_psf: 0, dsig_psf: 1000 }));
+  assert.ok("error" in _v308({ cc: Infinity, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
+});
+
+test("bounds: spec-v309 computeFootingEccentricPressure pins the kern branch flip, the outside-kern triangle, and error seams", () => {
+  const r = _v309({ p_kip: 60, m_kft: 60, b_ft: 8, l_ft: 8 });
+  assert.strictEqual(r.e_ft, 1);
+  assert.ok(Math.abs(r.q_max_ksf - 60 / 64 * 1.75) < 1e-9);
+  assert.ok(Math.abs(r.q_min_ksf - 60 / 64 * 0.25) < 1e-9);
+  assert.ok(r.kern_status.startsWith("inside"));
+  // Outside the kern: triangular bearing, q_min = 0, reduced length.
+  const r2 = _v309({ p_kip: 60, m_kft: 120, b_ft: 8, l_ft: 8 });
+  assert.strictEqual(r2.e_ft, 2);
+  assert.strictEqual(r2.q_min_ksf, 0);
+  assert.ok(Math.abs(r2.q_max_ksf - 2.5) < 1e-9);
+  assert.ok(Math.abs(r2.bearing_len_ft - 6) < 1e-9);
+  assert.ok(r2.kern_status.startsWith("outside"));
+  // Exactly at e = B/6 the inside branch still applies (q_min = 0).
+  const r3 = _v309({ p_kip: 60, m_kft: 80, b_ft: 8, l_ft: 8 }); // e = 1.333 = B/6
+  assert.ok(r3.kern_status.startsWith("inside"));
+  assert.ok(Math.abs(r3.q_min_ksf) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v309({ p_kip: 0, m_kft: 60, b_ft: 8, l_ft: 8 }));
+  assert.ok("error" in _v309({ p_kip: 60, m_kft: 60, b_ft: 0, l_ft: 8 }));
+  assert.ok("error" in _v309({ p_kip: 60, m_kft: 300, b_ft: 8, l_ft: 8 })); // e >= B/2 overturns
+  assert.ok("error" in _v309({ p_kip: NaN, m_kft: 60, b_ft: 8, l_ft: 8 }));
+});
+
+test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the setback behavior, and error seams", () => {
+  const r = _v310({ ql_plf: 1000, h_ft: 10, x_ft: 4, z_ft: 3 });
+  assert.ok(Math.abs(r.m_ratio - 0.4) < 1e-9);
+  assert.ok(Math.abs(r.n_ratio - 0.3) < 1e-9);
+  assert.ok(Math.abs(r.sigma_h_psf - 97.4) < 0.2); // m <= 0.4 branch
+  // The two branches agree near m = 0.4 (continuity).
+  const rEdge = _v310({ ql_plf: 1000, h_ft: 10, x_ft: 4.1, z_ft: 3 });
+  assert.ok(Math.abs(rEdge.sigma_h_psf - r.sigma_h_psf) < 2);
+  // A load set farther back pushes less.
+  const r2 = _v310({ ql_plf: 1000, h_ft: 10, x_ft: 6, z_ft: 3 });
+  assert.ok(r2.sigma_h_psf < r.sigma_h_psf);
+  assert.ok(Math.abs(r2.sigma_h_psf - 68.3) < 0.2);
+  // Error seams.
+  assert.ok("error" in _v310({ ql_plf: 0, h_ft: 10, x_ft: 4, z_ft: 3 }));
+  assert.ok("error" in _v310({ ql_plf: 1000, h_ft: 0, x_ft: 4, z_ft: 3 }));
+  assert.ok("error" in _v310({ ql_plf: 1000, h_ft: 10, x_ft: 0, z_ft: 3 }));
+  assert.ok("error" in _v310({ ql_plf: 1000, h_ft: 10, x_ft: 4, z_ft: 12 })); // z > H
+  assert.ok("error" in _v310({ ql_plf: Infinity, h_ft: 10, x_ft: 4, z_ft: 3 }));
+});

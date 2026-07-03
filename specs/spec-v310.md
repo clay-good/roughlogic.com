@@ -1,6 +1,6 @@
 # roughlogic.com Specification v310 -- Surcharge Lateral Pressure on a Wall from a Line Load (Boussinesq, NAVFAC DM-7) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v308..v310 (the geotechnical depth-2 trio -- consolidation
+> **Status: LANDED (2026-07-03, package 0.109.0; proposed 2026-07-02). Batch spec-v308..v310 (the geotechnical depth-2 trio -- consolidation
 > (v308), eccentric footing pressure (v309), the surcharge lateral pressure (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `lateral-earth-pressure` adds a uniform surcharge as
 > a constant `Ka q` over the wall, but a concentrated surface load -- a footing, a wheel line, a crane outrigger set back

@@ -959,6 +959,10 @@ const RELATED = {
   "reynolds-number-pipe": ["friction-loss","pipe-velocity","refrigerant-velocity"],
   "hydronic-gpm-deltat": ["radiant-loop-sizing","pump-tdh","chiller-tons"],
   "pump-specific-speed": ["pump-tdh","pump-operating-point","affinity-laws"],
+  // spec-v308..v310 geotechnical depth-2 batch (Group E)
+  "soil-consolidation-settlement": ["soil-settlement-elastic","soil-bearing-capacity","pile-axial-capacity"],
+  "footing-eccentric-pressure": ["soil-bearing-capacity","retaining-wall-stability","footing-area"],
+  "boussinesq-surcharge-wall": ["lateral-earth-pressure","retaining-wall-stability","footing-eccentric-pressure"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

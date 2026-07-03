@@ -28871,6 +28871,90 @@
       "outputs": {
         "ns": { "value": 3500, "tolerance": { "pct": 0.2 } }
       }
+    },
+    {
+      "tile_id": "soil-consolidation-settlement",
+      "source_publisher": "Terzaghi primary consolidation (Das / NAVFAC)",
+      "source_title": "10 ft NC clay, Cc 0.25, e0 0.90, sig0 2,000, dsig 1,000 psf -> 2.78 in",
+      "source_edition_or_year": "spec-v308 worked example (machine-verified)",
+      "source_section_or_page": "spec-v308 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cc": 0.25, "h_ft": 10, "e0": 0.90, "sig0_psf": 2000, "dsig_psf": 1000 },
+      "outputs": {
+        "sc_in": { "value": 2.78, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "soil-consolidation-settlement",
+      "source_publisher": "Terzaghi primary consolidation (Das / NAVFAC)",
+      "source_title": "cross-check: double the load increment to 2,000 psf -> 4.75 in (log-ratio, not double)",
+      "source_edition_or_year": "spec-v308 worked example (machine-verified)",
+      "source_section_or_page": "spec-v308 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cc": 0.25, "h_ft": 10, "e0": 0.90, "sig0_psf": 2000, "dsig_psf": 2000 },
+      "outputs": {
+        "sc_in": { "value": 4.75, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "footing-eccentric-pressure",
+      "source_publisher": "Eccentric footing bearing pressure (kern rule)",
+      "source_title": "60 kip on 8x8 ft footing, e 1 ft (inside kern 1.33) -> 0.23 to 1.64 ksf",
+      "source_edition_or_year": "spec-v309 worked example (machine-verified)",
+      "source_section_or_page": "spec-v309 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "p_kip": 60, "m_kft": 60, "b_ft": 8, "l_ft": 8 },
+      "outputs": {
+        "e_ft": { "value": 1, "tolerance": { "abs": 0.001 } },
+        "q_max_ksf": { "value": 1.64, "tolerance": { "pct": 0.5 } },
+        "q_min_ksf": { "value": 0.234, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "footing-eccentric-pressure",
+      "source_publisher": "Eccentric footing bearing pressure (outside kern)",
+      "source_title": "cross-check: push e to 2 ft (outside kern) -> triangle over 6 ft, q_max 2.5 ksf, q_min 0",
+      "source_edition_or_year": "spec-v309 worked example (machine-verified)",
+      "source_section_or_page": "spec-v309 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "p_kip": 60, "m_kft": 120, "b_ft": 8, "l_ft": 8 },
+      "outputs": {
+        "q_max_ksf": { "value": 2.5, "tolerance": { "pct": 0.5 } },
+        "q_min_ksf": { "value": 0, "tolerance": { "abs": 0.001 } },
+        "bearing_len_ft": { "value": 6, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "boussinesq-surcharge-wall",
+      "source_publisher": "NAVFAC DM-7.2 modified Boussinesq",
+      "source_title": "1,000 lb/ft line, 4 ft back from a 10 ft wall (m 0.4), z 3 ft (n 0.3) -> 97.4 psf",
+      "source_edition_or_year": "spec-v310 worked example (machine-verified)",
+      "source_section_or_page": "spec-v310 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ql_plf": 1000, "h_ft": 10, "x_ft": 4, "z_ft": 3 },
+      "outputs": {
+        "m_ratio": { "value": 0.4, "tolerance": { "abs": 0.001 } },
+        "n_ratio": { "value": 0.3, "tolerance": { "abs": 0.001 } },
+        "sigma_h_psf": { "value": 97.4, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "boussinesq-surcharge-wall",
+      "source_publisher": "NAVFAC DM-7.2 modified Boussinesq",
+      "source_title": "cross-check: move the load back to x 6 ft (m 0.6) -> 68.3 psf (less, deeper peak)",
+      "source_edition_or_year": "spec-v310 worked example (machine-verified)",
+      "source_section_or_page": "spec-v310 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ql_plf": 1000, "h_ft": 10, "x_ft": 6, "z_ft": 3 },
+      "outputs": {
+        "sigma_h_psf": { "value": 68.3, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

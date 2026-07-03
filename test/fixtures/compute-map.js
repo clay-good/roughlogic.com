@@ -675,6 +675,10 @@ export const COMPUTE_MAP = {
   "reynolds-number-pipe": { module: "../../calc-hvac.js", fn: "computeReynoldsNumberPipe" },
   "hydronic-gpm-deltat": { module: "../../calc-hvac.js", fn: "computeHydronicGpmDeltat" },
   "pump-specific-speed": { module: "../../calc-hvac.js", fn: "computePumpSpecificSpeed" },
+  // spec-v308..v310 geotechnical depth-2 batch (3 tiles)
+  "soil-consolidation-settlement": { module: "../../calc-geotech.js", fn: "computeSoilConsolidationSettlement" },
+  "footing-eccentric-pressure": { module: "../../calc-geotech.js", fn: "computeFootingEccentricPressure" },
+  "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", fn: "computeBoussinesqSurchargeWall" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

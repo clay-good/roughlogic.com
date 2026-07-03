@@ -1,6 +1,6 @@
 # roughlogic.com Specification v308 -- Primary Consolidation Settlement of Normally-Consolidated Clay (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v308..v310 (the geotechnical depth-2 trio -- the settlement
+> **Status: LANDED (2026-07-03, package 0.109.0; proposed 2026-07-02). Batch spec-v308..v310 (the geotechnical depth-2 trio -- the settlement
 > and pressure cases the first geotech batch deferred: primary consolidation of clay (this spec, the time-dependent
 > settlement `soil-settlement-elastic` names as separate), the eccentric footing bearing pressure (v309), and the surcharge
 > lateral pressure on a wall (v310).)**

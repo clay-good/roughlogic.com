@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): land spec-v308..v310 -- 3 geotechnical depth-2 tiles in calc-geotech.js; 776 -> 779 tiles, 0.109.0, 2026-07-03
+
+The geotechnical depth-2 trio, twelfth batch of the v275-v374 campaign: the settlement and pressure cases the first geotech batch deferred, all in the existing lazy `calc-geotech.js` (Group E); no new module, group, or dependency. Catalog **776 -> 779**, package **0.108.0 -> 0.109.0** (a minor). Proposed 2026-07-02.
+
+- **`soil-consolidation-settlement` (spec-v308).** The Terzaghi primary consolidation Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0) `soil-settlement-elastic` names separate. Pinned: a 10 ft NC clay under a 1,000 psf load -> 2.78 in; doubling the increment only reaches 4.75 in (log of the stress ratio, not double).
+- **`footing-eccentric-pressure` (spec-v309).** The kern-check bearing pressure: trapezoidal q = (P/BL)(1 +/- 6e/B) while e <= B/6, triangular q_max = 2P/(3L(B/2 - e)) past it. Pinned: 60 kip on an 8x8 ft footing at e 1 ft -> 0.23 to 1.64 ksf full-bearing; e 2 ft lifts the heel to a 6 ft triangle spiking to 2.5 ksf. The fuzzer pins the branch flip and the e >= B/2 overturn seam.
+- **`boussinesq-surcharge-wall` (spec-v310).** The NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure, doubled for a rigid wall, with the m <= 0.4 and m > 0.4 branches. Pinned: a 1,000 lb/ft line 4 ft back from a 10 ft wall at 3 ft depth -> 97.4 psf; the fuzzer pins branch continuity near m = 0.4 and the load-setback falloff.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the log-ratio behavior, the kern branch flip, the two Boussinesq branches and their continuity, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming Terzaghi/Das, the eccentric-footing kern rule, and NAVFAC DM-7.2. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 26 collision-checked aliases (the "toe pressure" term already lived on another tile and was skipped), `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-geotech 10000 -> 13500 (103.6% of the old cap). Housekeeping: home count 776 -> 779, README resynced (counts, correctness figures 1022/1025/1022, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 41 appended. All gates green at the new state: lint (**779 tiles / 56 modules / 801 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(hvac): land spec-v305..v307 -- 3 pump-and-fluid fundamentals tiles in calc-hvac.js; 773 -> 776 tiles, 0.108.0, 2026-07-03
 
 The pump-and-fluid fundamentals trio, eleventh batch of the v275-v374 campaign: the pieces the friction and pump tiles use internally but never expose, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **773 -> 776**, package **0.107.0 -> 0.108.0** (a minor). Proposed 2026-07-02.

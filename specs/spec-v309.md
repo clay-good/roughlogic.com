@@ -1,6 +1,6 @@
 # roughlogic.com Specification v309 -- Eccentric Footing Bearing Pressure and Kern Check (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v308..v310 (the geotechnical depth-2 trio -- consolidation
+> **Status: LANDED (2026-07-03, package 0.109.0; proposed 2026-07-02). Batch spec-v308..v310 (the geotechnical depth-2 trio -- consolidation
 > (v308), the eccentric footing pressure (this spec), the surcharge lateral pressure (v310)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `retaining-wall-stability` computes toe/heel pressure
 > for a wall, but a spread footing under a column carrying axial load plus moment (or an eccentric load) has the same

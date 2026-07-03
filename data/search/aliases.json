@@ -11767,6 +11767,136 @@
       "term": "pump geometry",
       "target": "pump-specific-speed",
       "kind": "adjacent"
+    },
+    {
+      "term": "consolidation settlement",
+      "target": "soil-consolidation-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "primary consolidation",
+      "target": "soil-consolidation-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "clay settlement",
+      "target": "soil-consolidation-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "compression index",
+      "target": "soil-consolidation-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "cc settlement",
+      "target": "soil-consolidation-settlement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "void ratio settlement",
+      "target": "soil-consolidation-settlement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "long term settlement",
+      "target": "soil-consolidation-settlement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "terzaghi consolidation",
+      "target": "soil-consolidation-settlement",
+      "kind": "industry"
+    },
+    {
+      "term": "settlement of clay",
+      "target": "soil-consolidation-settlement",
+      "kind": "adjacent"
+    },
+    {
+      "term": "eccentric footing",
+      "target": "footing-eccentric-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "bearing pressure moment",
+      "target": "footing-eccentric-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "kern middle third",
+      "target": "footing-eccentric-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "footing pressure distribution",
+      "target": "footing-eccentric-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "q max q min footing",
+      "target": "footing-eccentric-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "6e over b",
+      "target": "footing-eccentric-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column moment footing",
+      "target": "footing-eccentric-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "resultant outside kern",
+      "target": "footing-eccentric-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "surcharge lateral pressure",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "boussinesq wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "line load on wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "navfac dm-7 surcharge",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "wall pressure from footing",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "adjacent"
+    },
+    {
+      "term": "point load lateral pressure",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "adjacent"
+    },
+    {
+      "term": "crane outrigger wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rigid wall surcharge",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lateral pressure setback",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "adjacent"
     }
   ]
 }

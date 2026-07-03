@@ -436,6 +436,8 @@ const _TILES = [
   ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
   // spec-v305..v307 pump-and-fluid fundamentals batch (calc-hvac.js Group C)
   ["reynolds-number-pipe", "C"], ["hydronic-gpm-deltat", "C"], ["pump-specific-speed", "C"],
+  // spec-v308..v310 geotechnical depth-2 batch (calc-geotech.js Group E)
+  ["soil-consolidation-settlement", "E"], ["footing-eccentric-pressure", "E"], ["boussinesq-surcharge-wall", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

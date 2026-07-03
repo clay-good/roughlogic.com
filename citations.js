@@ -7599,6 +7599,42 @@ export const CITATIONS = {
       { name: "Adjusted values", value: "Fc' enters carrying the column-stability Cp; Fb' carrying the beam-stability CL", source: "NDS 2018 3.7 / 3.3.3" },
     ],
   },
+  "soil-consolidation-settlement": {
+    formula: "Sc_ft = (Cc H / (1 + e0)) log10((sigma'0 + d_sigma) / sigma'0); Sc_in = 12 Sc_ft.",
+    edition: "The Terzaghi primary consolidation settlement of a normally-consolidated clay Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0), with the compression index Cc, as compiled in the Das and NAVFAC references, by name.",
+    freeAccess: "The primary-consolidation relation is a public soil-mechanics result; NAVFAC DM-7 is public-domain and free online.",
+    governance: GOVERNANCE.general,
+    editionNote: "The normally-consolidated primary consolidation Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0), the compression index Cc (often ~0.009(LL - 10) for remolded clay), and the note that an overconsolidated clay uses the recompression index Cr below the preconsolidation stress. This returns the primary consolidation settlement of a single normally-consolidated clay layer - it is not the immediate elastic settlement or the secondary (creep) settlement, assumes the clay is normally consolidated (an OC clay straddling the preconsolidation stress needs the two-part Cr/Cc form), uses one representative mid-layer stress (sublayer the profile for accuracy), and gives no time rate (that needs the coefficient of consolidation). A design aid, not a substitute for the geotechnical engineer of record's report.",
+    assumptions: [
+      { name: "NC consolidation", value: "Sc = (Cc H/(1 + e0)) log10 of the effective-stress ratio at mid-layer", source: "Terzaghi / Das" },
+      { name: "Compression index", value: "Cc, often ~0.009(LL - 10) for remolded clay; OC clay uses Cr below the preconsolidation stress", source: "soil-mechanics references" },
+      { name: "Scope", value: "single NC layer, one mid-layer stress, no time rate or secondary creep", source: "scope of this tile" },
+    ],
+  },
+  "footing-eccentric-pressure": {
+    formula: "e = M/P; e <= B/6: q = (P/BL)(1 +/- 6e/B); e > B/6: q_max = 2P/(3L(B/2 - e)), q_min = 0, bearing length = 3(B/2 - e).",
+    edition: "The eccentric spread-footing bearing-pressure relations - the middle-third (kern) trapezoidal form and the resultant-outside-kern triangular form - a standard foundation-engineering result, by name.",
+    freeAccess: "The eccentric-footing pressure relations and the middle-third rule are public foundation-engineering results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The middle-third rule q = (P/BL)(1 +/- 6e/B) for e <= B/6 and the resultant-outside-kern q_max = 2P/(3L(B/2 - e)), q_min = 0 for e > B/6, with e = M/P. This returns the service bearing pressure distribution under a one-way eccentric or axial-plus-moment load - it covers uniaxial eccentricity (a biaxial ex, ey load needs the two-way form), assumes a rigid footing on a linear-elastic soil (no soil-model refinement), and does not check the allowable bearing, settlement, or the footing's own flexure/shear. A design aid, not a substitute for the structural/geotechnical engineer of record's design.",
+    assumptions: [
+      { name: "Kern rule", value: "trapezoidal q = (P/BL)(1 +/- 6e/B) while e <= B/6 (full bearing)", source: "foundation engineering" },
+      { name: "Outside kern", value: "heel lifts to a triangle over 3(B/2 - e) with q_max = 2P/(3L(B/2 - e))", source: "foundation engineering" },
+      { name: "Scope", value: "uniaxial eccentricity, rigid footing; allowable bearing and settlement are separate", source: "scope of this tile" },
+    ],
+  },
+  "boussinesq-surcharge-wall": {
+    formula: "m = x/H, n = z/H; m <= 0.4: sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2; m > 0.4: sigma_h = (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2.",
+    edition: "The NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure on a rigid wall, the doubled elastic Boussinesq solution for an unyielding wall, by name.",
+    freeAccess: "NAVFAC DM-7.2 is public-domain and free online; the modified-Boussinesq surcharge relations are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2 for m <= 0.4 and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 for m > 0.4, the doubling of the elastic Boussinesq solution for an unyielding (non-deflecting) rigid wall, and m = x/H, n = z/H. This returns the lateral pressure at a single depth from a line load parallel to the wall - it uses the rigid-wall (doubled) form (a flexible wall that can deflect sees roughly the un-doubled Boussinesq value), covers a line load (a point or strip load uses the companion NAVFAC forms), and does not integrate the resultant thrust and its point of application or add the at-rest/active earth pressure beneath it. A design aid, not a substitute for the geotechnical engineer of record's report.",
+    assumptions: [
+      { name: "Modified Boussinesq", value: "the two m-branch forms with m = x/H, n = z/H; doubled for a rigid non-deflecting wall", source: "NAVFAC DM-7.2" },
+      { name: "Line load", value: "a load per unit length parallel to the wall; point/strip loads use the companion forms", source: "NAVFAC DM-7.2" },
+      { name: "Single depth", value: "pressure at one z; the integrated resultant thrust is a separate step", source: "scope of this tile" },
+    ],
+  },
   "soil-settlement-elastic": {
     formula: "Se_ft = q B (1 - nu^2) Is / Es; Se_in = 12 Se_ft.",
     edition: "The theory-of-elasticity immediate (elastic) settlement of a shallow foundation, Se = q B (1 - nu^2) Is / Es, with the shape-and-rigidity influence factor Is (~0.82 rigid square, ~0.95 flexible-square average, larger for strips), as compiled in Bowles (Foundation Analysis and Design) and the customary geotechnical texts, by name.",

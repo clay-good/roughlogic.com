@@ -362,3 +362,131 @@ GEOTECH_RENDERERS["slope-stability-infinite"] = _simpleRenderer({
   ],
   compute: computeSlopeStabilityInfinite,
 });
+
+// ===================== spec-v308..v310: geotechnical depth-2 batch =====================
+// The settlement and pressure cases the first geotech batch deferred: primary
+// consolidation of clay (the time-dependent settlement soil-settlement-elastic
+// names separate), the eccentric footing bearing pressure and kern check, and
+// the concentrated (line-load) surcharge lateral pressure on a wall.
+
+// dims: in { cc: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2, dsig_psf: M L^-1 T^-2 } out: { sc_ft: L, sc_in: L }
+export function computeSoilConsolidationSettlement({ cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0, dsig_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
+  if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
+  if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
+  if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
+  if (dsig_psf < 0) return { error: "The stress increase cannot be negative (psf)." };
+  const sc_ft = (cc * h_ft / (1 + e0)) * Math.log10((sig0_psf + dsig_psf) / sig0_psf);
+  const sc_in = sc_ft * 12;
+  return {
+    sc_ft, sc_in,
+    note: "Terzaghi primary consolidation of a normally-consolidated clay Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0), with the compression index Cc (often ~0.009(LL - 10) for remolded clay); an overconsolidated clay uses the recompression index Cr below the preconsolidation stress. Because settlement grows with the log of the STRESS RATIO (not the stress), the first load increment is the costly one. Single normally-consolidated layer at one representative mid-layer stress (sublayer the profile for accuracy) - not the immediate elastic settlement, the secondary (creep) settlement, or the time rate (that needs the coefficient of consolidation). A design aid, not a substitute for the geotechnical engineer of record's report.",
+  };
+}
+export const soilConsolidationSettlementExample = { inputs: { cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: 1000 } };
+
+GEOTECH_RENDERERS["soil-consolidation-settlement"] = _simpleRenderer({
+  citation: "Citation: Terzaghi primary consolidation Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0) for a normally-consolidated clay, with the Cc/Cr distinction, as compiled in Das / NAVFAC, by name. Single NC layer, no time rate. A design aid, not a substitute for the geotechnical engineer's report.",
+  example: soilConsolidationSettlementExample.inputs,
+  fields: [
+    { key: "cc", label: "Compression index Cc", kind: "number" },
+    { key: "h_ft", label: "Clay layer thickness H (ft)", kind: "number" },
+    { key: "e0", label: "Initial void ratio e0", kind: "number" },
+    { key: "sig0_psf", label: "Initial effective stress at mid-layer (psf)", kind: "number" },
+    { key: "dsig_psf", label: "Stress increase from load (psf)", kind: "number" },
+  ],
+  outputs: [
+    { key: "sc", id: "scs-out-sc", label: "Primary consolidation settlement Sc", value: (r) => fmt(r.sc_in, 2) + " in (" + fmt(r.sc_ft, 4) + " ft)" },
+    { key: "n", id: "scs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSoilConsolidationSettlement,
+});
+
+// dims: in { p_kip: M L T^-2, m_kft: M L^2 T^-2, b_ft: L, l_ft: L } out: { e_ft: L, q_max_ksf: M L^-1 T^-2, q_min_ksf: M L^-1 T^-2, bearing_len_ft: L }
+export function computeFootingEccentricPressure({ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(p_kip > 0)) return { error: "Vertical load must be positive (kip)." };
+  if (m_kft < 0) return { error: "Enter the moment magnitude as non-negative (kip-ft)." };
+  if (!(b_ft > 0) || !(l_ft > 0)) return { error: "Footing dimensions must be positive (ft)." };
+  const e_ft = m_kft / p_kip;
+  const kern = b_ft / 6;
+  let q_max_ksf, q_min_ksf, bearing_len_ft, kern_status;
+  if (e_ft <= kern) {
+    const q_avg = p_kip / (b_ft * l_ft);
+    q_max_ksf = q_avg * (1 + (6 * e_ft) / b_ft);
+    q_min_ksf = q_avg * (1 - (6 * e_ft) / b_ft);
+    bearing_len_ft = b_ft;
+    kern_status = "inside the middle-third kern (e <= B/6): full trapezoidal bearing";
+  } else {
+    if (!(b_ft / 2 - e_ft > 0)) return { error: "The eccentricity reaches or passes the footing edge (e >= B/2) - the footing overturns." };
+    q_max_ksf = (2 * p_kip) / (3 * l_ft * (b_ft / 2 - e_ft));
+    q_min_ksf = 0;
+    bearing_len_ft = 3 * (b_ft / 2 - e_ft);
+    kern_status = "outside the kern (e > B/6): heel lifts, triangular bearing over the front " + fmt(bearing_len_ft, 2) + " ft";
+  }
+  return {
+    e_ft, kern, q_max_ksf, q_min_ksf, bearing_len_ft, kern_status,
+    note: "Rigid-footing bearing pressure under a one-way eccentric (axial + moment) load, e = M/P: while the resultant stays in the middle-third kern (e <= B/6) the pressure is trapezoidal, q = (P/BL)(1 +/- 6e/B); once e > B/6 the heel lifts and the pressure is a triangle over the reduced front length 3(B/2 - e) with q_min = 0 and q_max = 2P/(3L(B/2 - e)). Uniaxial eccentricity (a biaxial ex, ey load needs the two-way form), a rigid footing on linear-elastic soil - it does not check the allowable bearing (soil-bearing-capacity), settlement, or the footing's own flexure/shear. A design aid, not a substitute for the structural/geotechnical engineer of record's design.",
+  };
+}
+export const footingEccentricPressureExample = { inputs: { p_kip: 60, m_kft: 60, b_ft: 8, l_ft: 8 } };
+
+GEOTECH_RENDERERS["footing-eccentric-pressure"] = _simpleRenderer({
+  citation: "Citation: eccentric footing bearing pressure - the middle-third rule q = (P/BL)(1 +/- 6e/B) for e <= B/6, and the outside-kern triangle q_max = 2P/(3L(B/2 - e)), q_min = 0, with e = M/P, by name. Uniaxial, rigid footing. A design aid, not a substitute for the engineer of record.",
+  example: footingEccentricPressureExample.inputs,
+  fields: [
+    { key: "p_kip", label: "Vertical load P (kip)", kind: "number" },
+    { key: "m_kft", label: "Moment about the B axis M (kip-ft)", kind: "number" },
+    { key: "b_ft", label: "Footing width B, eccentricity direction (ft)", kind: "number" },
+    { key: "l_ft", label: "Footing length L (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "e", id: "fep-out-e", label: "Eccentricity e = M/P (kern B/6)", value: (r) => fmt(r.e_ft, 3) + " ft (kern " + fmt(r.kern, 2) + " ft)" },
+    { key: "qx", id: "fep-out-qx", label: "Maximum bearing pressure q_max", value: (r) => fmt(r.q_max_ksf, 2) + " ksf" },
+    { key: "qn", id: "fep-out-qn", label: "Minimum bearing pressure q_min", value: (r) => fmt(r.q_min_ksf, 2) + " ksf" },
+    { key: "k", id: "fep-out-k", label: "Kern status", value: (r) => r.kern_status },
+    { key: "n", id: "fep-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFootingEccentricPressure,
+});
+
+// dims: in { ql_plf: M T^-2, h_ft: L, x_ft: L, z_ft: L } out: { m_ratio: dimensionless, n_ratio: dimensionless, sigma_h_psf: M L^-1 T^-2 }
+export function computeBoussinesqSurchargeWall({ ql_plf = 0, h_ft = 0, x_ft = 0, z_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ql_plf > 0)) return { error: "Line load must be positive (lb/ft)." };
+  if (!(h_ft > 0)) return { error: "Wall height must be positive (ft)." };
+  if (!(x_ft > 0)) return { error: "Setback must be positive (ft)." };
+  if (z_ft < 0) return { error: "Depth cannot be negative (ft)." };
+  if (z_ft > h_ft) return { error: "Depth must be within the wall height (z <= H)." };
+  const m_ratio = x_ft / h_ft;
+  const n_ratio = z_ft / h_ft;
+  let sigma_h_psf;
+  if (m_ratio <= 0.4) {
+    sigma_h_psf = (0.203 * ql_plf / h_ft) * n_ratio / Math.pow(0.16 + n_ratio * n_ratio, 2);
+  } else {
+    sigma_h_psf = (1.28 * ql_plf / h_ft) * (m_ratio * m_ratio * n_ratio) / Math.pow(m_ratio * m_ratio + n_ratio * n_ratio, 2);
+  }
+  return {
+    m_ratio, n_ratio, sigma_h_psf,
+    note: "NAVFAC DM-7.2 modified-Boussinesq lateral pressure from a line load qL (parallel to the wall) at setback x, depth z, wall height H, with m = x/H, n = z/H: sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2 for m <= 0.4, and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 for m > 0.4 - the doubled elastic Boussinesq solution for an unyielding (non-deflecting) rigid wall (a flexible wall that can deflect sees roughly the un-doubled value). Pressure at a single depth from a line load - a point or strip load uses the companion NAVFAC forms; it does not integrate the resultant thrust and its point of application or add the earth pressure beneath it (lateral-earth-pressure). A design aid, not a substitute for the geotechnical engineer of record's report.",
+  };
+}
+export const boussinesqSurchargeWallExample = { inputs: { ql_plf: 1000, h_ft: 10, x_ft: 4, z_ft: 3 } };
+
+GEOTECH_RENDERERS["boussinesq-surcharge-wall"] = _simpleRenderer({
+  citation: "Citation: NAVFAC DM-7.2 modified-Boussinesq line-load lateral pressure sigma_h = (0.203 qL/H) n/(0.16 + n^2)^2 (m <= 0.4) and (1.28 qL/H)(m^2 n)/(m^2 + n^2)^2 (m > 0.4), the rigid-wall doubling, m = x/H, n = z/H, by name. Line load, single depth. A design aid, not a substitute for the geotechnical engineer's report.",
+  example: boussinesqSurchargeWallExample.inputs,
+  fields: [
+    { key: "ql_plf", label: "Line load qL (lb/ft, parallel to wall)", kind: "number" },
+    { key: "h_ft", label: "Wall height H (ft)", kind: "number" },
+    { key: "x_ft", label: "Setback of the load x (ft)", kind: "number" },
+    { key: "z_ft", label: "Depth to evaluate z (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "mn", id: "bsw-out-mn", label: "m = x/H / n = z/H", value: (r) => fmt(r.m_ratio, 3) + " / " + fmt(r.n_ratio, 3) },
+    { key: "sh", id: "bsw-out-sh", label: "Lateral pressure sigma_h", value: (r) => fmt(r.sigma_h_psf, 1) + " psf" },
+    { key: "n", id: "bsw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBoussinesqSurchargeWall,
+});

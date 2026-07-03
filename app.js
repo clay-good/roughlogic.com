@@ -454,6 +454,8 @@ const TOOL_MODULES = (() => {
     "soil-bearing-capacity", "lateral-earth-pressure", "retaining-wall-stability",
     // spec-v287..v289 foundation depth batch
     "soil-settlement-elastic", "pile-axial-capacity", "slope-stability-infinite",
+    // spec-v308..v310 geotechnical depth-2 batch
+    "soil-consolidation-settlement", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
   ]);
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio: a new lazy
   // Group E cluster, the masonry counterpart to the steel / RC member benches;
