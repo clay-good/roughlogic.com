@@ -27787,6 +27787,98 @@
         "r_factor": { "value": 0.2862, "tolerance": { "abs": 0.0001 } },
         "pa_kip": { "value": 14.0158, "tolerance": { "abs": 0.005 } }
       }
+    },
+    {
+      "tile_id": "diaphragm-shear",
+      "source_publisher": "AWC SDPWS flexible-diaphragm model (AWC/APA design guides, WoodWorks example)",
+      "source_title": "192 x 120 ft diaphragm at 516 plf -> V 49,536 lb, unit shear 413 plf (the WoodWorks value), chord 19.8 kip",
+      "source_edition_or_year": "spec-v272 worked example (machine-verified)",
+      "source_section_or_page": "spec-v272 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "w_plf": 516, "l_ft": 192, "b_ft": 120 },
+      "outputs": {
+        "v_end_lb": { "value": 49536.0, "tolerance": { "abs": 0.01 } },
+        "v_plf": { "value": 412.8, "tolerance": { "abs": 0.01 } },
+        "m_ftlb": { "value": 2377728.0, "tolerance": { "abs": 0.5 } },
+        "chord_kip": { "value": 19.8144, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "diaphragm-shear",
+      "source_publisher": "AWC SDPWS flexible-diaphragm model (AWC/APA design guides)",
+      "source_title": "cross-check: narrow the depth to 60 ft -> unit shear and chord both exactly double (the 1/b dependence)",
+      "source_edition_or_year": "spec-v272 worked example (machine-verified)",
+      "source_section_or_page": "spec-v272 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "w_plf": 516, "l_ft": 192, "b_ft": 60 },
+      "outputs": {
+        "v_plf": { "value": 825.6, "tolerance": { "abs": 0.01 } },
+        "chord_kip": { "value": 39.6288, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "shearwall-overturning",
+      "source_publisher": "AWC SDPWS segmented shear wall + ASCE 7 0.6D ASD overturning (AWC/APA design guides)",
+      "source_title": "8 ft wall, 8 kip story shear at 10 ft, 3,000 lb dead -> 1,000 plf unit shear, 9.1 kip net holdown tension",
+      "source_edition_or_year": "spec-v273 worked example (machine-verified)",
+      "source_section_or_page": "spec-v273 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "v_lb": 8000, "b_ft": 8, "h_ft": 10, "w_lb": 3000 },
+      "outputs": {
+        "v_plf": { "value": 1000.0, "tolerance": { "abs": 0.01 } },
+        "mot_ftlb": { "value": 80000.0, "tolerance": { "abs": 0.01 } },
+        "mr_ftlb": { "value": 7200.0, "tolerance": { "abs": 0.01 } },
+        "t_lb": { "value": 9100.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "shearwall-overturning",
+      "source_publisher": "AWC SDPWS segmented shear wall + ASCE 7 0.6D ASD overturning (AWC/APA design guides)",
+      "source_title": "cross-check: raise the tributary dead load to 20,000 lb -> gravity offsets the couple, holdown falls to 4.0 kip",
+      "source_edition_or_year": "spec-v273 worked example (machine-verified)",
+      "source_section_or_page": "spec-v273 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "v_lb": 8000, "b_ft": 8, "h_ft": 10, "w_lb": 20000 },
+      "outputs": {
+        "mr_ftlb": { "value": 48000.0, "tolerance": { "abs": 0.01 } },
+        "t_lb": { "value": 4000.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "shearwall-deflection",
+      "source_publisher": "AWC SDPWS Equation 4.3-1 (AWC/APA design guides)",
+      "source_title": "10 x 8 ft wall at 400 plf, 4x4 DF-L posts, Ga 15, da 0.15 -> 0.020 + 0.267 + 0.188 = 0.47 in, 0.40% drift",
+      "source_edition_or_year": "spec-v274 worked example (machine-verified)",
+      "source_section_or_page": "spec-v274 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "v_plf": 400, "h_ft": 10, "b_ft": 8, "e_psi": 1600000, "a_in2": 12.25, "ga_kin": 15, "da_in": 0.15 },
+      "outputs": {
+        "bend_in": { "value": 0.0204, "tolerance": { "abs": 0.0001 } },
+        "shear_in": { "value": 0.2667, "tolerance": { "abs": 0.0001 } },
+        "anchor_in": { "value": 0.1875, "tolerance": { "abs": 0.0001 } },
+        "delta_in": { "value": 0.4746, "tolerance": { "abs": 0.0005 } }
+      }
+    },
+    {
+      "tile_id": "shearwall-deflection",
+      "source_publisher": "AWC SDPWS Equation 4.3-1 (AWC/APA design guides)",
+      "source_title": "cross-check: double the height to 20 ft -> bending h^3 term x8, shear and anchorage x2, delta 1.07 in",
+      "source_edition_or_year": "spec-v274 worked example (machine-verified)",
+      "source_section_or_page": "spec-v274 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-02",
+      "inputs": { "v_plf": 400, "h_ft": 20, "b_ft": 8, "e_psi": 1600000, "a_in2": 12.25, "ga_kin": 15, "da_in": 0.15 },
+      "outputs": {
+        "bend_in": { "value": 0.1633, "tolerance": { "abs": 0.0001 } },
+        "shear_in": { "value": 0.5333, "tolerance": { "abs": 0.0001 } },
+        "anchor_in": { "value": 0.375, "tolerance": { "abs": 0.0001 } },
+        "delta_in": { "value": 1.0716, "tolerance": { "abs": 0.0005 } }
+      }
     }
   ]
 }

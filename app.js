@@ -435,6 +435,13 @@ const TOOL_MODULES = (() => {
   declare("./calc-masonry.js", "MASONRY_RENDERERS", [
     "cmu-wall-flexure", "cmu-shear-wall", "cmu-wall-axial",
   ]);
+  // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio: a new
+  // lazy Group E cluster closing the load path from seismic-base-shear /
+  // wind-pressure into the wood diaphragm, shear wall, and drift. All three
+  // KEEP group "E" (module independent of group letter).
+  declare("./calc-lateral.js", "LATERAL_RENDERERS", [
+    "diaphragm-shear", "shearwall-overturning", "shearwall-deflection",
+  ]);
   // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
   // moved out of calc-construction.js (it sat at 97.6% of its size cap) into
   // its own module. All five tiles KEEP group "E" (the module is independent

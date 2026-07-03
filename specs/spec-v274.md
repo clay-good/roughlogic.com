@@ -1,6 +1,6 @@
 # roughlogic.com Specification v274 -- Wood Shear Wall Deflection (SDPWS Three-Term Equation 4.3-1) (calc-lateral.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v272..v274 (the SDPWS wood lateral-force-resisting-system trio -- diaphragm
+> **Status: LANDED (2026-07-02, package 0.97.0; was PROPOSED 2026-07-02). Batch spec-v272..v274 (the SDPWS wood lateral-force-resisting-system trio -- diaphragm
 > (v272), shear wall (v273), deflection (this spec)). This spec closes the trio with the serviceability limit state: after
 > the diaphragm distributes the force and the shear wall carries it, how far does that wall actually deflect at the top --
 > the story drift the code caps.)**

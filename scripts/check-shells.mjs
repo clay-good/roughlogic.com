@@ -46,7 +46,10 @@ const TILE_GZIP_CAP = 6 * 1024;
 // concrete batches grew Group E (Construction) past Group A as the largest hub;
 // the v257..v259 reinforced-concrete trio took construction/index.html to
 // ~17.8 KB gz; 20 KB restores ~12% headroom for further Group E growth.
-const GROUP_GZIP_CAP = 20 * 1024;
+// Bumped 20 -> 24 KB later on 2026-07-02: the geotech (v260..v262), masonry
+// (v269..v271), and wood-lateral (v272..v274) trios -- all Group E -- took
+// construction/index.html to ~20.5 KB gz; 24 KB restores ~17% headroom.
+const GROUP_GZIP_CAP = 24 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

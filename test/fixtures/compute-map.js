@@ -723,6 +723,10 @@ export const COMPUTE_MAP = {
   "cmu-wall-flexure": { module: "../../calc-masonry.js", fn: "computeCmuWallFlexure" },
   "cmu-shear-wall": { module: "../../calc-masonry.js", fn: "computeCmuShearWall" },
   "cmu-wall-axial": { module: "../../calc-masonry.js", fn: "computeCmuWallAxial" },
+  // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio (3 tiles, new calc-lateral.js)
+  "diaphragm-shear": { module: "../../calc-lateral.js", fn: "computeDiaphragmShear" },
+  "shearwall-overturning": { module: "../../calc-lateral.js", fn: "computeShearwallOverturning" },
+  "shearwall-deflection": { module: "../../calc-lateral.js", fn: "computeShearwallDeflection" },
   // spec-v248..v250 fire-sprinkler system-design trio (3 tiles, new calc-firesprinkler.js)
   "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
   "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },

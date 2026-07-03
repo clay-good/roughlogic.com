@@ -7816,6 +7816,42 @@ export const CITATIONS = {
       { name: "Concentric only", value: "pure axial with no moment interaction; eccentric or combined loading runs through the unity check with the flexure tile", source: "TMS 402-16" },
     ],
   },
+  "diaphragm-shear": {
+    formula: "V = w L / 2; v = w L / (2 b); M = w L^2 / 8; chord T = C = M / b.",
+    edition: "The AWC Special Design Provisions for Wind and Seismic (SDPWS) simple-span flexible-diaphragm deep-beam model, as compiled in the AWC/APA engineered-wood-diaphragm design guides, by name.",
+    freeAccess: "AWC SDPWS is viewable free of charge through AWC's online reader; the deep-beam w L / (2 b) arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AWC SDPWS simple-span flexible-diaphragm model - the diaphragm as a deep horizontal beam with maximum unit shear v = w L / (2 b) at the supports and chord force T = C = M / b from the maximum moment M = w L^2 / 8 - as compiled in the AWC/APA engineered-wood-diaphragm design guides. Returns the maximum service-level unit shear and chord force of a simple-span, uniformly loaded flexible diaphragm: it assumes the diaphragm spans between two parallel resisting lines under a uniform load, is the flexible-diaphragm (tributary-area) distribution rather than a rigid-diaphragm (relative-stiffness) one, and does not add the collector / drag-strut force at intermediate lines, the diaphragm deflection, or openings. The unit shear is compared against the SDPWS nominal capacity for the chosen sheathing and nailing (with the ASD reduction or the seismic factor). A design aid, not a substitute for the engineer of record's stamped lateral design - the structural engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Simple-span flexible model", value: "uniform load between two parallel resisting lines with tributary-area distribution; a rigid-diaphragm relative-stiffness distribution and multi-span or cantilever diaphragms are separate analyses", source: "AWC SDPWS" },
+      { name: "Collectors and openings separate", value: "drag-strut / collector forces at intermediate lines, diaphragm deflection, and openings each have their own checks", source: "AWC/APA design guides" },
+      { name: "Compare to the nailing schedule", value: "the unit shear is checked against the SDPWS nominal capacity for the sheathing and nailing, with the ASD reduction or seismic factor applied", source: "AWC SDPWS Tables 4.2A-4.2D" },
+    ],
+  },
+  "shearwall-overturning": {
+    formula: "v = V / b; Mot = V h; Mr = 0.6 W (b/2); T = max((Mot - Mr) / b, 0).",
+    edition: "The AWC SDPWS segmented shear-wall model with the ASCE 7 / IBC 0.6D allowable-stress overturning check, as compiled in the AWC/APA wood-frame shear-wall design guides, by name.",
+    freeAccess: "AWC SDPWS is viewable free of charge through AWC's online reader; the unit-shear and overturning-couple arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AWC SDPWS segmented shear-wall model with the ASCE 7 / IBC allowable-stress overturning check: unit shear v = V / b, overturning moment Mot = V h resisted by 0.6 times the dead-load moment W x (b/2) per the 0.6D + 0.7E ASD load combination, net holdown tension T = (V h - 0.6 W b/2) / b, as compiled in the AWC/APA wood-frame shear-wall design guides. Returns the service-level unit shear and net holdown uplift of a single fully sheathed shear-wall segment. Uses the 0.6D resisting dead load of the ASD seismic combination (use the wind combination's factor where wind governs); W is the dead load tributary to and acting on the wall (not the whole floor); the wall is segmented (not force-transfer-around-openings or perforated). When 0.6D stabilizes the wall the uplift clamps to zero - no holdown is required for overturning, though sill anchorage and shear transfer still govern. The unit shear is compared against the SDPWS nominal capacity for the chosen sheathing and nailing; the compression-chord bearing check is separate. A design aid, not a substitute for the engineer of record's stamped lateral design - the structural engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "0.6D ASD combination", value: "the resisting dead load is factored 0.6 per the ASD 0.6D + 0.7E combination; where wind governs, use the wind combination's factors", source: "ASCE 7 §2.4 / IBC" },
+      { name: "Segmented wall", value: "a single fully sheathed segment with the holdown at its end; perforated and force-transfer-around-openings walls distribute differently", source: "AWC SDPWS §4.3" },
+      { name: "Companion checks separate", value: "sill anchor-bolt shear, compression-chord bearing, and the sheathing nailing selection are separate checks", source: "AWC/APA design guides" },
+    ],
+  },
+  "shearwall-deflection": {
+    formula: "delta = 8 v h^3 / (E A b) + v h / (1000 Ga) + h da / b (unit-specific: v plf, h/b ft, E psi, A in^2, Ga kips/in, da/delta in).",
+    edition: "The AWC SDPWS Equation 4.3-1 three-term shear-wall deflection (the apparent-shear-stiffness Ga linearization of the legacy four-term form), as compiled in the AWC/APA wood-frame shear-wall design guides, by name.",
+    freeAccess: "AWC SDPWS is viewable free of charge through AWC's online reader; the three-term equation and the Table 4.3A/4.3B Ga values are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AWC SDPWS Equation 4.3-1 three-term shear-wall deflection delta = 8 v h^3 / (E A b) + v h / (1000 Ga) + h da / b - the linearized (apparent-shear-stiffness Ga) form of the legacy four-term equation, its terms being end-post bending, combined panel-shear-and-nail-slip, and anchorage rotation - in the unit-specific convention (v in plf, h and b in ft, E in psi, A in in^2, Ga in kips/in, da and delta in inches; the equation is calibrated, so the tool does not rescale), as compiled in the AWC/APA wood-frame shear-wall design guides. Returns the top-of-wall deflection of a single segmented shear wall at the given service (ASD) unit shear. Ga is the tabulated apparent shear stiffness for the chosen sheathing and nailing (SDPWS Table 4.3A/4.3B, the seismic column); da is the total vertical anchorage elongation (holdown deformation, plate crushing, rod stretch and shrinkage) at that shear; the segmented-wall form, not the perforated or force-transfer-around-openings deflection. Compare against the ASCE 7 allowable story drift. A design aid, not a substitute for the engineer of record's stamped lateral design - the structural engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Unit-specific calibrated equation", value: "Eq 4.3-1 is dimensionally non-homogeneous by construction (the leading 8 folds the ft-to-in conversion); enter the documented units exactly and do not rescale", source: "AWC SDPWS Eq 4.3-1" },
+      { name: "Tabulated Ga and measured da", value: "Ga comes from SDPWS Table 4.3A/4.3B for the sheathing and nailing; da is the holdown / anchorage elongation at the design shear from the manufacturer's data", source: "AWC SDPWS Tables 4.3A/4.3B" },
+      { name: "Drift limit separate", value: "the computed deflection is checked against the ASCE 7 allowable story drift (amplified by Cd/I where the strength-level force is used)", source: "ASCE 7 §12.12" },
+    ],
+  },
   "fire-pump-curve": {
     formula: "churn_limit = 1.40 x rated_psi; overload_flow = 1.50 x rated_gpm; overload_min = 0.65 x rated_psi; churn_ok = churn <= churn_limit; overload_ok = measured >= overload_min; margins as % of rated pressure.",
     edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022, by name; the 140% churn ceiling and the 65%-of-rated-at-150%-flow overload point are the listed centrifugal fire pump curve limits.",

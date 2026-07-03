@@ -1,6 +1,6 @@
 # roughlogic.com Specification v272 -- Flexible Wood Diaphragm Unit Shear and Chord Force (SDPWS) (calc-lateral.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v272..v274 (the SDPWS wood lateral-force-resisting-system trio -- how the
+> **Status: LANDED (2026-07-02, package 0.97.0; was PROPOSED 2026-07-02). Batch spec-v272..v274 (the SDPWS wood lateral-force-resisting-system trio -- how the
 > lateral force the building already knows how to *demand* actually gets carried by the wood framing that resists it: the
 > roof or floor diaphragm that collects the story force and spans it to the walls (this spec), the shear wall that takes
 > that force down to the foundation with its holdown (v273), and the drift that same wall deflects under it (v274).

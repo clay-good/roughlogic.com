@@ -13060,3 +13060,78 @@ test("bounds: spec-v271 computeCmuWallAxial pins both slenderness branches, the 
   assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 91.5, ast_in2: -1, h_in: 144, r_in: 2.201 }));
   assert.ok("error" in _v271({ fm_psi: 2000, an_in2: 91.5, h_in: NaN, r_in: 2.201 }));
 });
+// ===================== spec-v272..v274 SDPWS wood lateral-force-resisting-system trio =====================
+import {
+  computeDiaphragmShear as _v272, computeShearwallOverturning as _v273, computeShearwallDeflection as _v274,
+} from "../../calc-lateral.js";
+
+test("bounds: spec-v272 computeDiaphragmShear pins V/v/M/chord, the 1/b scaling, and error seams", () => {
+  const r = _v272({ w_plf: 516, l_ft: 192, b_ft: 120 });
+  assert.ok(Math.abs(r.v_end_lb - 49536) < 1e-9);
+  assert.ok(Math.abs(r.v_plf - 412.8) < 1e-9);
+  assert.ok(Math.abs(r.m_ftlb - 2377728) < 1e-9);
+  assert.ok(Math.abs(r.chord_lb - 19814.4) < 1e-9);
+  // Cross-check: halving the depth exactly doubles the unit shear and chord (the 1/b law).
+  const r2 = _v272({ w_plf: 516, l_ft: 192, b_ft: 60 });
+  assert.ok(Math.abs(r2.v_plf - 2 * r.v_plf) < 1e-9);
+  assert.ok(Math.abs(r2.chord_lb - 2 * r.chord_lb) < 1e-9);
+  // Zero load is legal (no lateral force -> all zeros).
+  const r0 = _v272({ w_plf: 0, l_ft: 192, b_ft: 120 });
+  assert.strictEqual(r0.v_plf, 0);
+  // Error seams.
+  assert.ok("error" in _v272({ w_plf: -1, l_ft: 192, b_ft: 120 }));
+  assert.ok("error" in _v272({ w_plf: 516, l_ft: 0, b_ft: 120 }));
+  assert.ok("error" in _v272({ w_plf: 516, l_ft: 192, b_ft: 0 }));
+  assert.ok("error" in _v272({ w_plf: Infinity, l_ft: 192, b_ft: 120 }));
+});
+
+test("bounds: spec-v273 computeShearwallOverturning pins v/Mot/Mr/T, the clamp-to-zero seam, and error seams", () => {
+  const r = _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 3000 });
+  assert.ok(Math.abs(r.v_plf - 1000) < 1e-9);
+  assert.ok(Math.abs(r.mot_ftlb - 80000) < 1e-9);
+  assert.ok(Math.abs(r.mr_ftlb - 7200) < 1e-9);
+  assert.ok(Math.abs(r.t_lb - 9100) < 1e-9);
+  assert.strictEqual(r.holdown_required, true);
+  // Cross-check: 20,000 lb of dead load offsets most of the couple.
+  const r2 = _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 20000 });
+  assert.ok(Math.abs(r2.mr_ftlb - 48000) < 1e-9);
+  assert.ok(Math.abs(r2.t_lb - 4000) < 1e-9);
+  // Seam: enough dead load stabilizes the wall; T clamps to zero, never negative.
+  const r3 = _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: 34000 });
+  assert.strictEqual(r3.t_lb, 0);
+  assert.strictEqual(r3.holdown_required, false);
+  // Error seams.
+  assert.ok("error" in _v273({ v_lb: -1, b_ft: 8, h_ft: 10 }));
+  assert.ok("error" in _v273({ v_lb: 8000, b_ft: 8, h_ft: 10, w_lb: -1 }));
+  assert.ok("error" in _v273({ v_lb: 8000, b_ft: 0, h_ft: 10 }));
+  assert.ok("error" in _v273({ v_lb: 8000, b_ft: 8, h_ft: 0 }));
+  assert.ok("error" in _v273({ v_lb: NaN, b_ft: 8, h_ft: 10 }));
+});
+
+test("bounds: spec-v274 computeShearwallDeflection pins the three terms, the h/h^3 scaling laws, da=0, and error seams", () => {
+  const r = _v274({ v_plf: 400, h_ft: 10, b_ft: 8, e_psi: 1600000, a_in2: 12.25, ga_kin: 15, da_in: 0.15 });
+  assert.ok(Math.abs(r.bend_in - 0.02040816326530612) < 1e-12);
+  assert.ok(Math.abs(r.shear_in - 0.26666666666666666) < 1e-12);
+  assert.ok(Math.abs(r.anchor_in - 0.1875) < 1e-12);
+  assert.ok(Math.abs(r.delta_in - 0.4745748299319728) < 1e-12);
+  assert.ok(Math.abs(r.drift_ratio - 0.003954790249433107) < 1e-12);
+  // Cross-check: doubling h scales bending by 8 (h^3) and the other two terms by 2 (h).
+  const r2 = _v274({ v_plf: 400, h_ft: 20, b_ft: 8, e_psi: 1600000, a_in2: 12.25, ga_kin: 15, da_in: 0.15 });
+  assert.ok(Math.abs(r2.bend_in - 8 * r.bend_in) < 1e-12);
+  assert.ok(Math.abs(r2.shear_in - 2 * r.shear_in) < 1e-12);
+  assert.ok(Math.abs(r2.anchor_in - 2 * r.anchor_in) < 1e-12);
+  assert.ok(Math.abs(r2.delta_in - 1.0715986394557823) < 1e-9);
+  // da = 0 (rigid anchorage) is legal: the anchorage term drops out.
+  const r3 = _v274({ v_plf: 400, h_ft: 10, b_ft: 8, e_psi: 1600000, a_in2: 12.25, ga_kin: 15, da_in: 0 });
+  assert.strictEqual(r3.anchor_in, 0);
+  assert.ok(Math.abs(r3.delta_in - (r.bend_in + r.shear_in)) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v274({ v_plf: 0, h_ft: 10, b_ft: 8, a_in2: 12.25, ga_kin: 15 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 0, b_ft: 8, a_in2: 12.25, ga_kin: 15 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 0, a_in2: 12.25, ga_kin: 15 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, e_psi: 0, a_in2: 12.25, ga_kin: 15 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, a_in2: 0, ga_kin: 15 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, a_in2: 12.25, ga_kin: 0 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, a_in2: 12.25, ga_kin: 15, da_in: -0.1 }));
+  assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, a_in2: NaN, ga_kin: 15 }));
+});

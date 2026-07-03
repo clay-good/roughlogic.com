@@ -1,6 +1,6 @@
 # roughlogic.com Specification v273 -- Wood Shear Wall Unit Shear and Holdown Overturning (SDPWS / ASD) (calc-lateral.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02). Batch spec-v272..v274 (the SDPWS wood lateral-force-resisting-system trio -- diaphragm
+> **Status: LANDED (2026-07-02, package 0.97.0; was PROPOSED 2026-07-02). Batch spec-v272..v274 (the SDPWS wood lateral-force-resisting-system trio -- diaphragm
 > (v272), shear wall (this spec), deflection (v274)). This spec is the middle of the load path: the diaphragm reaction the
 > v272 tile computes lands on a shear wall, and this tile resolves the two numbers that wall is detailed for -- the unit
 > shear along its length and the holdown tension at its end.)**

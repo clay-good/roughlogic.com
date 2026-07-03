@@ -875,6 +875,10 @@ const RELATED = {
   "cmu-wall-flexure": ["cmu-shear-wall","cmu-wall-axial","cmu-grout-volume","rc-beam-flexure"],
   "cmu-shear-wall": ["cmu-wall-flexure","cmu-wall-axial","seismic-base-shear","cmu-grout-volume"],
   "cmu-wall-axial": ["cmu-wall-flexure","cmu-shear-wall","steel-column-capacity","cmu-grout-volume"],
+  // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio (Group E, calc-lateral.js)
+  "diaphragm-shear": ["shearwall-overturning","shearwall-deflection","seismic-base-shear","wind-pressure"],
+  "shearwall-overturning": ["diaphragm-shear","shearwall-deflection","seismic-base-shear","deck-ledger-fasteners"],
+  "shearwall-deflection": ["shearwall-overturning","diaphragm-shear","seismic-base-shear","joist-deflection"],
   // spec-v248..v250 fire-sprinkler system-design trio (Group F, calc-firesprinkler.js)
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],
