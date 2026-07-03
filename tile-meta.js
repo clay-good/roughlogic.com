@@ -442,6 +442,8 @@ const _TILES = [
   ["differential-leveling", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"],
   // spec-v314..v316 steel beam-column-and-connection depth batch
   ["steel-h1-interaction", "E"], ["steel-effective-length-k", "E"], ["steel-bolt-tension-shear", "E"],
+  // spec-v317..v319 machining depth batch (calc-machining.js Group K)
+  ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["ballnose-scallop-height", "K"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

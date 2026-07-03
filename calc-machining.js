@@ -6,7 +6,7 @@
 // See spec-v31 K.4 and spec-v34 K.5.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -226,3 +226,147 @@ function renderSpindlePowerTorque(inputRegion, outputRegion, citationEl) {
   for (const f of [mrr, unitPower, eff, rpm]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["spindle-power-torque"] = renderSpindlePowerTorque;
+
+// ===================== spec-v317..v319: machining depth batch =====================
+// The cutting-geometry effects the speeds-and-feeds tile never captures: radial
+// chip thinning at light radial engagement, boring-bar/overhang deflection and
+// the L/D chatter limit, and the ballnose scallop height from stepover.
+
+// dims: in { ae_in: L, d_in: L, fz_target: L } out: { ratio: dimensionless, rctf: dimensionless, fz_prog: L }
+export function computeRadialChipThinning({ ae_in = 0, d_in = 0, fz_target = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0)) return { error: "Cutter diameter must be positive (in)." };
+  if (!(ae_in > 0)) return { error: "Radial width of cut must be positive (in)." };
+  if (fz_target < 0) return { error: "Target chip load cannot be negative (in/tooth)." };
+  const ratio = ae_in / d_in;
+  let rctf, flag;
+  if (ratio >= 0.5) {
+    rctf = 1.0;
+    flag = ratio >= 1 ? "ae >= D (a full slot): no radial thinning, RCTF = 1.0" : "at or above half immersion (ae >= D/2): no thinning, RCTF = 1.0";
+  } else {
+    rctf = 1 / (2 * Math.sqrt(ratio - ratio * ratio));
+    flag = "light radial engagement (ae < D/2): compensate the feed by RCTF";
+  }
+  const fz_prog = fz_target * rctf;
+  return {
+    ratio, rctf, fz_prog, flag,
+    note: "Radial chip thinning factor RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) for a radial width of cut ae below half the cutter diameter D, with the compensated feed per tooth fz_prog = fz_target x RCTF; RCTF = 1.0 at half immersion and above. At light engagement the actual chip is thinner than the programmed feed, so raising the feed restores the intended chip load - the basis of high-feed and trochoidal milling, and the difference between a light pass that rubs and one that cuts. This is the radial (not axial/lead-angle) thinning; it does not cap the result against the machine feed limit, the tool's maximum chip load, or the spindle power. A shop aid; the tool manufacturer's recommended chip load and the machine govern.",
+  };
+}
+export const radialChipThinningExample = { inputs: { ae_in: 0.05, d_in: 0.5, fz_target: 0.004 } };
+
+function renderRadialChipThinning(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: radial chip thinning factor RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) for ae < D/2, the compensated feed fz_prog = fz_target x RCTF, RCTF = 1.0 at half immersion and above, per the modern milling / Machinery's Handbook references, by name. Radial thinning only. A shop aid; the tool maker's chip load governs.";
+  const ae = makeNumber("Radial width of cut ae (in)", "rct-ae", { step: "any", min: "0" });
+  const d = makeNumber("Cutter diameter D (in)", "rct-d", { step: "any", min: "0" });
+  const fz = makeNumber("Target chip load fz (in/tooth)", "rct-fz", { step: "any", min: "0" });
+  for (const f of [ae, d, fz]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ae.input.value = "0.05"; d.input.value = "0.5"; fz.input.value = "0.004"; update(); });
+  const oRctf = makeOutputLine(outputRegion, "Radial chip thinning factor", "rct-out-rctf");
+  const oFz = makeOutputLine(outputRegion, "Compensated feed per tooth", "rct-out-fz");
+  const oNote = makeOutputLine(outputRegion, "Note", "rct-out-note");
+  const update = debounce(() => {
+    const r = computeRadialChipThinning({ ae_in: Number(ae.input.value) || 0, d_in: Number(d.input.value) || 0, fz_target: Number(fz.input.value) || 0 });
+    if (r.error) { oRctf.textContent = r.error; oFz.textContent = "-"; oNote.textContent = "-"; return; }
+    oRctf.textContent = fmt(r.rctf, 3) + " (ae/D " + fmt(r.ratio, 3) + ")";
+    oFz.textContent = fmt(r.fz_prog, 4) + " in/tooth";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ae, d, fz]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["radial-chip-thinning"] = renderRadialChipThinning;
+
+// dims: in { d_in: L, l_in: L, f_lb: M L T^-2, e_psi: M L^-1 T^-2 } out: { i_in4: L^4, delta_in: L, ld: dimensionless }
+export function computeBoringBarDeflection({ d_in = 0, l_in = 0, f_lb = 0, e_psi = 30e6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0)) return { error: "Bar diameter must be positive (in)." };
+  if (!(l_in > 0)) return { error: "Overhang length must be positive (in)." };
+  if (!(f_lb > 0)) return { error: "Cutting force must be positive (lb)." };
+  if (!(e_psi > 0)) return { error: "Modulus must be positive (psi)." };
+  const i_in4 = (Math.PI * Math.pow(d_in, 4)) / 64;
+  const delta_in = (f_lb * Math.pow(l_in, 3)) / (3 * e_psi * i_in4);
+  const ld = l_in / d_in;
+  const verdict = ld <= 4 ? "L/d <= 4: stable for a steel bar" : (ld <= 8 ? "L/d 4-8: carbide/damped-bar territory" : "L/d > 8: chatter-prone, shorten the overhang or use a damped bar");
+  return {
+    i_in4, delta_in, ld, verdict,
+    note: "Static cantilever tip deflection delta = F L^3/(3 E I) with I = pi d^4/64 for a round bar, and the length-to-diameter ratio L/d for chatter risk (a steel bar is stable to about 4:1, a solid-carbide bar to 6:1-8:1, higher with heavy-metal or damped bars; E = 30e6 psi steel, ~90e6 carbide). The overhang, not the force, dominates via the L^3 law - halving the stickout cuts the deflection to one-eighth, which is why choking up on the tool is the first fix for chatter. A uniform solid round cantilever under a tip point load (a stepped or hollow bar changes I; a real cut adds a dynamic/regenerative-chatter component this static estimate does not capture). A shop aid; the tool and setup govern.",
+  };
+}
+export const boringBarDeflectionExample = { inputs: { d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 30e6 } };
+
+function renderBoringBarDeflection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cantilever tip deflection delta = F L^3/(3 E I), I = pi d^4/64, E = 30e6 psi steel / ~90e6 carbide, and the practical L/d overhang limits, by name. Static solid-round model, not a stability-lobe analysis. A shop aid; the tool and setup govern.";
+  const d = makeNumber("Bar / tool diameter d (in)", "bbd-d", { step: "any", min: "0" });
+  const l = makeNumber("Overhang length L (in)", "bbd-l", { step: "any", min: "0" });
+  const f = makeNumber("Radial cutting force F (lb)", "bbd-f", { step: "any", min: "0" });
+  const e = makeNumber("Modulus E (psi: 30e6 steel, ~90e6 carbide)", "bbd-e", { step: "any", min: "0" }); e.input.value = "30000000";
+  for (const x of [d, l, f, e]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "0.75"; l.input.value = "6"; f.input.value = "100"; e.input.value = "30000000"; update(); });
+  const oDelta = makeOutputLine(outputRegion, "Tip deflection", "bbd-out-delta");
+  const oLd = makeOutputLine(outputRegion, "L/d ratio", "bbd-out-ld");
+  const oNote = makeOutputLine(outputRegion, "Note", "bbd-out-note");
+  const update = debounce(() => {
+    const r = computeBoringBarDeflection({ d_in: Number(d.input.value) || 0, l_in: Number(l.input.value) || 0, f_lb: Number(f.input.value) || 0, e_psi: Number(e.input.value) || 0 });
+    if (r.error) { oDelta.textContent = r.error; oLd.textContent = "-"; oNote.textContent = "-"; return; }
+    oDelta.textContent = fmt(r.delta_in, 4) + " in (" + fmt(r.delta_in * 1000, 1) + " mil)";
+    oLd.textContent = fmt(r.ld, 1) + " - " + r.verdict;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [d, l, f, e]) x.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["boring-bar-deflection"] = renderBoringBarDeflection;
+
+// dims: in { r_in: L, mode: dimensionless, s_in: L, h_in: L } out: { out_in: L }
+export function computeBallnoseScallopHeight({ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(r_in > 0)) return { error: "Ballnose radius must be positive (in)." };
+  if (mode === "scallop-from-stepover") {
+    if (!(s_in > 0)) return { error: "Stepover must be positive (in)." };
+    if (s_in > 2 * r_in) return { error: "The stepover exceeds the cutter diameter (s > 2R) - adjacent passes do not overlap." };
+    const h_out = r_in - Math.sqrt(r_in * r_in - (s_in / 2) * (s_in / 2));
+    return {
+      out_kind: "scallop", out_in: h_out, s_in, h_in: h_out,
+      note: "Ballnose scallop (cusp) height h = R - sqrt(R^2 - (s/2)^2) between parallel passes of a ballnose cutter of radius R at stepover s, with the small-scallop approximation h ~ s^2/(8R) near the bottom (so the scallop scales with s^2 - doubling the stepover quadruples it). The theoretical geometric cusp on a FLAT surface: a sloped surface changes the effective stepover, and tool deflection and runout add to the real finish; the cusp along the feed direction is the separate turning-surface-finish geometry, and this does not convert to Ra. A shop aid; the actual finish depends on the tool, deflection, and surface slope.",
+    };
+  } else if (mode === "stepover-from-scallop") {
+    if (!(h_in > 0)) return { error: "Target scallop height must be positive (in)." };
+    if (h_in >= r_in) return { error: "The target scallop must be less than the ballnose radius." };
+    const s_out = 2 * Math.sqrt(r_in * r_in - (r_in - h_in) * (r_in - h_in));
+    return {
+      out_kind: "stepover", out_in: s_out, s_in: s_out, h_in,
+      note: "Inverse ballnose scallop: the stepover s = 2 sqrt(R^2 - (R - h)^2) that holds a target scallop height h for a ballnose of radius R, the inverse of h = R - sqrt(R^2 - (s/2)^2). The theoretical geometric cusp on a flat surface; a sloped surface, tool deflection, and runout change the real finish, and this does not convert to Ra. A shop aid; the actual finish depends on the tool, deflection, and surface slope.",
+    };
+  }
+  return { error: "Mode must be scallop-from-stepover or stepover-from-scallop." };
+}
+export const ballnoseScallopHeightExample = { inputs: { r_in: 0.25, mode: "scallop-from-stepover", s_in: 0.030, h_in: 0 } };
+
+function renderBallnoseScallopHeight(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ballnose scallop height h = R - sqrt(R^2 - (s/2)^2) and its inverse s = 2 sqrt(R^2 - (R - h)^2), with the small-scallop h ~ s^2/(8R) approximation, per the CAM / mold-machining references, by name. Theoretical flat-surface cusp, not Ra. A shop aid; the real finish depends on the tool and slope.";
+  const r = makeNumber("Ballnose radius R (in = cutter dia / 2)", "bsh-r", { step: "any", min: "0" });
+  const mode = makeSelect("Mode", "bsh-mode", [
+    { value: "scallop-from-stepover", label: "Scallop from stepover" },
+    { value: "stepover-from-scallop", label: "Stepover from scallop" },
+  ]);
+  const s = makeNumber("Stepover s (in, for scallop mode)", "bsh-s", { step: "any", min: "0" });
+  const h = makeNumber("Target scallop h (in, for stepover mode)", "bsh-h", { step: "any", min: "0" });
+  inputRegion.appendChild(r.wrap);
+  inputRegion.appendChild(mode.wrap);
+  inputRegion.appendChild(s.wrap);
+  inputRegion.appendChild(h.wrap);
+  attachExampleButton(inputRegion, () => { r.input.value = "0.25"; mode.select.value = "scallop-from-stepover"; s.input.value = "0.030"; h.input.value = ""; update(); });
+  const oOut = makeOutputLine(outputRegion, "Result", "bsh-out-res");
+  const oNote = makeOutputLine(outputRegion, "Note", "bsh-out-note");
+  const update = debounce(() => {
+    const res = computeBallnoseScallopHeight({ r_in: Number(r.input.value) || 0, mode: mode.select.value, s_in: Number(s.input.value) || 0, h_in: Number(h.input.value) || 0 });
+    if (res.error) { oOut.textContent = res.error; oNote.textContent = "-"; return; }
+    if (res.out_kind === "scallop") oOut.textContent = "Scallop height " + fmt(res.out_in, 5) + " in (" + fmt(res.out_in * 1000, 2) + " mil)";
+    else oOut.textContent = "Stepover " + fmt(res.out_in, 4) + " in";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  r.input.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+  s.input.addEventListener("input", update);
+  h.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["ballnose-scallop-height"] = renderBallnoseScallopHeight;

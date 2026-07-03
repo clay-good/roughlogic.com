@@ -145,7 +145,7 @@ const CAPS = {
   // tile; re-bumped 13000 -> 14000 the same day for the EN.13 fuel-range
   // solve-for inverse and EN.14 brake-pad per-axle enhancements (~13.2 KB gz).
   "calc-mechanic.js": 19500, // v100 2026-06-18 (18000->19500): +1 auto-body tile (paint-mix-ratio); built ~17.9 KB gz // v76 2026-06-15 (was 19500 at 95.6%): machining bench (cutting-speed-rpm, drill-point-depth) relocated to calc-machining.js (18.6->16.8 KB gz), lowered cap locks in the freed space; v31 2026-06-10 cutting-speed-rpm (was 18500 v20 2026-06-06; 14000 orig)
-  "calc-machining.js": 6500, // v135 2026-06-23 (5000->6500): +1 cut-planning tile (spindle-power-torque); built ~5.2 KB gz, lazy-loaded, +~25% headroom // v100 2026-06-18 (4000->5000): +1 machine-shop tile (cutting-fluid-concentration); built ~4.2 KB gz // v76 2026-06-15 new machining bench split out of calc-mechanic.js (2 tiles: cutting-speed-rpm, drill-point-depth; ~3.1 KB gz, lazy-loaded, fits with headroom)
+  "calc-machining.js": 11000, // spec-v317..v319 2026-07-03 (6500->11000): +3 machining depth tiles (radial-chip-thinning, boring-bar-deflection, ballnose-scallop-height) -> ~8.3 KB gz (75%); current + ~33% headroom; lazy-loaded, not in home-view payload
   // Bumped 12500 -> 15500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1700 bytes of inline annotation across
   // 27 exports including twelve DOM-mount renderers). Bumped 15500 ->

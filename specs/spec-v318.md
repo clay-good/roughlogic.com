@@ -1,6 +1,6 @@
 # roughlogic.com Specification v318 -- Boring Bar / Tool Overhang Deflection and L/D Chatter Limit (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v317..v319 (the machining depth trio -- radial chip thinning
+> **Status: LANDED (2026-07-03, package 0.112.0; proposed 2026-07-02). Batch spec-v317..v319 (the machining depth trio -- radial chip thinning
 > (v317), boring-bar deflection (this spec), ballnose scallop (v319)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog computes cutting power and surface finish
 > but nothing predicts the deflection of a boring bar or an end mill sticking out of the holder -- the cantilever bending

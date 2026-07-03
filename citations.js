@@ -7707,6 +7707,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "radial-chip-thinning": {
+    formula: "r = ae/D; RCTF = (r < 0.5) ? 1/(2 sqrt(r - r^2)) : 1.0; fz_prog = fz_target x RCTF.",
+    edition: "The radial-chip-thinning geometry - the chip thinning factor RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) for ae below half the cutter diameter and the compensated feed - as compiled in the modern milling and Machinery's Handbook references, by name.",
+    freeAccess: "The radial chip thinning relation is a public cutting-geometry result in the modern milling references and tool-maker guidance.",
+    governance: GOVERNANCE.general,
+    editionNote: "The radial chip thinning factor RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) for ae < D/2, the compensated feed fz_prog = fz_target x RCTF, and RCTF = 1.0 at half immersion and above, as compiled in the modern milling / Machinery's Handbook references. This returns the radial chip thinning factor and compensated feed - it is the radial (not axial/lead-angle) thinning, applies to ae < D/2 (above which no compensation is needed), and does not itself cap the result against the machine's feed limit, the tool's maximum chip load, or the spindle power. A shop aid; the tool manufacturer's recommended chip load and the machine govern.",
+    assumptions: [
+      { name: "Thinning factor", value: "RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) at light radial engagement", source: "milling geometry" },
+      { name: "Compensated feed", value: "fz_prog = fz_target x RCTF restores the intended chip thickness", source: "milling practice" },
+      { name: "Crossover", value: "RCTF = 1.0 at and above half immersion (ae >= D/2)", source: "radial-thinning geometry" },
+    ],
+  },
+  "boring-bar-deflection": {
+    formula: "I = pi d^4/64; delta = F L^3/(3 E I); L/d ratio for chatter risk. (E = 30e6 psi steel, ~90e6 carbide)",
+    edition: "The cantilever tip-deflection model delta = F L^3/(3 E I) with I = pi d^4/64 for a round bar, and the practical L/d overhang limits, a standard mechanics-of-materials result applied to tool overhang, by name.",
+    freeAccess: "The cantilever deflection formula is a public mechanics-of-materials result; the L/d overhang limits are standard machining guidance.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cantilever tip deflection delta = F L^3/(3 E I) with I = pi d^4/64 for a round bar, the default E = 30e6 psi (steel) / ~90e6 (solid carbide), and the practical L/d overhang limits (~4:1 steel, ~6:1 to 8:1 carbide, higher with heavy-metal or damped bars). This returns the static cantilever deflection and the L/d chatter-risk ratio - it models the tool as a uniform solid round cantilever under a tip point load (a stepped or hollow bar changes I; a real cut also has a dynamic/regenerative-chatter component this static estimate does not capture), uses the entered cutting force, and is an estimate, not a stability-lobe analysis. A shop aid; the tool and setup govern.",
+    assumptions: [
+      { name: "Cantilever model", value: "delta = F L^3/(3 E I), I = pi d^4/64, uniform solid round bar under a tip load", source: "mechanics of materials" },
+      { name: "L^3 dominance", value: "the overhang dominates via the cube law - halving the stickout cuts the deflection to one-eighth", source: "cantilever geometry" },
+      { name: "L/d limits", value: "~4:1 steel, 6-8:1 carbide; a static estimate, not a stability-lobe analysis", source: "machining practice" },
+    ],
+  },
+  "ballnose-scallop-height": {
+    formula: "scallop mode: h = R - sqrt(R^2 - (s/2)^2); stepover mode: s = 2 sqrt(R^2 - (R - h)^2); approx h ~ s^2/(8R).",
+    edition: "The ballnose scallop (cusp) height geometry and its inverse, with the small-scallop approximation, as compiled in the CAM and mold-machining references, by name.",
+    freeAccess: "The ballnose scallop-height geometry is a public CAM/milling result in the standard machining references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ballnose scallop height h = R - sqrt(R^2 - (s/2)^2) and its inverse s = 2 sqrt(R^2 - (R - h)^2), with the small-scallop approximation h ~ s^2/(8R), as compiled in the CAM / mold-machining references. This returns the theoretical scallop between parallel passes on a flat surface - it is the geometric cusp (a sloped surface changes the effective stepover, and tool deflection and runout add to the real finish), assumes a true ballnose radius, and does not cover the cusp along the feed direction (that is the feed/turning-surface-finish geometry) or convert to Ra. A shop aid; the actual finish depends on the tool, deflection, and surface slope.",
+    assumptions: [
+      { name: "Scallop geometry", value: "h = R - sqrt(R^2 - (s/2)^2) between parallel passes of a ballnose radius R", source: "CAM geometry" },
+      { name: "s^2 scaling", value: "near the bottom h ~ s^2/(8R), so doubling the stepover quadruples the scallop", source: "scallop approximation" },
+      { name: "Flat, geometric", value: "theoretical cusp on a flat surface; slope, deflection, and runout change the real finish", source: "scope of this tile" },
+    ],
+  },
   "differential-leveling": {
     formula: "HI_i = elev_(i-1) + BS_i; elev_i = HI_i - FS_i; final_elev = bm + sum(BS) - sum(FS); misclosure = final_elev - known_close.",
     edition: "The height-of-instrument differential-leveling reduction and the loop-misclosure check, as compiled in the standard surveying references (Ghilani/Wolf, Elementary Surveying), by name.",

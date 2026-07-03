@@ -12157,6 +12157,136 @@
       "term": "tension shear interaction",
       "target": "steel-bolt-tension-shear",
       "kind": "adjacent"
+    },
+    {
+      "term": "chip thinning",
+      "target": "radial-chip-thinning",
+      "kind": "industry"
+    },
+    {
+      "term": "radial chip thinning",
+      "target": "radial-chip-thinning",
+      "kind": "industry"
+    },
+    {
+      "term": "rctf",
+      "target": "radial-chip-thinning",
+      "kind": "industry"
+    },
+    {
+      "term": "trochoidal milling feed",
+      "target": "radial-chip-thinning",
+      "kind": "adjacent"
+    },
+    {
+      "term": "light radial engagement",
+      "target": "radial-chip-thinning",
+      "kind": "adjacent"
+    },
+    {
+      "term": "chip load compensation",
+      "target": "radial-chip-thinning",
+      "kind": "adjacent"
+    },
+    {
+      "term": "high feed milling",
+      "target": "radial-chip-thinning",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stepover feed",
+      "target": "radial-chip-thinning",
+      "kind": "adjacent"
+    },
+    {
+      "term": "milling feed adjustment",
+      "target": "radial-chip-thinning",
+      "kind": "adjacent"
+    },
+    {
+      "term": "boring bar deflection",
+      "target": "boring-bar-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "tool overhang",
+      "target": "boring-bar-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "l/d ratio",
+      "target": "boring-bar-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "chatter",
+      "target": "boring-bar-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "boring bar chatter",
+      "target": "boring-bar-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cantilever tool deflection",
+      "target": "boring-bar-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stickout",
+      "target": "boring-bar-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "end mill deflection",
+      "target": "boring-bar-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tool deflection",
+      "target": "boring-bar-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "scallop height",
+      "target": "ballnose-scallop-height",
+      "kind": "industry"
+    },
+    {
+      "term": "ballnose stepover",
+      "target": "ballnose-scallop-height",
+      "kind": "industry"
+    },
+    {
+      "term": "cusp height",
+      "target": "ballnose-scallop-height",
+      "kind": "industry"
+    },
+    {
+      "term": "3d milling finish",
+      "target": "ballnose-scallop-height",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stepover for finish",
+      "target": "ballnose-scallop-height",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ball end mill scallop",
+      "target": "ballnose-scallop-height",
+      "kind": "industry"
+    },
+    {
+      "term": "mold machining stepover",
+      "target": "ballnose-scallop-height",
+      "kind": "adjacent"
+    },
+    {
+      "term": "scallop calculator",
+      "target": "ballnose-scallop-height",
+      "kind": "adjacent"
     }
   ]
 }

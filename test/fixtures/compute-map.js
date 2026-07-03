@@ -687,6 +687,10 @@ export const COMPUTE_MAP = {
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
   "steel-bolt-tension-shear": { module: "../../calc-steel.js", fn: "computeSteelBoltTensionShear" },
+  // spec-v317..v319 machining depth batch (3 tiles)
+  "radial-chip-thinning": { module: "../../calc-machining.js", fn: "computeRadialChipThinning" },
+  "boring-bar-deflection": { module: "../../calc-machining.js", fn: "computeBoringBarDeflection" },
+  "ballnose-scallop-height": { module: "../../calc-machining.js", fn: "computeBallnoseScallopHeight" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

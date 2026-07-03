@@ -1,6 +1,6 @@
 # roughlogic.com Specification v319 -- Ballnose Milling Scallop Height from Stepover (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v317..v319 (the machining depth trio -- radial chip thinning
+> **Status: LANDED (2026-07-03, package 0.112.0; proposed 2026-07-02). Batch spec-v317..v319 (the machining depth trio -- radial chip thinning
 > (v317), boring-bar deflection (v318), the ballnose scallop height (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `turning-surface-finish` gives the theoretical finish
 > from feed and nose radius for turning, but 3D and mold work is done with a ballnose end mill, whose finish is set by the

@@ -29124,6 +29124,88 @@
         "fpnt_ksi": { "value": 90, "tolerance": { "abs": 0.01 } },
         "avail_tension_kip": { "value": 29.8, "tolerance": { "pct": 0.3 } }
       }
+    },
+    {
+      "tile_id": "radial-chip-thinning",
+      "source_publisher": "Radial chip thinning geometry",
+      "source_title": "10% radial engagement (ae/D 0.1), fz 0.004 -> RCTF 1.667, fz_prog 0.0067",
+      "source_edition_or_year": "spec-v317 worked example (machine-verified)",
+      "source_section_or_page": "spec-v317 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ae_in": 0.05, "d_in": 0.5, "fz_target": 0.004 },
+      "outputs": {
+        "rctf": { "value": 1.667, "tolerance": { "pct": 0.2 } },
+        "fz_prog": { "value": 0.00667, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "radial-chip-thinning",
+      "source_publisher": "Radial chip thinning geometry",
+      "source_title": "cross-check: quarter engagement -> RCTF 1.155; half immersion -> RCTF 1.0",
+      "source_edition_or_year": "spec-v317 worked example (machine-verified)",
+      "source_section_or_page": "spec-v317 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ae_in": 0.125, "d_in": 0.5, "fz_target": 0.004 },
+      "outputs": {
+        "rctf": { "value": 1.155, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "boring-bar-deflection",
+      "source_publisher": "Cantilever tool deflection",
+      "source_title": "0.75 in steel bar, 6 in overhang, 100 lb -> I 0.0155, delta 0.0155 in, L/d 8",
+      "source_edition_or_year": "spec-v318 worked example (machine-verified)",
+      "source_section_or_page": "spec-v318 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "d_in": 0.75, "l_in": 6, "f_lb": 100, "e_psi": 30000000 },
+      "outputs": {
+        "i_in4": { "value": 0.01553, "tolerance": { "pct": 0.5 } },
+        "delta_in": { "value": 0.01546, "tolerance": { "pct": 0.5 } },
+        "ld": { "value": 8, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "boring-bar-deflection",
+      "source_publisher": "Cantilever tool deflection",
+      "source_title": "cross-check: halve the overhang to 3 in -> 0.0019 in (one-eighth, the L^3 law)",
+      "source_edition_or_year": "spec-v318 worked example (machine-verified)",
+      "source_section_or_page": "spec-v318 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "d_in": 0.75, "l_in": 3, "f_lb": 100, "e_psi": 30000000 },
+      "outputs": {
+        "delta_in": { "value": 0.00193, "tolerance": { "pct": 0.5 } },
+        "ld": { "value": 4, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "ballnose-scallop-height",
+      "source_publisher": "Ballnose scallop geometry",
+      "source_title": "0.5 in ballnose (R 0.25), 0.030 in stepover -> scallop 0.00045 in (0.45 mil)",
+      "source_edition_or_year": "spec-v319 worked example (machine-verified)",
+      "source_section_or_page": "spec-v319 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "r_in": 0.25, "mode": "scallop-from-stepover", "s_in": 0.030, "h_in": 0 },
+      "outputs": {
+        "out_in": { "value": 0.00045, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "ballnose-scallop-height",
+      "source_publisher": "Ballnose scallop geometry",
+      "source_title": "cross-check: inverse - target scallop 0.00045 in returns the 0.030 in stepover",
+      "source_edition_or_year": "spec-v319 worked example (machine-verified)",
+      "source_section_or_page": "spec-v319 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "r_in": 0.25, "mode": "stepover-from-scallop", "s_in": 0, "h_in": 0.00045 },
+      "outputs": {
+        "out_in": { "value": 0.030, "tolerance": { "pct": 1 } }
+      }
     }
   ]
 }

@@ -647,6 +647,8 @@ const TOOL_MODULES = (() => {
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR
     "spindle-power-torque",
+    // spec-v317..v319 machining depth batch
+    "radial-chip-thinning", "boring-bar-deflection", "ballnose-scallop-height",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [

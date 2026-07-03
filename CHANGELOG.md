@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): land spec-v317..v319 -- 3 machining depth tiles in calc-machining.js; 785 -> 788 tiles, 0.112.0, 2026-07-03
+
+The machining depth trio, fifteenth batch of the v275-v374 campaign: the cutting-geometry effects the speeds-and-feeds tile never captures, all in the existing lazy `calc-machining.js` (Group K); no new module, group, or dependency. Catalog **785 -> 788**, package **0.111.0 -> 0.112.0** (a minor). Proposed 2026-07-02.
+
+- **`radial-chip-thinning` (spec-v317).** RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) feed compensation at light radial engagement (RCTF = 1.0 at half immersion and above). Pinned: 10% engagement -> RCTF 1.667, feed two-thirds higher; the fuzzer pins the half-immersion crossover and the full-slot clamp.
+- **`boring-bar-deflection` (spec-v318).** The cantilever delta = F L^3/(3 E I), I = pi d^4/64, with the L/d chatter-risk verdict. Pinned: a 0.75 in steel bar 6 in out under 100 lb -> 15 mil (L/d 8, carbide territory); choking to 3 in cuts it to 1.9 mil (one-eighth, the L^3 law).
+- **`ballnose-scallop-height` (spec-v319).** The scallop h = R - sqrt(R^2 - (s/2)^2) and its inverse. Pinned: a 0.5 in ballnose at 0.030 in stepover -> 0.45 mil; the fuzzer pins the s^2 doubling and the forward/inverse round-trip.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the crossover, the L^3 scaling and L/d verdict bands, the s^2 scaling and round-trip, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the radial-thinning geometry, the cantilever model, and the CAM scallop geometry. These three compute functions are exported (adding corpus/dims/fuzzer rows); the renderers are non-exported (one adds a `makeSelect` mode toggle, so `makeSelect` joined the calc-machining import). Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 27 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-machining 6500 -> 11000 (127% of the old cap). Housekeeping: home count 785 -> 788, README resynced (counts, correctness figures 1031/1034/1031, Group K cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 44 appended. All gates green at the new state: lint (**788 tiles / 56 modules / 810 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(steel): land spec-v314..v316 -- 3 steel beam-column-and-connection depth tiles in calc-steel.js; 782 -> 785 tiles, 0.111.0, 2026-07-03
 
 The steel beam-column-and-connection depth trio, fourteenth batch of the v275-v374 campaign: the interaction checks the single-action steel tiles never make, all in the existing lazy `calc-steel.js` (Group E); no new module, group, or dependency. Catalog **782 -> 785**, package **0.110.0 -> 0.111.0** (a minor). Proposed 2026-07-02.

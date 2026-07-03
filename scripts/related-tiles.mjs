@@ -971,6 +971,10 @@ const RELATED = {
   "steel-h1-interaction": ["steel-column-capacity","steel-beam-ltb","steel-effective-length-k"],
   "steel-effective-length-k": ["steel-column-capacity","steel-h1-interaction","steel-beam-ltb"],
   "steel-bolt-tension-shear": ["bolt-shear-bearing","steel-bolt-slip-critical","bolt-group-eccentric"],
+  // spec-v317..v319 machining depth batch (Group K)
+  "radial-chip-thinning": ["cutting-speed-rpm","material-removal-rate","spindle-power-torque"],
+  "boring-bar-deflection": ["spindle-power-torque","radial-chip-thinning","turning-surface-finish"],
+  "ballnose-scallop-height": ["turning-surface-finish","radial-chip-thinning","cutting-speed-rpm"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

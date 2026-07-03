@@ -1,6 +1,6 @@
 # roughlogic.com Specification v317 -- Radial Chip Thinning Feed Compensation (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v317..v319 (the machining depth trio -- the cutting-geometry
+> **Status: LANDED (2026-07-03, package 0.112.0; proposed 2026-07-02). Batch spec-v317..v319 (the machining depth trio -- the cutting-geometry
 > effects the speeds-and-feeds tile never captures: radial chip thinning at light radial engagement (this spec), boring-bar
 > deflection and the length-to-diameter chatter limit (v318), and the ballnose scallop height from stepover (v319).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `cutting-speed-rpm` computes feed from RPM, flutes,

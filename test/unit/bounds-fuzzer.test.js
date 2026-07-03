@@ -14082,3 +14082,64 @@ test("bounds: spec-v316 computeSteelBoltTensionShear pins the reduction, the cap
   assert.ok("error" in _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: -1 }));
   assert.ok("error" in _v316({ fnt_ksi: Infinity, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20 }));
 });
+
+// ===================== spec-v317..v319 machining depth batch =====================
+import { computeRadialChipThinning as _v317, computeBoringBarDeflection as _v318, computeBallnoseScallopHeight as _v319 } from "../../calc-machining.js";
+
+test("bounds: spec-v317 computeRadialChipThinning pins the thinning factor, the half-immersion crossover, and error seams", () => {
+  const r = _v317({ ae_in: 0.05, d_in: 0.5, fz_target: 0.004 });
+  assert.ok(Math.abs(r.rctf - 1 / (2 * Math.sqrt(0.1 - 0.01))) < 1e-9);
+  assert.ok(Math.abs(r.rctf - 1.6667) < 1e-3);
+  assert.ok(Math.abs(r.fz_prog - 0.004 * r.rctf) < 1e-12);
+  // Quarter engagement is a milder bump.
+  assert.ok(Math.abs(_v317({ ae_in: 0.125, d_in: 0.5, fz_target: 0.004 }).rctf - 1.1547) < 1e-3);
+  // Half immersion: exactly 1.0, no thinning.
+  assert.strictEqual(_v317({ ae_in: 0.25, d_in: 0.5, fz_target: 0.004 }).rctf, 1.0);
+  // A full slot (ae >= D) also pins RCTF = 1.0.
+  assert.strictEqual(_v317({ ae_in: 0.5, d_in: 0.5, fz_target: 0.004 }).rctf, 1.0);
+  // Error seams.
+  assert.ok("error" in _v317({ ae_in: 0.05, d_in: 0, fz_target: 0.004 }));
+  assert.ok("error" in _v317({ ae_in: 0, d_in: 0.5, fz_target: 0.004 }));
+  assert.ok("error" in _v317({ ae_in: Infinity, d_in: 0.5, fz_target: 0.004 }));
+});
+
+test("bounds: spec-v318 computeBoringBarDeflection pins the cantilever, the L^3 scaling, the L/d verdict, and error seams", () => {
+  const r = _v318({ d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 30e6 });
+  assert.ok(Math.abs(r.i_in4 - Math.PI * Math.pow(0.75, 4) / 64) < 1e-12);
+  assert.ok(Math.abs(r.delta_in - 0.01546) < 1e-4);
+  assert.strictEqual(r.ld, 8);
+  assert.ok(r.verdict.includes("carbide")); // L/d = 8 is the top of the carbide band
+  // Past 8 is chatter-prone.
+  assert.ok(_v318({ d_in: 0.5, l_in: 6, f_lb: 100, e_psi: 30e6 }).verdict.includes("chatter-prone")); // L/d = 12
+  // Halving the overhang cuts the deflection to one-eighth (L^3).
+  const r2 = _v318({ d_in: 0.75, l_in: 3, f_lb: 100, e_psi: 30e6 });
+  assert.ok(Math.abs(r2.delta_in - r.delta_in / 8) < 1e-9);
+  assert.strictEqual(r2.ld, 4);
+  assert.ok(r2.verdict.includes("stable"));
+  // A stiffer carbide bar (higher E) deflects less.
+  assert.ok(_v318({ d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 90e6 }).delta_in < r.delta_in);
+  // Error seams.
+  assert.ok("error" in _v318({ d_in: 0, l_in: 6, f_lb: 100 }));
+  assert.ok("error" in _v318({ d_in: 0.75, l_in: 0, f_lb: 100 }));
+  assert.ok("error" in _v318({ d_in: 0.75, l_in: 6, f_lb: 0 }));
+  assert.ok("error" in _v318({ d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 0 }));
+  assert.ok("error" in _v318({ d_in: NaN, l_in: 6, f_lb: 100 }));
+});
+
+test("bounds: spec-v319 computeBallnoseScallopHeight pins the forward/inverse round-trip, the s^2 scaling, and error seams", () => {
+  const r = _v319({ r_in: 0.25, mode: "scallop-from-stepover", s_in: 0.030 });
+  assert.ok(Math.abs(r.out_in - (0.25 - Math.sqrt(0.0625 - 0.000225))) < 1e-9);
+  assert.ok(Math.abs(r.out_in - 0.00045) < 5e-6);
+  // Double the stepover -> ~4x the scallop (s^2 law).
+  const r2 = _v319({ r_in: 0.25, mode: "scallop-from-stepover", s_in: 0.060 });
+  assert.ok(Math.abs(r2.out_in / r.out_in - 4) < 0.05);
+  // The inverse round-trips: target scallop returns the stepover.
+  const rInv = _v319({ r_in: 0.25, mode: "stepover-from-scallop", h_in: r.out_in });
+  assert.ok(Math.abs(rInv.out_in - 0.030) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v319({ r_in: 0, mode: "scallop-from-stepover", s_in: 0.03 }));
+  assert.ok("error" in _v319({ r_in: 0.25, mode: "scallop-from-stepover", s_in: 0.6 })); // s > 2R
+  assert.ok("error" in _v319({ r_in: 0.25, mode: "stepover-from-scallop", h_in: 0.3 })); // h >= R
+  assert.ok("error" in _v319({ r_in: 0.25, mode: "bogus", s_in: 0.03 }));
+  assert.ok("error" in _v319({ r_in: NaN, mode: "scallop-from-stepover", s_in: 0.03 }));
+});
