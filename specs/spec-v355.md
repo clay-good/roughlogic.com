@@ -1,6 +1,6 @@
 # roughlogic.com Specification v355 -- Breakpoint Chlorination Dose (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v353..v355 (the pool-and-water chemistry trio -- chlorine dose
+> **Status: LANDED (2026-07-03, package 0.124.0). Batch spec-v353..v355 (the pool-and-water chemistry trio -- chlorine dose
 > (v353), pool heater sizing (v354), the breakpoint-chlorination dose (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `chlorine-demand` computes the dose to hold a target
 > residual and even points to "check the breakpoint curve," but the breakpoint dose itself -- the chlorine needed to burn

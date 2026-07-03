@@ -14743,3 +14743,56 @@ test("bounds: spec-v352 computePvStringFusing pins the 1.56 Isc round-up, the la
   assert.ok("error" in _v352({ Isc_A: 10, max_fuse_A: 0, n_strings: 4 }));
   assert.ok("error" in _v352({ Isc_A: Infinity, max_fuse_A: 20, n_strings: 4 }));
 });
+
+// ===================== spec-v353..v355 pool chlorination & heating batch =====================
+import { computePoolChlorineDose as _v353, computePoolHeaterBtu as _v354, computeBreakpointChlorination as _v355 } from "../../calc-treatment.js";
+
+test("bounds: spec-v353 computePoolChlorineDose pins the mass balance, the dry/liquid split, and error seams", () => {
+  const r = _v353({ ppm: 2, gallons: 15000, product: "cal-hypo-65" });
+  assert.ok(Math.abs(r.lb_cl - 2 * 0.015 * 8.34) < 1e-9);
+  assert.ok(Math.abs(r.dry_oz - 6.16) < 0.1);
+  assert.strictEqual(r.avail_pct, 65);
+  // Liquid at a fifth the strength needs five times the weight.
+  const liq = _v353({ ppm: 2, gallons: 15000, product: "liquid-12.5" });
+  assert.ok(liq.isLiquid && Math.abs(liq.liq_floz - 25.6) < 0.2);
+  assert.ok(Math.abs(liq.lb_prod / r.lb_prod - 65 / 12.5) < 1e-9);
+  // Custom available fraction.
+  const cust = _v353({ ppm: 2, gallons: 15000, product: "custom", avail: 100 });
+  assert.strictEqual(cust.avail_pct, 100);
+  // Error seams.
+  assert.ok("error" in _v353({ ppm: 0, gallons: 15000, product: "cal-hypo-65" }));
+  assert.ok("error" in _v353({ ppm: 2, gallons: 0, product: "cal-hypo-65" }));
+  assert.ok("error" in _v353({ ppm: 2, gallons: 15000, product: "custom", avail: 0 }));
+  assert.ok("error" in _v353({ ppm: Infinity, gallons: 15000, product: "cal-hypo-65" }));
+});
+
+test("bounds: spec-v354 computePoolHeaterBtu pins the energy and time, and error seams", () => {
+  const r = _v354({ gallons: 20000, dT_F: 10, output: 400000, eff: 0.80 });
+  assert.strictEqual(r.Q_btu, 1668000);
+  assert.ok(Math.abs(r.hours - 5.2125) < 1e-6);
+  // A weaker heat pump takes proportionally longer.
+  const hp = _v354({ gallons: 20000, dT_F: 10, output: 150000, eff: 1.0 });
+  assert.ok(Math.abs(hp.hours - 11.12) < 0.01 && hp.hours > r.hours);
+  // Error seams.
+  assert.ok("error" in _v354({ gallons: 0, dT_F: 10, output: 400000 }));
+  assert.ok("error" in _v354({ gallons: 20000, dT_F: 0, output: 400000 }));
+  assert.ok("error" in _v354({ gallons: 20000, dT_F: 10, output: 0 }));
+  assert.ok("error" in _v354({ gallons: 20000, dT_F: 10, output: 400000, eff: 0 }));
+  assert.ok("error" in _v354({ gallons: NaN, dT_F: 10, output: 400000 }));
+});
+
+test("bounds: spec-v355 computeBreakpointChlorination pins the combined chlorine, the 10x dose, and error seams", () => {
+  const r = _v355({ total_ppm: 1.5, free_ppm: 1.0, ratio: 10, gallons: 15000, avail: 65 });
+  assert.ok(Math.abs(r.combined_ppm - 0.5) < 1e-9);
+  assert.ok(Math.abs(r.dose_ppm - 5) < 1e-9);
+  assert.ok(Math.abs(r.lb_product * 16 - 15.4) < 0.2);
+  // A heavier chloramine load needs a proportionally heavier shock.
+  const heavy = _v355({ total_ppm: 2.4, free_ppm: 1.2, ratio: 10 });
+  assert.ok(Math.abs(heavy.dose_ppm - 12) < 1e-9 && heavy.lb_product === null);
+  // No combined chlorine -> zero dose.
+  assert.strictEqual(_v355({ total_ppm: 1.0, free_ppm: 1.0, ratio: 10 }).dose_ppm, 0);
+  // Error seams.
+  assert.ok("error" in _v355({ total_ppm: 1.0, free_ppm: 1.5 })); // free > total
+  assert.ok("error" in _v355({ total_ppm: 1.5, free_ppm: 1.0, ratio: 0 }));
+  assert.ok("error" in _v355({ total_ppm: Infinity, free_ppm: 1.0 }));
+});

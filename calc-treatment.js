@@ -353,3 +353,141 @@ const renderPoolSaltDose = _rPool({
   compute: computePoolSaltDose,
 });
 TREATMENT_RENDERERS["pool-salt-dose"] = renderPoolSaltDose;
+
+// ===================== spec-v353..v355: pool chlorination & heating batch (Group M) =====================
+// The dose-and-heat field numbers the alkalinity/CYA/salt adjust tiles never
+// give: the free-chlorine dose by product strength (v353), the heater sizing
+// and heat-up time (v354), and the breakpoint (superchlorination) shock dose
+// that clears chloramines (v355).
+
+const _POOL_CL_PRODUCTS = { "liquid-12.5": 12.5, "cal-hypo-65": 65, "dichlor-56": 56, "trichlor-90": 90 };
+// dims: in { ppm: dimensionless, gallons: dimensionless, product: dimensionless, avail: dimensionless } out: { lb_cl: dimensionless, lb_prod: dimensionless, dry_oz: dimensionless, liq_floz: dimensionless }
+export function computePoolChlorineDose({ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const rise = Number(ppm) || 0;
+  const gal = Number(gallons) || 0;
+  if (!(rise > 0)) return { error: "Target free-chlorine rise must be positive (ppm)." };
+  if (!(gal > 0)) return { error: "Pool volume must be positive (gallons)." };
+  let av = product === "custom" ? (Number(avail) || 0) : _POOL_CL_PRODUCTS[product];
+  if (av === undefined) return { error: "Unknown product." };
+  if (!(av > 0 && av <= 100)) return { error: "Available chlorine must be between 0 and 100 percent." };
+  const lb_cl = rise * (gal / 1e6) * 8.34;
+  const lb_prod = lb_cl / (av / 100);
+  const dry_oz = lb_prod * 16;
+  const liq_floz = (lb_prod / 10) * 128; // ~10 lb per gallon of liquid chlorine
+  const isLiquid = product === "liquid-12.5" || (product === "custom" && av <= 15);
+  return {
+    lb_cl, lb_prod, dry_oz, liq_floz, avail_pct: av, isLiquid,
+    note: "Free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction to get the product weight, then expressed as dry ounces or (for liquid, ~10 lb/gal) fluid ounces. A weaker product needs proportionally more weight - liquid 12.5% takes five times the weight of 65% cal-hypo for the same chlorine - the cost/handling trade between a cheap heavy jug and a concentrated scoop. Dose to a target free-chlorine level; test and retest, and follow the product label. A pool-care aid, not a substitute for the label directions.",
+  };
+}
+const poolChlorineDoseExample = { inputs: { ppm: 2, gallons: 15000, product: "cal-hypo-65", avail: 0 } };
+function renderPoolChlorineDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: free-chlorine dose = ppm x (gallons/1,000,000) x 8.34 lb, divided by the product available-chlorine fraction; liquid ~10 lb/gal. Product strengths: liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%. Dose to a target and retest; the product label governs.";
+  const ppm = makeNumber("Target free-chlorine rise (ppm)", "pcd-ppm", { step: "any", min: "0" }); ppm.input.value = "2";
+  const gal = makeNumber("Pool volume (gallons)", "pcd-gal", { step: "any", min: "0" }); gal.input.value = "15000";
+  const prod = makeSelect("Product", "pcd-prod", [
+    { value: "cal-hypo-65", label: "Cal-hypo 65% (granular)" },
+    { value: "liquid-12.5", label: "Liquid chlorine 12.5%" },
+    { value: "dichlor-56", label: "Dichlor 56%" },
+    { value: "trichlor-90", label: "Trichlor 90%" },
+    { value: "custom", label: "Custom (enter %)" },
+  ]);
+  const av = makeNumber("Available chlorine (%, custom only)", "pcd-av", { step: "any", min: "0", max: "100" });
+  for (const f of [ppm, gal]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(prod.wrap); inputRegion.appendChild(av.wrap);
+  const oCl = makeOutputLine(outputRegion, "Chlorine mass", "pcd-out-cl");
+  const oProd = makeOutputLine(outputRegion, "Product amount", "pcd-out-prod");
+  const oNote = makeOutputLine(outputRegion, "Note", "pcd-out-note");
+  function syncFields() { av.wrap.style.display = prod.select.value === "custom" ? "" : "none"; }
+  const update = debounce(() => {
+    const r = computePoolChlorineDose({ ppm: Number(ppm.input.value) || 0, gallons: Number(gal.input.value) || 0, product: prod.select.value, avail: Number(av.input.value) || 0 });
+    if (r.error) { oCl.textContent = r.error; oProd.textContent = "-"; oNote.textContent = ""; return; }
+    oCl.textContent = fmt(r.lb_cl, 3) + " lb chlorine (" + fmt(r.avail_pct, 1) + "% product)";
+    oProd.textContent = r.isLiquid ? fmt(r.liq_floz, 1) + " fl oz (" + fmt(r.lb_prod, 2) + " lb)" : fmt(r.dry_oz, 1) + " oz (" + fmt(r.lb_prod, 2) + " lb)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { ppm.input.value = "2"; gal.input.value = "15000"; prod.select.value = "cal-hypo-65"; av.input.value = ""; syncFields(); update(); });
+  prod.select.addEventListener("change", () => { syncFields(); update(); });
+  for (const f of [ppm, gal, av]) f.input.addEventListener("input", update);
+  syncFields();
+}
+TREATMENT_RENDERERS["pool-chlorine-dose"] = renderPoolChlorineDose;
+
+// dims: in { gallons: dimensionless, dT_F: T, output: M L^2 T^-3, eff: dimensionless } out: { Q_btu: M L^2 T^-2, delivered: M L^2 T^-3, hours: T }
+export function computePoolHeaterBtu({ gallons = 0, dT_F = 0, output = 0, eff = 0.80 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const gal = Number(gallons) || 0;
+  const dT = Number(dT_F) || 0;
+  const out = Number(output) || 0;
+  const e = Number(eff) || 0;
+  if (!(gal > 0)) return { error: "Pool volume must be positive (gallons)." };
+  if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
+  if (!(out > 0)) return { error: "Heater output must be positive (Btu/h)." };
+  if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
+  const Q_btu = gal * 8.34 * dT;
+  const delivered = out * e;
+  const hours = Q_btu / delivered;
+  return {
+    Q_btu, delivered, hours,
+    note: "Pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise (1 Btu warms 1 lb of water 1 F), and the heat-up time = energy / (heater output x efficiency). A gas heater at ~80% warms fast; a heat pump (enter its COP-equivalent Btu/h) is far slower but cheaper to run, which is why a heat pump is left on to hold temperature rather than for a quick warm-up. Ignores cover, evaporation, and standby losses, so real heat-up runs longer. A sizing estimate; the equipment ratings and site conditions govern.",
+  };
+}
+const poolHeaterBtuExample = { inputs: { gallons: 20000, dT_F: 10, output: 400000, eff: 0.80 } };
+TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
+  citation: "Citation: pool heat-up energy Btu = gallons x 8.34 x temperature rise; time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
+  example: poolHeaterBtuExample.inputs,
+  fields: [
+    { key: "gallons", label: "Pool volume (gallons)", default: 20000 },
+    { key: "dT_F", label: "Temperature rise (F)", default: 10 },
+    { key: "output", label: "Heater output (Btu/h)", default: 400000 },
+    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)", default: 0.80 },
+  ],
+  outputs: [
+    { key: "q", id: "phb-out-q", label: "Heat-up energy", value: (r) => fmt(r.Q_btu, 0) + " Btu" },
+    { key: "h", id: "phb-out-h", label: "Heat-up time", value: (r) => fmt(r.hours, 1) + " h (" + fmt(r.delivered, 0) + " Btu/h delivered)" },
+    { key: "n", id: "phb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolHeaterBtu,
+});
+
+// dims: in { total_ppm: dimensionless, free_ppm: dimensionless, ratio: dimensionless, gallons: dimensionless, avail: dimensionless } out: { combined_ppm: dimensionless, dose_ppm: dimensionless, lb_product: dimensionless }
+export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const total = Number(total_ppm) || 0;
+  const free = Number(free_ppm) || 0;
+  const r = Number(ratio) || 0;
+  if (!(total >= 0)) return { error: "Total chlorine must be zero or positive (ppm)." };
+  if (!(free >= 0)) return { error: "Free chlorine must be zero or positive (ppm)." };
+  if (free > total) return { error: "Free chlorine cannot exceed total chlorine." };
+  if (!(r > 0)) return { error: "Breakpoint ratio must be positive." };
+  const combined_ppm = total - free;
+  const dose_ppm = r * combined_ppm;
+  const gal = Number(gallons) || 0;
+  const av = Number(avail) || 0;
+  let lb_product = null;
+  if (gal > 0 && av > 0) lb_product = dose_ppm * (gal / 1e6) * 8.34 / (av / 100);
+  return {
+    combined_ppm, dose_ppm, lb_product,
+    note: "Breakpoint (superchlorination) shock: combined chlorine (chloramines) = total - free, and the free-chlorine dose to reach breakpoint = ratio x combined (the ratio is commonly ~10:1). Chloramines cause the 'chlorine smell' and eye irritation; a partial dose below breakpoint makes it worse, so shock all the way. A heavier chloramine load needs a proportionally heavier shock, the reason letting combined chlorine build is expensive to clear. Optional volume and product strength convert the ppm dose to product weight. A pool-care aid; the product label and testing govern.",
+  };
+}
+const breakpointChlorinationExample = { inputs: { total_ppm: 1.5, free_ppm: 1.0, ratio: 10, gallons: 15000, avail: 65 } };
+TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
+  citation: "Citation: breakpoint chlorination: combined chlorine = total - free, breakpoint dose = ratio x combined (commonly ~10:1). Shock past breakpoint (a partial dose worsens chloramines). Optional volume/product convert ppm to weight. A pool-care aid; the label and testing govern.",
+  example: breakpointChlorinationExample.inputs,
+  fields: [
+    { key: "total_ppm", label: "Total chlorine (ppm)", default: 1.5 },
+    { key: "free_ppm", label: "Free chlorine (ppm)", default: 1.0 },
+    { key: "ratio", label: "Breakpoint ratio (default 10)", default: 10 },
+    { key: "gallons", label: "Pool volume (gallons, optional)", default: 15000 },
+    { key: "avail", label: "Product available chlorine (%, optional)", default: 65 },
+  ],
+  outputs: [
+    { key: "c", id: "bpc-out-c", label: "Combined chlorine (chloramines)", value: (r) => fmt(r.combined_ppm, 2) + " ppm" },
+    { key: "d", id: "bpc-out-d", label: "Breakpoint free-chlorine dose", value: (r) => fmt(r.dose_ppm, 1) + " ppm" },
+    { key: "p", id: "bpc-out-p", label: "Product amount", value: (r) => r.lb_product == null ? "(enter volume and product % for weight)" : fmt(r.lb_product * 16, 1) + " oz (" + fmt(r.lb_product, 2) + " lb)" },
+    { key: "n", id: "bpc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBreakpointChlorination,
+});

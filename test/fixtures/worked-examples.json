@@ -30124,6 +30124,87 @@
       "outputs": {
         "fuse_A": { "value": 25, "tolerance": { "abs": 0 } }
       }
+    },
+    {
+      "tile_id": "pool-chlorine-dose",
+      "source_publisher": "pool-care practice",
+      "source_title": "15,000 gal pool, +2 ppm, 65% cal-hypo -> 0.250 lb chlorine, 6.2 oz product",
+      "source_edition_or_year": "spec-v353 worked example (machine-verified)",
+      "source_section_or_page": "spec-v353 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ppm": 2, "gallons": 15000, "product": "cal-hypo-65", "avail": 0 },
+      "outputs": {
+        "lb_cl": { "value": 0.250, "tolerance": { "pct": 0.5 } },
+        "dry_oz": { "value": 6.2, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "pool-chlorine-dose",
+      "source_publisher": "pool-care practice",
+      "source_title": "cross-check: the same 0.250 lb as 12.5% liquid is 25.6 fl oz (five times the weight)",
+      "source_edition_or_year": "spec-v353 worked example (machine-verified)",
+      "source_section_or_page": "spec-v353 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ppm": 2, "gallons": 15000, "product": "liquid-12.5", "avail": 0 },
+      "outputs": {
+        "liq_floz": { "value": 25.6, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "pool-heater-btu",
+      "source_publisher": "thermodynamics",
+      "source_title": "20,000 gal, +10 F, 400,000 Btu/h gas at 80% -> 1,668,000 Btu, 5.2 h",
+      "source_edition_or_year": "spec-v354 worked example (machine-verified)",
+      "source_section_or_page": "spec-v354 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "gallons": 20000, "dT_F": 10, "output": 400000, "eff": 0.80 },
+      "outputs": {
+        "Q_btu": { "value": 1668000, "tolerance": { "abs": 1 } },
+        "hours": { "value": 5.2, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "pool-heater-btu",
+      "source_publisher": "thermodynamics",
+      "source_title": "cross-check: a 150,000 Btu/h heat pump takes 11.1 h, more than double",
+      "source_edition_or_year": "spec-v354 worked example (machine-verified)",
+      "source_section_or_page": "spec-v354 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "gallons": 20000, "dT_F": 10, "output": 150000, "eff": 1.0 },
+      "outputs": {
+        "hours": { "value": 11.1, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "breakpoint-chlorination",
+      "source_publisher": "Standard Methods 4500-Cl",
+      "source_title": "total 1.5, free 1.0 -> 0.5 ppm combined, a 5 ppm breakpoint dose; 15.4 oz of 65% cal-hypo",
+      "source_edition_or_year": "spec-v355 worked example (machine-verified)",
+      "source_section_or_page": "spec-v355 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "total_ppm": 1.5, "free_ppm": 1.0, "ratio": 10, "gallons": 15000, "avail": 65 },
+      "outputs": {
+        "combined_ppm": { "value": 0.5, "tolerance": { "abs": 0.01 } },
+        "dose_ppm": { "value": 5, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "breakpoint-chlorination",
+      "source_publisher": "Standard Methods 4500-Cl",
+      "source_title": "cross-check: a heavier load (total 2.4, free 1.2) -> 1.2 ppm combined, a 12 ppm dose",
+      "source_edition_or_year": "spec-v355 worked example (machine-verified)",
+      "source_section_or_page": "spec-v355 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "total_ppm": 2.4, "free_ppm": 1.2, "ratio": 10, "gallons": 0, "avail": 0 },
+      "outputs": {
+        "dose_ppm": { "value": 12, "tolerance": { "abs": 0.01 } }
+      }
     }
   ]
 }

@@ -6727,6 +6727,42 @@ export const CITATIONS = {
       { name: "Target CYA band", value: "~30-50 ppm outdoor chlorine pool (advisory)", source: "NSPF CPO" },
     ],
   },
+  "pool-chlorine-dose": {
+    formula: "lb_cl = ppm x (gallons/1e6) x 8.34; lb_prod = lb_cl / (avail/100); dry_oz = lb_prod x 16; liq_floz = (lb_prod/10) x 128.",
+    edition: "The standard pool free-chlorine dose mass balance and product available-chlorine fractions, by name.",
+    freeAccess: "The 8.34 lb/gal water constant and product available-chlorine strengths are published free by pool-care references and product labels. The product label directions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The free-chlorine dose: pounds of chlorine = ppm x (gallons/1,000,000) x 8.34, divided by the product's available-chlorine fraction (liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%, or a custom %) for the product weight, then dry ounces or (liquid ~10 lb/gal) fluid ounces. A weaker product needs proportionally more weight. This returns the dose to raise free chlorine by the target: it does not subtract the pool's existing chlorine demand and does not model the CYA (stabilizer) effect on effective chlorine. Dose to a target and retest; the product label directions govern.",
+    assumptions: [
+      { name: "Mass balance", value: "lb chlorine = ppm x (gal/1e6) x 8.34; product weight = /available fraction", source: "pool-care practice" },
+      { name: "Product strengths", value: "liquid 12.5%, cal-hypo 65%, dichlor 56%, trichlor 90%; liquid ~10 lb/gal", source: "product labels" },
+      { name: "No demand/CYA", value: "does not subtract chlorine demand or model the CYA effect", source: "scope of this tile" },
+    ],
+  },
+  "pool-heater-btu": {
+    formula: "Q_btu = gallons x 8.34 x dT; delivered = output x eff; hours = Q_btu / delivered.",
+    edition: "The sensible water-heating relation (1 Btu raises 1 lb of water 1 F), by name.",
+    freeAccess: "The water-heating energy relation and the 8.34 lb/gal constant are standard published values. The equipment ratings and site conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The pool heat-up: energy Btu = gallons x 8.34 lb/gal x temperature rise, and the heat-up time = energy / (heater output x efficiency). A gas heater at ~80% warms fast; a heat pump (entered as its COP-equivalent Btu/h) is far slower but cheaper to run, so it is left on to hold temperature rather than for a quick warm-up. This returns the sensible heat-up only: it ignores the cover, evaporation, and standby losses, so real heat-up takes longer, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
+    assumptions: [
+      { name: "Sensible heat", value: "Btu = gallons x 8.34 x dT; 1 Btu raises 1 lb water 1 F", source: "thermodynamics" },
+      { name: "Heat-up time", value: "hours = energy / (output x efficiency); enter COP-equiv Btu/h for a heat pump", source: "equipment ratings" },
+      { name: "No standby loss", value: "ignores cover/evaporation/standby losses; real heat-up runs longer", source: "scope of this tile" },
+    ],
+  },
+  "breakpoint-chlorination": {
+    formula: "combined = total - free; dose_ppm = ratio x combined (ratio ~10); optional lb_product = dose_ppm x (gal/1e6) x 8.34 / (avail/100).",
+    edition: "The breakpoint (superchlorination) chlorination rule and Standard Methods 4500-Cl, by name.",
+    freeAccess: "The breakpoint-curve behavior and the ~10:1 shock rule are published free by pool-care and water-treatment references (Standard Methods 4500-Cl). The product label and testing govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Breakpoint (superchlorination) shock: combined chlorine (chloramines) = total - free, and the free-chlorine dose to reach breakpoint = ratio x combined (commonly ~10:1). Chloramines cause the 'chlorine smell' and eye irritation; a partial dose below breakpoint makes it worse, so shock all the way. A heavier chloramine load needs a proportionally heavier shock. This returns the ppm dose (and, with optional volume and product strength, the product weight): the 10:1 is a rule of thumb, the actual breakpoint is confirmed by testing, and it does not add the pool's baseline chlorine demand. A pool-care aid; the product label and testing govern.",
+    assumptions: [
+      { name: "Combined chlorine", value: "combined = total - free; dose = ratio x combined (ratio ~10)", source: "breakpoint curve / Standard Methods 4500-Cl" },
+      { name: "Shock past breakpoint", value: "a partial dose below breakpoint worsens chloramines", source: "pool-care practice" },
+      { name: "Confirm by testing", value: "10:1 is a rule of thumb; confirm the breakpoint by testing; no baseline demand added", source: "scope of this tile" },
+    ],
+  },
   "pool-salt-dose": {
     formula: "Add: salt lb = gallons x 8.34 lb/gal x ppm rise / 1,000,000, bags = ceil(lb / 40); lower: drained fraction = 1 - target/current.",
     edition: "Mass-balance identity (NSPF CPO / ANSI-APSP-ICC, by name); 8.34 lb/gal water.",

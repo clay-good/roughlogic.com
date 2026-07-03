@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(treatment): land spec-v353..v355 -- 3 pool chlorination / heating tiles in calc-treatment.js; 821 -> 824 tiles, 0.124.0, 2026-07-03
+
+The pool chlorination / heating trio, twenty-seventh batch of the v275-v374 campaign: the dose-and-heat field numbers the alkalinity/CYA/salt adjust tiles never give, all in the existing lazy `calc-treatment.js` (Group M); no new module, group, or dependency. Catalog **821 -> 824**, package **0.123.0 -> 0.124.0** (a minor). Proposed 2026-07-02.
+
+- **`pool-chlorine-dose` (spec-v353).** lb chlorine = ppm x (gal/1e6) x 8.34, /available fraction, as dry oz or (liquid) fl oz. Pinned: a 15,000 gal pool +2 ppm needs 6.2 oz of 65% cal-hypo, or 25.6 fl oz of 12.5% liquid (five times the weight). A product `makeSelect` (liquid/cal-hypo/dichlor/trichlor/custom).
+- **`pool-heater-btu` (spec-v354).** Btu = gallons x 8.34 x rise, time = Btu/(output x eff). Pinned: a 20,000 gal pool +10 F takes 5.2 h on a 400,000 Btu/h gas heater at 80%, but 11.1 h on a 150,000 Btu/h heat pump.
+- **`breakpoint-chlorination` (spec-v355).** combined = total - free, dose = ratio x combined (~10:1). Pinned: total 1.5, free 1.0 -> 0.5 ppm combined, a 5 ppm shock; a heavier load (combined 1.2) needs 12 ppm. Optional volume/product convert to weight.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the mass balance, the dry/liquid split, the energy/time, the combined-chlorine dose, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the chlorine-dose mass balance, the water-heating relation, and the breakpoint rule (Standard Methods 4500-Cl). Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases (two pre-existing aliases repointed to the more-specific new tiles), `related-tiles`, and 3 fuzzer blocks (`pool-chlorine-dose` hand-writes its renderer for the product `makeSelect`; the other two use the `_rPool` factory); corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-treatment.js 8500 -> 12000. Housekeeping: home count 821 -> 824, README resynced (counts, Group M cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 56 appended. All gates green at the new state: lint, unit tests (**5,117**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(solar): land spec-v350..v352 -- 3 PV performance / protection tiles in calc-solar.js; 818 -> 821 tiles, 0.123.0, 2026-07-03
 
 The PV performance / protection trio, twenty-sixth batch of the v275-v374 campaign: the field-condition and code numbers the STC-nameplate PV tiles never give, all in the existing lazy `calc-solar.js` (Group A); no new module, group, or dependency. Catalog **818 -> 821**, package **0.122.0 -> 0.123.0** (a minor). Proposed 2026-07-02.

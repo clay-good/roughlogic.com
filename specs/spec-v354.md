@@ -1,6 +1,6 @@
 # roughlogic.com Specification v354 -- Pool Heater Sizing and Heat-Up Time (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v353..v355 (the pool-and-water chemistry trio -- chlorine dose
+> **Status: LANDED (2026-07-03, package 0.124.0). Batch spec-v353..v355 (the pool-and-water chemistry trio -- chlorine dose
 > (v353), the pool heater sizing (this spec), breakpoint chlorination (v355)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog doses pool chemistry but has no tile for
 > pool heating -- the BTUs and the hours to raise a pool of a given volume by a target temperature, the sizing a pool builder

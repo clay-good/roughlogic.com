@@ -3020,8 +3020,8 @@
     },
     {
       "term": "cal hypo dose",
-      "target": "pool-turnover",
-      "kind": "redirect"
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
     },
     {
       "term": "well drawdown",
@@ -5385,8 +5385,8 @@
     },
     {
       "term": "breakpoint chlorination",
-      "target": "chlorine-demand",
-      "kind": "adjacent"
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
     },
     {
       "term": "dose for residual",
@@ -13706,6 +13706,131 @@
     {
       "term": "solar fuse",
       "target": "pv-string-fusing",
+      "kind": "industry"
+    },
+    {
+      "term": "pool chlorine dose",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "shock dose pool",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "liquid chlorine pool",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "raise free chlorine",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "ppm chlorine pool",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "how much chlorine",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "pool shock amount",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "chlorine product dose",
+      "target": "pool-chlorine-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "pool heater size",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "pool heat up time",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "btu to heat pool",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "pool heater sizing",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "heat pump pool",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "pool warming time",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "gallons 8.34 delta t",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "pool heater btu",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "spa heater size",
+      "target": "pool-heater-btu",
+      "kind": "industry"
+    },
+    {
+      "term": "shock chlorine",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "chloramine removal",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "combined chlorine",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "10 times combined",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "superchlorination",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "break point dose",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "chloramine shock",
+      "target": "breakpoint-chlorination",
+      "kind": "industry"
+    },
+    {
+      "term": "free vs combined chlorine",
+      "target": "breakpoint-chlorination",
       "kind": "industry"
     }
   ]

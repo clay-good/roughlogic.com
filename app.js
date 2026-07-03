@@ -721,6 +721,7 @@ const TOOL_MODULES = (() => {
     "weir-flow", "langelier-index", "chemical-feed-pump",
     // v93 pool and spa chemical balance
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
+    "pool-chlorine-dose", "pool-heater-btu", "breakpoint-chlorination",
   ]);
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [

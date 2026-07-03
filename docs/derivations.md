@@ -2395,10 +2395,13 @@ cross-check.
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTapingCorrections` | `{ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_...` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
 | calc-treatment.js | `computeLangelierIndex` | `{ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolAlkalinityAdjust` | `{ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computePoolChlorineDose` | `{ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolCyaDose` | `{ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computePoolHeaterBtu` | `{ gallons = 0, dT_F = 0, output = 0, eff = 0.80 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolSaltDose` | `{ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
@@ -2478,7 +2481,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1064.
+Row count: 1067.
 
 <!-- END function-corpus-v14 -->
 
@@ -3277,11 +3280,12 @@ per spec-v14 §13.1 second paragraph.
 | `tree-rigging-shock` | Tree Rigging Shock (Dynamic) Load | Arborist rigging research / ANSI Z133...; 500 lb, 3 ft drop, 30 ft rope at 5% -> 1.5 ft stretch, 1,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (22 tiles)
+### Group M Water and wastewater (25 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `backflow-test-psi` | Backflow Assembly Test Pass Criteria | USC FCCCHR Manual / AWWA C511; #1 check 8 psid, relief 4 psid -> buffer 4 psid, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `breakpoint-chlorination` | Breakpoint Chlorination Dose | Standard Methods 4500-Cl; spec-v355 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chemical-feed-pump` | Chemical Metering-Pump Setting | Pounds formula (AWWA / EPA water-oper...; 0.5 MGD, 8 mg/L, 12.5% NaOCl, SG 1.16, 50 GPD pump -> ~55... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-decay` | Chlorine Residual Decay (First-Order) | EPA / AWWA; C(10) = 2*exp(-1) = 0.7358 mg/L; time to 0.2 mg/L = ln(2/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-demand` | Chlorine Demand and Dose for a Target Residual | Standard Methods 4500-Cl / AWWA M14 (...; spec-v116 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3293,7 +3297,9 @@ per spec-v14 §13.1 second paragraph.
 | `lab-dilution` | Lab Dilution and Serial Dilution | Project (first-principles) over stand...; C1=1000 / C2=50 / V2=100 -> V1=5, diluent=95 (computed by... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `langelier-index` | Langelier Saturation Index | Langelier (1936) / Standard Methods (...; pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-alkalinity-adjust` | Pool Total Alkalinity Adjustment | NSPF CPO Handbook / ANSI-APSP-ICC dos...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pool-chlorine-dose` | Pool Free-Chlorine Dose by Product | pool-care practice; spec-v353 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-cya-dose` | Pool Cyanuric Acid Dose | NSPF CPO Handbook / ANSI-APSP-ICC; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pool-heater-btu` | Pool Heater Sizing and Heat-Up Time | thermodynamics; spec-v354 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-salt-dose` | Pool Salt Dose | Mass-balance identity (NSPF CPO / ANS...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-turnover` | Pool Turnover Rate and Chlorine Demand | NSPF; GPM = 20000/(6*60) = 55.56; pure Cl = 20000*2*8.34/1e6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pounds-formula` | Pounds Formula | USEPA; Standard water-treatment chemical dose identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3485,6 +3491,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 821. Fixture-covered or reference-cadence: 821 / 821.
+Tile count: 824. Fixture-covered or reference-cadence: 824 / 824.
 
 <!-- END tile-index-v14 -->

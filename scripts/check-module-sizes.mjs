@@ -99,7 +99,7 @@ const CAPS = {
   // M.1 backflow-test-psi tile + the EN.15/16/17 disinfection/detention/
   // well-drawdown enhancements (built module ~18.3 KB gz).
   "calc-water.js": 24500, // spec-v116 2026-06-20 (21000->24500): +2 disinfection tiles (chlorine-demand, uv-dose) -> ~20.3 KB gz (96.5%); +~20% headroom. v75 2026-06-15 (was 23500 at 95.8%): v20 Phase M bench (weir-flow, langelier-index, chemical-feed-pump) relocated to calc-treatment.js (22.5->19.0 KB gz), lowered cap locks in the freed space and clears the WARN; v20 2026-06-06 (19500->23500)
-  "calc-treatment.js": 8500, // v93 2026-06-18 (6000->8500): +3 pool-chemistry dosing tiles (pool-alkalinity-adjust, pool-cya-dose, pool-salt-dose); built ~7.3 KB gz // v75 2026-06-15 new water-treatment bench split out of calc-water.js (3 tiles: weir-flow, langelier-index, chemical-feed-pump; ~4.6 KB gz, lazy-loaded, fits with headroom)
+  "calc-treatment.js": 12000, // spec-v353..v355 2026-07-03 (8500->12000): +3 Group M pool chlorination/heating tiles (pool-chlorine-dose, pool-heater-btu, breakpoint-chlorination) -> ~9.8 KB gz; current + ~20% headroom. v93 2026-06-18 (6000->8500): +3 pool-chemistry dosing tiles (pool-alkalinity-adjust, pool-cya-dose, pool-salt-dose); built ~7.3 KB gz // v75 2026-06-15 new water-treatment bench split out of calc-water.js (3 tiles: weir-flow, langelier-index, chemical-feed-pump; ~4.6 KB gz, lazy-loaded, fits with headroom)
   // Bumped 8500 -> 10000 for v9 §F.2 30-minute resume timer landing
   // 2026-05-12 (parseTimerState / encodeTimerState / timerRemainingSeconds
   // / formatTimerMMSS helpers plus the custom renderLightning that mounts

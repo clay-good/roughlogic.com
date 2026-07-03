@@ -1,6 +1,6 @@
 # roughlogic.com Specification v353 -- Pool Free-Chlorine Dose by Product (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v353..v355 (the pool-and-water chemistry trio -- the dosing
+> **Status: LANDED (2026-07-03, package 0.124.0). Batch spec-v353..v355 (the pool-and-water chemistry trio -- the dosing
 > and equipment numbers the salt and alkalinity tiles never cover: the free-chlorine dose by product (this spec), the pool
 > heater sizing and heat-up time (v354), and the breakpoint-chlorination dose (v355).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pool-salt-dose` doses a salt generator and
