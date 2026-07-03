@@ -1,6 +1,6 @@
 # roughlogic.com Specification v346 -- Fix-and-Flip Maximum Offer (70% Rule) (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v344..v346 (the real-estate underwriting trio -- debt yield
+> **Status: LANDED (2026-07-03, package 0.121.0). Batch spec-v344..v346 (the real-estate underwriting trio -- debt yield
 > (v344), break-even occupancy (v345), the fix-and-flip 70% max-offer rule (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog underwrites rentals but has no fix-and-flip
 > tile -- the 70% rule that sets the maximum a flipper should pay from the after-repair value and the repair budget, the

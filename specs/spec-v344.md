@@ -1,6 +1,6 @@
 # roughlogic.com Specification v344 -- Debt Yield (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v344..v346 (the real-estate underwriting trio -- the lender
+> **Status: LANDED (2026-07-03, package 0.121.0). Batch spec-v344..v346 (the real-estate underwriting trio -- the lender
 > and investor metrics the cap-rate/DSCR tile leaves out: the debt yield (this spec), the break-even occupancy (v345), and
 > the fix-and-flip 70% max-offer rule (v346).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `cap-rate-dscr` computes NOI/value and NOI/debt-

@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "debt-yield": ["cap-rate-dscr", "rental-worksheet", "break-even-occupancy", "loan-payment"],
+  "break-even-occupancy": ["cap-rate-dscr", "debt-yield", "rental-worksheet", "rent-roll-vacancy"],
+  "max-offer-70-rule": ["cap-rate-dscr", "rent-vs-buy", "seller-net-sheet", "material-cost"],
   "cantilever-beam": ["beam-loading", "beam-reactions", "section-properties", "joist-deflection"],
   "section-properties": ["cantilever-beam", "beam-loading", "combined-stress-axial-bending", "metal-weight"],
   "combined-stress-axial-bending": ["section-properties", "cantilever-beam", "wood-combined-bending-axial", "steel-h1-interaction"],

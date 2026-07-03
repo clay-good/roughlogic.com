@@ -812,6 +812,7 @@ const TOOL_MODULES = (() => {
   
     // v20
     "gross-rent-multiplier", "pmi-cancellation-date", "seller-net-sheet",
+    "debt-yield", "break-even-occupancy", "max-offer-70-rule",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [

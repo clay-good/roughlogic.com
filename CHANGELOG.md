@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(realestate): land spec-v344..v346 -- 3 investor-underwriting tiles in calc-realestate.js; 812 -> 815 tiles, 0.121.0, 2026-07-03
+
+The investor-underwriting trio, twenty-fourth batch of the v275-v374 campaign: the lender- and flipper-side ratios the cap-rate/DSCR and cash-on-cash tiles never give, all in the existing lazy `calc-realestate.js` (Group X); no new module, group, or dependency. Catalog **812 -> 815**, package **0.120.0 -> 0.121.0** (a minor). Proposed 2026-07-02.
+
+- **`debt-yield` (spec-v344).** DY = NOI / loan, or the max loan a target debt yield supports. Pinned: NOI $120,000 on a $1,500,000 loan -> 8.0% (below a typical 10% floor); sizing to a 10% debt yield caps the loan at $1,200,000 regardless of rate or amortization.
+- **`break-even-occupancy` (spec-v345).** BEO = (OpEx + debt service) / PGI, and the cushion to market occupancy. Pinned: OpEx $60,000 + debt $90,000 on $200,000 PGI -> 75%, a 17-point cushion to a 92% market; higher leverage (debt $120,000) pushes break-even to 90%, a thin 2-point margin.
+- **`max-offer-70-rule` (spec-v346).** MAO = ARV x rule% - repairs - fee. Pinned: ARV $300,000, $40,000 repairs, 70% -> a $170,000 max offer and a $90,000 gross spread; 75% with a $10,000 wholesale fee -> $175,000. A negative MAO returns no deal.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering both modes, the cushion, the no-deal case, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the CRE debt-yield and break-even-occupancy definitions and the 70%-rule heuristic. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module caps bumped with dated comments: citations.js 260000 -> 285000 (the registry crossed its cap this batch). Housekeeping: home count 812 -> 815, README resynced (counts, Group X cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 53 appended. All gates green at the new state: lint, unit tests (**5,108**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(construction): land spec-v341..v343 -- 3 structural-mechanics tiles in calc-construction.js; 809 -> 812 tiles, 0.120.0, 2026-07-03
 
 The structural-mechanics trio, twenty-third batch of the v275-v374 campaign: the bench-mechanics primitives the member-specific tiles already assume you have, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **809 -> 812**, package **0.119.0 -> 0.120.0** (a minor). Proposed 2026-07-02.

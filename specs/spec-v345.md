@@ -1,6 +1,6 @@
 # roughlogic.com Specification v345 -- Break-Even Occupancy (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v344..v346 (the real-estate underwriting trio -- debt yield
+> **Status: LANDED (2026-07-03, package 0.121.0). Batch spec-v344..v346 (the real-estate underwriting trio -- debt yield
 > (v344), the break-even occupancy (this spec), the fix-and-flip 70% rule (v346)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `breakeven` computes an accounting contribution-margin
 > break-even in units, but a rental property's break-even is an occupancy percentage -- the share of potential gross income

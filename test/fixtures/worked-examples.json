@@ -29878,6 +29878,86 @@
       "outputs": {
         "sigma_min": { "value": 120, "tolerance": { "pct": 5 } }
       }
+    },
+    {
+      "tile_id": "debt-yield",
+      "source_publisher": "CRE lender underwriting",
+      "source_title": "NOI $120,000 on a $1,500,000 loan -> 8.0% debt yield",
+      "source_edition_or_year": "spec-v344 worked example (machine-verified)",
+      "source_section_or_page": "spec-v344 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "mode": "yield", "noi": 120000, "loan": 1500000 },
+      "outputs": {
+        "debt_yield_pct": { "value": 8.0, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "debt-yield",
+      "source_publisher": "CRE lender underwriting",
+      "source_title": "cross-check: a 10% debt-yield floor caps the loan at $1,200,000",
+      "source_edition_or_year": "spec-v344 worked example (machine-verified)",
+      "source_section_or_page": "spec-v344 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "mode": "maxloan", "noi": 120000, "dy_target": 10 },
+      "outputs": {
+        "max_loan": { "value": 1200000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "break-even-occupancy",
+      "source_publisher": "CRE underwriting",
+      "source_title": "OpEx $60,000, debt service $90,000, PGI $200,000 -> 75% break-even, 17-pt cushion to 92%",
+      "source_edition_or_year": "spec-v345 worked example (machine-verified)",
+      "source_section_or_page": "spec-v345 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "opex": 60000, "debt_svc": 90000, "pgi": 200000, "target_occ": 92 },
+      "outputs": {
+        "beo_pct": { "value": 75, "tolerance": { "abs": 0.1 } },
+        "cushion_pts": { "value": 17, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "break-even-occupancy",
+      "source_publisher": "CRE underwriting",
+      "source_title": "cross-check: higher leverage (debt $120,000) pushes break-even to 90%",
+      "source_edition_or_year": "spec-v345 worked example (machine-verified)",
+      "source_section_or_page": "spec-v345 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "opex": 60000, "debt_svc": 120000, "pgi": 200000, "target_occ": 92 },
+      "outputs": {
+        "beo_pct": { "value": 90, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "max-offer-70-rule",
+      "source_publisher": "real-estate-investing heuristic",
+      "source_title": "ARV $300,000, repairs $40,000, 70% rule -> $170,000 max offer, $90,000 spread",
+      "source_edition_or_year": "spec-v346 worked example (machine-verified)",
+      "source_section_or_page": "spec-v346 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "arv": 300000, "repairs": 40000, "rule_pct": 70, "fee": 0 },
+      "outputs": {
+        "mao": { "value": 170000, "tolerance": { "abs": 1 } },
+        "spread": { "value": 90000, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "max-offer-70-rule",
+      "source_publisher": "real-estate-investing heuristic",
+      "source_title": "cross-check: 75% with a $10,000 wholesale fee -> $175,000",
+      "source_edition_or_year": "spec-v346 worked example (machine-verified)",
+      "source_section_or_page": "spec-v346 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "arv": 300000, "repairs": 40000, "rule_pct": 75, "fee": 10000 },
+      "outputs": {
+        "mao": { "value": 175000, "tolerance": { "abs": 1 } }
+      }
     }
   ]
 }

@@ -14587,3 +14587,54 @@ test("bounds: spec-v343 computeCombinedStressAxialBending pins the two-sign supe
   assert.ok("error" in _v343({ P_lb: 20000, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 0 }));
   assert.ok("error" in _v343({ P_lb: Infinity, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 }));
 });
+
+// ===================== spec-v344..v346 investor-underwriting batch =====================
+import { computeDebtYield as _v344, computeBreakEvenOccupancy as _v345, computeMaxOffer70Rule as _v346 } from "../../calc-realestate.js";
+
+test("bounds: spec-v344 computeDebtYield pins both modes and error seams", () => {
+  const y = _v344({ mode: "yield", noi: 120000, loan: 1500000 });
+  assert.ok(Math.abs(y.debt_yield_pct - 8.0) < 1e-9);
+  const ml = _v344({ mode: "maxloan", noi: 120000, dy_target: 10 });
+  assert.ok(Math.abs(ml.max_loan - 1200000) < 1e-6);
+  // Debt yield is leverage-independent: doubling the loan halves the yield.
+  const y2 = _v344({ mode: "yield", noi: 120000, loan: 3000000 });
+  assert.ok(Math.abs(y2.debt_yield_pct - 4.0) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v344({ mode: "yield", noi: 0, loan: 1500000 }));
+  assert.ok("error" in _v344({ mode: "yield", noi: 120000, loan: 0 }));
+  assert.ok("error" in _v344({ mode: "maxloan", noi: 120000, dy_target: 0 }));
+  assert.ok("error" in _v344({ mode: "yield", noi: Infinity, loan: 1500000 }));
+});
+
+test("bounds: spec-v345 computeBreakEvenOccupancy pins the ratio, the cushion, and error seams", () => {
+  const r = _v345({ opex: 60000, debt_svc: 90000, pgi: 200000, target_occ: 92 });
+  assert.ok(Math.abs(r.beo_pct - 75) < 1e-9);
+  assert.ok(Math.abs(r.cushion_pts - 17) < 1e-9);
+  // More leverage raises break-even.
+  const r2 = _v345({ opex: 60000, debt_svc: 120000, pgi: 200000, target_occ: 92 });
+  assert.ok(Math.abs(r2.beo_pct - 90) < 1e-9 && r2.cushion_pts < r.cushion_pts);
+  // Cushion is null without a target occupancy.
+  assert.strictEqual(_v345({ opex: 60000, debt_svc: 90000, pgi: 200000 }).cushion_pts, null);
+  // Error seams.
+  assert.ok("error" in _v345({ opex: 60000, debt_svc: 90000, pgi: 0 }));
+  assert.ok("error" in _v345({ opex: -1, debt_svc: 90000, pgi: 200000 }));
+  assert.ok("error" in _v345({ opex: 60000, debt_svc: 90000, pgi: NaN }));
+});
+
+test("bounds: spec-v346 computeMaxOffer70Rule pins the offer, the fee, the no-deal case, and error seams", () => {
+  const r = _v346({ arv: 300000, repairs: 40000, rule_pct: 70, fee: 0 });
+  assert.ok(Math.abs(r.mao - 170000) < 1e-6);
+  assert.ok(Math.abs(r.spread - 90000) < 1e-6);
+  assert.strictEqual(r.no_deal, false);
+  // A higher percentage lifts the offer; the fee gives some back.
+  const r2 = _v346({ arv: 300000, repairs: 40000, rule_pct: 75, fee: 10000 });
+  assert.ok(Math.abs(r2.mao - 175000) < 1e-6);
+  // A thin deal goes negative -> no deal.
+  const r3 = _v346({ arv: 100000, repairs: 80000, rule_pct: 70 });
+  assert.ok(r3.mao <= 0 && r3.no_deal === true);
+  // Error seams.
+  assert.ok("error" in _v346({ arv: 0, repairs: 40000, rule_pct: 70 }));
+  assert.ok("error" in _v346({ arv: 300000, repairs: 40000, rule_pct: 150 }));
+  assert.ok("error" in _v346({ arv: 300000, repairs: 40000, rule_pct: 0 }));
+  assert.ok("error" in _v346({ arv: Infinity, repairs: 40000, rule_pct: 70 }));
+});

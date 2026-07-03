@@ -145,6 +145,42 @@ export const CITATIONS = {
     ],
   },
 
+  "debt-yield": {
+    formula: "DY = NOI / loan x 100 (%); max_loan = NOI / (DY_min/100).",
+    edition: "The commercial-real-estate debt-yield definition used by CRE lenders, by name.",
+    freeAccess: "Debt yield is a standard CRE underwriting ratio defined in lender guidance and CRE finance references. The lender governs the required minimum.",
+    governance: GOVERNANCE.general,
+    editionNote: "Debt yield DY = NOI / loan, the lender's day-one return if it foreclosed, and the maximum loan a target debt yield supports max_loan = NOI / DY_min. Debt yield is independent of the interest rate, amortization, and cap rate, which is why it became the binding loan-sizing constraint in tight credit; typical lender minimums run 8-10%. This returns the ratio or the loan it supports: it uses the stabilized NOI as entered, is a loan-sizing screen not a full underwrite, and does not compute the DSCR or LTV (separate constraints). The lender governs the required floor.",
+    assumptions: [
+      { name: "Definition", value: "DY = NOI / loan; max_loan = NOI / DY_min", source: "CRE lender underwriting" },
+      { name: "Leverage-independent", value: "ignores rate, amortization, and cap rate", source: "CRE finance" },
+      { name: "Screen only", value: "a loan-sizing screen, not the DSCR/LTV constraints or a full underwrite", source: "scope of this tile" },
+    ],
+  },
+  "break-even-occupancy": {
+    formula: "BEO = (OpEx + debt service) / PGI x 100 (%); cushion = market occupancy - BEO.",
+    edition: "The break-even (default-ratio) occupancy definition used in real-estate underwriting, by name.",
+    freeAccess: "Break-even occupancy (the default ratio) is a standard underwriting metric in CRE finance references and lender guidance. The lender and market govern the acceptable level.",
+    governance: GOVERNANCE.general,
+    editionNote: "Break-even occupancy BEO = (operating expenses + annual debt service) / potential gross income, the occupancy at which the property exactly covers its costs, and the cushion to the market/stabilized occupancy. This returns the ratio and cushion: it uses the OpEx, debt service, and PGI as entered, treats PGI as fully-leased plus other income, and is an underwriting aid, not a full pro forma. A thin cushion (or a break-even above market) flags a fragile, highly-leveraged deal. The lender and market govern.",
+    assumptions: [
+      { name: "Definition", value: "BEO = (OpEx + debt service) / PGI; cushion = market occupancy - BEO", source: "CRE underwriting" },
+      { name: "PGI basis", value: "potential gross income = fully-leased rent plus other income", source: "CRE finance" },
+      { name: "Underwriting aid", value: "not a full pro forma; inputs entered, not derived", source: "scope of this tile" },
+    ],
+  },
+  "max-offer-70-rule": {
+    formula: "MAO = ARV x rule% - repairs - fee; spread = ARV - MAO - repairs.",
+    edition: "The fix-and-flip 70% rule heuristic used by real-estate investors, by name.",
+    freeAccess: "The 70% rule is a widely-published real-estate-investing rule of thumb. It is a heuristic, not an appraisal standard; the investor's actual costs and profit target govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fix-and-flip 70% rule: maximum allowable offer MAO = ARV x rule% - repairs (minus any wholesale assignment fee). At 70%, the 30% held back covers holding, financing, selling costs, and profit. This returns the max offer and the gross spread: the ARV must come from real comparable sales and the repair estimate from a real scope, the rule percentage is adjustable for market conditions, and a negative MAO is reported as no deal. A rule of thumb, not an appraisal; the investor's actual cost and profit targets govern.",
+    assumptions: [
+      { name: "Definition", value: "MAO = ARV x rule% - repairs - fee; default rule 70%", source: "real-estate-investing heuristic" },
+      { name: "30% haircut", value: "at 70%, the 30% held back covers holding, financing, selling, and profit", source: "fix-and-flip practice" },
+      { name: "Unverified inputs", value: "ARV must be from real comps and repairs from a real scope; not an appraisal", source: "scope of this tile" },
+    ],
+  },
   "seller-net-sheet": {
     formula: "commission = price*rate; transfer_tax = price*rate; tax_proration = annual_tax*days_seller_owes/365; net = price - payoff - commission - transfer_tax - fees - concessions - proration - other.",
     edition: "Per the TILA-RESPA Integrated Disclosure / Closing Disclosure (12 CFR 1026.38) and RESPA (12 CFR 1024), by name; the transfer-tax rate is state/local and user-supplied.",

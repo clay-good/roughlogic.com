@@ -13302,6 +13302,141 @@
       "term": "kern eccentricity",
       "target": "combined-stress-axial-bending",
       "kind": "industry"
+    },
+    {
+      "term": "debt yield",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "debt yield ratio",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "noi over loan",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "loan sizing",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "lender debt yield",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "cre debt yield",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum debt yield",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "maximum loan amount",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "debt yield underwriting",
+      "target": "debt-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "break-even occupancy",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "breakeven occupancy real estate",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "default ratio",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "occupancy break-even",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "rental break-even",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "vacancy cushion",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "opex plus debt service",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "cash flow break-even",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "economic occupancy",
+      "target": "break-even-occupancy",
+      "kind": "industry"
+    },
+    {
+      "term": "70 percent rule",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "maximum allowable offer",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "mao",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "fix and flip offer",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "arv rule",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "flip max offer",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "after repair value offer",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "wholesale offer",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
+    },
+    {
+      "term": "rehab offer",
+      "target": "max-offer-70-rule",
+      "kind": "industry"
     }
   ]
 }

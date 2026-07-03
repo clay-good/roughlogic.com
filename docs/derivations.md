@@ -2147,17 +2147,20 @@ cross-check.
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
+| calc-realestate.js | `computeBreakEvenOccupancy` | `{ opex = 0, debt_svc = 0, pgi = 0, target_occ = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |
 | calc-realestate.js | `computeCashOnCash` | `{ cash_invested, annual_pretax_cashflow }` | _ | _ | _ |
 | calc-realestate.js | `computeClosingCosts` | `{ purchase_price, loan_amount, transfer_tax_rate_pct, note_rate_pct }` | _ | _ | _ |
 | calc-realestate.js | `computeCommissionSplit` | `{ sale_price, total_commission_percent, side_share_percent, brokerage_split_t...` | _ | _ | _ |
 | calc-realestate.js | `computeCostOfWaiting` | `{ principal, current_rate_percent, future_rate_percent, term_years }` | _ | _ | _ |
 | calc-realestate.js | `computeDTI` | `{ gross_monthly_income, housing_payment, other_monthly_debts }` | _ | _ | _ |
+| calc-realestate.js | `computeDebtYield` | `{ mode = "yield", noi = 0, loan = 0, dy_target = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeDepreciationRecapture` | `{ asset_class = "1250", accumulated_depreciation = 0, total_gain = 0, ordinar...` | _ | _ | _ |
 | calc-realestate.js | `computeGrossRentMultiplier` | `{ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeHudFmr` | `input` | _ | _ | _ |
 | calc-realestate.js | `computeLTV` | `{ loan_amount, value }` | _ | _ | _ |
 | calc-realestate.js | `computeLoanLimits` | `input` | _ | _ | _ |
+| calc-realestate.js | `computeMaxOffer70Rule` | `{ arv = 0, repairs = 0, rule_pct = 70, fee = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeMortgagePointBreakeven` | `{ loan_amount, base_rate_pct, points_rate_pct, point_cost_pct, term_years, ho...` | _ | _ | _ |
 | calc-realestate.js | `computeMortgageReserves` | `{ piti_monthly, reserves_months, liquid_assets, retirement_balance, retiremen...` | _ | _ | _ |
 | calc-realestate.js | `computePITI` | `{ principal, apr_percent, term_years, annual_property_tax, annual_insurance, ...` | _ | _ | _ |
@@ -2469,7 +2472,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1055.
+Row count: 1058.
 
 <!-- END function-corpus-v14 -->
 
@@ -3391,16 +3394,18 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (24 tiles)
+### Group X Real Estate (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `amortization-schedule` | Full Amortization Schedule | Standard mortgage amortization (public); Worked example: $320,000 at 6.5% for 30 yr -> P&I $2022.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `break-even-occupancy` | Break-Even Occupancy | CRE underwriting; spec-v345 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cap-rate-dscr` | Cap Rate and DSCR | Standard CRE underwriting ratios (pub...; Worked example: NOI $84,000 / value $1.2M -> 7.0%; debt s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cash-on-cash` | Cash-on-Cash Return | Standard rental-RE investor practice ...; Worked example: $75,000 invested + $6,750 annual cash flo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `closing-costs` | Closing-Cost Estimator (CFPB Line Items) | CFPB Closing Disclosure (12 CFR Part ...; Worked example: $400k purchase / $320k loan / 0.4% transf... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `commission-split` | Commission Split | Standard residential-brokerage practi...; Worked example: $500k sale, 5% total, 50/50 sides, 80/20 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-of-waiting` | Cost of Waiting (Rate-Rise Scenario) | Standard mortgage amortization at two...; Worked example: $320,000 / 30 yr / 6.5% -> 7.5% raises P&... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `debt-yield` | Debt Yield | CRE lender underwriting; spec-v344 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `depreciation-recapture` | Depreciation Recapture on Sale | IRS Pub 544 / IRC §1245 / §1250; $100k accum SL, $150k gain -> $100k recaptured at 25% = $... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dti` | Debt-to-Income (DTI) | FNMA / FHA / VA underwriting guidelin...; Worked example: $7500/mo income, $2100 housing, $600 othe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `exchange-1031-timeline` | IRC §1031 Exchange Timeline | 26 USC 1031 / Treas. Reg. 1.1031(k)-1...; Worked example: sale-close 2026-03-01 -> identification 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3408,6 +3413,7 @@ per spec-v14 §13.1 second paragraph.
 | `hud-fmr` | HUD Fair Market Rents | HUD PD&R Fair Market Rents FY2026 (fe...; Worked example: San Francisco-Oakland-Berkeley HUD Metro ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-limits` | FHFA / FHA / VA Loan Limits by County | FHFA / HUD / VA (federal-published, 2...; Worked example: San Francisco, CA (FIPS 06075) returns th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ltv` | Loan-to-Value (LTV) | FNMA Single-Family Selling Guide (pub...; Worked example: $320,000 loan on $400,000 value -> LTV 80... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `max-offer-70-rule` | Fix-and-Flip Maximum Offer (70% Rule) | real-estate-investing heuristic; spec-v346 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mortgage-point-breakeven` | Mortgage Discount-Point Break-Even | First-principles amortization; CFPB L...; Worked example: $300k, 7.0% base vs 6.5% with 2 points ($... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mortgage-reserves` | Mortgage Reserves Requirement (Months PITI) | Fannie Mae Selling Guide B3-4.1-01 / ...; Worked example: $2,500 PITI x 6 mo = $15,000 required; $2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `per-diem-interest` | Per-Diem Prorated Interest at Closing | CFPB Closing Disclosure (12 CFR 1026....; Worked example: $300k @ 6.0%, close 2026-06-15, Actual/36... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3467,6 +3473,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 812. Fixture-covered or reference-cadence: 812 / 812.
+Tile count: 815. Fixture-covered or reference-cadence: 815 / 815.
 
 <!-- END tile-index-v14 -->

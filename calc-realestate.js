@@ -2483,3 +2483,156 @@ function renderSellerNetSheet(inputRegion, outputRegion, citationEl) {
   for (const f of [price.input, payoff.input, comm.input, tt.input, fees.input, conc.input, annualTax.input, days.input, other.input]) f.addEventListener("input", update);
 }
 REALESTATE_RENDERERS["seller-net-sheet"] = renderSellerNetSheet;
+
+// ====================================================================
+// X.x spec-v344..v346: investor underwriting batch
+// ====================================================================
+// The lender- and flipper-side ratios the cap-rate/DSCR and cash-on-cash
+// tiles never give: debt yield (the loan-sizing constraint that ignores
+// rate and amortization), break-even occupancy, and the 70% fix-and-flip
+// maximum offer.
+
+// dims: in { noi: dimensionless, loan: dimensionless, dy_target: dimensionless }
+//        out: { debt_yield_pct: dimensionless, max_loan: dimensionless }
+// (Debt yield = NOI / loan = ratio of like-dim dollars = dimensionless.)
+export function computeDebtYield({ mode = "yield", noi = 0, loan = 0, dy_target = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(noi) || 0;
+  if (!(n > 0)) return { error: "Enter a positive net operating income." };
+  if (mode === "maxloan") {
+    const t = Number(dy_target) || 0;
+    if (!(t > 0)) return { error: "Enter a positive target debt yield (%)." };
+    const max_loan = n / (t / 100);
+    if (!Number.isFinite(max_loan)) return { error: "Maximum loan is not valid." };
+    return { mode: "maxloan", max_loan, debt_yield_pct: null };
+  }
+  const l = Number(loan) || 0;
+  if (!(l > 0)) return { error: "Enter a positive loan amount." };
+  const dy = n / l * 100;
+  if (!Number.isFinite(dy)) return { error: "Debt yield is not valid." };
+  let band;
+  if (dy < 8) band = "below a typical 8-10% lender floor (loan likely capped)";
+  else if (dy < 10) band = "near a typical lender floor (8-10%)";
+  else band = "above a typical lender floor (>=10%)";
+  return { mode: "yield", debt_yield_pct: dy, band, max_loan: null };
+}
+export const debtYieldExample = { inputs: { mode: "yield", noi: 120000, loan: 1500000 } };
+
+function renderDebtYield(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Debt yield = NOI / loan amount, a lender's return if it took the property back on day one. It ignores the interest rate, amortization, and cap rate, which is why it became the binding loan-sizing constraint in tight credit; typical minimums run 8-10%. The lender governs the required floor.";
+  const mode = makeSelect("Solve for", "dy-mode", [
+    { value: "yield", label: "Debt yield (from a loan amount)" },
+    { value: "maxloan", label: "Max loan (from a target debt yield)" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const noi = makeNumber("Net operating income ($/yr)", "dy-noi", { step: "any", min: "0" });
+  const loan = makeNumber("Loan amount ($)", "dy-loan", { step: "any", min: "0" });
+  const tgt = makeNumber("Target debt yield (%)", "dy-tgt", { step: "any", min: "0" });
+  for (const f of [noi, loan, tgt]) inputRegion.appendChild(f.wrap);
+  const oOut = makeOutputLine(outputRegion, "Result", "dy-out");
+  const oBand = makeOutputLine(outputRegion, "Band", "dy-out-band");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() {
+    const isMax = mode.select.value === "maxloan";
+    loan.wrap.style.display = isMax ? "none" : "";
+    tgt.wrap.style.display = isMax ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computeDebtYield({ mode: mode.select.value, noi: readNum(noi.input), loan: readNum(loan.input), dy_target: readNum(tgt.input) });
+    if (r.error) { oOut.textContent = r.error; oBand.textContent = "-"; return; }
+    if (r.mode === "maxloan") { oOut.textContent = "Max loan " + fmt(r.max_loan, 0) + " $ at the target debt yield"; oBand.textContent = "-"; return; }
+    oOut.textContent = fmt(r.debt_yield_pct, 2) + "% debt yield";
+    oBand.textContent = r.band;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "yield"; syncFields(); noi.input.value = "120000"; loan.input.value = "1500000"; tgt.input.value = ""; update(); });
+  mode.select.addEventListener("input", () => { syncFields(); update(); });
+  for (const el of [noi.input, loan.input, tgt.input]) el.addEventListener("input", update);
+  syncFields();
+}
+REALESTATE_RENDERERS["debt-yield"] = renderDebtYield;
+
+// dims: in { opex: dimensionless, debt_svc: dimensionless, pgi: dimensionless, target_occ: dimensionless }
+//        out: { beo_pct: dimensionless, cushion_pts: dimensionless }
+// (Break-even occupancy = (opex + debt service) / PGI = dimensionless ratio.)
+export function computeBreakEvenOccupancy({ opex = 0, debt_svc = 0, pgi = 0, target_occ = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const o = Number(opex) || 0;
+  const d = Number(debt_svc) || 0;
+  const p = Number(pgi) || 0;
+  if (!(o >= 0)) return { error: "Operating expenses must be zero or positive." };
+  if (!(d >= 0)) return { error: "Debt service must be zero or positive." };
+  if (!(p > 0)) return { error: "Enter a positive potential gross income." };
+  const beo = (o + d) / p * 100;
+  if (!Number.isFinite(beo)) return { error: "Break-even occupancy is not valid." };
+  const t = Number(target_occ) || 0;
+  const cushion = t > 0 ? t - beo : null;
+  return { beo_pct: beo, cushion_pts: cushion, target_occ: t };
+}
+export const breakEvenOccupancyExample = { inputs: { opex: 60000, debt_svc: 90000, pgi: 200000, target_occ: 92 } };
+
+function renderBreakEvenOccupancy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Break-even occupancy = (operating expenses + annual debt service) / potential gross income, the occupancy at which the property exactly covers its costs. The cushion to the market/stabilized occupancy measures how much vacancy a deal can absorb before it goes cash-flow negative. The lender and the market govern the acceptable break-even.";
+  const opex = makeNumber("Operating expenses ($/yr)", "beo-opex", { step: "any", min: "0" });
+  const debt = makeNumber("Annual debt service ($/yr, P+I)", "beo-debt", { step: "any", min: "0" });
+  const pgi = makeNumber("Potential gross income ($/yr, fully leased)", "beo-pgi", { step: "any", min: "0" });
+  const occ = makeNumber("Market/stabilized occupancy (%, optional)", "beo-occ", { step: "any", min: "0", max: "100" });
+  for (const f of [opex, debt, pgi, occ]) inputRegion.appendChild(f.wrap);
+  const oBEO = makeOutputLine(outputRegion, "Break-even occupancy", "beo-out");
+  const oCush = makeOutputLine(outputRegion, "Cushion to market occupancy", "beo-out-cush");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBreakEvenOccupancy({ opex: readNum(opex.input), debt_svc: readNum(debt.input), pgi: readNum(pgi.input), target_occ: readNum(occ.input) });
+    if (r.error) { oBEO.textContent = r.error; oCush.textContent = "-"; return; }
+    oBEO.textContent = fmt(r.beo_pct, 1) + "%";
+    oCush.textContent = r.cushion_pts == null ? "(enter a market occupancy for the cushion)"
+      : fmt(r.cushion_pts, 1) + " points" + (r.cushion_pts < 0 ? " (break-even is ABOVE market -- the deal loses money at market occupancy)" : "");
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { opex.input.value = "60000"; debt.input.value = "90000"; pgi.input.value = "200000"; occ.input.value = "92"; update(); });
+  for (const el of [opex.input, debt.input, pgi.input, occ.input]) el.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["break-even-occupancy"] = renderBreakEvenOccupancy;
+
+// dims: in { arv: dimensionless, repairs: dimensionless, rule_pct: dimensionless, fee: dimensionless }
+//        out: { mao: dimensionless, spread: dimensionless }
+// (Maximum allowable offer = ARV x rule% - repairs - fee, all dollars.)
+export function computeMaxOffer70Rule({ arv = 0, repairs = 0, rule_pct = 70, fee = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(arv) || 0;
+  const r = Number(repairs) || 0;
+  const pct = Number(rule_pct) || 0;
+  const f = Number(fee) || 0;
+  if (!(a > 0)) return { error: "Enter a positive after-repair value (ARV)." };
+  if (!(r >= 0)) return { error: "Repairs must be zero or positive." };
+  if (!(pct > 0 && pct <= 100)) return { error: "Rule percentage must be between 0 and 100." };
+  if (!(f >= 0)) return { error: "Wholesale fee must be zero or positive." };
+  const mao = a * (pct / 100) - r - f;
+  if (!Number.isFinite(mao)) return { error: "Maximum offer is not valid." };
+  const spread = a - mao - r;
+  return {
+    mao, spread, no_deal: mao <= 0,
+    note: "The 70% rule: max allowable offer = ARV x rule% - repairs (- any wholesale fee). The 30% held back (at 70%) covers holding, financing, selling costs, and profit. A negative MAO means the numbers do not support a deal at this rule percentage.",
+  };
+}
+export const maxOffer70RuleExample = { inputs: { arv: 300000, repairs: 40000, rule_pct: 70, fee: 0 } };
+
+function renderMaxOffer70Rule(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fix-and-flip 70% rule: maximum allowable offer = ARV x 70% - repair costs (minus any wholesale assignment fee). The 30% margin covers holding, financing, closing, and profit. A rule of thumb, not an appraisal; the ARV must come from real comparable sales and the repair estimate from a real scope. The investor's actual cost and profit targets govern.";
+  const arv = makeNumber("After-repair value ARV ($, from comps)", "mao-arv", { step: "any", min: "0" });
+  const rep = makeNumber("Estimated repairs ($)", "mao-rep", { step: "any", min: "0" });
+  const pct = makeNumber("Rule percentage (%, default 70)", "mao-pct", { step: "any", min: "0", max: "100" });
+  const fee = makeNumber("Wholesale assignment fee ($, optional)", "mao-fee", { step: "any", min: "0" });
+  for (const f of [arv, rep, pct, fee]) inputRegion.appendChild(f.wrap);
+  pct.input.value = "70";
+  const oMAO = makeOutputLine(outputRegion, "Maximum allowable offer", "mao-out");
+  const oSpread = makeOutputLine(outputRegion, "Gross spread (costs + profit)", "mao-out-spread");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMaxOffer70Rule({ arv: readNum(arv.input), repairs: readNum(rep.input), rule_pct: pct.input.value === "" ? 70 : readNum(pct.input), fee: readNum(fee.input) });
+    if (r.error) { oMAO.textContent = r.error; oSpread.textContent = "-"; return; }
+    oMAO.textContent = r.no_deal ? "no deal (offer would be " + fmt(r.mao, 0) + " $ -- at or below zero)" : fmt(r.mao, 0) + " $";
+    oSpread.textContent = fmt(r.spread, 0) + " $";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { arv.input.value = "300000"; rep.input.value = "40000"; pct.input.value = "70"; fee.input.value = ""; update(); });
+  for (const el of [arv.input, rep.input, pct.input, fee.input]) el.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["max-offer-70-rule"] = renderMaxOffer70Rule;
