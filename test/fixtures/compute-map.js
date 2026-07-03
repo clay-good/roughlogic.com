@@ -691,6 +691,10 @@ export const COMPUTE_MAP = {
   "radial-chip-thinning": { module: "../../calc-machining.js", fn: "computeRadialChipThinning" },
   "boring-bar-deflection": { module: "../../calc-machining.js", fn: "computeBoringBarDeflection" },
   "ballnose-scallop-height": { module: "../../calc-machining.js", fn: "computeBallnoseScallopHeight" },
+  // spec-v320..v322 refrigeration-cycle batch (3 tiles)
+  "refrigerant-mass-flow": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantMassFlow" },
+  "refrigeration-cop": { module: "../../calc-refrigerant.js", fn: "computeRefrigerationCop" },
+  "condenser-heat-rejection": { module: "../../calc-refrigerant.js", fn: "computeCondenserHeatRejection" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(refrigerant): land spec-v320..v322 -- 3 refrigeration-cycle tiles in calc-refrigerant.js; 788 -> 791 tiles, 0.113.0, 2026-07-03
+
+The refrigeration-cycle trio, sixteenth batch of the v275-v374 campaign: the P-h-diagram quantities the catalog uses but never computes, all in the existing lazy `calc-refrigerant.js` (Group C); no new module, group, or dependency. Catalog **788 -> 791**, package **0.112.0 -> 0.113.0** (a minor). Proposed 2026-07-02.
+
+- **`refrigerant-mass-flow` (spec-v320).** m_dot = Q / (h1 - h4), the load over the refrigeration effect. Pinned: a 5-ton system with a 60 Btu/lb effect -> 16.7 lb/min (1,000 lb/h); less subcooling (RE 50) demands 20 lb/min. The fuzzer pins the tons/Btu-h paths and the inverse-RE scaling.
+- **`refrigeration-cop` (spec-v321).** COP = (h1 - h4)/(h2 - h1) against the Carnot ceiling T_evap/(T_cond - T_evap) in Rankine. Pinned: RE 60 / W 25 -> COP 2.40 (EER 8.19), Carnot 6.25, 38% of ideal; a smaller lift raises the ceiling. The fuzzer pins the Rankine conversion and the EER identity.
+- **`condenser-heat-rejection` (spec-v322).** THR = Q_evap (1 + 1/COP). Pinned: 5 tons at COP 2.4 -> 85,000 Btu/h (7.08 tons, factor 1.42); COP 1.5 climbs to 100,000. The fuzzer pins the 1 + 1/COP factor and the tons conversion.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the unit paths, the inverse-RE scaling, the Carnot Rankine conversion, the 1 + 1/COP factor, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the vapor-compression cycle relations. These three compute functions are exported (adding corpus/dims/fuzzer rows); the renderers are non-exported. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 25 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-refrigerant 9800 -> 13000 (111.2% of the old cap). Housekeeping: home count 788 -> 791, README resynced (counts, correctness figures 1034/1037/1034, Group C cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 45 appended. All gates green at the new state: lint (**791 tiles / 56 modules / 813 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(machining): land spec-v317..v319 -- 3 machining depth tiles in calc-machining.js; 785 -> 788 tiles, 0.112.0, 2026-07-03
 
 The machining depth trio, fifteenth batch of the v275-v374 campaign: the cutting-geometry effects the speeds-and-feeds tile never captures, all in the existing lazy `calc-machining.js` (Group K); no new module, group, or dependency. Catalog **785 -> 788**, package **0.111.0 -> 0.112.0** (a minor). Proposed 2026-07-02.

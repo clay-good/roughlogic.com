@@ -257,6 +257,8 @@ const TOOL_MODULES = (() => {
     "refrigerant-pt", "superheat-subcool", "compare-refrigerants", "refrigerant-charge",
     // v7
     "refrigerant-charging",
+    // spec-v320..v322 refrigeration-cycle batch
+    "refrigerant-mass-flow", "refrigeration-cop", "condenser-heat-rejection",
   ]);
   // spec-v81 cap-relief split: the cohesive spec-v16 "Group C expansion" batch
   // (seven first-principles HVAC engineering tiles) relocated out of calc-hvac.js

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v321 -- Refrigeration Coefficient of Performance and Carnot Limit (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v320..v322 (the refrigeration-cycle trio -- mass flow (v320),
+> **Status: LANDED (2026-07-03, package 0.113.0; proposed 2026-07-02). Batch spec-v320..v322 (the refrigeration-cycle trio -- mass flow (v320),
 > the coefficient of performance (this spec), condenser heat of rejection (v322)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog converts SEER/EER (`seer-eer`) but has no
 > tile for the fundamental cycle efficiency -- the coefficient of performance, the ratio of cooling delivered to compressor

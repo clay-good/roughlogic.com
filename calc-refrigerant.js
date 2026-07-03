@@ -590,3 +590,130 @@ export const REFRIGERANT_RENDERERS = {
   "refrigerant-charge": renderRefrigerantCharge,
   "refrigerant-charging": renderRefrigerantCharging,
 };
+
+// ===================== spec-v320..v322: refrigeration-cycle batch =====================
+// The P-h-diagram quantities the catalog uses but never computes: the
+// refrigerant mass flow from the load and the refrigeration effect, the cycle
+// COP and its Carnot ceiling, and the condenser total heat of rejection.
+
+// dims: in { q: M L^2 T^-3, unit_tons: dimensionless, h1_btulb: L^2 T^-2, h4_btulb: L^2 T^-2 } out: { re_btulb: L^2 T^-2, m_dot_lbmin: M T^-1, m_dot_lbh: M T^-1 }
+export function computeRefrigerantMassFlow({ q = 0, unit_tons = 0, h1_btulb = 0, h4_btulb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(q > 0)) return { error: "Capacity must be positive." };
+  const re_btulb = h1_btulb - h4_btulb;
+  if (!(re_btulb > 0)) return { error: "The refrigeration effect must be positive (h1 must exceed h4)." };
+  const q_btumin = unit_tons === 1 ? q * 200 : q / 60;
+  const m_dot_lbmin = q_btumin / re_btulb;
+  const m_dot_lbh = m_dot_lbmin * 60;
+  return {
+    re_btulb, m_dot_lbmin, m_dot_lbh,
+    note: "Refrigerant mass flow m_dot = Q / (h1 - h4), the cooling load over the refrigeration effect RE = h1 - h4 (the evaporator enthalpy rise off the P-h diagram), with 1 ton = 200 Btu/min = 12,000 Btu/h and h4 = hf at the condensing pressure (isenthalpic throttling). A lower refrigeration effect (a warmer, less-subcooled liquid line) demands more mass flow for the same tons, which is why subcooling matters to capacity. Take the enthalpies off the refrigerant's P-h diagram or tables at the operating condition; steady flow, 100% evaporator effectiveness - it does not compute the compressor displacement, the volumetric efficiency, or the enthalpies themselves. An engineering aid; the refrigerant property data at the operating condition govern.",
+  };
+}
+export const refrigerantMassFlowExample = { inputs: { q: 5, unit_tons: 1, h1_btulb: 180, h4_btulb: 120 } };
+
+function _v320renderRefrigerantMassFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: refrigerant mass flow m_dot = Q / (h1 - h4), the refrigeration effect RE = h1 - h4 from the P-h diagram, 1 ton = 200 Btu/min, and h4 = hf at the condenser (isenthalpic throttling), by name. Enter the enthalpies; steady flow. An engineering aid; the refrigerant property data govern.";
+  const q = makeNumber("Capacity (tons, or Btu/h if unit set to 0)", "rmf-q", { step: "any", min: "0" });
+  const unit = makeSelect("Capacity unit", "rmf-unit", [{ value: "1", label: "Tons" }, { value: "0", label: "Btu/h" }]);
+  const h1 = makeNumber("Suction enthalpy h1 (Btu/lb)", "rmf-h1", { step: "any" });
+  const h4 = makeNumber("Evaporator-inlet enthalpy h4 (Btu/lb)", "rmf-h4", { step: "any" });
+  for (const f of [q, unit, h1, h4]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "5"; unit.select.value = "1"; h1.input.value = "180"; h4.input.value = "120"; update(); });
+  const oRe = makeOutputLine(outputRegion, "Refrigeration effect", "rmf-out-re");
+  const oM = makeOutputLine(outputRegion, "Refrigerant mass flow", "rmf-out-m");
+  const oNote = makeOutputLine(outputRegion, "Note", "rmf-out-note");
+  const update = debounce(() => {
+    const r = computeRefrigerantMassFlow({ q: Number(q.input.value) || 0, unit_tons: Number(unit.select.value), h1_btulb: Number(h1.input.value) || 0, h4_btulb: Number(h4.input.value) || 0 });
+    if (r.error) { oRe.textContent = r.error; oM.textContent = "-"; oNote.textContent = "-"; return; }
+    oRe.textContent = fmt(r.re_btulb, 1) + " Btu/lb";
+    oM.textContent = fmt(r.m_dot_lbmin, 1) + " lb/min (" + fmt(r.m_dot_lbh, 0) + " lb/h)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q.input, unit.select, h1.input, h4.input]) f.addEventListener(f === unit.select ? "change" : "input", update);
+}
+REFRIGERANT_RENDERERS["refrigerant-mass-flow"] = _v320renderRefrigerantMassFlow;
+
+// dims: in { h1_btulb: L^2 T^-2, h2_btulb: L^2 T^-2, h4_btulb: L^2 T^-2, tevap_f: T, tcond_f: T } out: { cop: dimensionless, cop_carnot: dimensionless, eta_2nd: dimensionless, eer: dimensionless }
+export function computeRefrigerationCop({ h1_btulb = 0, h2_btulb = 0, h4_btulb = 0, tevap_f = 0, tcond_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const re = h1_btulb - h4_btulb;
+  const w = h2_btulb - h1_btulb;
+  if (!(re > 0)) return { error: "The refrigeration effect must be positive (h1 must exceed h4)." };
+  if (!(w > 0)) return { error: "The compressor work must be positive (h2 must exceed h1)." };
+  const cop = re / w;
+  const eer = 3.412 * cop;
+  const t_evap_r = tevap_f + 459.67;
+  const t_cond_r = tcond_f + 459.67;
+  if (!(t_cond_r > t_evap_r)) return { error: "The condenser temperature must exceed the evaporator temperature." };
+  const cop_carnot = t_evap_r / (t_cond_r - t_evap_r);
+  const eta_2nd = cop / cop_carnot;
+  return {
+    cop, cop_carnot, eta_2nd, eer,
+    note: "Cooling coefficient of performance COP = (h1 - h4)/(h2 - h1), the refrigeration effect over the compressor work off the P-h diagram; the Carnot ceiling COP_Carnot = T_evap/(T_cond - T_evap) in absolute (Rankine) temperature; the second-law efficiency COP/COP_Carnot; and EER = 3.412 x COP. A smaller lift (a higher evaporator, a cooler condenser) raises the Carnot ceiling - the lever a tech pulls for efficiency. Enter the enthalpies from the P-h diagram (ideal isentropic or actual work), saturation temperatures for the Carnot lift; the system COP is lower once motor/drive and parasitic loads are added. An engineering aid; the refrigerant property data and measured state points govern.",
+  };
+}
+export const refrigerationCopExample = { inputs: { h1_btulb: 180, h2_btulb: 205, h4_btulb: 120, tevap_f: 40, tcond_f: 120 } };
+
+function _v321renderRefrigerationCop(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cooling COP = (h1 - h4)/(h2 - h1), the Carnot limit COP_Carnot = T_evap/(T_cond - T_evap) in Rankine, the second-law efficiency COP/COP_Carnot, and EER = 3.412 x COP, by name. Enter the P-h enthalpies and saturation temperatures; no parasitic loads. An engineering aid; the property data govern.";
+  const h1 = makeNumber("Suction enthalpy h1 (Btu/lb)", "rc-h1", { step: "any" });
+  const h2 = makeNumber("Discharge enthalpy h2 (Btu/lb)", "rc-h2", { step: "any" });
+  const h4 = makeNumber("Evaporator-inlet enthalpy h4 (Btu/lb)", "rc-h4", { step: "any" });
+  const te = makeNumber("Evaporator saturation temp (F)", "rc-te", { step: "any" });
+  const tc = makeNumber("Condenser saturation temp (F)", "rc-tc", { step: "any" });
+  for (const f of [h1, h2, h4, te, tc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { h1.input.value = "180"; h2.input.value = "205"; h4.input.value = "120"; te.input.value = "40"; tc.input.value = "120"; update(); });
+  const oCop = makeOutputLine(outputRegion, "Cycle COP (EER)", "rc-out-cop");
+  const oCarnot = makeOutputLine(outputRegion, "Carnot COP / second-law efficiency", "rc-out-carnot");
+  const oNote = makeOutputLine(outputRegion, "Note", "rc-out-note");
+  const update = debounce(() => {
+    const r = computeRefrigerationCop({ h1_btulb: Number(h1.input.value) || 0, h2_btulb: Number(h2.input.value) || 0, h4_btulb: Number(h4.input.value) || 0, tevap_f: Number(te.input.value) || 0, tcond_f: Number(tc.input.value) || 0 });
+    if (r.error) { oCop.textContent = r.error; oCarnot.textContent = "-"; oNote.textContent = "-"; return; }
+    oCop.textContent = fmt(r.cop, 2) + " (EER " + fmt(r.eer, 2) + ")";
+    oCarnot.textContent = fmt(r.cop_carnot, 2) + " / " + fmt(r.eta_2nd * 100, 0) + "% of ideal";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [h1, h2, h4, te, tc]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["refrigeration-cop"] = _v321renderRefrigerationCop;
+
+// dims: in { q_evap: M L^2 T^-3, unit_tons: dimensionless, cop: dimensionless } out: { w_comp_btuh: M L^2 T^-3, thr_btuh: M L^2 T^-3, thr_tons: M L^2 T^-3, factor: dimensionless }
+export function computeCondenserHeatRejection({ q_evap = 0, unit_tons = 0, cop = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(q_evap > 0)) return { error: "Evaporator capacity must be positive." };
+  if (!(cop > 0)) return { error: "COP must be positive." };
+  const q_btuh = unit_tons === 1 ? q_evap * 12000 : q_evap;
+  const w_comp_btuh = q_btuh / cop;
+  const thr_btuh = q_btuh + w_comp_btuh;
+  const factor = 1 + 1 / cop;
+  const thr_tons = thr_btuh / 12000;
+  return {
+    w_comp_btuh, thr_btuh, thr_tons, factor,
+    note: "Total heat of rejection THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work W_comp = Q_evap/COP added to the evaporator load - the number that sizes the condenser, the cooling tower, or the air-cooled coil. The heat-rejection factor 1 + 1/COP is about 1.25 for comfort cooling and higher at lower COP / low-temperature refrigeration, so a struggling (low-COP) system overloads its own condenser and drives head pressure higher still. Uses the compressor work implied by the COP; the condenser is assumed to reject the full evaporator-plus-compressor heat (no desuperheater/heat-recovery split), and motor heat rejected outside the refrigerant (a hermetic compressor adds it) is not included. An engineering aid; the equipment's rated heat-of-rejection data govern.",
+  };
+}
+export const condenserHeatRejectionExample = { inputs: { q_evap: 5, unit_tons: 1, cop: 2.4 } };
+
+function _v322renderCondenserHeatRejection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: total heat of rejection THR = Q_evap (1 + 1/COP), compressor work W_comp = Q_evap/COP, and the ~1.25 comfort-cooling heat-rejection factor, by name. No heat-recovery split or hermetic motor heat. An engineering aid; the rated heat-of-rejection data govern.";
+  const q = makeNumber("Evaporator capacity (tons, or Btu/h if unit set to 0)", "chr-q", { step: "any", min: "0" });
+  const unit = makeSelect("Capacity unit", "chr-unit", [{ value: "1", label: "Tons" }, { value: "0", label: "Btu/h" }]);
+  const cop = makeNumber("Coefficient of performance COP", "chr-cop", { step: "any", min: "0" });
+  for (const f of [q, unit, cop]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "5"; unit.select.value = "1"; cop.input.value = "2.4"; update(); });
+  const oW = makeOutputLine(outputRegion, "Compressor work", "chr-out-w");
+  const oThr = makeOutputLine(outputRegion, "Total heat of rejection", "chr-out-thr");
+  const oFactor = makeOutputLine(outputRegion, "Heat-rejection factor", "chr-out-factor");
+  const oNote = makeOutputLine(outputRegion, "Note", "chr-out-note");
+  const update = debounce(() => {
+    const r = computeCondenserHeatRejection({ q_evap: Number(q.input.value) || 0, unit_tons: Number(unit.select.value), cop: Number(cop.input.value) || 0 });
+    if (r.error) { oW.textContent = r.error; oThr.textContent = "-"; oFactor.textContent = "-"; oNote.textContent = "-"; return; }
+    oW.textContent = fmt(r.w_comp_btuh, 0) + " Btu/h";
+    oThr.textContent = fmt(r.thr_btuh, 0) + " Btu/h (" + fmt(r.thr_tons, 2) + " tons)";
+    oFactor.textContent = fmt(r.factor, 3) + " (THR / Q_evap)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q.input, unit.select, cop.input]) f.addEventListener(f === unit.select ? "change" : "input", update);
+}
+REFRIGERANT_RENDERERS["condenser-heat-rejection"] = _v322renderCondenserHeatRejection;

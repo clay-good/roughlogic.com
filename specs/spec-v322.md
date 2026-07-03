@@ -1,6 +1,6 @@
 # roughlogic.com Specification v322 -- Condenser Heat of Rejection (Total Heat of Rejection) (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v320..v322 (the refrigeration-cycle trio -- mass flow (v320),
+> **Status: LANDED (2026-07-03, package 0.113.0; proposed 2026-07-02). Batch spec-v320..v322 (the refrigeration-cycle trio -- mass flow (v320),
 > COP (v321), the condenser heat of rejection (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `cooling-tower` computes heat rejection for a tower
 > from its water flow and range, but the refrigeration side never computes the total heat of rejection the condenser must

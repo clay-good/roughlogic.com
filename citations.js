@@ -7707,6 +7707,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "refrigerant-mass-flow": {
+    formula: "Q_btumin = (unit == tons) ? Q x 200 : Q/60; RE = h1 - h4; m_dot = Q_btumin / RE; m_dot_lbh = 60 m_dot.",
+    edition: "The refrigerant mass-flow-from-capacity relation m_dot = Q / (h1 - h4) with the refrigeration effect off the pressure-enthalpy diagram, a standard refrigeration-cycle result, by name.",
+    freeAccess: "The mass-flow-from-capacity relation is a public refrigeration-cycle result; the ASHRAE Handbook - Refrigeration covers the P-h cycle.",
+    governance: GOVERNANCE.general,
+    editionNote: "The refrigerant mass flow m_dot = Q / (h1 - h4), the refrigeration effect RE = h1 - h4 from the pressure-enthalpy diagram, the 1 ton = 200 Btu/min = 12,000 Btu/h conversion, and h4 = hf at the condensing pressure (isenthalpic throttling). This returns the circulated refrigerant mass flow - it takes the enthalpies off the refrigerant's P-h diagram or tables at the operating condition, assumes steady flow and 100% evaporator effectiveness, and does not compute the compressor displacement, the volumetric efficiency, or the enthalpies themselves. An engineering aid; the refrigerant property data at the operating condition govern.",
+    assumptions: [
+      { name: "Mass flow", value: "m_dot = Q / (h1 - h4), the load over the refrigeration effect", source: "vapor-compression cycle" },
+      { name: "Throttling", value: "h4 = hf at the condensing pressure (isenthalpic expansion)", source: "refrigeration cycle" },
+      { name: "Enthalpies", value: "read off the refrigerant P-h diagram or tables at the operating state points", source: "refrigerant property data" },
+    ],
+  },
+  "refrigeration-cop": {
+    formula: "COP = (h1 - h4)/(h2 - h1); COP_Carnot = (Tevap + 459.67)/((Tcond + 459.67) - (Tevap + 459.67)); eta_2nd = COP/COP_Carnot; EER = 3.412 COP.",
+    edition: "The cooling coefficient of performance, its Carnot ceiling, the second-law efficiency, and the EER relation, standard refrigeration-cycle definitions, by name.",
+    freeAccess: "The COP, Carnot-limit, and EER relations are public thermodynamic results; the ASHRAE Handbook covers the cycle.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cooling COP = (h1 - h4)/(h2 - h1), the Carnot limit COP_Carnot = T_evap/(T_cond - T_evap) in absolute (Rankine) temperature, the second-law efficiency COP/COP_Carnot, and the relation EER = 3.412 x COP. This returns the cycle COP, its Carnot ceiling, and the second-law efficiency - it uses the enthalpies from the P-h diagram, takes the ideal (isentropic-work) or actual work as entered, uses saturation temperatures for the Carnot lift, and does not add the motor/drive or parasitic loads (the system COP is lower). An engineering aid; the refrigerant property data and measured state points govern.",
+    assumptions: [
+      { name: "Cycle COP", value: "the refrigeration effect over the compressor work, from the P-h enthalpies", source: "vapor-compression cycle" },
+      { name: "Carnot ceiling", value: "T_evap/(T_cond - T_evap) in Rankine; the ratio is the second-law efficiency", source: "thermodynamics" },
+      { name: "EER", value: "EER = 3.412 x COP (Btu/Wh per unit COP)", source: "unit conversion" },
+    ],
+  },
+  "condenser-heat-rejection": {
+    formula: "Q_btuh = (unit == tons) ? Q x 12,000 : Q; W_comp = Q_btuh/COP; THR = Q_btuh (1 + 1/COP); factor = 1 + 1/COP; THR_tons = THR/12,000.",
+    edition: "The condenser total heat of rejection THR = Q_evap + W_comp = Q_evap (1 + 1/COP), a standard refrigeration-cycle result, by name.",
+    freeAccess: "The total-heat-of-rejection relation is a public refrigeration-cycle result; the ASHRAE Handbook covers condenser sizing.",
+    governance: GOVERNANCE.general,
+    editionNote: "The total heat of rejection THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work W_comp = Q_evap/COP, and the typical heat-rejection factor of about 1.25 for comfort cooling (higher at lower COP / low-temperature refrigeration). This returns the total heat of rejection at the condenser from the evaporator load and the COP - it uses the compressor work implied by the COP, assumes the condenser rejects the full evaporator-plus-compressor heat (no desuperheater/heat-recovery split), and does not add motor heat rejected outside the refrigerant (a hermetic compressor adds it, a belt-drive does not). An engineering aid; the equipment's rated heat-of-rejection data govern.",
+    assumptions: [
+      { name: "Heat of rejection", value: "THR = Q_evap (1 + 1/COP), the evaporator load plus the compressor work", source: "energy balance" },
+      { name: "Rejection factor", value: "1 + 1/COP, about 1.25 for comfort cooling, higher at lower COP", source: "refrigeration practice" },
+      { name: "No heat recovery", value: "full rejection at the condenser; no desuperheater split or external motor heat", source: "scope of this tile" },
+    ],
+  },
   "radial-chip-thinning": {
     formula: "r = ae/D; RCTF = (r < 0.5) ? 1/(2 sqrt(r - r^2)) : 1.0; fz_prog = fz_target x RCTF.",
     edition: "The radial-chip-thinning geometry - the chip thinning factor RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) for ae below half the cutter diameter and the compensated feed - as compiled in the modern milling and Machinery's Handbook references, by name.",

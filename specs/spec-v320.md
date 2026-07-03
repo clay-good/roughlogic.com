@@ -1,6 +1,6 @@
 # roughlogic.com Specification v320 -- Refrigerant Mass Flow from Capacity and Refrigeration Effect (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v320..v322 (the refrigeration-cycle trio -- the P-h-diagram
+> **Status: LANDED (2026-07-03, package 0.113.0; proposed 2026-07-02). Batch spec-v320..v322 (the refrigeration-cycle trio -- the P-h-diagram
 > quantities the catalog uses but never computes: the refrigerant mass flow from the load and the refrigeration effect
 > (this spec), the coefficient of performance (v321), and the condenser heat of rejection (v322).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `refrigerant-velocity` takes the mass flow as a given

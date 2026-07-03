@@ -975,6 +975,10 @@ const RELATED = {
   "radial-chip-thinning": ["cutting-speed-rpm","material-removal-rate","spindle-power-torque"],
   "boring-bar-deflection": ["spindle-power-torque","radial-chip-thinning","turning-surface-finish"],
   "ballnose-scallop-height": ["turning-surface-finish","radial-chip-thinning","cutting-speed-rpm"],
+  // spec-v320..v322 refrigeration-cycle batch (Group C)
+  "refrigerant-mass-flow": ["refrigerant-velocity","refrigeration-cop","condenser-heat-rejection"],
+  "refrigeration-cop": ["refrigerant-mass-flow","condenser-heat-rejection","seer-eer"],
+  "condenser-heat-rejection": ["refrigeration-cop","refrigerant-mass-flow","cooling-tower"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

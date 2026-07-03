@@ -12287,6 +12287,131 @@
       "term": "scallop calculator",
       "target": "ballnose-scallop-height",
       "kind": "adjacent"
+    },
+    {
+      "term": "refrigerant mass flow",
+      "target": "refrigerant-mass-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "mass flow rate refrigerant",
+      "target": "refrigerant-mass-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "refrigeration effect",
+      "target": "refrigerant-mass-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "lb/min refrigerant",
+      "target": "refrigerant-mass-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "p-h diagram mass flow",
+      "target": "refrigerant-mass-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "circulation rate",
+      "target": "refrigerant-mass-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "m dot refrigerant",
+      "target": "refrigerant-mass-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "evaporator mass flow",
+      "target": "refrigerant-mass-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cop",
+      "target": "refrigeration-cop",
+      "kind": "industry"
+    },
+    {
+      "term": "coefficient of performance",
+      "target": "refrigeration-cop",
+      "kind": "industry"
+    },
+    {
+      "term": "carnot cop",
+      "target": "refrigeration-cop",
+      "kind": "industry"
+    },
+    {
+      "term": "refrigeration efficiency",
+      "target": "refrigeration-cop",
+      "kind": "industry"
+    },
+    {
+      "term": "second law efficiency",
+      "target": "refrigeration-cop",
+      "kind": "adjacent"
+    },
+    {
+      "term": "eer from cop",
+      "target": "refrigeration-cop",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cycle efficiency",
+      "target": "refrigeration-cop",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cop calculator",
+      "target": "refrigeration-cop",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ideal cop",
+      "target": "refrigeration-cop",
+      "kind": "adjacent"
+    },
+    {
+      "term": "heat of rejection",
+      "target": "condenser-heat-rejection",
+      "kind": "industry"
+    },
+    {
+      "term": "total heat of rejection",
+      "target": "condenser-heat-rejection",
+      "kind": "industry"
+    },
+    {
+      "term": "thr",
+      "target": "condenser-heat-rejection",
+      "kind": "industry"
+    },
+    {
+      "term": "condenser load",
+      "target": "condenser-heat-rejection",
+      "kind": "industry"
+    },
+    {
+      "term": "heat rejection factor",
+      "target": "condenser-heat-rejection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "condenser sizing",
+      "target": "condenser-heat-rejection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "compressor heat",
+      "target": "condenser-heat-rejection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "reject heat refrigeration",
+      "target": "condenser-heat-rejection",
+      "kind": "adjacent"
     }
   ]
 }

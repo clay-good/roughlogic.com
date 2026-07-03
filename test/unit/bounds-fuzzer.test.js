@@ -14143,3 +14143,58 @@ test("bounds: spec-v319 computeBallnoseScallopHeight pins the forward/inverse ro
   assert.ok("error" in _v319({ r_in: 0.25, mode: "bogus", s_in: 0.03 }));
   assert.ok("error" in _v319({ r_in: NaN, mode: "scallop-from-stepover", s_in: 0.03 }));
 });
+
+// ===================== spec-v320..v322 refrigeration-cycle batch =====================
+import { computeRefrigerantMassFlow as _v320, computeRefrigerationCop as _v321, computeCondenserHeatRejection as _v322 } from "../../calc-refrigerant.js";
+
+test("bounds: spec-v320 computeRefrigerantMassFlow pins the tons path, the inverse-RE scaling, and error seams", () => {
+  const r = _v320({ q: 5, unit_tons: 1, h1_btulb: 180, h4_btulb: 120 });
+  assert.strictEqual(r.re_btulb, 60);
+  assert.ok(Math.abs(r.m_dot_lbmin - 1000 / 60) < 1e-9);
+  assert.ok(Math.abs(r.m_dot_lbh - r.m_dot_lbmin * 60) < 1e-9);
+  // A smaller refrigeration effect raises the mass flow (1/RE).
+  const r2 = _v320({ q: 5, unit_tons: 1, h1_btulb: 180, h4_btulb: 130 });
+  assert.ok(Math.abs(r2.m_dot_lbmin - 20) < 1e-9);
+  assert.ok(r2.m_dot_lbmin > r.m_dot_lbmin);
+  // Btu/h unit path.
+  assert.ok(Math.abs(_v320({ q: 60000, unit_tons: 0, h1_btulb: 180, h4_btulb: 120 }).m_dot_lbmin - 1000 / 60) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v320({ q: 0, h1_btulb: 180, h4_btulb: 120 }));
+  assert.ok("error" in _v320({ q: 5, unit_tons: 1, h1_btulb: 120, h4_btulb: 180 })); // h1 <= h4
+  assert.ok("error" in _v320({ q: Infinity, h1_btulb: 180, h4_btulb: 120 }));
+});
+
+test("bounds: spec-v321 computeRefrigerationCop pins the COP, the Carnot Rankine conversion, the EER identity, and error seams", () => {
+  const r = _v321({ h1_btulb: 180, h2_btulb: 205, h4_btulb: 120, tevap_f: 40, tcond_f: 120 });
+  assert.ok(Math.abs(r.cop - 60 / 25) < 1e-9);
+  assert.ok(Math.abs(r.eer - 3.412 * r.cop) < 1e-9);
+  assert.ok(Math.abs(r.cop_carnot - 499.67 / 80) < 1e-9);
+  assert.ok(Math.abs(r.eta_2nd - r.cop / r.cop_carnot) < 1e-12);
+  // A smaller lift raises the Carnot ceiling.
+  const r2 = _v321({ h1_btulb: 180, h2_btulb: 205, h4_btulb: 120, tevap_f: 45, tcond_f: 120 });
+  assert.ok(r2.cop_carnot > r.cop_carnot);
+  assert.ok(Math.abs(r2.cop_carnot - 504.67 / 75) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v321({ h1_btulb: 180, h2_btulb: 180, h4_btulb: 120, tevap_f: 40, tcond_f: 120 })); // h2 <= h1
+  assert.ok("error" in _v321({ h1_btulb: 120, h2_btulb: 205, h4_btulb: 180, tevap_f: 40, tcond_f: 120 })); // h1 <= h4
+  assert.ok("error" in _v321({ h1_btulb: 180, h2_btulb: 205, h4_btulb: 120, tevap_f: 120, tcond_f: 40 })); // Tcond <= Tevap
+  assert.ok("error" in _v321({ h1_btulb: Infinity, h2_btulb: 205, h4_btulb: 120, tevap_f: 40, tcond_f: 120 }));
+});
+
+test("bounds: spec-v322 computeCondenserHeatRejection pins the 1 + 1/COP factor, the tons conversion, and error seams", () => {
+  const r = _v322({ q_evap: 5, unit_tons: 1, cop: 2.4 });
+  assert.ok(Math.abs(r.w_comp_btuh - 60000 / 2.4) < 1e-9);
+  assert.ok(Math.abs(r.thr_btuh - 60000 * (1 + 1 / 2.4)) < 1e-9);
+  assert.ok(Math.abs(r.factor - (1 + 1 / 2.4)) < 1e-12);
+  assert.ok(Math.abs(r.thr_tons - r.thr_btuh / 12000) < 1e-9);
+  // A worse COP piles more heat on the condenser.
+  const r2 = _v322({ q_evap: 5, unit_tons: 1, cop: 1.5 });
+  assert.ok(Math.abs(r2.thr_btuh - 100000) < 1e-6);
+  assert.ok(r2.thr_btuh > r.thr_btuh);
+  // Btu/h unit path.
+  assert.ok(Math.abs(_v322({ q_evap: 60000, unit_tons: 0, cop: 2.4 }).thr_btuh - r.thr_btuh) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v322({ q_evap: 0, cop: 2.4 }));
+  assert.ok("error" in _v322({ q_evap: 5, unit_tons: 1, cop: 0 }));
+  assert.ok("error" in _v322({ q_evap: Infinity, cop: 2.4 }));
+});

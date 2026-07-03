@@ -29206,6 +29206,93 @@
       "outputs": {
         "out_in": { "value": 0.030, "tolerance": { "pct": 1 } }
       }
+    },
+    {
+      "tile_id": "refrigerant-mass-flow",
+      "source_publisher": "Vapor-compression cycle (m_dot = Q/(h1 - h4))",
+      "source_title": "5-ton system, RE 60 Btu/lb -> 16.7 lb/min (1,000 lb/h)",
+      "source_edition_or_year": "spec-v320 worked example (machine-verified)",
+      "source_section_or_page": "spec-v320 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "q": 5, "unit_tons": 1, "h1_btulb": 180, "h4_btulb": 120 },
+      "outputs": {
+        "re_btulb": { "value": 60, "tolerance": { "abs": 0.01 } },
+        "m_dot_lbmin": { "value": 16.67, "tolerance": { "pct": 0.2 } },
+        "m_dot_lbh": { "value": 1000, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "refrigerant-mass-flow",
+      "source_publisher": "Vapor-compression cycle (m_dot = Q/(h1 - h4))",
+      "source_title": "cross-check: less subcooling (RE 50) demands 20 lb/min for the same 5 tons",
+      "source_edition_or_year": "spec-v320 worked example (machine-verified)",
+      "source_section_or_page": "spec-v320 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "q": 5, "unit_tons": 1, "h1_btulb": 180, "h4_btulb": 130 },
+      "outputs": {
+        "m_dot_lbmin": { "value": 20.0, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "refrigeration-cop",
+      "source_publisher": "Refrigeration COP and Carnot limit",
+      "source_title": "RE 60, W 25 Btu/lb; 40/120 F lift -> COP 2.40 (EER 8.19), Carnot 6.25, 38% of ideal",
+      "source_edition_or_year": "spec-v321 worked example (machine-verified)",
+      "source_section_or_page": "spec-v321 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "h1_btulb": 180, "h2_btulb": 205, "h4_btulb": 120, "tevap_f": 40, "tcond_f": 120 },
+      "outputs": {
+        "cop": { "value": 2.40, "tolerance": { "pct": 0.2 } },
+        "eer": { "value": 8.19, "tolerance": { "pct": 0.2 } },
+        "cop_carnot": { "value": 6.25, "tolerance": { "pct": 0.2 } },
+        "eta_2nd": { "value": 0.384, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "refrigeration-cop",
+      "source_publisher": "Refrigeration COP and Carnot limit",
+      "source_title": "cross-check: raise the evaporator to 45 F (smaller lift) -> Carnot ceiling 6.73",
+      "source_edition_or_year": "spec-v321 worked example (machine-verified)",
+      "source_section_or_page": "spec-v321 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "h1_btulb": 180, "h2_btulb": 205, "h4_btulb": 120, "tevap_f": 45, "tcond_f": 120 },
+      "outputs": {
+        "cop_carnot": { "value": 6.73, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "condenser-heat-rejection",
+      "source_publisher": "Total heat of rejection THR = Q_evap (1 + 1/COP)",
+      "source_title": "5-ton system at COP 2.4 -> 85,000 Btu/h (7.08 tons), factor 1.417",
+      "source_edition_or_year": "spec-v322 worked example (machine-verified)",
+      "source_section_or_page": "spec-v322 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "q_evap": 5, "unit_tons": 1, "cop": 2.4 },
+      "outputs": {
+        "w_comp_btuh": { "value": 25000, "tolerance": { "pct": 0.2 } },
+        "thr_btuh": { "value": 85000, "tolerance": { "pct": 0.2 } },
+        "thr_tons": { "value": 7.08, "tolerance": { "pct": 0.2 } },
+        "factor": { "value": 1.417, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "condenser-heat-rejection",
+      "source_publisher": "Total heat of rejection THR = Q_evap (1 + 1/COP)",
+      "source_title": "cross-check: a low-efficiency COP 1.5 cycle rejects 100,000 Btu/h (8.33 tons)",
+      "source_edition_or_year": "spec-v322 worked example (machine-verified)",
+      "source_section_or_page": "spec-v322 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "q_evap": 5, "unit_tons": 1, "cop": 1.5 },
+      "outputs": {
+        "thr_btuh": { "value": 100000, "tolerance": { "pct": 0.2 } },
+        "thr_tons": { "value": 8.33, "tolerance": { "pct": 0.2 } }
+      }
     }
   ]
 }
