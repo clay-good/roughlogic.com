@@ -655,6 +655,10 @@ export const COMPUTE_MAP = {
   "wood-bearing-perpendicular": { module: "../../calc-construction.js", fn: "computeWoodBearingPerpendicular" },
   "wood-tension-member": { module: "../../calc-construction.js", fn: "computeWoodTensionMember" },
   "wood-combined-bending-axial": { module: "../../calc-construction.js", fn: "computeWoodCombinedBendingAxial" },
+  // spec-v293..v295 steel connection/detailing depth batch (3 tiles)
+  "steel-web-local-strength": { module: "../../calc-steel.js", fn: "computeSteelWebLocalStrength" },
+  "steel-bolt-slip-critical": { module: "../../calc-steel.js", fn: "computeSteelBoltSlipCritical" },
+  "steel-fillet-weld-size": { module: "../../calc-steel.js", fn: "computeSteelFilletWeldSize" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

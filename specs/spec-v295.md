@@ -1,6 +1,6 @@
 # roughlogic.com Specification v295 -- Fillet Weld Size Limits and Effective Throat (AISC 360 J2.2b) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v293..v295 (the steel connection/detailing depth trio -- web
+> **Status: LANDED (2026-07-03, package 0.104.0; proposed 2026-07-02). Batch spec-v293..v295 (the steel connection/detailing depth trio -- web
 > local strength (v293), the slip-critical bolt (v294), the fillet-weld size limits (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `fillet-weld-strength` computes the strength of a
 > weld of a given size, but it never tells the fabricator what size the code allows -- the minimum leg from the thinner

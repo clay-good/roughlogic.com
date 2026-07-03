@@ -28440,6 +28440,95 @@
       "outputs": {
         "interaction": { "value": 1.5499, "tolerance": { "abs": 0.002 } }
       }
+    },
+    {
+      "tile_id": "steel-web-local-strength",
+      "source_publisher": "AISC 360-22 J10.2 / J10.3",
+      "source_title": "W18x50, 4 in interior bearing -> WLY 181.9 / WC 204.2 kip; crippling governs ASD at 102.1 kip",
+      "source_edition_or_year": "spec-v293 worked example (machine-verified)",
+      "source_section_or_page": "spec-v293 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fy": 50, "tw": 0.355, "tf": 0.570, "k_in": 1.25, "d_in": 18.0, "lb_in": 4, "location": "interior" },
+      "outputs": {
+        "wly_rn": { "value": 181.94, "tolerance": { "pct": 0.1 } },
+        "wc_rn": { "value": 204.2, "tolerance": { "pct": 0.2 } },
+        "asd_kip": { "value": 102.1, "tolerance": { "pct": 0.2 } },
+        "lrfd_kip": { "value": 153.2, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "steel-web-local-strength",
+      "source_publisher": "AISC 360-22 J10.2 / J10.3",
+      "source_title": "cross-check: same bearing at the member end -> yielding drops to 126.5 kip and governs ASD at 84.3",
+      "source_edition_or_year": "spec-v293 worked example (machine-verified; corrects the spec prose's 126.0 rounding)",
+      "source_section_or_page": "spec-v293 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fy": 50, "tw": 0.355, "tf": 0.570, "k_in": 1.25, "d_in": 18.0, "lb_in": 4, "location": "end" },
+      "outputs": {
+        "wly_rn": { "value": 126.47, "tolerance": { "pct": 0.1 } },
+        "asd_kip": { "value": 84.31, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "steel-bolt-slip-critical",
+      "source_publisher": "AISC 360-22 J3.8 / Table J3.1",
+      "source_title": "3/4 in A325, Class A, one slip plane -> 9.49 kip/bolt (ASD 6.33); 4 bolts -> 38.0 kip LRFD",
+      "source_edition_or_year": "spec-v294 worked example (machine-verified)",
+      "source_section_or_page": "spec-v294 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "mu": 0.30, "tb_kip": 28, "ns": 1, "n": 4, "hf": 1.0, "du": 1.13 },
+      "outputs": {
+        "rn_bolt_kip": { "value": 9.492, "tolerance": { "abs": 0.005 } },
+        "asd_bolt_kip": { "value": 6.328, "tolerance": { "abs": 0.005 } },
+        "lrfd_total_kip": { "value": 37.97, "tolerance": { "pct": 0.1 } },
+        "asd_total_kip": { "value": 25.31, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "steel-bolt-slip-critical",
+      "source_publisher": "AISC 360-22 J3.8",
+      "source_title": "cross-check: Class B surface in double shear lifts one bolt 3.3x to 31.6 kip",
+      "source_edition_or_year": "spec-v294 worked example (machine-verified)",
+      "source_section_or_page": "spec-v294 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "mu": 0.50, "tb_kip": 28, "ns": 2, "n": 1, "hf": 1.0, "du": 1.13 },
+      "outputs": {
+        "rn_bolt_kip": { "value": 31.64, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "steel-fillet-weld-size",
+      "source_publisher": "AISC 360-22 Table J2.4 / J2.2b",
+      "source_title": "1/2 in to 3/8 in plates, chosen 1/4 in weld -> window 3/16 to 5/16, throat 0.177 in, 1 in min length",
+      "source_edition_or_year": "spec-v295 worked example (machine-verified)",
+      "source_section_or_page": "spec-v295 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t1_in": 0.5, "t2_in": 0.375, "w_in": 0.25 },
+      "outputs": {
+        "min_leg_in": { "value": 0.1875, "tolerance": { "abs": 0.0001 } },
+        "max_leg_in": { "value": 0.3125, "tolerance": { "abs": 0.0001 } },
+        "te_in": { "value": 0.17675, "tolerance": { "abs": 0.0005 } },
+        "min_len_in": { "value": 1.0, "tolerance": { "abs": 0.0001 } }
+      }
+    },
+    {
+      "tile_id": "steel-fillet-weld-size",
+      "source_publisher": "AISC 360-22 Table J2.4 / J2.2b",
+      "source_title": "cross-check: 3/16 in sheet - the max is the full thickness (t - 1/16 does not apply under 1/4 in)",
+      "source_edition_or_year": "spec-v295 worked example (machine-verified)",
+      "source_section_or_page": "spec-v295 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t1_in": 0.1875, "t2_in": 0.1875, "w_in": 0.1875 },
+      "outputs": {
+        "min_leg_in": { "value": 0.125, "tolerance": { "abs": 0.0001 } },
+        "max_leg_in": { "value": 0.1875, "tolerance": { "abs": 0.0001 } }
+      }
     }
   ]
 }

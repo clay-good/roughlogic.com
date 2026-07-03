@@ -426,6 +426,8 @@ const _TILES = [
   ["soil-settlement-elastic", "E"], ["pile-axial-capacity", "E"], ["slope-stability-infinite", "E"],
   // spec-v290..v292 NDS wood-member depth batch
   ["wood-bearing-perpendicular", "E"], ["wood-tension-member", "E"], ["wood-combined-bending-axial", "E"],
+  // spec-v293..v295 steel connection/detailing depth batch
+  ["steel-web-local-strength", "E"], ["steel-bolt-slip-critical", "E"], ["steel-fillet-weld-size", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

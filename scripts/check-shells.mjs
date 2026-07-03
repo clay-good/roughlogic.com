@@ -49,7 +49,11 @@ const TILE_GZIP_CAP = 6 * 1024;
 // Bumped 20 -> 24 KB later on 2026-07-02: the geotech (v260..v262), masonry
 // (v269..v271), and wood-lateral (v272..v274) trios -- all Group E -- took
 // construction/index.html to ~20.5 KB gz; 24 KB restores ~17% headroom.
-const GROUP_GZIP_CAP = 24 * 1024;
+// Bumped 24 -> 30 KB on 2026-07-03: the v275-v374 campaign's Group E depth
+// trios (steel v281/v293, concrete v284, geotech v287, wood v290) took
+// construction/index.html to ~24.7 KB gz; 30 KB restores ~21% headroom for
+// the campaign's remaining Group E batches.
+const GROUP_GZIP_CAP = 30 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

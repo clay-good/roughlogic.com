@@ -13555,3 +13555,71 @@ test("bounds: spec-v292 computeWoodCombinedBendingAxial pins the interaction, th
   assert.ok("error" in _v292({ ...P, p_lb: 3000, le_in: 0 }));
   assert.ok("error" in _v292({ ...P, p_lb: Infinity }));
 });
+
+// ===================== spec-v293..v295 steel connection/detailing depth batch =====================
+import { computeSteelWebLocalStrength as _v293, computeSteelBoltSlipCritical as _v294, computeSteelFilletWeldSize as _v295 } from "../../calc-steel.js";
+
+test("bounds: spec-v293 computeSteelWebLocalStrength pins both limit states, the interior/end branch, and error seams", () => {
+  const P = { fy: 50, tw: 0.355, tf: 0.570, k_in: 1.25, d_in: 18.0, lb_in: 4 };
+  const r = _v293({ ...P, location: "interior" });
+  assert.ok(Math.abs(r.wly_rn - 50 * 0.355 * 10.25) < 1e-9);
+  assert.ok(Math.abs(r.wc_rn - 204.2) < 0.1);
+  assert.ok(Math.abs(r.asd_kip - r.wc_rn / 2) < 1e-12); // crippling governs ASD (differing Omegas)
+  assert.ok(r.asd_governs.startsWith("web crippling"));
+  assert.ok(Math.abs(r.lrfd_kip - 0.75 * r.wc_rn) < 1e-12);
+  // At the end the yielding coefficient halves the k term and yielding governs.
+  const r2 = _v293({ ...P, location: "end" });
+  assert.ok(Math.abs(r2.wly_rn - 50 * 0.355 * 7.125) < 1e-9);
+  assert.ok(r2.asd_governs.startsWith("web local yielding"));
+  assert.ok(Math.abs(r2.asd_kip - r2.wly_rn / 1.5) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v293({ ...P, tw: 0, location: "interior" }));
+  assert.ok("error" in _v293({ ...P, lb_in: 0, location: "interior" }));
+  assert.ok("error" in _v293({ ...P, fy: 0, location: "interior" }));
+  assert.ok("error" in _v293({ ...P, d_in: NaN, location: "interior" }));
+});
+
+test("bounds: spec-v294 computeSteelBoltSlipCritical pins the Class A bolt, the mu/ns scaling, and error seams", () => {
+  const r = _v294({ mu: 0.30, tb_kip: 28, ns: 1, n: 1 });
+  assert.ok(Math.abs(r.rn_bolt_kip - 9.492) < 1e-9);
+  assert.ok(Math.abs(r.asd_bolt_kip - 9.492 / 1.5) < 1e-9);
+  assert.ok(Math.abs(r.lrfd_bolt_kip - 9.492) < 1e-9);
+  // Totals scale with the bolt count.
+  const r4 = _v294({ mu: 0.30, tb_kip: 28, ns: 1, n: 4 });
+  assert.ok(Math.abs(r4.lrfd_total_kip - 4 * r.rn_bolt_kip) < 1e-9);
+  // Class B + double shear: (0.50/0.30) x 2 = 3.33x per bolt.
+  const rB = _v294({ mu: 0.50, tb_kip: 28, ns: 2, n: 1 });
+  assert.ok(Math.abs(rB.rn_bolt_kip / r.rn_bolt_kip - (0.5 / 0.3) * 2) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v294({ mu: 0, tb_kip: 28 }));
+  assert.ok("error" in _v294({ mu: 0.30, tb_kip: 0 }));
+  assert.ok("error" in _v294({ mu: 0.30, tb_kip: 28, ns: 0 }));
+  assert.ok("error" in _v294({ mu: 0.30, tb_kip: 28, n: 2.5 }));
+  assert.ok("error" in _v294({ mu: 0.30, tb_kip: Infinity }));
+});
+
+test("bounds: spec-v295 computeSteelFilletWeldSize pins the J2.4 brackets, the edge-max branch, the throat, and error seams", () => {
+  const r = _v295({ t1_in: 0.5, t2_in: 0.375, w_in: 0.25 });
+  assert.strictEqual(r.t_thin, 0.375);
+  assert.strictEqual(r.min_leg_in, 0.1875);
+  assert.strictEqual(r.max_leg_in, 0.3125);
+  assert.ok(Math.abs(r.te_in - 0.707 * 0.25) < 1e-12);
+  assert.strictEqual(r.min_len_in, 1.0);
+  assert.ok(r.window_flag.includes("complies"));
+  // The four Table J2.4 minimum-leg brackets.
+  assert.strictEqual(_v295({ t1_in: 0.2, t2_in: 1 }).min_leg_in, 0.125);
+  assert.strictEqual(_v295({ t1_in: 0.4, t2_in: 1 }).min_leg_in, 0.1875);
+  assert.strictEqual(_v295({ t1_in: 0.6, t2_in: 1 }).min_leg_in, 0.25);
+  assert.strictEqual(_v295({ t1_in: 1.0, t2_in: 2 }).min_leg_in, 0.3125);
+  // Under 1/4 in the edge maximum is the full thickness (no 1/16 deduction).
+  const r2 = _v295({ t1_in: 0.1875, t2_in: 0.1875, w_in: 0.1875 });
+  assert.strictEqual(r2.max_leg_in, 0.1875);
+  assert.ok(r2.window_flag.includes("complies"));
+  // A leg outside the window is flagged, not an error.
+  assert.ok(_v295({ t1_in: 0.5, t2_in: 0.375, w_in: 0.5 }).window_flag.includes("EXCEEDS"));
+  assert.ok(_v295({ t1_in: 0.5, t2_in: 0.375, w_in: 0.125 }).window_flag.includes("BELOW"));
+  // Error seams.
+  assert.ok("error" in _v295({ t1_in: 0, t2_in: 0.375 }));
+  assert.ok("error" in _v295({ t1_in: 0.5, t2_in: 0.375, w_in: -1 }));
+  assert.ok("error" in _v295({ t1_in: NaN, t2_in: 0.375 }));
+});

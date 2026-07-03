@@ -428,6 +428,8 @@ const TOOL_MODULES = (() => {
     "bolt-group-eccentric", "bolt-shear-bearing", "column-base-plate",
     // spec-v281..v283 members-and-connections depth batch
     "steel-beam-ltb", "steel-block-shear", "steel-tension-member",
+    // spec-v293..v295 connection/detailing depth batch
+    "steel-web-local-strength", "steel-bolt-slip-critical", "steel-fillet-weld-size",
   ]);
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio: a new lazy
   // Group E cluster, the RC companion to calc-steel.js one material over.

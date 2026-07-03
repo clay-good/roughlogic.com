@@ -1,6 +1,6 @@
 # roughlogic.com Specification v294 -- Slip-Critical Bolt Design Strength (AISC 360 J3.8) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v293..v295 (the steel connection/detailing depth trio -- web
+> **Status: LANDED (2026-07-03, package 0.104.0; proposed 2026-07-02). Batch spec-v293..v295 (the steel connection/detailing depth trio -- web
 > local strength (v293), the slip-critical bolt (this spec), fillet-weld size limits (v295)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `bolt-shear-bearing` computes bearing-type bolt shear
 > and bearing/tearout, but a slip-critical connection -- required wherever slip cannot be tolerated (oversized holes,

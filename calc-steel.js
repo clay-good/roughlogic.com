@@ -546,3 +546,137 @@ STEEL_RENDERERS["steel-tension-member"] = _simpleRenderer({
   ],
   compute: computeSteelTensionMember,
 });
+
+// ===================== spec-v293..v295: steel connection/detailing depth batch =====================
+// The checks the member tiles never touch: the beam web under a concentrated
+// force (J10 yielding + crippling), the slip-critical pretensioned bolt
+// (J3.8), and the fillet-weld detailing size limits (J2.2b / Table J2.4).
+
+// dims: in { fy: M L^-1 T^-2, tw: L, tf: L, k_in: L, d_in: L, lb_in: L, location: dimensionless } out: { wly_rn: M L T^-2, wc_rn: M L T^-2, asd_kip: M L T^-2, lrfd_kip: M L T^-2 }
+export function computeSteelWebLocalStrength({ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interior" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
+  for (const [nm, v] of [["web thickness", tw], ["flange thickness", tf], ["k distance", k_in], ["depth", d_in], ["bearing length", lb_in]]) {
+    if (!(v > 0)) return { error: "The " + nm + " must be positive (in)." };
+  }
+  const interior = location !== "end";
+  const wly_rn = interior ? fy * tw * (5 * k_in + lb_in) : fy * tw * (2.5 * k_in + lb_in);
+  const wc_rn = 0.80 * tw * tw * (1 + 3 * (lb_in / d_in) * Math.pow(tw / tf, 1.5)) * Math.sqrt((_E_STEEL * fy * tf) / tw);
+  const wly_asd = wly_rn / 1.50, wly_lrfd = 1.00 * wly_rn;
+  const wc_asd = wc_rn / 2.00, wc_lrfd = 0.75 * wc_rn;
+  const asd_kip = Math.min(wly_asd, wc_asd);
+  const lrfd_kip = Math.min(wly_lrfd, wc_lrfd);
+  const asd_governs = wc_asd < wly_asd ? "web crippling governs (ASD)" : "web local yielding governs (ASD)";
+  return {
+    wly_rn, wc_rn, wly_asd, wc_asd, asd_kip, lrfd_kip, asd_governs,
+    note: "AISC 360-22 J10 concentrated-force web checks: J10.2 web local yielding Rn = Fy tw (5k + lb) at an interior location, (2.5k + lb) at an end (phi = 1.00 / Omega = 1.50), and J10.3 web crippling Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (phi = 0.75 / Omega = 2.00, E = 29,000 ksi, k = kdes). Because the safety factors differ, the governing limit state can flip between ASD and LRFD. The near-end crippling reduction for lb/d > 0.2, web sidesway/compression buckling (J10.4/J10.5), and the bearing-stiffener design are separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelWebLocalStrengthExample = { inputs: { fy: 50, tw: 0.355, tf: 0.570, k_in: 1.25, d_in: 18.0, lb_in: 4, location: "interior" } };
+
+STEEL_RENDERERS["steel-web-local-strength"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 J10.2 web local yielding Rn = Fy tw (5k + lb) interior / (2.5k + lb) end (phi 1.00 / Omega 1.50) and J10.3 web crippling Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (phi 0.75 / Omega 2.00), E = 29,000 ksi, by name. Stiffener design and sidesway buckling are separate. A design aid, not a substitute for the engineer of record.",
+  example: steelWebLocalStrengthExample.inputs,
+  fields: [
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 50 },
+    { key: "tw", label: "Web thickness tw (in)", kind: "number" },
+    { key: "tf", label: "Flange thickness tf (in)", kind: "number" },
+    { key: "k_in", label: "k distance kdes (in)", kind: "number" },
+    { key: "d_in", label: "Member depth d (in)", kind: "number" },
+    { key: "lb_in", label: "Bearing length lb (in)", kind: "number" },
+    { key: "location", label: "Force location", kind: "select", options: [
+      { value: "interior", label: "Interior (5k + lb)" },
+      { value: "end", label: "Near the member end (2.5k + lb)" },
+    ], default: "interior" },
+  ],
+  outputs: [
+    { key: "wly", id: "swls-out-wly", label: "Web local yielding Rn (ASD)", value: (r) => fmt(r.wly_rn, 1) + " kip (" + fmt(r.wly_asd, 1) + " kip)" },
+    { key: "wc", id: "swls-out-wc", label: "Web crippling Rn (ASD)", value: (r) => fmt(r.wc_rn, 1) + " kip (" + fmt(r.wc_asd, 1) + " kip)" },
+    { key: "asd", id: "swls-out-asd", label: "Governing ASD capacity", value: (r) => fmt(r.asd_kip, 1) + " kip (" + r.asd_governs + ")" },
+    { key: "lrfd", id: "swls-out-lrfd", label: "Governing LRFD capacity", value: (r) => fmt(r.lrfd_kip, 1) + " kip" },
+    { key: "n", id: "swls-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelWebLocalStrength,
+});
+
+// dims: in { mu: dimensionless, tb_kip: M L T^-2, ns: dimensionless, n: dimensionless, hf: dimensionless, du: dimensionless } out: { rn_bolt_kip: M L T^-2, asd_bolt_kip: M L T^-2, lrfd_bolt_kip: M L T^-2, asd_total_kip: M L T^-2, lrfd_total_kip: M L T^-2 }
+export function computeSteelBoltSlipCritical({ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(mu > 0 && mu <= 1)) return { error: "The slip coefficient mu is over 0 and up to 1 (0.30 Class A, 0.50 Class B)." };
+  if (!(tb_kip > 0)) return { error: "The minimum pretension Tb must be positive (kip)." };
+  if (!(ns >= 1) || !Number.isInteger(ns)) return { error: "Slip planes must be a whole number of at least 1." };
+  if (!(n >= 1) || !Number.isInteger(n)) return { error: "The bolt count must be a whole number of at least 1." };
+  if (!(hf > 0 && hf <= 1)) return { error: "The filler factor hf is over 0 and up to 1.0." };
+  if (!(du > 0)) return { error: "The Du multiplier must be positive (1.13 standard)." };
+  const rn_bolt_kip = mu * du * hf * tb_kip * ns;
+  const asd_bolt_kip = rn_bolt_kip / 1.50;
+  const lrfd_bolt_kip = 1.00 * rn_bolt_kip;
+  const asd_total_kip = n * asd_bolt_kip;
+  const lrfd_total_kip = n * lrfd_bolt_kip;
+  return {
+    rn_bolt_kip, asd_bolt_kip, lrfd_bolt_kip, asd_total_kip, lrfd_total_kip,
+    note: "AISC 360-22 J3.8 slip resistance of a pretensioned high-strength bolt: Rn = mu Du hf Tb ns, with mu = 0.30 (Class A unpainted mill scale) / 0.50 (Class B blast-cleaned), Du = 1.13, hf = 1.0 with no fillers or fillers developed, Tb from Table J3.1, and phi = 1.00 / Omega = 1.50 for STANDARD holes (oversized and slotted holes reduce phi / raise Omega). The strength-level bolt shear and bearing (bolt-shear-bearing) must ALSO be satisfied; the tension-slip interaction (J3.9) and the pretensioning method (turn-of-nut, DTI) are separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelBoltSlipCriticalExample = { inputs: { mu: 0.30, tb_kip: 28, ns: 1, n: 1, hf: 1.0, du: 1.13 } };
+
+STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 J3.8 slip-critical resistance Rn = mu Du hf Tb ns (mu 0.30 Class A / 0.50 Class B, Du = 1.13, Tb per Table J3.1), phi = 1.00 / Omega = 1.50 standard holes, by name. Bolt shear/bearing must also be checked. A design aid, not a substitute for the engineer of record.",
+  example: steelBoltSlipCriticalExample.inputs,
+  fields: [
+    { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number", default: 0.30 },
+    { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
+    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
+    { key: "hf", label: "Filler factor hf", kind: "number", default: 1.0 },
+    { key: "du", label: "Du multiplier", kind: "number", default: 1.13 },
+  ],
+  outputs: [
+    { key: "rb", id: "sbsc-out-rb", label: "Slip resistance per bolt", value: (r) => fmt(r.rn_bolt_kip, 2) + " kip (ASD " + fmt(r.asd_bolt_kip, 2) + " / LRFD " + fmt(r.lrfd_bolt_kip, 2) + ")" },
+    { key: "ta", id: "sbsc-out-ta", label: "Connection total (ASD)", value: (r) => fmt(r.asd_total_kip, 1) + " kip" },
+    { key: "tl", id: "sbsc-out-tl", label: "Connection total (LRFD)", value: (r) => fmt(r.lrfd_total_kip, 1) + " kip" },
+    { key: "n", id: "sbsc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelBoltSlipCritical,
+});
+
+// dims: in { t1_in: L, t2_in: L, w_in: L } out: { t_thin: L, min_leg_in: L, max_leg_in: L, te_in: L, min_len_in: L }
+export function computeSteelFilletWeldSize({ t1_in = 0, t2_in = 0, w_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(t1_in > 0) || !(t2_in > 0)) return { error: "Both part thicknesses must be positive (in)." };
+  if (w_in < 0) return { error: "The chosen weld leg cannot be negative (enter 0 to skip it)." };
+  const t_thin = Math.min(t1_in, t2_in);
+  const min_leg_in = t_thin <= 0.25 ? 0.125 : (t_thin <= 0.5 ? 0.1875 : (t_thin <= 0.75 ? 0.25 : 0.3125));
+  const max_leg_in = t_thin < 0.25 ? t_thin : t_thin - 0.0625;
+  let te_in = null, min_len_in = null, window_flag = "enter a chosen leg to check it against the window";
+  if (w_in > 0) {
+    te_in = 0.707 * w_in;
+    min_len_in = 4 * w_in;
+    window_flag = w_in >= min_leg_in && w_in <= max_leg_in
+      ? "the chosen leg complies with the Table J2.4 / J2.2b window"
+      : (w_in < min_leg_in ? "the chosen leg is BELOW the Table J2.4 minimum" : "the chosen leg EXCEEDS the J2.2b along-an-edge maximum");
+  }
+  return {
+    t_thin, min_leg_in, max_leg_in, te_in, min_len_in, window_flag,
+    note: "AISC 360-22 fillet-weld detailing: Table J2.4 minimum leg by the THINNER part joined (1/8 in up to 1/4; 3/16 over 1/4 to 1/2; 1/4 over 1/2 to 3/4; 5/16 over 3/4), the J2.2b maximum along an edge (the full thickness under 1/4 in, thickness minus 1/16 in at or over 1/4 in), the equal-leg effective throat te = 0.707 w, and the 4w minimum load-carrying length. Detailing geometry only - the strength is the fillet-weld-strength tile; equal-leg fillets along the thinner part's edge (an interior fillet away from an edge is not edge-limited); skewed tees and PJP grooves are separate. A fabrication aid; the AWS D1.1 WPS and the engineer of record govern.",
+  };
+}
+export const steelFilletWeldSizeExample = { inputs: { t1_in: 0.5, t2_in: 0.375, w_in: 0.25 } };
+
+STEEL_RENDERERS["steel-fillet-weld-size"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 Table J2.4 minimum fillet leg by thinner-part thickness, the J2.2b along-an-edge maximum (t under 1/4 in; t - 1/16 at or over), te = 0.707 w, and the 4w minimum length, by name. Detailing limits, not strength (fillet-weld-strength). A fabrication aid; the AWS D1.1 WPS and the engineer of record govern.",
+  example: steelFilletWeldSizeExample.inputs,
+  fields: [
+    { key: "t1_in", label: "Part 1 thickness (in)", kind: "number" },
+    { key: "t2_in", label: "Part 2 thickness (in)", kind: "number" },
+    { key: "w_in", label: "Chosen weld leg w (in, 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "win", id: "sfws-out-win", label: "Permitted leg window (min to max)", value: (r) => fmt(r.min_leg_in, 4) + " to " + fmt(r.max_leg_in, 4) + " in (thinner part " + fmt(r.t_thin, 3) + " in)" },
+    { key: "chk", id: "sfws-out-chk", label: "Chosen-leg check", value: (r) => r.window_flag },
+    { key: "te", id: "sfws-out-te", label: "Effective throat te = 0.707 w", value: (r) => (r.te_in === null ? "-" : fmt(r.te_in, 3) + " in") },
+    { key: "len", id: "sfws-out-len", label: "Minimum length 4w", value: (r) => (r.min_len_in === null ? "-" : fmt(r.min_len_in, 2) + " in") },
+    { key: "n", id: "sfws-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelFilletWeldSize,
+});

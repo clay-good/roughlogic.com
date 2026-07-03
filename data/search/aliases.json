@@ -11147,6 +11147,131 @@
       "term": "wall stud wind",
       "target": "wood-combined-bending-axial",
       "kind": "adjacent"
+    },
+    {
+      "term": "web local yielding",
+      "target": "steel-web-local-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "web crippling",
+      "target": "steel-web-local-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc j10",
+      "target": "steel-web-local-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "bearing stiffener",
+      "target": "steel-web-local-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "concentrated load web",
+      "target": "steel-web-local-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "5k plus n",
+      "target": "steel-web-local-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "reaction web check",
+      "target": "steel-web-local-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column on beam web",
+      "target": "steel-web-local-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "slip critical",
+      "target": "steel-bolt-slip-critical",
+      "kind": "industry"
+    },
+    {
+      "term": "slip resistance bolt",
+      "target": "steel-bolt-slip-critical",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc j3.8",
+      "target": "steel-bolt-slip-critical",
+      "kind": "industry"
+    },
+    {
+      "term": "faying surface",
+      "target": "steel-bolt-slip-critical",
+      "kind": "industry"
+    },
+    {
+      "term": "class a class b",
+      "target": "steel-bolt-slip-critical",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pretensioned bolt",
+      "target": "steel-bolt-slip-critical",
+      "kind": "industry"
+    },
+    {
+      "term": "friction connection",
+      "target": "steel-bolt-slip-critical",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bolt pretension tb",
+      "target": "steel-bolt-slip-critical",
+      "kind": "adjacent"
+    },
+    {
+      "term": "minimum fillet weld size",
+      "target": "steel-fillet-weld-size",
+      "kind": "industry"
+    },
+    {
+      "term": "maximum fillet size",
+      "target": "steel-fillet-weld-size",
+      "kind": "industry"
+    },
+    {
+      "term": "weld leg size",
+      "target": "steel-fillet-weld-size",
+      "kind": "industry"
+    },
+    {
+      "term": "effective throat",
+      "target": "steel-fillet-weld-size",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc j2.4",
+      "target": "steel-fillet-weld-size",
+      "kind": "industry"
+    },
+    {
+      "term": "weld size table",
+      "target": "steel-fillet-weld-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "minimum weld length",
+      "target": "steel-fillet-weld-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "0.707 throat",
+      "target": "steel-fillet-weld-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what size weld",
+      "target": "steel-fillet-weld-size",
+      "kind": "adjacent"
     }
   ]
 }

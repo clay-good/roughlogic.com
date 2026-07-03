@@ -1,6 +1,6 @@
 # roughlogic.com Specification v293 -- Steel Web Local Yielding and Web Crippling at a Concentrated Force (AISC 360 J10) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v293..v295 (the steel connection/detailing depth trio -- the
+> **Status: LANDED (2026-07-03, package 0.104.0; proposed 2026-07-02). Batch spec-v293..v295 (the steel connection/detailing depth trio -- the
 > checks the member tiles never touch: the beam web under a concentrated reaction or bearing force (this spec), the slip-
 > critical bolt (v294), and the fillet-weld size limits (v295).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the steel member tiles check the beam in bending and

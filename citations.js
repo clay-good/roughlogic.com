@@ -7491,6 +7491,42 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "steel-web-local-strength": {
+    formula: "WLY Rn = Fy tw (5k + lb) interior, Fy tw (2.5k + lb) end (Omega 1.50 / phi 1.00); WC Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (Omega 2.00 / phi 0.75); governing = min of the factored pair. (E = 29,000 ksi)",
+    edition: "The AISC 360-22 J10.2 web local yielding and J10.3 web crippling limit states under a concentrated transverse force, with the interior/end coefficients and their differing resistance/safety factors, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J10 provisions are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 J10.2 web local yielding Rn = Fy tw (5k + lb) interior / (2.5k + lb) end (phi = 1.00 / Omega = 1.50) and J10.3 web crippling Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) interior (phi = 0.75 / Omega = 2.00), E = 29,000 ksi, k = kdes. This returns the two web limit states under a concentrated transverse force at an interior or near-end location - it uses the interior/end forms as selected, and does not cover the near-end crippling reduction for lb/d > 0.2, web sidesway or compression buckling (J10.4/J10.5), or the bearing-stiffener design itself. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Web local yielding", value: "Fy tw (5k + lb) interior; (2.5k + lb) within a member depth of the end", source: "AISC 360-22 J10.2" },
+      { name: "Web crippling", value: "0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) for an interior force", source: "AISC 360-22 J10.3" },
+      { name: "Differing factors", value: "Omega 1.50 vs 2.00 (phi 1.00 vs 0.75) - the governing limit state can flip between ASD and LRFD", source: "AISC 360-22 J10" },
+    ],
+  },
+  "steel-bolt-slip-critical": {
+    formula: "Rn_bolt = mu Du hf Tb ns; ASD = Rn/1.50, LRFD = 1.00 Rn (standard holes); totals = n x per-bolt.",
+    edition: "The AISC 360-22 J3.8 slip-critical connection resistance with the Class A/B slip coefficients, Du = 1.13, the Table J3.1 minimum pretension, and the standard-hole phi = 1.00 / Omega = 1.50, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J3.8 provision and Table J3.1 pretensions are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 J3.8 slip resistance Rn = mu Du hf Tb ns, with mu = 0.30 (Class A) / 0.50 (Class B), Du = 1.13, the Table J3.1 minimum pretension Tb, and phi = 1.00 / Omega = 1.50 for standard holes. This returns the slip resistance of a pretensioned slip-critical bolt - it uses the standard-hole resistance factors (oversized and slotted holes reduce phi / raise Omega), the entered mu, Tb, and ns, and does not check the bolt shear/bearing at the strength level (which must also be satisfied), the bolt tension-slip interaction (J3.9), or the pretension installation method. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Slip resistance", value: "mu Du hf Tb per slip plane; friction, not shear, governs the serviceability of the joint", source: "AISC 360-22 J3.8" },
+      { name: "Surface class", value: "mu = 0.30 unpainted mill scale (Class A); 0.50 blast-cleaned (Class B)", source: "AISC 360-22 J3.8" },
+      { name: "Also check strength", value: "the bearing-type shear and bearing/tearout limit states still apply", source: "AISC 360-22 J3.8 user note" },
+    ],
+  },
+  "steel-fillet-weld-size": {
+    formula: "min_leg from Table J2.4 by the thinner part (1/8 to 5/16 in brackets); max_leg = t (t < 1/4 in) or t - 1/16 (t >= 1/4 in) along an edge; te = 0.707 w; min length = 4 w.",
+    edition: "The AISC 360-22 Table J2.4 minimum fillet-weld size, the J2.2b maximum size along an edge, the equal-leg effective throat, and the four-times-leg minimum length, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); Table J2.4 and the J2.2b limits are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Table J2.4 minimum fillet size by thinner-part thickness (1/8, 3/16, 1/4, 5/16 in), the J2.2b maximum size along an edge (t for t under 1/4 in, t - 1/16 in for t at or over 1/4 in), the effective throat te = 0.707 w for an equal-leg fillet, and the 4w minimum length. This returns the detailing size limits and geometry of an equal-leg fillet weld - it is not the weld strength, assumes an equal-leg fillet on connected material (not a skewed-tee or PJP groove), uses the along-an-edge maximum (an interior fillet away from an edge is not edge-limited), and does not cover the minimum-size-based-on-thicker-part alternative or prequalified WPS details. A fabrication aid; the welding procedure (AWS D1.1) and the engineer of record govern.",
+    assumptions: [
+      { name: "Minimum leg", value: "set by the THINNER part joined so the weld does not quench-crack: 1/8 / 3/16 / 1/4 / 5/16 in by thickness bracket", source: "AISC 360-22 Table J2.4" },
+      { name: "Maximum along an edge", value: "the full thickness under 1/4 in; thickness minus 1/16 in at or over, so the edge is not melted away", source: "AISC 360-22 J2.2b" },
+      { name: "Geometry", value: "equal-leg throat 0.707 w and a minimum load-carrying length of 4 legs", source: "AISC 360-22 J2.2a/J2.2b" },
+    ],
+  },
   "wood-bearing-perpendicular": {
     formula: "Cb = (lb < 6 in and not within 3 in of the end) ? (lb + 0.375)/lb : 1.0; Fc_perp' = Fc_perp x Cb; fc_perp = R/(b lb); DCR = fc_perp / Fc_perp'; lb_req = R/(b Fc_perp) (Cb = 1, conservative).",
     edition: "The NDS 2018 3.10.2 compression-perpendicular-to-grain bearing check and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for a bearing under 6 in and not within 3 in of the member end, by name.",

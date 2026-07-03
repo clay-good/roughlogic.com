@@ -939,6 +939,10 @@ const RELATED = {
   "wood-bearing-perpendicular": ["wood-beam-shear","wood-beam-bending","deck-beam-post"],
   "wood-tension-member": ["wood-bolt-connection","column-buckling-wood","truss-capacity"],
   "wood-combined-bending-axial": ["column-buckling-wood","wood-beam-bending","wall-bracing-length"],
+  // spec-v293..v295 steel connection/detailing depth batch (Group E)
+  "steel-web-local-strength": ["steel-beam-shear","steel-beam-ltb","column-base-plate"],
+  "steel-bolt-slip-critical": ["bolt-shear-bearing","bolt-group-eccentric","bolt-torque"],
+  "steel-fillet-weld-size": ["fillet-weld-strength","groove-weld-strength","weld-metal-volume"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)
