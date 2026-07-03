@@ -414,6 +414,8 @@ const _TILES = [
   ["heat-pump-seasonal-energy", "C"], ["dual-fuel-balance-point", "C"], ["heat-pump-cold-capacity", "C"],
   // spec-v239..v241 compressed-air energy batch
   ["air-leak-cost", "C"], ["compressed-air-power", "C"], ["air-pressure-setpoint-savings", "C"],
+  // spec-v275..v277 ventilation-and-recovery batch
+  ["erv-sensible-recovery", "C"], ["mua-tempering-load", "C"], ["dcv-co2-ventilation", "C"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

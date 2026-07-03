@@ -7456,6 +7456,42 @@ export const CITATIONS = {
       { name: "Minimum pressure", value: "the reduced setpoint must still serve the tools after system pressure drop", source: "compressed-air best practice" },
     ],
   },
+  "erv-sensible-recovery": {
+    formula: "dT_F = t_ra_F - t_oa_F; t_leave_F = t_oa_F + eps_s x dT_F; Q_s_btuh = 1.08 x cfm x eps_s x dT_F; Q_noerv_btuh = 1.08 x cfm x dT_F; Q_resid_btuh = Q_noerv_btuh - Q_s_btuh.",
+    edition: "The ASHRAE Standard 84 / AHRI Standard 1060 sensible-effectiveness definition (eps_s = (T_leaving - T_oa) / (T_ra - T_oa)) and the recovered sensible load Q_s = 1.08 x CFM x eps_s x (T_ra - T_oa), by name; the sea-level sensible constant 1.08 = 60 x 0.075 x 0.24 is a named constant.",
+    freeAccess: "The effectiveness definition and the sensible-heat relation are public; AHRI 1060 certified ratings are free in the AHRI directory at ahridirectory.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASHRAE Standard 84 / AHRI Standard 1060 sensible-effectiveness definition eps_s = (T_leaving - T_oa) / (T_ra - T_oa) and the recovered sensible load Q_s = 1.08 x CFM x eps_s x (T_ra - T_oa) with the sea-level sensible constant 1.08 = 60 x 0.075 x 0.24. This returns the sensible recovery only - it assumes balanced (equal supply and exhaust) airflow, uses the manufacturer's rated effectiveness at the AHRI test condition rather than the part-load or frosting-derated value, and excludes latent (total-enthalpy) recovery, the exhaust-fan and defrost energy, and the pressure-drop penalty; equal outdoor and return temperatures recover nothing (a zero, reported, not an error). A design aid, not a substitute for the manufacturer's certified performance data.",
+    assumptions: [
+      { name: "Effectiveness", value: "eps_s = (T_leaving - T_oa) / (T_ra - T_oa), the rated sensible effectiveness at balanced flow", source: "ASHRAE 84 / AHRI 1060" },
+      { name: "Recovered load", value: "Q_s = 1.08 x CFM x eps_s x dT with the sea-level sensible constant 1.08", source: "ASHRAE Fundamentals" },
+      { name: "Sensible only", value: "no latent (enthalpy) recovery, frosting/defrost derate, or fan and pressure-drop penalty", source: "scope of this tile" },
+    ],
+  },
+  "mua-tempering-load": {
+    formula: "dT_F = t_target_F - t_oa_F; Q_s_btuh = 1.08 x cfm x dT_F; Q_l_btuh = 0.68 x cfm x (w_oa_gr - w_target_gr); Q_t_btuh = Q_s_btuh + Q_l_btuh; input_btuh = Q_s_btuh / eta.",
+    edition: "The ASHRAE Fundamentals sensible (Q_s = 1.08 x CFM x dT), latent (Q_l = 0.68 x CFM x dW in gr/lb), and total psychrometric load equations and the IMC 508 makeup-air-equals-exhaust requirement, by name; the sea-level constants 1.08, 0.68, and 4.5 are named constants.",
+    freeAccess: "The psychrometric load equations and their sea-level constants are public; the IMC makeup-air requirement is readable free at codes.iccsafe.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ASHRAE Fundamentals sensible Q_s = 1.08 x CFM x dT, latent Q_l = 0.68 x CFM x dW (gr/lb), and total Q_t = 4.5 x CFM x dh equations with the sea-level constants 1.08 = 60 x 0.075 x 0.24, 0.68 = 60 x 0.075 x (1076/1.0)/7000, and 4.5 = 60 x 0.075, and the IMC 508 makeup-air-equals-exhaust requirement. This returns the design tempering load at the stated supply target - it uses sea-level air density (no altitude derate), assumes the makeup CFM equals the exhaust and is delivered at the target temperature (a neutral, not a heating, supply unless the target is set above space temperature), and excludes duct and cabinet losses, the fan heat, and the exhaust-hood capture efficiency; the latent term is zero when the humidity ratios are omitted (a heating-only MUA). A design aid, not a substitute for the mechanical engineer's stamped design.",
+    assumptions: [
+      { name: "Sensible load", value: "Q_s = 1.08 x CFM x (T_target - T_oa) at sea-level air density", source: "ASHRAE Fundamentals" },
+      { name: "Latent load", value: "optional Q_l = 0.68 x CFM x dW with the humidity ratios in grains per pound", source: "ASHRAE Fundamentals" },
+      { name: "Makeup requirement", value: "makeup air approximately equal to the exhaust; the burner input is the sensible load over the thermal efficiency", source: "IMC 508" },
+    ],
+  },
+  "dcv-co2-ventilation": {
+    formula: "dC_frac = (co2_set_ppm - co2_oa_ppm) / 1e6; Q_person_cfm = gen_cfm / dC_frac; Q_total_cfm = Q_person_cfm x n; co2_check_ppm = co2_oa_ppm + (gen_cfm / Q_person_cfm) x 1e6.",
+    edition: "The steady-state single-zone CO2 mass balance (C_in = C_oa + N / Q, solved for the per-person outdoor airflow Q = N / (C_set - C_oa)) with the ASHRAE 62.1 note that CO2 indicates occupant-generated bioeffluents and a common sedentary generation rate of about 0.0106 cfm per person, by name.",
+    freeAccess: "The single-zone mass balance is a public closed-form relation; ASHRAE 62.1 is readable free at ashrae.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The steady-state single-zone CO2 mass balance C_in = C_oa + N / Q, solved for the per-person outdoor airflow Q = N / (C_set - C_oa), with the ASHRAE 62.1 note that CO2 is an indicator of occupant-generated bioeffluents and a common sedentary generation rate of about 0.0106 cfm per person. This returns the equilibrium (fully mixed, steady-state) airflow - it is the airflow that eventually holds the setpoint, not the transient buildup or decay time (which depends on the room volume and air-change rate), assumes a single fully mixed zone at one occupancy, uses a fixed metabolic generation rate, and treats CO2 as an occupancy indicator rather than the ventilation design basis (the ASHRAE 62.1 Ventilation Rate Procedure governs the minimum outdoor air). A design and commissioning aid, not a substitute for the mechanical engineer's ventilation design.",
+    assumptions: [
+      { name: "Mass balance", value: "C_in = C_oa + N / Q at steady state in one fully mixed zone; Q = N / (C_set - C_oa)", source: "single-zone mass balance" },
+      { name: "Generation rate", value: "about 0.0106 cfm CO2 per sedentary person (editable for activity level)", source: "ASHRAE 62.1 guidance" },
+      { name: "Indicator only", value: "CO2 indicates occupancy; the Ventilation Rate Procedure governs the minimum outdoor air", source: "ASHRAE 62.1" },
+    ],
+  },
   "rain-load-ponding": {
     formula: "rain_load_psf = 5.2 x (static_head_in + hydraulic_head_in); design_flow_gpm = (roof_area > 0 && rainfall > 0) ? 0.0104 x roof_area_ft2 x rainfall_in_hr : null.",
     edition: "ASCE 7 Ch. 8 rain load (R = 5.2 x (ds + dh)) and the IPC roof-drainage design flow (Q = 0.0104 x A x i), by name; the 5.2 psf/in (62.4 pcf / 12) and 0.0104 gpm/(ft^2 in/hr) are named constants.",

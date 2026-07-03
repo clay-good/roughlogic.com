@@ -1,6 +1,6 @@
 # roughlogic.com Specification v275 -- Energy/Heat Recovery Ventilator Sensible Effectiveness and Recovered Load (ASHRAE 84 / AHRI 1060) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v275..v277 (the ventilation-and-recovery trio -- how a
+> **Status: LANDED (2026-07-03, package 0.98.0; proposed 2026-07-02). Batch spec-v275..v277 (the ventilation-and-recovery trio -- how a
 > mechanical ventilation system moves the code-required outdoor air without paying the full load to condition it: the
 > ERV/HRV that pre-tempers incoming outdoor air off the leaving exhaust (this spec), the makeup-air unit that heats the
 > outdoor air an exhaust hood pulls in (v276), and the demand-controlled ventilation rate a CO2 setpoint actually calls for

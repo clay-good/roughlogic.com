@@ -27879,6 +27879,103 @@
         "anchor_in": { "value": 0.375, "tolerance": { "abs": 0.0001 } },
         "delta_in": { "value": 1.0716, "tolerance": { "abs": 0.0005 } }
       }
+    },
+    {
+      "tile_id": "erv-sensible-recovery",
+      "source_publisher": "ASHRAE Standard 84 / AHRI Standard 1060 sensible effectiveness",
+      "source_title": "200 cfm at 75% on a 10 F day -> 55 F leaving, 9,720 Btu/h recovered",
+      "source_edition_or_year": "spec-v275 worked example (machine-verified)",
+      "source_section_or_page": "spec-v275 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cfm": 200, "t_oa_F": 10, "t_ra_F": 70, "eps_s": 0.75 },
+      "outputs": {
+        "dT_F": { "value": 60, "tolerance": { "abs": 0.001 } },
+        "t_leave_F": { "value": 55, "tolerance": { "abs": 0.001 } },
+        "Q_s_btuh": { "value": 9720, "tolerance": { "pct": 0.1 } },
+        "Q_noerv_btuh": { "value": 12960, "tolerance": { "pct": 0.1 } },
+        "Q_resid_btuh": { "value": 3240, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "erv-sensible-recovery",
+      "source_publisher": "ASHRAE Standard 84 / AHRI Standard 1060 sensible effectiveness",
+      "source_title": "cross-check: 95 F summer day, 75 F return -> 80 F leaving, -3,240 Btu/h (cooling relieved)",
+      "source_edition_or_year": "spec-v275 worked example (machine-verified)",
+      "source_section_or_page": "spec-v275 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cfm": 200, "t_oa_F": 95, "t_ra_F": 75, "eps_s": 0.75 },
+      "outputs": {
+        "dT_F": { "value": -20, "tolerance": { "abs": 0.001 } },
+        "t_leave_F": { "value": 80, "tolerance": { "abs": 0.001 } },
+        "Q_s_btuh": { "value": -3240, "tolerance": { "pct": 0.1 } },
+        "Q_noerv_btuh": { "value": -4320, "tolerance": { "pct": 0.1 } },
+        "Q_resid_btuh": { "value": -1080, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "mua-tempering-load",
+      "source_publisher": "ASHRAE Fundamentals psychrometric loads / IMC 508 makeup air",
+      "source_title": "2,000 cfm MUA, 20 F to 65 F, 80% gas -> 97,200 Btu/h out, 121,500 Btu/h input",
+      "source_edition_or_year": "spec-v276 worked example (machine-verified)",
+      "source_section_or_page": "spec-v276 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cfm": 2000, "t_oa_F": 20, "t_target_F": 65, "eta": 0.80 },
+      "outputs": {
+        "dT_F": { "value": 45, "tolerance": { "abs": 0.001 } },
+        "Q_s_btuh": { "value": 97200, "tolerance": { "pct": 0.1 } },
+        "Q_l_btuh": { "value": 0, "tolerance": { "abs": 0.001 } },
+        "Q_t_btuh": { "value": 97200, "tolerance": { "pct": 0.1 } },
+        "input_btuh": { "value": 121500, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "mua-tempering-load",
+      "source_publisher": "ASHRAE Fundamentals psychrometric loads / IMC 508 makeup air",
+      "source_title": "cross-check: 0 F day with 60->50 gr/lb latent -> 140,400 + 13,600 = 154,000 Btu/h",
+      "source_edition_or_year": "spec-v276 worked example (machine-verified)",
+      "source_section_or_page": "spec-v276 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cfm": 2000, "t_oa_F": 0, "t_target_F": 65, "eta": 0.80, "w_oa_gr": 60, "w_target_gr": 50 },
+      "outputs": {
+        "Q_s_btuh": { "value": 140400, "tolerance": { "pct": 0.1 } },
+        "Q_l_btuh": { "value": 13600, "tolerance": { "pct": 0.1 } },
+        "Q_t_btuh": { "value": 154000, "tolerance": { "pct": 0.1 } },
+        "input_btuh": { "value": 175500, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "dcv-co2-ventilation",
+      "source_publisher": "Steady-state single-zone CO2 mass balance (ASHRAE 62.1 indicator note)",
+      "source_title": "20 people, 1,100 ppm setpoint vs 400 ppm outdoor -> 15.1 cfm/person, 303 cfm",
+      "source_edition_or_year": "spec-v277 worked example (machine-verified)",
+      "source_section_or_page": "spec-v277 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "n": 20, "co2_set_ppm": 1100, "co2_oa_ppm": 400, "gen_cfm": 0.0106 },
+      "outputs": {
+        "Q_person_cfm": { "value": 15.142857, "tolerance": { "pct": 0.1 } },
+        "Q_total_cfm": { "value": 302.857143, "tolerance": { "pct": 0.1 } },
+        "co2_check_ppm": { "value": 1100, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "dcv-co2-ventilation",
+      "source_publisher": "Steady-state single-zone CO2 mass balance (ASHRAE 62.1 indicator note)",
+      "source_title": "cross-check: tighten to 800 ppm -> 26.5 cfm/person, 530 cfm (1.75x)",
+      "source_edition_or_year": "spec-v277 worked example (machine-verified)",
+      "source_section_or_page": "spec-v277 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "n": 20, "co2_set_ppm": 800, "co2_oa_ppm": 400, "gen_cfm": 0.0106 },
+      "outputs": {
+        "Q_person_cfm": { "value": 26.5, "tolerance": { "pct": 0.1 } },
+        "Q_total_cfm": { "value": 530, "tolerance": { "pct": 0.1 } },
+        "co2_check_ppm": { "value": 800, "tolerance": { "abs": 0.01 } }
+      }
     }
   ]
 }

@@ -231,6 +231,8 @@ const TOOL_MODULES = (() => {
     "heat-pump-seasonal-energy", "dual-fuel-balance-point", "heat-pump-cold-capacity",
     // spec-v239..v241 compressed-air energy batch
     "air-leak-cost", "compressed-air-power", "air-pressure-setpoint-savings",
+    // spec-v275..v277 ventilation-and-recovery batch
+    "erv-sensible-recovery", "mua-tempering-load", "dcv-co2-ventilation",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

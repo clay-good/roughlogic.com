@@ -631,6 +631,10 @@ export const COMPUTE_MAP = {
   "air-leak-cost": { module: "../../calc-hvac.js", fn: "computeAirLeakCost" },
   "compressed-air-power": { module: "../../calc-hvac.js", fn: "computeCompressedAirPower" },
   "air-pressure-setpoint-savings": { module: "../../calc-hvac.js", fn: "computeAirPressureSetpointSavings" },
+  // spec-v275..v277 ventilation-and-recovery batch (3 tiles)
+  "erv-sensible-recovery": { module: "../../calc-hvac.js", fn: "computeErvSensibleRecovery" },
+  "mua-tempering-load": { module: "../../calc-hvac.js", fn: "computeMuaTemperingLoad" },
+  "dcv-co2-ventilation": { module: "../../calc-hvac.js", fn: "computeDcvCo2Ventilation" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

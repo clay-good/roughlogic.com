@@ -13135,3 +13135,69 @@ test("bounds: spec-v274 computeShearwallDeflection pins the three terms, the h/h
   assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, a_in2: 12.25, ga_kin: 15, da_in: -0.1 }));
   assert.ok("error" in _v274({ v_plf: 400, h_ft: 10, b_ft: 8, a_in2: NaN, ga_kin: 15 }));
 });
+
+// ===================== spec-v275..v277 ventilation-and-recovery batch =====================
+import { computeErvSensibleRecovery as _v275, computeMuaTemperingLoad as _v276, computeDcvCo2Ventilation as _v277 } from "../../calc-hvac.js";
+
+test("bounds: spec-v275 computeErvSensibleRecovery pins the winter design day, the summer sign carry, and error seams", () => {
+  const r = _v275({ cfm: 200, t_oa_F: 10, t_ra_F: 70, eps_s: 0.75 });
+  assert.strictEqual(r.dT_F, 60);
+  assert.strictEqual(r.t_leave_F, 55);
+  assert.ok(Math.abs(r.Q_s_btuh - 9720) < 1e-9);
+  assert.ok(Math.abs(r.Q_noerv_btuh - 12960) < 1e-9);
+  assert.ok(Math.abs(r.Q_resid_btuh - 3240) < 1e-9);
+  // Leaving-temperature cross-form: Q = 1.08 x cfm x (t_leave - t_oa).
+  assert.ok(Math.abs(1.08 * 200 * (r.t_leave_F - 10) - r.Q_s_btuh) < 1e-9);
+  // Summer cooling day: the sign carries the direction of transfer.
+  const r2 = _v275({ cfm: 200, t_oa_F: 95, t_ra_F: 75, eps_s: 0.75 });
+  assert.strictEqual(r2.dT_F, -20);
+  assert.strictEqual(r2.t_leave_F, 80);
+  assert.ok(Math.abs(r2.Q_s_btuh - -3240) < 1e-9);
+  // Equal temperatures recover nothing (zero, not an error).
+  const r3 = _v275({ cfm: 200, t_oa_F: 70, t_ra_F: 70, eps_s: 0.75 });
+  assert.strictEqual(r3.Q_s_btuh, 0);
+  assert.ok(!("error" in r3));
+  // Error seams.
+  assert.ok("error" in _v275({ cfm: 0, t_oa_F: 10, t_ra_F: 70, eps_s: 0.75 }));
+  assert.ok("error" in _v275({ cfm: 200, t_oa_F: 10, t_ra_F: 70, eps_s: -0.1 }));
+  assert.ok("error" in _v275({ cfm: 200, t_oa_F: 10, t_ra_F: 70, eps_s: 1.1 }));
+  assert.ok("error" in _v275({ cfm: Infinity, t_oa_F: 10, t_ra_F: 70, eps_s: 0.75 }));
+});
+
+test("bounds: spec-v276 computeMuaTemperingLoad pins the kitchen MUA, the latent-optional path, and error seams", () => {
+  const r = _v276({ cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0.80 });
+  assert.strictEqual(r.dT_F, 45);
+  assert.ok(Math.abs(r.Q_s_btuh - 97200) < 1e-9);
+  assert.strictEqual(r.Q_l_btuh, 0); // heating-only: humidity omitted defaults latent to zero
+  assert.ok(Math.abs(r.Q_t_btuh - 97200) < 1e-9);
+  assert.ok(Math.abs(r.input_btuh - 121500) < 1e-9);
+  // Colder design with a latent term.
+  const r2 = _v276({ cfm: 2000, t_oa_F: 0, t_target_F: 65, eta: 0.80, w_oa_gr: 60, w_target_gr: 50 });
+  assert.ok(Math.abs(r2.Q_s_btuh - 140400) < 1e-9);
+  assert.ok(Math.abs(r2.Q_l_btuh - 13600) < 1e-9);
+  assert.ok(Math.abs(r2.Q_t_btuh - 154000) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v276({ cfm: 0, t_oa_F: 20, t_target_F: 65 }));
+  assert.ok("error" in _v276({ cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0 }));
+  assert.ok("error" in _v276({ cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 1.2 }));
+  assert.ok("error" in _v276({ cfm: 2000, t_oa_F: 20, t_target_F: 65, w_oa_gr: -5 }));
+  assert.ok("error" in _v276({ cfm: NaN, t_oa_F: 20, t_target_F: 65 }));
+});
+
+test("bounds: spec-v277 computeDcvCo2Ventilation pins the office rate, the back-check identity, and error seams", () => {
+  const r = _v277({ n: 20, co2_set_ppm: 1100, co2_oa_ppm: 400, gen_cfm: 0.0106 });
+  assert.ok(Math.abs(r.Q_person_cfm - 0.0106 / 0.0007) < 1e-9);
+  assert.ok(Math.abs(r.Q_total_cfm - 20 * 0.0106 / 0.0007) < 1e-9);
+  assert.ok(Math.abs(r.co2_check_ppm - 1100) < 1e-9); // steady-state back-check closes the loop
+  // Tighter setpoint scales as 1/(C_set - C_oa).
+  const r2 = _v277({ n: 20, co2_set_ppm: 800, co2_oa_ppm: 400, gen_cfm: 0.0106 });
+  assert.ok(Math.abs(r2.Q_person_cfm - 26.5) < 1e-9);
+  assert.ok(Math.abs(r2.Q_total_cfm - 530) < 1e-9);
+  assert.ok(Math.abs(r2.Q_person_cfm / r.Q_person_cfm - 700 / 400) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v277({ n: 0, co2_set_ppm: 1100, co2_oa_ppm: 400 }));
+  assert.ok("error" in _v277({ n: 20, co2_set_ppm: 1100, co2_oa_ppm: 400, gen_cfm: 0 }));
+  assert.ok("error" in _v277({ n: 20, co2_set_ppm: 400, co2_oa_ppm: 400 }));
+  assert.ok("error" in _v277({ n: 20, co2_set_ppm: 300, co2_oa_ppm: 400 }));
+  assert.ok("error" in _v277({ n: Infinity, co2_set_ppm: 1100, co2_oa_ppm: 400 }));
+});

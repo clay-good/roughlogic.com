@@ -1,6 +1,6 @@
 # roughlogic.com Specification v276 -- Makeup-Air Unit Tempering Load (Sensible, Latent, Total) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v275..v277 (the ventilation-and-recovery trio -- recover
+> **Status: LANDED (2026-07-03, package 0.98.0; proposed 2026-07-02). Batch spec-v275..v277 (the ventilation-and-recovery trio -- recover
 > (v275), temper (this spec), modulate (v277)). This tile sizes the heater or cooling coil a makeup-air unit needs to
 > temper the outdoor air an exhaust hood or process fan pulls into the building.**
 > In-scope catalog expansion under the spec-v106 trades-only charter: HVAC and commercial-kitchen mechanical work already

@@ -3119,3 +3119,124 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
   ],
   compute: computeAirPressureSetpointSavings,
 });
+
+// =====================================================================
+// spec-v275..v277: ventilation-and-recovery batch (Group C). The three
+// ways the trade meets a ventilation requirement without oversizing the
+// equipment behind it: recover (the ERV/HRV pre-tempers incoming outdoor
+// air off the leaving exhaust), temper (the makeup-air unit heats the
+// outdoor air an exhaust hood pulls in), modulate (the CO2-setpoint
+// demand-controlled ventilation rate). Sea-level psychrometric constants:
+// 1.08 = 60 x 0.075 x 0.24 (sensible), 0.68 = 60 x 0.075 x (1076/1.0)/7000
+// (latent, humidity ratio in gr/lb).
+// =====================================================================
+
+// dims: in { cfm: L^3 T^-1, t_oa_F: T, t_ra_F: T, eps_s: dimensionless } out: { dT_F: T, t_leave_F: T, Q_s_btuh: M L^2 T^-3, Q_noerv_btuh: M L^2 T^-3, Q_resid_btuh: M L^2 T^-3 }
+export function computeErvSensibleRecovery({ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(cfm > 0)) return { error: "Ventilation airflow must be positive (cfm)." };
+  if (!(eps_s >= 0 && eps_s <= 1)) return { error: "Sensible effectiveness must be between 0 and 1." };
+  const dT_F = t_ra_F - t_oa_F;
+  const t_leave_F = t_oa_F + eps_s * dT_F;
+  const Q_s_btuh = 1.08 * cfm * eps_s * dT_F;
+  const Q_noerv_btuh = 1.08 * cfm * dT_F;
+  const Q_resid_btuh = Q_noerv_btuh - Q_s_btuh;
+  return {
+    dT_F, t_leave_F, Q_s_btuh, Q_noerv_btuh, Q_resid_btuh,
+    note: "ASHRAE Standard 84 / AHRI 1060 sensible effectiveness: T_leaving = T_oa + eps_s x (T_ra - T_oa); recovered sensible load Q_s = 1.08 x CFM x eps_s x (T_ra - T_oa) with the sea-level constant 1.08 = 60 x 0.075 x 0.24. A positive Q_s is heating recovered in winter, a negative Q_s is sensible cooling relieved in summer; equal outdoor and return temperatures recover nothing (zero, not an error). Assumes balanced (equal supply and exhaust) airflow at the manufacturer's rated effectiveness - no part-load, frosting, or defrost derate, no latent (enthalpy) recovery, and no fan or pressure-drop penalty. A design aid, not the manufacturer's certified performance data.",
+  };
+}
+const ervSensibleRecoveryExample = { inputs: { cfm: 200, t_oa_F: 10, t_ra_F: 70, eps_s: 0.75 } };
+HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
+  citation: "Citation: ASHRAE Standard 84 / AHRI 1060 sensible-effectiveness definition (eps_s = (T_leaving - T_oa) / (T_ra - T_oa)) and the recovered sensible load Q_s = 1.08 x CFM x eps_s x dT (by name). Balanced flow at the rated effectiveness, sensible only. A design aid, not the manufacturer's certified data.",
+  example: ervSensibleRecoveryExample.inputs,
+  fields: [
+    { key: "cfm", label: "Balanced ventilation airflow (cfm)", kind: "number" },
+    { key: "t_oa_F", label: "Outdoor air temperature (F)", kind: "number" },
+    { key: "t_ra_F", label: "Return/exhaust air temperature (F)", kind: "number", default: 70 },
+    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 },
+  ],
+  outputs: [
+    { key: "dt", id: "esr-out-dt", label: "Available temperature difference", value: (r) => fmt(r.dT_F, 1) + " F" },
+    { key: "tl", id: "esr-out-tl", label: "Outdoor air leaving the core", value: (r) => fmt(r.t_leave_F, 1) + " F" },
+    { key: "qs", id: "esr-out-qs", label: "Recovered sensible load", value: (r) => fmt(r.Q_s_btuh, 0) + " Btu/h" },
+    { key: "qno", id: "esr-out-qno", label: "OA load with no recovery", value: (r) => fmt(r.Q_noerv_btuh, 0) + " Btu/h" },
+    { key: "qr", id: "esr-out-qr", label: "Residual OA load for the plant", value: (r) => fmt(r.Q_resid_btuh, 0) + " Btu/h" },
+    { key: "n", id: "esr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeErvSensibleRecovery,
+});
+
+// dims: in { cfm: L^3 T^-1, t_oa_F: T, t_target_F: T, eta: dimensionless, w_oa_gr: dimensionless, w_target_gr: dimensionless } out: { dT_F: T, Q_s_btuh: M L^2 T^-3, Q_l_btuh: M L^2 T^-3, Q_t_btuh: M L^2 T^-3, input_btuh: M L^2 T^-3 }
+export function computeMuaTemperingLoad({ cfm = 0, t_oa_F = 0, t_target_F = 0, eta = 0.80, w_oa_gr = 0, w_target_gr = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(cfm > 0)) return { error: "Makeup airflow must be positive (cfm)." };
+  if (!(eta > 0 && eta <= 1)) return { error: "Thermal efficiency must be over 0 and up to 1." };
+  if (w_oa_gr < 0 || w_target_gr < 0) return { error: "Humidity ratios must be non-negative (gr/lb)." };
+  const dT_F = t_target_F - t_oa_F;
+  const Q_s_btuh = 1.08 * cfm * dT_F;
+  const Q_l_btuh = 0.68 * cfm * (w_oa_gr - w_target_gr);
+  const Q_t_btuh = Q_s_btuh + Q_l_btuh;
+  const input_btuh = Q_s_btuh / eta;
+  return {
+    dT_F, Q_s_btuh, Q_l_btuh, Q_t_btuh, input_btuh,
+    note: "ASHRAE Fundamentals psychrometric loads at sea level: sensible Q_s = 1.08 x CFM x dT, latent Q_l = 0.68 x CFM x dW (gr/lb), total Q_t = Q_s + Q_l; the gas/heater input is the sensible load over the thermal efficiency. IMC 508 requires makeup air roughly equal to the exhaust. Leave both humidity ratios at zero for a heating-only MUA (latent = 0). Sea-level air density (no altitude derate), makeup CFM equal to the exhaust, delivery at the target temperature; duct and cabinet losses, fan heat, and hood capture efficiency excluded. A design aid, not the mechanical engineer's stamped design.",
+  };
+}
+const muaTemperingLoadExample = { inputs: { cfm: 2000, t_oa_F: 20, t_target_F: 65, eta: 0.80 } };
+HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
+  citation: "Citation: ASHRAE Fundamentals sensible Q_s = 1.08 x CFM x dT and latent Q_l = 0.68 x CFM x dW (gr/lb) tempering loads with the IMC 508 makeup-air-equals-exhaust requirement (by name). Sea-level constants, neutral supply target, no duct losses. A design aid, not the engineer's stamped design.",
+  example: muaTemperingLoadExample.inputs,
+  fields: [
+    { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" },
+    { key: "t_oa_F", label: "Outdoor air temperature (F)", kind: "number" },
+    { key: "t_target_F", label: "Target supply temperature (F)", kind: "number", default: 65 },
+    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number", default: 0.80 },
+    { key: "w_oa_gr", label: "Outdoor humidity ratio (gr/lb, optional)", kind: "number" },
+    { key: "w_target_gr", label: "Target humidity ratio (gr/lb, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "dt", id: "mua-out-dt", label: "Temperature rise", value: (r) => fmt(r.dT_F, 1) + " F" },
+    { key: "qs", id: "mua-out-qs", label: "Sensible tempering load", value: (r) => fmt(r.Q_s_btuh, 0) + " Btu/h" },
+    { key: "ql", id: "mua-out-ql", label: "Latent load", value: (r) => fmt(r.Q_l_btuh, 0) + " Btu/h" },
+    { key: "qt", id: "mua-out-qt", label: "Total load", value: (r) => fmt(r.Q_t_btuh, 0) + " Btu/h" },
+    { key: "in", id: "mua-out-in", label: "Required heater input", value: (r) => fmt(r.input_btuh, 0) + " Btu/h" },
+    { key: "n", id: "mua-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMuaTemperingLoad,
+});
+
+// dims: in { n: dimensionless, co2_set_ppm: dimensionless, co2_oa_ppm: dimensionless, gen_cfm: L^3 T^-1 } out: { Q_person_cfm: L^3 T^-1, Q_total_cfm: L^3 T^-1, co2_check_ppm: dimensionless }
+export function computeDcvCo2Ventilation({ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(n > 0)) return { error: "Occupancy must be positive." };
+  if (!(gen_cfm > 0)) return { error: "Per-person CO2 generation must be positive (cfm)." };
+  if (co2_oa_ppm < 0) return { error: "Outdoor CO2 must be non-negative (ppm)." };
+  if (!(co2_set_ppm > co2_oa_ppm)) return { error: "The setpoint must exceed the outdoor CO2 - no finite airflow can hold a setpoint at or below the outdoor concentration." };
+  const dC_frac = (co2_set_ppm - co2_oa_ppm) / 1e6;
+  const Q_person_cfm = gen_cfm / dC_frac;
+  const Q_total_cfm = Q_person_cfm * n;
+  const co2_check_ppm = co2_oa_ppm + (gen_cfm / Q_person_cfm) * 1e6;
+  return {
+    Q_person_cfm, Q_total_cfm, co2_check_ppm,
+    note: "Steady-state single-zone CO2 mass balance: C_in = C_oa + N / Q, solved for the per-person outdoor airflow Q = N / (C_set - C_oa) with the concentrations as volume fractions; the sedentary office generation rate is about 0.0106 cfm per person. This is the equilibrium (fully mixed) airflow that eventually holds the setpoint, not the transient buildup or decay time; one zone at one occupancy and a fixed metabolic rate. ASHRAE 62.1 treats CO2 as an indicator of occupant bioeffluents - the Ventilation Rate Procedure and the engineer of record govern the minimum outdoor air. A design and commissioning aid.",
+  };
+}
+const dcvCo2VentilationExample = { inputs: { n: 20, co2_set_ppm: 1100, co2_oa_ppm: 400, gen_cfm: 0.0106 } };
+HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
+  citation: "Citation: steady-state single-zone CO2 mass balance C_in = C_oa + N/Q, solved as Q = N / (C_set - C_oa), with the ASHRAE 62.1 CO2-as-indicator note and a sedentary generation of about 0.0106 cfm/person (by name). Equilibrium airflow, one fully mixed zone. The ASHRAE 62.1 rate procedure governs the minimum.",
+  example: dcvCo2VentilationExample.inputs,
+  fields: [
+    { key: "n", label: "Occupancy (people)", kind: "number" },
+    { key: "co2_set_ppm", label: "Indoor CO2 setpoint (ppm)", kind: "number" },
+    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 400 },
+    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number", default: 0.0106 },
+  ],
+  outputs: [
+    { key: "qp", id: "dcv-out-qp", label: "Outdoor airflow per person", value: (r) => fmt(r.Q_person_cfm, 1) + " cfm/person" },
+    { key: "qt", id: "dcv-out-qt", label: "Total outdoor airflow", value: (r) => fmt(r.Q_total_cfm, 0) + " cfm" },
+    { key: "chk", id: "dcv-out-chk", label: "Steady-state CO2 back-check", value: (r) => fmt(r.co2_check_ppm, 0) + " ppm" },
+    { key: "n", id: "dcv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDcvCo2Ventilation,
+});

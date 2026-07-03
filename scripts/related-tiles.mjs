@@ -915,6 +915,10 @@ const RELATED = {
   "air-leak-cost": ["air-receiver","compressed-air-power","air-pressure-setpoint-savings"],
   "compressed-air-power": ["air-leak-cost","air-pressure-setpoint-savings","air-receiver"],
   "air-pressure-setpoint-savings": ["compressed-air-power","air-leak-cost","air-receiver"],
+  // spec-v275..v277 ventilation-and-recovery batch (Group C)
+  "erv-sensible-recovery": ["outdoor-air-ventilation","ashrae-622-ventilation","mua-tempering-load"],
+  "mua-tempering-load": ["hood-exhaust","combustion-air","erv-sensible-recovery"],
+  "dcv-co2-ventilation": ["outdoor-air-ventilation","outdoor-air-mix","erv-sensible-recovery"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)
