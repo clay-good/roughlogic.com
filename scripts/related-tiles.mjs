@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "grain-shrink-moisture": ["grain-bin-capacity", "hay-dry-matter", "crop-yield", "livestock-dry-matter-intake"],
+  "livestock-dry-matter-intake": ["pearson-square-ration", "livestock-water-requirement", "hay-dry-matter", "cattle-stocking-rate"],
+  "manure-application-rate": ["npk-blend", "livestock-dry-matter-intake", "crop-yield", "irrigation-requirement"],
   "superelevation": ["horizontal-curve", "vertical-curve-sight-distance", "horizontal-sightline-offset", "stopping-sight-distance"],
   "vertical-curve-sight-distance": ["vertical-curve", "stopping-sight-distance", "superelevation", "horizontal-sightline-offset"],
   "horizontal-sightline-offset": ["horizontal-curve", "stopping-sight-distance", "superelevation", "vertical-curve-sight-distance"],

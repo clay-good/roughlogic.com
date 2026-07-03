@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): land spec-v338..v340 -- 3 farm-economics tiles in calc-agriculture.js; 806 -> 809 tiles, 0.119.0, 2026-07-03
+
+The farm-economics trio, twenty-second batch of the v275-v374 campaign: the grain-market, feed-budget, and manure-plan numbers the field-agronomy tiles never give, all in the existing lazy `calc-agriculture.js` (Group L); no new module, group, or dependency. Catalog **806 -> 809**, package **0.118.0 -> 0.119.0** (a minor). Proposed 2026-07-02.
+
+- **`grain-shrink-moisture` (spec-v338).** Moisture shrink (M_wet-M_dry)/(100-M_dry), dried weight, handling shrink, and net market bushels at the crop test weight. Pinned: 10,000 lb corn from 20% to a 15% market, 0.5% handling, 56 lb/bu -> 167.2 bu, 6.35% total shrink; drying to 14% costs more (165.3 bu, 7.44%).
+- **`livestock-dry-matter-intake` (spec-v339).** DMI = BW x intake%, as-fed = DMI / feed-DM%, herd total. Pinned: a 1,200 lb steer at 2.5% on dry hay (88% DM) -> 30 lb DMI, 34.1 lb as-fed; the same 30 lb on corn silage (35% DM) is 85.7 lb as-fed, 8,571 lb/day for a 100-head pen.
+- **`manure-application-rate` (spec-v340).** available/unit = total x availability%, rate = crop_need / available. Pinned: 150 lb N/acre from solid manure (10 lb N/ton, 50% available) -> 30 ton/acre; a liquid at 50 lb N/1,000 gal -> 6,000 gal/acre. Closes: applied = crop_need.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the shrink/as-fed/availability terms, the herd multiplier, the loop closure, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the USDA moisture-shrink method, the NRC dry-matter-intake basis, and NRCS Code 590. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-agriculture.js 37500 -> 44000; the Group L citation-coverage count moved 18 -> 21. Housekeeping: home count 806 -> 809, README resynced (counts, Group L cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 51 appended. All gates green at the new state: lint, unit tests (**5,102**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(civil): land spec-v335..v337 -- 3 roadway geometric-design tiles in calc-civil.js; 803 -> 806 tiles, 0.118.0, 2026-07-03
 
 The roadway geometric-design trio, twenty-first batch of the v275-v374 campaign: the sight-and-safety numbers the curve-layout tiles never give, all in the existing lazy `calc-civil.js` (Group E); no new module, group, or dependency. Catalog **803 -> 806**, package **0.117.0 -> 0.118.0** (a minor). Proposed 2026-07-02.

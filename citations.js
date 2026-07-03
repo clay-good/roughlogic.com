@@ -1187,6 +1187,42 @@ export const CITATIONS = {
       { name: "Utilization guideline", value: "25-50% arid range, 50-70% tame pasture (take-half-leave-half)", source: "NRCS range management practice" },
     ],
   },
+  "grain-shrink-moisture": {
+    formula: "moist_shrink = (M_wet - M_dry)/(100 - M_dry); W_dry = W (100 - M_wet)/(100 - M_dry); W_net = W_dry (1 - handling/100); bushels = W_net / test_weight; total_shrink = (W - W_net)/W.",
+    edition: "The standard grain moisture-shrink relation used by USDA and land-grant extension, by name.",
+    freeAccess: "Grain-shrink formulas are published free by land-grant extension services (e.g. Iowa State, Purdue). The buyer's contract, moisture discount schedule, and certified settlement scale govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The moisture-shrink fraction (M_wet - M_dry)/(100 - M_dry), the dried weight W (100 - M_wet)/(100 - M_dry), the handling/invisible shrink deduction, and the net market bushels at the crop's test weight (56 lb/bu corn, 60 lb/bu wheat and soybeans, 32 lb/bu oats). This returns the net dried weight, bushels, and total shrink for the entered moistures: it does not apply dockage for foreign material or damage, does not compute the elevator's moisture-discount dollars, and takes the handling shrink as entered. The buyer's contract and settlement scale govern; each extra point of drying costs more than a point of weight.",
+    assumptions: [
+      { name: "Moisture-shrink form", value: "(M_wet - M_dry)/(100 - M_dry) with the water-balance dried weight", source: "USDA / land-grant extension" },
+      { name: "Test weight", value: "56 lb/bu corn, 60 lb/bu wheat and soybeans, 32 lb/bu oats", source: "USDA FGIS" },
+      { name: "No dockage", value: "no foreign-material or damage dockage and no discount-dollar computation", source: "scope of this tile" },
+    ],
+  },
+  "livestock-dry-matter-intake": {
+    formula: "DMI = BW x intake/100; as_fed = DMI / (feed_DM/100); herd_as_fed = as_fed x head.",
+    edition: "The NRC Nutrient Requirements dry-matter-intake basis, by name.",
+    freeAccess: "Dry-matter-intake guidelines are published by NRC (National Research Council) and land-grant extension. A ration balancer and a nutritionist govern the actual diet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The dry-matter intake DMI = body weight x intake (percent of body weight, on a dry-matter basis), the as-fed conversion as_fed = DMI / feed dry-matter fraction, and the herd multiplier. Intake runs roughly 2-3% of body weight for beef cattle; feed dry matter is about 88% for dry hay and 30-40% for corn silage. This returns a single-feed as-fed amount from a dry-matter intake: it does not balance a ration for energy, protein, or minerals, does not account for a multi-ingredient TMR, and takes the intake percentage as entered. A nutritionist and the NRC requirements govern the diet.",
+    assumptions: [
+      { name: "Dry-matter basis", value: "DMI = BW x intake%, always figured on a dry-matter basis", source: "NRC Nutrient Requirements" },
+      { name: "As-fed conversion", value: "as_fed = DMI / (feed dry-matter fraction); wet feeds weigh far more as-fed", source: "NRC / extension" },
+      { name: "Single feed only", value: "not a balanced ration; no energy/protein/mineral balancing", source: "scope of this tile" },
+    ],
+  },
+  "manure-application-rate": {
+    formula: "available_per_unit = total_nutr x availability/100; rate = crop_need / available_per_unit; applied = rate x available_per_unit = crop_need.",
+    edition: "The nutrient-based manure application rate per USDA NRCS Conservation Practice Standard 590 (Nutrient Management), by name.",
+    freeAccess: "NRCS Code 590 and manure-management guidance are free at nrcs.usda.gov and from land-grant extension. A manure test and the farm's nutrient-management plan govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The available nutrient per unit = total nutrient x first-year availability fraction, and the application rate = crop nutrient requirement / available per unit (ton/acre for solid manure, 1,000 gal/acre for liquid). The rate is set by the most limiting of nitrogen or P2O5 under the farm's nutrient-management plan. This returns the single-nutrient rate for the entered availability: it takes the plant-available fraction as entered (not by a mineralization model), does not run a phosphorus-index or the P-based cap that often governs, and is not itself a nutrient-management plan. NRCS Code 590 and the farm's certified plan govern.",
+    assumptions: [
+      { name: "Nutrient-based rate", value: "rate = crop_need / (total_nutr x availability); closes to applied = crop_need", source: "NRCS Code 590" },
+      { name: "Form units", value: "ton/acre for solid manure (lb/ton), 1,000 gal/acre for liquid (lb/1,000 gal)", source: "extension manure guidance" },
+      { name: "Limiting nutrient", value: "the plan sets whether N or P2O5 governs; a P-index can force a lower rate", source: "scope of this tile" },
+    ],
+  },
   "grain-bin-capacity": {
     formula: "Cylinder volume = pi x (d/2)^2 x eave height. Cone volume = (1/3) x pi x (d/2)^2 x peak height. Total ft^3 = (cylinder + cone) x packing factor. Bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3). Weight = bushels x test weight.",
     edition: "Bin geometry first-principles; USDA FGIS (Federal Grain Inspection Service) standard test weights by name.",

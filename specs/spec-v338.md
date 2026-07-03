@@ -1,6 +1,6 @@
 # roughlogic.com Specification v338 -- Grain Drying Shrink and Net Market Bushels (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v338..v340 (the farm-operations trio -- the grain-marketing
+> **Status: LANDED (2026-07-03, package 0.119.0). Batch spec-v338..v340 (the farm-operations trio -- the grain-marketing
 > and livestock/land numbers the existing ag tiles never compute: the grain drying shrink and net market bushels (this
 > spec), the livestock dry-matter intake and as-fed ration (v339), and the nutrient-based manure application rate (v340).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `grain-bin-capacity` gives storage volume and

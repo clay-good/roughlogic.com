@@ -14470,3 +14470,56 @@ test("bounds: spec-v337 computeHorizontalSightlineOffset pins the forward/invers
   assert.ok("error" in _v337({ mode: "maxS", R_ft: 1000, M_ft: 2500 }));
   assert.ok("error" in _v337({ mode: "M", R_ft: Infinity, S_ft: 570 }));
 });
+
+// ===================== spec-v338..v340 agriculture batch =====================
+import { computeGrainShrinkMoisture as _v338, computeLivestockDryMatterIntake as _v339, computeManureApplicationRate as _v340 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v338 computeGrainShrinkMoisture pins the shrink terms, bushels, and error seams", () => {
+  const r = _v338({ W_lb: 10000, M_wet_pct: 20, M_dry_pct: 15, handling: 0.5, tw_lbbu: 56 });
+  assert.ok(Math.abs(r.moist_shrink_pct - (5 / 85 * 100)) < 1e-9);
+  assert.ok(Math.abs(r.W_dry_lb - 10000 * 80 / 85) < 1e-6);
+  assert.ok(Math.abs(r.bushels - 167.2) < 0.2);
+  assert.ok(Math.abs(r.total_shrink_pct - 6.35) < 0.05);
+  // Drying harder costs more shrink.
+  const r2 = _v338({ W_lb: 10000, M_wet_pct: 20, M_dry_pct: 14, handling: 0.5, tw_lbbu: 56 });
+  assert.ok(r2.total_shrink_pct > r.total_shrink_pct && Math.abs(r2.bushels - 165.3) < 0.2);
+  // Error seams.
+  assert.ok("error" in _v338({ W_lb: 0, M_wet_pct: 20, M_dry_pct: 15 }));
+  assert.ok("error" in _v338({ W_lb: 10000, M_wet_pct: 15, M_dry_pct: 20 })); // cannot dry up
+  assert.ok("error" in _v338({ W_lb: 10000, M_wet_pct: 20, M_dry_pct: 100 }));
+  assert.ok("error" in _v338({ W_lb: 10000, M_wet_pct: 20, M_dry_pct: 15, tw_lbbu: 0 }));
+  assert.ok("error" in _v338({ W_lb: Infinity, M_wet_pct: 20, M_dry_pct: 15 }));
+});
+
+test("bounds: spec-v339 computeLivestockDryMatterIntake pins the as-fed conversion, herd multiplier, and error seams", () => {
+  const r = _v339({ BW_lb: 1200, intake: 2.5, feed_DM: 88, head: 1 });
+  assert.ok(Math.abs(r.DMI_lb - 30) < 1e-9);
+  assert.ok(Math.abs(r.asfed_lb - 30 / 0.88) < 1e-9);
+  // A wetter feed needs much more as-fed for the same DMI, and the herd scales.
+  const r2 = _v339({ BW_lb: 1200, intake: 2.5, feed_DM: 35, head: 100 });
+  assert.ok(Math.abs(r2.asfed_lb - 85.71) < 0.1);
+  assert.ok(Math.abs(r2.herd_asfed_lb - r2.asfed_lb * 100) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v339({ BW_lb: 0, intake: 2.5, feed_DM: 88 }));
+  assert.ok("error" in _v339({ BW_lb: 1200, intake: 0, feed_DM: 88 }));
+  assert.ok("error" in _v339({ BW_lb: 1200, intake: 2.5, feed_DM: 0 }));
+  assert.ok("error" in _v339({ BW_lb: 1200, intake: 2.5, feed_DM: 88, head: -1 })); // blank/0 head defaults to 1; a negative head errors
+  assert.ok("error" in _v339({ BW_lb: NaN, intake: 2.5, feed_DM: 88 }));
+});
+
+test("bounds: spec-v340 computeManureApplicationRate pins the availability factor, loop closure, and error seams", () => {
+  const r = _v340({ crop_need: 150, total_nutr: 10, availability: 50, form: "solid" });
+  assert.ok(Math.abs(r.available_per_unit - 5) < 1e-9);
+  assert.ok(Math.abs(r.rate - 30) < 1e-9);
+  // The loop closes: rate x available = crop_need.
+  assert.ok(Math.abs(r.applied_nutrient - 150) < 1e-9);
+  // Liquid form.
+  const r2 = _v340({ crop_need: 150, total_nutr: 50, availability: 50, form: "liquid" });
+  assert.ok(Math.abs(r2.rate - 6) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v340({ crop_need: 0, total_nutr: 10, availability: 50 }));
+  assert.ok("error" in _v340({ crop_need: 150, total_nutr: 0, availability: 50 }));
+  assert.ok("error" in _v340({ crop_need: 150, total_nutr: 10, availability: 0 }));
+  assert.ok("error" in _v340({ crop_need: 150, total_nutr: 10, availability: 120 }));
+  assert.ok("error" in _v340({ crop_need: Infinity, total_nutr: 10, availability: 50 }));
+});

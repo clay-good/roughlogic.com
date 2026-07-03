@@ -13032,6 +13032,141 @@
       "term": "cut slope sight distance",
       "target": "horizontal-sightline-offset",
       "kind": "industry"
+    },
+    {
+      "term": "grain shrink",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "drying shrink",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "corn moisture shrink",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "net bushels",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "grain moisture discount",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "elevator shrink",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "market moisture",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "grain settlement",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "test weight bushels",
+      "target": "grain-shrink-moisture",
+      "kind": "industry"
+    },
+    {
+      "term": "dry matter intake",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "dmi",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "as fed ration",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "feed intake livestock",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "percent body weight intake",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "cattle feed amount",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "silage as fed",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "bunk weight",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "dry matter basis",
+      "target": "livestock-dry-matter-intake",
+      "kind": "industry"
+    },
+    {
+      "term": "manure application rate",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "manure spreading rate",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "nutrient management manure",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "n based manure",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "tons per acre manure",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "manure nitrogen rate",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "nrcs 590",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "gallons per acre manure",
+      "target": "manure-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "land application manure",
+      "target": "manure-application-rate",
+      "kind": "industry"
     }
   ]
 }

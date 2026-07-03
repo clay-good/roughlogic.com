@@ -2196,3 +2196,167 @@ const renderSodTakeoff = _v23SimpleRenderer({
   compute: computeSodTakeoff,
 });
 AGRICULTURE_RENDERERS["sod-takeoff"] = renderSodTakeoff;
+
+// --- spec-v338 L.x: Grain drying shrink & net market bushels (`grain-shrink-moisture`) ---
+// Moisture shrink from wet to market moisture, dried weight, handling shrink, and
+// net market bushels at the crop's test weight. moist_shrink = (Mw-Md)/(100-Md);
+// W_dry = W(100-Mw)/(100-Md); W_net = W_dry(1-h/100); bu = W_net/tw.
+// dims: in { W_lb: M, M_wet_pct: dimensionless, M_dry_pct: dimensionless, handling: dimensionless, tw_lbbu: M } out: { W_dry_lb: M, W_net_lb: M, bushels: dimensionless, moist_shrink_pct: dimensionless, total_shrink_pct: dimensionless }
+export function computeGrainShrinkMoisture({ W_lb = 0, M_wet_pct = 0, M_dry_pct = 0, handling = 0.5, tw_lbbu = 56 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(W_lb) || 0;
+  const Mw = Number(M_wet_pct) || 0;
+  const Md = Number(M_dry_pct) || 0;
+  const h = Number(handling) || 0;
+  const tw = Number(tw_lbbu) || 0;
+  if (!(W > 0)) return { error: "Enter a positive gross (wet) weight." };
+  if (!(Mw > 0 && Mw < 100)) return { error: "Wet moisture must be between 0 and 100 percent." };
+  if (!(Md >= 0 && Md < 100)) return { error: "Market moisture must be between 0 and 100 percent." };
+  if (!(Mw > Md)) return { error: "Wet moisture must be above the market moisture (you cannot dry up)." };
+  if (!(tw > 0)) return { error: "Enter a positive test weight (lb/bu)." };
+  const moist_shrink = (Mw - Md) / (100 - Md);
+  const W_dry = W * (100 - Mw) / (100 - Md);
+  const W_net = W_dry * (1 - h / 100);
+  const bushels = W_net / tw;
+  const total_shrink = (W - W_net) / W * 100;
+  return {
+    W_dry_lb: W_dry, W_net_lb: W_net, bushels,
+    moist_shrink_pct: moist_shrink * 100, total_shrink_pct: total_shrink,
+  };
+}
+export const grainShrinkMoistureExample = { inputs: { W_lb: 10000, M_wet_pct: 20, M_dry_pct: 15, handling: 0.5, tw_lbbu: 56 } };
+
+function renderGrainShrinkMoisture(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Grain drying shrink per the standard moisture-shrink relation used by USDA and land-grant extension: dry weight = wet weight x (100 - wet moisture)/(100 - market moisture), then a handling/invisible shrink deduction; net bushels = net weight / market test weight (56 lb corn, 60 wheat/soybeans). The buyer's contract, moisture discount schedule, and settlement scale govern.";
+  const W = makeNumber("Gross wet weight (lb)", "gsm-w", { step: "any", min: "0", value: "10000" });
+  W.input.value = "10000";
+  const Mw = makeNumber("Wet moisture (%)", "gsm-mw", { step: "any", min: "0", max: "100", value: "20" });
+  Mw.input.value = "20";
+  const Md = makeNumber("Market moisture (%)", "gsm-md", { step: "any", min: "0", max: "100", value: "15" });
+  Md.input.value = "15";
+  const h = makeNumber("Handling shrink (%)", "gsm-h", { step: "any", min: "0", value: "0.5" });
+  h.input.value = "0.5";
+  const tw = makeNumber("Test weight (lb/bu; 56 corn, 60 wheat/soy)", "gsm-tw", { step: "any", min: "0", value: "56" });
+  tw.input.value = "56";
+  for (const f of [W, Mw, Md, h, tw]) inputRegion.appendChild(f.wrap);
+  const oNet = makeOutputLine(outputRegion, "Net market weight", "gsm-out-net");
+  const oBu = makeOutputLine(outputRegion, "Net market bushels", "gsm-out-bu");
+  const oShrink = makeOutputLine(outputRegion, "Shrink", "gsm-out-shrink");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGrainShrinkMoisture({
+      W_lb: readNum(W.input), M_wet_pct: readNum(Mw.input), M_dry_pct: readNum(Md.input),
+      handling: readNum(h.input), tw_lbbu: readNum(tw.input),
+    });
+    if (r.error) { oNet.textContent = r.error; oBu.textContent = ""; oShrink.textContent = ""; return; }
+    oNet.textContent = fmt(r.W_net_lb, 0) + " lb (dried " + fmt(r.W_dry_lb, 0) + " lb)";
+    oBu.textContent = fmt(r.bushels, 1) + " bu";
+    oShrink.textContent = fmt(r.total_shrink_pct, 2) + "% total (" + fmt(r.moist_shrink_pct, 2) + "% moisture)";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { W.input.value = "10000"; Mw.input.value = "20"; Md.input.value = "15"; h.input.value = "0.5"; tw.input.value = "56"; update(); });
+  for (const f of [W.input, Mw.input, Md.input, h.input, tw.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["grain-shrink-moisture"] = renderGrainShrinkMoisture;
+
+// --- spec-v339 L.x: Livestock dry-matter intake & as-fed ration (`livestock-dry-matter-intake`) ---
+// DMI = BW x intake%; as-fed = DMI / (feed_DM%); herd as-fed = as-fed x head.
+// Intake is always figured on a dry-matter basis; wet feeds weigh far more as-fed.
+// dims: in { BW_lb: M, intake: dimensionless, feed_DM: dimensionless, head: dimensionless } out: { DMI_lb: M, asfed_lb: M, herd_asfed_lb: M }
+export function computeLivestockDryMatterIntake({ BW_lb = 0, intake = 0, feed_DM = 0, head = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const BW = Number(BW_lb) || 0;
+  const intk = Number(intake) || 0;
+  const dm = Number(feed_DM) || 0;
+  const hd = Number(head) || 1;
+  if (!(BW > 0)) return { error: "Enter a positive body weight." };
+  if (!(intk > 0)) return { error: "Enter a positive dry-matter intake percentage." };
+  if (!(dm > 0 && dm <= 100)) return { error: "Feed dry matter must be between 0 and 100 percent." };
+  if (!(hd > 0)) return { error: "Enter a positive number of animals." };
+  const DMI = BW * intk / 100;
+  const asfed = DMI / (dm / 100);
+  const herd_asfed = asfed * hd;
+  return { DMI_lb: DMI, asfed_lb: asfed, herd_asfed_lb: herd_asfed, head: hd };
+}
+export const livestockDryMatterIntakeExample = { inputs: { BW_lb: 1200, intake: 2.5, feed_DM: 88, head: 1 } };
+
+function renderLivestockDryMatterIntake(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Dry-matter intake per NRC Nutrient Requirements of Beef Cattle / Dairy Cattle: DMI = body weight x intake (% of BW on a dry-matter basis); as-fed = DMI / feed dry-matter fraction. Feed dry matter runs about 88% for dry hay and 30-40% for corn silage. A ration balancer and a nutritionist govern the actual diet.";
+  const BW = makeNumber("Body weight (lb)", "ldm-bw", { step: "any", min: "0", value: "1200" });
+  BW.input.value = "1200";
+  const intake = makeNumber("Dry-matter intake (% of body weight)", "ldm-in", { step: "any", min: "0", value: "2.5" });
+  intake.input.value = "2.5";
+  const dm = makeNumber("Feed dry matter (%; 88 hay, 35 silage)", "ldm-dm", { step: "any", min: "0", max: "100", value: "88" });
+  dm.input.value = "88";
+  const head = makeNumber("Number of animals", "ldm-head", { step: "1", min: "0", value: "1" });
+  head.input.value = "1";
+  for (const f of [BW, intake, dm, head]) inputRegion.appendChild(f.wrap);
+  const oDMI = makeOutputLine(outputRegion, "Dry-matter intake", "ldm-out-dmi");
+  const oAF = makeOutputLine(outputRegion, "As-fed intake", "ldm-out-af");
+  const oHerd = makeOutputLine(outputRegion, "Herd as-fed", "ldm-out-herd");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeLivestockDryMatterIntake({
+      BW_lb: readNum(BW.input), intake: readNum(intake.input), feed_DM: readNum(dm.input), head: readNum(head.input),
+    });
+    if (r.error) { oDMI.textContent = r.error; oAF.textContent = ""; oHerd.textContent = ""; return; }
+    oDMI.textContent = fmt(r.DMI_lb, 1) + " lb/day dry matter";
+    oAF.textContent = fmt(r.asfed_lb, 1) + " lb/day as-fed (bunk weight)";
+    oHerd.textContent = r.head > 1 ? fmt(r.herd_asfed_lb, 0) + " lb/day for " + r.head + " head" : "(enter head count > 1 for herd total)";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { BW.input.value = "1200"; intake.input.value = "2.5"; dm.input.value = "88"; head.input.value = "1"; update(); });
+  for (const f of [BW.input, intake.input, dm.input, head.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["livestock-dry-matter-intake"] = renderLivestockDryMatterIntake;
+
+// --- spec-v340 L.x: Nutrient-based manure application rate (`manure-application-rate`) ---
+// available_per_unit = total_nutr x availability%; rate = crop_need / available_per_unit
+// (ton/acre for solid, 1,000 gal/acre for liquid). Closes: rate x available = crop_need.
+// dims: in { crop_need: dimensionless, total_nutr: dimensionless, availability: dimensionless } out: { available_per_unit: dimensionless, rate: dimensionless, applied_nutrient: dimensionless }
+export function computeManureApplicationRate({ crop_need = 0, total_nutr = 0, availability = 0, form = "solid" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const need = Number(crop_need) || 0;
+  const total = Number(total_nutr) || 0;
+  const avail = Number(availability) || 0;
+  if (!(need > 0)) return { error: "Enter a positive crop nutrient requirement (lb/acre)." };
+  if (!(total > 0)) return { error: "Enter a positive total nutrient in the manure." };
+  if (!(avail > 0 && avail <= 100)) return { error: "Availability must be between 0 and 100 percent." };
+  const available_per_unit = total * avail / 100;
+  const rate = need / available_per_unit;
+  const applied_nutrient = rate * available_per_unit;
+  return { available_per_unit, rate, applied_nutrient, form };
+}
+export const manureApplicationRateExample = { inputs: { crop_need: 150, total_nutr: 10, availability: 50, form: "solid" } };
+
+function renderManureApplicationRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Nutrient-based manure rate per USDA NRCS Code 590 (Nutrient Management) and land-grant manure-management guidance: available nutrient per unit = total nutrient x first-year availability; application rate = crop requirement / available per unit. Solid manure is ton/acre, liquid is 1,000 gal/acre. The rate is set by the most limiting of N or P2O5 under the farm's nutrient-management plan; a manure test and the plan govern.";
+  const need = makeNumber("Crop nutrient need (lb/acre, N or P2O5)", "mar-need", { step: "any", min: "0", value: "150" });
+  need.input.value = "150";
+  const form = makeSelect("Manure form", "mar-form", [
+    { value: "solid", label: "Solid (lb/ton -> ton/acre)", selected: true },
+    { value: "liquid", label: "Liquid (lb/1,000 gal -> 1,000 gal/acre)" },
+  ]);
+  const total = makeNumber("Total nutrient (lb/ton or lb/1,000 gal)", "mar-total", { step: "any", min: "0", value: "10" });
+  total.input.value = "10";
+  const avail = makeNumber("First-year availability (%)", "mar-avail", { step: "any", min: "0", max: "100", value: "50" });
+  avail.input.value = "50";
+  for (const f of [need, form, total, avail]) inputRegion.appendChild(f.wrap);
+  const oAvail = makeOutputLine(outputRegion, "Available nutrient per unit", "mar-out-avail");
+  const oRate = makeOutputLine(outputRegion, "Application rate", "mar-out-rate");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeManureApplicationRate({
+      crop_need: readNum(need.input), total_nutr: readNum(total.input),
+      availability: readNum(avail.input), form: form.select.value,
+    });
+    if (r.error) { oAvail.textContent = r.error; oRate.textContent = ""; return; }
+    const solid = r.form === "solid";
+    oAvail.textContent = fmt(r.available_per_unit, 2) + (solid ? " lb/ton available" : " lb/1,000 gal available");
+    oRate.textContent = solid
+      ? fmt(r.rate, 1) + " ton/acre"
+      : fmt(r.rate, 2) + " (x1,000 gal) = " + fmt(r.rate * 1000, 0) + " gal/acre";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { need.input.value = "150"; form.select.value = "solid"; total.input.value = "10"; avail.input.value = "50"; update(); });
+  for (const f of [need.input, total.input, avail.input]) f.addEventListener("input", update);
+  form.select.addEventListener("change", update);
+}
+AGRICULTURE_RENDERERS["manure-application-rate"] = renderManureApplicationRate;

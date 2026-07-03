@@ -1,6 +1,6 @@
 # roughlogic.com Specification v340 -- Nutrient-Based Manure Application Rate (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v338..v340 (the farm-operations trio -- grain shrink (v338),
+> **Status: LANDED (2026-07-03, package 0.119.0). Batch spec-v338..v340 (the farm-operations trio -- grain shrink (v338),
 > dry-matter intake (v339), the manure application rate (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `npk-blend` sizes a commercial fertilizer blend from a
 > soil test, but a livestock operation applies manure, whose nutrient-based agronomic rate -- the tons or gallons per acre

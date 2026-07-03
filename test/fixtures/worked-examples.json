@@ -29706,6 +29706,90 @@
       "outputs": {
         "M_ft": { "value": 66.4, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "grain-shrink-moisture",
+      "source_publisher": "USDA / land-grant extension",
+      "source_title": "10,000 lb corn, 20% to 15% market, 0.5% handling, 56 lb/bu -> 167.2 bu, 6.35% shrink",
+      "source_edition_or_year": "spec-v338 worked example (machine-verified)",
+      "source_section_or_page": "spec-v338 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "W_lb": 10000, "M_wet_pct": 20, "M_dry_pct": 15, "handling": 0.5, "tw_lbbu": 56 },
+      "outputs": {
+        "W_net_lb": { "value": 9365, "tolerance": { "pct": 0.2 } },
+        "bushels": { "value": 167.2, "tolerance": { "pct": 0.3 } },
+        "total_shrink_pct": { "value": 6.35, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "grain-shrink-moisture",
+      "source_publisher": "USDA / land-grant extension",
+      "source_title": "cross-check: drying to 14% costs more shrink -> 165.3 bu, 7.44%",
+      "source_edition_or_year": "spec-v338 worked example (machine-verified)",
+      "source_section_or_page": "spec-v338 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "W_lb": 10000, "M_wet_pct": 20, "M_dry_pct": 14, "handling": 0.5, "tw_lbbu": 56 },
+      "outputs": {
+        "bushels": { "value": 165.3, "tolerance": { "pct": 0.3 } },
+        "total_shrink_pct": { "value": 7.44, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "livestock-dry-matter-intake",
+      "source_publisher": "NRC Nutrient Requirements",
+      "source_title": "1,200 lb steer at 2.5% intake, dry hay 88% DM -> 30 lb DMI, 34.1 lb as-fed",
+      "source_edition_or_year": "spec-v339 worked example (machine-verified)",
+      "source_section_or_page": "spec-v339 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "BW_lb": 1200, "intake": 2.5, "feed_DM": 88, "head": 1 },
+      "outputs": {
+        "DMI_lb": { "value": 30, "tolerance": { "abs": 0.1 } },
+        "asfed_lb": { "value": 34.1, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "livestock-dry-matter-intake",
+      "source_publisher": "NRC Nutrient Requirements",
+      "source_title": "cross-check: corn silage at 35% DM needs 85.7 lb as-fed; 100 head -> 8,571 lb/day",
+      "source_edition_or_year": "spec-v339 worked example (machine-verified)",
+      "source_section_or_page": "spec-v339 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "BW_lb": 1200, "intake": 2.5, "feed_DM": 35, "head": 100 },
+      "outputs": {
+        "asfed_lb": { "value": 85.7, "tolerance": { "pct": 0.5 } },
+        "herd_asfed_lb": { "value": 8571, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "manure-application-rate",
+      "source_publisher": "USDA NRCS Code 590",
+      "source_title": "150 lb N/acre, solid manure 10 lb N/ton at 50% available -> 30 ton/acre",
+      "source_edition_or_year": "spec-v340 worked example (machine-verified)",
+      "source_section_or_page": "spec-v340 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "crop_need": 150, "total_nutr": 10, "availability": 50, "form": "solid" },
+      "outputs": {
+        "rate": { "value": 30, "tolerance": { "abs": 0.1 } },
+        "applied_nutrient": { "value": 150, "tolerance": { "abs": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "manure-application-rate",
+      "source_publisher": "USDA NRCS Code 590",
+      "source_title": "cross-check: liquid at 50 lb N/1,000 gal, 50% available -> 6.0 (x1,000 gal) = 6,000 gal/acre",
+      "source_edition_or_year": "spec-v340 worked example (machine-verified)",
+      "source_section_or_page": "spec-v340 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "crop_need": 150, "total_nutr": 50, "availability": 50, "form": "liquid" },
+      "outputs": {
+        "rate": { "value": 6.0, "tolerance": { "abs": 0.05 } }
+      }
     }
   ]
 }

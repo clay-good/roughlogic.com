@@ -1,6 +1,6 @@
 # roughlogic.com Specification v339 -- Livestock Dry-Matter Intake and As-Fed Ration (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v338..v340 (the farm-operations trio -- grain shrink (v338),
+> **Status: LANDED (2026-07-03, package 0.119.0). Batch spec-v338..v340 (the farm-operations trio -- grain shrink (v338),
 > livestock dry-matter intake (this spec), manure application rate (v340)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pearson-square-ration` balances two feeds to a
 > nutrient target and `livestock-water-requirement` sizes water, but neither computes the dry-matter intake -- the pounds of

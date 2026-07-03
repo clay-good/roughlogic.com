@@ -669,6 +669,7 @@ const TOOL_MODULES = (() => {
     "thi-livestock", "sprayer-calibration",
     // v17
     "irrigation-requirement", "cattle-stocking-rate", "grain-bin-capacity",
+    "grain-shrink-moisture", "livestock-dry-matter-intake", "manure-application-rate",
     "npk-blend", "tank-mix",
     // v23
     "pesticide-rei-phi",
