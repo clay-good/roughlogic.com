@@ -13354,3 +13354,76 @@ test("bounds: spec-v283 computeSteelTensionMember pins the limit-state flip, the
   assert.ok("error" in _v283({ ag_in2: 3.75, fy: 36, fu: 58, xbar_in: 8, l_in: 6 })); // xbar >= L
   assert.ok("error" in _v283({ ag_in2: NaN, fy: 36, fu: 58 }));
 });
+
+// ===================== spec-v284..v286 reinforced-concrete member depth batch =====================
+import { computeRcColumnAxial as _v284, computeRcPunchingShear as _v285, computeRcHookDevelopment as _v286 } from "../../calc-concrete.js";
+
+test("bounds: spec-v284 computeRcColumnAxial pins the 16-in column, the concrete-strength lever, the rho flag, and error seams", () => {
+  const r = _v284({ b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000, ast_in2: 6.32 });
+  assert.strictEqual(r.ag_in2, 256);
+  assert.ok(Math.abs(r.rho_g - 6.32 / 256) < 1e-12);
+  assert.ok(r.rho_flag.startsWith("within"));
+  assert.ok(Math.abs(r.po_kip - 1228.112) < 1e-6);
+  assert.ok(Math.abs(r.phi_pn_kip - 638.61824) < 1e-6);
+  // 25% concrete-strength bump lifts a lightly reinforced column ~17%.
+  const r2 = _v284({ b_in: 16, h_in: 16, fc_psi: 5000, fy_psi: 60000, ast_in2: 6.32 });
+  assert.ok(Math.abs(r2.po_kip - 1440.34) < 1e-6);
+  assert.ok(Math.abs(r2.phi_pn_kip - 748.9768) < 1e-6);
+  // The rho flags fire outside the 1-8% band.
+  assert.ok(_v284({ b_in: 16, h_in: 16, ast_in2: 1.0 }).rho_flag.startsWith("below"));
+  assert.ok(_v284({ b_in: 16, h_in: 16, ast_in2: 25 }).rho_flag.startsWith("above"));
+  // Error seams.
+  assert.ok("error" in _v284({ b_in: 0, h_in: 16, ast_in2: 6.32 }));
+  assert.ok("error" in _v284({ b_in: 16, h_in: 16, ast_in2: 0 }));
+  assert.ok("error" in _v284({ b_in: 16, h_in: 16, ast_in2: 300 })); // steel >= gross
+  assert.ok("error" in _v284({ b_in: 16, h_in: 16, fc_psi: Infinity, ast_in2: 6.32 }));
+});
+
+test("bounds: spec-v285 computeRcPunchingShear pins the three-term least, the alpha_s map, and error seams", () => {
+  const r = _v285({ c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 });
+  assert.strictEqual(r.bo_in, 104);
+  assert.strictEqual(r.beta, 1);
+  assert.ok(Math.abs(r.vc_psi - 4 * Math.sqrt(4000)) < 1e-9);
+  assert.ok(Math.abs(r.phi_vc_kip - 118.39567559670412) < 1e-6);
+  assert.ok(r.governs.includes("base term"));
+  // Large column on a thin slab: the alpha_s term takes over.
+  const r2 = _v285({ c1_in: 36, c2_in: 36, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 });
+  assert.strictEqual(r2.bo_in, 168);
+  assert.ok(Math.abs(r2.vc_psi - (2 + 240 / 168) * Math.sqrt(4000)) < 1e-9);
+  assert.ok(Math.abs(r2.phi_vc_kip - 163.9324739031288) < 1e-6);
+  assert.ok(r2.governs.includes("large-column"));
+  // A very elongated column: the aspect-ratio term governs.
+  const r3 = _v285({ c1_in: 60, c2_in: 12, d_in: 6, fc_psi: 4000, position: "interior" });
+  assert.ok(Math.abs(r3.beta - 5) < 1e-12);
+  assert.ok(r3.governs.includes("aspect-ratio"));
+  // alpha_s position map.
+  assert.strictEqual(_v285({ c1_in: 20, c2_in: 20, d_in: 6, position: "edge" }).alpha_s, 30);
+  assert.strictEqual(_v285({ c1_in: 20, c2_in: 20, d_in: 6, position: "corner" }).alpha_s, 20);
+  // Error seams.
+  assert.ok("error" in _v285({ c1_in: 0, c2_in: 20, d_in: 6 }));
+  assert.ok("error" in _v285({ c1_in: 20, c2_in: 20, d_in: 0 }));
+  assert.ok("error" in _v285({ c1_in: 20, c2_in: 20, d_in: 6, lambda: 1.5 }));
+  assert.ok("error" in _v285({ c1_in: NaN, c2_in: 20, d_in: 6 }));
+});
+
+test("bounds: spec-v286 computeRcHookDevelopment pins the db^1.5 scaling, the psi_c branch, the floor, and error seams", () => {
+  const r = _v286({ db_in: 1.0, fy_psi: 60000, fc_psi: 4000 });
+  assert.ok(Math.abs(r.psi_c - (4000 / 15000 + 0.6)) < 1e-12);
+  assert.ok(Math.abs(r.ldh_in - 14.948948938977793) < 1e-9);
+  assert.strictEqual(r.floor_governs, false);
+  // db^1.5 scaling: a #5 needs (0.625)^1.5 of the #8 length.
+  const r2 = _v286({ db_in: 0.625, fy_psi: 60000, fc_psi: 4000 });
+  assert.ok(Math.abs(r2.ldh_in - r.ldh_in * Math.pow(0.625, 1.5)) < 1e-9);
+  // At f'c >= 6,000 psi the psi_c form pins to 1.0.
+  assert.strictEqual(_v286({ db_in: 1.0, fc_psi: 6000 }).psi_c, 1.0);
+  // The max(8db, 6 in) floor governs for a small bar.
+  const r3 = _v286({ db_in: 0.375 });
+  assert.strictEqual(r3.ldh_in, 6);
+  assert.strictEqual(r3.floor_governs, true);
+  // Error seams.
+  assert.ok("error" in _v286({ db_in: 0 }));
+  assert.ok("error" in _v286({ db_in: 1.0, fc_psi: 0 }));
+  assert.ok("error" in _v286({ db_in: 1.0, psi_e: 0 }));
+  assert.ok("error" in _v286({ db_in: 1.0, lambda: 1.5 }));
+  assert.ok("error" in _v286({ db_in: Infinity }));
+});

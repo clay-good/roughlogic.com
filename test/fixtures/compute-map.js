@@ -643,6 +643,10 @@ export const COMPUTE_MAP = {
   "steel-beam-ltb": { module: "../../calc-steel.js", fn: "computeSteelBeamLtb" },
   "steel-block-shear": { module: "../../calc-steel.js", fn: "computeSteelBlockShear" },
   "steel-tension-member": { module: "../../calc-steel.js", fn: "computeSteelTensionMember" },
+  // spec-v284..v286 reinforced-concrete member depth batch (3 tiles)
+  "rc-column-axial": { module: "../../calc-concrete.js", fn: "computeRcColumnAxial" },
+  "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
+  "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

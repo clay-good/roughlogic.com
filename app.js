@@ -432,6 +432,8 @@ const TOOL_MODULES = (() => {
   // All three KEEP group "E" (module independent of group letter).
   declare("./calc-concrete.js", "CONCRETE_RENDERERS", [
     "rc-beam-flexure", "rc-beam-shear", "rc-development-length",
+    // spec-v284..v286 member depth batch
+    "rc-column-axial", "rc-punching-shear", "rc-hook-development",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the

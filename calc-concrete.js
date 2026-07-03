@@ -209,3 +209,138 @@ CONCRETE_RENDERERS["rc-development-length"] = _simpleRenderer({
   ],
   compute: computeRcDevelopmentLength,
 });
+
+// ===================== spec-v284..v286: reinforced-concrete member depth batch =====================
+// The ACI checks the beam flexure/shear/development bench left open: the tied
+// column's concentric axial capacity (22.4), two-way punching shear at a
+// column (22.6), and the standard-hook development length (25.4.3).
+
+// dims: in { b_in: L, h_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, ast_in2: L^2 } out: { ag_in2: L^2, rho_g: dimensionless, po_kip: M L T^-2, phi_pn_kip: M L T^-2 }
+export function computeRcColumnAxial({ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_in > 0) || !(h_in > 0)) return { error: "Column dimensions must be positive (in)." };
+  if (!(fc_psi > 0) || !(fy_psi > 0)) return { error: "Concrete and steel strengths must be positive (psi)." };
+  if (!(ast_in2 > 0)) return { error: "Longitudinal steel area must be positive (in^2)." };
+  const ag_in2 = b_in * h_in;
+  if (!(ast_in2 < ag_in2)) return { error: "The steel area must be less than the gross section." };
+  const rho_g = ast_in2 / ag_in2;
+  const rho_flag = rho_g < 0.01 ? "below the ACI 10.6.1 1% minimum" : (rho_g > 0.08 ? "above the ACI 10.6.1 8% maximum" : "within the ACI 10.6.1 1-8% range");
+  const po_lb = 0.85 * fc_psi * (ag_in2 - ast_in2) + fy_psi * ast_in2;
+  const phi_pn_lb = 0.80 * 0.65 * po_lb;
+  const po_kip = po_lb / 1000;
+  const phi_pn_kip = phi_pn_lb / 1000;
+  return {
+    ag_in2, rho_g, rho_flag, po_kip, phi_pn_kip,
+    note: "ACI 318-19 22.4.2: nominal axial strength Po = 0.85 f'c (Ag - Ast) + fy Ast, with the 22.4.2.1 tied-column design cap phi Pn,max = 0.80 phi Po (phi = 0.65, compression-controlled tied) covering the accidental eccentricity a concentric load never truly avoids. Longitudinal steel belongs in the 10.6.1 1-8% ratio band. Concentric short tied column only - no P-M interaction diagram, no slenderness or second-order effects, and the spiral (0.85 / phi = 0.75) variant and tie detailing are separate. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcColumnAxialExample = { inputs: { b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000, ast_in2: 6.32 } };
+
+CONCRETE_RENDERERS["rc-column-axial"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 22.4.2 nominal axial strength Po = 0.85 f'c (Ag - Ast) + fy Ast with the 22.4.2.1 tied-column cap phi Pn,max = 0.80 phi Po (phi = 0.65) and the 10.6.1 1-8% longitudinal ratio, by name. Concentric short tied column; no P-M interaction or slenderness. A design aid, not a substitute for the engineer of record.",
+  example: rcColumnAxialExample.inputs,
+  fields: [
+    { key: "b_in", label: "Column width b (in)", kind: "number" },
+    { key: "h_in", label: "Column depth h (in)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "ast_in2", label: "Total longitudinal steel Ast (in^2)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ag", id: "rca-out-ag", label: "Gross area Ag", value: (r) => fmt(r.ag_in2, 0) + " in^2" },
+    { key: "rho", id: "rca-out-rho", label: "Steel ratio rho_g", value: (r) => fmt(r.rho_g * 100, 2) + "% (" + r.rho_flag + ")" },
+    { key: "po", id: "rca-out-po", label: "Nominal Po", value: (r) => fmt(r.po_kip, 0) + " kip" },
+    { key: "pn", id: "rca-out-pn", label: "Design phi Pn,max (0.80 x 0.65 x Po)", value: (r) => fmt(r.phi_pn_kip, 0) + " kip" },
+    { key: "n", id: "rca-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcColumnAxial,
+});
+
+// dims: in { c1_in: L, c2_in: L, d_in: L, fc_psi: M L^-1 T^-2, position: dimensionless, lambda: dimensionless } out: { bo_in: L, beta: dimensionless, vc_psi: M L^-1 T^-2, phi_vc_kip: M L T^-2 }
+export function computeRcPunchingShear({ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(c1_in > 0) || !(c2_in > 0)) return { error: "Column plan dimensions must be positive (in)." };
+  if (!(d_in > 0)) return { error: "Effective slab depth must be positive (in)." };
+  if (!(fc_psi > 0)) return { error: "Concrete strength must be positive (psi)." };
+  if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  const alpha_s = position === "edge" ? 30 : (position === "corner" ? 20 : 40);
+  const bo_in = 2 * (c1_in + d_in) + 2 * (c2_in + d_in);
+  const beta = Math.max(c1_in, c2_in) / Math.min(c1_in, c2_in);
+  const t1 = 4;
+  const t2 = 2 + 4 / beta;
+  const t3 = 2 + (alpha_s * d_in) / bo_in;
+  const least = Math.min(t1, t2, t3);
+  const governs = least === t1 ? "the 4 sqrt(f'c) base term" : (least === t2 ? "the aspect-ratio (2 + 4/beta) term" : "the (2 + alpha_s d/bo) large-column term");
+  const vc_psi = least * lambda * Math.sqrt(fc_psi);
+  const phi_vc_kip = (0.75 * vc_psi * bo_in * d_in) / 1000;
+  return {
+    bo_in, beta, alpha_s, t2, t3, least, governs, vc_psi, phi_vc_kip,
+    note: "ACI 318-19 Table 22.6.5.2 two-way (punching) shear on the d/2 critical perimeter: vc is the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), with alpha_s = 40/30/20 for an interior/edge/corner column and phi = 0.75; phi Vc = phi vc bo d. Shear without unbalanced-moment transfer (no gamma_v amplification), no shear reinforcement or drop panel, rectangular column with the full d/2 perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcPunchingShearExample = { inputs: { c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 } };
+
+CONCRETE_RENDERERS["rc-punching-shear"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Table 22.6.5.2 two-way shear (least of 4, 2 + 4/beta, 2 + alpha_s d/bo, each x lambda sqrt(f'c)) on the 22.6.4.1 d/2 critical perimeter, alpha_s = 40/30/20 interior/edge/corner, phi = 0.75, by name. No unbalanced-moment transfer or shear reinforcement. A design aid, not a substitute for the engineer of record.",
+  example: rcPunchingShearExample.inputs,
+  fields: [
+    { key: "c1_in", label: "Column dimension c1 (in)", kind: "number" },
+    { key: "c2_in", label: "Column dimension c2 (in)", kind: "number" },
+    { key: "d_in", label: "Effective slab depth d (in)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "position", label: "Column position (alpha_s)", kind: "select", options: [
+      { value: "interior", label: "Interior (alpha_s = 40)" },
+      { value: "edge", label: "Edge (alpha_s = 30)" },
+      { value: "corner", label: "Corner (alpha_s = 20)" },
+    ], default: "interior" },
+    { key: "lambda", label: "Lightweight factor lambda", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "bo", id: "rps-out-bo", label: "Critical perimeter bo (at d/2)", value: (r) => fmt(r.bo_in, 0) + " in" },
+    { key: "gov", id: "rps-out-gov", label: "Governing term", value: (r) => r.governs },
+    { key: "vc", id: "rps-out-vc", label: "Concrete shear stress vc", value: (r) => fmt(r.vc_psi, 0) + " psi" },
+    { key: "pvc", id: "rps-out-pvc", label: "Design capacity phi Vc", value: (r) => fmt(r.phi_vc_kip, 1) + " kip" },
+    { key: "n", id: "rps-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcPunchingShear,
+});
+
+// dims: in { db_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, psi_e: dimensionless, psi_r: dimensionless, psi_o: dimensionless, lambda: dimensionless } out: { psi_c: dimensionless, ldh_eq_in: L, ldh_in: L }
+export function computeRcHookDevelopment({ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o = 1.0, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(db_in > 0)) return { error: "Bar diameter must be positive (in)." };
+  if (!(fy_psi > 0) || !(fc_psi > 0)) return { error: "Steel and concrete strengths must be positive (psi)." };
+  if (!(psi_e > 0) || !(psi_r > 0) || !(psi_o > 0)) return { error: "Modification factors must be positive (1.0 is the base)." };
+  if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  const psi_c = fc_psi < 6000 ? fc_psi / 15000 + 0.6 : 1.0;
+  const ldh_eq_in = (fy_psi * psi_e * psi_r * psi_o * psi_c / (55 * lambda * Math.sqrt(fc_psi))) * Math.pow(db_in, 1.5);
+  const floor_in = Math.max(8 * db_in, 6);
+  const ldh_in = Math.max(ldh_eq_in, floor_in);
+  const floor_governs = floor_in >= ldh_eq_in;
+  return {
+    psi_c, ldh_eq_in, floor_in, floor_governs, ldh_in,
+    note: "ACI 318-19 Eq. 25.4.3.1a standard-hook tension development: ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5, not less than max(8 db, 6 in), with the 25.4.3.2 factors (psi_e 1.0 uncoated / 1.2-1.3 coated; psi_r confinement; psi_o location/cover; psi_c = f'c/15,000 + 0.6 below 6,000 psi, 1.0 at or above). The db^1.5 scaling is why a hook multiple-of-db rule of thumb misleads. Standard 90/180 degree hooks on deformed bars only - headed bars (25.4.4), compression development, and the bend-diameter/geometry detailing are separate. A design aid, not a substitute for the structural engineer of record's stamped detailing.",
+  };
+}
+export const rcHookDevelopmentExample = { inputs: { db_in: 1.0, fy_psi: 60000, fc_psi: 4000, psi_e: 1.0, psi_r: 1.0, psi_o: 1.0, lambda: 1.0 } };
+
+CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Eq. 25.4.3.1a hooked-bar development ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5 with the 25.4.3.2 modification factors (psi_c = f'c/15,000 + 0.6 under 6,000 psi) and the max(8 db, 6 in) floor, by name. Standard 90/180 hooks; headed bars are separate. A design aid, not a substitute for the engineer of record.",
+  example: rcHookDevelopmentExample.inputs,
+  fields: [
+    { key: "db_in", label: "Bar diameter db (in; #8 = 1.0)", kind: "number" },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "psi_e", label: "Epoxy factor psi_e", kind: "number", default: 1.0 },
+    { key: "psi_r", label: "Confinement factor psi_r", kind: "number", default: 1.0 },
+    { key: "psi_o", label: "Location/cover factor psi_o", kind: "number", default: 1.0 },
+    { key: "lambda", label: "Lightweight factor lambda", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "pc", id: "rhd-out-pc", label: "Strength factor psi_c", value: (r) => fmt(r.psi_c, 3) },
+    { key: "eq", id: "rhd-out-eq", label: "Equation ldh (before floor)", value: (r) => fmt(r.ldh_eq_in, 1) + " in" },
+    { key: "ldh", id: "rhd-out-ldh", label: "Hook development ldh", value: (r) => fmt(r.ldh_in, 1) + " in" + (r.floor_governs ? " (the max(8db, 6 in) floor governs)" : "") },
+    { key: "n", id: "rhd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcHookDevelopment,
+});

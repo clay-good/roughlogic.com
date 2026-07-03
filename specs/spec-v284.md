@@ -1,6 +1,6 @@
 # roughlogic.com Specification v284 -- Reinforced Concrete Tied Column Axial Capacity (ACI 318-19 22.4) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v284..v286 (the reinforced-concrete member depth trio -- the
+> **Status: LANDED (2026-07-03, package 0.101.0; proposed 2026-07-02). Batch spec-v284..v286 (the reinforced-concrete member depth trio -- the
 > ACI checks the beam-flexure/shear/development tiles left open: the tied column's concentric axial capacity (this spec),
 > two-way slab punching shear at a column (v285), and the standard hook development length (v286, the companion to the
 > straight-bar `rc-development-length`).)**

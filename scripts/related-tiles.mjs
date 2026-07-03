@@ -927,6 +927,10 @@ const RELATED = {
   "steel-beam-ltb": ["steel-beam-flexure","steel-beam-shear","steel-column-capacity"],
   "steel-block-shear": ["steel-beam-shear","bolt-shear-bearing","steel-tension-member"],
   "steel-tension-member": ["steel-block-shear","steel-column-capacity","bolt-shear-bearing"],
+  // spec-v284..v286 reinforced-concrete member depth batch (Group E)
+  "rc-column-axial": ["rc-beam-flexure","rc-beam-shear","steel-column-capacity"],
+  "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
+  "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

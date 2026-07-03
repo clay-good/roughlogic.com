@@ -1,6 +1,6 @@
 # roughlogic.com Specification v285 -- Two-Way Slab Punching Shear at a Column (ACI 318-19 22.6) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v284..v286 (the reinforced-concrete member depth trio --
+> **Status: LANDED (2026-07-03, package 0.101.0; proposed 2026-07-02). Batch spec-v284..v286 (the reinforced-concrete member depth trio --
 > tied column (v284), two-way punching shear (this spec), the standard hook (v286)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `rc-beam-shear` covers one-way (beam) shear, but a
 > flat slab or footing fails a different way -- the column punches a truncated cone through the slab, a two-way shear on the

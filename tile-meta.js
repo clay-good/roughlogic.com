@@ -420,6 +420,8 @@ const _TILES = [
   ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["continuous-load-ocpd", "A"],
   // spec-v281..v283 steel members-and-connections depth batch
   ["steel-beam-ltb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"],
+  // spec-v284..v286 reinforced-concrete member depth batch
+  ["rc-column-axial", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

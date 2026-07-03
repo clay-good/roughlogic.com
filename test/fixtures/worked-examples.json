@@ -28175,6 +28175,93 @@
         "p_asd_kip": { "value": 80.84, "tolerance": { "pct": 0.1 } },
         "p_lrfd_kip": { "value": 121.5, "tolerance": { "pct": 0.1 } }
       }
+    },
+    {
+      "tile_id": "rc-column-axial",
+      "source_publisher": "ACI 318-19 22.4.2 / 22.4.2.1",
+      "source_title": "16 in square, 4,000 psi, eight #8 Grade 60 -> Po 1,228 kip, phi Pn,max 639 kip",
+      "source_edition_or_year": "spec-v284 worked example (machine-verified)",
+      "source_section_or_page": "spec-v284 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "b_in": 16, "h_in": 16, "fc_psi": 4000, "fy_psi": 60000, "ast_in2": 6.32 },
+      "outputs": {
+        "ag_in2": { "value": 256, "tolerance": { "abs": 0.001 } },
+        "rho_g": { "value": 0.0247, "tolerance": { "abs": 0.0002 } },
+        "po_kip": { "value": 1228.1, "tolerance": { "pct": 0.1 } },
+        "phi_pn_kip": { "value": 638.6, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-column-axial",
+      "source_publisher": "ACI 318-19 22.4.2 / 22.4.2.1",
+      "source_title": "cross-check: 5,000 psi concrete lifts the same column to Po 1,440 kip, 749 kip design",
+      "source_edition_or_year": "spec-v284 worked example (machine-verified)",
+      "source_section_or_page": "spec-v284 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "b_in": 16, "h_in": 16, "fc_psi": 5000, "fy_psi": 60000, "ast_in2": 6.32 },
+      "outputs": {
+        "po_kip": { "value": 1440.3, "tolerance": { "pct": 0.1 } },
+        "phi_pn_kip": { "value": 749.0, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-punching-shear",
+      "source_publisher": "ACI 318-19 Table 22.6.5.2",
+      "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",
+      "source_edition_or_year": "spec-v285 worked example (machine-verified)",
+      "source_section_or_page": "spec-v285 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "c1_in": 20, "c2_in": 20, "d_in": 6, "fc_psi": 4000, "position": "interior", "lambda": 1.0 },
+      "outputs": {
+        "bo_in": { "value": 104, "tolerance": { "abs": 0.001 } },
+        "vc_psi": { "value": 252.98, "tolerance": { "pct": 0.1 } },
+        "phi_vc_kip": { "value": 118.4, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-punching-shear",
+      "source_publisher": "ACI 318-19 Table 22.6.5.2",
+      "source_title": "cross-check: 36 in column on the same slab -> the alpha_s term governs, 163.9 kip",
+      "source_edition_or_year": "spec-v285 worked example (machine-verified)",
+      "source_section_or_page": "spec-v285 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "c1_in": 36, "c2_in": 36, "d_in": 6, "fc_psi": 4000, "position": "interior", "lambda": 1.0 },
+      "outputs": {
+        "bo_in": { "value": 168, "tolerance": { "abs": 0.001 } },
+        "vc_psi": { "value": 216.84, "tolerance": { "pct": 0.1 } },
+        "phi_vc_kip": { "value": 163.9, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-hook-development",
+      "source_publisher": "ACI 318-19 Eq. 25.4.3.1a",
+      "source_title": "#8 Grade 60 in 4,000 psi, base factors -> psi_c 0.867, ldh 14.9 in",
+      "source_edition_or_year": "spec-v286 worked example (machine-verified)",
+      "source_section_or_page": "spec-v286 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "db_in": 1.0, "fy_psi": 60000, "fc_psi": 4000, "psi_e": 1.0, "psi_r": 1.0, "psi_o": 1.0, "lambda": 1.0 },
+      "outputs": {
+        "psi_c": { "value": 0.8667, "tolerance": { "abs": 0.0005 } },
+        "ldh_in": { "value": 14.949, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-hook-development",
+      "source_publisher": "ACI 318-19 Eq. 25.4.3.1a",
+      "source_title": "cross-check: a #5 bar hooks in 7.39 in - the db^1.5 scaling",
+      "source_edition_or_year": "spec-v286 worked example (machine-verified)",
+      "source_section_or_page": "spec-v286 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "db_in": 0.625, "fy_psi": 60000, "fc_psi": 4000, "psi_e": 1.0, "psi_r": 1.0, "psi_o": 1.0, "lambda": 1.0 },
+      "outputs": {
+        "ldh_in": { "value": 7.386, "tolerance": { "pct": 0.1 } }
+      }
     }
   ]
 }

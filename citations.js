@@ -7491,6 +7491,42 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "rc-column-axial": {
+    formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
+    edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 22.4 axial provisions and 10.6.1 limits are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 22.4.2 Po = 0.85 f'c (Ag - Ast) + fy Ast, the 22.4.2.1 tied-column cap phi Pn,max = 0.80 phi Po with phi = 0.65, and the 10.6.1 1% to 8% longitudinal steel ratio. This returns the concentric (pure-axial) design capacity of a short tied column - it does not include moment interaction (the P-M diagram), slenderness or second-order effects (short columns only), the spiral-column 0.85 / phi = 0.75 variant, or the tie detailing. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Nominal strength", value: "Po = 0.85 f'c on the net concrete plus fy on the longitudinal steel", source: "ACI 318-19 22.4.2.2" },
+      { name: "Tied cap", value: "phi Pn,max = 0.80 phi Po (phi = 0.65) for the accidental eccentricity a concentric load never truly avoids", source: "ACI 318-19 22.4.2.1 / 21.2" },
+      { name: "Steel ratio", value: "longitudinal rho_g flagged against the 1% minimum and 8% maximum", source: "ACI 318-19 10.6.1.1" },
+    ],
+  },
+  "rc-punching-shear": {
+    formula: "bo = 2(c1 + d) + 2(c2 + d); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda sqrt(f'c); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
+    edition: "The ACI 318-19 Table 22.6.5.2 two-way (punching) shear stress (least of the three terms) on the 22.6.4.1 critical section at d/2 from the column face, with alpha_s = 40/30/20 and phi = 0.75, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; Table 22.6.5.2 and the 22.6.4.1 critical-section definition are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 Table 22.6.5.2 two-way shear stress as the least of 4 lambda sqrt(f'c), (2 + 4/beta) lambda sqrt(f'c), and (2 + alpha_s d/bo) lambda sqrt(f'c), the d/2 critical perimeter, alpha_s = 40/30/20 for an interior/edge/corner column, and phi = 0.75. This returns the concrete two-way shear capacity on the d/2 critical section for a rectangular column - it assumes shear without unbalanced-moment transfer (no gamma_v eccentric-shear amplification), no shear reinforcement or shear-cap/drop panel, and a rectangular column with the full perimeter available. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Critical section", value: "the perimeter bo at d/2 from the column faces; capacity phi vc bo d", source: "ACI 318-19 22.6.4.1" },
+      { name: "Three-term least", value: "4, 2 + 4/beta, and 2 + alpha_s d/bo, each x lambda sqrt(f'c); the least governs", source: "ACI 318-19 Table 22.6.5.2" },
+      { name: "Position constant", value: "alpha_s = 40 interior, 30 edge, 20 corner", source: "ACI 318-19 22.6.5.3" },
+    ],
+  },
+  "rc-hook-development": {
+    formula: "psi_c = f'c/15,000 + 0.6 (f'c < 6,000 psi, else 1.0); ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5; ldh = max(ldh, 8 db, 6 in).",
+    edition: "The ACI 318-19 Eq. 25.4.3.1a hooked-bar tension development length with the 25.4.3.2 modification factors and the max(8 db, 6 in) minimum, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; Eq. 25.4.3.1a and the 25.4.3.2 factor table are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 Eq. 25.4.3.1a ldh = (fy psi_e psi_r psi_o psi_c / (55 lambda sqrt(f'c))) db^1.5, the 25.4.3.2 factors (psi_e 1.0/1.2/1.3 for coating, psi_r confining reinforcement, psi_o side cover/location, psi_c = f'c/15,000 + 0.6 for f'c below 6,000 psi), and the max(8 db, 6 in) minimum. This returns the tension development length of a standard 90 or 180 degree hooked deformed bar - it applies the modification factors as entered (defaulting to the base 1.0 values), assumes normalweight concrete unless lambda is set, and does not cover headed bars (25.4.4), compression development, or the hook geometry and bend-diameter detailing. A design aid, not a substitute for the structural engineer of record's stamped detailing.",
+    assumptions: [
+      { name: "Hook equation", value: "ldh scales with db^1.5 - not linearly - through Eq. 25.4.3.1a", source: "ACI 318-19 25.4.3.1" },
+      { name: "Modification factors", value: "psi_e epoxy, psi_r confinement, psi_o location/cover, psi_c strength (f'c/15,000 + 0.6 under 6,000 psi)", source: "ACI 318-19 25.4.3.2" },
+      { name: "Floor", value: "never less than 8 bar diameters nor 6 in", source: "ACI 318-19 25.4.3.1(b)/(c)" },
+    ],
+  },
   "steel-beam-ltb": {
     formula: "Mp = Fy Zx; Lp = 1.76 ry sqrt(E/Fy); Lr per AISC Eq. F2-6 (c = 1); Lb <= Lp: Mn = Mp; Lp < Lb <= Lr: Mn = Cb[Mp - (Mp - 0.7 Fy Sx)(Lb - Lp)/(Lr - Lp)] <= Mp; Lb > Lr: Fcr = Cb pi^2 E/(Lb/rts)^2 sqrt(1 + 0.078 Jc/(Sx ho)(Lb/rts)^2), Mn = Fcr Sx <= Mp. ASD = Mn/1.67; LRFD = 0.90 Mn. (E = 29,000 ksi)",
     edition: "The AISC 360-22 Section F2 lateral-torsional buckling provisions for a doubly-symmetric compact I-shape bending about its strong axis (Lp, the Eq. F2-6 Lr, the linear inelastic branch, and the Eq. F2-4 elastic critical stress with c = 1), by name; E = 29,000 ksi and the Omega_b = 1.67 / phi_b = 0.90 factors are named constants.",

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v286 -- Standard Hook Tension Development Length (ACI 318-19 25.4.3) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v284..v286 (the reinforced-concrete member depth trio -- tied
+> **Status: LANDED (2026-07-03, package 0.101.0; proposed 2026-07-02). Batch spec-v284..v286 (the reinforced-concrete member depth trio -- tied
 > column (v284), punching shear (v285), the standard hook (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `rc-development-length` computes the straight-bar
 > tension development length and ends "hooks ... are separate checks." Where a straight bar cannot fit -- a beam bar
