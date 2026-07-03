@@ -1,6 +1,6 @@
 # roughlogic.com Specification v290 -- Wood Bearing Perpendicular to Grain and Bearing Area Factor Cb (NDS 3.10) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v290..v292 (the NDS wood-member depth trio -- the checks the
+> **Status: LANDED (2026-07-03, package 0.103.0; proposed 2026-07-02). Batch spec-v290..v292 (the NDS wood-member depth trio -- the checks the
 > existing wood beam/column tiles left open: bearing compression perpendicular to grain at a support (this spec), tension
 > parallel to grain (v291), and combined bending-plus-axial beam-column interaction (v292).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog checks wood in bending (`wood-beam-bending`,

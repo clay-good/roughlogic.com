@@ -935,6 +935,10 @@ const RELATED = {
   "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],
   "pile-axial-capacity": ["helical-pile","soil-bearing-capacity","soil-settlement-elastic"],
   "slope-stability-infinite": ["retaining-wall-stability","lateral-earth-pressure","trench-slope"],
+  // spec-v290..v292 NDS wood-member depth batch (Group E)
+  "wood-bearing-perpendicular": ["wood-beam-shear","wood-beam-bending","deck-beam-post"],
+  "wood-tension-member": ["wood-bolt-connection","column-buckling-wood","truss-capacity"],
+  "wood-combined-bending-axial": ["column-buckling-wood","wood-beam-bending","wall-bracing-length"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

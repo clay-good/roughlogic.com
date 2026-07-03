@@ -1,6 +1,6 @@
 # roughlogic.com Specification v292 -- Wood Beam-Column Combined Bending and Axial Compression (NDS 3.9.2) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v290..v292 (the NDS wood-member depth trio -- bearing (v290),
+> **Status: LANDED (2026-07-03, package 0.103.0; proposed 2026-07-02). Batch spec-v290..v292 (the NDS wood-member depth trio -- bearing (v290),
 > tension (v291), the beam-column interaction (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `column-buckling-wood` checks pure axial and
 > `wood-beam-bending` checks pure bending, but a stud carrying wind on a bearing wall, or a post with an eccentric load, is

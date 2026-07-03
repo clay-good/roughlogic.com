@@ -7491,6 +7491,42 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "wood-bearing-perpendicular": {
+    formula: "Cb = (lb < 6 in and not within 3 in of the end) ? (lb + 0.375)/lb : 1.0; Fc_perp' = Fc_perp x Cb; fc_perp = R/(b lb); DCR = fc_perp / Fc_perp'; lb_req = R/(b Fc_perp) (Cb = 1, conservative).",
+    edition: "The NDS 2018 3.10.2 compression-perpendicular-to-grain bearing check and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for a bearing under 6 in and not within 3 in of the member end, by name.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 3.10 bearing provisions and the Cb factor are in the published standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 2018 3.10.2 bearing stress fc_perp = R/(b lb) against Fc_perp' = Fc_perp x Cb, and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for bearings under 6 in and not within 3 in of the end. This checks compression perpendicular to grain at a bearing - it uses the reference Fc_perp (already adjusted for wet service CM and temperature Ct if entered as such; Fc_perp is not adjusted by CD load duration), applies Cb only within its geometric limits, and does not cover angle-to-grain bearing (the Hankinson formula), the member's bending or shear, or the 0.04 in deformation-limit alternative. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Bearing check", value: "fc_perp = R/(b lb) at the support against the adjusted Fc_perp'", source: "NDS 2018 3.10.2" },
+      { name: "Bearing-area factor", value: "Cb = (lb + 0.375)/lb, only for lb < 6 in and bearings not within 3 in of the member end", source: "NDS 2018 3.10.4" },
+      { name: "No CD", value: "Fc_perp is a deformation-based value and takes no load-duration factor", source: "NDS 2018 Table 4.3.1" },
+    ],
+  },
+  "wood-tension-member": {
+    formula: "Ag = b d; An = Ag - nh dh b; Ft' = Ft x CD x CF; ft = T/An; DCR = ft/Ft'.",
+    edition: "The NDS 2018 3.8.1 tension-parallel-to-grain check on the net section, with the load-duration CD and size CF adjustment factors, by name.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 3.8 tension provisions and the adjustment-factor table are in the published standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 2018 3.8.1 tension check ft = T/An <= Ft', the net area An = b d - nh dh b, and the adjusted value Ft' = Ft x CD x CF (with the other applicable factors folded into the entered values). This checks tension parallel to grain on the net section - it takes the reference Ft and the entered CD and CF (the user supplies the remaining CM, Ct, Ci if they apply), deducts holes in a single transverse line (no staggered-row chain), and does not cover perpendicular-to-grain tension (avoid it), the fastener/connection yield, or the row/group tear-out. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Net section", value: "An deducts the fastener holes at the section in one transverse line", source: "NDS 2018 3.1.2 / 3.8.1" },
+      { name: "Adjusted value", value: "Ft' = Ft x CD x CF with the remaining applicable factors entered by the user", source: "NDS 2018 Table 4.3.1" },
+      { name: "Scope", value: "parallel-to-grain tension only; connection yield and tear-out are separate checks", source: "NDS 2018 3.8" },
+    ],
+  },
+  "wood-combined-bending-axial": {
+    formula: "fc = P/A; fb = M/S; FcE = 0.822 Emin'/(le/d)^2; interaction = (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0.",
+    edition: "The NDS 2018 3.9.2 combined bending and axial compression interaction with the Euler stress FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta moment magnifier, by name.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 3.9.2 interaction equation is in the published standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 2018 3.9.2 combined bending-and-axial-compression interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0, with FcE = 0.822 Emin'/(le/d)^2 and the 1 - fc/FcE P-delta amplifier. This checks uniaxial bending plus concentric axial compression - it takes the already-adjusted Fc' (including Cp) and Fb' (including CL) as entered (compute them in the wood column and beam tiles), uses the bending axis whose d and le are supplied, and does not cover biaxial bending, the eccentric-load fc(6e/d) term, or tension-plus-bending (NDS 3.9.1). A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Interaction", value: "the squared axial term plus the amplified bending term must not exceed 1.0", source: "NDS 2018 Eq. 3.9-3" },
+      { name: "P-delta amplifier", value: "the bending term divides by 1 - fc/FcE, growing without bound as fc approaches the Euler stress", source: "NDS 2018 3.9.2" },
+      { name: "Adjusted values", value: "Fc' enters carrying the column-stability Cp; Fb' carrying the beam-stability CL", source: "NDS 2018 3.7 / 3.3.3" },
+    ],
+  },
   "soil-settlement-elastic": {
     formula: "Se_ft = q B (1 - nu^2) Is / Es; Se_in = 12 Se_ft.",
     edition: "The theory-of-elasticity immediate (elastic) settlement of a shallow foundation, Se = q B (1 - nu^2) Is / Es, with the shape-and-rigidity influence factor Is (~0.82 rigid square, ~0.95 flexible-square average, larger for strips), as compiled in Bowles (Foundation Analysis and Design) and the customary geotechnical texts, by name.",

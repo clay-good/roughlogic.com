@@ -13489,3 +13489,69 @@ test("bounds: spec-v289 computeSlopeStabilityInfinite pins the cohesive cut, the
   assert.ok("error" in _v289({ beta_deg: 25, phi_deg: 30, c_psf: -5, h_ft: 8 }));
   assert.ok("error" in _v289({ beta_deg: NaN, phi_deg: 30, h_ft: 8 }));
 });
+
+// ===================== spec-v290..v292 NDS wood-member depth batch =====================
+import { computeWoodBearingPerpendicular as _v290, computeWoodTensionMember as _v291, computeWoodCombinedBendingAxial as _v292 } from "../../calc-construction.js";
+
+test("bounds: spec-v290 computeWoodBearingPerpendicular pins the joist, the heavy-beam fail, the Cb limits, and error seams", () => {
+  const r = _v290({ r_lb: 800, b_in: 1.5, lb_in: 1.5, fcperp_psi: 625, near_end: "no" });
+  assert.strictEqual(r.cb_f, 1.25);
+  assert.strictEqual(r.fcperp_adj_psi, 781.25);
+  assert.ok(Math.abs(r.fc_perp_psi - 800 / 2.25) < 1e-9);
+  assert.ok(Math.abs(r.dcr - 0.45511111) < 1e-6);
+  assert.ok(Math.abs(r.lb_req_in - 0.85333333) < 1e-6);
+  // A heavy reaction on the same footprint fails and demands 6.4 in.
+  const r2 = _v290({ r_lb: 6000, b_in: 1.5, lb_in: 1.5, fcperp_psi: 625, near_end: "no" });
+  assert.ok(r2.dcr > 3.4);
+  assert.ok(Math.abs(r2.lb_req_in - 6.4) < 1e-9);
+  // Cb geometric limits: near the end, or a 6-in-plus bearing, pins Cb = 1.0.
+  assert.strictEqual(_v290({ r_lb: 800, b_in: 1.5, lb_in: 1.5, fcperp_psi: 625, near_end: "yes" }).cb_f, 1.0);
+  assert.strictEqual(_v290({ r_lb: 800, b_in: 1.5, lb_in: 6, fcperp_psi: 625, near_end: "no" }).cb_f, 1.0);
+  // Error seams.
+  assert.ok("error" in _v290({ r_lb: 0, b_in: 1.5, lb_in: 1.5 }));
+  assert.ok("error" in _v290({ r_lb: 800, b_in: 0, lb_in: 1.5 }));
+  assert.ok("error" in _v290({ r_lb: 800, b_in: 1.5, lb_in: 1.5, fcperp_psi: 0 }));
+  assert.ok("error" in _v290({ r_lb: Infinity, b_in: 1.5, lb_in: 1.5 }));
+});
+
+test("bounds: spec-v291 computeWoodTensionMember pins the net-area deduction, the factor product, and error seams", () => {
+  const r = _v291({ t_lb: 3000, b_in: 1.5, d_in: 5.5, dh_in: 0.75, nh: 1, ft_psi: 575, cd_f: 1.0, cf_f: 1.3 });
+  assert.strictEqual(r.ag_in2, 8.25);
+  assert.strictEqual(r.an_in2, 7.125);
+  assert.ok(Math.abs(r.ft_adj_psi - 747.5) < 1e-9);
+  assert.ok(Math.abs(r.ft_applied_psi - 3000 / 7.125) < 1e-9);
+  assert.ok(Math.abs(r.dcr - 0.56328111) < 1e-6);
+  // Snow duration + full section relax the ratio.
+  const r2 = _v291({ t_lb: 3000, b_in: 1.5, d_in: 5.5, dh_in: 0, nh: 0, ft_psi: 575, cd_f: 1.15, cf_f: 1.3 });
+  assert.strictEqual(r2.an_in2, 8.25);
+  assert.ok(Math.abs(r2.ft_adj_psi - 575 * 1.15 * 1.3) < 1e-9);
+  assert.ok(r2.dcr < r.dcr);
+  // Error seams.
+  assert.ok("error" in _v291({ t_lb: 0, b_in: 1.5, d_in: 5.5 }));
+  assert.ok("error" in _v291({ t_lb: 3000, b_in: 1.5, d_in: 5.5, dh_in: 6, nh: 1 })); // holes consume the section
+  assert.ok("error" in _v291({ t_lb: 3000, b_in: 1.5, d_in: 5.5, nh: 1.5, dh_in: 0.75 }));
+  assert.ok("error" in _v291({ t_lb: 3000, b_in: 1.5, d_in: 5.5, cd_f: 0 }));
+  assert.ok("error" in _v291({ t_lb: NaN, b_in: 1.5, d_in: 5.5 }));
+});
+
+test("bounds: spec-v292 computeWoodCombinedBendingAxial pins the interaction, the P-delta growth, the buckling seam, and error seams", () => {
+  const P = { m_inlb: 3000, a_in2: 12.25, s_in3: 7.15, fc_adj_psi: 1150, fb_adj_psi: 1350, emin_adj_psi: 580000, le_in: 96, d_in: 3.5 };
+  const r = _v292({ ...P, p_lb: 3000 });
+  assert.ok(Math.abs(r.fc_psi - 3000 / 12.25) < 1e-9);
+  assert.ok(Math.abs(r.fce_psi - 0.822 * 580000 / Math.pow(96 / 3.5, 2)) < 1e-9);
+  assert.ok(Math.abs(r.interaction - 0.55193) < 5e-4);
+  assert.ok(r.verdict.startsWith("passes"));
+  // Doubling the axial load lifts the amplifier and fails the member.
+  const r2 = _v292({ ...P, p_lb: 6000 });
+  assert.ok(r2.amplifier > 2 * r.amplifier);
+  assert.ok(Math.abs(r2.interaction - 1.5499) < 2e-3);
+  assert.ok(r2.verdict.startsWith("FAILS"));
+  // At or past the Euler stress the tile errors rather than dividing by <= 0.
+  assert.ok("error" in _v292({ ...P, p_lb: 8000 }));
+  // Error seams.
+  assert.ok("error" in _v292({ ...P, p_lb: 0 }));
+  assert.ok("error" in _v292({ ...P, p_lb: 3000, a_in2: 0 }));
+  assert.ok("error" in _v292({ ...P, p_lb: 3000, fb_adj_psi: 0 }));
+  assert.ok("error" in _v292({ ...P, p_lb: 3000, le_in: 0 }));
+  assert.ok("error" in _v292({ ...P, p_lb: Infinity }));
+});

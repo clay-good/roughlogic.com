@@ -424,6 +424,8 @@ const _TILES = [
   ["rc-column-axial", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
   // spec-v287..v289 geotechnical foundation depth batch
   ["soil-settlement-elastic", "E"], ["pile-axial-capacity", "E"], ["slope-stability-infinite", "E"],
+  // spec-v290..v292 NDS wood-member depth batch
+  ["wood-bearing-perpendicular", "E"], ["wood-tension-member", "E"], ["wood-combined-bending-axial", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

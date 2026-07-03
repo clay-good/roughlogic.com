@@ -651,6 +651,10 @@ export const COMPUTE_MAP = {
   "soil-settlement-elastic": { module: "../../calc-geotech.js", fn: "computeSoilSettlementElastic" },
   "pile-axial-capacity": { module: "../../calc-geotech.js", fn: "computePileAxialCapacity" },
   "slope-stability-infinite": { module: "../../calc-geotech.js", fn: "computeSlopeStabilityInfinite" },
+  // spec-v290..v292 NDS wood-member depth batch (3 tiles)
+  "wood-bearing-perpendicular": { module: "../../calc-construction.js", fn: "computeWoodBearingPerpendicular" },
+  "wood-tension-member": { module: "../../calc-construction.js", fn: "computeWoodTensionMember" },
+  "wood-combined-bending-axial": { module: "../../calc-construction.js", fn: "computeWoodCombinedBendingAxial" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v291 -- Wood Tension Member Parallel to Grain (NDS 3.8) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v290..v292 (the NDS wood-member depth trio -- bearing (v290),
+> **Status: LANDED (2026-07-03, package 0.103.0; proposed 2026-07-02). Batch spec-v290..v292 (the NDS wood-member depth trio -- bearing (v290),
 > tension parallel to grain (this spec), combined bending-plus-axial (v292)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog checks wood in compression
 > (`column-buckling-wood`), bending, and shear, but has no tension-parallel-to-grain check -- a truss bottom chord, a

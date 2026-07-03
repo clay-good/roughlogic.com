@@ -373,6 +373,8 @@ const TOOL_MODULES = (() => {
     "allowable-area", "egress-travel-distance", "exterior-opening-protection",
     // spec-v263..v265 NDS sawn-lumber design trio.
     "wood-beam-bending", "wood-beam-shear", "wood-bolt-connection",
+    // spec-v290..v292 NDS wood-member depth batch.
+    "wood-bearing-perpendicular", "wood-tension-member", "wood-combined-bending-axial",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.

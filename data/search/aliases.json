@@ -11037,6 +11037,116 @@
       "term": "shallow slide",
       "target": "slope-stability-infinite",
       "kind": "adjacent"
+    },
+    {
+      "term": "bearing perpendicular to grain",
+      "target": "wood-bearing-perpendicular",
+      "kind": "industry"
+    },
+    {
+      "term": "bearing area factor",
+      "target": "wood-bearing-perpendicular",
+      "kind": "industry"
+    },
+    {
+      "term": "wood crushing",
+      "target": "wood-bearing-perpendicular",
+      "kind": "adjacent"
+    },
+    {
+      "term": "required bearing length",
+      "target": "wood-bearing-perpendicular",
+      "kind": "industry"
+    },
+    {
+      "term": "joist bearing",
+      "target": "wood-bearing-perpendicular",
+      "kind": "industry"
+    },
+    {
+      "term": "nds 3.10",
+      "target": "wood-bearing-perpendicular",
+      "kind": "industry"
+    },
+    {
+      "term": "beam bearing plate",
+      "target": "wood-bearing-perpendicular",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wood tension member",
+      "target": "wood-tension-member",
+      "kind": "industry"
+    },
+    {
+      "term": "tension parallel to grain",
+      "target": "wood-tension-member",
+      "kind": "industry"
+    },
+    {
+      "term": "bottom chord tension",
+      "target": "wood-tension-member",
+      "kind": "industry"
+    },
+    {
+      "term": "net area wood",
+      "target": "wood-tension-member",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nds 3.8",
+      "target": "wood-tension-member",
+      "kind": "industry"
+    },
+    {
+      "term": "truss tension",
+      "target": "wood-tension-member",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lumber tension",
+      "target": "wood-tension-member",
+      "kind": "adjacent"
+    },
+    {
+      "term": "beam column",
+      "target": "wood-combined-bending-axial",
+      "kind": "industry"
+    },
+    {
+      "term": "combined bending axial",
+      "target": "wood-combined-bending-axial",
+      "kind": "industry"
+    },
+    {
+      "term": "wood interaction equation",
+      "target": "wood-combined-bending-axial",
+      "kind": "industry"
+    },
+    {
+      "term": "nds 3.9.2",
+      "target": "wood-combined-bending-axial",
+      "kind": "industry"
+    },
+    {
+      "term": "stud bending compression",
+      "target": "wood-combined-bending-axial",
+      "kind": "adjacent"
+    },
+    {
+      "term": "p delta wood",
+      "target": "wood-combined-bending-axial",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fce",
+      "target": "wood-combined-bending-axial",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wall stud wind",
+      "target": "wood-combined-bending-axial",
+      "kind": "adjacent"
     }
   ]
 }

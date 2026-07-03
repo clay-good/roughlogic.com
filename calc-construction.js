@@ -5307,3 +5307,148 @@ const _renderWoodBoltConnection = _simpleRenderer({
   compute: computeWoodBoltConnection,
 });
 CONSTRUCTION_RENDERERS["wood-bolt-connection"] = _renderWoodBoltConnection;
+
+// ===================== spec-v290..v292: NDS wood-member depth batch =====================
+// The checks the wood bending/shear/compression/connection bench left open:
+// bearing perpendicular to grain at a support (3.10), tension parallel to
+// grain on the net section (3.8), and the beam-column interaction (3.9.2).
+
+// dims: in { r_lb: M L T^-2, b_in: L, lb_in: L, fcperp_psi: M L^-1 T^-2, near_end: dimensionless } out: { cb_f: dimensionless, fcperp_adj_psi: M L^-1 T^-2, fc_perp_psi: M L^-1 T^-2, dcr: dimensionless, lb_req_in: L }
+export function computeWoodBearingPerpendicular({ r_lb = 0, b_in = 0, lb_in = 0, fcperp_psi = 625, near_end = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(r_lb > 0)) return { error: "Bearing reaction must be positive (lb)." };
+  if (!(b_in > 0) || !(lb_in > 0)) return { error: "Bearing width and length must be positive (in)." };
+  if (!(fcperp_psi > 0)) return { error: "The Fc-perp design value must be positive (psi)." };
+  const cb_applies = lb_in < 6 && near_end !== "yes";
+  const cb_f = cb_applies ? (lb_in + 0.375) / lb_in : 1.0;
+  const cb_flag = cb_applies ? "Cb applies (bearing under 6 in, not within 3 in of the end)" : "Cb = 1.0 (bearing 6 in or longer, or within 3 in of the member end)";
+  const fcperp_adj_psi = fcperp_psi * cb_f;
+  const fc_perp_psi = r_lb / (b_in * lb_in);
+  const dcr = fc_perp_psi / fcperp_adj_psi;
+  const lb_req_in = r_lb / (b_in * fcperp_psi);
+  return {
+    cb_f, cb_flag, fcperp_adj_psi, fc_perp_psi, dcr, lb_req_in,
+    note: "NDS 3.10.2 bearing perpendicular to grain: fc_perp = R / (b x lb) against Fc_perp' = Fc_perp x Cb, with the 3.10.4 bearing-area factor Cb = (lb + 0.375) / lb for a bearing under 6 in and not within 3 in of the member end (1.0 otherwise). The required length reported uses Cb = 1 (conservative). Fc_perp is not adjusted by the load-duration factor CD; enter it already carrying wet-service CM / temperature Ct if they apply. Angle-to-grain bearing (Hankinson), the member's bending and shear, and the 0.04 in deformation-limit alternative are separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const woodBearingPerpendicularExample = { inputs: { r_lb: 800, b_in: 1.5, lb_in: 1.5, fcperp_psi: 625, near_end: "no" } };
+
+const _renderWoodBearingPerpendicular = _simpleRenderer({
+  citation: "Citation: NDS 2018 3.10.2 bearing stress fc_perp = R/(b lb) against Fc_perp' = Fc_perp x Cb, with the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for bearings under 6 in not within 3 in of the end, by name. Fc_perp takes no CD. A design aid, not a substitute for the engineer of record.",
+  example: woodBearingPerpendicularExample.inputs,
+  fields: [
+    { key: "r_lb", label: "Reaction / bearing force (lb)", kind: "number" },
+    { key: "b_in", label: "Bearing width b (in)", kind: "number" },
+    { key: "lb_in", label: "Bearing length lb (in)", kind: "number" },
+    { key: "fcperp_psi", label: "Reference Fc-perp (psi)", kind: "number", default: 625 },
+    { key: "near_end", label: "Within 3 in of the member end?", kind: "select", options: [
+      { value: "no", label: "No - Cb may apply" },
+      { value: "yes", label: "Yes - Cb = 1.0" },
+    ], default: "no" },
+  ],
+  outputs: [
+    { key: "cb", id: "wbp-out-cb", label: "Bearing-area factor Cb", value: (r) => fmt(r.cb_f, 3) + " (" + r.cb_flag + ")" },
+    { key: "fa", id: "wbp-out-fa", label: "Adjusted Fc-perp'", value: (r) => fmt(r.fcperp_adj_psi, 0) + " psi" },
+    { key: "fs", id: "wbp-out-fs", label: "Applied bearing stress", value: (r) => fmt(r.fc_perp_psi, 0) + " psi" },
+    { key: "dcr", id: "wbp-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 ? " (OVER - add bearing length or a plate)" : "") },
+    { key: "req", id: "wbp-out-req", label: "Required bearing length (Cb = 1)", value: (r) => fmt(r.lb_req_in, 2) + " in" },
+    { key: "n", id: "wbp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodBearingPerpendicular,
+});
+CONSTRUCTION_RENDERERS["wood-bearing-perpendicular"] = _renderWoodBearingPerpendicular;
+
+// dims: in { t_lb: M L T^-2, b_in: L, d_in: L, dh_in: L, nh: dimensionless, ft_psi: M L^-1 T^-2, cd_f: dimensionless, cf_f: dimensionless } out: { ag_in2: L^2, an_in2: L^2, ft_adj_psi: M L^-1 T^-2, ft_applied_psi: M L^-1 T^-2, dcr: dimensionless }
+export function computeWoodTensionMember({ t_lb = 0, b_in = 0, d_in = 0, dh_in = 0, nh = 0, ft_psi = 575, cd_f = 1.0, cf_f = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(t_lb > 0)) return { error: "Tension force must be positive (lb)." };
+  if (!(b_in > 0) || !(d_in > 0)) return { error: "Member width and depth must be positive (in)." };
+  if (dh_in < 0) return { error: "Hole diameter cannot be negative (in)." };
+  if (nh < 0 || !Number.isInteger(nh)) return { error: "Hole count must be a whole number (0 for none)." };
+  if (!(ft_psi > 0)) return { error: "The tension design value Ft must be positive (psi)." };
+  if (!(cd_f > 0) || !(cf_f > 0)) return { error: "The CD and CF factors must be positive (1.0 base)." };
+  const ag_in2 = b_in * d_in;
+  const an_in2 = ag_in2 - nh * dh_in * b_in;
+  if (!(an_in2 > 0)) return { error: "The fastener holes consume the whole section - the net area must be positive." };
+  const ft_adj_psi = ft_psi * cd_f * cf_f;
+  const ft_applied_psi = t_lb / an_in2;
+  const dcr = ft_applied_psi / ft_adj_psi;
+  return {
+    ag_in2, an_in2, ft_adj_psi, ft_applied_psi, dcr,
+    note: "NDS 3.8.1 tension parallel to grain: ft = T / An against Ft' = Ft x CD x CF (supply the remaining CM / Ct / Ci inside the entered factors if they apply), with the net area An = b d - nh dh b deducting fastener holes in a single transverse line (no staggered-row chain). Perpendicular-to-grain tension is avoided, not checked; the fastener yield is the wood-bolt-connection tile; row/group tear-out is separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const woodTensionMemberExample = { inputs: { t_lb: 3000, b_in: 1.5, d_in: 5.5, dh_in: 0.75, nh: 1, ft_psi: 575, cd_f: 1.0, cf_f: 1.3 } };
+
+const _renderWoodTensionMember = _simpleRenderer({
+  citation: "Citation: NDS 2018 3.8.1 tension parallel to grain ft = T/An <= Ft' with An = b d - nh dh b and Ft' = Ft x CD x CF, by name. Net section, single transverse hole line. The bolt itself is the wood-bolt-connection tile. A design aid, not a substitute for the engineer of record.",
+  example: woodTensionMemberExample.inputs,
+  fields: [
+    { key: "t_lb", label: "Tension force T (lb)", kind: "number" },
+    { key: "b_in", label: "Member width b (in)", kind: "number" },
+    { key: "d_in", label: "Member depth d (in)", kind: "number" },
+    { key: "dh_in", label: "Fastener-hole diameter (in, 0 if none)", kind: "number", default: 0 },
+    { key: "nh", label: "Holes across the section", kind: "number", attrs: { step: "1", min: "0" }, default: 0 },
+    { key: "ft_psi", label: "Reference Ft (psi)", kind: "number", default: 575 },
+    { key: "cd_f", label: "Load-duration factor CD", kind: "number", default: 1.0 },
+    { key: "cf_f", label: "Size factor CF", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "an", id: "wtm-out-an", label: "Gross / net area", value: (r) => fmt(r.ag_in2, 3) + " / " + fmt(r.an_in2, 3) + " in^2" },
+    { key: "fa", id: "wtm-out-fa", label: "Adjusted Ft'", value: (r) => fmt(r.ft_adj_psi, 0) + " psi" },
+    { key: "ft", id: "wtm-out-ft", label: "Applied tension stress", value: (r) => fmt(r.ft_applied_psi, 0) + " psi" },
+    { key: "dcr", id: "wtm-out-dcr", label: "Demand / capacity", value: (r) => fmt(r.dcr, 2) + (r.dcr > 1 ? " (OVER)" : "") },
+    { key: "n", id: "wtm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodTensionMember,
+});
+CONSTRUCTION_RENDERERS["wood-tension-member"] = _renderWoodTensionMember;
+
+// dims: in { p_lb: M L T^-2, m_inlb: M L^2 T^-2, a_in2: L^2, s_in3: L^3, fc_adj_psi: M L^-1 T^-2, fb_adj_psi: M L^-1 T^-2, emin_adj_psi: M L^-1 T^-2, le_in: L, d_in: L } out: { fc_psi: M L^-1 T^-2, fb_psi: M L^-1 T^-2, fce_psi: M L^-1 T^-2, amplifier: dimensionless, interaction: dimensionless }
+export function computeWoodCombinedBendingAxial({ p_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, fc_adj_psi = 0, fb_adj_psi = 0, emin_adj_psi = 580000, le_in = 0, d_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(p_lb > 0)) return { error: "Axial compression must be positive (lb)." };
+  if (m_inlb < 0) return { error: "Bending moment cannot be negative (in-lb)." };
+  if (!(a_in2 > 0) || !(s_in3 > 0)) return { error: "Area and section modulus must be positive." };
+  if (!(fc_adj_psi > 0) || !(fb_adj_psi > 0)) return { error: "The adjusted Fc' and Fb' must be positive (psi)." };
+  if (!(emin_adj_psi > 0)) return { error: "The adjusted Emin' must be positive (psi)." };
+  if (!(le_in > 0) || !(d_in > 0)) return { error: "Effective length and depth must be positive (in)." };
+  const fc_psi = p_lb / a_in2;
+  const fb_psi = m_inlb / s_in3;
+  const slr = le_in / d_in;
+  const fce_psi = (0.822 * emin_adj_psi) / (slr * slr);
+  if (!(fc_psi < fce_psi)) return { error: "The axial stress reaches the Euler buckling stress FcE - the column buckles before the interaction applies. Shorten the unbraced length or enlarge the member." };
+  const amplifier = 1 / (1 - fc_psi / fce_psi);
+  const interaction = Math.pow(fc_psi / fc_adj_psi, 2) + fb_psi / (fb_adj_psi * (1 - fc_psi / fce_psi));
+  const verdict = interaction <= 1.0 ? "passes (at or under 1.0)" : "FAILS the NDS 3.9.2 interaction (over 1.0)";
+  return {
+    fc_psi, fb_psi, fce_psi, amplifier, interaction, verdict,
+    note: "NDS 3.9.2 beam-column interaction (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with the Euler stress FcE = 0.822 Emin'/(le/d)^2; the 1 - fc/FcE term is the P-delta moment magnifier that grows without bound as the axial stress approaches FcE. Uniaxial bending plus concentric compression; enter Fc' already carrying Cp (column-buckling-wood) and Fb' already carrying CL (wood-beam-bending). Biaxial bending, the eccentric 6e/d term, and tension-plus-bending (3.9.1) are separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const woodCombinedBendingAxialExample = { inputs: { p_lb: 3000, m_inlb: 3000, a_in2: 12.25, s_in3: 7.15, fc_adj_psi: 1150, fb_adj_psi: 1350, emin_adj_psi: 580000, le_in: 96, d_in: 3.5 } };
+
+const _renderWoodCombinedBendingAxial = _simpleRenderer({
+  citation: "Citation: NDS 2018 3.9.2 combined bending and axial compression (fc/Fc')^2 + fb/[Fb'(1 - fc/FcE)] <= 1.0 with FcE = 0.822 Emin'/(le/d)^2 (the P-delta amplifier), by name. Uniaxial, adjusted values entered (Cp in Fc', CL in Fb'). A design aid, not a substitute for the engineer of record.",
+  example: woodCombinedBendingAxialExample.inputs,
+  fields: [
+    { key: "p_lb", label: "Axial compression P (lb)", kind: "number" },
+    { key: "m_inlb", label: "Bending moment M (in-lb)", kind: "number" },
+    { key: "a_in2", label: "Area A (in^2)", kind: "number" },
+    { key: "s_in3", label: "Section modulus S (in^3)", kind: "number" },
+    { key: "fc_adj_psi", label: "Adjusted Fc' (with Cp, psi)", kind: "number" },
+    { key: "fb_adj_psi", label: "Adjusted Fb' (with CL, psi)", kind: "number" },
+    { key: "emin_adj_psi", label: "Adjusted Emin' (psi)", kind: "number", default: 580000 },
+    { key: "le_in", label: "Effective length le (in)", kind: "number" },
+    { key: "d_in", label: "Depth d, bending axis (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "st", id: "wcba-out-st", label: "Applied fc / fb", value: (r) => fmt(r.fc_psi, 0) + " / " + fmt(r.fb_psi, 0) + " psi" },
+    { key: "fce", id: "wcba-out-fce", label: "Euler stress FcE", value: (r) => fmt(r.fce_psi, 0) + " psi" },
+    { key: "amp", id: "wcba-out-amp", label: "P-delta amplifier 1/(1 - fc/FcE)", value: (r) => fmt(r.amplifier, 2) + "x" },
+    { key: "ix", id: "wcba-out-ix", label: "Interaction (<= 1.0 passes)", value: (r) => fmt(r.interaction, 2) + " - " + r.verdict },
+    { key: "n", id: "wcba-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodCombinedBendingAxial,
+});
+CONSTRUCTION_RENDERERS["wood-combined-bending-axial"] = _renderWoodCombinedBendingAxial;

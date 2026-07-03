@@ -1551,7 +1551,10 @@ cross-check.
 | calc-construction.js | `computeWindPressure` | `{ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, Kd = 0.85, G = 0.85 }` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamBending` | `{ fb_star_psi = 0, emin_psi = 620000, b_in = 0, d_in = 0, le_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBeamShear` | `{ fv_prime_psi = 0, b_in = 0, d_in = 0, dn_in = 0, v_applied_lb = 0 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWoodBearingPerpendicular` | `{ r_lb = 0, b_in = 0, lb_in = 0, fcperp_psi = 625, near_end = "no" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBoltConnection` | `{ d_in = 0, lm_in = 0, ls_in = 0, gm = 0.50, gs = 0.50, fyb_psi = 45000, thet...` | _ | _ | _ |
+| calc-construction.js | `computeWoodCombinedBendingAxial` | `{ p_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, fc_adj_psi = 0, fb_adj_psi = 0,...` | _ | _ | _ |
+| calc-construction.js | `computeWoodTensionMember` | `{ t_lb = 0, b_in = 0, d_in = 0, dh_in = 0, nh = 0, ft_psi = 575, cd_f = 1.0, ...` | _ | _ | _ |
 | calc-construction.js | `renderAnchorEmbedment` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderArea` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderBeamLoading` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2415,7 +2418,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1001.
+Row count: 1004.
 
 <!-- END function-corpus-v14 -->
 
@@ -2815,7 +2818,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (136 tiles)
+### Group E Construction (139 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2954,7 +2957,10 @@ per spec-v14 §13.1 second paragraph.
 | `wire-feed-deposition` | Wire Feed Speed to Deposition Rate | first-principles wire-volume geometry...; 0.035 in wire, 300 in/min, 0.92 eff -> 4.91 lb/hr melt, 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-beam-bending` | Wood Bending Member (NDS Beam Stability Factor CL and Adjusted Fb') | NDS 3.3.3 (National Design Specificat...; spec-v263 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-beam-shear` | Wood Bending Member Shear (fv and the NDS Tension-Side End-Notch Reduction) | NDS 3.4.2 / 3.4.3.2 (National Design ...; spec-v264 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wood-bearing-perpendicular` | Wood Bearing Perpendicular to Grain (NDS 3.10) | NDS 2018 3.10.2 / 3.10.4; spec-v290 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-bolt-connection` | Single-Shear Bolted / Dowel Lateral Design Value (NDS Yield-Limit Z) | NDS Table 12.3.1A (National Design Sp...; spec-v265 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wood-combined-bending-axial` | Wood Beam-Column Interaction (NDS 3.9.2) | NDS 2018 3.9.2 (Eq. 3.9-3); spec-v292 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group F Fire-ground (30 tiles)
 
@@ -3359,6 +3365,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 758. Fixture-covered or reference-cadence: 758 / 758.
+Tile count: 761. Fixture-covered or reference-cadence: 761 / 761.
 
 <!-- END tile-index-v14 -->

@@ -28348,6 +28348,98 @@
       "outputs": {
         "fs_slope": { "value": 1.717, "tolerance": { "abs": 0.005 } }
       }
+    },
+    {
+      "tile_id": "wood-bearing-perpendicular",
+      "source_publisher": "NDS 2018 3.10.2 / 3.10.4",
+      "source_title": "2x joist, 1.5 in bearing, 800 lb, DF-L 625 psi -> Cb 1.25, DCR 0.46, 0.85 in required",
+      "source_edition_or_year": "spec-v290 worked example (machine-verified)",
+      "source_section_or_page": "spec-v290 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "r_lb": 800, "b_in": 1.5, "lb_in": 1.5, "fcperp_psi": 625, "near_end": "no" },
+      "outputs": {
+        "cb_f": { "value": 1.25, "tolerance": { "abs": 0.0001 } },
+        "fcperp_adj_psi": { "value": 781.25, "tolerance": { "abs": 0.01 } },
+        "fc_perp_psi": { "value": 355.56, "tolerance": { "pct": 0.1 } },
+        "dcr": { "value": 0.4551, "tolerance": { "abs": 0.001 } },
+        "lb_req_in": { "value": 0.8533, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wood-bearing-perpendicular",
+      "source_publisher": "NDS 2018 3.10.2 / 3.10.4",
+      "source_title": "cross-check: a 6,000 lb beam reaction on the same footprint fails at DCR 3.4, needs 6.4 in",
+      "source_edition_or_year": "spec-v290 worked example (machine-verified)",
+      "source_section_or_page": "spec-v290 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "r_lb": 6000, "b_in": 1.5, "lb_in": 1.5, "fcperp_psi": 625, "near_end": "no" },
+      "outputs": {
+        "fc_perp_psi": { "value": 2666.7, "tolerance": { "pct": 0.1 } },
+        "dcr": { "value": 3.413, "tolerance": { "abs": 0.005 } },
+        "lb_req_in": { "value": 6.4, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "wood-tension-member",
+      "source_publisher": "NDS 2018 3.8.1",
+      "source_title": "2x6 DF-L chord, 3,000 lb through one 3/4 in bolt -> An 7.125, ft 421 psi, DCR 0.56",
+      "source_edition_or_year": "spec-v291 worked example (machine-verified)",
+      "source_section_or_page": "spec-v291 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_lb": 3000, "b_in": 1.5, "d_in": 5.5, "dh_in": 0.75, "nh": 1, "ft_psi": 575, "cd_f": 1.0, "cf_f": 1.3 },
+      "outputs": {
+        "an_in2": { "value": 7.125, "tolerance": { "abs": 0.001 } },
+        "ft_adj_psi": { "value": 747.5, "tolerance": { "abs": 0.01 } },
+        "ft_applied_psi": { "value": 421.05, "tolerance": { "pct": 0.1 } },
+        "dcr": { "value": 0.5633, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wood-tension-member",
+      "source_publisher": "NDS 2018 3.8.1",
+      "source_title": "cross-check: snow duration (CD 1.15) and no holes relax the ratio to 0.42",
+      "source_edition_or_year": "spec-v291 worked example (machine-verified)",
+      "source_section_or_page": "spec-v291 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_lb": 3000, "b_in": 1.5, "d_in": 5.5, "dh_in": 0, "nh": 0, "ft_psi": 575, "cd_f": 1.15, "cf_f": 1.3 },
+      "outputs": {
+        "an_in2": { "value": 8.25, "tolerance": { "abs": 0.001 } },
+        "ft_adj_psi": { "value": 859.6, "tolerance": { "pct": 0.1 } },
+        "dcr": { "value": 0.423, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wood-combined-bending-axial",
+      "source_publisher": "NDS 2018 3.9.2 (Eq. 3.9-3)",
+      "source_title": "4x4 DF-L stud, 3,000 lb + 3,000 in-lb, 8 ft -> FcE 634 psi, interaction 0.55 passes",
+      "source_edition_or_year": "spec-v292 worked example (machine-verified)",
+      "source_section_or_page": "spec-v292 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "p_lb": 3000, "m_inlb": 3000, "a_in2": 12.25, "s_in3": 7.15, "fc_adj_psi": 1150, "fb_adj_psi": 1350, "emin_adj_psi": 580000, "le_in": 96, "d_in": 3.5 },
+      "outputs": {
+        "fc_psi": { "value": 244.9, "tolerance": { "pct": 0.1 } },
+        "fb_psi": { "value": 419.6, "tolerance": { "pct": 0.1 } },
+        "fce_psi": { "value": 633.7, "tolerance": { "pct": 0.1 } },
+        "interaction": { "value": 0.5519, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "wood-combined-bending-axial",
+      "source_publisher": "NDS 2018 3.9.2 (Eq. 3.9-3)",
+      "source_title": "cross-check: doubling the axial load to 6,000 lb amplifies the bending term to a 1.55 fail",
+      "source_edition_or_year": "spec-v292 worked example (machine-verified)",
+      "source_section_or_page": "spec-v292 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "p_lb": 6000, "m_inlb": 3000, "a_in2": 12.25, "s_in3": 7.15, "fc_adj_psi": 1150, "fb_adj_psi": 1350, "emin_adj_psi": 580000, "le_in": 96, "d_in": 3.5 },
+      "outputs": {
+        "interaction": { "value": 1.5499, "tolerance": { "abs": 0.002 } }
+      }
     }
   ]
 }
