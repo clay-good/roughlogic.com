@@ -1,6 +1,6 @@
 # roughlogic.com Specification v328 -- Atterberg Plasticity Indices and A-Line Classification (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v326..v328 (the soil characterization/QC trio -- relative
+> **Status: LANDED (2026-07-03, package 0.115.0; proposed 2026-07-02). Batch spec-v326..v328 (the soil characterization/QC trio -- relative
 > compaction (v326), soil phase relations (v327), the Atterberg indices (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog grades compaction and resolves phases but
 > has no tile for the consistency limits that classify a fine-grained soil -- the plasticity index and the A-line position

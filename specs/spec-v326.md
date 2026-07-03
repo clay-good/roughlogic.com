@@ -1,6 +1,6 @@
 # roughlogic.com Specification v326 -- Relative Compaction from Field Density and Proctor Maximum (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v326..v328 (the soil characterization/QC trio -- the earthwork
+> **Status: LANDED (2026-07-03, package 0.115.0; proposed 2026-07-02). Batch spec-v326..v328 (the soil characterization/QC trio -- the earthwork
 > and soil-testing numbers the volume-conversion tile never covers: the relative compaction of a placed lift (this spec),
 > the soil phase relations (void ratio, porosity, saturation) (v327), and the Atterberg plasticity indices (v328).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `soil-swell-shrink` converts bank to compacted volume,

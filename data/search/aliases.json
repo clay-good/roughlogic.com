@@ -12542,6 +12542,136 @@
       "term": "timeslip horsepower",
       "target": "trap-speed-horsepower",
       "kind": "adjacent"
+    },
+    {
+      "term": "relative compaction",
+      "target": "relative-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "percent compaction",
+      "target": "relative-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "field density test",
+      "target": "relative-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "proctor compaction",
+      "target": "relative-compaction",
+      "kind": "industry"
+    },
+    {
+      "term": "nuclear gauge compaction",
+      "target": "relative-compaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sand cone",
+      "target": "relative-compaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "95 percent compaction",
+      "target": "relative-compaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dry density field",
+      "target": "relative-compaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "compaction qc",
+      "target": "relative-compaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "soil phase relations",
+      "target": "soil-phase-relations",
+      "kind": "industry"
+    },
+    {
+      "term": "void ratio",
+      "target": "soil-phase-relations",
+      "kind": "industry"
+    },
+    {
+      "term": "porosity soil",
+      "target": "soil-phase-relations",
+      "kind": "industry"
+    },
+    {
+      "term": "degree of saturation",
+      "target": "soil-phase-relations",
+      "kind": "industry"
+    },
+    {
+      "term": "dry unit weight",
+      "target": "soil-phase-relations",
+      "kind": "adjacent"
+    },
+    {
+      "term": "specific gravity soil",
+      "target": "soil-phase-relations",
+      "kind": "adjacent"
+    },
+    {
+      "term": "three phase soil",
+      "target": "soil-phase-relations",
+      "kind": "adjacent"
+    },
+    {
+      "term": "soil weight volume",
+      "target": "soil-phase-relations",
+      "kind": "adjacent"
+    },
+    {
+      "term": "atterberg limits",
+      "target": "atterberg-indices",
+      "kind": "industry"
+    },
+    {
+      "term": "plasticity index",
+      "target": "atterberg-indices",
+      "kind": "industry"
+    },
+    {
+      "term": "liquid limit plastic limit",
+      "target": "atterberg-indices",
+      "kind": "industry"
+    },
+    {
+      "term": "a-line",
+      "target": "atterberg-indices",
+      "kind": "industry"
+    },
+    {
+      "term": "uscs classification",
+      "target": "atterberg-indices",
+      "kind": "industry"
+    },
+    {
+      "term": "liquidity index",
+      "target": "atterberg-indices",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pi soil",
+      "target": "atterberg-indices",
+      "kind": "adjacent"
+    },
+    {
+      "term": "clay silt classification",
+      "target": "atterberg-indices",
+      "kind": "adjacent"
+    },
+    {
+      "term": "soil consistency limits",
+      "target": "atterberg-indices",
+      "kind": "adjacent"
     }
   ]
 }

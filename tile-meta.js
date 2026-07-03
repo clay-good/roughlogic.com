@@ -448,6 +448,8 @@ const _TILES = [
   ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"],
   // spec-v323..v325 engine-build performance batch (calc-mechanic.js Group K)
   ["injector-size", "K"], ["mean-piston-speed", "K"], ["trap-speed-horsepower", "K"],
+  // spec-v326..v328 soil characterization / QC batch (calc-earthwork.js Group E)
+  ["relative-compaction", "E"], ["soil-phase-relations", "E"], ["atterberg-indices", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

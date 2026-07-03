@@ -1639,9 +1639,12 @@ cross-check.
 | calc-disinfect.js | `computeWellShockChlorination` | `{ casing_diameter_in = 0, water_column_ft = 0, target_ppm = 100, bleach_pct =...` | _ | _ | _ |
 | calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-earthwork.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
+| calc-earthwork.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
+| calc-earthwork.js | `computeSoilPhaseRelations` | `{ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSoilSwellShrink` | `{ bank_cy, swell_pct = 25, shrink_pct = 15 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeSpoilSetback` | `{ trench_depth_ft, spoil_height_ft, repose_deg = 34, min_setback_ft = 2 } = {}` | _ | _ | _ |
 | calc-edu.js | `computeAlternateReadability` | `{ text }` | _ | _ | _ |
@@ -2451,7 +2454,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1037.
+Row count: 1040.
 
 <!-- END function-corpus-v14 -->
 
@@ -2860,7 +2863,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (154 tiles)
+### Group E Construction (157 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2870,6 +2873,7 @@ per spec-v14 §13.1 second paragraph.
 | `anchor-embedment` | Anchor Bolt Embedment | Project (public bond-strength formula); 5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `asce7-load-combinations` | ASCE 7 ASD Load Combinations: Governing Demand and Net Uplift | ASCE 7 §2.4.1 basic ASD combinations; spec-v225 section 2.1 pinned example (roof uplift) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asphalt-tonnage` | Asphalt Tonnage | Project (first-principles); volume = 5000 * 3/12 = 1250 ft^3; tons = 1250 * 145 / 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-reactions` | Simple-Span Beam Reactions and Max Moment | Statics / AISC simple-beam diagrams; L 16 ft, w 200 plf -> R 1600 lb, M_max 6400 ft-lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2958,6 +2962,7 @@ per spec-v14 §13.1 second paragraph.
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-lap-splice` | Rebar Lap-Splice Length | ACI 318 development-and-splice basis ...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-schedule` | Rebar Bend and Weight Schedule | ACI Detailing Manual / CRSI (project ...; 12 #5 @ 20 ft + 2x 90 + 30 #4 @ 16 ft + 1 stirrup + 8 #6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `relative-compaction` | Relative Compaction from Field Density and Proctor Maximum | Relative compaction (earthwork QC); spec-v326 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `residential-framing` | Residential Framing Package | IRC framing practice + AWC NDS (proje...; 1500 ft^2 / 160 ft perim / 9 ft walls / 2x4 / 2x10 joists... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retaining-wall-block` | Segmental Retaining Wall Takeoff | Segmental retaining-wall maker guidan...; spec-v97 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retaining-wall-stability` | Cantilever Retaining Wall Stability (Overturning / Sliding / Bearing) | Das / NAVFAC DM-7.02 stability checks...; spec-v262 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2975,6 +2980,7 @@ per spec-v14 §13.1 second paragraph.
 | `snow-load` | Flat-Roof Snow Load | ASCE; Pg=30 psf ground snow / Ce=Ct=Is=1.0 -> Pf=21 psf flat-ro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `soil-bearing-capacity` | Shallow Foundation Bearing Capacity (Vesic) | Das, Principles of Foundation Enginee...; spec-v260 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-consolidation-settlement` | Primary Consolidation Settlement (NC Clay) | Terzaghi primary consolidation (Das /...; spec-v308 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `soil-phase-relations` | Soil Phase Relations (Void Ratio, Porosity, Saturation) | Soil phase relations (Das / NAVFAC); spec-v327 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-settlement-elastic` | Shallow Foundation Elastic (Immediate) Settlement | Theory-of-elasticity immediate settle...; spec-v287 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `soil-swell-shrink` | Soil Swell / Shrinkage Volume Conversion | Caterpillar Performance Handbook soil...; 100 bank cy common earth, swell 25%, shrink 15% -> 125 lo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `speeds-feeds` | Shop Speeds and Feeds | Machining Data Handbook / project bun...; drill / steel / 0.5 in / 2 flutes -> SFM 80, chipload 0.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3431,6 +3437,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 794. Fixture-covered or reference-cadence: 794 / 794.
+Tile count: 797. Fixture-covered or reference-cadence: 797 / 797.
 
 <!-- END tile-index-v14 -->

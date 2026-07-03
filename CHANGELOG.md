@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(earthwork): land spec-v326..v328 -- 3 soil characterization / QC tiles in calc-earthwork.js; 794 -> 797 tiles, 0.115.0, 2026-07-03
+
+The soil characterization / QC trio, eighteenth batch of the v275-v374 campaign: the earthwork and soil-testing numbers the volume-conversion tile never covers, all in the existing lazy `calc-earthwork.js` (Group E); no new module, group, or dependency. Catalog **794 -> 797**, package **0.114.0 -> 0.115.0** (a minor). Proposed 2026-07-02.
+
+- **`relative-compaction` (spec-v326).** RC = (field dry density / Proctor max) x 100 with the moisture back-out gamma_d = gamma_wet/(1 + w). Pinned: 128 pcf wet at 12% against a 120 pcf Proctor -> 95.2% pass; the same wet density at 16% fails at 91.9% (the water is not soil).
+- **`soil-phase-relations` (spec-v327).** gamma_d, e = Gs gamma_w/gamma_d - 1, n = e/(1 + e), S = w Gs/e. Pinned: 120 pcf at 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%; saturating the skeleton drives S to 100%.
+- **`atterberg-indices` (spec-v328).** PI = LL - PL, LI = (w - PL)/PI, and the A-line PI = 0.73(LL - 20) USCS classification. Pinned: LL 45 / PL 22 -> PI 23 above the A-line 18.3 -> CL; a low-PI silt (LL 30, PI 5) plots below -> ML. The fuzzer pins the A-line branch and the LL = 50 split.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the moisture back-out, the saturation identity, the A-line classification and LL split, and every error seam including the PL >= LL nonplastic case), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the earthwork-QC relation, the Das/NAVFAC phase relations, and the ASTM D4318 / USCS A-line. These three compute functions are exported (adding corpus/dims/fuzzer rows); the renderers are non-exported. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 26 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-earthwork 8500 -> 12500 (115.4% of the old cap). Housekeeping: home count 794 -> 797, README resynced (counts, correctness figures 1040/1043/1040, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 47 appended. All gates green at the new state: lint (**797 tiles / 56 modules / 819 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(mechanic): land spec-v323..v325 -- 3 engine-build performance tiles in calc-mechanic.js; 791 -> 794 tiles, 0.114.0, 2026-07-03
 
 The engine-build performance trio, seventeenth batch of the v275-v374 campaign: the sizing and durability numbers the displacement and horsepower tiles never give, all in the existing lazy `calc-mechanic.js` (Group K); no new module, group, or dependency. Catalog **791 -> 794**, package **0.113.0 -> 0.114.0** (a minor). Proposed 2026-07-02.

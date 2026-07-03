@@ -351,3 +351,131 @@ function _v67renderPipeBeddingBackfill(inputRegion, outputRegion, citationEl) {
   for (const f of [width, odIn, bedding, cover, length, density]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["pipe-bedding-backfill"] = _v67renderPipeBeddingBackfill;
+
+// ===================== spec-v326..v328: soil characterization / QC batch =====================
+// The earthwork and soil-testing numbers the volume-conversion tile never
+// covers: the relative compaction of a placed lift, the three-phase relations
+// (void ratio, porosity, saturation), and the Atterberg plasticity indices with
+// the A-line USCS classification.
+const _GAMMA_W = 62.4; // pcf, fresh water
+
+// dims: in { wet_pcf: M L^-2 T^-2, w_pct: dimensionless, max_pcf: M L^-2 T^-2, spec_pct: dimensionless } out: { gd_field: M L^-2 T^-2, rc_pct: dimensionless }
+export function computeRelativeCompaction({ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(wet_pcf > 0)) return { error: "Field wet density must be positive (pcf)." };
+  if (w_pct < 0) return { error: "Moisture content cannot be negative (%)." };
+  if (!(max_pcf > 0)) return { error: "Proctor maximum dry density must be positive (pcf)." };
+  if (!(spec_pct > 0)) return { error: "The required relative compaction must be positive (%)." };
+  const gd_field = wet_pcf / (1 + w_pct / 100);
+  const rc_pct = (gd_field / max_pcf) * 100;
+  const pass = rc_pct >= spec_pct;
+  return {
+    gd_field, rc_pct, pass,
+    note: "Relative compaction RC = (gamma_d,field / gamma_d,max) x 100, with the field dry density backed out of the measured wet density and moisture, gamma_d,field = gamma_wet / (1 + w). The Proctor maximum is from ASTM D698 (standard) or D1557 (modified), and typical specs run 90-95% (structural fill often 95%, pavement subgrade higher). The moisture reading is as important as the density - the same wet density fails when the extra water is not soil, which is why over-wet fill is rejected. Enter the Proctor maximum (it depends on the standard vs modified test and the soil); it does not compute the optimum-moisture window, the one-point Proctor, or the cohesionless relative density Dr. A QC aid; the project geotechnical specification and the testing agency govern.",
+  };
+}
+export const relativeCompactionExample = { inputs: { wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 } };
+
+function _v326renderRelativeCompaction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: relative compaction RC = (gamma_d,field / gamma_d,max) x 100, field dry density gamma_d,field = gamma_wet / (1 + w), Proctor maximum from ASTM D698 / D1557, typical 90-95% specs, by name. Enter the Proctor maximum. A QC aid; the geotechnical spec governs.";
+  const wet = makeNumber("Field wet density (pcf)", "rc-wet", { step: "any", min: "0" });
+  const w = makeNumber("Field moisture content (%)", "rc-w", { step: "any", min: "0" });
+  const max = makeNumber("Proctor maximum dry density (pcf)", "rc-max", { step: "any", min: "0" });
+  const spec = makeNumber("Required relative compaction (%)", "rc-spec", { step: "any", min: "0" }); spec.input.value = "95";
+  for (const f of [wet, w, max, spec]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wet.input.value = "128"; w.input.value = "12"; max.input.value = "120"; spec.input.value = "95"; update(); });
+  const oGd = makeOutputLine(outputRegion, "Field dry density", "rc-out-gd");
+  const oRc = makeOutputLine(outputRegion, "Relative compaction", "rc-out-rc");
+  const oNote = makeOutputLine(outputRegion, "Note", "rc-out-note");
+  const update = debounce(() => {
+    const r = computeRelativeCompaction({ wet_pcf: Number(wet.input.value) || 0, w_pct: Number(w.input.value) || 0, max_pcf: Number(max.input.value) || 0, spec_pct: Number(spec.input.value) || 0 });
+    if (r.error) { oGd.textContent = r.error; oRc.textContent = "-"; oNote.textContent = "-"; return; }
+    oGd.textContent = fmt(r.gd_field, 1) + " pcf";
+    oRc.textContent = fmt(r.rc_pct, 1) + "% - " + (r.pass ? "PASS" : "FAIL") + " (spec " + fmt(Number(spec.input.value) || 0, 0) + "%)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [wet, w, max, spec]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["relative-compaction"] = _v326renderRelativeCompaction;
+
+// dims: in { gamma_pcf: M L^-2 T^-2, w_pct: dimensionless, gs: dimensionless } out: { gamma_d_pcf: M L^-2 T^-2, e_ratio: dimensionless, n_porosity: dimensionless, s_pct: dimensionless }
+export function computeSoilPhaseRelations({ gamma_pcf = 0, w_pct = 0, gs = 2.70 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma_pcf > 0)) return { error: "Total unit weight must be positive (pcf)." };
+  if (w_pct < 0) return { error: "Water content cannot be negative (%)." };
+  if (!(gs > 0)) return { error: "Specific gravity of solids must be positive (~2.65-2.72)." };
+  const gamma_d_pcf = gamma_pcf / (1 + w_pct / 100);
+  const e_ratio = (gs * _GAMMA_W) / gamma_d_pcf - 1;
+  if (!(e_ratio > 0)) return { error: "The inputs give a non-positive void ratio - check the unit weight and Gs (an impossibly dense soil)." };
+  const n_porosity = e_ratio / (1 + e_ratio);
+  const s_pct = ((w_pct / 100) * gs) / e_ratio * 100;
+  return {
+    gamma_d_pcf, e_ratio, n_porosity, s_pct,
+    note: "Soil three-phase relations from the total unit weight, water content, and specific gravity of solids: dry unit weight gamma_d = gamma/(1 + w), void ratio e = Gs gamma_w/gamma_d - 1, porosity n = e/(1 + e), degree of saturation S = w Gs/e, with gamma_w = 62.4 pcf (fresh water) and Gs ~ 2.65-2.72 for common soils. The void ratio feeds a consolidation settlement, the porosity a seepage calc, and the saturation says how much air is left to squeeze out. Enter Gs (measure or estimate by soil type); it does not compute the permeability, the effective stress, or the compaction relative density. An engineering aid; the soil test data govern.",
+  };
+}
+export const soilPhaseRelationsExample = { inputs: { gamma_pcf: 120, w_pct: 15, gs: 2.70 } };
+
+function _v327renderSoilPhaseRelations(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: soil phase relations gamma_d = gamma/(1 + w), e = Gs gamma_w/gamma_d - 1, n = e/(1 + e), S = w Gs/e, with gamma_w = 62.4 pcf and Gs ~ 2.65-2.72, per Das / NAVFAC, by name. Enter Gs; fresh water. An engineering aid; the soil test data govern.";
+  const g = makeNumber("Total (moist) unit weight (pcf)", "spr-g", { step: "any", min: "0" });
+  const w = makeNumber("Water content (%)", "spr-w", { step: "any", min: "0" });
+  const gs = makeNumber("Specific gravity of solids Gs", "spr-gs", { step: "any", min: "0" }); gs.input.value = "2.70";
+  for (const f of [g, w, gs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { g.input.value = "120"; w.input.value = "15"; gs.input.value = "2.70"; update(); });
+  const oGd = makeOutputLine(outputRegion, "Dry unit weight", "spr-out-gd");
+  const oEn = makeOutputLine(outputRegion, "Void ratio / porosity", "spr-out-en");
+  const oS = makeOutputLine(outputRegion, "Degree of saturation", "spr-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "spr-out-note");
+  const update = debounce(() => {
+    const r = computeSoilPhaseRelations({ gamma_pcf: Number(g.input.value) || 0, w_pct: Number(w.input.value) || 0, gs: Number(gs.input.value) || 0 });
+    if (r.error) { oGd.textContent = r.error; oEn.textContent = "-"; oS.textContent = "-"; oNote.textContent = "-"; return; }
+    oGd.textContent = fmt(r.gamma_d_pcf, 1) + " pcf";
+    oEn.textContent = "e = " + fmt(r.e_ratio, 3) + " / n = " + fmt(r.n_porosity, 3);
+    oS.textContent = fmt(r.s_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [g, w, gs]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["soil-phase-relations"] = _v327renderSoilPhaseRelations;
+
+// dims: in { ll: dimensionless, pl: dimensionless, w_pct: dimensionless } out: { pi: dimensionless, aline: dimensionless, li: dimensionless }
+export function computeAtterbergIndices({ ll = 0, pl = 0, w_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ll > 0)) return { error: "Liquid limit must be positive (%)." };
+  if (!(pl > 0)) return { error: "Plastic limit must be positive (%)." };
+  if (!(ll > pl)) return { error: "The liquid limit must exceed the plastic limit (a soil with PL >= LL is nonplastic)." };
+  const pi = ll - pl;
+  const aline = 0.73 * (ll - 20);
+  const above_a = pi > aline;
+  const group = above_a ? (ll < 50 ? "CL (lean clay)" : "CH (fat clay)") : (ll < 50 ? "ML (silt)" : "MH (elastic silt)");
+  const li = w_pct > 0 ? (w_pct - pl) / pi : null;
+  return {
+    pi, aline, above_a, group, li,
+    note: "Atterberg limits: the plasticity index PI = LL - PL (liquid minus plastic limit), the liquidity index LI = (w - PL)/PI (where the in-situ water content sits between the limits), and the USCS A-line PI = 0.73(LL - 20). A soil plotting above the A-line is a clay (CL/CH), below it a silt (ML/MH), with the LL = 50 line splitting low from high plasticity - and in the low-PI range the A-line, not PI alone, separates a silt from a lean clay. Classification by the A-line/LL=50 chart (the full USCS also needs the fines content and gradation for a coarse or dual classification), limits from ASTM D4318; it does not compute the shrink-swell potential, the activity, or the coarse-fraction sieve classification. An engineering aid; the soil test data and the geotechnical engineer govern.",
+  };
+}
+export const atterbergIndicesExample = { inputs: { ll: 45, pl: 22, w_pct: 30 } };
+
+function _v328renderAtterbergIndices(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Atterberg plasticity index PI = LL - PL, liquidity index LI = (w - PL)/PI, and the USCS A-line PI = 0.73(LL - 20) with the LL = 50 low/high split, ASTM D4318, by name. Fine-grained chart classification only. An engineering aid; the soil test data govern.";
+  const ll = makeNumber("Liquid limit LL (%)", "att-ll", { step: "any", min: "0" });
+  const pl = makeNumber("Plastic limit PL (%)", "att-pl", { step: "any", min: "0" });
+  const w = makeNumber("In-situ water content (%, optional for LI)", "att-w", { step: "any", min: "0" });
+  for (const f of [ll, pl, w]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ll.input.value = "45"; pl.input.value = "22"; w.input.value = "30"; update(); });
+  const oPi = makeOutputLine(outputRegion, "Plasticity index (A-line PI)", "att-out-pi");
+  const oGroup = makeOutputLine(outputRegion, "USCS group", "att-out-group");
+  const oLi = makeOutputLine(outputRegion, "Liquidity index", "att-out-li");
+  const oNote = makeOutputLine(outputRegion, "Note", "att-out-note");
+  const update = debounce(() => {
+    const r = computeAtterbergIndices({ ll: Number(ll.input.value) || 0, pl: Number(pl.input.value) || 0, w_pct: Number(w.input.value) || 0 });
+    if (r.error) { oPi.textContent = r.error; oGroup.textContent = "-"; oLi.textContent = "-"; oNote.textContent = "-"; return; }
+    oPi.textContent = fmt(r.pi, 1) + " (A-line " + fmt(r.aline, 1) + ", " + (r.above_a ? "above" : "below") + ")";
+    oGroup.textContent = r.group;
+    oLi.textContent = r.li === null ? "- (enter water content)" : fmt(r.li, 2);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ll, pl, w]) f.input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["atterberg-indices"] = _v328renderAtterbergIndices;

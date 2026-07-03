@@ -29375,6 +29375,92 @@
       "outputs": {
         "hp": { "value": 380, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "relative-compaction",
+      "source_publisher": "Relative compaction (earthwork QC)",
+      "source_title": "128 pcf wet at 12%, Proctor 120 pcf, 95% spec -> 114.3 pcf dry, 95.2% pass",
+      "source_edition_or_year": "spec-v326 worked example (machine-verified)",
+      "source_section_or_page": "spec-v326 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "wet_pcf": 128, "w_pct": 12, "max_pcf": 120, "spec_pct": 95 },
+      "outputs": {
+        "gd_field": { "value": 114.3, "tolerance": { "pct": 0.2 } },
+        "rc_pct": { "value": 95.2, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "relative-compaction",
+      "source_publisher": "Relative compaction (earthwork QC)",
+      "source_title": "cross-check: the same wet density at 16% moisture fails at 91.9%",
+      "source_edition_or_year": "spec-v326 worked example (machine-verified)",
+      "source_section_or_page": "spec-v326 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "wet_pcf": 128, "w_pct": 16, "max_pcf": 120, "spec_pct": 95 },
+      "outputs": {
+        "rc_pct": { "value": 91.9, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "soil-phase-relations",
+      "source_publisher": "Soil phase relations (Das / NAVFAC)",
+      "source_title": "gamma 120 pcf, w 15%, Gs 2.70 -> gamma_d 104.3, e 0.615, n 0.381, S 65.9%",
+      "source_edition_or_year": "spec-v327 worked example (machine-verified)",
+      "source_section_or_page": "spec-v327 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "gamma_pcf": 120, "w_pct": 15, "gs": 2.70 },
+      "outputs": {
+        "gamma_d_pcf": { "value": 104.3, "tolerance": { "pct": 0.2 } },
+        "e_ratio": { "value": 0.615, "tolerance": { "pct": 0.5 } },
+        "n_porosity": { "value": 0.381, "tolerance": { "pct": 0.5 } },
+        "s_pct": { "value": 65.9, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "soil-phase-relations",
+      "source_publisher": "Soil phase relations (Das / NAVFAC)",
+      "source_title": "cross-check: saturate the same skeleton (w 22.8%) -> S 100%",
+      "source_edition_or_year": "spec-v327 worked example (machine-verified)",
+      "source_section_or_page": "spec-v327 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "gamma_pcf": 128, "w_pct": 22.78, "gs": 2.70 },
+      "outputs": {
+        "s_pct": { "value": 100, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "atterberg-indices",
+      "source_publisher": "Atterberg limits / USCS A-line",
+      "source_title": "LL 45, PL 22, w 30 -> PI 23, A-line 18.3, CL (lean clay), LI 0.35",
+      "source_edition_or_year": "spec-v328 worked example (machine-verified)",
+      "source_section_or_page": "spec-v328 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ll": 45, "pl": 22, "w_pct": 30 },
+      "outputs": {
+        "pi": { "value": 23, "tolerance": { "abs": 0.01 } },
+        "aline": { "value": 18.25, "tolerance": { "pct": 0.2 } },
+        "li": { "value": 0.348, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "atterberg-indices",
+      "source_publisher": "Atterberg limits / USCS A-line",
+      "source_title": "cross-check: a low-plasticity silt (LL 30, PL 25) plots below the A-line -> ML",
+      "source_edition_or_year": "spec-v328 worked example (machine-verified)",
+      "source_section_or_page": "spec-v328 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ll": 30, "pl": 25, "w_pct": 28 },
+      "outputs": {
+        "pi": { "value": 5, "tolerance": { "abs": 0.01 } },
+        "aline": { "value": 7.3, "tolerance": { "pct": 0.2 } },
+        "li": { "value": 0.6, "tolerance": { "pct": 1 } }
+      }
     }
   ]
 }

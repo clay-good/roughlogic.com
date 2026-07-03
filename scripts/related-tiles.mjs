@@ -983,6 +983,10 @@ const RELATED = {
   "injector-size": ["volumetric-efficiency","displacement-cr","hp-from-torque"],
   "mean-piston-speed": ["displacement-cr","hp-from-torque","injector-size"],
   "trap-speed-horsepower": ["hp-from-torque","injector-size","mean-piston-speed"],
+  // spec-v326..v328 soil characterization / QC batch (Group E)
+  "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],
+  "soil-phase-relations": ["relative-compaction","soil-consolidation-settlement","atterberg-indices"],
+  "atterberg-indices": ["soil-phase-relations","relative-compaction","soil-swell-shrink"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

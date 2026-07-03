@@ -14247,3 +14247,61 @@ test("bounds: spec-v325 computeTrapSpeedHorsepower pins the cube law, the ET com
   assert.ok("error" in _v325({ weight_lb: 3200, trap_mph: 0 }));
   assert.ok("error" in _v325({ weight_lb: Infinity, trap_mph: 108 }));
 });
+
+// ===================== spec-v326..v328 soil characterization / QC batch =====================
+import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
+
+test("bounds: spec-v326 computeRelativeCompaction pins the moisture back-out, the spec pass/fail, and error seams", () => {
+  const r = _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 120, spec_pct: 95 });
+  assert.ok(Math.abs(r.gd_field - 128 / 1.12) < 1e-9);
+  assert.ok(Math.abs(r.rc_pct - r.gd_field / 120 * 100) < 1e-9);
+  assert.ok(Math.abs(r.rc_pct - 95.2) < 0.1);
+  assert.strictEqual(r.pass, true);
+  // The same wet density wetter of optimum fails (the water is not soil).
+  const r2 = _v326({ wet_pcf: 128, w_pct: 16, max_pcf: 120, spec_pct: 95 });
+  assert.ok(r2.rc_pct < r.rc_pct);
+  assert.strictEqual(r2.pass, false);
+  // Error seams.
+  assert.ok("error" in _v326({ wet_pcf: 0, w_pct: 12, max_pcf: 120 }));
+  assert.ok("error" in _v326({ wet_pcf: 128, w_pct: -1, max_pcf: 120 }));
+  assert.ok("error" in _v326({ wet_pcf: 128, w_pct: 12, max_pcf: 0 }));
+  assert.ok("error" in _v326({ wet_pcf: Infinity, w_pct: 12, max_pcf: 120 }));
+});
+
+test("bounds: spec-v327 computeSoilPhaseRelations pins the phase relations, the S identity, and error seams", () => {
+  const r = _v327({ gamma_pcf: 120, w_pct: 15, gs: 2.70 });
+  assert.ok(Math.abs(r.gamma_d_pcf - 120 / 1.15) < 1e-9);
+  assert.ok(Math.abs(r.e_ratio - (2.70 * 62.4 / r.gamma_d_pcf - 1)) < 1e-9);
+  assert.ok(Math.abs(r.n_porosity - r.e_ratio / (1 + r.e_ratio)) < 1e-12);
+  assert.ok(Math.abs(r.s_pct - (0.15 * 2.70 / r.e_ratio) * 100) < 1e-9);
+  // Saturating the skeleton drives S to ~100%.
+  const r2 = _v327({ gamma_pcf: 128, w_pct: 22.78, gs: 2.70 });
+  assert.ok(Math.abs(r2.s_pct - 100) < 1);
+  // Error seams.
+  assert.ok("error" in _v327({ gamma_pcf: 0, w_pct: 15, gs: 2.70 }));
+  assert.ok("error" in _v327({ gamma_pcf: 120, w_pct: 15, gs: 0 }));
+  assert.ok("error" in _v327({ gamma_pcf: 200, w_pct: 0, gs: 2.70 })); // impossibly dense -> e <= 0
+  assert.ok("error" in _v327({ gamma_pcf: NaN, w_pct: 15, gs: 2.70 }));
+});
+
+test("bounds: spec-v328 computeAtterbergIndices pins the A-line classification, the LL split, and error seams", () => {
+  const r = _v328({ ll: 45, pl: 22, w_pct: 30 });
+  assert.strictEqual(r.pi, 23);
+  assert.ok(Math.abs(r.aline - 0.73 * 25) < 1e-9);
+  assert.strictEqual(r.above_a, true);
+  assert.strictEqual(r.group, "CL (lean clay)");
+  assert.ok(Math.abs(r.li - (30 - 22) / 23) < 1e-9);
+  // A low-PI soil below the A-line is a silt.
+  const r2 = _v328({ ll: 30, pl: 25, w_pct: 28 });
+  assert.strictEqual(r2.above_a, false);
+  assert.strictEqual(r2.group, "ML (silt)");
+  // The LL = 50 split: a high-LL clay is CH.
+  assert.strictEqual(_v328({ ll: 60, pl: 25 }).group, "CH (fat clay)");
+  assert.strictEqual(_v328({ ll: 60, pl: 55 }).group, "MH (elastic silt)"); // PI 5 below A-line 29.2
+  // Omitting water content leaves LI null.
+  assert.strictEqual(_v328({ ll: 45, pl: 22 }).li, null);
+  // Error seams.
+  assert.ok("error" in _v328({ ll: 0, pl: 22 }));
+  assert.ok("error" in _v328({ ll: 20, pl: 25 })); // PL >= LL nonplastic
+  assert.ok("error" in _v328({ ll: NaN, pl: 22 }));
+});

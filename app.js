@@ -482,6 +482,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-earthwork.js", "EARTHWORK_RENDERERS", [
     "soil-swell-shrink", "haul-cycle-production", "dewatering-rate",
     "spoil-setback", "pipe-bedding-backfill",
+    // spec-v326..v328 soil characterization / QC batch
+    "relative-compaction", "soil-phase-relations", "atterberg-indices",
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",

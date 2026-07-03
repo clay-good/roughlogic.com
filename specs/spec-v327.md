@@ -1,6 +1,6 @@
 # roughlogic.com Specification v327 -- Soil Phase Relations (Void Ratio, Porosity, Saturation) (calc-earthwork.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v326..v328 (the soil characterization/QC trio -- relative
+> **Status: LANDED (2026-07-03, package 0.115.0; proposed 2026-07-02). Batch spec-v326..v328 (the soil characterization/QC trio -- relative
 > compaction (v326), the soil phase relations (this spec), the Atterberg indices (v328)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog uses unit weights throughout the geotech
 > tiles but never resolves a soil into its three-phase makeup -- the void ratio, porosity, and degree of saturation that

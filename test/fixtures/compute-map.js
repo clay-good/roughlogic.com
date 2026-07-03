@@ -699,6 +699,10 @@ export const COMPUTE_MAP = {
   "injector-size": { module: "../../calc-mechanic.js", fn: "computeInjectorSize" },
   "mean-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMeanPistonSpeed" },
   "trap-speed-horsepower": { module: "../../calc-mechanic.js", fn: "computeTrapSpeedHorsepower" },
+  // spec-v326..v328 soil characterization / QC batch (3 tiles)
+  "relative-compaction": { module: "../../calc-earthwork.js", fn: "computeRelativeCompaction" },
+  "soil-phase-relations": { module: "../../calc-earthwork.js", fn: "computeSoilPhaseRelations" },
+  "atterberg-indices": { module: "../../calc-earthwork.js", fn: "computeAtterbergIndices" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

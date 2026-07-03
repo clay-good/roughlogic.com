@@ -7707,6 +7707,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "relative-compaction": {
+    formula: "gd_field = wet / (1 + w/100); RC = gd_field / max x 100; pass when RC >= spec.",
+    edition: "The relative-compaction relation RC = (gamma_d,field / gamma_d,max) x 100 with the moisture-back-out of field dry density and the ASTM D698/D1557 Proctor basis, a standard earthwork-QC result, by name.",
+    freeAccess: "The relative-compaction relation is a public earthwork-QC result; the ASTM D698/D1557 Proctor tests define the maximum dry density.",
+    governance: GOVERNANCE.general,
+    editionNote: "The relative compaction RC = (gamma_d,field / gamma_d,max) x 100, the field dry density gamma_d,field = gamma_wet / (1 + w), the Proctor maximum from ASTM D698 (standard) or D1557 (modified), and typical specs of 90 to 95% (structural fill often 95%, pavement subgrade higher). This returns the relative compaction and the pass/fail against an entered spec - it uses the entered Proctor maximum (which depends on the standard vs modified test and the soil), takes the field density from a nuclear gauge or sand cone as entered, and does not compute the optimum-moisture window, the one-point Proctor, or the relative density Dr of a cohesionless soil. A QC aid; the project geotechnical specification and the testing agency govern.",
+    assumptions: [
+      { name: "Relative compaction", value: "field dry density as a percentage of the lab Proctor maximum dry density", source: "earthwork QC practice" },
+      { name: "Moisture back-out", value: "gamma_d,field = gamma_wet / (1 + w) from the nuclear-gauge or sand-cone reading", source: "field density testing" },
+      { name: "Proctor basis", value: "maximum dry density from ASTM D698 (standard) or D1557 (modified)", source: "ASTM D698 / D1557" },
+    ],
+  },
+  "soil-phase-relations": {
+    formula: "gamma_d = gamma/(1 + w/100); e = Gs gamma_w/gamma_d - 1; n = e/(1 + e); S = w Gs/e. (gamma_w = 62.4 pcf)",
+    edition: "The soil three-phase relations - dry unit weight, void ratio, porosity, and degree of saturation - as compiled in the Das and NAVFAC geotechnical references, by name.",
+    freeAccess: "The soil phase relations are public geotechnical results; NAVFAC DM-7 is public-domain and free online.",
+    governance: GOVERNANCE.general,
+    editionNote: "The phase relations gamma_d = gamma/(1 + w), e = Gs gamma_w/gamma_d - 1, n = e/(1 + e), S = w Gs/e, and Gs ~ 2.65 to 2.72 for common soils, with gamma_w = 62.4 pcf, as compiled in the Das and NAVFAC references. This returns the void ratio, porosity, dry unit weight, and saturation from the total unit weight, water content, and specific gravity - it assumes the entered Gs (measure or estimate it by soil type), uses gamma_w = 62.4 pcf (fresh water), and does not compute the permeability, the effective stress, or the compaction relative density. An engineering aid; the soil test data govern.",
+    assumptions: [
+      { name: "Dry unit weight", value: "gamma_d = gamma/(1 + w), the solids weight per total volume", source: "soil mechanics" },
+      { name: "Void ratio and porosity", value: "e = Gs gamma_w/gamma_d - 1, n = e/(1 + e)", source: "soil mechanics" },
+      { name: "Saturation", value: "S = w Gs/e; gamma_w = 62.4 pcf fresh water, Gs ~ 2.65-2.72", source: "soil mechanics" },
+    ],
+  },
+  "atterberg-indices": {
+    formula: "PI = LL - PL; LI = (w - PL)/PI; A-line PI = 0.73(LL - 20); above A-line -> clay (CL/CH), below -> silt (ML/MH), split at LL = 50.",
+    edition: "The Atterberg-limit indices (plasticity index, liquidity index) and the USCS A-line classification, with the ASTM D4318 limit tests, by name.",
+    freeAccess: "The Atterberg-limit definitions and the USCS A-line are public geotechnical results; ASTM D4318 defines the limit tests.",
+    governance: GOVERNANCE.general,
+    editionNote: "The plasticity index PI = LL - PL, the liquidity index LI = (w - PL)/PI, the USCS A-line PI = 0.73(LL - 20) and U-line, the LL = 50 low/high-plasticity split, and the ASTM D4318 limit tests. This returns the plasticity indices and the A-line-based USCS group for a fine-grained soil - it classifies by the A-line/LL = 50 chart (the full USCS also needs the fines content and gradation for a coarse-grained or dual classification), assumes the limits are from the standard ASTM D4318 tests, and does not compute the shrink-swell potential, the activity, or the coarse-fraction sieve classification. An engineering aid; the soil test data and the geotechnical engineer govern.",
+    assumptions: [
+      { name: "Plasticity index", value: "PI = LL - PL; a soil with PL >= LL is nonplastic", source: "ASTM D4318" },
+      { name: "A-line", value: "PI = 0.73(LL - 20); above -> clay (CL/CH), below -> silt (ML/MH)", source: "USCS (ASTM D2487)" },
+      { name: "Plasticity split", value: "LL = 50 separates low (L) from high (H) plasticity", source: "USCS chart" },
+    ],
+  },
   "injector-size": {
     formula: "total_lbh = HP x BSFC; inj_lbh = total_lbh / (n_cyl x duty); inj_ccmin = inj_lbh x 10.5.",
     edition: "The fuel-injector-sizing relation lb/h = HP x BSFC / (n_cyl x duty), with the BSFC ranges, the customary 80% duty cycle, and the gasoline cc/min conversion, a standard tuning-reference result, by name.",
