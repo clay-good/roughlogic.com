@@ -683,6 +683,10 @@ export const COMPUTE_MAP = {
   "differential-leveling": { module: "../../calc-survey.js", fn: "computeDifferentialLeveling" },
   "stadia-distance": { module: "../../calc-survey.js", fn: "computeStadiaDistance" },
   "taping-corrections": { module: "../../calc-survey.js", fn: "computeTapingCorrections" },
+  // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
+  "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
+  "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
+  "steel-bolt-tension-shear": { module: "../../calc-steel.js", fn: "computeSteelBoltTensionShear" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

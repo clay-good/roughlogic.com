@@ -29042,6 +29042,88 @@
         "ct_ft": { "value": -0.0181, "tolerance": { "abs": 0.0005 } },
         "corrected_ft": { "value": 99.982, "tolerance": { "abs": 0.002 } }
       }
+    },
+    {
+      "tile_id": "steel-h1-interaction",
+      "source_publisher": "AISC 360-22 H1.1",
+      "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",
+      "source_edition_or_year": "spec-v314 worked example (machine-verified)",
+      "source_section_or_page": "spec-v314 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "pr_kip": 100, "pc_kip": 400, "mrx_kft": 80, "mcx_kft": 200, "mry_kft": 0, "mcy_kft": 0 },
+      "outputs": {
+        "ratio": { "value": 0.25, "tolerance": { "abs": 0.001 } },
+        "interaction": { "value": 0.6056, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "steel-h1-interaction",
+      "source_publisher": "AISC 360-22 H1.1",
+      "source_title": "cross-check: drop Pr to 50 (ratio 0.125 < 0.2) -> low-axial branch, interaction 0.46",
+      "source_edition_or_year": "spec-v314 worked example (machine-verified)",
+      "source_section_or_page": "spec-v314 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "pr_kip": 50, "pc_kip": 400, "mrx_kft": 80, "mcx_kft": 200, "mry_kft": 0, "mcy_kft": 0 },
+      "outputs": {
+        "ratio": { "value": 0.125, "tolerance": { "abs": 0.001 } },
+        "interaction": { "value": 0.4625, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "steel-effective-length-k",
+      "source_publisher": "AISC alignment chart (Dumonteil fit)",
+      "source_title": "GA 1.0, GB 2.0, sway frame -> K 1.47",
+      "source_edition_or_year": "spec-v315 worked example (machine-verified)",
+      "source_section_or_page": "spec-v315 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ga": 1.0, "gb": 2.0, "frame": "sway" },
+      "outputs": {
+        "k_factor": { "value": 1.47, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "steel-effective-length-k",
+      "source_publisher": "AISC alignment chart (Dumonteil fit)",
+      "source_title": "cross-check: same joints, braced frame -> K 0.82",
+      "source_edition_or_year": "spec-v315 worked example (machine-verified)",
+      "source_section_or_page": "spec-v315 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ga": 1.0, "gb": 2.0, "frame": "braced" },
+      "outputs": {
+        "k_factor": { "value": 0.82, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "steel-bolt-tension-shear",
+      "source_publisher": "AISC 360-22 J3.7",
+      "source_title": "3/4 A325, 20 ksi required shear, LRFD -> F'nt 72.6 ksi, available tension 24.1 kip",
+      "source_edition_or_year": "spec-v316 worked example (machine-verified)",
+      "source_section_or_page": "spec-v316 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fnt_ksi": 90, "fnv_ksi": 54, "ab_in2": 0.442, "frv_ksi": 20, "method": "LRFD" },
+      "outputs": {
+        "fpnt_ksi": { "value": 72.6, "tolerance": { "pct": 0.3 } },
+        "avail_tension_kip": { "value": 24.1, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "steel-bolt-tension-shear",
+      "source_publisher": "AISC 360-22 J3.7",
+      "source_title": "cross-check: no shear -> F'nt caps at Fnt 90, full 29.8 kip tension",
+      "source_edition_or_year": "spec-v316 worked example (machine-verified)",
+      "source_section_or_page": "spec-v316 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fnt_ksi": 90, "fnv_ksi": 54, "ab_in2": 0.442, "frv_ksi": 0, "method": "LRFD" },
+      "outputs": {
+        "fpnt_ksi": { "value": 90, "tolerance": { "abs": 0.01 } },
+        "avail_tension_kip": { "value": 29.8, "tolerance": { "pct": 0.3 } }
+      }
     }
   ]
 }

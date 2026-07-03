@@ -967,6 +967,10 @@ const RELATED = {
   "differential-leveling": ["traverse-closure","stadia-distance","drainage-invert"],
   "stadia-distance": ["differential-leveling","pacing-distance","traverse-closure"],
   "taping-corrections": ["differential-leveling","stadia-distance","traverse-closure"],
+  // spec-v314..v316 steel beam-column-and-connection depth batch (Group E)
+  "steel-h1-interaction": ["steel-column-capacity","steel-beam-ltb","steel-effective-length-k"],
+  "steel-effective-length-k": ["steel-column-capacity","steel-h1-interaction","steel-beam-ltb"],
+  "steel-bolt-tension-shear": ["bolt-shear-bearing","steel-bolt-slip-critical","bolt-group-eccentric"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

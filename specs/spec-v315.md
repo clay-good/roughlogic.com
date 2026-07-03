@@ -1,6 +1,6 @@
 # roughlogic.com Specification v315 -- Column Effective Length Factor K from Alignment-Chart G Factors (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v314..v316 (the steel beam-column-and-connection depth trio --
+> **Status: LANDED (2026-07-03, package 0.111.0; proposed 2026-07-02). Batch spec-v314..v316 (the steel beam-column-and-connection depth trio --
 > H1 interaction (v314), the effective-length factor K (this spec), the bolt under combined tension and shear (v316)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `steel-column-capacity` takes `KL/r` with `K`
 > entered, but `K` itself -- the effective-length factor that captures how a column's ends are restrained by the beams

@@ -680,3 +680,125 @@ STEEL_RENDERERS["steel-fillet-weld-size"] = _simpleRenderer({
   ],
   compute: computeSteelFilletWeldSize,
 });
+
+// ===================== spec-v314..v316: steel beam-column-and-connection depth batch =====================
+// The interaction checks the single-action steel tiles never make: combined
+// axial plus flexure (H1.1), the column effective-length factor K from the
+// alignment-chart G factors, and the bolt under combined tension and shear
+// (J3.7).
+
+// dims: in { pr_kip: M L T^-2, pc_kip: M L T^-2, mrx_kft: M L^2 T^-2, mcx_kft: M L^2 T^-2, mry_kft: M L^2 T^-2, mcy_kft: M L^2 T^-2 } out: { ratio: dimensionless, interaction: dimensionless }
+export function computeSteelH1Interaction({ pr_kip = 0, pc_kip = 0, mrx_kft = 0, mcx_kft = 0, mry_kft = 0, mcy_kft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pr_kip >= 0)) return { error: "Required axial strength cannot be negative (kip)." };
+  if (!(pc_kip > 0)) return { error: "Available axial strength must be positive (kip)." };
+  if (mrx_kft < 0 || mry_kft < 0) return { error: "Required moments cannot be negative (kip-ft)." };
+  if (!(mcx_kft > 0)) return { error: "Available strong-axis moment must be positive (kip-ft)." };
+  if (mry_kft > 0 && !(mcy_kft > 0)) return { error: "Enter the available weak-axis moment when a weak-axis moment is present." };
+  const ratio = pr_kip / pc_kip;
+  const moment_term = mrx_kft / mcx_kft + (mry_kft > 0 ? mry_kft / mcy_kft : 0);
+  const interaction = ratio >= 0.2 ? ratio + (8 / 9) * moment_term : ratio / 2 + moment_term;
+  const branch = ratio >= 0.2 ? "high-axial branch (Pr/Pc >= 0.2): Pr/Pc + (8/9)(sum Mr/Mc)" : "low-axial branch (Pr/Pc < 0.2): Pr/(2Pc) + (sum Mr/Mc)";
+  const pass = interaction <= 1.0;
+  return {
+    ratio, interaction, branch, pass,
+    note: "AISC 360-22 H1.1 combined axial force and flexure: for Pr/Pc >= 0.2, Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy) <= 1.0; for Pr/Pc < 0.2, Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy) <= 1.0, consistent for ASD (available = nominal/Omega) or LRFD (available = phi x nominal). This evaluates the interaction from the required and available strengths supplied - it takes Pc and Mc as already computed (from steel-column-capacity and steel-beam-ltb in the same ASD or LRFD basis), assumes the second-order (P-delta/P-Delta) amplification is already in Mr (Chapter C / Appendix 8), and does not cover the H1.3 out-of-plane or H2 unsymmetric-member cases. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelH1InteractionExample = { inputs: { pr_kip: 100, pc_kip: 400, mrx_kft: 80, mcx_kft: 200, mry_kft: 0, mcy_kft: 0 } };
+
+STEEL_RENDERERS["steel-h1-interaction"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 H1.1 combined axial and flexure interaction - Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy) for Pr/Pc >= 0.2, Pr/(2Pc) + (sum Mr/Mc) below - consistent for ASD or LRFD, by name. Pc/Mc from the member tiles; second-order Mr assumed. A design aid, not a substitute for the engineer of record.",
+  example: steelH1InteractionExample.inputs,
+  fields: [
+    { key: "pr_kip", label: "Required axial Pr (kip, 2nd-order)", kind: "number" },
+    { key: "pc_kip", label: "Available axial Pc (kip)", kind: "number" },
+    { key: "mrx_kft", label: "Required strong-axis moment Mrx (kip-ft)", kind: "number" },
+    { key: "mcx_kft", label: "Available strong-axis moment Mcx (kip-ft)", kind: "number" },
+    { key: "mry_kft", label: "Required weak-axis moment Mry (kip-ft, 0 if none)", kind: "number", default: 0 },
+    { key: "mcy_kft", label: "Available weak-axis moment Mcy (kip-ft)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "ratio", id: "sh1-out-ratio", label: "Axial ratio Pr/Pc", value: (r) => fmt(r.ratio, 3) },
+    { key: "br", id: "sh1-out-br", label: "Governing branch", value: (r) => r.branch },
+    { key: "ix", id: "sh1-out-ix", label: "Interaction (<= 1.0 passes)", value: (r) => fmt(r.interaction, 3) + (r.pass ? " (OK)" : " (OVER)") },
+    { key: "n", id: "sh1-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelH1Interaction,
+});
+
+// dims: in { ga: dimensionless, gb: dimensionless, frame: dimensionless } out: { k_factor: dimensionless }
+export function computeSteelEffectiveLengthK({ ga = 0, gb = 0, frame = "sway" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(ga > 0)) return { error: "The stiffness ratio GA must be positive (10 pinned, 1 fixed)." };
+  if (!(gb > 0)) return { error: "The stiffness ratio GB must be positive (10 pinned, 1 fixed)." };
+  if (frame !== "sway" && frame !== "braced") return { error: "Frame must be sway or braced." };
+  let k_factor;
+  if (frame === "sway") {
+    k_factor = Math.sqrt((1.6 * ga * gb + 4 * (ga + gb) + 7.5) / (ga + gb + 7.5));
+  } else {
+    k_factor = (3 * ga * gb + 1.4 * (ga + gb) + 0.64) / (3 * ga * gb + 2 * (ga + gb) + 1.28);
+  }
+  return {
+    k_factor,
+    note: "AISC alignment-chart effective-length factor K from the joint stiffness ratios G = sum(EI/L)_columns / sum(EI/L)_beams, via the Dumonteil closed-form fits: sway K = sqrt((1.6 GA GB + 4(GA + GB) + 7.5)/(GA + GB + 7.5)), braced K = (3 GA GB + 1.4(GA + GB) + 0.64)/(3 GA GB + 2(GA + GB) + 1.28). A sway frame nearly doubles the effective length of the same column versus braced, so bracing is the cheapest way to shorten a column. Within ~2% of the nomograph, with the chart's idealizing assumptions (elastic, all columns buckling simultaneously, equal L/r); enter G (or 10 pinned / 1 fixed) - it does not compute G from member sizes or apply the inelastic tau_b stiffness reduction. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelEffectiveLengthKExample = { inputs: { ga: 1.0, gb: 2.0, frame: "sway" } };
+
+STEEL_RENDERERS["steel-effective-length-k"] = _simpleRenderer({
+  citation: "Citation: AISC alignment-chart effective-length factor K from the joint stiffness ratios G, via the Dumonteil sway K = sqrt((1.6 GA GB + 4(GA+GB) + 7.5)/(GA+GB+7.5)) and braced fits, by name. Enter G (10 pinned / 1 fixed); no tau_b. A design aid, not a substitute for the engineer of record.",
+  example: steelEffectiveLengthKExample.inputs,
+  fields: [
+    { key: "ga", label: "Stiffness ratio GA (10 pinned, 1 fixed)", kind: "number" },
+    { key: "gb", label: "Stiffness ratio GB", kind: "number" },
+    { key: "frame", label: "Frame type", kind: "select", options: [
+      { value: "sway", label: "Sway (moment) frame" },
+      { value: "braced", label: "Braced (non-sway) frame" },
+    ], default: "sway" },
+  ],
+  outputs: [
+    { key: "k", id: "selk-out-k", label: "Effective-length factor K", value: (r) => fmt(r.k_factor, 3) },
+    { key: "n", id: "selk-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelEffectiveLengthK,
+});
+
+// dims: in { fnt_ksi: M L^-1 T^-2, fnv_ksi: M L^-1 T^-2, ab_in2: L^2, frv_ksi: M L^-1 T^-2, method: dimensionless } out: { fpnt_ksi: M L^-1 T^-2, avail_tension_kip: M L T^-2 }
+export function computeSteelBoltTensionShear({ fnt_ksi = 90, fnv_ksi = 54, ab_in2 = 0, frv_ksi = 0, method = "LRFD" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fnt_ksi > 0) || !(fnv_ksi > 0)) return { error: "Fnt and Fnv must be positive (ksi)." };
+  if (!(ab_in2 > 0)) return { error: "Bolt area Ab must be positive (in^2)." };
+  if (frv_ksi < 0) return { error: "Required shear stress cannot be negative (ksi)." };
+  if (method !== "LRFD" && method !== "ASD") return { error: "Method must be LRFD or ASD." };
+  const k = method === "LRFD" ? fnt_ksi / (0.75 * fnv_ksi) : (2.00 * fnt_ksi) / fnv_ksi;
+  const fpnt_ksi = Math.max(Math.min(1.3 * fnt_ksi - k * frv_ksi, fnt_ksi), 0);
+  const avail_tension_kip = method === "LRFD" ? 0.75 * fpnt_ksi * ab_in2 : (fpnt_ksi * ab_in2) / 2.00;
+  const pure_tension_kip = method === "LRFD" ? 0.75 * fnt_ksi * ab_in2 : (fnt_ksi * ab_in2) / 2.00;
+  return {
+    fpnt_ksi, avail_tension_kip, pure_tension_kip, method,
+    note: "AISC 360-22 J3.7 reduced tensile stress for a bearing-type bolt in combined tension and shear: F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD, phi = 0.75), or 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD, Omega = 2.00), with the required shear stress frv = required shear / Ab and the available tension = phi F'nt Ab (LRFD) or F'nt Ab / Omega (ASD). Table J3.2 values: A325/F1852 Fnt = 90, Fnv = 54 (threads-N) or 68 (threads-X) ksi. F'nt is capped at Fnt (no 1.3 benefit when shear is absent) and floored at zero. Bearing-type interaction only (a slip-critical joint reduces the slip resistance instead, J3.9); the bolt shear/bearing and connected-element limit states are separate. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const steelBoltTensionShearExample = { inputs: { fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20, method: "LRFD" } };
+
+STEEL_RENDERERS["steel-bolt-tension-shear"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 J3.7 combined tension and shear F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD), available tension phi F'nt Ab, Table J3.2 Fnt/Fnv, by name. Bearing-type; slip-critical is J3.9. A design aid, not a substitute for the engineer of record.",
+  example: steelBoltTensionShearExample.inputs,
+  fields: [
+    { key: "fnt_ksi", label: "Nominal tensile stress Fnt (ksi, 90 A325)", kind: "number", default: 90 },
+    { key: "fnv_ksi", label: "Nominal shear stress Fnv (ksi, 54 N / 68 X)", kind: "number", default: 54 },
+    { key: "ab_in2", label: "Nominal bolt area Ab (in^2)", kind: "number" },
+    { key: "frv_ksi", label: "Required shear stress frv (ksi = V/Ab)", kind: "number" },
+    { key: "method", label: "Method", kind: "select", options: [
+      { value: "LRFD", label: "LRFD (phi = 0.75)" },
+      { value: "ASD", label: "ASD (Omega = 2.00)" },
+    ], default: "LRFD" },
+  ],
+  outputs: [
+    { key: "fpnt", id: "sbts-out-fpnt", label: "Reduced tensile stress F'nt", value: (r) => fmt(r.fpnt_ksi, 1) + " ksi" },
+    { key: "at", id: "sbts-out-at", label: "Available tension (vs pure)", value: (r) => fmt(r.avail_tension_kip, 1) + " kip (pure " + fmt(r.pure_tension_kip, 1) + ")" },
+    { key: "n", id: "sbts-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelBoltTensionShear,
+});

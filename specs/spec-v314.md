@@ -1,6 +1,6 @@
 # roughlogic.com Specification v314 -- Steel Beam-Column Combined Axial and Flexure Interaction (AISC 360 H1.1) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v314..v316 (the steel beam-column-and-connection depth trio --
+> **Status: LANDED (2026-07-03, package 0.111.0; proposed 2026-07-02). Batch spec-v314..v316 (the steel beam-column-and-connection depth trio --
 > the interaction checks the single-action steel tiles never make: combined axial plus flexure (this spec, the AISC H1
 > equation that ties compression and bending together), the column effective-length factor K (v315), and the bolt under
 > combined tension and shear (v316).)**

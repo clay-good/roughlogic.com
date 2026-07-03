@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(steel): land spec-v314..v316 -- 3 steel beam-column-and-connection depth tiles in calc-steel.js; 782 -> 785 tiles, 0.111.0, 2026-07-03
+
+The steel beam-column-and-connection depth trio, fourteenth batch of the v275-v374 campaign: the interaction checks the single-action steel tiles never make, all in the existing lazy `calc-steel.js` (Group E); no new module, group, or dependency. Catalog **782 -> 785**, package **0.110.0 -> 0.111.0** (a minor). Proposed 2026-07-02.
+
+- **`steel-h1-interaction` (spec-v314).** AISC H1.1 bilinear axial-plus-flexure interaction (8/9 form above Pr/Pc = 0.2, half-axial below). Pinned: Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> 0.61 passes; dropping Pr to 50 crosses to the low-axial branch (0.46). The fuzzer pins the branch flip and the biaxial term.
+- **`steel-effective-length-k` (spec-v315).** The alignment-chart K from the joint stiffness ratios via the Dumonteil fits (sway and braced). Pinned: GA 1 / GB 2 -> K 1.47 sway, 0.82 braced (a 3.2x buckling-capacity factor). The fuzzer pins the trend toward the fixed limits.
+- **`steel-bolt-tension-shear` (spec-v316).** AISC J3.7 reduced bolt tension F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv, capped at Fnt. Pinned: a 3/4 A325 at 20 ksi shear -> 24.1 kip (down from 29.8 pure); no shear caps at the full 90 ksi, full shear floors at zero. The fuzzer pins the cap, floor, and ASD branch.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the branch flips, the biaxial term, the fixed-limit trend, the cap and floor, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming AISC 360-22 H1.1 / the alignment chart (Dumonteil) / J3.7. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 27 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bumps (calc-steel at 95.5%). Housekeeping: home count 782 -> 785, README resynced (counts, correctness figures 1028/1031/1028, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 43 appended. All gates green at the new state: lint (**785 tiles / 56 modules / 807 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(survey): land spec-v311..v313 -- 3 field-surveying depth tiles in calc-survey.js; 779 -> 782 tiles, 0.110.0, 2026-07-03
 
 The field-surveying depth trio, thirteenth batch of the v275-v374 campaign: the leveling and taping computations the coordinate tiles never cover, all in the existing lazy `calc-survey.js` (Group P); no new module, group, or dependency. Catalog **779 -> 782**, package **0.109.0 -> 0.110.0** (a minor). Proposed 2026-07-02.

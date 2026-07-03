@@ -14017,3 +14017,68 @@ test("bounds: spec-v313 computeTapingCorrections pins the temp sign flip, the om
   assert.ok("error" in _v313({ l_ft: 100, w_plf: 1.5, p_lb: 0 })); // sag needs positive pull
   assert.ok("error" in _v313({ l_ft: Infinity }));
 });
+
+// ===================== spec-v314..v316 steel beam-column-and-connection depth batch =====================
+import { computeSteelH1Interaction as _v314, computeSteelEffectiveLengthK as _v315, computeSteelBoltTensionShear as _v316 } from "../../calc-steel.js";
+
+test("bounds: spec-v314 computeSteelH1Interaction pins both branches, the biaxial term, and error seams", () => {
+  const r = _v314({ pr_kip: 100, pc_kip: 400, mrx_kft: 80, mcx_kft: 200 });
+  assert.ok(Math.abs(r.ratio - 0.25) < 1e-9);
+  assert.ok(Math.abs(r.interaction - (0.25 + 8 / 9 * 0.4)) < 1e-9);
+  assert.strictEqual(r.pass, true);
+  assert.ok(r.branch.startsWith("high-axial"));
+  // Low-axial branch below Pr/Pc = 0.2.
+  const r2 = _v314({ pr_kip: 50, pc_kip: 400, mrx_kft: 80, mcx_kft: 200 });
+  assert.ok(Math.abs(r2.interaction - (0.125 / 2 + 0.4)) < 1e-9);
+  assert.ok(r2.branch.startsWith("low-axial"));
+  // The biaxial term adds the weak-axis ratio.
+  const r3 = _v314({ pr_kip: 100, pc_kip: 400, mrx_kft: 80, mcx_kft: 200, mry_kft: 30, mcy_kft: 100 });
+  assert.ok(Math.abs(r3.interaction - (0.25 + 8 / 9 * (0.4 + 0.3))) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v314({ pr_kip: 100, pc_kip: 0, mrx_kft: 80, mcx_kft: 200 }));
+  assert.ok("error" in _v314({ pr_kip: 100, pc_kip: 400, mrx_kft: 80, mcx_kft: 0 }));
+  assert.ok("error" in _v314({ pr_kip: 100, pc_kip: 400, mrx_kft: 80, mcx_kft: 200, mry_kft: 30, mcy_kft: 0 }));
+  assert.ok("error" in _v314({ pr_kip: Infinity, pc_kip: 400, mrx_kft: 80, mcx_kft: 200 }));
+});
+
+test("bounds: spec-v315 computeSteelEffectiveLengthK pins sway vs braced, the fixed-limit trend, and error seams", () => {
+  const s = _v315({ ga: 1, gb: 2, frame: "sway" });
+  assert.ok(Math.abs(s.k_factor - 1.47) < 0.01);
+  const b = _v315({ ga: 1, gb: 2, frame: "braced" });
+  assert.ok(Math.abs(b.k_factor - 0.82) < 0.01);
+  // A sway frame gives a larger K than braced for the same joints.
+  assert.ok(s.k_factor > b.k_factor);
+  // Stiffer joints trend toward the fixed limits (sway -> 1.0, braced -> 0.5).
+  const s2 = _v315({ ga: 1, gb: 1, frame: "sway" });
+  assert.ok(s2.k_factor < s.k_factor);
+  const bStiff = _v315({ ga: 0.1, gb: 0.1, frame: "braced" });
+  assert.ok(bStiff.k_factor < 0.6); // approaching 0.5
+  // Error seams.
+  assert.ok("error" in _v315({ ga: 0, gb: 2, frame: "sway" }));
+  assert.ok("error" in _v315({ ga: 1, gb: 0, frame: "sway" }));
+  assert.ok("error" in _v315({ ga: 1, gb: 2, frame: "bogus" }));
+  assert.ok("error" in _v315({ ga: NaN, gb: 2, frame: "sway" }));
+});
+
+test("bounds: spec-v316 computeSteelBoltTensionShear pins the reduction, the cap and floor, the ASD branch, and error seams", () => {
+  const r = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20, method: "LRFD" });
+  assert.ok(Math.abs(r.fpnt_ksi - (1.3 * 90 - 90 / (0.75 * 54) * 20)) < 1e-9);
+  assert.ok(Math.abs(r.fpnt_ksi - 72.6) < 0.1);
+  assert.ok(Math.abs(r.avail_tension_kip - 0.75 * r.fpnt_ksi * 0.442) < 1e-9);
+  // No shear: F'nt caps at Fnt.
+  const r2 = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 0, method: "LRFD" });
+  assert.strictEqual(r2.fpnt_ksi, 90);
+  assert.ok(Math.abs(r2.avail_tension_kip - 0.75 * 90 * 0.442) < 1e-9);
+  // Full shear floors F'nt at zero.
+  const r3 = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 54, method: "LRFD" });
+  assert.strictEqual(r3.fpnt_ksi, 0);
+  // ASD branch uses Omega = 2.00.
+  const rA = _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 10, method: "ASD" });
+  assert.ok(Math.abs(rA.fpnt_ksi - Math.min(1.3 * 90 - 2 * 90 / 54 * 10, 90)) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v316({ fnt_ksi: 0, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20 }));
+  assert.ok("error" in _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0, frv_ksi: 20 }));
+  assert.ok("error" in _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20, method: "bogus" }));
+  assert.ok("error" in _v316({ fnt_ksi: 90, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: -1 }));
+  assert.ok("error" in _v316({ fnt_ksi: Infinity, fnv_ksi: 54, ab_in2: 0.442, frv_ksi: 20 }));
+});

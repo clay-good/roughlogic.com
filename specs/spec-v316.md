@@ -1,6 +1,6 @@
 # roughlogic.com Specification v316 -- Bolt Combined Tension and Shear (AISC 360 J3.7) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v314..v316 (the steel beam-column-and-connection depth trio --
+> **Status: LANDED (2026-07-03, package 0.111.0; proposed 2026-07-02). Batch spec-v314..v316 (the steel beam-column-and-connection depth trio --
 > H1 interaction (v314), effective-length K (v315), the bolt under combined tension and shear (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `bolt-shear-bearing` handles pure shear and the
 > catalog handles bolt torque and pretension, but a bolt in a bracket, a hanger, or a moment end-plate carries tension and

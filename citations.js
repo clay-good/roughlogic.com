@@ -7527,6 +7527,42 @@ export const CITATIONS = {
       { name: "Net cancels internal", value: "the internal pressure acts equally outward on both walls, so the net horizontal pressure is the external difference", source: "ASCE 7-22 Ch. 27 commentary" },
     ],
   },
+  "steel-h1-interaction": {
+    formula: "ratio = Pr/Pc; ratio >= 0.2: I = Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy); ratio < 0.2: I = Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy); pass when I <= 1.0.",
+    edition: "The AISC 360-22 Section H1.1 combined-force (axial plus flexure) bilinear interaction equations, consistent for ASD or LRFD, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the H1.1 interaction equations are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 H1.1 combined-force equations - Pr/Pc + (8/9)(Mrx/Mcx + Mry/Mcy) for Pr/Pc >= 0.2 and Pr/(2Pc) + (Mrx/Mcx + Mry/Mcy) for Pr/Pc < 0.2 - consistent for ASD (available = nominal/Omega) or LRFD (available = phi x nominal). This evaluates the H1.1 interaction from the required and available strengths supplied - it takes Pc and Mc as already computed (from steel-column-capacity and steel-beam-ltb in the same ASD or LRFD basis), assumes the second-order (P-delta/P-Delta) amplification is already in Mr (Chapter C / Appendix 8), and does not cover the H1.3 out-of-plane or H2 unsymmetric-member cases. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Bilinear interaction", value: "the 8/9 form for Pr/Pc >= 0.2, the half-axial form below, capped at 1.0", source: "AISC 360-22 Eq. H1-1a/H1-1b" },
+      { name: "Available strengths", value: "Pc and Mc entered from the member tiles in a consistent ASD or LRFD basis", source: "AISC 360-22 H1.1" },
+      { name: "Second-order", value: "the P-delta/P-Delta amplification is already carried in the required moment Mr", source: "AISC 360-22 Ch. C / App. 8" },
+    ],
+  },
+  "steel-effective-length-k": {
+    formula: "G = sum(EI/L)_columns / sum(EI/L)_beams; sway: K = sqrt((1.6 GA GB + 4(GA+GB) + 7.5)/(GA+GB+7.5)); braced: K = (3 GA GB + 1.4(GA+GB) + 0.64)/(3 GA GB + 2(GA+GB) + 1.28).",
+    edition: "The AISC alignment-chart effective-length factor K from the joint stiffness ratios G, via the Dumonteil closed-form approximations to the sway and braced nomographs, by name.",
+    freeAccess: "The AISC alignment charts and the Dumonteil closed-form fits are public results in the AISC Commentary and the standard steel-design references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC alignment-chart stiffness ratio G = sum(EI/L)_columns / sum(EI/L)_beams, the Dumonteil sway approximation K = sqrt((1.6 GA GB + 4(GA+GB) + 7.5)/(GA+GB+7.5)) and braced approximation K = (3 GA GB + 1.4(GA+GB) + 0.64)/(3 GA GB + 2(GA+GB) + 1.28), and the recommended G = 10 (pinned) / G = 1 (fixed) end conditions. This returns the effective-length factor from the joint stiffness ratios - it uses the Dumonteil closed-form fits (within ~2% of the nomograph), assumes the chart's idealizing assumptions (elastic behavior, all columns buckling simultaneously, equal L/r), and does not compute the G factors from member sizes for the user or apply the inelastic stiffness-reduction tau_b. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Stiffness ratio", value: "G = sum(EI/L)_columns / sum(EI/L)_beams at each joint (10 pinned, 1 fixed)", source: "AISC Commentary alignment charts" },
+      { name: "Closed-form K", value: "the Dumonteil sway/braced fits, within ~2% of the nomograph", source: "Dumonteil (1992)" },
+      { name: "Chart assumptions", value: "elastic behavior, simultaneous column buckling, equal L/r; no tau_b", source: "AISC Commentary" },
+    ],
+  },
+  "steel-bolt-tension-shear": {
+    formula: "k = (LRFD) Fnt/(0.75 Fnv), (ASD) 2.00 Fnt/Fnv; F'nt = min(1.3 Fnt - k frv, Fnt) (floored at 0); available tension = 0.75 F'nt Ab (LRFD) or F'nt Ab/2.00 (ASD).",
+    edition: "The AISC 360-22 Section J3.7 reduced tensile stress for a bearing-type bolt in combined tension and shear, with the Table J3.2 nominal stresses, by name.",
+    freeAccess: "AISC 360 is free to read at aisc.org (Specification for Structural Steel Buildings); the J3.7 provision and Table J3.2 are in the published specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 J3.7 reduced tensile stress F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD, phi = 0.75) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD, Omega = 2.00), the available tension phi F'nt Ab, and the Table J3.2 Fnt/Fnv values (A325/F1852: Fnt = 90, Fnv = 54 threads-N / 68 threads-X ksi). This returns the reduced bolt tension capacity in a bearing-type connection under combined tension and shear - it takes the required shear stress frv as entered (= required shear/Ab), uses the bearing-type interaction (a slip-critical joint reduces the slip resistance instead, J3.9), and does not check the bolt shear/bearing itself or the connected-element limit states. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Reduced tension", value: "F'nt = 1.3 Fnt - k frv, capped at Fnt (no 1.3 benefit without shear) and floored at zero", source: "AISC 360-22 J3.7" },
+      { name: "Nominal stresses", value: "Table J3.2: A325 Fnt = 90, Fnv = 54 (threads-N) or 68 (threads-X) ksi", source: "AISC 360-22 Table J3.2" },
+      { name: "Bearing-type", value: "the bearing-type interaction; a slip-critical joint uses the J3.9 slip reduction", source: "AISC 360-22 J3.7 / J3.9" },
+    ],
+  },
   "steel-web-local-strength": {
     formula: "WLY Rn = Fy tw (5k + lb) interior, Fy tw (2.5k + lb) end (Omega 1.50 / phi 1.00); WC Rn = 0.80 tw^2 [1 + 3(lb/d)(tw/tf)^1.5] sqrt(E Fy tf/tw) (Omega 2.00 / phi 0.75); governing = min of the factored pair. (E = 29,000 ksi)",
     edition: "The AISC 360-22 J10.2 web local yielding and J10.3 web crippling limit states under a concentrated transverse force, with the interior/end coefficients and their differing resistance/safety factors, by name.",

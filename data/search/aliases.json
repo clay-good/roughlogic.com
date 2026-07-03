@@ -12027,6 +12027,136 @@
       "term": "survey tape error",
       "target": "taping-corrections",
       "kind": "adjacent"
+    },
+    {
+      "term": "beam column interaction",
+      "target": "steel-h1-interaction",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc h1",
+      "target": "steel-h1-interaction",
+      "kind": "industry"
+    },
+    {
+      "term": "combined axial and bending steel",
+      "target": "steel-h1-interaction",
+      "kind": "industry"
+    },
+    {
+      "term": "pr pc mr mc",
+      "target": "steel-h1-interaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "interaction equation steel",
+      "target": "steel-h1-interaction",
+      "kind": "industry"
+    },
+    {
+      "term": "8/9 interaction",
+      "target": "steel-h1-interaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column with moment",
+      "target": "steel-h1-interaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "steel unity check",
+      "target": "steel-h1-interaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "combined loading",
+      "target": "steel-h1-interaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "effective length factor",
+      "target": "steel-effective-length-k",
+      "kind": "industry"
+    },
+    {
+      "term": "k factor column",
+      "target": "steel-effective-length-k",
+      "kind": "industry"
+    },
+    {
+      "term": "alignment chart",
+      "target": "steel-effective-length-k",
+      "kind": "industry"
+    },
+    {
+      "term": "g factor",
+      "target": "steel-effective-length-k",
+      "kind": "industry"
+    },
+    {
+      "term": "sway braced frame",
+      "target": "steel-effective-length-k",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nomograph k",
+      "target": "steel-effective-length-k",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column end restraint",
+      "target": "steel-effective-length-k",
+      "kind": "adjacent"
+    },
+    {
+      "term": "effective length",
+      "target": "steel-effective-length-k",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bolt tension shear",
+      "target": "steel-bolt-tension-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "combined tension shear bolt",
+      "target": "steel-bolt-tension-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc j3.7",
+      "target": "steel-bolt-tension-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "f prime nt",
+      "target": "steel-bolt-tension-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "reduced bolt tension",
+      "target": "steel-bolt-tension-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "bolt interaction",
+      "target": "steel-bolt-tension-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bracket bolt",
+      "target": "steel-bolt-tension-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "moment end plate bolt",
+      "target": "steel-bolt-tension-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tension shear interaction",
+      "target": "steel-bolt-tension-shear",
+      "kind": "adjacent"
     }
   ]
 }
