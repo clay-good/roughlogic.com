@@ -8919,6 +8919,42 @@ export const CITATIONS = {
       { name: "Detailing separate", value: "special-reinforced shear-wall detailing, minimum reinforcement ratios, and the shear-friction base check are separate code requirements", source: "TMS 402-16" },
     ],
   },
+  "masonry-wall-weight": {
+    formula: "grout_term = grout_adder x min(cell_spacing/grout_spacing, 1) (0 if ungrouted); wall_psf = hollow_psf + grout_term; line_load = wall_psf x height; total = wall_psf x area.",
+    edition: "The NCMA (National Concrete Masonry Association) TEK wall-weight tables and the grout-proration method, by name.",
+    freeAccess: "The NCMA TEK wall-weight tables (by unit thickness and density) are published free at ncma.org. The NCMA tables and the engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA TEK table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Line load = wall psf x height; total = wall psf x area. This returns the dead load for the entered NCMA weights: the hollow weight and grout adder must come from the NCMA table for the actual unit, and it does not add the veneer, floor, or roof loads. A design aid; the NCMA weight tables and the engineer of record govern.",
+    assumptions: [
+      { name: "Grout proration", value: "grout_term = adder x (cell/grout spacing), capped at the full adder; 0 if ungrouted", source: "NCMA TEK" },
+      { name: "NCMA weights", value: "hollow weight and grout adder from the NCMA table for the unit thickness/density", source: "NCMA TEK tables" },
+      { name: "Wall only", value: "the masonry wall dead load; no veneer/floor/roof loads", source: "scope of this tile" },
+    ],
+  },
+  "brick-veneer-anchor-spacing": {
+    formula: "anchors = ceil(area / area_per_anchor); area_per = 2.67 ft^2 typical (2.0 high-demand); max 32 in horizontal, 24 in vertical spacing.",
+    edition: "TMS 402 (Building Code Requirements for Masonry Structures) and IBC 1405 veneer-anchor provisions, by name.",
+    freeAccess: "The veneer-anchor area and spacing limits are in TMS 402 and IBC Chapter 14 (many jurisdictions post the adopted IBC). TMS 402 / IBC and the engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical, 2.0 ft^2 for high wind/seismic demand), with maximum spacing of 32 in horizontal and 24 in vertical. The count = ceil(area / area-per-anchor); a tighter demand limit adds anchors on a denser grid, and if the max horizontal x vertical grid is smaller than the area limit, the spacing caps govern. This returns the count and grid for the entered limits: the area-per-anchor and spacing caps depend on the adopted edition, the anchor type, and the wind/seismic demand, and it does not design the anchor itself. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
+    assumptions: [
+      { name: "Area per anchor", value: "one anchor per <= 2.67 ft^2 (2.0 ft^2 high-demand); count = ceil(area/area_per)", source: "TMS 402 / IBC 1405" },
+      { name: "Spacing caps", value: "max 32 in horizontal, 24 in vertical; spacing can govern over area", source: "TMS 402 / IBC" },
+      { name: "Not anchor design", value: "verify the adopted edition and demand; does not design the anchor", source: "scope of this tile" },
+    ],
+  },
+  "masonry-lintel-loading": {
+    formula: "tri_h = span/2; if wall_above >= tri_h: W = 0.5 x span x tri_h x wall_psf (arching); else W = span x wall_above x wall_psf (full rectangle); UDL = W/span.",
+    edition: "The masonry arching-action lintel-load method (TMS 402 commentary / masonry design references), by name.",
+    freeAccess: "The 45-degree arching triangle for masonry lintel loads is a standard masonry-design method (TMS 402 commentary / masonry design references). The engineer of record governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2), W = 0.5 x span x (span/2) x wall psf, an equivalent UDL of W/span. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case. This returns the dead load only: add the floor/roof/superimposed loads within the triangle separately, and confirm the arching assumptions (bond, no control joint in the triangle). A design aid; the engineer of record governs.",
+    assumptions: [
+      { name: "Arching triangle", value: "45-degree triangle, height span/2; arches only when wall above >= span/2", source: "masonry design method" },
+      { name: "No arching case", value: "insufficient wall above -> the full rectangle span x height x psf (more load)", source: "masonry design method" },
+      { name: "Dead load only", value: "add floor/roof/superimposed loads separately; confirm bond and no control joint", source: "scope of this tile" },
+    ],
+  },
   "cmu-wall-axial": {
     formula: "Pa = (0.25 f'm An + 0.65 Ast Fs) x R; R = 1 - (h/(140 r))^2 for h/r <= 99, R = (70 r / h)^2 for h/r > 99 (branches meet at h/r = 99).",
     edition: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress axial-compression provisions for reinforced masonry, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",

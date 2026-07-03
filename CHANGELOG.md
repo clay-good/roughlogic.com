@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(masonry): land spec-v368..v370 -- 3 masonry-loads tiles in calc-masonry.js; 836 -> 839 tiles, 0.129.0, 2026-07-03
+
+The masonry-loads trio, thirty-second batch of the v275-v374 campaign: the dead-load and detailing numbers the reinforced-masonry design tiles assume, all in the existing lazy `calc-masonry.js` (Group E); no new module, group, or dependency. Catalog **836 -> 839**, package **0.128.0 -> 0.129.0** (a minor). Proposed 2026-07-02.
+
+- **`masonry-wall-weight` (spec-v368).** wall psf = hollow (NCMA) + grout adder x (cell/grout spacing, capped). Pinned: 8 in CMU, hollow 55, adder 29, grouted 48 in o.c. -> 59.8 psf (598 lb/ft at 10 ft); fully grouting -> 84 psf (840 lb/ft), a 40% heavier wall.
+- **`brick-veneer-anchor-spacing` (spec-v369).** anchors = ceil(area / area-per-anchor), 32/24 in spacing caps, per TMS 402 / IBC 1405. Pinned: a 200 ft^2 veneer at 2.67 ft^2/anchor -> 75 ties; a high-wind 2.0 ft^2 limit -> 100.
+- **`masonry-lintel-loading` (spec-v370).** the 45-degree arching triangle (height span/2) when the wall above >= span/2, else the full rectangle. Pinned: a 6 ft opening, 60 psf, 5 ft above -> 540 lb (90 lb/ft); only 2 ft above -> the full 720 lb (arching not developed).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the grout proration and cap, the ceil count, the arching branch switch, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the NCMA weight tables, TMS 402 / IBC 1405, and the masonry arching-action method. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory); corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-masonry.js 6500 -> 9000. Housekeeping: home count 836 -> 839, README resynced (counts, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 61 appended. All gates green at the new state: lint, unit tests (**5,132**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(elecdesign): land spec-v365..v367 -- 3 lighting light-loss / compliance tiles in calc-elecdesign.js; 833 -> 836 tiles, 0.128.0, 2026-07-03
 
 The lighting light-loss / compliance trio, thirty-first batch of the v275-v374 campaign: the maintained-light and code numbers the lumen-method tile assumes, all in the existing lazy `calc-elecdesign.js` (Group A); no new module, group, or dependency. Catalog **833 -> 836**, package **0.127.0 -> 0.128.0** (a minor). Proposed 2026-07-02.

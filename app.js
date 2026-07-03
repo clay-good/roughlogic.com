@@ -476,6 +476,7 @@ const TOOL_MODULES = (() => {
   // masonry's first structural (not takeoff) tiles. All three KEEP group "E".
   declare("./calc-masonry.js", "MASONRY_RENDERERS", [
     "cmu-wall-flexure", "cmu-shear-wall", "cmu-wall-axial",
+    "masonry-wall-weight", "brick-veneer-anchor-spacing", "masonry-lintel-loading",
   ]);
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio: a new
   // lazy Group E cluster closing the load path from seismic-base-shear /

@@ -218,3 +218,125 @@ MASONRY_RENDERERS["cmu-wall-axial"] = _simpleRenderer({
   ],
   compute: computeCmuWallAxial,
 });
+
+// ===================== spec-v368..v370: masonry loads batch (Group E) =====================
+// The dead-load and detailing numbers the reinforced-masonry design tiles assume:
+// the wall dead load from NCMA weights (v368), the brick-veneer anchor spacing and
+// count per TMS 402 / IBC (v369), and the triangular arching load a lintel carries
+// over an opening (v370).
+
+// dims: in { hollow_psf: M L^-1 T^-2, grout_adder: M L^-1 T^-2, cell_spacing: L, grout_spacing: L, height_ft: L, area_ft2: L^2 } out: { wall_psf: M L^-1 T^-2, line_load_plf: M T^-2, total_lb: M L T^-2 }
+export function computeMasonryWallWeight({ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, height_ft = 0, area_ft2 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hollow = Number(hollow_psf) || 0;
+  const adder = Number(grout_adder) || 0;
+  const cell = Number(cell_spacing) || 0;
+  const gs = Number(grout_spacing) || 0;
+  const h = Number(height_ft) || 0;
+  if (!(hollow > 0)) return { error: "Hollow wall weight must be positive (psf)." };
+  if (!(cell > 0)) return { error: "Grouted-cell spacing must be positive (in)." };
+  // Ungrouted when grout spacing is 0/blank; capped at full grout (spacing <= cell).
+  let grout_term = 0;
+  if (gs > 0) grout_term = adder * Math.min(cell / gs, 1);
+  const wall_psf = hollow + grout_term;
+  const line_load_plf = h > 0 ? wall_psf * h : null;
+  const area = Number(area_ft2) || 0;
+  const total_lb = area > 0 ? wall_psf * area : null;
+  return {
+    grout_term, wall_psf, line_load_plf, total_lb,
+    note: "Masonry wall dead load: the hollow (ungrouted) wall weight (NCMA table, by thickness and unit density) plus a grout adder prorated by the grout spacing - fully grouted at cell spacing, none if ungrouted, and in between for partial grout (grout_term = adder x cell/spacing, capped at the full adder). Fully grouting can add ~40% to the wall weight and its load on the footing, the trade between reinforcement/strength and dead load. Line load = wall psf x height; total = wall psf x area. A design aid; the NCMA weight tables and the engineer of record govern." ,
+  };
+}
+const masonryWallWeightExample = { inputs: { hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10, area_ft2: 0 } };
+MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
+  citation: "Citation: masonry wall dead load from NCMA weight tables: wall psf = hollow weight + grout adder x (cell spacing / grout spacing, capped at full); line load = psf x height. The NCMA TEK weight tables and the engineer of record govern.",
+  example: masonryWallWeightExample.inputs,
+  fields: [
+    { key: "hollow_psf", label: "Hollow wall weight (psf, NCMA)", kind: "number" },
+    { key: "grout_adder", label: "Full-grout weight adder (psf, NCMA)", kind: "number" },
+    { key: "cell_spacing", label: "Grouted-cell spacing at full grout (in; 8 CMU)", kind: "number", default: 8 },
+    { key: "grout_spacing", label: "Grout/rebar spacing (in; 0 = ungrouted)", kind: "number", default: 0 },
+    { key: "height_ft", label: "Wall height (ft, for line load)", kind: "number" },
+    { key: "area_ft2", label: "Wall area (ft^2, optional, for total)", kind: "number" },
+  ],
+  outputs: [
+    { key: "psf", id: "mww-out-psf", label: "Wall weight", value: (r) => fmt(r.wall_psf, 1) + " psf (grout adds " + fmt(r.grout_term, 1) + ")" },
+    { key: "line", id: "mww-out-line", label: "Line load", value: (r) => r.line_load_plf == null ? "(enter height)" : fmt(r.line_load_plf, 0) + " lb/ft" },
+    { key: "tot", id: "mww-out-tot", label: "Total dead load", value: (r) => r.total_lb == null ? "(enter area)" : fmt(r.total_lb, 0) + " lb" },
+    { key: "n", id: "mww-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryWallWeight,
+});
+
+// dims: in { area_ft2: L^2, area_per: L^2, max_horiz_in: L, max_vert_in: L } out: { anchors: dimensionless, grid_ft2: L^2 }
+export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 24 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(area_ft2) || 0;
+  const per = Number(area_per) || 0;
+  const mh = Number(max_horiz_in) > 0 ? Number(max_horiz_in) : 32;
+  const mv = Number(max_vert_in) > 0 ? Number(max_vert_in) : 24;
+  if (!(area > 0)) return { error: "Veneer wall area must be positive (ft^2)." };
+  if (!(per > 0)) return { error: "Maximum area per anchor must be positive (ft^2)." };
+  const anchors = Math.ceil(area / per);
+  const grid_ft2 = area / anchors;
+  const max_grid_ft2 = (mh * mv) / 144;
+  const spacing_governs = max_grid_ft2 < per;
+  return {
+    anchors, grid_ft2, max_horiz_in: mh, max_vert_in: mv, max_grid_ft2, spacing_governs,
+    note: "Brick-veneer anchor count per TMS 402 / IBC 1405: one anchor per no more than the entered wall area (2.67 ft^2 typical, 2.0 ft^2 for high wind/seismic demand), with maximum spacing of 32 in horizontal and 24 in vertical. The count = ceil(area / area-per-anchor). A tighter demand limit adds anchors on a denser grid. If the max horizontal x vertical grid (here " + ((mh * mv) / 144).toFixed(2) + " ft^2) is smaller than the area limit, the spacing caps govern the count. A detailing aid; TMS 402 / IBC and the engineer of record govern.",
+  };
+}
+const brickVeneerAnchorSpacingExample = { inputs: { area_ft2: 200, area_per: 2.67, max_horiz_in: 32, max_vert_in: 24 } };
+MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
+  citation: "Citation: brick-veneer anchor spacing per TMS 402 / IBC 1405: one anchor per <= 2.67 ft^2 (2.0 ft^2 high-demand), max 32 in horizontal / 24 in vertical. Count = ceil(area / area-per-anchor). TMS 402 / IBC and the engineer of record govern.",
+  example: brickVeneerAnchorSpacingExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Veneer wall area (ft^2)", kind: "number" },
+    { key: "area_per", label: "Max area per anchor (ft^2; 2.67, 2.0 high-demand)", kind: "number", default: 2.67 },
+    { key: "max_horiz_in", label: "Max horizontal spacing (in)", kind: "number", default: 32 },
+    { key: "max_vert_in", label: "Max vertical spacing (in)", kind: "number", default: 24 },
+  ],
+  outputs: [
+    { key: "a", id: "bva-out-a", label: "Anchors required", value: (r) => String(r.anchors) },
+    { key: "g", id: "bva-out-g", label: "Achieved area per anchor", value: (r) => fmt(r.grid_ft2, 2) + " ft^2/anchor" },
+    { key: "s", id: "bva-out-s", label: "Spacing cap check", value: (r) => "max grid " + fmt(r.max_grid_ft2, 2) + " ft^2 (" + r.max_horiz_in + " x " + r.max_vert_in + " in)" + (r.spacing_governs ? " -- spacing governs" : "") },
+    { key: "n", id: "bva-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBrickVeneerAnchorSpacing,
+});
+
+// dims: in { span_ft: L, wall_psf: M L^-1 T^-2, wall_h_above: L } out: { tri_h_ft: L, W_lb: M L T^-2, w_udl_plf: M T^-2 }
+export function computeMasonryLintelLoading({ span_ft = 0, wall_psf = 0, wall_h_above = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const span = Number(span_ft) || 0;
+  const psf = Number(wall_psf) || 0;
+  const hAbove = Number(wall_h_above) || 0;
+  if (!(span > 0)) return { error: "Opening span must be positive (ft)." };
+  if (!(psf > 0)) return { error: "Wall weight must be positive (psf)." };
+  if (!(hAbove > 0)) return { error: "Height of wall above the opening must be positive (ft)." };
+  const tri_h_ft = span / 2;
+  const arching = hAbove >= tri_h_ft;
+  const W_lb = arching ? 0.5 * span * tri_h_ft * psf : span * hAbove * psf;
+  const w_udl_plf = W_lb / span;
+  return {
+    tri_h_ft, arching, W_lb, w_udl_plf,
+    note: "Masonry lintel arching load: for masonry above an opening, the lintel carries only the triangular dead load within a 45-degree triangle (height = span/2) IF enough wall is above (wall above >= span/2). W = 0.5 x span x (span/2) x wall psf, an equivalent UDL of W/span. If the wall above is shorter than the triangle (a lintel near the top of the wall or under a beam bearing), arching is not developed and the lintel carries the full rectangle span x height x psf - MORE load than the arched case, which is why the arching reduction is not always available. Dead load only; add the floor/roof/superimposed loads separately. A design aid; the engineer of record governs.",
+  };
+}
+const masonryLintelLoadingExample = { inputs: { span_ft: 6, wall_psf: 60, wall_h_above: 5 } };
+MASONRY_RENDERERS["masonry-lintel-loading"] = _simpleRenderer({
+  citation: "Citation: masonry lintel arching load: the triangular dead load in a 45-degree triangle (height span/2) when the wall above >= span/2, else the full rectangle. W = 0.5 x span x (span/2) x wall psf. Dead load only; the engineer of record governs.",
+  example: masonryLintelLoadingExample.inputs,
+  fields: [
+    { key: "span_ft", label: "Opening (clear) span (ft)", kind: "number" },
+    { key: "wall_psf", label: "Wall weight above (psf)", kind: "number" },
+    { key: "wall_h_above", label: "Height of wall above opening (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "mll-out-w", label: "Lintel dead load", value: (r) => fmt(r.W_lb, 0) + " lb (" + (r.arching ? "arching, triangular" : "full rectangle -- arching not developed") + ")" },
+    { key: "u", id: "mll-out-u", label: "Equivalent UDL", value: (r) => fmt(r.w_udl_plf, 0) + " lb/ft" },
+    { key: "t", id: "mll-out-t", label: "Triangle height (span/2)", value: (r) => fmt(r.tri_h_ft, 2) + " ft" },
+    { key: "n", id: "mll-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryLintelLoading,
+});

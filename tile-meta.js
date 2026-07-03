@@ -543,6 +543,7 @@ const _TILES = [
   ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["retaining-wall-stability", "E"],
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (calc-masonry.js)
   ["cmu-wall-flexure", "E"], ["cmu-shear-wall", "E"], ["cmu-wall-axial", "E"],
+  ["masonry-wall-weight", "E"], ["brick-veneer-anchor-spacing", "E"], ["masonry-lintel-loading", "E"],
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio (calc-lateral.js)
   ["diaphragm-shear", "E"], ["shearwall-overturning", "E"], ["shearwall-deflection", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)

@@ -30534,6 +30534,88 @@
       "outputs": {
         "max_min": { "value": 50, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "masonry-wall-weight",
+      "source_publisher": "NCMA TEK",
+      "source_title": "8 in CMU, hollow 55 psf, grout adder 29, grouted 48 in o.c., 10 ft -> 59.8 psf, 598 lb/ft",
+      "source_edition_or_year": "spec-v368 worked example (machine-verified)",
+      "source_section_or_page": "spec-v368 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "hollow_psf": 55, "grout_adder": 29, "cell_spacing": 8, "grout_spacing": 48, "height_ft": 10, "area_ft2": 0 },
+      "outputs": {
+        "wall_psf": { "value": 59.83, "tolerance": { "pct": 0.5 } },
+        "line_load_plf": { "value": 598.3, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "masonry-wall-weight",
+      "source_publisher": "NCMA TEK",
+      "source_title": "cross-check: fully grouting (spacing 8) caps the adder -> 84 psf, 840 lb/ft, a 40% heavier wall",
+      "source_edition_or_year": "spec-v368 worked example (machine-verified)",
+      "source_section_or_page": "spec-v368 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "hollow_psf": 55, "grout_adder": 29, "cell_spacing": 8, "grout_spacing": 8, "height_ft": 10, "area_ft2": 0 },
+      "outputs": {
+        "wall_psf": { "value": 84, "tolerance": { "abs": 0.1 } },
+        "line_load_plf": { "value": 840, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "brick-veneer-anchor-spacing",
+      "source_publisher": "TMS 402 / IBC 1405",
+      "source_title": "200 ft^2 veneer at 2.67 ft^2/anchor -> 75 anchors",
+      "source_edition_or_year": "spec-v369 worked example (machine-verified)",
+      "source_section_or_page": "spec-v369 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "area_ft2": 200, "area_per": 2.67, "max_horiz_in": 32, "max_vert_in": 24 },
+      "outputs": {
+        "anchors": { "value": 75, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "brick-veneer-anchor-spacing",
+      "source_publisher": "TMS 402 / IBC 1405",
+      "source_title": "cross-check: a high-wind 2.0 ft^2 limit -> 100 anchors, a third more",
+      "source_edition_or_year": "spec-v369 worked example (machine-verified)",
+      "source_section_or_page": "spec-v369 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "area_ft2": 200, "area_per": 2.0, "max_horiz_in": 32, "max_vert_in": 24 },
+      "outputs": {
+        "anchors": { "value": 100, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "masonry-lintel-loading",
+      "source_publisher": "masonry design method",
+      "source_title": "6 ft opening, 60 psf, 5 ft above -> arching, 540 lb (90 lb/ft)",
+      "source_edition_or_year": "spec-v370 worked example (machine-verified)",
+      "source_section_or_page": "spec-v370 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "span_ft": 6, "wall_psf": 60, "wall_h_above": 5 },
+      "outputs": {
+        "W_lb": { "value": 540, "tolerance": { "abs": 1 } },
+        "w_udl_plf": { "value": 90, "tolerance": { "abs": 1 } }
+      }
+    },
+    {
+      "tile_id": "masonry-lintel-loading",
+      "source_publisher": "masonry design method",
+      "source_title": "cross-check: only 2 ft above, arching not developed -> the full rectangle 720 lb (120 lb/ft)",
+      "source_edition_or_year": "spec-v370 worked example (machine-verified)",
+      "source_section_or_page": "spec-v370 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "span_ft": 6, "wall_psf": 60, "wall_h_above": 2 },
+      "outputs": {
+        "W_lb": { "value": 720, "tolerance": { "abs": 1 } },
+        "w_udl_plf": { "value": 120, "tolerance": { "abs": 1 } }
+      }
     }
   ]
 }

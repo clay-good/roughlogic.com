@@ -1,6 +1,6 @@
 # roughlogic.com Specification v368 -- Masonry Wall Dead Load (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v368..v370 (the masonry loading/detailing trio -- the weight
+> **Status: LANDED (2026-07-03, package 0.129.0). Batch spec-v368..v370 (the masonry loading/detailing trio -- the weight
 > and detail numbers the structural CMU member tiles assume: the masonry wall dead load (this spec), the brick-veneer
 > anchor spacing (v369), and the arching-action load on a masonry lintel (v370).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the `cmu-wall-*` tiles design masonry members and

@@ -14367,6 +14367,141 @@
       "term": "exit lighting level",
       "target": "egress-lighting-check",
       "kind": "industry"
+    },
+    {
+      "term": "masonry wall weight",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "cmu wall dead load",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "block wall psf",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry dead load",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "grouted wall weight",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "wall load per foot",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "cmu pounds per square foot",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry self weight",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "wall weight foundation",
+      "target": "masonry-wall-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "brick veneer anchors",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "veneer tie spacing",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "brick tie count",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "tms 402 veneer",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "ibc 1405 veneer",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry anchor spacing",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "brick tie pattern",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "2.67 square feet anchor",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "veneer anchor layout",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry lintel load",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "arching action",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "lintel triangle load",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry lintel loading",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "45 degree triangle lintel",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "arching masonry",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "lintel dead load",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "load on lintel",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry opening load",
+      "target": "masonry-lintel-loading",
+      "kind": "industry"
     }
   ]
 }

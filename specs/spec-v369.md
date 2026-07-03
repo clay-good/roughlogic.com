@@ -1,6 +1,6 @@
 # roughlogic.com Specification v369 -- Brick Veneer Anchor Spacing and Count (TMS 402 / IBC 1405) (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v368..v370 (the masonry loading/detailing trio -- wall dead
+> **Status: LANDED (2026-07-03, package 0.129.0). Batch spec-v368..v370 (the masonry loading/detailing trio -- wall dead
 > load (v368), the brick-veneer anchor spacing (this spec), the lintel arching load (v370)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: anchored brick veneer is tied back to its backup by
 > corrugated or wire anchors on a prescribed maximum spacing and wall area per anchor -- the TMS 402 / IBC 1405 rule a mason

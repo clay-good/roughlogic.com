@@ -15014,3 +15014,51 @@ test("bounds: spec-v367 computeEgressLightingCheck pins the mode thresholds and 
   assert.ok("error" in _v367({ avg_fc: 1.2, min_fc: 0.5, max_fc: 0.3 })); // max < min
   assert.ok("error" in _v367({ avg_fc: Infinity, min_fc: 0.1, max_fc: 3 }));
 });
+
+// ===================== spec-v368..v370 masonry loads batch =====================
+import { computeMasonryWallWeight as _v368, computeBrickVeneerAnchorSpacing as _v369, computeMasonryLintelLoading as _v370 } from "../../calc-masonry.js";
+
+test("bounds: spec-v368 computeMasonryWallWeight pins the grout proration, the cap, and error seams", () => {
+  const r = _v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 48, height_ft: 10 });
+  assert.ok(Math.abs(r.grout_term - 29 * 8 / 48) < 1e-9);
+  assert.ok(Math.abs(r.wall_psf - 59.833) < 0.01);
+  assert.ok(Math.abs(r.line_load_plf - r.wall_psf * 10) < 1e-9);
+  // Fully grouting caps the adder.
+  const full = _v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 8, height_ft: 10 });
+  assert.ok(Math.abs(full.wall_psf - 84) < 1e-9 && Math.abs(full.grout_term - 29) < 1e-9);
+  // Ungrouted (spacing 0) adds no grout.
+  assert.ok(Math.abs(_v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 8, grout_spacing: 0 }).wall_psf - 55) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v368({ hollow_psf: 0, grout_adder: 29, cell_spacing: 8 }));
+  assert.ok("error" in _v368({ hollow_psf: 55, grout_adder: 29, cell_spacing: 0 }));
+  assert.ok("error" in _v368({ hollow_psf: Infinity, grout_adder: 29, cell_spacing: 8 }));
+});
+
+test("bounds: spec-v369 computeBrickVeneerAnchorSpacing pins the ceil count and error seams", () => {
+  const r = _v369({ area_ft2: 200, area_per: 2.67 });
+  assert.strictEqual(r.anchors, 75);
+  assert.ok(Math.abs(r.grid_ft2 - 200 / 75) < 1e-9);
+  // A tighter demand limit adds anchors.
+  const hw = _v369({ area_ft2: 200, area_per: 2.0 });
+  assert.strictEqual(hw.anchors, 100);
+  // Error seams.
+  assert.ok("error" in _v369({ area_ft2: 0, area_per: 2.67 }));
+  assert.ok("error" in _v369({ area_ft2: 200, area_per: 0 }));
+  assert.ok("error" in _v369({ area_ft2: NaN, area_per: 2.67 }));
+});
+
+test("bounds: spec-v370 computeMasonryLintelLoading pins the arching branch switch and error seams", () => {
+  const r = _v370({ span_ft: 6, wall_psf: 60, wall_h_above: 5 });
+  assert.strictEqual(r.tri_h_ft, 3);
+  assert.strictEqual(r.arching, true);
+  assert.ok(Math.abs(r.W_lb - 540) < 1e-9 && Math.abs(r.w_udl_plf - 90) < 1e-9);
+  // Not enough wall above -> the full rectangle (more load).
+  const norch = _v370({ span_ft: 6, wall_psf: 60, wall_h_above: 2 });
+  assert.strictEqual(norch.arching, false);
+  assert.ok(Math.abs(norch.W_lb - 720) < 1e-9 && norch.W_lb > r.W_lb);
+  // Error seams.
+  assert.ok("error" in _v370({ span_ft: 0, wall_psf: 60, wall_h_above: 5 }));
+  assert.ok("error" in _v370({ span_ft: 6, wall_psf: 0, wall_h_above: 5 }));
+  assert.ok("error" in _v370({ span_ft: 6, wall_psf: 60, wall_h_above: 0 }));
+  assert.ok("error" in _v370({ span_ft: Infinity, wall_psf: 60, wall_h_above: 5 }));
+});

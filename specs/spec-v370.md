@@ -1,6 +1,6 @@
 # roughlogic.com Specification v370 -- Masonry Lintel Arching Load (Triangular Load Over an Opening) (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v368..v370 (the masonry loading/detailing trio -- wall dead
+> **Status: LANDED (2026-07-03, package 0.129.0). Batch spec-v368..v370 (the masonry loading/detailing trio -- wall dead
 > load (v368), veneer anchor spacing (v369), the lintel arching load (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: a lintel over an opening in a masonry wall does not
 > carry the whole wall above it -- the masonry arches over the opening, so the lintel carries only the triangle of masonry
