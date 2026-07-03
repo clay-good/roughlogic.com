@@ -1,6 +1,6 @@
 # roughlogic.com Specification v312 -- Stadia Tacheometry (Distance and Elevation from a Stadia Interval) (calc-survey.js, Group P, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v311..v313 (the field-surveying depth trio -- differential
+> **Status: LANDED (2026-07-03, package 0.110.0; proposed 2026-07-02). Batch spec-v311..v313 (the field-surveying depth trio -- differential
 > leveling (v311), stadia tacheometry (this spec), taping corrections (v313)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog has pacing (`pacing-distance`) and
 > coordinate reduction but no stadia tacheometry -- the classic instrument method of reading a distance and elevation

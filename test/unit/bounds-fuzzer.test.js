@@ -13950,3 +13950,70 @@ test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the s
   assert.ok("error" in _v310({ ql_plf: 1000, h_ft: 10, x_ft: 4, z_ft: 12 })); // z > H
   assert.ok("error" in _v310({ ql_plf: Infinity, h_ft: 10, x_ft: 4, z_ft: 3 }));
 });
+
+// ===================== spec-v311..v313 field-surveying depth batch =====================
+import { computeDifferentialLeveling as _v311, computeStadiaDistance as _v312, computeTapingCorrections as _v313 } from "../../calc-survey.js";
+
+test("bounds: spec-v311 computeDifferentialLeveling pins the HI reduction, the sum identity, the misclosure, and error seams", () => {
+  const r = _v311({ bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 });
+  assert.ok(Math.abs(r.final_elev - 104.37) < 1e-9);
+  assert.ok(Math.abs(r.sum_bs - 9.92) < 1e-9);
+  assert.ok(Math.abs(r.sum_fs - 5.55) < 1e-9);
+  // The sum(BS) - sum(FS) identity equals the elevation change.
+  assert.ok(Math.abs((r.sum_bs - r.sum_fs) - (r.final_elev - 100.00)) < 1e-9);
+  assert.ok(Math.abs(r.misclosure - (-0.03)) < 1e-9);
+  // Per-turning-point HI reduction.
+  assert.ok(Math.abs(r.steps[0].hi - 104.32) < 1e-9);
+  assert.ok(Math.abs(r.steps[0].elev - 102.17) < 1e-9);
+  // No closing elevation -> null misclosure.
+  assert.strictEqual(_v311({ bm_elev: 100, bs: [4.32, 5.60], fs: [2.15, 3.40] }).misclosure, null);
+  // Error seams.
+  assert.ok("error" in _v311({ bm_elev: 100, bs: [4.32], fs: [2.15, 3.40] })); // count mismatch
+  assert.ok("error" in _v311({ bm_elev: 100, bs: [], fs: [] }));
+  assert.ok("error" in _v311({ bm_elev: 100, bs: [4.32, NaN], fs: [2.15, 3.40] }));
+  assert.ok("error" in _v311({ bm_elev: Infinity, bs: [4.32], fs: [2.15] }));
+});
+
+test("bounds: spec-v312 computeStadiaDistance pins the inclined case, the level-sight identity, and error seams", () => {
+  const r = _v312({ s_ft: 1.50, theta_deg: 5, k_f: 100, hi_ft: 4.50, rod_ft: 5.20, sta_elev: 500.00 });
+  const t = 5 * Math.PI / 180;
+  assert.ok(Math.abs(r.h_ft - 100 * 1.5 * Math.cos(t) * Math.cos(t)) < 1e-9);
+  assert.ok(Math.abs(r.v_ft - 100 * 1.5 * Math.cos(t) * Math.sin(t)) < 1e-9);
+  assert.ok(Math.abs(r.elev_ft - (500 + 4.5 + r.v_ft - 5.2)) < 1e-9);
+  assert.ok(Math.abs(r.h_ft - 148.86) < 0.02);
+  // Level sight: H = K s, V = 0.
+  const r2 = _v312({ s_ft: 1.50, theta_deg: 0, k_f: 100 });
+  assert.ok(Math.abs(r2.h_ft - 150) < 1e-9);
+  assert.ok(Math.abs(r2.v_ft) < 1e-12);
+  assert.strictEqual(r2.elev_ft, null);
+  // V uses sin(2 theta): equal magnitude, opposite sign for -theta.
+  const rNeg = _v312({ s_ft: 1.50, theta_deg: -5, k_f: 100 });
+  assert.ok(Math.abs(rNeg.v_ft + r.v_ft) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v312({ s_ft: 0, theta_deg: 5 }));
+  assert.ok("error" in _v312({ s_ft: 1.5, theta_deg: 95 }));
+  assert.ok("error" in _v312({ s_ft: 1.5, theta_deg: 5, k_f: 0 }));
+  assert.ok("error" in _v312({ s_ft: Infinity, theta_deg: 5 }));
+});
+
+test("bounds: spec-v313 computeTapingCorrections pins the temp sign flip, the omitted-defaults-zero, and error seams", () => {
+  const r = _v313({ l_ft: 100, t_f: 95, t0_f: 68, h_ft: 3 });
+  assert.ok(Math.abs(r.ct_ft - 6.45e-6 * 27 * 100) < 1e-9);
+  assert.ok(r.ct_ft > 0); // warm tape reads short, positive correction
+  assert.ok(Math.abs(r.ch_ft - (-9 / 200)) < 1e-9);
+  assert.strictEqual(r.cp_ft, 0); // omitted tension
+  assert.strictEqual(r.cs_ft, 0); // omitted sag
+  assert.ok(Math.abs(r.corrected_ft - 99.972) < 1e-3);
+  // Cold tape flips the temperature sign.
+  const r2 = _v313({ l_ft: 100, t_f: 40, t0_f: 68, h_ft: 0 });
+  assert.ok(r2.ct_ft < 0);
+  assert.strictEqual(r2.ch_ft, 0); // omitted slope
+  assert.ok(Math.abs(r2.corrected_ft - 99.982) < 1e-3);
+  // A tension correction when A and P are provided.
+  const r3 = _v313({ l_ft: 100, t_f: 68, t0_f: 68, p_lb: 20, p0_lb: 10, a_in2: 0.005 });
+  assert.ok(r3.cp_ft > 0);
+  // Error seams.
+  assert.ok("error" in _v313({ l_ft: 0 }));
+  assert.ok("error" in _v313({ l_ft: 100, w_plf: 1.5, p_lb: 0 })); // sag needs positive pull
+  assert.ok("error" in _v313({ l_ft: Infinity }));
+});

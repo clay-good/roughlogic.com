@@ -963,6 +963,10 @@ const RELATED = {
   "soil-consolidation-settlement": ["soil-settlement-elastic","soil-bearing-capacity","pile-axial-capacity"],
   "footing-eccentric-pressure": ["soil-bearing-capacity","retaining-wall-stability","footing-area"],
   "boussinesq-surcharge-wall": ["lateral-earth-pressure","retaining-wall-stability","footing-eccentric-pressure"],
+  // spec-v311..v313 field-surveying depth batch (Group P)
+  "differential-leveling": ["traverse-closure","stadia-distance","drainage-invert"],
+  "stadia-distance": ["differential-leveling","pacing-distance","traverse-closure"],
+  "taping-corrections": ["differential-leveling","stadia-distance","traverse-closure"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

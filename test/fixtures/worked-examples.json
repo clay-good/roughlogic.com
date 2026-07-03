@@ -28955,6 +28955,93 @@
       "outputs": {
         "sigma_h_psf": { "value": 68.3, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "differential-leveling",
+      "source_publisher": "Height-of-instrument leveling (Ghilani/Wolf)",
+      "source_title": "BM 100.00 ft, BS 4.32/5.60, FS 2.15/3.40 -> 104.37 ft, misclosure -0.03 on 104.40",
+      "source_edition_or_year": "spec-v311 worked example (machine-verified)",
+      "source_section_or_page": "spec-v311 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "bm_elev": 100.00, "bs": [4.32, 5.60], "fs": [2.15, 3.40], "known_close": 104.40 },
+      "outputs": {
+        "final_elev": { "value": 104.37, "tolerance": { "abs": 0.005 } },
+        "misclosure": { "value": -0.03, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "differential-leveling",
+      "source_publisher": "Height-of-instrument leveling (Ghilani/Wolf)",
+      "source_title": "cross-check: no closing elevation -> final 104.37 ft, misclosure not computed",
+      "source_edition_or_year": "spec-v311 worked example (machine-verified)",
+      "source_section_or_page": "spec-v311 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "bm_elev": 100.00, "bs": [4.32, 5.60], "fs": [2.15, 3.40] },
+      "outputs": {
+        "final_elev": { "value": 104.37, "tolerance": { "abs": 0.005 } },
+        "sum_bs": { "value": 9.92, "tolerance": { "abs": 0.005 } },
+        "sum_fs": { "value": 5.55, "tolerance": { "abs": 0.005 } }
+      }
+    },
+    {
+      "tile_id": "stadia-distance",
+      "source_publisher": "Stadia tacheometry (K = 100)",
+      "source_title": "1.50 ft interval at +5 deg, sta 500 / HI 4.50 / rod 5.20 -> H 148.86, V 13.02, elev 512.32",
+      "source_edition_or_year": "spec-v312 worked example (machine-verified)",
+      "source_section_or_page": "spec-v312 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "s_ft": 1.50, "theta_deg": 5, "k_f": 100, "hi_ft": 4.50, "rod_ft": 5.20, "sta_elev": 500.00 },
+      "outputs": {
+        "h_ft": { "value": 148.86, "tolerance": { "pct": 0.1 } },
+        "v_ft": { "value": 13.02, "tolerance": { "pct": 0.2 } },
+        "elev_ft": { "value": 512.32, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "stadia-distance",
+      "source_publisher": "Stadia tacheometry (K = 100)",
+      "source_title": "cross-check: level sight (theta 0) -> H 150.0, V 0",
+      "source_edition_or_year": "spec-v312 worked example (machine-verified)",
+      "source_section_or_page": "spec-v312 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "s_ft": 1.50, "theta_deg": 0, "k_f": 100 },
+      "outputs": {
+        "h_ft": { "value": 150.0, "tolerance": { "pct": 0.1 } },
+        "v_ft": { "value": 0, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "taping-corrections",
+      "source_publisher": "Steel-tape corrections (Ghilani/Wolf)",
+      "source_title": "100 ft at 95 F down a 3 ft grade -> Ct +0.017, Ch -0.045, corrected 99.972 ft",
+      "source_edition_or_year": "spec-v313 worked example (machine-verified)",
+      "source_section_or_page": "spec-v313 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_ft": 100, "t_f": 95, "t0_f": 68, "h_ft": 3 },
+      "outputs": {
+        "ct_ft": { "value": 0.0174, "tolerance": { "abs": 0.0005 } },
+        "ch_ft": { "value": -0.045, "tolerance": { "abs": 0.0005 } },
+        "corrected_ft": { "value": 99.972, "tolerance": { "abs": 0.002 } }
+      }
+    },
+    {
+      "tile_id": "taping-corrections",
+      "source_publisher": "Steel-tape corrections (Ghilani/Wolf)",
+      "source_title": "cross-check: cold tape (40 F) on level ground -> Ct -0.018, corrected 99.982 ft",
+      "source_edition_or_year": "spec-v313 worked example (machine-verified)",
+      "source_section_or_page": "spec-v313 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_ft": 100, "t_f": 40, "t0_f": 68, "h_ft": 0 },
+      "outputs": {
+        "ct_ft": { "value": -0.0181, "tolerance": { "abs": 0.0005 } },
+        "corrected_ft": { "value": 99.982, "tolerance": { "abs": 0.002 } }
+      }
     }
   ]
 }

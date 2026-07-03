@@ -1,6 +1,6 @@
 # roughlogic.com Specification v311 -- Differential Leveling (HI Method) and Loop Misclosure (calc-survey.js, Group P, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v311..v313 (the field-surveying depth trio -- the leveling and
+> **Status: LANDED (2026-07-03, package 0.110.0; proposed 2026-07-02). Batch spec-v311..v313 (the field-surveying depth trio -- the leveling and
 > taping computations the coordinate tiles never cover: differential leveling to carry an elevation (this spec), stadia
 > tacheometry for distance and elevation (v312), and the temperature/slope corrections to a taped distance (v313).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog reduces horizontal traverses

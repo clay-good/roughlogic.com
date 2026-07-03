@@ -209,3 +209,164 @@ function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
   for (const f of [courses.input, n0.input, e0.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["traverse-closure"] = renderTraverseClosure;
+
+// ===================== spec-v311..v313: field-surveying depth batch =====================
+// The leveling and taping computations the coordinate tiles never cover:
+// differential leveling to carry an elevation, stadia tacheometry for distance
+// and elevation from a rod interval, and the temperature/slope/tension/sag
+// corrections to a raw taped distance.
+
+// dims: in { bm_elev: L, bs: dimensionless, fs: dimensionless, known_close: L } out: { sum_bs: L, sum_fs: L, final_elev: L, misclosure: L }
+export function computeDifferentialLeveling({ bm_elev = 0, bs, fs, known_close = null } = {}) {
+  const _g = _finiteGuard({ bm_elev, known_close: known_close === null ? 0 : known_close }); if (_g) return _g;
+  if (!Array.isArray(bs) || !Array.isArray(fs)) return { error: "Backsights and foresights must be lists." };
+  if (bs.length < 1 || fs.length < 1) return { error: "Need at least one backsight and one foresight." };
+  if (bs.length !== fs.length) return { error: "Each setup needs one backsight and one foresight (equal counts)." };
+  for (const v of [...bs, ...fs]) { if (!Number.isFinite(v)) return { error: "Every rod reading must be a finite number." }; }
+  let sum_bs = 0, sum_fs = 0;
+  const steps = [];
+  let elev = bm_elev;
+  for (let i = 0; i < bs.length; i++) {
+    const hi = elev + bs[i];
+    elev = hi - fs[i];
+    sum_bs += bs[i];
+    sum_fs += fs[i];
+    steps.push({ hi, elev });
+  }
+  const final_elev = elev;
+  const misclosure = known_close === null ? null : final_elev - known_close;
+  return {
+    sum_bs, sum_fs, final_elev, misclosure, steps,
+    note: "Height-of-instrument differential leveling: at each setup HI = elevation + backsight, and the next point elevation = HI - foresight, so the run's elevation change is sum(BS) - sum(FS). A level loop returning to a known elevation should close, and the misclosure = computed closing elevation - known closing elevation is the arithmetic check the field book is balanced against (an ordinary tolerance is about 0.05 sqrt(miles), or the project spec). This carries the elevations and the misclosure but does not distribute the error back through the turning points (a proportional adjustment is a follow-on), assumes rod readings already corrected for rod/collimation error, and does not set the allowable-misclosure standard. A computational aid; the project survey control and specifications govern.",
+  };
+}
+export const differentialLevelingExample = { inputs: { bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 } };
+
+function renderDifferentialLeveling(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: height-of-instrument differential leveling HI = elev + BS, elev = HI - FS, elevation change sum(BS) - sum(FS), and the loop misclosure, per the standard surveying references (Ghilani/Wolf), by name. Arithmetic reduction only; the project control and specs govern.";
+  const bm = makeNumber("Benchmark elevation (ft)", "dl-bm", { step: "any" }); bm.input.value = "100.00";
+  const bs = makeTextarea("Backsights, one per line (ft)", "dl-bs", { rows: "3" }); bs.input.value = "4.32\n5.60";
+  const fs = makeTextarea("Foresights, one per line (ft)", "dl-fs", { rows: "3" }); fs.input.value = "2.15\n3.40";
+  const kc = makeNumber("Known closing elevation (ft, optional)", "dl-kc", { step: "any" }); kc.input.value = "104.40";
+  for (const f of [bm, bs, fs, kc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bm.input.value = "100.00"; bs.input.value = "4.32\n5.60"; fs.input.value = "2.15\n3.40"; kc.input.value = "104.40"; update(); });
+  const oFinal = makeOutputLine(outputRegion, "Final elevation", "dl-out-final");
+  const oSums = makeOutputLine(outputRegion, "sum(BS) - sum(FS)", "dl-out-sums");
+  const oMis = makeOutputLine(outputRegion, "Loop misclosure", "dl-out-mis");
+  const oNote = makeOutputLine(outputRegion, "Note", "dl-out-note");
+  function parseNums(text) {
+    const out = [];
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim(); if (!line) continue;
+      const v = Number(line); if (!Number.isFinite(v)) return null; out.push(v);
+    }
+    return out;
+  }
+  const update = debounce(() => {
+    const bsArr = parseNums(bs.input.value), fsArr = parseNums(fs.input.value);
+    if (bsArr === null || fsArr === null) { oFinal.textContent = "Each rod reading must be a finite number, one per line."; oSums.textContent = "-"; oMis.textContent = "-"; oNote.textContent = "-"; return; }
+    const kcVal = kc.input.value.trim() === "" ? null : Number(kc.input.value);
+    const r = computeDifferentialLeveling({ bm_elev: Number(bm.input.value) || 0, bs: bsArr, fs: fsArr, known_close: kcVal });
+    if (r.error) { oFinal.textContent = r.error; oSums.textContent = "-"; oMis.textContent = "-"; oNote.textContent = "-"; return; }
+    oFinal.textContent = fmt(r.final_elev, 2) + " ft";
+    oSums.textContent = fmt(r.sum_bs, 2) + " - " + fmt(r.sum_fs, 2) + " = " + fmt(r.sum_bs - r.sum_fs, 2) + " ft rise";
+    oMis.textContent = r.misclosure === null ? "- (no closing elevation entered)" : fmt(r.misclosure, 3) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bm.input, bs.input, fs.input, kc.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["differential-leveling"] = renderDifferentialLeveling;
+
+// dims: in { s_ft: L, theta_deg: dimensionless, k_f: dimensionless, hi_ft: L, rod_ft: L, sta_elev: L } out: { h_ft: L, v_ft: L, elev_ft: L }
+export function computeStadiaDistance({ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(s_ft > 0)) return { error: "Stadia interval must be positive (ft)." };
+  if (!(theta_deg > -90 && theta_deg < 90)) return { error: "Vertical angle must be between -90 and 90 degrees." };
+  if (!(k_f > 0)) return { error: "The stadia interval factor K must be positive (100 typical)." };
+  const t = (theta_deg * Math.PI) / 180;
+  const h_ft = k_f * s_ft * Math.cos(t) * Math.cos(t);
+  const v_ft = k_f * s_ft * Math.cos(t) * Math.sin(t);
+  const has_elev = hi_ft !== 0 || rod_ft !== 0 || sta_elev !== 0;
+  const elev_ft = has_elev ? sta_elev + hi_ft + v_ft - rod_ft : null;
+  return {
+    h_ft, v_ft, elev_ft,
+    note: "Stadia tacheometry with the interval factor K (default 100): the horizontal distance H = K s cos^2(theta), the vertical distance V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta), and the target elevation = station elevation + HI + V - rod center. On a level sight (theta = 0) this reduces to the bare H = K s with no rise. Assumes an internal-focusing instrument (stadia constant C ~ 0; add C cos theta / C for an external-focusing constant), takes the vertical angle from the horizontal, and does not correct for earth curvature/refraction over long sights or a rod not held plumb. A computational aid; the instrument's stadia constants and the field procedure govern.",
+  };
+}
+export const stadiaDistanceExample = { inputs: { s_ft: 1.50, theta_deg: 5, k_f: 100, hi_ft: 4.50, rod_ft: 5.20, sta_elev: 500.00 } };
+
+function renderStadiaDistance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: stadia horizontal distance H = K s cos^2(theta), vertical V = (K s/2) sin(2 theta), elevation = HI + V - rod, K = 100, per the standard surveying references, by name. Internal-focusing instrument, no curvature/refraction. A computational aid; the instrument constants govern.";
+  const s = makeNumber("Stadia interval (upper - lower, ft)", "sd-s", { step: "any", min: "0" });
+  const th = makeNumber("Vertical angle from horizontal (deg, + up)", "sd-th", { step: "any" });
+  const k = makeNumber("Stadia interval factor K", "sd-k", { step: "any", min: "0" }); k.input.value = "100";
+  const hi = makeNumber("Height of instrument (ft, optional)", "sd-hi", { step: "any" });
+  const rod = makeNumber("Rod center reading (ft, optional)", "sd-rod", { step: "any" });
+  const sta = makeNumber("Station elevation (ft, optional)", "sd-sta", { step: "any" });
+  for (const f of [s, th, k, hi, rod, sta]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { s.input.value = "1.50"; th.input.value = "5"; k.input.value = "100"; hi.input.value = "4.50"; rod.input.value = "5.20"; sta.input.value = "500.00"; update(); });
+  const oH = makeOutputLine(outputRegion, "Horizontal distance", "sd-out-h");
+  const oV = makeOutputLine(outputRegion, "Vertical distance", "sd-out-v");
+  const oElev = makeOutputLine(outputRegion, "Target elevation", "sd-out-elev");
+  const oNote = makeOutputLine(outputRegion, "Note", "sd-out-note");
+  const update = debounce(() => {
+    const r = computeStadiaDistance({ s_ft: Number(s.input.value) || 0, theta_deg: Number(th.input.value) || 0, k_f: Number(k.input.value) || 0, hi_ft: Number(hi.input.value) || 0, rod_ft: Number(rod.input.value) || 0, sta_elev: Number(sta.input.value) || 0 });
+    if (r.error) { oH.textContent = r.error; oV.textContent = "-"; oElev.textContent = "-"; oNote.textContent = "-"; return; }
+    oH.textContent = fmt(r.h_ft, 2) + " ft";
+    oV.textContent = fmt(r.v_ft, 2) + " ft";
+    oElev.textContent = r.elev_ft === null ? "- (enter station elev / HI / rod)" : fmt(r.elev_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [s.input, th.input, k.input, hi.input, rod.input, sta.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["stadia-distance"] = renderStadiaDistance;
+
+// dims: in { l_ft: L, t_f: T, t0_f: T, h_ft: L, p_lb: M L T^-2, p0_lb: M L T^-2, a_in2: L^2, w_plf: M T^-2, alpha_f: dimensionless, e_psi: M L^-1 T^-2 } out: { ct_ft: L, ch_ft: L, cp_ft: L, cs_ft: L, corrected_ft: L }
+export function computeTapingCorrections({ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_plf = 0, alpha_f = 6.45e-6, e_psi = 29e6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(l_ft > 0)) return { error: "Measured length must be positive (ft)." };
+  const ct_ft = alpha_f * (t_f - t0_f) * l_ft;
+  const ch_ft = h_ft !== 0 ? -(h_ft * h_ft) / (2 * l_ft) : 0;
+  let cp_ft = 0;
+  if (p_lb !== 0 && a_in2 > 0) {
+    if (!(e_psi > 0)) return { error: "The tape modulus must be positive when a tension correction is applied." };
+    cp_ft = ((p_lb - p0_lb) * l_ft) / (a_in2 * e_psi);
+  }
+  let cs_ft = 0;
+  if (w_plf !== 0) {
+    if (!(p_lb > 0)) return { error: "The applied pull must be positive when a sag correction is applied." };
+    cs_ft = -(w_plf * w_plf * Math.pow(l_ft, 3)) / (24 * p_lb * p_lb);
+  }
+  const corrected_ft = l_ft + ct_ft + ch_ft + cp_ft + cs_ft;
+  return {
+    ct_ft, ch_ft, cp_ft, cs_ft, corrected_ft,
+    note: "Steel-tape distance corrections added to the measured length: temperature Ct = alpha (T - T0) L (alpha = 6.45e-6 /degF for steel; a warm tape expands and reads short, so the correction is positive), slope Ch = -h^2/(2L) reducing a slope distance to horizontal, tension Cp = (P - P0) L/(A E), and sag Cs = -w^2 L^3/(24 P^2) for an unsupported span. The slope term uses the approximate -h^2/(2L) (exact sqrt(L^2 - h^2) for steep grades); the sag term is zero when the tape is fully supported; omitted corrections default to zero. It does not cover the tape's own standardization/index error. A computational aid; the tape calibration and field procedure govern.",
+  };
+}
+export const tapingCorrectionsExample = { inputs: { l_ft: 100, t_f: 95, t0_f: 68, h_ft: 3, alpha_f: 6.45e-6, e_psi: 29e6 } };
+
+function renderTapingCorrections(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: steel-tape corrections temperature Ct = alpha (T - T0) L (alpha 6.45e-6 /degF), slope Ch = -h^2/(2L), tension Cp = (P - P0) L/(A E), sag Cs = -w^2 L^3/(24 P^2), per the standard surveying references (Ghilani/Wolf), by name. Approximate slope, unsupported sag. A computational aid; the tape calibration governs.";
+  const l = makeNumber("Measured length L (ft)", "tap-l", { step: "any", min: "0" });
+  const t = makeNumber("Field temperature (degF)", "tap-t", { step: "any" }); t.input.value = "68";
+  const t0 = makeNumber("Standardization temperature (degF)", "tap-t0", { step: "any" }); t0.input.value = "68";
+  const h = makeNumber("Elevation difference over span (ft, optional)", "tap-h", { step: "any" });
+  const p = makeNumber("Applied pull P (lb, optional)", "tap-p", { step: "any" });
+  const p0 = makeNumber("Standardization pull P0 (lb, optional)", "tap-p0", { step: "any" });
+  const a = makeNumber("Tape cross-section A (in^2, optional)", "tap-a", { step: "any", min: "0" });
+  const w = makeNumber("Tape weight per foot (lb/ft, optional)", "tap-w", { step: "any" });
+  for (const f of [l, t, t0, h, p, p0, a, w]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { l.input.value = "100"; t.input.value = "95"; t0.input.value = "68"; h.input.value = "3"; p.input.value = ""; p0.input.value = ""; a.input.value = ""; w.input.value = ""; update(); });
+  const oCorr = makeOutputLine(outputRegion, "Corrected horizontal distance", "tap-out-corr");
+  const oBreak = makeOutputLine(outputRegion, "Corrections (temp / slope / tension / sag)", "tap-out-break");
+  const oNote = makeOutputLine(outputRegion, "Note", "tap-out-note");
+  const update = debounce(() => {
+    const r = computeTapingCorrections({ l_ft: Number(l.input.value) || 0, t_f: Number(t.input.value) || 0, t0_f: Number(t0.input.value) || 0, h_ft: Number(h.input.value) || 0, p_lb: Number(p.input.value) || 0, p0_lb: Number(p0.input.value) || 0, a_in2: Number(a.input.value) || 0, w_plf: Number(w.input.value) || 0 });
+    if (r.error) { oCorr.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = "-"; return; }
+    oCorr.textContent = fmt(r.corrected_ft, 3) + " ft";
+    oBreak.textContent = fmt(r.ct_ft, 3) + " / " + fmt(r.ch_ft, 3) + " / " + fmt(r.cp_ft, 4) + " / " + fmt(r.cs_ft, 4) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [l.input, t.input, t0.input, h.input, p.input, p0.input, a.input, w.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["taping-corrections"] = renderTapingCorrections;

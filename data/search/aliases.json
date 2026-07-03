@@ -11897,6 +11897,136 @@
       "term": "lateral pressure setback",
       "target": "boussinesq-surcharge-wall",
       "kind": "adjacent"
+    },
+    {
+      "term": "differential leveling",
+      "target": "differential-leveling",
+      "kind": "industry"
+    },
+    {
+      "term": "hi method",
+      "target": "differential-leveling",
+      "kind": "industry"
+    },
+    {
+      "term": "backsight foresight",
+      "target": "differential-leveling",
+      "kind": "industry"
+    },
+    {
+      "term": "level loop",
+      "target": "differential-leveling",
+      "kind": "industry"
+    },
+    {
+      "term": "benchmark elevation",
+      "target": "differential-leveling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "height of instrument",
+      "target": "differential-leveling",
+      "kind": "industry"
+    },
+    {
+      "term": "level circuit misclosure",
+      "target": "differential-leveling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "carry elevation",
+      "target": "differential-leveling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "survey leveling",
+      "target": "differential-leveling",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stadia",
+      "target": "stadia-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "tacheometry",
+      "target": "stadia-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "stadia interval",
+      "target": "stadia-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "stadia distance",
+      "target": "stadia-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "transit stadia",
+      "target": "stadia-distance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "topo stadia",
+      "target": "stadia-distance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rod interval distance",
+      "target": "stadia-distance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stadia elevation",
+      "target": "stadia-distance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "taping corrections",
+      "target": "taping-corrections",
+      "kind": "industry"
+    },
+    {
+      "term": "tape temperature correction",
+      "target": "taping-corrections",
+      "kind": "industry"
+    },
+    {
+      "term": "slope correction tape",
+      "target": "taping-corrections",
+      "kind": "industry"
+    },
+    {
+      "term": "sag correction",
+      "target": "taping-corrections",
+      "kind": "industry"
+    },
+    {
+      "term": "tension correction tape",
+      "target": "taping-corrections",
+      "kind": "adjacent"
+    },
+    {
+      "term": "steel tape distance",
+      "target": "taping-corrections",
+      "kind": "industry"
+    },
+    {
+      "term": "chaining corrections",
+      "target": "taping-corrections",
+      "kind": "adjacent"
+    },
+    {
+      "term": "reduce to horizontal",
+      "target": "taping-corrections",
+      "kind": "adjacent"
+    },
+    {
+      "term": "survey tape error",
+      "target": "taping-corrections",
+      "kind": "adjacent"
     }
   ]
 }

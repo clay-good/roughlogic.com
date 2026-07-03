@@ -7671,6 +7671,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "differential-leveling": {
+    formula: "HI_i = elev_(i-1) + BS_i; elev_i = HI_i - FS_i; final_elev = bm + sum(BS) - sum(FS); misclosure = final_elev - known_close.",
+    edition: "The height-of-instrument differential-leveling reduction and the loop-misclosure check, as compiled in the standard surveying references (Ghilani/Wolf, Elementary Surveying), by name.",
+    freeAccess: "The HI leveling method and the loop-misclosure check are public surveying results; FM 5-233 (Construction Surveying) is a public-domain US Government reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "The height-of-instrument method HI = elevation + BS, elevation = HI - FS, the elevation change sum(BS) - sum(FS), and the loop misclosure = computed closing elevation - known closing elevation, as compiled in the standard surveying references. This returns the carried elevations and the loop misclosure - it applies the arithmetic HI reduction, does not distribute the misclosure back through the turning points (a proportional adjustment is a follow-on), assumes rod readings already corrected for any rod/collimation error, and does not set an allowable-misclosure standard (0.05 sqrt(miles) or the project spec governs). A computational aid; the project survey control and specifications govern.",
+    assumptions: [
+      { name: "HI method", value: "HI = elev + BS, elev = HI - FS; elevation change = sum(BS) - sum(FS)", source: "Ghilani/Wolf Elementary Surveying" },
+      { name: "Misclosure", value: "computed closing elevation minus the known closing elevation on a loop", source: "leveling practice" },
+      { name: "No adjustment", value: "the misclosure is not distributed back through the turning points here", source: "scope of this tile" },
+    ],
+  },
+  "stadia-distance": {
+    formula: "H = K s cos^2(theta); V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta); elevation = station_elev + HI + V - rod_center. (K = 100)",
+    edition: "The stadia-tacheometry distance and elevation reduction with the standard interval factor K = 100, as compiled in the standard surveying references, by name.",
+    freeAccess: "The stadia-reduction formulas are public surveying results in any elementary-surveying reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "The stadia horizontal distance H = K s cos^2(theta), the vertical distance V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta), the elevation = HI + V - rod-center, and the standard interval factor K = 100 (stadia constant C ~ 0 for internal-focusing instruments). This returns the reduced horizontal distance, vertical distance, and elevation from a stadia reading - it assumes an internal-focusing instrument (C = 0; add C cos theta / C for an external-focusing stadia constant), takes the vertical angle from the horizontal, and does not correct for earth curvature/refraction over long sights or for a rod not held plumb. A computational aid; the instrument's stadia constants and the field procedure govern.",
+    assumptions: [
+      { name: "Horizontal distance", value: "H = K s cos^2(theta) with K = 100 for an internal-focusing instrument", source: "stadia tacheometry" },
+      { name: "Vertical distance", value: "V = (K s/2) sin(2 theta); elevation = HI + V - rod center", source: "stadia tacheometry" },
+      { name: "Internal focusing", value: "stadia constant C ~ 0; external-focusing instruments add a C term", source: "instrument convention" },
+    ],
+  },
+  "taping-corrections": {
+    formula: "Ct = alpha (T - T0) L; Ch = -h^2/(2L); Cp = (P - P0) L/(A E); Cs = -w^2 L^3/(24 P^2); corrected = L + Ct + Ch + Cp + Cs. (alpha = 6.45e-6 /degF)",
+    edition: "The four steel-tape distance corrections (temperature, slope, tension, sag) added to the measured length, as compiled in the standard surveying references (Ghilani/Wolf), by name.",
+    freeAccess: "The taping-correction formulas and the steel thermal coefficient are public surveying results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The temperature Ct = alpha (T - T0) L (alpha = 6.45e-6 /degF for steel), slope Ch = -h^2/(2L), tension Cp = (P - P0) L/(A E), and sag Cs = -w^2 L^3/(24 P^2) corrections, added to the measured length. This returns the corrected horizontal distance for a steel tape - the slope correction uses the approximate -h^2/(2L) (exact sqrt(L^2 - h^2) for steep grades), the sag term applies only to an unsupported span (zero when the tape is fully supported), and it does not cover the tape's own standardization/index error (a separate calibration constant). A computational aid; the tape's calibration and the field procedure govern.",
+    assumptions: [
+      { name: "Temperature", value: "Ct = alpha (T - T0) L; a warm tape expands and reads short (positive correction)", source: "surveying references" },
+      { name: "Slope", value: "Ch = -h^2/(2L), the approximate reduction to horizontal (exact sqrt(L^2 - h^2) for steep grades)", source: "surveying references" },
+      { name: "Tension and sag", value: "Cp = (P - P0) L/(A E); Cs = -w^2 L^3/(24 P^2) for an unsupported span", source: "surveying references" },
+    ],
+  },
   "reynolds-number-pipe": {
     formula: "Re = V (D/12) / nu; regime = Re < 2,300 laminar, <= 4,000 transitional, else turbulent.",
     edition: "The Reynolds number Re = V D / nu (= rho V D / mu) and the standard pipe-flow transition bands, with a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, a standard fluid-mechanics result, by name.",

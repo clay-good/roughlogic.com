@@ -438,6 +438,8 @@ const _TILES = [
   ["reynolds-number-pipe", "C"], ["hydronic-gpm-deltat", "C"], ["pump-specific-speed", "C"],
   // spec-v308..v310 geotechnical depth-2 batch (calc-geotech.js Group E)
   ["soil-consolidation-settlement", "E"], ["footing-eccentric-pressure", "E"], ["boussinesq-surcharge-wall", "E"],
+  // spec-v311..v313 field-surveying depth batch (calc-survey.js Group P)
+  ["differential-leveling", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

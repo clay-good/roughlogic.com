@@ -1,6 +1,6 @@
 # roughlogic.com Specification v313 -- Steel Tape Distance Corrections (Temperature, Slope, Tension, Sag) (calc-survey.js, Group P, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v311..v313 (the field-surveying depth trio -- differential
+> **Status: LANDED (2026-07-03, package 0.110.0; proposed 2026-07-02). Batch spec-v311..v313 (the field-surveying depth trio -- differential
 > leveling (v311), stadia tacheometry (v312), taping corrections (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog reduces measured distances into
 > coordinates but never corrects the raw taped distance for the field conditions that bias it -- temperature, slope,

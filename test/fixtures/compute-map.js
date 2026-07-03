@@ -679,6 +679,10 @@ export const COMPUTE_MAP = {
   "soil-consolidation-settlement": { module: "../../calc-geotech.js", fn: "computeSoilConsolidationSettlement" },
   "footing-eccentric-pressure": { module: "../../calc-geotech.js", fn: "computeFootingEccentricPressure" },
   "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", fn: "computeBoussinesqSurchargeWall" },
+  // spec-v311..v313 field-surveying depth batch (3 tiles)
+  "differential-leveling": { module: "../../calc-survey.js", fn: "computeDifferentialLeveling" },
+  "stadia-distance": { module: "../../calc-survey.js", fn: "computeStadiaDistance" },
+  "taping-corrections": { module: "../../calc-survey.js", fn: "computeTapingCorrections" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

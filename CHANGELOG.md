@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): land spec-v311..v313 -- 3 field-surveying depth tiles in calc-survey.js; 779 -> 782 tiles, 0.110.0, 2026-07-03
+
+The field-surveying depth trio, thirteenth batch of the v275-v374 campaign: the leveling and taping computations the coordinate tiles never cover, all in the existing lazy `calc-survey.js` (Group P); no new module, group, or dependency. Catalog **779 -> 782**, package **0.109.0 -> 0.110.0** (a minor). Proposed 2026-07-02.
+
+- **`differential-leveling` (spec-v311).** The HI-method vertical control (HI = elev + BS, elev = HI - FS) with loop misclosure. Pinned: BM 100.00 with backsights 4.32/5.60 and foresights 2.15/3.40 -> 104.37 ft, misclosure -0.03 on a known 104.40. Takes newline-delimited backsight/foresight lists via `makeTextarea` (the multiline-inputs gate passes).
+- **`stadia-distance` (spec-v312).** Stadia tacheometry H = K s cos^2(theta), V = (K s/2) sin(2 theta). Pinned: a 1.50 ft interval at +5 deg -> H 148.86, V 13.02, elev 512.32; a level sight gives H 150.0, V 0. The fuzzer pins the sin(2 theta) sign symmetry.
+- **`taping-corrections` (spec-v313).** The four steel-tape corrections (temperature/slope/tension/sag) added to the measured length. Pinned: 100 ft at 95 F down a 3 ft grade -> 99.972 ft (Ct +0.017, Ch -0.045); a cold tape flips the temperature sign. The fuzzer pins the omitted-corrections-default-to-zero behavior and the sag-needs-positive-pull seam.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the HI reduction and sum identity, the level-sight identity, the temperature sign flip, and every error seam including the count-mismatch), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming Ghilani/Wolf Elementary Surveying. These three compute functions are exported (adding corpus/dims/fuzzer rows); the renderers are non-exported. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 26 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-survey 5000 -> 8000 (147.6% of the old cap). Housekeeping: home count 779 -> 782, README resynced (counts, correctness figures 1025/1028/1025, Group P cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 42 appended. All gates green at the new state: lint (**782 tiles / 56 modules / 804 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(geotech): land spec-v308..v310 -- 3 geotechnical depth-2 tiles in calc-geotech.js; 776 -> 779 tiles, 0.109.0, 2026-07-03
 
 The geotechnical depth-2 trio, twelfth batch of the v275-v374 campaign: the settlement and pressure cases the first geotech batch deferred, all in the existing lazy `calc-geotech.js` (Group E); no new module, group, or dependency. Catalog **776 -> 779**, package **0.108.0 -> 0.109.0** (a minor). Proposed 2026-07-02.

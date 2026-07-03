@@ -750,6 +750,8 @@ const TOOL_MODULES = (() => {
   // output changed.
   declare("./calc-survey.js", "SURVEY_RENDERERS", [
     "area-by-coordinates", "traverse-closure",
+    // spec-v311..v313 field-surveying depth batch
+    "differential-leveling", "stadia-distance", "taping-corrections",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [

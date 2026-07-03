@@ -124,7 +124,7 @@ const CAPS = {
   // spec-v71 2026-06-15: the surveying coordinate/traverse bench split out of
   // calc-field.js. 3833 B; cap 5000 (current + headroom). Lazy-loaded, so not
   // in the home-view first-paint payload.
-  "calc-survey.js": 5000,
+  "calc-survey.js": 8000, // spec-v311..v313 2026-07-03 (5000->8000): +3 field-surveying depth tiles (differential-leveling, stadia-distance, taping-corrections) -> ~7.2 KB gz (90%); current + ~11% headroom; lazy-loaded, not in home-view payload
   // spec-v72 2026-06-15: the spec-v26 feeder + transformer-conductor
   // overcurrent bench (motor-feeder-multiple, transformer-conductor-protection)
   // split out of calc-electrical.js. ~4.5 KB; cap 6000 (current + headroom).
