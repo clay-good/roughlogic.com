@@ -13427,3 +13427,65 @@ test("bounds: spec-v286 computeRcHookDevelopment pins the db^1.5 scaling, the ps
   assert.ok("error" in _v286({ db_in: 1.0, lambda: 1.5 }));
   assert.ok("error" in _v286({ db_in: Infinity }));
 });
+
+// ===================== spec-v287..v289 geotechnical foundation depth batch =====================
+import { computeSoilSettlementElastic as _v287, computePileAxialCapacity as _v288, computeSlopeStabilityInfinite as _v289 } from "../../calc-geotech.js";
+
+test("bounds: spec-v287 computeSoilSettlementElastic pins the medium-sand case, the 1/Es scaling, and error seams", () => {
+  const r = _v287({ q_ksf: 3, b_ft: 6, es_ksf: 250, nu: 0.3, is_f: 0.82 });
+  assert.ok(Math.abs(r.se_in - 0.64471680) < 1e-6);
+  assert.ok(r.verdict.startsWith("within"));
+  // Halving the modulus doubles the settlement (1/Es scaling) and trips the 1-in read.
+  const r2 = _v287({ q_ksf: 3, b_ft: 6, es_ksf: 125, nu: 0.3, is_f: 0.82 });
+  assert.ok(Math.abs(r2.se_in - 2 * r.se_in) < 1e-12);
+  assert.ok(r2.verdict.startsWith("over"));
+  // Error seams.
+  assert.ok("error" in _v287({ q_ksf: 0, b_ft: 6, es_ksf: 250 }));
+  assert.ok("error" in _v287({ q_ksf: 3, b_ft: 6, es_ksf: 0 }));
+  assert.ok("error" in _v287({ q_ksf: 3, b_ft: 6, es_ksf: 250, nu: 0.5 }));
+  assert.ok("error" in _v287({ q_ksf: 3, b_ft: 6, es_ksf: 250, is_f: 0 }));
+  assert.ok("error" in _v287({ q_ksf: Infinity, b_ft: 6, es_ksf: 250 }));
+});
+
+test("bounds: spec-v288 computePileAxialCapacity pins the friction pile, the shaft-vs-tip scaling, and error seams", () => {
+  const D = 16 / 12;
+  const r = _v288({ d_ft: D, l_ft: 40, cu_ksf: 1, alpha: 0.55, fs: 3 });
+  assert.ok(Math.abs(r.qs_kip - 0.55 * Math.PI * D * 40) < 1e-9);
+  assert.ok(Math.abs(r.qp_kip - 9 * Math.PI * D * D / 4) < 1e-9);
+  assert.ok(Math.abs(r.qult_kip - (r.qs_kip + r.qp_kip)) < 1e-12);
+  assert.ok(Math.abs(r.qall_kip - r.qult_kip / 3) < 1e-12);
+  assert.ok(r.skin_frac > 0.85); // slender friction pile: skin carries ~88%
+  // Doubling the length doubles the shaft term and leaves the tip unchanged.
+  const r2 = _v288({ d_ft: D, l_ft: 80, cu_ksf: 1, alpha: 0.55, fs: 3 });
+  assert.ok(Math.abs(r2.qs_kip - 2 * r.qs_kip) < 1e-9);
+  assert.ok(Math.abs(r2.qp_kip - r.qp_kip) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v288({ d_ft: 0, l_ft: 40, cu_ksf: 1 }));
+  assert.ok("error" in _v288({ d_ft: D, l_ft: 40, cu_ksf: 0 }));
+  assert.ok("error" in _v288({ d_ft: D, l_ft: 40, cu_ksf: 1, alpha: 1.2 }));
+  assert.ok("error" in _v288({ d_ft: D, l_ft: 40, cu_ksf: 1, fs: 0 }));
+  assert.ok("error" in _v288({ d_ft: NaN, l_ft: 40, cu_ksf: 1 }));
+});
+
+test("bounds: spec-v289 computeSlopeStabilityInfinite pins the cohesive cut, the cohesionless identity, the repose point, and error seams", () => {
+  const r = _v289({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, h_ft: 8 });
+  assert.ok(Math.abs(r.driving_psf - 120 * 8 * Math.sin(25 * Math.PI / 180) * Math.cos(25 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.fs_slope - 1.7822) < 5e-4);
+  assert.ok(r.verdict.includes("holds"));
+  // Cohesionless: FS = tan(phi)/tan(beta), independent of depth and unit weight.
+  const r2 = _v289({ beta_deg: 20, phi_deg: 32, c_psf: 0, gamma_pcf: 120, h_ft: 8 });
+  assert.ok(Math.abs(r2.fs_slope - Math.tan(32 * Math.PI / 180) / Math.tan(20 * Math.PI / 180)) < 1e-12);
+  const r2b = _v289({ beta_deg: 20, phi_deg: 32, c_psf: 0, gamma_pcf: 90, h_ft: 3 });
+  assert.ok(Math.abs(r2b.fs_slope - r2.fs_slope) < 1e-12);
+  // At beta = phi the cohesionless slope stands exactly at FS = 1 (angle of repose).
+  const r3 = _v289({ beta_deg: 30, phi_deg: 30, c_psf: 0, gamma_pcf: 120, h_ft: 8 });
+  assert.ok(Math.abs(r3.fs_slope - 1) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v289({ beta_deg: 0, phi_deg: 30, h_ft: 8 }));
+  assert.ok("error" in _v289({ beta_deg: 95, phi_deg: 30, h_ft: 8 }));
+  assert.ok("error" in _v289({ beta_deg: 25, phi_deg: -1, h_ft: 8 }));
+  assert.ok("error" in _v289({ beta_deg: 25, phi_deg: 30, h_ft: 0 }));
+  assert.ok("error" in _v289({ beta_deg: 25, phi_deg: 30, gamma_pcf: 0, h_ft: 8 }));
+  assert.ok("error" in _v289({ beta_deg: 25, phi_deg: 30, c_psf: -5, h_ft: 8 }));
+  assert.ok("error" in _v289({ beta_deg: NaN, phi_deg: 30, h_ft: 8 }));
+});

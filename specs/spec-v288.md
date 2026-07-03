@@ -1,6 +1,6 @@
 # roughlogic.com Specification v288 -- Deep Pile Axial Capacity in Clay (Alpha Method) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v287..v289 (the geotechnical foundation depth trio -- elastic
+> **Status: LANDED (2026-07-03, package 0.102.0; proposed 2026-07-02). Batch spec-v287..v289 (the geotechnical foundation depth trio -- elastic
 > settlement (v287), deep-pile axial capacity (this spec), infinite-slope stability (v289)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `helical-pile` gives a torque-to-capacity correlation
 > for a screw pile, but the catalog has no analytical axial capacity for a driven or bored pile from the soil's own

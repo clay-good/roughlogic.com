@@ -238,3 +238,127 @@ GEOTECH_RENDERERS["retaining-wall-stability"] = _simpleRenderer({
   ],
   compute: computeRetainingWallStability,
 });
+
+// ===================== spec-v287..v289: geotechnical foundation depth batch =====================
+// The checks the bearing/earth-pressure/wall bench left open: the immediate
+// elastic settlement soil-bearing-capacity calls separate, the alpha-method
+// pile capacity beside helical-pile's torque correlation, and the
+// infinite-slope translational factor of safety.
+
+// dims: in { q_ksf: M L^-1 T^-2, b_ft: L, es_ksf: M L^-1 T^-2, nu: dimensionless, is_f: dimensionless } out: { se_ft: L, se_in: L }
+export function computeSoilSettlementElastic({ q_ksf = 0, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(q_ksf > 0)) return { error: "Net contact pressure must be positive (ksf)." };
+  if (!(b_ft > 0)) return { error: "Footing width must be positive (ft)." };
+  if (!(es_ksf > 0)) return { error: "Soil elastic modulus must be positive (ksf)." };
+  if (!(nu >= 0 && nu < 0.5)) return { error: "Poisson's ratio must be at least 0 and below 0.5." };
+  if (!(is_f > 0)) return { error: "The influence factor must be positive (0.82 rigid square)." };
+  const se_ft = (q_ksf * b_ft * (1 - nu * nu) * is_f) / es_ksf;
+  const se_in = se_ft * 12;
+  const verdict = se_in <= 1 ? "within the customary 1 in serviceability limit" : "over the customary 1 in limit - resize the footing or improve the soil";
+  return {
+    se_ft, se_in, verdict,
+    note: "Theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es, with the shape-and-rigidity influence factor Is (~0.82 rigid square, ~0.95 flexible-square average, larger for strips) as compiled in Bowles and the customary geotechnical texts. Immediate (elastic) settlement on a deep uniform elastic layer only - not the time-dependent consolidation settlement of a clay; one homogeneous modulus (no layering or increase with depth); influence factor as entered; no embedment correction. A design aid, not a substitute for the geotechnical engineer of record's report.",
+  };
+}
+export const soilSettlementElasticExample = { inputs: { q_ksf: 3, b_ft: 6, es_ksf: 250, nu: 0.3, is_f: 0.82 } };
+
+GEOTECH_RENDERERS["soil-settlement-elastic"] = _simpleRenderer({
+  citation: "Citation: theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es with the shape/rigidity influence factor Is (Bowles and the customary geotechnical texts), by name. Immediate settlement on a uniform elastic layer; consolidation and embedment are separate. A design aid, not a substitute for the geotechnical engineer's report.",
+  example: soilSettlementElasticExample.inputs,
+  fields: [
+    { key: "q_ksf", label: "Net contact pressure q (ksf)", kind: "number" },
+    { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
+    { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
+    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
+    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number", default: 0.82 },
+  ],
+  outputs: [
+    { key: "se", id: "sse-out-se", label: "Elastic settlement Se", value: (r) => fmt(r.se_in, 2) + " in (" + fmt(r.se_ft, 4) + " ft)" },
+    { key: "v", id: "sse-out-v", label: "Serviceability read", value: (r) => r.verdict },
+    { key: "n", id: "sse-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSoilSettlementElastic,
+});
+
+// dims: in { d_ft: L, l_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { as_ft2: L^2, ap_ft2: L^2, qs_kip: M T^-2, qp_kip: M T^-2, qult_kip: M T^-2, qall_kip: M T^-2 }
+export function computePileAxialCapacity({ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_ft > 0)) return { error: "Pile diameter must be positive (ft)." };
+  if (!(l_ft > 0)) return { error: "Embedded length must be positive (ft)." };
+  if (!(cu_ksf > 0)) return { error: "Undrained shear strength must be positive (ksf)." };
+  if (!(alpha > 0 && alpha <= 1)) return { error: "The adhesion factor alpha is over 0 and up to 1.0." };
+  if (!(fs > 0)) return { error: "The factor of safety must be positive." };
+  const as_ft2 = Math.PI * d_ft * l_ft;
+  const ap_ft2 = (Math.PI * d_ft * d_ft) / 4;
+  const qs_kip = alpha * cu_ksf * as_ft2;
+  const qp_kip = 9 * cu_ksf * ap_ft2;
+  const qult_kip = qs_kip + qp_kip;
+  const qall_kip = qult_kip / fs;
+  const skin_frac = qs_kip / qult_kip;
+  return {
+    as_ft2, ap_ft2, qs_kip, qp_kip, qult_kip, qall_kip, skin_frac,
+    note: "Alpha (total-stress) method for a single straight-shaft pile in a uniform cohesive soil: Qult = alpha cu (pi D L) + 9 cu (pi D^2/4), with the adhesion factor alpha (~1.0 soft clay to ~0.5 stiff; ~0.55 medium stiff) and the tip bearing factor Nc = 9, as compiled in the FHWA and Das foundation texts; the customary factor of safety without a load test is 2 to 3. Compression capacity from the soil's shear strength - not the beta effective-stress method for sand, one soil layer, no group efficiency, no negative skin friction or uplift, no dynamic/driving capacity. A design aid; the geotechnical engineer of record and, where required, a load test govern.",
+  };
+}
+export const pileAxialCapacityExample = { inputs: { d_ft: 1.3333, l_ft: 40, cu_ksf: 1, alpha: 0.55, fs: 3 } };
+
+GEOTECH_RENDERERS["pile-axial-capacity"] = _simpleRenderer({
+  citation: "Citation: alpha (total-stress) pile capacity in clay, Qult = alpha cu (pi D L) + 9 cu (pi D^2/4), with the adhesion factor and Nc = 9 as compiled in the FHWA / Das foundation references, and the customary FS of 2-3 without a load test, by name. Single pile, uniform clay. A design aid; the geotechnical engineer and a load test govern.",
+  example: pileAxialCapacityExample.inputs,
+  fields: [
+    { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
+    { key: "l_ft", label: "Embedded length L (ft)", kind: "number" },
+    { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
+    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
+    { key: "fs", label: "Factor of safety FS", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "qs", id: "pac-out-qs", label: "Skin friction Qs", value: (r) => fmt(r.qs_kip, 1) + " kip (" + fmt(r.skin_frac * 100, 0) + "% of capacity)" },
+    { key: "qp", id: "pac-out-qp", label: "End bearing Qp (Nc = 9)", value: (r) => fmt(r.qp_kip, 1) + " kip" },
+    { key: "qu", id: "pac-out-qu", label: "Ultimate Qult", value: (r) => fmt(r.qult_kip, 1) + " kip" },
+    { key: "qa", id: "pac-out-qa", label: "Allowable Qall (Qult / FS)", value: (r) => fmt(r.qall_kip, 1) + " kip" },
+    { key: "n", id: "pac-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePileAxialCapacity,
+});
+
+// dims: in { beta_deg: dimensionless, phi_deg: dimensionless, c_psf: M L^-1 T^-2, gamma_pcf: M L^-2 T^-2, h_ft: L } out: { driving_psf: M L^-1 T^-2, resisting_psf: M L^-1 T^-2, fs_slope: dimensionless }
+export function computeSlopeStabilityInfinite({ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, h_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(beta_deg > 0 && beta_deg < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
+  if (!(phi_deg >= 0 && phi_deg < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
+  if (c_psf < 0) return { error: "Effective cohesion cannot be negative (psf)." };
+  if (!(gamma_pcf > 0)) return { error: "Unit weight must be positive (pcf)." };
+  if (!(h_ft > 0)) return { error: "Failure-plane depth must be positive (ft)." };
+  const b = (beta_deg * Math.PI) / 180;
+  const p = (phi_deg * Math.PI) / 180;
+  const driving_psf = gamma_pcf * h_ft * Math.sin(b) * Math.cos(b);
+  const resisting_psf = c_psf + gamma_pcf * h_ft * Math.cos(b) * Math.cos(b) * Math.tan(p);
+  const fs_slope = resisting_psf / driving_psf;
+  const verdict = fs_slope >= 1.5 ? "at or above the customary 1.5 - the slope holds" : (fs_slope >= 1.0 ? "between 1.0 and 1.5 - marginal; flatten the slope or retain it" : "below 1.0 - the slope is predicted to slide");
+  return {
+    driving_psf, resisting_psf, fs_slope, verdict,
+    note: "Infinite-slope factor of safety FS = (c' + gamma H cos^2 beta tan phi') / (gamma H sin beta cos beta), as compiled in the Das and NAVFAC slope-stability references; for a cohesionless soil (c' = 0) it collapses to FS = tan phi' / tan beta - depth- and weight-independent, which is why a dry sand slope stands exactly at its angle of repose. Shallow translational slide on a plane parallel to a long uniform slope, dry (no seepage or pore pressure; the submerged gamma - gamma_w case is a follow-on), drained effective-stress parameters, no seismic loading - not a circular Bishop/Spencer analysis. A screening aid; the geotechnical engineer of record governs.",
+  };
+}
+export const slopeStabilityInfiniteExample = { inputs: { beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, h_ft: 8 } };
+
+GEOTECH_RENDERERS["slope-stability-infinite"] = _simpleRenderer({
+  citation: "Citation: infinite-slope stability FS = (c' + gamma H cos^2 beta tan phi') / (gamma H sin beta cos beta) with the cohesionless reduction tan phi' / tan beta (Das / NAVFAC slope-stability references), by name. Translational slide, no seepage, uniform soil. A screening aid, not a substitute for the geotechnical engineer's stability analysis.",
+  example: slopeStabilityInfiniteExample.inputs,
+  fields: [
+    { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
+    { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
+    { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number", default: 0 },
+    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "h_ft", label: "Depth to failure plane H (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "drv", id: "ssi-out-drv", label: "Driving shear stress", value: (r) => fmt(r.driving_psf, 1) + " psf" },
+    { key: "res", id: "ssi-out-res", label: "Available shear strength", value: (r) => fmt(r.resisting_psf, 1) + " psf" },
+    { key: "fs", id: "ssi-out-fs", label: "Factor of safety", value: (r) => fmt(r.fs_slope, 2) + " (" + r.verdict + ")" },
+    { key: "n", id: "ssi-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlopeStabilityInfinite,
+});

@@ -931,6 +931,10 @@ const RELATED = {
   "rc-column-axial": ["rc-beam-flexure","rc-beam-shear","steel-column-capacity"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
+  // spec-v287..v289 geotechnical foundation depth batch (Group E)
+  "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],
+  "pile-axial-capacity": ["helical-pile","soil-bearing-capacity","soil-settlement-elastic"],
+  "slope-stability-infinite": ["retaining-wall-stability","lateral-earth-pressure","trench-slope"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

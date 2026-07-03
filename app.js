@@ -440,6 +440,8 @@ const TOOL_MODULES = (() => {
   // ground. All three KEEP group "E" (module independent of group letter).
   declare("./calc-geotech.js", "GEOTECH_RENDERERS", [
     "soil-bearing-capacity", "lateral-earth-pressure", "retaining-wall-stability",
+    // spec-v287..v289 foundation depth batch
+    "soil-settlement-elastic", "pile-axial-capacity", "slope-stability-infinite",
   ]);
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio: a new lazy
   // Group E cluster, the masonry counterpart to the steel / RC member benches;

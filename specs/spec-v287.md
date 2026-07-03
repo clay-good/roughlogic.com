@@ -1,6 +1,6 @@
 # roughlogic.com Specification v287 -- Shallow Foundation Elastic (Immediate) Settlement (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v287..v289 (the geotechnical foundation depth trio -- the
+> **Status: LANDED (2026-07-03, package 0.102.0; proposed 2026-07-02). Batch spec-v287..v289 (the geotechnical foundation depth trio -- the
 > checks the bearing-capacity and earth-pressure tiles left open: the immediate elastic settlement of a footing (this spec,
 > the settlement `soil-bearing-capacity` says "usually governs on sand and is separate"), the axial capacity of a deep
 > pile (v288), and the infinite-slope stability of a natural or cut slope (v289).)**

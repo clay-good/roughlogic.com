@@ -10922,6 +10922,121 @@
       "term": "rebar hook embedment",
       "target": "rc-hook-development",
       "kind": "adjacent"
+    },
+    {
+      "term": "elastic settlement",
+      "target": "soil-settlement-elastic",
+      "kind": "industry"
+    },
+    {
+      "term": "immediate settlement",
+      "target": "soil-settlement-elastic",
+      "kind": "industry"
+    },
+    {
+      "term": "footing settlement",
+      "target": "soil-settlement-elastic",
+      "kind": "industry"
+    },
+    {
+      "term": "foundation settlement",
+      "target": "soil-settlement-elastic",
+      "kind": "industry"
+    },
+    {
+      "term": "settlement calculator",
+      "target": "soil-settlement-elastic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "spread footing settlement",
+      "target": "soil-settlement-elastic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "settlement on sand",
+      "target": "soil-settlement-elastic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pile capacity",
+      "target": "pile-axial-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "alpha method",
+      "target": "pile-axial-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "driven pile capacity",
+      "target": "pile-axial-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "skin friction pile",
+      "target": "pile-axial-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "end bearing",
+      "target": "pile-axial-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "friction pile",
+      "target": "pile-axial-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "deep foundation capacity",
+      "target": "pile-axial-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pile axial load",
+      "target": "pile-axial-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "slope stability",
+      "target": "slope-stability-infinite",
+      "kind": "industry"
+    },
+    {
+      "term": "infinite slope",
+      "target": "slope-stability-infinite",
+      "kind": "industry"
+    },
+    {
+      "term": "factor of safety slope",
+      "target": "slope-stability-infinite",
+      "kind": "industry"
+    },
+    {
+      "term": "translational slide",
+      "target": "slope-stability-infinite",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cut slope safety",
+      "target": "slope-stability-infinite",
+      "kind": "adjacent"
+    },
+    {
+      "term": "angle of repose",
+      "target": "slope-stability-infinite",
+      "kind": "industry"
+    },
+    {
+      "term": "hillside stability",
+      "target": "slope-stability-infinite",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shallow slide",
+      "target": "slope-stability-infinite",
+      "kind": "adjacent"
     }
   ]
 }

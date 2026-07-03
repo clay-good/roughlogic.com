@@ -7491,6 +7491,42 @@ export const CITATIONS = {
       { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
     ],
   },
+  "soil-settlement-elastic": {
+    formula: "Se_ft = q B (1 - nu^2) Is / Es; Se_in = 12 Se_ft.",
+    edition: "The theory-of-elasticity immediate (elastic) settlement of a shallow foundation, Se = q B (1 - nu^2) Is / Es, with the shape-and-rigidity influence factor Is (~0.82 rigid square, ~0.95 flexible-square average, larger for strips), as compiled in Bowles (Foundation Analysis and Design) and the customary geotechnical texts, by name.",
+    freeAccess: "The elasticity-based settlement form and the influence-factor tables are public in the standard foundation-engineering references; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es, with the shape-and-rigidity influence factor Is (~0.82 rigid square, ~0.95 flexible average, larger for strips) as compiled in Bowles and the customary geotechnical texts. This returns the immediate (elastic) settlement of a footing on a deep, uniform elastic layer - it is not the consolidation settlement of a clay (a separate, time-dependent calculation), assumes a single homogeneous soil modulus (no layering or modulus increase with depth), takes the influence factor as entered, and excludes the embedment (depth) correction. A design aid, not a substitute for the geotechnical engineer of record's report.",
+    assumptions: [
+      { name: "Elastic form", value: "Se = q B (1 - nu^2) Is / Es on a deep uniform elastic layer", source: "theory of elasticity / Bowles" },
+      { name: "Influence factor", value: "Is as entered (~0.82 rigid square; ~0.95 flexible-square average; larger for strips)", source: "Bowles influence-factor tables" },
+      { name: "Scope", value: "immediate settlement only; consolidation, layering, and embedment are separate", source: "customary geotechnical practice" },
+    ],
+  },
+  "pile-axial-capacity": {
+    formula: "As = pi D L; Ap = pi D^2/4; Qs = alpha cu As; Qp = 9 cu Ap; Qult = Qs + Qp; Qall = Qult / FS.",
+    edition: "The alpha (total-stress) method for the static axial capacity of a pile in clay -- skin friction alpha cu over the shaft plus end bearing Nc cu (Nc = 9) at the tip -- with the adhesion factor alpha (~1.0 soft to ~0.5 stiff) as compiled in the FHWA driven-pile manual and Das (Principles of Foundation Engineering), and the customary factor of safety of 2 to 3 without a load test, by name.",
+    freeAccess: "The FHWA driven-pile design manuals are free at fhwa.dot.gov; the alpha-method relations are public in the standard foundation texts.",
+    governance: GOVERNANCE.general,
+    editionNote: "The alpha (total-stress) method for a pile in clay - Qult = alpha cu (pi D L) + 9 cu (pi D^2/4), with the adhesion factor alpha (~1.0 soft to ~0.5 stiff) and the tip bearing factor Nc = 9, as compiled in the FHWA and Das foundation texts - and the customary factor of safety of 2 to 3 without a load test. This returns the ultimate and allowable static axial (compression) capacity of a single straight-shaft pile in a uniform cohesive soil - it uses the total-stress alpha method (not the beta effective-stress method for sand), one soil layer, no group efficiency, no negative skin friction or uplift, and no pile-driving or dynamic capacity. A design aid; the geotechnical engineer of record and, where required, a load test govern.",
+    assumptions: [
+      { name: "Skin friction", value: "fs = alpha cu over the shaft surface pi D L; alpha from clay stiffness (~0.55 medium stiff)", source: "FHWA / Das alpha method" },
+      { name: "End bearing", value: "qp = 9 cu over the tip area (Nc = 9 for a deep foundation in clay)", source: "Skempton / FHWA" },
+      { name: "Safety factor", value: "the customary 2 to 3 on ultimate without a static load test", source: "FHWA driven-pile practice" },
+    ],
+  },
+  "slope-stability-infinite": {
+    formula: "driving = gamma H sin(beta) cos(beta); resisting = c' + gamma H cos^2(beta) tan(phi'); FS = resisting / driving. (c' = 0 collapses to FS = tan(phi')/tan(beta))",
+    edition: "The infinite-slope stability model -- the factor of safety of a shallow translational slide on a plane parallel to a long uniform slope, with its cohesionless reduction tan(phi')/tan(beta) -- as compiled in Das (Principles of Geotechnical Engineering) and the NAVFAC DM-7 slope-stability references, by name.",
+    freeAccess: "NAVFAC DM-7 is public-domain and free online; the infinite-slope relations are public in the standard geotechnical texts.",
+    governance: GOVERNANCE.general,
+    editionNote: "The infinite-slope factor of safety FS = (c' + gamma H cos^2(beta) tan(phi')) / (gamma H sin(beta) cos(beta)) and its cohesionless reduction FS = tan(phi')/tan(beta), as compiled in the Das and NAVFAC slope-stability references. This returns the factor of safety against a shallow translational slide on a plane parallel to a long, uniform slope with no seepage (dry, or water table below the failure plane) - it is not a circular/rotational (Bishop/Spencer) analysis, assumes a uniform soil and an infinite slope (edge effects and finite geometry ignored), takes drained effective-stress parameters, and excludes pore pressure / steady seepage (the gamma - gamma_w submerged case is a follow-on) and seismic loading. A design/screening aid, not a substitute for a geotechnical engineer's stability analysis.",
+    assumptions: [
+      { name: "Failure mode", value: "a shallow translational slide parallel to the surface at depth H; strength-over-stress ratio", source: "infinite-slope model (Das / NAVFAC)" },
+      { name: "Cohesionless case", value: "c' = 0 gives FS = tan(phi')/tan(beta), independent of depth and unit weight (the angle of repose at FS = 1)", source: "infinite-slope model" },
+      { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
+    ],
+  },
   "rc-column-axial": {
     formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
     edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",

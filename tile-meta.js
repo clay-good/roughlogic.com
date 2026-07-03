@@ -422,6 +422,8 @@ const _TILES = [
   ["steel-beam-ltb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"],
   // spec-v284..v286 reinforced-concrete member depth batch
   ["rc-column-axial", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
+  // spec-v287..v289 geotechnical foundation depth batch
+  ["soil-settlement-elastic", "E"], ["pile-axial-capacity", "E"], ["slope-stability-infinite", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

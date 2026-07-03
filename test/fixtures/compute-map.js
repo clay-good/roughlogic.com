@@ -647,6 +647,10 @@ export const COMPUTE_MAP = {
   "rc-column-axial": { module: "../../calc-concrete.js", fn: "computeRcColumnAxial" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
+  // spec-v287..v289 geotechnical foundation depth batch (3 tiles)
+  "soil-settlement-elastic": { module: "../../calc-geotech.js", fn: "computeSoilSettlementElastic" },
+  "pile-axial-capacity": { module: "../../calc-geotech.js", fn: "computePileAxialCapacity" },
+  "slope-stability-infinite": { module: "../../calc-geotech.js", fn: "computeSlopeStabilityInfinite" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

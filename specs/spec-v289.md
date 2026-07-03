@@ -1,6 +1,6 @@
 # roughlogic.com Specification v289 -- Infinite Slope Stability Factor of Safety (c'-phi', No Seepage) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v287..v289 (the geotechnical foundation depth trio -- elastic
+> **Status: LANDED (2026-07-03, package 0.102.0; proposed 2026-07-02). Batch spec-v287..v289 (the geotechnical foundation depth trio -- elastic
 > settlement (v287), deep-pile capacity (v288), infinite-slope stability (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog checks retaining walls and bearing, but
 > has no slope-stability check -- the factor of safety of a long natural or cut slope against a shallow translational slide
