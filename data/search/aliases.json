@@ -12802,6 +12802,116 @@
       "term": "vapor condensation wall",
       "target": "wall-condensation-gradient",
       "kind": "adjacent"
+    },
+    {
+      "term": "nail withdrawal",
+      "target": "wood-nail-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "nail pull out",
+      "target": "wood-nail-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "nds 12.2.3",
+      "target": "wood-nail-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "toenail capacity",
+      "target": "wood-nail-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nail uplift",
+      "target": "wood-nail-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "16d withdrawal",
+      "target": "wood-nail-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nail holding power",
+      "target": "wood-nail-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "withdrawal design value",
+      "target": "wood-nail-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lag screw withdrawal",
+      "target": "wood-lag-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "lag withdrawal",
+      "target": "wood-lag-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "nds 12.2.1",
+      "target": "wood-lag-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "lag bolt pullout",
+      "target": "wood-lag-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lag screw capacity",
+      "target": "wood-lag-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "ledger lag",
+      "target": "wood-lag-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lag thread penetration",
+      "target": "wood-lag-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wood screw withdrawal",
+      "target": "wood-screw-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "screw withdrawal",
+      "target": "wood-screw-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "nds 12.2.2",
+      "target": "wood-screw-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "screw pull out",
+      "target": "wood-screw-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "wood screw capacity",
+      "target": "wood-screw-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "screw holding power",
+      "target": "wood-screw-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "screw specific gravity",
+      "target": "wood-screw-withdrawal",
+      "kind": "adjacent"
     }
   ]
 }

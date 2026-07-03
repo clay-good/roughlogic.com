@@ -1,6 +1,6 @@
 # roughlogic.com Specification v334 -- Wood Screw Withdrawal Design Value (NDS 12.2.2) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v332..v334 (the wood-fastener withdrawal trio -- nail (v332),
+> **Status: LANDED (2026-07-03, package 0.117.0). Batch spec-v332..v334 (the wood-fastener withdrawal trio -- nail (v332),
 > lag screw (v333), wood screw (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the wood screw -- and the structural screws that have
 > largely replaced lags in decks and framing -- has its own NDS withdrawal equation, scaling with `G^2` and `D` and using

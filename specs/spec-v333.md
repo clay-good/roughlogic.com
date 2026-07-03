@@ -1,6 +1,6 @@
 # roughlogic.com Specification v333 -- Lag Screw Withdrawal Design Value (NDS 12.2.1) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v332..v334 (the wood-fastener withdrawal trio -- nail (v332),
+> **Status: LANDED (2026-07-03, package 0.117.0). Batch spec-v332..v334 (the wood-fastener withdrawal trio -- nail (v332),
 > lag screw (this spec), wood screw (v334)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the lag screw is the workhorse of ledger and heavy-
 > connection withdrawal, and its NDS withdrawal equation differs from the nail's -- it scales with `D^(3/4)`, not `D`, and

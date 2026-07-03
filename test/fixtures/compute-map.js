@@ -707,6 +707,10 @@ export const COMPUTE_MAP = {
   "building-ua": { module: "../../calc-hvac.js", fn: "computeBuildingUa" },
   "degree-day-energy": { module: "../../calc-hvac.js", fn: "computeDegreeDayEnergy" },
   "wall-condensation-gradient": { module: "../../calc-hvac.js", fn: "computeWallCondensationGradient" },
+  // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
+  "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
+  "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },
+  "wood-screw-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodScrewWithdrawal" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

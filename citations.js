@@ -7599,6 +7599,42 @@ export const CITATIONS = {
       { name: "Geometry", value: "equal-leg throat 0.707 w and a minimum load-carrying length of 4 legs", source: "AISC 360-22 J2.2a/J2.2b" },
     ],
   },
+  "wood-nail-withdrawal": {
+    formula: "W = 1,380 G^(5/2) D (lb/in); Ctn = toenailed ? 0.67 : 1.0; Z_w = W x p x CD x Ctn.",
+    edition: "The NDS 2018 12.2.3 reference nail/spike withdrawal design value and the toenail factor, by name; the 1,380 empirical constant is named.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.3 withdrawal equation and the 12.5.4 toenail factor are in the published standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 2018 12.2.3 reference withdrawal W = 1,380 G^(5/2) D (lb/in) with G the holding member's specific gravity and D the fastener diameter, the capacity W x p_pen, the toenail factor Ctn = 0.67 (12.5.4), and the rule that withdrawal from end grain is not permitted (12.2.3.4). This returns the reference nail-withdrawal design value and capacity - it applies to a nail loaded in withdrawal from side grain (not end grain), uses the holding member's specific gravity, multiplies by the entered CD and Ctn, and does not cover lateral (shear) loading, the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Withdrawal value", value: "W = 1,380 G^(5/2) D per inch of penetration into the holding member", source: "NDS 2018 12.2.3" },
+      { name: "Toenail factor", value: "Ctn = 0.67 for a toenailed connection (12.5.4)", source: "NDS 2018 12.5.4" },
+      { name: "Side grain only", value: "withdrawal from end grain is not permitted", source: "NDS 2018 12.2.3.4" },
+    ],
+  },
+  "wood-lag-withdrawal": {
+    formula: "W = 1,800 G^(3/2) D^(3/4) (lb/in of thread); Ceg = end grain ? 0.75 : 1.0; Z_w = W x p_thread x CD x Ceg.",
+    edition: "The NDS 2018 12.2.1 reference lag-screw withdrawal design value and the end-grain factor, by name; the 1,800 empirical constant is named.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.1 lag-withdrawal equation is in the published standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 2018 12.2.1 reference withdrawal W = 1,800 G^(3/2) D^(3/4) (lb/in of thread penetration) with G the holding member's specific gravity and D the shank diameter, the capacity W x p_thread, the load-duration CD, and the end-grain factor Ceg = 0.75. This returns the axial (withdrawal) lag design value - withdrawal scales only with the 3/4 power of diameter, so more or deeper lags beat one fat lag - and it does not cover the lateral yield-limit connection or the head/washer bearing. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Withdrawal value", value: "W = 1,800 G^(3/2) D^(3/4) per inch of thread penetration", source: "NDS 2018 12.2.1" },
+      { name: "End-grain factor", value: "Ceg = 0.75 for a lag installed into end grain", source: "NDS 2018 12.2.1" },
+      { name: "Axial only", value: "the withdrawal value, not the lateral connection or the head bearing", source: "scope of this tile" },
+    ],
+  },
+  "wood-screw-withdrawal": {
+    formula: "W = 2,850 G^2 D (lb/in); Z_w = W x p x CD.",
+    edition: "The NDS 2018 12.2.2 reference wood-screw withdrawal design value, by name; the 2,850 empirical constant is named.",
+    freeAccess: "The NDS is free to view at awc.org (ANSI/AWC NDS); the 12.2.2 wood-screw-withdrawal equation is in the published standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NDS 2018 12.2.2 reference withdrawal W = 2,850 G^2 D (lb/in) with G the holding member's specific gravity and D the screw diameter, the capacity W x p, and the load-duration CD. This returns the axial (withdrawal) wood-screw design value - withdrawal scales with the square of the specific gravity, so a screw that holds in Douglas Fir-Larch (G 0.50) can strip in a softer spruce (G 0.42) - and it does not cover the lateral connection or the head pull-through. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Withdrawal value", value: "W = 2,850 G^2 D per inch of penetration", source: "NDS 2018 12.2.2" },
+      { name: "G^2 sensitivity", value: "the square-of-specific-gravity law makes species the dominant variable", source: "NDS 2018 12.2.2" },
+      { name: "Axial only", value: "the withdrawal value, not the lateral connection or the head pull-through", source: "scope of this tile" },
+    ],
+  },
   "wood-bearing-perpendicular": {
     formula: "Cb = (lb < 6 in and not within 3 in of the end) ? (lb + 0.375)/lb : 1.0; Fc_perp' = Fc_perp x Cb; fc_perp = R/(b lb); DCR = fc_perp / Fc_perp'; lb_req = R/(b Fc_perp) (Cb = 1, conservative).",
     edition: "The NDS 2018 3.10.2 compression-perpendicular-to-grain bearing check and the 3.10.4 bearing-area factor Cb = (lb + 0.375)/lb for a bearing under 6 in and not within 3 in of the member end, by name.",

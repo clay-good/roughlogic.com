@@ -1560,6 +1560,9 @@ cross-check.
 | calc-construction.js | `computeWoodBearingPerpendicular` | `{ r_lb = 0, b_in = 0, lb_in = 0, fcperp_psi = 625, near_end = "no" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodBoltConnection` | `{ d_in = 0, lm_in = 0, ls_in = 0, gm = 0.50, gs = 0.50, fyb_psi = 45000, thet...` | _ | _ | _ |
 | calc-construction.js | `computeWoodCombinedBendingAxial` | `{ p_lb = 0, m_inlb = 0, a_in2 = 0, s_in3 = 0, fc_adj_psi = 0, fb_adj_psi = 0,...` | _ | _ | _ |
+| calc-construction.js | `computeWoodLagWithdrawal` | `{ g = 0, d_in = 0, p_thread_in = 0, cd = 1.0, end_grain = "no" } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWoodNailWithdrawal` | `{ g = 0, d_in = 0, p_in = 0, cd = 1.0, toenail = "no" } = {}` | _ | _ | _ |
+| calc-construction.js | `computeWoodScrewWithdrawal` | `{ g = 0, d_in = 0, p_in = 0, cd = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeWoodTensionMember` | `{ t_lb = 0, b_in = 0, d_in = 0, dh_in = 0, nh = 0, ft_psi = 575, cd_f = 1.0, ...` | _ | _ | _ |
 | calc-construction.js | `renderAnchorEmbedment` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderArea` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2457,7 +2460,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1043.
+Row count: 1046.
 
 <!-- END function-corpus-v14 -->
 
@@ -2869,7 +2872,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (157 tiles)
+### Group E Construction (160 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3029,6 +3032,9 @@ per spec-v14 §13.1 second paragraph.
 | `wood-bearing-perpendicular` | Wood Bearing Perpendicular to Grain (NDS 3.10) | NDS 2018 3.10.2 / 3.10.4; spec-v290 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-bolt-connection` | Single-Shear Bolted / Dowel Lateral Design Value (NDS Yield-Limit Z) | NDS Table 12.3.1A (National Design Sp...; spec-v265 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-combined-bending-axial` | Wood Beam-Column Interaction (NDS 3.9.2) | NDS 2018 3.9.2 (Eq. 3.9-3); spec-v292 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wood-lag-withdrawal` | Lag Screw Withdrawal Design Value (NDS 12.2.1) | NDS 2018 12.2.1; spec-v333 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wood-nail-withdrawal` | Nail Withdrawal Design Value (NDS 12.2.3) | NDS 2018 12.2.3; spec-v332 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group F Fire-ground (30 tiles)
@@ -3443,6 +3449,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 800. Fixture-covered or reference-cadence: 800 / 800.
+Tile count: 803. Fixture-covered or reference-cadence: 803 / 803.
 
 <!-- END tile-index-v14 -->

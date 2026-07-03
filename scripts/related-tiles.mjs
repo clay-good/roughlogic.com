@@ -991,6 +991,10 @@ const RELATED = {
   "building-ua": ["assembly-r-value","degree-day-energy","infiltration-load"],
   "degree-day-energy": ["building-ua","manual-j-heating","heat-pump-seasonal-energy"],
   "wall-condensation-gradient": ["surface-condensation-risk","assembly-r-value","building-ua"],
+  // spec-v332..v334 wood-fastener withdrawal batch (Group E)
+  "wood-nail-withdrawal": ["fastener-pullout","wood-lag-withdrawal","wood-screw-withdrawal"],
+  "wood-lag-withdrawal": ["wood-nail-withdrawal","wood-screw-withdrawal","fastener-pullout"],
+  "wood-screw-withdrawal": ["wood-nail-withdrawal","wood-lag-withdrawal","fastener-pullout"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

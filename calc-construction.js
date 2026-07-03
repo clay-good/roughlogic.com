@@ -5586,3 +5586,114 @@ const _renderWindMwfrsPressure = _simpleRenderer({
   compute: computeWindMwfrsPressure,
 });
 CONSTRUCTION_RENDERERS["wind-mwfrs-pressure"] = _renderWindMwfrsPressure;
+
+// ===================== spec-v332..v334: wood-fastener withdrawal batch =====================
+// The NDS withdrawal design equations the typical-value fastener-pullout tile
+// only tabulates: the nail (12.2.3), the lag screw (12.2.1), and the wood screw
+// (12.2.2), each with its own empirical constant and diameter/penetration law.
+
+// dims: in { g: dimensionless, d_in: L, p_in: L, cd: dimensionless, toenail: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
+export function computeWoodNailWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0, toenail = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
+  if (!(d_in > 0)) return { error: "Nail diameter must be positive (in)." };
+  if (!(p_in > 0)) return { error: "Penetration must be positive (in)." };
+  if (!(cd > 0)) return { error: "The load-duration factor CD must be positive." };
+  const w_lbin = 1380 * Math.pow(g, 2.5) * d_in;
+  const ctn = toenail === "yes" ? 0.67 : 1.0;
+  const z_w = w_lbin * p_in * cd * ctn;
+  return {
+    w_lbin, ctn, z_w,
+    note: "NDS 12.2.3 nail/spike reference withdrawal design value W = 1,380 G^(5/2) D (lb/in), with G the specific gravity of the holding member and D the fastener diameter, and the total capacity W x p_pen times the load-duration CD and the toenail factor Ctn = 0.67 (12.5.4). Withdrawal from side grain only - withdrawal from end grain is not permitted (12.2.3.4). The toenail penalty nearly cancels the wind-duration bump, which is why toenailed uplift connections are weak and framing hardware replaces them. This does not cover lateral (shear) loading (the yield-limit model), the head pull-through, or combined withdrawal-plus-lateral. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const woodNailWithdrawalExample = { inputs: { g: 0.50, d_in: 0.162, p_in: 1.5, cd: 1.0, toenail: "no" } };
+
+const _renderWoodNailWithdrawal = _simpleRenderer({
+  citation: "Citation: NDS 2018 12.2.3 nail withdrawal W = 1,380 G^(5/2) D (lb/in), capacity W x p x CD x Ctn (Ctn = 0.67 toenailed), side grain only (no end-grain withdrawal), by name. A design aid, not a substitute for the engineer of record.",
+  example: woodNailWithdrawalExample.inputs,
+  fields: [
+    { key: "g", label: "Specific gravity G (0.50 DF-L, 0.42 SPF)", kind: "number" },
+    { key: "d_in", label: "Nail diameter D (in; 16d common = 0.162)", kind: "number" },
+    { key: "p_in", label: "Penetration into holding member (in)", kind: "number" },
+    { key: "cd", label: "Load-duration factor CD (1.6 wind/seismic)", kind: "number", default: 1.0 },
+    { key: "toenail", label: "Toenailed? (Ctn = 0.67)", kind: "select", options: [{ value: "no", label: "No (face-nailed)" }, { value: "yes", label: "Yes (toenailed)" }], default: "no" },
+  ],
+  outputs: [
+    { key: "w", id: "wnw-out-w", label: "Reference withdrawal W", value: (r) => fmt(r.w_lbin, 1) + " lb/in" },
+    { key: "z", id: "wnw-out-z", label: "Withdrawal capacity", value: (r) => fmt(r.z_w, 0) + " lb" },
+    { key: "n", id: "wnw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodNailWithdrawal,
+});
+CONSTRUCTION_RENDERERS["wood-nail-withdrawal"] = _renderWoodNailWithdrawal;
+
+// dims: in { g: dimensionless, d_in: L, p_thread_in: L, cd: dimensionless, end_grain: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
+export function computeWoodLagWithdrawal({ g = 0, d_in = 0, p_thread_in = 0, cd = 1.0, end_grain = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
+  if (!(d_in > 0)) return { error: "Lag shank diameter must be positive (in)." };
+  if (!(p_thread_in > 0)) return { error: "Thread penetration must be positive (in)." };
+  if (!(cd > 0)) return { error: "The load-duration factor CD must be positive." };
+  const w_lbin = 1800 * Math.pow(g, 1.5) * Math.pow(d_in, 0.75);
+  const ceg = end_grain === "yes" ? 0.75 : 1.0;
+  const z_w = w_lbin * p_thread_in * cd * ceg;
+  return {
+    w_lbin, ceg, z_w,
+    note: "NDS 12.2.1 lag-screw reference withdrawal design value W = 1,800 G^(3/2) D^(3/4) (lb/in of thread penetration), with G the holding member's specific gravity and D the shank diameter, and the capacity W x p_thread times the load-duration CD and the end-grain factor Ceg = 0.75. Withdrawal scales only with the 3/4 power of diameter, so a bigger lag buys proportionally less capacity - more or deeper lags beat one fat lag. This is the withdrawal (axial) value only, not the lateral yield-limit connection or the head/washer bearing. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const woodLagWithdrawalExample = { inputs: { g: 0.50, d_in: 0.5, p_thread_in: 4, cd: 1.0, end_grain: "no" } };
+
+const _renderWoodLagWithdrawal = _simpleRenderer({
+  citation: "Citation: NDS 2018 12.2.1 lag-screw withdrawal W = 1,800 G^(3/2) D^(3/4) (lb/in), capacity W x p_thread x CD x Ceg (Ceg = 0.75 end grain), by name. Axial withdrawal only. A design aid, not a substitute for the engineer of record.",
+  example: woodLagWithdrawalExample.inputs,
+  fields: [
+    { key: "g", label: "Specific gravity G (0.50 DF-L, 0.42 SPF)", kind: "number" },
+    { key: "d_in", label: "Lag shank diameter D (in)", kind: "number" },
+    { key: "p_thread_in", label: "Thread penetration (in)", kind: "number" },
+    { key: "cd", label: "Load-duration factor CD", kind: "number", default: 1.0 },
+    { key: "end_grain", label: "Into end grain? (Ceg = 0.75)", kind: "select", options: [{ value: "no", label: "No (side grain)" }, { value: "yes", label: "Yes (end grain)" }], default: "no" },
+  ],
+  outputs: [
+    { key: "w", id: "wlw-out-w", label: "Reference withdrawal W", value: (r) => fmt(r.w_lbin, 0) + " lb/in" },
+    { key: "z", id: "wlw-out-z", label: "Withdrawal capacity", value: (r) => fmt(r.z_w, 0) + " lb" },
+    { key: "n", id: "wlw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodLagWithdrawal,
+});
+CONSTRUCTION_RENDERERS["wood-lag-withdrawal"] = _renderWoodLagWithdrawal;
+
+// dims: in { g: dimensionless, d_in: L, p_in: L, cd: dimensionless } out: { w_lbin: M T^-2, z_w: M L T^-2 }
+export function computeWoodScrewWithdrawal({ g = 0, d_in = 0, p_in = 0, cd = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(g > 0)) return { error: "Specific gravity must be positive (0.50 DF-L, 0.42 SPF)." };
+  if (!(d_in > 0)) return { error: "Screw diameter must be positive (in)." };
+  if (!(p_in > 0)) return { error: "Penetration must be positive (in)." };
+  if (!(cd > 0)) return { error: "The load-duration factor CD must be positive." };
+  const w_lbin = 2850 * g * g * d_in;
+  const z_w = w_lbin * p_in * cd;
+  return {
+    w_lbin, z_w,
+    note: "NDS 12.2.2 wood-screw reference withdrawal design value W = 2,850 G^2 D (lb/in), with G the holding member's specific gravity and D the screw diameter, and the capacity W x p times the load-duration CD. Withdrawal scales with the SQUARE of the specific gravity, so a screw that holds in Douglas Fir-Larch (G 0.50) can strip in a softer spruce (G 0.42) - about a 30% drop. This is the withdrawal (axial) value only, not the lateral connection or the head pull-through. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const woodScrewWithdrawalExample = { inputs: { g: 0.50, d_in: 0.190, p_in: 1.0, cd: 1.0 } };
+
+const _renderWoodScrewWithdrawal = _simpleRenderer({
+  citation: "Citation: NDS 2018 12.2.2 wood-screw withdrawal W = 2,850 G^2 D (lb/in), capacity W x p x CD, by name. Axial withdrawal only. A design aid, not a substitute for the engineer of record.",
+  example: woodScrewWithdrawalExample.inputs,
+  fields: [
+    { key: "g", label: "Specific gravity G (0.50 DF-L, 0.42 SPF)", kind: "number" },
+    { key: "d_in", label: "Screw diameter D (in; #10 ~ 0.190)", kind: "number" },
+    { key: "p_in", label: "Penetration into holding member (in)", kind: "number" },
+    { key: "cd", label: "Load-duration factor CD", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "w", id: "wsw-out-w", label: "Reference withdrawal W", value: (r) => fmt(r.w_lbin, 1) + " lb/in" },
+    { key: "z", id: "wsw-out-z", label: "Withdrawal capacity", value: (r) => fmt(r.z_w, 0) + " lb" },
+    { key: "n", id: "wsw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodScrewWithdrawal,
+});
+CONSTRUCTION_RENDERERS["wood-screw-withdrawal"] = _renderWoodScrewWithdrawal;

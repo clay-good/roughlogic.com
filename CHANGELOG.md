@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): land spec-v332..v334 -- 3 wood-fastener withdrawal tiles in calc-construction.js; 800 -> 803 tiles, 0.117.0, 2026-07-03
+
+The wood-fastener withdrawal trio, twentieth batch of the v275-v374 campaign: the axial (pull-out) design values the NDS lateral-connection tiles never cover, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **800 -> 803**, package **0.116.0 -> 0.117.0** (a minor). Proposed 2026-07-02.
+
+- **`wood-nail-withdrawal` (spec-v332).** W = 1,380 G^(5/2) D (lb/in), Z_w = W x p x CD x Ctn with the toenail factor Ctn = 0.67 (NDS 12.5.4). Pinned: a 16d common (D 0.162) in DF-L over 1.5 in -> 39.5 lb/in, 59 lb; toenailed at wind duration the Ctn 0.67 nearly cancels CD 1.6 -> 64 lb. Withdrawal from end grain is not permitted (12.2.3.4).
+- **`wood-lag-withdrawal` (spec-v333).** W = 1,800 G^(3/2) D^(3/4) (lb/in of thread), Z_w = W x p_thread x CD x Ceg with the end-grain factor Ceg = 0.75. Pinned: a 1/2 in lag in DF-L over 4 in of thread -> 378 lb/in, 1,514 lb; stepping to 5/8 in buys only ~18% (the D^(3/4) law) -> 1,789 lb.
+- **`wood-screw-withdrawal` (spec-v334).** W = 2,850 G^2 D (lb/in), Z_w = W x p x CD. Pinned: a #10 (D 0.190) in DF-L over 1 in -> 135 lb/in, 135 lb; the same screw in softer SPF (G 0.42) drops 30% (the G^2 law) -> 95.5 lb/in.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the empirical-constant power laws, the toenail/end-grain factors, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming NDS 2018 12.2.3 / 12.2.1 / 12.2.2 with editionNotes. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Housekeeping: home count 800 -> 803, README resynced (counts, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 49 appended. All gates green at the new state: lint, unit tests (**5,096**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile` / `check:multiline-inputs`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(hvac): land spec-v329..v331 -- 3 building-energy tiles in calc-hvac.js; 797 -> 800 tiles, 0.116.0, 2026-07-03
 
 The building-energy trio, nineteenth batch of the v275-v374 campaign: the whole-house numbers the single-assembly tiles never roll up, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **797 -> 800**, package **0.115.0 -> 0.116.0** (a minor). Proposed 2026-07-02.

@@ -385,6 +385,8 @@ const TOOL_MODULES = (() => {
     "wood-bearing-perpendicular", "wood-tension-member", "wood-combined-bending-axial",
     // spec-v296..v298 ASCE 7 wind-and-snow load depth batch.
     "wind-cc-pressure", "snow-drift-load", "wind-mwfrs-pressure",
+    // spec-v332..v334 wood-fastener withdrawal batch.
+    "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.

@@ -14365,3 +14365,54 @@ test("bounds: spec-v331 computeWallCondensationGradient pins the gradient, the d
   assert.ok("error" in _v331({ r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 120 }));
   assert.ok("error" in _v331({ r_inside: NaN, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 }));
 });
+
+// ===================== spec-v332..v334 wood-fastener withdrawal batch =====================
+import { computeWoodNailWithdrawal as _v332, computeWoodLagWithdrawal as _v333, computeWoodScrewWithdrawal as _v334 } from "../../calc-construction.js";
+
+test("bounds: spec-v332 computeWoodNailWithdrawal pins the G^2.5 value, the toenail/CD factors, and error seams", () => {
+  const r = _v332({ g: 0.50, d_in: 0.162, p_in: 1.5, cd: 1.0, toenail: "no" });
+  assert.ok(Math.abs(r.w_lbin - 1380 * Math.pow(0.5, 2.5) * 0.162) < 1e-9);
+  assert.ok(Math.abs(r.w_lbin - 39.5) < 0.1);
+  assert.ok(Math.abs(r.z_w - r.w_lbin * 1.5) < 1e-9);
+  // Toenailed at wind duration applies both factors.
+  const r2 = _v332({ g: 0.50, d_in: 0.162, p_in: 1.5, cd: 1.6, toenail: "yes" });
+  assert.strictEqual(r2.ctn, 0.67);
+  assert.ok(Math.abs(r2.z_w - r.w_lbin * 1.5 * 1.6 * 0.67) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v332({ g: 0, d_in: 0.162, p_in: 1.5 }));
+  assert.ok("error" in _v332({ g: 0.5, d_in: 0, p_in: 1.5 }));
+  assert.ok("error" in _v332({ g: 0.5, d_in: 0.162, p_in: 0 }));
+  assert.ok("error" in _v332({ g: Infinity, d_in: 0.162, p_in: 1.5 }));
+});
+
+test("bounds: spec-v333 computeWoodLagWithdrawal pins the D^0.75 law, the end-grain factor, and error seams", () => {
+  const r = _v333({ g: 0.50, d_in: 0.5, p_thread_in: 4, cd: 1.0, end_grain: "no" });
+  assert.ok(Math.abs(r.w_lbin - 1800 * Math.pow(0.5, 1.5) * Math.pow(0.5, 0.75)) < 1e-9);
+  assert.ok(Math.abs(r.z_w - 1514) < 2);
+  // A 25% larger diameter buys only ~18% more (D^0.75).
+  const r2 = _v333({ g: 0.50, d_in: 0.625, p_thread_in: 4, cd: 1.0 });
+  assert.ok(Math.abs(r2.z_w / r.z_w - Math.pow(0.625 / 0.5, 0.75)) < 1e-9);
+  // End grain applies the 0.75 factor.
+  const r3 = _v333({ g: 0.50, d_in: 0.5, p_thread_in: 4, cd: 1.0, end_grain: "yes" });
+  assert.strictEqual(r3.ceg, 0.75);
+  assert.ok(Math.abs(r3.z_w - r.z_w * 0.75) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v333({ g: 0, d_in: 0.5, p_thread_in: 4 }));
+  assert.ok("error" in _v333({ g: 0.5, d_in: 0.5, p_thread_in: 0 }));
+  assert.ok("error" in _v333({ g: 0.5, d_in: NaN, p_thread_in: 4 }));
+});
+
+test("bounds: spec-v334 computeWoodScrewWithdrawal pins the G^2 law and error seams", () => {
+  const r = _v334({ g: 0.50, d_in: 0.190, p_in: 1.0, cd: 1.0 });
+  assert.ok(Math.abs(r.w_lbin - 2850 * 0.25 * 0.190) < 1e-9);
+  assert.ok(Math.abs(r.w_lbin - 135.375) < 0.1);
+  assert.ok(Math.abs(r.z_w - r.w_lbin) < 1e-9);
+  // A softer species drops with G^2.
+  const r2 = _v334({ g: 0.42, d_in: 0.190, p_in: 1.0, cd: 1.0 });
+  assert.ok(Math.abs(r2.w_lbin / r.w_lbin - Math.pow(0.42 / 0.50, 2)) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v334({ g: 0, d_in: 0.190, p_in: 1.0 }));
+  assert.ok("error" in _v334({ g: 0.5, d_in: 0.190, p_in: 0 }));
+  assert.ok("error" in _v334({ g: 0.5, d_in: 0.190, p_in: 1.0, cd: 0 }));
+  assert.ok("error" in _v334({ g: Infinity, d_in: 0.190, p_in: 1.0 }));
+});

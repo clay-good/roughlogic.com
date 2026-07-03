@@ -1,6 +1,6 @@
 # roughlogic.com Specification v332 -- Nail Withdrawal Design Value (NDS 12.2.3) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v332..v334 (the wood-fastener withdrawal trio -- the NDS
+> **Status: LANDED (2026-07-03, package 0.117.0). Batch spec-v332..v334 (the wood-fastener withdrawal trio -- the NDS
 > withdrawal design equations the "typical values" tile only tabulates: the nail (this spec), the lag screw (v333), and the
 > wood screw (v334), each with its own empirical constant and penetration multiplier.)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `fastener-pullout` reports typical pull-out values by

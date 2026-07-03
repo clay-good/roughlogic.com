@@ -29546,6 +29546,87 @@
       "outputs": {
         "t_plane_f": { "value": 40.0, "tolerance": { "pct": 0.3 } }
       }
+    },
+    {
+      "tile_id": "wood-nail-withdrawal",
+      "source_publisher": "NDS 2018 12.2.3",
+      "source_title": "16d common in DF-L, 1.5 in penetration -> 39.5 lb/in, 59 lb",
+      "source_edition_or_year": "spec-v332 worked example (machine-verified)",
+      "source_section_or_page": "spec-v332 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "g": 0.50, "d_in": 0.162, "p_in": 1.5, "cd": 1.0, "toenail": "no" },
+      "outputs": {
+        "w_lbin": { "value": 39.5, "tolerance": { "pct": 0.3 } },
+        "z_w": { "value": 59, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wood-nail-withdrawal",
+      "source_publisher": "NDS 2018 12.2.3 / 12.5.4",
+      "source_title": "cross-check: toenailed at wind duration -> 64 lb (Ctn 0.67 near-cancels CD 1.6)",
+      "source_edition_or_year": "spec-v332 worked example (machine-verified)",
+      "source_section_or_page": "spec-v332 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "g": 0.50, "d_in": 0.162, "p_in": 1.5, "cd": 1.6, "toenail": "yes" },
+      "outputs": {
+        "z_w": { "value": 64, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "wood-lag-withdrawal",
+      "source_publisher": "NDS 2018 12.2.1",
+      "source_title": "1/2 in lag in DF-L, 4 in thread -> 378 lb/in, 1,514 lb",
+      "source_edition_or_year": "spec-v333 worked example (machine-verified)",
+      "source_section_or_page": "spec-v333 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "g": 0.50, "d_in": 0.5, "p_thread_in": 4, "cd": 1.0, "end_grain": "no" },
+      "outputs": {
+        "w_lbin": { "value": 378, "tolerance": { "pct": 0.3 } },
+        "z_w": { "value": 1514, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "wood-lag-withdrawal",
+      "source_publisher": "NDS 2018 12.2.1",
+      "source_title": "cross-check: a 5/8 in lag holds only 18% more (the D^(3/4) law) -> 1,789 lb",
+      "source_edition_or_year": "spec-v333 worked example (machine-verified)",
+      "source_section_or_page": "spec-v333 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "g": 0.50, "d_in": 0.625, "p_thread_in": 4, "cd": 1.0, "end_grain": "no" },
+      "outputs": {
+        "z_w": { "value": 1789, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "wood-screw-withdrawal",
+      "source_publisher": "NDS 2018 12.2.2",
+      "source_title": "#10 screw in DF-L, 1 in penetration -> 135 lb/in, 135 lb",
+      "source_edition_or_year": "spec-v334 worked example (machine-verified)",
+      "source_section_or_page": "spec-v334 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "g": 0.50, "d_in": 0.190, "p_in": 1.0, "cd": 1.0 },
+      "outputs": {
+        "w_lbin": { "value": 135, "tolerance": { "pct": 0.5 } },
+        "z_w": { "value": 135, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wood-screw-withdrawal",
+      "source_publisher": "NDS 2018 12.2.2",
+      "source_title": "cross-check: the same screw in softer SPF drops 30% (the G^2 law) -> 95.5 lb/in",
+      "source_edition_or_year": "spec-v334 worked example (machine-verified)",
+      "source_section_or_page": "spec-v334 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "g": 0.42, "d_in": 0.190, "p_in": 1.0, "cd": 1.0 },
+      "outputs": {
+        "w_lbin": { "value": 95.5, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }
