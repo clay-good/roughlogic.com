@@ -47,6 +47,7 @@ const TOOL_MODULES = (() => {
     "buck-boost-sizing", "wireway-fill", "rooftop-temp-adder", "working-space-110-26",
     // spec-v179/v185/v186 electrician second-pass batch
     "motor-branch-protection", "bends-between-pulls", "shock-approach-boundary",
+    "conduit-jam-ratio",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

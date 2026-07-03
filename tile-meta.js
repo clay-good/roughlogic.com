@@ -612,6 +612,7 @@ const _TILES = [
   ["vfd-energy-savings", "A"], ["lighting-retrofit-savings", "A"], ["power-factor-billing-savings", "A"],
   ["transformer-k-factor", "A"], ["motor-capacitor-max", "A"],
   ["bends-between-pulls", "A"], ["shock-approach-boundary", "A"],
+  ["conduit-jam-ratio", "A"],
   ["pool-bonding-680-26", "A"],
 ];
 

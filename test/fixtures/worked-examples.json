@@ -30697,6 +30697,32 @@
       "outputs": {
         "H_ft": { "value": 138.52, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "conduit-jam-ratio",
+      "source_publisher": "NEC (NFPA 70) Chapter 9",
+      "source_title": "three 0.65 in conductors in 2 in EMT (ID 2.067) -> ratio 3.18, jam-prone",
+      "source_edition_or_year": "spec-v374 worked example (machine-verified)",
+      "source_section_or_page": "spec-v374 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "conduit_id_in": 2.067, "conductor_od_in": 0.65, "n_conductors": 3 },
+      "outputs": {
+        "ratio": { "value": 3.18, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "conduit-jam-ratio",
+      "source_publisher": "NEC (NFPA 70) Chapter 9",
+      "source_title": "cross-check: three 0.5 in conductors in 1-1/4 in conduit (ID 1.61) -> ratio 3.22, just clear of the band",
+      "source_edition_or_year": "spec-v374 worked example (machine-verified)",
+      "source_section_or_page": "spec-v374 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "conduit_id_in": 1.61, "conductor_od_in": 0.5, "n_conductors": 3 },
+      "outputs": {
+        "ratio": { "value": 3.22, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): land spec-v374 -- conduit jam ratio (the 100th and final tile of the v275-v374 campaign); 842 -> 843 tiles, 0.131.0, 2026-07-03
+
+The conduit jam ratio, the lone thirty-fourth batch and the **100th tile** that completes the v275-v374 in-scope trade-calculator campaign, in the existing lazy `calc-electrical.js` (Group A); no new module, group, or dependency. Catalog **842 -> 843**, package **0.130.0 -> 0.131.0** (a minor). Proposed 2026-07-02.
+
+- **`conduit-jam-ratio` (spec-v374).** ratio = conduit ID / conductor OD; jam-prone when exactly three same-size conductors and 2.8 <= ratio <= 3.2 (they triangulate and wedge in a bend). Pinned: three 0.65 in conductors in 2 in EMT (ID 2.067) -> ratio 3.18, jam-prone; three 0.5 in conductors in 1-1/4 in conduit (ID 1.61) -> 3.22, just clear; a two-conductor pull at the same ratio is not flagged (jamming needs exactly three). The conduit-fill tile checks cross-sectional area; this catches the geometric jam the fill check misses.
+
+Carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, a fuzzer block covering the jam band, the exactly-three-conductor rule, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the NEC Chapter 9 jam-ratio guideline (Table 4 conduit ID, Table 5 conductor OD). Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 2 worked-example fixtures, 9 collision-checked aliases, `related-tiles`, and a fuzzer block; corpus + tile-index regenerated. No cap bump needed. Housekeeping: home count 842 -> 843, README resynced (counts, Group A cheat-sheet row and exemplar, catalog-state prose now noting the campaign is complete), the spec marked LANDED, docs/mobile-responsive.md section 63 appended. All gates green at the new state: lint, unit tests (**5,136**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the new tile.
+
+**Campaign complete.** Specs v275-v374 (100 in-scope trade tiles across electrical, plumbing, HVAC, structural/construction, masonry, civil, agriculture, real estate, welding, solar, pool, accounting, and lighting design) are all landed; the catalog stands at **843 tiles**, package **0.131.0**, all gates green.
+
 ### feat(plumbing): land spec-v371..v373 -- 3 pipe-flow energy tiles in calc-plumbing.js; 839 -> 842 tiles, 0.130.0, 2026-07-03
 
 The pipe-flow energy trio, thirty-third batch of the v275-v374 campaign: the Bernoulli energy pieces the friction and pressure tiles use but never expose, all in the existing lazy `calc-plumbing.js` (Group B); no new module, group, or dependency. Catalog **839 -> 842**, package **0.129.0 -> 0.130.0** (a minor). Proposed 2026-07-02.

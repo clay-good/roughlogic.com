@@ -4758,3 +4758,51 @@ function _v186renderShockApproachBoundary(inputRegion, outputRegion, citationEl)
   band.select.addEventListener("change", refresh);
 }
 ELECTRICAL_RENDERERS["shock-approach-boundary"] = _v186renderShockApproachBoundary;
+
+// ===================== spec-v374: conduit jam ratio (Group A) =====================
+// The conduit-fill tile checks cross-sectional area, but three same-size
+// conductors can jam in a bend when the conduit ID / conductor OD ratio lands
+// in a narrow band around 3.0 (they triangulate and wedge). The 100th tile of
+// the v275-v374 campaign.
+
+// dims: in { conduit_id_in: L, conductor_od_in: L, n_conductors: dimensionless } out: { ratio: dimensionless, jam_prone: dimensionless }
+export function computeConduitJamRatio({ conduit_id_in = 0, conductor_od_in = 0, n_conductors = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const id = Number(conduit_id_in) || 0;
+  const od = Number(conductor_od_in) || 0;
+  const n = Number(n_conductors) || 0;
+  if (!(id > 0)) return { error: "Conduit inside diameter must be positive (in)." };
+  if (!(od > 0)) return { error: "Conductor outside diameter must be positive (in)." };
+  if (!(od < id)) return { error: "Conductor OD must be smaller than the conduit ID." };
+  if (!(n >= 1)) return { error: "Number of conductors must be at least 1." };
+  const ratio = id / od;
+  const in_band = ratio >= 2.8 && ratio <= 3.2;
+  const jam_prone = n === 3 && in_band;
+  return {
+    ratio, in_band, jam_prone, n,
+    note: "Conduit jamming: three same-size conductors can wedge (triangulate) in a bend when the conduit ID / conductor OD ratio falls in the narrow band from about 2.8 to 3.2 - the geometry where they lock rather than slide past each other. It applies at EXACTLY three conductors; two or four+ do not triangulate the same way, so the count matters as much as the ratio. Use the NEC Chapter 9 Table 4 conduit ID and Table 5 conductor OD. A jam-prone ratio is a caution to plan the pull (lube, feed order) or upsize the conduit, not a code violation. A design aid; the NEC and the AHJ govern.",
+  };
+}
+export const conduitJamRatioExample = { inputs: { conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 3 } };
+function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: conduit jam ratio = conduit ID / conductor OD; jamming risk for exactly three same-size conductors when the ratio is ~2.8-3.2, a widely-referenced NEC Chapter 9 pulling guideline (Table 4 conduit ID, Table 5 conductor OD). A caution, not a code limit; the NEC and the AHJ govern.";
+  const id = makeNumber("Conduit inside diameter (in, NEC Ch.9 Table 4)", "cjr-id", { step: "any", min: "0" }); id.input.value = "2.067";
+  const od = makeNumber("Conductor outside diameter (in, Table 5)", "cjr-od", { step: "any", min: "0" }); od.input.value = "0.65";
+  const n = makeNumber("Number of conductors", "cjr-n", { step: "1", min: "1" }); n.input.value = "3";
+  for (const f of [id, od, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { id.input.value = "2.067"; od.input.value = "0.65"; n.input.value = "3"; update(); });
+  const oRatio = makeOutputLine(outputRegion, "Jam ratio (ID / OD)", "cjr-out-ratio");
+  const oVerdict = makeOutputLine(outputRegion, "Jam risk", "cjr-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Note", "cjr-out-note");
+  const update = debounce(() => {
+    const r = computeConduitJamRatio({ conduit_id_in: Number(id.input.value) || 0, conductor_od_in: Number(od.input.value) || 0, n_conductors: Number(n.input.value) || 0 });
+    if (r.error) { oRatio.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
+    oRatio.textContent = fmt(r.ratio, 2) + (r.in_band ? " (in the 2.8-3.2 jam band)" : " (outside the 2.8-3.2 band)");
+    oVerdict.textContent = r.jam_prone
+      ? "JAM-PRONE -- three conductors at a jam-band ratio; plan the pull or upsize the conduit"
+      : (r.n === 3 ? "Not jam-prone (ratio outside the band)" : "Not jam-prone (jamming needs exactly 3 conductors; this is " + r.n + ")");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [id, od, n]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["conduit-jam-ratio"] = _v374renderConduitJamRatio;

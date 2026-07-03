@@ -14637,6 +14637,51 @@
       "term": "head conservation",
       "target": "bernoulli-head",
       "kind": "industry"
+    },
+    {
+      "term": "conduit jam ratio",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "conductor jamming",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "three conductors jam",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "jam ratio conduit",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "nec jamming",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "cable jam in bend",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "wire pull jam",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "conduit id conductor od",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "jam probability conduit",
+      "target": "conduit-jam-ratio",
+      "kind": "industry"
     }
   ]
 }

@@ -15110,3 +15110,24 @@ test("bounds: spec-v373 computeBernoulliHead pins the three-term sum and error s
   assert.ok("error" in _v373({ P_psi: 30, V_fps: -1, z_ft: 10 }));
   assert.ok("error" in _v373({ P_psi: 30, V_fps: 6, z_ft: Infinity }));
 });
+
+// ===================== spec-v374 conduit jam ratio (the 100th tile) =====================
+import { computeConduitJamRatio as _v374 } from "../../calc-electrical.js";
+
+test("bounds: spec-v374 computeConduitJamRatio pins the jam band, the three-conductor rule, and error seams", () => {
+  const r = _v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 3 });
+  assert.ok(Math.abs(r.ratio - 3.18) < 0.01);
+  assert.strictEqual(r.in_band, true);
+  assert.strictEqual(r.jam_prone, true);
+  // Just above 3.2 is not jam-prone.
+  const clear = _v374({ conduit_id_in: 1.61, conductor_od_in: 0.5, n_conductors: 3 });
+  assert.ok(Math.abs(clear.ratio - 3.22) < 0.01 && clear.jam_prone === false);
+  // Two conductors at the same jam-band ratio are not flagged (needs exactly 3).
+  assert.strictEqual(_v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 2 }).jam_prone, false);
+  assert.strictEqual(_v374({ conduit_id_in: 2.067, conductor_od_in: 0.65, n_conductors: 4 }).jam_prone, false);
+  // Error seams.
+  assert.ok("error" in _v374({ conduit_id_in: 0, conductor_od_in: 0.65 }));
+  assert.ok("error" in _v374({ conduit_id_in: 2.067, conductor_od_in: 0 }));
+  assert.ok("error" in _v374({ conduit_id_in: 0.5, conductor_od_in: 0.65 })); // OD >= ID
+  assert.ok("error" in _v374({ conduit_id_in: Infinity, conductor_od_in: 0.65 }));
+});

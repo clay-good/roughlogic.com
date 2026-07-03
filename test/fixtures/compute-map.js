@@ -923,6 +923,7 @@ export const COMPUTE_MAP = {
   "motor-capacitor-max": { module: "../../calc-powerquality.js", fn: "computeMotorCapacitorMax" },
   "bends-between-pulls": { module: "../../calc-electrical.js", fn: "computeBendsBetweenPulls" },
   "shock-approach-boundary": { module: "../../calc-electrical.js", fn: "computeShockApproachBoundary" },
+  "conduit-jam-ratio": { module: "../../calc-electrical.js", fn: "computeConduitJamRatio" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

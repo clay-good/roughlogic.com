@@ -24,6 +24,7 @@
 // better match".
 
 const RELATED = {
+  "conduit-jam-ratio": ["conduit-fill", "pulling-tension", "cable-bend-radius", "min-bend-radius"],
   "velocity-head": ["pipe-velocity", "flow-continuity", "bernoulli-head", "orifice-flow"],
   "flow-continuity": ["pipe-velocity", "velocity-head", "bernoulli-head", "reducer-offset"],
   "bernoulli-head": ["pump-tdh", "velocity-head", "flow-continuity", "npsh-a"],

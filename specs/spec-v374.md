@@ -1,6 +1,6 @@
 # roughlogic.com Specification v374 -- Conduit Jam Ratio for Three Same-Size Conductors (NEC Ch. 9) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). The 100th tile of the trades-only catalog-expansion campaign
+> **Status: LANDED (2026-07-03, package 0.131.0). The 100th tile of the trades-only catalog-expansion campaign
 > (v275..v374). Where `conduit-fill` checks that conductors fit by cross-sectional percentage, this tile catches the
 > pulling problem percent fill misses: jamming, when three same-size conductors wedge in a bend as they cross over each
 > other.**

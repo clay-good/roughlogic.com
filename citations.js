@@ -678,6 +678,18 @@ export const CITATIONS = {
       { name: "Voltage-drop target", value: "3% branch + 5% feeder = 5% total", source: "NEC informational notes 210.19(A)(1) FPN 4 / 215.2(A)(1) FPN 2" },
     ],
   },
+  "conduit-jam-ratio": {
+    formula: "ratio = conduit_ID / conductor_OD; jam-prone if n = 3 AND 2.8 <= ratio <= 3.2.",
+    edition: "The conduit-jamming ratio guideline referenced with NEC Chapter 9 (Table 4 conduit ID, Table 5 conductor OD), by name.",
+    freeAccess: "The jam-ratio guideline is a widely-published cable-pulling rule; the conduit ID and conductor OD are in NEC Chapter 9 Tables 4 and 5 (NFPA 70). The NEC and the AHJ govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Conduit jamming: three same-size conductors can wedge (triangulate) in a bend when the conduit ID / conductor OD ratio falls in the narrow band from about 2.8 to 3.2 - the geometry where they lock rather than slide past each other. It applies at EXACTLY three conductors; two or four+ do not triangulate the same way, so the count matters as much as the ratio. Use the NEC Chapter 9 Table 4 conduit ID and Table 5 conductor OD. This flags the jam-prone condition: it is a caution to plan the pull (lubrication, feed order) or upsize the conduit, not a code violation, and it does not check the cross-sectional fill (a separate limit) or the pulling tension. A design aid; the NEC and the AHJ govern.",
+    assumptions: [
+      { name: "Jam band", value: "jam-prone when exactly three conductors and 2.8 <= ID/OD <= 3.2", source: "cable-pulling guideline / NEC Ch. 9" },
+      { name: "Table dimensions", value: "conduit ID from NEC Ch. 9 Table 4; conductor OD from Table 5", source: "NEC (NFPA 70) Chapter 9" },
+      { name: "A caution, not a limit", value: "a pull caution; does not check fill area or pulling tension", source: "scope of this tile" },
+    ],
+  },
   "conduit-fill": {
     formula: "Conductor cross-sectional area sum / interior conduit area, compared to NEC Chapter 9 Table 1 fill limits (53% / 31% / 40% for 1, 2, ≥ 3 conductors).",
     edition: NEC_2023 + " Chapter 9 Tables 1, 4, 5.",
