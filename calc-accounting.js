@@ -1331,3 +1331,167 @@ function renderEmployerPayrollTax(inputRegion, outputRegion, citationEl) {
   for (const f of [wages.input, ssBase.input, futaRate.input, sutaRate.input, sutaBase.input]) f.addEventListener("input", update);
 }
 ACCOUNTING_RENDERERS["employer-payroll-tax"] = renderEmployerPayrollTax;
+
+// ===================== spec-v362..v364: contractor cost-recovery batch (Group R) =====================
+// The bid-rate numbers a contractor builds from wages, iron, and overhead:
+// the fully-burdened labor rate (v362), the equipment owning-and-operating
+// hourly rate (v363), and the overhead recovery rate (v364).
+
+// dims: in { wage: dimensionless, payroll_pct: dimensionless, wc_pct: dimensionless, liab_pct: dimensionless, benefits: dimensionless, productivity: dimensionless } out: { burden_hr: dimensionless, burdened_hr: dimensionless, burden_pct: dimensionless }
+export function computeLaborBurdenRate({ wage = 0, payroll_pct = 9.15, wc_pct = 0, liab_pct = 0, benefits = 0, productivity = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(wage) || 0;
+  const pr = Number(payroll_pct) || 0;
+  const wc = Number(wc_pct) || 0;
+  const li = Number(liab_pct) || 0;
+  const ben = Number(benefits) || 0;
+  const prod = Number(productivity) || 0;
+  if (!(w > 0)) return { error: "Base wage must be positive ($/hr)." };
+  if (!(prod > 0 && prod <= 100)) return { error: "Productivity must be over 0 and up to 100 percent." };
+  const burden_hr = w * (pr + wc + li) / 100 + ben;
+  const burdened_hr = (w + burden_hr) / (prod / 100);
+  const burden_pct = (burdened_hr - w) / w * 100;
+  return {
+    burden_hr, burdened_hr, burden_pct,
+    note: "Fully-burdened labor rate: the base wage plus payroll taxes (FICA + FUTA/SUTA, about 9.15% of wage), workers' comp and general liability (both % of wage, and the WC class matters), and per-hour benefits, then divided by the billable (productive) fraction of paid hours. The productivity divisor spreads the non-billable time (travel, setup, rework) over the billed hours, which is why a crew's cost rate runs well above the hourly wage. A bid-rate aid; the payroll service, the insurer's rates, and the fringe package govern the actual burden.",
+  };
+}
+export const laborBurdenRateExample = { inputs: { wage: 25, payroll_pct: 9.15, wc_pct: 8, liab_pct: 2, benefits: 4, productivity: 85 } };
+function renderLaborBurdenRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: fully-burdened labor rate = (wage + payroll% + WC% + liability% + benefits) / productive fraction, standard contractor bid-rate estimating. Payroll ~9.15% (FICA 7.65 + FUTA/SUTA). The payroll service, insurer rates, and fringe package govern.";
+  const wage = makeNumber("Base wage ($/hr)", "lbr-wage", { step: "any", min: "0" }); wage.input.value = "25";
+  const pr = makeNumber("Payroll tax (%, FICA+FUTA/SUTA)", "lbr-pr", { step: "any", min: "0" }); pr.input.value = "9.15";
+  const wc = makeNumber("Workers' comp (% of wage)", "lbr-wc", { step: "any", min: "0" });
+  const li = makeNumber("General liability (% of wage)", "lbr-li", { step: "any", min: "0" });
+  const ben = makeNumber("Benefits ($/hr)", "lbr-ben", { step: "any", min: "0" });
+  const prod = makeNumber("Productive/billable fraction (%)", "lbr-prod", { step: "any", min: "0", max: "100" }); prod.input.value = "100";
+  for (const f of [wage, pr, wc, li, ben, prod]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wage.input.value = "25"; pr.input.value = "9.15"; wc.input.value = "8"; li.input.value = "2"; ben.input.value = "4"; prod.input.value = "85"; update(); });
+  const oBurden = makeOutputLine(outputRegion, "Burden (over wage)", "lbr-out-b");
+  const oRate = makeOutputLine(outputRegion, "Fully-burdened rate", "lbr-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "lbr-out-note");
+  const update = debounce(() => {
+    const r = computeLaborBurdenRate({ wage: Number(wage.input.value) || 0, payroll_pct: Number(pr.input.value) || 0, wc_pct: Number(wc.input.value) || 0, liab_pct: Number(li.input.value) || 0, benefits: Number(ben.input.value) || 0, productivity: Number(prod.input.value) || 0 });
+    if (r.error) { oBurden.textContent = r.error; oRate.textContent = "-"; oNote.textContent = ""; return; }
+    oBurden.textContent = "$" + fmt(r.burden_hr, 2) + "/hr";
+    oRate.textContent = "$" + fmt(r.burdened_hr, 2) + "/hr (" + fmt(r.burden_pct, 1) + "% over wage)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [wage, pr, wc, li, ben, prod]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["labor-burden-rate"] = renderLaborBurdenRate;
+
+// dims: in { purchase: dimensionless, salvage: dimensionless, life_hr: dimensionless, annual_hr: dimensionless, iit_pct: dimensionless, fuel_gph: dimensionless, fuel_price: dimensionless, maint_hr: dimensionless, wear_hr: dimensionless } out: { owning_hr: dimensionless, operating_hr: dimensionless, total_hr: dimensionless }
+export function computeEquipmentHourlyRate({ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gph = 0, fuel_price = 0, maint_hr = 0, wear_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pur = Number(purchase) || 0;
+  const sal = Number(salvage) || 0;
+  const life = Number(life_hr) || 0;
+  const ann = Number(annual_hr) || 0;
+  const iit = Number(iit_pct) || 0;
+  if (!(pur > 0)) return { error: "Purchase price must be positive ($)." };
+  if (!(sal >= 0 && sal < pur)) return { error: "Salvage must be zero or positive and less than the purchase price." };
+  if (!(life > 0)) return { error: "Useful life must be positive (hours)." };
+  if (!(ann > 0)) return { error: "Annual hours must be positive." };
+  const deprec = (pur - sal) / life;
+  const iit_hr = (iit / 100) * ((pur + sal) / 2) / ann;
+  const owning_hr = deprec + iit_hr;
+  const operating_hr = (Number(fuel_gph) || 0) * (Number(fuel_price) || 0) + (Number(maint_hr) || 0) + (Number(wear_hr) || 0);
+  const total_hr = owning_hr + operating_hr;
+  return {
+    deprec_hr: deprec, iit_hr, owning_hr, operating_hr, total_hr,
+    note: "Equipment owning + operating hourly rate (the CAT/AED method): owning = straight-line depreciation (purchase - salvage)/life + the interest/insurance/tax carry (% of average value / annual hours); operating = fuel (gph x price) + maintenance + tires/wear per hour. Running a machine more hours per year spreads the fixed interest-carry thinner, so an idle machine is expensive per hour. A bid-rate aid; the owner's actual costs, financing, and utilization govern.",
+  };
+}
+export const equipmentHourlyRateExample = { inputs: { purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 1000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 } };
+function renderEquipmentHourlyRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: equipment owning + operating hourly rate (CAT / AED cost-recovery method): owning = (purchase - salvage)/life + IIT% x avg value / annual hours; operating = fuel + maintenance + wear per hour. The owner's actual costs, financing, and utilization govern.";
+  const pur = makeNumber("Purchase price ($)", "ehr-pur", { step: "any", min: "0" }); pur.input.value = "50000";
+  const sal = makeNumber("Salvage value ($)", "ehr-sal", { step: "any", min: "0" }); sal.input.value = "10000";
+  const life = makeNumber("Useful life (hours)", "ehr-life", { step: "any", min: "0" }); life.input.value = "5000";
+  const ann = makeNumber("Hours operated per year", "ehr-ann", { step: "any", min: "0" }); ann.input.value = "1000";
+  const iit = makeNumber("Interest+insurance+tax (%/yr of avg value)", "ehr-iit", { step: "any", min: "0" }); iit.input.value = "8";
+  const fg = makeNumber("Fuel burn (gal/hr)", "ehr-fg", { step: "any", min: "0" }); fg.input.value = "2";
+  const fp = makeNumber("Fuel price ($/gal)", "ehr-fp", { step: "any", min: "0" }); fp.input.value = "4";
+  const mh = makeNumber("Maintenance ($/hr)", "ehr-mh", { step: "any", min: "0" }); mh.input.value = "4";
+  const wh = makeNumber("Tires/wear ($/hr)", "ehr-wh", { step: "any", min: "0" }); wh.input.value = "1";
+  for (const f of [pur, sal, life, ann, iit, fg, fp, mh, wh]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pur.input.value = "50000"; sal.input.value = "10000"; life.input.value = "5000"; ann.input.value = "1000"; iit.input.value = "8"; fg.input.value = "2"; fp.input.value = "4"; mh.input.value = "4"; wh.input.value = "1"; update(); });
+  const oOwn = makeOutputLine(outputRegion, "Owning cost", "ehr-out-own");
+  const oOp = makeOutputLine(outputRegion, "Operating cost", "ehr-out-op");
+  const oTot = makeOutputLine(outputRegion, "Total hourly rate", "ehr-out-tot");
+  const oNote = makeOutputLine(outputRegion, "Note", "ehr-out-note");
+  const update = debounce(() => {
+    const r = computeEquipmentHourlyRate({ purchase: Number(pur.input.value) || 0, salvage: Number(sal.input.value) || 0, life_hr: Number(life.input.value) || 0, annual_hr: Number(ann.input.value) || 0, iit_pct: Number(iit.input.value) || 0, fuel_gph: Number(fg.input.value) || 0, fuel_price: Number(fp.input.value) || 0, maint_hr: Number(mh.input.value) || 0, wear_hr: Number(wh.input.value) || 0 });
+    if (r.error) { oOwn.textContent = r.error; oOp.textContent = "-"; oTot.textContent = "-"; oNote.textContent = ""; return; }
+    oOwn.textContent = "$" + fmt(r.owning_hr, 2) + "/hr (deprec $" + fmt(r.deprec_hr, 2) + " + IIT $" + fmt(r.iit_hr, 2) + ")";
+    oOp.textContent = "$" + fmt(r.operating_hr, 2) + "/hr";
+    oTot.textContent = "$" + fmt(r.total_hr, 2) + "/hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pur, sal, life, ann, iit, fg, fp, mh, wh]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["equipment-hourly-rate"] = renderEquipmentHourlyRate;
+
+// dims: in { annual_overhead: dimensionless, basis: dimensionless, billable_hours: dimensionless, annual_direct: dimensionless, job_direct: dimensionless } out: { rate_hr: dimensionless, overhead_pct: dimensionless, job_overhead: dimensionless }
+export function computeOverheadRecoveryRate({ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct = 0, job_direct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const oh = Number(annual_overhead) || 0;
+  if (!(oh > 0)) return { error: "Annual overhead must be positive ($)." };
+  if (basis === "markup") {
+    const ad = Number(annual_direct) || 0;
+    if (!(ad > 0)) return { error: "Annual direct cost must be positive ($)." };
+    const overhead_pct = oh / ad * 100;
+    const jd = Number(job_direct) || 0;
+    const job_overhead = jd > 0 ? jd * overhead_pct / 100 : null;
+    return { basis: "markup", overhead_pct, job_overhead, rate_hr: null };
+  }
+  const bh = Number(billable_hours) || 0;
+  if (!(bh > 0)) return { error: "Billable hours must be positive." };
+  const rate_hr = oh / bh;
+  return {
+    basis: "per-hour", rate_hr, overhead_pct: null, job_overhead: null,
+    note: "Overhead recovery rate: the annual indirect overhead (office, trucks, insurance, non-billable staff) spread over the billable field hours ($/hr) or over the annual direct cost (a % markup). Every billed hour, or every direct dollar, must carry its share or the overhead is not recovered. Cutting overhead lowers the recovery rate directly, widening the competitive margin - the reason overhead control wins bids. A bid-rate aid; the contractor's actual books and billable volume govern.",
+  };
+}
+export const overheadRecoveryRateExample = { inputs: { annual_overhead: 200000, basis: "per-hour", billable_hours: 8000, annual_direct: 500000, job_direct: 10000 } };
+function renderOverheadRecoveryRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: overhead recovery = annual overhead / billable hours ($/hr) or / annual direct cost (% markup), standard contractor cost-recovery. Every billed hour or direct dollar carries its share. The contractor's books and billable volume govern.";
+  const oh = makeNumber("Annual overhead ($)", "orr-oh", { step: "any", min: "0" }); oh.input.value = "200000";
+  const basis = makeSelect("Recovery basis", "orr-basis", [
+    { value: "per-hour", label: "Per billable hour ($/hr)" },
+    { value: "markup", label: "Markup on direct cost (%)" },
+  ]);
+  const bh = makeNumber("Annual billable hours", "orr-bh", { step: "any", min: "0" }); bh.input.value = "8000";
+  const ad = makeNumber("Annual direct cost ($)", "orr-ad", { step: "any", min: "0" }); ad.input.value = "500000";
+  const jd = makeNumber("Job direct cost ($, optional)", "orr-jd", { step: "any", min: "0" });
+  inputRegion.appendChild(oh.wrap); inputRegion.appendChild(basis.wrap);
+  for (const f of [bh, ad, jd]) inputRegion.appendChild(f.wrap);
+  const oRate = makeOutputLine(outputRegion, "Recovery rate", "orr-out-rate");
+  const oJob = makeOutputLine(outputRegion, "Job overhead (markup)", "orr-out-job");
+  const oNote = makeOutputLine(outputRegion, "Note", "orr-out-note");
+  function syncFields() {
+    const isMarkup = basis.select.value === "markup";
+    bh.wrap.style.display = isMarkup ? "none" : "";
+    ad.wrap.style.display = isMarkup ? "" : "none";
+    jd.wrap.style.display = isMarkup ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computeOverheadRecoveryRate({ annual_overhead: Number(oh.input.value) || 0, basis: basis.select.value, billable_hours: Number(bh.input.value) || 0, annual_direct: Number(ad.input.value) || 0, job_direct: Number(jd.input.value) || 0 });
+    if (r.error) { oRate.textContent = r.error; oJob.textContent = "-"; oNote.textContent = ""; return; }
+    if (r.basis === "markup") {
+      oRate.textContent = fmt(r.overhead_pct, 1) + "% markup on direct cost";
+      oJob.textContent = r.job_overhead == null ? "(enter a job direct cost)" : "$" + fmt(r.job_overhead, 0) + " overhead on this job";
+      oNote.textContent = "Overhead recovery = annual overhead / annual direct cost, applied as a markup to a job's direct cost. Cutting overhead lowers the markup directly.";
+      return;
+    }
+    oRate.textContent = "$" + fmt(r.rate_hr, 2) + "/billable hour";
+    oJob.textContent = "(markup basis only)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { oh.input.value = "200000"; basis.select.value = "per-hour"; bh.input.value = "8000"; ad.input.value = "500000"; jd.input.value = ""; syncFields(); update(); });
+  basis.select.addEventListener("change", () => { syncFields(); update(); });
+  for (const f of [oh, bh, ad, jd]) f.input.addEventListener("input", update);
+  syncFields();
+}
+ACCOUNTING_RENDERERS["overhead-recovery-rate"] = renderOverheadRecoveryRate;

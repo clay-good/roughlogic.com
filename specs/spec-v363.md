@@ -1,6 +1,6 @@
 # roughlogic.com Specification v363 -- Equipment Owning and Operating Hourly Rate (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v362..v364 (the contractor-business trio -- labor burden
+> **Status: LANDED (2026-07-03, package 0.127.0). Batch spec-v362..v364 (the contractor-business trio -- labor burden
 > (v362), the equipment owning-and-operating hourly rate (this spec), overhead recovery (v364)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `cost-per-mile` gives a truck's per-mile cost, but a
 > contractor rents or charges out equipment by the hour, and the owning-and-operating rate -- depreciation, interest,

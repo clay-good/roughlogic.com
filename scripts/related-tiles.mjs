@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "labor-burden-rate": ["employer-payroll-tax", "equipment-hourly-rate", "overhead-recovery-rate", "time-and-materials"],
+  "equipment-hourly-rate": ["cost-per-mile", "labor-burden-rate", "straight-line-depreciation", "overhead-recovery-rate"],
+  "overhead-recovery-rate": ["labor-burden-rate", "equipment-hourly-rate", "markup", "markup-vs-margin"],
   "shaft-torsion": ["driveshaft-crit", "section-properties", "motor-shaft-torque", "hp-from-torque"],
   "thermal-stress-restrained": ["pipe-expansion", "pipe-expansion-loop", "thermal-expansion-volume", "conduit-thermal-expansion"],
   "hoop-stress-thin-wall": ["pipe-pressure-rating", "tank-volume", "metal-weight", "combined-stress-axial-bending"],

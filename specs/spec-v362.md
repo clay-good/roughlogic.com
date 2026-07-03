@@ -1,6 +1,6 @@
 # roughlogic.com Specification v362 -- Fully-Burdened Labor Rate (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v362..v364 (the contractor-business trio -- the true-cost
+> **Status: LANDED (2026-07-03, package 0.127.0). Batch spec-v362..v364 (the contractor-business trio -- the true-cost
 > numbers a trade estimator bids from: the fully-burdened labor rate (this spec), the equipment owning-and-operating hourly
 > rate (v363), and the overhead recovery rate per billable hour (v364).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `employer-payroll-tax` computes the tax portion of

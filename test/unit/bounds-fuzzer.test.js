@@ -14906,3 +14906,58 @@ test("bounds: spec-v361 computeHoopStressThinWall pins hoop = 2x longitudinal, t
   assert.ok("error" in _v361({ P_psi: 150, D_in: 12, t_in: 0 }));
   assert.ok("error" in _v361({ P_psi: Infinity, D_in: 12, t_in: 0.25 }));
 });
+
+// ===================== spec-v362..v364 contractor cost-recovery batch =====================
+import { computeLaborBurdenRate as _v362, computeEquipmentHourlyRate as _v363, computeOverheadRecoveryRate as _v364 } from "../../calc-accounting.js";
+
+test("bounds: spec-v362 computeLaborBurdenRate pins the burden build-up, the productivity divisor, and error seams", () => {
+  const r = _v362({ wage: 25, payroll_pct: 9.15, wc_pct: 8, liab_pct: 2, benefits: 4, productivity: 85 });
+  assert.ok(Math.abs(r.burden_hr - (25 * 0.1915 + 4)) < 1e-9);
+  assert.ok(Math.abs(r.burdened_hr - 39.75) < 0.01);
+  // At 100% productivity the burden_pct is 35.2%.
+  const full = _v362({ wage: 25, payroll_pct: 9.15, wc_pct: 8, liab_pct: 2, benefits: 4, productivity: 100 });
+  assert.ok(Math.abs(full.burdened_hr - 33.79) < 0.01 && Math.abs(full.burden_pct - 35.16) < 0.1);
+  // A lower WC class drops the rate.
+  const lowwc = _v362({ wage: 25, payroll_pct: 9.15, wc_pct: 4, liab_pct: 2, benefits: 4, productivity: 100 });
+  assert.ok(lowwc.burdened_hr < full.burdened_hr && Math.abs(lowwc.burdened_hr - 32.79) < 0.01);
+  // Error seams.
+  assert.ok("error" in _v362({ wage: 0 }));
+  assert.ok("error" in _v362({ wage: 25, productivity: 0 }));
+  assert.ok("error" in _v362({ wage: 25, productivity: 120 }));
+  assert.ok("error" in _v362({ wage: Infinity }));
+});
+
+test("bounds: spec-v363 computeEquipmentHourlyRate pins owning/operating, the utilization effect, and error seams", () => {
+  const r = _v363({ purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 1000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 });
+  assert.ok(Math.abs(r.deprec_hr - 8) < 1e-9);
+  assert.ok(Math.abs(r.iit_hr - 2.4) < 1e-9);
+  assert.ok(Math.abs(r.owning_hr - 10.4) < 1e-9);
+  assert.ok(Math.abs(r.operating_hr - 13) < 1e-9);
+  assert.ok(Math.abs(r.total_hr - 23.4) < 1e-9);
+  // More annual hours spread the fixed carry thinner.
+  const busy = _v363({ purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 2000, iit_pct: 8, fuel_gph: 2, fuel_price: 4, maint_hr: 4, wear_hr: 1 });
+  assert.ok(busy.total_hr < r.total_hr && Math.abs(busy.total_hr - 22.2) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v363({ purchase: 0, salvage: 0, life_hr: 5000, annual_hr: 1000 }));
+  assert.ok("error" in _v363({ purchase: 50000, salvage: 60000, life_hr: 5000, annual_hr: 1000 })); // salvage >= purchase
+  assert.ok("error" in _v363({ purchase: 50000, salvage: 10000, life_hr: 0, annual_hr: 1000 }));
+  assert.ok("error" in _v363({ purchase: 50000, salvage: 10000, life_hr: 5000, annual_hr: 0 }));
+});
+
+test("bounds: spec-v364 computeOverheadRecoveryRate pins both bases and error seams", () => {
+  const hr = _v364({ annual_overhead: 200000, basis: "per-hour", billable_hours: 8000 });
+  assert.ok(Math.abs(hr.rate_hr - 25) < 1e-9);
+  const mk = _v364({ annual_overhead: 200000, basis: "markup", annual_direct: 500000, job_direct: 10000 });
+  assert.ok(Math.abs(mk.overhead_pct - 40) < 1e-9);
+  assert.ok(Math.abs(mk.job_overhead - 4000) < 1e-9);
+  // Lower overhead drops the recovery.
+  const lean = _v364({ annual_overhead: 150000, basis: "per-hour", billable_hours: 8000 });
+  assert.ok(Math.abs(lean.rate_hr - 18.75) < 1e-9);
+  // job_overhead is null without a job direct cost.
+  assert.strictEqual(_v364({ annual_overhead: 200000, basis: "markup", annual_direct: 500000 }).job_overhead, null);
+  // Error seams.
+  assert.ok("error" in _v364({ annual_overhead: 0, basis: "per-hour", billable_hours: 8000 }));
+  assert.ok("error" in _v364({ annual_overhead: 200000, basis: "per-hour", billable_hours: 0 }));
+  assert.ok("error" in _v364({ annual_overhead: 200000, basis: "markup", annual_direct: 0 }));
+  assert.ok("error" in _v364({ annual_overhead: Infinity, basis: "per-hour", billable_hours: 8000 }));
+});

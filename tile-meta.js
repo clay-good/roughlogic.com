@@ -72,6 +72,7 @@ const _TILES = [
   ["declining-balance-depreciation", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],
+  ["labor-burden-rate", "R"], ["equipment-hourly-rate", "R"], ["overhead-recovery-rate", "R"],
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],

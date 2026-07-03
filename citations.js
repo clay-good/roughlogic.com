@@ -246,6 +246,42 @@ export const CITATIONS = {
     ],
   },
 
+  "labor-burden-rate": {
+    formula: "burden = wage x (payroll% + WC% + liability%)/100 + benefits; burdened = (wage + burden) / (productivity/100); burden_pct = (burdened - wage)/wage x 100.",
+    edition: "The standard contractor fully-burdened labor-rate build-up, by name.",
+    freeAccess: "The labor-burden build-up is standard contractor bid-rate estimating; the payroll-tax rates are published by the IRS and state agencies. The payroll service, insurer, and fringe package govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fully-burdened labor rate: the base wage plus payroll taxes (FICA 7.65% + FUTA/SUTA, about 9.15% of wage total), workers' comp and general liability (both a % of wage, and the WC class code matters), and per-hour benefits, then divided by the billable (productive) fraction of paid hours. The productivity divisor spreads non-billable time (travel, setup, rework) over the billed hours. This returns the burdened rate for the entered percentages: it uses the rates as entered (verify the current SUTA rate and wage base and the WC class), and does not compute the individual tax caps by employee. A bid-rate aid; the payroll service, the insurer's rates, and the fringe package govern.",
+    assumptions: [
+      { name: "Build-up", value: "burden = wage x (payroll+WC+liability)% + benefits; burdened = (wage+burden)/productivity", source: "contractor estimating" },
+      { name: "Payroll ~9.15%", value: "FICA 7.65% + FUTA/SUTA; verify the current SUTA rate and wage base", source: "IRS / state agencies" },
+      { name: "Productivity divisor", value: "spreads non-billable time over billed hours; enter the actual billable fraction", source: "scope of this tile" },
+    ],
+  },
+  "equipment-hourly-rate": {
+    formula: "deprec = (purchase - salvage)/life_hr; IIT = (iit%/100) x ((purchase + salvage)/2)/annual_hr; owning = deprec + IIT; operating = fuel_gph x price + maint + wear; total = owning + operating.",
+    edition: "The CAT / AED equipment owning-and-operating cost-recovery method, by name.",
+    freeAccess: "The owning-and-operating build-up is published in the Caterpillar Performance Handbook and AED cost-recovery guidance. The owner's actual costs, financing, and utilization govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The equipment owning + operating hourly rate: owning = straight-line depreciation (purchase - salvage)/life + the interest/insurance/tax carry (% of average value / annual hours); operating = fuel (gph x price) + maintenance + tires/wear per hour. Running a machine more hours per year spreads the fixed interest-carry thinner, so an idle machine is expensive per hour. This returns the internal cost rate for the entered figures: it uses straight-line depreciation (not a market-value or tax schedule) and the entered annual utilization, and it is a cost-recovery rate, not a rental market rate. A bid-rate aid; the owner's actual costs, financing, and utilization govern.",
+    assumptions: [
+      { name: "Owning", value: "straight-line depreciation + IIT carry on the average value / annual hours", source: "CAT / AED method" },
+      { name: "Operating", value: "fuel (gph x price) + maintenance + tires/wear per hour", source: "CAT / AED method" },
+      { name: "Utilization", value: "more annual hours spread the fixed carry thinner; a cost rate, not a rental rate", source: "scope of this tile" },
+    ],
+  },
+  "overhead-recovery-rate": {
+    formula: "per-hour: rate = annual_overhead / billable_hours; markup: overhead% = annual_overhead / annual_direct x 100; job_overhead = job_direct x overhead%/100.",
+    edition: "The standard contractor overhead-recovery (indirect cost allocation) method, by name.",
+    freeAccess: "Overhead recovery is standard contractor cost accounting; the allocation base is the contractor's own books. The contractor's actual books and billable volume govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The overhead recovery rate: the annual indirect overhead (office, trucks, insurance, non-billable staff) spread over the billable field hours ($/hr) or over the annual direct cost (a % markup applied to a job's direct cost). Every billed hour, or every direct dollar, must carry its share or the overhead is not recovered; cutting overhead lowers the recovery rate directly. This returns the recovery rate for the entered basis: it uses the contractor's entered overhead and allocation base, and does not itself set the profit markup (added on top of overhead). A bid-rate aid; the contractor's actual books and billable volume govern.",
+    assumptions: [
+      { name: "Two bases", value: "rate = overhead/billable hours ($/hr), or overhead/annual direct (% markup)", source: "contractor cost accounting" },
+      { name: "Full recovery", value: "each billed hour or direct dollar must carry its overhead share", source: "cost accounting" },
+      { name: "Excludes profit", value: "overhead recovery only; the profit markup is separate", source: "scope of this tile" },
+    ],
+  },
   "employer-payroll-tax": {
     formula: "SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages, 7000)*FUTA_rate; SUTA = min(wages, state_base)*SUTA_rate.",
     edition: "FICA - 26 USC 3101/3111 and IRS Pub 15 (Circular E), 6.2% SS / 1.45% Medicare; FUTA - 26 USC 3301-3306, $7,000 wage base, 0.6% net, IRS Form 940 - all by name.",

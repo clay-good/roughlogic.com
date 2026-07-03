@@ -155,8 +155,8 @@
     },
     {
       "term": "fully loaded labor cost",
-      "target": "employer-payroll-tax",
-      "kind": "adjacent"
+      "target": "labor-burden-rate",
+      "kind": "industry"
     },
     {
       "term": "probability of detection",
@@ -14101,6 +14101,136 @@
     {
       "term": "membrane stress",
       "target": "hoop-stress-thin-wall",
+      "kind": "industry"
+    },
+    {
+      "term": "labor burden",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "burdened labor rate",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "labor burden rate",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "true labor cost",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "workers comp burden",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "billable rate labor",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "productive hours cost",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "labor markup",
+      "target": "labor-burden-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "equipment hourly rate",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "owning and operating cost",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "machine hourly rate",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "equipment cost per hour",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "o&o rate",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "internal charge rate equipment",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "equipment rental break-even",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "depreciation per hour",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "machine rate",
+      "target": "equipment-hourly-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead recovery",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead rate",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead markup",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead per hour",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "indirect cost recovery",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead allocation",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "burden rate overhead",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead per billable hour",
+      "target": "overhead-recovery-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "recover overhead",
+      "target": "overhead-recovery-rate",
       "kind": "industry"
     }
   ]

@@ -30371,6 +30371,88 @@
       "outputs": {
         "sigma_h_psi": { "value": 2000, "tolerance": { "abs": 1 } }
       }
+    },
+    {
+      "tile_id": "labor-burden-rate",
+      "source_publisher": "contractor estimating",
+      "source_title": "$25/hr, 9.15% payroll, 8% WC, 2% liability, $4 benefits, 85% billable -> $39.75/hr",
+      "source_edition_or_year": "spec-v362 worked example (machine-verified)",
+      "source_section_or_page": "spec-v362 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "wage": 25, "payroll_pct": 9.15, "wc_pct": 8, "liab_pct": 2, "benefits": 4, "productivity": 85 },
+      "outputs": {
+        "burden_hr": { "value": 8.79, "tolerance": { "pct": 0.5 } },
+        "burdened_hr": { "value": 39.75, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "labor-burden-rate",
+      "source_publisher": "contractor estimating",
+      "source_title": "cross-check: a low-risk trade (WC 4%, 100% productive) -> $32.79/hr, 31% burden",
+      "source_edition_or_year": "spec-v362 worked example (machine-verified)",
+      "source_section_or_page": "spec-v362 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "wage": 25, "payroll_pct": 9.15, "wc_pct": 4, "liab_pct": 2, "benefits": 4, "productivity": 100 },
+      "outputs": {
+        "burdened_hr": { "value": 32.79, "tolerance": { "pct": 0.5 } },
+        "burden_pct": { "value": 31.2, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "equipment-hourly-rate",
+      "source_publisher": "CAT / AED method",
+      "source_title": "$50K skid steer, $10K salvage, 5,000-hr life, 1,000 hr/yr -> $23.40/hr",
+      "source_edition_or_year": "spec-v363 worked example (machine-verified)",
+      "source_section_or_page": "spec-v363 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "purchase": 50000, "salvage": 10000, "life_hr": 5000, "annual_hr": 1000, "iit_pct": 8, "fuel_gph": 2, "fuel_price": 4, "maint_hr": 4, "wear_hr": 1 },
+      "outputs": {
+        "owning_hr": { "value": 10.4, "tolerance": { "pct": 0.5 } },
+        "total_hr": { "value": 23.4, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "equipment-hourly-rate",
+      "source_publisher": "CAT / AED method",
+      "source_title": "cross-check: running 2,000 hr/yr halves the interest carry -> $22.20/hr",
+      "source_edition_or_year": "spec-v363 worked example (machine-verified)",
+      "source_section_or_page": "spec-v363 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "purchase": 50000, "salvage": 10000, "life_hr": 5000, "annual_hr": 2000, "iit_pct": 8, "fuel_gph": 2, "fuel_price": 4, "maint_hr": 4, "wear_hr": 1 },
+      "outputs": {
+        "total_hr": { "value": 22.2, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "overhead-recovery-rate",
+      "source_publisher": "contractor cost accounting",
+      "source_title": "$200,000 overhead over 8,000 billable hours -> $25/hr",
+      "source_edition_or_year": "spec-v364 worked example (machine-verified)",
+      "source_section_or_page": "spec-v364 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "annual_overhead": 200000, "basis": "per-hour", "billable_hours": 8000, "annual_direct": 0, "job_direct": 0 },
+      "outputs": {
+        "rate_hr": { "value": 25, "tolerance": { "abs": 0.01 } }
+      }
+    },
+    {
+      "tile_id": "overhead-recovery-rate",
+      "source_publisher": "contractor cost accounting",
+      "source_title": "cross-check: markup basis, $200K over $500K direct -> 40%, $4,000 on a $10K job",
+      "source_edition_or_year": "spec-v364 worked example (machine-verified)",
+      "source_section_or_page": "spec-v364 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "annual_overhead": 200000, "basis": "markup", "billable_hours": 0, "annual_direct": 500000, "job_direct": 10000 },
+      "outputs": {
+        "overhead_pct": { "value": 40, "tolerance": { "abs": 0.1 } },
+        "job_overhead": { "value": 4000, "tolerance": { "abs": 1 } }
+      }
     }
   ]
 }

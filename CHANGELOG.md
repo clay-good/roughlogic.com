@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(accounting): land spec-v362..v364 -- 3 contractor cost-recovery tiles in calc-accounting.js; 830 -> 833 tiles, 0.127.0, 2026-07-03
+
+The contractor cost-recovery trio, thirtieth batch of the v275-v374 campaign: the bid-rate numbers a contractor builds from wages, iron, and overhead, all in the existing lazy `calc-accounting.js` (Group R); no new module, group, or dependency. Catalog **830 -> 833**, package **0.126.0 -> 0.127.0** (a minor). Proposed 2026-07-02.
+
+- **`labor-burden-rate` (spec-v362).** burden = wage x (payroll+WC+liability)% + benefits, / productive fraction. Pinned: $25/hr at 9.15% payroll, 8% WC, 2% liability, $4 benefits, 85% billable -> $39.75/hr; a low-WC trade at full productivity -> $32.79/hr (31% burden).
+- **`equipment-hourly-rate` (spec-v363).** owning (depreciation + IIT carry) + operating (fuel + maint + wear), the CAT/AED method. Pinned: a $50K skid steer, $10K salvage, 5,000-hr life at 1,000 hr/yr -> $23.40/hr; running 2,000 hr/yr drops it to $22.20/hr.
+- **`overhead-recovery-rate` (spec-v364).** overhead / billable hours ($/hr), or / annual direct (% markup). Pinned: $200K over 8,000 hours -> $25/hr; over $500K direct -> 40%, so $4,000 on a $10K job. Cutting overhead lowers the rate directly.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the build-up, the utilization effect, both recovery bases, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the labor-burden build-up, the CAT/AED owning-and-operating method, and the overhead-recovery method. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases (one pre-existing alias repointed to the new tile), `related-tiles`, and 3 fuzzer blocks (`overhead-recovery-rate` hand-writes its renderer for the basis `makeSelect`); corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-accounting.js 23000 -> 28000; the `ACCOUNTING_RENDERERS` count test moved 16 -> 19. Housekeeping: home count 830 -> 833, README resynced (counts, Group R cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 59 appended. All gates green at the new state: lint, unit tests (**5,126**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(construction): land spec-v359..v361 -- 3 applied-mechanics tiles in calc-construction.js; 827 -> 830 tiles, 0.126.0, 2026-07-03
 
 The applied-mechanics trio, twenty-ninth batch of the v275-v374 campaign: the machine- and pressure-element mechanics the structural-member tiles never give, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **827 -> 830**, package **0.125.0 -> 0.126.0** (a minor). Proposed 2026-07-02.

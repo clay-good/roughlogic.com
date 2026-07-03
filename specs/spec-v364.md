@@ -1,6 +1,6 @@
 # roughlogic.com Specification v364 -- Overhead Recovery Rate (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v362..v364 (the contractor-business trio -- labor burden
+> **Status: LANDED (2026-07-03, package 0.127.0). Batch spec-v362..v364 (the contractor-business trio -- labor burden
 > (v362), equipment rate (v363), the overhead recovery rate (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog computes markup and margin, but not how a
 > contractor recovers indirect overhead -- the office rent, admin salaries, trucks, and insurance that no single job pays

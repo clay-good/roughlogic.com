@@ -789,6 +789,7 @@ const TOOL_MODULES = (() => {
   
     // v20
     "declining-balance-depreciation", "markup-vs-margin", "employer-payroll-tax",
+    "labor-burden-rate", "equipment-hourly-rate", "overhead-recovery-rate",
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [
