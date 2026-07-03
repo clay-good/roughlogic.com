@@ -1470,8 +1470,11 @@ cross-check.
 | calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnAxial` | `{ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcDevelopmentLength` | `{ fc = 4000, fy = 60000, db = 0, psi_t = 1.0, psi_e = 1.0, psi_s = 1.0, psi_g...` | _ | _ | _ |
+| calc-concrete.js | `computeRcDoublyReinforced` | `{ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_p...` | _ | _ | _ |
 | calc-concrete.js | `computeRcHookDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o =...` | _ | _ | _ |
 | calc-concrete.js | `computeRcPunchingShear` | `{ c1_in = 0, c2_in = 0, d_in = 0, fc_psi = 4000, position = "interior", lambd...` | _ | _ | _ |
+| calc-concrete.js | `computeRcShearFriction` | `{ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0, fc_psi = 4000, iface = "roughened"...` | _ | _ | _ |
+| calc-concrete.js | `computeRcSlabMinThickness` | `{ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
 | calc-construction.js | `computeAllowableArea` | `{ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_widt...` | _ | _ | _ |
@@ -2424,7 +2427,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1010.
+Row count: 1013.
 
 <!-- END function-corpus-v14 -->
 
@@ -2824,7 +2827,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (145 tiles)
+### Group E Construction (148 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2912,8 +2915,11 @@ per spec-v14 §13.1 second paragraph.
 | `rc-beam-shear` | Reinforced Concrete Beam Shear and Stirrup Spacing (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v258 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-column-axial` | RC Tied Column Axial Capacity (ACI 318-19 22.4) | ACI 318-19 22.4.2 / 22.4.2.1; spec-v284 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-development-length` | Rebar Tension Development Length (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v259 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rc-doubly-reinforced` | Doubly-Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 doubly-reinforced flexure; spec-v300 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-hook-development` | Standard Hook Development Length (ACI 318-19 25.4.3) | ACI 318-19 Eq. 25.4.3.1a; spec-v286 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-punching-shear` | Two-Way Slab Punching Shear at a Column (ACI 318-19 22.6) | ACI 318-19 Table 22.6.5.2; spec-v285 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rc-shear-friction` | Shear Friction Across an Interface (ACI 318-19 22.9) | ACI 318-19 22.9; spec-v301 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rc-slab-min-thickness` | One-Way Slab / Beam Minimum Thickness for Deflection (ACI 318-19) | ACI 318-19 Table 7.3.1.1 / 9.3.1.1; spec-v299 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-lap-splice` | Rebar Lap-Splice Length | ACI 318 development-and-splice basis ...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-schedule` | Rebar Bend and Weight Schedule | ACI Detailing Manual / CRSI (project ...; 12 #5 @ 20 ft + 2x 90 + 30 #4 @ 16 ft + 1 stirrup + 8 #6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3377,6 +3383,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 767. Fixture-covered or reference-cadence: 767 / 767.
+Tile count: 770. Fixture-covered or reference-cadence: 770 / 770.
 
 <!-- END tile-index-v14 -->

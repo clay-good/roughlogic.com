@@ -1,6 +1,6 @@
 # roughlogic.com Specification v300 -- Doubly-Reinforced Concrete Beam Flexural Capacity (ACI 318-19) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v299..v301 (the reinforced-concrete depth-2 trio -- min
+> **Status: LANDED (2026-07-03, package 0.106.0; proposed 2026-07-02). Batch spec-v299..v301 (the reinforced-concrete depth-2 trio -- min
 > thickness (v299), the doubly-reinforced beam (this spec), shear friction (v301)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `rc-beam-flexure` is singly-reinforced (tension steel
 > only) and explicitly names "compression steel ... separate checks." When a beam's depth is limited and the tension steel

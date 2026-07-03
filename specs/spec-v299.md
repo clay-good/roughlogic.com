@@ -1,6 +1,6 @@
 # roughlogic.com Specification v299 -- One-Way Slab/Beam Minimum Thickness for Deflection (ACI 318-19 Table 7.3.1.1 / 9.3.1.1) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v299..v301 (the reinforced-concrete depth-2 trio -- the ACI
+> **Status: LANDED (2026-07-03, package 0.106.0; proposed 2026-07-02). Batch spec-v299..v301 (the reinforced-concrete depth-2 trio -- the ACI
 > checks the strength tiles never make: the deflection-control minimum thickness (this spec), the doubly-reinforced beam
 > with compression steel (v300), and shear friction across an interface (v301).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the concrete tiles compute strength (flexure, shear,

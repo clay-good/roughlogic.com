@@ -28617,6 +28617,98 @@
         "p_ww_psf": { "value": 26.4, "tolerance": { "pct": 0.5 } },
         "p_net_psf": { "value": 32.8, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "rc-slab-min-thickness",
+      "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
+      "source_title": "simply supported one-way slab, 12 ft, Grade 60 normalweight -> 7.2 in",
+      "source_edition_or_year": "spec-v299 worked example (machine-verified)",
+      "source_section_or_page": "spec-v299 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_ft": 12, "support": "simply", "fy_psi": 60000, "wc_pcf": 145 },
+      "outputs": {
+        "base_in": { "value": 7.2, "tolerance": { "abs": 0.001 } },
+        "kfy": { "value": 1.0, "tolerance": { "abs": 0.0001 } },
+        "hmin_in": { "value": 7.2, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "rc-slab-min-thickness",
+      "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
+      "source_title": "cross-check: Grade 40 both-ends-continuous -> base 5.14, kfy 0.8, hmin 4.11 in",
+      "source_edition_or_year": "spec-v299 worked example (machine-verified)",
+      "source_section_or_page": "spec-v299 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_ft": 12, "support": "both-ends", "fy_psi": 40000, "wc_pcf": 145 },
+      "outputs": {
+        "base_in": { "value": 5.143, "tolerance": { "pct": 0.1 } },
+        "kfy": { "value": 0.8, "tolerance": { "abs": 0.0001 } },
+        "hmin_in": { "value": 4.114, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-doubly-reinforced",
+      "source_publisher": "ACI 318-19 doubly-reinforced flexure",
+      "source_title": "14x24 beam, d 22, d' 2, As 8, A's 3, 4,000 psi Grade 60 -> Mn 771, phi Mn 694 kip-ft",
+      "source_edition_or_year": "spec-v300 worked example (machine-verified)",
+      "source_section_or_page": "spec-v300 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "b_in": 14, "d_in": 22, "dp_in": 2.0, "as_in2": 8.0, "asp_in2": 3.0, "fc_psi": 4000, "fy_psi": 60000 },
+      "outputs": {
+        "a_in": { "value": 6.303, "tolerance": { "pct": 0.1 } },
+        "c_in": { "value": 7.415, "tolerance": { "pct": 0.1 } },
+        "mn_kipft": { "value": 771.2, "tolerance": { "pct": 0.2 } },
+        "phi_mn_kipft": { "value": 694.1, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "rc-doubly-reinforced",
+      "source_publisher": "ACI 318-19 doubly-reinforced flexure",
+      "source_title": "cross-check: remove the compression steel (A's ~0) -> a 10.08 in, Mn 678 kip-ft (singly)",
+      "source_edition_or_year": "spec-v300 worked example (machine-verified)",
+      "source_section_or_page": "spec-v300 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "b_in": 14, "d_in": 22, "dp_in": 2.0, "as_in2": 8.0, "asp_in2": 0.001, "fc_psi": 4000, "fy_psi": 60000 },
+      "outputs": {
+        "a_in": { "value": 10.078, "tolerance": { "pct": 0.2 } },
+        "mn_kipft": { "value": 678.4, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "rc-shear-friction",
+      "source_publisher": "ACI 318-19 22.9",
+      "source_title": "2.0 in^2 Grade 60 dowels, roughened cold joint, 12x16 in, 4,000 psi -> Vn 120, phi Vn 90 kip",
+      "source_edition_or_year": "spec-v301 worked example (machine-verified)",
+      "source_section_or_page": "spec-v301 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "avf_in2": 2.0, "fy_psi": 60000, "ac_in2": 192, "fc_psi": 4000, "iface": "roughened", "lambda": 1.0 },
+      "outputs": {
+        "mu_f": { "value": 1.0, "tolerance": { "abs": 0.0001 } },
+        "vn0_kip": { "value": 120, "tolerance": { "pct": 0.1 } },
+        "cap_kip": { "value": 153.6, "tolerance": { "pct": 0.1 } },
+        "vn_kip": { "value": 120, "tolerance": { "pct": 0.1 } },
+        "phi_vn_kip": { "value": 90, "tolerance": { "pct": 0.1 } }
+      }
+    },
+    {
+      "tile_id": "rc-shear-friction",
+      "source_publisher": "ACI 318-19 22.9",
+      "source_title": "cross-check: add dowels to 3.0 in^2 -> the 153.6 kip interface cap governs, phi Vn 115.2 kip",
+      "source_edition_or_year": "spec-v301 worked example (machine-verified)",
+      "source_section_or_page": "spec-v301 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "avf_in2": 3.0, "fy_psi": 60000, "ac_in2": 192, "fc_psi": 4000, "iface": "roughened", "lambda": 1.0 },
+      "outputs": {
+        "vn0_kip": { "value": 180, "tolerance": { "pct": 0.1 } },
+        "vn_kip": { "value": 153.6, "tolerance": { "pct": 0.1 } },
+        "phi_vn_kip": { "value": 115.2, "tolerance": { "pct": 0.1 } }
+      }
     }
   ]
 }

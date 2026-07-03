@@ -947,6 +947,10 @@ const RELATED = {
   "wind-cc-pressure": ["wind-pressure","wind-mwfrs-pressure","asce7-load-combinations"],
   "snow-drift-load": ["snow-load","rain-load-ponding","asce7-load-combinations"],
   "wind-mwfrs-pressure": ["wind-pressure","wind-cc-pressure","diaphragm-shear"],
+  // spec-v299..v301 reinforced-concrete depth-2 batch (Group E)
+  "rc-slab-min-thickness": ["rc-beam-flexure","rc-beam-shear","joist-deflection"],
+  "rc-doubly-reinforced": ["rc-beam-flexure","rc-beam-shear","rc-column-axial"],
+  "rc-shear-friction": ["rc-beam-shear","rebar-lap-splice","anchor-embedment"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

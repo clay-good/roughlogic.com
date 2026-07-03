@@ -663,6 +663,10 @@ export const COMPUTE_MAP = {
   "wind-cc-pressure": { module: "../../calc-construction.js", fn: "computeWindCcPressure" },
   "snow-drift-load": { module: "../../calc-construction.js", fn: "computeSnowDriftLoad" },
   "wind-mwfrs-pressure": { module: "../../calc-construction.js", fn: "computeWindMwfrsPressure" },
+  // spec-v299..v301 reinforced-concrete depth-2 batch (3 tiles)
+  "rc-slab-min-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMinThickness" },
+  "rc-doubly-reinforced": { module: "../../calc-concrete.js", fn: "computeRcDoublyReinforced" },
+  "rc-shear-friction": { module: "../../calc-concrete.js", fn: "computeRcShearFriction" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

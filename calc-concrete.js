@@ -344,3 +344,156 @@ CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
   ],
   compute: computeRcHookDevelopment,
 });
+
+// ===================== spec-v299..v301: reinforced-concrete depth-2 batch =====================
+// The ACI checks the strength tiles never make: the deflection-control minimum
+// thickness (Table 7.3.1.1 / 9.3.1.1), the doubly-reinforced beam with
+// compression steel, and shear friction across an interface (22.9).
+const _RC_BETA1 = (fc_psi) => fc_psi <= 4000 ? 0.85 : Math.max(0.85 - 0.05 * (fc_psi - 4000) / 1000, 0.65);
+
+// dims: in { l_ft: L, support: dimensionless, fy_psi: M L^-1 T^-2, wc_pcf: M L^-2 T^-2 } out: { base_in: L, kfy: dimensionless, klw: dimensionless, hmin_in: L }
+export function computeRcSlabMinThickness({ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(l_ft > 0)) return { error: "Span must be positive (ft)." };
+  if (!(fy_psi > 0)) return { error: "Steel yield fy must be positive (psi)." };
+  if (!(wc_pcf > 0)) return { error: "Concrete unit weight must be positive (pcf)." };
+  const denoms = { simply: 20, "one-end": 24, "both-ends": 28, cantilever: 10 };
+  const denom = denoms[support];
+  if (!denom) return { error: "Support condition must be simply, one-end, both-ends, or cantilever." };
+  const base_in = (l_ft * 12) / denom;
+  const kfy = fy_psi === 60000 ? 1.0 : 0.4 + fy_psi / 100000;
+  const klw = wc_pcf >= 145 ? 1.0 : Math.max(1.65 - 0.005 * wc_pcf, 1.09);
+  const hmin_in = base_in * kfy * klw;
+  return {
+    base_in, kfy, klw, hmin_in,
+    note: "ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness: l/20 simply supported, l/24 one end continuous, l/28 both ends continuous, l/10 cantilever, times (0.4 + fy/100,000) for fy other than 60,000 psi and the 1.65 - 0.005 wc lightweight factor (>= 1.09). This is the depth that WAIVES an explicit deflection calculation - it applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design or the actual deflection of a thinner member. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcSlabMinThicknessExample = { inputs: { l_ft: 12, support: "simply", fy_psi: 60000, wc_pcf: 145 } };
+
+CONCRETE_RENDERERS["rc-slab-min-thickness"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness (l/20, l/24, l/28, l/10), the (0.4 + fy/100,000) grade modifier, and the lightweight factor, by name. The depth that waives a deflection check, not a strength design. A design aid, not a substitute for the engineer of record.",
+  example: rcSlabMinThicknessExample.inputs,
+  fields: [
+    { key: "l_ft", label: "Span l (ft, clear span)", kind: "number" },
+    { key: "support", label: "Support condition", kind: "select", options: [
+      { value: "simply", label: "Simply supported (l/20)" },
+      { value: "one-end", label: "One end continuous (l/24)" },
+      { value: "both-ends", label: "Both ends continuous (l/28)" },
+      { value: "cantilever", label: "Cantilever (l/10)" },
+    ], default: "simply" },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "wc_pcf", label: "Concrete unit weight (pcf)", kind: "number", default: 145 },
+  ],
+  outputs: [
+    { key: "base", id: "rsmt-out-base", label: "Base thickness (l / denominator)", value: (r) => fmt(r.base_in, 2) + " in" },
+    { key: "mods", id: "rsmt-out-mods", label: "Grade / lightweight modifiers", value: (r) => fmt(r.kfy, 3) + " / " + fmt(r.klw, 3) },
+    { key: "hmin", id: "rsmt-out-hmin", label: "Minimum thickness hmin", value: (r) => fmt(r.hmin_in, 2) + " in" },
+    { key: "n", id: "rsmt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcSlabMinThickness,
+});
+
+// dims: in { b_in: L, d_in: L, dp_in: L, as_in2: L^2, asp_in2: L^2, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { a_in: L, c_in: L, eps_sp: dimensionless, eps_t: dimensionless, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2 }
+export function computeRcDoublyReinforced({ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_psi = 60000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_in > 0) || !(d_in > 0)) return { error: "Beam width and effective depth must be positive (in)." };
+  if (!(dp_in > 0)) return { error: "Compression-steel depth d' must be positive (in)." };
+  if (!(dp_in < d_in)) return { error: "The compression-steel depth d' must be less than the effective depth d." };
+  if (!(as_in2 > 0)) return { error: "Tension steel As must be positive (in^2)." };
+  if (asp_in2 < 0) return { error: "Compression steel A's cannot be negative (in^2)." };
+  if (!(as_in2 > asp_in2)) return { error: "The tension steel must exceed the compression steel (As > A's) for a net tension couple." };
+  if (!(fc_psi > 0) || !(fy_psi > 0)) return { error: "Concrete and steel strengths must be positive (psi)." };
+  const beta1 = _RC_BETA1(fc_psi);
+  const a_in = ((as_in2 - asp_in2) * fy_psi) / (0.85 * fc_psi * b_in);
+  const c_in = a_in / beta1;
+  const eps_y = fy_psi / 29e6;
+  const eps_sp = 0.003 * (c_in - dp_in) / c_in;
+  const eps_t = 0.003 * (d_in - c_in) / c_in;
+  const comp_yields = eps_sp >= eps_y;
+  const tension_controlled = eps_t >= 0.005;
+  const phi = tension_controlled ? 0.90 : (eps_t <= eps_y ? 0.65 : 0.65 + 0.25 * (eps_t - eps_y) / (0.005 - eps_y));
+  const mn_lbin = (as_in2 - asp_in2) * fy_psi * (d_in - a_in / 2) + asp_in2 * fy_psi * (d_in - dp_in);
+  const mn_kipft = mn_lbin / 12000;
+  const phi_mn_kipft = phi * mn_kipft;
+  return {
+    a_in, c_in, beta1, eps_sp, eps_t, eps_y, comp_yields, tension_controlled, phi, mn_kipft, phi_mn_kipft,
+    note: "ACI 318-19 doubly-reinforced rectangular-beam flexure: a = (As - A's) fy / (0.85 f'c b), c = a/beta1, and Mn = (As - A's) fy (d - a/2) + A's fy (d - d') - the singly-reinforced couple plus the steel-to-steel couple. This ASSUMES both steel layers yield (the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es is flagged when it fails, where a rigorous solution would iterate with f's = Es epsilon's <= fy), confirms the tension-controlled phi = 0.90 at epsilon_t >= 0.005, and covers a rectangular section (no T-beam flange). Minimum steel, bar spacing, and development are not checked. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcDoublyReinforcedExample = { inputs: { b_in: 14, d_in: 22, dp_in: 2.0, as_in2: 8.0, asp_in2: 3.0, fc_psi: 4000, fy_psi: 60000 } };
+
+CONCRETE_RENDERERS["rc-doubly-reinforced"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 doubly-reinforced flexure a = (As - A's) fy / (0.85 f'c b), Mn = (As - A's) fy (d - a/2) + A's fy (d - d'), the compression-steel yield check epsilon's >= fy/Es, and the tension-controlled phi = 0.90, by name. Both layers assumed to yield; rectangular section. A design aid, not a substitute for the engineer of record.",
+  example: rcDoublyReinforcedExample.inputs,
+  fields: [
+    { key: "b_in", label: "Beam width b (in)", kind: "number" },
+    { key: "d_in", label: "Effective depth d (in)", kind: "number" },
+    { key: "dp_in", label: "Compression-steel depth d' (in)", kind: "number" },
+    { key: "as_in2", label: "Tension steel As (in^2)", kind: "number" },
+    { key: "asp_in2", label: "Compression steel A's (in^2)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+  ],
+  outputs: [
+    { key: "ac", id: "rdr-out-ac", label: "Stress block a / neutral axis c", value: (r) => fmt(r.a_in, 2) + " / " + fmt(r.c_in, 2) + " in" },
+    { key: "yld", id: "rdr-out-yld", label: "Compression steel yields?", value: (r) => (r.comp_yields ? "yes (epsilon's " + fmt(r.eps_sp, 5) + " >= " + fmt(r.eps_y, 5) + ")" : "NO - both-yield assumption not met; result unconservative") },
+    { key: "tc", id: "rdr-out-tc", label: "Section (phi)", value: (r) => (r.tension_controlled ? "tension-controlled (phi 0.90)" : "transition (phi " + fmt(r.phi, 3) + ")") + ", epsilon_t " + fmt(r.eps_t, 4) },
+    { key: "mn", id: "rdr-out-mn", label: "Nominal Mn", value: (r) => fmt(r.mn_kipft, 1) + " kip-ft" },
+    { key: "pm", id: "rdr-out-pm", label: "Design phi Mn", value: (r) => fmt(r.phi_mn_kipft, 1) + " kip-ft" },
+    { key: "n", id: "rdr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcDoublyReinforced,
+});
+
+// dims: in { avf_in2: L^2, fy_psi: M L^-1 T^-2, ac_in2: L^2, fc_psi: M L^-1 T^-2, iface: dimensionless, lambda: dimensionless } out: { mu_f: dimensionless, vn0_kip: M L T^-2, cap_kip: M L T^-2, vn_kip: M L T^-2, phi_vn_kip: M L T^-2 }
+export function computeRcShearFriction({ avf_in2 = 0, fy_psi = 60000, ac_in2 = 0, fc_psi = 4000, iface = "roughened", lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(avf_in2 > 0)) return { error: "The friction reinforcement area Avf must be positive (in^2)." };
+  if (!(fy_psi > 0)) return { error: "Steel yield fy must be positive (psi)." };
+  if (!(ac_in2 > 0)) return { error: "The interface area Ac must be positive (in^2)." };
+  if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(lambda > 0 && lambda <= 1)) return { error: "The lightweight factor lambda is over 0 and up to 1.0." };
+  const mus = { monolithic: 1.4, roughened: 1.0, unroughened: 0.6, steel: 0.7 };
+  const base_mu = mus[iface];
+  if (!base_mu) return { error: "The interface must be monolithic, roughened, unroughened, or steel." };
+  const mu_f = base_mu * lambda;
+  const vn0_kip = (mu_f * avf_in2 * fy_psi) / 1000;
+  const cap_governs_mono = iface === "monolithic" || iface === "roughened";
+  const cap_kip = (Math.min(0.2 * fc_psi, 480 + 0.08 * fc_psi, 1600) * ac_in2) / 1000;
+  const vn_kip = cap_governs_mono ? Math.min(vn0_kip, cap_kip) : vn0_kip;
+  const capped = cap_governs_mono && cap_kip < vn0_kip;
+  const phi_vn_kip = 0.75 * vn_kip;
+  return {
+    mu_f, vn0_kip, cap_kip, vn_kip, capped, phi_vn_kip,
+    note: "ACI 318-19 22.9 shear-friction strength Vn = mu Avf fy, with mu = 1.4 lambda (monolithic), 1.0 lambda (against roughened hardened concrete), 0.6 lambda (unroughened), 0.7 lambda (against as-rolled steel), capped by min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac for a NORMALWEIGHT monolithic or roughened interface, and phi = 0.75. This returns the shear transferred across a single well-defined plane by friction in the perpendicular (no permanent net tension) case; a net tension across the plane needs added reinforcement Avf = Vu/(phi fy mu) + An. The reduced caps for lightweight or other interface conditions, the anchorage/development of the crossing bars, and the concrete bracket/corbel bearing are separate. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcShearFrictionExample = { inputs: { avf_in2: 2.0, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "roughened", lambda: 1.0 } };
+
+CONCRETE_RENDERERS["rc-shear-friction"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 22.9 shear friction Vn = mu Avf fy (mu 1.4/1.0/0.6/0.7 x lambda by interface), capped by min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac for normalweight monolithic/roughened, phi = 0.75, by name. Perpendicular (no net tension) case, single plane. A design aid, not a substitute for the engineer of record.",
+  example: rcShearFrictionExample.inputs,
+  fields: [
+    { key: "avf_in2", label: "Reinforcement crossing the plane Avf (in^2)", kind: "number" },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "ac_in2", label: "Interface area Ac (in^2)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "iface", label: "Interface condition (mu)", kind: "select", options: [
+      { value: "monolithic", label: "Monolithic (1.4)" },
+      { value: "roughened", label: "Against roughened concrete (1.0)" },
+      { value: "unroughened", label: "Against unroughened concrete (0.6)" },
+      { value: "steel", label: "Against as-rolled steel (0.7)" },
+    ], default: "roughened" },
+    { key: "lambda", label: "Lightweight factor lambda", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "mu", id: "rsf-out-mu", label: "Friction coefficient mu", value: (r) => fmt(r.mu_f, 2) },
+    { key: "vn0", id: "rsf-out-vn0", label: "Friction strength mu Avf fy", value: (r) => fmt(r.vn0_kip, 1) + " kip" },
+    { key: "cap", id: "rsf-out-cap", label: "Interface cap", value: (r) => fmt(r.cap_kip, 1) + " kip" + (r.capped ? " (governs)" : "") },
+    { key: "vn", id: "rsf-out-vn", label: "Nominal Vn", value: (r) => fmt(r.vn_kip, 1) + " kip" },
+    { key: "pv", id: "rsf-out-pv", label: "Design phi Vn", value: (r) => fmt(r.phi_vn_kip, 1) + " kip" },
+    { key: "n", id: "rsf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcShearFriction,
+});

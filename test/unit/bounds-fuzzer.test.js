@@ -13693,3 +13693,80 @@ test("bounds: spec-v298 computeWindMwfrsPressure pins the walls, the internal-ca
   assert.ok("error" in _v298({ qz_psf: 25.9, qh_psf: 25.9, gcpi: -0.1 }));
   assert.ok("error" in _v298({ qz_psf: Infinity, qh_psf: 25.9 }));
 });
+
+// ===================== spec-v299..v301 reinforced-concrete depth-2 batch =====================
+import { computeRcSlabMinThickness as _v299, computeRcDoublyReinforced as _v300, computeRcShearFriction as _v301 } from "../../calc-concrete.js";
+
+test("bounds: spec-v299 computeRcSlabMinThickness pins the support denominators, the modifiers, and error seams", () => {
+  const r = _v299({ l_ft: 12, support: "simply", fy_psi: 60000, wc_pcf: 145 });
+  assert.ok(Math.abs(r.base_in - 7.2) < 1e-9);
+  assert.strictEqual(r.kfy, 1.0);
+  assert.strictEqual(r.klw, 1.0);
+  assert.ok(Math.abs(r.hmin_in - 7.2) < 1e-9);
+  // The four support denominators.
+  assert.ok(Math.abs(_v299({ l_ft: 12, support: "one-end" }).base_in - 144 / 24) < 1e-9);
+  assert.ok(Math.abs(_v299({ l_ft: 12, support: "both-ends" }).base_in - 144 / 28) < 1e-9);
+  assert.ok(Math.abs(_v299({ l_ft: 12, support: "cantilever" }).base_in - 144 / 10) < 1e-9);
+  // Grade-40 modifier and continuity together.
+  const r2 = _v299({ l_ft: 12, support: "both-ends", fy_psi: 40000 });
+  assert.ok(Math.abs(r2.kfy - 0.8) < 1e-9);
+  assert.ok(Math.abs(r2.hmin_in - 144 / 28 * 0.8) < 1e-9);
+  // The lightweight modifier kicks in below 145 pcf and floors at 1.09 (wc > 112).
+  assert.ok(_v299({ l_ft: 12, support: "simply", wc_pcf: 110 }).klw > 1.0);
+  assert.ok(Math.abs(_v299({ l_ft: 12, support: "simply", wc_pcf: 90 }).klw - (1.65 - 0.005 * 90)) < 1e-9);
+  assert.strictEqual(_v299({ l_ft: 12, support: "simply", wc_pcf: 130 }).klw, 1.09);
+  // Error seams.
+  assert.ok("error" in _v299({ l_ft: 0, support: "simply" }));
+  assert.ok("error" in _v299({ l_ft: 12, support: "bogus" }));
+  assert.ok("error" in _v299({ l_ft: 12, support: "simply", fy_psi: 0 }));
+  assert.ok("error" in _v299({ l_ft: Infinity, support: "simply" }));
+});
+
+test("bounds: spec-v300 computeRcDoublyReinforced pins the two couples, the yield/phi checks, and error seams", () => {
+  const r = _v300({ b_in: 14, d_in: 22, dp_in: 2.0, as_in2: 8.0, asp_in2: 3.0, fc_psi: 4000, fy_psi: 60000 });
+  assert.ok(Math.abs(r.a_in - (8 - 3) * 60000 / (0.85 * 4000 * 14)) < 1e-9);
+  assert.ok(Math.abs(r.c_in - r.a_in / 0.85) < 1e-9);
+  assert.strictEqual(r.comp_yields, true);
+  assert.strictEqual(r.tension_controlled, true);
+  assert.strictEqual(r.phi, 0.90);
+  assert.ok(Math.abs(r.mn_kipft - 771.2) < 0.5);
+  assert.ok(Math.abs(r.phi_mn_kipft - 0.9 * r.mn_kipft) < 1e-9);
+  // Removing the compression steel drops the capacity and deepens the stress block.
+  const r2 = _v300({ b_in: 14, d_in: 22, dp_in: 2.0, as_in2: 8.0, asp_in2: 0.001, fc_psi: 4000, fy_psi: 60000 });
+  assert.ok(r2.a_in > r.a_in);
+  assert.ok(r2.mn_kipft < r.mn_kipft);
+  // The compression-steel-yield flag fires when d' is deep relative to c.
+  const r3 = _v300({ b_in: 14, d_in: 22, dp_in: 6.5, as_in2: 8.0, asp_in2: 3.0, fc_psi: 4000, fy_psi: 60000 });
+  assert.strictEqual(r3.comp_yields, false);
+  // Error seams.
+  assert.ok("error" in _v300({ b_in: 0, d_in: 22, dp_in: 2, as_in2: 8, asp_in2: 3 }));
+  assert.ok("error" in _v300({ b_in: 14, d_in: 22, dp_in: 22, as_in2: 8, asp_in2: 3 })); // d' >= d
+  assert.ok("error" in _v300({ b_in: 14, d_in: 22, dp_in: 2, as_in2: 3, asp_in2: 3 })); // As <= A's
+  assert.ok("error" in _v300({ b_in: 14, d_in: 22, dp_in: 2, as_in2: NaN, asp_in2: 3 }));
+});
+
+test("bounds: spec-v301 computeRcShearFriction pins the mu map, the interface cap, and error seams", () => {
+  const r = _v301({ avf_in2: 2.0, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "roughened", lambda: 1.0 });
+  assert.strictEqual(r.mu_f, 1.0);
+  assert.ok(Math.abs(r.vn0_kip - 120) < 1e-9);
+  assert.ok(Math.abs(r.cap_kip - 153.6) < 1e-9);
+  assert.ok(Math.abs(r.vn_kip - 120) < 1e-9); // friction governs
+  assert.strictEqual(r.capped, false);
+  assert.ok(Math.abs(r.phi_vn_kip - 90) < 1e-9);
+  // More dowels hit the interface cap.
+  const r2 = _v301({ avf_in2: 3.0, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "roughened" });
+  assert.ok(Math.abs(r2.vn_kip - 153.6) < 1e-9);
+  assert.strictEqual(r2.capped, true);
+  // The interface mu map.
+  assert.strictEqual(_v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "monolithic" }).mu_f, 1.4);
+  assert.strictEqual(_v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "unroughened" }).mu_f, 0.6);
+  assert.strictEqual(_v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "steel" }).mu_f, 0.7);
+  // Lightweight lambda scales mu.
+  assert.ok(Math.abs(_v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "roughened", lambda: 0.75 }).mu_f - 0.75) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v301({ avf_in2: 0, fy_psi: 60000, ac_in2: 192, fc_psi: 4000 }));
+  assert.ok("error" in _v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 0, fc_psi: 4000 }));
+  assert.ok("error" in _v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, iface: "bogus" }));
+  assert.ok("error" in _v301({ avf_in2: 2, fy_psi: 60000, ac_in2: 192, fc_psi: 4000, lambda: 1.5 }));
+  assert.ok("error" in _v301({ avf_in2: Infinity, fy_psi: 60000, ac_in2: 192, fc_psi: 4000 }));
+});

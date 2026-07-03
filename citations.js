@@ -7635,6 +7635,42 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "rc-slab-min-thickness": {
+    formula: "denom = {simply:20, one-end:24, both-ends:28, cantilever:10}; base = 12 l / denom; kfy = (fy == 60,000) ? 1 : 0.4 + fy/100,000; klw = (wc >= 145) ? 1 : max(1.65 - 0.005 wc, 1.09); hmin = base kfy klw.",
+    edition: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) minimum thickness for deflection control, with the (0.4 + fy/100,000) non-Grade-60 modifier and the lightweight-concrete factor, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the minimum-thickness tables are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and 9.3.1.1 (beams) minimum thickness l/20 (simply supported), l/24 (one end continuous), l/28 (both continuous), l/10 (cantilever), the (0.4 + fy/100,000) modifier for fy other than 60,000 psi, and the 1.65 - 0.005 wc lightweight factor (>= 1.09). This returns the deflection-control minimum thickness that waives an explicit deflection calculation - it applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design or the actual deflection of a thinner member. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Base thickness", value: "l/20, l/24, l/28, or l/10 by support condition, on the clear span", source: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1" },
+      { name: "Grade modifier", value: "(0.4 + fy/100,000) for fy other than 60,000 psi", source: "ACI 318-19 Table footnote" },
+      { name: "Scope", value: "members not supporting partitions likely to be damaged by deflection; not a strength design", source: "ACI 318-19 7.3.1.1" },
+    ],
+  },
+  "rc-doubly-reinforced": {
+    formula: "a = (As - A's) fy / (0.85 f'c b); c = a/beta1; eps's = 0.003 (c - d')/c; eps_t = 0.003 (d - c)/c; Mn = (As - A's) fy (d - a/2) + A's fy (d - d'); phi Mn (phi = 0.90 tension-controlled).",
+    edition: "The ACI 318-19 doubly-reinforced rectangular-beam flexural capacity with the compression-steel yield check and the tension-controlled strength-reduction factor, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the flexural provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 doubly-reinforced rectangular-beam capacity a = (As - A's) fy / (0.85 f'c b), Mn = (As - A's) fy (d - a/2) + A's fy (d - d'), the compression-steel yield check epsilon's = 0.003 (c - d')/c >= fy/Es, and the tension-controlled phi = 0.90 at epsilon_t >= 0.005. This assumes both steel layers yield (flagged when the compression steel does not, where a rigorous solution would iterate with f's = Es epsilon's <= fy), covers a rectangular section (no T-beam flange), and does not check minimum steel, bar spacing, or development. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Two couples", value: "the singly-reinforced concrete couple plus the compression-steel-to-tension-steel couple A's fy (d - d')", source: "ACI 318-19 22.2" },
+      { name: "Both yield", value: "both steel layers are assumed at fy; the compression-steel strain is checked and flagged", source: "ACI 318-19 22.2.1.1" },
+      { name: "Tension-controlled", value: "phi = 0.90 confirmed at epsilon_t >= 0.005 (transition below)", source: "ACI 318-19 21.2.2" },
+    ],
+  },
+  "rc-shear-friction": {
+    formula: "mu = {monolithic:1.4, roughened:1.0, unroughened:0.6, steel:0.7} x lambda; Vn0 = mu Avf fy; cap = min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac (normalweight mono/roughened); Vn = min(Vn0, cap); phi Vn = 0.75 Vn.",
+    edition: "The ACI 318-19 22.9 shear-friction strength Vn = mu Avf fy, with the interface friction coefficients and the maximum-transfer caps, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 22.9 shear-friction provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 22.9 shear-friction strength Vn = mu Avf fy, the mu values (1.4 lambda monolithic, 1.0 lambda against roughened hardened concrete, 0.6 lambda unroughened, 0.7 lambda against as-rolled steel), the maximum Vn = min(0.2 f'c, (480 + 0.08 f'c), 1600) Ac for a normalweight monolithic or roughened interface, and phi = 0.75. This returns the shear transferred across a single well-defined plane by friction in the perpendicular (no permanent net tension) case (a net tension needs added reinforcement Avf = Vu/(phi fy mu) + An), takes the reduced caps for lightweight or other interface conditions as a follow-on, and does not check the anchorage/development of the crossing bars or the concrete bracket/corbel bearing. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Friction transfer", value: "Vn = mu Avf fy on the reinforcement crossing the plane", source: "ACI 318-19 22.9.4.2" },
+      { name: "Interface coefficient", value: "mu = 1.4/1.0/0.6/0.7 x lambda by monolithic / roughened / unroughened / steel", source: "ACI 318-19 Table 22.9.4.2" },
+      { name: "Maximum transfer", value: "capped by the concrete interface min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac", source: "ACI 318-19 Table 22.9.4.4" },
+    ],
+  },
   "rc-column-axial": {
     formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
     edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",

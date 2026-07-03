@@ -440,6 +440,8 @@ const TOOL_MODULES = (() => {
     "rc-beam-flexure", "rc-beam-shear", "rc-development-length",
     // spec-v284..v286 member depth batch
     "rc-column-axial", "rc-punching-shear", "rc-hook-development",
+    // spec-v299..v301 depth-2 batch
+    "rc-slab-min-thickness", "rc-doubly-reinforced", "rc-shear-friction",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the

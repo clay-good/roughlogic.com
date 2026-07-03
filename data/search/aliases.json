@@ -11407,6 +11407,126 @@
       "term": "wind story force",
       "target": "wind-mwfrs-pressure",
       "kind": "adjacent"
+    },
+    {
+      "term": "slab thickness",
+      "target": "rc-slab-min-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum slab thickness",
+      "target": "rc-slab-min-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "deflection control",
+      "target": "rc-slab-min-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 7.3.1",
+      "target": "rc-slab-min-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "l over 20",
+      "target": "rc-slab-min-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "one way slab depth",
+      "target": "rc-slab-min-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "beam minimum depth",
+      "target": "rc-slab-min-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "no deflection check",
+      "target": "rc-slab-min-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "slab span depth",
+      "target": "rc-slab-min-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "doubly reinforced beam",
+      "target": "rc-doubly-reinforced",
+      "kind": "industry"
+    },
+    {
+      "term": "compression steel",
+      "target": "rc-doubly-reinforced",
+      "kind": "industry"
+    },
+    {
+      "term": "double reinforced",
+      "target": "rc-doubly-reinforced",
+      "kind": "industry"
+    },
+    {
+      "term": "top steel beam",
+      "target": "rc-doubly-reinforced",
+      "kind": "adjacent"
+    },
+    {
+      "term": "deep demand beam",
+      "target": "rc-doubly-reinforced",
+      "kind": "adjacent"
+    },
+    {
+      "term": "two layer reinforcement",
+      "target": "rc-doubly-reinforced",
+      "kind": "adjacent"
+    },
+    {
+      "term": "compression reinforcement",
+      "target": "rc-doubly-reinforced",
+      "kind": "industry"
+    },
+    {
+      "term": "shear friction",
+      "target": "rc-shear-friction",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 22.9",
+      "target": "rc-shear-friction",
+      "kind": "industry"
+    },
+    {
+      "term": "cold joint shear",
+      "target": "rc-shear-friction",
+      "kind": "industry"
+    },
+    {
+      "term": "interface shear transfer",
+      "target": "rc-shear-friction",
+      "kind": "industry"
+    },
+    {
+      "term": "corbel shear",
+      "target": "rc-shear-friction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dowel shear",
+      "target": "rc-shear-friction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shear across crack",
+      "target": "rc-shear-friction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "construction joint shear",
+      "target": "rc-shear-friction",
+      "kind": "adjacent"
     }
   ]
 }

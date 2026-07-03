@@ -1,6 +1,6 @@
 # roughlogic.com Specification v301 -- Shear Friction Across an Interface (ACI 318-19 22.9) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v299..v301 (the reinforced-concrete depth-2 trio -- min
+> **Status: LANDED (2026-07-03, package 0.106.0; proposed 2026-07-02). Batch spec-v299..v301 (the reinforced-concrete depth-2 trio -- min
 > thickness (v299), doubly-reinforced beam (v300), shear friction (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `rc-beam-shear` handles diagonal-tension (web) shear
 > in a beam, but a different mechanism governs shear transferred across a defined plane -- a cold joint, a precast corbel
