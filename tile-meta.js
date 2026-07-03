@@ -455,6 +455,7 @@ const _TILES = [
   ["relative-compaction", "E"], ["soil-phase-relations", "E"], ["atterberg-indices", "E"],
   // spec-v329..v331 building-energy batch (calc-hvac.js Group C)
   ["building-ua", "C"], ["degree-day-energy", "C"], ["wall-condensation-gradient", "C"],
+  ["duct-heat-gain", "C"], ["grille-face-velocity", "C"], ["air-density-correction", "C"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],

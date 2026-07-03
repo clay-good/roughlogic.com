@@ -1,6 +1,6 @@
 # roughlogic.com Specification v348 -- Grille/Register Face Velocity and Free-Area Sizing (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v347..v349 (the duct-and-airflow trio -- duct heat gain
+> **Status: LANDED (2026-07-03, package 0.122.0). Batch spec-v347..v349 (the duct-and-airflow trio -- duct heat gain
 > (v347), the grille face velocity and sizing (this spec), the air-density correction (v349)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `duct-sizing` sizes the duct, but the supply register
 > or return grille at the end of it is sized differently -- by the face velocity through its net free area, which sets both

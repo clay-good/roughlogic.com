@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v347..v349 -- 3 air-distribution / air-property tiles in calc-hvac.js; 815 -> 818 tiles, 0.122.0, 2026-07-03
+
+The air-distribution / air-property trio, twenty-fifth batch of the v275-v374 campaign: the duct-and-grille field numbers the load and friction tiles never give, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **815 -> 818**, package **0.121.0 -> 0.122.0** (a minor). Proposed 2026-07-02.
+
+- **`duct-heat-gain` (spec-v347).** Q = U A dT (U = 1/R) and dT_air = Q/(1.08 CFM). Pinned: 1,000 CFM of 55 F air, R-4 duct, 100 ft^2, a 120 F attic -> 1,625 Btu/h, 1.5 F warming; R-8 halves it; half the airflow doubles the per-cfm swing.
+- **`grille-face-velocity` (spec-v348).** V = CFM/(gross area x free-area ratio), or the required gross size from a target velocity. Pinned: 400 CFM sized to a 500 fpm supply -> 154 in^2 (a 12x14); a 400 fpm return target sizes larger (192 in^2), which is why returns are bigger than supplies.
+- **`air-density-correction` (spec-v349).** DF = (1 - 6.73e-6 elev)^5.258 x 530/(460+T); SCFM = ACFM x DF; corrected 1.08 and fan static. Pinned: 5,000 ft, 70 F -> DF 0.835, 835 SCFM, 0.42 in-wc from a 0.5 rating; 120 F rooftop air is 9% thinner at sea level.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the conductance, the two grille modes, the altitude/temperature factors, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the ASHRAE Fundamentals duct-heat, free-area face-velocity, and air-density relations. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (`grille-face-velocity` hand-writes its renderer for the mode `makeSelect`; the other two use the `_rEnv` factory); corpus + tile-index regenerated. No cap bump needed. Housekeeping: home count 815 -> 818, README resynced (counts, Group C cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 54 appended. All gates green at the new state: lint, unit tests (**5,111**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(realestate): land spec-v344..v346 -- 3 investor-underwriting tiles in calc-realestate.js; 812 -> 815 tiles, 0.121.0, 2026-07-03
 
 The investor-underwriting trio, twenty-fourth batch of the v275-v374 campaign: the lender- and flipper-side ratios the cap-rate/DSCR and cash-on-cash tiles never give, all in the existing lazy `calc-realestate.js` (Group X); no new module, group, or dependency. Catalog **812 -> 815**, package **0.120.0 -> 0.121.0** (a minor). Proposed 2026-07-02.

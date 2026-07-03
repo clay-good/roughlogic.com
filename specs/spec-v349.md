@@ -1,6 +1,6 @@
 # roughlogic.com Specification v349 -- Air Density Correction for Altitude and Temperature (ACFM/SCFM) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v347..v349 (the duct-and-airflow trio -- duct heat gain
+> **Status: LANDED (2026-07-03, package 0.122.0). Batch spec-v347..v349 (the duct-and-airflow trio -- duct heat gain
 > (v347), grille face velocity (v348), the air-density correction (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: nearly every HVAC airflow relation uses the sea-level
 > `1.08` sensible constant and standard air density, but at altitude or high temperature the air is thinner, so a fan's

@@ -3495,3 +3495,145 @@ HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
   ],
   compute: computeWallCondensationGradient,
 });
+
+// =====================================================================
+// spec-v347..v349: air-distribution / air-property batch (Group C). The
+// duct-and-grille field numbers the load and friction tiles never give:
+// duct heat gain through unconditioned space (v347), grille face velocity
+// and free-area sizing (v348), and the altitude/temperature air-density
+// correction that turns ACFM into SCFM (v349).
+// =====================================================================
+
+// dims: in { R_duct: dimensionless, A_ft2: L^2, dT_F: T, cfm: L^3 T^-1 } out: { Q_btuh: M L^2 T^-3, dT_air: T }
+export function computeDuctHeatGain({ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(R_duct > 0)) return { error: "Duct insulation R-value must be positive." };
+  if (!(A_ft2 > 0)) return { error: "Duct surface area must be positive (ft^2)." };
+  if (!(cfm > 0)) return { error: "Airflow must be positive (cfm)." };
+  const U = 1 / R_duct;
+  const Q_btuh = U * A_ft2 * dT_F;
+  const dT_air = Q_btuh / (1.08 * cfm);
+  return {
+    U, Q_btuh, dT_air,
+    note: "Conductive duct heat gain/loss through unconditioned space: U = 1/R, Q = U A dT with dT the ambient-minus-in-duct temperature (positive = the duct gains heat, e.g. a cold supply in a hot attic), and the resulting air temperature change dT_air = Q / (1.08 x cfm). Doubling the duct R-value halves the loss - the linear return that pays for attic-duct insulation - and halving the airflow doubles the per-cfm temperature swing. Steady-state conduction only; no radiant gain, air leakage, or latent transfer. A design aid; the ductwork design and the ambient conditions govern.",
+  };
+}
+const ductHeatGainExample = { inputs: { R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 1000 } };
+HVAC_RENDERERS["duct-heat-gain"] = _rEnv({
+  citation: "Citation: Conductive duct heat gain Q = U A dT with U = 1/R (ASHRAE Handbook - Fundamentals / duct-design method), and the air temperature change dT_air = Q / (1.08 x cfm). Steady-state conduction, no leakage or radiant gain. A design aid; the ductwork design governs.",
+  example: ductHeatGainExample.inputs,
+  fields: [
+    { key: "R_duct", label: "Duct insulation R (h-ft2-F/Btu)", kind: "number" },
+    { key: "A_ft2", label: "Duct surface area (ft^2)", kind: "number" },
+    { key: "dT_F", label: "Ambient minus in-duct temp (F, signed)", kind: "number" },
+    { key: "cfm", label: "Airflow (cfm)", kind: "number" },
+  ],
+  outputs: [
+    { key: "q", id: "dhg-out-q", label: "Heat gain (+) / loss (-)", value: (r) => fmt(r.Q_btuh, 0) + " Btu/h" },
+    { key: "dt", id: "dhg-out-dt", label: "Air temperature change", value: (r) => fmt(r.dT_air, 2) + " F" },
+    { key: "n", id: "dhg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctHeatGain,
+});
+
+// dims: in { mode: dimensionless, cfm: L^3 T^-1, ratio: dimensionless, A_gross_ft2: L^2, V_target: L T^-1 } out: { V_face: L T^-1, A_gross_req_ft2: L^2 }
+export function computeGrilleFaceVelocity({ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const q = Number(cfm) || 0;
+  const r = Number(ratio) || 0;
+  if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
+  if (!(r > 0 && r <= 1)) return { error: "Free-area ratio must be between 0 and 1." };
+  if (mode === "size") {
+    const v = Number(V_target) || 0;
+    if (!(v > 0)) return { error: "Target face velocity must be positive (fpm)." };
+    const A_gross_req_ft2 = q / (v * r);
+    if (!Number.isFinite(A_gross_req_ft2)) return { error: "Required grille area is not valid." };
+    return { mode: "size", A_gross_req_ft2, A_gross_req_in2: A_gross_req_ft2 * 144, V_face: null };
+  }
+  const A_gross = Number(A_gross_ft2) || 0;
+  if (!(A_gross > 0)) return { error: "Gross grille area must be positive (ft^2)." };
+  const A_free = A_gross * r;
+  const V_face = q / A_free;
+  if (!Number.isFinite(V_face)) return { error: "Face velocity is not valid." };
+  let band;
+  if (V_face < 400) band = "quiet (return / low-velocity supply, < 400 fpm)";
+  else if (V_face <= 700) band = "typical supply band (400-700 fpm)";
+  else band = "high (> 700 fpm; noise and draft risk)";
+  return { mode: "velocity", V_face, band, A_gross_req_ft2: null };
+}
+const grilleFaceVelocityExample = { inputs: { mode: "size", cfm: 400, ratio: 0.75, V_target: 500 } };
+
+function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Grille/register sizing from the free area: face velocity V = cfm / (gross area x free-area ratio), or the required gross area = cfm / (target velocity x ratio). Supply grilles run about 400-700 fpm, returns slower (quieter), which is why a return is larger than a supply for the same airflow. The manufacturer's published free-area ratio and throw data govern the selection.";
+  const mode = makeSelect("Solve for", "gfv-mode", [
+    { value: "size", label: "Required grille size (from a target velocity)" },
+    { value: "velocity", label: "Face velocity (from a gross grille size)" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const cfm = makeNumber("Airflow (cfm)", "gfv-cfm", { step: "any", min: "0" }); cfm.input.value = "400";
+  const ratio = makeNumber("Free-area ratio (0-1, default 0.75)", "gfv-ratio", { step: "any", min: "0", max: "1" }); ratio.input.value = "0.75";
+  const vtar = makeNumber("Target face velocity (fpm)", "gfv-vtar", { step: "any", min: "0" }); vtar.input.value = "500";
+  const agr = makeNumber("Gross grille area (ft^2)", "gfv-agr", { step: "any", min: "0" });
+  for (const f of [cfm, ratio, vtar, agr]) inputRegion.appendChild(f.wrap);
+  const oOut = makeOutputLine(outputRegion, "Result", "gfv-out");
+  const oBand = makeOutputLine(outputRegion, "Velocity band", "gfv-out-band");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() {
+    const isSize = mode.select.value === "size";
+    vtar.wrap.style.display = isSize ? "" : "none";
+    agr.wrap.style.display = isSize ? "none" : "";
+  }
+  const update = debounce(() => {
+    const r = computeGrilleFaceVelocity({ mode: mode.select.value, cfm: readNum(cfm.input), ratio: readNum(ratio.input), A_gross_ft2: readNum(agr.input), V_target: readNum(vtar.input) });
+    if (r.error) { oOut.textContent = r.error; oBand.textContent = "-"; return; }
+    if (r.mode === "size") { oOut.textContent = fmt(r.A_gross_req_ft2, 2) + " ft^2 gross (" + fmt(r.A_gross_req_in2, 0) + " in^2)"; oBand.textContent = "-"; return; }
+    oOut.textContent = fmt(r.V_face, 0) + " fpm face velocity";
+    oBand.textContent = r.band;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "size"; syncFields(); cfm.input.value = "400"; ratio.input.value = "0.75"; vtar.input.value = "500"; agr.input.value = ""; update(); });
+  mode.select.addEventListener("change", () => { syncFields(); update(); });
+  for (const f of [cfm.input, ratio.input, vtar.input, agr.input]) f.addEventListener("input", update);
+  syncFields();
+}
+HVAC_RENDERERS["grille-face-velocity"] = _renderGrilleFaceVelocity;
+
+// dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless }
+export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const elev = Number(elev_ft) || 0;
+  const T = Number(T_F);
+  if (!Number.isFinite(T)) return { error: "Enter a valid air temperature (F)." };
+  if (!(460 + T > 0)) return { error: "Temperature is below absolute zero." };
+  const alt_factor = Math.pow(1 - 6.73e-6 * elev, 5.258);
+  if (!Number.isFinite(alt_factor) || alt_factor <= 0) return { error: "Elevation is out of range." };
+  const temp_factor = 530 / (460 + T);
+  const DF = alt_factor * temp_factor;
+  const acfm_v = Number(acfm) || 0;
+  const SCFM = acfm_v > 0 ? acfm_v * DF : null;
+  const const_corr = 1.08 * DF;
+  const sp_v = Number(rated_sp) || 0;
+  const sp_corr = sp_v > 0 ? sp_v * DF : null;
+  return {
+    alt_factor, temp_factor, DF, SCFM, const_corr, sp_corr,
+    note: "Air density factor DF vs standard air (0.075 lb/ft^3, 70 F sea level): the altitude factor (1 - 6.73e-6 x elev)^5.258 and the temperature factor 530/(460 + T), multiplied. Thinner air (high altitude or hot air) carries less mass per cfm, so SCFM = ACFM x DF, the sensible constant 1.08 scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. A 5,000 ft site runs about 16% thinner; 120 F rooftop air is about 9% thinner even at sea level, which is why summer rooftop capacity lags the rating. A correction factor; the fan curve and the equipment ratings at the actual condition govern.",
+  };
+}
+const airDensityCorrectionExample = { inputs: { elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 } };
+HVAC_RENDERERS["air-density-correction"] = _rEnv({
+  citation: "Citation: Air density correction (ASHRAE Handbook - Fundamentals): altitude factor (1 - 6.73e-6 x elev)^5.258, temperature factor 530/(460 + T_F), density factor DF = their product; SCFM = ACFM x DF, corrected sensible constant 1.08 x DF, delivered fan static = rated x DF. A correction factor; the fan curve and equipment ratings govern.",
+  example: airDensityCorrectionExample.inputs,
+  fields: [
+    { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },
+    { key: "T_F", label: "Air temperature (F)", kind: "number", default: 70 },
+    { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" },
+    { key: "rated_sp", label: "Sea-level rated fan static (in-wc, optional)", kind: "number" },
+  ],
+  outputs: [
+    { key: "df", id: "adc-out-df", label: "Density factor DF", value: (r) => fmt(r.DF, 3) + " (alt " + fmt(r.alt_factor, 3) + " x temp " + fmt(r.temp_factor, 3) + ")" },
+    { key: "scfm", id: "adc-out-scfm", label: "Standard airflow SCFM", value: (r) => r.SCFM == null ? "(enter ACFM)" : fmt(r.SCFM, 0) + " scfm" },
+    { key: "cc", id: "adc-out-cc", label: "Corrected sensible constant", value: (r) => fmt(r.const_corr, 3) + " (vs 1.08)" },
+    { key: "sp", id: "adc-out-sp", label: "Delivered fan static", value: (r) => r.sp_corr == null ? "(enter rated static)" : fmt(r.sp_corr, 3) + " in-wc" },
+    { key: "n", id: "adc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAirDensityCorrection,
+});

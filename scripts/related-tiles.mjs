@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "duct-heat-gain": ["duct-sizing", "duct-leakage", "insulation-heat-loss", "grille-face-velocity"],
+  "grille-face-velocity": ["duct-sizing", "duct-heat-gain", "air-changes-hour", "outdoor-air-ventilation"],
+  "air-density-correction": ["gas-altitude-derate", "duct-heat-gain", "fan-motor-bhp", "manual-j-cooling"],
   "debt-yield": ["cap-rate-dscr", "rental-worksheet", "break-even-occupancy", "loan-payment"],
   "break-even-occupancy": ["cap-rate-dscr", "debt-yield", "rental-worksheet", "rent-roll-vacancy"],
   "max-offer-70-rule": ["cap-rate-dscr", "rent-vs-buy", "seller-net-sheet", "material-cost"],

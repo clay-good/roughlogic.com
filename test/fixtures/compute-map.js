@@ -716,6 +716,9 @@ export const COMPUTE_MAP = {
   "building-ua": { module: "../../calc-hvac.js", fn: "computeBuildingUa" },
   "degree-day-energy": { module: "../../calc-hvac.js", fn: "computeDegreeDayEnergy" },
   "wall-condensation-gradient": { module: "../../calc-hvac.js", fn: "computeWallCondensationGradient" },
+  "duct-heat-gain": { module: "../../calc-hvac.js", fn: "computeDuctHeatGain" },
+  "grille-face-velocity": { module: "../../calc-hvac.js", fn: "computeGrilleFaceVelocity" },
+  "air-density-correction": { module: "../../calc-hvac.js", fn: "computeAirDensityCorrection" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },

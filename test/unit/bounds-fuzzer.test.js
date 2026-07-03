@@ -14638,3 +14638,55 @@ test("bounds: spec-v346 computeMaxOffer70Rule pins the offer, the fee, the no-de
   assert.ok("error" in _v346({ arv: 300000, repairs: 40000, rule_pct: 0 }));
   assert.ok("error" in _v346({ arv: Infinity, repairs: 40000, rule_pct: 70 }));
 });
+
+// ===================== spec-v347..v349 air-distribution / air-property batch =====================
+import { computeDuctHeatGain as _v347, computeGrilleFaceVelocity as _v348, computeAirDensityCorrection as _v349 } from "../../calc-hvac.js";
+
+test("bounds: spec-v347 computeDuctHeatGain pins Q = U A dT, the airflow-inverse air-temp change, and error seams", () => {
+  const r = _v347({ R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 1000 });
+  assert.ok(Math.abs(r.Q_btuh - 1625) < 1e-6);
+  assert.ok(Math.abs(r.dT_air - 1625 / 1080) < 1e-9); // 1.5046 F, spec rounds to 1.5
+  // Double the R -> half the loss.
+  const r2 = _v347({ R_duct: 8, A_ft2: 100, dT_F: 65, cfm: 1000 });
+  assert.ok(Math.abs(r2.Q_btuh - r.Q_btuh / 2) < 1e-6);
+  // Half the airflow -> double the per-cfm temp change.
+  const r3 = _v347({ R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 500 });
+  assert.ok(Math.abs(r3.dT_air - 2 * (1625 / 1080)) < 1e-9); // exactly double the r case
+  // Error seams.
+  assert.ok("error" in _v347({ R_duct: 0, A_ft2: 100, dT_F: 65, cfm: 1000 }));
+  assert.ok("error" in _v347({ R_duct: 4, A_ft2: 0, dT_F: 65, cfm: 1000 }));
+  assert.ok("error" in _v347({ R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 0 }));
+  assert.ok("error" in _v347({ R_duct: Infinity, A_ft2: 100, dT_F: 65, cfm: 1000 }));
+});
+
+test("bounds: spec-v348 computeGrilleFaceVelocity pins both modes, the free-area ratio, and error seams", () => {
+  const size = _v348({ mode: "size", cfm: 400, ratio: 0.75, V_target: 500 });
+  assert.ok(Math.abs(size.A_gross_req_ft2 - 400 / 375) < 1e-9);
+  assert.ok(Math.abs(size.A_gross_req_in2 - size.A_gross_req_ft2 * 144) < 1e-9);
+  const vel = _v348({ mode: "velocity", cfm: 400, ratio: 0.75, A_gross_ft2: 1.0 });
+  assert.ok(Math.abs(vel.V_face - 533.33) < 0.1);
+  // A slower return target sizes a larger grille than a supply.
+  const ret = _v348({ mode: "size", cfm: 400, ratio: 0.75, V_target: 400 });
+  assert.ok(ret.A_gross_req_ft2 > size.A_gross_req_ft2);
+  // Error seams.
+  assert.ok("error" in _v348({ mode: "velocity", cfm: 0, ratio: 0.75, A_gross_ft2: 1 }));
+  assert.ok("error" in _v348({ mode: "size", cfm: 400, ratio: 1.5, V_target: 500 }));
+  assert.ok("error" in _v348({ mode: "size", cfm: 400, ratio: 0.75, V_target: 0 }));
+  assert.ok("error" in _v348({ mode: "velocity", cfm: 400, ratio: 0.75, A_gross_ft2: 0 }));
+  assert.ok("error" in _v348({ mode: "velocity", cfm: Infinity, ratio: 0.75, A_gross_ft2: 1 }));
+});
+
+test("bounds: spec-v349 computeAirDensityCorrection pins the altitude/temperature factors and error seams", () => {
+  const r = _v349({ elev_ft: 5000, T_F: 70, acfm: 1000, rated_sp: 0.5 });
+  assert.ok(Math.abs(r.alt_factor - Math.pow(1 - 6.73e-6 * 5000, 5.258)) < 1e-12);
+  assert.ok(Math.abs(r.temp_factor - 1.0) < 1e-9);
+  assert.ok(Math.abs(r.DF - 0.835) < 0.002);
+  assert.ok(Math.abs(r.SCFM - 1000 * r.DF) < 1e-9);
+  assert.ok(Math.abs(r.sp_corr - 0.5 * r.DF) < 1e-9);
+  // Hot air at sea level is thinner (temp factor < 1).
+  const hot = _v349({ elev_ft: 0, T_F: 120 });
+  assert.ok(Math.abs(hot.DF - 0.914) < 0.002 && hot.SCFM === null);
+  // Error seams.
+  assert.ok("error" in _v349({ elev_ft: 0, T_F: -500 })); // below absolute zero
+  assert.ok("error" in _v349({ elev_ft: Infinity, T_F: 70 }));
+});

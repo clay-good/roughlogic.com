@@ -8091,6 +8091,42 @@ export const CITATIONS = {
       { name: "Steady-state", value: "ignores internal and solar gains that lower the true balance point", source: "degree-day limitation" },
     ],
   },
+  "duct-heat-gain": {
+    formula: "U = 1/R_duct; Q = U A dT (Btu/h); dT_air = Q / (1.08 x CFM).",
+    edition: "The conductive duct heat-gain/loss relation from the ASHRAE Handbook - Fundamentals duct-design method, by name.",
+    freeAccess: "The Q = U A dT conduction relation and the 1.08 sensible-air constant are standard ASHRAE / duct-design values. The ductwork design and ambient conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The conductive duct heat gain/loss Q = U A dT with U = 1/R_duct and dT the ambient-minus-in-duct temperature (positive = the duct gains heat), and the resulting supply-air temperature change dT_air = Q / (1.08 x CFM). Doubling the duct R halves the loss (a linear return), and halving the airflow doubles the per-cfm temperature swing. This returns the steady-state conductive heat and air-temperature change: it uses a single mean dT and the R-value only, and does not model air leakage, radiant gain, or latent transfer. A design aid; the ductwork design governs.",
+    assumptions: [
+      { name: "Conduction", value: "Q = U A dT, U = 1/R_duct, mean dT across the run", source: "ASHRAE Fundamentals / duct design" },
+      { name: "Air-temp change", value: "dT_air = Q / (1.08 x CFM), the sensible-air constant", source: "ASHRAE" },
+      { name: "No leakage/latent", value: "conduction only; no air leakage, radiant gain, or latent transfer", source: "scope of this tile" },
+    ],
+  },
+  "grille-face-velocity": {
+    formula: "A_free = A_gross x ratio; V_face = CFM / A_free; A_gross_req = CFM / (V_target x ratio).",
+    edition: "The grille/register free-area face-velocity relation from ASHRAE / SMACNA air-distribution practice, by name.",
+    freeAccess: "Face velocity = airflow / free area is a standard air-distribution relation; the free-area ratio and throw/NC data come from the manufacturer's published grille catalog. The manufacturer's selection data govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The grille/register face velocity V_face = CFM / (gross area x free-area ratio) and the sizing inverse A_gross_req = CFM / (target velocity x ratio). Supply grilles run about 400-700 fpm and returns slower (quieter), which is why a return is larger than a supply for the same airflow. This returns the velocity or the required gross size: it uses the entered free-area ratio (a default 0.75), and does not compute the throw, drop, or noise criterion (NC) - those come from the manufacturer's published grille data. A design aid; the manufacturer's selection data govern.",
+    assumptions: [
+      { name: "Free-area velocity", value: "V_face = CFM / (A_gross x ratio); A_gross_req = CFM / (V_target x ratio)", source: "ASHRAE / SMACNA" },
+      { name: "Velocity bands", value: "supply ~400-700 fpm; returns slower for quiet", source: "air-distribution practice" },
+      { name: "No throw/NC", value: "throw, drop, and noise come from the manufacturer's catalog, not this tile", source: "scope of this tile" },
+    ],
+  },
+  "air-density-correction": {
+    formula: "alt = (1 - 6.73e-6 elev)^5.258; temp = 530/(460 + T_F); DF = alt x temp; SCFM = ACFM x DF; const = 1.08 x DF; sp = rated_sp x DF.",
+    edition: "The air density correction for altitude and temperature from the ASHRAE Handbook - Fundamentals, by name.",
+    freeAccess: "The barometric altitude factor and the absolute-temperature density ratio are standard ASHRAE air-property relations. The fan curve and equipment ratings at the actual condition govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The air density factor DF vs standard air (0.075 lb/ft^3 at 70 F sea level): the altitude factor (1 - 6.73e-6 x elev)^5.258 and the temperature factor 530/(460 + T_F), multiplied. Thinner air carries less mass per cfm, so SCFM = ACFM x DF, the 1.08 sensible constant scales to 1.08 x DF, and a sea-level-rated fan delivers rated_sp x DF of static. This returns the density factor and the corrected quantities: it assumes dry air and a standard atmosphere, and the delivered performance still must be read from the equipment's own fan curve and ratings at the actual condition. A correction factor; the appliance ratings govern.",
+    assumptions: [
+      { name: "Density factor", value: "DF = (1 - 6.73e-6 elev)^5.258 x 530/(460 + T_F)", source: "ASHRAE Fundamentals" },
+      { name: "Corrections", value: "SCFM = ACFM x DF, sensible constant 1.08 x DF, fan static rated x DF", source: "ASHRAE" },
+      { name: "Dry standard air", value: "dry air, standard atmosphere; verify against the equipment's fan curve", source: "scope of this tile" },
+    ],
+  },
   "wall-condensation-gradient": {
     formula: "R_total = R_inside + R_outside; T_plane = T_in - (R_inside/R_total)(T_in - T_out); T_dew = Magnus(T_in, RH); margin = T_plane - T_dew (<= 0 condensing).",
     edition: "The R-proportional through-wall temperature gradient and the Magnus dew-point comparison for a condensation-plane screen, standard building-science results, by name.",

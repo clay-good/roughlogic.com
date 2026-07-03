@@ -1,6 +1,6 @@
 # roughlogic.com Specification v347 -- Duct Heat Gain/Loss Through Unconditioned Space (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v347..v349 (the duct-and-airflow trio -- the airflow effects
+> **Status: LANDED (2026-07-03, package 0.122.0). Batch spec-v347..v349 (the duct-and-airflow trio -- the airflow effects
 > the duct-sizing tile never captures: the heat a duct gains or loses running through an unconditioned space (this spec),
 > the grille/register sizing by face velocity and free area (v348), and the air-density correction for altitude and
 > temperature (v349).)**

@@ -13437,6 +13437,141 @@
       "term": "rehab offer",
       "target": "max-offer-70-rule",
       "kind": "industry"
+    },
+    {
+      "term": "duct heat gain",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "duct heat loss",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "duct insulation loss",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "attic duct loss",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "supply air temperature rise",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "duct r value",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "duct capacity loss",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "ductwork heat gain",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "insulated duct",
+      "target": "duct-heat-gain",
+      "kind": "industry"
+    },
+    {
+      "term": "grille size",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "register sizing",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "face velocity",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "free area grille",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "diffuser sizing",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "return grille size",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "supply register velocity",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "grille cfm",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "air outlet sizing",
+      "target": "grille-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "air density correction",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "acfm scfm",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "altitude derate airflow",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "density factor air",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "standard cubic feet per minute",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "fan altitude correction",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "air density ratio",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "high altitude hvac",
+      "target": "air-density-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature air density",
+      "target": "air-density-correction",
+      "kind": "industry"
     }
   ]
 }
