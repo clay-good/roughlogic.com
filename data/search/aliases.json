@@ -13167,6 +13167,141 @@
       "term": "land application manure",
       "target": "manure-application-rate",
       "kind": "industry"
+    },
+    {
+      "term": "cantilever beam",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "cantilever deflection",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "bracket load",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "fixed end beam",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "cantilever moment",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "overhang beam",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "balcony joist",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "pl cubed over 3ei",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "cantilever formula",
+      "target": "cantilever-beam",
+      "kind": "industry"
+    },
+    {
+      "term": "section properties",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "moment of inertia",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "section modulus",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "radius of gyration",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "i beam property",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "area moment inertia",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "s section modulus",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "bh cubed over 12",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "cross section properties",
+      "target": "section-properties",
+      "kind": "industry"
+    },
+    {
+      "term": "combined stress",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "axial plus bending",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "p over a plus mc over i",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "eccentric load stress",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "combined loading stress",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "extreme fiber stress",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "bending plus axial",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "m over s stress",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
+    },
+    {
+      "term": "kern eccentricity",
+      "target": "combined-stress-axial-bending",
+      "kind": "industry"
     }
   ]
 }

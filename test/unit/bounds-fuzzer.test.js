@@ -14523,3 +14523,67 @@ test("bounds: spec-v340 computeManureApplicationRate pins the availability facto
   assert.ok("error" in _v340({ crop_need: 150, total_nutr: 10, availability: 120 }));
   assert.ok("error" in _v340({ crop_need: Infinity, total_nutr: 10, availability: 50 }));
 });
+
+// ===================== spec-v341..v343 structural-mechanics batch =====================
+import { computeCantileverBeam as _v341, computeSectionProperties as _v342, computeCombinedStressAxialBending as _v343 } from "../../calc-construction.js";
+
+test("bounds: spec-v341 computeCantileverBeam pins the M/V/delta superposition and error seams", () => {
+  const p = _v341({ L_ft: 6, P_lb: 2000, w_plf: 0, E_psi: 29e6, I_in4: 53 });
+  assert.strictEqual(p.M_lbft, 12000);
+  assert.strictEqual(p.V_lb, 2000);
+  assert.ok(Math.abs(p.delta_in - 0.162) < 0.002);
+  // A uniform load of comparable force makes less moment and a smaller deflection.
+  const w = _v341({ L_ft: 6, P_lb: 0, w_plf: 300, E_psi: 29e6, I_in4: 53 });
+  assert.strictEqual(w.M_lbft, 5400);
+  assert.strictEqual(w.V_lb, 1800);
+  assert.ok(w.delta_in < p.delta_in && Math.abs(w.delta_in - 0.055) < 0.002);
+  // Superposition: both loads sum.
+  const both = _v341({ L_ft: 6, P_lb: 2000, w_plf: 300, E_psi: 29e6, I_in4: 53 });
+  assert.ok(Math.abs(both.delta_in - (p.delta_in + w.delta_in)) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v341({ L_ft: 0, P_lb: 2000, E_psi: 29e6, I_in4: 53 }));
+  assert.ok("error" in _v341({ L_ft: 6, P_lb: 2000, E_psi: 0, I_in4: 53 }));
+  assert.ok("error" in _v341({ L_ft: 6, P_lb: 2000, E_psi: 29e6, I_in4: 0 }));
+  assert.ok("error" in _v341({ L_ft: 6, P_lb: 0, w_plf: 0, E_psi: 29e6, I_in4: 53 })); // no load
+  assert.ok("error" in _v341({ L_ft: Infinity, P_lb: 2000, E_psi: 29e6, I_in4: 53 }));
+});
+
+test("bounds: spec-v342 computeSectionProperties pins the four shapes, the h^3 axis effect, and error seams", () => {
+  const rect = _v342({ shape: "rectangle", b_in: 1.5, h_in: 7.25 });
+  assert.ok(Math.abs(rect.I_in4 - 47.63) < 0.05);
+  assert.ok(Math.abs(rect.S_in3 - 13.14) < 0.05);
+  assert.ok(Math.abs(rect.r_in - Math.sqrt(rect.I_in4 / rect.A_in2)) < 1e-9);
+  // Weak axis (b and h swapped) drops I by (h/b)^2 ~ 24x.
+  const weak = _v342({ shape: "rectangle", b_in: 7.25, h_in: 1.5 });
+  assert.ok(Math.abs(weak.I_in4 - 2.04) < 0.05 && rect.I_in4 / weak.I_in4 > 20);
+  const round = _v342({ shape: "round", d_in: 2 });
+  assert.ok(Math.abs(round.I_in4 - Math.PI * 16 / 64) < 1e-9 && Math.abs(round.r_in - 0.5) < 1e-9);
+  // Pipe subtracts the bore.
+  const pipe = _v342({ shape: "pipe", d_in: 2, di_in: 1.5 });
+  assert.ok(Math.abs(pipe.I_in4 - Math.PI * (16 - 5.0625) / 64) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v342({ shape: "rectangle", b_in: 0, h_in: 7.25 }));
+  assert.ok("error" in _v342({ shape: "round", d_in: 0 }));
+  assert.ok("error" in _v342({ shape: "pipe", d_in: 2, di_in: 3 })); // inner >= outer
+  assert.ok("error" in _v342({ shape: "bogus", b_in: 1, h_in: 1 }));
+  assert.ok("error" in _v342({ shape: "rectangle", b_in: Infinity, h_in: 7.25 }));
+});
+
+test("bounds: spec-v343 computeCombinedStressAxialBending pins the two-sign superposition, the kern threshold, and error seams", () => {
+  const r = _v343({ P_lb: 20000, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 });
+  assert.ok(Math.abs(r.sigma_axial - 661.16) < 1);
+  assert.ok(Math.abs(r.sigma_bend - 1081.26) < 1);
+  assert.ok(Math.abs(r.sigma_max - (r.sigma_axial + r.sigma_bend)) < 1e-9);
+  assert.ok(r.sigma_min < 0 && r.no_tension === false);
+  // Halving the moment keeps the whole section in compression.
+  const r2 = _v343({ P_lb: 20000, M_lbin: 15000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 });
+  assert.ok(r2.sigma_min > 0 && r2.no_tension === true);
+  // Eccentricity sets M = P e.
+  const r3 = _v343({ P_lb: 20000, e_in: 1.5, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 });
+  assert.strictEqual(r3.M_used, 30000);
+  // Error seams.
+  assert.ok("error" in _v343({ P_lb: 20000, M_lbin: 30000, A_in2: 0, c_in: 2.75, I_in4: 76.3 }));
+  assert.ok("error" in _v343({ P_lb: 20000, M_lbin: 30000, A_in2: 30.25, c_in: 0, I_in4: 76.3 }));
+  assert.ok("error" in _v343({ P_lb: 20000, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 0 }));
+  assert.ok("error" in _v343({ P_lb: Infinity, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3 }));
+});

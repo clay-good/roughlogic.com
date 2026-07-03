@@ -1,6 +1,6 @@
 # roughlogic.com Specification v343 -- Combined Axial and Bending Stress (P/A +/- Mc/I) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v341..v343 (the mechanics-of-materials trio -- cantilever beam
+> **Status: LANDED (2026-07-03, package 0.120.0). Batch spec-v341..v343 (the mechanics-of-materials trio -- cantilever beam
 > (v341), section properties (v342), the combined axial-plus-bending stress (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: a member carrying axial load and bending at once --
 > an eccentrically loaded column, a post with a side load, a chord with a nodal load -- has a combined extreme-fiber stress

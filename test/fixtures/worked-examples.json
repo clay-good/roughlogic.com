@@ -29790,6 +29790,94 @@
       "outputs": {
         "rate": { "value": 6.0, "tolerance": { "abs": 0.05 } }
       }
+    },
+    {
+      "tile_id": "cantilever-beam",
+      "source_publisher": "Roark / AISC beam diagrams",
+      "source_title": "6 ft steel bracket, 2,000 lb tip load, I 53 in^4 -> M 12,000 lb-ft, delta 0.162 in",
+      "source_edition_or_year": "spec-v341 worked example (machine-verified)",
+      "source_section_or_page": "spec-v341 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "L_ft": 6, "P_lb": 2000, "w_plf": 0, "E_psi": 29000000, "I_in4": 53 },
+      "outputs": {
+        "M_lbft": { "value": 12000, "tolerance": { "abs": 1 } },
+        "V_lb": { "value": 2000, "tolerance": { "abs": 1 } },
+        "delta_in": { "value": 0.162, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "cantilever-beam",
+      "source_publisher": "Roark / AISC beam diagrams",
+      "source_title": "cross-check: a 300 plf uniform load makes less moment and a third the deflection -> M 5,400, delta 0.055 in",
+      "source_edition_or_year": "spec-v341 worked example (machine-verified)",
+      "source_section_or_page": "spec-v341 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "L_ft": 6, "P_lb": 0, "w_plf": 300, "E_psi": 29000000, "I_in4": 53 },
+      "outputs": {
+        "M_lbft": { "value": 5400, "tolerance": { "abs": 1 } },
+        "delta_in": { "value": 0.055, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "section-properties",
+      "source_publisher": "mechanics of materials",
+      "source_title": "nominal 2x8 (1.5 x 7.25), strong axis -> A 10.9, I 47.6, S 13.1, r 2.09",
+      "source_edition_or_year": "spec-v342 worked example (machine-verified)",
+      "source_section_or_page": "spec-v342 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "shape": "rectangle", "b_in": 1.5, "h_in": 7.25, "d_in": 0, "di_in": 0 },
+      "outputs": {
+        "A_in2": { "value": 10.875, "tolerance": { "pct": 0.5 } },
+        "I_in4": { "value": 47.63, "tolerance": { "pct": 0.5 } },
+        "S_in3": { "value": 13.14, "tolerance": { "pct": 0.5 } },
+        "r_in": { "value": 2.09, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "section-properties",
+      "source_publisher": "mechanics of materials",
+      "source_title": "cross-check: a 2 in solid round bar -> A 3.14, I 0.785, S 0.785, r 0.50",
+      "source_edition_or_year": "spec-v342 worked example (machine-verified)",
+      "source_section_or_page": "spec-v342 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "shape": "round", "b_in": 0, "h_in": 0, "d_in": 2, "di_in": 0 },
+      "outputs": {
+        "A_in2": { "value": 3.1416, "tolerance": { "pct": 0.5 } },
+        "I_in4": { "value": 0.7854, "tolerance": { "pct": 0.5 } },
+        "r_in": { "value": 0.5, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "combined-stress-axial-bending",
+      "source_publisher": "mechanics of materials",
+      "source_title": "6x6 post, P 20,000 lb, M 30,000 lb-in -> sigma_max 1,743, sigma_min -421 (net tension)",
+      "source_edition_or_year": "spec-v343 worked example (machine-verified)",
+      "source_section_or_page": "spec-v343 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "P_lb": 20000, "M_lbin": 30000, "A_in2": 30.25, "c_in": 2.75, "I_in4": 76.3, "e_in": 0 },
+      "outputs": {
+        "sigma_axial": { "value": 661, "tolerance": { "pct": 1 } },
+        "sigma_max": { "value": 1743, "tolerance": { "pct": 1 } },
+        "sigma_min": { "value": -421, "tolerance": { "pct": 2 } }
+      }
+    },
+    {
+      "tile_id": "combined-stress-axial-bending",
+      "source_publisher": "mechanics of materials",
+      "source_title": "cross-check: halving the moment keeps the whole section in compression -> sigma_min +120",
+      "source_edition_or_year": "spec-v343 worked example (machine-verified)",
+      "source_section_or_page": "spec-v343 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "P_lb": 20000, "M_lbin": 15000, "A_in2": 30.25, "c_in": 2.75, "I_in4": 76.3, "e_in": 0 },
+      "outputs": {
+        "sigma_min": { "value": 120, "tolerance": { "pct": 5 } }
+      }
     }
   ]
 }

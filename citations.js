@@ -7671,6 +7671,42 @@ export const CITATIONS = {
       { name: "Geometry", value: "equal-leg throat 0.707 w and a minimum load-carrying length of 4 legs", source: "AISC 360-22 J2.2a/J2.2b" },
     ],
   },
+  "cantilever-beam": {
+    formula: "M = P L + w L^2/2 (max moment at support); V = P + w L (max shear); delta = P L^3/(3 E I) + w L^4/(8 E I) (tip deflection, L in inches).",
+    edition: "The standard cantilever beam moment/shear/deflection formulas (Roark's Formulas for Stress and Strain; AISC Manual beam diagrams), by name.",
+    freeAccess: "Cantilever beam diagrams are published free in engineering references and the AISC Steel Construction Manual beam-diagram tables. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cantilever fixed at the support: max moment M = P L + w L^2/2 and max shear V = P + w L both at the fixed end, and tip deflection delta = P L^3/(3 E I) + w L^4/(8 E I) with the point and uniform terms superposed (L in inches, w in lb/in). This returns the elastic moment/shear/deflection: it assumes a prismatic member, small deflection, and no self-weight unless included in w, and does not include lateral-torsional buckling, shear deformation, or a strength/capacity check. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Support/loads", value: "fixed at one end; a tip point load, a uniform load, or both, superposed", source: "Roark / AISC beam diagrams" },
+      { name: "Deflection form", value: "delta = P L^3/(3 E I) + w L^4/(8 E I)", source: "elastic beam theory" },
+      { name: "Not a capacity check", value: "no LTB, shear deformation, or allowable-stress check", source: "scope of this tile" },
+    ],
+  },
+  "section-properties": {
+    formula: "rectangle I = b h^3/12; round I = pi d^4/64; pipe I = pi(d^4 - di^4)/64; tube I = (b h^3 - bi hi^3)/12; S = I/c; r = sqrt(I/A).",
+    edition: "The standard cross-section property formulas (mechanics of materials; AISC Manual shapes), by name.",
+    freeAccess: "Section-property formulas are published free in any mechanics-of-materials reference and the AISC Manual shape tables. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The elastic cross-section properties about the bending (strong) axis: area A, moment of inertia I (b h^3/12 rectangle, pi d^4/64 round, the hollow difference for pipe/tube), section modulus S = I/c, extreme-fiber distance c, and radius of gyration r = sqrt(I/A). This returns the properties for a single rectangle, solid round, pipe, or hollow rectangular tube using the entered actual dimensions: it is the elastic (not plastic Z) property, is about the entered axis only, and does not handle built-up, composite, or standard rolled-shape lookups. I scales with the cube of the bending-direction depth, so orientation dominates. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Shapes", value: "rectangle, solid round, pipe (d/di), hollow rectangular tube (b/h, wall t)", source: "mechanics of materials" },
+      { name: "Elastic properties", value: "I, S = I/c, r = sqrt(I/A); not the plastic modulus Z", source: "AISC / mechanics" },
+      { name: "Actual dimensions", value: "uses the entered actual (dressed) dimensions, not nominal", source: "scope of this tile" },
+    ],
+  },
+  "combined-stress-axial-bending": {
+    formula: "sigma_axial = P/A; sigma_bend = M c/I; sigma_max = P/A + M c/I; sigma_min = P/A - M c/I; optional M = P e; no tension while M c/I <= P/A (kern e <= r^2/c).",
+    edition: "The standard combined axial-plus-bending stress superposition (mechanics of materials), by name.",
+    freeAccess: "The combined-stress superposition is published free in any mechanics-of-materials reference. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, extreme compression fiber at P/A + M c/I and the other fiber at P/A - M c/I (tension where negative); an eccentricity e sets M = P e. The section stays wholly in compression only while M c/I <= P/A, the kern limit e <= r^2/c. This returns the elastic uniaxial fiber stresses: it does NOT include the P-delta / moment amplification of a slender member (use a beam-column interaction check for that), assumes bending about one axis, and is not an allowable-stress or code capacity check. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Superposition", value: "sigma = P/A +/- M c/I, extreme fibers; M from a moment or an eccentricity M = P e", source: "mechanics of materials" },
+      { name: "Kern / no-tension", value: "the far face stays in compression while e <= r^2/c (the kern)", source: "mechanics of materials" },
+      { name: "Short member", value: "no P-delta amplification; not a slender-column beam-column check", source: "scope of this tile" },
+    ],
+  },
   "wood-nail-withdrawal": {
     formula: "W = 1,380 G^(5/2) D (lb/in); Ctn = toenailed ? 0.67 : 1.0; Z_w = W x p x CD x Ctn.",
     edition: "The NDS 2018 12.2.3 reference nail/spike withdrawal design value and the toenail factor, by name; the 1,380 empirical constant is named.",

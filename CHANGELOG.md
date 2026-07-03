@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): land spec-v341..v343 -- 3 structural-mechanics tiles in calc-construction.js; 809 -> 812 tiles, 0.120.0, 2026-07-03
+
+The structural-mechanics trio, twenty-third batch of the v275-v374 campaign: the bench-mechanics primitives the member-specific tiles already assume you have, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **809 -> 812**, package **0.119.0 -> 0.120.0** (a minor). Proposed 2026-07-02.
+
+- **`cantilever-beam` (spec-v341).** M = P L + w L^2/2, V = P + w L at the support, delta = P L^3/3EI + w L^4/8EI at the tip, point and uniform loads superposed. Pinned: a 6 ft steel bracket, 2,000 lb tip load, I 53 in^4 -> M 12,000 lb-ft, delta 0.162 in; a 300 plf uniform load makes less moment and a third the deflection (0.055 in).
+- **`section-properties` (spec-v342).** A, I, S = I/c, r = sqrt(I/A) for a rectangle, solid round, pipe, or hollow tube. Pinned: a nominal 2x8 (1.5 x 7.25) -> A 10.9, I 47.6, S 13.1, r 2.09; a 2 in round bar -> I 0.785; turning the 2x8 flatwise drops I to 2.0 in^4 (the h^3 penalty).
+- **`combined-stress-axial-bending` (spec-v343).** sigma = P/A +/- M c/I, with a moment or an eccentricity e (M = P e). Pinned: a 6x6 post, P 20,000 lb, M 30,000 lb-in -> sigma_max 1,743 psi, sigma_min -421 psi (net tension); halving the moment keeps the whole section in compression (the kern threshold e <= r^2/c).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the superposition, the four shape branches, the kern threshold, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the Roark/AISC cantilever formulas, the section-property forms, and the combined-stress superposition. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. Module cap bumped with a dated comment: calc-construction.js 95000 -> 110000. Housekeeping: home count 809 -> 812, README resynced (counts, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 52 appended. All gates green at the new state: lint, unit tests (**5,105**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(agriculture): land spec-v338..v340 -- 3 farm-economics tiles in calc-agriculture.js; 806 -> 809 tiles, 0.119.0, 2026-07-03
 
 The farm-economics trio, twenty-second batch of the v275-v374 campaign: the grain-market, feed-budget, and manure-plan numbers the field-agronomy tiles never give, all in the existing lazy `calc-agriculture.js` (Group L); no new module, group, or dependency. Catalog **806 -> 809**, package **0.118.0 -> 0.119.0** (a minor). Proposed 2026-07-02.

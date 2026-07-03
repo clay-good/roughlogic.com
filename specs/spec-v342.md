@@ -1,6 +1,6 @@
 # roughlogic.com Specification v342 -- Cross-Section Properties (Area, Moment of Inertia, Section Modulus, Radius of Gyration) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v341..v343 (the mechanics-of-materials trio -- cantilever beam
+> **Status: LANDED (2026-07-03, package 0.120.0). Batch spec-v341..v343 (the mechanics-of-materials trio -- cantilever beam
 > (v341), the cross-section properties (this spec), combined axial-plus-bending stress (v343)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: every beam, column, and stress calculation needs the
 > section's area, moment of inertia, section modulus, and radius of gyration, but the catalog has no tile that computes them

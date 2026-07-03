@@ -5697,3 +5697,153 @@ const _renderWoodScrewWithdrawal = _simpleRenderer({
   compute: computeWoodScrewWithdrawal,
 });
 CONSTRUCTION_RENDERERS["wood-screw-withdrawal"] = _renderWoodScrewWithdrawal;
+
+// ===================== spec-v341..v343: structural-mechanics batch =====================
+// The bench-mechanics primitives the member-specific tiles (beam spans, columns,
+// AISC/NDS checks) assume you already have: the cantilever's moment/shear/deflection
+// (v341), a cross-section's A/I/S/r for any of four shapes (v342), and the combined
+// axial+bending fiber stresses with the kern threshold (v343).
+
+// dims: in { L_ft: L, P_lb: M L T^-2, w_plf: M T^-2, E_psi: M L^-1 T^-2, I_in4: L^4 } out: { M_lbft: M L^2 T^-2, V_lb: M L T^-2, delta_in: L }
+export function computeCantileverBeam({ L_ft = 0, P_lb = 0, w_plf = 0, E_psi = 29e6, I_in4 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(L_ft > 0)) return { error: "Cantilever length must be positive (ft)." };
+  if (!(E_psi > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
+  if (!(I_in4 > 0)) return { error: "Moment of inertia must be positive (in^4)." };
+  if (!(P_lb > 0) && !(w_plf > 0)) return { error: "Enter a tip point load, a uniform load, or both." };
+  const L = L_ft * 12;
+  const M_lbft = P_lb * L_ft + w_plf * L_ft * L_ft / 2;
+  const V_lb = P_lb + w_plf * L_ft;
+  const delta_in = P_lb * Math.pow(L, 3) / (3 * E_psi * I_in4)
+    + (w_plf / 12) * Math.pow(L, 4) / (8 * E_psi * I_in4);
+  return {
+    M_lbft, V_lb, delta_in, span_ratio: delta_in > 0 ? L / delta_in : null,
+    note: "Cantilever fixed at the support: max moment M = P L + w L^2/2 and max shear V = P + w L both occur at the fixed end; tip deflection delta = P L^3/(3 E I) + w L^4/(8 E I) (L in inches, w converted to lb/in). A distributed load of equal total force makes less moment and about a third the tip deflection of a tip point load, because its resultant acts at mid-span. Elastic, small-deflection, prismatic member; no self-weight unless included in w, no lateral-torsional buckling or shear deformation. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const cantileverBeamExample = { inputs: { L_ft: 6, P_lb: 2000, w_plf: 0, E_psi: 29e6, I_in4: 53 } };
+
+const _renderCantileverBeam = _simpleRenderer({
+  citation: "Citation: Cantilever beam first-principles (Roark / AISC Manual beam diagrams): M = P L + w L^2/2, V = P + w L at the support, delta = P L^3/(3 E I) + w L^4/(8 E I) at the tip. Elastic small-deflection prismatic member. A design aid, not a substitute for the engineer of record.",
+  example: cantileverBeamExample.inputs,
+  fields: [
+    { key: "L_ft", label: "Cantilever length L (ft)", kind: "number" },
+    { key: "P_lb", label: "Tip point load P (lb, optional)", kind: "number" },
+    { key: "w_plf", label: "Uniform load w (lb/ft, optional)", kind: "number" },
+    { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 1.6e6 wood)", kind: "number", default: 29000000 },
+    { key: "I_in4", label: "Moment of inertia I (in^4)", kind: "number" },
+  ],
+  outputs: [
+    { key: "m", id: "cb-out-m", label: "Max moment (at support)", value: (r) => fmt(r.M_lbft, 0) + " lb-ft" },
+    { key: "v", id: "cb-out-v", label: "Max shear (at support)", value: (r) => fmt(r.V_lb, 0) + " lb" },
+    { key: "d", id: "cb-out-d", label: "Tip deflection", value: (r) => fmt(r.delta_in, 3) + " in" + (r.span_ratio ? " (L/" + fmt(r.span_ratio, 0) + ")" : "") },
+    { key: "n", id: "cb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCantileverBeam,
+});
+CONSTRUCTION_RENDERERS["cantilever-beam"] = _renderCantileverBeam;
+
+// dims: in { shape: dimensionless, b_in: L, h_in: L, d_in: L, di_in: L } out: { A_in2: L^2, I_in4: L^4, S_in3: L^3, c_in: L, r_in: L }
+export function computeSectionProperties({ shape = "rectangle", b_in = 0, h_in = 0, d_in = 0, di_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  let A, I, c;
+  if (shape === "rectangle") {
+    if (!(b_in > 0) || !(h_in > 0)) return { error: "Width and height must be positive (in)." };
+    A = b_in * h_in; I = b_in * Math.pow(h_in, 3) / 12; c = h_in / 2;
+  } else if (shape === "round") {
+    if (!(d_in > 0)) return { error: "Diameter must be positive (in)." };
+    A = Math.PI * d_in * d_in / 4; I = Math.PI * Math.pow(d_in, 4) / 64; c = d_in / 2;
+  } else if (shape === "pipe") {
+    if (!(d_in > 0)) return { error: "Outer diameter must be positive (in)." };
+    if (!(di_in > 0) || !(di_in < d_in)) return { error: "Inner diameter must be positive and smaller than the outer." };
+    A = Math.PI * (d_in * d_in - di_in * di_in) / 4;
+    I = Math.PI * (Math.pow(d_in, 4) - Math.pow(di_in, 4)) / 64; c = d_in / 2;
+  } else if (shape === "tube") {
+    if (!(b_in > 0) || !(h_in > 0)) return { error: "Outer width and height must be positive (in)." };
+    if (!(di_in > 0) || !(di_in < h_in)) return { error: "Wall thickness must leave a positive inner dimension." };
+    // di_in is the wall thickness; inner dims = outer minus 2t.
+    const bi = b_in - 2 * di_in, hi = h_in - 2 * di_in;
+    if (!(bi > 0) || !(hi > 0)) return { error: "Wall thickness is too large for the tube dimensions." };
+    A = b_in * h_in - bi * hi;
+    I = (b_in * Math.pow(h_in, 3) - bi * Math.pow(hi, 3)) / 12; c = h_in / 2;
+  } else {
+    return { error: "Unknown shape." };
+  }
+  if (!(A > 0) || !(I > 0)) return { error: "Section properties are not valid for these dimensions." };
+  const S = I / c;
+  const r = Math.sqrt(I / A);
+  return {
+    A_in2: A, I_in4: I, S_in3: S, c_in: c, r_in: r,
+    note: "Cross-section properties about the bending (strong) axis: area A, moment of inertia I, section modulus S = I/c, extreme-fiber distance c, and radius of gyration r = sqrt(I/A). I scales with the cube of the depth in the bending direction, so orientation dominates - turning a board flatwise can cost an order of magnitude in stiffness. Tube uses the entered wall thickness. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const sectionPropertiesExample = { inputs: { shape: "rectangle", b_in: 1.5, h_in: 7.25, d_in: 0, di_in: 0 } };
+
+const _renderSectionProperties = _simpleRenderer({
+  citation: "Citation: Cross-section properties first-principles: rectangle I = b h^3/12, round I = pi d^4/64, pipe I = pi(d^4 - di^4)/64, hollow tube I = (b h^3 - bi hi^3)/12; S = I/c, r = sqrt(I/A). A design aid, not a substitute for the engineer of record.",
+  example: sectionPropertiesExample.inputs,
+  fields: [
+    { key: "shape", label: "Shape", kind: "select", options: [
+      { value: "rectangle", label: "Rectangle (b x h)" },
+      { value: "round", label: "Solid round (d)" },
+      { value: "pipe", label: "Pipe (d outer, di inner)" },
+      { value: "tube", label: "Rect. tube (b x h, wall t)" },
+    ], default: "rectangle" },
+    { key: "b_in", label: "Width b (in; rectangle/tube)", kind: "number" },
+    { key: "h_in", label: "Height/depth h (in; bending axis)", kind: "number" },
+    { key: "d_in", label: "Outer diameter d (in; round/pipe)", kind: "number" },
+    { key: "di_in", label: "Inner dia. (pipe) or wall t (tube)", kind: "number" },
+  ],
+  outputs: [
+    { key: "a", id: "sp-out-a", label: "Area A", value: (r) => fmt(r.A_in2, 2) + " in^2" },
+    { key: "i", id: "sp-out-i", label: "Moment of inertia I", value: (r) => fmt(r.I_in4, 2) + " in^4" },
+    { key: "s", id: "sp-out-s", label: "Section modulus S", value: (r) => fmt(r.S_in3, 2) + " in^3 (c = " + fmt(r.c_in, 3) + " in)" },
+    { key: "r", id: "sp-out-r", label: "Radius of gyration r", value: (r) => fmt(r.r_in, 3) + " in" },
+    { key: "n", id: "sp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSectionProperties,
+});
+CONSTRUCTION_RENDERERS["section-properties"] = _renderSectionProperties;
+
+// dims: in { P_lb: M L T^-2, M_lbin: M L^2 T^-2, A_in2: L^2, c_in: L, I_in4: L^4, e_in: L } out: { sigma_axial: M L^-1 T^-2, sigma_bend: M L^-1 T^-2, sigma_max: M L^-1 T^-2, sigma_min: M L^-1 T^-2 }
+export function computeCombinedStressAxialBending({ P_lb = 0, M_lbin = 0, A_in2 = 0, c_in = 0, I_in4 = 0, e_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(A_in2 > 0)) return { error: "Cross-sectional area must be positive (in^2)." };
+  if (!(c_in > 0)) return { error: "Extreme-fiber distance c must be positive (in)." };
+  if (!(I_in4 > 0)) return { error: "Moment of inertia must be positive (in^4)." };
+  // Eccentricity, if entered, defines the moment M = P e.
+  const M = e_in > 0 ? P_lb * e_in : M_lbin;
+  const sigma_axial = P_lb / A_in2;
+  const sigma_bend = M * c_in / I_in4;
+  const sigma_max = sigma_axial + sigma_bend;
+  const sigma_min = sigma_axial - sigma_bend;
+  const S_in3 = I_in4 / c_in;
+  return {
+    sigma_axial, sigma_bend, sigma_max, sigma_min, M_used: M, S_in3,
+    no_tension: sigma_min >= 0,
+    note: "Combined axial-plus-bending fiber stress on a short (non-buckling) member: sigma = P/A +/- M c/I, with the extreme compression fiber at P/A + M c/I and the other fiber at P/A - M c/I (tension where negative). Enter a moment directly, or an eccentricity e to set M = P e. The far face stays in compression only while M c/I <= P/A - the kern limit e <= r^2/c, the same no-tension threshold the eccentric-footing tile enforces. Short member: this does NOT include the P-delta / column amplification of a slender member (use a beam-column interaction check). A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const combinedStressAxialBendingExample = { inputs: { P_lb: 20000, M_lbin: 30000, A_in2: 30.25, c_in: 2.75, I_in4: 76.3, e_in: 0 } };
+
+const _renderCombinedStressAxialBending = _simpleRenderer({
+  citation: "Citation: Combined axial + bending stress first-principles (mechanics of materials): sigma = P/A +/- M c/I; the kern / no-tension threshold e <= r^2/c. Short member (no P-delta amplification). A design aid, not a substitute for the engineer of record.",
+  example: combinedStressAxialBendingExample.inputs,
+  fields: [
+    { key: "P_lb", label: "Axial force P (lb, + compression)", kind: "number" },
+    { key: "M_lbin", label: "Bending moment M (lb-in)", kind: "number" },
+    { key: "e_in", label: "OR eccentricity e (in; sets M = P e)", kind: "number" },
+    { key: "A_in2", label: "Area A (in^2)", kind: "number" },
+    { key: "c_in", label: "Extreme-fiber distance c (in)", kind: "number" },
+    { key: "I_in4", label: "Moment of inertia I (in^4)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ax", id: "cs-out-ax", label: "Axial stress P/A", value: (r) => fmt(r.sigma_axial, 0) + " psi" },
+    { key: "bn", id: "cs-out-bn", label: "Bending stress Mc/I", value: (r) => fmt(r.sigma_bend, 0) + " psi" },
+    { key: "mx", id: "cs-out-mx", label: "Max fiber (compression)", value: (r) => fmt(r.sigma_max, 0) + " psi" },
+    { key: "mn", id: "cs-out-mn", label: "Min fiber", value: (r) => fmt(r.sigma_min, 0) + " psi (" + (r.no_tension ? "all compression" : "net tension") + ")" },
+    { key: "n", id: "cs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCombinedStressAxialBending,
+});
+CONSTRUCTION_RENDERERS["combined-stress-axial-bending"] = _renderCombinedStressAxialBending;

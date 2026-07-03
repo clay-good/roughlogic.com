@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "cantilever-beam": ["beam-loading", "beam-reactions", "section-properties", "joist-deflection"],
+  "section-properties": ["cantilever-beam", "beam-loading", "combined-stress-axial-bending", "metal-weight"],
+  "combined-stress-axial-bending": ["section-properties", "cantilever-beam", "wood-combined-bending-axial", "steel-h1-interaction"],
   "grain-shrink-moisture": ["grain-bin-capacity", "hay-dry-matter", "crop-yield", "livestock-dry-matter-intake"],
   "livestock-dry-matter-intake": ["pearson-square-ration", "livestock-water-requirement", "hay-dry-matter", "cattle-stocking-rate"],
   "manure-application-rate": ["npk-blend", "livestock-dry-matter-intake", "crop-yield", "irrigation-requirement"],

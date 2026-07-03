@@ -1,6 +1,6 @@
 # roughlogic.com Specification v341 -- Cantilever Beam Moment, Shear, and Deflection (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v341..v343 (the mechanics-of-materials trio -- the general
+> **Status: LANDED (2026-07-03, package 0.120.0). Batch spec-v341..v343 (the mechanics-of-materials trio -- the general
 > beam/section tools the simply-supported tile never covers: the cantilever beam (this spec), the cross-section properties
 > I/S/r (v342), and the combined axial-plus-bending stress (v343).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `beam-loading` gives moment and deflection for a
