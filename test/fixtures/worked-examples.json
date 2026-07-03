@@ -30205,6 +30205,88 @@
       "outputs": {
         "dose_ppm": { "value": 12, "tolerance": { "abs": 0.01 } }
       }
+    },
+    {
+      "tile_id": "weld-dilution",
+      "source_publisher": "welding metallurgy / AWS",
+      "source_title": "structural single-pass weld (A_base 0.03, A_filler 0.05) -> 37.5% dilution",
+      "source_edition_or_year": "spec-v356 worked example (machine-verified)",
+      "source_section_or_page": "spec-v356 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "A_base": 0.03, "A_filler": 0.05 },
+      "outputs": {
+        "dilution_pct": { "value": 37.5, "tolerance": { "pct": 0.5 } },
+        "filler_share_pct": { "value": 62.5, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "weld-dilution",
+      "source_publisher": "welding metallurgy / AWS",
+      "source_title": "cross-check: a low-dilution hardfacing overlay (A_base 0.02, A_filler 0.10) -> 16.7%",
+      "source_edition_or_year": "spec-v356 worked example (machine-verified)",
+      "source_section_or_page": "spec-v356 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "A_base": 0.02, "A_filler": 0.10 },
+      "outputs": {
+        "dilution_pct": { "value": 16.7, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "weld-passes-arc-time",
+      "source_publisher": "welding-cost estimating",
+      "source_title": "12 in weld, 0.15 in^2 groove, 0.03 in^2/pass, 8 lb/h -> 5 passes, 0.509 lb, 3.8 min arc",
+      "source_edition_or_year": "spec-v357 worked example (machine-verified)",
+      "source_section_or_page": "spec-v357 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "A_groove": 0.15, "length_in": 12, "a_pass": 0.03, "dep_rate": 8, "density": 0.283, "op_factor": 0.40 },
+      "outputs": {
+        "passes": { "value": 5, "tolerance": { "abs": 0 } },
+        "weight_lb": { "value": 0.509, "tolerance": { "pct": 0.5 } },
+        "arc_min": { "value": 3.8, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "weld-passes-arc-time",
+      "source_publisher": "welding-cost estimating",
+      "source_title": "cross-check: a bigger 0.30 in^2 groove doubles to 10 passes, 1.02 lb, 7.6 min",
+      "source_edition_or_year": "spec-v357 worked example (machine-verified)",
+      "source_section_or_page": "spec-v357 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "A_groove": 0.30, "length_in": 12, "a_pass": 0.03, "dep_rate": 8, "density": 0.283, "op_factor": 0 },
+      "outputs": {
+        "passes": { "value": 10, "tolerance": { "abs": 0 } },
+        "arc_min": { "value": 7.6, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "weld-travel-speed",
+      "source_publisher": "AWS / ASME",
+      "source_title": "GMAW 24 V, 200 A, eta 0.80, target 40 kJ/in -> 5.76 in/min",
+      "source_edition_or_year": "spec-v358 worked example (machine-verified)",
+      "source_section_or_page": "spec-v358 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "V_volts": 24, "I_amps": 200, "eta": 0.80, "HI_kjin": 40 },
+      "outputs": {
+        "travel_speed_ipm": { "value": 5.76, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "weld-travel-speed",
+      "source_publisher": "AWS / ASME",
+      "source_title": "cross-check: a tighter 25 kJ/in ceiling forces 9.22 in/min",
+      "source_edition_or_year": "spec-v358 worked example (machine-verified)",
+      "source_section_or_page": "spec-v358 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "V_volts": 24, "I_amps": 200, "eta": 0.80, "HI_kjin": 25 },
+      "outputs": {
+        "travel_speed_ipm": { "value": 9.22, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

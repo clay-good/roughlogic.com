@@ -1170,3 +1170,137 @@ function _v134renderShrinkFit(inputRegion, outputRegion, citationEl) {
   for (const f of [dia, interference, clearance, alpha, ambient]) f.input.addEventListener("input", update);
 }
 FAB_RENDERERS["shrink-fit"] = _v134renderShrinkFit;
+
+// ===================== spec-v356..v358: welding process batch (Group E) =====================
+// The process-planning numbers the weld-strength and cost tiles never give:
+// the base-metal dilution of a deposit (v356), the passes and arc time to fill
+// a groove (v357), and the travel speed for a target heat input (v358).
+
+// dims: in { A_base: L^2, A_filler: L^2 } out: { dilution_pct: dimensionless, filler_share_pct: dimensionless }
+export function computeWeldDilution({ A_base = 0, A_filler = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ab = Number(A_base) || 0;
+  const af = Number(A_filler) || 0;
+  if (!(ab > 0)) return { error: "Melted base-metal area must be positive (in^2)." };
+  if (!(af > 0)) return { error: "Filler (reinforcement) area must be positive (in^2)." };
+  const dilution_pct = ab / (ab + af) * 100;
+  const filler_share_pct = 100 - dilution_pct;
+  return {
+    dilution_pct, filler_share_pct,
+    note: "Weld dilution = melted base-metal area / total deposit area, the fraction of the weld that is base metal rather than filler. It sets how much the base metal's chemistry shifts the deposit: a structural single-pass weld runs 30-40%, but a hardfacing or corrosion overlay is kept low (weave, buttering, lower current) so the overlay chemistry stays near the filler's. This is the cross-sectional area ratio; it does not itself compute the diluted alloy composition (that needs each metal's chemistry). A process aid; the WPS and the filler-metal data govern.",
+  };
+}
+export const weldDilutionExample = { inputs: { A_base: 0.03, A_filler: 0.05 } };
+function _v356renderWeldDilution(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: weld dilution = A_base / (A_base + A_filler), the standard welding-metallurgy definition (by name). Sets how far the base metal shifts the deposit chemistry; overlays are kept low-dilution. The WPS and the filler-metal data govern.";
+  const ab = makeNumber("Melted base-metal (penetration) area (in^2)", "wd-ab", { step: "any", min: "0" });
+  const af = makeNumber("Filler (reinforcement) area (in^2)", "wd-af", { step: "any", min: "0" });
+  for (const f of [ab, af]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ab.input.value = "0.03"; af.input.value = "0.05"; update(); });
+  const oDil = makeOutputLine(outputRegion, "Dilution (base-metal share)", "wd-out-dil");
+  const oFill = makeOutputLine(outputRegion, "Filler share", "wd-out-fill");
+  const oNote = makeOutputLine(outputRegion, "Note", "wd-out-note");
+  const update = debounce(() => {
+    const r = computeWeldDilution({ A_base: Number(ab.input.value) || 0, A_filler: Number(af.input.value) || 0 });
+    if (r.error) { oDil.textContent = r.error; oFill.textContent = "-"; oNote.textContent = ""; return; }
+    oDil.textContent = fmt(r.dilution_pct, 1) + "%";
+    oFill.textContent = fmt(r.filler_share_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ab, af]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-dilution"] = _v356renderWeldDilution;
+
+// dims: in { A_groove: L^2, length_in: L, a_pass: L^2, dep_rate: M T^-1, density: M L^-3, op_factor: dimensionless } out: { passes: dimensionless, weight_lb: M, arc_h: T, total_h: T }
+export function computeWeldPassesArcTime({ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_factor = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ag = Number(A_groove) || 0;
+  const len = Number(length_in) || 0;
+  const ap = Number(a_pass) || 0;
+  const dr = Number(dep_rate) || 0;
+  const dens = Number(density) > 0 ? Number(density) : 0.283;
+  const of = Number(op_factor) || 0;
+  if (!(ag > 0)) return { error: "Groove cross-sectional area must be positive (in^2)." };
+  if (!(len > 0)) return { error: "Weld length must be positive (in)." };
+  if (!(ap > 0)) return { error: "Area per pass must be positive (in^2)." };
+  if (!(dr > 0)) return { error: "Deposition rate must be positive (lb/h)." };
+  const passes = Math.ceil(ag / ap);
+  const weight_lb = ag * len * dens;
+  const arc_h = weight_lb / dr;
+  const total_h = of > 0 ? arc_h / of : null;
+  return {
+    passes, weight_lb, arc_h, arc_min: arc_h * 60, total_h, total_min: total_h == null ? null : total_h * 60,
+    note: "Weld-metal volume drives welding cost. Passes = ceil(groove area / area per pass); deposited weight = groove area x length x density (steel ~0.283 lb/in^3); arc-on time = weight / deposition rate; and with an operator (duty) factor, total shop time = arc time / factor. Doubling the groove doubles the passes and the arc time - the linear scaling behind weld cost. The operator factor (often 20-40% for manual work) captures the fit-up, repositioning, and slag time between arcs. A planning estimate; the WPS and the shop's measured rates govern.",
+  };
+}
+export const weldPassesArcTimeExample = { inputs: { A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 8, density: 0.283, op_factor: 0.40 } };
+function _v357renderWeldPassesArcTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: passes = ceil(groove area / area per pass); deposited weight = area x length x density (steel ~0.283 lb/in^3); arc time = weight / deposition rate; total = arc / operator factor. Standard welding-cost estimating (by name). The WPS and the shop's measured rates govern.";
+  const ag = makeNumber("Groove cross-sectional area (in^2)", "wpa-ag", { step: "any", min: "0" });
+  const len = makeNumber("Weld length (in)", "wpa-len", { step: "any", min: "0" });
+  const ap = makeNumber("Area deposited per pass (in^2)", "wpa-ap", { step: "any", min: "0" });
+  const dr = makeNumber("Deposition rate (lb/h)", "wpa-dr", { step: "any", min: "0" });
+  const dens = makeNumber("Weld-metal density (lb/in^3, default 0.283)", "wpa-dens", { step: "any", min: "0" });
+  const of = makeNumber("Operator/duty factor (0-1, optional)", "wpa-of", { step: "any", min: "0", max: "1" });
+  for (const f of [ag, len, ap, dr, dens, of]) inputRegion.appendChild(f.wrap);
+  dens.input.value = "0.283";
+  attachExampleButton(inputRegion, () => { ag.input.value = "0.15"; len.input.value = "12"; ap.input.value = "0.03"; dr.input.value = "8"; dens.input.value = "0.283"; of.input.value = "0.40"; update(); });
+  const oPasses = makeOutputLine(outputRegion, "Passes", "wpa-out-p");
+  const oWeight = makeOutputLine(outputRegion, "Deposited weight", "wpa-out-w");
+  const oArc = makeOutputLine(outputRegion, "Arc-on time", "wpa-out-a");
+  const oTotal = makeOutputLine(outputRegion, "Total shop time", "wpa-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "wpa-out-note");
+  const update = debounce(() => {
+    const r = computeWeldPassesArcTime({ A_groove: Number(ag.input.value) || 0, length_in: Number(len.input.value) || 0, a_pass: Number(ap.input.value) || 0, dep_rate: Number(dr.input.value) || 0, density: Number(dens.input.value) || 0, op_factor: Number(of.input.value) || 0 });
+    if (r.error) { oPasses.textContent = r.error; oWeight.textContent = "-"; oArc.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    oPasses.textContent = String(r.passes);
+    oWeight.textContent = fmt(r.weight_lb, 3) + " lb";
+    oArc.textContent = fmt(r.arc_min, 1) + " min (" + fmt(r.arc_h, 3) + " h)";
+    oTotal.textContent = r.total_min == null ? "(enter an operator factor)" : fmt(r.total_min, 1) + " min";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ag, len, ap, dr, dens, of]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-passes-arc-time"] = _v357renderWeldPassesArcTime;
+
+// dims: in { V_volts: M L^2 T^-3 I^-1, I_amps: I, eta: dimensionless, HI_kjin: M L T^-2 } out: { travel_speed_ipm: L T^-1 }
+export function computeWeldTravelSpeed({ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const v = Number(V_volts) || 0;
+  const i = Number(I_amps) || 0;
+  const e = Number(eta) || 0;
+  const hi = Number(HI_kjin) || 0;
+  if (!(v > 0)) return { error: "Arc voltage must be positive (V)." };
+  if (!(i > 0)) return { error: "Welding current must be positive (A)." };
+  if (!(e > 0 && e <= 1)) return { error: "Arc efficiency must be in (0, 1]." };
+  if (!(hi > 0)) return { error: "Target heat input must be positive (kJ/in)." };
+  const travel_speed_ipm = (60 * v * i * e) / (1000 * hi);
+  if (!Number.isFinite(travel_speed_ipm) || travel_speed_ipm <= 0) return { error: "Travel speed is not valid." };
+  // Back-check: heat input at this travel speed reproduces the target.
+  const hi_check = (60 * v * i * e) / (1000 * travel_speed_ipm);
+  return {
+    travel_speed_ipm, hi_check,
+    note: "Travel speed for a target heat input: TS = (60 x V x I x eta) / (1000 x HI), with eta the arc efficiency (about 0.8 GMAW, 0.65 GTAW, 0.9 SAW). Travel at or ABOVE this to hold the heat input at or UNDER the target - a lower heat-input ceiling forces a faster travel, the inverse TS-HI relationship a welder uses to trade travel speed for HAZ control and to meet a WPS's heat-input limit. Slowing down at the same volts and amps raises the heat input. A process aid; the qualified WPS governs the allowable range.",
+  };
+}
+export const weldTravelSpeedExample = { inputs: { V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 40 } };
+function _v358renderWeldTravelSpeed(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: heat input HI = (60 V I eta)/(1000 TS) solved for travel speed, per the AWS/ASME arc heat-input relation with the arc efficiency eta (0.8 GMAW, 0.65 GTAW, 0.9 SAW), by name. Travel at or above the result to stay at or under the target HI. The qualified WPS governs the allowable range.";
+  const v = makeNumber("Arc voltage (V)", "wts-v", { step: "any", min: "0" });
+  const i = makeNumber("Welding current (A)", "wts-i", { step: "any", min: "0" });
+  const e = makeNumber("Arc efficiency (0.8 GMAW, 0.65 GTAW, 0.9 SAW)", "wts-e", { step: "any", min: "0", max: "1" });
+  const hi = makeNumber("Target heat input (kJ/in)", "wts-hi", { step: "any", min: "0" });
+  for (const f of [v, i, e, hi]) inputRegion.appendChild(f.wrap);
+  e.input.value = "0.80";
+  attachExampleButton(inputRegion, () => { v.input.value = "24"; i.input.value = "200"; e.input.value = "0.80"; hi.input.value = "40"; update(); });
+  const oTS = makeOutputLine(outputRegion, "Travel speed (at or above)", "wts-out-ts");
+  const oNote = makeOutputLine(outputRegion, "Note", "wts-out-note");
+  const update = debounce(() => {
+    const r = computeWeldTravelSpeed({ V_volts: Number(v.input.value) || 0, I_amps: Number(i.input.value) || 0, eta: Number(e.input.value) || 0, HI_kjin: Number(hi.input.value) || 0 });
+    if (r.error) { oTS.textContent = r.error; oNote.textContent = ""; return; }
+    oTS.textContent = fmt(r.travel_speed_ipm, 2) + " in/min";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [v, i, e, hi]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["weld-travel-speed"] = _v358renderWeldTravelSpeed;

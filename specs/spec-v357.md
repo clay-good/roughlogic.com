@@ -1,6 +1,6 @@
 # roughlogic.com Specification v357 -- Weld Passes and Arc Time to Fill a Groove (calc-fab.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v356..v358 (the welding-process trio -- dilution (v356), the
+> **Status: LANDED (2026-07-03, package 0.125.0). Batch spec-v356..v358 (the welding-process trio -- dilution (v356), the
 > passes and arc time to fill a groove (this spec), the travel speed for a target heat input (v358)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `weld-metal-volume` gives the volume of weld metal a
 > groove needs and `wire-feed-deposition` gives the deposition rate, but neither combines them into the two numbers a shop

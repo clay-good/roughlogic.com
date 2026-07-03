@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fab): land spec-v356..v358 -- 3 welding process tiles in calc-fab.js; 824 -> 827 tiles, 0.125.0, 2026-07-03
+
+The welding process trio, twenty-eighth batch of the v275-v374 campaign: the process-planning numbers the weld-strength and cost tiles never give, all in the existing lazy `calc-fab.js` (Group E); no new module, group, or dependency. Catalog **824 -> 827**, package **0.124.0 -> 0.125.0** (a minor). Proposed 2026-07-02.
+
+- **`weld-dilution` (spec-v356).** dilution = A_base / (A_base + A_filler). Pinned: a structural single-pass weld (0.03/0.05) -> 37.5% base metal; a low-dilution hardfacing overlay (0.02/0.10) -> 16.7%, keeping the overlay chemistry near the filler.
+- **`weld-passes-arc-time` (spec-v357).** passes = ceil(groove/pass), weight = area x length x density, arc = weight/dep_rate, total = arc/op_factor. Pinned: a 12 in, 0.15 in^2 groove at 8 lb/h -> 5 passes, 0.509 lb, 3.8 min arc (9.5 min at 40%); double the groove doubles both.
+- **`weld-travel-speed` (spec-v358).** TS = (60 V I eta)/(1000 HI). Pinned: GMAW 24 V, 200 A, eta 0.8, 40 kJ/in -> 5.76 in/min; a 25 kJ/in ceiling forces 9.22 in/min (the inverse TS-HI relation for HAZ control).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the ratio, the ceil passes and weight/time, the inverse heat-input relation with a round-trip check, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the weld-dilution definition, the welding-cost estimating relations, and the AWS/ASME heat-input formula. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bump needed. Housekeeping: home count 824 -> 827, README resynced (counts, Group E cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 57 appended. All gates green at the new state: lint, unit tests (**5,120**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(treatment): land spec-v353..v355 -- 3 pool chlorination / heating tiles in calc-treatment.js; 821 -> 824 tiles, 0.124.0, 2026-07-03
 
 The pool chlorination / heating trio, twenty-seventh batch of the v275-v374 campaign: the dose-and-heat field numbers the alkalinity/CYA/salt adjust tiles never give, all in the existing lazy `calc-treatment.js` (Group M); no new module, group, or dependency. Catalog **821 -> 824**, package **0.123.0 -> 0.124.0** (a minor). Proposed 2026-07-02.

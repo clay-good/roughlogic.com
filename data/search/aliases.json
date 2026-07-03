@@ -13832,6 +13832,141 @@
       "term": "free vs combined chlorine",
       "target": "breakpoint-chlorination",
       "kind": "industry"
+    },
+    {
+      "term": "weld dilution",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "dilution ratio welding",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "base metal dilution",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "overlay dilution",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "hardfacing dilution",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "penetration reinforcement area",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "cladding dilution",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "weld chemistry mix",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "fusion zone dilution",
+      "target": "weld-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "weld passes",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "number of weld passes",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "arc time",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "weld fill time",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "groove fill passes",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "welding time estimate",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "deposition arc time",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "weld metal weight",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "passes to fill",
+      "target": "weld-passes-arc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "weld travel speed",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "travel speed heat input",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "heat input travel speed",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "wps travel speed",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "kj/in travel speed",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "welding speed calculator",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "heat input control",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "travel speed for heat input",
+      "target": "weld-travel-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "arc travel speed",
+      "target": "weld-travel-speed",
+      "kind": "industry"
     }
   ]
 }

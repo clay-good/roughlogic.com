@@ -14796,3 +14796,55 @@ test("bounds: spec-v355 computeBreakpointChlorination pins the combined chlorine
   assert.ok("error" in _v355({ total_ppm: 1.5, free_ppm: 1.0, ratio: 0 }));
   assert.ok("error" in _v355({ total_ppm: Infinity, free_ppm: 1.0 }));
 });
+
+// ===================== spec-v356..v358 welding process batch =====================
+import { computeWeldDilution as _v356, computeWeldPassesArcTime as _v357, computeWeldTravelSpeed as _v358 } from "../../calc-fab.js";
+
+test("bounds: spec-v356 computeWeldDilution pins the ratio, the filler complement, and error seams", () => {
+  const r = _v356({ A_base: 0.03, A_filler: 0.05 });
+  assert.ok(Math.abs(r.dilution_pct - 37.5) < 1e-9);
+  assert.ok(Math.abs(r.filler_share_pct - 62.5) < 1e-9);
+  assert.ok(Math.abs(r.dilution_pct + r.filler_share_pct - 100) < 1e-9);
+  // A low-dilution overlay.
+  const ov = _v356({ A_base: 0.02, A_filler: 0.10 });
+  assert.ok(Math.abs(ov.dilution_pct - 16.6667) < 0.001);
+  // Error seams.
+  assert.ok("error" in _v356({ A_base: 0, A_filler: 0.05 }));
+  assert.ok("error" in _v356({ A_base: 0.03, A_filler: 0 }));
+  assert.ok("error" in _v356({ A_base: Infinity, A_filler: 0.05 }));
+});
+
+test("bounds: spec-v357 computeWeldPassesArcTime pins the ceil passes, weight, arc time, operator total, and error seams", () => {
+  const r = _v357({ A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 8, density: 0.283, op_factor: 0.40 });
+  assert.strictEqual(r.passes, 5);
+  assert.ok(Math.abs(r.weight_lb - 0.15 * 12 * 0.283) < 1e-9);
+  assert.ok(Math.abs(r.arc_min - r.weight_lb / 8 * 60) < 1e-9);
+  assert.ok(Math.abs(r.total_min - r.arc_min / 0.40) < 1e-9);
+  // Double the groove doubles the passes and the arc time.
+  const big = _v357({ A_groove: 0.30, length_in: 12, a_pass: 0.03, dep_rate: 8 });
+  assert.strictEqual(big.passes, 10);
+  assert.ok(Math.abs(big.arc_min - 2 * r.arc_min) < 1e-9 && big.total_min === null);
+  // Default density is 0.283 when omitted.
+  assert.ok(Math.abs(_v357({ A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 8 }).weight_lb - r.weight_lb) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v357({ A_groove: 0, length_in: 12, a_pass: 0.03, dep_rate: 8 }));
+  assert.ok("error" in _v357({ A_groove: 0.15, length_in: 12, a_pass: 0, dep_rate: 8 }));
+  assert.ok("error" in _v357({ A_groove: 0.15, length_in: 12, a_pass: 0.03, dep_rate: 0 }));
+  assert.ok("error" in _v357({ A_groove: 0.15, length_in: NaN, a_pass: 0.03, dep_rate: 8 }));
+});
+
+test("bounds: spec-v358 computeWeldTravelSpeed pins the inverse relation, the round-trip check, and error seams", () => {
+  const r = _v358({ V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 40 });
+  assert.ok(Math.abs(r.travel_speed_ipm - 5.76) < 0.01);
+  // The heat-input back-check reproduces the target.
+  assert.ok(Math.abs(r.hi_check - 40) < 1e-6);
+  // A tighter HI ceiling forces a faster travel (inverse).
+  const tight = _v358({ V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 25 });
+  assert.ok(tight.travel_speed_ipm > r.travel_speed_ipm && Math.abs(tight.travel_speed_ipm - 9.216) < 0.01);
+  // Error seams.
+  assert.ok("error" in _v358({ V_volts: 0, I_amps: 200, eta: 0.80, HI_kjin: 40 }));
+  assert.ok("error" in _v358({ V_volts: 24, I_amps: 0, eta: 0.80, HI_kjin: 40 }));
+  assert.ok("error" in _v358({ V_volts: 24, I_amps: 200, eta: 1.5, HI_kjin: 40 }));
+  assert.ok("error" in _v358({ V_volts: 24, I_amps: 200, eta: 0.80, HI_kjin: 0 }));
+  assert.ok("error" in _v358({ V_volts: Infinity, I_amps: 200, eta: 0.80, HI_kjin: 40 }));
+});

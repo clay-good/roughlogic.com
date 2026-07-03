@@ -578,6 +578,7 @@ const TOOL_MODULES = (() => {
     // v129..v134 metal-trades batch: weld estimating + plate forming (group E), shrink fit (group G)
     "weld-metal-volume", "wire-feed-deposition", "weld-transverse-shrinkage",
     "weld-group-eccentric", "min-bend-radius", "shrink-fit",
+    "weld-dilution", "weld-passes-arc-time", "weld-travel-speed",
   ]);
   // Group G (cont.): the layout & shop-geometry bench, split out of
   // calc-fab.js into calc-layout.js (spec-v56) once calc-fab hit 96% of its

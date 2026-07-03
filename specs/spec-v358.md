@@ -1,6 +1,6 @@
 # roughlogic.com Specification v358 -- Weld Travel Speed for a Target Heat Input (calc-fab.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v356..v358 (the welding-process trio -- dilution (v356),
+> **Status: LANDED (2026-07-03, package 0.125.0). Batch spec-v356..v358 (the welding-process trio -- dilution (v356),
 > passes/arc-time (v357), the travel speed for a target heat input (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `weld-heat-input` computes the heat input from the
 > voltage, current, and a given travel speed, but a welder qualifying to a WPS works the problem backward -- what travel

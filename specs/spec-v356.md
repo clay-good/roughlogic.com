@@ -1,6 +1,6 @@
 # roughlogic.com Specification v356 -- Weld Dilution Ratio (calc-fab.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v356..v358 (the welding-process trio -- the metallurgy and
+> **Status: LANDED (2026-07-03, package 0.125.0). Batch spec-v356..v358 (the welding-process trio -- the metallurgy and
 > production numbers the strength and cost tiles never compute: the weld dilution ratio (this spec), the number of passes
 > and arc time to fill a groove (v357), and the travel speed for a target heat input (v358).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog computes weld strength, heat input, and

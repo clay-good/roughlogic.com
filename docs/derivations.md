@@ -1794,10 +1794,13 @@ cross-check.
 | calc-fab.js | `computeShieldingGasRuntime` | `{ flow_cfh, arc_on_min, cylinder_ft3, gas_cost = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeShrinkFit` | `{ nominal_dia_in = 0, interference_in = 0, clearance_in = 0, alpha_per_f = 0....` | _ | _ | _ |
 | calc-fab.js | `computeWeldCostPerFoot` | `{ deposit_lb_per_ft, deposition_eff_pct = 95, filler_cost_per_lb = 0, deposit...` | _ | _ | _ |
+| calc-fab.js | `computeWeldDilution` | `{ A_base = 0, A_filler = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWeldGroupEccentric` | `{ load_lb = 0, ecc_in = 0, weld_len_in = 0, separation_in = 0, allow_per_16 =...` | _ | _ | _ |
 | calc-fab.js | `computeWeldMetalVolume` | `{ joint_type = "fillet", fillet_leg_in = 0, groove_area_in2 = 0, length_in = ...` | _ | _ | _ |
+| calc-fab.js | `computeWeldPassesArcTime` | `{ A_groove = 0, length_in = 0, a_pass = 0, dep_rate = 0, density = 0.283, op_...` | _ | _ | _ |
 | calc-fab.js | `computeWeldPreheatFuel` | `{ steel_lb, start_temp_F, preheat_temp_F, efficiency_pct = 25, c_steel = 0.11...` | _ | _ | _ |
 | calc-fab.js | `computeWeldTransverseShrinkage` | `{ weld_area_in2 = 0, thickness_in = 0, weld_count = 1 } = {}` | _ | _ | _ |
+| calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedDeposition` | `{ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeContinuousLoadOcpd` | `{ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeFeederTapRule` | `{ feeder_ocpd_a = 0, tap_length_ft = 0, tap_ampacity_a = 0 } = {}` | _ | _ | _ |
@@ -2481,7 +2484,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1067.
+Row count: 1070.
 
 <!-- END function-corpus-v14 -->
 
@@ -2899,7 +2902,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (166 tiles)
+### Group E Construction (169 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3049,12 +3052,15 @@ per spec-v14 §13.1 second paragraph.
 | `wall-bracing-length` | Braced-Wall-Panel Length (IRC R602.10) | IRC R602.10 (wall bracing); 40 ft line at 20% -> 8 ft required; 9 ft provided -> pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wallpaper-rolls` | Wallcovering Roll Takeoff With Pattern Repeat | Wallcovering industry estimating prac...; spec-v214 section 2.1 pinned example (Euro roll, modest r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-cost-per-foot` | All-In Welding Cost per Foot | AWS welding cost and consumable refer...; 0.10 lb/ft, 95% eff, $2.50/lb, 8 lb/hr, 30% factor, $65/h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `weld-dilution` | Weld Dilution Ratio | welding metallurgy / AWS; spec-v356 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-duty-cycle` | Welder Duty Cycle | NEMA EW-1 inverse-square duty-cycle r...; 250 A at 60% -> at 300 A: 41.67%, A100 193.6 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-group-eccentric` | Eccentric Fillet Weld Group (Elastic Method) | AISC 360 / Steel Construction Manual ...; 12 kip at 6 in, two 10 in welds 4 in apart -> J 246.7 in3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-heat-input` | Welding Heat Input | AWS D1.1 / ASME BPVC Section IX (by n...; 25 V, 200 A, 8 in/min, eta 0.8 -> arc energy 37500 J/in, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `weld-metal-volume` | Weld Deposit Weight, Filler, and Pass Count | first-principles joint geometry and s...; 5/16 in fillet, 120 in, 0.90 eff -> 0.0488 in2, 1.66 lb d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `weld-passes-arc-time` | Weld Passes and Arc Time to Fill a Groove | welding-cost estimating; spec-v357 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-preheat-fuel` | Weld Preheat Energy and Fuel | Carbon-steel specific heat / propane ...; 200 lb, 70 to 300 degF, 25% efficiency -> 5,060 Btu, 20,2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `weld-transverse-shrinkage` | Weld Transverse Shrinkage and Pre-Set | Blodgett, Design of Welded Structures; 0.10 in2 weld in 1/2 in plate, 3 welds -> 0.040 in per we... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `weld-travel-speed` | Weld Travel Speed for a Target Heat Input | AWS / ASME; spec-v358 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weld-usage` | Welding Rod and Wire Usage | AWS / Lincoln / Miller welding-engine...; GMAW / 0.05 in^2 cross-section / 120 in weld / 4 lb/min -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-cc-pressure` | Wind Components and Cladding Pressure (ASCE 7 Ch. 30) | ASCE 7-22 Chapter 30; spec-v296 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-mwfrs-pressure` | MWFRS Wall Pressure (ASCE 7 Ch. 27) | ASCE 7-22 Chapter 27; spec-v298 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3491,6 +3497,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 824. Fixture-covered or reference-cadence: 824 / 824.
+Tile count: 827. Fixture-covered or reference-cadence: 827 / 827.
 
 <!-- END tile-index-v14 -->

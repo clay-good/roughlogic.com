@@ -6379,6 +6379,42 @@ export const CITATIONS = {
       { name: "Grain direction", value: "transverse bends tolerate tighter radii than longitudinal; screen only", source: "forming practice" },
     ],
   },
+  "weld-dilution": {
+    formula: "dilution = A_base / (A_base + A_filler) x 100; filler_share = 100 - dilution.",
+    edition: "The standard welding-metallurgy weld-dilution definition, by name.",
+    freeAccess: "Weld dilution is a standard welding-metallurgy term defined in AWS references and filler-metal literature. The WPS and the filler-metal data govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Weld dilution = melted base-metal area / total deposit area, the fraction of the weld that is base metal rather than filler. It sets how much the base metal's chemistry shifts the deposit: a structural single-pass weld runs 30-40%, but a hardfacing or corrosion overlay is kept low (weave, buttering, lower current) so the overlay chemistry stays near the filler's. This is the cross-sectional area ratio: it uses the entered melted and reinforcement areas (from a macro-etch or estimate) and does not itself compute the diluted alloy composition (that needs each metal's chemistry). A process aid; the WPS and the filler-metal data govern.",
+    assumptions: [
+      { name: "Definition", value: "dilution = A_base / (A_base + A_filler)", source: "welding metallurgy / AWS" },
+      { name: "Overlay goal", value: "hardfacing/corrosion overlays kept low-dilution to preserve the filler chemistry", source: "welding practice" },
+      { name: "Area ratio only", value: "uses entered areas; does not compute the diluted alloy composition", source: "scope of this tile" },
+    ],
+  },
+  "weld-passes-arc-time": {
+    formula: "passes = ceil(A_groove / a_pass); weight = A_groove x length x density; arc_h = weight / dep_rate; total_h = arc_h / op_factor.",
+    edition: "The standard welding-cost estimating relations (passes, deposited weight, arc time, operator factor), by name.",
+    freeAccess: "The deposited-weight and arc-time estimating relations are standard welding-cost references (AWS / Lincoln / Miller estimating guides). The WPS and the shop's measured rates govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Weld-metal volume drives welding cost: passes = ceil(groove area / area per pass); deposited weight = groove area x length x density (steel ~0.283 lb/in^3); arc-on time = weight / deposition rate; and with an operator (duty) factor, total shop time = arc time / factor. Doubling the groove doubles the passes and the arc time. This returns the count and time estimate: it assumes uniform passes of the entered area, is arc-on time (the operator factor, often 20-40% for manual work, captures the fit-up/repositioning/slag time between arcs), and is not a full cost model. A planning estimate; the WPS and the shop's measured rates govern.",
+    assumptions: [
+      { name: "Volume-driven", value: "passes = ceil(area/a_pass); weight = area x length x density (steel ~0.283 lb/in^3)", source: "welding-cost estimating" },
+      { name: "Arc-on time", value: "arc_h = weight / deposition rate; total = arc / operator factor", source: "AWS / estimating guides" },
+      { name: "Uniform passes", value: "assumes uniform passes of the entered area; not a full cost model", source: "scope of this tile" },
+    ],
+  },
+  "weld-travel-speed": {
+    formula: "TS = (60 x V x I x eta) / (1000 x HI); check HI = (60 V I eta)/(1000 TS).",
+    edition: "The AWS/ASME arc heat-input relation solved for travel speed, by name.",
+    freeAccess: "The heat-input relation HI = (60 V I eta)/(1000 x travel speed) is a standard AWS/ASME formula. The qualified WPS governs the allowable range.",
+    governance: GOVERNANCE.general,
+    editionNote: "Travel speed for a target heat input: TS = (60 x V x I x eta) / (1000 x HI), with eta the arc efficiency (about 0.8 GMAW, 0.65 GTAW, 0.9 SAW). Travel at or ABOVE this to hold the heat input at or UNDER the target: a lower heat-input ceiling forces a faster travel, the inverse TS-HI relationship a welder uses to trade travel speed for HAZ control and to meet a WPS's heat-input limit; slowing down at the same volts and amps raises the heat input. This returns the travel speed: it uses the entered arc efficiency (match the WPS's convention - some codes omit eta), and it does not model the bead geometry, fusion, or deposition. A process aid; the qualified WPS governs the allowable range.",
+    assumptions: [
+      { name: "Heat-input relation", value: "TS = (60 V I eta)/(1000 HI); eta ~0.8 GMAW, 0.65 GTAW, 0.9 SAW", source: "AWS / ASME" },
+      { name: "Slower is hotter", value: "at fixed V and I, lower travel speed raises the heat input (inverse relation)", source: "arc physics" },
+      { name: "Match WPS eta", value: "match the WPS's efficiency convention; no bead-geometry or fusion model", source: "scope of this tile" },
+    ],
+  },
   "shrink-fit": {
     formula: "Required temperature change delta_T = (interference + assembly clearance) / (alpha x nominal diameter); heat the outer/bore part to ambient + delta_T, or chill the inner/shaft part to ambient - delta_T. From delta_dia = alpha x dia x delta_T.",
     edition: "Interference shrink-fit assembly temperature - first-principles thermal-expansion relation delta_dia = alpha x dia x delta_T (steel alpha 6.5e-6 per degF), by name; public domain.",
