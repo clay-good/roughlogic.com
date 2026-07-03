@@ -3782,3 +3782,120 @@ function _v304renderChannelFroudeNumber(inputRegion, outputRegion, citationEl) {
   for (const f of [b, q, y]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["channel-froude-number"] = _v304renderChannelFroudeNumber;
+
+// ===================== spec-v371..v373: pipe-flow energy batch (Group B) =====================
+// The Bernoulli energy pieces the friction and pressure tiles use but never
+// expose: the velocity head and dynamic pressure (v371), the continuity velocity
+// at a pipe size change (v372), and the Bernoulli total head (v373).
+
+// dims: in { V_fps: L T^-1, gamma: M L^-2 T^-2, rho: M L^-3 } out: { h_v_ft: L, q_psf: M L^-1 T^-2, q_psi: M L^-1 T^-2 }
+export function computeVelocityHead({ V_fps = 0, gamma = 62.4, rho = 1.94 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(V_fps) || 0;
+  const r = Number(rho) > 0 ? Number(rho) : 1.94;
+  if (!(V > 0)) return { error: "Velocity must be positive (ft/s)." };
+  const h_v_ft = V * V / (2 * 32.2);
+  const q_psf = 0.5 * r * V * V;
+  const q_psi = q_psf / 144;
+  return {
+    h_v_ft, q_psf, q_psi,
+    note: "Velocity head h_v = V^2 / (2g) is the kinetic energy of the flow expressed as feet of fluid, and the dynamic pressure q = 1/2 rho V^2 is that energy as a pressure. Both scale with the square of velocity, so doubling the velocity quadruples the head and pressure - the reason a small velocity increase drives large minor (fitting) losses and erosion, and why plumbing codes cap water velocity around 5-8 ft/s. Water defaults: rho 1.94 slug/ft^3, gamma 62.4 lb/ft^3. A design aid; the code velocity limits and the engineer of record govern.",
+  };
+}
+export const velocityHeadExample = { inputs: { V_fps: 10, gamma: 62.4, rho: 1.94 } };
+function _v371renderVelocityHead(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: velocity head h_v = V^2/(2g) (g = 32.2 ft/s^2) and dynamic pressure q = 1/2 rho V^2, first-principles fluid mechanics. Both scale with V^2. The code velocity limits (~5-8 ft/s water) and the engineer of record govern.";
+  const V = makeNumber("Flow velocity (ft/s)", "vh-v", { step: "any", min: "0" }); V.input.value = "10";
+  const rho = makeNumber("Fluid density (slug/ft^3, 1.94 water)", "vh-rho", { step: "any", min: "0" }); rho.input.value = "1.94";
+  for (const f of [V, rho]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { V.input.value = "10"; rho.input.value = "1.94"; update(); });
+  const oHv = makeOutputLine(outputRegion, "Velocity head", "vh-out-hv");
+  const oQ = makeOutputLine(outputRegion, "Dynamic pressure", "vh-out-q");
+  const oNote = makeOutputLine(outputRegion, "Note", "vh-out-n");
+  const update = debounce(() => {
+    const r = computeVelocityHead({ V_fps: Number(V.input.value) || 0, rho: Number(rho.input.value) || 0 });
+    if (r.error) { oHv.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
+    oHv.textContent = fmt(r.h_v_ft, 2) + " ft of fluid";
+    oQ.textContent = fmt(r.q_psf, 1) + " lb/ft^2 (" + fmt(r.q_psi, 2) + " psi)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [V, rho]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["velocity-head"] = _v371renderVelocityHead;
+
+// dims: in { V1_fps: L T^-1, D1_in: L, D2_in: L } out: { V2_fps: L T^-1 }
+export function computeFlowContinuity({ V1_fps = 0, D1_in = 0, D2_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V1 = Number(V1_fps) || 0;
+  const D1 = Number(D1_in) || 0;
+  const D2 = Number(D2_in) || 0;
+  if (!(V1 > 0)) return { error: "Upstream velocity must be positive (ft/s)." };
+  if (!(D1 > 0)) return { error: "Upstream diameter must be positive (in)." };
+  if (!(D2 > 0)) return { error: "Downstream diameter must be positive (in)." };
+  const V2_fps = V1 * Math.pow(D1 / D2, 2);
+  const ratio = V2_fps / V1;
+  return {
+    V2_fps, ratio, reducing: D2 < D1,
+    note: "Continuity: for an incompressible fluid the volumetric flow Q = A V is constant, so the velocity changes with the inverse square of the diameter, V2 = V1 (D1/D2)^2. Reducing the pipe accelerates the flow (a 4-to-2 in reduction quadruples the velocity, often past the erosion limit); expanding it slows the flow and converts the velocity head back to pressure (a diffuser). The downstream size is chosen to hold velocity in an acceptable band. Full flow, incompressible; a gas or two-phase flow does not obey this. A design aid; the code velocity limits govern.",
+  };
+}
+export const flowContinuityExample = { inputs: { V1_fps: 6, D1_in: 4, D2_in: 2 } };
+function _v372renderFlowContinuity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: continuity V2 = V1 (D1/D2)^2 from Q = A V constant for an incompressible fluid, first-principles. Reducing the pipe accelerates the flow; expanding it slows it. The code velocity limits and the engineer of record govern.";
+  const V1 = makeNumber("Upstream velocity (ft/s)", "fc-v1", { step: "any", min: "0" }); V1.input.value = "6";
+  const D1 = makeNumber("Upstream diameter (in)", "fc-d1", { step: "any", min: "0" }); D1.input.value = "4";
+  const D2 = makeNumber("Downstream diameter (in)", "fc-d2", { step: "any", min: "0" }); D2.input.value = "2";
+  for (const f of [V1, D1, D2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { V1.input.value = "6"; D1.input.value = "4"; D2.input.value = "2"; update(); });
+  const oV2 = makeOutputLine(outputRegion, "Downstream velocity", "fc-out-v2");
+  const oNote = makeOutputLine(outputRegion, "Note", "fc-out-n");
+  const update = debounce(() => {
+    const r = computeFlowContinuity({ V1_fps: Number(V1.input.value) || 0, D1_in: Number(D1.input.value) || 0, D2_in: Number(D2.input.value) || 0 });
+    if (r.error) { oV2.textContent = r.error; oNote.textContent = ""; return; }
+    oV2.textContent = fmt(r.V2_fps, 2) + " ft/s (" + fmt(r.ratio, 2) + "x, " + (r.reducing ? "reducing/accelerating" : "expanding/slowing") + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [V1, D1, D2]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["flow-continuity"] = _v372renderFlowContinuity;
+
+// dims: in { P_psi: M L^-1 T^-2, V_fps: L T^-1, z_ft: L, gamma: M L^-2 T^-2 } out: { h_press_ft: L, h_vel_ft: L, H_ft: L }
+export function computeBernoulliHead({ P_psi = 0, V_fps = 0, z_ft = 0, gamma = 62.4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(P_psi);
+  const V = Number(V_fps) || 0;
+  const z = Number(z_ft);
+  const g = Number(gamma) > 0 ? Number(gamma) : 62.4;
+  if (!Number.isFinite(P)) return { error: "Enter a valid gauge pressure (psi)." };
+  if (!(V >= 0)) return { error: "Velocity must be zero or positive (ft/s)." };
+  if (!Number.isFinite(z)) return { error: "Enter a valid elevation (ft)." };
+  const h_press_ft = P * 144 / g;
+  const h_vel_ft = V * V / (2 * 32.2);
+  const H_ft = h_press_ft + h_vel_ft + z;
+  return {
+    h_press_ft, h_vel_ft, z_ft: z, H_ft,
+    note: "Bernoulli total head H = pressure head (P/gamma) + velocity head (V^2/2g) + elevation head (z), the total mechanical energy per unit weight of fluid, in feet. Along a streamline with no loss the total head is conserved, so where the velocity drops (a pipe widens) the velocity head converts to pressure head - the Venturi/diffuser effect - and where it rises, pressure falls. Real flow loses head to friction and fittings (H1 = H2 + h_loss). Water default gamma 62.4 lb/ft^3. A design aid; the engineer of record governs the system analysis.",
+  };
+}
+export const bernoulliHeadExample = { inputs: { P_psi: 30, V_fps: 6, z_ft: 10, gamma: 62.4 } };
+function _v373renderBernoulliHead(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Bernoulli total head H = P/gamma + V^2/(2g) + z (feet of fluid), first-principles energy equation; conserved along a streamline with no loss (H1 = H2 + h_loss). The engineer of record governs the system analysis.";
+  const P = makeNumber("Gauge pressure (psi)", "bh-p", { step: "any" }); P.input.value = "30";
+  const V = makeNumber("Velocity (ft/s)", "bh-v", { step: "any", min: "0" }); V.input.value = "6";
+  const z = makeNumber("Elevation (ft)", "bh-z", { step: "any" }); z.input.value = "10";
+  const g = makeNumber("Fluid specific weight (lb/ft^3, 62.4 water)", "bh-g", { step: "any", min: "0" }); g.input.value = "62.4";
+  for (const f of [P, V, z, g]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "30"; V.input.value = "6"; z.input.value = "10"; g.input.value = "62.4"; update(); });
+  const oComp = makeOutputLine(outputRegion, "Pressure / velocity / elevation head", "bh-out-comp");
+  const oH = makeOutputLine(outputRegion, "Total head", "bh-out-h");
+  const oNote = makeOutputLine(outputRegion, "Note", "bh-out-n");
+  const update = debounce(() => {
+    const r = computeBernoulliHead({ P_psi: Number(P.input.value), V_fps: Number(V.input.value) || 0, z_ft: Number(z.input.value), gamma: Number(g.input.value) || 0 });
+    if (r.error) { oComp.textContent = r.error; oH.textContent = "-"; oNote.textContent = ""; return; }
+    oComp.textContent = fmt(r.h_press_ft, 2) + " + " + fmt(r.h_vel_ft, 2) + " + " + fmt(r.z_ft, 2) + " ft";
+    oH.textContent = fmt(r.H_ft, 2) + " ft of fluid";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [P, V, z, g]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["bernoulli-head"] = _v373renderBernoulliHead;

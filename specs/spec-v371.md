@@ -1,6 +1,6 @@
 # roughlogic.com Specification v371 -- Velocity Head and Dynamic Pressure (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v371..v373 (the fluid-mechanics fundamentals trio -- the
+> **Status: LANDED (2026-07-03, package 0.130.0). Batch spec-v371..v373 (the fluid-mechanics fundamentals trio -- the
 > energy terms the friction and pump tiles use implicitly: the velocity head and dynamic pressure (this spec), the
 > continuity velocity at a size change (v372), and the Bernoulli total head (v373).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pipe-velocity` gives the flow velocity, but the

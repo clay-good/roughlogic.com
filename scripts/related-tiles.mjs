@@ -24,6 +24,9 @@
 // better match".
 
 const RELATED = {
+  "velocity-head": ["pipe-velocity", "flow-continuity", "bernoulli-head", "orifice-flow"],
+  "flow-continuity": ["pipe-velocity", "velocity-head", "bernoulli-head", "reducer-offset"],
+  "bernoulli-head": ["pump-tdh", "velocity-head", "flow-continuity", "npsh-a"],
   "masonry-wall-weight": ["cmu-wall-axial", "cmu-grout-volume", "masonry-count", "masonry-lintel-loading"],
   "brick-veneer-anchor-spacing": ["masonry-count", "masonry-wall-weight", "masonry-coursing", "wind-cc-pressure"],
   "masonry-lintel-loading": ["masonry-wall-weight", "cmu-wall-flexure", "header-sizing", "beam-reactions"],

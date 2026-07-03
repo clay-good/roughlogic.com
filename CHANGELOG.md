@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): land spec-v371..v373 -- 3 pipe-flow energy tiles in calc-plumbing.js; 839 -> 842 tiles, 0.130.0, 2026-07-03
+
+The pipe-flow energy trio, thirty-third batch of the v275-v374 campaign: the Bernoulli energy pieces the friction and pressure tiles use but never expose, all in the existing lazy `calc-plumbing.js` (Group B); no new module, group, or dependency. Catalog **839 -> 842**, package **0.129.0 -> 0.130.0** (a minor). Proposed 2026-07-02.
+
+- **`velocity-head` (spec-v371).** h_v = V^2/(2g), q = 1/2 rho V^2. Pinned: water at 10 ft/s -> 1.55 ft head, 0.67 psi; at 20 ft/s -> 6.21 ft, 2.69 psi (four times, the V^2 law).
+- **`flow-continuity` (spec-v372).** V2 = V1 (D1/D2)^2 from Q = A V constant. Pinned: water at 6 ft/s, 4 in reduced to 2 in -> 24 ft/s (a four-fold jump past the erosion limit); to 3 in -> a gentler 10.7 ft/s; expanding 2-to-4 in drops it back to 6 ft/s.
+- **`bernoulli-head` (spec-v373).** H = P/gamma + V^2/(2g) + z. Pinned: water at 30 psi, 6 ft/s, 10 ft -> 69.23 + 0.56 + 10 = 79.79 ft; where velocity drops the head converts to pressure (the Venturi effect).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the V^2 law, the inverse-square continuity, the three-term head sum, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the velocity-head/dynamic-pressure, continuity, and Bernoulli energy relations. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. No cap bump needed. Housekeeping: home count 839 -> 842, README resynced (counts, Group B cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 62 appended. All gates green at the new state: lint, unit tests (**5,135**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(masonry): land spec-v368..v370 -- 3 masonry-loads tiles in calc-masonry.js; 836 -> 839 tiles, 0.129.0, 2026-07-03
 
 The masonry-loads trio, thirty-second batch of the v275-v374 campaign: the dead-load and detailing numbers the reinforced-masonry design tiles assume, all in the existing lazy `calc-masonry.js` (Group E); no new module, group, or dependency. Catalog **836 -> 839**, package **0.128.0 -> 0.129.0** (a minor). Proposed 2026-07-02.

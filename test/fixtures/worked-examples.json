@@ -30616,6 +30616,87 @@
         "W_lb": { "value": 720, "tolerance": { "abs": 1 } },
         "w_udl_plf": { "value": 120, "tolerance": { "abs": 1 } }
       }
+    },
+    {
+      "tile_id": "velocity-head",
+      "source_publisher": "fluid mechanics",
+      "source_title": "water at 10 ft/s -> 1.55 ft velocity head, 0.67 psi dynamic pressure",
+      "source_edition_or_year": "spec-v371 worked example (machine-verified)",
+      "source_section_or_page": "spec-v371 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "V_fps": 10, "gamma": 62.4, "rho": 1.94 },
+      "outputs": {
+        "h_v_ft": { "value": 1.553, "tolerance": { "pct": 0.5 } },
+        "q_psi": { "value": 0.674, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "velocity-head",
+      "source_publisher": "fluid mechanics",
+      "source_title": "cross-check: double to 20 ft/s -> 6.21 ft, 2.69 psi (four times, the V^2 law)",
+      "source_edition_or_year": "spec-v371 worked example (machine-verified)",
+      "source_section_or_page": "spec-v371 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "V_fps": 20, "gamma": 62.4, "rho": 1.94 },
+      "outputs": {
+        "h_v_ft": { "value": 6.211, "tolerance": { "pct": 0.5 } },
+        "q_psi": { "value": 2.694, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "flow-continuity",
+      "source_publisher": "fluid mechanics",
+      "source_title": "water at 6 ft/s, 4 in reduced to 2 in -> 24 ft/s (a four-fold jump)",
+      "source_edition_or_year": "spec-v372 worked example (machine-verified)",
+      "source_section_or_page": "spec-v372 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "V1_fps": 6, "D1_in": 4, "D2_in": 2 },
+      "outputs": {
+        "V2_fps": { "value": 24, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "flow-continuity",
+      "source_publisher": "fluid mechanics",
+      "source_title": "cross-check: reducing only to 3 in gives a gentler 10.7 ft/s",
+      "source_edition_or_year": "spec-v372 worked example (machine-verified)",
+      "source_section_or_page": "spec-v372 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "V1_fps": 6, "D1_in": 4, "D2_in": 3 },
+      "outputs": {
+        "V2_fps": { "value": 10.67, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "bernoulli-head",
+      "source_publisher": "fluid mechanics",
+      "source_title": "water at 30 psi, 6 ft/s, 10 ft -> 69.23 + 0.56 + 10 = 79.79 ft total head",
+      "source_edition_or_year": "spec-v373 worked example (machine-verified)",
+      "source_section_or_page": "spec-v373 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "P_psi": 30, "V_fps": 6, "z_ft": 10, "gamma": 62.4 },
+      "outputs": {
+        "h_press_ft": { "value": 69.23, "tolerance": { "pct": 0.5 } },
+        "H_ft": { "value": 79.79, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "bernoulli-head",
+      "source_publisher": "fluid mechanics",
+      "source_title": "cross-check: at 60 psi, 2 ft/s, 0 ft -> 138.46 + 0.06 = 138.52 ft",
+      "source_edition_or_year": "spec-v373 worked example (machine-verified)",
+      "source_section_or_page": "spec-v373 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "P_psi": 60, "V_fps": 2, "z_ft": 0, "gamma": 62.4 },
+      "outputs": {
+        "H_ft": { "value": 138.52, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

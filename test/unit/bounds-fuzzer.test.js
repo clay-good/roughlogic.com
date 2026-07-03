@@ -15062,3 +15062,51 @@ test("bounds: spec-v370 computeMasonryLintelLoading pins the arching branch swit
   assert.ok("error" in _v370({ span_ft: 6, wall_psf: 60, wall_h_above: 0 }));
   assert.ok("error" in _v370({ span_ft: Infinity, wall_psf: 60, wall_h_above: 5 }));
 });
+
+// ===================== spec-v371..v373 pipe-flow energy batch =====================
+import { computeVelocityHead as _v371, computeFlowContinuity as _v372, computeBernoulliHead as _v373 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v371 computeVelocityHead pins the V^2 law and error seams", () => {
+  const r = _v371({ V_fps: 10, rho: 1.94 });
+  assert.ok(Math.abs(r.h_v_ft - 100 / 64.4) < 1e-9);
+  assert.ok(Math.abs(r.q_psf - 97) < 1e-9);
+  assert.ok(Math.abs(r.q_psi - 97 / 144) < 1e-9);
+  // Doubling velocity quadruples head and pressure.
+  const dbl = _v371({ V_fps: 20, rho: 1.94 });
+  assert.ok(Math.abs(dbl.h_v_ft / r.h_v_ft - 4) < 1e-9 && Math.abs(dbl.q_psi / r.q_psi - 4) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v371({ V_fps: 0 }));
+  assert.ok("error" in _v371({ V_fps: Infinity }));
+});
+
+test("bounds: spec-v372 computeFlowContinuity pins the inverse-square law and error seams", () => {
+  const r = _v372({ V1_fps: 6, D1_in: 4, D2_in: 2 });
+  assert.ok(Math.abs(r.V2_fps - 24) < 1e-9);
+  assert.strictEqual(r.reducing, true);
+  // A gentler reduction.
+  const g = _v372({ V1_fps: 6, D1_in: 4, D2_in: 3 });
+  assert.ok(Math.abs(g.V2_fps - 6 * (16 / 9)) < 1e-9);
+  // Expanding slows the flow.
+  const ex = _v372({ V1_fps: 24, D1_in: 2, D2_in: 4 });
+  assert.ok(Math.abs(ex.V2_fps - 6) < 1e-9 && ex.reducing === false);
+  // Error seams.
+  assert.ok("error" in _v372({ V1_fps: 0, D1_in: 4, D2_in: 2 }));
+  assert.ok("error" in _v372({ V1_fps: 6, D1_in: 0, D2_in: 2 }));
+  assert.ok("error" in _v372({ V1_fps: 6, D1_in: 4, D2_in: 0 }));
+  assert.ok("error" in _v372({ V1_fps: 6, D1_in: NaN, D2_in: 2 }));
+});
+
+test("bounds: spec-v373 computeBernoulliHead pins the three-term sum and error seams", () => {
+  const r = _v373({ P_psi: 30, V_fps: 6, z_ft: 10, gamma: 62.4 });
+  assert.ok(Math.abs(r.h_press_ft - 30 * 144 / 62.4) < 1e-9);
+  assert.ok(Math.abs(r.h_vel_ft - 36 / 64.4) < 1e-9);
+  assert.ok(Math.abs(r.H_ft - (r.h_press_ft + r.h_vel_ft + 10)) < 1e-9);
+  assert.ok(Math.abs(r.H_ft - 79.79) < 0.01);
+  // Elevation head adds linearly; a lower point at the same P/V has less total head.
+  const low = _v373({ P_psi: 30, V_fps: 6, z_ft: 0, gamma: 62.4 });
+  assert.ok(Math.abs(r.H_ft - low.H_ft - 10) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v373({ P_psi: NaN, V_fps: 6, z_ft: 10 }));
+  assert.ok("error" in _v373({ P_psi: 30, V_fps: -1, z_ft: 10 }));
+  assert.ok("error" in _v373({ P_psi: 30, V_fps: 6, z_ft: Infinity }));
+});

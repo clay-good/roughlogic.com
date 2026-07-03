@@ -1,6 +1,6 @@
 # roughlogic.com Specification v372 -- Flow Continuity Velocity at a Size Change (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v371..v373 (the fluid-mechanics fundamentals trio -- velocity
+> **Status: LANDED (2026-07-03, package 0.130.0). Batch spec-v371..v373 (the fluid-mechanics fundamentals trio -- velocity
 > head (v371), the continuity velocity at a size change (this spec), the Bernoulli total head (v373)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pipe-velocity` gives the velocity in one pipe size,
 > but when a line changes diameter -- through a reducer, a nozzle, an orifice, a pump suction taper -- the velocity changes

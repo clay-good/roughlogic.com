@@ -1,6 +1,6 @@
 # roughlogic.com Specification v373 -- Bernoulli Total Head (Pressure + Velocity + Elevation) (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v371..v373 (the fluid-mechanics fundamentals trio -- velocity
+> **Status: LANDED (2026-07-03, package 0.130.0). Batch spec-v371..v373 (the fluid-mechanics fundamentals trio -- velocity
 > head (v371), continuity velocity (v372), the Bernoulli total head (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `pump-tdh` sums the heads of a pumping system, but the
 > underlying Bernoulli energy equation -- total head as the sum of pressure, velocity, and elevation head, and how it

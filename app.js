@@ -163,6 +163,7 @@ const TOOL_MODULES = (() => {
     "radiant-loop-sizing",
     // spec-v302..v304 site-hydraulics depth batch.
     "time-of-concentration", "orifice-flow", "channel-froude-number",
+    "velocity-head", "flow-continuity", "bernoulli-head",
   ]);
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-

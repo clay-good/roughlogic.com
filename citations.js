@@ -8415,6 +8415,42 @@ export const CITATIONS = {
       { name: "Steady head", value: "small orifice under a steady head; the falling-head drain time is separate", source: "scope of this tile" },
     ],
   },
+  "velocity-head": {
+    formula: "h_v = V^2 / (2 g) (g = 32.2 ft/s^2); q = 1/2 rho V^2 (lb/ft^2); q_psi = q/144.",
+    edition: "The velocity-head and dynamic-pressure relations from first-principles fluid mechanics, by name.",
+    freeAccess: "Velocity head and dynamic pressure are standard fluid-mechanics relations. The code velocity limits and the engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Velocity head h_v = V^2 / (2g) is the kinetic energy of the flow expressed as feet of fluid, and the dynamic pressure q = 1/2 rho V^2 is that energy as a pressure. Both scale with the square of velocity, so doubling the velocity quadruples the head and pressure - the reason a small velocity increase drives large minor (fitting) losses and erosion, and why plumbing codes cap water velocity around 5-8 ft/s. This returns the head and dynamic pressure for the entered velocity and fluid density (water default rho 1.94 slug/ft^3): it does not itself compute the friction or minor losses. A design aid; the code velocity limits and the engineer of record govern.",
+    assumptions: [
+      { name: "Velocity head", value: "h_v = V^2/(2g), g = 32.2 ft/s^2", source: "fluid mechanics" },
+      { name: "Dynamic pressure", value: "q = 1/2 rho V^2; water rho 1.94 slug/ft^3", source: "fluid mechanics" },
+      { name: "V-squared law", value: "both scale with V^2; a small velocity rise drives large minor losses", source: "scope of this tile" },
+    ],
+  },
+  "flow-continuity": {
+    formula: "V2 = V1 (D1/D2)^2 (from Q = A V constant, A = pi/4 D^2).",
+    edition: "The continuity equation for an incompressible fluid, by name.",
+    freeAccess: "The continuity equation Q = A V is a standard fluid-mechanics relation. The code velocity limits and the engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Continuity: for an incompressible fluid the volumetric flow Q = A V is constant, so the velocity changes with the inverse square of the diameter, V2 = V1 (D1/D2)^2. Reducing the pipe accelerates the flow (a 4-to-2 in reduction quadruples the velocity, often past the erosion limit); expanding it slows the flow and converts the velocity head back to pressure (a diffuser). This returns the downstream velocity for the entered sizes: it assumes full, incompressible flow (a gas or two-phase flow does not obey this) and does not compute the pressure change or the fitting loss at the transition. A design aid; the code velocity limits govern.",
+    assumptions: [
+      { name: "Continuity", value: "V2 = V1 (D1/D2)^2 from Q = A V constant", source: "fluid mechanics" },
+      { name: "Incompressible full flow", value: "full pipe, incompressible; a gas/two-phase flow does not obey this", source: "fluid mechanics" },
+      { name: "No transition loss", value: "does not compute the pressure change or the fitting loss at the size change", source: "scope of this tile" },
+    ],
+  },
+  "bernoulli-head": {
+    formula: "h_press = P x 144 / gamma; h_vel = V^2/(2 g); H = h_press + h_vel + z; conserved: H1 = H2 + h_loss.",
+    edition: "The Bernoulli energy equation (total head) from first-principles fluid mechanics, by name.",
+    freeAccess: "The Bernoulli equation is a standard fluid-mechanics relation. The engineer of record governs the system analysis.",
+    governance: GOVERNANCE.general,
+    editionNote: "Bernoulli total head H = pressure head (P/gamma) + velocity head (V^2/2g) + elevation head (z), the total mechanical energy per unit weight of fluid, in feet. Along a streamline with no loss the total head is conserved, so where the velocity drops (a pipe widens) the velocity head converts to pressure head - the Venturi/diffuser effect - and where it rises, pressure falls. This returns the three head components and the total for one point (water default gamma 62.4 lb/ft^3): real flow loses head to friction and fittings (H1 = H2 + h_loss), which this single-point form does not subtract. A design aid; the engineer of record governs the system analysis.",
+    assumptions: [
+      { name: "Total head", value: "H = P/gamma + V^2/(2g) + z (feet of fluid)", source: "fluid mechanics" },
+      { name: "Conserved ideal", value: "conserved along a streamline with no loss; velocity head <-> pressure head", source: "fluid mechanics" },
+      { name: "No loss term", value: "single-point form; real flow loses head to friction/fittings (H1 = H2 + h_loss)", source: "scope of this tile" },
+    ],
+  },
   "channel-froude-number": {
     formula: "V = Q/(b y); Fr = V/sqrt(g y) (g = 32.2, D = y rectangular); regime by Fr vs 1; q = Q/b; yc = (q^2/g)^(1/3).",
     edition: "The open-channel Froude-number regime classification Fr = V/sqrt(g D) and the rectangular critical depth yc = (q^2/g)^(1/3), as compiled in Chow's Open-Channel Hydraulics, by name.",
