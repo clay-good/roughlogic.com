@@ -29461,6 +29461,91 @@
         "aline": { "value": 7.3, "tolerance": { "pct": 0.2 } },
         "li": { "value": 0.6, "tolerance": { "pct": 1 } }
       }
+    },
+    {
+      "tile_id": "building-ua",
+      "source_publisher": "Whole-building UA (ASHRAE / RESNET)",
+      "source_title": "four assemblies + 50 cfm -> UA 309.7 Btu/h-F, 21,700 Btu/h at dT 70",
+      "source_edition_or_year": "spec-v329 worked example (machine-verified)",
+      "source_section_or_page": "spec-v329 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "assemblies": [{ "area": 1200, "r": 17 }, { "area": 1500, "r": 38 }, { "area": 200, "r": 3 }, { "area": 1500, "r": 19 }], "cfm_inf": 50, "dt_f": 70 },
+      "outputs": {
+        "cond": { "value": 255.7, "tolerance": { "pct": 0.2 } },
+        "ua": { "value": 309.7, "tolerance": { "pct": 0.2 } },
+        "design_load": { "value": 21677, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "building-ua",
+      "source_publisher": "Whole-building UA (ASHRAE / RESNET)",
+      "source_title": "cross-check: tighten to 25 cfm and R-5 windows -> UA 256.0 (17% cut)",
+      "source_edition_or_year": "spec-v329 worked example (machine-verified)",
+      "source_section_or_page": "spec-v329 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "assemblies": [{ "area": 1200, "r": 17 }, { "area": 1500, "r": 38 }, { "area": 200, "r": 5 }, { "area": 1500, "r": 19 }], "cfm_inf": 25, "dt_f": 70 },
+      "outputs": {
+        "ua": { "value": 256.0, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "degree-day-energy",
+      "source_publisher": "Degree-day method (ASHRAE / RESNET)",
+      "source_title": "UA 500, 5,000 HDD, 80% gas, $1.20/therm -> 60 MMBtu, 750 therms, $900/yr",
+      "source_edition_or_year": "spec-v330 worked example (machine-verified)",
+      "source_section_or_page": "spec-v330 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ua_btuhf": 500, "hdd": 5000, "eff": 0.80, "fuel": "gas", "price": 1.20 },
+      "outputs": {
+        "q_mmbtu": { "value": 60, "tolerance": { "pct": 0.2 } },
+        "fuel_units": { "value": 750, "tolerance": { "pct": 0.2 } },
+        "cost": { "value": 900, "tolerance": { "pct": 0.2 } }
+      }
+    },
+    {
+      "tile_id": "degree-day-energy",
+      "source_publisher": "Degree-day method (ASHRAE / RESNET)",
+      "source_title": "cross-check: a heat pump at COP 3.0 uses 5,862 kWh (~$879 at $0.15)",
+      "source_edition_or_year": "spec-v330 worked example (machine-verified)",
+      "source_section_or_page": "spec-v330 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ua_btuhf": 500, "hdd": 5000, "eff": 3.0, "fuel": "electric", "price": 0.15 },
+      "outputs": {
+        "fuel_units": { "value": 5862, "tolerance": { "pct": 0.2 } },
+        "cost": { "value": 879, "tolerance": { "pct": 0.3 } }
+      }
+    },
+    {
+      "tile_id": "wall-condensation-gradient",
+      "source_publisher": "R-proportional gradient + Magnus dew point",
+      "source_title": "R13.5 sheathing behind R4, 70/20 F, 40% RH -> 31.4 F plane, 44.6 F dew, condensing",
+      "source_edition_or_year": "spec-v331 worked example (machine-verified)",
+      "source_section_or_page": "spec-v331 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "r_inside": 13.5, "r_outside": 4, "t_in_f": 70, "t_out_f": 20, "rh_in_pct": 40 },
+      "outputs": {
+        "t_plane_f": { "value": 31.4, "tolerance": { "pct": 0.3 } },
+        "t_dew_f": { "value": 44.6, "tolerance": { "pct": 0.5 } },
+        "margin_f": { "value": -13.2, "tolerance": { "abs": 0.4 } }
+      }
+    },
+    {
+      "tile_id": "wall-condensation-gradient",
+      "source_publisher": "R-proportional gradient + Magnus dew point",
+      "source_title": "cross-check: add exterior R-5 (R_outside 9) -> plane warms to 40.0 F",
+      "source_edition_or_year": "spec-v331 worked example (machine-verified)",
+      "source_section_or_page": "spec-v331 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "r_inside": 13.5, "r_outside": 9, "t_in_f": 70, "t_out_f": 20, "rh_in_pct": 40 },
+      "outputs": {
+        "t_plane_f": { "value": 40.0, "tolerance": { "pct": 0.3 } }
+      }
     }
   ]
 }

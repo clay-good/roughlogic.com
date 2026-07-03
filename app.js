@@ -243,6 +243,8 @@ const TOOL_MODULES = (() => {
     "erv-sensible-recovery", "mua-tempering-load", "dcv-co2-ventilation",
     // spec-v305..v307 pump-and-fluid fundamentals batch
     "reynolds-number-pipe", "hydronic-gpm-deltat", "pump-specific-speed",
+    // spec-v329..v331 building-energy batch
+    "building-ua", "degree-day-energy", "wall-condensation-gradient",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

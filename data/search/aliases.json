@@ -12672,6 +12672,136 @@
       "term": "soil consistency limits",
       "target": "atterberg-indices",
       "kind": "adjacent"
+    },
+    {
+      "term": "building ua",
+      "target": "building-ua",
+      "kind": "industry"
+    },
+    {
+      "term": "heat loss coefficient",
+      "target": "building-ua",
+      "kind": "industry"
+    },
+    {
+      "term": "whole house ua",
+      "target": "building-ua",
+      "kind": "industry"
+    },
+    {
+      "term": "ua value",
+      "target": "building-ua",
+      "kind": "adjacent"
+    },
+    {
+      "term": "envelope heat loss",
+      "target": "building-ua",
+      "kind": "industry"
+    },
+    {
+      "term": "design heating load ua",
+      "target": "building-ua",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sum a over r",
+      "target": "building-ua",
+      "kind": "adjacent"
+    },
+    {
+      "term": "building load coefficient",
+      "target": "building-ua",
+      "kind": "adjacent"
+    },
+    {
+      "term": "energy audit ua",
+      "target": "building-ua",
+      "kind": "adjacent"
+    },
+    {
+      "term": "degree day energy",
+      "target": "degree-day-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "heating degree days",
+      "target": "degree-day-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "hdd energy",
+      "target": "degree-day-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "annual heating cost",
+      "target": "degree-day-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "24 hdd ua",
+      "target": "degree-day-energy",
+      "kind": "adjacent"
+    },
+    {
+      "term": "degree day method",
+      "target": "degree-day-energy",
+      "kind": "adjacent"
+    },
+    {
+      "term": "annual fuel use",
+      "target": "degree-day-energy",
+      "kind": "adjacent"
+    },
+    {
+      "term": "heating bill estimate",
+      "target": "degree-day-energy",
+      "kind": "adjacent"
+    },
+    {
+      "term": "therms per year",
+      "target": "degree-day-energy",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wall condensation",
+      "target": "wall-condensation-gradient",
+      "kind": "industry"
+    },
+    {
+      "term": "dew point in wall",
+      "target": "wall-condensation-gradient",
+      "kind": "industry"
+    },
+    {
+      "term": "sheathing condensation",
+      "target": "wall-condensation-gradient",
+      "kind": "industry"
+    },
+    {
+      "term": "condensation plane",
+      "target": "wall-condensation-gradient",
+      "kind": "industry"
+    },
+    {
+      "term": "where does condensation form",
+      "target": "wall-condensation-gradient",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cold sheathing",
+      "target": "wall-condensation-gradient",
+      "kind": "adjacent"
+    },
+    {
+      "term": "exterior insulation dew point",
+      "target": "wall-condensation-gradient",
+      "kind": "adjacent"
+    },
+    {
+      "term": "vapor condensation wall",
+      "target": "wall-condensation-gradient",
+      "kind": "adjacent"
     }
   ]
 }

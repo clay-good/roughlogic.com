@@ -1,6 +1,6 @@
 # roughlogic.com Specification v330 -- Annual Heating Energy and Fuel Cost from Degree-Days (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v329..v331 (the building-energy trio -- building UA (v329),
+> **Status: LANDED (2026-07-03, package 0.116.0; proposed 2026-07-02). Batch spec-v329..v331 (the building-energy trio -- building UA (v329),
 > the annual heating energy from degree-days (this spec), the wall condensation gradient (v331)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: with the whole-building `UA` from v329, the next
 > question an auditor or homeowner asks is the annual heating bill -- the degree-day method turns `UA` and the climate's

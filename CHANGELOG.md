@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v329..v331 -- 3 building-energy tiles in calc-hvac.js; 797 -> 800 tiles, 0.116.0, 2026-07-03
+
+The building-energy trio, nineteenth batch of the v275-v374 campaign: the whole-house numbers the single-assembly tiles never roll up, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **797 -> 800**, package **0.115.0 -> 0.116.0** (a minor). Proposed 2026-07-02.
+
+- **`building-ua` (spec-v329).** UA = sum(A_i/R_i) + 1.08 x CFM with the design load Q = UA x dT. Pinned: four assemblies + 50 cfm -> UA 309.7 Btu/h-F, 21,700 Btu/h at dT 70; tightening to 25 cfm and R-5 windows cuts it 17%. Takes newline-delimited area,R assemblies via `makeTextarea` (the multiline-inputs gate passes).
+- **`degree-day-energy` (spec-v330).** Q = 24 x HDD x UA with the fuel/cost conversions and a gas/oil/electric select. Pinned: UA 500 in 5,000 HDD at 80% gas -> 750 therms ($900/yr); a COP 3.0 heat pump uses 5,862 kWh (~$879). The fuel select and the three unit conversions are pinned.
+- **`wall-condensation-gradient` (spec-v331).** T_plane = T_in - (R_inside/R_total)(T_in - T_out) against the Magnus dew point. Pinned: R13.5 sheathing behind R4 on a 70/20 F, 40% RH day -> 31.4 F plane, 44.6 F dew, condensing; adding exterior R-5 warms the plane to 40.0 F.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the assembly summation, the infiltration term, the fuel conversions, the R-proportional gradient and dew-point flag, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the ASHRAE/RESNET UA roll-up, the degree-day method, and the R-gradient + Magnus dew point. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, 27 collision-checked aliases, `related-tiles`, and 3 fuzzer blocks; corpus + tile-index regenerated. `makeTextarea` joined the calc-hvac import for `building-ua`. Module caps bumped with dated comments: calc-hvac 55000 -> 62000, tile-meta.js 11000 -> 13000, and the tools-data.js registry 100000 -> 115000. Housekeeping: home count 797 -> 800, README resynced (counts, correctness figures 1043/1046/1043, Group C cheat-sheet row and exemplars, catalog-state prose), three specs marked LANDED, docs/mobile-responsive.md section 48 appended. All gates green at the new state: lint (**800 tiles / 56 modules / 822 sitemap URLs**), unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile` / `check:multiline-inputs`, and a targeted render-no-nan + a11y + output-to-the-value pass on the three new tiles.
+
 ### feat(earthwork): land spec-v326..v328 -- 3 soil characterization / QC tiles in calc-earthwork.js; 794 -> 797 tiles, 0.115.0, 2026-07-03
 
 The soil characterization / QC trio, eighteenth batch of the v275-v374 campaign: the earthwork and soil-testing numbers the volume-conversion tile never covers, all in the existing lazy `calc-earthwork.js` (Group E); no new module, group, or dependency. Catalog **794 -> 797**, package **0.114.0 -> 0.115.0** (a minor). Proposed 2026-07-02.

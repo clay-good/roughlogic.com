@@ -1,6 +1,6 @@
 # roughlogic.com Specification v331 -- Wall Condensation Plane Temperature vs Dew Point (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v329..v331 (the building-energy trio -- building UA (v329),
+> **Status: LANDED (2026-07-03, package 0.116.0; proposed 2026-07-02). Batch spec-v329..v331 (the building-energy trio -- building UA (v329),
 > degree-day energy (v330), the wall condensation gradient (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `surface-condensation-risk` compares an IR-measured
 > surface temperature to the dew point, but a wall assembly fails at an interior interface -- the sheathing behind the

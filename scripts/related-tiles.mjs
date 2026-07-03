@@ -987,6 +987,10 @@ const RELATED = {
   "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],
   "soil-phase-relations": ["relative-compaction","soil-consolidation-settlement","atterberg-indices"],
   "atterberg-indices": ["soil-phase-relations","relative-compaction","soil-swell-shrink"],
+  // spec-v329..v331 building-energy batch (Group C)
+  "building-ua": ["assembly-r-value","degree-day-energy","infiltration-load"],
+  "degree-day-energy": ["building-ua","manual-j-heating","heat-pump-seasonal-energy"],
+  "wall-condensation-gradient": ["surface-condensation-risk","assembly-r-value","building-ua"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

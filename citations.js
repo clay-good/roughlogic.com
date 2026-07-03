@@ -7887,6 +7887,42 @@ export const CITATIONS = {
       { name: "Tension and sag", value: "Cp = (P - P0) L/(A E); Cs = -w^2 L^3/(24 P^2) for an unsupported span", source: "surveying references" },
     ],
   },
+  "building-ua": {
+    formula: "cond = sum(A_i / R_i); UA_inf = 1.08 x CFM; UA = cond + UA_inf; design_load = UA x dT.",
+    edition: "The whole-building heat-loss-coefficient roll-up UA = sum(A/R) + 1.08 x CFM with the design load Q = UA x dT, as compiled in the ASHRAE Fundamentals and RESNET energy-audit references, by name.",
+    freeAccess: "The UA roll-up and the design-load relation are public building-science results in the ASHRAE Fundamentals and RESNET references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The heat-loss coefficient UA = sum(A_i/R_i) + 1.08 x CFM (Btu/h per degF), the infiltration conductance from the sensible-air constant 1.08 = 60 x 0.075 x 0.24, the design load Q = UA x dT, and the ASHRAE Fundamentals / RESNET energy-audit basis. This returns the whole-building sensible heat-loss coefficient - it sums the entered assemblies and a single infiltration airflow (convert ACH50 to natural infiltration via an LBL/N-factor first, or enter the natural cfm), uses clear-field assembly R-values (thermal bridging is captured only to the extent each R_i already accounts for it), and does not add the latent, ground-coupling, or solar terms. An energy-audit aid, not a stamped Manual J; the ACCA Manual J / RESNET analysis governs.",
+    assumptions: [
+      { name: "Conduction", value: "sum of each assembly's area over its clear-field R-value", source: "building science" },
+      { name: "Infiltration", value: "1.08 x CFM sensible conductance; enter the natural infiltration cfm", source: "ASHRAE Fundamentals" },
+      { name: "Design load", value: "Q = UA x dT at the design temperature difference; sensible only", source: "ASHRAE Fundamentals" },
+    ],
+  },
+  "degree-day-energy": {
+    formula: "Q = 24 x HDD x UA; fuel = Q/eff; units = fuel / {therm 1e5, oil 138,500, kWh 3,412}; cost = units x price.",
+    edition: "The degree-day annual-heating-energy method Q = 24 x HDD x UA (base-65 degF) with the fuel and cost conversions, as compiled in the ASHRAE degree-day / RESNET references, by name.",
+    freeAccess: "The degree-day method and the fuel-energy conversions are public building-science results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The degree-day annual energy Q = 24 x HDD x UA, the base-65 degF heating degree-day convention, the fuel = Q/efficiency, the unit conversions (1 therm = 100,000 Btu, 1 gal fuel oil ~ 138,500 Btu, 1 kWh = 3,412 Btu), and the ASHRAE degree-day / RESNET basis. This returns a degree-day annual-energy and cost estimate - it uses the base-65 degF steady-state degree-day method (a modified/variable-base method with the building's actual balance point is more accurate, and it ignores internal and solar gains that lower the true balance point), takes the UA and local HDD as entered, and does not add cooling, latent, or domestic-hot-water energy. An estimate, not a utility-bill-calibrated model; actual consumption depends on occupancy, weather, and gains.",
+    assumptions: [
+      { name: "Degree-day energy", value: "Q = 24 x HDD x UA at base-65 degF heating degree-days", source: "ASHRAE degree-day method" },
+      { name: "Fuel and cost", value: "fuel = Q/efficiency, then unit-converted and priced", source: "energy-audit practice" },
+      { name: "Steady-state", value: "ignores internal and solar gains that lower the true balance point", source: "degree-day limitation" },
+    ],
+  },
+  "wall-condensation-gradient": {
+    formula: "R_total = R_inside + R_outside; T_plane = T_in - (R_inside/R_total)(T_in - T_out); T_dew = Magnus(T_in, RH); margin = T_plane - T_dew (<= 0 condensing).",
+    edition: "The R-proportional through-wall temperature gradient and the Magnus dew-point comparison for a condensation-plane screen, standard building-science results, by name.",
+    freeAccess: "The R-proportional gradient and the Magnus dew-point approximation are public building-science results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The interface temperature T_plane = T_in - (R_inside/R_total)(T_in - T_out), the Magnus dew-point approximation for the indoor air, and the condensation criterion T_plane <= T_dew. This returns the condensation-plane temperature and its margin to the dew point - it is a one-dimensional steady-state thermal gradient (no thermal bridging, air movement, or vapor-diffusion/transient moisture accumulation, which a Glaser or hygrothermal model adds), uses the interior air's dew point (moderated by any vapor retarder), and is a screen. A building-science aid, not a substitute for a hygrothermal (WUFI-type) analysis; the assembly's vapor control and a full moisture analysis govern.",
+    assumptions: [
+      { name: "Temperature gradient", value: "T_plane = T_in - (R_inside/R_total)(T_in - T_out), 1-D steady state", source: "building science" },
+      { name: "Dew point", value: "Magnus approximation of the indoor air's dew point", source: "psychrometrics" },
+      { name: "Screen only", value: "no vapor diffusion or transient moisture; a Glaser/WUFI model is more complete", source: "scope of this tile" },
+    ],
+  },
   "reynolds-number-pipe": {
     formula: "Re = V (D/12) / nu; regime = Re < 2,300 laminar, <= 4,000 transitional, else turbulent.",
     edition: "The Reynolds number Re = V D / nu (= rho V D / mu) and the standard pipe-flow transition bands, with a 60 degF water kinematic viscosity of about 1.21e-5 ft^2/s, a standard fluid-mechanics result, by name.",

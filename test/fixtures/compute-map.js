@@ -703,6 +703,10 @@ export const COMPUTE_MAP = {
   "relative-compaction": { module: "../../calc-earthwork.js", fn: "computeRelativeCompaction" },
   "soil-phase-relations": { module: "../../calc-earthwork.js", fn: "computeSoilPhaseRelations" },
   "atterberg-indices": { module: "../../calc-earthwork.js", fn: "computeAtterbergIndices" },
+  // spec-v329..v331 building-energy batch (3 tiles)
+  "building-ua": { module: "../../calc-hvac.js", fn: "computeBuildingUa" },
+  "degree-day-energy": { module: "../../calc-hvac.js", fn: "computeDegreeDayEnergy" },
+  "wall-condensation-gradient": { module: "../../calc-hvac.js", fn: "computeWallCondensationGradient" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

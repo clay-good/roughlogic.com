@@ -762,7 +762,7 @@ export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) 
 // --- Renderers ---
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox,
+  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeCheckbox, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 // v8 §D.2 shared context-band helper.
@@ -3338,4 +3338,160 @@ HVAC_RENDERERS["pump-specific-speed"] = _rEnv({
     { key: "n", id: "pss-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePumpSpecificSpeed,
+});
+
+// =====================================================================
+// spec-v329..v331: building-energy batch (Group C). The whole-house
+// numbers the single-assembly tiles never roll up: the building heat-loss
+// coefficient UA, the annual heating energy from UA and degree-days, and
+// the through-wall condensation gradient.
+// =====================================================================
+
+// dims: in { assemblies: dimensionless, cfm_inf: L^3 T^-1, dt_f: T } out: { cond: M L^2 T^-3, ua_inf: M L^2 T^-3, ua: M L^2 T^-3, design_load: M L^2 T^-3 }
+export function computeBuildingUa({ assemblies, cfm_inf = 0, dt_f = 0 } = {}) {
+  const _g = _finiteGuardEnv({ cfm_inf, dt_f }); if (_g) return _g;
+  if (!Array.isArray(assemblies) || assemblies.length < 1) return { error: "Enter at least one envelope assembly (area, R-value)." };
+  if (cfm_inf < 0) return { error: "Infiltration airflow cannot be negative (cfm)." };
+  let cond = 0;
+  for (const a of assemblies) {
+    if (!a || !Number.isFinite(a.area) || !Number.isFinite(a.r)) return { error: "Each assembly needs a finite area and R-value." };
+    if (!(a.area > 0)) return { error: "Each assembly area must be positive (ft^2)." };
+    if (!(a.r > 0)) return { error: "Each assembly R-value must be positive." };
+    cond += a.area / a.r;
+  }
+  const ua_inf = 1.08 * cfm_inf;
+  const ua = cond + ua_inf;
+  const design_load = dt_f > 0 ? ua * dt_f : null;
+  return {
+    cond, ua_inf, ua, design_load,
+    note: "Whole-building heat-loss coefficient UA = sum(A_i/R_i) + 1.08 x CFM, in Btu/h per degF, with the infiltration conductance from the sensible-air constant 1.08 = 60 x 0.075 x 0.24 and the design load Q = UA x dT. It sums the entered assemblies and a single infiltration airflow (convert ACH50 to natural infiltration via an LBL/N-factor first, or enter the natural cfm), uses clear-field assembly R-values (thermal bridging is captured only to the extent each R_i already accounts for it), and does not add the latent, ground-coupling, or solar terms. An energy-audit aid, not a stamped Manual J; the ACCA Manual J / RESNET analysis governs.",
+  };
+}
+const buildingUaExample = { inputs: { assemblies: [{ area: 1200, r: 17 }, { area: 1500, r: 38 }, { area: 200, r: 3 }, { area: 1500, r: 19 }], cfm_inf: 50, dt_f: 70 } };
+function _v329renderBuildingUa(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: whole-building heat-loss coefficient UA = sum(A/R) + 1.08 x CFM, the infiltration conductance from 1.08 = 60 x 0.075 x 0.24, and the design load Q = UA x dT, ASHRAE Fundamentals / RESNET basis, by name. Sensible only; enter the natural infiltration cfm. An energy-audit aid, not a stamped Manual J.";
+  const asm = makeTextarea("Assemblies, one per line as area_ft2,R-value", "bua-asm", { rows: "4" });
+  asm.input.value = "1200,17\n1500,38\n200,3\n1500,19";
+  const cfm = makeNumber("Natural infiltration (cfm)", "bua-cfm", { step: "any", min: "0" }); cfm.input.value = "50";
+  const dt = makeNumber("Design temperature difference (F, optional)", "bua-dt", { step: "any", min: "0" }); dt.input.value = "70";
+  for (const f of [asm, cfm, dt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { asm.input.value = "1200,17\n1500,38\n200,3\n1500,19"; cfm.input.value = "50"; dt.input.value = "70"; update(); });
+  const oCond = makeOutputLine(outputRegion, "Conduction + infiltration conductance", "bua-out-cond");
+  const oUa = makeOutputLine(outputRegion, "Heat-loss coefficient UA", "bua-out-ua");
+  const oLoad = makeOutputLine(outputRegion, "Design heating load", "bua-out-load");
+  const oNote = makeOutputLine(outputRegion, "Note", "bua-out-note");
+  function parse(text) {
+    const out = [];
+    for (const raw of String(text).split("\n")) {
+      const line = raw.trim(); if (!line) continue;
+      const p = line.split(",").map((s) => Number(s.trim()));
+      if (p.length < 2 || !Number.isFinite(p[0]) || !Number.isFinite(p[1])) return null;
+      out.push({ area: p[0], r: p[1] });
+    }
+    return out;
+  }
+  const update = debounce(() => {
+    const list = parse(asm.input.value);
+    if (list === null) { oCond.textContent = "Each line must be area_ft2,R-value with finite numbers."; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
+    const r = computeBuildingUa({ assemblies: list, cfm_inf: Number(cfm.input.value) || 0, dt_f: Number(dt.input.value) || 0 });
+    if (r.error) { oCond.textContent = r.error; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
+    oCond.textContent = fmt(r.cond, 1) + " + " + fmt(r.ua_inf, 1) + " Btu/h-F";
+    oUa.textContent = fmt(r.ua, 1) + " Btu/h-F";
+    oLoad.textContent = r.design_load === null ? "- (enter a design dT)" : fmt(r.design_load, 0) + " Btu/h";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [asm.input, cfm.input, dt.input]) f.addEventListener("input", update);
+}
+HVAC_RENDERERS["building-ua"] = _v329renderBuildingUa;
+
+// dims: in { ua_btuhf: M L^2 T^-3, hdd: T, eff: dimensionless, fuel: dimensionless, price: dimensionless } out: { q_mmbtu: M L^2 T^-2, fuel_units: dimensionless, cost: dimensionless }
+export function computeDegreeDayEnergy({ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel = "gas", price = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(ua_btuhf > 0)) return { error: "The heat-loss coefficient UA must be positive (Btu/h-F)." };
+  if (!(hdd > 0)) return { error: "Heating degree-days must be positive (degF-days)." };
+  if (!(eff > 0)) return { error: "Efficiency (AFUE or COP) must be positive." };
+  if (price < 0) return { error: "Fuel price cannot be negative." };
+  const per_unit = { gas: 1e5, oil: 138500, electric: 3412 };
+  const unit_btu = per_unit[fuel];
+  if (!unit_btu) return { error: "Fuel must be gas (therm), oil (gal), or electric (kWh)." };
+  const unit_label = { gas: "therms", oil: "gal", electric: "kWh" }[fuel];
+  const q_btu = 24 * hdd * ua_btuhf;
+  const fuel_btu = q_btu / eff;
+  const fuel_units = fuel_btu / unit_btu;
+  const cost = fuel_units * price;
+  return {
+    q_mmbtu: q_btu / 1e6, fuel_units, unit_label, cost,
+    note: "Degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF heating degree-days), the fuel = Q/efficiency, and the cost = fuel x unit price, with 1 therm = 100,000 Btu, 1 gal fuel oil ~ 138,500 Btu, and 1 kWh = 3,412 Btu. The energy scales directly with UA, so a 20% envelope improvement is a 20% lower bill. This is the base-65 steady-state degree-day method - a variable-base method with the building's actual balance point is more accurate, and it ignores internal and solar gains that lower the true balance point; it takes UA and local HDD as entered and adds no cooling, latent, or domestic-hot-water energy. An estimate, not a utility-bill-calibrated model; actual consumption depends on occupancy, weather, and gains.",
+  };
+}
+const degreeDayEnergyExample = { inputs: { ua_btuhf: 500, hdd: 5000, eff: 0.80, fuel: "gas", price: 1.20 } };
+function _v330renderDegreeDayEnergy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: degree-day annual heating energy Q = 24 x HDD x UA (base-65 degF), fuel = Q/efficiency, with 1 therm = 100,000 Btu / 1 gal oil ~ 138,500 Btu / 1 kWh = 3,412 Btu, ASHRAE degree-day / RESNET basis, by name. Steady-state, no gains, heating only. An estimate, not a calibrated model.";
+  const ua = makeNumber("Heat-loss coefficient UA (Btu/h-F)", "dde-ua", { step: "any", min: "0" });
+  const hdd = makeNumber("Heating degree-days (base 65 F)", "dde-hdd", { step: "any", min: "0" });
+  const eff = makeNumber("System efficiency (AFUE or COP)", "dde-eff", { step: "any", min: "0" }); eff.input.value = "0.80";
+  const fuel = makeSelect("Fuel", "dde-fuel", [
+    { value: "gas", label: "Gas (therms)" },
+    { value: "oil", label: "Fuel oil (gal)" },
+    { value: "electric", label: "Electric (kWh)" },
+  ]);
+  const price = makeNumber("Fuel unit price ($/unit, optional)", "dde-price", { step: "any", min: "0" });
+  inputRegion.appendChild(ua.wrap); inputRegion.appendChild(hdd.wrap); inputRegion.appendChild(eff.wrap); inputRegion.appendChild(fuel.wrap); inputRegion.appendChild(price.wrap);
+  attachExampleButton(inputRegion, () => { ua.input.value = "500"; hdd.input.value = "5000"; eff.input.value = "0.80"; fuel.select.value = "gas"; price.input.value = "1.20"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Delivered heating energy", "dde-out-q");
+  const oFuel = makeOutputLine(outputRegion, "Fuel use", "dde-out-fuel");
+  const oCost = makeOutputLine(outputRegion, "Annual cost", "dde-out-cost");
+  const oNote = makeOutputLine(outputRegion, "Note", "dde-out-note");
+  const update = debounce(() => {
+    const r = computeDegreeDayEnergy({ ua_btuhf: Number(ua.input.value) || 0, hdd: Number(hdd.input.value) || 0, eff: Number(eff.input.value) || 0, fuel: fuel.select.value, price: Number(price.input.value) || 0 });
+    if (r.error) { oQ.textContent = r.error; oFuel.textContent = "-"; oCost.textContent = "-"; oNote.textContent = "-"; return; }
+    oQ.textContent = fmt(r.q_mmbtu, 1) + " MMBtu/yr";
+    oFuel.textContent = fmt(r.fuel_units, 0) + " " + r.unit_label + "/yr";
+    oCost.textContent = (Number(price.input.value) || 0) > 0 ? "$" + fmt(r.cost, 0) + "/yr" : "- (enter a price)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ua.input, hdd.input, eff.input, price.input]) f.addEventListener("input", update);
+  fuel.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["degree-day-energy"] = _v330renderDegreeDayEnergy;
+
+// dims: in { r_inside: dimensionless, r_outside: dimensionless, t_in_f: T, t_out_f: T, rh_in_pct: dimensionless } out: { t_plane_f: T, t_dew_f: T, margin_f: T }
+export function computeWallCondensationGradient({ r_inside = 0, r_outside = 0, t_in_f = 0, t_out_f = 0, rh_in_pct = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(r_inside > 0)) return { error: "The inside R-value (warm side to the plane) must be positive." };
+  if (!(r_outside > 0)) return { error: "The outside R-value (beyond the plane) must be positive." };
+  if (!(rh_in_pct > 0 && rh_in_pct <= 100)) return { error: "Indoor relative humidity must be over 0 and up to 100%." };
+  const r_total = r_inside + r_outside;
+  const t_plane_f = t_in_f - (r_inside / r_total) * (t_in_f - t_out_f);
+  // Magnus dew point of the indoor air.
+  const t_in_c = (t_in_f - 32) / 1.8;
+  const a = 17.625, b = 243.04;
+  const gamma = Math.log(rh_in_pct / 100) + (a * t_in_c) / (b + t_in_c);
+  const dew_c = (b * gamma) / (a - gamma);
+  const t_dew_f = dew_c * 1.8 + 32;
+  const margin_f = t_plane_f - t_dew_f;
+  const condensing = margin_f <= 0;
+  return {
+    t_plane_f, t_dew_f, margin_f, condensing,
+    note: "One-dimensional steady-state wall condensation screen: temperature drops across an assembly in proportion to R-value, so the interface temperature is T_plane = T_in - (R_inside/R_total)(T_in - T_out), and condensation forms wherever that plane sits at or below the interior air's Magnus dew point. Warming the plane - by adding continuous exterior insulation, which raises R_outside and shifts the ratio - keeps the structural sheathing above the dew point, the whole point of the ratio rule. This is a 1-D steady-state gradient (no thermal bridging, air movement, or vapor-diffusion/transient moisture accumulation, which a Glaser or hygrothermal model adds), uses the interior air's dew point moderated by any vapor retarder, and is a screen. A building-science aid, not a substitute for a hygrothermal (WUFI-type) analysis; the assembly's vapor control governs.",
+  };
+}
+const wallCondensationGradientExample = { inputs: { r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 } };
+HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
+  citation: "Citation: R-proportional interface temperature T_plane = T_in - (R_inside/R_total)(T_in - T_out), the Magnus dew point of the indoor air, and the condensation criterion T_plane <= T_dew, by name. 1-D steady-state screen, no vapor diffusion. A building-science aid, not a hygrothermal analysis.",
+  example: wallCondensationGradientExample.inputs,
+  fields: [
+    { key: "r_inside", label: "R-value warm side to the plane", kind: "number" },
+    { key: "r_outside", label: "R-value beyond the plane", kind: "number" },
+    { key: "t_in_f", label: "Indoor air temperature (F)", kind: "number", default: 70 },
+    { key: "t_out_f", label: "Outdoor air temperature (F)", kind: "number" },
+    { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number", default: 40 },
+  ],
+  outputs: [
+    { key: "tp", id: "wcg-out-tp", label: "Condensation-plane temperature", value: (r) => fmt(r.t_plane_f, 1) + " F" },
+    { key: "td", id: "wcg-out-td", label: "Indoor dew point", value: (r) => fmt(r.t_dew_f, 1) + " F" },
+    { key: "m", id: "wcg-out-m", label: "Margin to dew point", value: (r) => fmt(r.margin_f, 1) + " F - " + (r.condensing ? "CONDENSING" : "dry") },
+    { key: "n", id: "wcg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWallCondensationGradient,
 });

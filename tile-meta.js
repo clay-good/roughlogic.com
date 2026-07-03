@@ -450,6 +450,8 @@ const _TILES = [
   ["injector-size", "K"], ["mean-piston-speed", "K"], ["trap-speed-horsepower", "K"],
   // spec-v326..v328 soil characterization / QC batch (calc-earthwork.js Group E)
   ["relative-compaction", "E"], ["soil-phase-relations", "E"], ["atterberg-indices", "E"],
+  // spec-v329..v331 building-energy batch (calc-hvac.js Group C)
+  ["building-ua", "C"], ["degree-day-energy", "C"], ["wall-condensation-gradient", "C"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],

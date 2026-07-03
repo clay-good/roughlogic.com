@@ -14305,3 +14305,63 @@ test("bounds: spec-v328 computeAtterbergIndices pins the A-line classification, 
   assert.ok("error" in _v328({ ll: 20, pl: 25 })); // PL >= LL nonplastic
   assert.ok("error" in _v328({ ll: NaN, pl: 22 }));
 });
+
+// ===================== spec-v329..v331 building-energy batch =====================
+import { computeBuildingUa as _v329, computeDegreeDayEnergy as _v330, computeWallCondensationGradient as _v331 } from "../../calc-hvac.js";
+
+test("bounds: spec-v329 computeBuildingUa pins the assembly sum, the infiltration term, the design load, and error seams", () => {
+  const asm = [{ area: 1200, r: 17 }, { area: 1500, r: 38 }, { area: 200, r: 3 }, { area: 1500, r: 19 }];
+  const r = _v329({ assemblies: asm, cfm_inf: 50, dt_f: 70 });
+  assert.ok(Math.abs(r.cond - (1200 / 17 + 1500 / 38 + 200 / 3 + 1500 / 19)) < 1e-9);
+  assert.ok(Math.abs(r.ua_inf - 1.08 * 50) < 1e-9);
+  assert.ok(Math.abs(r.ua - (r.cond + r.ua_inf)) < 1e-12);
+  assert.ok(Math.abs(r.ua - 309.7) < 0.1);
+  assert.ok(Math.abs(r.design_load - r.ua * 70) < 1e-9);
+  // No dT -> null load.
+  assert.strictEqual(_v329({ assemblies: asm, cfm_inf: 50 }).design_load, null);
+  // Error seams.
+  assert.ok("error" in _v329({ assemblies: [], cfm_inf: 50 }));
+  assert.ok("error" in _v329({ assemblies: [{ area: 0, r: 17 }], cfm_inf: 50 }));
+  assert.ok("error" in _v329({ assemblies: [{ area: 1200, r: 0 }], cfm_inf: 50 }));
+  assert.ok("error" in _v329({ assemblies: asm, cfm_inf: -5 }));
+  assert.ok("error" in _v329({ assemblies: asm, cfm_inf: Infinity }));
+});
+
+test("bounds: spec-v330 computeDegreeDayEnergy pins the degree-day energy, the fuel conversions, and error seams", () => {
+  const r = _v330({ ua_btuhf: 500, hdd: 5000, eff: 0.80, fuel: "gas", price: 1.20 });
+  assert.ok(Math.abs(r.q_mmbtu - 24 * 5000 * 500 / 1e6) < 1e-9);
+  assert.ok(Math.abs(r.fuel_units - 750) < 1e-6);
+  assert.strictEqual(r.unit_label, "therms");
+  assert.ok(Math.abs(r.cost - 900) < 1e-6);
+  // The heat-pump/electric path.
+  const r2 = _v330({ ua_btuhf: 500, hdd: 5000, eff: 3.0, fuel: "electric", price: 0.15 });
+  assert.ok(Math.abs(r2.fuel_units - 24 * 5000 * 500 / 3.0 / 3412) < 1e-6);
+  assert.strictEqual(r2.unit_label, "kWh");
+  // Oil path.
+  assert.strictEqual(_v330({ ua_btuhf: 500, hdd: 5000, eff: 0.85, fuel: "oil", price: 3.5 }).unit_label, "gal");
+  // Error seams.
+  assert.ok("error" in _v330({ ua_btuhf: 0, hdd: 5000, eff: 0.8, fuel: "gas" }));
+  assert.ok("error" in _v330({ ua_btuhf: 500, hdd: 0, eff: 0.8, fuel: "gas" }));
+  assert.ok("error" in _v330({ ua_btuhf: 500, hdd: 5000, eff: 0, fuel: "gas" }));
+  assert.ok("error" in _v330({ ua_btuhf: 500, hdd: 5000, eff: 0.8, fuel: "bogus" }));
+  assert.ok("error" in _v330({ ua_btuhf: Infinity, hdd: 5000, eff: 0.8, fuel: "gas" }));
+});
+
+test("bounds: spec-v331 computeWallCondensationGradient pins the gradient, the dew point, the condensing flag, and error seams", () => {
+  const r = _v331({ r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 });
+  assert.ok(Math.abs(r.t_plane_f - (70 - (13.5 / 17.5) * 50)) < 1e-9);
+  assert.ok(Math.abs(r.t_plane_f - 31.4) < 0.1);
+  assert.ok(Math.abs(r.t_dew_f - 44.6) < 0.3);
+  assert.ok(r.margin_f < 0);
+  assert.strictEqual(r.condensing, true);
+  // Adding exterior insulation warms the plane.
+  const r2 = _v331({ r_inside: 13.5, r_outside: 9, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 });
+  assert.ok(r2.t_plane_f > r.t_plane_f);
+  assert.ok(Math.abs(r2.t_plane_f - 40.0) < 0.1);
+  // Error seams.
+  assert.ok("error" in _v331({ r_inside: 0, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 }));
+  assert.ok("error" in _v331({ r_inside: 13.5, r_outside: 0, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 }));
+  assert.ok("error" in _v331({ r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 0 }));
+  assert.ok("error" in _v331({ r_inside: 13.5, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 120 }));
+  assert.ok("error" in _v331({ r_inside: NaN, r_outside: 4, t_in_f: 70, t_out_f: 20, rh_in_pct: 40 }));
+});

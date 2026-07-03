@@ -1,6 +1,6 @@
 # roughlogic.com Specification v329 -- Whole-Building Heat-Loss Coefficient UA (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v329..v331 (the building-energy trio -- the whole-house
+> **Status: LANDED (2026-07-03, package 0.116.0; proposed 2026-07-02). Batch spec-v329..v331 (the building-energy trio -- the whole-house
 > numbers the single-assembly tiles never roll up: the building heat-loss coefficient UA (this spec), the annual heating
 > energy from UA and degree-days (v330), and the through-wall condensation gradient (v331).)**
 > In-scope catalog expansion under the spec-v106 trades-only charter: `assembly-r-value` gives one wall's parallel-path
