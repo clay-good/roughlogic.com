@@ -919,6 +919,10 @@ const RELATED = {
   "erv-sensible-recovery": ["outdoor-air-ventilation","ashrae-622-ventilation","mua-tempering-load"],
   "mua-tempering-load": ["hood-exhaust","combustion-air","erv-sensible-recovery"],
   "dcv-co2-ventilation": ["outdoor-air-ventilation","outdoor-air-mix","erv-sensible-recovery"],
+  // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch (Group A)
+  "motor-overload-sizing": ["motor-branch-protection","motor-fla","motor-feeder-multiple"],
+  "service-conductor-sizing": ["service-load-standard","service-load-optional","ambient-ampacity-adjust"],
+  "continuous-load-ocpd": ["service-conductor-sizing","commercial-lighting-load","wire-ampacity"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   "wood-emc": ["drying-goal","moisture-dry-goal","grains-removed"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

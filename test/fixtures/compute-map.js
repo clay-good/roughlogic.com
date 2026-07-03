@@ -635,6 +635,10 @@ export const COMPUTE_MAP = {
   "erv-sensible-recovery": { module: "../../calc-hvac.js", fn: "computeErvSensibleRecovery" },
   "mua-tempering-load": { module: "../../calc-hvac.js", fn: "computeMuaTemperingLoad" },
   "dcv-co2-ventilation": { module: "../../calc-hvac.js", fn: "computeDcvCo2Ventilation" },
+  // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch (3 tiles)
+  "motor-overload-sizing": { module: "../../calc-motor.js", fn: "computeMotorOverloadSizing" },
+  "service-conductor-sizing": { module: "../../calc-service.js", fn: "computeServiceConductorSizing" },
+  "continuous-load-ocpd": { module: "../../calc-feeder.js", fn: "computeContinuousLoadOcpd" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },

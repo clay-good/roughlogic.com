@@ -336,3 +336,59 @@ function _v164renderFeederTapRule(inputRegion, outputRegion, citationEl) {
   for (const f of [ocpd.input, len.input, amp.input]) f.addEventListener("input", update);
 }
 FEEDER_RENDERERS["feeder-tap-rule"] = _v164renderFeederTapRule;
+
+// =====================================================================
+// spec-v280: continuous-load OCPD and conductor at 125% (NEC 210.20 /
+// 215.3), Group A. The most-reused NEC sizing step as a standalone tile:
+// A_min = 1.25 x continuous + noncontinuous (1.00 x for a 100%-rated
+// assembly), device from the 240.6(A) standard ratings (ordered array,
+// smallest first).
+// =====================================================================
+const _CLO_STD_240_6 = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
+
+// dims: in { l_cont_A: I, l_noncont_A: I, rated_100: dimensionless } out: { A_min: I, ocpd_A: I, mult: dimensionless }
+export function computeContinuousLoadOcpd({ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}) {
+  const _g = _finiteGuard({ l_cont_A, l_noncont_A }); if (_g) return _g;
+  if (l_cont_A < 0 || l_noncont_A < 0) return { error: "Loads cannot be negative (A)." };
+  if (!(l_cont_A + l_noncont_A > 0)) return { error: "Total load must be positive (A)." };
+  const mult = rated_100 ? 1.00 : 1.25;
+  const A_min = mult * l_cont_A + l_noncont_A;
+  let ocpd_A = null;
+  for (const s of _CLO_STD_240_6) {
+    if (s >= A_min) { ocpd_A = s; break; }
+  }
+  if (ocpd_A === null) return { error: "The minimum rating exceeds the 240.6(A) standard sizes this tile carries (to 6000 A)." };
+  return {
+    mult, A_min, ocpd_A,
+    note: "NEC 210.20(A) (branch) / 215.3 (feeder): the overcurrent device is rated not less than 125% of the continuous load (a load at its maximum for 3 hours or more) plus 100% of the noncontinuous load, and 210.19(A)/215.2(A) require the conductor (before ampacity adjustment) to carry the same sum; the device is the smallest 240.6(A) standard rating at or above it. Where the device and assembly are listed for 100% continuous operation, the 1.25 factor drops. No ambient/fill adjustment, no 110.14(C) termination limit, no 240.4(B) next-size-up conductor allowance, and equipment-specific rules (motor 430, HVAC 440, welder 630) are separate. A design aid; the AHJ governs.",
+  };
+}
+export const continuousLoadOcpdExample = { inputs: { l_cont_A: 40, l_noncont_A: 20, rated_100: false } };
+
+function _v280renderContinuousLoadOcpd(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 210.20(A) / 215.3 overcurrent and 210.19(A) / 215.2(A) conductor rule (A_min = 1.25 x continuous + noncontinuous; 1.00 x for a 100%-rated assembly), device from the 240.6(A) standard ratings, by name. Before ampacity adjustment; equipment-specific rules are separate. The AHJ governs.";
+  const lc = _v26makeNumber("Continuous load (A, on 3 hours or more)", "clo-cont", { step: "any", min: "0" });
+  const ln = _v26makeNumber("Noncontinuous load (A)", "clo-noncont", { step: "any", min: "0" });
+  const rated = _v26makeSelect("Device and assembly rating", "clo-rated", [
+    { value: "no", label: "Standard (80%-rated) - 125% factor" },
+    { value: "yes", label: "Listed 100%-rated assembly" },
+  ]);
+  inputRegion.appendChild(lc.wrap);
+  inputRegion.appendChild(ln.wrap);
+  inputRegion.appendChild(rated.wrap);
+  _v26attachEx(inputRegion, () => { lc.input.value = "40"; ln.input.value = "20"; rated.select.value = "no"; update(); });
+  const oMin = _v26makeOut(outputRegion, "Minimum OCPD and conductor ampacity", "clo-out-min");
+  const oDev = _v26makeOut(outputRegion, "Overcurrent device (240.6(A))", "clo-out-dev");
+  const oNote = _v26makeOut(outputRegion, "Note", "clo-out-note");
+  const update = _v26debounce(() => {
+    const r = computeContinuousLoadOcpd({ l_cont_A: Number(lc.input.value) || 0, l_noncont_A: Number(ln.input.value) || 0, rated_100: rated.select.value === "yes" });
+    if (r.error) { oMin.textContent = r.error; oDev.textContent = "-"; oNote.textContent = "-"; return; }
+    oMin.textContent = _v26fmt(r.A_min, 1) + " A (" + _v26fmt(r.mult * 100, 0) + "% of continuous + 100% of noncontinuous)";
+    oDev.textContent = _v26fmt(r.ocpd_A, 0) + " A";
+    oNote.textContent = r.note;
+  }, _V26_DEB);
+  lc.input.addEventListener("input", update);
+  ln.input.addEventListener("input", update);
+  rated.select.addEventListener("change", update);
+}
+FEEDER_RENDERERS["continuous-load-ocpd"] = _v280renderContinuousLoadOcpd;

@@ -58,6 +58,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-motor.js", "MOTOR_RENDERERS", [
     "motor-synchronous-speed-slip", "motor-shaft-torque", "motor-operating-cost",
     "multi-motor-feeder",
+    // spec-v278 NEC 430.32 running overload
+    "motor-overload-sizing",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which
@@ -96,6 +98,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-feeder.js", "FEEDER_RENDERERS", [
     "motor-feeder-multiple", "transformer-conductor-protection",
     "feeder-tap-rule",
+    // spec-v280 NEC 210.20/215.3 continuous-load OCPD
+    "continuous-load-ocpd",
   ]);
   // spec-v28 low-voltage / data / security cabling (own module; registered
   // under Group A pending the Group-Z maintainer signoff, per the spec's
@@ -185,6 +189,8 @@ const TOOL_MODULES = (() => {
     "commercial-lighting-load", "noncoincident-load",
     // spec-v230..v232 electrical energy-cost-savings batch
     "vfd-energy-savings", "lighting-retrofit-savings", "power-factor-billing-savings",
+    // spec-v279 NEC 310.12 dwelling service conductor
+    "service-conductor-sizing",
   ]);
   // spec-v73 cap-relief split: the two spec-v62 storm-drainage tiles relocated
   // out of calc-plumbing.js (which had reached 96.2% of cap -- the tightest

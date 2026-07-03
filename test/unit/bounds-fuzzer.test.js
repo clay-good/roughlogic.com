@@ -13201,3 +13201,73 @@ test("bounds: spec-v277 computeDcvCo2Ventilation pins the office rate, the back-
   assert.ok("error" in _v277({ n: 20, co2_set_ppm: 300, co2_oa_ppm: 400 }));
   assert.ok("error" in _v277({ n: Infinity, co2_set_ppm: 1100, co2_oa_ppm: 400 }));
 });
+
+// ===================== spec-v278..v280 NEC conductor-and-overcurrent-sizing batch =====================
+import { computeMotorOverloadSizing as _v278 } from "../../calc-motor.js";
+import { computeServiceConductorSizing as _v279 } from "../../calc-service.js";
+import { computeContinuousLoadOcpd as _v280 } from "../../calc-feeder.js";
+
+test("bounds: spec-v278 computeMotorOverloadSizing pins both 430.32(A)(1) classes, the (C) ceiling, and error seams", () => {
+  const r = _v278({ fla_A: 26, sf: 1.15, rise_C: 40 });
+  assert.strictEqual(r.hi_class, true);
+  assert.ok(Math.abs(r.ol_A - 32.5) < 1e-9);
+  assert.ok(Math.abs(r.ol_max_A - 36.4) < 1e-9);
+  // Lower class: neither the SF nor the rise condition met.
+  const r2 = _v278({ fla_A: 26, sf: 1.0, rise_C: 55 });
+  assert.strictEqual(r2.hi_class, false);
+  assert.ok(Math.abs(r2.ol_A - 29.9) < 1e-9);
+  assert.ok(Math.abs(r2.ol_max_A - 33.8) < 1e-9);
+  // Either condition alone selects the higher class.
+  assert.strictEqual(_v278({ fla_A: 26, sf: 1.15, rise_C: 55 }).hi_class, true);
+  assert.strictEqual(_v278({ fla_A: 26, sf: 1.0, rise_C: 40 }).hi_class, true);
+  // A blank (zero) rise means unmarked and does NOT qualify.
+  assert.strictEqual(_v278({ fla_A: 26, sf: 0, rise_C: 0 }).hi_class, false);
+  // Error seams.
+  assert.ok("error" in _v278({ fla_A: 0, sf: 1.15, rise_C: 40 }));
+  assert.ok("error" in _v278({ fla_A: 26, sf: -1, rise_C: 40 }));
+  assert.ok("error" in _v278({ fla_A: 26, sf: 1.15, rise_C: -5 }));
+  assert.ok("error" in _v278({ fla_A: Infinity, sf: 1.15, rise_C: 40 }));
+});
+
+test("bounds: spec-v279 computeServiceConductorSizing pins the Table 310.12 selections and error seams", () => {
+  const r = _v279({ service_A: 200, material: "copper" });
+  assert.ok(Math.abs(r.A_req - 166) < 1e-9);
+  assert.strictEqual(r.size, "2/0");
+  assert.strictEqual(r.size_ampacity_A, 175);
+  // 100 A copper -> #4 (85 A), the Table 310.12 tabulated size.
+  const r2 = _v279({ service_A: 100, material: "copper" });
+  assert.ok(Math.abs(r2.A_req - 83) < 1e-9);
+  assert.strictEqual(r2.size, "#4");
+  // Aluminum runs one-to-two sizes larger: 200 A -> 4/0 Al (180 A), per Table 310.12.
+  const r3 = _v279({ service_A: 200, material: "aluminum" });
+  assert.strictEqual(r3.size, "4/0");
+  assert.strictEqual(r3.size_ampacity_A, 180);
+  assert.strictEqual(_v279({ service_A: 100, material: "aluminum" }).size, "#2");
+  // The selection scans an ORDERED list smallest-first (a 400 A copper service lands exactly on 400 kcmil).
+  assert.strictEqual(_v279({ service_A: 400, material: "copper" }).size, "400 kcmil");
+  // Error seams.
+  assert.ok("error" in _v279({ service_A: 0, material: "copper" }));
+  assert.ok("error" in _v279({ service_A: 600, material: "aluminum" })); // beyond the single-set table
+  assert.ok("error" in _v279({ service_A: NaN, material: "copper" }));
+});
+
+test("bounds: spec-v280 computeContinuousLoadOcpd pins the 125% rule, the 100%-rated exception, the 240.6(A) round-up, and error seams", () => {
+  const r = _v280({ l_cont_A: 40, l_noncont_A: 20, rated_100: false });
+  assert.ok(Math.abs(r.A_min - 70) < 1e-9);
+  assert.strictEqual(r.ocpd_A, 70); // 70 is itself a standard rating
+  // 100%-rated assembly drops the factor and one device size.
+  const r2 = _v280({ l_cont_A: 40, l_noncont_A: 20, rated_100: true });
+  assert.ok(Math.abs(r2.A_min - 60) < 1e-9);
+  assert.strictEqual(r2.ocpd_A, 60);
+  // A non-standard minimum rounds up to the next 240.6(A) size.
+  const r3 = _v280({ l_cont_A: 44, l_noncont_A: 10, rated_100: false });
+  assert.ok(Math.abs(r3.A_min - 65) < 1e-9);
+  assert.strictEqual(r3.ocpd_A, 70);
+  // All-noncontinuous passes at 100%.
+  assert.strictEqual(_v280({ l_cont_A: 0, l_noncont_A: 20 }).ocpd_A, 20);
+  // Error seams.
+  assert.ok("error" in _v280({ l_cont_A: -1, l_noncont_A: 20 }));
+  assert.ok("error" in _v280({ l_cont_A: 0, l_noncont_A: 0 }));
+  assert.ok("error" in _v280({ l_cont_A: 1e6, l_noncont_A: 0 })); // beyond the carried 240.6(A) set
+  assert.ok("error" in _v280({ l_cont_A: Infinity, l_noncont_A: 20 }));
+});

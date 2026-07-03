@@ -1,6 +1,6 @@
 # roughlogic.com Specification v278 -- Motor Running Overload Protection (NEC 430.32) (calc-motor.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v278..v280 (the NEC conductor-and-overcurrent-sizing trio --
+> **Status: LANDED (2026-07-03, package 0.99.0; proposed 2026-07-02). Batch spec-v278..v280 (the NEC conductor-and-overcurrent-sizing trio --
 > the three device-and-conductor sizing rules the existing catalog references but does not compute: the motor running
 > overload (this spec, the companion 430.32 that `motor-branch-protection` explicitly defers), the dwelling service-
 > entrance conductor at 83% (v279), and the continuous-load breaker-and-conductor at 125% (v280).)**

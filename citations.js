@@ -7456,6 +7456,41 @@ export const CITATIONS = {
       { name: "Minimum pressure", value: "the reduced setpoint must still serve the tools after system pressure drop", source: "compressed-air best practice" },
     ],
   },
+  "motor-overload-sizing": {
+    formula: "hi_class = (sf >= 1.15) or (marked rise <= 40 degC); mult = hi_class ? 1.25 : 1.15; mult_max = hi_class ? 1.40 : 1.30; ol_A = fla_A x mult; ol_max_A = fla_A x mult_max.",
+    edition: "Motor running-overload sizing on the nameplate full-load current under NEC 2023 430.32(A)(1) (125% for a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise) with the 430.32(C) will-not-start ceiling (140%/130%), by name. A computational aid; the AHJ-adopted NEC edition governs.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 430.32(B) small-motor rules, 430.36 fuse-as-overload, and thermally protected cases are stated as out of scope, not modeled.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Basis current", value: "the motor NAMEPLATE FLA, not the 430.6 table FLC the 430.52 branch device uses", source: "NEC 430.32 / 430.6(A)" },
+      { name: "Class selection", value: "125%/140% for marked SF >= 1.15 or marked rise <= 40 degC; 115%/130% otherwise; an unmarked (blank) value does not qualify", source: "NEC 430.32(A)(1) and (C)" },
+      { name: "Scope", value: "a continuous-duty motor over 1 hp with a separate overload device", source: "NEC 430.32(A)" },
+    ],
+  },
+  "service-conductor-sizing": {
+    formula: "A_req = 0.83 x service_A; size = smallest Table 310.16 75 degC conductor (ordered smallest first, copper or aluminum) with ampacity >= A_req.",
+    edition: "The dwelling service/feeder 83% allowance of NEC 2023 310.12(A)/(B) with the conductor selected from the Table 310.16 75 degC column (reproducing Table 310.12's tabulated 100 A -> #4 Cu, 200 A -> 2/0 Cu / 4/0 Al results), by name. A computational aid; the AHJ-adopted NEC edition governs.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The single-phase 120/240 V dwelling scope, the ambient/fill adjustments, and the neutral sizing are stated, not modeled.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "83% allowance", value: "ungrounded service-entrance or main-feeder conductors of a one-family dwelling (or an individual dwelling unit) at 83% of the service rating, single-phase 120/240 V", source: "NEC 310.12(A)/(B)" },
+      { name: "Ampacity column", value: "Table 310.16 at 75 degC (the common service-equipment termination rating), single set to 400 kcmil; parallel sets are out of scope", source: "NEC 310.16 / 110.14(C)" },
+    ],
+  },
+  "continuous-load-ocpd": {
+    formula: "mult = rated_100 ? 1.00 : 1.25; A_min = mult x l_cont_A + l_noncont_A; ocpd_A = smallest NEC 240.6(A) standard rating >= A_min.",
+    edition: "The continuous-load overcurrent and conductor rule of NEC 2023 210.20(A) (branch) / 215.3 (feeder) and 210.19(A) / 215.2(A) -- 125% of the continuous plus 100% of the noncontinuous load, device from the 240.6(A) standard ratings, with the 100%-rated-assembly exception -- by name. A computational aid; the AHJ-adopted NEC edition governs.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The ampacity-adjustment, termination-limit, 240.4(B), and equipment-specific (430/440/630) rules are stated as out of scope, not modeled.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Continuous load", value: "a load at its maximum current for 3 hours or more takes the 125% factor; a listed 100%-rated device-and-assembly drops it to 100%", source: "NEC 210.20(A) / 215.3" },
+      { name: "Device selection", value: "the smallest 240.6(A) standard ampere rating at or above the computed minimum", source: "NEC 240.6(A)" },
+      { name: "Conductor", value: "the conductor's pre-adjustment ampacity must also meet the same 125% + 100% sum", source: "NEC 210.19(A) / 215.2(A)" },
+    ],
+  },
   "erv-sensible-recovery": {
     formula: "dT_F = t_ra_F - t_oa_F; t_leave_F = t_oa_F + eps_s x dT_F; Q_s_btuh = 1.08 x cfm x eps_s x dT_F; Q_noerv_btuh = 1.08 x cfm x dT_F; Q_resid_btuh = Q_noerv_btuh - Q_s_btuh.",
     edition: "The ASHRAE Standard 84 / AHRI Standard 1060 sensible-effectiveness definition (eps_s = (T_leaving - T_oa) / (T_ra - T_oa)) and the recovered sensible load Q_s = 1.08 x CFM x eps_s x (T_ra - T_oa), by name; the sea-level sensible constant 1.08 = 60 x 0.075 x 0.24 is a named constant.",

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v279 -- Dwelling Service/Feeder Conductor at 83% (NEC 310.12) (calc-service.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v278..v280 (the NEC conductor-and-overcurrent-sizing trio --
+> **Status: LANDED (2026-07-03, package 0.99.0; proposed 2026-07-02; as-landed correction: the aluminum 75 degC ampacity set in section 2.1 was shifted one size high -- the landed table uses the true Table 310.16 values (#2=90 ... 4/0=180 ... 400 kcmil=270), reproducing Table 310.12s 200 A -> 4/0 Al). Batch spec-v278..v280 (the NEC conductor-and-overcurrent-sizing trio --
 > motor overload (v278), the dwelling service conductor at 83% (this spec), the continuous-load device at 125% (v280)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the catalog computes the dwelling service load in amps
 > (`service-load-standard`, `service-load-optional`, `service-load`) but stops at the load; it does not size the service-

@@ -216,3 +216,54 @@ function renderMultiMotorFeeder(inputRegion, outputRegion, citationEl) {
   for (const el of [largest.input, others.input, ocpd.input]) el.addEventListener("input", update);
 }
 MOTOR_RENDERERS["multi-motor-feeder"] = renderMultiMotorFeeder;
+
+// =====================================================================
+// spec-v278: motor running overload protection (NEC 430.32), Group A.
+// The companion device to motor-branch-protection (430.52): the branch
+// device is sized on the table FLC; the running overload on the
+// nameplate FLA. 125%/140% for a marked SF >= 1.15 or rise <= 40 degC,
+// 115%/130% otherwise.
+// =====================================================================
+
+// dims: in { fla_A: I, sf: dimensionless, rise_C: T } out: { ol_A: I, ol_max_A: I, mult: dimensionless, mult_max: dimensionless }
+export function computeMotorOverloadSizing({ fla_A = 0, sf = 0, rise_C = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fla_A > 0)) return { error: "Nameplate full-load current must be positive (A)." };
+  if (sf < 0) return { error: "Service factor cannot be negative." };
+  if (rise_C < 0) return { error: "Temperature rise cannot be negative (degC)." };
+  // 430.32(A)(1): the higher class needs a MARKED SF >= 1.15 or a MARKED
+  // rise <= 40 degC; a blank (zero) entry means unmarked and does not qualify.
+  const hi_class = sf >= 1.15 || (rise_C > 0 && rise_C <= 40);
+  const mult = hi_class ? 1.25 : 1.15;
+  const mult_max = hi_class ? 1.40 : 1.30;
+  const ol_A = fla_A * mult;
+  const ol_max_A = fla_A * mult_max;
+  return {
+    hi_class, mult, mult_max, ol_A, ol_max_A,
+    note: "NEC 430.32(A)(1) running overload on the motor NAMEPLATE FLA (not the table FLC the 430.52 branch device uses): 125% of FLA for a continuous-duty motor over 1 hp with a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise. Where the motor will not start or carry its load at that setting, 430.32(C) permits up to 140% (130% for the lower class). Leave an unmarked service factor or rise blank - an unmarked motor takes the lower class. Small-motor (430.32(B)), fuse-as-overload (430.36), and thermally protected cases are separate. A design aid; the AHJ governs.",
+  };
+}
+export const motorOverloadSizingExample = { inputs: { fla_A: 26, sf: 1.15, rise_C: 40 } };
+
+function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 430.32(A)(1) running-overload sizing on the nameplate FLA (125% for marked SF >= 1.15 or rise <= 40 degC, else 115%) with the 430.32(C) 140%/130% will-not-start ceiling, by name. The separate device from the 430.52 branch protection. The AHJ governs.";
+  const fla = makeNumber("Nameplate full-load current FLA (A)", "mos-fla", { step: "any", min: "0" });
+  const sf = makeNumber("Marked service factor (blank if unmarked)", "mos-sf", { step: "any", min: "0" });
+  const rise = makeNumber("Marked temperature rise (degC, blank if unmarked)", "mos-rise", { step: "any", min: "0" });
+  for (const f of [fla, sf, rise]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fla.input.value = "26"; sf.input.value = "1.15"; rise.input.value = "40"; update(); });
+  const oClass = makeOutputLine(outputRegion, "430.32(A)(1) class", "mos-out-class");
+  const oOl = makeOutputLine(outputRegion, "Overload setting", "mos-out-ol");
+  const oMax = makeOutputLine(outputRegion, "430.32(C) maximum (will not start)", "mos-out-max");
+  const oNote = makeOutputLine(outputRegion, "Note", "mos-out-note");
+  const update = debounce(() => {
+    const r = computeMotorOverloadSizing({ fla_A: Number(fla.input.value) || 0, sf: Number(sf.input.value) || 0, rise_C: Number(rise.input.value) || 0 });
+    if (r.error) { oClass.textContent = r.error; oOl.textContent = "-"; oMax.textContent = "-"; oNote.textContent = "-"; return; }
+    oClass.textContent = r.hi_class ? "higher (SF >= 1.15 or rise <= 40 degC): 125% base" : "lower (unmarked or outside): 115% base";
+    oOl.textContent = fmt(r.ol_A, 1) + " A (" + fmt(r.mult * 100, 0) + "% of FLA)";
+    oMax.textContent = fmt(r.ol_max_A, 1) + " A (" + fmt(r.mult_max * 100, 0) + "% of FLA)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fla, sf, rise]) f.input.addEventListener("input", update);
+}
+MOTOR_RENDERERS["motor-overload-sizing"] = renderMotorOverloadSizing;

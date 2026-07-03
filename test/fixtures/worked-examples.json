@@ -27976,6 +27976,108 @@
         "Q_total_cfm": { "value": 530, "tolerance": { "pct": 0.1 } },
         "co2_check_ppm": { "value": 800, "tolerance": { "abs": 0.01 } }
       }
+    },
+    {
+      "tile_id": "motor-overload-sizing",
+      "source_publisher": "NEC 2023 430.32(A)(1) / 430.32(C)",
+      "source_title": "26 A FLA, SF 1.15 -> 32.5 A overload, 36.4 A ceiling",
+      "source_edition_or_year": "spec-v278 worked example (machine-verified)",
+      "source_section_or_page": "spec-v278 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fla_A": 26, "sf": 1.15, "rise_C": 40 },
+      "outputs": {
+        "mult": { "value": 1.25, "tolerance": { "abs": 0.0001 } },
+        "ol_A": { "value": 32.5, "tolerance": { "abs": 0.001 } },
+        "ol_max_A": { "value": 36.4, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "motor-overload-sizing",
+      "source_publisher": "NEC 2023 430.32(A)(1) / 430.32(C)",
+      "source_title": "cross-check: SF 1.0, rise 55 C -> lower class, 29.9 A / 33.8 A",
+      "source_edition_or_year": "spec-v278 worked example (machine-verified)",
+      "source_section_or_page": "spec-v278 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "fla_A": 26, "sf": 1.0, "rise_C": 55 },
+      "outputs": {
+        "mult": { "value": 1.15, "tolerance": { "abs": 0.0001 } },
+        "ol_A": { "value": 29.9, "tolerance": { "abs": 0.001 } },
+        "ol_max_A": { "value": 33.8, "tolerance": { "abs": 0.001 } }
+      }
+    },
+    {
+      "tile_id": "service-conductor-sizing",
+      "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
+      "source_title": "200 A copper dwelling service -> 166 A -> 2/0 Cu (Table 310.12)",
+      "source_edition_or_year": "spec-v279 worked example (machine-verified)",
+      "source_section_or_page": "spec-v279 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "service_A": 200, "material": "copper" },
+      "outputs": {
+        "A_req": { "value": 166, "tolerance": { "abs": 0.001 } },
+        "size": { "value": "2/0", "tolerance": { "abs": 0 } },
+        "size_ampacity_A": { "value": 175, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "service-conductor-sizing",
+      "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
+      "source_title": "cross-check: 100 A copper -> 83 A -> #4 Cu (Table 310.12)",
+      "source_edition_or_year": "spec-v279 worked example (machine-verified)",
+      "source_section_or_page": "spec-v279 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "service_A": 100, "material": "copper" },
+      "outputs": {
+        "A_req": { "value": 83, "tolerance": { "abs": 0.001 } },
+        "size": { "value": "#4", "tolerance": { "abs": 0 } },
+        "size_ampacity_A": { "value": 85, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "continuous-load-ocpd",
+      "source_publisher": "NEC 2023 210.20(A) / 215.3 / 240.6(A)",
+      "source_title": "40 A continuous + 20 A noncontinuous -> 70 A minimum, 70 A device",
+      "source_edition_or_year": "spec-v280 worked example (machine-verified)",
+      "source_section_or_page": "spec-v280 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_cont_A": 40, "l_noncont_A": 20, "rated_100": false },
+      "outputs": {
+        "A_min": { "value": 70, "tolerance": { "abs": 0.001 } },
+        "ocpd_A": { "value": 70, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "continuous-load-ocpd",
+      "source_publisher": "NEC 2023 210.20(A) Exception (100%-rated assembly)",
+      "source_title": "cross-check: same load, 100%-rated -> 60 A minimum, 60 A device",
+      "source_edition_or_year": "spec-v280 worked example (machine-verified)",
+      "source_section_or_page": "spec-v280 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_cont_A": 40, "l_noncont_A": 20, "rated_100": true },
+      "outputs": {
+        "A_min": { "value": 60, "tolerance": { "abs": 0.001 } },
+        "ocpd_A": { "value": 60, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "continuous-load-ocpd",
+      "source_publisher": "NEC 2023 240.6(A) standard ratings",
+      "source_title": "cross-check: 44 + 10 A -> 65 A minimum rounds up to a 70 A device",
+      "source_edition_or_year": "spec-v280 worked example (machine-verified)",
+      "source_section_or_page": "spec-v280 section 2.1 round-up cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "l_cont_A": 44, "l_noncont_A": 10, "rated_100": false },
+      "outputs": {
+        "A_min": { "value": 65, "tolerance": { "abs": 0.001 } },
+        "ocpd_A": { "value": 70, "tolerance": { "abs": 0 } }
+      }
     }
   ]
 }

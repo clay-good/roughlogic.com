@@ -1,6 +1,6 @@
 # roughlogic.com Specification v280 -- Continuous-Load Overcurrent Device and Conductor at 125% (NEC 210.20 / 215.3) (calc-feeder.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-02, package 0.97.0). Batch spec-v278..v280 (the NEC conductor-and-overcurrent-sizing trio --
+> **Status: LANDED (2026-07-03, package 0.99.0; proposed 2026-07-02). Batch spec-v278..v280 (the NEC conductor-and-overcurrent-sizing trio --
 > motor overload (v278), the dwelling service conductor at 83% (v279), the continuous-load device at 125% (this spec)).**
 > In-scope catalog expansion under the spec-v106 trades-only charter: the 125% continuous-load rule is the single most
 > reused NEC sizing step, baked into `commercial-lighting-load` and others, but the catalog has no standalone tile that

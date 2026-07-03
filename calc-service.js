@@ -846,3 +846,65 @@ function renderPowerFactorBillingSavings(inputRegion, outputRegion, citationEl) 
   for (const f of [kw, pfe, pft, demand, cost]) f.input.addEventListener("input", update);
 }
 SERVICE_RENDERERS["power-factor-billing-savings"] = renderPowerFactorBillingSavings;
+
+// =====================================================================
+// spec-v279: dwelling service/feeder conductor at 83% (NEC 310.12),
+// Group A. The service-load-* tiles produce the amperage; this turns it
+// into the service-entrance conductor from the Table 310.16 75 degC
+// column. ORDERED arrays (smallest first) -- JS would reorder
+// integer-like object keys ("250", "300") ahead of string keys.
+// =====================================================================
+const _SC_CU_75 = [
+  ["#4", 85], ["#3", 100], ["#2", 115], ["#1", 130], ["1/0", 150], ["2/0", 175],
+  ["3/0", 200], ["4/0", 230], ["250 kcmil", 255], ["300 kcmil", 285], ["350 kcmil", 310], ["400 kcmil", 335],
+];
+// (The spec-v279 prose listed a shifted aluminum column; these are the
+// Table 310.16 75 degC aluminum values, which reproduce Table 310.12's
+// 200 A -> 4/0 Al.)
+const _SC_AL_75 = [
+  ["#2", 90], ["#1", 100], ["1/0", 120], ["2/0", 135], ["3/0", 155], ["4/0", 180],
+  ["250 kcmil", 205], ["300 kcmil", 230], ["350 kcmil", 250], ["400 kcmil", 270],
+];
+
+// dims: in { service_A: I, material: dimensionless } out: { A_req: I, size_ampacity_A: I }
+export function computeServiceConductorSizing({ service_A = 0, material = "copper" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(service_A > 0)) return { error: "Service rating must be positive (A)." };
+  const set = material === "aluminum" ? _SC_AL_75 : _SC_CU_75;
+  const A_req = 0.83 * service_A;
+  let size = null, size_ampacity_A = null;
+  for (const [s, amp] of set) {
+    if (amp >= A_req) { size = s; size_ampacity_A = amp; break; }
+  }
+  if (!size) return { error: "The required ampacity exceeds the tabulated single-set conductors (to 400 kcmil); a service that large runs parallel sets, outside this tile." };
+  return {
+    A_req, size, size_ampacity_A,
+    note: "NEC 310.12(A)/(B): a single-phase, 120/240 V one-family dwelling service (or the main feeder carrying the entire dwelling load) may use conductors rated 83% of the service rating; the conductor is then the smallest Table 310.16 75 degC size at or above 0.83 x the rating (Table 310.12 tabulates the common results: 100 A -> #4 Cu, 200 A -> 2/0 Cu). Dwelling single-phase services only; no ambient or conduit-fill adjustment, no 110.14(C) beyond 75 degC, and the neutral (250.24 / 220.61) is sized separately. A design aid; the AHJ governs.",
+  };
+}
+export const serviceConductorSizingExample = { inputs: { service_A: 200, material: "copper" } };
+
+function renderServiceConductorSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 310.12(A)/(B) dwelling service/feeder 83% allowance (A_req = 0.83 x service rating, conductor from the Table 310.16 75 degC column; Table 310.12 tabulates 100 A -> #4 Cu, 200 A -> 2/0 Cu), by name. Single-phase 120/240 V dwelling only; adjustments and the neutral are separate. The AHJ governs.";
+  const svc = makeNumber("Service or main-feeder rating (A)", "scs-a", { step: "any", min: "0" });
+  const mat = makeSelect("Conductor material", "scs-mat", [
+    { value: "copper", label: "Copper" },
+    { value: "aluminum", label: "Aluminum" },
+  ]);
+  inputRegion.appendChild(svc.wrap);
+  inputRegion.appendChild(mat.wrap);
+  attachExampleButton(inputRegion, () => { svc.input.value = "200"; mat.select.value = "copper"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required ampacity (83%)", "scs-out-req");
+  const oSize = makeOutputLine(outputRegion, "Service-entrance conductor", "scs-out-size");
+  const oNote = makeOutputLine(outputRegion, "Note", "scs-out-note");
+  const update = debounce(() => {
+    const r = computeServiceConductorSizing({ service_A: Number(svc.input.value) || 0, material: mat.select.value });
+    if (r.error) { oReq.textContent = r.error; oSize.textContent = "-"; oNote.textContent = "-"; return; }
+    oReq.textContent = fmt(r.A_req, 1) + " A";
+    oSize.textContent = r.size + " (" + fmt(r.size_ampacity_A, 0) + " A at 75 degC)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  svc.input.addEventListener("input", update);
+  mat.select.addEventListener("change", update);
+}
+SERVICE_RENDERERS["service-conductor-sizing"] = renderServiceConductorSizing;
