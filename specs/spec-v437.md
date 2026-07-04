@@ -1,6 +1,6 @@
 # roughlogic.com Specification v437 -- PV Interconnection 120% Busbar Rule (NEC 705.12) (calc-solar.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the NEC 690/705 PV-electrical trio (v435 max system voltage ->
+> **Status: CUT (2026-07-04, dupe of existing tile). NOT LANDED: the NEC 690/705 PV trio duplicates existing PV tiles -- v435 pv-max-system-voltage overlaps pv-string-sizing (cold-Voc max-series, NEC 690.7); v436 pv-conductor-sizing is an exact duplicate of pv-circuit-ampacity (NEC 690.8 156% rule); v437 pv-interconnection-120-rule is an exact duplicate of pv-interconnection-busbar (NEC 705.12 120% busbar rule). The PV/NEC-690 space (10+ tiles) is heavily built out; this trio was proposed without a dupe-check. Caught by a pre-implementation dupe-check. Original proposal below. Third and final tile of the NEC 690/705 PV-electrical trio (v435 max system voltage ->
 > v436 PV conductor sizing -> v437 interconnection 120% rule). Connecting solar to an existing panel is where most
 > residential installs get stuck, and the governing check -- the 120% busbar rule -- has no tile.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. When a PV backfeed breaker is added to an existing
