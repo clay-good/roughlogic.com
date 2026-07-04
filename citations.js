@@ -8427,6 +8427,42 @@ export const CITATIONS = {
       { name: "Physical band", value: "leaving air lies between the ADP and the entering temperature", source: "scope of this tile" },
     ],
   },
+  "fan-affinity-laws": {
+    formula: "r = N2/N1; Q2 = Q1 r; SP2 = SP1 r^2; BHP2 = BHP1 r^3.",
+    edition: "The fan affinity (fan) laws for a speed change from AMCA / ASHRAE Handbook - Fundamentals, by name.",
+    freeAccess: "The affinity laws (flow proportional to speed, pressure to speed squared, power to speed cubed) are standard published fan-engineering relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fan affinity laws for a fixed fan at a changed speed: Q2 = Q1 (N2/N1), SP2 = SP1 (N2/N1)^2, and BHP2 = BHP1 (N2/N1)^3. The cube-law power relation is why a modest speed reduction saves large power (a 25% slowdown cuts brake horsepower about 58%), the basis of VFD energy savings. This assumes the same fan riding the same system curve; it does not capture motor/drive efficiency changes, belt losses, or a shifted system curve, and the diameter form applies only within a geometrically similar fan family. A field aid; the manufacturer's fan curve and the equipment ratings govern.",
+    assumptions: [
+      { name: "Affinity laws", value: "Q2 = Q1 r, SP2 = SP1 r^2, BHP2 = BHP1 r^3, r = N2/N1", source: "AMCA / ASHRAE Fundamentals" },
+      { name: "Same fan and system", value: "same fan on the same system curve; efficiency shifts not captured", source: "fan engineering" },
+      { name: "Design aid", value: "the manufacturer's fan curve and ratings govern", source: "scope of this tile" },
+    ],
+  },
+  "pitot-traverse-cfm": {
+    formula: "V = 4005 sqrt(VP_avg); A = (w x h)/144; CFM = V x A.",
+    edition: "The Pitot-traverse airflow measurement (velocity-pressure to velocity, standard air) from ASHRAE Fundamentals / AABC-NEBB field practice, by name.",
+    freeAccess: "The V = 4005 sqrt(VP) standard-air relation and the traverse-average method are standard published air-balancing procedures.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Pitot-tube traverse airflow: velocity V = 4005 sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from the traverse-average velocity pressure, then CFM = V x duct cross-sectional area. Average the velocity pressures across the equal-area traverse points (a root-mean-square of the VP readings is more exact than a straight average); apply a density correction at altitude or high temperature, where the result is otherwise a standard-air equivalent. This returns a field measurement, not a substitute for a calibrated flow station or the equipment's own airflow rating. A field aid; the balancing report and equipment ratings govern.",
+    assumptions: [
+      { name: "Velocity from VP", value: "V = 4005 sqrt(VP) for standard air", source: "ASHRAE Fundamentals" },
+      { name: "Traverse average", value: "average the equal-area traverse VP readings (RMS is more exact)", source: "AABC / NEBB field practice" },
+      { name: "Standard air", value: "apply a density correction at altitude or high temperature", source: "scope of this tile" },
+    ],
+  },
+  "outside-air-percent-temps": {
+    formula: "%OA = 100 (T_ra - T_ma) / (T_ra - T_oa).",
+    edition: "The mixed-air temperature balance for the outside-air fraction from ASHRAE / AABC-NEBB field practice, by name.",
+    freeAccess: "The mixed-air temperature-balance outside-air percentage is a standard published air-balancing field check.",
+    governance: GOVERNANCE.general,
+    editionNote: "The measured outside-air fraction from a mixed-air temperature balance: %OA = 100 (T_ra - T_ma) / (T_ra - T_oa). The mixed-air temperature is the flow-weighted blend of return and outside air, so its position between the two reads the damper's actual outside-air fraction, the field check against the design minimum ventilation. It needs well-mixed, shielded dry-bulb readings; a mixed-air temperature outside the return/outdoor band signals a stratified duct or a sensor fault, and a return-to-outdoor spread under about 10 F makes the percentage sensitive to sensor error. A field aid, not a substitute for a direct airflow measurement.",
+    assumptions: [
+      { name: "Temperature balance", value: "%OA = 100 (T_ra - T_ma) / (T_ra - T_oa)", source: "ASHRAE / AABC / NEBB" },
+      { name: "Well-mixed readings", value: "shielded dry-bulb sensors in well-mixed air", source: "field practice" },
+      { name: "Low-spread caveat", value: "a return-to-outdoor spread under ~10 F is sensitive to sensor error", source: "scope of this tile" },
+    ],
+  },
   "wall-condensation-gradient": {
     formula: "R_total = R_inside + R_outside; T_plane = T_in - (R_inside/R_total)(T_in - T_out); T_dew = Magnus(T_in, RH); margin = T_plane - T_dew (<= 0 condensing).",
     edition: "The R-proportional through-wall temperature gradient and the Magnus dew-point comparison for a condensation-plane screen, standard building-science results, by name.",

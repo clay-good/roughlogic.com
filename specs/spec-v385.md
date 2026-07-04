@@ -1,6 +1,6 @@
 # roughlogic.com Specification v385 -- Pitot Traverse Airflow (Velocity Pressure to CFM) (calc-velocity.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the HVAC airflow field-methods trio (v384 fan laws -> v385 pitot traverse
+> **Status: LANDED (2026-07-03, 0.135.0; proposed 2026-07-03). Second tile of the HVAC airflow field-methods trio (v384 fan laws -> v385 pitot traverse
 > CFM -> v386 measured percent outside air). `duct-velocity-pressure` converts a single velocity-pressure reading to a
 > velocity; this tile takes the averaged reading from a duct traverse, multiplies by the duct area, and returns the airflow
 > a technician is actually measuring -- the CFM that a balance report lives on.**

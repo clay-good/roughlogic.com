@@ -8706,6 +8706,7 @@ test("bounds: calc-electrical render* renderers are exported as functions (DOM-b
 import {
   computeDuctVelocityPressure, renderDuctVelocityPressure,
   computeRefrigerantVelocity, renderRefrigerantVelocity,
+  renderPitotTraverseCfm,
 } from "../../calc-velocity.js";
 
 test("bounds: calc-hvac computeDuctVelocityPressure pins V = 4005*sqrt(VP) + inverse + rejects non-positive/Infinity", () => {
@@ -8781,7 +8782,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderPitotTraverseCfm, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });
@@ -15299,4 +15300,56 @@ test("bounds: spec-v383 computeSeismicPdeltaStability pins theta, theta_max, all
   assert.ok("error" in _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 0 }));
   assert.ok("error" in _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5, beta: 0 }));
   assert.ok("error" in _v383({ px_kip: Infinity, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5 }));
+});
+
+// ===================== spec-v384..v386 HVAC airflow field-methods trio (3 modules) =====================
+import { computeFanAffinityLaws as _v384 } from "../../calc-hvac.js";
+import { computePitotTraverseCfm as _v385 } from "../../calc-velocity.js";
+import { computeOutsideAirPercentTemps as _v386 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v384 computeFanAffinityLaws pins the speed/square/cube laws and error seams", () => {
+  const r = _v384({ q1_cfm: 10000, sp1_inwg: 1.0, bhp1_hp: 5.0, n1: 900, n2: 1200 });
+  assert.ok(Math.abs(r.r - 1200 / 900) < 1e-12);
+  assert.ok(Math.abs(r.q2_cfm - 10000 * (1200 / 900)) < 1e-9);
+  assert.ok(Math.abs(r.sp2_inwg - 1.0 * (1200 / 900) ** 2) < 1e-9);
+  assert.ok(Math.abs(r.bhp2_hp - 5.0 * (1200 / 900) ** 3) < 1e-9);
+  // Slowing down cuts power by the cube.
+  const slow = _v384({ q1_cfm: 10000, sp1_inwg: 1.0, bhp1_hp: 5.0, n1: 900, n2: 675 });
+  assert.ok(Math.abs(slow.bhp2_hp - 5.0 * 0.75 ** 3) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v384({ q1_cfm: 10000, sp1_inwg: 1, bhp1_hp: 5, n1: 0, n2: 1200 }));
+  assert.ok("error" in _v384({ q1_cfm: 10000, sp1_inwg: 1, bhp1_hp: 5, n1: 900, n2: 0 }));
+  assert.ok("error" in _v384({ q1_cfm: 10000, sp1_inwg: 1, bhp1_hp: 5, n1: Infinity, n2: 1200 }));
+});
+
+test("bounds: spec-v385 computePitotTraverseCfm pins V = 4005 sqrt(VP), CFM = V A, and error seams", () => {
+  const r = _v385({ vp_avg_inwc: 0.15, w_in: 24, h_in: 12 });
+  assert.ok(Math.abs(r.v_fpm - 4005 * Math.sqrt(0.15)) < 1e-9);
+  assert.ok(Math.abs(r.area_ft2 - 2.0) < 1e-12);
+  assert.ok(Math.abs(r.cfm - r.v_fpm * 2.0) < 1e-9);
+  // The square-root relation: a third the VP is not a third the velocity.
+  const light = _v385({ vp_avg_inwc: 0.05, w_in: 24, h_in: 12 });
+  assert.ok(Math.abs(light.v_fpm - 4005 * Math.sqrt(0.05)) < 1e-9 && light.v_fpm > r.v_fpm / 3);
+  // Error seams.
+  assert.ok("error" in _v385({ vp_avg_inwc: 0, w_in: 24, h_in: 12 }));
+  assert.ok("error" in _v385({ vp_avg_inwc: 0.15, w_in: 0, h_in: 12 }));
+  assert.ok("error" in _v385({ vp_avg_inwc: 0.15, w_in: 24, h_in: 0 }));
+  assert.ok("error" in _v385({ vp_avg_inwc: Infinity, w_in: 24, h_in: 12 }));
+});
+
+test("bounds: spec-v386 computeOutsideAirPercentTemps pins the balance, the band/spread flags, and error seams", () => {
+  const r = _v386({ t_ra_f: 75, t_ma_f: 68, t_oa_f: 40 });
+  assert.ok(Math.abs(r.pct_oa - 20.0) < 1e-9);
+  assert.strictEqual(r.low_spread, false);
+  // A further-open damper reads a higher percentage.
+  const more = _v386({ t_ra_f: 75, t_ma_f: 63, t_oa_f: 40 });
+  assert.ok(Math.abs(more.pct_oa - 100 * 12 / 35) < 1e-9 && more.pct_oa > r.pct_oa);
+  // A small spread is flagged (still returns a number).
+  const tight = _v386({ t_ra_f: 75, t_ma_f: 73, t_oa_f: 68 });
+  assert.ok(tight.low_spread === true && Number.isFinite(tight.pct_oa));
+  // Error seams: MA outside the band, equal return/outdoor, non-finite.
+  assert.ok("error" in _v386({ t_ra_f: 75, t_ma_f: 30, t_oa_f: 40 })); // below the band
+  assert.ok("error" in _v386({ t_ra_f: 75, t_ma_f: 80, t_oa_f: 40 })); // above the band
+  assert.ok("error" in _v386({ t_ra_f: 75, t_ma_f: 68, t_oa_f: 75 })); // zero denominator
+  assert.ok("error" in _v386({ t_ra_f: Infinity, t_ma_f: 68, t_oa_f: 40 }));
 });

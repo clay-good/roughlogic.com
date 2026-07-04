@@ -1,6 +1,6 @@
 # roughlogic.com Specification v384 -- Fan Affinity Laws (Speed / Diameter Change) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an HVAC airflow field-methods trio (v384 fan laws -> v385 pitot traverse
+> **Status: LANDED (2026-07-03, 0.135.0; proposed 2026-07-03). First tile of an HVAC airflow field-methods trio (v384 fan laws -> v385 pitot traverse
 > CFM -> v386 measured percent outside air). `fan-motor-bhp` gives one operating-point horsepower; this tile scales the whole
 > fan curve when the speed or wheel diameter changes -- the number a tech needs before slowing a fan on a VFD or swapping a
 > sheave.**

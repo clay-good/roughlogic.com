@@ -1,6 +1,6 @@
 # roughlogic.com Specification v386 -- Measured Outside-Air Percent from Mixed-Air Temperatures (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the HVAC airflow field-methods trio (v384 fan laws -> v385 pitot
+> **Status: LANDED (2026-07-03, 0.135.0; proposed 2026-07-03). Third and final tile of the HVAC airflow field-methods trio (v384 fan laws -> v385 pitot
 > traverse CFM -> v386 measured percent outside air). `outdoor-air-mix` predicts the mixed-air state when you already know
 > the outside-air fraction; this tile does the inverse a commissioning tech actually needs -- it backs the outside-air
 > percent out of three measured temperatures.**

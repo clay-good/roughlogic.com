@@ -122,3 +122,47 @@ export function renderRefrigerantVelocity(inputRegion, outputRegion, citationEl)
   for (const f of [mf.input, id.input, sv.input, orient.select]) f.addEventListener("input", update);
 }
 VELOCITY_RENDERERS["refrigerant-velocity"] = renderRefrigerantVelocity;
+
+// ===================== spec-v385: pitot traverse airflow (HVAC airflow field-methods trio) =====================
+
+// dims: in { vp_avg_inwc: dimensionless, w_in: L, h_in: L } out: { v_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1 }
+export function computePitotTraverseCfm({ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}) {
+  const vp = Number(vp_avg_inwc) || 0;
+  const w = Number(w_in) || 0;
+  const h = Number(h_in) || 0;
+  if (!(vp > 0 && Number.isFinite(vp))) return { error: "Average velocity pressure must be positive (in. w.c.)." };
+  if (!(w > 0 && Number.isFinite(w))) return { error: "Duct width must be positive (in)." };
+  if (!(h > 0 && Number.isFinite(h))) return { error: "Duct height must be positive (in)." };
+  const v_fpm = 4005 * Math.sqrt(vp);
+  const area_ft2 = (w * h) / 144;
+  const cfm = v_fpm * area_ft2;
+  return { v_fpm, area_ft2, cfm };
+}
+
+export const pitotTraverseCfmExample = { inputs: { vp_avg_inwc: 0.15, w_in: 24, h_in: 12 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderPitotTraverseCfm(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Pitot-tube traverse airflow (ASHRAE Fundamentals / AABC-NEBB field practice): velocity V = 4005 x sqrt(VP) for standard air (0.075 lb/ft^3, sea level) from the traverse-average velocity pressure, then CFM = V x duct area. Average the velocity pressures across the equal-area traverse points (root-mean-square of the VP readings is more exact); apply a density correction at altitude or high temperature. A field measurement, not a substitute for a calibrated flow station.";
+  const vp = _v23h_makeNumber("Average velocity pressure (in. w.c.)", "ptc-vp", { step: "any", min: "0" });
+  vp.input.value = "0.15";
+  const w = _v23h_makeNumber("Duct width (in)", "ptc-w", { step: "any", min: "0" });
+  w.input.value = "24";
+  const h = _v23h_makeNumber("Duct height (in)", "ptc-h", { step: "any", min: "0" });
+  h.input.value = "12";
+  for (const f of [vp, w, h]) inputRegion.appendChild(f.wrap);
+  _v23h_attachEx(inputRegion, () => { vp.input.value = "0.15"; w.input.value = "24"; h.input.value = "12"; update(); });
+  const oVel = _v23h_makeOut(outputRegion, "Traverse velocity", "ptc-out-v");
+  const oArea = _v23h_makeOut(outputRegion, "Duct area", "ptc-out-a");
+  const oCfm = _v23h_makeOut(outputRegion, "Airflow", "ptc-out-cfm");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = _v23h_debounce(() => {
+    const r = computePitotTraverseCfm({ vp_avg_inwc: readNum(vp.input), w_in: readNum(w.input), h_in: readNum(h.input) });
+    if (r.error) { oVel.textContent = r.error; oArea.textContent = ""; oCfm.textContent = ""; return; }
+    oVel.textContent = _v23h_fmt(r.v_fpm, 0) + " fpm";
+    oArea.textContent = _v23h_fmt(r.area_ft2, 2) + " ft^2";
+    oCfm.textContent = _v23h_fmt(r.cfm, 0) + " CFM";
+  }, _V23H_DEB);
+  for (const f of [vp.input, w.input, h.input]) f.addEventListener("input", update);
+}
+VELOCITY_RENDERERS["pitot-traverse-cfm"] = renderPitotTraverseCfm;

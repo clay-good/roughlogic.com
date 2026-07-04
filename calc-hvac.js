@@ -3734,3 +3734,41 @@ HVAC_RENDERERS["coil-bypass-factor"] = _rEnv({
   ],
   compute: computeCoilBypassFactor,
 });
+
+// ===================== spec-v384: fan affinity laws (HVAC airflow field-methods trio) =====================
+
+// dims: in { q1_cfm: L^3 T^-1, sp1_inwg: dimensionless, bhp1_hp: dimensionless, n1: T^-1, n2: T^-1 } out: { r: dimensionless, q2_cfm: L^3 T^-1, sp2_inwg: dimensionless, bhp2_hp: dimensionless }
+export function computeFanAffinityLaws({ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const N1 = Number(n1) || 0, N2 = Number(n2) || 0;
+  if (!(N1 > 0)) return { error: "Baseline speed N1 must be positive (rpm)." };
+  if (!(N2 > 0)) return { error: "New speed N2 must be positive (rpm)." };
+  const r = N2 / N1;
+  const q2_cfm = (Number(q1_cfm) || 0) * r;
+  const sp2_inwg = (Number(sp1_inwg) || 0) * r * r;
+  const bhp2_hp = (Number(bhp1_hp) || 0) * r * r * r;
+  return {
+    r, q2_cfm, sp2_inwg, bhp2_hp,
+    note: "Fan affinity laws for a fixed fan changing speed: airflow scales with speed (Q2 = Q1 r), static pressure with the square (SP2 = SP1 r^2), and brake horsepower with the cube (BHP2 = BHP1 r^3), where r = N2/N1. The cube law is why a small speed cut saves large power (a 25% slowdown cuts power ~58%), the core of VFD energy savings. Valid for the same fan on its system curve; it does not account for motor/drive efficiency shifts, belt losses, or a changed system curve. A field aid; the fan curve and equipment ratings govern.",
+  };
+}
+const fanAffinityLawsExample = { inputs: { q1_cfm: 10000, sp1_inwg: 1.0, bhp1_hp: 5.0, n1: 900, n2: 1200 } };
+HVAC_RENDERERS["fan-affinity-laws"] = _rEnv({
+  citation: "Citation: Fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) for a fixed fan at a changed speed: Q2 = Q1 (N2/N1), SP2 = SP1 (N2/N1)^2, BHP2 = BHP1 (N2/N1)^3. The cube-law power relation is the basis of VFD energy savings. Valid for the same fan on the same system curve; it does not capture motor/drive efficiency changes or a shifted system curve. A field aid; the fan curve and equipment ratings govern.",
+  example: fanAffinityLawsExample.inputs,
+  fields: [
+    { key: "q1_cfm", label: "Baseline airflow Q1 (cfm)", kind: "number", default: 10000 },
+    { key: "sp1_inwg", label: "Baseline static pressure SP1 (in wg)", kind: "number", default: 1.0 },
+    { key: "bhp1_hp", label: "Baseline brake horsepower BHP1 (hp)", kind: "number", default: 5.0 },
+    { key: "n1", label: "Baseline speed N1 (rpm)", kind: "number", default: 900 },
+    { key: "n2", label: "New speed N2 (rpm)", kind: "number", default: 1200 },
+  ],
+  outputs: [
+    { key: "r", id: "fal-out-r", label: "Speed ratio r = N2/N1", value: (r) => fmt(r.r, 4) },
+    { key: "q", id: "fal-out-q", label: "New airflow Q2 = Q1 r", value: (r) => fmt(r.q2_cfm, 0) + " cfm" },
+    { key: "sp", id: "fal-out-sp", label: "New static SP2 = SP1 r^2", value: (r) => fmt(r.sp2_inwg, 2) + " in wg" },
+    { key: "bhp", id: "fal-out-bhp", label: "New power BHP2 = BHP1 r^3", value: (r) => fmt(r.bhp2_hp, 2) + " hp" },
+    { key: "n", id: "fal-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFanAffinityLaws,
+});

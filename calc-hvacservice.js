@@ -563,3 +563,36 @@ HVACSERVICE_RENDERERS["infiltration-load"] = _simpleRenderer({
   ],
   compute: computeInfiltrationLoad,
 });
+
+// ===================== spec-v386: measured outside-air percent from mixed-air temperatures =====================
+
+// dims: in { t_ra_f: T, t_ma_f: T, t_oa_f: T } out: { pct_oa: dimensionless }
+export function computeOutsideAirPercentTemps({ t_ra_f = 0, t_ma_f = 0, t_oa_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ra = Number(t_ra_f), ma = Number(t_ma_f), oa = Number(t_oa_f);
+  if (ra === oa) return { error: "Return and outdoor temperatures must differ (zero denominator)." };
+  const lo = Math.min(ra, oa), hi = Math.max(ra, oa);
+  if (ma < lo || ma > hi) return { error: "Mixed-air temperature is outside the return/outdoor band -- check the sensor or the reading." };
+  const pct_oa = 100 * (ra - ma) / (ra - oa);
+  const low_spread = Math.abs(ra - oa) < 10;
+  return {
+    pct_oa, low_spread,
+    note: "Measured outside-air fraction from a mixed-air temperature balance: %OA = 100 (T_ra - T_ma) / (T_ra - T_oa). The mixed-air temperature is the flow-weighted blend of return and outside air, so its position between the two reads the damper's actual outside-air fraction - the field check against the design minimum ventilation. Use well-mixed, shielded dry-bulb readings; a return-to-outdoor spread under about 10 F makes the result sensitive to sensor error. A field aid; a direct airflow measurement is more reliable.",
+  };
+}
+const outsideAirPercentTempsExample = { inputs: { t_ra_f: 75, t_ma_f: 68, t_oa_f: 40 } };
+HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
+  citation: "Citation: The mixed-air temperature balance %OA = 100 (T_ra - T_ma) / (T_ra - T_oa) (ASHRAE / AABC-NEBB field practice), the standard field check of the outside-air damper fraction against the design minimum. Needs well-mixed, shielded dry-bulb readings; a small return-to-outdoor spread (under ~10 F) makes it sensitive to sensor error. A field aid, not a substitute for a direct airflow measurement.",
+  example: outsideAirPercentTempsExample.inputs,
+  fields: [
+    { key: "t_ra_f", label: "Return-air temperature T_ra (F)", kind: "number", default: 75 },
+    { key: "t_ma_f", label: "Mixed-air temperature T_ma (F)", kind: "number", default: 68 },
+    { key: "t_oa_f", label: "Outdoor-air temperature T_oa (F)", kind: "number", default: 40 },
+  ],
+  outputs: [
+    { key: "pct", id: "oapt-out-pct", label: "Outside-air fraction", value: (r) => fmt(r.pct_oa, 1) + "% OA" },
+    { key: "rel", id: "oapt-out-rel", label: "Reliability", value: (r) => r.low_spread ? "LOW SPREAD (< 10 F return-to-outdoor; sensitive to sensor error)" : "adequate temperature spread" },
+    { key: "n", id: "oapt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeOutsideAirPercentTemps,
+});

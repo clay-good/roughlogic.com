@@ -250,6 +250,7 @@ const TOOL_MODULES = (() => {
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
     "moist-air-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
+    "fan-affinity-laws",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,
@@ -284,7 +285,7 @@ const TOOL_MODULES = (() => {
   // module) into calc-velocity.js. They keep group: "C" (group letter
   // independent of module, the v42/v70/v71/v72/v73 precedent).
   declare("./calc-velocity.js", "VELOCITY_RENDERERS", [
-    "duct-velocity-pressure", "refrigerant-velocity",
+    "duct-velocity-pressure", "refrigerant-velocity", "pitot-traverse-cfm",
   ]);
   declare("./calc-restoration.js", "RESTORATION_RENDERERS", [
     "psychrometric", "drying-goal", "dehumidifier", "air-movers",
@@ -418,7 +419,7 @@ const TOOL_MODULES = (() => {
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".
   declare("./calc-hvacservice.js", "HVACSERVICE_RENDERERS", [
-    "condensate-drain", "recovery-cylinder",
+    "condensate-drain", "recovery-cylinder", "outside-air-percent-temps",
     // spec-v104 electrical-side field-service diagnostics (same module).
     "hvac-equipment-circuit", "run-capacitor-microfarad",
     // spec-v105 evacuation/leak-check field diagnostics (same module).

@@ -1940,6 +1940,7 @@ cross-check.
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeErvSensibleRecovery` | `{ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
+| calc-hvac.js | `computeFanAffinityLaws` | `{ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
 | calc-hvac.js | `computeGrilleFaceVelocity` | `{ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}` | _ | _ | _ |
@@ -1990,6 +1991,7 @@ cross-check.
 | calc-hvacservice.js | `computeHvacEquipmentCircuit` | `{ compressor_rla_A = 0, fan_fla_A = 0, other_load_A = 0, installed_breaker_A ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeInfiltrationLoad` | `{ cfm = 0, delta_t_f = 0, delta_gr = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeNitrogenPressureTest` | `{ start_psig = 0, start_temp_F = 0, end_temp_F = 0, end_psig = 0, atm_psi = 1...` | _ | _ | _ |
+| calc-hvacservice.js | `computeOutsideAirPercentTemps` | `{ t_ra_f = 0, t_ma_f = 0, t_oa_f = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeRecoveryCylinder` | `{ water_capacity_lb = 0, refrig_density_lb_gal = 0, current_net_lb = 0, fill_...` | _ | _ | _ |
 | calc-hvacservice.js | `computeRunCapacitorMicrofarad` | `{ rated_uf = 0, measured_volts_V = 0, measured_amps_A = 0, tolerance_pct = 6 ...` | _ | _ | _ |
 | calc-hvacservice.js | `computeVacuumDecayTest` | `{ start_micron = 0, end_micron = 0, hold_min = 0, pass_ceiling_micron = 500 }...` | _ | _ | _ |
@@ -2452,8 +2454,10 @@ cross-check.
 | calc-trucking.js | `computeTireLoadCheck` | `{ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `renderStoppingSightDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computePitotTraverseCfm` | `{ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-velocity.js | `renderPitotTraverseCfm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
@@ -2509,7 +2513,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1095.
+Row count: 1099.
 
 <!-- END function-corpus-v14 -->
 
@@ -2788,7 +2792,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (88 tiles)
+### Group C HVAC (91 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2834,6 +2838,7 @@ per spec-v14 §13.1 second paragraph.
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `erv-sensible-recovery` | ERV/HRV Sensible Effectiveness and Recovered Load | ASHRAE Standard 84 / AHRI Standard 10...; spec-v275 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `evaporative-cooling` | Latent Heat Evaporative Cooling | Project (first-principles); Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fan-affinity-laws` | Fan Affinity Laws (Speed / Diameter Change) | AMCA / ASHRAE Fundamentals; spec-v384 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fan-motor-bhp` | Fan Brake Horsepower | AMCA / ASHRAE fan-power relation + NE...; 4000 CFM, 2.0 in w.c., eta_fan 0.65 -> BHP ~1.94 -> 2 HP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-pressure-drop` | Filter Pressure Drop and Fan-Energy Penalty | ASHRAE / manufacturer cut sheets; airflow = 4*300 = 1200 CFM; clean 0.35 / change-out 0.70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `furnace-temp-rise` | Furnace Temperature Rise and Derived Airflow | First-principles sensible-heat relati...; spec-v110 section 2.2 pinned example (70->120 F, 100k inp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2859,7 +2864,9 @@ per spec-v14 §13.1 second paragraph.
 | `npsh-a` | Pump NPSH Available | Hydraulic Institute / centrifugal-pum...; 70 F water / 14.7 psi atm / 8 ft suction lift / 2 ft fric... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `outdoor-air-mix` | Outdoor Air Mix | ASHRAE Handbook (Fundamentals); Return 75 F / 50% RH, outdoor 95 F / 60% RH, OA fraction ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `outdoor-air-ventilation` | ASHRAE 62.1 Outdoor-Air Ventilation | ASHRAE; Vbz = Rp*Pz + Ra*Az; Voz = Vbz / E_z | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `outside-air-percent-temps` | Measured Outside-Air Percent from Mixed-Air Temperatures | ASHRAE / AABC-NEBB; spec-v386 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-heat-loss-radial` | Insulated Pipe Heat Loss (Radial) | Fourier cylindrical-shell conduction ...; r1=1 in, r2=2 in, k=0.25, 200 vs 70 F -> ~24.55 BTU/hr-ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pump-specific-speed` | Pump Specific Speed and Impeller Type | Hydraulic Institute specific speed; spec-v307 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `recovery-cylinder` | Recovery-Cylinder 80% Fill | DOT / AHRI 700 / EPA Section 608 reco...; spec-v102 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `refrigerant-charge` | Refrigerant Charge Weighing | Chemours / Honeywell published refrig...; R-410A / 25 ft of 3/8 in + 5 ft of 1/2 in -> 15 + 4.75 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3547,6 +3554,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 852. Fixture-covered or reference-cadence: 852 / 852.
+Tile count: 855. Fixture-covered or reference-cadence: 855 / 855.
 
 <!-- END tile-index-v14 -->

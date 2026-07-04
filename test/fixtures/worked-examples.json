@@ -30221,6 +30221,90 @@
       }
     },
     {
+      "tile_id": "fan-affinity-laws",
+      "source_publisher": "AMCA / ASHRAE Fundamentals",
+      "source_title": "10,000 CFM / 1.0 in wg / 5.0 BHP, 900 -> 1200 rpm -> 13,333 CFM, 1.78 in wg, 11.85 BHP",
+      "source_edition_or_year": "spec-v384 worked example (machine-verified)",
+      "source_section_or_page": "spec-v384 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "q1_cfm": 10000, "sp1_inwg": 1.0, "bhp1_hp": 5.0, "n1": 900, "n2": 1200 },
+      "outputs": {
+        "r": { "value": 1.3333, "tolerance": { "pct": 0.5 } },
+        "q2_cfm": { "value": 13333, "tolerance": { "pct": 0.5 } },
+        "sp2_inwg": { "value": 1.778, "tolerance": { "pct": 0.5 } },
+        "bhp2_hp": { "value": 11.85, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "fan-affinity-laws",
+      "source_publisher": "AMCA / ASHRAE Fundamentals",
+      "source_title": "cross-check: slow the same fan to r 0.75 -> BHP 2.11 (a 58% power cut for a 25% slowdown)",
+      "source_edition_or_year": "spec-v384 worked example (machine-verified)",
+      "source_section_or_page": "spec-v384 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "q1_cfm": 10000, "sp1_inwg": 1.0, "bhp1_hp": 5.0, "n1": 900, "n2": 675 },
+      "outputs": {
+        "bhp2_hp": { "value": 2.109, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "pitot-traverse-cfm",
+      "source_publisher": "ASHRAE Fundamentals / AABC-NEBB",
+      "source_title": "0.15 in wc, 24 x 12 in duct -> 1551 fpm, 2.0 ft^2, 3102 CFM",
+      "source_edition_or_year": "spec-v385 worked example (machine-verified)",
+      "source_section_or_page": "spec-v385 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "vp_avg_inwc": 0.15, "w_in": 24, "h_in": 12 },
+      "outputs": {
+        "v_fpm": { "value": 1551, "tolerance": { "pct": 0.5 } },
+        "area_ft2": { "value": 2.0, "tolerance": { "pct": 0.5 } },
+        "cfm": { "value": 3102, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "pitot-traverse-cfm",
+      "source_publisher": "ASHRAE Fundamentals / AABC-NEBB",
+      "source_title": "cross-check: a lighter 0.05 in wc in the same duct -> 896 fpm, 1792 CFM",
+      "source_edition_or_year": "spec-v385 worked example (machine-verified)",
+      "source_section_or_page": "spec-v385 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "vp_avg_inwc": 0.05, "w_in": 24, "h_in": 12 },
+      "outputs": {
+        "v_fpm": { "value": 895.6, "tolerance": { "pct": 0.5 } },
+        "cfm": { "value": 1791, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "outside-air-percent-temps",
+      "source_publisher": "ASHRAE / AABC-NEBB",
+      "source_title": "RA 75, MA 68, OA 40 F -> 20.0% outside air",
+      "source_edition_or_year": "spec-v386 worked example (machine-verified)",
+      "source_section_or_page": "spec-v386 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_ra_f": 75, "t_ma_f": 68, "t_oa_f": 40 },
+      "outputs": {
+        "pct_oa": { "value": 20.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "outside-air-percent-temps",
+      "source_publisher": "ASHRAE / AABC-NEBB",
+      "source_title": "cross-check: the damper opens further (MA 63 F) -> 34.3% outside air",
+      "source_edition_or_year": "spec-v386 worked example (machine-verified)",
+      "source_section_or_page": "spec-v386 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_ra_f": 75, "t_ma_f": 63, "t_oa_f": 40 },
+      "outputs": {
+        "pct_oa": { "value": 34.29, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "pv-cell-temperature-power",
       "source_publisher": "PV design practice / NREL",
       "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",

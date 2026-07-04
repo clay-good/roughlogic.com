@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v384..v386 -- 3 HVAC airflow field-methods tiles; 852 -> 855 tiles, 0.135.0, 2026-07-03
+
+The HVAC airflow field-methods trio, fourth batch of the v375-v474 campaign: the three numbers a balancer actually reads in the field, spread across their natural modules (all Group C); no new module, group, or dependency. Catalog **852 -> 855**, package **0.134.0 -> 0.135.0** (a minor). Proposed 2026-07-03.
+
+- **`fan-affinity-laws` (spec-v384, calc-hvac.js).** For a fixed fan changing speed: Q2 = Q1 r, SP2 = SP1 r^2, BHP2 = BHP1 r^3. Pinned: 10,000 CFM / 1.0 in wg / 5.0 BHP from 900 to 1200 rpm -> 13,333 CFM, 1.78 in wg, 11.85 BHP; slowing to r 0.75 cuts power 58% (the VFD payback in one line).
+- **`pitot-traverse-cfm` (spec-v385, calc-velocity.js).** V = 4005 sqrt(VP_avg), CFM = V x area. Pinned: 0.15 in wc in a 24x12 duct -> 1551 fpm, 2.0 ft^2, 3102 CFM; a lighter 0.05 in wc -> 896 fpm (the square-root relation).
+- **`outside-air-percent-temps` (spec-v386, calc-hvacservice.js).** %OA = 100 (T_ra - T_ma) / (T_ra - T_oa). Pinned: RA 75, MA 68, OA 40 F -> 20.0% OA; the damper opening to MA 63 F -> 34.3%. A mixed-air temperature outside the return/outdoor band flags a sensor fault; a spread under 10 F warns of low reliability.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the cube law, the square-root velocity relation, the temperature balance and its band/spread flags, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the AMCA/ASHRAE fan laws, the ASHRAE/AABC-NEBB Pitot-traverse method, and the mixed-air temperature balance. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (fan-affinity via `_rEnv`, pitot-traverse hand-written, outside-air via `_simpleRenderer`). Module cap bumped with a dated comment: calc-hvacservice.js 13000 -> 15500. Housekeeping: home count 852 -> 855, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 67 appended. All gates green at the new state: lint, unit tests (**5,148**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(construction): land spec-v381..v383 -- 3 seismic-parameters tiles in calc-construction.js; 849 -> 852 tiles, 0.134.0, 2026-07-03
 
 The seismic-parameters trio, third batch of the v375-v474 campaign: the ASCE 7-22 Chapter 11/12 numbers that turn the mapped hazard into design accelerations, a drift check, and a stability check, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **849 -> 852**, package **0.133.0 -> 0.134.0** (a minor). Proposed 2026-07-03.
