@@ -15611,3 +15611,53 @@ test("bounds: spec-v401 computeSpurGearGeometry pins the tooth proportions, cent
   assert.ok("error" in _v401({ diametral_pitch: 10, teeth: 0 }));
   assert.ok("error" in _v401({ diametral_pitch: Infinity, teeth: 40 }));
 });
+
+// ===================== spec-v402..v404 real-estate-investing trio (calc-realestate.js) =====================
+import { computeFixFlipProfit as _v402, computeBrrrrRefi as _v403, computeRentalTotalReturn as _v404 } from "../../calc-realestate.js";
+
+test("bounds: spec-v402 computeFixFlipProfit pins all-in, profit, ROI, and error seams", () => {
+  const r = _v402({ arv_usd: 300000, purchase_usd: 180000, rehab_usd: 40000, holding_usd: 8000, financing_usd: 12000, selling_pct: 6, cash_invested_usd: 114000, hold_months: 6 });
+  assert.ok(Math.abs(r.selling_usd - 18000) < 1e-6);
+  assert.ok(Math.abs(r.all_in_usd - 258000) < 1e-6);
+  assert.ok(Math.abs(r.profit_usd - 42000) < 1e-6);
+  assert.ok(Math.abs(r.roi - 42000 / 114000) < 1e-9);
+  assert.ok(Math.abs(r.annual_roi - r.roi * 2) < 1e-9); // 6-month hold doubles
+  // A higher purchase thins the deal.
+  const thin = _v402({ arv_usd: 300000, purchase_usd: 210000, rehab_usd: 40000, holding_usd: 8000, financing_usd: 12000, selling_pct: 6, cash_invested_usd: 114000, hold_months: 6 });
+  assert.ok(Math.abs(thin.profit_usd - 12000) < 1e-6 && thin.profit_usd < r.profit_usd);
+  // Error seams.
+  assert.ok("error" in _v402({ arv_usd: 0, cash_invested_usd: 114000, hold_months: 6 }));
+  assert.ok("error" in _v402({ arv_usd: 300000, cash_invested_usd: 0, hold_months: 6 }));
+  assert.ok("error" in _v402({ arv_usd: 300000, cash_invested_usd: 114000, hold_months: 0 }));
+  assert.ok("error" in _v402({ arv_usd: Infinity, cash_invested_usd: 114000, hold_months: 6 }));
+});
+
+test("bounds: spec-v403 computeBrrrrRefi pins the loan, capital recovery, CoC, and error seams", () => {
+  const r = _v403({ arv_usd: 200000, total_invested_usd: 140000, refi_ltv_pct: 75, existing_payoff_usd: 0, annual_cash_flow_usd: 0 });
+  assert.ok(Math.abs(r.new_loan_usd - 150000) < 1e-6);
+  assert.ok(Math.abs(r.cash_returned_usd - 150000) < 1e-6);
+  assert.ok(Math.abs(r.capital_left_usd + 10000) < 1e-6);
+  assert.ok(r.all_recovered === true && r.coc === null); // no Infinity leaks
+  // Some capital stays -> a finite cash-on-cash.
+  const some = _v403({ arv_usd: 200000, total_invested_usd: 160000, refi_ltv_pct: 75, existing_payoff_usd: 0, annual_cash_flow_usd: 2400 });
+  assert.ok(Math.abs(some.capital_left_usd - 10000) < 1e-6 && Math.abs(some.coc - 0.24) < 1e-9 && some.all_recovered === false);
+  // Error seams.
+  assert.ok("error" in _v403({ arv_usd: 0, total_invested_usd: 140000, refi_ltv_pct: 75 }));
+  assert.ok("error" in _v403({ arv_usd: 200000, total_invested_usd: 0, refi_ltv_pct: 75 }));
+  assert.ok("error" in _v403({ arv_usd: 200000, total_invested_usd: 140000, refi_ltv_pct: 150 }));
+  assert.ok("error" in _v403({ arv_usd: 200000, total_invested_usd: 140000, refi_ltv_pct: 0 }));
+  assert.ok("error" in _v403({ arv_usd: Infinity, total_invested_usd: 140000, refi_ltv_pct: 75 }));
+});
+
+test("bounds: spec-v404 computeRentalTotalReturn pins the four-component sum and error seams", () => {
+  const r = _v404({ cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 7500, tax_savings_usd: 1500 });
+  assert.ok(Math.abs(r.total_usd - 14500) < 1e-6);
+  assert.ok(Math.abs(r.total_pct - 0.29) < 1e-9);
+  assert.ok(Math.abs(r.cf_pct - 0.06) < 1e-9 && Math.abs(r.appr_pct - 0.15) < 1e-9);
+  // Zeroing appreciation still leaves the paydown + tax shield.
+  const flat = _v404({ cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 0, tax_savings_usd: 1500 });
+  assert.ok(Math.abs(flat.total_usd - 7000) < 1e-6 && flat.total_pct < r.total_pct);
+  // Error seams.
+  assert.ok("error" in _v404({ cash_invested_usd: 0, annual_cash_flow_usd: 3000 }));
+  assert.ok("error" in _v404({ cash_invested_usd: Infinity, annual_cash_flow_usd: 3000 }));
+});

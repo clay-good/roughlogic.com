@@ -1,6 +1,6 @@
 # roughlogic.com Specification v402 -- Fix-and-Flip Profit and Return (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a real-estate-investing trio (v402 fix-and-flip profit -> v403 BRRRR refi
+> **Status: LANDED (2026-07-04, 0.141.0; proposed 2026-07-03). First tile of a real-estate-investing trio (v402 fix-and-flip profit -> v403 BRRRR refi
 > -> v404 rental total return). `max-offer-70-rule` gives the offer price for a flip; this tile runs the deal that follows --
 > the full profit waterfall from purchase through rehab, holding, financing, and sale, with the return on cash.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A flip's profit is the after-repair value less every

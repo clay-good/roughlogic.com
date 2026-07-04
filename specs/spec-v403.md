@@ -1,6 +1,6 @@
 # roughlogic.com Specification v403 -- BRRRR Cash-Out Refinance and Capital Left In (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the real-estate-investing trio (v402 fix-and-flip -> v403 BRRRR refi ->
+> **Status: LANDED (2026-07-04, 0.141.0; proposed 2026-07-03). Second tile of the real-estate-investing trio (v402 fix-and-flip -> v403 BRRRR refi ->
 > v404 rental total return). The flip's buy-and-hold cousin: instead of selling, the investor refinances at the after-repair
 > value, pulls cash back out, and keeps the property as a rental. This tile computes how much cash the refi returns and how
 > much stays trapped in the deal.**

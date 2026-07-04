@@ -2194,6 +2194,7 @@ cross-check.
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
 | calc-realestate.js | `computeBreakEvenOccupancy` | `{ opex = 0, debt_svc = 0, pgi = 0, target_occ = 0 } = {}` | _ | _ | _ |
+| calc-realestate.js | `computeBrrrrRefi` | `{ arv_usd = 0, total_invested_usd = 0, refi_ltv_pct = 75, existing_payoff_usd...` | _ | _ | _ |
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |
 | calc-realestate.js | `computeCashOnCash` | `{ cash_invested, annual_pretax_cashflow }` | _ | _ | _ |
 | calc-realestate.js | `computeClosingCosts` | `{ purchase_price, loan_amount, transfer_tax_rate_pct, note_rate_pct }` | _ | _ | _ |
@@ -2202,6 +2203,7 @@ cross-check.
 | calc-realestate.js | `computeDTI` | `{ gross_monthly_income, housing_payment, other_monthly_debts }` | _ | _ | _ |
 | calc-realestate.js | `computeDebtYield` | `{ mode = "yield", noi = 0, loan = 0, dy_target = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeDepreciationRecapture` | `{ asset_class = "1250", accumulated_depreciation = 0, total_gain = 0, ordinar...` | _ | _ | _ |
+| calc-realestate.js | `computeFixFlipProfit` | `{ arv_usd = 0, purchase_usd = 0, rehab_usd = 0, holding_usd = 0, financing_us...` | _ | _ | _ |
 | calc-realestate.js | `computeGrossRentMultiplier` | `{ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeHudFmr` | `input` | _ | _ | _ |
 | calc-realestate.js | `computeLTV` | `{ loan_amount, value }` | _ | _ | _ |
@@ -2215,6 +2217,7 @@ cross-check.
 | calc-realestate.js | `computePropertyTax` | `{ assessed_value, mill_rate, homestead_exemption }` | _ | _ | _ |
 | calc-realestate.js | `computeRentRollVacancy` | `{ potential_gross_rent = 0, vacancy_rate_pct = 0, credit_loss_pct = 0, other_...` | _ | _ | _ |
 | calc-realestate.js | `computeRentVsBuy` | `inp` | _ | _ | _ |
+| calc-realestate.js | `computeRentalTotalReturn` | `{ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0,...` | _ | _ | _ |
 | calc-realestate.js | `computeRentalWorksheet` | `inputs` | _ | _ | _ |
 | calc-realestate.js | `computeSection121` | `{ filing_status, sale_price, selling_costs, purchase_price, improvements, mee...` | _ | _ | _ |
 | calc-realestate.js | `computeSellerNetSheet` | `{ price = 0, payoff = 0, commission_pct = 0, transfer_tax_pct = 0, fees = 0, ...` | _ | _ | _ |
@@ -2528,7 +2531,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1114.
+Row count: 1117.
 
 <!-- END function-corpus-v14 -->
 
@@ -3505,12 +3508,13 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (27 tiles)
+### Group X Real Estate (30 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `amortization-schedule` | Full Amortization Schedule | Standard mortgage amortization (public); Worked example: $320,000 at 6.5% for 30 yr -> P&I $2022.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `break-even-occupancy` | Break-Even Occupancy | CRE underwriting; spec-v345 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `brrrr-refi` | BRRRR Cash-Out Refinance and Capital Left In | real-estate-investing practice; spec-v403 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cap-rate-dscr` | Cap Rate and DSCR | Standard CRE underwriting ratios (pub...; Worked example: NOI $84,000 / value $1.2M -> 7.0%; debt s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cash-on-cash` | Cash-on-Cash Return | Standard rental-RE investor practice ...; Worked example: $75,000 invested + $6,750 annual cash flo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `closing-costs` | Closing-Cost Estimator (CFPB Line Items) | CFPB Closing Disclosure (12 CFR Part ...; Worked example: $400k purchase / $320k loan / 0.4% transf... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3520,6 +3524,7 @@ per spec-v14 §13.1 second paragraph.
 | `depreciation-recapture` | Depreciation Recapture on Sale | IRS Pub 544 / IRC §1245 / §1250; $100k accum SL, $150k gain -> $100k recaptured at 25% = $... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dti` | Debt-to-Income (DTI) | FNMA / FHA / VA underwriting guidelin...; Worked example: $7500/mo income, $2100 housing, $600 othe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `exchange-1031-timeline` | IRC §1031 Exchange Timeline | 26 USC 1031 / Treas. Reg. 1.1031(k)-1...; Worked example: sale-close 2026-03-01 -> identification 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fix-flip-profit` | Fix-and-Flip Profit and Return | real-estate-investing practice; spec-v402 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gross-rent-multiplier` | Gross Rent Multiplier | Appraisal Institute income-approach (...; $300,000 / $36,000 annual -> GRM 8.33, yield 12% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hud-fmr` | HUD Fair Market Rents | HUD PD&R Fair Market Rents FY2026 (fe...; Worked example: San Francisco-Oakland-Berkeley HUD Metro ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-limits` | FHFA / FHA / VA Loan Limits by County | FHFA / HUD / VA (federal-published, 2...; Worked example: San Francisco, CA (FIPS 06075) returns th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3533,6 +3538,7 @@ per spec-v14 §13.1 second paragraph.
 | `property-tax` | Property Tax Estimator | Standard mill-rate convention; Worked example: assessed $400k, mill 15, exemption $25k -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rent-roll-vacancy` | Rent Roll to Effective Gross Income | Appraisal Institute (income approach); $120k PGR, 5% vac + 2% credit, $6k other -> $8.4k loss, $... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rent-vs-buy` | Rent vs Buy NPV Comparison | New York Times rent-vs-buy methodolog...; $400k / $80k down / 6.5% 30yr / tax 1.2% / ins 1800 / mai... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rental-total-return` | Rental Total Return (Four Components) | real-estate-investing practice; spec-v404 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seller-net-sheet` | Seller Net Proceeds Sheet | TILA-RESPA Closing Disclosure (12 CFR...; $400,000 sale, $250,000 payoff, 5.5% commission, 0.5% tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3584,6 +3590,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 870. Fixture-covered or reference-cadence: 870 / 870.
+Tile count: 873. Fixture-covered or reference-cadence: 873 / 873.
 
 <!-- END tile-index-v14 -->

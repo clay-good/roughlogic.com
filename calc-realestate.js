@@ -2636,3 +2636,145 @@ function renderMaxOffer70Rule(inputRegion, outputRegion, citationEl) {
   for (const el of [arv.input, rep.input, pct.input, fee.input]) el.addEventListener("input", update);
 }
 REALESTATE_RENDERERS["max-offer-70-rule"] = renderMaxOffer70Rule;
+
+// ===================== spec-v402..v404: real-estate-investing trio (Group X) =====================
+
+// dims: in { arv_usd: dimensionless, purchase_usd: dimensionless, rehab_usd: dimensionless, holding_usd: dimensionless, financing_usd: dimensionless, selling_pct: dimensionless, cash_invested_usd: dimensionless, hold_months: dimensionless } out: { selling_usd: dimensionless, all_in_usd: dimensionless, profit_usd: dimensionless, margin: dimensionless, roi: dimensionless, annual_roi: dimensionless }
+export function computeFixFlipProfit({ arv_usd = 0, purchase_usd = 0, rehab_usd = 0, holding_usd = 0, financing_usd = 0, selling_pct = 6, cash_invested_usd = 0, hold_months = 6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const arv = Number(arv_usd) || 0;
+  const cash = Number(cash_invested_usd) || 0;
+  const months = Number(hold_months) || 0;
+  if (!(arv > 0)) return { error: "After-repair value must be positive (USD)." };
+  if (!(cash > 0)) return { error: "Cash invested must be positive (USD)." };
+  if (!(months > 0)) return { error: "Hold period must be positive (months)." };
+  const selling_usd = arv * (Number(selling_pct) || 0) / 100;
+  const all_in_usd = (Number(purchase_usd) || 0) + (Number(rehab_usd) || 0) + (Number(holding_usd) || 0) + (Number(financing_usd) || 0) + selling_usd;
+  const profit_usd = arv - all_in_usd;
+  const margin = profit_usd / arv;
+  const roi = profit_usd / cash;
+  const annual_roi = roi * 12 / months;
+  return {
+    selling_usd, all_in_usd, profit_usd, margin, roi, annual_roi,
+    note: "Fix-and-flip profit: all-in cost = purchase + rehab + holding + financing + selling costs (selling = ARV x selling%), profit = ARV - all-in, and the returns are profit / ARV (margin), profit / cash invested (cash ROI), and that annualized over the hold. Flippers commonly target a 10-15%+ margin and a cash return that beats the risk; thin deals leave no room for an ARV miss or a rehab overrun. The ARV must come from real comps and the rehab from a real scope. A screening aid; the actual deal governs.",
+  };
+}
+export const fixFlipProfitExample = { inputs: { arv_usd: 300000, purchase_usd: 180000, rehab_usd: 40000, holding_usd: 8000, financing_usd: 12000, selling_pct: 6, cash_invested_usd: 114000, hold_months: 6 } };
+function renderFixFlipProfit(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fix-and-flip profit and return (real-estate investing practice): all-in = purchase + rehab + holding + financing + selling (selling = ARV x selling%), profit = ARV - all-in, margin = profit/ARV, cash ROI = profit/cash, annualized = ROI x 12/months. The ARV must come from real comparable sales and the rehab from a real scope. A screening aid; the actual deal governs.";
+  const arv = makeNumber("After-repair value ARV ($)", "ffp-arv", { step: "any", min: "0" }); arv.input.value = "300000";
+  const buy = makeNumber("Purchase price ($)", "ffp-buy", { step: "any", min: "0" }); buy.input.value = "180000";
+  const rehab = makeNumber("Rehab budget ($)", "ffp-rehab", { step: "any", min: "0" }); rehab.input.value = "40000";
+  const hold = makeNumber("Holding costs ($)", "ffp-hold", { step: "any", min: "0" }); hold.input.value = "8000";
+  const fin = makeNumber("Financing (points + interest, $)", "ffp-fin", { step: "any", min: "0" }); fin.input.value = "12000";
+  const sell = makeNumber("Selling cost (% of ARV)", "ffp-sell", { step: "any", min: "0" }); sell.input.value = "6";
+  const cash = makeNumber("Cash invested ($)", "ffp-cash", { step: "any", min: "0" }); cash.input.value = "114000";
+  const months = makeNumber("Hold period (months)", "ffp-mo", { step: "any", min: "0" }); months.input.value = "6";
+  for (const f of [arv, buy, rehab, hold, fin, sell, cash, months]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { arv.input.value = "300000"; buy.input.value = "180000"; rehab.input.value = "40000"; hold.input.value = "8000"; fin.input.value = "12000"; sell.input.value = "6"; cash.input.value = "114000"; months.input.value = "6"; update(); });
+  const oProfit = makeOutputLine(outputRegion, "Net profit (margin)", "ffp-out-profit");
+  const oAllIn = makeOutputLine(outputRegion, "All-in cost", "ffp-out-allin");
+  const oRoi = makeOutputLine(outputRegion, "Cash ROI (annualized)", "ffp-out-roi");
+  const oNote = makeOutputLine(outputRegion, "Note", "ffp-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFixFlipProfit({ arv_usd: readNum(arv.input), purchase_usd: readNum(buy.input), rehab_usd: readNum(rehab.input), holding_usd: readNum(hold.input), financing_usd: readNum(fin.input), selling_pct: readNum(sell.input), cash_invested_usd: readNum(cash.input), hold_months: readNum(months.input) });
+    if (r.error) { oProfit.textContent = r.error; oAllIn.textContent = "-"; oRoi.textContent = "-"; oNote.textContent = ""; return; }
+    oProfit.textContent = "$" + fmt(r.profit_usd, 0) + " (" + fmt(r.margin * 100, 1) + "% of ARV)";
+    oAllIn.textContent = "$" + fmt(r.all_in_usd, 0) + " (selling $" + fmt(r.selling_usd, 0) + ")";
+    oRoi.textContent = fmt(r.roi * 100, 1) + "% cash ROI, " + fmt(r.annual_roi * 100, 1) + "% annualized";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [arv, buy, rehab, hold, fin, sell, cash, months]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["fix-flip-profit"] = renderFixFlipProfit;
+
+// dims: in { arv_usd: dimensionless, total_invested_usd: dimensionless, refi_ltv_pct: dimensionless, existing_payoff_usd: dimensionless, annual_cash_flow_usd: dimensionless } out: { new_loan_usd: dimensionless, cash_returned_usd: dimensionless, capital_left_usd: dimensionless, coc: dimensionless }
+export function computeBrrrrRefi({ arv_usd = 0, total_invested_usd = 0, refi_ltv_pct = 75, existing_payoff_usd = 0, annual_cash_flow_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const arv = Number(arv_usd) || 0;
+  const invested = Number(total_invested_usd) || 0;
+  const ltv = Number(refi_ltv_pct) || 0;
+  const payoff = Number(existing_payoff_usd) || 0;
+  const cashflow = Number(annual_cash_flow_usd) || 0;
+  if (!(arv > 0)) return { error: "After-repair value must be positive (USD)." };
+  if (!(invested > 0)) return { error: "Total invested must be positive (USD)." };
+  if (!(ltv > 0 && ltv <= 100)) return { error: "Refinance LTV must be between 0 and 100%." };
+  if (payoff < 0) return { error: "Existing payoff must be non-negative (USD)." };
+  const new_loan_usd = arv * ltv / 100;
+  const cash_returned_usd = new_loan_usd - payoff;
+  const capital_left_usd = invested - cash_returned_usd;
+  const all_recovered = capital_left_usd <= 0;
+  const coc = all_recovered ? null : cashflow / capital_left_usd;
+  return {
+    new_loan_usd, cash_returned_usd, capital_left_usd, coc, all_recovered,
+    note: "BRRRR cash-out refinance: the new loan = ARV x refi LTV (commonly 70-75%), cash returned = new loan - any existing payoff, and the capital left in the deal = total invested - cash returned. When the cash-out covers everything the investor has recovered all capital (an infinite cash-on-cash return) and repeats with the same money; otherwise the post-refi cash-on-cash = annual cash flow / capital left. The appraised ARV and the lender's seasoning and LTV rules govern whether the numbers hold. A screening aid; the actual refinance terms govern.",
+  };
+}
+export const brrrrRefiExample = { inputs: { arv_usd: 200000, total_invested_usd: 140000, refi_ltv_pct: 75, existing_payoff_usd: 0, annual_cash_flow_usd: 0 } };
+function renderBrrrrRefi(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: BRRRR cash-out refinance (real-estate investing practice): new loan = ARV x refi LTV, cash returned = new loan - existing payoff, capital left = total invested - cash returned, post-refi cash-on-cash = annual cash flow / capital left (infinite when all capital is recovered). The appraised ARV and the lender's LTV/seasoning rules govern. A screening aid; the actual refinance terms govern.";
+  const arv = makeNumber("Appraised ARV ($)", "brr-arv", { step: "any", min: "0" }); arv.input.value = "200000";
+  const inv = makeNumber("Total invested ($)", "brr-inv", { step: "any", min: "0" }); inv.input.value = "140000";
+  const ltv = makeNumber("Refi LTV (%)", "brr-ltv", { step: "any", min: "0", max: "100" }); ltv.input.value = "75";
+  const payoff = makeNumber("Existing loan payoff ($, optional)", "brr-pay", { step: "any", min: "0" }); payoff.input.value = "0";
+  const cf = makeNumber("Annual cash flow after new payment ($, optional)", "brr-cf", { step: "any" }); cf.input.value = "0";
+  for (const f of [arv, inv, ltv, payoff, cf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { arv.input.value = "200000"; inv.input.value = "140000"; ltv.input.value = "75"; payoff.input.value = "0"; cf.input.value = "0"; update(); });
+  const oLoan = makeOutputLine(outputRegion, "New loan / cash returned", "brr-out-loan");
+  const oLeft = makeOutputLine(outputRegion, "Capital left in the deal", "brr-out-left");
+  const oCoc = makeOutputLine(outputRegion, "Post-refi cash-on-cash", "brr-out-coc");
+  const oNote = makeOutputLine(outputRegion, "Note", "brr-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBrrrrRefi({ arv_usd: readNum(arv.input), total_invested_usd: readNum(inv.input), refi_ltv_pct: readNum(ltv.input), existing_payoff_usd: readNum(payoff.input), annual_cash_flow_usd: readNum(cf.input) });
+    if (r.error) { oLoan.textContent = r.error; oLeft.textContent = "-"; oCoc.textContent = "-"; oNote.textContent = ""; return; }
+    oLoan.textContent = "$" + fmt(r.new_loan_usd, 0) + " / $" + fmt(r.cash_returned_usd, 0) + " returned";
+    oLeft.textContent = r.all_recovered ? "all capital recovered ($" + fmt(-r.capital_left_usd, 0) + " cash-out surplus)" : "$" + fmt(r.capital_left_usd, 0);
+    oCoc.textContent = r.all_recovered ? "infinite (no capital left in)" : (r.coc === 0 ? "(enter annual cash flow)" : fmt(r.coc * 100, 1) + "%");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [arv, inv, ltv, payoff, cf]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["brrrr-refi"] = renderBrrrrRefi;
+
+// dims: in { cash_invested_usd: dimensionless, annual_cash_flow_usd: dimensionless, principal_paydown_usd: dimensionless, appreciation_usd: dimensionless, tax_savings_usd: dimensionless } out: { total_usd: dimensionless, total_pct: dimensionless }
+export function computeRentalTotalReturn({ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0, appreciation_usd = 0, tax_savings_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cash = Number(cash_invested_usd) || 0;
+  const cf = Number(annual_cash_flow_usd) || 0;
+  const paydown = Number(principal_paydown_usd) || 0;
+  const appr = Number(appreciation_usd) || 0;
+  const tax = Number(tax_savings_usd) || 0;
+  if (!(cash > 0)) return { error: "Cash invested must be positive (USD)." };
+  const total_usd = cf + paydown + appr + tax;
+  return {
+    total_usd, total_pct: total_usd / cash,
+    cf_pct: cf / cash, paydown_pct: paydown / cash, appr_pct: appr / cash, tax_pct: tax / cash,
+    note: "Rental total return, all four components as a percent of cash invested: cash flow (the money in hand), principal paydown (the tenant retiring your loan), appreciation (the value gain), and the depreciation tax shield. The cash-on-cash number alone (cash flow / cash) understates the real return, often by half or more, because it ignores equity buildup and the tax benefit. Appreciation is a projection, not a guarantee; the other three are realized. A screening aid; the actual results govern.",
+  };
+}
+export const rentalTotalReturnExample = { inputs: { cash_invested_usd: 50000, annual_cash_flow_usd: 3000, principal_paydown_usd: 2500, appreciation_usd: 7500, tax_savings_usd: 1500 } };
+function renderRentalTotalReturn(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Rental total return (real-estate investing practice): total = cash flow + principal paydown + appreciation + depreciation tax savings, each as a percent of cash invested. Cash-on-cash alone ignores equity buildup and the tax shield, understating the return. Appreciation is a projection. A screening aid; the actual results govern.";
+  const cash = makeNumber("Cash invested ($)", "rtr-cash", { step: "any", min: "0" }); cash.input.value = "50000";
+  const cf = makeNumber("Annual cash flow ($)", "rtr-cf", { step: "any" }); cf.input.value = "3000";
+  const pay = makeNumber("First-year principal paydown ($)", "rtr-pay", { step: "any", min: "0" }); pay.input.value = "2500";
+  const appr = makeNumber("First-year appreciation ($)", "rtr-appr", { step: "any" }); appr.input.value = "7500";
+  const tax = makeNumber("Depreciation tax savings ($)", "rtr-tax", { step: "any" }); tax.input.value = "1500";
+  for (const f of [cash, cf, pay, appr, tax]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cash.input.value = "50000"; cf.input.value = "3000"; pay.input.value = "2500"; appr.input.value = "7500"; tax.input.value = "1500"; update(); });
+  const oTotal = makeOutputLine(outputRegion, "Total first-year return", "rtr-out-total");
+  const oBreak = makeOutputLine(outputRegion, "Components (of cash invested)", "rtr-out-break");
+  const oNote = makeOutputLine(outputRegion, "Note", "rtr-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeRentalTotalReturn({ cash_invested_usd: readNum(cash.input), annual_cash_flow_usd: readNum(cf.input), principal_paydown_usd: readNum(pay.input), appreciation_usd: readNum(appr.input), tax_savings_usd: readNum(tax.input) });
+    if (r.error) { oTotal.textContent = r.error; oBreak.textContent = "-"; oNote.textContent = ""; return; }
+    oTotal.textContent = "$" + fmt(r.total_usd, 0) + " (" + fmt(r.total_pct * 100, 1) + "% of cash)";
+    oBreak.textContent = "cash " + fmt(r.cf_pct * 100, 1) + "% + paydown " + fmt(r.paydown_pct * 100, 1) + "% + appreciation " + fmt(r.appr_pct * 100, 1) + "% + tax " + fmt(r.tax_pct * 100, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cash, cf, pay, appr, tax]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["rental-total-return"] = renderRentalTotalReturn;

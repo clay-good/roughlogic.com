@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(realestate): land spec-v402..v404 -- 3 real-estate-investing tiles in calc-realestate.js; 870 -> 873 tiles, 0.141.0, 2026-07-04
+
+The real-estate-investing trio, tenth batch of the v375-v474 campaign: the flip, the BRRRR refinance, and the full rental return, all in the existing lazy `calc-realestate.js` (Group X); no new module, group, or dependency. Catalog **870 -> 873**, package **0.140.0 -> 0.141.0** (a minor). Proposed 2026-07-03.
+
+- **`fix-flip-profit` (spec-v402).** all-in = purchase + rehab + holding + financing + selling (ARV x sell%), profit = ARV - all-in, cash ROI annualized. Pinned: $300k ARV, $180k buy, $40k rehab, 6% sell, $114k cash, 6 mo -> $42k profit (14.0% margin), 36.8% cash ROI, 73.7% annualized; a thinner buy drops it to 10.5%.
+- **`brrrr-refi` (spec-v403).** new loan = ARV x LTV, cash returned = loan - payoff, capital left = invested - returned, post-refi cash-on-cash = cash flow / capital left. Pinned: $200k ARV, $140k in, 75% LTV -> $150k out, all capital recovered (infinite return); $160k in leaves $10k at a 24% return. Returns a null CoC (not Infinity) when all capital is recovered, so the renderer stays clean.
+- **`rental-total-return` (spec-v404).** total = cash flow + principal paydown + appreciation + tax shield, each as a percent of cash. Pinned: $50k cash with $3k/$2.5k/$7.5k/$1.5k -> $14,500 (29.0%) vs 6% cash-on-cash alone; a flat market still returns 14.0% from paydown and the tax shield.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the all-in profit, the capital-recovery/infinite-CoC branch, the four-component sum, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the fix-and-flip, BRRRR, and four-component-return frameworks. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers). Module cap bumped with a dated comment: calc-realestate.js 41000 -> 48000. Housekeeping: home count 870 -> 873, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 73 appended. All gates green at the new state: lint, unit tests (**5,166**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(shop): land spec-v399..v401 -- 3 fabrication shop-math tiles; 867 -> 870 tiles, 0.140.0, 2026-07-04
 
 The fabrication shop-math trio, ninth batch of the v375-v474 campaign: a tolerance analysis, a cone layout, and gear geometry, split across their natural modules; no new module, group, or dependency. Catalog **867 -> 870**, package **0.139.0 -> 0.140.0** (a minor). Proposed 2026-07-03.

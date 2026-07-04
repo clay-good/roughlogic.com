@@ -269,7 +269,7 @@ const CAPS = {
   // financing batch: X.1 mortgage-point-breakeven, X.3 per-diem-interest,
   // X.4 mortgage-reserves. Bumped 31000 -> 35000 on 2026-06-08 (current
   // + ~20% headroom rule) for the spec-v17 X.2 rent-vs-buy NPV tile.
-  "calc-realestate.js": 41000, // v20 2026-06-06 (35000)
+  "calc-realestate.js": 48000, // spec-v402..v404 RE-investing 2026-07-04 (41000->48000): +3 Group X tiles (fix-flip-profit, brrrr-refi, rental-total-return) -> ~38.5 KB raw (93.8% of the old cap); headroom for remaining backlog; lazy-loaded, not in home-view payload // v20 2026-06-06 (35000)
 
   // v12 Group Y (Educators / K-12). Y.1 Flesch-Kincaid readability,
   // Y.3 Lexile band by grade, Y.4 GPA calculator, Y.5 statistics

@@ -30211,6 +30211,92 @@
       }
     },
     {
+      "tile_id": "fix-flip-profit",
+      "source_publisher": "real-estate-investing practice",
+      "source_title": "$300k ARV, $180k buy, $40k rehab, $8k hold, $12k fin, 6% sell, $114k cash, 6 mo -> $42k profit",
+      "source_edition_or_year": "spec-v402 worked example (machine-verified)",
+      "source_section_or_page": "spec-v402 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "arv_usd": 300000, "purchase_usd": 180000, "rehab_usd": 40000, "holding_usd": 8000, "financing_usd": 12000, "selling_pct": 6, "cash_invested_usd": 114000, "hold_months": 6 },
+      "outputs": {
+        "all_in_usd": { "value": 258000, "tolerance": { "pct": 0.5 } },
+        "profit_usd": { "value": 42000, "tolerance": { "pct": 0.5 } },
+        "roi": { "value": 0.3684, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "fix-flip-profit",
+      "source_publisher": "real-estate-investing practice",
+      "source_title": "cross-check: a thin deal (buy $210k) -> $12,000 profit, a 10.5% cash return",
+      "source_edition_or_year": "spec-v402 worked example (machine-verified)",
+      "source_section_or_page": "spec-v402 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "arv_usd": 300000, "purchase_usd": 210000, "rehab_usd": 40000, "holding_usd": 8000, "financing_usd": 12000, "selling_pct": 6, "cash_invested_usd": 114000, "hold_months": 6 },
+      "outputs": {
+        "profit_usd": { "value": 12000, "tolerance": { "pct": 0.5 } },
+        "roi": { "value": 0.1053, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "brrrr-refi",
+      "source_publisher": "real-estate-investing practice",
+      "source_title": "$200k ARV, $140k invested, 75% LTV -> $150k loan, $150k returned, -$10k capital left (all recovered)",
+      "source_edition_or_year": "spec-v403 worked example (machine-verified)",
+      "source_section_or_page": "spec-v403 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "arv_usd": 200000, "total_invested_usd": 140000, "refi_ltv_pct": 75, "existing_payoff_usd": 0, "annual_cash_flow_usd": 0 },
+      "outputs": {
+        "new_loan_usd": { "value": 150000, "tolerance": { "pct": 0.5 } },
+        "cash_returned_usd": { "value": 150000, "tolerance": { "pct": 0.5 } },
+        "capital_left_usd": { "value": -10000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "brrrr-refi",
+      "source_publisher": "real-estate-investing practice",
+      "source_title": "cross-check: $160k invested leaves $10k capital; $2,400/yr -> a 24% post-refi return",
+      "source_edition_or_year": "spec-v403 worked example (machine-verified)",
+      "source_section_or_page": "spec-v403 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "arv_usd": 200000, "total_invested_usd": 160000, "refi_ltv_pct": 75, "existing_payoff_usd": 0, "annual_cash_flow_usd": 2400 },
+      "outputs": {
+        "capital_left_usd": { "value": 10000, "tolerance": { "pct": 0.5 } },
+        "coc": { "value": 0.24, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "rental-total-return",
+      "source_publisher": "real-estate-investing practice",
+      "source_title": "$50k cash; $3k CF, $2.5k paydown, $7.5k appreciation, $1.5k tax -> $14,500 (29.0%)",
+      "source_edition_or_year": "spec-v404 worked example (machine-verified)",
+      "source_section_or_page": "spec-v404 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "cash_invested_usd": 50000, "annual_cash_flow_usd": 3000, "principal_paydown_usd": 2500, "appreciation_usd": 7500, "tax_savings_usd": 1500 },
+      "outputs": {
+        "total_usd": { "value": 14500, "tolerance": { "pct": 0.5 } },
+        "total_pct": { "value": 0.29, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "rental-total-return",
+      "source_publisher": "real-estate-investing practice",
+      "source_title": "cross-check: a flat market (zero appreciation) -> $7,000 (14.0%), still double cash-only",
+      "source_edition_or_year": "spec-v404 worked example (machine-verified)",
+      "source_section_or_page": "spec-v404 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "cash_invested_usd": 50000, "annual_cash_flow_usd": 3000, "principal_paydown_usd": 2500, "appreciation_usd": 0, "tax_savings_usd": 1500 },
+      "outputs": {
+        "total_usd": { "value": 7000, "tolerance": { "pct": 0.5 } },
+        "total_pct": { "value": 0.14, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "duct-heat-gain",
       "source_publisher": "ASHRAE Fundamentals",
       "source_title": "1,000 CFM 55 F air, R-4 duct, 100 ft^2, 120 F attic -> 1,625 Btu/h, 1.5 F warming",

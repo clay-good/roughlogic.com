@@ -67,6 +67,7 @@ const _TILES = [
   ["pmi-cancellation-date", "X"],
   ["seller-net-sheet", "X"],
   ["debt-yield", "X"], ["break-even-occupancy", "X"], ["max-offer-70-rule", "X"],
+  ["fix-flip-profit", "X"], ["brrrr-refi", "X"], ["rental-total-return", "X"],
   ["primer-tm", "T"],
   ["cfu-plate-count", "T"],
   ["declining-balance-depreciation", "R"],

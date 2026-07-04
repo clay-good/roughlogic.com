@@ -1,6 +1,6 @@
 # roughlogic.com Specification v404 -- Rental Total Return (Four Components) (calc-realestate.js, Group X, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the real-estate-investing trio (v402 fix-and-flip -> v403 BRRRR
+> **Status: LANDED (2026-07-04, 0.141.0; proposed 2026-07-03). Third and final tile of the real-estate-investing trio (v402 fix-and-flip -> v403 BRRRR
 > refi -> v404 rental total return). `cash-on-cash` counts only the pre-tax cash flow; a rental actually returns four ways,
 > and this tile sums all of them into the first-year total return an investor compares against the stock market.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A held rental builds wealth through four channels:

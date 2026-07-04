@@ -181,6 +181,42 @@ export const CITATIONS = {
       { name: "Unverified inputs", value: "ARV must be from real comps and repairs from a real scope; not an appraisal", source: "scope of this tile" },
     ],
   },
+  "fix-flip-profit": {
+    formula: "selling = ARV x sell%; all_in = purchase + rehab + holding + financing + selling; profit = ARV - all_in; margin = profit/ARV; roi = profit/cash; annual = roi x 12/months.",
+    edition: "The fix-and-flip profit and return computation used by real-estate investors, by name.",
+    freeAccess: "The all-in-cost, profit, and cash-return breakdown of a flip is a widely-published real-estate-investing computation.",
+    governance: GOVERNANCE.general,
+    editionNote: "Fix-and-flip profit: the all-in cost = purchase + rehab + holding + financing + selling costs (selling = ARV x selling%), the net profit = ARV - all-in, and the returns are profit / ARV (the margin), profit / cash invested (the cash-on-cash ROI), and that annualized over the hold (x 12 / months). This screens a deal from the entered figures; the ARV must come from real comparable sales and the rehab from a real scope, and it does not model the tax on the gain or the risk of an ARV miss or rehab overrun. A screening aid; the actual deal and a professional's numbers govern.",
+    assumptions: [
+      { name: "All-in cost", value: "purchase + rehab + holding + financing + selling (ARV x sell%)", source: "fix-and-flip practice" },
+      { name: "Returns", value: "margin = profit/ARV, cash ROI = profit/cash, annualized x 12/months", source: "real-estate-investing" },
+      { name: "Unverified inputs", value: "ARV from real comps, rehab from a real scope; gain tax not modeled", source: "scope of this tile" },
+    ],
+  },
+  "brrrr-refi": {
+    formula: "new_loan = ARV x LTV%; cash_returned = new_loan - payoff; capital_left = invested - cash_returned; coc = cash_flow / capital_left (infinite if capital_left <= 0).",
+    edition: "The BRRRR cash-out refinance and capital-left-in computation used by real-estate investors, by name.",
+    freeAccess: "The BRRRR cash-out refinance math (new loan, capital recovered, capital left) is a widely-published real-estate-investing computation.",
+    governance: GOVERNANCE.general,
+    editionNote: "BRRRR (buy, rehab, rent, refinance, repeat) cash-out refinance: the new loan = ARV x the refinance LTV (commonly 70-75%), the cash returned = new loan - any existing loan payoff, and the capital left in the deal = total invested - cash returned. When the cash-out covers the full investment the investor has recovered all capital (an infinite cash-on-cash return) and can repeat with the same money; otherwise the post-refi cash-on-cash = annual cash flow / capital left. The appraised ARV and the lender's seasoning and LTV rules govern whether it works. A screening aid; the actual refinance terms and appraisal govern.",
+    assumptions: [
+      { name: "New loan", value: "new_loan = ARV x refi LTV; cash_returned = new_loan - payoff", source: "BRRRR practice" },
+      { name: "Capital left", value: "invested - cash_returned; infinite CoC if fully recovered", source: "real-estate-investing" },
+      { name: "Lender rules", value: "the appraised ARV and the lender's LTV/seasoning govern", source: "scope of this tile" },
+    ],
+  },
+  "rental-total-return": {
+    formula: "total = cash_flow + principal_paydown + appreciation + tax_savings; each% = component/cash; total% = total/cash.",
+    edition: "The four-component rental total return (cash flow, paydown, appreciation, tax shield) used by real-estate investors, by name.",
+    freeAccess: "The four-component total return of a rental is a widely-published real-estate-investing framework.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rental total return, all four components as a percent of cash invested: the cash flow (money in hand), the principal paydown (the tenant retiring the loan), the appreciation (the value gain), and the depreciation tax shield. The cash-on-cash figure alone (cash flow / cash) understates the real return, often by half or more, because it ignores equity buildup and the tax benefit. This sums the entered components; appreciation is a projection, not a guarantee, and the tax savings depend on the investor's situation. A screening aid; the actual results and a tax professional govern.",
+    assumptions: [
+      { name: "Four components", value: "cash flow + principal paydown + appreciation + tax savings", source: "real-estate-investing" },
+      { name: "As percent of cash", value: "each and the total divided by cash invested", source: "real-estate-investing" },
+      { name: "Projections", value: "appreciation is projected; tax savings depend on the taxpayer", source: "scope of this tile" },
+    ],
+  },
   "seller-net-sheet": {
     formula: "commission = price*rate; transfer_tax = price*rate; tax_proration = annual_tax*days_seller_owes/365; net = price - payoff - commission - transfer_tax - fees - concessions - proration - other.",
     edition: "Per the TILA-RESPA Integrated Disclosure / Closing Disclosure (12 CFR 1026.38) and RESPA (12 CFR 1024), by name; the transfer-tax rate is state/local and user-supplied.",
