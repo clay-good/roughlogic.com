@@ -1,6 +1,6 @@
 # roughlogic.com Specification v391 -- Change Order Price with Overhead and Profit (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the contractor-billing trio (v390 WIP -> v391 change-order markup ->
+> **Status: LANDED (2026-07-03, 0.137.0; proposed 2026-07-03). Second tile of the contractor-billing trio (v390 WIP -> v391 change-order markup ->
 > v392 retainage). `markup` prices a bid from cost by a single percentage; this tile prices a scope *change* the way a
 > contract allows it -- direct cost, then the overhead-and-profit markup (commonly "10 and 10") the AIA A201 permits on a
 > change order, with the effect on the contract total.**

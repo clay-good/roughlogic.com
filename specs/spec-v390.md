@@ -1,6 +1,6 @@
 # roughlogic.com Specification v390 -- Work-in-Progress Percent Complete and Over/Under Billing (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a contractor-billing trio (v390 WIP percent complete -> v391 change-order
+> **Status: LANDED (2026-07-03, 0.137.0; proposed 2026-07-03). First tile of a contractor-billing trio (v390 WIP percent complete -> v391 change-order
 > markup -> v392 retainage tracker). The catalog costs a job (`labor-burden-rate`, `equipment-hourly-rate`) and prices it
 > (`markup`), but never runs the cost-to-cost percent-complete that recognizes revenue and flags the over/under billing a
 > surety underwriter reads first.**

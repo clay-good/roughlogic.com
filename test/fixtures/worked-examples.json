@@ -30384,6 +30384,91 @@
       }
     },
     {
+      "tile_id": "wip-percent-complete",
+      "source_publisher": "construction accounting (cost-to-cost POC)",
+      "source_title": "$500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled",
+      "source_edition_or_year": "spec-v390 worked example (machine-verified)",
+      "source_section_or_page": "spec-v390 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "contract_usd": 500000, "cost_to_date_usd": 300000, "est_total_cost_usd": 400000, "billed_to_date_usd": 350000 },
+      "outputs": {
+        "pct_complete": { "value": 0.75, "tolerance": { "pct": 0.5 } },
+        "earned_revenue": { "value": 375000, "tolerance": { "pct": 0.5 } },
+        "over_under": { "value": 25000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "wip-percent-complete",
+      "source_publisher": "construction accounting (cost-to-cost POC)",
+      "source_title": "cross-check: billing $400K at the same progress -> -$25,000 overbilled (liability)",
+      "source_edition_or_year": "spec-v390 worked example (machine-verified)",
+      "source_section_or_page": "spec-v390 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "contract_usd": 500000, "cost_to_date_usd": 300000, "est_total_cost_usd": 400000, "billed_to_date_usd": 400000 },
+      "outputs": {
+        "over_under": { "value": -25000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "change-order-markup",
+      "source_publisher": "construction estimating (AIA G701)",
+      "source_title": "$10,000 direct, 10% and 10% compounded -> $12,100 (markup $2,100, 17.4% margin)",
+      "source_edition_or_year": "spec-v391 worked example (machine-verified)",
+      "source_section_or_page": "spec-v391 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "direct_cost_usd": 10000, "overhead_pct": 10, "profit_pct": 10, "current_contract_usd": 500000 },
+      "outputs": {
+        "price": { "value": 12100, "tolerance": { "pct": 0.5 } },
+        "markup": { "value": 2100, "tolerance": { "pct": 0.5 } },
+        "new_contract": { "value": 512100, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "change-order-markup",
+      "source_publisher": "construction estimating (AIA G701)",
+      "source_title": "cross-check: the additive method gives $12,000, $100 less than the compounded price",
+      "source_edition_or_year": "spec-v391 worked example (machine-verified)",
+      "source_section_or_page": "spec-v391 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "direct_cost_usd": 10000, "overhead_pct": 10, "profit_pct": 10, "current_contract_usd": 0 },
+      "outputs": {
+        "additive_price": { "value": 12000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "retainage-tracker",
+      "source_publisher": "construction billing (AIA G702/G703)",
+      "source_title": "$100,000 this period, 10% retainage, $40,000 prior -> $10K retained, $90K net, $50K cumulative",
+      "source_edition_or_year": "spec-v392 worked example (machine-verified)",
+      "source_section_or_page": "spec-v392 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "work_this_period_usd": 100000, "retainage_pct": 10, "prior_retained_usd": 40000 },
+      "outputs": {
+        "retention_this": { "value": 10000, "tolerance": { "pct": 0.5 } },
+        "net_payment": { "value": 90000, "tolerance": { "pct": 0.5 } },
+        "cumulative_ret": { "value": 50000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "retainage-tracker",
+      "source_publisher": "construction billing (AIA G702/G703)",
+      "source_title": "cross-check: a 5% job withholds $5,000 and pays $95,000 net",
+      "source_edition_or_year": "spec-v392 worked example (machine-verified)",
+      "source_section_or_page": "spec-v392 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "work_this_period_usd": 100000, "retainage_pct": 5, "prior_retained_usd": 40000 },
+      "outputs": {
+        "retention_this": { "value": 5000, "tolerance": { "pct": 0.5 } },
+        "net_payment": { "value": 95000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "pv-cell-temperature-power",
       "source_publisher": "PV design practice / NREL",
       "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",

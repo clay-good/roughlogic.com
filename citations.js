@@ -282,6 +282,42 @@ export const CITATIONS = {
       { name: "Excludes profit", value: "overhead recovery only; the profit markup is separate", source: "scope of this tile" },
     ],
   },
+  "wip-percent-complete": {
+    formula: "pct = min(cost_to_date / est_total_cost, 1); earned = pct x contract; over_under = earned - billed.",
+    edition: "The cost-to-cost percent-of-completion revenue recognition and the over/under-billing schedule from construction accounting (ASC 606 / AICPA construction guide), by name.",
+    freeAccess: "Cost-to-cost percent-of-completion and the WIP over/under-billing schedule are standard published construction-accounting methods.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cost-to-cost percent-of-completion (POC) method: percent complete = cost to date / estimated total cost (capped at 100%), earned revenue = percent complete x contract value, and over/under billing = earned revenue - billed to date. A positive result is underbilled (a costs-and-estimated-earnings-in-excess-of-billings asset); a negative result is overbilled (a billings-in-excess liability, cash collected against work not yet done). This is a management snapshot from the entered figures; it does not adjust for unapproved change orders, and the CPA-prepared WIP schedule and the estimate's accuracy govern.",
+    assumptions: [
+      { name: "Percent complete", value: "cost to date / estimated total cost, capped at 100%", source: "cost-to-cost POC" },
+      { name: "Over/under billing", value: "earned revenue - billed to date (+ underbilled asset, - overbilled liability)", source: "construction accounting" },
+      { name: "Estimate-driven", value: "accuracy depends on the estimated total cost; the CPA WIP schedule governs", source: "scope of this tile" },
+    ],
+  },
+  "change-order-markup": {
+    formula: "price = direct x (1 + OH%) x (1 + profit%); markup = price - direct; margin% = markup/price x 100.",
+    edition: "The change-order overhead-and-profit markup (compounded) from construction estimating practice / AIA G701, by name.",
+    freeAccess: "Overhead-and-profit markup on a change order is standard construction estimating; the allowed rate and method are in the contract.",
+    governance: GOVERNANCE.general,
+    editionNote: "The change-order price with overhead and profit compounded: price = direct cost x (1 + overhead%) x (1 + profit%), where direct cost is labor + material + equipment for the added scope. The compounded method (overhead first, then profit) is standard and yields slightly more than the additive direct x (1 + overhead% + profit%); which applies is set by the contract's general conditions. The reported margin is markup / price (gross margin), not the markup rate. This prices the change only; it does not evaluate schedule impact or a claim, and the contract terms and the owner's written approval govern.",
+    assumptions: [
+      { name: "Compounded markup", value: "price = direct x (1 + OH%) x (1 + profit%)", source: "AIA G701 / estimating practice" },
+      { name: "Additive alternative", value: "direct x (1 + OH% + profit%) is slightly less; the contract decides", source: "construction accounting" },
+      { name: "Contract governs", value: "the general conditions set the allowed markup and method", source: "scope of this tile" },
+    ],
+  },
+  "retainage-tracker": {
+    formula: "retention_this = work x rate%; net_payment = work - retention_this; cumulative = prior + retention_this.",
+    edition: "The retainage withholding and net-payment computation on an AIA G702/G703 progress application, by name.",
+    freeAccess: "Retainage on a progress draw is a standard published construction-billing computation (AIA G702/G703).",
+    governance: GOVERNANCE.general,
+    editionNote: "Retainage on a progress payment (AIA G702 Application and Certificate for Payment with the G703 Continuation Sheet): retention this period = work completed and stored x the retainage rate, net payment = work - retention, cumulative retention = prior retained + this period. Retainage is money earned but withheld as security until the work is accepted (commonly released at substantial completion, sometimes reduced to a lower rate at 50% complete); a lower rate frees the contractor's cash flow. This tracks the withholding from the entered figures; the contract terms, any statutory retainage cap, and the owner's certified payment govern.",
+    assumptions: [
+      { name: "Retention", value: "retention this period = work x retainage rate", source: "AIA G702/G703" },
+      { name: "Net and cumulative", value: "net = work - retention; cumulative = prior + this period", source: "construction billing" },
+      { name: "Contract governs", value: "release terms, statutory caps, and the certified payment govern", source: "scope of this tile" },
+    ],
+  },
   "employer-payroll-tax": {
     formula: "SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages, 7000)*FUTA_rate; SUTA = min(wages, state_base)*SUTA_rate.",
     edition: "FICA - 26 USC 3101/3111 and IRS Pub 15 (Circular E), 6.2% SS / 1.45% Medicare; FUTA - 26 USC 3301-3306, $7,000 wage base, 0.6% net, IRS Form 940 - all by name.",

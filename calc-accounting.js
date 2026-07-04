@@ -1495,3 +1495,137 @@ function renderOverheadRecoveryRate(inputRegion, outputRegion, citationEl) {
   syncFields();
 }
 ACCOUNTING_RENDERERS["overhead-recovery-rate"] = renderOverheadRecoveryRate;
+
+// ===================== spec-v390..v392: contractor-billing trio (Group R) =====================
+
+// dims: in { contract_usd: dimensionless, cost_to_date_usd: dimensionless, est_total_cost_usd: dimensionless, billed_to_date_usd: dimensionless } out: { pct_complete: dimensionless, earned_revenue: dimensionless, over_under: dimensionless }
+export function computeWipPercentComplete({ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_date_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const contract = Number(contract_usd) || 0;
+  const cost = Number(cost_to_date_usd) || 0;
+  const est = Number(est_total_cost_usd) || 0;
+  const billed = Number(billed_to_date_usd) || 0;
+  if (!(contract > 0)) return { error: "Contract value must be positive (USD)." };
+  if (!(est > 0)) return { error: "Estimated total cost must be positive (USD)." };
+  if (cost < 0 || billed < 0) return { error: "Cost and billed amounts must be non-negative (USD)." };
+  const raw_pct = cost / est;
+  const pct_complete = Math.min(raw_pct, 1.0);
+  const overrun = raw_pct > 1.0;
+  const earned_revenue = pct_complete * contract;
+  const over_under = earned_revenue - billed;
+  return {
+    pct_complete, earned_revenue, over_under, overrun,
+    underbilled: over_under >= 0,
+    note: "Cost-to-cost percent-complete (POC) revenue recognition: percent complete = cost to date / estimated total cost (capped at 100%), earned revenue = percent complete x contract value, and over/under billing = earned revenue - billed to date. A positive figure is underbilled (a costs-in-excess asset - work done but not yet billed); a negative figure is overbilled (a billings-in-excess liability - cash collected against future work). Persistent overbilling can mask a job going bad. A management aid; the CPA-prepared WIP schedule governs.",
+  };
+}
+export const wipPercentCompleteExample = { inputs: { contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 } };
+function renderWipPercentComplete(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cost-to-cost percent-of-completion revenue recognition (construction accounting, ASC 606 / AICPA construction guide): percent complete = cost to date / estimated total cost, earned revenue = percent complete x contract, over/under billing = earned revenue - billed. A management aid; the CPA-prepared WIP schedule governs.";
+  const contract = makeNumber("Contract value (USD)", "wip-c", { step: "any", min: "0" }); contract.input.value = "500000";
+  const cost = makeNumber("Cost to date (USD)", "wip-cost", { step: "any", min: "0" }); cost.input.value = "300000";
+  const est = makeNumber("Estimated total cost (USD)", "wip-est", { step: "any", min: "0" }); est.input.value = "400000";
+  const billed = makeNumber("Billed to date (USD)", "wip-b", { step: "any", min: "0" }); billed.input.value = "350000";
+  for (const f of [contract, cost, est, billed]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { contract.input.value = "500000"; cost.input.value = "300000"; est.input.value = "400000"; billed.input.value = "350000"; update(); });
+  const oPct = makeOutputLine(outputRegion, "Percent complete", "wip-out-pct");
+  const oEarn = makeOutputLine(outputRegion, "Earned revenue", "wip-out-earn");
+  const oOU = makeOutputLine(outputRegion, "Over / under billing", "wip-out-ou");
+  const oNote = makeOutputLine(outputRegion, "Note", "wip-out-n");
+  const update = debounce(() => {
+    const r = computeWipPercentComplete({ contract_usd: Number(contract.input.value) || 0, cost_to_date_usd: Number(cost.input.value) || 0, est_total_cost_usd: Number(est.input.value) || 0, billed_to_date_usd: Number(billed.input.value) || 0 });
+    if (r.error) { oPct.textContent = r.error; oEarn.textContent = "-"; oOU.textContent = "-"; oNote.textContent = ""; return; }
+    oPct.textContent = fmt(r.pct_complete * 100, 1) + "%" + (r.overrun ? " (cost past estimate -- overrun)" : "");
+    oEarn.textContent = "$" + fmt(r.earned_revenue, 0);
+    oOU.textContent = (r.underbilled ? "+$" + fmt(r.over_under, 0) + " underbilled (asset)" : "-$" + fmt(Math.abs(r.over_under), 0) + " overbilled (liability)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [contract, cost, est, billed]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["wip-percent-complete"] = renderWipPercentComplete;
+
+// dims: in { direct_cost_usd: dimensionless, overhead_pct: dimensionless, profit_pct: dimensionless, current_contract_usd: dimensionless } out: { price: dimensionless, markup: dimensionless, margin_pct: dimensionless, new_contract: dimensionless }
+export function computeChangeOrderMarkup({ direct_cost_usd = 0, overhead_pct = 10, profit_pct = 10, current_contract_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const direct = Number(direct_cost_usd) || 0;
+  const oh = Number(overhead_pct) || 0;
+  const profit = Number(profit_pct) || 0;
+  const current = Number(current_contract_usd) || 0;
+  if (!(direct > 0)) return { error: "Direct cost must be positive (USD)." };
+  if (oh < 0 || profit < 0) return { error: "Overhead and profit rates must be non-negative (%)." };
+  if (current < 0) return { error: "Current contract value must be non-negative (USD)." };
+  const price = direct * (1 + oh / 100) * (1 + profit / 100);
+  const markup = price - direct;
+  const margin_pct = price > 0 ? markup / price * 100 : 0;
+  const new_contract = current > 0 ? current + price : null;
+  const additive_price = direct * (1 + (oh + profit) / 100);
+  return {
+    price, markup, margin_pct, new_contract, additive_price,
+    note: "Change-order price with overhead and profit compounded: price = direct cost x (1 + OH%) x (1 + profit%). The compounded method (OH then profit) is standard and yields slightly more than the additive direct x (1 + OH% + profit%); which one applies is set by the contract's general conditions. Direct cost is labor + material + equipment for the added scope. Margin here is markup / price (the gross margin), not the markup rate. A pricing aid; the contract terms and the owner's approval govern.",
+  };
+}
+export const changeOrderMarkupExample = { inputs: { direct_cost_usd: 10000, overhead_pct: 10, profit_pct: 10, current_contract_usd: 500000 } };
+function renderChangeOrderMarkup(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Change-order pricing with overhead and profit (construction estimating practice / AIA G701): price = direct cost x (1 + overhead%) x (1 + profit%), the standard compounded markup (the additive direct x (1 + OH% + profit%) is slightly less). The contract's general conditions set the allowed markup and method. A pricing aid; the contract terms and owner approval govern.";
+  const direct = makeNumber("Added direct cost (USD)", "com-d", { step: "any", min: "0" }); direct.input.value = "10000";
+  const oh = makeNumber("Overhead markup (%)", "com-oh", { step: "any", min: "0" }); oh.input.value = "10";
+  const profit = makeNumber("Profit markup (%)", "com-p", { step: "any", min: "0" }); profit.input.value = "10";
+  const current = makeNumber("Current contract total (USD, optional)", "com-c", { step: "any", min: "0" }); current.input.value = "500000";
+  for (const f of [direct, oh, profit, current]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { direct.input.value = "10000"; oh.input.value = "10"; profit.input.value = "10"; current.input.value = "500000"; update(); });
+  const oPrice = makeOutputLine(outputRegion, "Change-order price", "com-out-price");
+  const oMarkup = makeOutputLine(outputRegion, "Markup (margin)", "com-out-markup");
+  const oNew = makeOutputLine(outputRegion, "New contract total", "com-out-new");
+  const oNote = makeOutputLine(outputRegion, "Note", "com-out-n");
+  const update = debounce(() => {
+    const r = computeChangeOrderMarkup({ direct_cost_usd: Number(direct.input.value) || 0, overhead_pct: Number(oh.input.value) || 0, profit_pct: Number(profit.input.value) || 0, current_contract_usd: Number(current.input.value) || 0 });
+    if (r.error) { oPrice.textContent = r.error; oMarkup.textContent = "-"; oNew.textContent = "-"; oNote.textContent = ""; return; }
+    oPrice.textContent = "$" + fmt(r.price, 0) + " (additive method $" + fmt(r.additive_price, 0) + ")";
+    oMarkup.textContent = "$" + fmt(r.markup, 0) + " (" + fmt(r.margin_pct, 1) + "% gross margin)";
+    oNew.textContent = r.new_contract == null ? "(enter a current contract total)" : "$" + fmt(r.new_contract, 0);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [direct, oh, profit, current]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["change-order-markup"] = renderChangeOrderMarkup;
+
+// dims: in { work_this_period_usd: dimensionless, retainage_pct: dimensionless, prior_retained_usd: dimensionless } out: { retention_this: dimensionless, net_payment: dimensionless, cumulative_ret: dimensionless }
+export function computeRetainageTracker({ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const work = Number(work_this_period_usd) || 0;
+  const rate = Number(retainage_pct) || 0;
+  const prior = Number(prior_retained_usd) || 0;
+  if (!(work > 0)) return { error: "Work completed this period must be positive (USD)." };
+  if (!(rate >= 0 && rate <= 100)) return { error: "Retainage rate must be between 0 and 100%." };
+  if (prior < 0) return { error: "Prior retained amount must be non-negative (USD)." };
+  const retention_this = work * (rate / 100);
+  const net_payment = work - retention_this;
+  const cumulative_ret = prior + retention_this;
+  return {
+    retention_this, net_payment, cumulative_ret,
+    note: "Retainage on a progress draw (AIA G702/G703): retention this period = work completed x retainage rate, net payment = work - retention, cumulative retention = prior retained + this period's retention. Retainage is money earned but withheld until the work is accepted (often released at substantial completion, sometimes reduced at 50% complete); a lower rate frees cash flow, which is why it is negotiated. A billing aid; the contract and the owner's certified payment govern.",
+  };
+}
+export const retainageTrackerExample = { inputs: { work_this_period_usd: 100000, retainage_pct: 10, prior_retained_usd: 40000 } };
+function renderRetainageTracker(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Retainage on a progress payment (AIA G702 Application and Certificate for Payment / G703 Continuation Sheet): retention this period = work completed x retainage rate, net payment = work - retention, cumulative retention = prior + this period. A billing aid; the contract terms and the owner's certified payment govern.";
+  const work = makeNumber("Work this period (USD)", "ret-w", { step: "any", min: "0" }); work.input.value = "100000";
+  const rate = makeNumber("Retainage rate (%)", "ret-r", { step: "any", min: "0", max: "100" }); rate.input.value = "10";
+  const prior = makeNumber("Prior retained (USD)", "ret-p", { step: "any", min: "0" }); prior.input.value = "40000";
+  for (const f of [work, rate, prior]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { work.input.value = "100000"; rate.input.value = "10"; prior.input.value = "40000"; update(); });
+  const oRet = makeOutputLine(outputRegion, "Retention this draw", "ret-out-ret");
+  const oNet = makeOutputLine(outputRegion, "Net payment", "ret-out-net");
+  const oCum = makeOutputLine(outputRegion, "Cumulative retention", "ret-out-cum");
+  const oNote = makeOutputLine(outputRegion, "Note", "ret-out-n");
+  const update = debounce(() => {
+    const r = computeRetainageTracker({ work_this_period_usd: Number(work.input.value) || 0, retainage_pct: Number(rate.input.value) || 0, prior_retained_usd: Number(prior.input.value) || 0 });
+    if (r.error) { oRet.textContent = r.error; oNet.textContent = "-"; oCum.textContent = "-"; oNote.textContent = ""; return; }
+    oRet.textContent = "$" + fmt(r.retention_this, 0);
+    oNet.textContent = "$" + fmt(r.net_payment, 0);
+    oCum.textContent = "$" + fmt(r.cumulative_ret, 0);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [work, rate, prior]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["retainage-tracker"] = renderRetainageTracker;

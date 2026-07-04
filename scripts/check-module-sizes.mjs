@@ -55,7 +55,7 @@ const CAPS = {
   // brushes its cap.
   // Bumped 15000 -> 18000 on 2026-06-05 for the spec-v17 R.3 home-office
   // tile (simplified-vs-actual deduction); built module ~15.1 KB gzipped.
-  "calc-accounting.js": 28000, // spec-v362..v364 2026-07-03 (23000->28000): +3 Group R contractor cost-recovery tiles (labor-burden-rate, equipment-hourly-rate, overhead-recovery-rate) -> ~23.2 KB gz; current + ~20% headroom. v20 2026-06-06 (18000)
+  "calc-accounting.js": 33000, // spec-v390..v392 contractor-billing trio 2026-07-03 (28000->33000): +3 Group R tiles (wip-percent-complete, change-order-markup, retainage-tracker) -> ~25.6 KB raw (91.5% of the old cap); headroom for the remaining accounting tiles in the v375..v474 backlog (v444-446 contractor-cost); lazy-loaded, not in the home-view payload // spec-v362..v364 2026-07-03 (23000->28000): +3 Group R contractor cost-recovery tiles (labor-burden-rate, equipment-hourly-rate, overhead-recovery-rate) -> ~23.2 KB gz; current + ~20% headroom. v20 2026-06-06 (18000)
   // Bumped 10500 -> 11500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~700 bytes of inline annotation across
   // the ten exports).

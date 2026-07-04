@@ -1416,6 +1416,7 @@ cross-check.
 | calc-accounting.js | `computeAmortization` | `{ principal = 0, annual_rate_pct = 0, term_months = 0, extra_principal = 0, f...` | _ | _ | _ |
 | calc-accounting.js | `computeBreakeven` | `{ fixed_costs = 0, variable_cost_per_unit = 0, sale_price_per_unit = 0, targe...` | _ | _ | _ |
 | calc-accounting.js | `computeCashConversionCycle` | `{ dso = 0, dio = 0, dpo = 0 }` | _ | _ | _ |
+| calc-accounting.js | `computeChangeOrderMarkup` | `{ direct_cost_usd = 0, overhead_pct = 10, profit_pct = 10, current_contract_u...` | _ | _ | _ |
 | calc-accounting.js | `computeDecliningBalanceDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, factor = 2, year = 1, sl_switch = true ...` | _ | _ | _ |
 | calc-accounting.js | `computeEmployerPayrollTax` | `{ wages = 0, ss_base = 0, futa_base = 7000, futa_rate_pct = 0.6, suta_rate_pc...` | _ | _ | _ |
 | calc-accounting.js | `computeEquipmentHourlyRate` | `{ purchase = 0, salvage = 0, life_hr = 0, annual_hr = 0, iit_pct = 0, fuel_gp...` | _ | _ | _ |
@@ -1428,10 +1429,12 @@ cross-check.
 | calc-accounting.js | `computeMileageRollup` | `{ trips = [], tax_year = 2025 }` | _ | _ | _ |
 | calc-accounting.js | `computeOverheadRecoveryRate` | `{ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct ...` | _ | _ | _ |
 | calc-accounting.js | `computePayrollWithholding` | `{ gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",...` | _ | _ | _ |
+| calc-accounting.js | `computeRetainageTracker` | `{ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeSETax` | `{ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 2025, filing_status = "sin...` | _ | _ | _ |
 | calc-accounting.js | `computeSalesTaxCompound` | `{ pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0, }` | _ | _ | _ |
 | calc-accounting.js | `computeSection179` | `{ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonu...` | _ | _ | _ |
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
+| calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft =...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
@@ -2516,7 +2519,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1102.
+Row count: 1105.
 
 <!-- END function-corpus-v14 -->
 
@@ -3438,12 +3441,13 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (19 tiles)
+### Group R Accounting (22 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `breakeven` | Breakeven and Contribution Margin | Project (first-principles); Standard CVP identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cash-conversion-cycle` | Cash Conversion Cycle | Project (first-principles); DSO 45 / DIO 60 / DPO 30 -> CCC 75 days | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `change-order-markup` | Change Order Price with Overhead and Profit | construction estimating (AIA G701); spec-v391 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `declining-balance-depreciation` | Declining-Balance Depreciation (Book) | GAAP book depreciation (ASC 360); $50,000 cost, $5,000 salvage, 5 yr, 200% DDB -> Yr1 $20,000 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `employer-payroll-tax` | Employer Payroll Tax | FICA/FUTA (26 USC 3101-3306 + IRS Pub...; $200,000 wages above the SS base ($168,600) -> SS capped ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equipment-hourly-rate` | Equipment Owning and Operating Hourly Rate | CAT / AED method; spec-v363 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3457,10 +3461,12 @@ per spec-v14 §13.1 second paragraph.
 | `mileage-rollup` | Mileage Log Roll-Up | IRS Pub. 463 / IRS Notice (annual sta...; Two trips / 60 business miles total / 2025 -> $42.00 dedu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `overhead-recovery-rate` | Overhead Recovery Rate | contractor cost accounting; spec-v364 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `payroll-withholding` | Payroll Tax Withholding (Simplified) | IRS Pub 15-T percentage method (singl...; $1500 biweekly / single / 2025 -> annualized $39,000 / fe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `retainage-tracker` | Retainage Withheld and Net Payment (AIA G702/G703) | construction billing (AIA G702/G703); spec-v392 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sales-tax-compound` | Sales Tax Compounding and Reverse | Project (first-principles); $1,000 / 6.25% state + 1.5% local -> 7.75% combined / $77... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `se-tax` | Self-Employment Tax (Schedule SE) | IRS Schedule SE (Form 1040); $80,000 net SE earnings / no W-2 wages / single / 2025 ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `section-179` | Section 179 and Bonus Depreciation | IRC sec. 179 (annual indexed limits; ...; $50,000 cost / 100% business use / $200k taxable income /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `straight-line-depreciation` | Straight-Line Depreciation | Project (first-principles); annual = (cost - salvage) / life | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group T Lab (14 tiles)
 
@@ -3560,6 +3566,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 858. Fixture-covered or reference-cadence: 858 / 858.
+Tile count: 861. Fixture-covered or reference-cadence: 861 / 861.
 
 <!-- END tile-index-v14 -->

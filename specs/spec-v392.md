@@ -1,6 +1,6 @@
 # roughlogic.com Specification v392 -- Retainage Withheld and Net Payment (AIA G702/G703) (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the contractor-billing trio (v390 WIP -> v391 change-order markup
+> **Status: LANDED (2026-07-03, 0.137.0; proposed 2026-07-03). Third and final tile of the contractor-billing trio (v390 WIP -> v391 change-order markup
 > -> v392 retainage). Every progress draw withholds a retention percentage until the job is substantially complete; this
 > tile computes the retention held this period, the cumulative amount tied up, and the net payment on the draw.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. On the AIA G702/G703 payment application, the owner

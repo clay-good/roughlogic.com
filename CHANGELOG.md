@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(accounting): land spec-v390..v392 -- 3 contractor-billing tiles in calc-accounting.js; 858 -> 861 tiles, 0.137.0, 2026-07-03
+
+The contractor-billing trio, sixth batch of the v375-v474 campaign: the three numbers behind a construction progress draw, all in the existing lazy `calc-accounting.js` (Group R); no new module, group, or dependency. Catalog **858 -> 861**, package **0.136.0 -> 0.137.0** (a minor). Proposed 2026-07-03.
+
+- **`wip-percent-complete` (spec-v390).** Cost-to-cost POC: percent complete = cost / estimated total cost, earned revenue = percent x contract, over/under billing = earned - billed. Pinned: $500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled (asset); billing $400K flips to -$25K overbilled (liability). Cost past the estimate caps percent complete at 100% and flags an overrun.
+- **`change-order-markup` (spec-v391).** price = direct x (1 + OH%) x (1 + profit%). Pinned: $10,000 direct at 10% and 10% -> $12,100 (markup $2,100, 17.4% gross margin); the additive method gives $12,000, the difference the contract's wording decides. Applied to a $500K contract -> $512,100.
+- **`retainage-tracker` (spec-v392).** retention = work x rate, net = work - retention, cumulative = prior + this. Pinned: $100,000 draw at 10%, $40,000 prior -> $10K retained, $90K net, $50K cumulative; a 5% job withholds $5,000 and pays $95,000 net.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the overrun cap, the compounded-vs-additive markup, the retention math, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming cost-to-cost POC / ASC 606, AIA G701, and AIA G702/G703. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers). The `ACCOUNTING_RENDERERS` exact-count assert in calc-accounting.test.js was bumped 19 -> 22. Module cap bumped with a dated comment: calc-accounting.js 28000 -> 33000. Housekeeping: home count 858 -> 861, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 69 appended. All gates green at the new state: lint, unit tests (**5,154**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(hvac): land spec-v387..v389 -- 3 water-system hydraulics tiles; 855 -> 858 tiles, 0.136.0, 2026-07-03
 
 The water-system hydraulics trio, fifth batch of the v375-v474 campaign: the friction factor, the buried-pipe thrust block, and the hydrant flow test, each in its natural module and group; no new module, group, or dependency. Catalog **855 -> 858**, package **0.135.0 -> 0.136.0** (a minor). Proposed 2026-07-03.

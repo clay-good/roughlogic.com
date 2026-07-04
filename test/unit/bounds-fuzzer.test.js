@@ -15406,3 +15406,57 @@ test("bounds: spec-v389 computeHydrantAvailableFlow pins QR, the color class, an
   assert.ok("error" in _v389({ static_psi: 70, residual_psi: 50, qf_gpm: 0 }));
   assert.ok("error" in _v389({ static_psi: Infinity, residual_psi: 50, qf_gpm: 1000 }));
 });
+
+// ===================== spec-v390..v392 contractor-billing trio (calc-accounting.js) =====================
+import { computeWipPercentComplete as _v390, computeChangeOrderMarkup as _v391, computeRetainageTracker as _v392 } from "../../calc-accounting.js";
+
+test("bounds: spec-v390 computeWipPercentComplete pins percent complete, over/under, the overrun cap, and error seams", () => {
+  const r = _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 });
+  assert.ok(Math.abs(r.pct_complete - 0.75) < 1e-12);
+  assert.ok(Math.abs(r.earned_revenue - 375000) < 1e-9);
+  assert.ok(Math.abs(r.over_under - 25000) < 1e-9 && r.underbilled === true);
+  // Front-loaded billing flips it to overbilled.
+  const over = _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 400000, billed_to_date_usd: 400000 });
+  assert.ok(Math.abs(over.over_under + 25000) < 1e-9 && over.underbilled === false);
+  // Cost past the estimate caps percent complete at 100% and flags overrun.
+  const orun = _v390({ contract_usd: 500000, cost_to_date_usd: 450000, est_total_cost_usd: 400000, billed_to_date_usd: 350000 });
+  assert.ok(orun.pct_complete === 1.0 && orun.overrun === true);
+  // Error seams.
+  assert.ok("error" in _v390({ contract_usd: 0, cost_to_date_usd: 300000, est_total_cost_usd: 400000 }));
+  assert.ok("error" in _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: 0 }));
+  assert.ok("error" in _v390({ contract_usd: 500000, cost_to_date_usd: 300000, est_total_cost_usd: Infinity }));
+});
+
+test("bounds: spec-v391 computeChangeOrderMarkup pins the compounded price, additive alternative, and error seams", () => {
+  const r = _v391({ direct_cost_usd: 10000, overhead_pct: 10, profit_pct: 10, current_contract_usd: 500000 });
+  assert.ok(Math.abs(r.price - 12100) < 1e-6);
+  assert.ok(Math.abs(r.markup - 2100) < 1e-6);
+  assert.ok(Math.abs(r.margin_pct - 2100 / 12100 * 100) < 1e-9);
+  assert.ok(Math.abs(r.new_contract - 512100) < 1e-6);
+  // The additive method is slightly less.
+  assert.ok(Math.abs(r.additive_price - 12000) < 1e-9 && r.additive_price < r.price);
+  // No current contract -> null new_contract.
+  assert.strictEqual(_v391({ direct_cost_usd: 10000, overhead_pct: 10, profit_pct: 10, current_contract_usd: 0 }).new_contract, null);
+  // Error seams.
+  assert.ok("error" in _v391({ direct_cost_usd: 0, overhead_pct: 10, profit_pct: 10 }));
+  assert.ok("error" in _v391({ direct_cost_usd: 10000, overhead_pct: -1, profit_pct: 10 }));
+  assert.ok("error" in _v391({ direct_cost_usd: Infinity, overhead_pct: 10, profit_pct: 10 }));
+});
+
+test("bounds: spec-v392 computeRetainageTracker pins retention, net, cumulative, and error seams", () => {
+  const r = _v392({ work_this_period_usd: 100000, retainage_pct: 10, prior_retained_usd: 40000 });
+  assert.ok(Math.abs(r.retention_this - 10000) < 1e-9);
+  assert.ok(Math.abs(r.net_payment - 90000) < 1e-9);
+  assert.ok(Math.abs(r.cumulative_ret - 50000) < 1e-9);
+  // A lower rate withholds less and pays more.
+  const low = _v392({ work_this_period_usd: 100000, retainage_pct: 5, prior_retained_usd: 40000 });
+  assert.ok(Math.abs(low.retention_this - 5000) < 1e-9 && Math.abs(low.net_payment - 95000) < 1e-9);
+  // Zero retainage pays the full amount.
+  assert.ok(Math.abs(_v392({ work_this_period_usd: 100000, retainage_pct: 0, prior_retained_usd: 0 }).net_payment - 100000) < 1e-9);
+  // Error seams: non-positive work, rate outside 0-100, negative prior, non-finite.
+  assert.ok("error" in _v392({ work_this_period_usd: 0, retainage_pct: 10, prior_retained_usd: 40000 }));
+  assert.ok("error" in _v392({ work_this_period_usd: 100000, retainage_pct: 101, prior_retained_usd: 40000 }));
+  assert.ok("error" in _v392({ work_this_period_usd: 100000, retainage_pct: -1, prior_retained_usd: 40000 }));
+  assert.ok("error" in _v392({ work_this_period_usd: 100000, retainage_pct: 10, prior_retained_usd: -1 }));
+  assert.ok("error" in _v392({ work_this_period_usd: Infinity, retainage_pct: 10, prior_retained_usd: 40000 }));
+});
