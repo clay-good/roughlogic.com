@@ -1,6 +1,6 @@
 # roughlogic.com Specification v413 -- Steel Beam Camber from Dead-Load Deflection (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the steel composite-beam trio (v411 shear stud strength ->
+> **Status: LANDED (2026-07-04, 0.144.0; proposed 2026-07-03). Third and final tile of the steel composite-beam trio (v411 shear stud strength ->
 > v412 composite flexure -> v413 beam camber). Long composite floor beams deflect under the wet concrete before it cures;
 > this tile computes that dead-load deflection and the shop camber a fabricator should cold-bend into the beam so it ends up
 > flat.**

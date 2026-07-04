@@ -27710,6 +27710,76 @@
       }
     },
     {
+      "tile_id": "shear-stud-strength",
+      "source_publisher": "AISC 360-22 I8",
+      "source_title": "3/4 in stud, f'c 4000, Ec 3.644e6, Fu 65, Rg 1.0, Rp 0.75 -> Qn 21.6 kip, 19 studs at V' 400",
+      "source_edition_or_year": "spec-v411 worked example (machine-verified)",
+      "source_section_or_page": "spec-v411 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "asc_in2": 0.442, "fc_psi": 4000, "ec_psi": 3644000, "fu_ksi": 65, "rg": 1.0, "rp": 0.75, "vprime_kip": 400 },
+      "outputs": {
+        "qn_kip": { "value": 21.55, "tolerance": { "pct": 0.5 } },
+        "studs_each_side": { "value": 19, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "shear-stud-strength",
+      "source_publisher": "AISC 360-22 I8",
+      "source_title": "cross-check: a weak-position stud (Rp 0.6) -> cap 17.2 kip, 24 studs each side",
+      "source_edition_or_year": "spec-v411 worked example (machine-verified)",
+      "source_section_or_page": "spec-v411 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "asc_in2": 0.442, "fc_psi": 4000, "ec_psi": 3644000, "fu_ksi": 65, "rg": 1.0, "rp": 0.6, "vprime_kip": 400 },
+      "outputs": {
+        "qn_kip": { "value": 17.24, "tolerance": { "pct": 0.5 } },
+        "studs_each_side": { "value": 24, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "composite-beam-flexure",
+      "source_publisher": "AISC 360-22 I3",
+      "source_title": "As 8.0, Fy 50, d 16, slab 4, be 90, f'c 4 -> C 400 kip, a 1.31 in, phi Mn 340 kip-ft",
+      "source_edition_or_year": "spec-v412 worked example (machine-verified)",
+      "source_section_or_page": "spec-v412 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "as_in2": 8.0, "fy_ksi": 50, "d_in": 16, "tslab_in": 4, "be_in": 90, "fc_ksi": 4 },
+      "outputs": {
+        "c_kip": { "value": 400, "tolerance": { "pct": 0.5 } },
+        "a_in": { "value": 1.307, "tolerance": { "pct": 0.5 } },
+        "phi_mn_kipft": { "value": 340, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "steel-camber",
+      "source_publisher": "AISC / fabrication practice",
+      "source_title": "1.0 kip/ft, 40 ft, I 2100 -> 0.95 in deflection, 3/4 in camber",
+      "source_edition_or_year": "spec-v413 worked example (machine-verified)",
+      "source_section_or_page": "spec-v413 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "w_kip_ft": 1.0, "span_ft": 40, "moi_in4": 2100, "e_ksi": 29000, "fraction": 0.80 },
+      "outputs": {
+        "defl_in": { "value": 0.9458, "tolerance": { "pct": 1 } },
+        "camber_in": { "value": 0.75, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "steel-camber",
+      "source_publisher": "AISC / fabrication practice",
+      "source_title": "cross-check: a stiff 20 ft beam deflecting 0.05 in is left flat (camber 0)",
+      "source_edition_or_year": "spec-v413 worked example (machine-verified)",
+      "source_section_or_page": "spec-v413 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "w_kip_ft": 0.5, "span_ft": 20, "moi_in4": 1350, "e_ksi": 29000, "fraction": 0.80 },
+      "outputs": {
+        "camber_in": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
       "tile_id": "fire-pump-curve",
       "source_publisher": "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection)",
       "source_title": "500 gpm at 100 psi pump, 128 psi churn / 72 psi at 750 gpm -> limit 140, floor 65, both pass (12% / 7% margins)",

@@ -857,6 +857,9 @@ export const COMPUTE_MAP = {
   "bolt-group-eccentric": { module: "../../calc-steel.js", fn: "computeBoltGroupEccentric" },
   "bolt-shear-bearing": { module: "../../calc-steel.js", fn: "computeBoltShearBearing" },
   "column-base-plate": { module: "../../calc-steel.js", fn: "computeColumnBasePlate" },
+  "shear-stud-strength": { module: "../../calc-steel.js", fn: "computeShearStudStrength" },
+  "composite-beam-flexure": { module: "../../calc-steel.js", fn: "computeCompositeBeamFlexure" },
+  "steel-camber": { module: "../../calc-steel.js", fn: "computeSteelCamber" },
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (3 tiles, new calc-concrete.js)
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },
   "rc-beam-shear": { module: "../../calc-concrete.js", fn: "computeRcBeamShear" },

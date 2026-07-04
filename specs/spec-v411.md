@@ -1,6 +1,6 @@
 # roughlogic.com Specification v411 -- Composite Shear Stud Strength and Count (AISC 360-22 I8) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a steel composite-beam trio (v411 shear stud strength -> v412 composite
+> **Status: LANDED (2026-07-04, 0.144.0; proposed 2026-07-03). First tile of a steel composite-beam trio (v411 shear stud strength -> v412 composite
 > flexure -> v413 beam camber). `steel-beam-flexure` gives a bare-steel beam's capacity; a composite floor beam is far
 > stronger because shear studs make the slab work with it -- and the number of studs comes from the single-stud strength this
 > tile computes.**

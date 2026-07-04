@@ -550,6 +550,7 @@ const _TILES = [
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (calc-steel.js)
   ["steel-beam-flexure", "E"], ["steel-beam-shear", "E"], ["steel-column-capacity", "E"],
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],
+  ["shear-stud-strength", "E"], ["composite-beam-flexure", "E"], ["steel-camber", "E"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (calc-concrete.js)
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)

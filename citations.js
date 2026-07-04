@@ -9267,6 +9267,42 @@ export const CITATIONS = {
       { name: "Concentric only", value: "concentric axial compression; moment / uplift, the anchor rods, and concrete breakout are separate checks", source: "AISC Design Guide 1" },
     ],
   },
+  "shear-stud-strength": {
+    formula: "Qn = 0.5 Asc sqrt(f'c Ec) <= Rg Rp Asc Fu; studs each side = ceil(V' / Qn).",
+    edition: "AISC 360-22 §I8.2a nominal strength of a steel headed stud anchor, by name.",
+    freeAccess: "The stud-strength expression and the Rg/Rp table factors are published in AISC 360-22 §I8; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "AISC 360-22 §I8.2a: the nominal shear strength of one steel headed stud anchor in a composite beam is Qn = 0.5 Asc sqrt(f'c Ec), but not more than Rg Rp Asc Fu, where Asc is the stud area, Ec the concrete modulus, Fu the stud tensile strength, and Rg (group) and Rp (position) are the Table I8.1 factors for the deck orientation, the number of studs per rib, and the weak/strong stud position. The upper bound usually governs. The number of studs required each side of the maximum-moment point = the horizontal shear V' for full composite action divided by Qn, rounded up. This returns Qn and the count; it does not check the deck, the stud spacing/edge limits, or partial composite action. A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Stud strength", value: "Qn = 0.5 Asc sqrt(f'c Ec) <= Rg Rp Asc Fu", source: "AISC 360-22 I8.2a" },
+      { name: "Rg/Rp factors", value: "group and position factors from Table I8.1", source: "AISC 360-22" },
+      { name: "Stud count", value: "studs each side = ceil(V' / Qn)", source: "scope of this tile" },
+    ],
+  },
+  "composite-beam-flexure": {
+    formula: "C = As Fy; a = C / (0.85 f'c be) [require a <= tslab]; Mn = C(d/2 + tslab - a/2); phi Mn = 0.90 Mn.",
+    edition: "AISC 360-22 §I3.2a composite beam flexural strength with the plastic neutral axis in the slab, by name.",
+    freeAccess: "The plastic-stress-distribution composite moment with the PNA in the slab is published in AISC 360-22 §I3; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "AISC 360-22 §I3.2a composite beam flexural strength for the plastic-neutral-axis-in-slab case: the steel yields fully in tension (C = As Fy), balanced by a rectangular concrete compression block of depth a = C / (0.85 f'c be); the nominal moment Mn = C x (d/2 + tslab - a/2) taken about the steel centroid, and phi Mn = 0.90 Mn. It is valid only while a <= the slab thickness (full composite, PNA in the slab); a deeper block means the PNA falls in the steel and the general method (with the steel partly in compression) applies, which the tile flags rather than reporting a wrong Mn. Assumes full composite action (adequate shear studs). A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Compression block", value: "C = As Fy, a = C/(0.85 f'c be)", source: "AISC 360-22 I3.2a" },
+      { name: "Moment", value: "Mn = C(d/2 + tslab - a/2), phi Mn = 0.90 Mn", source: "AISC 360-22 I3.2a" },
+      { name: "PNA-in-slab only", value: "valid while a <= slab thickness; else the general method applies", source: "scope of this tile" },
+    ],
+  },
+  "steel-camber": {
+    formula: "delta = 5 w L^4 / (384 E I); camber = round(fraction x delta to nearest 1/4 in).",
+    edition: "Steel beam camber from the dead-load deflection, standard AISC / fabrication practice, by name.",
+    freeAccess: "The simple-span deflection and the fractional-camber rounding are standard published structural results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Steel beam camber from the dead-load deflection: the simple-span midspan deflection delta = 5 w L^4 / (384 E I) under the deflection-causing (dead) load, cambered at a fraction (commonly 75-80%) of it and rounded to the nearest 1/4 in. Fabricators do not camber below about 3/4 in (the mill tolerance and cost are not worth it), so a stiff or short beam is left flat. Camber removes the dead-load sag so the floor finishes level after the concrete cures; the live-load deflection is not cambered out. This returns the deflection and the rounded camber; the structural drawings govern the specified value. A detailing aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Deflection", value: "delta = 5 w L^4 / (384 E I) simple span", source: "beam theory" },
+      { name: "Camber", value: "fraction (75-80%) of delta, rounded to nearest 1/4 in", source: "AISC / fabrication practice" },
+      { name: "Practical minimum", value: "not cambered below about 3/4 in", source: "fabrication practice" },
+    ],
+  },
   "rc-beam-flexure": {
     formula: "a = As x fy / (0.85 x f'c x b); Mn = As x fy x (d - a/2); phi Mn = 0.90 x Mn (tension-controlled); util = Mu / phi Mn.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.2.2.4.1 (equivalent rectangular stress block), §22.2 (nominal flexural strength), §21.2.2 (phi = 0.90 tension-controlled).",

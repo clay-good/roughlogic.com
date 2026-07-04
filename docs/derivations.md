@@ -2429,12 +2429,15 @@ cross-check.
 | calc-steel.js | `computeBoltGroupEccentric` | `{ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 }...` | _ | _ | _ |
 | calc-steel.js | `computeBoltShearBearing` | `{ d_in = 0.75, ab_in2 = 0.4418, fnv_ksi = 54, nplanes = 1, t_in = 0.5, fu_ksi...` | _ | _ | _ |
 | calc-steel.js | `computeColumnBasePlate` | `{ pu_kip = 0, fc_ksi = 4, fy_ksi = 36, d_in = 0, bf_in = 0, b_in = 0, n_in = ...` | _ | _ | _ |
+| calc-steel.js | `computeCompositeBeamFlexure` | `{ as_in2 = 0, fy_ksi = 50, d_in = 0, tslab_in = 0, be_in = 0, fc_ksi = 4 } = {}` | _ | _ | _ |
+| calc-steel.js | `computeShearStudStrength` | `{ asc_in2 = 0, fc_psi = 4000, ec_psi = 0, fu_ksi = 65, rg = 1.0, rp = 0.75, v...` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamFlexure` | `{ fy = 50, zx = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamLtb` | `{ fy = 50, zx = 0, sx = 0, ry = 0, rts = 0, j = 0, ho = 0, lb_ft = 0, cb = 1....` | _ | _ | _ |
 | calc-steel.js | `computeSteelBeamShear` | `{ fy = 50, d = 0, tw = 0, cv1 = 1.0, omega_v = 1.50, vu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBlockShear` | `{ t_in = 0, fy = 36, fu = 58, n = 0, s_in = 3, end_in = 0, edge_in = 0, dh_in...` | _ | _ | _ |
 | calc-steel.js | `computeSteelBoltSlipCritical` | `{ mu = 0.30, tb_kip = 0, ns = 1, n = 1, hf = 1.0, du = 1.13 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelBoltTensionShear` | `{ fnt_ksi = 90, fnv_ksi = 54, ab_in2 = 0, frv_ksi = 0, method = "LRFD" } = {}` | _ | _ | _ |
+| calc-steel.js | `computeSteelCamber` | `{ w_kip_ft = 0, span_ft = 0, moi_in4 = 0, e_ksi = 29000, fraction = 0.80 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelColumnCapacity` | `{ fy = 50, e_mod = 29000, k = 1.0, l_ft = 0, r_in = 0, ag = 0, pu = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelEffectiveLengthK` | `{ ga = 0, gb = 0, frame = "sway" } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelFilletWeldSize` | `{ t1_in = 0, t2_in = 0, w_in = 0 } = {}` | _ | _ | _ |
@@ -2537,7 +2540,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1123.
+Row count: 1126.
 
 <!-- END function-corpus-v14 -->
 
@@ -2973,7 +2976,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (184 tiles)
+### Group E Construction (187 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3004,6 +3007,7 @@ per spec-v14 §13.1 second paragraph.
 | `column-base-plate` | Column Base Plate under Axial Load (AISC Design Guide 1) | AISC Design Guide 1 §3.1 / AISC 360-2...; spec-v268 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `column-buckling-wood` | Wood Column Capacity (Slenderness) | NDS column-stability (Cp / Euler buck...; 3.5x3.5 in, le 96 in, Fc* 1150, Emin 580,000 -> capacity ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combined-stress-axial-bending` | Combined Axial and Bending Stress (P/A +/- Mc/I) | mechanics of materials; spec-v343 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `composite-beam-flexure` | Composite Beam Flexural Strength (AISC 360-22 I3) | AISC 360-22 I3; spec-v412 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compound-miter` | Compound Miter (Crown Molding) | First-principles compound-miter trigo...; 38 deg spring crown at a 90 deg corner -> 31.62 deg miter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-beam-min-flexural-steel` | Minimum Flexural Reinforcement As,min (ACI 318-19 9.6.1.2) | ACI 318-19 9.6.1.2; spec-v394 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3097,6 +3101,7 @@ per spec-v14 §13.1 second paragraph.
 | `seismic-pdelta-stability` | Seismic P-Delta Stability Coefficient (ASCE 7-22 12.8.7) | ASCE 7-22 12.8.7; spec-v383 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-story-drift` | Seismic Design Story Drift and Allowable Limit (ASCE 7-22 12.8.6 / 12.12) | ASCE 7-22 12.8.6 / 12.12; spec-v382 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shaft-torsion` | Shaft Torsional Shear Stress and Angle of Twist | mechanics of materials; spec-v359 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `shear-stud-strength` | Composite Shear Stud Strength and Count (AISC 360-22 I8) | AISC 360-22 I8; spec-v411 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-deflection` | Wood Shear Wall Deflection (SDPWS Eq 4.3-1) | AWC SDPWS Equation 4.3-1 (AWC/APA des...; spec-v274 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-overturning` | Wood Shear Wall Unit Shear and Holdown (SDPWS / ASD) | AWC SDPWS segmented shear wall + ASCE...; spec-v273 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shielding-gas-runtime` | Shielding-Gas Cylinder Runtime and Cost | Torch / regulator maker's flow charts...; 35 cfh, 120 min arc-on, 251 ft3 cylinder, $60/cylinder ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -3122,6 +3127,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-block-shear` | Steel Block Shear Rupture (AISC 360 J4.3) | AISC 360-22 Section J4.3; spec-v282 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-bolt-slip-critical` | Slip-Critical Bolt Design Strength (AISC 360 J3.8) | AISC 360-22 J3.8 / Table J3.1; spec-v294 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-bolt-tension-shear` | Bolt Combined Tension and Shear (AISC 360 J3.7) | AISC 360-22 J3.7; spec-v316 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `steel-camber` | Steel Beam Camber from Dead-Load Deflection | AISC / fabrication practice; spec-v413 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-column-capacity` | Steel Column Compressive Capacity (AISC 360 Ch. E, Flexural Buckling) | AISC 360-22 Chapter E / Steel Constru...; spec-v256 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-effective-length-k` | Column Effective Length Factor K (Alignment Chart) | AISC alignment chart (Dumonteil fit); spec-v315 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-fillet-weld-size` | Fillet Weld Size Limits and Effective Throat (AISC 360 J2.2b) | AISC 360-22 Table J2.4 / J2.2b; spec-v295 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3602,6 +3608,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 879. Fixture-covered or reference-cadence: 879 / 879.
+Tile count: 882. Fixture-covered or reference-cadence: 882 / 882.
 
 <!-- END tile-index-v14 -->

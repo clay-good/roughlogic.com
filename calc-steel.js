@@ -802,3 +802,147 @@ STEEL_RENDERERS["steel-bolt-tension-shear"] = _simpleRenderer({
   ],
   compute: computeSteelBoltTensionShear,
 });
+
+// ===================== spec-v411..v413: steel composite-beam trio (Group E) =====================
+
+// dims: in { asc_in2: L^2, fc_psi: M L^-1 T^-2, ec_psi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, rg: dimensionless, rp: dimensionless, vprime_kip: M L T^-2 } out: { qn_calc_kip: M L T^-2, qn_cap_kip: M L T^-2, qn_kip: M L T^-2, studs_each_side: dimensionless }
+export function computeShearStudStrength({ asc_in2 = 0, fc_psi = 4000, ec_psi = 0, fu_ksi = 65, rg = 1.0, rp = 0.75, vprime_kip = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const asc = Number(asc_in2) || 0;
+  const fc = Number(fc_psi) || 0;
+  const ec = Number(ec_psi) || 0;
+  const fu = Number(fu_ksi) || 0;
+  const Rg = Number(rg) || 0;
+  const Rp = Number(rp) || 0;
+  const vprime = Number(vprime_kip) || 0;
+  if (!(asc > 0)) return { error: "Stud area Asc must be positive (in^2)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(ec > 0)) return { error: "Concrete modulus Ec must be positive (psi)." };
+  if (!(fu > 0)) return { error: "Stud tensile strength Fu must be positive (ksi)." };
+  if (!(Rg > 0)) return { error: "Group factor Rg must be positive." };
+  if (!(Rp > 0)) return { error: "Position factor Rp must be positive." };
+  const qn_calc_kip = 0.5 * asc * Math.sqrt(fc * ec) / 1000;
+  const qn_cap_kip = Rg * Rp * asc * fu;
+  const qn_kip = Math.min(qn_calc_kip, qn_cap_kip);
+  const cap_governs = qn_cap_kip <= qn_calc_kip;
+  const studs_each_side = vprime > 0 ? Math.ceil(vprime / qn_kip) : null;
+  return {
+    qn_calc_kip, qn_cap_kip, qn_kip, cap_governs, studs_each_side,
+    note: "AISC 360-22 §I8.2a nominal strength of one steel headed stud anchor: Qn = 0.5 Asc sqrt(f'c Ec) but not more than Rg Rp Asc Fu, where Rg is the group factor and Rp the position factor from Table I8.1 (deck orientation, number of studs per rib, weak vs strong position). The upper bound (Rg Rp Asc Fu) usually governs. The number of studs each side of the maximum-moment point = the horizontal shear V' for full composite action / Qn, rounded up. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const shearStudStrengthExample = { inputs: { asc_in2: 0.442, fc_psi: 4000, ec_psi: 3644000, fu_ksi: 65, rg: 1.0, rp: 0.75, vprime_kip: 400 } };
+STEEL_RENDERERS["shear-stud-strength"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 §I8.2a: nominal shear-stud strength Qn = 0.5 Asc sqrt(f'c Ec) <= Rg Rp Asc Fu, with Rg (group) and Rp (position) from Table I8.1; the number of studs each side = V' / Qn rounded up. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: shearStudStrengthExample.inputs,
+  fields: [
+    { key: "asc_in2", label: "Stud area Asc (in^2)", kind: "number", default: 0.442 },
+    { key: "fc_psi", label: "Slab f'c (psi)", kind: "number", default: 4000 },
+    { key: "ec_psi", label: "Concrete modulus Ec (psi)", kind: "number", default: 3644000 },
+    { key: "fu_ksi", label: "Stud tensile Fu (ksi)", kind: "number", default: 65 },
+    { key: "rg", label: "Group factor Rg (Table I8.1)", kind: "number", default: 1.0 },
+    { key: "rp", label: "Position factor Rp (Table I8.1)", kind: "number", default: 0.75 },
+    { key: "vprime_kip", label: "Horizontal shear V' (kip, 0 = strength only)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "qn", id: "sss-out-qn", label: "Stud strength Qn", value: (r) => fmt(r.qn_kip, 1) + " kip (" + (r.cap_governs ? "Rg Rp Asc Fu cap governs" : "0.5 Asc sqrt(f'c Ec) governs") + ")" },
+    { key: "calc", id: "sss-out-calc", label: "Calc vs cap", value: (r) => fmt(r.qn_calc_kip, 1) + " / " + fmt(r.qn_cap_kip, 1) + " kip" },
+    { key: "n", id: "sss-out-n", label: "Studs each side", value: (r) => r.studs_each_side == null ? "(enter V' for the count)" : r.studs_each_side + " studs" },
+    { key: "note", id: "sss-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShearStudStrength,
+});
+
+// dims: in { as_in2: L^2, fy_ksi: M L^-1 T^-2, d_in: L, tslab_in: L, be_in: L, fc_ksi: M L^-1 T^-2 } out: { c_kip: M L T^-2, a_in: L, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2 }
+export function computeCompositeBeamFlexure({ as_in2 = 0, fy_ksi = 50, d_in = 0, tslab_in = 0, be_in = 0, fc_ksi = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const as = Number(as_in2) || 0;
+  const fy = Number(fy_ksi) || 0;
+  const d = Number(d_in) || 0;
+  const tslab = Number(tslab_in) || 0;
+  const be = Number(be_in) || 0;
+  const fc = Number(fc_ksi) || 0;
+  if (!(as > 0)) return { error: "Steel area As must be positive (in^2)." };
+  if (!(fy > 0)) return { error: "Steel yield Fy must be positive (ksi)." };
+  if (!(d > 0)) return { error: "Section depth d must be positive (in)." };
+  if (!(tslab > 0)) return { error: "Slab thickness must be positive (in)." };
+  if (!(be > 0)) return { error: "Effective slab width be must be positive (in)." };
+  if (!(fc > 0)) return { error: "Slab f'c must be positive (ksi)." };
+  const c_kip = as * fy;
+  const a_in = c_kip / (0.85 * fc * be);
+  const pna_in_slab = a_in <= tslab;
+  if (!pna_in_slab) {
+    return {
+      c_kip, a_in, pna_in_slab, mn_kipft: null, phi_mn_kipft: null,
+      note: "The plastic neutral axis falls in the steel section (a = " + a_in.toFixed(2) + " in > slab " + tslab.toFixed(2) + " in): the full steel yield force exceeds the slab's concrete compression capacity, so this simplified full-composite equation does not apply. Widen the effective slab, thicken the slab, or use the general AISC 360-22 I3 method with the PNA in the steel. A design aid; the engineer of record's stamped design governs.",
+    };
+  }
+  const mn_kipin = c_kip * (d / 2 + tslab - a_in / 2);
+  const mn_kipft = mn_kipin / 12;
+  const phi_mn_kipft = 0.90 * mn_kipft;
+  return {
+    c_kip, a_in, pna_in_slab, mn_kipft, phi_mn_kipft,
+    note: "AISC 360-22 §I3.2a composite beam flexural strength with the plastic neutral axis in the slab: the steel yields fully in tension (C = As Fy), balanced by a concrete compression block of depth a = C / (0.85 f'c be); the nominal moment Mn = C x (d/2 + tslab - a/2) taken about the steel centroid, and phi Mn = 0.90 Mn. Valid only while a <= slab thickness (full composite, PNA in slab); a deeper block flags the PNA in steel and defers to the general method. Assumes full composite action (enough shear studs). A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const compositeBeamFlexureExample = { inputs: { as_in2: 8.0, fy_ksi: 50, d_in: 16, tslab_in: 4, be_in: 90, fc_ksi: 4 } };
+STEEL_RENDERERS["composite-beam-flexure"] = _simpleRenderer({
+  citation: "Citation: AISC 360-22 §I3.2a: composite beam flexural strength with the PNA in the slab -- C = As Fy, a = C/(0.85 f'c be), Mn = C(d/2 + tslab - a/2), phi Mn = 0.90 Mn, valid while a <= slab thickness (full composite). Beyond that the PNA is in the steel and the general method applies. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: compositeBeamFlexureExample.inputs,
+  fields: [
+    { key: "as_in2", label: "Steel area As (in^2)", kind: "number", default: 8.0 },
+    { key: "fy_ksi", label: "Steel yield Fy (ksi)", kind: "number", default: 50 },
+    { key: "d_in", label: "Steel depth d (in)", kind: "number", default: 16 },
+    { key: "tslab_in", label: "Slab thickness (in)", kind: "number", default: 4 },
+    { key: "be_in", label: "Effective slab width be (in)", kind: "number", default: 90 },
+    { key: "fc_ksi", label: "Slab f'c (ksi)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "a", id: "cbf-out-a", label: "Compression block depth a", value: (r) => fmt(r.a_in, 2) + " in (C = " + fmt(r.c_kip, 0) + " kip)" },
+    { key: "pm", id: "cbf-out-pm", label: "Design moment phi Mn", value: (r) => r.phi_mn_kipft == null ? "PNA in steel -- general method needed" : fmt(r.phi_mn_kipft, 0) + " kip-ft (Mn " + fmt(r.mn_kipft, 0) + ")" },
+    { key: "n", id: "cbf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCompositeBeamFlexure,
+});
+
+// dims: in { w_kip_ft: M T^-2, span_ft: L, moi_in4: L^4, e_ksi: M L^-1 T^-2, fraction: dimensionless } out: { defl_in: L, camber_in: L }
+export function computeSteelCamber({ w_kip_ft = 0, span_ft = 0, moi_in4 = 0, e_ksi = 29000, fraction = 0.80 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(w_kip_ft) || 0;
+  const span = Number(span_ft) || 0;
+  const moi = Number(moi_in4) || 0;
+  const e = Number(e_ksi) || 0;
+  const frac = Number(fraction) || 0;
+  if (!(w > 0)) return { error: "Dead load must be positive (kip/ft)." };
+  if (!(span > 0)) return { error: "Span must be positive (ft)." };
+  if (!(moi > 0)) return { error: "Moment of inertia must be positive (in^4)." };
+  if (!(e > 0)) return { error: "Modulus must be positive (ksi)." };
+  if (!(frac > 0 && frac <= 1)) return { error: "Camber fraction must be between 0 and 1." };
+  const L = span * 12;
+  const defl_in = 5 * (w / 12) * Math.pow(L, 4) / (384 * e * moi);
+  const camber_raw = frac * defl_in;
+  const camber_in = Math.round(camber_raw / 0.25) * 0.25;
+  const cambered = camber_in >= 0.75;
+  return {
+    defl_in, camber_raw, camber_in, cambered,
+    note: "Steel beam camber from the dead-load deflection: the simple-span midspan deflection delta = 5 w L^4 / (384 E I) under the deflection-causing (dead) load, cambered at a fraction (commonly 75-80%) of it, rounded to the nearest 1/4 in. Fabricators do not camber below about 3/4 in (the mill tolerance and cost are not worth it), so a stiff or short beam is left flat. Camber removes the dead-load sag so the floor is level after the concrete cures; the live-load deflection is not cambered out. A detailing aid; the structural drawings govern the specified camber.",
+  };
+}
+export const steelCamberExample = { inputs: { w_kip_ft: 1.0, span_ft: 40, moi_in4: 2100, e_ksi: 29000, fraction: 0.80 } };
+STEEL_RENDERERS["steel-camber"] = _simpleRenderer({
+  citation: "Citation: Steel beam camber from the dead-load deflection: delta = 5 w L^4 / (384 E I), camber = a fraction (commonly 75-80%) of delta rounded to the nearest 1/4 in; fabricators leave a beam flat below about 3/4 in (AISC / fabrication practice). A detailing aid; the structural drawings govern the specified camber.",
+  example: steelCamberExample.inputs,
+  fields: [
+    { key: "w_kip_ft", label: "Uniform dead load (kip/ft)", kind: "number", default: 1.0 },
+    { key: "span_ft", label: "Simple span (ft)", kind: "number", default: 40 },
+    { key: "moi_in4", label: "Moment of inertia I (in^4)", kind: "number", default: 2100 },
+    { key: "e_ksi", label: "Modulus E (ksi)", kind: "number", default: 29000 },
+    { key: "fraction", label: "Camber fraction of DL deflection", kind: "number", default: 0.80 },
+  ],
+  outputs: [
+    { key: "d", id: "scm-out-d", label: "Dead-load deflection", value: (r) => fmt(r.defl_in, 2) + " in" },
+    { key: "c", id: "scm-out-c", label: "Specified camber", value: (r) => r.cambered ? fmt(r.camber_in, 2) + " in" : "leave flat (below ~3/4 in practical minimum)" },
+    { key: "n", id: "scm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelCamber,
+});

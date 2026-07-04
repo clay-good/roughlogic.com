@@ -15759,3 +15759,55 @@ test("bounds: spec-v410 computeVavBoxAirflow pins max/min, the governing branch,
   assert.ok("error" in _v410({ zone_sensible_btuh: 12000, supply_dt_f: 20, ventilation_cfm: 100, turndown: 1.5 }));
   assert.ok("error" in _v410({ zone_sensible_btuh: Infinity, supply_dt_f: 20, ventilation_cfm: 100 }));
 });
+
+// ===================== spec-v411..v413 steel composite-beam trio (calc-steel.js) =====================
+import { computeShearStudStrength as _v411, computeCompositeBeamFlexure as _v412, computeSteelCamber as _v413 } from "../../calc-steel.js";
+
+test("bounds: spec-v411 computeShearStudStrength pins Qn (min of calc/cap), the stud count, and error seams", () => {
+  const r = _v411({ asc_in2: 0.442, fc_psi: 4000, ec_psi: 3644000, fu_ksi: 65, rg: 1.0, rp: 0.75, vprime_kip: 400 });
+  assert.ok(Math.abs(r.qn_calc_kip - 0.5 * 0.442 * Math.sqrt(4000 * 3644000) / 1000) < 1e-6);
+  assert.ok(Math.abs(r.qn_cap_kip - 1.0 * 0.75 * 0.442 * 65) < 1e-9);
+  assert.ok(Math.abs(r.qn_kip - Math.min(r.qn_calc_kip, r.qn_cap_kip)) < 1e-12 && r.cap_governs === true);
+  assert.strictEqual(r.studs_each_side, 19);
+  // A weaker position raises the count.
+  const weak = _v411({ asc_in2: 0.442, fc_psi: 4000, ec_psi: 3644000, fu_ksi: 65, rg: 1.0, rp: 0.6, vprime_kip: 400 });
+  assert.strictEqual(weak.studs_each_side, 24);
+  // No V' -> null count.
+  assert.strictEqual(_v411({ asc_in2: 0.442, fc_psi: 4000, ec_psi: 3644000, fu_ksi: 65, rg: 1.0, rp: 0.75, vprime_kip: 0 }).studs_each_side, null);
+  // Error seams.
+  assert.ok("error" in _v411({ asc_in2: 0, fc_psi: 4000, ec_psi: 3644000, fu_ksi: 65 }));
+  assert.ok("error" in _v411({ asc_in2: 0.442, fc_psi: 0, ec_psi: 3644000, fu_ksi: 65 }));
+  assert.ok("error" in _v411({ asc_in2: 0.442, fc_psi: 4000, ec_psi: 0, fu_ksi: 65 }));
+  assert.ok("error" in _v411({ asc_in2: 0.442, fc_psi: 4000, ec_psi: 3644000, fu_ksi: Infinity }));
+});
+
+test("bounds: spec-v412 computeCompositeBeamFlexure pins C/a/phiMn, the PNA-in-steel flag, and error seams", () => {
+  const r = _v412({ as_in2: 8.0, fy_ksi: 50, d_in: 16, tslab_in: 4, be_in: 90, fc_ksi: 4 });
+  assert.ok(Math.abs(r.c_kip - 400) < 1e-9);
+  assert.ok(Math.abs(r.a_in - 400 / (0.85 * 4 * 90)) < 1e-9 && r.pna_in_slab === true);
+  assert.ok(Math.abs(r.phi_mn_kipft - 340) < 0.5);
+  // A narrow slab pushes the PNA into the steel -> flag, null moment.
+  const narrow = _v412({ as_in2: 8.0, fy_ksi: 50, d_in: 16, tslab_in: 4, be_in: 24, fc_ksi: 4 });
+  assert.ok(narrow.a_in > 4 && narrow.pna_in_slab === false && narrow.phi_mn_kipft === null);
+  // Error seams.
+  assert.ok("error" in _v412({ as_in2: 0, fy_ksi: 50, d_in: 16, tslab_in: 4, be_in: 90, fc_ksi: 4 }));
+  assert.ok("error" in _v412({ as_in2: 8.0, fy_ksi: 50, d_in: 16, tslab_in: 0, be_in: 90, fc_ksi: 4 }));
+  assert.ok("error" in _v412({ as_in2: 8.0, fy_ksi: 50, d_in: 16, tslab_in: 4, be_in: 90, fc_ksi: Infinity }));
+});
+
+test("bounds: spec-v413 computeSteelCamber pins the deflection, the 1/4-in rounding, the flat case, and error seams", () => {
+  const r = _v413({ w_kip_ft: 1.0, span_ft: 40, moi_in4: 2100, e_ksi: 29000, fraction: 0.80 });
+  assert.ok(Math.abs(r.defl_in - 0.9458) < 0.005);
+  assert.ok(Math.abs(r.camber_in - 0.75) < 1e-12 && r.cambered === true);
+  // Camber is a multiple of 1/4 in.
+  assert.ok(Math.abs((r.camber_in / 0.25) - Math.round(r.camber_in / 0.25)) < 1e-9);
+  // A short/stiff beam is left flat.
+  const flat = _v413({ w_kip_ft: 0.5, span_ft: 20, moi_in4: 1350, e_ksi: 29000, fraction: 0.80 });
+  assert.ok(flat.camber_in === 0 && flat.cambered === false);
+  // Error seams.
+  assert.ok("error" in _v413({ w_kip_ft: 0, span_ft: 40, moi_in4: 2100 }));
+  assert.ok("error" in _v413({ w_kip_ft: 1.0, span_ft: 0, moi_in4: 2100 }));
+  assert.ok("error" in _v413({ w_kip_ft: 1.0, span_ft: 40, moi_in4: 0 }));
+  assert.ok("error" in _v413({ w_kip_ft: 1.0, span_ft: 40, moi_in4: 2100, fraction: 1.5 }));
+  assert.ok("error" in _v413({ w_kip_ft: Infinity, span_ft: 40, moi_in4: 2100 }));
+});

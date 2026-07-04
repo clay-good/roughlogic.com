@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(steel): land spec-v411..v413 -- 3 steel composite-beam tiles in calc-steel.js; 879 -> 882 tiles, 0.144.0, 2026-07-04
+
+The steel composite-beam trio, thirteenth batch of the v375-v474 campaign: the shear-stud strength, the composite flexural strength, and the beam camber, all in the existing lazy `calc-steel.js` (Group E); no new module, group, or dependency. Catalog **879 -> 882**, package **0.143.0 -> 0.144.0** (a minor). Proposed 2026-07-03.
+
+- **`shear-stud-strength` (spec-v411).** Qn = 0.5 Asc sqrt(f'c Ec) <= Rg Rp Asc Fu, studs each side = ceil(V'/Qn) (AISC I8). Pinned: a 3/4 in stud, f'c 4000, Ec 3.644e6, Fu 65, Rg 1.0, Rp 0.75 -> Qn_calc 26.7, cap 21.6 kip governs; V' 400 -> 19 studs; a weak-position Rp 0.6 -> 24.
+- **`composite-beam-flexure` (spec-v412).** C = As Fy, a = C/(0.85 f'c be), Mn = C(d/2 + tslab - a/2), phi Mn = 0.90 Mn, valid while a <= slab (AISC I3). Pinned: As 8.0, Fy 50, d 16, slab 4, be 90, f'c 4 -> C 400 kip, a 1.31 in, phi Mn 340 kip-ft; a narrow be 24 pushes a past the slab and flags PNA-in-steel (returns a null moment, not a wrong one).
+- **`steel-camber` (spec-v413).** camber = round(fraction x 5 w L^4/(384 E I) to 1/4 in). Pinned: 1.0 kip/ft, 40 ft, I 2100 -> 0.95 in deflection, 3/4 in camber; a stiff 20 ft beam is left flat (below the ~3/4 in practical minimum).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the min-of-calc/cap, the PNA-in-steel flag, the 1/4-in rounding and flat case, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming AISC 360-22 §I8, §I3, and the camber practice. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory). Module cap bumped with a dated comment: calc-steel.js 16500 -> 21000. Housekeeping: home count 879 -> 882, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 76 appended. All gates green at the new state: lint, unit tests (**5,175**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(hvac): land spec-v408..v410 -- 3 HVAC duct-design tiles; 876 -> 879 tiles, 0.143.0, 2026-07-04
 
 The HVAC duct-design trio, twelfth batch of the v375-v474 campaign: the Manual D friction rate, the coil face velocity, and the VAV box airflow limits, split across calc-hvac.js and calc-hvacsystems.js (all Group C); no new module, group, or dependency. Catalog **876 -> 879**, package **0.142.0 -> 0.143.0** (a minor). Proposed 2026-07-03.

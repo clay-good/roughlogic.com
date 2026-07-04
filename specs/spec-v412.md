@@ -1,6 +1,6 @@
 # roughlogic.com Specification v412 -- Composite Beam Flexural Strength (AISC 360-22 I3) (calc-steel.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the steel composite-beam trio (v411 shear stud strength -> v412 composite
+> **Status: LANDED (2026-07-04, 0.144.0; proposed 2026-07-03). Second tile of the steel composite-beam trio (v411 shear stud strength -> v412 composite
 > flexure -> v413 beam camber). `steel-beam-flexure` gives the bare-steel plastic moment; this tile gives the fully composite
 > moment, where the studs make the concrete slab carry the compression and the moment arm grows to the slab -- the real
 > capacity of a composite floor beam.**
