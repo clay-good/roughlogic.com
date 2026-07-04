@@ -1,6 +1,6 @@
 # roughlogic.com Specification v398 -- Cooling-System Coolant Flow for a Heat Load (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the fluid-power / cooling trio (v396 pump drive HP -> v397 motor
+> **Status: LANDED (2026-07-04, 0.139.0; proposed 2026-07-03). Third and final tile of the fluid-power / cooling trio (v396 pump drive HP -> v397 motor
 > torque and speed -> v398 coolant flow). Every engine, hydraulic power unit, and oil cooler makes heat that a coolant loop
 > must carry away; this tile sizes the required flow from the heat rejection and the allowed temperature rise.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. To carry a heat load `Q` at a temperature rise `dT`

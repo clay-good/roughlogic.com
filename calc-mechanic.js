@@ -1020,3 +1020,113 @@ function renderTrapSpeedHorsepower(inputRegion, outputRegion, citationEl) {
   for (const f of [w, trap]) f.input.addEventListener("input", update);
 }
 MECHANIC_RENDERERS["trap-speed-horsepower"] = renderTrapSpeedHorsepower;
+
+// ===================== spec-v396..v398: fluid-power / cooling trio (Group K) =====================
+
+// dims: in { gpm: L^3 T^-1, psi: M L^-1 T^-2, efficiency: dimensionless } out: { fluid_hp: M L^2 T^-3, input_hp: M L^2 T^-3 }
+export function computeHydraulicPumpHorsepower({ gpm = 0, psi = 0, efficiency = 0.85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(gpm) || 0;
+  const p = Number(psi) || 0;
+  const eff = Number(efficiency) || 0;
+  if (!(q > 0)) return { error: "Pump flow must be positive (gpm)." };
+  if (!(p > 0)) return { error: "Working pressure must be positive (psi)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Efficiency must be between 0 and 1." };
+  const fluid_hp = q * p / 1714;
+  const input_hp = fluid_hp / eff;
+  return {
+    fluid_hp, input_hp, loss_hp: input_hp - fluid_hp,
+    note: "Hydraulic pump power: fluid (hydraulic) horsepower = gpm x psi / 1714, and the drive (input) horsepower = fluid HP / overall efficiency (typically 0.80-0.90 for a gear/vane pump, higher for a piston pump). Size the prime mover to the input HP and round up to a standard motor. The 1714 constant folds the unit conversions (1 HP = 1714 psi-gpm). A sizing aid; the pump and motor manufacturer data govern.",
+  };
+}
+export const hydraulicPumpHorsepowerExample = { inputs: { gpm: 10, psi: 2000, efficiency: 0.85 } };
+MECHANIC_RENDERERS["hydraulic-pump-horsepower"] = _simpleRenderer({
+  citation: "Citation: Hydraulic pump power (fluid-power engineering): fluid horsepower = gpm x psi / 1714, drive horsepower = fluid HP / overall pump efficiency. The 1714 constant is the psi-gpm-to-HP conversion. A sizing aid; the pump and motor manufacturer's data govern.",
+  example: hydraulicPumpHorsepowerExample.inputs,
+  fields: [
+    { key: "gpm", label: "Pump flow (gpm)", kind: "number", default: 10 },
+    { key: "psi", label: "Working pressure (psi)", kind: "number", default: 2000 },
+    { key: "efficiency", label: "Overall pump efficiency (0-1)", kind: "number", default: 0.85 },
+  ],
+  outputs: [
+    { key: "fh", id: "hph-out-fh", label: "Fluid horsepower", value: (r) => fmt(r.fluid_hp, 1) + " HP" },
+    { key: "ih", id: "hph-out-ih", label: "Drive (input) horsepower", value: (r) => fmt(r.input_hp, 1) + " HP (loss " + fmt(r.loss_hp, 1) + " HP)" },
+    { key: "n", id: "hph-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicPumpHorsepower,
+});
+
+// dims: in { psi: M L^-1 T^-2, disp_in3: L^3, gpm: L^3 T^-1, mech_eff: dimensionless, vol_eff: dimensionless } out: { torque_inlb: M L^2 T^-2, rpm: T^-1, output_hp: M L^2 T^-3 }
+export function computeHydraulicMotorTorqueSpeed({ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const p = Number(psi) || 0;
+  const disp = Number(disp_in3) || 0;
+  const q = Number(gpm) || 0;
+  const me = Number(mech_eff) || 0;
+  const ve = Number(vol_eff) || 0;
+  if (!(p > 0)) return { error: "Pressure differential must be positive (psi)." };
+  if (!(disp > 0)) return { error: "Motor displacement must be positive (in^3/rev)." };
+  if (!(q > 0)) return { error: "Supply flow must be positive (gpm)." };
+  if (!(me > 0 && me <= 1)) return { error: "Mechanical efficiency must be between 0 and 1." };
+  if (!(ve > 0 && ve <= 1)) return { error: "Volumetric efficiency must be between 0 and 1." };
+  const torque_inlb = p * disp / (2 * Math.PI) * me;
+  const rpm = 231 * q / disp * ve;
+  const output_hp = torque_inlb * rpm / 63025;
+  return {
+    torque_inlb, rpm, output_hp,
+    note: "Hydraulic motor output: torque = pressure x displacement / (2 pi) x mechanical efficiency (in-lb), speed = 231 x gpm / displacement x volumetric efficiency (rpm, 231 in^3 per gallon), and output HP = torque x rpm / 63025. A larger displacement trades speed for torque at the same flow and pressure (same power). A sizing aid; the motor manufacturer's data govern.",
+  };
+}
+export const hydraulicMotorTorqueSpeedExample = { inputs: { psi: 2000, disp_in3: 2.0, gpm: 10, mech_eff: 0.90, vol_eff: 0.95 } };
+MECHANIC_RENDERERS["hydraulic-motor-torque-speed"] = _simpleRenderer({
+  citation: "Citation: Hydraulic motor performance (fluid-power engineering): torque = psi x displacement / (2 pi) x mechanical efficiency (in-lb), speed = 231 x gpm / displacement x volumetric efficiency (rpm), output HP = torque x rpm / 63025. A sizing aid; the motor manufacturer's data govern.",
+  example: hydraulicMotorTorqueSpeedExample.inputs,
+  fields: [
+    { key: "psi", label: "Pressure differential (psi)", kind: "number", default: 2000 },
+    { key: "disp_in3", label: "Motor displacement (in^3/rev)", kind: "number", default: 2.0 },
+    { key: "gpm", label: "Supply flow (gpm)", kind: "number", default: 10 },
+    { key: "mech_eff", label: "Mechanical efficiency (0-1)", kind: "number", default: 0.90 },
+    { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number", default: 0.95 },
+  ],
+  outputs: [
+    { key: "t", id: "hmt-out-t", label: "Output torque", value: (r) => fmt(r.torque_inlb, 0) + " in-lb" },
+    { key: "n", id: "hmt-out-n", label: "Output speed", value: (r) => fmt(r.rpm, 0) + " rpm" },
+    { key: "hp", id: "hmt-out-hp", label: "Output power", value: (r) => fmt(r.output_hp, 2) + " HP" },
+    { key: "note", id: "hmt-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicMotorTorqueSpeed,
+});
+
+// dims: in { q_btuh: M L^2 T^-3, dt_f: T, coolant: dimensionless } out: { gpm: L^3 T^-1 }
+export function computeCoolingSystemFlow({ q_btuh = 0, dt_f = 0, coolant = "water" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(q_btuh) || 0;
+  const dt = Number(dt_f) || 0;
+  const cmap = { water: 500, glycol50: 427 };
+  const c = cmap[coolant] || 500;
+  if (!(q > 0)) return { error: "Heat load must be positive (Btu/hr)." };
+  if (!(dt > 0)) return { error: "Temperature rise must be positive (deg F)." };
+  const gpm = q / (c * dt);
+  return {
+    gpm, c, coolant_label: coolant === "glycol50" ? "50/50 glycol (c=427)" : "water (c=500)",
+    note: "Coolant flow for a heat load: gpm = Q / (c x deltaT), where the constant c folds the fluid's density and specific heat into Btu/hr per (gpm x deg F) - 500 for water (8.33 lb/gal x 60 min/hr x 1.0 Btu/lb-F), about 427 for 50/50 glycol (denser but lower specific heat, so it needs ~17% more flow for the same duty). A tighter allowed rise raises the flow proportionally. A sizing aid; the equipment ratings and the actual fluid properties govern.",
+  };
+}
+export const coolingSystemFlowExample = { inputs: { q_btuh: 150000, dt_f: 10, coolant: "water" } };
+MECHANIC_RENDERERS["cooling-system-flow"] = _simpleRenderer({
+  citation: "Citation: Cooling-system coolant flow (heat-transfer first principles): gpm = Q / (c x deltaT), with c = 500 for water and about 427 for 50/50 glycol (density x specific heat x 60 min/hr). A sizing aid; the equipment ratings and the actual fluid properties govern.",
+  example: coolingSystemFlowExample.inputs,
+  fields: [
+    { key: "q_btuh", label: "Heat rejection to coolant (Btu/hr)", kind: "number", default: 150000 },
+    { key: "dt_f", label: "Coolant temperature rise (deg F)", kind: "number", default: 10 },
+    { key: "coolant", label: "Coolant", kind: "select", options: [
+      { value: "water", label: "Water (c=500)" },
+      { value: "glycol50", label: "50/50 glycol (c=427)" },
+    ], default: "water" },
+  ],
+  outputs: [
+    { key: "g", id: "csf-out-g", label: "Required coolant flow", value: (r) => fmt(r.gpm, 1) + " gpm (" + r.coolant_label + ")" },
+    { key: "n", id: "csf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoolingSystemFlow,
+});

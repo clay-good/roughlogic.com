@@ -20628,6 +20628,88 @@
       }
     },
     {
+      "tile_id": "hydraulic-pump-horsepower",
+      "source_publisher": "fluid-power engineering",
+      "source_title": "10 GPM, 2000 psi, 0.85 efficiency -> 11.7 fluid HP, 13.7 drive HP",
+      "source_edition_or_year": "spec-v396 worked example (machine-verified)",
+      "source_section_or_page": "spec-v396 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "gpm": 10, "psi": 2000, "efficiency": 0.85 },
+      "outputs": {
+        "fluid_hp": { "value": 11.67, "tolerance": { "pct": 0.5 } },
+        "input_hp": { "value": 13.73, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydraulic-pump-horsepower",
+      "source_publisher": "fluid-power engineering",
+      "source_title": "cross-check: at 100% efficiency the input equals the fluid power (11.7 HP)",
+      "source_edition_or_year": "spec-v396 worked example (machine-verified)",
+      "source_section_or_page": "spec-v396 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "gpm": 10, "psi": 2000, "efficiency": 1.0 },
+      "outputs": {
+        "input_hp": { "value": 11.67, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydraulic-motor-torque-speed",
+      "source_publisher": "fluid-power engineering",
+      "source_title": "2000 psi, 2.0 in^3/rev, 10 GPM, 0.90/0.95 -> 573 in-lb, 1097 rpm, 9.98 HP",
+      "source_edition_or_year": "spec-v397 worked example (machine-verified)",
+      "source_section_or_page": "spec-v397 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "psi": 2000, "disp_in3": 2.0, "gpm": 10, "mech_eff": 0.90, "vol_eff": 0.95 },
+      "outputs": {
+        "torque_inlb": { "value": 573, "tolerance": { "pct": 0.5 } },
+        "rpm": { "value": 1097, "tolerance": { "pct": 0.5 } },
+        "output_hp": { "value": 9.98, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydraulic-motor-torque-speed",
+      "source_publisher": "fluid-power engineering",
+      "source_title": "cross-check: double the displacement (4.0 in^3/rev) -> 549 rpm, 1146 in-lb (same power)",
+      "source_edition_or_year": "spec-v397 worked example (machine-verified)",
+      "source_section_or_page": "spec-v397 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "psi": 2000, "disp_in3": 4.0, "gpm": 10, "mech_eff": 0.90, "vol_eff": 0.95 },
+      "outputs": {
+        "torque_inlb": { "value": 1146, "tolerance": { "pct": 0.5 } },
+        "rpm": { "value": 549, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cooling-system-flow",
+      "source_publisher": "heat-transfer first principles",
+      "source_title": "150,000 Btu/hr, 10 F rise, water -> 30 GPM",
+      "source_edition_or_year": "spec-v398 worked example (machine-verified)",
+      "source_section_or_page": "spec-v398 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "q_btuh": 150000, "dt_f": 10, "coolant": "water" },
+      "outputs": {
+        "gpm": { "value": 30, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cooling-system-flow",
+      "source_publisher": "heat-transfer first principles",
+      "source_title": "cross-check: 50/50 glycol (c=427) needs 35 GPM for the same duty",
+      "source_edition_or_year": "spec-v398 worked example (machine-verified)",
+      "source_section_or_page": "spec-v398 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "q_btuh": 150000, "dt_f": 10, "coolant": "glycol50" },
+      "outputs": {
+        "gpm": { "value": 35.13, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "cutting-fluid-concentration",
       "source_publisher": "Metalworking-fluid refractometer method",
       "source_title": "Concentration % = Brix x refractometer factor; add concentrate = sump x (target - current) / (100 - target); add water = sump x (current - target) / target.",

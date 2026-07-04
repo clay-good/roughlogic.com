@@ -472,6 +472,7 @@ const _TILES = [
   ["shaft-torsion", "E"], ["thermal-stress-restrained", "E"], ["hoop-stress-thin-wall", "E"],
   ["seismic-design-spectral-acceleration", "E"], ["seismic-story-drift", "E"], ["seismic-pdelta-stability", "E"],
   ["paint-mix-ratio", "K"],
+  ["hydraulic-pump-horsepower", "K"], ["hydraulic-motor-torque-speed", "K"], ["cooling-system-flow", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

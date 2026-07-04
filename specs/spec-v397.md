@@ -1,6 +1,6 @@
 # roughlogic.com Specification v397 -- Hydraulic Motor Torque and Speed (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the fluid-power / cooling trio (v396 pump drive HP -> v397 hydraulic motor
+> **Status: LANDED (2026-07-04, 0.139.0; proposed 2026-07-03). Second tile of the fluid-power / cooling trio (v396 pump drive HP -> v397 hydraulic motor
 > torque and speed -> v398 cooling-system coolant flow). `hydraulic-cylinder` gives a linear actuator's force and speed;
 > this tile gives the rotary counterpart -- the output torque and shaft speed of a hydraulic motor from its displacement,
 > the supply flow, and the pressure across it.**

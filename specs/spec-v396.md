@@ -1,6 +1,6 @@
 # roughlogic.com Specification v396 -- Hydraulic Pump Drive Horsepower (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a fluid-power / cooling trio (v396 pump drive HP -> v397 hydraulic motor
+> **Status: LANDED (2026-07-04, 0.139.0; proposed 2026-07-03). First tile of a fluid-power / cooling trio (v396 pump drive HP -> v397 hydraulic motor
 > torque and speed -> v398 cooling-system coolant flow). `hydraulic-cylinder` sizes an actuator's force and speed; nothing
 > sizes the prime mover -- the engine or electric-motor horsepower it takes to drive the pump that feeds the system.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A hydraulic power unit needs a prime mover big enough

@@ -15509,3 +15509,52 @@ test("bounds: spec-v395 computeConcreteCrackControlSpacing pins s1/s2, the cap, 
   assert.ok("error" in _v395({ fs_psi: 0, cc_in: 2 }));
   assert.ok("error" in _v395({ fs_psi: Infinity, cc_in: 2 }));
 });
+
+// ===================== spec-v396..v398 fluid-power / cooling trio (calc-mechanic.js) =====================
+import { computeHydraulicPumpHorsepower as _v396, computeHydraulicMotorTorqueSpeed as _v397, computeCoolingSystemFlow as _v398 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v396 computeHydraulicPumpHorsepower pins fluid/drive HP and error seams", () => {
+  const r = _v396({ gpm: 10, psi: 2000, efficiency: 0.85 });
+  assert.ok(Math.abs(r.fluid_hp - 10 * 2000 / 1714) < 1e-9);
+  assert.ok(Math.abs(r.input_hp - r.fluid_hp / 0.85) < 1e-9);
+  // At 100% efficiency the input equals the fluid power.
+  const ideal = _v396({ gpm: 10, psi: 2000, efficiency: 1.0 });
+  assert.ok(Math.abs(ideal.input_hp - ideal.fluid_hp) < 1e-12 && ideal.input_hp < r.input_hp);
+  // Error seams.
+  assert.ok("error" in _v396({ gpm: 0, psi: 2000, efficiency: 0.85 }));
+  assert.ok("error" in _v396({ gpm: 10, psi: 0, efficiency: 0.85 }));
+  assert.ok("error" in _v396({ gpm: 10, psi: 2000, efficiency: 0 }));
+  assert.ok("error" in _v396({ gpm: 10, psi: 2000, efficiency: 1.5 }));
+  assert.ok("error" in _v396({ gpm: Infinity, psi: 2000, efficiency: 0.85 }));
+});
+
+test("bounds: spec-v397 computeHydraulicMotorTorqueSpeed pins torque/speed/power and error seams", () => {
+  const r = _v397({ psi: 2000, disp_in3: 2.0, gpm: 10, mech_eff: 0.90, vol_eff: 0.95 });
+  assert.ok(Math.abs(r.torque_inlb - 2000 * 2.0 / (2 * Math.PI) * 0.90) < 1e-6);
+  assert.ok(Math.abs(r.rpm - 231 * 10 / 2.0 * 0.95) < 1e-9);
+  assert.ok(Math.abs(r.output_hp - r.torque_inlb * r.rpm / 63025) < 1e-9);
+  // Double the displacement -> half the speed, double the torque (same power).
+  const big = _v397({ psi: 2000, disp_in3: 4.0, gpm: 10, mech_eff: 0.90, vol_eff: 0.95 });
+  assert.ok(Math.abs(big.rpm - r.rpm / 2) < 1e-9 && Math.abs(big.torque_inlb - r.torque_inlb * 2) < 1e-6);
+  assert.ok(Math.abs(big.output_hp - r.output_hp) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v397({ psi: 0, disp_in3: 2.0, gpm: 10 }));
+  assert.ok("error" in _v397({ psi: 2000, disp_in3: 0, gpm: 10 }));
+  assert.ok("error" in _v397({ psi: 2000, disp_in3: 2.0, gpm: 0 }));
+  assert.ok("error" in _v397({ psi: 2000, disp_in3: 2.0, gpm: 10, mech_eff: 1.5 }));
+  assert.ok("error" in _v397({ psi: Infinity, disp_in3: 2.0, gpm: 10 }));
+});
+
+test("bounds: spec-v398 computeCoolingSystemFlow pins gpm = Q/(c dT), the coolant constant, and error seams", () => {
+  const w = _v398({ q_btuh: 150000, dt_f: 10, coolant: "water" });
+  assert.ok(Math.abs(w.gpm - 30) < 1e-9 && w.c === 500);
+  // Glycol (lower c) needs more flow for the same duty.
+  const g = _v398({ q_btuh: 150000, dt_f: 10, coolant: "glycol50" });
+  assert.ok(Math.abs(g.gpm - 150000 / (427 * 10)) < 1e-9 && g.gpm > w.gpm);
+  // A tighter rise raises the flow in proportion.
+  assert.ok(Math.abs(_v398({ q_btuh: 150000, dt_f: 5, coolant: "water" }).gpm - 60) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v398({ q_btuh: 0, dt_f: 10, coolant: "water" }));
+  assert.ok("error" in _v398({ q_btuh: 150000, dt_f: 0, coolant: "water" }));
+  assert.ok("error" in _v398({ q_btuh: Infinity, dt_f: 10, coolant: "water" }));
+});

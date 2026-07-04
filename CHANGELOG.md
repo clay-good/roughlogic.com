@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): land spec-v396..v398 -- 3 fluid-power / cooling tiles in calc-mechanic.js; 864 -> 867 tiles, 0.139.0, 2026-07-04
+
+The fluid-power / cooling trio, eighth batch of the v375-v474 campaign: the pump drive power, the motor torque/speed, and the coolant flow, all in the existing lazy `calc-mechanic.js` (Group K); no new module, group, or dependency. Catalog **864 -> 867**, package **0.138.0 -> 0.139.0** (a minor). Proposed 2026-07-03.
+
+- **`hydraulic-pump-horsepower` (spec-v396).** fluid HP = gpm x psi / 1714, drive HP = fluid HP / efficiency. Pinned: 10 GPM, 2000 psi, 0.85 -> 11.7 fluid HP, 13.7 drive HP; at 100% efficiency the 2.0 HP gap is the pump loss.
+- **`hydraulic-motor-torque-speed` (spec-v397).** T = psi x disp / (2 pi) x mech eff, N = 231 gpm / disp x vol eff, HP = T N / 63025. Pinned: 2000 psi, 2.0 in^3/rev, 10 GPM -> 573 in-lb, 1097 rpm, 9.98 HP; doubling displacement halves the speed and doubles the torque at the same power.
+- **`cooling-system-flow` (spec-v398).** gpm = Q / (c x deltaT), c = 500 water / 427 glycol. Pinned: 150,000 Btu/hr at a 10 F rise -> 30 GPM (water), 35 GPM (50/50 glycol, ~17% more); a 5 F rise doubles the water flow to 60 GPM.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the fluid/drive split, the displacement torque-speed trade, the coolant constant, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the fluid-power pump/motor relations and the sensible-heat flow relation. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory; the cooling tile adds a coolant select). Module cap bumped with a dated comment: calc-mechanic.js 19500 -> 25000. Housekeeping: home count 864 -> 867, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 71 appended. All gates green at the new state: lint, unit tests (**5,160**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(concrete): land spec-v393..v395 -- 3 concrete design-details tiles in calc-concrete.js; 861 -> 864 tiles, 0.138.0, 2026-07-04
 
 The concrete design-details trio, seventh batch of the v375-v474 campaign: the three ACI 318-19 detailing checks that sit between the material properties and the member design, all in the existing lazy `calc-concrete.js` (Group E); no new module, group, or dependency. Catalog **861 -> 864**, package **0.137.0 -> 0.138.0** (a minor). Proposed 2026-07-03.

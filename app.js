@@ -659,6 +659,8 @@ const TOOL_MODULES = (() => {
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
     // v100 auto-body 2K paint mix
     "paint-mix-ratio",
+    // spec-v396..v398 fluid-power / cooling trio
+    "hydraulic-pump-horsepower", "hydraulic-motor-torque-speed", "cooling-system-flow",
     // spec-v323..v325 engine-build performance batch
     "injector-size", "mean-piston-speed", "trap-speed-horsepower",
   ]);

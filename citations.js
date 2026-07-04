@@ -7059,6 +7059,42 @@ export const CITATIONS = {
       { name: "Induction and pot life", value: "~10-30 min induction, ~1-4 hr pot life at 70 F (off the TDS, not computed)", source: "paint TDS" },
     ],
   },
+  "hydraulic-pump-horsepower": {
+    formula: "fluid_hp = gpm x psi / 1714; input_hp = fluid_hp / efficiency.",
+    edition: "The fluid-power pump horsepower relation (fluid HP = gpm x psi / 1714), by name.",
+    freeAccess: "The gpm-psi-to-horsepower relation and the 1714 constant are standard published fluid-power results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Hydraulic pump power: the fluid (hydraulic) horsepower = gpm x psi / 1714, and the required drive (input) horsepower = fluid HP divided by the overall pump efficiency (typically 0.80-0.90 for gear/vane, higher for piston pumps). The 1714 constant folds the unit conversion (1 HP = 1714 psi-gpm). This sizes the prime mover from the flow and pressure; it does not select the pump, account for the pressure-drop budget of the circuit, or size the reservoir/cooling. A sizing aid; the pump and motor manufacturer's data govern.",
+    assumptions: [
+      { name: "Fluid power", value: "fluid HP = gpm x psi / 1714", source: "fluid-power engineering" },
+      { name: "Drive power", value: "input HP = fluid HP / overall efficiency", source: "fluid-power engineering" },
+      { name: "Sizing only", value: "round up to a standard motor; the manufacturer data govern", source: "scope of this tile" },
+    ],
+  },
+  "hydraulic-motor-torque-speed": {
+    formula: "torque = psi x disp / (2 pi) x mech_eff; rpm = 231 x gpm / disp x vol_eff; hp = torque x rpm / 63025.",
+    edition: "The fluid-power motor torque/speed relations (torque = psi x disp / 2 pi, speed = 231 gpm / disp), by name.",
+    freeAccess: "The displacement-based torque and speed relations and the 231 in^3/gal and 63025 constants are standard published fluid-power results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Hydraulic motor performance: the output torque = pressure differential x displacement / (2 pi) x mechanical efficiency (in-lb), the speed = 231 x gpm / displacement x volumetric efficiency (rpm, with 231 in^3 per gallon), and the output horsepower = torque x rpm / 63025. A larger displacement trades speed for torque at the same flow and pressure (the same power). This returns the motor's torque, speed, and power; it does not check the pressure/flow the pump can actually deliver or the load's demand. A sizing aid; the motor manufacturer's data govern.",
+    assumptions: [
+      { name: "Torque", value: "psi x disp / (2 pi) x mechanical efficiency (in-lb)", source: "fluid-power engineering" },
+      { name: "Speed", value: "231 x gpm / disp x volumetric efficiency (rpm)", source: "fluid-power engineering" },
+      { name: "Power", value: "output HP = torque x rpm / 63025", source: "fluid-power engineering" },
+    ],
+  },
+  "cooling-system-flow": {
+    formula: "gpm = Q / (c x deltaT); c = 500 water, 427 (50/50 glycol).",
+    edition: "The sensible-heat coolant-flow relation gpm = Q / (c x deltaT), by name.",
+    freeAccess: "The sensible-heat flow relation and the 500 (water) / 427 (glycol) constants are standard published heat-transfer results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Coolant flow for a heat load: gpm = Q / (c x deltaT), where the constant c folds the fluid's density and specific heat into Btu/hr per (gpm x deg F) - 500 for water (8.33 lb/gal x 60 min/hr x 1.0 Btu/lb-F) and about 427 for 50/50 propylene/ethylene glycol (denser but a lower specific heat, so it needs roughly 17% more flow for the same duty). A tighter allowed temperature rise raises the flow in proportion. This sizes the flow only; it does not size the pump head, the heat exchanger, or check the fluid's freeze protection. A sizing aid; the equipment ratings and the actual fluid properties govern.",
+    assumptions: [
+      { name: "Sensible flow", value: "gpm = Q / (c x deltaT)", source: "heat-transfer first principles" },
+      { name: "Fluid constant", value: "c = 500 water, ~427 for 50/50 glycol", source: "fluid properties" },
+      { name: "Flow only", value: "does not size the pump head or heat exchanger", source: "scope of this tile" },
+    ],
+  },
   "cutting-fluid-concentration": {
     formula: "Concentration % = Brix x refractometer factor; add concentrate = sump x (target - current) / (100 - target); add water = sump x (current - target) / target.",
     edition: "Metalworking-fluid refractometer method (by name).",
