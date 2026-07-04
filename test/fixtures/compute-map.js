@@ -856,6 +856,8 @@ export const COMPUTE_MAP = {
   "concrete-strength-gain": { module: "../../calc-construction.js", fn: "computeConcreteStrengthGain" },
   "rebar-weight-takeoff": { module: "../../calc-construction.js", fn: "computeRebarWeightTakeoff" },
   "ready-mix-concrete-order": { module: "../../calc-construction.js", fn: "computeReadyMixConcreteOrder" },
+  "insulation-batt-coverage": { module: "../../calc-construction.js", fn: "computeInsulationBattCoverage" },
+  "trim-linear-footage": { module: "../../calc-construction.js", fn: "computeTrimLinearFootage" },
   // spec-v251..v253 IBC plan-review trio (3 tiles)
   "allowable-area": { module: "../../calc-construction.js", fn: "computeAllowableArea" },
   "egress-travel-distance": { module: "../../calc-construction.js", fn: "computeEgressTravelDistance" },

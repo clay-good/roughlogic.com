@@ -548,6 +548,7 @@ const _TILES = [
   // spec-v245..v247 cast-in-place placing-and-curing trio
   ["shore-post-load", "E"], ["concrete-evaporation-rate", "E"], ["concrete-strength-gain", "E"],
   ["rebar-weight-takeoff", "E"], ["ready-mix-concrete-order", "E"],
+  ["insulation-batt-coverage", "E"], ["trim-linear-footage", "E"],
   // spec-v251..v253 IBC plan-review trio
   ["allowable-area", "E"], ["egress-travel-distance", "E"], ["exterior-opening-protection", "E"],
   // spec-v263..v265 NDS sawn-lumber design trio

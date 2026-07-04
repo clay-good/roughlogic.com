@@ -926,6 +926,8 @@ const RELATED = {
   "concrete-strength-gain": ["shore-post-load","concrete-mix-design","concrete-evaporation-rate"],
   "rebar-weight-takeoff": ["rebar-lap-splice","rc-development-length","formwork-pressure","ready-mix-concrete-order"],
   "ready-mix-concrete-order": ["concrete","rebar-weight-takeoff","formwork-pressure","concrete-mix-design"],
+  "insulation-batt-coverage": ["drywall","square-footage","flooring-takeoff","assembly-r-value"],
+  "trim-linear-footage": ["board-footage","square-footage","flooring-takeoff","stairs"],
   // spec-v251..v253 IBC plan-review trio
   "allowable-area": ["occupant-load","egress-capacity","exterior-opening-protection"],
   "egress-travel-distance": ["egress-capacity","occupant-load","allowable-area"],

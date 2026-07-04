@@ -16087,3 +16087,32 @@ test("bounds: spec-v434 computeEvaporatorTdDtd pins the TD, the humidity band, a
   assert.ok("error" in _v434({ box_temp_f: 35, sst_f: 35 }));
   assert.ok("error" in _v434({ box_temp_f: Infinity, sst_f: 25 }));
 });
+
+// ===================== spec-v439..v440 finish-carpentry takeoff pair (calc-construction.js) [v438 CUT] =====================
+import { computeInsulationBattCoverage as _v439, computeTrimLinearFootage as _v440 } from "../../calc-construction.js";
+
+test("bounds: spec-v439 computeInsulationBattCoverage pins the batts/bags counts and error seams", () => {
+  const r = _v439({ area_ft2: 500, coverage_per_batt: 10.67, coverage_per_bag: 88, waste_pct: 0 });
+  assert.ok(r.batts === 47 && r.bags === 6);
+  // A deeper batt covers fewer sq ft per bag -> more bags.
+  assert.ok(_v439({ area_ft2: 500, coverage_per_batt: 10.67, coverage_per_bag: 67 }).bags === 8);
+  // Waste raises the net area and can bump the count.
+  assert.ok(_v439({ area_ft2: 500, coverage_per_batt: 10.67, coverage_per_bag: 88, waste_pct: 10 }).bags >= 6);
+  // Error seams.
+  assert.ok("error" in _v439({ area_ft2: 0, coverage_per_batt: 10.67, coverage_per_bag: 88 }));
+  assert.ok("error" in _v439({ area_ft2: 500, coverage_per_batt: 0, coverage_per_bag: 0 }));
+  assert.ok("error" in _v439({ area_ft2: Infinity, coverage_per_batt: 10.67, coverage_per_bag: 88 }));
+});
+
+test("bounds: spec-v440 computeTrimLinearFootage pins the footage, the corner cuts, and error seams", () => {
+  const r = _v440({ perimeter_ft: 70, openings_ft: 6, waste_pct: 10, stock_len_ft: 16, spring_deg: 0 });
+  assert.ok(Math.abs(r.net_ft - 70.4) < 1e-9 && r.pieces === 5);
+  assert.ok(Math.abs(r.miter_deg - 45) < 1e-9 && r.bevel_deg === 0 && r.crown === false);
+  // A crown spring gives the compound cut.
+  const crown = _v440({ perimeter_ft: 70, openings_ft: 6, waste_pct: 10, stock_len_ft: 16, spring_deg: 38 });
+  assert.ok(crown.crown === true && Math.abs(crown.miter_deg - 31.62) < 0.1 && Math.abs(crown.bevel_deg - 33.86) < 0.1);
+  // Error seams: openings >= perimeter, non-positive, non-finite.
+  assert.ok("error" in _v440({ perimeter_ft: 70, openings_ft: 70, waste_pct: 10 }));
+  assert.ok("error" in _v440({ perimeter_ft: 0, openings_ft: 6, waste_pct: 10 }));
+  assert.ok("error" in _v440({ perimeter_ft: Infinity, openings_ft: 6, waste_pct: 10 }));
+});

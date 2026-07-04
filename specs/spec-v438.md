@@ -1,6 +1,6 @@
 # roughlogic.com Specification v438 -- Flooring Plank Layout and Takeoff (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an interior-finish takeoff trio (v438 flooring plank -> v439 insulation batt
+> **Status: CUT (2026-07-04, dupe of existing tile). NOT LANDED: flooring-plank-layout duplicates the existing flooring-takeoff tile (calc-finish.js, Resilient/LVP Flooring Takeoff), which already computes the boxes of plank to order and the row/rip-first-course layout. v438 would only add an area-direct input and an individual-plank count. The rest of the proposed trio (v439 insulation-batt-coverage, v440 trim-linear-footage) is genuinely new and lands. Original proposal below. First tile of an interior-finish takeoff trio (v438 flooring plank -> v439 insulation batt
 > -> v440 trim linear footage). `tile-count` counts tile and grout; plank flooring (LVP, laminate, hardwood) is laid out
 > differently -- by plank, box, and row -- and no tile does it.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Plank flooring is ordered by the box and laid in rows,

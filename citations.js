@@ -9291,6 +9291,30 @@ export const CITATIONS = {
       { name: "Supplier governs", value: "truck size, minimum, and short-load/standby fees are the supplier's", source: "scope of this tile" },
     ],
   },
+  "insulation-batt-coverage": {
+    formula: "net = area x (1 + waste%); batts = ceil(net / coverage_per_batt); bags = ceil(net / coverage_per_bag).",
+    edition: "Batt insulation takeoff from the manufacturer's label coverage per batt and per bag, by name.",
+    freeAccess: "The area-over-coverage takeoff is public arithmetic; the coverage per batt and per bag come from the manufacturer's label.",
+    governance: GOVERNANCE.general,
+    editionNote: "Batt insulation takeoff: the net cavity area (the wall or ceiling area less the window and door openings) times a waste allowance, divided by the coverage of one batt (a piece) and by the coverage per bag from the product label, each rounded up. The coverage depends on the R-value and the cavity width - an R-13 batt for a 15 in on-center 2x4 wall covers about 10.67 ft^2, and a deeper (higher-R) batt is thicker and packs fewer square feet per bag. Insulation is bought by the bag, but counting the batts confirms the wall is fully filled without gaps. This returns the counts; the manufacturer's label coverage for the specific product governs.",
+    assumptions: [
+      { name: "Net area", value: "cavity area less openings, times the waste allowance", source: "takeoff practice" },
+      { name: "Counts", value: "batts = ceil(net / coverage per batt); bags = ceil(net / coverage per bag)", source: "arithmetic" },
+      { name: "Label coverage", value: "coverage per batt/bag from the manufacturer's label", source: "scope of this tile" },
+    ],
+  },
+  "trim-linear-footage": {
+    formula: "net = (perimeter - openings) x (1 + waste%); pieces = ceil(net / stock); crown miter = atan(sin(spring) tan 45), bevel = asin(cos(spring) sin 45); else 45-deg miter.",
+    edition: "Trim linear-footage takeoff and the crown-molding compound-cut angles, finish-carpentry practice, by name.",
+    freeAccess: "The linear-footage takeoff and the compound-miter trigonometry are public; the stock length and spring angle are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Trim (baseboard, casing, crown) linear footage and corner cuts: the run to trim = the room perimeter minus the door openings (base and casing do not run across a doorway), times a waste allowance (commonly 10% for cutting and defects), divided by the stock length and rounded up to the number of sticks. For baseboard and casing an inside or outside corner is a flat 45-degree miter; for crown molding cut flat on the saw table the compound cut is miter = atan(sin(spring) x tan 45) and bevel = asin(cos(spring) x sin 45), from the molding's spring angle (commonly 38 or 45 degrees) - the same relations as the compound-miter tile. This estimates the material and gives the nominal corner cuts for a 90-degree corner; verify the miter on a scrap and measure the actual wall angles. A quantity and setup aid.",
+    assumptions: [
+      { name: "Linear footage", value: "(perimeter - openings) x (1 + waste%), pieces = ceil(net / stock)", source: "finish-carpentry practice" },
+      { name: "Corner cuts", value: "45-deg miter for base/casing; crown miter/bevel from the spring angle", source: "compound-miter geometry" },
+      { name: "Verify on site", value: "cut a scrap and measure the actual wall angles", source: "scope of this tile" },
+    ],
+  },
   "allowable-area": {
     formula: "w_eff = min(open_width_ft, 30); frontage_if = (F/P) < 0.25 ? 0 : (F/P - 0.25) x (w_eff / 30); allowable = tabular_area + ns_area x frontage_if; pass = actual_area <= allowable.",
     edition: "IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1, §506.3.2 (If = [F/P - 0.25] x W/30), and §506.3.3 (W capped at 30 ft), by name; Table 506.2 supplies the tabular areas.",

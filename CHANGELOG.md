@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): land spec-v439..v440 -- 2 finish-carpentry takeoff tiles (v438 cut as dupe); 899 -> 901 tiles, 0.151.0, 2026-07-04
+
+The finish-carpentry takeoff pair, twentieth batch of the v375-v474 campaign: the batt insulation count and the trim linear footage, in the existing lazy `calc-construction.js` (Group E). The proposed trio's first tile, v438 `flooring-plank-layout`, was cut as a duplicate of the existing `flooring-takeoff` (same boxes-of-plank + row-layout deliverable), so only two landed. Catalog **899 -> 901**, package **0.150.0 -> 0.151.0** (a minor). Proposed 2026-07-03.
+
+- **`insulation-batt-coverage` (spec-v439).** batts = ceil(net / coverage per batt), bags = ceil(net / coverage per bag). Pinned: 500 ft^2, R-13 batt (10.67 ft^2), 88 ft^2/bag -> 47 batts, 6 bags; a deeper R-21 bag (67 ft^2) -> 8 bags.
+- **`trim-linear-footage` (spec-v440).** net = (perimeter - openings) x (1 + waste%), pieces = ceil(net/stock), with 45-deg miters (base/casing) or the crown compound cut. Pinned: 70 ft perimeter, 6 ft openings, 10% waste, 16 ft stock -> 70.4 ft, 5 sticks; a 38-deg crown corner -> ~31.6 miter / 33.9 bevel.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the counts, the crown compound cut, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the label-coverage takeoff and the finish-carpentry / compound-miter practice. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 4 worked-example fixtures, collision-checked aliases, `related-tiles`, and 2 fuzzer blocks (both use the `_simpleRenderer` factory). No cap bump needed. v438's spec annotated CUT with the reason. This continues the campaign's pattern of pruning dupes in built-out domains: the intervening v435-v437 NEC 690/705 PV trio was also all dupes and was cut. Housekeeping: home count 899 -> 901, README resynced (counts, sitemap URLs), the two landed specs marked LANDED, docs/mobile-responsive.md section 83 appended. All gates green at the new state: lint, unit tests (**5,194**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the two new tiles.
+
 ### feat(refrigerant): land spec-v432..v434 -- 3 walk-in refrigeration tiles in calc-refrigerant.js; 896 -> 899 tiles, 0.150.0, 2026-07-04
 
 The walk-in refrigeration trio, nineteenth batch of the v375-v474 campaign: the box heat load, the product pull-down, and the evaporator TD, all in the existing lazy `calc-refrigerant.js` (Group C); no new module, group, or dependency. Catalog **896 -> 899**, package **0.149.0 -> 0.150.0** (a minor). Proposed 2026-07-03.

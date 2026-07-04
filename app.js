@@ -393,6 +393,8 @@ const TOOL_MODULES = (() => {
     "shore-post-load", "concrete-evaporation-rate", "concrete-strength-gain",
     // spec-v430..v431 concrete field-work (v429 cut as dupe)
     "rebar-weight-takeoff", "ready-mix-concrete-order",
+    // spec-v439..v440 finish-carpentry takeoff (v438 cut as dupe)
+    "insulation-batt-coverage", "trim-linear-footage",
     // spec-v251..v253 IBC plan-review trio.
     "allowable-area", "egress-travel-distance", "exterior-opening-protection",
     // spec-v263..v265 NDS sawn-lumber design trio.

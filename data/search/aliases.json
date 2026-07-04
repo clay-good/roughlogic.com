@@ -15232,6 +15232,23 @@
     { "term": "evaporator temperature difference", "target": "evaporator-td-dtd", "kind": "industry" },
     { "term": "refrigeration humidity td", "target": "evaporator-td-dtd", "kind": "industry" },
     { "term": "coil selection td", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "walk in humidity", "target": "evaporator-td-dtd", "kind": "industry" }
+    { "term": "walk in humidity", "target": "evaporator-td-dtd", "kind": "industry" },
+    { "term": "insulation batts", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "batt count", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "insulation coverage", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "batt insulation calculator", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "cavity insulation", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "r13 batts", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "insulation takeoff", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "square feet per bag", "target": "insulation-batt-coverage", "kind": "industry" },
+    { "term": "trim footage", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "baseboard calculator", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "crown molding", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "trim linear feet", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "molding takeoff", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "casing footage", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "crown compound miter", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "trim pieces", "target": "trim-linear-footage", "kind": "industry" },
+    { "term": "baseboard miter", "target": "trim-linear-footage", "kind": "industry" }
   ]
 }

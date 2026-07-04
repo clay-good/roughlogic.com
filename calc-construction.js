@@ -6191,3 +6191,86 @@ const _v431renderReadyMixConcreteOrder = _simpleRenderer({
   compute: computeReadyMixConcreteOrder,
 });
 CONSTRUCTION_RENDERERS["ready-mix-concrete-order"] = _v431renderReadyMixConcreteOrder;
+
+// ===================== spec-v439..v440: finish-carpentry takeoff pair (Group E) [v438 CUT as dupe of flooring-takeoff] =====================
+
+// dims: in { area_ft2: L^2, coverage_per_batt: L^2, coverage_per_bag: L^2, waste_pct: dimensionless } out: { net_ft2: L^2, batts: dimensionless, bags: dimensionless }
+export function computeInsulationBattCoverage({ area_ft2 = 0, coverage_per_batt = 0, coverage_per_bag = 0, waste_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(area_ft2) || 0;
+  const covBatt = Number(coverage_per_batt) || 0;
+  const covBag = Number(coverage_per_bag) || 0;
+  const waste = Number(waste_pct) || 0;
+  if (!(area > 0)) return { error: "Cavity area must be positive (ft^2)." };
+  if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
+  if (!(covBatt > 0) && !(covBag > 0)) return { error: "Enter the coverage per batt and/or per bag (ft^2)." };
+  const net_ft2 = area * (1 + waste / 100);
+  const batts = covBatt > 0 ? Math.ceil(net_ft2 / covBatt) : null;
+  const bags = covBag > 0 ? Math.ceil(net_ft2 / covBag) : null;
+  return {
+    net_ft2, batts, bags,
+    note: "Batt insulation takeoff: the net cavity area (wall or ceiling, less window and door openings) times a waste allowance, divided by the coverage of one batt (a piece) and by the coverage per bag from the label, each rounded up. Coverage depends on the R-value and cavity width: an R-13 batt for a 15 in on-center 2x4 wall covers about 10.67 ft^2, and a deeper R-value packs fewer square feet per bag. Buy by the bag but count the batts to confirm the wall is fully filled. A quantity aid; the manufacturer's label coverage governs.",
+  };
+}
+export const insulationBattCoverageExample = { inputs: { area_ft2: 500, coverage_per_batt: 10.67, coverage_per_bag: 88, waste_pct: 0 } };
+const _v439renderInsulationBattCoverage = _simpleRenderer({
+  citation: "Citation: Batt insulation takeoff (manufacturer label coverage): net area x (1 + waste%), divided by the coverage per batt and per bag, each rounded up. Coverage depends on R-value and cavity width (an R-13 15 in batt covers ~10.67 ft^2). A quantity aid; the label coverage governs.",
+  example: insulationBattCoverageExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Net cavity area (ft^2, less openings)", kind: "number", default: 500 },
+    { key: "coverage_per_batt", label: "Coverage per batt (ft^2, e.g. 10.67 for R-13 15 in)", kind: "number", default: 10.67 },
+    { key: "coverage_per_bag", label: "Coverage per bag (ft^2, from the label)", kind: "number", default: 88 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "b", id: "ibc-out-b", label: "Batts (pieces)", value: (r) => r.batts == null ? "(enter coverage per batt)" : r.batts + " batts" },
+    { key: "g", id: "ibc-out-g", label: "Bags", value: (r) => r.bags == null ? "(enter coverage per bag)" : r.bags + " bags (net " + fmt(r.net_ft2, 0) + " ft^2)" },
+    { key: "n", id: "ibc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInsulationBattCoverage,
+});
+CONSTRUCTION_RENDERERS["insulation-batt-coverage"] = _v439renderInsulationBattCoverage;
+
+// dims: in { perimeter_ft: L, openings_ft: L, waste_pct: dimensionless, stock_len_ft: L, spring_deg: dimensionless } out: { net_ft: L, pieces: dimensionless, miter_deg: dimensionless, bevel_deg: dimensionless }
+export function computeTrimLinearFootage({ perimeter_ft = 0, openings_ft = 0, waste_pct = 10, stock_len_ft = 16, spring_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const perim = Number(perimeter_ft) || 0;
+  const openings = Number(openings_ft) || 0;
+  const waste = Number(waste_pct) || 0;
+  const stock = Number(stock_len_ft) > 0 ? Number(stock_len_ft) : 16;
+  const spring = Number(spring_deg) || 0;
+  if (!(perim > 0)) return { error: "Perimeter must be positive (ft)." };
+  if (openings < 0) return { error: "Opening width must be non-negative (ft)." };
+  if (!(openings < perim)) return { error: "Openings cannot meet or exceed the perimeter." };
+  if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
+  const trimmed_ft = perim - openings;
+  const net_ft = trimmed_ft * (1 + waste / 100);
+  const pieces = Math.ceil(net_ft / stock);
+  const crown = spring > 0 && spring < 90;
+  const sr = spring * Math.PI / 180;
+  const miter_deg = crown ? Math.atan(Math.sin(sr) * Math.tan(Math.PI / 4)) * 180 / Math.PI : 45;
+  const bevel_deg = crown ? Math.asin(Math.cos(sr) * Math.sin(Math.PI / 4)) * 180 / Math.PI : 0;
+  return {
+    net_ft, pieces, miter_deg, bevel_deg, crown,
+    note: "Trim linear footage and corner cuts: the run to trim = the room perimeter minus the door openings (no base or casing runs across a doorway), times a waste allowance (commonly 10% for cuts and defects), divided by the stock length and rounded up to the number of sticks. For baseboard and casing an inside/outside corner is a flat 45-degree miter; for crown molding cut flat on the saw, the compound cut is miter = atan(sin(spring) x tan 45) and bevel = asin(cos(spring) x sin 45) from the crown's spring angle (38 or 45 degrees). A quantity and setup aid; verify the miter on a scrap and the actual wall angles.",
+  };
+}
+export const trimLinearFootageExample = { inputs: { perimeter_ft: 70, openings_ft: 6, waste_pct: 10, stock_len_ft: 16, spring_deg: 0 } };
+const _v440renderTrimLinearFootage = _simpleRenderer({
+  citation: "Citation: Trim takeoff and corner cuts (finish-carpentry practice): net = (perimeter - openings) x (1 + waste%), pieces = ceil(net / stock length). Corners are 45-degree miters for base/casing; for crown cut flat, miter = atan(sin(spring) tan 45), bevel = asin(cos(spring) sin 45). A quantity and setup aid; verify on a scrap.",
+  example: trimLinearFootageExample.inputs,
+  fields: [
+    { key: "perimeter_ft", label: "Room perimeter (ft)", kind: "number", default: 70 },
+    { key: "openings_ft", label: "Total door-opening width (ft, no trim below)", kind: "number", default: 6 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 10 },
+    { key: "stock_len_ft", label: "Trim stock length (ft, default 16)", kind: "number", default: 16 },
+    { key: "spring_deg", label: "Crown spring angle (deg, 0 = baseboard/casing)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "lf", id: "tlf-out-lf", label: "Trim to order / pieces", value: (r) => fmt(r.net_ft, 1) + " ft -> " + r.pieces + " stick(s)" },
+    { key: "cut", id: "tlf-out-cut", label: "Corner cut", value: (r) => r.crown ? "crown: " + fmt(r.miter_deg, 1) + " deg miter, " + fmt(r.bevel_deg, 1) + " deg bevel (cut flat)" : "45 deg miter (base/casing)" },
+    { key: "n", id: "tlf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrimLinearFootage,
+});
+CONSTRUCTION_RENDERERS["trim-linear-footage"] = _v440renderTrimLinearFootage;

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v439 -- Insulation Batt Coverage and Count (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the interior-finish takeoff trio (v438 flooring plank -> v439 insulation
+> **Status: LANDED (2026-07-04, 0.151.0; proposed 2026-07-03). Second tile of the interior-finish takeoff trio (v438 flooring plank -> v439 insulation
 > batt -> v440 trim linear footage). The catalog has `square-footage` and `drywall` but never counts the insulation batts
 > and bags a wall or ceiling takes, the number an insulator orders from.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Batt insulation is ordered by the bag, each covering a

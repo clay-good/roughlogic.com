@@ -41561,6 +41561,124 @@
           }
         }
       }
+    },
+    {
+      "tile_id": "insulation-batt-coverage",
+      "source_publisher": "manufacturer label",
+      "source_title": "500 ft^2, R-13 batt (10.67 ft^2), 88 ft^2/bag -> 47 batts, 6 bags",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v439 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "area_ft2": 500,
+        "coverage_per_batt": 10.67,
+        "coverage_per_bag": 88,
+        "waste_pct": 0
+      },
+      "outputs": {
+        "batts": {
+          "value": 47,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "bags": {
+          "value": 6,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "insulation-batt-coverage",
+      "source_publisher": "manufacturer label",
+      "source_title": "cross-check: an R-21 bag covering 67 ft^2 raises the bag count to 8",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v439 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "area_ft2": 500,
+        "coverage_per_batt": 10.67,
+        "coverage_per_bag": 67,
+        "waste_pct": 0
+      },
+      "outputs": {
+        "bags": {
+          "value": 8,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "trim-linear-footage",
+      "source_publisher": "finish-carpentry practice",
+      "source_title": "70 ft perimeter, 6 ft openings, 10% waste, 16 ft stock -> 70.4 ft, 5 sticks, 45-deg miter",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v440 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "perimeter_ft": 70,
+        "openings_ft": 6,
+        "waste_pct": 10,
+        "stock_len_ft": 16,
+        "spring_deg": 0
+      },
+      "outputs": {
+        "net_ft": {
+          "value": 70.4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "pieces": {
+          "value": 5,
+          "tolerance": {
+            "abs": 0
+          }
+        },
+        "miter_deg": {
+          "value": 45,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "trim-linear-footage",
+      "source_publisher": "finish-carpentry practice",
+      "source_title": "cross-check: a 38-deg crown corner is ~31.6 miter / 33.9 bevel cut flat",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v440 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "perimeter_ft": 70,
+        "openings_ft": 6,
+        "waste_pct": 10,
+        "stock_len_ft": 16,
+        "spring_deg": 38
+      },
+      "outputs": {
+        "miter_deg": {
+          "value": 31.62,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "bevel_deg": {
+          "value": 33.86,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
     }
   ]
 }

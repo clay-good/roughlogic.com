@@ -60,7 +60,10 @@ const TILE_GZIP_CAP = 6 * 1024;
 // concrete/seismic trios (v381..v383 seismic, v393..v395 concrete
 // design-details) took construction/index.html just past 34 KB gz; 36 KB
 // restores headroom for the remaining Group E batches in the backlog.
-const GROUP_GZIP_CAP = 36 * 1024;
+// Bumped 36 -> 39 KB on 2026-07-04: continued Group E landings this campaign
+// (concrete field-work, finish-carpentry takeoff) took construction/index.html
+// past 36 KB gz; 39 KB restores headroom for the remaining Group E batches.
+const GROUP_GZIP_CAP = 39 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

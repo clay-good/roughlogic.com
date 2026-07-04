@@ -1,6 +1,6 @@
 # roughlogic.com Specification v440 -- Trim Linear Footage and Miters (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the interior-finish takeoff trio (v438 flooring plank ->
+> **Status: LANDED (2026-07-04, 0.151.0; proposed 2026-07-03). Third and final tile of the interior-finish takeoff trio (v438 flooring plank ->
 > v439 insulation batt -> v440 trim linear footage). The catalog has area and sheet takeoffs but never the linear-foot
 > takeoff for baseboard, casing, and crown -- the running footage and stock pieces a trim carpenter orders and cuts.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Trim is ordered by the linear foot: the room perimeter
