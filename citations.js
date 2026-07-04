@@ -7959,6 +7959,42 @@ export const CITATIONS = {
       { name: "Not a code check", value: "no external pressure, discontinuity/nozzle stress, joint efficiency, or corrosion allowance", source: "scope of this tile" },
     ],
   },
+  "seismic-design-spectral-acceleration": {
+    formula: "SMS = Fa Ss; SM1 = Fv S1; SDS = (2/3) SMS; SD1 = (2/3) SM1.",
+    edition: "The ASCE 7-22 11.4 site-adjusted MCER and design spectral response accelerations, by name.",
+    freeAccess: "The ASCE 7 site-coefficient adjustment and two-thirds design reduction are the published seismic-load procedure; the mapped Ss/S1 come free from the USGS seismic design maps.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7-22 §11.4.4 (site-adjusted MCER: SMS = Fa Ss, SM1 = Fv S1) and §11.4.5 (design values SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv are the short-period and 1-second site coefficients from Tables 11.4-1 and 11.4-2, selected by Site Class (from a geotechnical report); Ss and S1 are the mapped MCER accelerations from the USGS seismic design maps. This returns the design spectral accelerations that feed the base shear (seismic-base-shear) and the drift checks; it does not select the Site Class, the Seismic Design Category, or the risk category. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Site adjustment", value: "SMS = Fa Ss, SM1 = Fv S1", source: "ASCE 7-22 11.4.4" },
+      { name: "Design reduction", value: "SDS = 2/3 SMS, SD1 = 2/3 SM1", source: "ASCE 7-22 11.4.5" },
+      { name: "Site coefficients", value: "Fa/Fv from Tables 11.4-1/11.4-2 by Site Class", source: "ASCE 7-22" },
+    ],
+  },
+  "seismic-story-drift": {
+    formula: "delta_x = Cd delta_xe / Ie; delta_a = drift_ratio x hsx; util = delta_x / delta_a.",
+    edition: "The ASCE 7-22 12.8.6 amplified design story drift and the 12.12 allowable story-drift limit, by name.",
+    freeAccess: "The Cd amplification of the elastic drift and the tabulated allowable drift are the published ASCE 7 drift-check procedure.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7-22 Eq. 12.8-15 (design story drift delta_x = Cd delta_xe / Ie) compared with the Table 12.12-1 allowable delta_a = (drift coefficient) x story height (commonly 0.020 hsx, ranging 0.007-0.025 by risk category and structural system). Cd is the deflection amplification factor from Table 12.2-1 for the selected seismic force-resisting system; delta_xe is the elastic drift from the strength-level analysis. This checks a single story against its allowable and reports the utilization; it does not run the structural analysis or check torsional-irregularity amplification. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Design drift", value: "delta_x = Cd delta_xe / Ie", source: "ASCE 7-22 Eq. 12.8-15" },
+      { name: "Allowable drift", value: "delta_a = drift coefficient x hsx (commonly 0.020 hsx)", source: "ASCE 7-22 Table 12.12-1" },
+      { name: "Single-story check", value: "does not run the analysis or check torsional amplification", source: "scope of this tile" },
+    ],
+  },
+  "seismic-pdelta-stability": {
+    formula: "theta = Px delta Ie / (Vx hsx Cd); theta_max = min(0.5/(beta Cd), 0.25); neglect <= 0.10, amplify 1/(1-theta) up to theta_max, unstable above.",
+    edition: "The ASCE 7-22 12.8.7 P-delta stability coefficient and its limits, by name.",
+    freeAccess: "The stability-coefficient P-delta check is the published ASCE 7 second-order procedure.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7-22 §12.8.7: the stability coefficient theta = Px delta Ie / (Vx hsx Cd). When theta <= 0.10 P-delta effects may be neglected; when 0.10 < theta <= theta_max = min(0.5/(beta Cd), 0.25) the member forces and drifts must be multiplied by 1/(1 - theta); when theta > theta_max the story is potentially unstable and must be redesigned. Px is the total gravity design load at and above the story, delta the design story drift, Vx the seismic story shear, and beta the shear demand-to-capacity ratio (conservatively 1.0). This returns the coefficient, its maximum, and the verdict; it does not perform a full second-order (P-delta) analysis. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Stability coefficient", value: "theta = Px delta Ie / (Vx hsx Cd)", source: "ASCE 7-22 12.8.7" },
+      { name: "Maximum", value: "theta_max = min(0.5/(beta Cd), 0.25)", source: "ASCE 7-22 Eq. 12.8-17" },
+      { name: "Thresholds", value: "neglect <= 0.10, amplify by 1/(1-theta), unstable above theta_max", source: "ASCE 7-22" },
+    ],
+  },
   "combined-stress-axial-bending": {
     formula: "sigma_axial = P/A; sigma_bend = M c/I; sigma_max = P/A + M c/I; sigma_min = P/A - M c/I; optional M = P e; no tension while M c/I <= P/A (kern e <= r^2/c).",
     edition: "The standard combined axial-plus-bending stress superposition (mechanics of materials), by name.",

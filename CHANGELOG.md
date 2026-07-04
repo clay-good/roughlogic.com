@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): land spec-v381..v383 -- 3 seismic-parameters tiles in calc-construction.js; 849 -> 852 tiles, 0.134.0, 2026-07-03
+
+The seismic-parameters trio, third batch of the v375-v474 campaign: the ASCE 7-22 Chapter 11/12 numbers that turn the mapped hazard into design accelerations, a drift check, and a stability check, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. Catalog **849 -> 852**, package **0.133.0 -> 0.134.0** (a minor). Proposed 2026-07-03.
+
+- **`seismic-design-spectral-acceleration` (spec-v381).** SMS = Fa Ss, SM1 = Fv S1, then SDS = 2/3 SMS, SD1 = 2/3 SM1 (ASCE 11.4). Pinned: Ss 1.0, S1 0.4, Site Class D (Fa 1.1, Fv 1.6) -> SDS 0.733g, SD1 0.427g, the exact inputs `seismic-base-shear` consumes, so the two tiles now chain end to end.
+- **`seismic-story-drift` (spec-v382).** delta_x = Cd delta_xe / Ie against delta_a = drift coefficient x story height (ASCE 12.8.6 / 12.12). Pinned: Cd 5.5, delta_xe 0.5 in, 144 in story -> 2.75 in vs 2.88 in allowable, OK at 0.955 utilization; a softer frame (0.6 in) -> 3.30 in, not OK.
+- **`seismic-pdelta-stability` (spec-v383).** theta = Px delta Ie / (Vx hsx Cd): neglect below 0.10, amplify by 1/(1 - theta) up to theta_max = min(0.5/(beta Cd), 0.25), unstable above (ASCE 12.8.7). Pinned: Px 400 kip, Delta 2.75 in, Vx 80 kip, 144 in, Cd 5.5 -> theta 0.017, neglect; a soft story -> theta 0.189, redesign.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the spectral reduction, the drift verdict, all three P-delta branches, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ASCE 7-22 §11.4, §12.8.6/§12.12, and §12.8.7. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory). No cap bump needed (calc-construction.js at 88.0%). Housekeeping: home count 849 -> 852, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 66 appended. All gates green at the new state: lint, unit tests (**5,145**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(concrete): land spec-v378..v380 -- 3 concrete material-properties tiles in calc-concrete.js; 846 -> 849 tiles, 0.133.0, 2026-07-03
 
 The concrete material-properties trio, second batch of the v375-v474 campaign: the three ACI 318-19 Chapter 19/24 numbers every deflection, cracking, and slab-detailing check depends on, all in the existing lazy `calc-concrete.js` (Group E); no new module, group, or dependency. Catalog **846 -> 849**, package **0.132.0 -> 0.133.0** (a minor). Proposed 2026-07-03.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v383 -- Seismic P-Delta Stability Coefficient (ASCE 7-22 12.8.7) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the seismic-parameters trio (v381 spectral -> v382 story drift ->
+> **Status: LANDED (2026-07-03, 0.134.0; proposed 2026-07-03). Third and final tile of the seismic-parameters trio (v381 spectral -> v382 story drift ->
 > v383 P-delta). It reads the design story drift `seismic-story-drift` produces and decides whether the gravity-on-sway
 > P-delta effect can be ignored, must be amplified, or makes the structure unstable.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. When a building sways under earthquake, the gravity

@@ -15243,3 +15243,60 @@ test("bounds: spec-v380 computeConcreteShrinkageTemperatureSteel pins the ratio,
   assert.ok("error" in _v380({ h_in: 6, b_in: 0, grade_ksi: 60 }));
   assert.ok("error" in _v380({ h_in: Infinity, b_in: 12, grade_ksi: 60 }));
 });
+
+// ===================== spec-v381..v383 seismic-parameters trio (ASCE 7-22) =====================
+import { computeSeismicDesignSpectralAcceleration as _v381, computeSeismicStoryDrift as _v382, computeSeismicPdeltaStability as _v383 } from "../../calc-construction.js";
+
+test("bounds: spec-v381 computeSeismicDesignSpectralAcceleration pins SMS/SM1/SDS/SD1 and error seams", () => {
+  const r = _v381({ ss: 1.0, s1: 0.4, fa: 1.1, fv: 1.6 });
+  assert.ok(Math.abs(r.sms - 1.10) < 1e-9);
+  assert.ok(Math.abs(r.sm1 - 0.64) < 1e-9);
+  assert.ok(Math.abs(r.sds - (2 / 3) * 1.10) < 1e-9);
+  assert.ok(Math.abs(r.sd1 - (2 / 3) * 0.64) < 1e-9);
+  // Higher site coefficient -> higher design acceleration.
+  assert.ok(_v381({ ss: 1.0, s1: 0.4, fa: 1.4, fv: 1.6 }).sds > r.sds);
+  // Error seams.
+  assert.ok("error" in _v381({ ss: -0.1, s1: 0.4, fa: 1.1, fv: 1.6 }));
+  assert.ok("error" in _v381({ ss: 1.0, s1: 0.4, fa: 0, fv: 1.6 }));
+  assert.ok("error" in _v381({ ss: 1.0, s1: 0.4, fa: 1.1, fv: 0 }));
+  assert.ok("error" in _v381({ ss: Infinity, s1: 0.4, fa: 1.1, fv: 1.6 }));
+});
+
+test("bounds: spec-v382 computeSeismicStoryDrift pins delta_x, delta_a, the OK/not-OK verdict, and error seams", () => {
+  const r = _v382({ delta_xe_in: 0.5, cd: 5.5, ie: 1.0, hsx_in: 144, drift_ratio: 0.020 });
+  assert.ok(Math.abs(r.delta_x - 2.75) < 1e-9);
+  assert.ok(Math.abs(r.delta_a - 2.88) < 1e-9);
+  assert.ok(Math.abs(r.util - 2.75 / 2.88) < 1e-9);
+  assert.strictEqual(r.ok, true);
+  // A softer frame exceeds the allowable.
+  const soft = _v382({ delta_xe_in: 0.6, cd: 5.5, ie: 1.0, hsx_in: 144, drift_ratio: 0.020 });
+  assert.ok(Math.abs(soft.delta_x - 3.30) < 1e-9 && soft.ok === false);
+  // Error seams.
+  assert.ok("error" in _v382({ delta_xe_in: 0, cd: 5.5, ie: 1.0, hsx_in: 144 }));
+  assert.ok("error" in _v382({ delta_xe_in: 0.5, cd: 0, ie: 1.0, hsx_in: 144 }));
+  assert.ok("error" in _v382({ delta_xe_in: 0.5, cd: 5.5, ie: 0, hsx_in: 144 }));
+  assert.ok("error" in _v382({ delta_xe_in: 0.5, cd: 5.5, ie: 1.0, hsx_in: 0 }));
+  assert.ok("error" in _v382({ delta_xe_in: Infinity, cd: 5.5, ie: 1.0, hsx_in: 144 }));
+});
+
+test("bounds: spec-v383 computeSeismicPdeltaStability pins theta, theta_max, all three verdicts, and error seams", () => {
+  const r = _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5, beta: 1.0 });
+  assert.ok(Math.abs(r.theta - 400 * 2.75 / (80 * 144 * 5.5)) < 1e-12);
+  assert.ok(Math.abs(r.theta - 0.01736) < 0.0005);
+  assert.ok(Math.abs(r.theta_max - Math.min(0.5 / (1.0 * 5.5), 0.25)) < 1e-12);
+  assert.ok(r.theta <= 0.10 && r.amplifier === null); // neglect branch
+  // Unstable: theta > theta_max.
+  const uns = _v383({ px_kip: 1000, delta_in: 5.0, ie: 1.0, vx_kip: 40, hsx_in: 120, cd: 5.5, beta: 1.0 });
+  assert.ok(Math.abs(uns.theta - 0.1894) < 0.0005 && uns.theta > uns.theta_max && uns.amplifier === null);
+  // Amplify branch: 0.10 < theta <= theta_max returns 1/(1 - theta).
+  const amp = _v383({ px_kip: 1000, delta_in: 8.0, ie: 1.0, vx_kip: 80, hsx_in: 120, cd: 5.5, beta: 0.5 });
+  assert.ok(amp.theta > 0.10 && amp.theta <= amp.theta_max);
+  assert.ok(Math.abs(amp.amplifier - 1 / (1 - amp.theta)) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v383({ px_kip: 0, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5 }));
+  assert.ok("error" in _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 0, hsx_in: 144, cd: 5.5 }));
+  assert.ok("error" in _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 0, cd: 5.5 }));
+  assert.ok("error" in _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 0 }));
+  assert.ok("error" in _v383({ px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5, beta: 0 }));
+  assert.ok("error" in _v383({ px_kip: Infinity, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5 }));
+});

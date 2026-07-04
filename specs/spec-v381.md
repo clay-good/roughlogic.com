@@ -1,6 +1,6 @@
 # roughlogic.com Specification v381 -- Design Spectral Response Accelerations SDS / SD1 (ASCE 7-22 11.4) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a seismic-parameters trio (v381 spectral SDS/SD1 -> v382 story drift ->
+> **Status: LANDED (2026-07-03, 0.134.0; proposed 2026-07-03). First tile of a seismic-parameters trio (v381 spectral SDS/SD1 -> v382 story drift ->
 > v383 P-delta stability) that brackets the existing `seismic-base-shear`. That tile takes `SDS` and `SD1` as given inputs
 > "from the USGS maps"; this tile derives them from the mapped `Ss`, `S1`, and the site coefficients -- the upstream step it
 > assumes.**

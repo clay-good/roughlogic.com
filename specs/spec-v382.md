@@ -1,6 +1,6 @@
 # roughlogic.com Specification v382 -- Seismic Design Story Drift and Allowable Limit (ASCE 7-22 12.8.6 / 12.12) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the seismic-parameters trio (v381 spectral -> v382 story drift ->
+> **Status: LANDED (2026-07-03, 0.134.0; proposed 2026-07-03). Second tile of the seismic-parameters trio (v381 spectral -> v382 story drift ->
 > v383 P-delta). `seismic-base-shear` returns the earthquake force; this tile takes the elastic sway that force produces,
 > amplifies it to the real inelastic drift, and checks it against the code limit -- the serviceability half of the
 > equivalent-lateral-force procedure the catalog was missing.**

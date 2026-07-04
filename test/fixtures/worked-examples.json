@@ -30551,6 +30551,77 @@
       }
     },
     {
+      "tile_id": "seismic-design-spectral-acceleration",
+      "source_publisher": "ASCE 7-22 11.4",
+      "source_title": "Ss 1.0, S1 0.4, Site Class D (Fa 1.1, Fv 1.6) -> SDS 0.733g, SD1 0.427g",
+      "source_edition_or_year": "spec-v381 worked example (machine-verified)",
+      "source_section_or_page": "spec-v381 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "ss": 1.0, "s1": 0.4, "fa": 1.1, "fv": 1.6 },
+      "outputs": {
+        "sms": { "value": 1.10, "tolerance": { "pct": 0.5 } },
+        "sm1": { "value": 0.64, "tolerance": { "pct": 0.5 } },
+        "sds": { "value": 0.7333, "tolerance": { "pct": 0.5 } },
+        "sd1": { "value": 0.4267, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "seismic-story-drift",
+      "source_publisher": "ASCE 7-22 12.8.6 / 12.12",
+      "source_title": "Cd 5.5, delta_xe 0.5 in, 144 in story -> delta_x 2.75 in vs 2.88 in allowable, OK",
+      "source_edition_or_year": "spec-v382 worked example (machine-verified)",
+      "source_section_or_page": "spec-v382 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "delta_xe_in": 0.5, "cd": 5.5, "ie": 1.0, "hsx_in": 144, "drift_ratio": 0.020 },
+      "outputs": {
+        "delta_x": { "value": 2.75, "tolerance": { "pct": 0.5 } },
+        "delta_a": { "value": 2.88, "tolerance": { "pct": 0.5 } },
+        "util": { "value": 0.955, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "seismic-story-drift",
+      "source_publisher": "ASCE 7-22 12.8.6 / 12.12",
+      "source_title": "cross-check: a softer frame (delta_xe 0.6 in) -> delta_x 3.30 in > 2.88 in, not OK",
+      "source_edition_or_year": "spec-v382 worked example (machine-verified)",
+      "source_section_or_page": "spec-v382 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "delta_xe_in": 0.6, "cd": 5.5, "ie": 1.0, "hsx_in": 144, "drift_ratio": 0.020 },
+      "outputs": {
+        "delta_x": { "value": 3.30, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "seismic-pdelta-stability",
+      "source_publisher": "ASCE 7-22 12.8.7",
+      "source_title": "Px 400 kip, Delta 2.75 in, Vx 80 kip, 144 in, Cd 5.5 -> theta 0.017, neglect P-delta",
+      "source_edition_or_year": "spec-v383 worked example (machine-verified)",
+      "source_section_or_page": "spec-v383 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "px_kip": 400, "delta_in": 2.75, "ie": 1.0, "vx_kip": 80, "hsx_in": 144, "cd": 5.5, "beta": 1.0 },
+      "outputs": {
+        "theta": { "value": 0.01736, "tolerance": { "pct": 0.5 } },
+        "theta_max": { "value": 0.0909, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "seismic-pdelta-stability",
+      "source_publisher": "ASCE 7-22 12.8.7",
+      "source_title": "cross-check: a soft story (Px 1000, Delta 5.0, Vx 40, 120 in) -> theta 0.189 > theta_max, unstable",
+      "source_edition_or_year": "spec-v383 worked example (machine-verified)",
+      "source_section_or_page": "spec-v383 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "px_kip": 1000, "delta_in": 5.0, "ie": 1.0, "vx_kip": 40, "hsx_in": 120, "cd": 5.5, "beta": 1.0 },
+      "outputs": {
+        "theta": { "value": 0.1894, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "labor-burden-rate",
       "source_publisher": "contractor estimating",
       "source_title": "$25/hr, 9.15% payroll, 8% WC, 2% liability, $4 benefits, 85% billable -> $39.75/hr",

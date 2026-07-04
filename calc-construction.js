@@ -5984,3 +5984,123 @@ const _renderHoopStressThinWall = _simpleRenderer({
   compute: computeHoopStressThinWall,
 });
 CONSTRUCTION_RENDERERS["hoop-stress-thin-wall"] = _renderHoopStressThinWall;
+
+// ===================== spec-v381..v383: seismic-parameters trio (ASCE 7-22) =====================
+
+// dims: in { ss: dimensionless, s1: dimensionless, fa: dimensionless, fv: dimensionless } out: { sms: dimensionless, sm1: dimensionless, sds: dimensionless, sd1: dimensionless }
+export function computeSeismicDesignSpectralAcceleration({ ss = 0, s1 = 0, fa = 0, fv = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Ss = Number(ss) || 0, S1 = Number(s1) || 0, Fa = Number(fa) || 0, Fv = Number(fv) || 0;
+  if (!(Ss >= 0) || !(S1 >= 0)) return { error: "Mapped accelerations Ss and S1 must be non-negative (fraction of g)." };
+  if (!(Fa > 0)) return { error: "Short-period site coefficient Fa must be positive." };
+  if (!(Fv > 0)) return { error: "One-second site coefficient Fv must be positive." };
+  const sms = Fa * Ss, sm1 = Fv * S1;
+  const sds = (2 / 3) * sms, sd1 = (2 / 3) * sm1;
+  return {
+    sms, sm1, sds, sd1,
+    note: "ASCE 7-22 §11.4.4/§11.4.5: site-adjust the mapped MCER accelerations by the site coefficients (SMS = Fa Ss, SM1 = Fv S1), then take two-thirds for the design values (SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv come from Tables 11.4-1/11.4-2 by Site Class; a geotechnical report sets the Site Class. SDS and SD1 feed the base shear and drift checks. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const seismicDesignSpectralAccelerationExample = { inputs: { ss: 1.0, s1: 0.4, fa: 1.1, fv: 1.6 } };
+const _renderSeismicSpectral = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 §11.4.4 (SMS = Fa Ss, SM1 = Fv S1) and §11.4.5 (SDS = 2/3 SMS, SD1 = 2/3 SM1). Fa and Fv are the site coefficients from Tables 11.4-1 and 11.4-2, selected by Site Class from a geotechnical report; the mapped Ss and S1 come from the USGS seismic design maps for the site. Returns the design spectral accelerations that feed the base shear and drift; it does not select the Site Class or the SDC. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: seismicDesignSpectralAccelerationExample.inputs,
+  fields: [
+    { key: "ss", label: "Mapped Ss (short-period, fraction of g)", kind: "number" },
+    { key: "s1", label: "Mapped S1 (1-second, fraction of g)", kind: "number" },
+    { key: "fa", label: "Site coefficient Fa (Table 11.4-1)", kind: "number", default: 1.0 },
+    { key: "fv", label: "Site coefficient Fv (Table 11.4-2)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "sms", id: "ssa-out-sms", label: "SMS = Fa Ss (MCER short)", value: (r) => fmt(r.sms, 3) + "g" },
+    { key: "sm1", id: "ssa-out-sm1", label: "SM1 = Fv S1 (MCER 1-sec)", value: (r) => fmt(r.sm1, 3) + "g" },
+    { key: "sds", id: "ssa-out-sds", label: "SDS = 2/3 SMS (design short)", value: (r) => fmt(r.sds, 3) + "g" },
+    { key: "sd1", id: "ssa-out-sd1", label: "SD1 = 2/3 SM1 (design 1-sec)", value: (r) => fmt(r.sd1, 3) + "g" },
+    { key: "n", id: "ssa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeismicDesignSpectralAcceleration,
+});
+CONSTRUCTION_RENDERERS["seismic-design-spectral-acceleration"] = _renderSeismicSpectral;
+
+// dims: in { delta_xe_in: L, cd: dimensionless, ie: dimensionless, hsx_in: L, drift_ratio: dimensionless } out: { delta_x: L, delta_a: L, util: dimensionless }
+export function computeSeismicStoryDrift({ delta_xe_in = 0, cd = 0, ie = 1.0, hsx_in = 0, drift_ratio = 0.020 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dxe = Number(delta_xe_in) || 0, Cd = Number(cd) || 0, Ie = Number(ie) || 0, hsx = Number(hsx_in) || 0, dr = Number(drift_ratio) || 0;
+  if (!(dxe > 0)) return { error: "Elastic story drift must be positive (in)." };
+  if (!(Cd > 0)) return { error: "Deflection amplification factor Cd must be positive." };
+  if (!(Ie > 0)) return { error: "Importance factor Ie must be positive." };
+  if (!(hsx > 0)) return { error: "Story height must be positive (in)." };
+  if (!(dr > 0)) return { error: "Allowable drift ratio must be positive." };
+  const delta_x = Cd * dxe / Ie;
+  const delta_a = dr * hsx;
+  const util = delta_x / delta_a;
+  return {
+    delta_x, delta_a, util, ok: delta_x <= delta_a,
+    note: "ASCE 7-22 Eq. 12.8-15: the amplified design story drift delta_x = Cd delta_xe / Ie, compared with the allowable delta_a = (drift coefficient) x story height (Table 12.12-1, commonly 0.020 hsx for most buildings, 0.010-0.025 by risk category and system). delta_xe is the elastic drift from the strength-level analysis. Exceeding delta_a means stiffen the frame. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const seismicStoryDriftExample = { inputs: { delta_xe_in: 0.5, cd: 5.5, ie: 1.0, hsx_in: 144, drift_ratio: 0.020 } };
+const _renderSeismicStoryDrift = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Eq. 12.8-15 (delta_x = Cd delta_xe / Ie) and Table 12.12-1 (allowable story drift delta_a = drift coefficient x story height, commonly 0.020 hsx). Cd is the deflection amplification factor from Table 12.2-1 for the seismic force-resisting system; delta_xe is the elastic drift from the strength-level analysis. Checks a single story against its allowable; it does not run the analysis or check torsional amplification. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: seismicStoryDriftExample.inputs,
+  fields: [
+    { key: "delta_xe_in", label: "Elastic story drift delta_xe (in)", kind: "number" },
+    { key: "cd", label: "Deflection amplification Cd (Table 12.2-1)", kind: "number" },
+    { key: "ie", label: "Importance factor Ie", kind: "number", default: 1.0 },
+    { key: "hsx_in", label: "Story height hsx (in)", kind: "number" },
+    { key: "drift_ratio", label: "Allowable drift coefficient (default 0.020)", kind: "number", default: 0.020 },
+  ],
+  outputs: [
+    { key: "dx", id: "ssd-out-dx", label: "Design story drift delta_x = Cd delta_xe / Ie", value: (r) => fmt(r.delta_x, 2) + " in" },
+    { key: "da", id: "ssd-out-da", label: "Allowable drift delta_a", value: (r) => fmt(r.delta_a, 2) + " in" },
+    { key: "ok", id: "ssd-out-ok", label: "Check", value: (r) => (r.ok ? "OK" : "NOT OK -- stiffen the frame") + " (util " + fmt(r.util, 3) + ")" },
+    { key: "n", id: "ssd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeismicStoryDrift,
+});
+CONSTRUCTION_RENDERERS["seismic-story-drift"] = _renderSeismicStoryDrift;
+
+// dims: in { px_kip: M L T^-2, delta_in: L, ie: dimensionless, vx_kip: M L T^-2, hsx_in: L, cd: dimensionless, beta: dimensionless } out: { theta: dimensionless, theta_max: dimensionless, amplifier: dimensionless }
+export function computeSeismicPdeltaStability({ px_kip = 0, delta_in = 0, ie = 1.0, vx_kip = 0, hsx_in = 0, cd = 0, beta = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Px = Number(px_kip) || 0, delta = Number(delta_in) || 0, Ie = Number(ie) || 0, Vx = Number(vx_kip) || 0, hsx = Number(hsx_in) || 0, Cd = Number(cd) || 0, b = Number(beta) || 0;
+  if (!(Px > 0)) return { error: "Gravity load Px must be positive (kip)." };
+  if (!(delta > 0)) return { error: "Design story drift must be positive (in)." };
+  if (!(Ie > 0)) return { error: "Importance factor Ie must be positive." };
+  if (!(Vx > 0)) return { error: "Seismic story shear Vx must be positive (kip)." };
+  if (!(hsx > 0)) return { error: "Story height must be positive (in)." };
+  if (!(Cd > 0)) return { error: "Deflection amplification factor Cd must be positive." };
+  if (!(b > 0)) return { error: "Shear demand/capacity ratio beta must be positive." };
+  const theta = Px * delta * Ie / (Vx * hsx * Cd);
+  const theta_max = Math.min(0.5 / (b * Cd), 0.25);
+  let verdict, amplifier = null;
+  if (theta <= 0.10) verdict = "neglect P-delta (theta <= 0.10)";
+  else if (theta <= theta_max) { amplifier = 1 / (1 - theta); verdict = "amplify forces and drifts by 1/(1 - theta)"; }
+  else verdict = "potentially unstable -- redesign (theta > theta_max)";
+  return {
+    theta, theta_max, amplifier, verdict,
+    note: "ASCE 7-22 §12.8.7 stability coefficient theta = Px delta Ie / (Vx hsx Cd). Below 0.10 P-delta may be neglected; between 0.10 and theta_max = min(0.5/(beta Cd), 0.25) the forces and drifts must be amplified by 1/(1 - theta); above theta_max the story is potentially unstable and must be redesigned (stiffen it). Px is the total gravity design load at and above the story; beta is the shear demand-to-capacity ratio (1.0 if unknown). A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const seismicPdeltaStabilityExample = { inputs: { px_kip: 400, delta_in: 2.75, ie: 1.0, vx_kip: 80, hsx_in: 144, cd: 5.5, beta: 1.0 } };
+const _renderSeismicPdelta = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 §12.8.7: the P-delta stability coefficient theta = Px delta Ie / (Vx hsx Cd), the neglect threshold 0.10, the amplification 1/(1 - theta), and the maximum theta_max = min(0.5/(beta Cd), 0.25) above which the structure is potentially unstable. Px is the total gravity design load at and above the story, delta the design story drift, beta the shear demand/capacity ratio (1.0 if unknown). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: seismicPdeltaStabilityExample.inputs,
+  fields: [
+    { key: "px_kip", label: "Gravity load at/above story Px (kip)", kind: "number" },
+    { key: "delta_in", label: "Design story drift delta (in)", kind: "number" },
+    { key: "ie", label: "Importance factor Ie", kind: "number", default: 1.0 },
+    { key: "vx_kip", label: "Seismic story shear Vx (kip)", kind: "number" },
+    { key: "hsx_in", label: "Story height hsx (in)", kind: "number" },
+    { key: "cd", label: "Deflection amplification Cd", kind: "number" },
+    { key: "beta", label: "Shear demand/capacity ratio beta (default 1.0)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "th", id: "spd-out-th", label: "Stability coefficient theta", value: (r) => fmt(r.theta, 3) },
+    { key: "tm", id: "spd-out-tm", label: "Maximum theta_max", value: (r) => fmt(r.theta_max, 3) },
+    { key: "v", id: "spd-out-v", label: "Verdict", value: (r) => r.verdict + (r.amplifier != null ? " = " + fmt(r.amplifier, 3) : "") },
+    { key: "n", id: "spd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSeismicPdeltaStability,
+});
+CONSTRUCTION_RENDERERS["seismic-pdelta-stability"] = _renderSeismicPdelta;

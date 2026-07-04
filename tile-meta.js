@@ -466,6 +466,7 @@ const _TILES = [
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],
   ["shaft-torsion", "E"], ["thermal-stress-restrained", "E"], ["hoop-stress-thin-wall", "E"],
+  ["seismic-design-spectral-acceleration", "E"], ["seismic-story-drift", "E"], ["seismic-pdelta-stability", "E"],
   ["paint-mix-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
