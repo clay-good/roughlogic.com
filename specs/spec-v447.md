@@ -1,6 +1,6 @@
 # roughlogic.com Specification v447 -- Concrete Threshold and Cracking Torsion (ACI 318-19 22.7) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a structural member-capacity trio (v447 concrete torsion -> v448 glulam
+> **Status: LANDED (2026-07-04). First tile of a structural member-capacity trio (v447 concrete torsion -> v448 glulam
 > volume factor -> v449 masonry anchor bolt). `rc-beam-shear` covers one-way shear but not torsion; this tile gives the two
 > torsion thresholds every spandrel and edge beam is checked against -- the threshold below which torsion is ignored and the
 > cracking torsion.**

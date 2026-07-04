@@ -15510,6 +15510,64 @@ test("bounds: spec-v446 computePrevailingWageFringe pins package, plan saving, a
   assert.ok("error" in _v446({ base_wage_hr: Infinity, fringe_hr: 15, payroll_tax: 7.65 }));
 });
 
+// ===================== spec-v447..v449 structural member-capacity trio =====================
+import { computeConcreteTorsionThreshold as _v447 } from "../../calc-concrete.js";
+import { computeGlulamVolumeFactor as _v448 } from "../../calc-construction.js";
+import { computeMasonryAnchorBolt as _v449 } from "../../calc-masonry.js";
+
+test("bounds: spec-v447 computeConcreteTorsionThreshold pins Tth, neglect, cracking, and error seams", () => {
+  const r = _v447({ fc_psi: 4000, b_in: 12, h_in: 20, lambda: 1.0 });
+  assert.ok(Math.abs(r.acp_in2 - 240) < 1e-9 && Math.abs(r.pcp_in - 64) < 1e-9);
+  assert.ok(Math.abs(r.tth_inlb - 56920.99788) < 1e-2);
+  assert.ok(Math.abs(r.neglect_inlb - 0.75 * r.tth_inlb) < 1e-9);
+  assert.ok(Math.abs(r.tcr_inlb - 4 * r.tth_inlb) < 1e-9);
+  // A bigger section raises the threshold fast (18x24 -> ~11.7 ft-kip, spec prose 14.6 was a slip).
+  const big = _v447({ fc_psi: 4000, b_in: 18, h_in: 24, lambda: 1.0 });
+  assert.ok(Math.abs(big.tth_inlb / 12000 - 11.7) < 0.1);
+  // Lightweight lambda reduces the threshold.
+  assert.ok(_v447({ fc_psi: 4000, b_in: 12, h_in: 20, lambda: 0.75 }).tth_inlb < r.tth_inlb);
+  // Error seams: non-positive f'c, dimension, lambda, non-finite.
+  assert.ok("error" in _v447({ fc_psi: 0, b_in: 12, h_in: 20, lambda: 1.0 }));
+  assert.ok("error" in _v447({ fc_psi: 4000, b_in: 0, h_in: 20, lambda: 1.0 }));
+  assert.ok("error" in _v447({ fc_psi: 4000, b_in: 12, h_in: 20, lambda: 0 }));
+  assert.ok("error" in _v447({ fc_psi: Infinity, b_in: 12, h_in: 20, lambda: 1.0 }));
+});
+
+test("bounds: spec-v448 computeGlulamVolumeFactor pins Cv, the 1.0 cap, and error seams", () => {
+  const r = _v448({ span_ft: 20, depth_in: 18, width_in: 5.125, x: 10, kl: 1.0 });
+  assert.ok(Math.abs(r.cv - 0.965) < 1e-3);
+  // A bigger girder is penalized more.
+  const big = _v448({ span_ft: 32, depth_in: 24, width_in: 6.75, x: 10, kl: 1.0 });
+  assert.ok(Math.abs(big.cv - 0.870) < 2e-3 && big.cv < r.cv);
+  // Southern Pine (x=20) penalizes less than softwood.
+  assert.ok(_v448({ span_ft: 20, depth_in: 18, width_in: 5.125, x: 20, kl: 1.0 }).cv > r.cv);
+  // A tiny beam caps Cv at 1.0.
+  assert.ok(_v448({ span_ft: 4, depth_in: 6, width_in: 3, x: 10, kl: 1.0 }).cv === 1.0);
+  // Select passes strings; string x works too.
+  assert.ok(Math.abs(_v448({ span_ft: 20, depth_in: 18, width_in: 5.125, x: "10", kl: 1.0 }).cv - 0.965) < 1e-3);
+  // Error seams: non-positive span, depth, width, non-finite.
+  assert.ok("error" in _v448({ span_ft: 0, depth_in: 18, width_in: 5.125, x: 10, kl: 1.0 }));
+  assert.ok("error" in _v448({ span_ft: 20, depth_in: 0, width_in: 5.125, x: 10, kl: 1.0 }));
+  assert.ok("error" in _v448({ span_ft: 20, depth_in: 18, width_in: 0, x: 10, kl: 1.0 }));
+  assert.ok("error" in _v448({ span_ft: Infinity, depth_in: 18, width_in: 5.125, x: 10, kl: 1.0 }));
+});
+
+test("bounds: spec-v449 computeMasonryAnchorBolt pins Bab/Bas, the governing switch, and error seams", () => {
+  const r = _v449({ fm_psi: 1500, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 });
+  assert.ok(Math.abs(r.apt_in2 - Math.PI * 16) < 1e-6);
+  assert.ok(Math.abs(r.bab_lb - 2433) < 1 && Math.abs(r.bas_lb - 9547.2) < 1e-6);
+  assert.ok(Math.abs(r.ba_lb - r.bab_lb) < 1e-9 && r.masonry_governs === true);
+  // Deep enough embedment makes the steel govern.
+  const deep = _v449({ fm_psi: 1500, lbe_in: 8, ab_in2: 0.442, fy_psi: 36000 });
+  assert.ok(Math.abs(deep.bab_lb - 9733.5) < 1 && Math.abs(deep.ba_lb - deep.bas_lb) < 1e-9 && deep.masonry_governs === false);
+  // Error seams: non-positive f'm, embedment, area, yield, non-finite.
+  assert.ok("error" in _v449({ fm_psi: 0, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v449({ fm_psi: 1500, lbe_in: 0, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v449({ fm_psi: 1500, lbe_in: 4, ab_in2: 0, fy_psi: 36000 }));
+  assert.ok("error" in _v449({ fm_psi: 1500, lbe_in: 4, ab_in2: 0.442, fy_psi: 0 }));
+  assert.ok("error" in _v449({ fm_psi: Infinity, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

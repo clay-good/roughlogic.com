@@ -1,6 +1,6 @@
 # roughlogic.com Specification v449 -- Masonry Headed Anchor Bolt Tension (TMS 402 ASD) (calc-masonry.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the structural member-capacity trio (v447 concrete torsion ->
+> **Status: LANDED (2026-07-04). Third and final tile of the structural member-capacity trio (v447 concrete torsion ->
 > v448 glulam volume factor -> v449 masonry anchor bolt). The catalog checks CMU walls for flexure, shear, and axial
 > (`cmu-wall-flexure`, `cmu-shear-wall`, `cmu-wall-axial`) but never the anchor bolt that fastens a ledger or sill to them --
 > the allowable tension governed by masonry breakout or steel yield.**

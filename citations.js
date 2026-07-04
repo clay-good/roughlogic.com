@@ -9399,6 +9399,18 @@ export const CITATIONS = {
       { name: "Effective length", value: "le is the effective unbraced length of the compression edge from NDS Table 3.3.3, not the clear span", source: "NDS Table 3.3.3" },
     ],
   },
+  "glulam-volume-factor": {
+    formula: "Cv = min( KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), 1.0 ); allowable bending uses the lesser of Cv and CL.",
+    edition: "NDS 2018 (National Design Specification for Wood Construction) §5.3.6, the glulam volume factor Cv, by name; the reference bending value and factors come from the NDS Supplement.",
+    freeAccess: "The Cv equation is stated in NDS 5.3.6, published free read-only by AWC at awc.org; the (21/L)^(1/x) arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "NDS 2018 §5.3.6 gives the glued-laminated volume factor Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the span in feet, d and b the depth and width in inches, x = 10 for all species except Southern Pine (x = 20), and KL is the loading-condition factor (1.0 for a uniformly loaded simple span, other values in the NDS for concentrated or cantilever loads). A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value Fb is reduced. The allowable bending value uses the LESSER of Cv and the beam-stability factor CL (NDS 3.3.3) - they are not multiplied together. Cv applies to glulam bending about the x-x (strong) axis, not to sawn lumber and not to weak-axis bending. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Volume factor", value: "Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0", source: "NDS 2018 §5.3.6" },
+      { name: "Species exponent", value: "x = 10 for all species except Southern Pine, where x = 20", source: "NDS 2018 §5.3.6" },
+      { name: "Lesser of Cv or CL", value: "the allowable bending uses the lesser of Cv and the stability factor CL, not their product", source: "NDS 2018 §5.3.6 / §3.3.3" },
+    ],
+  },
   "wood-beam-shear": {
     formula: "Vr = (2/3) Fv' b d; ratio = dn/d; Vr' = (2/3) Fv' b dn (dn/d)^2; fv = 3V / (2 b dn); dcr = V / Vr'.",
     edition: "NDS 3.4.2 rectangular-section shear stress and the NDS 3.4.3.2 tension-side end-notch reduction, by name; the adjusted shear value comes from the NDS Supplement.",
@@ -9555,6 +9567,18 @@ export const CITATIONS = {
       { name: "Limits separate", value: "the §22.5.1.2 section upper limit, §9.6.3 minimum shear reinforcement, and the d/4 tightening when Vs is high are separate checks the detailer applies", source: "ACI 318-19" },
     ],
   },
+  "concrete-torsion-threshold": {
+    formula: "Acp = b x h; pcp = 2(b + h); Tth = lambda x sqrt(f'c) x (Acp^2 / pcp); neglect if Tu < phi x Tth (phi = 0.75); Tcr = 4 x Tth.",
+    edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.7.4.1 (threshold torsion Tth), §22.7.1.1 (the neglect criterion Tu < phi x Tth), §22.7.5 (cracking torsion Tcr = 4 x Tth).",
+    freeAccess: "ACI 318-19 is viewable through ACI's online public-access reader; the lambda x sqrt(f'c) x (Acp^2/pcp) arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ACI 318-19 §22.7.4.1 gives the threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2/pcp) (nominal, without phi), where Acp is the area enclosed by the outside perimeter of the section and pcp is that outside perimeter; §22.7.1.1 permits torsion to be neglected when the factored torque Tu is below phi x Tth with phi = 0.75; and the cracking torsion is Tcr = 4 x Tth. This returns the torsion thresholds for a solid non-prestressed section from a rectangular Acp = b x h and pcp = 2(b + h); lambda defaults to 1.0 (normalweight; 0.75 lightweight, §19.2.4). Above phi x Tth the member must be designed for torsion with closed stirrups (At/s) and longitudinal steel (Al) per §22.7 and §9.5.4 - not computed here. A design aid, not a substitute for a licensed engineer's design - the engineer of record's stamped design governs.",
+    assumptions: [
+      { name: "Threshold torsion", value: "Tth = lambda x sqrt(f'c) x (Acp^2/pcp), nominal without phi", source: "ACI 318-19 §22.7.4.1" },
+      { name: "Solid rectangular section", value: "Acp = b x h and pcp = 2(b + h) for a solid non-prestressed rectangular section; a hollow or flanged section changes Acp/pcp", source: "ACI 318-19 §22.7" },
+      { name: "Design separate", value: "above phi x Tth the closed-stirrup At/s and longitudinal Al torsion reinforcement is a separate design step", source: "ACI 318-19 §9.5.4" },
+    ],
+  },
   "rc-development-length": {
     formula: "ld = (3/40) x fy x psi_t x psi_e x psi_s x psi_g / (lambda x sqrt(f'c) x (cb + Ktr)/db) x db; (cb + Ktr)/db capped at 2.5; psi_t x psi_e capped at 1.7; ld >= 12 in.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §25.4.2.3 (general tension development equation), §25.4.2.4 (confinement cap), Table 25.4.2.5 (modification factors), §25.4.2.1 (12 in minimum).",
@@ -9649,6 +9673,18 @@ export const CITATIONS = {
       { name: "Cracked working-stress section", value: "singly reinforced, fully grouted, cracked transformed section in near-pure flexure; the axial interaction and the slender-wall P-delta method are separate analyses", source: "TMS 402-16 / CMHA TEK 14-07C" },
       { name: "Allowable stresses", value: "Fs = 32,000 psi (Grade 60) and Fb = 0.45 f'm, with Em = 900 f'm for concrete masonry; editable for other grades and materials", source: "TMS 402-16" },
       { name: "Governing mode reported", value: "the lesser of the steel- and masonry-governed moments governs; adding steel past the balance point stops paying off once Mm < Ms", source: "Masonry Designers' Guide" },
+    ],
+  },
+  "masonry-anchor-bolt": {
+    formula: "Apt = pi x lbe^2; Bab = 1.25 x Apt x sqrt(f'm) (masonry breakout, ASD); Bas = 0.6 x Ab x fy (steel); Ba = min(Bab, Bas).",
+    edition: "TMS 402 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress anchor-bolt tension provisions, as compiled in the Masonry Designers' Guide and CMHA TEK notes, by name.",
+    freeAccess: "CMHA TEK notes on anchor-bolt design are free public CMHA technical notes; the 1.25 x Apt x sqrt(f'm) and 0.6 x Ab x fy arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "TMS 402 allowable-stress design of a headed anchor bolt in axial tension in grouted masonry: the allowable tension is the LESSER of the masonry breakout Bab = 1.25 x Apt x sqrt(f'm), with Apt = pi x lbe^2 the projected area of the 45-degree tension breakout cone (lbe the effective embedment), and the steel Bas = 0.6 x Ab x fy (Ab the bolt tensile-stress area, fy its yield). A shallow anchor pulls a cone of masonry out (masonry governs); a deep enough anchor makes the steel yield first (steel governs). The full-cone Apt is an upper bound - edge distance, or overlapping cones from closely spaced anchors, reduce it (a separate reduction the designer applies); anchor shear and combined shear-tension (pryout) are separate checks. The corresponding strength-design coefficient is 4 x Apt x sqrt(f'm). fy defaults to 36,000 psi (ASTM A307 / F1554 Grade 36). A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Lesser of two modes", value: "the allowable is the lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) and steel Bas = 0.6 x Ab x fy", source: "TMS 402 ASD" },
+      { name: "Full-cone projected area", value: "Apt = pi x lbe^2 assumes a full breakout cone; edge distance or overlapping cones reduce Apt", source: "TMS 402" },
+      { name: "Tension only", value: "axial tension only; anchor shear (pryout) and combined shear-tension are separate checks", source: "TMS 402" },
     ],
   },
   "cmu-shear-wall": {

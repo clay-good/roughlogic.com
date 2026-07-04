@@ -1489,6 +1489,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteElasticModulus` | `{ fc_psi = 4000, wc_pcf = 145 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteModulusOfRupture` | `{ fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteShrinkageTemperatureSteel` | `{ h_in = 0, b_in = 12, grade_ksi = 60 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteTorsionThreshold` | `{ fc_psi = 4000, b_in = 0, h_in = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamFlexure` | `{ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnAxial` | `{ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}` | _ | _ | _ |
@@ -1535,6 +1536,7 @@ cross-check.
 | calc-construction.js | `computeFilletWeldStrength` | `{ mode = "capacity-from-size", leg_in = 0, length_in = 0, electrode = "E70", ...` | _ | _ | _ |
 | calc-construction.js | `computeFootingArea` | `{ column_load_lb, soil_class, applied_moment_lbft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeFormworkPressure` | `{ pour_rate_ft_per_hr = 0, concrete_temp_F = 70, weight_factor = "normal", un...` | _ | _ | _ |
+| calc-construction.js | `computeGlulamVolumeFactor` | `{ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeGuardHandrailCheck` | `{ occupancy = "residential", surface_height_in = 0, measured_guard_in = 0, me...` | _ | _ | _ |
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
@@ -2090,6 +2092,7 @@ cross-check.
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallFlexure` | `{ fm_psi = 2000, as_in2 = 0, d_in = 0, b_in = 12, fs_psi = 32000 } = {}` | _ | _ | _ |
+| calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryLintelLoading` | `{ span_ft = 0, wall_psf = 0, wall_h_above = 0 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryWallWeight` | `{ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, heigh...` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
@@ -2565,7 +2568,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1151.
+Row count: 1154.
 
 <!-- END function-corpus-v14 -->
 
@@ -3010,7 +3013,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (194 tiles)
+### Group E Construction (197 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3052,6 +3055,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete-modulus-of-rupture` | Concrete Modulus of Rupture fr (ACI 318-19 19.2.3) | ACI 318-19 19.2.3; spec-v379 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-shrinkage-temperature-steel` | Shrinkage and Temperature Reinforcement (ACI 318-19 24.4) | ACI 318-19 24.4; spec-v380 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-strength-gain` | Concrete Age-Strength Gain for Form Stripping (ACI 209) | ACI 209R strength-development model; spec-v247 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-torsion-threshold` | Concrete Threshold and Cracking Torsion (ACI 318-19 22.7) | ACI 318-19 §22.7; spec-v447 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `consolidation-time-rate` | Consolidation Time Rate (Terzaghi) | Terzaghi consolidation theory; spec-v414 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `control-joint-spacing` | Concrete Control Joint Spacing | ACI 302.1R / 360R slab-on-ground guid...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load / 2-leg sling at 60 deg included / 12,000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3074,6 +3078,7 @@ per spec-v14 §13.1 second paragraph.
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-eccentric-pressure` | Eccentric Footing Bearing Pressure and Kern Check | Eccentric footing bearing pressure (k...; spec-v309 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `formwork-pressure` | Formwork Pressure | ACI 347 Guide to Formwork for Concrete; Pour 5 ft/hr / 70 F / 4 in slump / Class I -> 792.86 psf ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `glulam-volume-factor` | Glulam Volume Factor Cv (NDS 5.3.6) | NDS 2018 §5.3.6; spec-v448 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `groove-weld-strength` | Groove Weld Strength | AWS D1.1 / AISC 360 §J2 Table J2.5 (b...; PJP throat 0.25 in, 6 in long, E70, LRFD -> 0.75*0.60*70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `guard-handrail-check` | Guard and Handrail Code Check | IRC R312 / R311.7.8 / IBC 1015 (by se...; spec-v113 section 2.1 pinned example (48 in surface, 36 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gutter-downspout` | Gutter and Downspout Sizing | SMACNA / standard residential gutter ...; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3091,6 +3096,7 @@ per spec-v14 §13.1 second paragraph.
 | `layout-squaring` | Layout Squaring (3-4-5) | Pythagorean 3-4-5 method (public); sides 3 and 4 -> diagonal 5 exactly (the 3-4-5 right tria... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `liquefaction-screening` | Liquefaction Triggering Screening (Seed-Idriss CSR) | Seed-Idriss; spec-v416 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lumber-spans` | Lumber Spans | Project (first-principles) over AWC N...; DF-L No.2 / 2x10 / 50 psf total / 16 in o.c. / L/360 -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `masonry-anchor-bolt` | Masonry Headed Anchor Bolt Tension (TMS 402 ASD) | TMS 402 ASD; spec-v449 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-count` | Brick and CMU Count | Project (first-principles face-area c...; 100 ft^2 wall / CMU 8x8x16 / 3/8 in joints / 5% waste -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `masonry-coursing` | Masonry Coursing and Course-Out Check | BIA Technical Notes / NCMA TEK; spec-v213 section 2.1 pinned example (CMU wall on module) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `masonry-lintel-loading` | Masonry Lintel Arching Load (Triangular Load Over an Opening) | masonry design method; spec-v370 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3658,6 +3664,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 907. Fixture-covered or reference-cadence: 907 / 907.
+Tile count: 910. Fixture-covered or reference-cadence: 910 / 910.
 
 <!-- END tile-index-v14 -->

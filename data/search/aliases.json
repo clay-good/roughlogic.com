@@ -17322,6 +17322,141 @@
       "term": "public works fringe",
       "target": "prevailing-wage-fringe",
       "kind": "industry"
+    },
+    {
+      "term": "concrete torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "threshold torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "cracking torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 22.7",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "Tth Tcr",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "beam torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "torsion neglect",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "spandrel torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "Acp pcp torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "industry"
+    },
+    {
+      "term": "glulam volume factor",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "Cv glulam",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "nds 5.3.6",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "glulam bending",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "volume factor wood",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "glued laminated beam",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "glulam design",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "Cv wood beam",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "glulam strength reduction",
+      "target": "glulam-volume-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry anchor bolt",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "cmu anchor bolt",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "tms 402 anchor",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry breakout",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "anchor bolt tension masonry",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "headed anchor masonry",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "Bab Bas",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "grouted anchor bolt",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
+    },
+    {
+      "term": "masonry bolt capacity",
+      "target": "masonry-anchor-bolt",
+      "kind": "industry"
     }
   ]
 }

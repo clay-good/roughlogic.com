@@ -4,7 +4,7 @@ Field math for the trades. A calm, fast, ad-free, account-free, ever-free refere
 
 [roughlogic.com](https://roughlogic.com) is a single-page static web application that helps electricians, plumbers, HVAC technicians, water-damage and mold-restoration techs, carpenters and general contractors, fire-ground engineers, and a widening set of allied professions do the math they actually do during a workday. Everything runs in the browser. No server, no account, no analytics, no telemetry, no AI inference, no API key, no ongoing operating cost beyond domain renewal.
 
-> **907 deterministic tools across 21 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,096 unit tests. Works offline.**
+> **910 deterministic tools across 21 trade groups. 0 dependencies. 0 trackers. 0 LLM calls. 5,096 unit tests. Works offline.**
 
 <p align="center">
   <img src="docs/img/home-mobile.png" width="240" alt="roughlogic home view on a 390 px phone: a centered hero headline, a one-paragraph description, a single search bar, and a browse-by-trade index of the 21 group hubs">
@@ -24,7 +24,7 @@ Tradespeople do quick math constantly: voltage drop, friction loss, conduit fill
 
 ## The solution
 
-One static page with 907 small calculators and reference tools, organized into 21 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
+One static page with 910 small calculators and reference tools, organized into 21 categories. Each tool does one thing. The home page is scannable in five seconds. Every formula is computed from public physics or public-domain data. Every reference value is sourced and dated. The user can save the page and use it offline forever.
 
 The design constraints are the product:
 
@@ -51,7 +51,7 @@ Calculator state is encoded in the URL hash, so you can bookmark or share a calc
 
 The whole catalog is also available to AI agents through a local [Model Context Protocol](https://modelcontextprotocol.io) server in [`mcp/`](mcp/). It is zero-dependency and runs entirely on your machine over stdio: no hosting, no network, no install step. An agent (Claude Code, Claude Desktop, Cursor, and the like) can search the catalog, read a calculator's inputs and worked example, and run it with real numbers.
 
-Rather than register all 907 calculators as separate tools (which would swamp a client's tool list), the server exposes three meta-tools over the catalog:
+Rather than register all 910 calculators as separate tools (which would swamp a client's tool list), the server exposes three meta-tools over the catalog:
 
 | Tool | Purpose |
 | --- | --- |
@@ -162,7 +162,7 @@ Design decisions worth calling out:
 - **Computation on the main thread, with two exceptions.** Most tools compute in well under a millisecond, so a worker would only add latency. The simplified Manual J load estimators and the duct-sizing calculator (nested bisection + Colebrook iteration) run in `manual-j-worker.js` to keep the main thread responsive.
 - **Sharded data, hashed at build.** Reference datasets are split per group so a tool loads only what it needs. A startup integrity check (`integrity.js`) verifies the SHA-256 of each per-folder manifest against `data/integrity.json`; a mismatch surfaces a non-blocking banner naming the affected dataset.
 - **Hash-based state.** Per-tile inputs live in the URL hash (`hash-state.js`), which makes every calculation bookmarkable and shareable with zero server state. The grammar and its back-compat policy are documented in [docs/hash-state.md](docs/hash-state.md).
-- **Catalog metadata is lazy (spec-v10 §H.2).** The 907-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~28.0 KB gz; total home payload 40.7% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
+- **Catalog metadata is lazy (spec-v10 §H.2).** The 910-entry `TOOLS` registry -- every tile's id, name, group, trades, and description -- lives in `tools-data.js` and is dynamic-imported only on the first search keystroke or tile-route navigation (via `ensureTools()`, mirroring the alias loader). The bare home view is static HTML that the router only unhides, so first paint loads neither the catalog nor the search aliases. This keeps the home-view JS sub-budget well under its ceiling (~28.0 KB gz; total home payload 40.7% of the 100 KB budget) instead of ~99% with the array inlined; the bytes are deferred, not eliminated, so the gate measures honestly.
 - **One brand accent in an otherwise monochrome palette.** Links, the focus ring, the "Run the calculator" CTA, and the copy-success pulse share a single accent that clears WCAG AA on every surface in both themes.
 
 The component diagram above shows *what* loads; the sequence below shows *when*. Opening a tile is a chain of cached dynamic imports behind a crash-safe boundary, so the bytes a given calculator needs arrive only on first use and the home view ships none of them:
@@ -238,7 +238,7 @@ roughlogic.com/
   index.html            SPA shell: CSP, viewport, JSON-LD, theme pre-paint
   styles.css            single stylesheet (dark + light, mobile sweep, print)
   app.js                SPA entry: hash router, renderers, lazy loaders (~77 KB raw / ~25 KB gz)
-  tools-data.js         catalog registry (TOOLS, 907 tiles); lazy-loaded (~248 KB raw / ~84 KB gz)
+  tools-data.js         catalog registry (TOOLS, 910 tiles); lazy-loaded (~248 KB raw / ~84 KB gz)
   pure-math.js          physics/math primitives shared across groups
   calc-<group>.js       56 per-group calculator modules (electrical, hvac, ...,
                         calc-fab.js is the pipe & conduit fabrication bench split
@@ -303,7 +303,7 @@ roughlogic.com/
 
 ## The catalog (cheat sheet)
 
-907 tiles across 21 active group letters. The letters are stable identifiers; new groups append, retired groups (S / U / V / W, retired in spec-v107) leave a gap rather than renumbering, and retired tiles keep their IDs.
+910 tiles across 21 active group letters. The letters are stable identifiers; new groups append, retired groups (S / U / V / W, retired in spec-v107) leave a gap rather than renumbering, and retired tiles keep their IDs.
 
 | Letter | Group | Tiles | Representative tools |
 |---|---|--:|---|
@@ -495,17 +495,17 @@ The home document renders the SPA, and per-tile state lives in the URL hash. But
 ```mermaid
 flowchart LR
     SRC[TOOLS registry\n+ RELATED graph\n+ citations] --> BUILD[scripts/build.mjs]
-    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n907 static shells\n~1.9 KB gz each"]
+    BUILD --> TILE["/tools/&lt;id&gt;/index.html\n910 static shells\n~1.9 KB gz each"]
     BUILD --> GROUP["/groups/&lt;slug&gt;/index.html\n21 static shells\n~4.4 KB gz each"]
-    BUILD --> MAP["sitemap.xml\n929 URLs"]
+    BUILD --> MAP["sitemap.xml\n932 URLs"]
     BUILD --> COPY[home doc + SPA modules\ncopied into dist/]
     TILE -->|Run the calculator| SPA[("/#&lt;id&gt;\ninteractive SPA")]
     style BUILD fill:#1a3a5a,color:#fff
 ```
 
-- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (907). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, a canonical link, a **Formula and source block** (the cited formula and the source-stamp, prerendered from `CITATIONS` so the actual reference content -- the math and its authority -- is crawlable and readable offline, not just the tile name; spec-v45), an Audience block, a curated related-tiles list, a Posture block, and a "Run the calculator" anchor to the SPA hash route (800 shells). The `check-shells` gate (wired into CI as of spec-v45) fails the build on any tile shell missing the formula/source block, an over-cap title or description, an off-allowlist JSON-LD type, or an over-budget gzip size.
+- **`/tools/<id>/index.html`** is one static, zero-JavaScript shell per tile (910). Each carries the tile name as `<h1>`, a verb-first description, a JSON-LD `WebApplication` + `BreadcrumbList` block, Open Graph + Twitter Card meta, a canonical link, a **Formula and source block** (the cited formula and the source-stamp, prerendered from `CITATIONS` so the actual reference content -- the math and its authority -- is crawlable and readable offline, not just the tile name; spec-v45), an Audience block, a curated related-tiles list, a Posture block, and a "Run the calculator" anchor to the SPA hash route (800 shells). The `check-shells` gate (wired into CI as of spec-v45) fails the build on any tile shell missing the formula/source block, an over-cap title or description, an off-allowlist JSON-LD type, or an over-budget gzip size.
 - **`/groups/<slug>/index.html`** is one shell per active group (21), listing every tile with a one-line description and an internal link, plus JSON-LD `CollectionPage` + `BreadcrumbList` + `ItemList`.
-- **`sitemap.xml`** carries 929 URLs (home + 21 groups + 907 tiles), regenerated at every build.
+- **`sitemap.xml`** carries 932 URLs (home + 21 groups + 910 tiles), regenerated at every build.
 - **SPA-side canonical emission**: when the SPA opens a tile it sets `<link rel="canonical" href="https://roughlogic.com/tools/<id>/">` so a crawler that lands on a hash URL still reads the canonical shell.
 
 Measurement is source-side only (Cloudflare edge metrics, Google Search Console, Bing Webmaster Tools); there is no client telemetry. See [docs/seo.md](docs/seo.md) for the shell model, authoring rules, and JSON-LD allowlist.
@@ -523,8 +523,8 @@ flowchart TB
     F --> D[Phase D: bounds fuzzer\n1043/1043 covered]
     F --> E[Phase E: numerical stability\nbit-pattern pins on iterative methods]
     F --> Fa[Phase F: cross-tile invariants\n341 tests / 285 monotonicity batches]
-    F --> I[Phase I: derivation index\n904/907 tiles]
-    F --> G[Phase G: source-coverage map\n904/907 tiles, 163 sources]
+    F --> I[Phase I: derivation index\n904/910 tiles]
+    F --> G[Phase G: source-coverage map\n904/910 tiles, 163 sources]
     F -.pending.-> B[Phase B: independent worked-example source]
     F -.pending.-> H[Phase H: per-group reviewer signoff]
     style C fill:#14532d,color:#fff
@@ -547,9 +547,9 @@ Status as of this writing:
 | F | Every shared computation passes cross-tile invariant tests | Complete (5/5 shared-computation classes; round-trip identities; 285 monotonicity batches, 341 tests) |
 | G | Every tile maps to a classified source: a tracked published authority, or an explicit first-principles / public-domain / author-original class with no edition cycle | Complete (800/800 tiles classified, 100%; 163 tracked sources) |
 | H | Every active non-exempt group has a current reviewer signoff | Pending external reviewers (H and Q are exempt) |
-| I | One derivation-index row per tile | Complete (907/907) |
+| I | One derivation-index row per tile | Complete (910/910) |
 
-The **cross-tile invariant** suite is the most distinctive gate. Where an output is monotonic in an input (voltage drop in length, friction loss in flow, fluid plan in patient weight), a sweep asserts strict monotonicity plus a published-rule pin (for example, NEC 430.22 125%, Hazen-Williams `Q^1.907`, the IRS standard mileage rate against the bundled shard). A sign flip, an exponent swap, or a missing unit conversion fails immediately rather than producing a plausible-but-wrong number. The sweep now covers every catalog compute function whose output is monotonic in an input. See [docs/correctness.md](docs/correctness.md).
+The **cross-tile invariant** suite is the most distinctive gate. Where an output is monotonic in an input (voltage drop in length, friction loss in flow, fluid plan in patient weight), a sweep asserts strict monotonicity plus a published-rule pin (for example, NEC 430.22 125%, Hazen-Williams `Q^1.910`, the IRS standard mileage rate against the bundled shard). A sign flip, an exponent swap, or a missing unit conversion fails immediately rather than producing a plausible-but-wrong number. The sweep now covers every catalog compute function whose output is monotonic in an input. See [docs/correctness.md](docs/correctness.md).
 
 ---
 
@@ -560,7 +560,7 @@ The site has no command-line interface of its own. The repository ships these np
 | Command | What it does |
 |---|---|
 | `npm run dev` | Start a local development server. |
-| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 907 tile + 21 group shells, regenerates `sitemap.xml`). |
+| `npm run build` | Produce the static `dist/` for deployment (copies the SPA, prerenders 910 tile + 21 group shells, regenerates `sitemap.xml`). |
 | `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,003 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
@@ -568,7 +568,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
-| `npm run check:shell-mobile` | Audit every prerendered shell (907 tools + 21 groups + home) for zero horizontal scroll: all at the 320px floor, plus a representative sample at 568x320 landscape and 200% text zoom (needs a built `dist/` + Playwright; skips cleanly otherwise). |
+| `npm run check:shell-mobile` | Audit every prerendered shell (910 tools + 21 groups + home) for zero horizontal scroll: all at the 320px floor, plus a representative sample at 568x320 landscape and 200% text zoom (needs a built `dist/` + Playwright; skips cleanly otherwise). |
 | `npm run clean` | Remove `dist/`. |
 
 ### The lint chain

@@ -718,3 +718,45 @@ CONCRETE_RENDERERS["concrete-crack-control-spacing"] = _simpleRenderer({
   ],
   compute: computeConcreteCrackControlSpacing,
 });
+
+// ===================== spec-v447: concrete threshold and cracking torsion (ACI 318-19 22.7) =====================
+// dims: in { fc_psi: M L^-1 T^-2, b_in: L, h_in: L, lambda: dimensionless } out: { acp_in2: L^2, pcp_in: L, tth_inlb: M L^2 T^-2, neglect_inlb: M L^2 T^-2, tcr_inlb: M L^2 T^-2 }
+export function computeConcreteTorsionThreshold({ fc_psi = 4000, b_in = 0, h_in = 0, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fc = Number(fc_psi) || 0;
+  const b = Number(b_in) || 0;
+  const h = Number(h_in) || 0;
+  const lam = Number(lambda) || 0;
+  if (!(fc > 0)) return { error: "Specified strength f'c must be positive (psi)." };
+  if (!(b > 0)) return { error: "Section width must be positive (in)." };
+  if (!(h > 0)) return { error: "Section height must be positive (in)." };
+  if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  const acp_in2 = b * h;
+  const pcp_in = 2 * (b + h);
+  const tth_inlb = lam * Math.sqrt(fc) * (acp_in2 * acp_in2 / pcp_in);
+  const neglect_inlb = 0.75 * tth_inlb;
+  const tcr_inlb = 4 * tth_inlb;
+  return {
+    acp_in2, pcp_in, tth_inlb, neglect_inlb, tcr_inlb,
+    note: "ACI 318-19 §22.7 torsion thresholds for a solid non-prestressed section: the threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2 / pcp), where Acp = b x h is the area enclosed by the outside perimeter and pcp = 2(b + h) is that perimeter. Torsion may be neglected when the factored torque Tu is below phi x Tth (phi = 0.75); the section cracks in torsion at Tcr = 4 x Tth. Above phi x Tth the beam must be designed for torsion with closed stirrups (At/s) and longitudinal steel (Al) per §9.5.4. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  };
+}
+export const concreteTorsionThresholdExample = { inputs: { fc_psi: 4000, b_in: 12, h_in: 20, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-torsion-threshold"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §22.7.4.1: threshold torsion Tth = lambda x sqrt(f'c) x (Acp^2/pcp), neglect torsion when Tu < phi x Tth (phi = 0.75), cracking torsion Tcr = 4 x Tth, with Acp and pcp the area and perimeter of the outside section. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteTorsionThresholdExample.inputs,
+  fields: [
+    { key: "fc_psi", label: "Specified strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "b_in", label: "Section width b (in)", kind: "number", default: 12 },
+    { key: "h_in", label: "Section height h (in)", kind: "number", default: 20 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normal)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "tth", id: "ctt-out-tth", label: "Threshold torsion Tth", value: (r) => fmt(r.tth_inlb, 0) + " in-lb (" + fmt(r.tth_inlb / 12000, 2) + " ft-kip)" },
+    { key: "ne", id: "ctt-out-ne", label: "Neglect if Tu below phi x Tth", value: (r) => fmt(r.neglect_inlb / 12000, 2) + " ft-kip" },
+    { key: "tcr", id: "ctt-out-tcr", label: "Cracking torsion Tcr = 4 Tth", value: (r) => fmt(r.tcr_inlb / 12000, 2) + " ft-kip" },
+    { key: "ap", id: "ctt-out-ap", label: "Acp / pcp", value: (r) => fmt(r.acp_in2, 0) + " in^2 / " + fmt(r.pcp_in, 0) + " in" },
+    { key: "n", id: "ctt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteTorsionThreshold,
+});

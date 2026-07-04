@@ -885,6 +885,9 @@ export const COMPUTE_MAP = {
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (3 tiles, new calc-concrete.js)
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },
   "rc-beam-shear": { module: "../../calc-concrete.js", fn: "computeRcBeamShear" },
+  "concrete-torsion-threshold": { module: "../../calc-concrete.js", fn: "computeConcreteTorsionThreshold" },
+  "glulam-volume-factor": { module: "../../calc-construction.js", fn: "computeGlulamVolumeFactor" },
+  "masonry-anchor-bolt": { module: "../../calc-masonry.js", fn: "computeMasonryAnchorBolt" },
   "rc-development-length": { module: "../../calc-concrete.js", fn: "computeRcDevelopmentLength" },
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (3 tiles, new calc-geotech.js)
   "soil-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSoilBearingCapacity" },

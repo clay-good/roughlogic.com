@@ -41915,6 +41915,176 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "concrete-torsion-threshold",
+   "source_publisher": "ACI 318-19 §22.7",
+   "source_title": "12x20 in, 4000 psi -> Tth 56,921 in-lb (4.74 ft-kip), neglect 3.56, Tcr 18.97 ft-kip",
+   "source_edition_or_year": "spec-v447 worked example (machine-verified)",
+   "source_section_or_page": "spec-v447 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "fc_psi": 4000,
+    "b_in": 12,
+    "h_in": 20,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "tth_inlb": {
+     "value": 56920.99788,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "neglect_inlb": {
+     "value": 42690.74841,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "tcr_inlb": {
+     "value": 227683.9915,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-torsion-threshold",
+   "source_publisher": "ACI 318-19 §22.7",
+   "source_title": "18x24 in, 4000 psi -> Tth 140,502 in-lb (11.7 ft-kip)",
+   "source_edition_or_year": "spec-v447 cross-check (machine-verified; spec prose 14.6 was a slip, 11.7 is correct)",
+   "source_section_or_page": "spec-v447 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "fc_psi": 4000,
+    "b_in": 18,
+    "h_in": 24,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "tth_inlb": {
+     "value": 140502.16,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "glulam-volume-factor",
+   "source_publisher": "NDS 2018 §5.3.6",
+   "source_title": "5.125x18 in, 20 ft, softwood -> Cv 0.965 (3.5% reduction)",
+   "source_edition_or_year": "spec-v448 worked example (machine-verified)",
+   "source_section_or_page": "spec-v448 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "span_ft": 20,
+    "depth_in": 18,
+    "width_in": 5.125,
+    "x": 10,
+    "kl": 1.0
+   },
+   "outputs": {
+    "cv": {
+     "value": 0.965,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "glulam-volume-factor",
+   "source_publisher": "NDS 2018 §5.3.6",
+   "source_title": "6.75x24 in, 32 ft, softwood -> Cv 0.870 (13% reduction)",
+   "source_edition_or_year": "spec-v448 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v448 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "span_ft": 32,
+    "depth_in": 24,
+    "width_in": 6.75,
+    "x": 10,
+    "kl": 1.0
+   },
+   "outputs": {
+    "cv": {
+     "value": 0.87,
+     "tolerance": {
+      "pct": 0.6
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-anchor-bolt",
+   "source_publisher": "TMS 402 ASD",
+   "source_title": "3/4in anchor, 4in embed, 1500 psi, Fy 36 ksi -> Bab 2,433 lb (masonry governs), Bas 9,547 lb",
+   "source_edition_or_year": "spec-v449 worked example (machine-verified)",
+   "source_section_or_page": "spec-v449 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "fm_psi": 1500,
+    "lbe_in": 4,
+    "ab_in2": 0.442,
+    "fy_psi": 36000
+   },
+   "outputs": {
+    "bab_lb": {
+     "value": 2433,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "bas_lb": {
+     "value": 9547.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ba_lb": {
+     "value": 2433,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-anchor-bolt",
+   "source_publisher": "TMS 402 ASD",
+   "source_title": "8in embed doubles Apt -> Bab 9,733 lb, so 9,547 lb steel now governs",
+   "source_edition_or_year": "spec-v449 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v449 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "fm_psi": 1500,
+    "lbe_in": 8,
+    "ab_in2": 0.442,
+    "fy_psi": 36000
+   },
+   "outputs": {
+    "bab_lb": {
+     "value": 9733.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ba_lb": {
+     "value": 9547.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

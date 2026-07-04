@@ -397,6 +397,7 @@ const TOOL_MODULES = (() => {
     "rebar-weight-takeoff", "ready-mix-concrete-order",
     // spec-v439..v440 finish-carpentry takeoff (v438 cut as dupe)
     "insulation-batt-coverage", "trim-linear-footage",
+    "glulam-volume-factor",
     // spec-v251..v253 IBC plan-review trio.
     "allowable-area", "egress-travel-distance", "exterior-opening-protection",
     // spec-v263..v265 NDS sawn-lumber design trio.
@@ -477,6 +478,7 @@ const TOOL_MODULES = (() => {
   // All three KEEP group "E" (module independent of group letter).
   declare("./calc-concrete.js", "CONCRETE_RENDERERS", [
     "rc-beam-flexure", "rc-beam-shear", "rc-development-length",
+    "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch
     "rc-column-axial", "rc-punching-shear", "rc-hook-development",
     // spec-v299..v301 depth-2 batch
@@ -502,6 +504,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-masonry.js", "MASONRY_RENDERERS", [
     "cmu-wall-flexure", "cmu-shear-wall", "cmu-wall-axial",
     "masonry-wall-weight", "brick-veneer-anchor-spacing", "masonry-lintel-loading",
+    "masonry-anchor-bolt",
   ]);
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio: a new
   // lazy Group E cluster closing the load path from seismic-base-shear /

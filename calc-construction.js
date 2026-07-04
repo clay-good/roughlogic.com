@@ -6274,3 +6274,45 @@ const _v440renderTrimLinearFootage = _simpleRenderer({
   compute: computeTrimLinearFootage,
 });
 CONSTRUCTION_RENDERERS["trim-linear-footage"] = _v440renderTrimLinearFootage;
+
+// ===================== spec-v448: glulam volume factor Cv (NDS 5.3.6) =====================
+// dims: in { span_ft: L, depth_in: L, width_in: L, x: dimensionless, kl: dimensionless } out: { cv: dimensionless, reduction_pct: dimensionless }
+export function computeGlulamVolumeFactor({ span_ft = 0, depth_in = 0, width_in = 0, x = 10, kl = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const span = Number(span_ft) || 0;
+  const d = Number(depth_in) || 0;
+  const b = Number(width_in) || 0;
+  const xExp = Number(x) || 0;
+  const kL = Number(kl) || 0;
+  if (!(span > 0)) return { error: "Span must be positive (ft)." };
+  if (!(d > 0)) return { error: "Depth must be positive (in)." };
+  if (!(b > 0)) return { error: "Width must be positive (in)." };
+  if (!(xExp > 0)) return { error: "Species exponent x must be positive (10 softwood, 20 Southern Pine)." };
+  if (!(kL > 0)) return { error: "Loading factor KL must be positive." };
+  const raw = kL * Math.pow(21 / span, 1 / xExp) * Math.pow(12 / d, 1 / xExp) * Math.pow(5.125 / b, 1 / xExp);
+  const cv = Math.min(raw, 1.0);
+  const reduction_pct = (1 - cv) * 100;
+  return {
+    cv, reduction_pct, capped: raw > 1.0,
+    note: "NDS 2018 §5.3.6 glulam volume factor Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, where L is the span (ft), d and b the depth and width (in), x = 10 for softwoods (20 for Southern Pine), and KL = 1.0 for a uniformly loaded simple span. A larger stressed volume is more likely to contain a strength-limiting defect, so the reference bending value is reduced. The allowable bending uses the LESSER of Cv and the beam-stability factor CL; Cv applies to glulam bending about the x-x axis, not sawn lumber. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  };
+}
+export const glulamVolumeFactorExample = { inputs: { span_ft: 20, depth_in: 18, width_in: 5.125, x: 10, kl: 1.0 } };
+const _v448renderGlulamVolumeFactor = _simpleRenderer({
+  citation: "Citation: NDS 2018 §5.3.6 glulam volume factor Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x) <= 1.0, with x = 10 (softwood) or 20 (Southern Pine) and KL = 1.0 for a uniformly loaded simple span. The allowable bending uses the lesser of Cv and the stability factor CL. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: glulamVolumeFactorExample.inputs,
+  fields: [
+    { key: "span_ft", label: "Beam span L (ft)", kind: "number", default: 20 },
+    { key: "depth_in", label: "Beam depth d (in)", kind: "number", default: 18 },
+    { key: "width_in", label: "Beam width b (in)", kind: "number", default: 5.125 },
+    { key: "x", label: "Species exponent x", kind: "select", default: "10", options: [{ value: "10", label: "10 (softwood, DF/SPF)" }, { value: "20", label: "20 (Southern Pine)" }] },
+    { key: "kl", label: "Loading factor KL (1.0 uniform simple span)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "cv", id: "gvf-out-cv", label: "Volume factor Cv", value: (r) => fmt(r.cv, 3) + (r.capped ? " (capped at 1.0)" : "") },
+    { key: "red", id: "gvf-out-red", label: "Bending-value reduction", value: (r) => fmt(r.reduction_pct, 1) + "%" },
+    { key: "n", id: "gvf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGlulamVolumeFactor,
+});
+CONSTRUCTION_RENDERERS["glulam-volume-factor"] = _v448renderGlulamVolumeFactor;

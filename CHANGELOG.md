@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(structural): land spec-v447..v449 -- 3 member-capacity tiles (concrete torsion, glulam Cv, masonry anchor) across calc-concrete/construction/masonry.js; 907 -> 910 tiles, 0.154.0, 2026-07-04
+
+The structural member-capacity trio, twenty-third batch of the v375-v474 campaign, one tile each in three existing lazy Group E modules; no new module, group, or dependency. Catalog **907 -> 910**, package **0.153.0 -> 0.154.0** (a minor). Proposed 2026-07-03.
+
+- **`concrete-torsion-threshold` (spec-v447, calc-concrete.js).** ACI 318-19 §22.7: Tth = lambda x sqrt(f'c) x (Acp^2/pcp), neglect torsion below phi x Tth (phi = 0.75), cracking Tcr = 4 x Tth. Pinned: a 12x20 in / 4000 psi beam -> Tth 4.74 ft-kip, neglect 3.56, Tcr 18.97; an 18x24 in beam -> 11.7 ft-kip (the spec prose's 14.6 was a math slip; **11.7 is correct and landed**).
+- **`glulam-volume-factor` (spec-v448, calc-construction.js).** NDS 5.3.6: Cv = KL x (21/L)^(1/x) x (12/d)^(1/x) x (5.125/b)^(1/x), capped at 1.0, x=10 softwood / 20 Southern Pine (a select). Pinned: 5.125x18 in / 20 ft -> Cv 0.965; a 6.75x24 in / 32 ft girder -> 0.870. Allowable bending uses the lesser of Cv and CL.
+- **`masonry-anchor-bolt` (spec-v449, calc-masonry.js).** TMS 402 ASD: lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2) and steel Bas = 0.6 x Ab x fy. Pinned: a 3/4in anchor 4in deep in 1500 psi -> Bab 2,433 lb (governs), Bas 9,547 lb; at 8in embed Bab 9,733 lb, so the 9,547 lb steel governs.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering both examples, the lightweight/species/deep-embed swing, the Cv 1.0 cap, the governing switch, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ACI 318-19 §22.7, NDS 2018 §5.3.6, and TMS 402 ASD. Per-tile wiring across nine registries (`tools-data`, `tile-meta`, `citations`, `compute-map`, worked-examples, aliases, `related-tiles`, `app.js` in three separate module declare blocks, and three fuzzer blocks). Housekeeping: home count 907 -> 910, README resynced (counts, sitemap URLs 929 -> 932), three specs marked LANDED, docs/mobile-responsive.md section 86 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(accounting): land spec-v444..v446 -- 3 contractor-cost tiles (surety bond, workers-comp EMR, prevailing-wage fringe) in calc-accounting.js; 904 -> 907 tiles, 0.153.0, 2026-07-04
 
 The contractor-cost trio, twenty-second batch of the v375-v474 campaign, all in the existing lazy `calc-accounting.js` (Group R); no new module, group, or dependency. Catalog **904 -> 907**, package **0.152.0 -> 0.153.0** (a minor). Proposed 2026-07-03.

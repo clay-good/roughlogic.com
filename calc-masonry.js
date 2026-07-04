@@ -340,3 +340,45 @@ MASONRY_RENDERERS["masonry-lintel-loading"] = _simpleRenderer({
   ],
   compute: computeMasonryLintelLoading,
 });
+
+// ===================== spec-v449: masonry headed anchor bolt tension (TMS 402 ASD) =====================
+// dims: in { fm_psi: M L^-1 T^-2, lbe_in: L, ab_in2: L^2, fy_psi: M L^-1 T^-2 } out: { apt_in2: L^2, bab_lb: M L T^-2, bas_lb: M L T^-2, ba_lb: M L T^-2 }
+export function computeMasonryAnchorBolt({ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fm = Number(fm_psi) || 0;
+  const lbe = Number(lbe_in) || 0;
+  const ab = Number(ab_in2) || 0;
+  const fy = Number(fy_psi) || 0;
+  if (!(fm > 0)) return { error: "Masonry strength f'm must be positive (psi)." };
+  if (!(lbe > 0)) return { error: "Embedment lbe must be positive (in)." };
+  if (!(ab > 0)) return { error: "Bolt area Ab must be positive (in^2)." };
+  if (!(fy > 0)) return { error: "Bolt yield fy must be positive (psi)." };
+  const apt_in2 = Math.PI * lbe * lbe;
+  const bab_lb = 1.25 * apt_in2 * Math.sqrt(fm);
+  const bas_lb = 0.6 * ab * fy;
+  const ba_lb = Math.min(bab_lb, bas_lb);
+  const masonry_governs = bab_lb <= bas_lb;
+  return {
+    apt_in2, bab_lb, bas_lb, ba_lb, masonry_governs,
+    note: "TMS 402 allowable-stress design of a headed anchor bolt in tension in grouted masonry: the allowable is the LESSER of masonry breakout Bab = 1.25 x Apt x sqrt(f'm), with Apt = pi x lbe^2 the projected area of the 45-degree tension breakout cone, and steel Bas = 0.6 x Ab x fy. A shallow anchor pulls a cone of block out (masonry governs); a deep enough anchor makes the steel yield first (steel governs). Edge distance or overlapping cones reduce Apt (the full-cone value is an upper bound); anchor shear (pryout) is a separate check. The strength-design coefficient is 4 x Apt x sqrt(f'm). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  };
+}
+export const masonryAnchorBoltExample = { inputs: { fm_psi: 1500, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 } };
+MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
+  citation: "Citation: TMS 402 ASD headed anchor bolt tension: allowable = lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2, the projected cone) and steel Bas = 0.6 x Ab x fy. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: masonryAnchorBoltExample.inputs,
+  fields: [
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
+    { key: "lbe_in", label: "Effective embedment lbe (in)", kind: "number", default: 4 },
+    { key: "ab_in2", label: "Bolt tensile area Ab (in^2, 3/4in = 0.442)", kind: "number", default: 0.442 },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
+  ],
+  outputs: [
+    { key: "ba", id: "mab-out-ba", label: "Allowable tension Ba", value: (r) => fmt(r.ba_lb, 0) + " lb (" + (r.masonry_governs ? "masonry breakout governs" : "steel governs") + ")" },
+    { key: "bab", id: "mab-out-bab", label: "Masonry breakout Bab", value: (r) => fmt(r.bab_lb, 0) + " lb" },
+    { key: "bas", id: "mab-out-bas", label: "Steel Bas", value: (r) => fmt(r.bas_lb, 0) + " lb" },
+    { key: "apt", id: "mab-out-apt", label: "Projected area Apt = pi lbe^2", value: (r) => fmt(r.apt_in2, 1) + " in^2" },
+    { key: "n", id: "mab-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryAnchorBolt,
+});

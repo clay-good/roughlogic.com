@@ -1,6 +1,6 @@
 # roughlogic.com Specification v448 -- Glulam Volume Factor Cv (NDS 5.3.6) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the structural member-capacity trio (v447 concrete torsion ->
+> **Status: LANDED (2026-07-04). Second tile of the structural member-capacity trio (v447 concrete torsion ->
 > v448 glulam volume factor -> v449 masonry anchor bolt). `wood-beam-bending` computes the sawn-lumber beam-stability factor
 > `CL`; a glued-laminated beam has an additional strength reduction, the volume factor `Cv`, that no tile applies.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A glulam beam's bending strength is reduced for its
