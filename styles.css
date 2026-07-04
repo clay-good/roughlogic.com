@@ -264,6 +264,19 @@ main {
   color: var(--fg-muted);
 }
 
+.home-note {
+  margin: 0 auto var(--space-6);
+  max-width: 54ch;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+.home-note abbr {
+  text-decoration: none;
+  font-weight: 600;
+}
+
 /* One search bar with a results dropdown (combobox). Centered in the hero
    and sized large so it reads as the primary entry point. */
 .hero-search {
