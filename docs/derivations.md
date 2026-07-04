@@ -1624,6 +1624,7 @@ cross-check.
 | calc-construction.js | `renderStairs` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderTileCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderWindPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-cross.js | `computeCrossConnectionAirGap` | `{ opening_in = 0, near_wall = false, measured_in = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeDilution` | `{ concentrate_percent, target_percent, final_volume }` | _ | _ | _ |
 | calc-cross.js | `computeFallProtectionClearance` | `{ connector = "shock-absorbing-lanyard-6ft", free_fall_ft_override = null, de...` | _ | _ | _ |
 | calc-cross.js | `computeGearCascade` | `{ stages = [], input_rpm = 0, input_torque = 0, efficiency = 0.97, } = {}` | _ | _ | _ |
@@ -2149,6 +2150,7 @@ cross-check.
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
+| calc-plumbing.js | `computeHydronicFillPressure` | `{ height_ft = 0, margin_psi = 4 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydrostaticTest` | `{ working_pressure_psi = 0, system_volume_gal = 0, material = "water", multip...` | _ | _ | _ |
 | calc-plumbing.js | `computeManningSlope` | `{ pipe_diameter_in = 0, target_flow_gpm = 0, material = "pvc" }` | _ | _ | _ |
 | calc-plumbing.js | `computeMixedWaterTemp` | `{ mode = "find-blend", hot_temp_F = 0, cold_temp_F = 0, hot_gpm = 0, cold_gpm...` | _ | _ | _ |
@@ -2568,7 +2570,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1154.
+Row count: 1156.
 
 <!-- END function-corpus-v14 -->
 
@@ -2763,7 +2765,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (83 tiles)
+### Group B Plumbing (85 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2775,6 +2777,7 @@ per spec-v14 §13.1 second paragraph.
 | `branch-saddle-cutback` | Branch Saddle Cutback Template (Pipe-on-Pipe) | Cylinder-intersection geometry; Pipe ...; spec-v201 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `channel-froude-number` | Open-Channel Froude Number, Regime, and Critical Depth | Chow, Open-Channel Hydraulics; spec-v304 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-return-sizing` | Condensate Return Line Size From the Flash Steam | Continuity; ASHRAE / Spirax Sarco ret...; spec-v200 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cross-connection-air-gap` | Cross-Connection Air Gap (IPC 608.15.1) | IPC 608.15.1 / ASME A112.1.2; spec-v450 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-invert` | Drainage Invert Elevation, Drop, and Cover | Project (first-principles); slope = 0.25/12 = 0.020833 ft/ft; total_fall = 0.020833 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `expansion-guide-spacing` | Expansion Joint / Loop Guide Spacing (EJMA 4D/14D) | EJMA 4-diameter / 14-diameter guide-p...; spec-v205 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `expansion-tank` | Hydronic Expansion Tank | ASHRAE Handbook (HVAC Systems and Equ...; 100 gal system, 60 F -> 200 F, 12 psig fill, 30 psig reli... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2791,6 +2794,7 @@ per spec-v14 §13.1 second paragraph.
 | `glycol-mix` | Glycol Freeze Protection Mix | Dow; 50 gal system / -10 F target burst protection / propylene... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grease-trap` | Grease Trap Sizing | PDI; 50 gpm peak / 30 min retention / 1.25 loading factor -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hanger-rod-sizing` | Minimum Hanger Rod Diameter from Load (MSS SP-58) | MSS SP-58 carbon-steel threaded-rod l...; spec-v162 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `hydronic-fill-pressure` | Hydronic Fill Pressure (Static Height) | hydronic practice (static head); spec-v452 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrostatic-test` | Hydrostatic Test Pressure and Hold | IPC / Plumbing engineering practice; 100 psi working / 200 gal volume / water -> test_pressure... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `main-disinfection-chlorine` | Water Main Chlorination Dose | AWWA C651 Disinfecting Water Mains (b...; spec-v103 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manning-slope` | Manning's Equation Drainage Slope | Project (first-principles); 4 in PVC sewer at 50 gpm target -> slope ~0.0788 in/ft (s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3664,6 +3668,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 910. Fixture-covered or reference-cadence: 910 / 910.
+Tile count: 912. Fixture-covered or reference-cadence: 912 / 912.
 
 <!-- END tile-index-v14 -->

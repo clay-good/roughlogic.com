@@ -1,6 +1,6 @@
 # roughlogic.com Specification v450 -- Cross-Connection Air Gap (IPC 608.15.1) (calc-cross.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a plumbing-systems trio (v450 air gap -> v451 hydronic expansion tank ->
+> **Status: LANDED (2026-07-04). First tile of a plumbing-systems trio (v450 air gap -> v451 hydronic expansion tank ->
 > v452 hydronic fill pressure). `backflow-sizing` covers mechanical backflow assemblies; the simplest and most positive
 > cross-connection protection -- the physical air gap -- has no tile.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. An air gap is the vertical distance between a supply

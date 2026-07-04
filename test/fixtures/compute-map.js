@@ -445,6 +445,8 @@ export const COMPUTE_MAP = {
   "refrigerant-velocity": { module: "../../calc-velocity.js", fn: "computeRefrigerantVelocity" },
   "equipment-power-draw": { module: "../../calc-restoration.js", fn: "computeEquipmentCircuitLoad" },
   "backflow-sizing": { module: "../../calc-plumbing.js", fn: "computeBackflowSizing" },
+  "cross-connection-air-gap": { module: "../../calc-cross.js", fn: "computeCrossConnectionAirGap" },
+  "hydronic-fill-pressure": { module: "../../calc-plumbing.js", fn: "computeHydronicFillPressure" },
   "irrigation-requirement": { module: "../../calc-agriculture.js", fn: "computeIrrigationRequirement" },
   "cattle-stocking-rate": { module: "../../calc-agriculture.js", fn: "computeStockingRate" },
   "grain-bin-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBin" },

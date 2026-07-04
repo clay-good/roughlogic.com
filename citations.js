@@ -2774,6 +2774,31 @@ export const CITATIONS = {
     ],
   },
 
+  "cross-connection-air-gap": {
+    formula: "air_gap = max(2 x opening, 1); air_gap_wall = max(3 x opening, 1); required = near_wall ? air_gap_wall : air_gap; passes = measured >= required.",
+    edition: "IPC 2021 §608.15.1 (air gaps) and ASME A112.1.2 (Air Gaps in Plumbing Systems) by name.",
+    freeAccess: ICC_FREE,
+    governance: GOVERNANCE.plumbing,
+    editionNote: IPC_DISCLOSURE + " IPC 608.15.1 sets the minimum air gap at twice the effective opening diameter (the diameter of the least cross-sectional area of the supply outlet), but never less than 1 in; within three effective-opening diameters of a wall the minimum is three times the opening (ASME A112.1.2 Table 1). The air gap is the vertical distance between the supply outlet and the flood-level rim of the fixture it discharges into and is the most positive cross-connection protection there is -- unlike a mechanical assembly it cannot fail or be defeated. This returns the minimum air gap for indirect-waste and tank-fill protection and checks a measured gap against it; the AHJ's adopted plumbing code governs.",
+    assumptions: [
+      { name: "2x / 3x rule", value: "minimum = 2x the effective opening (1 in floor), or 3x within three diameters of a wall", source: "IPC 608.15.1 / ASME A112.1.2" },
+      { name: "Effective opening", value: "the diameter of the least cross-sectional area of the supply outlet", source: "ASME A112.1.2" },
+      { name: "AHJ governs", value: "the adopted plumbing code and the AHJ govern the required gap", source: "scope of this tile" },
+    ],
+  },
+  "hydronic-fill-pressure": {
+    formula: "static = height / 2.31; fill = static + margin; 2.31 ft of water column = 1 psi; margin (~4 psi) keeps the top of the loop above atmospheric.",
+    edition: "Hydronic fill-pressure by static height, standard heating-system practice (ASHRAE Handbook, HVAC Systems and Equipment; boiler manufacturer instructions) by name.",
+    freeAccess: "The height / 2.31 static-head conversion is public physics; the boiler and fill-valve settings are manufacturer data.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The cold-fill (make-up) pressure of a closed hydronic loop must lift water to the highest point plus a small margin so the top stays above atmospheric, which prevents air from being drawn in and keeps the circulator from cavitating: fill = height / 2.31 + margin, where 2.31 ft of water column equals 1 psi. The margin is commonly about 4 psi (roughly 5 psi remaining at the top). Set the automatic fill valve and match the expansion-tank pre-charge to this pressure; the relief valve (typically 30 psi on a residential boiler) must sit well above it. A design aid; the boiler and system manufacturer's instructions govern.",
+    assumptions: [
+      { name: "Static head", value: "static = height / 2.31 (2.31 ft of water = 1 psi)", source: "public physics" },
+      { name: "Top margin", value: "add ~4 psi so the top of the system stays above atmospheric", source: "hydronic practice" },
+      { name: "Manufacturer governs", value: "the boiler's fill and relief settings and the expansion-tank pre-charge govern", source: "manufacturer instructions" },
+    ],
+  },
+
   // --- Group H: Knowledge References (priority 3 per spec-v6.md §6,
   // covering the NFPA / IFC / OSHA / FEMA / FIRESCOPE reference set) ---
   // Reference pages, not calc tiles. The §3 "formula" line names the

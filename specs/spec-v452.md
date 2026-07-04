@@ -1,6 +1,6 @@
 # roughlogic.com Specification v452 -- Hydronic Fill Pressure (Static Height) (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the plumbing-systems trio (v450 air gap -> v451 hydronic expansion
+> **Status: LANDED (2026-07-04). Third and final tile of the plumbing-systems trio (v450 air gap -> v451 hydronic expansion
 > tank -> v452 hydronic fill pressure). Setting the fill (pressure-reducing) valve on a hydronic system is the first
 > commissioning step, and the minimum fill pressure -- enough to lift water to the highest point plus a margin -- has no
 > tile.**

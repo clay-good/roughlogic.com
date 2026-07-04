@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): land spec-v450, v452 -- 2 plumbing-systems tiles (v451 cut as dupe); 910 -> 912 tiles, 0.155.0, 2026-07-04
+
+The plumbing-systems trio, twenty-fourth batch of the v375-v474 campaign. The middle tile, v451 `hydronic-expansion-tank`, was **cut as a duplicate** of the existing `expansion-tank` (Hydronic Expansion Tank, calc-plumbing.js), which computes the same diaphragm-tank acceptance volume Vt = Ve/(1 - (Pi+14.7)/(Pf+14.7)) and additionally derives the expansion factor from the fill/operating temperatures -- so only two landed. Catalog **910 -> 912**, package **0.154.0 -> 0.155.0** (a minor). Proposed 2026-07-03.
+
+- **`cross-connection-air-gap` (spec-v450, calc-cross.js).** IPC 608.15.1: minimum air gap = max(2 x opening, 1 in), or 3 x opening within three diameters of a wall; checks a measured gap against the requirement. Pinned: a 1 in opening -> 2 in (3 in near a wall); a 1/2 in opening -> 1 in (the absolute floor governs). The most positive backflow protection there is.
+- **`hydronic-fill-pressure` (spec-v452, calc-plumbing.js).** Static-height fill: fill = height / 2.31 + margin (2.31 ft of water = 1 psi), a common margin ~4 psi. Pinned: a 30 ft system -> 17.0 psi (4 psi left at the top); a 35 ft system -> 19.2 psi.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the 2x/3x branch and 1 in floor, the static-lift and margin, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming IPC 608.15.1 / ASME A112.1.2 (with the IPC edition disclosure for CF-01) and hydronic static-head practice. The air-gap tile is hand-written in calc-cross.js with a `makeCheckbox` for the near-wall branch and an optional measured-gap pass/fail. Per-tile wiring across nine registries (`tools-data`, `tile-meta`, `citations`, `compute-map`, worked-examples, aliases, `related-tiles`, `app.js` in two module declare blocks, two fuzzer blocks). Housekeeping: home count 910 -> 912, README resynced (counts, sitemap URLs 932 -> 934), two specs LANDED + one CUT, docs/mobile-responsive.md section 87 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the two new tiles.
+
 ### feat(structural): land spec-v447..v449 -- 3 member-capacity tiles (concrete torsion, glulam Cv, masonry anchor) across calc-concrete/construction/masonry.js; 907 -> 910 tiles, 0.154.0, 2026-07-04
 
 The structural member-capacity trio, twenty-third batch of the v375-v474 campaign, one tile each in three existing lazy Group E modules; no new module, group, or dependency. Catalog **907 -> 910**, package **0.153.0 -> 0.154.0** (a minor). Proposed 2026-07-03.

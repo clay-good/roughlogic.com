@@ -1,6 +1,6 @@
 # roughlogic.com Specification v451 -- Hydronic Diaphragm Expansion Tank Sizing (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the plumbing-systems trio (v450 air gap -> v451 hydronic expansion tank ->
+> **Status: CUT (2026-07-04) -- dupe of the existing `expansion-tank` tile (Hydronic Expansion Tank, calc-plumbing.js), which computes the same diaphragm-tank acceptance volume Vt = Ve/(1 - (Pi+14.7)/(Pf+14.7)) and additionally derives the expansion factor from the fill/operating temperatures. Not landed.. Second tile of the plumbing-systems trio (v450 air gap -> v451 hydronic expansion tank ->
 > v452 hydronic fill pressure). `wh-expansion-tank` sizes a potable domestic-hot-water tank off the incoming supply
 > pressure; a closed hydronic *heating* loop uses a different formula -- the diaphragm-tank acceptance volume from the fill
 > and relief pressures -- that no tile computes.**

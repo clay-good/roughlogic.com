@@ -3991,3 +3991,38 @@ function _v428renderStormwaterDetentionVolume(inputRegion, outputRegion, citatio
   for (const f of [c, i, area, qa, dur]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["stormwater-detention-volume"] = _v428renderStormwaterDetentionVolume;
+
+// dims: in { height_ft: L, margin_psi: M L^-1 T^-2 } out: { fill_psi: M L^-1 T^-2, static_psi: M L^-1 T^-2, top_static_psi: M L^-1 T^-2 }
+export function computeHydronicFillPressure({ height_ft = 0, margin_psi = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const height = Number(height_ft) || 0;
+  const margin = Number(margin_psi) || 0;
+  if (!(height > 0)) return { error: "Height to the highest point must be positive (ft)." };
+  if (margin < 0) return { error: "Top-of-system margin must be non-negative (psi)." };
+  const static_psi = height / 2.31;
+  const fill_psi = static_psi + margin;
+  return {
+    static_psi, fill_psi, top_static_psi: margin,
+    note: "Hydronic fill (make-up) pressure by static height: the cold-fill pressure at the boiler must lift water to the highest point of the loop plus a small margin so the top stays above atmospheric (preventing air being drawn in and pump cavitation). fill = height / 2.31 + margin, where 2.31 ft of water = 1 psi and the margin is commonly about 4 psi (roughly 5 psi at the top of the system). Set the automatic fill valve and the expansion-tank pre-charge to this pressure. The relief valve (typically 30 psi on residential boilers) must sit well above it. A design aid; the boiler and system manufacturer's instructions govern.",
+  };
+}
+export const hydronicFillPressureExample = { inputs: { height_ft: 30, margin_psi: 4 } };
+function _v452renderHydronicFillPressure(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Hydronic fill pressure by static height: fill = height / 2.31 + margin (2.31 ft of water = 1 psi), a common margin ~4 psi to keep the top of the loop above atmospheric. The expansion-tank pre-charge matches the fill; the relief valve sits well above. A design aid; the manufacturer's instructions govern.";
+  const h = makeNumber("Height fill-to-highest-point (ft)", "hfp-h", { step: "any", min: "0" }); h.input.value = "30";
+  const m = makeNumber("Top-of-system margin (psi, default 4)", "hfp-m", { step: "any", min: "0" }); m.input.value = "4";
+  for (const f of [h, m]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { h.input.value = "30"; m.input.value = "4"; update(); });
+  const oFill = makeOutputLine(outputRegion, "Cold-fill pressure", "hfp-out-fill");
+  const oStatic = makeOutputLine(outputRegion, "Static lift (height/2.31)", "hfp-out-static");
+  const oNote = makeOutputLine(outputRegion, "Note", "hfp-out-n");
+  const update = debounce(() => {
+    const r = computeHydronicFillPressure({ height_ft: Number(h.input.value) || 0, margin_psi: Number(m.input.value) || 0 });
+    if (r.error) { oFill.textContent = r.error; oStatic.textContent = "-"; oNote.textContent = ""; return; }
+    oFill.textContent = fmt(r.fill_psi, 1) + " psi (" + fmt(r.top_static_psi, 1) + " psi left at the top)";
+    oStatic.textContent = fmt(r.static_psi, 1) + " psi";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [h, m]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["hydronic-fill-pressure"] = _v452renderHydronicFillPressure;

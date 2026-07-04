@@ -143,6 +143,7 @@ const _TILES = [
   ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["pipe-expansion-loop", "B"],
   ["water-heater-recovery", "B"], ["wh-expansion-tank", "B"],
   ["sanitary-dfu", "B"], ["trap-primer", "B"], ["backflow-sizing", "B"],
+  ["cross-connection-air-gap", "B"], ["hydronic-fill-pressure", "B"],
   ["septic-dose-tank", "B"], ["septic-pumpout-interval", "B"], ["septic-lpp-orifice", "B"],
 
   ["manual-j-cooling", "C"], ["manual-j-heating", "C"], ["duct-sizing", "C"],

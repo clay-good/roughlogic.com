@@ -2664,3 +2664,44 @@ function renderLinearInterpolation(inputRegion, outputRegion, citationEl) {
   for (const f of [x1.input, y1.input, x2.input, y2.input, x.input]) f.addEventListener("input", update);
 }
 CROSS_RENDERERS["linear-interpolation"] = renderLinearInterpolation;
+
+// dims: in { opening_in: L, near_wall: dimensionless, measured_in: L } out: { air_gap_in: L, air_gap_wall_in: L, required_in: L }
+export function computeCrossConnectionAirGap({ opening_in = 0, near_wall = false, measured_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const opening = Number(opening_in) || 0;
+  const measured = Number(measured_in) || 0;
+  if (!(opening > 0)) return { error: "Effective opening diameter must be positive (in)." };
+  const air_gap_in = Math.max(2 * opening, 1);
+  const air_gap_wall_in = Math.max(3 * opening, 1);
+  const required_in = near_wall ? air_gap_wall_in : air_gap_in;
+  const passes = measured > 0 ? measured >= required_in : null;
+  return {
+    air_gap_in, air_gap_wall_in, required_in, near_wall: !!near_wall, passes,
+    note: "IPC 608.15.1 cross-connection air gap: the minimum vertical distance between a supply outlet and the flood-level rim of the fixture it discharges into is twice the effective opening diameter, but never less than 1 in; within three effective-opening diameters of a wall the minimum is three times the opening. The effective opening is the least cross-sectional area of the supply outlet (a round pipe's diameter, or the equivalent diameter of a non-round outlet). An air gap is the most positive cross-connection protection -- nothing mechanical can defeat it. A design aid, not a substitute for the plumbing code adopted by your AHJ.",
+  };
+}
+export const crossConnectionAirGapExample = { inputs: { opening_in: 1, near_wall: false, measured_in: 2 } };
+function renderCrossConnectionAirGap(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IPC 608.15.1 / ASME A112.1.2 cross-connection air gap: minimum = 2x the effective opening diameter (never less than 1 in), or 3x within three diameters of a wall. The most positive backflow protection. A design aid, not a substitute for the plumbing code adopted by your AHJ.";
+  const op = makeNumber("Effective opening diameter (in)", "ccag-op", { step: "any", min: "0" }); op.input.value = "1";
+  const nw = makeCheckbox("Outlet within 3 diameters of a wall", "ccag-nw", false);
+  const me = makeNumber("Measured installed air gap to check (in, optional)", "ccag-me", { step: "any", min: "0" });
+  inputRegion.appendChild(op.wrap); inputRegion.appendChild(nw.wrap); inputRegion.appendChild(me.wrap);
+  attachExampleButton(inputRegion, () => { op.input.value = "1"; nw.input.checked = false; me.input.value = "2"; update(); });
+  const oReq = makeOutputLine(outputRegion, "Required air gap", "ccag-out-req");
+  const oBoth = makeOutputLine(outputRegion, "Standard / near-wall", "ccag-out-both");
+  const oPass = makeOutputLine(outputRegion, "Measured gap check", "ccag-out-pass");
+  const oNote = makeOutputLine(outputRegion, "Note", "ccag-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCrossConnectionAirGap({ opening_in: readNum(op.input), near_wall: nw.input.checked, measured_in: readNum(me.input) });
+    if (r.error) { oReq.textContent = r.error; oBoth.textContent = "-"; oPass.textContent = "-"; oNote.textContent = ""; return; }
+    oReq.textContent = fmt(r.required_in, 2) + " in" + (r.near_wall ? " (near a wall, 3x)" : " (standard, 2x)");
+    oBoth.textContent = fmt(r.air_gap_in, 2) + " in / " + fmt(r.air_gap_wall_in, 2) + " in";
+    oPass.textContent = r.passes === null ? "enter a measured gap to check" : (r.passes ? "PASS -- meets the minimum" : "FAIL -- below the minimum");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [op.input, me.input]) el.addEventListener("input", update);
+  nw.input.addEventListener("change", update);
+}
+CROSS_RENDERERS["cross-connection-air-gap"] = renderCrossConnectionAirGap;

@@ -15568,6 +15568,43 @@ test("bounds: spec-v449 computeMasonryAnchorBolt pins Bab/Bas, the governing swi
   assert.ok("error" in _v449({ fm_psi: Infinity, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
 });
 
+// ===================== spec-v450, v452 plumbing-systems (v451 cut as dupe of expansion-tank) =====================
+import { computeCrossConnectionAirGap as _v450 } from "../../calc-cross.js";
+import { computeHydronicFillPressure as _v452 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v450 computeCrossConnectionAirGap pins the 2x/3x gap, the 1 in floor, and error seams", () => {
+  const r = _v450({ opening_in: 1, near_wall: false, measured_in: 2 });
+  assert.ok(Math.abs(r.air_gap_in - 2) < 1e-9 && Math.abs(r.air_gap_wall_in - 3) < 1e-9);
+  assert.ok(Math.abs(r.required_in - 2) < 1e-9 && r.passes === true);
+  // Near a wall the requirement is 3x.
+  const wall = _v450({ opening_in: 1, near_wall: true, measured_in: 0 });
+  assert.ok(Math.abs(wall.required_in - 3) < 1e-9 && wall.passes === null);
+  // A small opening hits the 1 in absolute floor.
+  const small = _v450({ opening_in: 0.5, near_wall: false });
+  assert.ok(Math.abs(small.air_gap_in - 1) < 1e-9 && Math.abs(small.required_in - 1) < 1e-9);
+  // A measured gap below the requirement fails.
+  assert.ok(_v450({ opening_in: 2, near_wall: false, measured_in: 3 }).passes === false);
+  // Error seams: non-positive opening, non-finite.
+  assert.ok("error" in _v450({ opening_in: 0, near_wall: false }));
+  assert.ok("error" in _v450({ opening_in: Infinity, near_wall: false }));
+});
+
+test("bounds: spec-v452 computeHydronicFillPressure pins fill = height/2.31 + margin and error seams", () => {
+  const r = _v452({ height_ft: 30, margin_psi: 4 });
+  assert.ok(Math.abs(r.static_psi - 30 / 2.31) < 1e-9);
+  assert.ok(Math.abs(r.fill_psi - (30 / 2.31 + 4)) < 1e-9 && Math.abs(r.fill_psi - 16.987) < 1e-2);
+  assert.ok(Math.abs(r.top_static_psi - 4) < 1e-9);
+  // A taller system needs more fill pressure.
+  const tall = _v452({ height_ft: 35, margin_psi: 4 });
+  assert.ok(Math.abs(tall.fill_psi - 19.152) < 1e-2 && tall.fill_psi > r.fill_psi);
+  // Zero margin gives the bare static lift.
+  assert.ok(Math.abs(_v452({ height_ft: 30, margin_psi: 0 }).fill_psi - 30 / 2.31) < 1e-9);
+  // Error seams: non-positive height, negative margin, non-finite.
+  assert.ok("error" in _v452({ height_ft: 0, margin_psi: 4 }));
+  assert.ok("error" in _v452({ height_ft: 30, margin_psi: -1 }));
+  assert.ok("error" in _v452({ height_ft: Infinity, margin_psi: 4 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

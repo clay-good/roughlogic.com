@@ -141,6 +141,7 @@ const TOOL_MODULES = (() => {
     "stormwater-rational", "manning-slope", "hydrostatic-test", "grease-trap",
     "stormwater-detention-volume",
     "glycol-mix", "expansion-tank", "backflow-loss",
+    "hydronic-fill-pressure",
     // v7
     "water-hammer-surge", "pump-operating-point",
     "pipe-expansion-loop",
@@ -596,6 +597,8 @@ const TOOL_MODULES = (() => {
     "tank-volume",
     // v53 linear interpolation
     "linear-interpolation",
+    // spec-v450 cross-connection air gap
+    "cross-connection-air-gap",
   ]);
   // Group G (cont.): the pipe & conduit fabrication bench, split out of
   // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.

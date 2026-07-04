@@ -42085,6 +42085,116 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "cross-connection-air-gap",
+   "source_publisher": "IPC 608.15.1 / ASME A112.1.2",
+   "source_title": "1 in opening, not near a wall -> 2 in air gap (3 in near a wall)",
+   "source_edition_or_year": "spec-v450 worked example (machine-verified)",
+   "source_section_or_page": "spec-v450 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "opening_in": 1,
+    "near_wall": false,
+    "measured_in": 2
+   },
+   "outputs": {
+    "air_gap_in": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "air_gap_wall_in": {
+     "value": 3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_in": {
+     "value": 2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cross-connection-air-gap",
+   "source_publisher": "IPC 608.15.1 / ASME A112.1.2",
+   "source_title": "1/2 in opening -> 2x0.5 = 1 in, the 1 in absolute minimum governs",
+   "source_edition_or_year": "spec-v450 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v450 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "opening_in": 0.5,
+    "near_wall": false,
+    "measured_in": 0
+   },
+   "outputs": {
+    "air_gap_in": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "required_in": {
+     "value": 1,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-fill-pressure",
+   "source_publisher": "hydronic practice (static head)",
+   "source_title": "30 ft system, 4 psi margin -> 17.0 psi fill (4 psi left at the top)",
+   "source_edition_or_year": "spec-v452 worked example (machine-verified)",
+   "source_section_or_page": "spec-v452 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "height_ft": 30,
+    "margin_psi": 4
+   },
+   "outputs": {
+    "fill_psi": {
+     "value": 16.987,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "static_psi": {
+     "value": 12.987,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-fill-pressure",
+   "source_publisher": "hydronic practice (static head)",
+   "source_title": "35 ft system -> 19.2 psi fill (each story ~4.3 psi lift)",
+   "source_edition_or_year": "spec-v452 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v452 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "height_ft": 35,
+    "margin_psi": 4
+   },
+   "outputs": {
+    "fill_psi": {
+     "value": 19.152,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }
