@@ -42757,6 +42757,148 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "rain-on-snow-surcharge",
+   "source_publisher": "ASCE 7-22 §7.10",
+   "source_title": "Pf 15, Pg 18, low slope -> surcharge applies, total 23 psf",
+   "source_edition_or_year": "spec-v468 worked example (machine-verified)",
+   "source_section_or_page": "spec-v468 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "pf_psf": 15,
+    "pg_psf": 18,
+    "slope_deg": 1,
+    "eave_to_ridge_ft": 100,
+    "surcharge_psf": 8
+   },
+   "outputs": {
+    "total_psf": {
+     "value": 23,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rain-on-snow-surcharge",
+   "source_publisher": "ASCE 7-22 §7.10",
+   "source_title": "deep-snow Pg 25 -> surcharge does not apply, total stays 15 psf",
+   "source_edition_or_year": "spec-v468 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v468 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "pf_psf": 15,
+    "pg_psf": 25,
+    "slope_deg": 1,
+    "eave_to_ridge_ft": 100,
+    "surcharge_psf": 8
+   },
+   "outputs": {
+    "total_psf": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sliding-snow-load",
+   "source_publisher": "ASCE 7 §7.9",
+   "source_title": "upper Pf 20, W 40, lower >=15 ft -> 320 lb/ft over 15 ft = 21.3 psf",
+   "source_edition_or_year": "spec-v469 worked example (machine-verified)",
+   "source_section_or_page": "spec-v469 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "pf_upper_psf": 20,
+    "eave_ridge_ft": 40,
+    "lower_width_ft": 15
+   },
+   "outputs": {
+    "total_lb_ft": {
+     "value": 320,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "surcharge_psf": {
+     "value": 21.33,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sliding-snow-load",
+   "source_publisher": "ASCE 7 §7.9",
+   "source_title": "narrow 10 ft lower roof concentrates 320 lb/ft into 32 psf",
+   "source_edition_or_year": "spec-v469 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v469 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "pf_upper_psf": 20,
+    "eave_ridge_ft": 40,
+    "lower_width_ft": 10
+   },
+   "outputs": {
+    "surcharge_psf": {
+     "value": 32,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "minimum-roof-snow",
+   "source_publisher": "ASCE 7 §7.3.4",
+   "source_title": "Pg 15, Is 1.0 -> Pm 15 psf (Pg <= 20 branch)",
+   "source_edition_or_year": "spec-v470 worked example (machine-verified)",
+   "source_section_or_page": "spec-v470 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "pg_psf": 15,
+    "importance": 1.0,
+    "pf_computed": 0
+   },
+   "outputs": {
+    "pm_psf": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "minimum-roof-snow",
+   "source_publisher": "ASCE 7 §7.3.4",
+   "source_title": "Pg 25, Is 1.1 -> Pm caps at 20 x 1.1 = 22 psf",
+   "source_edition_or_year": "spec-v470 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v470 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "pg_psf": 25,
+    "importance": 1.1,
+    "pf_computed": 0
+   },
+   "outputs": {
+    "pm_psf": {
+     "value": 22,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

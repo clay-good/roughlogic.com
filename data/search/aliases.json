@@ -17962,6 +17962,96 @@
       "term": "attic fan size",
       "target": "powered-attic-ventilator",
       "kind": "industry"
+    },
+    {
+      "term": "rain on snow surcharge",
+      "target": "rain-on-snow-surcharge",
+      "kind": "industry"
+    },
+    {
+      "term": "rain on snow",
+      "target": "rain-on-snow-surcharge",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7.10",
+      "target": "rain-on-snow-surcharge",
+      "kind": "industry"
+    },
+    {
+      "term": "snow surcharge",
+      "target": "rain-on-snow-surcharge",
+      "kind": "industry"
+    },
+    {
+      "term": "low slope snow surcharge",
+      "target": "rain-on-snow-surcharge",
+      "kind": "industry"
+    },
+    {
+      "term": "rain snow load",
+      "target": "rain-on-snow-surcharge",
+      "kind": "industry"
+    },
+    {
+      "term": "sliding snow load",
+      "target": "sliding-snow-load",
+      "kind": "industry"
+    },
+    {
+      "term": "snow sliding lower roof",
+      "target": "sliding-snow-load",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7.9",
+      "target": "sliding-snow-load",
+      "kind": "industry"
+    },
+    {
+      "term": "sliding snow",
+      "target": "sliding-snow-load",
+      "kind": "industry"
+    },
+    {
+      "term": "snow off upper roof",
+      "target": "sliding-snow-load",
+      "kind": "industry"
+    },
+    {
+      "term": "lower roof snow surcharge",
+      "target": "sliding-snow-load",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum roof snow",
+      "target": "minimum-roof-snow",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum snow load",
+      "target": "minimum-roof-snow",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7.3.4",
+      "target": "minimum-roof-snow",
+      "kind": "industry"
+    },
+    {
+      "term": "pm snow",
+      "target": "minimum-roof-snow",
+      "kind": "industry"
+    },
+    {
+      "term": "snow load floor",
+      "target": "minimum-roof-snow",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum flat roof snow",
+      "target": "minimum-roof-snow",
+      "kind": "industry"
     }
   ]
 }

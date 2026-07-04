@@ -410,6 +410,8 @@ const TOOL_MODULES = (() => {
     "wood-bearing-perpendicular", "wood-tension-member", "wood-combined-bending-axial",
     // spec-v296..v298 ASCE 7 wind-and-snow load depth batch.
     "wind-cc-pressure", "snow-drift-load", "wind-mwfrs-pressure",
+    // spec-v468..v470 ASCE 7 snow provisions batch.
+    "rain-on-snow-surcharge", "sliding-snow-load", "minimum-roof-snow",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",

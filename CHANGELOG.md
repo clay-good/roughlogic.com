@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(structural): land spec-v468..v470 -- 3 ASCE 7 snow-provision tiles in calc-construction.js; 922 -> 925 tiles, 0.161.0, 2026-07-04
+
+The ASCE 7 snow-provisions trio, thirtieth batch of the v375-v474 campaign, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. All three are ASCE 7 Chapter 7 provisions the existing `snow-load` (balanced Pf) and `snow-drift-load` (drift) tiles never covered. Catalog **922 -> 925**, package **0.160.0 -> 0.161.0** (a minor). Proposed 2026-07-03.
+
+- **`rain-on-snow-surcharge` (spec-v468).** ASCE 7-22 §7.10: surcharge added when Pg <= 20 psf and slope (deg) < W/50. Pinned: Pf 15 / Pg 18 / low slope -> +8 -> 23 psf; a deep-snow region (Pg 25) takes no surcharge (stays 15).
+- **`sliding-snow-load` (spec-v469).** ASCE 7 §7.9: total = 0.4 x upper Pf x W (lb/ft) over the lesser of 15 ft or the lower-roof width. Pinned: 20 psf / 40 ft upper -> 320 lb/ft = 21.3 psf over 15 ft; a narrow 10 ft catch roof -> 32 psf.
+- **`minimum-roof-snow` (spec-v470).** ASCE 7 §7.3.4: Pm = Is x Pg (Pg <= 20) or 20 x Is; design = max(Pm, computed Pf). Pinned: Pg 15 / Is 1.0 -> 15 psf; Pg 25 / Is 1.1 -> 22 psf.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the surcharge trigger, the narrow-roof concentration, the Pm cap, the governing max, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ASCE 7-22 §7.10, §7.9, and §7.3.4. All three use the shared `_simpleRenderer`. Per-tile wiring across nine registries. Housekeeping: home count 922 -> 925, README resynced (counts, sitemap URLs 944 -> 947), three specs LANDED, docs/mobile-responsive.md section 93 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(roofing): land spec-v467 -- powered attic ventilator sizing (v465/v466 cut as dupes); 921 -> 922 tiles, 0.160.0, 2026-07-04
 
 The attic-ventilation trio, twenty-ninth batch of the v375-v474 campaign. Two of three were **cut as duplicates** of the existing `attic-ventilation` (Attic Ventilation Net Free Area, calc-finish.js), which already computes the IRC 1/150 and 1/300 net free area, the 50/50 intake/exhaust split, the soffit-vent count, and the ridge-vent length: v465 `attic-ventilation-nfva` (the NFVA) and v466 `ridge-soffit-vent-linear` (the split-to-linear-feet) -- so only one landed. Catalog **921 -> 922**, package **0.159.0 -> 0.160.0** (a minor). Proposed 2026-07-03.

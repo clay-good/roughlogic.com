@@ -8284,6 +8284,42 @@ export const CITATIONS = {
       { name: "Surcharge and width", value: "pd = hd gamma at the step over a 4 hd width (full-height triangle, hd <= hc)", source: "ASCE 7-22 7.7.1" },
     ],
   },
+  "rain-on-snow-surcharge": {
+    formula: "applies = (pg <= 20 psf) AND (slope_deg < W/50); total = pf + (applies ? surcharge : 0); ASCE 7-22 surcharge 5-8 psf (default 8).",
+    edition: "The ASCE 7-22 §7.10 rain-on-snow surcharge load, by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §7.10 trigger and surcharge are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7-22 §7.10 adds a rain-on-snow surcharge to the balanced flat-roof snow load Pf where the ground snow load Pg is 20 psf or less AND the roof slope in degrees is less than W/50, with W the horizontal eave-to-ridge distance in feet. ASCE 7-22 increased the surcharge to a 5-8 psf range (the tile defaults to 8) from the older flat 5 psf, recognizing that a low-slope roof in a warm wet-snow climate retains rain that a steeper roof would shed. The surcharge applies only to the balanced load case and only where both triggers are met; it is not added to a steep roof or a high-ground-snow (Pg > 20) region, and it does not apply to drift, sliding, or partial-load cases. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Trigger", value: "Pg <= 20 psf and slope (deg) < W/50", source: "ASCE 7-22 §7.10" },
+      { name: "Surcharge", value: "5-8 psf (default 8) added to the balanced Pf only", source: "ASCE 7-22 §7.10" },
+      { name: "Balanced only", value: "not added to drift, sliding, or partial-load cases", source: "ASCE 7-22 Ch. 7" },
+    ],
+  },
+  "sliding-snow-load": {
+    formula: "total = 0.4 x pf_upper x W (lb/ft); distributed over min(15 ft, lower_width); surcharge = total / distribution width (psf).",
+    edition: "The ASCE 7 §7.9 sliding snow load on a lower roof, by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §7.9 sliding-load relation is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7 §7.9 accounts for snow sliding off a slippery upper roof onto a lower roof: the total sliding load per foot of shared eave = 0.4 x the upper roof's flat-roof snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave (or the full lower-roof width if it is less than 15 ft), so a lower roof narrower than 15 ft carries the same total spread over less area and sees a heavier per-square-foot surcharge. The sliding load is superimposed on the lower roof's own balanced snow load. It applies where the upper roof is slippery (e.g. metal, membrane) and sloped enough to shed; the engineer judges whether sliding is possible. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Total sliding load", value: "0.4 x upper Pf x upper eave-to-ridge W, per foot of eave", source: "ASCE 7 §7.9" },
+      { name: "Distribution", value: "uniform over the lesser of 15 ft or the lower-roof width", source: "ASCE 7 §7.9" },
+      { name: "Superimposed", value: "added to the lower roof's own balanced snow load", source: "ASCE 7 Ch. 7" },
+    ],
+  },
+  "minimum-roof-snow": {
+    formula: "pm = (pg <= 20 psf) ? Is x pg : 20 x Is; governing = max(pm, pf_computed).",
+    edition: "The ASCE 7 §7.3.4 minimum roof snow load Pm, by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the §7.3.4 minimum relation is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7 §7.3.4 sets a minimum roof snow load Pm for low-slope roofs (roof slope less than 15 degrees; for monoslope, hip, and gable roofs also W <= a code limit): Pm = Is x Pg where the ground snow Pg is 20 psf or less, or Pm = 20 x Is where Pg is over 20 psf, with Is the snow importance factor from ASCE 7 Table 1.5-2. The design flat-roof snow load is taken as the greater of Pm and the computed balanced Pf, so the exposure (Ce), thermal (Ct), and slope (Cs) reductions cannot drop the design below a single heavy snowfall. The minimum is a separate load case applied to the balanced condition only, not to partial-loading, drift, sliding, or unbalanced cases. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Minimum", value: "Pm = Is x Pg for Pg <= 20 psf, else 20 x Is", source: "ASCE 7 §7.3.4" },
+      { name: "Governing", value: "design flat-roof snow = greater of Pm and computed Pf", source: "ASCE 7 §7.3.4" },
+      { name: "Low-slope, balanced", value: "applies to low-slope roofs, balanced case only", source: "ASCE 7 §7.3.4" },
+    ],
+  },
   "wind-mwfrs-pressure": {
     formula: "p_ww = qz G Cp_ww +/- qh GCpi (worst sign); p_lw = qh G Cp_lw +/- qh GCpi (worst sign); p_net = qz G Cp_ww - qh G Cp_lw (internal cancels).",
     edition: "The ASCE 7-22 Chapter 27 MWFRS design wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid), the wall Cp (+0.8 windward, -0.5 leeward for L/B <= 1), and GCpi = +/-0.18 (enclosed), by name.",

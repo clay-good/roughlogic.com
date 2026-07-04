@@ -1,6 +1,6 @@
 # roughlogic.com Specification v469 -- Sliding Snow Load on a Lower Roof (ASCE 7 7.9) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the snow-load-provisions trio (v468 rain-on-snow surcharge -> v469 sliding
+> **Status: LANDED (2026-07-04). Second tile of the snow-load-provisions trio (v468 rain-on-snow surcharge -> v469 sliding
 > snow -> v470 minimum roof snow). Snow sliding off an upper roof piles onto the lower roof below it; `snow-drift-load` covers
 > the wind-driven leeward drift, but the sliding surcharge is a separate load ASCE 7 §7.9 adds, and no tile computes it.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Where a sloped upper roof sheds onto a lower roof, the

@@ -719,6 +719,9 @@ export const COMPUTE_MAP = {
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch (3 tiles)
   "wind-cc-pressure": { module: "../../calc-construction.js", fn: "computeWindCcPressure" },
   "snow-drift-load": { module: "../../calc-construction.js", fn: "computeSnowDriftLoad" },
+  "rain-on-snow-surcharge": { module: "../../calc-construction.js", fn: "computeRainOnSnowSurcharge" },
+  "sliding-snow-load": { module: "../../calc-construction.js", fn: "computeSlidingSnowLoad" },
+  "minimum-roof-snow": { module: "../../calc-construction.js", fn: "computeMinimumRoofSnow" },
   "wind-mwfrs-pressure": { module: "../../calc-construction.js", fn: "computeWindMwfrsPressure" },
   // spec-v299..v301 reinforced-concrete depth-2 batch (3 tiles)
   "rc-slab-min-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMinThickness" },

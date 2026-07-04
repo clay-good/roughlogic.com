@@ -1056,6 +1056,9 @@ const RELATED = {
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch (Group E)
   "wind-cc-pressure": ["wind-pressure","wind-mwfrs-pressure","asce7-load-combinations"],
   "snow-drift-load": ["snow-load","rain-load-ponding","asce7-load-combinations"],
+  "rain-on-snow-surcharge": ["snow-load","snow-drift-load","rain-load-ponding","minimum-roof-snow"],
+  "sliding-snow-load": ["snow-load","snow-drift-load","minimum-roof-snow","rain-on-snow-surcharge"],
+  "minimum-roof-snow": ["snow-load","rain-on-snow-surcharge","sliding-snow-load","snow-drift-load"],
   "wind-mwfrs-pressure": ["wind-pressure","wind-cc-pressure","diaphragm-shear"],
   // spec-v299..v301 reinforced-concrete depth-2 batch (Group E)
   "rc-slab-min-thickness": ["rc-beam-flexure","rc-beam-shear","joist-deflection"],

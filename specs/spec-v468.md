@@ -1,6 +1,6 @@
 # roughlogic.com Specification v468 -- Rain-on-Snow Surcharge (ASCE 7-22 7.10) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a snow-load-provisions trio (v468 rain-on-snow surcharge -> v469 sliding
+> **Status: LANDED (2026-07-04). First tile of a snow-load-provisions trio (v468 rain-on-snow surcharge -> v469 sliding
 > snow -> v470 minimum roof snow). `snow-load` gives the balanced flat-roof snow and `snow-drift-load` the leeward drift, but
 > neither adds the rain-on-snow surcharge that catches the extra weight of rain soaking into a low-slope roof's snowpack.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. On a nearly flat roof, rain falling on snow cannot drain

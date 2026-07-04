@@ -1553,6 +1553,7 @@ cross-check.
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |
 | calc-construction.js | `computeMetalRoofPanels` | `{ eave_width_ft = 0, panel_length_ft = 0, panel_net_in = 36, fasteners_per_sq...` | _ | _ | _ |
 | calc-construction.js | `computeMetalWeight` | `{ shape, dia_in, id_in, side_in, width_in, height_in, thickness_in, wall_in, ...` | _ | _ | _ |
+| calc-construction.js | `computeMinimumRoofSnow` | `{ pg_psf = 0, importance = 1.0, pf_computed = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computeMultiBendFlatPattern` | `{ mold_line_in = 0, n_bends = 0, bd_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeOccupantLoad` | `{ spaces = [] } = {}` | _ | _ | _ |
@@ -1565,6 +1566,7 @@ cross-check.
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
 | calc-construction.js | `computeRafter` | `{ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeRainLoadPonding` | `{ static_head_in = 0, hydraulic_head_in = 0, roof_area_ft2 = 0, rainfall_in_h...` | _ | _ | _ |
+| calc-construction.js | `computeRainOnSnowSurcharge` | `{ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf ...` | _ | _ | _ |
 | calc-construction.js | `computeReadyMixConcreteOrder` | `{ volume_yd3 = 0, waste_pct = 8, load_yd3 = 10, min_yd3 = 10, price_per_yd3 =...` | _ | _ | _ |
 | calc-construction.js | `computeRebar` | `{ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }` | _ | _ | _ |
 | calc-construction.js | `computeRebarLapSplice` | `{ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}` | _ | _ | _ |
@@ -1581,6 +1583,7 @@ cross-check.
 | calc-construction.js | `computeSeismicStoryDrift` | `{ delta_xe_in = 0, cd = 0, ie = 1.0, hsx_in = 0, drift_ratio = 0.020 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShaftTorsion` | `{ T_lbin = 0, d_in = 0, di_in = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShorePostLoad` | `{ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x =...` | _ | _ | _ |
+| calc-construction.js | `computeSlidingSnowLoad` | `{ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSnowDriftLoad` | `{ lu_ft = 0, pg_psf = 0, hc_ft = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSnowLoad` | `{ Pg_psf, Ce = 1.0, Ct = 1.0, Is = 1.0, Cs = 1.0, drift_upwind_length_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeSpeedsAndFeeds` | `{ tool = "drill", material = "steel", diameter_in = 0, flutes = 1 }` | _ | _ | _ |
@@ -2580,7 +2583,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1166.
+Row count: 1169.
 
 <!-- END function-corpus-v14 -->
 
@@ -3031,7 +3034,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (200 tiles)
+### Group E Construction (203 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3124,6 +3127,7 @@ per spec-v14 §13.1 second paragraph.
 | `metal-roof-panels` | Metal Roof Panels, Linear Feet, and Fasteners | MCA / MRA install references + manufa...; spec-v216 section 2.1 pinned example (exposed-fastener ag... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `metal-weight` | Metal Weight by Shape and Alloy | first-principles (volume x density); 1 in x 12 in x 120 in A36 plate -> area 12 in^2, 408.384 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `min-bend-radius` | Minimum Plate Bend Radius | published forming-limit relation; 1/4 in A36 at 20% elongation -> 1.5 T, 0.375 in | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `minimum-roof-snow` | Minimum Roof Snow Load (ASCE 7 7.3.4) | ASCE 7 §7.3.4; spec-v470 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mortar-mix` | Mortar Mix and Yield | PCA; 600 modular bricks at 3/8 in joints, Type N -> 20 bags (6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `multi-bend-flat-pattern` | Multi-Bend Flat Pattern (Developed Length) | sheet-metal layout (developed length); spec-v454 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `occupant-load` | Building Occupant Load from Area and Use (IBC Table 1004.5) | IBC 2021 Table 1004.5 occupant-load f...; spec-v242 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3140,6 +3144,7 @@ per spec-v14 §13.1 second paragraph.
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rafter` | Rafter Length | Project (first-principles); Pythagoras on rise / 12 run with overhang | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rain-load-ponding` | Roof Rain Load and Secondary-Drainage Flow (ASCE 7 Ch. 8) | ASCE 7 Ch. 8 + IPC drainage; spec-v224 section 2.1 pinned example (typical scupper) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rain-on-snow-surcharge` | Rain-on-Snow Surcharge (ASCE 7-22 7.10) | ASCE 7-22 §7.10; spec-v468 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-beam-flexure` | Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v257 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-beam-shear` | Reinforced Concrete Beam Shear and Stirrup Spacing (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v258 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-column-axial` | RC Tied Column Axial Capacity (ACI 318-19 22.4) | ACI 318-19 22.4.2 / 22.4.2.1; spec-v284 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3172,6 +3177,7 @@ per spec-v14 §13.1 second paragraph.
 | `shearwall-overturning` | Wood Shear Wall Unit Shear and Holdown (SDPWS / ASD) | AWC SDPWS segmented shear wall + ASCE...; spec-v273 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shielding-gas-runtime` | Shielding-Gas Cylinder Runtime and Cost | Torch / regulator maker's flow charts...; 35 cfh, 120 min arc-on, 251 ft3 cylinder, $60/cylinder ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `shore-post-load` | Formwork Shore Post Load and Spacing (ACI 347) | ACI 347 Guide to Formwork for Concrete; spec-v245 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sliding-snow-load` | Sliding Snow Load on a Lower Roof (ASCE 7 7.9) | ASCE 7 §7.9; spec-v469 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stability-infinite` | Infinite Slope Stability Factor of Safety | Infinite-slope stability (Das / NAVFA...; spec-v289 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stake-cut-fill` | Slope-Stake Cut and Fill | FM 5-233 / FHWA construction-survey g...; existing 104.5, design 100.0 -> 4.5 ft cut; 2:1 slope, of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `snow-drift-load` | Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) | ASCE 7-22 Chapter 7; spec-v297 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3688,6 +3694,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 922. Fixture-covered or reference-cadence: 922 / 922.
+Tile count: 925. Fixture-covered or reference-cadence: 925 / 925.
 
 <!-- END tile-index-v14 -->

@@ -15764,6 +15764,54 @@ test("bounds: spec-v467 computePoweredAtticVentilator pins the fan CFM, intake, 
   assert.ok("error" in _v467({ attic_area_ft2: Infinity, cfm_per_ft2: 0.7 }));
 });
 
+// ===================== spec-v468..v470 ASCE 7 snow provisions trio =====================
+import { computeRainOnSnowSurcharge as _v468, computeSlidingSnowLoad as _v469, computeMinimumRoofSnow as _v470 } from "../../calc-construction.js";
+
+test("bounds: spec-v468 computeRainOnSnowSurcharge pins the trigger, total, and error seams", () => {
+  const r = _v468({ pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 });
+  assert.ok(r.applies === true && Math.abs(r.total_psf - 23) < 1e-9);
+  // A deep-snow region (Pg > 20) takes no surcharge.
+  const deep = _v468({ pf_psf: 15, pg_psf: 25, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 });
+  assert.ok(deep.applies === false && Math.abs(deep.total_psf - 15) < 1e-9);
+  // A steep roop (slope >= W/50) also takes no surcharge.
+  assert.ok(_v468({ pf_psf: 15, pg_psf: 18, slope_deg: 5, eave_to_ridge_ft: 100, surcharge_psf: 8 }).applies === false);
+  // Error seams: non-positive Pf, Pg, W, non-finite.
+  assert.ok("error" in _v468({ pf_psf: 0, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100 }));
+  assert.ok("error" in _v468({ pf_psf: 15, pg_psf: 0, slope_deg: 1, eave_to_ridge_ft: 100 }));
+  assert.ok("error" in _v468({ pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 0 }));
+  assert.ok("error" in _v468({ pf_psf: Infinity, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100 }));
+});
+
+test("bounds: spec-v469 computeSlidingSnowLoad pins the total, surcharge, and error seams", () => {
+  const r = _v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 15 });
+  assert.ok(Math.abs(r.total_lb_ft - 320) < 1e-9 && Math.abs(r.surcharge_psf - 320 / 15) < 1e-9);
+  // A narrow lower roof concentrates the same total.
+  const narrow = _v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 10 });
+  assert.ok(Math.abs(narrow.surcharge_psf - 32) < 1e-9 && narrow.narrow === true);
+  // A wider-than-15 ft roof still distributes over only 15 ft.
+  assert.ok(Math.abs(_v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 30 }).surcharge_psf - 320 / 15) < 1e-9);
+  // Error seams: non-positive snow, length, width, non-finite.
+  assert.ok("error" in _v469({ pf_upper_psf: 0, eave_ridge_ft: 40, lower_width_ft: 15 }));
+  assert.ok("error" in _v469({ pf_upper_psf: 20, eave_ridge_ft: 0, lower_width_ft: 15 }));
+  assert.ok("error" in _v469({ pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 0 }));
+  assert.ok("error" in _v469({ pf_upper_psf: Infinity, eave_ridge_ft: 40, lower_width_ft: 15 }));
+});
+
+test("bounds: spec-v470 computeMinimumRoofSnow pins Pm, the governing value, and error seams", () => {
+  const r = _v470({ pg_psf: 15, importance: 1.0, pf_computed: 0 });
+  assert.ok(Math.abs(r.pm_psf - 15) < 1e-9 && Math.abs(r.governing_psf - 15) < 1e-9);
+  // Pg > 20 caps Pm at 20 x Is.
+  assert.ok(Math.abs(_v470({ pg_psf: 30, importance: 1.0 }).pm_psf - 20) < 1e-9);
+  assert.ok(Math.abs(_v470({ pg_psf: 25, importance: 1.1 }).pm_psf - 22) < 1e-9);
+  // The governing value is the greater of Pm and the computed Pf.
+  const g = _v470({ pg_psf: 15, importance: 1.0, pf_computed: 25 });
+  assert.ok(Math.abs(g.governing_psf - 25) < 1e-9 && g.min_governs === false);
+  // Error seams: non-positive Pg, importance, non-finite.
+  assert.ok("error" in _v470({ pg_psf: 0, importance: 1.0 }));
+  assert.ok("error" in _v470({ pg_psf: 15, importance: 0 }));
+  assert.ok("error" in _v470({ pg_psf: Infinity, importance: 1.0 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

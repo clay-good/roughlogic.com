@@ -450,6 +450,7 @@ const _TILES = [
   ["steel-web-local-strength", "E"], ["steel-bolt-slip-critical", "E"], ["steel-fillet-weld-size", "E"],
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch
   ["wind-cc-pressure", "E"], ["snow-drift-load", "E"], ["wind-mwfrs-pressure", "E"],
+  ["rain-on-snow-surcharge", "E"], ["sliding-snow-load", "E"], ["minimum-roof-snow", "E"],
   // spec-v299..v301 reinforced-concrete depth-2 batch
   ["rc-slab-min-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
   ["concrete-elastic-modulus", "E"], ["concrete-modulus-of-rupture", "E"], ["concrete-shrinkage-temperature-steel", "E"],

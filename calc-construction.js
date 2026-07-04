@@ -6426,3 +6426,115 @@ const _v467renderPoweredAtticVentilator = _simpleRenderer({
   compute: computePoweredAtticVentilator,
 });
 CONSTRUCTION_RENDERERS["powered-attic-ventilator"] = _v467renderPoweredAtticVentilator;
+
+// ===================== spec-v468: rain-on-snow surcharge (ASCE 7-22 7.10) =====================
+// dims: in { pf_psf: M L^-1 T^-2, pg_psf: M L^-1 T^-2, slope_deg: dimensionless, eave_to_ridge_ft: L, surcharge_psf: M L^-1 T^-2 } out: { total_psf: M L^-1 T^-2 }
+export function computeRainOnSnowSurcharge({ pf_psf = 0, pg_psf = 0, slope_deg = 0, eave_to_ridge_ft = 0, surcharge_psf = 8 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pf = Number(pf_psf) || 0;
+  const pg = Number(pg_psf) || 0;
+  const slope = Number(slope_deg) || 0;
+  const W = Number(eave_to_ridge_ft) || 0;
+  const surcharge = Number(surcharge_psf) || 0;
+  if (!(pf > 0)) return { error: "Flat-roof snow load Pf must be positive (psf)." };
+  if (!(pg > 0)) return { error: "Ground snow load Pg must be positive (psf)." };
+  if (!(W > 0)) return { error: "Eave-to-ridge distance W must be positive (ft)." };
+  if (slope < 0) return { error: "Slope must be non-negative (deg)." };
+  if (surcharge < 0) return { error: "Surcharge must be non-negative (psf)." };
+  const applies = pg <= 20 && slope < W / 50;
+  const total_psf = pf + (applies ? surcharge : 0);
+  return {
+    applies, total_psf, added_psf: applies ? surcharge : 0,
+    note: "Rain-on-snow surcharge (ASCE 7-22 §7.10): where the ground snow load Pg is 20 psf or less and the roof slope (in degrees) is less than W/50 with W the eave-to-ridge distance in feet, add a surcharge to the balanced flat-roof snow load Pf. ASCE 7-22 raised this surcharge to 5-8 psf (commonly 8) from the older flat 5 psf, because a low-slope roof in a warm, wet-snow climate can hold rain in the snowpack that would run off a steeper roof. It applies only to the balanced load case and only where both triggers are met; a steep roof or a deep-snow (high-Pg) region does not take the surcharge. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const rainOnSnowSurchargeExample = { inputs: { pf_psf: 15, pg_psf: 18, slope_deg: 1, eave_to_ridge_ft: 100, surcharge_psf: 8 } };
+const _v468renderRainOnSnowSurcharge = _simpleRenderer({
+  citation: "Citation: Rain-on-snow surcharge (ASCE 7-22 §7.10): where Pg <= 20 psf and the slope (deg) < W/50, add a surcharge (5-8 psf, commonly 8) to the balanced flat-roof snow load Pf. Balanced case only, both triggers required. A design aid, not a substitute for the engineer of record.",
+  example: rainOnSnowSurchargeExample.inputs,
+  fields: [
+    { key: "pf_psf", label: "Balanced flat-roof snow Pf (psf)", kind: "number", default: 15 },
+    { key: "pg_psf", label: "Ground snow load Pg (psf)", kind: "number", default: 18 },
+    { key: "slope_deg", label: "Roof slope (deg)", kind: "number", default: 1 },
+    { key: "eave_to_ridge_ft", label: "Eave-to-ridge distance W (ft)", kind: "number", default: 100 },
+    { key: "surcharge_psf", label: "Surcharge value (psf, ASCE 7-22 ~8)", kind: "number", default: 8 },
+  ],
+  outputs: [
+    { key: "tot", id: "ros-out-tot", label: "Total with surcharge", value: (r) => fmt(r.total_psf, 1) + " psf" },
+    { key: "app", id: "ros-out-app", label: "Surcharge applies?", value: (r) => r.applies ? "YES -- +" + fmt(r.added_psf, 1) + " psf" : "no (Pg > 20 or slope >= W/50)" },
+    { key: "n", id: "ros-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRainOnSnowSurcharge,
+});
+CONSTRUCTION_RENDERERS["rain-on-snow-surcharge"] = _v468renderRainOnSnowSurcharge;
+
+// ===================== spec-v469: sliding snow load on a lower roof (ASCE 7 7.9) =====================
+// dims: in { pf_upper_psf: M L^-1 T^-2, eave_ridge_ft: L, lower_width_ft: L } out: { total_lb_ft: M T^-2, surcharge_psf: M L^-1 T^-2 }
+export function computeSlidingSnowLoad({ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pf = Number(pf_upper_psf) || 0;
+  const W = Number(eave_ridge_ft) || 0;
+  const lower = Number(lower_width_ft) || 0;
+  if (!(pf > 0)) return { error: "Upper-roof snow load must be positive (psf)." };
+  if (!(W > 0)) return { error: "Upper-roof eave-to-ridge length must be positive (ft)." };
+  if (!(lower > 0)) return { error: "Lower-roof width must be positive (ft)." };
+  const total_lb_ft = 0.4 * pf * W;
+  const dist_width = Math.min(15, lower);
+  const surcharge_psf = total_lb_ft / dist_width;
+  return {
+    total_lb_ft, dist_width, surcharge_psf, narrow: lower < 15,
+    note: "Sliding snow load on a lower roof (ASCE 7 §7.9): snow that slides off a slippery upper roof piles on the lower roof below. The total sliding load per foot of shared eave = 0.4 x the upper roof's flat snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave (or the full lower-roof width if it is narrower than 15 ft), so a narrower catch roof concentrates the same total into a heavier surcharge. It adds to the lower roof's own balanced snow load, and applies where the upper roof is slippery and sloped enough to shed. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const slidingSnowLoadExample = { inputs: { pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 15 } };
+const _v469renderSlidingSnowLoad = _simpleRenderer({
+  citation: "Citation: Sliding snow load (ASCE 7 §7.9): total = 0.4 x upper Pf x upper eave-to-ridge W (lb/ft), distributed over the lesser of 15 ft or the lower-roof width. Adds to the lower roof's own snow. A design aid, not a substitute for the engineer of record.",
+  example: slidingSnowLoadExample.inputs,
+  fields: [
+    { key: "pf_upper_psf", label: "Upper-roof flat snow load Pf (psf)", kind: "number", default: 20 },
+    { key: "eave_ridge_ft", label: "Upper-roof eave-to-ridge length W (ft)", kind: "number", default: 40 },
+    { key: "lower_width_ft", label: "Lower-roof width available (ft)", kind: "number", default: 15 },
+  ],
+  outputs: [
+    { key: "tot", id: "sls-out-tot", label: "Total sliding load", value: (r) => fmt(r.total_lb_ft, 0) + " lb/ft over " + fmt(r.dist_width, 0) + " ft" },
+    { key: "sur", id: "sls-out-sur", label: "Surcharge on lower roof", value: (r) => fmt(r.surcharge_psf, 1) + " psf" + (r.narrow ? " (narrow roof concentrates it)" : "") },
+    { key: "n", id: "sls-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlidingSnowLoad,
+});
+CONSTRUCTION_RENDERERS["sliding-snow-load"] = _v469renderSlidingSnowLoad;
+
+// ===================== spec-v470: minimum roof snow load (ASCE 7 7.3.4) =====================
+// dims: in { pg_psf: M L^-1 T^-2, importance: dimensionless, pf_computed: M L^-1 T^-2 } out: { pm_psf: M L^-1 T^-2, governing_psf: M L^-1 T^-2 }
+export function computeMinimumRoofSnow({ pg_psf = 0, importance = 1.0, pf_computed = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pg = Number(pg_psf) || 0;
+  const Is = Number(importance) || 0;
+  const pfc = Number(pf_computed) || 0;
+  if (!(pg > 0)) return { error: "Ground snow load Pg must be positive (psf)." };
+  if (!(Is > 0)) return { error: "Snow importance factor Is must be positive." };
+  if (pfc < 0) return { error: "Computed flat-roof snow must be non-negative (psf)." };
+  const pm_psf = pg <= 20 ? Is * pg : 20 * Is;
+  const governing_psf = Math.max(pm_psf, pfc);
+  return {
+    pm_psf, governing_psf, min_governs: pm_psf >= pfc,
+    note: "Minimum roof snow load (ASCE 7 §7.3.4): a low-slope roof (slope less than 15 degrees, and monoslope/hip/gable roofs with W <= a limit) has a minimum snow load Pm that the design cannot fall below, meant to catch a single heavy snowfall before it is reduced by the exposure, thermal, and slope factors. Pm = Is x Pg where Pg is 20 psf or less, or 20 x Is where Pg is over 20 psf (Is the snow importance factor from ASCE 7 Table 1.5-2). The design flat-roof snow load is the greater of this minimum and the computed Pf. The minimum applies only to the balanced case, not to partial-loading, drift, or sliding cases. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const minimumRoofSnowExample = { inputs: { pg_psf: 15, importance: 1.0, pf_computed: 0 } };
+const _v470renderMinimumRoofSnow = _simpleRenderer({
+  citation: "Citation: Minimum roof snow load (ASCE 7 §7.3.4): Pm = Is x Pg for Pg <= 20 psf, else 20 x Is; the design flat-roof snow is the greater of Pm and the computed Pf. Low-slope, balanced case only. A design aid, not a substitute for the engineer of record.",
+  example: minimumRoofSnowExample.inputs,
+  fields: [
+    { key: "pg_psf", label: "Ground snow load Pg (psf)", kind: "number", default: 15 },
+    { key: "importance", label: "Snow importance factor Is (Table 1.5-2)", kind: "number", default: 1.0 },
+    { key: "pf_computed", label: "Computed flat-roof snow Pf (psf, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "pm", id: "mrs-out-pm", label: "Minimum roof snow Pm", value: (r) => fmt(r.pm_psf, 1) + " psf" },
+    { key: "gov", id: "mrs-out-gov", label: "Governing flat-roof snow", value: (r) => fmt(r.governing_psf, 1) + " psf (" + (r.min_governs ? "minimum governs" : "computed Pf governs") + ")" },
+    { key: "n", id: "mrs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMinimumRoofSnow,
+});
+CONSTRUCTION_RENDERERS["minimum-roof-snow"] = _v470renderMinimumRoofSnow;

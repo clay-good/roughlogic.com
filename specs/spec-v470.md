@@ -1,6 +1,6 @@
 # roughlogic.com Specification v470 -- Minimum Roof Snow Load (ASCE 7 7.3.4) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the snow-load-provisions trio (v468 rain-on-snow surcharge ->
+> **Status: LANDED (2026-07-04). Third and final tile of the snow-load-provisions trio (v468 rain-on-snow surcharge ->
 > v469 sliding snow -> v470 minimum roof snow). `snow-load` computes the flat-roof snow from the ground snow and the
 > coefficients, but on a low-slope roof a separate minimum can govern, and no tile applies it.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. On low-slope roofs, ASCE 7 §7.3.4 enforces a minimum
