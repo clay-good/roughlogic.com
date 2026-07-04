@@ -63,7 +63,10 @@ const TILE_GZIP_CAP = 6 * 1024;
 // Bumped 36 -> 39 KB on 2026-07-04: continued Group E landings this campaign
 // (concrete field-work, finish-carpentry takeoff) took construction/index.html
 // past 36 KB gz; 39 KB restores headroom for the remaining Group E batches.
-const GROUP_GZIP_CAP = 39 * 1024;
+// Bumped 39 -> 42 KB on 2026-07-04: the v375-v474 campaign close (fabrication
+// weld/bend, powered-attic-ventilator, ASCE 7 snow trio, ADA ramp) took
+// construction/index.html to ~40.1 KB gz; 42 KB restores headroom.
+const GROUP_GZIP_CAP = 42 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

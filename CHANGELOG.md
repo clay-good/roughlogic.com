@@ -4,6 +4,19 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): land spec-v471..v474 -- energy-economics trio + ADA ramp; 925 -> 929 tiles, 0.162.0, 2026-07-04 (v375-v474 campaign complete)
+
+The final batch of the v375-v474 campaign: three electrical energy-economics tiles in `calc-electrical.js` (Group A) plus the ADA ramp-layout tile in `calc-construction.js` (Group E). **This closes the second 100-tile campaign (v375-v474).** Catalog **925 -> 929**, package **0.161.0 -> 0.162.0** (a minor). Proposed 2026-07-03.
+
+- **`motor-efficiency-upgrade-savings` (spec-v471).** Premium-motor retrofit saving: (kW at old eff - kW at new) x hours x rate. Pinned: a 50 hp / 75% / 90->94.5% / 4,000 hr / $0.12 -> ~$710/yr; at full load ~$947. Distinct from `motor-operating-cost` (one motor's cost, not the two-efficiency comparison).
+- **`transformer-loading-efficiency` (spec-v472).** Core + copper losses: efficiency = output / (output + no-load + load^2 x copper). Pinned: 75 kVA / 200 W / 1,200 W / 75% -> 98.47%, peak near 41% load.
+- **`economic-conductor-sizing` (spec-v473).** I^2R payback: saving = (3 I^2 R_small - 3 I^2 R_big) x hours x rate; payback = cost / saving. Pinned: 100 A / 0.20->0.125 ohm -> $1,080/yr, 0.7 yr; at 40 A -> 4.6 yr.
+- **`ada-ramp-slope` (spec-v474).** IBC 1012 / ADA ramp layout: run = rise x ratio (1:12 max), runs = ceil(rise/30), landings, total length, handrails if rise > 6 in. Pinned: 24 in -> one 24 ft run; 40 in -> 2 runs + landing = 45 ft. Distinct from the slope-check `ramp-slope` (this lays out the multi-run ramp).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the load-scaling saving, the copper-loss square law, the I^2R payback, the multi-run ramp with landings, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline. The three electrical tiles are hand-written renderers; the ramp tile uses `_simpleRenderer`. Module cap `calc-electrical.js` bumped 67000 -> 72000 (the three energy tiles took it over the old cap). Per-tile wiring across nine registries. Housekeeping: home count 925 -> 929, README resynced (counts, sitemap URLs 947 -> 951), four specs LANDED, docs/mobile-responsive.md section 94 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the four new tiles.
+
+**Campaign v375-v474 complete:** across the two 100-tile spec campaigns' second half, this batch of specs proposed 100 tiles; ~86 landed and ~14 were cut as duplicates of existing tiles (each cut recorded in its spec's Status line). The catalog now stands at **929 tiles**.
+
 ### feat(structural): land spec-v468..v470 -- 3 ASCE 7 snow-provision tiles in calc-construction.js; 922 -> 925 tiles, 0.161.0, 2026-07-04
 
 The ASCE 7 snow-provisions trio, thirtieth batch of the v375-v474 campaign, all in the existing lazy `calc-construction.js` (Group E); no new module, group, or dependency. All three are ASCE 7 Chapter 7 provisions the existing `snow-load` (balanced Pf) and `snow-drift-load` (drift) tiles never covered. Catalog **922 -> 925**, package **0.160.0 -> 0.161.0** (a minor). Proposed 2026-07-03.

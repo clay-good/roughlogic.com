@@ -1,6 +1,6 @@
 # roughlogic.com Specification v474 -- ADA Ramp Slope, Runs, and Landings (IBC 1012 / ADA) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). The 100th and final tile of the trades-only catalog-expansion campaign (v375..v474).
+> **Status: LANDED (2026-07-04). The 100th and final tile of the trades-only catalog-expansion campaign (v375..v474).
 > `stairs` and `stair-stringer` lay out steps; the accessible ramp that serves the same rise -- its length at the code
 > slope, the number of runs, and the landings -- has no tile, and it is one of the most common questions on a permit set.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. An accessible ramp is limited to a `1:12` slope

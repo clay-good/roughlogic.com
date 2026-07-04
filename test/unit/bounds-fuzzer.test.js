@@ -15812,6 +15812,67 @@ test("bounds: spec-v470 computeMinimumRoofSnow pins Pm, the governing value, and
   assert.ok("error" in _v470({ pg_psf: Infinity, importance: 1.0 }));
 });
 
+// ===================== spec-v471..v473 energy-economics + v474 ADA ramp (campaign close) =====================
+import { computeMotorEfficiencyUpgradeSavings as _v471, computeTransformerLoadingEfficiency as _v472, computeEconomicConductorSizing as _v473 } from "../../calc-electrical.js";
+import { computeAdaRampSlope as _v474 } from "../../calc-construction.js";
+
+test("bounds: spec-v471 computeMotorEfficiencyUpgradeSavings pins the saving, load scaling, and error seams", () => {
+  const r = _v471({ hp: 50, load: 0.75, eff_standard: 0.90, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 });
+  assert.ok(Math.abs(r.kw_standard - 31.083) < 0.01 && Math.abs(r.kw_premium - 29.603) < 0.01);
+  assert.ok(Math.abs(r.annual_saving - 710) < 2);
+  // The fixed efficiency gap saves more at full load.
+  const full = _v471({ hp: 50, load: 1.0, eff_standard: 0.90, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 });
+  assert.ok(Math.abs(full.annual_saving - 947) < 2 && full.annual_saving > r.annual_saving);
+  // Error seams: non-positive HP, out-of-range load/efficiency, non-finite.
+  assert.ok("error" in _v471({ hp: 0, load: 0.75, eff_standard: 0.9, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v471({ hp: 50, load: 1.5, eff_standard: 0.9, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v471({ hp: 50, load: 0.75, eff_standard: 1.2, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 }));
+  assert.ok("error" in _v471({ hp: Infinity, load: 0.75, eff_standard: 0.9, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 }));
+});
+
+test("bounds: spec-v472 computeTransformerLoadingEfficiency pins efficiency, peak-load, and error seams", () => {
+  const r = _v472({ kva_rating: 75, noload_w: 200, loadloss_w: 1200, load: 0.75, pf: 1.0 });
+  assert.ok(Math.abs(r.output_kw - 56.25) < 1e-9 && Math.abs(r.losses_kw - 0.875) < 1e-9);
+  assert.ok(Math.abs(r.efficiency - 98.47) < 0.01 && Math.abs(r.max_eff_load - Math.sqrt(200 / 1200)) < 1e-9);
+  // Copper loss falls with the square of load.
+  const light = _v472({ kva_rating: 75, noload_w: 200, loadloss_w: 1200, load: 0.25, pf: 1.0 });
+  assert.ok(Math.abs(light.losses_kw - 0.275) < 1e-9);
+  // Error seams: non-positive kVA, losses, out-of-range load/pf, non-finite.
+  assert.ok("error" in _v472({ kva_rating: 0, noload_w: 200, loadloss_w: 1200, load: 0.75, pf: 1 }));
+  assert.ok("error" in _v472({ kva_rating: 75, noload_w: 0, loadloss_w: 1200, load: 0.75, pf: 1 }));
+  assert.ok("error" in _v472({ kva_rating: 75, noload_w: 200, loadloss_w: 1200, load: 1.5, pf: 1 }));
+  assert.ok("error" in _v472({ kva_rating: 75, noload_w: 200, loadloss_w: 1200, load: 0.75, pf: 0 }));
+  assert.ok("error" in _v472({ kva_rating: Infinity, noload_w: 200, loadloss_w: 1200, load: 0.75, pf: 1 }));
+});
+
+test("bounds: spec-v473 computeEconomicConductorSizing pins the loss saving, payback, and error seams", () => {
+  const r = _v473({ current_a: 100, r_small_ohm: 0.20, r_big_ohm: 0.125, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 });
+  assert.ok(Math.abs(r.loss_small_kw - 6) < 1e-9 && Math.abs(r.loss_big_kw - 3.75) < 1e-9);
+  assert.ok(Math.abs(r.annual_saving - 1080) < 1e-9 && Math.abs(r.payback_yr - 800 / 1080) < 1e-9);
+  // A lightly loaded feeder pays back slowly (loss scales with I^2).
+  const light = _v473({ current_a: 40, r_small_ohm: 0.20, r_big_ohm: 0.125, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 });
+  assert.ok(Math.abs(light.payback_yr - 4.63) < 0.05 && light.payback_yr > r.payback_yr);
+  // Error seams: non-positive current, resistance ordering wrong, non-finite.
+  assert.ok("error" in _v473({ current_a: 0, r_small_ohm: 0.2, r_big_ohm: 0.125, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 }));
+  assert.ok("error" in _v473({ current_a: 100, r_small_ohm: 0.125, r_big_ohm: 0.20, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 }));
+  assert.ok("error" in _v473({ current_a: Infinity, r_small_ohm: 0.2, r_big_ohm: 0.125, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 }));
+});
+
+test("bounds: spec-v474 computeAdaRampSlope pins run, runs, landings, handrails, and error seams", () => {
+  const r = _v474({ rise_in: 24, slope_ratio: 12, landing_in: 60 });
+  assert.ok(Math.abs(r.run_in - 288) < 1e-9 && Math.abs(r.slope_pct - 100 / 12) < 1e-9);
+  assert.ok(r.runs === 1 && Math.abs(r.landings_in - 0) < 1e-9 && r.handrails === true);
+  // A tall rise needs a second run and a landing.
+  const tall = _v474({ rise_in: 40, slope_ratio: 12, landing_in: 60 });
+  assert.ok(tall.runs === 2 && Math.abs(tall.total_len_in - 540) < 1e-9);
+  // A low rise skips handrails.
+  assert.ok(_v474({ rise_in: 5, slope_ratio: 12, landing_in: 60 }).handrails === false);
+  // Error seams: non-positive rise, too-steep slope (< 1:12), non-finite.
+  assert.ok("error" in _v474({ rise_in: 0, slope_ratio: 12, landing_in: 60 }));
+  assert.ok("error" in _v474({ rise_in: 24, slope_ratio: 10, landing_in: 60 }));
+  assert.ok("error" in _v474({ rise_in: Infinity, slope_ratio: 12, landing_in: 60 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

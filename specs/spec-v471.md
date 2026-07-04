@@ -1,6 +1,6 @@
 # roughlogic.com Specification v471 -- Premium Motor Upgrade Energy Savings (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an electrical energy-efficiency trio (v471 premium motor upgrade ->
+> **Status: LANDED (2026-07-04). First tile of an electrical energy-efficiency trio (v471 premium motor upgrade ->
 > v472 transformer loading efficiency -> v473 economic conductor sizing). The catalog prices a VFD retrofit and an LED
 > retrofit, but not the classic motor question -- what a NEMA Premium motor saves over a standard one.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A more efficient motor draws less power for the same

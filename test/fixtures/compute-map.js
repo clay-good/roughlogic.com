@@ -1006,6 +1006,10 @@ export const COMPUTE_MAP = {
   "bends-between-pulls": { module: "../../calc-electrical.js", fn: "computeBendsBetweenPulls" },
   "shock-approach-boundary": { module: "../../calc-electrical.js", fn: "computeShockApproachBoundary" },
   "conduit-jam-ratio": { module: "../../calc-electrical.js", fn: "computeConduitJamRatio" },
+  "motor-efficiency-upgrade-savings": { module: "../../calc-electrical.js", fn: "computeMotorEfficiencyUpgradeSavings" },
+  "transformer-loading-efficiency": { module: "../../calc-electrical.js", fn: "computeTransformerLoadingEfficiency" },
+  "economic-conductor-sizing": { module: "../../calc-electrical.js", fn: "computeEconomicConductorSizing" },
+  "ada-ramp-slope": { module: "../../calc-construction.js", fn: "computeAdaRampSlope" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
 

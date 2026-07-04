@@ -1,6 +1,6 @@
 # roughlogic.com Specification v473 -- Economic Conductor Sizing (I2R Payback) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the electrical energy-efficiency trio (v471 premium motor upgrade
+> **Status: LANDED (2026-07-04). Third and final tile of the electrical energy-efficiency trio (v471 premium motor upgrade
 > -> v472 transformer loading efficiency -> v473 economic conductor sizing). `voltage-drop` sizes a conductor to meet a
 > voltage-drop limit; this tile answers the money question -- whether upsizing a heavily loaded feeder pays for itself in
 > reduced I-squared-R energy loss.**

@@ -906,6 +906,42 @@ export const CITATIONS = {
       { name: "A caution, not a limit", value: "a pull caution; does not check fill area or pulling tension", source: "scope of this tile" },
     ],
   },
+  "motor-efficiency-upgrade-savings": {
+    formula: "kw = HP x 0.746 x load / efficiency; annual_saving = (kw_standard - kw_premium) x hours x rate.",
+    edition: "Premium-motor energy-saving comparison, standard motor-efficiency retrofit practice (NEMA Premium / DOE motor efficiency levels) by name; first-principles input-power relation.",
+    freeAccess: "The input-power relation (HP x 0.746 / efficiency) and the saving arithmetic are first-principles; NEMA Premium efficiency levels are published free.",
+    governance: GOVERNANCE.general,
+    editionNote: "A motor's electrical input power = HP x 0.746 (kW per HP) x load fraction / efficiency, so a higher-efficiency motor draws less input for the same shaft output. The annual energy saving of replacing a standard motor with a premium one = (input kW at the old efficiency - input kW at the new) x annual run hours x the energy rate. Because the fixed efficiency gap multiplies the input power, the saving grows with load, run hours, and rate; a lightly loaded or seldom-run motor may never pay back the premium, while a fully loaded always-on motor pays quickly. This is the energy-charge component only and excludes demand, time-of-use, and power-factor effects; a utility rebate shortens the payback. A screening estimate, not a metered measurement-and-verification.",
+    assumptions: [
+      { name: "Input power", value: "input kW = HP x 0.746 x load / efficiency", source: "first-principles motor relation" },
+      { name: "Saving", value: "(kW at old eff - kW at new eff) x run hours x rate", source: "energy-charge arithmetic" },
+      { name: "Energy only", value: "excludes demand / TOU / power-factor charges and rebates", source: "scope of this tile" },
+    ],
+  },
+  "transformer-loading-efficiency": {
+    formula: "output = kVA x load x pf; losses = (noload_w + load^2 x loadloss_w)/1000; efficiency = output/(output+losses); peak at load = sqrt(noload/loadloss).",
+    edition: "Transformer loading efficiency and losses, standard power-transformer practice (IEEE C57 loss definitions) by name; first-principles core-plus-copper loss model.",
+    freeAccess: "The core-plus-copper loss model and the efficiency relation are first-principles; transformer test-report losses are manufacturer data.",
+    governance: GOVERNANCE.general,
+    editionNote: "A transformer has a fixed no-load (core / iron / excitation) loss that is present whenever it is energized, plus a load (copper / I^2R / winding) loss that varies with the square of the load fraction. Output kW = kVA x load fraction x power factor; total loss kW = (no-load loss + load^2 x full-load copper loss) / 1000; efficiency = output / (output + total loss). Peak efficiency occurs where the variable copper loss equals the fixed core loss, at a load fraction = sqrt(no-load / full-load loss), commonly 40-60% for a distribution transformer -- which is why a lightly loaded oversized transformer has a poor all-day (energy) efficiency even though its nameplate efficiency looks high. A design/screening aid; the manufacturer's certified test report governs the actual losses.",
+    assumptions: [
+      { name: "Two-part loss", value: "fixed core loss + load^2 x full-load copper loss", source: "transformer loss model" },
+      { name: "Efficiency", value: "output / (output + total loss), output = kVA x load x pf", source: "first principles" },
+      { name: "Peak load", value: "maximum efficiency at load = sqrt(no-load / full-load loss)", source: "loss-balance derivation" },
+    ],
+  },
+  "economic-conductor-sizing": {
+    formula: "loss = 3 x I^2 x R / 1000 (kW, per size); annual_saving = (loss_small - loss_big) x hours x rate; payback = upsize_cost / annual_saving.",
+    edition: "Economic (loss-based) conductor sizing, standard energy-engineering practice (NEC Informative Annex D / IEEE economic-conductor methods) by name; first-principles I^2R loss.",
+    freeAccess: "The three-phase I^2R loss and the payback arithmetic are first-principles; conductor resistances are in NEC Chapter 9 Table 8/9.",
+    governance: GOVERNANCE.general,
+    editionNote: "A conductor sized to the code minimum still dissipates energy as heat, and that loss costs money over the life of a heavily used feeder. The three-phase resistive loss = 3 x I^2 x R (R the per-phase resistance of the run), so upsizing to a lower-resistance conductor cuts the loss and saves (loss at the small size - loss at the large size) x annual run hours x the energy rate per year; the simple payback = the added installed copper cost / that annual saving. Because the loss scales with the square of the current, upsizing pays quickly on heavily loaded, long-hour feeders and may never pay on lightly loaded or intermittent runs. This is an economic screen only: the NEC minimum ampacity and voltage-drop limits, conduit fill, termination ratings, and installed (not just material) cost still govern the conductor actually installed. A screening estimate; the engineer of record and the NEC govern.",
+    assumptions: [
+      { name: "I^2R loss", value: "three-phase loss = 3 x I^2 x R per conductor size", source: "first-principles resistive loss" },
+      { name: "Payback", value: "saving = (loss_small - loss_big) x hours x rate; payback = cost / saving", source: "economic arithmetic" },
+      { name: "Code still governs", value: "NEC minimum ampacity, voltage drop, and fill govern the actual conductor", source: "scope of this tile" },
+    ],
+  },
   "conduit-fill": {
     formula: "Conductor cross-sectional area sum / interior conduit area, compared to NEC Chapter 9 Table 1 fill limits (53% / 31% / 40% for 1, 2, ≥ 3 conductors).",
     edition: NEC_2023 + " Chapter 9 Tables 1, 4, 5.",
@@ -4474,6 +4510,18 @@ export const CITATIONS = {
     editionNote: "Single-edition (ADA 2010 Standards + ICC A117.1-2017).",
     assumptions: [
       { name: "Pass-fail threshold", value: "1:12 (8.33%) maximum running slope; 1:48 max cross-slope", source: "ADA §405.2 / §403.3" },
+    ],
+  },
+  "ada-ramp-slope": {
+    formula: "run = rise x slope_ratio; slope_pct = 100 / slope_ratio; runs = ceil(rise / 30); landings = (runs - 1) x landing_len; total = run + landings; handrails if rise > 6 in.",
+    edition: "IBC §1012 (ramps) and the ADA Standards for Accessible Design (2010) §405 / ICC A117.1, by name.",
+    freeAccess: "IBC is viewable through the ICC public-access reader; ADA Standards are free at ada.gov.",
+    governance: GOVERNANCE.structural,
+    editionNote: "An accessible ramp (IBC §1012, ADA §405) has a maximum running slope of 1:12 (8.33%), so the sloped run = the rise x the slope ratio. A single ramp run may rise at most 30 in before a level landing at least 60 in long is required, so the number of runs = ceil(rise / 30) and the intermediate landings add (runs - 1) x the landing length to the total ramp length. Handrails are required on both sides where the ramp rise exceeds 6 in (ADA §405.8 / IBC §1012.8). Landings are also required at the top and bottom of every ramp and where a ramp changes direction, and the running slope, cross slope (max 1:48), clear width (min 36 in), and edge protection have their own limits not all computed here. A layout aid; the adopted building code and ADA / ICC A117.1 govern the accessible design.",
+    assumptions: [
+      { name: "Max slope / run", value: "1:12 (8.33%) running slope; run = rise x slope ratio", source: "ADA §405.2 / IBC §1012" },
+      { name: "30 in rise per run", value: "a level >=60 in landing after each 30 in of rise; runs = ceil(rise / 30)", source: "ADA §405.6-405.7" },
+      { name: "Handrails", value: "required both sides where rise > 6 in", source: "ADA §405.8 / IBC §1012.8" },
     ],
   },
   "rainwater-yield": {

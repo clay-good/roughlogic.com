@@ -48,6 +48,8 @@ const TOOL_MODULES = (() => {
     // spec-v179/v185/v186 electrician second-pass batch
     "motor-branch-protection", "bends-between-pulls", "shock-approach-boundary",
     "conduit-jam-ratio",
+    // spec-v471..v473 energy-economics batch
+    "motor-efficiency-upgrade-savings", "transformer-loading-efficiency", "economic-conductor-sizing",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,
@@ -412,6 +414,8 @@ const TOOL_MODULES = (() => {
     "wind-cc-pressure", "snow-drift-load", "wind-mwfrs-pressure",
     // spec-v468..v470 ASCE 7 snow provisions batch.
     "rain-on-snow-surcharge", "sliding-snow-load", "minimum-roof-snow",
+    // spec-v474 ADA ramp layout
+    "ada-ramp-slope",
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",

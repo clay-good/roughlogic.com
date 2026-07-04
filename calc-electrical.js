@@ -4806,3 +4806,157 @@ function _v374renderConduitJamRatio(inputRegion, outputRegion, citationEl) {
   for (const f of [id, od, n]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["conduit-jam-ratio"] = _v374renderConduitJamRatio;
+
+// ===================== spec-v471: premium motor upgrade energy savings =====================
+// dims: in { hp: dimensionless, load: dimensionless, eff_standard: dimensionless, eff_premium: dimensionless, hours: dimensionless, rate_kwh: dimensionless } out: { kw_standard: dimensionless, kw_premium: dimensionless, annual_saving: dimensionless }
+export function computeMotorEfficiencyUpgradeSavings({ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(hp) || 0;
+  const ld = Number(load) || 0;
+  const es = Number(eff_standard) || 0;
+  const ep = Number(eff_premium) || 0;
+  const hr = Number(hours) || 0;
+  const rate = Number(rate_kwh) || 0;
+  if (!(h > 0)) return { error: "Horsepower must be positive." };
+  if (!(ld > 0 && ld <= 1)) return { error: "Load fraction must be between 0 and 1." };
+  if (!(es > 0 && es <= 1)) return { error: "Standard efficiency must be a fraction in (0, 1]." };
+  if (!(ep > 0 && ep <= 1)) return { error: "Premium efficiency must be a fraction in (0, 1]." };
+  if (!(hr > 0)) return { error: "Annual run hours must be positive." };
+  if (rate < 0) return { error: "Electricity rate must be non-negative." };
+  const kw_standard = h * 0.746 * ld / es;
+  const kw_premium = h * 0.746 * ld / ep;
+  const kw_saved = kw_standard - kw_premium;
+  const annual_kwh_saved = kw_saved * hr;
+  const annual_saving = annual_kwh_saved * rate;
+  return {
+    kw_standard, kw_premium, kw_saved, annual_kwh_saved, annual_saving,
+    note: "Premium-motor upgrade energy saving: a motor's input power = HP x 0.746 x load / efficiency, so a more efficient motor draws less input for the same shaft work. The saving = (input at the old efficiency - input at the new) x annual run hours x the energy rate. Because the efficiency gap acts on the input power, the saving grows with load, run hours, and rate: a lightly loaded or seldom-run motor may never pay back the premium, while a fully loaded, always-on motor pays quickly. This is the energy charge only; the utility tariff (demand, time-of-use, power factor) and any utility rebate change the payback. A screening estimate, not a metered M&V.",
+  };
+}
+export const motorEfficiencyUpgradeSavingsExample = { inputs: { hp: 50, load: 0.75, eff_standard: 0.90, eff_premium: 0.945, hours: 4000, rate_kwh: 0.12 } };
+function _v471renderMotorEfficiencyUpgradeSavings(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Premium-motor upgrade saving (first-principles): input kW = HP x 0.746 x load / efficiency; annual saving = (kW at old eff - kW at new eff) x run hours x rate. The saving scales with load, hours, and rate. Energy charge only; the utility tariff and rebates change the payback. A screening estimate, not a metered M&V.";
+  const hp = makeNumber("Motor horsepower", "meu-hp", { step: "any", min: "0" }); hp.input.value = "50";
+  const ld = makeNumber("Load fraction (0-1)", "meu-ld", { step: "any", min: "0", max: "1" }); ld.input.value = "0.75";
+  const es = makeNumber("Existing motor efficiency (0-1)", "meu-es", { step: "any", min: "0", max: "1" }); es.input.value = "0.90";
+  const ep = makeNumber("Premium motor efficiency (0-1)", "meu-ep", { step: "any", min: "0", max: "1" }); ep.input.value = "0.945";
+  const hr = makeNumber("Annual run hours", "meu-hr", { step: "any", min: "0" }); hr.input.value = "4000";
+  const rate = makeNumber("Electricity rate ($/kWh)", "meu-rate", { step: "any", min: "0" }); rate.input.value = "0.12";
+  for (const f of [hp, ld, es, ep, hr, rate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hp.input.value = "50"; ld.input.value = "0.75"; es.input.value = "0.90"; ep.input.value = "0.945"; hr.input.value = "4000"; rate.input.value = "0.12"; update(); });
+  const oKw = makeOutputLine(outputRegion, "Input kW standard / premium", "meu-out-kw");
+  const oSave = makeOutputLine(outputRegion, "Annual saving", "meu-out-save");
+  const oNote = makeOutputLine(outputRegion, "Note", "meu-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMotorEfficiencyUpgradeSavings({ hp: readNum(hp.input), load: readNum(ld.input), eff_standard: readNum(es.input), eff_premium: readNum(ep.input), hours: readNum(hr.input), rate_kwh: readNum(rate.input) });
+    if (r.error) { oKw.textContent = r.error; oSave.textContent = "-"; oNote.textContent = ""; return; }
+    oKw.textContent = fmt(r.kw_standard, 2) + " -> " + fmt(r.kw_premium, 2) + " kW (" + fmt(r.kw_saved, 2) + " kW saved)";
+    oSave.textContent = "$" + fmt(r.annual_saving, 0) + "/yr (" + fmt(r.annual_kwh_saved, 0) + " kWh)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [hp, ld, es, ep, hr, rate]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["motor-efficiency-upgrade-savings"] = _v471renderMotorEfficiencyUpgradeSavings;
+
+// ===================== spec-v472: transformer loading efficiency and losses =====================
+// dims: in { kva_rating: dimensionless, noload_w: dimensionless, loadloss_w: dimensionless, load: dimensionless, pf: dimensionless } out: { output_kw: dimensionless, losses_kw: dimensionless, efficiency: dimensionless, max_eff_load: dimensionless }
+export function computeTransformerLoadingEfficiency({ kva_rating = 0, noload_w = 0, loadloss_w = 0, load = 0, pf = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const kva = Number(kva_rating) || 0;
+  const nl = Number(noload_w) || 0;
+  const ll = Number(loadloss_w) || 0;
+  const ld = Number(load) || 0;
+  const pfac = Number(pf) || 0;
+  if (!(kva > 0)) return { error: "kVA rating must be positive." };
+  if (!(nl > 0)) return { error: "No-load (core) loss must be positive (W)." };
+  if (!(ll > 0)) return { error: "Full-load (copper) loss must be positive (W)." };
+  if (!(ld > 0 && ld <= 1)) return { error: "Load fraction must be between 0 and 1." };
+  if (!(pfac > 0 && pfac <= 1)) return { error: "Power factor must be between 0 and 1." };
+  const output_kw = kva * ld * pfac;
+  const losses_kw = (nl + ld * ld * ll) / 1000;
+  const efficiency = output_kw / (output_kw + losses_kw) * 100;
+  const max_eff_load = Math.sqrt(nl / ll);
+  return {
+    output_kw, losses_kw, efficiency, max_eff_load,
+    note: "Transformer loading efficiency and losses: a transformer has a fixed no-load (core / iron) loss that runs whenever it is energized, plus a load (copper / I^2R) loss that grows with the square of the load fraction. Output kW = kVA x load x power factor; total loss kW = (no-load + load^2 x full-load loss) / 1000; efficiency = output / (output + loss). Peak efficiency occurs where the copper loss equals the core loss, at a load fraction = sqrt(no-load / full-load loss) -- typically 40-60% for a distribution transformer, which is why an oversized transformer with a large core loss has a poor all-day efficiency. A design/screening aid; the manufacturer's test report governs.",
+  };
+}
+export const transformerLoadingEfficiencyExample = { inputs: { kva_rating: 75, noload_w: 200, loadloss_w: 1200, load: 0.75, pf: 1.0 } };
+function _v472renderTransformerLoadingEfficiency(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Transformer loading efficiency (first-principles): output = kVA x load x PF; loss = (no-load + load^2 x full-load loss); efficiency = output / (output + loss); peak efficiency at load = sqrt(no-load / full-load loss). A design/screening aid; the manufacturer's test report governs.";
+  const kva = makeNumber("Transformer rating (kVA)", "tle-kva", { step: "any", min: "0" }); kva.input.value = "75";
+  const nl = makeNumber("No-load (core) loss (W)", "tle-nl", { step: "any", min: "0" }); nl.input.value = "200";
+  const ll = makeNumber("Full-load (copper) loss (W)", "tle-ll", { step: "any", min: "0" }); ll.input.value = "1200";
+  const ld = makeNumber("Load fraction (0-1)", "tle-ld", { step: "any", min: "0", max: "1" }); ld.input.value = "0.75";
+  const pf = makeNumber("Power factor (0-1)", "tle-pf", { step: "any", min: "0", max: "1" }); pf.input.value = "1.0";
+  for (const f of [kva, nl, ll, ld, pf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kva.input.value = "75"; nl.input.value = "200"; ll.input.value = "1200"; ld.input.value = "0.75"; pf.input.value = "1.0"; update(); });
+  const oEff = makeOutputLine(outputRegion, "Efficiency", "tle-out-eff");
+  const oLoss = makeOutputLine(outputRegion, "Output / losses", "tle-out-loss");
+  const oPeak = makeOutputLine(outputRegion, "Peak-efficiency load", "tle-out-peak");
+  const oNote = makeOutputLine(outputRegion, "Note", "tle-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTransformerLoadingEfficiency({ kva_rating: readNum(kva.input), noload_w: readNum(nl.input), loadloss_w: readNum(ll.input), load: readNum(ld.input), pf: readNum(pf.input) });
+    if (r.error) { oEff.textContent = r.error; oLoss.textContent = "-"; oPeak.textContent = "-"; oNote.textContent = ""; return; }
+    oEff.textContent = fmt(r.efficiency, 2) + "%";
+    oLoss.textContent = fmt(r.output_kw, 2) + " kW out, " + fmt(r.losses_kw * 1000, 0) + " W loss";
+    oPeak.textContent = fmt(r.max_eff_load * 100, 0) + "% load";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kva, nl, ll, ld, pf]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["transformer-loading-efficiency"] = _v472renderTransformerLoadingEfficiency;
+
+// ===================== spec-v473: economic conductor sizing (I2R payback) =====================
+// dims: in { current_a: dimensionless, r_small_ohm: dimensionless, r_big_ohm: dimensionless, hours: dimensionless, rate_kwh: dimensionless, upsize_cost: dimensionless } out: { loss_small_kw: dimensionless, loss_big_kw: dimensionless, annual_saving: dimensionless, payback_yr: dimensionless }
+export function computeEconomicConductorSizing({ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, upsize_cost = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const I = Number(current_a) || 0;
+  const rs = Number(r_small_ohm) || 0;
+  const rb = Number(r_big_ohm) || 0;
+  const hr = Number(hours) || 0;
+  const rate = Number(rate_kwh) || 0;
+  const cost = Number(upsize_cost) || 0;
+  if (!(I > 0)) return { error: "Load current must be positive (A)." };
+  if (!(rs > 0)) return { error: "Smaller-conductor resistance must be positive (ohm)." };
+  if (!(rb > 0)) return { error: "Larger-conductor resistance must be positive (ohm)." };
+  if (!(rb < rs)) return { error: "The larger conductor must have less resistance than the smaller one." };
+  if (!(hr > 0)) return { error: "Annual run hours must be positive." };
+  if (rate < 0) return { error: "Electricity rate must be non-negative." };
+  if (cost < 0) return { error: "Upsize cost must be non-negative." };
+  const loss_small_kw = 3 * I * I * rs / 1000;
+  const loss_big_kw = 3 * I * I * rb / 1000;
+  const annual_saving = (loss_small_kw - loss_big_kw) * hr * rate;
+  const payback_yr = annual_saving > 0 ? cost / annual_saving : null;
+  return {
+    loss_small_kw, loss_big_kw, annual_saving, payback_yr,
+    note: "Economic conductor sizing (I^2R payback): a feeder sized to the code minimum still wastes energy as heat in the conductor. Upsizing lowers the per-phase resistance, so the three-phase loss = 3 x I^2 x R drops and the annual energy saving = (loss at the small size - loss at the large) x run hours x rate. Divide the added material cost by that saving for a simple payback. Because the loss scales with the square of the current, upsizing only pays on heavily loaded, long-hour feeders; a lightly loaded or intermittent run may never earn back the copper. A screening estimate; installed cost, conduit fill, and the code minimum still govern the actual conductor.",
+  };
+}
+export const economicConductorSizingExample = { inputs: { current_a: 100, r_small_ohm: 0.20, r_big_ohm: 0.125, hours: 4000, rate_kwh: 0.12, upsize_cost: 800 } };
+function _v473renderEconomicConductorSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Economic conductor sizing (first-principles I^2R): three-phase loss = 3 x I^2 x R; annual saving = (loss small - loss big) x hours x rate; payback = upsize cost / saving. Pays only on heavily loaded, long-hour feeders. A screening estimate; installed cost and the code minimum still govern.";
+  const I = makeNumber("Per-phase load current (A)", "ecs-i", { step: "any", min: "0" }); I.input.value = "100";
+  const rs = makeNumber("Smaller conductor resistance (ohm, run)", "ecs-rs", { step: "any", min: "0" }); rs.input.value = "0.20";
+  const rb = makeNumber("Larger conductor resistance (ohm, run)", "ecs-rb", { step: "any", min: "0" }); rb.input.value = "0.125";
+  const hr = makeNumber("Annual run hours", "ecs-hr", { step: "any", min: "0" }); hr.input.value = "4000";
+  const rate = makeNumber("Electricity rate ($/kWh)", "ecs-rate", { step: "any", min: "0" }); rate.input.value = "0.12";
+  const cost = makeNumber("Added upsize cost ($)", "ecs-cost", { step: "any", min: "0" }); cost.input.value = "800";
+  for (const f of [I, rs, rb, hr, rate, cost]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { I.input.value = "100"; rs.input.value = "0.20"; rb.input.value = "0.125"; hr.input.value = "4000"; rate.input.value = "0.12"; cost.input.value = "800"; update(); });
+  const oLoss = makeOutputLine(outputRegion, "Loss small / big", "ecs-out-loss");
+  const oSave = makeOutputLine(outputRegion, "Annual saving / payback", "ecs-out-save");
+  const oNote = makeOutputLine(outputRegion, "Note", "ecs-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEconomicConductorSizing({ current_a: readNum(I.input), r_small_ohm: readNum(rs.input), r_big_ohm: readNum(rb.input), hours: readNum(hr.input), rate_kwh: readNum(rate.input), upsize_cost: readNum(cost.input) });
+    if (r.error) { oLoss.textContent = r.error; oSave.textContent = "-"; oNote.textContent = ""; return; }
+    oLoss.textContent = fmt(r.loss_small_kw, 2) + " kW -> " + fmt(r.loss_big_kw, 2) + " kW";
+    oSave.textContent = "$" + fmt(r.annual_saving, 0) + "/yr, payback " + (r.payback_yr === null ? "n/a" : fmt(r.payback_yr, 1) + " yr");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [I, rs, rb, hr, rate, cost]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["economic-conductor-sizing"] = _v473renderEconomicConductorSizing;

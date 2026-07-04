@@ -18052,6 +18052,151 @@
       "term": "minimum flat roof snow",
       "target": "minimum-roof-snow",
       "kind": "industry"
+    },
+    {
+      "term": "premium motor savings",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "motor efficiency upgrade",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "nema premium motor",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "motor retrofit savings",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "energy efficient motor",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "motor upgrade payback",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "high efficiency motor savings",
+      "target": "motor-efficiency-upgrade-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer efficiency",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer losses",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer loading",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "core copper loss",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer no load loss",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer loading efficiency",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer peak efficiency",
+      "target": "transformer-loading-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "economic conductor sizing",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "i2r payback",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "conductor upsize payback",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "wire loss savings",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "economic wire size",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "conductor loss payback",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "upsize conductor savings",
+      "target": "economic-conductor-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "ada ramp slope",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "accessible ramp",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "ramp landings",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "ada ramp layout",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "ibc 1012 ramp",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "wheelchair ramp",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "ramp run length",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
+    },
+    {
+      "term": "ada ramp handrails",
+      "target": "ada-ramp-slope",
+      "kind": "industry"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v472 -- Transformer Loading Efficiency and Losses (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the electrical energy-efficiency trio (v471 premium motor upgrade ->
+> **Status: LANDED (2026-07-04). Second tile of the electrical energy-efficiency trio (v471 premium motor upgrade ->
 > v472 transformer loading efficiency -> v473 economic conductor sizing). `transformer-sizing` picks a kVA rating; this tile
 > tells you how efficiently that transformer runs at a given load -- the no-load and load losses that never stop costing.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A transformer's losses are the constant no-load

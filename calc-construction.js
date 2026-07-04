@@ -6538,3 +6538,43 @@ const _v470renderMinimumRoofSnow = _simpleRenderer({
   compute: computeMinimumRoofSnow,
 });
 CONSTRUCTION_RENDERERS["minimum-roof-snow"] = _v470renderMinimumRoofSnow;
+
+// ===================== spec-v474: ADA ramp slope, runs, and landings (IBC 1012 / ADA) =====================
+// dims: in { rise_in: L, slope_ratio: dimensionless, landing_in: L } out: { run_in: L, slope_pct: dimensionless, total_len_in: L, landings_in: L }
+export function computeAdaRampSlope({ rise_in = 0, slope_ratio = 12, landing_in = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rise = Number(rise_in) || 0;
+  const ratio = Number(slope_ratio) || 0;
+  const landing = Number(landing_in) || 0;
+  if (!(rise > 0)) return { error: "Rise must be positive (in)." };
+  if (!(ratio >= 12)) return { error: "Slope ratio (run:rise) must be at least 12 (a 1:12 maximum; steeper is not accessible)." };
+  if (!(landing > 0)) return { error: "Landing length must be positive (in)." };
+  const run_in = rise * ratio;
+  const slope_pct = 100 / ratio;
+  const runs = Math.ceil(rise / 30);
+  const landings_in = (runs - 1) * landing;
+  const total_len_in = run_in + landings_in;
+  const handrails = rise > 6;
+  return {
+    run_in, slope_pct, runs, landings_in, total_len_in, handrails,
+    note: "ADA / IBC 1012 ramp layout: an accessible ramp runs no steeper than 1:12 (8.33%), so the sloped run = rise x the slope ratio. A single run may rise at most 30 in before a level landing (at least 60 in long) is required, so the number of runs = ceil(rise / 30) and the intermediate landings add (runs - 1) x the landing length to the total. Handrails are required on both sides where the rise exceeds 6 in. Landings are also required at the top and bottom and where the ramp changes direction (not added here). A layout aid; the adopted building code and ADA/ANSI A117.1 govern the running slope, cross slope, width, edge protection, and handrail details.",
+  };
+}
+export const adaRampSlopeExample = { inputs: { rise_in: 24, slope_ratio: 12, landing_in: 60 } };
+const _v474renderAdaRampSlope = _simpleRenderer({
+  citation: "Citation: ADA / IBC 1012 ramp: max 1:12 (8.33%) slope, run = rise x ratio; max 30 in rise per run then a >=60 in landing, runs = ceil(rise/30); handrails where rise > 6 in. A layout aid; the adopted code and ADA/ANSI A117.1 govern slope, width, and handrail details.",
+  example: adaRampSlopeExample.inputs,
+  fields: [
+    { key: "rise_in", label: "Total vertical rise (in)", kind: "number", default: 24 },
+    { key: "slope_ratio", label: "Slope ratio run:rise (12 = 1:12 max)", kind: "number", default: 12 },
+    { key: "landing_in", label: "Landing length between runs (in)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "run", id: "ars-out-run", label: "Sloped run / slope", value: (r) => fmt(r.run_in, 0) + " in (" + fmt(r.run_in / 12, 1) + " ft) at " + fmt(r.slope_pct, 2) + "%" },
+    { key: "tot", id: "ars-out-tot", label: "Runs / landings / total length", value: (r) => r.runs + " run(s), " + fmt(r.landings_in, 0) + " in landings, " + fmt(r.total_len_in / 12, 1) + " ft total" },
+    { key: "hr", id: "ars-out-hr", label: "Handrails", value: (r) => r.handrails ? "required (rise > 6 in)" : "not required (rise <= 6 in)" },
+    { key: "n", id: "ars-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAdaRampSlope,
+});
+CONSTRUCTION_RENDERERS["ada-ramp-slope"] = _v474renderAdaRampSlope;

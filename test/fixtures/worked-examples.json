@@ -42899,6 +42899,228 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "motor-efficiency-upgrade-savings",
+   "source_publisher": "motor-efficiency retrofit practice",
+   "source_title": "50 hp, 75% load, 90%->94.5%, 4000 hr, $0.12 -> $710/yr saved",
+   "source_edition_or_year": "spec-v471 worked example (machine-verified)",
+   "source_section_or_page": "spec-v471 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "hp": 50,
+    "load": 0.75,
+    "eff_standard": 0.9,
+    "eff_premium": 0.945,
+    "hours": 4000,
+    "rate_kwh": 0.12
+   },
+   "outputs": {
+    "kw_standard": {
+     "value": 31.08,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kw_premium": {
+     "value": 29.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "annual_saving": {
+     "value": 710,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-efficiency-upgrade-savings",
+   "source_publisher": "motor-efficiency retrofit practice",
+   "source_title": "same swap at 100% load saves about $947/yr",
+   "source_edition_or_year": "spec-v471 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v471 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "hp": 50,
+    "load": 1.0,
+    "eff_standard": 0.9,
+    "eff_premium": 0.945,
+    "hours": 4000,
+    "rate_kwh": 0.12
+   },
+   "outputs": {
+    "annual_saving": {
+     "value": 947,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-loading-efficiency",
+   "source_publisher": "transformer loss model",
+   "source_title": "75 kVA, 200 W core, 1200 W copper, 75% load, PF 1 -> 98.47%, peak ~41%",
+   "source_edition_or_year": "spec-v472 worked example (machine-verified)",
+   "source_section_or_page": "spec-v472 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "kva_rating": 75,
+    "noload_w": 200,
+    "loadloss_w": 1200,
+    "load": 0.75,
+    "pf": 1.0
+   },
+   "outputs": {
+    "efficiency": {
+     "value": 98.47,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_eff_load": {
+     "value": 0.408,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-loading-efficiency",
+   "source_publisher": "transformer loss model",
+   "source_title": "at 25% load efficiency 98.55% but core loss dominates the small throughput",
+   "source_edition_or_year": "spec-v472 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v472 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "kva_rating": 75,
+    "noload_w": 200,
+    "loadloss_w": 1200,
+    "load": 0.25,
+    "pf": 1.0
+   },
+   "outputs": {
+    "efficiency": {
+     "value": 98.55,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "economic-conductor-sizing",
+   "source_publisher": "economic conductor sizing (I2R)",
+   "source_title": "100 A, 0.20->0.125 ohm, 4000 hr, $0.12, $800 -> $1080/yr, 0.7 yr payback",
+   "source_edition_or_year": "spec-v473 worked example (machine-verified)",
+   "source_section_or_page": "spec-v473 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "current_a": 100,
+    "r_small_ohm": 0.2,
+    "r_big_ohm": 0.125,
+    "hours": 4000,
+    "rate_kwh": 0.12,
+    "upsize_cost": 800
+   },
+   "outputs": {
+    "annual_saving": {
+     "value": 1080,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "payback_yr": {
+     "value": 0.74,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "economic-conductor-sizing",
+   "source_publisher": "economic conductor sizing (I2R)",
+   "source_title": "at 40 A the saving falls to $173/yr, a 4.6-year payback",
+   "source_edition_or_year": "spec-v473 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v473 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "current_a": 40,
+    "r_small_ohm": 0.2,
+    "r_big_ohm": 0.125,
+    "hours": 4000,
+    "rate_kwh": 0.12,
+    "upsize_cost": 800
+   },
+   "outputs": {
+    "payback_yr": {
+     "value": 4.63,
+     "tolerance": {
+      "pct": 1.0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ada-ramp-slope",
+   "source_publisher": "IBC 1012 / ADA",
+   "source_title": "24 in rise at 1:12 -> 288 in (24 ft) run, 8.33%, 1 run, handrails",
+   "source_edition_or_year": "spec-v474 worked example (machine-verified)",
+   "source_section_or_page": "spec-v474 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "rise_in": 24,
+    "slope_ratio": 12,
+    "landing_in": 60
+   },
+   "outputs": {
+    "run_in": {
+     "value": 288,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "slope_pct": {
+     "value": 8.33,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ada-ramp-slope",
+   "source_publisher": "IBC 1012 / ADA",
+   "source_title": "40 in rise -> 2 runs, one 60 in landing, 540 in (45 ft) total",
+   "source_edition_or_year": "spec-v474 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v474 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "rise_in": 40,
+    "slope_ratio": 12,
+    "landing_in": 60
+   },
+   "outputs": {
+    "total_len_in": {
+     "value": 540,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

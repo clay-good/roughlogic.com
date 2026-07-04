@@ -1501,6 +1501,7 @@ cross-check.
 | calc-concrete.js | `computeRcSlabMinThickness` | `{ l_ft = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeTBeamEffectiveFlangeWidth` | `{ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAbrasiveBlast` | `{ nozzle_bore_in, pressure_psi = 100, area_ft2, lb_per_ft2 = 8 } = {}` | _ | _ | _ |
+| calc-construction.js | `computeAdaRampSlope` | `{ rise_in = 0, slope_ratio = 12, landing_in = 60 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeAggregate` | `{ area_ft2 = 0, depth_in = 0, material = "crushed_stone" }` | _ | _ | _ |
 | calc-construction.js | `computeAllowableArea` | `{ tabular_area = 0, ns_area = 0, frontage_ft = 0, perimeter_ft = 0, open_widt...` | _ | _ | _ |
 | calc-construction.js | `computeAnchorEmbedment` | `{ uplift_lb, bolt_diameter_in, fc_psi, cracked = false, edge_distance_in = 0 }` | _ | _ | _ |
@@ -1764,6 +1765,7 @@ cross-check.
 | calc-electrical.js | `computeConduitThermalExpansion` | `{ run_length_ft = 0, temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigge...` | _ | _ | _ |
 | calc-electrical.js | `computeDeltaWyeLinePhase` | `{ configuration = "wye", line_voltage_v = 0, line_current_a = 0, power_factor...` | _ | _ | _ |
 | calc-electrical.js | `computeEGCSize` | `{ ocpd_A, material }` | _ | _ | _ |
+| calc-electrical.js | `computeEconomicConductorSizing` | `{ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, ups...` | _ | _ | _ |
 | calc-electrical.js | `computeEgcUpsizeProportional` | `{ base_egc_cmil = 0, base_phase_cmil = 0, installed_phase_cmil = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeGFCIReference` | `` | _ | _ | _ |
 | calc-electrical.js | `computeGeneratorMotorStarting` | `{ motors = [], non_motor_kW = 0, dip_factor = 0.30, starts_per_hour = "occasi...` | _ | _ | _ |
@@ -1776,6 +1778,7 @@ cross-check.
 | calc-electrical.js | `computeMinConductorForVd` | `{ phase = "single", material = "copper", current_A = 0, length_ft = 0, source...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchFromNameplate` | `{ hp = 0, voltage_V = 0, phase = 1, eta = 0.90, power_factor = 0.85, nameplat...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorBranchProtection` | `{ flc_a = 0, device_type = "inverse-time breaker" } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeMotorEfficiencyUpgradeSavings` | `{ hp = 0, load = 0, eff_standard = 0, eff_premium = 0, hours = 0, rate_kwh = ...` | _ | _ | _ |
 | calc-electrical.js | `computeMotorFLA` | `{ hp, voltage, phase }` | _ | _ | _ |
 | calc-electrical.js | `computeMultiLoadVoltageDrop` | `{ material = "copper", awg = "12", source_voltage_V = 120, loads = [], }` | _ | _ | _ |
 | calc-electrical.js | `computeOhmsLaw` | `{ V, I, R, P }` | _ | _ | _ |
@@ -1793,6 +1796,7 @@ cross-check.
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
 | calc-electrical.js | `computeThreePhase` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerKvaSizing` | `{ loads = [], primary_V = 480, secondary_V = 208, phase = "three", growth_res...` | _ | _ | _ |
+| calc-electrical.js | `computeTransformerLoadingEfficiency` | `{ kva_rating = 0, noload_w = 0, loadloss_w = 0, load = 0, pf = 1.0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerSize` | `{ load_kW, power_factor = 1, primary_V, secondary_V, phase = "three" }` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDrop` | `{ phase, material, awg, length_ft, current_A, source_voltage_V }` | _ | _ | _ |
 | calc-electrical.js | `computeVoltageDropReactance` | `{ system_voltage_v = 0, current_a = 0, length_ft = 0, r_ohm_per_kft = 0, x_oh...` | _ | _ | _ |
@@ -2583,7 +2587,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1169.
+Row count: 1173.
 
 <!-- END function-corpus-v14 -->
 
@@ -2664,7 +2668,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (112 tiles)
+### Group A Electrical (115 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2698,6 +2702,7 @@ per spec-v14 §13.1 second paragraph.
 | `copper-resistance` | Conductor Resistance at Temperature | NFPA; NEC Table 8 gives 1.93 ohm/1000 ft at 75 C uncoated coppe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `delta-wye-line-phase` | Wye / Delta Line-to-Phase Voltage and Current | First-principles three-phase theory; spec-v128 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dryer-demand-220-54` | Household Clothes Dryer Demand Load (NEC 220.54) | NEC 2023 (NFPA 70); each at 5000 W floor; 4 x 5000 = 20000 W at 100% = 83.3 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `economic-conductor-sizing` | Economic Conductor Sizing (I2R Payback) | economic conductor sizing (I2R); spec-v473 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egc-sizing` | Equipment Grounding Conductor Sizing | NFPA; Table 250.122 (60 A OCPD -> 10 AWG copper EGC) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egc-upsize-proportional` | EGC Proportional Upsize for Increased Conductors (NEC 250.122(B)) | NFPA; spec-v127 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egress-lighting-check` | Egress Lighting Illuminance Compliance Check (NFPA 101 / IBC) | NFPA 101 / IBC; spec-v367 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2720,6 +2725,7 @@ per spec-v14 §13.1 second paragraph.
 | `motor-branch-from-nameplate` | Motor Branch-Circuit from Nameplate | NFPA; §430.6(A)(1) reference-FLA tables; §430.22 125% rule; §43... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-branch-protection` | Motor Branch-Circuit Protection and Disconnect (NEC 430.52 / 430.110) | NEC 2023 (NFPA 70); 10 HP 230 V 3ph FLC 28 A x 250% = 70 A (standard); discon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-capacitor-max` | Max Capacitor kVAR at Motor Terminals (Self-Excitation Limit) | NEMA MG-1 / IEEE 18; 480 V, 8 A no-load: sqrt(3) x 480 x 8 / 1000 = 6.65 kVAR;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-efficiency-upgrade-savings` | Premium Motor Upgrade Energy Savings | motor-efficiency retrofit practice; spec-v471 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-feeder-multiple` | Feeder Sizing for Multiple Motors | NEC Articles 430.24 / 430.62 (by name); FLC 28/16/10 A, largest device 40 A -> conductor 1.25*28+... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-operating-cost` | Motor Input Power, Annual Energy, and Cost | First-principles motor input power; spec-v123 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2772,6 +2778,7 @@ per spec-v14 §13.1 second paragraph.
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-k-factor` | Transformer K-Factor From the Harmonic Spectrum (UL 1561) | UL 1561 / IEEE C57.110; K = sum(Ih^2 h^2)/sum(Ih^2) = 5.455/1.183 = 4.61 -> K-9 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-kva-sizing` | Transformer kVA Sizing and FLA | NFPA / ANSI/IEEE C57; Loads {25 kVA, 18 kVA, 7500 W @ 0.85 pf = 8.82 kVA, 15 kV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `transformer-loading-efficiency` | Transformer Loading Efficiency and Losses | transformer loss model; spec-v472 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `transformer-sizing` | Transformer Sizing | Project (first-principles); 90 kW @ 0.9 pf -> 100 kVA required; next ANSI standard st... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vfd-energy-savings` | VFD Retrofit Energy and Cost Savings (Affinity Cube Law) | US DOE motor/pump-system energy method; spec-v230 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `voltage-drop` | Voltage Drop | Project (first-principles); Standard single-phase voltage-drop derivation; K=12.9 ohm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3034,11 +3041,12 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (203 tiles)
+### Group E Construction (204 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `abrasive-blast` | Abrasive Blast Air and Abrasive Consumption | SSPC / AMPP SP specs / nozzle manufac...; 3/8 in nozzle at 100 psi, 3,000 ft^2 at 8 lb/ft^2 -> 283 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ada-ramp-slope` | ADA Ramp Slope, Runs, and Landings (IBC 1012 / ADA) | IBC 1012 / ADA; spec-v474 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `aggregate` | Aggregate / Gravel Cubic Yards | Project (first-principles); volume = 1000 * 4/12 = 333.33 ft^3; cubic_yards = 333.33/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `allowable-area` | Allowable Building Area per Story (IBC Chapter 5) | IBC 2021 §506.2 / §506.3 and Table 506.2; spec-v251 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-embedment` | Anchor Bolt Embedment | Project (public bond-strength formula); 5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3694,6 +3702,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 925. Fixture-covered or reference-cadence: 925 / 925.
+Tile count: 929. Fixture-covered or reference-cadence: 929 / 929.
 
 <!-- END tile-index-v14 -->
