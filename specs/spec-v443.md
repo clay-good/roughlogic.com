@@ -1,6 +1,6 @@
 # roughlogic.com Specification v443 -- Economizer Enthalpy Changeover (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the HVAC energy-recovery trio (v441 ERV total enthalpy ->
+> **Status: LANDED (2026-07-04, 0.152.0; proposed 2026-07-03). Third and final tile of the HVAC energy-recovery trio (v441 ERV total enthalpy ->
 > v442 radiant floor output -> v443 economizer enthalpy changeover). `economizer-savings-hours` estimates the annual free-
 > cooling hours; this tile is the control decision behind them -- whether, at a given moment, outdoor air is a better source
 > of cooling than the return air, so the economizer should open or lock out.**

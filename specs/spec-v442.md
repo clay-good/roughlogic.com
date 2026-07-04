@@ -1,6 +1,6 @@
 # roughlogic.com Specification v442 -- Radiant Floor Heat Output (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the HVAC energy-recovery trio (v441 ERV total enthalpy -> v442 radiant
+> **Status: LANDED (2026-07-04, 0.152.0; proposed 2026-07-03). Second tile of the HVAC energy-recovery trio (v441 ERV total enthalpy -> v442 radiant
 > floor output -> v443 economizer enthalpy changeover). `radiant-loop-sizing` sizes the tubing footage and flow but states
 > it does not do the panel surface-temperature design; this tile fills exactly that gap -- the heat a warm floor gives off
 > and the surface temperature a load requires.**

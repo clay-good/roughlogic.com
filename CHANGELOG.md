@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v441..v443 -- 3 energy-recovery / hydronic / economizer tiles in calc-hvac.js; 901 -> 904 tiles, 0.152.0, 2026-07-04
+
+The HVAC energy-recovery / hydronic / economizer trio, twenty-first batch of the v375-v474 campaign, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **901 -> 904**, package **0.151.0 -> 0.152.0** (a minor). Proposed 2026-07-03.
+
+- **`erv-total-enthalpy-recovery` (spec-v441).** Q = 4.5 x CFM x effectiveness x (h_oa - h_ra), supply enthalpy from the effectiveness. Pinned: 1000 CFM, 0.75, 38 -> 28 Btu/lb -> 33,750 Btu/hr recovered, 30.5 Btu/lb supply; a winter 12 vs 28 Btu/lb recovers -54,000 Btu/hr (heating). Feeds off moist-air-enthalpy.
+- **`radiant-floor-output` (spec-v442).** q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2, solvable both ways, with the ~85 F surface comfort cap. Pinned: an 85 F floor over a 70 F room -> 39.3 Btu/hr-ft^2 (at the cap); a 30 Btu/hr-ft^2 load needs an 81.7 F surface. Distinct from radiant-loop-sizing (which sizes the tubing).
+- **`economizer-enthalpy-changeover` (spec-v443).** differential-enthalpy (enable if outdoor enthalpy < return) or fixed-dry-bulb high-limit. Pinned: OA 24 vs RA 28 Btu/lb -> enable (4 margin); a humid OA 32 vs 28 locks out even when cool; fixed 70 F vs 65 F setpoint locks out. Distinct from economizer-savings-hours (which counts the free-cooling energy).
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the cooling/heating recovery, both solve directions and the comfort cap, both changeover modes, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming AHRI 1060, radiant-panel practice, and ASHRAE 90.1. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (ERV via `_rEnv`, the radiant and economizer tiles hand-written with a mode select). Module caps bumped with dated comments: calc-hvac.js 68000 -> 74000 and citations.js 320000 -> 360000 (both trending up over the campaign). Housekeeping: home count 901 -> 904, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 84 appended. All gates green at the new state: lint, unit tests (**5,197**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(construction): land spec-v439..v440 -- 2 finish-carpentry takeoff tiles (v438 cut as dupe); 899 -> 901 tiles, 0.151.0, 2026-07-04
 
 The finish-carpentry takeoff pair, twentieth batch of the v375-v474 campaign: the batt insulation count and the trim linear footage, in the existing lazy `calc-construction.js` (Group E). The proposed trio's first tile, v438 `flooring-plank-layout`, was cut as a duplicate of the existing `flooring-takeoff` (same boxes-of-plank + row-layout deliverable), so only two landed. Catalog **899 -> 901**, package **0.150.0 -> 0.151.0** (a minor). Proposed 2026-07-03.

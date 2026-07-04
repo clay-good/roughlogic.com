@@ -1956,9 +1956,11 @@ cross-check.
 | calc-hvac.js | `computeDuctHeatGain` | `{ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctLeakage` | `{ design_cfm = 0, measured_cfm = 0, duct_surface_ft2 = 0, test_pressure_inwc ...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctSize` | `{ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }` | _ | _ | _ |
+| calc-hvac.js | `computeEconomizerEnthalpyChangeover` | `{ mode = "differential_enthalpy", h_outdoor = 0, h_return = 0, t_outdoor_f = ...` | _ | _ | _ |
 | calc-hvac.js | `computeEconomizerSavingsHours` | `{ cfm = 0, delta_t_f = 0, hours = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeErvSensibleRecovery` | `{ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeErvTotalEnthalpyRecovery` | `{ cfm = 0, effectiveness = 0, h_outdoor = 0, h_return = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFanAffinityLaws` | `{ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
@@ -1978,6 +1980,7 @@ cross-check.
 | calc-hvac.js | `computeOutdoorAirVentilation` | `{ Rp_cfm_per_person = 0, Ra_cfm_per_ft2 = 0, people = 0, floor_area_ft2 = 0, ...` | _ | _ | _ |
 | calc-hvac.js | `computePipeHeatLossRadial` | `{ od_in = 0, thickness_in = 0, k_value = 0, hot_f = 0, amb_f = 0, length_ft =...` | _ | _ | _ |
 | calc-hvac.js | `computePumpSpecificSpeed` | `{ n_rpm = 0, q_gpm = 0, h_ft = 0 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeRadiantFloorOutput` | `{ mode = "surface_to_q", t_surface_f = 0, t_room_f = 70, q_target = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeReynoldsNumberPipe` | `{ v_fps = 0, d_in = 0, nu = 1.21e-5 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeRoundToRectDuct` | `{ mode = "rect-to-round", round_diameter_in = 0, side_a_in = 0, side_b_in = 0...` | _ | _ | _ |
 | calc-hvac.js | `computeSHR` | `{ sensible_btu_hr, total_btu_hr }` | _ | _ | _ |
@@ -2559,7 +2562,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1145.
+Row count: 1148.
 
 <!-- END function-corpus-v14 -->
 
@@ -2842,7 +2845,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (98 tiles)
+### Group C HVAC (101 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2885,10 +2888,12 @@ per spec-v14 §13.1 second paragraph.
 | `duct-sizing` | Duct Sizing | ACCA Manual D / ASHRAE Fundamentals; 400 cfm @ 0.08 in WC / 100 ft -> 10.14 in round (9.28 in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-static-pressure-total` | Total External Static Pressure | ACCA Manual D / SMACNA (by name); filter 0.10 + registers 0.03 + grille 0.03 + coil 0.30 + ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-velocity-pressure` | Duct Velocity Pressure | ACCA Manual D / ASHRAE Fundamentals (...; VP 0.25 in. w.c. -> V = 4005 * 0.5 = 2002.5 fpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `economizer-enthalpy-changeover` | Economizer Enthalpy Changeover | ASHRAE 90.1; spec-v443 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `economizer-savings-hours` | Air-Side Economizer Free-Cooling Hours | ASHRAE sensible-heat relation + Stand...; 4000 CFM, dT 20 F -> 86,400 BTU/hr | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `envelope-conduction-load` | Opaque-Envelope Conduction Cooling Load (Sol-Air CLTD) | ASHRAE / ACCA Manual J opaque envelope; spec-v229 section 2.1 pinned example (dark roof) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `erv-sensible-recovery` | ERV/HRV Sensible Effectiveness and Recovered Load | ASHRAE Standard 84 / AHRI Standard 10...; spec-v275 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `erv-total-enthalpy-recovery` | ERV Total Enthalpy Recovery | ASHRAE Fundamentals; spec-v441 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `evaporative-cooling` | Latent Heat Evaporative Cooling | Project (first-principles); Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporator-td-dtd` | Evaporator Design TD and Humidity Band | ASHRAE Refrigeration; spec-v434 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fan-affinity-laws` | Fan Affinity Laws (Speed / Diameter Change) | AMCA / ASHRAE Fundamentals; spec-v384 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2923,6 +2928,7 @@ per spec-v14 §13.1 second paragraph.
 | `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `product-pull-down-load` | Product Pull-Down Load | ASHRAE Refrigeration; spec-v433 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pump-specific-speed` | Pump Specific Speed and Impeller Type | Hydraulic Institute specific speed; spec-v307 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `radiant-floor-output` | Radiant Floor Heat Output | radiant-panel practice; spec-v442 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `recovery-cylinder` | Recovery-Cylinder 80% Fill | DOT / AHRI 700 / EPA Section 608 reco...; spec-v102 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `refrigerant-charge` | Refrigerant Charge Weighing | Chemours / Honeywell published refrig...; R-410A / 25 ft of 3/8 in + 5 ft of 1/2 in -> 15 + 4.75 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-charging` | Refrigerant Superheat / Subcooling (psig-psia toggle) | ACCA / NATE refrigerant-charging meth...; R_410A / 130 psig suction / 50 F suction-line / 350 psig ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3646,6 +3652,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 901. Fixture-covered or reference-cadence: 901 / 901.
+Tile count: 904. Fixture-covered or reference-cadence: 904 / 904.
 
 <!-- END tile-index-v14 -->

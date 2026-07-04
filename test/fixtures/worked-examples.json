@@ -41679,6 +41679,151 @@
           }
         }
       }
+    },
+    {
+      "tile_id": "erv-total-enthalpy-recovery",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "1000 CFM, 0.75, 38 -> 28 Btu/lb -> 33,750 Btu/hr, 30.5 Btu/lb supply",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v441 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "cfm": 1000,
+        "effectiveness": 0.75,
+        "h_outdoor": 38,
+        "h_return": 28
+      },
+      "outputs": {
+        "q_total_btuh": {
+          "value": 33750,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "h_supply": {
+          "value": 30.5,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "erv-total-enthalpy-recovery",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "cross-check: winter 12 vs 28 Btu/lb -> -54,000 Btu/hr (heating recovery)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v441 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "cfm": 1000,
+        "effectiveness": 0.75,
+        "h_outdoor": 12,
+        "h_return": 28
+      },
+      "outputs": {
+        "q_total_btuh": {
+          "value": -54000,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "radiant-floor-output",
+      "source_publisher": "radiant-panel practice",
+      "source_title": "85 F floor, 70 F room -> 39.3 Btu/hr-ft^2 (at the comfort limit)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v442 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "mode": "surface_to_q",
+        "t_surface_f": 85,
+        "t_room_f": 70,
+        "q_target": 0
+      },
+      "outputs": {
+        "q_btuh_ft2": {
+          "value": 39.3,
+          "tolerance": {
+            "pct": 1
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "radiant-floor-output",
+      "source_publisher": "radiant-panel practice",
+      "source_title": "cross-check: a 30 Btu/hr-ft^2 load needs an 81.7 F surface (under the 85 F cap)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v442 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "mode": "q_to_surface",
+        "t_room_f": 70,
+        "q_target": 30
+      },
+      "outputs": {
+        "t_surface_out_f": {
+          "value": 81.7,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "economizer-enthalpy-changeover",
+      "source_publisher": "ASHRAE 90.1",
+      "source_title": "differential enthalpy, OA 24 vs RA 28 Btu/lb -> enable, 4 Btu/lb margin",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v443 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "mode": "differential_enthalpy",
+        "h_outdoor": 24,
+        "h_return": 28,
+        "t_outdoor_f": 70,
+        "setpoint_f": 65
+      },
+      "outputs": {
+        "margin": {
+          "value": 4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "economizer-enthalpy-changeover",
+      "source_publisher": "ASHRAE 90.1",
+      "source_title": "cross-check: a humid OA 32 vs 28 Btu/lb locks out (-4 margin)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v443 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "mode": "differential_enthalpy",
+        "h_outdoor": 32,
+        "h_return": 28,
+        "t_outdoor_f": 70,
+        "setpoint_f": 65
+      },
+      "outputs": {
+        "margin": {
+          "value": -4,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
     }
   ]
 }

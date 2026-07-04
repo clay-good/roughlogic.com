@@ -255,6 +255,8 @@ const TOOL_MODULES = (() => {
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
     "moist-air-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
     "fan-affinity-laws", "colebrook-friction-factor", "manual-d-friction-rate",
+    // spec-v441..v443 energy-recovery / hydronic / economizer
+    "erv-total-enthalpy-recovery", "radiant-floor-output", "economizer-enthalpy-changeover",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

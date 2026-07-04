@@ -160,6 +160,7 @@ const _TILES = [
   // spec-v227..v229 cooling-load-components batch
   ["window-solar-heat-gain", "C"], ["internal-heat-gains", "C"], ["envelope-conduction-load", "C"],
   ["manual-d-friction-rate", "C"], ["coil-face-velocity", "C"], ["vav-box-airflow", "C"],
+  ["erv-total-enthalpy-recovery", "C"], ["radiant-floor-output", "C"], ["economizer-enthalpy-changeover", "C"],
   ["duct-velocity-pressure", "C"], ["refrigerant-velocity", "C"],
 
   ["psychrometric", "D"], ["drying-goal", "D"], ["dehumidifier", "D"],

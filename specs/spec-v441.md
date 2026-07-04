@@ -1,6 +1,6 @@
 # roughlogic.com Specification v441 -- ERV Total Enthalpy Recovery (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an HVAC energy-recovery trio (v441 ERV total enthalpy -> v442 radiant floor
+> **Status: LANDED (2026-07-04, 0.152.0; proposed 2026-07-03). First tile of an HVAC energy-recovery trio (v441 ERV total enthalpy -> v442 radiant floor
 > output -> v443 economizer enthalpy changeover). `erv-sensible-recovery` recovers only the temperature (sensible) energy; a
 > true enthalpy wheel or membrane ERV also moves moisture, and this tile computes that total recovery from the enthalpy
 > difference.**

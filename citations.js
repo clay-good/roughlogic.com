@@ -9795,6 +9795,42 @@ export const CITATIONS = {
       { name: "TEL", value: "longest supply+return path incl. fitting equivalent lengths", source: "scope of this tile" },
     ],
   },
+  "erv-total-enthalpy-recovery": {
+    formula: "Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return); h_supply = h_outdoor - effectiveness x (h_outdoor - h_return).",
+    edition: "The energy-recovery-ventilator total (enthalpy) recovery relation (ASHRAE Handbook - Fundamentals / AHRI 1060 effectiveness), by name.",
+    freeAccess: "The 4.5 x CFM x effectiveness x enthalpy-difference total-recovery relation is a standard published air-side result; the effectiveness is the AHRI 1060 rating.",
+    governance: GOVERNANCE.general,
+    editionNote: "ERV total (enthalpy) recovery: Q = 4.5 x CFM x the total-energy effectiveness x (the outdoor-air enthalpy - the return/exhaust-air enthalpy) Btu/hr (4.5 = 60 x 0.075 standard air), and the air leaving the wheel toward the space has an enthalpy = h_outdoor - effectiveness x (h_outdoor - h_return). In summer the outdoor air carries more energy than the return, so the wheel pre-cools and dries the ventilation air (a positive Q, offloading the cooling coil); in winter it pre-warms and humidifies it (a negative Q). The effectiveness is the AHRI 1060-rated total-energy value at the design airflow. Feed the two enthalpies from moist-air-enthalpy. This returns the recovered energy and the supply state; it does not add the fan energy or the frost-control penalty. A design aid; the ERV manufacturer's rated effectiveness governs.",
+    assumptions: [
+      { name: "Total recovery", value: "Q = 4.5 x CFM x effectiveness x (h_oa - h_ra)", source: "ASHRAE Fundamentals" },
+      { name: "Supply state", value: "h_supply = h_oa - effectiveness x (h_oa - h_ra)", source: "definition of effectiveness" },
+      { name: "Rated effectiveness", value: "the AHRI 1060 total-energy effectiveness at design airflow", source: "scope of this tile" },
+    ],
+  },
+  "radiant-floor-output": {
+    formula: "q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2; inverse T_surface = T_room + (q/2)^(1/1.1); comfort cap ~85 F surface.",
+    edition: "The radiant-floor heat-output relation q = 2 (Tsurface - Troom)^1.1 with the ~85 F surface comfort limit, from ASHRAE / radiant-panel practice, by name.",
+    freeAccess: "The floor heat-output correlation and the ~85 F comfort limit are standard published radiant-heating results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Radiant floor heat output: the combined radiant-plus-convective output of a warm floor is about q = 2 x (the mean surface temperature - the room air temperature)^1.1 Btu/hr-ft^2, solvable in either direction (the output from a surface temperature, or the surface temperature needed for a target output). The mean surface temperature is held to about 85 F for foot comfort (ASHRAE), which caps the output near 39 Btu/hr-ft^2 in a 70 F room; a higher load needs more floor area, a supplemental emitter, or a warmer design condition, not a hotter floor. The surface temperature itself follows from the water temperature, the tube spacing, and the floor-covering resistance (see radiant-loop-sizing for the tubing layout). A design aid; the panel manufacturer's ratings govern.",
+    assumptions: [
+      { name: "Output", value: "q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2", source: "radiant-panel practice" },
+      { name: "Comfort cap", value: "mean surface temperature limited to ~85 F (~39 Btu/hr-ft^2 in a 70 F room)", source: "ASHRAE comfort" },
+      { name: "Tubing separate", value: "the surface temperature follows from water temp, spacing, and covering", source: "scope of this tile" },
+    ],
+  },
+  "economizer-enthalpy-changeover": {
+    formula: "differential enthalpy: enable if h_outdoor < h_return; fixed dry-bulb: enable if t_outdoor < setpoint; margin = the difference to the limit.",
+    edition: "The air-side economizer high-limit (changeover) control, differential enthalpy and fixed dry-bulb, from ASHRAE 90.1 6.5.1.1.3, by name.",
+    freeAccess: "The differential-enthalpy and fixed-dry-bulb high-limit logic is the published ASHRAE 90.1 economizer control requirement.",
+    governance: GOVERNANCE.general,
+    editionNote: "The air-side economizer high-limit (changeover) control per ASHRAE 90.1 Table 6.5.1.1.3. In differential-enthalpy mode the economizer is enabled (free cooling) when the outdoor-air total heat content (enthalpy) is below the return-air enthalpy and locked out above it, which correctly rejects a cool but humid outdoor condition that carries more total energy than the return (bringing it in would add a dehumidification load). In fixed-dry-bulb mode it is enabled below a dry-bulb setpoint (commonly 65-75 F by climate zone) and locked out above; this is simpler but ignores humidity. This returns the enable/lock-out decision and the margin to the changeover; it does not model the mixed-air reset, the minimum-position damper, or the actual free-cooling energy (see economizer-savings-hours). A control aid; the ASHRAE 90.1 high-limit for the climate zone and the equipment control sequence govern.",
+    assumptions: [
+      { name: "Differential enthalpy", value: "enable when h_outdoor < h_return (accounts for latent load)", source: "ASHRAE 90.1 6.5.1.1.3" },
+      { name: "Fixed dry-bulb", value: "enable below a dry-bulb setpoint (climate-zone dependent)", source: "ASHRAE 90.1 6.5.1.1.3" },
+      { name: "Decision only", value: "does not model reset, minimum position, or free-cooling energy", source: "scope of this tile" },
+    ],
+  },
   "coil-face-velocity": {
     formula: "face_area = w x h / 144; face_velocity = CFM / face_area; carryover if velocity > threshold (~500 fpm).",
     edition: "The cooling-coil face velocity and the moisture-carryover limit, standard coil-selection practice (ASHRAE), by name.",

@@ -3842,3 +3842,148 @@ HVAC_RENDERERS["manual-d-friction-rate"] = _rEnv({
   ],
   compute: computeManualDFrictionRate,
 });
+
+// ===================== spec-v441..v443: HVAC energy-recovery / hydronic / economizer trio (Group C) =====================
+
+// dims: in { cfm: L^3 T^-1, effectiveness: dimensionless, h_outdoor: L^2 T^-2, h_return: L^2 T^-2 } out: { q_total_btuh: M L^2 T^-3, h_supply: L^2 T^-2 }
+export function computeErvTotalEnthalpyRecovery({ cfm = 0, effectiveness = 0, h_outdoor = 0, h_return = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const q = Number(cfm) || 0;
+  const eff = Number(effectiveness) || 0;
+  const hoa = Number(h_outdoor);
+  const hra = Number(h_return);
+  if (!(q > 0)) return { error: "Ventilation airflow must be positive (cfm)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Effectiveness must be between 0 and 1." };
+  if (!Number.isFinite(hoa) || !Number.isFinite(hra)) return { error: "Enter valid enthalpies (Btu/lb)." };
+  const q_total_btuh = 4.5 * q * eff * (hoa - hra);
+  const h_supply = hoa - eff * (hoa - hra);
+  return {
+    q_total_btuh, h_supply, cooling: q_total_btuh > 0,
+    note: "ERV total (enthalpy) recovery: Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return) Btu/hr, and the air leaving the wheel toward the space is h_supply = h_outdoor - effectiveness x (h_outdoor - h_return). In summer the outdoor air is more energetic than the return, so the wheel pre-cools and dries the incoming air (a positive Q, a cooling recovery that offloads the coil); in winter it pre-warms and humidifies it (a negative Q, a heating recovery). The effectiveness is the wheel's total-energy rating at the design airflow. Feed the two enthalpies from moist-air-enthalpy. A design aid; the ERV manufacturer's rated effectiveness governs.",
+  };
+}
+const ervTotalEnthalpyRecoveryExample = { inputs: { cfm: 1000, effectiveness: 0.75, h_outdoor: 38, h_return: 28 } };
+HVAC_RENDERERS["erv-total-enthalpy-recovery"] = _rEnv({
+  citation: "Citation: ERV total (enthalpy) recovery (ASHRAE Handbook - Fundamentals / AHRI 1060): Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return) Btu/hr, supply enthalpy = h_outdoor - effectiveness x (h_outdoor - h_return). Positive Q is a summer cooling recovery, negative a winter heating recovery. A design aid; the ERV's rated effectiveness governs.",
+  example: ervTotalEnthalpyRecoveryExample.inputs,
+  fields: [
+    { key: "cfm", label: "Ventilation airflow through the ERV (cfm)", kind: "number", default: 1000 },
+    { key: "effectiveness", label: "Enthalpy (total-energy) effectiveness (0-1)", kind: "number", default: 0.75 },
+    { key: "h_outdoor", label: "Outdoor-air enthalpy (Btu/lb)", kind: "number", default: 38 },
+    { key: "h_return", label: "Return/exhaust-air enthalpy (Btu/lb)", kind: "number", default: 28 },
+  ],
+  outputs: [
+    { key: "q", id: "erv-out-q", label: "Total energy recovered", value: (r) => (r.cooling ? "" : "heating: ") + fmt(Math.abs(r.q_total_btuh), 0) + " Btu/hr" + (r.cooling ? " (cooling recovery)" : "") },
+    { key: "h", id: "erv-out-h", label: "Supply-air enthalpy leaving the wheel", value: (r) => fmt(r.h_supply, 2) + " Btu/lb" },
+    { key: "n", id: "erv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeErvTotalEnthalpyRecovery,
+});
+
+// dims: in { mode: dimensionless, t_surface_f: T, t_room_f: T, q_target: M T^-3 } out: { q_btuh_ft2: M T^-3, t_surface_out_f: T }
+export function computeRadiantFloorOutput({ mode = "surface_to_q", t_surface_f = 0, t_room_f = 70, q_target = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const room = Number(t_room_f);
+  if (!Number.isFinite(room)) return { error: "Enter a valid room temperature (F)." };
+  if (mode === "q_to_surface") {
+    const q = Number(q_target) || 0;
+    if (!(q > 0)) return { error: "Target output must be positive (Btu/hr-ft^2)." };
+    const t_surface_out_f = room + Math.pow(q / 2, 1 / 1.1);
+    return {
+      mode, q_btuh_ft2: q, t_surface_out_f, comfort_ok: t_surface_out_f <= 85,
+      note: "Radiant floor heat output (the standard q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2 relation): here solved inverse for the mean floor surface temperature that delivers the target output. The 85 F comfort limit caps the output at about 39 Btu/hr-ft^2 for a 70 F room; a higher load needs supplemental heat or a warmer design condition, not a hotter floor. The output scales with the surface-to-room difference, set by the water temperature, tube spacing, and floor covering resistance (see radiant-loop-sizing for the tubing). A design aid; the panel manufacturer's ratings govern.",
+    };
+  }
+  const surf = Number(t_surface_f);
+  if (!Number.isFinite(surf)) return { error: "Enter a valid surface temperature (F)." };
+  if (!(surf > room)) return { error: "Surface temperature must be above the room temperature." };
+  const q_btuh_ft2 = 2 * Math.pow(surf - room, 1.1);
+  return {
+    mode, q_btuh_ft2, t_surface_out_f: surf, comfort_ok: surf <= 85,
+    note: "Radiant floor heat output: q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2, the combined convective-plus-radiant output of a warm floor. Comfort caps the mean surface temperature at about 85 F (a warmer floor is uncomfortable underfoot), which limits the output to roughly 39 Btu/hr-ft^2 in a 70 F room; a higher load needs more floor area or supplemental heat. The surface temperature follows from the water temperature, tube spacing, and floor covering (see radiant-loop-sizing). A design aid; the panel manufacturer's ratings govern.",
+  };
+}
+export const radiantFloorOutputExample = { inputs: { mode: "surface_to_q", t_surface_f: 85, t_room_f: 70, q_target: 0 } };
+function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Radiant floor heat output q = 2 x (T_surface - T_room)^1.1 Btu/hr-ft^2 (ASHRAE / radiant-panel practice), with the ~85 F mean-surface comfort limit (~39 Btu/hr-ft^2 in a 70 F room). A design aid; the panel manufacturer's ratings govern.";
+  const mode = makeSelect("Solve for", "rfo-mode", [
+    { value: "surface_to_q", label: "Output from a surface temperature" },
+    { value: "q_to_surface", label: "Surface temperature for a target output" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const surf = makeNumber("Floor mean surface temperature (F)", "rfo-surf", { step: "any" }); surf.input.value = "85";
+  const room = makeNumber("Room air temperature (F)", "rfo-room", { step: "any" }); room.input.value = "70";
+  const qt = makeNumber("Target output (Btu/hr-ft^2)", "rfo-qt", { step: "any", min: "0" }); qt.input.value = "30";
+  for (const f of [surf, room, qt]) inputRegion.appendChild(f.wrap);
+  const oQ = makeOutputLine(outputRegion, "Heat output", "rfo-out-q");
+  const oS = makeOutputLine(outputRegion, "Mean surface temperature", "rfo-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "rfo-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function sync() { const inv = mode.select.value === "q_to_surface"; surf.wrap.style.display = inv ? "none" : ""; qt.wrap.style.display = inv ? "" : "none"; }
+  const update = debounce(() => {
+    const r = computeRadiantFloorOutput({ mode: mode.select.value, t_surface_f: readNum(surf.input), t_room_f: readNum(room.input), q_target: readNum(qt.input) });
+    if (r.error) { oQ.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.q_btuh_ft2, 1) + " Btu/hr-ft^2";
+    oS.textContent = fmt(r.t_surface_out_f, 1) + " F" + (r.comfort_ok ? " (within 85 F comfort limit)" : " -- OVER the 85 F comfort limit");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "surface_to_q"; surf.input.value = "85"; room.input.value = "70"; qt.input.value = "30"; sync(); update(); });
+  mode.select.addEventListener("change", () => { sync(); update(); });
+  for (const f of [surf, room, qt]) f.input.addEventListener("input", update);
+  sync();
+}
+HVAC_RENDERERS["radiant-floor-output"] = _v442renderRadiantFloorOutput;
+
+// dims: in { mode: dimensionless, h_outdoor: L^2 T^-2, h_return: L^2 T^-2, t_outdoor_f: T, setpoint_f: T } out: { enable: dimensionless, margin: dimensionless }
+export function computeEconomizerEnthalpyChangeover({ mode = "differential_enthalpy", h_outdoor = 0, h_return = 0, t_outdoor_f = 0, setpoint_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (mode === "fixed_drybulb") {
+    const toa = Number(t_outdoor_f);
+    const sp = Number(setpoint_f);
+    if (!Number.isFinite(toa) || !Number.isFinite(sp)) return { error: "Enter valid temperatures (F)." };
+    const enable = toa < sp;
+    return {
+      mode, enable, margin: sp - toa, unit: "F",
+      note: "Fixed-dry-bulb economizer high-limit: enable free cooling when the outdoor dry-bulb is below the setpoint (commonly 65-75 F by climate zone, ASHRAE 90.1 Table 6.5.1.1.3), lock out above it. Simple and reliable but it ignores humidity, so in a humid climate it can bring in muggy air that the coil must then dehumidify. The differential-enthalpy mode is the more accurate high-limit where latent load matters. A control aid; the ASHRAE 90.1 high-limit for the climate zone and the equipment sequence govern.",
+    };
+  }
+  const hoa = Number(h_outdoor);
+  const hra = Number(h_return);
+  if (!Number.isFinite(hoa) || !Number.isFinite(hra)) return { error: "Enter valid enthalpies (Btu/lb)." };
+  const enable = hoa < hra;
+  return {
+    mode, enable, margin: hra - hoa, unit: "Btu/lb",
+    note: "Differential-enthalpy economizer high-limit: enable free cooling when the outdoor-air total heat content (enthalpy) is below the return-air enthalpy, lock out above it. Unlike a dry-bulb changeover this accounts for the latent (moisture) load, so a cool but humid outdoor condition that carries more total energy than the return correctly locks the economizer out - bringing that air in would add a dehumidification load. Feed the enthalpies from moist-air-enthalpy. A control aid; the ASHRAE 90.1 high-limit and the equipment sequence govern.",
+  };
+}
+export const economizerEnthalpyChangeoverExample = { inputs: { mode: "differential_enthalpy", h_outdoor: 24, h_return: 28, t_outdoor_f: 70, setpoint_f: 65 } };
+function _v443renderEconomizerEnthalpyChangeover(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Economizer high-limit changeover (ASHRAE 90.1 6.5.1.1.3): differential-enthalpy enables free cooling when outdoor enthalpy < return enthalpy (accounts for latent load); fixed-dry-bulb enables below a dry-bulb setpoint. A control aid; the 90.1 high-limit for the climate zone and the equipment sequence govern.";
+  const mode = makeSelect("Changeover type", "eco-mode", [
+    { value: "differential_enthalpy", label: "Differential enthalpy (accounts for humidity)" },
+    { value: "fixed_drybulb", label: "Fixed dry-bulb setpoint" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const hoa = makeNumber("Outdoor-air enthalpy (Btu/lb)", "eco-hoa", { step: "any" }); hoa.input.value = "24";
+  const hra = makeNumber("Return-air enthalpy (Btu/lb)", "eco-hra", { step: "any" }); hra.input.value = "28";
+  const toa = makeNumber("Outdoor dry-bulb (F)", "eco-toa", { step: "any" }); toa.input.value = "70";
+  const sp = makeNumber("Fixed high-limit setpoint (F)", "eco-sp", { step: "any" }); sp.input.value = "65";
+  for (const f of [hoa, hra, toa, sp]) inputRegion.appendChild(f.wrap);
+  const oE = makeOutputLine(outputRegion, "Economizer", "eco-out-e");
+  const oM = makeOutputLine(outputRegion, "Margin to changeover", "eco-out-m");
+  const oNote = makeOutputLine(outputRegion, "Note", "eco-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function sync() { const en = mode.select.value === "differential_enthalpy"; hoa.wrap.style.display = en ? "" : "none"; hra.wrap.style.display = en ? "" : "none"; toa.wrap.style.display = en ? "none" : ""; sp.wrap.style.display = en ? "none" : ""; }
+  const update = debounce(() => {
+    const r = computeEconomizerEnthalpyChangeover({ mode: mode.select.value, h_outdoor: readNum(hoa.input), h_return: readNum(hra.input), t_outdoor_f: readNum(toa.input), setpoint_f: readNum(sp.input) });
+    if (r.error) { oE.textContent = r.error; oM.textContent = "-"; oNote.textContent = ""; return; }
+    oE.textContent = r.enable ? "ENABLE free cooling" : "LOCK OUT (mechanical cooling)";
+    oM.textContent = (r.margin >= 0 ? "+" : "") + fmt(r.margin, 1) + " " + r.unit + (r.enable ? " below the limit" : " over the limit");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "differential_enthalpy"; hoa.input.value = "24"; hra.input.value = "28"; toa.input.value = "70"; sp.input.value = "65"; sync(); update(); });
+  mode.select.addEventListener("change", () => { sync(); update(); });
+  for (const f of [hoa, hra, toa, sp]) f.input.addEventListener("input", update);
+  sync();
+}
+HVAC_RENDERERS["economizer-enthalpy-changeover"] = _v443renderEconomizerEnthalpyChangeover;

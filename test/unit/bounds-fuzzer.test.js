@@ -16116,3 +16116,47 @@ test("bounds: spec-v440 computeTrimLinearFootage pins the footage, the corner cu
   assert.ok("error" in _v440({ perimeter_ft: 0, openings_ft: 6, waste_pct: 10 }));
   assert.ok("error" in _v440({ perimeter_ft: Infinity, openings_ft: 6, waste_pct: 10 }));
 });
+
+// ===================== spec-v441..v443 HVAC energy-recovery / hydronic / economizer trio (calc-hvac.js) =====================
+import { computeErvTotalEnthalpyRecovery as _v441, computeRadiantFloorOutput as _v442, computeEconomizerEnthalpyChangeover as _v443 } from "../../calc-hvac.js";
+
+test("bounds: spec-v441 computeErvTotalEnthalpyRecovery pins the recovery, supply state, heating case, and error seams", () => {
+  const r = _v441({ cfm: 1000, effectiveness: 0.75, h_outdoor: 38, h_return: 28 });
+  assert.ok(Math.abs(r.q_total_btuh - 33750) < 1e-6 && r.cooling === true);
+  assert.ok(Math.abs(r.h_supply - 30.5) < 1e-9);
+  // Winter: outdoor colder/drier than return -> negative Q (heating recovery).
+  const winter = _v441({ cfm: 1000, effectiveness: 0.75, h_outdoor: 12, h_return: 28 });
+  assert.ok(Math.abs(winter.q_total_btuh + 54000) < 1e-6 && winter.cooling === false);
+  // Error seams.
+  assert.ok("error" in _v441({ cfm: 0, effectiveness: 0.75, h_outdoor: 38, h_return: 28 }));
+  assert.ok("error" in _v441({ cfm: 1000, effectiveness: 1.5, h_outdoor: 38, h_return: 28 }));
+  assert.ok("error" in _v441({ cfm: 1000, effectiveness: 0.75, h_outdoor: Infinity, h_return: 28 }));
+});
+
+test("bounds: spec-v442 computeRadiantFloorOutput pins both directions, the comfort cap, and error seams", () => {
+  const r = _v442({ mode: "surface_to_q", t_surface_f: 85, t_room_f: 70 });
+  assert.ok(Math.abs(r.q_btuh_ft2 - 2 * Math.pow(15, 1.1)) < 1e-9 && r.comfort_ok === true);
+  // Inverse: the surface needed for a target output.
+  const inv = _v442({ mode: "q_to_surface", t_room_f: 70, q_target: 30 });
+  assert.ok(Math.abs(inv.t_surface_out_f - (70 + Math.pow(15, 1 / 1.1))) < 1e-9 && inv.comfort_ok === true);
+  // A hot surface exceeds the comfort cap.
+  assert.ok(_v442({ mode: "surface_to_q", t_surface_f: 95, t_room_f: 70 }).comfort_ok === false);
+  // Error seams.
+  assert.ok("error" in _v442({ mode: "surface_to_q", t_surface_f: 70, t_room_f: 70 }));
+  assert.ok("error" in _v442({ mode: "q_to_surface", t_room_f: 70, q_target: 0 }));
+  assert.ok("error" in _v442({ mode: "surface_to_q", t_surface_f: Infinity, t_room_f: 70 }));
+});
+
+test("bounds: spec-v443 computeEconomizerEnthalpyChangeover pins both modes, the decision, and error seams", () => {
+  const en = _v443({ mode: "differential_enthalpy", h_outdoor: 24, h_return: 28 });
+  assert.ok(en.enable === true && Math.abs(en.margin - 4) < 1e-9 && en.unit === "Btu/lb");
+  // A humid outdoor condition (higher enthalpy) locks out even if cool.
+  const humid = _v443({ mode: "differential_enthalpy", h_outdoor: 32, h_return: 28 });
+  assert.ok(humid.enable === false && Math.abs(humid.margin + 4) < 1e-9);
+  // Fixed dry-bulb mode.
+  assert.ok(_v443({ mode: "fixed_drybulb", t_outdoor_f: 70, setpoint_f: 65 }).enable === false);
+  assert.ok(_v443({ mode: "fixed_drybulb", t_outdoor_f: 60, setpoint_f: 65 }).enable === true);
+  // Error seams.
+  assert.ok("error" in _v443({ mode: "differential_enthalpy", h_outdoor: Infinity, h_return: 28 }));
+  assert.ok("error" in _v443({ mode: "fixed_drybulb", t_outdoor_f: NaN, setpoint_f: 65 }));
+});
