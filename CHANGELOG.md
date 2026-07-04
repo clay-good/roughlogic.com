@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): land spec-v378..v380 -- 3 concrete material-properties tiles in calc-concrete.js; 846 -> 849 tiles, 0.133.0, 2026-07-03
+
+The concrete material-properties trio, second batch of the v375-v474 campaign: the three ACI 318-19 Chapter 19/24 numbers every deflection, cracking, and slab-detailing check depends on, all in the existing lazy `calc-concrete.js` (Group E); no new module, group, or dependency. Catalog **846 -> 849**, package **0.132.0 -> 0.133.0** (a minor). Proposed 2026-07-03.
+
+- **`concrete-elastic-modulus` (spec-v378).** Ec = wc^1.5 x 33 x sqrt(f'c) psi (ACI 19.2.2.1), the stiffness behind every deflection, drift, and short-column check; the normalweight shortcut is 57000 x sqrt(f'c). Pinned: 4000 psi at 145 pcf -> 3,644,000 psi (3644 ksi), the shortcut 3,605,000 within 1%; a 115 pcf lightweight deck -> 2,573,000 psi, about 70% as stiff. wc outside 90-160 pcf is flagged while still returning the number.
+- **`concrete-modulus-of-rupture` (spec-v379).** fr = 7.5 x lambda x sqrt(f'c) psi (ACI 19.2.3.1), the tensile stress at which plain concrete first cracks. Pinned: 4000 psi normalweight -> 474 psi (~0.119 f'c); all-lightweight (lambda 0.75) -> 356 psi; 3000 psi -> 411 psi. lambda outside 0.75-1.0 is flagged.
+- **`concrete-shrinkage-temperature-steel` (spec-v380).** Minimum S&T reinforcement perpendicular to the main bars: ratio 0.0018 (Grade 60) or 0.0020 (Grade 40/50), never below 0.0014, As,min = ratio x b x h, spacing <= min(5h, 18 in). Pinned: a 6 in slab, 12 in strip, Grade 60 -> 0.130 in^2/ft, 18 in max (about #4 at 18); a thin 3 in slab -> 15 in where 5h governs.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the modulus relations, the lightweight penalties, the ratio switch and spacing governor, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ACI 318-19 §19.2.2, §19.2.3, and §24.4. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory). Module cap bumped with a dated comment: calc-concrete.js 12500 -> 17000. Housekeeping: home count 846 -> 849, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 65 appended. All gates green at the new state: lint, unit tests (**5,142**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(hvac): land spec-v375..v377 -- 3 psychrometric coil-analysis tiles in calc-hvac.js; 843 -> 846 tiles, 0.132.0, 2026-07-03
 
 The psychrometric coil-analysis trio, first batch of the new v375-v474 in-scope trade-calculator campaign: the moist-air state property and the two coil numbers built on it, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **843 -> 846**, package **0.131.0 -> 0.132.0** (a minor). Proposed 2026-07-03.

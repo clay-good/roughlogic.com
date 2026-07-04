@@ -1,6 +1,6 @@
 # roughlogic.com Specification v379 -- Concrete Modulus of Rupture fr (ACI 318-19 19.2.3) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the concrete-material-properties trio (v378 Ec -> v379 modulus of
+> **Status: LANDED (2026-07-03, 0.133.0; proposed 2026-07-03). Second tile of the concrete-material-properties trio (v378 Ec -> v379 modulus of
 > rupture -> v380 shrinkage/temperature steel). The catalog has flexural strength (`rc-beam-flexure`) but not the tensile
 > stress at which plain concrete first cracks -- the modulus of rupture that sets the cracking moment behind every
 > deflection and minimum-reinforcement check.**

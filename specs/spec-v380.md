@@ -1,6 +1,6 @@
 # roughlogic.com Specification v380 -- Shrinkage and Temperature Reinforcement (ACI 318-19 24.4) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the concrete-material-properties trio (v378 Ec -> v379 modulus
+> **Status: LANDED (2026-07-03, 0.133.0; proposed 2026-07-03). Third and final tile of the concrete-material-properties trio (v378 Ec -> v379 modulus
 > of rupture -> v380 shrinkage/temperature steel). The catalog sets slab thickness for deflection (`rc-slab-min-thickness`)
 > and computes flexural steel (`rc-beam-flexure`), but never the minimum shrinkage-and-temperature reinforcement a one-way
 > slab needs in the direction perpendicular to the main bars.**

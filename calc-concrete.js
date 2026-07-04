@@ -497,3 +497,103 @@ CONCRETE_RENDERERS["rc-shear-friction"] = _simpleRenderer({
   ],
   compute: computeRcShearFriction,
 });
+
+// ===================== spec-v378..v380: concrete material-properties trio =====================
+
+// dims: in { fc_psi: M L^-1 T^-2, wc_pcf: M L^-3 } out: { ec_psi: M L^-1 T^-2, ec_ksi: M L^-1 T^-2, ec_normal_psi: M L^-1 T^-2 }
+export function computeConcreteElasticModulus({ fc_psi = 4000, wc_pcf = 145 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(wc_pcf > 0)) return { error: "Unit weight wc must be positive (pcf)." };
+  const ec_psi = Math.pow(wc_pcf, 1.5) * 33 * Math.sqrt(fc_psi);
+  const ec_normal_psi = 57000 * Math.sqrt(fc_psi);
+  const out_of_band = wc_pcf < 90 || wc_pcf > 160;
+  return {
+    ec_psi, ec_ksi: ec_psi / 1000, ec_normal_psi, ec_normal_ksi: ec_normal_psi / 1000, out_of_band,
+    note: "ACI 318-19 §19.2.2.1(a): Ec = wc^1.5 x 33 x sqrt(f'c) psi, valid for 90 <= wc <= 160 pcf; the §19.2.2.1(b) normalweight shortcut is 57000 x sqrt(f'c). Ec sets the stiffness behind every deflection, drift, and short-column calculation. A lightweight deck (lower wc) is markedly less stiff at the same strength. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteElasticModulusExample = { inputs: { fc_psi: 4000, wc_pcf: 145 } };
+CONCRETE_RENDERERS["concrete-elastic-modulus"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §19.2.2.1(a): Ec = wc^1.5 x 33 x sqrt(f'c) (psi), applicable for wc between 90 and 160 pcf; §19.2.2.1(b) gives the normalweight shortcut Ec = 57000 x sqrt(f'c). Returns the secant modulus used for deflection, drift, and stiffness; it is not the dynamic or tangent modulus, and the actual in-place modulus varies with aggregate and mix. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteElasticModulusExample.inputs,
+  fields: [
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number", default: 145 },
+  ],
+  outputs: [
+    { key: "ec", id: "cem-out-ec", label: "Modulus Ec = wc^1.5 x 33 x sqrt(f'c)", value: (r) => fmt(r.ec_psi, 0) + " psi (" + fmt(r.ec_ksi, 0) + " ksi)" },
+    { key: "en", id: "cem-out-en", label: "Normalweight shortcut 57000 x sqrt(f'c)", value: (r) => fmt(r.ec_normal_psi, 0) + " psi (" + fmt(r.ec_normal_ksi, 0) + " ksi)" },
+    { key: "ob", id: "cem-out-ob", label: "Unit-weight range", value: (r) => r.out_of_band ? "OUT OF BAND (wc outside 90-160 pcf; ACI eq. not applicable)" : "within ACI 90-160 pcf" },
+    { key: "n", id: "cem-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteElasticModulus,
+});
+
+// dims: in { fc_psi: M L^-1 T^-2, lambda: dimensionless } out: { fr_psi: M L^-1 T^-2, fr_fraction: dimensionless }
+export function computeConcreteModulusOfRupture({ fc_psi = 4000, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
+  const fr_psi = 7.5 * lambda * Math.sqrt(fc_psi);
+  const fr_fraction = fr_psi / fc_psi;
+  const out_of_band = lambda < 0.75 || lambda > 1.0;
+  return {
+    fr_psi, fr_fraction, out_of_band,
+    note: "ACI 318-19 §19.2.3.1: fr = 7.5 x lambda x sqrt(f'c) psi, the flexural tensile stress at which plain concrete first cracks. lambda is 1.0 normalweight, 0.75 all-lightweight (§19.2.4). fr sets the cracking moment Mcr behind deflection (Ie) and minimum-reinforcement checks. It is a lower-bound design value, well below the actual scatter of a beam test. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteModulusOfRuptureExample = { inputs: { fc_psi: 4000, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-modulus-of-rupture"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §19.2.3.1: fr = 7.5 x lambda x sqrt(f'c) (psi), the modulus of rupture, with lambda = 1.0 normalweight and 0.75 all-lightweight (§19.2.4). This is the code cracking stress used for the cracking moment Mcr and minimum flexural reinforcement; the true rupture strength of a given mix scatters above this conservative design value. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteModulusOfRuptureExample.inputs,
+  fields: [
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "fr", id: "cmr-out-fr", label: "Modulus of rupture fr = 7.5 lambda sqrt(f'c)", value: (r) => fmt(r.fr_psi, 0) + " psi" },
+    { key: "ff", id: "cmr-out-ff", label: "As a fraction of f'c", value: (r) => fmt(r.fr_fraction, 4) + " x f'c" },
+    { key: "ob", id: "cmr-out-ob", label: "Lambda range", value: (r) => r.out_of_band ? "OUT OF BAND (lambda outside 0.75-1.0)" : "within 0.75-1.0" },
+    { key: "n", id: "cmr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteModulusOfRupture,
+});
+
+// dims: in { h_in: L, b_in: L, grade_ksi: M L^-1 T^-2 } out: { ratio: dimensionless, as_min_in2: L^2, s_max_in: L }
+export function computeConcreteShrinkageTemperatureSteel({ h_in = 0, b_in = 12, grade_ksi = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(h_in > 0)) return { error: "Slab thickness h must be positive (in)." };
+  if (!(b_in > 0)) return { error: "Design strip width b must be positive (in)." };
+  if (!(grade_ksi > 0)) return { error: "Reinforcement grade must be positive (ksi)." };
+  const ratio = Math.max(grade_ksi >= 60 ? 0.0018 : 0.0020, 0.0014);
+  const ag_in2 = b_in * h_in;
+  const as_min_in2 = ratio * ag_in2;
+  const s_max_in = Math.min(5 * h_in, 18);
+  const spacing_governor = 5 * h_in < 18 ? "5h" : "18 in cap";
+  return {
+    ratio, ag_in2, as_min_in2, s_max_in, spacing_governor,
+    note: "ACI 318-19 §24.4.3.2: minimum shrinkage-and-temperature reinforcement ratio is 0.0018 for Grade 60 (and higher-yield deformed bars per §24.4.3.2(c) scaled by 60/fy but never below 0.0014), 0.0020 for Grade 40/50; As,min = ratio x b x h per strip. §24.4.3.3 caps the spacing at the smaller of 5h and 18 in. This is the steel perpendicular to the main bars in a one-way slab, not the flexural steel. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteShrinkageTemperatureSteelExample = { inputs: { h_in: 6, b_in: 12, grade_ksi: 60 } };
+CONCRETE_RENDERERS["concrete-shrinkage-temperature-steel"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §24.4.3.2 (minimum shrinkage and temperature reinforcement ratio: 0.0018 for Grade 60, 0.0020 for Grade 40/50, never below 0.0014) and §24.4.3.3 (spacing not to exceed the smaller of 5h and 18 in). As,min = ratio x b x h is the reinforcement perpendicular to the main bars in a one-way slab. Does not size the flexural (main) steel or check crack width for exposure. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteShrinkageTemperatureSteelExample.inputs,
+  fields: [
+    { key: "h_in", label: "Slab thickness h (in)", kind: "number" },
+    { key: "b_in", label: "Design strip width b (in, default 12)", kind: "number", default: 12 },
+    { key: "grade_ksi", label: "Reinforcement grade (ksi)", kind: "select", options: [
+      { value: "60", label: "Grade 60 (ratio 0.0018)" },
+      { value: "40", label: "Grade 40 (ratio 0.0020)" },
+      { value: "50", label: "Grade 50 (ratio 0.0020)" },
+    ], default: "60" },
+  ],
+  outputs: [
+    { key: "rt", id: "csts-out-rt", label: "Reinforcement ratio", value: (r) => fmt(r.ratio, 4) },
+    { key: "as", id: "csts-out-as", label: "Minimum area As,min = ratio x b x h", value: (r) => fmt(r.as_min_in2, 3) + " in^2 per strip" },
+    { key: "sm", id: "csts-out-sm", label: "Max spacing min(5h, 18 in)", value: (r) => fmt(r.s_max_in, 1) + " in (" + r.spacing_governor + " governs)" },
+    { key: "n", id: "csts-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteShrinkageTemperatureSteel,
+});

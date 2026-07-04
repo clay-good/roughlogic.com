@@ -8547,6 +8547,42 @@ export const CITATIONS = {
       { name: "Maximum transfer", value: "capped by the concrete interface min(0.2 f'c, 480 + 0.08 f'c, 1600) Ac", source: "ACI 318-19 Table 22.9.4.4" },
     ],
   },
+  "concrete-elastic-modulus": {
+    formula: "Ec = wc^1.5 x 33 x sqrt(f'c) psi (90 <= wc <= 160); normalweight shortcut Ec = 57000 x sqrt(f'c).",
+    edition: "The ACI 318-19 19.2.2.1 modulus of elasticity of concrete, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 19.2.2 modulus provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 19.2.2.1(a) secant modulus Ec = wc^1.5 x 33 x sqrt(f'c) psi, applicable for a unit weight wc between 90 and 160 pcf, and the 19.2.2.1(b) normalweight shortcut Ec = 57000 x sqrt(f'c). This returns the design elastic modulus that sets deflection, drift, and short-column stiffness; it is the code secant value, not the dynamic or tangent modulus, and the in-place modulus of a given mix varies with aggregate stiffness and moisture. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Secant modulus", value: "Ec = wc^1.5 x 33 x sqrt(f'c) psi for 90 <= wc <= 160 pcf", source: "ACI 318-19 19.2.2.1(a)" },
+      { name: "Normalweight shortcut", value: "Ec = 57000 x sqrt(f'c) psi", source: "ACI 318-19 19.2.2.1(b)" },
+      { name: "Design value", value: "code secant modulus; the in-place value varies with aggregate and mix", source: "scope of this tile" },
+    ],
+  },
+  "concrete-modulus-of-rupture": {
+    formula: "fr = 7.5 x lambda x sqrt(f'c) psi; lambda = 1.0 normalweight, 0.75 all-lightweight.",
+    edition: "The ACI 318-19 19.2.3.1 modulus of rupture of concrete, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 19.2.3 rupture provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 19.2.3.1 modulus of rupture fr = 7.5 x lambda x sqrt(f'c) psi, with lambda = 1.0 normalweight and 0.75 all-lightweight (19.2.4). This is the flexural tensile stress at which plain concrete first cracks, used for the cracking moment Mcr behind deflection (effective moment of inertia) and minimum flexural reinforcement; it is a conservative lower-bound design value, and the actual rupture strength of a given mix scatters above it. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Rupture stress", value: "fr = 7.5 x lambda x sqrt(f'c) psi", source: "ACI 318-19 19.2.3.1" },
+      { name: "Lightweight factor", value: "lambda = 1.0 normalweight, 0.75 all-lightweight", source: "ACI 318-19 19.2.4" },
+      { name: "Design value", value: "conservative cracking stress; test strength scatters above it", source: "scope of this tile" },
+    ],
+  },
+  "concrete-shrinkage-temperature-steel": {
+    formula: "ratio = 0.0018 (Grade 60) or 0.0020 (Grade 40/50), never below 0.0014; As,min = ratio x b x h; s_max = min(5h, 18 in).",
+    edition: "The ACI 318-19 24.4 shrinkage and temperature reinforcement provisions, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 24.4 shrinkage-and-temperature provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 24.4.3.2 minimum shrinkage-and-temperature reinforcement ratio (0.0018 for Grade 60 deformed bars, 0.0020 for Grade 40/50, and never less than 0.0014), As,min = ratio x b x h per design strip, and the 24.4.3.3 spacing limit of the smaller of 5h and 18 in. This is the reinforcement placed perpendicular to the main flexural bars in a one-way slab to control shrinkage and thermal cracking; it does not size the flexural (main) steel and does not check crack width for a given exposure class. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Minimum ratio", value: "0.0018 Grade 60, 0.0020 Grade 40/50, floor 0.0014", source: "ACI 318-19 24.4.3.2" },
+      { name: "Minimum area", value: "As,min = ratio x b x h per strip", source: "ACI 318-19 24.4.3.2" },
+      { name: "Spacing limit", value: "s_max = min(5h, 18 in)", source: "ACI 318-19 24.4.3.3" },
+    ],
+  },
   "rc-column-axial": {
     formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
     edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",

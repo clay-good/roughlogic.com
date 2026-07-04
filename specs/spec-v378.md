@@ -1,6 +1,6 @@
 # roughlogic.com Specification v378 -- Concrete Modulus of Elasticity Ec (ACI 318-19 19.2.2) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a concrete-material-properties trio (v378 Ec -> v379 modulus of rupture
+> **Status: LANDED (2026-07-03, 0.133.0; proposed 2026-07-03). First tile of a concrete-material-properties trio (v378 Ec -> v379 modulus of rupture
 > -> v380 shrinkage/temperature steel). The catalog has the ACI 318 member checks (`rc-beam-flexure`, `rc-beam-shear`,
 > `rc-column-axial`, `rc-slab-min-thickness`, ...) but not the elastic modulus every deflection, drift, and short-column
 > stiffness calculation depends on.**

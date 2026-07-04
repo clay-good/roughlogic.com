@@ -994,6 +994,9 @@ const RELATED = {
   "rc-slab-min-thickness": ["rc-beam-flexure","rc-beam-shear","joist-deflection"],
   "rc-doubly-reinforced": ["rc-beam-flexure","rc-beam-shear","rc-column-axial"],
   "rc-shear-friction": ["rc-beam-shear","rebar-lap-splice","anchor-embedment"],
+  "concrete-elastic-modulus": ["rc-slab-min-thickness","rc-beam-flexure","concrete-modulus-of-rupture","rc-doubly-reinforced"],
+  "concrete-modulus-of-rupture": ["concrete-elastic-modulus","rc-slab-min-thickness","rc-beam-flexure","rc-development-length"],
+  "concrete-shrinkage-temperature-steel": ["rc-slab-min-thickness","concrete-modulus-of-rupture","rc-beam-flexure","rebar-lap-splice"],
   // spec-v302..v304 site-hydraulics depth batch (Group B)
   "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
   "orifice-flow": ["weir-flow","time-of-concentration","pipe-velocity"],

@@ -685,6 +685,9 @@ export const COMPUTE_MAP = {
   "rc-slab-min-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMinThickness" },
   "rc-doubly-reinforced": { module: "../../calc-concrete.js", fn: "computeRcDoublyReinforced" },
   "rc-shear-friction": { module: "../../calc-concrete.js", fn: "computeRcShearFriction" },
+  "concrete-elastic-modulus": { module: "../../calc-concrete.js", fn: "computeConcreteElasticModulus" },
+  "concrete-modulus-of-rupture": { module: "../../calc-concrete.js", fn: "computeConcreteModulusOfRupture" },
+  "concrete-shrinkage-temperature-steel": { module: "../../calc-concrete.js", fn: "computeConcreteShrinkageTemperatureSteel" },
   // spec-v302..v304 site-hydraulics depth batch (3 tiles)
   "time-of-concentration": { module: "../../calc-plumbing.js", fn: "computeTimeOfConcentration" },
   "orifice-flow": { module: "../../calc-plumbing.js", fn: "computeOrificeFlow" },

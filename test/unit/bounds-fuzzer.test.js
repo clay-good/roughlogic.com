@@ -15185,3 +15185,61 @@ test("bounds: spec-v377 computeCoilBypassFactor pins BF/CF, the shallow-coil cas
   assert.ok("error" in _v377({ t_ent_f: 50, t_lvg_f: 48, t_adp_f: 50 })); // entering = ADP
   assert.ok("error" in _v377({ t_ent_f: Infinity, t_lvg_f: 55, t_adp_f: 50 }));
 });
+
+// ===================== spec-v378..v380 concrete material-properties trio =====================
+import { computeConcreteElasticModulus as _v378, computeConcreteModulusOfRupture as _v379, computeConcreteShrinkageTemperatureSteel as _v380 } from "../../calc-concrete.js";
+
+test("bounds: spec-v378 computeConcreteElasticModulus pins Ec = wc^1.5 x 33 x sqrt(f'c), the shortcut, and error seams", () => {
+  const r = _v378({ fc_psi: 4000, wc_pcf: 145 });
+  assert.ok(Math.abs(r.ec_psi - Math.pow(145, 1.5) * 33 * Math.sqrt(4000)) < 1e-6);
+  assert.ok(Math.abs(r.ec_psi - 3644147) < 1);
+  assert.ok(Math.abs(r.ec_normal_psi - 57000 * Math.sqrt(4000)) < 1e-6);
+  assert.strictEqual(r.out_of_band, false);
+  // Lightweight is markedly less stiff at the same strength.
+  const lw = _v378({ fc_psi: 4000, wc_pcf: 115 });
+  assert.ok(Math.abs(lw.ec_psi - 2573894) < 1 && lw.ec_psi < r.ec_psi);
+  // Out-of-band unit weight is flagged but still returns a number.
+  const ob = _v378({ fc_psi: 4000, wc_pcf: 80 });
+  assert.ok(ob.out_of_band === true && Number.isFinite(ob.ec_psi));
+  // Error seams.
+  assert.ok("error" in _v378({ fc_psi: 0, wc_pcf: 145 }));
+  assert.ok("error" in _v378({ fc_psi: 4000, wc_pcf: 0 }));
+  assert.ok("error" in _v378({ fc_psi: Infinity, wc_pcf: 145 }));
+});
+
+test("bounds: spec-v379 computeConcreteModulusOfRupture pins fr = 7.5 lambda sqrt(f'c), the LW penalty, and error seams", () => {
+  const r = _v379({ fc_psi: 4000, lambda: 1.0 });
+  assert.ok(Math.abs(r.fr_psi - 7.5 * Math.sqrt(4000)) < 1e-9);
+  assert.ok(Math.abs(r.fr_psi - 474.34) < 0.1);
+  assert.ok(Math.abs(r.fr_fraction - r.fr_psi / 4000) < 1e-12);
+  // All-lightweight is a lower cracking stress.
+  const lw = _v379({ fc_psi: 4000, lambda: 0.75 });
+  assert.ok(Math.abs(lw.fr_psi - 355.75) < 0.1 && lw.fr_psi < r.fr_psi);
+  // Lower strength -> lower fr.
+  assert.ok(_v379({ fc_psi: 3000, lambda: 1.0 }).fr_psi < r.fr_psi);
+  // Lambda outside 0.75..1.0 is flagged but still returns a number.
+  assert.ok(_v379({ fc_psi: 4000, lambda: 0.5 }).out_of_band === true);
+  // Error seams.
+  assert.ok("error" in _v379({ fc_psi: 0, lambda: 1.0 }));
+  assert.ok("error" in _v379({ fc_psi: 4000, lambda: 0 }));
+  assert.ok("error" in _v379({ fc_psi: 4000, lambda: NaN }));
+});
+
+test("bounds: spec-v380 computeConcreteShrinkageTemperatureSteel pins the ratio, As,min, s_max, and error seams", () => {
+  const r = _v380({ h_in: 6, b_in: 12, grade_ksi: 60 });
+  assert.ok(Math.abs(r.ratio - 0.0018) < 1e-12);
+  assert.ok(Math.abs(r.as_min_in2 - 0.0018 * 72) < 1e-12);
+  assert.ok(Math.abs(r.s_max_in - 18) < 1e-12); // min(30, 18)
+  // Grade 40/50 raises the ratio.
+  const g40 = _v380({ h_in: 6, b_in: 12, grade_ksi: 40 });
+  assert.ok(Math.abs(g40.ratio - 0.0020) < 1e-12 && Math.abs(g40.as_min_in2 - 0.144) < 1e-9);
+  // The string select value (from the renderer) behaves like the number.
+  assert.ok(Math.abs(_v380({ h_in: 6, b_in: 12, grade_ksi: "40" }).ratio - 0.0020) < 1e-12);
+  // A thin slab makes 5h govern instead of the 18 in cap.
+  const thin = _v380({ h_in: 3, b_in: 12, grade_ksi: 60 });
+  assert.ok(Math.abs(thin.s_max_in - 15) < 1e-12 && thin.spacing_governor === "5h");
+  // Error seams.
+  assert.ok("error" in _v380({ h_in: 0, b_in: 12, grade_ksi: 60 }));
+  assert.ok("error" in _v380({ h_in: 6, b_in: 0, grade_ksi: 60 }));
+  assert.ok("error" in _v380({ h_in: Infinity, b_in: 12, grade_ksi: 60 }));
+});
