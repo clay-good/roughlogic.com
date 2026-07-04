@@ -23893,6 +23893,87 @@
       }
     },
     {
+      "tile_id": "manual-d-friction-rate",
+      "source_publisher": "ACCA Manual D",
+      "source_title": "0.60 ESP, 0.42 drops, 180 ft TEL -> ASP 0.18, FR 0.10 in wg/100 ft",
+      "source_edition_or_year": "spec-v408 worked example (machine-verified)",
+      "source_section_or_page": "spec-v408 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "blower_esp_inwg": 0.60, "component_drop_inwg": 0.42, "tel_ft": 180 },
+      "outputs": {
+        "asp_inwg": { "value": 0.18, "tolerance": { "pct": 0.5 } },
+        "fr_inwg_100ft": { "value": 0.10, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "manual-d-friction-rate",
+      "source_publisher": "ACCA Manual D",
+      "source_title": "cross-check: a 300 ft run softens the rate to 0.06 in wg/100 ft",
+      "source_edition_or_year": "spec-v408 worked example (machine-verified)",
+      "source_section_or_page": "spec-v408 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "blower_esp_inwg": 0.60, "component_drop_inwg": 0.42, "tel_ft": 300 },
+      "outputs": {
+        "fr_inwg_100ft": { "value": 0.06, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "coil-face-velocity",
+      "source_publisher": "coil-selection practice",
+      "source_title": "2000 CFM, 24 x 18 coil (3.0 ft^2) -> 667 fpm, carryover risk",
+      "source_edition_or_year": "spec-v409 worked example (machine-verified)",
+      "source_section_or_page": "spec-v409 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "cfm": 2000, "face_width_in": 24, "face_height_in": 18, "threshold_fpm": 500 },
+      "outputs": {
+        "face_area_ft2": { "value": 3.0, "tolerance": { "pct": 0.5 } },
+        "face_velocity_fpm": { "value": 667, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "coil-face-velocity",
+      "source_publisher": "coil-selection practice",
+      "source_title": "cross-check: 1200 CFM on the same coil -> 400 fpm, below threshold",
+      "source_edition_or_year": "spec-v409 worked example (machine-verified)",
+      "source_section_or_page": "spec-v409 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "cfm": 1200, "face_width_in": 24, "face_height_in": 18, "threshold_fpm": 500 },
+      "outputs": {
+        "face_velocity_fpm": { "value": 400, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "vav-box-airflow",
+      "source_publisher": "VAV design / ASHRAE 62.1",
+      "source_title": "12,000 Btu/hr, 20 F, 100 CFM vent, 0.30 turndown -> 556 max, 167 min (turndown governs)",
+      "source_edition_or_year": "spec-v410 worked example (machine-verified)",
+      "source_section_or_page": "spec-v410 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "zone_sensible_btuh": 12000, "supply_dt_f": 20, "ventilation_cfm": 100, "turndown": 0.30 },
+      "outputs": {
+        "cfm_max": { "value": 555.6, "tolerance": { "pct": 0.5 } },
+        "cfm_min": { "value": 166.7, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "vav-box-airflow",
+      "source_publisher": "VAV design / ASHRAE 62.1",
+      "source_title": "cross-check: a 250 CFM ventilation minimum governs over the 167 turndown",
+      "source_edition_or_year": "spec-v410 worked example (machine-verified)",
+      "source_section_or_page": "spec-v410 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "zone_sensible_btuh": 12000, "supply_dt_f": 20, "ventilation_cfm": 250, "turndown": 0.30 },
+      "outputs": {
+        "cfm_min": { "value": 250, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "wood-emc",
       "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
       "source_title": "70 F, 50% RH -> EMC ~9.2% (standard interior conditions)",

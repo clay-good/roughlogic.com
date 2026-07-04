@@ -1,6 +1,6 @@
 # roughlogic.com Specification v409 -- Cooling Coil Face Velocity and Carryover Check (calc-hvacsystems.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the HVAC duct-design trio (v408 Manual D friction rate -> v409 coil face
+> **Status: LANDED (2026-07-04, 0.143.0; proposed 2026-07-03). Second tile of the HVAC duct-design trio (v408 Manual D friction rate -> v409 coil face
 > velocity -> v410 VAV box airflow). `grille-face-velocity` sizes registers and `filter-pressure-drop` handles filters, but
 > nothing sizes the cooling coil itself -- the face velocity that decides whether condensate blows off the fins as water
 > carryover.**

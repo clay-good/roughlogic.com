@@ -1,6 +1,6 @@
 # roughlogic.com Specification v410 -- VAV Box Minimum and Maximum Airflow (calc-hvacsystems.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the HVAC duct-design trio (v408 Manual D friction rate ->
+> **Status: LANDED (2026-07-04, 0.143.0; proposed 2026-07-03). Third and final tile of the HVAC duct-design trio (v408 Manual D friction rate ->
 > v409 coil face velocity -> v410 VAV box airflow). `grille-face-velocity` sizes registers and `duct-sizing` sizes trunks,
 > but nothing sets the min and max airflow of a VAV terminal -- the cooling-maximum from the zone load and the
 > ventilation-or-turndown minimum that a box is scheduled to.**

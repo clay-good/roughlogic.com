@@ -251,7 +251,7 @@ const TOOL_MODULES = (() => {
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
     "moist-air-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
-    "fan-affinity-laws", "colebrook-friction-factor",
+    "fan-affinity-laws", "colebrook-friction-factor", "manual-d-friction-rate",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,
@@ -280,6 +280,8 @@ const TOOL_MODULES = (() => {
     "filter-pressure-drop",
     // spec-v227..v229 cooling-load-components batch
     "window-solar-heat-gain", "internal-heat-gains", "envelope-conduction-load",
+    // spec-v409..v410 HVAC duct-design
+    "coil-face-velocity", "vav-box-airflow",
   ]);
   // spec-v74 cap-relief split: the two spec-v23 velocity tiles relocated out of
   // calc-hvac.js (which had reached 95.9% of cap -- the tightest remaining calc

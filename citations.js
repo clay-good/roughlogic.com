@@ -9519,6 +9519,42 @@ export const CITATIONS = {
       { name: "Component only", value: "one envelope line of a cooling load, not the whole Manual J", source: "first principles" },
     ],
   },
+  "manual-d-friction-rate": {
+    formula: "ASP = blower_ESP - component_drops; FR = ASP x 100 / TEL (in wg per 100 ft).",
+    edition: "The ACCA Manual D friction rate (available static pressure over total effective length), by name.",
+    freeAccess: "The available-static-pressure and friction-rate relations are the published ACCA Manual D residential duct-design method.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACCA Manual D friction rate: the available static pressure ASP = the blower's rated external static at design CFM minus the sum of the component pressure drops (coil, filter, registers/grilles, dampers, balancing), and the design friction rate FR = ASP x 100 / the total effective length (in wg per 100 ft). The TEL is the longest supply-plus-return path including the equivalent lengths of the fittings, not the physical run. A typical FR target is 0.06-0.10; a lower rate requires larger ducts. This returns the ASP and FR; it does not size the individual ducts (that is the Manual D duct chart / ductulator step). A design aid; the full Manual D layout governs.",
+    assumptions: [
+      { name: "Available static", value: "ASP = blower ESP - total component drops", source: "ACCA Manual D" },
+      { name: "Friction rate", value: "FR = ASP x 100 / total effective length", source: "ACCA Manual D" },
+      { name: "TEL", value: "longest supply+return path incl. fitting equivalent lengths", source: "scope of this tile" },
+    ],
+  },
+  "coil-face-velocity": {
+    formula: "face_area = w x h / 144; face_velocity = CFM / face_area; carryover if velocity > threshold (~500 fpm).",
+    edition: "The cooling-coil face velocity and the moisture-carryover limit, standard coil-selection practice (ASHRAE), by name.",
+    freeAccess: "Face velocity = airflow / face area and the ~500 fpm wet-coil carryover limit are standard published coil-selection results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The cooling-coil face velocity = airflow / coil face area, the number that governs condensate carryover: above about 500 fpm (the editable threshold) a wet cooling coil blows condensate droplets off the fins past the drain pan and into the downstream duct. A wet coil is kept at or below ~500 fpm; a dry heating coil tolerates more. A lower velocity requires a larger coil face for the same airflow. This returns the velocity and the carryover flag; the coil manufacturer's rated face velocity and moisture-carryover limit govern the actual selection.",
+    assumptions: [
+      { name: "Face velocity", value: "CFM / (width x height / 144)", source: "coil-selection practice" },
+      { name: "Carryover limit", value: "~500 fpm for a wet cooling coil (editable)", source: "ASHRAE / coil practice" },
+      { name: "Selection aid", value: "the coil manufacturer's rated face velocity governs", source: "scope of this tile" },
+    ],
+  },
+  "vav-box-airflow": {
+    formula: "cfm_max = load / (1.08 x supply_dt); cfm_min = max(ventilation_cfm, turndown x cfm_max).",
+    edition: "The VAV box maximum and minimum airflow from the zone load and the ASHRAE 62.1 ventilation minimum, by name.",
+    freeAccess: "The sensible-airflow maximum and the ventilation/turndown minimum are standard published VAV design relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "The VAV box airflow limits: the maximum = zone sensible cooling load / (1.08 x supply-to-room temperature difference), the airflow the box must pass at design cooling (1.08 is the sensible-heat constant for standard air), and the minimum = the larger of the ASHRAE 62.1 ventilation minimum and the box's turndown fraction (commonly 0.30) of the maximum. A dense-occupancy zone is driven to a higher minimum by its fresh-air requirement (ventilation governs); a lightly occupied zone rides the mechanical turndown, which also sets the reheat energy floor. This returns the two limits; the box manufacturer's controllable range and the project's ventilation calculation govern.",
+    assumptions: [
+      { name: "Maximum", value: "cfm_max = load / (1.08 x supply deltaT)", source: "VAV design" },
+      { name: "Minimum", value: "max(ASHRAE 62.1 ventilation, turndown x max)", source: "ASHRAE 62.1 / VAV practice" },
+      { name: "Box range", value: "the manufacturer's controllable range governs", source: "scope of this tile" },
+    ],
+  },
   "wood-emc": {
     formula: "EMC% = (1800/W)[Kh/(1-Kh) + (K1 K h + 2 K1 K2 K^2 h^2)/(1 + K1 K h + K1 K2 K^2 h^2)], h = RH/100, with W, K, K1, K2 temperature polynomials in degrees F (USDA FPL / Hailwood-Horrobin).",
     edition: "USDA Forest Products Laboratory Wood Handbook (Hailwood-Horrobin sorption equation) by name; the four temperature polynomials are bundled, no edition cycle.",

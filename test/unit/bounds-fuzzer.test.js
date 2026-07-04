@@ -15712,3 +15712,50 @@ test("bounds: spec-v407 computeTdsFromConductivity pins TDS, the k-band, and err
   assert.ok("error" in _v407({ conductivity_us_cm: 1000, k_factor: 0.3 }));
   assert.ok("error" in _v407({ conductivity_us_cm: Infinity, k_factor: 0.65 }));
 });
+
+// ===================== spec-v408..v410 HVAC duct-design trio (2 modules) =====================
+import { computeManualDFrictionRate as _v408 } from "../../calc-hvac.js";
+import { computeCoilFaceVelocity as _v409, computeVavBoxAirflow as _v410 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v408 computeManualDFrictionRate pins ASP/FR, the unworkable case, and error seams", () => {
+  const r = _v408({ blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 180 });
+  assert.ok(Math.abs(r.asp_inwg - 0.18) < 1e-9);
+  assert.ok(Math.abs(r.fr_inwg_100ft - 0.10) < 1e-9);
+  // A longer run softens the rate.
+  const long = _v408({ blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 300 });
+  assert.ok(Math.abs(long.fr_inwg_100ft - 0.06) < 1e-9 && long.fr_inwg_100ft < r.fr_inwg_100ft);
+  // Drops meeting/exceeding the blower static is unworkable.
+  assert.ok("error" in _v408({ blower_esp_inwg: 0.40, component_drop_inwg: 0.50, tel_ft: 180 }));
+  // Error seams.
+  assert.ok("error" in _v408({ blower_esp_inwg: 0, component_drop_inwg: 0.42, tel_ft: 180 }));
+  assert.ok("error" in _v408({ blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 0 }));
+  assert.ok("error" in _v408({ blower_esp_inwg: Infinity, component_drop_inwg: 0.42, tel_ft: 180 }));
+});
+
+test("bounds: spec-v409 computeCoilFaceVelocity pins the velocity, the carryover flag, and error seams", () => {
+  const r = _v409({ cfm: 2000, face_width_in: 24, face_height_in: 18, threshold_fpm: 500 });
+  assert.ok(Math.abs(r.face_area_ft2 - 3.0) < 1e-9);
+  assert.ok(Math.abs(r.face_velocity_fpm - 2000 / 3) < 1e-9 && r.carryover === true);
+  // Lower airflow stays below the threshold.
+  const low = _v409({ cfm: 1200, face_width_in: 24, face_height_in: 18, threshold_fpm: 500 });
+  assert.ok(Math.abs(low.face_velocity_fpm - 400) < 1e-9 && low.carryover === false);
+  // Error seams.
+  assert.ok("error" in _v409({ cfm: 0, face_width_in: 24, face_height_in: 18 }));
+  assert.ok("error" in _v409({ cfm: 2000, face_width_in: 0, face_height_in: 18 }));
+  assert.ok("error" in _v409({ cfm: 2000, face_width_in: 24, face_height_in: 0 }));
+  assert.ok("error" in _v409({ cfm: Infinity, face_width_in: 24, face_height_in: 18 }));
+});
+
+test("bounds: spec-v410 computeVavBoxAirflow pins max/min, the governing branch, and error seams", () => {
+  const r = _v410({ zone_sensible_btuh: 12000, supply_dt_f: 20, ventilation_cfm: 100, turndown: 0.30 });
+  assert.ok(Math.abs(r.cfm_max - 12000 / (1.08 * 20)) < 1e-9);
+  assert.ok(Math.abs(r.cfm_min - 0.30 * r.cfm_max) < 1e-9 && r.min_governed_by === "turndown");
+  // A high ventilation minimum governs instead.
+  const vent = _v410({ zone_sensible_btuh: 12000, supply_dt_f: 20, ventilation_cfm: 250, turndown: 0.30 });
+  assert.ok(Math.abs(vent.cfm_min - 250) < 1e-9 && vent.min_governed_by === "ventilation");
+  // Error seams.
+  assert.ok("error" in _v410({ zone_sensible_btuh: 0, supply_dt_f: 20, ventilation_cfm: 100 }));
+  assert.ok("error" in _v410({ zone_sensible_btuh: 12000, supply_dt_f: 0, ventilation_cfm: 100 }));
+  assert.ok("error" in _v410({ zone_sensible_btuh: 12000, supply_dt_f: 20, ventilation_cfm: 100, turndown: 1.5 }));
+  assert.ok("error" in _v410({ zone_sensible_btuh: Infinity, supply_dt_f: 20, ventilation_cfm: 100 }));
+});

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v408..v410 -- 3 HVAC duct-design tiles; 876 -> 879 tiles, 0.143.0, 2026-07-04
+
+The HVAC duct-design trio, twelfth batch of the v375-v474 campaign: the Manual D friction rate, the coil face velocity, and the VAV box airflow limits, split across calc-hvac.js and calc-hvacsystems.js (all Group C); no new module, group, or dependency. Catalog **876 -> 879**, package **0.142.0 -> 0.143.0** (a minor). Proposed 2026-07-03.
+
+- **`manual-d-friction-rate` (spec-v408, calc-hvac.js).** ASP = blower ESP - component drops, FR = ASP x 100 / total effective length. Pinned: 0.60 ESP, 0.42 drops, 180 ft TEL -> 0.18 ASP, 0.10 in wg/100 ft; a 300 ft run softens it to 0.06 (larger ducts). Drops above the blower static flag an unworkable system.
+- **`coil-face-velocity` (spec-v409, calc-hvacsystems.js).** velocity = CFM / face area, vs the ~500 fpm carryover threshold. Pinned: 2000 CFM on a 24x18 coil (3.0 ft^2) -> 667 fpm, carryover risk; 1200 CFM -> 400 fpm, safe.
+- **`vav-box-airflow` (spec-v410, calc-hvacsystems.js).** max = load / (1.08 deltaT), min = max(ventilation, turndown x max). Pinned: 12,000 Btu/hr, 20 F, 100 CFM vent, 0.30 turndown -> 556 max, 167 min (turndown governs); a 250 CFM vent minimum governs for a denser zone.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the friction rate and unworkable case, the carryover flag, the min-governing branch, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ACCA Manual D, the coil face-velocity limit, and the VAV/ASHRAE 62.1 airflow relations. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (manual-d via `_rEnv`, the two hvacsystems tiles hand-written). Module cap bumped with a dated comment: calc-hvacsystems.js 19000 -> 23000. Housekeeping: home count 876 -> 879, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 75 appended. All gates green at the new state: lint, unit tests (**5,172**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(treatment): land spec-v405..v407 -- 3 water/wastewater-operations tiles in calc-treatment.js; 873 -> 876 tiles, 0.142.0, 2026-07-04
 
 The water/wastewater-operations trio, eleventh batch of the v375-v474 campaign: the clarifier loading, the mass loading/removal, and the TDS-from-conductivity estimate, all in the existing lazy `calc-treatment.js` (Group M); no new module, group, or dependency. Catalog **873 -> 876**, package **0.141.0 -> 0.142.0** (a minor). Proposed 2026-07-03.

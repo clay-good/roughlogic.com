@@ -1118,3 +1118,87 @@ function _v16h_renderEnvelopeConductionLoad(inputRegion, outputRegion, citationE
   for (const el of [area.input, u.input, cltd.input]) el.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["envelope-conduction-load"] = _v16h_renderEnvelopeConductionLoad;
+
+// ===================== spec-v409..v410: HVAC duct-design trio (Group C) =====================
+
+// dims: in { cfm: L^3 T^-1, face_width_in: L, face_height_in: L, threshold_fpm: L T^-1 } out: { face_area_ft2: L^2, face_velocity_fpm: L T^-1 }
+export function computeCoilFaceVelocity({ cfm = 0, face_width_in = 0, face_height_in = 0, threshold_fpm = 500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(cfm) || 0;
+  const w = Number(face_width_in) || 0;
+  const h = Number(face_height_in) || 0;
+  const thr = Number(threshold_fpm) > 0 ? Number(threshold_fpm) : 500;
+  if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
+  if (!(w > 0)) return { error: "Coil face width must be positive (in)." };
+  if (!(h > 0)) return { error: "Coil face height must be positive (in)." };
+  const face_area_ft2 = (w * h) / 144;
+  const face_velocity_fpm = q / face_area_ft2;
+  return {
+    face_area_ft2, face_velocity_fpm, threshold_fpm: thr,
+    carryover: face_velocity_fpm > thr,
+    note: "Cooling-coil face velocity = airflow / coil face area, the number that governs condensate carryover: above about 500 fpm (the editable threshold) a wet cooling coil blows droplets off the fins past the drain pan, wetting the downstream duct. Keep a wet coil at or below ~500 fpm (dry heating coils tolerate more). Lower velocity means a larger coil face for the same airflow. A selection aid; the coil manufacturer's rated face velocity and moisture-carryover limit govern.",
+  };
+}
+function _v409renderCoilFaceVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Cooling-coil face velocity = CFM / coil face area, with the ~500 fpm moisture-carryover limit for a wet coil (ASHRAE / coil-selection practice). Above the threshold a wet coil blows condensate past the drain pan. A selection aid; the coil manufacturer's rated face velocity governs.";
+  const cfm = makeNumber("Airflow (cfm)", "cfv-cfm", { step: "any", min: "0", value: "2000" });
+  const w = makeNumber("Coil face width (in)", "cfv-w", { step: "any", min: "0", value: "24" });
+  const h = makeNumber("Coil face height (in)", "cfv-h", { step: "any", min: "0", value: "18" });
+  const thr = makeNumber("Carryover threshold (fpm, default 500)", "cfv-thr", { step: "any", min: "0", value: "500" });
+  for (const f of [cfm, w, h, thr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cfm.input.value = "2000"; w.input.value = "24"; h.input.value = "18"; thr.input.value = "500"; update(); });
+  const oV = makeOutputLine(outputRegion, "Face velocity", "cfv-out-v");
+  const oA = makeOutputLine(outputRegion, "Face area", "cfv-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "cfv-out-note");
+  const update = debounce(() => {
+    const r = computeCoilFaceVelocity({ cfm: Number(cfm.input.value) || 0, face_width_in: Number(w.input.value) || 0, face_height_in: Number(h.input.value) || 0, threshold_fpm: Number(thr.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oA.textContent = ""; oNote.textContent = ""; return; }
+    oV.textContent = fmt(r.face_velocity_fpm, 0) + " fpm" + (r.carryover ? " (OVER " + fmt(r.threshold_fpm, 0) + " -- carryover risk)" : " (below threshold)");
+    oA.textContent = fmt(r.face_area_ft2, 2) + " ft^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [cfm.input, w.input, h.input, thr.input]) el.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["coil-face-velocity"] = _v409renderCoilFaceVelocity;
+
+// dims: in { zone_sensible_btuh: M L^2 T^-3, supply_dt_f: T, ventilation_cfm: L^3 T^-1, turndown: dimensionless } out: { cfm_max: L^3 T^-1, cfm_min: L^3 T^-1 }
+export function computeVavBoxAirflow({ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0.30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(zone_sensible_btuh) || 0;
+  const dt = Number(supply_dt_f) || 0;
+  const vent = Number(ventilation_cfm) || 0;
+  const td = Number(turndown) || 0;
+  if (!(load > 0)) return { error: "Zone sensible load must be positive (Btu/hr)." };
+  if (!(dt > 0)) return { error: "Supply-to-room temperature difference must be positive (F)." };
+  if (vent < 0) return { error: "Ventilation minimum must be non-negative (cfm)." };
+  if (!(td > 0 && td <= 1)) return { error: "Turndown fraction must be between 0 and 1." };
+  const cfm_max = load / (1.08 * dt);
+  const turndown_cfm = td * cfm_max;
+  const cfm_min = Math.max(vent, turndown_cfm);
+  return {
+    cfm_max, cfm_min, turndown_cfm,
+    min_governed_by: vent >= turndown_cfm ? "ventilation" : "turndown",
+    note: "VAV box airflow limits: the maximum = zone sensible load / (1.08 x supply deltaT), the airflow needed at design cooling, and the minimum = the larger of the ASHRAE 62.1 ventilation minimum and the box's turndown fraction (commonly 0.30) of the maximum. A dense-occupancy zone is driven to a higher minimum by fresh-air needs (ventilation governs); a lightly occupied zone rides the mechanical turndown. Feeds the box schedule and the reheat check. A design aid; the box manufacturer's range and the ventilation calc govern.",
+  };
+}
+function _v410renderVavBoxAirflow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: VAV box airflow limits: maximum = zone sensible / (1.08 x supply deltaT), minimum = max(ASHRAE 62.1 ventilation minimum, turndown x maximum). The 1.08 is the sensible-heat constant for standard air. A design aid; the box manufacturer's range and the ventilation calculation govern.";
+  const load = makeNumber("Zone sensible load (Btu/hr)", "vav-load", { step: "any", min: "0", value: "12000" });
+  const dt = makeNumber("Supply-to-room deltaT (F)", "vav-dt", { step: "any", min: "0", value: "20" });
+  const vent = makeNumber("Ventilation minimum (cfm, ASHRAE 62.1)", "vav-vent", { step: "any", min: "0", value: "100" });
+  const td = makeNumber("Turndown fraction (default 0.30)", "vav-td", { step: "any", min: "0", max: "1", value: "0.30" });
+  for (const f of [load, dt, vent, td]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "12000"; dt.input.value = "20"; vent.input.value = "100"; td.input.value = "0.30"; update(); });
+  const oMax = makeOutputLine(outputRegion, "Maximum airflow", "vav-out-max");
+  const oMin = makeOutputLine(outputRegion, "Minimum airflow", "vav-out-min");
+  const oNote = makeOutputLine(outputRegion, "Note", "vav-out-note");
+  const update = debounce(() => {
+    const r = computeVavBoxAirflow({ zone_sensible_btuh: Number(load.input.value) || 0, supply_dt_f: Number(dt.input.value) || 0, ventilation_cfm: Number(vent.input.value) || 0, turndown: Number(td.input.value) || 0 });
+    if (r.error) { oMax.textContent = r.error; oMin.textContent = ""; oNote.textContent = ""; return; }
+    oMax.textContent = fmt(r.cfm_max, 0) + " cfm";
+    oMin.textContent = fmt(r.cfm_min, 0) + " cfm (" + r.min_governed_by + " governs)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [load.input, dt.input, vent.input, td.input]) el.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["vav-box-airflow"] = _v410renderVavBoxAirflow;

@@ -966,6 +966,9 @@ const RELATED = {
   "window-solar-heat-gain": ["manual-j-cooling","internal-heat-gains","envelope-conduction-load"],
   "internal-heat-gains": ["manual-j-cooling","window-solar-heat-gain","shr"],
   "envelope-conduction-load": ["assembly-r-value","window-solar-heat-gain","manual-j-cooling"],
+  "manual-d-friction-rate": ["duct-sizing","duct-friction-static","duct-static-pressure-total","equivalent-length"],
+  "coil-face-velocity": ["grille-face-velocity","filter-pressure-drop","cooling-coil-total-load","coil-bypass-factor"],
+  "vav-box-airflow": ["duct-sizing","grille-face-velocity","shr-latent","dcv-co2-ventilation"],
   // spec-v230..v232 electrical energy-cost-savings batch (Group A)
   "vfd-energy-savings": ["affinity-laws","motor-operating-cost","fan-motor-bhp"],
   "lighting-retrofit-savings": ["commercial-lighting-load","lumen-method","vfd-energy-savings"],

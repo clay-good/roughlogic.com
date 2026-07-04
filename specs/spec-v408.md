@@ -1,6 +1,6 @@
 # roughlogic.com Specification v408 -- Manual D Friction Rate (Available Static Pressure) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an HVAC duct-design trio (v408 Manual D friction rate -> v409 coil face
+> **Status: LANDED (2026-07-04, 0.143.0; proposed 2026-07-03). First tile of an HVAC duct-design trio (v408 Manual D friction rate -> v409 coil face
 > velocity -> v410 VAV box airflow). `duct-sizing` and `duct-friction-static` both need a friction rate as an input; this
 > tile derives it the ACCA Manual D way -- the available static pressure spread over the total effective length -- so the
 > sizing tiles finally have their missing upstream number.**

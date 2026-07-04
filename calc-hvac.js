@@ -3806,3 +3806,39 @@ HVAC_RENDERERS["colebrook-friction-factor"] = _rEnv({
   ],
   compute: computeColebrookFrictionFactor,
 });
+
+// ===================== spec-v408: Manual D friction rate (HVAC duct-design trio) =====================
+
+// dims: in { blower_esp_inwg: dimensionless, component_drop_inwg: dimensionless, tel_ft: L } out: { asp_inwg: dimensionless, fr_inwg_100ft: dimensionless }
+export function computeManualDFrictionRate({ blower_esp_inwg = 0, component_drop_inwg = 0, tel_ft = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const esp = Number(blower_esp_inwg) || 0;
+  const drops = Number(component_drop_inwg) || 0;
+  const tel = Number(tel_ft) || 0;
+  if (!(esp > 0)) return { error: "Blower external static pressure must be positive (in wg)." };
+  if (drops < 0) return { error: "Component pressure drops must be non-negative (in wg)." };
+  if (!(tel > 0)) return { error: "Total effective length must be positive (ft)." };
+  const asp_inwg = esp - drops;
+  if (!(asp_inwg > 0)) return { error: "Component drops meet or exceed the blower static -- no available static for the ducts (unworkable; reduce drops or pick a stronger blower)." };
+  const fr_inwg_100ft = asp_inwg * 100 / tel;
+  return {
+    asp_inwg, fr_inwg_100ft,
+    note: "ACCA Manual D friction rate: the available static pressure ASP = blower rated external static at design CFM - the sum of component drops (coil, filter, registers/grilles, dampers, balancing), and the design friction rate FR = ASP x 100 / total effective length (in wg per 100 ft). The TEL is the longest supply-plus-return path including the equivalent lengths of the fittings, not the physical run. A typical FR target is 0.06-0.10; a lower rate needs larger ducts. A design aid; a full Manual D duct layout governs.",
+  };
+}
+const manualDFrictionRateExample = { inputs: { blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 180 } };
+HVAC_RENDERERS["manual-d-friction-rate"] = _rEnv({
+  citation: "Citation: ACCA Manual D friction rate: available static pressure ASP = blower rated ESP - total component drops, design friction rate FR = ASP x 100 / total effective length (in wg per 100 ft). The TEL includes the fitting equivalent lengths, not just the physical run. A design aid; the full Manual D layout governs.",
+  example: manualDFrictionRateExample.inputs,
+  fields: [
+    { key: "blower_esp_inwg", label: "Blower rated ESP at design CFM (in wg)", kind: "number", default: 0.60 },
+    { key: "component_drop_inwg", label: "Total component drops (in wg)", kind: "number", default: 0.42 },
+    { key: "tel_ft", label: "Total effective length (ft)", kind: "number", default: 180 },
+  ],
+  outputs: [
+    { key: "asp", id: "mdf-out-asp", label: "Available static pressure", value: (r) => fmt(r.asp_inwg, 2) + " in wg" },
+    { key: "fr", id: "mdf-out-fr", label: "Design friction rate", value: (r) => fmt(r.fr_inwg_100ft, 3) + " in wg/100 ft" },
+    { key: "n", id: "mdf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeManualDFrictionRate,
+});

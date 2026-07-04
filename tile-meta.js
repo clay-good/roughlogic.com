@@ -157,6 +157,7 @@ const _TILES = [
   ["humidifier-capacity", "C"], ["filter-pressure-drop", "C"],
   // spec-v227..v229 cooling-load-components batch
   ["window-solar-heat-gain", "C"], ["internal-heat-gains", "C"], ["envelope-conduction-load", "C"],
+  ["manual-d-friction-rate", "C"], ["coil-face-velocity", "C"], ["vav-box-airflow", "C"],
   ["duct-velocity-pressure", "C"], ["refrigerant-velocity", "C"],
 
   ["psychrometric", "D"], ["drying-goal", "D"], ["dehumidifier", "D"],
