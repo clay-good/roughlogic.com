@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): land spec-v417..v419 -- 3 landscape/agriculture tiles in calc-agriculture.js; 885 -> 888 tiles, 0.146.0, 2026-07-04
+
+The landscape/agriculture trio, fifteenth batch of the v375-v474 campaign: the bulk-material volume, the grain-drying energy, and the manure nutrient rate, all in the existing lazy `calc-agriculture.js` (Group L); no new module, group, or dependency. Catalog **885 -> 888**, package **0.145.0 -> 0.146.0** (a minor). Proposed 2026-07-03.
+
+- **`mulch-topsoil-volume` (spec-v417).** yd^3 = area x depth/324, bags/tons/loads. Pinned: 1000 ft^2 at 3 in topsoil (1.1 ton/yd^3) -> 9.26 yd^3, 125 bags, 10.2 tons, 1 load; lighter mulch (0.5) is 4.6 tons at the same volume.
+- **`grain-drying-energy` (spec-v418).** water = weight x (Mi - Mf)/(100 - Mf), propane = energy/91,500. Pinned: 1000 bu corn (56 lb/bu) 20% to 15% -> 3,294 lb water, 4.94 million Btu, 54 gal. As-landed note: the spec's cross-check prose (1,615 lb / 26 gal) is a slip; its own formula gives 1,697 lb / ~27.8 gal, which is what landed.
+- **`manure-nutrient-application` (spec-v419).** rate = crop N / (total N x availability), with the co-applied P2O5/K2O reported. Pinned: 150 lb N/acre, 10 lb N/ton, 50% avail -> 30 ton/acre, delivering 150 lb P2O5/acre; 70% availability -> 21.4 ton/acre. Complements the existing `manure-application-rate` (which gives the rate alone) by surfacing the phosphorus over-application.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the volume/weight split, the nonlinear moisture shrink, the co-applied P/K, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the material take-off, the grain-shrink energy balance, and USDA NRCS Code 590. The three rows land inside the tools-data.js `// Group L: Agriculture` block, so the citations.test.js Group L count assert was bumped 21 -> 24. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases (4 v419 terms already belonged to `manure-application-rate` and were dropped), `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers). Module cap bumped with a dated comment: calc-agriculture.js 44000 -> 48000. Housekeeping: home count 885 -> 888, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 78 appended. All gates green at the new state: lint, unit tests (**5,181**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(geotech): land spec-v414..v416 -- 3 geotechnical settlement/foundation tiles in calc-geotech.js; 882 -> 885 tiles, 0.145.0, 2026-07-04
 
 The geotechnical settlement/foundation trio, fourteenth batch of the v375-v474 campaign: the consolidation time, the SPT allowable bearing, and the liquefaction screen, all in the existing lazy `calc-geotech.js` (Group E); no new module, group, or dependency. Catalog **882 -> 885**, package **0.144.0 -> 0.145.0** (a minor). Proposed 2026-07-03.

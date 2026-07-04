@@ -1441,6 +1441,7 @@ cross-check.
 | calc-agriculture.js | `computeDripZoneFlow` | `{ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_co...` | _ | _ | _ |
 | calc-agriculture.js | `computeGPA` | `{ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainBin` | `{ diameter_ft = 0, eave_height_ft = 0, peak_height_ft = 0, grain = "corn", pa...` | _ | _ | _ |
+| calc-agriculture.js | `computeGrainDryingEnergy` | `{ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb...` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainShrinkMoisture` | `{ W_lb = 0, M_wet_pct = 0, M_dry_pct = 0, handling = 0.5, tw_lbbu = 56 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeGrowingDegreeDays` | `{ days_series = [], base_f = 50, cutoff_f = 0, method = "standard" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeHayDryMatter` | `{ bale_weight_lb = 0, moisture_pct = 0, target_moisture_pct = 15, safe_thresh...` | _ | _ | _ |
@@ -1449,6 +1450,8 @@ cross-check.
 | calc-agriculture.js | `computeLivestockDryMatterIntake` | `{ BW_lb = 0, intake = 0, feed_DM = 0, head = 1 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeLivestockWaterRequirement` | `{ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f ...` | _ | _ | _ |
 | calc-agriculture.js | `computeManureApplicationRate` | `{ crop_need = 0, total_nutr = 0, availability = 0, form = "solid" } = {}` | _ | _ | _ |
+| calc-agriculture.js | `computeManureNutrientApplication` | `{ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_...` | _ | _ | _ |
+| calc-agriculture.js | `computeMulchTopsoilVolume` | `{ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, w...` | _ | _ | _ |
 | calc-agriculture.js | `computeNozzleFlowPressure` | `{ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeNpkBlend` | `{ crop = "corn", soil_n_lb_per_acre = 0, soil_p_lb_per_acre = 0, soil_k_lb_pe...` | _ | _ | _ |
 | calc-agriculture.js | `computePearsonSquareRation` | `{ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}` | _ | _ | _ |
@@ -2543,7 +2546,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1129.
+Row count: 1132.
 
 <!-- END function-corpus-v14 -->
 
@@ -3350,7 +3353,7 @@ per spec-v14 §13.1 second paragraph.
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group L Agriculture (36 tiles)
+### Group L Agriculture (39 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3363,6 +3366,7 @@ per spec-v14 §13.1 second paragraph.
 | `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-rate` | Chemical Application Rate (GPA) | Project (first-principles); Standard agricultural-sprayer calibration identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grain-bin-capacity` | Grain Bin Capacity (Bushels) | USDA FGIS; area = pi*15^2 = 706.86; cyl = 14,137.2 ft^3; cone = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `grain-drying-energy` | Grain Drying Energy and Fuel | grain-handling practice; spec-v418 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grain-shrink-moisture` | Grain Drying Shrink and Net Bushels | USDA / land-grant extension; spec-v338 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `growing-degree-days` | Growing Degree Days | USDA / NWS GDD method + McMaster & Wi...; corn, Tmax 92 / Tmin 64 (modified) -> 25 GDD | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hay-dry-matter` | Hay Dry-Matter and Safe-Storage Weight | First-principles dry-matter balance +...; spec-v118 section 2.1 pinned example (over the 18% ceiling) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3373,6 +3377,8 @@ per spec-v14 §13.1 second paragraph.
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manure-application-rate` | Nutrient-Based Manure Application Rate | USDA NRCS Code 590; spec-v340 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `manure-nutrient-application` | Manure Nutrient Application Rate | USDA NRCS Code 590; spec-v419 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `mulch-topsoil-volume` | Mulch, Topsoil, and Aggregate Volume | landscape material take-off; spec-v417 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nozzle-flow-pressure` | Nozzle Flow vs Pressure and Tip Selection | Spray-nozzle hydraulics / USDA land-g...; 0.4 gpm tip at 40 psi run at 60 psi -> 0.49 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `npk-blend` | NPK Fertilizer Blend from Soil Test | USDA NRCS; rec = 130 N / 50 P2O5 / 25 K2O; DAP = 50/0.46 = 108.70 (N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pearson-square-ration` | Pearson-Square Feed Ration | Pearson square (land-grant animal sci...; corn 9% / SBM 44% to 16% CP -> 80% corn, 20% SBM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3614,6 +3620,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 885. Fixture-covered or reference-cadence: 885 / 885.
+Tile count: 888. Fixture-covered or reference-cadence: 888 / 888.
 
 <!-- END tile-index-v14 -->

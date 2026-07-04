@@ -15729,6 +15729,89 @@
       }
     },
     {
+      "tile_id": "mulch-topsoil-volume",
+      "source_publisher": "landscape material take-off",
+      "source_title": "1000 ft^2, 3 in, topsoil 1.1 ton/yd^3 -> 9.26 yd^3, 125 bags, 10.2 tons, 1 load",
+      "source_edition_or_year": "spec-v417 worked example (machine-verified)",
+      "source_section_or_page": "spec-v417 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "area_ft2": 1000, "depth_in": 3, "bulk_density": 1.1, "bag_ft3": 2, "load_yd3": 10, "waste_pct": 0 },
+      "outputs": {
+        "yd3": { "value": 9.259, "tolerance": { "pct": 0.5 } },
+        "bags": { "value": 125, "tolerance": { "abs": 0 } },
+        "tons": { "value": 10.19, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "mulch-topsoil-volume",
+      "source_publisher": "landscape material take-off",
+      "source_title": "cross-check: the same 9.26 yd^3 of mulch (0.5 ton/yd^3) is 4.6 tons",
+      "source_edition_or_year": "spec-v417 worked example (machine-verified)",
+      "source_section_or_page": "spec-v417 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "area_ft2": 1000, "depth_in": 3, "bulk_density": 0.5, "bag_ft3": 2, "load_yd3": 10, "waste_pct": 0 },
+      "outputs": {
+        "tons": { "value": 4.63, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "grain-drying-energy",
+      "source_publisher": "grain-handling practice",
+      "source_title": "1000 bu corn (56 lb/bu), 20% to 15% -> 3,294 lb water, 54 gal propane",
+      "source_edition_or_year": "spec-v418 worked example (machine-verified)",
+      "source_section_or_page": "spec-v418 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "bushels": 1000, "lb_per_bushel": 56, "mi_percent": 20, "mf_percent": 15, "btu_per_lb": 1500, "price_per_gal": 0 },
+      "outputs": {
+        "water_lb": { "value": 3294, "tolerance": { "pct": 0.5 } },
+        "propane_gal": { "value": 54, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "grain-drying-energy",
+      "source_publisher": "grain-handling practice",
+      "source_title": "cross-check: drying only to 17.5% removes 1,697 lb water, about 28 gal (roughly half)",
+      "source_edition_or_year": "spec-v418 worked example (machine-verified)",
+      "source_section_or_page": "spec-v418 section 2.1 cross-check (as-landed: the spec prose's 1,615 lb / 26 gal is a slip; the spec's own formula gives 1,697 lb / 27.8 gal)",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "bushels": 1000, "lb_per_bushel": 56, "mi_percent": 20, "mf_percent": 17.5, "btu_per_lb": 1500, "price_per_gal": 0 },
+      "outputs": {
+        "water_lb": { "value": 1697, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "manure-nutrient-application",
+      "source_publisher": "USDA NRCS Code 590",
+      "source_title": "150 lb N/acre need, 10 lb N/ton, 50% avail -> 30 ton/acre, 150 lb P2O5/acre",
+      "source_edition_or_year": "spec-v419 worked example (machine-verified)",
+      "source_section_or_page": "spec-v419 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "crop_n_need_lb_acre": 150, "total_n_lb_ton": 10, "availability_pct": 50, "p2o5_lb_ton": 5, "k2o_lb_ton": 8 },
+      "outputs": {
+        "avail_n_per_ton": { "value": 5, "tolerance": { "pct": 0.5 } },
+        "rate_ton_acre": { "value": 30, "tolerance": { "pct": 0.5 } },
+        "p2o5_applied": { "value": 150, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "manure-nutrient-application",
+      "source_publisher": "USDA NRCS Code 590",
+      "source_title": "cross-check: composted manure at 70% availability -> 21.4 ton/acre (less hauled)",
+      "source_edition_or_year": "spec-v419 worked example (machine-verified)",
+      "source_section_or_page": "spec-v419 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "crop_n_need_lb_acre": 150, "total_n_lb_ton": 10, "availability_pct": 70, "p2o5_lb_ton": 0, "k2o_lb_ton": 0 },
+      "outputs": {
+        "rate_ton_acre": { "value": 21.43, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "two-stroke-mix",
       "source_publisher": "First-principles volume arithmetic (small-engine mix convention)",
       "source_title": "oil = fuel / ratio; 1 US gal = 128 fl oz; 1 fl oz = 29.5735 mL",

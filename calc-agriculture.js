@@ -2360,3 +2360,150 @@ function renderManureApplicationRate(inputRegion, outputRegion, citationEl) {
   form.select.addEventListener("change", update);
 }
 AGRICULTURE_RENDERERS["manure-application-rate"] = renderManureApplicationRate;
+
+// ===================== spec-v417..v419: landscape/agriculture trio (Group L) =====================
+
+// dims: in { area_ft2: L^2, depth_in: L, bulk_density: dimensionless, bag_ft3: L^3, load_yd3: L^3, waste_pct: dimensionless } out: { yd3: L^3, bags: dimensionless, tons: dimensionless, loads: dimensionless }
+export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, waste_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(area_ft2) || 0;
+  const depth = Number(depth_in) || 0;
+  const dens = Number(bulk_density) || 0;
+  const bag = Number(bag_ft3) > 0 ? Number(bag_ft3) : 2;
+  const load = Number(load_yd3) > 0 ? Number(load_yd3) : 10;
+  const waste = Number(waste_pct) || 0;
+  if (!(area > 0)) return { error: "Area must be positive (ft^2)." };
+  if (!(depth > 0)) return { error: "Depth must be positive (in)." };
+  if (!(dens > 0)) return { error: "Bulk density must be positive (ton/yd^3)." };
+  if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
+  const yd3 = area * (depth / 12) / 27 * (1 + waste / 100);
+  const bags = Math.ceil(yd3 * 27 / bag);
+  const tons = yd3 * dens;
+  const loads = Math.ceil(yd3 / load);
+  return {
+    yd3, bags, tons, loads,
+    note: "Bulk landscape material: cubic yards = area x (depth/12) / 27, times a waste/compaction allowance, then bagged (ceil of yd^3 x 27 / bag ft^3), weighed (yd^3 x bulk density), and trucked (ceil of yd^3 / load). Bulk densities vary: mulch about 0.5, topsoil about 1.1, and gravel about 1.4 ton/yd^3, so the same volume weighs very differently. A quantity aid; the supplier's actual bag size, load size, and product density govern.",
+  };
+}
+export const mulchTopsoilVolumeExample = { inputs: { area_ft2: 1000, depth_in: 3, bulk_density: 1.1, bag_ft3: 2, load_yd3: 10, waste_pct: 0 } };
+function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Bulk landscape material take-off (first-principles volume): cubic yards = area x depth / 324 (depth in inches), bags = ceil(yd^3 x 27 / bag size), tons = yd^3 x bulk density, truckloads = ceil(yd^3 / load). Bulk densities: mulch ~0.5, topsoil ~1.1, gravel ~1.4 ton/yd^3. A quantity aid; the supplier's bag/load size and product density govern.";
+  const area = makeNumber("Area (ft^2)", "mtv-area", { step: "any", min: "0", value: "1000" });
+  const depth = makeNumber("Depth (in)", "mtv-depth", { step: "any", min: "0", value: "3" });
+  const dens = makeNumber("Bulk density (ton/yd^3: mulch 0.5, topsoil 1.1, gravel 1.4)", "mtv-dens", { step: "any", min: "0", value: "1.1" });
+  const bag = makeNumber("Bag size (ft^3, default 2)", "mtv-bag", { step: "any", min: "0", value: "2" });
+  const load = makeNumber("Truck load (yd^3, default 10)", "mtv-load", { step: "any", min: "0", value: "10" });
+  const waste = makeNumber("Waste/compaction allowance (%)", "mtv-waste", { step: "any", min: "0", value: "0" });
+  for (const f of [area, depth, dens, bag, load, waste]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { area.input.value = "1000"; depth.input.value = "3"; dens.input.value = "1.1"; bag.input.value = "2"; load.input.value = "10"; waste.input.value = "0"; update(); });
+  const oYd = makeOutputLine(outputRegion, "Volume", "mtv-out-yd");
+  const oBags = makeOutputLine(outputRegion, "Bags / tons / loads", "mtv-out-b");
+  const oNote = makeOutputLine(outputRegion, "Note", "mtv-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: readNum(bag.input), load_yd3: readNum(load.input), waste_pct: readNum(waste.input) });
+    if (r.error) { oYd.textContent = r.error; oBags.textContent = ""; oNote.textContent = ""; return; }
+    oYd.textContent = fmt(r.yd3, 2) + " yd^3";
+    oBags.textContent = r.bags + " bags / " + fmt(r.tons, 1) + " tons / " + r.loads + " load(s)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [area.input, depth.input, dens.input, bag.input, load.input, waste.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["mulch-topsoil-volume"] = renderMulchTopsoilVolume;
+
+// dims: in { bushels: dimensionless, lb_per_bushel: dimensionless, mi_percent: dimensionless, mf_percent: dimensionless, btu_per_lb: dimensionless, price_per_gal: dimensionless } out: { weight_lb: M, water_lb: M, energy_btu: M L^2 T^-2, propane_gal: dimensionless }
+export function computeGrainDryingEnergy({ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb = 1500, price_per_gal = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bu = Number(bushels) || 0;
+  const lbbu = Number(lb_per_bushel) || 0;
+  const mi = Number(mi_percent) || 0;
+  const mf = Number(mf_percent) || 0;
+  const btu = Number(btu_per_lb) > 0 ? Number(btu_per_lb) : 1500;
+  const price = Number(price_per_gal) || 0;
+  if (!(bu > 0)) return { error: "Bushels must be positive." };
+  if (!(lbbu > 0)) return { error: "Test weight must be positive (lb/bushel)." };
+  if (!(mf >= 0 && mf < 100)) return { error: "Final moisture must be between 0 and 100%." };
+  if (!(mi > mf)) return { error: "Initial moisture must exceed the final (target) moisture." };
+  const weight_lb = bu * lbbu;
+  const water_lb = weight_lb * (mi - mf) / (100 - mf);
+  const energy_btu = water_lb * btu;
+  const propane_gal = energy_btu / 91500;
+  const cost_usd = price > 0 ? propane_gal * price : null;
+  return {
+    weight_lb, water_lb, energy_btu, propane_gal, cost_usd,
+    note: "Grain drying energy: the water removed = wet weight x (Mi - Mf) / (100 - Mf) on the wet basis (the shrink formula), the drying energy = water x the per-pound energy (about 1500 Btu/lb including dryer efficiency), and the propane = energy / 91,500 Btu per gallon. Removing fewer moisture points removes disproportionately less water because the denominator shifts. A planning aid; the dryer's actual efficiency, the fuel heat content, and the market discount schedule govern.",
+  };
+}
+export const grainDryingEnergyExample = { inputs: { bushels: 1000, lb_per_bushel: 56, mi_percent: 20, mf_percent: 15, btu_per_lb: 1500, price_per_gal: 0 } };
+function renderGrainDryingEnergy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Grain drying energy (first-principles shrink + heat balance): water removed = weight x (Mi - Mf)/(100 - Mf), energy = water x ~1500 Btu/lb (dryer efficiency included), propane = energy / 91,500 Btu/gal. A planning aid; the dryer efficiency, fuel heat content, and market discount schedule govern.";
+  const bu = makeNumber("Quantity (bushels)", "gde-bu", { step: "any", min: "0", value: "1000" });
+  const lbbu = makeNumber("Test weight (lb/bu: corn 56, wheat/soy 60)", "gde-lb", { step: "any", min: "0", value: "56" });
+  const mi = makeNumber("Initial moisture (%)", "gde-mi", { step: "any", min: "0", value: "20" });
+  const mf = makeNumber("Final moisture (%)", "gde-mf", { step: "any", min: "0", value: "15" });
+  const btu = makeNumber("Drying energy (Btu/lb water, default 1500)", "gde-btu", { step: "any", min: "0", value: "1500" });
+  const price = makeNumber("Propane price ($/gal, optional)", "gde-price", { step: "any", min: "0", value: "" });
+  for (const f of [bu, lbbu, mi, mf, btu, price]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bu.input.value = "1000"; lbbu.input.value = "56"; mi.input.value = "20"; mf.input.value = "15"; btu.input.value = "1500"; price.input.value = ""; update(); });
+  const oWater = makeOutputLine(outputRegion, "Water removed", "gde-out-water");
+  const oEnergy = makeOutputLine(outputRegion, "Energy / propane", "gde-out-energy");
+  const oCost = makeOutputLine(outputRegion, "Fuel cost", "gde-out-cost");
+  const oNote = makeOutputLine(outputRegion, "Note", "gde-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGrainDryingEnergy({ bushels: readNum(bu.input), lb_per_bushel: readNum(lbbu.input), mi_percent: readNum(mi.input), mf_percent: readNum(mf.input), btu_per_lb: readNum(btu.input), price_per_gal: readNum(price.input) });
+    if (r.error) { oWater.textContent = r.error; oEnergy.textContent = ""; oCost.textContent = ""; oNote.textContent = ""; return; }
+    oWater.textContent = fmt(r.water_lb, 0) + " lb (of " + fmt(r.weight_lb, 0) + " lb)";
+    oEnergy.textContent = fmt(r.energy_btu / 1e6, 2) + " million Btu, " + fmt(r.propane_gal, 0) + " gal propane";
+    oCost.textContent = r.cost_usd == null ? "(enter a propane price)" : "$" + fmt(r.cost_usd, 2);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bu.input, lbbu.input, mi.input, mf.input, btu.input, price.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["grain-drying-energy"] = renderGrainDryingEnergy;
+
+// dims: in { crop_n_need_lb_acre: dimensionless, total_n_lb_ton: dimensionless, availability_pct: dimensionless, p2o5_lb_ton: dimensionless, k2o_lb_ton: dimensionless } out: { avail_n_per_ton: dimensionless, rate_ton_acre: dimensionless, p2o5_applied: dimensionless, k2o_applied: dimensionless }
+export function computeManureNutrientApplication({ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_ton = 0, k2o_lb_ton = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const need = Number(crop_n_need_lb_acre) || 0;
+  const totalN = Number(total_n_lb_ton) || 0;
+  const avail = Number(availability_pct) || 0;
+  const p2o5 = Number(p2o5_lb_ton) || 0;
+  const k2o = Number(k2o_lb_ton) || 0;
+  if (!(need > 0)) return { error: "Crop nitrogen need must be positive (lb/acre)." };
+  if (!(totalN > 0)) return { error: "Manure nitrogen content must be positive (lb/ton)." };
+  if (!(avail > 0 && avail <= 100)) return { error: "Availability must be between 0 and 100%." };
+  if (p2o5 < 0 || k2o < 0) return { error: "Phosphate and potash content must be non-negative (lb/ton)." };
+  const avail_n_per_ton = totalN * avail / 100;
+  const rate_ton_acre = need / avail_n_per_ton;
+  const p2o5_applied = p2o5 > 0 ? rate_ton_acre * p2o5 : null;
+  const k2o_applied = k2o > 0 ? rate_ton_acre * k2o : null;
+  return {
+    avail_n_per_ton, rate_ton_acre, p2o5_applied, k2o_applied,
+    note: "Manure application rate set by the nitrogen need: the available N per ton = total N x the first-year availability (mineralization), and the rate = crop N need / available N per ton. Meeting the N need with manure also delivers whatever P2O5 and K2O ride along, and because manure is N-poor relative to P, an N-based rate usually over-applies phosphorus - the classic reason a nutrient-management plan switches to a P-based rate on high-P soils. This reports the P and K delivered so that over-application is visible. A planning aid; a manure test, the soil test, and the NRCS Code 590 nutrient-management plan govern.",
+  };
+}
+export const manureNutrientApplicationExample = { inputs: { crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 50, p2o5_lb_ton: 5, k2o_lb_ton: 8 } };
+function renderManureNutrientApplication(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: N-based manure application rate (USDA NRCS Code 590 Nutrient Management): available N per ton = total N x first-year availability, rate = crop N need / available N per ton, with the P2O5 and K2O delivered at that rate reported so phosphorus over-application is visible. A planning aid; a manure test, the soil test, and the nutrient-management plan govern.";
+  const need = makeNumber("Crop N need (lb/acre)", "mna-need", { step: "any", min: "0", value: "150" });
+  const totalN = makeNumber("Manure total N (lb/ton)", "mna-tn", { step: "any", min: "0", value: "10" });
+  const avail = makeNumber("First-year N availability (%)", "mna-av", { step: "any", min: "0", max: "100", value: "50" });
+  const p2o5 = makeNumber("Manure P2O5 (lb/ton, optional)", "mna-p", { step: "any", min: "0", value: "5" });
+  const k2o = makeNumber("Manure K2O (lb/ton, optional)", "mna-k", { step: "any", min: "0", value: "8" });
+  for (const f of [need, totalN, avail, p2o5, k2o]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { need.input.value = "150"; totalN.input.value = "10"; avail.input.value = "50"; p2o5.input.value = "5"; k2o.input.value = "8"; update(); });
+  const oRate = makeOutputLine(outputRegion, "Application rate (N-based)", "mna-out-rate");
+  const oPK = makeOutputLine(outputRegion, "P2O5 / K2O also applied", "mna-out-pk");
+  const oNote = makeOutputLine(outputRegion, "Note", "mna-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeManureNutrientApplication({ crop_n_need_lb_acre: readNum(need.input), total_n_lb_ton: readNum(totalN.input), availability_pct: readNum(avail.input), p2o5_lb_ton: readNum(p2o5.input), k2o_lb_ton: readNum(k2o.input) });
+    if (r.error) { oRate.textContent = r.error; oPK.textContent = ""; oNote.textContent = ""; return; }
+    oRate.textContent = fmt(r.rate_ton_acre, 1) + " ton/acre (" + fmt(r.avail_n_per_ton, 2) + " lb available N/ton)";
+    oPK.textContent = (r.p2o5_applied == null ? "P2O5 -" : fmt(r.p2o5_applied, 0) + " lb P2O5") + " / " + (r.k2o_applied == null ? "K2O -" : fmt(r.k2o_applied, 0) + " lb K2O") + " per acre";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [need.input, totalN.input, avail.input, p2o5.input, k2o.input]) f.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["manure-nutrient-application"] = renderManureNutrientApplication;

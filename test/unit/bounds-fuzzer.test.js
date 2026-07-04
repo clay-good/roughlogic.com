@@ -15865,3 +15865,56 @@ test("bounds: spec-v416 computeLiquefactionScreening pins CSR/FS, the trigger, a
   assert.ok("error" in _v416({ amax_g: 0, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20 }));
   assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: Infinity }));
 });
+
+// ===================== spec-v417..v419 landscape/agriculture trio (calc-agriculture.js) =====================
+import { computeMulchTopsoilVolume as _v417, computeGrainDryingEnergy as _v418, computeManureNutrientApplication as _v419 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v417 computeMulchTopsoilVolume pins the volume, bags/tons/loads, and error seams", () => {
+  const r = _v417({ area_ft2: 1000, depth_in: 3, bulk_density: 1.1, bag_ft3: 2, load_yd3: 10, waste_pct: 0 });
+  assert.ok(Math.abs(r.yd3 - 1000 * 0.25 / 27) < 1e-9);
+  assert.strictEqual(r.bags, 125);
+  assert.ok(Math.abs(r.tons - r.yd3 * 1.1) < 1e-9 && r.loads === 1);
+  // Density only changes the weight, not the volume/loads.
+  const mulch = _v417({ area_ft2: 1000, depth_in: 3, bulk_density: 0.5 });
+  assert.ok(Math.abs(mulch.yd3 - r.yd3) < 1e-12 && Math.abs(mulch.tons - r.yd3 * 0.5) < 1e-9);
+  // A waste allowance raises the volume.
+  assert.ok(_v417({ area_ft2: 1000, depth_in: 3, bulk_density: 1.1, waste_pct: 10 }).yd3 > r.yd3);
+  // Error seams.
+  assert.ok("error" in _v417({ area_ft2: 0, depth_in: 3, bulk_density: 1.1 }));
+  assert.ok("error" in _v417({ area_ft2: 1000, depth_in: 0, bulk_density: 1.1 }));
+  assert.ok("error" in _v417({ area_ft2: 1000, depth_in: 3, bulk_density: 0 }));
+  assert.ok("error" in _v417({ area_ft2: Infinity, depth_in: 3, bulk_density: 1.1 }));
+});
+
+test("bounds: spec-v418 computeGrainDryingEnergy pins the water/energy/propane and error seams", () => {
+  const r = _v418({ bushels: 1000, lb_per_bushel: 56, mi_percent: 20, mf_percent: 15, btu_per_lb: 1500 });
+  assert.ok(Math.abs(r.weight_lb - 56000) < 1e-9);
+  assert.ok(Math.abs(r.water_lb - 56000 * 5 / 85) < 1e-6);
+  assert.ok(Math.abs(r.propane_gal - r.energy_btu / 91500) < 1e-9 && Math.abs(r.propane_gal - 54) < 1);
+  // Removing fewer points removes disproportionately less water (nonlinear).
+  const less = _v418({ bushels: 1000, lb_per_bushel: 56, mi_percent: 20, mf_percent: 17.5, btu_per_lb: 1500 });
+  assert.ok(Math.abs(less.water_lb - 56000 * 2.5 / 82.5) < 1e-6 && less.water_lb > r.water_lb / 2.2 && less.water_lb < r.water_lb / 1.8);
+  // Error seams: final >= initial, non-positive, non-finite.
+  assert.ok("error" in _v418({ bushels: 1000, lb_per_bushel: 56, mi_percent: 15, mf_percent: 15 }));
+  assert.ok("error" in _v418({ bushels: 0, lb_per_bushel: 56, mi_percent: 20, mf_percent: 15 }));
+  assert.ok("error" in _v418({ bushels: 1000, lb_per_bushel: 56, mi_percent: 20, mf_percent: 100 }));
+  assert.ok("error" in _v418({ bushels: Infinity, lb_per_bushel: 56, mi_percent: 20, mf_percent: 15 }));
+});
+
+test("bounds: spec-v419 computeManureNutrientApplication pins the rate, co-applied P/K, and error seams", () => {
+  const r = _v419({ crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 50, p2o5_lb_ton: 5, k2o_lb_ton: 8 });
+  assert.ok(Math.abs(r.avail_n_per_ton - 5) < 1e-9);
+  assert.ok(Math.abs(r.rate_ton_acre - 30) < 1e-9);
+  assert.ok(Math.abs(r.p2o5_applied - 150) < 1e-9 && Math.abs(r.k2o_applied - 240) < 1e-9);
+  // Higher availability lowers the rate.
+  const composted = _v419({ crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 70 });
+  assert.ok(Math.abs(composted.rate_ton_acre - 150 / 7) < 1e-9 && composted.rate_ton_acre < r.rate_ton_acre);
+  // No P/K entered -> null co-applied.
+  assert.ok(composted.p2o5_applied === null && composted.k2o_applied === null);
+  // Error seams.
+  assert.ok("error" in _v419({ crop_n_need_lb_acre: 0, total_n_lb_ton: 10, availability_pct: 50 }));
+  assert.ok("error" in _v419({ crop_n_need_lb_acre: 150, total_n_lb_ton: 0, availability_pct: 50 }));
+  assert.ok("error" in _v419({ crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 0 }));
+  assert.ok("error" in _v419({ crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 101 }));
+  assert.ok("error" in _v419({ crop_n_need_lb_acre: Infinity, total_n_lb_ton: 10, availability_pct: 50 }));
+});

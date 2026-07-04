@@ -510,6 +510,42 @@ export const CITATIONS = {
       { name: "Breakpoints", value: "per-class temperature/gallon breakpoints user-supplied from NRC / NRCS tables", source: "NRC / NRCS" },
     ],
   },
+  "mulch-topsoil-volume": {
+    formula: "yd^3 = area x (depth/12)/27 x (1 + waste%); bags = ceil(yd^3 x 27 / bag_ft3); tons = yd^3 x bulk_density; loads = ceil(yd^3 / load_yd3).",
+    edition: "Bulk landscape-material take-off from area, spread depth, and product density, first-principles volume, by name.",
+    freeAccess: "The area-by-depth volume, the 27 ft^3 per cubic yard conversion, and the density-to-weight step are public arithmetic; product densities come from the supplier.",
+    governance: GOVERNANCE.general,
+    editionNote: "A bulk landscape-material take-off: the cubic yards = area x (depth in inches / 12) / 27, times a waste/compaction allowance, then converted to bags (ceil of yd^3 x 27 / bag size in ft^3), weight (yd^3 x the product's bulk density), and truckloads (ceil of yd^3 / load size). Bulk densities vary widely - mulch about 0.5, topsoil about 1.1, and gravel about 1.4 ton/yd^3 - so the same volume weighs very differently and the density must match the actual product. This returns the quantities from the entered dimensions; the supplier's actual bag size, load size, and delivered density govern.",
+    assumptions: [
+      { name: "Volume", value: "yd^3 = area x depth/324 (depth in inches), x waste allowance", source: "first-principles volume" },
+      { name: "Quantities", value: "bags = ceil(yd^3 x 27 / bag), tons = yd^3 x density, loads = ceil(yd^3 / load)", source: "arithmetic" },
+      { name: "Product density", value: "mulch ~0.5, topsoil ~1.1, gravel ~1.4 ton/yd^3; supplier's value governs", source: "scope of this tile" },
+    ],
+  },
+  "grain-drying-energy": {
+    formula: "weight = bushels x lb/bu; water = weight x (Mi - Mf)/(100 - Mf); energy = water x Btu/lb; propane = energy / 91500.",
+    edition: "Grain drying energy from the wet-basis shrink and a heat balance, standard grain-handling practice, by name.",
+    freeAccess: "The wet-basis moisture-shrink formula and the propane heat content (91,500 Btu/gal) are public grain-handling results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Grain drying energy: the weight = bushels x the test weight (lb/bushel), the water removed = weight x (Mi - Mf)/(100 - Mf) on the wet basis (the standard shrink formula, where the denominator shifts because the dry matter is conserved), the drying energy = water x the per-pound energy (commonly about 1500 Btu/lb including dryer efficiency, well above the 970 Btu/lb latent heat), and the propane = energy / 91,500 Btu per gallon. Removing fewer moisture points removes disproportionately less water. This estimates the energy and fuel; the dryer's actual efficiency, the fuel's heat content, and the elevator's discount/shrink schedule govern.",
+    assumptions: [
+      { name: "Water removed", value: "weight x (Mi - Mf)/(100 - Mf), wet basis", source: "moisture-shrink formula" },
+      { name: "Energy and fuel", value: "energy = water x ~1500 Btu/lb; propane = energy / 91500 Btu/gal", source: "grain-handling practice" },
+      { name: "Efficiency", value: "the ~1500 Btu/lb includes dryer efficiency; actual varies", source: "scope of this tile" },
+    ],
+  },
+  "manure-nutrient-application": {
+    formula: "avail_N_per_ton = total_N x availability%; rate = crop_N_need / avail_N_per_ton; P2O5_applied = rate x P2O5/ton; K2O_applied = rate x K2O/ton.",
+    edition: "Nitrogen-based manure application rate and the co-applied P/K, per USDA NRCS Code 590 (Nutrient Management), by name.",
+    freeAccess: "The N-based rate and the co-applied nutrient arithmetic follow the public USDA NRCS Code 590 nutrient-management method.",
+    governance: GOVERNANCE.general,
+    editionNote: "The manure application rate set by the nitrogen need: the available N per ton = the manure's total N x the first-year availability (mineralization) factor, and the rate = the crop N requirement / the available N per ton. Meeting the N need also delivers whatever P2O5 and K2O the manure carries, and because manure is nitrogen-poor relative to phosphorus, an N-based rate usually over-applies P - the reason a nutrient-management plan switches to a P-based rate on high-phosphorus soils. This reports the P2O5 and K2O delivered so the over-application is visible (see also manure-application-rate for the rate alone). A planning aid; a manure test, the soil test, and the NRCS Code 590 nutrient-management plan govern.",
+    assumptions: [
+      { name: "Available N", value: "total N x first-year availability; rate = crop N need / available N", source: "USDA NRCS Code 590" },
+      { name: "Co-applied P/K", value: "P2O5 and K2O = rate x their content per ton", source: "USDA NRCS Code 590" },
+      { name: "P over-application", value: "an N-based rate usually over-applies phosphorus; the plan governs", source: "scope of this tile" },
+    ],
+  },
 
   "two-stroke-mix": {
     formula: "oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz; 1 fl oz = 29.5735 mL; oz per gallon = 128 / ratio.",

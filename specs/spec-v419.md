@@ -1,6 +1,6 @@
 # roughlogic.com Specification v419 -- Manure Nutrient Application Rate (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the landscape/agriculture trio (v417 mulch/topsoil volume ->
+> **Status: LANDED (2026-07-04, 0.146.0; proposed 2026-07-03). Third and final tile of the landscape/agriculture trio (v417 mulch/topsoil volume ->
 > v418 grain drying energy -> v419 manure nutrient application). `npk-blend` blends commercial fertilizer to a soil-test
 > target; this tile sizes a manure spreader to meet a crop's nitrogen need from a manure analysis, accounting for the fact
 > that only part of manure nitrogen is available the first year.**

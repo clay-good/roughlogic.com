@@ -1,6 +1,6 @@
 # roughlogic.com Specification v417 -- Mulch, Topsoil, and Aggregate Volume (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a landscape/agriculture trio (v417 mulch/topsoil volume -> v418 grain
+> **Status: LANDED (2026-07-04, 0.146.0; proposed 2026-07-03). First tile of a landscape/agriculture trio (v417 mulch/topsoil volume -> v418 grain
 > drying energy -> v419 manure nutrient application). One of the most common jobsite questions has no tile: how many cubic
 > yards, bags, tons, and truckloads of mulch, topsoil, or aggregate does it take to cover an area to a depth.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Spreading a bulk material is pure volume:

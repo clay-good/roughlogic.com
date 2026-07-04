@@ -1,6 +1,6 @@
 # roughlogic.com Specification v418 -- Grain Drying Energy and Fuel (calc-agriculture.js, Group L, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the landscape/agriculture trio (v417 mulch/topsoil volume -> v418 grain
+> **Status: LANDED (2026-07-04, 0.146.0; proposed 2026-07-03). As-landed correction: the cross-check prose (20% to 17.5% removes 1,615 lb, 26 gal) is a slip; the spec-s own formula 56000*(20-17.5)/(100-17.5) gives 1,697 lb and ~27.8 gal, which is what landed. Second tile of the landscape/agriculture trio (v417 mulch/topsoil volume -> v418 grain
 > drying energy -> v419 manure nutrient application). `grain-shrink-moisture` gives the weight and bushels lost to drying;
 > this tile gives the other half a farmer needs -- the energy and propane it takes to remove that moisture.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Drying grain costs fuel. The water to remove is
