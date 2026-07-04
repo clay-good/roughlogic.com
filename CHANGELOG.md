@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): land spec-v430..v431 -- 2 concrete field-work tiles (v429 cut as dupe); 894 -> 896 tiles, 0.149.0, 2026-07-04
+
+The concrete field-work pair, eighteenth batch of the v375-v474 campaign: the rebar weight takeoff and the ready-mix order, in the existing lazy `calc-construction.js` (Group E). The proposed trio's first tile, v429 `concrete-formwork-pressure`, was cut as a duplicate of the existing `formwork-pressure` tile (same ACI 347 lateral-pressure formula capped at the wet head), so only two landed. Catalog **894 -> 896**, package **0.148.0 -> 0.149.0** (a minor). Proposed 2026-07-03.
+
+- **`rebar-weight-takeoff` (spec-v430).** ASTM A615 nominal unit weight x total feet, to tons and cost. Pinned: a #5 bar (1.043 lb/ft) x 500 ft -> 522 lb (0.26 ton); a #8 at the same length -> 1,335 lb (0.67 ton).
+- **`ready-mix-concrete-order` (spec-v431).** ordered = volume x (1 + waste%), trucks = ceil(ordered/capacity), short-load fee below the plant minimum. Pinned: 42 yd^3 at 8% waste, 10 yd^3 trucks -> 45.4 yd^3, 5 trucks, 5.4 yd^3 last load; a small 6 yd^3 pour trips the sub-10 yd^3 short-load fee.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the bar-weight table, the truck rounding and short-load flag, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ASTM A615 and concrete-supply practice. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 4 worked-example fixtures, collision-checked aliases, `related-tiles`, and 2 fuzzer blocks (both use the `_simpleRenderer` factory; the rebar tile adds a bar-size select). No cap bump needed (calc-construction.js at 88.0%). v429's spec is annotated CUT with the reason (and a maintainer note that the existing formwork-pressure omits the ACI 347 600 Cw minimum). Housekeeping: home count 894 -> 896, README resynced (counts, sitemap URLs), the two landed specs marked LANDED, docs/mobile-responsive.md section 81 appended. All gates green at the new state: lint, unit tests (**5,189**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the two new tiles.
+
 ### feat(drainage): land spec-v426..v428 -- 3 drainage/stormwater tiles; 891 -> 894 tiles, 0.148.0, 2026-07-04
 
 The drainage/stormwater trio, seventeenth batch of the v375-v474 campaign: the overflow scupper, the force-main scour velocity, and the detention volume, split across calc-drainage.js and calc-plumbing.js (all Group B); no new module, group, or dependency. Catalog **891 -> 894**, package **0.147.0 -> 0.148.0** (a minor). Proposed 2026-07-03.

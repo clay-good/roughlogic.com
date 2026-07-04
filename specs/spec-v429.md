@@ -1,6 +1,6 @@
 # roughlogic.com Specification v429 -- Concrete Formwork Lateral Pressure (ACI 347) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a concrete-construction trio (v429 formwork pressure -> v430 rebar weight
+> **Status: CUT (2026-07-04, dupe of existing tile). NOT LANDED: concrete-formwork-pressure duplicates the existing formwork-pressure tile (calc-construction.js), which already computes the ACI 347 lateral pressure P = Cw(150 + 9000R/T) capped at the wet-head hydrostatic. v429 would only add the Cc chemistry coefficient and the 600*Cw minimum floor; a second near-identical tile would confuse. (Note for a maintainer: the existing formwork-pressure omits the ACI 347 P_min = 600*Cw floor and the Cc factor -- a small correctness gap worth adding to THAT tile rather than a new one.) The rest of the proposed trio (v430 rebar-weight-takeoff, v431 ready-mix-concrete-order) is genuinely new and lands. Original proposal below. First tile of a concrete-construction trio (v429 formwork pressure -> v430 rebar weight
 > takeoff -> v431 ready-mix order). `shore-post-load` (ACI 347) carries the vertical form load; this tile gives the lateral
 > pressure fresh concrete pushes on a wall form -- the number that sizes the ties, walers, and studs and, when a pour goes
 > too fast, blows a form out.**

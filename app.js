@@ -389,6 +389,8 @@ const TOOL_MODULES = (() => {
     "occupant-load", "egress-capacity", "plumbing-fixture-count",
     // spec-v245..v247 cast-in-place placing-and-curing trio.
     "shore-post-load", "concrete-evaporation-rate", "concrete-strength-gain",
+    // spec-v430..v431 concrete field-work (v429 cut as dupe)
+    "rebar-weight-takeoff", "ready-mix-concrete-order",
     // spec-v251..v253 IBC plan-review trio.
     "allowable-area", "egress-travel-distance", "exterior-opening-protection",
     // spec-v263..v265 NDS sawn-lumber design trio.

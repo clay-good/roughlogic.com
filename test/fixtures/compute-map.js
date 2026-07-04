@@ -851,6 +851,8 @@ export const COMPUTE_MAP = {
   "shore-post-load": { module: "../../calc-construction.js", fn: "computeShorePostLoad" },
   "concrete-evaporation-rate": { module: "../../calc-construction.js", fn: "computeConcreteEvaporationRate" },
   "concrete-strength-gain": { module: "../../calc-construction.js", fn: "computeConcreteStrengthGain" },
+  "rebar-weight-takeoff": { module: "../../calc-construction.js", fn: "computeRebarWeightTakeoff" },
+  "ready-mix-concrete-order": { module: "../../calc-construction.js", fn: "computeReadyMixConcreteOrder" },
   // spec-v251..v253 IBC plan-review trio (3 tiles)
   "allowable-area": { module: "../../calc-construction.js", fn: "computeAllowableArea" },
   "egress-travel-distance": { module: "../../calc-construction.js", fn: "computeEgressTravelDistance" },

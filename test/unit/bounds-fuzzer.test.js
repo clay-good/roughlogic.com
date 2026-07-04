@@ -16009,3 +16009,36 @@ test("bounds: spec-v428 computeStormwaterDetentionVolume pins Q_in, storage, and
   assert.ok("error" in _v428({ runoff_c: 0.85, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 1.0, duration_min: 0 }));
   assert.ok("error" in _v428({ runoff_c: 0.85, intensity_in_hr: Infinity, area_ac: 2, q_allow_cfs: 1.0, duration_min: 30 }));
 });
+
+// ===================== spec-v430..v431 concrete field-work pair (calc-construction.js) [v429 CUT as dupe] =====================
+import { computeRebarWeightTakeoff as _v430, computeReadyMixConcreteOrder as _v431 } from "../../calc-construction.js";
+
+test("bounds: spec-v430 computeRebarWeightTakeoff pins the unit weight, total, and error seams", () => {
+  const r = _v430({ bar_size: "5", total_len_ft: 500 });
+  assert.ok(Math.abs(r.unit_wt - 1.043) < 1e-9);
+  assert.ok(Math.abs(r.weight_lb - 521.5) < 1e-9 && Math.abs(r.tons - 521.5 / 2000) < 1e-9);
+  // A bigger bar weighs more than double.
+  const big = _v430({ bar_size: "8", total_len_ft: 500 });
+  assert.ok(Math.abs(big.weight_lb - 1335) < 1e-9 && big.weight_lb > 2 * r.weight_lb);
+  // The largest bars are in the table.
+  assert.ok(Math.abs(_v430({ bar_size: "18", total_len_ft: 100 }).weight_lb - 1360) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v430({ bar_size: "99", total_len_ft: 500 }));
+  assert.ok("error" in _v430({ bar_size: "5", total_len_ft: 0 }));
+  assert.ok("error" in _v430({ bar_size: "5", total_len_ft: Infinity }));
+});
+
+test("bounds: spec-v431 computeReadyMixConcreteOrder pins the order, trucks, short-load, and error seams", () => {
+  const r = _v431({ volume_yd3: 42, waste_pct: 8, load_yd3: 10, min_yd3: 10 });
+  assert.ok(Math.abs(r.ordered_yd3 - 45.36) < 1e-9 && r.trucks === 5);
+  assert.ok(Math.abs(r.last_load_yd3 - 5.36) < 1e-9 && r.short_load === false);
+  // A small pour trips the short-load fee.
+  const small = _v431({ volume_yd3: 6, waste_pct: 8, load_yd3: 10, min_yd3: 10 });
+  assert.ok(Math.abs(small.ordered_yd3 - 6.48) < 1e-9 && small.trucks === 1 && small.short_load === true);
+  // A blank truck capacity (0) falls back to the 10 yd^3 default, not an error.
+  assert.ok(!("error" in _v431({ volume_yd3: 42, waste_pct: 8, load_yd3: 0 })) && _v431({ volume_yd3: 42, waste_pct: 8, load_yd3: 0 }).trucks === 5);
+  // Error seams.
+  assert.ok("error" in _v431({ volume_yd3: 0, waste_pct: 8, load_yd3: 10 }));
+  assert.ok("error" in _v431({ volume_yd3: 42, waste_pct: -1, load_yd3: 10 }));
+  assert.ok("error" in _v431({ volume_yd3: Infinity, waste_pct: 8, load_yd3: 10 }));
+});

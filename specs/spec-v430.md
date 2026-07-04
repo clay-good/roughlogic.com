@@ -1,6 +1,6 @@
 # roughlogic.com Specification v430 -- Rebar Weight Takeoff (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the concrete-construction trio (v429 formwork pressure -> v430 rebar
+> **Status: LANDED (2026-07-04, 0.149.0; proposed 2026-07-03). Second tile of the concrete-construction trio (v429 formwork pressure -> v430 rebar
 > weight takeoff -> v431 ready-mix order). The catalog develops, splices, and designs reinforcement (`rc-development-length`,
 > `rebar-lap-splice`, `rc-beam-flexure`) but never weighs it -- the tonnage a rebar order and a placement crew are priced
 > and paid on.**

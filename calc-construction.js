@@ -6104,3 +6104,90 @@ const _renderSeismicPdelta = _simpleRenderer({
   compute: computeSeismicPdeltaStability,
 });
 CONSTRUCTION_RENDERERS["seismic-pdelta-stability"] = _renderSeismicPdelta;
+
+// ===================== spec-v430..v431: concrete field-work pair (Group E) [v429 CUT as dupe of formwork-pressure] =====================
+
+const _V430_REBAR_UNIT_WT = { "3": 0.376, "4": 0.668, "5": 1.043, "6": 1.502, "7": 2.044, "8": 2.670, "9": 3.400, "10": 4.303, "11": 5.313, "14": 7.65, "18": 13.60 };
+
+// dims: in { bar_size: dimensionless, total_len_ft: L, price_per_lb: dimensionless } out: { unit_wt: dimensionless, weight_lb: M, tons: dimensionless }
+export function computeRebarWeightTakeoff({ bar_size = "5", total_len_ft = 0, price_per_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const size = String(bar_size);
+  const len = Number(total_len_ft) || 0;
+  const price = Number(price_per_lb) || 0;
+  const unit_wt = _V430_REBAR_UNIT_WT[size];
+  if (!Number.isFinite(unit_wt)) return { error: "Unrecognized bar size (use 3-11, 14, or 18)." };
+  if (!(len > 0)) return { error: "Total length must be positive (ft)." };
+  const weight_lb = unit_wt * len;
+  const tons = weight_lb / 2000;
+  const cost_usd = price > 0 ? weight_lb * price : null;
+  return {
+    unit_wt, weight_lb, tons, cost_usd,
+    note: "Rebar weight takeoff: the ASTM A615 nominal unit weight per foot (a #N bar is about N/8 inch in diameter; #3 is 0.376 lb/ft up to #11 at 5.313, then #14 at 7.65 and #18 at 13.60) times the total linear feet of that size, converted to tons and priced. Rebar is bought and priced by weight, so a bill of material is summed size-by-size. Add lap-splice and waste length before this (the takeoff is of the placed length). A quantity aid; the shop drawings and the mill's actual weights govern.",
+  };
+}
+export const rebarWeightTakeoffExample = { inputs: { bar_size: "5", total_len_ft: 500, price_per_lb: 0 } };
+const _v430renderRebarWeightTakeoff = _simpleRenderer({
+  citation: "Citation: Rebar weight takeoff (ASTM A615 nominal bar weights): unit weight per foot x total linear feet, to tons and cost. #3 0.376, #4 0.668, #5 1.043, ... #11 5.313, #14 7.65, #18 13.60 lb/ft. A quantity aid; the shop drawings and mill weights govern.",
+  example: rebarWeightTakeoffExample.inputs,
+  fields: [
+    { key: "bar_size", label: "Bar size", kind: "select", options: [
+      { value: "3", label: "#3 (0.376 lb/ft)" }, { value: "4", label: "#4 (0.668)" }, { value: "5", label: "#5 (1.043)" },
+      { value: "6", label: "#6 (1.502)" }, { value: "7", label: "#7 (2.044)" }, { value: "8", label: "#8 (2.670)" },
+      { value: "9", label: "#9 (3.400)" }, { value: "10", label: "#10 (4.303)" }, { value: "11", label: "#11 (5.313)" },
+      { value: "14", label: "#14 (7.65)" }, { value: "18", label: "#18 (13.60)" },
+    ], default: "5" },
+    { key: "total_len_ft", label: "Total linear feet of this size", kind: "number", default: 500 },
+    { key: "price_per_lb", label: "Rebar price ($/lb, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "w", id: "rwt-out-w", label: "Weight", value: (r) => fmt(r.weight_lb, 0) + " lb (" + fmt(r.tons, 2) + " ton, at " + fmt(r.unit_wt, 3) + " lb/ft)" },
+    { key: "c", id: "rwt-out-c", label: "Cost", value: (r) => r.cost_usd == null ? "(enter a price)" : "$" + fmt(r.cost_usd, 2) },
+    { key: "n", id: "rwt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRebarWeightTakeoff,
+});
+CONSTRUCTION_RENDERERS["rebar-weight-takeoff"] = _v430renderRebarWeightTakeoff;
+
+// dims: in { volume_yd3: L^3, waste_pct: dimensionless, load_yd3: L^3, min_yd3: L^3, price_per_yd3: dimensionless } out: { ordered_yd3: L^3, trucks: dimensionless, last_load_yd3: L^3 }
+export function computeReadyMixConcreteOrder({ volume_yd3 = 0, waste_pct = 8, load_yd3 = 10, min_yd3 = 10, price_per_yd3 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vol = Number(volume_yd3) || 0;
+  const waste = Number(waste_pct) || 0;
+  const load = Number(load_yd3) > 0 ? Number(load_yd3) : 10;
+  const min = Number(min_yd3) || 0;
+  const price = Number(price_per_yd3) || 0;
+  if (!(vol > 0)) return { error: "Required volume must be positive (yd^3)." };
+  if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
+  if (!(load > 0)) return { error: "Truck capacity must be positive (yd^3)." };
+  if (min < 0) return { error: "Plant minimum must be non-negative (yd^3)." };
+  const ordered_yd3 = vol * (1 + waste / 100);
+  const trucks = Math.ceil(ordered_yd3 / load);
+  const last_load_yd3 = ordered_yd3 - (trucks - 1) * load;
+  const short_load = ordered_yd3 < min;
+  const cost_usd = price > 0 ? ordered_yd3 * price : null;
+  return {
+    ordered_yd3, trucks, last_load_yd3, short_load, cost_usd,
+    note: "Ready-mix concrete order: the ordered volume = the in-place volume x (1 + a waste/over-order allowance, commonly 5-10% for spillage, over-excavation, and a safety margin so the pour is not short), the number of truckloads = the ordered volume / the truck capacity rounded up, and a short-load fee applies when the order is below the plant minimum (often ~10 yd^3). Running short mid-pour risks a cold joint, so ordering a little long is cheaper than a second small delivery. A quantity aid; the ready-mix supplier's truck size, minimum, and short-load and standby (waiting-time) fees govern.",
+  };
+}
+export const readyMixConcreteOrderExample = { inputs: { volume_yd3: 42, waste_pct: 8, load_yd3: 10, min_yd3: 10, price_per_yd3: 0 } };
+const _v431renderReadyMixConcreteOrder = _simpleRenderer({
+  citation: "Citation: Ready-mix concrete order (concrete-supply practice): ordered = in-place volume x (1 + waste%), trucks = ceil(ordered / truck capacity), short-load fee when the order is below the plant minimum. A quantity aid; the supplier's truck size, minimum, and short-load/standby fees govern.",
+  example: readyMixConcreteOrderExample.inputs,
+  fields: [
+    { key: "volume_yd3", label: "Required in-place volume (yd^3)", kind: "number", default: 42 },
+    { key: "waste_pct", label: "Waste/over-order allowance (%)", kind: "number", default: 8 },
+    { key: "load_yd3", label: "Truck capacity (yd^3, default 10)", kind: "number", default: 10 },
+    { key: "min_yd3", label: "Plant minimum before short-load fee (yd^3)", kind: "number", default: 10 },
+    { key: "price_per_yd3", label: "Concrete price ($/yd^3, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "o", id: "rmc-out-o", label: "Order / trucks", value: (r) => fmt(r.ordered_yd3, 2) + " yd^3 -> " + r.trucks + " truck(s), last load " + fmt(r.last_load_yd3, 2) + " yd^3" },
+    { key: "s", id: "rmc-out-s", label: "Short-load fee", value: (r) => r.short_load ? "YES -- order below the plant minimum" : "no (order meets the minimum)" },
+    { key: "c", id: "rmc-out-c", label: "Cost", value: (r) => r.cost_usd == null ? "(enter a price)" : "$" + fmt(r.cost_usd, 2) },
+    { key: "n", id: "rmc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeReadyMixConcreteOrder,
+});
+CONSTRUCTION_RENDERERS["ready-mix-concrete-order"] = _v431renderReadyMixConcreteOrder;

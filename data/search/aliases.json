@@ -15188,6 +15188,23 @@
     { "term": "detention pond", "target": "stormwater-detention-volume", "kind": "industry" },
     { "term": "runoff storage", "target": "stormwater-detention-volume", "kind": "industry" },
     { "term": "detention calculation", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "pre post development runoff", "target": "stormwater-detention-volume", "kind": "industry" }
+    { "term": "pre post development runoff", "target": "stormwater-detention-volume", "kind": "industry" },
+    { "term": "rebar weight", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "rebar takeoff", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "reinforcing steel weight", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "bar weight per foot", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "rebar tonnage", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "rebar pounds", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "reinforcement takeoff", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "steel bar weight", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "rebar order weight", "target": "rebar-weight-takeoff", "kind": "industry" },
+    { "term": "ready mix order", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "concrete truck loads", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "concrete order", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "concrete waste allowance", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "short load fee", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "concrete delivery", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "ready mix trucks", "target": "ready-mix-concrete-order", "kind": "industry" },
+    { "term": "concrete ordering", "target": "ready-mix-concrete-order", "kind": "industry" }
   ]
 }

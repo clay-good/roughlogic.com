@@ -9231,6 +9231,30 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the spec and cylinder breaks govern the strip; cold weather slows the real gain", source: "ASTM C1074" },
     ],
   },
+  "rebar-weight-takeoff": {
+    formula: "weight = unit_wt(bar_size) x total_len_ft; tons = weight / 2000; cost = weight x price_per_lb.",
+    edition: "The ASTM A615 nominal reinforcing-bar unit weights (#3 0.376 lb/ft ... #18 13.60 lb/ft), by name.",
+    freeAccess: "The nominal bar weights are the standard ASTM A615 values, published in every rebar reference; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rebar weight takeoff: the ASTM A615 nominal unit weight per foot for the bar size (a #N bar is nominally N/8 inch in diameter; #3 = 0.376 lb/ft, #4 = 0.668, #5 = 1.043, up to #11 = 5.313, then #14 = 7.65 and #18 = 13.60) multiplied by the total linear feet of that size, then converted to tons and priced. Reinforcing steel is bought and priced by weight, so a bill of material sums each size separately. The takeoff is of the placed length; add lap-splice length (see rebar-lap-splice) and any waste before this. A quantity aid; the placing drawings, the bar list, and the mill's actual weights govern.",
+    assumptions: [
+      { name: "Nominal weights", value: "ASTM A615: #3 0.376 ... #11 5.313, #14 7.65, #18 13.60 lb/ft", source: "ASTM A615" },
+      { name: "Weight and tons", value: "weight = unit weight x length; tons = weight / 2000", source: "arithmetic" },
+      { name: "Placed length", value: "add lap and waste before the takeoff; the bar list governs", source: "scope of this tile" },
+    ],
+  },
+  "ready-mix-concrete-order": {
+    formula: "ordered = volume x (1 + waste%); trucks = ceil(ordered / load); last_load = ordered - (trucks-1) x load; short_load if ordered < min.",
+    edition: "Ready-mix concrete ordering (volume, waste allowance, truckloads, short-load minimum), standard concrete-supply practice, by name.",
+    freeAccess: "The waste-allowance, truckload, and short-load-minimum arithmetic is public; the truck size, plant minimum, and fee schedule come from the supplier.",
+    governance: GOVERNANCE.general,
+    editionNote: "Ready-mix concrete order: the ordered volume = the in-place (neat) volume x (1 + a waste/over-order allowance, commonly 5-10% to cover spillage, over-excavation of the subgrade, and a margin so the pour does not come up short), the number of truckloads = the ordered volume / the truck capacity rounded up, and a short-load fee applies when the order is below the plant's minimum (often about 10 yd^3). Coming up short mid-pour risks a cold joint and a second small-load fee, so ordering slightly long is the cheaper risk. This estimates the order from the entered figures; the ready-mix supplier's actual truck size, plant minimum, and short-load and standby (waiting-time) fees, plus the mix design and any pump losses, govern. A quantity aid.",
+    assumptions: [
+      { name: "Order and trucks", value: "ordered = volume x (1 + waste%); trucks = ceil(ordered / capacity)", source: "concrete-supply practice" },
+      { name: "Short load", value: "a fee applies below the plant minimum (often ~10 yd^3)", source: "concrete-supply practice" },
+      { name: "Supplier governs", value: "truck size, minimum, and short-load/standby fees are the supplier's", source: "scope of this tile" },
+    ],
+  },
   "allowable-area": {
     formula: "w_eff = min(open_width_ft, 30); frontage_if = (F/P) < 0.25 ? 0 : (F/P - 0.25) x (w_eff / 30); allowable = tabular_area + ns_area x frontage_if; pass = actual_area <= allowable.",
     edition: "IBC 2021 §506.2 (Aa = At + NS x If), §506.3.1, §506.3.2 (If = [F/P - 0.25] x W/30), and §506.3.3 (W capped at 30 ft), by name; Table 506.2 supplies the tabular areas.",

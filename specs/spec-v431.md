@@ -1,6 +1,6 @@
 # roughlogic.com Specification v431 -- Ready-Mix Concrete Order (Trucks, Waste, Short Load) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the concrete-construction trio (v429 formwork pressure ->
+> **Status: LANDED (2026-07-04, 0.149.0; proposed 2026-07-03). Third and final tile of the concrete-construction trio (v429 formwork pressure ->
 > v430 rebar weight takeoff -> v431 ready-mix order). The catalog computes concrete volume, but ordering it is a different
 > job: how many truckloads, how much waste to add so you do not come up short, and whether the last load trips a
 > short-load fee.**

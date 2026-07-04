@@ -1556,9 +1556,11 @@ cross-check.
 | calc-construction.js | `computePullout` | `{ fastener_type, fastener_size, species, penetration_in }` | _ | _ | _ |
 | calc-construction.js | `computeRafter` | `{ horizontal_span_ft, pitch_rise_per_12, overhang_ft = 0 }` | _ | _ | _ |
 | calc-construction.js | `computeRainLoadPonding` | `{ static_head_in = 0, hydraulic_head_in = 0, roof_area_ft2 = 0, rainfall_in_h...` | _ | _ | _ |
+| calc-construction.js | `computeReadyMixConcreteOrder` | `{ volume_yd3 = 0, waste_pct = 8, load_yd3 = 10, min_yd3 = 10, price_per_yd3 =...` | _ | _ | _ |
 | calc-construction.js | `computeRebar` | `{ length_ft, width_ft, spacing_in, edge_clearance_in = 3, bar_size = "#4" }` | _ | _ | _ |
 | calc-construction.js | `computeRebarLapSplice` | `{ bar_size = "#5", lap_factor = 48, min_lap_in = 12 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeRebarSchedule` | `{ rows = [] } = {}` | _ | _ | _ |
+| calc-construction.js | `computeRebarWeightTakeoff` | `{ bar_size = "5", total_len_ft = 0, price_per_lb = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeResidentialFraming` | `{ footprint_ft2 = 0, perimeter_ft = 0, wall_height_ft = 8, stud_oc_in = 16, j...` | _ | _ | _ |
 | calc-construction.js | `computeRidgeCapFasteners` | `{ ridge_lf = 0, hip_lf = 0, cap_lf_per_bundle = 20, cap_exposure_in = 5, squa...` | _ | _ | _ |
 | calc-construction.js | `computeRoofPitch` | `{ rise = null, run = 12, mode = "rise_run" }` | _ | _ | _ |
@@ -2552,7 +2554,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1138.
+Row count: 1140.
 
 <!-- END function-corpus-v14 -->
 
@@ -2991,7 +2993,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (190 tiles)
+### Group E Construction (192 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3102,9 +3104,11 @@ per spec-v14 §13.1 second paragraph.
 | `rc-punching-shear` | Two-Way Slab Punching Shear at a Column (ACI 318-19 22.6) | ACI 318-19 Table 22.6.5.2; spec-v285 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-shear-friction` | Shear Friction Across an Interface (ACI 318-19 22.9) | ACI 318-19 22.9; spec-v301 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-slab-min-thickness` | One-Way Slab / Beam Minimum Thickness for Deflection (ACI 318-19) | ACI 318-19 Table 7.3.1.1 / 9.3.1.1; spec-v299 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ready-mix-concrete-order` | Ready-Mix Concrete Order (Trucks, Waste, Short Load) | concrete-supply practice; spec-v431 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rebar` | Rebar Spacing and Quantity | Project (first-principles slab grid l...; 20 ft x 10 ft slab / 12 in spacing / 3 in edge clearance ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-lap-splice` | Rebar Lap-Splice Length | ACI 318 development-and-splice basis ...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rebar-schedule` | Rebar Bend and Weight Schedule | ACI Detailing Manual / CRSI (project ...; 12 #5 @ 20 ft + 2x 90 + 30 #4 @ 16 ft + 1 stirrup + 8 #6 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rebar-weight-takeoff` | Rebar Weight Takeoff | ASTM A615; spec-v430 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `relative-compaction` | Relative Compaction from Field Density and Proctor Maximum | Relative compaction (earthwork QC); spec-v326 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `residential-framing` | Residential Framing Package | IRC framing practice + AWC NDS (proje...; 1500 ft^2 / 160 ft perim / 9 ft walls / 2x4 / 2x10 joists... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `retaining-wall-block` | Segmental Retaining Wall Takeoff | Segmental retaining-wall maker guidan...; spec-v97 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3632,6 +3636,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 894. Fixture-covered or reference-cadence: 894 / 894.
+Tile count: 896. Fixture-covered or reference-cadence: 896 / 896.
 
 <!-- END tile-index-v14 -->
