@@ -17922,6 +17922,46 @@
       "term": "alternator load balance",
       "target": "alternator-charging-load",
       "kind": "industry"
+    },
+    {
+      "term": "powered attic ventilator",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "attic fan sizing",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "attic fan cfm",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "power attic fan",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "attic exhaust fan",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "attic fan intake",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "attic ventilator cfm",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
+    },
+    {
+      "term": "attic fan size",
+      "target": "powered-attic-ventilator",
+      "kind": "industry"
     }
   ]
 }

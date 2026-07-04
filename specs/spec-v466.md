@@ -1,6 +1,6 @@
 # roughlogic.com Specification v466 -- Ridge and Soffit Vent Linear Feet (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the roofing-ventilation trio (v465 attic NFVA -> v466 ridge/soffit vent
+> **Status: CUT (2026-07-04) -- dupe of the existing `attic-ventilation` tile, which already outputs the 50/50 intake/exhaust split, the soffit-vent count, and the ridge-vent length. Not landed.. Second tile of the roofing-ventilation trio (v465 attic NFVA -> v466 ridge/soffit vent
 > linear feet -> v467 powered attic ventilator). `attic-ventilation-nfva` gives the required net free vent area; this tile
 > turns that area into the linear feet of ridge and soffit vent a roofer orders and installs.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A balanced attic vents half its net free area high (the

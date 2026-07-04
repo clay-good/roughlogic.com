@@ -1,6 +1,6 @@
 # roughlogic.com Specification v467 -- Powered Attic Ventilator Sizing (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the roofing-ventilation trio (v465 attic NFVA -> v466 ridge/soffit
+> **Status: LANDED (2026-07-04). Third and final tile of the roofing-ventilation trio (v465 attic NFVA -> v466 ridge/soffit
 > vent linear feet -> v467 powered attic ventilator). When passive venting is not enough, a powered attic fan is sized on
 > airflow, not net free area -- and it needs matching intake or it will pull conditioned air from the house.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A powered attic ventilator is sized at about

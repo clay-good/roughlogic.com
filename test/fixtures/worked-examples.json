@@ -42695,6 +42695,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "powered-attic-ventilator",
+   "source_publisher": "attic-fan sizing practice",
+   "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",
+   "source_edition_or_year": "spec-v467 worked example (machine-verified)",
+   "source_section_or_page": "spec-v467 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "attic_area_ft2": 1500,
+    "cfm_per_ft2": 0.7,
+    "dark_roof": "no"
+   },
+   "outputs": {
+    "fan_cfm": {
+     "value": 1050,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "intake_ft2": {
+     "value": 3.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "intake_in2": {
+     "value": 504,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "powered-attic-ventilator",
+   "source_publisher": "attic-fan sizing practice",
+   "source_title": "dark roof adds ~15% -> 1208 CFM fan, 4.0 ft2 intake",
+   "source_edition_or_year": "spec-v467 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v467 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "attic_area_ft2": 1500,
+    "cfm_per_ft2": 0.7,
+    "dark_roof": "yes"
+   },
+   "outputs": {
+    "fan_cfm": {
+     "value": 1207.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "intake_ft2": {
+     "value": 4.025,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

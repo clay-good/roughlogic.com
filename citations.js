@@ -7368,6 +7368,18 @@ export const CITATIONS = {
       { name: "Ratio", value: "1/150, reducible to 1/300 with a balanced split + vapor retarder (advisory)", source: "IRC R806" },
     ],
   },
+  "powered-attic-ventilator": {
+    formula: "fan_cfm = attic_area x cfm_per_ft2 x (dark_roof ? 1.15 : 1.0); intake_ft2 = fan_cfm / 300; intake_in2 = intake_ft2 x 144. Default cfm_per_ft2 = 0.7.",
+    edition: "Powered attic-ventilator sizing, standard roofing / attic-fan manufacturer practice (~0.7 CFM per ft^2, ~1 ft^2 intake per 300 CFM) by name; first-principles airflow.",
+    freeAccess: "The CFM-per-square-foot and intake-per-CFM rules of thumb are published free in attic-fan manufacturer sizing guides.",
+    governance: GOVERNANCE.general,
+    editionNote: "A powered attic ventilator (attic fan) is sized to roughly 0.7 CFM per square foot of attic floor (about 10 air changes per hour for a typical attic), increased by about 15% for a dark roof that runs hotter. The fan must be paired with adequate intake (soffit) net free area, roughly 1 square foot per 300 CFM, so it draws outdoor air rather than starving and depressurizing the attic (which can back-draft atmospheric combustion appliances or pull air-conditioned air out of the house through ceiling leaks). Powered fans are only one approach: balanced passive ridge-and-soffit ventilation (see attic-ventilation) is frequently preferred, and some codes and utility programs discourage or restrict powered attic fans on conditioned homes. A sizing aid; the fan manufacturer's data, the intake actually available, and the local code govern.",
+    assumptions: [
+      { name: "Fan airflow", value: "~0.7 CFM per ft^2 of attic floor (~10 ACH), +~15% for a dark roof", source: "attic-fan sizing practice" },
+      { name: "Intake area", value: "~1 ft^2 of net free intake per 300 CFM so the fan is not starved", source: "attic-fan sizing practice" },
+      { name: "Passive preferred", value: "balanced passive ventilation is often preferred; some codes restrict powered fans", source: "scope of this tile" },
+    ],
+  },
   "gutter-downspout": {
     formula: "Adjusted area = plan area x pitch factor x (rainfall / 5 in/hr); downspouts = ceil((adjusted / 100) / downspout sq in); gutter 5 in K-style up to ~5,520 sq ft else 6 in.",
     edition: "SMACNA / standard residential gutter method (by name).",

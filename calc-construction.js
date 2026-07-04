@@ -6391,3 +6391,38 @@ const _v454renderMultiBendFlatPattern = _simpleRenderer({
   compute: computeMultiBendFlatPattern,
 });
 CONSTRUCTION_RENDERERS["multi-bend-flat-pattern"] = _v454renderMultiBendFlatPattern;
+
+// ===================== spec-v467: powered attic ventilator sizing =====================
+// dims: in { attic_area_ft2: L^2, cfm_per_ft2: dimensionless, dark_roof: dimensionless } out: { fan_cfm: L^3 T^-1, intake_ft2: L^2, intake_in2: L^2 }
+export function computePoweredAtticVentilator({ attic_area_ft2 = 0, cfm_per_ft2 = 0.7, dark_roof = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const area = Number(attic_area_ft2) || 0;
+  const factor = Number(cfm_per_ft2) || 0;
+  const dark = dark_roof === "yes" || dark_roof === true;
+  if (!(area > 0)) return { error: "Attic floor area must be positive (ft^2)." };
+  if (!(factor > 0)) return { error: "Airflow factor must be positive (CFM per ft^2)." };
+  const fan_cfm = area * factor * (dark ? 1.15 : 1.0);
+  const intake_ft2 = fan_cfm / 300;
+  const intake_in2 = intake_ft2 * 144;
+  return {
+    fan_cfm, intake_ft2, intake_in2, dark,
+    note: "Powered attic ventilator (fan) sizing: size the fan to about 0.7 CFM per square foot of attic floor (roughly 10 air changes per hour for a typical attic), with about a 15% increase for a dark roof that runs hotter. The fan needs matching intake (soffit) net free area of roughly 1 ft^2 per 300 CFM so it pulls outdoor air rather than starving and depressurizing the attic (which can back-draft combustion appliances or pull conditioned air from the house). Powered ventilators are one approach; balanced passive ridge-and-soffit ventilation (see the attic-ventilation tile) is often preferred and some codes restrict powered fans. A sizing aid; the fan manufacturer's data and the local code govern.",
+  };
+}
+export const poweredAtticVentilatorExample = { inputs: { attic_area_ft2: 1500, cfm_per_ft2: 0.7, dark_roof: "no" } };
+const _v467renderPoweredAtticVentilator = _simpleRenderer({
+  citation: "Citation: Powered attic ventilator sizing: fan ~0.7 CFM per ft^2 of attic floor (about 10 ACH), +~15% for a dark roof; matching intake net free area ~1 ft^2 per 300 CFM. Balanced passive ventilation is often preferred and some codes restrict powered fans. A sizing aid; the fan manufacturer's data and the local code govern.",
+  example: poweredAtticVentilatorExample.inputs,
+  fields: [
+    { key: "attic_area_ft2", label: "Attic floor area (ft^2)", kind: "number", default: 1500 },
+    { key: "cfm_per_ft2", label: "Airflow factor (CFM per ft^2)", kind: "number", default: 0.7 },
+    { key: "dark_roof", label: "Dark roof (~15% increase)?", kind: "select", default: "no", options: [{ value: "no", label: "No (light/average roof)" }, { value: "yes", label: "Yes (dark roof)" }] },
+  ],
+  outputs: [
+    { key: "fan", id: "pav-out-fan", label: "Fan size", value: (r) => fmt(r.fan_cfm, 0) + " CFM" + (r.dark ? " (dark-roof adjusted)" : "") },
+    { key: "in", id: "pav-out-in", label: "Required intake (soffit) area", value: (r) => fmt(r.intake_ft2, 1) + " ft^2 (" + fmt(r.intake_in2, 0) + " in^2)" },
+    { key: "n", id: "pav-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoweredAtticVentilator,
+});
+CONSTRUCTION_RENDERERS["powered-attic-ventilator"] = _v467renderPoweredAtticVentilator;

@@ -426,7 +426,7 @@ const _TILES = [
   ["rebar-lap-splice", "E"],
   ["paver-patio", "E"],
   ["retaining-wall-block", "E"],
-  ["attic-ventilation", "E"],
+  ["attic-ventilation", "E"], ["powered-attic-ventilator", "E"],
   ["gutter-downspout", "E"],
   ["assembly-r-value", "C"],
   ["blown-insulation-coverage", "C"],

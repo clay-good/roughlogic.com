@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(roofing): land spec-v467 -- powered attic ventilator sizing (v465/v466 cut as dupes); 921 -> 922 tiles, 0.160.0, 2026-07-04
+
+The attic-ventilation trio, twenty-ninth batch of the v375-v474 campaign. Two of three were **cut as duplicates** of the existing `attic-ventilation` (Attic Ventilation Net Free Area, calc-finish.js), which already computes the IRC 1/150 and 1/300 net free area, the 50/50 intake/exhaust split, the soffit-vent count, and the ridge-vent length: v465 `attic-ventilation-nfva` (the NFVA) and v466 `ridge-soffit-vent-linear` (the split-to-linear-feet) -- so only one landed. Catalog **921 -> 922**, package **0.159.0 -> 0.160.0** (a minor). Proposed 2026-07-03.
+
+- **`powered-attic-ventilator` (spec-v467, calc-construction.js).** Fan CFM = attic area x ~0.7 CFM/ft^2 x (dark roof ? 1.15 : 1.0), matching intake = fan CFM / 300. Pinned: a 1,500 ft^2 attic -> 1,050 CFM fan, 3.5 ft^2 (504 in^2) intake; a dark roof -> 1,208 CFM. Distinct from the passive-NFVA `attic-ventilation` (this sizes an active fan and its required intake).
+
+Carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, a fuzzer block covering the dark-roof factor, the boolean/string dark input, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming attic-fan sizing practice and the intake-per-CFM rule. Uses the shared `_simpleRenderer` (dark-roof as a yes/no `makeSelect`). Per-tile wiring across nine registries. Housekeeping: home count 921 -> 922, README resynced (counts, sitemap URLs 943 -> 944), one spec LANDED + two CUT, docs/mobile-responsive.md section 92 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the new tile.
+
 ### feat(mechanic): land spec-v462..v464 -- 3 marine/engine/electrical tiles in calc-mechanic.js; 918 -> 921 tiles, 0.159.0, 2026-07-04
 
 The mechanic trio, twenty-eighth batch of the v375-v474 campaign, all in the existing lazy `calc-mechanic.js` (Group K); no new module, group, or dependency. Catalog **918 -> 921**, package **0.158.0 -> 0.159.0** (a minor). Proposed 2026-07-03.

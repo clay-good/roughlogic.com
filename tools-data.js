@@ -793,6 +793,7 @@ export const TOOLS = [
 
   // spec-v98 Group E attic ventilation + residential gutter sizing (calc-finish.js)
   { id: "attic-ventilation", name: "Attic Ventilation Net Free Area", group: "E", trades: ["roofing","carpentry"], desc: "The net free vent area an attic needs (the IRC 1/150 rule, or 1/300 balanced with a vapor retarder), the 50/50 intake/exhaust split, and the soffit-vent count and ridge-vent length." },
+  { id: "powered-attic-ventilator", name: "Powered Attic Ventilator Sizing", group: "E", trades: ["roofing", "carpentry"], desc: "The fan size and matching intake for a powered attic ventilator: fan CFM = attic floor area x ~0.7 CFM/ft^2 (about 10 air changes/hr), with a ~15% increase for a dark roof, and the required intake (soffit) net free area of about 1 ft^2 per 300 CFM so the fan pulls outdoor air rather than starving. A 1,500 ft^2 attic needs a 1,050 CFM fan and 3.5 ft^2 (504 in^2) of intake; a dark roof pushes the fan to 1,208 CFM. Balanced passive ridge-and-soffit ventilation is often preferred and some codes restrict powered fans. A sizing aid; the fan manufacturer's data and the local code govern." },
   { id: "gutter-downspout", name: "Gutter and Downspout Sizing", group: "E", trades: ["roofing","carpentry"], desc: "The gutter size and number of downspouts a roof needs: the adjusted (design) roof area from the plan area, the roof pitch, and the local rainfall intensity, then the gutter and downspout count." },
 
   // spec-v99 Group C building-envelope insulation (calc-hvac.js)

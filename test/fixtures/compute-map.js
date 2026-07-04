@@ -676,6 +676,7 @@ export const COMPUTE_MAP = {
   "paver-patio": { module: "../../calc-finish.js", fn: "computePaverPatio" },
   "retaining-wall-block": { module: "../../calc-finish.js", fn: "computeRetainingWallBlock" },
   "attic-ventilation": { module: "../../calc-finish.js", fn: "computeAtticVentilation" },
+  "powered-attic-ventilator": { module: "../../calc-construction.js", fn: "computePoweredAtticVentilator" },
   "gutter-downspout": { module: "../../calc-finish.js", fn: "computeGutterDownspout" },
   "assembly-r-value": { module: "../../calc-hvac.js", fn: "computeAssemblyRValue" },
   "blown-insulation-coverage": { module: "../../calc-hvac.js", fn: "computeBlownInsulationCoverage" },

@@ -15747,6 +15747,23 @@ test("bounds: spec-v464 computeAlternatorChargingLoad pins the idle/cruise balan
   assert.ok("error" in _v464({ total_load_a: Infinity, alternator_a: 120 }));
 });
 
+// ===================== spec-v467 powered attic ventilator (v465/v466 cut as dupes of attic-ventilation) =====================
+import { computePoweredAtticVentilator as _v467 } from "../../calc-construction.js";
+
+test("bounds: spec-v467 computePoweredAtticVentilator pins the fan CFM, intake, dark-roof factor, and error seams", () => {
+  const r = _v467({ attic_area_ft2: 1500, cfm_per_ft2: 0.7, dark_roof: "no" });
+  assert.ok(Math.abs(r.fan_cfm - 1050) < 1e-9 && Math.abs(r.intake_ft2 - 3.5) < 1e-9 && Math.abs(r.intake_in2 - 504) < 1e-9);
+  // A dark roof raises the fan ~15%.
+  const dark = _v467({ attic_area_ft2: 1500, cfm_per_ft2: 0.7, dark_roof: "yes" });
+  assert.ok(Math.abs(dark.fan_cfm - 1207.5) < 1e-9 && dark.fan_cfm > r.fan_cfm);
+  // Boolean true is accepted as dark too.
+  assert.ok(Math.abs(_v467({ attic_area_ft2: 1500, cfm_per_ft2: 0.7, dark_roof: true }).fan_cfm - 1207.5) < 1e-9);
+  // Error seams: non-positive area, non-positive factor, non-finite.
+  assert.ok("error" in _v467({ attic_area_ft2: 0, cfm_per_ft2: 0.7 }));
+  assert.ok("error" in _v467({ attic_area_ft2: 1500, cfm_per_ft2: 0 }));
+  assert.ok("error" in _v467({ attic_area_ft2: Infinity, cfm_per_ft2: 0.7 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

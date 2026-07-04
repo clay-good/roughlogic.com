@@ -859,6 +859,7 @@ const RELATED = {
   "paver-patio": ["aggregate","retaining-wall-block","square-footage"],
   "retaining-wall-block": ["paver-patio","aggregate","masonry-count"],
   "attic-ventilation": ["roofing-squares","gutter-downspout","blown-insulation-coverage"],
+  "powered-attic-ventilator": ["attic-ventilation","ridge-cap-fasteners","blown-insulation-coverage","insulation-heat-loss"],
   "gutter-downspout": ["roofing-squares","attic-ventilation","roof-drain-sizing"],
   "assembly-r-value": ["insulation-heat-loss","manual-j-heating","blown-insulation-coverage"],
   "blown-insulation-coverage": ["assembly-r-value","attic-ventilation","manual-j-heating"],

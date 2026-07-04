@@ -1,6 +1,6 @@
 # roughlogic.com Specification v465 -- Attic Ventilation Net Free Area (IRC R806) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a roofing-ventilation trio (v465 attic NFVA -> v466 ridge/soffit vent
+> **Status: CUT (2026-07-04) -- dupe of the existing `attic-ventilation` tile (Attic Ventilation Net Free Area, calc-finish.js), which already computes the IRC 1/150 and 1/300 net free area. Not landed.. First tile of a roofing-ventilation trio (v465 attic NFVA -> v466 ridge/soffit vent
 > linear feet -> v467 powered attic ventilator). `roofing-squares` counts shingles; nothing sizes the attic ventilation that
 > keeps a roof from cooking shingles and forming ice dams -- the required net free vent area.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. IRC R806 requires attic ventilation of at least
