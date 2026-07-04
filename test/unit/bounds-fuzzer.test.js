@@ -15460,3 +15460,52 @@ test("bounds: spec-v392 computeRetainageTracker pins retention, net, cumulative,
   assert.ok("error" in _v392({ work_this_period_usd: 100000, retainage_pct: 10, prior_retained_usd: -1 }));
   assert.ok("error" in _v392({ work_this_period_usd: Infinity, retainage_pct: 10, prior_retained_usd: 40000 }));
 });
+
+// ===================== spec-v393..v395 concrete design-details trio =====================
+import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
+
+test("bounds: spec-v393 computeTBeamEffectiveFlangeWidth pins the interior/edge overhang and error seams", () => {
+  const i = _v393({ bw_in: 12, hf_in: 4, ln_in: 240, sw_in: 48, beam_type: "interior" });
+  assert.ok(Math.abs(i.overhang_in - 24) < 1e-9); // min(32, 24, 30)
+  assert.ok(Math.abs(i.be_in - 60) < 1e-9);
+  // An edge beam counts one flange with the tighter limits.
+  const e = _v393({ bw_in: 12, hf_in: 4, ln_in: 240, sw_in: 48, beam_type: "edge" });
+  assert.ok(Math.abs(e.overhang_in - 20) < 1e-9 && Math.abs(e.be_in - 32) < 1e-9); // min(24, 24, 20)
+  // Flange-thickness limit can govern for a thin slab / wide spacing.
+  const thin = _v393({ bw_in: 12, hf_in: 2, ln_in: 240, sw_in: 48, beam_type: "interior" });
+  assert.ok(Math.abs(thin.overhang_in - 16) < 1e-9); // 8 hf = 16 governs
+  // Error seams.
+  assert.ok("error" in _v393({ bw_in: 0, hf_in: 4, ln_in: 240, sw_in: 48 }));
+  assert.ok("error" in _v393({ bw_in: 12, hf_in: 0, ln_in: 240, sw_in: 48 }));
+  assert.ok("error" in _v393({ bw_in: 12, hf_in: 4, ln_in: 0, sw_in: 48 }));
+  assert.ok("error" in _v393({ bw_in: 12, hf_in: 4, ln_in: 240, sw_in: Infinity }));
+});
+
+test("bounds: spec-v394 computeConcreteBeamMinFlexuralSteel pins the max-of-two ratio and error seams", () => {
+  const r = _v394({ fc_psi: 4000, fy_psi: 60000, bw_in: 12, d_in: 20 });
+  assert.ok(Math.abs(r.ratio - 200 / 60000) < 1e-9); // flat floor governs at 4000 psi
+  assert.ok(Math.abs(r.as_min_in2 - 0.80) < 0.005);
+  // Higher-strength concrete makes the sqrt term govern.
+  const hi = _v394({ fc_psi: 5000, fy_psi: 60000, bw_in: 12, d_in: 20 });
+  assert.ok(Math.abs(hi.ratio - 3 * Math.sqrt(5000) / 60000) < 1e-9 && Math.abs(hi.as_min_in2 - 0.85) < 0.005);
+  assert.ok(hi.as_min_in2 > r.as_min_in2);
+  // Error seams.
+  assert.ok("error" in _v394({ fc_psi: 0, fy_psi: 60000, bw_in: 12, d_in: 20 }));
+  assert.ok("error" in _v394({ fc_psi: 4000, fy_psi: 0, bw_in: 12, d_in: 20 }));
+  assert.ok("error" in _v394({ fc_psi: 4000, fy_psi: 60000, bw_in: 0, d_in: 20 }));
+  assert.ok("error" in _v394({ fc_psi: 4000, fy_psi: 60000, bw_in: 12, d_in: Infinity }));
+});
+
+test("bounds: spec-v395 computeConcreteCrackControlSpacing pins s1/s2, the cap, and error/redesign seams", () => {
+  const r = _v395({ fs_psi: 40000, cc_in: 2 });
+  assert.ok(Math.abs(r.s1_in - 10) < 1e-9 && Math.abs(r.s2_in - 12) < 1e-9);
+  assert.ok(Math.abs(r.s_max_in - 10) < 1e-9); // s1 governs
+  // More cover tightens the spacing.
+  const more = _v395({ fs_psi: 40000, cc_in: 3 });
+  assert.ok(Math.abs(more.s_max_in - 7.5) < 1e-9 && more.s_max_in < r.s_max_in);
+  // A high service stress can drive s1 to zero-or-below -> redesign path.
+  assert.ok("error" in _v395({ fs_psi: 40000, cc_in: 6 })); // s1 = 15 - 15 = 0
+  // Error seams.
+  assert.ok("error" in _v395({ fs_psi: 0, cc_in: 2 }));
+  assert.ok("error" in _v395({ fs_psi: Infinity, cc_in: 2 }));
+});

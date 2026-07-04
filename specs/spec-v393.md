@@ -1,6 +1,6 @@
 # roughlogic.com Specification v393 -- T-Beam Effective Flange Width (ACI 318-19 6.3.2) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a concrete design-details trio (v393 T-beam flange width -> v394 minimum
+> **Status: LANDED (2026-07-04, 0.138.0; proposed 2026-07-03). First tile of a concrete design-details trio (v393 T-beam flange width -> v394 minimum
 > flexural steel -> v395 crack-control bar spacing). `rc-beam-flexure` and `rc-doubly-reinforced` assume a rectangular
 > section; a monolithic slab-and-beam pour is a T-beam, and its flexural capacity depends first on how much of the slab acts
 > as the compression flange -- the effective flange width no tile computes.**

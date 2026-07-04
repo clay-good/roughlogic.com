@@ -8727,6 +8727,42 @@ export const CITATIONS = {
       { name: "Spacing limit", value: "s_max = min(5h, 18 in)", source: "ACI 318-19 24.4.3.3" },
     ],
   },
+  "t-beam-effective-flange-width": {
+    formula: "interior: overhang = min(8 hf, sw/2, ln/8), be = bw + 2 overhang; edge: overhang = min(6 hf, sw/2, ln/12), be = bw + overhang.",
+    edition: "The ACI 318-19 6.3.2 effective flange width of a T-beam, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 6.3.2 effective-flange provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 §6.3.2.1 effective flange width of a T-beam: for an interior beam the flange overhang on each side is the smallest of 8 times the flange thickness, half the clear distance to the adjacent web, and one-eighth of the clear span, so be = bw + 2 x overhang; for an edge (spandrel) beam only one flange counts with the smaller limits 6 hf and ln/12, so be = bw + overhang. Only this effective width acts as the compression flange in the flexural design. This returns the effective width; it does not perform the flexural design. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Interior overhang", value: "min(8 hf, sw/2, ln/8); be = bw + 2 overhang", source: "ACI 318-19 6.3.2.1" },
+      { name: "Edge overhang", value: "min(6 hf, sw/2, ln/12); be = bw + overhang", source: "ACI 318-19 6.3.2.1" },
+      { name: "Compression flange", value: "only the effective width acts as the flange in flexure", source: "scope of this tile" },
+    ],
+  },
+  "concrete-beam-min-flexural-steel": {
+    formula: "ratio = max(3 sqrt(f'c)/fy, 200/fy); As,min = ratio x bw x d.",
+    edition: "The ACI 318-19 9.6.1.2 minimum flexural reinforcement, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 9.6.1.2 minimum-reinforcement provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 §9.6.1.2 minimum flexural reinforcement As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d, which keeps the flexural capacity above the cracking moment so a lightly reinforced beam does not fail suddenly the instant it cracks. The 200/fy floor governs up to about f'c = 4444 psi; the 3 sqrt(f'c)/fy term controls above that. For a statically determinate member with the flange in tension, bw is replaced by the smaller of 2 bw and the flange width (not applied here). This returns the minimum area; it does not check the provided steel or the strength. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Minimum steel", value: "As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d", source: "ACI 318-19 9.6.1.2" },
+      { name: "Floor crossover", value: "200/fy governs to ~4444 psi; 3 sqrt(f'c)/fy above", source: "ACI 318-19" },
+      { name: "Rectangular web", value: "flange-in-tension bw substitution not applied here", source: "scope of this tile" },
+    ],
+  },
+  "concrete-crack-control-spacing": {
+    formula: "s1 = 15(40000/fs) - 2.5 cc; s2 = 12(40000/fs); s_max = min(s1, s2).",
+    edition: "The ACI 318-19 24.3.2 maximum spacing of tension reinforcement for crack control, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 24.3.2 crack-control spacing provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 §24.3.2 maximum center-to-center spacing of the tension reinforcement closest to the surface for flexural crack control: s = 15(40000/fs) - 2.5 cc, but not more than 12(40000/fs), where fs is the calculated service-load stress in the reinforcement (permitted to be taken as 2/3 fy) and cc is the least clear cover from the surface to the bar. Wider spacing or higher steel stress opens wider cracks; more cover requires tighter spacing. This is a serviceability crack-control limit, not a strength check. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Spacing limit", value: "s = min(15(40000/fs) - 2.5 cc, 12(40000/fs))", source: "ACI 318-19 24.3.2" },
+      { name: "Service stress", value: "fs may be taken as 2/3 fy", source: "ACI 318-19 24.3.2.1" },
+      { name: "Serviceability", value: "crack-control limit, not a strength check", source: "scope of this tile" },
+    ],
+  },
   "rc-column-axial": {
     formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
     edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",

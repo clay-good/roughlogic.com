@@ -691,6 +691,9 @@ export const COMPUTE_MAP = {
   "concrete-elastic-modulus": { module: "../../calc-concrete.js", fn: "computeConcreteElasticModulus" },
   "concrete-modulus-of-rupture": { module: "../../calc-concrete.js", fn: "computeConcreteModulusOfRupture" },
   "concrete-shrinkage-temperature-steel": { module: "../../calc-concrete.js", fn: "computeConcreteShrinkageTemperatureSteel" },
+  "t-beam-effective-flange-width": { module: "../../calc-concrete.js", fn: "computeTBeamEffectiveFlangeWidth" },
+  "concrete-beam-min-flexural-steel": { module: "../../calc-concrete.js", fn: "computeConcreteBeamMinFlexuralSteel" },
+  "concrete-crack-control-spacing": { module: "../../calc-concrete.js", fn: "computeConcreteCrackControlSpacing" },
   // spec-v302..v304 site-hydraulics depth batch (3 tiles)
   "time-of-concentration": { module: "../../calc-plumbing.js", fn: "computeTimeOfConcentration" },
   "orifice-flow": { module: "../../calc-plumbing.js", fn: "computeOrificeFlow" },

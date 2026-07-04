@@ -1,6 +1,6 @@
 # roughlogic.com Specification v395 -- Crack-Control Bar Spacing (ACI 318-19 24.3.2) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the concrete design-details trio (v393 T-beam flange ->
+> **Status: LANDED (2026-07-04, 0.138.0; proposed 2026-07-03). Third and final tile of the concrete design-details trio (v393 T-beam flange ->
 > v394 minimum flexural steel -> v395 crack-control spacing). The catalog develops and splices bars (`rc-development-length`,
 > `rebar-lap-splice`) but never checks the serviceability rule that limits how far apart tension bars can sit to keep flexural
 > cracks tight.**

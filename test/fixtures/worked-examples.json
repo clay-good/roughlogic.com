@@ -30469,6 +30469,87 @@
       }
     },
     {
+      "tile_id": "t-beam-effective-flange-width",
+      "source_publisher": "ACI 318-19 6.3.2",
+      "source_title": "interior: 12 in web, 4 in slab, ln 240, sw 48 -> be 60 in (sw/2 governs)",
+      "source_edition_or_year": "spec-v393 worked example (machine-verified)",
+      "source_section_or_page": "spec-v393 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "bw_in": 12, "hf_in": 4, "ln_in": 240, "sw_in": 48, "beam_type": "interior" },
+      "outputs": {
+        "overhang_in": { "value": 24, "tolerance": { "pct": 0.5 } },
+        "be_in": { "value": 60, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "t-beam-effective-flange-width",
+      "source_publisher": "ACI 318-19 6.3.2",
+      "source_title": "cross-check: an edge beam -> be 32 in (ln/12 governs)",
+      "source_edition_or_year": "spec-v393 worked example (machine-verified)",
+      "source_section_or_page": "spec-v393 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "bw_in": 12, "hf_in": 4, "ln_in": 240, "sw_in": 48, "beam_type": "edge" },
+      "outputs": {
+        "be_in": { "value": 32, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "concrete-beam-min-flexural-steel",
+      "source_publisher": "ACI 318-19 9.6.1.2",
+      "source_title": "4000 psi, Grade 60, 12x20 -> As,min 0.80 in^2 (200/fy floor governs)",
+      "source_edition_or_year": "spec-v394 worked example (machine-verified)",
+      "source_section_or_page": "spec-v394 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "fc_psi": 4000, "fy_psi": 60000, "bw_in": 12, "d_in": 20 },
+      "outputs": {
+        "as_min_in2": { "value": 0.80, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "concrete-beam-min-flexural-steel",
+      "source_publisher": "ACI 318-19 9.6.1.2",
+      "source_title": "cross-check: 5000 psi -> the sqrt term governs, As,min 0.85 in^2",
+      "source_edition_or_year": "spec-v394 worked example (machine-verified)",
+      "source_section_or_page": "spec-v394 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "fc_psi": 5000, "fy_psi": 60000, "bw_in": 12, "d_in": 20 },
+      "outputs": {
+        "as_min_in2": { "value": 0.85, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "concrete-crack-control-spacing",
+      "source_publisher": "ACI 318-19 24.3.2",
+      "source_title": "fs 40000 psi, cover 2 in -> s_max 10 in (cover term governs)",
+      "source_edition_or_year": "spec-v395 worked example (machine-verified)",
+      "source_section_or_page": "spec-v395 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "fs_psi": 40000, "cc_in": 2 },
+      "outputs": {
+        "s1_in": { "value": 10, "tolerance": { "pct": 0.5 } },
+        "s2_in": { "value": 12, "tolerance": { "pct": 0.5 } },
+        "s_max_in": { "value": 10, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "concrete-crack-control-spacing",
+      "source_publisher": "ACI 318-19 24.3.2",
+      "source_title": "cross-check: more cover (3 in) tightens spacing to 7.5 in",
+      "source_edition_or_year": "spec-v395 worked example (machine-verified)",
+      "source_section_or_page": "spec-v395 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "fs_psi": 40000, "cc_in": 3 },
+      "outputs": {
+        "s_max_in": { "value": 7.5, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "pv-cell-temperature-power",
       "source_publisher": "PV design practice / NREL",
       "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",

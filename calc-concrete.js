@@ -597,3 +597,124 @@ CONCRETE_RENDERERS["concrete-shrinkage-temperature-steel"] = _simpleRenderer({
   ],
   compute: computeConcreteShrinkageTemperatureSteel,
 });
+
+// ===================== spec-v393..v395: concrete design-details trio =====================
+
+// dims: in { bw_in: L, hf_in: L, ln_in: L, sw_in: L, beam_type: dimensionless } out: { overhang_in: L, be_in: L }
+export function computeTBeamEffectiveFlangeWidth({ bw_in = 0, hf_in = 0, ln_in = 0, sw_in = 0, beam_type = "interior" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bw = Number(bw_in) || 0;
+  const hf = Number(hf_in) || 0;
+  const ln = Number(ln_in) || 0;
+  const sw = Number(sw_in) || 0;
+  if (!(bw > 0)) return { error: "Web width bw must be positive (in)." };
+  if (!(hf > 0)) return { error: "Flange (slab) thickness hf must be positive (in)." };
+  if (!(ln > 0)) return { error: "Clear span ln must be positive (in)." };
+  if (!(sw > 0)) return { error: "Clear distance to the adjacent web sw must be positive (in)." };
+  const edge = beam_type === "edge";
+  const overhang = edge
+    ? Math.min(6 * hf, sw / 2, ln / 12)
+    : Math.min(8 * hf, sw / 2, ln / 8);
+  const be_in = edge ? bw + overhang : bw + 2 * overhang;
+  const governs = edge
+    ? (overhang === 6 * hf ? "6 hf" : overhang === sw / 2 ? "sw/2" : "ln/12")
+    : (overhang === 8 * hf ? "8 hf" : overhang === sw / 2 ? "sw/2" : "ln/8");
+  return {
+    overhang_in: overhang, be_in, governs,
+    note: "ACI 318-19 §6.3.2 effective flange width of a T-beam: the slab that acts with the web is limited to the smallest of a multiple of the flange thickness, half the clear distance to the next web, and a fraction of the clear span - taken on both sides for an interior beam (be = bw + 2 x overhang) and one side for an edge/spandrel beam (be = bw + overhang). Only this width is counted as the compression flange in the flexural design. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const tBeamEffectiveFlangeWidthExample = { inputs: { bw_in: 12, hf_in: 4, ln_in: 240, sw_in: 48, beam_type: "interior" } };
+CONCRETE_RENDERERS["t-beam-effective-flange-width"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §6.3.2.1 (interior T-beam effective flange overhang = smallest of 8 hf, half the clear distance to the next web, and ln/8; be = bw + 2 x overhang) and §6.3.2.1 for an edge beam (6 hf, half the clear distance, ln/12; be = bw + overhang). Only the effective flange acts as the compression flange in flexure. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: tBeamEffectiveFlangeWidthExample.inputs,
+  fields: [
+    { key: "bw_in", label: "Web width bw (in)", kind: "number", default: 12 },
+    { key: "hf_in", label: "Flange (slab) thickness hf (in)", kind: "number", default: 4 },
+    { key: "ln_in", label: "Clear span ln (in)", kind: "number", default: 240 },
+    { key: "sw_in", label: "Clear distance to adjacent web sw (in)", kind: "number", default: 48 },
+    { key: "beam_type", label: "Beam type", kind: "select", options: [
+      { value: "interior", label: "Interior (flange both sides)" },
+      { value: "edge", label: "Edge / spandrel (flange one side)" },
+    ], default: "interior" },
+  ],
+  outputs: [
+    { key: "oh", id: "tbf-out-oh", label: "Per-side flange overhang", value: (r) => fmt(r.overhang_in, 1) + " in (" + r.governs + " governs)" },
+    { key: "be", id: "tbf-out-be", label: "Effective flange width be", value: (r) => fmt(r.be_in, 1) + " in" },
+    { key: "n", id: "tbf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTBeamEffectiveFlangeWidth,
+});
+
+// dims: in { fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, bw_in: L, d_in: L } out: { ratio: dimensionless, as_min_in2: L^2 }
+export function computeConcreteBeamMinFlexuralSteel({ fc_psi = 4000, fy_psi = 60000, bw_in = 0, d_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fc = Number(fc_psi) || 0;
+  const fy = Number(fy_psi) || 0;
+  const bw = Number(bw_in) || 0;
+  const d = Number(d_in) || 0;
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(fy > 0)) return { error: "Steel yield fy must be positive (psi)." };
+  if (!(bw > 0)) return { error: "Web width bw must be positive (in)." };
+  if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
+  const term_sqrt = 3 * Math.sqrt(fc) / fy;
+  const term_flat = 200 / fy;
+  const ratio = Math.max(term_sqrt, term_flat);
+  const as_min_in2 = ratio * bw * d;
+  const governs = term_sqrt >= term_flat ? "3 sqrt(f'c)/fy" : "200/fy";
+  return {
+    ratio, as_min_in2, governs,
+    note: "ACI 318-19 §9.6.1.2 minimum flexural reinforcement: As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d, so the beam has more capacity cracked than uncracked and does not fail suddenly at first cracking. The 200/fy floor governs up to about f'c = 4444 psi; above that the 3 sqrt(f'c)/fy term controls. For a statically determinate T-beam with the flange in tension, bw is replaced by the smaller of 2 bw and the flange width (not applied here). A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteBeamMinFlexuralSteelExample = { inputs: { fc_psi: 4000, fy_psi: 60000, bw_in: 12, d_in: 20 } };
+CONCRETE_RENDERERS["concrete-beam-min-flexural-steel"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §9.6.1.2: minimum flexural reinforcement As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d, ensuring the cracking moment does not exceed the flexural capacity (no sudden failure at first crack). The 200/fy floor governs to about f'c = 4444 psi; the sqrt term controls above. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteBeamMinFlexuralSteelExample.inputs,
+  fields: [
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "bw_in", label: "Web width bw (in)", kind: "number", default: 12 },
+    { key: "d_in", label: "Effective depth d (in)", kind: "number", default: 20 },
+  ],
+  outputs: [
+    { key: "rt", id: "cmf-out-rt", label: "Minimum steel ratio", value: (r) => fmt(r.ratio, 5) + " (" + r.governs + " governs)" },
+    { key: "as", id: "cmf-out-as", label: "Minimum area As,min", value: (r) => fmt(r.as_min_in2, 2) + " in^2" },
+    { key: "n", id: "cmf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteBeamMinFlexuralSteel,
+});
+
+// dims: in { fs_psi: M L^-1 T^-2, cc_in: L } out: { s1_in: L, s2_in: L, s_max_in: L }
+export function computeConcreteCrackControlSpacing({ fs_psi = 40000, cc_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fs = Number(fs_psi) || 0;
+  const cc = Number(cc_in) || 0;
+  if (!(fs > 0)) return { error: "Service-load steel stress fs must be positive (psi)." };
+  if (!(cc >= 0)) return { error: "Clear cover must be non-negative (in)." };
+  const s1 = 15 * (40000 / fs) - 2.5 * cc;
+  const s2 = 12 * (40000 / fs);
+  const s_max = Math.min(s1, s2);
+  if (!(s_max > 0)) return { error: "Required spacing is not positive -- reduce cover or steel stress (the section needs redesign)." };
+  return {
+    s1_in: s1, s2_in: s2, s_max_in: s_max,
+    governs: s1 <= s2 ? "s1 (cover term)" : "s2 (12 x 40000/fs cap)",
+    note: "ACI 318-19 §24.3.2 maximum spacing of tension reinforcement for flexural crack control: s = 15(40000/fs) - 2.5 cc, but not more than 12(40000/fs), where fs is the service-load stress (permitted as 2/3 fy) and cc is the clear cover to the nearest bar surface. Wider spacing or higher stress opens wider cracks; more cover requires tighter spacing. This is a serviceability (crack-width) limit, not a strength check. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteCrackControlSpacingExample = { inputs: { fs_psi: 40000, cc_in: 2 } };
+CONCRETE_RENDERERS["concrete-crack-control-spacing"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §24.3.2: maximum tension-bar spacing for flexural crack control s = 15(40000/fs) - 2.5 cc, not more than 12(40000/fs), with fs the service-load steel stress (may be taken as 2/3 fy) and cc the clear cover. A serviceability crack-control limit, not a strength check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteCrackControlSpacingExample.inputs,
+  fields: [
+    { key: "fs_psi", label: "Service steel stress fs (psi, default 2/3 fy)", kind: "number", default: 40000 },
+    { key: "cc_in", label: "Clear cover cc (in)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "s1", id: "ccs-out-s1", label: "s1 = 15(40000/fs) - 2.5 cc", value: (r) => fmt(r.s1_in, 1) + " in" },
+    { key: "s2", id: "ccs-out-s2", label: "s2 = 12(40000/fs) cap", value: (r) => fmt(r.s2_in, 1) + " in" },
+    { key: "sm", id: "ccs-out-sm", label: "Max bar spacing", value: (r) => fmt(r.s_max_in, 1) + " in (" + r.governs + ")" },
+    { key: "n", id: "ccs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteCrackControlSpacing,
+});

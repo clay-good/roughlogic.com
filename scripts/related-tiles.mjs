@@ -1009,6 +1009,9 @@ const RELATED = {
   "concrete-elastic-modulus": ["rc-slab-min-thickness","rc-beam-flexure","concrete-modulus-of-rupture","rc-doubly-reinforced"],
   "concrete-modulus-of-rupture": ["concrete-elastic-modulus","rc-slab-min-thickness","rc-beam-flexure","rc-development-length"],
   "concrete-shrinkage-temperature-steel": ["rc-slab-min-thickness","concrete-modulus-of-rupture","rc-beam-flexure","rebar-lap-splice"],
+  "t-beam-effective-flange-width": ["rc-beam-flexure","rc-doubly-reinforced","concrete-beam-min-flexural-steel","rc-slab-min-thickness"],
+  "concrete-beam-min-flexural-steel": ["rc-beam-flexure","t-beam-effective-flange-width","concrete-shrinkage-temperature-steel","rc-doubly-reinforced"],
+  "concrete-crack-control-spacing": ["concrete-beam-min-flexural-steel","rc-development-length","rebar-lap-splice","concrete-shrinkage-temperature-steel"],
   // spec-v302..v304 site-hydraulics depth batch (Group B)
   "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
   "orifice-flow": ["weir-flow","time-of-concentration","pipe-velocity"],

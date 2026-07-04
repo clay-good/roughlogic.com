@@ -56,7 +56,11 @@ const TILE_GZIP_CAP = 6 * 1024;
 // Bumped 30 -> 34 KB on 2026-07-03: the wood-fastener withdrawal (v332..v334)
 // and roadway geometric-design (v335..v337) Group E trios took
 // construction/index.html to ~30.2 KB gz; 34 KB restores ~13% headroom.
-const GROUP_GZIP_CAP = 34 * 1024;
+// Bumped 34 -> 36 KB on 2026-07-04: the v375-v474 campaign's Group E
+// concrete/seismic trios (v381..v383 seismic, v393..v395 concrete
+// design-details) took construction/index.html just past 34 KB gz; 36 KB
+// restores headroom for the remaining Group E batches in the backlog.
+const GROUP_GZIP_CAP = 36 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v394 -- Minimum Flexural Reinforcement As,min (ACI 318-19 9.6.1.2) (calc-concrete.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the concrete design-details trio (v393 T-beam flange -> v394 minimum
+> **Status: LANDED (2026-07-04, 0.138.0; proposed 2026-07-03). Second tile of the concrete design-details trio (v393 T-beam flange -> v394 minimum
 > flexural steel -> v395 crack-control spacing). `rc-beam-flexure` computes a beam's moment capacity from a given steel
 > area, but never enforces the code floor: a lightly reinforced beam can fail more abruptly than a plain one, so ACI sets a
 > minimum flexural reinforcement the catalog does not check.**

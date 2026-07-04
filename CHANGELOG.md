@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): land spec-v393..v395 -- 3 concrete design-details tiles in calc-concrete.js; 861 -> 864 tiles, 0.138.0, 2026-07-04
+
+The concrete design-details trio, seventh batch of the v375-v474 campaign: the three ACI 318-19 detailing checks that sit between the material properties and the member design, all in the existing lazy `calc-concrete.js` (Group E); no new module, group, or dependency. Catalog **861 -> 864**, package **0.137.0 -> 0.138.0** (a minor). Proposed 2026-07-03.
+
+- **`t-beam-effective-flange-width` (spec-v393).** Interior overhang = min(8 hf, sw/2, ln/8), be = bw + 2 overhang; edge = min(6 hf, sw/2, ln/12), be = bw + overhang (ACI 6.3.2). Pinned: 12 in web, 4 in slab, ln 240, sw 48 -> be 60 in interior (sw/2 governs), 32 in edge (ln/12 governs).
+- **`concrete-beam-min-flexural-steel` (spec-v394).** As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d (ACI 9.6.1.2). Pinned: 4000 psi, Grade 60, 12x20 -> 0.80 in^2 (200/fy floor governs); at 5000 psi the sqrt term governs -> 0.85 in^2.
+- **`concrete-crack-control-spacing` (spec-v395).** s = min(15(40000/fs) - 2.5 cc, 12(40000/fs)) (ACI 24.3.2). Pinned: fs 40000, cover 2 in -> 10 in; more cover (3 in) tightens it to 7.5 in.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the three-way min, the max-of-two ratio crossover, the spacing cap and redesign seam, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ACI 318-19 §6.3.2, §9.6.1.2, and §24.3.2. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory; T-beam adds a beam-type select). No cap bump needed (calc-concrete.js at 79.9%). Housekeeping: home count 861 -> 864, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 70 appended. All gates green at the new state: lint, unit tests (**5,157**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(accounting): land spec-v390..v392 -- 3 contractor-billing tiles in calc-accounting.js; 858 -> 861 tiles, 0.137.0, 2026-07-03
 
 The contractor-billing trio, sixth batch of the v375-v474 campaign: the three numbers behind a construction progress draw, all in the existing lazy `calc-accounting.js` (Group R); no new module, group, or dependency. Catalog **858 -> 861**, package **0.136.0 -> 0.137.0** (a minor). Proposed 2026-07-03.
