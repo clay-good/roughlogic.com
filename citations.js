@@ -6602,6 +6602,42 @@ export const CITATIONS = {
       { name: "Cut flat", value: "the molding lies flat on the saw table (not sprung against the fence); the spring angle is the molding's installed angle from the wall", source: "compound-miter geometry" },
     ],
   },
+  "tolerance-stack-rss": {
+    formula: "tol_wc = sum(|tol_i|); tol_rss = sqrt(sum(tol_i^2)); gap = nominal +/- tol.",
+    edition: "Worst-case and RSS (root-sum-square) tolerance stack-up, standard mechanical-design / GD&T practice, by name.",
+    freeAccess: "The worst-case sum and the RSS square-root-of-sum-of-squares are public tolerance-analysis results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Tolerance stack-up on a dimension chain: the worst-case tolerance is the arithmetic sum of the individual half-widths (a fit always achieved but often overbuilt), while the statistical RSS tolerance is the square root of the sum of the squares - the realistic assembly spread when the dimensions vary independently, are centered on nominal, and are roughly normally distributed. RSS is always tighter than worst-case, and the gap between them widens as the chain lengthens. This returns both tolerances and the resulting fits; it assumes centered, independent, normal dimensions (add a static offset or a Cpk factor for a shifted process). A design aid; the drawing tolerances and the assembly's criticality govern.",
+    assumptions: [
+      { name: "Worst-case", value: "tol_wc = sum of the half-widths", source: "tolerance analysis" },
+      { name: "RSS", value: "tol_rss = sqrt(sum of squares)", source: "statistical tolerance analysis" },
+      { name: "RSS assumptions", value: "centered, independent, normally distributed dimensions", source: "scope of this tile" },
+    ],
+  },
+  "cone-flat-pattern": {
+    formula: "L = sqrt(base_radius^2 + height^2); pattern radius = L; sweep = 360 x base_radius / L.",
+    edition: "Radial-line development of a right cone, standard sheet-metal layout, by name.",
+    freeAccess: "The slant-height and sector-sweep relations are public sheet-metal layout geometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "Radial-line (triangulation) development of a right cone: the flat pattern is a pie sector whose radius equals the slant height L = sqrt(base_radius^2 + height^2), swept through an angle = 360 x base_radius / L degrees, because the sector arc must equal the base circumference. A sharper (taller) cone has a longer slant and opens to a narrower sector. This is the neutral-line pattern; add material for the seam/lap and the bend allowance, and confirm against a test piece. A layout aid; the fabrication drawing governs.",
+    assumptions: [
+      { name: "Slant height", value: "L = sqrt(base_radius^2 + height^2)", source: "right-cone geometry" },
+      { name: "Sector sweep", value: "angle = 360 x base_radius / L", source: "sheet-metal layout" },
+      { name: "Neutral line", value: "add seam/lap and bend allowance; verify on a test piece", source: "scope of this tile" },
+    ],
+  },
+  "spur-gear-geometry": {
+    formula: "PD = N/Pd; OD = (N+2)/Pd; addendum = 1/Pd; dedendum = 1.25/Pd; whole depth = 2.25/Pd; root = (N-2.5)/Pd; center = (N1+N2)/(2 Pd).",
+    edition: "Spur gear tooth proportions in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), by name.",
+    freeAccess: "The diametral-pitch tooth proportions are standard published gear geometry (Machinery's Handbook).",
+    governance: GOVERNANCE.general,
+    editionNote: "Spur gear geometry from the diametral pitch Pd (teeth per inch of pitch diameter, which must match for two gears to mesh): pitch diameter = N/Pd, outside diameter = (N+2)/Pd, addendum = 1/Pd, dedendum = 1.25/Pd, whole depth = 2.25/Pd, root diameter = (N-2.5)/Pd, and the standard center distance of a mating pair = (N1+N2)/(2 Pd). These are the standard 20-degree full-depth involute proportions; a finer pitch (larger Pd) makes every dimension smaller for the same tooth count. This returns the geometry only; it does not check tooth strength, backlash, or undercutting. A shop aid; the gear drawing and the AGMA standard govern.",
+    assumptions: [
+      { name: "Diametral pitch", value: "Pd = teeth per inch of pitch diameter; must match to mesh", source: "gear geometry" },
+      { name: "Full-depth proportions", value: "addendum 1/Pd, dedendum 1.25/Pd, whole depth 2.25/Pd", source: "20-deg full-depth involute" },
+      { name: "Geometry only", value: "no tooth-strength, backlash, or undercut check", source: "scope of this tile" },
+    ],
+  },
 
   // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
   "circular-arc": {

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v399 -- Tolerance Stack-Up: Worst-Case and RSS (calc-shop.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a fabrication shop-math trio (v399 tolerance stack -> v400 cone flat
+> **Status: LANDED (2026-07-04, 0.140.0; proposed 2026-07-03). First tile of a fabrication shop-math trio (v399 tolerance stack -> v400 cone flat
 > pattern -> v401 spur-gear geometry). The catalog has layout geometry (`bolt-circle`, `circular-arc`, `rolled-blank`) but
 > nothing that stacks the tolerances on a chain of dimensions to predict the assembly gap -- the number that decides whether
 > parts fit.**

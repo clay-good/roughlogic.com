@@ -23,7 +23,7 @@
 // =====================================================================
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -809,3 +809,84 @@ function _renderCompoundMiter(inputRegion, outputRegion, citationEl) {
   for (const f of [spring.input, corner.input]) f.addEventListener("input", update);
 }
 SHOP_RENDERERS["compound-miter"] = _renderCompoundMiter;
+
+// ===================== spec-v399..v400: fabrication shop-math (Group G) =====================
+
+// dims: in { nominal_gap_in: L, tolerances: dimensionless } out: { tol_wc: L, tol_rss: L, n: dimensionless }
+export function computeToleranceStackRss({ nominal_gap_in = 0, tolerances = "" } = {}) {
+  const gap = Number(nominal_gap_in);
+  if (!Number.isFinite(gap)) return { error: "Enter a valid nominal gap (in)." };
+  let vals;
+  if (Array.isArray(tolerances)) vals = tolerances.map(Number);
+  else if (typeof tolerances === "string") vals = tolerances.split(/[\s,]+/).map((x) => x.trim()).filter((x) => x !== "").map(Number);
+  else return { error: "Enter the tolerance half-widths." };
+  if (!vals.length) return { error: "Enter at least one tolerance half-width." };
+  for (const v of vals) {
+    if (!Number.isFinite(v)) return { error: "All tolerances must be finite numbers." };
+    if (v < 0) return { error: "Tolerances must be non-negative half-widths." };
+  }
+  const tol_wc = vals.reduce((a, b) => a + Math.abs(b), 0);
+  const tol_rss = Math.sqrt(vals.reduce((a, b) => a + b * b, 0));
+  return {
+    tol_wc, tol_rss, n: vals.length,
+    gap_wc_lo: gap - tol_wc, gap_wc_hi: gap + tol_wc,
+    gap_rss_lo: gap - tol_rss, gap_rss_hi: gap + tol_rss,
+    note: "Tolerance stack-up on a dimension chain: the worst-case tolerance is the arithmetic sum of the half-widths (every part at its extreme, a fit that is always met but often overbuilt), while the statistical RSS tolerance is the square root of the sum of squares (the realistic spread when the dimensions vary independently and are centered). RSS is always tighter than worst-case and the gap widens as the chain grows, which is why it is used for a multi-part assembly with capable processes. Assumes centered, independent, normally distributed dimensions. A design aid; the drawing tolerances and the assembly's criticality govern.",
+  };
+}
+export const toleranceStackRssExample = { inputs: { nominal_gap_in: 0.020, tolerances: "0.005, 0.005, 0.005" } };
+function _v399renderToleranceStackRss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Tolerance stack-up (mechanical design / GD&T practice): worst-case tolerance = sum of the half-widths, RSS (statistical) tolerance = sqrt(sum of squares). RSS assumes centered, independent, normally distributed dimensions. A design aid; the drawing tolerances and the assembly's criticality govern.";
+  const gap = makeNumber("Nominal (mean) gap (in)", "tsr-gap", { step: "any" }); gap.input.value = "0.020";
+  const tols = makeTextarea("Tolerance half-widths (in, comma or space separated)", "tsr-tols", { rows: "3" });
+  tols.input.value = "0.005, 0.005, 0.005";
+  for (const f of [gap, tols]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { gap.input.value = "0.020"; tols.input.value = "0.005, 0.005, 0.005"; update(); });
+  const oWc = makeOutputLine(outputRegion, "Worst-case tolerance / fit", "tsr-out-wc");
+  const oRss = makeOutputLine(outputRegion, "RSS tolerance / fit", "tsr-out-rss");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsr-out-n");
+  const update = debounce(() => {
+    const r = computeToleranceStackRss({ nominal_gap_in: Number(gap.input.value), tolerances: tols.input.value });
+    if (r.error) { oWc.textContent = r.error; oRss.textContent = "-"; oNote.textContent = ""; return; }
+    oWc.textContent = "+/-" + fmt(r.tol_wc, 4) + " in (" + fmt(r.gap_wc_lo, 4) + " to " + fmt(r.gap_wc_hi, 4) + " in, " + r.n + " dims)";
+    oRss.textContent = "+/-" + fmt(r.tol_rss, 4) + " in (" + fmt(r.gap_rss_lo, 4) + " to " + fmt(r.gap_rss_hi, 4) + " in)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [gap, tols]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["tolerance-stack-rss"] = _v399renderToleranceStackRss;
+
+// dims: in { base_radius_in: L, height_in: L } out: { slant_L_in: L, pattern_radius_in: L, sweep_deg: dimensionless }
+export function computeConeFlatPattern({ base_radius_in = 0, height_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const r = Number(base_radius_in) || 0;
+  const h = Number(height_in) || 0;
+  if (!(r > 0)) return { error: "Base radius must be positive (in)." };
+  if (!(h > 0)) return { error: "Height must be positive (in)." };
+  const slant_L_in = Math.sqrt(r * r + h * h);
+  const sweep_deg = 360 * r / slant_L_in;
+  return {
+    slant_L_in, pattern_radius_in: slant_L_in, sweep_deg,
+    note: "Radial-line development of a right cone: the flat pattern is a pie sector of radius equal to the slant height L = sqrt(base_radius^2 + height^2) swept through an angle = 360 x base_radius / L. Lay out the sector, roll it to the slant, and the arc becomes the base circumference. A sharper (taller) cone has a longer slant and opens to a narrower sector. Add material for the seam/lap and bend allowance; this is the neutral-line pattern. A layout aid; verify against a test piece.",
+  };
+}
+export const coneFlatPatternExample = { inputs: { base_radius_in: 6, height_in: 8 } };
+function _v400renderConeFlatPattern(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Radial-line cone development (sheet-metal layout): slant height L = sqrt(r^2 + h^2), flat-pattern sector radius = L, sweep angle = 360 x r / L. Add seam/lap and bend allowance. A layout aid; verify against a test piece.";
+  const r = makeNumber("Base radius (in)", "cfp-r", { step: "any", min: "0" }); r.input.value = "6";
+  const h = makeNumber("Vertical height (in)", "cfp-h", { step: "any", min: "0" }); h.input.value = "8";
+  for (const f of [r, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { r.input.value = "6"; h.input.value = "8"; update(); });
+  const oL = makeOutputLine(outputRegion, "Slant height / pattern radius", "cfp-out-l");
+  const oS = makeOutputLine(outputRegion, "Sector sweep angle", "cfp-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "cfp-out-n");
+  const update = debounce(() => {
+    const res = computeConeFlatPattern({ base_radius_in: Number(r.input.value) || 0, height_in: Number(h.input.value) || 0 });
+    if (res.error) { oL.textContent = res.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = fmt(res.slant_L_in, 3) + " in";
+    oS.textContent = fmt(res.sweep_deg, 1) + " deg";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [r, h]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["cone-flat-pattern"] = _v400renderConeFlatPattern;

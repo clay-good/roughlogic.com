@@ -631,6 +631,8 @@ const TOOL_MODULES = (() => {
     "tap-drill-size", "rolled-blank",
     // spec-v54: Group E carpentry compound miter
     "compound-miter",
+    // spec-v399..v400 fabrication shop-math
+    "tolerance-stack-rss", "cone-flat-pattern",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
@@ -678,6 +680,8 @@ const TOOL_MODULES = (() => {
     "spindle-power-torque",
     // spec-v317..v319 machining depth batch
     "radial-chip-thinning", "boring-bar-deflection", "ballnose-scallop-height",
+    // spec-v401 spur gear tooth geometry
+    "spur-gear-geometry",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [

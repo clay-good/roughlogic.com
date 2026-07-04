@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(shop): land spec-v399..v401 -- 3 fabrication shop-math tiles; 867 -> 870 tiles, 0.140.0, 2026-07-04
+
+The fabrication shop-math trio, ninth batch of the v375-v474 campaign: a tolerance analysis, a cone layout, and gear geometry, split across their natural modules; no new module, group, or dependency. Catalog **867 -> 870**, package **0.139.0 -> 0.140.0** (a minor). Proposed 2026-07-03.
+
+- **`tolerance-stack-rss` (spec-v399, calc-shop.js, Group G).** Worst-case = sum of half-widths, RSS = sqrt(sum of squares). Pinned: three dims at +/-0.005 -> +/-0.015 WC, +/-0.00866 RSS; a fourth dim -> +/-0.020 WC but only +/-0.010 RSS (the statistical benefit widens with the chain). Accepts a comma/space/newline list via a textarea.
+- **`cone-flat-pattern` (spec-v400, calc-shop.js, Group G).** L = sqrt(r^2 + h^2), sector radius = L, sweep = 360 r / L. Pinned: R 6, h 8 -> L 10 in, 216-degree sector; a taller R 6/h 16 cone -> 17.09 in slant, a narrower 126.4-degree sector.
+- **`spur-gear-geometry` (spec-v401, calc-machining.js, Group K).** From the diametral pitch: PD = N/Pd, OD = (N+2)/Pd, addendum/dedendum/whole-depth, root, and center distance. Pinned: Pd 10, N 40, mate 20 -> PD 4.000, OD 4.200, center 3.000 in; a finer Pd 20 halves every dimension.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the WC/RSS split, the slant/sweep, the tooth proportions, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming worst-case/RSS tolerance analysis, radial-line cone development, and the diametral-pitch gear system. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers; the tolerance tile adds a `makeTextarea` list input, so `calc-shop.js` gained the import). Module cap bumped with a dated comment: calc-shop.js 16000 -> 20000. Housekeeping: home count 867 -> 870, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 72 appended. All gates green at the new state: lint, unit tests (**5,163**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(mechanic): land spec-v396..v398 -- 3 fluid-power / cooling tiles in calc-mechanic.js; 864 -> 867 tiles, 0.139.0, 2026-07-04
 
 The fluid-power / cooling trio, eighth batch of the v375-v474 campaign: the pump drive power, the motor torque/speed, and the coolant flow, all in the existing lazy `calc-mechanic.js` (Group K); no new module, group, or dependency. Catalog **864 -> 867**, package **0.138.0 -> 0.139.0** (a minor). Proposed 2026-07-03.

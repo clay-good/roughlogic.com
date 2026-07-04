@@ -370,3 +370,52 @@ function renderBallnoseScallopHeight(inputRegion, outputRegion, citationEl) {
   h.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["ballnose-scallop-height"] = renderBallnoseScallopHeight;
+
+// ===================== spec-v401: spur gear tooth geometry (fabrication shop-math trio) =====================
+
+// dims: in { diametral_pitch: dimensionless, teeth: dimensionless, mating_teeth: dimensionless } out: { pitch_dia_in: L, outside_dia_in: L, addendum_in: L, dedendum_in: L, whole_depth_in: L, root_dia_in: L, center_dist_in: L }
+export function computeSpurGearGeometry({ diametral_pitch = 0, teeth = 0, mating_teeth = 0 } = {}) {
+  const _g = _finiteGuard({ diametral_pitch, teeth, mating_teeth }); if (_g) return _g;
+  const pd = Number(diametral_pitch) || 0;
+  const n = Number(teeth) || 0;
+  const nm = Number(mating_teeth) || 0;
+  if (!(pd > 0)) return { error: "Diametral pitch must be positive (teeth/in)." };
+  if (!(n > 0)) return { error: "Number of teeth must be positive." };
+  if (nm < 0) return { error: "Mating tooth count must be non-negative." };
+  const pitch_dia_in = n / pd;
+  const outside_dia_in = (n + 2) / pd;
+  const addendum_in = 1 / pd;
+  const dedendum_in = 1.25 / pd;
+  const whole_depth_in = 2.25 / pd;
+  const root_dia_in = (n - 2.5) / pd;
+  const center_dist_in = nm > 0 ? (n + nm) / (2 * pd) : null;
+  return {
+    pitch_dia_in, outside_dia_in, addendum_in, dedendum_in, whole_depth_in, root_dia_in, center_dist_in,
+    note: "Spur gear geometry from the diametral pitch Pd (teeth per inch of pitch diameter, the unit that must match for two gears to mesh): pitch diameter = N/Pd, outside diameter = (N+2)/Pd, addendum = 1/Pd, dedendum = 1.25/Pd, whole depth = 2.25/Pd, root diameter = (N-2.5)/Pd, and the center distance of a mating pair = (N1+N2)/(2 Pd). Standard 20-degree full-depth involute proportions. A finer pitch (larger Pd) makes every dimension smaller for the same tooth count. A shop aid; the gear drawing and AGMA standard govern.",
+  };
+}
+export const spurGearGeometryExample = { inputs: { diametral_pitch: 10, teeth: 40, mating_teeth: 20 } };
+function renderSpurGearGeometry(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Spur gear tooth proportions (diametral-pitch system, 20-degree full-depth involute; AGMA / Machinery's Handbook): pitch dia = N/Pd, OD = (N+2)/Pd, addendum = 1/Pd, dedendum = 1.25/Pd, whole depth = 2.25/Pd, root = (N-2.5)/Pd, center distance = (N1+N2)/(2 Pd). A shop aid; the gear drawing and AGMA standard govern.";
+  const pd = makeNumber("Diametral pitch Pd (teeth/in)", "sgg-pd", { step: "any", min: "0" }); pd.input.value = "10";
+  const n = makeNumber("Number of teeth N", "sgg-n", { step: "any", min: "0" }); n.input.value = "40";
+  const nm = makeNumber("Mating gear teeth (optional)", "sgg-nm", { step: "any", min: "0" }); nm.input.value = "20";
+  for (const f of [pd, n, nm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pd.input.value = "10"; n.input.value = "40"; nm.input.value = "20"; update(); });
+  const oPd = makeOutputLine(outputRegion, "Pitch / outside diameter", "sgg-out-pd");
+  const oDepth = makeOutputLine(outputRegion, "Addendum / dedendum / whole depth", "sgg-out-d");
+  const oRoot = makeOutputLine(outputRegion, "Root diameter", "sgg-out-r");
+  const oCd = makeOutputLine(outputRegion, "Center distance (with mate)", "sgg-out-cd");
+  const oNote = makeOutputLine(outputRegion, "Note", "sgg-out-n");
+  const update = debounce(() => {
+    const r = computeSpurGearGeometry({ diametral_pitch: Number(pd.input.value) || 0, teeth: Number(n.input.value) || 0, mating_teeth: Number(nm.input.value) || 0 });
+    if (r.error) { oPd.textContent = r.error; oDepth.textContent = "-"; oRoot.textContent = "-"; oCd.textContent = "-"; oNote.textContent = ""; return; }
+    oPd.textContent = fmt(r.pitch_dia_in, 3) + " in / " + fmt(r.outside_dia_in, 3) + " in";
+    oDepth.textContent = fmt(r.addendum_in, 3) + " / " + fmt(r.dedendum_in, 3) + " / " + fmt(r.whole_depth_in, 3) + " in";
+    oRoot.textContent = fmt(r.root_dia_in, 3) + " in";
+    oCd.textContent = r.center_dist_in == null ? "(enter the mating tooth count)" : fmt(r.center_dist_in, 3) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pd, n, nm]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["spur-gear-geometry"] = renderSpurGearGeometry;

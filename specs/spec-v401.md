@@ -1,6 +1,6 @@
 # roughlogic.com Specification v401 -- Spur Gear Tooth Geometry (Diametral Pitch) (calc-machining.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the fabrication shop-math trio (v399 tolerance stack -> v400 cone
+> **Status: LANDED (2026-07-04, 0.140.0; proposed 2026-07-03). Third and final tile of the fabrication shop-math trio (v399 tolerance stack -> v400 cone
 > flat pattern -> v401 spur-gear geometry). `gear-cascade` computes ratios and output RPM through a gear train, but never the
 > tooth dimensions -- the pitch, outside, and root diameters a machinist needs to cut or inspect a spur gear.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A spur gear's dimensions all follow from its diametral

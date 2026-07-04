@@ -2064,6 +2064,7 @@ cross-check.
 | calc-machining.js | `computeDrillPointDepth` | `{ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeRadialChipThinning` | `{ ae_in = 0, d_in = 0, fz_target = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindlePowerTorque` | `{ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeSpurGearGeometry` | `{ diametral_pitch = 0, teeth = 0, mating_teeth = 0 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeBrickVeneerAnchorSpacing` | `{ area_ft2 = 0, area_per = 2.67, max_horiz_in = 32, max_vert_in = 24 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeCmuShearWall` | `{ fm_psi = 1500, b_in = 0, dv_in = 0, p_lb = 0, mvd = 0.5, av_in2 = 0, s_in =...` | _ | _ | _ |
 | calc-masonry.js | `computeCmuWallAxial` | `{ fm_psi = 2000, an_in2 = 0, ast_in2 = 0, h_in = 0, r_in = 0, fs_psi = 32000 ...` | _ | _ | _ |
@@ -2370,6 +2371,7 @@ cross-check.
 | calc-service.js | `computeVfdEnergySavings` | `{ full_load_kw = 0, frac_a = 1.0, hours_a = 0, frac_b = 0.75, hours_b = 0, fr...` | _ | _ | _ |
 | calc-shop.js | `computeCarbonEquivalent` | `{ c = 0, mn = 0, cr = 0, mo = 0, v = 0, ni = 0, cu = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeConeFlatPattern` | `{ base_radius_in = 0, height_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
@@ -2379,6 +2381,7 @@ cross-check.
 | calc-shop.js | `computeTapDrillSize` | `{ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_p...` | _ | _ | _ |
 | calc-shop.js | `computeTaperCalc` | `{ large_dia_in = 0, small_dia_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeThreadMeasureWire` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wir...` | _ | _ | _ |
+| calc-shop.js | `computeToleranceStackRss` | `{ nominal_gap_in = 0, tolerances = "" } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTurningSurfaceFinish` | `{ feed_ipr_in = 0, nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeWeldDutyCycle` | `{ rated_amps = 0, rated_duty_pct = 0, target_amps = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeBatteryCRate` | `{ nameplate_kwh = 0, c_rate = 0.5, dod = 0.90, inverter_kw = 0 } = {}` | _ | _ | _ |
@@ -2525,7 +2528,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1111.
+Row count: 1114.
 
 <!-- END function-corpus-v14 -->
 
@@ -3183,7 +3186,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (52 tiles)
+### Group G Cross-trade (54 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3191,6 +3194,7 @@ per spec-v14 §13.1 second paragraph.
 | `center-of-gravity-2point` | Center of Gravity from Two Scales | ASME B30.9 / ITI rigging references (...; readings 3000 and 1000 lb over 10 ft -> 4000 lb total, CG... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circle-from-3-points` | Circle Through Three Points | First-principles coordinate geometry ...; (0,0),(4,0),(0,3) -> center (2, 1.5), radius 2.5 (right-t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circular-arc` | Circular Arc Layout | First-principles circle geometry (sag...; chord 24 in, rise 4 in -> radius 20 in, central angle 73.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `cone-flat-pattern` | Cone Flat-Pattern Development (Radial Line) | sheet-metal radial-line layout; spec-v400 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decimal-to-fraction` | Decimal to Fraction | First-principles tape-measure arithmetic; 2.375 in to nearest 1/16 -> 2-3/8 in (whole 2, 3/8), error 0 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dilution` | Dilution / Mixing Ratio | Project (first-principles); C1*V1 = C2*V2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `equal-spacing` | Equal Spacing Layout | First-principles equal-spacing layout...; 60 in run, 1.5 in balusters, 4 in max gap -> 11 balusters... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3233,6 +3237,7 @@ per spec-v14 §13.1 second paragraph.
 | `time-and-materials` | Time and Materials | Project (first-principles); Standard contracting cost-up identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `timesheet` | Daily Multi-Job Timesheet | Project (first-principles) over IRS s...; Five jobs / 47.5 total hours / 40 reg + 7.5 OT / $25 rate... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tip-out` | Tip Out | Project (first-principles); $600 pool, 8/4/4 hours -> 16 total hours, 50% / 25% / 25%... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tolerance-stack-rss` | Tolerance Stack-Up: Worst-Case and RSS | mechanical design / GD&T; spec-v399 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trench-slope` | OSHA Trench Sloping | OSHA; Type A 0.75:1; Type B 1:1; Type C 1.5:1 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `unit-converter` | Unit Converter | NIST SI/customary unit conversion fac...; 100 ft -> meters: 30.48 m; pure unit conversion identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `upgrade-roi` | Upgrade ROI / Payback | Project (first-principles); NPV = -C + sum(S / (1+d)^i) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3283,7 +3288,7 @@ per spec-v14 §13.1 second paragraph.
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (32 tiles)
+### Group K Mechanic (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3312,6 +3317,7 @@ per spec-v14 §13.1 second paragraph.
 | `radial-chip-thinning` | Radial Chip Thinning Feed Compensation | Radial chip thinning geometry; spec-v317 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `screw-conveyor` | Screw / Auger Conveyor Capacity | CEMA Screw Conveyor standard (Book No...; 9 in screw, 2.5 in shaft, 9 in pitch, 40 RPM, 0.30 loadin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spindle-power-torque` | Cutting Power and Spindle Torque | first-principles specific-cutting-ene...; 3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `spur-gear-geometry` | Spur Gear Tooth Geometry (Diametral Pitch) | Machinery's Handbook / AGMA; spec-v401 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tap-drill-size` | Tap Drill Size | First-principles 60-degree thread geo...; 1/4-20 UNC at 75% -> 0.201286 in (#7 drill 0.201 in); nea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `taper-calc` | Taper per Foot and Angle | First-principles taper trigonometry +...; D 1.0, d 0.75, L 3.0 -> TPF 1.0 in/ft, angle/side 2.38594... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-gearing` | Tire Size and Effective Gear Ratio | Project (first-principles) over Tire ...; P265/70R17 -> 33x12.50R17 / 3.73 axle / 0.84 top gear / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3578,6 +3584,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 867. Fixture-covered or reference-cadence: 867 / 867.
+Tile count: 870. Fixture-covered or reference-cadence: 870 / 870.
 
 <!-- END tile-index-v14 -->

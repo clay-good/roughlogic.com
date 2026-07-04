@@ -15383,6 +15383,92 @@
       }
     },
     {
+      "tile_id": "tolerance-stack-rss",
+      "source_publisher": "mechanical design / GD&T",
+      "source_title": "three dims at +/-0.005 in -> +/-0.015 worst-case, +/-0.00866 RSS",
+      "source_edition_or_year": "spec-v399 worked example (machine-verified)",
+      "source_section_or_page": "spec-v399 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "nominal_gap_in": 0.020, "tolerances": [0.005, 0.005, 0.005] },
+      "outputs": {
+        "tol_wc": { "value": 0.015, "tolerance": { "pct": 0.5 } },
+        "tol_rss": { "value": 0.008660, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "tolerance-stack-rss",
+      "source_publisher": "mechanical design / GD&T",
+      "source_title": "cross-check: a fourth +/-0.005 dim -> +/-0.020 worst-case, only +/-0.010 RSS",
+      "source_edition_or_year": "spec-v399 worked example (machine-verified)",
+      "source_section_or_page": "spec-v399 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "nominal_gap_in": 0.020, "tolerances": [0.005, 0.005, 0.005, 0.005] },
+      "outputs": {
+        "tol_wc": { "value": 0.020, "tolerance": { "pct": 0.5 } },
+        "tol_rss": { "value": 0.010, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cone-flat-pattern",
+      "source_publisher": "sheet-metal radial-line layout",
+      "source_title": "R 6 in, h 8 in -> slant 10 in, 216-degree sector",
+      "source_edition_or_year": "spec-v400 worked example (machine-verified)",
+      "source_section_or_page": "spec-v400 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "base_radius_in": 6, "height_in": 8 },
+      "outputs": {
+        "slant_L_in": { "value": 10, "tolerance": { "pct": 0.5 } },
+        "sweep_deg": { "value": 216, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cone-flat-pattern",
+      "source_publisher": "sheet-metal radial-line layout",
+      "source_title": "cross-check: a taller R 6/h 16 cone -> 17.09 in slant, a narrower 126.4-degree sector",
+      "source_edition_or_year": "spec-v400 worked example (machine-verified)",
+      "source_section_or_page": "spec-v400 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "base_radius_in": 6, "height_in": 16 },
+      "outputs": {
+        "slant_L_in": { "value": 17.088, "tolerance": { "pct": 0.5 } },
+        "sweep_deg": { "value": 126.4, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "spur-gear-geometry",
+      "source_publisher": "Machinery's Handbook / AGMA",
+      "source_title": "Pd 10, N 40, mate 20 -> PD 4.000, OD 4.200, root 3.750, center 3.000 in",
+      "source_edition_or_year": "spec-v401 worked example (machine-verified)",
+      "source_section_or_page": "spec-v401 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "diametral_pitch": 10, "teeth": 40, "mating_teeth": 20 },
+      "outputs": {
+        "pitch_dia_in": { "value": 4.000, "tolerance": { "pct": 0.5 } },
+        "outside_dia_in": { "value": 4.200, "tolerance": { "pct": 0.5 } },
+        "root_dia_in": { "value": 3.750, "tolerance": { "pct": 0.5 } },
+        "center_dist_in": { "value": 3.000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "spur-gear-geometry",
+      "source_publisher": "Machinery's Handbook / AGMA",
+      "source_title": "cross-check: a finer Pd 20 halves every dimension -> PD 2.000, OD 2.100 in",
+      "source_edition_or_year": "spec-v401 worked example (machine-verified)",
+      "source_section_or_page": "spec-v401 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "diametral_pitch": 20, "teeth": 40, "mating_teeth": 20 },
+      "outputs": {
+        "pitch_dia_in": { "value": 2.000, "tolerance": { "pct": 0.5 } },
+        "outside_dia_in": { "value": 2.100, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "circular-arc",
       "source_publisher": "First-principles circle geometry (sagitta relation)",
       "source_title": "R = (chord^2/4 + rise^2)/(2 rise); arc = R x 2 acos((R-rise)/R)",

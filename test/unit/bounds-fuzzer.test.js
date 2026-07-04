@@ -15558,3 +15558,56 @@ test("bounds: spec-v398 computeCoolingSystemFlow pins gpm = Q/(c dT), the coolan
   assert.ok("error" in _v398({ q_btuh: 150000, dt_f: 0, coolant: "water" }));
   assert.ok("error" in _v398({ q_btuh: Infinity, dt_f: 10, coolant: "water" }));
 });
+
+// ===================== spec-v399..v401 fabrication shop-math trio (2 modules) =====================
+import { computeToleranceStackRss as _v399, computeConeFlatPattern as _v400 } from "../../calc-shop.js";
+import { computeSpurGearGeometry as _v401 } from "../../calc-machining.js";
+
+test("bounds: spec-v399 computeToleranceStackRss pins worst-case/RSS, the growing gap, and error seams", () => {
+  const r = _v399({ nominal_gap_in: 0.020, tolerances: [0.005, 0.005, 0.005] });
+  assert.ok(Math.abs(r.tol_wc - 0.015) < 1e-12);
+  assert.ok(Math.abs(r.tol_rss - Math.sqrt(3 * 0.005 ** 2)) < 1e-12);
+  assert.ok(r.tol_rss < r.tol_wc && r.n === 3);
+  // Accepts a string too (the renderer path).
+  assert.ok(Math.abs(_v399({ nominal_gap_in: 0.02, tolerances: "0.005 0.005 0.005" }).tol_wc - 0.015) < 1e-12);
+  // A fourth dimension widens the WC-vs-RSS gap.
+  const four = _v399({ nominal_gap_in: 0.020, tolerances: [0.005, 0.005, 0.005, 0.005] });
+  assert.ok(Math.abs(four.tol_wc - 0.020) < 1e-12 && Math.abs(four.tol_rss - 0.010) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v399({ nominal_gap_in: 0.02, tolerances: [] }));
+  assert.ok("error" in _v399({ nominal_gap_in: 0.02, tolerances: [0.005, -0.001] }));
+  assert.ok("error" in _v399({ nominal_gap_in: Infinity, tolerances: [0.005] }));
+  assert.ok("error" in _v399({ nominal_gap_in: 0.02, tolerances: [0.005, Infinity] }));
+});
+
+test("bounds: spec-v400 computeConeFlatPattern pins the slant, sweep, and error seams", () => {
+  const r = _v400({ base_radius_in: 6, height_in: 8 });
+  assert.ok(Math.abs(r.slant_L_in - 10) < 1e-12);
+  assert.ok(Math.abs(r.sweep_deg - 216) < 1e-9);
+  assert.ok(Math.abs(r.pattern_radius_in - r.slant_L_in) < 1e-12);
+  // A taller cone opens to a narrower sector.
+  const tall = _v400({ base_radius_in: 6, height_in: 16 });
+  assert.ok(Math.abs(tall.slant_L_in - Math.sqrt(292)) < 1e-9 && tall.sweep_deg < r.sweep_deg);
+  // Error seams.
+  assert.ok("error" in _v400({ base_radius_in: 0, height_in: 8 }));
+  assert.ok("error" in _v400({ base_radius_in: 6, height_in: 0 }));
+  assert.ok("error" in _v400({ base_radius_in: Infinity, height_in: 8 }));
+});
+
+test("bounds: spec-v401 computeSpurGearGeometry pins the tooth proportions, center distance, and error seams", () => {
+  const r = _v401({ diametral_pitch: 10, teeth: 40, mating_teeth: 20 });
+  assert.ok(Math.abs(r.pitch_dia_in - 4.0) < 1e-12);
+  assert.ok(Math.abs(r.outside_dia_in - 4.2) < 1e-12);
+  assert.ok(Math.abs(r.addendum_in - 0.1) < 1e-12 && Math.abs(r.dedendum_in - 0.125) < 1e-12);
+  assert.ok(Math.abs(r.root_dia_in - 3.75) < 1e-12);
+  assert.ok(Math.abs(r.center_dist_in - 3.0) < 1e-12);
+  // A finer pitch halves every dimension.
+  const fine = _v401({ diametral_pitch: 20, teeth: 40, mating_teeth: 20 });
+  assert.ok(Math.abs(fine.pitch_dia_in - 2.0) < 1e-12 && Math.abs(fine.outside_dia_in - 2.1) < 1e-12);
+  // No mate -> null center distance.
+  assert.strictEqual(_v401({ diametral_pitch: 10, teeth: 40, mating_teeth: 0 }).center_dist_in, null);
+  // Error seams.
+  assert.ok("error" in _v401({ diametral_pitch: 0, teeth: 40 }));
+  assert.ok("error" in _v401({ diametral_pitch: 10, teeth: 0 }));
+  assert.ok("error" in _v401({ diametral_pitch: Infinity, teeth: 40 }));
+});

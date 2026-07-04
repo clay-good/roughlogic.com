@@ -1,6 +1,6 @@
 # roughlogic.com Specification v400 -- Cone Flat-Pattern Development (Radial Line) (calc-shop.js, Group G, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the fabrication shop-math trio (v399 tolerance stack -> v400 cone flat
+> **Status: LANDED (2026-07-04, 0.140.0; proposed 2026-07-03). Second tile of the fabrication shop-math trio (v399 tolerance stack -> v400 cone flat
 > pattern -> v401 spur-gear geometry). `rolled-blank` develops a cylinder to a straight rectangle; a cone develops to a flat
 > sector, a completely different layout the catalog cannot produce.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. To cut a flat blank that rolls into a right cone (a
