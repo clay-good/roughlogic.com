@@ -1,6 +1,6 @@
 # roughlogic.com Specification v426 -- Overflow Scupper Sizing (Weir Flow) (calc-drainage.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a drainage-hydraulics trio (v426 overflow scupper -> v427 sewage force-main
+> **Status: LANDED (2026-07-04, 0.148.0; proposed 2026-07-03). First tile of a drainage-hydraulics trio (v426 overflow scupper -> v427 sewage force-main
 > velocity -> v428 stormwater detention volume). `roof-drain-sizing` sizes the primary vertical leader; the secondary
 > (overflow) scupper that keeps a blocked roof from ponding to collapse is a weir, sized a different way no tile computes.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A secondary roof drain or scupper must pass the design

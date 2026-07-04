@@ -15964,3 +15964,48 @@ test("bounds: spec-v425 computeInvoiceFactoringCost pins the split, the APR, and
   assert.ok("error" in _v425({ invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 0 }));
   assert.ok("error" in _v425({ invoice_usd: Infinity, advance_pct: 90, fee_pct: 3, days_to_pay: 30 }));
 });
+
+// ===================== spec-v426..v428 drainage trio (2 modules) =====================
+import { computeOverflowScupperSizing as _v426, computeSewageForceMainVelocity as _v427 } from "../../calc-drainage.js";
+import { computeStormwaterDetentionVolume as _v428 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v426 computeOverflowScupperSizing pins the weir flow, contracted form, and error seams", () => {
+  const r = _v426({ length_in: 6, head_in: 3.5 });
+  assert.ok(Math.abs(r.q_gpm - 117.7) < 1 && Math.abs(r.q_gpm_contracted - 103.9) < 1);
+  assert.ok(r.q_cfs_contracted < r.q_cfs);
+  // Wider, shallower passes similar flow.
+  const wide = _v426({ length_in: 12, head_in: 2 });
+  assert.ok(Math.abs(wide.q_gpm - 101.7) < 1);
+  // Error seams.
+  assert.ok("error" in _v426({ length_in: 0, head_in: 3.5 }));
+  assert.ok("error" in _v426({ length_in: 6, head_in: 0 }));
+  assert.ok("error" in _v426({ length_in: Infinity, head_in: 3.5 }));
+});
+
+test("bounds: spec-v427 computeSewageForceMainVelocity pins V, the scour ID, the flag, and error seams", () => {
+  const r = _v427({ gpm: 50, id_in: 2 });
+  assert.ok(Math.abs(r.velocity_fps - 0.4085 * 50 / 4) < 1e-9 && r.scours === true);
+  assert.ok(Math.abs(r.d_max_scour_in - Math.sqrt(0.4085 * 50 / 2)) < 1e-9);
+  // A larger main falls below the scour velocity.
+  const big = _v427({ gpm: 50, id_in: 4 });
+  assert.ok(Math.abs(big.velocity_fps - 0.4085 * 50 / 16) < 1e-9 && big.scours === false);
+  // Error seams.
+  assert.ok("error" in _v427({ gpm: 0, id_in: 2 }));
+  assert.ok("error" in _v427({ gpm: 50, id_in: 0 }));
+  assert.ok("error" in _v427({ gpm: Infinity, id_in: 2 }));
+});
+
+test("bounds: spec-v428 computeStormwaterDetentionVolume pins Q_in, storage, and error seams", () => {
+  const r = _v428({ runoff_c: 0.85, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 1.0, duration_min: 30 });
+  assert.ok(Math.abs(r.q_in_cfs - 5.10) < 1e-9);
+  assert.ok(Math.abs(r.storage_cf - 7380) < 1e-6);
+  assert.ok(Math.abs(r.storage_ac_ft - 7380 / 43560) < 1e-9);
+  // A longer, lighter storm can need more storage.
+  const longer = _v428({ runoff_c: 0.85, intensity_in_hr: 2, area_ac: 2, q_allow_cfs: 1.0, duration_min: 60 });
+  assert.ok(Math.abs(longer.storage_cf - 8640) < 1e-6 && longer.storage_cf > r.storage_cf);
+  // Error seams: allowable >= inflow, non-positive, non-finite.
+  assert.ok("error" in _v428({ runoff_c: 0.85, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 10, duration_min: 30 }));
+  assert.ok("error" in _v428({ runoff_c: 0, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 1.0, duration_min: 30 }));
+  assert.ok("error" in _v428({ runoff_c: 0.85, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 1.0, duration_min: 0 }));
+  assert.ok("error" in _v428({ runoff_c: 0.85, intensity_in_hr: Infinity, area_ac: 2, q_allow_cfs: 1.0, duration_min: 30 }));
+});

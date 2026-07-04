@@ -323,6 +323,7 @@ const _TILES = [
   ["mixed-water-temp", "B"], ["pressure-tank-drawdown", "B"], ["pipe-velocity", "B"],
   ["wsfu-demand", "B"], ["supply-pressure-budget", "B"],
   ["roof-drain-sizing", "B"], ["sump-basin-sizing", "B"],
+  ["overflow-scupper-sizing", "B"], ["sewage-force-main-velocity", "B"], ["stormwater-detention-volume", "B"],
   ["gas-appliance-demand", "B"], ["tpr-discharge", "B"],
   ["pipe-support-spacing", "B"], ["softener-sizing", "B"],
   ["pipe-fitting-takeout", "G"], ["pipe-miter-cut", "G"],

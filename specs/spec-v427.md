@@ -1,6 +1,6 @@
 # roughlogic.com Specification v427 -- Sewage Force-Main Scour Velocity (calc-drainage.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the drainage-hydraulics trio (v426 overflow scupper -> v427 sewage
+> **Status: LANDED (2026-07-04, 0.148.0; proposed 2026-07-03). Second tile of the drainage-hydraulics trio (v426 overflow scupper -> v427 sewage
 > force-main velocity -> v428 stormwater detention volume). `sump-basin-sizing` checks the ejector basin's drawdown and
 > cycling; this tile handles the other half of a pressurized sewage system -- the force-main pipe size that keeps solids
 > from settling out, the scour velocity.**

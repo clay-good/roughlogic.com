@@ -1670,7 +1670,9 @@ cross-check.
 | calc-demo.js | `computeMoistureDryGoal` | `{ reference_reading, affected_reading, acceptable_delta = 4 } = {}` | _ | _ | _ |
 | calc-disinfect.js | `computeMainDisinfectionChlorine` | `{ diameter_in = 0, length_ft = 0, dose_mg_l = 25, product_pct = 65 } = {}` | _ | _ | _ |
 | calc-disinfect.js | `computeWellShockChlorination` | `{ casing_diameter_in = 0, water_column_ft = 0, target_ppm = 100, bleach_pct =...` | _ | _ | _ |
+| calc-drainage.js | `computeOverflowScupperSizing` | `{ length_in = 0, head_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeRoofDrainSizing` | `{ roof_area, rainfall_rate, drain_slope = "1/4", leader_table = null, horiz_t...` | _ | _ | _ |
+| calc-drainage.js | `computeSewageForceMainVelocity` | `{ gpm = 0, id_in = 0 } = {}` | _ | _ | _ |
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
@@ -2152,6 +2154,7 @@ cross-check.
 | calc-plumbing.js | `computeSanitaryDfu` | `{ fixtures = {}, config = "horizontal_branch", slope_in_per_ft = 0.25, propos...` | _ | _ | _ |
 | calc-plumbing.js | `computeSlope` | `{ rise, run, units = "in_per_ft" }` | _ | _ | _ |
 | calc-plumbing.js | `computeStaticPressureLossPiping` | `{ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }` | _ | _ | _ |
+| calc-plumbing.js | `computeStormwaterDetentionVolume` | `{ runoff_c = 0, intensity_in_hr = 0, area_ac = 0, q_allow_cfs = 0, duration_m...` | _ | _ | _ |
 | calc-plumbing.js | `computeStormwaterRational` | `{ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeSupplyPressureBudget` | `{ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction...` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_...` | _ | _ | _ |
@@ -2549,7 +2552,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1135.
+Row count: 1138.
 
 <!-- END function-corpus-v14 -->
 
@@ -2744,7 +2747,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (80 tiles)
+### Group B Plumbing (83 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2778,6 +2781,7 @@ per spec-v14 §13.1 second paragraph.
 | `medgas-demand` | Medical Gas System Demand and Diversity (NFPA 99) | NFPA 99 Health Care Facilities Code d...; spec-v206 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mixed-water-temp` | Mixing / Tempering Valve Blend Temperature | First-principles mixing energy balanc...; 140 F hot + 60 F cold at equal flow -> 100 F, 50% hot | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `orifice-flow` | Orifice Discharge Flow | Orifice discharge Q = Cd A sqrt(2 g h); spec-v303 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `overflow-scupper-sizing` | Overflow Scupper Sizing (Weir Flow) | Francis weir / IPC 1108; spec-v426 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pipe-cold-spring` | Pipe Cold Spring (Cut-Short) | ASME B31.1 §119 / B31.9 (by name); 100 ft carbon steel (alpha 6.5e-6), 50 F to 250 F (dT 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion` | Pipe Thermal Expansion | ASHRAE / ASTM; Copper alpha = 9.4e-6 in/in/F; 100 ft of copper x 100 F d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-expansion-loop` | Pipe Thermal Expansion and Loop Sizing | Project (first-principles); Carbon steel A53 4.5 in OD / 200 ft run / 100 F dT -> 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -2802,11 +2806,13 @@ per spec-v14 §13.1 second paragraph.
 | `septic-lpp-orifice` | Septic LPP Orifice Flow and Squirt Height | Orifice-discharge equation / universi...; 1/4 in orifice, 5 ft squirt, Cd 0.6, 10 orifices x 4 late... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `septic-pumpout-interval` | Septic Tank Pump-Out Interval | USEPA Onsite Wastewater Treatment Sys...; 1,000 gal tank, 4 people, 30 gal/pp/yr, 1/3 fill -> 330 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `septic-tank` | Septic Tank Sizing | IPC / state primacy agency; 4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sewage-force-main-velocity` | Sewage Force-Main Scour Velocity | Ten States Standards; spec-v427 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope` | Drainage Slope | IPC; Rise 1, run 4 (same units) -> 3 in/ft / 25% / 14.04 deg /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `softener-sizing` | Water Softener Sizing | NSF/ANSI 44 / Water Quality Association; 4 people at 75 gal/day, 20 gpg, 2 ppm iron, 32,000-grain ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `static-pressure-piping` | Static Pressure Loss in Piping | Project (first-principles); 30 ft column of water -> 30 * 62.4 / 144 = 13.00 psi elev... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `steam-pipe-velocity` | Steam Main Size from Flow and Velocity | Continuity; ASHRAE Fundamentals / Sys...; spec-v158 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steam-trap-sizing` | Steam Trap Condensate Load and Required Capacity | Steam thermodynamics; safety-factor p...; spec-v159 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `stormwater-detention-volume` | Stormwater Detention Volume (Modified Rational) | Modified Rational method; spec-v428 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3626,6 +3632,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 891. Fixture-covered or reference-cadence: 891 / 891.
+Tile count: 894. Fixture-covered or reference-cadence: 894 / 894.
 
 <!-- END tile-index-v14 -->

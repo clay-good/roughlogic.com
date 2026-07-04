@@ -32039,6 +32039,87 @@
       "outputs": {
         "apr_percent": { "value": 81.11, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "overflow-scupper-sizing",
+      "source_publisher": "Francis weir / IPC 1108",
+      "source_title": "6 in scupper, 3.5 in head -> 118 gpm (104 contracted)",
+      "source_edition_or_year": "spec-v426 worked example (machine-verified)",
+      "source_section_or_page": "spec-v426 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "length_in": 6, "head_in": 3.5 },
+      "outputs": {
+        "q_gpm": { "value": 117.7, "tolerance": { "pct": 1 } },
+        "q_gpm_contracted": { "value": 103.9, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "overflow-scupper-sizing",
+      "source_publisher": "Francis weir / IPC 1108",
+      "source_title": "cross-check: a wide 12 in / 2 in scupper passes 102 gpm",
+      "source_edition_or_year": "spec-v426 worked example (machine-verified)",
+      "source_section_or_page": "spec-v426 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "length_in": 12, "head_in": 2 },
+      "outputs": {
+        "q_gpm": { "value": 101.7, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "sewage-force-main-velocity",
+      "source_publisher": "Ten States Standards",
+      "source_title": "50 GPM, 2 in main -> 5.11 ft/s (scours), largest ID at 2 ft/s is 3.20 in",
+      "source_edition_or_year": "spec-v427 worked example (machine-verified)",
+      "source_section_or_page": "spec-v427 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "gpm": 50, "id_in": 2 },
+      "outputs": {
+        "velocity_fps": { "value": 5.106, "tolerance": { "pct": 0.5 } },
+        "d_max_scour_in": { "value": 3.196, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "sewage-force-main-velocity",
+      "source_publisher": "Ten States Standards",
+      "source_title": "cross-check: a 4 in main falls to 1.28 ft/s and solids settle",
+      "source_edition_or_year": "spec-v427 worked example (machine-verified)",
+      "source_section_or_page": "spec-v427 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "gpm": 50, "id_in": 4 },
+      "outputs": {
+        "velocity_fps": { "value": 1.277, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "stormwater-detention-volume",
+      "source_publisher": "Modified Rational method",
+      "source_title": "C 0.85, i 3 in/hr, 2 ac, Q_allow 1.0 cfs, 30 min -> 5.10 cfs, 7,380 ft^3 (0.169 acre-ft)",
+      "source_edition_or_year": "spec-v428 worked example (machine-verified)",
+      "source_section_or_page": "spec-v428 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "runoff_c": 0.85, "intensity_in_hr": 3, "area_ac": 2, "q_allow_cfs": 1.0, "duration_min": 30 },
+      "outputs": {
+        "q_in_cfs": { "value": 5.10, "tolerance": { "pct": 0.5 } },
+        "storage_cf": { "value": 7380, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "stormwater-detention-volume",
+      "source_publisher": "Modified Rational method",
+      "source_title": "cross-check: a longer 60 min / 2 in/hr storm needs 8,640 ft^3 (larger)",
+      "source_edition_or_year": "spec-v428 worked example (machine-verified)",
+      "source_section_or_page": "spec-v428 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "runoff_c": 0.85, "intensity_in_hr": 2, "area_ac": 2, "q_allow_cfs": 1.0, "duration_min": 60 },
+      "outputs": {
+        "storage_cf": { "value": 8640, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

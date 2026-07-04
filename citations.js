@@ -5960,6 +5960,42 @@ export const CITATIONS = {
       { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader and the horizontal storm drain at each slope; tune to IPC Tables 1106.2 / 1106.3 / 1106.6", source: "IPC 2021 Section 1106" },
     ],
   },
+  "overflow-scupper-sizing": {
+    formula: "Q = 3.33 L H^1.5 (cfs, L and H in ft); contracted Q = 3.33 (L - 0.2 H) H^1.5; gpm = cfs x 448.8.",
+    edition: "The rectangular (Francis) weir capacity of an overflow scupper, secondary roof drainage per IPC 1108 / FM Global, by name.",
+    freeAccess: "The Francis rectangular-weir formula is public; the secondary-drainage requirement is in the published IPC (Section 1108) and FM Global data sheets.",
+    governance: GOVERNANCE.general,
+    editionNote: "Overflow (secondary) scupper capacity treated as a rectangular sharp-crested weir: Q = 3.33 L H^1.5 in cfs with the length L and the head H in feet, or the end-contracted form 3.33 (L - 0.2 H) H^1.5 for a scupper narrower than the wall. The head H is the depth of water above the scupper invert at the design condition, which for secondary drainage is evaluated with the primary drains assumed blocked (IPC 1108 / FM Global); the overflow path must pass the design storm on its own. This sizes the weir flow; it does not set the invert height, the number of scuppers, or the resulting ponding depth for the structural roof-load check. A design aid; the plumbing code, the AHJ, and the structural engineer govern.",
+    assumptions: [
+      { name: "Weir flow", value: "Q = 3.33 L H^1.5 (cfs, ft); contracted 3.33 (L - 0.2 H) H^1.5", source: "Francis rectangular weir" },
+      { name: "Blocked-primary head", value: "H evaluated with the primary drainage assumed plugged", source: "IPC 1108 / FM Global" },
+      { name: "Structural check separate", value: "the ponding depth and roof load are the structural engineer's", source: "scope of this tile" },
+    ],
+  },
+  "sewage-force-main-velocity": {
+    formula: "V = 0.4085 Q / d^2 (ft/s, Q gpm, d in); d_max = sqrt(0.4085 Q / 2); scours when V >= 2 ft/s.",
+    edition: "The force-main scour-velocity criterion (about 2 ft/s minimum) from the Ten States Standards (Recommended Standards for Wastewater Facilities), by name.",
+    freeAccess: "The V = 0.4085 Q / d^2 velocity relation is public arithmetic; the 2 ft/s minimum scour velocity is the published Ten States Standards criterion.",
+    governance: GOVERNANCE.general,
+    editionNote: "Sewage force-main velocity: V = 0.4085 Q / d^2 in ft/s with the flow Q in gpm and the inside diameter d in inches. A minimum velocity of about 2 ft/s at the design pumping rate is needed to scour the main and keep solids in suspension (Ten States Standards); below it grit and grease settle and the pipe fouls and loses capacity. The largest inside diameter that still holds 2 ft/s at the given flow = sqrt(0.4085 Q / 2). An upper velocity near 8 ft/s is the customary limit to control headloss and water hammer (not enforced here). This checks the velocity; the pump curve, the system head, and the state design criteria govern the final selection. A design aid; the engineer of record governs.",
+    assumptions: [
+      { name: "Velocity", value: "V = 0.4085 Q / d^2 (ft/s, gpm, in)", source: "continuity" },
+      { name: "Scour minimum", value: "about 2 ft/s to keep solids suspended", source: "Ten States Standards" },
+      { name: "Pump curve governs", value: "the actual velocity varies with the pump operating point", source: "scope of this tile" },
+    ],
+  },
+  "stormwater-detention-volume": {
+    formula: "Q_in = C i A (cfs); storage = (Q_in - Q_allow) x duration x 60 (ft^3); acre-ft = ft^3 / 43560.",
+    edition: "The Modified Rational method for detention storage volume, standard stormwater-management practice, by name.",
+    freeAccess: "The Rational-method inflow and the (inflow minus release) x duration storage are standard published hydrology results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Modified Rational detention volume: the peak inflow Q_in = C i A (the Rational method, with the runoff coefficient C, the design intensity i in in/hr, and the area A in acres giving cfs directly), and the required storage = (Q_in - the allowable release) x the storm duration x 60, the volume held while the outlet passes only the allowable (typically pre-development) rate. Because a longer, lower-intensity storm can require a larger volume than the short intense one, the critical duration must be found by trying several durations off the local IDF curve and taking the largest storage. This sizes one duration and does not route the hydrograph, size the outlet structure, or account for the falling limb; a full hydrograph routing (e.g., TR-55/TR-20) is more accurate. A design aid; the local drainage ordinance and the engineer of record govern.",
+    assumptions: [
+      { name: "Rational inflow", value: "Q_in = C i A (cfs, with A in acres)", source: "Rational method" },
+      { name: "Storage", value: "(Q_in - Q_allow) x duration x 60 (ft^3)", source: "Modified Rational method" },
+      { name: "Critical duration", value: "search the IDF curve for the largest volume; routing is more exact", source: "scope of this tile" },
+    ],
+  },
   "sump-basin-sizing": {
     formula: "area_ft2 = (PI/4)(basin_dia/12)^2; drawdown_gal = area_ft2 x (drawdown_in/12) x 7.48; run_time_s = drawdown_gal / (pump_gpm - inflow_gpm) x 60; fill_time_s = drawdown_gal / inflow_gpm x 60; cycles_per_hr = 3600 / (run + fill); adequate = run_time_s >= min_run_s.",
     edition: "IPC 2021 Section 712 (Sumps and Ejectors) and the Hydraulic Institute pump-cycling guidance by name; first-principles basin geometry and cycle math.",

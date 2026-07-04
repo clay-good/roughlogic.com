@@ -139,6 +139,7 @@ const TOOL_MODULES = (() => {
     "pipe-expansion", "tankless-gpm",
     // v3
     "stormwater-rational", "manning-slope", "hydrostatic-test", "grease-trap",
+    "stormwater-detention-volume",
     "glycol-mix", "expansion-tank", "backflow-loss",
     // v7
     "water-hammer-surge", "pump-operating-point",
@@ -204,6 +205,8 @@ const TOOL_MODULES = (() => {
   // letter independent of module, the v42/v70/v71/v72 precedent).
   declare("./calc-drainage.js", "DRAINAGE_RENDERERS", [
     "roof-drain-sizing", "sump-basin-sizing",
+    // spec-v426..v427 drainage
+    "overflow-scupper-sizing", "sewage-force-main-velocity",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They

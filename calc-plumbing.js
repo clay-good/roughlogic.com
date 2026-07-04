@@ -3943,3 +3943,51 @@ function _v388renderThrustBlockSizing(inputRegion, outputRegion, citationEl) {
   for (const f of [P, od, bend, soil]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["thrust-block-sizing"] = _v388renderThrustBlockSizing;
+
+// ===================== spec-v428: stormwater detention volume (drainage trio) =====================
+
+// dims: in { runoff_c: dimensionless, intensity_in_hr: dimensionless, area_ac: dimensionless, q_allow_cfs: L^3 T^-1, duration_min: dimensionless } out: { q_in_cfs: L^3 T^-1, storage_cf: L^3, storage_ac_ft: L^3 }
+export function computeStormwaterDetentionVolume({ runoff_c = 0, intensity_in_hr = 0, area_ac = 0, q_allow_cfs = 0, duration_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const c = Number(runoff_c) || 0;
+  const i = Number(intensity_in_hr) || 0;
+  const area = Number(area_ac) || 0;
+  const qa = Number(q_allow_cfs) || 0;
+  const dur = Number(duration_min) || 0;
+  if (!(c > 0)) return { error: "Runoff coefficient must be positive." };
+  if (!(i > 0)) return { error: "Rainfall intensity must be positive (in/hr)." };
+  if (!(area > 0)) return { error: "Drainage area must be positive (acres)." };
+  if (qa < 0) return { error: "Allowable release must be non-negative (cfs)." };
+  if (!(dur > 0)) return { error: "Storm duration must be positive (min)." };
+  const q_in_cfs = c * i * area;
+  if (!(q_in_cfs > qa)) return { error: "Allowable release meets or exceeds the inflow -- no detention is needed for this duration (search a longer, less intense storm)." };
+  const storage_cf = (q_in_cfs - qa) * dur * 60;
+  const storage_ac_ft = storage_cf / 43560;
+  return {
+    q_in_cfs, storage_cf, storage_ac_ft, storage_gal: storage_cf * 7.48052,
+    note: "Modified Rational detention volume: the peak inflow Q_in = C i A (the Rational method, C runoff coefficient, i design intensity in in/hr, A in acres gives cfs directly), and the required storage = (Q_in - Q_allow) x duration x 60, the volume that must be held while the outlet passes only the allowable (pre-development) release. Because a longer, lighter storm can require MORE storage than the short intense one, the critical duration must be searched by trying several durations off the IDF curve and taking the largest volume. This sizes one duration; the routing, the outlet structure, and the local drainage ordinance govern. A design aid; the engineer of record governs.",
+  };
+}
+export const stormwaterDetentionVolumeExample = { inputs: { runoff_c: 0.85, intensity_in_hr: 3, area_ac: 2, q_allow_cfs: 1.0, duration_min: 30 } };
+function _v428renderStormwaterDetentionVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Modified Rational detention volume: peak inflow Q_in = C i A (Rational method), storage = (Q_in - Q_allow) x duration x 60. The critical duration is found by searching the IDF curve for the largest volume. A design aid; the routing, the outlet, and the local drainage ordinance govern.";
+  const c = makeNumber("Developed runoff coefficient C", "sdv-c", { step: "any", min: "0" }); c.input.value = "0.85";
+  const i = makeNumber("Design rainfall intensity (in/hr)", "sdv-i", { step: "any", min: "0" }); i.input.value = "3";
+  const area = makeNumber("Drainage area (acres)", "sdv-a", { step: "any", min: "0" }); area.input.value = "2";
+  const qa = makeNumber("Allowable release (cfs)", "sdv-qa", { step: "any", min: "0" }); qa.input.value = "1.0";
+  const dur = makeNumber("Storm duration (min)", "sdv-d", { step: "any", min: "0" }); dur.input.value = "30";
+  for (const f of [c, i, area, qa, dur]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "0.85"; i.input.value = "3"; area.input.value = "2"; qa.input.value = "1.0"; dur.input.value = "30"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Peak inflow", "sdv-out-q");
+  const oV = makeOutputLine(outputRegion, "Required storage", "sdv-out-v");
+  const oNote = makeOutputLine(outputRegion, "Note", "sdv-out-n");
+  const update = debounce(() => {
+    const r = computeStormwaterDetentionVolume({ runoff_c: Number(c.input.value) || 0, intensity_in_hr: Number(i.input.value) || 0, area_ac: Number(area.input.value) || 0, q_allow_cfs: Number(qa.input.value) || 0, duration_min: Number(dur.input.value) || 0 });
+    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.q_in_cfs, 2) + " cfs";
+    oV.textContent = fmt(r.storage_cf, 0) + " ft^3 (" + fmt(r.storage_ac_ft, 3) + " acre-ft, " + fmt(r.storage_gal, 0) + " gal)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [c, i, area, qa, dur]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["stormwater-detention-volume"] = _v428renderStormwaterDetentionVolume;

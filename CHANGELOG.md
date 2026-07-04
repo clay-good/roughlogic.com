@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(drainage): land spec-v426..v428 -- 3 drainage/stormwater tiles; 891 -> 894 tiles, 0.148.0, 2026-07-04
+
+The drainage/stormwater trio, seventeenth batch of the v375-v474 campaign: the overflow scupper, the force-main scour velocity, and the detention volume, split across calc-drainage.js and calc-plumbing.js (all Group B); no new module, group, or dependency. Catalog **891 -> 894**, package **0.147.0 -> 0.148.0** (a minor). Proposed 2026-07-03.
+
+- **`overflow-scupper-sizing` (spec-v426, calc-drainage.js).** Q = 3.33 L H^1.5 (rectangular weir), contracted 3.33(L - 0.2H)H^1.5. Pinned: a 6 in scupper at 3.5 in head -> 118 gpm (104 contracted); a wide 12 in / 2 in scupper -> 102 gpm. Head at the blocked-primary condition (IPC 1108 / FM Global).
+- **`sewage-force-main-velocity` (spec-v427, calc-drainage.js).** V = 0.4085 Q / d^2 vs the ~2 ft/s scour minimum. Pinned: 50 GPM in a 2 in main -> 5.11 ft/s (scours); the largest ID at 2 ft/s is 3.20 in, so a 4 in main (1.28 ft/s) lets solids settle.
+- **`stormwater-detention-volume` (spec-v428, calc-plumbing.js).** Q_in = C i A, storage = (Q_in - Q_allow) x duration x 60 (Modified Rational). Pinned: C 0.85, i 3 in/hr, 2 ac, Q_allow 1.0 cfs, 30 min -> 5.10 cfs, 7,380 ft^3 (0.169 acre-ft); a longer 60 min / 2 in/hr storm needs 8,640 ft^3, so the critical duration must be searched.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the weir contraction, the scour flag, the critical-duration growth, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming the Francis weir / IPC 1108, the Ten States Standards, and the Modified Rational method. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers). Module caps bumped with dated comments: calc-drainage.js 6000 -> 9000 and tools-data.js 115000 -> 130000 (the campaign's ~48 landed catalog rows took the registry past its cap). Housekeeping: home count 891 -> 894, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 80 appended. All gates green at the new state: lint, unit tests (**5,187**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(trucking): land spec-v423..v425 -- 3 trucking-business tiles in calc-trucking.js; 888 -> 891 tiles, 0.147.0, 2026-07-04
 
 The trucking-business trio, sixteenth batch of the v375-v474 campaign: the detention billing, the driver-pay comparison, and the invoice-factoring cost, all in the existing lazy `calc-trucking.js` (Group J); no new module, group, or dependency. Catalog **888 -> 891**, package **0.146.0 -> 0.147.0** (a minor). Proposed 2026-07-03.

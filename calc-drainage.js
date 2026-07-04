@@ -205,3 +205,78 @@ function renderSumpBasinSizing(inputRegion, outputRegion, citationEl) {
   for (const el of [dia.input, band.input, inflow.input, pump.input, minRun.input]) el.addEventListener("input", update);
 }
 DRAINAGE_RENDERERS["sump-basin-sizing"] = renderSumpBasinSizing;
+
+// ===================== spec-v426..v427: drainage trio (Group B) =====================
+
+// dims: in { length_in: L, head_in: L } out: { q_cfs: L^3 T^-1, q_cfs_contracted: L^3 T^-1, q_gpm: L^3 T^-1 }
+export function computeOverflowScupperSizing({ length_in = 0, head_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const len = Number(length_in) || 0;
+  const head = Number(head_in) || 0;
+  if (!(len > 0)) return { error: "Scupper length must be positive (in)." };
+  if (!(head > 0)) return { error: "Head must be positive (in)." };
+  const L = len / 12;
+  const H = head / 12;
+  const q_cfs = 3.33 * L * Math.pow(H, 1.5);
+  const effL = Math.max(0, L - 0.2 * H);
+  const q_cfs_contracted = 3.33 * effL * Math.pow(H, 1.5);
+  return {
+    q_cfs, q_cfs_contracted, q_gpm: q_cfs * 448.8, q_gpm_contracted: q_cfs_contracted * 448.8,
+    note: "Overflow scupper capacity as a rectangular (Francis) weir: Q = 3.33 L H^1.5 (cfs, L and H in feet), or the contracted form 3.33 (L - 0.2 H) H^1.5 for a scupper narrower than the wall. The head H is measured above the scupper invert at the design (blocked-primary) condition, and the overflow scuppers or drains must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width up and keep the parapet high enough for the head. A design aid; the plumbing code and the structural roof-loading check govern.",
+  };
+}
+export const overflowScupperSizingExample = { inputs: { length_in: 6, head_in: 3.5 } };
+function renderOverflowScupperSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Overflow scupper as a rectangular weir Q = 3.33 L H^1.5 (cfs, feet), contracted 3.33 (L - 0.2 H) H^1.5 (IPC 1108 secondary drainage / FM Global). Head at the blocked-primary condition. A design aid; the plumbing code and roof-loading check govern.";
+  const len = makeNumber("Scupper opening width (in)", "oss-len", { step: "any", min: "0" }); len.input.value = "6";
+  const head = makeNumber("Head above scupper invert (in)", "oss-head", { step: "any", min: "0" }); head.input.value = "3.5";
+  for (const f of [len, head]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { len.input.value = "6"; head.input.value = "3.5"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Capacity (suppressed)", "oss-out-q");
+  const oC = makeOutputLine(outputRegion, "Capacity (contracted)", "oss-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "oss-out-n");
+  const update = debounce(() => {
+    const r = computeOverflowScupperSizing({ length_in: Number(len.input.value) || 0, head_in: Number(head.input.value) || 0 });
+    if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.q_gpm, 0) + " gpm (" + fmt(r.q_cfs, 3) + " cfs)";
+    oC.textContent = fmt(r.q_gpm_contracted, 0) + " gpm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [len.input, head.input]) f.addEventListener("input", update);
+}
+DRAINAGE_RENDERERS["overflow-scupper-sizing"] = renderOverflowScupperSizing;
+
+// dims: in { gpm: L^3 T^-1, id_in: L } out: { velocity_fps: L T^-1, d_max_scour_in: L }
+export function computeSewageForceMainVelocity({ gpm = 0, id_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(gpm) || 0;
+  const id = Number(id_in) || 0;
+  if (!(q > 0)) return { error: "Pump flow must be positive (gpm)." };
+  if (!(id > 0)) return { error: "Force-main inside diameter must be positive (in)." };
+  const velocity_fps = 0.4085 * q / (id * id);
+  const d_max_scour_in = Math.sqrt(0.4085 * q / 2);
+  return {
+    velocity_fps, d_max_scour_in, scours: velocity_fps >= 2.0,
+    note: "Sewage force-main scour velocity: V = 0.4085 Q / d^2 (ft/s, Q in gpm, d in inches). A minimum of about 2 ft/s at the design flow is needed to scour the pipe and keep solids in suspension (Ten States Standards); below it grit and grease settle and the main fouls. The largest inside diameter that still holds 2 ft/s at this flow = sqrt(0.4085 Q / 2). An upper limit near 8 ft/s avoids excessive headloss and water hammer. A design aid; the state design criteria and the pump curve govern.",
+  };
+}
+export const sewageForceMainVelocityExample = { inputs: { gpm: 50, id_in: 2 } };
+function renderSewageForceMainVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Sewage force-main velocity V = 0.4085 Q / d^2 (ft/s, gpm, in), with the ~2 ft/s minimum scour velocity to keep solids suspended (Ten States Standards). A design aid; the state design criteria and the pump curve govern.";
+  const q = makeNumber("Pump flow (gpm)", "sfm-q", { step: "any", min: "0" }); q.input.value = "50";
+  const id = makeNumber("Force-main inside diameter (in)", "sfm-id", { step: "any", min: "0" }); id.input.value = "2";
+  for (const f of [q, id]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "50"; id.input.value = "2"; update(); });
+  const oV = makeOutputLine(outputRegion, "Velocity", "sfm-out-v");
+  const oD = makeOutputLine(outputRegion, "Largest ID holding 2 ft/s", "sfm-out-d");
+  const oNote = makeOutputLine(outputRegion, "Note", "sfm-out-n");
+  const update = debounce(() => {
+    const r = computeSewageForceMainVelocity({ gpm: Number(q.input.value) || 0, id_in: Number(id.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oD.textContent = "-"; oNote.textContent = ""; return; }
+    oV.textContent = fmt(r.velocity_fps, 2) + " ft/s" + (r.scours ? " (scours -- OK)" : " (below 2 ft/s -- solids settle)");
+    oD.textContent = fmt(r.d_max_scour_in, 2) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q.input, id.input]) f.addEventListener("input", update);
+}
+DRAINAGE_RENDERERS["sewage-force-main-velocity"] = renderSewageForceMainVelocity;

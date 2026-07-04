@@ -1,6 +1,6 @@
 # roughlogic.com Specification v428 -- Stormwater Detention Volume (Modified Rational) (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the drainage-hydraulics trio (v426 overflow scupper ->
+> **Status: LANDED (2026-07-04, 0.148.0; proposed 2026-07-03). Third and final tile of the drainage-hydraulics trio (v426 overflow scupper ->
 > v427 sewage force-main velocity -> v428 stormwater detention volume). `stormwater-rational` gives the peak runoff rate off
 > a site; this tile sizes the detention basin that holds the difference between that developed runoff and the allowable
 > release, the storage a site-development permit requires.**
