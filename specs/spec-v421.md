@@ -1,6 +1,6 @@
 # roughlogic.com Specification v421 -- Cable Tray Fill for Large Single Conductors (NEC 392.22) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the NEC electrical-installation trio (v420 EV charging load -> v421 cable
+> **Status: CUT (2026-07-04, dupe of existing tile). NOT LANDED: v420 ev-charging-load duplicates the existing ev-charger-load (calc-solar.js, NEC 625.42 continuous load + panel impact); v421 cable-tray-fill is an EXACT id collision with the existing cable-tray-fill (calc-lowvoltage.js, NEC 392.22); v422 buck-boost-transformer-sizing duplicates the existing buck-boost-sizing (calc-electrical.js). The NEC electrical-installation space was already built out; this trio was proposed without a dupe-check against the live catalog. Original proposal below. Second tile of the NEC electrical-installation trio (v420 EV charging load -> v421 cable
 > tray fill -> v422 buck-boost transformer). `conduit-fill` checks conductors in a raceway by cross-sectional percent; a
 > cable tray uses a completely different rule, and no tile applies it.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. For single conductors `1/0 AWG` and larger in a ladder

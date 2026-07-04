@@ -1,6 +1,6 @@
 # roughlogic.com Specification v420 -- EV Charging Load (NEC 625.42 / 220.57) (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an NEC electrical-installation trio (v420 EV charging load -> v421 cable
+> **Status: CUT (2026-07-04, dupe of existing tile). NOT LANDED: v420 ev-charging-load duplicates the existing ev-charger-load (calc-solar.js, NEC 625.42 continuous load + panel impact); v421 cable-tray-fill is an EXACT id collision with the existing cable-tray-fill (calc-lowvoltage.js, NEC 392.22); v422 buck-boost-transformer-sizing duplicates the existing buck-boost-sizing (calc-electrical.js). The NEC electrical-installation space was already built out; this trio was proposed without a dupe-check against the live catalog. Original proposal below. First tile of an NEC electrical-installation trio (v420 EV charging load -> v421 cable
 > tray fill -> v422 buck-boost transformer). EVSE is now on most services, and it has two code numbers no tile computes: the
 > continuous-load branch/feeder sizing at 125% and the service-load contribution at the greater of 7200 VA or nameplate.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. NEC 625.42 makes electric-vehicle supply equipment a

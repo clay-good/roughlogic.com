@@ -1,6 +1,6 @@
 # roughlogic.com Specification v422 -- Buck-Boost Transformer Sizing (calc-electrical.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the NEC electrical-installation trio (v420 EV charging load ->
+> **Status: CUT (2026-07-04, dupe of existing tile). NOT LANDED: v420 ev-charging-load duplicates the existing ev-charger-load (calc-solar.js, NEC 625.42 continuous load + panel impact); v421 cable-tray-fill is an EXACT id collision with the existing cable-tray-fill (calc-lowvoltage.js, NEC 392.22); v422 buck-boost-transformer-sizing duplicates the existing buck-boost-sizing (calc-electrical.js). The NEC electrical-installation space was already built out; this trio was proposed without a dupe-check against the live catalog. Original proposal below. Third and final tile of the NEC electrical-installation trio (v420 EV charging load ->
 > v421 cable tray fill -> v422 buck-boost transformer). `transformer-sizing` sizes an isolation transformer by the full load
 > kVA; a buck-boost is connected as an autotransformer, so a tiny nameplate handles a large line load -- a sizing this tile
 > makes explicit and the isolation formula gets very wrong.**
