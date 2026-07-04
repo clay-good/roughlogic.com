@@ -249,6 +249,7 @@ const TOOL_MODULES = (() => {
     // spec-v329..v331 building-energy batch
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
+    "moist-air-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

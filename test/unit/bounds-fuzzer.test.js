@@ -15131,3 +15131,57 @@ test("bounds: spec-v374 computeConduitJamRatio pins the jam band, the three-cond
   assert.ok("error" in _v374({ conduit_id_in: 0.5, conductor_od_in: 0.65 })); // OD >= ID
   assert.ok("error" in _v374({ conduit_id_in: Infinity, conductor_od_in: 0.65 }));
 });
+
+// ===================== spec-v375..v377 psychrometric coil-analysis trio =====================
+import { computeMoistAirEnthalpy as _v375, computeCoolingCoilTotalLoad as _v376, computeCoilBypassFactor as _v377 } from "../../calc-hvac.js";
+
+test("bounds: spec-v375 computeMoistAirEnthalpy pins h = 0.240 t + W(1061 + 0.444 t), the dry-air floor, and error seams", () => {
+  const r = _v375({ t_db_f: 80, w_lb_lb: 0.0112 });
+  assert.ok(Math.abs(r.h - 31.481) < 0.01);
+  assert.ok(Math.abs(r.h_sensible - 19.2) < 1e-9);
+  assert.ok(Math.abs(r.h_latent - 0.0112 * (1061 + 0.444 * 80)) < 1e-9);
+  // Supply-air cross-check.
+  const s = _v375({ t_db_f: 55, w_lb_lb: 0.0090 });
+  assert.ok(Math.abs(s.h - 22.969) < 0.01);
+  // Dry air (W = 0) is the sensible-only floor.
+  const dry = _v375({ t_db_f: 80, w_lb_lb: 0 });
+  assert.ok(Math.abs(dry.h - 19.2) < 1e-9 && dry.h_latent === 0);
+  // More moisture -> more enthalpy at the same temperature.
+  assert.ok(_v375({ t_db_f: 80, w_lb_lb: 0.015 }).h > r.h);
+  // Error seams: negative W and non-finite.
+  assert.ok("error" in _v375({ t_db_f: 80, w_lb_lb: -0.001 }));
+  assert.ok("error" in _v375({ t_db_f: Infinity, w_lb_lb: 0.0112 }));
+  assert.ok("error" in _v375({ t_db_f: 80, w_lb_lb: NaN }));
+});
+
+test("bounds: spec-v376 computeCoolingCoilTotalLoad pins Q = 4.5 CFM dh, tons, the heating case, and error seams", () => {
+  const r = _v376({ cfm: 2000, h_ent_btu: 31.48, h_lvg_btu: 22.97 });
+  assert.ok(Math.abs(r.q_btuh - 76590) < 1e-6);
+  assert.ok(Math.abs(r.tons - 76590 / 12000) < 1e-9);
+  assert.ok(Math.abs(r.dh - 8.51) < 1e-9);
+  // Double the airflow -> double the load.
+  const r2 = _v376({ cfm: 4000, h_ent_btu: 31.48, h_lvg_btu: 22.97 });
+  assert.ok(Math.abs(r2.q_btuh - 2 * r.q_btuh) < 1e-6);
+  // Leaving enthalpy above entering -> negative Q (heating), not an error.
+  const heat = _v376({ cfm: 2000, h_ent_btu: 22, h_lvg_btu: 25 });
+  assert.ok(Math.abs(heat.q_btuh + 27000) < 1e-6 && heat.heating === true);
+  // Error seams: non-positive CFM and non-finite.
+  assert.ok("error" in _v376({ cfm: 0, h_ent_btu: 31, h_lvg_btu: 22 }));
+  assert.ok("error" in _v376({ cfm: -100, h_ent_btu: 31, h_lvg_btu: 22 }));
+  assert.ok("error" in _v376({ cfm: 2000, h_ent_btu: Infinity, h_lvg_btu: 22 }));
+});
+
+test("bounds: spec-v377 computeCoilBypassFactor pins BF/CF, the shallow-coil case, and out-of-band error seams", () => {
+  const r = _v377({ t_ent_f: 80, t_lvg_f: 55, t_adp_f: 50 });
+  assert.ok(Math.abs(r.bf - 5 / 30) < 1e-9);
+  assert.ok(Math.abs(r.cf - (1 - 5 / 30)) < 1e-9);
+  // A shallower coil bypasses more (higher BF).
+  const shallow = _v377({ t_ent_f: 78, t_lvg_f: 60, t_adp_f: 52 });
+  assert.ok(Math.abs(shallow.bf - 8 / 26) < 1e-9);
+  assert.ok(shallow.bf > r.bf);
+  // Error seams: leaving below the ADP, leaving above entering, entering = ADP, non-finite.
+  assert.ok("error" in _v377({ t_ent_f: 80, t_lvg_f: 45, t_adp_f: 50 })); // below ADP -> BF < 0
+  assert.ok("error" in _v377({ t_ent_f: 80, t_lvg_f: 85, t_adp_f: 50 })); // above entering -> BF > 1
+  assert.ok("error" in _v377({ t_ent_f: 50, t_lvg_f: 48, t_adp_f: 50 })); // entering = ADP
+  assert.ok("error" in _v377({ t_ent_f: Infinity, t_lvg_f: 55, t_adp_f: 50 }));
+});

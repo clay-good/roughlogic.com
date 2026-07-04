@@ -1,6 +1,6 @@
 # roughlogic.com Specification v376 -- Cooling Coil Total Load from Enthalpy Difference (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the psychrometric coil trio (v375 enthalpy -> v376 total load ->
+> **Status: LANDED (2026-07-03, 0.132.0; proposed 2026-07-03). As-landed correction: the pinned inputs 31.48/22.97 Btu/lb give Q = 4.5 x 2000 x 8.51 = 76,590 Btu/hr (6.38 tons); the spec prose said 76,610, a rounding slip. Landed the exact 76,590. Second tile of the psychrometric coil trio (v375 enthalpy -> v376 total load ->
 > v377 bypass factor). `shr-latent` splits a total load you already know into sensible and latent; this tile computes that
 > total in the first place, the honest way -- airflow times the enthalpy drop across the coil, which captures the sensible
 > temperature drop and the latent moisture removal in one number.**

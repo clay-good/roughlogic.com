@@ -1918,8 +1918,10 @@ cross-check.
 | calc-hvac.js | `computeBlownInsulationCoverage` | `{ area_sqft = 0, bags_per_1000 = 0, r_per_inch = 3.5, target_r = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeBuildingUa` | `{ assemblies, cfm_inf = 0, dt_f = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCfmPerTon` | `{ tons, climate = "standard" }` | _ | _ | _ |
+| calc-hvac.js | `computeCoilBypassFactor` | `{ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
 | calc-hvac.js | `computeCompressedAirPower` | `{ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75...` | _ | _ | _ |
+| calc-hvac.js | `computeCoolingCoilTotalLoad` | `{ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDcvCo2Ventilation` | `{ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDegreeDayEnergy` | `{ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel = "gas", price = 0 } = {}` | _ | _ | _ |
@@ -1941,6 +1943,7 @@ cross-check.
 | calc-hvac.js | `computeHydronicGpmDeltat` | `{ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
+| calc-hvac.js | `computeMoistAirEnthalpy` | `{ t_db_f = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeMuaTemperingLoad` | `{ cfm = 0, t_oa_F = 0, t_target_F = 0, eta = 0.80, w_oa_gr = 0, w_target_gr =...` | _ | _ | _ |
 | calc-hvac.js | `computeNPSHa` | `{ elevation_ft = 0, water_temp_F = 60, source_elevation_relative_ft = 0, // p...` | _ | _ | _ |
 | calc-hvac.js | `computeOutdoorAirMix` | `{ return_T_F, return_RH_percent, outdoor_T_F, outdoor_RH_percent, oa_fraction }` | _ | _ | _ |
@@ -2500,7 +2503,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1086.
+Row count: 1089.
 
 <!-- END function-corpus-v14 -->
 
@@ -2779,7 +2782,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (85 tiles)
+### Group C HVAC (88 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2801,6 +2804,7 @@ per spec-v14 §13.1 second paragraph.
 | `building-ua` | Whole-Building Heat-Loss Coefficient UA | Whole-building UA (ASHRAE / RESNET); spec-v329 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cfm-per-ton` | CFM per Ton | Project (first-principles); ACCA Manual D / industry rule of thumb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chiller-tons` | Chiller Tonnage (Delta-T and GPM) | ASHRAE; Q = 240*500*10 = 1,200,000 BTU/hr; tons = 1,200,000/12000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `coil-bypass-factor` | Coil Bypass Factor and Apparatus Dew Point | ASHRAE Fundamentals; spec-v377 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `combustion-air` | Combustion Air | ICC; required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compare-refrigerants` | Compare Two Refrigerants | Chemours / Honeywell / Daikin publish...; R-410A vs R-32 at 118 psig -> 40 F vs 43.2 F sat-temp; pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressed-air-power` | Compressed-Air Compression Power (Isentropic) and Energy Cost | Single-stage adiabatic (isentropic) c...; spec-v240 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2808,6 +2812,7 @@ per spec-v14 §13.1 second paragraph.
 | `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condensate-drain` | Condensate Rate and Drain Size | IMC 307.2.2 (drain size by capacity) ...; spec-v102 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dcv-co2-ventilation` | Demand-Controlled Ventilation Rate from a CO2 Setpoint | Steady-state single-zone CO2 mass bal...; spec-v277 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `degree-day-energy` | Annual Heating Energy and Fuel Cost from Degree-Days | Degree-day method (ASHRAE / RESNET); spec-v330 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2842,6 +2847,7 @@ per spec-v14 §13.1 second paragraph.
 | `internal-heat-gains` | Internal Heat Gains: People, Lighting, Equipment | ASHRAE / ACCA Manual J internal gains; spec-v228 section 2.1 pinned example (small office) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manual-j-cooling` | Manual J Cooling Load (Simplified) | ACCA Manual J residential cooling-loa...; 1500 ft^2 / 1200 wall / 200 window / 4 occupants / 95 out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manual-j-heating` | Manual J Heating Load (Simplified) | ACCA Manual J residential heating-loa...; 1500 ft^2 / 1200 wall / 200 window / 1500 ceiling / 10 ou... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `moist-air-enthalpy` | Moist Air Enthalpy (ASHRAE Psychrometrics) | ASHRAE Fundamentals; spec-v375 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `mua-tempering-load` | Makeup-Air Unit Tempering Load (Sensible, Latent, Total) | ASHRAE Fundamentals psychrometric loa...; spec-v276 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nitrogen-pressure-test` | Nitrogen Pressure Test (Temperature-Corrected) | First-principles Gay-Lussac's law (co...; spec-v105 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `npsh-a` | Pump NPSH Available | Hydraulic Institute / centrifugal-pum...; 70 F water / 14.7 psi atm / 8 ft suction lift / 2 ft fric... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3529,6 +3535,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 843. Fixture-covered or reference-cadence: 843 / 843.
+Tile count: 846. Fixture-covered or reference-cadence: 846 / 846.
 
 <!-- END tile-index-v14 -->

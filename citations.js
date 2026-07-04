@@ -8355,6 +8355,42 @@ export const CITATIONS = {
       { name: "Dry standard air", value: "dry air, standard atmosphere; verify against the equipment's fan curve", source: "scope of this tile" },
     ],
   },
+  "moist-air-enthalpy": {
+    formula: "h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air.",
+    edition: "The I-P moist-air enthalpy relation from the ASHRAE Handbook - Fundamentals, by name.",
+    freeAccess: "The moist-air enthalpy relation and its sea-level coefficients are standard ASHRAE psychrometric results. A measured chart state and the equipment ratings govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The I-P moist-air enthalpy h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air): 0.240 is the dry-air specific heat, 1061 the latent heat of vaporization at the 0 F datum, and 0.444 the water-vapor specific heat, all sea-level coefficients. This returns the total heat content of the air at one state: it is the property cooling-coil-total-load differences across a coil and that an economizer control compares, uses the humidity ratio (not RH directly - pair with outdoor-air-mix or a psychrometric chart to get W), and is a design aid, not a substitute for a measured chart state or the equipment ratings.",
+    assumptions: [
+      { name: "Enthalpy relation", value: "h = 0.240 t + W (1061 + 0.444 t) Btu/lb dry air", source: "ASHRAE Fundamentals" },
+      { name: "Sea-level coefficients", value: "0.240 dry-air cp, 1061 latent heat at the 0 F datum, 0.444 vapor cp", source: "ASHRAE" },
+      { name: "Humidity-ratio input", value: "W is the moisture input (lb/lb); get it from RH via outdoor-air-mix or a chart", source: "scope of this tile" },
+    ],
+  },
+  "cooling-coil-total-load": {
+    formula: "Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr; tons = Q / 12000.",
+    edition: "The total-heat coil-load relation from the ASHRAE Handbook - Fundamentals, by name.",
+    freeAccess: "The 4.5 x CFM x enthalpy-difference total-heat relation is a standard airside coil result. The coil rating governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The total coil load Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, where 4.5 = 60 min/hr x 0.075 lb/ft^3 standard air density and the enthalpies come from moist-air-enthalpy; tons = Q / 12000. This captures the full sensible-plus-latent heat the coil removes, unlike the dry-bulb 1.08 x CFM x deltaT which never sees the condensed-moisture (latent) load. A leaving enthalpy above entering returns a negative Q (the coil is heating), not an error. A design aid; the coil selection and equipment ratings govern.",
+    assumptions: [
+      { name: "Total-heat load", value: "Q = 4.5 x CFM x (h_ent - h_lvg); 4.5 = 60 x 0.075", source: "ASHRAE Fundamentals" },
+      { name: "Enthalpy source", value: "entering/leaving enthalpies from moist-air-enthalpy", source: "ASHRAE" },
+      { name: "Tons conversion", value: "tons = Q / 12000; negative Q means heating", source: "scope of this tile" },
+    ],
+  },
+  "coil-bypass-factor": {
+    formula: "BF = (t_lvg - t_adp) / (t_ent - t_adp); CF = 1 - BF.",
+    edition: "The coil bypass / contact factor and apparatus-dew-point definition from the ASHRAE Handbook - Fundamentals, by name.",
+    freeAccess: "The bypass-factor / apparatus-dew-point construction is a standard coil-performance result. The coil rating and ADP selection govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bypass factor BF = (t_lvg - t_adp) / (t_ent - t_adp) and contact factor CF = 1 - BF, where the apparatus dew point (ADP) is the effective coil-surface temperature the air is driven toward. BF is the fraction of air that slips past the coil unconditioned, so a lower BF (a deeper, slower coil) contacts more air and dehumidifies better. This returns the two factors from the three temperatures: leaving air cannot be colder than the ADP or warmer than entering (those take the error path rather than reporting a factor outside [0,1]). A design aid; the coil rating and ADP selection govern.",
+    assumptions: [
+      { name: "Bypass / contact factor", value: "BF = (t_lvg - t_adp)/(t_ent - t_adp); CF = 1 - BF", source: "ASHRAE Fundamentals" },
+      { name: "Apparatus dew point", value: "ADP is the effective coil-surface temperature", source: "ASHRAE" },
+      { name: "Physical band", value: "leaving air lies between the ADP and the entering temperature", source: "scope of this tile" },
+    ],
+  },
   "wall-condensation-gradient": {
     formula: "R_total = R_inside + R_outside; T_plane = T_in - (R_inside/R_total)(T_in - T_out); T_dew = Magnus(T_in, RH); margin = T_plane - T_dew (<= 0 condensing).",
     edition: "The R-proportional through-wall temperature gradient and the Magnus dew-point comparison for a condensation-plane screen, standard building-science results, by name.",

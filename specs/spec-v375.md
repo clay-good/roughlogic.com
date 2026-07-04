@@ -1,6 +1,6 @@
 # roughlogic.com Specification v375 -- Moist Air Enthalpy (ASHRAE Psychrometrics) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a psychrometric coil-analysis trio (v375 enthalpy -> v376 total coil load
+> **Status: LANDED (2026-07-03, 0.132.0; proposed 2026-07-03). First tile of a psychrometric coil-analysis trio (v375 enthalpy -> v376 total coil load
 > -> v377 bypass factor). The catalog computes humidity ratio (`outdoor-air-mix`), the sensible/latent split (`shr-latent`),
 > and refrigerant-cycle enthalpies (`refrigeration-cop`), but never the one number every cooling-coil and air-mixing
 > calculation actually starts from: the total heat content of moist air, its enthalpy.**

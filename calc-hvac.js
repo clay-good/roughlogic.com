@@ -3637,3 +3637,100 @@ HVAC_RENDERERS["air-density-correction"] = _rEnv({
   ],
   compute: computeAirDensityCorrection,
 });
+
+// =====================================================================
+// spec-v375..v377: psychrometric coil-analysis trio (Group C).
+// =====================================================================
+
+// dims: in { t_db_f: T, w_lb_lb: dimensionless } out: { h: L^2 T^-2, h_sensible: L^2 T^-2, h_latent: L^2 T^-2 }
+export function computeMoistAirEnthalpy({ t_db_f = 0, w_lb_lb = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const t = Number(t_db_f);
+  const w = Number(w_lb_lb);
+  if (w < 0) return { error: "Humidity ratio must be non-negative (lb water / lb dry air)." };
+  const h_sensible = 0.240 * t;
+  const h_latent = w * (1061 + 0.444 * t);
+  const h = h_sensible + h_latent;
+  return {
+    h, h_sensible, h_latent,
+    note: "ASHRAE I-P moist-air enthalpy h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air: 0.240 is the dry-air specific heat, 1061 the latent heat of vaporization at the 0 F datum, 0.444 the water-vapor specific heat. The humidity ratio W (lb water / lb dry air) is the moisture input - pair with outdoor-air-mix or a psychrometric chart to get W from RH. This is the total heat content of one air state; a cooling coil removes the difference between two of these. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
+  };
+}
+const moistAirEnthalpyExample = { inputs: { t_db_f: 80, w_lb_lb: 0.0112 } };
+HVAC_RENDERERS["moist-air-enthalpy"] = _rEnv({
+  citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals): h = 0.240 t + W (1061 + 0.444 t) Btu per lb dry air, with t the dry-bulb (F) and W the humidity ratio (lb water / lb dry air). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. Total heat content of one air state; pair with outdoor-air-mix or a psychrometric chart for W. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
+  example: moistAirEnthalpyExample.inputs,
+  fields: [
+    { key: "t_db_f", label: "Dry-bulb temperature (F)", kind: "number", default: 80 },
+    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number", default: 0.0112 },
+  ],
+  outputs: [
+    { key: "h", id: "mae-out-h", label: "Enthalpy h", value: (r) => fmt(r.h, 2) + " Btu/lb dry air" },
+    { key: "split", id: "mae-out-split", label: "Sensible + latent", value: (r) => fmt(r.h_sensible, 2) + " + " + fmt(r.h_latent, 2) + " Btu/lb" },
+    { key: "n", id: "mae-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMoistAirEnthalpy,
+});
+
+// dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: dimensionless, dh: L^2 T^-2 }
+export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const q = Number(cfm) || 0;
+  if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
+  const dh = Number(h_ent_btu) - Number(h_lvg_btu);
+  const q_btuh = 4.5 * q * dh;
+  const tons = q_btuh / 12000;
+  return {
+    q_btuh, tons, dh,
+    heating: dh < 0,
+    note: "Total coil load Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, where 4.5 = 60 min/hr x 0.075 lb/ft^3 standard air density. This is the whole heat the coil removes - sensible drop plus condensed moisture (latent) - not the dry-bulb-only 1.08 x CFM x deltaT, which misses the latent load. Feed the entering and leaving enthalpies from moist-air-enthalpy. tons = Q / 12000. A leaving enthalpy above entering returns a negative Q (the coil is heating). A design aid; the equipment ratings govern.",
+  };
+}
+const coolingCoilTotalLoadExample = { inputs: { cfm: 2000, h_ent_btu: 31.48, h_lvg_btu: 22.97 } };
+HVAC_RENDERERS["cooling-coil-total-load"] = _rEnv({
+  citation: "Citation: Cooling-coil total load (ASHRAE Handbook - Fundamentals): Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, with 4.5 = 60 x 0.075 (standard air) and enthalpies from moist-air-enthalpy; tons = Q / 12000. Captures the full sensible-plus-latent heat the coil removes, unlike the dry-bulb 1.08 x CFM x deltaT. A leaving enthalpy above entering gives a negative Q (heating). A design aid; equipment ratings govern.",
+  example: coolingCoilTotalLoadExample.inputs,
+  fields: [
+    { key: "cfm", label: "Airflow across the coil (cfm)", kind: "number", default: 2000 },
+    { key: "h_ent_btu", label: "Entering-air enthalpy (Btu/lb)", kind: "number", default: 31.48 },
+    { key: "h_lvg_btu", label: "Leaving-air enthalpy (Btu/lb)", kind: "number", default: 22.97 },
+  ],
+  outputs: [
+    { key: "q", id: "cctl-out-q", label: "Total coil load", value: (r) => (r.heating ? "heating: " : "") + fmt(r.q_btuh, 0) + " Btu/hr" },
+    { key: "tons", id: "cctl-out-tons", label: "Tons", value: (r) => fmt(r.tons, 2) + " tons (dh = " + fmt(r.dh, 2) + " Btu/lb)" },
+    { key: "n", id: "cctl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoolingCoilTotalLoad,
+});
+
+// dims: in { t_ent_f: T, t_lvg_f: T, t_adp_f: T } out: { bf: dimensionless, cf: dimensionless }
+export function computeCoilBypassFactor({ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const te = Number(t_ent_f);
+  const tl = Number(t_lvg_f);
+  const ta = Number(t_adp_f);
+  if (!(te > ta)) return { error: "Entering dry-bulb must be above the apparatus dew point." };
+  const bf = (tl - ta) / (te - ta);
+  if (!(bf >= 0 && bf <= 1)) return { error: "Leaving temperature must be between the apparatus dew point and the entering temperature (bypass factor outside [0,1])." };
+  const cf = 1 - bf;
+  return {
+    bf, cf,
+    note: "Bypass factor BF = (t_lvg - t_adp) / (t_ent - t_adp), contact factor CF = 1 - BF, where the apparatus dew point (ADP) is the effective coil-surface temperature the air is driven toward. BF is the fraction of air that slips past the coil unconditioned; a lower BF (deeper, slower coil) contacts more air and dehumidifies better. Leaving air cannot be colder than the ADP or warmer than entering. A design aid; the coil rating and ADP selection govern.",
+  };
+}
+const coilBypassFactorExample = { inputs: { t_ent_f: 80, t_lvg_f: 55, t_adp_f: 50 } };
+HVAC_RENDERERS["coil-bypass-factor"] = _rEnv({
+  citation: "Citation: Coil bypass / contact factor (ASHRAE Handbook - Fundamentals): BF = (t_lvg - t_adp) / (t_ent - t_adp), CF = 1 - BF, with the apparatus dew point (ADP) the effective coil-surface temperature. BF is the fraction of air bypassing the coil unconditioned; a lower BF dehumidifies better. Leaving air lies between the ADP and the entering temperature. A design aid; the coil rating governs.",
+  example: coilBypassFactorExample.inputs,
+  fields: [
+    { key: "t_ent_f", label: "Entering-air dry-bulb (F)", kind: "number", default: 80 },
+    { key: "t_lvg_f", label: "Leaving-air dry-bulb (F)", kind: "number", default: 55 },
+    { key: "t_adp_f", label: "Apparatus dew point ADP (F)", kind: "number", default: 50 },
+  ],
+  outputs: [
+    { key: "bf", id: "cbf-out-bf", label: "Bypass factor BF", value: (r) => fmt(r.bf, 3) },
+    { key: "cf", id: "cbf-out-cf", label: "Contact factor CF", value: (r) => fmt(r.cf, 3) },
+    { key: "n", id: "cbf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCoilBypassFactor,
+});

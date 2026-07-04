@@ -13574,6 +13574,116 @@
       "kind": "industry"
     },
     {
+      "term": "moist air enthalpy",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "air enthalpy",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "psychrometric enthalpy",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "total heat content air",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy btu per lb",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "ashrae enthalpy",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "air total heat",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy of air",
+      "target": "moist-air-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "cooling coil total load",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "coil load enthalpy",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "total heat coil",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "total cooling capacity",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "wet coil load",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "sensible plus latent coil",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "airside coil load",
+      "target": "cooling-coil-total-load",
+      "kind": "industry"
+    },
+    {
+      "term": "coil bypass factor",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "bypass factor",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "contact factor",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "apparatus dew point",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "adp coil",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "coil surface temperature",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "dx coil bypass",
+      "target": "coil-bypass-factor",
+      "kind": "industry"
+    },
+    {
       "term": "cell temperature pv",
       "target": "pv-cell-temperature-power",
       "kind": "industry"

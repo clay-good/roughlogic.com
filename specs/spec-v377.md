@@ -1,6 +1,6 @@
 # roughlogic.com Specification v377 -- Coil Bypass Factor and Apparatus Dew Point (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the psychrometric coil trio (v375 enthalpy -> v376 total load ->
+> **Status: LANDED (2026-07-03, 0.132.0; proposed 2026-07-03). Third and final tile of the psychrometric coil trio (v375 enthalpy -> v376 total load ->
 > v377 bypass factor). Where v375/v376 size the load, this tile describes how completely a real coil reaches its cold
 > surface: the bypass factor, the fraction of air that slips past the coil unconditioned, and its complement the contact
 > factor.**

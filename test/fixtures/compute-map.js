@@ -731,6 +731,9 @@ export const COMPUTE_MAP = {
   "duct-heat-gain": { module: "../../calc-hvac.js", fn: "computeDuctHeatGain" },
   "grille-face-velocity": { module: "../../calc-hvac.js", fn: "computeGrilleFaceVelocity" },
   "air-density-correction": { module: "../../calc-hvac.js", fn: "computeAirDensityCorrection" },
+  "moist-air-enthalpy": { module: "../../calc-hvac.js", fn: "computeMoistAirEnthalpy" },
+  "cooling-coil-total-load": { module: "../../calc-hvac.js", fn: "computeCoolingCoilTotalLoad" },
+  "coil-bypass-factor": { module: "../../calc-hvac.js", fn: "computeCoilBypassFactor" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },

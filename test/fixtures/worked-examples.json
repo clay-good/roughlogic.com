@@ -30043,6 +30043,101 @@
       }
     },
     {
+      "tile_id": "moist-air-enthalpy",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "return air 80 F, W 0.0112 -> h 31.48 Btu/lb dry air",
+      "source_edition_or_year": "spec-v375 worked example (machine-verified)",
+      "source_section_or_page": "spec-v375 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_db_f": 80, "w_lb_lb": 0.0112 },
+      "outputs": {
+        "h": { "value": 31.48, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "moist-air-enthalpy",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "cross-check: supply air 55 F, W 0.0090 -> h 22.97 Btu/lb",
+      "source_edition_or_year": "spec-v375 worked example (machine-verified)",
+      "source_section_or_page": "spec-v375 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_db_f": 55, "w_lb_lb": 0.0090 },
+      "outputs": {
+        "h": { "value": 22.97, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "moist-air-enthalpy",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "dry-air floor: 80 F, W 0 -> h 19.2 Btu/lb (sensible only)",
+      "source_edition_or_year": "spec-v375 worked example (machine-verified)",
+      "source_section_or_page": "spec-v375 section 2.1 dry-air floor",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_db_f": 80, "w_lb_lb": 0 },
+      "outputs": {
+        "h": { "value": 19.2, "tolerance": { "pct": 0.5 } },
+        "h_latent": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "cooling-coil-total-load",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "2000 CFM across a 31.48 -> 22.97 Btu/lb drop -> 76,590 Btu/hr, 6.38 tons",
+      "source_edition_or_year": "spec-v376 worked example (machine-verified)",
+      "source_section_or_page": "spec-v376 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cfm": 2000, "h_ent_btu": 31.48, "h_lvg_btu": 22.97 },
+      "outputs": {
+        "q_btuh": { "value": 76590, "tolerance": { "pct": 0.5 } },
+        "tons": { "value": 6.38, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "cooling-coil-total-load",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "cross-check: a leaving enthalpy above entering returns a negative Q (heating)",
+      "source_edition_or_year": "spec-v376 worked example (machine-verified)",
+      "source_section_or_page": "spec-v376 section 2.1 heating case",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "cfm": 2000, "h_ent_btu": 22, "h_lvg_btu": 25 },
+      "outputs": {
+        "q_btuh": { "value": -27000, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "coil-bypass-factor",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "deep coil 80 -> 55 F off a 50 F ADP -> BF 0.167, CF 0.833",
+      "source_edition_or_year": "spec-v377 worked example (machine-verified)",
+      "source_section_or_page": "spec-v377 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_ent_f": 80, "t_lvg_f": 55, "t_adp_f": 50 },
+      "outputs": {
+        "bf": { "value": 0.1667, "tolerance": { "pct": 0.5 } },
+        "cf": { "value": 0.8333, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "coil-bypass-factor",
+      "source_publisher": "ASHRAE Fundamentals",
+      "source_title": "cross-check: shallow coil 78 -> 60 F off a 52 F ADP -> BF 0.308, CF 0.692",
+      "source_edition_or_year": "spec-v377 worked example (machine-verified)",
+      "source_section_or_page": "spec-v377 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "t_ent_f": 78, "t_lvg_f": 60, "t_adp_f": 52 },
+      "outputs": {
+        "bf": { "value": 0.3077, "tolerance": { "pct": 0.5 } },
+        "cf": { "value": 0.6923, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "pv-cell-temperature-power",
       "source_publisher": "PV design practice / NREL",
       "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",
