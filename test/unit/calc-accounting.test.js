@@ -128,9 +128,9 @@ test("HomeOffice: office exceeding home area is rejected", () => { assert.ok("er
 test("HomeOffice: non-positive areas are rejected", () => { assert.ok("error" in computeHomeOffice({ office_ft2: 0, home_ft2: 2000 })); assert.ok("error" in computeHomeOffice({ office_ft2: 100, home_ft2: 0 })); });
 
 // Renderer registry
-test("ACCOUNTING_RENDERERS exposes all 22 utilities", () => {
+test("ACCOUNTING_RENDERERS exposes all 25 utilities", () => {
   const ids = Object.keys(ACCOUNTING_RENDERERS);
-  assert.equal(ids.length, 22);
+  assert.equal(ids.length, 25);
   for (const id of [
     "straight-line-depreciation", "macrs-depreciation", "section-179",
     "se-tax", "estimated-tax", "payroll-withholding",
@@ -138,5 +138,6 @@ test("ACCOUNTING_RENDERERS exposes all 22 utilities", () => {
     "inventory-turnover", "cash-conversion-cycle", "mileage-rollup",
     "home-office",
     "wip-percent-complete", "change-order-markup", "retainage-tracker",
+    "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",
   ]) assert.ok(typeof ACCOUNTING_RENDERERS[id] === "function", id);
 });

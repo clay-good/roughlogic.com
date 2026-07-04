@@ -75,6 +75,7 @@ const _TILES = [
   ["employer-payroll-tax", "R"],
   ["labor-burden-rate", "R"], ["equipment-hourly-rate", "R"], ["overhead-recovery-rate", "R"],
   ["wip-percent-complete", "R"], ["change-order-markup", "R"], ["retainage-tracker", "R"],
+  ["surety-bond-premium", "R"], ["workers-comp-emr-premium", "R"], ["prevailing-wage-fringe", "R"],
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],

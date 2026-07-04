@@ -1,6 +1,6 @@
 # roughlogic.com Specification v445 -- Workers-Comp Premium and Experience Mod (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the contractor-cost trio (v444 surety bond premium -> v445 workers-comp
+> **Status: LANDED (2026-07-04). Second tile of the contractor-cost trio (v444 surety bond premium -> v445 workers-comp
 > EMR -> v446 prevailing-wage fringe). `labor-burden-rate` folds workers-comp in as a flat percent of wages; this tile
 > isolates the piece a contractor actually controls -- the experience modification rate (EMR) and its dollar swing on the
 > premium.**

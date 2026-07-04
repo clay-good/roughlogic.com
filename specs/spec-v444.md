@@ -1,6 +1,6 @@
 # roughlogic.com Specification v444 -- Surety Bond Premium (Tiered Rate) (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a contractor-cost trio (v444 surety bond premium -> v445 workers-comp EMR
+> **Status: LANDED (2026-07-04). First tile of a contractor-cost trio (v444 surety bond premium -> v445 workers-comp EMR
 > -> v446 prevailing-wage fringe). Public and larger private jobs require performance and payment bonds, and their premium is
 > a real line-item cost no tile computes -- a tiered rate applied to the contract value.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. A surety charges the bond premium on a sliding

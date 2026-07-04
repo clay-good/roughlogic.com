@@ -15461,6 +15461,55 @@ test("bounds: spec-v392 computeRetainageTracker pins retention, net, cumulative,
   assert.ok("error" in _v392({ work_this_period_usd: Infinity, retainage_pct: 10, prior_retained_usd: 40000 }));
 });
 
+// ===================== spec-v444..v446 contractor-cost trio =====================
+import { computeSuretyBondPremium as _v444, computeWorkersCompEmrPremium as _v445, computePrevailingWageFringe as _v446 } from "../../calc-accounting.js";
+
+test("bounds: spec-v444 computeSuretyBondPremium pins tiered premium, effective rate, and error seams", () => {
+  const r = _v444({ contract_usd: 500000, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 });
+  assert.ok(Math.abs(r.premium_usd - 8500) < 1e-9);
+  assert.ok(Math.abs(r.effective_rate - 0.017) < 1e-9);
+  // The top band blends the rate lower as the contract grows.
+  const big = _v444({ contract_usd: 2500000, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 });
+  assert.ok(Math.abs(big.premium_usd - 28500) < 1e-9);
+  assert.ok(big.effective_rate < r.effective_rate);
+  // Error seams: non-positive contract, negative rate, non-finite.
+  assert.ok("error" in _v444({ contract_usd: 0, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 }));
+  assert.ok("error" in _v444({ contract_usd: 500000, rate1_per_k: -1, rate2_per_k: 15, rate3_per_k: 10 }));
+  assert.ok("error" in _v444({ contract_usd: Infinity, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 }));
+});
+
+test("bounds: spec-v445 computeWorkersCompEmrPremium pins manual/modified premium, swing, and error seams", () => {
+  const r = _v445({ payroll_usd: 500000, class_rate: 8, emr: 0.85 });
+  assert.ok(Math.abs(r.manual_premium - 40000) < 1e-9);
+  assert.ok(Math.abs(r.modified_premium - 34000) < 1e-9);
+  assert.ok(Math.abs(r.cost_per_100 - 6.8) < 1e-9 && r.credit === true);
+  // A bad-safety EMR above 1.0 is a debit (negative swing).
+  const bad = _v445({ payroll_usd: 500000, class_rate: 8, emr: 1.15 });
+  assert.ok(Math.abs(bad.modified_premium - 46000) < 1e-9 && bad.emr_swing < 0 && bad.credit === false);
+  // Error seams: non-positive payroll, non-positive rate, non-positive EMR, non-finite.
+  assert.ok("error" in _v445({ payroll_usd: 0, class_rate: 8, emr: 0.85 }));
+  assert.ok("error" in _v445({ payroll_usd: 500000, class_rate: 0, emr: 0.85 }));
+  assert.ok("error" in _v445({ payroll_usd: 500000, class_rate: 8, emr: 0 }));
+  assert.ok("error" in _v445({ payroll_usd: Infinity, class_rate: 8, emr: 0.85 }));
+});
+
+test("bounds: spec-v446 computePrevailingWageFringe pins package, plan saving, and error seams", () => {
+  const r = _v446({ base_wage_hr: 35, fringe_hr: 15, payroll_tax: 7.65 });
+  assert.ok(Math.abs(r.package_hr - 50) < 1e-9);
+  assert.ok(Math.abs(r.savings_hr - 1.1475) < 1e-9);
+  assert.ok(r.plan_cost_hr < r.cash_cost_hr);
+  // A fuller burden saves more per hour.
+  const full = _v446({ base_wage_hr: 35, fringe_hr: 15, payroll_tax: 15 });
+  assert.ok(Math.abs(full.savings_hr - 2.25) < 1e-9);
+  // Zero fringe saves nothing.
+  assert.ok(Math.abs(_v446({ base_wage_hr: 35, fringe_hr: 0, payroll_tax: 7.65 }).savings_hr) < 1e-9);
+  // Error seams: non-positive base, negative fringe, negative tax, non-finite.
+  assert.ok("error" in _v446({ base_wage_hr: 0, fringe_hr: 15, payroll_tax: 7.65 }));
+  assert.ok("error" in _v446({ base_wage_hr: 35, fringe_hr: -1, payroll_tax: 7.65 }));
+  assert.ok("error" in _v446({ base_wage_hr: 35, fringe_hr: 15, payroll_tax: -1 }));
+  assert.ok("error" in _v446({ base_wage_hr: Infinity, fringe_hr: 15, payroll_tax: 7.65 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

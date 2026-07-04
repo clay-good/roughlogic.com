@@ -354,6 +354,42 @@ export const CITATIONS = {
       { name: "Contract governs", value: "release terms, statutory caps, and the certified payment govern", source: "scope of this tile" },
     ],
   },
+  "surety-bond-premium": {
+    formula: "premium = sum over bands of (contract in band / 1000) x band_rate; band rates $25/$15/$10 per $1,000 on first $100k / next $400k / above $500k; rate% = premium / contract.",
+    edition: "A tiered surety-bond premium on a performance/payment bond, priced per $1,000 of contract value on a declining-rate schedule, by name.",
+    freeAccess: "The tiered per-$1,000 bond-rate structure is a standard published surety-pricing method; the specific rates are user-supplied defaults.",
+    governance: GOVERNANCE.general,
+    editionNote: "A performance and payment bond is priced as a premium per $1,000 of contract value on a declining tiered schedule: the first $100,000 at a higher rate, the next $400,000 lower, and everything above $500,000 lower still, so the blended rate falls as the contract grows. The rates shown are common defaults; a contractor's actual rate depends on the surety's rate schedule, the bond class, and the underwriting of the contractor's financials and experience. The premium is a real bid cost that belongs in the markup. The surety's filed rate schedule and underwriting govern.",
+    assumptions: [
+      { name: "Tiered rate", value: "premium = sum of (band amount / 1000) x band rate", source: "surety rate schedule" },
+      { name: "Default bands", value: "$25 / $15 / $10 per $1,000 on first $100k / next $400k / above $500k", source: "common surety pricing" },
+      { name: "Underwriting governs", value: "the surety's filed rates and underwriting set the actual premium", source: "scope of this tile" },
+    ],
+  },
+  "workers-comp-emr-premium": {
+    formula: "manual = payroll/100 x class_rate; modified = manual x EMR; rate_per_100 = modified/payroll x 100; credit_or_debit = manual - modified.",
+    edition: "The workers-compensation manual premium and its experience modification (EMR / e-mod), by name.",
+    freeAccess: "The manual-premium and experience-mod computation is a standard published workers-comp rating method (NCCI-style); rates are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "Workers-compensation premium starts as manual premium = payroll per $100 x the class rate, then is multiplied by the experience modification rate (EMR, or e-mod) that compares the employer's loss history to peers: below 1.0 is a credit (good safety record), above 1.0 a debit. A lower EMR both cuts premium and, on many public and large-owner projects, is a bid-list qualifier (an EMR at or below 1.0 is a common threshold). Rates and the EMR shown are inputs; the rating bureau (NCCI or an independent state bureau) publishes the class rate and computes the official EMR. The bureau's rating governs.",
+    assumptions: [
+      { name: "Manual premium", value: "manual = payroll/100 x class rate", source: "NCCI-style rating" },
+      { name: "Experience mod", value: "modified = manual x EMR; below 1.0 credit, above 1.0 debit", source: "experience rating" },
+      { name: "Bureau governs", value: "the rating bureau's published rate and official EMR govern", source: "scope of this tile" },
+    ],
+  },
+  "prevailing-wage-fringe": {
+    formula: "package = base + fringe; cash_burden = fringe x burden%; plan_saves_per_hr = fringe x burden% (fringe funded through a bona-fide plan is not taxable wages).",
+    edition: "The prevailing-wage total package (base wage plus fringe) and the payroll-burden savings of paying fringe through a bona-fide plan versus as cash, by name.",
+    freeAccess: "Prevailing-wage determinations are published free at sam.gov (Davis-Bacon) and state DOL sites; the burden rate is user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "A prevailing-wage determination sets a total package = a base hourly wage plus an hourly fringe amount. Paying the fringe as extra cash makes it taxable wages, so the employer owes payroll burden (FICA, and often workers-comp and other wage-based costs) on it; funding the same fringe through a bona-fide benefit plan (health, pension, training) satisfies the obligation without adding taxable wages, saving fringe x the wage-based burden per hour. At just FICA (7.65%) a $15 fringe saves about $1.15/hr; at a fuller 15% burden it saves about $2.25/hr, real money across a crew and a job. The applicable wage determination and whether the plan qualifies as bona-fide under Davis-Bacon / the state statute govern.",
+    assumptions: [
+      { name: "Package", value: "total package = base wage + hourly fringe", source: "wage determination" },
+      { name: "Bona-fide plan", value: "fringe paid through a bona-fide plan is not taxable wages; cash fringe is", source: "Davis-Bacon 29 CFR 5.28" },
+      { name: "Determination governs", value: "the wage determination and the plan's bona-fide status govern", source: "scope of this tile" },
+    ],
+  },
   "employer-payroll-tax": {
     formula: "SS = min(wages, SS_base)*6.2%; Medicare = wages*1.45%; FUTA = min(wages, 7000)*FUTA_rate; SUTA = min(wages, state_base)*SUTA_rate.",
     edition: "FICA - 26 USC 3101/3111 and IRS Pub 15 (Circular E), 6.2% SS / 1.45% Medicare; FUTA - 26 USC 3301-3306, $7,000 wage base, 0.6% net, IRS Form 940 - all by name.",

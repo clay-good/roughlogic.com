@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(accounting): land spec-v444..v446 -- 3 contractor-cost tiles (surety bond, workers-comp EMR, prevailing-wage fringe) in calc-accounting.js; 904 -> 907 tiles, 0.153.0, 2026-07-04
+
+The contractor-cost trio, twenty-second batch of the v375-v474 campaign, all in the existing lazy `calc-accounting.js` (Group R); no new module, group, or dependency. Catalog **904 -> 907**, package **0.152.0 -> 0.153.0** (a minor). Proposed 2026-07-03.
+
+- **`surety-bond-premium` (spec-v444).** Tiered premium per $1,000 of contract: default $25/$15/$10 on the first $100k / next $400k / above $500k, so the effective rate falls as the contract grows. Pinned: a $500,000 contract -> $8,500 (1.70%); a $2.5M job -> $28,500 (1.14%, the top band blends lower). A bid cost that belongs in the markup.
+- **`workers-comp-emr-premium` (spec-v445).** Manual premium = payroll/100 x class rate, actual = manual x EMR. Pinned: $500k payroll, $8/$100, EMR 0.85 -> $40,000 manual, $34,000 modified ($6.80/$100), a $6,000 credit; a bad-safety EMR 1.15 -> $46,000, a $6,000 debit. A low EMR both cuts premium and qualifies bid lists.
+- **`prevailing-wage-fringe` (spec-v446).** Package = base + fringe; paying the fringe as cash makes it taxable wages, funding it through a bona-fide plan does not, saving fringe x the wage-based burden per hour. Pinned: $35 base + $15 fringe at 7.65% -> $50 package, $1.15/hr saved; a fuller 15% burden saves $2.25/hr.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the tiered/blended premium, the EMR credit-vs-debit swing, both fringe modes and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming surety rate schedules, NCCI-style experience rating, and Davis-Bacon 29 CFR 5.28. Per-tile wiring: `tools-data` (Group R), `tile-meta`, `citations` (GOVERNANCE.general), `compute-map`, worked-example fixtures, collision-checked aliases, `related-tiles`, 3 fuzzer blocks (all hand-written renderers), and the `ACCOUNTING_RENDERERS exposes all N utilities` count bumped 22 -> 25. Housekeeping: home count 904 -> 907, README resynced (counts, sitemap URLs 926 -> 929), three specs marked LANDED, docs/mobile-responsive.md section 85 appended. All gates green at the new state: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(hvac): land spec-v441..v443 -- 3 energy-recovery / hydronic / economizer tiles in calc-hvac.js; 901 -> 904 tiles, 0.152.0, 2026-07-04
 
 The HVAC energy-recovery / hydronic / economizer trio, twenty-first batch of the v375-v474 campaign, all in the existing lazy `calc-hvac.js` (Group C); no new module, group, or dependency. Catalog **901 -> 904**, package **0.151.0 -> 0.152.0** (a minor). Proposed 2026-07-03.

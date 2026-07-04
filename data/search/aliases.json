@@ -11528,27 +11528,111 @@
       "target": "rc-shear-friction",
       "kind": "adjacent"
     },
-    { "term": "concrete elastic modulus", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "modulus of elasticity concrete", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "ec concrete", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "57000 sqrt fc", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "concrete stiffness", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "concrete youngs modulus", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "concrete modulus", "target": "concrete-elastic-modulus", "kind": "industry" },
-    { "term": "modulus of rupture", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "concrete rupture modulus", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "cracking stress concrete", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "fr concrete", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "7.5 sqrt fc", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "flexural tensile strength concrete", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "concrete flexural cracking", "target": "concrete-modulus-of-rupture", "kind": "industry" },
-    { "term": "shrinkage temperature steel", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
-    { "term": "temperature and shrinkage reinforcement", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
-    { "term": "minimum slab steel", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
-    { "term": "s and t reinforcement", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
-    { "term": "slab minimum reinforcement", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
-    { "term": "distribution steel slab", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
-    { "term": "transverse slab steel", "target": "concrete-shrinkage-temperature-steel", "kind": "industry" },
+    {
+      "term": "concrete elastic modulus",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "modulus of elasticity concrete",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "ec concrete",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "57000 sqrt fc",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete stiffness",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete youngs modulus",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete modulus",
+      "target": "concrete-elastic-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "modulus of rupture",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete rupture modulus",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "cracking stress concrete",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "fr concrete",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "7.5 sqrt fc",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "flexural tensile strength concrete",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete flexural cracking",
+      "target": "concrete-modulus-of-rupture",
+      "kind": "industry"
+    },
+    {
+      "term": "shrinkage temperature steel",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature and shrinkage reinforcement",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum slab steel",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "s and t reinforcement",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "slab minimum reinforcement",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "distribution steel slab",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "transverse slab steel",
+      "target": "concrete-shrinkage-temperature-steel",
+      "kind": "industry"
+    },
     {
       "term": "time of concentration",
       "target": "time-of-concentration",
@@ -13704,306 +13788,1506 @@
       "target": "coil-bypass-factor",
       "kind": "industry"
     },
-    { "term": "fan affinity laws", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "fan laws", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "fan speed change cfm", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "affinity laws", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "fan bhp cube law", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "vfd fan airflow", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "pulley change fan", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "fan rpm scaling", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "amca fan laws", "target": "fan-affinity-laws", "kind": "industry" },
-    { "term": "pitot traverse", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "duct traverse cfm", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "velocity pressure to cfm", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "4005 sqrt vp", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "airflow traverse", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "measure duct airflow", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "pitot tube cfm", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "duct velocity traverse", "target": "pitot-traverse-cfm", "kind": "industry" },
-    { "term": "outside air percent", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "percent outside air", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "oa fraction temperatures", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "mixed air temperature oa", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "economizer verification", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "ventilation percent measured", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "outdoor air percent", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "oa damper check", "target": "outside-air-percent-temps", "kind": "industry" },
-    { "term": "darcy friction factor", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "swamee jain", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "colebrook white", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "moody friction factor", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "friction factor calculator", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "relative roughness", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "f darcy weisbach", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "pipe friction factor", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "64 over re", "target": "colebrook-friction-factor", "kind": "industry" },
-    { "term": "thrust block", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "pipe thrust", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "thrust restraint", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "awwa thrust", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "bearing area bend", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "buried pipe thrust", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "bend reaction force", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "concrete thrust block", "target": "thrust-block-sizing", "kind": "industry" },
-    { "term": "hydrant available flow", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "rated flow 20 psi", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "nfpa 291", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "fire flow test", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "hydrant color class", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "available fire flow", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "flow at 20 psi", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "hydrant marking", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "qr qf hydrant", "target": "hydrant-available-flow", "kind": "industry" },
-    { "term": "work in progress", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "wip schedule", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "percent complete", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "cost to cost", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "earned revenue", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "over under billing", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "overbilling", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "underbilling", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "revenue recognition construction", "target": "wip-percent-complete", "kind": "industry" },
-    { "term": "change order markup", "target": "change-order-markup", "kind": "industry" },
-    { "term": "change order pricing", "target": "change-order-markup", "kind": "industry" },
-    { "term": "overhead and profit", "target": "change-order-markup", "kind": "industry" },
-    { "term": "10 and 10", "target": "change-order-markup", "kind": "industry" },
-    { "term": "aia change order", "target": "change-order-markup", "kind": "industry" },
-    { "term": "co price", "target": "change-order-markup", "kind": "industry" },
-    { "term": "scope change cost", "target": "change-order-markup", "kind": "industry" },
-    { "term": "contract change pricing", "target": "change-order-markup", "kind": "industry" },
-    { "term": "retainage", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "retention", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "retainage tracker", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "g702 g703", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "net payment draw", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "construction retention", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "withheld retainage", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "progress payment retention", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "retainage release", "target": "retainage-tracker", "kind": "industry" },
-    { "term": "t-beam flange width", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "effective flange width", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "t beam effective width", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "aci 6.3.2", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "flange overhang", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "tee beam flange", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "monolithic beam slab", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "compression flange width", "target": "t-beam-effective-flange-width", "kind": "industry" },
-    { "term": "minimum flexural reinforcement", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "as min beam", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "aci 9.6.1.2", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "minimum steel beam", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "min rebar flexure", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "concrete beam minimum steel", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "flexural minimum", "target": "concrete-beam-min-flexural-steel", "kind": "industry" },
-    { "term": "crack control spacing", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "bar spacing crack", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "maximum bar spacing", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "aci 24.3.2", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "flexural crack control", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "tension bar spacing", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "crack width spacing", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "service stress spacing", "target": "concrete-crack-control-spacing", "kind": "industry" },
-    { "term": "hydraulic pump horsepower", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "pump drive hp", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "hydraulic hp", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "1714 gpm psi", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "hydraulic power unit hp", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "pump input power", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "fluid power horsepower", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "gpm psi horsepower", "target": "hydraulic-pump-horsepower", "kind": "industry" },
-    { "term": "hydraulic motor torque", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "hydraulic motor speed", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "motor displacement rpm", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "231 gpm displacement", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "psi displacement torque", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "hydraulic motor sizing", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "orbital motor torque", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "fluid motor rpm", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "hydraulic motor hp", "target": "hydraulic-motor-torque-speed", "kind": "industry" },
-    { "term": "cooling system flow", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "coolant flow gpm", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "radiator flow", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "engine cooling gpm", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "heat rejection coolant", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "oil cooler flow", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "glycol coolant flow", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "cooling loop sizing", "target": "cooling-system-flow", "kind": "industry" },
-    { "term": "tolerance stack", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "tolerance stackup", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "worst case tolerance", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "rss tolerance", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "root sum square", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "dimensional stack up", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "assembly gap tolerance", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "statistical tolerance", "target": "tolerance-stack-rss", "kind": "industry" },
-    { "term": "cone flat pattern", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "cone development", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "cone layout", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "radial line development", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "cone template", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "sheet metal cone", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "sector angle cone", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "frustum development", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "cone blank", "target": "cone-flat-pattern", "kind": "industry" },
-    { "term": "spur gear geometry", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "gear tooth dimensions", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "diametral pitch gear", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "pitch diameter gear", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "gear addendum dedendum", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "outside diameter gear", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "gear center distance", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "gear cutting dimensions", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "root diameter gear", "target": "spur-gear-geometry", "kind": "industry" },
-    { "term": "fix and flip", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "flip profit", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "flip roi", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "arv profit", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "house flip calculator", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "flip return", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "rehab profit", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "flip deal analyzer", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "after repair value profit", "target": "fix-flip-profit", "kind": "industry" },
-    { "term": "brrrr", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "cash out refinance", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "brrrr calculator", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "capital left in deal", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "refinance rental", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "infinite return real estate", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "brrrr refi", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "pull cash out rental", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "seasoned refinance", "target": "brrrr-refi", "kind": "industry" },
-    { "term": "rental total return", "target": "rental-total-return", "kind": "industry" },
-    { "term": "total return real estate", "target": "rental-total-return", "kind": "industry" },
-    { "term": "four returns rental", "target": "rental-total-return", "kind": "industry" },
-    { "term": "equity buildup", "target": "rental-total-return", "kind": "industry" },
-    { "term": "appreciation return", "target": "rental-total-return", "kind": "industry" },
-    { "term": "tax shield rental", "target": "rental-total-return", "kind": "industry" },
-    { "term": "cash flow appreciation paydown", "target": "rental-total-return", "kind": "industry" },
-    { "term": "real estate total return", "target": "rental-total-return", "kind": "industry" },
-    { "term": "first year return rental", "target": "rental-total-return", "kind": "industry" },
-    { "term": "clarifier loading", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "surface overflow rate", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "weir loading rate", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "solids loading rate", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "clarifier sizing", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "sedimentation loading", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "sor gpd ft2", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "settling basin loading", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "secondary clarifier", "target": "clarifier-surface-loading", "kind": "industry" },
-    { "term": "bod loading", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "tss loading", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "pounds per day formula", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "percent removal", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "mass loading wastewater", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "npdes loading", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "bod removal efficiency", "target": "bod-tss-loading-removal", "kind": "industry" },
-    { "term": "tds from conductivity", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "conductivity to tds", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "ec to tds", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "total dissolved solids conductivity", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "tds meter factor", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "specific conductance tds", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "microsiemens tds", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "standard methods 2510", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "tds estimate", "target": "tds-from-conductivity", "kind": "industry" },
-    { "term": "manual d friction rate", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "available static pressure", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "friction rate duct", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "asp hvac", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "total effective length", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "acca manual d", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "duct design friction rate", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "blower external static", "target": "manual-d-friction-rate", "kind": "industry" },
-    { "term": "coil face velocity", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "cooling coil velocity", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "moisture carryover", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "coil face area", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "500 fpm coil", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "wet coil carryover", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "coil sizing velocity", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "condensate carryover", "target": "coil-face-velocity", "kind": "industry" },
-    { "term": "vav box airflow", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "vav minimum maximum", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "vav turndown", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "terminal box cfm", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "vav sizing", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "cooling maximum cfm", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "vav minimum airflow", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "vav box schedule", "target": "vav-box-airflow", "kind": "industry" },
-    { "term": "shear stud strength", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "composite stud", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "qn stud", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "shear connector", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "stud count composite", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "aisc i8", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "headed stud strength", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "composite beam studs", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "nelson stud", "target": "shear-stud-strength", "kind": "industry" },
-    { "term": "composite beam", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "composite flexure", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "composite moment", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "aisc i3", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "composite beam strength", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "steel concrete composite", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "composite mn", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "floor beam composite", "target": "composite-beam-flexure", "kind": "industry" },
-    { "term": "steel camber", "target": "steel-camber", "kind": "industry" },
-    { "term": "beam camber", "target": "steel-camber", "kind": "industry" },
-    { "term": "dead load deflection", "target": "steel-camber", "kind": "industry" },
-    { "term": "camber calculator", "target": "steel-camber", "kind": "industry" },
-    { "term": "shop camber", "target": "steel-camber", "kind": "industry" },
-    { "term": "beam deflection steel", "target": "steel-camber", "kind": "industry" },
-    { "term": "camber fabrication", "target": "steel-camber", "kind": "industry" },
-    { "term": "floor beam camber", "target": "steel-camber", "kind": "industry" },
-    { "term": "consolidation time", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "time rate of consolidation", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "degree of consolidation time", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "cv consolidation", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "time factor tv", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "preload surcharge time", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "settlement time clay", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "consolidation rate", "target": "consolidation-time-rate", "kind": "industry" },
-    { "term": "spt bearing capacity", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "meyerhof bearing", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "allowable bearing sand", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "n60 bearing", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "settlement bearing sand", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "spt allowable pressure", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "footing on sand", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "blow count bearing", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "granular bearing capacity", "target": "spt-bearing-capacity", "kind": "industry" },
-    { "term": "liquefaction", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "cyclic stress ratio", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "csr crr", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "liquefaction screening", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "seed idriss", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "factor of safety liquefaction", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "soil liquefaction", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "sand liquefaction", "target": "liquefaction-screening", "kind": "industry" },
-    { "term": "mulch volume", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "topsoil volume", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "cubic yards mulch", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "landscape material calculator", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "mulch bags", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "topsoil tons", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "gravel volume", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "material coverage", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "yards of dirt", "target": "mulch-topsoil-volume", "kind": "industry" },
-    { "term": "grain drying energy", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "grain drying fuel", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "propane grain drying", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "moisture removal energy", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "corn drying cost", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "dryer fuel", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "btu grain drying", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "grain dryer propane", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "drying cost per bushel", "target": "grain-drying-energy", "kind": "industry" },
-    { "term": "manure nutrient", "target": "manure-nutrient-application", "kind": "industry" },
-    { "term": "spreader rate", "target": "manure-nutrient-application", "kind": "industry" },
-    { "term": "manure nitrogen availability", "target": "manure-nutrient-application", "kind": "industry" },
-    { "term": "manure spreading", "target": "manure-nutrient-application", "kind": "industry" },
-    { "term": "manure n p k", "target": "manure-nutrient-application", "kind": "industry" },
+    {
+      "term": "fan affinity laws",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "fan laws",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "fan speed change cfm",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "affinity laws",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "fan bhp cube law",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "vfd fan airflow",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "pulley change fan",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "fan rpm scaling",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "amca fan laws",
+      "target": "fan-affinity-laws",
+      "kind": "industry"
+    },
+    {
+      "term": "pitot traverse",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "duct traverse cfm",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "velocity pressure to cfm",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "4005 sqrt vp",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "airflow traverse",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "measure duct airflow",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "pitot tube cfm",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "duct velocity traverse",
+      "target": "pitot-traverse-cfm",
+      "kind": "industry"
+    },
+    {
+      "term": "outside air percent",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "percent outside air",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "oa fraction temperatures",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "mixed air temperature oa",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "economizer verification",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "ventilation percent measured",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "outdoor air percent",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "oa damper check",
+      "target": "outside-air-percent-temps",
+      "kind": "industry"
+    },
+    {
+      "term": "darcy friction factor",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "swamee jain",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "colebrook white",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "moody friction factor",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "friction factor calculator",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "relative roughness",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "f darcy weisbach",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe friction factor",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "64 over re",
+      "target": "colebrook-friction-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "thrust block",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe thrust",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "thrust restraint",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "awwa thrust",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "bearing area bend",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "buried pipe thrust",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "bend reaction force",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete thrust block",
+      "target": "thrust-block-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "hydrant available flow",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "rated flow 20 psi",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "nfpa 291",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "fire flow test",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "hydrant color class",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "available fire flow",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "flow at 20 psi",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "hydrant marking",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "qr qf hydrant",
+      "target": "hydrant-available-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "work in progress",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "wip schedule",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "percent complete",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "cost to cost",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "earned revenue",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "over under billing",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "overbilling",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "underbilling",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "revenue recognition construction",
+      "target": "wip-percent-complete",
+      "kind": "industry"
+    },
+    {
+      "term": "change order markup",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "change order pricing",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "overhead and profit",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "10 and 10",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "aia change order",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "co price",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "scope change cost",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "contract change pricing",
+      "target": "change-order-markup",
+      "kind": "industry"
+    },
+    {
+      "term": "retainage",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "retention",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "retainage tracker",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "g702 g703",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "net payment draw",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "construction retention",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "withheld retainage",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "progress payment retention",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "retainage release",
+      "target": "retainage-tracker",
+      "kind": "industry"
+    },
+    {
+      "term": "t-beam flange width",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "effective flange width",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "t beam effective width",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 6.3.2",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "flange overhang",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "tee beam flange",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "monolithic beam slab",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "compression flange width",
+      "target": "t-beam-effective-flange-width",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum flexural reinforcement",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "as min beam",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 9.6.1.2",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum steel beam",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "min rebar flexure",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete beam minimum steel",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "flexural minimum",
+      "target": "concrete-beam-min-flexural-steel",
+      "kind": "industry"
+    },
+    {
+      "term": "crack control spacing",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "bar spacing crack",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "maximum bar spacing",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 24.3.2",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "flexural crack control",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "tension bar spacing",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "crack width spacing",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "service stress spacing",
+      "target": "concrete-crack-control-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic pump horsepower",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "pump drive hp",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic hp",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "1714 gpm psi",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic power unit hp",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "pump input power",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "fluid power horsepower",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "gpm psi horsepower",
+      "target": "hydraulic-pump-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic motor torque",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic motor speed",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "motor displacement rpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "231 gpm displacement",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "psi displacement torque",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic motor sizing",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "orbital motor torque",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "fluid motor rpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "hydraulic motor hp",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "cooling system flow",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "coolant flow gpm",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "radiator flow",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "engine cooling gpm",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "heat rejection coolant",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "oil cooler flow",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "glycol coolant flow",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "cooling loop sizing",
+      "target": "cooling-system-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "tolerance stack",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "tolerance stackup",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "worst case tolerance",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "rss tolerance",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "root sum square",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "dimensional stack up",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "assembly gap tolerance",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "statistical tolerance",
+      "target": "tolerance-stack-rss",
+      "kind": "industry"
+    },
+    {
+      "term": "cone flat pattern",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "cone development",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "cone layout",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "radial line development",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "cone template",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "sheet metal cone",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "sector angle cone",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "frustum development",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "cone blank",
+      "target": "cone-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "spur gear geometry",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "gear tooth dimensions",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "diametral pitch gear",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "pitch diameter gear",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "gear addendum dedendum",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "outside diameter gear",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "gear center distance",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "gear cutting dimensions",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "root diameter gear",
+      "target": "spur-gear-geometry",
+      "kind": "industry"
+    },
+    {
+      "term": "fix and flip",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "flip profit",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "flip roi",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "arv profit",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "house flip calculator",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "flip return",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "rehab profit",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "flip deal analyzer",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "after repair value profit",
+      "target": "fix-flip-profit",
+      "kind": "industry"
+    },
+    {
+      "term": "brrrr",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "cash out refinance",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "brrrr calculator",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "capital left in deal",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "refinance rental",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "infinite return real estate",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "brrrr refi",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "pull cash out rental",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "seasoned refinance",
+      "target": "brrrr-refi",
+      "kind": "industry"
+    },
+    {
+      "term": "rental total return",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "total return real estate",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "four returns rental",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "equity buildup",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "appreciation return",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "tax shield rental",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "cash flow appreciation paydown",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "real estate total return",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "first year return rental",
+      "target": "rental-total-return",
+      "kind": "industry"
+    },
+    {
+      "term": "clarifier loading",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "surface overflow rate",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "weir loading rate",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "solids loading rate",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "clarifier sizing",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "sedimentation loading",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "sor gpd ft2",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "settling basin loading",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "secondary clarifier",
+      "target": "clarifier-surface-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "bod loading",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "tss loading",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "pounds per day formula",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "percent removal",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "mass loading wastewater",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "npdes loading",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "bod removal efficiency",
+      "target": "bod-tss-loading-removal",
+      "kind": "industry"
+    },
+    {
+      "term": "tds from conductivity",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "conductivity to tds",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "ec to tds",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "total dissolved solids conductivity",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "tds meter factor",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "specific conductance tds",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "microsiemens tds",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "standard methods 2510",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "tds estimate",
+      "target": "tds-from-conductivity",
+      "kind": "industry"
+    },
+    {
+      "term": "manual d friction rate",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "available static pressure",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "friction rate duct",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "asp hvac",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "total effective length",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "acca manual d",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "duct design friction rate",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "blower external static",
+      "target": "manual-d-friction-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "coil face velocity",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "cooling coil velocity",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "moisture carryover",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "coil face area",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "500 fpm coil",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "wet coil carryover",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "coil sizing velocity",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "condensate carryover",
+      "target": "coil-face-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "vav box airflow",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "vav minimum maximum",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "vav turndown",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "terminal box cfm",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "vav sizing",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "cooling maximum cfm",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "vav minimum airflow",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "vav box schedule",
+      "target": "vav-box-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "shear stud strength",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "composite stud",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "qn stud",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "shear connector",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "stud count composite",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc i8",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "headed stud strength",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "composite beam studs",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "nelson stud",
+      "target": "shear-stud-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "composite beam",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "composite flexure",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "composite moment",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc i3",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "composite beam strength",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "steel concrete composite",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "composite mn",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "floor beam composite",
+      "target": "composite-beam-flexure",
+      "kind": "industry"
+    },
+    {
+      "term": "steel camber",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "beam camber",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "dead load deflection",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "camber calculator",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "shop camber",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "beam deflection steel",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "camber fabrication",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "floor beam camber",
+      "target": "steel-camber",
+      "kind": "industry"
+    },
+    {
+      "term": "consolidation time",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "time rate of consolidation",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "degree of consolidation time",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "cv consolidation",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "time factor tv",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "preload surcharge time",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "settlement time clay",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "consolidation rate",
+      "target": "consolidation-time-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "spt bearing capacity",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "meyerhof bearing",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "allowable bearing sand",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "n60 bearing",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "settlement bearing sand",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "spt allowable pressure",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "footing on sand",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "blow count bearing",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "granular bearing capacity",
+      "target": "spt-bearing-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "liquefaction",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "cyclic stress ratio",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "csr crr",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "liquefaction screening",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "seed idriss",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "factor of safety liquefaction",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "soil liquefaction",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "sand liquefaction",
+      "target": "liquefaction-screening",
+      "kind": "industry"
+    },
+    {
+      "term": "mulch volume",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "topsoil volume",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "cubic yards mulch",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "landscape material calculator",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "mulch bags",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "topsoil tons",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "gravel volume",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "material coverage",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "yards of dirt",
+      "target": "mulch-topsoil-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "grain drying energy",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "grain drying fuel",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "propane grain drying",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "moisture removal energy",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "corn drying cost",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "dryer fuel",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "btu grain drying",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "grain dryer propane",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "drying cost per bushel",
+      "target": "grain-drying-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "manure nutrient",
+      "target": "manure-nutrient-application",
+      "kind": "industry"
+    },
+    {
+      "term": "spreader rate",
+      "target": "manure-nutrient-application",
+      "kind": "industry"
+    },
+    {
+      "term": "manure nitrogen availability",
+      "target": "manure-nutrient-application",
+      "kind": "industry"
+    },
+    {
+      "term": "manure spreading",
+      "target": "manure-nutrient-application",
+      "kind": "industry"
+    },
+    {
+      "term": "manure n p k",
+      "target": "manure-nutrient-application",
+      "kind": "industry"
+    },
     {
       "term": "cell temperature pv",
       "target": "pv-cell-temperature-power",
@@ -14534,28 +15818,116 @@
       "target": "hoop-stress-thin-wall",
       "kind": "industry"
     },
-    { "term": "design spectral acceleration", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "sds sd1", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "sds sd1 calculator", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "fa fv site coefficient", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "mcer spectral acceleration", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "asce 11.4", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "sms sm1", "target": "seismic-design-spectral-acceleration", "kind": "industry" },
-    { "term": "seismic story drift", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "story drift limit", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "allowable drift", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "cd deflection amplification", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "design story drift", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "inelastic drift", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "asce 12.8.6", "target": "seismic-story-drift", "kind": "industry" },
-    { "term": "p-delta stability", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "stability coefficient theta", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "p delta seismic", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "theta max asce", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "secondary moment seismic", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "12.8.7 stability", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "p-delta amplification", "target": "seismic-pdelta-stability", "kind": "industry" },
-    { "term": "story stability", "target": "seismic-pdelta-stability", "kind": "industry" },
+    {
+      "term": "design spectral acceleration",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "sds sd1",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "sds sd1 calculator",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "fa fv site coefficient",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "mcer spectral acceleration",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 11.4",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "sms sm1",
+      "target": "seismic-design-spectral-acceleration",
+      "kind": "industry"
+    },
+    {
+      "term": "seismic story drift",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "story drift limit",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "allowable drift",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "cd deflection amplification",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "design story drift",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "inelastic drift",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 12.8.6",
+      "target": "seismic-story-drift",
+      "kind": "industry"
+    },
+    {
+      "term": "p-delta stability",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "stability coefficient theta",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "p delta seismic",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "theta max asce",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "secondary moment seismic",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "12.8.7 stability",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "p-delta amplification",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
+    {
+      "term": "story stability",
+      "target": "seismic-pdelta-stability",
+      "kind": "industry"
+    },
     {
       "term": "labor burden",
       "target": "labor-burden-rate",
@@ -15136,145 +16508,820 @@
       "target": "conduit-jam-ratio",
       "kind": "industry"
     },
-    { "term": "detention billing", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "demurrage", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "detention pay", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "truck detention", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "free time detention", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "accessorial detention", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "detention rate", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "shipper detention", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "waiting time charge", "target": "detention-demurrage-billing", "kind": "industry" },
-    { "term": "driver pay", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "cents per mile vs percentage", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "cpm vs percent", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "driver pay comparison", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "percentage of linehaul", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "truck driver pay", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "cpm breakeven", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "owner operator pay", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "company driver pay", "target": "driver-pay-cpm-vs-percentage", "kind": "industry" },
-    { "term": "invoice factoring", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "factoring cost", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "freight factoring", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "factoring apr", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "accounts receivable factoring", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "advance rate factoring", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "factoring fee", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "owner operator factoring", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "freight bill factoring", "target": "invoice-factoring-cost", "kind": "industry" },
-    { "term": "scupper sizing", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "secondary roof drain", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "scupper flow", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "weir scupper", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "roof overflow", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "emergency roof drain", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "francis weir scupper", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "ponding overflow", "target": "overflow-scupper-sizing", "kind": "industry" },
-    { "term": "force main velocity", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "sewage force main", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "scour velocity", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "grinder pump pipe", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "2 fps scour", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "ejector force main", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "force main sizing", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "sewage pump pipe", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "solids scour velocity", "target": "sewage-force-main-velocity", "kind": "industry" },
-    { "term": "stormwater detention", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "detention volume", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "modified rational", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "detention basin sizing", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "stormwater storage", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "detention pond", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "runoff storage", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "detention calculation", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "pre post development runoff", "target": "stormwater-detention-volume", "kind": "industry" },
-    { "term": "rebar weight", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "rebar takeoff", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "reinforcing steel weight", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "bar weight per foot", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "rebar tonnage", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "rebar pounds", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "reinforcement takeoff", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "steel bar weight", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "rebar order weight", "target": "rebar-weight-takeoff", "kind": "industry" },
-    { "term": "ready mix order", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "concrete truck loads", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "concrete order", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "concrete waste allowance", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "short load fee", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "concrete delivery", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "ready mix trucks", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "concrete ordering", "target": "ready-mix-concrete-order", "kind": "industry" },
-    { "term": "walk in cooler load", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "refrigeration load", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "box load", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "cooler heat load", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "walk in refrigeration", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "cooler sizing", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "refrigeration box heat gain", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "freezer load", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "walk in tons", "target": "walk-in-cooler-load", "kind": "industry" },
-    { "term": "product load", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "product pull down", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "product cooling load", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "freezing load", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "pull down time", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "product refrigeration load", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "latent heat fusion food", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "product heat removal", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "cooling load food", "target": "product-pull-down-load", "kind": "industry" },
-    { "term": "evaporator td", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "design td refrigeration", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "coil td", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "dtd evaporator", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "box temp suction td", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "evaporator temperature difference", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "refrigeration humidity td", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "coil selection td", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "walk in humidity", "target": "evaporator-td-dtd", "kind": "industry" },
-    { "term": "insulation batts", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "batt count", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "insulation coverage", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "batt insulation calculator", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "cavity insulation", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "r13 batts", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "insulation takeoff", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "square feet per bag", "target": "insulation-batt-coverage", "kind": "industry" },
-    { "term": "trim footage", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "baseboard calculator", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "crown molding", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "trim linear feet", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "molding takeoff", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "casing footage", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "crown compound miter", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "trim pieces", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "baseboard miter", "target": "trim-linear-footage", "kind": "industry" },
-    { "term": "erv total recovery", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "enthalpy recovery", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "erv latent", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "total energy recovery", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "erv effectiveness", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "enthalpy wheel", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "erv btu", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "latent recovery ventilation", "target": "erv-total-enthalpy-recovery", "kind": "industry" },
-    { "term": "radiant floor output", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "radiant panel heat", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "floor heating btu", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "radiant floor surface temperature", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "heated floor output", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "radiant panel", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "floor heat flux", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "warm floor btu", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "radiant comfort limit", "target": "radiant-floor-output", "kind": "industry" },
-    { "term": "economizer changeover", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "enthalpy changeover", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "economizer high limit", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "differential enthalpy", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "economizer setpoint", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "free cooling changeover", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "economizer lockout", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "outdoor air enthalpy", "target": "economizer-enthalpy-changeover", "kind": "industry" },
-    { "term": "economizer control", "target": "economizer-enthalpy-changeover", "kind": "industry" }
+    {
+      "term": "detention billing",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "demurrage",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "detention pay",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "truck detention",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "free time detention",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "accessorial detention",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "detention rate",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "shipper detention",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "waiting time charge",
+      "target": "detention-demurrage-billing",
+      "kind": "industry"
+    },
+    {
+      "term": "driver pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "cents per mile vs percentage",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "cpm vs percent",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "driver pay comparison",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "percentage of linehaul",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "truck driver pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "cpm breakeven",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "owner operator pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "company driver pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "industry"
+    },
+    {
+      "term": "invoice factoring",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "factoring cost",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "freight factoring",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "factoring apr",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "accounts receivable factoring",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "advance rate factoring",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "factoring fee",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "owner operator factoring",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "freight bill factoring",
+      "target": "invoice-factoring-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "scupper sizing",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "secondary roof drain",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "scupper flow",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "weir scupper",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "roof overflow",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "emergency roof drain",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "francis weir scupper",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "ponding overflow",
+      "target": "overflow-scupper-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "force main velocity",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "sewage force main",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "scour velocity",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "grinder pump pipe",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "2 fps scour",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "ejector force main",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "force main sizing",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "sewage pump pipe",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "solids scour velocity",
+      "target": "sewage-force-main-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "stormwater detention",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "detention volume",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "modified rational",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "detention basin sizing",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "stormwater storage",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "detention pond",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "runoff storage",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "detention calculation",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "pre post development runoff",
+      "target": "stormwater-detention-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar weight",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar takeoff",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "reinforcing steel weight",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "bar weight per foot",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar tonnage",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar pounds",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "reinforcement takeoff",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "steel bar weight",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "rebar order weight",
+      "target": "rebar-weight-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "ready mix order",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete truck loads",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete order",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete waste allowance",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "short load fee",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete delivery",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "ready mix trucks",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete ordering",
+      "target": "ready-mix-concrete-order",
+      "kind": "industry"
+    },
+    {
+      "term": "walk in cooler load",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "refrigeration load",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "box load",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "cooler heat load",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "walk in refrigeration",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "cooler sizing",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "refrigeration box heat gain",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "freezer load",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "walk in tons",
+      "target": "walk-in-cooler-load",
+      "kind": "industry"
+    },
+    {
+      "term": "product load",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "product pull down",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "product cooling load",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "freezing load",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "pull down time",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "product refrigeration load",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "latent heat fusion food",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "product heat removal",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "cooling load food",
+      "target": "product-pull-down-load",
+      "kind": "industry"
+    },
+    {
+      "term": "evaporator td",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "design td refrigeration",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "coil td",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "dtd evaporator",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "box temp suction td",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "evaporator temperature difference",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "refrigeration humidity td",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "coil selection td",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "walk in humidity",
+      "target": "evaporator-td-dtd",
+      "kind": "industry"
+    },
+    {
+      "term": "insulation batts",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "batt count",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "insulation coverage",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "batt insulation calculator",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "cavity insulation",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "r13 batts",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "insulation takeoff",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "square feet per bag",
+      "target": "insulation-batt-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "trim footage",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "baseboard calculator",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "crown molding",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "trim linear feet",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "molding takeoff",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "casing footage",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "crown compound miter",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "trim pieces",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "baseboard miter",
+      "target": "trim-linear-footage",
+      "kind": "industry"
+    },
+    {
+      "term": "erv total recovery",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy recovery",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "erv latent",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "total energy recovery",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "erv effectiveness",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy wheel",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "erv btu",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "latent recovery ventilation",
+      "target": "erv-total-enthalpy-recovery",
+      "kind": "industry"
+    },
+    {
+      "term": "radiant floor output",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "radiant panel heat",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "floor heating btu",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "radiant floor surface temperature",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "heated floor output",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "radiant panel",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "floor heat flux",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "warm floor btu",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "radiant comfort limit",
+      "target": "radiant-floor-output",
+      "kind": "industry"
+    },
+    {
+      "term": "economizer changeover",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy changeover",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "economizer high limit",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "differential enthalpy",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "economizer setpoint",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "free cooling changeover",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "economizer lockout",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "outdoor air enthalpy",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "economizer control",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "industry"
+    },
+    {
+      "term": "surety bond premium",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "surety bond",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "bid bond cost",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "performance bond premium",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "payment bond rate",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "bond rate per thousand",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "contract surety",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "sliding scale bond",
+      "target": "surety-bond-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "workers comp emr",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "experience mod rate",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "e-mod",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "emr premium",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "workers comp premium",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "experience modification",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "comp mod",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "xmod",
+      "target": "workers-comp-emr-premium",
+      "kind": "industry"
+    },
+    {
+      "term": "prevailing wage fringe",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    },
+    {
+      "term": "davis bacon fringe",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    },
+    {
+      "term": "certified payroll fringe",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    },
+    {
+      "term": "bona fide fringe",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    },
+    {
+      "term": "fringe benefits cash vs plan",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    },
+    {
+      "term": "wage determination package",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    },
+    {
+      "term": "public works fringe",
+      "target": "prevailing-wage-fringe",
+      "kind": "industry"
+    }
   ]
 }

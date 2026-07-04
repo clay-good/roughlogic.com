@@ -1629,3 +1629,132 @@ function renderRetainageTracker(inputRegion, outputRegion, citationEl) {
   for (const f of [work, rate, prior]) f.input.addEventListener("input", update);
 }
 ACCOUNTING_RENDERERS["retainage-tracker"] = renderRetainageTracker;
+
+// ===================== spec-v444..v446: contractor-cost trio (Group R) =====================
+
+// dims: in { contract_usd: dimensionless, rate1_per_k: dimensionless, rate2_per_k: dimensionless, rate3_per_k: dimensionless } out: { premium_usd: dimensionless, effective_rate: dimensionless }
+export function computeSuretyBondPremium({ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const contract = Number(contract_usd) || 0;
+  const r1 = Number(rate1_per_k) || 0;
+  const r2 = Number(rate2_per_k) || 0;
+  const r3 = Number(rate3_per_k) || 0;
+  if (!(contract > 0)) return { error: "Contract value must be positive (USD)." };
+  if (r1 < 0 || r2 < 0 || r3 < 0) return { error: "Rates must be non-negative (USD per $1,000)." };
+  const band1 = Math.min(contract, 100000) / 1000 * r1;
+  const band2 = Math.min(Math.max(contract - 100000, 0), 400000) / 1000 * r2;
+  const band3 = Math.max(contract - 500000, 0) / 1000 * r3;
+  const premium_usd = band1 + band2 + band3;
+  const effective_rate = premium_usd / contract;
+  return {
+    band1, band2, band3, premium_usd, effective_rate,
+    note: "Surety bond premium on a tiered (sliding-scale) rate: the premium is charged per $1,000 of contract value in bands - a common schedule is $25/thousand on the first $100,000, $15 on the next $400,000, and $10 above $500,000 - so the effective rate falls as the contract grows and the cheaper top band dominates. Rates depend on the contractor's financial strength, experience, and the surety's underwriting, and a small or new contractor pays more. The premium is a project cost that belongs in the bid. A budgeting aid; the surety's actual rate schedule and underwriting govern.",
+  };
+}
+export const suretyBondPremiumExample = { inputs: { contract_usd: 500000, rate1_per_k: 25, rate2_per_k: 15, rate3_per_k: 10 } };
+function renderSuretyBondPremium(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Surety bond premium (tiered rate, surety-industry practice): charged per $1,000 of contract in bands (e.g. $25/$15/$10 per thousand on the first $100k / next $400k / above $500k). The effective rate falls as the contract grows. A budgeting aid; the surety's rate schedule and underwriting govern.";
+  const c = makeNumber("Contract value to bond ($)", "sbp-c", { step: "any", min: "0" }); c.input.value = "500000";
+  const r1 = makeNumber("Rate on first $100k ($/thousand)", "sbp-r1", { step: "any", min: "0" }); r1.input.value = "25";
+  const r2 = makeNumber("Rate on next $400k ($/thousand)", "sbp-r2", { step: "any", min: "0" }); r2.input.value = "15";
+  const r3 = makeNumber("Rate above $500k ($/thousand)", "sbp-r3", { step: "any", min: "0" }); r3.input.value = "10";
+  for (const f of [c, r1, r2, r3]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "500000"; r1.input.value = "25"; r2.input.value = "15"; r3.input.value = "10"; update(); });
+  const oP = makeOutputLine(outputRegion, "Bond premium", "sbp-out-p");
+  const oR = makeOutputLine(outputRegion, "Effective rate", "sbp-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "sbp-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSuretyBondPremium({ contract_usd: readNum(c.input), rate1_per_k: readNum(r1.input), rate2_per_k: readNum(r2.input), rate3_per_k: readNum(r3.input) });
+    if (r.error) { oP.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = "$" + fmt(r.premium_usd, 0);
+    oR.textContent = fmt(r.effective_rate * 100, 2) + "% of the contract";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [c, r1, r2, r3]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["surety-bond-premium"] = renderSuretyBondPremium;
+
+// dims: in { payroll_usd: dimensionless, class_rate: dimensionless, emr: dimensionless } out: { manual_premium: dimensionless, modified_premium: dimensionless, emr_swing: dimensionless }
+export function computeWorkersCompEmrPremium({ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const payroll = Number(payroll_usd) || 0;
+  const rate = Number(class_rate) || 0;
+  const mod = Number(emr) || 0;
+  if (!(payroll > 0)) return { error: "Payroll must be positive (USD)." };
+  if (!(rate > 0)) return { error: "Class rate must be positive (USD per $100)." };
+  if (!(mod > 0)) return { error: "Experience mod (EMR) must be positive." };
+  const manual_premium = payroll / 100 * rate;
+  const modified_premium = manual_premium * mod;
+  const emr_swing = manual_premium * (1 - mod);
+  const cost_per_100 = modified_premium / (payroll / 100);
+  return {
+    manual_premium, modified_premium, emr_swing, cost_per_100, credit: mod < 1,
+    note: "Workers-compensation premium and the experience modification rate (EMR): the manual premium = payroll / 100 x the class rate (the rate per $100 of payroll for the job classification), and the actual premium = manual premium x the EMR, the multiplier the rating bureau assigns from the contractor's claims history versus its class peers. An EMR below 1.0 is a credit (a safety record better than average), above 1.0 a debit (worse), and the swing is manual premium x (1 - EMR). A low EMR also opens doors on bid lists that require one below a threshold, so safety pays twice. A budgeting aid; the rating bureau's EMR and the insurer's rates govern.",
+  };
+}
+export const workersCompEmrPremiumExample = { inputs: { payroll_usd: 500000, class_rate: 8.00, emr: 0.85 } };
+function renderWorkersCompEmrPremium(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Workers-comp premium and experience mod (NCCI / state rating-bureau practice): manual premium = payroll/100 x class rate, actual premium = manual x EMR (an EMR below 1.0 is a credit, above 1.0 a debit). A budgeting aid; the rating bureau's EMR and the insurer's rates govern.";
+  const p = makeNumber("Annual payroll for the class ($)", "wce-p", { step: "any", min: "0" }); p.input.value = "500000";
+  const rate = makeNumber("Manual class rate ($/$100 payroll)", "wce-r", { step: "any", min: "0" }); rate.input.value = "8.00";
+  const emr = makeNumber("Experience mod (EMR)", "wce-e", { step: "any", min: "0" }); emr.input.value = "0.85";
+  for (const f of [p, rate, emr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "500000"; rate.input.value = "8.00"; emr.input.value = "0.85"; update(); });
+  const oM = makeOutputLine(outputRegion, "Manual / modified premium", "wce-out-m");
+  const oS = makeOutputLine(outputRegion, "EMR swing", "wce-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "wce-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeWorkersCompEmrPremium({ payroll_usd: readNum(p.input), class_rate: readNum(rate.input), emr: readNum(emr.input) });
+    if (r.error) { oM.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oM.textContent = "$" + fmt(r.manual_premium, 0) + " -> $" + fmt(r.modified_premium, 0) + " ($" + fmt(r.cost_per_100, 2) + "/$100)";
+    oS.textContent = (r.credit ? "$" + fmt(r.emr_swing, 0) + " credit (EMR < 1.0)" : "$" + fmt(-r.emr_swing, 0) + " debit (EMR > 1.0)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [p, rate, emr]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["workers-comp-emr-premium"] = renderWorkersCompEmrPremium;
+
+// dims: in { base_wage_hr: dimensionless, fringe_hr: dimensionless, payroll_tax: dimensionless } out: { package_hr: dimensionless, cash_cost_hr: dimensionless, plan_cost_hr: dimensionless, savings_hr: dimensionless }
+export function computePrevailingWageFringe({ base_wage_hr = 0, fringe_hr = 0, payroll_tax = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const base = Number(base_wage_hr) || 0;
+  const fringe = Number(fringe_hr) || 0;
+  const tax = Number(payroll_tax) || 0;
+  if (!(base > 0)) return { error: "Base wage must be positive (USD/hr)." };
+  if (fringe < 0) return { error: "Fringe rate must be non-negative (USD/hr)." };
+  if (tax < 0) return { error: "Payroll-tax rate must be non-negative (%)." };
+  const package_hr = base + fringe;
+  const cash_cost_hr = package_hr + package_hr * tax / 100;
+  const plan_cost_hr = package_hr + base * tax / 100;
+  const savings_hr = fringe * tax / 100;
+  return {
+    package_hr, cash_cost_hr, plan_cost_hr, savings_hr,
+    note: "Prevailing-wage package, cash vs bona-fide fringe: the required package = the base hourly wage + the fringe rate from the wage determination (Davis-Bacon / state). If the fringe is paid as cash on the paycheck it becomes taxable wages, so the employer also pays payroll taxes (and any wage-based workers-comp) on it; if it is funded through a bona-fide benefit plan (health, retirement, apprenticeship) it is not wages, so the payroll-tax burden on the fringe portion disappears. The saving = the fringe x the wage-based burden rate per hour, a real reduction in the labor cost of a public job with no cut to the worker's total package. A budgeting aid; the wage determination, the plan's bona-fide status, and the compliance rules govern.",
+  };
+}
+export const prevailingWageFringeExample = { inputs: { base_wage_hr: 35, fringe_hr: 15, payroll_tax: 7.65 } };
+function renderPrevailingWageFringe(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Prevailing-wage fringe (Davis-Bacon / state determination): package = base wage + fringe; paying the fringe as cash makes it taxable wages, funding it through a bona-fide plan does not, saving fringe x the wage-based burden per hour. A budgeting aid; the wage determination and the plan's bona-fide status govern.";
+  const base = makeNumber("Base hourly wage ($/hr)", "pwf-b", { step: "any", min: "0" }); base.input.value = "35";
+  const fringe = makeNumber("Fringe rate from the determination ($/hr)", "pwf-f", { step: "any", min: "0" }); fringe.input.value = "15";
+  const tax = makeNumber("Wage-based burden (payroll tax + comp, %)", "pwf-t", { step: "any", min: "0" }); tax.input.value = "7.65";
+  for (const f of [base, fringe, tax]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { base.input.value = "35"; fringe.input.value = "15"; tax.input.value = "7.65"; update(); });
+  const oP = makeOutputLine(outputRegion, "Required package", "pwf-out-p");
+  const oC = makeOutputLine(outputRegion, "Cash vs plan cost", "pwf-out-c");
+  const oS = makeOutputLine(outputRegion, "Saving via a bona-fide plan", "pwf-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "pwf-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePrevailingWageFringe({ base_wage_hr: readNum(base.input), fringe_hr: readNum(fringe.input), payroll_tax: readNum(tax.input) });
+    if (r.error) { oP.textContent = r.error; oC.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = "$" + fmt(r.package_hr, 2) + "/hr (base + fringe)";
+    oC.textContent = "$" + fmt(r.cash_cost_hr, 3) + " cash vs $" + fmt(r.plan_cost_hr, 3) + " plan, per hour";
+    oS.textContent = "$" + fmt(r.savings_hr, 2) + "/hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [base, fringe, tax]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["prevailing-wage-fringe"] = renderPrevailingWageFringe;

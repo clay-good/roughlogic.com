@@ -1,6 +1,6 @@
 # roughlogic.com Specification v446 -- Prevailing-Wage Package: Cash vs Bona-Fide Fringe (calc-accounting.js, Group R, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the contractor-cost trio (v444 surety bond premium ->
+> **Status: LANDED (2026-07-04). Third and final tile of the contractor-cost trio (v444 surety bond premium ->
 > v445 workers-comp EMR -> v446 prevailing-wage fringe). Davis-Bacon and state prevailing-wage jobs require a base wage plus
 > a fringe, and how the fringe is paid changes the employer's cost -- a difference this tile makes explicit and no tile
 > computes.**
