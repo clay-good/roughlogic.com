@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fabrication): land spec-v453, v454 -- 2 fabrication-layout tiles (v455 cut as dupe) in calc-construction.js; 912 -> 914 tiles, 0.156.0, 2026-07-04
+
+The fabrication-layout trio, twenty-fifth batch of the v375-v474 campaign, both in the existing lazy `calc-construction.js` (Group E). The third tile, v455 `bend-deduction-setback`, was **cut as a duplicate** of the existing `bend-allowance`, which already outputs the bend allowance, outside setback (OSSB), and bend deduction (BD = 2 OSSB - BA) -- so only two landed. Catalog **912 -> 914**, package **0.155.0 -> 0.156.0** (a minor). Proposed 2026-07-03.
+
+- **`intermittent-fillet-weld` (spec-v453).** AISC 360 J2.2b / AWS D1.1 stitch-weld schedule: weld a fraction w_req/w of the length at the larger stitch size, pitch = increment / fraction, each increment >= max(4 x weld size, 1.5 in). Pinned: a 3/16 in required weld done as 5/16 in stitches -> weld 60% of the length, a 3 in increment gives a 5 in pitch (weld 3, skip 2) and clears the 1.5 in minimum.
+- **`multi-bend-flat-pattern` (spec-v454).** Developed length: flat = mold_line - n_bends x BD (BD per bend from bend-allowance). Pinned: a U-channel 8 in mold-line / 2 bends / 0.1355 in BD -> 7.73 in; a hat section 12 in / 4 bends -> 11.46 in.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the strength-match fraction and pitch, the minimum-increment threshold, the multi-bend developed length, and every error seam incl. the required-larger-than-stitch and deduction-exceeds-mold-line guards), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming AISC 360 J2.2b / AWS D1.1 and sheet-metal developed-length practice. Both use the shared `_simpleRenderer`. Per-tile wiring across nine registries. Housekeeping: home count 912 -> 914, README resynced (counts, sitemap URLs 934 -> 936), two specs LANDED + one CUT, docs/mobile-responsive.md section 88 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the two new tiles.
+
 ### feat(plumbing): land spec-v450, v452 -- 2 plumbing-systems tiles (v451 cut as dupe); 910 -> 912 tiles, 0.155.0, 2026-07-04
 
 The plumbing-systems trio, twenty-fourth batch of the v375-v474 campaign. The middle tile, v451 `hydronic-expansion-tank`, was **cut as a duplicate** of the existing `expansion-tank` (Hydronic Expansion Tank, calc-plumbing.js), which computes the same diaphragm-tank acceptance volume Vt = Ve/(1 - (Pi+14.7)/(Pf+14.7)) and additionally derives the expansion factor from the fill/operating temperatures -- so only two landed. Catalog **910 -> 912**, package **0.154.0 -> 0.155.0** (a minor). Proposed 2026-07-03.

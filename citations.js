@@ -3478,6 +3478,18 @@ export const CITATIONS = {
       { name: "Default K-factor", value: "0.33 (mild steel air bend) unless user supplies", source: "Machinery's Handbook typical" },
     ],
   },
+  "multi-bend-flat-pattern": {
+    formula: "flat = mold_line - n_bends x BD; the per-bend bend deduction BD = 2 x OSSB - BA comes from the bend-allowance geometry.",
+    edition: "Machinery's Handbook (sheet-metal bend geometry) by name; SME Sheet Metal Forming by name; press-brake developed-length practice.",
+    freeAccess: "Older Machinery's Handbook editions free at archive.org; the flat = mold_line - n x BD arithmetic is public geometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "The developed (flat-blank) length of a multi-bend sheet-metal part equals the sum of the outside (mold-line) flange dimensions minus the bend deduction for each bend: flat = mold_line - n_bends x BD. The mold-line dimensions are measured to the theoretical sharp outside corners, and the per-bend BD (= 2 x outside setback - bend allowance) comes from the bend geometry (see bend-allowance for BA / OSSB / BD). Each bend pulls material out of the blank, so more bends give a shorter flat. A layout aid; the actual BD shifts with the tooling, material, and grain direction, so confirm the first part against a test bend on the actual press brake.",
+    assumptions: [
+      { name: "Developed length", value: "flat = mold_line - n_bends x BD, mold-line measured to sharp outside corners", source: "sheet-metal layout practice" },
+      { name: "BD source", value: "the per-bend bend deduction comes from the bend-allowance geometry (BD = 2 OSSB - BA)", source: "Machinery's Handbook" },
+      { name: "Test bend governs", value: "the real BD depends on tooling, material, and grain; confirm on a test part", source: "shop practice" },
+    ],
+  },
   "speeds-feeds": {
     formula: "RPM = (SFM × 3.82) / D_in. Feed rate IPM = RPM × chipload × flutes. SFM and chipload from engineering-practice tables keyed to material and tool-type.",
     edition: "Machinery's Handbook engineering-consensus values; tooling-manufacturer (Sandvik, Kennametal, Niagara) recommendations by name.",
@@ -6467,6 +6479,18 @@ export const CITATIONS = {
     editionNote: "AWS D1.1 / AISC 360 §J2. The ASD/LRFD method is a labeled toggle so the two safety bases are never mixed. Cross-links weld-heat-input and metal-weight.",
     assumptions: [
       { name: "Electrode strength", value: "E60/E70/E80 sets F_Exx; matching filler is the engineer's", source: "AWS D1.1" },
+    ],
+  },
+  "intermittent-fillet-weld": {
+    formula: "fraction = w_req / w_intermit; pitch = increment / fraction; min_increment = max(4 x w_intermit, 1.5 in); ok = increment >= min_increment.",
+    edition: "AISC 360 §J2.2b (intermittent fillet welds, minimum length) and AWS D1.1 Structural Welding Code - Steel, by name.",
+    freeAccess: "First-principles strength-match geometry; the AISC 360 minimum-length rule (4 x weld size, not less than 1-1/2 in) is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "An intermittent (stitch) fillet weld replaces a light continuous fillet with a larger weld run over only part of the length. To match a required continuous weld of size w_req with an intermittent weld of size w, weld a fraction w_req/w of the length, so the pitch (center to center) is P = increment / fraction. AISC 360 §J2.2b requires the effective length of each weld segment be at least the greater of 4 x the weld size or 1-1/2 in. The maximum longitudinal spacing (AISC 360 §J3.5 for built-up members / §E6 for the connectors of built-up compression members), end returns, and the minimum-length rules for the specific member are separate checks. A design aid, not a substitute for the engineer of record's weld design and the qualified WPS.",
+    assumptions: [
+      { name: "Strength match", value: "weld a fraction w_req/w of the length; pitch = increment / fraction", source: "weld strength-match geometry" },
+      { name: "Minimum increment", value: "each segment at least the greater of 4 x weld size or 1-1/2 in", source: "AISC 360 §J2.2b" },
+      { name: "Spacing separate", value: "maximum longitudinal spacing and end returns are separate code checks", source: "AISC 360 §J3.5 / AWS D1.1" },
     ],
   },
   "round-to-rect-duct": {

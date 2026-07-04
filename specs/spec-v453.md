@@ -1,6 +1,6 @@
 # roughlogic.com Specification v453 -- Intermittent Fillet Weld Schedule (AISC J2 / AWS) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a fabrication-layout trio (v453 intermittent fillet weld -> v454 multi-bend
+> **Status: LANDED (2026-07-04). First tile of a fabrication-layout trio (v453 intermittent fillet weld -> v454 multi-bend
 > flat pattern -> v455 bend deduction). `fillet-weld-strength` gives a continuous weld's capacity; when the required weld is
 > smaller than the practical minimum, welders stitch an intermittent schedule instead, and this tile sizes the increment and
 > pitch to match the continuous strength.**

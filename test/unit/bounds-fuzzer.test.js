@@ -15605,6 +15605,38 @@ test("bounds: spec-v452 computeHydronicFillPressure pins fill = height/2.31 + ma
   assert.ok("error" in _v452({ height_ft: Infinity, margin_psi: 4 }));
 });
 
+// ===================== spec-v453, v454 fabrication-layout (v455 cut as dupe of bend-allowance) =====================
+import { computeIntermittentFilletWeld as _v453, computeMultiBendFlatPattern as _v454 } from "../../calc-construction.js";
+
+test("bounds: spec-v453 computeIntermittentFilletWeld pins the fraction, pitch, min-increment, and error seams", () => {
+  const r = _v453({ w_req_in: 0.1875, w_intermit_in: 0.3125, increment_in: 3 });
+  assert.ok(Math.abs(r.fraction - 0.6) < 1e-9 && Math.abs(r.pitch_in - 5) < 1e-9);
+  assert.ok(Math.abs(r.min_incr_in - 1.5) < 1e-9 && r.ok === true);
+  // A tighter increment gives a closer pitch, same fraction.
+  const tight = _v453({ w_req_in: 0.1875, w_intermit_in: 0.3125, increment_in: 2 });
+  assert.ok(Math.abs(tight.pitch_in - 2 / 0.6) < 1e-9 && Math.abs(tight.fraction - 0.6) < 1e-9);
+  // A big stitch weld raises the minimum increment above 1.5 (4 x 0.5 = 2.0).
+  assert.ok(Math.abs(_v453({ w_req_in: 0.25, w_intermit_in: 0.5, increment_in: 1 }).min_incr_in - 2) < 1e-9);
+  // Error seams: required larger than stitch, non-positive, non-finite.
+  assert.ok("error" in _v453({ w_req_in: 0.4, w_intermit_in: 0.3125, increment_in: 3 }));
+  assert.ok("error" in _v453({ w_req_in: 0, w_intermit_in: 0.3125, increment_in: 3 }));
+  assert.ok("error" in _v453({ w_req_in: 0.1875, w_intermit_in: 0.3125, increment_in: 0 }));
+  assert.ok("error" in _v453({ w_req_in: Infinity, w_intermit_in: 0.3125, increment_in: 3 }));
+});
+
+test("bounds: spec-v454 computeMultiBendFlatPattern pins the developed length and error seams", () => {
+  const r = _v454({ mold_line_in: 8, n_bends: 2, bd_in: 0.1355 });
+  assert.ok(Math.abs(r.flat_in - 7.729) < 1e-9 && Math.abs(r.total_deduction_in - 0.271) < 1e-9);
+  // More bends pull more material out of the blank.
+  const hat = _v454({ mold_line_in: 12, n_bends: 4, bd_in: 0.1355 });
+  assert.ok(Math.abs(hat.flat_in - 11.458) < 1e-9 && hat.total_deduction_in > r.total_deduction_in);
+  // Error seams: non-positive mold-line, non-integer bends, deduction exceeds mold-line, non-finite.
+  assert.ok("error" in _v454({ mold_line_in: 0, n_bends: 2, bd_in: 0.1 }));
+  assert.ok("error" in _v454({ mold_line_in: 8, n_bends: 2.5, bd_in: 0.1 }));
+  assert.ok("error" in _v454({ mold_line_in: 1, n_bends: 20, bd_in: 0.5 }));
+  assert.ok("error" in _v454({ mold_line_in: Infinity, n_bends: 2, bd_in: 0.1 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v455 -- Bend Deduction and Setback (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the fabrication-layout trio (v453 intermittent fillet weld ->
+> **Status: CUT (2026-07-04) -- dupe of the existing `bend-allowance` tile (Sheet Metal Bend Allowance, calc-construction.js), which already outputs bend allowance, outside setback (OSSB), and bend deduction (BD = 2 OSSB - BA) from thickness, radius, angle, and K-factor. Not landed.. Third and final tile of the fabrication-layout trio (v453 intermittent fillet weld ->
 > v454 multi-bend flat pattern -> v455 bend deduction). `bend-allowance` outputs the bend allowance and the total flat length
 > from a neutral-axis K-factor; this tile gives the flange-referenced numbers a brake operator actually marks -- the outside
 > setback and the bend deduction -- and feeds the multi-bend flat pattern.**

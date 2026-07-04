@@ -640,6 +640,8 @@ const RELATED = {
   "concrete-mix-design": ["concrete", "aggregate", "mortar-mix"],
   "bolt-torque": ["bolt-stretch", "fastener-pullout"],
   "bend-allowance": ["speeds-feeds", "weld-usage"],
+  "intermittent-fillet-weld": ["fillet-weld-strength", "steel-fillet-weld-size", "weld-metal-volume", "weld-cost-per-foot"],
+  "multi-bend-flat-pattern": ["bend-allowance", "rolled-blank", "min-bend-radius", "cone-flat-pattern"],
   "speeds-feeds": ["bend-allowance", "weld-usage"],
   "weld-usage": ["bend-allowance", "speeds-feeds"],
   "shielding-gas-runtime": ["weld-usage", "weld-cost-per-foot", "weld-duty-cycle"],

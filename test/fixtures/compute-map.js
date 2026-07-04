@@ -197,6 +197,8 @@ export const COMPUTE_MAP = {
   "aggregate": { module: "../../calc-construction.js", fn: "computeAggregate" },
   "bolt-torque": { module: "../../calc-construction.js", fn: "computeBoltTorque" },
   "bend-allowance": { module: "../../calc-construction.js", fn: "computeBendAllowance" },
+  "intermittent-fillet-weld": { module: "../../calc-construction.js", fn: "computeIntermittentFilletWeld" },
+  "multi-bend-flat-pattern": { module: "../../calc-construction.js", fn: "computeMultiBendFlatPattern" },
   "copper-resistance": { module: "../../calc-electrical.js", fn: "computeConductorResistance" },
   "balance-point": { module: "../../calc-hvac.js", fn: "computeBalancePoint" },
   "combustion-air": { module: "../../calc-hvac.js", fn: "computeCombustionAir" },

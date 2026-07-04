@@ -1,6 +1,6 @@
 # roughlogic.com Specification v454 -- Multi-Bend Flat Pattern (Developed Length) (calc-construction.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the fabrication-layout trio (v453 intermittent fillet weld -> v454
+> **Status: LANDED (2026-07-04). Second tile of the fabrication-layout trio (v453 intermittent fillet weld -> v454
 > multi-bend flat pattern -> v455 bend deduction). `bend-allowance` develops a single bend; a real part -- a channel, a hat
 > section, a bracket -- has several bends, and its flat blank is the sum of the mold-line dimensions less the bend deduction
 > at every bend.**

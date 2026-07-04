@@ -358,6 +358,7 @@ const TOOL_MODULES = (() => {
     // v3
     "drywall", "roofing-squares", "asphalt-tonnage", "aggregate", "mortar-mix",
     "concrete-mix-design", "bolt-torque", "bend-allowance", "speeds-feeds",
+    "intermittent-fillet-weld", "multi-bend-flat-pattern",
     "weld-usage", "demo-debris", "formwork-pressure",
     // v7
     "stair-stringer-layout", "hip-valley-rafter", "rebar-schedule",

@@ -17542,6 +17542,91 @@
       "term": "boiler pressure setting",
       "target": "hydronic-fill-pressure",
       "kind": "industry"
+    },
+    {
+      "term": "intermittent fillet weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "stitch weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "weld increment pitch",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "skip weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "intermittent weld spacing",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "stitch welding",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "weld pitch",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc intermittent weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "intermittent weld schedule",
+      "target": "intermittent-fillet-weld",
+      "kind": "industry"
+    },
+    {
+      "term": "multi bend flat pattern",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "developed length sheet metal",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "flat blank multi bend",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "sheet metal flat pattern",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "bend deduction flat",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "hat section flat pattern",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "u channel flat blank",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
+    },
+    {
+      "term": "flat pattern layout",
+      "target": "multi-bend-flat-pattern",
+      "kind": "industry"
     }
   ]
 }

@@ -42195,6 +42195,118 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "intermittent-fillet-weld",
+   "source_publisher": "AISC 360 J2.2b / AWS D1.1",
+   "source_title": "3/16 req, 5/16 stitch, 3 in increment -> 60%, 5.0 in pitch, clears 1.5 in min",
+   "source_edition_or_year": "spec-v453 worked example (machine-verified)",
+   "source_section_or_page": "spec-v453 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "w_req_in": 0.1875,
+    "w_intermit_in": 0.3125,
+    "increment_in": 3
+   },
+   "outputs": {
+    "fraction": {
+     "value": 0.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pitch_in": {
+     "value": 5.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_incr_in": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "intermittent-fillet-weld",
+   "source_publisher": "AISC 360 J2.2b / AWS D1.1",
+   "source_title": "2 in increment -> 3.33 in pitch, still above the 1.5 in minimum",
+   "source_edition_or_year": "spec-v453 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v453 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "w_req_in": 0.1875,
+    "w_intermit_in": 0.3125,
+    "increment_in": 2
+   },
+   "outputs": {
+    "pitch_in": {
+     "value": 3.3333,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "min_incr_in": {
+     "value": 1.5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "multi-bend-flat-pattern",
+   "source_publisher": "sheet-metal layout (developed length)",
+   "source_title": "U-channel 8 in mold-line, 2 bends, BD 0.1355 -> 7.73 in flat",
+   "source_edition_or_year": "spec-v454 worked example (machine-verified)",
+   "source_section_or_page": "spec-v454 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "mold_line_in": 8,
+    "n_bends": 2,
+    "bd_in": 0.1355
+   },
+   "outputs": {
+    "flat_in": {
+     "value": 7.729,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "total_deduction_in": {
+     "value": 0.271,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "multi-bend-flat-pattern",
+   "source_publisher": "sheet-metal layout (developed length)",
+   "source_title": "hat section 12 in mold-line, 4 bends -> 11.46 in flat",
+   "source_edition_or_year": "spec-v454 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v454 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "mold_line_in": 12,
+    "n_bends": 4,
+    "bd_in": 0.1355
+   },
+   "outputs": {
+    "flat_in": {
+     "value": 11.458,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

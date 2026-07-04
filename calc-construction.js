@@ -6316,3 +6316,78 @@ const _v448renderGlulamVolumeFactor = _simpleRenderer({
   compute: computeGlulamVolumeFactor,
 });
 CONSTRUCTION_RENDERERS["glulam-volume-factor"] = _v448renderGlulamVolumeFactor;
+
+// ===================== spec-v453: intermittent fillet weld schedule (AISC J2 / AWS) =====================
+// dims: in { w_req_in: L, w_intermit_in: L, increment_in: L } out: { fraction: dimensionless, pitch_in: L, min_incr_in: L }
+export function computeIntermittentFilletWeld({ w_req_in = 0, w_intermit_in = 0, increment_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const wReq = Number(w_req_in) || 0;
+  const wInt = Number(w_intermit_in) || 0;
+  const incr = Number(increment_in) || 0;
+  if (!(wReq > 0)) return { error: "Required continuous weld size must be positive (in)." };
+  if (!(wInt > 0)) return { error: "Intermittent weld size must be positive (in)." };
+  if (!(incr > 0)) return { error: "Weld increment length must be positive (in)." };
+  if (wReq > wInt) return { error: "Intermittent size must be at least the required continuous size (a stitch weld cannot be weaker than the weld it replaces)." };
+  const fraction = wReq / wInt;
+  const pitch_in = incr / fraction;
+  const min_incr_in = Math.max(4 * wInt, 1.5);
+  const ok = incr >= min_incr_in;
+  return {
+    fraction, pitch_in, min_incr_in, ok, increment_in: incr,
+    note: "Intermittent (stitch) fillet weld schedule: when a required continuous fillet is smaller than the practical minimum weld for the plate, weld a larger intermittent fillet over only part of the length. To match a continuous weld of size w_req with an intermittent weld of size w, weld a fraction w_req/w of the length; the pitch (center to center) is P = increment / fraction, so you weld the increment, skip (pitch - increment), and repeat. AISC 360 J2.2b requires each increment be at least the greater of 4 x the weld size or 1.5 in. The maximum longitudinal spacing (J3.5), end returns, and minimum-length rules are separate checks. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const intermittentFilletWeldExample = { inputs: { w_req_in: 0.1875, w_intermit_in: 0.3125, increment_in: 3 } };
+const _v453renderIntermittentFilletWeld = _simpleRenderer({
+  citation: "Citation: AISC 360 J2.2b / AWS D1.1 intermittent fillet weld: weld a fraction w_req/w of the length at the larger stitch size w, pitch P = increment / fraction, each increment at least the greater of 4 x weld size or 1.5 in. Maximum spacing and end returns are separate checks. A design aid, not a substitute for the engineer of record.",
+  example: intermittentFilletWeldExample.inputs,
+  fields: [
+    { key: "w_req_in", label: "Required continuous fillet size (in)", kind: "number", default: 0.1875 },
+    { key: "w_intermit_in", label: "Intermittent (stitch) fillet size (in)", kind: "number", default: 0.3125 },
+    { key: "increment_in", label: "Weld increment length (in)", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "frac", id: "ifw-out-frac", label: "Fraction of length to weld", value: (r) => fmt(r.fraction * 100, 1) + "%" },
+    { key: "pitch", id: "ifw-out-pitch", label: "Pitch (center to center)", value: (r) => fmt(r.pitch_in, 2) + " in (weld " + fmt(r.increment_in, 2) + " in, skip " + fmt(r.pitch_in - r.increment_in, 2) + " in)" },
+    { key: "min", id: "ifw-out-min", label: "Minimum increment check", value: (r) => "min " + fmt(r.min_incr_in, 2) + " in -- " + (r.ok ? "increment OK" : "increment TOO SHORT") },
+    { key: "n", id: "ifw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeIntermittentFilletWeld,
+});
+CONSTRUCTION_RENDERERS["intermittent-fillet-weld"] = _v453renderIntermittentFilletWeld;
+
+// ===================== spec-v454: multi-bend flat pattern (developed length) =====================
+// dims: in { mold_line_in: L, n_bends: dimensionless, bd_in: L } out: { flat_in: L, total_deduction_in: L }
+export function computeMultiBendFlatPattern({ mold_line_in = 0, n_bends = 0, bd_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mold = Number(mold_line_in) || 0;
+  const n = Number(n_bends) || 0;
+  const bd = Number(bd_in) || 0;
+  if (!(mold > 0)) return { error: "Mold-line length must be positive (in)." };
+  if (!(n > 0) || !Number.isInteger(n)) return { error: "Number of bends must be a positive whole number." };
+  if (!(bd >= 0)) return { error: "Bend deduction must be non-negative (in)." };
+  const total_deduction_in = n * bd;
+  const flat_in = mold - total_deduction_in;
+  if (!(flat_in > 0)) return { error: "Total bend deduction exceeds the mold-line length -- check the deduction and bend count." };
+  return {
+    flat_in, total_deduction_in,
+    note: "Multi-bend flat pattern (developed length): the flat blank for a part with several bends is the sum of the outside (mold-line) flange dimensions minus the bend deduction for each bend, flat = mold_line - n_bends x BD, where the per-bend BD comes from the bend-deduction/setback relation (see bend-allowance). Each bend pulls material out of the blank, so more bends give a shorter flat. Mold-line dimensions are measured to the theoretical sharp outside corners. A layout aid; confirm the first part against a test bend on the actual press brake, since the real BD shifts with tooling, material, and grain direction.",
+  };
+}
+export const multiBendFlatPatternExample = { inputs: { mold_line_in: 8, n_bends: 2, bd_in: 0.1355 } };
+const _v454renderMultiBendFlatPattern = _simpleRenderer({
+  citation: "Citation: Multi-bend flat pattern: flat = mold_line - n_bends x BD, the sum of outside (mold-line) flange dimensions minus the bend deduction per bend (from bend-allowance). A layout aid; confirm the first part against a test bend, since the real BD shifts with tooling, material, and grain.",
+  example: multiBendFlatPatternExample.inputs,
+  fields: [
+    { key: "mold_line_in", label: "Sum of mold-line (outside) flanges (in)", kind: "number", default: 8 },
+    { key: "n_bends", label: "Number of bends", kind: "number", default: 2 },
+    { key: "bd_in", label: "Bend deduction per bend (in, from bend-allowance)", kind: "number", default: 0.1355 },
+  ],
+  outputs: [
+    { key: "flat", id: "mbfp-out-flat", label: "Developed flat length", value: (r) => fmt(r.flat_in, 3) + " in" },
+    { key: "ded", id: "mbfp-out-ded", label: "Total deduction", value: (r) => fmt(r.total_deduction_in, 3) + " in" },
+    { key: "n", id: "mbfp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMultiBendFlatPattern,
+});
+CONSTRUCTION_RENDERERS["multi-bend-flat-pattern"] = _v454renderMultiBendFlatPattern;
