@@ -15353,3 +15353,56 @@ test("bounds: spec-v386 computeOutsideAirPercentTemps pins the balance, the band
   assert.ok("error" in _v386({ t_ra_f: 75, t_ma_f: 68, t_oa_f: 75 })); // zero denominator
   assert.ok("error" in _v386({ t_ra_f: Infinity, t_ma_f: 68, t_oa_f: 40 }));
 });
+
+// ===================== spec-v387..v389 water-system hydraulics trio (3 modules) =====================
+import { computeColebrookFrictionFactor as _v387 } from "../../calc-hvac.js";
+import { computeThrustBlockSizing as _v388 } from "../../calc-plumbing.js";
+import { computeHydrantAvailableFlow as _v389 } from "../../calc-fire.js";
+
+test("bounds: spec-v387 computeColebrookFrictionFactor pins laminar/turbulent, the transition flag, and error seams", () => {
+  const t = _v387({ reynolds: 100000, rel_roughness: 0.0003 });
+  assert.ok(Math.abs(t.f - 0.0195) < 0.0005 && t.laminar === false);
+  // Laminar is exactly 64/Re, roughness-independent.
+  const lam = _v387({ reynolds: 1500, rel_roughness: 0.0003 });
+  assert.ok(Math.abs(lam.f - 64 / 1500) < 1e-12 && lam.laminar === true);
+  assert.ok(Math.abs(_v387({ reynolds: 1500, rel_roughness: 0.05 }).f - 64 / 1500) < 1e-12);
+  // The 2300-4000 band is flagged transitional.
+  assert.strictEqual(_v387({ reynolds: 3000, rel_roughness: 0.0003 }).transitional, true);
+  // Rougher pipe -> higher turbulent f.
+  assert.ok(_v387({ reynolds: 100000, rel_roughness: 0.01 }).f > t.f);
+  // Error seams.
+  assert.ok("error" in _v387({ reynolds: 0, rel_roughness: 0.0003 }));
+  assert.ok("error" in _v387({ reynolds: 100000, rel_roughness: -0.001 }));
+  assert.ok("error" in _v387({ reynolds: Infinity, rel_roughness: 0.0003 }));
+});
+
+test("bounds: spec-v388 computeThrustBlockSizing pins T = 2 P A sin(theta/2), the bearing area, and error seams", () => {
+  const r = _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 });
+  assert.ok(Math.abs(r.area_in2 - (Math.PI / 4) * 8.625 ** 2) < 1e-9);
+  assert.ok(Math.abs(r.thrust_lb - 8263) < 2);
+  assert.ok(Math.abs(r.bearing_area_ft2 - r.thrust_lb / 2000) < 1e-9);
+  // A 45-deg bend is about half the thrust (sin(theta/2)).
+  const b45 = _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 45, soil_bearing_psf: 2000 });
+  assert.ok(Math.abs(b45.thrust_lb - 4472) < 2 && b45.thrust_lb < r.thrust_lb);
+  // Error seams.
+  assert.ok("error" in _v388({ pressure_psi: 0, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v388({ pressure_psi: 100, od_in: 0, bend_deg: 90, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 0, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 180, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v388({ pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 0 }));
+  assert.ok("error" in _v388({ pressure_psi: Infinity, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }));
+});
+
+test("bounds: spec-v389 computeHydrantAvailableFlow pins QR, the color class, and error seams", () => {
+  const r = _v389({ static_psi: 70, residual_psi: 50, qf_gpm: 1000 });
+  assert.ok(Math.abs(r.qr_gpm - 1000 * (50 / 20) ** 0.54) < 1e-6);
+  assert.ok(Math.abs(r.qr_gpm - 1640) < 2 && r.hydrant_class === "AA (light blue)");
+  // A weaker main downgrades the class.
+  const weak = _v389({ static_psi: 65, residual_psi: 45, qf_gpm: 800 });
+  assert.ok(Math.abs(weak.qr_gpm - 1240) < 2 && weak.hydrant_class === "A (green)");
+  // Error seams: residual >= static, static <= 20, non-positive flow, non-finite.
+  assert.ok("error" in _v389({ static_psi: 70, residual_psi: 70, qf_gpm: 1000 }));
+  assert.ok("error" in _v389({ static_psi: 20, residual_psi: 10, qf_gpm: 1000 }));
+  assert.ok("error" in _v389({ static_psi: 70, residual_psi: 50, qf_gpm: 0 }));
+  assert.ok("error" in _v389({ static_psi: Infinity, residual_psi: 50, qf_gpm: 1000 }));
+});

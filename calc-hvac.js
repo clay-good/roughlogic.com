@@ -3772,3 +3772,37 @@ HVAC_RENDERERS["fan-affinity-laws"] = _rEnv({
   ],
   compute: computeFanAffinityLaws,
 });
+
+// ===================== spec-v387: Darcy friction factor (water-system hydraulics trio) =====================
+
+// dims: in { reynolds: dimensionless, rel_roughness: dimensionless } out: { f: dimensionless }
+export function computeColebrookFrictionFactor({ reynolds = 0, rel_roughness = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const re = Number(reynolds) || 0;
+  const rr = Number(rel_roughness) || 0;
+  if (!(re > 0)) return { error: "Reynolds number must be positive." };
+  if (rr < 0) return { error: "Relative roughness must be non-negative." };
+  const laminar = re < 2300;
+  const transitional = re >= 2300 && re <= 4000;
+  const f = laminar ? 64 / re : 0.25 / Math.pow(Math.log10(rr / 3.7 + 5.74 / Math.pow(re, 0.9)), 2);
+  const regime = laminar ? "laminar (f = 64/Re)" : transitional ? "transitional (2300-4000; f is indeterminate, estimate shown)" : "turbulent (Swamee-Jain)";
+  return {
+    f, regime, laminar, transitional,
+    note: "Darcy-Weisbach friction factor f: laminar (Re < 2300) is exactly 64/Re, independent of roughness; turbulent uses the Swamee-Jain explicit fit to the Colebrook equation, f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2, within ~1% of Moody-chart values for 5000 < Re < 1e8 and eps/D < 0.05. The 2300-4000 transition band is physically indeterminate; the turbulent estimate is flagged there. Feeds the head-loss h = f (L/D) V^2/(2g). A design aid; the system analysis governs.",
+  };
+}
+const colebrookFrictionFactorExample = { inputs: { reynolds: 100000, rel_roughness: 0.0003 } };
+HVAC_RENDERERS["colebrook-friction-factor"] = _rEnv({
+  citation: "Citation: Darcy friction factor -- laminar f = 64/Re, and the Swamee-Jain (1976) explicit approximation to the Colebrook-White equation f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2 for turbulent flow (within ~1% of the Colebrook/Moody value over 5000 < Re < 1e8, eps/D <= 0.05). The 2300-4000 transition is indeterminate. Feeds the Darcy-Weisbach head loss h = f (L/D) V^2/(2g). A design aid; the system analysis governs.",
+  example: colebrookFrictionFactorExample.inputs,
+  fields: [
+    { key: "reynolds", label: "Reynolds number Re", kind: "number", default: 100000 },
+    { key: "rel_roughness", label: "Relative roughness eps/D", kind: "number", default: 0.0003 },
+  ],
+  outputs: [
+    { key: "f", id: "cff-out-f", label: "Darcy friction factor f", value: (r) => fmt(r.f, 4) },
+    { key: "reg", id: "cff-out-reg", label: "Flow regime", value: (r) => r.regime },
+    { key: "n", id: "cff-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeColebrookFrictionFactor,
+});

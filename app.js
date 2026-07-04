@@ -165,6 +165,7 @@ const TOOL_MODULES = (() => {
     // spec-v302..v304 site-hydraulics depth batch.
     "time-of-concentration", "orifice-flow", "channel-froude-number",
     "velocity-head", "flow-continuity", "bernoulli-head",
+    "thrust-block-sizing",
   ]);
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-
@@ -250,7 +251,7 @@ const TOOL_MODULES = (() => {
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
     "moist-air-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
-    "fan-affinity-laws",
+    "fan-affinity-laws", "colebrook-friction-factor",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,
@@ -523,6 +524,7 @@ const TOOL_MODULES = (() => {
     "elevation-pressure-loss", "water-supply-duration",
     // spec-v114 smooth-bore nozzle flow (gpm = 29.7 d^2 sqrt(NP)).
     "smooth-bore-flow",
+    "hydrant-available-flow",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
   // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.

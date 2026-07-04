@@ -3899,3 +3899,47 @@ function _v373renderBernoulliHead(inputRegion, outputRegion, citationEl) {
   for (const f of [P, V, z, g]) f.input.addEventListener("input", update);
 }
 PLUMBING_RENDERERS["bernoulli-head"] = _v373renderBernoulliHead;
+
+// ===================== spec-v388: thrust block bearing area at a pipe bend (water-system hydraulics trio) =====================
+
+// dims: in { pressure_psi: M L^-1 T^-2, od_in: L, bend_deg: dimensionless, soil_bearing_psf: M L^-1 T^-2 } out: { area_in2: L^2, thrust_lb: M L T^-2, bearing_area_ft2: L^2 }
+export function computeThrustBlockSizing({ pressure_psi = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(pressure_psi) || 0;
+  const od = Number(od_in) || 0;
+  const bend = Number(bend_deg) || 0;
+  const soil = Number(soil_bearing_psf) || 0;
+  if (!(P > 0)) return { error: "Internal pressure must be positive (psi)." };
+  if (!(od > 0)) return { error: "Pipe outside diameter must be positive (in)." };
+  if (!(bend > 0 && bend < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
+  if (!(soil > 0)) return { error: "Allowable soil bearing must be positive (psf)." };
+  const area_in2 = (Math.PI / 4) * od * od;
+  const thrust_lb = 2 * P * area_in2 * Math.sin((bend * Math.PI / 180) / 2);
+  const bearing_area_ft2 = thrust_lb / soil;
+  return {
+    area_in2, thrust_lb, bearing_area_ft2,
+    note: "Thrust at a horizontal bend T = 2 P A sin(theta/2) (AWWA M41), where A is the pipe cross-sectional area from the outside diameter and the sin(theta/2) term makes a 90-degree bend push far harder than a 45; the bearing block face must be at least Ab = T / (allowable soil bearing). Use the test or surge pressure, not the working pressure, and a conservative soil value from the geotechnical report. This sizes the bearing face only; block geometry, depth, and the passive-restraint or restrained-joint alternative are the engineer's design. A design aid; the engineer of record governs.",
+  };
+}
+export const thrustBlockSizingExample = { inputs: { pressure_psi: 100, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
+function _v388renderThrustBlockSizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- resultant thrust at a bend T = 2 P A sin(theta/2), bearing area Ab = T / (allowable soil bearing). Use the test/surge pressure and a geotechnical soil-bearing value. Sizes the bearing face only; the engineer of record governs the block design.";
+  const P = makeNumber("Internal pressure (psi, test/surge)", "tbs-p", { step: "any", min: "0" }); P.input.value = "100";
+  const od = makeNumber("Pipe outside diameter (in)", "tbs-od", { step: "any", min: "0" }); od.input.value = "8.625";
+  const bend = makeNumber("Bend angle (deg)", "tbs-b", { step: "any", min: "0" }); bend.input.value = "90";
+  const soil = makeNumber("Allowable soil bearing (psf)", "tbs-s", { step: "any", min: "0" }); soil.input.value = "2000";
+  for (const f of [P, od, bend, soil]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "100"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
+  const oT = makeOutputLine(outputRegion, "Resultant thrust", "tbs-out-t");
+  const oA = makeOutputLine(outputRegion, "Required bearing area", "tbs-out-a");
+  const oN = makeOutputLine(outputRegion, "Note", "tbs-out-n");
+  const update = debounce(() => {
+    const r = computeThrustBlockSizing({ pressure_psi: Number(P.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oN.textContent = ""; return; }
+    oT.textContent = fmt(r.thrust_lb, 0) + " lb (pipe area " + fmt(r.area_in2, 1) + " in^2)";
+    oA.textContent = fmt(r.bearing_area_ft2, 2) + " ft^2";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [P, od, bend, soil]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["thrust-block-sizing"] = _v388renderThrustBlockSizing;

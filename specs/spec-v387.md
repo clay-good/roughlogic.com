@@ -1,6 +1,6 @@
 # roughlogic.com Specification v387 -- Darcy Friction Factor (Swamee-Jain / Colebrook) (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a water-system hydraulics trio (v387 friction factor -> v388 thrust block
+> **Status: LANDED (2026-07-03, 0.136.0; proposed 2026-07-03). First tile of a water-system hydraulics trio (v387 friction factor -> v388 thrust block
 > -> v389 hydrant available flow). `reynolds-number-pipe` classifies the flow regime and `friction-loss` reports a head
 > loss, but neither exposes the Darcy friction factor `f` itself -- the dimensionless number every Darcy-Weisbach pressure-
 > drop and pump-head calculation turns on.**

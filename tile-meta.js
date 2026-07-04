@@ -463,6 +463,7 @@ const _TILES = [
   ["duct-heat-gain", "C"], ["grille-face-velocity", "C"], ["air-density-correction", "C"],
   ["moist-air-enthalpy", "C"], ["cooling-coil-total-load", "C"], ["coil-bypass-factor", "C"],
   ["fan-affinity-laws", "C"], ["pitot-traverse-cfm", "C"], ["outside-air-percent-temps", "C"],
+  ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["hydrant-available-flow", "F"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v388 -- Thrust Block Bearing Area at a Pipe Bend (AWWA M41) (calc-plumbing.js, Group B, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the water-system hydraulics trio (v387 friction factor -> v388 thrust
+> **Status: LANDED (2026-07-03, 0.136.0; proposed 2026-07-03). Second tile of the water-system hydraulics trio (v387 friction factor -> v388 thrust
 > block -> v389 hydrant available flow). A buried pressurized pipe pushes outward at every bend; this tile computes that
 > unbalanced thrust and the concrete bearing area a thrust block needs to hold it against the soil.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. At a bend in a pressurized main, the internal pressure

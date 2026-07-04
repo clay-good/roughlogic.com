@@ -30305,6 +30305,85 @@
       }
     },
     {
+      "tile_id": "colebrook-friction-factor",
+      "source_publisher": "Swamee-Jain / Moody",
+      "source_title": "Re 100,000, eps/D 0.0003 -> f 0.0195 (turbulent, commercial steel)",
+      "source_edition_or_year": "spec-v387 worked example (machine-verified)",
+      "source_section_or_page": "spec-v387 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "reynolds": 100000, "rel_roughness": 0.0003 },
+      "outputs": {
+        "f": { "value": 0.0195, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "colebrook-friction-factor",
+      "source_publisher": "Darcy-Weisbach",
+      "source_title": "cross-check: laminar Re 1500 -> f = 64/1500 = 0.0427 (roughness drops out)",
+      "source_edition_or_year": "spec-v387 worked example (machine-verified)",
+      "source_section_or_page": "spec-v387 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "reynolds": 1500, "rel_roughness": 0.0003 },
+      "outputs": {
+        "f": { "value": 0.04267, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "thrust-block-sizing",
+      "source_publisher": "AWWA M41",
+      "source_title": "8 in main (OD 8.625), 100 psi, 90-deg bend, 2000 psf soil -> T 8,263 lb, Ab 4.13 ft^2",
+      "source_edition_or_year": "spec-v388 worked example (machine-verified)",
+      "source_section_or_page": "spec-v388 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "pressure_psi": 100, "od_in": 8.625, "bend_deg": 90, "soil_bearing_psf": 2000 },
+      "outputs": {
+        "thrust_lb": { "value": 8263, "tolerance": { "pct": 0.5 } },
+        "bearing_area_ft2": { "value": 4.13, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "thrust-block-sizing",
+      "source_publisher": "AWWA M41",
+      "source_title": "cross-check: a 45-deg bend at the same pressure -> T 4,472 lb (about half, the sin(theta/2) term)",
+      "source_edition_or_year": "spec-v388 worked example (machine-verified)",
+      "source_section_or_page": "spec-v388 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "pressure_psi": 100, "od_in": 8.625, "bend_deg": 45, "soil_bearing_psf": 2000 },
+      "outputs": {
+        "thrust_lb": { "value": 4472, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydrant-available-flow",
+      "source_publisher": "NFPA 291",
+      "source_title": "static 70, residual 50, QF 1000 gpm -> QR 1640 gpm, Class AA",
+      "source_edition_or_year": "spec-v389 worked example (machine-verified)",
+      "source_section_or_page": "spec-v389 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "static_psi": 70, "residual_psi": 50, "qf_gpm": 1000 },
+      "outputs": {
+        "qr_gpm": { "value": 1640, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "hydrant-available-flow",
+      "source_publisher": "NFPA 291",
+      "source_title": "cross-check: a weaker main (static 65, residual 45, QF 800) -> QR 1240 gpm, Class A",
+      "source_edition_or_year": "spec-v389 worked example (machine-verified)",
+      "source_section_or_page": "spec-v389 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-03",
+      "inputs": { "static_psi": 65, "residual_psi": 45, "qf_gpm": 800 },
+      "outputs": {
+        "qr_gpm": { "value": 1240, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "pv-cell-temperature-power",
       "source_publisher": "PV design practice / NREL",
       "source_title": "400 W module, 30 C air, 800 W/m^2, NOCT 45 -> 55 C cell, 358 W (10.5% loss)",

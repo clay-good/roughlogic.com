@@ -1,6 +1,6 @@
 # roughlogic.com Specification v389 -- Hydrant Rated Flow at 20 psi (NFPA 291) (calc-fire.js, Group F, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the water-system hydraulics trio (v387 friction factor ->
+> **Status: LANDED (2026-07-03, 0.136.0; proposed 2026-07-03). Third and final tile of the water-system hydraulics trio (v387 friction factor ->
 > v388 thrust block -> v389 hydrant available flow). `hydrant-flow` gives the GPM out of one Pitot-gauged outlet during a
 > test; this tile projects a two-gauge flow test to the standard rated capacity at 20 psi residual and returns the NFPA 291
 > hydrant color class.**

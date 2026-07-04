@@ -1791,3 +1791,46 @@ function renderSmoothBoreFlow(inputRegion, outputRegion, citationEl) {
   for (const f of [bore.input, np.input]) f.addEventListener("input", update);
 }
 FIRE_RENDERERS["smooth-bore-flow"] = renderSmoothBoreFlow;
+
+// ===================== spec-v389: hydrant rated flow at 20 psi (water-system hydraulics trio) =====================
+
+// dims: in { static_psi: M L^-1 T^-2, residual_psi: M L^-1 T^-2, qf_gpm: L^3 T^-1 } out: { hf_psi: M L^-1 T^-2, hr_psi: M L^-1 T^-2, qr_gpm: L^3 T^-1 }
+export function computeHydrantAvailableFlow({ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const s = Number(static_psi) || 0;
+  const res = Number(residual_psi) || 0;
+  const qf = Number(qf_gpm) || 0;
+  if (!(qf > 0)) return { error: "Test flow QF must be positive (gpm)." };
+  if (!(s > 20)) return { error: "Static pressure must be above 20 psi (the rated residual)." };
+  if (!(res < s)) return { error: "Residual pressure must be below the static pressure (a flow must drop it)." };
+  if (!(res >= 0)) return { error: "Residual pressure must be non-negative (psi)." };
+  const hf_psi = s - res;
+  const hr_psi = s - 20;
+  const qr_gpm = qf * Math.pow(hr_psi / hf_psi, 0.54);
+  const cls = qr_gpm >= 1500 ? "AA (light blue)" : qr_gpm >= 1000 ? "A (green)" : qr_gpm >= 500 ? "B (orange)" : "C (red)";
+  return {
+    hf_psi, hr_psi, qr_gpm, hydrant_class: cls,
+    note: "NFPA 291 hydrant rated capacity at 20 psi residual: QR = QF x (hr/hf)^0.54, where hf is the test pressure drop (static minus residual at the measured flow QF) and hr is the drop from static to the 20 psi rated residual. The 0.54 exponent is the standard hydraulic fit. The color class (AA >= 1500, A >= 1000, B >= 500, C < 500 gpm) is the NFPA 291 marking. A field/planning estimate at one location and time; the water authority's flow data govern.",
+  };
+}
+export const hydrantAvailableFlowExample = { inputs: { static_psi: 70, residual_psi: 50, qf_gpm: 1000 } };
+function renderHydrantAvailableFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NFPA 291 (Fire Flow Testing and Marking of Hydrants) -- rated flow at 20 psi QR = QF x (hr/hf)^0.54 with hf = static - residual and hr = static - 20, and the AA/A/B/C color classes (>= 1500 / 1000 / 500 / < 500 gpm). A field estimate at one location and time; the water authority's flow data govern.";
+  const s = makeNumber("Static pressure (psi)", "haf-s", { step: "any", min: "0" }); s.input.value = "70";
+  const res = makeNumber("Residual pressure while flowing (psi)", "haf-r", { step: "any", min: "0" }); res.input.value = "50";
+  const qf = makeNumber("Test flow QF (gpm)", "haf-q", { step: "any", min: "0" }); qf.input.value = "1000";
+  for (const f of [s, res, qf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { s.input.value = "70"; res.input.value = "50"; qf.input.value = "1000"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Rated flow at 20 psi", "haf-out-q");
+  const oC = makeOutputLine(outputRegion, "Hydrant class", "haf-out-c");
+  const oN = makeOutputLine(outputRegion, "Note", "haf-out-n");
+  const update = debounce(() => {
+    const r = computeHydrantAvailableFlow({ static_psi: Number(s.input.value) || 0, residual_psi: Number(res.input.value) || 0, qf_gpm: Number(qf.input.value) || 0 });
+    if (r.error) { oQ.textContent = r.error; oC.textContent = "-"; oN.textContent = ""; return; }
+    oQ.textContent = fmt(r.qr_gpm, 0) + " gpm (drop " + fmt(r.hf_psi, 0) + " -> 20 psi rated)";
+    oC.textContent = "Class " + r.hydrant_class;
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [s, res, qf]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["hydrant-available-flow"] = renderHydrantAvailableFlow;

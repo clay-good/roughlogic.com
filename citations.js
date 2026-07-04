@@ -8463,6 +8463,42 @@ export const CITATIONS = {
       { name: "Low-spread caveat", value: "a return-to-outdoor spread under ~10 F is sensitive to sensor error", source: "scope of this tile" },
     ],
   },
+  "colebrook-friction-factor": {
+    formula: "f = 64/Re (Re < 2300); else f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2 (Swamee-Jain).",
+    edition: "The laminar Darcy factor 64/Re and the Swamee-Jain (1976) explicit approximation to the Colebrook-White equation, by name.",
+    freeAccess: "The 64/Re laminar relation and the Swamee-Jain explicit friction-factor fit are published free in any fluid-mechanics reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Darcy friction factor: laminar flow (Re < 2300) is exactly f = 64/Re, independent of roughness; turbulent flow uses the Swamee-Jain explicit fit to the implicit Colebrook-White equation, f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2, within about 1% of the Colebrook/Moody value for 5000 < Re < 1e8 and eps/D <= 0.05. The 2300-4000 transition band is physically indeterminate and the turbulent estimate is flagged there. This returns the factor that feeds the Darcy-Weisbach head loss h = f (L/D) V^2/(2g); it does not compute the head loss itself or select the roughness. A design aid; the system analysis governs.",
+    assumptions: [
+      { name: "Laminar", value: "f = 64/Re for Re < 2300, roughness-independent", source: "Darcy-Weisbach" },
+      { name: "Turbulent", value: "Swamee-Jain f = 0.25 / [log10(eps/D/3.7 + 5.74/Re^0.9)]^2", source: "Swamee & Jain 1976" },
+      { name: "Transition band", value: "2300-4000 is indeterminate; estimate flagged", source: "scope of this tile" },
+    ],
+  },
+  "thrust-block-sizing": {
+    formula: "A = (pi/4) OD^2; T = 2 P A sin(theta/2); Ab = T / (allowable soil bearing).",
+    edition: "The AWWA M41 thrust-block resultant-thrust and bearing-area method for a pipe bend, by name.",
+    freeAccess: "The resultant-thrust T = 2 P A sin(theta/2) and the bearing-area check are the standard published AWWA thrust-restraint relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method: the resultant thrust at a horizontal bend T = 2 P A sin(theta/2), where A is the pipe cross-sectional area from the outside diameter, and the required bearing face Ab = T / (allowable soil bearing pressure). The sin(theta/2) term is why a 90-degree bend pushes far harder than a 45. Use the test or surge pressure (not the working pressure) and a conservative geotechnical soil-bearing value. This sizes the bearing face only; the block geometry, burial depth, and the restrained-joint or passive-restraint alternative are the engineer's design. A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Resultant thrust", value: "T = 2 P A sin(theta/2), A = (pi/4) OD^2", source: "AWWA M41" },
+      { name: "Bearing area", value: "Ab = T / (allowable soil bearing)", source: "AWWA M41" },
+      { name: "Design pressure", value: "use the test/surge pressure and a geotechnical soil value", source: "scope of this tile" },
+    ],
+  },
+  "hydrant-available-flow": {
+    formula: "hf = static - residual; hr = static - 20; QR = QF (hr/hf)^0.54; class AA/A/B/C by QR.",
+    edition: "The NFPA 291 hydrant rated-flow-at-20-psi projection and the color-class marking, by name.",
+    freeAccess: "The QR = QF (hr/hf)^0.54 flow projection and the AA/A/B/C color classes are the published NFPA 291 method.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NFPA 291 (Fire Flow Testing and Marking of Hydrants) rated capacity at a 20 psi residual: QR = QF x (hr/hf)^0.54, where hf is the test pressure drop (static minus the residual measured at flow QF) and hr is the drop from static to the 20 psi rated residual; the 0.54 exponent is the standard hydraulic fit. The color class (AA >= 1500, A >= 1000, B >= 500, C < 500 gpm) is the NFPA 291 marking. This is a projection from one flow test at one location and time; the water authority's flow-test data and current system pressures govern.",
+    assumptions: [
+      { name: "Flow projection", value: "QR = QF (hr/hf)^0.54, hf = static - residual, hr = static - 20", source: "NFPA 291" },
+      { name: "Color class", value: "AA >= 1500, A >= 1000, B >= 500, C < 500 gpm", source: "NFPA 291" },
+      { name: "Single test", value: "one location and time; the water authority's data govern", source: "scope of this tile" },
+    ],
+  },
   "wall-condensation-gradient": {
     formula: "R_total = R_inside + R_outside; T_plane = T_in - (R_inside/R_total)(T_in - T_out); T_dew = Magnus(T_in, RH); margin = T_plane - T_dew (<= 0 condensing).",
     edition: "The R-proportional through-wall temperature gradient and the Magnus dew-point comparison for a condensation-plane screen, standard building-science results, by name.",
