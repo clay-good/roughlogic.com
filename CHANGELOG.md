@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(refrigerant): land spec-v432..v434 -- 3 walk-in refrigeration tiles in calc-refrigerant.js; 896 -> 899 tiles, 0.150.0, 2026-07-04
+
+The walk-in refrigeration trio, nineteenth batch of the v375-v474 campaign: the box heat load, the product pull-down, and the evaporator TD, all in the existing lazy `calc-refrigerant.js` (Group C); no new module, group, or dependency. Catalog **896 -> 899**, package **0.149.0 -> 0.150.0** (a minor). Proposed 2026-07-03.
+
+- **`walk-in-cooler-load` (spec-v432).** transmission (U A deltaT) + infiltration + product + internal, x safety. Pinned: U 0.05, 800 ft^2, 60 F, +3000/5000/1500, 1.10 -> 2,400 transmission, 13,090 Btu/hr (1.09 tons); a 6 in panel (U 0.03) -> 12,034.
+- **`product-pull-down-load` (spec-v433).** above freezing Q = m cp deltaT; freezing adds the latent heat of fusion + frozen sensible. Pinned: 2000 lb produce, cp 0.9, 80 -> 35 F, 24 hr -> 81,000 Btu, 3,375 Btu/hr; freezing to 0 F -> 358,800 Btu (latent dominates).
+- **`evaporator-td-dtd` (spec-v434).** DTD = box - saturated suction, with the humidity band (<=10 F ~90% RH ... >16 F <70%). Pinned: a 35 F box on a 25 F SST -> 10 F TD, ~90% RH; a drying 17 F suction -> 18 F TD, <70% RH.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the four load components, both the sensible and freezing pull-down paths, the humidity bands, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming ASHRAE Refrigeration. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers). Module cap bumped with a dated comment: calc-refrigerant.js 13000 -> 16500. Housekeeping: home count 896 -> 899, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 82 appended. All gates green at the new state: lint, unit tests (**5,192**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(construction): land spec-v430..v431 -- 2 concrete field-work tiles (v429 cut as dupe); 894 -> 896 tiles, 0.149.0, 2026-07-04
 
 The concrete field-work pair, eighteenth batch of the v375-v474 campaign: the rebar weight takeoff and the ready-mix order, in the existing lazy `calc-construction.js` (Group E). The proposed trio's first tile, v429 `concrete-formwork-pressure`, was cut as a duplicate of the existing `formwork-pressure` tile (same ACI 347 lateral-pressure formula capped at the wet head), so only two landed. Catalog **894 -> 896**, package **0.148.0 -> 0.149.0** (a minor). Proposed 2026-07-03.

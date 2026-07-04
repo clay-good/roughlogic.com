@@ -1,6 +1,6 @@
 # roughlogic.com Specification v434 -- Evaporator Design TD and Humidity Band (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the walk-in refrigeration trio (v432 box heat load ->
+> **Status: LANDED (2026-07-04, 0.150.0; proposed 2026-07-03). Third and final tile of the walk-in refrigeration trio (v432 box heat load ->
 > v433 product pull-down -> v434 evaporator TD). `approach-delta-t` is the condenser approach; this tile is the evaporator
 > side -- the design temperature difference between the box and the saturated suction, which sets the coil selection and the
 > humidity the box holds.**

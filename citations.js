@@ -8547,6 +8547,42 @@ export const CITATIONS = {
       { name: "No heat recovery", value: "full rejection at the condenser; no desuperheater split or external motor heat", source: "scope of this tile" },
     ],
   },
+  "walk-in-cooler-load": {
+    formula: "transmission = U x area x deltaT; total = (transmission + infiltration + product + internal) x safety; tons = total / 12000.",
+    edition: "The walk-in cooler/freezer box heat-load method (transmission + infiltration + product + internal, with a safety factor), from ASHRAE Refrigeration, by name.",
+    freeAccess: "The four-component box-load method is standard published refrigeration practice; the ASHRAE Handbook - Refrigeration covers it.",
+    governance: GOVERNANCE.general,
+    editionNote: "The walk-in cooler/freezer heat load as the sum of four components: the transmission (conduction) load = the panel U-factor x the total envelope area x the ambient-to-box temperature difference; the infiltration (air-change and door) load; the product load (the pull-down and respiration heat, see product-pull-down-load); and the internal load from lights, evaporator-fan motors, and people; the subtotal is multiplied by a safety factor (commonly about 1.10). Thicker insulation (a lower U-factor) reduces the transmission and the compressor directly. The evaporator equipment is usually selected for an 18-hour running time, so the equipment capacity = the box load x 24/18. This sums the entered components; the manufacturer's detailed box-load method and the equipment ratings govern the final selection.",
+    assumptions: [
+      { name: "Four components", value: "transmission (U A deltaT) + infiltration + product + internal, x safety", source: "ASHRAE Refrigeration" },
+      { name: "Insulation", value: "a lower U-factor cuts the transmission and the compressor directly", source: "first principles" },
+      { name: "18-hour run", value: "equipment capacity = box load x 24/18 (typical)", source: "refrigeration practice" },
+    ],
+  },
+  "product-pull-down-load": {
+    formula: "above freezing: Q = m cp (t_enter - t_storage); freezing: Q = m cp_above (t_enter - t_freeze) + m hif + m cp_below (t_freeze - t_storage); rate = Q / hours.",
+    edition: "The product pull-down (cooling and freezing) load with the latent heat of fusion, from ASHRAE Refrigeration, by name.",
+    freeAccess: "The sensible-plus-latent product-cooling load is standard published refrigeration practice; the property tables are in the ASHRAE Handbook - Refrigeration.",
+    governance: GOVERNANCE.general,
+    editionNote: "The product pull-down load, the heat removed to bring the product from its entering temperature down to storage over the pull-down period. Above freezing it is a single sensible term = mass x the specific heat x the temperature drop. For a freezer it is three terms: the sensible cooling from the entering temperature to the product's freezing point, plus the latent heat of fusion (mass x hif, usually the largest term), plus the sensible cooling of the now-frozen product from its freezing point to storage (using the lower below-freezing specific heat). The rate = the total heat / the pull-down hours (commonly 24) is the product's contribution to the box load. Respiration heat of live produce is a separate, smaller addition. A sizing aid; the ASHRAE Refrigeration product-property tables (specific heats, freezing points, latent heats) govern.",
+    assumptions: [
+      { name: "Sensible", value: "above freezing Q = m cp (t_enter - t_storage)", source: "calorimetry" },
+      { name: "Freezing", value: "add sensible-to-freezing + m x hif + frozen sensible below", source: "ASHRAE Refrigeration" },
+      { name: "Property tables", value: "specific heats, freezing points, and latent heats from ASHRAE", source: "scope of this tile" },
+    ],
+  },
+  "evaporator-td-dtd": {
+    formula: "DTD = box_temp - saturated_suction_temp; humidity band by DTD (<=10 F ~90% RH ... >16 F <70% RH).",
+    edition: "The evaporator design temperature difference (DTD) and the resulting box-humidity bands, from refrigeration coil-selection practice, by name.",
+    freeAccess: "The DTD-to-humidity relationship is standard published refrigeration coil-selection guidance.",
+    governance: GOVERNANCE.general,
+    editionNote: "The evaporator design temperature difference (DTD) = the box (room) temperature minus the saturated suction temperature at the coil, the single number that sets the resulting box relative humidity. A small DTD (the coil surface running close to the box temperature) condenses less moisture and holds a high relative humidity, right for produce, flowers, and cut greens; a large DTD dries the air, which suits packaged or frozen goods but wilts fresh produce. The customary bands are: DTD <= 10 F gives about 90% RH, 10-12 F about 80-85%, 12-16 F about 75-80%, and above 16 F below 70%. Coil selection trades DTD (humidity) against coil face area (a smaller DTD needs a larger coil for the same capacity). This returns the DTD and the expected band; the coil manufacturer's rating at the design DTD governs the actual capacity and humidity.",
+    assumptions: [
+      { name: "Design TD", value: "DTD = box temperature - saturated suction temperature", source: "coil-selection practice" },
+      { name: "Humidity bands", value: "<=10 F ~90% RH, 10-12 ~80-85%, 12-16 ~75-80%, >16 <70%", source: "refrigeration practice" },
+      { name: "Coil tradeoff", value: "a smaller DTD holds more humidity but needs a larger coil", source: "scope of this tile" },
+    ],
+  },
   "radial-chip-thinning": {
     formula: "r = ae/D; RCTF = (r < 0.5) ? 1/(2 sqrt(r - r^2)) : 1.0; fz_prog = fz_target x RCTF.",
     edition: "The radial-chip-thinning geometry - the chip thinning factor RCTF = 1/(2 sqrt((ae/D) - (ae/D)^2)) for ae below half the cutter diameter and the compensated feed - as compiled in the modern milling and Machinery's Handbook references, by name.",

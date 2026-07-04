@@ -1072,6 +1072,9 @@ const RELATED = {
   "refrigerant-mass-flow": ["refrigerant-velocity","refrigeration-cop","condenser-heat-rejection"],
   "refrigeration-cop": ["refrigerant-mass-flow","condenser-heat-rejection","seer-eer"],
   "condenser-heat-rejection": ["refrigeration-cop","refrigerant-mass-flow","cooling-tower"],
+  "walk-in-cooler-load": ["product-pull-down-load","evaporator-td-dtd","refrigeration-cop","condenser-heat-rejection"],
+  "product-pull-down-load": ["walk-in-cooler-load","evaporator-td-dtd","refrigeration-cop","refrigerant-mass-flow"],
+  "evaporator-td-dtd": ["approach-delta-t","superheat-subcool","walk-in-cooler-load","product-pull-down-load"],
   // spec-v323..v325 engine-build performance batch (Group K)
   "injector-size": ["volumetric-efficiency","displacement-cr","hp-from-torque"],
   "mean-piston-speed": ["displacement-cr","hp-from-torque","injector-size"],

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v433 -- Product Pull-Down Load (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the walk-in refrigeration trio (v432 box heat load -> v433 product
+> **Status: LANDED (2026-07-04, 0.150.0; proposed 2026-07-03). Second tile of the walk-in refrigeration trio (v432 box heat load -> v433 product
 > pull-down -> v434 evaporator TD). `walk-in-cooler-load` takes the product load as a given input; this tile computes it --
 > the heat to cool (and, for a freezer, freeze) the product from its entering temperature to storage over the pull-down
 > time.**

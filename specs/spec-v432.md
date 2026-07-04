@@ -1,6 +1,6 @@
 # roughlogic.com Specification v432 -- Walk-In Cooler Heat Load (calc-refrigerant.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a walk-in refrigeration trio (v432 box heat load -> v433 product pull-down
+> **Status: LANDED (2026-07-04, 0.150.0; proposed 2026-07-03). First tile of a walk-in refrigeration trio (v432 box heat load -> v433 product pull-down
 > -> v434 evaporator TD). The catalog has the refrigeration cycle (`refrigeration-cop`, `refrigerant-mass-flow`,
 > `condenser-heat-rejection`) but never the box heat load that sizes the system -- the sum of transmission, infiltration,
 > product, and internal gains a walk-in cooler must remove.**

@@ -717,3 +717,150 @@ function _v322renderCondenserHeatRejection(inputRegion, outputRegion, citationEl
   for (const f of [q.input, unit.select, cop.input]) f.addEventListener(f === unit.select ? "change" : "input", update);
 }
 REFRIGERANT_RENDERERS["condenser-heat-rejection"] = _v322renderCondenserHeatRejection;
+
+// ===================== spec-v432..v434: walk-in refrigeration trio (Group C) =====================
+
+// dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: dimensionless }
+export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f = 0, infiltration_btuh = 0, product_btuh = 0, internal_btuh = 0, safety = 1.10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const u = Number(u_factor) || 0;
+  const area = Number(area_ft2) || 0;
+  const dt = Number(delta_t_f) || 0;
+  const infil = Number(infiltration_btuh) || 0;
+  const prod = Number(product_btuh) || 0;
+  const internal = Number(internal_btuh) || 0;
+  const sf = Number(safety) > 0 ? Number(safety) : 1.10;
+  if (!(u > 0)) return { error: "Panel U-factor must be positive (Btu/hr-ft^2-F)." };
+  if (!(area > 0)) return { error: "Envelope area must be positive (ft^2)." };
+  if (!(dt > 0)) return { error: "Temperature difference must be positive (F)." };
+  if (infil < 0 || prod < 0 || internal < 0) return { error: "Load components must be non-negative (Btu/hr)." };
+  const transmission_btuh = u * area * dt;
+  const subtotal_btuh = transmission_btuh + infil + prod + internal;
+  const total_btuh = subtotal_btuh * sf;
+  return {
+    transmission_btuh, subtotal_btuh, total_btuh, tons: total_btuh / 12000,
+    note: "Walk-in cooler/freezer heat load: the transmission (conduction) through the panels = U x envelope area x the ambient-to-box temperature difference, plus the infiltration/door load, the product load (see product-pull-down-load), and the internal load (lights, evaporator-fan motors, people), all times a safety factor (commonly 1.10). Thicker insulation (a lower U) shrinks the transmission and the compressor directly. The evaporator is usually sized for an 18-hour run so the equipment total = load x 24/18. A sizing aid; the manufacturer's box-load method and the equipment ratings govern.",
+  };
+}
+export const walkInCoolerLoadExample = { inputs: { u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.10 } };
+function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Walk-in cooler heat load (ASHRAE Refrigeration / box-load practice): transmission = U x area x deltaT, plus infiltration + product + internal loads, times a safety factor (~1.10). Size the evaporator for an ~18-hour run. A sizing aid; the box-load method and equipment ratings govern.";
+  const u = makeNumber("Panel U-factor (4 in ~0.05, 6 in ~0.03)", "wic-u", { step: "any", min: "0" }); u.input.value = "0.05";
+  const area = makeNumber("Envelope area (ft^2)", "wic-a", { step: "any", min: "0" }); area.input.value = "800";
+  const dt = makeNumber("Ambient-to-box deltaT (F)", "wic-dt", { step: "any", min: "0" }); dt.input.value = "60";
+  const infil = makeNumber("Infiltration/door load (Btu/hr)", "wic-inf", { step: "any", min: "0" }); infil.input.value = "3000";
+  const prod = makeNumber("Product load (Btu/hr)", "wic-prod", { step: "any", min: "0" }); prod.input.value = "5000";
+  const internal = makeNumber("Internal load: lights/motors/people (Btu/hr)", "wic-int", { step: "any", min: "0" }); internal.input.value = "1500";
+  const sf = makeNumber("Safety factor (default 1.10)", "wic-sf", { step: "any", min: "0" }); sf.input.value = "1.10";
+  for (const f of [u, area, dt, infil, prod, internal, sf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { u.input.value = "0.05"; area.input.value = "800"; dt.input.value = "60"; infil.input.value = "3000"; prod.input.value = "5000"; internal.input.value = "1500"; sf.input.value = "1.10"; update(); });
+  const oT = makeOutputLine(outputRegion, "Transmission load", "wic-out-t");
+  const oTot = makeOutputLine(outputRegion, "Total load", "wic-out-tot");
+  const oNote = makeOutputLine(outputRegion, "Note", "wic-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: readNum(sf.input) });
+    if (r.error) { oT.textContent = r.error; oTot.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.transmission_btuh, 0) + " Btu/hr";
+    oTot.textContent = fmt(r.total_btuh, 0) + " Btu/hr (" + fmt(r.tons, 2) + " tons)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [u, area, dt, infil, prod, internal, sf]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["walk-in-cooler-load"] = _v432renderWalkInCoolerLoad;
+
+// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, hours: dimensionless } out: { q_btu: M L^2 T^-2, rate_btuh: M L^2 T^-3 }
+export function computeProductPullDownLoad({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, hours = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mass = Number(mass_lb) || 0;
+  const cpa = Number(cp_above) || 0;
+  const tEnter = Number(t_enter_f);
+  const tStore = Number(t_storage_f);
+  const tFreeze = Number(t_freeze_f) || 0;
+  const hif = Number(hif_btu_lb) || 0;
+  const cpb = Number(cp_below) || 0;
+  const hrs = Number(hours) || 0;
+  if (!(mass > 0)) return { error: "Product mass must be positive (lb)." };
+  if (!(cpa > 0)) return { error: "Specific heat above freezing must be positive (Btu/lb-F)." };
+  if (!Number.isFinite(tEnter) || !Number.isFinite(tStore)) return { error: "Enter valid temperatures (F)." };
+  if (!(hrs > 0)) return { error: "Pull-down time must be positive (hr)." };
+  const freezing = tFreeze !== 0 && tStore < tFreeze && hif > 0;
+  let q_btu;
+  if (freezing) {
+    q_btu = mass * cpa * (tEnter - tFreeze) + mass * hif + mass * cpb * (tFreeze - tStore);
+  } else {
+    q_btu = mass * cpa * (tEnter - tStore);
+  }
+  const rate_btuh = q_btu / hrs;
+  return {
+    q_btu, rate_btuh, freezing,
+    note: "Product pull-down (respiration and cooling) load: the heat to bring the product from its entering temperature to storage over the pull-down period. Above freezing it is a single sensible term mass x cp x deltaT; for a freezer it is the sensible cooling to the freezing point, plus the latent heat of fusion (the bulk of the load), plus the sensible cooling of the frozen product to storage. The rate = total heat / the pull-down hours (commonly 24) is the product contribution to the box load. Respiration heat of live produce is a separate, smaller add. A sizing aid; the product property tables (ASHRAE Refrigeration) govern.",
+  };
+}
+export const productPullDownLoadExample = { inputs: { mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, t_freeze_f: 0, hif_btu_lb: 0, cp_below: 0, hours: 24 } };
+function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Product pull-down load (ASHRAE Refrigeration): above freezing Q = m cp deltaT; for a freezer Q = sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen; rate = Q / pull-down hours. A sizing aid; the product property tables govern.";
+  const mass = makeNumber("Product mass (lb)", "ppd-m", { step: "any", min: "0" }); mass.input.value = "2000";
+  const cpa = makeNumber("Specific heat above freezing (Btu/lb-F)", "ppd-cpa", { step: "any", min: "0" }); cpa.input.value = "0.9";
+  const tEnter = makeNumber("Entering temperature (F)", "ppd-te", { step: "any" }); tEnter.input.value = "80";
+  const tStore = makeNumber("Storage (target) temperature (F)", "ppd-ts", { step: "any" }); tStore.input.value = "35";
+  const tFreeze = makeNumber("Freezing point (F, optional for freezers)", "ppd-tf", { step: "any" }); tFreeze.input.value = "";
+  const hif = makeNumber("Latent heat of fusion (Btu/lb, optional)", "ppd-hif", { step: "any", min: "0" }); hif.input.value = "";
+  const cpb = makeNumber("Specific heat below freezing (Btu/lb-F, optional)", "ppd-cpb", { step: "any", min: "0" }); cpb.input.value = "";
+  const hrs = makeNumber("Pull-down time (hr)", "ppd-h", { step: "any", min: "0" }); hrs.input.value = "24";
+  for (const f of [mass, cpa, tEnter, tStore, tFreeze, hif, cpb, hrs]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mass.input.value = "2000"; cpa.input.value = "0.9"; tEnter.input.value = "80"; tStore.input.value = "35"; tFreeze.input.value = ""; hif.input.value = ""; cpb.input.value = ""; hrs.input.value = "24"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Total heat to remove", "ppd-out-q");
+  const oR = makeOutputLine(outputRegion, "Load rate", "ppd-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "ppd-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeProductPullDownLoad({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: readNum(tEnter.input), t_storage_f: readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), hours: readNum(hrs.input) });
+    if (r.error) { oQ.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.freezing ? " (incl. latent freezing)" : "");
+    oR.textContent = fmt(r.rate_btuh, 0) + " Btu/hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [mass, cpa, tEnter, tStore, tFreeze, hif, cpb, hrs]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["product-pull-down-load"] = _v433renderProductPullDownLoad;
+
+// dims: in { box_temp_f: T, sst_f: T } out: { dtd: T }
+export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const box = Number(box_temp_f);
+  const sst = Number(sst_f);
+  if (!Number.isFinite(box) || !Number.isFinite(sst)) return { error: "Enter valid temperatures (F)." };
+  const dtd = box - sst;
+  if (!(dtd > 0)) return { error: "Saturated suction must be below the box temperature (a positive TD is required)." };
+  let band;
+  if (dtd <= 10) band = "~90% RH (produce, flowers, cut greens)";
+  else if (dtd <= 12) band = "~80-85% RH (general walk-in cooler)";
+  else if (dtd <= 16) band = "~75-80% RH (meat, packaged goods)";
+  else band = "<70% RH (low-humidity / frozen storage)";
+  return {
+    dtd, band,
+    note: "Evaporator design TD (DTD) = box temperature - the saturated suction temperature at the coil, the single number that sets the resulting box humidity. A small TD (a coil running close to the box temperature) holds a high relative humidity for produce and flowers; a large TD dries the air, which suits packaged or frozen goods but wilts produce. Common bands: <=10 F ~90% RH, 10-12 F ~80-85%, 12-16 F ~75-80%, >16 F <70%. Coil selection trades TD (humidity) against coil size (a smaller TD needs more coil). A selection aid; the coil manufacturer's rating at the design TD governs.",
+  };
+}
+export const evaporatorTdDtdExample = { inputs: { box_temp_f: 35, sst_f: 25 } };
+function _v434renderEvaporatorTdDtd(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Evaporator design TD (DTD) = box temperature - saturated suction temperature, which sets the box humidity: a small TD holds high RH (produce), a large TD dries the air (packaged/frozen). A selection aid; the coil manufacturer's rating at the design TD governs.";
+  const box = makeNumber("Box (room) temperature (F)", "etd-box", { step: "any" }); box.input.value = "35";
+  const sst = makeNumber("Saturated suction temperature (F)", "etd-sst", { step: "any" }); sst.input.value = "25";
+  for (const f of [box, sst]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { box.input.value = "35"; sst.input.value = "25"; update(); });
+  const oD = makeOutputLine(outputRegion, "Design TD (DTD)", "etd-out-d");
+  const oB = makeOutputLine(outputRegion, "Expected humidity band", "etd-out-b");
+  const oNote = makeOutputLine(outputRegion, "Note", "etd-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEvaporatorTdDtd({ box_temp_f: readNum(box.input), sst_f: readNum(sst.input) });
+    if (r.error) { oD.textContent = r.error; oB.textContent = "-"; oNote.textContent = ""; return; }
+    oD.textContent = fmt(r.dtd, 1) + " F";
+    oB.textContent = r.band;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [box, sst]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["evaporator-td-dtd"] = _v434renderEvaporatorTdDtd;

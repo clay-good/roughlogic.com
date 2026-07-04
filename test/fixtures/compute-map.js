@@ -746,6 +746,9 @@ export const COMPUTE_MAP = {
   "refrigerant-mass-flow": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantMassFlow" },
   "refrigeration-cop": { module: "../../calc-refrigerant.js", fn: "computeRefrigerationCop" },
   "condenser-heat-rejection": { module: "../../calc-refrigerant.js", fn: "computeCondenserHeatRejection" },
+  "walk-in-cooler-load": { module: "../../calc-refrigerant.js", fn: "computeWalkInCoolerLoad" },
+  "product-pull-down-load": { module: "../../calc-refrigerant.js", fn: "computeProductPullDownLoad" },
+  "evaporator-td-dtd": { module: "../../calc-refrigerant.js", fn: "computeEvaporatorTdDtd" },
   // spec-v323..v325 engine-build performance batch (3 tiles)
   "injector-size": { module: "../../calc-mechanic.js", fn: "computeInjectorSize" },
   "mean-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMeanPistonSpeed" },

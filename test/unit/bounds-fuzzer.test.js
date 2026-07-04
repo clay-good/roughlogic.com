@@ -16042,3 +16042,48 @@ test("bounds: spec-v431 computeReadyMixConcreteOrder pins the order, trucks, sho
   assert.ok("error" in _v431({ volume_yd3: 42, waste_pct: -1, load_yd3: 10 }));
   assert.ok("error" in _v431({ volume_yd3: Infinity, waste_pct: 8, load_yd3: 10 }));
 });
+
+// ===================== spec-v432..v434 walk-in refrigeration trio (calc-refrigerant.js) =====================
+import { computeWalkInCoolerLoad as _v432, computeProductPullDownLoad as _v433, computeEvaporatorTdDtd as _v434 } from "../../calc-refrigerant.js";
+
+test("bounds: spec-v432 computeWalkInCoolerLoad pins the components, the safety factor, and error seams", () => {
+  const r = _v432({ u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.10 });
+  assert.ok(Math.abs(r.transmission_btuh - 2400) < 1e-9);
+  assert.ok(Math.abs(r.subtotal_btuh - 11900) < 1e-9);
+  assert.ok(Math.abs(r.total_btuh - 13090) < 1e-6 && Math.abs(r.tons - 13090 / 12000) < 1e-9);
+  // A lower U-factor shrinks the load.
+  assert.ok(_v432({ u_factor: 0.03, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.10 }).total_btuh < r.total_btuh);
+  // Error seams.
+  assert.ok("error" in _v432({ u_factor: 0, area_ft2: 800, delta_t_f: 60 }));
+  assert.ok("error" in _v432({ u_factor: 0.05, area_ft2: 0, delta_t_f: 60 }));
+  assert.ok("error" in _v432({ u_factor: 0.05, area_ft2: 800, delta_t_f: 0 }));
+  assert.ok("error" in _v432({ u_factor: Infinity, area_ft2: 800, delta_t_f: 60 }));
+});
+
+test("bounds: spec-v433 computeProductPullDownLoad pins sensible and freezing paths and error seams", () => {
+  const sens = _v433({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: 24 });
+  assert.ok(Math.abs(sens.q_btu - 81000) < 1e-6 && Math.abs(sens.rate_btuh - 3375) < 1e-6 && sens.freezing === false);
+  // The freezing path adds the latent heat of fusion (the bulk).
+  const fr = _v433({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 0, t_freeze_f: 28, hif_btu_lb: 120, cp_below: 0.45, hours: 24 });
+  assert.ok(Math.abs(fr.q_btu - 358800) < 1e-6 && fr.freezing === true && fr.q_btu > sens.q_btu);
+  // Error seams.
+  assert.ok("error" in _v433({ mass_lb: 0, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: 24 }));
+  assert.ok("error" in _v433({ mass_lb: 2000, cp_above: 0, t_enter_f: 80, t_storage_f: 35, hours: 24 }));
+  assert.ok("error" in _v433({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: 0 }));
+  assert.ok("error" in _v433({ mass_lb: Infinity, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: 24 }));
+});
+
+test("bounds: spec-v434 computeEvaporatorTdDtd pins the TD, the humidity band, and error seams", () => {
+  const r = _v434({ box_temp_f: 35, sst_f: 25 });
+  assert.ok(Math.abs(r.dtd - 10) < 1e-9 && /90% RH/.test(r.band));
+  // A larger TD dries the air.
+  const dry = _v434({ box_temp_f: 35, sst_f: 17 });
+  assert.ok(Math.abs(dry.dtd - 18) < 1e-9 && /< ?70% RH/.test(dry.band));
+  // Band boundaries.
+  assert.ok(/80-85% RH/.test(_v434({ box_temp_f: 35, sst_f: 24 }).band)); // TD 11
+  assert.ok(/75-80% RH/.test(_v434({ box_temp_f: 35, sst_f: 21 }).band)); // TD 14
+  // Error seams: SST >= box, non-finite.
+  assert.ok("error" in _v434({ box_temp_f: 35, sst_f: 40 }));
+  assert.ok("error" in _v434({ box_temp_f: 35, sst_f: 35 }));
+  assert.ok("error" in _v434({ box_temp_f: Infinity, sst_f: 25 }));
+});

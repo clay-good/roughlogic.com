@@ -271,6 +271,8 @@ const TOOL_MODULES = (() => {
     "refrigerant-charging",
     // spec-v320..v322 refrigeration-cycle batch
     "refrigerant-mass-flow", "refrigeration-cop", "condenser-heat-rejection",
+    // spec-v432..v434 walk-in refrigeration
+    "walk-in-cooler-load", "product-pull-down-load", "evaporator-td-dtd",
   ]);
   // spec-v81 cap-relief split: the cohesive spec-v16 "Group C expansion" batch
   // (seven first-principles HVAC engineering tiles) relocated out of calc-hvac.js

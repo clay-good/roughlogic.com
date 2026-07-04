@@ -41404,6 +41404,163 @@
           }
         }
       }
+    },
+    {
+      "tile_id": "walk-in-cooler-load",
+      "source_publisher": "ASHRAE Refrigeration",
+      "source_title": "U 0.05, 800 ft^2, dT 60, +3000/5000/1500, 1.10 -> 13,090 Btu/hr (1.09 tons)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v432 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "u_factor": 0.05,
+        "area_ft2": 800,
+        "delta_t_f": 60,
+        "infiltration_btuh": 3000,
+        "product_btuh": 5000,
+        "internal_btuh": 1500,
+        "safety": 1.1
+      },
+      "outputs": {
+        "transmission_btuh": {
+          "value": 2400,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "total_btuh": {
+          "value": 13090,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "walk-in-cooler-load",
+      "source_publisher": "ASHRAE Refrigeration",
+      "source_title": "cross-check: a 6 in panel (U 0.03) cuts the total to 12,034 Btu/hr",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v432 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "u_factor": 0.03,
+        "area_ft2": 800,
+        "delta_t_f": 60,
+        "infiltration_btuh": 3000,
+        "product_btuh": 5000,
+        "internal_btuh": 1500,
+        "safety": 1.1
+      },
+      "outputs": {
+        "total_btuh": {
+          "value": 12034,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "product-pull-down-load",
+      "source_publisher": "ASHRAE Refrigeration",
+      "source_title": "2000 lb produce, cp 0.9, 80 -> 35 F, 24 hr -> 81,000 Btu, 3,375 Btu/hr",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v433 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "mass_lb": 2000,
+        "cp_above": 0.9,
+        "t_enter_f": 80,
+        "t_storage_f": 35,
+        "hours": 24
+      },
+      "outputs": {
+        "q_btu": {
+          "value": 81000,
+          "tolerance": {
+            "pct": 0.5
+          }
+        },
+        "rate_btuh": {
+          "value": 3375,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "product-pull-down-load",
+      "source_publisher": "ASHRAE Refrigeration",
+      "source_title": "cross-check: freezing to 0 F (freeze 28, hif 120, cp_below 0.45) -> 358,800 Btu",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v433 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "mass_lb": 2000,
+        "cp_above": 0.9,
+        "t_enter_f": 80,
+        "t_storage_f": 0,
+        "t_freeze_f": 28,
+        "hif_btu_lb": 120,
+        "cp_below": 0.45,
+        "hours": 24
+      },
+      "outputs": {
+        "q_btu": {
+          "value": 358800,
+          "tolerance": {
+            "pct": 0.5
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "evaporator-td-dtd",
+      "source_publisher": "ASHRAE Refrigeration",
+      "source_title": "35 F box, 25 F SST -> 10 F TD, ~90% RH (produce)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v434 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "box_temp_f": 35,
+        "sst_f": 25
+      },
+      "outputs": {
+        "dtd": {
+          "value": 10,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
+    },
+    {
+      "tile_id": "evaporator-td-dtd",
+      "source_publisher": "ASHRAE Refrigeration",
+      "source_title": "cross-check: a 17 F suction gives 18 F TD, <70% RH (drying coil)",
+      "source_edition_or_year": "spec worked example (machine-verified)",
+      "source_section_or_page": "spec-v434 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": {
+        "box_temp_f": 35,
+        "sst_f": 17
+      },
+      "outputs": {
+        "dtd": {
+          "value": 18,
+          "tolerance": {
+            "abs": 0
+          }
+        }
+      }
     }
   ]
 }
