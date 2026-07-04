@@ -9375,6 +9375,42 @@ export const CITATIONS = {
       { name: "Member design separate", value: "the stem and base are reinforced-concrete members with their own flexure / shear / development checks (see the ACI 318-19 tiles)", source: "ACI 318-19" },
     ],
   },
+  "consolidation-time-rate": {
+    formula: "Tv = (pi/4)(U/100)^2 for U <= 60%, else 1.781 - 0.933 log10(100 - U); t = Tv Hdr^2 / cv.",
+    edition: "Terzaghi one-dimensional consolidation theory (time factor Tv), as compiled in Das, Principles of Geotechnical Engineering, by name.",
+    freeAccess: "The Terzaghi time-factor series and the t = Tv Hdr^2/cv relation are standard published soil-mechanics results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Terzaghi's one-dimensional consolidation time: the dimensionless time factor Tv = (pi/4)(U/100)^2 for a degree of consolidation U <= 60% and 1.781 - 0.933 log10(100 - U) above, and the elapsed time t = Tv Hdr^2 / cv. The drainage path Hdr is the longest distance water travels to a drainage boundary - the full clay-layer thickness for single (one-way) drainage or half the thickness for double (two-way) drainage - so mis-identifying it changes the time by a factor of four. The consolidation decelerates, so the last increment of settlement takes disproportionately long. This returns Tv and the time; it does not compute the settlement magnitude (see the settlement tiles) or account for secondary compression. A design aid; the engineer of record and the site-specific cv from an oedometer test govern.",
+    assumptions: [
+      { name: "Time factor", value: "Tv = (pi/4)(U/100)^2 (U <= 60%), else 1.781 - 0.933 log10(100 - U)", source: "Terzaghi consolidation theory" },
+      { name: "Time", value: "t = Tv Hdr^2 / cv", source: "Das, Principles of Geotechnical Engineering" },
+      { name: "Drainage path", value: "Hdr = full layer (single) or half (double drainage)", source: "scope of this tile" },
+    ],
+  },
+  "spt-bearing-capacity": {
+    formula: "qa_base = N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2; Kd = min(1 + 0.33 D/B, 1.33); qa = qa_base Kd (ksf, 1 in settlement).",
+    edition: "The Meyerhof SPT settlement-based allowable bearing on sand, as compiled in Das, Principles of Foundation Engineering, by name.",
+    freeAccess: "The Meyerhof N-value allowable-bearing correlations are standard published foundation-engineering results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Meyerhof allowable soil bearing pressure on sand for a 1 inch (25 mm) settlement, from the energy-corrected SPT blow count N60: qa = N60/4 ksf for a footing width B <= 4 ft, or (N60/6)((B+1)/B)^2 for wider footings, multiplied by the depth (embedment) factor Kd = 1 + 0.33 D/B capped at 1.33. Because this is a settlement-controlled (serviceability) allowable, no additional factor of safety is applied. The N60 must already be energy-corrected (and, for design, overburden-corrected per the reference used); a high water table near the footing roughly halves the capacity and is not applied here. This returns the allowable; it does not check the ultimate bearing capacity or global settlement. A design aid; the engineer of record and the geotechnical report govern.",
+    assumptions: [
+      { name: "Allowable bearing", value: "N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2, x Kd", source: "Meyerhof / Das" },
+      { name: "Depth factor", value: "Kd = min(1 + 0.33 D/B, 1.33)", source: "Meyerhof" },
+      { name: "Settlement-controlled", value: "1 in settlement allowable; no added FS; N60 energy-corrected", source: "scope of this tile" },
+    ],
+  },
+  "liquefaction-screening": {
+    formula: "rd = 1 - 0.00765 z (z <= 9.15 m) else 1.174 - 0.0267 z; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
+    edition: "The Seed-Idriss simplified liquefaction-triggering procedure (NCEER/NSF workshop consensus), by name.",
+    freeAccess: "The Seed-Idriss simplified CSR/CRR procedure and the rd relation are standard published earthquake-geotechnical results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction coefficient rd = 1 - 0.00765 z for a depth z <= 9.15 m (else 1.174 - 0.0267 z), the earthquake-induced cyclic stress ratio CSR = 0.65 amax (sigma_v / sigma'_v) rd, and the factor of safety FS = (CRR / CSR) x MSF, with liquefaction triggered when FS < 1. The cyclic resistance ratio CRR is read from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor MSF adjusts from the Mw 7.5 reference event. This is a screening tool for level ground; a site-specific triggering analysis, the fines-content correction, the overburden correction, and the post-liquefaction settlement/lateral-spread evaluation are the geotechnical engineer's work. A design aid; the geotechnical engineer of record governs.",
+    assumptions: [
+      { name: "Cyclic stress ratio", value: "CSR = 0.65 amax (sigma_v/sigma'_v) rd", source: "Seed-Idriss" },
+      { name: "Factor of safety", value: "FS = (CRR/CSR) x MSF; liquefiable if FS < 1", source: "Seed-Idriss / NCEER" },
+      { name: "Screening only", value: "level ground; fines/overburden corrections and settlement are separate", source: "scope of this tile" },
+    ],
+  },
   "cmu-wall-flexure": {
     formula: "n = Es/Em (Em = 900 f'm); rho = As/(b d); k = sqrt(2 rho n + (rho n)^2) - rho n; j = 1 - k/3; Ms = As Fs j d; Mm = 0.5 Fb k j b d^2 (Fb = 0.45 f'm); Ma = min(Ms, Mm).",
     edition: "TMS 402-16 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress-design cracked transformed-section flexure, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",

@@ -490,3 +490,117 @@ GEOTECH_RENDERERS["boussinesq-surcharge-wall"] = _simpleRenderer({
   ],
   compute: computeBoussinesqSurchargeWall,
 });
+
+// ===================== spec-v414..v416: geotechnical settlement/foundation trio (Group E) =====================
+
+// dims: in { u_percent: dimensionless, cv_ft2_day: dimensionless, hdr_ft: L } out: { tv: dimensionless, t_days: dimensionless }
+export function computeConsolidationTimeRate({ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const u = Number(u_percent) || 0;
+  const cv = Number(cv_ft2_day) || 0;
+  const hdr = Number(hdr_ft) || 0;
+  if (!(u > 0 && u < 100)) return { error: "Degree of consolidation must be between 0 and 100%." };
+  if (!(cv > 0)) return { error: "Coefficient of consolidation cv must be positive (ft^2/day)." };
+  if (!(hdr > 0)) return { error: "Drainage path Hdr must be positive (ft)." };
+  const tv = u <= 60 ? (Math.PI / 4) * Math.pow(u / 100, 2) : 1.781 - 0.933 * Math.log10(100 - u);
+  const t_days = tv * hdr * hdr / cv;
+  return {
+    tv, t_days, t_years: t_days / 365.25,
+    note: "Terzaghi one-dimensional consolidation time: the time factor Tv = (pi/4)(U/100)^2 for U <= 60% and 1.781 - 0.933 log10(100 - U) above, then the time t = Tv Hdr^2 / cv. Hdr is the longest drainage path - the full layer thickness for single (one-way) drainage, or half the thickness for double (two-way) drainage - so mis-setting it changes the time by a factor of four. The decelerating curve means the last increment of settlement takes far longer than the first. A design aid; the engineer of record and the site-specific cv govern.",
+  };
+}
+export const consolidationTimeRateExample = { inputs: { u_percent: 90, cv_ft2_day: 0.1, hdr_ft: 10 } };
+GEOTECH_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
+  citation: "Citation: Terzaghi 1-D consolidation time factor: Tv = (pi/4)(U/100)^2 for U <= 60%, else 1.781 - 0.933 log10(100 - U); time t = Tv Hdr^2 / cv, with Hdr the longest drainage path (full layer for single, half for double drainage). A design aid; the engineer of record and the site cv govern.",
+  example: consolidationTimeRateExample.inputs,
+  fields: [
+    { key: "u_percent", label: "Target degree of consolidation U (%)", kind: "number", default: 90 },
+    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft^2/day)", kind: "number", default: 0.1 },
+    { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "tv", id: "ctr-out-tv", label: "Time factor Tv", value: (r) => fmt(r.tv, 3) },
+    { key: "t", id: "ctr-out-t", label: "Time to reach U", value: (r) => fmt(r.t_days, 0) + " days (" + fmt(r.t_years, 2) + " yr)" },
+    { key: "n", id: "ctr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConsolidationTimeRate,
+});
+
+// dims: in { n60: dimensionless, b_ft: L, d_ft: L } out: { qa_base_ksf: M L^-1 T^-2, kd: dimensionless, qa_ksf: M L^-1 T^-2 }
+export function computeSptBearingCapacity({ n60 = 0, b_ft = 0, d_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(n60) || 0;
+  const b = Number(b_ft) || 0;
+  const d = Number(d_ft) || 0;
+  if (!(n > 0)) return { error: "SPT N60 must be positive." };
+  if (!(b > 0)) return { error: "Footing width B must be positive (ft)." };
+  if (!(d > 0)) return { error: "Embedment depth D must be positive (ft)." };
+  const qa_base_ksf = b <= 4 ? n / 4 : (n / 6) * Math.pow((b + 1) / b, 2);
+  const kd = Math.min(1 + 0.33 * d / b, 1.33);
+  const qa_ksf = qa_base_ksf * kd;
+  return {
+    qa_base_ksf, kd, qa_ksf, small_footing: b <= 4,
+    note: "Meyerhof allowable soil bearing on sand for a 1 inch settlement, from the energy-corrected SPT N60: qa = N60/4 (ksf) for B <= 4 ft, or (N60/6)((B+1)/B)^2 for wider footings, times the depth factor Kd = 1 + 0.33 D/B (capped at 1.33). This is a settlement-controlled allowable, not the ultimate bearing capacity, so no additional factor of safety applies. The N60 must be energy-corrected; a shallow water table roughly halves the capacity (not applied here). A design aid; the engineer of record and the geotechnical report govern.",
+  };
+}
+export const sptBearingCapacityExample = { inputs: { n60: 20, b_ft: 6, d_ft: 2 } };
+GEOTECH_RENDERERS["spt-bearing-capacity"] = _simpleRenderer({
+  citation: "Citation: Meyerhof SPT allowable bearing on sand for 1 in settlement: qa = N60/4 ksf for B <= 4 ft, else (N60/6)((B+1)/B)^2, times Kd = min(1 + 0.33 D/B, 1.33). A settlement-controlled allowable (no added factor of safety); N60 must be energy-corrected. A design aid; the engineer of record and the geotechnical report govern.",
+  example: sptBearingCapacityExample.inputs,
+  fields: [
+    { key: "n60", label: "SPT N60 (energy-corrected)", kind: "number", default: 20 },
+    { key: "b_ft", label: "Footing width B (ft)", kind: "number", default: 6 },
+    { key: "d_ft", label: "Embedment depth D (ft)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "qab", id: "spt-out-qab", label: "Base allowable (before depth factor)", value: (r) => fmt(r.qa_base_ksf, 2) + " ksf (" + (r.small_footing ? "B <= 4 branch" : "wide-footing branch") + ")" },
+    { key: "kd", id: "spt-out-kd", label: "Depth factor Kd", value: (r) => fmt(r.kd, 2) },
+    { key: "qa", id: "spt-out-qa", label: "Allowable bearing qa", value: (r) => fmt(r.qa_ksf, 2) + " ksf" },
+    { key: "n", id: "spt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSptBearingCapacity,
+});
+
+// dims: in { amax_g: dimensionless, sigma_v_psf: M L^-1 T^-2, sigma_vp_psf: M L^-1 T^-2, depth_m: L, crr: dimensionless, msf: dimensionless } out: { rd: dimensionless, csr: dimensionless, fs: dimensionless }
+export function computeLiquefactionScreening({ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_m = 0, crr = 0, msf = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const amax = Number(amax_g) || 0;
+  const sv = Number(sigma_v_psf) || 0;
+  const svp = Number(sigma_vp_psf) || 0;
+  const depth = Number(depth_m) || 0;
+  const crrv = Number(crr) || 0;
+  const msfv = Number(msf) || 0;
+  if (!(amax > 0)) return { error: "Peak ground acceleration must be positive (g)." };
+  if (!(sv > 0)) return { error: "Total vertical stress must be positive (psf)." };
+  if (!(svp > 0)) return { error: "Effective vertical stress must be positive (psf)." };
+  if (!(svp <= sv)) return { error: "Effective stress cannot exceed the total stress." };
+  if (!(depth > 0)) return { error: "Depth must be positive (m)." };
+  if (!(crrv > 0)) return { error: "Cyclic resistance ratio CRR must be positive." };
+  if (!(msfv > 0)) return { error: "Magnitude scaling factor must be positive." };
+  const rd = depth <= 9.15 ? 1 - 0.00765 * depth : 1.174 - 0.0267 * depth;
+  const csr = 0.65 * amax * (sv / svp) * rd;
+  const fs = (crrv / csr) * msfv;
+  return {
+    rd, csr, fs, liquefiable: fs < 1.0,
+    note: "Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction factor rd = 1 - 0.00765 z for z <= 9.15 m (else 1.174 - 0.0267 z), the cyclic stress ratio CSR = 0.65 amax (sigma_v/sigma'_v) rd, and the factor of safety FS = (CRR/CSR) x MSF, with liquefaction triggered when FS < 1. CRR comes from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor adjusts from the Mw 7.5 reference. This is a screening tool for level ground; a site-specific analysis, the fines correction, and the post-liquefaction settlement are the engineer's work. A design aid; the geotechnical engineer of record governs.",
+  };
+}
+export const liquefactionScreeningExample = { inputs: { amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20, msf: 1.0 } };
+GEOTECH_RENDERERS["liquefaction-screening"] = _simpleRenderer({
+  citation: "Citation: Seed-Idriss simplified liquefaction triggering: rd = 1 - 0.00765 z (z <= 9.15 m) else 1.174 - 0.0267 z, CSR = 0.65 amax (sigma_v/sigma'_v) rd, FS = (CRR/CSR) MSF, liquefiable if FS < 1. A screening tool for level ground; the geotechnical engineer of record and a site-specific analysis govern.",
+  example: liquefactionScreeningExample.inputs,
+  fields: [
+    { key: "amax_g", label: "Peak ground acceleration (g)", kind: "number", default: 0.30 },
+    { key: "sigma_v_psf", label: "Total vertical stress (psf)", kind: "number", default: 2000 },
+    { key: "sigma_vp_psf", label: "Effective vertical stress (psf)", kind: "number", default: 1200 },
+    { key: "depth_m", label: "Depth (m)", kind: "number", default: 5 },
+    { key: "crr", label: "Cyclic resistance ratio CRR", kind: "number", default: 0.20 },
+    { key: "msf", label: "Magnitude scaling factor (Mw 7.5 = 1.0)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "csr", id: "liq-out-csr", label: "Cyclic stress ratio CSR", value: (r) => fmt(r.csr, 3) + " (rd " + fmt(r.rd, 3) + ")" },
+    { key: "fs", id: "liq-out-fs", label: "Factor of safety FS", value: (r) => fmt(r.fs, 2) + (r.liquefiable ? " -- LIQUEFIABLE (FS < 1)" : " -- not liquefiable") },
+    { key: "n", id: "liq-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLiquefactionScreening,
+});

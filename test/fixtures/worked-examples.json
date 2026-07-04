@@ -28091,6 +28091,88 @@
       }
     },
     {
+      "tile_id": "consolidation-time-rate",
+      "source_publisher": "Terzaghi consolidation theory",
+      "source_title": "U 90%, cv 0.1 ft^2/day, Hdr 10 ft -> Tv 0.848, 848 days",
+      "source_edition_or_year": "spec-v414 worked example (machine-verified)",
+      "source_section_or_page": "spec-v414 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "u_percent": 90, "cv_ft2_day": 0.1, "hdr_ft": 10 },
+      "outputs": {
+        "tv": { "value": 0.848, "tolerance": { "pct": 0.5 } },
+        "t_days": { "value": 848, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "consolidation-time-rate",
+      "source_publisher": "Terzaghi consolidation theory",
+      "source_title": "cross-check: U 50% -> Tv 0.196, 196 days (the decelerating curve)",
+      "source_edition_or_year": "spec-v414 worked example (machine-verified)",
+      "source_section_or_page": "spec-v414 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "u_percent": 50, "cv_ft2_day": 0.1, "hdr_ft": 10 },
+      "outputs": {
+        "t_days": { "value": 196, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "spt-bearing-capacity",
+      "source_publisher": "Meyerhof / Das",
+      "source_title": "N60 20, B 6 ft, D 2 ft -> base 4.54, Kd 1.11, qa 5.04 ksf",
+      "source_edition_or_year": "spec-v415 worked example (machine-verified)",
+      "source_section_or_page": "spec-v415 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "n60": 20, "b_ft": 6, "d_ft": 2 },
+      "outputs": {
+        "qa_base_ksf": { "value": 4.537, "tolerance": { "pct": 0.5 } },
+        "qa_ksf": { "value": 5.036, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "spt-bearing-capacity",
+      "source_publisher": "Meyerhof / Das",
+      "source_title": "cross-check: a narrow B 3 ft footing uses the N60/4 branch -> 5.00 ksf base",
+      "source_edition_or_year": "spec-v415 worked example (machine-verified)",
+      "source_section_or_page": "spec-v415 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "n60": 20, "b_ft": 3, "d_ft": 2 },
+      "outputs": {
+        "qa_base_ksf": { "value": 5.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "liquefaction-screening",
+      "source_publisher": "Seed-Idriss",
+      "source_title": "amax 0.30g, sv 2000, s'v 1200 psf, z 5 m, CRR 0.20 -> CSR 0.313, FS 0.64, liquefiable",
+      "source_edition_or_year": "spec-v416 worked example (machine-verified)",
+      "source_section_or_page": "spec-v416 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "amax_g": 0.30, "sigma_v_psf": 2000, "sigma_vp_psf": 1200, "depth_m": 5, "crr": 0.20, "msf": 1.0 },
+      "outputs": {
+        "rd": { "value": 0.962, "tolerance": { "pct": 0.5 } },
+        "csr": { "value": 0.313, "tolerance": { "pct": 0.5 } },
+        "fs": { "value": 0.64, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "liquefaction-screening",
+      "source_publisher": "Seed-Idriss",
+      "source_title": "cross-check: denser sand (CRR 0.40) -> FS 1.28, not liquefiable",
+      "source_edition_or_year": "spec-v416 worked example (machine-verified)",
+      "source_section_or_page": "spec-v416 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "amax_g": 0.30, "sigma_v_psf": 2000, "sigma_vp_psf": 1200, "depth_m": 5, "crr": 0.40, "msf": 1.0 },
+      "outputs": {
+        "fs": { "value": 1.28, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
       "tile_id": "cmu-wall-flexure",
       "source_publisher": "TMS 402-16 (ACI 530 / ASCE 5) via Masonry Designers' Guide / CMHA TEK 14-07C",
       "source_title": "8 in fully grouted wall, #5 at 24 in, f'm 2,000 psi -> k 0.280 / j 0.907, Ma 1,428 lb-ft per foot, steel-governed",

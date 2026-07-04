@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): land spec-v414..v416 -- 3 geotechnical settlement/foundation tiles in calc-geotech.js; 882 -> 885 tiles, 0.145.0, 2026-07-04
+
+The geotechnical settlement/foundation trio, fourteenth batch of the v375-v474 campaign: the consolidation time, the SPT allowable bearing, and the liquefaction screen, all in the existing lazy `calc-geotech.js` (Group E); no new module, group, or dependency. Catalog **882 -> 885**, package **0.144.0 -> 0.145.0** (a minor). Proposed 2026-07-03.
+
+- **`consolidation-time-rate` (spec-v414).** Terzaghi Tv piecewise, t = Tv Hdr^2/cv. Pinned: U 90%, cv 0.1 ft^2/day, Hdr 10 ft -> Tv 0.848, 848 days; U 50% -> 196 days (the decelerating curve). Hdr is half the layer for double drainage (a 4x time swing).
+- **`spt-bearing-capacity` (spec-v415).** Meyerhof qa = N60/4 or (N60/6)((B+1)/B)^2, x Kd = min(1 + 0.33 D/B, 1.33). Pinned: N60 20, B 6, D 2 -> 4.54 base, Kd 1.11, 5.04 ksf; a 3 ft footing uses the N60/4 branch -> 5.00 ksf. A 1 in settlement allowable.
+- **`liquefaction-screening` (spec-v416).** Seed-Idriss rd, CSR = 0.65 amax (sv/s'v) rd, FS = (CRR/CSR) MSF. Pinned: amax 0.30g, sv 2000, s'v 1200 psf, z 5 m, CRR 0.20 -> CSR 0.313, FS 0.64, liquefiable; CRR 0.40 -> FS 1.28.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the piecewise Tv, both bearing branches and the Kd cap, the CSR/FS trigger and both rd branches, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming Terzaghi, Meyerhof, and Seed-Idriss. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory). Module cap bumped with a dated comment: calc-geotech.js 13500 -> 16500. Housekeeping: home count 882 -> 885, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 77 appended. All gates green at the new state: lint, unit tests (**5,178**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(steel): land spec-v411..v413 -- 3 steel composite-beam tiles in calc-steel.js; 879 -> 882 tiles, 0.144.0, 2026-07-04
 
 The steel composite-beam trio, thirteenth batch of the v375-v474 campaign: the shear-stud strength, the composite flexural strength, and the beam camber, all in the existing lazy `calc-steel.js` (Group E); no new module, group, or dependency. Catalog **879 -> 882**, package **0.143.0 -> 0.144.0** (a minor). Proposed 2026-07-03.

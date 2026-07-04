@@ -1,6 +1,6 @@
 # roughlogic.com Specification v414 -- Consolidation Time Rate (Terzaghi) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a geotechnical settlement/foundation trio (v414 consolidation time rate ->
+> **Status: LANDED (2026-07-04, 0.145.0; proposed 2026-07-03). First tile of a geotechnical settlement/foundation trio (v414 consolidation time rate ->
 > v415 SPT bearing capacity -> v416 liquefaction screening). `soil-consolidation-settlement` gives how much a clay layer
 > will settle; this tile gives how long it takes -- the time rate a schedule and a surcharge program depend on.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. `soil-consolidation-settlement` explicitly computes

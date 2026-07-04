@@ -1,6 +1,6 @@
 # roughlogic.com Specification v416 -- Liquefaction Triggering Screening (Seed-Idriss CSR) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the geotechnical settlement/foundation trio (v414 consolidation
+> **Status: LANDED (2026-07-04, 0.145.0; proposed 2026-07-03). Third and final tile of the geotechnical settlement/foundation trio (v414 consolidation
 > time -> v415 SPT bearing -> v416 liquefaction screening). Saturated loose sand can turn to liquid in an earthquake; this
 > tile runs the simplified Seed-Idriss screening -- the seismic demand (cyclic stress ratio) against the soil's resistance
 > and the resulting factor of safety.**

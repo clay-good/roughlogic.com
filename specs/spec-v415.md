@@ -1,6 +1,6 @@
 # roughlogic.com Specification v415 -- SPT Allowable Bearing on Sand (Meyerhof) (calc-geotech.js, Group E, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the geotechnical settlement/foundation trio (v414 consolidation time ->
+> **Status: LANDED (2026-07-04, 0.145.0; proposed 2026-07-03). Second tile of the geotechnical settlement/foundation trio (v414 consolidation time ->
 > v415 SPT bearing -> v416 liquefaction screening). `soil-bearing-capacity` gives the shear-strength (Vesic) bearing from
 > `c` and `phi`; on sand, settlement governs, and this tile gives the settlement-limited allowable bearing straight from the
 > SPT blow count -- the number a field engineer actually has.**

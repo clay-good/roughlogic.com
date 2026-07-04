@@ -15811,3 +15811,57 @@ test("bounds: spec-v413 computeSteelCamber pins the deflection, the 1/4-in round
   assert.ok("error" in _v413({ w_kip_ft: 1.0, span_ft: 40, moi_in4: 2100, fraction: 1.5 }));
   assert.ok("error" in _v413({ w_kip_ft: Infinity, span_ft: 40, moi_in4: 2100 }));
 });
+
+// ===================== spec-v414..v416 geotechnical settlement/foundation trio (calc-geotech.js) =====================
+import { computeConsolidationTimeRate as _v414, computeSptBearingCapacity as _v415, computeLiquefactionScreening as _v416 } from "../../calc-geotech.js";
+
+test("bounds: spec-v414 computeConsolidationTimeRate pins the piecewise Tv, the time, and error seams", () => {
+  const r = _v414({ u_percent: 90, cv_ft2_day: 0.1, hdr_ft: 10 });
+  assert.ok(Math.abs(r.tv - (1.781 - 0.933 * Math.log10(10))) < 1e-9);
+  assert.ok(Math.abs(r.t_days - 848) < 1);
+  // The U <= 60 branch uses the parabolic form.
+  const half = _v414({ u_percent: 50, cv_ft2_day: 0.1, hdr_ft: 10 });
+  assert.ok(Math.abs(half.tv - (Math.PI / 4) * 0.25) < 1e-9 && Math.abs(half.t_days - 196) < 1);
+  // Doubling the drainage path quadruples the time.
+  assert.ok(Math.abs(_v414({ u_percent: 90, cv_ft2_day: 0.1, hdr_ft: 20 }).t_days - 4 * r.t_days) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v414({ u_percent: 100, cv_ft2_day: 0.1, hdr_ft: 10 }));
+  assert.ok("error" in _v414({ u_percent: 90, cv_ft2_day: 0, hdr_ft: 10 }));
+  assert.ok("error" in _v414({ u_percent: 90, cv_ft2_day: 0.1, hdr_ft: 0 }));
+  assert.ok("error" in _v414({ u_percent: 90, cv_ft2_day: Infinity, hdr_ft: 10 }));
+});
+
+test("bounds: spec-v415 computeSptBearingCapacity pins both branches, the depth factor, and error seams", () => {
+  const r = _v415({ n60: 20, b_ft: 6, d_ft: 2 });
+  assert.ok(Math.abs(r.qa_base_ksf - (20 / 6) * Math.pow(7 / 6, 2)) < 1e-9 && r.small_footing === false);
+  assert.ok(Math.abs(r.kd - (1 + 0.33 * 2 / 6)) < 1e-9);
+  assert.ok(Math.abs(r.qa_ksf - r.qa_base_ksf * r.kd) < 1e-9);
+  // A narrow footing uses the N60/4 branch.
+  const narrow = _v415({ n60: 20, b_ft: 3, d_ft: 2 });
+  assert.ok(Math.abs(narrow.qa_base_ksf - 5.0) < 1e-9 && narrow.small_footing === true);
+  // The depth factor is capped at 1.33.
+  assert.ok(Math.abs(_v415({ n60: 20, b_ft: 6, d_ft: 100 }).kd - 1.33) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v415({ n60: 0, b_ft: 6, d_ft: 2 }));
+  assert.ok("error" in _v415({ n60: 20, b_ft: 0, d_ft: 2 }));
+  assert.ok("error" in _v415({ n60: 20, b_ft: 6, d_ft: 0 }));
+  assert.ok("error" in _v415({ n60: Infinity, b_ft: 6, d_ft: 2 }));
+});
+
+test("bounds: spec-v416 computeLiquefactionScreening pins CSR/FS, the trigger, and error seams", () => {
+  const r = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20, msf: 1.0 });
+  assert.ok(Math.abs(r.rd - (1 - 0.00765 * 5)) < 1e-9);
+  assert.ok(Math.abs(r.csr - 0.65 * 0.30 * (2000 / 1200) * r.rd) < 1e-9);
+  assert.ok(Math.abs(r.fs - r.crr / r.csr) < 1e-9 || Math.abs(r.fs - (0.20 / r.csr)) < 1e-6);
+  assert.ok(r.fs < 1 && r.liquefiable === true);
+  // Denser sand (higher CRR) survives.
+  const dense = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.40, msf: 1.0 });
+  assert.ok(dense.fs > 1 && dense.liquefiable === false);
+  // The deep branch of rd applies below 9.15 m.
+  assert.ok(Math.abs(_v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 12, crr: 0.20 }).rd - (1.174 - 0.0267 * 12)) < 1e-9);
+  // Error seams: effective stress above total, non-positive, non-finite.
+  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 1000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20 }));
+  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 0, depth_m: 5, crr: 0.20 }));
+  assert.ok("error" in _v416({ amax_g: 0, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20 }));
+  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: Infinity }));
+});
