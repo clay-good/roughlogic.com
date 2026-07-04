@@ -31954,6 +31954,91 @@
       "outputs": {
         "ratio": { "value": 3.22, "tolerance": { "pct": 0.5 } }
       }
+    },
+    {
+      "tile_id": "detention-demurrage-billing",
+      "source_publisher": "carrier tariff practice",
+      "source_title": "2 hr free, 5 hr actual, $50/hr, $80/hr truck -> 3 hr, $150 billed, $240 opportunity",
+      "source_edition_or_year": "spec-v423 worked example (machine-verified)",
+      "source_section_or_page": "spec-v423 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "free_hours": 2, "actual_hours": 5, "rate_usd_hr": 50, "truck_rev_usd_hr": 80 },
+      "outputs": {
+        "detention_hours": { "value": 3, "tolerance": { "abs": 0 } },
+        "billable_usd": { "value": 150, "tolerance": { "pct": 0.5 } },
+        "opportunity_usd": { "value": 240, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "detention-demurrage-billing",
+      "source_publisher": "carrier tariff practice",
+      "source_title": "cross-check: within the free time (1.5 hr actual) nothing bills",
+      "source_edition_or_year": "spec-v423 worked example (machine-verified)",
+      "source_section_or_page": "spec-v423 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "free_hours": 2, "actual_hours": 1.5, "rate_usd_hr": 50, "truck_rev_usd_hr": 80 },
+      "outputs": {
+        "detention_hours": { "value": 0, "tolerance": { "abs": 0 } },
+        "billable_usd": { "value": 0, "tolerance": { "abs": 0 } }
+      }
+    },
+    {
+      "tile_id": "driver-pay-cpm-vs-percentage",
+      "source_publisher": "carrier settlement practice",
+      "source_title": "$0.60/mi or 25%, 1000 mi, $2,500 -> $600 vs $625 (percentage wins), break-even $2.40/mi",
+      "source_edition_or_year": "spec-v424 worked example (machine-verified)",
+      "source_section_or_page": "spec-v424 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "cpm_usd": 0.60, "pct": 25, "miles": 1000, "linehaul_usd": 2500 },
+      "outputs": {
+        "cpm_pay_usd": { "value": 600, "tolerance": { "pct": 0.5 } },
+        "pct_pay_usd": { "value": 625, "tolerance": { "pct": 0.5 } },
+        "breakeven_rate_usd_mi": { "value": 2.40, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "driver-pay-cpm-vs-percentage",
+      "source_publisher": "carrier settlement practice",
+      "source_title": "cross-check: a cheap $1,800 load pays only $450 percentage, below the $600 CPM",
+      "source_edition_or_year": "spec-v424 worked example (machine-verified)",
+      "source_section_or_page": "spec-v424 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "cpm_usd": 0.60, "pct": 25, "miles": 1000, "linehaul_usd": 1800 },
+      "outputs": {
+        "pct_pay_usd": { "value": 450, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "invoice-factoring-cost",
+      "source_publisher": "freight-factoring practice",
+      "source_title": "$2,000, 90% advance, 3% fee, 30 days -> $1,800 advance, $140 reserve, 40.6% APR",
+      "source_edition_or_year": "spec-v425 worked example (machine-verified)",
+      "source_section_or_page": "spec-v425 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "invoice_usd": 2000, "advance_pct": 90, "fee_pct": 3, "days_to_pay": 30 },
+      "outputs": {
+        "advance_usd": { "value": 1800, "tolerance": { "pct": 0.5 } },
+        "reserve_usd": { "value": 140, "tolerance": { "pct": 0.5 } },
+        "apr_percent": { "value": 40.56, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "invoice-factoring-cost",
+      "source_publisher": "freight-factoring practice",
+      "source_title": "cross-check: paid in 15 days the same 3% fee annualizes to 81.1% APR",
+      "source_edition_or_year": "spec-v425 worked example (machine-verified)",
+      "source_section_or_page": "spec-v425 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "invoice_usd": 2000, "advance_pct": 90, "fee_pct": 3, "days_to_pay": 15 },
+      "outputs": {
+        "apr_percent": { "value": 81.11, "tolerance": { "pct": 0.5 } }
+      }
     }
   ]
 }

@@ -95,6 +95,7 @@ const _TILES = [
   ["cost-per-mile", "J"],
   ["deadhead-percent", "J"],
   ["axle-load-distribution", "J"],
+  ["detention-demurrage-billing", "J"], ["driver-pay-cpm-vs-percentage", "J"], ["invoice-factoring-cost", "J"],
   ["elevation-pressure-loss", "F"],
   ["water-supply-duration", "F"],
   ["point-load-bearing", "E"],

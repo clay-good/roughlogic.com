@@ -4,6 +4,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(trucking): land spec-v423..v425 -- 3 trucking-business tiles in calc-trucking.js; 888 -> 891 tiles, 0.147.0, 2026-07-04
+
+The trucking-business trio, sixteenth batch of the v375-v474 campaign: the detention billing, the driver-pay comparison, and the invoice-factoring cost, all in the existing lazy `calc-trucking.js` (Group J); no new module, group, or dependency. Catalog **888 -> 891**, package **0.146.0 -> 0.147.0** (a minor). Proposed 2026-07-03.
+
+- **`detention-demurrage-billing` (spec-v423).** hours = max(0, actual - free), charge = hours x rate, opportunity = hours x on-road revenue/hr. Pinned: 2 hr free, 5 hr actual, $50/hr, $80/hr truck -> 3 hr, $150 billed, $240 opportunity (the charge does not cover it); within the free time nothing bills.
+- **`driver-pay-cpm-vs-percentage` (spec-v424).** CPM pay = rate x miles, percentage pay = percent x linehaul, break-even = CPM/(percent). Pinned: $0.60/mi or 25%, 1000 mi, $2,500 -> $600 vs $625 (percentage wins above $2.40/mi); a $1,800 load favors CPM ($600 vs $450).
+- **`invoice-factoring-cost` (spec-v425).** advance/fee/reserve split, APR = (fee%/advance%) x (365/days). Pinned: $2,000, 90% advance, 3% fee, 30 days -> $1,800 now, $140 reserve, 40.6% APR; paid in 15 days it annualizes to 81.1%.
+
+Note: this batch follows a CUT trio -- the proposed NEC electrical-installation trio (v420-v422) was found at land time to be all dupes of existing tiles (ev-charger-load, cable-tray-fill, buck-boost-sizing) and was cut, not landed; the worked-example runner's id-collision check surfaced it.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the free-time floor, the pay winner and break-even, the APR annualization, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline (business tiles use the general governance variant). The three rows land inside the tools-data.js `// Group J: Trucking` block, so the citations.test.js Group J count assert was bumped 13 -> 16. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three use the `_simpleRenderer` factory). Module cap bumped with a dated comment: calc-trucking.js 26500 -> 30000. Housekeeping: home count 888 -> 891, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 79 appended. All gates green at the new state: lint (incl. CF-09 no-spelled-out-money), unit tests (**5,184**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(agriculture): land spec-v417..v419 -- 3 landscape/agriculture tiles in calc-agriculture.js; 885 -> 888 tiles, 0.146.0, 2026-07-04
 
 The landscape/agriculture trio, fifteenth batch of the v375-v474 campaign: the bulk-material volume, the grain-drying energy, and the manure nutrient rate, all in the existing lazy `calc-agriculture.js` (Group L); no new module, group, or dependency. Catalog **885 -> 888**, package **0.145.0 -> 0.146.0** (a minor). Proposed 2026-07-03.

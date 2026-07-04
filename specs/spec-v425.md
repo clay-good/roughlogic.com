@@ -1,6 +1,6 @@
 # roughlogic.com Specification v425 -- Invoice Factoring Cost and Effective APR (calc-trucking.js, Group J, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the owner-operator finance trio (v423 detention billing ->
+> **Status: LANDED (2026-07-04, 0.147.0; proposed 2026-07-03). Third and final tile of the owner-operator finance trio (v423 detention billing ->
 > v424 driver pay CPM vs percentage -> v425 invoice factoring cost). Owner-operators and small carriers factor their freight
 > invoices for same-day cash; this tile shows what that cash costs -- the advance, the fee, the reserve, and the eye-opening
 > effective annual rate.**

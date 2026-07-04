@@ -655,6 +655,8 @@ const TOOL_MODULES = (() => {
     "load-profitability", "fuel-surcharge", "maintenance-reserve",
     // spec-v115 weight compliance: GCWR combination + tire load-rating checks.
     "gcwr-check", "tire-load-check",
+    // spec-v423..v425 trucking business
+    "detention-demurrage-billing", "driver-pay-cpm-vs-percentage", "invoice-factoring-cost",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [

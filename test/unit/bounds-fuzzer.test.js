@@ -15918,3 +15918,49 @@ test("bounds: spec-v419 computeManureNutrientApplication pins the rate, co-appli
   assert.ok("error" in _v419({ crop_n_need_lb_acre: 150, total_n_lb_ton: 10, availability_pct: 101 }));
   assert.ok("error" in _v419({ crop_n_need_lb_acre: Infinity, total_n_lb_ton: 10, availability_pct: 50 }));
 });
+
+// ===================== spec-v423..v425 trucking-business trio (calc-trucking.js) =====================
+import { computeDetentionDemurrageBilling as _v423, computeDriverPayCpmVsPercentage as _v424, computeInvoiceFactoringCost as _v425 } from "../../calc-trucking.js";
+
+test("bounds: spec-v423 computeDetentionDemurrageBilling pins the chargeable hours, charge, and error seams", () => {
+  const r = _v423({ free_hours: 2, actual_hours: 5, rate_usd_hr: 50, truck_rev_usd_hr: 80 });
+  assert.ok(Math.abs(r.detention_hours - 3) < 1e-12);
+  assert.ok(Math.abs(r.billable_usd - 150) < 1e-9 && Math.abs(r.opportunity_usd - 240) < 1e-9);
+  assert.ok(Math.abs(r.shortfall_usd - 90) < 1e-9);
+  // Within the free time nothing bills.
+  const free = _v423({ free_hours: 2, actual_hours: 1.5, rate_usd_hr: 50, truck_rev_usd_hr: 80 });
+  assert.ok(free.detention_hours === 0 && free.billable_usd === 0);
+  // Error seams.
+  assert.ok("error" in _v423({ free_hours: -1, actual_hours: 5, rate_usd_hr: 50 }));
+  assert.ok("error" in _v423({ free_hours: 2, actual_hours: 5, rate_usd_hr: -1 }));
+  assert.ok("error" in _v423({ free_hours: 2, actual_hours: Infinity, rate_usd_hr: 50 }));
+});
+
+test("bounds: spec-v424 computeDriverPayCpmVsPercentage pins both pays, the break-even, the winner, and error seams", () => {
+  const r = _v424({ cpm_usd: 0.60, pct: 25, miles: 1000, linehaul_usd: 2500 });
+  assert.ok(Math.abs(r.cpm_pay_usd - 600) < 1e-9 && Math.abs(r.pct_pay_usd - 625) < 1e-9);
+  assert.ok(Math.abs(r.breakeven_rate_usd_mi - 2.40) < 1e-9 && r.winner === "percentage");
+  // A cheap load favors cents-per-mile.
+  const cheap = _v424({ cpm_usd: 0.60, pct: 25, miles: 1000, linehaul_usd: 1800 });
+  assert.ok(Math.abs(cheap.pct_pay_usd - 450) < 1e-9 && cheap.winner === "cents-per-mile");
+  // Error seams.
+  assert.ok("error" in _v424({ cpm_usd: 0, pct: 25, miles: 1000, linehaul_usd: 2500 }));
+  assert.ok("error" in _v424({ cpm_usd: 0.60, pct: 0, miles: 1000, linehaul_usd: 2500 }));
+  assert.ok("error" in _v424({ cpm_usd: 0.60, pct: 25, miles: 0, linehaul_usd: 2500 }));
+  assert.ok("error" in _v424({ cpm_usd: 0.60, pct: 25, miles: 1000, linehaul_usd: Infinity }));
+});
+
+test("bounds: spec-v425 computeInvoiceFactoringCost pins the split, the APR, and error seams", () => {
+  const r = _v425({ invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 30 });
+  assert.ok(Math.abs(r.advance_usd - 1800) < 1e-9 && Math.abs(r.fee_usd - 60) < 1e-9);
+  assert.ok(Math.abs(r.reserve_usd - 140) < 1e-9);
+  assert.ok(Math.abs(r.apr_percent - (3 / 90) * (365 / 30) * 100) < 1e-9);
+  // Faster payment annualizes the fee to a higher rate.
+  const fast = _v425({ invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 15 });
+  assert.ok(Math.abs(fast.apr_percent - 2 * r.apr_percent) < 1e-9 && fast.apr_percent > r.apr_percent);
+  // Error seams: non-positive invoice/days, advance outside 0-100, non-finite.
+  assert.ok("error" in _v425({ invoice_usd: 0, advance_pct: 90, fee_pct: 3, days_to_pay: 30 }));
+  assert.ok("error" in _v425({ invoice_usd: 2000, advance_pct: 101, fee_pct: 3, days_to_pay: 30 }));
+  assert.ok("error" in _v425({ invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 0 }));
+  assert.ok("error" in _v425({ invoice_usd: Infinity, advance_pct: 90, fee_pct: 3, days_to_pay: 30 }));
+});

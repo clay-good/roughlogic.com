@@ -1,6 +1,6 @@
 # roughlogic.com Specification v423 -- Detention Billing and Opportunity Cost (calc-trucking.js, Group J, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an owner-operator finance trio (v423 detention billing -> v424 driver pay
+> **Status: LANDED (2026-07-04, 0.147.0; proposed 2026-07-03). First tile of an owner-operator finance trio (v423 detention billing -> v424 driver pay
 > CPM vs percentage -> v425 invoice factoring cost). The catalog costs the truck (`cost-per-mile`, `load-profitability`) but
 > never the detention a shipper owes when they hold a driver past free time -- both the billable charge and the revenue the
 > tied-up truck lost.**

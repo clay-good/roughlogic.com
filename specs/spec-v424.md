@@ -1,6 +1,6 @@
 # roughlogic.com Specification v424 -- Driver Pay: Cents-per-Mile vs Percentage (calc-trucking.js, Group J, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the owner-operator finance trio (v423 detention billing -> v424 driver pay
+> **Status: LANDED (2026-07-04, 0.147.0; proposed 2026-07-03). Second tile of the owner-operator finance trio (v423 detention billing -> v424 driver pay
 > CPM vs percentage -> v425 invoice factoring cost). `cost-per-mile` costs the truck; this tile compares the two ways a
 > driver actually gets paid -- cents-per-mile versus a percentage of the linehaul -- and finds the freight rate where they
 > cross.**

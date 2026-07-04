@@ -140,7 +140,7 @@ const CAPS = {
   // DOM-mount renderer).
   // Bumped 13500 -> 15500 on 2026-06-06 for the spec-v23 J.1
   // cargo-securement-wll + J.2 fuel-tax-ifta tiles (built module ~14.3 KB gz).
-  "calc-trucking.js": 26500, // spec-v115 2026-06-20 (22500->26500): +2 weight-compliance tiles (gcwr-check, tire-load-check) -> ~22.1 KB gz (98.2%); +~20% headroom. v91 2026-06-18 (19500->22500): +3 owner-operator load-economics tiles (load-profitability, fuel-surcharge, maintenance-reserve); built ~20.7 KB gz // v20 2026-06-06 (15500)
+  "calc-trucking.js": 30000, // spec-v423..v425 trucking-business trio 2026-07-04 (26500->30000): +3 Group J tiles (detention-demurrage-billing, driver-pay-cpm-vs-percentage, invoice-factoring-cost) -> ~22.1 KB raw (83.4%); headroom for backlog; lazy-loaded // // spec-v115 2026-06-20 (22500->26500): +2 weight-compliance tiles (gcwr-check, tire-load-check) -> ~22.1 KB gz (98.2%); +~20% headroom. v91 2026-06-18 (19500->22500): +3 owner-operator load-economics tiles (load-profitability, fuel-surcharge, maintenance-reserve); built ~20.7 KB gz // v20 2026-06-06 (15500)
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 K.2 screw-conveyor
   // tile; re-bumped 13000 -> 14000 the same day for the EN.13 fuel-range
   // solve-for inverse and EN.14 brake-pad per-axle enhancements (~13.2 KB gz).

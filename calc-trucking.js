@@ -1361,3 +1361,124 @@ const renderTireLoadCheck = _simpleRenderer({
   compute: computeTireLoadCheck,
 });
 TRUCKING_RENDERERS["tire-load-check"] = renderTireLoadCheck;
+
+// ===================== spec-v423..v425: trucking-business trio (Group J) =====================
+
+// dims: in { free_hours: dimensionless, actual_hours: dimensionless, rate_usd_hr: dimensionless, truck_rev_usd_hr: dimensionless } out: { detention_hours: dimensionless, billable_usd: dimensionless, opportunity_usd: dimensionless }
+export function computeDetentionDemurrageBilling({ free_hours = 0, actual_hours = 0, rate_usd_hr = 0, truck_rev_usd_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const free = Number(free_hours) || 0;
+  const actual = Number(actual_hours) || 0;
+  const rate = Number(rate_usd_hr) || 0;
+  const rev = Number(truck_rev_usd_hr) || 0;
+  if (free < 0 || actual < 0) return { error: "Hours must be non-negative." };
+  if (rate < 0 || rev < 0) return { error: "Rates must be non-negative (USD/hr)." };
+  const detention_hours = Math.max(0, actual - free);
+  const billable_usd = detention_hours * rate;
+  const opportunity_usd = detention_hours * rev;
+  return {
+    detention_hours, billable_usd, opportunity_usd,
+    shortfall_usd: opportunity_usd > 0 ? opportunity_usd - billable_usd : null,
+    note: "Detention (or demurrage) billing: the chargeable hours = the time at the facility beyond the free time (max of zero), the detention charge = those hours x the detention rate, and the opportunity cost = those hours x what the truck earns per hour on the road. The detention rate rarely covers the lost revenue (a truck sitting is not driving the next load), so a large gap is the case for a higher rate or a stricter free-time clause. This bills the entered numbers; the carrier's tariff and the signed rate confirmation govern the actual charge.",
+  };
+}
+const detentionDemurrageBillingExample = { inputs: { free_hours: 2, actual_hours: 5, rate_usd_hr: 50, truck_rev_usd_hr: 80 } };
+const renderDetentionDemurrageBilling = _simpleRenderer({
+  citation: "Citation: Detention/demurrage billing (carrier tariff / rate-confirmation practice): chargeable hours = max(0, actual - free), charge = hours x detention rate, opportunity cost = hours x on-road revenue per hour. A billing aid; the carrier's tariff and the signed rate confirmation govern the actual charge.",
+  example: detentionDemurrageBillingExample.inputs,
+  fields: [
+    { key: "free_hours", label: "Free time (hr)", kind: "number", default: 2 },
+    { key: "actual_hours", label: "Actual time at facility (hr)", kind: "number", default: 5 },
+    { key: "rate_usd_hr", label: "Detention rate ($/hr)", kind: "number", default: 50 },
+    { key: "truck_rev_usd_hr", label: "Truck revenue on road ($/hr, optional)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "dh", id: "ddb-out-dh", label: "Detention hours", value: (r) => fmt(r.detention_hours, 1) + " hr" },
+    { key: "b", id: "ddb-out-b", label: "Billable detention", value: (r) => "$" + fmt(r.billable_usd, 2) },
+    { key: "o", id: "ddb-out-o", label: "Opportunity cost / shortfall", value: (r) => r.shortfall_usd == null ? "(enter on-road revenue)" : "$" + fmt(r.opportunity_usd, 2) + " ($" + fmt(r.shortfall_usd, 2) + " uncovered)" },
+    { key: "n", id: "ddb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDetentionDemurrageBilling,
+});
+TRUCKING_RENDERERS["detention-demurrage-billing"] = renderDetentionDemurrageBilling;
+
+// dims: in { cpm_usd: dimensionless, pct: dimensionless, miles: dimensionless, linehaul_usd: dimensionless } out: { cpm_pay_usd: dimensionless, pct_pay_usd: dimensionless, breakeven_rate_usd_mi: dimensionless }
+export function computeDriverPayCpmVsPercentage({ cpm_usd = 0, pct = 0, miles = 0, linehaul_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cpm = Number(cpm_usd) || 0;
+  const p = Number(pct) || 0;
+  const mi = Number(miles) || 0;
+  const lh = Number(linehaul_usd) || 0;
+  if (!(cpm > 0)) return { error: "Cents-per-mile rate must be positive (USD/mi)." };
+  if (!(p > 0)) return { error: "Percentage rate must be positive (%)." };
+  if (!(mi > 0)) return { error: "Miles must be positive." };
+  if (!(lh > 0)) return { error: "Linehaul revenue must be positive (USD)." };
+  const cpm_pay_usd = cpm * mi;
+  const pct_pay_usd = (p / 100) * lh;
+  const breakeven_rate_usd_mi = cpm / (p / 100);
+  const load_rate_usd_mi = lh / mi;
+  const winner = pct_pay_usd >= cpm_pay_usd ? "percentage" : "cents-per-mile";
+  return {
+    cpm_pay_usd, pct_pay_usd, breakeven_rate_usd_mi, load_rate_usd_mi, winner,
+    note: "Driver pay, cents-per-mile vs percentage-of-linehaul: CPM pay = rate x miles, percentage pay = (percent) x linehaul revenue, and the two are equal at a break-even load rate = CPM / (percent as a decimal), in dollars per mile of linehaul. Above the break-even rate the percentage deal pays more (the driver shares the upside of a high-paying load); below it, cents-per-mile pays more (it protects the driver on cheap freight). This compares one load or one settlement period; the actual pay plan, accessorials, and empty-mile pay govern.",
+  };
+}
+const driverPayCpmVsPercentageExample = { inputs: { cpm_usd: 0.60, pct: 25, miles: 1000, linehaul_usd: 2500 } };
+const renderDriverPayCpmVsPercentage = _simpleRenderer({
+  citation: "Citation: Driver pay comparison (carrier settlement practice): CPM pay = rate x miles, percentage pay = percent x linehaul, break-even load rate = CPM / (percent decimal) per mile. Above break-even the percentage pays more; below it, cents-per-mile does. A comparison aid; the pay plan and accessorials govern.",
+  example: driverPayCpmVsPercentageExample.inputs,
+  fields: [
+    { key: "cpm_usd", label: "Cents-per-mile rate ($/mi)", kind: "number", default: 0.60 },
+    { key: "pct", label: "Percentage-of-linehaul rate (%)", kind: "number", default: 25 },
+    { key: "miles", label: "Loaded miles", kind: "number", default: 1000 },
+    { key: "linehaul_usd", label: "Load linehaul revenue ($)", kind: "number", default: 2500 },
+  ],
+  outputs: [
+    { key: "cpm", id: "dpc-out-cpm", label: "Cents-per-mile pay", value: (r) => "$" + fmt(r.cpm_pay_usd, 2) },
+    { key: "pct", id: "dpc-out-pct", label: "Percentage pay", value: (r) => "$" + fmt(r.pct_pay_usd, 2) + " (" + r.winner + " pays more)" },
+    { key: "be", id: "dpc-out-be", label: "Break-even load rate", value: (r) => "$" + fmt(r.breakeven_rate_usd_mi, 2) + "/mi (this load $" + fmt(r.load_rate_usd_mi, 2) + "/mi)" },
+    { key: "n", id: "dpc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDriverPayCpmVsPercentage,
+});
+TRUCKING_RENDERERS["driver-pay-cpm-vs-percentage"] = renderDriverPayCpmVsPercentage;
+
+// dims: in { invoice_usd: dimensionless, advance_pct: dimensionless, fee_pct: dimensionless, days_to_pay: dimensionless } out: { advance_usd: dimensionless, fee_usd: dimensionless, reserve_usd: dimensionless, apr_percent: dimensionless }
+export function computeInvoiceFactoringCost({ invoice_usd = 0, advance_pct = 90, fee_pct = 3, days_to_pay = 30 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const inv = Number(invoice_usd) || 0;
+  const adv = Number(advance_pct) || 0;
+  const fee = Number(fee_pct) || 0;
+  const days = Number(days_to_pay) || 0;
+  if (!(inv > 0)) return { error: "Invoice amount must be positive (USD)." };
+  if (!(adv > 0 && adv <= 100)) return { error: "Advance rate must be between 0 and 100%." };
+  if (fee < 0) return { error: "Factoring fee must be non-negative (%)." };
+  if (!(days > 0)) return { error: "Days to pay must be positive." };
+  const advance_usd = inv * adv / 100;
+  const fee_usd = inv * fee / 100;
+  const reserve_usd = inv - advance_usd - fee_usd;
+  const apr_percent = (fee / adv) * (365 / days) * 100;
+  return {
+    advance_usd, fee_usd, reserve_usd, apr_percent,
+    note: "Invoice factoring cost and effective APR: the factor advances a percentage of the freight bill now (typically 90-97%), keeps a fee (typically 1-5%), and pays the reserve (invoice - advance - fee) when the customer pays. The effective annual rate = (fee% / advance%) x (365 / days the cash is out) x 100, because a flat fee on money out for only a few weeks annualizes to a high rate. The faster the customer pays, the more expensive the same fee. This estimates the cost from the entered terms; the factoring agreement (recourse vs non-recourse, minimums, and reserve release) governs.",
+  };
+}
+const invoiceFactoringCostExample = { inputs: { invoice_usd: 2000, advance_pct: 90, fee_pct: 3, days_to_pay: 30 } };
+const renderInvoiceFactoringCost = _simpleRenderer({
+  citation: "Citation: Invoice factoring cost (freight-factoring practice): advance = invoice x advance%, fee = invoice x fee%, reserve = invoice - advance - fee, effective APR = (fee%/advance%) x (365/days) x 100. A cost aid; the factoring agreement (recourse, minimums, reserve release) governs.",
+  example: invoiceFactoringCostExample.inputs,
+  fields: [
+    { key: "invoice_usd", label: "Invoice amount ($)", kind: "number", default: 2000 },
+    { key: "advance_pct", label: "Advance rate (%)", kind: "number", default: 90 },
+    { key: "fee_pct", label: "Factoring fee (%)", kind: "number", default: 3 },
+    { key: "days_to_pay", label: "Days until customer pays", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "adv", id: "ifc-out-adv", label: "Advance now / fee", value: (r) => "$" + fmt(r.advance_usd, 2) + " advanced, $" + fmt(r.fee_usd, 2) + " fee" },
+    { key: "res", id: "ifc-out-res", label: "Reserve released later", value: (r) => "$" + fmt(r.reserve_usd, 2) },
+    { key: "apr", id: "ifc-out-apr", label: "Effective APR", value: (r) => fmt(r.apr_percent, 1) + "%" },
+    { key: "n", id: "ifc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInvoiceFactoringCost,
+});
+TRUCKING_RENDERERS["invoice-factoring-cost"] = renderInvoiceFactoringCost;

@@ -645,6 +645,42 @@ export const CITATIONS = {
       { name: "Per-hole shift", value: "computed from the lever arm (trailer load * spacing / kingpin-to-tandem distance), not assumed", source: "statics" },
     ],
   },
+  "detention-demurrage-billing": {
+    formula: "detention_hours = max(0, actual - free); billable = hours x rate; opportunity = hours x on-road revenue/hr.",
+    edition: "Detention/demurrage billing from carrier tariff and rate-confirmation practice, by name.",
+    freeAccess: "The chargeable-hours and opportunity-cost arithmetic is public; the free time, rate, and terms come from the carrier tariff and the rate confirmation.",
+    governance: GOVERNANCE.general,
+    editionNote: "Detention (over-the-road) or demurrage (intermodal) billing: the chargeable hours = the time at the shipper/receiver beyond the contracted free time (not less than zero), the detention charge = those hours x the detention rate, and the opportunity cost = those hours x what the truck would earn per hour running. The detention rate rarely covers the lost revenue, since a truck sitting at a dock is not moving the next load, so a large shortfall is the argument for a higher rate or a tighter free-time clause. This computes the entered numbers; the carrier's tariff, the signed rate confirmation, and the detention terms govern the amount actually collectible.",
+    assumptions: [
+      { name: "Chargeable hours", value: "max(0, actual - free); charge = hours x rate", source: "carrier tariff practice" },
+      { name: "Opportunity cost", value: "hours x on-road revenue per hour", source: "operating economics" },
+      { name: "Terms govern", value: "the tariff and the rate confirmation set the collectible charge", source: "scope of this tile" },
+    ],
+  },
+  "driver-pay-cpm-vs-percentage": {
+    formula: "cpm_pay = cpm x miles; pct_pay = (pct/100) x linehaul; breakeven_rate = cpm / (pct/100) (USD per linehaul mile).",
+    edition: "Driver pay comparison, cents-per-mile vs percentage-of-linehaul, from carrier settlement practice, by name.",
+    freeAccess: "The two pay computations and the break-even load rate are public arithmetic; the pay rates and accessorials come from the settlement agreement.",
+    governance: GOVERNANCE.general,
+    editionNote: "Driver (or owner-operator) pay comparison: cents-per-mile pay = the CPM rate x the loaded miles, percentage pay = the percentage x the load's linehaul revenue, and the two are equal at a break-even load rate = the CPM rate / the percentage as a decimal, per mile of linehaul. Above the break-even rate the percentage plan pays more (it shares the upside of a high-paying load); below it, the cents-per-mile plan pays more (it protects the driver on cheap freight). This compares one load or one settlement period on the entered numbers; the actual pay plan, the accessorial and empty-mile pay, and deadhead all shift the real comparison.",
+    assumptions: [
+      { name: "The two pays", value: "cpm x miles vs (pct/100) x linehaul", source: "settlement practice" },
+      { name: "Break-even", value: "load rate = cpm / (pct/100) per linehaul mile", source: "algebra" },
+      { name: "One-load view", value: "accessorials, empty-mile pay, and deadhead shift the real comparison", source: "scope of this tile" },
+    ],
+  },
+  "invoice-factoring-cost": {
+    formula: "advance = invoice x advance%; fee = invoice x fee%; reserve = invoice - advance - fee; APR = (fee%/advance%) x (365/days) x 100.",
+    edition: "Invoice (freight) factoring cost and effective APR, from freight-factoring practice, by name.",
+    freeAccess: "The advance/fee/reserve split and the fee-to-APR annualization are public arithmetic; the rates and terms come from the factoring agreement.",
+    governance: GOVERNANCE.general,
+    editionNote: "Invoice factoring cost and effective annual rate: the factor advances a percentage of the freight bill immediately (typically 90-97%), keeps a fee (typically 1-5%), and releases the reserve (invoice minus advance minus fee) when the customer pays. The effective annual rate = (fee% / advance%) x (365 / the days the cash is out) x 100, because a flat fee on money advanced for only a few weeks annualizes to a high rate - and the faster the customer pays, the more expensive the same fee is on an annual basis. This estimates the cost from the entered terms; the factoring agreement (recourse vs non-recourse, monthly minimums, reserve-release timing, and any ancillary fees) governs the true cost.",
+    assumptions: [
+      { name: "Split", value: "advance = invoice x advance%, fee = invoice x fee%, reserve = the remainder", source: "factoring practice" },
+      { name: "Effective APR", value: "(fee%/advance%) x (365/days) x 100", source: "annualization" },
+      { name: "Agreement governs", value: "recourse, minimums, reserve release, and ancillary fees set the true cost", source: "scope of this tile" },
+    ],
+  },
 
   "elevation-pressure-loss": {
     formula: "Exact P = 0.434 * dH_ft; rule of thumb ~5 psi per floor (assumes 10-ft floors). Climbing is a loss, descending a gain.",
