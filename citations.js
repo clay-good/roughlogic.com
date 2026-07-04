@@ -441,6 +441,42 @@ export const CITATIONS = {
       { name: "8.34 lb/gal", value: "weight of one gallon of water", source: "pounds formula" },
     ],
   },
+  "clarifier-surface-loading": {
+    formula: "SOR = flow x 1e6 / area (gpd/ft^2); weir = flow x 1e6 / weir_len (gpd/ft); solids = flow x MLSS x 8.34 / area (lb/ft^2/day).",
+    edition: "Clarifier surface, weir, and solids loading rates, standard wastewater-operations practice (Ten States Standards / Metcalf & Eddy), by name.",
+    freeAccess: "The overflow-rate and solids-loading relations are standard published wastewater results; the state design criteria govern the limits.",
+    governance: GOVERNANCE.water,
+    editionNote: "The clarifier loading checks: the surface overflow rate = flow / surface area (gpd/ft^2), the weir overflow rate = flow / total weir length (gpd/ft), and the secondary-clarifier solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). Typical design ceilings are roughly 700-1000 gpd/ft^2 SOR, 10,000-20,000 gpd/ft weir, and 20-30 lb/ft^2/day solids; exceeding the SOR carries floc over the weir. This returns the rates for comparison; the Ten States Standards and the state design criteria govern the actual limits. An operations aid; the operator of record and the primacy agency govern.",
+    assumptions: [
+      { name: "Surface overflow rate", value: "SOR = flow / surface area (gpd/ft^2)", source: "wastewater operations" },
+      { name: "Weir and solids loading", value: "weir = flow / weir length; solids = flow x MLSS x 8.34 / area", source: "Ten States Standards" },
+      { name: "Design limits", value: "state design criteria govern the actual ceilings", source: "scope of this tile" },
+    ],
+  },
+  "bod-tss-loading-removal": {
+    formula: "influent_lb = flow x influent x 8.34; effluent_lb = flow x effluent x 8.34; removed = influent_lb - effluent_lb; removal% = (influent - effluent)/influent x 100.",
+    edition: "BOD/TSS mass loading and percent removal via the pounds formula, standard wastewater-operations practice, by name.",
+    freeAccess: "The pounds formula and the percent-removal definition are standard published wastewater-operator results.",
+    governance: GOVERNANCE.water,
+    editionNote: "BOD/TSS mass loading and percent removal: the load (lb/day) = flow (MGD) x concentration (mg/L) x 8.34, applied to the influent and the effluent, with removed = influent - effluent load and removal% = (influent - effluent) / influent x 100. Load scales with flow while removal efficiency does not, so a larger plant at the same concentrations carries a proportionally larger load. An effluent concentration above the influent is a treatment upset (a negative removal), reported rather than errored. This computes the loads and the removal from the entered values. An operations aid; the operator of record and the primacy agency govern compliance.",
+    assumptions: [
+      { name: "Pounds formula", value: "load (lb/day) = MGD x mg/L x 8.34", source: "wastewater operations" },
+      { name: "Percent removal", value: "(influent - effluent) / influent x 100", source: "wastewater operations" },
+      { name: "Upset", value: "effluent above influent is a negative removal, reported not errored", source: "scope of this tile" },
+    ],
+  },
+  "tds-from-conductivity": {
+    formula: "tds_mgl = k_factor x conductivity_us_cm; k commonly 0.55-0.75 (default 0.65).",
+    edition: "Total dissolved solids from electrical conductivity (Standard Methods 2510), by name.",
+    freeAccess: "The TDS = k x EC correlation is a standard published water-quality relation; the k factor is calibrated to the specific water.",
+    governance: GOVERNANCE.water,
+    editionNote: "Total dissolved solids from electrical conductivity: TDS (mg/L) = k x EC (uS/cm at 25 C), with the correlation factor k commonly 0.55-0.75 (default 0.65) depending on the dominant dissolved ions. The result is an estimate, not a gravimetric (dried-residue) TDS measurement; the +/-15% band from the k range is reported so the number is not read as exact. Calibrate k against a laboratory TDS for the specific source water. This returns the estimate and the band from the entered values. An operations aid; the operator of record and the primacy agency govern compliance.",
+    assumptions: [
+      { name: "Correlation", value: "TDS (mg/L) = k x EC (uS/cm at 25 C)", source: "Standard Methods 2510" },
+      { name: "Factor range", value: "k commonly 0.55-0.75 by ion makeup; default 0.65", source: "water-quality practice" },
+      { name: "Estimate", value: "not a gravimetric TDS; calibrate k to a lab result", source: "scope of this tile" },
+    ],
+  },
 
   "growing-degree-days": {
     formula: "GDD = ((min(Tmax,cutoff) + Tmin_adj)/2) - base, floored at 0. The modified method caps Tmax at the cutoff and floors Tmin at the base before averaging.",

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(treatment): land spec-v405..v407 -- 3 water/wastewater-operations tiles in calc-treatment.js; 873 -> 876 tiles, 0.142.0, 2026-07-04
+
+The water/wastewater-operations trio, eleventh batch of the v375-v474 campaign: the clarifier loading, the mass loading/removal, and the TDS-from-conductivity estimate, all in the existing lazy `calc-treatment.js` (Group M); no new module, group, or dependency. Catalog **873 -> 876**, package **0.141.0 -> 0.142.0** (a minor). Proposed 2026-07-03.
+
+- **`clarifier-surface-loading` (spec-v405).** SOR = flow/area, weir = flow/weir length, solids = flow x MLSS x 8.34 / area. Pinned: 1.0 MGD, 1256.6 ft^2, 125.7 ft weir, MLSS 2500 -> SOR 796 gpd/ft^2, weir 7,958 gpd/ft, solids 16.6 lb/ft^2/day; double the flow and SOR passes the ~1000 limit (floc carryover flagged).
+- **`bod-tss-loading-removal` (spec-v406).** load (lb/day) = MGD x mg/L x 8.34, removal% = (in - out)/in x 100. Pinned: 1.0 MGD, 200 -> 20 mg/L -> 1,668 lb/day in, 1,501 removed, 90.0%; a 4.0 MGD plant carries 6,672 lb/day at the same 90% (load scales, efficiency does not). An effluent above influent is a reported upset, not an error.
+- **`tds-from-conductivity` (spec-v407).** TDS (mg/L) = k x EC (uS/cm), k 0.55-0.75 (default 0.65). Pinned: 1000 uS/cm -> 650 mg/L, with a 550-750 band from the k range so it is not read as exact.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the overload flag, the load scaling and upset case, the k-band, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline (the water governance variant, flagging the operator of record and primacy agency). The three rows land inside the tools-data.js `// Group M: Water` block, so the citations.test.js Group M count assert was bumped 17 -> 20. Per-tile wiring: `tools-data`, `tile-meta`, `citations`, `compute-map`, 6 worked-example fixtures, collision-checked aliases, `related-tiles`, and 3 fuzzer blocks (all three hand-write their renderers with inline finite guards). Module caps bumped with dated comments: calc-treatment.js 12000 -> 15000 and citations.js 285000 -> 320000 (the campaign's landings grew CITATIONS past the cap). Housekeeping: home count 873 -> 876, README resynced (counts, sitemap URLs), three specs marked LANDED, docs/mobile-responsive.md section 74 appended. All gates green at the new state: lint, unit tests (**5,169**), build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(realestate): land spec-v402..v404 -- 3 real-estate-investing tiles in calc-realestate.js; 870 -> 873 tiles, 0.141.0, 2026-07-04
 
 The real-estate-investing trio, tenth batch of the v375-v474 campaign: the flip, the BRRRR refinance, and the full rental return, all in the existing lazy `calc-realestate.js` (Group X); no new module, group, or dependency. Catalog **870 -> 873**, package **0.140.0 -> 0.141.0** (a minor). Proposed 2026-07-03.

@@ -1,6 +1,6 @@
 # roughlogic.com Specification v406 -- BOD/TSS Mass Loading and Percent Removal (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the water/wastewater-operations trio (v405 clarifier loading -> v406
+> **Status: LANDED (2026-07-04, 0.142.0; proposed 2026-07-03). Second tile of the water/wastewater-operations trio (v405 clarifier loading -> v406
 > BOD/TSS mass loading -> v407 TDS from conductivity). `srt-fm-ratio` measures the food-to-microorganism ratio against the
 > MLSS mass; this tile computes the raw mass loading and treatment efficiency an NPDES report is built on -- pounds per day
 > in, pounds per day out, and percent removal.**

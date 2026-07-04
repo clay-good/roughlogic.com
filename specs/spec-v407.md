@@ -1,6 +1,6 @@
 # roughlogic.com Specification v407 -- Total Dissolved Solids from Conductivity (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the water/wastewater-operations trio (v405 clarifier loading ->
+> **Status: LANDED (2026-07-04, 0.142.0; proposed 2026-07-03). Third and final tile of the water/wastewater-operations trio (v405 clarifier loading ->
 > v406 BOD/TSS mass loading -> v407 TDS from conductivity). `langelier-index` needs total dissolved solids as an input but
 > never derives it; this tile estimates TDS from an electrical-conductivity meter reading, the field measurement an operator
 > actually takes.**

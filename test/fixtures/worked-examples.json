@@ -15853,6 +15853,89 @@
       }
     },
     {
+      "tile_id": "clarifier-surface-loading",
+      "source_publisher": "Ten States Standards / Metcalf & Eddy",
+      "source_title": "1.0 MGD, 1256.6 ft^2, 125.7 ft weir, MLSS 2500 -> SOR 796, weir 7,958, solids 16.6",
+      "source_edition_or_year": "spec-v405 worked example (machine-verified)",
+      "source_section_or_page": "spec-v405 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "flow_mgd": 1.0, "surface_ft2": 1256.6, "weir_len_ft": 125.7, "mlss_mgl": 2500 },
+      "outputs": {
+        "sor_gpd_ft2": { "value": 796, "tolerance": { "pct": 0.5 } },
+        "weir_gpd_ft": { "value": 7958, "tolerance": { "pct": 0.5 } },
+        "solids_lb_ft2_day": { "value": 16.6, "tolerance": { "pct": 1 } }
+      }
+    },
+    {
+      "tile_id": "clarifier-surface-loading",
+      "source_publisher": "Ten States Standards / Metcalf & Eddy",
+      "source_title": "cross-check: double the flow -> SOR 1,592 gpd/ft^2, past the ~1000 limit",
+      "source_edition_or_year": "spec-v405 worked example (machine-verified)",
+      "source_section_or_page": "spec-v405 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "flow_mgd": 2.0, "surface_ft2": 1256.6, "weir_len_ft": 125.7, "mlss_mgl": 0 },
+      "outputs": {
+        "sor_gpd_ft2": { "value": 1592, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "bod-tss-loading-removal",
+      "source_publisher": "wastewater operations (pounds formula)",
+      "source_title": "1.0 MGD, 200 -> 20 mg/L -> 1,668 lb/day in, 1,501 removed, 90.0%",
+      "source_edition_or_year": "spec-v406 worked example (machine-verified)",
+      "source_section_or_page": "spec-v406 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "flow_mgd": 1.0, "influent_mgl": 200, "effluent_mgl": 20 },
+      "outputs": {
+        "influent_lb_day": { "value": 1668, "tolerance": { "pct": 0.5 } },
+        "removed_lb_day": { "value": 1501.2, "tolerance": { "pct": 0.5 } },
+        "removal_pct": { "value": 90.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "bod-tss-loading-removal",
+      "source_publisher": "wastewater operations (pounds formula)",
+      "source_title": "cross-check: a 4.0 MGD plant carries 6,672 lb/day in at the same 90.0% removal",
+      "source_edition_or_year": "spec-v406 worked example (machine-verified)",
+      "source_section_or_page": "spec-v406 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "flow_mgd": 4.0, "influent_mgl": 200, "effluent_mgl": 20 },
+      "outputs": {
+        "influent_lb_day": { "value": 6672, "tolerance": { "pct": 0.5 } },
+        "removal_pct": { "value": 90.0, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "tds-from-conductivity",
+      "source_publisher": "Standard Methods 2510",
+      "source_title": "1000 uS/cm, k 0.65 -> 650 mg/L",
+      "source_edition_or_year": "spec-v407 worked example (machine-verified)",
+      "source_section_or_page": "spec-v407 section 2.1 pinned example",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "conductivity_us_cm": 1000, "k_factor": 0.65 },
+      "outputs": {
+        "tds_mgl": { "value": 650, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
+      "tile_id": "tds-from-conductivity",
+      "source_publisher": "Standard Methods 2510",
+      "source_title": "cross-check: the factor sets the band -> 550 mg/L at k 0.55, 750 at k 0.75",
+      "source_edition_or_year": "spec-v407 worked example (machine-verified)",
+      "source_section_or_page": "spec-v407 section 2.1 cross-check",
+      "verified_by": "rl",
+      "verified_on": "2026-07-04",
+      "inputs": { "conductivity_us_cm": 1000, "k_factor": 0.55 },
+      "outputs": {
+        "tds_mgl": { "value": 550, "tolerance": { "pct": 0.5 } }
+      }
+    },
+    {
       "tile_id": "power-distro",
       "source_publisher": "First-principles AC power + NEC 80% continuous rule",
       "source_title": "3-phase I = W/(sqrt(3)*V_LL*PF)",

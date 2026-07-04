@@ -491,3 +491,127 @@ TREATMENT_RENDERERS["breakpoint-chlorination"] = _rPool({
   ],
   compute: computeBreakpointChlorination,
 });
+
+// ===================== spec-v405..v407: water/wastewater-operations trio (Group M) =====================
+
+// dims: in { flow_mgd: dimensionless, surface_ft2: L^2, weir_len_ft: L, mlss_mgl: dimensionless } out: { sor_gpd_ft2: dimensionless, weir_gpd_ft: dimensionless, solids_lb_ft2_day: dimensionless }
+export function computeClarifierSurfaceLoading({ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}) {
+  const flow = Number(flow_mgd) || 0;
+  const area = Number(surface_ft2) || 0;
+  const weir = Number(weir_len_ft) || 0;
+  const mlss = Number(mlss_mgl) || 0;
+  if (!(flow > 0 && Number.isFinite(flow))) return { error: "Flow must be positive (MGD)." };
+  if (!(area > 0 && Number.isFinite(area))) return { error: "Surface area must be positive (ft^2)." };
+  if (!(weir > 0 && Number.isFinite(weir))) return { error: "Weir length must be positive (ft)." };
+  if (mlss < 0 || !Number.isFinite(mlss)) return { error: "MLSS must be a non-negative finite number (mg/L)." };
+  const sor_gpd_ft2 = (flow * 1e6) / area;
+  const weir_gpd_ft = (flow * 1e6) / weir;
+  const solids_lb_ft2_day = mlss > 0 ? flow * mlss * 8.34 / area : null;
+  return {
+    sor_gpd_ft2, weir_gpd_ft, solids_lb_ft2_day,
+    sor_overloaded: sor_gpd_ft2 > 1000,
+    note: "Clarifier loading checks: surface overflow rate SOR = flow / surface area (gpd/ft^2), weir overflow rate = flow / total weir length (gpd/ft), and (for a secondary clarifier) solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). Typical design limits are roughly 700-1000 gpd/ft^2 SOR, 10,000-20,000 gpd/ft weir, and 20-30 lb/ft^2/day solids; exceeding the SOR carries floc over the weir. Ten States Standards and the state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.",
+  };
+}
+export const clarifierSurfaceLoadingExample = { inputs: { flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 2500 } };
+function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Clarifier hydraulic and solids loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area (gpd/ft^2), weir overflow rate = flow/weir length (gpd/ft), solids loading = flow x MLSS x 8.34 / area (lb/ft^2/day). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
+  const flow = makeNumber("Flow (MGD)", "csl-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
+  const area = makeNumber("Surface area (ft^2)", "csl-area", { step: "any", min: "0" }); area.input.value = "1256.6";
+  const weir = makeNumber("Total weir length (ft)", "csl-weir", { step: "any", min: "0" }); weir.input.value = "125.7";
+  const mlss = makeNumber("MLSS (mg/L, secondary only)", "csl-mlss", { step: "any", min: "0" }); mlss.input.value = "2500";
+  for (const f of [flow, area, weir, mlss]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; area.input.value = "1256.6"; weir.input.value = "125.7"; mlss.input.value = "2500"; update(); });
+  const oSor = makeOutputLine(outputRegion, "Surface overflow rate", "csl-out-sor");
+  const oWeir = makeOutputLine(outputRegion, "Weir overflow rate", "csl-out-weir");
+  const oSolids = makeOutputLine(outputRegion, "Solids loading", "csl-out-solids");
+  const oNote = makeOutputLine(outputRegion, "Note", "csl-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeClarifierSurfaceLoading({ flow_mgd: readNum(flow.input), surface_ft2: readNum(area.input), weir_len_ft: readNum(weir.input), mlss_mgl: readNum(mlss.input) });
+    if (r.error) { oSor.textContent = r.error; oWeir.textContent = "-"; oSolids.textContent = "-"; oNote.textContent = ""; return; }
+    oSor.textContent = fmt(r.sor_gpd_ft2, 0) + " gpd/ft^2" + (r.sor_overloaded ? " (OVER ~1000 -- floc carryover risk)" : "");
+    oWeir.textContent = fmt(r.weir_gpd_ft, 0) + " gpd/ft";
+    oSolids.textContent = r.solids_lb_ft2_day == null ? "(enter MLSS for a secondary clarifier)" : fmt(r.solids_lb_ft2_day, 1) + " lb/ft^2/day";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [flow, area, weir, mlss]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["clarifier-surface-loading"] = renderClarifierSurfaceLoading;
+
+// dims: in { flow_mgd: dimensionless, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: dimensionless, effluent_lb_day: dimensionless, removed_lb_day: dimensionless, removal_pct: dimensionless }
+export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}) {
+  const flow = Number(flow_mgd) || 0;
+  const inf = Number(influent_mgl) || 0;
+  const eff = Number(effluent_mgl) || 0;
+  if (!(flow > 0 && Number.isFinite(flow))) return { error: "Flow must be positive (MGD)." };
+  if (!(inf > 0 && Number.isFinite(inf))) return { error: "Influent concentration must be positive (mg/L)." };
+  if (!(eff >= 0 && Number.isFinite(eff))) return { error: "Effluent concentration must be non-negative (mg/L)." };
+  const influent_lb_day = flow * inf * 8.34;
+  const effluent_lb_day = flow * eff * 8.34;
+  const removed_lb_day = influent_lb_day - effluent_lb_day;
+  const removal_pct = (inf - eff) / inf * 100;
+  return {
+    influent_lb_day, effluent_lb_day, removed_lb_day, removal_pct,
+    upset: removal_pct < 0,
+    note: "BOD/TSS mass loading and percent removal: load (lb/day) = flow (MGD) x concentration (mg/L) x 8.34, applied to the influent and effluent, with removed = influent - effluent load and removal% = (influent - effluent) / influent x 100. Load scales with flow while removal efficiency does not, so a bigger plant at the same concentrations carries a proportionally larger load. An effluent above the influent is a treatment upset (negative removal), reported rather than errored. An operations aid; the operator of record and the primacy agency govern compliance.",
+  };
+}
+export const bodTssLoadingRemovalExample = { inputs: { flow_mgd: 1.0, influent_mgl: 200, effluent_mgl: 20 } };
+function renderBodTssLoadingRemoval(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: BOD/TSS mass loading and removal (the pounds formula, Metcalf & Eddy / operator practice): load (lb/day) = MGD x mg/L x 8.34, removal% = (influent - effluent) / influent x 100. An operations aid; the operator of record and the primacy agency govern compliance.";
+  const flow = makeNumber("Plant flow (MGD)", "btl-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
+  const inf = makeNumber("Influent BOD or TSS (mg/L)", "btl-inf", { step: "any", min: "0" }); inf.input.value = "200";
+  const eff = makeNumber("Effluent BOD or TSS (mg/L)", "btl-eff", { step: "any", min: "0" }); eff.input.value = "20";
+  for (const f of [flow, inf, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; inf.input.value = "200"; eff.input.value = "20"; update(); });
+  const oInf = makeOutputLine(outputRegion, "Influent / effluent load", "btl-out-inf");
+  const oRem = makeOutputLine(outputRegion, "Removed load", "btl-out-rem");
+  const oPct = makeOutputLine(outputRegion, "Percent removal", "btl-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Note", "btl-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBodTssLoadingRemoval({ flow_mgd: readNum(flow.input), influent_mgl: readNum(inf.input), effluent_mgl: readNum(eff.input) });
+    if (r.error) { oInf.textContent = r.error; oRem.textContent = "-"; oPct.textContent = "-"; oNote.textContent = ""; return; }
+    oInf.textContent = fmt(r.influent_lb_day, 0) + " / " + fmt(r.effluent_lb_day, 0) + " lb/day";
+    oRem.textContent = fmt(r.removed_lb_day, 0) + " lb/day";
+    oPct.textContent = fmt(r.removal_pct, 1) + "%" + (r.upset ? " (UPSET -- effluent above influent)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [flow, inf, eff]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["bod-tss-loading-removal"] = renderBodTssLoadingRemoval;
+
+// dims: in { conductivity_us_cm: dimensionless, k_factor: dimensionless } out: { tds_mgl: dimensionless }
+export function computeTdsFromConductivity({ conductivity_us_cm = 0, k_factor = 0.65 } = {}) {
+  const ec = Number(conductivity_us_cm) || 0;
+  const k = Number(k_factor) || 0;
+  if (!(ec > 0 && Number.isFinite(ec))) return { error: "Conductivity must be positive (uS/cm)." };
+  if (!(k >= 0.4 && k <= 0.9)) return { error: "TDS/EC factor must be between 0.4 and 0.9." };
+  const tds_mgl = k * ec;
+  return {
+    tds_mgl, tds_low: 0.55 * ec, tds_high: 0.75 * ec,
+    note: "Total dissolved solids from electrical conductivity: TDS (mg/L) = k x EC (uS/cm at 25 C), with the correlation factor k commonly 0.55-0.75 (default 0.65) depending on the dominant ions. The result is an estimate, not a gravimetric measurement; the +/-15% band from the k range is shown so the number is not read as exact. Calibrate k against a lab TDS for the specific water. An operations aid; the operator of record and the primacy agency govern compliance.",
+  };
+}
+export const tdsFromConductivityExample = { inputs: { conductivity_us_cm: 1000, k_factor: 0.65 } };
+function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: TDS from conductivity (Standard Methods 2510 / operator practice): TDS (mg/L) = k x EC (uS/cm at 25 C), k commonly 0.55-0.75 by ion makeup. An estimate, not a gravimetric TDS; calibrate k against a lab result. An operations aid; the operator of record and the primacy agency govern compliance.";
+  const ec = makeNumber("Conductivity (uS/cm at 25 C)", "tfc-ec", { step: "any", min: "0" }); ec.input.value = "1000";
+  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "tfc-k", { step: "any", min: "0" }); k.input.value = "0.65";
+  for (const f of [ec, k]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ec.input.value = "1000"; k.input.value = "0.65"; update(); });
+  const oTds = makeOutputLine(outputRegion, "Total dissolved solids", "tfc-out-tds");
+  const oBand = makeOutputLine(outputRegion, "Range (k 0.55-0.75)", "tfc-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "tfc-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTdsFromConductivity({ conductivity_us_cm: readNum(ec.input), k_factor: readNum(k.input) });
+    if (r.error) { oTds.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
+    oTds.textContent = fmt(r.tds_mgl, 0) + " mg/L";
+    oBand.textContent = fmt(r.tds_low, 0) + " to " + fmt(r.tds_high, 0) + " mg/L";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ec, k]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["tds-from-conductivity"] = renderTdsFromConductivity;

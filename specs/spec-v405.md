@@ -1,6 +1,6 @@
 # roughlogic.com Specification v405 -- Clarifier Surface, Weir, and Solids Loading (calc-treatment.js, Group M, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a water/wastewater-operations trio (v405 clarifier loading -> v406 BOD/TSS
+> **Status: LANDED (2026-07-04, 0.142.0; proposed 2026-07-03). First tile of a water/wastewater-operations trio (v405 clarifier loading -> v406 BOD/TSS
 > mass loading and removal -> v407 TDS from conductivity). The catalog has activated-sludge process control (`srt-fm-ratio`,
 > `svi-sludge-index`) and filter loading, but never the three loading rates that tell an operator whether a settling basin
 > is overloaded.**

@@ -2443,14 +2443,17 @@ cross-check.
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTapingCorrections` | `{ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_...` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeBodTssLoadingRemoval` | `{ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
+| calc-treatment.js | `computeClarifierSurfaceLoading` | `{ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeLangelierIndex` | `{ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolAlkalinityAdjust` | `{ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolChlorineDose` | `{ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolCyaDose` | `{ gallons = 0, current_cya_ppm = 0, target_cya_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolHeaterBtu` | `{ gallons = 0, dT_F = 0, output = 0, eff = 0.80 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolSaltDose` | `{ gallons = 0, current_salt_ppm = 0, target_salt_ppm = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeTdsFromConductivity` | `{ conductivity_us_cm = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormula` | `{ axle_weights_lb = [], axle_spacings_ft = [] }` | _ | _ | _ |
@@ -2531,7 +2534,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1117.
+Row count: 1120.
 
 <!-- END function-corpus-v14 -->
 
@@ -3370,15 +3373,17 @@ per spec-v14 §13.1 second paragraph.
 | `tree-rigging-shock` | Tree Rigging Shock (Dynamic) Load | Arborist rigging research / ANSI Z133...; 500 lb, 3 ft drop, 30 ft rope at 5% -> 1.5 ft stretch, 1,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (25 tiles)
+### Group M Water and wastewater (28 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `backflow-test-psi` | Backflow Assembly Test Pass Criteria | USC FCCCHR Manual / AWWA C511; #1 check 8 psid, relief 4 psid -> buffer 4 psid, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bod-tss-loading-removal` | BOD/TSS Mass Loading and Percent Removal | wastewater operations (pounds formula); spec-v406 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `breakpoint-chlorination` | Breakpoint Chlorination Dose | Standard Methods 4500-Cl; spec-v355 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chemical-feed-pump` | Chemical Metering-Pump Setting | Pounds formula (AWWA / EPA water-oper...; 0.5 MGD, 8 mg/L, 12.5% NaOCl, SG 1.16, 50 GPD pump -> ~55... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-decay` | Chlorine Residual Decay (First-Order) | EPA / AWWA; C(10) = 2*exp(-1) = 0.7358 mg/L; time to 0.2 mg/L = ln(2/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-demand` | Chlorine Demand and Dose for a Target Residual | Standard Methods 4500-Cl / AWWA M14 (...; spec-v116 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `clarifier-surface-loading` | Clarifier Surface, Weir, and Solids Loading | Ten States Standards / Metcalf & Eddy; spec-v405 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; dr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `detention-time` | Detention Time | USEPA; Standard hydraulic retention identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3396,6 +3401,7 @@ per spec-v14 §13.1 second paragraph.
 | `pump-eff-w2w` | Pump Wire-to-Water Efficiency | Hydraulic Institute pump-efficiency i...; 500 gpm / 120 ft TDH / 25 kW / 0.92 motor eff -> WHP 15.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 0.05 MGD WAS / 8000 mg/L... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `svi-sludge-index` | Sludge Volume Index (SVI) | USEPA / WEF; SVI = SV30 * 1000 / MLSS | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tds-from-conductivity` | Total Dissolved Solids from Conductivity | Standard Methods 2510; spec-v407 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `uv-dose` | UV Dose and Target Check | USEPA UV Disinfection Guidance Manual...; spec-v116 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3590,6 +3596,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 873. Fixture-covered or reference-cadence: 873 / 873.
+Tile count: 876. Fixture-covered or reference-cadence: 876 / 876.
 
 <!-- END tile-index-v14 -->

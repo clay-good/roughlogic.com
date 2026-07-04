@@ -15661,3 +15661,54 @@ test("bounds: spec-v404 computeRentalTotalReturn pins the four-component sum and
   assert.ok("error" in _v404({ cash_invested_usd: 0, annual_cash_flow_usd: 3000 }));
   assert.ok("error" in _v404({ cash_invested_usd: Infinity, annual_cash_flow_usd: 3000 }));
 });
+
+// ===================== spec-v405..v407 water/wastewater-operations trio (calc-treatment.js) =====================
+import { computeClarifierSurfaceLoading as _v405, computeBodTssLoadingRemoval as _v406, computeTdsFromConductivity as _v407 } from "../../calc-treatment.js";
+
+test("bounds: spec-v405 computeClarifierSurfaceLoading pins SOR/weir/solids, the overload flag, and error seams", () => {
+  const r = _v405({ flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 2500 });
+  assert.ok(Math.abs(r.sor_gpd_ft2 - 1e6 / 1256.6) < 1e-6);
+  assert.ok(Math.abs(r.weir_gpd_ft - 1e6 / 125.7) < 1e-6);
+  assert.ok(Math.abs(r.solids_lb_ft2_day - 1 * 2500 * 8.34 / 1256.6) < 1e-9);
+  assert.strictEqual(r.sor_overloaded, false);
+  // No MLSS -> null solids loading.
+  assert.strictEqual(_v405({ flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: 0 }).solids_lb_ft2_day, null);
+  // Double the flow overloads the surface.
+  assert.strictEqual(_v405({ flow_mgd: 2.0, surface_ft2: 1256.6, weir_len_ft: 125.7 }).sor_overloaded, true);
+  // Error seams.
+  assert.ok("error" in _v405({ flow_mgd: 0, surface_ft2: 1256.6, weir_len_ft: 125.7 }));
+  assert.ok("error" in _v405({ flow_mgd: 1.0, surface_ft2: 0, weir_len_ft: 125.7 }));
+  assert.ok("error" in _v405({ flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 0 }));
+  assert.ok("error" in _v405({ flow_mgd: Infinity, surface_ft2: 1256.6, weir_len_ft: 125.7 }));
+  assert.ok("error" in _v405({ flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: Infinity }));
+});
+
+test("bounds: spec-v406 computeBodTssLoadingRemoval pins the loads, removal, the upset case, and error seams", () => {
+  const r = _v406({ flow_mgd: 1.0, influent_mgl: 200, effluent_mgl: 20 });
+  assert.ok(Math.abs(r.influent_lb_day - 1668) < 1e-6);
+  assert.ok(Math.abs(r.removed_lb_day - 1501.2) < 1e-6);
+  assert.ok(Math.abs(r.removal_pct - 90) < 1e-9 && r.upset === false);
+  // Load scales with flow; efficiency does not.
+  const big = _v406({ flow_mgd: 4.0, influent_mgl: 200, effluent_mgl: 20 });
+  assert.ok(Math.abs(big.influent_lb_day - 6672) < 1e-6 && Math.abs(big.removal_pct - 90) < 1e-9);
+  // An effluent above influent is a reported upset, not an error.
+  const upset = _v406({ flow_mgd: 1.0, influent_mgl: 20, effluent_mgl: 30 });
+  assert.ok(upset.removal_pct < 0 && upset.upset === true && !("error" in upset));
+  // Error seams.
+  assert.ok("error" in _v406({ flow_mgd: 0, influent_mgl: 200, effluent_mgl: 20 }));
+  assert.ok("error" in _v406({ flow_mgd: 1.0, influent_mgl: 0, effluent_mgl: 20 }));
+  assert.ok("error" in _v406({ flow_mgd: Infinity, influent_mgl: 200, effluent_mgl: 20 }));
+});
+
+test("bounds: spec-v407 computeTdsFromConductivity pins TDS, the k-band, and error seams", () => {
+  const r = _v407({ conductivity_us_cm: 1000, k_factor: 0.65 });
+  assert.ok(Math.abs(r.tds_mgl - 650) < 1e-9);
+  assert.ok(Math.abs(r.tds_low - 550) < 1e-9 && Math.abs(r.tds_high - 750) < 1e-9);
+  // A different factor scales linearly.
+  assert.ok(Math.abs(_v407({ conductivity_us_cm: 1000, k_factor: 0.55 }).tds_mgl - 550) < 1e-9);
+  // Error seams: non-positive EC, out-of-range factor, non-finite.
+  assert.ok("error" in _v407({ conductivity_us_cm: 0, k_factor: 0.65 }));
+  assert.ok("error" in _v407({ conductivity_us_cm: 1000, k_factor: 1.5 }));
+  assert.ok("error" in _v407({ conductivity_us_cm: 1000, k_factor: 0.3 }));
+  assert.ok("error" in _v407({ conductivity_us_cm: Infinity, k_factor: 0.65 }));
+});
