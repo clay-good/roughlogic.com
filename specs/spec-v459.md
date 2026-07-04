@@ -1,6 +1,6 @@
 # roughlogic.com Specification v459 -- Gas Appliance Altitude Derate (NFPA 54) (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an HVAC field-checks trio (v459 gas appliance altitude derate ->
+> **Status: CUT (2026-07-04) -- dupe of the existing `gas-altitude-derate` tile (High-Altitude Appliance Input Derate), same NFPA 54/IFGC 4%-per-1000ft-above-2000ft derate and derated input. Not landed.. First tile of an HVAC field-checks trio (v459 gas appliance altitude derate ->
 > v460 duct equivalent diameter -> v461 duct leakage CFM25). `gas-meter-clock` measures an appliance's actual firing rate;
 > nothing derates its rated input for altitude, the correction every high-elevation install needs.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. Thinner air at altitude carries less oxygen, so a gas

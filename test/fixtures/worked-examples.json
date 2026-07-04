@@ -42495,6 +42495,50 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "duct-leakage-cfm25",
+   "source_publisher": "IECC R403.3.5",
+   "source_title": "80 CFM25, 2000 ft2, limit 4 -> 4.0 CFM25/100 ft2, passes at the limit",
+   "source_edition_or_year": "spec-v461 worked example (machine-verified)",
+   "source_section_or_page": "spec-v461 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "leakage_cfm25": 80,
+    "cfa_ft2": 2000,
+    "limit": 4
+   },
+   "outputs": {
+    "normalized": {
+     "value": 4.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "duct-leakage-cfm25",
+   "source_publisher": "IECC R403.3.5",
+   "source_title": "a leakier 100 CFM25 on 2000 ft2 -> 5.0, fails the limit of 4",
+   "source_edition_or_year": "spec-v461 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v461 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "leakage_cfm25": 100,
+    "cfa_ft2": 2000,
+    "limit": 4
+   },
+   "outputs": {
+    "normalized": {
+     "value": 5.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

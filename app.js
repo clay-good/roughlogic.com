@@ -446,6 +446,8 @@ const TOOL_MODULES = (() => {
     "gas-meter-clock", "furnace-temp-rise",
     // spec-v218..v220 residential air-tightness and ventilation batch.
     "blower-door-ach50", "ashrae-622-ventilation", "infiltration-load",
+    // spec-v461 residential duct leakage
+    "duct-leakage-cfm25",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

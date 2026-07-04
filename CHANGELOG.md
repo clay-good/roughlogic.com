@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): land spec-v461 -- residential duct leakage CFM25 (v459/v460 cut as dupes); 917 -> 918 tiles, 0.158.0, 2026-07-04
+
+The HVAC field-test trio, twenty-seventh batch of the v375-v474 campaign. Two of three were **cut as duplicates**: v459 `gas-appliance-altitude-derate` duplicates the existing `gas-altitude-derate` (same NFPA 54 / IFGC 4%-per-1000-ft-above-2000-ft derate), and v460 `duct-equivalent-diameter` duplicates the existing `round-to-rect-duct` (same ASHRAE equal-friction De = 1.30 (ab)^0.625/(a+b)^0.25 and aspect ratio) -- so only one landed. Catalog **917 -> 918**, package **0.157.0 -> 0.158.0** (a minor). Proposed 2026-07-03.
+
+- **`duct-leakage-cfm25` (spec-v461, calc-hvacservice.js).** IECC R403.3.5 residential duct tightness: normalized = leakage CFM25 / conditioned floor area x 100, against the code limit (4 total / post-construction, 3 rough-in without the air handler). Pinned: 80 CFM25 on 2,000 ft^2 -> exactly 4.0 (pass at the limit); 60 -> 3.0 (pass), 100 -> 5.0 (fail). Distinct from the SMACNA leakage-class `duct-leakage` (commercial).
+
+Carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, a fuzzer block covering the normalization, the pass/fail flip, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming IECC R403.3.5 / RESNET. Uses the shared `_simpleRenderer`. Per-tile wiring across nine registries. Also bumped the `calc-lowvoltage.js` module-size cap 11000 -> 13000 (a dated comment): the prior spec-v456..v458 AV/security batch had pushed it to ~11.8 KB gz, over the old cap. Housekeeping: home count 917 -> 918, README resynced (counts, sitemap URLs 939 -> 940), one spec LANDED + two CUT, docs/mobile-responsive.md section 90 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the new tile.
+
 ### feat(lowvoltage): land spec-v456..v458 -- 3 AV / security / data tiles in calc-lowvoltage.js; 914 -> 917 tiles, 0.157.0, 2026-07-04
 
 The low-voltage AV/security/data trio, twenty-sixth batch of the v375-v474 campaign, all in the existing lazy `calc-lowvoltage.js` (Group A); no new module, group, or dependency. Catalog **914 -> 917**, package **0.156.0 -> 0.157.0** (a minor). Proposed 2026-07-03.

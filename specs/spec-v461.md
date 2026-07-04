@@ -1,6 +1,6 @@
 # roughlogic.com Specification v461 -- Residential Duct Leakage CFM25 (IECC R403.3.5) (calc-hvacservice.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the HVAC field-checks trio (v459 gas appliance altitude derate ->
+> **Status: LANDED (2026-07-04). Third and final tile of the HVAC field-checks trio (v459 gas appliance altitude derate ->
 > v460 duct equivalent diameter -> v461 duct leakage CFM25). `duct-leakage` is the commercial SMACNA leakage-class test
 > (CFM per 100 ft^2 of duct surface); this tile is the residential IECC code test, normalized to conditioned floor area,
 > with a different pass/fail limit.**

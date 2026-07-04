@@ -17757,6 +17757,51 @@
       "term": "channel limit cabling",
       "target": "structured-cabling-channel",
       "kind": "industry"
+    },
+    {
+      "term": "duct leakage cfm25",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "cfm25",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "residential duct leakage",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "duct blaster test",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "iecc duct test",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "duct tightness",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "total duct leakage",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "duct leakage per 100",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
+    },
+    {
+      "term": "r403.3.5",
+      "target": "duct-leakage-cfm25",
+      "kind": "industry"
     }
   ]
 }

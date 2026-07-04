@@ -596,3 +596,37 @@ HVACSERVICE_RENDERERS["outside-air-percent-temps"] = _simpleRenderer({
   ],
   compute: computeOutsideAirPercentTemps,
 });
+
+// ===================== spec-v461: residential duct leakage CFM25 (IECC R403.3.5) =====================
+// dims: in { leakage_cfm25: L^3 T^-1, cfa_ft2: L^2, limit: dimensionless } out: { normalized: dimensionless }
+export function computeDuctLeakageCfm25({ leakage_cfm25 = 0, cfa_ft2 = 0, limit = 4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const leak = Number(leakage_cfm25) || 0;
+  const cfa = Number(cfa_ft2) || 0;
+  const lim = Number(limit) || 0;
+  if (!(leak >= 0)) return { error: "Measured leakage must be non-negative (CFM25)." };
+  if (!(cfa > 0)) return { error: "Conditioned floor area must be positive (ft^2)." };
+  if (!(lim > 0)) return { error: "Leakage limit must be positive (CFM25 per 100 ft^2)." };
+  const normalized = leakage_cfm25 / cfa * 100;
+  const passes = normalized <= lim;
+  return {
+    normalized, passes, limit: lim,
+    note: "Residential duct leakage (IECC R403.3.5): a blower (duct blaster) pressurizes the duct system to 25 Pa and the leakage is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100. The IECC total-leakage limit is 4 CFM25 per 100 ft^2 for a rough-in test with the air handler installed, or the post-construction total; a rough-in test without the air handler is limited to 3, and 4 applies to leakage to outdoors on some paths (verify the test type and the code edition adopted). A tighter system wastes less conditioned air into attics and crawlspaces. A field aid; the adopted energy code, the required test type, and the rater govern.",
+  };
+}
+export const ductLeakageCfm25Example = { inputs: { leakage_cfm25: 80, cfa_ft2: 2000, limit: 4 } };
+HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
+  citation: "Citation: Residential duct leakage (IECC R403.3.5): normalized = leakage CFM25 / conditioned floor area x 100, compared to the code limit (4 CFM25 per 100 ft^2 total / post-construction, 3 for a rough-in without the air handler). A field aid; the adopted energy code, the required test type, and the rater govern.",
+  example: ductLeakageCfm25Example.inputs,
+  fields: [
+    { key: "leakage_cfm25", label: "Measured total leakage at 25 Pa (CFM25)", kind: "number", default: 80 },
+    { key: "cfa_ft2", label: "Conditioned floor area (ft^2)", kind: "number", default: 2000 },
+    { key: "limit", label: "Limit (CFM25 per 100 ft^2, default 4)", kind: "number", default: 4 },
+  ],
+  outputs: [
+    { key: "norm", id: "dlc-out-norm", label: "Normalized leakage", value: (r) => fmt(r.normalized, 2) + " CFM25 / 100 ft^2" },
+    { key: "pass", id: "dlc-out-pass", label: "Result", value: (r) => r.passes ? "PASS (<= " + fmt(r.limit, 1) + ")" : "FAIL (> " + fmt(r.limit, 1) + ")" },
+    { key: "n", id: "dlc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDuctLeakageCfm25,
+});

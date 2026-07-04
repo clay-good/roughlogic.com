@@ -588,6 +588,7 @@ const RELATED = {
   "baseboard-output": ["manual-j-heating", "balance-point", "insulation-heat-loss"],
   "npsh-a": ["pump-sizing", "pump-operating-point", "friction-loss"],
   "duct-leakage": ["duct-sizing", "static-pressure-hvac", "duct-friction-static"],
+  "duct-leakage-cfm25": ["duct-leakage", "blower-door-ach50", "duct-sizing", "infiltration-load"],
   "duct-friction-static": ["duct-sizing", "static-pressure-hvac", "equivalent-length"],
   "refrigerant-charging": ["refrigerant-pt", "superheat-subcool", "refrigerant-charge"],
   "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer", "chiller-tons"],

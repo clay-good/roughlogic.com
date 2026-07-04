@@ -15682,6 +15682,25 @@ test("bounds: spec-v458 computeStructuredCablingChannel pins de-rated max, chann
   assert.ok("error" in _v458({ permanent_link_m: Infinity, cords_m: 8 }));
 });
 
+// ===================== spec-v461 residential duct leakage (v459/v460 cut as dupes of gas-altitude-derate / round-to-rect-duct) =====================
+import { computeDuctLeakageCfm25 as _v461 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v461 computeDuctLeakageCfm25 pins the normalization, pass/fail, and error seams", () => {
+  const r = _v461({ leakage_cfm25: 80, cfa_ft2: 2000, limit: 4 });
+  assert.ok(Math.abs(r.normalized - 4) < 1e-9 && r.passes === true);
+  // A tighter house passes comfortably; a leakier one fails.
+  assert.ok(Math.abs(_v461({ leakage_cfm25: 60, cfa_ft2: 2000, limit: 4 }).normalized - 3) < 1e-9);
+  const leaky = _v461({ leakage_cfm25: 100, cfa_ft2: 2000, limit: 4 });
+  assert.ok(Math.abs(leaky.normalized - 5) < 1e-9 && leaky.passes === false);
+  // Zero leakage is a perfect pass.
+  assert.ok(_v461({ leakage_cfm25: 0, cfa_ft2: 2000, limit: 4 }).passes === true);
+  // Error seams: negative leakage, non-positive area, non-positive limit, non-finite.
+  assert.ok("error" in _v461({ leakage_cfm25: -1, cfa_ft2: 2000, limit: 4 }));
+  assert.ok("error" in _v461({ leakage_cfm25: 80, cfa_ft2: 0, limit: 4 }));
+  assert.ok("error" in _v461({ leakage_cfm25: 80, cfa_ft2: 2000, limit: 0 }));
+  assert.ok("error" in _v461({ leakage_cfm25: Infinity, cfa_ft2: 2000, limit: 4 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

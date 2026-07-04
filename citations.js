@@ -1257,6 +1257,18 @@ export const CITATIONS = {
       { name: "Leakage classes", value: "3 / 6 / 12 / 24 / 48 cfm per 100 ft² at 1 in WC", source: "SMACNA Duct Leakage Test Manual" },
     ],
   },
+  "duct-leakage-cfm25": {
+    formula: "normalized = leakage_cfm25 / cfa_ft2 x 100; passes = normalized <= limit (default 4 CFM25 per 100 ft^2).",
+    edition: "IECC (International Energy Conservation Code) §R403.3.5 (duct testing) and RESNET / ANSI 380 duct-leakage test methods, by name.",
+    freeAccess: "IECC is viewable through the ICC public-access reader; the leakage / area x 100 normalization is public arithmetic.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "IECC §R403.3.5 requires the duct system be tested for total leakage with a duct pressurization tester at 25 Pa (0.1 in WC); the result is normalized to the conditioned floor area, CFM25 per 100 ft^2 = leakage / area x 100, and compared to the code limit. The common limits are 4 CFM25 per 100 ft^2 for a post-construction total-leakage test or a rough-in test with the air handler installed, and 3 for a rough-in test without the air handler; some editions and the leakage-to-outdoors path differ, so the limit is an editable input. A tighter system loses less conditioned air to unconditioned spaces. Distinct from the SMACNA leakage-class test for commercial duct (see duct-leakage). A field aid; the adopted IECC edition, the required test type, and the rater's calibrated equipment govern.",
+    assumptions: [
+      { name: "Normalization", value: "CFM25 per 100 ft^2 = leakage / conditioned floor area x 100", source: "IECC §R403.3.5" },
+      { name: "Limit editable", value: "4 total / post-construction, 3 rough-in without the air handler; the edition and test type set it", source: "IECC / RESNET" },
+      { name: "Rater governs", value: "the required test type and the rater's calibrated duct tester govern the official result", source: "scope of this tile" },
+    ],
+  },
   "residential-framing": {
     formula: "Stud count = ceil(perimeter / stud_oc) + 8 (corner/T allowance). Plate lf = ceil(perimeter × 3 × 1.10) (sole + 2 top + 10% waste). Joist count = ceil(footprint / (joist_span × joist_oc)) + 2. Rafter count derived from approx_length / rafter_oc × 2 (both sides). Rafter length = building_run × m_common where m_common = sqrt(P² + 144) / 12. Board feet per ft per nominal: 2x4 = 0.667, 2x6 = 1.0, 2x8 = 1.333, 2x10 = 1.667, 2x12 = 2.0.",
     edition: IRC_2021 + " Tables R502.5 (joists), R602.5 (studs), R802.5.1 (rafters). WWPA standard grading rules for board-feet conversions.",

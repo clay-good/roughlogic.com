@@ -1,6 +1,6 @@
 # roughlogic.com Specification v460 -- Duct Equivalent Round Diameter (calc-hvac.js, Group C, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the HVAC field-checks trio (v459 gas appliance altitude derate ->
+> **Status: CUT (2026-07-04) -- dupe of the existing `round-to-rect-duct` tile (Round-to-Rectangular Duct Equivalent), same ASHRAE equal-friction De = 1.30 (ab)^0.625/(a+b)^0.25 and aspect ratio. Not landed.. Second tile of the HVAC field-checks trio (v459 gas appliance altitude derate ->
 > v460 duct equivalent diameter -> v461 duct leakage CFM25). `duct-sizing` and `duct-friction-static` work in round-duct
 > terms, but ductwork is often rectangular; converting a rectangular duct to its equivalent round diameter -- the round duct
 > that carries the same airflow at the same friction -- has no tile.**

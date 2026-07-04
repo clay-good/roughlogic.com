@@ -503,6 +503,7 @@ export const COMPUTE_MAP = {
   "refrigerant-charge": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantCharge" },
   "refrigerant-charging": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantCharging" },
   "duct-leakage": { module: "../../calc-hvac.js", fn: "computeDuctLeakage" },
+  "duct-leakage-cfm25": { module: "../../calc-hvacservice.js", fn: "computeDuctLeakageCfm25" },
   "duct-friction-static": { module: "../../calc-hvac.js", fn: "computeDuctFrictionStatic" },
   "pallet-loadout": { module: "../../calc-trucking.js", fn: "computePalletLoadout" },
   "hos-math": { module: "../../calc-trucking.js", fn: "computeHOS" },
