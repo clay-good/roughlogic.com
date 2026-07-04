@@ -1,6 +1,6 @@
 # roughlogic.com Specification v464 -- Alternator Charging Load Balance (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the engine/vehicle-systems trio (v462 prop pitch -> v463 engine
+> **Status: LANDED (2026-07-04). Third and final tile of the engine/vehicle-systems trio (v462 prop pitch -> v463 engine
 > fuel burn -> v464 alternator charging). The catalog has no charging-system tile; this one audits the electrical load
 > against the alternator's real output at idle and at cruise, and flags the deficit that drains the battery at a stoplight.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. An alternator makes only a fraction of its rated output

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): land spec-v462..v464 -- 3 marine/engine/electrical tiles in calc-mechanic.js; 918 -> 921 tiles, 0.159.0, 2026-07-04
+
+The mechanic trio, twenty-eighth batch of the v375-v474 campaign, all in the existing lazy `calc-mechanic.js` (Group K); no new module, group, or dependency. Catalog **918 -> 921**, package **0.158.0 -> 0.159.0** (a minor). Proposed 2026-07-03.
+
+- **`prop-pitch-selection` (spec-v462).** Marine prop repitch: new pitch = current - (target - current WOT RPM) / rpm-per-inch (~200). Pinned: a 19 in prop hitting 5000 rpm against a 5400 target -> 17 in; over-revving to 6000 -> 22 in. Distinct from `prop-slip` (which measures slip, not pitch selection).
+- **`engine-fuel-burn-gph` (spec-v463).** BSFC burn: gph = HP x BSFC / fuel density, run time = tank / gph. Pinned: a 300 hp diesel at BSFC 0.37 -> 15.6 GPH (12.8 hr on 200 gal); the same power gasoline (0.50) -> 24.6 GPH, 58% more. Distinct from `fuel-range` (energy/range) and `injector-size` (per-injector flow).
+- **`alternator-charging-load` (spec-v464).** Charging balance: output = alternator x (~0.5 idle / ~0.9 cruise), balance = output - load. Pinned: a 65 A load on a 120 A alternator -> -5 A at idle (drains), +43 A at cruise; a 160 A alternator -> +15 A idle.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the under/over-rev direction, the diesel-vs-gasoline burn, the idle/cruise balance sign, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming outboard prop-selection practice, BSFC engine-performance, and alternator output-curve practice. All three use the shared `_simpleRenderer`. Per-tile wiring across nine registries. Housekeeping: home count 918 -> 921, README resynced (counts, sitemap URLs 940 -> 943), three specs LANDED, docs/mobile-responsive.md section 91 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(hvac): land spec-v461 -- residential duct leakage CFM25 (v459/v460 cut as dupes); 917 -> 918 tiles, 0.158.0, 2026-07-04
 
 The HVAC field-test trio, twenty-seventh batch of the v375-v474 campaign. Two of three were **cut as duplicates**: v459 `gas-appliance-altitude-derate` duplicates the existing `gas-altitude-derate` (same NFPA 54 / IFGC 4%-per-1000-ft-above-2000-ft derate), and v460 `duct-equivalent-diameter` duplicates the existing `round-to-rect-duct` (same ASHRAE equal-friction De = 1.30 (ab)^0.625/(a+b)^0.25 and aspect ratio) -- so only one landed. Catalog **917 -> 918**, package **0.157.0 -> 0.158.0** (a minor). Proposed 2026-07-03.

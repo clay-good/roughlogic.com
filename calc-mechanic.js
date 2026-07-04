@@ -1130,3 +1130,118 @@ MECHANIC_RENDERERS["cooling-system-flow"] = _simpleRenderer({
   ],
   compute: computeCoolingSystemFlow,
 });
+
+// ===================== spec-v462: marine propeller pitch selection =====================
+// dims: in { current_pitch_in: L, current_wot_rpm: dimensionless, target_wot_rpm: dimensionless, rpm_per_inch: dimensionless } out: { pitch_change_in: L, new_pitch_in: L }
+export function computePropPitchSelection({ current_pitch_in = 0, current_wot_rpm = 0, target_wot_rpm = 0, rpm_per_inch = 200 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pitch = Number(current_pitch_in) || 0;
+  const curRpm = Number(current_wot_rpm) || 0;
+  const tgtRpm = Number(target_wot_rpm) || 0;
+  const rpi = Number(rpm_per_inch) || 0;
+  if (!(pitch > 0)) return { error: "Current pitch must be positive (in)." };
+  if (!(curRpm > 0)) return { error: "Current WOT RPM must be positive." };
+  if (!(tgtRpm > 0)) return { error: "Target WOT RPM must be positive." };
+  if (!(rpi > 0)) return { error: "RPM per inch of pitch must be positive." };
+  const pitch_change_in = (tgtRpm - curRpm) / rpi;
+  const new_pitch_in = pitch - pitch_change_in;
+  if (!(new_pitch_in > 0)) return { error: "The computed pitch is not positive -- check the RPM values (too large a change for this prop)." };
+  return {
+    pitch_change_in, new_pitch_in, lower: pitch_change_in > 0,
+    note: "Marine propeller pitch selection: at wide-open throttle the engine should reach the top of its rated RPM band. Each inch of propeller pitch changes WOT RPM by roughly 200 rpm (150-250 depending on the boat), so pitch change = (target - current WOT RPM) / rpm-per-inch and the new pitch = current pitch - that change. An engine that under-revs (below its band) needs LESS pitch; one that over-revs needs MORE. Diameter, blade count, cupping, and gear ratio also matter, so treat this as the starting point for a prop swap. A selection aid; a WOT test with the new prop and the dealer's prop chart govern.",
+  };
+}
+export const propPitchSelectionExample = { inputs: { current_pitch_in: 19, current_wot_rpm: 5000, target_wot_rpm: 5400, rpm_per_inch: 200 } };
+MECHANIC_RENDERERS["prop-pitch-selection"] = _simpleRenderer({
+  citation: "Citation: Marine prop pitch selection (rule of thumb): each inch of pitch changes WOT RPM by ~200 rpm; pitch change = (target - current WOT RPM) / rpm-per-inch, new pitch = current - change. Under-rev needs less pitch, over-rev needs more. A selection aid; a WOT test and the prop chart govern.",
+  example: propPitchSelectionExample.inputs,
+  fields: [
+    { key: "current_pitch_in", label: "Current prop pitch (in)", kind: "number", default: 19 },
+    { key: "current_wot_rpm", label: "Measured WOT RPM now", kind: "number", default: 5000 },
+    { key: "target_wot_rpm", label: "Target WOT RPM (rated band)", kind: "number", default: 5400 },
+    { key: "rpm_per_inch", label: "RPM change per inch of pitch", kind: "number", default: 200 },
+  ],
+  outputs: [
+    { key: "np", id: "pps-out-np", label: "New pitch", value: (r) => fmt(r.new_pitch_in, 1) + " in (" + (r.lower ? "lower pitch, engine was under-revving" : "higher pitch, engine was over-revving") + ")" },
+    { key: "pc", id: "pps-out-pc", label: "Pitch change", value: (r) => fmt(Math.abs(r.pitch_change_in), 1) + " in " + (r.lower ? "less" : "more") },
+    { key: "n", id: "pps-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePropPitchSelection,
+});
+
+// ===================== spec-v463: engine fuel burn from horsepower (BSFC) =====================
+// dims: in { horsepower: dimensionless, bsfc_lb_hp_hr: dimensionless, density_lb_gal: dimensionless, tank_gal: L^3 } out: { gph: L^3 T^-1, run_hours: dimensionless }
+export function computeEngineFuelBurnGph({ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hp = Number(horsepower) || 0;
+  const bsfc = Number(bsfc_lb_hp_hr) || 0;
+  const dens = Number(density_lb_gal) || 0;
+  const tank = Number(tank_gal) || 0;
+  if (!(hp > 0)) return { error: "Horsepower must be positive." };
+  if (!(bsfc > 0)) return { error: "BSFC must be positive (lb/hp-hr)." };
+  if (!(dens > 0)) return { error: "Fuel density must be positive (lb/gal)." };
+  if (tank < 0) return { error: "Tank size must be non-negative (gal)." };
+  const gph = hp * bsfc / dens;
+  const run_hours = tank > 0 ? tank / gph : null;
+  return {
+    gph, run_hours, lb_per_hr: hp * bsfc,
+    note: "Engine fuel burn from horsepower and BSFC: the fuel flow in lb/hr = horsepower x brake-specific fuel consumption (BSFC, the pounds of fuel per horsepower per hour), and gallons per hour = that divided by the fuel density (diesel about 7.1 lb/gal, gasoline about 6.1). A modern diesel runs BSFC ~0.35-0.40; a gasoline engine ~0.45-0.55, so a gasoline engine of the same power burns markedly more volume per hour. Given a tank size the run time = tank / gph. This is the burn at the entered (usually near-full) power; real duty-cycle burn is lower. A planning aid; the engine's fuel map and a measured burn govern.",
+  };
+}
+export const engineFuelBurnGphExample = { inputs: { horsepower: 300, bsfc_lb_hp_hr: 0.37, density_lb_gal: 7.1, tank_gal: 200 } };
+MECHANIC_RENDERERS["engine-fuel-burn-gph"] = _simpleRenderer({
+  citation: "Citation: Engine fuel burn (BSFC): lb/hr = HP x BSFC, gph = lb/hr / fuel density (diesel ~7.1, gasoline ~6.1 lb/gal); run time = tank / gph. The burn at the entered power; real duty-cycle burn is lower. A planning aid; the engine's fuel map and a measured burn govern.",
+  example: engineFuelBurnGphExample.inputs,
+  fields: [
+    { key: "horsepower", label: "Engine power output (hp)", kind: "number", default: 300 },
+    { key: "bsfc_lb_hp_hr", label: "BSFC (lb/hp-hr, diesel ~0.37)", kind: "number", default: 0.37 },
+    { key: "density_lb_gal", label: "Fuel density (lb/gal, diesel 7.1 / gas 6.1)", kind: "number", default: 7.1 },
+    { key: "tank_gal", label: "Tank size (gal, optional for run time)", kind: "number", default: 200 },
+  ],
+  outputs: [
+    { key: "gph", id: "efb-out-gph", label: "Fuel burn", value: (r) => fmt(r.gph, 1) + " gph (" + fmt(r.lb_per_hr, 0) + " lb/hr)" },
+    { key: "rt", id: "efb-out-rt", label: "Run time on tank", value: (r) => r.run_hours === null ? "enter a tank size" : fmt(r.run_hours, 1) + " hours" },
+    { key: "n", id: "efb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEngineFuelBurnGph,
+});
+
+// ===================== spec-v464: alternator charging load balance =====================
+// dims: in { total_load_a: dimensionless, alternator_a: dimensionless, idle_frac: dimensionless, cruise_frac: dimensionless } out: { idle_out_a: dimensionless, cruise_out_a: dimensionless, idle_balance_a: dimensionless, cruise_balance_a: dimensionless }
+export function computeAlternatorChargingLoad({ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(total_load_a) || 0;
+  const alt = Number(alternator_a) || 0;
+  const idleF = Number(idle_frac) || 0;
+  const cruiseF = Number(cruise_frac) || 0;
+  if (!(load > 0)) return { error: "Total electrical load must be positive (A)." };
+  if (!(alt > 0)) return { error: "Alternator rating must be positive (A)." };
+  if (!(idleF > 0 && idleF <= 1)) return { error: "Idle output fraction must be between 0 and 1." };
+  if (!(cruiseF > 0 && cruiseF <= 1)) return { error: "Cruise output fraction must be between 0 and 1." };
+  const idle_out_a = alt * idleF;
+  const cruise_out_a = alt * cruiseF;
+  const idle_balance_a = idle_out_a - load;
+  const cruise_balance_a = cruise_out_a - load;
+  return {
+    idle_out_a, cruise_out_a, idle_balance_a, cruise_balance_a,
+    idle_ok: idle_balance_a >= 0, cruise_ok: cruise_balance_a >= 0,
+    note: "Alternator charging load balance: an alternator makes only a fraction of its rated output at engine idle (roughly 50%) and most of it at cruise (roughly 90%). The balance = output - total continuous load: a negative idle balance means the battery drains at idle or a stoplight (accessories, lights, blower, and the charging deficit come from the battery), while a positive cruise balance means it recharges on the road. If the idle balance is negative and matters (lots of idling, a stereo, a winch), step up the alternator or reduce the load. A screening aid; the alternator's actual output curve and the real duty cycle govern.",
+  };
+}
+export const alternatorChargingLoadExample = { inputs: { total_load_a: 65, alternator_a: 120, idle_frac: 0.5, cruise_frac: 0.9 } };
+MECHANIC_RENDERERS["alternator-charging-load"] = _simpleRenderer({
+  citation: "Citation: Alternator charging balance: an alternator makes ~50% of rated output at idle and ~90% at cruise; balance = output - total load. A negative idle balance drains the battery at idle; a positive cruise balance recharges it. A screening aid; the actual output curve and duty cycle govern.",
+  example: alternatorChargingLoadExample.inputs,
+  fields: [
+    { key: "total_load_a", label: "Total continuous electrical load (A)", kind: "number", default: 65 },
+    { key: "alternator_a", label: "Alternator rated output (A)", kind: "number", default: 120 },
+    { key: "idle_frac", label: "Output fraction at idle (0-1)", kind: "number", default: 0.5 },
+    { key: "cruise_frac", label: "Output fraction at cruise (0-1)", kind: "number", default: 0.9 },
+  ],
+  outputs: [
+    { key: "idle", id: "acl-out-idle", label: "Idle: output / balance", value: (r) => fmt(r.idle_out_a, 0) + " A / " + (r.idle_ok ? "+" : "") + fmt(r.idle_balance_a, 0) + " A " + (r.idle_ok ? "(surplus)" : "(DEFICIT -- drains at idle)") },
+    { key: "cruise", id: "acl-out-cruise", label: "Cruise: output / balance", value: (r) => fmt(r.cruise_out_a, 0) + " A / " + (r.cruise_ok ? "+" : "") + fmt(r.cruise_balance_a, 0) + " A " + (r.cruise_ok ? "(surplus)" : "(DEFICIT)") },
+    { key: "n", id: "acl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAlternatorChargingLoad,
+});

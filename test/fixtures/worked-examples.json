@@ -42539,6 +42539,162 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "prop-pitch-selection",
+   "source_publisher": "outboard prop selection practice",
+   "source_title": "19 in prop, 5000 rpm WOT, target 5400 -> 2 in less, 17 in new pitch",
+   "source_edition_or_year": "spec-v462 worked example (machine-verified)",
+   "source_section_or_page": "spec-v462 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "current_pitch_in": 19,
+    "current_wot_rpm": 5000,
+    "target_wot_rpm": 5400,
+    "rpm_per_inch": 200
+   },
+   "outputs": {
+    "pitch_change_in": {
+     "value": 2.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "new_pitch_in": {
+     "value": 17.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "prop-pitch-selection",
+   "source_publisher": "outboard prop selection practice",
+   "source_title": "over-revving 6000 vs 5400 -> +3 in, 22 in new pitch pulls RPM down",
+   "source_edition_or_year": "spec-v462 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v462 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "current_pitch_in": 19,
+    "current_wot_rpm": 6000,
+    "target_wot_rpm": 5400,
+    "rpm_per_inch": 200
+   },
+   "outputs": {
+    "new_pitch_in": {
+     "value": 22.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "engine-fuel-burn-gph",
+   "source_publisher": "BSFC engine-performance practice",
+   "source_title": "300 hp diesel, BSFC 0.37, 7.1 lb/gal -> 15.6 GPH, 12.8 hr on 200 gal",
+   "source_edition_or_year": "spec-v463 worked example (machine-verified)",
+   "source_section_or_page": "spec-v463 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "horsepower": 300,
+    "bsfc_lb_hp_hr": 0.37,
+    "density_lb_gal": 7.1,
+    "tank_gal": 200
+   },
+   "outputs": {
+    "gph": {
+     "value": 15.63,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "run_hours": {
+     "value": 12.79,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "engine-fuel-burn-gph",
+   "source_publisher": "BSFC engine-performance practice",
+   "source_title": "same 300 hp gasoline (BSFC 0.50, 6.1 lb/gal) -> 24.6 GPH, 58% more",
+   "source_edition_or_year": "spec-v463 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v463 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "horsepower": 300,
+    "bsfc_lb_hp_hr": 0.5,
+    "density_lb_gal": 6.1,
+    "tank_gal": 0
+   },
+   "outputs": {
+    "gph": {
+     "value": 24.59,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "alternator-charging-load",
+   "source_publisher": "automotive-electrical practice",
+   "source_title": "65 A load, 120 A alt -> idle 60 A (-5 deficit), cruise 108 A (+43 surplus)",
+   "source_edition_or_year": "spec-v464 worked example (machine-verified)",
+   "source_section_or_page": "spec-v464 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "total_load_a": 65,
+    "alternator_a": 120,
+    "idle_frac": 0.5,
+    "cruise_frac": 0.9
+   },
+   "outputs": {
+    "idle_balance_a": {
+     "value": -5,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cruise_balance_a": {
+     "value": 43,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "alternator-charging-load",
+   "source_publisher": "automotive-electrical practice",
+   "source_title": "160 A alternator raises idle output to 80 A -> +15 A idle balance",
+   "source_edition_or_year": "spec-v464 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v464 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "total_load_a": 65,
+    "alternator_a": 160,
+    "idle_frac": 0.5,
+    "cruise_frac": 0.9
+   },
+   "outputs": {
+    "idle_balance_a": {
+     "value": 15,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

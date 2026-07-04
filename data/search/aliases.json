@@ -17802,6 +17802,126 @@
       "term": "r403.3.5",
       "target": "duct-leakage-cfm25",
       "kind": "industry"
+    },
+    {
+      "term": "prop pitch selection",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "propeller pitch",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "marine prop pitch",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "wot rpm prop",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "prop repitch",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "boat prop pitch",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "rpm per inch pitch",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "outboard prop selection",
+      "target": "prop-pitch-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "engine fuel burn",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "bsfc fuel burn",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "gph fuel",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "fuel burn gph",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "gallons per hour engine",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "diesel fuel burn",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "fuel consumption horsepower",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "engine run time tank",
+      "target": "engine-fuel-burn-gph",
+      "kind": "industry"
+    },
+    {
+      "term": "alternator charging load",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "alternator sizing",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "charging balance",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "alternator output idle",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "battery drain idle",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "alternator amps",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "charging system load",
+      "target": "alternator-charging-load",
+      "kind": "industry"
+    },
+    {
+      "term": "alternator load balance",
+      "target": "alternator-charging-load",
+      "kind": "industry"
     }
   ]
 }

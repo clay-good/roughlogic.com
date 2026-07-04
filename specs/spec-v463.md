@@ -1,6 +1,6 @@
 # roughlogic.com Specification v463 -- Engine Fuel Burn from Horsepower (BSFC) (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the engine/vehicle-systems trio (v462 prop pitch -> v463 engine fuel burn
+> **Status: LANDED (2026-07-04). Second tile of the engine/vehicle-systems trio (v462 prop pitch -> v463 engine fuel burn
 > -> v464 alternator charging). `fuel-range` converts a fuel quantity to range; this tile computes the instantaneous burn
 > rate -- the gallons per hour an engine drinks at a given power output, the number a marine or generator operator watches.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. An engine's fuel burn is its power times its

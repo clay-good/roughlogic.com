@@ -15701,6 +15701,52 @@ test("bounds: spec-v461 computeDuctLeakageCfm25 pins the normalization, pass/fai
   assert.ok("error" in _v461({ leakage_cfm25: Infinity, cfa_ft2: 2000, limit: 4 }));
 });
 
+// ===================== spec-v462..v464 marine/engine/electrical mechanic trio =====================
+import { computePropPitchSelection as _v462, computeEngineFuelBurnGph as _v463, computeAlternatorChargingLoad as _v464 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v462 computePropPitchSelection pins the pitch change, new pitch, and error seams", () => {
+  const r = _v462({ current_pitch_in: 19, current_wot_rpm: 5000, target_wot_rpm: 5400, rpm_per_inch: 200 });
+  assert.ok(Math.abs(r.pitch_change_in - 2) < 1e-9 && Math.abs(r.new_pitch_in - 17) < 1e-9 && r.lower === true);
+  // An over-revving boat needs MORE pitch.
+  const over = _v462({ current_pitch_in: 19, current_wot_rpm: 6000, target_wot_rpm: 5400, rpm_per_inch: 200 });
+  assert.ok(Math.abs(over.new_pitch_in - 22) < 1e-9 && over.lower === false);
+  // Error seams: non-positive pitch, RPM, rpm-per-inch, non-finite.
+  assert.ok("error" in _v462({ current_pitch_in: 0, current_wot_rpm: 5000, target_wot_rpm: 5400, rpm_per_inch: 200 }));
+  assert.ok("error" in _v462({ current_pitch_in: 19, current_wot_rpm: 0, target_wot_rpm: 5400, rpm_per_inch: 200 }));
+  assert.ok("error" in _v462({ current_pitch_in: 19, current_wot_rpm: 5000, target_wot_rpm: 5400, rpm_per_inch: 0 }));
+  assert.ok("error" in _v462({ current_pitch_in: Infinity, current_wot_rpm: 5000, target_wot_rpm: 5400, rpm_per_inch: 200 }));
+});
+
+test("bounds: spec-v463 computeEngineFuelBurnGph pins the burn, run time, and error seams", () => {
+  const r = _v463({ horsepower: 300, bsfc_lb_hp_hr: 0.37, density_lb_gal: 7.1, tank_gal: 200 });
+  assert.ok(Math.abs(r.gph - 300 * 0.37 / 7.1) < 1e-9 && Math.abs(r.gph - 15.63) < 0.01);
+  assert.ok(Math.abs(r.run_hours - 200 / r.gph) < 1e-9);
+  // Gasoline burns more volume for the same power.
+  const gas = _v463({ horsepower: 300, bsfc_lb_hp_hr: 0.5, density_lb_gal: 6.1, tank_gal: 0 });
+  assert.ok(Math.abs(gas.gph - 24.59) < 0.01 && gas.run_hours === null && gas.gph > r.gph);
+  // Error seams: non-positive HP, BSFC, density, negative tank, non-finite.
+  assert.ok("error" in _v463({ horsepower: 0, bsfc_lb_hp_hr: 0.37, density_lb_gal: 7.1 }));
+  assert.ok("error" in _v463({ horsepower: 300, bsfc_lb_hp_hr: 0, density_lb_gal: 7.1 }));
+  assert.ok("error" in _v463({ horsepower: 300, bsfc_lb_hp_hr: 0.37, density_lb_gal: 0 }));
+  assert.ok("error" in _v463({ horsepower: 300, bsfc_lb_hp_hr: 0.37, density_lb_gal: 7.1, tank_gal: -1 }));
+  assert.ok("error" in _v463({ horsepower: Infinity, bsfc_lb_hp_hr: 0.37, density_lb_gal: 7.1 }));
+});
+
+test("bounds: spec-v464 computeAlternatorChargingLoad pins the idle/cruise balance and error seams", () => {
+  const r = _v464({ total_load_a: 65, alternator_a: 120, idle_frac: 0.5, cruise_frac: 0.9 });
+  assert.ok(Math.abs(r.idle_out_a - 60) < 1e-9 && Math.abs(r.idle_balance_a + 5) < 1e-9 && r.idle_ok === false);
+  assert.ok(Math.abs(r.cruise_balance_a - 43) < 1e-9 && r.cruise_ok === true);
+  // A bigger alternator fixes the idle deficit.
+  const big = _v464({ total_load_a: 65, alternator_a: 160, idle_frac: 0.5, cruise_frac: 0.9 });
+  assert.ok(Math.abs(big.idle_balance_a - 15) < 1e-9 && big.idle_ok === true);
+  // Error seams: non-positive load, rating, out-of-range fractions, non-finite.
+  assert.ok("error" in _v464({ total_load_a: 0, alternator_a: 120 }));
+  assert.ok("error" in _v464({ total_load_a: 65, alternator_a: 0 }));
+  assert.ok("error" in _v464({ total_load_a: 65, alternator_a: 120, idle_frac: 1.5 }));
+  assert.ok("error" in _v464({ total_load_a: 65, alternator_a: 120, cruise_frac: 0 }));
+  assert.ok("error" in _v464({ total_load_a: Infinity, alternator_a: 120 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

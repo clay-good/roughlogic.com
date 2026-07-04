@@ -487,6 +487,7 @@ const _TILES = [
   ["seismic-design-spectral-acceleration", "E"], ["seismic-story-drift", "E"], ["seismic-pdelta-stability", "E"],
   ["paint-mix-ratio", "K"],
   ["hydraulic-pump-horsepower", "K"], ["hydraulic-motor-torque-speed", "K"], ["cooling-system-flow", "K"],
+  ["prop-pitch-selection", "K"], ["engine-fuel-burn-gph", "K"], ["alternator-charging-load", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

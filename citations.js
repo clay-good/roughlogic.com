@@ -7444,6 +7444,42 @@ export const CITATIONS = {
       { name: "Flow only", value: "does not size the pump head or heat exchanger", source: "scope of this tile" },
     ],
   },
+  "prop-pitch-selection": {
+    formula: "pitch_change = (target_wot_rpm - current_wot_rpm) / rpm_per_inch; new_pitch = current_pitch - pitch_change; default rpm_per_inch = 200.",
+    edition: "Marine propeller pitch selection, standard boating / outboard-manufacturer practice (Mercury / Yamaha prop selection guides) by name; the ~200 rpm per inch of pitch rule of thumb.",
+    freeAccess: "The rpm-per-inch rule and the pitch/RPM relation are published free in outboard-manufacturer propeller selection guides.",
+    governance: GOVERNANCE.general,
+    editionNote: "At wide-open throttle the engine should turn near the top of its rated RPM band; running below wastes power and lugs, running above over-revs and risks damage. Each inch of propeller pitch changes WOT RPM by roughly 200 rpm (a common 150-250 range depending on hull and load), so the pitch change to hit a target = (target - current WOT RPM) / rpm-per-inch and the new pitch = current pitch minus that change (less pitch to raise RPM, more to lower it). Diameter, blade number and area, cupping, gear ratio, and boat load also move WOT RPM, so this is the starting point for a prop swap, not the final answer. A selection aid; a WOT test with the new propeller and the manufacturer's prop chart govern.",
+    assumptions: [
+      { name: "RPM per inch", value: "each inch of pitch changes WOT RPM by ~200 rpm (150-250 typical)", source: "outboard-manufacturer prop guides" },
+      { name: "Pitch relation", value: "new pitch = current - (target - current RPM) / rpm-per-inch", source: "propeller selection practice" },
+      { name: "Other factors", value: "diameter, cupping, gear ratio, and load also affect WOT RPM; confirm with a WOT test", source: "scope of this tile" },
+    ],
+  },
+  "engine-fuel-burn-gph": {
+    formula: "gph = horsepower x bsfc / fuel_density; run_hours = tank / gph; diesel ~7.1 lb/gal, gasoline ~6.1 lb/gal.",
+    edition: "Brake-specific fuel consumption (BSFC) fuel-flow relation, standard engine-performance practice by name; first-principles mass-to-volume conversion.",
+    freeAccess: "The BSFC fuel-flow relation (lb/hr = HP x BSFC) and fuel densities are standard published engine-performance results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Brake-specific fuel consumption (BSFC) is the pounds of fuel an engine burns per horsepower per hour, so the fuel mass flow = horsepower x BSFC and the volume flow (gph) = that divided by the fuel density (diesel about 7.1 lb/gal, gasoline about 6.1). A modern diesel runs BSFC roughly 0.35-0.40 near its efficient load; a naturally aspirated gasoline engine roughly 0.45-0.55, so for the same power a gasoline engine burns markedly more volume per hour. Given a tank size, run time = tank / gph. This is the burn at the entered power (usually near-full); the real burn over a duty cycle with part-load operation is lower. A planning aid; the engine's published fuel map and a measured burn govern.",
+    assumptions: [
+      { name: "BSFC flow", value: "lb/hr = HP x BSFC; gph = lb/hr / fuel density", source: "engine-performance first principles" },
+      { name: "Fuel density", value: "diesel ~7.1 lb/gal, gasoline ~6.1 lb/gal", source: "fuel properties" },
+      { name: "Full-power burn", value: "the burn at the entered power; part-load duty-cycle burn is lower", source: "scope of this tile" },
+    ],
+  },
+  "alternator-charging-load": {
+    formula: "idle_out = alternator x idle_frac; cruise_out = alternator x cruise_frac; balance = output - total_load; idle_frac ~0.5, cruise_frac ~0.9.",
+    edition: "Automotive/marine alternator charging-balance practice (alternator output-vs-RPM curves) by name; first-principles load balance.",
+    freeAccess: "The output-fraction rule of thumb and the load-balance arithmetic are standard published automotive-electrical results.",
+    governance: GOVERNANCE.general,
+    editionNote: "An alternator's output depends on rotor speed, so at engine idle it makes only a fraction of its rated output (commonly around half) and near cruise most of it (around 90%). The charging balance = available output - total continuous electrical load: a negative idle balance means the battery supplies the shortfall at idle or at a stoplight (headlights, blower, ignition, audio, accessories), and a positive cruise balance means the battery recharges while driving. If the idle balance is negative and the vehicle idles a lot or runs a big accessory load, step up the alternator or shed load. The output fractions are rules of thumb; the alternator's actual output-vs-RPM curve and the real duty cycle govern.",
+    assumptions: [
+      { name: "Output fractions", value: "~50% of rated output at idle, ~90% at cruise (rotor-speed dependent)", source: "alternator output curves" },
+      { name: "Load balance", value: "balance = output - total continuous load; negative at idle drains the battery", source: "automotive-electrical practice" },
+      { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
+    ],
+  },
   "cutting-fluid-concentration": {
     formula: "Concentration % = Brix x refractometer factor; add concentrate = sump x (target - current) / (100 - target); add water = sump x (current - target) / target.",
     edition: "Metalworking-fluid refractometer method (by name).",

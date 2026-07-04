@@ -1,6 +1,6 @@
 # roughlogic.com Specification v462 -- Marine Propeller Pitch Selection (calc-mechanic.js, Group K, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of an engine/vehicle-systems trio (v462 prop pitch -> v463 engine fuel burn ->
+> **Status: LANDED (2026-07-04). First tile of an engine/vehicle-systems trio (v462 prop pitch -> v463 engine fuel burn ->
 > v464 alternator charging). `prop-slip` measures how much a fixed propeller slips; this tile is the selection side --
 > repitching a prop to hit the engine's rated wide-open-throttle (WOT) RPM.**
 > In-scope catalog expansion under the spec-v106 trades-only charter. If a boat over- or under-revs at wide-open throttle,
