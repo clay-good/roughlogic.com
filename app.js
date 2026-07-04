@@ -109,6 +109,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-lowvoltage.js", "LOWVOLTAGE_RENDERERS", [
     "fiber-loss-budget", "cable-tray-fill", "cctv-storage",
     "speaker-70v-line", "standby-battery-sizing", "coax-rg-loss",
+    "camera-lens-fov", "ceiling-speaker-coverage", "structured-cabling-channel",
   ]);
   // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per
   // the spec-v28 §7 roadmap; lives in its own module because calc-electrical

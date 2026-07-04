@@ -1,6 +1,6 @@
 # roughlogic.com Specification v456 -- Camera Lens Field of View and Pixel Density (IEC 62676-4 DORI) (calc-lowvoltage.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). First tile of a low-voltage systems trio (v456 camera lens FOV -> v457 ceiling speaker
+> **Status: LANDED (2026-07-04). First tile of a low-voltage systems trio (v456 camera lens FOV -> v457 ceiling speaker
 > coverage -> v458 structured cabling channel). `cctv-storage` sizes the recording bandwidth and disk; nothing sizes the
 > lens -- the field of view and the pixels-per-foot that decide whether a camera can detect, recognize, or identify a person
 > at a given distance.**

@@ -42307,6 +42307,194 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "camera-lens-fov",
+   "source_publisher": "IEC 62676-4 DORI",
+   "source_title": "5.37 mm sensor, 4 mm lens, 30 ft, 1920 px -> 67.7 deg FOV, 40.3 ft scene, 47.7 ppf (Recognize)",
+   "source_edition_or_year": "spec-v456 worked example (machine-verified)",
+   "source_section_or_page": "spec-v456 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "sensor_width_mm": 5.37,
+    "focal_length_mm": 4,
+    "distance_ft": 30,
+    "h_pixels": 1920
+   },
+   "outputs": {
+    "fov_deg": {
+     "value": 67.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "scene_ft": {
+     "value": 40.275,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ppf": {
+     "value": 47.67,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "camera-lens-fov",
+   "source_publisher": "IEC 62676-4 DORI",
+   "source_title": "8 mm lens halves scene to 20.1 ft, doubles density to 95.3 ppf (Identify)",
+   "source_edition_or_year": "spec-v456 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v456 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "sensor_width_mm": 5.37,
+    "focal_length_mm": 8,
+    "distance_ft": 30,
+    "h_pixels": 1920
+   },
+   "outputs": {
+    "scene_ft": {
+     "value": 20.1375,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "ppf": {
+     "value": 95.34,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-speaker-coverage",
+   "source_publisher": "commercial-audio design practice",
+   "source_title": "10 ft ceiling, 4 ft ear, 90 deg, 1200 ft2, edge-to-edge -> 12 ft diameter, 9 speakers",
+   "source_edition_or_year": "spec-v457 worked example (machine-verified)",
+   "source_section_or_page": "spec-v457 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "ceiling_ft": 10,
+    "ear_ft": 4,
+    "coverage_deg": 90,
+    "room_area_ft2": 1200,
+    "layout": "edge_to_edge"
+   },
+   "outputs": {
+    "diameter_ft": {
+     "value": 12.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "spacing_ft": {
+     "value": 12.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "count": {
+     "value": 9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ceiling-speaker-coverage",
+   "source_publisher": "commercial-audio design practice",
+   "source_title": "minimum-overlap spacing 0.7x12 = 8.4 ft -> 18 speakers (exact ceil(1200/70.56))",
+   "source_edition_or_year": "spec-v457 cross-check (machine-verified; spec prose 17 used rounded 70.6, exact is 18)",
+   "source_section_or_page": "spec-v457 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "ceiling_ft": 10,
+    "ear_ft": 4,
+    "coverage_deg": 90,
+    "room_area_ft2": 1200,
+    "layout": "minimum_overlap"
+   },
+   "outputs": {
+    "spacing_ft": {
+     "value": 8.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "count": {
+     "value": 18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structured-cabling-channel",
+   "source_publisher": "ANSI/TIA-568",
+   "source_title": "85 m link, 8 m cords, 20 deg C -> 93 m channel, 90 m max link, passes",
+   "source_edition_or_year": "spec-v458 worked example (machine-verified)",
+   "source_section_or_page": "spec-v458 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "permanent_link_m": 85,
+    "cords_m": 8,
+    "temp_c": 20,
+    "derate_per_c": 0.004
+   },
+   "outputs": {
+    "max_pl_m": {
+     "value": 90,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "channel_m": {
+     "value": 93,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "structured-cabling-channel",
+   "source_publisher": "ANSI/TIA-568",
+   "source_title": "40 deg C de-rates max link to 82.8 m, so 85 m link now fails",
+   "source_edition_or_year": "spec-v458 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v458 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-04",
+   "inputs": {
+    "permanent_link_m": 85,
+    "cords_m": 8,
+    "temp_c": 40,
+    "derate_per_c": 0.004
+   },
+   "outputs": {
+    "max_pl_m": {
+     "value": 82.8,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "channel_m": {
+     "value": 93,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
   }
  ]
 }

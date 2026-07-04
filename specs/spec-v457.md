@@ -1,6 +1,6 @@
 # roughlogic.com Specification v457 -- Ceiling Speaker Coverage and Spacing (calc-lowvoltage.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Second tile of the low-voltage systems trio (v456 camera lens FOV -> v457 ceiling speaker
+> **Status: LANDED (2026-07-04). Second tile of the low-voltage systems trio (v456 camera lens FOV -> v457 ceiling speaker
 > coverage -> v458 structured cabling channel). `speaker-70v-line` handles the amplifier tap loading and `spl-distance` the
 > level, but neither lays out the ceiling grid -- the coverage diameter and spacing that decide how many speakers a room
 > needs for even sound.**

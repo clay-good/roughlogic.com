@@ -1,6 +1,6 @@
 # roughlogic.com Specification v458 -- Structured Cabling Channel Length (TIA-568) (calc-lowvoltage.js, Group A, 1 New Tile)
 
-> **Status: PROPOSED (2026-07-03). Third and final tile of the low-voltage systems trio (v456 camera lens FOV -> v457
+> **Status: LANDED (2026-07-04). Third and final tile of the low-voltage systems trio (v456 camera lens FOV -> v457
 > ceiling speaker coverage -> v458 structured cabling channel). `fiber-loss-budget` and `poe-budget` cover optical loss and
 > power; the copper channel has a hard physical-length budget -- 90 m horizontal, 100 m channel -- with a temperature
 > de-rating that no tile checks.**

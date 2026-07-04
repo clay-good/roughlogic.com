@@ -2078,11 +2078,14 @@ cross-check.
 | calc-layout.js | `computeSineBar` | `{ solve_for = "angle", bar_length_in = 5, stack_height_in = 0, target_angle_d...` | _ | _ | _ |
 | calc-layout.js | `computeThreadPitch` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCableTrayFill` | `{ tray_type = "ladder", tray_width_in = 0, cables = [] } = {}` | _ | _ | _ |
+| calc-lowvoltage.js | `computeCameraLensFov` | `{ sensor_width_mm = 0, focal_length_mm = 0, distance_ft = 0, h_pixels = 0 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCctvStorage` | `{ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_d...` | _ | _ | _ |
+| calc-lowvoltage.js | `computeCeilingSpeakerCoverage` | `{ ceiling_ft = 0, ear_ft = 0, coverage_deg = 90, room_area_ft2 = 0, layout = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCoaxRgLoss` | `{ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, t...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberLossBudget` | `{ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connecto...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeSpeaker70vLine` | `{ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeStandbyBatterySizing` | `{ standby_current_a = 0, standby_hours = 0, alarm_current_a = 0, alarm_minute...` | _ | _ | _ |
+| calc-lowvoltage.js | `computeStructuredCablingChannel` | `{ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBallnoseScallopHeight` | `{ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBoringBarDeflection` | `{ d_in = 0, l_in = 0, f_lb = 0, e_psi = 30e6 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeCuttingFluidConcentration` | `{ brix_reading = 0, refractometer_factor = 0, sump_volume_gal = 0, target_pct...` | _ | _ | _ |
@@ -2572,7 +2575,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1158.
+Row count: 1161.
 
 <!-- END function-corpus-v14 -->
 
@@ -2653,7 +2656,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (109 tiles)
+### Group A Electrical (112 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2671,7 +2674,9 @@ per spec-v14 §13.1 second paragraph.
 | `burial-depth-300-5` | Underground Burial Cover-Depth Lookup (NEC Table 300.5) | NEC 2023 (NFPA 70); nonmetallic raceway (PVC), general earth -> 18 in cover | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ceiling-speaker-coverage` | Ceiling Speaker Coverage and Spacing | commercial-audio design practice; spec-v457 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.44) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conductor-short-circuit-withstand` | Conductor Short-Circuit Thermal Withstand (Onderdonk / ICEA) | ICEA / Onderdonk; spec-v125 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -2753,6 +2758,7 @@ per spec-v14 §13.1 second paragraph.
 | `short-circuit-pp` | Short-Circuit Current at Panel (Point-to-Point) | NEMA / Bussmann (Cooper); 1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `speaker-70v-line` | 70-Volt Distributed Speaker Line | constant-voltage distributed audio pr...; sixteen 8 W taps (128 W) on a 200 W amp at 20% headroom -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standby-battery-sizing` | Fire-Alarm / Security Standby Battery | NFPA 72 §10.6 (by name); 0.5 A x 24 h + 2.0 A x 5 min, derate 1.2 -> (12 + 0.1667)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `structured-cabling-channel` | Structured Cabling Channel Length (TIA-568) | ANSI/TIA-568; spec-v458 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3672,6 +3678,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 914. Fixture-covered or reference-cadence: 914 / 914.
+Tile count: 917. Fixture-covered or reference-cadence: 917 / 917.
 
 <!-- END tile-index-v14 -->

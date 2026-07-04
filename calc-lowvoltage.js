@@ -438,3 +438,138 @@ function _renderCoaxRgLoss(inputRegion, outputRegion, citationEl) {
   type.select.addEventListener("change", () => { fillLoss(); update(); });
 }
 LOWVOLTAGE_RENDERERS["coax-rg-loss"] = _renderCoaxRgLoss;
+
+// ===================== spec-v456: camera lens field of view and pixel density (DORI) =====================
+// dims: in { sensor_width_mm: L, focal_length_mm: L, distance_ft: L, h_pixels: dimensionless } out: { fov_deg: dimensionless, scene_ft: L, ppf: dimensionless }
+export function computeCameraLensFov({ sensor_width_mm = 0, focal_length_mm = 0, distance_ft = 0, h_pixels = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sensor = Number(sensor_width_mm) || 0;
+  const focal = Number(focal_length_mm) || 0;
+  const dist = Number(distance_ft) || 0;
+  const px = Number(h_pixels) || 0;
+  if (!(sensor > 0)) return { error: "Sensor width must be positive (mm)." };
+  if (!(focal > 0)) return { error: "Focal length must be positive (mm)." };
+  if (!(dist > 0)) return { error: "Target distance must be positive (ft)." };
+  if (!(px > 0)) return { error: "Horizontal resolution must be positive (pixels)." };
+  const fov_deg = 2 * Math.atan(sensor / (2 * focal)) * 180 / Math.PI;
+  const scene_ft = dist * sensor / focal;
+  const ppf = px / scene_ft;
+  const dori = ppf >= 76 ? "Identify (>= 76 ppf)" : ppf >= 38 ? "Recognize (>= 38 ppf)" : ppf >= 19 ? "Observe (>= 19 ppf)" : ppf >= 8 ? "Detect (>= 8 ppf)" : "below Detect (< 8 ppf)";
+  return {
+    fov_deg, scene_ft, ppf, dori,
+    note: "Camera lens field of view and pixel density (IEC 62676-4 DORI): the horizontal field of view is 2 x atan(sensor width / (2 x focal length)); the scene width at the target = distance x sensor / focal; the pixel density in pixels per foot (ppf) = horizontal resolution / scene width. The DORI bands set the density needed for a task: Detect 8 ppf, Observe 19, Recognize 38, Identify 76 (per meter these are 25/63/125/250 ppm). A longer lens narrows the FOV and raises the density at that distance. A design aid; verify against the manufacturer's lens chart and a live view.",
+  };
+}
+export const cameraLensFovExample = { inputs: { sensor_width_mm: 5.37, focal_length_mm: 4, distance_ft: 30, h_pixels: 1920 } };
+function _renderCameraLensFov(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Camera FOV and pixel density (IEC 62676-4 DORI): FOV = 2 atan(sensor/(2 focal)); scene = distance x sensor/focal; ppf = pixels/scene. DORI bands Detect 8 / Observe 19 / Recognize 38 / Identify 76 ppf. A design aid; verify against the lens chart and a live view.";
+  const sw = makeNumber("Sensor width (mm, e.g. 1/2.7in = 5.37)", "clf-sw", { step: "any", min: "0" }); sw.input.value = "5.37";
+  const fl = makeNumber("Focal length (mm)", "clf-fl", { step: "any", min: "0" }); fl.input.value = "4";
+  const di = makeNumber("Target distance (ft)", "clf-di", { step: "any", min: "0" }); di.input.value = "30";
+  const px = makeNumber("Horizontal resolution (pixels)", "clf-px", { step: "1", min: "0" }); px.input.value = "1920";
+  for (const f of [sw, fl, di, px]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sw.input.value = "5.37"; fl.input.value = "4"; di.input.value = "30"; px.input.value = "1920"; update(); });
+  const oFov = makeOutputLine(outputRegion, "Horizontal FOV / scene width", "clf-out-fov");
+  const oPpf = makeOutputLine(outputRegion, "Pixel density / DORI", "clf-out-ppf");
+  const oNote = makeOutputLine(outputRegion, "Note", "clf-out-n");
+  const update = debounce(() => {
+    const r = computeCameraLensFov({ sensor_width_mm: Number(sw.input.value) || 0, focal_length_mm: Number(fl.input.value) || 0, distance_ft: Number(di.input.value) || 0, h_pixels: Number(px.input.value) || 0 });
+    if (r.error) { oFov.textContent = r.error; oPpf.textContent = "-"; oNote.textContent = ""; return; }
+    oFov.textContent = fmt(r.fov_deg, 1) + " deg over " + fmt(r.scene_ft, 1) + " ft";
+    oPpf.textContent = fmt(r.ppf, 1) + " ppf -- " + r.dori;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sw, fl, di, px]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["camera-lens-fov"] = _renderCameraLensFov;
+
+// ===================== spec-v457: ceiling speaker coverage and spacing =====================
+// dims: in { ceiling_ft: L, ear_ft: L, coverage_deg: dimensionless, room_area_ft2: L^2, layout: dimensionless } out: { diameter_ft: L, spacing_ft: L, count: dimensionless }
+export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, coverage_deg = 90, room_area_ft2 = 0, layout = "edge_to_edge" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ceiling = Number(ceiling_ft) || 0;
+  const ear = Number(ear_ft) || 0;
+  const cov = Number(coverage_deg) || 0;
+  const area = Number(room_area_ft2) || 0;
+  if (!(ceiling > 0)) return { error: "Ceiling height must be positive (ft)." };
+  if (!(ear >= 0)) return { error: "Ear height must be non-negative (ft)." };
+  if (!(ceiling > ear)) return { error: "Ceiling must be above the listener ear height." };
+  if (!(cov > 0 && cov < 180)) return { error: "Coverage angle must be between 0 and 180 deg." };
+  if (!(area > 0)) return { error: "Room area must be positive (ft^2)." };
+  const diameter_ft = 2 * (ceiling - ear) * Math.tan((cov / 2) * Math.PI / 180);
+  const spacing_ft = layout === "minimum_overlap" ? 0.7 * diameter_ft : diameter_ft;
+  const count = Math.ceil(area / (spacing_ft * spacing_ft));
+  return {
+    diameter_ft, spacing_ft, count, overlap: layout === "minimum_overlap",
+    note: "Ceiling speaker coverage and spacing: a ceiling speaker covers a cone whose diameter at the listener plane = 2 x (ceiling - ear height) x tan(coverage angle / 2). Spacing edge-to-edge (speakers just touching, spacing = diameter) gives minimum count but the level dips between speakers; minimum-overlap spacing = 0.7 x diameter (each covers where its neighbor is at -6 dB) gives even coverage for more speakers. Count = ceil(room area / spacing^2). A layout aid; verify with the speaker's coverage-angle spec at the design frequency (angle narrows at high frequency) and the target SPL.",
+  };
+}
+export const ceilingSpeakerCoverageExample = { inputs: { ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "edge_to_edge" } };
+function _renderCeilingSpeakerCoverage(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Ceiling speaker coverage: diameter = 2 x (ceiling - ear) x tan(angle/2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap, -6 dB); count = ceil(area / spacing^2). A layout aid; verify with the speaker's coverage angle at the design frequency and the target SPL.";
+  const ch = makeNumber("Ceiling height (ft)", "csc-ch", { step: "any", min: "0" }); ch.input.value = "10";
+  const ea = makeNumber("Listener ear height (ft, seated ~4)", "csc-ea", { step: "any", min: "0" }); ea.input.value = "4";
+  const co = makeNumber("Speaker coverage angle (deg, ~90)", "csc-co", { step: "any", min: "0" }); co.input.value = "90";
+  const ar = makeNumber("Room area (ft^2)", "csc-ar", { step: "any", min: "0" }); ar.input.value = "1200";
+  const ly = makeSelect("Layout", "csc-ly", [
+    { value: "edge_to_edge", label: "Edge-to-edge (minimum count)", selected: true }, { value: "minimum_overlap", label: "Minimum overlap (even coverage)" },
+  ]);
+  for (const f of [ch, ea, co, ar, ly]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ch.input.value = "10"; ea.input.value = "4"; co.input.value = "90"; ar.input.value = "1200"; ly.select.value = "edge_to_edge"; update(); });
+  const oDia = makeOutputLine(outputRegion, "Coverage diameter / spacing", "csc-out-dia");
+  const oCount = makeOutputLine(outputRegion, "Speaker count", "csc-out-count");
+  const oNote = makeOutputLine(outputRegion, "Note", "csc-out-n");
+  const update = debounce(() => {
+    const r = computeCeilingSpeakerCoverage({ ceiling_ft: Number(ch.input.value) || 0, ear_ft: Number(ea.input.value) || 0, coverage_deg: Number(co.input.value) || 0, room_area_ft2: Number(ar.input.value) || 0, layout: ly.select.value });
+    if (r.error) { oDia.textContent = r.error; oCount.textContent = "-"; oNote.textContent = ""; return; }
+    oDia.textContent = fmt(r.diameter_ft, 1) + " ft dia, " + fmt(r.spacing_ft, 1) + " ft spacing (" + (r.overlap ? "minimum overlap" : "edge-to-edge") + ")";
+    oCount.textContent = r.count + " speaker(s)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ch, ea, co, ar]) f.input.addEventListener("input", update);
+  ly.select.addEventListener("change", update);
+}
+LOWVOLTAGE_RENDERERS["ceiling-speaker-coverage"] = _renderCeilingSpeakerCoverage;
+
+// ===================== spec-v458: structured cabling channel length (TIA-568) =====================
+// dims: in { permanent_link_m: L, cords_m: L, temp_c: dimensionless, derate_per_c: dimensionless } out: { max_pl_m: L, channel_m: L }
+export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pl = Number(permanent_link_m) || 0;
+  const cords = Number(cords_m) || 0;
+  const temp = Number(temp_c) || 0;
+  const derate = Number(derate_per_c) || 0;
+  if (!(pl > 0)) return { error: "Permanent-link length must be positive (m)." };
+  if (cords < 0) return { error: "Cord length must be non-negative (m)." };
+  if (derate < 0) return { error: "De-rate factor must be non-negative." };
+  const max_pl_m = 90 * (1 - Math.max(temp - 20, 0) * derate);
+  const channel_m = pl + cords;
+  const pl_ok = pl <= max_pl_m;
+  const chan_ok = channel_m <= 100;
+  return {
+    max_pl_m, channel_m, pl_ok, chan_ok, ok: pl_ok && chan_ok,
+    note: "Structured cabling channel length (TIA-568): a horizontal channel is limited to 100 m total = a 90 m permanent link (the fixed horizontal cable) plus up to 10 m of patch and equipment cords. Above 20 deg C the maximum permanent-link length de-rates (about 0.4% per deg C for UTP, more for screened cable) because warmer copper has higher resistance and insertion loss, so a hot ceiling or plenum shortens the allowed run. The channel passes only if the permanent link is within its de-rated maximum AND the total channel is within 100 m. A design aid; the specific cable's published de-rating and the TIA-568 edition adopted govern.",
+  };
+}
+export const structuredCablingChannelExample = { inputs: { permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 } };
+function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Structured cabling channel (TIA-568): 100 m total = 90 m permanent link + up to 10 m cords; above 20 deg C the max permanent link de-rates ~0.4%/deg C (UTP). Passes if the link is within its de-rated max and the channel is within 100 m. A design aid; the cable's published de-rating and the adopted TIA-568 edition govern.";
+  const pl = makeNumber("Permanent-link length (m)", "scc-pl", { step: "any", min: "0" }); pl.input.value = "85";
+  const cd = makeNumber("Total patch + equipment cords (m)", "scc-cd", { step: "any", min: "0" }); cd.input.value = "8";
+  const tc = makeNumber("Installed cable temperature (deg C)", "scc-tc", { step: "any" }); tc.input.value = "20";
+  const dr = makeNumber("De-rate per deg C above 20 (0.004 UTP)", "scc-dr", { step: "any", min: "0" }); dr.input.value = "0.004";
+  for (const f of [pl, cd, tc, dr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { pl.input.value = "85"; cd.input.value = "8"; tc.input.value = "20"; dr.input.value = "0.004"; update(); });
+  const oPl = makeOutputLine(outputRegion, "Permanent link vs de-rated max", "scc-out-pl");
+  const oCh = makeOutputLine(outputRegion, "Channel vs 100 m", "scc-out-ch");
+  const oNote = makeOutputLine(outputRegion, "Note", "scc-out-n");
+  const update = debounce(() => {
+    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: Number(tc.input.value) || 0, derate_per_c: Number(dr.input.value) || 0 });
+    if (r.error) { oPl.textContent = r.error; oCh.textContent = "-"; oNote.textContent = ""; return; }
+    oPl.textContent = fmt(r.max_pl_m, 1) + " m max -- link " + (r.pl_ok ? "OK" : "TOO LONG");
+    oCh.textContent = fmt(r.channel_m, 1) + " m -- channel " + (r.chan_ok ? "OK" : "OVER 100 m");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pl, cd, tc, dr]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["structured-cabling-channel"] = _renderStructuredCablingChannel;

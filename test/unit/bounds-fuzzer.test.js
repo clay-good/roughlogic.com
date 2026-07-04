@@ -15637,6 +15637,51 @@ test("bounds: spec-v454 computeMultiBendFlatPattern pins the developed length an
   assert.ok("error" in _v454({ mold_line_in: Infinity, n_bends: 2, bd_in: 0.1 }));
 });
 
+// ===================== spec-v456..v458 low-voltage AV/security trio =====================
+import { computeCameraLensFov as _v456, computeCeilingSpeakerCoverage as _v457, computeStructuredCablingChannel as _v458 } from "../../calc-lowvoltage.js";
+
+test("bounds: spec-v456 computeCameraLensFov pins FOV, scene, pixel density / DORI, and error seams", () => {
+  const r = _v456({ sensor_width_mm: 5.37, focal_length_mm: 4, distance_ft: 30, h_pixels: 1920 });
+  assert.ok(Math.abs(r.fov_deg - 67.7) < 0.1);
+  assert.ok(Math.abs(r.scene_ft - 40.275) < 1e-3 && Math.abs(r.ppf - 47.67) < 0.05);
+  assert.ok(r.dori.startsWith("Recognize"));
+  // A longer lens halves the scene and doubles the density into Identify.
+  const long = _v456({ sensor_width_mm: 5.37, focal_length_mm: 8, distance_ft: 30, h_pixels: 1920 });
+  assert.ok(Math.abs(long.scene_ft - 20.1375) < 1e-3 && long.dori.startsWith("Identify"));
+  // Error seams: non-positive sensor, focal, distance, pixels, non-finite.
+  assert.ok("error" in _v456({ sensor_width_mm: 0, focal_length_mm: 4, distance_ft: 30, h_pixels: 1920 }));
+  assert.ok("error" in _v456({ sensor_width_mm: 5.37, focal_length_mm: 0, distance_ft: 30, h_pixels: 1920 }));
+  assert.ok("error" in _v456({ sensor_width_mm: 5.37, focal_length_mm: 4, distance_ft: 30, h_pixels: 0 }));
+  assert.ok("error" in _v456({ sensor_width_mm: Infinity, focal_length_mm: 4, distance_ft: 30, h_pixels: 1920 }));
+});
+
+test("bounds: spec-v457 computeCeilingSpeakerCoverage pins diameter, count, layouts, and error seams", () => {
+  const r = _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "edge_to_edge" });
+  assert.ok(Math.abs(r.diameter_ft - 12) < 1e-9 && Math.abs(r.spacing_ft - 12) < 1e-9 && r.count === 9);
+  // Minimum-overlap spacing (0.7 x diameter = 8.4) needs 18 -- exact ceil(1200/70.56), spec prose 17 used rounded 70.6.
+  const ov = _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "minimum_overlap" });
+  assert.ok(Math.abs(ov.spacing_ft - 8.4) < 1e-9 && ov.count === 18 && ov.count > r.count);
+  // Error seams: ceiling at/below ear, non-positive area, out-of-range angle, non-finite.
+  assert.ok("error" in _v457({ ceiling_ft: 4, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200 }));
+  assert.ok("error" in _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 0 }));
+  assert.ok("error" in _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 200, room_area_ft2: 1200 }));
+  assert.ok("error" in _v457({ ceiling_ft: Infinity, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200 }));
+});
+
+test("bounds: spec-v458 computeStructuredCablingChannel pins de-rated max, channel, pass/fail, and error seams", () => {
+  const r = _v458({ permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 });
+  assert.ok(Math.abs(r.max_pl_m - 90) < 1e-9 && Math.abs(r.channel_m - 93) < 1e-9);
+  assert.ok(r.pl_ok === true && r.chan_ok === true && r.ok === true);
+  // A hot plenum de-rates the max link below the 85 m link, so it fails.
+  const hot = _v458({ permanent_link_m: 85, cords_m: 8, temp_c: 40, derate_per_c: 0.004 });
+  assert.ok(Math.abs(hot.max_pl_m - 82.8) < 1e-9 && hot.pl_ok === false && hot.ok === false);
+  // Error seams: non-positive link, negative cords, negative derate, non-finite.
+  assert.ok("error" in _v458({ permanent_link_m: 0, cords_m: 8 }));
+  assert.ok("error" in _v458({ permanent_link_m: 85, cords_m: -1 }));
+  assert.ok("error" in _v458({ permanent_link_m: 85, cords_m: 8, temp_c: 40, derate_per_c: -0.1 }));
+  assert.ok("error" in _v458({ permanent_link_m: Infinity, cords_m: 8 }));
+});
+
 // ===================== spec-v393..v395 concrete design-details trio =====================
 import { computeTBeamEffectiveFlangeWidth as _v393, computeConcreteBeamMinFlexuralSteel as _v394, computeConcreteCrackControlSpacing as _v395 } from "../../calc-concrete.js";
 

@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lowvoltage): land spec-v456..v458 -- 3 AV / security / data tiles in calc-lowvoltage.js; 914 -> 917 tiles, 0.157.0, 2026-07-04
+
+The low-voltage AV/security/data trio, twenty-sixth batch of the v375-v474 campaign, all in the existing lazy `calc-lowvoltage.js` (Group A); no new module, group, or dependency. Catalog **914 -> 917**, package **0.156.0 -> 0.157.0** (a minor). Proposed 2026-07-03.
+
+- **`camera-lens-fov` (spec-v456).** IEC 62676-4 DORI: FOV = 2 atan(sensor / 2 focal), scene = distance x sensor / focal, ppf = pixels / scene, banded Detect 8 / Observe 19 / Recognize 38 / Identify 76 ppf. Pinned: a 5.37 mm sensor / 4 mm lens at 30 ft / 1920 px -> 67.7 deg FOV, 40.3 ft scene, 47.7 ppf (Recognize); an 8 mm lens -> 95 ppf (Identify).
+- **`ceiling-speaker-coverage` (spec-v457).** diameter = 2 (ceiling - ear) tan(angle/2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap); count = ceil(area / spacing^2). Pinned: a 10 ft ceiling / 4 ft ear / 90 deg / 1200 ft^2 -> 12 ft circle, 9 speakers edge-to-edge; at minimum overlap (8.4 ft) **18** (the spec prose's 17 came from rounding 8.4^2 to 70.6; the exact ceil(1200/70.56) is 18, which is what landed).
+- **`structured-cabling-channel` (spec-v458).** TIA-568: 100 m channel = 90 m permanent link + <=10 m cords, the link de-rating above 20 deg C. Pinned: an 85 m link / 8 m cords at 20 deg C passes (93 m channel); at 40 deg C the max link de-rates to 82.8 m so the 85 m link fails.
+
+Each carries the full v14 discipline (dims annotation, pinned example + cross-check verified to the digit, fuzzer blocks covering the DORI bands, both speaker layouts, the temperature de-rate pass/fail, and every error seam), the v18/v21 `{error}` contract, and v19/v22 citation discipline naming IEC 62676-4, commercial-audio coverage geometry, and ANSI/TIA-568. All three are hand-written renderers (the speaker tile with a layout `makeSelect`). Note: `security` was dropped from the trades lists (not an established trade slug) -- the two surveillance tiles use `["electrical"]` like `cctv-storage`. Per-tile wiring across nine registries. Housekeeping: home count 914 -> 917, README resynced (counts, sitemap URLs 936 -> 939), three specs LANDED, docs/mobile-responsive.md section 89 appended. All gates green: lint, unit tests, build, data:verify, `check:dist` / `check:shells` / `check:shell-mobile`, and a targeted render-no-nan + a11y pass on the three new tiles.
+
 ### feat(fabrication): land spec-v453, v454 -- 2 fabrication-layout tiles (v455 cut as dupe) in calc-construction.js; 912 -> 914 tiles, 0.156.0, 2026-07-04
 
 The fabrication-layout trio, twenty-fifth batch of the v375-v474 campaign, both in the existing lazy `calc-construction.js` (Group E). The third tile, v455 `bend-deduction-setback`, was **cut as a duplicate** of the existing `bend-allowance`, which already outputs the bend allowance, outside setback (OSSB), and bend deduction (BD = 2 OSSB - BA) -- so only two landed. Catalog **912 -> 914**, package **0.155.0 -> 0.156.0** (a minor). Proposed 2026-07-03.

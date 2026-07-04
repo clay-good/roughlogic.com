@@ -17627,6 +17627,136 @@
       "term": "flat pattern layout",
       "target": "multi-bend-flat-pattern",
       "kind": "industry"
+    },
+    {
+      "term": "camera lens fov",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "field of view camera",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "dori",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "pixel density camera",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "ppf camera",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "cctv lens",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "surveillance lens",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "camera focal length",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "pixels per foot",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "recognize identify camera",
+      "target": "camera-lens-fov",
+      "kind": "industry"
+    },
+    {
+      "term": "ceiling speaker coverage",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "speaker spacing",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "ceiling speaker layout",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "70v speaker spacing",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "distributed audio coverage",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "speaker count room",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "ceiling speaker count",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "overlap spacing speakers",
+      "target": "ceiling-speaker-coverage",
+      "kind": "industry"
+    },
+    {
+      "term": "structured cabling channel",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "tia 568 length",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "cat6 channel length",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "permanent link length",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "100 meter channel",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "patch cord length",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "horizontal cabling length",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
+    },
+    {
+      "term": "channel limit cabling",
+      "target": "structured-cabling-channel",
+      "kind": "industry"
     }
   ]
 }

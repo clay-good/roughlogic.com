@@ -7011,6 +7011,42 @@ export const CITATIONS = {
       { name: "Per-100-ft loss", value: "type- and frequency-specific; RG6 ~ 6 dB, RG59 ~ 11 dB, RG11 ~ 3.5 dB per 100 ft at ~1 GHz default", source: "Belden / CommScope datasheets" },
     ],
   },
+  "camera-lens-fov": {
+    formula: "fov = 2 x atan(sensor_width / (2 x focal_length)); scene = distance x sensor_width / focal_length; ppf = h_pixels / scene; DORI band by ppf (8 Detect / 19 Observe / 38 Recognize / 76 Identify).",
+    edition: "IEC 62676-4 (Video surveillance systems - Application guidelines) DORI criteria, by name; first-principles thin-lens field-of-view geometry.",
+    freeAccess: "The FOV and scene-width geometry is first-principles optics; the DORI pixel-density bands are published in IEC 62676-4 (and widely reproduced by camera manufacturers).",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The horizontal field of view of a camera is 2 x atan(sensor width / (2 x focal length)); the scene width captured at a target distance is distance x sensor width / focal length (similar triangles); the pixel density is the horizontal pixel count divided by the scene width. IEC 62676-4 sets the DORI (Detection, Observation, Recognition, Identification) minimum densities: 25 / 63 / 125 / 250 pixels per meter, which are about 8 / 19 / 38 / 76 pixels per foot. A longer focal length narrows the FOV and raises the density at a given distance. This uses the sensor's physical width; the effective (used) sensor area and lens distortion shift the real FOV, so verify against the manufacturer's lens chart and a live view.",
+    assumptions: [
+      { name: "Thin-lens FOV", value: "fov = 2 atan(sensor / 2 focal); scene = distance x sensor / focal", source: "first-principles optics" },
+      { name: "DORI bands", value: "25 / 63 / 125 / 250 ppm (~8 / 19 / 38 / 76 ppf) for Detect / Observe / Recognize / Identify", source: "IEC 62676-4" },
+      { name: "Verify on site", value: "effective sensor width and lens distortion shift the real FOV; confirm with the lens chart and a live view", source: "scope of this tile" },
+    ],
+  },
+  "ceiling-speaker-coverage": {
+    formula: "diameter = 2 x (ceiling - ear) x tan(coverage_deg / 2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap); count = ceil(area / spacing^2).",
+    edition: "Distributed ceiling-loudspeaker coverage geometry, standard commercial-audio design practice (manufacturer design guides, e.g. Bose / JBL / Atlas) by name; first-principles cone geometry.",
+    freeAccess: "The coverage-cone geometry is first-principles; the spacing conventions are published in loudspeaker-manufacturer design guides.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "A ceiling loudspeaker projects a coverage cone whose diameter at the listener plane is 2 x (ceiling height - ear height) x tan(coverage angle / 2). Edge-to-edge spacing (spacing = diameter) is the minimum count but the level dips between speakers; minimum-overlap spacing (0.7 x diameter, each speaker reaching where its neighbor is 6 dB down) gives even coverage at the cost of more speakers; a partial-overlap (square or hex) layout sits between. Count = ceil(area / spacing^2). The rated coverage angle narrows at high frequency, so the density needed for intelligible speech is usually set by the coverage at 2-4 kHz, not the nominal angle; verify against the speaker's directivity data and the target SPL.",
+    assumptions: [
+      { name: "Coverage cone", value: "diameter = 2 x (ceiling - ear) x tan(angle / 2) at the listener plane", source: "cone geometry" },
+      { name: "Spacing convention", value: "edge-to-edge = diameter; minimum overlap = 0.7 x diameter (-6 dB overlap)", source: "commercial-audio design practice" },
+      { name: "Angle narrows with frequency", value: "the rated angle is broadest at low frequency; use the 2-4 kHz coverage for speech", source: "loudspeaker directivity data" },
+    ],
+  },
+  "structured-cabling-channel": {
+    formula: "max_pl = 90 x (1 - max(temp - 20, 0) x derate); channel = permanent_link + cords; pl_ok = permanent_link <= max_pl; chan_ok = channel <= 100 m.",
+    edition: "ANSI/TIA-568 (Balanced Twisted-Pair Telecommunications Cabling) 100 m channel model and the temperature de-rating of the permanent link, by name.",
+    freeAccess: "The 100 m channel / 90 m permanent-link model and the temperature de-rating are published in ANSI/TIA-568; the arithmetic is public.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "ANSI/TIA-568 limits a balanced twisted-pair horizontal channel to 100 m total: a 90 m permanent link (the fixed in-wall horizontal cable, wall plate to patch panel) plus up to 10 m of patch and equipment cords combined. Above 20 deg C the maximum permanent-link length de-rates because warmer copper has higher insertion loss - about 0.4% per deg C for unscreened (UTP) cable and about 0.6% per deg C for screened cable - so a hot ceiling or plenum shortens the allowed run. The channel is compliant only if the permanent link is within its de-rated maximum AND the total channel is within 100 m. The de-rate factor and the cable's specifics are user inputs; the adopted TIA-568 edition and the cable manufacturer's data govern.",
+    assumptions: [
+      { name: "100 m channel", value: "channel = permanent link + cords <= 100 m, with the permanent link <= 90 m at 20 deg C", source: "ANSI/TIA-568" },
+      { name: "Temperature de-rate", value: "max permanent link = 90 x (1 - (temp - 20) x derate); ~0.4%/deg C UTP, ~0.6%/deg C screened", source: "ANSI/TIA-568" },
+      { name: "Manufacturer governs", value: "the adopted TIA-568 edition and the cable's published de-rating govern", source: "scope of this tile" },
+    ],
+  },
   "pipe-cold-spring": {
     formula: "Free growth dL = alpha * L * dT (alpha per material in/in/F, L in inches, dT = |T_operating - T_install|); cold-spring gap = (factor/100) * dL; residual movement = dL - gap.",
     edition: "Pipe cold spring (cut-short) - the run is cut short by a fraction of the computed free thermal growth and sprung into place at the install temperature, lowering the hot anchor and equipment-nozzle reactions - per ASME B31.1 Power Piping §119 / B31.9 Building Services Piping, by name; first-principles linear expansion.",
