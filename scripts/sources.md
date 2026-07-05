@@ -118,6 +118,12 @@ Per spec-v5.md §8, every state-keyed shard recheck against the state source pag
 - 2025-01-15 (initial v5 starter): Clay Good. JI / SOTL / LT-notice / minimum-wage / small-claims / nexus initial bundling complete. State coverage: full 50 states + DC on each per-state shard at this checkpoint (sales-tax-nexus excludes DE / MT / NH / OR by design).
 - _Next quarterly recheck due 2025-04-15. Prioritize states whose statutes were amended in calendar Q1 2025; refresh `verified_on` per entry. Replace with author-of-record on the actual recheck PR._
 
+## Free-access probe review log (v10 §3.2)
+
+Per spec-v10.md §3.2, a `check:free-access` WARN (4xx / 5xx / network error on a cited free-access URL) is logged here after manual review.
+
+- 2026-07-05: Clay Good. Probe run: 24 OK / 2 WARN, both on `ncei.noaa.gov` (apex and `/products/world-magnetic-model`; `fetch failed` network error in the probe environment). Manual recheck the same day: `https://www.ncei.noaa.gov` returns 200 and the apex `https://ncei.noaa.gov` returns a 301 to www, with the WMM product page live at `https://www.ncei.noaa.gov/products/world-magnetic-model`. The source (NOAA NCEI, World Magnetic Model — `data/field/wmm/coefficients.json`) remains free and public; the WARN was an apex-host fetch quirk, not a paywall or takedown. No action needed; recheck on the next probe run.
+
 ## Adding a new dataset
 
 1. Add the authoritative input to `scripts/build-data.mjs` (or to a new in-tree input file under `scripts/`).

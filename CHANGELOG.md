@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(lint): add the check-doc-links gate + log the free-access probe review; 0.162.1, 2026-07-05
+
+A platform/housekeeping change; no tile, calculator output, or shipped-bundle byte changes. Package **0.162.0 -> 0.162.1** (a patch). Two pieces:
+
+1. **New lint gate `scripts/check-doc-links.mjs` (27 -> 28 gates).** Verifies every relative markdown link in the living docs (README.md, ARCHITECTURE.md, `docs/*.md`, `mcp/README.md`; currently 1,490 links across 27 files) resolves to a real file. This drift class has bitten twice -- the spec-v107 trades-only cut left 16 dead links across four docs (fixed at 3b03cb5), and the throwaway auditor written for that sweep was never committed, so nothing guarded the surface since. `CHANGELOG.md` and `specs/` are deliberately excluded as append-only records: their entries keep links to files later specs deleted (the 81 CHANGELOG refs and one spec-v11 ref to the spec-v107 cut modules stay as written, per the 2026-07-05 resync entry). Wired into the `lint` chain after `check-readme-counts`; negative-tested (an injected dead link fails with the file:line and exit 1). README updated: repo-map gate count, the `npm run lint` row, and the lint-chain table gain the 28th gate.
+
+2. **Free-access probe manual review logged (spec-v10 §3.2).** `check:free-access` reported 2 WARNs, both `ncei.noaa.gov` (apex + the WMM product page; `fetch failed` in the probe environment). Manual recheck the same day: www resolves 200, the apex 301s to www, the WMM page is live -- the source remains free and public; an apex-host fetch quirk, not a paywall or takedown. Logged in a new "Free-access probe review log (v10 §3.2)" section of `scripts/sources.md`.
+
+Verification for this pass (the full-tree QA sweep that motivated it): lint (now 28 gates), **5,222** unit tests, build (929 tile + 21 group shells, 951-URL sitemap), data:verify (117 entries), `check:dist` / `check:shells` / `check:shell-mobile` (1,045 mobile checks: 320 px portrait + 568x320 landscape + 200% text-zoom samples, zero horizontal scroll), `check:home-payload` / `check:csp` / `check:readme-counts` / `check:free-access` / `check:module-sizes`, the axe a11y loop + perf + print + CSV layers of the integration suite, and the full render-no-nan (929/929) and responsive-stress (Chromium + WebKit) sweeps. A fresh README fact-check against the live tree found zero stale figures (sizes to the byte, corpus 1,227, dims 1,176/1,176, sources 165, all 21 per-group cheat-sheet counts re-summed to 929), and the doc-link audit found zero broken links in the living docs.
+
 ### docs: resync ungated README figures to the 929-tile catalog, 2026-07-05
 
 A documentation-only accuracy pass; no tile, code-path, or version change. Two runtime sweeps confirmed the catalog is clean first: the static `check-shell-mobile` gate (1,045 checks across 951 prerendered shells at the 320 px floor plus the landscape / 200% text-zoom samples, zero page-level horizontal scroll) and a live-SPA spot sweep (13 representative routes at 320 px, example-populated, including the newest v471-v474 tiles and both wide-table tiles: zero console errors, zero horizontal scroll, zero NaN / Infinity / undefined leak). No bug was found.

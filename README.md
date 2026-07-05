@@ -294,7 +294,7 @@ roughlogic.com/
   data/                 sharded, hashed reference JSON (per group)
   specs/                spec.md .. spec-v475.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
-  scripts/              build + 27 lint/audit gates + data pipeline
+  scripts/              build + 28 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
   dist/                 build output: prerendered shells + sitemap (generated)
 ```
@@ -564,7 +564,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `npm test` / `npm run test:unit` | Run the unit suite under Node's built-in test runner (5,222 tests). |
 | `npm run test:e2e` | Run the Playwright integration suite (per-tile smoke, layout, print, CSV, render-leak, perf, responsive-stress). |
 | `npm run test:a11y` | Run the axe-core accessibility loop over every tile. |
-| `npm run lint` | Run the 27-gate lint chain (below). |
+| `npm run lint` | Run the 28-gate lint chain (below). |
 | `npm run audit` | The pre-PR gate: lint, test, build, dist check, data verify. |
 | `npm run data:refresh` | Run the data pipeline (fetch, parse, shard). |
 | `npm run data:verify` | Verify shard SHA-256 hashes against `data/integrity.json`. |
@@ -573,7 +573,7 @@ The site has no command-line interface of its own. The repository ships these np
 
 ### The lint chain
 
-`npm run lint` runs 27 gates in sequence. They are the project's executable spec: a violation fails CI.
+`npm run lint` runs 28 gates in sequence. They are the project's executable spec: a violation fails CI.
 
 | Gate | Guards |
 |---|---|
@@ -586,6 +586,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `build-citation-strings --check` | Generated citation strings are not stale. |
 | `check-discoverability` | Search aliases + group/tile counts are consistent. |
 | `check-readme-counts` | The catalog counts the README states (tile / module / group / sitemap-URL totals, including the Mermaid-diagram nodes that glue the number to `\n` and evade a word-boundary substitution) match the live values. |
+| `check-doc-links` | Every relative markdown link in the living docs (README, ARCHITECTURE, `docs/`, `mcp/README`) resolves to a real file; `CHANGELOG.md` and `specs/` are excluded as append-only records whose links to spec-v107-deleted files stay as written. |
 | `check-worked-examples` | Every tile has a worked-example fixture. |
 | `check-tile-meta` | Tile metadata is well-formed. |
 | `check-related-tiles` | Every tile has a curated related-tiles entry. |
