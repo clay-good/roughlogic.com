@@ -1,54 +1,54 @@
 {
   "name": "accounting",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
-  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-07-01.",
-  "asOf": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
+  "edition": "IRS Pub 946 (MACRS), Pub 15-T (payroll percentage method), annual Rev. Proc. (Section 179 cap), SSA wage-base announcement (SE tax), IRS Form 1040-ES schedule (estimated tax), IRS standard mileage rate notice. U.S. Census ARTS / SBA published medians (inventory). Per-year entries with verified-on date; verified 2026-07-06.",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "macrs-tables.json",
       "name": "IRS Pub 946 Tables A-1 (200%/150% DB, half-year)",
-      "gzip_size_bytes": 536
+      "gzip_size_bytes": 533
     },
     {
       "file": "section-179-limits.json",
       "name": "Section 179 cap and phase-out, per-year",
-      "gzip_size_bytes": 350
+      "gzip_size_bytes": 353
     },
     {
       "file": "se-tax-parameters.json",
       "name": "Social Security wage base + Additional Medicare threshold, per-year",
-      "gzip_size_bytes": 361
+      "gzip_size_bytes": 362
     },
     {
       "file": "estimated-tax-due-dates.json",
       "name": "IRS Form 1040-ES quarterly due dates",
-      "gzip_size_bytes": 340
+      "gzip_size_bytes": 339
     },
     {
       "file": "standard-mileage-rates.json",
       "name": "IRS standard mileage rate, per-year",
-      "gzip_size_bytes": 270
+      "gzip_size_bytes": 269
     },
     {
       "file": "inventory-benchmarks.json",
       "name": "Industry-median inventory turnover (Census ARTS / SBA)",
-      "gzip_size_bytes": 370
+      "gzip_size_bytes": 372
     },
     {
       "file": "pub-15-t-tables.json",
       "name": "IRS Pub 15-T percentage-method brackets (single-filer, illustrative)",
-      "gzip_size_bytes": 430
+      "gzip_size_bytes": 431
     }
   ],
   "hashes": {
-    "macrs-tables.json": "3b4047e4f1245443df3a1310a8c2a73c960a9c9880f0adc333c2162428daabe7",
-    "section-179-limits.json": "21ae5fc0391778e6f83d2d5f97ea21ce2d44b78ba6cc1e6e90ee204be49c27b9",
-    "se-tax-parameters.json": "c0482bb77afc570b5fff37f589bb9227c13b933aa2f1cf000f2189dddc36d527",
-    "estimated-tax-due-dates.json": "304480499d2f69fa7b559732de5eadda1827281e03a6ae8dae3e9c6c96e57537",
-    "standard-mileage-rates.json": "45ef1d4ee98c68c64e6a1e983139cd71c8d6ba1082ef6341aad635bd2eccbbe0",
-    "inventory-benchmarks.json": "58a4e65f6ea2916d31ba733d93a93d32389a8081bc3e5ccc232ea38142cf34c5",
-    "pub-15-t-tables.json": "803202558ec50b030ce1dc5c8990e4791e230278c541c6c71e39f28b60fbf8c8"
+    "macrs-tables.json": "46d67def7ecdf518de9882b93e770fc49ca8b60d3f2e81baaaae05d3800d2754",
+    "section-179-limits.json": "8b697baa6855b27d49cd97f0e3bb2fe1ad66d4c63cb092274187c44936b9ba0b",
+    "se-tax-parameters.json": "463491c1ec7eba8950a8156c2451f39f62550274e704772e930aa8b250449709",
+    "estimated-tax-due-dates.json": "fab72ce16c101bb85e15c179905b69da88b4ed01a8fed218f0d3871e4e10b1c7",
+    "standard-mileage-rates.json": "b0595fe266d19a11e71e03b71f507afbfa8ac8ca577d59997a30ee481c556d77",
+    "inventory-benchmarks.json": "cbbf0fa390d7bd9c3c4cf8ad3bab1aac99bb5a39677903d383527c926c540251",
+    "pub-15-t-tables.json": "89061c2ce4abd1106a4ce5b9e867f4339d4e9ff7347cee4ff942ef5b2bed5848"
   }
 }

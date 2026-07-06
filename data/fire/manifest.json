@@ -1,25 +1,25 @@
 {
   "name": "fire",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
-  "edition": "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified 2026-07-01.",
-  "asOf": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
+  "edition": "NFA hose-friction training materials (U.S. government, public domain); ISO Public Protection Classification fire-flow formulas + NFF construction-class table; verified 2026-07-06.",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "hose-friction.json",
       "name": "Fire hose friction coefficients (NFA)",
-      "gzip_size_bytes": 230
+      "gzip_size_bytes": 231
     },
     {
       "file": "fire-flow-formulas.json",
       "name": "Fire flow formulas",
-      "gzip_size_bytes": 350
+      "gzip_size_bytes": 349
     },
     {
       "file": "iso-nff.json",
       "name": "ISO PPC NFF construction-class F and occupancy Oi (cited by name only)",
-      "gzip_size_bytes": 468
+      "gzip_size_bytes": 464
     }
   ],
   "hashes": {
