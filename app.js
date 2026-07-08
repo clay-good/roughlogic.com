@@ -261,6 +261,8 @@ const TOOL_MODULES = (() => {
     "fan-affinity-laws", "colebrook-friction-factor", "manual-d-friction-rate",
     // spec-v441..v443 energy-recovery / hydronic / economizer
     "erv-total-enthalpy-recovery", "radiant-floor-output", "economizer-enthalpy-changeover",
+    // spec-v478 hydronic snowmelt sizing (the v199 radiant follow-on).
+    "snowmelt-load",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

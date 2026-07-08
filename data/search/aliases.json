@@ -8439,6 +8439,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "snowmelt",
+      "target": "snowmelt-load",
+      "kind": "industry"
+    },
+    {
+      "term": "snow melting system",
+      "target": "snowmelt-load",
+      "kind": "industry"
+    },
+    {
+      "term": "heated driveway",
+      "target": "snowmelt-load",
+      "kind": "industry"
+    },
+    {
+      "term": "snow melt btu",
+      "target": "snowmelt-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hydronic snow melting",
+      "target": "snowmelt-load",
+      "kind": "industry"
+    },
+    {
+      "term": "heated sidewalk",
+      "target": "snowmelt-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "snow free area ratio",
+      "target": "snowmelt-load",
+      "kind": "industry"
+    },
+    {
+      "term": "driveway heating load",
+      "target": "snowmelt-load",
+      "kind": "adjacent"
+    },
+    {
       "term": "allowable area",
       "target": "allowable-area",
       "kind": "industry"

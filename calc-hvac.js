@@ -3934,6 +3934,56 @@ function _v442renderRadiantFloorOutput(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["radiant-floor-output"] = _v442renderRadiantFloorOutput;
 
+// ----- spec-v478: Hydronic Snowmelt Surface Load and Boiler Sizing (ASHRAE / Chapman) -----
+
+// dims: in { s_inhr: L T^-1, t_air_f: T, wind_mph: L T^-1, rh_pct: dimensionless, ar: dimensionless, area_ft2: L^2, back_loss_pct: dimensionless } out: { p_av_inhg: M L^-1 T^-2, q_s: M T^-3, q_m: M T^-3, q_h: M T^-3, q_e: M T^-3, q_o: M T^-3, boiler_btu_hr: M L^2 T^-3, t_m_f: T }
+export function computeSnowmeltLoad({ s_inhr = 0, t_air_f = 0, wind_mph = 0, rh_pct = 0, ar = 0.5, area_ft2 = 0, back_loss_pct = 20 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const TF = 33; // melting film temperature, F (Chapman / ASHRAE)
+  if (!(s_inhr > 0)) return { error: "Design snowfall rate must be positive (in/hr water equivalent)." };
+  if (!(t_air_f <= TF)) return { error: "Design air temperature must be at or below the 33 F melting film (the correlation is for snowfall conditions)." };
+  if (!(rh_pct >= 0 && rh_pct <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
+  if (wind_mph < 0) return { error: "Wind speed cannot be negative (mph)." };
+  if (!(ar >= 0 && ar <= 1)) return { error: "Snow-free area ratio must be 0 to 1 (0 Class I, 0.5 Class II, 1 Class III)." };
+  if (!(area_ft2 > 0)) return { error: "Heated slab area must be positive (ft^2)." };
+  if (!(back_loss_pct >= 0 && back_loss_pct < 100)) return { error: "Back and edge losses must be 0 to 99 percent." };
+  // Ambient vapor pressure from the Magnus saturation curve (hPa -> in Hg), times RH.
+  const tc = (t_air_f - 32) / 1.8;
+  const es_hpa = 6.1094 * Math.exp((17.625 * tc) / (tc + 243.04));
+  const p_av_inhg = (rh_pct / 100) * es_hpa * 0.02953;
+  const wind_fn = 0.0201 * wind_mph + 0.055;
+  const q_s = 2.6 * s_inhr * (TF - t_air_f);
+  const q_m = 746 * s_inhr;
+  const q_h = 11.4 * wind_fn * (TF - t_air_f);
+  // h_fg = 1075.5 Btu/lb at the 33 F film (steam table); 0.188 in Hg = saturation at the film.
+  const q_e = 1075.5 * wind_fn * Math.max(0, 0.188 - p_av_inhg);
+  const q_o = q_s + q_m + ar * (q_h + q_e);
+  const boiler_btu_hr = q_o * area_ft2 * (1 + back_loss_pct / 100);
+  const t_m_f = 0.5 * q_o + TF;
+  return { p_av_inhg, q_s, q_m, q_h, q_e, q_o, boiler_btu_hr, mbh: boiler_btu_hr / 1000, t_m_f };
+}
+export const snowmeltLoadExample = { inputs: { s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500, back_loss_pct: 20 } };
+HVAC_RENDERERS["snowmelt-load"] = _rEnv({
+  citation: "Citation: ASHRAE Handbook (HVAC Applications, Snow Melting and Freeze Protection) steady-state surface flux q_o = q_s + q_m + A_r(q_h + q_e), with the Chapman (1956) IP component forms as printed in Lund, Pavement Snow Melting (Geo-Heat Center): q_s = 2.6 s (33 - t_a); q_m = 746 s; q_h = 11.4 (0.0201 V + 0.055)(33 - t_a); q_e = h_fg (0.0201 V + 0.055)(0.188 - p_av) with h_fg = 1075.5 Btu/lb at the 33 F film (steam table) and p_av from the Magnus curve times RH. A_r: 0 Class I residential, 0.5 Class II commercial, 1 Class III critical. Boiler = q_o x area x (1 + back loss), ~20% typical for an insulated slab back. Mean fluid roughly 0.5 q_o + 33 F (Chapman rule of thumb). A steady-state design flux for the chosen storm, not an annual energy; controls, idling, and glycol design follow the manufacturer's manual. A sizing aid, not a stamped hydronic design.",
+  example: snowmeltLoadExample.inputs,
+  fields: [
+    { key: "s_inhr", label: "Snowfall rate, water equiv (in/hr)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "t_air_f", label: "Design air temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "wind_mph", label: "Design wind speed (mph)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "rh_pct", label: "Relative humidity (%)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "ar", label: "Snow-free area ratio A_r (0 / 0.5 / 1)", kind: "number", default: 0.5, attrs: { step: "any", min: "0" } },
+    { key: "area_ft2", label: "Heated slab area (ft^2)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "back_loss_pct", label: "Back + edge losses (%)", kind: "number", default: 20, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "qo", id: "sml-out-qo", label: "Design surface flux q_o", value: (r) => fmt(r.q_o, 1) + " Btu/hr-ft^2" },
+    { key: "cp", id: "sml-out-cp", label: "Components qs / qm / qh / qe", value: (r) => fmt(r.q_s, 1) + " / " + fmt(r.q_m, 1) + " / " + fmt(r.q_h, 1) + " / " + fmt(r.q_e, 1) },
+    { key: "bl", id: "sml-out-bl", label: "Boiler output (with back loss)", value: (r) => fmt(r.boiler_btu_hr, 0) + " Btu/hr (" + fmt(r.mbh, 1) + " MBH)" },
+    { key: "tm", id: "sml-out-tm", label: "Mean fluid temp (rule of thumb)", value: (r) => fmt(r.t_m_f, 0) + " F" },
+  ],
+  compute: computeSnowmeltLoad,
+});
+
 // dims: in { mode: dimensionless, h_outdoor: L^2 T^-2, h_return: L^2 T^-2, t_outdoor_f: T, setpoint_f: T } out: { enable: dimensionless, margin: dimensionless }
 export function computeEconomizerEnthalpyChangeover({ mode = "differential_enthalpy", h_outdoor = 0, h_return = 0, t_outdoor_f = 0, setpoint_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

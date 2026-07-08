@@ -2004,6 +2004,7 @@ cross-check.
 | calc-hvac.js | `computeSHR` | `{ sensible_btu_hr, total_btu_hr }` | _ | _ | _ |
 | calc-hvac.js | `computeSHRLatent` | `{ total_capacity_btu_hr = 0, return_db_F = 75, return_wb_F = 63, supply_db_F ...` | _ | _ | _ |
 | calc-hvac.js | `computeSeerEer` | `{ value, from, cooling_load_btu_hr = 0, annual_hours = 0, electricity_rate = 0 }` | _ | _ | _ |
+| calc-hvac.js | `computeSnowmeltLoad` | `{ s_inhr = 0, t_air_f = 0, wind_mph = 0, rh_pct = 0, ar = 0.5, area_ft2 = 0, ...` | _ | _ | _ |
 | calc-hvac.js | `computeStaticPressureHvac` | `{ elements }` | _ | _ | _ |
 | calc-hvac.js | `computeWallCondensationGradient` | `{ r_inside = 0, r_outside = 0, t_in_f = 0, t_out_f = 0, rh_in_pct = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeWetBulbPsychrometer` | `{ dry_bulb_F, wet_bulb_F, P_hPa = 1013.25 }` | _ | _ | _ |
@@ -2589,7 +2590,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1175.
+Row count: 1176.
 
 <!-- END function-corpus-v14 -->
 
@@ -2880,7 +2881,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (102 tiles)
+### Group C HVAC (103 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2978,6 +2979,7 @@ per spec-v14 §13.1 second paragraph.
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 13.44 / SEER2 estimate 12.768 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `snowmelt-load` | Hydronic Snowmelt Load and Boiler Sizing (ASHRAE/Chapman) | ASHRAE snow-melting flux / Chapman IP...; spec-v478 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `static-pressure-hvac` | Static Pressure | ACCA Manual D / ASHRAE Fundamentals; filter 0.25 + coil 0.30 + duct 0.20 -> 0.75 in WC TESP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `superheat-subcool` | Superheat and Subcool | AHRI / manufacturer P-T charts; R-410A at 118 psig saturates at ~40 F; suction line at 50... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vacuum-decay-test` | Vacuum Decay (Blank-Off) Test | First-principles standing-decay (blan...; spec-v105 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3706,6 +3708,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 931. Fixture-covered or reference-cadence: 931 / 931.
+Tile count: 932. Fixture-covered or reference-cadence: 932 / 932.
 
 <!-- END tile-index-v14 -->

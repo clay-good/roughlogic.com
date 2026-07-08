@@ -12231,6 +12231,41 @@ test("bounds: spec-v238 computeBatteryCRate pins the inverter-limited and no-lim
 
 // ===================== spec-v239..v241 compressed-air energy batch =====================
 import { computeAirLeakCost as _v239, computeCompressedAirPower as _v240, computeAirPressureSetpointSavings as _v241 } from "../../calc-hvac.js";
+import { computeSnowmeltLoad as _v478 } from "../../calc-hvac.js";
+
+test("bounds: spec-v478 computeSnowmeltLoad pins the Chapman components, the class ratio, and error seams", () => {
+  // Pinned example: Class II walk, 0.1 in/hr WE, 20 F, 10 mph, 80% RH, 500 ft^2, 20% back loss.
+  const r = _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500, back_loss_pct: 20 });
+  assert.ok(Math.abs(r.p_av_inhg - 0.0877943) < 1e-6);
+  assert.ok(Math.abs(r.q_s - 3.38) < 1e-9);
+  assert.ok(Math.abs(r.q_m - 74.6) < 1e-9);
+  assert.ok(Math.abs(r.q_h - 37.9392) < 1e-6);
+  assert.ok(Math.abs(r.q_e - 27.5894315) < 1e-6);
+  assert.ok(Math.abs(r.q_o - 110.7443157) < 1e-6);
+  assert.ok(Math.abs(r.boiler_btu_hr - 66446.5894) < 1e-3);
+  assert.ok(Math.abs(r.t_m_f - 88.3721579) < 1e-6);
+  // Class III: A_r = 1 pays the full exposed-surface losses.
+  const r3 = _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 1.0, area_ft2: 500, back_loss_pct: 20 });
+  assert.ok(Math.abs(r3.q_o - 143.5086315) < 1e-6);
+  assert.ok(Math.abs(r3.boiler_btu_hr - 86105.1789) < 1e-3);
+  // Class I: A_r = 0 drops the losses entirely (q_o = q_s + q_m).
+  const r1 = _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0, area_ft2: 500, back_loss_pct: 20 });
+  assert.ok(Math.abs(r1.q_o - (r1.q_s + r1.q_m)) < 1e-12);
+  assert.ok(Math.abs(r1.q_o - 77.98) < 1e-9);
+  // At 100% RH near the film, the evaporative driving term floors at zero (never negative).
+  const rw = _v478({ s_inhr: 0.1, t_air_f: 33, wind_mph: 10, rh_pct: 100, ar: 1.0, area_ft2: 500, back_loss_pct: 20 });
+  assert.ok(rw.q_e >= 0 && rw.q_e < 0.2);
+  assert.ok(Math.abs(rw.q_s) < 1e-9); // no sensible warming needed at the film
+  // Error seams.
+  assert.ok("error" in _v478({ s_inhr: 0, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500 }));
+  assert.ok("error" in _v478({ s_inhr: 0.1, t_air_f: 40, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500 })); // above the film
+  assert.ok("error" in _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: -1, rh_pct: 80, ar: 0.5, area_ft2: 500 }));
+  assert.ok("error" in _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 101, ar: 0.5, area_ft2: 500 }));
+  assert.ok("error" in _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 1.5, area_ft2: 500 }));
+  assert.ok("error" in _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 0 }));
+  assert.ok("error" in _v478({ s_inhr: 0.1, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500, back_loss_pct: 100 }));
+  assert.ok("error" in _v478({ s_inhr: Infinity, t_air_f: 20, wind_mph: 10, rh_pct: 80, ar: 0.5, area_ft2: 500 }));
+});
 
 test("bounds: spec-v239 computeAirLeakCost pins the neglected system, the post-repair case, and error seams", () => {
   const r = _v239({ compressor_cfm: 500, load_min: 3, unload_min: 12, specific_power: 22, run_hours: 8760, rate_kwh: 0.10 });

@@ -440,6 +440,7 @@ export const COMPUTE_MAP = {
   "manual-d-friction-rate": { module: "../../calc-hvac.js", fn: "computeManualDFrictionRate" },
   "erv-total-enthalpy-recovery": { module: "../../calc-hvac.js", fn: "computeErvTotalEnthalpyRecovery" },
   "radiant-floor-output": { module: "../../calc-hvac.js", fn: "computeRadiantFloorOutput" },
+  "snowmelt-load": { module: "../../calc-hvac.js", fn: "computeSnowmeltLoad" },
   "economizer-enthalpy-changeover": { module: "../../calc-hvac.js", fn: "computeEconomizerEnthalpyChangeover" },
   "coil-face-velocity": { module: "../../calc-hvacsystems.js", fn: "computeCoilFaceVelocity" },
   "vav-box-airflow": { module: "../../calc-hvacsystems.js", fn: "computeVavBoxAirflow" },

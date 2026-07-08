@@ -31000,6 +31000,100 @@
    }
   },
   {
+   "tile_id": "snowmelt-load",
+   "source_publisher": "ASHRAE snow-melting flux / Chapman IP forms via Lund (Geo-Heat Center)",
+   "source_title": "Class II walk, 0.1 in/hr WE at 20 F, 10 mph, 80% RH -> 110.7 Btu/hr-ft^2, 66.4 MBH over 500 ft^2",
+   "source_edition_or_year": "spec-v478 worked example (machine-verified)",
+   "source_section_or_page": "spec-v478 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "s_inhr": 0.1,
+    "t_air_f": 20,
+    "wind_mph": 10,
+    "rh_pct": 80,
+    "ar": 0.5,
+    "area_ft2": 500,
+    "back_loss_pct": 20
+   },
+   "outputs": {
+    "q_s": {
+     "value": 3.38,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_m": {
+     "value": 74.6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_h": {
+     "value": 37.9392,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_e": {
+     "value": 27.5894315,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_o": {
+     "value": 110.7443157,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "boiler_btu_hr": {
+     "value": 66446.5894,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "t_m_f": {
+     "value": 88.3721579,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "snowmelt-load",
+   "source_publisher": "ASHRAE snow-melting flux / Chapman IP forms via Lund (Geo-Heat Center)",
+   "source_title": "cross-check: the same storm on a Class III (A_r = 1) surface -> 143.5 Btu/hr-ft^2, 86.1 MBH",
+   "source_edition_or_year": "spec-v478 worked example (machine-verified)",
+   "source_section_or_page": "spec-v478 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "s_inhr": 0.1,
+    "t_air_f": 20,
+    "wind_mph": 10,
+    "rh_pct": 80,
+    "ar": 1.0,
+    "area_ft2": 500,
+    "back_loss_pct": 20
+   },
+   "outputs": {
+    "q_o": {
+     "value": 143.5086315,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "boiler_btu_hr": {
+     "value": 86105.1789,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "allowable-area",
    "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
    "source_title": "VB / B corner-lot office, sprinklered -> 29,250 ft^2 allowable, 25,000 passes",

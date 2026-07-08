@@ -10144,6 +10144,18 @@ export const CITATIONS = {
       { name: "Tubing separate", value: "the surface temperature follows from water temp, spacing, and covering", source: "scope of this tile" },
     ],
   },
+  "snowmelt-load": {
+    formula: "q_o = q_s + q_m + A_r(q_h + q_e), with q_s = 2.6 s (33 - t_a); q_m = 746 s; q_h = 11.4 (0.0201 V + 0.055)(33 - t_a); q_e = 1075.5 (0.0201 V + 0.055)(0.188 - p_av); p_av from the Magnus curve x RH; boiler = q_o x area x (1 + back_loss); t_m ~ 0.5 q_o + 33.",
+    edition: "ASHRAE Handbook (HVAC Applications, Snow Melting and Freeze Protection) steady-state surface flux, with the Chapman (1956) IP component forms as printed in Lund, Pavement Snow Melting (Geo-Heat Center / OSTI), by name.",
+    freeAccess: "The energy balance is stated in the ASHRAE snow-melting chapter and the Chapman closed forms are reproduced verbatim in Lund's Geo-Heat Center paper (free via OSTI); the Magnus saturation curve and steam-table h_fg are public; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASHRAE snow-melting steady-state surface flux q_o = q_s + q_m + A_r(q_h + q_e): warm the falling snow to the 33 F melting film (q_s = 2.6 s (33 - t_a), s in in/hr water equivalent), melt it (q_m = 746 s), and over the snow-free fraction A_r pay the exposed wet surface's convective (q_h = 11.4 (0.0201 V + 0.055)(33 - t_a), V in mph) and evaporative (q_e = h_fg (0.0201 V + 0.055)(0.188 - p_av), p_av in in Hg) losses -- the Chapman (1956) IP forms as printed in Lund, with h_fg = 1075.5 Btu/lb at the film (a steam-table value; Lund leaves it symbolic) and 0.188 in Hg the saturation pressure at the film. The ambient vapor pressure comes from the August-Roche-Magnus saturation curve times the relative humidity. A_r is Chapman's class choice: 0 Class I (residential, may run snow-covered), 0.5 Class II (commercial), 1.0 Class III (critical; must stay clear). The boiler output adds the ~20% ASHRAE-typical back-and-edge loss for an insulated slab (bridges and exposed backs run higher), and the mean fluid temperature is roughly 0.5 q_o + 33 F (Chapman's rule of thumb). A steady-state design flux for the chosen storm, not an annual energy; the idling/pickup strategy, controls, and glycol fluid design follow the manufacturer's manual. A sizing aid, not a stamped hydronic design.",
+    assumptions: [
+      { name: "Energy balance", value: "q_o = q_s + q_m + A_r(q_h + q_e) at the 33 F melting film", source: "ASHRAE / Chapman via Lund" },
+      { name: "Class ratio", value: "A_r = 0 / 0.5 / 1.0 for Class I / II / III; the class, not the climate, is the first sizing question", source: "Chapman (1957)" },
+      { name: "Back loss", value: "boiler = q_o x area x (1 + ~20%) for an insulated slab back; exposed backs run higher", source: "ASHRAE snow-melting chapter" },
+    ],
+  },
   "economizer-enthalpy-changeover": {
     formula: "differential enthalpy: enable if h_outdoor < h_return; fixed dry-bulb: enable if t_outdoor < setpoint; margin = the difference to the limit.",
     edition: "The air-side economizer high-limit (changeover) control, differential enthalpy and fixed dry-bulb, from ASHRAE 90.1 6.5.1.1.3, by name.",
