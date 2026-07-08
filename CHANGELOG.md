@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(ci): assert Lighthouse budgets on the median of 3 runs, not a single sample, 2026-07-08
+
+A CI-robustness fix; no tile, calculator output, or shipped-bundle byte changes. CI run 28948374513 (the docs-only audit-trail commit) failed its Lighthouse job with home-page CLS **0.0908** against the 0.05 budget -- on shipped bytes byte-identical to the runs that passed 25 minutes before and 40 minutes after it (pass / fail / pass on the same `dist/`). The uploaded report attributes the whole shift to `main#main` with no source breakdown, and the shift does not reproduce: 3 local `lhci` runs, 6 instrumented Chromium runs at 8x CPU throttle with a buffered `layout-shift` PerformanceObserver (zero entries), and the very next CI run all measure CLS 0. Diagnosis: single-sample measurement noise on a loaded shared runner -- `numberOfRuns: 1` gave one noisy trace veto power over the merge signal.
+
+The fix collects **3 runs per URL** (12 total) and pins `aggregationMethod: "median"` on both assert-matrix entries. Median was chosen over lhci's default `optimistic` (best-of-N, which would hide a real regression that shows in 2 of 3 runs) and over `pessimistic` (worst-of-N, which re-introduces exactly this one-bad-trace veto): a genuine layout shift in the page reproduces in every trace and still fails the median, while a one-off runner hiccup no longer does. Every budget value is unchanged. Verified locally with the exact CI invocation (`lhci autorun`, 12 runs, all assertions pass, exit 0); the Lighthouse job's wall-clock rises from ~1.5 to a still-bounded ~4 minutes.
+
 ### chore(mcp): self-sync the MCP server version + retire the last stale-count comments, 2026-07-08
 
 A housekeeping pass; no tile, calculator output, or shipped-bundle byte changes. Three drift fixes in the two surfaces the count gates do not anchor:
