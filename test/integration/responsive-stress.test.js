@@ -172,7 +172,24 @@ test("every live tile view: no page-level horizontal scroll at 320 px", async ({
       sw: document.documentElement.scrollWidth,
       cw: document.documentElement.clientWidth,
     }));
-    if (m.sw > m.cw + 1) offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw})`);
+    if (m.sw > m.cw + 1) {
+      // Name the elements that poke past the viewport, not just the tile:
+      // a runner-only overflow (fonts, engine build, timing) is undebuggable
+      // from the id alone, and the failing environment is the only place the
+      // geometry exists to be read.
+      const culprits = await page.evaluate(() => {
+        const doc = document.documentElement;
+        const out = [];
+        for (const el of document.querySelectorAll("body *")) {
+          const r = el.getBoundingClientRect();
+          if (r.right > doc.clientWidth + 1 || r.left < -1) {
+            out.push(`${el.tagName.toLowerCase()}#${el.id || "-"} .${(el.className || "").toString().trim().split(/\s+/)[0] || "-"} left=${Math.round(r.left)} right=${Math.round(r.right)} w=${Math.round(r.width)} :: ${(el.textContent || "").trim().slice(0, 60)}`);
+          }
+        }
+        return out.slice(0, 8);
+      });
+      offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw})${culprits.length ? "\n  " + culprits.join("\n  ") : " (no element extends past the viewport edge at re-measure)"}`);
+    }
   }
   expect(
     offenders,
