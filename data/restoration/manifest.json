@@ -1,9 +1,9 @@
 {
   "name": "restoration",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
-  "edition": "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of 2026-07-01.",
-  "asOf": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
+  "edition": "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of 2026-07-06.",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -14,12 +14,12 @@
     {
       "file": "water-classes.json",
       "name": "Water classes and categories",
-      "gzip_size_bytes": 517
+      "gzip_size_bytes": 513
     },
     {
       "file": "drying-times.json",
       "name": "Material drying times",
-      "gzip_size_bytes": 468
+      "gzip_size_bytes": 464
     },
     {
       "file": "mold-conditions.json",
@@ -29,7 +29,7 @@
     {
       "file": "hepa-loading.json",
       "name": "HEPA scrubber loading rates",
-      "gzip_size_bytes": 251
+      "gzip_size_bytes": 254
     }
   ],
   "hashes": {

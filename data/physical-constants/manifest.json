@@ -1,20 +1,20 @@
 {
   "name": "physical-constants",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
   "edition": "NIST CODATA 2018; physical-fact constants do not have an edition cycle.",
-  "asOf": "2026-07-01",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "constants.json",
       "name": "NIST physical constants",
-      "gzip_size_bytes": 485
+      "gzip_size_bytes": 488
     },
     {
       "file": "material-properties.json",
       "name": "Material properties",
-      "gzip_size_bytes": 336
+      "gzip_size_bytes": 340
     }
   ],
   "hashes": {

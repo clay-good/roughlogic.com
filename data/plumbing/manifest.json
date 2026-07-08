@@ -1,15 +1,15 @@
 {
   "name": "plumbing",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
-  "edition": "IPC 2021; IFGC 2021; Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of 2026-07-01.",
-  "asOf": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
+  "edition": "IPC 2021; IFGC 2021; Hazen-Williams (AWWA M11, 5th ed.); Manning (USGS WSP-2339, public domain); ASME B31.1 / B31.9 (guided-cantilever expansion-loop method); Joukowsky (1898) / ASCE MOP-49; Hydraulic Institute pump engineering practice; manufacturer specs as of 2026-07-06.",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "pipe-properties.json",
       "name": "Pipe properties",
-      "gzip_size_bytes": 311
+      "gzip_size_bytes": 316
     },
     {
       "file": "fixture-units.json",
@@ -19,37 +19,37 @@
     {
       "file": "gas-pipe-capacity.json",
       "name": "Gas pipe capacity",
-      "gzip_size_bytes": 211
+      "gzip_size_bytes": 215
     },
     {
       "file": "material-expansion.json",
       "name": "Pipe thermal expansion coefficients",
-      "gzip_size_bytes": 244
+      "gzip_size_bytes": 245
     },
     {
       "file": "septic-rules.json",
       "name": "Septic sizing rules (EPA / state)",
-      "gzip_size_bytes": 234
+      "gzip_size_bytes": 232
     },
     {
       "file": "runoff-coefficients.json",
       "name": "Runoff coefficients (rational method)",
-      "gzip_size_bytes": 291
+      "gzip_size_bytes": 290
     },
     {
       "file": "manning-roughness.json",
       "name": "Manning roughness coefficients",
-      "gzip_size_bytes": 264
+      "gzip_size_bytes": 267
     },
     {
       "file": "glycol-curves.json",
       "name": "Glycol freeze-point curves (manufacturer-attributed)",
-      "gzip_size_bytes": 321
+      "gzip_size_bytes": 322
     },
     {
       "file": "backflow-curves.json",
       "name": "Backflow preventer pressure-loss curves",
-      "gzip_size_bytes": 490
+      "gzip_size_bytes": 492
     },
     {
       "file": "pipe-elastic-properties.json",
@@ -64,7 +64,7 @@
     {
       "file": "thermal-expansion-coefficients.json",
       "name": "Pipe thermal-expansion coefficients and guided-cantilever stress allowables",
-      "gzip_size_bytes": 542
+      "gzip_size_bytes": 539
     }
   ],
   "hashes": {

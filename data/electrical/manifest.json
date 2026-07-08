@@ -1,50 +1,50 @@
 {
   "name": "electrical",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
-  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-07-01.",
-  "asOf": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
+  "edition": "NEC 2023 (NFPA 70); IEEE 802.3bt-2018 PoE; ANSI/IEEE C57 (transformer step series); NEMA MG-1 (motor code letters); Eaton/Bussmann SPD (point-to-point C-values); manufacturer cable specs as of 2026-07-06.",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "conductor-properties.json",
       "name": "Conductor properties (AWG)",
-      "gzip_size_bytes": 758
+      "gzip_size_bytes": 748
     },
     {
       "file": "ampacity-physics.json",
       "name": "Ampacity physics methodology",
-      "gzip_size_bytes": 367
+      "gzip_size_bytes": 370
     },
     {
       "file": "motor-fla.json",
       "name": "Motor full-load amps",
-      "gzip_size_bytes": 396
+      "gzip_size_bytes": 398
     },
     {
       "file": "conduit-fill-tables.json",
       "name": "Conduit fill data",
-      "gzip_size_bytes": 345
+      "gzip_size_bytes": 346
     },
     {
       "file": "demand-factors.json",
       "name": "Residential service demand factors",
-      "gzip_size_bytes": 387
+      "gzip_size_bytes": 391
     },
     {
       "file": "lighting-density.json",
       "name": "Lighting power density benchmarks",
-      "gzip_size_bytes": 307
+      "gzip_size_bytes": 306
     },
     {
       "file": "cable-bend-radius.json",
       "name": "Cable bend radius (manufacturer-attributed)",
-      "gzip_size_bytes": 390
+      "gzip_size_bytes": 389
     },
     {
       "file": "poe-classes.json",
       "name": "PoE class budgets and cable resistance",
-      "gzip_size_bytes": 361
+      "gzip_size_bytes": 362
     },
     {
       "file": "conductor-c-values.json",
@@ -54,12 +54,12 @@
     {
       "file": "nema-mg1-code-letters.json",
       "name": "NEMA MG-1 code-letter starting kVA per HP",
-      "gzip_size_bytes": 449
+      "gzip_size_bytes": 458
     },
     {
       "file": "dwelling-demand.json",
       "name": "Dwelling demand-factor parameters (NEC 2023 Article 220)",
-      "gzip_size_bytes": 424
+      "gzip_size_bytes": 428
     }
   ],
   "hashes": {

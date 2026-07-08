@@ -1,8 +1,8 @@
 {
   "source": "IRS annual standard-mileage-rate notice (e.g., Notice 2024-08 for 2024).",
   "edition": "per-year",
-  "fetched": "2026-07-01",
-  "verified_on": "2026-07-01",
+  "fetched": "2026-07-06",
+  "verified_on": "2026-07-06",
   "free_access": "irs.gov/tax-professionals/standard-mileage-rates.",
   "rates_per_mile_usd": {
     "2023": {

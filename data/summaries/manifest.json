@@ -1,25 +1,25 @@
 {
   "name": "summaries",
-  "version": "2026-07-01",
-  "fetched": "2026-07-01",
-  "edition": "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision 2026-07-01.",
-  "asOf": "2026-07-01",
+  "version": "2026-07-06",
+  "fetched": "2026-07-06",
+  "edition": "Original plain-English summaries by the project author; MIT-licensed creative work. Last revision 2026-07-06.",
+  "asOf": "2026-07-06",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "summaries.json",
       "name": "Original plain-English summaries",
-      "gzip_size_bytes": 3028
+      "gzip_size_bytes": 2986
     },
     {
       "file": "v2-references.json",
       "name": "v2 reference summaries (GFCI/AFCI and others)",
-      "gzip_size_bytes": 626
+      "gzip_size_bytes": 622
     },
     {
       "file": "v3-references.json",
       "name": "v3 reference summaries (hand signals, OSHA top 10, LOTO, defensible space, storm shelter, triage)",
-      "gzip_size_bytes": 665
+      "gzip_size_bytes": 662
     }
   ],
   "hashes": {
