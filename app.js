@@ -579,6 +579,7 @@ const TOOL_MODULES = (() => {
   // independent of group letter, per the v28/v30/v36/v39/v70..v82 precedent).
   declare("./calc-firesprinkler.js", "FIRESPRINKLER_RENDERERS", [
     "fire-pump-curve", "sprinkler-system-demand", "sprinkler-head-layout",
+    "sprinkler-pressure-demand",
   ]);
   declare("./calc-references.js", "REFERENCE_RENDERERS", [
     "color-codes", "knot-reference", "inspection-checklist",

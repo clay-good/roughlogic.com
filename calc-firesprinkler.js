@@ -9,9 +9,10 @@
 // must sustain, and the head layout that puts the density on the floor.
 // Every tile keeps group: "F" (a tile's group letter is independent of the
 // module that holds it -- the spec-v70..v98 split precedent). Tiles:
-//   v248 fire-pump-curve         (NFPA 20 churn / rated / 150% overload envelope)
-//   v249 sprinkler-system-demand (NFPA 13 density x area + hose, duration, volume)
-//   v250 sprinkler-head-layout   (NFPA 13 protection-area / spacing caps, head count)
+//   v248 fire-pump-curve            (NFPA 20 churn / rated / 150% overload envelope)
+//   v249 sprinkler-system-demand    (NFPA 13 density x area + hose, duration, volume)
+//   v250 sprinkler-head-layout      (NFPA 13 protection-area / spacing caps, head count)
+//   v479 sprinkler-pressure-demand  (NFPA 13 base-of-riser demand: K-factor + Hazen-Williams + elevation)
 // All GOVERNANCE.general design aids; the hazard-class densities, areas, hose
 // allowances, and spacing caps are editable defaults from the NFPA 13 tables.
 // See spec-v248.md..v250.md.
@@ -193,4 +194,48 @@ FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
     { key: "wd", id: "shl-out-wd", label: "Max distance to walls", value: (r) => fmt(r.max_wall_distance, 2) + " ft" },
   ],
   compute: computeSprinklerHeadLayout,
+});
+
+// ===================== spec-v479: sprinkler pressure demand at the base of riser =====================
+
+// dims: in { q_head_gpm: L^3 T^-1, k_factor: dimensionless, q_total_gpm: L^3 T^-1, pipe_id_in: L, c_factor: dimensionless, equiv_length_ft: L, elevation_ft: L } out: { start_pressure_psi: M L^-1 T^-2, friction_per_ft_psi: M L^-1 T^-2, friction_psi: M L^-1 T^-2, elevation_psi: M L^-1 T^-2, demand_psi: M L^-1 T^-2 }
+export function computeSprinklerPressureDemand({ q_head_gpm = 0, k_factor = 5.6, q_total_gpm = 0, pipe_id_in = 0, c_factor = 120, equiv_length_ft = 0, elevation_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(q_head_gpm > 0)) return { error: "Remote-head flow must be positive (gpm)." };
+  if (!(k_factor > 0)) return { error: "K-factor must be positive (gpm/psi^0.5)." };
+  if (!(q_total_gpm > 0)) return { error: "Total flow must be positive (gpm)." };
+  if (!(pipe_id_in > 0)) return { error: "Pipe internal diameter must be positive (in)." };
+  if (!(c_factor > 0)) return { error: "Hazen-Williams C must be positive." };
+  if (equiv_length_ft < 0) return { error: "Equivalent length cannot be negative (ft)." };
+  const start_pressure_psi = Math.pow(q_head_gpm / k_factor, 2);
+  const friction_per_ft_psi = 4.52 * Math.pow(q_total_gpm, 1.85) / (Math.pow(c_factor, 1.85) * Math.pow(pipe_id_in, 4.87));
+  const friction_psi = friction_per_ft_psi * equiv_length_ft;
+  const elevation_psi = 0.433 * elevation_ft;
+  const demand_psi = start_pressure_psi + friction_psi + elevation_psi;
+  const below_min = start_pressure_psi < 7;
+  return { start_pressure_psi, friction_per_ft_psi, friction_psi, elevation_psi, demand_psi, below_min };
+}
+
+export const sprinklerPressureDemandExample = { inputs: { q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 } };
+
+FIRESPRINKLER_RENDERERS["sprinkler-pressure-demand"] = _simpleRenderer({
+  citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022 hydraulic method: the pressure demand at the base of the riser is the start pressure at the hydraulically most remote sprinkler P1 = (Q_head / K)^2 (the K-factor discharge relation Q = K sqrt(P)), plus the Hazen-Williams friction loss p = 4.52 Q^1.85 / (C^1.85 d^4.87) psi per foot carried over the governing run's equivalent length, plus the elevation head 0.433 psi per foot to lift the water to the head. The Hazen-Williams C defaults are the NFPA 13 pipe-type values (120 black/galvanized steel, 150 copper or listed CPVC, 100 old unlined cast iron), the equivalent length is the actual pipe plus the fitting/valve equivalents from the NFPA 13 fitting table, and the 7 psi minimum operating pressure at the end sprinkler is the standard-spray floor (flagged, not enforced). This assembles one representative flowing path; a full stamped design balances every node, branch, and grid loop in the remote area. A design aid, not a stamped hydraulic submittal - a qualified fire-protection engineer and the AHJ govern.",
+  example: sprinklerPressureDemandExample.inputs,
+  fields: [
+    { key: "q_head_gpm", label: "Flow at most remote head (gpm)", kind: "number", default: 26 },
+    { key: "k_factor", label: "Sprinkler K-factor (gpm/psi^0.5)", kind: "number", default: 5.6 },
+    { key: "q_total_gpm", label: "Total flow through governing run (gpm)", kind: "number", default: 260 },
+    { key: "pipe_id_in", label: "Pipe internal diameter (in)", kind: "number", default: 3.068 },
+    { key: "c_factor", label: "Hazen-Williams C (120 steel / 150 CPVC / 100 old CI)", kind: "number", default: 120 },
+    { key: "equiv_length_ft", label: "Equivalent length: pipe + fittings (ft)", kind: "number", default: 150 },
+    { key: "elevation_ft", label: "Elevation of remote head above base of riser (ft)", kind: "number", default: 15 },
+  ],
+  outputs: [
+    { key: "sp", id: "spd-out-sp", label: "Start pressure at remote head", value: (r) => fmt(r.start_pressure_psi, 1) + " psi" + (r.below_min ? " (below 7 psi minimum)" : "") },
+    { key: "pf", id: "spd-out-pf", label: "Friction loss rate", value: (r) => fmt(r.friction_per_ft_psi, 4) + " psi/ft" },
+    { key: "fr", id: "spd-out-fr", label: "Friction loss over run", value: (r) => fmt(r.friction_psi, 1) + " psi" },
+    { key: "el", id: "spd-out-el", label: "Elevation head", value: (r) => fmt(r.elevation_psi, 1) + " psi" },
+    { key: "dm", id: "spd-out-dm", label: "Demand at base of riser", value: (r) => fmt(r.demand_psi, 1) + " psi" },
+  ],
+  compute: computeSprinklerPressureDemand,
 });

@@ -10072,6 +10072,18 @@ export const CITATIONS = {
       { name: "Minimum spacing separate", value: "the minimum distance between heads (typically 6 ft, preventing cold-soldering) is a separate check this tile does not perform", source: "NFPA 13 (2022)" },
     ],
   },
+  "sprinkler-pressure-demand": {
+    formula: "P1 = (q_head_gpm / k_factor)^2; pf = 4.52 x q_total_gpm^1.85 / (c_factor^1.85 x pipe_id_in^4.87); friction = pf x equiv_length_ft; elevation = 0.433 x elevation_ft; demand = P1 + friction + elevation.",
+    edition: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022, by name; the Hazen-Williams friction coefficient 4.52 and exponents 1.85 / 4.87, the pipe-type C values, the 0.433 psi/ft water column, and the K-factor discharge relation Q = K sqrt(P) are the NFPA 13 hydraulic-calculation method.",
+    freeAccess: "NFPA 13 is viewable free of charge through NFPA's online free-access reader; the Hazen-Williams friction, K-factor, and elevation arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022 hydraulic method: the pressure demand at the base of the riser is the start pressure at the hydraulically most remote sprinkler P1 = (Q_head / K)^2 (the K-factor discharge relation Q = K sqrt(P)), plus the Hazen-Williams friction loss p = 4.52 Q^1.85 / (C^1.85 d^4.87) psi per foot carried over the governing run's equivalent length, plus the elevation head 0.433 psi per foot to lift the water to the head. The Hazen-Williams C defaults are the NFPA 13 pipe-type values (120 black/galvanized steel, 150 copper or listed CPVC, 100 old unlined cast iron), the equivalent length is the actual pipe plus the fitting/valve equivalents from the NFPA 13 fitting table, and the 7 psi minimum operating pressure at the end sprinkler is the standard-spray floor (flagged, not enforced). This assembles one representative flowing path; a full stamped design balances every node, branch, and grid loop in the remote area. A design aid, not a stamped hydraulic submittal - a qualified fire-protection engineer and the AHJ govern.",
+    assumptions: [
+      { name: "Hazen-Williams C", value: "the pipe-roughness default is the NFPA 13 pipe-type value (120 black/galvanized steel, 150 copper or listed CPVC, 100 old unlined cast iron), editable; the diameter is the actual internal diameter, not the nominal size", source: "NFPA 13 (2022)" },
+      { name: "Equivalent length", value: "the entered length is the actual pipe run plus the fitting and valve equivalent lengths from the NFPA 13 fitting table; the tile does not tabulate fittings itself", source: "NFPA 13 (2022)" },
+      { name: "Single representative path", value: "the demand is assembled over one flowing path at a single total flow; a full stamped design balances every node, branch, and grid loop in the remote area, and the 7 psi end-sprinkler minimum is flagged, not enforced", source: "NFPA 13 (2022)" },
+    ],
+  },
   "window-solar-heat-gain": {
     formula: "q_solar = area_ft2 x shgc x psf; q_cond = area_ft2 x u_factor x cltd_f; q_total = q_solar + q_cond.",
     edition: "ASHRAE / ACCA Manual J fenestration cooling load (Q_solar = A x SHGC x PSF, Q_cond = A x U x CLTD), by name; the relations are public.",

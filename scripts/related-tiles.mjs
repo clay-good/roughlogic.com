@@ -992,6 +992,7 @@ const RELATED = {
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],
   "sprinkler-head-layout": ["sprinkler-system-demand","sprinkler-density","fire-pump-curve"],
+  "sprinkler-pressure-demand": ["sprinkler-system-demand","sprinkler-k-factor","fire-pump-curve"],
   // spec-v218..v220 residential air-tightness and ventilation batch (Group C)
   "blower-door-ach50": ["air-changes-hour","ashrae-622-ventilation","infiltration-load"],
   "ashrae-622-ventilation": ["blower-door-ach50","outdoor-air-ventilation","air-changes-hour"],

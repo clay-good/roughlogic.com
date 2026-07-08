@@ -12829,6 +12829,7 @@ test("bounds: spec-v268 computeColumnBasePlate pins A1_req/m/n/n'/l/tp, the bear
 // ===================== spec-v248..v250 NFPA 13/20 fire-sprinkler system-design trio =====================
 import {
   computeFirePumpCurve as _v248, computeSprinklerSystemDemand as _v249, computeSprinklerHeadLayout as _v250,
+  computeSprinklerPressureDemand as _v479,
 } from "../../calc-firesprinkler.js";
 
 test("bounds: spec-v248 computeFirePumpCurve pins the envelope, the pass/fail flags, the null path, and error seams", () => {
@@ -12906,6 +12907,37 @@ test("bounds: spec-v250 computeSprinklerHeadLayout pins the binding-cap flip, th
   assert.ok("error" in _v250({ room_length: 40, room_width: 30, area_per_head: 0 }));
   assert.ok("error" in _v250({ room_length: 40, room_width: 30, max_spacing: 0 }));
   assert.ok("error" in _v250({ room_length: Infinity, room_width: 30 }));
+});
+
+test("bounds: spec-v479 computeSprinklerPressureDemand pins the base-of-riser demand, the below-min flag, signed elevation, and error seams", () => {
+  const r = _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 });
+  assert.ok(Math.abs(r.start_pressure_psi - 21.556122448979597) < 1e-9);
+  assert.ok(Math.abs(r.friction_per_ft_psi - 0.08042077299429665) < 1e-9);
+  assert.ok(Math.abs(r.friction_psi - 12.063115949144496) < 1e-9);
+  assert.ok(Math.abs(r.elevation_psi - 6.495) < 1e-9);
+  assert.ok(Math.abs(r.demand_psi - 40.114238398124094) < 1e-9);
+  assert.strictEqual(r.below_min, false);
+  // Cross-check: the same run in listed CPVC (C = 150) trims the friction to ~8 psi.
+  const r2 = _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 150, equiv_length_ft: 150, elevation_ft: 15 });
+  assert.ok(Math.abs(r2.friction_psi - 7.983181039792272) < 1e-9);
+  assert.ok(Math.abs(r2.demand_psi - 36.03430348877187) < 1e-9);
+  // Below-min flag: a 10 gpm K-5.6 head starts at 3.19 psi, under the 7 psi standard-spray floor.
+  const rlo = _v479({ q_head_gpm: 10, k_factor: 5.6, q_total_gpm: 10, pipe_id_in: 1.049, c_factor: 120, equiv_length_ft: 10, elevation_ft: 0 });
+  assert.strictEqual(rlo.below_min, true);
+  // Signed elevation: a remote head 10 ft below the base of riser subtracts 4.33 psi of lift.
+  const rneg = _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 26, pipe_id_in: 2.067, c_factor: 120, equiv_length_ft: 0, elevation_ft: -10 });
+  assert.ok(Math.abs(rneg.elevation_psi - -4.33) < 1e-9);
+  assert.ok(Math.abs(rneg.demand_psi - (rneg.start_pressure_psi - 4.33)) < 1e-9);
+  // Zero equivalent length is legal (no friction contribution).
+  assert.ok(Math.abs(_v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 0, elevation_ft: 0 }).friction_psi) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v479({ q_head_gpm: 0, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 }));
+  assert.ok("error" in _v479({ q_head_gpm: 26, k_factor: 0, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 }));
+  assert.ok("error" in _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 0, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 }));
+  assert.ok("error" in _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 0, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 }));
+  assert.ok("error" in _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 0, equiv_length_ft: 150, elevation_ft: 15 }));
+  assert.ok("error" in _v479({ q_head_gpm: 26, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: -1, elevation_ft: 15 }));
+  assert.ok("error" in _v479({ q_head_gpm: Infinity, k_factor: 5.6, q_total_gpm: 260, pipe_id_in: 3.068, c_factor: 120, equiv_length_ft: 150, elevation_ft: 15 }));
 });
 
 // ===================== spec-v257..v259 ACI 318-19 reinforced-concrete member trio =====================

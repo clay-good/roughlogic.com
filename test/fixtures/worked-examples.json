@@ -32494,6 +32494,82 @@
    }
   },
   {
+   "tile_id": "sprinkler-pressure-demand",
+   "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+   "source_title": "OH2 remote area: 26 gpm K-5.6 head (P1 21.6 psi) + 260 gpm through 150 ft of 3 in steel (C 120, 12.1 psi) + 15 ft lift (6.5 psi) -> 40.1 psi at base of riser",
+   "source_edition_or_year": "spec-v479 worked example (machine-verified)",
+   "source_section_or_page": "spec-v479 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "q_head_gpm": 26,
+    "k_factor": 5.6,
+    "q_total_gpm": 260,
+    "pipe_id_in": 3.068,
+    "c_factor": 120,
+    "equiv_length_ft": 150,
+    "elevation_ft": 15
+   },
+   "outputs": {
+    "start_pressure_psi": {
+     "value": 21.556122448979597,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "friction_psi": {
+     "value": 12.063115949144496,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "elevation_psi": {
+     "value": 6.495,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "demand_psi": {
+     "value": 40.114238398124094,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sprinkler-pressure-demand",
+   "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+   "source_title": "cross-check: same run in listed CPVC (C 150) trims friction to 8.0 psi -> 36.0 psi demand, about 4 psi the smoother pipe is worth",
+   "source_edition_or_year": "spec-v479 worked example (machine-verified)",
+   "source_section_or_page": "spec-v479 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "q_head_gpm": 26,
+    "k_factor": 5.6,
+    "q_total_gpm": 260,
+    "pipe_id_in": 3.068,
+    "c_factor": 150,
+    "equiv_length_ft": 150,
+    "elevation_ft": 15
+   },
+   "outputs": {
+    "friction_psi": {
+     "value": 7.983181039792272,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "demand_psi": {
+     "value": 36.03430348877187,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-beam-flexure",
    "source_publisher": "ACI 318-19 (Building Code Requirements for Structural Concrete)",
    "source_title": "12x24 beam, three #9 Grade 60 bars on 4,000 psi concrete -> a 4.41 in, phi Mn 260 kip-ft, 0.77 utilization at Mu 200",

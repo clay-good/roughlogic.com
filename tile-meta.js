@@ -526,6 +526,7 @@ const _TILES = [
   ["smooth-bore-flow", "F"],
   // spec-v248..v250 fire-sprinkler system-design trio (calc-firesprinkler.js)
   ["fire-pump-curve", "F"], ["sprinkler-system-demand", "F"], ["sprinkler-head-layout", "F"],
+  ["sprinkler-pressure-demand", "F"],
   // spec-v115 trucking weight compliance (Group J)
   ["gcwr-check", "J"],
   ["tire-load-check", "J"],

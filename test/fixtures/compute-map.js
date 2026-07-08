@@ -929,6 +929,7 @@ export const COMPUTE_MAP = {
   "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
   "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },
   "sprinkler-head-layout": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerHeadLayout" },
+  "sprinkler-pressure-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerPressureDemand" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },

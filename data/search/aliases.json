@@ -9144,6 +9144,46 @@
       "kind": "redirect"
     },
     {
+      "term": "base of riser",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "sprinkler pressure demand",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "sprinkler hydraulic calculation",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "hazen williams sprinkler",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "most remote sprinkler",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "sprinkler friction loss",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "sprinkler system pressure",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "nfpa 13 hydraulic",
+      "target": "sprinkler-pressure-demand",
+      "kind": "industry"
+    },
+    {
       "term": "concrete beam capacity",
       "target": "rc-beam-flexure",
       "kind": "industry"
