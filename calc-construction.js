@@ -4303,6 +4303,53 @@ const renderGuardHandrailCheck = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["guard-handrail-check"] = renderGuardHandrailCheck;
 
+// ===================== spec-v481: stair geometry code check (IBC 1011 / IRC R311) =====================
+
+// dims: in { occupancy: dimensionless, riser_height_in: L, tread_depth_in: L, stair_width_in: L } out: { max_riser: L, min_tread: L, min_width: L, two_r_plus_t: L }
+export function computeStairCodeCheck({ occupancy = "commercial", riser_height_in = 0, tread_depth_in = 0, stair_width_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (riser_height_in < 0 || tread_depth_in < 0 || stair_width_in < 0) {
+    return { error: "Riser, tread, and width must be non-negative (in)." };
+  }
+  const isCommercial = occupancy === "commercial";
+  // IBC 2021 §1011.5.2 / §1011.2 (commercial) vs IRC 2021 R311.7.5 / R311.7.1 (residential).
+  const max_riser = isCommercial ? 7.0 : 7.75;
+  const min_riser = isCommercial ? 4.0 : 0;
+  const min_tread = isCommercial ? 11.0 : 10.0;
+  const min_width = isCommercial ? 44 : 36;
+  const riser_ok = riser_height_in <= max_riser && riser_height_in >= min_riser;
+  const tread_ok = tread_depth_in >= min_tread;
+  const width_ok = stair_width_in >= min_width;
+  const two_r_plus_t = 2 * riser_height_in + tread_depth_in;
+  const comfort_ok = two_r_plus_t >= 24 && two_r_plus_t <= 25;
+  const all_pass = riser_ok && tread_ok && width_ok;
+  return {
+    max_riser, min_riser, min_tread, min_width, riser_ok, tread_ok, width_ok, two_r_plus_t, comfort_ok, all_pass,
+    note: "Dimensional stair limits for the selected occupancy: IBC 2021 §1011.5.2 caps the commercial riser at 7 in (4 in minimum) and floors the tread at 11 in, with §1011.2 requiring 44 in of width (36 in where the occupant load is under 50); IRC 2021 R311.7.5 allows a 7-3/4 in residential riser and a 10 in tread at 36 in of width (R311.7.1). The tread is the horizontal run excluding the nosing. 2R + T between 24 and 25 in is a design comfort rule of thumb, not a code pass/fail. The 3/8 in riser/tread uniformity limit over a flight, the nosing profile, the landings, and winder/spiral geometry are separate checks; the egress width the occupant load requires is the egress-capacity tile. A design aid, not a code-official determination; the AHJ and the adopted code and edition govern.",
+  };
+}
+const stairCodeCheckExample = { inputs: { occupancy: "commercial", riser_height_in: 7, tread_depth_in: 11, stair_width_in: 44 } };
+const renderStairCodeCheck = _simpleRenderer({
+  citation: "Citation: IBC 2021 §1011.5.2 (commercial riser 4-7 in, tread 11 in min) / §1011.2 (44 in width, 36 in where occupant load under 50) and IRC 2021 R311.7.5 (residential riser 7-3/4 in max, tread 10 in min) / R311.7.1 (36 in width), by section. 2R + T of 24-25 in is a comfort rule of thumb, not code. Uniformity, nosing, landings, and winders are separate checks; the AHJ governs. Free at codes.iccsafe.org.",
+  example: stairCodeCheckExample.inputs,
+  fields: [
+    { key: "occupancy", label: "Occupancy / code", kind: "select", options: [{ value: "commercial", label: "Commercial (IBC)" }, { value: "residential", label: "Residential (IRC)" }] },
+    { key: "riser_height_in", label: "Proposed riser height (in)", kind: "number", default: 7 },
+    { key: "tread_depth_in", label: "Proposed tread run, no nosing (in)", kind: "number", default: 11 },
+    { key: "stair_width_in", label: "Proposed clear stair width (in)", kind: "number", default: 44 },
+  ],
+  outputs: [
+    { key: "r", id: "scc-out-r", label: "Riser height", value: (r) => (r.riser_ok ? "ok" : "FAIL") + " (" + fmt(r.min_riser, 0) + "-" + fmt(r.max_riser, 2) + " in)" },
+    { key: "t", id: "scc-out-t", label: "Tread depth", value: (r) => (r.tread_ok ? "ok" : "FAIL") + " (min " + fmt(r.min_tread, 0) + " in)" },
+    { key: "w", id: "scc-out-w", label: "Stair width", value: (r) => (r.width_ok ? "ok" : "FAIL") + " (min " + fmt(r.min_width, 0) + " in)" },
+    { key: "c", id: "scc-out-c", label: "2R + T comfort", value: (r) => fmt(r.two_r_plus_t, 2) + " in (" + (r.comfort_ok ? "in the 24-25 in band" : "outside the 24-25 in band") + ")" },
+    { key: "v", id: "scc-out-v", label: "Verdict", value: (r) => r.all_pass ? "all dimensional checks pass" : "one or more checks fail" },
+    { key: "n", id: "scc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStairCodeCheck,
+});
+CONSTRUCTION_RENDERERS["stair-code-check"] = renderStairCodeCheck;
+
 // =====================================================================
 // spec-v212..v214 (Group E) - masonry and finish takeoffs the two-tile
 // masonry shelf left open: grouted-cell volume, modular coursing,

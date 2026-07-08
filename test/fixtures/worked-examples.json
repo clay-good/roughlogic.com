@@ -22709,6 +22709,54 @@
    }
   },
   {
+   "tile_id": "stair-code-check",
+   "source_publisher": "IBC 2021 §1011.5.2 / §1011.2 (by section)",
+   "source_title": "commercial stair 7 in riser / 11 in tread / 44 in wide -> all dimensional checks pass, 2R+T = 25 in",
+   "source_edition_or_year": "spec-v481 worked example (machine-verified)",
+   "source_section_or_page": "spec-v481 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "occupancy": "commercial",
+    "riser_height_in": 7,
+    "tread_depth_in": 11,
+    "stair_width_in": 44
+   },
+   "outputs": {
+    "max_riser": { "value": 7, "tolerance": { "abs": 0 } },
+    "min_tread": { "value": 11, "tolerance": { "abs": 0 } },
+    "min_width": { "value": 44, "tolerance": { "abs": 0 } },
+    "riser_ok": { "value": 1, "tolerance": { "abs": 0 } },
+    "tread_ok": { "value": 1, "tolerance": { "abs": 0 } },
+    "width_ok": { "value": 1, "tolerance": { "abs": 0 } },
+    "two_r_plus_t": { "value": 25, "tolerance": { "abs": 0.0001 } },
+    "all_pass": { "value": 1, "tolerance": { "abs": 0 } }
+   }
+  },
+  {
+   "tile_id": "stair-code-check",
+   "source_publisher": "IBC 2021 §1011.5.2 (by section)",
+   "source_title": "cross-check: a 7-3/4 in riser passes IRC but fails IBC (riser_ok 0) - the 3/4 in a remodel gets away with and a TI is red-tagged for",
+   "source_edition_or_year": "spec-v481 worked example (machine-verified)",
+   "source_section_or_page": "spec-v481 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "occupancy": "commercial",
+    "riser_height_in": 7.75,
+    "tread_depth_in": 11,
+    "stair_width_in": 44
+   },
+   "outputs": {
+    "max_riser": { "value": 7, "tolerance": { "abs": 0 } },
+    "riser_ok": { "value": 0, "tolerance": { "abs": 0 } },
+    "tread_ok": { "value": 1, "tolerance": { "abs": 0 } },
+    "width_ok": { "value": 1, "tolerance": { "abs": 0 } },
+    "two_r_plus_t": { "value": 26.5, "tolerance": { "abs": 0.0001 } },
+    "all_pass": { "value": 0, "tolerance": { "abs": 0 } }
+   }
+  },
+  {
    "tile_id": "smooth-bore-flow",
    "source_publisher": "IFSTA Pumping Apparatus Driver/Operator (by name)",
    "source_title": "1-1/8 in handline tip at 50 psi",

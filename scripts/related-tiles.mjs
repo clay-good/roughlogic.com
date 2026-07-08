@@ -908,6 +908,7 @@ const RELATED = {
   "water-heater-storage-sizing": ["water-heater-recovery","tankless-gpm","wh-expansion-tank"],
   // spec-v113 guard and handrail code check (Group E)
   "guard-handrail-check": ["stair-stringer-layout","deck-beam-post","equal-spacing"],
+  "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],
   // spec-v115 trucking weight compliance (Group J)

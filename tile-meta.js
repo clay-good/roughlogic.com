@@ -522,6 +522,7 @@ const _TILES = [
   ["water-heater-storage-sizing", "B"],
   // spec-v113 guard and handrail code check (Group E)
   ["guard-handrail-check", "E"],
+  ["stair-code-check", "E"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   ["smooth-bore-flow", "F"],
   // spec-v248..v250 fire-sprinkler system-design trio (calc-firesprinkler.js)

@@ -10552,6 +10552,29 @@ test("bounds: spec-v113 guard and handrail code check (IRC R312 / R311.7.8)", ()
   assert.ok("error" in _v113({ surface_height_in: Infinity }) && "error" in _v113({ surface_height_in: -1 }));
 });
 
+import { computeStairCodeCheck as _v481 } from "../../calc-construction.js";
+test("bounds: spec-v481 stair geometry code check (IBC 1011 / IRC R311)", () => {
+  // Pinned example: commercial 7 / 11 / 44 -> all pass, 2R+T = 25.
+  const a = _v481({ occupancy: "commercial", riser_height_in: 7, tread_depth_in: 11, stair_width_in: 44 });
+  assert.ok(a.max_riser === 7 && a.min_tread === 11 && a.min_width === 44);
+  assert.ok(a.riser_ok === true && a.tread_ok === true && a.width_ok === true && a.all_pass === true);
+  assert.ok(Math.abs(a.two_r_plus_t - 25) < 1e-9 && a.comfort_ok === true);
+  // The riser flip: a 7-3/4 in riser passes IRC (7.75 max) but fails IBC (7 max).
+  const irc = _v481({ occupancy: "residential", riser_height_in: 7.75, tread_depth_in: 10, stair_width_in: 36 });
+  assert.ok(irc.max_riser === 7.75 && irc.min_tread === 10 && irc.min_width === 36 && irc.all_pass === true);
+  const ibc = _v481({ occupancy: "commercial", riser_height_in: 7.75, tread_depth_in: 11, stair_width_in: 44 });
+  assert.ok(ibc.riser_ok === false && ibc.tread_ok === true && ibc.width_ok === true && ibc.all_pass === false);
+  assert.ok(Math.abs(ibc.two_r_plus_t - 26.5) < 1e-9 && ibc.comfort_ok === false);
+  // A too-narrow tread and width fail their minimums; a below-4-in commercial riser fails the min.
+  const narrow = _v481({ occupancy: "commercial", riser_height_in: 3, tread_depth_in: 9, stair_width_in: 40 });
+  assert.ok(narrow.riser_ok === false && narrow.tread_ok === false && narrow.width_ok === false && narrow.all_pass === false);
+  // Error seams.
+  assert.ok("error" in _v481({ riser_height_in: -1, tread_depth_in: 11, stair_width_in: 44 }));
+  assert.ok("error" in _v481({ riser_height_in: 7, tread_depth_in: -1, stair_width_in: 44 }));
+  assert.ok("error" in _v481({ riser_height_in: 7, tread_depth_in: 11, stair_width_in: -1 }));
+  assert.ok("error" in _v481({ riser_height_in: Infinity, tread_depth_in: 11, stair_width_in: 44 }));
+});
+
 import { computeSmoothBoreFlow as _v114 } from "../../calc-fire.js";
 test("bounds: spec-v114 smooth-bore nozzle flow (29.7 d^2 sqrt(NP))", () => {
   const a = _v114({ bore_in: 1.125, nozzle_pressure_psi: 50 });

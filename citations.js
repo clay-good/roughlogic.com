@@ -7789,6 +7789,18 @@ export const CITATIONS = {
       { name: "AHJ governs", value: "the AHJ-adopted code and edition govern the final acceptance", source: "AHJ" },
     ],
   },
+  "stair-code-check": {
+    formula: "IBC (commercial): riser 4-7 in, tread >= 11 in, width >= 44 in. IRC (residential): riser <= 7.75 in, tread >= 10 in, width >= 36 in. Each measured value is compared to its limit; 2R + T (comfort 24-25 in) is reported, not enforced.",
+    edition: "IBC 2021 (International Building Code) §1011.5.2 (riser/tread) and §1011.2 (width), and IRC 2021 (International Residential Code) R311.7.5 (riser/tread) and R311.7.1 (width), by section; dimensional minimums only, not reproduced.",
+    freeAccess: "Read-only at codes.iccsafe.org. The dimensional stair limits are facts; the AHJ-adopted code and edition govern.",
+    governance: GOVERNANCE.structural,
+    editionNote: "Multi-edition (the AHJ-adopted IBC / IRC edition governs the riser, tread, and width minimums). IBC 2021 §1011.5.2 caps the commercial riser at 7 in (4 in minimum) and floors the tread at 11 in; §1011.2 requires 44 in of width (36 in where the occupant load is under 50). IRC 2021 R311.7.5 allows a 7-3/4 in residential riser and a 10 in tread; R311.7.1 requires 36 in of width. The tread is the horizontal run excluding the nosing; 2R + T of 24-25 in is a comfort rule of thumb, not a code pass/fail. The 3/8 in riser/tread uniformity limit over a flight, the nosing profile, the landings, and winder/spiral geometry are separate checks; the egress width the occupant load requires is the egress-capacity tile.",
+    assumptions: [
+      { name: "Thresholds", value: "IBC commercial riser 4-7 in, tread 11 in min, width 44 in; IRC residential riser 7-3/4 in max, tread 10 in min, width 36 in", source: "IBC 1011.5.2 / 1011.2 / IRC R311.7.5 / R311.7.1" },
+      { name: "Comfort read", value: "2R + T between 24 and 25 in is a design rule of thumb reported for reference, not a code pass/fail requirement", source: "trade practice" },
+      { name: "Separate checks", value: "the 3/8 in flight uniformity limit, nosing, landings, winders, and the occupant-load egress width (the egress-capacity tile) are not checked here; the AHJ governs", source: "IBC 1011 / IRC R311" },
+    ],
+  },
   "smooth-bore-flow": {
     formula: "gpm = 29.7 x bore_in^2 x sqrt(nozzle_pressure_psi); companion nozzle reaction = 1.57 x bore_in^2 x nozzle_pressure_psi.",
     edition: "IFSTA Pumping Apparatus Driver/Operator Handbook smooth-bore discharge form (by name); classical orifice discharge, no edition cycle.",

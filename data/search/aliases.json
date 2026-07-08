@@ -5309,6 +5309,46 @@
       "kind": "redirect"
     },
     {
+      "term": "stair code",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "riser height",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "tread depth",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "stair rise and run",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "7-11 rule",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "2r plus t",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "stair riser tread",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
+      "term": "ibc stair",
+      "target": "stair-code-check",
+      "kind": "industry"
+    },
+    {
       "term": "smooth bore gpm",
       "target": "smooth-bore-flow",
       "kind": "industry"

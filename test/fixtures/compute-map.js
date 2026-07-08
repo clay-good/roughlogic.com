@@ -844,6 +844,7 @@ export const COMPUTE_MAP = {
   "gas-fuel-conversion": { module: "../../calc-gas.js", fn: "computeGasFuelConversion" },
   "water-heater-storage-sizing": { module: "../../calc-plumbing.js", fn: "computeWaterHeaterStorageSizing" },
   "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
+  "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
   "gcwr-check": { module: "../../calc-trucking.js", fn: "computeGcwrCheck" },
   "tire-load-check": { module: "../../calc-trucking.js", fn: "computeTireLoadCheck" },
