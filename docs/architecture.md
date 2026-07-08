@@ -34,14 +34,12 @@ The service worker caches the application shell on first load. Data shards are c
 |  |  +------------+  +-----------+  +---------------------+   | |
 |  |  | pinned     |  | theme     |  | offline / print     |   | |
 |  |  +------------+  +-----------+  +---------------------+   | |
-|  |   dynamic-import: 50 calc-* modules (electrical, plumbing,| |
-|  |   hvac, restoration, construction, fire, cross,           | |
-|  |   references, trucking, mechanic, agriculture, water,     | |
-|  |   stage, kitchen, field, historical, accounting, legal,   | |
-|  |   lab, vet, ems, aviation, realestate, edu, lowvoltage,   | |
-|  |   pipefit, metalair, fab, shop, gas) plus citations /     | |
-|  |   tile-meta / limitation-banner / search-discovery /      | |
-|  |   hash-state / clipboard / cost-output / v5-platform      | |
+|  |   dynamic-import: 56 calc-* modules (the repo-root        | |
+|  |   calc-*.js set, one per trade bench; each holds a        | |
+|  |   documented gzip cap in check-module-sizes.mjs) plus     | |
+|  |   citations / tile-meta / limitation-banner /             | |
+|  |   search-discovery / hash-state / clipboard /             | |
+|  |   cost-output / v5-platform                               | |
 |  +-----------------------------------------------------------+ |
 |           |                              |                     |
 |           v                              v                     |
@@ -97,8 +95,10 @@ There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `them
 ## v2 module layout
 
 The v2 expansion (spec-v2.md) added the first lazy-loaded module past
-the original seven trade calc-* modules. The set has since grown
-across v3-v12; the current inventory is in the v12 calc-* list above.
+the original seven trade calc-* modules. The set has since grown to 56
+modules (through spec-v475); the authoritative current inventory is the
+repo-root `calc-*.js` set, each with a documented gzip cap in
+`scripts/check-module-sizes.mjs`.
 
 - `calc-electrical.js`, `calc-plumbing.js`, `calc-hvac.js`, `calc-restoration.js`, `calc-construction.js`, `calc-fire.js`, `calc-cross.js` (v1 originals; v2-v12 utilities appended in place)
 - `calc-references.js` (v2 §H; knowledge references)

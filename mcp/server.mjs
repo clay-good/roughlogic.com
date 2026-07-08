@@ -1,22 +1,29 @@
 #!/usr/bin/env node
 // roughlogic MCP server — zero-dependency, local, stdio transport.
 //
-// Exposes the site's 679 trades calculators to any MCP client (Claude
-// Desktop, Claude Code, Cursor, …) as three tools:
+// Exposes the site's full trades-calculator catalog to any MCP client
+// (Claude Desktop, Claude Code, Cursor, …) as three tools:
 //   search_calculators   — find calculators by keyword and/or trade
 //   describe_calculator  — inputs, a worked example, and the source for one
 //   run_calculator       — evaluate a calculator with your own inputs
 //
-// One catalog meta-surface, not 679 individual tools — that keeps the tool
-// list small enough for any client while still reaching every calculator.
+// One catalog meta-surface, not one tool per calculator — that keeps the
+// tool list small enough for any client while still reaching every
+// calculator, and the count tracks the live registry with no edits here.
 //
 // Transport is MCP stdio: newline-delimited JSON-RPC 2.0 on stdin/stdout.
 // stderr is for logs only. No network, no install — `node mcp/server.mjs`.
 
 import { createInterface } from "node:readline";
+import { readFileSync } from "node:fs";
 import { search, describe, run } from "./catalog.mjs";
 
-const SERVER_INFO = { name: "roughlogic", version: "0.85.0" };
+// Report the site's version: the server exposes the site's catalog verbatim,
+// so its version is the root package.json version, read at startup.
+const SITE_VERSION = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+).version;
+const SERVER_INFO = { name: "roughlogic", version: SITE_VERSION };
 // Echo the client's protocol version when sane; otherwise this baseline.
 const DEFAULT_PROTOCOL = "2024-11-05";
 
