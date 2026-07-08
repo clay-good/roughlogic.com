@@ -1004,6 +1004,7 @@ const RELATED = {
   "rain-load-ponding": ["snow-load","roof-drain-sizing","gutter-downspout"],
   "asce7-load-combinations": ["snow-load","wind-pressure","rain-load-ponding"],
   "seismic-base-shear": ["wind-pressure","asce7-load-combinations","snow-load"],
+  "seismic-vertical-distribution": ["seismic-base-shear","seismic-story-drift","seismic-pdelta-stability"],
   // spec-v227..v229 cooling-load-components batch (Group C)
   "window-solar-heat-gain": ["manual-j-cooling","internal-heat-gains","envelope-conduction-load"],
   "internal-heat-gains": ["manual-j-cooling","window-solar-heat-gain","shr"],

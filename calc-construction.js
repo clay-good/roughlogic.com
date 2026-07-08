@@ -1723,6 +1723,7 @@ export const formworkPressureExample = { inputs: { pour_rate_ft_per_hr: 5, concr
 import {
   DEBOUNCE_MS as _DC, debounce as _debC, makeNumber as _mnC, makeSelect as _msC,
   makeOutputLine as _moC, attachExampleButton as _aeC, fmt as _fmtC,
+  makeTextarea,
 } from "./ui-fields.js";
 
 function _simpleRenderer(spec) {
@@ -4704,6 +4705,90 @@ CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
   ],
   compute: computeSeismicBaseShear,
 });
+
+// ----- spec-v477: Vertical Distribution of Seismic Forces (ASCE 7-22 12.8.3 / 12.8.4) -----
+
+// dims: in { base_shear_kip: M L T^-2, period_s: T, stories: dimensionless } out: { k: dimensionless, sigma_wh: dimensionless, fx_top_kip: M L T^-2, vx_base_kip: M L T^-2, level_count: dimensionless }
+export function computeSeismicVerticalDistribution({ base_shear_kip = 0, period_s = 0, stories = [] } = {}) {
+  if (!Array.isArray(stories) || stories.length === 0) return { error: "Provide at least one level: weight_kips,height_ft per line, bottom-up." };
+  if (!Number.isFinite(base_shear_kip) || !(base_shear_kip > 0)) return { error: "Base shear V must be positive (kips)." };
+  if (!Number.isFinite(period_s) || !(period_s > 0)) return { error: "Fundamental period T must be positive (s)." };
+  // ASCE 7 12.8.3: k = 1 at or below 0.5 s, 2 at or above 2.5 s, linear interpolation between.
+  const k = period_s <= 0.5 ? 1 : period_s >= 2.5 ? 2 : 1 + (period_s - 0.5) / 2;
+  const levels = [];
+  let sigma_wh = 0;
+  let prev_h = 0;
+  for (const s of stories) {
+    const w = Number(s.w);
+    const h = Number(s.h);
+    if (!Number.isFinite(w) || !Number.isFinite(h)) return { error: "All level inputs must be finite numbers." };
+    if (!(w > 0)) return { error: "Each level weight must be positive (kips)." };
+    if (!(h > prev_h)) return { error: "Level heights must be positive and increase bottom-up (ft from the base)." };
+    prev_h = h;
+    const wh = w * Math.pow(h, k);
+    levels.push({ w, h, wh });
+    sigma_wh += wh;
+  }
+  const per_level = levels.map((l) => {
+    const cvx = l.wh / sigma_wh;
+    return { w: l.w, h: l.h, cvx, fx_kip: cvx * base_shear_kip };
+  });
+  // Eq. 12.8-13: the story shear at level x is the sum of the forces at and above it.
+  let running = 0;
+  for (let i = per_level.length - 1; i >= 0; i--) {
+    running += per_level[i].fx_kip;
+    per_level[i].vx_kip = running;
+  }
+  return {
+    k, sigma_wh, per_level,
+    fx_top_kip: per_level[per_level.length - 1].fx_kip,
+    vx_base_kip: per_level[0].vx_kip,
+    level_count: per_level.length,
+  };
+}
+
+export const seismicVerticalDistributionExample = {
+  inputs: { base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: 12 }, { w: 1000, h: 24 }, { w: 800, h: 36 }] },
+};
+
+// Custom renderer: V + T + a bottom-up level list (textarea per the check-multiline-inputs rule).
+function _renderSeismicVerticalDistribution(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASCE 7-22 12.8.3 vertical distribution, Fx = Cvx x V (Eq. 12.8-11) with Cvx = wx hx^k / Sum(wi hi^k) (Eq. 12.8-12), and 12.8.4 story shear Vx = Sum Fi at and above the level (Eq. 12.8-13). The exponent k = 1 for T at or below 0.5 s, k = 2 at or above 2.5 s, linear interpolation between (the standard also permits k = 2 outright in that band). Weights are the effective seismic weights per 12.7.2; heights are from the base. Assumes the ELF procedure is permitted for the structure (12.6 system and irregularity limits). Feeds the story shear that seismic-story-drift and seismic-pdelta-stability consume. A design aid, not a lateral-analysis substitute; the engineer of record governs.";
+  _aeC(inputRegion, () => fillExample(seismicVerticalDistributionExample.inputs));
+  const vIn = _mnC("Base shear V (kips)", "svd-v", { step: "any", min: "0" });
+  const tIn = _mnC("Fundamental period T (s)", "svd-t", { step: "any", min: "0" });
+  const list = makeTextarea("Levels bottom-up: weight(kips),height(ft) per line", "svd-list", { rows: "5" });
+  inputRegion.appendChild(vIn.wrap); inputRegion.appendChild(tIn.wrap); inputRegion.appendChild(list.wrap);
+  const oK = _moC(outputRegion, "Distribution exponent k", "svd-out-k");
+  const oF = _moC(outputRegion, "Level forces Fx, bottom-up (kips)", "svd-out-f");
+  const oS = _moC(outputRegion, "Story shears Vx, bottom-up (kips)", "svd-out-s");
+  const oC = _moC(outputRegion, "Check", "svd-out-c");
+  function fillExample(x) {
+    vIn.input.value = x.base_shear_kip;
+    tIn.input.value = x.period_s;
+    list.input.value = (x.stories || []).map((s) => s.w + "," + s.h).join("\n");
+    update();
+  }
+  const update = _debC(() => {
+    const stories = [];
+    for (const line of String(list.input.value).split("\n")) {
+      const t = line.trim();
+      if (!t) continue;
+      const parts = t.split(",");
+      stories.push({ w: Number(parts[0]), h: Number(parts[1]) });
+    }
+    const r = computeSeismicVerticalDistribution({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories });
+    if (r.error) { oK.textContent = r.error; oF.textContent = "-"; oS.textContent = "-"; oC.textContent = "-"; return; }
+    oK.textContent = _fmtC(r.k, 2);
+    oF.textContent = r.per_level.map((l) => _fmtC(l.fx_kip, 1)).join(" / ");
+    oS.textContent = r.per_level.map((l) => _fmtC(l.vx_kip, 1)).join(" / ");
+    oC.textContent = "Sum Fx = " + _fmtC(r.vx_base_kip, 1) + " kips = V (base story carries the full shear)";
+  }, _DC);
+  vIn.input.addEventListener("input", update);
+  tIn.input.addEventListener("input", update);
+  list.input.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["seismic-vertical-distribution"] = _renderSeismicVerticalDistribution;
 
 // ===================================================================================
 // spec-v242..v244 IBC/IPC occupancy trio + spec-v245..v247 cast-in-place concrete

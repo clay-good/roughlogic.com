@@ -12296,7 +12296,48 @@ import {
   computeShorePostLoad as _v245, computeConcreteEvaporationRate as _v246, computeConcreteStrengthGain as _v247,
   computeAllowableArea as _v251, computeEgressTravelDistance as _v252, computeExteriorOpeningProtection as _v253,
   computeConcreteMaturity as _v476,
+  computeSeismicVerticalDistribution as _v477,
 } from "../../calc-construction.js";
+
+test("bounds: spec-v477 computeSeismicVerticalDistribution pins the distribution, story shears, k rule, and error seams", () => {
+  const ST = [{ w: 1000, h: 12 }, { w: 1000, h: 24 }, { w: 800, h: 36 }];
+  // Pinned example: V = 200 kips, T = 0.4 s -> k = 1.
+  const r = _v477({ base_shear_kip: 200, period_s: 0.4, stories: ST });
+  assert.strictEqual(r.k, 1);
+  assert.ok(Math.abs(r.sigma_wh - 64800) < 1e-9);
+  const fx = r.per_level.map((l) => l.fx_kip);
+  assert.ok(Math.abs(fx[0] - 37.0370370) < 1e-6);
+  assert.ok(Math.abs(fx[1] - 74.0740741) < 1e-6);
+  assert.ok(Math.abs(fx[2] - 88.8888889) < 1e-6);
+  const vx = r.per_level.map((l) => l.vx_kip);
+  assert.ok(Math.abs(vx[0] - 200) < 1e-9); // base story carries the full V
+  assert.ok(Math.abs(vx[1] - 162.9629630) < 1e-6);
+  assert.ok(Math.abs(vx[2] - 88.8888889) < 1e-6);
+  assert.ok(Math.abs(r.fx_top_kip - 88.8888889) < 1e-6);
+  assert.ok(Math.abs(r.vx_base_kip - 200) < 1e-9);
+  // Cross-check: T = 1.06 s -> k = 1.28 (the SEAOC/Tedds verification period); force shifts to the roof.
+  const r2 = _v477({ base_shear_kip: 200, period_s: 1.06, stories: ST });
+  assert.ok(Math.abs(r2.k - 1.28) < 1e-12);
+  assert.ok(Math.abs(r2.sigma_wh - 161049.7548) < 1e-2);
+  assert.ok(Math.abs(r2.fx_top_kip - 97.5499645) < 1e-6);
+  assert.ok(Math.abs(r2.per_level[1].vx_kip - 170.1171563) < 1e-6);
+  assert.ok(Math.abs(r2.vx_base_kip - 200) < 1e-9);
+  // k boundaries: exactly 0.5 stays 1; exactly 2.5 hits 2.
+  assert.strictEqual(_v477({ base_shear_kip: 100, period_s: 0.5, stories: ST }).k, 1);
+  assert.strictEqual(_v477({ base_shear_kip: 100, period_s: 2.5, stories: ST }).k, 2);
+  assert.ok(Math.abs(_v477({ base_shear_kip: 100, period_s: 1.5, stories: ST }).k - 1.5) < 1e-12);
+  // A single-level structure puts the whole V at that level.
+  const r1 = _v477({ base_shear_kip: 50, period_s: 0.3, stories: [{ w: 500, h: 14 }] });
+  assert.ok(Math.abs(r1.fx_top_kip - 50) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v477({ base_shear_kip: 0, period_s: 0.4, stories: ST }));
+  assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0, stories: ST }));
+  assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0.4, stories: [] }));
+  assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 0, h: 12 }] }));
+  assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: 24 }, { w: 1000, h: 12 }] })); // heights must increase bottom-up
+  assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: NaN }] }));
+  assert.ok("error" in _v477({ base_shear_kip: Infinity, period_s: 0.4, stories: ST }));
+});
 
 test("bounds: spec-v476 computeConcreteMaturity pins the TTF, equivalent age, target solve, and error seams", () => {
   // Pinned example: 50 F for 168 hr against a 1,600 C-hr calibrated target.

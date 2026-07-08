@@ -8399,6 +8399,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "vertical distribution seismic",
+      "target": "seismic-vertical-distribution",
+      "kind": "industry"
+    },
+    {
+      "term": "seismic story forces",
+      "target": "seismic-vertical-distribution",
+      "kind": "industry"
+    },
+    {
+      "term": "cvx",
+      "target": "seismic-vertical-distribution",
+      "kind": "industry"
+    },
+    {
+      "term": "story shear",
+      "target": "seismic-vertical-distribution",
+      "kind": "industry"
+    },
+    {
+      "term": "ASCE 12.8.3",
+      "target": "seismic-vertical-distribution",
+      "kind": "industry"
+    },
+    {
+      "term": "equivalent lateral force distribution",
+      "target": "seismic-vertical-distribution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "k exponent seismic",
+      "target": "seismic-vertical-distribution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "seismic force per floor",
+      "target": "seismic-vertical-distribution",
+      "kind": "adjacent"
+    },
+    {
       "term": "allowable area",
       "target": "allowable-area",
       "kind": "industry"

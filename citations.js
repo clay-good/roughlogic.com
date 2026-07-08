@@ -9460,6 +9460,18 @@ export const CITATIONS = {
       { name: "Base shear", value: "V = Cs x seismic weight is the lateral demand that sizes the shear walls, braced frames, hold-downs, and anchorage", source: "ASCE 7 §12.8" },
     ],
   },
+  "seismic-vertical-distribution": {
+    formula: "k = 1 for T <= 0.5 s, 2 for T >= 2.5 s, 1 + (T - 0.5)/2 between; Cvx = wx hx^k / Sum(wi hi^k); Fx = Cvx x V; Vx = Sum Fi for i = x..n (forces at and above the level).",
+    edition: "ASCE 7-22 §12.8.3 (Eqs. 12.8-11 and 12.8-12, the vertical distribution and its exponent k) and §12.8.4 (Eq. 12.8-13, the story shear), by name.",
+    freeAccess: "The vertical-distribution and story-shear relations are stated in ASCE 7 §12.8.3 / §12.8.4 and reproduced across the public seismic-design literature (FEMA P-1051, the SEAOC design manuals); the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7-22 §12.8.3: the equivalent-lateral-force base shear distributes up the height as Fx = Cvx x V (Eq. 12.8-11) with Cvx = wx hx^k / Sum(wi hi^k) (Eq. 12.8-12); the exponent k is 1 for a period at or below 0.5 s, 2 at or above 2.5 s, and linearly interpolated between (the standard also permits taking k = 2 outright in that band as the conservative-for-overturning choice). §12.8.4 (Eq. 12.8-13): the story shear at a level is the sum of the lateral forces at and above it, so the base story carries the full V. The weights are the effective seismic weights per §12.7.2 and the heights are measured from the base; the distribution assumes the ELF procedure is permitted for the structure (the §12.6 system and irregularity limits). A design aid, not a lateral-analysis substitute; the engineer of record governs.",
+    assumptions: [
+      { name: "Distribution", value: "Fx = Cvx x V with Cvx = wx hx^k / Sum(wi hi^k); a longer period (larger k) shifts force toward the roof", source: "ASCE 7 §12.8.3" },
+      { name: "Exponent k", value: "1 at or below T = 0.5 s, 2 at or above 2.5 s, linear interpolation between (k = 2 outright also permitted)", source: "ASCE 7 §12.8.3" },
+      { name: "Story shear", value: "Vx sums the forces at and above the level (Eq. 12.8-13); the base story carries the full V", source: "ASCE 7 §12.8.4" },
+    ],
+  },
   "occupant-load": {
     formula: "per_space_load = ceil(area / olf); total_load = sum over spaces of per_space_load.",
     edition: "IBC 2021 §1004.5 and Table 1004.5 (occupant load = area / occupant-load factor, summed over spaces) and §1004.2 (round up to a whole person), by name.",

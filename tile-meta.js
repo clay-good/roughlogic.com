@@ -551,6 +551,8 @@ const _TILES = [
   ["ridge-cap-fasteners", "E"],
   // spec-v224..v226 ASCE 7 structural design-loads batch
   ["rain-load-ponding", "E"], ["asce7-load-combinations", "E"], ["seismic-base-shear", "E"],
+  // spec-v477 ELF vertical distribution
+  ["seismic-vertical-distribution", "E"],
   // spec-v242..v244 IBC/IPC occupancy trio
   ["occupant-load", "E"], ["egress-capacity", "E"], ["plumbing-fixture-count", "E"],
   // spec-v245..v247 cast-in-place placing-and-curing trio

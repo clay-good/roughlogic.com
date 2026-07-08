@@ -395,6 +395,8 @@ const TOOL_MODULES = (() => {
     "ice-barrier-coverage", "metal-roof-panels", "ridge-cap-fasteners",
     // spec-v224..v226 ASCE 7 structural design-loads batch.
     "rain-load-ponding", "asce7-load-combinations", "seismic-base-shear",
+    // spec-v477 ELF vertical distribution (the v226/v383 follow-on).
+    "seismic-vertical-distribution",
     // spec-v242..v244 IBC/IPC occupancy trio.
     "occupant-load", "egress-capacity", "plumbing-fixture-count",
     // spec-v245..v247 cast-in-place placing-and-curing trio.

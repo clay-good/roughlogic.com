@@ -867,6 +867,7 @@ export const COMPUTE_MAP = {
   "rain-load-ponding": { module: "../../calc-construction.js", fn: "computeRainLoadPonding" },
   "asce7-load-combinations": { module: "../../calc-construction.js", fn: "computeAsce7LoadCombinations" },
   "seismic-base-shear": { module: "../../calc-construction.js", fn: "computeSeismicBaseShear" },
+  "seismic-vertical-distribution": { module: "../../calc-construction.js", fn: "computeSeismicVerticalDistribution" },
   // spec-v242..v244 IBC/IPC occupancy trio (3 tiles)
   "occupant-load": { module: "../../calc-construction.js", fn: "computeOccupantLoad" },
   "egress-capacity": { module: "../../calc-construction.js", fn: "computeEgressCapacity" },

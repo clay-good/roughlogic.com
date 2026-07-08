@@ -30906,6 +30906,100 @@
    }
   },
   {
+   "tile_id": "seismic-vertical-distribution",
+   "source_publisher": "ASCE 7-22 §12.8.3 / §12.8.4 (Eqs. 12.8-11/-12/-13)",
+   "source_title": "3-story, V = 200 kips, T = 0.4 s (k = 1) -> Fx 37.0 / 74.1 / 88.9 kips, base story shear 200",
+   "source_edition_or_year": "spec-v477 worked example (machine-verified)",
+   "source_section_or_page": "spec-v477 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "base_shear_kip": 200,
+    "period_s": 0.4,
+    "stories": [
+     { "w": 1000, "h": 12 },
+     { "w": 1000, "h": 24 },
+     { "w": 800, "h": 36 }
+    ]
+   },
+   "outputs": {
+    "k": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sigma_wh": {
+     "value": 64800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fx_top_kip": {
+     "value": 88.8888889,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "vx_base_kip": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "level_count": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-vertical-distribution",
+   "source_publisher": "ASCE 7-22 §12.8.3 / §12.8.4 (Eqs. 12.8-11/-12/-13)",
+   "source_title": "cross-check: same building at T = 1.06 s (k = 1.28, the SEAOC/Tedds example period) -> roof force 97.5 kips",
+   "source_edition_or_year": "spec-v477 worked example (machine-verified)",
+   "source_section_or_page": "spec-v477 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "base_shear_kip": 200,
+    "period_s": 1.06,
+    "stories": [
+     { "w": 1000, "h": 12 },
+     { "w": 1000, "h": 24 },
+     { "w": 800, "h": 36 }
+    ]
+   },
+   "outputs": {
+    "k": {
+     "value": 1.28,
+     "tolerance": {
+      "abs": 0.0000001
+     }
+    },
+    "sigma_wh": {
+     "value": 161049.7548,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fx_top_kip": {
+     "value": 97.5499645,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "vx_base_kip": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "allowable-area",
    "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
    "source_title": "VB / B corner-lot office, sprinklered -> 29,250 ft^2 allowable, 25,000 passes",
