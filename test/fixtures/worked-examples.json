@@ -30821,6 +30821,91 @@
    }
   },
   {
+   "tile_id": "concrete-maturity",
+   "source_publisher": "ASTM C1074 maturity method (Nurse-Saul + Arrhenius)",
+   "source_title": "50 F cure week -> 1,680 C-hr TTF, 3.83 equivalent days, 160 hr to a 1,600 C-hr target",
+   "source_edition_or_year": "spec-v476 worked example (machine-verified)",
+   "source_section_or_page": "spec-v476 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "concrete_temp_f": 50,
+    "hours": 168,
+    "datum_f": 32,
+    "q_kelvin": 5000,
+    "ref_temp_f": 68,
+    "target_ttf_c": 1600
+   },
+   "outputs": {
+    "M_c": {
+     "value": 1680,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "M_f": {
+     "value": 3024,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "te_hours": {
+     "value": 91.9820726,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "te_days": {
+     "value": 3.8325864,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "target_hours": {
+     "value": 160,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-maturity",
+   "source_publisher": "ASTM C1074 maturity method (Nurse-Saul + Arrhenius)",
+   "source_title": "cross-check: 3 days at 90 F -> 2,320 C-hr, 5.94 equivalent days",
+   "source_edition_or_year": "spec-v476 worked example (machine-verified)",
+   "source_section_or_page": "spec-v476 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "concrete_temp_f": 90,
+    "hours": 72,
+    "datum_f": 32,
+    "q_kelvin": 5000,
+    "ref_temp_f": 68
+   },
+   "outputs": {
+    "M_c": {
+     "value": 2320,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "te_hours": {
+     "value": 142.4969073,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "te_days": {
+     "value": 5.9373711,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "allowable-area",
    "source_publisher": "IBC 2021 §506.2 / §506.3 and Table 506.2",
    "source_title": "VB / B corner-lot office, sprinklered -> 29,250 ft^2 allowable, 25,000 passes",

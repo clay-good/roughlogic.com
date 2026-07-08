@@ -8359,6 +8359,46 @@
       "kind": "redirect"
     },
     {
+      "term": "concrete maturity",
+      "target": "concrete-maturity",
+      "kind": "industry"
+    },
+    {
+      "term": "maturity method",
+      "target": "concrete-maturity",
+      "kind": "industry"
+    },
+    {
+      "term": "ASTM C1074",
+      "target": "concrete-maturity",
+      "kind": "industry"
+    },
+    {
+      "term": "nurse saul",
+      "target": "concrete-maturity",
+      "kind": "industry"
+    },
+    {
+      "term": "time temperature factor",
+      "target": "concrete-maturity",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete equivalent age",
+      "target": "concrete-maturity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "maturity meter",
+      "target": "concrete-maturity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cold weather concrete strength",
+      "target": "concrete-maturity",
+      "kind": "adjacent"
+    },
+    {
       "term": "allowable area",
       "target": "allowable-area",
       "kind": "industry"

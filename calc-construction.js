@@ -5012,6 +5012,58 @@ const _renderConcreteStrengthGain = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["concrete-strength-gain"] = _renderConcreteStrengthGain;
 
+// ----- spec-v476: Concrete Maturity and Equivalent Age (ASTM C1074) -----
+
+// dims: in { concrete_temp_f: T, hours: T, datum_f: T, q_kelvin: T, ref_temp_f: T, target_ttf_c: T^2 } out: { M_c: T^2, M_f: T^2, age_factor: dimensionless, te_hours: T, te_days: T, target_hours: T, target_days: T }
+export function computeConcreteMaturity({ concrete_temp_f = 0, hours = 0, datum_f = 32, q_kelvin = 5000, ref_temp_f = 68, target_ttf_c = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hours > 0)) return { error: "Elapsed time must be positive (hours)." };
+  if (!(q_kelvin > 0)) return { error: "Activation constant Q must be positive (kelvin)." };
+  if (target_ttf_c < 0) return { error: "Target TTF cannot be negative (deg C-hr)." };
+  const Tc = (concrete_temp_f - 32) / 1.8;
+  const T0 = (datum_f - 32) / 1.8;
+  const Tr = (ref_temp_f - 32) / 1.8;
+  // Below the datum the mix accrues no maturity (ASTM C1074); the inverse would divide by <= 0.
+  if (!(Tc > T0)) return { error: "Concrete temperature must be above the datum; at or below it no maturity accrues." };
+  if (!(Tr > T0)) return { error: "Reference temperature must be above the datum." };
+  const M_c = (Tc - T0) * hours;
+  const M_f = M_c * 1.8;
+  const age_factor = Math.exp(-q_kelvin * (1 / (Tc + 273.15) - 1 / (Tr + 273.15)));
+  const te_hours = age_factor * hours;
+  const te_days = te_hours / 24;
+  let target_hours = null, target_days = null;
+  if (target_ttf_c > 0) {
+    target_hours = target_ttf_c / (Tc - T0);
+    target_days = target_hours / 24;
+  }
+  return { Tc, T0, M_c, M_f, age_factor, te_hours, te_days, target_hours, target_days };
+}
+
+export const concreteMaturityExample = {
+  inputs: { concrete_temp_f: 50, hours: 168, datum_f: 32, q_kelvin: 5000, ref_temp_f: 68, target_ttf_c: 1600 },
+};
+
+const _renderConcreteMaturity = _simpleRenderer({
+  citation: "Citation: ASTM C1074 maturity method. Nurse-Saul time-temperature factor M = Sum (Ta - T0) x dt in deg C-hr, evaluated here over one constant-temperature interval; recommended datum T0 = 0 C (32 F) for Type I cement without admixtures cured 0 to 40 C, otherwise per the C1074 datum procedure. Arrhenius equivalent age te = exp(-Q x (1/Ta - 1/Tr)) x t with temperatures in kelvin; Q = 5000 K for Type I without admixtures and Tr = 20 C (68 F) traditional per C1074 (23 C also permissible; both editable). The strength a TTF represents comes only from the lab-calibrated strength-maturity curve for the project's own mix (the C1074 procedure); compare the field TTF to that calibrated target. Intervals at or below the datum accrue no maturity. A scheduling estimate that supplements, not replaces, acceptance cylinders; the engineer of record and the project specification govern.",
+  example: concreteMaturityExample.inputs,
+  fields: [
+    { key: "concrete_temp_f", label: "Average concrete temperature (F)", kind: "number", attrs: { step: "any" } },
+    { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
+    { key: "datum_f", label: "Datum temperature T0 (F)", kind: "number", default: 32, attrs: { step: "any" } },
+    { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number", default: 5000 },
+    { key: "ref_temp_f", label: "Reference temperature Tr (F)", kind: "number", default: 68, attrs: { step: "any" } },
+    { key: "target_ttf_c", label: "Target TTF (deg C-hr, 0 = none)", kind: "number", default: 1600 },
+  ],
+  outputs: [
+    { key: "mc", id: "cmat-out-mc", label: "Maturity index (TTF)", value: (r) => _fmtC(r.M_c, 0) + " deg C-hr" },
+    { key: "mf", id: "cmat-out-mf", label: "TTF in F-hr", value: (r) => _fmtC(r.M_f, 0) + " deg F-hr" },
+    { key: "te", id: "cmat-out-te", label: "Equivalent age at Tr", value: (r) => _fmtC(r.te_days, 2) + " days (" + _fmtC(r.te_hours, 1) + " hr)" },
+    { key: "tt", id: "cmat-out-tt", label: "Time to target TTF", value: (r) => r.target_hours === null ? "(no target set)" : _fmtC(r.target_hours, 1) + " hr (" + _fmtC(r.target_days, 2) + " days)" },
+  ],
+  compute: computeConcreteMaturity,
+});
+CONSTRUCTION_RENDERERS["concrete-maturity"] = _renderConcreteMaturity;
+
 // ----- spec-v251: Allowable Building Area per Story (IBC 2021 Chapter 5) -----
 
 // dims: in { tabular_area: L^2, ns_area: L^2, frontage_ft: L, perimeter_ft: L, open_width_ft: L, actual_area: L^2 } out: { frontage_if: dimensionless, allowable: L^2 }

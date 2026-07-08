@@ -9532,6 +9532,18 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the spec and cylinder breaks govern the strip; cold weather slows the real gain", source: "ASTM C1074" },
     ],
   },
+  "concrete-maturity": {
+    formula: "M = (Ta - T0) x hours in deg C-hr (Nurse-Saul, one constant-temperature interval); te = exp(-Q x (1/(Ta+273.15) - 1/(Tr+273.15))) x hours (Arrhenius equivalent age, kelvin); target_hours = target_TTF / (Ta - T0) when a calibrated target is given.",
+    edition: "ASTM C1074 (Standard Practice for Estimating Concrete Strength by the Maturity Method), by name; both maturity functions with their recommended Type I no-admixture constants.",
+    freeAccess: "The Nurse-Saul and Arrhenius maturity functions and the recommended constants are stated in ASTM C1074 and reproduced across the public maturity literature (NRMCA CIP 39); the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASTM C1074 maturity method: the Nurse-Saul time-temperature factor M = Sum (Ta - T0) x dt in deg C-hr, evaluated over one constant-temperature interval, with the recommended datum T0 = 0 C (32 F) for Type I cement without admixtures cured 0 to 40 C (otherwise per the C1074 datum procedure); and the Arrhenius equivalent age te = exp(-Q x (1/Ta - 1/Tr)) x t with temperatures in kelvin, Q = 5000 K for Type I without admixtures, and the traditional reference Tr = 20 C (68 F; C1074 permits others such as 23 C; both ship editable). Intervals at or below the datum accrue no maturity. The strength a TTF represents comes only from the lab-developed strength-maturity relationship for the project's own materials and mix (the C1074 calibration procedure); the field TTF is compared to that calibrated target. A scheduling estimate that supplements, not replaces, acceptance cylinders; the engineer of record and the project specification govern.",
+    assumptions: [
+      { name: "Datum and Q", value: "T0 = 0 C and Q = 5000 K are the C1074 recommendations for Type I cement without admixtures; other mixes calibrate their own", source: "ASTM C1074" },
+      { name: "Single interval", value: "one average temperature over the period; a logged history sums interval by interval", source: "ASTM C1074" },
+      { name: "Calibration governs", value: "TTF maps to strength only through the lab curve for the actual mix; acceptance cylinders are not replaced", source: "NRMCA CIP 39" },
+    ],
+  },
   "rebar-weight-takeoff": {
     formula: "weight = unit_wt(bar_size) x total_len_ft; tons = weight / 2000; cost = weight x price_per_lb.",
     edition: "The ASTM A615 nominal reinforcing-bar unit weights (#3 0.376 lb/ft ... #18 13.60 lb/ft), by name.",

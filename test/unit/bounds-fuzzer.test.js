@@ -12295,7 +12295,39 @@ import {
   computeOccupantLoad as _v242, computeEgressCapacity as _v243, computePlumbingFixtureCount as _v244,
   computeShorePostLoad as _v245, computeConcreteEvaporationRate as _v246, computeConcreteStrengthGain as _v247,
   computeAllowableArea as _v251, computeEgressTravelDistance as _v252, computeExteriorOpeningProtection as _v253,
+  computeConcreteMaturity as _v476,
 } from "../../calc-construction.js";
+
+test("bounds: spec-v476 computeConcreteMaturity pins the TTF, equivalent age, target solve, and error seams", () => {
+  // Pinned example: 50 F for 168 hr against a 1,600 C-hr calibrated target.
+  const r = _v476({ concrete_temp_f: 50, hours: 168, datum_f: 32, q_kelvin: 5000, ref_temp_f: 68, target_ttf_c: 1600 });
+  assert.ok(Math.abs(r.M_c - 1680) < 1e-9);
+  assert.ok(Math.abs(r.M_f - 3024) < 1e-9);
+  assert.ok(Math.abs(r.age_factor - 0.5475123) < 1e-6);
+  assert.ok(Math.abs(r.te_hours - 91.9820726) < 1e-6);
+  assert.ok(Math.abs(r.te_days - 3.8325864) < 1e-6);
+  assert.ok(Math.abs(r.target_hours - 160) < 1e-9);
+  assert.ok(Math.abs(r.target_days - 6.6666667) < 1e-6);
+  // Cross-check: a hot 90 F cure for 3 days runs ahead of the clock; defaults fill the rest.
+  const r2 = _v476({ concrete_temp_f: 90, hours: 72 });
+  assert.ok(Math.abs(r2.M_c - 2320) < 1e-9);
+  assert.ok(Math.abs(r2.age_factor - 1.9791237) < 1e-6);
+  assert.ok(Math.abs(r2.te_hours - 142.4969073) < 1e-6);
+  assert.strictEqual(r2.target_hours, null);
+  assert.strictEqual(r2.target_days, null);
+  // At the reference temperature the age factor is exactly 1 (te = clock time).
+  const r3 = _v476({ concrete_temp_f: 68, hours: 100 });
+  assert.ok(Math.abs(r3.age_factor - 1) < 1e-12);
+  assert.ok(Math.abs(r3.te_hours - 100) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v476({ concrete_temp_f: 50, hours: 0 }));
+  assert.ok("error" in _v476({ concrete_temp_f: 50, hours: 168, q_kelvin: 0 }));
+  assert.ok("error" in _v476({ concrete_temp_f: 32, hours: 168 })); // at the datum: no maturity accrues
+  assert.ok("error" in _v476({ concrete_temp_f: 20, hours: 168 })); // below the datum
+  assert.ok("error" in _v476({ concrete_temp_f: 90, hours: 168, datum_f: 70 })); // reference (68 F) below the datum
+  assert.ok("error" in _v476({ concrete_temp_f: 50, hours: 168, target_ttf_c: -1 }));
+  assert.ok("error" in _v476({ concrete_temp_f: Infinity, hours: 168 }));
+});
 
 test("bounds: spec-v242 computeOccupantLoad pins the summed occupant load, per-space round-up, and error seams", () => {
   const r = _v242({ spaces: [{ area: 3000, olf: 150 }, { area: 600, olf: 15 }] });

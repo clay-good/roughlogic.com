@@ -875,6 +875,7 @@ export const COMPUTE_MAP = {
   "shore-post-load": { module: "../../calc-construction.js", fn: "computeShorePostLoad" },
   "concrete-evaporation-rate": { module: "../../calc-construction.js", fn: "computeConcreteEvaporationRate" },
   "concrete-strength-gain": { module: "../../calc-construction.js", fn: "computeConcreteStrengthGain" },
+  "concrete-maturity": { module: "../../calc-construction.js", fn: "computeConcreteMaturity" },
   "rebar-weight-takeoff": { module: "../../calc-construction.js", fn: "computeRebarWeightTakeoff" },
   "ready-mix-concrete-order": { module: "../../calc-construction.js", fn: "computeReadyMixConcreteOrder" },
   "insulation-batt-coverage": { module: "../../calc-construction.js", fn: "computeInsulationBattCoverage" },
