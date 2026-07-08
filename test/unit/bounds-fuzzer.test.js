@@ -12332,6 +12332,7 @@ import {
   computeAllowableArea as _v251, computeEgressTravelDistance as _v252, computeExteriorOpeningProtection as _v253,
   computeConcreteMaturity as _v476,
   computeSeismicVerticalDistribution as _v477,
+  computeSeismicOverturningMoment as _v480,
 } from "../../calc-construction.js";
 
 test("bounds: spec-v477 computeSeismicVerticalDistribution pins the distribution, story shears, k rule, and error seams", () => {
@@ -12372,6 +12373,41 @@ test("bounds: spec-v477 computeSeismicVerticalDistribution pins the distribution
   assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: 24 }, { w: 1000, h: 12 }] })); // heights must increase bottom-up
   assert.ok("error" in _v477({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: NaN }] }));
   assert.ok("error" in _v477({ base_shear_kip: Infinity, period_s: 0.4, stories: ST }));
+});
+
+test("bounds: spec-v480 computeSeismicOverturningMoment pins the base moment, per-level moments, reduction, and error seams", () => {
+  const ST = [{ w: 1000, h: 12 }, { w: 1000, h: 24 }, { w: 800, h: 36 }];
+  // Pinned example: V = 200 kips, T = 0.4 s -> k = 1, Fx 37.0/74.1/88.9 (the v477 distribution).
+  const r = _v480({ base_shear_kip: 200, period_s: 0.4, stories: ST });
+  assert.strictEqual(r.k, 1);
+  const fx = r.per_level.map((l) => l.fx_kip);
+  assert.ok(Math.abs(fx[0] - 37.0370370) < 1e-6);
+  assert.ok(Math.abs(fx[2] - 88.8888889) < 1e-6);
+  assert.ok(Math.abs(r.m_base_kipft - 5422.2222222) < 1e-6);
+  assert.ok(Math.abs(r.m_base_reduced_kipft - 4066.6666667) < 1e-6);
+  // Per-level moments, base-up: base = M0, then the two floor planes above.
+  assert.ok(Math.abs(r.m_levels_kipft[0] - 5422.2222222) < 1e-6); // base plane = full M0
+  assert.ok(Math.abs(r.m_levels_kipft[1] - 3022.2222222) < 1e-6);
+  assert.ok(Math.abs(r.m_levels_kipft[2] - 1066.6666667) < 1e-6);
+  // The reduced moment is always exactly 75% of the base moment.
+  assert.ok(Math.abs(r.m_base_reduced_kipft - 0.75 * r.m_base_kipft) < 1e-9);
+  // Cross-check: T = 1.0 s -> k = 1.25 (interpolated); the taller level draws more force and more moment.
+  const r2 = _v480({ base_shear_kip: 100, period_s: 1.0, stories: [{ w: 500, h: 10 }, { w: 400, h: 20 }] });
+  assert.ok(Math.abs(r2.k - 1.25) < 1e-12);
+  assert.ok(Math.abs(r2.m_base_kipft - 1655.4968863) < 1e-6);
+  assert.ok(Math.abs(r2.m_base_reduced_kipft - 1241.6226647) < 1e-6);
+  // A single-level structure: M0 = F * h = V * h, one plane (the base).
+  const r1 = _v480({ base_shear_kip: 50, period_s: 0.3, stories: [{ w: 500, h: 14 }] });
+  assert.ok(Math.abs(r1.m_base_kipft - 700) < 1e-9); // 50 kips x 14 ft
+  assert.strictEqual(r1.m_levels_kipft.length, 1);
+  // Error seams.
+  assert.ok("error" in _v480({ base_shear_kip: 0, period_s: 0.4, stories: ST }));
+  assert.ok("error" in _v480({ base_shear_kip: 200, period_s: 0, stories: ST }));
+  assert.ok("error" in _v480({ base_shear_kip: 200, period_s: 0.4, stories: [] }));
+  assert.ok("error" in _v480({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 0, h: 12 }] }));
+  assert.ok("error" in _v480({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: 24 }, { w: 1000, h: 12 }] }));
+  assert.ok("error" in _v480({ base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: NaN }] }));
+  assert.ok("error" in _v480({ base_shear_kip: Infinity, period_s: 0.4, stories: ST }));
 });
 
 test("bounds: spec-v476 computeConcreteMaturity pins the TTF, equivalent age, target solve, and error seams", () => {

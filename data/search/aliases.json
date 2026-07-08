@@ -8439,6 +8439,41 @@
       "kind": "adjacent"
     },
     {
+      "term": "overturning moment",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "seismic overturning",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "foundation overturning",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 12.8.5",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "base moment seismic",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "seismic foundation moment",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "overturning stability",
+      "target": "seismic-overturning-moment",
+      "kind": "industry"
+    },
+    {
       "term": "snowmelt",
       "target": "snowmelt-load",
       "kind": "industry"

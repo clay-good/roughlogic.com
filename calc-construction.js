@@ -4790,6 +4790,90 @@ function _renderSeismicVerticalDistribution(inputRegion, outputRegion, citationE
 }
 CONSTRUCTION_RENDERERS["seismic-vertical-distribution"] = _renderSeismicVerticalDistribution;
 
+// ===================== spec-v480: seismic overturning moment (ASCE 7-22 12.8.5) =====================
+
+// dims: in { base_shear_kip: M L T^-2, period_s: T, stories: dimensionless } out: { k: dimensionless, m_base_kipft: M L^2 T^-2, m_base_reduced_kipft: M L^2 T^-2, level_count: dimensionless }
+export function computeSeismicOverturningMoment({ base_shear_kip = 0, period_s = 0, stories = [] } = {}) {
+  if (!Array.isArray(stories) || stories.length === 0) return { error: "Provide at least one level: weight_kips,height_ft per line, bottom-up." };
+  if (!Number.isFinite(base_shear_kip) || !(base_shear_kip > 0)) return { error: "Base shear V must be positive (kips)." };
+  if (!Number.isFinite(period_s) || !(period_s > 0)) return { error: "Fundamental period T must be positive (s)." };
+  // ASCE 7 12.8.3: k = 1 at or below 0.5 s, 2 at or above 2.5 s, linear interpolation between.
+  const k = period_s <= 0.5 ? 1 : period_s >= 2.5 ? 2 : 1 + (period_s - 0.5) / 2;
+  const levels = [];
+  let sigma_wh = 0;
+  let prev_h = 0;
+  for (const s of stories) {
+    const w = Number(s.w);
+    const h = Number(s.h);
+    if (!Number.isFinite(w) || !Number.isFinite(h)) return { error: "All level inputs must be finite numbers." };
+    if (!(w > 0)) return { error: "Each level weight must be positive (kips)." };
+    if (!(h > prev_h)) return { error: "Level heights must be positive and increase bottom-up (ft from the base)." };
+    prev_h = h;
+    const wh = w * Math.pow(h, k);
+    levels.push({ w, h, wh });
+    sigma_wh += wh;
+  }
+  const per_level = levels.map((l) => ({ h: l.h, fx_kip: (l.wh / sigma_wh) * base_shear_kip }));
+  // 12.8.5 overturning: about the base M0 = Sum(Fi hi); about level x, Mx = Sum over i above x of Fi (hi - hx).
+  // Report the moment at the base of each level's plane (the base plane at h = 0 first), bottom-up.
+  const planes = [0, ...per_level.slice(0, -1).map((p) => p.h)];
+  const m_levels_kipft = planes.map((hj) =>
+    per_level.filter((p) => p.h > hj).reduce((acc, p) => acc + p.fx_kip * (p.h - hj), 0)
+  );
+  const m_base_kipft = per_level.reduce((acc, p) => acc + p.fx_kip * p.h, 0);
+  const m_base_reduced_kipft = 0.75 * m_base_kipft; // ASCE 7 12.13.4 soil-interface 25% reduction
+  return {
+    k, per_level, m_levels_kipft, m_base_kipft, m_base_reduced_kipft,
+    level_count: per_level.length,
+  };
+}
+
+export const seismicOverturningMomentExample = {
+  inputs: { base_shear_kip: 200, period_s: 0.4, stories: [{ w: 1000, h: 12 }, { w: 1000, h: 24 }, { w: 800, h: 36 }] },
+};
+
+// Custom renderer: V + T + a bottom-up level list (textarea per the check-multiline-inputs rule),
+// mirroring the sibling seismic-vertical-distribution.
+function _renderSeismicOverturningMoment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASCE 7-22 12.8.5 (Overturning): the structure resists the overturning caused by the 12.8.3 story forces Fx = Cvx V, Cvx = wx hx^k / Sum(wi hi^k), with k = 1 for T at or below 0.5 s, k = 2 at or above 2.5 s, linear between. The base overturning moment M0 = Sum(Fi hi); the moment about level x is Sum over the forces above x of Fi (hi - hx). 12.13.4 permits a 25% reduction of the ELF overturning moment at the soil-foundation interface, reported as the reduced foundation moment. Weights are the effective seismic weights per 12.7.2; V and T come from seismic-base-shear and the distribution. The resisting dead load, the foundation stability ratio, and the shear-wall hold-down design are separate checks. A design aid, not a lateral-analysis substitute; the engineer of record governs.";
+  _aeC(inputRegion, () => fillExample(seismicOverturningMomentExample.inputs));
+  const vIn = _mnC("Base shear V (kips)", "som-v", { step: "any", min: "0" });
+  const tIn = _mnC("Fundamental period T (s)", "som-t", { step: "any", min: "0" });
+  const list = makeTextarea("Levels bottom-up: weight(kips),height(ft) per line", "som-list", { rows: "5" });
+  inputRegion.appendChild(vIn.wrap); inputRegion.appendChild(tIn.wrap); inputRegion.appendChild(list.wrap);
+  const oK = _moC(outputRegion, "Distribution exponent k", "som-out-k");
+  const oF = _moC(outputRegion, "Level forces Fx, bottom-up (kips)", "som-out-f");
+  const oM = _moC(outputRegion, "Overturning moment about each level, base-up (kip-ft)", "som-out-m");
+  const oB = _moC(outputRegion, "Base overturning moment M0 (kip-ft)", "som-out-b");
+  const oR = _moC(outputRegion, "Reduced foundation moment, 0.75 M0 (kip-ft)", "som-out-r");
+  function fillExample(x) {
+    vIn.input.value = x.base_shear_kip;
+    tIn.input.value = x.period_s;
+    list.input.value = (x.stories || []).map((s) => s.w + "," + s.h).join("\n");
+    update();
+  }
+  const update = _debC(() => {
+    const stories = [];
+    for (const line of String(list.input.value).split("\n")) {
+      const t = line.trim();
+      if (!t) continue;
+      const parts = t.split(",");
+      stories.push({ w: Number(parts[0]), h: Number(parts[1]) });
+    }
+    const r = computeSeismicOverturningMoment({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories });
+    if (r.error) { oK.textContent = r.error; oF.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oR.textContent = "-"; return; }
+    oK.textContent = _fmtC(r.k, 2);
+    oF.textContent = r.per_level.map((l) => _fmtC(l.fx_kip, 1)).join(" / ");
+    oM.textContent = r.m_levels_kipft.map((m) => _fmtC(m, 0)).join(" / ");
+    oB.textContent = _fmtC(r.m_base_kipft, 0);
+    oR.textContent = _fmtC(r.m_base_reduced_kipft, 0);
+  }, _DC);
+  vIn.input.addEventListener("input", update);
+  tIn.input.addEventListener("input", update);
+  list.input.addEventListener("input", update);
+}
+CONSTRUCTION_RENDERERS["seismic-overturning-moment"] = _renderSeismicOverturningMoment;
+
 // ===================================================================================
 // spec-v242..v244 IBC/IPC occupancy trio + spec-v245..v247 cast-in-place concrete
 // trio + spec-v251..v253 IBC plan-review trio (Group E). The three code numbers a

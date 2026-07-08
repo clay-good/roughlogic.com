@@ -31000,6 +31000,81 @@
    }
   },
   {
+   "tile_id": "seismic-overturning-moment",
+   "source_publisher": "ASCE 7-22 §12.8.5 (Overturning) with §12.8.3 distribution and §12.13.4",
+   "source_title": "3-story, V = 200 kips, T = 0.4 s (k = 1), Fx 37/74/89 kips at 12/24/36 ft -> base overturning 5,422 kip-ft, reduced 4,067",
+   "source_edition_or_year": "spec-v480 worked example (machine-verified)",
+   "source_section_or_page": "spec-v480 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "base_shear_kip": 200,
+    "period_s": 0.4,
+    "stories": [
+     { "w": 1000, "h": 12 },
+     { "w": 1000, "h": 24 },
+     { "w": 800, "h": 36 }
+    ]
+   },
+   "outputs": {
+    "k": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.0000001
+     }
+    },
+    "m_base_kipft": {
+     "value": 5422.222222222223,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "m_base_reduced_kipft": {
+     "value": 4066.666666666667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "seismic-overturning-moment",
+   "source_publisher": "ASCE 7-22 §12.8.5 (Overturning) with §12.8.3 distribution and §12.13.4",
+   "source_title": "cross-check: 2-story, V = 100 kips, T = 1.0 s (k = 1.25 interpolated), Fx 34.5/65.5 kips at 10/20 ft -> base overturning 1,655 kip-ft, reduced 1,242",
+   "source_edition_or_year": "spec-v480 worked example (machine-verified)",
+   "source_section_or_page": "spec-v480 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "base_shear_kip": 100,
+    "period_s": 1.0,
+    "stories": [
+     { "w": 500, "h": 10 },
+     { "w": 400, "h": 20 }
+    ]
+   },
+   "outputs": {
+    "k": {
+     "value": 1.25,
+     "tolerance": {
+      "abs": 0.0000001
+     }
+    },
+    "m_base_kipft": {
+     "value": 1655.4968863083404,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "m_base_reduced_kipft": {
+     "value": 1241.6226647312553,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "snowmelt-load",
    "source_publisher": "ASHRAE snow-melting flux / Chapman IP forms via Lund (Geo-Heat Center)",
    "source_title": "Class II walk, 0.1 in/hr WE at 20 F, 10 mph, 80% RH -> 110.7 Btu/hr-ft^2, 66.4 MBH over 500 ft^2",

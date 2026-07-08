@@ -9472,6 +9472,18 @@ export const CITATIONS = {
       { name: "Story shear", value: "Vx sums the forces at and above the level (Eq. 12.8-13); the base story carries the full V", source: "ASCE 7 §12.8.4" },
     ],
   },
+  "seismic-overturning-moment": {
+    formula: "k = 1 for T <= 0.5 s, 2 for T >= 2.5 s, 1 + (T - 0.5)/2 between; Cvx = wx hx^k / Sum(wi hi^k); Fx = Cvx x V; M0 = Sum(Fi hi); Mx = Sum over i above x of Fi (hi - hx); M0_foundation = 0.75 x M0.",
+    edition: "ASCE 7-22 §12.8.5 (Overturning) with the §12.8.3 vertical distribution (Eqs. 12.8-11 / 12.8-12) and the §12.13.4 25% reduction of the ELF overturning moment at the soil-foundation interface, by name.",
+    freeAccess: "The overturning-moment accumulation and the §12.13.4 25% soil-interface reduction are stated in ASCE 7 §12.8.5 / §12.13.4 and reproduced across the public seismic-design literature (FEMA P-1051, the SEAOC design manuals); the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASCE 7-22 §12.8.5 (Overturning): the structure resists the overturning caused by the §12.8.3 story forces Fx = Cvx x V (Cvx = wx hx^k / Sum(wi hi^k), k = 1 for T at or below 0.5 s, 2 at or above 2.5 s, linear between). The base overturning moment is M0 = Sum(Fi hi); the overturning moment about a level x is Sum over the forces above x of Fi (hi - hx). §12.13.4 permits a 25% reduction of the ELF overturning moment at the soil-foundation interface (the equivalent-lateral-force method overstates the simultaneous peak), reported here as the reduced foundation moment. The weights are the effective seismic weights per §12.7.2 and the heights are from the base; V and T come from the base-shear and distribution. The resisting dead load, the foundation stability ratio, and the shear-wall hold-down design are separate checks. A design aid, not a lateral-analysis substitute; the engineer of record governs.",
+    assumptions: [
+      { name: "Base moment", value: "M0 = Sum(Fi hi) from the §12.8.3 story forces; the moment about level x sums only the forces above x times their height above x", source: "ASCE 7 §12.8.5" },
+      { name: "Foundation reduction", value: "§12.13.4 permits a 25% reduction of the ELF overturning moment at the soil-foundation interface (not to the structure above); reported as 0.75 x M0", source: "ASCE 7 §12.13.4" },
+      { name: "Separate checks", value: "the resisting dead load, the overturning stability ratio, and the shear-wall hold-down design are separate checks this tile does not perform", source: "ASCE 7 §12.8.5" },
+    ],
+  },
   "occupant-load": {
     formula: "per_space_load = ceil(area / olf); total_load = sum over spaces of per_space_load.",
     edition: "IBC 2021 §1004.5 and Table 1004.5 (occupant load = area / occupant-load factor, summed over spaces) and §1004.2 (round up to a whole person), by name.",

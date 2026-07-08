@@ -399,6 +399,8 @@ const TOOL_MODULES = (() => {
     "rain-load-ponding", "asce7-load-combinations", "seismic-base-shear",
     // spec-v477 ELF vertical distribution (the v226/v383 follow-on).
     "seismic-vertical-distribution",
+    // spec-v480 ELF overturning moment (the v477 §12.8.5 follow-on).
+    "seismic-overturning-moment",
     // spec-v242..v244 IBC/IPC occupancy trio.
     "occupant-load", "egress-capacity", "plumbing-fixture-count",
     // spec-v245..v247 cast-in-place placing-and-curing trio.
