@@ -191,10 +191,15 @@ test("every live tile view: no page-level horizontal scroll at 320 px", async ({
       }));
     }
     if (m.sw > m.cw + 1) {
-      // Name the elements that poke past the right viewport edge, not just
-      // the tile: a runner-only overflow is undebuggable from the id alone,
-      // and the failing environment is the only place the geometry exists
-      // to be read. (Leftward-offscreen elements -- the a11y skip-link at
+      // Name what pokes past the right viewport edge, not just the tile: a
+      // runner-only overflow is undebuggable from the id alone, and the
+      // failing environment is the only place the geometry exists to be
+      // read. Element boxes are NOT enough -- an unbreakable inline token
+      // wider than its column overflows the line box while the block's own
+      // border-box rect stays viewport-bounded (this is exactly how the
+      // snowmelt-load "(ASHRAE/Chapman)" H1 token failed CI while the
+      // element dump came back empty) -- so text-node line rects are swept
+      // too. (Leftward-offscreen elements -- the a11y skip-link at
       // left:-9999px -- do not grow scrollWidth and are not reported.)
       const culprits = await page.evaluate(() => {
         const doc = document.documentElement;
@@ -205,9 +210,22 @@ test("every live tile view: no page-level horizontal scroll at 320 px", async ({
             out.push(`${el.tagName.toLowerCase()}#${el.id || "-"} .${(el.className || "").toString().trim().split(/\s+/)[0] || "-"} left=${Math.round(r.left)} right=${Math.round(r.right)} w=${Math.round(r.width)} :: ${(el.textContent || "").trim().slice(0, 60)}`);
           }
         }
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let n;
+        while ((n = walker.nextNode())) {
+          if (!n.textContent.trim()) continue;
+          const range = document.createRange();
+          range.selectNodeContents(n);
+          for (const r of range.getClientRects()) {
+            if (r.right > doc.clientWidth + 1) {
+              const p = n.parentElement;
+              out.push(`text-line in ${p ? p.tagName.toLowerCase() + "." + ((p.className || "").toString().split(/\s+/)[0] || "-") : "?"} right=${Math.round(r.right)} w=${Math.round(r.width)} :: ${n.textContent.trim().slice(0, 60)}`);
+            }
+          }
+        }
         return out.slice(0, 8);
       });
-      offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw}, persisted through a 150 ms settle)${culprits.length ? "\n  " + culprits.join("\n  ") : " (no element extends past the right viewport edge at dump time)"}`);
+      offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw}, persisted through a 150 ms settle)${culprits.length ? "\n  " + culprits.join("\n  ") : " (nothing extends past the right viewport edge at dump time)"}`);
     }
   }
   expect(
