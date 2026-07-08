@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs(audit-trail): add the missing Group Z row to the per-group signoff table, 2026-07-08
+
+A documentation-only accuracy fix; no tile, code-path, or version change. The spec-v14 §12 per-group signoff status table in `docs/audit-trail.md` never received a row for **Group Z (Rigging and Heavy Lift)** when the group landed at spec-v65 (0.63.0) -- every later group (through the spec-v107 retirements and beyond) was tracked, so `check-audit-trail` has been emitting a non-fatal `WARN: active group 'Z' is missing from the per-group signoff status table` on every lint run since. The row is added (open; credential sought: PE or equivalent rigging certification; 15 tiles in `calc-rigging.js`; ASME B30 / BTH-1 / B56.1 + OSHA 1926.1400 primary sources) and the stale table-footer counts line (frozen at the pre-v107 "24 active groups" snapshot of 2026-05-22) gains a dated current-state line: 21 active groups, 19 open, 2 exempt, 0 signed-off. `check-audit-trail` now reports 21/21 active groups with zero warnings. This pass also merged the automated weekly data refresh (PR #1, run 28803769488) after verifying the hand-authored integrity-hash carry-forward held (117 entries, `data:verify` green).
+
 ### docs: full-tree QA re-verification + resync the README status paragraph, 2026-07-08
 
 A documentation-only accuracy pass; no tile, code-path, or version change. The full verification matrix was re-run first and found no defect: lint (all 28 gates), **5,222** unit tests, data:verify (117 entries), build (929 tile + 21 group shells, 951-URL sitemap), `check:dist` (3,125 same-origin references, 0 orphans), `check:shells`, `check:shell-mobile` (1,045 checks across 951 shells at 320 px portrait / 568x320 landscape / 200% text zoom, zero horizontal scroll), the full Playwright integration suite (**1,972** tests passing on Chromium plus the WebKit responsive-stress re-run, 16.8 min, exit 0 -- render-no-nan across all 929 tiles, the axe a11y loop, print, CSV, and perf), and the `mcp/server.mjs` stdio smoke test (`ohms-law` -> R 12 / P 1200).

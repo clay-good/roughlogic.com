@@ -2113,9 +2113,13 @@ until every non-exempt row reaches **signed-off**.
 | Aviation | W | ATP or CFI | retired (spec-v107) | — | — | 23 tiles in `calc-aviation.js`, retired in spec-v107 under the trades-only charter (out of charter). |
 | Real Estate | X | Licensed broker, appraiser, or lender | open | — | — | 24 tiles in [../calc-realestate.js](../calc-realestate.js); FNMA / FHFA / HUD / CFPB primary sources. |
 | Educators | Y | Working classroom teacher or curriculum specialist | open | — | — | 22 tiles in [../calc-edu.js](../calc-edu.js); OpenIntro Stats + NIST + IUPAC primary sources. |
+| Rigging and Heavy Lift | Z | PE or equivalent rigging certification (NCCCO / ASME B30 qualified person) | open | — | — | 15 tiles in [../calc-rigging.js](../calc-rigging.js); ASME B30 / BTH-1 / B56.1 + OSHA 1926.1400 subpart CC primary sources. |
 
-Counts: 24 active groups (22 non-exempt; 2 exempt H / Q). At
-2026-05-22: 0 signed-off, 22 open, 2 exempt.
+Counts: 21 active groups (19 non-exempt; 2 exempt H / Q; 4 rows
+retired in spec-v107 retained for the record). At 2026-05-22:
+0 signed-off, 22 open, 2 exempt. At 2026-07-08: 0 signed-off,
+19 open, 2 exempt (the Group Z row, omitted when the group landed
+at spec-v65, added this date).
 
 ---
 
