@@ -168,27 +168,46 @@ test("every live tile view: no page-level horizontal scroll at 320 px", async ({
     await page.waitForTimeout(30);
     const btn = await page.$(".input-region button");
     if (btn) { await btn.click().catch(() => {}); await page.waitForTimeout(40); }
-    const m = await page.evaluate(() => ({
+    let m = await page.evaluate(() => ({
       sw: document.documentElement.scrollWidth,
       cw: document.documentElement.clientWidth,
     }));
     if (m.sw > m.cw + 1) {
-      // Name the elements that poke past the viewport, not just the tile:
-      // a runner-only overflow (fonts, engine build, timing) is undebuggable
-      // from the id alone, and the failing environment is the only place the
-      // geometry exists to be read.
+      // Double-check before reporting. On a loaded shared runner the first
+      // read can catch a mid-render transient (the 50 ms debounced compute,
+      // the previous tile's teardown, a scrollbar repaint): CI run
+      // 28963302008 measured snowmelt-load at scrollWidth 328 while its own
+      // culprit dump -- one evaluate later -- found no element past the
+      // right edge, and the same sweep passes in every faithful local
+      // reproduction (macOS + Linux WebKit, same version, same fonts, full
+      // 932-tile walk). A real overflow (a wide table, an unbreakable token)
+      // is a settled layout fact and survives the settle; a transient does
+      // not. Same principle as the Lighthouse median-of-3 fix: one noisy
+      // sample must not veto the merge signal.
+      await page.waitForTimeout(150);
+      m = await page.evaluate(() => ({
+        sw: document.documentElement.scrollWidth,
+        cw: document.documentElement.clientWidth,
+      }));
+    }
+    if (m.sw > m.cw + 1) {
+      // Name the elements that poke past the right viewport edge, not just
+      // the tile: a runner-only overflow is undebuggable from the id alone,
+      // and the failing environment is the only place the geometry exists
+      // to be read. (Leftward-offscreen elements -- the a11y skip-link at
+      // left:-9999px -- do not grow scrollWidth and are not reported.)
       const culprits = await page.evaluate(() => {
         const doc = document.documentElement;
         const out = [];
         for (const el of document.querySelectorAll("body *")) {
           const r = el.getBoundingClientRect();
-          if (r.right > doc.clientWidth + 1 || r.left < -1) {
+          if (r.right > doc.clientWidth + 1) {
             out.push(`${el.tagName.toLowerCase()}#${el.id || "-"} .${(el.className || "").toString().trim().split(/\s+/)[0] || "-"} left=${Math.round(r.left)} right=${Math.round(r.right)} w=${Math.round(r.width)} :: ${(el.textContent || "").trim().slice(0, 60)}`);
           }
         }
         return out.slice(0, 8);
       });
-      offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw})${culprits.length ? "\n  " + culprits.join("\n  ") : " (no element extends past the viewport edge at re-measure)"}`);
+      offenders.push(`${id} (scrollWidth ${m.sw} > clientWidth ${m.cw}, persisted through a 150 ms settle)${culprits.length ? "\n  " + culprits.join("\n  ") : " (no element extends past the right viewport edge at dump time)"}`);
     }
   }
   expect(
