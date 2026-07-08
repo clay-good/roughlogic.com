@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: full-tree QA re-verification + resync the README status paragraph, 2026-07-08
+
+A documentation-only accuracy pass; no tile, code-path, or version change. The full verification matrix was re-run first and found no defect: lint (all 28 gates), **5,222** unit tests, data:verify (117 entries), build (929 tile + 21 group shells, 951-URL sitemap), `check:dist` (3,125 same-origin references, 0 orphans), `check:shells`, `check:shell-mobile` (1,045 checks across 951 shells at 320 px portrait / 568x320 landscape / 200% text zoom, zero horizontal scroll), the full Playwright integration suite (**1,972** tests passing on Chromium plus the WebKit responsive-stress re-run, 16.8 min, exit 0 -- render-no-nan across all 929 tiles, the axe a11y loop, print, CSV, and perf), and the `mcp/server.mjs` stdio smoke test (`ohms-law` -> R 12 / P 1200).
+
+One staleness fix: the README "Where the catalog stands today" paragraph. The 2026-07-05 figure resync (e34ea45) landed one commit before the gate that took the lint chain 27 -> 28 (6efcf65), so the paragraph froze at "package 0.162.0" and "all 27 checks". Both moved to the live values (**0.162.1**, **28 checks**). Every other README figure re-checked clean against the live tree, `check-doc-links` re-verified all 1,490 living-doc links, and the gitignored local `ARCHITECTURE.md` openlore snapshot was regenerated against the current tree (a local analysis artifact, not a shipped file).
+
 ### chore(lint): add the check-doc-links gate + log the free-access probe review; 0.162.1, 2026-07-05
 
 A platform/housekeeping change; no tile, calculator output, or shipped-bundle byte changes. Package **0.162.0 -> 0.162.1** (a patch). Two pieces:
