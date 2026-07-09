@@ -44118,6 +44118,72 @@
    }
   },
   {
+   "tile_id": "crosswind-component",
+   "source_publisher": "runway wind-component resolution (FAA vector method)",
+   "source_title": "runway 36 (heading 360), wind 030 at 20 kt -> 30 deg off, 10.0 kt crosswind, 17.3 kt headwind",
+   "source_edition_or_year": "spec-v501 worked example (machine-verified)",
+   "source_section_or_page": "spec-v501 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "runway_heading_deg": 360,
+    "wind_dir_deg": 30,
+    "wind_speed_kt": 20,
+    "gust_kt": 0,
+    "max_demo_xwind_kt": 0
+   },
+   "outputs": {
+    "angle_deg": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "crosswind_kt": {
+     "value": 10.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "headwind_kt": {
+     "value": 17.32,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crosswind-component",
+   "source_publisher": "runway wind-component resolution (FAA vector method)",
+   "source_title": "cross-check: same 20 kt from 150 is a quartering tailwind -> 10.0 kt crosswind, -17.3 kt (tailwind)",
+   "source_edition_or_year": "spec-v501 worked example (machine-verified)",
+   "source_section_or_page": "spec-v501 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "runway_heading_deg": 360,
+    "wind_dir_deg": 150,
+    "wind_speed_kt": 20,
+    "gust_kt": 0,
+    "max_demo_xwind_kt": 0
+   },
+   "outputs": {
+    "crosswind_kt": {
+     "value": 10.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "headwind_kt": {
+     "value": -17.32,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

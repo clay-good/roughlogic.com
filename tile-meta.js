@@ -515,6 +515,8 @@ const _TILES = [
   ["torque-adapter-correction", "K"],
   // spec-v500 density altitude and pressure altitude
   ["density-altitude", "K"],
+  // spec-v501 crosswind and headwind component
+  ["crosswind-component", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

@@ -7652,6 +7652,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "crosswind-component": {
+    formula: "angle = fold(|wind_dir - runway_heading|, 0..180); crosswind = speed x sin(angle); headwind = speed x cos(angle) (negative = tailwind); gust_xwind = (gust > 0 ? gust : speed) x sin(angle).",
+    edition: "Runway wind-component resolution (the FAA vector method / POH crosswind chart), first-principles trigonometry, by name; the pilot in command and the aircraft flight manual govern.",
+    freeAccess: "The wind-component resolution is first-principles trigonometry; the runway heading, wind, and demonstrated crosswind come from the ATIS/METAR and the aircraft flight manual.",
+    governance: GOVERNANCE.general,
+    editionNote: "Runway wind-component resolution. angle = |wind direction - runway heading| folded to 0-180 degrees, crosswind = speed x sin(angle), and headwind = speed x cos(angle) (a negative headwind is a tailwind). The crosswind checked against the aircraft's maximum demonstrated crosswind should use the GUST value. A wind more than 90 degrees off the runway is a tailwind that adds crosswind while removing the headwind margin. The demonstrated crosswind is a capability figure, not a regulatory limit. A planning aid, not a clearance; the pilot in command and the flight manual govern.",
+    assumptions: [
+      { name: "Gust governs the check", value: "the crosswind limit should be checked against the gust, not the steady wind", source: "POH crosswind guidance" },
+      { name: "Tailwind", value: "a wind more than 90 degrees off the runway is a tailwind (negative headwind)", source: "vector resolution" },
+      { name: "Demonstrated crosswind", value: "a capability figure, not a regulatory limit", source: "aircraft flight manual" },
+    ],
+  },
   "density-altitude": {
     formula: "oat_c = (oat_f - 32) x 5/9; PA = elevation + (29.92 - altimeter) x 1000; ISA = 15 - 2 x (PA/1000); DA = PA + 120 x (oat_c - ISA).",
     edition: "FAA density-altitude method (ISA lapse correction), per FAA AC 00-6 / the ICAO Standard Atmosphere, by name; the aircraft flight manual performance charts and the pilot in command govern.",

@@ -17242,3 +17242,29 @@ test("bounds: spec-v500 computeDensityAltitude pins the hot-day DA, the ISA laps
   assert.ok("error" in _v500({ field_elevation_ft: 5000, altimeter_in_hg: 0, oat_f: 59 }));
   assert.ok("error" in _v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: -500 }));
 });
+
+import { computeCrosswindComponent as _v501 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v501 computeCrosswindComponent pins the wind split, the tailwind flip, the gust check, and error seams", () => {
+  const r = _v501({ runway_heading_deg: 360, wind_dir_deg: 30, wind_speed_kt: 20 });
+  assert.ok(Math.abs(r.angle_deg - 30) < 1e-9);
+  assert.ok(Math.abs(r.crosswind_kt - 10) < 1e-6);
+  assert.ok(Math.abs(r.headwind_kt - 17.3205) < 1e-3);
+  assert.strictEqual(r.tailwind, false);
+  // A wind more than 90 degrees off is a tailwind: same crosswind, negative headwind, flag set.
+  const tw = _v501({ runway_heading_deg: 360, wind_dir_deg: 150, wind_speed_kt: 20 });
+  assert.ok(Math.abs(tw.crosswind_kt - 10) < 1e-6 && tw.headwind_kt < 0 && tw.tailwind === true);
+  // A direct headwind has zero crosswind; a direct crosswind has zero headwind.
+  assert.ok(Math.abs(_v501({ runway_heading_deg: 360, wind_dir_deg: 360, wind_speed_kt: 20 }).crosswind_kt) < 1e-9);
+  assert.ok(Math.abs(_v501({ runway_heading_deg: 360, wind_dir_deg: 90, wind_speed_kt: 20 }).headwind_kt) < 1e-9);
+  // The gust drives the exceeds check, not the steady wind.
+  const gust = _v501({ runway_heading_deg: 360, wind_dir_deg: 90, wind_speed_kt: 12, gust_kt: 20, max_demo_xwind_kt: 15 });
+  assert.ok(Math.abs(gust.gust_xwind_kt - 20) < 1e-6 && gust.exceeds === true);
+  assert.ok(_v501({ runway_heading_deg: 360, wind_dir_deg: 90, wind_speed_kt: 12, gust_kt: 0, max_demo_xwind_kt: 15 }).exceeds === false);
+  // Error seams: non-finite, negative wind, gust below steady, direction out of range.
+  assert.ok("error" in _v501({ runway_heading_deg: 360, wind_dir_deg: Infinity, wind_speed_kt: 20 }));
+  assert.ok("error" in _v501({ runway_heading_deg: 360, wind_dir_deg: 30, wind_speed_kt: -5 }));
+  assert.ok("error" in _v501({ runway_heading_deg: 360, wind_dir_deg: 30, wind_speed_kt: 20, gust_kt: 10 })); // gust < steady
+  assert.ok("error" in _v501({ runway_heading_deg: 400, wind_dir_deg: 30, wind_speed_kt: 20 }));
+  assert.ok("error" in _v501({ runway_heading_deg: 360, wind_dir_deg: 400, wind_speed_kt: 20 }));
+});

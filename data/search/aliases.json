@@ -18754,6 +18754,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "crosswind component",
+      "target": "crosswind-component",
+      "kind": "industry"
+    },
+    {
+      "term": "headwind component",
+      "target": "crosswind-component",
+      "kind": "industry"
+    },
+    {
+      "term": "runway wind",
+      "target": "crosswind-component",
+      "kind": "industry"
+    },
+    {
+      "term": "max demonstrated crosswind",
+      "target": "crosswind-component",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tailwind",
+      "target": "crosswind-component",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wind angle",
+      "target": "crosswind-component",
+      "kind": "adjacent"
+    },
+    {
+      "term": "gust crosswind",
+      "target": "crosswind-component",
+      "kind": "adjacent"
+    },
+    {
+      "term": "quartering wind",
+      "target": "crosswind-component",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

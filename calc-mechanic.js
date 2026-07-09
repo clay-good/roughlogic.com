@@ -1328,3 +1328,54 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   ],
   compute: computeDensityAltitude,
 });
+
+// ===================== spec-v501: crosswind and headwind component =====================
+
+// dims: in { runway_heading_deg: dimensionless, wind_dir_deg: dimensionless, wind_speed_kt: L T^-1, gust_kt: L T^-1, max_demo_xwind_kt: L T^-1 } out: { angle_deg: dimensionless, crosswind_kt: L T^-1, headwind_kt: L T^-1, gust_xwind_kt: L T^-1, tailwind: dimensionless, exceeds: dimensionless }
+export function computeCrosswindComponent({ runway_heading_deg = 0, wind_dir_deg = 0, wind_speed_kt = 0, gust_kt = 0, max_demo_xwind_kt = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rw = Number(runway_heading_deg);
+  const wd = Number(wind_dir_deg);
+  const sp = Number(wind_speed_kt) || 0;
+  const gust = Number(gust_kt) || 0;
+  const maxd = Number(max_demo_xwind_kt) || 0;
+  if (!(rw >= 0 && rw <= 360)) return { error: "Runway heading must be 0 to 360 degrees." };
+  if (!(wd >= 0 && wd <= 360)) return { error: "Wind direction must be 0 to 360 degrees." };
+  if (sp < 0) return { error: "Wind speed cannot be negative (kt)." };
+  if (gust < 0) return { error: "Gust cannot be negative (kt)." };
+  if (gust > 0 && gust < sp) return { error: "Gust must be at least the steady wind speed (kt)." };
+  if (maxd < 0) return { error: "Maximum demonstrated crosswind cannot be negative (kt)." };
+  let angle_deg = Math.abs(wd - rw) % 360; if (angle_deg > 180) angle_deg = 360 - angle_deg;
+  const rad = angle_deg * Math.PI / 180;
+  const crosswind_kt = sp * Math.sin(rad);
+  const headwind_kt = sp * Math.cos(rad);
+  const gust_speed = gust > 0 ? gust : sp;
+  const gust_xwind_kt = gust_speed * Math.sin(rad);
+  const tailwind = angle_deg > 90;
+  const exceeds = maxd > 0 && gust_xwind_kt > maxd;
+  if (![angle_deg, crosswind_kt, headwind_kt, gust_xwind_kt].every(Number.isFinite)) return { error: "Wind-component math is not a finite value." };
+  return {
+    angle_deg, crosswind_kt, headwind_kt, gust_xwind_kt, tailwind, exceeds,
+    note: "Runway wind-component resolution: angle = |wind direction - runway heading| folded to 0-180, crosswind = speed x sin(angle), headwind = speed x cos(angle) (a negative headwind is a tailwind). The value checked against the aircraft's maximum demonstrated crosswind should be the GUST, not the steady wind. A wind more than 90 degrees off the runway is a tailwind that adds crosswind while removing the headwind margin -- the setup that overruns a runway. The demonstrated crosswind is a capability figure, not a regulatory limit. A planning aid, not a clearance; the pilot in command and the flight manual govern.",
+  };
+}
+export const crosswindComponentExample = { inputs: { runway_heading_deg: 360, wind_dir_deg: 30, wind_speed_kt: 20, gust_kt: 0, max_demo_xwind_kt: 0 } };
+
+MECHANIC_RENDERERS["crosswind-component"] = _simpleRenderer({
+  citation: "Citation: runway wind-component resolution (FAA vector method / POH crosswind chart): angle = |wind dir - runway heading| folded to 0-180; crosswind = speed x sin(angle); headwind = speed x cos(angle), negative = tailwind. Check the crosswind limit against the gust, not the steady wind. A planning aid; the pilot in command and the flight manual govern.",
+  example: crosswindComponentExample.inputs,
+  fields: [
+    { key: "runway_heading_deg", label: "Runway heading (deg, e.g. 360 for runway 36)", kind: "number", default: 360 },
+    { key: "wind_dir_deg", label: "Wind direction FROM (deg)", kind: "number", default: 30 },
+    { key: "wind_speed_kt", label: "Steady wind speed (kt)", kind: "number", default: 20 },
+    { key: "gust_kt", label: "Gust speed (kt, 0 = none)", kind: "number", default: 0 },
+    { key: "max_demo_xwind_kt", label: "Max demonstrated crosswind (kt, 0 = skip check)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "xw", id: "cwc-out-xw", label: "Crosswind component", value: (r) => fmt(r.crosswind_kt, 1) + " kt" + (r.gust_xwind_kt > r.crosswind_kt ? " (gust " + fmt(r.gust_xwind_kt, 1) + " kt)" : "") + (r.exceeds ? " -- EXCEEDS the demonstrated crosswind" : "") },
+    { key: "hw", id: "cwc-out-hw", label: "Headwind component", value: (r) => r.tailwind ? fmt(-r.headwind_kt, 1) + " kt TAILWIND" : fmt(r.headwind_kt, 1) + " kt headwind" },
+    { key: "ang", id: "cwc-out-ang", label: "Wind angle off the runway", value: (r) => fmt(r.angle_deg, 0) + " deg" + (r.tailwind ? " (behind the runway heading)" : "") },
+    { key: "n", id: "cwc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCrosswindComponent,
+});
