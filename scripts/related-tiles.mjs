@@ -60,6 +60,7 @@ const RELATED = {
   "pv-string-fusing": ["pv-circuit-ampacity", "pv-interconnection-busbar", "pv-string-sizing", "continuous-load-ocpd"],
   "duct-heat-gain": ["duct-sizing", "duct-leakage", "insulation-heat-loss", "grille-face-velocity"],
   "grille-face-velocity": ["duct-sizing", "duct-heat-gain", "air-changes-hour", "outdoor-air-ventilation"],
+  "adpi-diffuser-selection": ["grille-face-velocity", "window-solar-heat-gain", "duct-velocity-pressure"],
   "air-density-correction": ["gas-altitude-derate", "duct-heat-gain", "fan-motor-bhp", "manual-j-cooling"],
   "moist-air-enthalpy": ["outdoor-air-mix", "shr-latent", "wet-bulb-psychrometer", "humidifier-capacity"],
   "cooling-coil-total-load": ["moist-air-enthalpy", "shr-latent", "hydronic-gpm-deltat", "coil-bypass-factor"],

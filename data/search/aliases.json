@@ -13869,6 +13869,46 @@
       "kind": "industry"
     },
     {
+      "term": "adpi",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "air diffusion performance index",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "room air distribution",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "throw ratio",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "diffuser selection",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "throw to length",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "space air diffusion",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
+      "term": "air mixing",
+      "target": "adpi-diffuser-selection",
+      "kind": "industry"
+    },
+    {
       "term": "air density correction",
       "target": "air-density-correction",
       "kind": "industry"

@@ -1951,6 +1951,7 @@ cross-check.
 | calc-historical.js | `computePercentileBands` | `{ points = [], lookback_months = 12 } = {}` | _ | _ | _ |
 | calc-historical.js | `quantile` | `values, p` | _ | _ | _ |
 | calc-hvac.js | `bandLabel` | `value, low, high` | _ | _ | _ |
+| calc-hvac.js | `computeAdpiSelection` | `{ diffuser_type = "circular-ceiling", cooling_load = 40, throw_ft = 0, char_l...` | _ | _ | _ |
 | calc-hvac.js | `computeAffinityLaws` | `{ baseline_RPM = 0, baseline_CFM = 0, baseline_SP_in_wc = 0, baseline_kW = 0,...` | _ | _ | _ |
 | calc-hvac.js | `computeAirDensityCorrection` | `{ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeAirLeakCost` | `{ compressor_cfm = 0, load_min = 0, unload_min = 0, specific_power = 22, run_...` | _ | _ | _ |
@@ -2593,7 +2594,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1179.
+Row count: 1180.
 
 <!-- END function-corpus-v14 -->
 
@@ -2884,10 +2885,11 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (103 tiles)
+### Group C HVAC (104 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `adpi-diffuser-selection` | ADPI Room Air Diffusion Selection (ASHRAE) | ASHRAE Handbook -- Fundamentals, Spac...; spec-v482 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `affinity-laws` | Fan Affinity Laws | ASHRAE; ratio = 1500/1750 = 0.857; CFM = 5000 * r = 4285.7; SP = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-changes-hour` | Air Changes per Hour (ACH) | ASHRAE; ACH = 1000*60/10000 = 6.0, within the 4-6 classroom target | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `air-density-correction` | Air Density Correction for Altitude and Temperature (ACFM/SCFM) | ASHRAE Fundamentals; spec-v349 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3714,6 +3716,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 935. Fixture-covered or reference-cadence: 935 / 935.
+Tile count: 936. Fixture-covered or reference-cadence: 936 / 936.
 
 <!-- END tile-index-v14 -->

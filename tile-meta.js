@@ -480,6 +480,7 @@ const _TILES = [
   // spec-v329..v331 building-energy batch (calc-hvac.js Group C)
   ["building-ua", "C"], ["degree-day-energy", "C"], ["wall-condensation-gradient", "C"],
   ["duct-heat-gain", "C"], ["grille-face-velocity", "C"], ["air-density-correction", "C"],
+  ["adpi-diffuser-selection", "C"],
   ["moist-air-enthalpy", "C"], ["cooling-coil-total-load", "C"], ["coil-bypass-factor", "C"],
   ["fan-affinity-laws", "C"], ["pitot-traverse-cfm", "C"], ["outside-air-percent-temps", "C"],
   ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["hydrant-available-flow", "F"],

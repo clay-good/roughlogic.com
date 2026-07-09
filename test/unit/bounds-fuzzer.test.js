@@ -14841,6 +14841,33 @@ test("bounds: spec-v346 computeMaxOffer70Rule pins the offer, the fee, the no-de
 
 // ===================== spec-v347..v349 air-distribution / air-property batch =====================
 import { computeDuctHeatGain as _v347, computeGrilleFaceVelocity as _v348, computeAirDensityCorrection as _v349 } from "../../calc-hvac.js";
+import { computeAdpiSelection as _v482 } from "../../calc-hvac.js";
+test("bounds: spec-v482 computeAdpiSelection pins the table lookup, the load ceiling, the band flags, and error seams", () => {
+  // Pinned example: circular ceiling, 40 Btu/hr-ft^2, T0.25 = 8 ft over L = 10 -> ratio 0.8 = optimum, ADPI 88, in band.
+  const a = _v482({ diffuser_type: "circular-ceiling", cooling_load: 40, throw_ft: 8, char_length_ft: 10 });
+  assert.ok(Math.abs(a.ratio - 0.8) < 1e-9 && a.opt_ratio === 0.8 && a.max_adpi === 88);
+  assert.ok(a.in_band === true && a.has_band === true && Math.abs(a.target_throw_ft - 8) < 1e-9);
+  // Cross-check: high sidewall at 80 Btu/hr-ft^2 -> optimum 1.8 but only ADPI 68, no >80 band published.
+  const b = _v482({ diffuser_type: "high-sidewall", cooling_load: 80, throw_ft: 36, char_length_ft: 20 });
+  assert.ok(Math.abs(b.ratio - 1.8) < 1e-9 && b.opt_ratio === 1.8 && b.max_adpi === 68);
+  assert.ok(b.has_band === false && b.in_band === false);
+  // The load snaps to the nearest tabulated band (35 -> 40).
+  assert.strictEqual(_v482({ diffuser_type: "circular-ceiling", cooling_load: 35, throw_ft: 8, char_length_ft: 10 }).load_used, 40);
+  // Ceiling slot is load-independent in its optimum (0.3 at every load) and uses the T0.5 throw basis.
+  const slot = _v482({ diffuser_type: "ceiling-slot", cooling_load: 20, throw_ft: 2.4, char_length_ft: 8 });
+  assert.ok(slot.opt_ratio === 0.3 && Math.abs(slot.target_throw_ft - 2.4) < 1e-9 && slot.throw_basis.indexOf("100") >= 0);
+  // Perforated is a single load-independent row (opt 2.0); a ratio in 1.0-3.4 is in band.
+  const perf = _v482({ diffuser_type: "perforated", cooling_load: 80, throw_ft: 40, char_length_ft: 20 });
+  assert.ok(perf.opt_ratio === 2.0 && perf.load_used === null && perf.in_band === true);
+  // Out of band: too small a throw for a sidewall grille at a light load.
+  const oob = _v482({ diffuser_type: "high-sidewall", cooling_load: 20, throw_ft: 5, char_length_ft: 20 });
+  assert.ok(oob.has_band === true && oob.in_band === false); // ratio 0.25 < band_lo 1.0
+  // Error seams.
+  assert.ok("error" in _v482({ diffuser_type: "bogus", throw_ft: 8, char_length_ft: 10 }));
+  assert.ok("error" in _v482({ diffuser_type: "circular-ceiling", throw_ft: 0, char_length_ft: 10 }));
+  assert.ok("error" in _v482({ diffuser_type: "circular-ceiling", throw_ft: 8, char_length_ft: 0 }));
+  assert.ok("error" in _v482({ diffuser_type: "circular-ceiling", throw_ft: Infinity, char_length_ft: 10 }));
+});
 
 test("bounds: spec-v347 computeDuctHeatGain pins Q = U A dT, the airflow-inverse air-temp change, and error seams", () => {
   const r = _v347({ R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 1000 });

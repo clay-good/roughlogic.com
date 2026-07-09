@@ -8980,6 +8980,18 @@ export const CITATIONS = {
       { name: "No throw/NC", value: "throw, drop, and noise come from the manufacturer's catalog, not this tile", source: "scope of this tile" },
     ],
   },
+  "adpi-diffuser-selection": {
+    formula: "ratio = throw_ft / char_length_ft; look up the ADPI table row for the outlet type and nearest cooling load (20/40/60/80 Btu/hr-ft^2); in_band = band_lo <= ratio <= band_hi; target_throw = opt_ratio x char_length_ft.",
+    edition: "ASHRAE Handbook -- Fundamentals, Space Air Diffusion chapter, the ADPI (Air Diffusion Performance Index) Selection Guide table (throw per ASHRAE Standard 70, ADPI per ASHRAE Standard 113; the Miller / Nevins Kansas State research), by name.",
+    freeAccess: "The ADPI selection method and its throw-to-characteristic-length table are published in the ASHRAE Handbook -- Fundamentals and reproduced across the manufacturer engineering guides (Price, Krueger, Titus); the ratio arithmetic is public. The manufacturer's throw catalog governs the selection.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASHRAE Handbook -- Fundamentals, Space Air Diffusion, ADPI Selection Guide: the outlet's throw-to-characteristic-length ratio T/L predicts the Air Diffusion Performance Index (the fraction of occupied-zone points inside the draft-comfort envelope). Each outlet type and cooling load (20 to 80 Btu/hr-ft^2) has a T/L for maximum ADPI and a band of T/L over which ADPI stays above the published threshold; a heavier load caps the achievable ADPI regardless of throw. The throw T is the manufacturer's isothermal catalog throw to the outlet's terminal velocity (50 fpm / T0.25 for most types, 100 fpm / T0.5 for ceiling slots); the characteristic length L is the outlet-specific distance the table footnotes define (to the wall or the midplane between outlets, adjusted from the 9 ft tabulated ceiling). Cooling mode only; the light-troffer row (whose throw basis the published reproductions disagree on) is omitted, and heating and the noise-criterion (NC) selection are separate. A selection aid, not a stamped air-distribution design; the design engineer and the manufacturer's data govern.",
+    assumptions: [
+      { name: "T/L predicts ADPI", value: "the throw-to-characteristic-length ratio, looked up per outlet type and cooling load, gives the max-ADPI ratio and the above-threshold band", source: "ASHRAE Fundamentals, Space Air Diffusion" },
+      { name: "Load caps ADPI", value: "a heavier cooling load lowers the achievable ADPI at the optimum throw (e.g. a high sidewall grille reaches only ADPI 68 at 80 Btu/hr-ft^2)", source: "ASHRAE Fundamentals, Space Air Diffusion" },
+      { name: "Isothermal catalog throw", value: "T is the manufacturer's isothermal throw to the outlet terminal velocity (50 fpm most, 100 fpm ceiling slots); cooling mode; light-troffer, heating, and NC are separate", source: "ASHRAE Standard 70 / 113" },
+    ],
+  },
   "air-density-correction": {
     formula: "alt = (1 - 6.73e-6 elev)^5.258; temp = 530/(460 + T_F); DF = alt x temp; SCFM = ACFM x DF; const = 1.08 x DF; sp = rated_sp x DF.",
     edition: "The air density correction for altitude and temperature from the ASHRAE Handbook - Fundamentals, by name.",

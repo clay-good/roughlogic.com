@@ -3597,6 +3597,102 @@ function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["grille-face-velocity"] = _renderGrilleFaceVelocity;
 
+// ===================== spec-v482: ADPI room air diffusion selection (ASHRAE) =====================
+// The ASHRAE Handbook -- Fundamentals "Space Air Diffusion" ADPI Selection Guide,
+// per outlet type and cooling load (Btu/hr-ft^2): { opt: T/L for max ADPI, max:
+// achievable ADPI, thr: the published "ADPI greater than" threshold, lo/hi: the
+// T/L band over which ADPI stays above that threshold (null = no band published
+// at that load). Throw is T0.25 (50 fpm) for all rows here except ceiling slot,
+// which is T0.5 (100 fpm). The light-troffer row is omitted: its throw basis is
+// inconsistent across the published reproductions. Values from the ASHRAE table
+// as reproduced in the Price / Krueger / Titus engineering guides.
+const _ADPI_TABLE = {
+  "high-sidewall": { throw: "T0.25 (50 fpm)", 80: { opt: 1.8, max: 68, thr: null, lo: null, hi: null }, 60: { opt: 1.8, max: 72, thr: 70, lo: 1.5, hi: 2.2 }, 40: { opt: 1.6, max: 78, thr: 70, lo: 1.2, hi: 2.3 }, 20: { opt: 1.5, max: 85, thr: 80, lo: 1.0, hi: 1.9 } },
+  "circular-ceiling": { throw: "T0.25 (50 fpm)", 80: { opt: 0.8, max: 76, thr: 70, lo: 0.7, hi: 1.3 }, 60: { opt: 0.8, max: 83, thr: 80, lo: 0.7, hi: 1.2 }, 40: { opt: 0.8, max: 88, thr: 80, lo: 0.5, hi: 1.5 }, 20: { opt: 0.8, max: 93, thr: 80, lo: 0.4, hi: 1.7 } },
+  "sill-straight": { throw: "T0.25 (50 fpm)", 80: { opt: 1.7, max: 61, thr: 60, lo: 1.5, hi: 1.7 }, 60: { opt: 1.7, max: 72, thr: 70, lo: 1.4, hi: 1.7 }, 40: { opt: 1.3, max: 86, thr: 80, lo: 1.2, hi: 1.8 }, 20: { opt: 0.9, max: 95, thr: 90, lo: 0.8, hi: 1.3 } },
+  "sill-spread": { throw: "T0.25 (50 fpm)", 80: { opt: 0.7, max: 94, thr: 90, lo: 0.6, hi: 1.5 }, 60: { opt: 0.7, max: 94, thr: 80, lo: 0.6, hi: 1.7 }, 40: { opt: 0.7, max: 94, thr: null, lo: null, hi: null }, 20: { opt: 0.7, max: 94, thr: null, lo: null, hi: null } },
+  "ceiling-slot": { throw: "T0.5 (100 fpm)", 80: { opt: 0.3, max: 85, thr: 80, lo: 0.3, hi: 0.7 }, 60: { opt: 0.3, max: 88, thr: 80, lo: 0.3, hi: 0.8 }, 40: { opt: 0.3, max: 91, thr: 80, lo: 0.3, hi: 1.1 }, 20: { opt: 0.3, max: 92, thr: 80, lo: 0.3, hi: 1.5 } },
+};
+const _ADPI_PERFORATED = { throw: "T0.25 (50 fpm)", opt: 2.0, max: 96, thr: 80, lo: 1.0, hi: 3.4 };
+const _ADPI_LOADS = [20, 40, 60, 80];
+
+// dims: in { diffuser_type: dimensionless, cooling_load: dimensionless, throw_ft: L, char_length_ft: L } out: { ratio: dimensionless, opt_ratio: dimensionless, max_adpi: dimensionless, threshold: dimensionless, target_throw_ft: L }
+export function computeAdpiSelection({ diffuser_type = "circular-ceiling", cooling_load = 40, throw_ft = 0, char_length_ft = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const Tt = Number(throw_ft) || 0;
+  const L = Number(char_length_ft) || 0;
+  if (!(Tt > 0)) return { error: "Throw must be positive (ft)." };
+  if (!(L > 0)) return { error: "Characteristic length must be positive (ft)." };
+  let row, throwBasis, load_used;
+  if (diffuser_type === "perforated") {
+    row = _ADPI_PERFORATED; throwBasis = _ADPI_PERFORATED.throw; load_used = null;
+  } else {
+    const t = _ADPI_TABLE[diffuser_type];
+    if (!t) return { error: "Unknown diffuser type." };
+    const load = Number(cooling_load) || 40;
+    load_used = _ADPI_LOADS.reduce((a, b) => (Math.abs(b - load) < Math.abs(a - load) ? b : a));
+    row = t[load_used]; throwBasis = t.throw;
+  }
+  const ratio = Tt / L;
+  const has_band = row.lo != null && row.hi != null;
+  const in_band = has_band && ratio >= row.lo && ratio <= row.hi;
+  const target_throw_ft = row.opt * L;
+  return {
+    ratio, opt_ratio: row.opt, max_adpi: row.max, threshold: row.thr,
+    band_lo: row.lo, band_hi: row.hi, has_band, in_band, target_throw_ft,
+    throw_basis: throwBasis, load_used,
+    note: "ASHRAE Handbook -- Fundamentals Space Air Diffusion, ADPI Selection Guide: the outlet's throw-to-characteristic-length ratio T/L predicts the Air Diffusion Performance Index (the fraction of occupied-zone points inside the draft-comfort envelope). Each outlet type and cooling load has a T/L for maximum ADPI and a band over which ADPI stays above the published threshold; a heavier load caps the achievable ADPI regardless of throw. Enter the manufacturer's isothermal catalog throw to the outlet's terminal velocity (" + throwBasis + " for this type) and the characteristic length L (to the wall or the midplane between outlets, per the ASHRAE footnote, adjusted from the 9 ft tabulated ceiling). Cooling mode only; the light-troffer row, heating, and the noise-criterion selection are separate. A selection aid, not a stamped air-distribution design.",
+  };
+}
+const adpiSelectionExample = { inputs: { diffuser_type: "circular-ceiling", cooling_load: 40, throw_ft: 8, char_length_ft: 10 } };
+
+function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE Handbook -- Fundamentals, Space Air Diffusion, ADPI Selection Guide (throw per ASHRAE Standard 70, ADPI per Standard 113; the Miller / Nevins Kansas State research). T/L predicts the Air Diffusion Performance Index; each outlet type and cooling load has a max-ADPI T/L and an above-threshold band. Isothermal catalog throw to the outlet's terminal velocity (50 fpm most; 100 fpm ceiling slots). Cooling mode; a selection aid, the manufacturer's data and the design engineer govern.";
+  const type = makeSelect("Outlet type", "adpi-type", [
+    { value: "high-sidewall", label: "High sidewall grille (T0.25)" },
+    { value: "circular-ceiling", label: "Circular ceiling diffuser (T0.25)" },
+    { value: "sill-straight", label: "Sill grille, straight vanes (T0.25)" },
+    { value: "sill-spread", label: "Sill grille, spread vanes (T0.25)" },
+    { value: "ceiling-slot", label: "Ceiling slot diffuser (T0.5)" },
+    { value: "perforated", label: "Perforated / louvered ceiling (T0.25)" },
+  ]);
+  type.select.value = "circular-ceiling";
+  const load = makeSelect("Room cooling load (Btu/hr-ft^2)", "adpi-load", [
+    { value: "20", label: "20 (light)" }, { value: "40", label: "40" }, { value: "60", label: "60" }, { value: "80", label: "80 (heavy)" },
+  ]);
+  load.select.value = "40";
+  inputRegion.appendChild(type.wrap); inputRegion.appendChild(load.wrap);
+  const thr = makeNumber("Catalog isothermal throw T (ft)", "adpi-throw", { step: "any", min: "0" }); thr.input.value = "8";
+  const clen = makeNumber("Characteristic length L (ft)", "adpi-l", { step: "any", min: "0" }); clen.input.value = "10";
+  for (const f of [thr, clen]) inputRegion.appendChild(f.wrap);
+  const oRatio = makeOutputLine(outputRegion, "T/L ratio", "adpi-out-ratio");
+  const oOpt = makeOutputLine(outputRegion, "Optimum T/L (max ADPI)", "adpi-out-opt");
+  const oAdpi = makeOutputLine(outputRegion, "Achievable ADPI at this load", "adpi-out-adpi");
+  const oBand = makeOutputLine(outputRegion, "Comfort band", "adpi-out-band");
+  const oTarget = makeOutputLine(outputRegion, "Throw to spec for max ADPI", "adpi-out-target");
+  const oNote = makeOutputLine(outputRegion, "Note", "adpi-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  function syncFields() { load.wrap.style.display = type.select.value === "perforated" ? "none" : ""; }
+  const update = debounce(() => {
+    const r = computeAdpiSelection({ diffuser_type: type.select.value, cooling_load: load.select.value, throw_ft: readNum(thr.input), char_length_ft: readNum(clen.input) });
+    if (r.error) { oRatio.textContent = r.error; oOpt.textContent = "-"; oAdpi.textContent = "-"; oBand.textContent = "-"; oTarget.textContent = "-"; oNote.textContent = ""; return; }
+    oRatio.textContent = fmt(r.ratio, 2);
+    oOpt.textContent = fmt(r.opt_ratio, 2);
+    oAdpi.textContent = "up to ADPI " + fmt(r.max_adpi, 0) + (r.max_adpi < 80 ? " (load caps comfort below 80)" : "");
+    oBand.textContent = r.has_band
+      ? (r.in_band ? "in the band" : "OUTSIDE the band") + " (ADPI > " + fmt(r.threshold, 0) + " for T/L " + fmt(r.band_lo, 1) + " to " + fmt(r.band_hi, 1) + ")"
+      : "no band above threshold at this load (optimum only)";
+    oTarget.textContent = fmt(r.target_throw_ft, 1) + " ft (T/L " + fmt(r.opt_ratio, 2) + " x L)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { type.select.value = "circular-ceiling"; load.select.value = "40"; thr.input.value = "8"; clen.input.value = "10"; syncFields(); update(); });
+  type.select.addEventListener("change", () => { syncFields(); update(); });
+  load.select.addEventListener("change", update);
+  for (const f of [thr.input, clen.input]) f.addEventListener("input", update);
+  syncFields();
+}
+HVAC_RENDERERS["adpi-diffuser-selection"] = _renderAdpiSelection;
+
 // dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless }
 export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
