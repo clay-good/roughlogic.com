@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-powerquality.js gzip cap 9500 -> 12000; 2026-07-09
+
+Two Group A tiles landed in `calc-powerquality.js` (spec-v523 `harmonic-resonance`, spec-v524 `tdd-ieee-519`), taking the built copy over the 9500 B cap (97.4% at v523). Raised the `check-module-sizes` cap to **12000**. Lazy-loaded, absent from the home-view payload.
+
 ### chore(sizes): raise calc-motor.js gzip cap 7500 -> 10000; 2026-07-09
 
 Two Group A tiles landed in `calc-motor.js` (spec-v499 `motor-locked-rotor-kva`, spec-v521 `motor-fault-contribution`), taking the built copy over the 7500 B cap (it was 95.7% at v499). Raised the `check-module-sizes` cap to **10000**. Lazy-loaded, absent from the home-view payload.

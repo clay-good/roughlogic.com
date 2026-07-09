@@ -740,6 +740,7 @@ export const COMPUTE_MAP = {
   "motor-fault-contribution": { module: "../../calc-motor.js", fn: "computeMotorFaultContribution" },
   "reduced-voltage-starter": { module: "../../calc-motor.js", fn: "computeReducedVoltageStarter" },
   "harmonic-resonance": { module: "../../calc-powerquality.js", fn: "computeHarmonicResonance" },
+  "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

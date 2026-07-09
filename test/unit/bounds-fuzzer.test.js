@@ -17730,3 +17730,23 @@ test("bounds: spec-v523 computeHarmonicResonance pins the resonant order, the pr
   assert.ok("error" in _v523({ short_circuit_mva: 0, cap_bank_mvar: 1.2 }));
   assert.ok("error" in _v523({ short_circuit_mva: 200, cap_bank_mvar: 0 }));
 });
+
+import { computeTddIeee519 as _v524 } from "../../calc-powerquality.js";
+
+test("bounds: spec-v524 computeTddIeee519 pins the ratio-banded limit, the same-distortion flip, and error seams", () => {
+  const r = _v524({ isc_a: 10000, il_a: 400, measured_tdd_pct: 6 });
+  assert.ok(Math.abs(r.ratio - 25) < 1e-9); // 10000/400 -> 20-50 band
+  assert.ok(Math.abs(r.limit_pct - 8.0) < 1e-9 && r.pass === true);
+  // The same 6% distortion fails on a softer service (lower ratio, tighter limit).
+  const soft = _v524({ isc_a: 6000, il_a: 400, measured_tdd_pct: 6 });
+  assert.ok(Math.abs(soft.ratio - 15) < 1e-9 && Math.abs(soft.limit_pct - 5.0) < 1e-9 && soft.pass === false);
+  // The band boundaries: ratio 20 -> 8%, 50 -> 12%, 100 -> 15%, over 1000 -> 20%.
+  assert.ok(_v524({ isc_a: 20, il_a: 1, measured_tdd_pct: 0 }).limit_pct === 8.0);
+  assert.ok(_v524({ isc_a: 100, il_a: 1, measured_tdd_pct: 0 }).limit_pct === 15.0);
+  assert.ok(_v524({ isc_a: 2000, il_a: 1, measured_tdd_pct: 0 }).limit_pct === 20.0);
+  // Error seams: non-finite, non-positive Isc / IL, negative TDD.
+  assert.ok("error" in _v524({ isc_a: Infinity, il_a: 400, measured_tdd_pct: 6 }));
+  assert.ok("error" in _v524({ isc_a: 0, il_a: 400, measured_tdd_pct: 6 }));
+  assert.ok("error" in _v524({ isc_a: 10000, il_a: 0, measured_tdd_pct: 6 }));
+  assert.ok("error" in _v524({ isc_a: 10000, il_a: 400, measured_tdd_pct: -1 }));
+});

@@ -6124,6 +6124,18 @@ export const CITATIONS = {
       { name: "Minimum ampacity", value: "the maximum current times another 125% before any conditions-of-use adjustment", source: "NEC 690.8(B)(1)" },
     ],
   },
+  "tdd-ieee-519": {
+    formula: "ratio = Isc / IL; limit = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0 (%); pass = measured_TDD <= limit.",
+    edition: "The IEEE 519-2022 Table 1 current-distortion limits (total demand distortion at the point of common coupling), by name; the utility agreement and a measurement study govern.",
+    freeAccess: "The IEEE 519 TDD limit bands by Isc/IL ratio are published in the standard; the short-circuit and demand currents come from the facility's service data.",
+    governance: GOVERNANCE.general,
+    editionNote: "IEEE 519-2022 Table 1 current-distortion limits (TDD at the PCC). The limit is on total demand distortion -- harmonic current as a percent of the maximum DEMAND load, not THD (percent of the instantaneous fundamental) and not a flat 5%. The limit loosens as the short-circuit ratio Isc/IL rises because a stiffer supply absorbs more harmonic current: ratio < 20 -> 5%, 20-50 -> 8%, 50-100 -> 12%, 100-1000 -> 15%, > 1000 -> 20%. Individual-harmonic and even-harmonic sub-limits also apply (evens are capped at 25% of the odd limit) and are not checked here. A screening aid, not a compliance report; the utility agreement and a measurement study govern.",
+    assumptions: [
+      { name: "TDD not THD", value: "the limit is on total demand distortion (over the maximum demand load), not THD", source: "IEEE 519-2022" },
+      { name: "Ratio-dependent", value: "the limit loosens as Isc/IL rises because a stiffer supply absorbs more harmonic current", source: "IEEE 519-2022 Table 1" },
+      { name: "Sub-limits", value: "individual-harmonic and even-harmonic sub-limits also apply and are not checked here", source: "IEEE 519-2022" },
+    ],
+  },
   "harmonic-resonance": {
     formula: "h_resonant = sqrt(MVA_sc / MVAR_cap); flag if h_resonant is within 0.5 of the 5th, 7th, 11th, or 13th harmonic.",
     edition: "Parallel-resonance order of a power-factor capacitor bank (IEEE 519 / IEEE 1531 harmonic filter and resonance guidance), first-principles, by name; a harmonic study governs.",

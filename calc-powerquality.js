@@ -471,3 +471,47 @@ function _v523renderHarmonicResonance(inputRegion, outputRegion, citationEl) {
   for (const f of [sc, cap]) f.input.addEventListener("input", update);
 }
 POWERQUALITY_RENDERERS["harmonic-resonance"] = _v523renderHarmonicResonance;
+
+// ===================== spec-v524: total demand distortion limit check (IEEE 519-2022) =====================
+// dims: in { isc_a: I, il_a: I, measured_tdd_pct: dimensionless } out: { ratio: dimensionless, limit_pct: dimensionless, pass: dimensionless }
+export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}) {
+  const isc = Number(isc_a);
+  const il = Number(il_a);
+  const tdd = Number(measured_tdd_pct);
+  if (!Number.isFinite(isc) || !Number.isFinite(il) || !Number.isFinite(tdd)) return { error: "All numeric inputs must be finite numbers." };
+  if (!(isc > 0)) return { error: "Short-circuit current must be positive (A)." };
+  if (!(il > 0)) return { error: "Maximum demand current must be positive (A)." };
+  if (tdd < 0) return { error: "Measured TDD cannot be negative (%)." };
+  const ratio = isc / il;
+  const limit_pct = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0;
+  const pass = tdd <= limit_pct;
+  if (![ratio, limit_pct].every(Number.isFinite)) return { error: "TDD-limit math is not a finite value." };
+  return {
+    ratio, limit_pct, pass,
+    note: "IEEE 519-2022 Table 1 current-distortion limits (TDD at the point of common coupling). The limit is on total demand distortion -- harmonic current as a percent of the maximum DEMAND load, not THD (percent of the instantaneous fundamental) and not a flat 5%. The limit LOOSENS as the short-circuit ratio Isc/IL rises, because a stiffer supply absorbs more harmonic current: ratio < 20 -> 5%, 20-50 -> 8%, 50-100 -> 12%, 100-1000 -> 15%, > 1000 -> 20%. Individual-harmonic and even-harmonic sub-limits also apply (evens are capped at 25% of the odd limit) and are not checked here. The pass/fail is TDD <= limit. A screening aid, not a compliance report; the utility agreement and a measurement study govern.",
+  };
+}
+export const tddIeee519Example = { inputs: { isc_a: 10000, il_a: 400, measured_tdd_pct: 6 } };
+function _v524renderTddIeee519(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IEEE 519-2022 Table 1 current-distortion limits (TDD at the PCC): ratio = Isc/IL; limit = 5% (ratio < 20) / 8% (20-50) / 12% (50-100) / 15% (100-1000) / 20% (> 1000); pass if measured TDD <= limit. The limit is on total demand distortion, not THD, and loosens with a stiffer supply. A screening aid; the utility agreement and a measurement study govern.";
+  const isc = makeNumber("Short-circuit current at the PCC (A)", "tdd-isc", { step: "any", min: "0" }); isc.input.value = "10000";
+  const il = makeNumber("Maximum demand load current (A)", "tdd-il", { step: "any", min: "0" }); il.input.value = "400";
+  const tdd = makeNumber("Measured TDD (%)", "tdd-tdd", { step: "any", min: "0" }); tdd.input.value = "6";
+  for (const f of [isc, il, tdd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { isc.input.value = "10000"; il.input.value = "400"; tdd.input.value = "6"; update(); });
+  const oRatio = makeOutputLine(outputRegion, "Short-circuit ratio Isc/IL", "tdd-out-ratio");
+  const oLimit = makeOutputLine(outputRegion, "Applicable TDD limit", "tdd-out-limit");
+  const oPass = makeOutputLine(outputRegion, "Compliant?", "tdd-out-pass");
+  const oNote = makeOutputLine(outputRegion, "Note", "tdd-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTddIeee519({ isc_a: readNum(isc.input), il_a: readNum(il.input), measured_tdd_pct: readNum(tdd.input) });
+    if (r.error) { oRatio.textContent = r.error; oLimit.textContent = "-"; oPass.textContent = "-"; oNote.textContent = ""; return; }
+    oRatio.textContent = fmt(r.ratio, 0);
+    oLimit.textContent = fmt(r.limit_pct, 1) + "%";
+    oPass.textContent = r.pass ? "yes (TDD within the limit)" : "NO -- exceeds the IEEE 519 limit at this stiffness";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [isc, il, tdd]) f.input.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["tdd-ieee-519"] = _v524renderTddIeee519;

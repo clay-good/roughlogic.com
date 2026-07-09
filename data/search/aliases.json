@@ -7499,6 +7499,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "tdd",
+      "target": "tdd-ieee-519",
+      "kind": "industry"
+    },
+    {
+      "term": "total demand distortion",
+      "target": "tdd-ieee-519",
+      "kind": "industry"
+    },
+    {
+      "term": "ieee 519",
+      "target": "tdd-ieee-519",
+      "kind": "industry"
+    },
+    {
+      "term": "harmonic current limit",
+      "target": "tdd-ieee-519",
+      "kind": "adjacent"
+    },
+    {
+      "term": "isc/il ratio",
+      "target": "tdd-ieee-519",
+      "kind": "adjacent"
+    },
+    {
+      "term": "distortion limit pcc",
+      "target": "tdd-ieee-519",
+      "kind": "adjacent"
+    },
+    {
+      "term": "thd vs tdd",
+      "target": "tdd-ieee-519",
+      "kind": "adjacent"
+    },
+    {
+      "term": "current distortion",
+      "target": "tdd-ieee-519",
+      "kind": "adjacent"
+    },
+    {
       "term": "self excitation",
       "target": "motor-capacitor-max",
       "kind": "industry"

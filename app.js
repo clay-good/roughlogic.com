@@ -120,6 +120,8 @@ const TOOL_MODULES = (() => {
     "transformer-k-factor", "motor-capacitor-max",
     // spec-v523 harmonic parallel-resonance order
     "harmonic-resonance",
+    // spec-v524 total demand distortion limit check (IEEE 519)
+    "tdd-ieee-519",
   ]);
   // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
   // relocated from calc-electrical.js at spec-v72 to relieve that module's
