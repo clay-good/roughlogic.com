@@ -719,6 +719,7 @@ export const COMPUTE_MAP = {
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-mechanic.js", fn: "computeCrosswindComponent" },
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
+  "bolt-proof-load": { module: "../../calc-cross.js", fn: "computeBoltProofLoad" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

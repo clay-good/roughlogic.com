@@ -2705,3 +2705,62 @@ function renderCrossConnectionAirGap(inputRegion, outputRegion, citationEl) {
   nw.input.addEventListener("change", update);
 }
 CROSS_RENDERERS["cross-connection-air-gap"] = renderCrossConnectionAirGap;
+
+// ===================== spec-v503: bolt proof, yield, and tensile load (SAE J429) =====================
+// SAE J429 inch-series grade strengths (psi): proof / yield / tensile.
+const _J429_GRADES = {
+  "2": { proof: 55000, yld: 57000, tensile: 74000, label: "SAE Grade 2" },
+  "5": { proof: 85000, yld: 92000, tensile: 120000, label: "SAE Grade 5 / A325" },
+  "8": { proof: 120000, yld: 130000, tensile: 150000, label: "SAE Grade 8 / A490" },
+};
+// dims: in { nominal_diameter_in: L, threads_per_inch: dimensionless, grade: dimensionless } out: { at_in2: L^2, proof_load_lb: M L T^-2, yield_load_lb: M L T^-2, tensile_load_lb: M L T^-2, rec_clamp_lb: M L T^-2 }
+export function computeBoltProofLoad({ nominal_diameter_in = 0, threads_per_inch = 0, grade = "5" } = {}) {
+  const _g = _finiteGuard({ nominal_diameter_in, threads_per_inch }); if (_g) return _g;
+  const d = Number(nominal_diameter_in) || 0;
+  const n = Number(threads_per_inch) || 0;
+  const g = _J429_GRADES[String(grade)];
+  if (!(d > 0)) return { error: "Nominal diameter must be positive (in)." };
+  if (!(n > 0)) return { error: "Threads per inch must be positive." };
+  if (!g) return { error: "Grade must be SAE 2, 5, or 8 (A325 = 5, A490 = 8)." };
+  const at_in2 = 0.7854 * Math.pow(d - 0.9743 / n, 2);
+  const proof_load_lb = at_in2 * g.proof;
+  const yield_load_lb = at_in2 * g.yld;
+  const tensile_load_lb = at_in2 * g.tensile;
+  const rec_clamp_lb = 0.75 * proof_load_lb;
+  if (![at_in2, proof_load_lb, yield_load_lb, tensile_load_lb, rec_clamp_lb].every(Number.isFinite)) return { error: "Bolt-load math is not a finite value." };
+  return {
+    at_in2, proof_load_lb, yield_load_lb, tensile_load_lb, rec_clamp_lb, grade_label: g.label,
+    note: "SAE J429 bolt strength model: the strength acts on the tensile stress area at the thread root, At = 0.7854 x (D - 0.9743/n)^2, which is about 15% smaller than the nominal shank area (so a nominal-area estimate over-predicts capacity). Proof, yield, and tensile loads are At times the grade's proof, yield, and tensile strengths -- and the grade, read from the head markings, sets every number, so a Grade 2, Grade 5, and Grade 8 of identical diameter carry wildly different loads. The recommended clamp of about 75% of proof leaves margin for torque scatter and service loads -- the working target a torque value should aim for. A design aid; the joint design, torque method, and any preload requirement govern.",
+  };
+}
+export const boltProofLoadExample = { inputs: { nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "5" } };
+function renderBoltProofLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: SAE J429 inch-series bolt strength (ASME B1.1 tensile stress area): At = 0.7854 x (D - 0.9743/n)^2; proof / yield / tensile load = At x the grade strength (Grade 2: 55/57/74 ksi; Grade 5 / A325: 85/92/120; Grade 8 / A490: 120/130/150); recommended clamp = 75% of proof. The grade is read from the head markings. A design aid; the joint design and torque method govern.";
+  const d = makeNumber("Nominal (major) diameter D (in)", "bpl-d", { step: "any", min: "0" }); d.input.value = "0.5";
+  const n = makeNumber("Threads per inch (TPI)", "bpl-n", { step: "any", min: "0" }); n.input.value = "13";
+  const grade = makeSelect("SAE grade", "bpl-grade", [
+    { value: "2", label: "Grade 2 (55 ksi proof)" },
+    { value: "5", label: "Grade 5 / A325 (85 ksi proof)", selected: true },
+    { value: "8", label: "Grade 8 / A490 (120 ksi proof)" },
+  ]);
+  for (const f of [d, n, grade]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "0.5"; n.input.value = "13"; grade.select.value = "5"; update(); });
+  const oAt = makeOutputLine(outputRegion, "Tensile stress area At", "bpl-out-at");
+  const oProof = makeOutputLine(outputRegion, "Proof load (do not exceed)", "bpl-out-proof");
+  const oYield = makeOutputLine(outputRegion, "Yield load", "bpl-out-yield");
+  const oTens = makeOutputLine(outputRegion, "Tensile (breaking) load", "bpl-out-tens");
+  const oClamp = makeOutputLine(outputRegion, "Recommended clamp (75% of proof)", "bpl-out-clamp");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBoltProofLoad({ nominal_diameter_in: readNum(d.input), threads_per_inch: readNum(n.input), grade: grade.select.value });
+    if (r.error) { oAt.textContent = r.error; oProof.textContent = "-"; oYield.textContent = "-"; oTens.textContent = "-"; oClamp.textContent = "-"; return; }
+    oAt.textContent = fmt(r.at_in2, 4) + " in^2 (" + r.grade_label + ")";
+    oProof.textContent = fmt(r.proof_load_lb, 0) + " lb";
+    oYield.textContent = fmt(r.yield_load_lb, 0) + " lb";
+    oTens.textContent = fmt(r.tensile_load_lb, 0) + " lb";
+    oClamp.textContent = fmt(r.rec_clamp_lb, 0) + " lb";
+  }, DEBOUNCE_MS);
+  for (const f of [d, n]) f.input.addEventListener("input", update);
+  grade.select.addEventListener("change", update);
+}
+CROSS_RENDERERS["bolt-proof-load"] = renderBoltProofLoad;

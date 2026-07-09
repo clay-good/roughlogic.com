@@ -1638,6 +1638,7 @@ cross-check.
 | calc-construction.js | `renderStairs` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderTileCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-construction.js | `renderWindPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-cross.js | `computeBoltProofLoad` | `{ nominal_diameter_in = 0, threads_per_inch = 0, grade = "5" } = {}` | _ | _ | _ |
 | calc-cross.js | `computeCrossConnectionAirGap` | `{ opening_in = 0, near_wall = false, measured_in = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeDilution` | `{ concentrate_percent, target_percent, final_volume }` | _ | _ | _ |
 | calc-cross.js | `computeFallProtectionClearance` | `{ connector = "shock-absorbing-lanyard-6ft", free_fall_ft_override = null, de...` | _ | _ | _ |
@@ -2614,7 +2615,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1200.
+Row count: 1201.
 
 <!-- END function-corpus-v14 -->
 
@@ -3334,11 +3335,12 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (54 tiles)
+### Group G Cross-trade (55 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `bolt-circle` | Bolt Circle Layout | First-principles circle-of-holes trig...; 8-in bolt circle, 6 holes, start 0 deg -> R 4, spacing 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bolt-proof-load` | Bolt Proof, Yield, and Tensile Load (SAE J429) | SAE J429 (ASME B1.1 tensile stress area); spec-v503 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `center-of-gravity-2point` | Center of Gravity from Two Scales | ASME B30.9 / ITI rigging references (...; readings 3000 and 1000 lb over 10 ft -> 4000 lb total, CG... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circle-from-3-points` | Circle Through Three Points | First-principles coordinate geometry ...; (0,0),(4,0),(0,3) -> center (2, 1.5), radius 2.5 (right-t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `circular-arc` | Circular Arc Layout | First-principles circle geometry (sag...; chord 24 in, rise 4 in -> radius 20 in, central angle 73.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3756,6 +3758,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 956. Fixture-covered or reference-cadence: 956 / 956.
+Tile count: 957. Fixture-covered or reference-cadence: 957 / 957.
 
 <!-- END tile-index-v14 -->

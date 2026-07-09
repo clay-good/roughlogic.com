@@ -124,6 +124,7 @@ const RELATED = {
   "decimal-to-fraction": ["unit-converter", "layout-squaring", "geometry"],
   "sine-bar": ["bolt-circle", "decimal-to-fraction", "cutting-speed-rpm"],
   "thread-pitch": ["sine-bar", "bolt-circle", "cutting-speed-rpm"],
+  "bolt-proof-load": ["bolt-torque", "thread-measure-wire", "thread-pitch"],
   "machining-time": ["cutting-speed-rpm", "material-removal-rate", "drill-point-depth"],
   "material-removal-rate": ["cutting-speed-rpm", "machining-time", "turning-surface-finish"],
   "turning-surface-finish": ["cutting-speed-rpm", "material-removal-rate", "taper-calc"],

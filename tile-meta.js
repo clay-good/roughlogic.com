@@ -350,6 +350,8 @@ const _TILES = [
   ["decimal-to-fraction", "G"],
   ["sine-bar", "G"],
   ["thread-pitch", "G"],
+  // spec-v503 bolt proof, yield, and tensile load (SAE J429)
+  ["bolt-proof-load", "G"],
 
   // v40 machine-shop & fab bench (new calc-shop.js module; mixed group letters K/G/E)
   ["machining-time", "K"], ["material-removal-rate", "K"], ["turning-surface-finish", "K"],

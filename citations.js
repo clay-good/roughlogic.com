@@ -6719,6 +6719,18 @@ export const CITATIONS = {
     ],
   },
 
+  "bolt-proof-load": {
+    formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
+    edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
+    freeAccess: "The tensile-stress-area formula and the SAE J429 grade strengths are published in standard fastener references; the grade is read from the bolt head markings.",
+    governance: GOVERNANCE.general,
+    editionNote: "SAE J429 bolt strength model. The strength acts on the tensile stress area at the thread root, At = 0.7854 x (D - 0.9743/n)^2 (about 15% smaller than the nominal shank area, so a nominal-area estimate over-predicts). Proof, yield, and tensile loads are At times the grade's proof, yield, and tensile strengths (Grade 2: 55/57/74 ksi; Grade 5 and A325: 85/92/120; Grade 8 and A490: 120/130/150). The grade, read from the head markings, sets every number. The recommended clamp of about 75% of proof leaves margin for torque scatter and service loads. A design aid, not the engineer of record; the joint design, torque method, and any preload requirement govern.",
+    assumptions: [
+      { name: "Stress area", value: "At = 0.7854 x (D - 0.9743/n)^2 at the thread root, ~15% under the nominal shank area", source: "ASME B1.1 / SAE J429" },
+      { name: "Grade sets strength", value: "the grade read from the head markings sets proof, yield, and tensile strength", source: "SAE J429" },
+      { name: "Recommended clamp", value: "about 75% of proof leaves margin for torque scatter and service loads", source: "fastener practice" },
+    ],
+  },
   "thread-pitch": {
     formula: "Inch: P = 1 / TPI. Metric: P is the pitch in mm, TPI = 25.4 / P. Lead = P * starts. Sharp-V 60-degree height H = P * cos(30) = P * sqrt(3) / 2.",
     edition: "Thread pitch, lead, and 60-degree form - Unified (UN/UNC/UNF) inch and ISO metric threads share a 60-degree included angle - as in Machinery's Handbook (Industrial Press), by name; first-principles geometry.",

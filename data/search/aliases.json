@@ -479,6 +479,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "bolt proof load",
+      "target": "bolt-proof-load",
+      "kind": "industry"
+    },
+    {
+      "term": "tensile stress area",
+      "target": "bolt-proof-load",
+      "kind": "industry"
+    },
+    {
+      "term": "sae j429",
+      "target": "bolt-proof-load",
+      "kind": "industry"
+    },
+    {
+      "term": "grade 5 grade 8",
+      "target": "bolt-proof-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bolt strength",
+      "target": "bolt-proof-load",
+      "kind": "industry"
+    },
+    {
+      "term": "clamp load",
+      "target": "bolt-proof-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "proof yield tensile",
+      "target": "bolt-proof-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "a325 a490",
+      "target": "bolt-proof-load",
+      "kind": "adjacent"
+    },
+    {
       "term": "machining time",
       "target": "machining-time",
       "kind": "industry"

@@ -17289,3 +17289,26 @@ test("bounds: spec-v502 computeHullSpeed pins the 1.34 sqrt(LWL) ceiling, the re
   assert.ok("error" in _v502({ lwl_ft: 0 }));
   assert.ok("error" in _v502({ lwl_ft: 25, actual_speed_kn: -1 }));
 });
+
+import { computeBoltProofLoad as _v503 } from "../../calc-cross.js";
+
+test("bounds: spec-v503 computeBoltProofLoad pins the stress area, the grade loads, the proof<yield<tensile order, and error seams", () => {
+  const r = _v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "5" });
+  assert.ok(Math.abs(r.at_in2 - 0.1419) < 5e-4);
+  assert.ok(Math.abs(r.proof_load_lb - 12060) < 5);
+  assert.ok(Math.abs(r.tensile_load_lb - 17028) < 5);
+  assert.ok(Math.abs(r.rec_clamp_lb - 0.75 * r.proof_load_lb) < 1e-6);
+  // Proof < yield < tensile for every grade.
+  assert.ok(r.proof_load_lb < r.yield_load_lb && r.yield_load_lb < r.tensile_load_lb);
+  // The grade is everything: the identical bolt in Grade 8 has a higher proof load, same stress area.
+  const g8 = _v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "8" });
+  assert.ok(Math.abs(g8.at_in2 - r.at_in2) < 1e-12 && g8.proof_load_lb > r.proof_load_lb);
+  assert.ok(Math.abs(g8.proof_load_lb - 17028) < 5 && Math.abs(g8.rec_clamp_lb - 12771) < 5);
+  // A325 maps to Grade 5, A490 to Grade 8 (same numeric grade keys).
+  assert.ok(Math.abs(_v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "2" }).proof_load_lb - r.at_in2 * 55000) < 1);
+  // Error seams: non-finite, non-positive diameter/TPI, unknown grade.
+  assert.ok("error" in _v503({ nominal_diameter_in: Infinity, threads_per_inch: 13, grade: "5" }));
+  assert.ok("error" in _v503({ nominal_diameter_in: 0, threads_per_inch: 13, grade: "5" }));
+  assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 0, grade: "5" }));
+  assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "10" }));
+});

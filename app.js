@@ -648,6 +648,8 @@ const TOOL_MODULES = (() => {
     "linear-interpolation",
     // spec-v450 cross-connection air gap
     "cross-connection-air-gap",
+    // spec-v503 bolt proof, yield, and tensile load (SAE J429)
+    "bolt-proof-load",
   ]);
   // Group G (cont.): the pipe & conduit fabrication bench, split out of
   // calc-cross.js into calc-fab.js (spec-v36) once calc-cross hit its cap.

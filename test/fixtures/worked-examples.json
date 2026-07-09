@@ -15094,6 +15094,74 @@
    }
   },
   {
+   "tile_id": "bolt-proof-load",
+   "source_publisher": "SAE J429 (ASME B1.1 tensile stress area)",
+   "source_title": "1/2-13 Grade 5 -> At 0.1419 in^2, proof 12,060 lb, tensile 17,030 lb, clamp 9,045 lb",
+   "source_edition_or_year": "spec-v503 worked example (machine-verified)",
+   "source_section_or_page": "spec-v503 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "nominal_diameter_in": 0.5,
+    "threads_per_inch": 13,
+    "grade": "5"
+   },
+   "outputs": {
+    "at_in2": {
+     "value": 0.1419,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "proof_load_lb": {
+     "value": 12060,
+     "tolerance": {
+      "abs": 10
+     }
+    },
+    "tensile_load_lb": {
+     "value": 17028,
+     "tolerance": {
+      "abs": 10
+     }
+    },
+    "rec_clamp_lb": {
+     "value": 9046,
+     "tolerance": {
+      "abs": 10
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bolt-proof-load",
+   "source_publisher": "SAE J429 (ASME B1.1 tensile stress area)",
+   "source_title": "cross-check: identical 1/2-13 in Grade 8 -> proof 17,028 lb, clamp 12,771 lb (grade is everything)",
+   "source_edition_or_year": "spec-v503 worked example (machine-verified)",
+   "source_section_or_page": "spec-v503 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "nominal_diameter_in": 0.5,
+    "threads_per_inch": 13,
+    "grade": "8"
+   },
+   "outputs": {
+    "proof_load_lb": {
+     "value": 17028,
+     "tolerance": {
+      "abs": 10
+     }
+    },
+    "rec_clamp_lb": {
+     "value": 12771,
+     "tolerance": {
+      "abs": 10
+     }
+    }
+   }
+  },
+  {
    "tile_id": "machining-time",
    "source_publisher": "First-principles cutting time + Machinery's Handbook",
    "source_title": "feed_IPM = RPM x IPR; t = L / feed_IPM; total = t x passes",
