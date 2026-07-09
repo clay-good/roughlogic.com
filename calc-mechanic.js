@@ -1583,3 +1583,56 @@ MECHANIC_RENDERERS["wheel-offset-backspacing"] = _simpleRenderer({
   ],
   compute: computeWheelOffsetBackspacing,
 });
+
+// ===================== spec-v514: brake pedal ratio and line pressure =====================
+
+// dims: in { pedal_force_lb: M L T^-2, pedal_ratio: dimensionless, booster_factor: dimensionless, mc_bore_in: L, caliper_area_in2: L^2, pad_friction: dimensionless, rotor_radius_in: L } out: { mc_force_lb: M L T^-2, line_psi: M L^-1 T^-2, clamp_lb: M L T^-2, brake_torque_inlb: M L^2 T^-2 }
+export function computeBrakePedalHydraulic({ pedal_force_lb = 0, pedal_ratio = 0, booster_factor = 1, mc_bore_in = 0, caliper_area_in2 = 0, pad_friction = 0.4, rotor_radius_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pf = Number(pedal_force_lb) || 0;
+  const ratio = Number(pedal_ratio) || 0;
+  const boost = Number(booster_factor) || 0;
+  const bore = Number(mc_bore_in) || 0;
+  const cal = Number(caliper_area_in2) || 0;
+  const mu = Number(pad_friction) || 0;
+  const rr = Number(rotor_radius_in) || 0;
+  if (!(pf > 0)) return { error: "Pedal force must be positive (lb)." };
+  if (!(ratio > 0)) return { error: "Pedal ratio must be positive." };
+  if (!(boost > 0)) return { error: "Booster factor must be positive (1.0 = manual)." };
+  if (!(bore > 0)) return { error: "Master-cylinder bore must be positive (in)." };
+  if (!(cal > 0)) return { error: "Caliper piston area must be positive (in^2)." };
+  if (!(rr > 0)) return { error: "Rotor radius must be positive (in)." };
+  if (mu < 0) return { error: "Pad friction coefficient cannot be negative." };
+  const mc_force_lb = pf * ratio * boost;
+  const mc_area = Math.PI / 4 * bore * bore;
+  const line_psi = mc_force_lb / mc_area;
+  const clamp_lb = line_psi * cal;
+  const brake_torque_inlb = clamp_lb * 2 * mu * rr;
+  if (![mc_force_lb, line_psi, clamp_lb, brake_torque_inlb].every(Number.isFinite)) return { error: "Brake-hydraulic math is not a finite value." };
+  return {
+    mc_force_lb, line_psi, clamp_lb, brake_torque_inlb,
+    note: "Hydraulic brake force chain (Pascal's law): mc_force = pedal_force x pedal_ratio x booster; line_pressure = mc_force / mc_area (mc_area = pi/4 x bore^2); clamp = line_pressure x caliper_area; brake_torque = clamp x 2 x pad_friction x rotor_radius. Because pressure is force over area and area scales with the SQUARE of the bore, DOUBLING the master-cylinder bore QUARTERS the line pressure for the same leg effort -- the whole manual-versus-boosted trade: a big-bore master makes less pressure but moves more fluid (firmer-but-heavier), a small-bore master makes pressure easily but needs more pedal travel. The factor of 2 in the torque accounts for both pad faces. A design aid, not a validated brake system; the actual pad friction, thermal state, and system compliance govern.",
+  };
+}
+export const brakePedalHydraulicExample = { inputs: { pedal_force_lb: 50, pedal_ratio: 5, booster_factor: 1, mc_bore_in: 0.875, caliper_area_in2: 4, pad_friction: 0.4, rotor_radius_in: 4.5 } };
+
+MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
+  citation: "Citation: hydraulic brake force chain (Pascal's law; SAE brake-system design practice): mc_force = pedal_force x ratio x booster; line_pressure = mc_force / (pi/4 x bore^2); clamp = line_pressure x caliper_area; brake_torque = clamp x 2 x friction x rotor_radius. Doubling the master-cylinder bore quarters the pressure (area ~ bore^2); the 2 accounts for both pad faces. A design aid; the pad friction, thermal state, and system compliance govern.",
+  example: brakePedalHydraulicExample.inputs,
+  fields: [
+    { key: "pedal_force_lb", label: "Pedal force (lb)", kind: "number", default: 50 },
+    { key: "pedal_ratio", label: "Pedal ratio", kind: "number", default: 5 },
+    { key: "booster_factor", label: "Booster factor (1.0 = manual)", kind: "number", default: 1 },
+    { key: "mc_bore_in", label: "Master-cylinder bore (in)", kind: "number", default: 0.875 },
+    { key: "caliper_area_in2", label: "Caliper piston area per corner (in^2)", kind: "number", default: 4 },
+    { key: "pad_friction", label: "Pad friction coefficient (~0.4)", kind: "number", default: 0.4 },
+    { key: "rotor_radius_in", label: "Effective rotor radius (in)", kind: "number", default: 4.5 },
+  ],
+  outputs: [
+    { key: "lp", id: "bph-out-lp", label: "Line pressure", value: (r) => fmt(r.line_psi, 0) + " psi (MC force " + fmt(r.mc_force_lb, 0) + " lb)" },
+    { key: "cl", id: "bph-out-cl", label: "Caliper clamp", value: (r) => fmt(r.clamp_lb, 0) + " lb" },
+    { key: "bt", id: "bph-out-bt", label: "Brake torque (per corner)", value: (r) => fmt(r.brake_torque_inlb, 0) + " in-lb" },
+    { key: "n", id: "bph-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBrakePedalHydraulic,
+});

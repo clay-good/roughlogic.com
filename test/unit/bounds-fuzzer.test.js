@@ -17522,3 +17522,26 @@ test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2
   assert.ok("error" in _v513({ shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 0 }));
   assert.ok("error" in _v513({ shaft_diameter_in: 1.0, torque_in_lb: 0, key_length_in: 1.5 }));
 });
+
+import { computeBrakePedalHydraulic as _v514 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v514 computeBrakePedalHydraulic pins the force chain, the bore-quartering, the two-pad torque, and error seams", () => {
+  const r = _v514({ pedal_force_lb: 50, pedal_ratio: 5, booster_factor: 1, mc_bore_in: 0.875, caliper_area_in2: 4, pad_friction: 0.4, rotor_radius_in: 4.5 });
+  assert.ok(Math.abs(r.mc_force_lb - 250) < 1e-9);
+  assert.ok(Math.abs(r.line_psi - 416) < 1);
+  assert.ok(Math.abs(r.clamp_lb - 1663) < 2);
+  assert.ok(Math.abs(r.brake_torque_inlb - 5987) < 5);
+  // Doubling the master-cylinder bore quarters the line pressure for the same leg effort.
+  const dbl = _v514({ pedal_force_lb: 50, pedal_ratio: 5, booster_factor: 1, mc_bore_in: 1.75, caliper_area_in2: 4, pad_friction: 0.4, rotor_radius_in: 4.5 });
+  assert.ok(Math.abs(dbl.line_psi - r.line_psi / 4) < 1e-6 && Math.abs(dbl.line_psi - 104) < 1);
+  // A booster multiplies the line pressure linearly.
+  assert.ok(Math.abs(_v514({ pedal_force_lb: 50, pedal_ratio: 5, booster_factor: 2, mc_bore_in: 0.875, caliper_area_in2: 4, pad_friction: 0.4, rotor_radius_in: 4.5 }).line_psi - 2 * r.line_psi) < 1e-6);
+  // Error seams: non-finite, non-positive pedal/ratio/bore/caliper/radius, negative friction.
+  assert.ok("error" in _v514({ pedal_force_lb: Infinity, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 4, rotor_radius_in: 4.5 }));
+  assert.ok("error" in _v514({ pedal_force_lb: 0, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 4, rotor_radius_in: 4.5 }));
+  assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 0, mc_bore_in: 0.875, caliper_area_in2: 4, rotor_radius_in: 4.5 }));
+  assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 5, mc_bore_in: 0, caliper_area_in2: 4, rotor_radius_in: 4.5 }));
+  assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 0, rotor_radius_in: 4.5 }));
+  assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 4, rotor_radius_in: 0 }));
+  assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 4, pad_friction: -0.1, rotor_radius_in: 4.5 }));
+});

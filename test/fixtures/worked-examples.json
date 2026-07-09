@@ -44884,6 +44884,70 @@
    }
   },
   {
+   "tile_id": "brake-pedal-hydraulic",
+   "source_publisher": "hydraulic brake force chain (Pascal's law)",
+   "source_title": "50 lb pedal, 5:1, manual, 7/8 in master, 4 in^2 caliper, 0.4 pad, 4.5 in rotor -> 416 psi, 1,663 lb, 5,987 in-lb",
+   "source_edition_or_year": "spec-v514 worked example (machine-verified)",
+   "source_section_or_page": "spec-v514 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "pedal_force_lb": 50,
+    "pedal_ratio": 5,
+    "booster_factor": 1,
+    "mc_bore_in": 0.875,
+    "caliper_area_in2": 4,
+    "pad_friction": 0.4,
+    "rotor_radius_in": 4.5
+   },
+   "outputs": {
+    "line_psi": {
+     "value": 416,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "clamp_lb": {
+     "value": 1663,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "brake_torque_inlb": {
+     "value": 5987,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "brake-pedal-hydraulic",
+   "source_publisher": "hydraulic brake force chain (Pascal's law)",
+   "source_title": "cross-check: double the master bore to 1.75 in -> 104 psi, exactly a quarter of the pressure for the same leg",
+   "source_edition_or_year": "spec-v514 worked example (machine-verified)",
+   "source_section_or_page": "spec-v514 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "pedal_force_lb": 50,
+    "pedal_ratio": 5,
+    "booster_factor": 1,
+    "mc_bore_in": 1.75,
+    "caliper_area_in2": 4,
+    "pad_friction": 0.4,
+    "rotor_radius_in": 4.5
+   },
+   "outputs": {
+    "line_psi": {
+     "value": 104,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

@@ -7736,6 +7736,18 @@ export const CITATIONS = {
       { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
     ],
   },
+  "brake-pedal-hydraulic": {
+    formula: "mc_force = pedal_force x ratio x booster; line_pressure = mc_force / (pi/4 x bore^2); clamp = line_pressure x caliper_area; brake_torque = clamp x 2 x friction x rotor_radius.",
+    edition: "Hydraulic brake force chain (Pascal's law; SAE brake-system design practice), first-principles, by name; the actual pad friction, thermal state, and system compliance govern.",
+    freeAccess: "The hydraulic brake force chain is first-principles Pascal's law; the pedal ratio, bore, caliper area, and rotor radius come from the vehicle's brake components.",
+    governance: GOVERNANCE.general,
+    editionNote: "Hydraulic brake force chain (Pascal's law). mc_force = pedal_force x pedal_ratio x booster, line_pressure = mc_force / mc_area (mc_area = pi/4 x bore^2), clamp = line_pressure x caliper_area, and brake_torque = clamp x 2 x pad_friction x rotor_radius. Because pressure is force over area and area scales with the square of the bore, doubling the master-cylinder bore quarters the line pressure for the same leg effort -- the manual-versus-boosted trade (a big-bore master makes less pressure but moves more fluid; a small-bore master makes pressure easily but needs more pedal travel). The factor of 2 in the torque accounts for both pad faces. A design aid, not a validated brake system; the actual pad friction, thermal state, and system compliance govern.",
+    assumptions: [
+      { name: "Bore squared", value: "line pressure ~ 1/bore^2, so doubling the master-cylinder bore quarters the pressure", source: "Pascal's law" },
+      { name: "Two pad faces", value: "brake torque includes a factor of 2 for both pad faces clamping the rotor", source: "caliper geometry" },
+      { name: "Idealized", value: "ignores thermal fade and system compliance; the pad friction and thermal state govern", source: "scope of this tile" },
+    ],
+  },
   "wheel-offset-backspacing": {
     formula: "overall_width = rim_width + 1; backspacing = rim_width/2 + 0.5 + offset_mm/25.4; offset_mm = (backspacing - rim_width/2 - 0.5) x 25.4; frontspacing = overall_width - backspacing.",
     edition: "Wheel offset / backspacing conversion (Tire & Rim Association wheel dimensions), first-principles geometry, by name; the actual wheel, hub, and suspension clearances govern.",

@@ -19274,6 +19274,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "brake pedal ratio",
+      "target": "brake-pedal-hydraulic",
+      "kind": "industry"
+    },
+    {
+      "term": "brake line pressure",
+      "target": "brake-pedal-hydraulic",
+      "kind": "industry"
+    },
+    {
+      "term": "master cylinder bore",
+      "target": "brake-pedal-hydraulic",
+      "kind": "industry"
+    },
+    {
+      "term": "brake clamp force",
+      "target": "brake-pedal-hydraulic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pascal law brakes",
+      "target": "brake-pedal-hydraulic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "brake torque",
+      "target": "brake-pedal-hydraulic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "manual vs power brakes",
+      "target": "brake-pedal-hydraulic",
+      "kind": "adjacent"
+    },
+    {
+      "term": "caliper clamp",
+      "target": "brake-pedal-hydraulic",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -541,6 +541,8 @@ const _TILES = [
   ["crouch-planing-speed", "K"],
   // spec-v510 wheel offset and backspacing
   ["wheel-offset-backspacing", "K"],
+  // spec-v514 brake pedal ratio and line pressure
+  ["brake-pedal-hydraulic", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],
