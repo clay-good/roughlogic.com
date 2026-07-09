@@ -760,3 +760,44 @@ CONCRETE_RENDERERS["concrete-torsion-threshold"] = _simpleRenderer({
   ],
   compute: computeConcreteTorsionThreshold,
 });
+
+// ===================== spec-v490: concrete bearing strength (ACI 318-19 §22.8) =====================
+
+// dims: in { loaded_area_in2: L^2, support_area_in2: L^2, fc_psi: M L^-1 T^-2, factored_load_kip: M L T^-2 } out: { sqrt_ratio: dimensionless, bn_lb: M L T^-2, phibn_kip: M L T^-2, dcr: dimensionless }
+export function computeConcreteBearingStrength({ loaded_area_in2 = 0, support_area_in2 = 0, fc_psi = 4000, factored_load_kip = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a1 = Number(loaded_area_in2) || 0;
+  const a2 = Number(support_area_in2) || 0;
+  const fc = Number(fc_psi) || 0;
+  const pu = Number(factored_load_kip) || 0;
+  if (!(a1 > 0)) return { error: "Loaded area A1 must be positive (in^2)." };
+  if (!(a2 >= a1)) return { error: "Supporting area A2 must be at least the loaded area A1 (A2 < A1 is geometrically impossible)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (pu < 0) return { error: "Factored load must be non-negative (kip; 0 = capacity only)." };
+  const sqrt_ratio = Math.min(Math.sqrt(a2 / a1), 2.0);
+  const bn_lb = 0.85 * fc * a1 * sqrt_ratio;
+  const phibn_kip = 0.65 * bn_lb / 1000;
+  const dcr = pu > 0 ? pu / phibn_kip : null;
+  if (![sqrt_ratio, bn_lb, phibn_kip].every(Number.isFinite)) return { error: "Bearing-strength math is not a finite value." };
+  return { sqrt_ratio, bn_lb, phibn_kip, dcr };
+}
+
+export const concreteBearingStrengthExample = { inputs: { loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 4000, factored_load_kip: 500 } };
+
+CONCRETE_RENDERERS["concrete-bearing-strength"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §22.8.3 bearing strength: sqrt_ratio = min(sqrt(A2 / A1), 2.0), Bn = 0.85 x f'c x A1 x sqrt_ratio, phiBn = 0.65 x Bn (phi = 0.65 for bearing, §21.2). The sqrt(A2/A1) confinement bonus applies only when the supporting surface is wider than the loaded area on all sides and the slopes/steps meet §22.8.3.2, and it is capped at 2.0. A required bearing area exceeding the member may need a bearing plate or confinement reinforcement. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  example: concreteBearingStrengthExample.inputs,
+  fields: [
+    { key: "loaded_area_in2", label: "Loaded area A1 (in^2)", kind: "number" },
+    { key: "support_area_in2", label: "Supporting area A2 (in^2, >= A1)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "factored_load_kip", label: "Factored load Pu (kip, 0 = capacity only)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "sr", id: "cbs-out-sr", label: "Confinement factor sqrt(A2/A1), capped at 2.0", value: (r) => fmt(r.sqrt_ratio, 3) + (r.sqrt_ratio >= 2 ? " (at the 2.0 cap)" : "") },
+    { key: "bn", id: "cbs-out-bn", label: "Nominal bearing strength Bn", value: (r) => fmt(r.bn_lb, 0) + " lb (" + fmt(r.bn_lb / 1000, 1) + " kip)" },
+    { key: "pb", id: "cbs-out-pb", label: "Design bearing strength phiBn (phi = 0.65)", value: (r) => fmt(r.phibn_kip, 1) + " kip" },
+    { key: "dcr", id: "cbs-out-dcr", label: "Demand / capacity", value: (r) => r.dcr === null ? "- (no Pu entered)" : fmt(r.dcr, 2) + (r.dcr <= 1 ? " (OK)" : " (OVER)") },
+  ],
+  compute: computeConcreteBearingStrength,
+});

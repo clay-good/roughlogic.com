@@ -1058,6 +1058,7 @@ const RELATED = {
   "steel-tension-member": ["steel-block-shear","steel-column-capacity","bolt-shear-bearing"],
   // spec-v284..v286 reinforced-concrete member depth batch (Group E)
   "rc-column-axial": ["rc-beam-flexure","rc-beam-shear","steel-column-capacity"],
+  "concrete-bearing-strength": ["rc-column-axial","column-base-plate","footing-eccentric-pressure"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
   // spec-v287..v289 geotechnical foundation depth batch (Group E)

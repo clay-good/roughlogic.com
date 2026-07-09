@@ -514,6 +514,8 @@ const TOOL_MODULES = (() => {
     "rc-slab-min-thickness", "rc-doubly-reinforced", "rc-shear-friction",
     "concrete-elastic-modulus", "concrete-modulus-of-rupture", "concrete-shrinkage-temperature-steel",
     "t-beam-effective-flange-width", "concrete-beam-min-flexural-steel", "concrete-crack-control-spacing",
+    // spec-v490 concrete bearing strength (ACI 318-19 §22.8)
+    "concrete-bearing-strength",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the

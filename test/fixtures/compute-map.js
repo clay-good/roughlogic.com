@@ -706,6 +706,7 @@ export const COMPUTE_MAP = {
   "steel-tension-member": { module: "../../calc-steel.js", fn: "computeSteelTensionMember" },
   // spec-v284..v286 reinforced-concrete member depth batch (3 tiles)
   "rc-column-axial": { module: "../../calc-concrete.js", fn: "computeRcColumnAxial" },
+  "concrete-bearing-strength": { module: "../../calc-concrete.js", fn: "computeConcreteBearingStrength" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

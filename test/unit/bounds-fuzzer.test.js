@@ -16985,3 +16985,28 @@ test("bounds: spec-v489 computeEvChargeCost pins the meter haircut, the cost, th
   assert.ok("error" in _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.15, efficiency_pct: 0 }));
   assert.ok("error" in _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.15, miles_per_kwh: -1 }));
 });
+
+import { computeConcreteBearingStrength as _v490 } from "../../calc-concrete.js";
+
+test("bounds: spec-v490 computeConcreteBearingStrength pins the capped confinement bonus, the half-capacity relation, and error seams", () => {
+  const r = _v490({ loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 4000, factored_load_kip: 500 });
+  assert.ok(Math.abs(r.sqrt_ratio - 2.0) < 1e-9); // sqrt(9) = 3, capped to 2.0
+  assert.ok(Math.abs(r.bn_lb - 979200) < 1e-6);
+  assert.ok(Math.abs(r.phibn_kip - 636.48) < 1e-6);
+  assert.ok(Math.abs(r.dcr - 500 / 636.48) < 1e-9);
+  // The sqrt_ratio never exceeds 2.0 no matter how wide the support.
+  assert.ok(_v490({ loaded_area_in2: 100, support_area_in2: 1e9, fc_psi: 4000 }).sqrt_ratio === 2.0);
+  // A pad flush to its support (A2 = A1) earns no bonus: exactly half the confined capacity, and no bonus means DCR doubles.
+  const flush = _v490({ loaded_area_in2: 144, support_area_in2: 144, fc_psi: 4000, factored_load_kip: 500 });
+  assert.ok(Math.abs(flush.sqrt_ratio - 1.0) < 1e-9);
+  assert.ok(Math.abs(flush.phibn_kip - r.phibn_kip / 2) < 1e-6);
+  assert.ok(flush.dcr > 1 && Math.abs(flush.dcr - 1.5711) < 0.01);
+  // DCR is null when no factored load is given (capacity only).
+  assert.ok(_v490({ loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 4000 }).dcr === null);
+  // Error seams: non-finite, non-positive loaded area, A2 < A1, non-positive f'c, negative load.
+  assert.ok("error" in _v490({ loaded_area_in2: Infinity, support_area_in2: 1296, fc_psi: 4000 }));
+  assert.ok("error" in _v490({ loaded_area_in2: 0, support_area_in2: 1296, fc_psi: 4000 }));
+  assert.ok("error" in _v490({ loaded_area_in2: 200, support_area_in2: 144, fc_psi: 4000 })); // A2 < A1
+  assert.ok("error" in _v490({ loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 0 }));
+  assert.ok("error" in _v490({ loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 4000, factored_load_kip: -1 }));
+});

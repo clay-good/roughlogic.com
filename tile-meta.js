@@ -463,6 +463,8 @@ const _TILES = [
   ["rc-slab-min-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
   ["concrete-elastic-modulus", "E"], ["concrete-modulus-of-rupture", "E"], ["concrete-shrinkage-temperature-steel", "E"],
   ["t-beam-effective-flange-width", "E"], ["concrete-beam-min-flexural-steel", "E"], ["concrete-crack-control-spacing", "E"],
+  // spec-v490 concrete bearing strength (ACI 318-19 §22.8)
+  ["concrete-bearing-strength", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
   ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
   ["velocity-head", "B"], ["flow-continuity", "B"], ["bernoulli-head", "B"],

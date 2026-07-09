@@ -34978,6 +34978,82 @@
    }
   },
   {
+   "tile_id": "concrete-bearing-strength",
+   "source_publisher": "ACI 318-19 22.8.3",
+   "source_title": "12x12 in column (144 in^2) on a 36x36 in footing (1296 in^2), 4000 psi -> sqrt ratio capped 2.0, phiBn 636.5 kip, DCR 0.79 at 500 kip",
+   "source_edition_or_year": "spec-v490 worked example (machine-verified)",
+   "source_section_or_page": "spec-v490 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "loaded_area_in2": 144,
+    "support_area_in2": 1296,
+    "fc_psi": 4000,
+    "factored_load_kip": 500
+   },
+   "outputs": {
+    "sqrt_ratio": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "bn_lb": {
+     "value": 979200,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "phibn_kip": {
+     "value": 636.48,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "dcr": {
+     "value": 0.7856,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-bearing-strength",
+   "source_publisher": "ACI 318-19 22.8.3",
+   "source_title": "cross-check: same 144 in^2 patch flush to its support (A2 = A1) earns no bonus -> phiBn 318.2 kip, exactly half, DCR 1.57 fails",
+   "source_edition_or_year": "spec-v490 worked example (machine-verified)",
+   "source_section_or_page": "spec-v490 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "loaded_area_in2": 144,
+    "support_area_in2": 144,
+    "fc_psi": 4000,
+    "factored_load_kip": 500
+   },
+   "outputs": {
+    "sqrt_ratio": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "phibn_kip": {
+     "value": 318.24,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "dcr": {
+     "value": 1.5711,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-punching-shear",
    "source_publisher": "ACI 318-19 Table 22.6.5.2",
    "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",

@@ -9440,6 +9440,18 @@ export const CITATIONS = {
       { name: "Steel ratio", value: "longitudinal rho_g flagged against the 1% minimum and 8% maximum", source: "ACI 318-19 10.6.1.1" },
     ],
   },
+  "concrete-bearing-strength": {
+    formula: "sqrt_ratio = min(sqrt(A2 / A1), 2.0); Bn = 0.85 f'c A1 sqrt_ratio; phi Bn = 0.65 Bn; DCR = Pu / phi Bn.",
+    edition: "The ACI 318-19 22.8.3 bearing strength of concrete, with the 22.8.3.2 confinement multiplier sqrt(A2/A1) capped at 2.0 and phi = 0.65 for bearing (21.2), by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 22.8 bearing provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 22.8.3 bearing strength Bn = 0.85 f'c A1 times the confinement factor sqrt(A2/A1), phi Bn = 0.65 Bn, and DCR = Pu / phi Bn. The sqrt(A2/A1) bonus applies only when the supporting surface is wider than the loaded area on all sides and the slopes/steps meet 22.8.3.2, and it is capped at 2.0. phi = 0.65 for bearing (21.2). A required bearing area exceeding the member may need a bearing plate or confinement reinforcement. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Nominal strength", value: "Bn = 0.85 f'c on the loaded area A1", source: "ACI 318-19 22.8.3.2" },
+      { name: "Confinement bonus", value: "multiply by sqrt(A2/A1) when the support is wider on all sides, capped at 2.0", source: "ACI 318-19 22.8.3.2" },
+      { name: "Strength reduction", value: "phi = 0.65 for bearing", source: "ACI 318-19 21.2" },
+    ],
+  },
   "rc-punching-shear": {
     formula: "bo = 2(c1 + d) + 2(c2 + d); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda sqrt(f'c); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
     edition: "The ACI 318-19 Table 22.6.5.2 two-way (punching) shear stress (least of the three terms) on the 22.6.4.1 critical section at d/2 from the column face, with alpha_s = 40/30/20 and phi = 0.75, by name.",

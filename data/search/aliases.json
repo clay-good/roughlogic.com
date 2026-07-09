@@ -17844,6 +17844,46 @@
       "kind": "industry"
     },
     {
+      "term": "bearing on concrete",
+      "target": "concrete-bearing-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "bearing strength",
+      "target": "concrete-bearing-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 318 22.8",
+      "target": "concrete-bearing-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "confinement bonus",
+      "target": "concrete-bearing-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "a2/a1",
+      "target": "concrete-bearing-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column on footing",
+      "target": "concrete-bearing-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "base plate bearing",
+      "target": "concrete-bearing-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bearing capacity concrete",
+      "target": "concrete-bearing-strength",
+      "kind": "adjacent"
+    },
+    {
       "term": "glulam volume factor",
       "target": "glulam-volume-factor",
       "kind": "industry"
