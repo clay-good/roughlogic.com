@@ -166,6 +166,7 @@ export const COMPUTE_MAP = {
   "voltage-drop-reactance": { module: "../../calc-electrical.js", fn: "computeVoltageDropReactance" },
   "power-triangle": { module: "../../calc-electrical.js", fn: "computePowerTriangle" },
   "ev-charger-load": { module: "../../calc-solar.js", fn: "computeEvChargerLoad" },
+  "ev-charge-time": { module: "../../calc-solar.js", fn: "computeEvChargeTime" },
   "ambient-ampacity-adjust": { module: "../../calc-electrical.js", fn: "computeAmbientAmpacityAdjust" },
   "service-load-optional": { module: "../../calc-electrical.js", fn: "computeServiceLoadOptional" },
   "lux-to-footcandle": { module: "../../calc-electrical.js", fn: "computeLuxFootcandle" },

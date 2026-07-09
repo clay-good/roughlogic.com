@@ -934,6 +934,60 @@ function renderBatteryCRate(inputRegion, outputRegion, citationEl) {
   for (const f of [kwh, c, dod, inv]) f.input.addEventListener("input", update);
 }
 
+// spec-v488: EV charge time (AC Level 2). energy = capacity x (target - start);
+// AC power is capped by the vehicle onboard charger (min(EVSE, onboard)); time =
+// energy / (power x efficiency). The onboard-charger limit is the field gotcha.
+// dims: in { battery_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, evse_power_kw: M L^2 T^-3, onboard_charger_kw: M L^2 T^-3, efficiency_pct: dimensionless } out: { energy_needed_kwh: M L^2 T^-2, charge_power_kw: M L^2 T^-3, time_hr: T }
+export function computeEvChargeTime({ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, evse_power_kw = 0, onboard_charger_kw = 0, efficiency_pct = 88 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(battery_capacity_kwh) || 0;
+  const start = Number(start_soc_pct) || 0;
+  const target = Number(target_soc_pct) || 0;
+  const evse = Number(evse_power_kw) || 0;
+  const onboard = Number(onboard_charger_kw) || 0;
+  const eff = Number(efficiency_pct) || 0;
+  if (!(cap > 0)) return { error: "Battery capacity must be positive (kWh)." };
+  if (!(start >= 0 && start < 100)) return { error: "Start state of charge must be 0 to under 100 percent." };
+  if (!(target > start && target <= 100)) return { error: "Target state of charge must exceed the start and be at most 100 percent." };
+  if (!(evse > 0)) return { error: "EVSE power must be positive (kW)." };
+  if (onboard < 0) return { error: "Onboard charger rating must be non-negative (0 = DC fast / no AC cap)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Charging efficiency must be over 0 and at most 100 percent." };
+  const energy_needed_kwh = cap * (target - start) / 100;
+  const charge_power_kw = onboard > 0 ? Math.min(evse, onboard) : evse;
+  const power_to_battery_kw = charge_power_kw * eff / 100;
+  const time_hr = energy_needed_kwh / power_to_battery_kw;
+  const onboard_limited = onboard > 0 && onboard < evse;
+  if (![energy_needed_kwh, charge_power_kw, time_hr].every(Number.isFinite)) return { error: "Charge-time math is not a finite value." };
+  return {
+    energy_needed_kwh, charge_power_kw, power_to_battery_kw, time_hr, onboard_limited,
+    note: "AC Level 2 charge time = energy needed / (charge power x efficiency), where the charge power is the LESSER of the wall EVSE output and the vehicle's onboard charger - and it is almost always the onboard charger that governs, so a bigger EVSE does not speed up a car with a small onboard charger (the onboard-limited flag calls this out). Charging from the start to the target state of charge; the efficiency (default 88%) covers the AC-to-DC and thermal losses, so the grid draws more than the battery stores. This constant-power model holds for AC Level 2 to the target but NOT for DC fast charging, which tapers sharply above about 80% state of charge and would take longer than this predicts near full. A planning estimate; the vehicle's actual charging curve and the installed equipment govern.",
+  };
+}
+function renderEvChargeTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AC Level 2 charge time (SAE J1772 onboard-charger limit): energy = capacity x (target - start); charge power = min(EVSE, onboard charger); time = energy / (power x efficiency). AC is capped by the onboard charger; DC fast charging tapers and is not this model. A planning estimate; the vehicle's charging curve governs.";
+  const cap = makeNumber("Battery capacity (kWh)", "ect-cap", { step: "any", min: "0", value: "75" }); cap.input.value = "75";
+  const start = makeNumber("Start state of charge (%)", "ect-start", { step: "any", min: "0", max: "100", value: "20" }); start.input.value = "20";
+  const target = makeNumber("Target state of charge (%)", "ect-target", { step: "any", min: "0", max: "100", value: "80" }); target.input.value = "80";
+  const evse = makeNumber("EVSE output power (kW)", "ect-evse", { step: "any", min: "0", value: "11.5" }); evse.input.value = "11.5";
+  const onboard = makeNumber("Vehicle onboard charger (kW, 0 = DC fast)", "ect-onboard", { step: "any", min: "0", value: "7.7" }); onboard.input.value = "7.7";
+  const eff = makeNumber("Charging efficiency (%)", "ect-eff", { step: "any", min: "0", max: "100", value: "88" }); eff.input.value = "88";
+  for (const f of [cap, start, target, evse, onboard, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "75"; start.input.value = "20"; target.input.value = "80"; evse.input.value = "11.5"; onboard.input.value = "7.7"; eff.input.value = "88"; update(); });
+  const oEnergy = makeOutputLine(outputRegion, "Energy needed", "ect-out-energy");
+  const oPower = makeOutputLine(outputRegion, "Charge power (governing)", "ect-out-power");
+  const oTime = makeOutputLine(outputRegion, "Charge time", "ect-out-time");
+  const oNote = makeOutputLine(outputRegion, "Note", "ect-out-note");
+  const update = debounce(() => {
+    const r = computeEvChargeTime({ battery_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, evse_power_kw: Number(evse.input.value) || 0, onboard_charger_kw: Number(onboard.input.value) || 0, efficiency_pct: eff.input.value === "" ? 88 : Number(eff.input.value) });
+    if (r.error) { oEnergy.textContent = r.error; oPower.textContent = "-"; oTime.textContent = "-"; oNote.textContent = ""; return; }
+    oEnergy.textContent = fmt(r.energy_needed_kwh, 1) + " kWh";
+    oPower.textContent = fmt(r.charge_power_kw, 1) + " kW" + (r.onboard_limited ? " (onboard-charger limited -- EVSE oversized)" : "");
+    oTime.textContent = fmt(r.time_hr, 1) + " hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cap, start, target, evse, onboard, eff]) f.input.addEventListener("input", update);
+}
+
 // Renderer registry keyed by tool id. All tiles keep group: "A"; this
 // registry is merged into the Group A renderer set by app.js (spec-v88).
 export const SOLAR_RENDERERS = {
@@ -942,6 +996,7 @@ export const SOLAR_RENDERERS = {
   "pv-interconnection-busbar": renderPvInterconnectionBusbar,
   "off-grid-battery": renderOffGridBattery,
   "ev-charger-load": renderEvChargerLoad,
+  "ev-charge-time": renderEvChargeTime,
   "pv-circuit-ampacity": renderPvCircuitAmpacity,
   // spec-v221..v223 PV system-design batch
   "pv-energy-yield": renderPvEnergyYield,

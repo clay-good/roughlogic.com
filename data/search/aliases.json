@@ -1934,6 +1934,46 @@
       "kind": "redirect"
     },
     {
+      "term": "ev charge time",
+      "target": "ev-charge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "charging time",
+      "target": "ev-charge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "how long to charge",
+      "target": "ev-charge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "level 2 charge time",
+      "target": "ev-charge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "onboard charger",
+      "target": "ev-charge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "charge duration",
+      "target": "ev-charge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ev charging hours",
+      "target": "ev-charge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "time to full charge",
+      "target": "ev-charge-time",
+      "kind": "adjacent"
+    },
+    {
       "term": "ambient correction",
       "target": "ambient-ampacity-adjust",
       "kind": "industry"

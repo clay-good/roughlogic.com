@@ -1929,6 +1929,19 @@ export const CITATIONS = {
     ],
   },
 
+  "ev-charge-time": {
+    formula: "energy = capacity x (target - start)/100; charge_power = onboard > 0 ? min(evse, onboard) : evse; time_hr = energy / (charge_power x efficiency/100).",
+    edition: "AC Level 2 EV charge-time model (SAE J1772 onboard-charger limit; charging losses), first-principles; the vehicle's charging curve governs the actual profile.",
+    freeAccess: "Charge time = energy needed / charging power is first-principles; the onboard-charger limit is inherent to AC (SAE J1772) charging and the ratings come from the vehicle and EVSE.",
+    governance: GOVERNANCE.general,
+    editionNote: "AC Level 2 charge time = the energy needed (capacity times the state-of-charge change) divided by the charging power and the efficiency. The charging power is the LESSER of the wall EVSE output and the vehicle's onboard charger - and it is almost always the onboard charger that governs, so a larger EVSE does not speed up a car with a small onboard charger. The efficiency (default 88%) covers the AC-to-DC conversion and thermal losses, so the grid draws more than the battery stores. This constant-power model holds for AC Level 2 up to the target, but NOT for DC fast charging, which tapers sharply above about 80% state of charge and would take longer near full than this predicts. A planning estimate; the vehicle's actual charging curve and the installed equipment govern.",
+    assumptions: [
+      { name: "AC power limit", value: "charge power = min(EVSE output, vehicle onboard charger); the onboard charger usually governs", source: "SAE J1772 AC charging" },
+      { name: "Efficiency", value: "default 88% covers AC-to-DC and thermal losses; the grid draws more than the battery stores", source: "charging losses" },
+      { name: "Constant power", value: "holds for AC Level 2; DC fast charging tapers above ~80% SOC and this over-predicts near full", source: "scope of this tile" },
+    ],
+  },
+
   "ambient-ampacity-adjust": {
     formula: "adjusted_ampacity = base_ampacity * ambient_factor * fill_factor. Ambient factor per 310.15(B)(1) (30 C table basis), fill factor per 310.15(C)(1) (more than three current-carrying conductors).",
     edition: NEC_2023 + " 310.15(B)(1) (ambient correction) and 310.15(C)(1) (conductor-fill adjustment).",

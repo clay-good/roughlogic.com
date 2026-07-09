@@ -126,6 +126,8 @@ const _TILES = [
   ["grounding-electrode", "A"],
   ["pv-interconnection-busbar", "A"], ["off-grid-battery", "A"],
   ["voltage-drop-reactance", "A"], ["power-triangle", "A"], ["ev-charger-load", "A"],
+  // spec-v488 EV charge time, AC Level 2 (Group A, calc-solar.js)
+  ["ev-charge-time", "A"],
   ["ambient-ampacity-adjust", "A"], ["service-load-optional", "A"],
   ["lux-to-footcandle", "A"],
   ["parallel-conductor-derate", "A"], ["neutral-current-3ph", "A"], ["motor-vd-starting", "A"],

@@ -3329,6 +3329,74 @@
    }
   },
   {
+   "tile_id": "ev-charge-time",
+   "source_publisher": "AC Level 2 EV charge-time model (SAE J1772 onboard limit)",
+   "source_title": "75 kWh, 20-80% (45 kWh), 11.5 kW EVSE, 7.7 kW onboard, 88% -> 7.7 kW governs, 6.6 hr",
+   "source_edition_or_year": "spec-v488 worked example (machine-verified)",
+   "source_section_or_page": "spec-v488 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "battery_capacity_kwh": 75,
+    "start_soc_pct": 20,
+    "target_soc_pct": 80,
+    "evse_power_kw": 11.5,
+    "onboard_charger_kw": 7.7,
+    "efficiency_pct": 88
+   },
+   "outputs": {
+    "energy_needed_kwh": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "charge_power_kw": {
+     "value": 7.7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "time_hr": {
+     "value": 6.64,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-charge-time",
+   "source_publisher": "AC Level 2 EV charge-time model (SAE J1772 onboard limit)",
+   "source_title": "cross-check: same session with an 11.5 kW onboard charger -> 11.5 kW governs, 4.4 hr",
+   "source_edition_or_year": "spec-v488 worked example (machine-verified)",
+   "source_section_or_page": "spec-v488 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "battery_capacity_kwh": 75,
+    "start_soc_pct": 20,
+    "target_soc_pct": 80,
+    "evse_power_kw": 11.5,
+    "onboard_charger_kw": 11.5,
+    "efficiency_pct": 88
+   },
+   "outputs": {
+    "charge_power_kw": {
+     "value": 11.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "time_hr": {
+     "value": 4.45,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ambient-ampacity-adjust",
    "source_publisher": "NFPA",
    "source_title": "Ambient + fill ampacity adjustment: 75 A base (#6 THHN Cu, 90 C column), 50 C ambient, 12 conductors",

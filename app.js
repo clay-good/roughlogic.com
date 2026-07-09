@@ -84,6 +84,8 @@ const TOOL_MODULES = (() => {
     "pv-cell-temperature-power", "pv-performance-ratio", "pv-string-fusing",
     // spec-v236..v238 grid-tied battery-economics batch
     "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",
+    // spec-v488 EV charge time (AC Level 2)
+    "ev-charge-time",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)

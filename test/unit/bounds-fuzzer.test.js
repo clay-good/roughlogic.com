@@ -16931,3 +16931,31 @@ test("bounds: spec-v487 computeGeneratorFuelRuntime pins usable fuel, runtime, t
   assert.ok("error" in _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 150 }));
   assert.ok("error" in _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, target_runtime_hr: -1 }));
 });
+
+// ===================== spec-v488 EV charge time, AC Level 2 (Group A) =====================
+import { computeEvChargeTime as _v488 } from "../../calc-solar.js";
+
+test("bounds: spec-v488 computeEvChargeTime pins the energy, the onboard-charger min, the efficiency scaling, and error seams", () => {
+  const r = _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, onboard_charger_kw: 7.7, efficiency_pct: 88 });
+  assert.ok(Math.abs(r.energy_needed_kwh - 45) < 1e-9);
+  assert.ok(Math.abs(r.charge_power_kw - 7.7) < 1e-9); // onboard charger governs
+  assert.strictEqual(r.onboard_limited, true);
+  assert.ok(Math.abs(r.time_hr - 45 / (7.7 * 0.88)) < 1e-9);
+  assert.ok(Math.abs(r.time_hr - 6.641) < 0.01);
+  // A bigger onboard charger lets the EVSE deliver full power and cuts the time.
+  const r2 = _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, onboard_charger_kw: 11.5, efficiency_pct: 88 });
+  assert.ok(Math.abs(r2.charge_power_kw - 11.5) < 1e-9 && r2.onboard_limited === false);
+  assert.ok(Math.abs(r2.time_hr - 4.447) < 0.01 && r2.time_hr < r.time_hr);
+  // onboard = 0 means DC / no AC cap: the EVSE power governs directly.
+  assert.ok(Math.abs(_v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 150, onboard_charger_kw: 0, efficiency_pct: 88 }).charge_power_kw - 150) < 1e-9);
+  // Lower efficiency lengthens the charge (more grid energy per kWh stored).
+  assert.ok(_v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, onboard_charger_kw: 7.7, efficiency_pct: 80 }).time_hr > r.time_hr);
+  // Error seams: non-finite, non-positive capacity / EVSE, out-of-range SOC and efficiency, target <= start.
+  assert.ok("error" in _v488({ battery_capacity_kwh: Infinity, evse_power_kw: 11.5 }));
+  assert.ok("error" in _v488({ battery_capacity_kwh: 0, evse_power_kw: 11.5, target_soc_pct: 80 }));
+  assert.ok("error" in _v488({ battery_capacity_kwh: 75, evse_power_kw: 0, target_soc_pct: 80 }));
+  assert.ok("error" in _v488({ battery_capacity_kwh: 75, start_soc_pct: 80, target_soc_pct: 80, evse_power_kw: 11.5 })); // target <= start
+  assert.ok("error" in _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 120, evse_power_kw: 11.5 })); // target > 100
+  assert.ok("error" in _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, onboard_charger_kw: -1 }));
+  assert.ok("error" in _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, efficiency_pct: 0 }));
+});
