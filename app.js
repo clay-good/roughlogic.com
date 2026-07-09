@@ -745,6 +745,8 @@ const TOOL_MODULES = (() => {
     "torque-adapter-correction",
     // spec-v323..v325 engine-build performance batch
     "injector-size", "mean-piston-speed", "trap-speed-horsepower",
+    // spec-v500 density altitude and pressure altitude
+    "density-altitude",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

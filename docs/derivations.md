@@ -2131,6 +2131,7 @@ cross-check.
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickne...` | _ | _ | _ |
 | calc-mechanic.js | `computeCoolingSystemFlow` | `{ q_btuh = 0, dt_f = 0, coolant = "water" } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeDensityAltitude` | `{ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeDisplacementCR` | `{ bore_in = 0, stroke_in = 0, cylinders = 0, chamber_cc = 0, gasket_bore_in =...` | _ | _ | _ |
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineFuelBurnGph` | `{ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}` | _ | _ | _ |
@@ -2611,7 +2612,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1197.
+Row count: 1198.
 
 <!-- END function-corpus-v14 -->
 
@@ -3437,7 +3438,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (37 tiles)
+### Group K Mechanic (38 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3449,6 +3450,7 @@ per spec-v14 §13.1 second paragraph.
 | `cooling-system-flow` | Cooling-System Coolant Flow for a Heat Load | heat-transfer first principles; spec-v398 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cutting-fluid-concentration` | Cutting-Fluid Concentration | Metalworking-fluid refractometer method; spec-v100 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cutting-speed-rpm` | Machining Speed and Feed | First-principles cutting geometry + M...; 100 SFM, 0.5-in cutter, 2 flutes, 0.002 in/tooth -> 763.9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `density-altitude` | Density Altitude and Pressure Altitude | FAA density-altitude method (ISA laps...; spec-v500 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `displacement-cr` | Engine Displacement and Compression Ratio | Project (first-principles) over stand...; 4.0 bore / 3.48 stroke / 8 cyl / 64 cc chamber / 4.1 gask... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dividing-head` | Dividing-Head Simple Indexing | First-principles indexing arithmetic ...; N 9 on a 40:1 head -> 4 turns + 4/9; on a 54-hole circle ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drill-point-depth` | Drill Point Depth | First-principles drill-point geometry...; 0.5-in drill, 118-deg point, 1.0-in full depth -> 0.1502-... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3750,6 +3752,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 953. Fixture-covered or reference-cadence: 953 / 953.
+Tile count: 954. Fixture-covered or reference-cadence: 954 / 954.
 
 <!-- END tile-index-v14 -->

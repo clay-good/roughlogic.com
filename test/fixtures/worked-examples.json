@@ -44062,6 +44062,62 @@
    }
   },
   {
+   "tile_id": "density-altitude",
+   "source_publisher": "FAA density-altitude method (ISA lapse correction)",
+   "source_title": "5,000 ft field, 29.92 altimeter, 95 F -> PA 5,000 ft, DA 8,600 ft (flies like 3,600 ft higher)",
+   "source_edition_or_year": "spec-v500 worked example (machine-verified)",
+   "source_section_or_page": "spec-v500 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "field_elevation_ft": 5000,
+    "altimeter_in_hg": 29.92,
+    "oat_f": 95
+   },
+   "outputs": {
+    "pa_ft": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "isa_c": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "da_ft": {
+     "value": 8600,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "density-altitude",
+   "source_publisher": "FAA density-altitude method (ISA lapse correction)",
+   "source_title": "cross-check: cold -5 F day drops the density altitude below the field elevation to about 1,933 ft",
+   "source_edition_or_year": "spec-v500 worked example (machine-verified)",
+   "source_section_or_page": "spec-v500 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "field_elevation_ft": 5000,
+    "altimeter_in_hg": 29.92,
+    "oat_f": -5
+   },
+   "outputs": {
+    "da_ft": {
+     "value": 1933,
+     "tolerance": {
+      "abs": 10
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

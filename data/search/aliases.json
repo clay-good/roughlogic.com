@@ -18714,6 +18714,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "density altitude",
+      "target": "density-altitude",
+      "kind": "industry"
+    },
+    {
+      "term": "pressure altitude",
+      "target": "density-altitude",
+      "kind": "industry"
+    },
+    {
+      "term": "hot and high",
+      "target": "density-altitude",
+      "kind": "industry"
+    },
+    {
+      "term": "da calculator",
+      "target": "density-altitude",
+      "kind": "adjacent"
+    },
+    {
+      "term": "isa deviation",
+      "target": "density-altitude",
+      "kind": "adjacent"
+    },
+    {
+      "term": "high altitude takeoff",
+      "target": "density-altitude",
+      "kind": "adjacent"
+    },
+    {
+      "term": "field elevation performance",
+      "target": "density-altitude",
+      "kind": "adjacent"
+    },
+    {
+      "term": "altimeter setting",
+      "target": "density-altitude",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

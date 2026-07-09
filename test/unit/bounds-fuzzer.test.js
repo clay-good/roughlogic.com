@@ -17220,3 +17220,25 @@ test("bounds: spec-v499 computeMotorLockedRotorKva pins the code-letter kVA/hp, 
   assert.ok("error" in _v499({ horsepower: 25, code_letter: "Z", voltage_v: 460 }));
   assert.ok("error" in _v499({ horsepower: 25, code_letter: "G", voltage_v: 460, phase: 2 }));
 });
+
+import { computeDensityAltitude as _v500 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v500 computeDensityAltitude pins the hot-day DA, the ISA lapse, the cold-day sign, and error seams", () => {
+  const hot = _v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 });
+  assert.ok(Math.abs(hot.pa_ft - 5000) < 1e-9); // standard altimeter -> PA = field elevation
+  assert.ok(Math.abs(hot.isa_c - 5) < 1e-9); // 15 - 2 x 5
+  assert.ok(Math.abs(hot.da_ft - 8600) < 1e-6);
+  assert.ok(hot.da_ft > hot.pa_ft); // hot -> DA above pressure altitude
+  // The ISA lapse is 2 C per 1000 ft.
+  const higher = _v500({ field_elevation_ft: 10000, altimeter_in_hg: 29.92, oat_f: 59 });
+  assert.ok(Math.abs(higher.isa_c - (15 - 20)) < 1e-9);
+  // A cold day drives density altitude below the pressure altitude.
+  const cold = _v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: -5 });
+  assert.ok(cold.da_ft < cold.pa_ft && Math.abs(cold.da_ft - 1933.33) < 1);
+  // A low altimeter setting raises the pressure altitude above the field elevation.
+  assert.ok(_v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.42, oat_f: 59 }).pa_ft > 5000);
+  // Error seams: non-finite, non-positive altimeter, sub-absolute-zero temperature.
+  assert.ok("error" in _v500({ field_elevation_ft: Infinity, altimeter_in_hg: 29.92, oat_f: 59 }));
+  assert.ok("error" in _v500({ field_elevation_ft: 5000, altimeter_in_hg: 0, oat_f: 59 }));
+  assert.ok("error" in _v500({ field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: -500 }));
+});

@@ -7652,6 +7652,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "density-altitude": {
+    formula: "oat_c = (oat_f - 32) x 5/9; PA = elevation + (29.92 - altimeter) x 1000; ISA = 15 - 2 x (PA/1000); DA = PA + 120 x (oat_c - ISA).",
+    edition: "FAA density-altitude method (ISA lapse correction), per FAA AC 00-6 / the ICAO Standard Atmosphere, by name; the aircraft flight manual performance charts and the pilot in command govern.",
+    freeAccess: "The density-altitude relation is a published FAA/ICAO standard-atmosphere approximation; the inputs come from the field elevation, the altimeter setting, and a thermometer.",
+    governance: GOVERNANCE.general,
+    editionNote: "FAA density-altitude method (ISA lapse correction). PA = elevation + (29.92 - altimeter) x 1000, ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard: hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate, not a performance guarantee; the aircraft flight manual performance charts and the pilot in command govern.",
+    assumptions: [
+      { name: "Pressure altitude", value: "PA = elevation + (29.92 - altimeter) x 1000; equals the field elevation at a standard 29.92 setting", source: "FAA AC 00-6" },
+      { name: "ISA lapse", value: "standard temperature falls 2 degrees C per 1000 ft from 15 C at sea level", source: "ICAO Standard Atmosphere" },
+      { name: "Dry air", value: "ignores humidity, which lowers density and raises DA further", source: "scope of this tile" },
+    ],
+  },
   "torque-adapter-correction": {
     formula: "E_eff = adapter_length x cos(adapter_angle); TW = target x wrench_length / (wrench_length + E_eff); actual_if_uncorrected = target x (wrench_length + E_eff) / wrench_length; correction_pct = (TW - target) / target x 100.",
     edition: "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B torque-wrench extension relation) by name; first-principles lever statics.",

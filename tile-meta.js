@@ -513,6 +513,8 @@ const _TILES = [
   ["prop-pitch-selection", "K"], ["engine-fuel-burn-gph", "K"], ["alternator-charging-load", "K"],
   // spec-v485 torque wrench extension / crowfoot correction (Group K)
   ["torque-adapter-correction", "K"],
+  // spec-v500 density altitude and pressure altitude
+  ["density-altitude", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

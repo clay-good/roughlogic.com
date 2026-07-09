@@ -1289,3 +1289,42 @@ MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
   ],
   compute: computeTorqueAdapterCorrection,
 });
+
+// ===================== spec-v500: density altitude and pressure altitude =====================
+
+// dims: in { field_elevation_ft: L, altimeter_in_hg: dimensionless, oat_f: T } out: { oat_c: T, pa_ft: L, isa_c: T, da_ft: L }
+export function computeDensityAltitude({ field_elevation_ft = 0, altimeter_in_hg = 29.92, oat_f = 59 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const elev = Number(field_elevation_ft) || 0;
+  const alt = Number(altimeter_in_hg) || 0;
+  const oatf = Number(oat_f);
+  if (!(alt > 0)) return { error: "Altimeter setting must be positive (in Hg)." };
+  if (!Number.isFinite(oatf) || oatf < -459.67) return { error: "Outside air temperature must be above absolute zero (-459.67 F)." };
+  const oat_c = (oatf - 32) * 5 / 9;
+  const pa_ft = elev + (29.92 - alt) * 1000;
+  const isa_c = 15 - 2 * (pa_ft / 1000);
+  const da_ft = pa_ft + 120 * (oat_c - isa_c);
+  if (![oat_c, pa_ft, isa_c, da_ft].every(Number.isFinite)) return { error: "Density-altitude math is not a finite value." };
+  return {
+    oat_c, pa_ft, isa_c, da_ft,
+    note: "FAA density-altitude method (ISA lapse correction): PA = elevation + (29.92 - altimeter) x 1000, ISA temp = 15 - 2 x (PA/1000) degrees C, and DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for the temperature departure from standard -- hot and high robs lift, engine power, and prop thrust even when the field elevation looks benign, so a warm day flies like a much higher field. Humidity lowers air density further; this dry-air model ignores it, so it slightly under-predicts DA on a humid day. A planning estimate; the aircraft flight manual performance charts and the pilot in command govern.",
+  };
+}
+export const densityAltitudeExample = { inputs: { field_elevation_ft: 5000, altimeter_in_hg: 29.92, oat_f: 95 } };
+
+MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
+  citation: "Citation: FAA density-altitude method (FAA AC 00-6 / ICAO Standard Atmosphere): PA = elevation + (29.92 - altimeter) x 1000; ISA = 15 - 2 x (PA/1000) degrees C; DA = PA + 120 x (OAT - ISA). Density altitude is the pressure altitude corrected for temperature; this dry-air model ignores humidity. A planning estimate; the aircraft flight manual and the pilot in command govern.",
+  example: densityAltitudeExample.inputs,
+  fields: [
+    { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number", default: 5000 },
+    { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number", default: 29.92 },
+    { key: "oat_f", label: "Outside air temperature (deg F)", kind: "number", default: 95 },
+  ],
+  outputs: [
+    { key: "pa", id: "da-out-pa", label: "Pressure altitude", value: (r) => fmt(r.pa_ft, 0) + " ft" },
+    { key: "isa", id: "da-out-isa", label: "Standard (ISA) temp at that altitude", value: (r) => fmt(r.isa_c, 1) + " C (OAT " + fmt(r.oat_c, 1) + " C)" },
+    { key: "da", id: "da-out-da", label: "Density altitude", value: (r) => fmt(r.da_ft, 0) + " ft (" + (r.da_ft >= r.pa_ft ? "+" : "") + fmt(r.da_ft - r.pa_ft, 0) + " ft vs pressure altitude)" },
+    { key: "n", id: "da-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDensityAltitude,
+});
