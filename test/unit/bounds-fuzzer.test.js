@@ -16821,3 +16821,28 @@ test("bounds: spec-v443 computeEconomizerEnthalpyChangeover pins both modes, the
   assert.ok("error" in _v443({ mode: "differential_enthalpy", h_outdoor: Infinity, h_return: 28 }));
   assert.ok("error" in _v443({ mode: "fixed_drybulb", t_outdoor_f: NaN, setpoint_f: 65 }));
 });
+
+// ===================== spec-v484 spanned cable sag and tension (Group Z) =====================
+import { computeSpanlineSagTension as _v484 } from "../../calc-rigging.js";
+
+test("bounds: spec-v484 computeSpanlineSagTension pins H = wL^2/8d, the support tension, the developed length, the inverse-sag trap, and error seams", () => {
+  const r = _v484({ span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 2.5 });
+  assert.ok(Math.abs(r.horizontal_tension_lb - 500) < 1e-9);
+  assert.ok(Math.abs(r.support_tension_lb - 500 * Math.sqrt(1 + Math.pow(0.1, 2))) < 1e-9);
+  assert.ok(Math.abs(r.support_tension_lb - 502.4938) < 1e-3);
+  assert.ok(Math.abs(r.cable_length_ft - (100 + 8 * 6.25 / 300)) < 1e-9);
+  assert.ok(Math.abs(r.slack_ft - (r.cable_length_ft - 100)) < 1e-12);
+  assert.ok(Math.abs(r.sag_ratio - 0.025) < 1e-12);
+  assert.strictEqual(r.shallow, true);
+  // The taut-span trap: five times less sag -> five times the tension for the same load.
+  const r2 = _v484({ span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 0.5 });
+  assert.ok(Math.abs(r2.horizontal_tension_lb - 2500) < 1e-9);
+  assert.ok(Math.abs(r2.horizontal_tension_lb - 5 * r.horizontal_tension_lb) < 1e-9);
+  // A deep sag drops the shallow-parabola flag (sag ratio > 0.1).
+  assert.strictEqual(_v484({ span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 20 }).shallow, false);
+  // Error seams: non-finite, and non-positive span / load / sag (a zero sag is the infinite-tension limit).
+  assert.ok("error" in _v484({ span_ft: Infinity, load_lb_per_ft: 1.0, sag_ft: 2.5 }));
+  assert.ok("error" in _v484({ span_ft: 0, load_lb_per_ft: 1.0, sag_ft: 2.5 }));
+  assert.ok("error" in _v484({ span_ft: 100, load_lb_per_ft: 0, sag_ft: 2.5 }));
+  assert.ok("error" in _v484({ span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 0 }));
+});

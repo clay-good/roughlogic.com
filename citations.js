@@ -7885,6 +7885,19 @@ export const CITATIONS = {
       { name: "Estimate only", value: "use the certified breaking strength for any real lift; never use unmarked or uncertified rope", source: "manufacturer certification" },
     ],
   },
+  "spanline-sag-tension": {
+    formula: "H = w x L^2 / (8 x d); T_support = H x sqrt(1 + (4 d / L)^2); length = L + 8 d^2 / (3 L); slack = length - L; sag_ratio = d / L.",
+    edition: "Shallow-cable parabola statics (by name) with ASME B30.9 / Wire Rope Users Manual rigging practice; first-principles, no edition cycle.",
+    freeAccess: "The shallow-cable parabola (H = w L^2 / 8d) is a public statics result; ASME B30.9 governs sling and rigging practice. An ESTIMATE only; the certified rope WLL and the head rigger govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The horizontal tension H = w L^2 / (8 d), the support (anchor) tension T = H sqrt(1 + (4 d / L)^2), and the developed length L + 8 d^2 / (3 L), for a uniform load w over a span L sagging d at midspan. The tension is inversely proportional to the sag - halving the sag doubles the tension - so pulling a span tight to take out the sag multiplies the rope and anchor load. The relations are the shallow-parabola idealization (valid where the sag is under about a tenth of the span; a deep sag trends toward the catenary), the load is taken as uniform along the horizontal span (the rope self-weight plus any evenly distributed load; a concentrated load is the sling-angle point-load case), and the supports are taken as level. A planning screen; the wire-rope working load limit, the anchor capacity, and the head rigger govern.",
+    assumptions: [
+      { name: "Shallow parabola", value: "valid where the sag is under about a tenth of the span; a deep sag trends toward the catenary", source: "cable statics" },
+      { name: "Uniform load", value: "the rope self-weight plus any evenly distributed load; a concentrated load is the sling-angle case", source: "cable statics" },
+      { name: "Level supports", value: "the two supports are taken at the same height", source: "cable statics" },
+      { name: "Estimate only", value: "the certified rope WLL, the anchor capacity, and the head rigger govern the actual pick", source: "ASME B30.9" },
+    ],
+  },
   "hay-dry-matter": {
     formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18% large / 20% small).",
     edition: "First-principles dry-matter mass balance with USDA NRCS / land-grant extension safe-storage guidance (by name); no edition cycle.",

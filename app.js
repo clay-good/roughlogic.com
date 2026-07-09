@@ -930,6 +930,8 @@ const TOOL_MODULES = (() => {
     "roller-jack-force", "chain-lever-hoist", "block-redirect-load",
     // spec-v117 multi-leg sling load per leg + wire-rope strength estimate.
     "multi-leg-sling", "wire-rope-strength",
+    // spec-v484 spanned cable sag and tension
+    "spanline-sag-tension",
   ]);
   return map;
 })();

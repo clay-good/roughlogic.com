@@ -23191,6 +23191,68 @@
    }
   },
   {
+   "tile_id": "spanline-sag-tension",
+   "source_publisher": "Shallow-cable parabola statics (by name)",
+   "source_title": "100 ft span, 1.0 lb/ft, 2.5 ft sag -> 500 lb horizontal, 502.5 lb support, 100.17 ft",
+   "source_edition_or_year": "spec-v484 worked example (machine-verified)",
+   "source_section_or_page": "spec-v484 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "span_ft": 100,
+    "load_lb_per_ft": 1.0,
+    "sag_ft": 2.5
+   },
+   "outputs": {
+    "horizontal_tension_lb": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "support_tension_lb": {
+     "value": 502.494,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cable_length_ft": {
+     "value": 100.1667,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "sag_ratio": {
+     "value": 0.025,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spanline-sag-tension",
+   "source_publisher": "Shallow-cable parabola statics (by name)",
+   "source_title": "cross-check: pull to a 0.5 ft sag -> 2,500 lb horizontal (5x the tension for 5x less sag)",
+   "source_edition_or_year": "spec-v484 worked example (machine-verified)",
+   "source_section_or_page": "spec-v484 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "span_ft": 100,
+    "load_lb_per_ft": 1.0,
+    "sag_ft": 0.5
+   },
+   "outputs": {
+    "horizontal_tension_lb": {
+     "value": 2500,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hay-dry-matter",
    "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
    "source_title": "1,200 lb round bale at 22% -> 936 lb DM, 1,101 lb at 15%, flag",

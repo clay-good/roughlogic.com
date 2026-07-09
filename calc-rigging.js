@@ -887,3 +887,59 @@ function renderWireRopeStrength(inputRegion, outputRegion, citationEl) {
   for (const f of [dia, cf, df]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["wire-rope-strength"] = renderWireRopeStrength;
+
+// --- spanline-sag-tension: Sag and Tension on a Horizontally Spanned Cable ---
+//
+// Shallow-parabola statics: a uniform load w over a span L sagging d at
+// midspan develops H = w L^2 / (8 d), a support tension T = H sqrt(1 + (4d/L)^2),
+// and a developed length L + 8 d^2 / (3 L). Tension is inversely proportional to
+// the sag: pulling the span tight multiplies the rope and anchor load.
+// dims: in { span_ft: L, load_lb_per_ft: M T^-2, sag_ft: L } out: { horizontal_tension_lb: M L T^-2, support_tension_lb: M L T^-2, cable_length_ft: L, slack_ft: L, sag_ratio: dimensionless }
+// (Span, sag, length and slack are lengths L; the uniform load is a force per
+//  length M T^-2; the tensions are forces M L T^-2; the sag ratio is dimensionless.)
+export function computeSpanlineSagTension({ span_ft, load_lb_per_ft, sag_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(span_ft);
+  const w = Number(load_lb_per_ft);
+  const d = Number(sag_ft);
+  if (!Number.isFinite(L) || L <= 0) return { error: "Span must be a positive finite number (ft)." };
+  if (!Number.isFinite(w) || w <= 0) return { error: "Uniform load must be a positive finite number (lb/ft)." };
+  if (!Number.isFinite(d) || d <= 0) return { error: "Sag must be a positive finite number (ft); a zero sag is the infinite-tension limit." };
+  const horizontal_tension_lb = w * L * L / (8 * d);
+  const support_tension_lb = horizontal_tension_lb * Math.sqrt(1 + Math.pow(4 * d / L, 2));
+  const cable_length_ft = L + 8 * d * d / (3 * L);
+  const slack_ft = cable_length_ft - L;
+  const sag_ratio = d / L;
+  const shallow = sag_ratio <= 0.1;
+  if (![horizontal_tension_lb, support_tension_lb, cable_length_ft, slack_ft, sag_ratio].every(Number.isFinite)) return { error: "Spanline math is not a finite value." };
+  return {
+    horizontal_tension_lb, support_tension_lb, cable_length_ft, slack_ft, sag_ratio, shallow,
+    note: "Shallow-cable parabola: the horizontal tension H = w L^2 / (8 d), the support (anchor) tension T = H sqrt(1 + (4 d / L)^2), and the developed length L + 8 d^2 / (3 L), for a uniform load w over a span L sagging d at midspan. The tension is inversely proportional to the sag - halve the sag and you double the tension - so pulling a span tight to take out the sag multiplies the rope and anchor load, and a nearly level span can reach many times the load it carries. Valid where the sag is under about a tenth of the span (a deep sag trends toward the catenary; the shallow flag drops when the ratio is exceeded); the load is taken as uniform along the horizontal span (the rope self-weight plus any evenly distributed load - a concentrated load is the sling-angle point-load case instead), and the supports are taken as level. A planning screen; the wire-rope working load limit, the anchor capacity, and the head rigger govern the actual pick.",
+  };
+}
+export const spanlineSagTensionExample = { inputs: { span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 2.5 } };
+
+function renderSpanlineSagTension(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: shallow-cable parabola H = w L^2 / (8 d), support tension T = H sqrt(1 + (4 d / L)^2), developed length L + 8 d^2 / (3 L), by name. Tension is inverse to the sag - a tight span multiplies the load. Uniform load, level supports, sag under ~1/10 of the span. A planning screen; the WLL chart and the head rigger govern.";
+  const span = makeNumber("Horizontal span (ft)", "sst-span", { step: "any", min: "0" });
+  const load = makeNumber("Uniform load along span (lb/ft)", "sst-load", { step: "any", min: "0" });
+  const sag = makeNumber("Sag at midspan (ft)", "sst-sag", { step: "any", min: "0" });
+  for (const f of [span, load, sag]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { span.input.value = "100"; load.input.value = "1.0"; sag.input.value = "2.5"; update(); });
+  const oH = makeOutputLine(outputRegion, "Horizontal tension", "sst-out-h");
+  const oT = makeOutputLine(outputRegion, "Support (anchor) tension", "sst-out-t");
+  const oLen = makeOutputLine(outputRegion, "Cable length / slack", "sst-out-len");
+  const oRatio = makeOutputLine(outputRegion, "Sag ratio", "sst-out-ratio");
+  const oNote = makeOutputLine(outputRegion, "Note", "sst-out-note");
+  const update = debounce(() => {
+    const r = computeSpanlineSagTension({ span_ft: Number(span.input.value) || 0, load_lb_per_ft: Number(load.input.value) || 0, sag_ft: Number(sag.input.value) || 0 });
+    if (r.error) { oH.textContent = r.error; oT.textContent = "-"; oLen.textContent = "-"; oRatio.textContent = "-"; oNote.textContent = "-"; return; }
+    oH.textContent = fmt(r.horizontal_tension_lb, 1) + " lb";
+    oT.textContent = fmt(r.support_tension_lb, 1) + " lb";
+    oLen.textContent = fmt(r.cable_length_ft, 3) + " ft (" + fmt(r.slack_ft, 3) + " ft slack)";
+    oRatio.textContent = fmt(r.sag_ratio, 3) + (r.shallow ? " (shallow-parabola valid)" : " (deep - trends to catenary; treat as approximate)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [span, load, sag]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["spanline-sag-tension"] = renderSpanlineSagTension;

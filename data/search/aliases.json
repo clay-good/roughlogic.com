@@ -5499,6 +5499,46 @@
       "kind": "redirect"
     },
     {
+      "term": "cable sag",
+      "target": "spanline-sag-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "spanline",
+      "target": "spanline-sag-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "highline",
+      "target": "spanline-sag-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "tramline",
+      "target": "spanline-sag-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "catenary sag",
+      "target": "spanline-sag-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wire rope span",
+      "target": "spanline-sag-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "span tension",
+      "target": "spanline-sag-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "guy wire tension",
+      "target": "spanline-sag-tension",
+      "kind": "adjacent"
+    },
+    {
       "term": "hay moisture",
       "target": "hay-dry-matter",
       "kind": "industry"

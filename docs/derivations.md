@@ -2403,6 +2403,7 @@ cross-check.
 | calc-rigging.js | `computeRollerJackForce` | `{ load_lb, roll_coef = 0.03, incline_deg = 0, skate_cap_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeShackleEyeboltWll` | `{ leg_load_lb, rated_wll_lb, angle_deg = 0, hardware = "shackle", design_fact...` | _ | _ | _ |
 | calc-rigging.js | `computeSlingDdEfficiency` | `{ rated_wll_lb, bend_dia_in, sling_dia_in } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeSpanlineSagTension` | `{ span_ft, load_lb_per_ft, sag_ft } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeSpreaderBeam` | `{ load_lb, bar_length_ft, top_height_ft } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeTaglineForce` | `{ lateral_force_lb, tagline_angle_deg, per_person_lb = 50 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeTandemLiftShare` | `{ total_weight_lb, span_in, cg_from_c1_in, derate_pct = 75, c1_chart_lb, c2_c...` | _ | _ | _ |
@@ -2595,7 +2596,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1181.
+Row count: 1182.
 
 <!-- END function-corpus-v14 -->
 
@@ -3698,7 +3699,7 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (15 tiles)
+### Group Z (unnamed) (16 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3712,12 +3713,13 @@ per spec-v14 §13.1 second paragraph.
 | `roller-jack-force` | Roller / Skate / Jacking Push Force | Standard machinery-moving practice; 12,000 lb on skates (coef 0.03), level, 5,000 lb skate ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shackle-eyebolt-wll` | Shackle / Eye-Bolt WLL and Angular Derate | ASME B30.26 / B18.15 manufacturer data; shoulder eye bolt rated 7,000 lb, leg 3,000 lb, pull 45 d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sling-d-d-efficiency` | Wire-Rope Sling D/d Bend Efficiency | WRTB Wire Rope Users Manual / ASME B30.9; 10,000 lb 6x19 sling around a 3 in pin, 1 in sling -> D/d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `spanline-sag-tension` | Spanned Cable Sag and Tension | Shallow-cable parabola statics (by name); spec-v484 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spreader-beam` | Spreader Bar vs Lifting Beam Below the Hook | ASME BTH-1 / B30.20; 10,000 lb on a 10 ft bar, top 6 ft -> 50.2 deg, 6,509 lb ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tagline-force` | Tag Line Pull and Handler Count | OSHA 1926 Subpart CC / rigging practice; 328 lb wind force, tag at 30 deg, 50 lb per person -> 378... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tandem-lift-share` | Tandem (Two-Crane) Lift Load Share | ASME B30.5 / OSHA 1926 Subpart CC; 40,000 lb, picks 300 in apart, CG 120 from crane 1, 75% d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 937. Fixture-covered or reference-cadence: 937 / 937.
+Tile count: 938. Fixture-covered or reference-cadence: 938 / 938.
 
 <!-- END tile-index-v14 -->
