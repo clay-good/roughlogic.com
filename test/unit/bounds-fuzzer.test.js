@@ -17010,3 +17010,27 @@ test("bounds: spec-v490 computeConcreteBearingStrength pins the capped confineme
   assert.ok("error" in _v490({ loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 0 }));
   assert.ok("error" in _v490({ loaded_area_in2: 144, support_area_in2: 1296, fc_psi: 4000, factored_load_kip: -1 }));
 });
+
+import { computeRcCompressionDevLength as _v491 } from "../../calc-concrete.js";
+
+test("bounds: spec-v491 computeRcCompressionDevLength pins the two governing terms, the 8 in floor, the high-f'c crossover, and error seams", () => {
+  const r = _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, lambda: 1.0, psi_r: 1.0 });
+  assert.ok(Math.abs(r.term1_in - 18.9737) < 0.01); // fy / (50 sqrt(4000)) x db governs
+  assert.ok(Math.abs(r.term2_in - 18.0) < 1e-9);
+  assert.ok(Math.abs(r.ldc_in - 18.9737) < 0.01);
+  // High f'c: the sqrt(f'c) term shrinks, so the 0.0003 fy db floor takes over and the length stops falling.
+  const hi = _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 8000, lambda: 1.0, psi_r: 1.0 });
+  assert.ok(hi.term1_in < hi.term2_in && Math.abs(hi.ldc_in - 18.0) < 1e-9);
+  // Confining ties (psi_r = 0.75) scale both terms down.
+  const ties = _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, lambda: 1.0, psi_r: 0.75 });
+  assert.ok(Math.abs(ties.ldc_in - 14.23) < 0.01 && ties.ldc_in < r.ldc_in);
+  // The 8 in absolute minimum: a tiny bar never develops in less than 8 in.
+  assert.ok(_v491({ bar_diameter_in: 0.375, fy_psi: 60000, fc_psi: 4000, lambda: 1.0, psi_r: 1.0 }).ldc_in >= 8.0);
+  // Error seams: non-finite, non-positive db/fy/f'c, lambda out of range, psi_r out of range.
+  assert.ok("error" in _v491({ bar_diameter_in: Infinity, fy_psi: 60000, fc_psi: 4000 }));
+  assert.ok("error" in _v491({ bar_diameter_in: 0, fy_psi: 60000, fc_psi: 4000 }));
+  assert.ok("error" in _v491({ bar_diameter_in: 1.0, fy_psi: 0, fc_psi: 4000 }));
+  assert.ok("error" in _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 0 }));
+  assert.ok("error" in _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, lambda: 1.5 }));
+  assert.ok("error" in _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, psi_r: 0.5 }));
+});

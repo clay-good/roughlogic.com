@@ -1494,6 +1494,7 @@ cross-check.
 | calc-concrete.js | `computeRcBeamFlexure` | `{ fc = 4000, fy = 60000, as_in2 = 0, b = 0, d = 0, mu = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcBeamShear` | `{ fc = 4000, fyt = 60000, bw = 0, d = 0, av_in2 = 0, vu = 0, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeRcColumnAxial` | `{ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000, ast_in2 = 0 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeRcCompressionDevLength` | `{ bar_diameter_in = 0, fy_psi = 60000, fc_psi = 4000, lambda = 1.0, psi_r = 1...` | _ | _ | _ |
 | calc-concrete.js | `computeRcDevelopmentLength` | `{ fc = 4000, fy = 60000, db = 0, psi_t = 1.0, psi_e = 1.0, psi_s = 1.0, psi_g...` | _ | _ | _ |
 | calc-concrete.js | `computeRcDoublyReinforced` | `{ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_p...` | _ | _ | _ |
 | calc-concrete.js | `computeRcHookDevelopment` | `{ db_in = 0, fy_psi = 60000, fc_psi = 4000, psi_e = 1.0, psi_r = 1.0, psi_o =...` | _ | _ | _ |
@@ -2602,7 +2603,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1188.
+Row count: 1189.
 
 <!-- END function-corpus-v14 -->
 
@@ -3062,7 +3063,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (209 tiles)
+### Group E Construction (210 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3179,6 +3180,7 @@ per spec-v14 §13.1 second paragraph.
 | `rc-beam-flexure` | Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v257 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-beam-shear` | Reinforced Concrete Beam Shear and Stirrup Spacing (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v258 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-column-axial` | RC Tied Column Axial Capacity (ACI 318-19 22.4) | ACI 318-19 22.4.2 / 22.4.2.1; spec-v284 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `rc-compression-dev-length` | Rebar Compression Development Length (ACI 318-19 25.4.9) | ACI 318-19 25.4.9.2; spec-v491 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-development-length` | Rebar Tension Development Length (ACI 318-19) | ACI 318-19 (Building Code Requirement...; spec-v259 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-doubly-reinforced` | Doubly-Reinforced Concrete Beam Flexural Capacity (ACI 318-19) | ACI 318-19 doubly-reinforced flexure; spec-v300 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rc-hook-development` | Standard Hook Development Length (ACI 318-19 25.4.3) | ACI 318-19 Eq. 25.4.3.1a; spec-v286 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3732,6 +3734,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 944. Fixture-covered or reference-cadence: 944 / 944.
+Tile count: 945. Fixture-covered or reference-cadence: 945 / 945.
 
 <!-- END tile-index-v14 -->

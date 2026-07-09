@@ -17884,6 +17884,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "compression development length",
+      "target": "rc-compression-dev-length",
+      "kind": "industry"
+    },
+    {
+      "term": "ldc",
+      "target": "rc-compression-dev-length",
+      "kind": "industry"
+    },
+    {
+      "term": "compression lap splice",
+      "target": "rc-compression-dev-length",
+      "kind": "industry"
+    },
+    {
+      "term": "dowel embedment",
+      "target": "rc-compression-dev-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rebar compression",
+      "target": "rc-compression-dev-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aci 25.4.9",
+      "target": "rc-compression-dev-length",
+      "kind": "industry"
+    },
+    {
+      "term": "column dowels",
+      "target": "rc-compression-dev-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "compression splice length",
+      "target": "rc-compression-dev-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "glulam volume factor",
       "target": "glulam-volume-factor",
       "kind": "industry"

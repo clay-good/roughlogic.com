@@ -9452,6 +9452,18 @@ export const CITATIONS = {
       { name: "Strength reduction", value: "phi = 0.65 for bearing", source: "ACI 318-19 21.2" },
     ],
   },
+  "rc-compression-dev-length": {
+    formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
+    edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 25.4.9 compression-development provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 25.4.9.2 compression development length ldc = max((fy x psi_r) / (50 x lambda x sqrt(f'c)) x db, 0.0003 x fy x psi_r x db, 8 in). Compression development is shorter than tension because the bar end bears on the concrete (no flexural-cracking penalty). The 0.0003 fy db term governs at high f'c, where the sqrt(f'c) term keeps shrinking. psi_r = 0.75 applies only where 25.4.9.3 confining reinforcement (ties or a spiral of the stated size and spacing) wraps the developed bar, and lambda = 0.75 for lightweight concrete. Lap-splice and minimum-length provisions still apply. A design aid, not a substitute for the engineer of record's detailing.",
+    assumptions: [
+      { name: "Governing terms", value: "the larger of the fy/sqrt(f'c) term and the 0.0003 fy db floor, never below 8 in", source: "ACI 318-19 25.4.9.2" },
+      { name: "Confinement", value: "psi_r = 0.75 only with 25.4.9.3 ties or spiral, else 1.0", source: "ACI 318-19 25.4.9.3" },
+      { name: "Lightweight", value: "lambda = 0.75 for lightweight concrete, 1.0 normalweight", source: "ACI 318-19 19.2.4" },
+    ],
+  },
   "rc-punching-shear": {
     formula: "bo = 2(c1 + d) + 2(c2 + d); beta = max(c1,c2)/min(c1,c2); vc = min(4, 2 + 4/beta, 2 + alpha_s d/bo) x lambda sqrt(f'c); phi Vc = 0.75 vc bo d. (alpha_s = 40/30/20 interior/edge/corner)",
     edition: "The ACI 318-19 Table 22.6.5.2 two-way (punching) shear stress (least of the three terms) on the 22.6.4.1 critical section at d/2 from the column face, with alpha_s = 40/30/20 and phi = 0.75, by name.",

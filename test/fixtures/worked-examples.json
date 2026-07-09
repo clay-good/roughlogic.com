@@ -35054,6 +35054,72 @@
    }
   },
   {
+   "tile_id": "rc-compression-dev-length",
+   "source_publisher": "ACI 318-19 25.4.9.2",
+   "source_title": "#8 Grade 60 dowel, 4000 psi, normalweight, no ties -> term1 18.97 in governs, ldc 19.0 in",
+   "source_edition_or_year": "spec-v491 worked example (machine-verified)",
+   "source_section_or_page": "spec-v491 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "bar_diameter_in": 1.0,
+    "fy_psi": 60000,
+    "fc_psi": 4000,
+    "lambda": 1.0,
+    "psi_r": 1.0
+   },
+   "outputs": {
+    "term1_in": {
+     "value": 18.974,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "term2_in": {
+     "value": 18.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ldc_in": {
+     "value": 18.974,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-compression-dev-length",
+   "source_publisher": "ACI 318-19 25.4.9.2",
+   "source_title": "cross-check: raise f'c to 8000 psi and the 0.0003 fy db floor takes over -> ldc 18.0 in (unchanged)",
+   "source_edition_or_year": "spec-v491 worked example (machine-verified)",
+   "source_section_or_page": "spec-v491 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "bar_diameter_in": 1.0,
+    "fy_psi": 60000,
+    "fc_psi": 8000,
+    "lambda": 1.0,
+    "psi_r": 1.0
+   },
+   "outputs": {
+    "term1_in": {
+     "value": 13.416,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ldc_in": {
+     "value": 18.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-punching-shear",
    "source_publisher": "ACI 318-19 Table 22.6.5.2",
    "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",

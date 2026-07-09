@@ -801,3 +801,47 @@ CONCRETE_RENDERERS["concrete-bearing-strength"] = _simpleRenderer({
   ],
   compute: computeConcreteBearingStrength,
 });
+
+// ===================== spec-v491: rebar compression development length (ACI 318-19 §25.4.9) =====================
+
+// dims: in { bar_diameter_in: L, fy_psi: M L^-1 T^-2, fc_psi: M L^-1 T^-2, lambda: dimensionless, psi_r: dimensionless } out: { term1_in: L, term2_in: L, ldc_in: L, governing: dimensionless }
+export function computeRcCompressionDevLength({ bar_diameter_in = 0, fy_psi = 60000, fc_psi = 4000, lambda = 1.0, psi_r = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const db = Number(bar_diameter_in) || 0;
+  const fy = Number(fy_psi) || 0;
+  const fc = Number(fc_psi) || 0;
+  const lam = Number(lambda) || 0;
+  const pr = Number(psi_r) || 0;
+  if (!(db > 0)) return { error: "Bar diameter db must be positive (in)." };
+  if (!(fy > 0)) return { error: "Bar yield fy must be positive (psi)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(lam > 0 && lam <= 1)) return { error: "Lightweight factor lambda must be in (0, 1] (1.0 normalweight, 0.75 lightweight)." };
+  if (!(pr >= 0.75 && pr <= 1.0)) return { error: "Confinement factor psi_r must be 0.75 to 1.0 (0.75 with ties/spiral per 25.4.9.3, else 1.0)." };
+  const term1_in = (fy * pr) / (50 * lam * Math.sqrt(fc)) * db;
+  const term2_in = 0.0003 * fy * pr * db;
+  const ldc_in = Math.max(term1_in, term2_in, 8.0);
+  const governing = ldc_in <= 8.0 ? "8 in minimum" : (term1_in >= term2_in ? "term1: fy / (50 lambda sqrt(f'c))" : "term2: 0.0003 fy floor");
+  if (![term1_in, term2_in, ldc_in].every(Number.isFinite)) return { error: "Compression-development math is not a finite value." };
+  return { term1_in, term2_in, ldc_in, governing };
+}
+
+export const rcCompressionDevLengthExample = { inputs: { bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, lambda: 1.0, psi_r: 1.0 } };
+
+CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §25.4.9.2 compression development length ldc = max((fy x psi_r) / (50 x lambda x sqrt(f'c)) x db, 0.0003 x fy x psi_r x db, 8 in). Compression development is shorter than tension because the bar end bears on the concrete (no flexural-cracking penalty). The 0.0003 fy db term governs at high f'c, where the sqrt(f'c) term keeps shrinking. psi_r = 0.75 applies only where §25.4.9.3 confining reinforcement (ties or a spiral of the stated size and spacing) wraps the developed bar; lambda = 0.75 for lightweight concrete. Lap-splice (§25.5) and minimum-length provisions still apply. A design aid, not a substitute for the engineer of record's detailing.",
+  example: rcCompressionDevLengthExample.inputs,
+  fields: [
+    { key: "bar_diameter_in", label: "Bar diameter db (in, #8 = 1.00)", kind: "number" },
+    { key: "fy_psi", label: "Bar yield fy (psi)", kind: "number", default: 60000 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight, 0.75 lightweight)", kind: "number", default: 1.0 },
+    { key: "psi_r", label: "Confinement factor psi_r (0.75 with ties/spiral, else 1.0)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "t1", id: "rcd-out-t1", label: "Term 1: fy / (50 lambda sqrt(f'c)) x db", value: (r) => fmt(r.term1_in, 2) + " in" },
+    { key: "t2", id: "rcd-out-t2", label: "Term 2: 0.0003 fy db (floor)", value: (r) => fmt(r.term2_in, 2) + " in" },
+    { key: "ld", id: "rcd-out-ld", label: "Compression development length ldc (8 in min)", value: (r) => fmt(r.ldc_in, 1) + " in" },
+    { key: "gv", id: "rcd-out-gv", label: "Governing term", value: (r) => r.governing },
+  ],
+  compute: computeRcCompressionDevLength,
+});
