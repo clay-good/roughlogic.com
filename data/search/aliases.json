@@ -7539,6 +7539,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "neutral grounding resistor",
+      "target": "neutral-grounding-resistor",
+      "kind": "industry"
+    },
+    {
+      "term": "ngr sizing",
+      "target": "neutral-grounding-resistor",
+      "kind": "industry"
+    },
+    {
+      "term": "high resistance ground",
+      "target": "neutral-grounding-resistor",
+      "kind": "industry"
+    },
+    {
+      "term": "low resistance ground",
+      "target": "neutral-grounding-resistor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hrg lrg",
+      "target": "neutral-grounding-resistor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ground fault current limit",
+      "target": "neutral-grounding-resistor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ieee 142 grounding",
+      "target": "neutral-grounding-resistor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "resistance grounded system",
+      "target": "neutral-grounding-resistor",
+      "kind": "adjacent"
+    },
+    {
       "term": "self excitation",
       "target": "motor-capacitor-max",
       "kind": "industry"

@@ -6124,6 +6124,18 @@ export const CITATIONS = {
       { name: "Minimum ampacity", value: "the maximum current times another 125% before any conditions-of-use adjustment", source: "NEC 690.8(B)(1)" },
     ],
   },
+  "neutral-grounding-resistor": {
+    formula: "V_LN = V_LL / sqrt(3); R = V_LN / I_ground; P = I_ground^2 x R (= V_LN x I_ground).",
+    edition: "Neutral grounding resistor sizing (IEEE 142 grounding practice), first-principles, by name; IEEE 142 and the protection scheme govern.",
+    freeAccess: "The NGR sizing relation is first-principles Ohm's law on the line-to-neutral voltage; the system voltage and target fault current come from the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "Neutral grounding resistor sizing. The resistor sees the LINE-TO-NEUTRAL voltage, V_LN = V_LL / sqrt(3), not the line-to-line -- sizing off V_LL makes the resistor sqrt(3) too large and the fault current too small to detect. R = V_LN / I_ground and P = I_ground^2 x R (which equals V_LN x I_ground). A high-resistance ground (HRG) limits the fault to a few amps and lets the plant run through the first fault; its resistor is rated for continuous dissipation. A low-resistance ground (LRG) limits it to 100 to 400 A for fast coordinated tripping; its resistor is rated only for the short trip time. For an HRG the resistor current must exceed the system's total charging current to control transient overvoltage. A design aid, not the engineer of record; IEEE 142 and the protection scheme govern.",
+    assumptions: [
+      { name: "Line-to-neutral", value: "the resistor sees V_LL / sqrt(3); sizing off V_LL makes it sqrt(3) too large", source: "IEEE 142" },
+      { name: "HRG vs LRG", value: "HRG limits to a few amps (continuous rating); LRG to 100-400 A (short-time rating)", source: "IEEE 142" },
+      { name: "Charging current", value: "the HRG resistor current must exceed the system charging current to control overvoltage", source: "IEEE 142" },
+    ],
+  },
   "tdd-ieee-519": {
     formula: "ratio = Isc / IL; limit = ratio < 20 ? 5.0 : ratio < 50 ? 8.0 : ratio < 100 ? 12.0 : ratio <= 1000 ? 15.0 : 20.0 (%); pass = measured_TDD <= limit.",
     edition: "The IEEE 519-2022 Table 1 current-distortion limits (total demand distortion at the point of common coupling), by name; the utility agreement and a measurement study govern.",

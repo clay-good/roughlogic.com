@@ -483,6 +483,8 @@ const TOOL_MODULES = (() => {
     // spec-v175 electrician batch
     "point-illuminance",
     "lighting-light-loss-factor", "lighting-uniformity-ratio", "egress-lighting-check",
+    // spec-v525 neutral grounding resistor sizing (IEEE 142)
+    "neutral-grounding-resistor",
   ]);
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".

@@ -17750,3 +17750,22 @@ test("bounds: spec-v524 computeTddIeee519 pins the ratio-banded limit, the same-
   assert.ok("error" in _v524({ isc_a: 10000, il_a: 0, measured_tdd_pct: 6 }));
   assert.ok("error" in _v524({ isc_a: 10000, il_a: 400, measured_tdd_pct: -1 }));
 });
+
+import { computeNeutralGroundingResistor as _v525 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v525 computeNeutralGroundingResistor pins the line-to-neutral sizing, the power, HRG vs LRG, and error seams", () => {
+  const r = _v525({ system_voltage_ll_v: 480, target_fault_a: 5, duty: "hrg" });
+  assert.ok(Math.abs(r.v_ln_v - 277.13) < 0.1); // 480 / sqrt(3), NOT 480
+  assert.ok(Math.abs(r.r_ohm - 55.43) < 0.1);
+  assert.ok(Math.abs(r.p_watt - 1385.6) < 1); // I^2 R = V_ln x I
+  assert.ok(Math.abs(r.p_watt - r.v_ln_v * 5) < 1e-6);
+  // Sizing off line-to-line would give an sqrt(3)-too-large resistor: verify the tile does NOT do that.
+  assert.ok(Math.abs(r.r_ohm - 480 / 5) > 1); // 480/5 = 96 ohm is the wrong value
+  // A low-resistance ground at a high fault current gives a small resistor and a large short-time power.
+  const lrg = _v525({ system_voltage_ll_v: 480, target_fault_a: 200, duty: "lrg" });
+  assert.ok(lrg.r_ohm < r.r_ohm && lrg.p_watt > r.p_watt && Math.abs(lrg.r_ohm - 1.386) < 0.01);
+  // Error seams: non-finite, non-positive voltage / target current.
+  assert.ok("error" in _v525({ system_voltage_ll_v: Infinity, target_fault_a: 5 }));
+  assert.ok("error" in _v525({ system_voltage_ll_v: 0, target_fault_a: 5 }));
+  assert.ok("error" in _v525({ system_voltage_ll_v: 480, target_fault_a: 0 }));
+});

@@ -332,3 +332,42 @@ ELECDESIGN_RENDERERS["egress-lighting-check"] = _simpleRenderer({
   ],
   compute: computeEgressLightingCheck,
 });
+
+// ===================== spec-v525: neutral grounding resistor sizing (IEEE 142) =====================
+// dims: in { system_voltage_ll_v: M L^2 T^-3 I^-1, target_fault_a: I, duty: dimensionless } out: { v_ln_v: M L^2 T^-3 I^-1, r_ohm: M L^2 T^-3 I^-2, p_watt: M L^2 T^-3 }
+export function computeNeutralGroundingResistor({ system_voltage_ll_v = 0, target_fault_a = 0, duty = "hrg" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vll = Number(system_voltage_ll_v) || 0;
+  const i = Number(target_fault_a) || 0;
+  const d = String(duty) === "lrg" ? "lrg" : "hrg";
+  if (!(vll > 0)) return { error: "System line-to-line voltage must be positive (V)." };
+  if (!(i > 0)) return { error: "Target fault current must be positive (A)." };
+  const v_ln_v = vll / Math.sqrt(3);
+  const r_ohm = v_ln_v / i;
+  const p_watt = i * i * r_ohm;
+  if (![v_ln_v, r_ohm, p_watt].every(Number.isFinite)) return { error: "NGR-sizing math is not a finite value." };
+  return {
+    v_ln_v, r_ohm, p_watt, duty: d,
+    note: "Neutral grounding resistor sizing (IEEE 142). The resistor sees the LINE-TO-NEUTRAL voltage, V_LN = V_LL / sqrt(3), not the line-to-line -- sizing off V_LL makes the resistor sqrt(3) too large and the fault current too small to detect. R = V_LN / I_ground, and P = I_ground^2 x R (which equals V_LN x I_ground). A high-resistance ground (HRG) limits the fault to a few amps and lets the plant run through the first fault, and its resistor is rated for CONTINUOUS dissipation; a low-resistance ground (LRG) limits it to 100 to 400 A for fast coordinated tripping, and its resistor is rated only for the SHORT trip time. For an HRG the resistor current must exceed the system's total charging current to control transient overvoltage. A design aid, not the engineer of record; IEEE 142 and the protection scheme govern.",
+  };
+}
+export const neutralGroundingResistorExample = { inputs: { system_voltage_ll_v: 480, target_fault_a: 5, duty: "hrg" } };
+
+ELECDESIGN_RENDERERS["neutral-grounding-resistor"] = _simpleRenderer({
+  citation: "Citation: neutral grounding resistor sizing (IEEE 142 grounding practice): V_LN = V_LL / sqrt(3); R = V_LN / I_ground; P = I_ground^2 x R = V_LN x I_ground. The resistor sees line-to-neutral, not line-to-line. HRG limits to a few amps (continuous rating); LRG to 100-400 A (short-time rating). A design aid; IEEE 142 and the protection scheme govern.",
+  example: neutralGroundingResistorExample.inputs,
+  fields: [
+    { key: "system_voltage_ll_v", label: "System line-to-line voltage (V)", kind: "number", default: 480 },
+    { key: "target_fault_a", label: "Target ground-fault current (A)", kind: "number", default: 5 },
+    { key: "duty", label: "Grounding duty", kind: "select", default: "hrg", options: [
+      { value: "hrg", label: "High-resistance (HRG) - continuous rating" },
+      { value: "lrg", label: "Low-resistance (LRG) - short-time rating" },
+    ] },
+  ],
+  outputs: [
+    { key: "vln", id: "ngr-out-vln", label: "Voltage across the resistor (line-to-neutral)", value: (r) => fmt(r.v_ln_v, 1) + " V" },
+    { key: "r", id: "ngr-out-r", label: "Resistor value", value: (r) => fmt(r.r_ohm, 2) + " ohm" },
+    { key: "p", id: "ngr-out-p", label: "Power dissipation", value: (r) => fmt(r.p_watt, 0) + " W (" + (r.duty === "hrg" ? "continuous" : "short-time trip rating") + ")" },
+  ],
+  compute: computeNeutralGroundingResistor,
+});

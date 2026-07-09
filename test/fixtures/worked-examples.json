@@ -42501,6 +42501,68 @@
    }
   },
   {
+   "tile_id": "neutral-grounding-resistor",
+   "source_publisher": "neutral grounding resistor sizing (IEEE 142)",
+   "source_title": "480 V system, 5 A HRG target -> 277 V across the resistor, 55.4 ohm, 1,386 W continuous",
+   "source_edition_or_year": "spec-v525 worked example (machine-verified)",
+   "source_section_or_page": "spec-v525 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "system_voltage_ll_v": 480,
+    "target_fault_a": 5,
+    "duty": "hrg"
+   },
+   "outputs": {
+    "v_ln_v": {
+     "value": 277.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "r_ohm": {
+     "value": 55.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "p_watt": {
+     "value": 1386,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "neutral-grounding-resistor",
+   "source_publisher": "neutral grounding resistor sizing (IEEE 142)",
+   "source_title": "cross-check: a 480 V LRG at 200 A -> 1.39 ohm, 55.4 kW (short-time trip rating)",
+   "source_edition_or_year": "spec-v525 worked example (machine-verified)",
+   "source_section_or_page": "spec-v525 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "system_voltage_ll_v": 480,
+    "target_fault_a": 200,
+    "duty": "lrg"
+   },
+   "outputs": {
+    "r_ohm": {
+     "value": 1.386,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "p_watt": {
+     "value": 55426,
+     "tolerance": {
+      "abs": 50
+     }
+    }
+   }
+  },
+  {
    "tile_id": "masonry-wall-weight",
    "source_publisher": "NCMA TEK",
    "source_title": "8 in CMU, hollow 55 psf, grout adder 29, grouted 48 in o.c., 10 ft -> 59.8 psf, 598 lb/ft",

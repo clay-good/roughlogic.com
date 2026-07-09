@@ -1756,6 +1756,7 @@ cross-check.
 | calc-elecdesign.js | `computeLightingLightLossFactor` | `{ LLD = 0, LDD = 0, BF = 0, LBO = 0, RSDD = 0, other = 0, initial_lm = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeLightingUniformityRatio` | `{ readings = [], target_avgmin = 0, target_maxmin = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeLumenMethod` | `{ target_fc = 0, area_sqft = 0, lumens_per_lum = 0, cu = 0.7, llf = 0.8 } = {}` | _ | _ | _ |
+| calc-elecdesign.js | `computeNeutralGroundingResistor` | `{ system_voltage_ll_v = 0, target_fault_a = 0, duty = "hrg" } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computePointIlluminance` | `{ intensity_cd = 0, mount_height_ft = 0, angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computePullBoxSizing` | `{ pull_type = "straight", largest_raceway_in = 0, other_raceways_in = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeAmbientAmpacityAdjust` | `{ base_ampacity_a = 0, temp_column = 75, ambient_c = 30, conductor_count = 3,...` | _ | _ | _ |
@@ -2636,7 +2637,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1222.
+Row count: 1223.
 
 <!-- END function-corpus-v14 -->
 
@@ -2717,7 +2718,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (131 tiles)
+### Group A Electrical (132 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2799,6 +2800,7 @@ per spec-v14 §13.1 second paragraph.
 | `multi-motor-feeder` | Feeder for a Group of Motors (NEC 430.24 / 430.62) | NFPA; spec-v124 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `neutral-current-3ph` | Three-Phase Neutral Current | Phasor sum of three 120-degree-displa...; Ia=100, Ib=80, Ic=60 -> I_N = sqrt(1200) = 34.641 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `neutral-demand-220-61` | Feeder/Service Neutral Demand Load (NEC 220.61) | NEC 2023 (NFPA 70); 200 A at 100% + 50 A at 70% = 200 + 35 = 235 A | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `neutral-grounding-resistor` | Neutral Grounding Resistor Sizing (IEEE 142) | neutral grounding resistor sizing (IE...; spec-v525 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `noncoincident-load` | Noncoincident Loads: Larger of Heating vs A/C (NEC 220.60) | NEC 2023 (NFPA 70); heat 9,000 VA vs A/C 6,000 VA, not simultaneous -> count ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `off-grid-battery` | Off-Grid Battery Bank Sizing | IEEE; nameplate_Wh = daily_Wh * days / (DoD * efficiency); Ah =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ohms-law` | Ohm's Law | Project (first-principles); Ohm's law definition | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3800,6 +3802,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 978. Fixture-covered or reference-cadence: 978 / 978.
+Tile count: 979. Fixture-covered or reference-cadence: 979 / 979.
 
 <!-- END tile-index-v14 -->
