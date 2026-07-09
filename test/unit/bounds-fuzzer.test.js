@@ -16901,3 +16901,33 @@ test("bounds: spec-v486 computeTrailerTongueWeight pins the percent, the convent
   assert.ok("error" in _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 7000 }));
   assert.ok("error" in _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_rating_lb: -1 }));
 });
+
+// ===================== spec-v487 generator fuel runtime and backup duration (Group A) =====================
+import { computeGeneratorFuelRuntime as _v487 } from "../../calc-electrical.js";
+
+test("bounds: spec-v487 computeGeneratorFuelRuntime pins usable fuel, runtime, the target fuel/tank sizing, meets-target, and error seams", () => {
+  const r = _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 90, target_runtime_hr: 72 });
+  assert.ok(Math.abs(r.usable_gallons - 90) < 1e-9);
+  assert.ok(Math.abs(r.runtime_hr - 30) < 1e-9);
+  assert.ok(Math.abs(r.runtime_days - 1.25) < 1e-9);
+  assert.ok(Math.abs(r.fuel_for_target_gal - 216) < 1e-9);
+  assert.ok(Math.abs(r.tank_for_target_gal - 240) < 1e-9);
+  assert.strictEqual(r.meets_target, false); // 30 hr < 72 hr
+  // A 4x tank meets the 72-hour basis.
+  const r2 = _v487({ tank_capacity_gal: 400, consumption_gph: 3.0, usable_pct: 90, target_runtime_hr: 72 });
+  assert.ok(Math.abs(r2.runtime_hr - 120) < 1e-9 && Math.abs(r2.runtime_days - 5) < 1e-9);
+  assert.strictEqual(r2.meets_target, true);
+  // No target -> the target fields stay null.
+  const r3 = _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 90, target_runtime_hr: 0 });
+  assert.strictEqual(r3.fuel_for_target_gal, null);
+  assert.strictEqual(r3.meets_target, null);
+  // Usable fraction scales the runtime linearly.
+  assert.ok(Math.abs(_v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 100 }).runtime_hr - 100 / 3) < 1e-9);
+  // Error seams: non-finite, non-positive tank / consumption, out-of-range usable, negative target.
+  assert.ok("error" in _v487({ tank_capacity_gal: Infinity, consumption_gph: 3.0 }));
+  assert.ok("error" in _v487({ tank_capacity_gal: 0, consumption_gph: 3.0 }));
+  assert.ok("error" in _v487({ tank_capacity_gal: 100, consumption_gph: 0 }));
+  assert.ok("error" in _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 0 }));
+  assert.ok("error" in _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 150 }));
+  assert.ok("error" in _v487({ tank_capacity_gal: 100, consumption_gph: 3.0, target_runtime_hr: -1 }));
+});

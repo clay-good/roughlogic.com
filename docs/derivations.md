@@ -1772,6 +1772,7 @@ cross-check.
 | calc-electrical.js | `computeEconomicConductorSizing` | `{ current_a = 0, r_small_ohm = 0, r_big_ohm = 0, hours = 0, rate_kwh = 0, ups...` | _ | _ | _ |
 | calc-electrical.js | `computeEgcUpsizeProportional` | `{ base_egc_cmil = 0, base_phase_cmil = 0, installed_phase_cmil = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeGFCIReference` | `` | _ | _ | _ |
+| calc-electrical.js | `computeGeneratorFuelRuntime` | `{ tank_capacity_gal = 0, consumption_gph = 0, usable_pct = 90, target_runtime...` | _ | _ | _ |
 | calc-electrical.js | `computeGeneratorMotorStarting` | `{ motors = [], non_motor_kW = 0, dip_factor = 0.30, starts_per_hour = "occasi...` | _ | _ | _ |
 | calc-electrical.js | `computeGeneratorSize` | `{ items = [] }` | _ | _ | _ |
 | calc-electrical.js | `computeGroundingElectrodeConductor` | `{ service_kcmil = 0, material = "copper", electrode_type = "rod-pipe-plate" }...` | _ | _ | _ |
@@ -2598,7 +2599,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1184.
+Row count: 1185.
 
 <!-- END function-corpus-v14 -->
 
@@ -2679,7 +2680,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (115 tiles)
+### Group A Electrical (116 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2720,6 +2721,7 @@ per spec-v14 §13.1 second paragraph.
 | `ev-charger-load` | EV Charger Continuous Load and Panel Impact | NFPA; I_circuit = I_charger*1.25; new_load = existing + I_circuit | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `feeder-tap-rule` | Feeder Tap Conductor 10-ft / 25-ft Rule (NEC 240.21(B)) | NEC 2023 (NFPA 70); 400 A feeder, 22 ft tap -> 25-ft rule, min = 400/3 = 133.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fiber-loss-budget` | Fiber Optic Loss Budget | TIA-568 / TIA-526 / IEEE 802.3 (by name); 300 m OM4 @ 850 nm (3.0 dB/km, 2 connectors @ 0.75 dB) ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `generator-fuel-runtime` | Generator Fuel Runtime and Backup Duration | generator fuel runtime (first-princip...; spec-v487 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `generator-motor-starting` | Generator Sizing for Motor Starting | NEC 430.110 + manufacturer locked-rot...; 25 hp / 480 V / Code F single motor on 100 kVA generator ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `generator-sizing` | Generator Sizing | Project (first-principles); Refrigerator (700 / 2200) + Lights (400 / 400) + Sump pum... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gfci-afci-reference` | GFCI / AFCI Requirements Reference | NEC 2023 + project bundled GFCI/AFCI ...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3724,6 +3726,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 940. Fixture-covered or reference-cadence: 940 / 940.
+Tile count: 941. Fixture-covered or reference-cadence: 941 / 941.
 
 <!-- END tile-index-v14 -->

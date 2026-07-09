@@ -955,6 +955,18 @@ export const CITATIONS = {
       { name: "Code still governs", value: "NEC minimum ampacity, voltage drop, and fill govern the actual conductor", source: "scope of this tile" },
     ],
   },
+  "generator-fuel-runtime": {
+    formula: "usable = tank x usable%/100; runtime_hr = usable / consumption_gph; runtime_days = runtime_hr/24; for a target: fuel = consumption_gph x target_hr, tank_needed = fuel / (usable%/100).",
+    edition: "Generator fuel runtime from the fuel supply and consumption, first-principles; the genset manufacturer's published fuel-consumption curve governs the rate.",
+    freeAccess: "Runtime = usable fuel / consumption is first-principles arithmetic; the consumption rate is from the generator's published data plate / fuel curve.",
+    governance: GOVERNANCE.general,
+    editionNote: "A standby generator's runtime is the usable fuel divided by the consumption at the operating load: runtime = (tank x usable fraction) / gph. The usable fraction defaults to 90% because a tank is not drawn to the bottom (reserve, pickup height, and sediment). Enter the consumption from the genset data plate - a diesel set burns roughly 0.05-0.08 gal/hr per kW at load, but it climbs with load and differs by fuel, so read the published fuel curve rather than a rule of thumb. For a target backup duration (a 72-hour outage is a common design basis, e.g. NFPA 110 / healthcare and telecom), the tile returns the fuel and tank that duration needs and whether the current tank meets it. This is the liquid-fuel-tank case; a natural-gas set on a utility feed has no tank limit and propane meters differently. A planning aid; the genset's published fuel-consumption curve, the fuel quality, and the AHJ's on-site fuel-storage rules govern.",
+    assumptions: [
+      { name: "Runtime", value: "usable fuel / consumption; usable = tank x usable% (default 90%)", source: "first-principles" },
+      { name: "Consumption", value: "from the genset data plate / fuel curve (~0.05-0.08 gal/hr per kW at load for diesel)", source: "manufacturer fuel curve" },
+      { name: "Target sizing", value: "fuel = gph x target hours; tank = fuel / usable%; a 72-hour basis is common (NFPA 110)", source: "backup-power planning" },
+    ],
+  },
   "conduit-fill": {
     formula: "Conductor cross-sectional area sum / interior conduit area, compared to NEC Chapter 9 Table 1 fill limits (53% / 31% / 40% for 1, 2, ≥ 3 conductors).",
     edition: NEC_2023 + " Chapter 9 Tables 1, 4, 5.",

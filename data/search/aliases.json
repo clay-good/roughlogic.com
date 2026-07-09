@@ -18594,6 +18594,46 @@
       "kind": "industry"
     },
     {
+      "term": "generator runtime",
+      "target": "generator-fuel-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "generator fuel",
+      "target": "generator-fuel-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "fuel runtime",
+      "target": "generator-fuel-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "genset runtime",
+      "target": "generator-fuel-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "backup power runtime",
+      "target": "generator-fuel-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "standby generator fuel",
+      "target": "generator-fuel-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "backup duration",
+      "target": "generator-fuel-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "generator gph",
+      "target": "generator-fuel-runtime",
+      "kind": "adjacent"
+    },
+    {
       "term": "ada ramp slope",
       "target": "ada-ramp-slope",
       "kind": "industry"

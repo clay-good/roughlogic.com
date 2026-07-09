@@ -660,6 +660,8 @@ const _TILES = [
   ["bends-between-pulls", "A"], ["shock-approach-boundary", "A"],
   ["conduit-jam-ratio", "A"],
   ["motor-efficiency-upgrade-savings", "A"], ["transformer-loading-efficiency", "A"], ["economic-conductor-sizing", "A"],
+  // spec-v487 generator fuel runtime and backup duration (Group A)
+  ["generator-fuel-runtime", "A"],
   ["ada-ramp-slope", "E"],
   ["pool-bonding-680-26", "A"],
 ];

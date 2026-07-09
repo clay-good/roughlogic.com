@@ -1,6 +1,6 @@
 {
   "name": "roughlogic-mcp",
-  "version": "0.173.0",
+  "version": "0.174.0",
   "description": "Local MCP server exposing the roughlogic trades calculators (search / describe / run).",
   "type": "module",
   "license": "MIT",

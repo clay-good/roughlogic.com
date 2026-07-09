@@ -50,6 +50,8 @@ const TOOL_MODULES = (() => {
     "conduit-jam-ratio",
     // spec-v471..v473 energy-economics batch
     "motor-efficiency-upgrade-savings", "transformer-loading-efficiency", "economic-conductor-sizing",
+    // spec-v487 generator fuel runtime and backup duration
+    "generator-fuel-runtime",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

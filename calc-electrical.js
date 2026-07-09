@@ -4960,3 +4960,58 @@ function _v473renderEconomicConductorSizing(inputRegion, outputRegion, citationE
   for (const f of [I, rs, rb, hr, rate, cost]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["economic-conductor-sizing"] = _v473renderEconomicConductorSizing;
+
+// spec-v487: generator fuel runtime and backup duration. The fuel analog of
+// battery-runtime for a standby genset: runtime = usable fuel / consumption,
+// and the fuel/tank a target backup duration needs.
+// dims: in { tank_capacity_gal: L^3, consumption_gph: L^3 T^-1, usable_pct: dimensionless, target_runtime_hr: T } out: { usable_gallons: L^3, runtime_hr: T, runtime_days: T, fuel_for_target_gal: L^3, tank_for_target_gal: L^3 }
+export function computeGeneratorFuelRuntime({ tank_capacity_gal = 0, consumption_gph = 0, usable_pct = 90, target_runtime_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tank = Number(tank_capacity_gal) || 0;
+  const gph = Number(consumption_gph) || 0;
+  const usable = Number(usable_pct) || 0;
+  const target = Number(target_runtime_hr) || 0;
+  if (!(tank > 0)) return { error: "Tank capacity must be positive (gal)." };
+  if (!(gph > 0)) return { error: "Fuel consumption must be positive (gph)." };
+  if (!(usable > 0 && usable <= 100)) return { error: "Usable fraction must be between 0 and 100 percent." };
+  if (!(target >= 0)) return { error: "Target runtime must be zero or positive (hr)." };
+  const usable_gallons = tank * usable / 100;
+  const runtime_hr = usable_gallons / gph;
+  const runtime_days = runtime_hr / 24;
+  let fuel_for_target_gal = null, tank_for_target_gal = null, meets_target = null;
+  if (target > 0) {
+    fuel_for_target_gal = gph * target;
+    tank_for_target_gal = fuel_for_target_gal / (usable / 100);
+    meets_target = runtime_hr >= target;
+  }
+  if (![usable_gallons, runtime_hr, runtime_days].every(Number.isFinite)) return { error: "Runtime math is not a finite value." };
+  return {
+    usable_gallons, runtime_hr, runtime_days, fuel_for_target_gal, tank_for_target_gal, meets_target,
+    note: "Standby-generator fuel runtime = usable fuel / consumption, the fuel-supply companion to the battery-runtime tile. Enter the consumption at the operating load from the genset data plate (a diesel set burns roughly 0.05-0.08 gal/hr per kW at load, but read the actual spec - it climbs with load and differs by fuel). The usable fraction defaults to 90% because a tank is not drawn to the bottom (reserve, pickup height, and sediment). For a target backup duration (a 72-hour outage is a common design basis), the tile also returns the fuel and the tank size that duration needs, and whether the current tank meets it. Natural-gas and propane sets meter fuel differently (a utility gas feed has no tank limit); this is the liquid-fuel-tank case. A planning aid; the genset's published fuel curve, the fuel quality, and the AHJ's on-site fuel-storage rules govern.",
+  };
+}
+export const generatorFuelRuntimeExample = { inputs: { tank_capacity_gal: 100, consumption_gph: 3.0, usable_pct: 90, target_runtime_hr: 72 } };
+function _v487renderGeneratorFuelRuntime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: generator fuel runtime (first-principles): runtime = usable fuel / consumption; usable = tank x usable%. For a target duration, fuel = consumption x hours and the tank = fuel / usable%. Enter consumption from the genset data plate. A planning aid; the published fuel curve and the AHJ's fuel-storage rules govern.";
+  const tank = makeNumber("Fuel tank capacity (gal)", "gfr-tank", { step: "any", min: "0" }); tank.input.value = "100";
+  const gph = makeNumber("Fuel consumption at load (gph)", "gfr-gph", { step: "any", min: "0" }); gph.input.value = "3.0";
+  const usable = makeNumber("Usable tank fraction (%)", "gfr-usable", { step: "any", min: "0", max: "100" }); usable.input.value = "90";
+  const target = makeNumber("Target backup duration (hr, 0 to skip)", "gfr-target", { step: "any", min: "0" }); target.input.value = "72";
+  for (const f of [tank, gph, usable, target]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tank.input.value = "100"; gph.input.value = "3.0"; usable.input.value = "90"; target.input.value = "72"; update(); });
+  const oRun = makeOutputLine(outputRegion, "Runtime on a full tank", "gfr-out-run");
+  const oUsable = makeOutputLine(outputRegion, "Usable fuel", "gfr-out-usable");
+  const oTarget = makeOutputLine(outputRegion, "For the target duration", "gfr-out-target");
+  const oNote = makeOutputLine(outputRegion, "Note", "gfr-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGeneratorFuelRuntime({ tank_capacity_gal: readNum(tank.input), consumption_gph: readNum(gph.input), usable_pct: usable.input.value === "" ? 90 : readNum(usable.input), target_runtime_hr: readNum(target.input) });
+    if (r.error) { oRun.textContent = r.error; oUsable.textContent = "-"; oTarget.textContent = "-"; oNote.textContent = ""; return; }
+    oRun.textContent = fmt(r.runtime_hr, 1) + " hr (" + fmt(r.runtime_days, 2) + " days)";
+    oUsable.textContent = fmt(r.usable_gallons, 1) + " gal";
+    oTarget.textContent = r.fuel_for_target_gal === null ? "-" : fmt(r.fuel_for_target_gal, 0) + " gal, needs a " + fmt(r.tank_for_target_gal, 0) + " gal tank (" + (r.meets_target ? "current tank MEETS it" : "current tank does NOT meet it") + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tank, gph, usable, target]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["generator-fuel-runtime"] = _v487renderGeneratorFuelRuntime;

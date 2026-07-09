@@ -43810,6 +43810,76 @@
    }
   },
   {
+   "tile_id": "generator-fuel-runtime",
+   "source_publisher": "generator fuel runtime (first-principles)",
+   "source_title": "100 gal tank, 3.0 gph, 90% usable -> 30 hr (1.25 days); 72 hr needs 216 gal / 240 gal tank",
+   "source_edition_or_year": "spec-v487 worked example (machine-verified)",
+   "source_section_or_page": "spec-v487 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "tank_capacity_gal": 100,
+    "consumption_gph": 3.0,
+    "usable_pct": 90,
+    "target_runtime_hr": 72
+   },
+   "outputs": {
+    "usable_gallons": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "runtime_hr": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fuel_for_target_gal": {
+     "value": 216,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "tank_for_target_gal": {
+     "value": 240,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-fuel-runtime",
+   "source_publisher": "generator fuel runtime (first-principles)",
+   "source_title": "cross-check: a 400 gal tank at the same 3.0 gph, 90% usable -> 120 hr (5 days), meets 72 hr",
+   "source_edition_or_year": "spec-v487 worked example (machine-verified)",
+   "source_section_or_page": "spec-v487 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "tank_capacity_gal": 400,
+    "consumption_gph": 3.0,
+    "usable_pct": 90,
+    "target_runtime_hr": 72
+   },
+   "outputs": {
+    "runtime_hr": {
+     "value": 120,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "runtime_days": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ada-ramp-slope",
    "source_publisher": "IBC 1012 / ADA",
    "source_title": "24 in rise at 1:12 -> 288 in (24 ft) run, 8.33%, 1 run, handrails",

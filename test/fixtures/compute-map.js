@@ -1020,6 +1020,7 @@ export const COMPUTE_MAP = {
   "motor-efficiency-upgrade-savings": { module: "../../calc-electrical.js", fn: "computeMotorEfficiencyUpgradeSavings" },
   "transformer-loading-efficiency": { module: "../../calc-electrical.js", fn: "computeTransformerLoadingEfficiency" },
   "economic-conductor-sizing": { module: "../../calc-electrical.js", fn: "computeEconomicConductorSizing" },
+  "generator-fuel-runtime": { module: "../../calc-electrical.js", fn: "computeGeneratorFuelRuntime" },
   "ada-ramp-slope": { module: "../../calc-construction.js", fn: "computeAdaRampSlope" },
   "pool-bonding-680-26": { module: "../../calc-references.js", fn: "computePoolBonding68026" },
 };
