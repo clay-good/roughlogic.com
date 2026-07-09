@@ -753,6 +753,8 @@ const TOOL_MODULES = (() => {
     "crosswind-component",
     // spec-v502 displacement hull speed and speed/length ratio
     "hull-speed",
+    // spec-v505 anchor rode scope and swing radius
+    "anchor-rode-scope",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

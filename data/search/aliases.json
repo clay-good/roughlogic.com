@@ -18914,6 +18914,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "anchor scope",
+      "target": "anchor-rode-scope",
+      "kind": "industry"
+    },
+    {
+      "term": "rode length",
+      "target": "anchor-rode-scope",
+      "kind": "industry"
+    },
+    {
+      "term": "swing radius",
+      "target": "anchor-rode-scope",
+      "kind": "industry"
+    },
+    {
+      "term": "anchoring scope ratio",
+      "target": "anchor-rode-scope",
+      "kind": "adjacent"
+    },
+    {
+      "term": "7 to 1 scope",
+      "target": "anchor-rode-scope",
+      "kind": "adjacent"
+    },
+    {
+      "term": "all chain scope",
+      "target": "anchor-rode-scope",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ground tackle",
+      "target": "anchor-rode-scope",
+      "kind": "adjacent"
+    },
+    {
+      "term": "anchor rode",
+      "target": "anchor-rode-scope",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

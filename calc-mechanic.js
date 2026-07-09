@@ -1415,3 +1415,46 @@ MECHANIC_RENDERERS["hull-speed"] = _simpleRenderer({
   ],
   compute: computeHullSpeed,
 });
+
+// ===================== spec-v505: anchor rode scope and swing radius =====================
+
+// dims: in { water_depth_ft: L, bow_height_ft: L, scope_ratio: dimensionless, boat_loa_ft: L } out: { vertical_ft: L, rode_ft: L, actual_scope: dimensionless, swing_radius_ft: L }
+export function computeAnchorRodeScope({ water_depth_ft = 0, bow_height_ft = 0, scope_ratio = 7, boat_loa_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const depth = Number(water_depth_ft) || 0;
+  const bow = Number(bow_height_ft) || 0;
+  const scope = Number(scope_ratio) || 0;
+  const loa = Number(boat_loa_ft) || 0;
+  if (!(depth > 0)) return { error: "Water depth must be positive (ft)." };
+  if (bow < 0) return { error: "Bow-roller height cannot be negative (ft)." };
+  if (loa < 0) return { error: "Boat length cannot be negative (ft)." };
+  if (!(scope >= 1)) return { error: "Scope ratio must be at least 1." };
+  const vertical_ft = depth + bow;
+  const rode_ft = scope * vertical_ft;
+  const actual_scope = rode_ft / vertical_ft;
+  const swing_radius_ft = Math.sqrt(Math.max(0, rode_ft * rode_ft - vertical_ft * vertical_ft)) + loa;
+  if (![vertical_ft, rode_ft, actual_scope, swing_radius_ft].every(Number.isFinite)) return { error: "Anchor-scope math is not a finite value." };
+  return {
+    vertical_ft, rode_ft, actual_scope, swing_radius_ft,
+    note: "Anchor rode scope and swing radius: scope is the ratio of rode paid out to the VERTICAL rise from the seabed to the bow roller -- depth PLUS the bow-roller height, and figured at HIGH tide, not the instantaneous sounder depth. Skip the bow height and the rising tide and the real scope falls short, the anchor breaks out, and the boat drags. rode = scope x vertical, and the swing radius = sqrt(rode^2 - vertical^2) + boat length is the circle the boat sweeps around a set anchor, governing spacing to neighbors and hazards. An all-chain rode holds at a lower ratio (about 5:1 or even 3:1) while rope-and-chain wants 7:1. A planning aid, not a guarantee the anchor holds; local conditions, bottom type, and skipper judgment govern.",
+  };
+}
+export const anchorRodeScopeExample = { inputs: { water_depth_ft: 15, bow_height_ft: 3, scope_ratio: 7, boat_loa_ft: 30 } };
+
+MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
+  citation: "Citation: anchor rode scope and swing radius (seamanship convention -- Chapman Piloting, US Sailing, ABYC ground-tackle references): vertical = depth + bow height (at high tide); rode = scope x vertical; swing_radius = sqrt(rode^2 - vertical^2) + boat length. All-chain holds at a lower ratio (5:1 or 3:1); rope-and-chain wants 7:1. A planning aid; local conditions, bottom type, and skipper judgment govern.",
+  example: anchorRodeScopeExample.inputs,
+  fields: [
+    { key: "water_depth_ft", label: "Water depth at high tide (ft)", kind: "number", default: 15 },
+    { key: "bow_height_ft", label: "Bow-roller height above water (ft)", kind: "number", default: 3 },
+    { key: "scope_ratio", label: "Desired scope (7 rope+chain / 5 mixed / 3 all-chain)", kind: "number", default: 7 },
+    { key: "boat_loa_ft", label: "Boat length overall (ft, for swing radius)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "vt", id: "ars-out-vt", label: "True vertical (depth + bow height)", value: (r) => fmt(r.vertical_ft, 1) + " ft" },
+    { key: "rd", id: "ars-out-rd", label: "Rode to deploy", value: (r) => fmt(r.rode_ft, 0) + " ft (actual scope " + fmt(r.actual_scope, 1) + ":1)" },
+    { key: "sw", id: "ars-out-sw", label: "Swing radius", value: (r) => fmt(r.swing_radius_ft, 1) + " ft" },
+    { key: "n", id: "ars-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAnchorRodeScope,
+});

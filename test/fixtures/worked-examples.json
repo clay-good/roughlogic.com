@@ -44352,6 +44352,70 @@
    }
   },
   {
+   "tile_id": "anchor-rode-scope",
+   "source_publisher": "anchor rode scope and swing radius (seamanship convention)",
+   "source_title": "15 ft water, 3 ft bow roller, 7:1 scope, 30 ft boat -> 18 ft vertical, 126 ft rode, 154.7 ft swing",
+   "source_edition_or_year": "spec-v505 worked example (machine-verified)",
+   "source_section_or_page": "spec-v505 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "water_depth_ft": 15,
+    "bow_height_ft": 3,
+    "scope_ratio": 7,
+    "boat_loa_ft": 30
+   },
+   "outputs": {
+    "vertical_ft": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "rode_ft": {
+     "value": 126,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "swing_radius_ft": {
+     "value": 154.7,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "anchor-rode-scope",
+   "source_publisher": "anchor rode scope and swing radius (seamanship convention)",
+   "source_title": "cross-check: all-chain 3:1 on the same water -> 54 ft rode, 80.9 ft swing (a tighter circle)",
+   "source_edition_or_year": "spec-v505 worked example (machine-verified)",
+   "source_section_or_page": "spec-v505 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "water_depth_ft": 15,
+    "bow_height_ft": 3,
+    "scope_ratio": 3,
+    "boat_loa_ft": 30
+   },
+   "outputs": {
+    "rode_ft": {
+     "value": 54,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "swing_radius_ft": {
+     "value": 80.9,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

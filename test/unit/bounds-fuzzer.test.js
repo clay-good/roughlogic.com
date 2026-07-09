@@ -17335,3 +17335,24 @@ test("bounds: spec-v504 computeBearingL10Life pins the cube law, the ball/roller
   assert.ok("error" in _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 0 }));
   assert.ok("error" in _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "needle" }));
 });
+
+import { computeAnchorRodeScope as _v505 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v505 computeAnchorRodeScope pins the bow-height vertical, the rode, the swing radius, and error seams", () => {
+  const r = _v505({ water_depth_ft: 15, bow_height_ft: 3, scope_ratio: 7, boat_loa_ft: 30 });
+  assert.ok(Math.abs(r.vertical_ft - 18) < 1e-9); // depth + bow height, NOT depth alone
+  assert.ok(Math.abs(r.rode_ft - 126) < 1e-9);
+  assert.ok(Math.abs(r.actual_scope - 7) < 1e-9);
+  assert.ok(Math.abs(r.swing_radius_ft - 154.708) < 0.01);
+  // All-chain at a lower ratio gives less rode and a tighter swing circle.
+  const chain = _v505({ water_depth_ft: 15, bow_height_ft: 3, scope_ratio: 3, boat_loa_ft: 30 });
+  assert.ok(chain.rode_ft < r.rode_ft && chain.swing_radius_ft < r.swing_radius_ft && Math.abs(chain.swing_radius_ft - 80.912) < 0.01);
+  // Ignoring the bow height understates the vertical and the rode.
+  assert.ok(_v505({ water_depth_ft: 15, bow_height_ft: 0, scope_ratio: 7, boat_loa_ft: 30 }).rode_ft < r.rode_ft);
+  // Error seams: non-finite, non-positive depth, negative bow/boat, scope below 1.
+  assert.ok("error" in _v505({ water_depth_ft: Infinity, scope_ratio: 7 }));
+  assert.ok("error" in _v505({ water_depth_ft: 0, scope_ratio: 7 }));
+  assert.ok("error" in _v505({ water_depth_ft: 15, bow_height_ft: -1, scope_ratio: 7 }));
+  assert.ok("error" in _v505({ water_depth_ft: 15, scope_ratio: 7, boat_loa_ft: -1 }));
+  assert.ok("error" in _v505({ water_depth_ft: 15, scope_ratio: 0.5 }));
+});

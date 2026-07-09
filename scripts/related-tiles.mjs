@@ -883,6 +883,7 @@ const RELATED = {
   "density-altitude": ["air-density-correction","prop-pitch-selection","engine-fuel-burn-gph"],
   "crosswind-component": ["density-altitude","prop-pitch-selection","wind-chill"],
   "hull-speed": ["prop-slip","prop-pitch-selection","fuel-range"],
+  "anchor-rode-scope": ["hull-speed","prop-slip","wire-rope-strength"],
   "cutting-fluid-concentration": ["cutting-speed-rpm","dilution","paint-mix-ratio"],
   "pull-box-sizing": ["box-fill","conduit-fill","cable-tray-fill"],
   "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],

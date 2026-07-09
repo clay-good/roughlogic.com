@@ -7676,6 +7676,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "anchor-rode-scope": {
+    formula: "vertical = depth + bow_height (at high tide); rode = scope x vertical; actual_scope = rode / vertical; swing_radius = sqrt(rode^2 - vertical^2) + boat_length.",
+    edition: "Anchor rode scope and swing-radius relations (seamanship convention -- Chapman Piloting, US Sailing, ABYC ground-tackle references), by name; local conditions, bottom type, and skipper judgment govern.",
+    freeAccess: "The scope and swing-radius relations are standard seamanship geometry; the depth, tide, and ground-tackle choice come from the chart and the vessel.",
+    governance: GOVERNANCE.general,
+    editionNote: "Anchor rode scope and swing radius. Scope is measured from the seabed to the bow roller (depth plus bow height) at HIGH tide, not the instantaneous sounder depth: rode = scope x vertical and swing_radius = sqrt(rode^2 - vertical^2) + boat length. An all-chain rode holds at a lower ratio (about 5:1 or even 3:1) while rope-and-chain wants 7:1. The swing radius assumes the boat pivots on a set anchor and governs the spacing to neighbors and hazards. A planning aid, not a guarantee the anchor holds; local conditions, bottom type, and skipper judgment govern.",
+    assumptions: [
+      { name: "True vertical", value: "scope uses depth + bow-roller height at high tide, not the sounder depth", source: "seamanship convention" },
+      { name: "Ground tackle", value: "all-chain holds at ~5:1 or 3:1; rope-and-chain wants 7:1", source: "Chapman Piloting / US Sailing" },
+      { name: "Swing radius", value: "assumes the boat pivots on a set anchor; governs spacing to neighbors", source: "geometry" },
+    ],
+  },
   "hull-speed": {
     formula: "hull_speed_kn = 1.34 x sqrt(LWL_ft); SL_ratio = actual_speed / sqrt(LWL_ft); regime = SL <= 1.34 displacement / 1.34-2.5 semi-displacement / > 2.5 planing.",
     edition: "Displacement hull-speed relation (Froude speed-length theory), the 1.34 x sqrt(LWL) ceiling, by name; the actual hull form, displacement, and power govern.",

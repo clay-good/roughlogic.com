@@ -523,6 +523,8 @@ const _TILES = [
   ["crosswind-component", "K"],
   // spec-v502 displacement hull speed and speed/length ratio
   ["hull-speed", "K"],
+  // spec-v505 anchor rode scope and swing radius
+  ["anchor-rode-scope", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],
