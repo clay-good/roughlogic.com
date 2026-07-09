@@ -545,6 +545,8 @@ const _TILES = [
   ["brake-pedal-hydraulic", "K"],
   // spec-v515 SAE J1349 dyno correction factor
   ["dyno-correction-sae", "K"],
+  // spec-v516 aircraft weight and balance (CG envelope)
+  ["aircraft-weight-balance", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

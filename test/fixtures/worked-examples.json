@@ -45000,6 +45000,82 @@
    }
   },
   {
+   "tile_id": "aircraft-weight-balance",
+   "source_publisher": "station-moment weight and balance (FAA-H-8083-1)",
+   "source_title": "empty 1500@39, front 340@37, fuel 180@48, baggage 200@95, env 35-47, MGW 2300 -> 2,220 lb, CG 44.47 in, legal",
+   "source_edition_or_year": "spec-v516 worked example (machine-verified)",
+   "source_section_or_page": "spec-v516 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "empty_weight_lb": 1500,
+    "empty_arm_in": 39,
+    "front_weight_lb": 340,
+    "front_arm_in": 37,
+    "rear_weight_lb": 0,
+    "rear_arm_in": 71,
+    "fuel_weight_lb": 180,
+    "fuel_arm_in": 48,
+    "baggage_weight_lb": 200,
+    "baggage_arm_in": 95,
+    "max_gross_lb": 2300,
+    "fwd_cg_limit_in": 35,
+    "aft_cg_limit_in": 47
+   },
+   "outputs": {
+    "total_weight_lb": {
+     "value": 2220,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cg_in": {
+     "value": 44.47,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aircraft-weight-balance",
+   "source_publisher": "station-moment weight and balance (FAA-H-8083-1)",
+   "source_title": "cross-check: under gross but out of CG -- 2,100 lb yet CG 47.24 in, behind the 47 in aft limit",
+   "source_edition_or_year": "spec-v516 worked example (machine-verified)",
+   "source_section_or_page": "spec-v516 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "empty_weight_lb": 1500,
+    "empty_arm_in": 39,
+    "front_weight_lb": 200,
+    "front_arm_in": 37,
+    "rear_weight_lb": 0,
+    "rear_arm_in": 71,
+    "fuel_weight_lb": 100,
+    "fuel_arm_in": 48,
+    "baggage_weight_lb": 300,
+    "baggage_arm_in": 95,
+    "max_gross_lb": 2300,
+    "fwd_cg_limit_in": 35,
+    "aft_cg_limit_in": 47
+   },
+   "outputs": {
+    "total_weight_lb": {
+     "value": 2100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cg_in": {
+     "value": 47.24,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

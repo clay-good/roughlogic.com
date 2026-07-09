@@ -2131,6 +2131,7 @@ cross-check.
 | calc-masonry.js | `computeMasonryAnchorBolt` | `{ fm_psi = 1500, lbe_in = 0, ab_in2 = 0, fy_psi = 36000 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryLintelLoading` | `{ span_ft = 0, wall_psf = 0, wall_h_above = 0 } = {}` | _ | _ | _ |
 | calc-masonry.js | `computeMasonryWallWeight` | `{ hollow_psf = 0, grout_adder = 0, cell_spacing = 8, grout_spacing = 0, heigh...` | _ | _ | _ |
+| calc-mechanic.js | `computeAircraftWeightBalance` | `{ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeAlternatorChargingLoad` | `{ total_load_a = 0, alternator_a = 0, idle_frac = 0.5, cruise_frac = 0.9 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeAnchorRodeScope` | `{ water_depth_ft = 0, bow_height_ft = 0, scope_ratio = 7, boat_loa_ft = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
@@ -2627,7 +2628,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1213.
+Row count: 1214.
 
 <!-- END function-corpus-v14 -->
 
@@ -3456,10 +3457,11 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (50 tiles)
+### Group K Mechanic (51 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `aircraft-weight-balance` | Aircraft Weight and Balance (CG Envelope) | station-moment weight and balance (FA...; spec-v516 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `alternator-charging-load` | Alternator Charging Load Balance | automotive-electrical practice; spec-v464 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `anchor-rode-scope` | Anchor Rode Scope and Swing Radius | anchor rode scope and swing radius (s...; spec-v505 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ballnose-scallop-height` | Ballnose Milling Scallop Height from Stepover | Ballnose scallop geometry; spec-v319 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3782,6 +3784,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 969. Fixture-covered or reference-cadence: 969 / 969.
+Tile count: 970. Fixture-covered or reference-cadence: 970 / 970.
 
 <!-- END tile-index-v14 -->

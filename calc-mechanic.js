@@ -1682,3 +1682,64 @@ MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
   ],
   compute: computeDynoCorrectionSae,
 });
+
+// ===================== spec-v516: aircraft weight and balance (CG envelope) =====================
+
+// dims: in { empty_weight_lb: M L T^-2, empty_arm_in: L, front_weight_lb: M L T^-2, front_arm_in: L, rear_weight_lb: M L T^-2, rear_arm_in: L, fuel_weight_lb: M L T^-2, fuel_arm_in: L, baggage_weight_lb: M L T^-2, baggage_arm_in: L, max_gross_lb: M L T^-2, fwd_cg_limit_in: L, aft_cg_limit_in: L } out: { total_weight_lb: M L T^-2, total_moment_inlb: M L^2 T^-2, cg_in: L, in_envelope: dimensionless }
+export function computeAircraftWeightBalance({ empty_weight_lb = 0, empty_arm_in = 0, front_weight_lb = 0, front_arm_in = 0, rear_weight_lb = 0, rear_arm_in = 0, fuel_weight_lb = 0, fuel_arm_in = 0, baggage_weight_lb = 0, baggage_arm_in = 0, max_gross_lb = 0, fwd_cg_limit_in = 0, aft_cg_limit_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ew = Number(empty_weight_lb) || 0;
+  const mgw = Number(max_gross_lb) || 0;
+  const fwd = Number(fwd_cg_limit_in) || 0;
+  const aft = Number(aft_cg_limit_in) || 0;
+  const stations = [
+    [ew, Number(empty_arm_in) || 0],
+    [Number(front_weight_lb) || 0, Number(front_arm_in) || 0],
+    [Number(rear_weight_lb) || 0, Number(rear_arm_in) || 0],
+    [Number(fuel_weight_lb) || 0, Number(fuel_arm_in) || 0],
+    [Number(baggage_weight_lb) || 0, Number(baggage_arm_in) || 0],
+  ];
+  if (!(ew > 0)) return { error: "Empty weight must be positive (lb)." };
+  if (!(mgw > 0)) return { error: "Maximum gross weight must be positive (lb)." };
+  if (!(fwd < aft)) return { error: "Forward CG limit must be below the aft CG limit (in)." };
+  for (const [w] of stations) if (w < 0) return { error: "Station weights cannot be negative (lb)." };
+  let total_weight_lb = 0, total_moment_inlb = 0;
+  for (const [w, arm] of stations) { total_weight_lb += w; total_moment_inlb += w * arm; }
+  const cg_in = total_moment_inlb / total_weight_lb;
+  const over_gross = total_weight_lb > mgw;
+  const cg_out = cg_in < fwd || cg_in > aft;
+  const in_envelope = !over_gross && !cg_out;
+  if (![total_weight_lb, total_moment_inlb, cg_in].every(Number.isFinite)) return { error: "Weight-and-balance math is not a finite value." };
+  return {
+    total_weight_lb, total_moment_inlb, cg_in, in_envelope, over_gross, cg_out,
+    note: "Station-moment weight and balance: total_weight = sum(w), total_moment = sum(w x arm), CG = total_moment / total_weight, and the load is legal only if weight <= max gross AND fwd_limit <= CG <= aft_limit. A load WITHIN gross weight can still be OUT of CG -- pile baggage aft and the airplane weighs less than its maximum while its CG slides behind the aft limit, dangerously unstable in pitch. This is the trap W&B exists to catch. Fuel burn moves the CG in flight, so a load in the envelope at takeoff can drift out by landing -- both the takeoff and the zero-fuel/landing CG must fall in the envelope. Arms are measured from the aircraft datum. A loading aid, not an airworthiness determination; the specific aircraft flight manual and the pilot in command govern.",
+  };
+}
+export const aircraftWeightBalanceExample = { inputs: { empty_weight_lb: 1500, empty_arm_in: 39, front_weight_lb: 340, front_arm_in: 37, rear_weight_lb: 0, rear_arm_in: 71, fuel_weight_lb: 180, fuel_arm_in: 48, baggage_weight_lb: 200, baggage_arm_in: 95, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 } };
+
+MECHANIC_RENDERERS["aircraft-weight-balance"] = _simpleRenderer({
+  citation: "Citation: station-moment weight and balance (FAA Weight & Balance Handbook FAA-H-8083-1; AC 91-23): total_weight = sum(w), total_moment = sum(w x arm), CG = moment / weight; legal only if weight <= max gross AND fwd_limit <= CG <= aft_limit. A load within gross can still be out of CG; fuel burn moves the CG, so both ends must be checked. A loading aid; the aircraft flight manual and the pilot in command govern.",
+  example: aircraftWeightBalanceExample.inputs,
+  fields: [
+    { key: "empty_weight_lb", label: "Empty weight (lb)", kind: "number", default: 1500 },
+    { key: "empty_arm_in", label: "Empty-weight arm (in from datum)", kind: "number", default: 39 },
+    { key: "front_weight_lb", label: "Front seats weight (lb)", kind: "number", default: 340 },
+    { key: "front_arm_in", label: "Front seats arm (in)", kind: "number", default: 37 },
+    { key: "rear_weight_lb", label: "Rear seats weight (lb)", kind: "number", default: 0 },
+    { key: "rear_arm_in", label: "Rear seats arm (in)", kind: "number", default: 71 },
+    { key: "fuel_weight_lb", label: "Fuel weight (lb)", kind: "number", default: 180 },
+    { key: "fuel_arm_in", label: "Fuel arm (in)", kind: "number", default: 48 },
+    { key: "baggage_weight_lb", label: "Baggage weight (lb)", kind: "number", default: 200 },
+    { key: "baggage_arm_in", label: "Baggage arm (in)", kind: "number", default: 95 },
+    { key: "max_gross_lb", label: "Maximum gross weight (lb)", kind: "number", default: 2300 },
+    { key: "fwd_cg_limit_in", label: "Forward CG limit (in)", kind: "number", default: 35 },
+    { key: "aft_cg_limit_in", label: "Aft CG limit (in)", kind: "number", default: 47 },
+  ],
+  outputs: [
+    { key: "tw", id: "awb-out-tw", label: "Total weight", value: (r) => fmt(r.total_weight_lb, 0) + " lb" + (r.over_gross ? " -- OVER max gross" : "") },
+    { key: "cg", id: "awb-out-cg", label: "Center of gravity", value: (r) => fmt(r.cg_in, 2) + " in" + (r.cg_out ? " -- OUTSIDE the CG envelope" : "") },
+    { key: "v", id: "awb-out-v", label: "In envelope?", value: (r) => r.in_envelope ? "YES (within weight and CG)" : (r.over_gross && r.cg_out ? "NO -- over gross AND out of CG" : r.over_gross ? "NO -- over max gross" : "NO -- out of CG (under gross but CG outside limits)") },
+    { key: "n", id: "awb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAircraftWeightBalance,
+});

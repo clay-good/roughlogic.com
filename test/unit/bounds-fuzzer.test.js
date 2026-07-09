@@ -17568,3 +17568,25 @@ test("bounds: spec-v515 computeDynoCorrectionSae pins the CF, the dry-pressure s
   assert.ok("error" in _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: -300 }));
   assert.ok("error" in _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 120 }));
 });
+
+import { computeAircraftWeightBalance as _v516 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v516 computeAircraftWeightBalance pins the moment sum, the CG, the in-gross-out-of-CG case, and error seams", () => {
+  const r = _v516({ empty_weight_lb: 1500, empty_arm_in: 39, front_weight_lb: 340, front_arm_in: 37, fuel_weight_lb: 180, fuel_arm_in: 48, baggage_weight_lb: 200, baggage_arm_in: 95, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 });
+  assert.ok(Math.abs(r.total_weight_lb - 2220) < 1e-9);
+  assert.ok(Math.abs(r.total_moment_inlb - 98720) < 1e-6);
+  assert.ok(Math.abs(r.cg_in - 44.468) < 0.01);
+  assert.ok(r.in_envelope === true && r.over_gross === false && r.cg_out === false);
+  // The trap: under gross weight but out of CG (aft baggage) is flagged out of envelope.
+  const aft = _v516({ empty_weight_lb: 1500, empty_arm_in: 39, front_weight_lb: 200, front_arm_in: 37, fuel_weight_lb: 100, fuel_arm_in: 48, baggage_weight_lb: 300, baggage_arm_in: 95, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 });
+  assert.ok(aft.total_weight_lb < 2300 && aft.over_gross === false && aft.cg_out === true && aft.in_envelope === false);
+  assert.ok(Math.abs(aft.cg_in - 47.238) < 0.01);
+  // Over max gross alone also fails the envelope.
+  assert.ok(_v516({ empty_weight_lb: 2200, empty_arm_in: 40, baggage_weight_lb: 300, baggage_arm_in: 40, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }).over_gross === true);
+  // Error seams: non-finite, non-positive empty weight / MGW, negative station weight, fwd limit not below aft.
+  assert.ok("error" in _v516({ empty_weight_lb: Infinity, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
+  assert.ok("error" in _v516({ empty_weight_lb: 0, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
+  assert.ok("error" in _v516({ empty_weight_lb: 1500, max_gross_lb: 0, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
+  assert.ok("error" in _v516({ empty_weight_lb: 1500, baggage_weight_lb: -10, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
+  assert.ok("error" in _v516({ empty_weight_lb: 1500, max_gross_lb: 2300, fwd_cg_limit_in: 47, aft_cg_limit_in: 35 }));
+});

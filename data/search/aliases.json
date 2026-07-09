@@ -19354,6 +19354,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "weight and balance",
+      "target": "aircraft-weight-balance",
+      "kind": "industry"
+    },
+    {
+      "term": "aircraft cg",
+      "target": "aircraft-weight-balance",
+      "kind": "industry"
+    },
+    {
+      "term": "cg envelope",
+      "target": "aircraft-weight-balance",
+      "kind": "industry"
+    },
+    {
+      "term": "station moment",
+      "target": "aircraft-weight-balance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "loading chart",
+      "target": "aircraft-weight-balance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aft cg limit",
+      "target": "aircraft-weight-balance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "moment arm aircraft",
+      "target": "aircraft-weight-balance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "w&b calculator",
+      "target": "aircraft-weight-balance",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

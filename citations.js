@@ -7736,6 +7736,18 @@ export const CITATIONS = {
       { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
     ],
   },
+  "aircraft-weight-balance": {
+    formula: "total_weight = sum(w); total_moment = sum(w x arm); CG = total_moment / total_weight; in_envelope = weight <= max_gross AND fwd_limit <= CG <= aft_limit.",
+    edition: "The station-moment weight-and-balance check of the FAA Weight & Balance Handbook (FAA-H-8083-1; AC 91-23), by name; the specific aircraft flight manual and the pilot in command govern.",
+    freeAccess: "The station-moment weight-and-balance method is published in the FAA Weight & Balance Handbook; the station weights, arms, and CG limits come from the aircraft's loading data.",
+    governance: GOVERNANCE.general,
+    editionNote: "Station-moment weight-and-balance check. total_weight = sum of the station weights, total_moment = sum of (weight x arm), CG = total_moment / total_weight, and the load is legal only if weight <= max gross AND fwd_limit <= CG <= aft_limit. A load within gross weight can still be out of CG: aft baggage slides the CG behind the aft limit and makes the airplane unstable in pitch. Fuel burn moves the CG in flight, so both the takeoff and the zero-fuel/landing CG must fall in the envelope. The arms are measured from the aircraft datum. A loading aid, not an airworthiness determination; the specific aircraft flight manual and the pilot in command govern.",
+    assumptions: [
+      { name: "Weight and CG both", value: "a load can be within gross weight and still out of CG; both must pass", source: "FAA-H-8083-1" },
+      { name: "Fuel burn", value: "fuel burn moves the CG, so both the takeoff and the zero-fuel CG must be in the envelope", source: "FAA-H-8083-1" },
+      { name: "Datum", value: "arms are measured from the aircraft datum per the flight manual", source: "AC 91-23" },
+    ],
+  },
   "dyno-correction-sae": {
     formula: "vapor = es(temp) x RH/100; P_dry = baro - vapor; CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18; corrected = observed x CF.",
     edition: "The SAE J1349 engine power correction factor (STD per SAE J607), correcting observed power to a standard dry day, by name; the dyno, correction basis, and test procedure govern.",
