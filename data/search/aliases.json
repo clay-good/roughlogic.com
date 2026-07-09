@@ -18279,6 +18279,46 @@
       "kind": "industry"
     },
     {
+      "term": "crowfoot",
+      "target": "torque-adapter-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "crow foot",
+      "target": "torque-adapter-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "crows foot",
+      "target": "torque-adapter-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "torque adapter",
+      "target": "torque-adapter-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "torque wrench extension",
+      "target": "torque-adapter-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "wrench setting",
+      "target": "torque-adapter-correction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "torque correction",
+      "target": "torque-adapter-correction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "swivel adapter",
+      "target": "torque-adapter-correction",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

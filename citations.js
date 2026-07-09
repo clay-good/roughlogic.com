@@ -7540,6 +7540,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "torque-adapter-correction": {
+    formula: "E_eff = adapter_length x cos(adapter_angle); TW = target x wrench_length / (wrench_length + E_eff); actual_if_uncorrected = target x (wrench_length + E_eff) / wrench_length; correction_pct = (TW - target) / target x 100.",
+    edition: "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B torque-wrench extension relation) by name; first-principles lever statics.",
+    freeAccess: "The torque-adapter relation TW = TA x L / (L + E) is a public result; FAA AC 43.13.1B is free at faa.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "With a crowfoot or in-line extension on a torque wrench, dial the wrench to TW = TA x L / (L + E cos(angle)), where TA is the torque wanted at the fastener, L is the wrench lever length (drive/ratchet center to the center of the hand grip), E is the adapter length, and the angle is the adapter's offset from the wrench axis. An in-line adapter (0 degrees) lengthens the lever, so setting the wrench to the target over-torques the fastener by the (L + E)/L ratio - a 3 in crowfoot on an 18 in wrench applies about 17% more than the dial reads. Mounting the crowfoot at 90 degrees to the handle makes cos(angle) = 0, so the adapter adds no effective length and no correction is needed (the standard field workaround). Measure L to where the hand actually pulls; the relation assumes the extension lies in the plane of the swing. A shop aid; the calibrated wrench and the manufacturer's fastener torque spec govern.",
+    assumptions: [
+      { name: "Effective lever", value: "TW = TA x L / (L + E cos(angle)); an in-line adapter lengthens the lever and lowers the setting", source: "lever statics" },
+      { name: "90-degree adapter", value: "a crowfoot square to the handle adds no effective length (cos 90 = 0) and needs no correction", source: "torque-adapter practice" },
+      { name: "Calibration governs", value: "the calibrated wrench and the manufacturer's fastener torque spec govern", source: "scope of this tile" },
+    ],
+  },
   "cutting-fluid-concentration": {
     formula: "Concentration % = Brix x refractometer factor; add concentrate = sump x (target - current) / (100 - target); add water = sump x (current - target) / target.",
     edition: "Metalworking-fluid refractometer method (by name).",

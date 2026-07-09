@@ -814,6 +814,7 @@ export const COMPUTE_MAP = {
   "prop-pitch-selection": { module: "../../calc-mechanic.js", fn: "computePropPitchSelection" },
   "engine-fuel-burn-gph": { module: "../../calc-mechanic.js", fn: "computeEngineFuelBurnGph" },
   "alternator-charging-load": { module: "../../calc-mechanic.js", fn: "computeAlternatorChargingLoad" },
+  "torque-adapter-correction": { module: "../../calc-mechanic.js", fn: "computeTorqueAdapterCorrection" },
   "cutting-fluid-concentration": { module: "../../calc-machining.js", fn: "computeCuttingFluidConcentration" },
   "pull-box-sizing": { module: "../../calc-elecdesign.js", fn: "computePullBoxSizing" },
   "lumen-method": { module: "../../calc-elecdesign.js", fn: "computeLumenMethod" },

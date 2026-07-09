@@ -713,6 +713,8 @@ const TOOL_MODULES = (() => {
     "hydraulic-pump-horsepower", "hydraulic-motor-torque-speed", "cooling-system-flow",
     // spec-v462..v464 marine/engine/electrical mechanic trio
     "prop-pitch-selection", "engine-fuel-burn-gph", "alternator-charging-load",
+    // spec-v485 torque wrench extension / crowfoot correction
+    "torque-adapter-correction",
     // spec-v323..v325 engine-build performance batch
     "injector-size", "mean-piston-speed", "trap-speed-horsepower",
   ]);

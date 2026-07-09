@@ -43312,6 +43312,70 @@
    }
   },
   {
+   "tile_id": "torque-adapter-correction",
+   "source_publisher": "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B)",
+   "source_title": "100 ft-lb target, 18 in wrench, 3 in in-line crowfoot -> dial 85.7 ft-lb; uncorrected 116.7 (17% over)",
+   "source_edition_or_year": "spec-v485 worked example (machine-verified)",
+   "source_section_or_page": "spec-v485 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "target_torque_ftlb": 100,
+    "wrench_length_in": 18,
+    "adapter_length_in": 3,
+    "adapter_angle_deg": 0
+   },
+   "outputs": {
+    "wrench_setting_ftlb": {
+     "value": 85.714,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "uncorrected_actual_ftlb": {
+     "value": 116.667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "effective_extension_in": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "torque-adapter-correction",
+   "source_publisher": "Standard torque-adapter correction (Snap-on / FAA AC 43.13.1B)",
+   "source_title": "cross-check: swing the 3 in crowfoot to 90 deg -> no correction, dial 100 ft-lb",
+   "source_edition_or_year": "spec-v485 worked example (machine-verified)",
+   "source_section_or_page": "spec-v485 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "target_torque_ftlb": 100,
+    "wrench_length_in": 18,
+    "adapter_length_in": 3,
+    "adapter_angle_deg": 90
+   },
+   "outputs": {
+    "wrench_setting_ftlb": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "effective_extension_in": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

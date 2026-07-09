@@ -873,6 +873,7 @@ const RELATED = {
   "prop-pitch-selection": ["prop-slip","displacement-cr","hp-from-torque","engine-fuel-burn-gph"],
   "engine-fuel-burn-gph": ["fuel-range","injector-size","hp-from-torque","volumetric-efficiency"],
   "alternator-charging-load": ["battery-runtime","fuel-range","hp-from-torque","service-load"],
+  "torque-adapter-correction": ["bolt-torque","flange-bolt-torque","bolt-stretch"],
   "cutting-fluid-concentration": ["cutting-speed-rpm","dilution","paint-mix-ratio"],
   "pull-box-sizing": ["box-fill","conduit-fill","cable-tray-fill"],
   "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],

@@ -1245,3 +1245,47 @@ MECHANIC_RENDERERS["alternator-charging-load"] = _simpleRenderer({
   ],
   compute: computeAlternatorChargingLoad,
 });
+
+// spec-v485: torque-wrench extension / crowfoot correction. A crowfoot or
+// in-line extension changes the effective lever, so the wrench setting differs
+// from the torque at the fastener: TW = TA x L / (L + E cos(angle)).
+// dims: in { target_torque_ftlb: M L^2 T^-2, wrench_length_in: L, adapter_length_in: L, adapter_angle_deg: dimensionless } out: { effective_extension_in: L, wrench_setting_ftlb: M L^2 T^-2, uncorrected_actual_ftlb: M L^2 T^-2, correction_pct: dimensionless }
+export function computeTorqueAdapterCorrection({ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapter_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(target_torque_ftlb) || 0;
+  const L = Number(wrench_length_in) || 0;
+  const E = Number(adapter_length_in) || 0;
+  const ang = Number(adapter_angle_deg) || 0;
+  if (!(T > 0)) return { error: "Target torque must be positive (ft-lb)." };
+  if (!(L > 0)) return { error: "Wrench length must be positive (in)." };
+  if (!(E >= 0)) return { error: "Adapter length must be zero or positive (in)." };
+  const effective_extension_in = E * Math.cos(ang * Math.PI / 180);
+  const denom = L + effective_extension_in;
+  if (!(denom > 0)) return { error: "The adapter geometry drives the effective lever to zero or less; check the length and angle." };
+  const wrench_setting_ftlb = T * L / denom;
+  const uncorrected_actual_ftlb = T * denom / L;
+  const correction_pct = (wrench_setting_ftlb - T) / T * 100;
+  if (![effective_extension_in, wrench_setting_ftlb, uncorrected_actual_ftlb, correction_pct].every(Number.isFinite)) return { error: "Torque-correction math is not a finite value." };
+  return {
+    effective_extension_in, wrench_setting_ftlb, uncorrected_actual_ftlb, correction_pct,
+    note: "Torque-adapter correction: with a crowfoot or in-line extension, dial the wrench to TW = TA x L / (L + E cos(angle)), where TA is the torque wanted at the fastener, L is the wrench lever length (drive center to hand-grip center), E is the adapter length, and the angle is the adapter's offset from the wrench axis. An in-line adapter (0 deg) lengthens the lever, so setting the wrench to the target over-torques the fastener by the (L + E)/L ratio - a 3 in crowfoot on an 18 in wrench delivers 17% more than the dial reads. Mounting the crowfoot at 90 deg to the handle makes cos(angle) = 0, so the adapter adds no effective length and no correction is needed - the standard field workaround. Measure L to where the hand actually pulls; the relation assumes the extension lies in the plane of the swing. A shop aid; the calibrated wrench and the manufacturer's fastener torque spec govern.",
+  };
+}
+export const torqueAdapterCorrectionExample = { inputs: { target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: 3, adapter_angle_deg: 0 } };
+MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
+  citation: "Citation: standard torque-adapter correction (Snap-on / FAA AC 43.13.1B): wrench setting TW = TA x L / (L + E cos(angle)), with L the wrench lever length and E the crowfoot/extension length. An in-line adapter over-torques if set to the target; a 90-degree crowfoot needs no correction. A shop aid; the calibrated wrench and the fastener torque spec govern.",
+  example: torqueAdapterCorrectionExample.inputs,
+  fields: [
+    { key: "target_torque_ftlb", label: "Target torque at fastener (ft-lb)", kind: "number", default: 100 },
+    { key: "wrench_length_in", label: "Wrench lever length (in, drive to grip)", kind: "number", default: 18 },
+    { key: "adapter_length_in", label: "Crowfoot / extension length (in)", kind: "number", default: 3 },
+    { key: "adapter_angle_deg", label: "Adapter angle from wrench axis (deg, 0 in-line / 90 perpendicular)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "set", id: "tac-out-set", label: "Dial the wrench to", value: (r) => fmt(r.wrench_setting_ftlb, 1) + " ft-lb (" + (r.correction_pct >= 0 ? "+" : "") + fmt(r.correction_pct, 1) + "%)" },
+    { key: "unc", id: "tac-out-unc", label: "If set to target instead (uncorrected)", value: (r) => fmt(r.uncorrected_actual_ftlb, 1) + " ft-lb at the fastener" },
+    { key: "eff", id: "tac-out-eff", label: "Effective added lever", value: (r) => fmt(r.effective_extension_in, 2) + " in" },
+    { key: "n", id: "tac-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTorqueAdapterCorrection,
+});

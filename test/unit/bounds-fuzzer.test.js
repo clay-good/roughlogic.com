@@ -16846,3 +16846,29 @@ test("bounds: spec-v484 computeSpanlineSagTension pins H = wL^2/8d, the support 
   assert.ok("error" in _v484({ span_ft: 100, load_lb_per_ft: 0, sag_ft: 2.5 }));
   assert.ok("error" in _v484({ span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 0 }));
 });
+
+// ===================== spec-v485 torque wrench extension / crowfoot correction (Group K) =====================
+import { computeTorqueAdapterCorrection as _v485 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v485 computeTorqueAdapterCorrection pins TW = TA L/(L+E cos), the in-line over-torque, the 90-degree null, and error seams", () => {
+  const r = _v485({ target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: 3, adapter_angle_deg: 0 });
+  assert.ok(Math.abs(r.effective_extension_in - 3) < 1e-9);
+  assert.ok(Math.abs(r.wrench_setting_ftlb - 100 * 18 / 21) < 1e-9);
+  assert.ok(Math.abs(r.wrench_setting_ftlb - 85.7143) < 1e-3);
+  assert.ok(Math.abs(r.uncorrected_actual_ftlb - 100 * 21 / 18) < 1e-9);
+  assert.ok(Math.abs(r.uncorrected_actual_ftlb - 116.6667) < 1e-3);
+  assert.ok(r.correction_pct < 0); // in-line adapter -> dial down
+  // 90-degree crowfoot: cos(90) = 0, no effective length, no correction.
+  const r2 = _v485({ target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: 3, adapter_angle_deg: 90 });
+  assert.ok(Math.abs(r2.effective_extension_in) < 1e-9);
+  assert.ok(Math.abs(r2.wrench_setting_ftlb - 100) < 1e-9);
+  assert.ok(Math.abs(r2.correction_pct) < 1e-9);
+  // The uncorrected torque always exceeds the setting for an in-line adapter (over-torque trap).
+  assert.ok(r.uncorrected_actual_ftlb > r.wrench_setting_ftlb);
+  // Error seams: non-finite, non-positive target / wrench length, negative adapter, degenerate lever (E backward > L).
+  assert.ok("error" in _v485({ target_torque_ftlb: Infinity, wrench_length_in: 18, adapter_length_in: 3 }));
+  assert.ok("error" in _v485({ target_torque_ftlb: 0, wrench_length_in: 18, adapter_length_in: 3 }));
+  assert.ok("error" in _v485({ target_torque_ftlb: 100, wrench_length_in: 0, adapter_length_in: 3 }));
+  assert.ok("error" in _v485({ target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: -3 }));
+  assert.ok("error" in _v485({ target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: 30, adapter_angle_deg: 180 }));
+});

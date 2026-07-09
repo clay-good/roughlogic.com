@@ -493,6 +493,8 @@ const _TILES = [
   ["paint-mix-ratio", "K"],
   ["hydraulic-pump-horsepower", "K"], ["hydraulic-motor-torque-speed", "K"], ["cooling-system-flow", "K"],
   ["prop-pitch-selection", "K"], ["engine-fuel-burn-gph", "K"], ["alternator-charging-load", "K"],
+  // spec-v485 torque wrench extension / crowfoot correction (Group K)
+  ["torque-adapter-correction", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],
