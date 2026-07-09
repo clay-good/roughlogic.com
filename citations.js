@@ -9513,6 +9513,18 @@ export const CITATIONS = {
       { name: "Strength reduction", value: "phi = 0.65 for bearing", source: "ACI 318-19 21.2" },
     ],
   },
+  "concrete-longterm-defl": {
+    formula: "xi = 2.0 (>=60 mo) / 1.4 (>=12) / 1.2 (>=6) / 1.0 (else); lambda = xi / (1 + 50 rho'); additional = lambda x immediate; total = immediate + additional.",
+    edition: "The ACI 318-19 24.2.4.1.1 additional time-dependent (creep and shrinkage) deflection multiplier lambda = xi / (1 + 50 rho'), with the 24.2.4.1.3 time factor xi, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 24.2.4 deflection provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 24.2.4.1.1 additional time-dependent deflection multiplier lambda = xi / (1 + 50 rho'), with the 24.2.4.1.3 time factor xi (2.0 at 5 years or more, 1.4 at 12 months, 1.2 at 6 months, 1.0 at 3 months), the additional long-term deflection = lambda x immediate, and the total = immediate + additional. The multiplier applies to the immediate deflection from the SUSTAINED portion of the load (dead plus the sustained fraction of live). Compression reinforcement rho' = As'/(b d) reduces creep, so a doubly-reinforced beam deflects far less over time. The total long-term deflection is what the L/240 and L/480 serviceability limits are checked against; the immediate deflection itself comes from an effective-moment-of-inertia (Ie) analysis. A design aid, not a substitute for the engineer of record's design.",
+    assumptions: [
+      { name: "Time factor", value: "xi = 2.0 at 5 years or more, 1.4 at 12 months, 1.2 at 6 months, 1.0 at 3 months", source: "ACI 318-19 24.2.4.1.3" },
+      { name: "Compression steel", value: "rho' = As'/(b d) reduces the multiplier; a doubly-reinforced beam creeps far less", source: "ACI 318-19 24.2.4.1.1" },
+      { name: "Sustained load", value: "the multiplier applies to the immediate deflection from the sustained load only", source: "ACI 318-19 24.2.4.1" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

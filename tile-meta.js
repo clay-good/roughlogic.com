@@ -471,6 +471,8 @@ const _TILES = [
   ["concrete-bearing-strength", "E"],
   // spec-v491 rebar compression development length (ACI 318-19 §25.4.9)
   ["rc-compression-dev-length", "E"],
+  // spec-v497 long-term deflection multiplier (ACI 318-19 §24.2.4.1)
+  ["concrete-longterm-defl", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
   ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
   ["velocity-head", "B"], ["flow-continuity", "B"], ["bernoulli-head", "B"],

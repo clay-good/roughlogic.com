@@ -35254,6 +35254,74 @@
    }
   },
   {
+   "tile_id": "concrete-longterm-defl",
+   "source_publisher": "ACI 318-19 24.2.4.1.1",
+   "source_title": "bottom-only beam, 0.4 in immediate, 5-year sustained (rho'=0) -> lambda 2.0, +0.80 in, 1.20 in total",
+   "source_edition_or_year": "spec-v497 worked example (machine-verified)",
+   "source_section_or_page": "spec-v497 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "immediate_defl_in": 0.4,
+    "duration_months": 60,
+    "comp_steel_ratio": 0
+   },
+   "outputs": {
+    "xi": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "lambda": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "additional_defl_in": {
+     "value": 0.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_defl_in": {
+     "value": 1.2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-longterm-defl",
+   "source_publisher": "ACI 318-19 24.2.4.1.1",
+   "source_title": "cross-check: compression steel rho'=0.01 tames the creep -> lambda 1.333, 0.93 in total (22% less)",
+   "source_edition_or_year": "spec-v497 worked example (machine-verified)",
+   "source_section_or_page": "spec-v497 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "immediate_defl_in": 0.4,
+    "duration_months": 60,
+    "comp_steel_ratio": 0.01
+   },
+   "outputs": {
+    "lambda": {
+     "value": 1.3333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_defl_in": {
+     "value": 0.9333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-punching-shear",
    "source_publisher": "ACI 318-19 Table 22.6.5.2",
    "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",

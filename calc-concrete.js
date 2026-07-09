@@ -845,3 +845,41 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
   ],
   compute: computeRcCompressionDevLength,
 });
+
+// ===================== spec-v497: long-term deflection multiplier (ACI 318-19 §24.2.4.1) =====================
+
+// dims: in { immediate_defl_in: L, duration_months: T, comp_steel_ratio: dimensionless } out: { xi: dimensionless, lambda: dimensionless, additional_defl_in: L, total_defl_in: L }
+export function computeConcreteLongtermDefl({ immediate_defl_in = 0, duration_months = 60, comp_steel_ratio = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const di = Number(immediate_defl_in) || 0;
+  const mo = Number(duration_months) || 0;
+  const rho = Number(comp_steel_ratio) || 0;
+  if (di < 0) return { error: "Immediate deflection cannot be negative (in)." };
+  if (!(mo > 0)) return { error: "Sustained-load duration must be positive (months)." };
+  if (rho < 0) return { error: "Compression-steel ratio cannot be negative." };
+  const xi = mo >= 60 ? 2.0 : mo >= 12 ? 1.4 : mo >= 6 ? 1.2 : 1.0;
+  const lambda = xi / (1 + 50 * rho);
+  const additional_defl_in = lambda * di;
+  const total_defl_in = di + additional_defl_in;
+  if (![xi, lambda, additional_defl_in, total_defl_in].every(Number.isFinite)) return { error: "Long-term-deflection math is not a finite value." };
+  return { xi, lambda, additional_defl_in, total_defl_in };
+}
+
+export const concreteLongtermDeflExample = { inputs: { immediate_defl_in: 0.4, duration_months: 60, comp_steel_ratio: 0 } };
+
+CONCRETE_RENDERERS["concrete-longterm-defl"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §24.2.4.1.1 additional time-dependent (creep and shrinkage) deflection: lambda = xi / (1 + 50 rho'), additional = lambda x immediate, total = immediate + additional. The time factor xi is 2.0 at 5 years or more, 1.4 at 12 months, 1.2 at 6 months, 1.0 at 3 months. The multiplier applies to the immediate deflection from the SUSTAINED portion of the load (dead plus the sustained fraction of live). Compression reinforcement rho' = As'/(b d) reduces creep, so a doubly-reinforced beam deflects far less over time. The total long-term deflection is what the L/240 and L/480 serviceability limits are checked against; the immediate deflection itself comes from an effective-moment-of-inertia (Ie) analysis. A design aid, not a substitute for the engineer of record's design.",
+  example: concreteLongtermDeflExample.inputs,
+  fields: [
+    { key: "immediate_defl_in", label: "Immediate deflection from sustained load (in)", kind: "number" },
+    { key: "duration_months", label: "Sustained-load duration (months, >=60 = 5 yr)", kind: "number", default: 60 },
+    { key: "comp_steel_ratio", label: "Compression-steel ratio rho' = As'/(b d) (0 if none)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "xi", id: "cld-out-xi", label: "Time factor xi", value: (r) => fmt(r.xi, 2) },
+    { key: "lm", id: "cld-out-lm", label: "Creep multiplier lambda", value: (r) => fmt(r.lambda, 3) },
+    { key: "ad", id: "cld-out-ad", label: "Additional long-term deflection", value: (r) => fmt(r.additional_defl_in, 3) + " in" },
+    { key: "tot", id: "cld-out-tot", label: "Total deflection (immediate + long-term)", value: (r) => fmt(r.total_defl_in, 3) + " in" },
+  ],
+  compute: computeConcreteLongtermDefl,
+});

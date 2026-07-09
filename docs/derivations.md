@@ -1488,6 +1488,7 @@ cross-check.
 | calc-concrete.js | `computeConcreteBearingStrength` | `{ loaded_area_in2 = 0, support_area_in2 = 0, fc_psi = 4000, factored_load_kip...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCrackControlSpacing` | `{ fs_psi = 40000, cc_in = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteElasticModulus` | `{ fc_psi = 4000, wc_pcf = 145 } = {}` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteLongtermDefl` | `{ immediate_defl_in = 0, duration_months = 60, comp_steel_ratio = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteModulusOfRupture` | `{ fc_psi = 4000, lambda = 1.0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteShrinkageTemperatureSteel` | `{ h_in = 0, b_in = 12, grade_ksi = 60 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteTorsionThreshold` | `{ fc_psi = 4000, b_in = 0, h_in = 0, lambda = 1.0 } = {}` | _ | _ | _ |
@@ -2608,7 +2609,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1194.
+Row count: 1195.
 
 <!-- END function-corpus-v14 -->
 
@@ -3073,7 +3074,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (210 tiles)
+### Group E Construction (211 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3113,6 +3114,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete-crack-control-spacing` | Crack-Control Bar Spacing (ACI 318-19 24.3.2) | ACI 318-19 24.3.2; spec-v395 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-elastic-modulus` | Concrete Modulus of Elasticity Ec (ACI 318-19 19.2.2) | ACI 318-19 19.2.2; spec-v378 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-evaporation-rate` | Concrete Surface Evaporation Rate and Plastic-Shrinkage Risk (ACI 305) | ACI 305 Hot Weather Concreting / Menz...; spec-v246 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-longterm-defl` | Long-Term Deflection Multiplier (ACI 318-19 24.2.4) | ACI 318-19 24.2.4.1.1; spec-v497 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-maturity` | Concrete Maturity and Equivalent Age (ASTM C1074) | ASTM C1074 maturity method (Nurse-Sau...; spec-v476 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-mix-design` | Concrete Mix Design (Simplified) | ACI; wc = 0.48; water = 325 lb/yd^3 (1 in agg, 4 in slump base... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete-modulus-of-rupture` | Concrete Modulus of Rupture fr (ACI 318-19 19.2.3) | ACI 318-19 19.2.3; spec-v379 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3744,6 +3746,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 950. Fixture-covered or reference-cadence: 950 / 950.
+Tile count: 951. Fixture-covered or reference-cadence: 951 / 951.
 
 <!-- END tile-index-v14 -->

@@ -17999,6 +17999,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "long-term deflection",
+      "target": "concrete-longterm-defl",
+      "kind": "industry"
+    },
+    {
+      "term": "creep deflection",
+      "target": "concrete-longterm-defl",
+      "kind": "industry"
+    },
+    {
+      "term": "sustained load deflection",
+      "target": "concrete-longterm-defl",
+      "kind": "industry"
+    },
+    {
+      "term": "lambda delta",
+      "target": "concrete-longterm-defl",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aci 24.2.4",
+      "target": "concrete-longterm-defl",
+      "kind": "industry"
+    },
+    {
+      "term": "compression steel creep",
+      "target": "concrete-longterm-defl",
+      "kind": "adjacent"
+    },
+    {
+      "term": "time-dependent deflection",
+      "target": "concrete-longterm-defl",
+      "kind": "adjacent"
+    },
+    {
+      "term": "l/240",
+      "target": "concrete-longterm-defl",
+      "kind": "adjacent"
+    },
+    {
       "term": "glulam volume factor",
       "target": "glulam-volume-factor",
       "kind": "industry"

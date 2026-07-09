@@ -17150,3 +17150,28 @@ test("bounds: spec-v496 computeAsymmetricalFaultXr pins both factors, their mono
   assert.ok("error" in _v496({ isym_ka: 0, x_over_r: 15 }));
   assert.ok("error" in _v496({ isym_ka: 20, x_over_r: 0 }));
 });
+
+import { computeConcreteLongtermDefl as _v497 } from "../../calc-concrete.js";
+
+test("bounds: spec-v497 computeConcreteLongtermDefl pins the xi steps, the rho' reduction, the total identity, and error seams", () => {
+  const r = _v497({ immediate_defl_in: 0.4, duration_months: 60, comp_steel_ratio: 0 });
+  assert.ok(Math.abs(r.xi - 2.0) < 1e-9);
+  assert.ok(Math.abs(r.lambda - 2.0) < 1e-9); // no compression steel -> full multiplier
+  assert.ok(Math.abs(r.additional_defl_in - 0.8) < 1e-9);
+  assert.ok(Math.abs(r.total_defl_in - 1.2) < 1e-9);
+  // total = immediate x (1 + lambda).
+  assert.ok(Math.abs(r.total_defl_in - 0.4 * (1 + r.lambda)) < 1e-9);
+  // xi steps by duration.
+  assert.strictEqual(_v497({ immediate_defl_in: 1, duration_months: 12, comp_steel_ratio: 0 }).xi, 1.4);
+  assert.strictEqual(_v497({ immediate_defl_in: 1, duration_months: 6, comp_steel_ratio: 0 }).xi, 1.2);
+  assert.strictEqual(_v497({ immediate_defl_in: 1, duration_months: 3, comp_steel_ratio: 0 }).xi, 1.0);
+  // Compression steel drives the multiplier down monotonically.
+  const withSteel = _v497({ immediate_defl_in: 0.4, duration_months: 60, comp_steel_ratio: 0.01 });
+  assert.ok(withSteel.lambda < r.lambda && Math.abs(withSteel.lambda - 4 / 3) < 1e-9);
+  assert.ok(withSteel.total_defl_in < r.total_defl_in);
+  // Error seams: non-finite, negative immediate deflection, non-positive duration, negative rho'.
+  assert.ok("error" in _v497({ immediate_defl_in: Infinity, duration_months: 60 }));
+  assert.ok("error" in _v497({ immediate_defl_in: -0.1, duration_months: 60 }));
+  assert.ok("error" in _v497({ immediate_defl_in: 0.4, duration_months: 0 }));
+  assert.ok("error" in _v497({ immediate_defl_in: 0.4, duration_months: 60, comp_steel_ratio: -0.01 }));
+});
