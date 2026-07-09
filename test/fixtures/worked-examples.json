@@ -15856,6 +15856,64 @@
    }
   },
   {
+   "tile_id": "bearing-l10-life",
+   "source_publisher": "ISO 281 basic rating life",
+   "source_title": "ball bearing C 5,000 lbf, P 1,000 lbf, 1,750 rpm -> 125 million rev, 1,190 hr",
+   "source_edition_or_year": "spec-v504 worked example (machine-verified)",
+   "source_section_or_page": "spec-v504 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "dynamic_rating_lbf": 5000,
+    "equivalent_load_lbf": 1000,
+    "speed_rpm": 1750,
+    "bearing_type": "ball"
+   },
+   "outputs": {
+    "l10_rev": {
+     "value": 125000000,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "l10_hr": {
+     "value": 1190.5,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-l10-life",
+   "source_publisher": "ISO 281 basic rating life",
+   "source_title": "cross-check: a 25% overload (P 1,250 lbf) drops it to 64 million rev, 610 hr (cube law, 49% loss)",
+   "source_edition_or_year": "spec-v504 worked example (machine-verified)",
+   "source_section_or_page": "spec-v504 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "dynamic_rating_lbf": 5000,
+    "equivalent_load_lbf": 1250,
+    "speed_rpm": 1750,
+    "bearing_type": "ball"
+   },
+   "outputs": {
+    "l10_rev": {
+     "value": 64000000,
+     "tolerance": {
+      "pct": 0.1
+     }
+    },
+    "l10_hr": {
+     "value": 609.5,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "circular-arc",
    "source_publisher": "First-principles circle geometry (sagitta relation)",
    "source_title": "R = (chord^2/4 + rise^2)/(2 rise); arc = R x 2 acos((R-rise)/R)",

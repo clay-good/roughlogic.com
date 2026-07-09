@@ -17312,3 +17312,26 @@ test("bounds: spec-v503 computeBoltProofLoad pins the stress area, the grade loa
   assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 0, grade: "5" }));
   assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "10" }));
 });
+
+import { computeBearingL10Life as _v504 } from "../../calc-machining.js";
+
+test("bounds: spec-v504 computeBearingL10Life pins the cube law, the ball/roller exponent, the hours, and error seams", () => {
+  const r = _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "ball" });
+  assert.strictEqual(r.p_exp, 3);
+  assert.ok(Math.abs(r.l10_rev - 125e6) < 1); // (5)^3 x 1e6
+  assert.ok(Math.abs(r.l10_hr - 1190.48) < 0.5);
+  // The cube law: a 25% overload roughly halves life (to 64/125 = 51%).
+  const over = _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1250, speed_rpm: 1750, bearing_type: "ball" });
+  assert.ok(Math.abs(over.l10_rev - 64e6) < 1 && over.l10_rev / r.l10_rev < 0.52 && over.l10_rev / r.l10_rev > 0.5);
+  // Roller bearings use the 10/3 exponent, giving more life than a ball bearing at the same ratio.
+  const roller = _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "roller" });
+  assert.ok(Math.abs(roller.p_exp - 10 / 3) < 1e-9 && roller.l10_rev > r.l10_rev);
+  // Doubling the speed halves the hours for the same revolution life.
+  assert.ok(Math.abs(_v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 3500, bearing_type: "ball" }).l10_hr - r.l10_hr / 2) < 1e-6);
+  // Error seams: non-finite, non-positive C/P/speed, unknown type.
+  assert.ok("error" in _v504({ dynamic_rating_lbf: Infinity, equivalent_load_lbf: 1000, speed_rpm: 1750 }));
+  assert.ok("error" in _v504({ dynamic_rating_lbf: 0, equivalent_load_lbf: 1000, speed_rpm: 1750 }));
+  assert.ok("error" in _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 0, speed_rpm: 1750 }));
+  assert.ok("error" in _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 0 }));
+  assert.ok("error" in _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "needle" }));
+});

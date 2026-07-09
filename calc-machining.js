@@ -419,3 +419,52 @@ function renderSpurGearGeometry(inputRegion, outputRegion, citationEl) {
   for (const f of [pd, n, nm]) f.input.addEventListener("input", update);
 }
 MACHINING_RENDERERS["spur-gear-geometry"] = renderSpurGearGeometry;
+
+// ===================== spec-v504: rolling-bearing L10 rating life (ISO 281) =====================
+// dims: in { dynamic_rating_lbf: M L T^-2, equivalent_load_lbf: M L T^-2, speed_rpm: T^-1, bearing_type: dimensionless } out: { p_exp: dimensionless, l10_rev: dimensionless, l10_hr: T }
+export function computeBearingL10Life({ dynamic_rating_lbf = 0, equivalent_load_lbf = 0, speed_rpm = 0, bearing_type = "ball" } = {}) {
+  const _g = _finiteGuard({ dynamic_rating_lbf, equivalent_load_lbf, speed_rpm }); if (_g) return _g;
+  const c = Number(dynamic_rating_lbf) || 0;
+  const pl = Number(equivalent_load_lbf) || 0;
+  const rpm = Number(speed_rpm) || 0;
+  const type = String(bearing_type);
+  if (!(c > 0)) return { error: "Dynamic load rating C must be positive (lbf)." };
+  if (!(pl > 0)) return { error: "Equivalent dynamic load P must be positive (lbf)." };
+  if (!(rpm > 0)) return { error: "Speed must be positive (rpm)." };
+  if (type !== "ball" && type !== "roller") return { error: "Bearing type must be ball or roller." };
+  const p_exp = type === "roller" ? 10 / 3 : 3;
+  const l10_rev = Math.pow(c / pl, p_exp) * 1e6;
+  const l10_hr = l10_rev / (60 * rpm);
+  if (![p_exp, l10_rev, l10_hr].every(Number.isFinite)) return { error: "Bearing-life math is not a finite value." };
+  return {
+    p_exp, l10_rev, l10_hr,
+    note: "ISO 281 basic rating life: L10 = (C/P)^p x 10^6 revolutions, L10h = L10 / (60 x rpm) hours, with p = 3 for ball bearings and 10/3 for roller bearings. Life scales as the CUBE (ball) of the load ratio, so a modest overload cuts life sharply -- a 25% overload roughly halves it -- and a small load reduction (better alignment, lighter belt tension) buys a large life gain. The basic L10 assumes clean, well-lubricated operation; contamination, misalignment, and lubricant condition are handled by the modified aISO life. L10 is the life at which 10% of a population has failed, not the average. A planning estimate, not a warranty; the mounting, lubrication, and application govern.",
+  };
+}
+export const bearingL10LifeExample = { inputs: { dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "ball" } };
+function renderBearingL10Life(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ISO 281 / ABMA 9 & 11 basic rating life: L10 = (C/P)^p x 10^6 rev, L10h = L10 / (60 x rpm), p = 3 ball / 10/3 roller. Life scales as the cube (ball) of the load ratio. Basic L10 assumes clean, well-lubricated operation; L10 is the life at which 10% have failed, not the average. A planning estimate; the mounting, lubrication, and application govern.";
+  const c = makeNumber("Basic dynamic load rating C (lbf)", "bl10-c", { step: "any", min: "0" }); c.input.value = "5000";
+  const p = makeNumber("Equivalent dynamic load P (lbf)", "bl10-p", { step: "any", min: "0" }); p.input.value = "1000";
+  const rpm = makeNumber("Operating speed (rpm)", "bl10-rpm", { step: "any", min: "0" }); rpm.input.value = "1750";
+  const type = makeSelect("Bearing type", "bl10-type", [
+    { value: "ball", label: "Ball (p = 3)", selected: true },
+    { value: "roller", label: "Roller (p = 10/3)" },
+  ]);
+  for (const f of [c, p, rpm, type]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "5000"; p.input.value = "1000"; rpm.input.value = "1750"; type.select.value = "ball"; update(); });
+  const oRev = makeOutputLine(outputRegion, "Rating life L10", "bl10-out-rev");
+  const oHr = makeOutputLine(outputRegion, "Rating life L10h", "bl10-out-hr");
+  const oNote = makeOutputLine(outputRegion, "Note", "bl10-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBearingL10Life({ dynamic_rating_lbf: readNum(c.input), equivalent_load_lbf: readNum(p.input), speed_rpm: readNum(rpm.input), bearing_type: type.select.value });
+    if (r.error) { oRev.textContent = r.error; oHr.textContent = "-"; oNote.textContent = ""; return; }
+    oRev.textContent = fmt(r.l10_rev / 1e6, 1) + " million rev (p = " + fmt(r.p_exp, 3) + ")";
+    oHr.textContent = fmt(r.l10_hr, 0) + " hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [c, p, rpm]) f.input.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["bearing-l10-life"] = renderBearingL10Life;

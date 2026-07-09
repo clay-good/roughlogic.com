@@ -15214,6 +15214,46 @@
       "kind": "industry"
     },
     {
+      "term": "bearing life",
+      "target": "bearing-l10-life",
+      "kind": "industry"
+    },
+    {
+      "term": "l10 life",
+      "target": "bearing-l10-life",
+      "kind": "industry"
+    },
+    {
+      "term": "rating life",
+      "target": "bearing-l10-life",
+      "kind": "industry"
+    },
+    {
+      "term": "iso 281",
+      "target": "bearing-l10-life",
+      "kind": "industry"
+    },
+    {
+      "term": "dynamic load rating",
+      "target": "bearing-l10-life",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bearing cube law",
+      "target": "bearing-l10-life",
+      "kind": "adjacent"
+    },
+    {
+      "term": "c/p ratio",
+      "target": "bearing-l10-life",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bearing hours",
+      "target": "bearing-l10-life",
+      "kind": "adjacent"
+    },
+    {
       "term": "fix and flip",
       "target": "fix-flip-profit",
       "kind": "industry"

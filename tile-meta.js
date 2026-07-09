@@ -373,6 +373,8 @@ const _TILES = [
   // v54 compound miter for crown molding (calc-shop.js; Group E carpentry)
   ["compound-miter", "E"],
   ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["spur-gear-geometry", "K"],
+  // spec-v504 rolling-bearing L10 rating life (ISO 281)
+  ["bearing-l10-life", "K"],
 
   // v43 cross-trade tank gauging (calc-cross.js)
   ["tank-volume", "G"], ["linear-interpolation", "G"],

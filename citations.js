@@ -6719,6 +6719,18 @@ export const CITATIONS = {
     ],
   },
 
+  "bearing-l10-life": {
+    formula: "p = 3 (ball) or 10/3 (roller); L10 = (C/P)^p x 10^6 rev; L10h = L10 / (60 x rpm).",
+    edition: "The ISO 281 / ABMA 9 & 11 basic rating life (L10) of a rolling-element bearing, by name; the mounting, lubrication, and application govern.",
+    freeAccess: "The L10 rating-life relation is a published ISO 281 / ABMA result; the dynamic load rating C comes from the bearing catalog and the equivalent load P from the application.",
+    governance: GOVERNANCE.general,
+    editionNote: "ISO 281 basic rating life. L10 = (C/P)^p x 10^6 revolutions and L10h = L10 / (60 x rpm) hours, with p = 3 for ball bearings and 10/3 for roller bearings. Life scales as the cube (ball) of the load ratio, so a modest overload cuts life sharply (a 25% overload roughly halves it) and a small load reduction buys a large life gain. The basic L10 assumes clean, well-lubricated operation; contamination, misalignment, and lubricant condition are handled by the modified aISO life. L10 is the life at which 10% of a population has failed, not the average. A planning estimate, not a warranty; the mounting, lubrication, and application govern.",
+    assumptions: [
+      { name: "Cube law", value: "life scales as (C/P)^3 for ball bearings, (C/P)^(10/3) for roller", source: "ISO 281" },
+      { name: "Basic L10", value: "assumes clean, well-lubricated operation; contamination needs the modified aISO life", source: "ISO 281" },
+      { name: "10% definition", value: "L10 is the life at which 10% have failed, not the average (L50 is ~5x)", source: "ABMA 9 & 11" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",

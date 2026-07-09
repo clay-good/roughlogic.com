@@ -143,6 +143,7 @@ const RELATED = {
   "tolerance-stack-rss": ["rolled-blank", "sine-bar", "decimal-to-fraction", "cone-flat-pattern"],
   "cone-flat-pattern": ["rolled-blank", "circular-arc", "tolerance-stack-rss", "circle-from-3-points"],
   "spur-gear-geometry": ["gear-cascade", "cutting-speed-rpm", "dividing-head", "bolt-circle"],
+  "bearing-l10-life": ["vbelt-drive", "shrink-fit", "spur-gear-geometry"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
   "polygon-miter": ["compound-miter", "bolt-circle", "decimal-to-fraction"],

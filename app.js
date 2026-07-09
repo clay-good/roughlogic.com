@@ -770,6 +770,8 @@ const TOOL_MODULES = (() => {
     "radial-chip-thinning", "boring-bar-deflection", "ballnose-scallop-height",
     // spec-v401 spur gear tooth geometry
     "spur-gear-geometry",
+    // spec-v504 rolling-bearing L10 rating life (ISO 281)
+    "bearing-l10-life",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
