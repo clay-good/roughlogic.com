@@ -722,6 +722,8 @@ const _TILES = [
   ["capacitor-discharge-time", "A"],
   // spec-v496 asymmetrical and peak fault current from X/R
   ["asymmetrical-fault-xr", "A"],
+  // spec-v518 battery room hydrogen ventilation (IEEE 1635)
+  ["battery-hydrogen-vent", "A"],
   ["ada-ramp-slope", "E"],
   ["pool-bonding-680-26", "A"],
 ];

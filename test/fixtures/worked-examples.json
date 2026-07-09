@@ -45628,6 +45628,56 @@
    }
   },
   {
+   "tile_id": "battery-hydrogen-vent",
+   "source_publisher": "IEEE 1635 battery-room hydrogen ventilation",
+   "source_title": "24 cells at 20 A in an 800 ft^3 room -> 25.9 cfm, 1.9 ACH",
+   "source_edition_or_year": "spec-v518 worked example (machine-verified)",
+   "source_section_or_page": "spec-v518 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "cell_count": 24,
+    "charge_current_a": 20,
+    "room_volume_ft3": 800
+   },
+   "outputs": {
+    "q_cfm": {
+     "value": 25.9,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "ach": {
+     "value": 1.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-hydrogen-vent",
+   "source_publisher": "IEEE 1635 battery-room hydrogen ventilation",
+   "source_title": "cross-check: counting jars is really 144 cells -> 155.5 cfm, six times the airflow",
+   "source_edition_or_year": "spec-v518 worked example (machine-verified)",
+   "source_section_or_page": "spec-v518 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "cell_count": 144,
+    "charge_current_a": 20,
+    "room_volume_ft3": 800
+   },
+   "outputs": {
+    "q_cfm": {
+     "value": 155.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "economic-conductor-sizing",
    "source_publisher": "economic conductor sizing (I2R)",
    "source_title": "100 A, 0.20->0.125 ohm, 4000 hr, $0.12, $800 -> $1080/yr, 0.7 yr payback",

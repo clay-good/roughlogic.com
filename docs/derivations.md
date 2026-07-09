@@ -1761,6 +1761,7 @@ cross-check.
 | calc-electrical.js | `computeAmbientAmpacityAdjust` | `{ base_ampacity_a = 0, temp_column = 75, ambient_c = 30, conductor_count = 3,...` | _ | _ | _ |
 | calc-electrical.js | `computeArcFlashScreen` | `{ voltage_V = 0, bolted_fault_A = 0, clearing_time_s = 0, working_distance_in...` | _ | _ | _ |
 | calc-electrical.js | `computeAsymmetricalFaultXr` | `{ isym_ka = 0, x_over_r = 0 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeBatteryHydrogenVent` | `{ cell_count = 0, charge_current_a = 0, room_volume_ft3 = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeBendRadius` | `{ cable_type, cable_od_in }` | _ | _ | _ |
 | calc-electrical.js | `computeBendsBetweenPulls` | `{ bend1_deg = 0, bend2_deg = 0, bend3_deg = 0, bend4_deg = 0, bend5_deg = 0, ...` | _ | _ | _ |
 | calc-electrical.js | `computeBondingJumper` | `{ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, p...` | _ | _ | _ |
@@ -2629,7 +2630,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1215.
+Row count: 1216.
 
 <!-- END function-corpus-v14 -->
 
@@ -2710,7 +2711,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (124 tiles)
+### Group A Electrical (125 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2718,6 +2719,7 @@ per spec-v14 §13.1 second paragraph.
 | `arc-flash-screen` | Arc-Flash Incident-Energy Screen (Lee 1982) | Lee 1982 / NFPA; Closed-form Lee equation; NFPA 70E-2024 §130.5 governs th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `asymmetrical-fault-xr` | Asymmetrical and Peak Fault Current from X/R | first-cycle fault asymmetry model (DC...; spec-v496 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-c-rate` | Battery C-Rate: Deliverable Power and Discharge Duration | Battery C-rate definition; spec-v238 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `battery-hydrogen-vent` | Battery Room Hydrogen Ventilation (IEEE 1635) | IEEE 1635 battery-room hydrogen venti...; spec-v518 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-peak-shaving` | Battery Peak-Shaving Demand-Charge Savings | Demand-charge peak-shaving method; spec-v237 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `battery-runtime` | Battery Runtime | Project (first-principles); 100 Ah * 0.80 * 12 V = 960 Wh; 960 Wh / 120 W = 8 h | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `battery-tou-arbitrage` | Battery Time-of-Use Arbitrage Value | NREL battery round-trip / arbitrage v...; spec-v236 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3786,6 +3788,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 971. Fixture-covered or reference-cadence: 971 / 971.
+Tile count: 972. Fixture-covered or reference-cadence: 972 / 972.
 
 <!-- END tile-index-v14 -->

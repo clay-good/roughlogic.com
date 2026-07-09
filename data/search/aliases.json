@@ -19754,6 +19754,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "battery room ventilation",
+      "target": "battery-hydrogen-vent",
+      "kind": "industry"
+    },
+    {
+      "term": "hydrogen ventilation",
+      "target": "battery-hydrogen-vent",
+      "kind": "industry"
+    },
+    {
+      "term": "ieee 1635",
+      "target": "battery-hydrogen-vent",
+      "kind": "industry"
+    },
+    {
+      "term": "battery hydrogen cfm",
+      "target": "battery-hydrogen-vent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cells not jars",
+      "target": "battery-hydrogen-vent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "battery room exhaust",
+      "target": "battery-hydrogen-vent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "h2 ventilation",
+      "target": "battery-hydrogen-vent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "vrla ventilation",
+      "target": "battery-hydrogen-vent",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"

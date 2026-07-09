@@ -17613,3 +17613,22 @@ test("bounds: spec-v517 computeAbycDcWire pins the round-trip circular mils, the
   assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 0 }));
   assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 120 }));
 });
+
+import { computeBatteryHydrogenVent as _v518 } from "../../calc-electrical.js";
+
+test("bounds: spec-v518 computeBatteryHydrogenVent pins the 0.054 I N rate, the cells-not-jars scaling, the ACH, and error seams", () => {
+  const r = _v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 800 });
+  assert.ok(Math.abs(r.q_cfm - 25.92) < 0.01); // 0.054 x 20 x 24
+  assert.ok(Math.abs(r.ach - 1.944) < 0.01);
+  // Counting jars (6x the cells) sextuples the airflow.
+  const jars = _v518({ cell_count: 144, charge_current_a: 20, room_volume_ft3: 800 });
+  assert.ok(Math.abs(jars.q_cfm - 6 * r.q_cfm) < 1e-6 && Math.abs(jars.q_cfm - 155.52) < 0.01);
+  // Airflow scales linearly with cells and current; ACH inversely with room volume.
+  assert.ok(Math.abs(_v518({ cell_count: 24, charge_current_a: 40, room_volume_ft3: 800 }).q_cfm - 2 * r.q_cfm) < 1e-6);
+  assert.ok(Math.abs(_v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 400 }).ach - 2 * r.ach) < 1e-6);
+  // Error seams: non-finite, cell count < 1, non-positive current / room volume.
+  assert.ok("error" in _v518({ cell_count: Infinity, charge_current_a: 20, room_volume_ft3: 800 }));
+  assert.ok("error" in _v518({ cell_count: 0, charge_current_a: 20, room_volume_ft3: 800 }));
+  assert.ok("error" in _v518({ cell_count: 24, charge_current_a: 0, room_volume_ft3: 800 }));
+  assert.ok("error" in _v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 0 }));
+});

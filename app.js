@@ -58,6 +58,8 @@ const TOOL_MODULES = (() => {
     "capacitor-discharge-time",
     // spec-v496 asymmetrical and peak fault current from X/R
     "asymmetrical-fault-xr",
+    // spec-v518 battery room hydrogen ventilation (IEEE 1635)
+    "battery-hydrogen-vent",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

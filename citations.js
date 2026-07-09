@@ -1061,6 +1061,18 @@ export const CITATIONS = {
       { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
     ],
   },
+  "battery-hydrogen-vent": {
+    formula: "Q_cfm = 0.054 x I x N (N = individual 2 V cells); ACH = Q x 60 / room_volume.",
+    edition: "The IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation rate, holding the room-average hydrogen below 1% (NFPA 855 4% LEL), by name; the applicable code and the room design govern.",
+    freeAccess: "The Q = 0.054 x I x N ventilation relation is a published IEEE 1635 result; the cell count, charge current, and room volume come from the battery installation.",
+    governance: GOVERNANCE.general,
+    editionNote: "IEEE 1635 battery-room hydrogen ventilation rate. Q = 0.054 x I x N cfm holds the room-average hydrogen below 1% by volume (a 75% margin under the 4% lower explosive limit), where I is the maximum charge current and N is the number of individual 2 V CELLS -- not jars or modules. A 12 V jar contains six 2 V cells, so a room of twenty-four 12 V jars is 144 cells, and confusing them undersizes the exhaust several-fold. Local spots near cells can exceed the room average, so diffusion and inlet placement matter, and sealed VRLA in normal float produces far less gas than this bounding case. A design aid, not the fire and building code; the applicable code and the room design govern.",
+    assumptions: [
+      { name: "Cells not jars", value: "N counts individual 2 V cells; a 12 V jar is six cells, so counting jars undersizes six-fold", source: "IEEE 1635" },
+      { name: "1% target", value: "holds the room-average hydrogen below 1%, a 75% margin under the 4% LEL", source: "IEEE 1635 / NFPA 855" },
+      { name: "Bounding case", value: "sealed VRLA in normal float gasses far less than this vented-cell bounding rate", source: "battery practice" },
+    ],
+  },
   "asymmetrical-fault-xr": {
     formula: "I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF_rms.",
     edition: "First-cycle fault-asymmetry model (DC offset from X/R), an IEEE C37 / NEMA AB-4 first-cycle relation, by name; the interrupting-duty rating and coordination study govern the applied duty.",

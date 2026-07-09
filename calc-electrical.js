@@ -5165,3 +5165,44 @@ function _v496renderAsymmetricalFaultXr(inputRegion, outputRegion, citationEl) {
   for (const f of [isym, xr]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["asymmetrical-fault-xr"] = _v496renderAsymmetricalFaultXr;
+
+// ===================== spec-v518: battery room hydrogen ventilation (IEEE 1635) =====================
+// dims: in { cell_count: dimensionless, charge_current_a: I, room_volume_ft3: L^3 } out: { q_cfm: L^3 T^-1, ach: T^-1 }
+export function computeBatteryHydrogenVent({ cell_count = 0, charge_current_a = 0, room_volume_ft3 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(cell_count) || 0;
+  const i = Number(charge_current_a) || 0;
+  const vol = Number(room_volume_ft3) || 0;
+  if (!(n >= 1)) return { error: "Cell count must be at least 1 (individual 2 V cells, not jars)." };
+  if (!(i > 0)) return { error: "Charge current must be positive (A)." };
+  if (!(vol > 0)) return { error: "Room volume must be positive (ft^3)." };
+  const q_cfm = 0.054 * i * n;
+  const ach = q_cfm * 60 / vol;
+  if (![q_cfm, ach].every(Number.isFinite)) return { error: "Battery-vent math is not a finite value." };
+  return {
+    q_cfm, ach,
+    note: "IEEE 1635 battery-room hydrogen ventilation: Q = 0.054 x I x N cfm holds the room-average hydrogen below 1% by volume (a 75% margin under the 4% lower explosive limit), where I is the maximum charge current and N is the number of individual 2 V CELLS -- not jars or modules. A 12 V AGM/flooded jar contains six 2 V cells, so a room of twenty-four 12 V jars is 144 cells, not 24, and confusing the two undersizes the exhaust six-fold. Local spots near cells can exceed the room average, so diffusion and inlet placement matter; sealed VRLA in normal float produces far less gas than this bounding case. A design aid, not the fire and building code; the applicable code and the room design govern.",
+  };
+}
+export const batteryHydrogenVentExample = { inputs: { cell_count: 24, charge_current_a: 20, room_volume_ft3: 800 } };
+function _v518renderBatteryHydrogenVent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation (NFPA 855 4% LEL): Q = 0.054 x I x N cfm (N = individual 2 V CELLS, not jars), ACH = Q x 60 / room volume; holds the average hydrogen below 1% (75% margin under the 4% LEL). A design aid; the applicable code and room design govern.";
+  const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bhv-n", { step: "1", min: "1" }); n.input.value = "24";
+  const i = makeNumber("Maximum charge current (A)", "bhv-i", { step: "any", min: "0" }); i.input.value = "20";
+  const vol = makeNumber("Room volume (ft^3)", "bhv-v", { step: "any", min: "0" }); vol.input.value = "800";
+  for (const f of [n, i, vol]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "24"; i.input.value = "20"; vol.input.value = "800"; update(); });
+  const oQ = makeOutputLine(outputRegion, "Required exhaust airflow", "bhv-out-q");
+  const oACH = makeOutputLine(outputRegion, "Air changes per hour", "bhv-out-ach");
+  const oNote = makeOutputLine(outputRegion, "Note", "bhv-out-n");
+  function readNum(x) { if (x.value === "") return 0; const v = Number(x.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBatteryHydrogenVent({ cell_count: readNum(n.input), charge_current_a: readNum(i.input), room_volume_ft3: readNum(vol.input) });
+    if (r.error) { oQ.textContent = r.error; oACH.textContent = "-"; oNote.textContent = ""; return; }
+    oQ.textContent = fmt(r.q_cfm, 1) + " cfm";
+    oACH.textContent = fmt(r.ach, 1) + " ACH";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n, i, vol]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["battery-hydrogen-vent"] = _v518renderBatteryHydrogenVent;
