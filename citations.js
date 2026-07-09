@@ -8992,6 +8992,18 @@ export const CITATIONS = {
       { name: "Isothermal catalog throw", value: "T is the manufacturer's isothermal throw to the outlet terminal velocity (50 fpm most, 100 fpm ceiling slots); cooling mode; light-troffer, heating, and NC are separate", source: "ASHRAE Standard 70 / 113" },
     ],
   },
+  "vibration-isolation": {
+    formula: "fn = 3.13 / sqrt(static_deflection_in) Hz (= (1/2pi) sqrt(g/deflection), g = 386.4 in/s^2); f = rpm/60; ratio = f/fn; T = 1 / |ratio^2 - 1|; efficiency = (1 - T) x 100%; isolation requires ratio > sqrt(2).",
+    edition: "ASHRAE Handbook -- Fundamentals, Sound and Vibration chapter, the single-degree-of-freedom vibration isolator (the classical Den Hartog transmissibility relation), by name.",
+    freeAccess: "The single-DOF isolator relations (natural frequency from static deflection, transmissibility, and isolation efficiency) are standard vibration theory published in the ASHRAE Handbook -- Fundamentals and every mechanical-vibration text; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASHRAE Handbook -- Fundamentals, Sound and Vibration: the single-degree-of-freedom vibration isolator. The isolated system's natural frequency fn = 3.13 / sqrt(static deflection in inches) Hz (equivalently (1/2pi) sqrt(g/deflection) with g = 386.4 in/s^2, or 187.8 / sqrt(deflection) cpm); the disturbing frequency is the equipment running speed rpm/60 Hz (the lowest forcing frequency, which isolates worst); the transmissibility T = 1 / |(f/fn)^2 - 1| is the fraction of the shaking force reaching the structure, and the isolation efficiency is (1 - T). Isolation requires the frequency ratio to exceed sqrt(2) = 1.414; below that the mount amplifies the vibration (true resonance at a ratio of 1), and the fix is a stiffer isolator (less deflection raises fn). This is the undamped idealization (damping trims high-frequency isolation slightly but tames the resonant peak). The deflection is the isolator's rated static deflection under the actual equipment load; the equipment unbalance, floor stiffness, seismic restraint, and the isolator selection are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
+    assumptions: [
+      { name: "Natural frequency", value: "fn = 3.13 / sqrt(static deflection in inches) Hz, from (1/2pi) sqrt(g/deflection); the deflection is the isolator's rated value under the actual load", source: "ASHRAE Fundamentals, Sound and Vibration" },
+      { name: "sqrt(2) threshold", value: "isolation occurs only when the disturbing frequency exceeds sqrt(2) x fn; below that the mount amplifies, with resonance at a ratio of 1; a stiffer isolator raises fn", source: "ASHRAE Fundamentals, Sound and Vibration" },
+      { name: "Undamped idealization", value: "the transmissibility neglects damping (which slightly reduces high-frequency isolation but limits the resonant peak); the disturbing frequency is taken as the running speed", source: "single-DOF vibration theory" },
+    ],
+  },
   "air-density-correction": {
     formula: "alt = (1 - 6.73e-6 elev)^5.258; temp = 530/(460 + T_F); DF = alt x temp; SCFM = ACFM x DF; const = 1.08 x DF; sp = rated_sp x DF.",
     edition: "The air density correction for altitude and temperature from the ASHRAE Handbook - Fundamentals, by name.",

@@ -783,6 +783,7 @@ export const COMPUTE_MAP = {
   "duct-heat-gain": { module: "../../calc-hvac.js", fn: "computeDuctHeatGain" },
   "grille-face-velocity": { module: "../../calc-hvac.js", fn: "computeGrilleFaceVelocity" },
   "adpi-diffuser-selection": { module: "../../calc-hvac.js", fn: "computeAdpiSelection" },
+  "vibration-isolation": { module: "../../calc-hvac.js", fn: "computeVibrationIsolation" },
   "air-density-correction": { module: "../../calc-hvac.js", fn: "computeAirDensityCorrection" },
   "moist-air-enthalpy": { module: "../../calc-hvac.js", fn: "computeMoistAirEnthalpy" },
   "cooling-coil-total-load": { module: "../../calc-hvac.js", fn: "computeCoolingCoilTotalLoad" },

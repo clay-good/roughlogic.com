@@ -14869,6 +14869,29 @@ test("bounds: spec-v482 computeAdpiSelection pins the table lookup, the load cei
   assert.ok("error" in _v482({ diffuser_type: "circular-ceiling", throw_ft: Infinity, char_length_ft: 10 }));
 });
 
+import { computeVibrationIsolation as _v483 } from "../../calc-hvac.js";
+test("bounds: spec-v483 computeVibrationIsolation pins fn, transmissibility, efficiency, the sqrt(2) threshold, and error seams", () => {
+  // Pinned example: 900 rpm on 1 in deflection -> fn 3.13 Hz, ratio 4.79, T 0.0455, 95.4% efficient.
+  const a = _v483({ equipment_rpm: 900, static_deflection_in: 1 });
+  assert.ok(Math.abs(a.fn_hz - 3.13) < 1e-9 && Math.abs(a.disturbing_hz - 15) < 1e-9);
+  assert.ok(Math.abs(a.ratio - 4.7923322684) < 1e-6 && Math.abs(a.transmissibility - 0.0455239725) < 1e-7);
+  assert.ok(Math.abs(a.efficiency_pct - 95.4476027529) < 1e-6 && a.isolating === true);
+  // fn = 3.13/sqrt(defl): a 0.25 in isolator doubles fn to 6.26 Hz.
+  assert.ok(Math.abs(_v483({ equipment_rpm: 900, static_deflection_in: 0.25 }).fn_hz - 6.26) < 1e-9);
+  // The amplification trap: 200 rpm on 1 in sits below sqrt(2) (ratio 1.06) and amplifies (T > 1), efficiency null.
+  const b = _v483({ equipment_rpm: 200, static_deflection_in: 1 });
+  assert.ok(b.isolating === false && b.transmissibility > 1 && b.efficiency_pct === null);
+  assert.ok(Math.abs(b.transmissibility - 7.4545861903) < 1e-6);
+  // Just above the sqrt(2) threshold isolation begins (ratio slightly over 1.414 -> isolating, small positive efficiency).
+  const c = _v483({ equipment_rpm: 285, static_deflection_in: 1 }); // f = 4.75 Hz, fn 3.13, ratio 1.517 > 1.414
+  assert.ok(c.isolating === true && c.efficiency_pct > 0);
+  // Error seams.
+  assert.ok("error" in _v483({ equipment_rpm: 0, static_deflection_in: 1 }));
+  assert.ok("error" in _v483({ equipment_rpm: 900, static_deflection_in: 0 }));
+  assert.ok("error" in _v483({ equipment_rpm: Infinity, static_deflection_in: 1 }));
+  assert.ok("error" in _v483({ equipment_rpm: 900, static_deflection_in: -1 }));
+});
+
 test("bounds: spec-v347 computeDuctHeatGain pins Q = U A dT, the airflow-inverse air-temp change, and error seams", () => {
   const r = _v347({ R_duct: 4, A_ft2: 100, dT_F: 65, cfm: 1000 });
   assert.ok(Math.abs(r.Q_btuh - 1625) < 1e-6);

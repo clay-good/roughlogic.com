@@ -13909,6 +13909,46 @@
       "kind": "industry"
     },
     {
+      "term": "vibration isolation",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "isolator selection",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "transmissibility",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "isolation efficiency",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "spring isolator",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "vibration mount",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "natural frequency",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
+      "term": "isolator deflection",
+      "target": "vibration-isolation",
+      "kind": "industry"
+    },
+    {
       "term": "air density correction",
       "target": "air-density-correction",
       "kind": "industry"

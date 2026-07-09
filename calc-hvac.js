@@ -3693,6 +3693,57 @@ function _renderAdpiSelection(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["adpi-diffuser-selection"] = _renderAdpiSelection;
 
+// ===================== spec-v483: vibration isolation efficiency (ASHRAE) =====================
+
+// dims: in { equipment_rpm: dimensionless, static_deflection_in: L } out: { fn_hz: T^-1, fn_cpm: T^-1, disturbing_hz: T^-1, ratio: dimensionless, transmissibility: dimensionless, efficiency_pct: dimensionless }
+export function computeVibrationIsolation({ equipment_rpm = 0, static_deflection_in = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const rpm = Number(equipment_rpm) || 0;
+  const defl = Number(static_deflection_in) || 0;
+  if (!(rpm > 0)) return { error: "Running speed must be positive (rpm)." };
+  if (!(defl > 0)) return { error: "Static deflection must be positive (in)." };
+  // ASHRAE / Den Hartog single-DOF isolator: fn = (1/2pi) sqrt(g/defl), g = 386.4 in/s^2 -> 3.13/sqrt(defl) Hz.
+  const fn_hz = 3.13 / Math.sqrt(defl);
+  const fn_cpm = fn_hz * 60;
+  const disturbing_hz = rpm / 60;
+  const ratio = disturbing_hz / fn_hz;
+  const isolating = ratio > Math.SQRT2;
+  const transmissibility = 1 / Math.abs(ratio * ratio - 1);
+  const efficiency_pct = isolating ? (1 - transmissibility) * 100 : null;
+  return {
+    fn_hz, fn_cpm, disturbing_hz, ratio, transmissibility, efficiency_pct, isolating,
+    note: "ASHRAE Handbook -- Fundamentals, Sound and Vibration: the single-degree-of-freedom vibration isolator. The isolated system's natural frequency fn = 3.13 / sqrt(static deflection in inches) Hz (= (1/2pi) sqrt(g/deflection)); the disturbing frequency is the running speed rpm/60 Hz (the lowest forcing frequency, which isolates worst); the transmissibility T = 1 / |(f/fn)^2 - 1| is the fraction of the shaking force that still reaches the structure, and the isolation efficiency is (1 - T). Isolation requires the frequency ratio to exceed sqrt(2) = 1.414; below that the mount amplifies the vibration (true resonance at a ratio of 1), and the fix is a stiffer isolator (less deflection raises fn). The undamped idealization (damping trims high-frequency isolation slightly but tames the resonant peak). The deflection is the isolator's rated value under the actual load; the equipment unbalance, floor stiffness, seismic restraint, and the isolator selection are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
+  };
+}
+const vibrationIsolationExample = { inputs: { equipment_rpm: 900, static_deflection_in: 1 } };
+
+function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASHRAE Handbook -- Fundamentals, Sound and Vibration (single-DOF isolator). Natural frequency fn = 3.13/sqrt(static deflection in inches) Hz; disturbing frequency = rpm/60; transmissibility T = 1/|(f/fn)^2 - 1|; isolation efficiency = (1 - T). Isolation needs a frequency ratio over sqrt(2) = 1.414, else the mount amplifies (resonance at 1). Undamped idealization; the rated isolator deflection under load governs. A design aid, not a stamped vibration-isolation design.";
+  const rpm = makeNumber("Equipment running speed (rpm)", "vib-rpm", { step: "any", min: "0" }); rpm.input.value = "900";
+  const defl = makeNumber("Isolator static deflection under load (in)", "vib-defl", { step: "any", min: "0" }); defl.input.value = "1";
+  for (const f of [rpm, defl]) inputRegion.appendChild(f.wrap);
+  const oFn = makeOutputLine(outputRegion, "System natural frequency", "vib-out-fn");
+  const oFd = makeOutputLine(outputRegion, "Disturbing frequency", "vib-out-fd");
+  const oR = makeOutputLine(outputRegion, "Frequency ratio f/fn", "vib-out-r");
+  const oT = makeOutputLine(outputRegion, "Transmissibility", "vib-out-t");
+  const oEff = makeOutputLine(outputRegion, "Isolation efficiency", "vib-out-eff");
+  const oNote = makeOutputLine(outputRegion, "Note", "vib-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVibrationIsolation({ equipment_rpm: readNum(rpm.input), static_deflection_in: readNum(defl.input) });
+    if (r.error) { oFn.textContent = r.error; oFd.textContent = "-"; oR.textContent = "-"; oT.textContent = "-"; oEff.textContent = "-"; oNote.textContent = ""; return; }
+    oFn.textContent = fmt(r.fn_hz, 2) + " Hz (" + fmt(r.fn_cpm, 0) + " cpm)";
+    oFd.textContent = fmt(r.disturbing_hz, 2) + " Hz";
+    oR.textContent = fmt(r.ratio, 2) + (r.isolating ? " (over sqrt(2): isolating)" : " (under sqrt(2): amplifying)");
+    oT.textContent = fmt(r.transmissibility, 3);
+    oEff.textContent = r.isolating ? fmt(r.efficiency_pct, 1) + "%" : "none - the mount AMPLIFIES " + fmt(r.transmissibility, 1) + "x (near resonance; use a stiffer isolator)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { rpm.input.value = "900"; defl.input.value = "1"; update(); });
+  for (const f of [rpm.input, defl.input]) f.addEventListener("input", update);
+}
+HVAC_RENDERERS["vibration-isolation"] = _renderVibrationIsolation;
+
 // dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless }
 export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;

@@ -39067,6 +39067,44 @@
    }
   },
   {
+   "tile_id": "vibration-isolation",
+   "source_publisher": "ASHRAE Handbook -- Fundamentals, Sound and Vibration (single-DOF isolator)",
+   "source_title": "900 rpm fan on 1 in isolators: fn 3.13 Hz, ratio 4.79, T 0.046 -> 95.4% isolation efficiency",
+   "source_edition_or_year": "spec-v483 worked example (machine-verified)",
+   "source_section_or_page": "spec-v483 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "equipment_rpm": 900,
+    "static_deflection_in": 1
+   },
+   "outputs": {
+    "fn_hz": { "value": 3.13, "tolerance": { "abs": 0.0001 } },
+    "disturbing_hz": { "value": 15, "tolerance": { "abs": 0.0001 } },
+    "ratio": { "value": 4.7923322683706076, "tolerance": { "abs": 0.0001 } },
+    "transmissibility": { "value": 0.04552397247065678, "tolerance": { "abs": 0.00001 } },
+    "efficiency_pct": { "value": 95.44760275293433, "tolerance": { "abs": 0.001 } }
+   }
+  },
+  {
+   "tile_id": "vibration-isolation",
+   "source_publisher": "ASHRAE Handbook -- Fundamentals, Sound and Vibration (single-DOF isolator)",
+   "source_title": "amplification trap: a 200 rpm unit on the same 1 in isolators sits below sqrt(2) (ratio 1.06) and AMPLIFIES 7.45x - a stiffer isolator is the fix",
+   "source_edition_or_year": "spec-v483 worked example (machine-verified)",
+   "source_section_or_page": "spec-v483 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-08",
+   "inputs": {
+    "equipment_rpm": 200,
+    "static_deflection_in": 1
+   },
+   "outputs": {
+    "ratio": { "value": 1.0649627263045793, "tolerance": { "abs": 0.0001 } },
+    "transmissibility": { "value": 7.45458619027892, "tolerance": { "abs": 0.0001 } },
+    "isolating": { "value": 0, "tolerance": { "abs": 0 } }
+   }
+  },
+  {
    "tile_id": "air-density-correction",
    "source_publisher": "ASHRAE Fundamentals",
    "source_title": "5,000 ft, 70 F, 1,000 ACFM -> DF 0.835, SCFM 835, static 0.42 in-wc",

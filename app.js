@@ -257,7 +257,7 @@ const TOOL_MODULES = (() => {
     // spec-v329..v331 building-energy batch
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",
-    "adpi-diffuser-selection",
+    "adpi-diffuser-selection", "vibration-isolation",
     "moist-air-enthalpy", "cooling-coil-total-load", "coil-bypass-factor",
     "fan-affinity-laws", "colebrook-friction-factor", "manual-d-friction-rate",
     // spec-v441..v443 energy-recovery / hydronic / economizer
