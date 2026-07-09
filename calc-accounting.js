@@ -1758,3 +1758,48 @@ function renderPrevailingWageFringe(inputRegion, outputRegion, citationEl) {
   for (const f of [base, fringe, tax]) f.input.addEventListener("input", update);
 }
 ACCOUNTING_RENDERERS["prevailing-wage-fringe"] = renderPrevailingWageFringe;
+
+// ===================== spec-v529: economic order quantity (Wilson EOQ) =====================
+// dims: in { annual_demand: dimensionless, order_cost: dimensionless, holding_cost: dimensionless } out: { eoq: dimensionless, orders_per_year: dimensionless, cycle_days: T, total_annual: dimensionless }
+export function computeEoqOrderQuantity({ annual_demand = 0, order_cost = 0, holding_cost = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(annual_demand) || 0;
+  const s = Number(order_cost) || 0;
+  const h = Number(holding_cost) || 0;
+  if (!(d > 0)) return { error: "Annual demand must be positive (units)." };
+  if (!(s > 0)) return { error: "Order cost must be positive ($)." };
+  if (!(h > 0)) return { error: "Holding cost must be positive ($/unit/yr)." };
+  const eoq = Math.sqrt(2 * d * s / h);
+  const orders_per_year = d / eoq;
+  const cycle_days = 365 / orders_per_year;
+  const total_annual = Math.sqrt(2 * d * s * h);
+  if (![eoq, orders_per_year, cycle_days, total_annual].every(Number.isFinite)) return { error: "EOQ math is not a finite value." };
+  return {
+    eoq, orders_per_year, cycle_days, total_annual,
+    note: "Economic order quantity (Wilson model): EOQ = sqrt(2 D S / H) is the order size that minimizes the SUM of two costs pulling opposite ways -- order too often and the fixed per-order cost (setup, freight, receiving) piles up; order too much at once and the holding cost (capital, storage, spoilage) piles up. At the EOQ the total annual ordering-plus-holding cost is sqrt(2 D S H), and ordering and holding cost are equal. The reassuring catch: the total-cost curve is FLAT near the minimum, so rounding the EOQ to a case or pallet quantity barely raises cost -- but hand-to-mouth ordering or a full truckload for a discount does. The model assumes steady demand and no quantity discounts (a discount tier needs a separate comparison). A planning aid, not a purchasing policy; the actual demand, lead time, and supplier terms govern.",
+  };
+}
+export const eoqOrderQuantityExample = { inputs: { annual_demand: 12000, order_cost: 50, holding_cost: 3 } };
+function renderEoqOrderQuantity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: economic order quantity (Wilson EOQ inventory model): EOQ = sqrt(2 D S / H); orders/yr = D / EOQ; cycle = 365 / orders; total annual cost = sqrt(2 D S H). Minimizes ordering plus holding cost; the total-cost curve is flat near the minimum, so rounding to a case quantity barely hurts. No quantity discounts assumed. A planning aid; the demand and supplier terms govern.";
+  const d = makeNumber("Annual demand (units/yr)", "eoq-d", { step: "any", min: "0" }); d.input.value = "12000";
+  const s = makeNumber("Fixed cost per order ($)", "eoq-s", { step: "any", min: "0" }); s.input.value = "50";
+  const h = makeNumber("Annual holding cost per unit ($/unit/yr)", "eoq-h", { step: "any", min: "0" }); h.input.value = "3";
+  for (const f of [d, s, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "12000"; s.input.value = "50"; h.input.value = "3"; update(); });
+  const oEoq = makeOutputLine(outputRegion, "Economic order quantity", "eoq-out-eoq");
+  const oOrders = makeOutputLine(outputRegion, "Orders per year / cycle", "eoq-out-orders");
+  const oTotal = makeOutputLine(outputRegion, "Total annual cost at EOQ", "eoq-out-total");
+  const oNote = makeOutputLine(outputRegion, "Note", "eoq-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeEoqOrderQuantity({ annual_demand: readNum(d.input), order_cost: readNum(s.input), holding_cost: readNum(h.input) });
+    if (r.error) { oEoq.textContent = r.error; oOrders.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    oEoq.textContent = fmt(r.eoq, 0) + " units per order";
+    oOrders.textContent = fmt(r.orders_per_year, 1) + " orders/yr (every " + fmt(r.cycle_days, 0) + " days)";
+    oTotal.textContent = "$" + fmt(r.total_annual, 0) + "/yr (ordering + holding)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, s, h]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["eoq-order-quantity"] = renderEoqOrderQuantity;

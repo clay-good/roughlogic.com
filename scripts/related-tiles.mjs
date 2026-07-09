@@ -43,6 +43,7 @@ const RELATED = {
   "surety-bond-premium": ["markup", "wip-percent-complete", "workers-comp-emr-premium", "change-order-markup"],
   "workers-comp-emr-premium": ["labor-burden-rate", "surety-bond-premium", "prevailing-wage-fringe", "employer-payroll-tax"],
   "prevailing-wage-fringe": ["employer-payroll-tax", "labor-burden-rate", "workers-comp-emr-premium", "surety-bond-premium"],
+  "eoq-order-quantity": ["inventory-turnover", "cash-conversion-cycle", "equipment-hourly-rate"],
   "shaft-torsion": ["driveshaft-crit", "section-properties", "motor-shaft-torque", "hp-from-torque"],
   "thermal-stress-restrained": ["pipe-expansion", "pipe-expansion-loop", "thermal-expansion-volume", "conduit-thermal-expansion"],
   "hoop-stress-thin-wall": ["pipe-pressure-rating", "tank-volume", "metal-weight", "combined-stress-axial-bending"],

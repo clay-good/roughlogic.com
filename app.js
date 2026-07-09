@@ -944,6 +944,8 @@ const TOOL_MODULES = (() => {
     "labor-burden-rate", "equipment-hourly-rate", "overhead-recovery-rate",
     "wip-percent-complete", "change-order-markup", "retainage-tracker",
     "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",
+    // spec-v529 economic order quantity (Wilson EOQ)
+    "eoq-order-quantity",
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [

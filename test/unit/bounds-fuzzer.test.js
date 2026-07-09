@@ -17831,3 +17831,22 @@ test("bounds: spec-v528 computeBlendedMortgageRate pins the balance-weighted ble
   assert.ok("error" in _v528({ balance_1: 300000, rate_1: -1, balance_2: 100000, rate_2: 8 }));
   assert.ok("error" in _v528({ balance_1: 0, rate_1: 4, balance_2: 0, rate_2: 8 }));
 });
+
+import { computeEoqOrderQuantity as _v529 } from "../../calc-accounting.js";
+
+test("bounds: spec-v529 computeEoqOrderQuantity pins the Wilson EOQ, the equal-cost identity, the scaling, and error seams", () => {
+  const r = _v529({ annual_demand: 12000, order_cost: 50, holding_cost: 3 });
+  assert.ok(Math.abs(r.eoq - 632.456) < 0.1); // sqrt(2 x 12000 x 50 / 3)
+  assert.ok(Math.abs(r.orders_per_year - 18.974) < 0.01);
+  assert.ok(Math.abs(r.cycle_days - 365 / r.orders_per_year) < 1e-6);
+  assert.ok(Math.abs(r.total_annual - 1897.37) < 0.1); // sqrt(2 D S H)
+  // At the EOQ ordering cost equals holding cost: D/EOQ x S == EOQ/2 x H.
+  assert.ok(Math.abs((r.orders_per_year * 50) - (r.eoq / 2 * 3)) < 0.01);
+  // Quadrupling the order cost doubles the EOQ (sqrt scaling).
+  assert.ok(Math.abs(_v529({ annual_demand: 12000, order_cost: 200, holding_cost: 3 }).eoq - 2 * r.eoq) < 1e-6);
+  // Error seams: non-finite, non-positive demand / order cost / holding cost.
+  assert.ok("error" in _v529({ annual_demand: Infinity, order_cost: 50, holding_cost: 3 }));
+  assert.ok("error" in _v529({ annual_demand: 0, order_cost: 50, holding_cost: 3 }));
+  assert.ok("error" in _v529({ annual_demand: 12000, order_cost: 0, holding_cost: 3 }));
+  assert.ok("error" in _v529({ annual_demand: 12000, order_cost: 50, holding_cost: 0 }));
+});

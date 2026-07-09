@@ -414,6 +414,18 @@ export const CITATIONS = {
       { name: "Bureau governs", value: "the rating bureau's published rate and official EMR govern", source: "scope of this tile" },
     ],
   },
+  "eoq-order-quantity": {
+    formula: "EOQ = sqrt(2 x D x S / H); orders_per_year = D / EOQ; cycle_days = 365 / orders_per_year; total_annual = sqrt(2 x D x S x H).",
+    edition: "The Wilson economic order quantity (EOQ) inventory model, by name; the actual demand, lead time, and supplier terms govern.",
+    freeAccess: "The Wilson EOQ formula is a standard published inventory-management result; the annual demand, order cost, and holding cost come from the business's records.",
+    governance: GOVERNANCE.general,
+    editionNote: "Economic order quantity (Wilson model). EOQ = sqrt(2 D S / H) is the order size that minimizes the SUM of ordering and holding cost -- ordering too often piles up the fixed per-order cost, ordering too much at once piles up the holding cost. At the EOQ the total annual cost is sqrt(2 D S H) and the two costs are equal. The total-cost curve is FLAT near the minimum, so rounding the EOQ to a case or pallet quantity barely raises cost. The model assumes steady demand and no quantity discounts (a discount tier needs a separate comparison). A planning aid, not a purchasing policy; the actual demand, lead time, and supplier terms govern.",
+    assumptions: [
+      { name: "Balances two costs", value: "EOQ minimizes fixed ordering cost plus holding cost; the two are equal at the EOQ", source: "Wilson EOQ model" },
+      { name: "Flat near minimum", value: "the total-cost curve is flat near the EOQ, so rounding to a case quantity barely hurts", source: "Wilson EOQ model" },
+      { name: "No discounts", value: "assumes steady demand and no quantity discounts; a discount tier needs a separate comparison", source: "scope of this tile" },
+    ],
+  },
   "prevailing-wage-fringe": {
     formula: "package = base + fringe; cash_burden = fringe x burden%; plan_saves_per_hr = fringe x burden% (fringe funded through a bona-fide plan is not taxable wages).",
     edition: "The prevailing-wage total package (base wage plus fringe) and the payroll-burden savings of paying fringe through a bona-fide plan versus as cash, by name.",

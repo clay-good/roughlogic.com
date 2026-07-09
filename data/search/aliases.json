@@ -18514,6 +18514,46 @@
       "kind": "industry"
     },
     {
+      "term": "eoq",
+      "target": "eoq-order-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "economic order quantity",
+      "target": "eoq-order-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "wilson eoq",
+      "target": "eoq-order-quantity",
+      "kind": "industry"
+    },
+    {
+      "term": "order quantity",
+      "target": "eoq-order-quantity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "inventory ordering cost",
+      "target": "eoq-order-quantity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "holding cost",
+      "target": "eoq-order-quantity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "optimal order size",
+      "target": "eoq-order-quantity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "reorder quantity",
+      "target": "eoq-order-quantity",
+      "kind": "adjacent"
+    },
+    {
       "term": "concrete torsion",
       "target": "concrete-torsion-threshold",
       "kind": "industry"

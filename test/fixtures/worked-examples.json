@@ -44164,6 +44164,62 @@
    }
   },
   {
+   "tile_id": "eoq-order-quantity",
+   "source_publisher": "Wilson economic order quantity (EOQ) inventory model",
+   "source_title": "12,000 units/yr, $50/order, $3/unit/yr -> 632 units EOQ, 19 orders/yr, $1,897/yr total",
+   "source_edition_or_year": "spec-v529 worked example (machine-verified)",
+   "source_section_or_page": "spec-v529 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "annual_demand": 12000,
+    "order_cost": 50,
+    "holding_cost": 3
+   },
+   "outputs": {
+    "eoq": {
+     "value": 632,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "orders_per_year": {
+     "value": 18.97,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "total_annual": {
+     "value": 1897,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "eoq-order-quantity",
+   "source_publisher": "Wilson economic order quantity (EOQ) inventory model",
+   "source_title": "cross-check: quadrupling the order cost to $200 doubles the EOQ to 1,265 units",
+   "source_edition_or_year": "spec-v529 worked example (machine-verified)",
+   "source_section_or_page": "spec-v529 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "annual_demand": 12000,
+    "order_cost": 200,
+    "holding_cost": 3
+   },
+   "outputs": {
+    "eoq": {
+     "value": 1265,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-torsion-threshold",
    "source_publisher": "ACI 318-19 §22.7",
    "source_title": "12x20 in, 4000 psi -> Tth 56,921 in-lb (4.74 ft-kip), neglect 3.56, Tcr 18.97 ft-kip",

@@ -82,6 +82,8 @@ const _TILES = [
   ["labor-burden-rate", "R"], ["equipment-hourly-rate", "R"], ["overhead-recovery-rate", "R"],
   ["wip-percent-complete", "R"], ["change-order-markup", "R"], ["retainage-tracker", "R"],
   ["surety-bond-premium", "R"], ["workers-comp-emr-premium", "R"], ["prevailing-wage-fringe", "R"],
+  // spec-v529 economic order quantity (Wilson EOQ)
+  ["eoq-order-quantity", "R"],
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],
