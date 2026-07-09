@@ -80,6 +80,7 @@ const RELATED = {
   "rental-total-return": ["cash-on-cash", "rental-worksheet", "brrrr-refi", "gross-rent-multiplier"],
   "net-effective-rent": ["rent-roll-vacancy", "rental-worksheet", "cap-rate-dscr"],
   "commercial-load-factor": ["net-effective-rent", "square-footage", "rental-worksheet"],
+  "blended-mortgage-rate": ["piti", "mortgage-point-breakeven", "loan-payment"],
   "cantilever-beam": ["beam-loading", "beam-reactions", "section-properties", "joist-deflection"],
   "section-properties": ["cantilever-beam", "beam-loading", "combined-stress-axial-bending", "metal-weight"],
   "combined-stress-axial-bending": ["section-properties", "cantilever-beam", "wood-combined-bending-axial", "steel-h1-interaction"],

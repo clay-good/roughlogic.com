@@ -40364,6 +40364,64 @@
    }
   },
   {
+   "tile_id": "blended-mortgage-rate",
+   "source_publisher": "blended mortgage rate (weighted-average cost of debt)",
+   "source_title": "$300K at 4% + $100K at 8% -> 5.00% blended on $400K, $1,667/mo interest",
+   "source_edition_or_year": "spec-v528 worked example (machine-verified)",
+   "source_section_or_page": "spec-v528 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "balance_1": 300000,
+    "rate_1": 4,
+    "balance_2": 100000,
+    "rate_2": 8
+   },
+   "outputs": {
+    "blended_rate": {
+     "value": 5.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "combined": {
+     "value": 400000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "monthly_interest": {
+     "value": 1666.67,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "blended-mortgage-rate",
+   "source_publisher": "blended mortgage rate (weighted-average cost of debt)",
+   "source_title": "cross-check: a smaller $40K second barely moves the blend to 4.47%",
+   "source_edition_or_year": "spec-v528 worked example (machine-verified)",
+   "source_section_or_page": "spec-v528 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "balance_1": 300000,
+    "rate_1": 4,
+    "balance_2": 40000,
+    "rate_2": 8
+   },
+   "outputs": {
+    "blended_rate": {
+     "value": 4.47,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "duct-heat-gain",
    "source_publisher": "ASHRAE Fundamentals",
    "source_title": "1,000 CFM 55 F air, R-4 duct, 100 ft^2, 120 F attic -> 1,625 Btu/h, 1.5 F warming",

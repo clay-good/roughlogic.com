@@ -205,6 +205,18 @@ export const CITATIONS = {
       { name: "Lender rules", value: "the appraised ARV and the lender's LTV/seasoning govern", source: "scope of this tile" },
     ],
   },
+  "blended-mortgage-rate": {
+    formula: "combined = balance_1 + balance_2; blended = (balance_1 x rate_1 + balance_2 x rate_2) / combined; monthly_interest = (balance_1 x rate_1 + balance_2 x rate_2) / 1200.",
+    edition: "Blended mortgage rate (the balance-weighted average cost of debt across two loans), by name; the actual loan documents govern.",
+    freeAccess: "The balance-weighted average rate is a standard weighted-average-cost-of-debt calculation; the balances and rates come from the loan statements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Blended mortgage rate (balance-weighted average). blended = (bal1 x rate1 + bal2 x rate2) / (bal1 + bal2), and the monthly interest = the same numerator / 1200. It compares the weighted cost of debt of keeping a low-rate first and adding a second (a HELOC or seller carry) against a single cash-out refinance rate: keep-and-add wins only if the refinance rate is above the blended rate. This is a balance-weighted SNAPSHOT that ignores the loans' differing terms and amortization, and a variable-rate second (a HELOC that resets) makes the blend drift over time. It is a cost-of-debt comparison, not a payment schedule. A comparison aid, not a payment plan; the actual loan documents govern.",
+    assumptions: [
+      { name: "Balance-weighted", value: "the blend follows the balances, so a small second hardly dilutes a big low-rate first", source: "weighted-average cost of debt" },
+      { name: "Snapshot", value: "ignores differing terms and amortization; a variable second drifts as its rate resets", source: "scope of this tile" },
+      { name: "Comparison basis", value: "keep-and-add beats a refinance only if the single new rate exceeds the blended rate", source: "cost-of-debt comparison" },
+    ],
+  },
   "commercial-load-factor": {
     formula: "rentable = usable x (1 + common_area_factor); load_factor = rentable / usable; annual_rent = base_rent x rentable; cost_per_usable = base_rent x load_factor.",
     edition: "BOMA rentable/usable load factor (the ANSI/BOMA Z65.1 Office Standard), by name; the measured BOMA areas and the lease govern.",

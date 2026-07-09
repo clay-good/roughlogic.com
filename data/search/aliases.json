@@ -15829,6 +15829,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "blended rate",
+      "target": "blended-mortgage-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "blended mortgage rate",
+      "target": "blended-mortgage-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "weighted average rate",
+      "target": "blended-mortgage-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "first and second mortgage",
+      "target": "blended-mortgage-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "heloc blend",
+      "target": "blended-mortgage-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "combined rate",
+      "target": "blended-mortgage-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cost of debt",
+      "target": "blended-mortgage-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "keep first add second",
+      "target": "blended-mortgage-rate",
+      "kind": "adjacent"
+    },
+    {
       "term": "clarifier loading",
       "target": "clarifier-surface-loading",
       "kind": "industry"

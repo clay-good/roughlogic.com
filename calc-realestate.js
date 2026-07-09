@@ -2871,3 +2871,50 @@ function renderCommercialLoadFactor(inputRegion, outputRegion, citationEl) {
   for (const f of [usable, caf, rent]) f.input.addEventListener("input", update);
 }
 REALESTATE_RENDERERS["commercial-load-factor"] = renderCommercialLoadFactor;
+
+// ===================== spec-v528: blended mortgage rate (two loans) =====================
+// dims: in { balance_1: dimensionless, rate_1: dimensionless, balance_2: dimensionless, rate_2: dimensionless } out: { combined: dimensionless, blended_rate: dimensionless, monthly_interest: dimensionless }
+export function computeBlendedMortgageRate({ balance_1 = 0, rate_1 = 0, balance_2 = 0, rate_2 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b1 = Number(balance_1) || 0;
+  const r1 = Number(rate_1) || 0;
+  const b2 = Number(balance_2) || 0;
+  const r2 = Number(rate_2) || 0;
+  if (b1 < 0 || b2 < 0) return { error: "Loan balances cannot be negative." };
+  if (r1 < 0 || r2 < 0) return { error: "Interest rates cannot be negative." };
+  const combined = b1 + b2;
+  if (!(combined > 0)) return { error: "The combined balance must be positive." };
+  const weighted = b1 * r1 + b2 * r2;
+  const blended_rate = weighted / combined;
+  const monthly_interest = weighted / 1200;
+  if (![combined, blended_rate, monthly_interest].every(Number.isFinite)) return { error: "Blended-rate math is not a finite value." };
+  return {
+    combined, blended_rate, monthly_interest,
+    note: "Blended mortgage rate = the balance-weighted average of two loans: blended = (bal1 x rate1 + bal2 x rate2) / (bal1 + bal2). It answers one question well -- is the weighted cost of debt of keeping a low-rate first and ADDING a second (a HELOC or seller carry) lower than the rate on a cash-out REFINANCE of everything? Keep-and-add wins only if the single refinance rate is above the blended rate. The catch: this is a snapshot that ignores the loans' differing terms and amortization, and a variable-rate second (a HELOC that resets) makes the blend DRIFT over time. The weighting follows the balances, so a small second hardly dilutes a big low-rate first. A comparison aid, not a payment plan; the actual loan documents govern.",
+  };
+}
+export const blendedMortgageRateExample = { inputs: { balance_1: 300000, rate_1: 4, balance_2: 100000, rate_2: 8 } };
+function renderBlendedMortgageRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: blended mortgage rate (weighted-average cost of debt): blended = (bal1 x rate1 + bal2 x rate2) / (bal1 + bal2); monthly interest = (bal1 x rate1 + bal2 x rate2) / 1200. A balance-weighted snapshot that ignores differing terms and amortization; a variable second drifts. A comparison aid; the loan documents govern.";
+  const b1 = makeNumber("First loan balance ($)", "bmr-b1", { step: "any", min: "0" }); b1.input.value = "300000";
+  const r1 = makeNumber("First loan rate (%)", "bmr-r1", { step: "any", min: "0" }); r1.input.value = "4";
+  const b2 = makeNumber("Second loan balance ($, HELOC / seller 2nd)", "bmr-b2", { step: "any", min: "0" }); b2.input.value = "100000";
+  const r2 = makeNumber("Second loan rate (%)", "bmr-r2", { step: "any", min: "0" }); r2.input.value = "8";
+  for (const f of [b1, r1, b2, r2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { b1.input.value = "300000"; r1.input.value = "4"; b2.input.value = "100000"; r2.input.value = "8"; update(); });
+  const oBlend = makeOutputLine(outputRegion, "Blended rate", "bmr-out-blend");
+  const oComb = makeOutputLine(outputRegion, "Combined balance", "bmr-out-comb");
+  const oInt = makeOutputLine(outputRegion, "Total monthly interest", "bmr-out-int");
+  const oNote = makeOutputLine(outputRegion, "Note", "bmr-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBlendedMortgageRate({ balance_1: readNum(b1.input), rate_1: readNum(r1.input), balance_2: readNum(b2.input), rate_2: readNum(r2.input) });
+    if (r.error) { oBlend.textContent = r.error; oComb.textContent = "-"; oInt.textContent = "-"; oNote.textContent = ""; return; }
+    oBlend.textContent = fmt(r.blended_rate, 2) + "% (refinance below this to win)";
+    oComb.textContent = "$" + fmt(r.combined, 0);
+    oInt.textContent = "$" + fmt(r.monthly_interest, 0) + "/mo";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b1, r1, b2, r2]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["blended-mortgage-rate"] = renderBlendedMortgageRate;

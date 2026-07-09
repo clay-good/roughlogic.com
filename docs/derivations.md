@@ -2279,6 +2279,7 @@ cross-check.
 | calc-powerquality.js | `computeTransformerKFactor` | `{ i1 = 1, i3 = 0, i5 = 0, i7 = 0, i9 = 0, i11 = 0, i13 = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `compute1031Timeline` | `{ sale_close_iso }` | _ | _ | _ |
 | calc-realestate.js | `computeAmortizationSchedule` | `{ principal, apr_percent, term_years, extra_monthly_principal }` | _ | _ | _ |
+| calc-realestate.js | `computeBlendedMortgageRate` | `{ balance_1 = 0, rate_1 = 0, balance_2 = 0, rate_2 = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeBreakEvenOccupancy` | `{ opex = 0, debt_svc = 0, pgi = 0, target_occ = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeBrrrrRefi` | `{ arv_usd = 0, total_invested_usd = 0, refi_ltv_pct = 75, existing_payoff_usd...` | _ | _ | _ |
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |
@@ -2639,7 +2640,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1225.
+Row count: 1226.
 
 <!-- END function-corpus-v14 -->
 
@@ -3721,11 +3722,12 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (32 tiles)
+### Group X Real Estate (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `amortization-schedule` | Full Amortization Schedule | Standard mortgage amortization (public); Worked example: $320,000 at 6.5% for 30 yr -> P&I $2022.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `blended-mortgage-rate` | Blended Mortgage Rate (Two Loans) | blended mortgage rate (weighted-avera...; spec-v528 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `break-even-occupancy` | Break-Even Occupancy | CRE underwriting; spec-v345 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `brrrr-refi` | BRRRR Cash-Out Refinance and Capital Left In | real-estate-investing practice; spec-v403 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cap-rate-dscr` | Cap Rate and DSCR | Standard CRE underwriting ratios (pub...; Worked example: NOI $84,000 / value $1.2M -> 7.0%; debt s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3806,6 +3808,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 981. Fixture-covered or reference-cadence: 981 / 981.
+Tile count: 982. Fixture-covered or reference-cadence: 982 / 982.
 
 <!-- END tile-index-v14 -->

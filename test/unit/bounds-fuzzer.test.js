@@ -17811,3 +17811,23 @@ test("bounds: spec-v527 computeCommercialLoadFactor pins the rentable area, the 
   assert.ok("error" in _v527({ usable_sf: 10000, common_area_factor: -0.1, base_rent: 30 }));
   assert.ok("error" in _v527({ usable_sf: 10000, common_area_factor: 0.15, base_rent: -1 }));
 });
+
+import { computeBlendedMortgageRate as _v528 } from "../../calc-realestate.js";
+
+test("bounds: spec-v528 computeBlendedMortgageRate pins the balance-weighted blend, the monthly interest, and error seams", () => {
+  const r = _v528({ balance_1: 300000, rate_1: 4, balance_2: 100000, rate_2: 8 });
+  assert.ok(Math.abs(r.blended_rate - 5.0) < 1e-9); // (300000x4 + 100000x8) / 400000
+  assert.ok(Math.abs(r.combined - 400000) < 1e-9);
+  assert.ok(Math.abs(r.monthly_interest - 1666.667) < 0.01);
+  // The blend sits between the two rates, weighted toward the larger balance.
+  assert.ok(r.blended_rate > 4 && r.blended_rate < 8);
+  const small = _v528({ balance_1: 300000, rate_1: 4, balance_2: 40000, rate_2: 8 });
+  assert.ok(Math.abs(small.blended_rate - 4.4706) < 0.001 && small.blended_rate < r.blended_rate);
+  // A single loan (second balance zero) returns the first rate.
+  assert.ok(Math.abs(_v528({ balance_1: 300000, rate_1: 4, balance_2: 0, rate_2: 8 }).blended_rate - 4) < 1e-9);
+  // Error seams: non-finite, negative balance / rate, zero combined balance.
+  assert.ok("error" in _v528({ balance_1: Infinity, rate_1: 4, balance_2: 100000, rate_2: 8 }));
+  assert.ok("error" in _v528({ balance_1: -1, rate_1: 4, balance_2: 100000, rate_2: 8 }));
+  assert.ok("error" in _v528({ balance_1: 300000, rate_1: -1, balance_2: 100000, rate_2: 8 }));
+  assert.ok("error" in _v528({ balance_1: 0, rate_1: 4, balance_2: 0, rate_2: 8 }));
+});

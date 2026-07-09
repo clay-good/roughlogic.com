@@ -72,6 +72,8 @@ const _TILES = [
   ["net-effective-rent", "X"],
   // spec-v527 rentable/usable load factor (BOMA)
   ["commercial-load-factor", "X"],
+  // spec-v528 blended mortgage rate (two loans)
+  ["blended-mortgage-rate", "X"],
   ["primer-tm", "T"],
   ["cfu-plate-count", "T"],
   ["declining-balance-depreciation", "R"],
