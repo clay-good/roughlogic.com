@@ -7700,6 +7700,18 @@ export const CITATIONS = {
       { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
     ],
   },
+  "wheel-offset-backspacing": {
+    formula: "overall_width = rim_width + 1; backspacing = rim_width/2 + 0.5 + offset_mm/25.4; offset_mm = (backspacing - rim_width/2 - 0.5) x 25.4; frontspacing = overall_width - backspacing.",
+    edition: "Wheel offset / backspacing conversion (Tire & Rim Association wheel dimensions), first-principles geometry, by name; the actual wheel, hub, and suspension clearances govern.",
+    freeAccess: "The offset-backspacing conversion is first-principles wheel geometry; the rim width and offset come from the wheel specification.",
+    governance: GOVERNANCE.general,
+    editionNote: "Wheel offset / backspacing conversion. overall_width = rim_width + 1, backspacing = rim_width/2 + 0.5 + offset/25.4, and offset = (backspacing - rim_width/2 - 0.5) x 25.4. The rim width is the BEAD SEAT and the wheel is about one inch wider overall (half an inch per flange), so backspacing is figured off the overall width -- omit that inch and a fitment comes out an inch wrong. A more positive offset pulls the wheel inboard (more fender clearance, less brake and strut clearance); backspacing and offset describe the same geometry in different units and directions. A fitment aid, not a guarantee it clears; the actual wheel, hub, and suspension clearances govern.",
+    assumptions: [
+      { name: "Bead seat vs overall", value: "the rim width is the bead seat; the wheel is ~1 in wider overall (0.5 in per flange)", source: "Tire & Rim Association" },
+      { name: "Positive offset", value: "a more positive offset pulls the wheel inboard (more fender, less brake/strut clearance)", source: "wheel fitment practice" },
+      { name: "Same geometry", value: "backspacing and offset describe the same fitment in different units and directions", source: "geometry" },
+    ],
+  },
   "crouch-planing-speed": {
     formula: "speed_mph = C / sqrt(weight_lb / hp), with the hull constant C ~150 heavy cruiser / ~190 runabout / ~210 race.",
     edition: "Crouch's planing-speed formula (naval-architecture back-of-envelope for planing top speed), by name; the actual hull, propeller, and conditions govern.",

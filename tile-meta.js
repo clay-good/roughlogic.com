@@ -533,6 +533,8 @@ const _TILES = [
   ["turbo-pressure-ratio", "K"],
   // spec-v507 Crouch planing-speed estimate
   ["crouch-planing-speed", "K"],
+  // spec-v510 wheel offset and backspacing
+  ["wheel-offset-backspacing", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

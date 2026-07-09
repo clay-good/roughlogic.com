@@ -17437,3 +17437,21 @@ test("bounds: spec-v509 computeCountersinkDepth pins the plunge depth, the angle
   assert.ok("error" in _v509({ countersink_dia_in: 0.5, included_angle_deg: 0, pilot_hole_dia_in: 0.25 }));
   assert.ok("error" in _v509({ countersink_dia_in: 0.5, included_angle_deg: 180, pilot_hole_dia_in: 0.25 }));
 });
+
+import { computeWheelOffsetBackspacing as _v510 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v510 computeWheelOffsetBackspacing pins the offset->backspacing conversion, the round-trip, and error seams", () => {
+  const r = _v510({ rim_width_in: 8, offset_mm: 45, backspacing_in: 0 });
+  assert.ok(Math.abs(r.overall_width_in - 9) < 1e-9); // bead seat + 1 in
+  assert.ok(Math.abs(r.backspacing_out_in - 6.2717) < 1e-3); // 4 + 0.5 + 45/25.4
+  assert.ok(Math.abs(r.frontspacing_in - 2.7283) < 1e-3);
+  // Round-trip: solving offset from that backspacing returns ~45 mm.
+  const back = _v510({ rim_width_in: 8, offset_mm: 0, backspacing_in: r.backspacing_out_in });
+  assert.ok(Math.abs(back.offset_mm_out - 45) < 1e-6);
+  // A more positive offset increases backspacing (pulls the wheel inboard); zero offset is ~1.8 in less.
+  assert.ok(_v510({ rim_width_in: 8, offset_mm: 0, backspacing_in: 0 }).backspacing_out_in < r.backspacing_out_in);
+  assert.ok(Math.abs(r.backspacing_out_in - _v510({ rim_width_in: 8, offset_mm: 0, backspacing_in: 0 }).backspacing_out_in - 45 / 25.4) < 1e-6);
+  // Error seams: non-finite, non-positive rim width.
+  assert.ok("error" in _v510({ rim_width_in: Infinity, offset_mm: 45 }));
+  assert.ok("error" in _v510({ rim_width_in: 0, offset_mm: 45 }));
+});

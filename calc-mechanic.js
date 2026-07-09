@@ -1538,3 +1538,48 @@ MECHANIC_RENDERERS["crouch-planing-speed"] = _simpleRenderer({
   ],
   compute: computeCrouchPlaningSpeed,
 });
+
+// ===================== spec-v510: wheel offset and backspacing =====================
+
+// dims: in { rim_width_in: L, offset_mm: L, backspacing_in: L } out: { overall_width_in: L, backspacing_out_in: L, offset_mm_out: L, frontspacing_in: L }
+export function computeWheelOffsetBackspacing({ rim_width_in = 0, offset_mm = 0, backspacing_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rim = Number(rim_width_in) || 0;
+  const off = Number(offset_mm) || 0;
+  const back = Number(backspacing_in) || 0;
+  if (!(rim > 0)) return { error: "Rim width must be positive (in)." };
+  const overall_width_in = rim + 1;
+  let backspacing_out_in, offset_mm_out;
+  if (back > 0) {
+    backspacing_out_in = back;
+    offset_mm_out = (back - rim / 2 - 0.5) * 25.4;
+  } else {
+    offset_mm_out = off;
+    backspacing_out_in = rim / 2 + 0.5 + off / 25.4;
+  }
+  const frontspacing_in = overall_width_in - backspacing_out_in;
+  if (![overall_width_in, backspacing_out_in, offset_mm_out, frontspacing_in].every(Number.isFinite)) return { error: "Wheel-fitment math is not a finite value." };
+  return {
+    overall_width_in, backspacing_out_in, offset_mm_out, frontspacing_in,
+    note: "Wheel offset / backspacing conversion: OFFSET (ET, mm) is from the mounting face to the wheel centerline, BACKSPACING (in) is from the mounting face to the inboard rim edge -- the same geometry in different units and directions. The rim 'width' is the BEAD SEAT, but the wheel is about one inch wider overall (half an inch per flange), so backspacing = rim_width/2 + 0.5 + offset/25.4 -- omit that inch and a fitment comes out an inch wrong. A more POSITIVE offset pulls the wheel INBOARD (more fender clearance, less brake and strut clearance): 0 to +45 mm moves the wheel about 1.8 in inward. A fitment aid, not a guarantee it clears; the actual wheel, hub, and suspension clearances govern.",
+  };
+}
+export const wheelOffsetBackspacingExample = { inputs: { rim_width_in: 8, offset_mm: 45, backspacing_in: 0 } };
+
+MECHANIC_RENDERERS["wheel-offset-backspacing"] = _simpleRenderer({
+  citation: "Citation: wheel offset / backspacing conversion (Tire & Rim Association wheel dimensions): overall_width = rim_width + 1; backspacing = rim_width/2 + 0.5 + offset/25.4; offset = (backspacing - rim_width/2 - 0.5) x 25.4. The rim width is the bead seat; the wheel is ~1 in wider overall. A more positive offset pulls the wheel inboard. A fitment aid; the wheel, hub, and suspension clearances govern.",
+  example: wheelOffsetBackspacingExample.inputs,
+  fields: [
+    { key: "rim_width_in", label: "Rim (bead-seat) width (in)", kind: "number", default: 8 },
+    { key: "offset_mm", label: "Offset ET (mm, + = outboard face; use if solving from offset)", kind: "number", default: 45 },
+    { key: "backspacing_in", label: "Backspacing (in, 0 = solve it from offset)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "ov", id: "wob-out-ov", label: "Overall width (bead seat + 1 in)", value: (r) => fmt(r.overall_width_in, 2) + " in" },
+    { key: "bk", id: "wob-out-bk", label: "Backspacing", value: (r) => fmt(r.backspacing_out_in, 2) + " in" },
+    { key: "of", id: "wob-out-of", label: "Offset ET", value: (r) => fmt(r.offset_mm_out, 0) + " mm" },
+    { key: "fr", id: "wob-out-fr", label: "Frontspacing", value: (r) => fmt(r.frontspacing_in, 2) + " in" },
+    { key: "n", id: "wob-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWheelOffsetBackspacing,
+});

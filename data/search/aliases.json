@@ -19114,6 +19114,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "wheel offset",
+      "target": "wheel-offset-backspacing",
+      "kind": "industry"
+    },
+    {
+      "term": "backspacing",
+      "target": "wheel-offset-backspacing",
+      "kind": "industry"
+    },
+    {
+      "term": "et offset",
+      "target": "wheel-offset-backspacing",
+      "kind": "industry"
+    },
+    {
+      "term": "wheel fitment",
+      "target": "wheel-offset-backspacing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "offset to backspacing",
+      "target": "wheel-offset-backspacing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "positive negative offset",
+      "target": "wheel-offset-backspacing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rim backspacing",
+      "target": "wheel-offset-backspacing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wheel poke",
+      "target": "wheel-offset-backspacing",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -761,6 +761,8 @@ const TOOL_MODULES = (() => {
     "turbo-pressure-ratio",
     // spec-v507 Crouch planing-speed estimate
     "crouch-planing-speed",
+    // spec-v510 wheel offset and backspacing
+    "wheel-offset-backspacing",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

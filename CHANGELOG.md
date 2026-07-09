@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-machining.js gzip cap 11000 -> 13000; 2026-07-09
+
+The spec-v489..v588 campaign added two Group K tiles to `calc-machining.js` (spec-v504 `bearing-l10-life`, spec-v509 `countersink-depth`), taking the built copy to ~11.2 KB gz (102% of the 11000 B cap). Raised the `check-module-sizes` cap to **13000** (current + ~16% headroom). Lazy-loaded, absent from the home-view payload.
+
 ### chore(sizes): raise calc-mechanic.js gzip cap 28000 -> 32000; 2026-07-09
 
 Three more Group K marine/engine tiles landed in `calc-mechanic.js` (spec-v505 `anchor-rode-scope`, spec-v506 `turbo-pressure-ratio`, spec-v507 `crouch-planing-speed`), taking the built copy to ~28.3 KB gz (101.1% of the 28000 B cap set three tiles earlier). Raised the cap to **32000** (current + ~13% headroom) to absorb the remaining Group K tiles in the campaign without another immediate raise. Lazy-loaded, absent from the home-view payload.
