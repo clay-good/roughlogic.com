@@ -5614,6 +5614,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "def consumption",
+      "target": "def-consumption",
+      "kind": "industry"
+    },
+    {
+      "term": "diesel exhaust fluid",
+      "target": "def-consumption",
+      "kind": "industry"
+    },
+    {
+      "term": "def range",
+      "target": "def-consumption",
+      "kind": "industry"
+    },
+    {
+      "term": "def usage",
+      "target": "def-consumption",
+      "kind": "adjacent"
+    },
+    {
+      "term": "scr def dose",
+      "target": "def-consumption",
+      "kind": "adjacent"
+    },
+    {
+      "term": "def tank",
+      "target": "def-consumption",
+      "kind": "adjacent"
+    },
+    {
+      "term": "def per gallon diesel",
+      "target": "def-consumption",
+      "kind": "adjacent"
+    },
+    {
+      "term": "def derate",
+      "target": "def-consumption",
+      "kind": "adjacent"
+    },
+    {
       "term": "chlorine demand dose",
       "target": "chlorine-demand",
       "kind": "industry"

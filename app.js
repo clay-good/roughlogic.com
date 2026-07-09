@@ -727,6 +727,8 @@ const TOOL_MODULES = (() => {
     "detention-demurrage-billing", "driver-pay-cpm-vs-percentage", "invoice-factoring-cost",
     // spec-v486 trailer tongue weight and sway check
     "trailer-tongue-weight",
+    // spec-v508 diesel exhaust fluid (DEF) consumption and range
+    "def-consumption",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [

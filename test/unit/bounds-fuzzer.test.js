@@ -17398,3 +17398,23 @@ test("bounds: spec-v507 computeCrouchPlaningSpeed pins the Crouch speed, the sqr
   assert.ok("error" in _v507({ displacement_lb: 6000, shaft_hp: 0, hull_constant: 190 }));
   assert.ok("error" in _v507({ displacement_lb: 6000, shaft_hp: 200, hull_constant: 0 }));
 });
+
+import { computeDefConsumption as _v508 } from "../../calc-trucking.js";
+
+test("bounds: spec-v508 computeDefConsumption pins the 2.5% dose, the diesel-per-tank, the range, and error seams", () => {
+  const r = _v508({ diesel_gal: 200, mpg: 6.5, dose_pct: 2.5, def_tank_gal: 13 });
+  assert.ok(Math.abs(r.def_used_gal - 5) < 1e-9); // 200 x 2.5%
+  assert.ok(Math.abs(r.diesel_per_def_gal - 520) < 1e-9); // 13 / 0.025
+  assert.ok(Math.abs(r.range_mi - 3380) < 1e-6);
+  // A heavier dose burns DEF faster and shortens the range on a tank.
+  const heavy = _v508({ diesel_gal: 200, mpg: 6.5, dose_pct: 3.0, def_tank_gal: 13 });
+  assert.ok(heavy.def_used_gal > r.def_used_gal && heavy.diesel_per_def_gal < r.diesel_per_def_gal && Math.abs(heavy.range_mi - 2816.67) < 1);
+  // The miles/mpg path derives diesel when diesel is 0.
+  assert.ok(Math.abs(_v508({ diesel_gal: 0, trip_miles: 1300, mpg: 6.5, dose_pct: 2.5, def_tank_gal: 13 }).diesel_gal_used - 200) < 1e-9);
+  // Error seams: non-finite, non-positive dose/tank, no diesel and no miles, missing mpg on the miles path.
+  assert.ok("error" in _v508({ diesel_gal: Infinity, dose_pct: 2.5, def_tank_gal: 13 }));
+  assert.ok("error" in _v508({ diesel_gal: 200, dose_pct: 0, def_tank_gal: 13 }));
+  assert.ok("error" in _v508({ diesel_gal: 200, dose_pct: 2.5, def_tank_gal: 0 }));
+  assert.ok("error" in _v508({ diesel_gal: 0, trip_miles: 0, dose_pct: 2.5, def_tank_gal: 13 }));
+  assert.ok("error" in _v508({ diesel_gal: 0, trip_miles: 1300, mpg: 0, dose_pct: 2.5, def_tank_gal: 13 }));
+});

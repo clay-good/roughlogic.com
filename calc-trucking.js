@@ -1535,3 +1535,52 @@ const renderTrailerTongueWeight = _simpleRenderer({
   compute: computeTrailerTongueWeight,
 });
 TRUCKING_RENDERERS["trailer-tongue-weight"] = renderTrailerTongueWeight;
+
+// ===================== spec-v508: diesel exhaust fluid (DEF) consumption and range =====================
+// dims: in { diesel_gal: L^3, trip_miles: L, mpg: L^-2, dose_pct: dimensionless, def_tank_gal: L^3 } out: { diesel_gal_used: L^3, def_used_gal: L^3, diesel_per_def_gal: L^3, range_mi: L }
+export function computeDefConsumption({ diesel_gal = 0, trip_miles = 0, mpg = 0, dose_pct = 2.5, def_tank_gal = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dsl = Number(diesel_gal) || 0;
+  const miles = Number(trip_miles) || 0;
+  const mpgv = Number(mpg) || 0;
+  const dose = Number(dose_pct) || 0;
+  const tank = Number(def_tank_gal) || 0;
+  if (!(dose > 0)) return { error: "DEF dose rate must be positive (percent)." };
+  if (!(tank > 0)) return { error: "DEF tank size must be positive (gal)." };
+  let diesel_gal_used;
+  if (dsl > 0) {
+    diesel_gal_used = dsl;
+  } else {
+    if (!(miles > 0)) return { error: "Provide diesel gallons, or positive trip miles to derive it." };
+    if (!(mpgv > 0)) return { error: "Fuel economy must be positive (mpg) to derive diesel from miles." };
+    diesel_gal_used = miles / mpgv;
+  }
+  const def_used_gal = diesel_gal_used * dose / 100;
+  const diesel_per_def_gal = tank / (dose / 100);
+  const range_mi = mpgv > 0 ? diesel_per_def_gal * mpgv : null;
+  if (![diesel_gal_used, def_used_gal, diesel_per_def_gal].every(Number.isFinite)) return { error: "DEF-consumption math is not a finite value." };
+  return {
+    diesel_gal_used, def_used_gal, diesel_per_def_gal, range_mi,
+    note: "DEF consumption and range: diesel exhaust fluid is metered into the SCR aftertreatment at only about 2 to 3% of the diesel consumed, so a DEF tank spans SEVERAL diesel fills -- def_used = diesel x dose/100, and a full DEF tank covers diesel = def_tank / (dose/100), which at the truck's mpg is the range on one DEF fill. Plan DEF per fuel stop and you either haul jugs you do not need or run it dry -- and running DEF empty forces an ECU derate to roughly a 5 mph limp-home, non-negotiable, until refilled. DEF freezes at about 12 F (the SCR system thaws it in service). The actual dose rate varies with engine, load, and duty cycle; a hard-pulling truck doses higher and pulls the refill forward. A planning estimate, not the truck's metered rate; the OEM and DEF quality govern.",
+  };
+}
+export const defConsumptionExample = { inputs: { diesel_gal: 200, trip_miles: 0, mpg: 6.5, dose_pct: 2.5, def_tank_gal: 13 } };
+
+TRUCKING_RENDERERS["def-consumption"] = _simpleRenderer({
+  citation: "Citation: DEF consumption and range model (SCR aftertreatment; ISO 22241 DEF spec): def_used = diesel x dose/100; diesel per DEF tank = def_tank / (dose/100); range = diesel_per_def x mpg. DEF runs at about 2 to 3% of diesel, so a DEF tank spans several fuel fills; running it empty forces an ECU derate to ~5 mph. DEF freezes at ~12 F. A planning estimate; the OEM and DEF quality govern.",
+  example: defConsumptionExample.inputs,
+  fields: [
+    { key: "diesel_gal", label: "Diesel consumed (gal, 0 = derive from miles/mpg)", kind: "number", default: 200 },
+    { key: "trip_miles", label: "Trip distance (mi, used if diesel is 0)", kind: "number", default: 0 },
+    { key: "mpg", label: "Fuel economy (mpg, for range)", kind: "number", default: 6.5 },
+    { key: "dose_pct", label: "DEF dose (% of diesel, ~2-3)", kind: "number", default: 2.5 },
+    { key: "def_tank_gal", label: "DEF tank size (gal)", kind: "number", default: 13 },
+  ],
+  outputs: [
+    { key: "du", id: "def-out-du", label: "DEF used this leg", value: (r) => fmt(r.def_used_gal, 1) + " gal (from " + fmt(r.diesel_gal_used, 0) + " gal diesel)" },
+    { key: "dp", id: "def-out-dp", label: "Diesel per full DEF tank", value: (r) => fmt(r.diesel_per_def_gal, 0) + " gal" },
+    { key: "rg", id: "def-out-rg", label: "Range on one DEF fill", value: (r) => r.range_mi === null ? "- (enter mpg)" : fmt(r.range_mi, 0) + " mi" },
+    { key: "n", id: "def-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDefConsumption,
+});

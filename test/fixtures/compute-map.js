@@ -724,6 +724,7 @@ export const COMPUTE_MAP = {
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "crouch-planing-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchPlaningSpeed" },
+  "def-consumption": { module: "../../calc-trucking.js", fn: "computeDefConsumption" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

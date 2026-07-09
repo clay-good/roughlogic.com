@@ -2542,6 +2542,7 @@ cross-check.
 | calc-trucking.js | `computeCostPerMile` | `{ fixed_monthly = 0, miles_month = 0, fuel_price = 0, mpg = 0, maint_cpm = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeDIM` | `{ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier =...` | _ | _ | _ |
 | calc-trucking.js | `computeDeadheadPercent` | `{ loaded_mi = 0, deadhead_mi = 0, revenue = 0, surcharge = 0 } = {}` | _ | _ | _ |
+| calc-trucking.js | `computeDefConsumption` | `{ diesel_gal = 0, trip_miles = 0, mpg = 0, dose_pct = 2.5, def_tank_gal = 0 }...` | _ | _ | _ |
 | calc-trucking.js | `computeDetentionDemurrageBilling` | `{ free_hours = 0, actual_hours = 0, rate_usd_hr = 0, truck_rev_usd_hr = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeDriverPayCpmVsPercentage` | `{ cpm_usd = 0, pct = 0, miles = 0, linehaul_usd = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeFreightDensity` | `{ length_in = 0, width_in = 0, height_in = 0, weight_lb = 0 }` | _ | _ | _ |
@@ -2619,7 +2620,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1205.
+Row count: 1206.
 
 <!-- END function-corpus-v14 -->
 
@@ -3419,7 +3420,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (22 tiles)
+### Group J Trucking (23 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3428,6 +3429,7 @@ per spec-v14 §13.1 second paragraph.
 | `cargo-securement-wll` | Cargo Securement Working-Load-Limit Check | FMCSA 49 CFR 393.100-393.136; 8000 lb, 4 tiedowns x 1500 lb -> 6000 lb aggregate >= 400... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-per-mile` | Operating Cost Per Mile | ATRI cost-per-mile bucket methodology; $6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deadhead-percent` | Deadhead Percentage and Effective Rate | Freight-economics arithmetic + FMCSA ...; 800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `def-consumption` | Diesel Exhaust Fluid (DEF) Consumption and Range | DEF consumption and range model (SCR ...; spec-v508 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `detention-demurrage-billing` | Detention Billing and Opportunity Cost | carrier tariff practice; spec-v423 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dim-weight` | Dimensional Weight (DIM) | UPS / FedEx (carrier-published); UPS Service Guide divisor; FedEx Ground / Express also 13... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `driver-pay-cpm-vs-percentage` | Driver Pay: Cents-per-Mile vs Percentage | carrier settlement practice; spec-v424 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3766,6 +3768,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 961. Fixture-covered or reference-cadence: 961 / 961.
+Tile count: 962. Fixture-covered or reference-cadence: 962 / 962.
 
 <!-- END tile-index-v14 -->

@@ -7676,6 +7676,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "def-consumption": {
+    formula: "diesel = diesel_gal > 0 ? diesel_gal : trip_miles / mpg; def_used = diesel x dose/100; diesel_per_def_tank = def_tank / (dose/100); range = diesel_per_def_tank x mpg.",
+    edition: "DEF consumption and range model (SCR aftertreatment; the ISO 22241 diesel-exhaust-fluid spec), by name; the OEM and the DEF quality govern the metered rate.",
+    freeAccess: "The DEF-to-diesel dose relation is a first-principles ratio; the ~2-3% dose, tank size, and mpg come from the truck and the duty cycle.",
+    governance: GOVERNANCE.general,
+    editionNote: "DEF consumption and range model. def_used = diesel x dose/100 and a full DEF tank covers diesel = def_tank / (dose/100), which at the truck's mpg is the range on one DEF fill. DEF is consumed at only about 2 to 3% of diesel, so a DEF tank lasts several diesel fills. Running the DEF tank empty forces an ECU derate to roughly a 5 mph limp-home until refilled. DEF freezes at about 12 F (the SCR system thaws it in service). The actual dose rate varies with engine, load, and duty cycle. A planning estimate, not the truck's metered rate; the OEM and the DEF quality govern.",
+    assumptions: [
+      { name: "Dose rate", value: "DEF runs about 2 to 3% of diesel by volume (default 2.5%)", source: "SCR aftertreatment" },
+      { name: "Derate", value: "an empty DEF tank forces an ECU derate to roughly a 5 mph limp-home", source: "emissions compliance" },
+      { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
+    ],
+  },
   "crouch-planing-speed": {
     formula: "speed_mph = C / sqrt(weight_lb / hp), with the hull constant C ~150 heavy cruiser / ~190 runabout / ~210 race.",
     edition: "Crouch's planing-speed formula (naval-architecture back-of-envelope for planing top speed), by name; the actual hull, propeller, and conditions govern.",

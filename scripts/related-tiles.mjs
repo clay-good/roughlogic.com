@@ -934,6 +934,7 @@ const RELATED = {
   "gcwr-check": ["bridge-formula","axle-load-distribution","vehicle-load"],
   "tire-load-check": ["axle-load-distribution","bridge-formula","gcwr-check"],
   "trailer-tongue-weight": ["axle-load-distribution","gcwr-check","tire-load-check"],
+  "def-consumption": ["reefer-burn","cost-per-mile","fuel-surcharge"],
   // spec-v116 water disinfection (Group M)
   "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
   "uv-dose": ["disinfection-ct","chlorine-demand"],

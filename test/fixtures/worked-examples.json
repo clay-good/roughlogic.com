@@ -42573,6 +42573,72 @@
    }
   },
   {
+   "tile_id": "def-consumption",
+   "source_publisher": "DEF consumption and range model (SCR aftertreatment)",
+   "source_title": "13 gal DEF tank, 2.5% dose, 6.5 mpg, 200 gal diesel -> 5.0 gal DEF, 520 gal/tank, 3,380 mi range",
+   "source_edition_or_year": "spec-v508 worked example (machine-verified)",
+   "source_section_or_page": "spec-v508 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "diesel_gal": 200,
+    "trip_miles": 0,
+    "mpg": 6.5,
+    "dose_pct": 2.5,
+    "def_tank_gal": 13
+   },
+   "outputs": {
+    "def_used_gal": {
+     "value": 5.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "diesel_per_def_gal": {
+     "value": 520,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "range_mi": {
+     "value": 3380,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "def-consumption",
+   "source_publisher": "DEF consumption and range model (SCR aftertreatment)",
+   "source_title": "cross-check: a hard-pulling 3.0% dose shortens it to 433 gal diesel = 2,817 mi per DEF fill",
+   "source_edition_or_year": "spec-v508 worked example (machine-verified)",
+   "source_section_or_page": "spec-v508 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "diesel_gal": 200,
+    "trip_miles": 0,
+    "mpg": 6.5,
+    "dose_pct": 3.0,
+    "def_tank_gal": 13
+   },
+   "outputs": {
+    "diesel_per_def_gal": {
+     "value": 433.33,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "range_mi": {
+     "value": 2816.67,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "overflow-scupper-sizing",
    "source_publisher": "Francis weir / IPC 1108",
    "source_title": "6 in scupper, 3.5 in head -> 118 gpm (104 contracted)",

@@ -99,6 +99,8 @@ const _TILES = [
   ["detention-demurrage-billing", "J"], ["driver-pay-cpm-vs-percentage", "J"], ["invoice-factoring-cost", "J"],
   // spec-v486 trailer tongue weight and sway check (Group J)
   ["trailer-tongue-weight", "J"],
+  // spec-v508 diesel exhaust fluid (DEF) consumption and range
+  ["def-consumption", "J"],
   ["elevation-pressure-loss", "F"],
   ["water-supply-duration", "F"],
   ["point-load-bearing", "E"],
