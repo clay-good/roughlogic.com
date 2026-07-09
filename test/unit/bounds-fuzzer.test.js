@@ -17478,3 +17478,24 @@ test("bounds: spec-v511 computePressFitPressure pins the Lame pressure, the thin
   assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 2, engagement_in: 3 })); // hub OD <= shaft
   assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, friction_coeff: -0.1, engagement_in: 3 }));
 });
+
+import { computeRollerChainLength as _v512 } from "../../calc-shop.js";
+
+test("bounds: spec-v512 computeRollerChainLength pins the pitch count, the even round-up, the corrected center, and error seams", () => {
+  const r = _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0.5 });
+  assert.ok(Math.abs(r.length_pitches - 154.488) < 0.01);
+  assert.strictEqual(r.length_even, 156); // rounded UP to the next even count
+  assert.ok(r.length_even % 2 === 0);
+  assert.ok(Math.abs(r.center_corrected_in - 30.38) < 0.01 && r.center_corrected_in > 30); // corrected center exceeds nominal
+  // A tighter nominal center gives a shorter chain and a corrected center near it.
+  const tight = _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 20, pitch_in: 0.5 });
+  assert.strictEqual(tight.length_even, 116);
+  assert.ok(Math.abs(tight.center_corrected_in - 20.32) < 0.01 && tight.center_corrected_in < r.center_corrected_in);
+  // The even count is always even even when the exact length lands just above an even integer.
+  assert.ok(_v512({ small_teeth_n1: 20, large_teeth_n2: 20, center_distance_in: 20, pitch_in: 0.5 }).length_even % 2 === 0);
+  // Error seams: non-finite, tooth count < 1, non-positive center / pitch.
+  assert.ok("error" in _v512({ small_teeth_n1: Infinity, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0.5 }));
+  assert.ok("error" in _v512({ small_teeth_n1: 0, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0.5 }));
+  assert.ok("error" in _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 0, pitch_in: 0.5 }));
+  assert.ok("error" in _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0 }));
+});

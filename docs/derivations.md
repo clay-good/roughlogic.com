@@ -2459,6 +2459,7 @@ cross-check.
 | calc-shop.js | `computePressFitPressure` | `{ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, f...` | _ | _ | _ |
 | calc-shop.js | `computePunchForce` | `{ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_i...` | _ | _ | _ |
 | calc-shop.js | `computeRolledBlank` | `{ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}` | _ | _ | _ |
+| calc-shop.js | `computeRollerChainLength` | `{ small_teeth_n1 = 0, large_teeth_n2 = 0, center_distance_in = 0, pitch_in = ...` | _ | _ | _ |
 | calc-shop.js | `computeTapDrillSize` | `{ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_p...` | _ | _ | _ |
 | calc-shop.js | `computeTaperCalc` | `{ large_dia_in = 0, small_dia_in = 0, length_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeThreadMeasureWire` | `{ thread_standard = "inch", tpi = 0, pitch_mm = 0, pitch_diameter_in = 0, wir...` | _ | _ | _ |
@@ -2623,7 +2624,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1209.
+Row count: 1210.
 
 <!-- END function-corpus-v14 -->
 
@@ -3452,7 +3453,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (46 tiles)
+### Group K Mechanic (47 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3489,6 +3490,7 @@ per spec-v14 §13.1 second paragraph.
 | `prop-pitch-selection` | Marine Propeller Pitch Selection | outboard prop selection practice; spec-v462 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `prop-slip` | Marine Prop Slip | Project (first-principles); theoretical_kt = (4500/1.85) * 19 / 1056 = 43.77; slip = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `radial-chip-thinning` | Radial Chip Thinning Feed Compensation | Radial chip thinning geometry; spec-v317 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `roller-chain-length` | Roller Chain Length in Pitches (ANSI B29.1) | ANSI B29.1 roller-chain length; spec-v512 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `screw-conveyor` | Screw / Auger Conveyor Capacity | CEMA Screw Conveyor standard (Book No...; 9 in screw, 2.5 in shaft, 9 in pitch, 40 RPM, 0.30 loadin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `spindle-power-torque` | Cutting Power and Spindle Torque | first-principles specific-cutting-ene...; 3.0 in3/min steel, 80% eff, 800 rpm -> 3.0 cutting hp, 3.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spur-gear-geometry` | Spur Gear Tooth Geometry (Diametral Pitch) | Machinery's Handbook / AGMA; spec-v401 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3774,6 +3776,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 965. Fixture-covered or reference-cadence: 965 / 965.
+Tile count: 966. Fixture-covered or reference-cadence: 966 / 966.
 
 <!-- END tile-index-v14 -->

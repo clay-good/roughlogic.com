@@ -709,6 +709,8 @@ const TOOL_MODULES = (() => {
     "tolerance-stack-rss", "cone-flat-pattern",
     // spec-v511 interference press-fit pressure and holding force
     "press-fit-pressure",
+    // spec-v512 roller chain length in pitches (ANSI B29.1)
+    "roller-chain-length",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [

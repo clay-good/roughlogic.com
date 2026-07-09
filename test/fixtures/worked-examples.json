@@ -27546,6 +27546,70 @@
    }
   },
   {
+   "tile_id": "roller-chain-length",
+   "source_publisher": "ANSI B29.1 roller-chain length",
+   "source_title": "17-to-51-tooth #40 (0.5 in pitch), 30 in center -> 154.49 pitches, 156 to order, 30.38 in corrected",
+   "source_edition_or_year": "spec-v512 worked example (machine-verified)",
+   "source_section_or_page": "spec-v512 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "small_teeth_n1": 17,
+    "large_teeth_n2": 51,
+    "center_distance_in": 30,
+    "pitch_in": 0.5
+   },
+   "outputs": {
+    "length_pitches": {
+     "value": 154.49,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "length_even": {
+     "value": 156,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "center_corrected_in": {
+     "value": 30.38,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "roller-chain-length",
+   "source_publisher": "ANSI B29.1 roller-chain length",
+   "source_title": "cross-check: pull the center to 20 in -> 114.73 pitches, 116 to order, 20.32 in corrected",
+   "source_edition_or_year": "spec-v512 worked example (machine-verified)",
+   "source_section_or_page": "spec-v512 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "small_teeth_n1": 17,
+    "large_teeth_n2": 51,
+    "center_distance_in": 20,
+    "pitch_in": 0.5
+   },
+   "outputs": {
+    "length_even": {
+     "value": 116,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "center_corrected_in": {
+     "value": 20.32,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

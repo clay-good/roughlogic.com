@@ -377,6 +377,8 @@ const _TILES = [
   ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["spur-gear-geometry", "K"],
   // spec-v511 interference press-fit pressure and holding force
   ["press-fit-pressure", "G"],
+  // spec-v512 roller chain length in pitches (ANSI B29.1)
+  ["roller-chain-length", "K"],
   // spec-v504 rolling-bearing L10 rating life (ISO 281)
   ["bearing-l10-life", "K"],
   // spec-v509 countersink diameter and cutting depth

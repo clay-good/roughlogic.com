@@ -519,6 +519,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "roller chain length",
+      "target": "roller-chain-length",
+      "kind": "industry"
+    },
+    {
+      "term": "chain pitches",
+      "target": "roller-chain-length",
+      "kind": "industry"
+    },
+    {
+      "term": "ansi b29.1",
+      "target": "roller-chain-length",
+      "kind": "industry"
+    },
+    {
+      "term": "chain drive length",
+      "target": "roller-chain-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "even link chain",
+      "target": "roller-chain-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "offset link",
+      "target": "roller-chain-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sprocket center distance",
+      "target": "roller-chain-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "chain sizing",
+      "target": "roller-chain-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

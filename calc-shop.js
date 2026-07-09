@@ -942,3 +942,53 @@ function _v511renderPressFitPressure(inputRegion, outputRegion, citationEl) {
   for (const f of [d, i, dout, e, mu, len]) f.input.addEventListener("input", update);
 }
 SHOP_RENDERERS["press-fit-pressure"] = _v511renderPressFitPressure;
+
+// ===================== spec-v512: roller chain length in pitches (ANSI B29.1) =====================
+// dims: in { small_teeth_n1: dimensionless, large_teeth_n2: dimensionless, center_distance_in: L, pitch_in: L } out: { length_pitches: dimensionless, length_even: dimensionless, center_corrected_in: L }
+export function computeRollerChainLength({ small_teeth_n1 = 0, large_teeth_n2 = 0, center_distance_in = 0, pitch_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n1 = Number(small_teeth_n1) || 0;
+  const n2 = Number(large_teeth_n2) || 0;
+  const c = Number(center_distance_in) || 0;
+  const p = Number(pitch_in) || 0;
+  if (!(n1 >= 1)) return { error: "Small sprocket tooth count must be at least 1." };
+  if (!(n2 >= 1)) return { error: "Large sprocket tooth count must be at least 1." };
+  if (!(c > 0)) return { error: "Center distance must be positive (in)." };
+  if (!(p > 0)) return { error: "Chain pitch must be positive (in)." };
+  const cp = c / p;
+  const k = Math.pow((n2 - n1) / (2 * Math.PI), 2);
+  const length_pitches = 2 * cp + (n1 + n2) / 2 + k / cp;
+  let length_even = Math.ceil(length_pitches);
+  if (length_even % 2 !== 0) length_even += 1;
+  const a = length_even - (n1 + n2) / 2;
+  const center_corrected_in = (p / 4) * (a + Math.sqrt(Math.max(0, a * a - 8 * k)));
+  if (![length_pitches, length_even, center_corrected_in].every(Number.isFinite)) return { error: "Chain-length math is not a finite value." };
+  return {
+    length_pitches, length_even, center_corrected_in,
+    note: "ANSI B29.1 chain-length relation: L = 2(C/p) + (N1 + N2)/2 + ((N2 - N1)/(2 pi))^2 / (C/p), in pitches. The pitch count must come out EVEN, because an odd count forces a weaker offset (half) link -- so the length is rounded UP to the next even number. Because that round-up changed the length, the center distance must be RECOMPUTED so the assembled chain has correct sag: C = (p/4)[A + sqrt(A^2 - 8((N2 - N1)/(2 pi))^2)] with A = L_even - (N1 + N2)/2. That round-up-then-back-solve is the step people skip, ending with a chain too tight or too loose. The center distance should be at least about 30 pitches for good wrap. A design aid; the sprocket selection and take-up govern.",
+  };
+}
+export const rollerChainLengthExample = { inputs: { small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0.5 } };
+function _v512renderRollerChainLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ANSI B29.1 roller-chain length: L = 2(C/p) + (N1+N2)/2 + ((N2-N1)/(2 pi))^2/(C/p) pitches, rounded UP to an even count (an odd count needs a weaker offset link), then the center distance recomputed C = (p/4)[A + sqrt(A^2 - 8((N2-N1)/(2 pi))^2)]. A design aid; the sprocket selection and take-up govern.";
+  const n1 = makeNumber("Small sprocket teeth N1", "rcl-n1", { step: "1", min: "1" }); n1.input.value = "17";
+  const n2 = makeNumber("Large sprocket teeth N2", "rcl-n2", { step: "1", min: "1" }); n2.input.value = "51";
+  const c = makeNumber("Nominal center distance C (in)", "rcl-c", { step: "any", min: "0" }); c.input.value = "30";
+  const p = makeNumber("Chain pitch p (in, #40 = 0.5)", "rcl-p", { step: "any", min: "0" }); p.input.value = "0.5";
+  for (const f of [n1, n2, c, p]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n1.input.value = "17"; n2.input.value = "51"; c.input.value = "30"; p.input.value = "0.5"; update(); });
+  const oL = makeOutputLine(outputRegion, "Exact chain length", "rcl-out-l");
+  const oLe = makeOutputLine(outputRegion, "Even count to order", "rcl-out-le");
+  const oC = makeOutputLine(outputRegion, "Corrected center distance", "rcl-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "rcl-out-n");
+  const update = debounce(() => {
+    const r = computeRollerChainLength({ small_teeth_n1: _readNum(n1.input), large_teeth_n2: _readNum(n2.input), center_distance_in: _readNum(c.input), pitch_in: _readNum(p.input) });
+    if (r.error) { oL.textContent = r.error; oLe.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = fmt(r.length_pitches, 2) + " pitches";
+    oLe.textContent = r.length_even + " pitches (even)";
+    oC.textContent = fmt(r.center_corrected_in, 2) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n1, n2, c, p]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["roller-chain-length"] = _v512renderRollerChainLength;

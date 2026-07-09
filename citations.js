@@ -6719,6 +6719,18 @@ export const CITATIONS = {
     ],
   },
 
+  "roller-chain-length": {
+    formula: "Cp = C/p; L = 2 Cp + (N1 + N2)/2 + ((N2 - N1)/(2 pi))^2 / Cp; round L up to an even L_even; A = L_even - (N1 + N2)/2; C_corr = (p/4)[A + sqrt(A^2 - 8((N2 - N1)/(2 pi))^2)].",
+    edition: "The ANSI B29.1 roller-chain and sprocket chain-length relation, with the even-pitch round-up and corrected center distance, by name; the sprocket selection and take-up govern.",
+    freeAccess: "The chain-length relation is a published ANSI B29.1 / machine-design result; the tooth counts, center distance, and pitch come from the drive layout.",
+    governance: GOVERNANCE.general,
+    editionNote: "ANSI B29.1 chain-length relation. L = 2(C/p) + (N1 + N2)/2 + ((N2 - N1)/(2 pi))^2 / (C/p) in pitches. The pitch count must be EVEN because an odd count forces a weaker offset (half) link, so the length is rounded up to the next even L_even. Because the round-up changed the length, the center distance is recomputed C = (p/4)[A + sqrt(A^2 - 8((N2 - N1)/(2 pi))^2)] with A = L_even - (N1 + N2)/2, so the assembled chain has correct sag. The center distance should be at least about 30 pitches for good wrap. A design aid, not the manufacturer's chart; the sprocket selection and take-up govern.",
+    assumptions: [
+      { name: "Even count", value: "the pitch count is rounded up to an even number to avoid a weaker offset (half) link", source: "ANSI B29.1" },
+      { name: "Corrected center", value: "the center distance is recomputed after the round-up so the chain fits with proper sag", source: "ANSI B29.1" },
+      { name: "Wrap", value: "the center distance should be at least about 30 pitches for good wrap", source: "chain-drive practice" },
+    ],
+  },
   "press-fit-pressure": {
     formula: "p = (E x interference / D) x (Do^2 - D^2) / (2 Do^2); holding_force = p x pi x D x length x friction; hub_bore_stress = p x (Do^2 + D^2) / (Do^2 - D^2).",
     edition: "Lame interference-fit model (Machinery's Handbook 'Forces and Fits'; the Lame thick-cylinder equations, same-material solid shaft), by name; the actual materials, surface finish, and assembly method govern.",

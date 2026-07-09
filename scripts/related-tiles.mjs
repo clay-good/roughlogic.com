@@ -143,6 +143,7 @@ const RELATED = {
   "tolerance-stack-rss": ["rolled-blank", "sine-bar", "decimal-to-fraction", "cone-flat-pattern"],
   "cone-flat-pattern": ["rolled-blank", "circular-arc", "tolerance-stack-rss", "circle-from-3-points"],
   "press-fit-pressure": ["shrink-fit", "bearing-l10-life", "bolt-proof-load"],
+  "roller-chain-length": ["vbelt-drive", "bearing-l10-life", "gear-mph-rpm"],
   "spur-gear-geometry": ["gear-cascade", "cutting-speed-rpm", "dividing-head", "bolt-circle"],
   "bearing-l10-life": ["vbelt-drive", "shrink-fit", "spur-gear-geometry"],
   "countersink-depth": ["drill-point-depth", "tap-drill-size", "cutting-speed-rpm"],
