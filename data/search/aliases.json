@@ -18794,6 +18794,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "hull speed",
+      "target": "hull-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "displacement speed",
+      "target": "hull-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "speed length ratio",
+      "target": "hull-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "froude number boat",
+      "target": "hull-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "1.34 sqrt lwl",
+      "target": "hull-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "waterline length speed",
+      "target": "hull-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "planing threshold",
+      "target": "hull-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "displacement wall",
+      "target": "hull-speed",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

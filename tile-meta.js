@@ -517,6 +517,8 @@ const _TILES = [
   ["density-altitude", "K"],
   // spec-v501 crosswind and headwind component
   ["crosswind-component", "K"],
+  // spec-v502 displacement hull speed and speed/length ratio
+  ["hull-speed", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

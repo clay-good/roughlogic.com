@@ -7652,6 +7652,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "hull-speed": {
+    formula: "hull_speed_kn = 1.34 x sqrt(LWL_ft); SL_ratio = actual_speed / sqrt(LWL_ft); regime = SL <= 1.34 displacement / 1.34-2.5 semi-displacement / > 2.5 planing.",
+    edition: "Displacement hull-speed relation (Froude speed-length theory), the 1.34 x sqrt(LWL) ceiling, by name; the actual hull form, displacement, and power govern.",
+    freeAccess: "The speed-length relation is a published empirical result of displacement-hull / Froude theory; the waterline length comes from the boat's measurements.",
+    governance: GOVERNANCE.general,
+    editionNote: "Displacement hull-speed relation. hull_speed = 1.34 x sqrt(LWL) knots and the speed-length ratio SL = speed / sqrt(LWL), with the regime bands SL <= 1.34 displacement, 1.34-2.5 semi-displacement, > 2.5 planing. The 1.34 ceiling is a practical wall for a pure displacement hull because the boat cannot outrun the wavelength of its own wave without climbing onto plane. Light and long hulls exceed it more easily, and the coefficient is an approximation (some references use 1.34 to 1.4). A planning estimate, not a performance prediction; the actual hull form, displacement, and power govern.",
+    assumptions: [
+      { name: "Displacement wall", value: "1.34 x sqrt(LWL) is a practical ceiling for a pure displacement hull", source: "Froude speed-length theory" },
+      { name: "Regime", value: "SL <= 1.34 displacement, 1.34-2.5 semi-displacement, > 2.5 planing", source: "displacement-hull practice" },
+      { name: "Approximation", value: "the coefficient varies 1.34 to 1.4; hull form and displacement govern", source: "scope of this tile" },
+    ],
+  },
   "crosswind-component": {
     formula: "angle = fold(|wind_dir - runway_heading|, 0..180); crosswind = speed x sin(angle); headwind = speed x cos(angle) (negative = tailwind); gust_xwind = (gust > 0 ? gust : speed) x sin(angle).",
     edition: "Runway wind-component resolution (the FAA vector method / POH crosswind chart), first-principles trigonometry, by name; the pilot in command and the aircraft flight manual govern.",

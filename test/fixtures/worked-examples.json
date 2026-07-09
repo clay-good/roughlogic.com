@@ -44184,6 +44184,48 @@
    }
   },
   {
+   "tile_id": "hull-speed",
+   "source_publisher": "displacement hull-speed relation (Froude speed-length theory)",
+   "source_title": "25 ft waterline displacement cruiser -> hull speed 6.70 kn",
+   "source_edition_or_year": "spec-v502 worked example (machine-verified)",
+   "source_section_or_page": "spec-v502 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "lwl_ft": 25,
+    "actual_speed_kn": 0
+   },
+   "outputs": {
+    "hull_speed_kn": {
+     "value": 6.7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hull-speed",
+   "source_publisher": "displacement hull-speed relation (Froude speed-length theory)",
+   "source_title": "cross-check: same 25 ft hull at 18 kn is SL 3.6 -> planing, off the displacement wall",
+   "source_edition_or_year": "spec-v502 worked example (machine-verified)",
+   "source_section_or_page": "spec-v502 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "lwl_ft": 25,
+    "actual_speed_kn": 18
+   },
+   "outputs": {
+    "sl_ratio": {
+     "value": 3.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

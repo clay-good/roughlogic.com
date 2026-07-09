@@ -17268,3 +17268,24 @@ test("bounds: spec-v501 computeCrosswindComponent pins the wind split, the tailw
   assert.ok("error" in _v501({ runway_heading_deg: 400, wind_dir_deg: 30, wind_speed_kt: 20 }));
   assert.ok("error" in _v501({ runway_heading_deg: 360, wind_dir_deg: 400, wind_speed_kt: 20 }));
 });
+
+import { computeHullSpeed as _v502 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v502 computeHullSpeed pins the 1.34 sqrt(LWL) ceiling, the regime bands, and error seams", () => {
+  const r = _v502({ lwl_ft: 25, actual_speed_kn: 0 });
+  assert.ok(Math.abs(r.hull_speed_kn - 6.7) < 1e-9); // 1.34 x 5
+  assert.strictEqual(r.sl_ratio, null); // no speed -> no ratio
+  assert.strictEqual(r.regime, null);
+  // A fast boat on plane leaves the displacement wall.
+  const fast = _v502({ lwl_ft: 25, actual_speed_kn: 18 });
+  assert.ok(Math.abs(fast.sl_ratio - 3.6) < 1e-9 && fast.regime === "planing");
+  // Regime band boundaries: at SL 1.34 it is displacement, just above it is semi-displacement.
+  assert.strictEqual(_v502({ lwl_ft: 25, actual_speed_kn: 1.34 * 5 }).regime, "displacement");
+  assert.strictEqual(_v502({ lwl_ft: 25, actual_speed_kn: 2.0 * 5 }).regime, "semi-displacement");
+  // Hull speed scales with sqrt(LWL): quadrupling the waterline doubles the ceiling.
+  assert.ok(Math.abs(_v502({ lwl_ft: 100 }).hull_speed_kn - 2 * r.hull_speed_kn) < 1e-9);
+  // Error seams: non-finite, non-positive LWL, negative actual speed.
+  assert.ok("error" in _v502({ lwl_ft: Infinity }));
+  assert.ok("error" in _v502({ lwl_ft: 0 }));
+  assert.ok("error" in _v502({ lwl_ft: 25, actual_speed_kn: -1 }));
+});

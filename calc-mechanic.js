@@ -1379,3 +1379,39 @@ MECHANIC_RENDERERS["crosswind-component"] = _simpleRenderer({
   ],
   compute: computeCrosswindComponent,
 });
+
+// ===================== spec-v502: displacement hull speed and speed/length ratio =====================
+
+// dims: in { lwl_ft: L, actual_speed_kn: L T^-1 } out: { hull_speed_kn: L T^-1, sl_ratio: dimensionless, regime: dimensionless }
+export function computeHullSpeed({ lwl_ft = 0, actual_speed_kn = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const lwl = Number(lwl_ft) || 0;
+  const sp = Number(actual_speed_kn) || 0;
+  if (!(lwl > 0)) return { error: "Waterline length must be positive (ft)." };
+  if (sp < 0) return { error: "Actual speed cannot be negative (kn)." };
+  const hull_speed_kn = 1.34 * Math.sqrt(lwl);
+  const sl_ratio = sp > 0 ? sp / Math.sqrt(lwl) : null;
+  const regime = sl_ratio === null ? null : (sl_ratio <= 1.34 ? "displacement" : sl_ratio <= 2.5 ? "semi-displacement" : "planing");
+  if (![hull_speed_kn].every(Number.isFinite)) return { error: "Hull-speed math is not a finite value." };
+  return {
+    hull_speed_kn, sl_ratio, regime,
+    note: "Displacement hull-speed relation (Froude speed-length theory): hull_speed = 1.34 x sqrt(LWL) knots, and the speed-length ratio SL = speed / sqrt(LWL). A pure displacement hull is trapped by the wave it makes -- near SL = 1.34 the bow and stern waves merge into a single wave as long as the boat, and the hull cannot climb its own bow wave without enormous added power, so 1.34 is a practical wall. Regime bands: SL <= 1.34 displacement, 1.34-2.5 semi-displacement, > 2.5 planing (riding on top of the water, no longer bound by the displacement ceiling). Light and long hulls exceed the wall more easily; the coefficient is an approximation (some references use 1.34 to 1.4). A planning estimate; the actual hull form, displacement, and power govern.",
+  };
+}
+export const hullSpeedExample = { inputs: { lwl_ft: 25, actual_speed_kn: 0 } };
+
+MECHANIC_RENDERERS["hull-speed"] = _simpleRenderer({
+  citation: "Citation: displacement hull-speed relation (Froude speed-length theory): hull_speed = 1.34 x sqrt(LWL) knots; SL ratio = speed / sqrt(LWL); regime bands SL <= 1.34 displacement, 1.34-2.5 semi-displacement, > 2.5 planing. The 1.34 ceiling is a practical wall for a pure displacement hull. A planning estimate; the hull form, displacement, and power govern.",
+  example: hullSpeedExample.inputs,
+  fields: [
+    { key: "lwl_ft", label: "Load waterline length LWL (ft)", kind: "number", default: 25 },
+    { key: "actual_speed_kn", label: "Actual / target speed (kn, 0 = hull speed only)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "hs", id: "hs-out-hs", label: "Theoretical hull speed", value: (r) => fmt(r.hull_speed_kn, 2) + " kn" },
+    { key: "sl", id: "hs-out-sl", label: "Speed-length ratio", value: (r) => r.sl_ratio === null ? "- (enter an actual speed)" : fmt(r.sl_ratio, 2) },
+    { key: "rg", id: "hs-out-rg", label: "Regime", value: (r) => r.regime === null ? "-" : r.regime },
+    { key: "n", id: "hs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHullSpeed,
+});

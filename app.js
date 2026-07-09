@@ -749,6 +749,8 @@ const TOOL_MODULES = (() => {
     "density-altitude",
     // spec-v501 crosswind and headwind component
     "crosswind-component",
+    // spec-v502 displacement hull speed and speed/length ratio
+    "hull-speed",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

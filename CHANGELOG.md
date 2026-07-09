@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-mechanic.js gzip cap 25000 -> 28000; 2026-07-09
+
+The spec-v489..v588 campaign added three Group K tiles to `calc-mechanic.js` (spec-v500 `density-altitude`, spec-v501 `crosswind-component`, spec-v502 `hull-speed`), taking the built copy to ~26.4 KB gz (105.6% of the old 25000 B cap). Raised the `check-module-sizes` cap to **28000** (current + ~6% headroom). The module is lazy-loaded and absent from the home-view payload.
+
 ### chore(sizes): raise tools-data.js 130000 -> 140000 and tile-meta.js 13000 -> 14500 gzip caps; 2026-07-09
 
 The spec-v489..v588 single-tile landing campaign grows the catalog registry (`tools-data.js`) and the `_TILES` id/group table (`tile-meta.js`) by one row per tile. At tile 953 (spec-v499) both crossed their caps (`tools-data.js` 100.3%, `tile-meta.js` 100.1%). Raised the `check-module-sizes` caps to **140000** (tools-data, ~7% headroom for the ~87 remaining backlog tiles) and **14500** (tile-meta, ~11% headroom). Both are lazy-loaded (spec-v10 H.2) and absent from the home-view payload, so this does not affect first paint.
