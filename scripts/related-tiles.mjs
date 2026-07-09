@@ -894,6 +894,7 @@ const RELATED = {
   "brake-pedal-hydraulic": ["brake-pad-life","wheel-offset-backspacing","bolt-proof-load"],
   "dyno-correction-sae": ["trap-speed-horsepower","turbo-pressure-ratio","air-density-correction"],
   "aircraft-weight-balance": ["density-altitude","crosswind-component","center-of-gravity-2point"],
+  "abyc-dc-wire": ["voltage-drop","anchor-rode-scope","wire-ampacity"],
   "cutting-fluid-concentration": ["cutting-speed-rpm","dilution","paint-mix-ratio"],
   "pull-box-sizing": ["box-fill","conduit-fill","cable-tray-fill"],
   "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],

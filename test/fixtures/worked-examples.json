@@ -45076,6 +45076,58 @@
    }
   },
   {
+   "tile_id": "abyc-dc-wire",
+   "source_publisher": "ABYC E-11 DC wire sizing by voltage drop",
+   "source_title": "20 A nav feeder, 25 ft one-way, 12 V, 3% critical -> 0.36 V drop, 29,861 CM, #4",
+   "source_edition_or_year": "spec-v517 worked example (machine-verified)",
+   "source_section_or_page": "spec-v517 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "current_a": 20,
+    "run_length_ft": 25,
+    "system_voltage_v": 12,
+    "drop_pct": 3
+   },
+   "outputs": {
+    "v_drop_v": {
+     "value": 0.36,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "circular_mils": {
+     "value": 29861,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "abyc-dc-wire",
+   "source_publisher": "ABYC E-11 DC wire sizing by voltage drop",
+   "source_title": "cross-check: same run as a 10% non-critical circuit -> 8,958 CM, #10, three sizes smaller",
+   "source_edition_or_year": "spec-v517 worked example (machine-verified)",
+   "source_section_or_page": "spec-v517 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "current_a": 20,
+    "run_length_ft": 25,
+    "system_voltage_v": 12,
+    "drop_pct": 10
+   },
+   "outputs": {
+    "circular_mils": {
+     "value": 8958,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

@@ -17590,3 +17590,26 @@ test("bounds: spec-v516 computeAircraftWeightBalance pins the moment sum, the CG
   assert.ok("error" in _v516({ empty_weight_lb: 1500, baggage_weight_lb: -10, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
   assert.ok("error" in _v516({ empty_weight_lb: 1500, max_gross_lb: 2300, fwd_cg_limit_in: 47, aft_cg_limit_in: 35 }));
 });
+
+import { computeAbycDcWire as _v517 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v517 computeAbycDcWire pins the round-trip circular mils, the AWG pick, the 3%-vs-10% shift, and error seams", () => {
+  const r = _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 3 });
+  assert.ok(Math.abs(r.v_drop_v - 0.36) < 1e-9);
+  assert.ok(Math.abs(r.circular_mils - 29861) < 2); // 10.75 x 20 x 50 / 0.36
+  assert.strictEqual(r.awg, "4"); // #6 (26240 CM) falls short
+  // The round trip doubles the length: halving the one-way run halves the circular mils.
+  assert.ok(Math.abs(_v517({ current_a: 20, run_length_ft: 12.5, system_voltage_v: 12, drop_pct: 3 }).circular_mils - r.circular_mils / 2) < 1e-6);
+  // Relaxing to 10% non-critical shrinks the wire several sizes.
+  const nc = _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 10 });
+  assert.ok(Math.abs(nc.circular_mils - 8958) < 2 && nc.awg === "10");
+  // A higher system voltage needs less copper for the same percent drop.
+  assert.ok(_v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 24, drop_pct: 3 }).circular_mils < r.circular_mils);
+  // Error seams: non-finite, non-positive current / length / voltage, drop out of range.
+  assert.ok("error" in _v517({ current_a: Infinity, run_length_ft: 25, system_voltage_v: 12 }));
+  assert.ok("error" in _v517({ current_a: 0, run_length_ft: 25, system_voltage_v: 12 }));
+  assert.ok("error" in _v517({ current_a: 20, run_length_ft: 0, system_voltage_v: 12 }));
+  assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 0 }));
+  assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 0 }));
+  assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 120 }));
+});

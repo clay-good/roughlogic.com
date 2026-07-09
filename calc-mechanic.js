@@ -1743,3 +1743,53 @@ MECHANIC_RENDERERS["aircraft-weight-balance"] = _simpleRenderer({
   ],
   compute: computeAircraftWeightBalance,
 });
+
+// ===================== spec-v517: ABYC E-11 marine DC wire sizing =====================
+// Standard AWG circular-mil areas, smallest wire to largest.
+const _AWG_CIRCULAR_MILS = [
+  { awg: "18", cm: 1620 }, { awg: "16", cm: 2580 }, { awg: "14", cm: 4110 },
+  { awg: "12", cm: 6530 }, { awg: "10", cm: 10380 }, { awg: "8", cm: 16510 },
+  { awg: "6", cm: 26240 }, { awg: "4", cm: 41740 }, { awg: "2", cm: 66360 },
+  { awg: "1", cm: 83690 }, { awg: "1/0", cm: 105600 }, { awg: "2/0", cm: 133100 },
+  { awg: "3/0", cm: 167800 }, { awg: "4/0", cm: 211600 },
+];
+// dims: in { current_a: I, run_length_ft: L, system_voltage_v: M L^2 T^-3 I^-1, drop_pct: dimensionless } out: { v_drop_v: M L^2 T^-3 I^-1, circular_mils: dimensionless, awg: dimensionless }
+export function computeAbycDcWire({ current_a = 0, run_length_ft = 0, system_voltage_v = 0, drop_pct = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const i = Number(current_a) || 0;
+  const len = Number(run_length_ft) || 0;
+  const v = Number(system_voltage_v) || 0;
+  const dp = Number(drop_pct) || 0;
+  if (!(i > 0)) return { error: "Load current must be positive (A)." };
+  if (!(len > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(v > 0)) return { error: "System voltage must be positive (V)." };
+  if (!(dp > 0 && dp <= 100)) return { error: "Allowable drop must be over 0 and at most 100 percent." };
+  const v_drop_v = dp / 100 * v;
+  const circular_mils = 10.75 * i * (2 * len) / v_drop_v;
+  const pick = _AWG_CIRCULAR_MILS.find((a) => a.cm >= circular_mils);
+  const awg = pick ? pick.awg : null;
+  if (![v_drop_v, circular_mils].every(Number.isFinite)) return { error: "ABYC wire-size math is not a finite value." };
+  return {
+    v_drop_v, circular_mils, awg, awg_cm: pick ? pick.cm : null,
+    note: "ABYC E-11 DC wire sizing by voltage drop: a dockside NEC wire size undersizes on a boat for two reasons. First, ABYC sizes on the ROUND-TRIP length (out and back), CM = 10.75 x current x (2 x length) / V_drop, not the NEC one-way habit. Second, the marine allowable drop is stricter where it matters: 3% for panelboard feeders and navigation/critical loads (10% for non-critical) -- on a 12 V system a 3% drop is only 0.36 V of headroom, which drives the conductor up fast. The AWG is the smallest standard size with at least that circular-mil area. The ABYC ampacity table (with its engine-space and bundling derates) sets a SEPARATE floor the drop size must also clear. A design aid, not the ABYC standard itself; the standard, the wire's temperature rating, and the installation govern.",
+  };
+}
+export const abycDcWireExample = { inputs: { current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 3 } };
+
+MECHANIC_RENDERERS["abyc-dc-wire"] = _simpleRenderer({
+  citation: "Citation: ABYC E-11 (AC & DC Electrical Systems on Boats) DC wire sizing by voltage drop: V_drop = drop_pct/100 x system_voltage; CM = 10.75 x current x (2 x length) / V_drop (round-trip length); AWG = smallest standard size with >= that circular-mil area. 3% drop for panelboard feeders and critical loads, 10% non-critical; the ABYC ampacity table sets a separate floor. A design aid; the standard and installation govern.",
+  example: abycDcWireExample.inputs,
+  fields: [
+    { key: "current_a", label: "Load current (A)", kind: "number", default: 20 },
+    { key: "run_length_ft", label: "One-way run length (ft, tile doubles it)", kind: "number", default: 25 },
+    { key: "system_voltage_v", label: "System voltage (V, 12 / 24 / 32)", kind: "number", default: 12 },
+    { key: "drop_pct", label: "Allowable drop (%, 3 critical / 10 non-critical)", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "vd", id: "adw-out-vd", label: "Allowable voltage drop", value: (r) => fmt(r.v_drop_v, 2) + " V" },
+    { key: "cm", id: "adw-out-cm", label: "Required copper", value: (r) => fmt(r.circular_mils, 0) + " circular mils" },
+    { key: "awg", id: "adw-out-awg", label: "AWG to pick (by voltage drop)", value: (r) => r.awg === null ? "> 4/0 (exceeds this tile's table)" : "#" + r.awg + " (" + fmt(r.awg_cm, 0) + " CM)" },
+    { key: "n", id: "adw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAbycDcWire,
+});

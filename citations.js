@@ -7736,6 +7736,18 @@ export const CITATIONS = {
       { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
     ],
   },
+  "abyc-dc-wire": {
+    formula: "V_drop = drop_pct/100 x system_voltage; CM = 10.75 x current x (2 x length) / V_drop; AWG = smallest standard size with circular-mil area >= CM.",
+    edition: "The ABYC E-11 (AC & DC Electrical Systems on Boats) DC conductor sizing by voltage drop, on the round-trip length, by name; the standard, the wire's temperature rating, and the installation govern.",
+    freeAccess: "The circular-mils-by-voltage-drop relation is a published ABYC E-11 method; the current, run, voltage, and allowable drop come from the circuit and the standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "ABYC E-11 DC wire sizing by voltage drop. V_drop = drop_pct/100 x system_voltage, CM = 10.75 x current x (2 x length) / V_drop, and the AWG is the smallest standard size with at least that circular-mil area. The length is DOUBLED for the round trip (out and back), unlike the NEC one-way habit. A 3% drop is required for panelboard feeders and navigation/critical loads (10% for non-critical); on a low-voltage 12 V system 3% is only 0.36 V of headroom, which drives the conductor up fast. The ABYC ampacity table, with its engine-space and bundling derates, sets a separate floor the drop size must also clear. A design aid, not the ABYC standard itself; the standard, the wire's temperature rating, and the installation govern.",
+    assumptions: [
+      { name: "Round trip", value: "the length is doubled (out and back), unlike the NEC one-way habit", source: "ABYC E-11" },
+      { name: "Allowable drop", value: "3% for panelboard feeders and critical loads, 10% for non-critical", source: "ABYC E-11" },
+      { name: "Ampacity floor", value: "the ABYC ampacity table with engine-space and bundling derates sets a separate floor", source: "ABYC E-11" },
+    ],
+  },
   "aircraft-weight-balance": {
     formula: "total_weight = sum(w); total_moment = sum(w x arm); CG = total_moment / total_weight; in_envelope = weight <= max_gross AND fwd_limit <= CG <= aft_limit.",
     edition: "The station-moment weight-and-balance check of the FAA Weight & Balance Handbook (FAA-H-8083-1; AC 91-23), by name; the specific aircraft flight manual and the pilot in command govern.",

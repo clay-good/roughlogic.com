@@ -547,6 +547,8 @@ const _TILES = [
   ["dyno-correction-sae", "K"],
   // spec-v516 aircraft weight and balance (CG envelope)
   ["aircraft-weight-balance", "K"],
+  // spec-v517 ABYC E-11 marine DC wire sizing
+  ["abyc-dc-wire", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],

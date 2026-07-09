@@ -773,6 +773,8 @@ const TOOL_MODULES = (() => {
     "dyno-correction-sae",
     // spec-v516 aircraft weight and balance (CG envelope)
     "aircraft-weight-balance",
+    // spec-v517 ABYC E-11 marine DC wire sizing
+    "abyc-dc-wire",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

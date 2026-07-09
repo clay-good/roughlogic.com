@@ -19394,6 +19394,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "marine wire size",
+      "target": "abyc-dc-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "abyc e-11",
+      "target": "abyc-dc-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "boat dc wire",
+      "target": "abyc-dc-wire",
+      "kind": "industry"
+    },
+    {
+      "term": "12v wire gauge",
+      "target": "abyc-dc-wire",
+      "kind": "adjacent"
+    },
+    {
+      "term": "round trip voltage drop",
+      "target": "abyc-dc-wire",
+      "kind": "adjacent"
+    },
+    {
+      "term": "3 percent drop marine",
+      "target": "abyc-dc-wire",
+      "kind": "adjacent"
+    },
+    {
+      "term": "circular mils marine",
+      "target": "abyc-dc-wire",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nav feeder wire",
+      "target": "abyc-dc-wire",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"
