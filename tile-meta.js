@@ -678,6 +678,8 @@ const _TILES = [
   ["transformer-voltage-regulation", "A"],
   // spec-v495 capacitor discharge time and bleed resistor
   ["capacitor-discharge-time", "A"],
+  // spec-v496 asymmetrical and peak fault current from X/R
+  ["asymmetrical-fault-xr", "A"],
   ["ada-ramp-slope", "E"],
   ["pool-bonding-680-26", "A"],
 ];

@@ -17128,3 +17128,25 @@ test("bounds: spec-v495 computeCapacitorDischargeTime pins the R_max, the contin
   assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 600, safe_voltage: 600 })); // V_safe >= V0
   assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 600, resistor_ohm: -5 }));
 });
+
+import { computeAsymmetricalFaultXr as _v496 } from "../../calc-electrical.js";
+
+test("bounds: spec-v496 computeAsymmetricalFaultXr pins both factors, their monotonic rise and limits, and error seams", () => {
+  const r = _v496({ isym_ka: 20, x_over_r: 15 });
+  assert.ok(Math.abs(r.i_peak_ka - 51.2) < 0.1);
+  assert.ok(Math.abs(r.peak_factor - 2.56) < 0.01);
+  assert.ok(Math.abs(r.mf_rms - 1.522) < 0.005);
+  assert.ok(Math.abs(r.i_asym_ka - 30.4) < 0.1);
+  // Both factors rise monotonically with X/R.
+  const lo = _v496({ isym_ka: 20, x_over_r: 5 });
+  assert.ok(r.peak_factor > lo.peak_factor && r.mf_rms > lo.mf_rms);
+  assert.ok(Math.abs(lo.i_peak_ka - 43.4) < 0.1 && Math.abs(lo.mf_rms - 1.253) < 0.005);
+  // The peak factor is bounded below sqrt(2) x 2 and the RMS factor below sqrt(3), even at a huge X/R.
+  const stiff = _v496({ isym_ka: 20, x_over_r: 1e6 });
+  assert.ok(stiff.peak_factor < 2 * Math.SQRT2 && stiff.peak_factor > 2.82);
+  assert.ok(stiff.mf_rms < Math.sqrt(3) && stiff.mf_rms > 1.73);
+  // Error seams: non-finite, non-positive isym / X/R.
+  assert.ok("error" in _v496({ isym_ka: Infinity, x_over_r: 15 }));
+  assert.ok("error" in _v496({ isym_ka: 0, x_over_r: 15 }));
+  assert.ok("error" in _v496({ isym_ka: 20, x_over_r: 0 }));
+});

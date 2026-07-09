@@ -1061,6 +1061,18 @@ export const CITATIONS = {
       { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
     ],
   },
+  "asymmetrical-fault-xr": {
+    formula: "I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF_rms.",
+    edition: "First-cycle fault-asymmetry model (DC offset from X/R), an IEEE C37 / NEMA AB-4 first-cycle relation, by name; the interrupting-duty rating and coordination study govern the applied duty.",
+    freeAccess: "The DC-offset asymmetry factors are a standard first-principles first-cycle model; X/R comes from the utility and transformer impedance data.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-cycle fault asymmetry model (DC offset from X/R). I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))), MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))), and I_asym_rms = I_sym x MF_rms. The first-cycle asymmetrical current, not the symmetrical RMS, is what a device's peak-withstand and a bus bracing rating must survive; the DC offset and both factors grow as X/R rises (highest near large transformers and generators, approaching a 2.6x peak and 1.7x RMS in the stiff limit). The factors assume the worst-case fully offset phase. A design aid, not the engineer of record; the interrupting-duty rating and a protective-device coordination study govern.",
+    assumptions: [
+      { name: "Peak factor", value: "I_peak/I_sym = sqrt(2)(1 + e^(-pi/(X/R))), approaching 2.828 as X/R goes to infinity", source: "first-cycle DC-offset model" },
+      { name: "RMS factor", value: "MF = sqrt(1 + 2 e^(-2 pi/(X/R))), approaching sqrt(3) in the stiff limit", source: "first-cycle DC-offset model" },
+      { name: "Worst case", value: "assumes the fully offset phase; the applied duty per the interrupting rating governs", source: "IEEE C37 / NEMA AB-4" },
+    ],
+  },
   "capacitor-discharge-time": {
     formula: "V(t) = V0 e^(-t/RC); t_discharge = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); P_continuous = V0^2/R.",
     edition: "The capacitor stored-energy discharge requirement of NEC 2023 460.6 -- residual voltage to 50 V within 1 minute at or below 600 V, 5 minutes above 600 V, by a permanent or automatic discharge means -- by name. A computational aid; the AHJ-adopted NEC edition and the equipment listing govern.",

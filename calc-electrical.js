@@ -5125,3 +5125,43 @@ function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl
   for (const f of [cap, v0, vs, tl, r]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["capacitor-discharge-time"] = _v495renderCapacitorDischargeTime;
+
+// ===================== spec-v496: asymmetrical and peak fault current from X/R =====================
+// dims: in { isym_ka: I, x_over_r: dimensionless } out: { i_peak_ka: I, mf_rms: dimensionless, i_asym_ka: I, peak_factor: dimensionless }
+export function computeAsymmetricalFaultXr({ isym_ka = 0, x_over_r = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const isym = Number(isym_ka) || 0;
+  const xr = Number(x_over_r) || 0;
+  if (!(isym > 0)) return { error: "Symmetrical fault current must be positive (kA)." };
+  if (!(xr > 0)) return { error: "X/R ratio must be positive." };
+  const i_peak_ka = Math.SQRT2 * isym * (1 + Math.exp(-Math.PI / xr));
+  const mf_rms = Math.sqrt(1 + 2 * Math.exp(-2 * Math.PI / xr));
+  const i_asym_ka = isym * mf_rms;
+  const peak_factor = i_peak_ka / isym;
+  if (![i_peak_ka, mf_rms, i_asym_ka, peak_factor].every(Number.isFinite)) return { error: "Fault-asymmetry math is not a finite value." };
+  return {
+    i_peak_ka, mf_rms, i_asym_ka, peak_factor,
+    note: "First-cycle fault asymmetry from the DC offset: the first half-cycle of a real fault rides a DC offset on the AC wave, sized by the circuit X/R ratio. I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))) and the asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))). Both grow as X/R rises -- highest near large transformers and generators, approaching a 2.6x peak and 1.7x RMS in the stiff limit. A device's peak-withstand and a bus bracing rating must survive the ASYMMETRICAL first-cycle current, not the symmetrical RMS, so comparing gear against the symmetrical value under-rates it on a stiff, high-X/R service. The factors assume the worst-case fully offset phase. A design aid; the interrupting-duty rating and a coordination study govern.",
+  };
+}
+export const asymmetricalFaultXrExample = { inputs: { isym_ka: 20, x_over_r: 15 } };
+function _v496renderAsymmetricalFaultXr(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-cycle fault asymmetry from X/R (IEEE C37 / NEMA AB-4 model): I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); asymmetrical RMS multiplier MF = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF. The asymmetrical first-cycle current, not the symmetrical RMS, is what a peak-withstand and bus bracing rating must survive. A design aid; the interrupting-duty rating and coordination study govern.";
+  const isym = makeNumber("Symmetrical RMS fault current (kA)", "afx-isym", { step: "any", min: "0" }); isym.input.value = "20";
+  const xr = makeNumber("Circuit X/R ratio", "afx-xr", { step: "any", min: "0" }); xr.input.value = "15";
+  for (const f of [isym, xr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { isym.input.value = "20"; xr.input.value = "15"; update(); });
+  const oPeak = makeOutputLine(outputRegion, "First peak current", "afx-out-peak");
+  const oAsym = makeOutputLine(outputRegion, "First-cycle asymmetrical RMS", "afx-out-asym");
+  const oNote = makeOutputLine(outputRegion, "Note", "afx-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeAsymmetricalFaultXr({ isym_ka: readNum(isym.input), x_over_r: readNum(xr.input) });
+    if (r.error) { oPeak.textContent = r.error; oAsym.textContent = "-"; oNote.textContent = ""; return; }
+    oPeak.textContent = fmt(r.i_peak_ka, 1) + " kA (" + fmt(r.peak_factor, 2) + "x symmetrical)";
+    oAsym.textContent = fmt(r.i_asym_ka, 1) + " kA (" + fmt(r.mf_rms, 3) + "x symmetrical)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [isym, xr]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["asymmetrical-fault-xr"] = _v496renderAsymmetricalFaultXr;

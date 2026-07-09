@@ -56,6 +56,8 @@ const TOOL_MODULES = (() => {
     "transformer-voltage-regulation",
     // spec-v495 capacitor discharge time and bleed resistor
     "capacitor-discharge-time",
+    // spec-v496 asymmetrical and peak fault current from X/R
+    "asymmetrical-fault-xr",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

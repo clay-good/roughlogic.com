@@ -18874,6 +18874,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "asymmetrical fault",
+      "target": "asymmetrical-fault-xr",
+      "kind": "industry"
+    },
+    {
+      "term": "peak fault current",
+      "target": "asymmetrical-fault-xr",
+      "kind": "industry"
+    },
+    {
+      "term": "x/r ratio",
+      "target": "asymmetrical-fault-xr",
+      "kind": "industry"
+    },
+    {
+      "term": "dc offset",
+      "target": "asymmetrical-fault-xr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "first cycle",
+      "target": "asymmetrical-fault-xr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "asymmetry factor",
+      "target": "asymmetrical-fault-xr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "peak withstand",
+      "target": "asymmetrical-fault-xr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "momentary rating",
+      "target": "asymmetrical-fault-xr",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"
