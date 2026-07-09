@@ -735,6 +735,7 @@ export const COMPUTE_MAP = {
   "aircraft-weight-balance": { module: "../../calc-mechanic.js", fn: "computeAircraftWeightBalance" },
   "abyc-dc-wire": { module: "../../calc-mechanic.js", fn: "computeAbycDcWire" },
   "battery-hydrogen-vent": { module: "../../calc-electrical.js", fn: "computeBatteryHydrogenVent" },
+  "existing-load-220-87": { module: "../../calc-feeder.js", fn: "computeExistingLoad22087" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

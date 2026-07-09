@@ -35258,6 +35258,70 @@
    }
   },
   {
+   "tile_id": "existing-load-220-87",
+   "source_publisher": "NEC 2023 220.87",
+   "source_title": "200 A service, 120 A recorded peak, adding a 40 A EVSE -> 150 A basis, 190 A total, 10 A headroom, fits",
+   "source_edition_or_year": "spec-v519 worked example (machine-verified)",
+   "source_section_or_page": "spec-v519 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "recorded_peak_a": 120,
+    "new_load_a": 40,
+    "service_rating_a": 200,
+    "pv_or_peakshave": false
+   },
+   "outputs": {
+    "basis_a": {
+     "value": 150,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "total_a": {
+     "value": 190,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "headroom_a": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "existing-load-220-87",
+   "source_publisher": "NEC 2023 220.87",
+   "source_title": "cross-check: a busier 145 A recorded peak -> 221.25 A total, over the 200 A service (-21.25 A)",
+   "source_edition_or_year": "spec-v519 worked example (machine-verified)",
+   "source_section_or_page": "spec-v519 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "recorded_peak_a": 145,
+    "new_load_a": 40,
+    "service_rating_a": 200,
+    "pv_or_peakshave": false
+   },
+   "outputs": {
+    "total_a": {
+     "value": 221.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "headroom_a": {
+     "value": -21.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-ltb",
    "source_publisher": "AISC 360-22 Section F2 (AISC Manual W18x50 properties)",
    "source_title": "W18x50 A992 braced at 10 ft, Cb 1.0 -> inelastic zone, Mn 360.2 kip-ft (ASD 215.7)",

@@ -124,6 +124,8 @@ const TOOL_MODULES = (() => {
     "continuous-load-ocpd",
     // spec-v493 NEC 445.13 generator output conductor at 115%
     "generator-conductor-445",
+    // spec-v519 NEC 220.87 existing-facility load by peak demand
+    "existing-load-220-87",
   ]);
   // spec-v28 low-voltage / data / security cabling (own module; registered
   // under Group A pending the Group-Z maintainer signoff, per the spec's

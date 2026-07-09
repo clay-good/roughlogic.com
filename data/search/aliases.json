@@ -11344,6 +11344,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "220.87",
+      "target": "existing-load-220-87",
+      "kind": "industry"
+    },
+    {
+      "term": "existing load calculation",
+      "target": "existing-load-220-87",
+      "kind": "industry"
+    },
+    {
+      "term": "metered peak demand",
+      "target": "existing-load-220-87",
+      "kind": "industry"
+    },
+    {
+      "term": "add ev charger service",
+      "target": "existing-load-220-87",
+      "kind": "adjacent"
+    },
+    {
+      "term": "service upgrade avoid",
+      "target": "existing-load-220-87",
+      "kind": "adjacent"
+    },
+    {
+      "term": "maximum demand method",
+      "target": "existing-load-220-87",
+      "kind": "adjacent"
+    },
+    {
+      "term": "125 percent demand",
+      "target": "existing-load-220-87",
+      "kind": "adjacent"
+    },
+    {
+      "term": "existing dwelling load",
+      "target": "existing-load-220-87",
+      "kind": "adjacent"
+    },
+    {
       "term": "lateral torsional buckling",
       "target": "steel-beam-ltb",
       "kind": "industry"

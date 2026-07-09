@@ -455,3 +455,53 @@ function _v493renderGeneratorConductor445(inputRegion, outputRegion, citationEl)
   for (const f of [ph, ol]) f.select.addEventListener("change", update);
 }
 FEEDER_RENDERERS["generator-conductor-445"] = _v493renderGeneratorConductor445;
+
+// ===================== spec-v519: existing-facility load by peak demand (NEC 220.87) =====================
+// dims: in { recorded_peak_a: I, new_load_a: I, service_rating_a: I, pv_or_peakshave: dimensionless } out: { basis_a: I, total_a: I, headroom_a: I, fits: dimensionless }
+export function computeExistingLoad22087({ recorded_peak_a = 0, new_load_a = 0, service_rating_a = 0, pv_or_peakshave = false } = {}) {
+  const _g = _finiteGuard({ recorded_peak_a, new_load_a, service_rating_a }); if (_g) return _g;
+  const peak = Number(recorded_peak_a) || 0;
+  const nl = Number(new_load_a) || 0;
+  const rating = Number(service_rating_a) || 0;
+  if (!(peak > 0)) return { error: "Recorded peak demand must be positive (A)." };
+  if (nl < 0) return { error: "New load cannot be negative (A)." };
+  if (!(rating > 0)) return { error: "Service rating must be positive (A)." };
+  const basis_a = 1.25 * peak;
+  const total_a = basis_a + nl;
+  const headroom_a = rating - total_a;
+  const fits = headroom_a >= 0 && !pv_or_peakshave;
+  if (![basis_a, total_a, headroom_a].every(Number.isFinite)) return { error: "Existing-load math is not a finite value." };
+  return {
+    basis_a, total_a, headroom_a, fits, pv_or_peakshave: !!pv_or_peakshave,
+    note: "NEC 220.87 determining existing loads: instead of summing connected loads (which overstates what a service carries), take the maximum demand the utility actually METERED over the last year (or a 30-day recording) and add 125% of it to the new load. basis = 1.25 x recorded peak, total = basis + new load, headroom = service rating - total. This tells a contractor whether an EV charger or heat pump fits without a costly service upgrade, because a building rarely runs near its connected total. The data must span at least a year (or a 30-day recording per 220.87), and the method is VOID where the recorded demand already reflects on-site PV or a peak-shaving system that hides the true peak. A design aid; the AHJ and the utility data govern.",
+  };
+}
+export const existingLoad22087Example = { inputs: { recorded_peak_a: 120, new_load_a: 40, service_rating_a: 200, pv_or_peakshave: false } };
+
+function _v519renderExistingLoad22087(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 220.87 (determining existing loads): basis = 125% of the maximum demand the utility metered (a year of data, or a 30-day recording); total = basis + new load; headroom = service rating - total. Void where the recorded data reflects on-site PV or peak-shaving that hides the true peak. A design aid; the AHJ and utility data govern.";
+  const peak = _v26makeNumber("Recorded peak demand (A, metered over the last year)", "el2-peak", { step: "any", min: "0" });
+  const nl = _v26makeNumber("New load to add (A, continuous-equivalent)", "el2-new", { step: "any", min: "0" });
+  const rating = _v26makeNumber("Existing service rating (A)", "el2-rating", { step: "any", min: "0" });
+  const pv = _v26makeSelect("Recorded data reflects PV / peak-shaving?", "el2-pv", [
+    { value: "no", label: "No - clean metered demand", selected: true },
+    { value: "yes", label: "Yes - 220.87 does not apply" },
+  ]);
+  for (const f of [peak, nl, rating, pv]) inputRegion.appendChild(f.wrap);
+  _v26attachEx(inputRegion, () => { peak.input.value = "120"; nl.input.value = "40"; rating.input.value = "200"; pv.select.value = "no"; update(); });
+  const oBasis = _v26makeOut(outputRegion, "125% basis (of metered peak)", "el2-out-basis");
+  const oTotal = _v26makeOut(outputRegion, "Total load (basis + new)", "el2-out-total");
+  const oHead = _v26makeOut(outputRegion, "Headroom under the service", "el2-out-head");
+  const oNote = _v26makeOut(outputRegion, "Note", "el2-out-note");
+  const update = _v26debounce(() => {
+    const r = computeExistingLoad22087({ recorded_peak_a: Number(peak.input.value) || 0, new_load_a: Number(nl.input.value) || 0, service_rating_a: Number(rating.input.value) || 0, pv_or_peakshave: pv.select.value === "yes" });
+    if (r.error) { oBasis.textContent = r.error; oTotal.textContent = "-"; oHead.textContent = "-"; oNote.textContent = "-"; return; }
+    oBasis.textContent = _v26fmt(r.basis_a, 1) + " A";
+    oTotal.textContent = _v26fmt(r.total_a, 1) + " A";
+    oHead.textContent = _v26fmt(r.headroom_a, 1) + " A" + (r.pv_or_peakshave ? " -- but 220.87 does not apply (PV / peak-shaving)" : r.fits ? " -- FITS, no upgrade needed" : " -- OVER, upgrade or load management needed");
+    oNote.textContent = r.note;
+  }, _V26_DEB);
+  for (const f of [peak, nl, rating]) f.input.addEventListener("input", update);
+  pv.select.addEventListener("change", update);
+}
+FEEDER_RENDERERS["existing-load-220-87"] = _v519renderExistingLoad22087;

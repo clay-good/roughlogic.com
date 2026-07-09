@@ -17632,3 +17632,23 @@ test("bounds: spec-v518 computeBatteryHydrogenVent pins the 0.054 I N rate, the 
   assert.ok("error" in _v518({ cell_count: 24, charge_current_a: 0, room_volume_ft3: 800 }));
   assert.ok("error" in _v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 0 }));
 });
+
+import { computeExistingLoad22087 as _v519 } from "../../calc-feeder.js";
+
+test("bounds: spec-v519 computeExistingLoad22087 pins the 125% basis, the headroom, the PV void, and error seams", () => {
+  const r = _v519({ recorded_peak_a: 120, new_load_a: 40, service_rating_a: 200, pv_or_peakshave: false });
+  assert.ok(Math.abs(r.basis_a - 150) < 1e-9); // 1.25 x 120
+  assert.ok(Math.abs(r.total_a - 190) < 1e-9);
+  assert.ok(Math.abs(r.headroom_a - 10) < 1e-9 && r.fits === true);
+  // A busier building goes over the service.
+  const busy = _v519({ recorded_peak_a: 145, new_load_a: 40, service_rating_a: 200, pv_or_peakshave: false });
+  assert.ok(Math.abs(busy.total_a - 221.25) < 1e-9 && busy.headroom_a < 0 && busy.fits === false);
+  // The PV / peak-shaving flag voids 220.87 even when the headroom is positive.
+  const pv = _v519({ recorded_peak_a: 120, new_load_a: 40, service_rating_a: 200, pv_or_peakshave: true });
+  assert.ok(pv.headroom_a >= 0 && pv.fits === false && pv.pv_or_peakshave === true);
+  // Error seams: non-finite, non-positive peak / rating, negative new load.
+  assert.ok("error" in _v519({ recorded_peak_a: Infinity, new_load_a: 40, service_rating_a: 200 }));
+  assert.ok("error" in _v519({ recorded_peak_a: 0, new_load_a: 40, service_rating_a: 200 }));
+  assert.ok("error" in _v519({ recorded_peak_a: 120, new_load_a: -1, service_rating_a: 200 }));
+  assert.ok("error" in _v519({ recorded_peak_a: 120, new_load_a: 40, service_rating_a: 0 }));
+});

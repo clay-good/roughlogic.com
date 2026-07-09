@@ -1119,6 +1119,18 @@ export const CITATIONS = {
       { name: "Surge tolerance", value: "30% voltage dip on starting (engineering practice)", source: "NEMA MG 1 by name" },
     ],
   },
+  "existing-load-220-87": {
+    formula: "basis = 1.25 x recorded_peak; total = basis + new_load; headroom = service_rating - total; fits = headroom >= 0 and not pv_or_peakshave.",
+    edition: "The existing-load determination of NEC 2023 220.87 -- 125% of the maximum demand the utility metered over a year (or a 30-day recording) plus the new load -- by name. A computational aid; the AHJ-adopted NEC edition and the utility data govern.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 220.87 maximum-demand method and its data conditions are in the published code.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Metered basis", value: "125% of the maximum demand the utility metered, not the sum of connected loads", source: "NEC 220.87" },
+      { name: "Data span", value: "at least a year of data, or a 30-day recording per 220.87 conditions", source: "NEC 220.87" },
+      { name: "Void condition", value: "does not apply where the recorded demand reflects on-site PV or peak-shaving that hides the true peak", source: "NEC 220.87" },
+    ],
+  },
   "generator-conductor-445": {
     formula: "nameplate = given, or kW x 1000 / (sqrt(3) x V x pf) three-phase, or kW x 1000 / (V x pf) single-phase; basis = overload_limited ? 1.00 : 1.15; required_ampacity = basis x nameplate.",
     edition: "The generator output-conductor ampacity rule of NEC 2023 445.13(A) -- not less than 115% of the generator nameplate current, or 100% where the design prevents output above the nameplate -- by name. A computational aid; the AHJ-adopted NEC edition governs.",
