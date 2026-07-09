@@ -205,6 +205,18 @@ export const CITATIONS = {
       { name: "Lender rules", value: "the appraised ARV and the lender's LTV/seasoning govern", source: "scope of this tile" },
     ],
   },
+  "commercial-load-factor": {
+    formula: "rentable = usable x (1 + common_area_factor); load_factor = rentable / usable; annual_rent = base_rent x rentable; cost_per_usable = base_rent x load_factor.",
+    edition: "BOMA rentable/usable load factor (the ANSI/BOMA Z65.1 Office Standard), by name; the measured BOMA areas and the lease govern.",
+    freeAccess: "The rentable/usable load-factor relation is a standard commercial-real-estate calculation; the usable area and common-area factor come from the BOMA measurement and the building.",
+    governance: GOVERNANCE.general,
+    editionNote: "BOMA rentable/usable load factor. Office rent is quoted per RENTABLE square foot, which includes the tenant's pro-rata share of building common areas (lobbies, corridors, restrooms) they cannot occupy, but the tenant only uses the USABLE square feet. rentable = usable x (1 + common_area_factor), the load factor = rentable / usable, and the effective cost per usable square foot = base_rent x load_factor. A 15% factor means the space actually used costs 15% more than the quoted rate. Add-on and loss-factor conventions vary, so the measured BOMA areas and the lease govern. A cost-comparison aid, not a BOMA measurement report.",
+    assumptions: [
+      { name: "Rentable includes common", value: "rentable adds the pro-rata share of building common areas the tenant cannot occupy", source: "ANSI/BOMA Z65.1" },
+      { name: "Cost per usable", value: "the real cost of usable space is the quoted rate times the load factor", source: "BOMA convention" },
+      { name: "Conventions vary", value: "add-on and loss-factor conventions vary; the measured BOMA areas govern", source: "ANSI/BOMA Z65.1" },
+    ],
+  },
   "net-effective-rent": {
     formula: "paid = face_rent x (term - free_periods); NER = (paid - one_time_credit) / term; total_saving = face x term - (paid - credit); discount_pct = (1 - NER / face) x 100.",
     edition: "Net effective rent (straight-line concession spread), per the Appraisal Institute income approach and standard commercial-lease concession practice, by name; the executed lease governs.",

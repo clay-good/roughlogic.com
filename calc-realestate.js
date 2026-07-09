@@ -2826,3 +2826,48 @@ function renderNetEffectiveRent(inputRegion, outputRegion, citationEl) {
   for (const f of [face, term, free, credit]) f.input.addEventListener("input", update);
 }
 REALESTATE_RENDERERS["net-effective-rent"] = renderNetEffectiveRent;
+
+// ===================== spec-v527: rentable/usable load factor (BOMA) =====================
+// dims: in { usable_sf: L^2, common_area_factor: dimensionless, base_rent: dimensionless } out: { rentable_sf: L^2, load_factor: dimensionless, annual_rent: dimensionless, cost_per_usable: dimensionless }
+export function computeCommercialLoadFactor({ usable_sf = 0, common_area_factor = 0, base_rent = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const usable = Number(usable_sf) || 0;
+  const caf = Number(common_area_factor) || 0;
+  const rent = Number(base_rent) || 0;
+  if (!(usable > 0)) return { error: "Usable area must be positive (SF)." };
+  if (caf < 0) return { error: "Common-area factor cannot be negative." };
+  if (rent < 0) return { error: "Base rent cannot be negative." };
+  const rentable_sf = usable * (1 + caf);
+  const load_factor = rentable_sf / usable;
+  const annual_rent = rent * rentable_sf;
+  const cost_per_usable = rent * load_factor;
+  if (![rentable_sf, load_factor, annual_rent, cost_per_usable].every(Number.isFinite)) return { error: "Load-factor math is not a finite value." };
+  return {
+    rentable_sf, load_factor, annual_rent, cost_per_usable,
+    note: "BOMA rentable/usable load factor (ANSI/BOMA Z65.1). Office rent is quoted per RENTABLE square foot, but a tenant only occupies the USABLE square feet -- the rentable figure adds the tenant's pro-rata share of lobbies, corridors, and restrooms that cannot hold a desk. rentable = usable x (1 + common_area_factor), the load factor = rentable / usable, and the real cost of the space you use is base_rent x load_factor. A 15% factor means the space actually used costs 15% more than the quoted rate, the hidden common-area cost the quoted rate conceals. Add-on and loss-factor conventions vary, so the measured BOMA areas and the lease govern. A cost-comparison aid, not a BOMA measurement report.",
+  };
+}
+export const commercialLoadFactorExample = { inputs: { usable_sf: 10000, common_area_factor: 0.15, base_rent: 30 } };
+function renderCommercialLoadFactor(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: BOMA rentable/usable load factor (ANSI/BOMA Z65.1 Office Standard): rentable = usable x (1 + common_area_factor); load_factor = rentable / usable; annual_rent = base_rent x rentable; cost_per_usable = base_rent x load_factor. Rent is per rentable SF, which includes common areas the tenant cannot occupy. A cost-comparison aid; the measured BOMA areas and the lease govern.";
+  const usable = makeNumber("Usable (occupiable) area (SF)", "clf-usable", { step: "any", min: "0" }); usable.input.value = "10000";
+  const caf = makeNumber("Common-area (add-on) factor (decimal, 0.15 = 15%)", "clf-caf", { step: "any", min: "0" }); caf.input.value = "0.15";
+  const rent = makeNumber("Quoted base rent ($/rentable SF/yr)", "clf-rent", { step: "any", min: "0" }); rent.input.value = "30";
+  for (const f of [usable, caf, rent]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { usable.input.value = "10000"; caf.input.value = "0.15"; rent.input.value = "30"; update(); });
+  const oRent = makeOutputLine(outputRegion, "Rentable area (load factor)", "clf-out-rent");
+  const oAnnual = makeOutputLine(outputRegion, "Annual rent", "clf-out-annual");
+  const oCost = makeOutputLine(outputRegion, "Effective cost per USABLE SF", "clf-out-cost");
+  const oNote = makeOutputLine(outputRegion, "Note", "clf-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCommercialLoadFactor({ usable_sf: readNum(usable.input), common_area_factor: readNum(caf.input), base_rent: readNum(rent.input) });
+    if (r.error) { oRent.textContent = r.error; oAnnual.textContent = "-"; oCost.textContent = "-"; oNote.textContent = ""; return; }
+    oRent.textContent = fmt(r.rentable_sf, 0) + " SF (load factor " + fmt(r.load_factor, 3) + ")";
+    oAnnual.textContent = "$" + fmt(r.annual_rent, 0) + "/yr";
+    oCost.textContent = "$" + fmt(r.cost_per_usable, 2) + "/usable SF";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [usable, caf, rent]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["commercial-load-factor"] = renderCommercialLoadFactor;

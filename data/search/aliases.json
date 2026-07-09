@@ -15789,6 +15789,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "commercial load factor",
+      "target": "commercial-load-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "rentable usable",
+      "target": "commercial-load-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "boma",
+      "target": "commercial-load-factor",
+      "kind": "industry"
+    },
+    {
+      "term": "add-on factor",
+      "target": "commercial-load-factor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "common area factor",
+      "target": "commercial-load-factor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rentable square feet",
+      "target": "commercial-load-factor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "loss factor",
+      "target": "commercial-load-factor",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cost per usable sf",
+      "target": "commercial-load-factor",
+      "kind": "adjacent"
+    },
+    {
       "term": "clarifier loading",
       "target": "clarifier-surface-loading",
       "kind": "industry"

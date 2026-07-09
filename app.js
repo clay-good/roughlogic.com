@@ -976,6 +976,8 @@ const TOOL_MODULES = (() => {
     "fix-flip-profit", "brrrr-refi", "rental-total-return",
     // spec-v526 net effective rent (lease concessions)
     "net-effective-rent",
+    // spec-v527 rentable/usable load factor (BOMA)
+    "commercial-load-factor",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [

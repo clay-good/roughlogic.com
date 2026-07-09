@@ -2284,6 +2284,7 @@ cross-check.
 | calc-realestate.js | `computeCapRateDSCR` | `{ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate...` | _ | _ | _ |
 | calc-realestate.js | `computeCashOnCash` | `{ cash_invested, annual_pretax_cashflow }` | _ | _ | _ |
 | calc-realestate.js | `computeClosingCosts` | `{ purchase_price, loan_amount, transfer_tax_rate_pct, note_rate_pct }` | _ | _ | _ |
+| calc-realestate.js | `computeCommercialLoadFactor` | `{ usable_sf = 0, common_area_factor = 0, base_rent = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeCommissionSplit` | `{ sale_price, total_commission_percent, side_share_percent, brokerage_split_t...` | _ | _ | _ |
 | calc-realestate.js | `computeCostOfWaiting` | `{ principal, current_rate_percent, future_rate_percent, term_years }` | _ | _ | _ |
 | calc-realestate.js | `computeDTI` | `{ gross_monthly_income, housing_payment, other_monthly_debts }` | _ | _ | _ |
@@ -2638,7 +2639,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1224.
+Row count: 1225.
 
 <!-- END function-corpus-v14 -->
 
@@ -3720,7 +3721,7 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (31 tiles)
+### Group X Real Estate (32 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3730,6 +3731,7 @@ per spec-v14 §13.1 second paragraph.
 | `cap-rate-dscr` | Cap Rate and DSCR | Standard CRE underwriting ratios (pub...; Worked example: NOI $84,000 / value $1.2M -> 7.0%; debt s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cash-on-cash` | Cash-on-Cash Return | Standard rental-RE investor practice ...; Worked example: $75,000 invested + $6,750 annual cash flo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `closing-costs` | Closing-Cost Estimator (CFPB Line Items) | CFPB Closing Disclosure (12 CFR Part ...; Worked example: $400k purchase / $320k loan / 0.4% transf... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `commercial-load-factor` | Rentable/Usable Load Factor (BOMA) | BOMA rentable/usable load factor (ANS...; spec-v527 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `commission-split` | Commission Split | Standard residential-brokerage practi...; Worked example: $500k sale, 5% total, 50/50 sides, 80/20 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-of-waiting` | Cost of Waiting (Rate-Rise Scenario) | Standard mortgage amortization at two...; Worked example: $320,000 / 30 yr / 6.5% -> 7.5% raises P&... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `debt-yield` | Debt Yield | CRE lender underwriting; spec-v344 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3804,6 +3806,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 980. Fixture-covered or reference-cadence: 980 / 980.
+Tile count: 981. Fixture-covered or reference-cadence: 981 / 981.
 
 <!-- END tile-index-v14 -->

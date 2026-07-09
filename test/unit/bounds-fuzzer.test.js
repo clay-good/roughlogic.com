@@ -17790,3 +17790,24 @@ test("bounds: spec-v526 computeNetEffectiveRent pins the concession spread, the 
   assert.ok("error" in _v526({ face_rent: 40, term_periods: 120, free_periods: 120 })); // free >= term
   assert.ok("error" in _v526({ face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: -1 }));
 });
+
+import { computeCommercialLoadFactor as _v527 } from "../../calc-realestate.js";
+
+test("bounds: spec-v527 computeCommercialLoadFactor pins the rentable area, the load factor, the cost per usable SF, and error seams", () => {
+  const r = _v527({ usable_sf: 10000, common_area_factor: 0.15, base_rent: 30 });
+  assert.ok(Math.abs(r.rentable_sf - 11500) < 1e-6); // usable x 1.15
+  assert.ok(Math.abs(r.load_factor - 1.15) < 1e-9);
+  assert.ok(Math.abs(r.annual_rent - 345000) < 1e-6);
+  assert.ok(Math.abs(r.cost_per_usable - 34.5) < 1e-9); // base x load factor, above the $30 quoted rate
+  // A heavier common load raises the cost per usable SF.
+  const heavy = _v527({ usable_sf: 10000, common_area_factor: 0.20, base_rent: 30 });
+  assert.ok(heavy.cost_per_usable > r.cost_per_usable && Math.abs(heavy.cost_per_usable - 36) < 1e-9);
+  // Zero common-area factor means rentable equals usable and cost equals the quoted rate.
+  const none = _v527({ usable_sf: 10000, common_area_factor: 0, base_rent: 30 });
+  assert.ok(Math.abs(none.rentable_sf - 10000) < 1e-9 && Math.abs(none.cost_per_usable - 30) < 1e-9);
+  // Error seams: non-finite, non-positive usable area, negative factor / rent.
+  assert.ok("error" in _v527({ usable_sf: Infinity, common_area_factor: 0.15, base_rent: 30 }));
+  assert.ok("error" in _v527({ usable_sf: 0, common_area_factor: 0.15, base_rent: 30 }));
+  assert.ok("error" in _v527({ usable_sf: 10000, common_area_factor: -0.1, base_rent: 30 }));
+  assert.ok("error" in _v527({ usable_sf: 10000, common_area_factor: 0.15, base_rent: -1 }));
+});
