@@ -974,6 +974,8 @@ const TOOL_MODULES = (() => {
     "gross-rent-multiplier", "pmi-cancellation-date", "seller-net-sheet",
     "debt-yield", "break-even-occupancy", "max-offer-70-rule",
     "fix-flip-profit", "brrrr-refi", "rental-total-return",
+    // spec-v526 net effective rent (lease concessions)
+    "net-effective-rent",
   ]);
   // v12 Group Y: Educators / K-12 (spec-v12.md §9).
   declare("./calc-edu.js", "EDU_RENDERERS", [

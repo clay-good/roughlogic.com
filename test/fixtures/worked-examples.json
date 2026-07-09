@@ -40256,6 +40256,58 @@
    }
   },
   {
+   "tile_id": "net-effective-rent",
+   "source_publisher": "net effective rent (straight-line concession spread)",
+   "source_title": "$40/SF face, 120-month term, 10 months free -> $36.67/SF/yr NER, 8.3% discount",
+   "source_edition_or_year": "spec-v526 worked example (machine-verified)",
+   "source_section_or_page": "spec-v526 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "face_rent": 40,
+    "term_periods": 120,
+    "free_periods": 10,
+    "one_time_credit": 0
+   },
+   "outputs": {
+    "ner": {
+     "value": 36.67,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "discount_pct": {
+     "value": 8.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "net-effective-rent",
+   "source_publisher": "net effective rent (straight-line concession spread)",
+   "source_title": "cross-check: add a $5/SF one-time TI credit -> NER drops to $36.63/SF/yr",
+   "source_edition_or_year": "spec-v526 worked example (machine-verified)",
+   "source_section_or_page": "spec-v526 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "face_rent": 40,
+    "term_periods": 120,
+    "free_periods": 10,
+    "one_time_credit": 5
+   },
+   "outputs": {
+    "ner": {
+     "value": 36.63,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "duct-heat-gain",
    "source_publisher": "ASHRAE Fundamentals",
    "source_title": "1,000 CFM 55 F air, R-4 duct, 100 ft^2, 120 F attic -> 1,625 Btu/h, 1.5 F warming",

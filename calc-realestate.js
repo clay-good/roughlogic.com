@@ -2778,3 +2778,51 @@ function renderRentalTotalReturn(inputRegion, outputRegion, citationEl) {
   for (const f of [cash, cf, pay, appr, tax]) f.input.addEventListener("input", update);
 }
 REALESTATE_RENDERERS["rental-total-return"] = renderRentalTotalReturn;
+
+// ===================== spec-v526: net effective rent (lease concessions) =====================
+// dims: in { face_rent: dimensionless, term_periods: dimensionless, free_periods: dimensionless, one_time_credit: dimensionless } out: { paid: dimensionless, ner: dimensionless, total_saving: dimensionless, discount_pct: dimensionless }
+export function computeNetEffectiveRent({ face_rent = 0, term_periods = 0, free_periods = 0, one_time_credit = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const face = Number(face_rent) || 0;
+  const term = Number(term_periods) || 0;
+  const free = Number(free_periods) || 0;
+  const credit = Number(one_time_credit) || 0;
+  if (!(face > 0)) return { error: "Face rent must be positive." };
+  if (!(term > 0)) return { error: "Lease term must be positive." };
+  if (!(free >= 0 && free < term)) return { error: "Free-rent periods must be 0 or more and below the term." };
+  if (credit < 0) return { error: "One-time credit cannot be negative." };
+  const paid = face * (term - free);
+  const ner = (paid - credit) / term;
+  const total_saving = face * term - (paid - credit);
+  const discount_pct = (1 - ner / face) * 100;
+  if (![paid, ner, total_saving, discount_pct].every(Number.isFinite)) return { error: "Net-effective-rent math is not a finite value." };
+  return {
+    paid, ner, total_saving, discount_pct,
+    note: "Net effective rent spreads lease concessions across the full term to the rate a tenant ACTUALLY pays. Landlords quote the high FACE rent and bury free rent and TI credits, so the term-sheet number is not the number to compare between competing offers. paid = face x (term - free_periods), NER = (paid - one_time_credit) / term, and discount = (1 - NER/face) x 100. A five-year lease at a high face with several months free can carry an effective rate 10 to 20% below face. This is a straight-line (undiscounted) average, the common broker convention -- not a present-value effective rent; escalations and operating-expense pass-throughs change the picture. A comparison aid, not lease terms; the executed lease governs.",
+  };
+}
+export const netEffectiveRentExample = { inputs: { face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: 0 } };
+function renderNetEffectiveRent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: net effective rent (straight-line concession spread; Appraisal Institute income approach / commercial-lease concession practice): paid = face x (term - free); NER = (paid - one-time credit) / term; discount = (1 - NER/face) x 100. A straight-line average, not a present-value effective rent. A comparison aid; the executed lease governs.";
+  const face = makeNumber("Face (base) rent ($/period, e.g. $/SF/yr)", "ner-face", { step: "any", min: "0" }); face.input.value = "40";
+  const term = makeNumber("Lease term (periods)", "ner-term", { step: "any", min: "0" }); term.input.value = "120";
+  const free = makeNumber("Free-rent periods", "ner-free", { step: "any", min: "0" }); free.input.value = "10";
+  const credit = makeNumber("One-time TI / concession credit ($, 0 = none)", "ner-credit", { step: "any", min: "0" }); credit.input.value = "0";
+  for (const f of [face, term, free, credit]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { face.input.value = "40"; term.input.value = "120"; free.input.value = "10"; credit.input.value = "0"; update(); });
+  const oNer = makeOutputLine(outputRegion, "Net effective rent", "ner-out-ner");
+  const oSave = makeOutputLine(outputRegion, "Total concession value", "ner-out-save");
+  const oDisc = makeOutputLine(outputRegion, "Discount off face", "ner-out-disc");
+  const oNote = makeOutputLine(outputRegion, "Note", "ner-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeNetEffectiveRent({ face_rent: readNum(face.input), term_periods: readNum(term.input), free_periods: readNum(free.input), one_time_credit: readNum(credit.input) });
+    if (r.error) { oNer.textContent = r.error; oSave.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
+    oNer.textContent = "$" + fmt(r.ner, 2) + " per period";
+    oSave.textContent = "$" + fmt(r.total_saving, 2);
+    oDisc.textContent = fmt(r.discount_pct, 1) + "% below face";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [face, term, free, credit]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["net-effective-rent"] = renderNetEffectiveRent;

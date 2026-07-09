@@ -2297,6 +2297,7 @@ cross-check.
 | calc-realestate.js | `computeMaxOffer70Rule` | `{ arv = 0, repairs = 0, rule_pct = 70, fee = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeMortgagePointBreakeven` | `{ loan_amount, base_rate_pct, points_rate_pct, point_cost_pct, term_years, ho...` | _ | _ | _ |
 | calc-realestate.js | `computeMortgageReserves` | `{ piti_monthly, reserves_months, liquid_assets, retirement_balance, retiremen...` | _ | _ | _ |
+| calc-realestate.js | `computeNetEffectiveRent` | `{ face_rent = 0, term_periods = 0, free_periods = 0, one_time_credit = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computePITI` | `{ principal, apr_percent, term_years, annual_property_tax, annual_insurance, ...` | _ | _ | _ |
 | calc-realestate.js | `computePerDiemInterest` | `{ loan_amount, annual_rate_pct, closing_date_iso, day_count }` | _ | _ | _ |
 | calc-realestate.js | `computePmiCancellationDate` | `{ value = 0, loan = 0, rate_pct = 0, term_months = 0 } = {}` | _ | _ | _ |
@@ -2637,7 +2638,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1223.
+Row count: 1224.
 
 <!-- END function-corpus-v14 -->
 
@@ -3719,7 +3720,7 @@ per spec-v14 §13.1 second paragraph.
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group X Real Estate (30 tiles)
+### Group X Real Estate (31 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3743,6 +3744,7 @@ per spec-v14 §13.1 second paragraph.
 | `max-offer-70-rule` | Fix-and-Flip Maximum Offer (70% Rule) | real-estate-investing heuristic; spec-v346 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mortgage-point-breakeven` | Mortgage Discount-Point Break-Even | First-principles amortization; CFPB L...; Worked example: $300k, 7.0% base vs 6.5% with 2 points ($... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mortgage-reserves` | Mortgage Reserves Requirement (Months PITI) | Fannie Mae Selling Guide B3-4.1-01 / ...; Worked example: $2,500 PITI x 6 mo = $15,000 required; $2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `net-effective-rent` | Net Effective Rent (Lease Concessions) | net effective rent (straight-line con...; spec-v526 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `per-diem-interest` | Per-Diem Prorated Interest at Closing | CFPB Closing Disclosure (12 CFR 1026....; Worked example: $300k @ 6.0%, close 2026-06-15, Actual/36... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `piti` | PITI Mortgage Payment | Standard mortgage amortization (public); Worked example: $320k @ 6.5% for 30y + $4800 tax + $1800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pmi-cancellation-date` | PMI Cancellation / Termination | Homeowners Protection Act of 1998 (12...; $250,000 value/loan, 30 yr at 6.5% -> 80% at month 146, 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3802,6 +3804,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 979. Fixture-covered or reference-cadence: 979 / 979.
+Tile count: 980. Fixture-covered or reference-cadence: 980 / 980.
 
 <!-- END tile-index-v14 -->

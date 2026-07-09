@@ -15749,6 +15749,46 @@
       "kind": "industry"
     },
     {
+      "term": "net effective rent",
+      "target": "net-effective-rent",
+      "kind": "industry"
+    },
+    {
+      "term": "lease concessions",
+      "target": "net-effective-rent",
+      "kind": "industry"
+    },
+    {
+      "term": "free rent",
+      "target": "net-effective-rent",
+      "kind": "industry"
+    },
+    {
+      "term": "effective rent",
+      "target": "net-effective-rent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "face vs effective rent",
+      "target": "net-effective-rent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ti allowance",
+      "target": "net-effective-rent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "concession spread",
+      "target": "net-effective-rent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "commercial lease rate",
+      "target": "net-effective-rent",
+      "kind": "adjacent"
+    },
+    {
       "term": "clarifier loading",
       "target": "clarifier-surface-loading",
       "kind": "industry"

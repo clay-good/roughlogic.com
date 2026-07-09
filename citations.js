@@ -205,6 +205,18 @@ export const CITATIONS = {
       { name: "Lender rules", value: "the appraised ARV and the lender's LTV/seasoning govern", source: "scope of this tile" },
     ],
   },
+  "net-effective-rent": {
+    formula: "paid = face_rent x (term - free_periods); NER = (paid - one_time_credit) / term; total_saving = face x term - (paid - credit); discount_pct = (1 - NER / face) x 100.",
+    edition: "Net effective rent (straight-line concession spread), per the Appraisal Institute income approach and standard commercial-lease concession practice, by name; the executed lease governs.",
+    freeAccess: "Spreading lease concessions straight-line to an effective rent is a standard commercial-real-estate calculation; the face rent, term, and concessions come from the lease proposal.",
+    governance: GOVERNANCE.general,
+    editionNote: "Net effective rent (straight-line concession spread). The FACE rent is the quoted rate before concessions; the NET EFFECTIVE rent is the rate actually paid after free rent and one-time credits are spread over the full term: paid = face x (term - free_periods), NER = (paid - one_time_credit) / term, and discount = (1 - NER/face) x 100. This is a straight-line average, the common broker convention -- NOT a present-value (discounted) effective rent. Escalations and operating-expense pass-throughs change the picture. A comparison aid, not lease terms; the executed lease governs.",
+    assumptions: [
+      { name: "Face vs effective", value: "face is the quoted rate; net effective is after free rent and credits are spread over the term", source: "commercial-lease practice" },
+      { name: "Straight-line", value: "a straight-line average, not a present-value effective rent", source: "broker convention" },
+      { name: "Excludes", value: "ignores escalations and operating-expense pass-throughs", source: "scope of this tile" },
+    ],
+  },
   "rental-total-return": {
     formula: "total = cash_flow + principal_paydown + appreciation + tax_savings; each% = component/cash; total% = total/cash.",
     edition: "The four-component rental total return (cash flow, paydown, appreciation, tax shield) used by real-estate investors, by name.",

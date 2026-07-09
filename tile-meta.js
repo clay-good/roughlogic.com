@@ -68,6 +68,8 @@ const _TILES = [
   ["seller-net-sheet", "X"],
   ["debt-yield", "X"], ["break-even-occupancy", "X"], ["max-offer-70-rule", "X"],
   ["fix-flip-profit", "X"], ["brrrr-refi", "X"], ["rental-total-return", "X"],
+  // spec-v526 net effective rent (lease concessions)
+  ["net-effective-rent", "X"],
   ["primer-tm", "T"],
   ["cfu-plate-count", "T"],
   ["declining-balance-depreciation", "R"],

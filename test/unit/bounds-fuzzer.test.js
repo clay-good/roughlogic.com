@@ -17769,3 +17769,24 @@ test("bounds: spec-v525 computeNeutralGroundingResistor pins the line-to-neutral
   assert.ok("error" in _v525({ system_voltage_ll_v: 0, target_fault_a: 5 }));
   assert.ok("error" in _v525({ system_voltage_ll_v: 480, target_fault_a: 0 }));
 });
+
+import { computeNetEffectiveRent as _v526 } from "../../calc-realestate.js";
+
+test("bounds: spec-v526 computeNetEffectiveRent pins the concession spread, the discount, the TI credit, and error seams", () => {
+  const r = _v526({ face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: 0 });
+  assert.ok(Math.abs(r.ner - 36.667) < 0.01); // 40 x (120-10) / 120
+  assert.ok(Math.abs(r.discount_pct - 8.333) < 0.01);
+  assert.ok(Math.abs(r.total_saving - 400) < 1e-6); // 10 months of free rent at $40
+  // A one-time credit lowers the NER further.
+  const credit = _v526({ face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: 5 });
+  assert.ok(credit.ner < r.ner && Math.abs(credit.ner - 36.625) < 0.01);
+  // No concessions means NER equals face with zero discount.
+  const none = _v526({ face_rent: 40, term_periods: 120, free_periods: 0, one_time_credit: 0 });
+  assert.ok(Math.abs(none.ner - 40) < 1e-9 && Math.abs(none.discount_pct) < 1e-9);
+  // Error seams: non-finite, non-positive face / term, free >= term, negative credit.
+  assert.ok("error" in _v526({ face_rent: Infinity, term_periods: 120, free_periods: 10 }));
+  assert.ok("error" in _v526({ face_rent: 0, term_periods: 120, free_periods: 10 }));
+  assert.ok("error" in _v526({ face_rent: 40, term_periods: 0, free_periods: 0 }));
+  assert.ok("error" in _v526({ face_rent: 40, term_periods: 120, free_periods: 120 })); // free >= term
+  assert.ok("error" in _v526({ face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: -1 }));
+});
