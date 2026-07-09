@@ -5069,3 +5069,59 @@ function _v494renderTransformerVoltageRegulation(inputRegion, outputRegion, cita
   lead.select.addEventListener("change", update);
 }
 ELECTRICAL_RENDERERS["transformer-voltage-regulation"] = _v494renderTransformerVoltageRegulation;
+
+// ===================== spec-v495: capacitor discharge time and bleed resistor (NEC 460.6) =====================
+// dims: in { capacitance_uf: M^-1 L^-2 T^4 I^2, initial_voltage: M L^2 T^-3 I^-1, safe_voltage: M L^2 T^-3 I^-1, time_limit_s: T, resistor_ohm: M L^2 T^-3 I^-2 } out: { ln_ratio: dimensionless, r_max_ohm: M L^2 T^-3 I^-2, r_used_ohm: M L^2 T^-3 I^-2, t_discharge_s: T, p_continuous_w: M L^2 T^-3, limit_s: T, meets_code: dimensionless }
+export function computeCapacitorDischargeTime({ capacitance_uf = 0, initial_voltage = 0, safe_voltage = 50, time_limit_s = 0, resistor_ohm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cuf = Number(capacitance_uf) || 0;
+  const v0 = Number(initial_voltage) || 0;
+  const vsafe = Number(safe_voltage) || 0;
+  const rin = Number(resistor_ohm) || 0;
+  if (!(cuf > 0)) return { error: "Capacitance must be positive (uF)." };
+  if (!(v0 > 0)) return { error: "Initial voltage must be positive (V)." };
+  if (!(vsafe > 0 && vsafe < v0)) return { error: "Safe voltage must be positive and below the initial voltage." };
+  if (rin < 0) return { error: "Supplied resistance must be positive (ohm; 0 = solve for the largest compliant resistor)." };
+  const limit_s = Number(time_limit_s) > 0 ? Number(time_limit_s) : (v0 <= 600 ? 60 : 300);
+  const C = cuf * 1e-6;
+  const ln_ratio = Math.log(v0 / vsafe);
+  const r_max_ohm = limit_s / (C * ln_ratio);
+  const r_used_ohm = rin > 0 ? rin : r_max_ohm;
+  const t_discharge_s = r_used_ohm * C * ln_ratio;
+  const p_continuous_w = v0 * v0 / r_used_ohm;
+  const meets_code = t_discharge_s <= limit_s + 1e-9;
+  if (![ln_ratio, r_max_ohm, r_used_ohm, t_discharge_s, p_continuous_w].every(Number.isFinite)) return { error: "Discharge math is not a finite value." };
+  return {
+    ln_ratio, r_max_ohm, r_used_ohm, t_discharge_s, p_continuous_w, limit_s, meets_code,
+    note: "NEC 460.6: a capacitor holds a lethal charge after disconnect, so a discharge means must bring the residual voltage to 50 V or less within 1 minute at or below 600 V, and within 5 minutes above 600 V. V(t) = V0 e^(-t/RC), so t = R C ln(V0/V_safe) and the largest compliant resistor is R_max = t_limit / (C ln(V0/V_safe)). The discharge means must be PERMANENTLY connected to the capacitor terminals or connect automatically on loss of line voltage -- a manually switched bleed does not comply. Sizing is a trade-off: a smaller resistor discharges faster but dissipates V0^2/R continuously while the bank is energized, so rate it for that power with margin. A listed capacitor's internal discharge resistors may already satisfy this. A design aid, not a substitute for the equipment listing.",
+  };
+}
+export const capacitorDischargeTimeExample = { inputs: { capacitance_uf: 100, initial_voltage: 600, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 } };
+function _v495renderCapacitorDischargeTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 460.6 discharge of stored energy: residual voltage to 50 V within 1 minute at or below 600 V (5 minutes above 600 V). V(t) = V0 e^(-t/RC); t = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); continuous burn = V0^2/R. The discharge means must be permanently or automatically connected. A design aid; the equipment listing and the AHJ govern.";
+  const cap = makeNumber("Total capacitance (uF)", "cdt-cap", { step: "any", min: "0" }); cap.input.value = "100";
+  const v0 = makeNumber("Initial voltage at disconnect (V)", "cdt-v0", { step: "any", min: "0" }); v0.input.value = "600";
+  const vs = makeNumber("Safe voltage target (V, 460.6 = 50)", "cdt-vs", { step: "any", min: "0" }); vs.input.value = "50";
+  const tl = makeNumber("Code time limit (s, 0 = auto 60/300)", "cdt-tl", { step: "any", min: "0" }); tl.input.value = "0";
+  const r = makeNumber("Bleed resistor (ohm, 0 = solve for largest)", "cdt-r", { step: "any", min: "0" }); r.input.value = "0";
+  for (const f of [cap, v0, vs, tl, r]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "100"; v0.input.value = "600"; vs.input.value = "50"; tl.input.value = "0"; r.input.value = "0"; update(); });
+  const oR = makeOutputLine(outputRegion, "Resistor (max compliant or chosen)", "cdt-out-r");
+  const oT = makeOutputLine(outputRegion, "Discharge time to safe voltage", "cdt-out-t");
+  const oP = makeOutputLine(outputRegion, "Continuous power while energized", "cdt-out-p");
+  const oM = makeOutputLine(outputRegion, "Meets the code time?", "cdt-out-m");
+  const oNote = makeOutputLine(outputRegion, "Note", "cdt-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const res = computeCapacitorDischargeTime({ capacitance_uf: readNum(cap.input), initial_voltage: readNum(v0.input), safe_voltage: vs.input.value === "" ? 50 : readNum(vs.input), time_limit_s: readNum(tl.input), resistor_ohm: readNum(r.input) });
+    if (res.error) { oR.textContent = res.error; oT.textContent = "-"; oP.textContent = "-"; oM.textContent = "-"; oNote.textContent = ""; return; }
+    const rk = res.r_used_ohm >= 1e6 ? fmt(res.r_used_ohm / 1e6, 2) + " Mohm" : res.r_used_ohm >= 1000 ? fmt(res.r_used_ohm / 1000, 1) + " kohm" : fmt(res.r_used_ohm, 0) + " ohm";
+    oR.textContent = rk + (readNum(r.input) > 0 ? " (chosen)" : " (R_max for the " + fmt(res.limit_s, 0) + " s limit)");
+    oT.textContent = fmt(res.t_discharge_s, 1) + " s (limit " + fmt(res.limit_s, 0) + " s)";
+    oP.textContent = fmt(res.p_continuous_w, 2) + " W";
+    oM.textContent = res.meets_code ? "yes" : "NO -- reduce the resistor";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cap, v0, vs, tl, r]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["capacitor-discharge-time"] = _v495renderCapacitorDischargeTime;

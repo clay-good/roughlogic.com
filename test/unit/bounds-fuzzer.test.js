@@ -17104,3 +17104,27 @@ test("bounds: spec-v494 computeTransformerVoltageRegulation pins the lagging sag
   assert.ok("error" in _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 1.5 }));
   assert.ok("error" in _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, load_fraction: -1 }));
 });
+
+import { computeCapacitorDischargeTime as _v495 } from "../../calc-electrical.js";
+
+test("bounds: spec-v495 computeCapacitorDischargeTime pins the R_max, the continuous power, the class limit, and error seams", () => {
+  const r = _v495({ capacitance_uf: 100, initial_voltage: 600, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 });
+  assert.ok(Math.abs(r.r_max_ohm - 241458) < 300); // 60 / (100e-6 x ln(12))
+  assert.ok(Math.abs(r.p_continuous_w - 1.49) < 0.02);
+  assert.strictEqual(r.limit_s, 60); // <= 600 V takes the 1-minute class
+  // At R_max the discharge time equals the code limit exactly (the identity R_max solves for).
+  assert.ok(Math.abs(r.t_discharge_s - r.limit_s) < 1e-6 && r.meets_code);
+  // A medium-voltage cap gets the 5-minute allowance automatically.
+  const mv = _v495({ capacitance_uf: 1, initial_voltage: 4160, safe_voltage: 50, time_limit_s: 0, resistor_ohm: 0 });
+  assert.strictEqual(mv.limit_s, 300);
+  assert.ok(Math.abs(mv.r_max_ohm - 67.85e6) < 1e5 && Math.abs(mv.p_continuous_w - 0.255) < 0.01);
+  // A smaller resistor discharges faster but burns more continuous power.
+  const small = _v495({ capacitance_uf: 100, initial_voltage: 600, safe_voltage: 50, resistor_ohm: 100000 });
+  assert.ok(small.t_discharge_s < r.t_discharge_s && small.p_continuous_w > r.p_continuous_w && small.meets_code);
+  // Error seams: non-finite, non-positive C / V0, V_safe >= V0, negative supplied resistance.
+  assert.ok("error" in _v495({ capacitance_uf: Infinity, initial_voltage: 600 }));
+  assert.ok("error" in _v495({ capacitance_uf: 0, initial_voltage: 600 }));
+  assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 0 }));
+  assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 600, safe_voltage: 600 })); // V_safe >= V0
+  assert.ok("error" in _v495({ capacitance_uf: 100, initial_voltage: 600, resistor_ohm: -5 }));
+});

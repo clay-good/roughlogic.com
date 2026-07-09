@@ -1,6 +1,6 @@
 {
   "name": "roughlogic",
-  "version": "0.175.6",
+  "version": "0.175.7",
   "private": true,
   "description": "Field math for the trades. A 100% client-side static site.",
   "type": "module",

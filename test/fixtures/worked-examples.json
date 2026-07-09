@@ -44232,6 +44232,78 @@
    }
   },
   {
+   "tile_id": "capacitor-discharge-time",
+   "source_publisher": "NEC 2023 460.6",
+   "source_title": "100 uF, 600 V, to 50 V in the 1-minute class -> R_max 241 kohm, 1.49 W continuous, meets code",
+   "source_edition_or_year": "spec-v495 worked example (machine-verified)",
+   "source_section_or_page": "spec-v495 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "capacitance_uf": 100,
+    "initial_voltage": 600,
+    "safe_voltage": 50,
+    "time_limit_s": 0,
+    "resistor_ohm": 0
+   },
+   "outputs": {
+    "r_max_ohm": {
+     "value": 241458,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "p_continuous_w": {
+     "value": 1.49,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "limit_s": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "capacitor-discharge-time",
+   "source_publisher": "NEC 2023 460.6 (above 600 V)",
+   "source_title": "cross-check: 1 uF, 4160 V surge cap gets the 5-minute allowance -> R_max 67.9 Mohm, only 0.26 W",
+   "source_edition_or_year": "spec-v495 worked example (machine-verified)",
+   "source_section_or_page": "spec-v495 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "capacitance_uf": 1,
+    "initial_voltage": 4160,
+    "safe_voltage": 50,
+    "time_limit_s": 0,
+    "resistor_ohm": 0
+   },
+   "outputs": {
+    "r_max_ohm": {
+     "value": 67854000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "p_continuous_w": {
+     "value": 0.255,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "limit_s": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "economic-conductor-sizing",
    "source_publisher": "economic conductor sizing (I2R)",
    "source_title": "100 A, 0.20->0.125 ohm, 4000 hr, $0.12, $800 -> $1080/yr, 0.7 yr payback",

@@ -171,6 +171,7 @@ export const COMPUTE_MAP = {
   "ev-dcfc-time": { module: "../../calc-solar.js", fn: "computeEvDcfcTime" },
   "generator-conductor-445": { module: "../../calc-feeder.js", fn: "computeGeneratorConductor445" },
   "transformer-voltage-regulation": { module: "../../calc-electrical.js", fn: "computeTransformerVoltageRegulation" },
+  "capacitor-discharge-time": { module: "../../calc-electrical.js", fn: "computeCapacitorDischargeTime" },
   "ambient-ampacity-adjust": { module: "../../calc-electrical.js", fn: "computeAmbientAmpacityAdjust" },
   "service-load-optional": { module: "../../calc-electrical.js", fn: "computeServiceLoadOptional" },
   "lux-to-footcandle": { module: "../../calc-electrical.js", fn: "computeLuxFootcandle" },

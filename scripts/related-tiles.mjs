@@ -901,6 +901,7 @@ const RELATED = {
   "economic-conductor-sizing": ["voltage-drop", "min-conductor-for-vd", "motor-efficiency-upgrade-savings", "transformer-loading-efficiency"],
   "generator-fuel-runtime": ["generator-sizing", "battery-runtime", "generator-motor-starting"],
   "transformer-voltage-regulation": ["transformer-loading-efficiency", "buck-boost-sizing", "voltage-drop"],
+  "capacitor-discharge-time": ["pf-correction", "motor-capacitor-max", "power-factor-billing-savings"],
   "multi-motor-feeder": ["motor-branch-from-nameplate", "motor-fla", "breaker-sizing"],
   "conductor-short-circuit-withstand": ["short-circuit-pp", "egc-sizing", "copper-resistance"],
   "conduit-thermal-expansion": ["conduit-fill", "cable-bend-radius", "copper-resistance"],

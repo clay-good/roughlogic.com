@@ -1061,6 +1061,18 @@ export const CITATIONS = {
       { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
     ],
   },
+  "capacitor-discharge-time": {
+    formula: "V(t) = V0 e^(-t/RC); t_discharge = R C ln(V0/V_safe); R_max = t_limit / (C ln(V0/V_safe)); P_continuous = V0^2/R.",
+    edition: "The capacitor stored-energy discharge requirement of NEC 2023 460.6 -- residual voltage to 50 V within 1 minute at or below 600 V, 5 minutes above 600 V, by a permanent or automatic discharge means -- by name. A computational aid; the AHJ-adopted NEC edition and the equipment listing govern.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The RC-discharge relation is first-principles; the 460.6 time limits and the permanent/automatic-connection requirement are in the published code.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Time limit", value: "residual to 50 V within 1 minute at or below 600 V, 5 minutes above 600 V", source: "NEC 460.6(A)" },
+      { name: "Connection", value: "the discharge means must be permanently connected or connect automatically on loss of line; a manually switched bleed does not comply", source: "NEC 460.6(B)" },
+      { name: "Continuous power", value: "the resistor dissipates V0^2/R while the bank is energized; rate it with margin", source: "first-principles" },
+    ],
+  },
   "transformer-voltage-regulation": {
     formula: "cos = pf; sin = sqrt(1 - pf^2) x (leading ? -1 : +1); VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200.",
     edition: "Transformer voltage-regulation approximation from %R, %X, and load power factor (an IEEE C57 test-report quantity), first-principles; the utility's voltage study governs the actual profile.",

@@ -1764,6 +1764,7 @@ cross-check.
 | calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
 | calc-electrical.js | `computeBuckBoostSizing` | `{ supply_v = 0, desired_v = 0, load_a = 0 } = {}` | _ | _ | _ |
+| calc-electrical.js | `computeCapacitorDischargeTime` | `{ capacitance_uf = 0, initial_voltage = 0, safe_voltage = 50, time_limit_s = ...` | _ | _ | _ |
 | calc-electrical.js | `computeConductorResistance` | `{ material, awg, length_ft, temperature_C }` | _ | _ | _ |
 | calc-electrical.js | `computeConductorShortCircuitWithstand` | `{ area_cmil = 0, fault_current_a = 0, clearing_time_s = 0, material = "copper...` | _ | _ | _ |
 | calc-electrical.js | `computeConduitFill` | `{ conduit, trade_size, conductors }` | _ | _ | _ |
@@ -2606,7 +2607,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1192.
+Row count: 1193.
 
 <!-- END function-corpus-v14 -->
 
@@ -2687,7 +2688,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (121 tiles)
+### Group A Electrical (122 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2706,6 +2707,7 @@ per spec-v14 §13.1 second paragraph.
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `capacitor-discharge-time` | Capacitor Discharge Time and Bleed Resistor (NEC 460.6) | NEC 2023 460.6; spec-v495 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ceiling-speaker-coverage` | Ceiling Speaker Coverage and Spacing | commercial-audio design practice; spec-v457 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3740,6 +3742,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 948. Fixture-covered or reference-cadence: 948 / 948.
+Tile count: 949. Fixture-covered or reference-cadence: 949 / 949.
 
 <!-- END tile-index-v14 -->

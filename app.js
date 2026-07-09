@@ -54,6 +54,8 @@ const TOOL_MODULES = (() => {
     "generator-fuel-runtime",
     // spec-v494 transformer voltage regulation from %R and %X
     "transformer-voltage-regulation",
+    // spec-v495 capacitor discharge time and bleed resistor
+    "capacitor-discharge-time",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

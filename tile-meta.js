@@ -676,6 +676,8 @@ const _TILES = [
   ["generator-fuel-runtime", "A"],
   // spec-v494 transformer voltage regulation from %R and %X
   ["transformer-voltage-regulation", "A"],
+  // spec-v495 capacitor discharge time and bleed resistor
+  ["capacitor-discharge-time", "A"],
   ["ada-ramp-slope", "E"],
   ["pool-bonding-680-26", "A"],
 ];

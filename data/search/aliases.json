@@ -18834,6 +18834,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "capacitor discharge",
+      "target": "capacitor-discharge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "bleed resistor",
+      "target": "capacitor-discharge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "460.6",
+      "target": "capacitor-discharge-time",
+      "kind": "industry"
+    },
+    {
+      "term": "residual voltage",
+      "target": "capacitor-discharge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "discharge time",
+      "target": "capacitor-discharge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stored energy discharge",
+      "target": "capacitor-discharge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cap bank safety",
+      "target": "capacitor-discharge-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rc discharge",
+      "target": "capacitor-discharge-time",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"
