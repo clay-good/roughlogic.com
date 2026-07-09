@@ -147,6 +147,7 @@ const RELATED = {
   "spur-gear-geometry": ["gear-cascade", "cutting-speed-rpm", "dividing-head", "bolt-circle"],
   "bearing-l10-life": ["vbelt-drive", "shrink-fit", "spur-gear-geometry"],
   "countersink-depth": ["drill-point-depth", "tap-drill-size", "cutting-speed-rpm"],
+  "keyseat-key-size": ["countersink-depth", "shrink-fit", "press-fit-pressure"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
   "polygon-miter": ["compound-miter", "bolt-circle", "decimal-to-fraction"],

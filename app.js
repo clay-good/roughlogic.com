@@ -788,6 +788,8 @@ const TOOL_MODULES = (() => {
     "bearing-l10-life",
     // spec-v509 countersink diameter and cutting depth
     "countersink-depth",
+    // spec-v513 shaft key and keyseat size (ANSI B17.1)
+    "keyseat-key-size",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [

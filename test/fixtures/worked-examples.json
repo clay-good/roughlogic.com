@@ -15958,6 +15958,68 @@
    }
   },
   {
+   "tile_id": "keyseat-key-size",
+   "source_publisher": "ANSI B17.1 Keys and Keyseats",
+   "source_title": "1.000 in shaft, 1,000 in-lb, 1.5 in key -> 1/4 in square key, 0.125 in depth, 5,333 psi shear, 10,667 psi bearing",
+   "source_edition_or_year": "spec-v513 worked example (machine-verified)",
+   "source_section_or_page": "spec-v513 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "shaft_diameter_in": 1.0,
+    "torque_in_lb": 1000,
+    "key_length_in": 1.5
+   },
+   "outputs": {
+    "key_width_in": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "shaft_keyseat_depth_in": {
+     "value": 0.125,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "shear_stress_psi": {
+     "value": 5333,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "bearing_stress_psi": {
+     "value": 10667,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "keyseat-key-size",
+   "source_publisher": "ANSI B17.1 Keys and Keyseats",
+   "source_title": "cross-check: a key past the hub buys nothing -- a 1.0 in hub length raises the shear to 8,000 psi",
+   "source_edition_or_year": "spec-v513 worked example (machine-verified)",
+   "source_section_or_page": "spec-v513 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "shaft_diameter_in": 1.0,
+    "torque_in_lb": 1000,
+    "key_length_in": 1.0
+   },
+   "outputs": {
+    "shear_stress_psi": {
+     "value": 8000,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "circular-arc",
    "source_publisher": "First-principles circle geometry (sagitta relation)",
    "source_title": "R = (chord^2/4 + rise^2)/(2 rise); arc = R x 2 acos((R-rise)/R)",

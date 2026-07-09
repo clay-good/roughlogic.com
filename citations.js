@@ -6743,6 +6743,18 @@ export const CITATIONS = {
       { name: "Same material solid shaft", value: "assumes elastic same-material parts and a solid shaft; hollow or dissimilar changes the coefficients", source: "scope of this tile" },
     ],
   },
+  "keyseat-key-size": {
+    formula: "key_width = standard width from the ANSI B17.1 shaft-diameter band; shaft_keyseat_depth = key_height/2; shear_stress = 2T/(D x W x L); bearing_stress = 4T/(D x H x L).",
+    edition: "The ANSI B17.1 Keys and Keyseats standard key and keyseat sizing (Machinery's Handbook), by name; the material allowables and the fit class govern.",
+    freeAccess: "The ANSI B17.1 key-size bands and the key-stress relations are published in standard machine-design references; the torque and hub length come from the drive.",
+    governance: GOVERNANCE.general,
+    editionNote: "ANSI B17.1 key and keyseat sizing. The standard key width comes from the shaft-diameter band table, not exactly D/4. The shaft keyseat is cut to half the key height (H/2) -- over-cutting off the full key height weakens the shaft. Key shear stress = 2T/(D x W x L) and bearing stress = 4T/(D x H x L). A key longer than the hub adds no torque capacity because the hub is the limit, so the effective (hub) length governs and a key past the hub is wasted. This tile models a square key; larger shafts use rectangular keys per the table. A design aid, not the engineer of record; the material allowables and the fit class govern.",
+    assumptions: [
+      { name: "Band-table width", value: "the key width comes from the shaft-diameter band, not exactly D/4", source: "ANSI B17.1" },
+      { name: "H/2 depth", value: "the shaft keyseat is cut to half the key height; over-cutting weakens the shaft", source: "ANSI B17.1" },
+      { name: "Hub limits length", value: "a key longer than the hub adds no capacity; the hub length is the effective length", source: "key-stress model" },
+    ],
+  },
   "countersink-depth": {
     formula: "Z = (D_cs - d_hole) / (2 x tan(angle/2)); Z_full = D_cs / (2 x tan(angle/2)).",
     edition: "Countersink diameter-to-depth relation (Machinery's Handbook countersinking; 82 deg inch and 90 deg metric flat-head standards), first-principles trigonometry, by name; the tool geometry and the fastener callout govern.",

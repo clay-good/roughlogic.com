@@ -519,3 +519,72 @@ function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
   ang.select.addEventListener("change", update);
 }
 MACHINING_RENDERERS["countersink-depth"] = renderCountersinkDepth;
+
+// ===================== spec-v513: shaft key and keyseat size (ANSI B17.1) =====================
+// ANSI B17.1 standard square-key width by shaft-diameter band (upper bound inclusive, in).
+const _B17_1_KEY_BANDS = [
+  { maxD: 0.4375, w: 3 / 32 },
+  { maxD: 0.5625, w: 1 / 8 },
+  { maxD: 0.875, w: 3 / 16 },
+  { maxD: 1.25, w: 1 / 4 },
+  { maxD: 1.375, w: 5 / 16 },
+  { maxD: 1.75, w: 3 / 8 },
+  { maxD: 2.25, w: 1 / 2 },
+  { maxD: 2.75, w: 5 / 8 },
+  { maxD: 3.25, w: 3 / 4 },
+  { maxD: 3.75, w: 7 / 8 },
+  { maxD: 4.5, w: 1 },
+  { maxD: 5.5, w: 1.25 },
+  { maxD: 6.5, w: 1.5 },
+];
+// dims: in { shaft_diameter_in: L, torque_in_lb: M L^2 T^-2, key_length_in: L } out: { key_width_in: L, key_height_in: L, shaft_keyseat_depth_in: L, shear_stress_psi: M L^-1 T^-2, bearing_stress_psi: M L^-1 T^-2 }
+export function computeKeyseatKeySize({ shaft_diameter_in = 0, torque_in_lb = 0, key_length_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(shaft_diameter_in) || 0;
+  const t = Number(torque_in_lb) || 0;
+  const len = Number(key_length_in) || 0;
+  if (!(d > 0)) return { error: "Shaft diameter must be positive (in)." };
+  const wantStress = t > 0 || len > 0;
+  if (wantStress) {
+    if (!(t > 0)) return { error: "Torque must be positive (in-lb) for the stress check (0 = geometry only)." };
+    if (!(len > 0)) return { error: "Key length must be positive (in) for the stress check (0 = geometry only)." };
+  }
+  let band = _B17_1_KEY_BANDS.find((b) => d <= b.maxD);
+  if (!band) band = _B17_1_KEY_BANDS[_B17_1_KEY_BANDS.length - 1];
+  const key_width_in = band.w;
+  const key_height_in = band.w; // square key
+  const shaft_keyseat_depth_in = key_height_in / 2;
+  const shear_stress_psi = wantStress ? 2 * t / (d * key_width_in * len) : null;
+  const bearing_stress_psi = wantStress ? 4 * t / (d * key_height_in * len) : null;
+  if (![key_width_in, key_height_in, shaft_keyseat_depth_in].every(Number.isFinite)) return { error: "Key-size math is not a finite value." };
+  return {
+    key_width_in, key_height_in, shaft_keyseat_depth_in, shear_stress_psi, bearing_stress_psi,
+    note: "ANSI B17.1 key and keyseat sizing: the standard key WIDTH comes from the shaft-diameter band table, not exactly D/4 -- a 1 in shaft (over 7/8 to 1-1/4 band) takes a 1/4 in square key. The SHAFT keyseat is cut to half the key height (H/2), the depth machinists mis-read off the full key height and cut too deep, weakening the shaft. Key stresses: shear = 2T / (D x W x L), bearing = 4T / (D x H x L). A key LONGER than the hub adds no torque capacity -- the hub is the limit -- so enter the effective (hub) length, not the key stock, and a key past the hub is wasted. This tile models a square key; larger shafts use rectangular keys per the table. A design aid; the material allowables and the fit class govern.",
+  };
+}
+export const keyseatKeySizeExample = { inputs: { shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 1.5 } };
+function renderKeyseatKeySize(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ANSI B17.1 Keys and Keyseats (Machinery's Handbook): the standard key width from the shaft-diameter band; shaft keyseat depth = key height / 2; key shear = 2T/(D W L), bearing = 4T/(D H L). The key width is band-based, not D/4; a key longer than the hub adds no capacity. A design aid; the material allowables and fit class govern.";
+  const d = makeNumber("Shaft diameter D (in)", "kks-d", { step: "any", min: "0" }); d.input.value = "1.0";
+  const t = makeNumber("Transmitted torque (in-lb, 0 = geometry only)", "kks-t", { step: "any", min: "0" }); t.input.value = "1000";
+  const len = makeNumber("Key / hub engagement length L (in, 0 = geometry only)", "kks-l", { step: "any", min: "0" }); len.input.value = "1.5";
+  for (const f of [d, t, len]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "1.0"; t.input.value = "1000"; len.input.value = "1.5"; update(); });
+  const oW = makeOutputLine(outputRegion, "Standard key (W x H)", "kks-out-w");
+  const oDepth = makeOutputLine(outputRegion, "Shaft keyseat depth (H/2)", "kks-out-depth");
+  const oShear = makeOutputLine(outputRegion, "Key shear stress", "kks-out-shear");
+  const oBear = makeOutputLine(outputRegion, "Key bearing stress", "kks-out-bear");
+  const oNote = makeOutputLine(outputRegion, "Note", "kks-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeKeyseatKeySize({ shaft_diameter_in: readNum(d.input), torque_in_lb: readNum(t.input), key_length_in: readNum(len.input) });
+    if (r.error) { oW.textContent = r.error; oDepth.textContent = "-"; oShear.textContent = "-"; oBear.textContent = "-"; oNote.textContent = ""; return; }
+    oW.textContent = fmt(r.key_width_in, 4) + " x " + fmt(r.key_height_in, 4) + " in";
+    oDepth.textContent = fmt(r.shaft_keyseat_depth_in, 4) + " in";
+    oShear.textContent = r.shear_stress_psi === null ? "- (enter torque and length)" : fmt(r.shear_stress_psi, 0) + " psi";
+    oBear.textContent = r.bearing_stress_psi === null ? "-" : fmt(r.bearing_stress_psi, 0) + " psi";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, t, len]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["keyseat-key-size"] = renderKeyseatKeySize;

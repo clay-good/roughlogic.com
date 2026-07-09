@@ -729,6 +729,7 @@ export const COMPUTE_MAP = {
   "wheel-offset-backspacing": { module: "../../calc-mechanic.js", fn: "computeWheelOffsetBackspacing" },
   "press-fit-pressure": { module: "../../calc-shop.js", fn: "computePressFitPressure" },
   "roller-chain-length": { module: "../../calc-shop.js", fn: "computeRollerChainLength" },
+  "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

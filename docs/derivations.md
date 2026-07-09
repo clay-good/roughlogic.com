@@ -2120,6 +2120,7 @@ cross-check.
 | calc-machining.js | `computeCuttingFluidConcentration` | `{ brix_reading = 0, refractometer_factor = 0, sump_volume_gal = 0, target_pct...` | _ | _ | _ |
 | calc-machining.js | `computeCuttingSpeed` | `{ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } ...` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointDepth` | `{ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeKeyseatKeySize` | `{ shaft_diameter_in = 0, torque_in_lb = 0, key_length_in = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeRadialChipThinning` | `{ ae_in = 0, d_in = 0, fz_target = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpindlePowerTorque` | `{ mrr_in3_min = 0, unit_power_hp = 1.0, efficiency_pct = 80, rpm = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeSpurGearGeometry` | `{ diametral_pitch = 0, teeth = 0, mating_teeth = 0 } = {}` | _ | _ | _ |
@@ -2624,7 +2625,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1210.
+Row count: 1211.
 
 <!-- END function-corpus-v14 -->
 
@@ -3453,7 +3454,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (47 tiles)
+### Group K Mechanic (48 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3483,6 +3484,7 @@ per spec-v14 §13.1 second paragraph.
 | `hydraulic-motor-torque-speed` | Hydraulic Motor Torque and Speed | fluid-power engineering; spec-v397 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-pump-horsepower` | Hydraulic Pump Drive Horsepower | fluid-power engineering; spec-v396 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `injector-size` | Fuel Injector Size from Horsepower, BSFC, and Duty Cycle | Fuel injector sizing (HP x BSFC / (n ...; spec-v323 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `keyseat-key-size` | Shaft Key and Keyseat Size (ANSI B17.1) | ANSI B17.1 Keys and Keyseats; spec-v513 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `machining-time` | Cut Time per Pass | First-principles cutting time + Machi...; 6 in at 500 RPM x 0.010 IPR -> 5 IPM, 1.2 min/pass, 4 pas... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `material-removal-rate` | Material Removal Rate | First-principles swept-volume geometr...; 0.5 x 0.1 x 10 IPM -> 0.5 in3/min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mean-piston-speed` | Mean Piston Speed and RPM-Limit Reading | Mean piston speed (engine building); spec-v324 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3776,6 +3778,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 966. Fixture-covered or reference-cadence: 966 / 966.
+Tile count: 967. Fixture-covered or reference-cadence: 967 / 967.
 
 <!-- END tile-index-v14 -->

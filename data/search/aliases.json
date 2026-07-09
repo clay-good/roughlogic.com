@@ -15414,6 +15414,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "key size",
+      "target": "keyseat-key-size",
+      "kind": "industry"
+    },
+    {
+      "term": "keyseat",
+      "target": "keyseat-key-size",
+      "kind": "industry"
+    },
+    {
+      "term": "keyway",
+      "target": "keyseat-key-size",
+      "kind": "industry"
+    },
+    {
+      "term": "ansi b17.1",
+      "target": "keyseat-key-size",
+      "kind": "industry"
+    },
+    {
+      "term": "shaft key",
+      "target": "keyseat-key-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "key shear stress",
+      "target": "keyseat-key-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "square key",
+      "target": "keyseat-key-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "keyseat depth",
+      "target": "keyseat-key-size",
+      "kind": "adjacent"
+    },
+    {
       "term": "fix and flip",
       "target": "fix-flip-profit",
       "kind": "industry"

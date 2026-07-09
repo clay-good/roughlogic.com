@@ -17499,3 +17499,26 @@ test("bounds: spec-v512 computeRollerChainLength pins the pitch count, the even 
   assert.ok("error" in _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 0, pitch_in: 0.5 }));
   assert.ok("error" in _v512({ small_teeth_n1: 17, large_teeth_n2: 51, center_distance_in: 30, pitch_in: 0 }));
 });
+
+import { computeKeyseatKeySize as _v513 } from "../../calc-machining.js";
+
+test("bounds: spec-v513 computeKeyseatKeySize pins the band-table width, the H/2 depth, the key stresses, and error seams", () => {
+  const r = _v513({ shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 1.5 });
+  assert.ok(Math.abs(r.key_width_in - 0.25) < 1e-9); // 1 in shaft -> 1/4 in square key from the band
+  assert.ok(Math.abs(r.shaft_keyseat_depth_in - 0.125) < 1e-9); // H/2, not H
+  assert.ok(Math.abs(r.shear_stress_psi - 5333.33) < 1);
+  assert.ok(Math.abs(r.bearing_stress_psi - 10666.67) < 1);
+  // A shorter (hub-limited) key raises the stresses.
+  const hub = _v513({ shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 1.0 });
+  assert.ok(Math.abs(hub.shear_stress_psi - 8000) < 1 && hub.shear_stress_psi > r.shear_stress_psi);
+  // The width steps up by band: a 1.5 in shaft takes a 3/8 in key.
+  assert.ok(Math.abs(_v513({ shaft_diameter_in: 1.5 }).key_width_in - 0.375) < 1e-9);
+  // Geometry-only mode (no torque, no length) returns null stresses, not an error.
+  const geo = _v513({ shaft_diameter_in: 1.0 });
+  assert.ok(geo.shear_stress_psi === null && geo.bearing_stress_psi === null && Math.abs(geo.key_width_in - 0.25) < 1e-9);
+  // Error seams: non-finite, non-positive diameter, torque given without length (and vice versa).
+  assert.ok("error" in _v513({ shaft_diameter_in: Infinity }));
+  assert.ok("error" in _v513({ shaft_diameter_in: 0 }));
+  assert.ok("error" in _v513({ shaft_diameter_in: 1.0, torque_in_lb: 1000, key_length_in: 0 }));
+  assert.ok("error" in _v513({ shaft_diameter_in: 1.0, torque_in_lb: 0, key_length_in: 1.5 }));
+});
