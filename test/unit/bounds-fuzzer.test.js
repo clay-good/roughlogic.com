@@ -17671,3 +17671,23 @@ test("bounds: spec-v520 computeTransformerInrushPoint pins the FLA, the inrush p
   assert.ok("error" in _v520({ kva: 75, primary_voltage_v: 480, inrush_multiple: 0 }));
   assert.ok("error" in _v520({ kva: 75, primary_voltage_v: 480, duration_s: 0 }));
 });
+
+import { computeMotorFaultContribution as _v521 } from "../../calc-motor.js";
+
+test("bounds: spec-v521 computeMotorFaultContribution pins the FLA/reactance contribution, the total, and error seams", () => {
+  const r = _v521({ motor_fla_a: 500, x_subtransient_pu: 0.167, utility_fault_a: 22000 });
+  assert.ok(Math.abs(r.contribution_a - 2994) < 2); // 500 / 0.167
+  assert.ok(Math.abs(r.total_a - 24994) < 2);
+  assert.ok(Math.abs(r.multiple - 1 / 0.167) < 1e-6 && Math.abs(r.multiple - 6.0) < 0.02);
+  // A lumped 4x FLA (25% reactance) gives a smaller contribution.
+  const lump = _v521({ motor_fla_a: 500, x_subtransient_pu: 0.25, utility_fault_a: 22000 });
+  assert.ok(Math.abs(lump.contribution_a - 2000) < 1e-6 && lump.contribution_a < r.contribution_a);
+  // The contribution adds directly to the utility fault.
+  assert.ok(Math.abs(_v521({ motor_fla_a: 500, x_subtransient_pu: 0.167, utility_fault_a: 0 }).total_a - r.contribution_a) < 1e-6);
+  // Error seams: non-finite, non-positive motor FLA, reactance out of range, negative utility fault.
+  assert.ok("error" in _v521({ motor_fla_a: Infinity, x_subtransient_pu: 0.167, utility_fault_a: 22000 }));
+  assert.ok("error" in _v521({ motor_fla_a: 0, x_subtransient_pu: 0.167, utility_fault_a: 22000 }));
+  assert.ok("error" in _v521({ motor_fla_a: 500, x_subtransient_pu: 0, utility_fault_a: 22000 }));
+  assert.ok("error" in _v521({ motor_fla_a: 500, x_subtransient_pu: 1.5, utility_fault_a: 22000 }));
+  assert.ok("error" in _v521({ motor_fla_a: 500, x_subtransient_pu: 0.167, utility_fault_a: -1 }));
+});

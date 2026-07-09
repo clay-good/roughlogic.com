@@ -77,6 +77,8 @@ const TOOL_MODULES = (() => {
     "motor-overload-sizing",
     // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
     "motor-locked-rotor-kva",
+    // spec-v521 motor short-circuit contribution (first cycle)
+    "motor-fault-contribution",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which

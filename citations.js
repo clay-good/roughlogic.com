@@ -8674,6 +8674,18 @@ export const CITATIONS = {
       { name: "Minimum pressure", value: "the reduced setpoint must still serve the tools after system pressure drop", source: "compressed-air best practice" },
     ],
   },
+  "motor-fault-contribution": {
+    formula: "contribution = motor_fla / x_subtransient_pu; total = utility_fault + contribution; multiple = 1 / x_subtransient_pu.",
+    edition: "First-cycle motor short-circuit contribution (IEEE C37.13 / IEEE 141), first-principles, by name; a full short-circuit study governs.",
+    freeAccess: "The motor-contribution relation (FLA / subtransient reactance) is a published IEEE first-cycle method; the summed motor FLA, reactance, and utility fault come from the system data.",
+    governance: GOVERNANCE.general,
+    editionNote: "Motor short-circuit contribution (first cycle). For the first cycle after a fault, a running motor feeds the fault at roughly its full-load current divided by its subtransient reactance (contribution = motor_fla / x_subtransient, about 4 to 6 times FLA), and the total first-cycle fault = utility_fault + contribution. Ignoring it under-reports the interrupting duty and can leave a panel's AIC rating exceeded by the real first-cycle current. This is a first-cycle effect that decays within a few cycles -- it matters for the momentary and interrupting ratings, not the steady-state fault. Grouped small motors are often taken at a lumped 4x FLA per IEEE C37.13 while a single large machine uses its own reactance. A design aid, not the engineer of record; a full short-circuit study governs.",
+    assumptions: [
+      { name: "Contribution", value: "a running motor feeds the fault at FLA / subtransient reactance (~4 to 6x FLA)", source: "IEEE 141" },
+      { name: "First cycle", value: "decays within a few cycles; drives the momentary and interrupting duty, not the steady-state fault", source: "IEEE C37.13" },
+      { name: "Lumped small motors", value: "grouped small motors are often taken at a lumped 4x FLA", source: "IEEE C37.13" },
+    ],
+  },
   "motor-locked-rotor-kva": {
     formula: "kVA/hp = upper bound of the Table 430.7(B) code-letter band; locked_rotor_kva = hp x kVA/hp; LRA = kVA x 1000 / (sqrt(3) x V) three-phase, kVA x 1000 / V single-phase.",
     edition: "The NEC 2023 Table 430.7(B) locked-rotor indicating code letters, mapping the nameplate code letter to a locked-rotor kVA/hp band, by name; the motor nameplate and measured inrush govern.",

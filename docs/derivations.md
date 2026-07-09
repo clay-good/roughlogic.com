@@ -2172,6 +2172,7 @@ cross-check.
 | calc-metalair.js | `computeCompressionRatio` | `{ suction_psig = 0, discharge_psig = 0, atmospheric_psia = 14.696 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeDuctStaticTotal` | `{ components = [], rated_esp_in_wc = 0 } = {}` | _ | _ | _ |
 | calc-metalair.js | `computeGrooveWeldStrength` | `{ weld_type = "PJP", effective_throat_in = 0, base_thickness_in = 0, length_i...` | _ | _ | _ |
+| calc-motor.js | `computeMotorFaultContribution` | `{ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorLockedRotorKva` | `{ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorOperatingCost` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rat...` | _ | _ | _ |
 | calc-motor.js | `computeMotorOverloadSizing` | `{ fla_A = 0, sf = 0, rise_C = 0 } = {}` | _ | _ | _ |
@@ -2632,7 +2633,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1218.
+Row count: 1219.
 
 <!-- END function-corpus-v14 -->
 
@@ -2713,7 +2714,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (127 tiles)
+### Group A Electrical (128 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2780,6 +2781,7 @@ per spec-v14 §13.1 second paragraph.
 | `motor-branch-protection` | Motor Branch-Circuit Protection and Disconnect (NEC 430.52 / 430.110) | NEC 2023 (NFPA 70); 10 HP 230 V 3ph FLC 28 A x 250% = 70 A (standard); discon... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-capacitor-max` | Max Capacitor kVAR at Motor Terminals (Self-Excitation Limit) | NEMA MG-1 / IEEE 18; 480 V, 8 A no-load: sqrt(3) x 480 x 8 / 1000 = 6.65 kVAR;... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-efficiency-upgrade-savings` | Premium Motor Upgrade Energy Savings | motor-efficiency retrofit practice; spec-v471 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-fault-contribution` | Motor Short-Circuit Contribution (First Cycle) | first-cycle motor short-circuit contr...; spec-v521 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-feeder-multiple` | Feeder Sizing for Multiple Motors | NEC Articles 430.24 / 430.62 (by name); FLC 28/16/10 A, largest device 40 A -> conductor 1.25*28+... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-fla` | Motor Full Load Amps | NFPA / NEMA; Tables 430.247-430.250; manufacturer NEMA-aligned bulletins | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-locked-rotor-kva` | Motor Locked-Rotor Current from Code Letter (NEC 430.7(B)) | NEC 2023 Table 430.7(B); spec-v499 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3792,6 +3794,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 974. Fixture-covered or reference-cadence: 974 / 974.
+Tile count: 975. Fixture-covered or reference-cadence: 975 / 975.
 
 <!-- END tile-index-v14 -->

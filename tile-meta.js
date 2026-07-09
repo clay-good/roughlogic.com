@@ -464,6 +464,8 @@ const _TILES = [
   ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["continuous-load-ocpd", "A"],
   // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
   ["motor-locked-rotor-kva", "A"],
+  // spec-v521 motor short-circuit contribution (first cycle)
+  ["motor-fault-contribution", "A"],
   // spec-v493 NEC 445.13 generator output conductor at 115%
   ["generator-conductor-445", "A"],
   // spec-v519 NEC 220.87 existing-facility load by peak demand

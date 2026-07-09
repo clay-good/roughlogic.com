@@ -321,3 +321,45 @@ function renderMotorLockedRotorKva(inputRegion, outputRegion, citationEl) {
   for (const f of [code, ph]) f.select.addEventListener("change", update);
 }
 MOTOR_RENDERERS["motor-locked-rotor-kva"] = renderMotorLockedRotorKva;
+
+// ===================== spec-v521: motor short-circuit contribution (first cycle) =====================
+// dims: in { motor_fla_a: I, x_subtransient_pu: dimensionless, utility_fault_a: I } out: { contribution_a: I, total_a: I, multiple: dimensionless }
+export function computeMotorFaultContribution({ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fla = Number(motor_fla_a) || 0;
+  const xd = Number(x_subtransient_pu) || 0;
+  const util = Number(utility_fault_a) || 0;
+  if (!(fla > 0)) return { error: "Summed motor full-load current must be positive (A)." };
+  if (!(xd > 0 && xd <= 1)) return { error: "Subtransient reactance must be over 0 and at most 1 per unit." };
+  if (util < 0) return { error: "Utility fault current cannot be negative (A)." };
+  const contribution_a = fla / xd;
+  const total_a = util + contribution_a;
+  const multiple = contribution_a / fla;
+  if (![contribution_a, total_a, multiple].every(Number.isFinite)) return { error: "Motor-contribution math is not a finite value." };
+  return {
+    contribution_a, total_a, multiple,
+    note: "Motor short-circuit contribution (first cycle): for the first cycle after a fault, every spinning motor becomes a generator -- its rotating inertia drives current INTO the fault at roughly its full-load current divided by its subtransient reactance (about 4 to 6 times FLA). contribution = motor_FLA / x_subtransient, and the total first-cycle fault = utility_fault + contribution. Ignore it and the interrupting duty is under-reported, which can leave a panel's AIC rating exceeded by the real first-cycle current. This is a FIRST-CYCLE effect that decays within a few cycles -- it matters for the momentary and interrupting ratings, not the steady-state fault. Grouped small motors are often taken at a lumped 4x FLA per IEEE C37.13 while a single large machine uses its own reactance. A design aid, not the engineer of record; a full short-circuit study governs.",
+  };
+}
+export const motorFaultContributionExample = { inputs: { motor_fla_a: 500, x_subtransient_pu: 0.167, utility_fault_a: 22000 } };
+function renderMotorFaultContribution(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-cycle motor short-circuit contribution (IEEE C37.13 / IEEE 141): contribution = summed motor FLA / subtransient reactance (~4-6x FLA), total = utility fault + contribution. A first-cycle effect for the momentary and interrupting duty; grouped small motors often lumped at 4x FLA per IEEE C37.13. A design aid; a full short-circuit study governs.";
+  const fla = makeNumber("Summed motor full-load current (A)", "mfc-fla", { step: "any", min: "0" }); fla.input.value = "500";
+  const xd = makeNumber("Subtransient reactance (per unit, 0.167 = 16.7%)", "mfc-xd", { step: "any", min: "0", max: "1" }); xd.input.value = "0.167";
+  const util = makeNumber("Utility / transformer fault current (A)", "mfc-util", { step: "any", min: "0" }); util.input.value = "22000";
+  for (const f of [fla, xd, util]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fla.input.value = "500"; xd.input.value = "0.167"; util.input.value = "22000"; update(); });
+  const oC = makeOutputLine(outputRegion, "Motor contribution (first cycle)", "mfc-out-c");
+  const oT = makeOutputLine(outputRegion, "Total first-cycle fault", "mfc-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "mfc-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMotorFaultContribution({ motor_fla_a: readNum(fla.input), x_subtransient_pu: xd.input.value === "" ? 0.167 : readNum(xd.input), utility_fault_a: readNum(util.input) });
+    if (r.error) { oC.textContent = r.error; oT.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.contribution_a, 0) + " A (" + fmt(r.multiple, 1) + "x FLA)";
+    oT.textContent = fmt(r.total_a, 0) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fla, xd, util]) f.input.addEventListener("input", update);
+}
+MOTOR_RENDERERS["motor-fault-contribution"] = renderMotorFaultContribution;

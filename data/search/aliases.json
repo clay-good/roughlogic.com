@@ -19874,6 +19874,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "motor fault contribution",
+      "target": "motor-fault-contribution",
+      "kind": "industry"
+    },
+    {
+      "term": "motor short circuit",
+      "target": "motor-fault-contribution",
+      "kind": "industry"
+    },
+    {
+      "term": "first cycle fault",
+      "target": "motor-fault-contribution",
+      "kind": "industry"
+    },
+    {
+      "term": "motor contribution aic",
+      "target": "motor-fault-contribution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "subtransient reactance",
+      "target": "motor-fault-contribution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "5x fla fault",
+      "target": "motor-fault-contribution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "interrupting duty motors",
+      "target": "motor-fault-contribution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "spinning motor fault",
+      "target": "motor-fault-contribution",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"

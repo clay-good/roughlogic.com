@@ -737,6 +737,7 @@ export const COMPUTE_MAP = {
   "battery-hydrogen-vent": { module: "../../calc-electrical.js", fn: "computeBatteryHydrogenVent" },
   "existing-load-220-87": { module: "../../calc-feeder.js", fn: "computeExistingLoad22087" },
   "transformer-inrush-point": { module: "../../calc-electrical.js", fn: "computeTransformerInrushPoint" },
+  "motor-fault-contribution": { module: "../../calc-motor.js", fn: "computeMotorFaultContribution" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

@@ -35040,6 +35040,56 @@
    }
   },
   {
+   "tile_id": "motor-fault-contribution",
+   "source_publisher": "first-cycle motor short-circuit contribution (IEEE 141)",
+   "source_title": "500 A of running motors at 16.7% reactance on a 22 kA bus -> 2,994 A (6x FLA), 24,994 A total",
+   "source_edition_or_year": "spec-v521 worked example (machine-verified)",
+   "source_section_or_page": "spec-v521 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "motor_fla_a": 500,
+    "x_subtransient_pu": 0.167,
+    "utility_fault_a": 22000
+   },
+   "outputs": {
+    "contribution_a": {
+     "value": 2994,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "total_a": {
+     "value": 24994,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-fault-contribution",
+   "source_publisher": "first-cycle motor short-circuit contribution (IEEE 141)",
+   "source_title": "cross-check: at a lumped 4x FLA (25% reactance) the same motors add 2,000 A -> 24,000 A total",
+   "source_edition_or_year": "spec-v521 worked example (machine-verified)",
+   "source_section_or_page": "spec-v521 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "motor_fla_a": 500,
+    "x_subtransient_pu": 0.25,
+    "utility_fault_a": 22000
+   },
+   "outputs": {
+    "contribution_a": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "service-conductor-sizing",
    "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
    "source_title": "200 A copper dwelling service -> 166 A -> 2/0 Cu (Table 310.12)",
