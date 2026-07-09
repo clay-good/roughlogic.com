@@ -17356,3 +17356,27 @@ test("bounds: spec-v505 computeAnchorRodeScope pins the bow-height vertical, the
   assert.ok("error" in _v505({ water_depth_ft: 15, scope_ratio: 7, boat_loa_ft: -1 }));
   assert.ok("error" in _v505({ water_depth_ft: 15, scope_ratio: 0.5 }));
 });
+
+import { computeTurboPressureRatio as _v506 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v506 computeTurboPressureRatio pins the gauge-to-absolute PR, the heat of compression, the altitude effect, and error seams", () => {
+  const r = _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 70 });
+  assert.ok(Math.abs(r.pr - 2.02) < 0.01); // (14.7 + 15) / 14.7, gauge boost + ambient
+  assert.ok(Math.abs(r.t_out_f - 250) < 1);
+  assert.ok(Math.abs(r.temp_rise_f - 170) < 1 && r.temp_rise_f > 0); // compression heats the air
+  // The same gauge boost needs a higher pressure ratio at altitude (lower ambient).
+  const alt = _v506({ boost_psi: 15, ambient_psia: 12.2, inlet_temp_f: 80, compressor_eff_pct: 70 });
+  assert.ok(alt.pr > r.pr && Math.abs(alt.pr - 2.23) < 0.01 && alt.t_out_f > r.t_out_f);
+  // Lower compressor efficiency means a hotter outlet for the same pressure ratio.
+  assert.ok(_v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 60 }).t_out_f > r.t_out_f);
+  // Zero boost gives PR 1 and no temperature rise.
+  const nb = _v506({ boost_psi: 0, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 70 });
+  assert.ok(Math.abs(nb.pr - 1) < 1e-9 && Math.abs(nb.temp_rise_f) < 1e-9);
+  // Error seams: non-finite, non-positive ambient, negative boost, sub-absolute-zero inlet, efficiency out of range.
+  assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: Infinity, inlet_temp_f: 80 }));
+  assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 0, inlet_temp_f: 80 }));
+  assert.ok("error" in _v506({ boost_psi: -1, ambient_psia: 14.7, inlet_temp_f: 80 }));
+  assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: -500 }));
+  assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 0 }));
+  assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 120 }));
+});

@@ -2154,6 +2154,7 @@ cross-check.
 | calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
 | calc-mechanic.js | `computeTrapSpeedHorsepower` | `{ weight_lb = 0, trap_mph = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeTurboPressureRatio` | `{ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeValveFlowCoefficient` | `{ solve_for = "flow", fluid = "liquid", specific_gravity = 1, cv = 0, flow_gp...` | _ | _ | _ |
 | calc-mechanic.js | `computeVolumetricEfficiency` | `{ displacement_ci = 0, rpm = 0, cycle = "four", actual_cfm = 0, ve_pct = 0 } ...` | _ | _ | _ |
 | calc-mechanic.js | `parseTireSize` | `str` | _ | _ | _ |
@@ -2617,7 +2618,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1203.
+Row count: 1204.
 
 <!-- END function-corpus-v14 -->
 
@@ -3444,7 +3445,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (42 tiles)
+### Group K Mechanic (43 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3487,6 +3488,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-gearing` | Tire Size and Effective Gear Ratio | Project (first-principles) over Tire ...; P265/70R17 -> 33x12.50R17 / 3.73 axle / 0.84 top gear / 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `torque-adapter-correction` | Torque Wrench Extension / Crowfoot Correction | Standard torque-adapter correction (S...; spec-v485 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trap-speed-horsepower` | Horsepower from Quarter-Mile Trap Speed | Hale quarter-mile trap-speed relation; spec-v325 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `turbo-pressure-ratio` | Turbocharger Pressure Ratio and Charge-Air Temp | turbocharger pressure-ratio and charg...; spec-v506 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `turning-surface-finish` | Theoretical Surface Finish | First-principles scallop geometry + M...; f 0.005 IPR, r 1/32 in -> Rt 100 uin, Ra 25 uin | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `valve-flow-coefficient` | Valve Flow Coefficient (Cv) | ISA-75.01 / Crane TP-410 (control-val...; Cv 10, dP 25 psi, SG 1 -> Q = 10 * sqrt(25) = 50 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3762,6 +3764,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 959. Fixture-covered or reference-cadence: 959 / 959.
+Tile count: 960. Fixture-covered or reference-cadence: 960 / 960.
 
 <!-- END tile-index-v14 -->

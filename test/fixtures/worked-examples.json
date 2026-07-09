@@ -44416,6 +44416,64 @@
    }
   },
   {
+   "tile_id": "turbo-pressure-ratio",
+   "source_publisher": "turbocharger pressure-ratio and charge-air-temperature model",
+   "source_title": "15 psi at sea level (14.7 psia), 80 F inlet, 70% eff -> PR 2.02, outlet 250 F (170 F rise)",
+   "source_edition_or_year": "spec-v506 worked example (machine-verified)",
+   "source_section_or_page": "spec-v506 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "boost_psi": 15,
+    "ambient_psia": 14.7,
+    "inlet_temp_f": 80,
+    "compressor_eff_pct": 70
+   },
+   "outputs": {
+    "pr": {
+     "value": 2.02,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "t_out_f": {
+     "value": 250,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "temp_rise_f": {
+     "value": 170,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "turbo-pressure-ratio",
+   "source_publisher": "turbocharger pressure-ratio and charge-air-temperature model",
+   "source_title": "cross-check: same 15 psi gauge boost a mile high (12.2 psia) -> PR 2.23, a higher ratio for the same boost",
+   "source_edition_or_year": "spec-v506 worked example (machine-verified)",
+   "source_section_or_page": "spec-v506 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "boost_psi": 15,
+    "ambient_psia": 12.2,
+    "inlet_temp_f": 80,
+    "compressor_eff_pct": 70
+   },
+   "outputs": {
+    "pr": {
+     "value": 2.23,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

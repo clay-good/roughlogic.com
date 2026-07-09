@@ -18954,6 +18954,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "turbo pressure ratio",
+      "target": "turbo-pressure-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "boost gauge absolute",
+      "target": "turbo-pressure-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "charge air temp",
+      "target": "turbo-pressure-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "compressor outlet temperature",
+      "target": "turbo-pressure-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "intercooler need",
+      "target": "turbo-pressure-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "adiabatic compression",
+      "target": "turbo-pressure-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pr calculator",
+      "target": "turbo-pressure-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "turbo sizing",
+      "target": "turbo-pressure-ratio",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -7676,6 +7676,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "turbo-pressure-ratio": {
+    formula: "PR = (ambient_psia + boost_psi) / ambient_psia; T_out = T_in x [1 + (PR^0.283 - 1) / (efficiency/100)] with temperatures absolute (Rankine); temp_rise = T_out - T_in.",
+    edition: "Turbocharger pressure-ratio and charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression with gamma = 1.4), first-principles, by name; the compressor map and the engine build govern.",
+    freeAccess: "The pressure-ratio and adiabatic-temperature relations are first-principles thermodynamics; boost, ambient, inlet temp, and compressor efficiency come from the application and the compressor map.",
+    governance: GOVERNANCE.general,
+    editionNote: "Turbocharger pressure-ratio and charge-air-temperature model. Boost is a GAUGE pressure, so PR = (ambient_abs + boost) / ambient_abs -- the ambient must be added before forming the ratio, and the same gauge boost needs a higher pressure ratio at altitude where the ambient is lower. T_out = T_in x [1 + (PR^0.283 - 1) / efficiency] with temperatures absolute; the PR^0.283 term is the heat of compression that makes an intercooler necessary. This reports the compressor-OUTLET temperature (it ignores any intercooler, not the manifold temperature) and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
+    assumptions: [
+      { name: "Gauge boost", value: "PR uses absolute pressures; add the ambient to the gauge boost before dividing", source: "compressor-map sizing" },
+      { name: "Heat of compression", value: "T_out ~ T_in x PR^0.283 adjusted by efficiency; a modest PR adds over 100 F", source: "adiabatic compression (gamma = 1.4)" },
+      { name: "No intercooler", value: "reports the compressor-outlet temperature, not the post-intercooler manifold temperature", source: "scope of this tile" },
+    ],
+  },
   "anchor-rode-scope": {
     formula: "vertical = depth + bow_height (at high tide); rode = scope x vertical; actual_scope = rode / vertical; swing_radius = sqrt(rode^2 - vertical^2) + boat_length.",
     edition: "Anchor rode scope and swing-radius relations (seamanship convention -- Chapman Piloting, US Sailing, ABYC ground-tackle references), by name; local conditions, bottom type, and skipper judgment govern.",

@@ -1458,3 +1458,46 @@ MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
   ],
   compute: computeAnchorRodeScope,
 });
+
+// ===================== spec-v506: turbocharger pressure ratio and charge-air temp =====================
+
+// dims: in { boost_psi: M L^-1 T^-2, ambient_psia: M L^-1 T^-2, inlet_temp_f: T, compressor_eff_pct: dimensionless } out: { pr: dimensionless, t_out_f: T, temp_rise_f: T }
+export function computeTurboPressureRatio({ boost_psi = 0, ambient_psia = 14.7, inlet_temp_f = 0, compressor_eff_pct = 70 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const boost = Number(boost_psi) || 0;
+  const amb = Number(ambient_psia) || 0;
+  const tinF = Number(inlet_temp_f);
+  const eff = Number(compressor_eff_pct) || 0;
+  if (!(amb > 0)) return { error: "Ambient pressure must be positive (psia)." };
+  if (boost < 0) return { error: "Boost cannot be negative (psi)." };
+  if (!Number.isFinite(tinF) || tinF <= -459.67) return { error: "Inlet temperature must be above absolute zero (-459.67 F)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Compressor efficiency must be over 0 and at most 100 percent." };
+  const pr = (amb + boost) / amb;
+  const t_in_r = tinF + 459.67;
+  const t_out_r = t_in_r * (1 + (Math.pow(pr, 0.283) - 1) / (eff / 100));
+  const t_out_f = t_out_r - 459.67;
+  const temp_rise_f = t_out_f - tinF;
+  if (![pr, t_out_f, temp_rise_f].every(Number.isFinite)) return { error: "Turbo math is not a finite value." };
+  return {
+    pr, t_out_f, temp_rise_f,
+    note: "Turbocharger pressure ratio and charge-air temperature: boost is a GAUGE number, so PR = (ambient_abs + boost) / ambient_abs -- the ambient must be added before dividing, and the same gauge boost needs a higher pressure ratio at altitude where the ambient is lower. Compressing air heats it: T_out = T_in x [1 + (PR^0.283 - 1) / efficiency] (temperatures absolute), and the PR^0.283 adiabatic term can raise the charge-air temperature well over a hundred degrees, which is why an intercooler is not optional on a serious build. This reports the compressor-OUTLET temperature (it ignores any intercooler, not the manifold temperature) and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
+  };
+}
+export const turboPressureRatioExample = { inputs: { boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 70 } };
+
+MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
+  citation: "Citation: turbocharger pressure-ratio and charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression): PR = (ambient_abs + boost) / ambient_abs; T_out = T_in x [1 + (PR^0.283 - 1) / efficiency], temperatures absolute. Boost is gauge, so add the ambient first; the PR^0.283 term is the heat of compression. Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
+  example: turboPressureRatioExample.inputs,
+  fields: [
+    { key: "boost_psi", label: "Target boost (psi, gauge)", kind: "number", default: 15 },
+    { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
+    { key: "inlet_temp_f", label: "Compressor inlet air temp (deg F)", kind: "number", default: 80 },
+    { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number", default: 70 },
+  ],
+  outputs: [
+    { key: "pr", id: "tpr-out-pr", label: "Pressure ratio", value: (r) => fmt(r.pr, 2) },
+    { key: "to", id: "tpr-out-to", label: "Compressor-outlet temp", value: (r) => fmt(r.t_out_f, 0) + " F (rise " + fmt(r.temp_rise_f, 0) + " F)" },
+    { key: "n", id: "tpr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTurboPressureRatio,
+});

@@ -525,6 +525,8 @@ const _TILES = [
   ["hull-speed", "K"],
   // spec-v505 anchor rode scope and swing radius
   ["anchor-rode-scope", "K"],
+  // spec-v506 turbocharger pressure ratio and charge-air temp
+  ["turbo-pressure-ratio", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],
