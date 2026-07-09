@@ -44184,6 +44184,54 @@
    }
   },
   {
+   "tile_id": "transformer-voltage-regulation",
+   "source_publisher": "transformer voltage-regulation approximation (%R, %X, load pf)",
+   "source_title": "%R 1.2, %X 5.0, 0.85 lagging, full load -> secondary sags +3.72%",
+   "source_edition_or_year": "spec-v494 worked example (machine-verified)",
+   "source_section_or_page": "spec-v494 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "percent_r": 1.2,
+    "percent_x": 5.0,
+    "power_factor": 0.85,
+    "leading": false,
+    "load_fraction": 1.0
+   },
+   "outputs": {
+    "vr_percent": {
+     "value": 3.72,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-voltage-regulation",
+   "source_publisher": "transformer voltage-regulation approximation (%R, %X, load pf)",
+   "source_title": "cross-check: same bank at 0.85 LEADING raises the voltage -1.50% above nominal",
+   "source_edition_or_year": "spec-v494 worked example (machine-verified)",
+   "source_section_or_page": "spec-v494 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "percent_r": 1.2,
+    "percent_x": 5.0,
+    "power_factor": 0.85,
+    "leading": true,
+    "load_fraction": 1.0
+   },
+   "outputs": {
+    "vr_percent": {
+     "value": -1.495,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "economic-conductor-sizing",
    "source_publisher": "economic conductor sizing (I2R)",
    "source_title": "100 A, 0.20->0.125 ohm, 4000 hr, $0.12, $800 -> $1080/yr, 0.7 yr payback",

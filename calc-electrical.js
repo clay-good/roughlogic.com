@@ -5015,3 +5015,57 @@ function _v487renderGeneratorFuelRuntime(inputRegion, outputRegion, citationEl) 
   for (const f of [tank, gph, usable, target]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["generator-fuel-runtime"] = _v487renderGeneratorFuelRuntime;
+
+// ===================== spec-v494: transformer voltage regulation from %R and %X =====================
+// dims: in { percent_r: dimensionless, percent_x: dimensionless, power_factor: dimensionless, leading: dimensionless, load_fraction: dimensionless } out: { cos: dimensionless, sin: dimensionless, main_term: dimensionless, quad_term: dimensionless, vr_percent: dimensionless }
+export function computeTransformerVoltageRegulation({ percent_r = 0, percent_x = 0, power_factor = 0.85, leading = false, load_fraction = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pr = Number(percent_r) || 0;
+  const px = Number(percent_x) || 0;
+  const pf = Number(power_factor) || 0;
+  const ld = Number(load_fraction) || 0;
+  if (pr < 0) return { error: "%R cannot be negative." };
+  if (px < 0) return { error: "%X cannot be negative." };
+  if (!(pf > 0 && pf <= 1)) return { error: "Power factor must be over 0 and at most 1." };
+  if (ld < 0) return { error: "Per-unit loading cannot be negative." };
+  const cos = pf;
+  const sin = Math.sqrt(Math.max(0, 1 - pf * pf)) * (leading ? -1 : 1);
+  const main_term = ld * (pr * cos + px * sin);
+  const quad_term = ld * ld * Math.pow(px * cos - pr * sin, 2) / 200;
+  const vr_percent = main_term + quad_term;
+  if (![cos, sin, main_term, quad_term, vr_percent].every(Number.isFinite)) return { error: "Voltage-regulation math is not a finite value." };
+  return {
+    cos, sin, main_term, quad_term, vr_percent,
+    note: "Transformer voltage regulation is the drop from no-load to full-load at the transformer terminals: VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200, with sin taking the load's sign (negative for a leading power factor). The nameplate %Z alone does not give it -- the drop depends on how %Z splits between %R and %X and on the load power factor. A lagging load (motors) sags the voltage; a leading load (an over-corrected plant or a PV inverter exporting reactive power) can raise the secondary above nominal, tripping over-voltage relays. The quadrature term is a small correction that grows with the square of loading. This is the terminal regulation, not the full feeder drop -- conductor voltage drop adds to it. A design aid, not the utility's voltage study.",
+  };
+}
+export const transformerVoltageRegulationExample = { inputs: { percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, leading: false, load_fraction: 1.0 } };
+function _v494renderTransformerVoltageRegulation(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Transformer voltage-regulation approximation (from %R, %X, and load power factor): VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200, sin negative for a leading power factor. An IEEE C57 test-report quantity; %Z alone does not give it because it depends on the %R / %X split and the power factor. Terminal regulation, not the feeder drop. A design aid; the utility's voltage study governs.";
+  const pr = makeNumber("Transformer %R (from test report)", "tvr-r", { step: "any", min: "0" }); pr.input.value = "1.2";
+  const px = makeNumber("Transformer %X (from test report)", "tvr-x", { step: "any", min: "0" }); px.input.value = "5.0";
+  const pf = makeNumber("Load power factor (0-1)", "tvr-pf", { step: "any", min: "0", max: "1" }); pf.input.value = "0.85";
+  const lead = makeSelect("Power-factor type", "tvr-lead", [
+    { value: "lagging", label: "Lagging (motors) - voltage sags", selected: true },
+    { value: "leading", label: "Leading (over-corrected / exporting) - voltage rises" },
+  ]);
+  const ld = makeNumber("Per-unit loading (1.0 = full load)", "tvr-ld", { step: "any", min: "0" }); ld.input.value = "1.0";
+  for (const f of [pr, px, pf]) inputRegion.appendChild(f.wrap);
+  inputRegion.appendChild(lead.wrap);
+  inputRegion.appendChild(ld.wrap);
+  attachExampleButton(inputRegion, () => { pr.input.value = "1.2"; px.input.value = "5.0"; pf.input.value = "0.85"; lead.select.value = "lagging"; ld.input.value = "1.0"; update(); });
+  const oVr = makeOutputLine(outputRegion, "Voltage regulation", "tvr-out-vr");
+  const oMain = makeOutputLine(outputRegion, "Main term / quadrature term", "tvr-out-terms");
+  const oNote = makeOutputLine(outputRegion, "Note", "tvr-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTransformerVoltageRegulation({ percent_r: readNum(pr.input), percent_x: readNum(px.input), power_factor: pf.input.value === "" ? 0.85 : readNum(pf.input), leading: lead.select.value === "leading", load_fraction: ld.input.value === "" ? 1.0 : readNum(ld.input) });
+    if (r.error) { oVr.textContent = r.error; oMain.textContent = "-"; oNote.textContent = ""; return; }
+    oVr.textContent = (r.vr_percent >= 0 ? "+" : "") + fmt(r.vr_percent, 2) + "%" + (r.vr_percent < 0 ? " (voltage RISES above nominal)" : " (voltage sags)");
+    oMain.textContent = fmt(r.main_term, 3) + "% + " + fmt(r.quad_term, 3) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [pr, px, pf, ld]) f.input.addEventListener("input", update);
+  lead.select.addEventListener("change", update);
+}
+ELECTRICAL_RENDERERS["transformer-voltage-regulation"] = _v494renderTransformerVoltageRegulation;

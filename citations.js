@@ -1061,6 +1061,18 @@ export const CITATIONS = {
       { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
     ],
   },
+  "transformer-voltage-regulation": {
+    formula: "cos = pf; sin = sqrt(1 - pf^2) x (leading ? -1 : +1); VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200.",
+    edition: "Transformer voltage-regulation approximation from %R, %X, and load power factor (an IEEE C57 test-report quantity), first-principles; the utility's voltage study governs the actual profile.",
+    freeAccess: "The regulation from %R, %X, and power factor is a standard first-principles approximation; %R and %X come from the transformer's IEEE C57 test report.",
+    governance: GOVERNANCE.general,
+    editionNote: "Transformer voltage-regulation approximation (from %R, %X, and load power factor). VR% = load x (%R cos + %X sin) + load^2 x (%X cos - %R sin)^2 / 200, with sin taking the load's sign (negative for a leading power factor). The nameplate %Z does not by itself give the regulation because it depends on the %R / %X split and the load power factor: a lagging load sags the voltage while a leading (over-corrected or exporting) load can raise it above nominal. The second (quadrature) term is a small correction that grows with the square of loading. This is the terminal regulation, not the full feeder drop -- conductor voltage drop adds to it. A design aid, not the utility's voltage study.",
+    assumptions: [
+      { name: "Impedance split", value: "regulation uses %R and %X separately, not just %Z; %Z = sqrt(%R^2 + %X^2)", source: "IEEE C57 test report" },
+      { name: "Power-factor sign", value: "lagging sin positive (voltage sags), leading sin negative (voltage can rise)", source: "load power factor" },
+      { name: "Scope", value: "terminal regulation only; conductor voltage drop adds on top", source: "scope of this tile" },
+    ],
+  },
   "generator-sizing": {
     formula: "Required kW = max(starting kVA / surge factor, sum of running loads / efficiency); largest-motor LRA contribution per NEC 430.251(B).",
     edition: NEC_2023 + " Article 700 / 701 / 702; NEMA MG 1 by name.",

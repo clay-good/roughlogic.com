@@ -52,6 +52,8 @@ const TOOL_MODULES = (() => {
     "motor-efficiency-upgrade-savings", "transformer-loading-efficiency", "economic-conductor-sizing",
     // spec-v487 generator fuel runtime and backup duration
     "generator-fuel-runtime",
+    // spec-v494 transformer voltage regulation from %R and %X
+    "transformer-voltage-regulation",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

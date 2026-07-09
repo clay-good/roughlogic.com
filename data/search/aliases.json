@@ -18794,6 +18794,46 @@
       "kind": "industry"
     },
     {
+      "term": "voltage regulation",
+      "target": "transformer-voltage-regulation",
+      "kind": "industry"
+    },
+    {
+      "term": "transformer regulation",
+      "target": "transformer-voltage-regulation",
+      "kind": "industry"
+    },
+    {
+      "term": "%r %x",
+      "target": "transformer-voltage-regulation",
+      "kind": "industry"
+    },
+    {
+      "term": "secondary voltage drop",
+      "target": "transformer-voltage-regulation",
+      "kind": "adjacent"
+    },
+    {
+      "term": "leading power factor rise",
+      "target": "transformer-voltage-regulation",
+      "kind": "adjacent"
+    },
+    {
+      "term": "no-load to full-load",
+      "target": "transformer-voltage-regulation",
+      "kind": "adjacent"
+    },
+    {
+      "term": "regulation percent",
+      "target": "transformer-voltage-regulation",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tap changer",
+      "target": "transformer-voltage-regulation",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"

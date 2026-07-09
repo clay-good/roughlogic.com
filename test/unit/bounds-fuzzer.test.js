@@ -17080,3 +17080,27 @@ test("bounds: spec-v493 computeGeneratorConductor445 pins the 115% basis, the de
   assert.ok("error" in _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 0 }));
   assert.ok("error" in _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 480, power_factor: 1.5 }));
 });
+
+import { computeTransformerVoltageRegulation as _v494 } from "../../calc-electrical.js";
+
+test("bounds: spec-v494 computeTransformerVoltageRegulation pins the lagging sag, the leading rise, the load scaling, and error seams", () => {
+  const lag = _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, leading: false, load_fraction: 1.0 });
+  assert.ok(Math.abs(lag.vr_percent - 3.72) < 0.02); // reactance-dominated sag
+  assert.ok(lag.vr_percent > 0);
+  // A leading power factor flips the reactive term's sign and can raise the voltage above nominal (negative regulation).
+  const lead = _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, leading: true, load_fraction: 1.0 });
+  assert.ok(lead.vr_percent < 0 && Math.abs(lead.vr_percent - (-1.495)) < 0.02);
+  assert.ok(Math.sign(lead.sin) === -1 && Math.sign(lag.sin) === 1);
+  // The main term scales linearly with load, the quadrature term quadratically: half load is less than half the full-load main term plus a quarter of the quadrature.
+  const half = _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, leading: false, load_fraction: 0.5 });
+  assert.ok(Math.abs(half.main_term - lag.main_term * 0.5) < 1e-9);
+  assert.ok(Math.abs(half.quad_term - lag.quad_term * 0.25) < 1e-9);
+  // Zero load gives zero regulation.
+  assert.ok(Math.abs(_v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, load_fraction: 0 }).vr_percent) < 1e-12);
+  // Error seams: non-finite, negative %R / %X, pf out of range, negative load.
+  assert.ok("error" in _v494({ percent_r: Infinity, percent_x: 5.0, power_factor: 0.85 }));
+  assert.ok("error" in _v494({ percent_r: -1, percent_x: 5.0, power_factor: 0.85 }));
+  assert.ok("error" in _v494({ percent_r: 1.2, percent_x: -5.0, power_factor: 0.85 }));
+  assert.ok("error" in _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 1.5 }));
+  assert.ok("error" in _v494({ percent_r: 1.2, percent_x: 5.0, power_factor: 0.85, load_fraction: -1 }));
+});
