@@ -118,6 +118,8 @@ const TOOL_MODULES = (() => {
     "motor-unbalance-derate",
     // spec-v183/v184 electrician second-pass batch
     "transformer-k-factor", "motor-capacitor-max",
+    // spec-v523 harmonic parallel-resonance order
+    "harmonic-resonance",
   ]);
   // spec-v26 feeder + transformer-conductor overcurrent bench (group A;
   // relocated from calc-electrical.js at spec-v72 to relieve that module's

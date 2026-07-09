@@ -466,6 +466,8 @@ const _TILES = [
   ["motor-locked-rotor-kva", "A"],
   // spec-v521 motor short-circuit contribution (first cycle)
   ["motor-fault-contribution", "A"],
+  // spec-v523 harmonic parallel-resonance order
+  ["harmonic-resonance", "A"],
   // spec-v522 reduced-voltage starter current and torque
   ["reduced-voltage-starter", "A"],
   // spec-v493 NEC 445.13 generator output conductor at 115%

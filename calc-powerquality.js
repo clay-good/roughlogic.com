@@ -429,3 +429,45 @@ function _v184renderMotorCapacitorMax(inputRegion, outputRegion, citationEl) {
   for (const f of [v, i, sf]) f.input.addEventListener("input", update);
 }
 POWERQUALITY_RENDERERS["motor-capacitor-max"] = _v184renderMotorCapacitorMax;
+
+// ===================== spec-v523: harmonic parallel-resonance order =====================
+// dims: in { short_circuit_mva: M L^2 T^-3, cap_bank_mvar: M L^2 T^-3 } out: { h_resonant: dimensionless, near_harmonic: dimensionless }
+export function computeHarmonicResonance({ short_circuit_mva = 0, cap_bank_mvar = 0 } = {}) {
+  const sc = Number(short_circuit_mva);
+  const cap = Number(cap_bank_mvar);
+  if (!Number.isFinite(sc) || !Number.isFinite(cap)) return { error: "All numeric inputs must be finite numbers." };
+  if (!(sc > 0)) return { error: "Short-circuit MVA must be positive." };
+  if (!(cap > 0)) return { error: "Capacitor bank MVAR must be positive." };
+  const h_resonant = Math.sqrt(sc / cap);
+  let near_harmonic = null, best = 0.5 + 1e-9;
+  for (const h of [5, 7, 11, 13]) {
+    const d = Math.abs(h_resonant - h);
+    if (d <= 0.5 + 1e-9 && d < best) { best = d; near_harmonic = h; }
+  }
+  if (!Number.isFinite(h_resonant)) return { error: "Resonance math is not a finite value." };
+  return {
+    h_resonant, near_harmonic,
+    note: "Parallel-resonance order of a power-factor capacitor bank: on a bus feeding nonlinear loads, the PF capacitors and the system source inductance form a parallel LC circuit whose resonant order is h = sqrt(MVA_sc / MVAR_cap). If that order lands on a harmonic the loads produce -- the 5th, 7th, 11th, or 13th -- the resonance AMPLIFIES it into damaging overvoltage and current that blow the caps or overheat transformers. The counterintuitive catch: a BIGGER capacitor bank lowers the resonant order toward the strong low-order harmonics, so upsizing for power factor can walk the resonance right onto a dominant harmonic. This estimate uses the bus short-circuit level and the bank rating and ignores load and resistive damping; a detuning reactor (making it a filter) or a harmonic study is the fix. A screening aid, not a harmonic study.",
+  };
+}
+export const harmonicResonanceExample = { inputs: { short_circuit_mva: 200, cap_bank_mvar: 1.2 } };
+function _v523renderHarmonicResonance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531 harmonic filter and resonance guidance): h_resonant = sqrt(MVA_sc / MVAR_cap); flagged when within 0.5 of the 5th/7th/11th/13th. A bigger bank lowers the order toward the strong low harmonics. A screening aid; a harmonic study governs.";
+  const sc = makeNumber("Short-circuit power at the bus (MVA)", "hr-sc", { step: "any", min: "0" }); sc.input.value = "200";
+  const cap = makeNumber("Power-factor capacitor bank (MVAR)", "hr-cap", { step: "any", min: "0" }); cap.input.value = "1.2";
+  for (const f of [sc, cap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sc.input.value = "200"; cap.input.value = "1.2"; update(); });
+  const oH = makeOutputLine(outputRegion, "Resonant order", "hr-out-h");
+  const oNear = makeOutputLine(outputRegion, "Near a common harmonic?", "hr-out-near");
+  const oNote = makeOutputLine(outputRegion, "Note", "hr-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeHarmonicResonance({ short_circuit_mva: readNum(sc.input), cap_bank_mvar: readNum(cap.input) });
+    if (r.error) { oH.textContent = r.error; oNear.textContent = "-"; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.h_resonant, 2) + "th order";
+    oNear.textContent = r.near_harmonic === null ? "no (not within 0.5 of the 5/7/11/13th)" : "YES -- near the " + r.near_harmonic + "th harmonic, RESONANCE RISK";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sc, cap]) f.input.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["harmonic-resonance"] = _v523renderHarmonicResonance;

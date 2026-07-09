@@ -7459,6 +7459,46 @@
       "kind": "redirect"
     },
     {
+      "term": "harmonic resonance",
+      "target": "harmonic-resonance",
+      "kind": "industry"
+    },
+    {
+      "term": "parallel resonance",
+      "target": "harmonic-resonance",
+      "kind": "industry"
+    },
+    {
+      "term": "capacitor bank resonance",
+      "target": "harmonic-resonance",
+      "kind": "industry"
+    },
+    {
+      "term": "resonant order",
+      "target": "harmonic-resonance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pf cap harmonics",
+      "target": "harmonic-resonance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "detuning reactor",
+      "target": "harmonic-resonance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ieee 1531",
+      "target": "harmonic-resonance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "harmonic amplification",
+      "target": "harmonic-resonance",
+      "kind": "adjacent"
+    },
+    {
       "term": "self excitation",
       "target": "motor-capacitor-max",
       "kind": "industry"

@@ -28834,6 +28834,54 @@
    }
   },
   {
+   "tile_id": "harmonic-resonance",
+   "source_publisher": "parallel-resonance order of a PF capacitor bank (IEEE 1531)",
+   "source_title": "200 MVA bus, 1.2 MVAR bank -> 12.91th order, near the 13th harmonic (resonance risk)",
+   "source_edition_or_year": "spec-v523 worked example (machine-verified)",
+   "source_section_or_page": "spec-v523 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "short_circuit_mva": 200,
+    "cap_bank_mvar": 1.2
+   },
+   "outputs": {
+    "h_resonant": {
+     "value": 12.91,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "near_harmonic": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "harmonic-resonance",
+   "source_publisher": "parallel-resonance order of a PF capacitor bank (IEEE 1531)",
+   "source_title": "cross-check: doubling the bank to 2.4 MVAR walks the resonance down to the 9.13th order",
+   "source_edition_or_year": "spec-v523 worked example (machine-verified)",
+   "source_section_or_page": "spec-v523 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "short_circuit_mva": 200,
+    "cap_bank_mvar": 2.4
+   },
+   "outputs": {
+    "h_resonant": {
+     "value": 9.13,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bends-between-pulls",
    "source_publisher": "NEC 2023 (NFPA 70)",
    "source_title": "Bends between pull points, within the 360-degree limit",

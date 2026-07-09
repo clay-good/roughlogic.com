@@ -6124,6 +6124,18 @@ export const CITATIONS = {
       { name: "Minimum ampacity", value: "the maximum current times another 125% before any conditions-of-use adjustment", source: "NEC 690.8(B)(1)" },
     ],
   },
+  "harmonic-resonance": {
+    formula: "h_resonant = sqrt(MVA_sc / MVAR_cap); flag if h_resonant is within 0.5 of the 5th, 7th, 11th, or 13th harmonic.",
+    edition: "Parallel-resonance order of a power-factor capacitor bank (IEEE 519 / IEEE 1531 harmonic filter and resonance guidance), first-principles, by name; a harmonic study governs.",
+    freeAccess: "The h = sqrt(MVA_sc / MVAR_cap) resonance relation is a published first-principles result; the bus short-circuit level and the bank rating come from the system data.",
+    governance: GOVERNANCE.general,
+    editionNote: "Parallel-resonance order of a power-factor capacitor bank. The PF capacitors and the system source inductance form a parallel LC circuit whose resonant order is h = sqrt(MVA_sc / MVAR_cap). If that order lands on a harmonic the nonlinear loads produce (the 5th, 7th, 11th, or 13th), the resonance amplifies it into damaging overvoltage and current that blow the capacitors or overheat transformers. A larger capacitor bank lowers the resonant order toward the strong low-order harmonics, so upsizing for power factor can create the problem. The estimate uses the bus short-circuit level and the bank rating and ignores load and resistive damping; a detuning reactor (making it a filter) or a harmonic study is the fix. A screening aid, not a harmonic study.",
+    assumptions: [
+      { name: "Resonant order", value: "h = sqrt(MVA_sc / MVAR_cap) for the parallel cap-and-source-inductance circuit", source: "IEEE 1531" },
+      { name: "Bigger bank, lower order", value: "a larger capacitor bank lowers the resonant order toward the strong low harmonics", source: "IEEE 519" },
+      { name: "Idealized", value: "ignores load and resistive damping; a detuning reactor or harmonic study is the fix", source: "scope of this tile" },
+    ],
+  },
   "transformer-k-factor": {
     formula: "K = sum(Ih^2 x h^2) / sum(Ih^2) over h = 1,3,5,7,9,11,13 with harmonics in per-unit of the fundamental; round up to the next standard K-rating (K-1, K-4, K-9, K-13, K-20, K-30, K-40).",
     edition: "Transformer K-factor for nonlinear loads, UL 1561 and IEEE C57.110, by name.",

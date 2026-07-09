@@ -17713,3 +17713,20 @@ test("bounds: spec-v522 computeReducedVoltageStarter pins the tap-squared line c
   assert.ok("error" in _v522({ across_line_lra_a: 600, starter_type: "autotransformer", tap_fraction: 0 }));
   assert.ok("error" in _v522({ across_line_lra_a: 600, starter_type: "autotransformer", tap_fraction: 1.5 }));
 });
+
+import { computeHarmonicResonance as _v523 } from "../../calc-powerquality.js";
+
+test("bounds: spec-v523 computeHarmonicResonance pins the resonant order, the proximity flag, the bigger-bank-lower-order rule, and error seams", () => {
+  const r = _v523({ short_circuit_mva: 200, cap_bank_mvar: 1.2 });
+  assert.ok(Math.abs(r.h_resonant - 12.91) < 0.02); // sqrt(200/1.2)
+  assert.strictEqual(r.near_harmonic, 13); // within 0.5 of the 13th
+  // A bigger bank lowers the resonant order.
+  const big = _v523({ short_circuit_mva: 200, cap_bank_mvar: 2.4 });
+  assert.ok(big.h_resonant < r.h_resonant && Math.abs(big.h_resonant - 9.13) < 0.02 && big.near_harmonic === null);
+  // A bank tuned so the order lands on the 5th fires the flag.
+  assert.strictEqual(_v523({ short_circuit_mva: 200, cap_bank_mvar: 8 }).near_harmonic, 5); // sqrt(25) = 5
+  // Error seams: non-finite, non-positive MVA / MVAR.
+  assert.ok("error" in _v523({ short_circuit_mva: Infinity, cap_bank_mvar: 1.2 }));
+  assert.ok("error" in _v523({ short_circuit_mva: 0, cap_bank_mvar: 1.2 }));
+  assert.ok("error" in _v523({ short_circuit_mva: 200, cap_bank_mvar: 0 }));
+});
