@@ -34606,6 +34606,70 @@
    }
   },
   {
+   "tile_id": "motor-locked-rotor-kva",
+   "source_publisher": "NEC 2023 Table 430.7(B)",
+   "source_title": "25 hp, code G, 460 V three-phase -> 6.29 kVA/hp, 157.3 kVA, 197.4 A LRA",
+   "source_edition_or_year": "spec-v499 worked example (machine-verified)",
+   "source_section_or_page": "spec-v499 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "horsepower": 25,
+    "code_letter": "G",
+    "voltage_v": 460,
+    "phase": 3
+   },
+   "outputs": {
+    "kva_per_hp": {
+     "value": 6.29,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "locked_rotor_kva": {
+     "value": 157.25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "lra_a": {
+     "value": 197.4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-locked-rotor-kva",
+   "source_publisher": "NEC 2023 Table 430.7(B)",
+   "source_title": "cross-check: same 25 hp / 460 V as code J (7.99 kVA/hp) -> 250.7 A LRA, 7.4x FLA",
+   "source_edition_or_year": "spec-v499 worked example (machine-verified)",
+   "source_section_or_page": "spec-v499 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "horsepower": 25,
+    "code_letter": "J",
+    "voltage_v": 460,
+    "phase": 3
+   },
+   "outputs": {
+    "kva_per_hp": {
+     "value": 7.99,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "lra_a": {
+     "value": 250.7,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "service-conductor-sizing",
    "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
    "source_title": "200 A copper dwelling service -> 166 A -> 2/0 Cu (Table 310.12)",

@@ -448,6 +448,8 @@ const _TILES = [
   ["erv-sensible-recovery", "C"], ["mua-tempering-load", "C"], ["dcv-co2-ventilation", "C"],
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch
   ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["continuous-load-ocpd", "A"],
+  // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
+  ["motor-locked-rotor-kva", "A"],
   // spec-v493 NEC 445.13 generator output conductor at 115%
   ["generator-conductor-445", "A"],
   // spec-v281..v283 steel members-and-connections depth batch

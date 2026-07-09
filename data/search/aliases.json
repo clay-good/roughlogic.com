@@ -11029,6 +11029,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "locked rotor current",
+      "target": "motor-locked-rotor-kva",
+      "kind": "industry"
+    },
+    {
+      "term": "code letter",
+      "target": "motor-locked-rotor-kva",
+      "kind": "industry"
+    },
+    {
+      "term": "430.7(b)",
+      "target": "motor-locked-rotor-kva",
+      "kind": "industry"
+    },
+    {
+      "term": "starting kva",
+      "target": "motor-locked-rotor-kva",
+      "kind": "industry"
+    },
+    {
+      "term": "lra",
+      "target": "motor-locked-rotor-kva",
+      "kind": "adjacent"
+    },
+    {
+      "term": "motor inrush",
+      "target": "motor-locked-rotor-kva",
+      "kind": "adjacent"
+    },
+    {
+      "term": "locked rotor kva",
+      "target": "motor-locked-rotor-kva",
+      "kind": "adjacent"
+    },
+    {
+      "term": "kva per hp",
+      "target": "motor-locked-rotor-kva",
+      "kind": "adjacent"
+    },
+    {
       "term": "service conductor size",
       "target": "service-conductor-sizing",
       "kind": "industry"

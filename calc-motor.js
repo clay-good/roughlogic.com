@@ -15,7 +15,7 @@
 // tiles, so it is not in the home-view first-paint payload.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -267,3 +267,57 @@ function renderMotorOverloadSizing(inputRegion, outputRegion, citationEl) {
   for (const f of [fla, sf, rise]) f.input.addEventListener("input", update);
 }
 MOTOR_RENDERERS["motor-overload-sizing"] = renderMotorOverloadSizing;
+
+// ===================== spec-v499: motor locked-rotor current from code letter (NEC Table 430.7(B)) =====================
+// NEC Table 430.7(B): code letter -> upper bound of the locked-rotor kVA/hp band (I, O, Q are not used).
+const _NEC_430_7B_KVA_PER_HP = {
+  A: 3.14, B: 3.54, C: 3.99, D: 4.49, E: 4.99, F: 5.59, G: 6.29, H: 7.09, J: 7.99,
+  K: 8.99, L: 9.99, M: 11.19, N: 12.49, P: 13.99, R: 15.99, S: 17.99, T: 19.99, U: 22.39, V: 22.4,
+};
+// dims: in { horsepower: M L^2 T^-3, code_letter: dimensionless, voltage_v: M L^2 T^-3 I^-1, phase: dimensionless } out: { kva_per_hp: dimensionless, locked_rotor_kva: M L^2 T^-3, lra_a: I }
+export function computeMotorLockedRotorKva({ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}) {
+  const _g = _finiteGuard({ horsepower, voltage_v }); if (_g) return _g;
+  const hp = Number(horsepower) || 0;
+  const v = Number(voltage_v) || 0;
+  const ph = Number(phase) === 1 ? 1 : (Number(phase) === 3 ? 3 : 0);
+  const letter = String(code_letter || "").trim().toUpperCase();
+  if (!(hp > 0)) return { error: "Horsepower must be positive." };
+  if (!(v > 0)) return { error: "Voltage must be positive (V)." };
+  if (ph !== 1 && ph !== 3) return { error: "Phase must be 1 or 3." };
+  const kva_per_hp = _NEC_430_7B_KVA_PER_HP[letter];
+  if (kva_per_hp === undefined) return { error: "Code letter must be a NEC Table 430.7(B) letter (A-V, excluding I, O, Q)." };
+  const locked_rotor_kva = hp * kva_per_hp;
+  const lra_a = ph === 3 ? locked_rotor_kva * 1000 / (Math.sqrt(3) * v) : locked_rotor_kva * 1000 / v;
+  if (![locked_rotor_kva, lra_a].every(Number.isFinite)) return { error: "Locked-rotor math is not a finite value." };
+  return {
+    kva_per_hp, locked_rotor_kva, lra_a,
+    note: "NEC Table 430.7(B) locked-rotor code letter: the letter maps to a band of locked-rotor (starting) kVA per horsepower; this tile uses the upper end of the band for a conservative starting current. locked_rotor_kva = hp x kVA/hp and LRA = kVA x 1000 / (sqrt(3) x V) three-phase (kVA x 1000 / V single-phase). The code letter is about starting kVA and is NOT the design letter (A/B/C/D), which describes the torque-speed curve -- the two are routinely confused. The '6x FLA' rule of thumb holds only for mid-range code letters and undersizes high-code motors that draw 7-8x FLA at start, which the instantaneous-trip breaker, the SCCR check, and the voltage-dip calculation must account for. The actual measured inrush and the motor nameplate govern. A design aid, not a substitute for the nameplate.",
+  };
+}
+export const motorLockedRotorKvaExample = { inputs: { horsepower: 25, code_letter: "G", voltage_v: 460, phase: 3 } };
+function renderMotorLockedRotorKva(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Table 430.7(B) locked-rotor indicating code letters: the letter gives the locked-rotor kVA/hp band (upper end used here); locked_rotor_kva = hp x kVA/hp; LRA = kVA x 1000 / (sqrt(3) x V) three-phase. The code letter is not the design letter. A design aid; the nameplate and measured inrush govern.";
+  const hp = makeNumber("Motor horsepower (hp)", "mlr-hp", { step: "any", min: "0" }); hp.input.value = "25";
+  const code = makeSelect("Code letter (NEC 430.7(B))", "mlr-code", Object.keys(_NEC_430_7B_KVA_PER_HP).map((k) => ({ value: k, label: k + " (" + _NEC_430_7B_KVA_PER_HP[k] + " kVA/hp)", selected: k === "G" })));
+  const v = makeNumber("Voltage (V)", "mlr-v", { step: "any", min: "0" }); v.input.value = "460";
+  const ph = makeSelect("Phase", "mlr-ph", [
+    { value: "3", label: "Three-phase", selected: true },
+    { value: "1", label: "Single-phase" },
+  ]);
+  for (const f of [hp, code, v, ph]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hp.input.value = "25"; code.select.value = "G"; v.input.value = "460"; ph.select.value = "3"; update(); });
+  const oKva = makeOutputLine(outputRegion, "Locked-rotor kVA", "mlr-out-kva");
+  const oLra = makeOutputLine(outputRegion, "Locked-rotor amps (LRA)", "mlr-out-lra");
+  const oNote = makeOutputLine(outputRegion, "Note", "mlr-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMotorLockedRotorKva({ horsepower: readNum(hp.input), code_letter: code.select.value, voltage_v: readNum(v.input), phase: Number(ph.select.value) });
+    if (r.error) { oKva.textContent = r.error; oLra.textContent = "-"; oNote.textContent = ""; return; }
+    oKva.textContent = fmt(r.locked_rotor_kva, 1) + " kVA (" + fmt(r.kva_per_hp, 2) + " kVA/hp)";
+    oLra.textContent = fmt(r.lra_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [hp, v]) f.input.addEventListener("input", update);
+  for (const f of [code, ph]) f.select.addEventListener("change", update);
+}
+MOTOR_RENDERERS["motor-locked-rotor-kva"] = renderMotorLockedRotorKva;

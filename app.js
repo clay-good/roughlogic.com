@@ -71,6 +71,8 @@ const TOOL_MODULES = (() => {
     "multi-motor-feeder",
     // spec-v278 NEC 430.32 running overload
     "motor-overload-sizing",
+    // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
+    "motor-locked-rotor-kva",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which

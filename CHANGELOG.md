@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise tools-data.js 130000 -> 140000 and tile-meta.js 13000 -> 14500 gzip caps; 2026-07-09
+
+The spec-v489..v588 single-tile landing campaign grows the catalog registry (`tools-data.js`) and the `_TILES` id/group table (`tile-meta.js`) by one row per tile. At tile 953 (spec-v499) both crossed their caps (`tools-data.js` 100.3%, `tile-meta.js` 100.1%). Raised the `check-module-sizes` caps to **140000** (tools-data, ~7% headroom for the ~87 remaining backlog tiles) and **14500** (tile-meta, ~11% headroom). Both are lazy-loaded (spec-v10 H.2) and absent from the home-view payload, so this does not affect first paint.
+
 ### chore(sizes): raise calc-electrical.js gzip cap 72000 -> 78000; 2026-07-09
 
 Landing the spec-v489..v588 single-tile campaign added three Group A tiles to `calc-electrical.js` (spec-v494 `transformer-voltage-regulation`, spec-v495 `capacitor-discharge-time`, spec-v496 `asymmetrical-fault-xr`), taking the built copy to ~73.1 KB gz (101.5% of the old 72000 B cap). Raised the `check-module-sizes` cap to **78000** (current + ~7% headroom). The module is lazy-loaded and absent from the home-view payload, so this does not affect first paint. Prior campaign tiles (spec-v489..v495, package 0.175.1 -> 0.175.7) landed without a per-tile CHANGELOG entry (the changelog is maintainer-only and ungated); this note exists because the size gate was touched.

@@ -715,6 +715,7 @@ export const COMPUTE_MAP = {
   "rc-compression-dev-length": { module: "../../calc-concrete.js", fn: "computeRcCompressionDevLength" },
   "concrete-longterm-defl": { module: "../../calc-concrete.js", fn: "computeConcreteLongtermDefl" },
   "pile-group-efficiency": { module: "../../calc-geotech.js", fn: "computePileGroupEfficiency" },
+  "motor-locked-rotor-kva": { module: "../../calc-motor.js", fn: "computeMotorLockedRotorKva" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

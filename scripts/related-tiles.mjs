@@ -175,6 +175,7 @@ const RELATED = {
   "conduit-fill": ["box-fill", "wire-ampacity", "cable-bend-radius"],
   "breaker-sizing": ["wire-ampacity", "motor-fla", "service-load"],
   "motor-fla": ["wire-ampacity", "breaker-sizing", "three-phase", "voltage-imbalance"],
+  "motor-locked-rotor-kva": ["motor-fla", "generator-motor-starting", "motor-vd-starting"],
   "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   "buck-boost-sizing": ["transformer-kva-sizing", "transformer-conductor-protection", "three-phase"],

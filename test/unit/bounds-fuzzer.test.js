@@ -17198,3 +17198,25 @@ test("bounds: spec-v498 computePileGroupEfficiency pins the Converse-Labarre eff
   assert.ok("error" in _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 6 })); // s < d
   assert.ok("error" in _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 36, single_allow_kip: -1 }));
 });
+
+import { computeMotorLockedRotorKva as _v499 } from "../../calc-motor.js";
+
+test("bounds: spec-v499 computeMotorLockedRotorKva pins the code-letter kVA/hp, the LRA, the single-phase path, and error seams", () => {
+  const r = _v499({ horsepower: 25, code_letter: "G", voltage_v: 460, phase: 3 });
+  assert.ok(Math.abs(r.kva_per_hp - 6.29) < 1e-9);
+  assert.ok(Math.abs(r.locked_rotor_kva - 157.25) < 1e-9);
+  assert.ok(Math.abs(r.lra_a - 197.4) < 0.5);
+  // A higher code letter draws more starting current on the same motor.
+  const j = _v499({ horsepower: 25, code_letter: "J", voltage_v: 460, phase: 3 });
+  assert.ok(j.lra_a > r.lra_a && Math.abs(j.lra_a - 250.7) < 0.5);
+  // Case-insensitive letter and single-phase path.
+  assert.ok(Math.abs(_v499({ horsepower: 25, code_letter: "g", voltage_v: 460, phase: 3 }).lra_a - r.lra_a) < 1e-9);
+  assert.ok(Math.abs(_v499({ horsepower: 5, code_letter: "F", voltage_v: 230, phase: 1 }).lra_a - 5 * 5.59 * 1000 / 230) < 1e-6);
+  // Error seams: non-finite, non-positive hp/voltage, bad code letter (I/O/Q not used), bad phase.
+  assert.ok("error" in _v499({ horsepower: Infinity, code_letter: "G", voltage_v: 460 }));
+  assert.ok("error" in _v499({ horsepower: 0, code_letter: "G", voltage_v: 460 }));
+  assert.ok("error" in _v499({ horsepower: 25, code_letter: "G", voltage_v: 0 }));
+  assert.ok("error" in _v499({ horsepower: 25, code_letter: "I", voltage_v: 460 })); // I is not a valid code letter
+  assert.ok("error" in _v499({ horsepower: 25, code_letter: "Z", voltage_v: 460 }));
+  assert.ok("error" in _v499({ horsepower: 25, code_letter: "G", voltage_v: 460, phase: 2 }));
+});
