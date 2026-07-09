@@ -112,6 +112,8 @@ const TOOL_MODULES = (() => {
     "feeder-tap-rule",
     // spec-v280 NEC 210.20/215.3 continuous-load OCPD
     "continuous-load-ocpd",
+    // spec-v493 NEC 445.13 generator output conductor at 115%
+    "generator-conductor-445",
   ]);
   // spec-v28 low-voltage / data / security cabling (own module; registered
   // under Group A pending the Group-Z maintainer signoff, per the spec's

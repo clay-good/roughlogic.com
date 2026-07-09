@@ -392,3 +392,66 @@ function _v280renderContinuousLoadOcpd(inputRegion, outputRegion, citationEl) {
   rated.select.addEventListener("change", update);
 }
 FEEDER_RENDERERS["continuous-load-ocpd"] = _v280renderContinuousLoadOcpd;
+
+// ===================== spec-v493: generator output conductor at 115% (NEC 445.13) =====================
+
+// dims: in { nameplate_current_a: I, gen_kw: M L^2 T^-3, voltage_v: M L^2 T^-3 I^-1, phase: dimensionless, power_factor: dimensionless, overload_limited: dimensionless } out: { nameplate_a: I, basis: dimensionless, required_ampacity_a: I }
+export function computeGeneratorConductor445({ nameplate_current_a = 0, gen_kw = 0, voltage_v = 0, phase = 3, power_factor = 0.8, overload_limited = false } = {}) {
+  const _g = _finiteGuard({ nameplate_current_a, gen_kw, voltage_v, power_factor }); if (_g) return _g;
+  const npIn = Number(nameplate_current_a) || 0;
+  const kw = Number(gen_kw) || 0;
+  const v = Number(voltage_v) || 0;
+  const ph = Number(phase) === 1 ? 1 : 3;
+  const pf = Number(power_factor) || 0;
+  let nameplate_a;
+  if (npIn > 0) {
+    nameplate_a = npIn;
+  } else {
+    if (!(kw > 0)) return { error: "Provide the nameplate current, or a positive generator kW to derive it." };
+    if (!(v > 0)) return { error: "Voltage must be positive (V) to derive the nameplate current." };
+    if (!(pf > 0 && pf <= 1)) return { error: "Power factor must be over 0 and at most 1." };
+    nameplate_a = ph === 3 ? kw * 1000 / (Math.sqrt(3) * v * pf) : kw * 1000 / (v * pf);
+  }
+  if (!(nameplate_a > 0)) return { error: "Nameplate current must be positive (A)." };
+  const basis = overload_limited ? 1.00 : 1.15;
+  const required_ampacity_a = basis * nameplate_a;
+  if (![nameplate_a, required_ampacity_a].every(Number.isFinite)) return { error: "Generator-conductor math is not a finite value." };
+  return {
+    nameplate_a, basis, required_ampacity_a,
+    note: "NEC 445.13(A): the ampacity of generator output conductors (from the generator to its first overcurrent device) is not less than 115% of the generator nameplate current -- the nameplate, not 125% of a computed load and not the connected running load. Where the generator's design (overload protection, or an inherently overload-limited machine) prevents the output from exceeding the nameplate, the conductors may be sized at 100% of nameplate (the 445.13(A) exception). The conductor still must satisfy the 110.14(C) termination-temperature limit and any 310.15 ambient/fill adjustment, and neutral, tap, and AHJ provisions govern. A design aid, not the engineer of record.",
+  };
+}
+export const generatorConductor445Example = { inputs: { nameplate_current_a: 0, gen_kw: 150, voltage_v: 480, phase: 3, power_factor: 0.8, overload_limited: false } };
+
+function _v493renderGeneratorConductor445(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 445.13(A) generator output conductors: required ampacity = 115% of the generator nameplate current (100% where the design prevents output above nameplate). The basis is the nameplate, not 125% of a computed load. The 110.14(C) termination limit and 310.15 adjustments still apply. A design aid; the AHJ governs.";
+  const np = _v26makeNumber("Nameplate current (A, 0 = derive from kW)", "gc4-np", { step: "any", min: "0" });
+  const kw = _v26makeNumber("Generator real power (kW, used if nameplate is 0)", "gc4-kw", { step: "any", min: "0" });
+  const v = _v26makeNumber("Voltage (V, line-to-line 3ph or line-to-neutral 1ph)", "gc4-v", { step: "any", min: "0" });
+  const ph = _v26makeSelect("Phase", "gc4-ph", [
+    { value: "3", label: "Three-phase", selected: true },
+    { value: "1", label: "Single-phase" },
+  ]);
+  const pf = _v26makeNumber("Power factor", "gc4-pf", { step: "any", min: "0", max: "1" }); pf.input.value = "0.8";
+  const ol = _v26makeSelect("Generator design", "gc4-ol", [
+    { value: "no", label: "Standard - 115% of nameplate", selected: true },
+    { value: "yes", label: "Overload-limited - 100% of nameplate" },
+  ]);
+  for (const f of [np, kw, v, ph, pf, ol]) inputRegion.appendChild(f.wrap);
+  _v26attachEx(inputRegion, () => { np.input.value = "0"; kw.input.value = "150"; v.input.value = "480"; ph.select.value = "3"; pf.input.value = "0.8"; ol.select.value = "no"; update(); });
+  const oNp = _v26makeOut(outputRegion, "Nameplate current", "gc4-out-np");
+  const oBasis = _v26makeOut(outputRegion, "Applied basis", "gc4-out-basis");
+  const oReq = _v26makeOut(outputRegion, "Required conductor ampacity", "gc4-out-req");
+  const oNote = _v26makeOut(outputRegion, "Note", "gc4-out-note");
+  const update = _v26debounce(() => {
+    const r = computeGeneratorConductor445({ nameplate_current_a: Number(np.input.value) || 0, gen_kw: Number(kw.input.value) || 0, voltage_v: Number(v.input.value) || 0, phase: Number(ph.select.value), power_factor: pf.input.value === "" ? 0.8 : Number(pf.input.value), overload_limited: ol.select.value === "yes" });
+    if (r.error) { oNp.textContent = r.error; oBasis.textContent = "-"; oReq.textContent = "-"; oNote.textContent = "-"; return; }
+    oNp.textContent = _v26fmt(r.nameplate_a, 1) + " A";
+    oBasis.textContent = _v26fmt(r.basis * 100, 0) + "% of nameplate";
+    oReq.textContent = _v26fmt(r.required_ampacity_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, _V26_DEB);
+  for (const f of [np, kw, v, pf]) f.input.addEventListener("input", update);
+  for (const f of [ph, ol]) f.select.addEventListener("change", update);
+}
+FEEDER_RENDERERS["generator-conductor-445"] = _v493renderGeneratorConductor445;

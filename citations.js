@@ -1071,6 +1071,18 @@ export const CITATIONS = {
       { name: "Surge tolerance", value: "30% voltage dip on starting (engineering practice)", source: "NEMA MG 1 by name" },
     ],
   },
+  "generator-conductor-445": {
+    formula: "nameplate = given, or kW x 1000 / (sqrt(3) x V x pf) three-phase, or kW x 1000 / (V x pf) single-phase; basis = overload_limited ? 1.00 : 1.15; required_ampacity = basis x nameplate.",
+    edition: "The generator output-conductor ampacity rule of NEC 2023 445.13(A) -- not less than 115% of the generator nameplate current, or 100% where the design prevents output above the nameplate -- by name. A computational aid; the AHJ-adopted NEC edition governs.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. The 115% basis is on the nameplate current, not 125% of a computed load; the 110.14(C) termination limit and 310.15 ambient/fill adjustment are stated as out of scope, not modeled.",
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Basis", value: "115% of the generator nameplate current for output conductors; 100% where the design prevents output above nameplate", source: "NEC 445.13(A)" },
+      { name: "Nameplate", value: "supplied directly, or derived from kW, voltage, phase, and power factor", source: "generator nameplate" },
+      { name: "Downstream", value: "the conductor still must satisfy the 110.14(C) termination limit and any 310.15 adjustment", source: "NEC 110.14(C) / 310.15" },
+    ],
+  },
   "pv-string-sizing": {
     formula: "Vmax = Voc(STC) × temperature correction at record-low ambient (NEC 690.7); current sizing 125% × Isc per NEC 690.8(A); OCP per NEC 690.9.",
     edition: NEC_2023 + " Article 690.",

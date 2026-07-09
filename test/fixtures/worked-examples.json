@@ -34690,6 +34690,74 @@
    }
   },
   {
+   "tile_id": "generator-conductor-445",
+   "source_publisher": "NEC 2023 445.13(A)",
+   "source_title": "150 kW, 480 V three-phase, 0.8 pf, standard 115% basis -> 225.6 A nameplate, 259.4 A required",
+   "source_edition_or_year": "spec-v493 worked example (machine-verified)",
+   "source_section_or_page": "spec-v493 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "nameplate_current_a": 0,
+    "gen_kw": 150,
+    "voltage_v": 480,
+    "phase": 3,
+    "power_factor": 0.8,
+    "overload_limited": false
+   },
+   "outputs": {
+    "nameplate_a": {
+     "value": 225.6,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "basis": {
+     "value": 1.15,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "required_ampacity_a": {
+     "value": 259.4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "generator-conductor-445",
+   "source_publisher": "NEC 2023 445.13(A) exception",
+   "source_title": "cross-check: an overload-limited design earns the 100% basis -> required ampacity equals the 225.6 A nameplate",
+   "source_edition_or_year": "spec-v493 worked example (machine-verified)",
+   "source_section_or_page": "spec-v493 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "nameplate_current_a": 0,
+    "gen_kw": 150,
+    "voltage_v": 480,
+    "phase": 3,
+    "power_factor": 0.8,
+    "overload_limited": true
+   },
+   "outputs": {
+    "basis": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "required_ampacity_a": {
+     "value": 225.6,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-ltb",
    "source_publisher": "AISC 360-22 Section F2 (AISC Manual W18x50 properties)",
    "source_title": "W18x50 A992 braced at 10 ft, Cb 1.0 -> inelastic zone, Mn 360.2 kip-ft (ASD 215.7)",

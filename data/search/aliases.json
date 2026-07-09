@@ -11109,6 +11109,41 @@
       "kind": "industry"
     },
     {
+      "term": "generator conductor",
+      "target": "generator-conductor-445",
+      "kind": "industry"
+    },
+    {
+      "term": "445.13",
+      "target": "generator-conductor-445",
+      "kind": "industry"
+    },
+    {
+      "term": "115 percent nameplate",
+      "target": "generator-conductor-445",
+      "kind": "industry"
+    },
+    {
+      "term": "generator output conductor",
+      "target": "generator-conductor-445",
+      "kind": "industry"
+    },
+    {
+      "term": "genset feeder",
+      "target": "generator-conductor-445",
+      "kind": "adjacent"
+    },
+    {
+      "term": "generator wire size",
+      "target": "generator-conductor-445",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nameplate current",
+      "target": "generator-conductor-445",
+      "kind": "adjacent"
+    },
+    {
       "term": "lateral torsional buckling",
       "target": "steel-beam-ltb",
       "kind": "industry"

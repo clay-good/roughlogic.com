@@ -448,6 +448,8 @@ const _TILES = [
   ["erv-sensible-recovery", "C"], ["mua-tempering-load", "C"], ["dcv-co2-ventilation", "C"],
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch
   ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["continuous-load-ocpd", "A"],
+  // spec-v493 NEC 445.13 generator output conductor at 115%
+  ["generator-conductor-445", "A"],
   // spec-v281..v283 steel members-and-connections depth batch
   ["steel-beam-ltb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"],
   // spec-v284..v286 reinforced-concrete member depth batch

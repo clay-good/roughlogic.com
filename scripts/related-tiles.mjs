@@ -1053,6 +1053,7 @@ const RELATED = {
   "motor-overload-sizing": ["motor-branch-protection","motor-fla","motor-feeder-multiple"],
   "service-conductor-sizing": ["service-load-standard","service-load-optional","ambient-ampacity-adjust"],
   "continuous-load-ocpd": ["service-conductor-sizing","commercial-lighting-load","wire-ampacity"],
+  "generator-conductor-445": ["generator-sizing","service-conductor-sizing","wire-ampacity"],
   // spec-v281..v283 steel members-and-connections depth batch (Group E)
   "steel-beam-ltb": ["steel-beam-flexure","steel-beam-shear","steel-column-capacity"],
   "steel-block-shear": ["steel-beam-shear","bolt-shear-bearing","steel-tension-member"],

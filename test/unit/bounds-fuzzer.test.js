@@ -17058,3 +17058,25 @@ test("bounds: spec-v492 computeEvDcfcTime pins the acceptance-limited power, the
   assert.ok("error" in _v492({ usable_capacity_kwh: 60, start_soc_pct: 80, target_soc_pct: 80, charger_power_kw: 150, acceptance_kw: 100 })); // target <= start
   assert.ok("error" in _v492({ usable_capacity_kwh: 60, start_soc_pct: 10, target_soc_pct: 120, charger_power_kw: 150, acceptance_kw: 100 })); // target > 100
 });
+
+import { computeGeneratorConductor445 as _v493 } from "../../calc-feeder.js";
+
+test("bounds: spec-v493 computeGeneratorConductor445 pins the 115% basis, the derive-from-kW path, the 100% exception, and error seams", () => {
+  const r = _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 480, phase: 3, power_factor: 0.8, overload_limited: false });
+  assert.ok(Math.abs(r.nameplate_a - 225.53) < 0.1); // 150000 / (sqrt(3) x 480 x 0.8)
+  assert.ok(Math.abs(r.basis - 1.15) < 1e-9);
+  assert.ok(Math.abs(r.required_ampacity_a - 1.15 * r.nameplate_a) < 1e-9);
+  assert.ok(Math.abs(r.required_ampacity_a - 259.36) < 0.2);
+  // A directly supplied nameplate governs over the kW path.
+  assert.ok(Math.abs(_v493({ nameplate_current_a: 225.6 }).required_ampacity_a - 1.15 * 225.6) < 1e-9);
+  // Single-phase derive: kW x 1000 / (V x pf).
+  assert.ok(Math.abs(_v493({ gen_kw: 10, voltage_v: 240, phase: 1, power_factor: 1 }).nameplate_a - 10000 / 240) < 1e-6);
+  // The overload-limited exception drops the basis to 1.00 (the full nameplate, no adder).
+  const ol = _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 480, phase: 3, power_factor: 0.8, overload_limited: true });
+  assert.ok(Math.abs(ol.basis - 1.0) < 1e-9 && Math.abs(ol.required_ampacity_a - ol.nameplate_a) < 1e-9 && ol.required_ampacity_a < r.required_ampacity_a);
+  // Error seams: non-finite, no nameplate and no kW, non-positive voltage, pf out of range.
+  assert.ok("error" in _v493({ nameplate_current_a: Infinity }));
+  assert.ok("error" in _v493({ nameplate_current_a: 0, gen_kw: 0 }));
+  assert.ok("error" in _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 0 }));
+  assert.ok("error" in _v493({ nameplate_current_a: 0, gen_kw: 150, voltage_v: 480, power_factor: 1.5 }));
+});
