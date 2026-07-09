@@ -35090,6 +35090,70 @@
    }
   },
   {
+   "tile_id": "reduced-voltage-starter",
+   "source_publisher": "reduced-voltage-starter current and torque (NEMA ICS 2)",
+   "source_title": "600 A LRA, autotransformer at 65% tap -> 390 A motor, 254 A line, 42.3% torque",
+   "source_edition_or_year": "spec-v522 worked example (machine-verified)",
+   "source_section_or_page": "spec-v522 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "across_line_lra_a": 600,
+    "across_line_lrt_pct": 100,
+    "starter_type": "autotransformer",
+    "tap_fraction": 0.65
+   },
+   "outputs": {
+    "motor_current_a": {
+     "value": 390,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "line_current_a": {
+     "value": 253.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "torque_pct": {
+     "value": 42.25,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reduced-voltage-starter",
+   "source_publisher": "reduced-voltage-starter current and torque (NEMA ICS 2)",
+   "source_title": "cross-check: wye-delta gives a fixed 1/3 -> 200 A on both motor and line, 33.3% torque",
+   "source_edition_or_year": "spec-v522 worked example (machine-verified)",
+   "source_section_or_page": "spec-v522 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "across_line_lra_a": 600,
+    "across_line_lrt_pct": 100,
+    "starter_type": "wye-delta",
+    "tap_fraction": 0.65
+   },
+   "outputs": {
+    "line_current_a": {
+     "value": 199.8,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "torque_pct": {
+     "value": 33.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "service-conductor-sizing",
    "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
    "source_title": "200 A copper dwelling service -> 166 A -> 2/0 Cu (Table 310.12)",

@@ -2179,6 +2179,7 @@ cross-check.
 | calc-motor.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
+| calc-motor.js | `computeReducedVoltageStarter` | `{ across_line_lra_a = 0, across_line_lrt_pct = 100, starter_type = "autotrans...` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchReinforcement` | `{ run_od_in = 0, run_wall_in = 0, run_treq_in = 0, branch_od_in = 0, branch_w...` | _ | _ | _ |
 | calc-pipefit.js | `computeBranchSaddleCutback` | `{ branch_od_in = 0, run_od_in = 0, stations = 6 } = {}` | _ | _ | _ |
 | calc-pipefit.js | `computeColdSpring` | `{ material = "steel", run_length_ft = 0, install_temp_f = 0, operating_temp_f...` | _ | _ | _ |
@@ -2633,7 +2634,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1219.
+Row count: 1220.
 
 <!-- END function-corpus-v14 -->
 
@@ -2714,7 +2715,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (128 tiles)
+### Group A Electrical (129 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2820,6 +2821,7 @@ per spec-v14 §13.1 second paragraph.
 | `pv-string-sizing` | Solar PV String Sizing | NFPA; Module 40 V Voc / 33 V Vmp / 0.3%/C at -10 C record low a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `raceway-expansion-fitting` | PVC Raceway Expansion Fitting | NEC Article 352.44 / Table 352.44 (by...; 100 ft PVC, dT 100 F -> 3.38e-5 * 1200 in * 100 = 4.056 i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `range-demand-220-55` | Household Range Demand Load (NEC Table 220.55 Col. C) | NEC 2023 (NFPA 70); 1 range Column C = 8 kW (not 12); demand 8 kW = 33.3 A at... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `reduced-voltage-starter` | Reduced-Voltage Starter Current and Torque | reduced-voltage-starter current and t...; spec-v522 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rooftop-temp-adder` | Rooftop Conduit Sunlight Ambient Adder (NEC 310.15(B)(2)) | NEC 2023 (NFPA 70); 95 F on the roof (<7/8 in) + 60 F adder = 155 F (~68 C) -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-conductor-sizing` | Dwelling Service/Feeder Conductor at 83% (NEC 310.12) | NEC 2023 310.12 / Table 310.16 (75 degC); spec-v279 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3794,6 +3796,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 975. Fixture-covered or reference-cadence: 975 / 975.
+Tile count: 976. Fixture-covered or reference-cadence: 976 / 976.
 
 <!-- END tile-index-v14 -->

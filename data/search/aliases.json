@@ -19914,6 +19914,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "reduced voltage starter",
+      "target": "reduced-voltage-starter",
+      "kind": "industry"
+    },
+    {
+      "term": "autotransformer starter",
+      "target": "reduced-voltage-starter",
+      "kind": "industry"
+    },
+    {
+      "term": "wye delta start",
+      "target": "reduced-voltage-starter",
+      "kind": "industry"
+    },
+    {
+      "term": "soft start current",
+      "target": "reduced-voltage-starter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tap squared line current",
+      "target": "reduced-voltage-starter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "starting torque voltage squared",
+      "target": "reduced-voltage-starter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rvss",
+      "target": "reduced-voltage-starter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "part winding start",
+      "target": "reduced-voltage-starter",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"

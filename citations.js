@@ -8674,6 +8674,18 @@ export const CITATIONS = {
       { name: "Minimum pressure", value: "the reduced setpoint must still serve the tools after system pressure drop", source: "compressed-air best practice" },
     ],
   },
+  "reduced-voltage-starter": {
+    formula: "autotransformer: motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT. wye-delta: 0.333x on current and torque. solid-state/reactor: motor = line = tap x LRA, torque = tap^2 x LRT.",
+    edition: "Reduced-voltage-starter current and torque relations (NEMA ICS 2; torque proportional to voltage squared), by name; the motor speed-torque curve and the load govern.",
+    freeAccess: "The reduced-voltage current and torque relations are published in NEMA ICS 2 and standard motor references; the across-the-line LRA and torque come from the motor data.",
+    governance: GOVERNANCE.general,
+    editionNote: "Reduced-voltage-starter current and torque model. Torque falls with the SQUARE of the applied voltage, so too deep a reduction stalls the start. For an autotransformer, motor_current = tap x LRA, line_current = tap^2 x LRA, and torque = tap^2 x LRT -- the LINE current is the tap SQUARED (not the tap) because the autotransformer trades voltage for current, so at a 65% tap the motor sees 65% current while the line sees 42%. Wye-delta gives a fixed one-third of current and torque; a solid-state or reactor start at a voltage fraction draws that fraction of LRA on both motor and line with the fraction squared of torque. A design aid, not the engineer of record; the motor speed-torque curve and the load govern.",
+    assumptions: [
+      { name: "Torque ~ V^2", value: "starting torque falls with the square of the applied voltage", source: "NEMA ICS 2" },
+      { name: "Autotransformer line current", value: "line current = tap^2 x LRA, not tap x LRA, because it trades voltage for current", source: "autotransformer action" },
+      { name: "Wye-delta", value: "fixed one-third of current and torque", source: "wye-delta connection" },
+    ],
+  },
   "motor-fault-contribution": {
     formula: "contribution = motor_fla / x_subtransient_pu; total = utility_fault + contribution; multiple = 1 / x_subtransient_pu.",
     edition: "First-cycle motor short-circuit contribution (IEEE C37.13 / IEEE 141), first-principles, by name; a full short-circuit study governs.",

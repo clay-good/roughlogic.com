@@ -363,3 +363,68 @@ function renderMotorFaultContribution(inputRegion, outputRegion, citationEl) {
   for (const f of [fla, xd, util]) f.input.addEventListener("input", update);
 }
 MOTOR_RENDERERS["motor-fault-contribution"] = renderMotorFaultContribution;
+
+// ===================== spec-v522: reduced-voltage starter current and torque =====================
+// dims: in { across_line_lra_a: I, across_line_lrt_pct: dimensionless, starter_type: dimensionless, tap_fraction: dimensionless } out: { motor_current_a: I, line_current_a: I, torque_pct: dimensionless }
+export function computeReducedVoltageStarter({ across_line_lra_a = 0, across_line_lrt_pct = 100, starter_type = "autotransformer", tap_fraction = 0.65 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const lra = Number(across_line_lra_a) || 0;
+  const lrt = Number(across_line_lrt_pct) || 0;
+  const type = String(starter_type);
+  const tap = Number(tap_fraction) || 0;
+  if (!(lra > 0)) return { error: "Across-the-line LRA must be positive (A)." };
+  if (lrt < 0) return { error: "Across-the-line torque basis cannot be negative (%)." };
+  if (type !== "autotransformer" && type !== "wye-delta" && type !== "solid-state") return { error: "Starter type must be autotransformer, wye-delta, or solid-state." };
+  let motor_current_a, line_current_a, torque_pct;
+  if (type === "wye-delta") {
+    motor_current_a = 0.333 * lra;
+    line_current_a = 0.333 * lra;
+    torque_pct = 0.333 * lrt;
+  } else {
+    if (!(tap > 0 && tap <= 1)) return { error: "Tap / voltage fraction must be over 0 and at most 1." };
+    if (type === "autotransformer") {
+      motor_current_a = tap * lra;
+      line_current_a = tap * tap * lra;
+      torque_pct = tap * tap * lrt;
+    } else { // solid-state / reactor
+      motor_current_a = tap * lra;
+      line_current_a = tap * lra;
+      torque_pct = tap * tap * lrt;
+    }
+  }
+  if (![motor_current_a, line_current_a, torque_pct].every(Number.isFinite)) return { error: "Reduced-voltage-starter math is not a finite value." };
+  return {
+    motor_current_a, line_current_a, torque_pct, starter_type: type,
+    note: "Reduced-voltage-starter current and torque (NEMA ICS 2; torque proportional to voltage squared). Torque falls with the SQUARE of the applied voltage, so a 65% voltage delivers only 42% of locked-rotor torque -- reduce the inrush too far and the motor will not break the load away. The catch that trips techs: an AUTOTRANSFORMER draws a LINE current of the tap SQUARED times the across-the-line value (not the tap), because it trades voltage for current -- at a 65% tap the motor sees 65% current but the line sees only 42%. That squared line-current cut is why an autotransformer beats a reactor or solid-state start at equal reduced voltage. Wye-delta gives a fixed one-third of current and torque. A design aid, not the engineer of record; the motor speed-torque curve and the load govern.",
+  };
+}
+export const reducedVoltageStarterExample = { inputs: { across_line_lra_a: 600, across_line_lrt_pct: 100, starter_type: "autotransformer", tap_fraction: 0.65 } };
+function renderReducedVoltageStarter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: reduced-voltage-starter current and torque (NEMA ICS 2; torque ~ voltage^2): autotransformer motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT; wye-delta = 0.333x on current and torque; solid-state/reactor = tap x LRA on both with tap^2 x LRT. An autotransformer's line current is the tap squared. A design aid; the motor speed-torque curve and the load govern.";
+  const lra = makeNumber("Across-the-line LRA (A)", "rvs-lra", { step: "any", min: "0" }); lra.input.value = "600";
+  const lrt = makeNumber("Across-the-line torque basis (%)", "rvs-lrt", { step: "any", min: "0" }); lrt.input.value = "100";
+  const type = makeSelect("Starter type", "rvs-type", [
+    { value: "autotransformer", label: "Autotransformer (line = tap^2)", selected: true },
+    { value: "wye-delta", label: "Wye-delta (fixed 1/3)" },
+    { value: "solid-state", label: "Solid-state / reactor (line = tap)" },
+  ]);
+  const tap = makeNumber("Tap / voltage fraction (e.g. 0.65)", "rvs-tap", { step: "any", min: "0", max: "1" }); tap.input.value = "0.65";
+  for (const f of [lra, lrt, type, tap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lra.input.value = "600"; lrt.input.value = "100"; type.select.value = "autotransformer"; tap.input.value = "0.65"; update(); });
+  const oM = makeOutputLine(outputRegion, "Motor current", "rvs-out-m");
+  const oL = makeOutputLine(outputRegion, "Line current", "rvs-out-l");
+  const oT = makeOutputLine(outputRegion, "Starting torque", "rvs-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "rvs-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeReducedVoltageStarter({ across_line_lra_a: readNum(lra.input), across_line_lrt_pct: lrt.input.value === "" ? 100 : readNum(lrt.input), starter_type: type.select.value, tap_fraction: tap.input.value === "" ? 0.65 : readNum(tap.input) });
+    if (r.error) { oM.textContent = r.error; oL.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
+    oM.textContent = fmt(r.motor_current_a, 0) + " A";
+    oL.textContent = fmt(r.line_current_a, 0) + " A";
+    oT.textContent = fmt(r.torque_pct, 1) + "% of locked-rotor torque";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [lra, lrt, tap]) f.input.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+MOTOR_RENDERERS["reduced-voltage-starter"] = renderReducedVoltageStarter;

@@ -17691,3 +17691,25 @@ test("bounds: spec-v521 computeMotorFaultContribution pins the FLA/reactance con
   assert.ok("error" in _v521({ motor_fla_a: 500, x_subtransient_pu: 1.5, utility_fault_a: 22000 }));
   assert.ok("error" in _v521({ motor_fla_a: 500, x_subtransient_pu: 0.167, utility_fault_a: -1 }));
 });
+
+import { computeReducedVoltageStarter as _v522 } from "../../calc-motor.js";
+
+test("bounds: spec-v522 computeReducedVoltageStarter pins the tap-squared line current, wye-delta, solid-state, and error seams", () => {
+  const a = _v522({ across_line_lra_a: 600, across_line_lrt_pct: 100, starter_type: "autotransformer", tap_fraction: 0.65 });
+  assert.ok(Math.abs(a.motor_current_a - 390) < 0.5); // tap x LRA
+  assert.ok(Math.abs(a.line_current_a - 253.5) < 0.5); // tap^2 x LRA -- the line is tap SQUARED
+  assert.ok(Math.abs(a.torque_pct - 42.25) < 0.1);
+  assert.ok(a.line_current_a < a.motor_current_a); // autotransformer pulls less line than motor current
+  // Wye-delta is a fixed one-third on both current and torque.
+  const w = _v522({ across_line_lra_a: 600, starter_type: "wye-delta" });
+  assert.ok(Math.abs(w.motor_current_a - w.line_current_a) < 1e-9 && Math.abs(w.line_current_a - 199.8) < 0.5 && Math.abs(w.torque_pct - 33.3) < 0.1);
+  // Solid-state: motor and line currents equal (no squared line reduction), same torque as the autotransformer.
+  const s = _v522({ across_line_lra_a: 600, starter_type: "solid-state", tap_fraction: 0.65 });
+  assert.ok(Math.abs(s.line_current_a - s.motor_current_a) < 1e-9 && s.line_current_a > a.line_current_a && Math.abs(s.torque_pct - a.torque_pct) < 1e-9);
+  // Error seams: non-finite, non-positive LRA, bad type, autotransformer tap out of range.
+  assert.ok("error" in _v522({ across_line_lra_a: Infinity, starter_type: "autotransformer", tap_fraction: 0.65 }));
+  assert.ok("error" in _v522({ across_line_lra_a: 0, starter_type: "autotransformer", tap_fraction: 0.65 }));
+  assert.ok("error" in _v522({ across_line_lra_a: 600, starter_type: "part-winding", tap_fraction: 0.65 }));
+  assert.ok("error" in _v522({ across_line_lra_a: 600, starter_type: "autotransformer", tap_fraction: 0 }));
+  assert.ok("error" in _v522({ across_line_lra_a: 600, starter_type: "autotransformer", tap_fraction: 1.5 }));
+});

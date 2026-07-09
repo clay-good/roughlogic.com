@@ -183,6 +183,7 @@ const RELATED = {
   "motor-fla": ["wire-ampacity", "breaker-sizing", "three-phase", "voltage-imbalance"],
   "motor-locked-rotor-kva": ["motor-fla", "generator-motor-starting", "motor-vd-starting"],
   "motor-fault-contribution": ["short-circuit-pp", "motor-fla", "asymmetrical-fault-xr"],
+  "reduced-voltage-starter": ["motor-locked-rotor-kva", "motor-vd-starting", "generator-motor-starting"],
   "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   "buck-boost-sizing": ["transformer-kva-sizing", "transformer-conductor-protection", "three-phase"],
