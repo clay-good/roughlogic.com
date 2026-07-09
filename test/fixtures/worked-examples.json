@@ -27472,6 +27472,80 @@
    }
   },
   {
+   "tile_id": "press-fit-pressure",
+   "source_publisher": "Lame interference-fit model (Machinery's Handbook Forces and Fits)",
+   "source_title": "2 in shaft, 0.002 in interference, 4 in hub, steel, mu 0.12, 3 in -> 11,250 psi, 25,447 lb, 18,750 psi bore",
+   "source_edition_or_year": "spec-v511 worked example (machine-verified)",
+   "source_section_or_page": "spec-v511 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "shaft_dia_in": 2,
+    "interference_in": 0.002,
+    "hub_od_in": 4,
+    "modulus_psi": 30000000,
+    "friction_coeff": 0.12,
+    "engagement_in": 3
+   },
+   "outputs": {
+    "p_psi": {
+     "value": 11250,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "holding_lb": {
+     "value": 25447,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "hub_stress_psi": {
+     "value": 18750,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "press-fit-pressure",
+   "source_publisher": "Lame interference-fit model (Machinery's Handbook Forces and Fits)",
+   "source_title": "cross-check: a thin 2.5 in hub grips far less -> 5,400 psi, 12,215 lb, and a higher 24,600 psi bore stress",
+   "source_edition_or_year": "spec-v511 worked example (machine-verified)",
+   "source_section_or_page": "spec-v511 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "shaft_dia_in": 2,
+    "interference_in": 0.002,
+    "hub_od_in": 2.5,
+    "modulus_psi": 30000000,
+    "friction_coeff": 0.12,
+    "engagement_in": 3
+   },
+   "outputs": {
+    "p_psi": {
+     "value": 5400,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "holding_lb": {
+     "value": 12215,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "hub_stress_psi": {
+     "value": 24600,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cutting_hp = MRR x unit power; motor_hp = cutting_hp / eff; torque = 5252 x cutting_hp / rpm",

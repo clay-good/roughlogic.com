@@ -6719,6 +6719,18 @@ export const CITATIONS = {
     ],
   },
 
+  "press-fit-pressure": {
+    formula: "p = (E x interference / D) x (Do^2 - D^2) / (2 Do^2); holding_force = p x pi x D x length x friction; hub_bore_stress = p x (Do^2 + D^2) / (Do^2 - D^2).",
+    edition: "Lame interference-fit model (Machinery's Handbook 'Forces and Fits'; the Lame thick-cylinder equations, same-material solid shaft), by name; the actual materials, surface finish, and assembly method govern.",
+    freeAccess: "The Lame thick-cylinder press-fit relations are published in standard machine-design references; the interference and modulus come from the fit and the material.",
+    governance: GOVERNANCE.general,
+    editionNote: "Lame interference-fit model (same-material solid shaft). The diametral interference produces a contact pressure p = (E x interference / D) x (Do^2 - D^2) / (2 Do^2), an axial holding force = p x pi x D x length x friction, and a tangential (hoop) stress at the hub bore = p x (Do^2 + D^2) / (Do^2 - D^2). A thin hub (Do close to D) develops far less pressure for the same interference, so the holding force falls as the hub thins. The interference also raises a tangential stress at the hub bore that must stay below yield or the hub cracks. The model assumes elastic same-material parts and a solid shaft; a hollow shaft or dissimilar metals change the coefficients. A design aid, not the engineer of record; the actual materials, surface finish, and assembly method govern.",
+    assumptions: [
+      { name: "Thin hub", value: "a hub OD close to the shaft develops far less contact pressure for the same interference", source: "Lame thick-cylinder" },
+      { name: "Hub stress", value: "the interference raises a hoop stress at the hub bore that must stay below yield", source: "Lame thick-cylinder" },
+      { name: "Same material solid shaft", value: "assumes elastic same-material parts and a solid shaft; hollow or dissimilar changes the coefficients", source: "scope of this tile" },
+    ],
+  },
   "countersink-depth": {
     formula: "Z = (D_cs - d_hole) / (2 x tan(angle/2)); Z_full = D_cs / (2 x tan(angle/2)).",
     edition: "Countersink diameter-to-depth relation (Machinery's Handbook countersinking; 82 deg inch and 90 deg metric flat-head standards), first-principles trigonometry, by name; the tool geometry and the fastener callout govern.",

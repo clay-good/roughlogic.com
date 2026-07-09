@@ -890,3 +890,55 @@ function _v400renderConeFlatPattern(inputRegion, outputRegion, citationEl) {
   for (const f of [r, h]) f.input.addEventListener("input", update);
 }
 SHOP_RENDERERS["cone-flat-pattern"] = _v400renderConeFlatPattern;
+
+// ===================== spec-v511: interference press-fit pressure and holding force (Lame) =====================
+// dims: in { shaft_dia_in: L, interference_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L } out: { p_psi: M L^-1 T^-2, holding_lb: M L T^-2, hub_stress_psi: M L^-1 T^-2 }
+export function computePressFitPressure({ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(shaft_dia_in) || 0;
+  const i = Number(interference_in) || 0;
+  const dout = Number(hub_od_in) || 0;
+  const e = Number(modulus_psi) || 0;
+  const mu = Number(friction_coeff) || 0;
+  const len = Number(engagement_in) || 0;
+  if (!(d > 0)) return { error: "Shaft diameter must be positive (in)." };
+  if (!(i > 0)) return { error: "Interference must be positive (in)." };
+  if (!(e > 0)) return { error: "Elastic modulus must be positive (psi)." };
+  if (!(len > 0)) return { error: "Engagement length must be positive (in)." };
+  if (!(dout > d)) return { error: "Hub outer diameter must exceed the shaft diameter (in)." };
+  if (mu < 0) return { error: "Friction coefficient cannot be negative." };
+  const p_psi = (e * i / d) * (dout * dout - d * d) / (2 * dout * dout);
+  const holding_lb = p_psi * Math.PI * d * len * mu;
+  const hub_stress_psi = p_psi * (dout * dout + d * d) / (dout * dout - d * d);
+  if (![p_psi, holding_lb, hub_stress_psi].every(Number.isFinite)) return { error: "Press-fit math is not a finite value." };
+  return {
+    p_psi, holding_lb, hub_stress_psi,
+    note: "Lame interference-fit model (same-material solid shaft): the diametral interference produces a contact pressure p = (E x interference / D) x (Do^2 - D^2) / (2 Do^2), an axial holding force = p x pi x D x length x friction, and a tangential (hoop) stress at the hub bore = p x (Do^2 + D^2) / (Do^2 - D^2). A THIN hub (Do close to D) develops far less pressure for the same interference, so the holding force collapses as the hub thins. The same interference that holds the shaft also stresses the hub bore, and too much interference yields or bursts the hub -- the failure that turns a press job into scrap, so keep the bore stress below yield. The model assumes elastic same-material parts and a solid shaft; a hollow shaft or dissimilar metals change the coefficients. A design aid, not the engineer of record; the actual materials, surface finish, and assembly method govern.",
+  };
+}
+export const pressFitPressureExample = { inputs: { shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3 } };
+function _v511renderPressFitPressure(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Lame interference-fit relations (Machinery's Handbook 'Forces and Fits'; Lame thick-cylinder equations, same-material solid shaft): p = (E x interference / D) x (Do^2 - D^2)/(2 Do^2); holding force = p x pi x D x length x friction; hub bore stress = p x (Do^2 + D^2)/(Do^2 - D^2). A design aid; the materials, surface finish, and assembly method govern.";
+  const d = makeNumber("Interface diameter D (in)", "pfp-d", { step: "any", min: "0" }); d.input.value = "2";
+  const i = makeNumber("Diametral interference (in)", "pfp-i", { step: "any", min: "0" }); i.input.value = "0.002";
+  const dout = makeNumber("Hub outer diameter Do (in)", "pfp-do", { step: "any", min: "0" }); dout.input.value = "4";
+  const e = makeNumber("Elastic modulus E (psi, steel ~30e6)", "pfp-e", { step: "any", min: "0" }); e.input.value = "30000000";
+  const mu = makeNumber("Friction coefficient (~0.12 dry steel)", "pfp-mu", { step: "any", min: "0" }); mu.input.value = "0.12";
+  const len = makeNumber("Engagement length L (in)", "pfp-l", { step: "any", min: "0" }); len.input.value = "3";
+  for (const f of [d, i, dout, e, mu, len]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "2"; i.input.value = "0.002"; dout.input.value = "4"; e.input.value = "30000000"; mu.input.value = "0.12"; len.input.value = "3"; update(); });
+  const oP = makeOutputLine(outputRegion, "Contact pressure", "pfp-out-p");
+  const oH = makeOutputLine(outputRegion, "Axial holding force", "pfp-out-h");
+  const oS = makeOutputLine(outputRegion, "Hub bore (hoop) stress", "pfp-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "pfp-out-n");
+  const update = debounce(() => {
+    const r = computePressFitPressure({ shaft_dia_in: _readNum(d.input), interference_in: _readNum(i.input), hub_od_in: _readNum(dout.input), modulus_psi: _readNum(e.input), friction_coeff: _readNum(mu.input), engagement_in: _readNum(len.input) });
+    if (r.error) { oP.textContent = r.error; oH.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oP.textContent = fmt(r.p_psi, 0) + " psi";
+    oH.textContent = fmt(r.holding_lb, 0) + " lb";
+    oS.textContent = fmt(r.hub_stress_psi, 0) + " psi (keep below hub yield)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, i, dout, e, mu, len]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["press-fit-pressure"] = _v511renderPressFitPressure;

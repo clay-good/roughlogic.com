@@ -479,6 +479,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "press fit pressure",
+      "target": "press-fit-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "interference fit force",
+      "target": "press-fit-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "lame equations",
+      "target": "press-fit-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "holding force press fit",
+      "target": "press-fit-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shrink fit holding",
+      "target": "press-fit-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hub bore stress",
+      "target": "press-fit-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "forces and fits",
+      "target": "press-fit-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "interference contact pressure",
+      "target": "press-fit-pressure",
+      "kind": "adjacent"
+    },
+    {
       "term": "bolt proof load",
       "target": "bolt-proof-load",
       "kind": "industry"

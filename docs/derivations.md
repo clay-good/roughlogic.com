@@ -2456,6 +2456,7 @@ cross-check.
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
+| calc-shop.js | `computePressFitPressure` | `{ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, f...` | _ | _ | _ |
 | calc-shop.js | `computePunchForce` | `{ shape = "round", diameter_in = 0, side_a_in = 0, side_b_in = 0, perimeter_i...` | _ | _ | _ |
 | calc-shop.js | `computeRolledBlank` | `{ reference = "od", diameter_in = 0, thickness_in = 0, k_factor = 0.5 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeTapDrillSize` | `{ thread_standard = "inch", major_dia_in = 0, tpi = 0, pitch_mm = 0, thread_p...` | _ | _ | _ |
@@ -2622,7 +2623,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1208.
+Row count: 1209.
 
 <!-- END function-corpus-v14 -->
 
@@ -3342,7 +3343,7 @@ per spec-v14 §13.1 second paragraph.
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (55 tiles)
+### Group G Cross-trade (56 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3377,6 +3378,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-spacing-rack` | Insulated Pipe Rack Spacing | ASTM C585 + first-principles geometry...; 2.375 in OD + 1 in insulation -> 4.375 in insulated OD; +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pipe-template-wrap` | Pipe Wraparound Template Ordinates | NCCER Pipefitting / standard layout r...; 45 deg cut on 6.625 in OD, 8 stations -> max ordinate 6.6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `polygon-miter` | Regular Polygon Miter and Layout | First-principles regular-polygon geom...; regular hexagon, side 12 in -> 30 deg miter, 120 deg inte... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `press-fit-pressure` | Interference Press-Fit Pressure and Holding Force (Lame) | Lame interference-fit model (Machiner...; spec-v511 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `punch-force` | Punch / Shear Force | First-principles shear + Machinery's ...; round 0.5 in hole, T 0.25 in, tau 50,000 psi -> 19,634.95... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3772,6 +3774,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 964. Fixture-covered or reference-cadence: 964 / 964.
+Tile count: 965. Fixture-covered or reference-cadence: 965 / 965.
 
 <!-- END tile-index-v14 -->

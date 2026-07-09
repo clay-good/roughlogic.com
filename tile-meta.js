@@ -375,6 +375,8 @@ const _TILES = [
   // v54 compound miter for crown molding (calc-shop.js; Group E carpentry)
   ["compound-miter", "E"],
   ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["spur-gear-geometry", "K"],
+  // spec-v511 interference press-fit pressure and holding force
+  ["press-fit-pressure", "G"],
   // spec-v504 rolling-bearing L10 rating life (ISO 281)
   ["bearing-l10-life", "K"],
   // spec-v509 countersink diameter and cutting depth

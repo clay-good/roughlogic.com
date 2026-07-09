@@ -17455,3 +17455,26 @@ test("bounds: spec-v510 computeWheelOffsetBackspacing pins the offset->backspaci
   assert.ok("error" in _v510({ rim_width_in: Infinity, offset_mm: 45 }));
   assert.ok("error" in _v510({ rim_width_in: 0, offset_mm: 45 }));
 });
+
+import { computePressFitPressure as _v511 } from "../../calc-shop.js";
+
+test("bounds: spec-v511 computePressFitPressure pins the Lame pressure, the thin-hub collapse, the hub stress, and error seams", () => {
+  const r = _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3 });
+  assert.ok(Math.abs(r.p_psi - 11250) < 1);
+  assert.ok(Math.abs(r.holding_lb - 25447) < 2);
+  assert.ok(Math.abs(r.hub_stress_psi - 18750) < 1);
+  // A thin hub develops far less pressure and holding force, but a higher bore stress.
+  const thin = _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 2.5, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3 });
+  assert.ok(thin.p_psi < r.p_psi && thin.holding_lb < r.holding_lb / 2 * 1.01 && thin.hub_stress_psi > r.hub_stress_psi);
+  assert.ok(Math.abs(thin.p_psi - 5400) < 1 && Math.abs(thin.holding_lb - 12215) < 2);
+  // Holding force scales linearly with engagement length and friction.
+  assert.ok(Math.abs(_v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 6 }).holding_lb - 2 * r.holding_lb) < 1e-3);
+  // Error seams: non-finite, non-positive diameter/interference/modulus/length, hub OD <= shaft, negative friction.
+  assert.ok("error" in _v511({ shaft_dia_in: Infinity, interference_in: 0.002, hub_od_in: 4, engagement_in: 3 }));
+  assert.ok("error" in _v511({ shaft_dia_in: 0, interference_in: 0.002, hub_od_in: 4, engagement_in: 3 }));
+  assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0, hub_od_in: 4, engagement_in: 3 }));
+  assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, modulus_psi: 0, engagement_in: 3 }));
+  assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, engagement_in: 0 }));
+  assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 2, engagement_in: 3 })); // hub OD <= shaft
+  assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, friction_coeff: -0.1, engagement_in: 3 }));
+});

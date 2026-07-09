@@ -707,6 +707,8 @@ const TOOL_MODULES = (() => {
     "compound-miter",
     // spec-v399..v400 fabrication shop-math
     "tolerance-stack-rss", "cone-flat-pattern",
+    // spec-v511 interference press-fit pressure and holding force
+    "press-fit-pressure",
   ]);
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
