@@ -18994,6 +18994,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "crouch formula",
+      "target": "crouch-planing-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "planing speed",
+      "target": "crouch-planing-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "boat top speed",
+      "target": "crouch-planing-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "power to weight boat",
+      "target": "crouch-planing-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hull constant",
+      "target": "crouch-planing-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "planing hull speed",
+      "target": "crouch-planing-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "speed from horsepower",
+      "target": "crouch-planing-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "runabout speed",
+      "target": "crouch-planing-speed",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

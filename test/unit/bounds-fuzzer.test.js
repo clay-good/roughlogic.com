@@ -17380,3 +17380,21 @@ test("bounds: spec-v506 computeTurboPressureRatio pins the gauge-to-absolute PR,
   assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 0 }));
   assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 120 }));
 });
+
+import { computeCrouchPlaningSpeed as _v507 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v507 computeCrouchPlaningSpeed pins the Crouch speed, the sqrt(2) power return, and error seams", () => {
+  const r = _v507({ displacement_lb: 6000, shaft_hp: 200, hull_constant: 190 });
+  assert.ok(Math.abs(r.speed_mph - 34.69) < 0.1); // 190 / sqrt(30)
+  assert.ok(Math.abs(r.weight_to_power - 30) < 1e-9);
+  // Doubling the power gains sqrt(2) = 41% more speed, not double.
+  const dbl = _v507({ displacement_lb: 6000, shaft_hp: 400, hull_constant: 190 });
+  assert.ok(Math.abs(dbl.speed_mph - 49.07) < 0.1 && Math.abs(dbl.speed_mph / r.speed_mph - Math.SQRT2) < 1e-6);
+  // A higher hull constant scales the speed linearly.
+  assert.ok(Math.abs(_v507({ displacement_lb: 6000, shaft_hp: 200, hull_constant: 210 }).speed_mph - r.speed_mph * 210 / 190) < 1e-6);
+  // Error seams: non-finite, non-positive displacement/hp/hull constant.
+  assert.ok("error" in _v507({ displacement_lb: Infinity, shaft_hp: 200, hull_constant: 190 }));
+  assert.ok("error" in _v507({ displacement_lb: 0, shaft_hp: 200, hull_constant: 190 }));
+  assert.ok("error" in _v507({ displacement_lb: 6000, shaft_hp: 0, hull_constant: 190 }));
+  assert.ok("error" in _v507({ displacement_lb: 6000, shaft_hp: 200, hull_constant: 0 }));
+});

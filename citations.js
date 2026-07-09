@@ -7676,6 +7676,18 @@ export const CITATIONS = {
       { name: "Curve governs", value: "the alternator's actual output-vs-RPM curve and the real duty cycle govern", source: "scope of this tile" },
     ],
   },
+  "crouch-planing-speed": {
+    formula: "speed_mph = C / sqrt(weight_lb / hp), with the hull constant C ~150 heavy cruiser / ~190 runabout / ~210 race.",
+    edition: "Crouch's planing-speed formula (naval-architecture back-of-envelope for planing top speed), by name; the actual hull, propeller, and conditions govern.",
+    freeAccess: "Crouch's formula is a published naval-architecture estimate; the displacement, horsepower, and hull constant come from the boat and its class.",
+    governance: GOVERNANCE.general,
+    editionNote: "Crouch's planing-speed formula. speed_mph = C / sqrt(weight / hp). The result is MILES PER HOUR, not knots, for the conventional hull constant C. Speed rises only with the square root of the power-to-weight ratio, so doubling the horsepower (or halving the weight) buys about 41% more speed, not double. The hull constant C (about 150 heavy cruiser, 190 runabout, 210 race) is chosen by hull type and dominates the estimate. The formula assumes the boat is already on plane; below the planing threshold it does not apply -- use the displacement hull speed. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+    assumptions: [
+      { name: "Units", value: "the result is mph, not knots; do not compare directly to a displacement hull speed in knots", source: "Crouch's formula convention" },
+      { name: "Square-root return", value: "speed scales with sqrt(hp/weight), so doubling power gains about 41%", source: "Crouch's formula" },
+      { name: "Hull constant", value: "C ~150 heavy cruiser, ~190 runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
+    ],
+  },
   "turbo-pressure-ratio": {
     formula: "PR = (ambient_psia + boost_psi) / ambient_psia; T_out = T_in x [1 + (PR^0.283 - 1) / (efficiency/100)] with temperatures absolute (Rankine); temp_rise = T_out - T_in.",
     edition: "Turbocharger pressure-ratio and charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression with gamma = 1.4), first-principles, by name; the compressor map and the engine build govern.",

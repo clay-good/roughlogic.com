@@ -885,6 +885,7 @@ const RELATED = {
   "hull-speed": ["prop-slip","prop-pitch-selection","fuel-range"],
   "anchor-rode-scope": ["hull-speed","prop-slip","wire-rope-strength"],
   "turbo-pressure-ratio": ["volumetric-efficiency","density-altitude","air-density-correction"],
+  "crouch-planing-speed": ["hull-speed","prop-pitch-selection","prop-slip"],
   "cutting-fluid-concentration": ["cutting-speed-rpm","dilution","paint-mix-ratio"],
   "pull-box-sizing": ["box-fill","conduit-fill","cable-tray-fill"],
   "lumen-method": ["lighting-density","lux-to-footcandle","service-load"],

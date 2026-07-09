@@ -44474,6 +44474,50 @@
    }
   },
   {
+   "tile_id": "crouch-planing-speed",
+   "source_publisher": "Crouch's planing-speed formula",
+   "source_title": "6,000 lb runabout, 200 hp, C = 190 -> 34.7 mph",
+   "source_edition_or_year": "spec-v507 worked example (machine-verified)",
+   "source_section_or_page": "spec-v507 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "displacement_lb": 6000,
+    "shaft_hp": 200,
+    "hull_constant": 190
+   },
+   "outputs": {
+    "speed_mph": {
+     "value": 34.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crouch-planing-speed",
+   "source_publisher": "Crouch's planing-speed formula",
+   "source_title": "cross-check: double the power to 400 hp -> only 49.1 mph (sqrt(2) = 41% more, not double)",
+   "source_edition_or_year": "spec-v507 worked example (machine-verified)",
+   "source_section_or_page": "spec-v507 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "displacement_lb": 6000,
+    "shaft_hp": 400,
+    "hull_constant": 190
+   },
+   "outputs": {
+    "speed_mph": {
+     "value": 49.1,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

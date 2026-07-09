@@ -757,6 +757,8 @@ const TOOL_MODULES = (() => {
     "anchor-rode-scope",
     // spec-v506 turbocharger pressure ratio and charge-air temp
     "turbo-pressure-ratio",
+    // spec-v507 Crouch planing-speed estimate
+    "crouch-planing-speed",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

@@ -527,6 +527,8 @@ const _TILES = [
   ["anchor-rode-scope", "K"],
   // spec-v506 turbocharger pressure ratio and charge-air temp
   ["turbo-pressure-ratio", "K"],
+  // spec-v507 Crouch planing-speed estimate
+  ["crouch-planing-speed", "K"],
   ["cutting-fluid-concentration", "K"],
   ["pull-box-sizing", "A"],
   ["lumen-method", "A"],
