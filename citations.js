@@ -1942,6 +1942,19 @@ export const CITATIONS = {
     ],
   },
 
+  "ev-charge-cost": {
+    formula: "energy_to_battery = capacity x (target - start)/100; grid_energy = energy_to_battery / (efficiency/100); cost = grid_energy x rate; cost_per_stored_kwh = rate / (efficiency/100); cost_per_mile = miles_per_kwh > 0 ? cost / (energy_to_battery x miles_per_kwh) : null.",
+    edition: "EV charge-cost-at-the-meter model (energy metered = energy stored / charging efficiency), first-principles; the local tariff and the vehicle's charging behavior govern the actual bill.",
+    freeAccess: "Cost = metered energy x rate is first-principles; the efficiency haircut (grid draws more than the pack stores) is inherent to AC charging losses, and the rate comes from the local tariff.",
+    governance: GOVERNANCE.general,
+    editionNote: "EV charge-cost-at-the-meter model. You pay for kWh at the meter, not at the battery: energy_to_battery = capacity x (target - start), grid_energy = energy_to_battery / efficiency, cost = grid_energy x rate, and cost_per_stored_kwh = rate / efficiency. The utility meter draws more kWh than the battery stores because AC Level 2 charging loses about 10-15% to the onboard rectifier and thermal load, so pricing the battery energy alone under-counts the bill. The constant-rate model ignores tiered and time-of-use pricing and demand charges, and the local tariff and the vehicle's actual charging behavior govern -- a planning estimate, not a metered invoice.",
+    assumptions: [
+      { name: "Metered energy", value: "grid draws more than the battery stores: grid_energy = battery_energy / efficiency (default 88%)", source: "AC charging losses" },
+      { name: "Flat rate", value: "constant $/kWh; ignores tiered, time-of-use, and demand pricing", source: "scope of this tile" },
+      { name: "Currency", value: "rate, cost, cost per kWh, and cost per mile carried as dimensionless; currency and mileage are not physical dimensions", source: "cost-tile convention" },
+    ],
+  },
+
   "ambient-ampacity-adjust": {
     formula: "adjusted_ampacity = base_ampacity * ambient_factor * fill_factor. Ambient factor per 310.15(B)(1) (30 C table basis), fill factor per 310.15(C)(1) (more than three current-carrying conductors).",
     edition: NEC_2023 + " 310.15(B)(1) (ambient correction) and 310.15(C)(1) (conductor-fill adjustment).",

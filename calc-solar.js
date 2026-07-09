@@ -1171,3 +1171,59 @@ function renderPvStringFusing(inputRegion, outputRegion, citationEl) {
   for (const f of [isc, maxf, n]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["pv-string-fusing"] = renderPvStringFusing;
+
+// dims: in { battery_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, electricity_rate: dimensionless, efficiency_pct: dimensionless, miles_per_kwh: dimensionless } out: { energy_to_battery_kwh: M L^2 T^-2, grid_energy_kwh: M L^2 T^-2, cost: dimensionless, cost_per_stored_kwh: dimensionless, cost_per_mile: dimensionless }
+export function computeEvChargeCost({ battery_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, electricity_rate = 0, efficiency_pct = 88, miles_per_kwh = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(battery_capacity_kwh) || 0;
+  const start = Number(start_soc_pct) || 0;
+  const target = Number(target_soc_pct) || 0;
+  const rate = Number(electricity_rate) || 0;
+  const eff = Number(efficiency_pct) || 0;
+  const mpk = Number(miles_per_kwh) || 0;
+  if (!(cap > 0)) return { error: "Battery capacity must be positive (kWh)." };
+  if (!(rate >= 0)) return { error: "Electricity rate must be non-negative ($/kWh)." };
+  if (!(start >= 0 && start < 100)) return { error: "Start state of charge must be 0 to under 100 percent." };
+  if (!(target > start && target <= 100)) return { error: "Target state of charge must exceed the start and be at most 100 percent." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Charging efficiency must be over 0 and at most 100 percent (a positive efficiency is required so the grid draw is finite)." };
+  if (mpk < 0) return { error: "Vehicle efficiency must be non-negative (mi/kWh; 0 = skip the cost per mile)." };
+  const energy_to_battery_kwh = cap * (target - start) / 100;
+  const grid_energy_kwh = energy_to_battery_kwh / (eff / 100);
+  const cost = grid_energy_kwh * rate;
+  const cost_per_stored_kwh = rate / (eff / 100);
+  const cost_per_mile = mpk > 0 ? cost / (energy_to_battery_kwh * mpk) : null;
+  if (![energy_to_battery_kwh, grid_energy_kwh, cost, cost_per_stored_kwh].every(Number.isFinite)) return { error: "Charge-cost math is not a finite value." };
+  return {
+    energy_to_battery_kwh, grid_energy_kwh, cost, cost_per_stored_kwh, cost_per_mile,
+    note: "You pay for kWh at the meter, not at the battery. The energy that lands in the pack is capacity x (target - start), but AC Level 2 charging loses roughly 10-15% to the onboard rectifier and thermal load, so the utility meter always draws more: grid energy = battery energy / efficiency (default 88%). Pricing the battery energy alone under-counts the bill by that loss every time. The effective cost per stored kWh = rate / efficiency, always above the meter rate. This constant-rate model ignores tiered and time-of-use pricing and demand charges; the local tariff and the vehicle's actual charging behavior govern. A planning estimate, not a metered invoice.",
+  };
+}
+function renderEvChargeCost(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: EV charge-cost-at-the-meter model. energy to battery = capacity x (target - start); grid energy = energy / efficiency (the meter draws more than the pack stores, because AC Level 2 loses about 10-15% to the onboard rectifier and thermal load); cost = grid energy x rate; cost per stored kWh = rate / efficiency. Ignores tiered, time-of-use, and demand pricing. A planning estimate; the local tariff governs.";
+  const cap = makeNumber("Battery capacity (kWh)", "ecc-cap", { step: "any", min: "0", value: "75" }); cap.input.value = "75";
+  const start = makeNumber("Start state of charge (%)", "ecc-start", { step: "any", min: "0", max: "100", value: "20" }); start.input.value = "20";
+  const target = makeNumber("Target state of charge (%)", "ecc-target", { step: "any", min: "0", max: "100", value: "80" }); target.input.value = "80";
+  const rate = makeNumber("Electricity rate ($/kWh)", "ecc-rate", { step: "any", min: "0", value: "0.15" }); rate.input.value = "0.15";
+  const eff = makeNumber("Charging efficiency (%)", "ecc-eff", { step: "any", min: "0", max: "100", value: "88" }); eff.input.value = "88";
+  const mpk = makeNumber("Vehicle efficiency (mi/kWh, 0 = skip)", "ecc-mpk", { step: "any", min: "0", value: "3.5" }); mpk.input.value = "3.5";
+  for (const f of [cap, start, target, rate, eff, mpk]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "75"; start.input.value = "20"; target.input.value = "80"; rate.input.value = "0.15"; eff.input.value = "88"; mpk.input.value = "3.5"; update(); });
+  const oEnergy = makeOutputLine(outputRegion, "Energy to battery", "ecc-out-energy");
+  const oGrid = makeOutputLine(outputRegion, "Grid energy (metered)", "ecc-out-grid");
+  const oCost = makeOutputLine(outputRegion, "Cost", "ecc-out-cost");
+  const oPerKwh = makeOutputLine(outputRegion, "Cost per stored kWh", "ecc-out-perkwh");
+  const oPerMile = makeOutputLine(outputRegion, "Cost per mile", "ecc-out-permile");
+  const oNote = makeOutputLine(outputRegion, "Note", "ecc-out-note");
+  const update = debounce(() => {
+    const r = computeEvChargeCost({ battery_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, electricity_rate: Number(rate.input.value) || 0, efficiency_pct: eff.input.value === "" ? 88 : Number(eff.input.value), miles_per_kwh: Number(mpk.input.value) || 0 });
+    if (r.error) { oEnergy.textContent = r.error; oGrid.textContent = "-"; oCost.textContent = "-"; oPerKwh.textContent = "-"; oPerMile.textContent = "-"; oNote.textContent = ""; return; }
+    oEnergy.textContent = fmt(r.energy_to_battery_kwh, 1) + " kWh";
+    oGrid.textContent = fmt(r.grid_energy_kwh, 1) + " kWh";
+    oCost.textContent = "$" + fmt(r.cost, 2);
+    oPerKwh.textContent = "$" + fmt(r.cost_per_stored_kwh, 3) + "/kWh";
+    oPerMile.textContent = r.cost_per_mile === null ? "-- (enter a mi/kWh above)" : "$" + fmt(r.cost_per_mile, 3) + "/mi";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cap, start, target, rate, eff, mpk]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["ev-charge-cost"] = renderEvChargeCost;

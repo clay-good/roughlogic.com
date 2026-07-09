@@ -128,6 +128,8 @@ const _TILES = [
   ["voltage-drop-reactance", "A"], ["power-triangle", "A"], ["ev-charger-load", "A"],
   // spec-v488 EV charge time, AC Level 2 (Group A, calc-solar.js)
   ["ev-charge-time", "A"],
+  // spec-v489 EV charge cost at the meter (Group A, calc-solar.js)
+  ["ev-charge-cost", "A"],
   ["ambient-ampacity-adjust", "A"], ["service-load-optional", "A"],
   ["lux-to-footcandle", "A"],
   ["parallel-conductor-derate", "A"], ["neutral-current-3ph", "A"], ["motor-vd-starting", "A"],

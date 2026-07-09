@@ -526,6 +526,7 @@ const RELATED = {
   "power-triangle": ["pf-correction", "three-phase", "transformer-kva-sizing"],
   "ev-charger-load": ["service-load-optional", "breaker-sizing", "wire-ampacity"],
   "ev-charge-time": ["ev-charger-load", "battery-runtime", "battery-c-rate"],
+  "ev-charge-cost": ["ev-charge-time", "ev-charger-load", "battery-tou-arbitrage"],
   "ambient-ampacity-adjust": ["wire-ampacity", "conduit-fill", "voltage-drop"],
   "service-load-optional": ["service-load-standard", "service-load", "ev-charger-load"],
 

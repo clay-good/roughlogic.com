@@ -16959,3 +16959,29 @@ test("bounds: spec-v488 computeEvChargeTime pins the energy, the onboard-charger
   assert.ok("error" in _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, onboard_charger_kw: -1 }));
   assert.ok("error" in _v488({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, evse_power_kw: 11.5, efficiency_pct: 0 }));
 });
+
+import { computeEvChargeCost as _v489 } from "../../calc-solar.js";
+
+test("bounds: spec-v489 computeEvChargeCost pins the meter haircut, the cost, the per-mile branch, and error seams", () => {
+  const r = _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.15, efficiency_pct: 88, miles_per_kwh: 3.5 });
+  assert.ok(Math.abs(r.energy_to_battery_kwh - 45) < 1e-9);
+  assert.ok(Math.abs(r.grid_energy_kwh - 45 / 0.88) < 1e-9);
+  assert.ok(r.grid_energy_kwh > r.energy_to_battery_kwh); // the meter always draws more than the pack stores at efficiency < 100
+  assert.ok(Math.abs(r.cost - 7.6704) < 0.01);
+  assert.ok(Math.abs(r.cost_per_stored_kwh - 0.15 / 0.88) < 1e-9);
+  assert.ok(r.cost_per_stored_kwh > 0.15); // effective rate above the meter rate
+  assert.ok(Math.abs(r.cost_per_mile - 7.6704 / 157.5) < 0.01);
+  // At 100% efficiency the grid energy equals the battery energy (no haircut).
+  assert.ok(Math.abs(_v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.15, efficiency_pct: 100 }).grid_energy_kwh - 45) < 1e-9);
+  // DC fast cross-check: $0.45/kWh at 92% -> $22.01, and cost per mile is null when mi/kWh is 0.
+  const dc = _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.45, efficiency_pct: 92, miles_per_kwh: 0 });
+  assert.ok(Math.abs(dc.cost - 22.011) < 0.02 && dc.cost_per_mile === null);
+  // Error seams: non-finite, non-positive capacity, negative rate, out-of-range SOC and efficiency, target <= start, negative mi/kWh.
+  assert.ok("error" in _v489({ battery_capacity_kwh: Infinity, electricity_rate: 0.15 }));
+  assert.ok("error" in _v489({ battery_capacity_kwh: 0, electricity_rate: 0.15, target_soc_pct: 80 }));
+  assert.ok("error" in _v489({ battery_capacity_kwh: 75, electricity_rate: -0.1, target_soc_pct: 80 }));
+  assert.ok("error" in _v489({ battery_capacity_kwh: 75, start_soc_pct: 80, target_soc_pct: 80, electricity_rate: 0.15 })); // target <= start
+  assert.ok("error" in _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 120, electricity_rate: 0.15 })); // target > 100
+  assert.ok("error" in _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.15, efficiency_pct: 0 }));
+  assert.ok("error" in _v489({ battery_capacity_kwh: 75, start_soc_pct: 20, target_soc_pct: 80, electricity_rate: 0.15, miles_per_kwh: -1 }));
+});

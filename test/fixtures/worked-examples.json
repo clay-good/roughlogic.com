@@ -3397,6 +3397,92 @@
    }
   },
   {
+   "tile_id": "ev-charge-cost",
+   "source_publisher": "EV charge-cost-at-the-meter model (energy metered = energy stored / efficiency)",
+   "source_title": "75 kWh, 20-80% (45 kWh), $0.15/kWh, 88%, 3.5 mi/kWh -> 51.1 kWh metered, $7.67, $0.170/kWh, $0.049/mi",
+   "source_edition_or_year": "spec-v489 worked example (machine-verified)",
+   "source_section_or_page": "spec-v489 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "battery_capacity_kwh": 75,
+    "start_soc_pct": 20,
+    "target_soc_pct": 80,
+    "electricity_rate": 0.15,
+    "efficiency_pct": 88,
+    "miles_per_kwh": 3.5
+   },
+   "outputs": {
+    "energy_to_battery_kwh": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "grid_energy_kwh": {
+     "value": 51.136,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cost": {
+     "value": 7.67,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_stored_kwh": {
+     "value": 0.1705,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cost_per_mile": {
+     "value": 0.0487,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-charge-cost",
+   "source_publisher": "EV charge-cost-at-the-meter model (energy metered = energy stored / efficiency)",
+   "source_title": "cross-check: same 45 kWh session on a $0.45/kWh DC fast charger at 92% -> 48.9 kWh metered, $22.01, $0.489/kWh",
+   "source_edition_or_year": "spec-v489 worked example (machine-verified)",
+   "source_section_or_page": "spec-v489 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "battery_capacity_kwh": 75,
+    "start_soc_pct": 20,
+    "target_soc_pct": 80,
+    "electricity_rate": 0.45,
+    "efficiency_pct": 92,
+    "miles_per_kwh": 0
+   },
+   "outputs": {
+    "grid_energy_kwh": {
+     "value": 48.913,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cost": {
+     "value": 22.01,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "cost_per_stored_kwh": {
+     "value": 0.4891,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ambient-ampacity-adjust",
    "source_publisher": "NFPA",
    "source_title": "Ambient + fill ampacity adjustment: 75 A base (#6 THHN Cu, 90 C column), 50 C ambient, 12 conductors",

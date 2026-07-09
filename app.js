@@ -86,6 +86,8 @@ const TOOL_MODULES = (() => {
     "battery-tou-arbitrage", "battery-peak-shaving", "battery-c-rate",
     // spec-v488 EV charge time (AC Level 2)
     "ev-charge-time",
+    // spec-v489 EV charge cost at the meter
+    "ev-charge-cost",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)

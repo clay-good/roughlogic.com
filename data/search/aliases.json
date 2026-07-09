@@ -1974,6 +1974,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "ev charge cost",
+      "target": "ev-charge-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "cost to charge",
+      "target": "ev-charge-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "charging cost",
+      "target": "ev-charge-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "cost per charge",
+      "target": "ev-charge-cost",
+      "kind": "industry"
+    },
+    {
+      "term": "cost per mile ev",
+      "target": "ev-charge-cost",
+      "kind": "adjacent"
+    },
+    {
+      "term": "electricity cost to charge",
+      "target": "ev-charge-cost",
+      "kind": "adjacent"
+    },
+    {
+      "term": "home charging cost",
+      "target": "ev-charge-cost",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dc fast charge cost",
+      "target": "ev-charge-cost",
+      "kind": "adjacent"
+    },
+    {
       "term": "ambient correction",
       "target": "ambient-ampacity-adjust",
       "kind": "industry"
