@@ -19314,6 +19314,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "dyno correction factor",
+      "target": "dyno-correction-sae",
+      "kind": "industry"
+    },
+    {
+      "term": "sae j1349",
+      "target": "dyno-correction-sae",
+      "kind": "industry"
+    },
+    {
+      "term": "corrected horsepower",
+      "target": "dyno-correction-sae",
+      "kind": "industry"
+    },
+    {
+      "term": "std vs sae power",
+      "target": "dyno-correction-sae",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dry air pressure",
+      "target": "dyno-correction-sae",
+      "kind": "adjacent"
+    },
+    {
+      "term": "atmospheric correction",
+      "target": "dyno-correction-sae",
+      "kind": "adjacent"
+    },
+    {
+      "term": "humidity power correction",
+      "target": "dyno-correction-sae",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dyno standard day",
+      "target": "dyno-correction-sae",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

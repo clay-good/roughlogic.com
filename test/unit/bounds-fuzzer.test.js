@@ -17545,3 +17545,26 @@ test("bounds: spec-v514 computeBrakePedalHydraulic pins the force chain, the bor
   assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 4, rotor_radius_in: 0 }));
   assert.ok("error" in _v514({ pedal_force_lb: 50, pedal_ratio: 5, mc_bore_in: 0.875, caliper_area_in2: 4, pad_friction: -0.1, rotor_radius_in: 4.5 }));
 });
+
+import { computeDynoCorrectionSae as _v515 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v515 computeDynoCorrectionSae pins the CF, the dry-pressure subtraction, the window flag, and error seams", () => {
+  const r = _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 0 });
+  assert.ok(Math.abs(r.cf - 1.0220) < 0.001);
+  assert.ok(Math.abs(r.corrected_hp - 408.8) < 0.5);
+  assert.ok(r.in_window === true);
+  // A hotter, thinner day corrects harder.
+  const hot = _v515({ observed_hp: 400, baro_mbar: 970, air_temp_c: 35, humidity_pct: 0 });
+  assert.ok(hot.cf > r.cf && Math.abs(hot.cf - 1.0444) < 0.001);
+  // Humidity lowers the dry pressure, which raises the correction factor.
+  const humid = _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 80 });
+  assert.ok(humid.p_dry_mbar < 980 && humid.cf > r.cf);
+  // Outside the validity window the flag clears.
+  assert.ok(_v515({ observed_hp: 400, baro_mbar: 850, air_temp_c: 45, humidity_pct: 0 }).in_window === false);
+  // Error seams: non-finite, non-positive power / pressure, sub-absolute-zero temp, humidity out of range.
+  assert.ok("error" in _v515({ observed_hp: Infinity, baro_mbar: 980, air_temp_c: 30 }));
+  assert.ok("error" in _v515({ observed_hp: 0, baro_mbar: 980, air_temp_c: 30 }));
+  assert.ok("error" in _v515({ observed_hp: 400, baro_mbar: 0, air_temp_c: 30 }));
+  assert.ok("error" in _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: -300 }));
+  assert.ok("error" in _v515({ observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 120 }));
+});

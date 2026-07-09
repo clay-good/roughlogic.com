@@ -1636,3 +1636,49 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
   ],
   compute: computeBrakePedalHydraulic,
 });
+
+// ===================== spec-v515: SAE J1349 dyno correction factor =====================
+
+// dims: in { observed_hp: M L^2 T^-3, baro_mbar: M L^-1 T^-2, air_temp_c: T, humidity_pct: dimensionless } out: { vapor_mbar: M L^-1 T^-2, p_dry_mbar: M L^-1 T^-2, cf: dimensionless, corrected_hp: M L^2 T^-3, in_window: dimensionless }
+export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, air_temp_c = 25, humidity_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const p = Number(observed_hp) || 0;
+  const baro = Number(baro_mbar) || 0;
+  const t = Number(air_temp_c);
+  const rh = Number(humidity_pct) || 0;
+  if (!(p > 0)) return { error: "Observed power must be positive (hp)." };
+  if (!(baro > 0)) return { error: "Barometric pressure must be positive (mbar)." };
+  if (!Number.isFinite(t) || t <= -273.15) return { error: "Air temperature must be above absolute zero (-273.15 C)." };
+  if (!(rh >= 0 && rh <= 100)) return { error: "Relative humidity must be 0 to 100 percent." };
+  const es_mbar = 6.1078 * Math.pow(10, 7.5 * t / (237.3 + t)); // Magnus saturation vapor pressure
+  const vapor_mbar = es_mbar * rh / 100;
+  const p_dry_mbar = baro - vapor_mbar;
+  if (!(p_dry_mbar > 0)) return { error: "Dry pressure came out non-positive; check the barometric pressure and humidity." };
+  const cf = 1.18 * (990 / p_dry_mbar) * Math.sqrt((t + 273) / 298) - 0.18;
+  const corrected_hp = p * cf;
+  const in_window = t >= 15 && t <= 35 && p_dry_mbar >= 900 && p_dry_mbar <= 1050;
+  if (![vapor_mbar, p_dry_mbar, cf, corrected_hp].every(Number.isFinite)) return { error: "Dyno-correction math is not a finite value." };
+  return {
+    vapor_mbar, p_dry_mbar, cf, corrected_hp, in_window,
+    note: "SAE J1349 dyno correction factor: corrects observed power to a standard day (25 C, 99 kPa DRY). The pressure used must be the DRY pressure with the water-vapor pressure removed (humid air makes less power, and the correction must know it): P_dry = baro - vapor, CF = 1.18 x (990 / P_dry) x sqrt((temp_C + 273)/298) - 0.18, corrected = observed x CF. The factor is valid only in about the 15 to 35 C and 900 to 1050 mbar window; outside it the correction distorts (this tile flags it). The older STD (SAE J607) basis runs about 4% higher than J1349, so a shop quoting STD numbers cannot be compared to a SAE number without matching the basis. A comparison aid, not a certified rating; the dyno, correction basis, and test procedure govern.",
+  };
+}
+export const dynoCorrectionSaeExample = { inputs: { observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 0 } };
+
+MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
+  citation: "Citation: SAE J1349 dyno correction factor (STD per SAE J607): P_dry = baro - vapor(temp, RH); CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18; corrected = observed x CF. Corrects to a standard dry day; the pressure must be dry (vapor removed); valid ~15-35 C, 900-1050 mbar; STD (J607) runs ~4% higher. A comparison aid; the dyno and correction basis govern.",
+  example: dynoCorrectionSaeExample.inputs,
+  fields: [
+    { key: "observed_hp", label: "Observed power (hp)", kind: "number", default: 400 },
+    { key: "baro_mbar", label: "Barometric pressure (mbar, absolute)", kind: "number", default: 980 },
+    { key: "air_temp_c", label: "Inlet air temperature (deg C)", kind: "number", default: 30 },
+    { key: "humidity_pct", label: "Relative humidity (%)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "pd", id: "dcs-out-pd", label: "Dry pressure (vapor removed)", value: (r) => fmt(r.p_dry_mbar, 1) + " mbar" },
+    { key: "cf", id: "dcs-out-cf", label: "SAE J1349 correction factor", value: (r) => fmt(r.cf, 4) + (r.in_window ? "" : " -- OUTSIDE the 15-35 C / 900-1050 mbar validity window") },
+    { key: "cp", id: "dcs-out-cp", label: "Corrected power (SAE)", value: (r) => fmt(r.corrected_hp, 1) + " hp" },
+    { key: "n", id: "dcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDynoCorrectionSae,
+});

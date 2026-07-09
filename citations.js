@@ -7736,6 +7736,18 @@ export const CITATIONS = {
       { name: "Freeze point", value: "DEF freezes at about 12 F; the SCR system thaws it in service", source: "ISO 22241" },
     ],
   },
+  "dyno-correction-sae": {
+    formula: "vapor = es(temp) x RH/100; P_dry = baro - vapor; CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18; corrected = observed x CF.",
+    edition: "The SAE J1349 engine power correction factor (STD per SAE J607), correcting observed power to a standard dry day, by name; the dyno, correction basis, and test procedure govern.",
+    freeAccess: "The J1349 correction relation is a published SAE formula; the observed power, barometric pressure, temperature, and humidity come from the dyno cell.",
+    governance: GOVERNANCE.general,
+    editionNote: "SAE J1349 dyno correction factor. The pressure used must be the DRY pressure with the water-vapor pressure removed (humid air makes less power): P_dry = baro - vapor, CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18, and corrected = observed x CF. The factor corrects observed power to a standard day (25 C, 99 kPa dry). It is valid only in about the 15 to 35 C and 900 to 1050 mbar window; outside it the correction distorts. The older STD (SAE J607) basis runs about 4% higher than J1349, so a shop quoting STD numbers cannot be compared to a J1349 number without matching the basis. A comparison aid, not a certified rating; the dyno, correction basis, and test procedure govern.",
+    assumptions: [
+      { name: "Dry pressure", value: "subtract the water-vapor pressure before applying the factor; humid air makes less power", source: "SAE J1349" },
+      { name: "Validity window", value: "valid about 15 to 35 C and 900 to 1050 mbar; flagged outside", source: "SAE J1349" },
+      { name: "STD vs SAE", value: "the STD (J607) basis runs about 4% higher and cannot be compared to a J1349 number", source: "SAE J607" },
+    ],
+  },
   "brake-pedal-hydraulic": {
     formula: "mc_force = pedal_force x ratio x booster; line_pressure = mc_force / (pi/4 x bore^2); clamp = line_pressure x caliper_area; brake_torque = clamp x 2 x friction x rotor_radius.",
     edition: "Hydraulic brake force chain (Pascal's law; SAE brake-system design practice), first-principles, by name; the actual pad friction, thermal state, and system compliance govern.",

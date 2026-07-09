@@ -44948,6 +44948,58 @@
    }
   },
   {
+   "tile_id": "dyno-correction-sae",
+   "source_publisher": "SAE J1349 dyno correction factor",
+   "source_title": "400 hp observed, 980 mbar dry, 30 C -> CF 1.0220, 408.8 hp corrected",
+   "source_edition_or_year": "spec-v515 worked example (machine-verified)",
+   "source_section_or_page": "spec-v515 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "observed_hp": 400,
+    "baro_mbar": 980,
+    "air_temp_c": 30,
+    "humidity_pct": 0
+   },
+   "outputs": {
+    "cf": {
+     "value": 1.022,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "corrected_hp": {
+     "value": 408.8,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "dyno-correction-sae",
+   "source_publisher": "SAE J1349 dyno correction factor",
+   "source_title": "cross-check: a hot, thin 970 mbar / 35 C day corrects harder -> CF 1.0444",
+   "source_edition_or_year": "spec-v515 worked example (machine-verified)",
+   "source_section_or_page": "spec-v515 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "observed_hp": 400,
+    "baro_mbar": 970,
+    "air_temp_c": 35,
+    "humidity_pct": 0
+   },
+   "outputs": {
+    "cf": {
+     "value": 1.0444,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "powered-attic-ventilator",
    "source_publisher": "attic-fan sizing practice",
    "source_title": "1500 ft2 attic, 0.7 CFM/ft2, light roof -> 1050 CFM fan, 3.5 ft2 (504 in2) intake",

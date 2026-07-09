@@ -769,6 +769,8 @@ const TOOL_MODULES = (() => {
     "wheel-offset-backspacing",
     // spec-v514 brake pedal ratio and line pressure
     "brake-pedal-hydraulic",
+    // spec-v515 SAE J1349 dyno correction factor
+    "dyno-correction-sae",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached
