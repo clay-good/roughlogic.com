@@ -168,6 +168,7 @@ export const COMPUTE_MAP = {
   "ev-charger-load": { module: "../../calc-solar.js", fn: "computeEvChargerLoad" },
   "ev-charge-time": { module: "../../calc-solar.js", fn: "computeEvChargeTime" },
   "ev-charge-cost": { module: "../../calc-solar.js", fn: "computeEvChargeCost" },
+  "ev-dcfc-time": { module: "../../calc-solar.js", fn: "computeEvDcfcTime" },
   "ambient-ampacity-adjust": { module: "../../calc-electrical.js", fn: "computeAmbientAmpacityAdjust" },
   "service-load-optional": { module: "../../calc-electrical.js", fn: "computeServiceLoadOptional" },
   "lux-to-footcandle": { module: "../../calc-electrical.js", fn: "computeLuxFootcandle" },

@@ -17034,3 +17034,27 @@ test("bounds: spec-v491 computeRcCompressionDevLength pins the two governing ter
   assert.ok("error" in _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, lambda: 1.5 }));
   assert.ok("error" in _v491({ bar_diameter_in: 1.0, fy_psi: 60000, fc_psi: 4000, psi_r: 0.5 }));
 });
+
+import { computeEvDcfcTime as _v492 } from "../../calc-solar.js";
+
+test("bounds: spec-v492 computeEvDcfcTime pins the acceptance-limited power, the three taper bands, the to-80 relation, and error seams", () => {
+  const r = _v492({ usable_capacity_kwh: 60, start_soc_pct: 10, target_soc_pct: 100, charger_power_kw: 150, acceptance_kw: 100 });
+  assert.ok(Math.abs(r.cc_power_kw - 100) < 1e-9); // acceptance-limited: min(150, 100)
+  assert.ok(Math.abs(r.time_to_80_hr * 60 - 25.2) < 0.01);
+  assert.ok(Math.abs(r.time_8090_hr * 60 - 7.2) < 0.01);
+  assert.ok(Math.abs(r.time_90100_hr * 60 - 14.4) < 0.01);
+  assert.ok(Math.abs(r.time_total_hr * 60 - 46.8) < 0.01);
+  // The taper makes each band slower per SOC point than the fast leg: the top 10% band is slower than the 80-90% band.
+  assert.ok(r.time_90100_hr > r.time_8090_hr);
+  assert.ok(Math.abs(r.time_total_hr - (r.time_to_80_hr + r.time_8090_hr + r.time_90100_hr)) < 1e-9);
+  // Stopping at 80% makes time_to_80 equal the total (no taper bands entered) and <= a to-full total.
+  const to80 = _v492({ usable_capacity_kwh: 60, start_soc_pct: 10, target_soc_pct: 80, charger_power_kw: 150, acceptance_kw: 100 });
+  assert.ok(Math.abs(to80.time_total_hr - to80.time_to_80_hr) < 1e-9 && to80.time_total_hr <= r.time_total_hr);
+  // Error seams: non-finite, non-positive capacity / charger / acceptance, out-of-range SOC, target <= start.
+  assert.ok("error" in _v492({ usable_capacity_kwh: Infinity, charger_power_kw: 150, acceptance_kw: 100 }));
+  assert.ok("error" in _v492({ usable_capacity_kwh: 0, charger_power_kw: 150, acceptance_kw: 100, target_soc_pct: 80 }));
+  assert.ok("error" in _v492({ usable_capacity_kwh: 60, charger_power_kw: 0, acceptance_kw: 100, target_soc_pct: 80 }));
+  assert.ok("error" in _v492({ usable_capacity_kwh: 60, charger_power_kw: 150, acceptance_kw: 0, target_soc_pct: 80 }));
+  assert.ok("error" in _v492({ usable_capacity_kwh: 60, start_soc_pct: 80, target_soc_pct: 80, charger_power_kw: 150, acceptance_kw: 100 })); // target <= start
+  assert.ok("error" in _v492({ usable_capacity_kwh: 60, start_soc_pct: 10, target_soc_pct: 120, charger_power_kw: 150, acceptance_kw: 100 })); // target > 100
+});

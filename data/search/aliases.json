@@ -2014,6 +2014,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "dc fast charge time",
+      "target": "ev-dcfc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "dcfc",
+      "target": "ev-dcfc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "fast charging time",
+      "target": "ev-dcfc-time",
+      "kind": "industry"
+    },
+    {
+      "term": "80 percent charge",
+      "target": "ev-dcfc-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "charge taper",
+      "target": "ev-dcfc-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ccs charging",
+      "target": "ev-dcfc-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how long dc fast charge",
+      "target": "ev-dcfc-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "constant current constant voltage",
+      "target": "ev-dcfc-time",
+      "kind": "adjacent"
+    },
+    {
       "term": "ambient correction",
       "target": "ambient-ampacity-adjust",
       "kind": "industry"

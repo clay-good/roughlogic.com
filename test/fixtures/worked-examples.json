@@ -3483,6 +3483,72 @@
    }
   },
   {
+   "tile_id": "ev-dcfc-time",
+   "source_publisher": "DC fast-charge CC-CV taper model (three constant-power bands)",
+   "source_title": "60 kWh EV, 10-100%, 150 kW charger, 100 kW acceptance -> cc 100 kW, fast leg 25.2 min, total 46.8 min",
+   "source_edition_or_year": "spec-v492 worked example (machine-verified)",
+   "source_section_or_page": "spec-v492 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "usable_capacity_kwh": 60,
+    "start_soc_pct": 10,
+    "target_soc_pct": 100,
+    "charger_power_kw": 150,
+    "acceptance_kw": 100
+   },
+   "outputs": {
+    "cc_power_kw": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "time_to_80_hr": {
+     "value": 0.42,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "time_total_hr": {
+     "value": 0.78,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-dcfc-time",
+   "source_publisher": "DC fast-charge CC-CV taper model (three constant-power bands)",
+   "source_title": "cross-check: the fast leg alone (10-80%) is 25.2 min, so the top 20% (21.6 min) nearly equals it",
+   "source_edition_or_year": "spec-v492 worked example (machine-verified)",
+   "source_section_or_page": "spec-v492 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "usable_capacity_kwh": 60,
+    "start_soc_pct": 10,
+    "target_soc_pct": 80,
+    "charger_power_kw": 150,
+    "acceptance_kw": 100
+   },
+   "outputs": {
+    "time_to_80_hr": {
+     "value": 0.42,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "time_total_hr": {
+     "value": 0.42,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ambient-ampacity-adjust",
    "source_publisher": "NFPA",
    "source_title": "Ambient + fill ampacity adjustment: 75 A base (#6 THHN Cu, 90 C column), 50 C ambient, 12 conductors",

@@ -527,6 +527,7 @@ const RELATED = {
   "ev-charger-load": ["service-load-optional", "breaker-sizing", "wire-ampacity"],
   "ev-charge-time": ["ev-charger-load", "battery-runtime", "battery-c-rate"],
   "ev-charge-cost": ["ev-charge-time", "ev-charger-load", "battery-tou-arbitrage"],
+  "ev-dcfc-time": ["ev-charge-time", "ev-charge-cost", "battery-c-rate"],
   "ambient-ampacity-adjust": ["wire-ampacity", "conduit-fill", "voltage-drop"],
   "service-load-optional": ["service-load-standard", "service-load", "ev-charger-load"],
 

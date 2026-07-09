@@ -1227,3 +1227,64 @@ function renderEvChargeCost(inputRegion, outputRegion, citationEl) {
   for (const f of [cap, start, target, rate, eff, mpk]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["ev-charge-cost"] = renderEvChargeCost;
+
+// dims: in { usable_capacity_kwh: M L^2 T^-2, start_soc_pct: dimensionless, target_soc_pct: dimensionless, charger_power_kw: M L^2 T^-3, acceptance_kw: M L^2 T^-3 } out: { cc_power_kw: M L^2 T^-3, time_to_80_hr: T, time_8090_hr: T, time_90100_hr: T, time_total_hr: T, energy_total_kwh: M L^2 T^-2 }
+export function computeEvDcfcTime({ usable_capacity_kwh = 0, start_soc_pct = 0, target_soc_pct = 80, charger_power_kw = 0, acceptance_kw = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(usable_capacity_kwh) || 0;
+  const start = Number(start_soc_pct) || 0;
+  const target = Number(target_soc_pct) || 0;
+  const charger = Number(charger_power_kw) || 0;
+  const accept = Number(acceptance_kw) || 0;
+  if (!(cap > 0)) return { error: "Usable capacity must be positive (kWh)." };
+  if (!(charger > 0)) return { error: "Charger power must be positive (kW)." };
+  if (!(accept > 0)) return { error: "Vehicle acceptance must be positive (kW)." };
+  if (!(start >= 0 && start < 100)) return { error: "Start state of charge must be 0 to under 100 percent." };
+  if (!(target > start && target <= 100)) return { error: "Target state of charge must exceed the start and be at most 100 percent." };
+  const cc_power_kw = Math.min(charger, accept);
+  const bands = [[0, 80, 1.0], [80, 90, 0.5], [90, 100, 0.25]];
+  const times = [];
+  let time_total_hr = 0, energy_total_kwh = 0;
+  for (const [lo, hi, frac] of bands) {
+    const span = Math.max(0, Math.min(hi, target) - Math.max(lo, start));
+    const energy = cap * span / 100;
+    const bt = span > 0 ? energy / (cc_power_kw * frac) : 0;
+    times.push(bt);
+    time_total_hr += bt;
+    energy_total_kwh += energy;
+  }
+  const [time_to_80_hr, time_8090_hr, time_90100_hr] = times;
+  if (![cc_power_kw, time_to_80_hr, time_8090_hr, time_90100_hr, time_total_hr].every(Number.isFinite)) return { error: "Fast-charge math is not a finite value." };
+  return {
+    cc_power_kw, time_to_80_hr, time_8090_hr, time_90100_hr, time_total_hr, energy_total_kwh,
+    note: "DC fast charging holds a constant high power -- the lesser of the station's rating and the vehicle's peak acceptance -- only to about 80% state of charge, then the battery management system tapers the current to protect the cells: this model uses three constant-power bands (0-80% at full power, 80-90% at about 50%, 90-100% at about 25%). The result is that the last 20% can take as long as the entire fast leg, which is why fast-charge etiquette is to unplug at 80%. Dividing the whole energy by the rated power under-predicts a to-full session roughly two-fold. The 80/90/100 breakpoints and the 1.0/0.5/0.25 fractions approximate a smooth manufacturer curve that varies by chemistry and temperature; cold cells taper earlier. A planning estimate, not the vehicle's charging profile.",
+  };
+}
+function renderEvDcfcTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: DC fast-charge CC-CV taper model. cc_power = min(charger, vehicle acceptance); three constant-power bands (0-80% at full power, 80-90% at ~50%, 90-100% at ~25%); per-band time = energy / (cc_power x band_fraction). DC fast charging holds constant power only to ~80% and then tapers to protect the cells, so the naive energy / rated-power estimate under-predicts a to-full session. A planning estimate; the vehicle's charging curve governs.";
+  const cap = makeNumber("Usable capacity (kWh)", "edt-cap", { step: "any", min: "0", value: "60" }); cap.input.value = "60";
+  const start = makeNumber("Start state of charge (%)", "edt-start", { step: "any", min: "0", max: "100", value: "10" }); start.input.value = "10";
+  const target = makeNumber("Target state of charge (%)", "edt-target", { step: "any", min: "0", max: "100", value: "100" }); target.input.value = "100";
+  const charger = makeNumber("Charger rated power (kW)", "edt-charger", { step: "any", min: "0", value: "150" }); charger.input.value = "150";
+  const accept = makeNumber("Vehicle peak DC acceptance (kW)", "edt-accept", { step: "any", min: "0", value: "100" }); accept.input.value = "100";
+  for (const f of [cap, start, target, charger, accept]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "60"; start.input.value = "10"; target.input.value = "100"; charger.input.value = "150"; accept.input.value = "100"; update(); });
+  const oPower = makeOutputLine(outputRegion, "Constant-current power", "edt-out-power");
+  const oFast = makeOutputLine(outputRegion, "Fast leg (time to 80%)", "edt-out-fast");
+  const oBand2 = makeOutputLine(outputRegion, "80-90% band", "edt-out-band2");
+  const oBand3 = makeOutputLine(outputRegion, "90-100% band", "edt-out-band3");
+  const oTotal = makeOutputLine(outputRegion, "Total time", "edt-out-total");
+  const oNote = makeOutputLine(outputRegion, "Note", "edt-out-note");
+  const update = debounce(() => {
+    const r = computeEvDcfcTime({ usable_capacity_kwh: Number(cap.input.value) || 0, start_soc_pct: Number(start.input.value) || 0, target_soc_pct: Number(target.input.value) || 0, charger_power_kw: Number(charger.input.value) || 0, acceptance_kw: Number(accept.input.value) || 0 });
+    if (r.error) { oPower.textContent = r.error; oFast.textContent = "-"; oBand2.textContent = "-"; oBand3.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    oPower.textContent = fmt(r.cc_power_kw, 0) + " kW" + (r.cc_power_kw < Number(charger.input.value) ? " (vehicle-acceptance limited)" : "");
+    oFast.textContent = fmt(r.time_to_80_hr * 60, 1) + " min";
+    oBand2.textContent = fmt(r.time_8090_hr * 60, 1) + " min";
+    oBand3.textContent = fmt(r.time_90100_hr * 60, 1) + " min";
+    oTotal.textContent = fmt(r.time_total_hr * 60, 1) + " min (" + fmt(r.time_total_hr, 2) + " hr)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cap, start, target, charger, accept]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["ev-dcfc-time"] = renderEvDcfcTime;

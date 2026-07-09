@@ -130,6 +130,8 @@ const _TILES = [
   ["ev-charge-time", "A"],
   // spec-v489 EV charge cost at the meter (Group A, calc-solar.js)
   ["ev-charge-cost", "A"],
+  // spec-v492 EV DC fast-charge time with CC-CV taper (Group A, calc-solar.js)
+  ["ev-dcfc-time", "A"],
   ["ambient-ampacity-adjust", "A"], ["service-load-optional", "A"],
   ["lux-to-footcandle", "A"],
   ["parallel-conductor-derate", "A"], ["neutral-current-3ph", "A"], ["motor-vd-starting", "A"],

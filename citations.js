@@ -1955,6 +1955,19 @@ export const CITATIONS = {
     ],
   },
 
+  "ev-dcfc-time": {
+    formula: "cc_power = min(charger, acceptance); bands 0-80% at 1.0, 80-90% at 0.5, 90-100% at 0.25 x cc_power; per-band time = (capacity x band_span/100) / (cc_power x fraction); total = sum over covered bands.",
+    edition: "DC fast-charge CC-CV taper model (three constant-power bands), first-principles; the vehicle's charging curve governs the actual profile.",
+    freeAccess: "Time = energy / power per band is first-principles; the taper above 80% is inherent to lithium-ion CC-CV charging and the band powers come from the vehicle's BMS behavior.",
+    governance: GOVERNANCE.general,
+    editionNote: "DC fast-charge CC-CV taper model. The constant-current power is the lesser of the station rating and the vehicle's peak acceptance; the charge is modeled as three constant-power bands (0-80% at full power, 80-90% at about 50%, 90-100% at about 25%), and the per-band time is the band energy divided by the band power. DC fast charging holds constant power only to about 80% state of charge and then tapers sharply to protect the cells, so the naive energy / rated-power estimate under-predicts a to-full session roughly two-fold. The 80/90/100 breakpoints and the 1.0/0.5/0.25 fractions approximate a smooth manufacturer curve that varies by pack chemistry and temperature, and cold cells taper earlier. A planning estimate, not the vehicle's charging profile.",
+    assumptions: [
+      { name: "Constant-current power", value: "cc_power = min(charger rating, vehicle peak DC acceptance); the pack limit usually governs", source: "DC fast charging" },
+      { name: "Taper bands", value: "0-80% at full power, 80-90% at ~50%, 90-100% at ~25%", source: "lithium-ion CC-CV charge curve" },
+      { name: "Approximation", value: "breakpoints and fractions approximate a smooth manufacturer curve; chemistry and temperature shift it", source: "scope of this tile" },
+    ],
+  },
+
   "ambient-ampacity-adjust": {
     formula: "adjusted_ampacity = base_ampacity * ambient_factor * fill_factor. Ambient factor per 310.15(B)(1) (30 C table basis), fill factor per 310.15(C)(1) (more than three current-carrying conductors).",
     edition: NEC_2023 + " 310.15(B)(1) (ambient correction) and 310.15(C)(1) (conductor-fill adjustment).",
