@@ -15294,6 +15294,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "countersink depth",
+      "target": "countersink-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "countersink diameter",
+      "target": "countersink-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "82 degree countersink",
+      "target": "countersink-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "flat head screw sink",
+      "target": "countersink-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "csink z depth",
+      "target": "countersink-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "counterbore vs countersink",
+      "target": "countersink-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "included angle depth",
+      "target": "countersink-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "machinist countersink",
+      "target": "countersink-depth",
+      "kind": "adjacent"
+    },
+    {
       "term": "fix and flip",
       "target": "fix-flip-profit",
       "kind": "industry"

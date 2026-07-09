@@ -6719,6 +6719,18 @@ export const CITATIONS = {
     ],
   },
 
+  "countersink-depth": {
+    formula: "Z = (D_cs - d_hole) / (2 x tan(angle/2)); Z_full = D_cs / (2 x tan(angle/2)).",
+    edition: "Countersink diameter-to-depth relation (Machinery's Handbook countersinking; 82 deg inch and 90 deg metric flat-head standards), first-principles trigonometry, by name; the tool geometry and the fastener callout govern.",
+    freeAccess: "The countersink diameter-to-depth relation is first-principles cone trigonometry; the diameter, angle, and pilot hole come from the print and the tool.",
+    governance: GOVERNANCE.general,
+    editionNote: "Countersink diameter-to-depth relation. Z = (D_cs - d_hole) / (2 x tan(angle/2)) is the plunge depth below the surface to open the cone from the pilot hole out to the finished countersink diameter, and Z_full = D_cs / (2 x tan(angle/2)) is the theoretical full-cone travel. The print calls out a DIAMETER while the machine is set to a DEPTH, and a small over-plunge sits a flat-head screw proud or sunken. 82 degree inch flat-head heads and 90 degree metric heads are not interchangeable in the same sink, and a shallower angle drives the tool deeper for the same diameter. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
+    assumptions: [
+      { name: "Diameter to depth", value: "the machine is set to a depth to produce the diameter the print calls out", source: "Machinery's Handbook" },
+      { name: "Angle standard", value: "82 deg inch flat-head and 90 deg metric are not interchangeable", source: "flat-head fastener standards" },
+      { name: "Angle drives depth", value: "a shallower included angle plunges deeper for the same diameter", source: "cone geometry" },
+    ],
+  },
   "bearing-l10-life": {
     formula: "p = 3 (ball) or 10/3 (roller); L10 = (C/P)^p x 10^6 rev; L10h = L10 / (60 x rpm).",
     edition: "The ISO 281 / ABMA 9 & 11 basic rating life (L10) of a rolling-element bearing, by name; the mounting, lubrication, and application govern.",

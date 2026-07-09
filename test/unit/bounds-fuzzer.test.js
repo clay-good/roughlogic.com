@@ -17418,3 +17418,22 @@ test("bounds: spec-v508 computeDefConsumption pins the 2.5% dose, the diesel-per
   assert.ok("error" in _v508({ diesel_gal: 0, trip_miles: 0, dose_pct: 2.5, def_tank_gal: 13 }));
   assert.ok("error" in _v508({ diesel_gal: 0, trip_miles: 1300, mpg: 0, dose_pct: 2.5, def_tank_gal: 13 }));
 });
+
+import { computeCountersinkDepth as _v509 } from "../../calc-machining.js";
+
+test("bounds: spec-v509 computeCountersinkDepth pins the plunge depth, the angle-drives-depth relation, and error seams", () => {
+  const r = _v509({ countersink_dia_in: 0.5, included_angle_deg: 82, pilot_hole_dia_in: 0.25 });
+  assert.ok(Math.abs(r.z_in - 0.1438) < 5e-4); // (0.5 - 0.25) / (2 tan 41)
+  assert.ok(r.z_full_in > r.z_in); // full-cone travel exceeds the from-pilot depth
+  // A shallower included angle drives the tool deeper for the same diameter.
+  const shallow = _v509({ countersink_dia_in: 0.5, included_angle_deg: 60, pilot_hole_dia_in: 0.25 });
+  assert.ok(shallow.z_in > r.z_in && Math.abs(shallow.z_in - 0.2165) < 5e-4);
+  // A larger pilot hole leaves less cone to open, so a shallower plunge.
+  assert.ok(_v509({ countersink_dia_in: 0.5, included_angle_deg: 82, pilot_hole_dia_in: 0.375 }).z_in < r.z_in);
+  // Error seams: non-finite, non-positive diameter, pilot >= countersink, angle out of range.
+  assert.ok("error" in _v509({ countersink_dia_in: Infinity, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }));
+  assert.ok("error" in _v509({ countersink_dia_in: 0, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }));
+  assert.ok("error" in _v509({ countersink_dia_in: 0.5, included_angle_deg: 82, pilot_hole_dia_in: 0.5 })); // pilot >= countersink
+  assert.ok("error" in _v509({ countersink_dia_in: 0.5, included_angle_deg: 0, pilot_hole_dia_in: 0.25 }));
+  assert.ok("error" in _v509({ countersink_dia_in: 0.5, included_angle_deg: 180, pilot_hole_dia_in: 0.25 }));
+});

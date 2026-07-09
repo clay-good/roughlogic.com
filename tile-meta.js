@@ -377,6 +377,8 @@ const _TILES = [
   ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["spur-gear-geometry", "K"],
   // spec-v504 rolling-bearing L10 rating life (ISO 281)
   ["bearing-l10-life", "K"],
+  // spec-v509 countersink diameter and cutting depth
+  ["countersink-depth", "K"],
 
   // v43 cross-trade tank gauging (calc-cross.js)
   ["tank-volume", "G"], ["linear-interpolation", "G"],

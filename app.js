@@ -780,6 +780,8 @@ const TOOL_MODULES = (() => {
     "spur-gear-geometry",
     // spec-v504 rolling-bearing L10 rating life (ISO 281)
     "bearing-l10-life",
+    // spec-v509 countersink diameter and cutting depth
+    "countersink-depth",
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [

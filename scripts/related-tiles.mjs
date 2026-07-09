@@ -144,6 +144,7 @@ const RELATED = {
   "cone-flat-pattern": ["rolled-blank", "circular-arc", "tolerance-stack-rss", "circle-from-3-points"],
   "spur-gear-geometry": ["gear-cascade", "cutting-speed-rpm", "dividing-head", "bolt-circle"],
   "bearing-l10-life": ["vbelt-drive", "shrink-fit", "spur-gear-geometry"],
+  "countersink-depth": ["drill-point-depth", "tap-drill-size", "cutting-speed-rpm"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
   "polygon-miter": ["compound-miter", "bolt-circle", "decimal-to-fraction"],

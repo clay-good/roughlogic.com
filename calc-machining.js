@@ -468,3 +468,54 @@ function renderBearingL10Life(inputRegion, outputRegion, citationEl) {
   type.select.addEventListener("change", update);
 }
 MACHINING_RENDERERS["bearing-l10-life"] = renderBearingL10Life;
+
+// ===================== spec-v509: countersink diameter and cutting depth =====================
+// dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
+export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {
+  const _g = _finiteGuard({ countersink_dia_in, included_angle_deg, pilot_hole_dia_in }); if (_g) return _g;
+  const dcs = Number(countersink_dia_in) || 0;
+  const ang = Number(included_angle_deg) || 0;
+  const dhole = Number(pilot_hole_dia_in) || 0;
+  if (!(dcs > 0)) return { error: "Countersink diameter must be positive (in)." };
+  if (dhole < 0) return { error: "Pilot-hole diameter cannot be negative (in)." };
+  if (!(dhole < dcs)) return { error: "Pilot-hole diameter must be less than the countersink diameter (in)." };
+  if (!(ang > 0 && ang < 180)) return { error: "Included angle must be between 0 and 180 degrees." };
+  const halfRad = (ang / 2) * Math.PI / 180;
+  const tanHalf = Math.tan(halfRad);
+  const z_in = (dcs - dhole) / (2 * tanHalf);
+  const z_full_in = dcs / (2 * tanHalf);
+  if (![z_in, z_full_in].every(Number.isFinite)) return { error: "Countersink-depth math is not a finite value." };
+  return {
+    z_in, z_full_in,
+    note: "Countersink diameter-to-depth: the print calls out the finished (major) DIAMETER, but the machine is set to a plunge DEPTH -- Z = (D_cs - d_hole) / (2 tan(angle/2)), the depth below the surface to open the cone from the pilot hole out to the countersink diameter. A few thousandths of over-plunge sits a flat-head screw proud or buried. The included angle is not interchangeable: 82 degrees is the inch flat-head standard and 90 degrees is the metric standard, and a screw and a sink of mismatched angles never seat flush. A shallower angle drives the tool deeper for the same diameter, so the angle callout matters as much as the diameter. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
+  };
+}
+export const countersinkDepthExample = { inputs: { countersink_dia_in: 0.5, included_angle_deg: 82, pilot_hole_dia_in: 0.25 } };
+function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: countersink diameter-to-depth (Machinery's Handbook countersinking): Z = (D_cs - d_hole) / (2 tan(angle/2)); full-cone travel = D_cs / (2 tan(angle/2)). 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
+  const d = makeNumber("Finished countersink diameter D_cs (in)", "csd-d", { step: "any", min: "0" }); d.input.value = "0.5";
+  const ang = makeSelect("Included angle (deg)", "csd-ang", [
+    { value: "82", label: "82 (inch flat-head)", selected: true },
+    { value: "90", label: "90 (metric flat-head)" },
+    { value: "100", label: "100 (aircraft flush)" },
+    { value: "120", label: "120" },
+    { value: "60", label: "60 (lathe center)" },
+  ]);
+  const hole = makeNumber("Pilot / through-hole diameter (in)", "csd-hole", { step: "any", min: "0" }); hole.input.value = "0.25";
+  for (const f of [d, ang, hole]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "0.5"; ang.select.value = "82"; hole.input.value = "0.25"; update(); });
+  const oZ = makeOutputLine(outputRegion, "Plunge depth below surface", "csd-out-z");
+  const oZf = makeOutputLine(outputRegion, "Theoretical full-cone travel", "csd-out-zf");
+  const oNote = makeOutputLine(outputRegion, "Note", "csd-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeCountersinkDepth({ countersink_dia_in: readNum(d.input), included_angle_deg: Number(ang.select.value), pilot_hole_dia_in: readNum(hole.input) });
+    if (r.error) { oZ.textContent = r.error; oZf.textContent = "-"; oNote.textContent = ""; return; }
+    oZ.textContent = fmt(r.z_in, 4) + " in";
+    oZf.textContent = fmt(r.z_full_in, 4) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [d, hole]) f.input.addEventListener("input", update);
+  ang.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["countersink-depth"] = renderCountersinkDepth;
