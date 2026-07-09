@@ -1071,6 +1071,7 @@ const RELATED = {
   // spec-v287..v289 geotechnical foundation depth batch (Group E)
   "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],
   "pile-axial-capacity": ["helical-pile","soil-bearing-capacity","soil-settlement-elastic"],
+  "pile-group-efficiency": ["pile-axial-capacity","helical-pile","soil-bearing-capacity"],
   "slope-stability-infinite": ["retaining-wall-stability","lateral-earth-pressure","trench-slope"],
   // spec-v290..v292 NDS wood-member depth batch (Group E)
   "wood-bearing-perpendicular": ["wood-beam-shear","wood-beam-bending","deck-beam-post"],

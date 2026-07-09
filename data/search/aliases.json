@@ -11469,6 +11469,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "pile group efficiency",
+      "target": "pile-group-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "converse labarre",
+      "target": "pile-group-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "pile group capacity",
+      "target": "pile-group-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "group action piles",
+      "target": "pile-group-efficiency",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pile spacing efficiency",
+      "target": "pile-group-efficiency",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pile cap",
+      "target": "pile-group-efficiency",
+      "kind": "adjacent"
+    },
+    {
+      "term": "group settlement",
+      "target": "pile-group-efficiency",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stress bulb overlap",
+      "target": "pile-group-efficiency",
+      "kind": "adjacent"
+    },
+    {
       "term": "slope stability",
       "target": "slope-stability-infinite",
       "kind": "industry"

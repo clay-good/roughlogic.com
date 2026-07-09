@@ -604,3 +604,50 @@ GEOTECH_RENDERERS["liquefaction-screening"] = _simpleRenderer({
   ],
   compute: computeLiquefactionScreening,
 });
+
+// ===================== spec-v498: pile group efficiency, Converse-Labarre =====================
+
+// dims: in { rows_n: dimensionless, cols_m: dimensionless, diameter_in: L, spacing_in: L, single_allow_kip: M L T^-2 } out: { theta_deg: dimensionless, eg: dimensionless, n_piles: dimensionless, group_kip: M L T^-2, naive_kip: M L T^-2 }
+export function computePileGroupEfficiency({ rows_n = 0, cols_m = 0, diameter_in = 0, spacing_in = 0, single_allow_kip = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(rows_n) || 0;
+  const m = Number(cols_m) || 0;
+  const d = Number(diameter_in) || 0;
+  const s = Number(spacing_in) || 0;
+  const q = Number(single_allow_kip) || 0;
+  if (!(n >= 1)) return { error: "Number of rows must be at least 1." };
+  if (!(m >= 1)) return { error: "Number of columns must be at least 1." };
+  if (!(d > 0)) return { error: "Pile diameter must be positive (in)." };
+  if (!(s >= d)) return { error: "Center-to-center spacing must be at least the pile diameter (in)." };
+  if (q < 0) return { error: "Single-pile allowable cannot be negative (kip)." };
+  const theta_deg = Math.atan(d / s) * 180 / Math.PI;
+  const eg = 1 - theta_deg * ((n - 1) * m + (m - 1) * n) / (90 * m * n);
+  const n_piles = m * n;
+  const group_kip = eg * n_piles * q;
+  const naive_kip = n_piles * q;
+  if (![theta_deg, eg, group_kip, naive_kip].every(Number.isFinite)) return { error: "Pile-group math is not a finite value." };
+  return {
+    theta_deg, eg, n_piles, group_kip, naive_kip,
+    note: "Converse-Labarre pile-group efficiency: a pile group carries LESS than the sum of its piles because the stress bulbs of adjacent piles overlap. theta = atan(d/s), Eg = 1 - theta x ((n-1)m + (m-1)n) / (90 m n), and the group allowable = Eg x (m x n) x Q_single. Efficiency drops as the spacing tightens -- below about 3d it falls under 0.7, so close-spaced piles give diminishing returns and adding piles at tight spacing over-predicts the group. This is an empirical friction-pile hand check; a block (pier) failure of the group acting as a unit and group settlement are separate checks this tile does not replace. A design aid, not a substitute for the geotechnical engineer of record.",
+  };
+}
+export const pileGroupEfficiencyExample = { inputs: { rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 36, single_allow_kip: 100 } };
+
+GEOTECH_RENDERERS["pile-group-efficiency"] = _simpleRenderer({
+  citation: "Citation: Converse-Labarre pile-group efficiency (standard geotechnical practice): theta = atan(d/s) in degrees; Eg = 1 - theta x ((n-1)m + (m-1)n) / (90 m n); group allowable = Eg x (m x n) x Q_single. Group capacity is less than the sum of the piles because the stress bulbs overlap; efficiency drops as spacing tightens. An empirical friction-pile hand check; block failure and settlement are separate. A design aid; the geotechnical engineer of record governs.",
+  example: pileGroupEfficiencyExample.inputs,
+  fields: [
+    { key: "rows_n", label: "Pile rows n", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "cols_m", label: "Pile columns m", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "diameter_in", label: "Pile diameter d (in)", kind: "number" },
+    { key: "spacing_in", label: "Center-to-center spacing s (in, >= d)", kind: "number" },
+    { key: "single_allow_kip", label: "Single-pile allowable Q (kip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "th", id: "pge-out-th", label: "Angle theta = atan(d/s)", value: (r) => fmt(r.theta_deg, 2) + " deg" },
+    { key: "eg", id: "pge-out-eg", label: "Converse-Labarre efficiency Eg", value: (r) => fmt(r.eg, 3) },
+    { key: "grp", id: "pge-out-grp", label: "Group allowable (" + "Eg x n x Q)", value: (r) => fmt(r.group_kip, 0) + " kip (" + r.n_piles + " piles)" },
+    { key: "nv", id: "pge-out-nv", label: "Naive sum it corrects", value: (r) => fmt(r.naive_kip, 0) + " kip (over-predicts by " + fmt(r.naive_kip - r.group_kip, 0) + " kip)" },
+  ],
+  compute: computePileGroupEfficiency,
+});

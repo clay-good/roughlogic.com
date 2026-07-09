@@ -17175,3 +17175,26 @@ test("bounds: spec-v497 computeConcreteLongtermDefl pins the xi steps, the rho' 
   assert.ok("error" in _v497({ immediate_defl_in: 0.4, duration_months: 0 }));
   assert.ok("error" in _v497({ immediate_defl_in: 0.4, duration_months: 60, comp_steel_ratio: -0.01 }));
 });
+
+import { computePileGroupEfficiency as _v498 } from "../../calc-geotech.js";
+
+test("bounds: spec-v498 computePileGroupEfficiency pins the Converse-Labarre efficiency, its drop with spacing, and error seams", () => {
+  const r = _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 36, single_allow_kip: 100 });
+  assert.ok(Math.abs(r.theta_deg - 18.43) < 0.05);
+  assert.ok(Math.abs(r.eg - 0.727) < 0.002);
+  assert.ok(Math.abs(r.group_kip - 654) < 1);
+  assert.ok(Math.abs(r.naive_kip - 900) < 1e-9 && r.group_kip < r.naive_kip); // group carries less than the sum
+  // Tightening the spacing lowers the efficiency (Eg monotonic in s).
+  const tight = _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 24, single_allow_kip: 100 });
+  assert.ok(tight.eg < r.eg && Math.abs(tight.eg - 0.606) < 0.002 && Math.abs(tight.group_kip - 546) < 1);
+  // Efficiency stays in (0, 1].
+  assert.ok(r.eg > 0 && r.eg <= 1);
+  // A single pile (1x1) has no group action: efficiency 1.0.
+  assert.ok(Math.abs(_v498({ rows_n: 1, cols_m: 1, diameter_in: 12, spacing_in: 36, single_allow_kip: 100 }).eg - 1.0) < 1e-9);
+  // Error seams: non-finite, rows/cols < 1, non-positive diameter/spacing, spacing < diameter, negative single allowable.
+  assert.ok("error" in _v498({ rows_n: Infinity, cols_m: 3, diameter_in: 12, spacing_in: 36 }));
+  assert.ok("error" in _v498({ rows_n: 0, cols_m: 3, diameter_in: 12, spacing_in: 36 }));
+  assert.ok("error" in _v498({ rows_n: 3, cols_m: 3, diameter_in: 0, spacing_in: 36 }));
+  assert.ok("error" in _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 6 })); // s < d
+  assert.ok("error" in _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 36, single_allow_kip: -1 }));
+});

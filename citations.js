@@ -8829,6 +8829,18 @@ export const CITATIONS = {
       { name: "Scope", value: "immediate settlement only; consolidation, layering, and embedment are separate", source: "customary geotechnical practice" },
     ],
   },
+  "pile-group-efficiency": {
+    formula: "theta = atan(d/s) [deg]; Eg = 1 - theta x ((n-1)m + (m-1)n) / (90 m n); group_allowable = Eg x (m x n) x Q_single.",
+    edition: "Converse-Labarre pile-group efficiency (standard geotechnical practice), an empirical friction-pile group hand check, by name; the geotechnical engineer of record and a load test govern.",
+    freeAccess: "The Converse-Labarre efficiency is a published empirical relation in standard foundation-engineering texts; the single-pile allowable comes from a pile analysis or load test.",
+    governance: GOVERNANCE.general,
+    editionNote: "Converse-Labarre pile-group efficiency. theta = atan(d/s) in degrees, Eg = 1 - theta x ((n-1)m + (m-1)n) / (90 m n), and the group allowable = Eg x (m x n) x Q_single. Group capacity is less than the sum of the piles because the stress bulbs of adjacent piles overlap, and efficiency drops as the spacing tightens (below about 3d it falls under 0.7, so close-spaced piles give diminishing returns). This is an empirical friction-pile hand check; a block (pier) failure of the group acting as a unit and group settlement are separate checks this tile does not replace. A design aid, not a substitute for the geotechnical engineer of record.",
+    assumptions: [
+      { name: "Overlap discount", value: "group capacity < sum of piles because the stress bulbs overlap", source: "Converse-Labarre" },
+      { name: "Spacing", value: "efficiency falls as s/d tightens; below ~3d Eg drops under 0.7", source: "Converse-Labarre" },
+      { name: "Scope", value: "friction-pile hand check; block failure and settlement are separate", source: "scope of this tile" },
+    ],
+  },
   "pile-axial-capacity": {
     formula: "As = pi D L; Ap = pi D^2/4; Qs = alpha cu As; Qp = 9 cu Ap; Qult = Qs + Qp; Qall = Qult / FS.",
     edition: "The alpha (total-stress) method for the static axial capacity of a pile in clay -- skin friction alpha cu over the shaft plus end bearing Nc cu (Nc = 9) at the tip -- with the adhesion factor alpha (~1.0 soft to ~0.5 stiff) as compiled in the FHWA driven-pile manual and Das (Principles of Foundation Engineering), and the customary factor of safety of 2 to 3 without a load test, by name.",

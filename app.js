@@ -542,6 +542,8 @@ const TOOL_MODULES = (() => {
     "soil-consolidation-settlement", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
     // spec-v414..v416 settlement/foundation trio
     "consolidation-time-rate", "spt-bearing-capacity", "liquefaction-screening",
+    // spec-v498 pile group efficiency (Converse-Labarre)
+    "pile-group-efficiency",
   ]);
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio: a new lazy
   // Group E cluster, the masonry counterpart to the steel / RC member benches;
