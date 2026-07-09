@@ -1061,6 +1061,18 @@ export const CITATIONS = {
       { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
     ],
   },
+  "transformer-inrush-point": {
+    formula: "FLA = kVA x 1000 / (sqrt(3) x V) three-phase (kVA x 1000 / V single-phase); inrush_point = inrush_multiple x FLA at the stated duration.",
+    edition: "Transformer energization-inrush coordination point (IEEE C57.109 through-fault / energization; NEC 450.3 context), first-principles, by name; the manufacturer's inrush data and a coordination study govern.",
+    freeAccess: "The FLA and inrush-multiple relations are first-principles; the inrush multiple and duration come from the transformer's energization data and a coordination study.",
+    governance: GOVERNANCE.general,
+    editionNote: "Transformer energization-inrush coordination point. FLA = kVA x 1000 / (sqrt(3) x V) three-phase, and the inrush point = multiple x FLA at the stated duration (commonly about 12x FLA at 0.1 s, up to 25x at 0.01 s). A primary device meeting the NEC 450.3 percentage limits can still nuisance-trip on the magnetizing inrush: its time-current curve must pass to the RIGHT of the inrush point (higher current at that short time) while staying LEFT of the transformer damage curve. The actual inrush depends on the point-on-wave, residual flux, and transformer design. A design aid, not the engineer of record; the manufacturer's inrush data and a coordination study govern.",
+    assumptions: [
+      { name: "Inrush multiple", value: "commonly 8 to 12x FLA at 0.1 s, up to about 25x in the first sub-cycle", source: "transformer energization" },
+      { name: "Curve placement", value: "the primary device curve must sit right of the inrush point and left of the damage curve", source: "IEEE C57.109" },
+      { name: "Variability", value: "the actual inrush depends on point-on-wave, residual flux, and transformer design", source: "manufacturer data" },
+    ],
+  },
   "battery-hydrogen-vent": {
     formula: "Q_cfm = 0.054 x I x N (N = individual 2 V cells); ACH = Q x 60 / room_volume.",
     edition: "The IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation rate, holding the room-average hydrogen below 1% (NFPA 855 4% LEL), by name; the applicable code and the room design govern.",

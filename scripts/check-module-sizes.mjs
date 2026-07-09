@@ -129,7 +129,7 @@ const CAPS = {
   // overcurrent bench (motor-feeder-multiple, transformer-conductor-protection)
   // split out of calc-electrical.js. ~4.5 KB; cap 6000 (current + headroom).
   // Lazy-loaded, so not in the home-view first-paint payload.
-  "calc-feeder.js": 8500, // spec-v280 2026-07-03 (7000->8500): +continuous-load-ocpd took the built copy to 6795 B (97.1%); +~25% headroom. Lazy-loaded, absent from the home payload. // v164 2026-06-23 (6000->7000): +feeder-tap-rule took the built copy to 5721 B (95.3%, WARN); +~17% locks in headroom for the v164..v178 electrician batch.
+  "calc-feeder.js": 11000, // spec-v493/v519 2026-07-09 (8500->11000): +2 Group A tiles (generator-conductor-445, existing-load-220-87) take the built copy to ~9.1 KB gz (106.8% of the old cap); cap = current + ~21% headroom; lazy-loaded, not in the home-view payload // spec-v280 2026-07-03 (7000->8500): +continuous-load-ocpd took the built copy to 6795 B (97.1%); +~25% headroom. Lazy-loaded, absent from the home payload. // v164 2026-06-23 (6000->7000): +feeder-tap-rule took the built copy to 5721 B (95.3%, WARN); +~17% locks in headroom for the v164..v178 electrician batch.
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.

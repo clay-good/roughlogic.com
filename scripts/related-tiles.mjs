@@ -922,6 +922,7 @@ const RELATED = {
   "capacitor-discharge-time": ["pf-correction", "motor-capacitor-max", "power-factor-billing-savings"],
   "asymmetrical-fault-xr": ["short-circuit-pp", "conductor-short-circuit-withstand", "arc-flash-screen"],
   "battery-hydrogen-vent": ["standby-battery-sizing", "off-grid-battery", "battery-runtime"],
+  "transformer-inrush-point": ["transformer-conductor-protection", "transformer-kva-sizing", "motor-locked-rotor-kva"],
   "multi-motor-feeder": ["motor-branch-from-nameplate", "motor-fla", "breaker-sizing"],
   "conductor-short-circuit-withstand": ["short-circuit-pp", "egc-sizing", "copper-resistance"],
   "conduit-thermal-expansion": ["conduit-fill", "cable-bend-radius", "copper-resistance"],

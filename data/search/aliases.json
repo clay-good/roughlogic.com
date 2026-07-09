@@ -19834,6 +19834,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "transformer inrush",
+      "target": "transformer-inrush-point",
+      "kind": "industry"
+    },
+    {
+      "term": "magnetizing inrush",
+      "target": "transformer-inrush-point",
+      "kind": "industry"
+    },
+    {
+      "term": "inrush coordination",
+      "target": "transformer-inrush-point",
+      "kind": "industry"
+    },
+    {
+      "term": "nuisance trip transformer",
+      "target": "transformer-inrush-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "energization inrush",
+      "target": "transformer-inrush-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "450.3 coordination",
+      "target": "transformer-inrush-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "inrush point",
+      "target": "transformer-inrush-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "12x fla",
+      "target": "transformer-inrush-point",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"

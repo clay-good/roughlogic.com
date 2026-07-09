@@ -60,6 +60,8 @@ const TOOL_MODULES = (() => {
     "asymmetrical-fault-xr",
     // spec-v518 battery room hydrogen ventilation (IEEE 1635)
     "battery-hydrogen-vent",
+    // spec-v520 transformer inrush coordination point
+    "transformer-inrush-point",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

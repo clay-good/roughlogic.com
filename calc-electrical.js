@@ -5206,3 +5206,54 @@ function _v518renderBatteryHydrogenVent(inputRegion, outputRegion, citationEl) {
   for (const f of [n, i, vol]) f.input.addEventListener("input", update);
 }
 ELECTRICAL_RENDERERS["battery-hydrogen-vent"] = _v518renderBatteryHydrogenVent;
+
+// ===================== spec-v520: transformer inrush coordination point =====================
+// dims: in { kva: M L^2 T^-3, primary_voltage_v: M L^2 T^-3 I^-1, phase: dimensionless, inrush_multiple: dimensionless, duration_s: T } out: { fla_a: I, inrush_point_a: I }
+export function computeTransformerInrushPoint({ kva = 0, primary_voltage_v = 0, phase = 3, inrush_multiple = 12, duration_s = 0.1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const k = Number(kva) || 0;
+  const v = Number(primary_voltage_v) || 0;
+  const ph = Number(phase) === 1 ? 1 : (Number(phase) === 3 ? 3 : 0);
+  const mult = Number(inrush_multiple) || 0;
+  const dur = Number(duration_s) || 0;
+  if (!(k > 0)) return { error: "Transformer kVA must be positive." };
+  if (!(v > 0)) return { error: "Primary voltage must be positive (V)." };
+  if (ph !== 1 && ph !== 3) return { error: "Phase must be 1 or 3." };
+  if (!(mult > 0)) return { error: "Inrush multiple must be positive." };
+  if (!(dur > 0)) return { error: "Inrush duration must be positive (s)." };
+  const fla_a = ph === 3 ? k * 1000 / (Math.sqrt(3) * v) : k * 1000 / v;
+  const inrush_point_a = mult * fla_a;
+  if (![fla_a, inrush_point_a].every(Number.isFinite)) return { error: "Inrush-point math is not a finite value." };
+  return {
+    fla_a, inrush_point_a, duration_s: dur,
+    note: "Transformer energization-inrush coordination point: FLA = kVA x 1000 / (sqrt(3) x V) three-phase, and the inrush point = multiple x FLA at the stated duration. The instant a transformer is energized at an unfavorable point on the voltage wave, the core saturates and draws a magnetizing inrush many times full load -- commonly 8 to 12x, up to about 25x in the first sub-cycle, decaying over a few cycles. A primary device meeting the NEC 450.3 percentage limits can still NUISANCE-TRIP on this inrush: its time-current curve must pass to the RIGHT of the inrush point (higher current at that short time) while staying LEFT of the transformer damage curve. The actual inrush depends on the point-on-wave, residual flux, and transformer design. A design aid, not the engineer of record; the manufacturer's inrush data and a coordination study govern.",
+  };
+}
+export const transformerInrushPointExample = { inputs: { kva: 75, primary_voltage_v: 480, phase: 3, inrush_multiple: 12, duration_s: 0.1 } };
+function _v520renderTransformerInrushPoint(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: transformer energization-inrush coordination (IEEE C57.109; NEC 450.3 context): FLA = kVA x 1000 / (sqrt(3) x V) three-phase; inrush point = multiple x FLA at the stated duration (~12x at 0.1 s, up to 25x at 0.01 s). The primary device curve must sit right of the inrush point and left of the damage curve. A design aid; the manufacturer's inrush data and a coordination study govern.";
+  const kva = makeNumber("Transformer rating (kVA)", "tip-kva", { step: "any", min: "0" }); kva.input.value = "75";
+  const v = makeNumber("Primary line voltage (V)", "tip-v", { step: "any", min: "0" }); v.input.value = "480";
+  const ph = makeSelect("Phase", "tip-ph", [
+    { value: "3", label: "Three-phase", selected: true },
+    { value: "1", label: "Single-phase" },
+  ]);
+  const mult = makeNumber("Inrush multiple (x FLA)", "tip-mult", { step: "any", min: "0" }); mult.input.value = "12";
+  const dur = makeNumber("Duration (s)", "tip-dur", { step: "any", min: "0" }); dur.input.value = "0.1";
+  for (const f of [kva, v, ph, mult, dur]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kva.input.value = "75"; v.input.value = "480"; ph.select.value = "3"; mult.input.value = "12"; dur.input.value = "0.1"; update(); });
+  const oFla = makeOutputLine(outputRegion, "Full-load current (FLA)", "tip-out-fla");
+  const oIn = makeOutputLine(outputRegion, "Inrush coordination point", "tip-out-in");
+  const oNote = makeOutputLine(outputRegion, "Note", "tip-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTransformerInrushPoint({ kva: readNum(kva.input), primary_voltage_v: readNum(v.input), phase: Number(ph.select.value), inrush_multiple: mult.input.value === "" ? 12 : readNum(mult.input), duration_s: dur.input.value === "" ? 0.1 : readNum(dur.input) });
+    if (r.error) { oFla.textContent = r.error; oIn.textContent = "-"; oNote.textContent = ""; return; }
+    oFla.textContent = fmt(r.fla_a, 1) + " A";
+    oIn.textContent = fmt(r.inrush_point_a, 0) + " A at " + fmt(r.duration_s, 3) + " s";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kva, v, mult, dur]) f.input.addEventListener("input", update);
+  ph.select.addEventListener("change", update);
+}
+ELECTRICAL_RENDERERS["transformer-inrush-point"] = _v520renderTransformerInrushPoint;

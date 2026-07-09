@@ -45742,6 +45742,60 @@
    }
   },
   {
+   "tile_id": "transformer-inrush-point",
+   "source_publisher": "transformer energization-inrush coordination",
+   "source_title": "75 kVA, 480 V three-phase, 12x at 0.1 s -> 90.2 A FLA, 1,083 A inrush point",
+   "source_edition_or_year": "spec-v520 worked example (machine-verified)",
+   "source_section_or_page": "spec-v520 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "kva": 75,
+    "primary_voltage_v": 480,
+    "phase": 3,
+    "inrush_multiple": 12,
+    "duration_s": 0.1
+   },
+   "outputs": {
+    "fla_a": {
+     "value": 90.2,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "inrush_point_a": {
+     "value": 1083,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "transformer-inrush-point",
+   "source_publisher": "transformer energization-inrush coordination",
+   "source_title": "cross-check: the sub-cycle point is higher and shorter -> 25x = 2,255 A at 0.01 s",
+   "source_edition_or_year": "spec-v520 worked example (machine-verified)",
+   "source_section_or_page": "spec-v520 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "kva": 75,
+    "primary_voltage_v": 480,
+    "phase": 3,
+    "inrush_multiple": 25,
+    "duration_s": 0.01
+   },
+   "outputs": {
+    "inrush_point_a": {
+     "value": 2255,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "economic-conductor-sizing",
    "source_publisher": "economic conductor sizing (I2R)",
    "source_title": "100 A, 0.20->0.125 ohm, 4000 hr, $0.12, $800 -> $1080/yr, 0.7 yr payback",

@@ -17652,3 +17652,22 @@ test("bounds: spec-v519 computeExistingLoad22087 pins the 125% basis, the headro
   assert.ok("error" in _v519({ recorded_peak_a: 120, new_load_a: -1, service_rating_a: 200 }));
   assert.ok("error" in _v519({ recorded_peak_a: 120, new_load_a: 40, service_rating_a: 0 }));
 });
+
+import { computeTransformerInrushPoint as _v520 } from "../../calc-electrical.js";
+
+test("bounds: spec-v520 computeTransformerInrushPoint pins the FLA, the inrush point, the single-phase path, and error seams", () => {
+  const r = _v520({ kva: 75, primary_voltage_v: 480, phase: 3, inrush_multiple: 12, duration_s: 0.1 });
+  assert.ok(Math.abs(r.fla_a - 90.21) < 0.1); // 75000 / (sqrt(3) x 480)
+  assert.ok(Math.abs(r.inrush_point_a - 1083) < 2);
+  // The inrush point scales linearly with the multiple.
+  assert.ok(Math.abs(_v520({ kva: 75, primary_voltage_v: 480, phase: 3, inrush_multiple: 25, duration_s: 0.01 }).inrush_point_a - 25 / 12 * r.inrush_point_a) < 1e-6);
+  // Single-phase FLA = kVA x 1000 / V.
+  assert.ok(Math.abs(_v520({ kva: 10, primary_voltage_v: 240, phase: 1, inrush_multiple: 12, duration_s: 0.1 }).fla_a - 10000 / 240) < 1e-6);
+  // Error seams: non-finite, non-positive kVA / voltage, bad phase, non-positive multiple / duration.
+  assert.ok("error" in _v520({ kva: Infinity, primary_voltage_v: 480 }));
+  assert.ok("error" in _v520({ kva: 0, primary_voltage_v: 480 }));
+  assert.ok("error" in _v520({ kva: 75, primary_voltage_v: 0 }));
+  assert.ok("error" in _v520({ kva: 75, primary_voltage_v: 480, phase: 2 }));
+  assert.ok("error" in _v520({ kva: 75, primary_voltage_v: 480, inrush_multiple: 0 }));
+  assert.ok("error" in _v520({ kva: 75, primary_voltage_v: 480, duration_s: 0 }));
+});

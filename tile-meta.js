@@ -726,6 +726,8 @@ const _TILES = [
   ["asymmetrical-fault-xr", "A"],
   // spec-v518 battery room hydrogen ventilation (IEEE 1635)
   ["battery-hydrogen-vent", "A"],
+  // spec-v520 transformer inrush coordination point
+  ["transformer-inrush-point", "A"],
   ["ada-ramp-slope", "E"],
   ["pool-bonding-680-26", "A"],
 ];
