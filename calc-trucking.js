@@ -1482,3 +1482,56 @@ const renderInvoiceFactoringCost = _simpleRenderer({
   compute: computeInvoiceFactoringCost,
 });
 TRUCKING_RENDERERS["invoice-factoring-cost"] = renderInvoiceFactoringCost;
+
+// spec-v486: trailer tongue weight and sway check. Tongue% = tongue / gross x
+// 100, against the 10-15% conventional / 15-25% gooseneck target bands. Too
+// little tongue weight causes trailer sway; too much overloads the hitch and
+// unloads the tow vehicle's steer axle.
+// dims: in { trailer_gross_weight_lb: M, tongue_weight_lb: M, hitch_type: dimensionless, hitch_rating_lb: M } out: { tongue_pct: dimensionless, target_low_lb: M, target_high_lb: M }
+export function computeTrailerTongueWeight({ trailer_gross_weight_lb = 0, tongue_weight_lb = 0, hitch_type = "conventional", hitch_rating_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const gross = Number(trailer_gross_weight_lb) || 0;
+  const tongue = Number(tongue_weight_lb) || 0;
+  const rating = Number(hitch_rating_lb) || 0;
+  if (!(gross > 0)) return { error: "Trailer gross weight must be positive (lb)." };
+  if (!(tongue > 0)) return { error: "Tongue weight must be positive (lb)." };
+  if (!(tongue < gross)) return { error: "Tongue weight must be less than the trailer gross weight (the tongue carries a fraction of the load)." };
+  if (!(rating >= 0)) return { error: "Hitch rating must be zero or positive (lb)." };
+  const band = hitch_type === "gooseneck" ? { low: 15, high: 25, label: "gooseneck / fifth wheel" } : { low: 10, high: 15, label: "conventional (bumper-pull)" };
+  const tongue_pct = tongue / gross * 100;
+  const target_low_lb = gross * band.low / 100;
+  const target_high_lb = gross * band.high / 100;
+  const in_band = tongue_pct >= band.low && tongue_pct <= band.high;
+  const over_rating = rating > 0 && tongue > rating;
+  const verdict = tongue_pct < band.low
+    ? "TOO LIGHT (" + fmt(tongue_pct, 1) + "% < " + band.low + "%) - trailer-sway risk; move cargo forward of the trailer axle to add tongue weight"
+    : tongue_pct > band.high
+      ? "TOO HEAVY (" + fmt(tongue_pct, 1) + "% > " + band.high + "%) - overloads the hitch and the tow vehicle's rear axle and unloads the steer axle; move cargo rearward"
+      : "in band (" + band.low + "-" + band.high + "% for a " + band.label + " hitch)";
+  return {
+    tongue_pct, target_low_lb, target_high_lb, in_band, over_rating, band_label: band.label,
+    note: "Tongue weight is the down-force the loaded trailer puts on the hitch ball, and its share of the trailer's gross weight is what keeps the rig tracking straight: the industry bands are 10-15% for a conventional (bumper-pull) hitch and 15-25% for a gooseneck or fifth wheel. Below the band the load sits too far behind the axle and the trailer sways (fishtails), the classic single-vehicle trailer wreck; above it the hitch and the tow vehicle's rear axle are overloaded while the steer axle lightens, robbing steering and braking. Adjust by moving cargo forward (more tongue) or rearward (less). The bands are rules of thumb; the specific vehicle, hitch, and trailer manufacturer ratings and the tow vehicle's payload and rear-axle GAWR govern. Weigh the tongue with the trailer level and loaded as it will tow; a scale reading, not a guess.",
+  };
+}
+const trailerTongueWeightExample = { inputs: { trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_type: "conventional", hitch_rating_lb: 0 } };
+const renderTrailerTongueWeight = _simpleRenderer({
+  citation: "Citation: standard towing tongue-weight guidance (NHTSA / SAE J2807 and the hitch/vehicle manufacturer ratings): tongue% = tongue / gross x 100, target 10-15% conventional and 15-25% gooseneck/fifth wheel. Too little causes sway; too much overloads the hitch and unloads the steer axle. A setup screen; the manufacturer ratings and a scale govern.",
+  example: trailerTongueWeightExample.inputs,
+  fields: [
+    { key: "trailer_gross_weight_lb", label: "Trailer gross weight, loaded (lb)", kind: "number", default: 7000 },
+    { key: "tongue_weight_lb", label: "Measured tongue (coupler) weight (lb)", kind: "number", default: 700 },
+    { key: "hitch_type", label: "Hitch type", kind: "select", options: [
+      { value: "conventional", label: "Conventional / bumper-pull (10-15%)" },
+      { value: "gooseneck", label: "Gooseneck / fifth wheel (15-25%)" },
+    ], default: "conventional" },
+    { key: "hitch_rating_lb", label: "Hitch tongue-weight rating (lb, 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "p", id: "ttw-out-p", label: "Tongue weight", value: (r) => fmt(r.tongue_pct, 1) + "%" },
+    { key: "t", id: "ttw-out-t", label: "Target window", value: (r) => fmt(r.target_low_lb, 0) + " - " + fmt(r.target_high_lb, 0) + " lb (" + r.band_label + ")" },
+    { key: "v", id: "ttw-out-v", label: "Verdict", value: (r) => (r.in_band ? "OK: " : "") + r.verdict + (r.over_rating ? " -- ALSO over the hitch tongue-weight rating" : "") },
+    { key: "n", id: "ttw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTrailerTongueWeight,
+});
+TRUCKING_RENDERERS["trailer-tongue-weight"] = renderTrailerTongueWeight;

@@ -16872,3 +16872,32 @@ test("bounds: spec-v485 computeTorqueAdapterCorrection pins TW = TA L/(L+E cos),
   assert.ok("error" in _v485({ target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: -3 }));
   assert.ok("error" in _v485({ target_torque_ftlb: 100, wrench_length_in: 18, adapter_length_in: 30, adapter_angle_deg: 180 }));
 });
+
+// ===================== spec-v486 trailer tongue weight and sway check (Group J) =====================
+import { computeTrailerTongueWeight as _v486 } from "../../calc-trucking.js";
+
+test("bounds: spec-v486 computeTrailerTongueWeight pins the percent, the conventional/gooseneck bands, the sway flag, the over-rating flag, and error seams", () => {
+  const r = _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_type: "conventional", hitch_rating_lb: 0 });
+  assert.ok(Math.abs(r.tongue_pct - 10) < 1e-9);
+  assert.ok(Math.abs(r.target_low_lb - 700) < 1e-9 && Math.abs(r.target_high_lb - 1050) < 1e-9);
+  assert.strictEqual(r.in_band, true); // 10% is at the inclusive floor
+  // The sway trap: shifting load back to 7% drops below the 10% floor.
+  const r2 = _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 490, hitch_type: "conventional" });
+  assert.ok(Math.abs(r2.tongue_pct - 7) < 1e-9);
+  assert.strictEqual(r2.in_band, false);
+  // Too heavy: 20% conventional is over the 15% ceiling.
+  assert.strictEqual(_v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 1400, hitch_type: "conventional" }).in_band, false);
+  // Gooseneck band is 15-25%: 20% is in band there.
+  const g = _v486({ trailer_gross_weight_lb: 14000, tongue_weight_lb: 2800, hitch_type: "gooseneck" });
+  assert.ok(Math.abs(g.tongue_pct - 20) < 1e-9 && g.in_band === true);
+  assert.ok(Math.abs(g.target_low_lb - 2100) < 1e-9 && Math.abs(g.target_high_lb - 3500) < 1e-9);
+  // Over-rating flag trips when the tongue exceeds an entered hitch rating.
+  assert.strictEqual(_v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_type: "conventional", hitch_rating_lb: 500 }).over_rating, true);
+  assert.strictEqual(_v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_type: "conventional", hitch_rating_lb: 1000 }).over_rating, false);
+  // Error seams: non-finite, non-positive weights, tongue >= gross, negative rating.
+  assert.ok("error" in _v486({ trailer_gross_weight_lb: Infinity, tongue_weight_lb: 700 }));
+  assert.ok("error" in _v486({ trailer_gross_weight_lb: 0, tongue_weight_lb: 700 }));
+  assert.ok("error" in _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 0 }));
+  assert.ok("error" in _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 7000 }));
+  assert.ok("error" in _v486({ trailer_gross_weight_lb: 7000, tongue_weight_lb: 700, hitch_rating_lb: -1 }));
+});

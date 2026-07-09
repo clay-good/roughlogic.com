@@ -97,6 +97,8 @@ const _TILES = [
   ["deadhead-percent", "J"],
   ["axle-load-distribution", "J"],
   ["detention-demurrage-billing", "J"], ["driver-pay-cpm-vs-percentage", "J"], ["invoice-factoring-cost", "J"],
+  // spec-v486 trailer tongue weight and sway check (Group J)
+  ["trailer-tongue-weight", "J"],
   ["elevation-pressure-loss", "F"],
   ["water-supply-duration", "F"],
   ["point-load-bearing", "E"],

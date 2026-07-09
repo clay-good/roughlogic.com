@@ -697,6 +697,8 @@ const TOOL_MODULES = (() => {
     "gcwr-check", "tire-load-check",
     // spec-v423..v425 trucking business
     "detention-demurrage-billing", "driver-pay-cpm-vs-percentage", "invoice-factoring-cost",
+    // spec-v486 trailer tongue weight and sway check
+    "trailer-tongue-weight",
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [

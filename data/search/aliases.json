@@ -5414,6 +5414,46 @@
       "kind": "redirect"
     },
     {
+      "term": "tongue weight",
+      "target": "trailer-tongue-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "trailer sway",
+      "target": "trailer-tongue-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "hitch weight",
+      "target": "trailer-tongue-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "tongue percentage",
+      "target": "trailer-tongue-weight",
+      "kind": "adjacent"
+    },
+    {
+      "term": "gooseneck weight",
+      "target": "trailer-tongue-weight",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fifth wheel weight",
+      "target": "trailer-tongue-weight",
+      "kind": "adjacent"
+    },
+    {
+      "term": "trailer balance",
+      "target": "trailer-tongue-weight",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sway control",
+      "target": "trailer-tongue-weight",
+      "kind": "adjacent"
+    },
+    {
       "term": "chlorine demand dose",
       "target": "chlorine-demand",
       "kind": "industry"

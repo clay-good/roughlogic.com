@@ -41761,6 +41761,64 @@
    }
   },
   {
+   "tile_id": "trailer-tongue-weight",
+   "source_publisher": "NHTSA / SAE J2807 towing tongue-weight guidance",
+   "source_title": "7,000 lb conventional trailer, 700 lb tongue -> 10.0% (in band, 700-1,050 lb target)",
+   "source_edition_or_year": "spec-v486 worked example (machine-verified)",
+   "source_section_or_page": "spec-v486 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "trailer_gross_weight_lb": 7000,
+    "tongue_weight_lb": 700,
+    "hitch_type": "conventional",
+    "hitch_rating_lb": 0
+   },
+   "outputs": {
+    "tongue_pct": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "target_low_lb": {
+     "value": 700,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "target_high_lb": {
+     "value": 1050,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "trailer-tongue-weight",
+   "source_publisher": "NHTSA / SAE J2807 towing tongue-weight guidance",
+   "source_title": "cross-check: shift load back to a 490 lb tongue -> 7.0%, below the 10% floor (sway risk)",
+   "source_edition_or_year": "spec-v486 worked example (machine-verified)",
+   "source_section_or_page": "spec-v486 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "trailer_gross_weight_lb": 7000,
+    "tongue_weight_lb": 490,
+    "hitch_type": "conventional",
+    "hitch_rating_lb": 0
+   },
+   "outputs": {
+    "tongue_pct": {
+     "value": 7,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "overflow-scupper-sizing",
    "source_publisher": "Francis weir / IPC 1108",
    "source_title": "6 in scupper, 3.5 in head -> 118 gpm (104 contracted)",

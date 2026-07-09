@@ -917,6 +917,7 @@ const RELATED = {
   // spec-v115 trucking weight compliance (Group J)
   "gcwr-check": ["bridge-formula","axle-load-distribution","vehicle-load"],
   "tire-load-check": ["axle-load-distribution","bridge-formula","gcwr-check"],
+  "trailer-tongue-weight": ["axle-load-distribution","gcwr-check","tire-load-check"],
   // spec-v116 water disinfection (Group M)
   "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
   "uv-dose": ["disinfection-ct","chlorine-demand"],

@@ -69,6 +69,7 @@ export const COMPUTE_MAP = {
   "detention-demurrage-billing": { module: "../../calc-trucking.js", fn: "computeDetentionDemurrageBilling" },
   "driver-pay-cpm-vs-percentage": { module: "../../calc-trucking.js", fn: "computeDriverPayCpmVsPercentage" },
   "invoice-factoring-cost": { module: "../../calc-trucking.js", fn: "computeInvoiceFactoringCost" },
+  "trailer-tongue-weight": { module: "../../calc-trucking.js", fn: "computeTrailerTongueWeight" },
   "elevation-pressure-loss": { module: "../../calc-fire.js", fn: "computeElevationPressureLoss" },
   "water-supply-duration": { module: "../../calc-fire.js", fn: "computeWaterSupplyDuration" },
   "point-load-bearing": { module: "../../calc-construction.js", fn: "computePointLoadBearing" },

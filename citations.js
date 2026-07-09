@@ -718,6 +718,19 @@ export const CITATIONS = {
     ],
   },
 
+  "trailer-tongue-weight": {
+    formula: "tongue% = tongue_weight / trailer_gross x 100; target band = 10-15% (conventional) or 15-25% (gooseneck / fifth wheel); target_lb window = gross x band; over_rating when tongue > hitch rating.",
+    edition: "Standard towing tongue-weight guidance (NHTSA / SAE J2807; the hitch and vehicle manufacturer ratings), by name.",
+    freeAccess: "The tongue-weight percentage bands are public towing-safety guidance (NHTSA, SAE J2807); the specific ratings come from the vehicle, hitch, and trailer manufacturers.",
+    governance: GOVERNANCE.general,
+    editionNote: "Tongue weight is the down-force the loaded trailer places on the hitch ball, and its share of the trailer's gross weight is what keeps the rig tracking straight: the industry target is 10-15% of the trailer gross weight for a conventional (bumper-pull) hitch and 15-25% for a gooseneck or fifth wheel. Below the band the load sits too far behind the trailer axle and the trailer sways or fishtails (the classic single-vehicle trailer wreck); above it the hitch and the tow vehicle's rear axle are overloaded while the steer axle lightens, robbing steering and braking. Adjust by moving cargo forward (more tongue) or rearward (less). The bands are rules of thumb; the specific vehicle, hitch, and trailer manufacturer ratings and the tow vehicle's payload and rear-axle GAWR govern the actual limits. Weigh the tongue with the trailer level and loaded as it will tow - a scale reading, not a guess.",
+    assumptions: [
+      { name: "Target bands", value: "10-15% of trailer gross for a conventional hitch; 15-25% for a gooseneck / fifth wheel", source: "NHTSA / SAE J2807" },
+      { name: "Sway vs overload", value: "below the band the trailer sways; above it the hitch and tow-vehicle rear axle are overloaded and the steer axle lightens", source: "towing-safety practice" },
+      { name: "Ratings govern", value: "the vehicle, hitch, and trailer manufacturer ratings and the tow vehicle's payload / rear-axle GAWR govern; weigh on a scale", source: "scope of this tile" },
+    ],
+  },
+
   "elevation-pressure-loss": {
     formula: "Exact P = 0.434 * dH_ft; rule of thumb ~5 psi per floor (assumes 10-ft floors). Climbing is a loss, descending a gain.",
     edition: "Hydrostatic head 0.434 psi/ft (public); fire-ground 5-psi-per-floor approximation per IFSTA Pumping Apparatus Driver/Operator and the NFPA 14 design basis, by name.",
