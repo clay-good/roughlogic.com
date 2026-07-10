@@ -6374,6 +6374,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "winch line pull",
+      "target": "winch-drum-line-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "drum line pull",
+      "target": "winch-drum-line-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "winch layer derate",
+      "target": "winch-drum-line-pull",
+      "kind": "redirect"
+    },
+    {
+      "term": "bare drum rating",
+      "target": "winch-drum-line-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "winch capacity by layer",
+      "target": "winch-drum-line-pull",
+      "kind": "redirect"
+    },
+    {
+      "term": "wire rope drum",
+      "target": "winch-drum-line-pull",
+      "kind": "adjacent"
+    },
+    {
+      "term": "line speed layer",
+      "target": "winch-drum-line-pull",
+      "kind": "adjacent"
+    },
+    {
+      "term": "winch stall",
+      "target": "winch-drum-line-pull",
+      "kind": "adjacent"
+    },
+    {
       "term": "hay moisture",
       "target": "hay-dry-matter",
       "kind": "industry"

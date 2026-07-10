@@ -8518,6 +8518,17 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.9" },
     ],
   },
+  "winch-drum-line-pull": {
+    formula: "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia).",
+    edition: "Wire-rope drum mechanics / SAE winch rating convention, by name.",
+    freeAccess: "Drum line-pull mechanics are a public engineering result; the winch manufacturer's layer ratings govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The rated line pull is a bare-drum figure for the first wrap and it falls layer by layer as the growing moment arm works against the motor (outer layers can be 30-40% weaker) while the line speed rises in proportion; the rope must also fit the drum capacity. A planning aid, not the winch's certified capacity.",
+    assumptions: [
+      { name: "Mean-diameter model", value: "Dn = drum + (2n-1) x rope_dia; pull inversely proportional to mean diameter", source: "drum mechanics" },
+      { name: "Layer ratings govern", value: "the winch manufacturer's published per-layer ratings are authoritative", source: "SAE winch rating" },
+    ],
+  },
   "hay-dry-matter": {
     formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18% large / 20% small).",
     edition: "First-principles dry-matter mass balance with USDA NRCS / land-grant extension safe-storage guidance (by name); no edition cycle.",

@@ -914,6 +914,7 @@ export const COMPUTE_MAP = {
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },
   "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },
+  "winch-drum-line-pull": { module: "../../calc-rigging.js", fn: "computeWinchDrumLinePull" },
   "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
   "sprinkler-precip-rate": { module: "../../calc-agriculture.js", fn: "computeSprinklerPrecipRate" },
   "irrigation-zone-runtime": { module: "../../calc-agriculture.js", fn: "computeIrrigationZoneRuntime" },

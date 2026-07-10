@@ -24471,6 +24471,66 @@
    }
   },
   {
+   "tile_id": "winch-drum-line-pull",
+   "source_publisher": "Wire-rope drum mechanics / SAE winch rating convention",
+   "source_title": "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn",
+   "source_edition_or_year": "drum mechanics",
+   "source_section_or_page": "10000 lb bare, 10 in drum, 1/2 in rope, 12 in barrel, layer 4 -> 13.5 in, 7407 lb, 1.35x speed, 24 wraps",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "rated_pull_lb": 10000,
+    "drum_dia_in": 10,
+    "rope_dia_in": 0.5,
+    "barrel_width_in": 12,
+    "target_layer": 4
+   },
+   "outputs": {
+    "mean_dia_in": {
+     "value": 13.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "pull_at_layer_lb": {
+     "value": 7407,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "wraps_per_layer": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "winch-drum-line-pull",
+   "source_publisher": "Wire-rope drum mechanics / SAE winch rating convention",
+   "source_title": "a fatter rope grows the drum faster and fades the pull faster",
+   "source_edition_or_year": "drum mechanics",
+   "source_section_or_page": "Same winch with 3/4 in rope, layer 4 -> 15.25 in mean diameter, 6557 lb (34% loss)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "rated_pull_lb": 10000,
+    "drum_dia_in": 10,
+    "rope_dia_in": 0.75,
+    "barrel_width_in": 12,
+    "target_layer": 4
+   },
+   "outputs": {
+    "pull_at_layer_lb": {
+     "value": 6557,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hay-dry-matter",
    "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
    "source_title": "1,200 lb round bale at 22% -> 936 lb DM, 1,101 lb at 15%, flag",

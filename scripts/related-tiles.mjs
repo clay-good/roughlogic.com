@@ -978,6 +978,7 @@ const RELATED = {
   // spec-v484 spanned cable sag and tension (Group Z)
   "spanline-sag-tension": ["sling-angle","wire-rope-strength","block-redirect-load"],
   "bridle-leg-tension": ["multi-leg-sling","sling-angle","counterweight-arbor-load"],
+  "winch-drum-line-pull": ["wire-rope-strength","chain-lever-hoist","pulley-ma-gen"],
   // spec-v118 hay dry-matter (Group L)
   "hay-dry-matter": ["pearson-square-ration","grain-bin-capacity","livestock-water-requirement"],
   // spec-v207..v211 landscape irrigation and planting install cluster (Group L)

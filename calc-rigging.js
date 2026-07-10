@@ -992,3 +992,54 @@ function renderBridleLegTension(inputRegion, outputRegion, citationEl) {
   for (const f of [w, r1, h1, r2, h2]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["bridle-leg-tension"] = renderBridleLegTension;
+
+// --- spec-v545 Z: Winch drum line pull and capacity by layer (`winch-drum-line-pull`) ---
+// Dn = drum + (2n-1)*rope. Pn = rated*drum/Dn. Vn = drum_speed*Dn/drum. wraps = floor(barrel/rope).
+// dims: in { rated_pull_lb: M L T^-2, drum_dia_in: L, rope_dia_in: L, barrel_width_in: L, target_layer: dimensionless } out: { mean_dia_in: L, pull_at_layer_lb: M L T^-2, speed_ratio: dimensionless, wraps_per_layer: dimensionless }
+export function computeWinchDrumLinePull({ rated_pull_lb, drum_dia_in, rope_dia_in, barrel_width_in, target_layer = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P1 = Number(rated_pull_lb);
+  const D1 = Number(drum_dia_in);
+  const dr = Number(rope_dia_in);
+  const bw = Number(barrel_width_in);
+  const n = Number(target_layer);
+  if (!Number.isFinite(P1) || P1 <= 0) return { error: "Rated pull must be a positive finite number (lb)." };
+  if (!Number.isFinite(D1) || D1 <= 0) return { error: "Drum diameter must be a positive finite number (in)." };
+  if (!Number.isFinite(dr) || dr <= 0) return { error: "Rope diameter must be a positive finite number (in)." };
+  if (!Number.isFinite(bw) || bw <= 0) return { error: "Barrel width must be a positive finite number (in)." };
+  if (!Number.isFinite(n) || n < 1) return { error: "Target layer must be at least 1." };
+  const layer = Math.floor(n);
+  const mean_dia_in = D1 + (2 * layer - 1) * dr;
+  const pull_at_layer_lb = P1 * D1 / mean_dia_in;
+  const speed_ratio = mean_dia_in / D1;
+  const wraps_per_layer = Math.floor(bw / dr);
+  const derate_pct = (1 - pull_at_layer_lb / P1) * 100;
+  return {
+    mean_dia_in, pull_at_layer_lb, speed_ratio, wraps_per_layer, derate_pct,
+    note: "The rated line pull is a bare-drum figure for the first wrap; it falls layer by layer as the growing moment arm works against the motor (outer layers can be 30-40% weaker) while the line speed rises in proportion. The rope must also fit the drum capacity. The winch manufacturer's layer ratings govern.",
+  };
+}
+
+function renderWinchDrumLinePull(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Wire-rope drum mechanics / SAE winch rating convention, by name. Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia). The rated pull is a bare-drum first-wrap figure that fades layer by layer (outer layers 30-40% weaker) as line speed rises in proportion. The winch manufacturer's layer ratings govern.";
+  const p = makeNumber("Bare-drum rated pull (lb)", "wdl-p", { step: "any", min: "0" });
+  const d = makeNumber("Bare drum diameter (in)", "wdl-d", { step: "any", min: "0" });
+  const rr = makeNumber("Wire rope diameter (in)", "wdl-r", { step: "any", min: "0" });
+  const bw = makeNumber("Drum barrel width (in)", "wdl-bw", { step: "any", min: "0" });
+  const n = makeNumber("Target layer (1 = bare)", "wdl-n", { step: "1", min: "1", value: "1" });
+  n.input.value = "1";
+  for (const f of [p, d, rr, bw, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { p.input.value = "10000"; d.input.value = "10"; rr.input.value = "0.5"; bw.input.value = "12"; n.input.value = "4"; update(); });
+  const oM = makeOutputLine(outputRegion, "Mean diameter at layer", "wdl-out-m");
+  const oP = makeOutputLine(outputRegion, "Pull at layer", "wdl-out-p");
+  const oS = makeOutputLine(outputRegion, "Speed / wraps per layer", "wdl-out-s");
+  const update = debounce(() => {
+    const r = computeWinchDrumLinePull({ rated_pull_lb: Number(p.input.value) || 0, drum_dia_in: Number(d.input.value) || 0, rope_dia_in: Number(rr.input.value) || 0, barrel_width_in: Number(bw.input.value) || 0, target_layer: Number(n.input.value) || 0 });
+    if (r.error) { oM.textContent = r.error; for (const o of [oP, oS]) o.textContent = "-"; return; }
+    oM.textContent = fmt(r.mean_dia_in, 2) + " in";
+    oP.textContent = fmt(r.pull_at_layer_lb, 0) + " lb (" + fmt(r.derate_pct, 0) + "% below rated)";
+    oS.textContent = fmt(r.speed_ratio, 2) + "x speed, " + r.wraps_per_layer + " wraps/layer";
+  }, DEBOUNCE_MS);
+  for (const f of [p, d, rr, bw, n]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["winch-drum-line-pull"] = renderWinchDrumLinePull;

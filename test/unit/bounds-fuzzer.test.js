@@ -18196,3 +18196,28 @@ test("bounds: spec-v544 computeBridleLegTension pins the unequal split, horizont
   assert.ok("error" in _v544({ apex_load_lb: 1000, run1_ft: 4, rise1_ft: 0, run2_ft: 10, rise2_ft: 6 }));
   assert.ok("error" in _v544({ apex_load_lb: 1000, run1_ft: 4, rise1_ft: 8, run2_ft: 10, rise2_ft: 0 }));
 });
+
+import { computeWinchDrumLinePull as _v545 } from "../../calc-rigging.js";
+
+test("bounds: spec-v545 computeWinchDrumLinePull pins the per-layer derate, the speed rise, the wraps, and error seams", () => {
+  const l4 = _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 4 });
+  assert.ok(Math.abs(l4.mean_dia_in - 13.5) < 1e-9); // 10 + 7*0.5
+  assert.ok(Math.abs(l4.pull_at_layer_lb - 7407) < 1); // 10000*10/13.5
+  assert.ok(Math.abs(l4.speed_ratio - 1.35) < 1e-9);
+  assert.equal(l4.wraps_per_layer, 24); // floor(12/0.5)
+  // Layer 1 is the bare-drum near-nameplate case.
+  const l1 = _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 1 });
+  assert.ok(Math.abs(l1.pull_at_layer_lb - 9524) < 1); // 10000*10/10.5
+  // Pull falls and speed rises with each layer.
+  assert.ok(l4.pull_at_layer_lb < l1.pull_at_layer_lb);
+  assert.ok(l4.speed_ratio > l1.speed_ratio);
+  // A fatter rope fades faster at the same layer.
+  assert.ok(_v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.75, barrel_width_in: 12, target_layer: 4 }).pull_at_layer_lb < l4.pull_at_layer_lb);
+  // Error seams: non-finite, non-positive pull / diameters / barrel, layer < 1.
+  assert.ok("error" in _v545({ rated_pull_lb: Infinity, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 4 }));
+  assert.ok("error" in _v545({ rated_pull_lb: 0, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 4 }));
+  assert.ok("error" in _v545({ rated_pull_lb: 10000, drum_dia_in: 0, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 4 }));
+  assert.ok("error" in _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0, barrel_width_in: 12, target_layer: 4 }));
+  assert.ok("error" in _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 0, target_layer: 4 }));
+  assert.ok("error" in _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 0 }));
+});

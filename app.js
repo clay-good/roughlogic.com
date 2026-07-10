@@ -1052,6 +1052,8 @@ const TOOL_MODULES = (() => {
     "spanline-sag-tension",
     // spec-v544
     "bridle-leg-tension",
+    // spec-v545
+    "winch-drum-line-pull",
   ]);
   return map;
 })();
