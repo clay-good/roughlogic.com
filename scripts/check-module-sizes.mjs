@@ -62,7 +62,7 @@ const CAPS = {
   // Bumped 11500 -> 13000 on 2026-06-06 for the spec-v23 T.1
   // gel-percent-agarose tile + the shared _v23SimpleRenderer helper
   // (built module ~12.4 KB gzipped).
-  "calc-lab.js": 17000, // v20 2026-06-06 (13000)
+  "calc-lab.js": 21000, // v20 2026-06-06 (13000); spec-v531..v534 Group T campaign (17000)
   // Bumped 7500 -> 10000 when v9 §H.6 sous-vide-pasteurization added
   // the FDA Annex 6 Table A break points + diffusivity table. Per
   // spec-v10 §H.1 the per-tile split is the preferred long-term path.

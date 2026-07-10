@@ -318,6 +318,17 @@ export const CITATIONS = {
     ],
   },
 
+  "ligation-molar-ratio": {
+    formula: "insert_ng = ratio x (insert_length / vector_length) x vector_ng; vector_pmol = vector_ng / (vector_length x 650) x 1e3; insert_pmol = ratio x vector_pmol.",
+    edition: "Ligation insert:vector molar-ratio setup (standard molecular cloning), by name.",
+    freeAccess: "Standard molecular-cloning bench relation; the enzyme protocol and fragment ends govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ratio is molar, not mass, so a short insert needs proportionally less mass than the vector (equal masses over-represent small fragments and cut efficiency); 650 g/mol per base pair is the double-stranded DNA average (single-stranded and RNA differ); the standard 3:1 insert:vector is a starting point optimized empirically. A setup aid, not a protocol.",
+    assumptions: [
+      { name: "Average bp mass", value: "650 g/mol per base pair (dsDNA average; ssDNA and RNA differ)", source: "standard molecular cloning" },
+    ],
+  },
+
   "declining-balance-depreciation": {
     formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",
     edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",

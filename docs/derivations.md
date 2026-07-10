@@ -2090,6 +2090,7 @@ cross-check.
 | calc-lab.js | `computeGelPercentAgarose` | `{ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeHemocytometer` | `{ total_cells_counted = 0, squares_counted = 4, dilution_factor = 1, dead_cel...` | _ | _ | _ |
 | calc-lab.js | `computeHendersonHasselbalch` | `{ pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0, }` | _ | _ | _ |
+| calc-lab.js | `computeLigationMolarRatio` | `{ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 ...` | _ | _ | _ |
 | calc-lab.js | `computeMassMoles` | `{ mass_g, moles, molecular_weight }` | _ | _ | _ |
 | calc-lab.js | `computeMolarityFromStock` | `{ purity_pct = 0, density_g_ml = 0, mol_weight = 0, target_m = 0, final_volum...` | _ | _ | _ |
 | calc-lab.js | `computeMolecularWeight` | `{ formula = "" }` | _ | _ | _ |
@@ -2645,7 +2646,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1231.
+Row count: 1232.
 
 <!-- END function-corpus-v14 -->
 
@@ -3711,7 +3712,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (16 tiles)
+### Group T Lab (17 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3720,6 +3721,7 @@ per spec-v14 §13.1 second paragraph.
 | `gel-percent-agarose` | Agarose Gel Percent | Sambrook & Russell, Molecular Cloning; 10 kb max -> 0.8%; 100 mL -> 0.8 g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hemocytometer` | Hemocytometer Cell Count | Improved Neubauer hemocytometer (proj...; 240 cells / 4 squares / 1:2 dilution / 12 dead -> 60 avg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `henderson-hasselbalch` | Henderson-Hasselbalch Buffer | Project (first-principles); pH = pKa + log10([A-]/[HA]) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ligation-molar-ratio` | Ligation Insert:Vector Molar Ratio | Standard molecular cloning (ligation ...; 50 ng of a 5000 bp vector, 1000 bp insert, 3:1 -> 30 ng i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mass-moles` | Mass-to-Moles and Moles-to-Mass | Project (first-principles); Mole identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `molarity-dilution` | Molarity and Dilution (C1V1=C2V2) | Project (first-principles); C1 = 1.0 M / C2 = 0.1 M / V2 = 50 mL -> V1 = 5 mL stock +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `molarity-from-stock` | Molarity from Concentrated Reagent | Standard reagent preparation (stock m...; Concentrated HCl: 37% w/w, 1.19 g/mL, MW 36.46 -> 12.08 M... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3818,6 +3820,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 987. Fixture-covered or reference-cadence: 987 / 987.
+Tile count: 988. Fixture-covered or reference-cadence: 988 / 988.
 
 <!-- END tile-index-v14 -->

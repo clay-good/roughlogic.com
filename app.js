@@ -965,6 +965,8 @@ const TOOL_MODULES = (() => {
     "molarity-from-stock",
     // spec-v533
     "nucleic-acid-a260",
+    // spec-v534
+    "ligation-molar-ratio",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [

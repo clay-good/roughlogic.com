@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-lab.js gzip cap 17000 -> 21000; 2026-07-09
+
+The spec-v531..v534 Group T lab batch (`molarity-from-stock`, `nucleic-acid-a260`, `ligation-molar-ratio`, plus units-of-production) adds four hand-written renderer tiles to `calc-lab.js`, crossing the 17000 B cap at tile v534 (105%). Raised the `check-module-sizes` cap to **21000** with headroom for the remaining Group T campaign tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise tools-data.js gzip cap 140000 -> 155000; 2026-07-09
 
 The spec-v489..v588 single-tile campaign grows the catalog registry (`tools-data.js`) by one row per tile; at tile 984 it crossed the 140000 B cap set earlier in the campaign. Raised the `check-module-sizes` cap to **155000** (~10% headroom for the ~55 remaining backlog tiles). Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

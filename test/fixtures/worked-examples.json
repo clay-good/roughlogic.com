@@ -17124,6 +17124,64 @@
    }
   },
   {
+   "tile_id": "ligation-molar-ratio",
+   "source_publisher": "Standard molecular cloning (ligation insert:vector molar ratio)",
+   "source_title": "insert_ng = ratio x (insert_length / vector_length) x vector_ng",
+   "source_edition_or_year": "standard molecular cloning",
+   "source_section_or_page": "50 ng of a 5000 bp vector, 1000 bp insert, 3:1 -> 30 ng insert; vector 0.01538 pmol, insert 0.04615 pmol",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "vector_ng": 50,
+    "vector_length_bp": 5000,
+    "insert_length_bp": 1000,
+    "molar_ratio": 3
+   },
+   "outputs": {
+    "insert_ng": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "vector_pmol": {
+     "value": 0.01538,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "insert_pmol": {
+     "value": 0.04615,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ligation-molar-ratio",
+   "source_publisher": "Standard molecular cloning (ligation insert:vector molar ratio)",
+   "source_title": "vector_pmol = vector_ng / (vector_length x 650) x 1e3",
+   "source_edition_or_year": "standard molecular cloning",
+   "source_section_or_page": "Equal mass 50 ng of the 1000 bp insert -> 0.07692 pmol, a 5:1 molar excess vs the 5000 bp vector",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "vector_ng": 50,
+    "vector_length_bp": 1000,
+    "insert_length_bp": 1000,
+    "molar_ratio": 1
+   },
+   "outputs": {
+    "vector_pmol": {
+     "value": 0.07692,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gross-rent-multiplier",
    "source_publisher": "Appraisal Institute income-approach (GRM)",
    "source_title": "GRM = price / gross_annual_rent",

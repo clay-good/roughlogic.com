@@ -17938,3 +17938,23 @@ test("bounds: spec-v533 computeNucleicAcidA260 pins the dsDNA concentration, the
   assert.ok("error" in _v533({ a260: 0.6, na_type: "foo", dilution_factor: 50 }));
   assert.ok("error" in _v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: -1 }));
 });
+
+import { computeLigationMolarRatio as _v534 } from "../../calc-lab.js";
+
+test("bounds: spec-v534 computeLigationMolarRatio pins the length-scaled insert mass, the pmol amounts, and error seams", () => {
+  const r = _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 3 });
+  assert.ok(Math.abs(r.insert_ng - 30) < 1e-9); // 3 * (1000/5000) * 50
+  assert.ok(Math.abs(r.vector_pmol - 0.015385) < 1e-5); // 50 / (5000*650) * 1e6
+  assert.ok(Math.abs(r.insert_pmol - 0.046154) < 1e-5); // 3 * vector_pmol
+  // A short insert needs less mass, not equal mass: halving the insert length halves the insert mass.
+  assert.ok(Math.abs(_v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 500, molar_ratio: 3 }).insert_ng - 15) < 1e-9);
+  // Equal mass of the 1000 bp insert is 5x the vector's pmol (the over-representation).
+  const eq = _v534({ vector_ng: 50, vector_length_bp: 1000, insert_length_bp: 1000, molar_ratio: 1 });
+  assert.ok(Math.abs(eq.vector_pmol / r.vector_pmol - 5) < 1e-6);
+  // Error seams: non-finite, non-positive vector mass / lengths / ratio.
+  assert.ok("error" in _v534({ vector_ng: Infinity, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 3 }));
+  assert.ok("error" in _v534({ vector_ng: 0, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 3 }));
+  assert.ok("error" in _v534({ vector_ng: 50, vector_length_bp: 0, insert_length_bp: 1000, molar_ratio: 3 }));
+  assert.ok("error" in _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 0, molar_ratio: 3 }));
+  assert.ok("error" in _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 0 }));
+});

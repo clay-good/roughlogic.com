@@ -194,6 +194,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "ligation ratio",
+      "target": "ligation-molar-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "insert vector ratio",
+      "target": "ligation-molar-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "molar ratio cloning",
+      "target": "ligation-molar-ratio",
+      "kind": "redirect"
+    },
+    {
+      "term": "ligation calculator",
+      "target": "ligation-molar-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "3:1 insert vector",
+      "target": "ligation-molar-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pmol dna",
+      "target": "ligation-molar-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cloning setup",
+      "target": "ligation-molar-ratio",
+      "kind": "adjacent"
+    },
+    {
+      "term": "650 g/mol bp",
+      "target": "ligation-molar-ratio",
+      "kind": "redirect"
+    },
+    {
       "term": "declining balance",
       "target": "declining-balance-depreciation",
       "kind": "industry"

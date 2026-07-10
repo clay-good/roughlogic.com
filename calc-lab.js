@@ -1060,3 +1060,52 @@ function renderNucleicAcidA260(inputRegion, outputRegion, citationEl) {
   for (const f of [a260.input, type.select, dil.input, a280.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["nucleic-acid-a260"] = renderNucleicAcidA260;
+
+// --- spec-v534 T: Ligation insert:vector molar ratio (`ligation-molar-ratio`) ---
+// insert_ng = ratio x (insert_len/vector_len) x vector_ng. pmol = ng / (len x 650) x 1e6.
+// dims: in { vector_ng: dimensionless, vector_length_bp: dimensionless, insert_length_bp: dimensionless, molar_ratio: dimensionless } out: { insert_ng: dimensionless, vector_pmol: dimensionless, insert_pmol: dimensionless }
+export function computeLigationMolarRatio({ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vng = Number(vector_ng) || 0;
+  const vlen = Number(vector_length_bp) || 0;
+  const ilen = Number(insert_length_bp) || 0;
+  const ratio = Number(molar_ratio) || 0;
+  if (!(vng > 0)) return { error: "Vector mass must be positive (ng)." };
+  if (!(vlen > 0)) return { error: "Vector length must be positive (bp)." };
+  if (!(ilen > 0)) return { error: "Insert length must be positive (bp)." };
+  if (!(ratio > 0)) return { error: "Molar ratio must be positive." };
+  const insert_ng = ratio * (ilen / vlen) * vng;
+  // ng / (bp * 650 g/mol) gives mol; x 1e3 converts to pmol (the spec's 1e6 yields femtomoles).
+  const vector_pmol = vng / (vlen * 650) * 1e3;
+  const insert_pmol = ratio * vector_pmol;
+  return {
+    insert_ng,
+    vector_pmol,
+    insert_pmol,
+    note: "The ratio is molar, not mass, so a short insert needs proportionally less mass than the vector (equal masses over-represent small fragments and cut efficiency). 650 g/mol per base pair is the double-stranded DNA average (single-stranded and RNA differ). The standard 3:1 insert:vector is a starting point optimized empirically. The enzyme protocol and fragment ends govern.",
+  };
+}
+export const ligationMolarRatioExample = { inputs: { vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 3 } };
+
+function renderLigationMolarRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard molecular cloning - ligation insert:vector molar-ratio setup; insert_ng = ratio x (insert_length / vector_length) x vector_ng; vector_pmol = vector_ng / (vector_length x 650) x 1e3; insert_pmol = ratio x vector_pmol. The ratio is molar, not mass; 650 g/mol per bp is the dsDNA average (ssDNA and RNA differ); 3:1 is a starting point optimized empirically. The enzyme protocol and fragment ends govern.";
+  const vng = makeNumber("Vector mass (ng)", "lmr-vng", { step: "any", min: "0", value: "50" }); vng.input.value = "50";
+  const vlen = makeNumber("Vector length (bp)", "lmr-vlen", { step: "any", min: "0", value: "5000" }); vlen.input.value = "5000";
+  const ilen = makeNumber("Insert length (bp)", "lmr-ilen", { step: "any", min: "0", value: "1000" }); ilen.input.value = "1000";
+  const ratio = makeNumber("Insert:vector molar ratio", "lmr-ratio", { step: "any", min: "0", value: "3" }); ratio.input.value = "3";
+  for (const f of [vng, vlen, ilen, ratio]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vng.input.value = "50"; vlen.input.value = "5000"; ilen.input.value = "1000"; ratio.input.value = "3"; update(); });
+  const oInsert = makeOutputLine(outputRegion, "Insert mass to add", "lmr-out-insert");
+  const oPmol = makeOutputLine(outputRegion, "Amounts (pmol)", "lmr-out-pmol");
+  const oNote = makeOutputLine(outputRegion, "Note", "lmr-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeLigationMolarRatio({ vector_ng: readNum(vng.input), vector_length_bp: readNum(vlen.input), insert_length_bp: readNum(ilen.input), molar_ratio: readNum(ratio.input) });
+    if (r.error) { oInsert.textContent = r.error; oPmol.textContent = ""; oNote.textContent = ""; return; }
+    oInsert.textContent = fmt(r.insert_ng, 1) + " ng of insert";
+    oPmol.textContent = "vector " + fmt(r.vector_pmol, 4) + " pmol, insert " + fmt(r.insert_pmol, 4) + " pmol";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [vng.input, vlen.input, ilen.input, ratio.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["ligation-molar-ratio"] = renderLigationMolarRatio;

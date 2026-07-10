@@ -78,6 +78,7 @@ const _TILES = [
   ["cfu-plate-count", "T"],
   ["molarity-from-stock", "T"],
   ["nucleic-acid-a260", "T"],
+  ["ligation-molar-ratio", "T"],
   ["declining-balance-depreciation", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],

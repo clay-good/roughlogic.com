@@ -426,6 +426,7 @@ const RELATED = {
   "molarity-dilution": ["serial-dilution", "resuspension-volume", "mass-moles"],
   "molarity-from-stock": ["molarity-dilution", "mass-moles", "molecular-weight"],
   "nucleic-acid-a260": ["beer-lambert", "od600-cell-count", "molarity-from-stock"],
+  "ligation-molar-ratio": ["nucleic-acid-a260", "mass-moles", "pcr-master-mix"],
   "serial-dilution": ["molarity-dilution", "resuspension-volume"],
   "resuspension-volume": ["molarity-dilution", "serial-dilution"],
   "molecular-weight": ["mass-moles", "molarity-dilution"],
