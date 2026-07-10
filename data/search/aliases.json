@@ -12294,6 +12294,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "evems",
+      "target": "ev-load-management-ems",
+      "kind": "industry"
+    },
+    {
+      "term": "ev load management",
+      "target": "ev-load-management-ems",
+      "kind": "industry"
+    },
+    {
+      "term": "625.42",
+      "target": "ev-load-management-ems",
+      "kind": "redirect"
+    },
+    {
+      "term": "diversified ev load",
+      "target": "ev-load-management-ems",
+      "kind": "redirect"
+    },
+    {
+      "term": "energy management ev charging",
+      "target": "ev-load-management-ems",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ev demand factor",
+      "target": "ev-load-management-ems",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aggregate charging limit",
+      "target": "ev-load-management-ems",
+      "kind": "industry"
+    },
+    {
+      "term": "ev service upgrade avoid",
+      "target": "ev-load-management-ems",
+      "kind": "redirect"
+    },
+    {
       "term": "lateral torsional buckling",
       "target": "steel-beam-ltb",
       "kind": "industry"

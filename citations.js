@@ -2128,6 +2128,17 @@ export const CITATIONS = {
     ],
   },
 
+  "ev-load-management-ems": {
+    formula: "unmanaged_sum = 1.25 x per_charger x count; managed_demand = evems_limit > 0 ? (setpoint125 ? 1.25 : 1.0) x evems_limit : unmanaged_sum; freed_headroom = unmanaged_sum - managed_demand.",
+    edition: NEC_2023 + " Article 625 (625.42(A) energy management systems) with the 2026 625.48 continuous factor on the EVEMS setpoint.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Diversified demand", value: "with a listed EVEMS the demand is the aggregate limit it enforces, not the sum of all chargers at 125%", source: "NEC 2023 625.42(A)" },
+      { name: "2026 setpoint factor", value: "the 2026 NEC (625.48) applies the 125% continuous factor to the EVEMS setpoint; the EVEMS must be listed and enforced in hardware", source: "NEC 2026 625.48; the AHJ governs" },
+    ],
+  },
   "ev-charger-load": {
     formula: "I_circuit = I_charger * 1.25 (continuous); recommended breaker = next standard size >= I_circuit; new_panel_load = existing_load + I_circuit; headroom = main - new_panel_load.",
     edition: NEC_2023 + " Article 625 (625.41/625.42 continuous-load and load-management); 220.83/220.87 panel load; 310.16 conductor.",

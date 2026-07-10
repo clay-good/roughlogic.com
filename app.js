@@ -140,6 +140,8 @@ const TOOL_MODULES = (() => {
     "generator-conductor-445",
     // spec-v519 NEC 220.87 existing-facility load by peak demand
     "existing-load-220-87",
+    // spec-v561
+    "ev-load-management-ems",
   ]);
   // spec-v28 low-voltage / data / security cabling (own module; registered
   // under Group A pending the Group-Z maintainer signoff, per the spec's

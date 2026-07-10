@@ -505,3 +505,55 @@ function _v519renderExistingLoad22087(inputRegion, outputRegion, citationEl) {
   pv.select.addEventListener("change", update);
 }
 FEEDER_RENDERERS["existing-load-220-87"] = _v519renderExistingLoad22087;
+
+// --- spec-v561 A: EV load-management (EVEMS) diversified service load (NEC 625.42) ---
+// unmanaged = 1.25 x per_charger x count. managed = evems > 0 ? (setpoint125 ? 1.25 : 1.0) x evems : unmanaged.
+// dims: in { charger_count: dimensionless, per_charger_a: I, evems_limit_a: I, apply_125_setpoint: dimensionless } out: { unmanaged_sum_a: I, managed_demand_a: I, freed_headroom_a: I }
+export function computeEvLoadManagementEms({ charger_count = 0, per_charger_a = 0, evems_limit_a = 0, apply_125_setpoint = true } = {}) {
+  const _g = _finiteGuard({ charger_count, per_charger_a, evems_limit_a }); if (_g) return _g;
+  const n = Number(charger_count) || 0;
+  const per = Number(per_charger_a) || 0;
+  const limit = Number(evems_limit_a) || 0;
+  const setpoint125 = apply_125_setpoint === true || apply_125_setpoint === "yes";
+  if (!(n >= 1)) return { error: "Charger count must be at least 1." };
+  if (!(per > 0)) return { error: "Per-charger rating must be positive (A)." };
+  if (limit < 0) return { error: "EVEMS limit cannot be negative (A)." };
+  const unmanaged_sum_a = 1.25 * per * n;
+  const managed = limit > 0;
+  if (managed && !(limit > 0)) return { error: "EVEMS limit must be positive when management is used." };
+  const managed_demand_a = managed ? (setpoint125 ? 1.25 : 1.0) * limit : unmanaged_sum_a;
+  const freed_headroom_a = unmanaged_sum_a - managed_demand_a;
+  return {
+    unmanaged_sum_a, managed_demand_a, freed_headroom_a, managed, setpoint125,
+    note: "Without an EVEMS the service must carry the sum of all chargers at 125% (forcing an upgrade); a listed EVEMS lets the demand be the aggregate limit it enforces rather than the sum. The 2026 NEC (625.48) applies the 125% continuous factor to the EVEMS setpoint. The EVEMS must be listed and its setpoint enforced in hardware. NEC 625.42(A) permits the management; the NEC and the AHJ govern.",
+  };
+}
+export const evLoadManagementEmsExample = { inputs: { charger_count: 4, per_charger_a: 40, evems_limit_a: 80, apply_125_setpoint: true } };
+
+function _v561renderEvLoadManagementEms(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 625.42(A) energy management systems (EVEMS) with the 2026 625.48 continuous factor: un-managed = 1.25 x per-charger x count; managed demand = 1.25 x EVEMS aggregate limit; freed headroom is the difference. A listed EVEMS lets the demand be the enforced aggregate limit, not the sum. The EVEMS must be listed and its setpoint enforced in hardware. The NEC and the AHJ govern.";
+  const n = _v26makeNumber("Number of EVSE (chargers)", "evems-n", { step: "1", min: "1" });
+  const per = _v26makeNumber("Per-charger continuous rating (A)", "evems-per", { step: "any", min: "0" });
+  const limit = _v26makeNumber("EVEMS aggregate limit (A, 0 = no management)", "evems-limit", { step: "any", min: "0" });
+  const sp = _v26makeSelect("Apply the 2026 125% factor to the setpoint?", "evems-sp", [
+    { value: "yes", label: "Yes (2026 625.48 continuous)", selected: true },
+    { value: "no", label: "No (setpoint at 100%)" },
+  ]);
+  for (const f of [n, per, limit, sp]) inputRegion.appendChild(f.wrap);
+  _v26attachEx(inputRegion, () => { n.input.value = "4"; per.input.value = "40"; limit.input.value = "80"; sp.select.value = "yes"; update(); });
+  const oSum = _v26makeOut(outputRegion, "Un-managed sum (125% of all)", "evems-out-sum");
+  const oDem = _v26makeOut(outputRegion, "Managed demand", "evems-out-dem");
+  const oFree = _v26makeOut(outputRegion, "Freed headroom", "evems-out-free");
+  const oNote = _v26makeOut(outputRegion, "Note", "evems-out-note");
+  const update = _v26debounce(() => {
+    const r = computeEvLoadManagementEms({ charger_count: Number(n.input.value) || 0, per_charger_a: Number(per.input.value) || 0, evems_limit_a: Number(limit.input.value) || 0, apply_125_setpoint: sp.select.value === "yes" });
+    if (r.error) { oSum.textContent = r.error; oDem.textContent = "-"; oFree.textContent = "-"; oNote.textContent = "-"; return; }
+    oSum.textContent = _v26fmt(r.unmanaged_sum_a, 1) + " A";
+    oDem.textContent = _v26fmt(r.managed_demand_a, 1) + " A" + (r.managed ? " (EVEMS aggregate)" : " (no management - full sum)");
+    oFree.textContent = _v26fmt(r.freed_headroom_a, 1) + " A" + (r.managed ? " freed vs the un-managed sum" : "");
+    oNote.textContent = r.note;
+  }, _V26_DEB);
+  for (const f of [n, per, limit]) f.input.addEventListener("input", update);
+  sp.select.addEventListener("change", update);
+}
+FEEDER_RENDERERS["ev-load-management-ems"] = _v561renderEvLoadManagementEms;

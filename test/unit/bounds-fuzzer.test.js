@@ -18561,3 +18561,27 @@ test("bounds: spec-v560 computeSccrCombination pins the min-of-components rating
   assert.ok("error" in _v560({ component_sccrs_ka: "65, 5", feeder_ir_ka: 0, available_fault_ka: -1 }));
   assert.ok("error" in _v560({ component_sccrs_ka: "65, 5", feeder_ir_ka: -1, available_fault_ka: 22 }));
 });
+
+import { computeEvLoadManagementEms as _v561 } from "../../calc-feeder.js";
+
+test("bounds: spec-v561 computeEvLoadManagementEms pins the un-managed sum, the managed demand, the 2026 setpoint factor, the freed headroom, and error seams", () => {
+  const r = _v561({ charger_count: 4, per_charger_a: 40, evems_limit_a: 80, apply_125_setpoint: true });
+  assert.ok(Math.abs(r.unmanaged_sum_a - 200) < 1e-9); // 1.25 * 40 * 4
+  assert.ok(Math.abs(r.managed_demand_a - 100) < 1e-9); // 1.25 * 80
+  assert.ok(Math.abs(r.freed_headroom_a - 100) < 1e-9);
+  assert.equal(r.managed, true);
+  // No EVEMS reverts to the full 125% sum with no freed headroom.
+  const none = _v561({ charger_count: 4, per_charger_a: 40, evems_limit_a: 0, apply_125_setpoint: true });
+  assert.ok(Math.abs(none.managed_demand_a - 200) < 1e-9);
+  assert.equal(none.freed_headroom_a, 0);
+  assert.equal(none.managed, false);
+  // Turning off the 2026 setpoint factor uses the EVEMS limit at 100%.
+  assert.ok(Math.abs(_v561({ charger_count: 4, per_charger_a: 40, evems_limit_a: 80, apply_125_setpoint: false }).managed_demand_a - 80) < 1e-9);
+  // The un-managed sum scales with the charger count.
+  assert.ok(Math.abs(_v561({ charger_count: 8, per_charger_a: 40, evems_limit_a: 80, apply_125_setpoint: true }).unmanaged_sum_a - 400) < 1e-9);
+  // Error seams: non-finite, count < 1, non-positive rating, negative limit.
+  assert.ok("error" in _v561({ charger_count: Infinity, per_charger_a: 40, evems_limit_a: 80 }));
+  assert.ok("error" in _v561({ charger_count: 0, per_charger_a: 40, evems_limit_a: 80 }));
+  assert.ok("error" in _v561({ charger_count: 4, per_charger_a: 0, evems_limit_a: 80 }));
+  assert.ok("error" in _v561({ charger_count: 4, per_charger_a: 40, evems_limit_a: -1 }));
+});

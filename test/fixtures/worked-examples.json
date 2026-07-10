@@ -36782,6 +36782,70 @@
    }
   },
   {
+   "tile_id": "ev-load-management-ems",
+   "source_publisher": "NEC 2023 625.42(A) / 2026 625.48",
+   "source_title": "unmanaged = 1.25 x per_charger x count; managed = 1.25 x EVEMS limit",
+   "source_edition_or_year": "NEC 2023/2026",
+   "source_section_or_page": "Four 40 A chargers, 80 A EVEMS -> 200 A un-managed, 100 A managed, 100 A freed",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "charger_count": 4,
+    "per_charger_a": 40,
+    "evems_limit_a": 80,
+    "apply_125_setpoint": true
+   },
+   "outputs": {
+    "unmanaged_sum_a": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "managed_demand_a": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "freed_headroom_a": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-load-management-ems",
+   "source_publisher": "NEC 2023 625.42(A) / 2026 625.48",
+   "source_title": "no EVEMS means the demand reverts to the full 125% sum",
+   "source_edition_or_year": "NEC 2023/2026",
+   "source_section_or_page": "Same four chargers with no EVEMS -> managed demand 200 A (the full sum, upgrade needed)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "charger_count": 4,
+    "per_charger_a": 40,
+    "evems_limit_a": 0,
+    "apply_125_setpoint": true
+   },
+   "outputs": {
+    "managed_demand_a": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "freed_headroom_a": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-ltb",
    "source_publisher": "AISC 360-22 Section F2 (AISC Manual W18x50 properties)",
    "source_title": "W18x50 A992 braced at 10 ft, Cb 1.0 -> inelastic zone, Mn 360.2 kip-ft (ASD 215.7)",

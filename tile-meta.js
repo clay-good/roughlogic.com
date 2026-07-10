@@ -506,6 +506,7 @@ const _TILES = [
   ["generator-conductor-445", "A"],
   // spec-v519 NEC 220.87 existing-facility load by peak demand
   ["existing-load-220-87", "A"],
+  ["ev-load-management-ems", "A"],
   // spec-v281..v283 steel members-and-connections depth batch
   ["steel-beam-ltb", "E"], ["steel-block-shear", "E"], ["steel-tension-member", "E"],
   // spec-v284..v286 reinforced-concrete member depth batch
