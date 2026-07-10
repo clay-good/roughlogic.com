@@ -671,6 +671,8 @@ const TOOL_MODULES = (() => {
     "search-track-spacing",
     // spec-v541
     "sweat-rate-hydration",
+    // spec-v595
+    "searcher-hours",
   ]);
   // spec-v248..v250 fire-sprinkler system-design trio: a new lazy Group F
   // cluster split off beside calc-fire.js exactly as calc-rescue.js was (the

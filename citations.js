@@ -4783,6 +4783,16 @@ export const CITATIONS = {
       { name: "Detection model", value: "exponential (random-search) POD = 1 - e^(-coverage); conservative vs parallel-track", source: "NSARC / USCG" },
     ],
   },
+  "searcher-hours": {
+    formula: "track_ft = 43,560 x area_acres / track_spacing_ft; searcher_hours = track_ft / (speed_mph x 5,280); team_clock_hr = searcher_hours / searchers.",
+    edition: "NSARC / USCG search-planning practice (effort = area over spacing over speed), by name.",
+    freeAccess: "Search-planning relations are public (US Coast Guard / NSARC references); the incident commander and search plan govern.",
+    governance: GOVERNANCE.fire,
+    editionNote: "This is the raw grid-walking effort - briefing, travel to and from the segment, rest breaks, and terrain detours add on top. The spacing comes from a POD calculation (search-track-spacing) and repeated passes compound via search-probability. The incident commander and search plan govern - a planning aid, not a promise of coverage.",
+    assumptions: [
+      { name: "Grid-walking only", value: "effort counts track-line walking; briefing, travel, rest, and detours add on top", source: "NSARC / USCG search-planning practice" },
+    ],
+  },
   "sweat-rate-hydration": {
     formula: "sweat_loss = (pre - post) x 16 + fluid - urine; sweat_rate = sweat_loss / hours; pct_bw_loss = (pre - post) / pre x 100; rehydration = 1.5 x max(0, deficit).",
     edition: "ACSM / NATA position on fluid replacement (weigh-in/weigh-out method), by name.",

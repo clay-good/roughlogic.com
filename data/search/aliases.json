@@ -80762,6 +80762,56 @@
       "term": "net vs gross combustion efficiency",
       "target": "flue-gas-combustion-eff",
       "kind": "question"
+    },
+    {
+      "term": "searcher hours",
+      "target": "searcher-hours",
+      "kind": "industry"
+    },
+    {
+      "term": "search effort",
+      "target": "searcher-hours",
+      "kind": "industry"
+    },
+    {
+      "term": "sar segment effort",
+      "target": "searcher-hours",
+      "kind": "adjacent"
+    },
+    {
+      "term": "search segment time",
+      "target": "searcher-hours",
+      "kind": "adjacent"
+    },
+    {
+      "term": "track line miles",
+      "target": "searcher-hours",
+      "kind": "redirect"
+    },
+    {
+      "term": "how long to search a segment",
+      "target": "searcher-hours",
+      "kind": "question"
+    },
+    {
+      "term": "how many searchers do i need for a segment",
+      "target": "searcher-hours",
+      "kind": "question"
+    },
+    {
+      "term": "searcher hours for a grid search",
+      "target": "searcher-hours",
+      "kind": "question"
+    },
+    {
+      "term": "how many miles of track line in a search area",
+      "target": "searcher-hours",
+      "kind": "question"
+    },
+    {
+      "term": "search team time for 160 acres",
+      "target": "searcher-hours",
+      "kind": "question"
     }
   ]
 }

@@ -732,6 +732,7 @@ const RELATED = {
   "sling-angle": ["rope-ma", "rigging-check", "ladder-angle"],
   "search-track-spacing": ["search-probability", "area-by-coordinates", "pacing-distance"],
   "sweat-rate-hydration": ["heat-stress", "wind-chill", "backcountry-needs"],
+  "searcher-hours": ["search-track-spacing", "search-probability", "sweat-rate-hydration"],
   "iso-nff": ["required-fire-flow", "hydrant-flow", "nfpa-1142-water-supply"],
   "scba-cylinder-time": ["confined-space-vent"],
   "nfpa-1142-water-supply": ["required-fire-flow", "iso-nff", "hydrant-flow"],

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(field): spec-v595 search effort in searcher-hours; 2026-07-10
+
+Lands `searcher-hours` (Group P, calc-rescue.js), the follow-on spec-v540 named: what sweeping a segment costs. track_ft = 43,560 x acres / spacing; searcher_hours = track_ft / (mph x 5,280); team clock = effort / searchers. Prices the spacing search-track-spacing sets for a POD (a 160-acre segment at 40 ft spacing is 33 miles of track line). Group P audit count 11 -> 12. Catalog 1,042 -> 1,043 (version 0.184.0).
+
 ### feat(hvac): spec-v594 flue-gas combustion efficiency (stack loss); 2026-07-10
 
 Lands `flue-gas-combustion-eff` (Group C, calc-hvacservice.js), the tile spec-v583 and spec-v584 both named as the third leg of the combustion-analysis triad: the analyzer's O2 and stack-temperature readings to steady-state combustion efficiency via the Siegert stack loss (CO2 = CO2max x (1 - O2/20.9); qA = dT_C x (A1/CO2 + B); per-fuel DIN coefficients for natural gas, propane, and #2 oil), reported on both the net (LHV, European convention) and approximate gross (HHV, US analyzer) bases. The gross conversion cross-checks within half a point of the published TSI fuel-oil efficiency table. Catalog 1,041 -> 1,042 (version 0.183.0).

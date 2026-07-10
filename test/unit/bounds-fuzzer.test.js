@@ -19214,3 +19214,34 @@ test("bounds: spec-v594 computeFlueGasCombustionEff pins the Siegert loss, both 
   assert.ok("error" in _v594({ fuel: "natural_gas", flue_o2_pct: 5, stack_temp_f: 60, air_temp_f: 70 }));
   assert.ok("error" in _v594({ fuel: "diesel", flue_o2_pct: 5, stack_temp_f: 400, air_temp_f: 70 }));
 });
+
+import { computeSearcherHours as _v595 } from "../../calc-rescue.js";
+
+test("bounds: spec-v595 computeSearcherHours pins the track line, effort, clock time, linear scalings, and error seams", () => {
+  // Pinned worked example: 160 acres, 40 ft spacing, 1.5 mph, team of 8.
+  const r = _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 1.5, searchers: 8 });
+  assert.ok(Math.abs(r.track_line_mi - 33) < 1e-9);
+  assert.ok(Math.abs(r.searcher_hours - 22) < 1e-9);
+  assert.ok(Math.abs(r.team_clock_hr - 2.75) < 1e-9);
+  // Cross-check: 40 acres, 50 ft, 2 mph, 6 searchers.
+  const x = _v595({ area_acres: 40, track_spacing_ft: 50, speed_mph: 2, searchers: 6 });
+  assert.ok(Math.abs(x.track_line_mi - 6.6) < 1e-9);
+  assert.ok(Math.abs(x.searcher_hours - 3.3) < 1e-9);
+  assert.ok(Math.abs(x.team_clock_hr - 0.55) < 1e-9);
+  // Effort scales linearly with area, inversely with spacing and speed.
+  const dbl = _v595({ area_acres: 320, track_spacing_ft: 40, speed_mph: 1.5, searchers: 8 });
+  assert.ok(Math.abs(dbl.searcher_hours - 2 * r.searcher_hours) < 1e-9);
+  const wide = _v595({ area_acres: 160, track_spacing_ft: 80, speed_mph: 1.5, searchers: 8 });
+  assert.ok(Math.abs(wide.searcher_hours - r.searcher_hours / 2) < 1e-9);
+  const fast = _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 3, searchers: 8 });
+  assert.ok(Math.abs(fast.searcher_hours - r.searcher_hours / 2) < 1e-9);
+  // A solo searcher's clock time equals the full effort.
+  const solo = _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 1.5, searchers: 1 });
+  assert.ok(Math.abs(solo.team_clock_hr - solo.searcher_hours) < 1e-9);
+  // Error seams: non-finite, non-positive area / spacing / speed, searchers < 1.
+  assert.ok("error" in _v595({ area_acres: Infinity, track_spacing_ft: 40, speed_mph: 1.5 }));
+  assert.ok("error" in _v595({ area_acres: 0, track_spacing_ft: 40, speed_mph: 1.5 }));
+  assert.ok("error" in _v595({ area_acres: 160, track_spacing_ft: 0, speed_mph: 1.5 }));
+  assert.ok("error" in _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 0 }));
+  assert.ok("error" in _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 1.5, searchers: 0.5 }));
+});

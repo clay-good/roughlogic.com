@@ -324,10 +324,60 @@ function renderSweatRateHydration(inputRegion, outputRegion, citationEl) {
   for (const el of [pre.input, post.input, fluid.input, urine.input, dur.input]) el.addEventListener("input", update);
 }
 
+// --- spec-v595 P: Search effort in searcher-hours (`searcher-hours`) ---
+// track_ft = 43,560 x acres / spacing; searcher_hours = track_ft / (mph x 5,280); clock = effort / searchers.
+// dims: in { area_acres: L^2, track_spacing_ft: L, speed_mph: L T^-1, searchers: dimensionless } out: { track_line_mi: L, searcher_hours: T, team_clock_hr: T }
+export function computeSearcherHours({ area_acres = 0, track_spacing_ft = 0, speed_mph = 0, searchers = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(area_acres) || 0;
+  const s = Number(track_spacing_ft) || 0;
+  const v = Number(speed_mph) || 0;
+  const n = Number(searchers) || 0;
+  if (!(a > 0)) return { error: "Segment area must be positive (acres)." };
+  if (!(s > 0)) return { error: "Track spacing must be positive (ft)." };
+  if (!(v > 0)) return { error: "Ground speed must be positive (mph)." };
+  if (!(n >= 1)) return { error: "Searchers must be at least 1." };
+  const track_ft = 43560 * a / s;
+  const track_line_mi = track_ft / 5280;
+  const searcher_hours = track_ft / (v * 5280);
+  const team_clock_hr = searcher_hours / n;
+  return {
+    track_line_mi, searcher_hours, team_clock_hr,
+    note: "This is the raw grid-walking effort - briefing, travel to and from the segment, rest breaks, and terrain detours add on top. The spacing comes from a POD calculation (search-track-spacing) and repeated passes compound via search-probability. The incident commander and search plan govern - a planning aid, not a promise of coverage.",
+  };
+}
+export const searcherHoursExample = { inputs: { area_acres: 160, track_spacing_ft: 40, speed_mph: 1.5, searchers: 8 } };
+
+function renderSearcherHours(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: The incident commander and search plan govern all SAR operations; a planning aid, not a promise of coverage. Citation: NSARC / USCG search-planning practice (effort = area over spacing over speed), by name. track_ft = 43,560 x area_acres / spacing_ft; searcher_hours = track_ft / (speed_mph x 5,280); team_clock_hr = searcher_hours / searchers. Raw grid-walking effort only - briefing, travel, rest, and terrain detours add on top.";
+  _aeF(inputRegion, () => fillExample(searcherHoursExample.inputs));
+  const a = _mnF("Segment area (acres)", "shr-a", { step: "any", min: "0" });
+  const s = _mnF("Track spacing (ft)", "shr-s", { step: "any", min: "0" });
+  const v = _mnF("Ground speed (mph)", "shr-v", { step: "any", min: "0" });
+  const n = _mnF("Searchers walking simultaneously", "shr-n", { step: "1", min: "1", value: "1" });
+  n.input.value = "1";
+  for (const f of [a, s, v, n]) inputRegion.appendChild(f.wrap);
+  const oT = _moF(outputRegion, "Track-line length", "shr-out-t");
+  const oE = _moF(outputRegion, "Total effort", "shr-out-e");
+  const oC = _moF(outputRegion, "Team clock time", "shr-out-c");
+  const oN = _moF(outputRegion, "Note", "shr-out-n");
+  function fillExample(x) { a.input.value = x.area_acres; s.input.value = x.track_spacing_ft; v.input.value = x.speed_mph; n.input.value = x.searchers; update(); }
+  const update = _debF(() => {
+    const r = computeSearcherHours({ area_acres: Number(a.input.value) || 0, track_spacing_ft: Number(s.input.value) || 0, speed_mph: Number(v.input.value) || 0, searchers: n.input.value === "" ? 1 : Number(n.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oE.textContent = "-"; oC.textContent = "-"; oN.textContent = ""; return; }
+    oT.textContent = _fmtF(r.track_line_mi, 1) + " mi";
+    oE.textContent = _fmtF(r.searcher_hours, 1) + " searcher-hours";
+    oC.textContent = _fmtF(r.team_clock_hr, 2) + " hr";
+    oN.textContent = r.note;
+  }, _DF);
+  for (const el of [a.input, s.input, v.input, n.input]) el.addEventListener("input", update);
+}
+
 export const RESCUE_RENDERERS = {
   "confined-space-purge": renderConfinedSpacePurge,
   "rope-ma": renderRopeMA,
   "sling-angle": renderSlingAngle,
   "search-track-spacing": renderSearchTrackSpacing,
   "sweat-rate-hydration": renderSweatRateHydration,
+  "searcher-hours": renderSearcherHours,
 };

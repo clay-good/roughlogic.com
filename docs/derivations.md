@@ -2412,6 +2412,7 @@ cross-check.
 | calc-rescue.js | `computeConfinedSpacePurge` | `{ volume_ft3 = 0, blower_cfm = 0, target_purges = 7 }` | _ | _ | _ |
 | calc-rescue.js | `computeRopeMA` | `{ rig = "3:1", efficiency = 0.9, load_lb = 0 }` | _ | _ | _ |
 | calc-rescue.js | `computeSearchTrackSpacing` | `{ sweep_width_m = 0, track_spacing_m = 0, target_pod = 0 } = {}` | _ | _ | _ |
+| calc-rescue.js | `computeSearcherHours` | `{ area_acres = 0, track_spacing_ft = 0, speed_mph = 0, searchers = 1 } = {}` | _ | _ | _ |
 | calc-rescue.js | `computeSlingAngle` | `{ load_lb = 0, sling_config = "vertical", included_angle_deg = 60, n_legs = 2...` | _ | _ | _ |
 | calc-rescue.js | `computeSweatRateHydration` | `{ pre_weight_lb = 0, post_weight_lb = 0, fluid_oz = 0, urine_oz = 0, duration...` | _ | _ | _ |
 | calc-restoration.js | `computeAirMovers` | `{ affected_area_ft2, water_class = "2" }` | _ | _ | _ |
@@ -2700,7 +2701,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1286.
+Row count: 1287.
 
 <!-- END function-corpus-v14 -->
 
@@ -3753,7 +3754,7 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (17 tiles)
+### Group P Field (18 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3767,6 +3768,7 @@ per spec-v14 §13.1 second paragraph.
 | `pacing-distance` | Pacing and Distance | Project (first-principles); 100 ft over 38 paces / 120 current paces / flat -> pace 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `search-probability` | Search Probability of Detection | SAR search theory (Koopman) / Nationa...; POD 30/40/50%, POA 60% -> cum POD 79%, POS 47.4% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `search-track-spacing` | Search Track Spacing and Coverage | NSARC / USCG search theory (exponenti...; 100 m sweep width, 50 m spacing -> coverage 2.0, POD 86% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `searcher-hours` | Search Effort in Searcher-Hours | NSARC / USCG search-planning practice; 160 acres at 40 ft spacing -> 33 mi of track line; at 1.5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-avalanche` | Slope Angle and Avalanche Risk Window | American Avalanche Association / NWS ...; Measured 32 deg -> 62.49% slope, in_avalanche_window true... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `solar-times` | Sunrise, Sunset, and Civil Twilight | NOAA Solar Position Algorithm (SPA, p...; 40 N / -105 W / 2026-06-21 (summer solstice) / -6 UTC -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `stadia-distance` | Stadia Tacheometry (Distance and Elevation) | Stadia tacheometry (K = 100); spec-v312 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3928,6 +3930,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1042. Fixture-covered or reference-cadence: 1042 / 1042.
+Tile count: 1043. Fixture-covered or reference-cadence: 1043 / 1043.
 
 <!-- END tile-index-v14 -->

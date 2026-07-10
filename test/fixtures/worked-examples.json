@@ -49848,6 +49848,76 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "searcher-hours",
+   "source_publisher": "NSARC / USCG search-planning practice",
+   "source_title": "effort = area over spacing over speed (spec-v540's named follow-on)",
+   "source_edition_or_year": "NSARC / USCG search-planning practice",
+   "source_section_or_page": "160 acres at 40 ft spacing -> 33 mi of track line; at 1.5 mph -> 22 searcher-hours; team of 8 -> 2.75 clock hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "area_acres": 160,
+    "track_spacing_ft": 40,
+    "speed_mph": 1.5,
+    "searchers": 8
+   },
+   "outputs": {
+    "track_line_mi": {
+     "value": 33,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "searcher_hours": {
+     "value": 22,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "team_clock_hr": {
+     "value": 2.75,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "searcher-hours",
+   "source_publisher": "NSARC / USCG search-planning practice",
+   "source_title": "cross-check: a small urban-fringe segment scales linearly",
+   "source_edition_or_year": "NSARC / USCG search-planning practice",
+   "source_section_or_page": "40 acres at 50 ft spacing, 2 mph, 6 searchers -> 6.6 mi, 3.3 searcher-hours, 0.55 clock hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "area_acres": 40,
+    "track_spacing_ft": 50,
+    "speed_mph": 2,
+    "searchers": 6
+   },
+   "outputs": {
+    "track_line_mi": {
+     "value": 6.6,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "searcher_hours": {
+     "value": 3.3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "team_clock_hr": {
+     "value": 0.55,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

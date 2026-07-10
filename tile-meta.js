@@ -241,6 +241,7 @@ const _TILES = [
   ["sling-angle", "F"], ["iso-nff", "F"],
   ["search-track-spacing", "P"],
   ["sweat-rate-hydration", "P"],
+  ["searcher-hours", "P"],
   ["scba-cylinder-time", "F"], ["nfpa-1142-water-supply", "F"],
   ["confined-space-vent", "F"],
   ["standpipe-pdp", "F"], ["smoke-ejector-cfm", "F"],
