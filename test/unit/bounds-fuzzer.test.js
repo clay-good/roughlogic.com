@@ -18762,3 +18762,26 @@ test("bounds: spec-v569 computeGrainAerationAirflow pins the rate x bushels airf
   assert.ok("error" in _v569({ bin_capacity_bu: 0, airflow_rate: 0.15 }));
   assert.ok("error" in _v569({ bin_capacity_bu: 20000, airflow_rate: 0 }));
 });
+
+import { computePopulationEquivalent as _v570 } from "../../calc-water.js";
+
+test("bounds: spec-v570 computePopulationEquivalent pins the three PE relations, the governing maximum, and error seams", () => {
+  const r = _v570({ flow_mgd: 0.5, bod_mg_l: 600, ss_mg_l: 400 });
+  assert.ok(Math.abs(r.pe_bod - 14718) < 2); // 0.5*600*8.34/0.17
+  assert.ok(Math.abs(r.pe_flow - 5000) < 0.5); // 0.5e6/100
+  assert.ok(Math.abs(r.pe_ss - 8340) < 2); // (0.5*400*8.34)/0.20
+  assert.ok(Math.abs(r.pe_governing - 14718) < 2);
+  assert.equal(r.governed_by, "BOD"); // high-strength, low-flow
+  // A dilute, high-flow discharge flips the governing parameter to flow.
+  const dilute = _v570({ flow_mgd: 2, bod_mg_l: 100, ss_mg_l: 0 });
+  assert.ok(Math.abs(dilute.pe_flow - 20000) < 0.5);
+  assert.equal(dilute.governed_by, "flow");
+  assert.equal(dilute.pe_ss, null); // SS skipped
+  // The governing PE is the maximum of the three.
+  assert.ok(r.pe_governing >= r.pe_bod && r.pe_governing >= r.pe_flow && r.pe_governing >= (r.pe_ss || 0));
+  // Error seams: non-finite, non-positive flow / BOD, negative SS.
+  assert.ok("error" in _v570({ flow_mgd: Infinity, bod_mg_l: 600 }));
+  assert.ok("error" in _v570({ flow_mgd: 0, bod_mg_l: 600 }));
+  assert.ok("error" in _v570({ flow_mgd: 0.5, bod_mg_l: 0 }));
+  assert.ok("error" in _v570({ flow_mgd: 0.5, bod_mg_l: 600, ss_mg_l: -1 }));
+});

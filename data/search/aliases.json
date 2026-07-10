@@ -6489,6 +6489,46 @@
       "kind": "redirect"
     },
     {
+      "term": "population equivalent",
+      "target": "population-equivalent",
+      "kind": "industry"
+    },
+    {
+      "term": "pe wastewater",
+      "target": "population-equivalent",
+      "kind": "redirect"
+    },
+    {
+      "term": "organic load equivalent",
+      "target": "population-equivalent",
+      "kind": "redirect"
+    },
+    {
+      "term": "0.17 lb bod capita",
+      "target": "population-equivalent",
+      "kind": "redirect"
+    },
+    {
+      "term": "industrial load equivalent",
+      "target": "population-equivalent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pretreatment surcharge",
+      "target": "population-equivalent",
+      "kind": "adjacent"
+    },
+    {
+      "term": "capita equivalent",
+      "target": "population-equivalent",
+      "kind": "redirect"
+    },
+    {
+      "term": "loading equivalent",
+      "target": "population-equivalent",
+      "kind": "adjacent"
+    },
+    {
       "term": "multi leg sling",
       "target": "multi-leg-sling",
       "kind": "industry"

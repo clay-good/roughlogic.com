@@ -910,6 +910,8 @@ const TOOL_MODULES = (() => {
     "backflow-test-psi",
     // spec-v116 disinfection: chlorine demand/breakpoint + UV dose.
     "chlorine-demand", "uv-dose",
+    // spec-v570
+    "population-equivalent",
   ]);
   // spec-v75 cap-relief split: the cohesive spec-v20 Phase M bench (weir-flow,
   // langelier-index, chemical-feed-pump) relocated out of calc-water.js (which had

@@ -928,6 +928,7 @@ export const COMPUTE_MAP = {
   "tire-load-check": { module: "../../calc-trucking.js", fn: "computeTireLoadCheck" },
   "chlorine-demand": { module: "../../calc-water.js", fn: "computeChlorineDemand" },
   "uv-dose": { module: "../../calc-water.js", fn: "computeUvDose" },
+  "population-equivalent": { module: "../../calc-water.js", fn: "computePopulationEquivalent" },
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },

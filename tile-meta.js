@@ -645,6 +645,7 @@ const _TILES = [
   // spec-v116 water disinfection (Group M)
   ["chlorine-demand", "M"],
   ["uv-dose", "M"],
+  ["population-equivalent", "M"],
   // spec-v117 rigging load / wire-rope (Group Z)
   ["multi-leg-sling", "Z"],
   ["wire-rope-strength", "Z"],

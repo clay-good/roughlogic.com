@@ -1338,3 +1338,44 @@ const renderUvDose = _v23SimpleRenderer({
   compute: computeUvDose,
 });
 WATER_RENDERERS["uv-dose"] = renderUvDose;
+
+// --- spec-v570 M: Population equivalent (organic load) ---
+// PE_bod = MGD*BOD*8.34/0.17. PE_flow = MGD*1e6/100. PE_ss = MGD*SS*8.34/0.20. PE = max.
+// dims: in { flow_mgd: L^3 T^-1, bod_mg_l: M L^-3, ss_mg_l: M L^-3 } out: { pe_bod: dimensionless, pe_flow: dimensionless, pe_governing: dimensionless }
+export function computePopulationEquivalent({ flow_mgd = 0, bod_mg_l = 0, ss_mg_l = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mgd = Number(flow_mgd) || 0;
+  const bod = Number(bod_mg_l) || 0;
+  const ss = Number(ss_mg_l) || 0;
+  if (!(mgd > 0)) return { error: "Flow must be positive (MGD)." };
+  if (!(bod > 0)) return { error: "BOD must be positive (mg/L)." };
+  if (ss < 0) return { error: "Suspended solids cannot be negative (mg/L)." };
+  const bod_load_lb = mgd * bod * 8.34;
+  const pe_bod = bod_load_lb / 0.17;
+  const pe_flow = mgd * 1e6 / 100;
+  const pe_ss = ss > 0 ? (mgd * ss * 8.34) / 0.20 : null;
+  const pe_governing = Math.max(pe_bod, pe_flow, pe_ss || 0);
+  const governed_by = pe_governing === pe_bod ? "BOD" : pe_governing === pe_flow ? "flow" : "suspended solids";
+  return {
+    bod_load_lb, pe_bod, pe_flow, pe_ss, pe_governing, governed_by,
+    note: "The population equivalent is set by the governing parameter (BOD, flow, or suspended solids), whichever is largest, not by BOD alone - a high-strength, low-flow industrial discharge can equal thousands of residents in oxygen demand while its gallons say otherwise, so billing on flow alone under-bills the loader. The per-capita bases (0.17 lb BOD, 100 gpd, 0.20 lb SS per person per day) are editable conventions. The pretreatment ordinance and the authority govern.",
+  };
+}
+export const populationEquivalentExample = { inputs: { flow_mgd: 0.5, bod_mg_l: 600, ss_mg_l: 400 } };
+const renderPopulationEquivalent = _v23SimpleRenderer({
+  citation: "Citation: population equivalent (organic load), standard sanitary engineering, by name. bod_load = MGD x BOD x 8.34; PE_bod = bod_load / 0.17; PE_flow = gpd / 100; PE_ss = ss_load / 0.20; governing PE = max of the three. The largest of BOD, flow, and SS governs, not BOD alone. The per-capita bases are editable conventions; the pretreatment ordinance and the authority govern.",
+  example: populationEquivalentExample.inputs,
+  fields: [
+    { key: "flow_mgd", label: "Discharge flow (MGD)", kind: "number" },
+    { key: "bod_mg_l", label: "BOD concentration (mg/L)", kind: "number" },
+    { key: "ss_mg_l", label: "Suspended solids (mg/L, 0 to skip)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "b", id: "pe-out-b", label: "PE from BOD", value: (r) => fmt(r.pe_bod, 0) + " people (" + fmt(r.bod_load_lb, 0) + " lb/day)" },
+    { key: "f", id: "pe-out-f", label: "PE from flow / SS", value: (r) => fmt(r.pe_flow, 0) + " (flow) / " + (r.pe_ss == null ? "-" : fmt(r.pe_ss, 0) + " (SS)") + " people" },
+    { key: "g", id: "pe-out-g", label: "Governing PE", value: (r) => fmt(r.pe_governing, 0) + " people (" + r.governed_by + " governs)" },
+    { key: "n", id: "pe-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePopulationEquivalent,
+});
+WATER_RENDERERS["population-equivalent"] = renderPopulationEquivalent;

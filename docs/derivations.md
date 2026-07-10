@@ -2636,6 +2636,7 @@ cross-check.
 | calc-water.js | `computeDisinfectionCT` | `{ chlorine_mg_l = 0, t10_minutes = 0, temperature_C = 5, pH = 7.0, log_target...` | _ | _ | _ |
 | calc-water.js | `computeFilterLoading` | `{ filter_area_ft2 = 0, flow_gpm = 0, backwash_rate_gpm_ft2 = 15 }` | _ | _ | _ |
 | calc-water.js | `computePoolTurnover` | `{ pool_volume_gal = 0, turnover_hr = 6, chlorine_ppm = 2, chlorine_type = "ca...` | _ | _ | _ |
+| calc-water.js | `computePopulationEquivalent` | `{ flow_mgd = 0, bod_mg_l = 0, ss_mg_l = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computePoundsFormula` | `{ flow_mgd = 0, dose_mg_l = 0, chemical = "chlorine_gas" }` | _ | _ | _ |
 | calc-water.js | `computePumpEfficiency` | `{ flow_gpm = 0, tdh_ft = 0, motor_kW = 0, motor_eff = 0.92, drive_eff = 1.0 }` | _ | _ | _ |
 | calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, was_flow_mgd = 0, w...` | _ | _ | _ |
@@ -2680,7 +2681,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1266.
+Row count: 1267.
 
 <!-- END function-corpus-v14 -->
 
@@ -3639,7 +3640,7 @@ per spec-v14 §13.1 second paragraph.
 | `trunk-decay-strength` | Hollow / Decayed Trunk Strength Loss | Wagener 1963 / Mattheck t/R / ISA TRAQ; 24 in trunk, 4 in sound shell (hollow 16) -> 29.6% loss, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (28 tiles)
+### Group M Water and wastewater (29 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3663,6 +3664,7 @@ per spec-v14 §13.1 second paragraph.
 | `pool-heater-btu` | Pool Heater Sizing and Heat-Up Time | thermodynamics; spec-v354 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-salt-dose` | Pool Salt Dose | Mass-balance identity (NSPF CPO / ANS...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-turnover` | Pool Turnover Rate and Chlorine Demand | NSPF; GPM = 20000/(6*60) = 55.56; pure Cl = 20000*2*8.34/1e6 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `population-equivalent` | Population Equivalent (Organic Load) | Population equivalent (organic load),...; 0.5 MGD, 600 mg/L BOD, 400 mg/L SS -> PE_bod 14718, PE_fl... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pounds-formula` | Pounds Formula | USEPA; Standard water-treatment chemical dose identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-eff-w2w` | Pump Wire-to-Water Efficiency | Hydraulic Institute pump-efficiency i...; 500 gpm / 120 ft TDH / 25 kW / 0.92 motor eff -> WHP 15.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `srt-fm-ratio` | SRT and F/M Ratio | WEF MOP 11 + Metcalf & Eddy activated...; 1 MG aeration / 2500 mg/L MLSS / 0.05 MGD WAS / 8000 mg/L... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3888,6 +3890,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1022. Fixture-covered or reference-cadence: 1022 / 1022.
+Tile count: 1023. Fixture-covered or reference-cadence: 1023 / 1023.
 
 <!-- END tile-index-v14 -->

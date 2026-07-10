@@ -24639,6 +24639,62 @@
    }
   },
   {
+   "tile_id": "population-equivalent",
+   "source_publisher": "Population equivalent (organic load), standard sanitary engineering",
+   "source_title": "PE_bod = MGD x BOD x 8.34 / 0.17; PE = max(PE_bod, PE_flow, PE_ss)",
+   "source_edition_or_year": "sanitary engineering",
+   "source_section_or_page": "0.5 MGD, 600 mg/L BOD, 400 mg/L SS -> PE_bod 14718, PE_flow 5000, PE_ss 8340, governing 14718 (BOD)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "flow_mgd": 0.5,
+    "bod_mg_l": 600,
+    "ss_mg_l": 400
+   },
+   "outputs": {
+    "pe_bod": {
+     "value": 14718,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "pe_flow": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pe_governing": {
+     "value": 14718,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "population-equivalent",
+   "source_publisher": "Population equivalent (organic load), standard sanitary engineering",
+   "source_title": "a dilute high-flow discharge flips the governing parameter to flow",
+   "source_edition_or_year": "sanitary engineering",
+   "source_section_or_page": "2 MGD at 100 mg/L BOD -> PE_bod 9812, PE_flow 20000 (flow governs)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "flow_mgd": 2,
+    "bod_mg_l": 100,
+    "ss_mg_l": 0
+   },
+   "outputs": {
+    "pe_governing": {
+     "value": 20000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",

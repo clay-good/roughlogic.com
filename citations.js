@@ -8603,6 +8603,17 @@ export const CITATIONS = {
       { name: "Short dose", value: "a short dose points to an aged lamp, a fouled sleeve, or low UV transmittance (turbidity)", source: "USEPA UVDGM" },
     ],
   },
+  "population-equivalent": {
+    formula: "bod_load = MGD x BOD x 8.34; PE_bod = bod_load / 0.17; PE_flow = gpd / 100; PE_ss = ss_load / 0.20; PE = max(PE_bod, PE_flow, PE_ss).",
+    edition: "Population equivalent (organic load), standard sanitary engineering, by name.",
+    freeAccess: "The per-capita loading bases and the population-equivalent relation are public sanitary-engineering conventions; the pretreatment ordinance and the authority govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The population equivalent is set by the governing parameter (BOD, flow, or suspended solids), whichever is largest, not by BOD alone - a high-strength, low-flow industrial discharge can equal thousands of residents in oxygen demand while its gallons say otherwise; the per-capita bases (0.17 lb BOD, 100 gpd, 0.20 lb SS per person per day) are editable conventions. An estimating aid, not a permit determination.",
+    assumptions: [
+      { name: "Per-capita bases", value: "0.17 lb BOD, 100 gpd, 0.20 lb SS per person per day (editable conventions)", source: "sanitary engineering" },
+      { name: "Governing max", value: "the largest of PE_bod, PE_flow, and PE_ss governs, not BOD alone", source: "sanitary engineering" },
+    ],
+  },
   "multi-leg-sling": {
     formula: "share_legs = (num_legs >= 3) ? 2 : num_legs; tension_per_leg = (total_load / share_legs) / sin(angle); load_factor = 1/sin(angle); equal-share reference = (total_load / num_legs) / sin(angle).",
     edition: "ASME B30.9 (Slings) by section; classical sling statics, no edition cycle.",

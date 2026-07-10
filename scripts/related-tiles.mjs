@@ -984,6 +984,7 @@ const RELATED = {
   // spec-v116 water disinfection (Group M)
   "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
   "uv-dose": ["disinfection-ct","chlorine-demand"],
+  "population-equivalent": ["bod-tss-loading-removal","pounds-formula","chlorine-demand"],
   // spec-v117 rigging load / wire-rope (Group Z)
   "multi-leg-sling": ["cg-load-share","shackle-eyebolt-wll","spreader-beam"],
   "wire-rope-strength": ["sling-d-d-efficiency","shackle-eyebolt-wll"],
