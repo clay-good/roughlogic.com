@@ -9,7 +9,7 @@
     {
       "file": "aliases.json",
       "name": "Search aliases (industry vocab + redirects + adjacent-question)",
-      "gzip_size_bytes": 72269
+      "gzip_size_bytes": 96060
     },
     {
       "file": "slots.json",

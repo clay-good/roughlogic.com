@@ -271,7 +271,11 @@ function corpusFor(tool, aliases, aliasEntry) {
       aliasesRef: aliases,
       aliasLen,
       name: tokenize(tool.name, true),
-      alias: tokenize(terms.join(" "), true),
+      // Pure-number alias tokens are illustrative ("wire for 100 amp
+      // subpanel 150 feet away"), not identifying: left in the corpus
+      // they let any coincidental number in a query outrank the true
+      // target. Compounds ("12/2", "220-61") stay.
+      alias: tokenize(terms.join(" "), true).filter((t) => !/^\d+(\.\d+)?$/.test(t)),
       trade: tokenize(Array.isArray(tool.trades) ? tool.trades.join(" ") : "", true),
       desc: tokenize(tool.desc, true),
       nameLower: typeof tool.name === "string" ? tool.name.toLowerCase() : "",
@@ -366,6 +370,12 @@ export function rankTools(tokens, tools, aliases, opts) {
 
   // Pass 1: exact / prefix / plural scoring. Track which query tokens
   // matched at least one tool anywhere (typo eligibility is global).
+  // Digit-led tokens ("150", "120v", "12/2" parts) are VALUES, not
+  // content words: they add score when they happen to match, but never
+  // count toward coverage -- otherwise a number quoted in some tile's
+  // alias ("...150 feet away") outranks the true target whenever the
+  // user's quantity coincides with it.
+  const soft = tokens.map((t) => /^\d/.test(t));
   const scored = [];
   const matchedAnywhere = new Array(tokens.length).fill(false);
   for (const tool of tools) {
@@ -379,7 +389,7 @@ export function rankTools(tokens, tools, aliases, opts) {
       weights[i] = w;
       if (w > 0) {
         score += w;
-        coverage++;
+        if (!soft[i]) coverage++;
         matchedAnywhere[i] = true;
       }
     }
@@ -394,7 +404,7 @@ export function rankTools(tokens, tools, aliases, opts) {
   // from firing on tokens that already carry signal.)
   const typoEligible = new Array(tokens.length).fill(false);
   for (let i = 0; i < tokens.length; i++) {
-    if (matchedAnywhere[i] || tokens[i].length < 3) continue;
+    if (matchedAnywhere[i] || tokens[i].length < 3 || soft[i]) continue;
     typoEligible[i] = true;
     for (const row of scored) {
       const hit = typoFieldWeight(tokens[i], row.corpus);
