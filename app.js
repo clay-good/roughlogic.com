@@ -931,6 +931,8 @@ const TOOL_MODULES = (() => {
     "digester-vs-loading",
     // spec-v575
     "flocculation-g-value",
+    // spec-v576
+    "chlorine-cylinder-withdrawal",
     // v93 pool and spa chemical balance
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
     "pool-chlorine-dose", "pool-heater-btu", "breakpoint-chlorination",

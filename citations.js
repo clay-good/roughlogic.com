@@ -628,6 +628,17 @@ export const CITATIONS = {
       { name: "Upset", value: "effluent above influent is a negative removal, reported not errored", source: "scope of this tile" },
     ],
   },
+  "chlorine-cylinder-withdrawal": {
+    formula: "per_container = base(type) x temperature-derate (base ~40 lb/day cylinder, ~400 lb/day ton at ~70 F); containers = ceil(feed_rate / per_container).",
+    edition: "Gas chlorine container withdrawal rate (The Chlorine Institute; state operator training), by name.",
+    freeAccess: "The withdrawal-rate ceilings are published Chlorine Institute guidance; the manufacturer's container chart governs the exact rate.",
+    governance: GOVERNANCE.general,
+    editionNote: "The withdrawal rate is a temperature-dependent ceiling, not a valve setting - pulling gas faster than the liquid re-vaporizes frosts the container and the rate collapses (the latent-heat limit); about 40 lb/day for a 150-lb cylinder and 400 lb/day for a 1-ton container at about 70 F, derated in a colder room; exceeding it forces a multi-container manifold or an evaporator, never a bigger regulator. A planning aid, not the manufacturer's data.",
+    assumptions: [
+      { name: "Withdrawal ceilings", value: "~40 lb/day (150-lb cylinder) and ~400 lb/day (1-ton) at ~70 F, derated below (linear from the -29 F boiling point here)", source: "The Chlorine Institute" },
+      { name: "Latent-heat limit", value: "over-withdrawal frosts the container as vaporization cools the liquid and drops its vapor pressure; manifold or evaporate", source: "The Chlorine Institute" },
+    ],
+  },
   "flocculation-g-value": {
     formula: "G = sqrt(P / (mu x V)); Gt = G x detention_time; mu = water dynamic viscosity at the given temperature.",
     edition: "Camp-Stein velocity gradient (Camp & Stein 1943; Ten States Standards), by name.",

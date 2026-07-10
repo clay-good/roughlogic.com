@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-treatment.js 15000 -> 18000 and tile-meta.js 14500 -> 16500; 2026-07-10
+
+The spec-v573/v575/v576 Group M wastewater-ops tiles (`digester-vs-loading`, `flocculation-g-value`, `chlorine-cylinder-withdrawal`) crossed `calc-treatment.js`'s 15000 B cap at v576 (104.3%); raised to **18000**. The single-tile landing campaign's per-tile `_TILES` rows crossed `tile-meta.js`'s 14500 B cap (100.0%); raised to **16500** with headroom for the v577-v588 tail. Both lazy-loaded, absent from the home-view payload.
+
 ### chore(sizes): raise calc-arborist.js gzip cap 8000 -> 13000; 2026-07-10
 
 The spec-v563..v566 forestry / tree-risk batch (`basal-area-prism`, `reineke-sdi`, `trunk-decay-strength`, `tree-protection-zone`) adds four hand-written renderer tiles to `calc-arborist.js`, taking it from 8000 B to over 10000 B (102.7% at v566). Raised the `check-module-sizes` cap to **13000** with headroom for further Group L forestry tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

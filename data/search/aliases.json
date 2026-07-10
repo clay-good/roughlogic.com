@@ -17344,6 +17344,46 @@
       "kind": "redirect"
     },
     {
+      "term": "chlorine withdrawal rate",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "chlorine cylinder",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "gas chlorine feed",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "redirect"
+    },
+    {
+      "term": "150 lb cylinder",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ton container chlorine",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "industry"
+    },
+    {
+      "term": "chlorine frost",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "chlorine manifold",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "adjacent"
+    },
+    {
+      "term": "chlorine evaporator",
+      "target": "chlorine-cylinder-withdrawal",
+      "kind": "adjacent"
+    },
+    {
       "term": "manual d friction rate",
       "target": "manual-d-friction-rate",
       "kind": "industry"

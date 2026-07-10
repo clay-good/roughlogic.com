@@ -18903,3 +18903,28 @@ test("bounds: spec-v575 computeFlocculationGValue pins the sqrt relation, the vi
   assert.ok("error" in _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: 50, detention_time_s: 1200 }));
   assert.ok("error" in _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: -5, detention_time_s: 1200 }));
 });
+
+import { computeChlorineCylinderWithdrawal as _v576 } from "../../calc-treatment.js";
+
+test("bounds: spec-v576 computeChlorineCylinderWithdrawal pins the per-container ceiling by type, the container count, the frost warning, and error seams", () => {
+  const r = _v576({ feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: 70 });
+  assert.ok(Math.abs(r.per_container_lb_day - 40) < 0.5); // 150-lb cylinder at 70 F
+  assert.equal(r.containers, 3); // ceil(100/40)
+  assert.equal(r.frost_warn, false);
+  // A 1-ton container carries the same feed alone.
+  const ton = _v576({ feed_rate_lb_day: 100, container_type: "ton", room_temp_f: 70 });
+  assert.ok(Math.abs(ton.per_container_lb_day - 400) < 0.5);
+  assert.equal(ton.containers, 1);
+  // A cold room derates the ceiling and trips the frost warning.
+  const cold = _v576({ feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: 45 });
+  assert.ok(cold.per_container_lb_day < 40);
+  assert.equal(cold.frost_warn, true);
+  assert.ok(cold.containers > r.containers);
+  // A single cylinder handles a feed under its ceiling.
+  assert.equal(_v576({ feed_rate_lb_day: 30, container_type: "cylinder", room_temp_f: 70 }).containers, 1);
+  // Error seams: non-finite, non-positive feed, bad type, sub-vaporization temp.
+  assert.ok("error" in _v576({ feed_rate_lb_day: Infinity, container_type: "cylinder", room_temp_f: 70 }));
+  assert.ok("error" in _v576({ feed_rate_lb_day: 0, container_type: "cylinder", room_temp_f: 70 }));
+  assert.ok("error" in _v576({ feed_rate_lb_day: 100, container_type: "foo", room_temp_f: 70 }));
+  assert.ok("error" in _v576({ feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: -30 }));
+});

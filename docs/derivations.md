@@ -2587,6 +2587,7 @@ cross-check.
 | calc-treatment.js | `computeBodTssLoadingRemoval` | `{ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeBreakpointChlorination` | `{ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
+| calc-treatment.js | `computeChlorineCylinderWithdrawal` | `{ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeClarifierSurfaceLoading` | `{ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeDigesterVsLoading` | `{ feed_flow_gpd = 0, percent_ts = 0, percent_vs = 0, digester_ft3 = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeFlocculationGValue` | `{ power_input_w = 0, basin_volume_m3 = 0, water_temp_c = 15, detention_time_s...` | _ | _ | _ |
@@ -2686,7 +2687,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1272.
+Row count: 1273.
 
 <!-- END function-corpus-v14 -->
 
@@ -3645,7 +3646,7 @@ per spec-v14 §13.1 second paragraph.
 | `trunk-decay-strength` | Hollow / Decayed Trunk Strength Loss | Wagener 1963 / Mattheck t/R / ISA TRAQ; 24 in trunk, 4 in sound shell (hollow 16) -> 29.6% loss, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (34 tiles)
+### Group M Water and wastewater (35 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3654,6 +3655,7 @@ per spec-v14 §13.1 second paragraph.
 | `bod-tss-loading-removal` | BOD/TSS Mass Loading and Percent Removal | wastewater operations (pounds formula); spec-v406 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `breakpoint-chlorination` | Breakpoint Chlorination Dose | Standard Methods 4500-Cl; spec-v355 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chemical-feed-pump` | Chemical Metering-Pump Setting | Pounds formula (AWWA / EPA water-oper...; 0.5 MGD, 8 mg/L, 12.5% NaOCl, SG 1.16, 50 GPD pump -> ~55... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `chlorine-cylinder-withdrawal` | Gas Chlorine Cylinder Withdrawal Rate | The Chlorine Institute / state operat...; 100 lb/day from 150-lb cylinders at 70 F -> 40 lb/day cei... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `chlorine-decay` | Chlorine Residual Decay (First-Order) | EPA / AWWA; C(10) = 2*exp(-1) = 0.7358 mg/L; time to 0.2 mg/L = ln(2/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chlorine-demand` | Chlorine Demand and Dose for a Target Residual | Standard Methods 4500-Cl / AWWA M14 (...; spec-v116 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `clarifier-surface-loading` | Clarifier Surface, Weir, and Solids Loading | Ten States Standards / Metcalf & Eddy; spec-v405 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3900,6 +3902,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1028. Fixture-covered or reference-cadence: 1028 / 1028.
+Tile count: 1029. Fixture-covered or reference-cadence: 1029 / 1029.
 
 <!-- END tile-index-v14 -->

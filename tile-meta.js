@@ -102,6 +102,7 @@ const _TILES = [
   ["clarifier-surface-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"],
   ["digester-vs-loading", "M"],
   ["flocculation-g-value", "M"],
+  ["chlorine-cylinder-withdrawal", "M"],
   ["growing-degree-days", "L"],
   ["pearson-square-ration", "L"],
   ["livestock-water-requirement", "L"],

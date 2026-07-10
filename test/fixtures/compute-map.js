@@ -58,6 +58,7 @@ export const COMPUTE_MAP = {
   "tds-from-conductivity": { module: "../../calc-treatment.js", fn: "computeTdsFromConductivity" },
   "digester-vs-loading": { module: "../../calc-treatment.js", fn: "computeDigesterVsLoading" },
   "flocculation-g-value": { module: "../../calc-treatment.js", fn: "computeFlocculationGValue" },
+  "chlorine-cylinder-withdrawal": { module: "../../calc-treatment.js", fn: "computeChlorineCylinderWithdrawal" },
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },
   "pearson-square-ration": { module: "../../calc-agriculture.js", fn: "computePearsonSquareRation" },
   "livestock-water-requirement": { module: "../../calc-agriculture.js", fn: "computeLivestockWaterRequirement" },

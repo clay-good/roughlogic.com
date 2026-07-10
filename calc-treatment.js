@@ -714,3 +714,54 @@ const renderFlocculationGValue = _rPool({
   compute: computeFlocculationGValue,
 });
 TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
+
+// --- spec-v576 M: Gas chlorine cylinder withdrawal rate ---
+// per_container = base(type) x temp-derate. containers = ceil(feed / per). Frost warn if cold or near ceiling.
+const _CL_WITHDRAWAL_BASE = { cylinder: 40, ton: 400 }; // lb/day at ~70 F
+// dims: in { feed_rate_lb_day: M T^-1, container_type: dimensionless, room_temp_f: dimensionless } out: { per_container_lb_day: M T^-1, containers: dimensionless }
+export function computeChlorineCylinderWithdrawal({ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}) {
+  const feed = Number(feed_rate_lb_day) || 0;
+  const temp = Number(room_temp_f);
+  if (!(feed > 0 && Number.isFinite(feed))) return { error: "Feed rate must be positive (lb/day)." };
+  const base = _CL_WITHDRAWAL_BASE[container_type];
+  if (base === undefined) return { error: "Container type must be cylinder (150 lb) or ton." };
+  if (!Number.isFinite(temp) || temp <= -20) return { error: "Room temperature is too low for liquid chlorine to vaporize (well below the practical limit)." };
+  const derate = Math.min(1, Math.max(0, (temp + 29) / 99)); // linear from the -29 F boiling point to the 70 F reference
+  const per_container_lb_day = base * derate;
+  if (!(per_container_lb_day > 0)) return { error: "The derated withdrawal ceiling is zero at this temperature - warm the room or use an evaporator." };
+  const containers = Math.ceil(feed / per_container_lb_day);
+  const per_container_draw = feed / containers;
+  const frost_warn = temp < 60 || per_container_draw >= 0.9 * per_container_lb_day;
+  return {
+    per_container_lb_day, containers, per_container_draw, frost_warn, derate,
+    note: "The withdrawal rate is a temperature-dependent ceiling, not a valve setting - pulling gas faster than the liquid re-vaporizes frosts the container and the rate collapses (the latent-heat limit). About 40 lb/day for a 150-lb cylinder and 400 lb/day for a 1-ton container at ~70 F, derated in a colder room. Exceeding it forces a multi-container manifold or an evaporator, never a bigger regulator. The Chlorine Institute guidance and the manufacturer chart govern.",
+  };
+}
+export const chlorineCylinderWithdrawalExample = { inputs: { feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: 70 } };
+function renderChlorineCylinderWithdrawal(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: gas chlorine container withdrawal rate (The Chlorine Institute; state operator training), by name. Per-container ceiling ~40 lb/day (150-lb cylinder) or ~400 lb/day (1-ton) at ~70 F, derated in a colder room; containers = ceil(feed / per-container). The withdrawal rate is a temperature-dependent latent-heat ceiling - pulling too fast frosts the container. Exceeding it forces a manifold or evaporator. The Chlorine Institute guidance and the manufacturer chart govern.";
+  const feed = makeNumber("Required chlorine feed (lb/day)", "ccw-feed", { step: "any", min: "0", value: "100" }); feed.input.value = "100";
+  const type = makeSelect("Container type", "ccw-type", [
+    { value: "cylinder", label: "150-lb cylinder (~40 lb/day)", selected: true },
+    { value: "ton", label: "1-ton container (~400 lb/day)" },
+  ]);
+  const temp = makeNumber("Chlorine room temperature (F)", "ccw-temp", { step: "any", value: "70" }); temp.input.value = "70";
+  for (const f of [feed, type, temp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { feed.input.value = "100"; type.select.value = "cylinder"; temp.input.value = "70"; update(); });
+  const oPer = makeOutputLine(outputRegion, "Per-container ceiling", "ccw-out-per");
+  const oCont = makeOutputLine(outputRegion, "Containers to manifold", "ccw-out-cont");
+  const oWarn = makeOutputLine(outputRegion, "Frost / temperature", "ccw-out-warn");
+  const oNote = makeOutputLine(outputRegion, "Note", "ccw-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeChlorineCylinderWithdrawal({ feed_rate_lb_day: readNum(feed.input), container_type: type.select.value, room_temp_f: temp.input.value === "" ? 70 : readNum(temp.input) });
+    if (r.error) { oPer.textContent = r.error; oCont.textContent = "-"; oWarn.textContent = "-"; oNote.textContent = ""; return; }
+    oPer.textContent = fmt(r.per_container_lb_day, 0) + " lb/day" + (r.derate < 0.999 ? " (derated " + fmt(r.derate * 100, 0) + "% for the room temp)" : "");
+    oCont.textContent = r.containers + " (each draws " + fmt(r.per_container_draw, 0) + " lb/day)";
+    oWarn.textContent = r.frost_warn ? "FROST RISK - cold room or near the ceiling; add a container or an evaporator" : "OK - within the ceiling with margin";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [feed, temp]) f.input.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+TREATMENT_RENDERERS["chlorine-cylinder-withdrawal"] = renderChlorineCylinderWithdrawal;

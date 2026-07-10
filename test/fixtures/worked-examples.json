@@ -24975,6 +24975,62 @@
    }
   },
   {
+   "tile_id": "chlorine-cylinder-withdrawal",
+   "source_publisher": "The Chlorine Institute / state operator training",
+   "source_title": "per_container ~40 lb/day (cylinder) at 70 F; containers = ceil(feed / per_container)",
+   "source_edition_or_year": "The Chlorine Institute",
+   "source_section_or_page": "100 lb/day from 150-lb cylinders at 70 F -> 40 lb/day ceiling, 3 cylinders manifolded",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "feed_rate_lb_day": 100,
+    "container_type": "cylinder",
+    "room_temp_f": 70
+   },
+   "outputs": {
+    "per_container_lb_day": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "containers": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chlorine-cylinder-withdrawal",
+   "source_publisher": "The Chlorine Institute / state operator training",
+   "source_title": "a 1-ton container carries the feed alone",
+   "source_edition_or_year": "The Chlorine Institute",
+   "source_section_or_page": "Same 100 lb/day from a 1-ton container (~400 lb/day) -> 1 container",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "feed_rate_lb_day": 100,
+    "container_type": "ton",
+    "room_temp_f": 70
+   },
+   "outputs": {
+    "per_container_lb_day": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "containers": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",
