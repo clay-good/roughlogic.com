@@ -122,6 +122,7 @@ const DATA_MANIFESTS = [
   "./data/search/manifest.json",
   "./data/search/aliases.json",
   "./data/search/slots.json",
+  "./data/search/preview-map.json",
 ];
 
 self.addEventListener("install", (event) => {

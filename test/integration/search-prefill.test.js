@@ -25,6 +25,44 @@ const CASES = [
   },
 ];
 
+// spec-v592: the computed answer renders inside the dropdown on the
+// top-ranked row once the slots map, and Escape clears it with the rest
+// of the dropdown.
+test("search preview: flagship query shows a computed answer in the dropdown", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("voltage drop 120v 150 ft 20 amps");
+  const preview = page.locator("#search-result-0 .sr-preview");
+  await expect(preview).toBeVisible();
+  const text = await preview.textContent();
+  expect(text).toMatch(/drop \d+(\.\d+)? V/);
+  expect(text).not.toMatch(/NaN|Infinity|undefined/);
+  await input.press("Escape");
+  await expect(page.locator("#search-results")).toBeHidden();
+  await expect(preview).toHaveCount(0);
+});
+
+test("search did-you-mean: an all-typo result set says what it matched", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("condiut fill");
+  const note = page.locator(".search-didyoumean");
+  await expect(note).toBeVisible();
+  await expect(note).toContainText('showing matches for "conduit fill"');
+});
+
+test("search no-match: the dead end offers the browse-all-trades fork", async ({ page }) => {
+  await page.goto("/");
+  const input = page.locator("#search-input");
+  await input.click();
+  await input.fill("zzzzqqqq");
+  const browse = page.locator(".search-browse a");
+  await expect(browse).toBeVisible();
+  await expect(browse).toContainText("Browse all 21 trades");
+});
+
 for (const c of CASES) {
   test(`search prefill: "${c.query}" arrives on ${c.name} with inputs filled`, async ({ page }) => {
     await page.goto("/");

@@ -163,6 +163,12 @@ test("rankTools corrects a transposition typo at half weight", async () => {
   const ranked = rankTools(normalizeQuery("condiut fill").tokens, TOOLS, aliases, { limit: 12 });
   assert.equal(ranked[0].tool.id, "conduit-fill");
   assert.ok(ranked[0].viaTypo, "typo-corrected result must set viaTypo");
+  // spec-v592 did-you-mean: the corrected corpus token is exposed so the
+  // dropdown can say what the results actually match.
+  assert.equal(ranked[0].typoFixes.condiut, "conduit");
+  const corrected = normalizeQuery("condiut fill").tokens
+    .map((t) => ranked[0].typoFixes[t] || t).join(" ");
+  assert.equal(corrected, "conduit fill");
 });
 
 test("rankTools survives a dropped-letter typo plus partial coverage", async () => {

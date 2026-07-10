@@ -333,14 +333,16 @@ function bestFieldWeight(token, corpus) {
   return 0;
 }
 
-// Half-weight edit-distance-1 fallback for one query token.
+// Half-weight edit-distance-1 fallback for one query token. Returns the
+// corrected corpus token alongside the weight so callers can surface
+// "showing matches for ..." (spec-v592 did-you-mean).
 function typoFieldWeight(token, corpus) {
   for (const field of FIELD_ORDER) {
     for (const ct of corpus[field]) {
-      if (editDistance1(token, ct)) return FIELD_WEIGHTS[field] / 2;
+      if (editDistance1(token, ct)) return { w: FIELD_WEIGHTS[field] / 2, ct };
     }
   }
-  return 0;
+  return null;
 }
 
 // One query token covers one name token when any candidate matches it
@@ -395,12 +397,14 @@ export function rankTools(tokens, tools, aliases, opts) {
     if (matchedAnywhere[i] || tokens[i].length < 3) continue;
     typoEligible[i] = true;
     for (const row of scored) {
-      const w = typoFieldWeight(tokens[i], row.corpus);
-      if (w > 0) {
-        row.weights[i] = w;
-        row.score += w;
+      const hit = typoFieldWeight(tokens[i], row.corpus);
+      if (hit) {
+        row.weights[i] = hit.w;
+        row.score += hit.w;
         row.coverage++;
         row.viaTypo = true;
+        if (!row.typoFixes) row.typoFixes = {};
+        row.typoFixes[tokens[i]] = hit.ct;
       }
     }
   }
@@ -434,7 +438,12 @@ export function rankTools(tokens, tools, aliases, opts) {
   );
   return out
     .slice(0, limit)
-    .map((r) => ({ tool: r.tool, score: r.score, viaTypo: r.viaTypo }));
+    .map((r) => ({
+      tool: r.tool,
+      score: r.score,
+      viaTypo: r.viaTypo,
+      typoFixes: r.typoFixes || null,
+    }));
 }
 
 // ---------------------------------------------------------------------------

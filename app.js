@@ -1725,20 +1725,78 @@ function bindSearch() {
     return tool.id + "?v=1&" + new URLSearchParams(params).toString();
   }
 
+  // spec-v592 live answer preview. The map is a lazy shard; the compute
+  // is the same lazily-imported module export the tile itself calls. Any
+  // failure renders nothing: the preview only ever adds to a result row.
+  let previewMap = null;
+  let previewLoading = false;
+  function ensurePreview() {
+    if (previewMap || previewLoading) return;
+    previewLoading = true;
+    fetch("data/search/preview-map.json", { credentials: "omit" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => { if (json && json.tiles) previewMap = json.tiles; })
+      .catch(() => { /* preview is opt-in; failure is a no-op */ });
+  }
+  let previewTimer = 0;
+  let previewSeq = 0;
+  function schedulePreview(topTool, typed, rowEl) {
+    if (!previewMap || !discovery || !slotsByTile) return;
+    const entry = previewMap[topTool.id];
+    const slotRow = slotsByTile.get(topTool.id);
+    if (!entry || !slotRow) return;
+    const mapped = discovery.mapSlots(discovery.extractQuantities(typed), slotRow);
+    if (!mapped) return;
+    const seq = ++previewSeq;
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(() => {
+      import(entry.module).then((mod) => {
+        if (seq !== previewSeq || !rowEl.isConnected) return;
+        const fn = mod[entry.fn];
+        if (typeof fn !== "function") return;
+        const args = { ...entry.defaults };
+        for (const [param, argName] of Object.entries(entry.args)) {
+          if (param in mapped) args[argName] = Number(mapped[param]);
+        }
+        let result;
+        try { result = fn(args); } catch { return; }
+        if (!result || typeof result !== "object" || result.error) return;
+        const parts = [];
+        for (const h of entry.headline) {
+          const v = Number(result[h.key]);
+          if (!Number.isFinite(v)) return;
+          parts.push(h.label + " " + v.toFixed(h.decimals) + (h.unit ? " " + h.unit : ""));
+        }
+        const span = document.createElement("span");
+        span.className = "sr-preview";
+        span.textContent = parts.join(" / ");
+        rowEl.appendChild(span);
+      }).catch(() => { /* preview only ever adds */ });
+    }, 150);
+  }
+
   // Rank tiles for a query. Preferred path (spec-v589): stopword-stripped
   // token ranking via search-discovery.js rankTools. Fallback (module not
   // yet loaded, or the query normalizes to nothing, e.g. a bare "how"):
   // the original substring pass over name, then description, then alias
   // terms. Empty query lists the catalog A-Z.
+  // Ranked-result metadata for the most recent searchTools call that went
+  // through rankTools; null when the substring fallback answered. Feeds
+  // the spec-v592 did-you-mean row and the answer preview.
+  let lastRanked = null;
   function searchTools(query) {
     if (!searchReady) return [];
+    lastRanked = null;
     const q = (query || "").trim().toLowerCase();
     if (!q) return ALL;
     if (discovery) {
       const { tokens } = discovery.normalizeQuery(q);
       if (tokens.length) {
         const ranked = discovery.rankTools(tokens, TOOLS, aliasRows, { limit: 12 });
-        if (ranked.length) return ranked.map((r) => r.tool);
+        if (ranked.length) {
+          lastRanked = { rows: ranked, tokens };
+          return ranked.map((r) => r.tool);
+        }
       }
     }
     const seen = new Set();
@@ -1796,9 +1854,41 @@ function bindSearch() {
       empty.setAttribute("role", "presentation");
       empty.textContent = "No match yet. Try a trade, a unit, or a tool name (e.g. \"voltage drop\", \"duct\", \"mileage\").";
       list.appendChild(empty);
+      // spec-v592 no-match fallback: a dead end becomes a fork in the
+      // road -- route home to the browse-by-trade index.
+      const browse = document.createElement("li");
+      browse.className = "search-empty search-browse";
+      browse.setAttribute("role", "presentation");
+      const link = document.createElement("a");
+      link.href = "#home";
+      link.textContent = "Browse all " + GROUPS.length + " trades";
+      link.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        input.value = "";
+        setExpanded(false);
+        input.blur();
+        navigateTo("home");
+        const nav = document.querySelector(".home-trades");
+        if (nav) nav.scrollIntoView({ block: "start" });
+      });
+      browse.appendChild(link);
+      list.appendChild(browse);
       setExpanded(true);
       setActive(-1);
       return;
+    }
+    // spec-v592 did-you-mean: when the top match needed the typo pass,
+    // say what the results actually match so the vocabulary is learned.
+    // (Top-result, not all-results: a generic token like "fill" always
+    // matches some tile exactly, so an every-match condition never fires.)
+    if (lastRanked && lastRanked.rows[0].viaTypo) {
+      const fixes = lastRanked.rows[0].typoFixes || {};
+      const corrected = lastRanked.tokens.map((t) => fixes[t] || t).join(" ");
+      const note = document.createElement("li");
+      note.className = "search-empty search-didyoumean";
+      note.setAttribute("role", "presentation");
+      note.textContent = "showing matches for \"" + corrected + "\"";
+      list.appendChild(note);
     }
     matches.forEach((tool, i) => {
       const item = document.createElement("li");
@@ -1818,6 +1908,9 @@ function bindSearch() {
       item.addEventListener("mousedown", (e) => { e.preventDefault(); pick(tool); });
       item.addEventListener("mouseenter", () => setActive(i));
       list.appendChild(item);
+      // spec-v592: computed answer preview on the top-ranked row when the
+      // typed numbers map onto the tile's slots.
+      if (i === 0 && lastRanked) schedulePreview(tool, query, item);
     });
     setExpanded(true);
     setActive(0);
@@ -1826,10 +1919,27 @@ function bindSearch() {
   function loadAndRender() {
     ensureDiscovery();
     ensureSlots();
+    ensurePreview();
     ensureTools().then(() => { initSearchData(); ensureAliases(); render(input.value); });
   }
   input.addEventListener("focus", loadAndRender);
   input.addEventListener("input", loadAndRender);
+
+  // spec-v592 placeholder rotation: one example QUESTION per day of month
+  // (deterministic, no timers, nothing for prefers-reduced-motion to
+  // object to). The shipped index.html placeholder is the static
+  // fallback; the .hero-label accessible name is unchanged.
+  const QUESTION_PLACEHOLDERS = [
+    "how many yards of concrete for a 10x12 slab",
+    "what size wire for 50 amps at 120 ft",
+    "voltage drop 120v 150 ft 20 amps",
+    "how many squares on a roof",
+    "what gauge wire for a 30 amp breaker",
+    "cfm for a 12 inch round duct",
+    "how much can the crane pick after deductions",
+    "friction loss 200 ft of hose at 150 gpm",
+  ];
+  input.placeholder = QUESTION_PLACEHOLDERS[(new Date().getDate() - 1) % QUESTION_PLACEHOLDERS.length];
 
   input.addEventListener("keydown", (e) => {
     if (e.key === "ArrowDown") {

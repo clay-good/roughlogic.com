@@ -1,9 +1,20 @@
 # roughlogic.com Specification v592 -- Live Answer Preview and Search UX Polish (app.js, index.html, data/search/preview-map.json, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-10). Platform spec, last of the "ask it a question" search series (v589-v592). Depends on
+> **Status: LANDED (2026-07-10, package 0.179.0). Platform spec, last of the "ask it a question" search series (v589-v592). Depends on
 > v589 (ranker, viaTypo) and v591 (slot mapping).** No new tile, module, or dependency; every behavior below is a
 > deterministic function of the query and bundled data -- the answer preview calls the same exported compute functions
 > the tiles call. Inherits spec.md through spec-v591.md.
+>
+> **As-landed deltas.** (1) The preview-map entry carries two fields the sketch in §1 omitted and the feature cannot work
+> without: `args` (DOM input id -> compute **argument name** -- computes take named parameters, not DOM ids) and
+> `defaults` (the renderer's example-fill values for arguments the slots do not supply, without which most computes
+> return non-finite and no preview would ever render). (2) The did-you-mean row fires when the **top** match needed the
+> typo pass, not when *every* match did -- a generic token like "fill" always matches some tile exactly, so the
+> every-match condition never fires, including on this spec's own "conduit fill" example. (3) The no-match fallback's
+> group-coverage rows are unreachable by construction (rankTools returns every tool with coverage > 0, so zero results
+> implies zero group signal); the landed fallback is the "Browse all 21 trades" row. (4) rankTools rows expose
+> `typoFixes` (corrected corpus token per query token) to feed the did-you-mean copy. (5) Home-payload js grew ~2.6 KB
+> gz (35,934 B, 71.6% of the sub-budget) vs the <= 2 KB estimate; no cap change.
 >
 > **The gap, and the evidence for it.** After v591, *"voltage drop 120v 150 ft 20 amps"* routes to a prefilled tile --
 > but the user still has to click through to learn the answer. The compute functions are pure, exported, and lazy-loadable

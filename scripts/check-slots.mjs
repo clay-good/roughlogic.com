@@ -23,7 +23,7 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SLOTS_PATH = resolve(ROOT, "data", "search", "slots.json");
@@ -104,6 +104,78 @@ for (const row of shard.tiles || []) {
   }
 }
 
+// spec-v592: the answer-preview map rides the same gate. Every preview
+// tile must have a slot row; module / fn must import-resolve; and each
+// headline key is asserted present (and finite) by running the tile's
+// worked-example inputs through the function -- a renamed output key
+// fails CI, not the user.
+const PREVIEW_PATH = resolve(ROOT, "data", "search", "preview-map.json");
+let preview = null;
+try {
+  preview = JSON.parse(await readFile(PREVIEW_PATH, "utf8"));
+} catch (e) {
+  errors.push("preview-map.json unreadable or invalid JSON: " + e.message);
+}
+let previewCount = 0;
+if (preview) {
+  if (preview.version !== 1 || !preview.tiles || typeof preview.tiles !== "object") {
+    errors.push("preview-map.json: expected { version: 1, tiles: { ... } }.");
+  }
+  const examplesRaw = JSON.parse(
+    await readFile(resolve(ROOT, "test", "fixtures", "worked-examples.json"), "utf8"),
+  );
+  const exampleByTile = new Map();
+  for (const row of examplesRaw.rows) {
+    if (!exampleByTile.has(row.tile_id)) exampleByTile.set(row.tile_id, row);
+  }
+  for (const [tile, entry] of Object.entries(preview.tiles || {})) {
+    previewCount++;
+    const where = "preview-map.json tile '" + tile + "'";
+    const slotRow = (shard.tiles || []).find((r) => r && r.tile === tile);
+    if (!slotRow) { errors.push(where + ": no slot row in slots.json."); continue; }
+    if (!entry || typeof entry.module !== "string" || typeof entry.fn !== "string" ||
+        !entry.args || typeof entry.args !== "object" ||
+        !Array.isArray(entry.headline) || entry.headline.length === 0) {
+      errors.push(where + ": malformed entry.");
+      continue;
+    }
+    const slotParams = new Set(slotRow.slots.map((s) => s && s.param));
+    for (const param of Object.keys(entry.args)) {
+      if (!slotParams.has(param)) errors.push(where + ": args key '" + param + "' is not a slot param.");
+    }
+    let fn;
+    try {
+      const mod = await import(pathToFileURL(resolve(ROOT, entry.module)).href);
+      fn = mod[entry.fn];
+    } catch (e) {
+      errors.push(where + ": module '" + entry.module + "' failed to import: " + e.message);
+      continue;
+    }
+    if (typeof fn !== "function") {
+      errors.push(where + ": export '" + entry.fn + "' is not a function in " + entry.module + ".");
+      continue;
+    }
+    const ex = exampleByTile.get(tile);
+    if (!ex) { errors.push(where + ": no worked example to verify headline keys."); continue; }
+    let result;
+    try { result = fn({ ...ex.inputs }); } catch (e) {
+      errors.push(where + ": compute threw on worked-example inputs: " + e.message);
+      continue;
+    }
+    for (const h of entry.headline) {
+      if (!h || typeof h.key !== "string" || typeof h.label !== "string" ||
+          typeof h.unit !== "string" || !Number.isInteger(h.decimals)) {
+        errors.push(where + ": malformed headline line " + JSON.stringify(h));
+        continue;
+      }
+      const v = Number(result ? result[h.key] : NaN);
+      if (!Number.isFinite(v)) {
+        errors.push(where + ": headline key '" + h.key + "' is not a finite number on the worked example.");
+      }
+    }
+  }
+}
+
 if (errors.length) {
   console.error("check-slots: " + errors.length + " issue(s):");
   for (const e of errors) console.error("  - " + e);
@@ -111,5 +183,6 @@ if (errors.length) {
 }
 console.log(
   "check-slots OK: " + seenTiles.size + " tiles / " + slotCount +
-  " slots; all tiles live, params source-verified, unit tokens unique per tile.",
+  " slots; all tiles live, params source-verified, unit tokens unique per tile; " +
+  previewCount + " preview entries import-resolved with finite worked-example headlines.",
 );

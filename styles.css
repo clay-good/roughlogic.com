@@ -405,6 +405,29 @@ main {
   text-align: center;
 }
 
+/* spec-v592: computed answer preview on the top-ranked result row. */
+.search-result .sr-preview {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* spec-v592: did-you-mean note + no-match browse fallback rows. */
+.search-didyoumean {
+  padding: 8px 14px 0;
+  font-style: italic;
+  text-align: left;
+}
+
+.search-browse {
+  padding-top: 0;
+}
+
+.search-browse a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 /* ============================================================
    Tool view (content panel)
    ============================================================ */

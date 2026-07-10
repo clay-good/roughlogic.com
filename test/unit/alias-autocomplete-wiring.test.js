@@ -26,7 +26,17 @@ test("bindSearch lazy-loads aliases.json via ensureAliases", async () => {
   // and the alias fetch off the first-paint path. spec-v589 adds the
   // ranking module to the same lazy path (ensureDiscovery).
   assert.match(t, /input\.addEventListener\("focus",\s*loadAndRender\)/);
-  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureSlots\(\);\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureSlots\(\);\s*ensurePreview\(\);\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+});
+
+test("the spec-v592 preview, did-you-mean, and browse fallback are wired", async () => {
+  const t = await readApp();
+  assert.match(t, /fetch\("data\/search\/preview-map\.json",\s*\{\s*credentials:\s*"omit"\s*\}\)/);
+  assert.match(t, /span\.className = "sr-preview"/);
+  assert.match(t, /search-didyoumean/);
+  assert.match(t, /search-browse/);
+  // Placeholder rotation is day-of-month indexed, no timers.
+  assert.match(t, /QUESTION_PLACEHOLDERS\[\(new Date\(\)\.getDate\(\) - 1\) % QUESTION_PLACEHOLDERS\.length\]/);
 });
 
 test("the spec-v591 slot shard lazy-loads and prefills the pick hash", async () => {

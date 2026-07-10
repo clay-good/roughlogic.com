@@ -15,10 +15,16 @@
       "file": "slots.json",
       "name": "Quantity slot tables (search prefill deep links, spec-v591)",
       "gzip_size_bytes": 820
+    },
+    {
+      "file": "preview-map.json",
+      "name": "Answer-preview map (search dropdown computed previews, spec-v592)",
+      "gzip_size_bytes": 1823
     }
   ],
   "hashes": {
     "aliases.json": "pending",
-    "slots.json": "pending"
+    "slots.json": "pending",
+    "preview-map.json": "pending"
   }
 }
