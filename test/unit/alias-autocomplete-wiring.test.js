@@ -23,9 +23,18 @@ test("bindSearch lazy-loads aliases.json via ensureAliases", async () => {
   // spec-v17 §H.2 the focus handler is loadAndRender, which first
   // lazy-loads the TOOLS catalog (ensureTools) and only then builds the
   // search indexes and folds in the aliases — keeping both the catalog
-  // and the alias fetch off the first-paint path.
+  // and the alias fetch off the first-paint path. spec-v589 adds the
+  // ranking module to the same lazy path (ensureDiscovery).
   assert.match(t, /input\.addEventListener\("focus",\s*loadAndRender\)/);
-  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+});
+
+test("the spec-v589 ranking module lazy-loads off the first-paint path", async () => {
+  const t = await readApp();
+  assert.match(t, /import\("\.\/search-discovery\.js"\)/);
+  // searchTools prefers normalizeQuery + rankTools once the module is in.
+  assert.match(t, /discovery\.normalizeQuery\(q\)/);
+  assert.match(t, /discovery\.rankTools\(tokens,\s*TOOLS,\s*aliasRows,\s*\{\s*limit:\s*12\s*\}\)/);
 });
 
 test("alias terms are kept only for targets that are real tile ids", async () => {
@@ -40,13 +49,15 @@ test("alias terms are kept only for targets that are real tile ids", async () =>
 
 test("alias terms map a free-text phrase to a tile id", async () => {
   const t = await readApp();
-  assert.match(t, /aliasTerms\.push\(\{\s*term:\s*row\.term\.toLowerCase\(\),\s*id:\s*row\.target\s*\}\)/);
+  // Shard row shape ({ term, target }) is preserved so the rows feed
+  // rankTools directly (spec-v589).
+  assert.match(t, /rows\.push\(\{\s*term:\s*row\.term\.toLowerCase\(\),\s*target:\s*row\.target\s*\}\)/);
 });
 
 test("the matcher folds alias-term matches into the results", async () => {
   const t = await readApp();
-  // searchTools walks aliasTerms and surfaces the matching target tile.
-  assert.match(t, /for\s*\(const al of aliasTerms\)/);
+  // The substring fallback walks aliasRows and surfaces the target tile.
+  assert.match(t, /for\s*\(const al of aliasRows\)/);
   assert.match(t, /al\.term\.includes\(q\)/);
 });
 

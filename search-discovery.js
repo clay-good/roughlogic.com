@@ -21,6 +21,22 @@
 //
 // All inputs are validated; bad input returns the appropriate empty
 // value rather than throwing.
+//
+// spec-v589 adds the deterministic natural-language ranking layer:
+//
+//   normalizeQuery(query) -> { tokens, raw }
+//     Lowercase, strip punctuation, split, map unit spellings through
+//     TOKEN_SYNONYMS, drop STOPWORDS. An empty `tokens` array tells the
+//     caller to fall back to plain substring matching on `raw`.
+//
+//   rankTools(tokens, tools, aliases, { limit }) -> [{ tool, score, viaTypo }]
+//     Deterministic per-token field-weighted ranking over each tool's
+//     name / alias terms / trades / desc, with prefix stemming, a
+//     plural-strip fallback, and a bounded edit-distance-1 typo
+//     fallback. Same input, same order, on every device, offline.
+//
+//   editDistance1(a, b) -> boolean
+//     Damerau-Levenshtein distance <= 1 (transposition included).
 
 export function resolveQuery(query, aliases, toolIds) {
   if (typeof query !== "string") return null;
@@ -61,4 +77,350 @@ function toIdSet(toolIds) {
   if (toolIds instanceof Set) return toolIds;
   if (Array.isArray(toolIds)) return new Set(toolIds);
   return new Set();
+}
+
+// ---------------------------------------------------------------------------
+// spec-v589: deterministic natural-language ranking.
+// ---------------------------------------------------------------------------
+
+// Question-frame words stripped from a query before ranking. Deliberately
+// excludes trade vocabulary that appears in tile names ("drop", "load",
+// "span", "fall", "grade", ...): only words that carry no catalog signal.
+export const STOPWORDS = new Set([
+  // question frames
+  "how", "what", "whats", "when", "wheres", "where", "which", "who", "whom",
+  "whose", "why", "whichever", "whatever",
+  // auxiliaries / copulas
+  "do", "does", "did", "doing", "done", "is", "are", "was", "were", "be",
+  "been", "being", "am", "can", "cant", "could", "couldnt", "should",
+  "shouldnt", "would", "wouldnt", "will", "wont", "shall", "may", "might",
+  "must", "have", "has", "had", "having", "dont", "doesnt", "didnt", "isnt",
+  "arent", "wasnt", "werent", "im", "ive", "id", "ill",
+  // pronouns / determiners
+  "i", "me", "my", "mine", "myself", "we", "us", "our", "ours", "you",
+  "your", "yours", "he", "him", "his", "she", "her", "hers", "they", "them",
+  "their", "theirs", "it", "its", "this", "that", "these", "those", "there",
+  "here", "the", "a", "an", "each", "both", "either", "neither", "such",
+  "own", "same", "another", "other", "others", "something", "anything",
+  "everything", "someone", "anyone",
+  // glue prepositions / conjunctions
+  "to", "of", "in", "on", "at", "by", "for", "from", "with", "without",
+  "into", "onto", "as", "if", "then", "than", "so", "but", "and", "or",
+  "nor", "not", "no", "yes", "about", "around", "between", "through",
+  "during", "before", "after", "again", "also", "too", "just", "only",
+  "even", "still", "yet", "per", "via", "versus", "vs",
+  // quantity / degree frames
+  "much", "many", "more", "most", "less", "least", "few", "fewer", "lot",
+  "lots", "some", "any", "all", "every", "enough", "approx",
+  "approximately", "roughly", "exactly",
+  // request verbs
+  "need", "needs", "needed", "want", "wants", "wanted", "get", "gets",
+  "getting", "got", "give", "gives", "figure", "figuring", "figured",
+  "out", "tell", "show", "find", "know", "help", "trying", "try", "going",
+  "make", "makes", "use", "used", "using", "work", "works", "way", "ways",
+  "calculate", "calculating", "calculation", "calculator", "compute",
+  "determine", "estimate", "estimating", "convert", "converting",
+  // generic sizing frames (the unit / trade tokens carry the signal)
+  "size", "sizes", "sized", "sizing", "big", "right", "correct", "proper",
+  "good", "best", "kind", "type", "long", "does", "take", "takes",
+]);
+
+// Unit / vocabulary spellings mapped to the canonical token(s) the tile
+// names, descriptions, and alias terms actually use. A value may be a
+// single token or an array of tokens.
+export const TOKEN_SYNONYMS = new Map([
+  ["sqft", ["square", "feet"]],
+  ["sf", ["square", "feet"]],
+  ["sq", "square"],
+  ["ft", "feet"],
+  ["foot", "feet"],
+  ["lf", ["linear", "feet"]],
+  ["cuft", ["cubic", "feet"]],
+  ["cf", ["cubic", "feet"]],
+  ["cuyd", ["cubic", "yard"]],
+  ["cy", ["cubic", "yard"]],
+  ["yd", "yard"],
+  ["yds", "yard"],
+  ["gal", "gallon"],
+  ["gals", "gallon"],
+  ["lb", "pound"],
+  ["lbs", "pound"],
+  ["oz", "ounce"],
+  ["amps", "amp"],
+  ["ampere", "amp"],
+  ["amperes", "amp"],
+  ["volts", "volt"],
+  ["watts", "watt"],
+  ["hp", "horsepower"],
+  ["btuh", "btu"],
+  ["btus", "btu"],
+  ["kwhr", "kwh"],
+  ["hr", "hour"],
+  ["hrs", "hour"],
+  ["temp", "temperature"],
+]);
+
+// Tokenize free text: lowercase, keep [a-z0-9], hyphen, slash, dot; split
+// on whitespace. Compound tokens ("three-phase", "kw/ton") also emit their
+// separator-split parts. `keepCompound` keeps the unsplit compound in the
+// output (used for the corpus side so both shapes are matchable).
+function tokenize(text, keepCompound) {
+  if (typeof text !== "string" || !text) return [];
+  const rough = text.toLowerCase().replace(/[^a-z0-9\-/.]+/g, " ").split(" ");
+  const out = [];
+  for (const tok of rough) {
+    const t = tok.replace(/^[-/.]+|[-/.]+$/g, "");
+    if (!t) continue;
+    if (/[-/.]/.test(t)) {
+      if (keepCompound) out.push(t);
+      for (const part of t.split(/[-/.]+/)) if (part) out.push(part);
+    } else {
+      out.push(t);
+    }
+  }
+  return out;
+}
+
+export function normalizeQuery(query) {
+  if (typeof query !== "string") return { tokens: [], raw: "" };
+  const raw = query.trim().toLowerCase();
+  const tokens = [];
+  const seen = new Set();
+  for (const tok of tokenize(raw, false)) {
+    const mapped = TOKEN_SYNONYMS.get(tok);
+    const expanded = mapped == null ? [tok] : Array.isArray(mapped) ? mapped : [mapped];
+    for (const t of expanded) {
+      if (STOPWORDS.has(t) || seen.has(t)) continue;
+      seen.add(t);
+      tokens.push(t);
+    }
+  }
+  return { tokens, raw };
+}
+
+// Damerau-Levenshtein distance <= 1: equal, one substitution, one
+// insertion / deletion, or one adjacent transposition.
+export function editDistance1(a, b) {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  if (a === b) return true;
+  const la = a.length;
+  const lb = b.length;
+  if (Math.abs(la - lb) > 1) return false;
+  if (la === lb) {
+    let i = 0;
+    while (i < la && a[i] === b[i]) i++;
+    if (a.slice(i + 1) === b.slice(i + 1)) return true; // substitution
+    return (
+      a[i] === b[i + 1] &&
+      a[i + 1] === b[i] &&
+      a.slice(i + 2) === b.slice(i + 2)
+    ); // transposition
+  }
+  const short = la < lb ? a : b;
+  const long = la < lb ? b : a;
+  let i = 0;
+  while (i < short.length && short[i] === long[i]) i++;
+  return short.slice(i) === long.slice(i + 1); // insertion / deletion
+}
+
+// Field weights per matched query token (spec-v589 §2).
+const FIELD_WEIGHTS = { name: 3, alias: 2, trade: 2, desc: 1 };
+const FIELD_ORDER = ["name", "alias", "trade", "desc"];
+
+// Per-tool tokenized corpus, cached on the tool object. The cache entry
+// remembers the aliases array (identity + length) it was built against so
+// a late-loaded or swapped alias shard rebuilds instead of going stale.
+const _corpusCache = new WeakMap();
+const _aliasIndexCache = new WeakMap();
+
+function aliasIndex(aliases) {
+  if (!Array.isArray(aliases)) return null;
+  let entry = _aliasIndexCache.get(aliases);
+  if (!entry || entry.len !== aliases.length) {
+    const byTarget = new Map();
+    for (const row of aliases) {
+      if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
+      const list = byTarget.get(row.target);
+      if (list) list.push(row.term);
+      else byTarget.set(row.target, [row.term]);
+    }
+    entry = { len: aliases.length, byTarget };
+    _aliasIndexCache.set(aliases, entry);
+  }
+  return entry;
+}
+
+function corpusFor(tool, aliases, aliasEntry) {
+  let c = _corpusCache.get(tool);
+  const aliasLen = Array.isArray(aliases) ? aliases.length : 0;
+  if (!c || c.aliasesRef !== aliases || c.aliasLen !== aliasLen) {
+    const terms = aliasEntry ? aliasEntry.byTarget.get(tool.id) || [] : [];
+    c = {
+      aliasesRef: aliases,
+      aliasLen,
+      name: tokenize(tool.name, true),
+      alias: tokenize(terms.join(" "), true),
+      trade: tokenize(Array.isArray(tool.trades) ? tool.trades.join(" ") : "", true),
+      desc: tokenize(tool.desc, true),
+      nameLower: typeof tool.name === "string" ? tool.name.toLowerCase() : "",
+      // Signal-bearing name parts for the covered-name bonus: split
+      // compounds, drop question-frame words ("with", "for", "a").
+      nameParts: tokenize(tool.name, false).filter((t) => !STOPWORDS.has(t)),
+    };
+    _corpusCache.set(tool, c);
+  }
+  return c;
+}
+
+// A query token matches a corpus token when equal, or when the query
+// token (length >= 3) is a prefix of it: cheap stemming ("volt" ->
+// "voltage", "amp" -> "ampacity"). Deliberately one-directional: letting
+// short corpus tokens absorb longer query tokens would swallow typos
+// ("con" would match "condiut") and defeat the edit-distance fallback.
+// The longer-query-token direction ("voltages" -> "voltage") is handled
+// by the plural-strip candidates instead.
+function tokenMatches(qt, ct) {
+  if (qt === ct) return true;
+  return qt.length >= 3 && ct.length > qt.length && ct.startsWith(qt);
+}
+
+// Digit <-> word equivalence so "3 phase" meets "three-phase" (and the
+// reverse) without rewriting the token, which would break fraction
+// queries like "3/4".
+const DIGIT_EQUIV = new Map([
+  ["1", "one"], ["2", "two"], ["3", "three"], ["4", "four"], ["5", "five"],
+  ["6", "six"], ["7", "seven"], ["8", "eight"], ["9", "nine"], ["10", "ten"],
+  ["one", "1"], ["two", "2"], ["three", "3"], ["four", "4"], ["five", "5"],
+  ["six", "6"], ["seven", "7"], ["eight", "8"], ["nine", "9"], ["ten", "10"],
+]);
+
+// Match candidates for a query token: the token itself, its
+// plural-stripped forms (only useful when the unstripped token matches
+// nothing, since the unstripped form is tried first), and its digit /
+// word twin.
+function candidatesOf(token) {
+  const out = [token];
+  if (token.length >= 4) {
+    if (token.endsWith("es")) out.push(token.slice(0, -2));
+    if (token.endsWith("s")) out.push(token.slice(0, -1));
+  }
+  const twin = DIGIT_EQUIV.get(token);
+  if (twin) out.push(twin);
+  return out;
+}
+
+// Best field weight for one query token against one tool corpus.
+function bestFieldWeight(token, corpus) {
+  for (const cand of candidatesOf(token)) {
+    for (const field of FIELD_ORDER) {
+      for (const ct of corpus[field]) {
+        if (tokenMatches(cand, ct)) return FIELD_WEIGHTS[field];
+      }
+    }
+  }
+  return 0;
+}
+
+// Half-weight edit-distance-1 fallback for one query token.
+function typoFieldWeight(token, corpus) {
+  for (const field of FIELD_ORDER) {
+    for (const ct of corpus[field]) {
+      if (editDistance1(token, ct)) return FIELD_WEIGHTS[field] / 2;
+    }
+  }
+  return 0;
+}
+
+// One query token covers one name token when any candidate matches it
+// exactly / by prefix, or (for a typo-eligible token) at edit distance 1.
+function coversNamePart(token, namePart, typoEligible) {
+  for (const cand of candidatesOf(token)) {
+    if (tokenMatches(cand, namePart)) return true;
+  }
+  return typoEligible && editDistance1(token, namePart);
+}
+
+export function rankTools(tokens, tools, aliases, opts) {
+  if (!Array.isArray(tokens) || tokens.length === 0) return [];
+  if (!Array.isArray(tools) || tools.length === 0) return [];
+  const limit =
+    opts && Number.isFinite(opts.limit) && opts.limit > 0
+      ? Math.floor(opts.limit)
+      : 12;
+  const aliasEntry = aliasIndex(aliases);
+  const joined = tokens.join(" ");
+
+  // Pass 1: exact / prefix / plural scoring. Track which query tokens
+  // matched at least one tool anywhere (typo eligibility is global).
+  const scored = [];
+  const matchedAnywhere = new Array(tokens.length).fill(false);
+  for (const tool of tools) {
+    if (!tool || typeof tool !== "object" || typeof tool.id !== "string") continue;
+    const corpus = corpusFor(tool, aliases, aliasEntry);
+    const weights = new Array(tokens.length);
+    let score = 0;
+    let coverage = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      const w = bestFieldWeight(tokens[i], corpus);
+      weights[i] = w;
+      if (w > 0) {
+        score += w;
+        coverage++;
+        matchedAnywhere[i] = true;
+      }
+    }
+    if (corpus.nameLower.startsWith(joined)) score += 2;
+    scored.push({ tool, corpus, weights, score, coverage, viaTypo: false });
+  }
+
+  // Pass 2: bounded typo fallback, only for query tokens of length >= 3
+  // that matched nothing exactly in any tool. (Three, not four: a
+  // dropped-vowel token like "drp" is exactly the gloves-on-a-phone case
+  // this pass exists for, and the global matched-nothing gate keeps it
+  // from firing on tokens that already carry signal.)
+  const typoEligible = new Array(tokens.length).fill(false);
+  for (let i = 0; i < tokens.length; i++) {
+    if (matchedAnywhere[i] || tokens[i].length < 3) continue;
+    typoEligible[i] = true;
+    for (const row of scored) {
+      const w = typoFieldWeight(tokens[i], row.corpus);
+      if (w > 0) {
+        row.weights[i] = w;
+        row.score += w;
+        row.coverage++;
+        row.viaTypo = true;
+      }
+    }
+  }
+
+  // Covered-name bonus: when every signal-bearing name token is matched
+  // by some query token, the tile IS what was asked (plus qualifiers), so
+  // "voltage drop 3 phase" prefers Voltage Drop over wordier siblings.
+  for (const row of scored) {
+    if (row.coverage === 0) continue;
+    const parts = row.corpus.nameParts;
+    if (!parts.length) continue;
+    let covered = true;
+    for (const part of parts) {
+      let hit = false;
+      for (let i = 0; i < tokens.length && !hit; i++) {
+        if (row.weights[i] > 0 && coversNamePart(tokens[i], part, typoEligible[i])) hit = true;
+      }
+      if (!hit) { covered = false; break; }
+    }
+    if (covered) row.score += 2;
+  }
+
+  const out = scored.filter((r) => r.coverage > 0);
+  // Full-coverage candidates first, then best token coverage; ties break
+  // by score desc, then name: a total, deterministic order.
+  out.sort(
+    (a, b) =>
+      b.coverage - a.coverage ||
+      b.score - a.score ||
+      String(a.tool.name).localeCompare(String(b.tool.name)),
+  );
+  return out
+    .slice(0, limit)
+    .map((r) => ({ tool: r.tool, score: r.score, viaTypo: r.viaTypo }));
 }

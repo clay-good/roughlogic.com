@@ -1653,7 +1653,10 @@ function bindSearch() {
   let activeIndex = -1;
 
   // Alias terms map a free-text phrase to a tile id; loaded lazily.
-  const aliasTerms = [];
+  // Row shape matches the shard ({ term, target }) so the rows feed
+  // rankTools directly. Reassigned (not mutated) on load so the ranker's
+  // per-array caches never go stale.
+  let aliasRows = [];
   let aliasLoaded = false;
   async function ensureAliases() {
     if (aliasLoaded) return;
@@ -1663,22 +1666,47 @@ function bindSearch() {
       if (!r.ok) return;
       const json = await r.json();
       if (!json || !Array.isArray(json.aliases)) return;
+      const rows = [];
       for (const row of json.aliases) {
         if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
         if (!nameToId.has(row.target) && !TOOLS.some((t) => t.id === row.target)) continue;
-        aliasTerms.push({ term: row.term.toLowerCase(), id: row.target });
+        rows.push({ term: row.term.toLowerCase(), target: row.target });
       }
+      aliasRows = rows;
       // Refresh the open dropdown so just-loaded aliases become searchable.
       if (document.activeElement === input) render(input.value);
     } catch { /* alias autocomplete is opt-in; failure is a no-op */ }
   }
 
-  // Rank tiles for a query: name-prefix, then name-substring, then
-  // description, then alias-term match. Empty query lists the catalog A-Z.
+  // The spec-v589 pure ranking layer (normalizeQuery / rankTools) loads
+  // lazily alongside ensureTools so the bare home view never pulls it.
+  let discovery = null;
+  let discoveryLoading = false;
+  function ensureDiscovery() {
+    if (discovery || discoveryLoading) return;
+    discoveryLoading = true;
+    import("./search-discovery.js").then((mod) => {
+      discovery = mod;
+      if (document.activeElement === input) render(input.value);
+    }).catch(() => { discoveryLoading = false; });
+  }
+
+  // Rank tiles for a query. Preferred path (spec-v589): stopword-stripped
+  // token ranking via search-discovery.js rankTools. Fallback (module not
+  // yet loaded, or the query normalizes to nothing, e.g. a bare "how"):
+  // the original substring pass over name, then description, then alias
+  // terms. Empty query lists the catalog A-Z.
   function searchTools(query) {
     if (!searchReady) return [];
     const q = (query || "").trim().toLowerCase();
     if (!q) return ALL;
+    if (discovery) {
+      const { tokens } = discovery.normalizeQuery(q);
+      if (tokens.length) {
+        const ranked = discovery.rankTools(tokens, TOOLS, aliasRows, { limit: 12 });
+        if (ranked.length) return ranked.map((r) => r.tool);
+      }
+    }
     const seen = new Set();
     const out = [];
     const add = (t) => { if (t && !seen.has(t.id)) { seen.add(t.id); out.push(t); } };
@@ -1690,8 +1718,8 @@ function bindSearch() {
     });
     named.forEach(add);
     ALL.filter((t) => t.desc.toLowerCase().includes(q)).forEach(add);
-    for (const al of aliasTerms) {
-      if (al.term.includes(q)) add(TOOLS.find((t) => t.id === al.id));
+    for (const al of aliasRows) {
+      if (al.term.includes(q)) add(TOOLS.find((t) => t.id === al.target));
     }
     return out.slice(0, 12);
   }
@@ -1761,6 +1789,7 @@ function bindSearch() {
   }
 
   function loadAndRender() {
+    ensureDiscovery();
     ensureTools().then(() => { initSearchData(); ensureAliases(); render(input.value); });
   }
   input.addEventListener("focus", loadAndRender);

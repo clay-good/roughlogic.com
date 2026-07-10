@@ -327,8 +327,12 @@ const CAPS = {
   // 2026-06-05 for the spec-v17 V.1 ideal-body-weight and V.3 corrected-qt
   // canonical copy (current + ~20% headroom rule).
   "limitation-banner.js": 11500,
-  // v10 Phase D pure-functional resolvers.
-  "search-discovery.js": 2500,
+  // v10 Phase D pure-functional resolvers. Bumped 2500 -> 7000 B on
+  // 2026-07-10 for the spec-v589 deterministic NL ranking layer
+  // (stopword set, synonym table, ranker, edit-distance fallback):
+  // 5925 B as landed plus the ~20% headroom rule (the spec's 6000 B
+  // estimate left under 2% headroom).
+  "search-discovery.js": 7000,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally
   // toward full TOOLS coverage; cap raised in lockstep. Bumped from
   // 7000 -> 9000 B on 2026-05-18 (spec-v13 Phase E seed of 55

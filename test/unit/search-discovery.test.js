@@ -13,7 +13,13 @@ import { fileURLToPath } from "node:url";
 import {
   resolveQuery,
   matchAliasPrefix,
+  normalizeQuery,
+  rankTools,
+  editDistance1,
+  STOPWORDS,
+  TOKEN_SYNONYMS,
 } from "../../search-discovery.js";
+import { search as mcpSearch } from "../../mcp/catalog.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -92,6 +98,112 @@ test("matchAliasPrefix returns [] on empty / bad input", () => {
   assert.deepEqual(matchAliasPrefix("", [{ term: "amps", target: "x" }]), []);
   assert.deepEqual(matchAliasPrefix(null, []), []);
   assert.deepEqual(matchAliasPrefix("amp", null), []);
+});
+
+// ---------------------------------------------------------------------------
+// spec-v589: deterministic natural-language ranking.
+// ---------------------------------------------------------------------------
+
+async function loadCatalog() {
+  const [{ TOOLS }, { aliases }] = await Promise.all([
+    import("../../tools-data.js"),
+    loadShards(),
+  ]);
+  return { TOOLS, aliases };
+}
+
+test("normalizeQuery strips stopwords and punctuation", () => {
+  const { tokens } = normalizeQuery("How many yards of concrete do I need, for a slab?");
+  assert.deepEqual(tokens, ["yards", "concrete", "slab"]);
+});
+
+test("normalizeQuery maps unit spellings through TOKEN_SYNONYMS", () => {
+  assert.deepEqual(normalizeQuery("500 sqft deck").tokens, ["500", "square", "feet", "deck"]);
+  assert.deepEqual(normalizeQuery("50 amps wire").tokens, ["50", "amp", "wire"]);
+  assert.ok(TOKEN_SYNONYMS.get("lbs") === "pound");
+});
+
+test("normalizeQuery on a stopword-only query returns no tokens (substring fallback)", () => {
+  assert.deepEqual(normalizeQuery("how").tokens, []);
+  assert.deepEqual(normalizeQuery("how do i").tokens, []);
+  assert.equal(normalizeQuery("how do i").raw, "how do i");
+  assert.ok(STOPWORDS.has("how"));
+});
+
+test("normalizeQuery handles bad input", () => {
+  assert.deepEqual(normalizeQuery(null), { tokens: [], raw: "" });
+  assert.deepEqual(normalizeQuery("").tokens, []);
+});
+
+test("editDistance1 is Damerau-Levenshtein <= 1", () => {
+  assert.ok(editDistance1("conduit", "conduit")); // equal
+  assert.ok(editDistance1("condiut", "conduit")); // transposition
+  assert.ok(editDistance1("voltge", "voltage")); // deletion
+  assert.ok(editDistance1("volttage", "voltage")); // insertion
+  assert.ok(editDistance1("voltafe", "voltage")); // substitution
+  assert.ok(!editDistance1("volt", "voltage"));
+  assert.ok(!editDistance1("conduit", "circuit"));
+  assert.ok(!editDistance1(null, "voltage"));
+});
+
+test("rankTools is deterministic: same input, identical order", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const { tokens } = normalizeQuery("concrete slab yards");
+  const a = rankTools(tokens, TOOLS, aliases, { limit: 12 });
+  const b = rankTools(tokens, TOOLS, aliases, { limit: 12 });
+  assert.ok(a.length > 0 && a.length <= 12);
+  assert.deepEqual(a.map((r) => r.tool.id), b.map((r) => r.tool.id));
+});
+
+test("rankTools corrects a transposition typo at half weight", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const ranked = rankTools(normalizeQuery("condiut fill").tokens, TOOLS, aliases, { limit: 12 });
+  assert.equal(ranked[0].tool.id, "conduit-fill");
+  assert.ok(ranked[0].viaTypo, "typo-corrected result must set viaTypo");
+});
+
+test("rankTools survives a dropped-letter typo plus partial coverage", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const ranked = rankTools(normalizeQuery("voltage drp").tokens, TOOLS, aliases, { limit: 12 });
+  assert.equal(ranked[0].tool.id, "voltage-drop");
+});
+
+test("acceptance: question-shaped queries rank the expected tile first", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const table = [
+    ["how many yards of concrete do i need for a slab", "concrete"],
+    ["what size wire for 50 amps", "wire-ampacity"],
+    ["voltage drop 3 phase", "voltage-drop"],
+  ];
+  for (const [query, expected] of table) {
+    const { tokens } = normalizeQuery(query);
+    assert.ok(tokens.length > 0, "tokens empty for: " + query);
+    const ranked = rankTools(tokens, TOOLS, aliases, { limit: 12 });
+    assert.ok(ranked.length > 0, "no results for: " + query);
+    assert.equal(
+      ranked[0].tool.id,
+      expected,
+      `"${query}" ranked ${ranked[0].tool.id}, expected ${expected}`,
+    );
+  }
+});
+
+test("rankTools returns [] on empty tokens or bad input", () => {
+  assert.deepEqual(rankTools([], [{ id: "x", name: "X", desc: "", trades: [] }], []), []);
+  assert.deepEqual(rankTools(null, [], []), []);
+  assert.deepEqual(rankTools(["volt"], null, []), []);
+});
+
+test("MCP search parity: typo query resolves through the same ranker", async () => {
+  const got = await mcpSearch({ query: "conduit fil" });
+  assert.ok(got.results.length > 0);
+  assert.equal(got.results[0].id, "conduit-fill");
+  const questioned = await mcpSearch({ query: "what size wire for 50 amps" });
+  assert.equal(questioned.results[0].id, "wire-ampacity");
+  // Trade filter still constrains the pool.
+  const traded = await mcpSearch({ query: "voltage drop", trade: "electrical" });
+  assert.ok(traded.results.every((r) => r.trades.includes("electrical")));
+  assert.equal(traded.results[0].id, "voltage-drop");
 });
 
 test("end-to-end: real shards resolve representative queries", async () => {

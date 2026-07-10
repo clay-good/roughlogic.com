@@ -1,6 +1,12 @@
 # roughlogic.com Specification v589 -- Deterministic Natural-Language Search Ranking (search-discovery.js, app.js, mcp/catalog.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-10). Platform spec, first of the four-part "ask it a question" search series (v589-v592).**
+> **Status: LANDED (2026-07-10, package 0.176.0). Platform spec, first of the four-part "ask it a question" search series (v589-v592).**
+> As-landed deltas from the proposal: the corpus-token prefix stemming is one-directional (query token -> corpus token;
+> the reverse direction would let short corpus tokens swallow typos and defeat the edit-distance fallback -- plural-strip
+> candidates cover the longer-query-token case); the typo gate is length >= 3, not 4 (the spec's own "voltage drp"
+> acceptance case requires it); a digit/word equivalence table ("3 phase" meets "three-phase") and a +2 covered-name
+> bonus (every signal-bearing name token matched) were needed to pin the §3 acceptance table; the gzip cap landed at
+> 7000 B, not 6000 B (5925 B as landed left under 2% headroom against the ~20% rule).
 > No new tile, module, group, or dependency; no runtime model or inference of any kind -- the "No AI" constraint table row
 > in the README is untouched. Inherits spec.md through spec-v588.md.
 >

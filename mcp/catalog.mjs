@@ -14,18 +14,23 @@
 // run() of a tile in that module, exactly as the worked-example runner does.
 
 import { readFile } from "node:fs/promises";
+import { normalizeQuery, rankTools } from "../search-discovery.js";
 
 const COMPUTE_MAP_URL = new URL("../test/fixtures/compute-map.js", import.meta.url);
 const EXAMPLES_URL = new URL("../test/fixtures/worked-examples.json", import.meta.url);
+const ALIASES_URL = new URL("../data/search/aliases.json", import.meta.url);
 
 let _state = null;
 
 async function load() {
   if (_state) return _state;
-  const [{ TOOLS }, { COMPUTE_MAP }, examplesRaw] = await Promise.all([
+  const [{ TOOLS }, { COMPUTE_MAP }, examplesRaw, aliasesRaw] = await Promise.all([
     import(new URL("../tools-data.js", import.meta.url).href),
     import(COMPUTE_MAP_URL.href),
     readFile(EXAMPLES_URL, "utf8"),
+    // Alias shard for search parity with the browser combobox
+    // (spec-v589); a missing or unreadable shard degrades to no aliases.
+    readFile(ALIASES_URL, "utf8").catch(() => "{}"),
   ]);
 
   // First worked example per tile id (a tile can have several rows; the first
@@ -38,7 +43,21 @@ async function load() {
   const byId = new Map(TOOLS.map((t) => [t.id, t]));
   const modCache = new Map();
 
-  _state = { TOOLS, COMPUTE_MAP, examples, byId, modCache };
+  let aliases = [];
+  try {
+    const parsed = JSON.parse(aliasesRaw);
+    if (parsed && Array.isArray(parsed.aliases)) {
+      aliases = parsed.aliases.filter(
+        (row) =>
+          row &&
+          typeof row.term === "string" &&
+          typeof row.target === "string" &&
+          byId.has(row.target),
+      );
+    }
+  } catch { /* degrade to no aliases */ }
+
+  _state = { TOOLS, COMPUTE_MAP, examples, byId, modCache, aliases };
   return _state;
 }
 
@@ -102,7 +121,7 @@ function introspectInputs(fn) {
 }
 
 export async function search({ query = "", trade = "", limit = 30 } = {}) {
-  const { TOOLS } = await load();
+  const { TOOLS, aliases } = await load();
   const q = String(query).toLowerCase().trim();
   const tr = String(trade).toLowerCase().trim();
 
@@ -117,13 +136,30 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
     };
   }
 
-  const terms = q.split(/\s+/).filter(Boolean);
-  const matches = TOOLS.filter((t) => {
-    if (tr && !t.trades.some((x) => x.toLowerCase().includes(tr))) return false;
-    if (!terms.length) return true;
-    const hay = `${t.id} ${t.name} ${t.desc}`.toLowerCase();
-    return terms.every((term) => hay.includes(term));
-  });
+  const pool = tr
+    ? TOOLS.filter((t) => t.trades.some((x) => x.toLowerCase().includes(tr)))
+    : TOOLS;
+
+  // spec-v589: the browser combobox's deterministic NL ranker, shared via
+  // search-discovery.js so agent and browser recall cannot drift. If the
+  // query normalizes to nothing (stopwords only) or ranks nothing, fall
+  // back to the original AND-of-substrings pass.
+  let matches = null;
+  if (q) {
+    const { tokens } = normalizeQuery(q);
+    if (tokens.length) {
+      const ranked = rankTools(tokens, pool, aliases, { limit: pool.length });
+      if (ranked.length) matches = ranked.map((r) => r.tool);
+    }
+  }
+  if (!matches) {
+    const terms = q.split(/\s+/).filter(Boolean);
+    matches = pool.filter((t) => {
+      if (!terms.length) return true;
+      const hay = `${t.id} ${t.name} ${t.desc}`.toLowerCase();
+      return terms.every((term) => hay.includes(term));
+    });
+  }
 
   return {
     total: matches.length,
