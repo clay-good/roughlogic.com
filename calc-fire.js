@@ -1885,3 +1885,53 @@ function renderNfaFiregroundFlow(inputRegion, outputRegion, citationEl) {
   for (const f of [L, W, pct, floors, exp]) f.input.addEventListener("input", update);
 }
 FIRE_RENDERERS["nfa-fireground-flow"] = renderNfaFiregroundFlow;
+
+// --- spec-v578 F: Relay pumping max distance ---
+// budget = max_discharge - intake_residual - 0.434*elevation. FL_per_100 = C*(Q/100)^2. max_distance = budget/FL_per_100*100.
+// dims: in { target_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, max_discharge_psi: M L^-1 T^-2, intake_residual_psi: M L^-1 T^-2, elevation_ft: L } out: { budget_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_distance_ft: L }
+export function computeRelayPumpDistance({ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_residual_psi = 20, elevation_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Q = Number(target_flow_gpm) || 0;
+  const C = Number(hose_coefficient) || 0;
+  const maxD = Number(max_discharge_psi) || 0;
+  const intake = Number(intake_residual_psi) || 0;
+  const elev = Number(elevation_ft) || 0;
+  if (!(Q > 0)) return { error: "Relay flow must be positive (gpm)." };
+  if (!(C > 0)) return { error: "Hose coefficient must be positive." };
+  if (!(maxD > 0)) return { error: "Max discharge pressure must be positive (psi)." };
+  const budget_psi = maxD - intake - 0.434 * elev;
+  if (!(budget_psi > 0)) return { error: "No pressure budget: the intake residual and elevation lift already exceed the pump's max discharge." };
+  const fl_per_100_psi = C * Math.pow(Q / 100, 2);
+  if (!(fl_per_100_psi > 0)) return { error: "Friction loss per 100 ft resolved to zero; check the flow and coefficient." };
+  const max_distance_ft = budget_psi / fl_per_100_psi * 100;
+  return {
+    budget_psi, fl_per_100_psi, max_distance_ft,
+    note: "The next pumper needs a 20 psi residual on its intake or it cavitates, so the usable pressure is the max discharge minus 20 minus the lift - not the whole pump. The distance falls with the square of flow (doubling gpm quarters the spacing, which is why big water uses large-diameter hose and more pumpers, not more pressure). The elevation term is 0.434 psi per foot. The SOP and the pump's real capability govern - a planning aid, not incident command.",
+  };
+}
+export const relayPumpDistanceExample = { inputs: { target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 20, elevation_ft: 10 } };
+function renderRelayPumpDistance(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not incident command; the SOP and the pump's real capability govern. Citation: IFSTA Pumping Apparatus Driver/Operator relay pumping maximum distance, by name. budget = max_discharge - intake_residual - 0.434 x elevation; FL_per_100 = C x (Q/100)^2; max_distance = budget / FL_per_100 x 100. The next pumper needs a 20 psi intake residual or it cavitates, so the usable pressure is the max discharge minus 20 minus the lift; distance falls with the square of flow.";
+  const Q = makeNumber("Relay flow (gpm)", "relay-q", { step: "any", min: "0", value: "800" }); Q.input.value = "800";
+  const C = makeNumber("Hose coefficient C (5 in LDH ~ 0.08)", "relay-c", { step: "any", min: "0", value: "0.08" }); C.input.value = "0.08";
+  const maxD = makeNumber("Pump max discharge (psi)", "relay-maxd", { step: "any", min: "0", value: "200" }); maxD.input.value = "200";
+  const intake = makeNumber("Intake residual to hold (psi)", "relay-intake", { step: "any", min: "0", value: "20" }); intake.input.value = "20";
+  const elev = makeNumber("Elevation gain (ft, negative = downhill)", "relay-elev", { step: "any", value: "10" }); elev.input.value = "10";
+  for (const f of [Q, C, maxD, intake, elev]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Q.input.value = "800"; C.input.value = "0.08"; maxD.input.value = "200"; intake.input.value = "20"; elev.input.value = "10"; update(); });
+  const oBudget = makeOutputLine(outputRegion, "Pressure budget", "relay-out-budget");
+  const oFL = makeOutputLine(outputRegion, "Friction loss per 100 ft", "relay-out-fl");
+  const oDist = makeOutputLine(outputRegion, "Maximum pumper spacing", "relay-out-dist");
+  const oNote = makeOutputLine(outputRegion, "Note", "relay-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeRelayPumpDistance({ target_flow_gpm: readNum(Q.input), hose_coefficient: readNum(C.input), max_discharge_psi: readNum(maxD.input), intake_residual_psi: intake.input.value === "" ? 20 : readNum(intake.input), elevation_ft: readNum(elev.input) });
+    if (r.error) { oBudget.textContent = r.error; oFL.textContent = "-"; oDist.textContent = "-"; oNote.textContent = ""; return; }
+    oBudget.textContent = fmt(r.budget_psi, 1) + " psi";
+    oFL.textContent = fmt(r.fl_per_100_psi, 1) + " psi per 100 ft";
+    oDist.textContent = fmt(r.max_distance_ft, 0) + " ft between pumpers";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Q, C, maxD, intake, elev]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["relay-pump-distance"] = renderRelayPumpDistance;

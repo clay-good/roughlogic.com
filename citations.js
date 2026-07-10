@@ -4503,6 +4503,17 @@ export const CITATIONS = {
       { name: "Default coefficient", value: "0.90 (rounded outlet) unless user supplies", source: "AWWA M17 typical" },
     ],
   },
+  "relay-pump-distance": {
+    formula: "budget = max_discharge - intake_residual - 0.434 x elevation; FL_per_100 = C x (target_flow / 100)^2; max_distance = budget / FL_per_100 x 100.",
+    edition: "IFSTA Pumping Apparatus Driver/Operator relay pumping maximum distance, by name.",
+    freeAccess: "The relay-pumping relations are public fire-service training material; the SOP and the pump's real capability govern the actual relay.",
+    governance: GOVERNANCE.general,
+    editionNote: "The next pumper needs a 20 psi residual on its intake or it cavitates, so the usable pressure is the max discharge minus 20 minus the lift - not the whole pump; the distance falls with the square of flow (doubling gpm quarters the spacing, why big water uses large-diameter hose and more pumpers, not more pressure); the elevation term is 0.434 psi per foot; the SOP and the pump's real capability govern - a planning aid, not incident command.",
+    assumptions: [
+      { name: "Intake residual", value: "hold 20 psi at the next intake so the pump does not cavitate", source: "IFSTA Pumping Apparatus D/O" },
+      { name: "Square-law spacing", value: "FL per 100 ft scales with (Q/100)^2, so doubling the flow quarters the distance", source: "IFSTA / Hazen-Williams family" },
+    ],
+  },
   "nfa-fireground-flow": {
     formula: "base = (length x width / 3) x (percent_involved / 100) x floors_involved; exposure = 0.25 x base per exposure; total = base + exposure; valid when percent_involved <= 50 and base <= 1000 gpm.",
     edition: "National Fire Academy fireground fire-flow quick-calc (NFA; IFSTA), by name.",

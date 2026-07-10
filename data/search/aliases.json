@@ -16304,6 +16304,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "relay pumping",
+      "target": "relay-pump-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "relay distance",
+      "target": "relay-pump-distance",
+      "kind": "redirect"
+    },
+    {
+      "term": "pumper spacing",
+      "target": "relay-pump-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "20 psi intake residual",
+      "target": "relay-pump-distance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "supply line relay",
+      "target": "relay-pump-distance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ldh relay",
+      "target": "relay-pump-distance",
+      "kind": "industry"
+    },
+    {
+      "term": "max distance relay",
+      "target": "relay-pump-distance",
+      "kind": "redirect"
+    },
+    {
+      "term": "water supply relay",
+      "target": "relay-pump-distance",
+      "kind": "adjacent"
+    },
+    {
       "term": "work in progress",
       "target": "wip-percent-complete",
       "kind": "industry"

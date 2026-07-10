@@ -43656,6 +43656,66 @@
    }
   },
   {
+   "tile_id": "relay-pump-distance",
+   "source_publisher": "IFSTA Pumping Apparatus Driver/Operator",
+   "source_title": "budget = max_discharge - intake - 0.434 x elevation; FL_per_100 = C x (Q/100)^2; distance = budget / FL_per_100 x 100",
+   "source_edition_or_year": "IFSTA",
+   "source_section_or_page": "800 gpm, C 0.08, 200 psi pump, 20 psi intake, 10 ft uphill -> budget 175.7 psi, 5.1 psi/100 ft, 3,431 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "target_flow_gpm": 800,
+    "hose_coefficient": 0.08,
+    "max_discharge_psi": 200,
+    "intake_residual_psi": 20,
+    "elevation_ft": 10
+   },
+   "outputs": {
+    "budget_psi": {
+     "value": 175.66,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "fl_per_100_psi": {
+     "value": 5.12,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "max_distance_ft": {
+     "value": 3431,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "relay-pump-distance",
+   "source_publisher": "IFSTA Pumping Apparatus Driver/Operator",
+   "source_title": "doubling the flow quarters the spacing (square-law)",
+   "source_edition_or_year": "IFSTA",
+   "source_section_or_page": "Same hose at 1,600 gpm -> FL 20.5 psi/100 ft, spacing collapses to 858 ft (a quarter of the distance for double the flow)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "target_flow_gpm": 1600,
+    "hose_coefficient": 0.08,
+    "max_discharge_psi": 200,
+    "intake_residual_psi": 20,
+    "elevation_ft": 10
+   },
+   "outputs": {
+    "max_distance_ft": {
+     "value": 858,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wip-percent-complete",
    "source_publisher": "construction accounting (cost-to-cost POC)",
    "source_title": "$500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled",

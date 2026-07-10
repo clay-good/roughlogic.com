@@ -76,6 +76,7 @@ const RELATED = {
   "thrust-block-sizing": ["pipe-expansion-loop", "water-hammer-surge", "colebrook-friction-factor", "hydrant-available-flow"],
   "hydrant-available-flow": ["hydrant-flow", "required-fire-flow", "standpipe-pdp", "thrust-block-sizing"],
   "nfa-fireground-flow": ["required-fire-flow", "iso-nff", "pdp"],
+  "relay-pump-distance": ["reverse-lay-friction", "pdp", "standpipe-pdp"],
   "debt-yield": ["cap-rate-dscr", "rental-worksheet", "break-even-occupancy", "loan-payment"],
   "break-even-occupancy": ["cap-rate-dscr", "debt-yield", "rental-worksheet", "rent-roll-vacancy"],
   "max-offer-70-rule": ["cap-rate-dscr", "rent-vs-buy", "seller-net-sheet", "material-cost"],

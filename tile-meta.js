@@ -574,6 +574,7 @@ const _TILES = [
   ["fan-affinity-laws", "C"], ["pitot-traverse-cfm", "C"], ["outside-air-percent-temps", "C"],
   ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["hydrant-available-flow", "F"],
   ["nfa-fireground-flow", "F"],
+  ["relay-pump-distance", "F"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],

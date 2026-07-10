@@ -18954,3 +18954,23 @@ test("bounds: spec-v577 computeNfaFiregroundFlow pins the base flow, the exposur
   assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 0 }));
   assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, exposures: -1 }));
 });
+
+import { computeRelayPumpDistance as _v578 } from "../../calc-fire.js";
+
+test("bounds: spec-v578 computeRelayPumpDistance pins the budget, the loss per 100 ft, the max distance, the square-law, and error seams", () => {
+  const r = _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 20, elevation_ft: 10 });
+  assert.ok(Math.abs(r.budget_psi - 175.66) < 1e-6); // 200 - 20 - 0.434*10
+  assert.ok(Math.abs(r.fl_per_100_psi - 5.12) < 1e-9); // 0.08*(800/100)^2
+  assert.ok(Math.abs(r.max_distance_ft - 3430.859375) < 1e-3);
+  // Square-law: doubling the flow quarters the spacing.
+  const dbl = _v578({ target_flow_gpm: 1600, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 20, elevation_ft: 10 });
+  assert.ok(Math.abs(dbl.max_distance_ft - r.max_distance_ft / 4) < 1e-6);
+  // Downhill (negative elevation) increases the budget.
+  assert.ok(_v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 20, elevation_ft: -10 }).budget_psi > r.budget_psi);
+  // Error seams: non-finite, non-positive flow / coefficient / max discharge, exhausted budget.
+  assert.ok("error" in _v578({ target_flow_gpm: Infinity, hose_coefficient: 0.08, max_discharge_psi: 200 }));
+  assert.ok("error" in _v578({ target_flow_gpm: 0, hose_coefficient: 0.08, max_discharge_psi: 200 }));
+  assert.ok("error" in _v578({ target_flow_gpm: 800, hose_coefficient: 0, max_discharge_psi: 200 }));
+  assert.ok("error" in _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 0 }));
+  assert.ok("error" in _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 250, elevation_ft: 0 }));
+});

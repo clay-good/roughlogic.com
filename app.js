@@ -641,6 +641,7 @@ const TOOL_MODULES = (() => {
     "hydrant-available-flow",
     // spec-v577
     "nfa-fireground-flow",
+    "relay-pump-distance",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
   // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.

@@ -1928,6 +1928,7 @@ cross-check.
 | calc-fire.js | `computeNFPA1142WaterSupply` | `{ volume_ft3 = 0, occupancy_class = 1, construction_class = "V", exposure_wit...` | _ | _ | _ |
 | calc-fire.js | `computeNfaFiregroundFlow` | `{ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exp...` | _ | _ | _ |
 | calc-fire.js | `computePDP` | `{ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_ps...` | _ | _ | _ |
+| calc-fire.js | `computeRelayPumpDistance` | `{ target_flow_gpm = 0, hose_coefficient = 0, max_discharge_psi = 0, intake_re...` | _ | _ | _ |
 | calc-fire.js | `computeRequiredFireFlow` | `{ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0...` | _ | _ | _ |
 | calc-fire.js | `computeReverseLayFriction` | `{ hose_diameter, gpm, length_ft, n_pumps = 1 }` | _ | _ | _ |
 | calc-fire.js | `computeScbaCylinderTime` | `{ V_rated_scf = 0, P_rated_psi = 0, P_start_psi = 0, P_alarm_psi = 0, consump...` | _ | _ | _ |
@@ -2688,7 +2689,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1274.
+Row count: 1275.
 
 <!-- END function-corpus-v14 -->
 
@@ -3393,7 +3394,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (33 tiles)
+### Group F Fire-ground (34 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3414,6 +3415,7 @@ per spec-v14 §13.1 second paragraph.
 | `nfa-fireground-flow` | National Fire Academy Quick Fire-Flow | National Fire Academy / IFSTA; 40 x 60 ft, 50% involved, 1 floor, 2 exposures -> base 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nfpa-1142-water-supply` | NFPA 1142 Rural Water Supply | NFPA; §5 Q = (V * O * H) / 5 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pdp` | Pump Discharge Pressure | NFPA; PDP = NP + FL + elev_psi + appliance = 100 + 25 + 0.5*20 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `relay-pump-distance` | Relay Pumping Max Distance | IFSTA Pumping Apparatus Driver/Operator; 800 gpm, C 0.08, 200 psi pump, 20 psi intake, 10 ft uphil... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `required-fire-flow` | Required Fire Flow | ISO / NFPA 1142 area-based simplified...; 5000 ft^2 / ordinary / occupancy 1.0 / exposure 1.0 / com... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `reverse-lay-friction` | Reverse-Lay Friction Loss | IFSTA Pumping Apparatus / NFPA 1962 h...; 2.5 in / 250 gpm / 600 ft / 2 pumps -> 75 psi single-pump... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rope-ma` | Rope Rescue Mechanical Advantage | Project (first-principles); 4:1 rig (3 pulleys), efficiency 0.9, 600 lb load -> theor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3904,6 +3906,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1030. Fixture-covered or reference-cadence: 1030 / 1030.
+Tile count: 1031. Fixture-covered or reference-cadence: 1031 / 1031.
 
 <!-- END tile-index-v14 -->
