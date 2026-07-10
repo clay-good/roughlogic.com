@@ -80697,6 +80697,71 @@
       "term": "pad eye governing failure mode",
       "target": "lifting-lug-design",
       "kind": "question"
+    },
+    {
+      "term": "combustion efficiency",
+      "target": "flue-gas-combustion-eff",
+      "kind": "industry"
+    },
+    {
+      "term": "stack loss",
+      "target": "flue-gas-combustion-eff",
+      "kind": "industry"
+    },
+    {
+      "term": "flue gas efficiency",
+      "target": "flue-gas-combustion-eff",
+      "kind": "redirect"
+    },
+    {
+      "term": "siegert formula",
+      "target": "flue-gas-combustion-eff",
+      "kind": "industry"
+    },
+    {
+      "term": "steady state efficiency",
+      "target": "flue-gas-combustion-eff",
+      "kind": "adjacent"
+    },
+    {
+      "term": "analyzer efficiency reading",
+      "target": "flue-gas-combustion-eff",
+      "kind": "adjacent"
+    },
+    {
+      "term": "flue loss",
+      "target": "flue-gas-combustion-eff",
+      "kind": "redirect"
+    },
+    {
+      "term": "what is my furnace combustion efficiency",
+      "target": "flue-gas-combustion-eff",
+      "kind": "question"
+    },
+    {
+      "term": "combustion efficiency from o2 and stack temperature",
+      "target": "flue-gas-combustion-eff",
+      "kind": "question"
+    },
+    {
+      "term": "how much heat is going up the flue",
+      "target": "flue-gas-combustion-eff",
+      "kind": "question"
+    },
+    {
+      "term": "stack loss from an analyzer reading",
+      "target": "flue-gas-combustion-eff",
+      "kind": "question"
+    },
+    {
+      "term": "why does my analyzer show 82 percent efficiency",
+      "target": "flue-gas-combustion-eff",
+      "kind": "question"
+    },
+    {
+      "term": "net vs gross combustion efficiency",
+      "target": "flue-gas-combustion-eff",
+      "kind": "question"
     }
   ]
 }

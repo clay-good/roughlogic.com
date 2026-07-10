@@ -193,6 +193,7 @@ const _TILES = [
   ["excess-air-o2", "C"],
   ["co-air-free", "C"],
   ["chimney-draft", "C"],
+  ["flue-gas-combustion-eff", "C"],
   ["refrigerant-charging", "C"], ["cooling-tower", "C"], ["insulation-heat-loss", "C"],
   ["chiller-tons", "C"], ["hx-lmtd-ntu", "C"], ["air-changes-hour", "C"],
   ["boiler-pipe-sizing", "C"], ["compressor-short-cycle", "C"],

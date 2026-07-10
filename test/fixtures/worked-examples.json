@@ -49784,6 +49784,70 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "flue-gas-combustion-eff",
+   "source_publisher": "Siegert stack-loss method (DIN combustion-analysis practice)",
+   "source_title": "qA = dT_C x (A1 / CO2 + B); eff_net = 100 - qA; eff_gross ~ eff_net x LHV/HHV",
+   "source_edition_or_year": "analyzer fuel tables (Madur) / TSI Combustion Analysis Basics",
+   "source_section_or_page": "Natural gas, 5% O2, 400 F stack over 70 F air -> CO2 8.90%, qA 9.27%, 90.7% net, ~81.8% gross (US analyzer basis)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "fuel": "natural_gas",
+    "flue_o2_pct": 5,
+    "stack_temp_f": 400,
+    "air_temp_f": 70
+   },
+   "outputs": {
+    "stack_loss_pct": {
+     "value": 9.27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "eff_net_pct": {
+     "value": 90.73,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "eff_gross_pct": {
+     "value": 81.84,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flue-gas-combustion-eff",
+   "source_publisher": "TSI Combustion Analysis Basics (fuel-oil efficiency table)",
+   "source_title": "the published analyzer table agrees within half a point",
+   "source_edition_or_year": "TSI Combustion Analysis Basics",
+   "source_section_or_page": "#2 oil, 4% O2, 500 F net rise (570 F over 70 F) -> 86.9% net, 81.6% gross vs 82.1% in the TSI table",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "fuel": "oil2",
+    "flue_o2_pct": 4,
+    "stack_temp_f": 570,
+    "air_temp_f": 70
+   },
+   "outputs": {
+    "eff_net_pct": {
+     "value": 86.9,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "eff_gross_pct": {
+     "value": 81.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
   }
  ]
 }

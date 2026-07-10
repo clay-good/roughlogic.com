@@ -1617,6 +1617,17 @@ export const CITATIONS = {
       { name: "Altitude and absolute temps", value: "barometric pressure must be altitude-corrected; temperatures are absolute (Rankine), T_m the mean flue temp", source: "ASHRAE / NFPA 211" },
     ],
   },
+  "flue-gas-combustion-eff": {
+    formula: "co2_pct = CO2max x (1 - flue_o2_pct / 20.9); qa_pct = (stack_temp_f - air_temp_f) x 5/9 x (A1 / co2_pct + B); eff_net_pct = 100 - qa_pct; eff_gross_pct = eff_net_pct x LHV/HHV.",
+    edition: "Siegert stack-loss method (DIN combustion-analysis practice as implemented by flue-gas analyzers), by name.",
+    freeAccess: "The Siegert stack-loss relation and its per-fuel coefficients are standard combustion-analysis practice; the analyzer and appliance manufacturer instructions govern the actual tune.",
+    governance: GOVERNANCE.general,
+    editionNote: "Per-fuel constants (A1 / B / CO2max / LHV-HHV): natural gas 0.37 / 0.009 / 11.7% / 0.902, propane 0.475 / 0.000 / 13.7% / 0.920, #2 oil 0.50 / 0.007 / 15.4% / 0.939. The net figure is the European analyzer convention; US analyzers display the gross (HHV) basis, and the gross conversion here is approximate (within about a point of the analyzer tables). Sample dry in the undiluted flue before the draft hood. A condensing appliance recovers latent heat, so judge it by its measured efficiency, not this stack loss; measurable CO adds an incomplete-combustion loss this tile ignores. The analyzer, the appliance, and the manufacturer instructions govern - a tuning aid, not a certified combustion test or an AFUE rating.",
+    assumptions: [
+      { name: "Siegert coefficients", value: "A1 / B / CO2max: natural gas 0.37 / 0.009 / 11.7%, propane 0.475 / 0.000 / 13.7%, #2 oil 0.50 / 0.007 / 15.4%", source: "DIN combustion-analysis practice (analyzer fuel tables)" },
+      { name: "Basis conversion", value: "net (LHV) is the European convention; US analyzers display gross (HHV), approximated as net x LHV/HHV (0.902 gas / 0.920 propane / 0.939 oil)", source: "fuel heating values / TSI Combustion Analysis Basics" },
+    ],
+  },
   "co-air-free": {
     formula: "CO_air_free = measured_co_ppm x 20.9 / (20.9 - measured_o2_pct); over_ansi = CO_air_free > 400; over_field = CO_air_free > 100.",
     edition: "ANSI Z21 400 ppm air-free limit / BPI field practice air-free CO correction, by name.",

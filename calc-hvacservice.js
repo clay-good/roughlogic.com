@@ -17,7 +17,7 @@
 // (GOVERNANCE.general). See spec-v102.md and spec-v104.md.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -765,3 +765,65 @@ function _v585renderChimneyDraft(inputRegion, outputRegion, citationEl) {
   for (const f of [H, to, tm, B, factor]) f.input.addEventListener("input", update);
 }
 HVACSERVICE_RENDERERS["chimney-draft"] = _v585renderChimneyDraft;
+
+// ===================== spec-v594 C: flue-gas combustion efficiency (stack loss) =====================
+// CO2 = CO2max x (1 - O2/20.9); qA = dT_C x (A1/CO2 + B); eff_net = 100 - qA; eff_gross ~ eff_net x LHV/HHV.
+const _V594_FUELS = {
+  natural_gas: { co2max: 11.7, a1: 0.37, b: 0.009, lhv_hhv: 0.902 },
+  propane: { co2max: 13.7, a1: 0.475, b: 0.000, lhv_hhv: 0.920 },
+  oil2: { co2max: 15.4, a1: 0.50, b: 0.007, lhv_hhv: 0.939 },
+};
+// dims: in { flue_o2_pct: dimensionless, stack_temp_f: T, air_temp_f: T } out: { co2_pct: dimensionless, stack_loss_pct: dimensionless, eff_net_pct: dimensionless, eff_gross_pct: dimensionless }
+export function computeFlueGasCombustionEff({ fuel = "natural_gas", flue_o2_pct = 0, stack_temp_f = 0, air_temp_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const f = _V594_FUELS[fuel];
+  if (!f) return { error: "Fuel must be natural gas, propane, or #2 fuel oil." };
+  const o2 = Number(flue_o2_pct) || 0;
+  const ts = Number(stack_temp_f) || 0;
+  const ta = Number(air_temp_f) || 0;
+  if (o2 < 0) return { error: "Oxygen cannot be negative (%)." };
+  if (!(o2 < 20.9)) return { error: "Oxygen at or above 20.9% means no combustion." };
+  if (!(ts > ta)) return { error: "Stack temperature must exceed the combustion-air temperature." };
+  const co2_pct = f.co2max * (1 - o2 / 20.9);
+  const dt_c = (ts - ta) * 5 / 9;
+  const stack_loss_pct = dt_c * (f.a1 / co2_pct + f.b);
+  const eff_net_pct = 100 - stack_loss_pct;
+  const eff_gross_pct = eff_net_pct * f.lhv_hhv;
+  return {
+    co2_pct, stack_loss_pct, eff_net_pct, eff_gross_pct,
+    note: "The net (LHV) figure is the European analyzer convention; US analyzers display the gross (HHV) basis, which counts the latent heat of the fuel's water vapor as lost - the gross conversion here is approximate (within about a point of the analyzer tables). Sample dry in the undiluted flue, before the draft hood or dilution air. A condensing appliance recovers latent heat, so judge it by its measured efficiency, not this stack loss; measurable CO adds an incomplete-combustion loss this tile ignores. The analyzer, the appliance, and the manufacturer instructions govern - a tuning aid, not a certified combustion test or an AFUE rating.",
+  };
+}
+export const flueGasCombustionEffExample = { inputs: { fuel: "natural_gas", flue_o2_pct: 5, stack_temp_f: 400, air_temp_f: 70 } };
+function _v594renderFlueGasCombustionEff(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A tuning aid, not a certified combustion test or an AFUE rating; the analyzer, the appliance, and the manufacturer instructions govern. Citation: Siegert stack-loss method (DIN combustion-analysis practice as implemented by flue-gas analyzers), by name. CO2 = CO2max x (1 - O2 / 20.9); qA_pct = dT_C x (A1 / CO2 + B) with dT_C = (T_stack_F - T_air_F) x 5/9; eff_net = 100 - qA; eff_gross ~ eff_net x LHV/HHV. Constants (A1 / B / CO2max / LHV-HHV): natural gas 0.37 / 0.009 / 11.7% / 0.902, propane 0.475 / 0.000 / 13.7% / 0.920, #2 oil 0.50 / 0.007 / 15.4% / 0.939. The net figure is the European convention; US analyzers display the gross (HHV) basis, and the conversion here is approximate. Sample dry in the undiluted flue before the draft hood; a condensing appliance recovers latent heat this stack loss counts as lost.";
+  const fuel = makeSelect("Fuel", "fgce-fuel", [
+    { value: "natural_gas", label: "Natural gas", selected: true },
+    { value: "propane", label: "Propane (LPG)" },
+    { value: "oil2", label: "#2 fuel oil" },
+  ]);
+  const o2 = makeNumber("Flue-gas O2 (%, dry, undiluted)", "fgce-o2", { step: "any", min: "0", max: "20.9", value: "5" }); o2.input.value = "5";
+  const ts = makeNumber("Stack temperature (F)", "fgce-ts", { step: "any", value: "400" }); ts.input.value = "400";
+  const ta = makeNumber("Combustion-air temperature (F)", "fgce-ta", { step: "any", value: "70" }); ta.input.value = "70";
+  inputRegion.appendChild(fuel.wrap);
+  for (const f of [o2, ts, ta]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fuel.select.value = "natural_gas"; o2.input.value = "5"; ts.input.value = "400"; ta.input.value = "70"; update(); });
+  const oCo2 = makeOutputLine(outputRegion, "Calculated flue CO2", "fgce-out-co2");
+  const oQa = makeOutputLine(outputRegion, "Dry stack loss (Siegert)", "fgce-out-qa");
+  const oNet = makeOutputLine(outputRegion, "Combustion efficiency, net (LHV)", "fgce-out-net");
+  const oGross = makeOutputLine(outputRegion, "Approx. gross (HHV, US analyzer basis)", "fgce-out-gross");
+  const oNote = makeOutputLine(outputRegion, "Note", "fgce-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFlueGasCombustionEff({ fuel: fuel.select.value, flue_o2_pct: readNum(o2.input), stack_temp_f: readNum(ts.input), air_temp_f: ta.input.value === "" ? 70 : readNum(ta.input) });
+    if (r.error) { oCo2.textContent = r.error; oQa.textContent = "-"; oNet.textContent = "-"; oGross.textContent = "-"; oNote.textContent = ""; return; }
+    oCo2.textContent = fmt(r.co2_pct, 2) + "%";
+    oQa.textContent = fmt(r.stack_loss_pct, 2) + "%";
+    oNet.textContent = fmt(r.eff_net_pct, 1) + "%";
+    oGross.textContent = fmt(r.eff_gross_pct, 1) + "%";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [o2, ts, ta]) f.input.addEventListener("input", update);
+  fuel.select.addEventListener("change", update);
+}
+HVACSERVICE_RENDERERS["flue-gas-combustion-eff"] = _v594renderFlueGasCombustionEff;

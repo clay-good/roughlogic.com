@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v594 flue-gas combustion efficiency (stack loss); 2026-07-10
+
+Lands `flue-gas-combustion-eff` (Group C, calc-hvacservice.js), the tile spec-v583 and spec-v584 both named as the third leg of the combustion-analysis triad: the analyzer's O2 and stack-temperature readings to steady-state combustion efficiency via the Siegert stack loss (CO2 = CO2max x (1 - O2/20.9); qA = dT_C x (A1/CO2 + B); per-fuel DIN coefficients for natural gas, propane, and #2 oil), reported on both the net (LHV, European convention) and approximate gross (HHV, US analyzer) bases. The gross conversion cross-checks within half a point of the published TSI fuel-oil efficiency table. Catalog 1,041 -> 1,042 (version 0.183.0).
+
 ### feat(search): spec-v592 follow-on -- preview map 17 -> 44 entries; 2026-07-10
 
 Answer previews now cover 44 of the 49 slot tiles (asphalt tonnage, breaker sizing, dim weight, drywall sheets, base plates, and peers). Five slot tiles stay preview-less on principle: four whose renderers convert US inputs into SI-native computes (the preview runtime maps args identically, so a direct mapping would show numerically wrong answers -- amp-power-spl, dyno-correction-sae, flocculation-g-value, spl-atmospheric; a conversion field in the schema is the recorded follow-on if demand appears), and tankless-gpm (its preview would need the inverse solve mode, which the worked-example gate check cannot verify). All 44 verified two ways: the check-slots worked-example run and a slot-mapped preview simulation (44/44 finite, leak-free).

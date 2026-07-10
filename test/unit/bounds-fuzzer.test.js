@@ -19180,3 +19180,37 @@ test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier ca
   assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 120 }));
   assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 1.5 }));
 });
+
+import { computeFlueGasCombustionEff as _v594 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v594 computeFlueGasCombustionEff pins the Siegert loss, both efficiency bases, the TSI oil cross-check, and error seams", () => {
+  // Pinned worked example: natural gas, 5% O2, 400 F stack over 70 F air.
+  const r = _v594({ fuel: "natural_gas", flue_o2_pct: 5, stack_temp_f: 400, air_temp_f: 70 });
+  assert.ok(Math.abs(r.co2_pct - 11.7 * (1 - 5 / 20.9)) < 1e-9);
+  const dt_c = (400 - 70) * 5 / 9;
+  assert.ok(Math.abs(r.stack_loss_pct - dt_c * (0.37 / r.co2_pct + 0.009)) < 1e-9);
+  assert.ok(Math.abs(r.eff_net_pct - (100 - r.stack_loss_pct)) < 1e-9);
+  assert.ok(Math.abs(r.eff_net_pct - 90.7291) < 0.001);
+  assert.ok(Math.abs(r.eff_gross_pct - r.eff_net_pct * 0.902) < 1e-9);
+  assert.ok(Math.abs(r.eff_gross_pct - 81.8376) < 0.001);
+  // Cross-check: #2 oil at 4% O2 and a 500 F net rise lands within half a point of TSI's 82.1%.
+  const oil = _v594({ fuel: "oil2", flue_o2_pct: 4, stack_temp_f: 570, air_temp_f: 70 });
+  assert.ok(Math.abs(oil.eff_gross_pct - 82.1) < 0.5);
+  assert.ok(Math.abs(oil.eff_net_pct - 86.9022) < 0.001);
+  // A hotter stack loses more (efficiency falls monotonically with stack temp).
+  const hot = _v594({ fuel: "natural_gas", flue_o2_pct: 5, stack_temp_f: 500, air_temp_f: 70 });
+  assert.ok(hot.eff_net_pct < r.eff_net_pct);
+  // More excess air (higher O2, thinner CO2) also loses more.
+  const lean = _v594({ fuel: "natural_gas", flue_o2_pct: 9, stack_temp_f: 400, air_temp_f: 70 });
+  assert.ok(lean.eff_net_pct < r.eff_net_pct);
+  // Propane's B is zero: loss is exactly dT_C x A1/CO2.
+  const lp = _v594({ fuel: "propane", flue_o2_pct: 5, stack_temp_f: 400, air_temp_f: 70 });
+  assert.ok(Math.abs(lp.stack_loss_pct - dt_c * (0.475 / lp.co2_pct)) < 1e-9);
+  // Error seams: non-finite, O2 out of range, no stack rise, unknown fuel.
+  assert.ok("error" in _v594({ fuel: "natural_gas", flue_o2_pct: Infinity, stack_temp_f: 400, air_temp_f: 70 }));
+  assert.ok("error" in _v594({ fuel: "natural_gas", flue_o2_pct: -1, stack_temp_f: 400, air_temp_f: 70 }));
+  assert.ok("error" in _v594({ fuel: "natural_gas", flue_o2_pct: 20.9, stack_temp_f: 400, air_temp_f: 70 }));
+  assert.ok("error" in _v594({ fuel: "natural_gas", flue_o2_pct: 5, stack_temp_f: 70, air_temp_f: 70 }));
+  assert.ok("error" in _v594({ fuel: "natural_gas", flue_o2_pct: 5, stack_temp_f: 60, air_temp_f: 70 }));
+  assert.ok("error" in _v594({ fuel: "diesel", flue_o2_pct: 5, stack_temp_f: 400, air_temp_f: 70 }));
+});

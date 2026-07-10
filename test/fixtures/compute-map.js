@@ -530,6 +530,7 @@ export const COMPUTE_MAP = {
   "excess-air-o2": { module: "../../calc-hvacservice.js", fn: "computeExcessAirO2" },
   "co-air-free": { module: "../../calc-hvacservice.js", fn: "computeCoAirFree" },
   "chimney-draft": { module: "../../calc-hvacservice.js", fn: "computeChimneyDraft" },
+  "flue-gas-combustion-eff": { module: "../../calc-hvacservice.js", fn: "computeFlueGasCombustionEff" },
   "duct-friction-static": { module: "../../calc-hvac.js", fn: "computeDuctFrictionStatic" },
   "pallet-loadout": { module: "../../calc-trucking.js", fn: "computePalletLoadout" },
   "hos-math": { module: "../../calc-trucking.js", fn: "computeHOS" },
