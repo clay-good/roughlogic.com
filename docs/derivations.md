@@ -1921,6 +1921,7 @@ cross-check.
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
 | calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
 | calc-fire.js | `computeFoam` | `{ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, du...` | _ | _ | _ |
+| calc-fire.js | `computeFoamEductorLimit` | `{ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_...` | _ | _ | _ |
 | calc-fire.js | `computeHydrantAvailableFlow` | `{ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeHydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
 | calc-fire.js | `computeIsoNeededFireFlow` | `{ area_ft2 = 0, stories = 1, construction_class = 3, occupancy_factor = 1.0, ...` | _ | _ | _ |
@@ -2691,7 +2692,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1277.
+Row count: 1278.
 
 <!-- END function-corpus-v14 -->
 
@@ -3396,7 +3397,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (36 tiles)
+### Group F Fire-ground (37 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3410,6 +3411,7 @@ per spec-v14 §13.1 second paragraph.
 | `fire-pump-curve` | Fire Pump Rated / Churn / Overload Curve Check (NFPA 20) | NFPA 20 (Standard for the Installatio...; spec-v248 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `fire-stream-reaction` | Nozzle / Fire-Stream Reaction Force | IFSTA Pumping Apparatus Driver/Operat...; 1.0 in smooth bore @ 50 psi -> NR = 1.57 * 1 * 50 = 78.5 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam` | Foam Concentrate | NFPA; 1500 ft^2 fire / 0.10 gpm/ft^2 application / 3% concentra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `foam-eductor-limit` | Foam Eductor Back-Pressure / Hose-Lay Limit | IFSTA / eductor manufacturer data (TF...; 200 psi inlet, 95 gpm eductor, C 15.5, 100 psi nozzle, 30... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrant-available-flow` | Hydrant Rated Flow at 20 psi (NFPA 291) | NFPA 291; spec-v389 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `iso-nff` | ISO Needed Fire Flow | ISO Public Protection Classification ...; 5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3910,6 +3912,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1033. Fixture-covered or reference-cadence: 1033 / 1033.
+Tile count: 1034. Fixture-covered or reference-cadence: 1034 / 1034.
 
 <!-- END tile-index-v14 -->

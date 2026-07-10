@@ -2020,3 +2020,54 @@ function renderTankerShuttleFlow(inputRegion, outputRegion, citationEl) {
   for (const f of [nom, frac, count, cycle]) f.input.addEventListener("input", update);
 }
 FIRE_RENDERERS["tanker-shuttle-flow"] = renderTankerShuttleFlow;
+
+// --- spec-v581 F: In-line foam eductor back-pressure / hose-lay limit ---
+// max_bp = 0.65*inlet. FL_per_100 = C*(Q/100)^2. max_length = (max_bp - nozzle - 0.434*elev)/FL_per_100*100 (>=0).
+// dims: in { inlet_pressure_psi: M L^-1 T^-2, eductor_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, nozzle_pressure_psi: M L^-1 T^-2, elevation_ft: L } out: { max_back_pressure_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_length_ft: L }
+export function computeFoamEductorLimit({ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_pressure_psi = 0, elevation_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const inlet = Number(inlet_pressure_psi) || 0;
+  const Q = Number(eductor_flow_gpm) || 0;
+  const C = Number(hose_coefficient) || 0;
+  const nozzle = Number(nozzle_pressure_psi) || 0;
+  const elev = Number(elevation_ft) || 0;
+  if (!(inlet > 0)) return { error: "Inlet pressure must be positive (psi)." };
+  if (!(Q > 0)) return { error: "Eductor flow must be positive (gpm)." };
+  if (!(C > 0)) return { error: "Hose coefficient must be positive." };
+  if (nozzle < 0) return { error: "Nozzle pressure cannot be negative (psi)." };
+  const max_back_pressure_psi = 0.65 * inlet;
+  const fl_per_100_psi = C * Math.pow(Q / 100, 2);
+  const friction_budget = max_back_pressure_psi - nozzle - 0.434 * elev;
+  const max_length_ft = friction_budget > 0 ? friction_budget / fl_per_100_psi * 100 : 0;
+  const proportions = max_length_ft > 0;
+  return {
+    max_back_pressure_psi, fl_per_100_psi, max_length_ft, proportions,
+    note: "If the downstream back-pressure exceeds about 65% of the inlet, the eductor stops drawing foam concentrate entirely - not less, none - while water keeps flowing, so it looks like it is working. A long lay, an elevated nozzle, or a high-pressure automatic nozzle can cross that line. The eductor's rated flow must equal the nozzle's flow. The eductor manufacturer data governs - a planning aid, not incident command.",
+  };
+}
+export const foamEductorLimitExample = { inputs: { inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 100, elevation_ft: 30 } };
+function renderFoamEductorLimit(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not incident command; the eductor manufacturer data governs. Citation: IFSTA / eductor manufacturer data (TFT/Elkhart) in-line foam eductor back-pressure limit, by name. max_back_pressure = 0.65 x inlet; FL_per_100 = C x (Q/100)^2; max_length = (max_back_pressure - nozzle - 0.434 x elevation) / FL_per_100 x 100. If the back-pressure exceeds about 65% of inlet the eductor stops drawing foam concentrate entirely (not less, none) while water keeps flowing; the eductor's rated flow must equal the nozzle's flow.";
+  const inlet = makeNumber("Eductor inlet pressure (psi, ~200)", "fe-inlet", { step: "any", min: "0", value: "200" }); inlet.input.value = "200";
+  const Q = makeNumber("Rated eductor flow (gpm, = nozzle flow)", "fe-q", { step: "any", min: "0", value: "95" }); Q.input.value = "95";
+  const C = makeNumber("Downstream hose coefficient C (1.75 in ~ 15.5)", "fe-c", { step: "any", min: "0", value: "15.5" }); C.input.value = "15.5";
+  const nozzle = makeNumber("Nozzle operating pressure (psi)", "fe-nozzle", { step: "any", min: "0", value: "100" }); nozzle.input.value = "100";
+  const elev = makeNumber("Elevation to nozzle (ft, negative = downhill)", "fe-elev", { step: "any", value: "30" }); elev.input.value = "30";
+  for (const f of [inlet, Q, C, nozzle, elev]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { inlet.input.value = "200"; Q.input.value = "95"; C.input.value = "15.5"; nozzle.input.value = "100"; elev.input.value = "30"; update(); });
+  const oBP = makeOutputLine(outputRegion, "Maximum allowable back-pressure", "fe-out-bp");
+  const oFL = makeOutputLine(outputRegion, "Downstream friction loss per 100 ft", "fe-out-fl");
+  const oLen = makeOutputLine(outputRegion, "Maximum hose length past the eductor", "fe-out-len");
+  const oNote = makeOutputLine(outputRegion, "Note", "fe-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFoamEductorLimit({ inlet_pressure_psi: readNum(inlet.input), eductor_flow_gpm: readNum(Q.input), hose_coefficient: readNum(C.input), nozzle_pressure_psi: readNum(nozzle.input), elevation_ft: readNum(elev.input) });
+    if (r.error) { oBP.textContent = r.error; oFL.textContent = "-"; oLen.textContent = "-"; oNote.textContent = ""; return; }
+    oBP.textContent = fmt(r.max_back_pressure_psi, 0) + " psi (65% of inlet)";
+    oFL.textContent = fmt(r.fl_per_100_psi, 1) + " psi per 100 ft";
+    oLen.textContent = r.proportions ? fmt(r.max_length_ft, 0) + " ft before proportioning fails" : "0 ft - nozzle + lift already exceed the 65% ceiling; the eductor will not draw foam";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [inlet, Q, C, nozzle, elev]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["foam-eductor-limit"] = renderFoamEductorLimit;

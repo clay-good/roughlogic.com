@@ -19013,3 +19013,26 @@ test("bounds: spec-v580 computeTankerShuttleFlow pins the usable credit, the shu
   assert.ok("error" in _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 0, cycle_time_min: 12 }));
   assert.ok("error" in _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 0 }));
 });
+
+import { computeFoamEductorLimit as _v581 } from "../../calc-fire.js";
+
+test("bounds: spec-v581 computeFoamEductorLimit pins the 65% ceiling, the Q^2 friction, the max length, the won't-proportion case, and error seams", () => {
+  const r = _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 100, elevation_ft: 30 });
+  assert.ok(Math.abs(r.max_back_pressure_psi - 130) < 1e-9); // 0.65*200
+  assert.ok(Math.abs(r.fl_per_100_psi - 15.5 * Math.pow(95 / 100, 2)) < 1e-9);
+  assert.ok(Math.abs(r.max_length_ft - 121.4) < 0.5);
+  assert.equal(r.proportions, true);
+  // A lower-pressure nozzle buys hose length.
+  const lp = _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 50, elevation_ft: 30 });
+  assert.ok(Math.abs(lp.max_length_ft - 478.8) < 0.5);
+  // Won't-proportion: nozzle + lift already exceed the 65% ceiling -> zero length.
+  const dead = _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 130, elevation_ft: 30 });
+  assert.equal(dead.max_length_ft, 0);
+  assert.equal(dead.proportions, false);
+  // Error seams: non-finite, non-positive inlet / flow / C, negative nozzle.
+  assert.ok("error" in _v581({ inlet_pressure_psi: Infinity, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 100 }));
+  assert.ok("error" in _v581({ inlet_pressure_psi: 0, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: 100 }));
+  assert.ok("error" in _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 0, hose_coefficient: 15.5, nozzle_pressure_psi: 100 }));
+  assert.ok("error" in _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 0, nozzle_pressure_psi: 100 }));
+  assert.ok("error" in _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: -1 }));
+});

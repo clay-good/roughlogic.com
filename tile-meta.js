@@ -577,6 +577,7 @@ const _TILES = [
   ["relay-pump-distance", "F"],
   ["draft-lift-max", "F"],
   ["tanker-shuttle-flow", "F"],
+  ["foam-eductor-limit", "F"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],

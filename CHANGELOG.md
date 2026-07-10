@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-fire.js 28000 -> 34000; 2026-07-10
+
+The spec-v577-v581 fire-ground water-supply batch (`nfa-fireground-flow`, `relay-pump-distance`, `draft-lift-max`, `tanker-shuttle-flow`, `foam-eductor-limit`) crossed `calc-fire.js`'s 28000 B cap at v581 (103.2%); raised to **34000** with ~18% headroom for the remaining Group F tail. Lazy-loaded, absent from the home-view payload.
+
 ### chore(sizes): raise calc-treatment.js 15000 -> 18000 and tile-meta.js 14500 -> 16500; 2026-07-10
 
 The spec-v573/v575/v576 Group M wastewater-ops tiles (`digester-vs-loading`, `flocculation-g-value`, `chlorine-cylinder-withdrawal`) crossed `calc-treatment.js`'s 15000 B cap at v576 (104.3%); raised to **18000**. The single-tile landing campaign's per-tile `_TILES` rows crossed `tile-meta.js`'s 14500 B cap (100.0%); raised to **16500** with headroom for the v577-v588 tail. Both lazy-loaded, absent from the home-view payload.

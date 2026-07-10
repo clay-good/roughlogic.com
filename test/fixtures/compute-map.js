@@ -876,6 +876,7 @@ export const COMPUTE_MAP = {
   "relay-pump-distance": { module: "../../calc-fire.js", fn: "computeRelayPumpDistance" },
   "draft-lift-max": { module: "../../calc-fire.js", fn: "computeDraftLiftMax" },
   "tanker-shuttle-flow": { module: "../../calc-fire.js", fn: "computeTankerShuttleFlow" },
+  "foam-eductor-limit": { module: "../../calc-fire.js", fn: "computeFoamEductorLimit" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },

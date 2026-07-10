@@ -43818,6 +43818,66 @@
    }
   },
   {
+   "tile_id": "foam-eductor-limit",
+   "source_publisher": "IFSTA / eductor manufacturer data (TFT/Elkhart)",
+   "source_title": "max_back_pressure = 0.65 x inlet; max_length = (0.65 x inlet - nozzle - 0.434 x elevation) / FL_per_100 x 100",
+   "source_edition_or_year": "IFSTA / manufacturer data",
+   "source_section_or_page": "200 psi inlet, 95 gpm eductor, C 15.5, 100 psi nozzle, 30 ft lift -> 130 psi max BP, 14.0 psi/100 ft, 121 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "inlet_pressure_psi": 200,
+    "eductor_flow_gpm": 95,
+    "hose_coefficient": 15.5,
+    "nozzle_pressure_psi": 100,
+    "elevation_ft": 30
+   },
+   "outputs": {
+    "max_back_pressure_psi": {
+     "value": 130,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "fl_per_100_psi": {
+     "value": 13.99,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "max_length_ft": {
+     "value": 121.4,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "foam-eductor-limit",
+   "source_publisher": "IFSTA / eductor manufacturer data (TFT/Elkhart)",
+   "source_title": "a lower-pressure nozzle buys length (foam nozzles run at reduced pressure)",
+   "source_edition_or_year": "IFSTA / manufacturer data",
+   "source_section_or_page": "Same setup with a 50 psi low-pressure nozzle -> 67 psi left for friction, max_length 479 ft (four times the reach)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "inlet_pressure_psi": 200,
+    "eductor_flow_gpm": 95,
+    "hose_coefficient": 15.5,
+    "nozzle_pressure_psi": 50,
+    "elevation_ft": 30
+   },
+   "outputs": {
+    "max_length_ft": {
+     "value": 478.8,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wip-percent-complete",
    "source_publisher": "construction accounting (cost-to-cost POC)",
    "source_title": "$500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled",

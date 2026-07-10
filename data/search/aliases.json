@@ -16424,6 +16424,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "foam eductor",
+      "target": "foam-eductor-limit",
+      "kind": "industry"
+    },
+    {
+      "term": "eductor back pressure",
+      "target": "foam-eductor-limit",
+      "kind": "redirect"
+    },
+    {
+      "term": "foam proportioning limit",
+      "target": "foam-eductor-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "in-line eductor",
+      "target": "foam-eductor-limit",
+      "kind": "industry"
+    },
+    {
+      "term": "65 percent back pressure",
+      "target": "foam-eductor-limit",
+      "kind": "redirect"
+    },
+    {
+      "term": "foam hose length",
+      "target": "foam-eductor-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "eductor flow match",
+      "target": "foam-eductor-limit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "foam concentrate draw",
+      "target": "foam-eductor-limit",
+      "kind": "redirect"
+    },
+    {
       "term": "work in progress",
       "target": "wip-percent-complete",
       "kind": "industry"

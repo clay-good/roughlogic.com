@@ -4503,6 +4503,17 @@ export const CITATIONS = {
       { name: "Default coefficient", value: "0.90 (rounded outlet) unless user supplies", source: "AWWA M17 typical" },
     ],
   },
+  "foam-eductor-limit": {
+    formula: "max_back_pressure = 0.65 x inlet_pressure; FL_per_100 = hose_coefficient x (eductor_flow / 100)^2; max_length = (max_back_pressure - nozzle_pressure - 0.434 x elevation) / FL_per_100 x 100 (0 if the budget is non-positive).",
+    edition: "IFSTA / eductor manufacturer data (TFT/Elkhart) in-line foam eductor back-pressure limit, by name.",
+    freeAccess: "The eductor back-pressure relations are public fire-service training / manufacturer material; the eductor manufacturer data governs the actual limit.",
+    governance: GOVERNANCE.general,
+    editionNote: "If the downstream back-pressure exceeds about 65% of the inlet, the eductor stops drawing foam concentrate entirely - not less, none - while water keeps flowing, so it looks like it is working. A long lay, an elevated nozzle, or a high-pressure automatic nozzle can cross that line. The eductor's rated flow must equal the nozzle's flow. The eductor manufacturer data governs - a planning aid, not incident command.",
+    assumptions: [
+      { name: "Back-pressure ceiling", value: "downstream back-pressure must stay below about 65% of the inlet or proportioning stops entirely", source: "IFSTA / eductor manufacturer data" },
+      { name: "Flow match", value: "the eductor's rated flow must equal the nozzle's flow", source: "eductor manufacturer data (TFT/Elkhart)" },
+    ],
+  },
   "tanker-shuttle-flow": {
     formula: "usable_gal = nominal_tank_gal x usable_fraction; shuttle_flow = usable_gal x tanker_count / cycle_time_min (cycle = fill + dump + 2 x travel).",
     edition: "ISO PPC hauled-water credit / NFPA 1142 water shuttle, by name.",
