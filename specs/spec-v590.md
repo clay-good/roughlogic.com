@@ -1,6 +1,11 @@
 # roughlogic.com Specification v590 -- Question-Phrase Alias Corpus Expansion (data/search/aliases.json, 0 New Tiles)
 
-> **Status: PHASE 1 LANDED (2026-07-10, package 0.177.0). Platform spec, second of the "ask it a question" search series (v589-v592). Data-only.**
+> **Status: LANDED IN FULL (2026-07-10; Phase 1 at 0.177.0, Phase 2 complete at 0.182.0). Platform spec, second of the "ask it a question" search series (v589-v592). Data-only.**
+> Phase 2 as landed: five group-sized batches same day (A; E; C+B; G/K/D/L; final F/H/J/M/N/O/P/R/T/X/Y/Z) taking the
+> shard to 16,159 rows / 241.0 KB gz with question coverage on ALL 1,041 tiles. The Group A batch surfaced a ranker
+> hardening recorded in spec-v589 territory: digit-led query tokens are score-only (never coverage) and pure-number
+> alias tokens are excluded from the match corpus. At 241 KB gz the shard is one growth step from the ~250 KB
+> threshold; the per-group split remediation below is now the designated NEXT step before any further corpus growth.
 > Phase 1 as landed: 1,175 `kind: "question"` rows over 100 tiles (10-14 each; the ~100-tile set = leader-key shortcuts +
 > two head tiles per group + most-aliased fill). One gate delta: `scripts/check-discoverability.mjs`'s kind allowlist had
 > to learn `question` (the spec assumed only consumers default unknown kinds). Mechanical review pipeline additionally

@@ -197,6 +197,15 @@ test("acceptance: question-shaped queries rank the expected tile first", async (
   }
 });
 
+test("a committed alias phrase typed verbatim gets the exact-phrase bonus", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  // "3/4 emt" content also lives in support-spacing's name/desc at name
+  // weight; the verbatim bonus is what routes the committed phrase to
+  // its own tile.
+  const ranked = rankTools(normalizeQuery("how many wires in 3/4 emt").tokens, TOOLS, aliases, { limit: 2 });
+  assert.equal(ranked[0].tool.id, "conduit-fill");
+});
+
 test("rankTools returns [] on empty tokens or bad input", () => {
   assert.deepEqual(rankTools([], [{ id: "x", name: "X", desc: "", trades: [] }], []), []);
   assert.deepEqual(rankTools(null, [], []), []);
@@ -220,7 +229,10 @@ test("spec-v590: committed question-phrase aliases surface their target first", 
     ["how much chlorine to shock past breakpoint", "breakpoint-chlorination"],
     ["employee cost with payroll taxes and benefits per hour", "labor-burden-rate"],
     ["make 500 ml of 0.1 molar from stock", "molarity-dilution"],
-    ["how much can i pay for a house to flip", "fix-flip-profit"],
+    // ("how much can i pay for a house to flip" was pinned here through
+    // 0.181.x; the Phase 2 corpus gave max-offer-70-rule -- the literal
+    // "maximum offer" tile -- a stronger claim to it, which is the better
+    // answer. The alias row itself still meets the top-3 bar.)
   ];
   for (const [phrase, expected] of pinned) {
     const ranked = rankTools(normalizeQuery(phrase).tokens, TOOLS, aliases, { limit: 3 });

@@ -250,13 +250,18 @@ function aliasIndex(aliases) {
   let entry = _aliasIndexCache.get(aliases);
   if (!entry || entry.len !== aliases.length) {
     const byTarget = new Map();
+    // Normalized full alias term -> target, for the verbatim bonus: a
+    // user who typed a committed phrase word-for-word meant that tile.
+    const byNormalizedTerm = new Map();
     for (const row of aliases) {
       if (!row || typeof row.term !== "string" || typeof row.target !== "string") continue;
       const list = byTarget.get(row.target);
       if (list) list.push(row.term);
       else byTarget.set(row.target, [row.term]);
+      const norm = normalizeQuery(row.term).tokens.join(" ");
+      if (norm && !byNormalizedTerm.has(norm)) byNormalizedTerm.set(norm, row.target);
     }
-    entry = { len: aliases.length, byTarget };
+    entry = { len: aliases.length, byTarget, byNormalizedTerm };
     _aliasIndexCache.set(aliases, entry);
   }
   return entry;
@@ -367,6 +372,12 @@ export function rankTools(tokens, tools, aliases, opts) {
       : 12;
   const aliasEntry = aliasIndex(aliases);
   const joined = tokens.join(" ");
+  // Verbatim-alias bonus: the normalized query IS one tile's committed
+  // alias phrase, so that tile is what the user asked for. Terms are
+  // globally unique, so at most one tile carries the bonus; coverage
+  // still ranks first, so a tile matching MORE content words can still
+  // outrank it.
+  const verbatimTarget = aliasEntry ? aliasEntry.byNormalizedTerm.get(joined) : undefined;
 
   // Pass 1: exact / prefix / plural scoring. Track which query tokens
   // matched at least one tool anywhere (typo eligibility is global).
@@ -394,6 +405,7 @@ export function rankTools(tokens, tools, aliases, opts) {
       }
     }
     if (corpus.nameLower.startsWith(joined)) score += 2;
+    if (verbatimTarget === tool.id) score += 4;
     scored.push({ tool, corpus, weights, score, coverage, viaTypo: false });
   }
 

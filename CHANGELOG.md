@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): spec-v590 Phase 2 COMPLETE -- final small-groups batch; 2026-07-10
+
+2,548 question-phrase aliases covering the last 241 uncovered tiles (Groups F/H/J/M/N/O/P/R/T/X/Y/Z, 9-12 phrasings each; 8 rows dropped by the pipeline). **Every one of the catalog's 1,041 tiles now carries question-phrase coverage** -- the "ask it a question" search answers plain-language questions across the whole catalog, deterministically and offline. A full shard-wide top-3 re-audit after the merge pruned 20 older rows the bigger corpus outcompeted (one previously pinned phrase now correctly prefers the literal max-offer tile). The ranker also gains a verbatim-alias bonus (+4 when the normalized query IS a tile's committed alias phrase; terms are globally unique so at most one tile qualifies, and coverage still ranks first): a committed question phrase typed word-for-word now surfaces its own tile first for 99.8% of the 11,608 question rows. Shard 13,611 -> 16,139 rows, 240.8 KB gz: within but approaching the spec's ~250 KB per-shard threshold, so the next corpus growth should take the spec's designated remediation (per-group shard split) first.
+
 ### feat(search): spec-v590 Phase 2 batch 4 -- Groups G/K/D/L question corpus; 2026-07-10
 
 2,016 question-phrase aliases covering all 192 previously uncovered Group G (cross-trade), K (mechanic/machining), D (trucking), and L (agriculture/landscape/arborist) tiles at 8-12 phrasings each, same pipeline (6 sibling-collision rows dropped by the top-3 rank check). Shard 11,595 -> 13,611 rows, 198.6 KB gz -- approaching the spec's ~250 KB per-shard threshold; the final small-groups batch closes Phase 2 and the per-group split remediation stays deferred-until-evidence per the spec.
