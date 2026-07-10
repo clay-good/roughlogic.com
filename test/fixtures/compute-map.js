@@ -728,6 +728,7 @@ export const COMPUTE_MAP = {
   "concrete-longterm-defl": { module: "../../calc-concrete.js", fn: "computeConcreteLongtermDefl" },
   "concrete-anchor-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorBreakout" },
   "rc-slender-column-magnify": { module: "../../calc-concrete.js", fn: "computeRcSlenderColumnMagnify" },
+  "concrete-corbel-bracket": { module: "../../calc-concrete.js", fn: "computeConcreteCorbelBracket" },
   "pile-group-efficiency": { module: "../../calc-geotech.js", fn: "computePileGroupEfficiency" },
   "motor-locked-rotor-kva": { module: "../../calc-motor.js", fn: "computeMotorLockedRotorKva" },
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },

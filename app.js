@@ -560,6 +560,8 @@ const TOOL_MODULES = (() => {
     "concrete-anchor-breakout",
     // spec-v552
     "rc-slender-column-magnify",
+    // spec-v556
+    "concrete-corbel-bracket",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the

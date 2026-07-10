@@ -1120,6 +1120,7 @@ const RELATED = {
   "concrete-longterm-defl": ["joist-deflection","rc-beam-flexure","steel-camber"],
   "concrete-anchor-breakout": ["anchor-embedment","column-base-plate","masonry-anchor-bolt"],
   "rc-slender-column-magnify": ["rc-column-axial","column-buckling-wood","concrete-longterm-defl"],
+  "concrete-corbel-bracket": ["rc-shear-friction","rc-beam-shear","concrete-bearing-strength"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
   // spec-v287..v289 geotechnical foundation depth batch (Group E)

@@ -18431,3 +18431,32 @@ test("bounds: spec-v555 computeSteelPanelZoneShear pins the two branch strengths
   assert.ok("error" in _v555({ ...base, beam_depth_db_in: 1.0, beam_flange_tf_in: 1.0, pz_in_analysis: "no" })); // db <= tf
   assert.ok("error" in _v555({ ...base, demand_moment_kin: -1, pz_in_analysis: "no" }));
 });
+
+import { computeConcreteCorbelBracket as _v556 } from "../../calc-concrete.js";
+
+test("bounds: spec-v556 computeConcreteCorbelBracket pins the 0.2Vu tension clamp, the greater-of-two steel paths, the shear cap, and error seams", () => {
+  const cb = { factored_shear_lb: 40000, horiz_tension_lb: 0, shear_span_av_in: 4, eff_depth_d_in: 12, height_h_in: 14, width_b_in: 14, fc_psi: 4000, fy_psi: 60000, friction_mu: 1.4 };
+  const r = _v556(cb);
+  assert.ok(Math.abs(r.nuc_lb - 8000) < 1); // max(0, 0.2*40000)
+  assert.ok(Math.abs(r.asc_in2 - 0.601) < 0.005);
+  assert.equal(r.governing_path, "shear-friction + tension"); // 0.601 > 0.561
+  assert.ok(Math.abs(r.phi_vn_lb - 100800) < 50); // 0.75*800*14*12
+  assert.equal(r.shear_ok, true);
+  // A longer shear span flips the governing path to flexure and needs more steel.
+  const long = _v556({ ...cb, shear_span_av_in: 8 });
+  assert.ok(Math.abs(long.asc_in2 - 0.910) < 0.005);
+  assert.equal(long.governing_path, "flexure + tension");
+  assert.ok(long.asc_in2 > r.asc_in2);
+  // Nuc is clamped up to 0.2 Vu even when a smaller value is entered.
+  assert.ok(Math.abs(_v556({ ...cb, horiz_tension_lb: 1000 }).nuc_lb - 8000) < 1);
+  // A larger applied tension is used as-is.
+  assert.ok(Math.abs(_v556({ ...cb, horiz_tension_lb: 12000 }).nuc_lb - 12000) < 1);
+  // Error seams: non-finite, non-positive shear / depth / width / f'c / fy, av > d.
+  assert.ok("error" in _v556({ ...cb, factored_shear_lb: Infinity }));
+  assert.ok("error" in _v556({ ...cb, factored_shear_lb: 0 }));
+  assert.ok("error" in _v556({ ...cb, eff_depth_d_in: 0 }));
+  assert.ok("error" in _v556({ ...cb, width_b_in: 0 }));
+  assert.ok("error" in _v556({ ...cb, fc_psi: 0 }));
+  assert.ok("error" in _v556({ ...cb, fy_psi: 0 }));
+  assert.ok("error" in _v556({ ...cb, shear_span_av_in: 14 })); // av > d
+});

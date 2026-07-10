@@ -968,6 +968,70 @@ CONCRETE_RENDERERS["rc-slender-column-magnify"] = _simpleRenderer({
   compute: computeRcSlenderColumnMagnify,
 });
 
+// ===================== spec-v556: concrete corbel / bracket design (ACI 318-19 16.5) =====================
+
+// dims: in { factored_shear_lb: M L T^-2, horiz_tension_lb: M L T^-2, shear_span_av_in: L, eff_depth_d_in: L, height_h_in: L, width_b_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2, friction_mu: dimensionless } out: { nuc_lb: M L T^-2, asc_in2: L^2, phi_vn_lb: M L T^-2 }
+export function computeConcreteCorbelBracket({ factored_shear_lb = 0, horiz_tension_lb = 0, shear_span_av_in = 0, eff_depth_d_in = 0, height_h_in = 0, width_b_in = 0, fc_psi = 4000, fy_psi = 60000, friction_mu = 1.4 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Vu = Number(factored_shear_lb) || 0;
+  const Nuc_in = Number(horiz_tension_lb) || 0;
+  const av = Number(shear_span_av_in) || 0;
+  const d = Number(eff_depth_d_in) || 0;
+  const h = Number(height_h_in) || 0;
+  const b = Number(width_b_in) || 0;
+  const fc = Number(fc_psi) || 0;
+  const fy = Number(fy_psi) || 0;
+  const mu = Number(friction_mu) || 0;
+  if (!(Vu > 0)) return { error: "Factored shear Vu must be positive (lb)." };
+  if (!(d > 0)) return { error: "Effective depth d must be positive (in)." };
+  if (!(b > 0)) return { error: "Width b must be positive (in)." };
+  if (!(h > 0)) return { error: "Height h must be positive (in)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(fy > 0)) return { error: "Yield strength fy must be positive (psi)." };
+  if (!(mu > 0)) return { error: "Shear-friction coefficient must be positive." };
+  if (av < 0) return { error: "Shear span cannot be negative (in)." };
+  if (av > d) return { error: "Shear span av exceeds d (av/d > 1) - outside the ACI 16.5 corbel range; design as a cantilever beam." };
+  const nuc_lb = Math.max(Nuc_in, 0.2 * Vu);
+  const avf_in2 = Vu / (0.75 * mu * fy);
+  const mu_lbin = Vu * av + nuc_lb * (h - d);
+  const af_in2 = mu_lbin / (0.75 * fy * 0.85 * d);
+  const an_in2 = nuc_lb / (0.75 * fy);
+  const flex_path = af_in2 + an_in2;
+  const sf_path = (2 / 3) * avf_in2 + an_in2;
+  const asc_in2 = Math.max(flex_path, sf_path);
+  const governing_path = flex_path >= sf_path ? "flexure + tension" : "shear-friction + tension";
+  const phi_vn_lb = 0.75 * Math.min(0.2 * fc, 480 + 0.08 * fc, 1600) * b * d;
+  return {
+    nuc_lb, avf_in2, af_in2, an_in2, flex_path, sf_path, asc_in2, governing_path, phi_vn_lb, shear_ok: Vu <= phi_vn_lb,
+    note: "The horizontal tension Nuc of at least 0.2 Vu is mandatory (restrained shrinkage and creep drag on the bearing) and drives the top steel. The primary steel is the greater of the flexure-plus-tension and shear-friction-plus-tension paths (which governs flips with the shear span). The shear is capped by the min-of-three limit, not the sqrt(f'c) shear, so a deep short corbel is cap-governed. ACI 318 and the engineer of record govern.",
+  };
+}
+
+export const concreteCorbelBracketExample = { inputs: { factored_shear_lb: 40000, horiz_tension_lb: 0, shear_span_av_in: 4, eff_depth_d_in: 12, height_h_in: 14, width_b_in: 14, fc_psi: 4000, fy_psi: 60000, friction_mu: 1.4 } };
+
+CONCRETE_RENDERERS["concrete-corbel-bracket"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 16.5 brackets and corbels: Nuc = max(input, 0.2 Vu); Avf = Vu/(phi mu fy); Mu = Vu av + Nuc(h - d); Af = Mu/(phi fy 0.85 d); An = Nuc/(phi fy); Asc = max(Af + An, (2/3)Avf + An); phiVn = phi min(0.2 f'c, 480 + 0.08 f'c, 1600) b d (phi = 0.75). The 0.2 Vu horizontal tension is mandatory and drives the top steel; the primary steel is the greater of two paths; the shear is capped by the min-of-three limit. ACI 318 and the engineer of record govern.",
+  example: concreteCorbelBracketExample.inputs,
+  fields: [
+    { key: "factored_shear_lb", label: "Factored shear Vu (lb)", kind: "number" },
+    { key: "horiz_tension_lb", label: "Horizontal tension Nuc (lb, clamped to 0.2 Vu)", kind: "number" },
+    { key: "shear_span_av_in", label: "Shear span av (in, av/d <= 1)", kind: "number" },
+    { key: "eff_depth_d_in", label: "Effective depth d (in)", kind: "number" },
+    { key: "height_h_in", label: "Total height h (in)", kind: "number" },
+    { key: "width_b_in", label: "Width b (in)", kind: "number" },
+    { key: "fc_psi", label: "Concrete f'c (psi)", kind: "number", default: 4000 },
+    { key: "fy_psi", label: "Steel fy (psi)", kind: "number", default: 60000 },
+    { key: "friction_mu", label: "Shear-friction mu", kind: "number", default: 1.4 },
+  ],
+  outputs: [
+    { key: "n", id: "ccb-out-n", label: "Mandatory tension Nuc", value: (r) => fmt(r.nuc_lb, 0) + " lb" },
+    { key: "asc", id: "ccb-out-asc", label: "Primary steel Asc (governing)", value: (r) => fmt(r.asc_in2, 3) + " in^2 (" + r.governing_path + ")" },
+    { key: "paths", id: "ccb-out-paths", label: "Flexure vs shear-friction path", value: (r) => fmt(r.flex_path, 3) + " / " + fmt(r.sf_path, 3) + " in^2" },
+    { key: "v", id: "ccb-out-v", label: "Shear cap phiVn", value: (r) => fmt(r.phi_vn_lb / 1000, 1) + " kip - " + (r.shear_ok ? "OK" : "OVER, deepen the corbel") },
+  ],
+  compute: computeConcreteCorbelBracket,
+});
+
 CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = 0.65 Ncb. The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorBreakoutExample.inputs,

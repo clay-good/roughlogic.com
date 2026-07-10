@@ -19709,6 +19709,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "corbel",
+      "target": "concrete-corbel-bracket",
+      "kind": "industry"
+    },
+    {
+      "term": "bracket design",
+      "target": "concrete-corbel-bracket",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 16.5",
+      "target": "concrete-corbel-bracket",
+      "kind": "redirect"
+    },
+    {
+      "term": "shear friction corbel",
+      "target": "concrete-corbel-bracket",
+      "kind": "adjacent"
+    },
+    {
+      "term": "corbel steel",
+      "target": "concrete-corbel-bracket",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nuc tension corbel",
+      "target": "concrete-corbel-bracket",
+      "kind": "redirect"
+    },
+    {
+      "term": "bearing bracket",
+      "target": "concrete-corbel-bracket",
+      "kind": "adjacent"
+    },
+    {
+      "term": "corbel reinforcement",
+      "target": "concrete-corbel-bracket",
+      "kind": "industry"
+    },
+    {
       "term": "glulam volume factor",
       "target": "glulam-volume-factor",
       "kind": "industry"

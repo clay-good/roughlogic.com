@@ -37368,6 +37368,74 @@
    }
   },
   {
+   "tile_id": "concrete-corbel-bracket",
+   "source_publisher": "ACI 318-19 Section 16.5 (brackets and corbels)",
+   "source_title": "Asc = max(Af + An, (2/3)Avf + An); Nuc = max(input, 0.2 Vu)",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "Vu 40k, av 4, d 12, h 14, b 14, fc 4000, fy 60k -> Nuc 8k, Asc 0.601 (shear-friction), phiVn 100.8k",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "factored_shear_lb": 40000,
+    "horiz_tension_lb": 0,
+    "shear_span_av_in": 4,
+    "eff_depth_d_in": 12,
+    "height_h_in": 14,
+    "width_b_in": 14,
+    "fc_psi": 4000,
+    "fy_psi": 60000,
+    "friction_mu": 1.4
+   },
+   "outputs": {
+    "nuc_lb": {
+     "value": 8000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "asc_in2": {
+     "value": 0.601,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "phi_vn_lb": {
+     "value": 100800,
+     "tolerance": {
+      "abs": 50
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-corbel-bracket",
+   "source_publisher": "ACI 318-19 Section 16.5 (brackets and corbels)",
+   "source_title": "a longer shear span flips the governing steel path to flexure",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "Same corbel at av 8 in -> Asc 0.910 in^2 (flexure governs, 51% more top steel)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "factored_shear_lb": 40000,
+    "horiz_tension_lb": 0,
+    "shear_span_av_in": 8,
+    "eff_depth_d_in": 12,
+    "height_h_in": 14,
+    "width_b_in": 14,
+    "fc_psi": 4000,
+    "fy_psi": 60000,
+    "friction_mu": 1.4
+   },
+   "outputs": {
+    "asc_in2": {
+     "value": 0.910,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-punching-shear",
    "source_publisher": "ACI 318-19 Table 22.6.5.2",
    "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",

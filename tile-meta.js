@@ -529,6 +529,7 @@ const _TILES = [
   ["concrete-longterm-defl", "E"],
   ["concrete-anchor-breakout", "E"],
   ["rc-slender-column-magnify", "E"],
+  ["concrete-corbel-bracket", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
   ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
   ["velocity-head", "B"], ["flow-continuity", "B"], ["bernoulli-head", "B"],

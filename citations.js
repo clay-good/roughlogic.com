@@ -10135,6 +10135,18 @@ export const CITATIONS = {
       { name: "0.75 stiffness factor", value: "Pc appears as 0.75 Pc in the denominator (the stiffness-reduction factor)", source: "ACI 318-19 6.6.4.5.2" },
     ],
   },
+  "concrete-corbel-bracket": {
+    formula: "Nuc = max(input, 0.2 Vu); Avf = Vu/(phi mu fy); Mu = Vu av + Nuc(h - d); Af = Mu/(phi fy 0.85 d); An = Nuc/(phi fy); Asc = max(Af + An, (2/3)Avf + An); phiVn = phi min(0.2 f'c, 480 + 0.08 f'c, 1600) b d (phi = 0.75).",
+    edition: "The ACI 318-19 Section 16.5 brackets-and-corbels design provisions, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Section 16.5 corbel provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The horizontal tension Nuc of at least 0.2 Vu is mandatory (restrained shrinkage and creep drag on the bearing) and drives the top steel; the primary steel is the greater of the flexure-plus-tension and shear-friction-plus-tension paths (which governs flips with the shear span); the shear is capped by the min-of-three limit, not the sqrt(f'c) shear, so a deep short corbel is cap-governed. Applies for av/d <= 1. A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Mandatory tension", value: "Nuc >= 0.2 Vu regardless of the applied horizontal load", source: "ACI 318-19 16.5.3.5" },
+      { name: "Greater-of-two steel", value: "Asc = max(Af + An, (2/3)Avf + An); the governing path flips with the shear span", source: "ACI 318-19 16.5.5" },
+      { name: "Shear cap", value: "Vn <= min(0.2 f'c, 480 + 0.08 f'c, 1600) b d, not the usual sqrt(f'c) shear", source: "ACI 318-19 16.5.2.4" },
+    ],
+  },
   "concrete-anchor-breakout": {
     formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb.",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",
