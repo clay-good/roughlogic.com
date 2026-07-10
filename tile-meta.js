@@ -633,6 +633,7 @@ const _TILES = [
   ["wire-rope-strength", "Z"],
   // spec-v484 spanned cable sag and tension (Group Z)
   ["spanline-sag-tension", "Z"],
+  ["bridle-leg-tension", "Z"],
   // spec-v118 hay dry-matter (Group L)
   ["hay-dry-matter", "L"],
   // spec-v207..v211 landscape irrigation and planting install cluster (Group L)

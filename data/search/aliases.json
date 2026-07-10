@@ -6334,6 +6334,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "bridle tension",
+      "target": "bridle-leg-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "two leg bridle",
+      "target": "bridle-leg-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "asymmetric bridle",
+      "target": "bridle-leg-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "bridle leg load",
+      "target": "bridle-leg-tension",
+      "kind": "redirect"
+    },
+    {
+      "term": "rigging bridle geometry",
+      "target": "bridle-leg-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "apex load split",
+      "target": "bridle-leg-tension",
+      "kind": "redirect"
+    },
+    {
+      "term": "shallow bridle",
+      "target": "bridle-leg-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bridle horizontal pull",
+      "target": "bridle-leg-tension",
+      "kind": "adjacent"
+    },
+    {
       "term": "hay moisture",
       "target": "hay-dry-matter",
       "kind": "industry"

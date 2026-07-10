@@ -24405,6 +24405,72 @@
    }
   },
   {
+   "tile_id": "bridle-leg-tension",
+   "source_publisher": "Entertainment rigging bridle geometry (asymmetric two-leg static resolution)",
+   "source_title": "T1 = W a2/den, T2 = W a1/den, den = a2 b1 + a1 b2",
+   "source_edition_or_year": "bridle statics",
+   "source_section_or_page": "1000 lb; leg1 4 out/8 up (steep), leg2 10 out/6 up (shallow) -> T1 860 lb, T2 449 lb, H 385 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "apex_load_lb": 1000,
+    "run1_ft": 4,
+    "rise1_ft": 8,
+    "run2_ft": 10,
+    "rise2_ft": 6
+   },
+   "outputs": {
+    "t1_lb": {
+     "value": 860,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "t2_lb": {
+     "value": 449,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "horizontal_lb": {
+     "value": 385,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bridle-leg-tension",
+   "source_publisher": "Entertainment rigging bridle geometry (asymmetric two-leg static resolution)",
+   "source_title": "a shallow bridle drives both legs above the hung load",
+   "source_edition_or_year": "bridle statics",
+   "source_section_or_page": "1000 lb; leg1 12 out/4 up, leg2 12 out/5 up (both near-horizontal) -> T1 ~1405 lb, T2 ~1444 lb (each over the load)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "apex_load_lb": 1000,
+    "run1_ft": 12,
+    "rise1_ft": 4,
+    "run2_ft": 12,
+    "rise2_ft": 5
+   },
+   "outputs": {
+    "t1_lb": {
+     "value": 1405,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "t2_lb": {
+     "value": 1444,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hay-dry-matter",
    "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
    "source_title": "1,200 lb round bale at 22% -> 936 lb DM, 1,101 lb at 15%, flag",

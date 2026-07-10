@@ -18172,3 +18172,27 @@ test("bounds: spec-v543 computeLedTapeRun pins the load, PSU headroom, uniform-l
   assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, headroom_pct: 100 }));
   assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, drop_tolerance_pct: 100 }));
 });
+
+import { computeBridleLegTension as _v544 } from "../../calc-rigging.js";
+
+test("bounds: spec-v544 computeBridleLegTension pins the unequal split, horizontal equilibrium, the shallow-bridle multiplication, and error seams", () => {
+  const r = _v544({ apex_load_lb: 1000, run1_ft: 4, rise1_ft: 8, run2_ft: 10, rise2_ft: 6 });
+  assert.ok(Math.abs(r.t1_lb - 860) < 1); // steeper leg carries more
+  assert.ok(Math.abs(r.t2_lb - 449) < 1);
+  assert.ok(Math.abs(r.horizontal_lb - 385) < 1);
+  // The legs never carry half each on an asymmetric bridle.
+  assert.ok(r.t1_lb > r.t2_lb);
+  // Horizontal equilibrium: T1 a1 = T2 a2.
+  const a1 = 4 / Math.hypot(4, 8), a2 = 10 / Math.hypot(10, 6);
+  assert.ok(Math.abs(r.t1_lb * a1 - r.t2_lb * a2) < 1e-6);
+  // A shallow bridle drives both legs above the hung load.
+  const s = _v544({ apex_load_lb: 1000, run1_ft: 12, rise1_ft: 4, run2_ft: 12, rise2_ft: 5 });
+  assert.ok(s.t1_lb > 1000 && s.t2_lb > 1000);
+  assert.equal(s.over_load, true);
+  // Error seams: non-finite, non-positive load / run / rise.
+  assert.ok("error" in _v544({ apex_load_lb: Infinity, run1_ft: 4, rise1_ft: 8, run2_ft: 10, rise2_ft: 6 }));
+  assert.ok("error" in _v544({ apex_load_lb: 0, run1_ft: 4, rise1_ft: 8, run2_ft: 10, rise2_ft: 6 }));
+  assert.ok("error" in _v544({ apex_load_lb: 1000, run1_ft: 0, rise1_ft: 8, run2_ft: 10, rise2_ft: 6 }));
+  assert.ok("error" in _v544({ apex_load_lb: 1000, run1_ft: 4, rise1_ft: 0, run2_ft: 10, rise2_ft: 6 }));
+  assert.ok("error" in _v544({ apex_load_lb: 1000, run1_ft: 4, rise1_ft: 8, run2_ft: 10, rise2_ft: 0 }));
+});

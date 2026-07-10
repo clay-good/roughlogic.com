@@ -2444,6 +2444,7 @@ cross-check.
 | calc-restoration.js | `renderThermalDeltaT` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-restoration.js | `renderWaterClasses` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-rigging.js | `computeBlockRedirectLoad` | `{ line_tension_lb, direction_chg_deg } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeBridleLegTension` | `{ apex_load_lb, run1_ft, rise1_ft, run2_ft, rise2_ft } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeCgLoadShare` | `{ total_weight_lb, span_in, cg_from_p1_in } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeChainLeverHoist` | `{ load_lb, rated_wll_lb, mech_adv, efficiency = 0.85, lift_ft = 1 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeCraneGroundBearing` | `{ reaction_lb, bearing_area_ft2, allowable_psf } = {}` | _ | _ | _ |
@@ -2655,7 +2656,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1241.
+Row count: 1242.
 
 <!-- END function-corpus-v14 -->
 
@@ -3817,11 +3818,12 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (16 tiles)
+### Group Z (unnamed) (17 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `block-redirect-load` | Rigging Block Redirect Resultant Load | ASME B30.26 / rigging statics; 3,000 lb line turning 90 deg through a block -> 2 x 3,000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bridle-leg-tension` | Two-Leg Bridle Leg Tension | Entertainment rigging bridle geometry...; 1000 lb; leg1 4 out/8 up (steep), leg2 10 out/6 up (shall... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cg-load-share` | Center of Gravity and Pick-Point Load Share | ASME B30.9 / ITI rigging practice; 12,000 lb skid, picks 120 in apart, CG 40 in from pick 1 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chain-lever-hoist` | Chain / Lever Hoist Effort and Travel | ASME B30.16 / B30.21; 2,000 lb, 2,000 lb hoist, MA 32, eff 0.85, lift 4 ft -> 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-ground-bearing` | Crane Ground Bearing Pressure and Mat Size | OSHA 1926 Subpart CC / outrigger-reac...; 60,000 lb on a 4.0 ft^2 float, 3,000 psf allowable -> 15,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3838,6 +3840,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 997. Fixture-covered or reference-cadence: 997 / 997.
+Tile count: 998. Fixture-covered or reference-cadence: 998 / 998.
 
 <!-- END tile-index-v14 -->

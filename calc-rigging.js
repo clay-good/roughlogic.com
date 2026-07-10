@@ -943,3 +943,52 @@ function renderSpanlineSagTension(inputRegion, outputRegion, citationEl) {
   for (const f of [span, load, sag]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["spanline-sag-tension"] = renderSpanlineSagTension;
+
+// --- spec-v544 Z: Two-leg asymmetric bridle leg tension (`bridle-leg-tension`) ---
+// L=sqrt(run^2+rise^2), a=run/L, b=rise/L. den = a2*b1 + a1*b2. T1 = W*a2/den, T2 = W*a1/den. H = T1*a1.
+// dims: in { apex_load_lb: M L T^-2, run1_ft: L, rise1_ft: L, run2_ft: L, rise2_ft: L } out: { t1_lb: M L T^-2, t2_lb: M L T^-2, horizontal_lb: M L T^-2 }
+export function computeBridleLegTension({ apex_load_lb, run1_ft, rise1_ft, run2_ft, rise2_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(apex_load_lb);
+  const r1 = Number(run1_ft), h1 = Number(rise1_ft), r2 = Number(run2_ft), h2 = Number(rise2_ft);
+  if (!Number.isFinite(W) || W <= 0) return { error: "Apex load must be a positive finite number (lb)." };
+  if (!Number.isFinite(r1) || r1 <= 0 || !Number.isFinite(h1) || h1 <= 0) return { error: "Leg 1 needs a positive horizontal run and vertical rise (ft)." };
+  if (!Number.isFinite(r2) || r2 <= 0 || !Number.isFinite(h2) || h2 <= 0) return { error: "Leg 2 needs a positive horizontal run and vertical rise (ft)." };
+  const L1 = Math.hypot(r1, h1), L2 = Math.hypot(r2, h2);
+  const a1 = r1 / L1, b1 = h1 / L1, a2 = r2 / L2, b2 = h2 / L2;
+  const den = a2 * b1 + a1 * b2;
+  if (!(den > 0)) return { error: "Bridle geometry is degenerate (legs on the same side)." };
+  const t1_lb = W * a2 / den;
+  const t2_lb = W * a1 / den;
+  const horizontal_lb = t1_lb * a1;
+  const angle1_deg = Math.atan2(h1, r1) * 180 / Math.PI;
+  const angle2_deg = Math.atan2(h2, r2) * 180 / Math.PI;
+  const over_load = t1_lb > W || t2_lb > W;
+  return {
+    l1_ft: L1, l2_ft: L2, t1_lb, t2_lb, horizontal_lb, angle1_deg, angle2_deg, over_load,
+    note: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper or shorter leg carries more). A shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams. This is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). The hardware ratings and a qualified rigger govern.",
+  };
+}
+
+function renderBridleLegTension(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Entertainment rigging bridle geometry (static two-dimensional resolution), by name. L = sqrt(run^2 + rise^2); a = run/L, b = rise/L; den = a2 b1 + a1 b2; T1 = W a2/den, T2 = W a1/den; H = T1 a1 = T2 a2. An off-center apex makes the legs carry unequal tension; a shallow bridle multiplies tension above the load and drives a large horizontal pull into the beams. The hardware ratings and a qualified rigger govern.";
+  const w = makeNumber("Apex load (lb)", "blt-w", { step: "any", min: "0" });
+  const r1 = makeNumber("Leg 1 horizontal run (ft)", "blt-r1", { step: "any", min: "0" });
+  const h1 = makeNumber("Leg 1 vertical rise (ft)", "blt-h1", { step: "any", min: "0" });
+  const r2 = makeNumber("Leg 2 horizontal run (ft)", "blt-r2", { step: "any", min: "0" });
+  const h2 = makeNumber("Leg 2 vertical rise (ft)", "blt-h2", { step: "any", min: "0" });
+  for (const f of [w, r1, h1, r2, h2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "1000"; r1.input.value = "4"; h1.input.value = "8"; r2.input.value = "10"; h2.input.value = "6"; update(); });
+  const oT1 = makeOutputLine(outputRegion, "Leg 1 tension / angle", "blt-out-t1");
+  const oT2 = makeOutputLine(outputRegion, "Leg 2 tension / angle", "blt-out-t2");
+  const oH = makeOutputLine(outputRegion, "Horizontal beam reaction", "blt-out-h");
+  const update = debounce(() => {
+    const r = computeBridleLegTension({ apex_load_lb: Number(w.input.value) || 0, run1_ft: Number(r1.input.value) || 0, rise1_ft: Number(h1.input.value) || 0, run2_ft: Number(r2.input.value) || 0, rise2_ft: Number(h2.input.value) || 0 });
+    if (r.error) { oT1.textContent = r.error; for (const o of [oT2, oH]) o.textContent = "-"; return; }
+    oT1.textContent = fmt(r.t1_lb, 0) + " lb at " + fmt(r.angle1_deg, 0) + " deg (" + fmt(r.l1_ft, 2) + " ft)" + (r.t1_lb > (Number(w.input.value) || 0) ? " - over the load" : "");
+    oT2.textContent = fmt(r.t2_lb, 0) + " lb at " + fmt(r.angle2_deg, 0) + " deg (" + fmt(r.l2_ft, 2) + " ft)" + (r.t2_lb > (Number(w.input.value) || 0) ? " - over the load" : "");
+    oH.textContent = fmt(r.horizontal_lb, 0) + " lb" + (r.over_load ? " - shallow bridle, check the beams" : "");
+  }, DEBOUNCE_MS);
+  for (const f of [w, r1, h1, r2, h2]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["bridle-leg-tension"] = renderBridleLegTension;

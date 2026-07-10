@@ -8507,6 +8507,17 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the certified rope WLL, the anchor capacity, and the head rigger govern the actual pick", source: "ASME B30.9" },
     ],
   },
+  "bridle-leg-tension": {
+    formula: "L = sqrt(run^2 + rise^2) per leg; a = run/L, b = rise/L; den = a2 b1 + a1 b2; T1 = W a2/den, T2 = W a1/den; H = T1 a1 = T2 a2.",
+    edition: "Entertainment rigging bridle geometry (asymmetric two-leg static resolution), by name.",
+    freeAccess: "Static bridle resolution is a public statics result; ASME B30.9 governs rigging practice. An ESTIMATE only; the hardware ratings and a qualified rigger govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "An off-center or unequal-height apex makes the two legs carry unequal tension (the steeper or shorter leg carries more); a shallow bridle multiplies leg tension so a leg can exceed the hung load and drives a large horizontal pull into the beams; this is a static two-dimensional resolution (a three-point bridle or out-of-plane geometry differs). A design aid, not a rigging sign-off.",
+    assumptions: [
+      { name: "Two-dimensional statics", value: "single apex, two legs in one vertical plane; a three-point or out-of-plane bridle differs", source: "bridle statics" },
+      { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.9" },
+    ],
+  },
   "hay-dry-matter": {
     formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18% large / 20% small).",
     edition: "First-principles dry-matter mass balance with USDA NRCS / land-grant extension safe-storage guidance (by name); no edition cycle.",

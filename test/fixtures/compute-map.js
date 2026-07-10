@@ -913,6 +913,7 @@ export const COMPUTE_MAP = {
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },
+  "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },
   "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
   "sprinkler-precip-rate": { module: "../../calc-agriculture.js", fn: "computeSprinklerPrecipRate" },
   "irrigation-zone-runtime": { module: "../../calc-agriculture.js", fn: "computeIrrigationZoneRuntime" },

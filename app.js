@@ -1050,6 +1050,8 @@ const TOOL_MODULES = (() => {
     "multi-leg-sling", "wire-rope-strength",
     // spec-v484 spanned cable sag and tension
     "spanline-sag-tension",
+    // spec-v544
+    "bridle-leg-tension",
   ]);
   return map;
 })();
