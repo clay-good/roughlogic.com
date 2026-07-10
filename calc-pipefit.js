@@ -881,3 +881,49 @@ function _renderExpansionGuideSpacing(inputRegion, outputRegion, citationEl) {
   for (const f of [od.input, m1.input, m2.input]) f.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["expansion-guide-spacing"] = _renderExpansionGuideSpacing;
+
+// ===================== spec-v588 B: steam orifice / PRV capacity (Napier) =====================
+// choked = P2 < 0.58*P1. W = 51.43*Cd*A*P1 (saturated, choked).
+// dims: in { orifice_area_in2: L^2, upstream_p_psia: M L^-1 T^-2, downstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { steam_capacity_lb_hr: M T^-1 }
+export function computeSteamPrvNapier({ orifice_area_in2 = 0, upstream_p_psia = 0, downstream_p_psia = 0, discharge_coeff = 0.9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(orifice_area_in2) || 0;
+  const P1 = Number(upstream_p_psia) || 0;
+  const P2 = Number(downstream_p_psia) || 0;
+  const Cd = Number(discharge_coeff) || 0;
+  if (!(A > 0)) return { error: "Orifice area must be positive (in^2)." };
+  if (!(P1 > 0)) return { error: "Upstream pressure must be positive (psia)." };
+  if (P2 < 0) return { error: "Downstream pressure cannot be negative (psia)." };
+  if (P2 > P1) return { error: "Downstream pressure cannot exceed the upstream pressure." };
+  if (!(Cd > 0 && Cd <= 1)) return { error: "Discharge coefficient must be over 0 and at most 1." };
+  const choke_threshold_psia = 0.58 * P1;
+  const choked = P2 < choke_threshold_psia;
+  const steam_capacity_lb_hr = 51.43 * Cd * A * P1;
+  return {
+    steam_capacity_lb_hr, choked, choke_threshold_psia,
+    note: "Flow chokes when the downstream absolute pressure is below 58% of the upstream, and the capacity then depends only on the upstream pressure - dropping the downstream further does not increase it. Napier is for saturated steam (superheat needs a Ksh factor). A liquid Cv (which scales with the square root of pressure drop) is wrong for choked steam, which is linear in the upstream pressure. The discharge coefficient (about 0.6 for a sharp-edged orifice, near 1 for a nozzle) must be applied. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
+  };
+}
+export const steamPrvNapierExample = { inputs: { orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 } };
+function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name. Choked when P2 < 0.58 x P1; capacity W = 51.43 x Cd x A x P1 (saturated, choked). When choked the capacity depends only on the upstream pressure. Napier is for saturated steam (superheat needs a Ksh factor); a liquid Cv (square-root in pressure drop) is wrong for choked steam, which is linear in P1. Apply the discharge coefficient (~0.6 sharp orifice, ~1 nozzle).";
+  const A = makeNumber("Orifice / seat area (in^2)", "spn-a", { step: "any", min: "0", value: "0.5" }); A.input.value = "0.5";
+  const P1 = makeNumber("Upstream absolute pressure (psia)", "spn-p1", { step: "any", min: "0", value: "100" }); P1.input.value = "100";
+  const P2 = makeNumber("Downstream absolute pressure (psia)", "spn-p2", { step: "any", min: "0", value: "30" }); P2.input.value = "30";
+  const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spn-cd", { step: "any", min: "0", max: "1", value: "0.9" }); Cd.input.value = "0.9";
+  for (const f of [A, P1, P2, Cd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { A.input.value = "0.5"; P1.input.value = "100"; P2.input.value = "30"; Cd.input.value = "0.9"; update(); });
+  const oChoke = makeOutputLine(outputRegion, "Flow regime", "spn-out-choke");
+  const oCap = makeOutputLine(outputRegion, "Steam capacity", "spn-out-cap");
+  const oNote = makeOutputLine(outputRegion, "Note", "spn-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSteamPrvNapier({ orifice_area_in2: readNum(A.input), upstream_p_psia: readNum(P1.input), downstream_p_psia: readNum(P2.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) });
+    if (r.error) { oChoke.textContent = r.error; oCap.textContent = "-"; oNote.textContent = ""; return; }
+    oChoke.textContent = r.choked ? "Choked (P2 < " + fmt(r.choke_threshold_psia, 1) + " psia) - capacity set by upstream only" : "Subcritical (P2 >= " + fmt(r.choke_threshold_psia, 1) + " psia) - apply a subcritical correction";
+    oCap.textContent = fmt(r.steam_capacity_lb_hr, 0) + " lb/hr (saturated)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [A, P1, P2, Cd]) f.input.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["steam-prv-napier"] = _renderSteamPrvNapier;

@@ -7614,6 +7614,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "napier formula",
+      "target": "steam-prv-napier",
+      "kind": "redirect"
+    },
+    {
+      "term": "steam orifice capacity",
+      "target": "steam-prv-napier",
+      "kind": "industry"
+    },
+    {
+      "term": "steam prv",
+      "target": "steam-prv-napier",
+      "kind": "industry"
+    },
+    {
+      "term": "steam relief sizing",
+      "target": "steam-prv-napier",
+      "kind": "adjacent"
+    },
+    {
+      "term": "choked steam flow",
+      "target": "steam-prv-napier",
+      "kind": "redirect"
+    },
+    {
+      "term": "51.43 napier",
+      "target": "steam-prv-napier",
+      "kind": "adjacent"
+    },
+    {
+      "term": "steam valve capacity",
+      "target": "steam-prv-napier",
+      "kind": "adjacent"
+    },
+    {
+      "term": "critical steam flow",
+      "target": "steam-prv-napier",
+      "kind": "redirect"
+    },
+    {
       "term": "pipe pressure rating",
       "target": "pipe-pressure-rating",
       "kind": "industry"

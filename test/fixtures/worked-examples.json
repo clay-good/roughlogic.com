@@ -27922,6 +27922,52 @@
    }
   },
   {
+   "tile_id": "steam-prv-napier",
+   "source_publisher": "Napier's formula / ASME/API 520",
+   "source_title": "choked when P2 < 0.58 x P1; W = 51.43 x Cd x A x P1",
+   "source_edition_or_year": "Napier / ASME-API 520",
+   "source_section_or_page": "0.5 in2 orifice, 100 psia upstream, 30 psia downstream, Cd 0.9 -> choked, 2,314 lb/hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "orifice_area_in2": 0.5,
+    "upstream_p_psia": 100,
+    "downstream_p_psia": 30,
+    "discharge_coeff": 0.9
+   },
+   "outputs": {
+    "steam_capacity_lb_hr": {
+     "value": 2314.35,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-prv-napier",
+   "source_publisher": "Napier's formula / ASME/API 520",
+   "source_title": "more upstream pressure raises the choked capacity linearly",
+   "source_edition_or_year": "Napier / ASME-API 520",
+   "source_section_or_page": "Raise upstream to 150 psia (still choked at 30) -> 51.43 x 0.9 x 0.5 x 150 = 3,472 lb/hr (50% more for 50% more P1)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "orifice_area_in2": 0.5,
+    "upstream_p_psia": 150,
+    "downstream_p_psia": 30,
+    "discharge_coeff": 0.9
+   },
+   "outputs": {
+    "steam_capacity_lb_hr": {
+     "value": 3471.53,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pipe-pressure-rating",
    "source_publisher": "ASME B31.1 Power Piping (by name)",
    "source_title": "4 in Sch 40 A106-B (OD 4.5, wall 0.237), S 17,100, E 1.0, y 0.4 -> ~1,636 psi allowable",

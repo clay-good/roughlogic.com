@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-pipefit.js 17000 -> 21000 and citations.js 360000 -> 380000; 2026-07-10
+
+The spec-v588 steam orifice/PRV tile (`steam-prv-napier`) crossed `calc-pipefit.js`'s 17000 B cap (105.0%); raised to **21000**. The v489-v588 single-tile campaign's ~90+ landed citation blocks crossed `citations.js`'s 360000 B cap (100.1%); raised to **380000**. Both lazy-loaded, absent from the home-view payload (`citations.js` is prerendered into shells at build).
+
 ### chore(sizes): raise calc-hvacservice.js 15500 -> 19000; 2026-07-10
 
 The spec-v583-v585 combustion/venting bench batch (`excess-air-o2`, `co-air-free`, `chimney-draft`) crossed `calc-hvacservice.js`'s 15500 B cap at v585 (102.6%); raised to **19000** with ~19% headroom. Lazy-loaded, absent from the home-view payload.

@@ -166,6 +166,8 @@ const TOOL_MODULES = (() => {
     "flange-rating",
     // spec-v204..v205 process-piping branch reinforcement + expansion guide spacing.
     "branch-reinforcement", "expansion-guide-spacing",
+    // spec-v588 steam orifice / PRV capacity (Napier)
+    "steam-prv-napier",
   ]);
   // spec-v30 metal / air / refrigerant bench (deepens Groups E, C per the
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are

@@ -759,6 +759,7 @@ const _TILES = [
   ["flash-steam-pct", "B"],
   ["steam-pipe-velocity", "B"],
   ["steam-trap-sizing", "B"],
+  ["steam-prv-napier", "B"],
   ["pipe-pressure-rating", "B"],
   ["pipe-filled-support-load", "B"],
   ["hanger-rod-sizing", "B"],

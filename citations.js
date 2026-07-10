@@ -11739,6 +11739,17 @@ export const CITATIONS = {
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
   },
+  "steam-prv-napier": {
+    formula: "choked = downstream_p_psia < 0.58 x upstream_p_psia; capacity W = 51.43 x discharge_coeff x orifice_area_in2 x upstream_p_psia [lb/hr] (saturated, choked).",
+    edition: "Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name.",
+    freeAccess: "Napier's formula is a classical, published steam-flow relation; ASME/API and the valve manufacturer govern the actual certification.",
+    governance: GOVERNANCE.general,
+    editionNote: "Flow chokes when the downstream absolute pressure is below 58% of the upstream, and the capacity then depends only on the upstream pressure (dropping the downstream further does not increase it). Napier is for saturated steam (superheat needs a Ksh factor). A liquid Cv, which scales with the square root of pressure drop, is wrong for choked steam, which is linear in the upstream pressure. The discharge coefficient (about 0.6 sharp-edged orifice, near 1 nozzle) must be applied. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
+    assumptions: [
+      { name: "Choked flow", value: "chokes at P2 < 0.58 x P1; capacity then depends only on the upstream pressure", source: "Napier / Grashof" },
+      { name: "Saturated steam", value: "Napier is for saturated steam; superheat needs a Ksh factor; apply the discharge coefficient", source: "ASME/API 520" },
+    ],
+  },
   "steam-trap-sizing": {
     formula: "condensate_lbhr = heat_duty_btuhr / hfg_btulb; req_capacity_lbhr = condensate_lbhr x safety_factor (2x typical, 3x warm-up / modulating).",
     edition: "First-principles condensate-load relation and the safety-factor practice, by name; the latent heat is from the ASME steam tables. Not edition-bound.",

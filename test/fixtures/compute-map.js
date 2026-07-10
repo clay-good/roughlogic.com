@@ -1040,6 +1040,7 @@ export const COMPUTE_MAP = {
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },
   "steam-trap-sizing": { module: "../../calc-pipefit.js", fn: "computeSteamTrapSizing" },
+  "steam-prv-napier": { module: "../../calc-pipefit.js", fn: "computeSteamPrvNapier" },
   "pipe-pressure-rating": { module: "../../calc-pipefit.js", fn: "computePipePressureRating" },
   "pipe-filled-support-load": { module: "../../calc-pipefit.js", fn: "computePipeFilledSupportLoad" },
   "hanger-rod-sizing": { module: "../../calc-pipefit.js", fn: "computeHangerRodSizing" },

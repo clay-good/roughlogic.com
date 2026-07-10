@@ -19161,3 +19161,22 @@ test("bounds: spec-v587 computeHydronicBufferTank pins the buffer volume, the wo
   assert.ok("error" in _v587({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 0 }));
   assert.ok("error" in _v587({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: -1, delta_t_f: 20 }));
 });
+
+import { computeSteamPrvNapier as _v588 } from "../../calc-pipefit.js";
+
+test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier capacity, the linear-in-P1 behavior, and error seams", () => {
+  const r = _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 0.9 });
+  assert.equal(r.choked, true); // 30 < 0.58*100 = 58
+  assert.ok(Math.abs(r.steam_capacity_lb_hr - 51.43 * 0.9 * 0.5 * 100) < 1e-6);
+  // Capacity is linear in upstream pressure (a liquid Cv would be square-root).
+  const hi = _v588({ orifice_area_in2: 0.5, upstream_p_psia: 150, downstream_p_psia: 30, discharge_coeff: 0.9 });
+  assert.ok(Math.abs(hi.steam_capacity_lb_hr - r.steam_capacity_lb_hr * 1.5) < 1e-6);
+  // Downstream at/above 58% of upstream is subcritical.
+  assert.equal(_v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 70, discharge_coeff: 0.9 }).choked, false);
+  // Error seams: non-finite, non-positive area / upstream, downstream over upstream, Cd out of (0,1].
+  assert.ok("error" in _v588({ orifice_area_in2: Infinity, upstream_p_psia: 100, downstream_p_psia: 30 }));
+  assert.ok("error" in _v588({ orifice_area_in2: 0, upstream_p_psia: 100, downstream_p_psia: 30 }));
+  assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 0, downstream_p_psia: 30 }));
+  assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 120 }));
+  assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 1.5 }));
+});
