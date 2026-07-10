@@ -658,6 +658,50 @@ const renderDigesterVsLoading = _rPool({
 });
 TREATMENT_RENDERERS["digester-vs-loading"] = renderDigesterVsLoading;
 
+// --- spec-v596 M: Digester gas and methane production (`digester-gas-production`) ---
+// VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.
+// dims: in { vs_fed_lb_day: dimensionless, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: dimensionless, gas_ft3_day: dimensionless, methane_ft3_day: dimensionless, energy_btu_day: dimensionless }
+export function computeDigesterGasProduction({ vs_fed_lb_day = 0, vs_reduction_pct = 0, gas_yield_ft3_lb = 15, methane_pct = 65 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const vsf = Number(vs_fed_lb_day) || 0;
+  const red = Number(vs_reduction_pct) || 0;
+  const yld = Number(gas_yield_ft3_lb) || 0;
+  const ch4 = Number(methane_pct) || 0;
+  if (!(vsf > 0)) return { error: "Volatile solids fed must be positive (lb/day)." };
+  if (!(red > 0 && red <= 100)) return { error: "Volatile-solids reduction must be over 0 and at most 100 (%)." };
+  if (!(yld > 0)) return { error: "Gas yield must be positive (ft^3 per lb VS destroyed)." };
+  if (!(ch4 > 0 && ch4 <= 100)) return { error: "Methane percent must be over 0 and at most 100." };
+  const vs_destroyed_lb_day = vsf * red / 100;
+  const gas_ft3_day = vs_destroyed_lb_day * yld;
+  const methane_ft3_day = gas_ft3_day * ch4 / 100;
+  const energy_btu_day = methane_ft3_day * 960;
+  return {
+    vs_destroyed_lb_day, gas_ft3_day, methane_ft3_day, energy_btu_day,
+    energy_mmbtu_day: energy_btu_day / 1e6,
+    note: "The yield (12-18 ft^3/lb VS destroyed) and the methane fraction (~65%) depend on the feed and temperature - a digester-gas analysis governs the real values. The energy counts the methane heating value only (~960 BTU/ft^3); the CO2 fraction carries none. The estimate assumes steady mesophilic operation. The digester monitoring and the operator of record govern - a planning estimate, not a metered gas measurement.",
+  };
+}
+export const digesterGasProductionExample = { inputs: { vs_fed_lb_day: 10000, vs_reduction_pct: 55, gas_yield_ft3_lb: 15, methane_pct: 65 } };
+const renderDigesterGasProduction = _rPool({
+  citation: "Citation: anaerobic digester gas production (WEF; university operator courses), by name. VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield (12-18 ft^3/lb, default 15); methane = gas x methane_pct/100 (~65%); energy = methane x 960 BTU/ft^3. The yield and methane fraction depend on feed and temperature; a digester-gas analysis governs. The digester monitoring and the operator of record govern - a planning estimate, not a metered gas measurement.",
+  example: digesterGasProductionExample.inputs,
+  fields: [
+    { key: "vs_fed_lb_day", label: "Volatile solids fed (lb/day)", kind: "number" },
+    { key: "vs_reduction_pct", label: "VS reduction (%, typical 50-60)", kind: "number" },
+    { key: "gas_yield_ft3_lb", label: "Gas yield (ft^3 per lb VS destroyed)", kind: "number", default: 15 },
+    { key: "methane_pct", label: "Methane fraction of gas (%)", kind: "number", default: 65 },
+  ],
+  outputs: [
+    { key: "vsd", id: "dgp-out-vsd", label: "VS destroyed", value: (r) => fmt(r.vs_destroyed_lb_day, 0) + " lb/day" },
+    { key: "gas", id: "dgp-out-gas", label: "Digester gas", value: (r) => fmt(r.gas_ft3_day, 0) + " ft^3/day" },
+    { key: "ch4", id: "dgp-out-ch4", label: "Methane", value: (r) => fmt(r.methane_ft3_day, 0) + " ft^3/day" },
+    { key: "e", id: "dgp-out-e", label: "Recoverable energy", value: (r) => fmt(r.energy_mmbtu_day, 1) + " MMBtu/day" },
+    { key: "n", id: "dgp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDigesterGasProduction,
+});
+TREATMENT_RENDERERS["digester-gas-production"] = renderDigesterGasProduction;
+
 // --- spec-v575 M: Mixing velocity gradient (Camp-Stein G / Gt) ---
 // mu(T) from a water-property table; G = sqrt(P/(mu*V)); Gt = G*t.
 const _WATER_VISCOSITY_PAS = [

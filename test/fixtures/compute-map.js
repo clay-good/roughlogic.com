@@ -57,6 +57,7 @@ export const COMPUTE_MAP = {
   "bod-tss-loading-removal": { module: "../../calc-treatment.js", fn: "computeBodTssLoadingRemoval" },
   "tds-from-conductivity": { module: "../../calc-treatment.js", fn: "computeTdsFromConductivity" },
   "digester-vs-loading": { module: "../../calc-treatment.js", fn: "computeDigesterVsLoading" },
+  "digester-gas-production": { module: "../../calc-treatment.js", fn: "computeDigesterGasProduction" },
   "flocculation-g-value": { module: "../../calc-treatment.js", fn: "computeFlocculationGValue" },
   "chlorine-cylinder-withdrawal": { module: "../../calc-treatment.js", fn: "computeChlorineCylinderWithdrawal" },
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },

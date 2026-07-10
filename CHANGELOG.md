@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(wastewater): spec-v596 digester gas and methane production; 2026-07-10
+
+Lands `digester-gas-production` (Group M, calc-treatment.js), the follow-on spec-v573 named: the payoff side of anaerobic digestion. VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield (12-18 ft^3/lb, default 15); methane = gas x ~65%; energy = methane x 960 BTU/ft^3. A digester destroying 5,500 lb VS/day makes about 82,500 ft^3 of gas and 51.5 MMBtu/day. Group M audit count 27 -> 28. Catalog 1,043 -> 1,044 (version 0.185.0).
+
 ### feat(field): spec-v595 search effort in searcher-hours; 2026-07-10
 
 Lands `searcher-hours` (Group P, calc-rescue.js), the follow-on spec-v540 named: what sweeping a segment costs. track_ft = 43,560 x acres / spacing; searcher_hours = track_ft / (mph x 5,280); team clock = effort / searchers. Prices the spacing search-track-spacing sets for a POD (a 160-acre segment at 40 ft spacing is 33 miles of track line). Group P audit count 11 -> 12. Catalog 1,042 -> 1,043 (version 0.184.0).

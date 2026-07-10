@@ -80812,6 +80812,56 @@
       "term": "search team time for 160 acres",
       "target": "searcher-hours",
       "kind": "question"
+    },
+    {
+      "term": "digester gas",
+      "target": "digester-gas-production",
+      "kind": "industry"
+    },
+    {
+      "term": "biogas production",
+      "target": "digester-gas-production",
+      "kind": "industry"
+    },
+    {
+      "term": "methane production wastewater",
+      "target": "digester-gas-production",
+      "kind": "redirect"
+    },
+    {
+      "term": "digester gas energy",
+      "target": "digester-gas-production",
+      "kind": "adjacent"
+    },
+    {
+      "term": "volatile solids destroyed",
+      "target": "digester-gas-production",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much biogas does a digester make",
+      "target": "digester-gas-production",
+      "kind": "question"
+    },
+    {
+      "term": "methane from volatile solids destroyed",
+      "target": "digester-gas-production",
+      "kind": "question"
+    },
+    {
+      "term": "digester gas energy in mmbtu",
+      "target": "digester-gas-production",
+      "kind": "question"
+    },
+    {
+      "term": "how much gas from anaerobic digestion",
+      "target": "digester-gas-production",
+      "kind": "question"
+    },
+    {
+      "term": "cubic feet of gas per pound volatile solids",
+      "target": "digester-gas-production",
+      "kind": "question"
     }
   ]
 }

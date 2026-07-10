@@ -19245,3 +19245,35 @@ test("bounds: spec-v595 computeSearcherHours pins the track line, effort, clock 
   assert.ok("error" in _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 0 }));
   assert.ok("error" in _v595({ area_acres: 160, track_spacing_ft: 40, speed_mph: 1.5, searchers: 0.5 }));
 });
+
+import { computeDigesterGasProduction as _v596 } from "../../calc-treatment.js";
+
+test("bounds: spec-v596 computeDigesterGasProduction pins gas/methane/energy, the linear scalings, and error seams", () => {
+  // Pinned worked example: 10,000 lb/day VS fed, 55% reduction, 15 ft^3/lb, 65% methane.
+  const r = _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, gas_yield_ft3_lb: 15, methane_pct: 65 });
+  assert.ok(Math.abs(r.vs_destroyed_lb_day - 5500) < 1e-9);
+  assert.ok(Math.abs(r.gas_ft3_day - 82500) < 1e-9);
+  assert.ok(Math.abs(r.methane_ft3_day - 53625) < 1e-9);
+  assert.ok(Math.abs(r.energy_btu_day - 51480000) < 1e-6);
+  assert.ok(Math.abs(r.energy_mmbtu_day - 51.48) < 1e-9);
+  // Cross-check: 6,000 lb/day, 60% reduction, 16 ft^3/lb, 62% methane.
+  const x = _v596({ vs_fed_lb_day: 6000, vs_reduction_pct: 60, gas_yield_ft3_lb: 16, methane_pct: 62 });
+  assert.ok(Math.abs(x.gas_ft3_day - 57600) < 1e-9);
+  assert.ok(Math.abs(x.methane_ft3_day - 35712) < 1e-9);
+  assert.ok(Math.abs(x.energy_mmbtu_day - 34.28352) < 1e-9);
+  // Defaults apply when yield/methane omitted (15 / 65).
+  const d = _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55 });
+  assert.ok(Math.abs(d.gas_ft3_day - 82500) < 1e-9);
+  assert.ok(Math.abs(d.methane_ft3_day - 53625) < 1e-9);
+  // Gas scales linearly with VS fed, reduction, and yield.
+  const more = _v596({ vs_fed_lb_day: 20000, vs_reduction_pct: 55, gas_yield_ft3_lb: 15, methane_pct: 65 });
+  assert.ok(Math.abs(more.gas_ft3_day - 2 * r.gas_ft3_day) < 1e-9);
+  // Error seams: non-finite, non-positive VS fed / yield, reduction or methane out of 0-100.
+  assert.ok("error" in _v596({ vs_fed_lb_day: Infinity, vs_reduction_pct: 55 }));
+  assert.ok("error" in _v596({ vs_fed_lb_day: 0, vs_reduction_pct: 55 }));
+  assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 0 }));
+  assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 101 }));
+  assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, gas_yield_ft3_lb: 0 }));
+  assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, methane_pct: 0 }));
+  assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, methane_pct: 101 }));
+});

@@ -953,6 +953,8 @@ const TOOL_MODULES = (() => {
     "clarifier-surface-loading", "bod-tss-loading-removal", "tds-from-conductivity",
     // spec-v573
     "digester-vs-loading",
+    // spec-v596
+    "digester-gas-production",
     // spec-v575
     "flocculation-g-value",
     // spec-v576

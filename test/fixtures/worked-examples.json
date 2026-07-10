@@ -49918,6 +49918,88 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "digester-gas-production",
+   "source_publisher": "Anaerobic digester gas production (WEF / operator courses)",
+   "source_title": "gas = VS_destroyed x yield; methane = gas x 65%; energy = methane x 960 BTU/ft3 (spec-v573's named follow-on)",
+   "source_edition_or_year": "WEF / university operator courses",
+   "source_section_or_page": "10,000 lb/day VS fed at 55% reduction, 15 ft3/lb, 65% methane -> 5,500 lb destroyed, 82,500 ft3 gas, 53,625 ft3 methane, 51.5 MMBtu/day",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "vs_fed_lb_day": 10000,
+    "vs_reduction_pct": 55,
+    "gas_yield_ft3_lb": 15,
+    "methane_pct": 65
+   },
+   "outputs": {
+    "vs_destroyed_lb_day": {
+     "value": 5500,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "gas_ft3_day": {
+     "value": 82500,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "methane_ft3_day": {
+     "value": 53625,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "energy_mmbtu_day": {
+     "value": 51.48,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "digester-gas-production",
+   "source_publisher": "Anaerobic digester gas production (WEF / operator courses)",
+   "source_title": "cross-check: a smaller plant with richer gas scales with VS destroyed, yield, and methane fraction",
+   "source_edition_or_year": "WEF / university operator courses",
+   "source_section_or_page": "6,000 lb/day VS fed at 60% reduction, 16 ft3/lb, 62% methane -> 3,600 lb destroyed, 57,600 ft3 gas, 35,712 ft3 methane, 34.3 MMBtu/day",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "vs_fed_lb_day": 6000,
+    "vs_reduction_pct": 60,
+    "gas_yield_ft3_lb": 16,
+    "methane_pct": 62
+   },
+   "outputs": {
+    "vs_destroyed_lb_day": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "gas_ft3_day": {
+     "value": 57600,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "methane_ft3_day": {
+     "value": 35712,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "energy_mmbtu_day": {
+     "value": 34.28352,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

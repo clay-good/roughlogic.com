@@ -650,6 +650,17 @@ export const CITATIONS = {
       { name: "Target bands", value: "rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5", source: "Ten States Standards" },
     ],
   },
+  "digester-gas-production": {
+    formula: "VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.",
+    edition: "Anaerobic digester gas production (WEF; university operator courses), by name.",
+    freeAccess: "The digester-gas production relation and its typical yields are public wastewater-operations results; the digester monitoring and the operator govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The yield (12-18 ft^3/lb VS destroyed, default 15) and the methane fraction (~65%) depend on the feed and temperature - a digester-gas analysis governs the real values. The energy counts the methane heating value only (~960 BTU/ft^3); the CO2 fraction carries none. The estimate assumes steady mesophilic operation. The digester monitoring and the operator of record govern - a planning estimate, not a metered gas measurement.",
+    assumptions: [
+      { name: "Gas yield", value: "12-18 ft^3 digester gas per lb VS destroyed (default 15); feed- and temperature-dependent", source: "WEF / operator courses" },
+      { name: "Methane and energy", value: "gas is ~65% methane; recoverable energy is methane x ~960 BTU/ft^3 (the CO2 carries none)", source: "WEF / operator courses" },
+    ],
+  },
   "digester-vs-loading": {
     formula: "VS_fed = feed_gal x 8.34 x (%TS/100) x (%VS/100); VSLR = VS_fed / volume x 1000; DT = volume x 7.48 / feed_gal.",
     edition: "Anaerobic digester volatile-solids loading rate (WEF; university operator courses), by name.",
