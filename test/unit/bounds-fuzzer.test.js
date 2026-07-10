@@ -18785,3 +18785,24 @@ test("bounds: spec-v570 computePopulationEquivalent pins the three PE relations,
   assert.ok("error" in _v570({ flow_mgd: 0.5, bod_mg_l: 0 }));
   assert.ok("error" in _v570({ flow_mgd: 0.5, bod_mg_l: 600, ss_mg_l: -1 }));
 });
+
+import { computeRasFlowRate as _v571 } from "../../calc-water.js";
+
+test("bounds: spec-v571 computeRasFlowRate pins the mass-balance relation, the return ratio, the RAS_SS > MLSS requirement, and error seams", () => {
+  const r = _v571({ plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 8000 });
+  assert.ok(Math.abs(r.q_ras_mgd - 2.2727) < 0.001); // 5*2500/(8000-2500)
+  assert.ok(Math.abs(r.ras_ratio_pct - 45.45) < 0.1); // 2.27/5*100
+  // A poorly thickening clarifier forces a much higher return for the same MLSS.
+  const poor = _v571({ plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 6000 });
+  assert.ok(Math.abs(poor.q_ras_mgd - 3.5714) < 0.001);
+  assert.ok(Math.abs(poor.ras_ratio_pct - 71.43) < 0.1);
+  assert.ok(poor.q_ras_mgd > r.q_ras_mgd);
+  // The RAS flow scales with the plant flow at fixed concentrations.
+  assert.ok(Math.abs(_v571({ plant_flow_mgd: 10, mlss_mg_l: 2500, ras_ss_mg_l: 8000 }).q_ras_mgd - 2 * r.q_ras_mgd) < 1e-6);
+  // Error seams: non-finite, non-positive flow / MLSS, RAS_SS <= MLSS.
+  assert.ok("error" in _v571({ plant_flow_mgd: Infinity, mlss_mg_l: 2500, ras_ss_mg_l: 8000 }));
+  assert.ok("error" in _v571({ plant_flow_mgd: 0, mlss_mg_l: 2500, ras_ss_mg_l: 8000 }));
+  assert.ok("error" in _v571({ plant_flow_mgd: 5, mlss_mg_l: 0, ras_ss_mg_l: 8000 }));
+  assert.ok("error" in _v571({ plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 2500 })); // RAS_SS == MLSS
+  assert.ok("error" in _v571({ plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 2000 })); // RAS_SS < MLSS
+});

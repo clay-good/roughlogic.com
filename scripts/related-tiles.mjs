@@ -985,6 +985,7 @@ const RELATED = {
   "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
   "uv-dose": ["disinfection-ct","chlorine-demand"],
   "population-equivalent": ["bod-tss-loading-removal","pounds-formula","chlorine-demand"],
+  "ras-flow-rate": ["srt-fm-ratio","svi-sludge-index","clarifier-surface-loading"],
   // spec-v117 rigging load / wire-rope (Group Z)
   "multi-leg-sling": ["cg-load-share","shackle-eyebolt-wll","spreader-beam"],
   "wire-rope-strength": ["sling-d-d-efficiency","shackle-eyebolt-wll"],

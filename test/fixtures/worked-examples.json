@@ -24695,6 +24695,62 @@
    }
   },
   {
+   "tile_id": "ras-flow-rate",
+   "source_publisher": "WEF / Sacramento activated-sludge manuals",
+   "source_title": "Q_RAS = Q x MLSS / (RAS_SS - MLSS); ratio = Q_RAS / Q x 100",
+   "source_edition_or_year": "activated-sludge solids balance",
+   "source_section_or_page": "5 MGD, 2500 MLSS, 8000 RAS_SS -> 2.27 MGD, 45% return",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "plant_flow_mgd": 5,
+    "mlss_mg_l": 2500,
+    "ras_ss_mg_l": 8000
+   },
+   "outputs": {
+    "q_ras_mgd": {
+     "value": 2.27,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ras_ratio_pct": {
+     "value": 45,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ras-flow-rate",
+   "source_publisher": "WEF / Sacramento activated-sludge manuals",
+   "source_title": "a poorly thickening clarifier forces a much higher return",
+   "source_edition_or_year": "activated-sludge solids balance",
+   "source_section_or_page": "Same plant, RAS_SS only 6000 -> 3.57 MGD, 71% return",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "plant_flow_mgd": 5,
+    "mlss_mg_l": 2500,
+    "ras_ss_mg_l": 6000
+   },
+   "outputs": {
+    "q_ras_mgd": {
+     "value": 3.57,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "ras_ratio_pct": {
+     "value": 71,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",

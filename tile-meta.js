@@ -646,6 +646,7 @@ const _TILES = [
   ["chlorine-demand", "M"],
   ["uv-dose", "M"],
   ["population-equivalent", "M"],
+  ["ras-flow-rate", "M"],
   // spec-v117 rigging load / wire-rope (Group Z)
   ["multi-leg-sling", "Z"],
   ["wire-rope-strength", "Z"],

@@ -6529,6 +6529,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "ras flow",
+      "target": "ras-flow-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "return activated sludge",
+      "target": "ras-flow-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "ras ratio",
+      "target": "ras-flow-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "sludge return rate",
+      "target": "ras-flow-rate",
+      "kind": "redirect"
+    },
+    {
+      "term": "mlss mass balance",
+      "target": "ras-flow-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ras pump rate",
+      "target": "ras-flow-rate",
+      "kind": "redirect"
+    },
+    {
+      "term": "return sludge flow",
+      "target": "ras-flow-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "activated sludge return",
+      "target": "ras-flow-rate",
+      "kind": "adjacent"
+    },
+    {
       "term": "multi leg sling",
       "target": "multi-leg-sling",
       "kind": "industry"

@@ -8603,6 +8603,17 @@ export const CITATIONS = {
       { name: "Short dose", value: "a short dose points to an aged lamp, a fouled sleeve, or low UV transmittance (turbidity)", source: "USEPA UVDGM" },
     ],
   },
+  "ras-flow-rate": {
+    formula: "Q_RAS = Q x MLSS / (RAS_SS - MLSS); ras_ratio = Q_RAS / Q x 100.",
+    edition: "RAS flow from the activated-sludge solids mass balance (WEF MOP / Sacramento activated-sludge manuals), by name.",
+    freeAccess: "The solids-balance return-rate relation is a public wastewater-operations result; the settleability and clarifier performance govern the actual set point.",
+    governance: GOVERNANCE.general,
+    editionNote: "The clarifier only thickens sludge about three to four times, so the return solids concentration is capped - cranking the RAS pump to chase a higher MLSS floods the clarifier and washes solids over the weir; the mass balance, not the pump maximum, sets the rate, and the return solids must exceed the mixed-liquor solids. An operating aid, not a process design.",
+    assumptions: [
+      { name: "Mass balance", value: "Q_RAS = Q x MLSS / (RAS_SS - MLSS); the return solids must exceed the mixed-liquor solids", source: "activated-sludge solids balance" },
+      { name: "Thickening cap", value: "the clarifier thickens sludge only ~3-4x; the settleability (SVI) and clarifier performance cap RAS_SS", source: "WEF / Sacramento manuals" },
+    ],
+  },
   "population-equivalent": {
     formula: "bod_load = MGD x BOD x 8.34; PE_bod = bod_load / 0.17; PE_flow = gpd / 100; PE_ss = ss_load / 0.20; PE = max(PE_bod, PE_flow, PE_ss).",
     edition: "Population equivalent (organic load), standard sanitary engineering, by name.",

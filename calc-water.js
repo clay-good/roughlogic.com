@@ -1379,3 +1379,40 @@ const renderPopulationEquivalent = _v23SimpleRenderer({
   compute: computePopulationEquivalent,
 });
 WATER_RENDERERS["population-equivalent"] = renderPopulationEquivalent;
+
+// --- spec-v571 M: Return activated sludge (RAS) flow rate ---
+// Q_RAS = Q x MLSS / (RAS_SS - MLSS). ratio = Q_RAS / Q x 100.
+// dims: in { plant_flow_mgd: L^3 T^-1, mlss_mg_l: M L^-3, ras_ss_mg_l: M L^-3 } out: { q_ras_mgd: L^3 T^-1, ras_ratio_pct: dimensionless }
+export function computeRasFlowRate({ plant_flow_mgd = 0, mlss_mg_l = 0, ras_ss_mg_l = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(plant_flow_mgd) || 0;
+  const mlss = Number(mlss_mg_l) || 0;
+  const ras = Number(ras_ss_mg_l) || 0;
+  if (!(q > 0)) return { error: "Plant flow must be positive (MGD)." };
+  if (!(mlss > 0)) return { error: "Mixed-liquor solids must be positive (mg/L)." };
+  if (!(ras > mlss)) return { error: "Return solids must exceed the mixed-liquor solids (the clarifier cannot thicken to at or below the basin concentration)." };
+  const q_ras_mgd = q * mlss / (ras - mlss);
+  const ras_ratio_pct = q_ras_mgd / q * 100;
+  const thickening = ras / mlss;
+  return {
+    q_ras_mgd, ras_ratio_pct, thickening,
+    note: "The clarifier only thickens sludge about three to four times, so the return solids concentration is capped - cranking the RAS pump to chase a higher MLSS floods the clarifier and washes solids over the weir. The mass balance, not the pump maximum, sets the rate; the return solids must exceed the mixed-liquor solids. The settleability (SVI) and clarifier performance govern.",
+  };
+}
+export const rasFlowRateExample = { inputs: { plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 8000 } };
+const renderRasFlowRate = _v23SimpleRenderer({
+  citation: "Citation: RAS flow from the solids mass balance (WEF / Sacramento activated-sludge manuals), by name. Q_RAS = Q x MLSS / (RAS_SS - MLSS); ratio = Q_RAS / Q x 100. The clarifier only thickens sludge 3-4x, so the return solids are capped - the mass balance, not the pump maximum, sets the rate. The settleability and clarifier performance govern.",
+  example: rasFlowRateExample.inputs,
+  fields: [
+    { key: "plant_flow_mgd", label: "Plant influent flow Q (MGD)", kind: "number" },
+    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L, target)", kind: "number" },
+    { key: "ras_ss_mg_l", label: "Return solids RAS_SS (mg/L, > MLSS)", kind: "number" },
+  ],
+  outputs: [
+    { key: "q", id: "ras-out-q", label: "RAS flow rate", value: (r) => fmt(r.q_ras_mgd, 2) + " MGD" },
+    { key: "r", id: "ras-out-r", label: "Return ratio", value: (r) => fmt(r.ras_ratio_pct, 0) + "% of plant flow (" + fmt(r.thickening, 1) + "x thickening)" },
+    { key: "n", id: "ras-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRasFlowRate,
+});
+WATER_RENDERERS["ras-flow-rate"] = renderRasFlowRate;
