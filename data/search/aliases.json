@@ -21264,6 +21264,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "reflected wave",
+      "target": "vfd-reflected-wave",
+      "kind": "industry"
+    },
+    {
+      "term": "vfd cable length",
+      "target": "vfd-reflected-wave",
+      "kind": "industry"
+    },
+    {
+      "term": "nema mg-1 part 31",
+      "target": "vfd-reflected-wave",
+      "kind": "redirect"
+    },
+    {
+      "term": "motor terminal voltage",
+      "target": "vfd-reflected-wave",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dv/dt filter",
+      "target": "vfd-reflected-wave",
+      "kind": "industry"
+    },
+    {
+      "term": "long cable vfd",
+      "target": "vfd-reflected-wave",
+      "kind": "redirect"
+    },
+    {
+      "term": "reflected wave motor",
+      "target": "vfd-reflected-wave",
+      "kind": "adjacent"
+    },
+    {
+      "term": "igbt overvoltage",
+      "target": "vfd-reflected-wave",
+      "kind": "adjacent"
+    },
+    {
       "term": "economic conductor sizing",
       "target": "economic-conductor-sizing",
       "kind": "industry"

@@ -81,6 +81,8 @@ const TOOL_MODULES = (() => {
     "motor-fault-contribution",
     // spec-v522 reduced-voltage starter current and torque
     "reduced-voltage-starter",
+    // spec-v557
+    "vfd-reflected-wave",
   ]);
   // spec-v88 cap-relief split: the cohesive solar-PV / battery-storage /
   // EV-charging electrification bench moved out of calc-electrical.js (which

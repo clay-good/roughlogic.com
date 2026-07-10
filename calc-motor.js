@@ -428,3 +428,56 @@ function renderReducedVoltageStarter(inputRegion, outputRegion, citationEl) {
   type.select.addEventListener("change", update);
 }
 MOTOR_RENDERERS["reduced-voltage-starter"] = renderReducedVoltageStarter;
+
+// --- spec-v557 A: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31) ---
+// cable_velocity = 0.01 x velocity_pct x 984. L_crit = rise_time x cable_velocity / 2. V_peak doubles past L_crit.
+// dims: in { rise_time_us: T, velocity_pct: dimensionless, system_voltage_v: dimensionless, run_length_ft: L } out: { l_crit_ft: L, v_peak_v: dimensionless, limit_invduty_v: dimensionless }
+export function computeVfdReflectedWave({ rise_time_us = 0, velocity_pct = 50, system_voltage_v = 0, run_length_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rt = Number(rise_time_us) || 0;
+  const vp = Number(velocity_pct) || 0;
+  const Vll = Number(system_voltage_v) || 0;
+  const run = Number(run_length_ft) || 0;
+  if (!(rt > 0)) return { error: "Rise time must be positive (us)." };
+  if (!(vp > 0)) return { error: "Cable velocity percent must be positive." };
+  if (!(Vll > 0)) return { error: "System voltage must be positive (V)." };
+  if (!(run > 0)) return { error: "Run length must be positive (ft)." };
+  const cable_velocity_ft_us = 0.01 * vp * 984;
+  const l_crit_ft = rt * cable_velocity_ft_us / 2;
+  const v_bus_v = Math.SQRT2 * Vll;
+  const v_peak_v = run > l_crit_ft ? 2 * v_bus_v : v_bus_v * (1 + run / l_crit_ft);
+  const limit_invduty_v = 3.1 * Vll;
+  const limit_genpurpose_v = 1000;
+  return {
+    cable_velocity_ft_us, l_crit_ft, v_bus_v, v_peak_v, limit_invduty_v, limit_genpurpose_v,
+    exceeds_invduty: v_peak_v > limit_invduty_v,
+    exceeds_genpurpose: v_peak_v > limit_genpurpose_v,
+    note: "The limit is set by the drive rise time, not the motor horsepower. Above the critical length the reflection fully develops and the peak terminal voltage reaches twice the DC bus. NEMA MG-1 Part 31 inverter-duty insulation withstands about 3.1 times the line-to-line, while a general-purpose motor is limited near 1000 V. The fix is a dV/dt or sine-wave filter or an inverter-duty motor. The drive and motor data govern.",
+  };
+}
+export const vfdReflectedWaveExample = { inputs: { rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 100 } };
+
+function renderVfdReflectedWave(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: VFD reflected-wave cable-length limit (NEMA MG-1 Part 31; transmission-line reflection): cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus past L_crit; limits 3.1 x V_LL (inverter-duty) and ~1000 V (general-purpose). The limit is the drive rise time, not the horsepower. The fix is a dV/dt filter or an inverter-duty motor. The drive and motor data govern.";
+  const rt = makeNumber("Drive rise time (us)", "rw-rt", { step: "any", min: "0", value: "0.1" }); rt.input.value = "0.1";
+  const vp = makeNumber("Cable velocity (% of light)", "rw-vp", { step: "any", min: "0", value: "50" }); vp.input.value = "50";
+  const Vll = makeNumber("System voltage V_LL (V)", "rw-v", { step: "any", min: "0", value: "480" }); Vll.input.value = "480";
+  const run = makeNumber("Cable run length (ft)", "rw-run", { step: "any", min: "0", value: "100" }); run.input.value = "100";
+  for (const f of [rt, vp, Vll, run]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rt.input.value = "0.1"; vp.input.value = "50"; Vll.input.value = "480"; run.input.value = "100"; update(); });
+  const oL = makeOutputLine(outputRegion, "Critical length", "rw-out-l");
+  const oV = makeOutputLine(outputRegion, "Peak terminal voltage", "rw-out-v");
+  const oLim = makeOutputLine(outputRegion, "Limit check", "rw-out-lim");
+  const oNote = makeOutputLine(outputRegion, "Note", "rw-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVfdReflectedWave({ rise_time_us: readNum(rt.input), velocity_pct: readNum(vp.input), system_voltage_v: readNum(Vll.input), run_length_ft: readNum(run.input) });
+    if (r.error) { oL.textContent = r.error; oV.textContent = "-"; oLim.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = fmt(r.l_crit_ft, 1) + " ft (run " + (readNum(run.input) > r.l_crit_ft ? "past - reflection develops" : "under - safe") + ")";
+    oV.textContent = fmt(r.v_peak_v, 0) + " V (bus " + fmt(r.v_bus_v, 0) + " V)";
+    oLim.textContent = (r.exceeds_invduty ? "OVER inverter-duty " : "under inverter-duty ") + fmt(r.limit_invduty_v, 0) + " V; " + (r.exceeds_genpurpose ? "OVER" : "under") + " general-purpose ~1000 V";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [rt, vp, Vll, run]) f.input.addEventListener("input", update);
+}
+MOTOR_RENDERERS["vfd-reflected-wave"] = renderVfdReflectedWave;

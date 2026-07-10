@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-motor.js gzip cap 10000 -> 12000; 2026-07-09
+
+The spec-v557 `vfd-reflected-wave` tile pushes `calc-motor.js` over the 10000 B cap. Raised the `check-module-sizes` cap to **12000** with headroom for further Group A motor tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-concrete.js gzip cap 17000 -> 20000; 2026-07-09
 
 The spec-v548 `concrete-anchor-breakout` tile (ACI 318-19 Ch. 17 CCD breakout) pushes `calc-concrete.js` over the 17000 B cap (103.0%). Raised the `check-module-sizes` cap to **20000** with headroom for further Group E concrete tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

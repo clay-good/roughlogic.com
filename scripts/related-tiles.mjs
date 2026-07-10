@@ -190,6 +190,7 @@ const RELATED = {
   "motor-locked-rotor-kva": ["motor-fla", "generator-motor-starting", "motor-vd-starting"],
   "motor-fault-contribution": ["short-circuit-pp", "motor-fla", "asymmetrical-fault-xr"],
   "reduced-voltage-starter": ["motor-locked-rotor-kva", "motor-vd-starting", "generator-motor-starting"],
+  "vfd-reflected-wave": ["vfd-energy-savings", "cable-bend-radius", "reduced-voltage-starter"],
   "harmonic-resonance": ["pf-correction", "transformer-k-factor", "power-factor-billing-savings"],
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],

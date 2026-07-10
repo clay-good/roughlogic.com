@@ -754,6 +754,7 @@ export const COMPUTE_MAP = {
   "transformer-inrush-point": { module: "../../calc-electrical.js", fn: "computeTransformerInrushPoint" },
   "motor-fault-contribution": { module: "../../calc-motor.js", fn: "computeMotorFaultContribution" },
   "reduced-voltage-starter": { module: "../../calc-motor.js", fn: "computeReducedVoltageStarter" },
+  "vfd-reflected-wave": { module: "../../calc-motor.js", fn: "computeVfdReflectedWave" },
   "harmonic-resonance": { module: "../../calc-powerquality.js", fn: "computeHarmonicResonance" },
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
   "neutral-grounding-resistor": { module: "../../calc-elecdesign.js", fn: "computeNeutralGroundingResistor" },

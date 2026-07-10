@@ -18460,3 +18460,29 @@ test("bounds: spec-v556 computeConcreteCorbelBracket pins the 0.2Vu tension clam
   assert.ok("error" in _v556({ ...cb, fy_psi: 0 }));
   assert.ok("error" in _v556({ ...cb, shear_span_av_in: 14 })); // av > d
 });
+
+import { computeVfdReflectedWave as _v557 } from "../../calc-motor.js";
+
+test("bounds: spec-v557 computeVfdReflectedWave pins the critical length, the peak-voltage doubling past L_crit, the limit checks, and error seams", () => {
+  const r = _v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 100 });
+  assert.ok(Math.abs(r.l_crit_ft - 24.6) < 0.1); // 0.1 * 492 / 2
+  assert.ok(Math.abs(r.v_bus_v - 679) < 1); // sqrt(2)*480
+  assert.ok(Math.abs(r.v_peak_v - 1358) < 2); // 2 * 679 (run past L_crit)
+  assert.ok(Math.abs(r.limit_invduty_v - 1488) < 1); // 3.1 * 480
+  assert.equal(r.exceeds_invduty, false); // 1358 < 1488
+  assert.equal(r.exceeds_genpurpose, true); // 1358 > 1000
+  // A short run under the critical length does not fully reflect (peak below the doubled value).
+  const short = _v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 15 });
+  assert.ok(short.v_peak_v < r.v_peak_v);
+  assert.ok(Math.abs(short.v_peak_v - 1093) < 3);
+  // A very short run approaches the bus voltage.
+  assert.ok(_v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 0.5 }).v_peak_v < 720);
+  // A higher system voltage raises the peak proportionally.
+  assert.ok(Math.abs(_v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 600, run_length_ft: 100 }).v_peak_v - r.v_peak_v * 600 / 480) < 1);
+  // Error seams: non-finite, non-positive rise / velocity / voltage / run.
+  assert.ok("error" in _v557({ rise_time_us: Infinity, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 100 }));
+  assert.ok("error" in _v557({ rise_time_us: 0, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 100 }));
+  assert.ok("error" in _v557({ rise_time_us: 0.1, velocity_pct: 0, system_voltage_v: 480, run_length_ft: 100 }));
+  assert.ok("error" in _v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 0, run_length_ft: 100 }));
+  assert.ok("error" in _v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 0 }));
+});

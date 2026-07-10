@@ -8951,6 +8951,17 @@ export const CITATIONS = {
       { name: "Minimum pressure", value: "the reduced setpoint must still serve the tools after system pressure drop", source: "compressed-air best practice" },
     ],
   },
+  "vfd-reflected-wave": {
+    formula: "cable_velocity = 0.01 x velocity_pct x 984; L_crit = rise_time x cable_velocity / 2; V_bus = sqrt(2) x V_LL; V_peak = 2 V_bus (run > L_crit); limits 3.1 x V_LL (inverter-duty) and ~1000 V (general-purpose).",
+    edition: "VFD reflected-wave cable-length limit (NEMA MG-1 Part 31; transmission-line reflection), by name.",
+    freeAccess: "The transmission-line reflection relation is public physics; NEMA MG-1 Part 31 defines the inverter-duty withstand. The drive and motor data govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The limit is set by the drive rise time, not the motor horsepower or the cable ampacity. Above the critical length the reflection fully develops and the peak terminal voltage reaches twice the DC bus. NEMA MG-1 Part 31 inverter-duty insulation withstands about 3.1 times the line-to-line (about 1600 V for 600 V systems), while a general-purpose motor is limited near 1000 V. The fix is a dV/dt or sine-wave filter or an inverter-duty motor. A screening aid, not the manufacturer's spec.",
+    assumptions: [
+      { name: "Critical length", value: "L_crit = rise_time x cable_velocity / 2; past it the reflection fully develops (V_peak = 2 V_bus)", source: "transmission-line reflection" },
+      { name: "Inverter-duty withstand", value: "NEMA MG-1 Part 31 ~3.1 x V_LL; general-purpose motors far lower (~1000 V)", source: "NEMA MG-1 Part 31" },
+    ],
+  },
   "reduced-voltage-starter": {
     formula: "autotransformer: motor = tap x LRA, line = tap^2 x LRA, torque = tap^2 x LRT. wye-delta: 0.333x on current and torque. solid-state/reactor: motor = line = tap x LRA, torque = tap^2 x LRT.",
     edition: "Reduced-voltage-starter current and torque relations (NEMA ICS 2; torque proportional to voltage squared), by name; the motor speed-torque curve and the load govern.",

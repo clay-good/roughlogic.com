@@ -36392,6 +36392,64 @@
    }
   },
   {
+   "tile_id": "vfd-reflected-wave",
+   "source_publisher": "VFD reflected-wave cable-length limit (NEMA MG-1 Part 31)",
+   "source_title": "L_crit = rise_time x cable_velocity / 2; V_peak = 2 x sqrt(2) x V_LL past L_crit",
+   "source_edition_or_year": "NEMA MG-1 Part 31",
+   "source_section_or_page": "480 V, 0.1 us rise, 50% velocity, 100 ft -> L_crit 24.6 ft, V_peak 1358 V (over general-purpose, under inverter-duty 1488)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "rise_time_us": 0.1,
+    "velocity_pct": 50,
+    "system_voltage_v": 480,
+    "run_length_ft": 100
+   },
+   "outputs": {
+    "l_crit_ft": {
+     "value": 24.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "v_peak_v": {
+     "value": 1358,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "limit_invduty_v": {
+     "value": 1488,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vfd-reflected-wave",
+   "source_publisher": "VFD reflected-wave cable-length limit (NEMA MG-1 Part 31)",
+   "source_title": "a short run under the critical length does not fully reflect",
+   "source_edition_or_year": "NEMA MG-1 Part 31",
+   "source_section_or_page": "Same drive on a 15 ft run (< 24.6 ft) -> V_peak 1093 V (partial, not doubled)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "rise_time_us": 0.1,
+    "velocity_pct": 50,
+    "system_voltage_v": 480,
+    "run_length_ft": 15
+   },
+   "outputs": {
+    "v_peak_v": {
+     "value": 1093,
+     "tolerance": {
+      "abs": 3
+     }
+    }
+   }
+  },
+  {
    "tile_id": "service-conductor-sizing",
    "source_publisher": "NEC 2023 310.12 / Table 310.16 (75 degC)",
    "source_title": "200 A copper dwelling service -> 166 A -> 2/0 Cu (Table 310.12)",
