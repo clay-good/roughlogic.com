@@ -2449,6 +2449,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "pv egc",
+      "target": "solar-egc-690-45",
+      "kind": "industry"
+    },
+    {
+      "term": "solar grounding conductor",
+      "target": "solar-egc-690-45",
+      "kind": "industry"
+    },
+    {
+      "term": "690.45",
+      "target": "solar-egc-690-45",
+      "kind": "redirect"
+    },
+    {
+      "term": "equipment grounding pv",
+      "target": "solar-egc-690-45",
+      "kind": "adjacent"
+    },
+    {
+      "term": "no ocpd egc",
+      "target": "solar-egc-690-45",
+      "kind": "adjacent"
+    },
+    {
+      "term": "voltage drop egc exception",
+      "target": "solar-egc-690-45",
+      "kind": "redirect"
+    },
+    {
+      "term": "14 awg minimum egc",
+      "target": "solar-egc-690-45",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pv source circuit ground",
+      "target": "solar-egc-690-45",
+      "kind": "industry"
+    },
+    {
       "term": "ambient correction",
       "target": "ambient-ampacity-adjust",
       "kind": "industry"

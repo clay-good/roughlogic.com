@@ -108,6 +108,8 @@ const TOOL_MODULES = (() => {
     "ev-charge-cost",
     // spec-v492 EV DC fast-charge time with CC-CV taper
     "ev-dcfc-time",
+    // spec-v559
+    "solar-egc-690-45",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)

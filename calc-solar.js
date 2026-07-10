@@ -1288,3 +1288,55 @@ function renderEvDcfcTime(inputRegion, outputRegion, citationEl) {
   for (const f of [cap, start, target, charger, accept]) f.input.addEventListener("input", update);
 }
 SOLAR_RENDERERS["ev-dcfc-time"] = renderEvDcfcTime;
+
+// --- spec-v559 A: PV equipment grounding conductor (NEC 690.45) ---
+// EGC from Table 250.122 by OCPD (or PV Isc where none), floored at 14 AWG; 690.45 waives the 250.122(B) upsize.
+const _PV_EGC_TABLE_CU = [
+  { ocpd_max_A: 15, awg: "14" }, { ocpd_max_A: 20, awg: "12" }, { ocpd_max_A: 60, awg: "10" },
+  { ocpd_max_A: 100, awg: "8" }, { ocpd_max_A: 200, awg: "6" }, { ocpd_max_A: 300, awg: "4" },
+  { ocpd_max_A: 400, awg: "3" }, { ocpd_max_A: 500, awg: "2" }, { ocpd_max_A: 600, awg: "1" },
+  { ocpd_max_A: 800, awg: "1/0" }, { ocpd_max_A: 1000, awg: "2/0" },
+];
+// dims: in { ocpd_rating_a: I, pv_isc_a: I, vd_upsized: dimensionless } out: { basis_current_a: I, egc_awg: dimensionless }
+export function computeSolarEgc69045({ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ocpd = Number(ocpd_rating_a) || 0;
+  const isc = Number(pv_isc_a) || 0;
+  const vdUp = vd_upsized === true || vd_upsized === "yes";
+  if (!(ocpd > 0) && !(isc > 0)) return { error: "Provide the OCPD rating, or the PV short-circuit current when there is no overcurrent device." };
+  const basis_current_a = ocpd > 0 ? ocpd : isc;
+  const has_ocpd = ocpd > 0;
+  const row = _PV_EGC_TABLE_CU.find((r) => basis_current_a <= r.ocpd_max_A);
+  if (!row) return { error: "Basis current exceeds the bundled Table 250.122 range; consult engineering analysis." };
+  const egc_awg = row.awg; // table minimum is 14 AWG, so the 690.45 14 AWG floor is inherent
+  return {
+    basis_current_a, egc_awg, has_ocpd, egc_upsize_required: false, vd_upsized: vdUp,
+    note: (has_ocpd
+      ? "The EGC is sized from the overcurrent device rating via Table 250.122."
+      : "This PV source circuit has no overcurrent device (two or fewer source circuits cannot deliver enough fault current), so the EGC is sized from the PV short-circuit current, not an OCPD rating.")
+      + " The EGC is never smaller than 14 AWG. NEC 690.45 waives the 250.122(B) proportional-upsize rule, so enlarging the circuit conductors for voltage drop does NOT require enlarging the EGC" + (vdUp ? " - the conductors were upsized here, but the EGC stays as sized." : ".") + " The NEC and the AHJ govern.",
+  };
+}
+const solarEgc69045Example = { inputs: { ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" } };
+
+function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 690.45 equipment grounding conductors for PV systems with Table 250.122: the EGC is sized from the governing overcurrent rating (or, where there is no OCPD, from the PV short-circuit current), never smaller than 14 AWG, and 690.45 waives the 250.122(B) proportional upsize so enlarging the circuit conductors for voltage drop does not enlarge the EGC. The NEC and the AHJ govern.";
+  const ocpd = makeNumber("OCPD rating (A, 0 = no OCPD)", "segc-ocpd", { step: "1", min: "0", value: "20" }); ocpd.input.value = "20";
+  const isc = makeNumber("PV short-circuit current (A, used if no OCPD)", "segc-isc", { step: "any", min: "0", value: "0" }); isc.input.value = "0";
+  const vd = makeSelect("Conductors upsized for voltage drop?", "segc-vd", [{ value: "no", label: "No" }, { value: "yes", label: "Yes" }]);
+  for (const f of [ocpd, isc, vd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ocpd.input.value = "20"; isc.input.value = "0"; vd.select.value = "no"; update(); });
+  const oBasis = makeOutputLine(outputRegion, "Sizing basis", "segc-out-basis");
+  const oEgc = makeOutputLine(outputRegion, "Required EGC (copper)", "segc-out-egc");
+  const oNote = makeOutputLine(outputRegion, "Note", "segc-out-note");
+  const update = debounce(() => {
+    const r = computeSolarEgc69045({ ocpd_rating_a: Number(ocpd.input.value) || 0, pv_isc_a: Number(isc.input.value) || 0, vd_upsized: vd.select.value });
+    if (r.error) { oBasis.textContent = r.error; oEgc.textContent = "-"; oNote.textContent = ""; return; }
+    oBasis.textContent = fmt(r.basis_current_a, 0) + " A (" + (r.has_ocpd ? "OCPD rating" : "PV Isc - no OCPD") + ")";
+    oEgc.textContent = r.egc_awg + " AWG" + (r.egc_awg === "14" ? " (14 AWG minimum)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ocpd, isc]) f.input.addEventListener("input", update);
+  vd.select.addEventListener("change", update);
+}
+SOLAR_RENDERERS["solar-egc-690-45"] = renderSolarEgc69045;

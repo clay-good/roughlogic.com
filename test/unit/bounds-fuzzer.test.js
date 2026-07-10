@@ -18509,3 +18509,27 @@ test("bounds: spec-v558 computeStepTouchVoltage pins Cs, the step-vs-touch order
   assert.ok("error" in _v558({ clearing_time_s: 0, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" }));
   assert.ok("error" in _v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "60" }));
 });
+
+import { computeSolarEgc69045 as _v559 } from "../../calc-solar.js";
+
+test("bounds: spec-v559 computeSolarEgc69045 pins the OCPD-vs-Isc basis, the 14 AWG floor, the no-upsize-for-VD behavior, and error seams", () => {
+  const r = _v559({ ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "no" });
+  assert.equal(r.basis_current_a, 20); // OCPD governs
+  assert.equal(r.egc_awg, "12"); // Table 250.122 20 A copper
+  assert.equal(r.has_ocpd, true);
+  // No OCPD: the EGC is sized from the PV short-circuit current, floored at 14 AWG.
+  const noOcpd = _v559({ ocpd_rating_a: 0, pv_isc_a: 10, vd_upsized: "yes" });
+  assert.equal(noOcpd.basis_current_a, 10);
+  assert.equal(noOcpd.egc_awg, "14"); // 10 A -> 14 AWG (the minimum)
+  assert.equal(noOcpd.has_ocpd, false);
+  // 690.45 waives the 250.122(B) upsize even when the conductors are upsized for voltage drop.
+  assert.equal(noOcpd.egc_upsize_required, false);
+  assert.equal(_v559({ ocpd_rating_a: 20, pv_isc_a: 0, vd_upsized: "yes" }).egc_upsize_required, false);
+  // The 14 AWG floor holds for any small basis current.
+  assert.equal(_v559({ ocpd_rating_a: 0, pv_isc_a: 2, vd_upsized: "no" }).egc_awg, "14");
+  // A larger OCPD steps the table up.
+  assert.equal(_v559({ ocpd_rating_a: 100, pv_isc_a: 0, vd_upsized: "no" }).egc_awg, "8");
+  // Error seams: non-finite, neither OCPD nor Isc positive.
+  assert.ok("error" in _v559({ ocpd_rating_a: Infinity, pv_isc_a: 0, vd_upsized: "no" }));
+  assert.ok("error" in _v559({ ocpd_rating_a: 0, pv_isc_a: 0, vd_upsized: "no" }));
+});

@@ -553,6 +553,7 @@ const RELATED = {
   "ev-charge-time": ["ev-charger-load", "battery-runtime", "battery-c-rate"],
   "ev-charge-cost": ["ev-charge-time", "ev-charger-load", "battery-tou-arbitrage"],
   "ev-dcfc-time": ["ev-charge-time", "ev-charge-cost", "battery-c-rate"],
+  "solar-egc-690-45": ["egc-sizing", "pv-circuit-ampacity", "pv-string-fusing"],
   "ambient-ampacity-adjust": ["wire-ampacity", "conduit-fill", "voltage-drop"],
   "service-load-optional": ["service-load-standard", "service-load", "ev-charger-load"],
 

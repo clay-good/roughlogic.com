@@ -3549,6 +3549,56 @@
    }
   },
   {
+   "tile_id": "solar-egc-690-45",
+   "source_publisher": "NFPA",
+   "source_title": "NEC 2023 690.45 with Table 250.122",
+   "source_edition_or_year": "NEC 2023",
+   "source_section_or_page": "20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "ocpd_rating_a": 20,
+    "pv_isc_a": 0,
+    "vd_upsized": "no"
+   },
+   "outputs": {
+    "basis_current_a": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "egc_awg": {
+     "value": "12",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "solar-egc-690-45",
+   "source_publisher": "NFPA",
+   "source_title": "no OCPD: EGC sized from PV Isc, 14 AWG floor, no VD upsize (690.45)",
+   "source_edition_or_year": "NEC 2023",
+   "source_section_or_page": "No OCPD, 10 A Isc, conductors upsized for VD -> 14 AWG (stays; 690.45 waives 250.122(B))",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "ocpd_rating_a": 0,
+    "pv_isc_a": 10,
+    "vd_upsized": "yes"
+   },
+   "outputs": {
+    "egc_awg": {
+     "value": "14",
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ambient-ampacity-adjust",
    "source_publisher": "NFPA",
    "source_title": "Ambient + fill ampacity adjustment: 75 A base (#6 THHN Cu, 90 C column), 50 C ambient, 12 conductors",

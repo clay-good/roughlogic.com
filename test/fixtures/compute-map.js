@@ -174,6 +174,7 @@ export const COMPUTE_MAP = {
   "ev-charge-time": { module: "../../calc-solar.js", fn: "computeEvChargeTime" },
   "ev-charge-cost": { module: "../../calc-solar.js", fn: "computeEvChargeCost" },
   "ev-dcfc-time": { module: "../../calc-solar.js", fn: "computeEvDcfcTime" },
+  "solar-egc-690-45": { module: "../../calc-solar.js", fn: "computeSolarEgc69045" },
   "generator-conductor-445": { module: "../../calc-feeder.js", fn: "computeGeneratorConductor445" },
   "transformer-voltage-regulation": { module: "../../calc-electrical.js", fn: "computeTransformerVoltageRegulation" },
   "capacitor-discharge-time": { module: "../../calc-electrical.js", fn: "computeCapacitorDischargeTime" },

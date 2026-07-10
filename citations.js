@@ -2166,6 +2166,18 @@ export const CITATIONS = {
     ],
   },
 
+  "solar-egc-690-45": {
+    formula: "basis = OCPD rating > 0 ? OCPD : PV Isc; EGC = Table 250.122 size for the basis, never smaller than 14 AWG; the 250.122(B) proportional upsize does not apply (690.45).",
+    edition: "The NEC 2023 690.45 equipment grounding conductors for PV systems, with Table 250.122, by name.",
+    freeAccess: "The NEC is available through NFPA's free online read-only access at nfpa.org; the 690.45 and Table 250.122 provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "A PV source circuit with two or fewer source circuits often has no overcurrent device, so the EGC is sized from the PV short-circuit current, not an OCPD rating; the EGC is never smaller than 14 AWG; NEC 690.45 waives the 250.122(B) rule, so enlarging the circuit conductors for voltage drop does not require enlarging the EGC. A design aid, not the AHJ.",
+    assumptions: [
+      { name: "No-OCPD sizing", value: "where there is no overcurrent device, the EGC is sized from the PV short-circuit current", source: "NEC 690.45" },
+      { name: "14 AWG minimum", value: "the PV EGC is never smaller than 14 AWG (copper)", source: "NEC 690.45" },
+      { name: "250.122(B) waived", value: "the voltage-drop proportional upsize does not apply to PV EGCs", source: "NEC 690.45" },
+    ],
+  },
   "ev-dcfc-time": {
     formula: "cc_power = min(charger, acceptance); bands 0-80% at 1.0, 80-90% at 0.5, 90-100% at 0.25 x cc_power; per-band time = (capacity x band_span/100) / (cc_power x fraction); total = sum over covered bands.",
     edition: "DC fast-charge CC-CV taper model (three constant-power bands), first-principles; the vehicle's charging curve governs the actual profile.",
