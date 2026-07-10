@@ -963,6 +963,8 @@ const TOOL_MODULES = (() => {
     "primer-tm", "cfu-plate-count",
     // spec-v531
     "molarity-from-stock",
+    // spec-v533
+    "nucleic-acid-a260",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [

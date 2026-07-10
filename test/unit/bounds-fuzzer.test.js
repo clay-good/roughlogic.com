@@ -17915,3 +17915,26 @@ test("bounds: spec-v532 computeMolarityFromStock pins the 12 M HCl stock, the vo
   assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 1.0, final_volume_ml: 0 }));
   assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 20, final_volume_ml: 1000 })); // target > stock
 });
+
+import { computeNucleicAcidA260 as _v533 } from "../../calc-lab.js";
+
+test("bounds: spec-v533 computeNucleicAcidA260 pins the dsDNA concentration, the 260/280 ratio, the strandedness factor, and error seams", () => {
+  const r = _v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: 0.324 });
+  assert.ok(Math.abs(r.concentration_ng_ul - 1500) < 0.5); // 0.6 * 50 * 50
+  assert.ok(Math.abs(r.purity_260_280 - 1.85) < 0.01); // 0.6 / 0.324
+  assert.equal(r.clean, true); // 1.85 >= 1.8 DNA threshold
+  // Strandedness lowers the concentration at the same A260 (ssDNA factor 33 vs dsDNA 50).
+  assert.ok(Math.abs(_v533({ a260: 0.6, na_type: "ssDNA", dilution_factor: 50 }).concentration_ng_ul - 990) < 0.5);
+  assert.equal(_v533({ a260: 0.6, na_type: "oligo", dilution_factor: 50 }).factor, 33);
+  assert.equal(_v533({ a260: 0.6, na_type: "RNA", dilution_factor: 50 }).factor, 40);
+  // No A280 -> no purity ratio.
+  assert.equal(_v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50 }).purity_260_280, null);
+  // A low 260/280 flags carryover.
+  assert.equal(_v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: 0.5 }).clean, false);
+  // Error seams: non-finite, negative A260, non-positive dilution, bad type, non-positive A280 with ratio.
+  assert.ok("error" in _v533({ a260: Infinity, na_type: "dsDNA", dilution_factor: 50 }));
+  assert.ok("error" in _v533({ a260: -0.1, na_type: "dsDNA", dilution_factor: 50 }));
+  assert.ok("error" in _v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 0 }));
+  assert.ok("error" in _v533({ a260: 0.6, na_type: "foo", dilution_factor: 50 }));
+  assert.ok("error" in _v533({ a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: -1 }));
+});

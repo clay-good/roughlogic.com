@@ -154,6 +154,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "a260",
+      "target": "nucleic-acid-a260",
+      "kind": "industry"
+    },
+    {
+      "term": "nucleic acid concentration",
+      "target": "nucleic-acid-a260",
+      "kind": "industry"
+    },
+    {
+      "term": "dna quantitation",
+      "target": "nucleic-acid-a260",
+      "kind": "redirect"
+    },
+    {
+      "term": "260/280 ratio",
+      "target": "nucleic-acid-a260",
+      "kind": "industry"
+    },
+    {
+      "term": "nanodrop",
+      "target": "nucleic-acid-a260",
+      "kind": "industry"
+    },
+    {
+      "term": "dsdna 50 factor",
+      "target": "nucleic-acid-a260",
+      "kind": "redirect"
+    },
+    {
+      "term": "rna concentration",
+      "target": "nucleic-acid-a260",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dna purity ratio",
+      "target": "nucleic-acid-a260",
+      "kind": "adjacent"
+    },
+    {
       "term": "declining balance",
       "target": "declining-balance-depreciation",
       "kind": "industry"

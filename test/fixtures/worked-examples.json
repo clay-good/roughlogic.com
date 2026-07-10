@@ -17073,6 +17073,57 @@
    }
   },
   {
+   "tile_id": "nucleic-acid-a260",
+   "source_publisher": "Standard spectrophotometric nucleic-acid quantitation (A260)",
+   "source_title": "concentration = A260 x factor x dilution; purity = A260 / A280",
+   "source_edition_or_year": "standard spectrophotometry",
+   "source_section_or_page": "A260 0.6, dsDNA (50), 1:50 dilution, A280 0.324 -> 1500 ng/uL, 260/280 = 1.85",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "a260": 0.6,
+    "na_type": "dsDNA",
+    "dilution_factor": 50,
+    "a280": 0.324
+   },
+   "outputs": {
+    "concentration_ng_ul": {
+     "value": 1500,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "purity_260_280": {
+     "value": 1.85,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nucleic-acid-a260",
+   "source_publisher": "Standard spectrophotometric nucleic-acid quantitation (A260)",
+   "source_title": "concentration = A260 x factor x dilution",
+   "source_edition_or_year": "standard spectrophotometry",
+   "source_section_or_page": "Same A260 0.6 read as ssDNA (factor 33), 1:50 dilution -> 990 ng/uL (strandedness lowers the value)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "a260": 0.6,
+    "na_type": "ssDNA",
+    "dilution_factor": 50
+   },
+   "outputs": {
+    "concentration_ng_ul": {
+     "value": 990,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gross-rent-multiplier",
    "source_publisher": "Appraisal Institute income-approach (GRM)",
    "source_title": "GRM = price / gross_annual_rent",

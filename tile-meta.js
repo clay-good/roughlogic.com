@@ -77,6 +77,7 @@ const _TILES = [
   ["primer-tm", "T"],
   ["cfu-plate-count", "T"],
   ["molarity-from-stock", "T"],
+  ["nucleic-acid-a260", "T"],
   ["declining-balance-depreciation", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],

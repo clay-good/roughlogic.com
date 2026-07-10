@@ -1001,3 +1001,62 @@ function renderMolarityFromStock(inputRegion, outputRegion, citationEl) {
   for (const f of [purity.input, density.input, mw.input, target.input, finalVol.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["molarity-from-stock"] = renderMolarityFromStock;
+
+// --- spec-v533 T: Nucleic-acid concentration from A260 (`nucleic-acid-a260`) ---
+// concentration = A260 x factor x dilution (factor 50 dsDNA, 33 ssDNA/oligo, 40 RNA). purity = A260/A280.
+const NUCLEIC_ACID_FACTORS = { dsDNA: 50, ssDNA: 33, oligo: 33, RNA: 40 };
+// dims: in { a260: dimensionless, na_type: dimensionless, dilution_factor: dimensionless, a280: dimensionless } out: { concentration_ng_ul: dimensionless, purity_260_280: dimensionless }
+export function computeNucleicAcidA260({ a260 = 0, na_type = "dsDNA", dilution_factor = 1, a280 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a = Number(a260) || 0;
+  const dil = Number(dilution_factor) || 0;
+  const a2 = Number(a280) || 0;
+  if (a < 0) return { error: "A260 must be non-negative." };
+  const factor = NUCLEIC_ACID_FACTORS[na_type];
+  if (!factor) return { error: "Nucleic-acid type must be dsDNA, ssDNA, oligo, or RNA." };
+  if (!(dil > 0)) return { error: "Dilution factor must be positive." };
+  const concentration_ng_ul = a * factor * dil;
+  let purity_260_280 = null;
+  if (a2 !== 0) {
+    if (!(a2 > 0)) return { error: "A280 must be positive when a purity ratio is requested." };
+    purity_260_280 = a / a2;
+  }
+  const threshold = na_type === "RNA" ? 2.0 : 1.8;
+  const clean = purity_260_280 === null ? null : purity_260_280 >= threshold;
+  return {
+    concentration_ng_ul,
+    purity_260_280,
+    factor,
+    clean,
+    note: "The factor is an empirical mass coefficient, not a molar one, and it differs by strandedness (ssDNA absorbs more per mass, so it reads a lower concentration at the same A260). A 260/280 below about 1.8 (DNA) or 2.0 (RNA) flags protein or phenol carryover that makes the concentration unreliable. The read assumes a clean 1 cm path and a blanked instrument. The sample and instrument govern.",
+  };
+}
+export const nucleicAcidA260Example = { inputs: { a260: 0.6, na_type: "dsDNA", dilution_factor: 50, a280: 0.324 } };
+
+function renderNucleicAcidA260(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard spectrophotometric nucleic-acid quantitation (Beer-Lambert at 260 nm); concentration = A260 x factor x dilution, factor 50 (dsDNA) / 33 (ssDNA, oligo) / 40 (RNA) ug/mL per A260; purity = A260 / A280. The factor is an empirical mass coefficient, not molar, and differs by strandedness. A 260/280 below ~1.8 (DNA) or ~2.0 (RNA) flags protein/phenol carryover. Assumes a clean 1 cm path and a blanked instrument. The sample and instrument govern.";
+  const a260 = makeNumber("A260 (absorbance at 260 nm)", "na260-a260", { step: "any", min: "0", value: "0.6" }); a260.input.value = "0.6";
+  const type = makeSelect("Nucleic-acid type", "na260-type", [
+    { value: "dsDNA", label: "Double-stranded DNA (factor 50)" },
+    { value: "ssDNA", label: "Single-stranded DNA (factor 33)" },
+    { value: "oligo", label: "Oligo (factor 33)" },
+    { value: "RNA", label: "RNA (factor 40)" },
+  ]);
+  const dil = makeNumber("Dilution factor", "na260-dil", { step: "any", min: "0", value: "50" }); dil.input.value = "50";
+  const a280 = makeNumber("A280 (optional, for 260/280 purity)", "na260-a280", { step: "any", min: "0", value: "0.324" }); a280.input.value = "0.324";
+  for (const f of [a260, type, dil, a280]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a260.input.value = "0.6"; type.select.value = "dsDNA"; dil.input.value = "50"; a280.input.value = "0.324"; update(); });
+  const oConc = makeOutputLine(outputRegion, "Concentration", "na260-out-conc");
+  const oPurity = makeOutputLine(outputRegion, "260/280 purity", "na260-out-purity");
+  const oNote = makeOutputLine(outputRegion, "Note", "na260-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeNucleicAcidA260({ a260: readNum(a260.input), na_type: type.select.value, dilution_factor: readNum(dil.input), a280: readNum(a280.input) });
+    if (r.error) { oConc.textContent = r.error; oPurity.textContent = ""; oNote.textContent = ""; return; }
+    oConc.textContent = fmt(r.concentration_ng_ul, 1) + " ng/uL (factor " + r.factor + ")";
+    oPurity.textContent = r.purity_260_280 !== null ? fmt(r.purity_260_280, 2) + (r.clean ? " - clean" : " - below threshold, protein/phenol carryover") : "- (enter A280)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [a260.input, type.select, dil.input, a280.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["nucleic-acid-a260"] = renderNucleicAcidA260;

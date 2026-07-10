@@ -2093,6 +2093,7 @@ cross-check.
 | calc-lab.js | `computeMassMoles` | `{ mass_g, moles, molecular_weight }` | _ | _ | _ |
 | calc-lab.js | `computeMolarityFromStock` | `{ purity_pct = 0, density_g_ml = 0, mol_weight = 0, target_m = 0, final_volum...` | _ | _ | _ |
 | calc-lab.js | `computeMolecularWeight` | `{ formula = "" }` | _ | _ | _ |
+| calc-lab.js | `computeNucleicAcidA260` | `{ a260 = 0, na_type = "dsDNA", dilution_factor = 1, a280 = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeOd600CellCount` | `{ od600 = 0, factor_cells_per_od = 0, dilution = 1 } = {}` | _ | _ | _ |
 | calc-lab.js | `computePcrMix` | `{ number_of_reactions = 1, components = [], fudge_factor_pct = 10, }` | _ | _ | _ |
 | calc-lab.js | `computePrimerTm` | `{ sequence = "", method = "auto" } = {}` | _ | _ | _ |
@@ -2644,7 +2645,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1230.
+Row count: 1231.
 
 <!-- END function-corpus-v14 -->
 
@@ -3710,7 +3711,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (15 tiles)
+### Group T Lab (16 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3723,6 +3724,7 @@ per spec-v14 §13.1 second paragraph.
 | `molarity-dilution` | Molarity and Dilution (C1V1=C2V2) | Project (first-principles); C1 = 1.0 M / C2 = 0.1 M / V2 = 50 mL -> V1 = 5 mL stock +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `molarity-from-stock` | Molarity from Concentrated Reagent | Standard reagent preparation (stock m...; Concentrated HCl: 37% w/w, 1.19 g/mL, MW 36.46 -> 12.08 M... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `molecular-weight` | Molecular Weight from Formula | IUPAC; Na 22.99 + Cl 35.45 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `nucleic-acid-a260` | Nucleic Acid Concentration (A260) | Standard spectrophotometric nucleic-a...; A260 0.6, dsDNA (50), 1:50 dilution, A280 0.324 -> 1500 n... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `od600-cell-count` | OD600 to Cell Density | Standard microbiology spectrophotomet...; OD 0.5 * 8e8 cells/mL/OD * 1 -> 4.0e8 cells/mL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pcr-master-mix` | PCR Master Mix | Project (first-principles); 24 reactions / 10% extra / 25 uL total per rxn (12.5 mast... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `primer-tm` | Primer Melting Temperature | Wallace 1979 / Marmur & Doty 1962 (pr...; GCGGATCCATG (11 nt) via Wallace -> Tm 36 C | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3816,6 +3818,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 986. Fixture-covered or reference-cadence: 986 / 986.
+Tile count: 987. Fixture-covered or reference-cadence: 987 / 987.
 
 <!-- END tile-index-v14 -->

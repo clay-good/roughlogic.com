@@ -307,6 +307,17 @@ export const CITATIONS = {
     ],
   },
 
+  "nucleic-acid-a260": {
+    formula: "concentration = A260 x factor x dilution (factor 50 dsDNA, 33 ssDNA/oligo, 40 RNA, ug/mL per A260); purity_260_280 = A260 / A280.",
+    edition: "A260 nucleic-acid quantitation (Beer-Lambert at 260 nm; standard spectrophotometric mass factors), by name.",
+    freeAccess: "Standard molecular-biology spectrophotometry; the mass factors are established practice. The sample and instrument govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The factor is an empirical mass coefficient, not a molar one, and it differs by strandedness (ssDNA absorbs more per mass, so it reads a lower concentration at the same A260); a 260/280 below about 1.8 (DNA) or 2.0 (RNA) flags protein or phenol carryover that makes the concentration unreliable. Assumes a clean 1 cm path and a blanked instrument. A quantitation aid, not a certified assay.",
+    assumptions: [
+      { name: "Mass extinction factor", value: "50 dsDNA / 33 ssDNA, oligo / 40 RNA ug/mL per A260; empirical, not molar", source: "standard spectrophotometry" },
+    ],
+  },
+
   "declining-balance-depreciation": {
     formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",
     edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",
