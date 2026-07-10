@@ -1,8 +1,17 @@
 # roughlogic.com Specification v591 -- Quantity Slot Parsing and Prefilled Deep Links (data/search/slots.json, search-discovery.js, app.js, scripts/check-slots.mjs, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-10). Platform spec, third of the "ask it a question" search series (v589-v592). Depends on
+> **Status: LANDED (2026-07-10, package 0.178.0). Platform spec, third of the "ask it a question" search series (v589-v592). Depends on
 > v589 (normalizeQuery).** No new tile, module, or dependency; fully deterministic (a regex-and-table parser, no model).
 > Inherits spec.md through spec-v590.md.
+>
+> **As-landed deltas.** (1) The seed is **17 tiles / 27 slots**, not ~50: factory-built renderers (`_simpleRenderer` and
+> kin) call `makeNumber(f.label, f.id, ...)` with `f.id` undefined -- their inputs render with `id="undefined"`, so no
+> hash-state param can target them. Slot coverage for those tiles is blocked until the factories assign real ids (a
+> worthwhile follow-on: it would also fix label/for association on every factory tile). (2) check-slots verifies each
+> `param` as the **id-position literal of a make\* call**, not merely a string literal in the module -- field KEYS are
+> string literals too and would have passed as dead prefills. (3) Single-letter units ("v", "a") are accepted glued-only
+> ("120v", not "120 v"), so an article or dimension separator never reads as a unit. (4) search-discovery.js cap landed
+> at 8500 B (7053 B as landed), continuing from v589's 7000.
 >
 > **The gap, and the evidence for it.** A user who types *"voltage drop 120v 150 ft 20 amps"* today lands on a **blank**
 > voltage-drop tile and re-types the three numbers they just typed. The infrastructure to do better already exists and is

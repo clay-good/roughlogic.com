@@ -121,6 +121,7 @@ const DATA_MANIFESTS = [
   "./data/realestate/manifest.json",
   "./data/search/manifest.json",
   "./data/search/aliases.json",
+  "./data/search/slots.json",
 ];
 
 self.addEventListener("install", (event) => {

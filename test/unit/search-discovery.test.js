@@ -18,8 +18,11 @@ import {
   editDistance1,
   STOPWORDS,
   TOKEN_SYNONYMS,
+  extractQuantities,
+  mapSlots,
 } from "../../search-discovery.js";
 import { search as mcpSearch } from "../../mcp/catalog.mjs";
+import { parseHashRoute } from "../../routing.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -229,6 +232,82 @@ test("MCP search parity: typo query resolves through the same ranker", async () 
   const traded = await mcpSearch({ query: "voltage drop", trade: "electrical" });
   assert.ok(traded.results.every((r) => r.trades.includes("electrical")));
   assert.equal(traded.results[0].id, "voltage-drop");
+});
+
+// ---------------------------------------------------------------------------
+// spec-v591: quantity slot parsing and prefilled deep links.
+// ---------------------------------------------------------------------------
+
+test("extractQuantities: glued, spaced, fraction, comma, unitless", () => {
+  assert.deepEqual(extractQuantities("120v"), [{ value: "120", unit: "v" }]);
+  assert.deepEqual(extractQuantities("150 ft"), [{ value: "150", unit: "ft" }]);
+  assert.deepEqual(extractQuantities("3/4 in"), [{ value: "0.75", unit: "in" }]);
+  assert.deepEqual(extractQuantities("1,200 watts"), [{ value: "1200", unit: "watts" }]);
+  assert.deepEqual(extractQuantities("about 40"), [{ value: "40", unit: null }]);
+  // Single-letter units are glued-only: an article never reads as a unit.
+  assert.deepEqual(extractQuantities("for a 50 amp circuit"), [{ value: "50", unit: "amp" }]);
+  assert.deepEqual(extractQuantities("20 a"), [{ value: "20", unit: null }]);
+  // Identifier-glued digits are not quantities; bad input is empty.
+  assert.deepEqual(extractQuantities("ashrae 62.2"), [{ value: "62.2", unit: null }]);
+  assert.deepEqual(extractQuantities(null), []);
+});
+
+test("extractQuantities: a dimension pair maps nothing", () => {
+  const got = extractQuantities("10x12 shed");
+  assert.ok(got.every((qty) => qty.unit === null || qty.unit === "shed"));
+});
+
+test("mapSlots fills only unambiguous, yet-unfilled slots", () => {
+  const row = {
+    tile: "voltage-drop",
+    slots: [
+      { param: "vd-src", units: ["v", "volt", "volts"] },
+      { param: "vd-len", units: ["ft", "foot", "feet"] },
+      { param: "vd-cur", units: ["a", "amp", "amps"] },
+    ],
+  };
+  assert.deepEqual(
+    mapSlots(extractQuantities("voltage drop 120v 150 ft 20 amps"), row),
+    { "vd-src": "120", "vd-len": "150", "vd-cur": "20" },
+  );
+  // Unitless numbers never map.
+  assert.equal(mapSlots(extractQuantities("voltage drop 120 150 20"), row), null);
+  // A second quantity for an already-filled slot is dropped.
+  assert.deepEqual(
+    mapSlots(extractQuantities("100 ft or 200 ft"), row),
+    { "vd-len": "100" },
+  );
+  // Ambiguity across two slots accepting the same token drops the quantity.
+  const ambiguous = { tile: "x", slots: [
+    { param: "a1", units: ["ft"] },
+    { param: "a2", units: ["ft"] },
+  ] };
+  assert.equal(mapSlots(extractQuantities("50 ft"), ambiguous), null);
+  assert.equal(mapSlots([], row), null);
+  assert.equal(mapSlots(null, row), null);
+});
+
+test("flagship: question with numbers ranks voltage-drop and maps all three params", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  const shard = JSON.parse(
+    await readFile(resolve(ROOT, "data", "search", "slots.json"), "utf8"),
+  );
+  const query = "voltage drop 120v 150 ft 20 amps";
+  const ranked = rankTools(normalizeQuery(query).tokens, TOOLS, aliases, { limit: 3 });
+  assert.equal(ranked[0].tool.id, "voltage-drop");
+  const row = shard.tiles.find((t) => t.tile === "voltage-drop");
+  assert.ok(row, "voltage-drop missing from slots.json seed");
+  const params = mapSlots(extractQuantities(query), row);
+  assert.deepEqual(params, { "vd-src": "120", "vd-len": "150", "vd-cur": "20" });
+  // The emitted hash round-trips through the router with params intact.
+  const hash = "voltage-drop?v=1&" + new URLSearchParams(params).toString();
+  const { route } = parseHashRoute("#" + hash, new Set(TOOLS.map((t) => t.id)));
+  assert.equal(route.view, "tool");
+  assert.equal(route.id, "voltage-drop");
+  assert.equal(route.params["vd-len"], "150");
+  assert.equal(route.params["vd-cur"], "20");
+  assert.equal(route.params["vd-src"], "120");
+  assert.equal(route.params.v, "1");
 });
 
 test("end-to-end: real shards resolve representative queries", async () => {

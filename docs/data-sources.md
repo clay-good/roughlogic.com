@@ -515,8 +515,16 @@ The principle from spec.md section 5 governs every entry: the data is either pub
 - Source: Original project-authored mapping of free-text terms (industry vocabulary, regional names, misspellings, adjacent-question redirects) to existing tile ids.
 - License: MIT-licensed creative work. Not derived from any external standard or commercial taxonomy.
 - Cadence: Reviewed once per minor release. New tiles add aliases as part of the contributor checklist.
-- Shard layout: `{ aliases: [{ term, target, kind }] }` where `kind` is `industry`, `redirect`, or `adjacent`.
+- Shard layout: `{ aliases: [{ term, target, kind }] }` where `kind` is `industry`, `redirect`, `adjacent`, or (since spec-v590) `question`.
 - Privacy: No runtime fetch. Per spec-v10 §13.3 the data is bounded to fit lazy-loaded after first keystroke. No personalization, no telemetry.
+
+### data/search/slots.json (spec-v591)
+
+- Source: Original project-authored quantity-slot tables mapping unit spellings typed in a search query to a tile's own input ids, so a picked result arrives with the typed numbers prefilled.
+- License: MIT-licensed creative work. Not derived from any external standard or commercial taxonomy.
+- Cadence: Grows in review-sized batches under spec-v591; `scripts/check-slots.mjs` fails CI when a row targets a renamed input or a deleted tile.
+- Shard layout: `{ version: 1, tiles: [{ tile, slots: [{ param, units }] }] }` where `param` is the tile's DOM input id and `units` are lowercase unit spellings, unique per tile.
+- Privacy: No runtime fetch beyond the same lazy load as the aliases shard. No free text enters the hash; values are parser-canonical decimal strings.
 
 ### data/cross/glossary.json (v5, utility 271)
 

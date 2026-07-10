@@ -331,8 +331,10 @@ const CAPS = {
   // 2026-07-10 for the spec-v589 deterministic NL ranking layer
   // (stopword set, synonym table, ranker, edit-distance fallback):
   // 5925 B as landed plus the ~20% headroom rule (the spec's 6000 B
-  // estimate left under 2% headroom).
-  "search-discovery.js": 7000,
+  // estimate left under 2% headroom). Re-bumped 7000 -> 8500 B later on
+  // 2026-07-10 for the spec-v591 quantity slot parser
+  // (extractQuantities / mapSlots, 7053 B as landed + ~20% headroom).
+  "search-discovery.js": 8500,
   // v10 Phase B.2 per-tile meta-object registry. Grows incrementally
   // toward full TOOLS coverage; cap raised in lockstep. Bumped from
   // 7000 -> 9000 B on 2026-05-18 (spec-v13 Phase E seed of 55

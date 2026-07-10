@@ -294,7 +294,7 @@ roughlogic.com/
   data/                 sharded, hashed reference JSON (per group)
   specs/                spec.md .. spec-v478.md (inheriting build specs)
   docs/                 architecture, correctness, data-sources, a11y, ...
-  scripts/              build + 28 lint/audit gates + data pipeline
+  scripts/              build + 29 lint/audit gates + data pipeline
   test/                 unit (Node test runner) + integration (Playwright)
   dist/                 build output: prerendered shells + sitemap (generated)
 ```
@@ -573,7 +573,7 @@ The site has no command-line interface of its own. The repository ships these np
 
 ### The lint chain
 
-`npm run lint` runs 28 gates in sequence. They are the project's executable spec: a violation fails CI.
+`npm run lint` runs 29 gates in sequence. They are the project's executable spec: a violation fails CI.
 
 | Gate | Guards |
 |---|---|
@@ -585,6 +585,7 @@ The site has no command-line interface of its own. The repository ships these np
 | `check-citation-freshness` | Citation editions are current. |
 | `build-citation-strings --check` | Generated citation strings are not stale. |
 | `check-discoverability` | Search aliases + group/tile counts are consistent. |
+| `check-slots` | Every `data/search/slots.json` prefill row targets a live tile and a real DOM input id (id-position literal in the renderer source), with unit tokens unique per tile. |
 | `check-readme-counts` | The catalog counts the README states (tile / module / group / sitemap-URL totals, including the Mermaid-diagram nodes that glue the number to `\n` and evade a word-boundary substitution) match the live values. |
 | `check-doc-links` | Every relative markdown link in the living docs (README, ARCHITECTURE, `docs/`, `mcp/README`) resolves to a real file; `CHANGELOG.md` and `specs/` are excluded as append-only records whose links to spec-v107-deleted files stay as written. |
 | `check-worked-examples` | Every tile has a worked-example fixture. |

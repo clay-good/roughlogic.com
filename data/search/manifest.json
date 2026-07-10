@@ -10,9 +10,15 @@
       "file": "aliases.json",
       "name": "Search aliases (industry vocab + redirects + adjacent-question)",
       "gzip_size_bytes": 72269
+    },
+    {
+      "file": "slots.json",
+      "name": "Quantity slot tables (search prefill deep links, spec-v591)",
+      "gzip_size_bytes": 820
     }
   ],
   "hashes": {
-    "aliases.json": "pending"
+    "aliases.json": "pending",
+    "slots.json": "pending"
   }
 }

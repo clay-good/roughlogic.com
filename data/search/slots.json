@@ -1,0 +1,311 @@
+{
+  "version": 1,
+  "_comment": "spec-v591 quantity-slot tables. One row per tile; param = the DOM input id (the literal passed to makeNumber in the renderer, the same key applyHashState reads), units = lowercase spellings accepted after a number in a search query. Consumed by mapSlots (search-discovery.js) to build prefilled hash deep links from the combobox. Gated by scripts/check-slots.mjs.",
+  "tiles": [
+    {
+      "tile": "camera-lens-fov",
+      "slots": [
+        {
+          "param": "clf-di",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "cg-load-share",
+      "slots": [
+        {
+          "param": "cls-w",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
+          ]
+        },
+        {
+          "param": "cls-span",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "crane-net-capacity",
+      "slots": [
+        {
+          "param": "cnc-load",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "drying-goal",
+      "slots": [
+        {
+          "param": "dg-ot",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "duct-sizing",
+      "slots": [
+        {
+          "param": "ds-cfm",
+          "units": [
+            "cfm"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "fire-friction",
+      "slots": [
+        {
+          "param": "ff-q",
+          "units": [
+            "gpm"
+          ]
+        },
+        {
+          "param": "ff-l",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "friction-loss",
+      "slots": [
+        {
+          "param": "fl-len",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        },
+        {
+          "param": "fl-flow",
+          "units": [
+            "gpm"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "lumber-spans",
+      "slots": [
+        {
+          "param": "ls-tw",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "manual-j-cooling",
+      "slots": [
+        {
+          "param": "mjc-fa",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        },
+        {
+          "param": "mjc-od",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "manual-j-heating",
+      "slots": [
+        {
+          "param": "mjh-fa",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        },
+        {
+          "param": "mjh-od",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "ohms-law",
+      "slots": [
+        {
+          "param": "ol-v",
+          "units": [
+            "v",
+            "volt",
+            "volts"
+          ]
+        },
+        {
+          "param": "ol-i",
+          "units": [
+            "a",
+            "amp",
+            "amps"
+          ]
+        },
+        {
+          "param": "ol-p",
+          "units": [
+            "w",
+            "watt",
+            "watts"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "pdp",
+      "slots": [
+        {
+          "param": "pdp-np",
+          "units": [
+            "psi"
+          ]
+        },
+        {
+          "param": "pdp-e",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "psychrometric",
+      "slots": [
+        {
+          "param": "py-t",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "roof-pitch",
+      "slots": [
+        {
+          "param": "rp-r",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "stairs",
+      "slots": [
+        {
+          "param": "st-tr",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "truss-capacity",
+      "slots": [
+        {
+          "param": "tr-s",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "voltage-drop",
+      "slots": [
+        {
+          "param": "vd-len",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        },
+        {
+          "param": "vd-cur",
+          "units": [
+            "a",
+            "amp",
+            "amps"
+          ]
+        },
+        {
+          "param": "vd-src",
+          "units": [
+            "v",
+            "volt",
+            "volts"
+          ]
+        }
+      ]
+    }
+  ]
+}

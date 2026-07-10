@@ -1691,6 +1691,40 @@ function bindSearch() {
     }).catch(() => { discoveryLoading = false; });
   }
 
+  // spec-v591 slot tables: tile id -> { slots: [{ param, units }] }.
+  // Lazy-loaded with the aliases on first search interaction; failure is
+  // a no-op (picks navigate to the bare tile hash, exactly as before).
+  let slotsByTile = null;
+  let slotsLoading = false;
+  function ensureSlots() {
+    if (slotsByTile || slotsLoading) return;
+    slotsLoading = true;
+    fetch("data/search/slots.json", { credentials: "omit" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (!json || !Array.isArray(json.tiles)) return;
+        slotsByTile = new Map();
+        for (const row of json.tiles) {
+          if (row && typeof row.tile === "string" && Array.isArray(row.slots)) {
+            slotsByTile.set(row.tile, row);
+          }
+        }
+      })
+      .catch(() => { /* prefill is opt-in; failure is a no-op */ });
+  }
+
+  // Prefill hash for a picked tile: numbers-with-units in the typed query
+  // map onto the tile's hash-state params (spec-v591). Keys come only
+  // from the static shard; values are parser-canonical decimal strings.
+  function prefillHash(tool, typed) {
+    if (!discovery || !slotsByTile || !typed) return tool.id;
+    const row = slotsByTile.get(tool.id);
+    if (!row) return tool.id;
+    const params = discovery.mapSlots(discovery.extractQuantities(typed), row);
+    if (!params) return tool.id;
+    return tool.id + "?v=1&" + new URLSearchParams(params).toString();
+  }
+
   // Rank tiles for a query. Preferred path (spec-v589): stopword-stripped
   // token ranking via search-discovery.js rankTools. Fallback (module not
   // yet loaded, or the query normalizes to nothing, e.g. a bare "how"):
@@ -1743,13 +1777,14 @@ function bindSearch() {
 
   function pick(tool) {
     if (!tool) return;
+    const typed = input.value;
     input.value = "";
     matches = [];
     clearChildren(list);
     setExpanded(false);
     setActive(-1);
     input.blur();
-    navigateTo(tool.id);
+    navigateTo(prefillHash(tool, typed));
   }
 
   function render(query) {
@@ -1790,6 +1825,7 @@ function bindSearch() {
 
   function loadAndRender() {
     ensureDiscovery();
+    ensureSlots();
     ensureTools().then(() => { initSearchData(); ensureAliases(); render(input.value); });
   }
   input.addEventListener("focus", loadAndRender);

@@ -26,7 +26,14 @@ test("bindSearch lazy-loads aliases.json via ensureAliases", async () => {
   // and the alias fetch off the first-paint path. spec-v589 adds the
   // ranking module to the same lazy path (ensureDiscovery).
   assert.match(t, /input\.addEventListener\("focus",\s*loadAndRender\)/);
-  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+  assert.match(t, /function loadAndRender\(\)\s*\{\s*ensureDiscovery\(\);\s*ensureSlots\(\);\s*ensureTools\(\)\.then\(\(\)\s*=>\s*\{\s*initSearchData\(\);\s*ensureAliases\(\);/);
+});
+
+test("the spec-v591 slot shard lazy-loads and prefills the pick hash", async () => {
+  const t = await readApp();
+  assert.match(t, /fetch\("data\/search\/slots\.json",\s*\{\s*credentials:\s*"omit"\s*\}\)/);
+  assert.match(t, /discovery\.mapSlots\(discovery\.extractQuantities\(typed\),\s*row\)/);
+  assert.match(t, /navigateTo\(prefillHash\(tool,\s*typed\)\)/);
 });
 
 test("the spec-v589 ranking module lazy-loads off the first-paint path", async () => {

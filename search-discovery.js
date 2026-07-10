@@ -37,6 +37,18 @@
 //
 //   editDistance1(a, b) -> boolean
 //     Damerau-Levenshtein distance <= 1 (transposition included).
+//
+// spec-v591 adds the quantity slot parser feeding prefilled deep links:
+//
+//   extractQuantities(query) -> [{ value, unit }]
+//     Deterministic number+unit extraction ("120v", "150 ft", "3/4 in",
+//     "1,200"). `value` is a canonical decimal string; `unit` is the
+//     lowercase unit token or null. Unitless numbers never map.
+//
+//   mapSlots(quantities, slotRow) -> { param: value, ... } | null
+//     Fills a tile's hash-state params from a data/search/slots.json row.
+//     A quantity maps only when exactly one yet-unfilled slot accepts its
+//     unit token; any ambiguity drops that quantity.
 
 export function resolveQuery(query, aliases, toolIds) {
   if (typeof query !== "string") return null;
@@ -423,4 +435,69 @@ export function rankTools(tokens, tools, aliases, opts) {
   return out
     .slice(0, limit)
     .map((r) => ({ tool: r.tool, score: r.score, viaTypo: r.viaTypo }));
+}
+
+// ---------------------------------------------------------------------------
+// spec-v591: quantity slot parsing for prefilled deep links.
+// ---------------------------------------------------------------------------
+
+// Number grammar: a simple fraction ("3/4"), a thousands-comma group
+// ("1,200"), or a plain decimal. The match must not sit inside a longer
+// number-ish token ("62.2", "6-3-2" never yield partial quantities).
+const QUANTITY_RE = /(\d+\s*\/\s*\d+|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)/g;
+
+export function extractQuantities(query) {
+  if (typeof query !== "string" || !query) return [];
+  const q = query.toLowerCase();
+  const out = [];
+  QUANTITY_RE.lastIndex = 0;
+  let m;
+  while ((m = QUANTITY_RE.exec(q)) !== null) {
+    const before = m.index === 0 ? "" : q[m.index - 1];
+    const afterIdx = m.index + m[0].length;
+    // Anchored: a digit run glued to a preceding letter / number
+    // punctuation is part of an identifier ("m3", "62.2" tail), not a
+    // quantity.
+    if (before && /[a-z0-9.,/-]/.test(before)) continue;
+    let value;
+    const frac = m[0].match(/^(\d+)\s*\/\s*(\d+)$/);
+    if (frac) {
+      const denom = Number(frac[2]);
+      if (denom === 0) continue;
+      value = String(parseFloat((Number(frac[1]) / denom).toFixed(6)));
+    } else {
+      value = m[0].replace(/,/g, "");
+    }
+    // Unit token: glued ("120v") or exactly one space away ("150 ft").
+    // Single-letter units are accepted glued only, so an article ("a")
+    // or a dimension separator ("x") never reads as a unit.
+    let unit = null;
+    const rest = q.slice(afterIdx);
+    const glued = rest.match(/^([a-z%][a-z%/]{0,7})(?![a-z0-9])/);
+    const spaced = rest.match(/^ ([a-z][a-z/]{1,7})(?![a-z0-9])/);
+    if (glued) unit = glued[1];
+    else if (spaced) unit = spaced[1];
+    out.push({ value, unit });
+  }
+  return out;
+}
+
+export function mapSlots(quantities, slotRow) {
+  if (!Array.isArray(quantities)) return null;
+  if (!slotRow || !Array.isArray(slotRow.slots)) return null;
+  const filled = {};
+  for (const qty of quantities) {
+    if (!qty || typeof qty.value !== "string") continue;
+    if (typeof qty.unit !== "string" || !qty.unit) continue; // unitless never maps
+    const candidates = slotRow.slots.filter(
+      (s) =>
+        s &&
+        typeof s.param === "string" &&
+        Array.isArray(s.units) &&
+        s.units.includes(qty.unit) &&
+        !(s.param in filled),
+    );
+    if (candidates.length === 1) filled[candidates[0].param] = qty.value;
+  }
+  return Object.keys(filled).length > 0 ? filled : null;
 }
