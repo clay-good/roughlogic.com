@@ -1,15 +1,15 @@
 {
   "name": "search",
-  "version": "2026-05-10",
+  "version": "2026-07-10",
   "fetched": "2026-05-10",
   "edition": "Original project-authored search-discoverability metadata for spec-v10 §6 (D.1 aliases). MIT-licensed creative work; not derived from any external standard. Reviewed once per minor release.",
-  "asOf": "2026-05-10",
+  "asOf": "2026-07-10",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "aliases.json",
       "name": "Search aliases (industry vocab + redirects + adjacent-question)",
-      "gzip_size_bytes": 0
+      "gzip_size_bytes": 72269
     }
   ],
   "hashes": {

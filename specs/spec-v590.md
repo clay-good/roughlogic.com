@@ -1,6 +1,11 @@
 # roughlogic.com Specification v590 -- Question-Phrase Alias Corpus Expansion (data/search/aliases.json, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-10). Platform spec, second of the "ask it a question" search series (v589-v592). Data-only.**
+> **Status: PHASE 1 LANDED (2026-07-10, package 0.177.0). Platform spec, second of the "ask it a question" search series (v589-v592). Data-only.**
+> Phase 1 as landed: 1,175 `kind: "question"` rows over 100 tiles (10-14 each; the ~100-tile set = leader-key shortcuts +
+> two head tiles per group + most-aliased fill). One gate delta: `scripts/check-discoverability.mjs`'s kind allowlist had
+> to learn `question` (the spec assumed only consumers default unknown kinds). Mechanical review pipeline additionally
+> enforced a top-3 rank check through the v589 ranker; 2 drafted rows were dropped by it. Shard 72.3 KB gz. Phase 2
+> (rest of the catalog, group-sized batches) remains open under this spec.
 > No new tile, module, code path, or dependency. Runtime stays 100% deterministic: this spec grows a static JSON shard.
 > AI assistance is permitted **at authoring time only** (the same way it drafts tiles and specs), with every generated row
 > human-reviewed before commit -- the README's "No AI" runtime constraint is untouched. Inherits spec.md through

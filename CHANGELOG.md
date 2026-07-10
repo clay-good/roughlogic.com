@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): land spec-v590 Phase 1 -- question-phrase alias corpus; 2026-07-10
+
+`data/search/aliases.json` grows 4,531 -> 5,706 rows: 1,175 question-phrase aliases (new `kind: "question"`) covering the 100 highest-traffic tiles (leader-key shortcut set, each group's head tiles, most-aliased tiles) at 10-14 phrasings each -- "what gauge wire for a 30 amp breaker", "how much can the crane pick after deductions". Drafted with AI at authoring time per the spec, then mechanically reviewed: charset/style gate, live-target and id-collision checks, global case-insensitive dedupe, stopword-survival through `normalizeQuery`, and a top-3 rank check through the v589 ranker (2 drafted rows dropped as better answered by other tiles). `check-discoverability` accepts the new kind; runtime treats all kinds uniformly. Shard is lazy-loaded (not home-payload): 659 KB raw / 72.3 KB gzipped, logged in `data/search/manifest.json`. Verified end-to-end: 5 committed phrases typed verbatim into the deployed combobox each surface their tile first at 320 px.
+
 ### chore(sizes): raise group-shell gzip cap 42 -> 48 KB (fixes CI red since v547); 2026-07-10
 
 The v489-v588 single-tile campaign's Group E structural singles (`steel-floor-vibration` v547 onward) took `groups/construction/index.html` past the 42 KB group-shell gzip cap (~43.4 KB). `check-shells` runs only in CI's integration job, not in push lint, so local landings stayed green while every CI run from v547 through v589 failed on this one cap. Raised to **48 KB** (~11% headroom); also re-ran the masked `check:shell-mobile` step locally (1,157 checks, zero horizontal scroll).

@@ -1,6 +1,6 @@
 {
   "_comment": "v10 Phase D.1 search aliases (spec-v10 §6.1). One row per alias mapping a free-text term to a tile id. The shard is lazy-loaded on the first keystroke into the home-view search bar (bindSearch / ensureAliases in app.js); on exact-term match the user is routed to the target tile via the same path as a tool-name suggestion. Per spec-v10 §13.3 the data file is bounded at 5 KB gzipped. Industry vocabulary, misspellings, abbreviations, and adjacent-question redirects only. The resolveQuery / matchAliasPrefix helpers in search-discovery.js are the canonical pure-functional resolvers (exercised by test/unit/search-discovery.test.js); app.js currently inlines the equivalent exact-term lookup for the simple case.",
-  "_updated": "2026-06-30",
+  "_updated": "2026-07-10",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
     {
@@ -22657,6 +22657,5881 @@
       "term": "ada ramp handrails",
       "target": "ada-ramp-slope",
       "kind": "industry"
+    },
+    {
+      "term": "how many feet in a meter",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "convert psi to feet of head",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many gallons in a cubic foot",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "convert celsius to fahrenheit",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many btu in a kilowatt hour",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "convert inches of water column to psi",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many pounds in a kilogram",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many square feet in an acre",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "convert kpa to psi",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many liters in a gallon",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "convert horsepower to watts",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many cubic feet in a cubic yard",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "convert gpm to liters per minute",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many millimeters in an inch",
+      "target": "unit-converter",
+      "kind": "question"
+    },
+    {
+      "term": "how many amps from watts and volts",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure amps from voltage and resistance",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "how many watts is 15 amps at 120 volts",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "how to find resistance from volts and amps",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "how many amps does a 1500 watt heater pull",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "watts to amps at 240 volts",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "how to calculate wattage from amps and volts",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "amps from ohms and volts",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "power draw from voltage and current",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "current through a resistor from voltage",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "volts times amps equals watts calculator",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "how many amps is 2000 watts",
+      "target": "ohms-law",
+      "kind": "question"
+    },
+    {
+      "term": "what size wire for 50 amps",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "what gauge wire for a 30 amp breaker",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "how many amps can 12 gauge wire handle",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "can i run 40 amps on 8 gauge copper",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "how many amps is 10 awg good for",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "copper vs aluminum wire amp rating",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "what wire gauge for a 60 amp subpanel",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "wire derating in a hot attic",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "max amps for 6 awg aluminum",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "what size copper wire for 100 amp service",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "how many amps can 14 gauge handle",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "amp rating for 4 gauge wire",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "what size wire do i need for a stove circuit",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "12/2 wire max amps",
+      "target": "wire-ampacity",
+      "kind": "question"
+    },
+    {
+      "term": "how much voltage drop over 200 feet",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "voltage drop on a 100 foot run of 12 gauge",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "what size wire for a 300 foot run",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "how far can i run 10 gauge wire on 30 amps",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "voltage drop for a well pump run",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "will my lights dim on a long wire run",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "3 phase voltage drop over distance",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure voltage loss on a long circuit",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "max distance for 12 awg at 20 amps",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "voltage drop to a detached garage",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "percent voltage drop on a feeder",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "how many volts do i lose per 100 feet of wire",
+      "target": "voltage-drop",
+      "kind": "question"
+    },
+    {
+      "term": "how much psi do i lose per 100 feet of pipe",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "pressure drop in 3/4 inch copper pipe",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "hazen williams friction loss for pvc pipe",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "how much pressure loss at 10 gpm through 1 inch pipe",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss in pex vs copper",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "pipe friction per foot at a given gpm",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "how much head do i lose pumping through pipe",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "gas pipe pressure drop over length",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "psi loss through a long water line",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "does higher gpm increase pipe friction loss",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss in 1/2 inch water line",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure pressure drop in a supply line",
+      "target": "friction-loss",
+      "kind": "question"
+    },
+    {
+      "term": "what size duct for 400 cfm",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how many cfm can a 6 inch duct handle",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "round duct diameter for a given cfm",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what size rectangular duct for 800 cfm",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "duct diameter at 0.1 friction rate",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how big of a duct do i need for a bedroom",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "cfm through 8 inch flex duct",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "convert round duct to rectangular equivalent",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what size return duct for a 3 ton unit",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how many cfm per duct diameter",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "trunk duct size for 1200 cfm",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "6 inch vs 8 inch duct airflow",
+      "target": "duct-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what pressure should r410a be at 70 degrees",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "saturation temperature for r410a at 118 psi",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "r22 pressure temperature relationship",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "refrigerant saturation temp from gauge pressure",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "what should my suction pressure be for r410a",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "convert refrigerant pressure to temperature",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "r134a pressure at room temperature",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "condensing temperature from head pressure",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "pt chart for r32",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "boiling point of refrigerant at a given psi",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "what pressure equals 40 degree evaporator temp",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "r407c temp at a given pressure",
+      "target": "refrigerant-pt",
+      "kind": "question"
+    },
+    {
+      "term": "how far can a 2x10 span",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "max span for 2x8 floor joists",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "can a 2x6 span 10 feet",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "joist span for southern yellow pine",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "what size joist to span 14 feet",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "2x6 rafter span",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "deck joist span for 2x8",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "max ceiling joist span for 2x4",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "how long can a 2x10 be without support",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "lumber size to span 16 feet",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "spf vs doug fir span difference",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "2x12 span at 16 on center",
+      "target": "lumber-spans",
+      "kind": "question"
+    },
+    {
+      "term": "how many yards for a 10x10 slab",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how much concrete for a 24x24 garage slab",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "cubic yards in a footing",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "concrete needed for a 4 inch thick slab",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how much concrete for sonotube footings",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "yards of concrete per square foot at 4 inches",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how many yards in a 20x20 pad",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "concrete for a 12 inch footing 30 feet long",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how much mud do i need for a slab pour",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "cubic yards for a column pour",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure concrete for footings and stem wall",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "concrete volume for a driveway pour",
+      "target": "concrete",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure total external static pressure",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "add up pressure drops across duct fittings",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "static pressure across a filter and coil",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "tesp from component pressure drops",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "external static pressure for a furnace blower",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "pressure drop of filter plus coil plus ducts",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "how much static does my duct system add",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "is 0.8 inches of static pressure too high",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "inches of water column across a duct system",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "total static from supply and return drops",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "blower static pressure budget",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "duct system resistance in inches wc",
+      "target": "static-pressure-hvac",
+      "kind": "question"
+    },
+    {
+      "term": "what size water line for a house",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how many fixture units on 3/4 inch pipe",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "drain pipe size for a bathroom group",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what size main water supply for 3 bathrooms",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how many dfu can a 3 inch drain handle",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what size drain line for a kitchen sink",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "water supply pipe size from fixture count",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how many fixtures on a half inch line",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what size sewer pipe for a house",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "pipe size for a shower and lavatory combined",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "3/4 vs 1 inch water service sizing",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "how big should my cold water main be",
+      "target": "pipe-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "what size ac unit for a 2000 square foot house",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "how many tons of ac do i need",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "btu needed to cool a room",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "how many btu per square foot for cooling",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "ac tonnage for my house",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "what size air conditioner for 1500 sq ft",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "cooling btu for a garage",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "how many tons for 2400 square feet",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "what tonnage heat pump to cool my home",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "quick ac sizing estimate for a house",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "ac size for a sunroom addition",
+      "target": "manual-j-cooling",
+      "kind": "question"
+    },
+    {
+      "term": "what size furnace for a 2000 square foot house",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "how many btu to heat a garage",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "furnace btu per square foot",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "heating btu needed for my house",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "what size heater for a 24x24 shop",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "how many btu to heat 1500 sq ft",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "boiler size for a small house",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "furnace size for winter design temperature",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "what size heat pump for heating my home",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "heat loss estimate for sizing a furnace",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "btu to heat a basement",
+      "target": "manual-j-heating",
+      "kind": "question"
+    },
+    {
+      "term": "how to find dew point from temperature and humidity",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "grains per pound from temp and rh",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "what is the dew point at 75 degrees and 60 percent",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "gpp from temperature and relative humidity",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "vapor pressure from air temperature and rh",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "will condensation form on a cold pipe",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "convert relative humidity to grains",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "moisture in the air at a given temp and rh",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "how many grains of moisture in the air",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "at what temp will this air hit dew point",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "humidity ratio from dry bulb and rh",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "dew point reading for a drying job",
+      "target": "psychrometric",
+      "kind": "question"
+    },
+    {
+      "term": "target gpp for a water damage job",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "what should indoor grains be compared to outside",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "drying target based on outdoor humidity",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "how dry should the air be inside a flooded house",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "indoor gpp goal from outdoor conditions",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "how low should grains be for structural drying",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "dehumidifier target grains for a wet building",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "what gpp counts as dry inside",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "indoor vs outdoor grains for drying",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "how to set moisture targets on a restoration job",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "grains reading to stop drying equipment",
+      "target": "drying-goal",
+      "kind": "question"
+    },
+    {
+      "term": "how many steps for 8 feet of rise",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "stair riser height for a 9 foot ceiling",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure rise and run for stairs",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "how many risers in a staircase",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "stair tread depth and riser height",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "what is a comfortable step height for stairs",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "total run length for a set of stairs",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "how much room do stairs take up",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "headroom clearance over a stairway",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "deck stair rise and run",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "stringer layout rise per step",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "how many steps from basement to first floor",
+      "target": "stairs",
+      "kind": "question"
+    },
+    {
+      "term": "what angle is a 4/12 roof",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "convert roof pitch to degrees",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "how steep is a 6/12 pitch",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "roof pitch from rise and run",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "what pitch is a 30 degree roof",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "roof slope in percent",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "pitch of my roof from measurements",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "degrees to roof pitch conversion",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure roof pitch with a level and tape",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "8/12 roof angle in degrees",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "roof rise per foot of run",
+      "target": "roof-pitch",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss in 1 3/4 hose at 150 gpm",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "how much friction loss per 100 feet of hose",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "hose friction loss at 250 gpm",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss in 2 1/2 inch attack line",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "fl for 5 inch supply hose",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "psi lost per length of fire hose",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss coefficient for 1.75 hose",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "how much pressure does a 200 foot handline lose",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "does higher gpm raise hose friction loss",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss for a preconnect line",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "friction loss in ldh",
+      "target": "fire-friction",
+      "kind": "question"
+    },
+    {
+      "term": "what pressure to pump a 200 foot 1 3/4 line",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "pump pressure for a fog nozzle at 100 psi",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure engine pressure for a handline",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "pump pressure with elevation gain to a second floor",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "nozzle pressure plus friction loss equals what pump pressure",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "what psi do i pump for a smooth bore nozzle",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "engine pressure for a 2 1/2 attack line",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "how much to add for elevation when pumping hose",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "pump discharge for a master stream",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "correct pump panel pressure for a preconnect",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "psi at the pump for a 150 gpm line",
+      "target": "pdp",
+      "kind": "question"
+    },
+    {
+      "term": "total cost of lumber at a price per board",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "how much will 40 sheets of drywall cost",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "cost of wire per foot times length",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "price out materials for a job",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "how much does 20 yards of concrete cost",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "total price for 500 feet of pipe",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "add up material prices for an estimate",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "cost per square foot times area",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "how much for 12 sticks of conduit",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "figure material cost for a bid",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "what will the pipe and fittings cost",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "unit price times quantity total",
+      "target": "material-cost",
+      "kind": "question"
+    },
+    {
+      "term": "what color is the neutral wire",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "which wire is hot black or red",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "is the ground wire green or bare",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "what does a yellow pipe marking mean",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "what color is the gas line supposed to be",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "what color is 277 volt wiring",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "480v wire color phases",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "what color pipe is potable water",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "blue wire vs white wire which is neutral",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "what do pipe label colors mean",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "which color wire goes to the brass screw",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "what color are the phases on a 3 phase panel",
+      "target": "color-codes",
+      "kind": "question"
+    },
+    {
+      "term": "how much strength does a knot take out of rope",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "what knot to tie off a rope for rigging",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "best knot for hoisting tools on a rope",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "does a knot weaken the rope",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "bowline vs figure 8 strength",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "what knot for rescue rope work",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "rope strength loss from knots",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "how to tie a clove hitch on a pole",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "knot for lowering tools from a roof",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "which knot holds under load on rope",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "figure 8 knot strength reduction",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "knot efficiency of a rope",
+      "target": "knot-reference",
+      "kind": "question"
+    },
+    {
+      "term": "how do carriers bill by box size",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "billable weight from box dimensions",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "ups fedex divisor for package weight",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure shipping weight from length width height",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "when does box size cost more than actual weight",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "cubic size divided by 139",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "shipping charge by package volume",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "is my package billed by size or weight",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "volumetric weight of a box",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "what weight will fedex charge for a big light box",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "package dimensions to billable pounds",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "freight billed on cube not weight",
+      "target": "dim-weight",
+      "kind": "question"
+    },
+    {
+      "term": "what freight class is my pallet",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "pounds per cubic foot of a pallet",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure freight class from weight and size",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "ltl class from pallet dimensions",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "density of my shipment in lb per cubic foot",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "what class is 8 pounds per cubic foot freight",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "nmfc class by density",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "pallet weight and size to freight class",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "how dense is my freight shipment",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "ltl freight class lookup by density",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "shipment density for a freight quote",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "class 70 vs class 125 freight density",
+      "target": "freight-density",
+      "kind": "question"
+    },
+    {
+      "term": "how fast should my boat go at this rpm",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "prop pitch and rpm to boat speed",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "percent slip of my boat prop",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "is my prop slipping too much",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "theoretical boat speed from prop pitch",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "gear ratio rpm and pitch to speed on a boat",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "why is my boat slower than the prop pitch says",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "outboard prop slip percent",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "boat gps speed vs prop speed",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "how much prop slip is normal for a planing hull",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "speed difference from a prop pitch change",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "boat mph per 100 rpm",
+      "target": "prop-slip",
+      "kind": "question"
+    },
+    {
+      "term": "cubic inches from bore and stroke",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure engine compression ratio",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "what compression ratio with a thinner head gasket",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "bore and stroke to liters",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "static compression from chamber volume",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "compression ratio after milling the head",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "engine size in liters from bore and stroke",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "piston dome effect on compression ratio",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "deck height and gasket thickness compression",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "how many cubic inches is a stroker motor",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "compression ratio with flat top pistons",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "what compression ratio for pump gas",
+      "target": "displacement-cr",
+      "kind": "question"
+    },
+    {
+      "term": "gallons per acre from sprayer speed and nozzle",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what gpm nozzle for 15 gallons per acre",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "sprayer calibration gallons per acre",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how much spray per acre at 6 mph",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "nozzle spacing speed gpa formula",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "boom sprayer output per acre",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "5940 sprayer formula",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how fast to drive for target gallons per acre",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "sprayer nozzle flow for 20 gpa",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "gallons per acre at 20 inch nozzle spacing",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "calibrate my sprayer gpa",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "spray rate per acre from gpm",
+      "target": "gpa-rate",
+      "kind": "question"
+    },
+    {
+      "term": "board feet in a log",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "doyle scale for a 16 foot log",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "how much lumber in a log by diameter",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "scribner vs doyle board feet",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "log scale from small end diameter",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "how many board feet in a 20 inch log",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "international quarter inch log rule",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "estimate lumber from a sawlog",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "log diameter and length to board feet",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "how to scale logs for the mill",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "bf per log doyle",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "sawlog volume by log rule",
+      "target": "timber-cruise",
+      "kind": "question"
+    },
+    {
+      "term": "pounds of chlorine per day from dose",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "mgd times mg/l times 8.34",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "chemical feed pounds per day",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "how many pounds of alum for 2 mgd",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "lbs per day chemical dose water plant",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "dosage to pounds formula water treatment",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "chemical feed rate at 65 percent purity",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "pounds per day from flow and dose",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "how much chemical to feed per mgd",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "convert mg/l dose to lbs per day",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "chlorine feed rate in pounds",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "8.34 conversion factor water dose",
+      "target": "pounds-formula",
+      "kind": "question"
+    },
+    {
+      "term": "filter loading rate gpm per square foot",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "backwash flow for a sand filter",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how many gpm per square foot on a filter",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "rapid sand vs high rate filter loading",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "water plant filter flow rate check",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "backwash rate in gpm per sq ft",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "is my filter loading rate too high",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "filter area from flow and loading rate",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "sand filter backwash gallons per minute",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "gpm/ft2 filtration rate",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how much water to backwash a filter",
+      "target": "filter-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how much weight can the truss hold",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "point loads on stage truss",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "truss span load chart check",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "can i hang this load on the truss",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "max point load at mid span of truss",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "rigging points on box truss",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "truss allowable load per span",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "distributed vs point load on truss",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how many pounds per foot can truss take",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "stage truss reactions at the supports",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "is my truss overloaded",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "load capacity of a 20 foot truss span",
+      "target": "truss-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how many milliseconds of delay for speakers",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "delay tower distance to ms",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "speaker delay per foot",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "how much delay for speakers 100 feet back",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "align delay speakers to the main pa",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "speed of sound delay for speakers",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "ms of delay for fill speakers",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "haas effect delay offset",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "time align subs to tops",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "delay speakers by distance",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "pa delay time from distance",
+      "target": "time-alignment",
+      "kind": "question"
+    },
+    {
+      "term": "scale a recipe from 4 to 10 servings",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "double a recipe measurements",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "convert recipe cups to grams",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "batch up a recipe for 50 portions",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "how much flour if i triple the recipe",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "recipe conversion factor for servings",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "half a recipe with odd measurements",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "scale ingredients by batch size",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "grams instead of cups when scaling a recipe",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "resize a recipe for a bigger pan",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "multiply recipe ingredients",
+      "target": "recipe-scale",
+      "kind": "question"
+    },
+    {
+      "term": "edible portion cost per pound",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "how much usable meat after trim",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "yield percent after trimming and cooking",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "ap to ep cost conversion",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "true cost per pound after waste",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "food yield percentage",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "how much raw meat to buy for 10 lb cooked",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "trim loss cost of food",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "raw weight to cooked weight cost",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "what does the meat really cost after trim",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "ep weight from as purchased weight",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "cooking loss percentage of meat",
+      "target": "yield-ep",
+      "kind": "question"
+    },
+    {
+      "term": "how far is 100 paces",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "pace count per 100 meters",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "distance from step count",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "how many paces to a chain",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "convert my paces to feet",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "pace count correction on a slope",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "walking distance by counting steps",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "how long is my stride in feet",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "paces per mile",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "measure distance by pacing",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "terrain correction for pace count",
+      "target": "pacing-distance",
+      "kind": "question"
+    },
+    {
+      "term": "convert magnetic bearing to true",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "compass declination adjustment",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "east declination add or subtract",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "true north vs magnetic north correction",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "how to correct a compass bearing for declination",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "magnetic azimuth to true azimuth",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "declination east is least rule",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "compass bearing to map bearing",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "adjust a bearing for 12 degrees declination",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "grid vs magnetic bearing conversion",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "what is my true heading from the compass",
+      "target": "bearing-conversion",
+      "kind": "question"
+    },
+    {
+      "term": "is lumber expensive right now compared to history",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "copper price compared to past years",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "historical price of diesel",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "is this a good price for steel",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "lumber price percentile vs history",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "where is the price of copper vs normal",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "commodity price history for the trades",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "has diesel ever been this high",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "typical price range for lumber",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "material price compared to 5 year history",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "price band for plywood over time",
+      "target": "historical-pricing",
+      "kind": "question"
+    },
+    {
+      "term": "depreciation per year on equipment",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "write off a truck over 5 years evenly",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "book value after 3 years of depreciation",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "salvage value depreciation formula",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "how much depreciation each year straight line",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "equal annual depreciation on a machine",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "cost minus salvage over useful life",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "annual depreciation on a work van",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "depreciate tools evenly over their life",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "accumulated depreciation after 4 years",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "how long to depreciate equipment evenly",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "yearly depreciation from cost salvage and life",
+      "target": "straight-line-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "5 year property depreciation schedule",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "irs depreciation table for a truck",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "half year convention depreciation",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "macrs percentage each year",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "depreciation year by year for equipment",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "7 year class life depreciation",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "200 percent declining balance schedule",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "tax depreciation on a work truck",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "first year depreciation percent for 5 year property",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "pub 946 depreciation table",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "what class life is my equipment",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "accelerated depreciation schedule per year",
+      "target": "macrs-depreciation",
+      "kind": "question"
+    },
+    {
+      "term": "c1v1 c2v2 solve for volume",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how much stock solution to dilute",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "dilute 10 molar down to 1 molar",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "what volume of stock for a final concentration",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how much water to add to dilute a solution",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "final concentration after dilution",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "make 500 ml of 0.1 molar from stock",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "dilution factor from stock to working solution",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "stock concentration needed for target molarity",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how to dilute a concentrated solution to a target",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "volume of diluent for a dilution",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "molar concentration after adding water",
+      "target": "molarity-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how much sample to transfer at each dilution step",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how much diluent per tube for a dilution series",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "what concentration after each dilution tube",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how to make a 10 fold dilution series",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "transfer volume for 1 to 10 dilution",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how many tubes to reach my final concentration",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how much stock and diluent per step",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "dilution factor per tube concentration",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how to set up a stepwise dilution",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "final concentration after 5 serial dilutions",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "how much liquid to move down the row of tubes",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "volume to pipette for each dilution",
+      "target": "serial-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "what percent is my loan of the home value",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "do i need pmi at this loan amount",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "how much can i borrow against the appraised value",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "loan amount divided by home value percent",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "when does pmi drop off my mortgage",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "how much down payment to avoid pmi",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "is my loan over 80 percent of value",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "how much equity do i have on this appraisal",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "loan to value on a refinance",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "what percent equity to skip mortgage insurance",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure loan against purchase price",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "conforming loan value ratio for pmi",
+      "target": "ltv",
+      "kind": "question"
+    },
+    {
+      "term": "what percent of income goes to debt",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "how much house payment can my income cover",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "do i qualify for a mortgage with my debts",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "front end and back end debt ratio",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "monthly debt divided by monthly income",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "what dti does fha allow",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "is my debt ratio too high for a va loan",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "how much debt to income for underwriting",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "housing payment as percent of income",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure debt ratio for a loan",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "max monthly debt for my paycheck",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "income needed to pass debt ratio",
+      "target": "dti",
+      "kind": "question"
+    },
+    {
+      "term": "what grade level is my writing",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "how hard is this text to read",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "reading ease score for a paragraph",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "how many words per sentence in my document",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "count syllables and sentences in text",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "what reading grade for a safety sheet",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "is my manual written too high a grade",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "how to check reading level of a document",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "flesch grade level of my text",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "what school grade can read this passage",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "reading level score for a handout",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "how readable is my instructions text",
+      "target": "readability",
+      "kind": "question"
+    },
+    {
+      "term": "average and standard deviation of a list of numbers",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "how to find the mean median and mode",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "standard deviation of test readings",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "variance of a set of numbers",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "what is the spread of my measurements",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "middle value of a list of numbers",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure sample standard deviation",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "range and average of my data",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "most common value in a number list",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "population vs sample standard deviation",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "summary stats for a column of numbers",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "how to average a bunch of readings",
+      "target": "statistics-quickread",
+      "kind": "question"
+    },
+    {
+      "term": "how much weight on each pick point in a two point lift",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "load split between two crane hooks",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "where to set the picks on an offset load",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "how much of the load goes to each sling",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "is the center of gravity outside my pick points",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "how uneven is the load between two lift points",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "weight on each end of a lifted beam",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "how far off center can i pick a load",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "load on the near hook with offset cg",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "percent imbalance on a two point pick",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "how to share a load across two pick points",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "pick point spacing for an unbalanced beam",
+      "target": "cg-load-share",
+      "kind": "question"
+    },
+    {
+      "term": "how much can the crane pick after deductions",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "net hook capacity after block and jib",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how much weight off the load chart after rigging",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "what percent of chart is my lift",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "is this a critical lift over 75 percent",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "deduct hook block and wire rope from capacity",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how much lift left after the jib deduction",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "total hook load vs net capacity",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "am i over 90 percent of the crane chart",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "crane capacity minus attachment weights",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure net pick after deductions",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "available capacity on the hook for a pick",
+      "target": "crane-net-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how much shear can one bolt take through a plate",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "does bolt shear or tearout govern this connection",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "tearout strength at a bolt hole",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "how thin can the plate be before tearout controls",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "design strength of a 3/4 inch a325 bolt",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "bearing capacity of a bolt on a36 plate",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "edge distance for bolt tearout",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "allowable load per bolt in single shear",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a bolt carry in a steel plate",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "bolt bearing vs shear rupture strength",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "lrfd design strength of one bolt",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "how strong is a bolt through half inch steel",
+      "target": "bolt-shear-bearing",
+      "kind": "question"
+    },
+    {
+      "term": "what lens do i need to identify a face at 30 feet",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "how wide does my camera see at a distance",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "pixels per foot for a security camera",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "can this camera recognize a person at 50 feet",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "what focal length for the coverage i need",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "field of view of a 4mm lens",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "scene width a surveillance camera covers",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "how far can a camera identify at 76 ppf",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "dori distance for a cctv lens",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "lens to read a license plate at range",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "how many degrees does my camera cover",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "pixel density for recognize vs identify",
+      "target": "camera-lens-fov",
+      "kind": "question"
+    },
+    {
+      "term": "how thick base plate for a steel column",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "what size base plate for 400 kip column",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "how big a plate under a steel column on concrete",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "bearing area needed on the concrete for a column",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "base plate size for a w10x49 column",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "is my base plate too small in bearing",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "base plate thickness for axial load",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "cantilever dimensions m and n for a base plate",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "how much concrete bearing under a column plate",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "steel column to footing plate sizing",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "plate size for a column at 700 kips",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "how to size a column base plate on 4 ksi concrete",
+      "target": "column-base-plate",
+      "kind": "question"
+    },
+    {
+      "term": "how much water does a sprinkler system need",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "gpm to size a fire pump for sprinklers",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "how many gallons for the fire water tank",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "sprinkler flow for ordinary hazard group 2",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "density times design area sprinkler flow",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "hose stream allowance to add to sprinkler demand",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "stored water for 90 minute sprinkler duration",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "how much flow at 0.20 gpm per square foot",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "water supply to design a sprinkler system around",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "total sprinkler demand plus hose",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "tank size for a fire sprinkler system",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "gpm for a 1500 square foot sprinkler area",
+      "target": "sprinkler-system-demand",
+      "kind": "question"
+    },
+    {
+      "term": "how much lateral load can one bolt carry in wood",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "single shear value for a bolt through two boards",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "lateral capacity of a 1/2 inch bolt in lumber",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "reference design value for a wood bolt",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "which yield mode governs my bolted wood joint",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "dowel bearing strength for a bolt in wood",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "how strong is a bolted connection in a beam",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "load per bolt through a thin side member",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "z value for a wood to wood bolt",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "how much can a bolt hold in a wood splice",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "lateral load for a dowel in two wood members",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "bolt capacity before adjustment factors in wood",
+      "target": "wood-bolt-connection",
+      "kind": "question"
+    },
+    {
+      "term": "how much does airflow drop at 5000 feet altitude",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "convert acfm to scfm at elevation",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "air density factor for high altitude",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "how thin is the air at 5000 ft for a fan",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "correct fan static for altitude",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "derate airflow for hot rooftop air",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "standard cfm from actual cfm at altitude",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "how much less dense is 120 degree air",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "altitude correction for a hvac fan",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "temperature effect on air density for airflow",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "density ratio to correct the 1.08 sensible constant",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "how to adjust cfm for thin mountain air",
+      "target": "air-density-correction",
+      "kind": "question"
+    },
+    {
+      "term": "what is the plasticity index of this soil",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "is the soil clay or silt from the limits",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "liquid limit minus plastic limit",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "how to classify soil above the a-line",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "uscs class from liquid and plastic limit",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "is this fill lean clay or silt",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "liquidity index of a soil sample",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "pi of a soil for an earthwork spec",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "where does my soil plot on the a-line chart",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "how plastic is the clay from atterberg data",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "is the fill suitable from the plasticity limits",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "soil consistency numbers from a geotech report",
+      "target": "atterberg-indices",
+      "kind": "question"
+    },
+    {
+      "term": "total head from pressure velocity and elevation",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "how much head does water at 30 psi have",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "convert psi and velocity to feet of head",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "mechanical energy per pound of fluid",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "how much pressure at a venturi throat",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "velocity head at 6 feet per second",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "total energy head along a pipe",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "pressure rise where flow slows down",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "how to add pressure and velocity head",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "feet of head for water in a line",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "energy equation head for a fluid",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "how head converts between pressure and speed",
+      "target": "bernoulli-head",
+      "kind": "question"
+    },
+    {
+      "term": "how much force on the corner bolt in a bracket",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "worst bolt load in an eccentric group",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "load on a shear tab bolt off center",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "how much shear on a bolt from an offset load",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "force on the far bolt with eccentricity",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "bolt group polar moment for a bracket",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "how much does eccentricity add to bolt shear",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "peak bolt force in a 2 by 3 group",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "resultant force on a bracket bolt",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "direct plus torsional shear on a bolt",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure eccentric shear on a bolt group",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "load on the most loaded bolt in a connection",
+      "target": "bolt-group-eccentric",
+      "kind": "question"
+    },
+    {
+      "term": "how far can i stick out a boring bar before chatter",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "how much does a boring bar deflect at 6 inches out",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "l over d ratio limit for a boring bar",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "why is my boring bar chattering",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "max overhang for a steel boring bar",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "tool deflection from stickout length",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "how much stickout before a carbide bar chatters",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "deflection of a cantilever cutting tool",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "how much does shortening the tool help deflection",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "end mill deflection at a given overhang",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "safe length to diameter for a boring bar",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "how far out can i run a 0.75 inch bar",
+      "target": "boring-bar-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "lateral pressure on a wall from a footing set back",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how much does a crane outrigger push on a wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "surcharge pressure from a line load near a wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "wall pressure from a wheel load setback",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how far back to keep a load off a basement wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "extra lateral pressure from a surface load",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "point load lateral pressure on a retaining wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "where does the surcharge pressure peak on a wall",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "boussinesq lateral pressure at a wall setback",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how much load a footing adds to a wall pressure",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "rigid wall pressure from a nearby line load",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "psf on a wall from a load 4 feet back",
+      "target": "boussinesq-surcharge-wall",
+      "kind": "question"
+    },
+    {
+      "term": "what occupancy before the property loses money",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "how full does the building need to be to break even",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "break even occupancy from opex and debt",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "how much vacancy can the property take",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "occupancy needed to cover the mortgage and expenses",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "cushion between market and break even occupancy",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "expenses plus debt over gross income percent",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "what fill rate to stay cash flow positive",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "when does a rental go cash flow negative",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "how low can occupancy drop before losses",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "break even fill rate on a rental property",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "vacancy cushion for a commercial building",
+      "target": "break-even-occupancy",
+      "kind": "question"
+    },
+    {
+      "term": "how much chlorine to shock past breakpoint",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "how much shock to clear chloramines",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "combined chlorine from total and free",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "how much chlorine to remove combined chlorine",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "shock dose at 10 times combined chlorine",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "how much chlorine to get past the breakpoint",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "free vs combined chlorine ppm",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "how much to superchlorinate a pool",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "dose to break the chloramines",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "how much shock for 0.5 ppm combined",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "chlorine to reach breakpoint",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "why did a partial chlorine dose make it worse",
+      "target": "breakpoint-chlorination",
+      "kind": "question"
+    },
+    {
+      "term": "how many brick ties do i need per square foot",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart do brick veneer ties go",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how many wall ties for 200 square feet of brick",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "brick tie spacing on studs",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how many square feet per brick tie",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "do i need more veneer ties in high wind",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "max spacing for brick veneer anchors",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how many corrugated ties for a brick wall",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure brick tie quantity for a veneer wall",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "what spacing for masonry veneer ties",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how many anchors per course of brick",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "veneer tie count for a house wall",
+      "target": "brick-veneer-anchor-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "how much cash can i pull out of a rental refinance",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "how much money left in deal after refi",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "will i get all my money back on a brrrr deal",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "cash out refi at 75 ltv on rental",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "how much loan on arv for cash out refi",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure cash on cash after refinance",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "how much equity can i pull from a rehab property",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "does the refi cover my rehab costs",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "what loan amount from arv and ltv",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "how much capital stays in my rental after cash out",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "can i recover my down payment with a cash out refi",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "return on money left in rental deal",
+      "target": "brrrr-refi",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure whole house heat loss",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "heat loss from r values and square footage",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how many btu per hour does my house lose per degree",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how much does air sealing cut my heating load",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how to add up wall ceiling and window heat loss",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "what is my house heating load from r values",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "btu per hour per degree f for a house",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how much heat loss through windows vs walls",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "infiltration cfm heat loss btu",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how big is my heating load at design temperature",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "heat loss calc for energy audit",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how much do better windows lower heat loss",
+      "target": "building-ua",
+      "kind": "question"
+    },
+    {
+      "term": "how much will a cantilever deflect",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "how far can a beam cantilever with a point load",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "deflection of a beam fixed at one end",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "how much load can a cantilever beam hold",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "moment at the wall for an overhang load",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "how much does a balcony beam sag at the tip",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "bending moment for a cantilevered joist",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "shear at the support of a cantilever",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "tip deflection from a uniform load on a cantilever",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "how strong does a bracket beam need to be",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "deck overhang beam deflection",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "how much sag on a cantilevered deck",
+      "target": "cantilever-beam",
+      "kind": "question"
+    },
+    {
+      "term": "is my channel flow subcritical or supercritical",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "how to tell if a ditch flow is tranquil or rapid",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "critical depth for a rectangular channel",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "will my channel get a hydraulic jump",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "froude number from velocity and depth",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "how fast is too fast for open channel flow",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "what depth makes channel flow go critical",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "is 50 cfs in a 4 ft channel supercritical",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "flow regime in an open ditch",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "how deep does a channel run at critical flow",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "upstream or downstream control in a channel",
+      "target": "channel-froude-number",
+      "kind": "question"
+    },
+    {
+      "term": "how many gpd per square foot on a clarifier",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "is my clarifier overloaded",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "overflow rate for a 40 ft clarifier",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how much flow can a clarifier handle",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "weir overflow rate gpd per foot",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "solids loading on a secondary clarifier",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "clarifier loading at 1 mgd",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure pounds of solids per square foot clarifier",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "surface loading rate for a settling tank",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how big a clarifier for my plant flow",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "mlss solids loading calculation",
+      "target": "clarifier-surface-loading",
+      "kind": "question"
+    },
+    {
+      "term": "how to find friction factor for pipe flow",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "friction factor from reynolds number and roughness",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "what friction factor for steel pipe",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "f value for darcy weisbach head loss",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "friction factor for laminar vs turbulent flow",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "how rough is my pipe friction factor",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "friction factor at reynolds 100000",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "reading the moody chart without the chart",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "friction factor for pvc pipe flow",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "what f to use for duct pressure loss",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "how does roughness change pipe friction",
+      "target": "colebrook-friction-factor",
+      "kind": "question"
+    },
+    {
+      "term": "stress from axial load plus bending moment",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "how to check a post with an off center load",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "stress on a column loaded off center",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "does an eccentric load put the far face in tension",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "combined compression and bending stress check",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "max fiber stress from load and moment",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "how much stress from a moment on a short column",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "stress at the edge of an eccentrically loaded member",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "will the footing face go into tension kern check",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "how to add bending stress to axial stress",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "eccentricity limit before tension develops",
+      "target": "combined-stress-axial-bending",
+      "kind": "question"
+    },
+    {
+      "term": "when can i ignore torsion in a concrete beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "torsion limit for a spandrel beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "how much torque cracks a concrete beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "does my edge beam need closed stirrups for torsion",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "threshold torque for a 12x20 concrete beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "torsion check for concrete edge beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "how much torsion before stirrups are required",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "cracking torque of a rectangular concrete section",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "torsion capacity from beam size and fc",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "do i need torsion steel in my beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "ft-kip torsion limit concrete beam",
+      "target": "concrete-torsion-threshold",
+      "kind": "question"
+    },
+    {
+      "term": "will three wires jam in my conduit",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "how to check for wire jamming in a bend",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "can three conductors wedge in 2 inch emt",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "jam check for pulling three conductors",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "conduit size to avoid jamming three wires",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "what ratio causes conductor jam in conduit",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "is 2 inch conduit jam prone for my wire size",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "three same size wires stuck in a conduit bend",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "how to avoid jamming on a conduit pull",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "wire od to conduit id jam check",
+      "target": "conduit-jam-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "how to lay out a cone from flat sheet metal",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "flat pattern for a cone with radius and height",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "what sector angle to cut for a cone",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "how big a blank for a sheet metal cone",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "how to make a cone template from flat stock",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "slant height of a cone for layout",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "how many degrees of arc for a cone pattern",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "rolling a cone from a flat sector",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "pattern for a duct reducer cone",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "how to mark out a cone on plate",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "cutting a cone shape from flat metal",
+      "target": "cone-flat-pattern",
+      "kind": "question"
+    },
+    {
+      "term": "how big does an air gap need to be",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "minimum air gap above the flood rim",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "air gap for an indirect waste pipe",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "how much gap between faucet and rim",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "is my air gap big enough for backflow",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "required air gap for a 1 inch outlet",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "air gap near a wall three diameters",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "how high above the drain does the pipe end",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "backflow protection gap size",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "air gap for filling a tank",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "check installed air gap against code",
+      "target": "cross-connection-air-gap",
+      "kind": "question"
+    },
+    {
+      "term": "noi divided by loan amount percentage",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "how big a loan will my noi support",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "what loan can i get at a 10 percent debt yield",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "is my debt yield high enough for the lender",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure debt yield on a commercial loan",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "debt yield on a 1.5 million loan",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "max loan from noi and debt yield floor",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "how lenders size loans off noi",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "what debt yield do lenders want",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "loan amount capped by debt yield",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "debt yield vs cap rate loan sizing",
+      "target": "debt-yield",
+      "kind": "question"
+    },
+    {
+      "term": "how many therms will my house use per year",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "annual heating cost from degree days",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much gas to heat a house per winter",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "heating cost from ua and degree days",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much will i save switching gas to heat pump",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "yearly kwh for electric heat",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "fuel cost per heating season",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much does insulation save on the annual heating bill",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "estimate heating bill from climate degree days",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "mmbtu per year to heat a house",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "gas vs heat pump annual cost comparison",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much energy does my house use per heating season",
+      "target": "degree-day-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much detention pay after free time",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "what to bill a shipper for waiting at the dock",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "detention charge for 5 hours at the dock",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "how many hours of detention can i charge",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "is detention pay worth the wait vs driving",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "how much money lost sitting at a shipper",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "waiting at the dock cost per hour",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "detention invoice amount for a load",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "how much does dock time cost my truck",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "free time before detention starts",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "billed detention vs lost revenue",
+      "target": "detention-demurrage-billing",
+      "kind": "question"
+    },
+    {
+      "term": "how to carry an elevation with a level",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "elevation from backsight and foresight readings",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "how to run levels from a benchmark",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "did my level loop close",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "how much misclosure in my level run",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "height of instrument from rod reading",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "how to reduce level notes in a field book",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "elevation at a new point from rod shots",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "checking a level circuit back to the benchmark",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "rod readings to elevation calculation",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "level loop error allowed",
+      "target": "differential-leveling",
+      "kind": "question"
+    },
+    {
+      "term": "cents per mile or percentage which pays more",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "at what rate does percentage pay beat mileage pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "25 percent of linehaul vs 60 cents a mile",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "how much do i make on a load at percentage pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "mileage pay vs load percentage comparison",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "break even rate per mile for percentage pay",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "should i drive for cpm or percent of the load",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "pay on a 2500 dollar load at 25 percent",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "which pay plan makes more for a trucker",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "percent pay vs mile pay on cheap freight",
+      "target": "driver-pay-cpm-vs-percentage",
+      "kind": "question"
+    },
+    {
+      "term": "how much heat does attic duct pick up",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "supply air temperature rise through a hot attic",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "how much cooling lost through duct walls",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "duct insulation r value savings",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "how many degrees does supply air warm in the attic",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "heat gain through uninsulated duct",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "does r8 duct insulation pay off vs r4",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "btu lost through duct in unconditioned space",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "how much colder is the air at the register",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "duct loss in a crawl space",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "temperature drop in supply duct run",
+      "target": "duct-heat-gain",
+      "kind": "question"
+    },
+    {
+      "term": "how much duct leakage is allowed per code",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "did my duct blaster test pass",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "cfm25 per 100 square feet limit",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "duct leakage limit for a 2000 sq ft house",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "how leaky can ducts be and still pass",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "max cfm25 for energy code",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "rough in duct test limit without air handler",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure duct leakage per 100 square feet",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "passing number for a duct tightness test",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "total leakage at 25 pascals allowed",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "duct test pass fail for new construction",
+      "target": "duct-leakage-cfm25",
+      "kind": "question"
+    },
+    {
+      "term": "when should the economizer bring in outside air",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "economizer on or off from outdoor enthalpy",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "free cooling when outside air is cooler",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "should the economizer lock out on humid days",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "outdoor vs return air enthalpy comparison",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "dry bulb setpoint for economizer changeover",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "can i use outside air for cooling right now",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "why is the economizer locked out on a cool day",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "enthalpy vs dry bulb economizer control",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "when does humid outdoor air disable free cooling",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "rooftop unit free cooling enable point",
+      "target": "economizer-enthalpy-changeover",
+      "kind": "question"
+    },
+    {
+      "term": "how many footcandles do i need in a stairwell",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "how bright does exit path lighting have to be",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "is 1 foot candle enough for a corridor",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "what light level is required for emergency exits",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "minimum footcandles for emergency lighting at 90 minutes",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "how dark can a spot be under emergency lights",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "does my corridor lighting pass code footcandles",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "what is the max to min ratio for exit path lighting",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "how many foot candles for stairs during a power outage",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "required light level along the exit route",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "do my light meter readings pass egress code",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "how low can emergency light levels drop after 90 minutes",
+      "target": "egress-lighting-check",
+      "kind": "question"
+    },
+    {
+      "term": "how much does my skid steer cost per hour to run",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what should i charge per hour for my excavator",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure fuel and maintenance cost per machine hour",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what does it cost to own a backhoe per hour",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "hourly cost of running a mini excavator",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how much per hour should equipment bill on a job",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what is my dozer really costing me per hour",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "cost per hour to own and run a loader",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how to price machine time on an estimate",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "is renting or owning a skid steer cheaper per hour",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how many hours a year to justify buying a machine",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what hourly rate covers equipment depreciation and fuel",
+      "target": "equipment-hourly-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what temperature does the air leave an erv in winter",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "how many btu does a heat recovery ventilator save",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "how warm is the fresh air after the hrv core",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "how much heating load does an erv take off the furnace",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "what supply temp from an hrv at 10 degrees outside",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "how much does ventilation air get pre-heated by an erv",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "erv at 75 percent effectiveness how many btu is that",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "how much smaller can the coil be with heat recovery ventilation",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "can an erv cover most of my ventilation heating load",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "what does 200 cfm of recovery ventilation give back in btu",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "incoming air temperature after the energy recovery core",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "how much heat does exhaust air give back through an hrv",
+      "target": "erv-sensible-recovery",
+      "kind": "question"
+    },
+    {
+      "term": "what td keeps a walk in cooler at 90 percent humidity",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "how far below box temp should my suction saturation be",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "what suction temp for a 35 degree produce cooler",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "what td for a meat cooler coil",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "why is my walk in drying out the produce",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "how do i pick coil td for a walk in freezer",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "what humidity does a 10 degree td give in a cooler",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "box temperature minus saturated suction what should it be",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "what td for a frozen food storage coil",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "how does coil td change walk in humidity",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "is a 15 degree td too much for produce storage",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "what evaporator split do i need for high humidity",
+      "target": "evaporator-td-dtd",
+      "kind": "question"
+    },
+    {
+      "term": "how much more cfm if i speed up the fan",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "what happens to fan horsepower when rpm goes up",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "how much power do i save slowing a fan down",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "new cfm after a pulley change on the blower",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "how much does static pressure rise with fan speed",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "if i bump blower rpm 20 percent what does cfm do",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "how much energy does slowing a fan to 75 percent speed save",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "what rpm do i need for more airflow from the same fan",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "blower speed change effect on amps and cfm",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "how does fan cfm scale with speed",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "how much does slowing the fan cut the motor load",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "fan brake horsepower at a higher rpm",
+      "target": "fan-affinity-laws",
+      "kind": "question"
+    },
+    {
+      "term": "how high can fire pump churn pressure go",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "does my fire pump pass the 150 percent flow test",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "what pressure does a 500 gpm fire pump need at overload",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "max no flow pressure for a fire pump",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "is 140 percent of rated pressure ok at churn",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "what psi must the pump hold at 150 percent flow",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "fire pump annual test pass or fail numbers",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "when does a fire pump need a pressure relief valve",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "how to check a fire pump curve against the nfpa envelope",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "minimum pressure at overload flow for a fire pump",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "my pump shutoff pressure is too high what does that mean",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "three point fire pump acceptance check",
+      "target": "fire-pump-curve",
+      "kind": "question"
+    },
+    {
+      "term": "how much profit on a house flip",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "will this flip make money after rehab and holding costs",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure profit on a fixer upper",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "what will i clear on a flip after selling costs",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "is 40k rehab worth it on a 300k arv house",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "how much can i pay for a house to flip",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "what return on my cash for a 6 month flip",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "what margin on arv is good for a flip",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "how do holding costs eat into flip profit",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "what percent of arv should a flip make",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "how much do closing and agent fees cut into a flip",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "annualized return on a house flip",
+      "target": "fix-flip-profit",
+      "kind": "question"
+    },
+    {
+      "term": "how fast does water move through a smaller pipe",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "velocity when pipe reduces from 4 to 2 inch",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "what happens to water speed at a reducer",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "how much does velocity jump when pipe size drops",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "water velocity after a pipe size change",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "does flow speed up in a smaller line",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "how slow does flow get in a bigger pipe",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "velocity too high after reducing pipe diameter",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "same gpm smaller pipe what velocity",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure velocity from a pipe diameter change",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "is 24 feet per second too fast in copper pipe",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "flow speed in duct when it necks down",
+      "target": "flow-continuity",
+      "kind": "question"
+    },
+    {
+      "term": "how much strength does a big glulam beam lose",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "do i reduce bending stress for a long glulam span",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "what factor for a 24 inch deep glulam girder",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "why does a bigger glulam beam have lower allowable bending",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "size penalty for glued laminated beams",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "how to adjust glulam allowable bending for span and depth",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "does southern pine glulam use a different volume exponent",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "cv or cl which one controls my glulam beam",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "bending reduction for a 32 foot glulam span",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "glulam depth effect on allowable stress",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "how much does volume knock off glulam capacity",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "allowable bending for a 6-3/4 x 24 glulam",
+      "target": "glulam-volume-factor",
+      "kind": "question"
+    },
+    {
+      "term": "how much propane to dry 1000 bushels of corn",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how many gallons of lp to take corn from 20 to 15",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "propane cost to dry a bin of corn",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much fuel does a grain dryer burn per point",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "btu to remove a point of moisture from corn",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much water comes out of corn when drying",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "lp gas needed for corn drying this fall",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "drying corn 5 points how much propane",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how much does it cost in fuel to dry wheat",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "energy to dry a bushel of grain per point of moisture",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "gallons of propane per 1000 bushels dried",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "is it cheaper to dry corn to 17.5 instead of 15",
+      "target": "grain-drying-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how many bushels do i lose drying corn from 20 percent",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "wet bushels to dry bushels conversion",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "how much does the elevator dock for wet corn",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "shrink on 5000 bushels of 18 percent corn",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "how many dry bushels after moisture and handling shrink",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure payable bushels on wet grain",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "what does 1.4 percent shrink per point mean for my load",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "how many market bushels in a load of wet soybeans",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "moisture dock on wheat at the elevator",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "what will my wet corn weigh after drying",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "bushels lost to shrink when grain dries down",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "how much grain weight disappears drying to market moisture",
+      "target": "grain-shrink-moisture",
+      "kind": "question"
+    },
+    {
+      "term": "what size grille for 400 cfm",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "how big should my return air grille be",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "what size register for a bedroom supply",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "is my return grille too small and noisy",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "how many square inches of grille per cfm",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "what velocity through a supply register is quiet",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "how to size a return air opening for a furnace",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "cfm through a 12x14 grille at 500 fpm",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "why is air whistling through my return grille",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "how much free area does a grille need for the airflow",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "what fpm should air move through a return",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "register too loud what size do i need",
+      "target": "grille-face-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "how much pressure can a thin wall tank take",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "stress in a pipe wall from internal pressure",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "why do pipes split lengthwise under pressure",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "wall stress on a 12 inch tank at 150 psi",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how thick does a tank wall need to be for the pressure",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "what stress does 150 psi put on a cylinder wall",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "is my tank wall thick enough for the psi",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "pressure times diameter over wall thickness stress",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure stress in a compressed air tank shell",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "which direction does a pipe burst under pressure",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "stress along the pipe vs around the pipe from pressure",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how much psi before a thin cylinder yields",
+      "target": "hoop-stress-thin-wall",
+      "kind": "question"
+    },
+    {
+      "term": "how far back must a wall be from a curve for sight distance",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "can a driver see around this curve past the barrier",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "offset from the road needed for stopping sight on a curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "how much clearance inside a curve for sight distance",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "sight line clearance to a cut slope on a horizontal curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "how close can trees be to the inside of a curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "middle ordinate needed for stopping sight distance",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "does the retaining wall block sight distance on the curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "how far to set a fence off a curving road for visibility",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "required lateral clearance on a 1000 foot radius curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "obstruction setback for sight distance around a bend",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "how much offset for a barrier on the inside of a curve",
+      "target": "horizontal-sightline-offset",
+      "kind": "question"
+    },
+    {
+      "term": "how many gpm can this hydrant put out at 20 psi",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "what does static 70 residual 50 mean for hydrant flow",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure hydrant capacity from a flow test",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "what color should the hydrant cap be for 1500 gpm",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "gpm available from a hydrant at 20 psi residual",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "hydrant flow test math static and residual",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "how much water can the hydrant really deliver",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "what class is a hydrant that flows 1200 gpm",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "converting a flow test to rated hydrant capacity",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "how much fire flow can i get from this hydrant",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "hydrant static and residual readings to gpm",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "is this hydrant strong enough for the sprinkler demand",
+      "target": "hydrant-available-flow",
+      "kind": "question"
+    },
+    {
+      "term": "how much torque from a hydraulic motor at 2000 psi",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "what rpm will my hydraulic motor turn at 10 gpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure hydraulic motor rpm from gpm and displacement",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "torque from psi and motor displacement",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "what displacement motor for more torque at the same gpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "horsepower of a hydraulic motor from torque and rpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how fast does a 2 cubic inch motor spin on 10 gpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "gpm needed to spin a hydraulic motor at 1000 rpm",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "what pressure do i need for 500 inch pounds from my motor",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "does a bigger displacement motor turn slower",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "auger motor torque from hydraulic flow and pressure",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how much horsepower is my hydraulic motor making",
+      "target": "hydraulic-motor-torque-speed",
+      "kind": "question"
+    },
+    {
+      "term": "what size injectors for 400 hp",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "how big of injectors do i need for my turbo build",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "injectors for a 500 horsepower v8",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "what cc injectors for a boosted engine",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "how much fuel flow per injector for my horsepower goal",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "do i need bigger injectors when i add boost",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "how many lb per hour injectors for 600 hp",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "injector flow needed at 80 percent duty",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "what injectors support 450 hp on pump gas",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "converting horsepower to injector cc per minute",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "are my stock injectors big enough for more power",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "what flow injectors for a supercharged motor",
+      "target": "injector-size",
+      "kind": "question"
+    },
+    {
+      "term": "how far apart can stitch welds be",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "what pitch for skip welding a stiffener",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "how long does each stitch weld need to be",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "minimum length of an intermittent weld segment",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "weld 3 skip 2 what does that carry",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "spacing for stitch welds on a long seam",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "can i stitch weld instead of a continuous fillet",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "how much of the joint length do i have to weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "stitch size to match a continuous fillet",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "what stitch schedule matches a 3/16 continuous weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "do stitch welds carry the same as a continuous weld",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "is a 5 inch pitch ok for 3 inch stitches",
+      "target": "intermittent-fillet-weld",
+      "kind": "question"
+    },
+    {
+      "term": "how much does it cost to factor a 2000 dollar load",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "what do i actually get paid when i factor an invoice",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "is 3 percent to factor an invoice a good deal",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "what apr am i really paying to factor freight bills",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "how much of my invoice does the factor advance",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "factoring vs waiting 30 days for the broker to pay",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "real cost of factoring loads over a year",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "how much does quick pay vs factoring cost me",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "what does 90 percent advance and 3 percent fee work out to",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "is factoring worth it for an owner operator",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "annualized rate on factored invoices",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "how much money do i lose to the factoring company",
+      "target": "invoice-factoring-cost",
+      "kind": "question"
+    },
+    {
+      "term": "what does an employee really cost per hour",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how much to add to wages for taxes and insurance",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "true hourly cost of a 25 dollar an hour employee",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how much does workers comp add per hour",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what should i bill for a guy i pay 25 an hour",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "employee cost with payroll taxes and benefits per hour",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how to figure crew cost per hour for a bid",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what percent to mark up wages for burden",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "cost per billable hour for my crew",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "how much do benefits add to hourly labor cost",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "wage plus burden per productive hour",
+      "target": "labor-burden-rate",
+      "kind": "question"
+    },
+    {
+      "term": "what hourly rate covers payroll taxes comp and benefits",
+      "target": "labor-burden-rate",
+      "kind": "question"
     }
   ]
 }

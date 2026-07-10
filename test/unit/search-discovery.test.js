@@ -194,6 +194,31 @@ test("rankTools returns [] on empty tokens or bad input", () => {
   assert.deepEqual(rankTools(["volt"], null, []), []);
 });
 
+test("spec-v590: committed question-phrase aliases surface their target first", async () => {
+  const { TOOLS, aliases } = await loadCatalog();
+  // Shard sanity: the question corpus landed and is well-formed.
+  const questions = aliases.filter((r) => r.kind === "question");
+  assert.ok(questions.length >= 1000, "question corpus missing or truncated");
+  for (const r of questions) {
+    assert.match(r.term, /^[a-z0-9][a-z0-9 /.\-]*$/, "style violation: " + r.term);
+    assert.ok(normalizeQuery(r.term).tokens.length > 0, "stopword-only phrase shipped: " + r.term);
+  }
+  // A handful of committed phrases, typed verbatim, rank their tile first.
+  const pinned = [
+    ["12/2 wire max amps", "wire-ampacity"],
+    ["what angle is a 4/12 roof", "roof-pitch"],
+    ["how much can the crane pick after deductions", "crane-net-capacity"],
+    ["how much chlorine to shock past breakpoint", "breakpoint-chlorination"],
+    ["employee cost with payroll taxes and benefits per hour", "labor-burden-rate"],
+    ["make 500 ml of 0.1 molar from stock", "molarity-dilution"],
+    ["how much can i pay for a house to flip", "fix-flip-profit"],
+  ];
+  for (const [phrase, expected] of pinned) {
+    const ranked = rankTools(normalizeQuery(phrase).tokens, TOOLS, aliases, { limit: 3 });
+    assert.equal(ranked[0].tool.id, expected, `"${phrase}" ranked ${ranked[0] && ranked[0].tool.id}`);
+  }
+});
+
 test("MCP search parity: typo query resolves through the same ranker", async () => {
   const got = await mcpSearch({ query: "conduit fil" });
   assert.ok(got.results.length > 0);

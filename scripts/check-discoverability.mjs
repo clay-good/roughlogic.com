@@ -66,9 +66,11 @@ async function main() {
           errors.push("data/search/aliases.json: term '" + term + "' missing 'target'.");
           continue;
         }
-        if (kind !== "industry" && kind !== "redirect" && kind !== "adjacent") {
+        // spec-v590 adds "question" (question-phrase rows); consumers treat
+        // all kinds uniformly, so the kind is an editorial tag only.
+        if (kind !== "industry" && kind !== "redirect" && kind !== "adjacent" && kind !== "question") {
           errors.push(
-            "data/search/aliases.json: term '" + term + "' has invalid kind '" + kind + "' (expected industry|redirect|adjacent).",
+            "data/search/aliases.json: term '" + term + "' has invalid kind '" + kind + "' (expected industry|redirect|adjacent|question).",
           );
         }
         if (!toolIds.has(target)) {
