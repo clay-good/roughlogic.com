@@ -76,6 +76,7 @@ const _TILES = [
   ["blended-mortgage-rate", "X"],
   ["primer-tm", "T"],
   ["cfu-plate-count", "T"],
+  ["molarity-from-stock", "T"],
   ["declining-balance-depreciation", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],

@@ -424,6 +424,7 @@ const RELATED = {
   // mass-moles + beer-lambert are the quantitation cluster; rcf-rpm +
   // hemocytometer are the bench-instrument pair.
   "molarity-dilution": ["serial-dilution", "resuspension-volume", "mass-moles"],
+  "molarity-from-stock": ["molarity-dilution", "mass-moles", "molecular-weight"],
   "serial-dilution": ["molarity-dilution", "resuspension-volume"],
   "resuspension-volume": ["molarity-dilution", "serial-dilution"],
   "molecular-weight": ["mass-moles", "molarity-dilution"],

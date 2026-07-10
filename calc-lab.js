@@ -947,3 +947,57 @@ function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
   for (const f of [col.input, df.input, vol.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["cfu-plate-count"] = renderCfuPlateCount;
+
+// --- spec-v531 T: Molarity from a concentrated reagent (`molarity-from-stock`) ---
+// M = 10 * %(w/w) * density / MW. volume_to_draw = target_M * final_volume / stock_M.
+// dims: in { purity_pct: dimensionless, density_g_ml: dimensionless, mol_weight: dimensionless, target_m: dimensionless, final_volume_ml: dimensionless } out: { stock_m: dimensionless, volume_to_draw_ml: dimensionless }
+export function computeMolarityFromStock({ purity_pct = 0, density_g_ml = 0, mol_weight = 0, target_m = 0, final_volume_ml = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const purity = Number(purity_pct) || 0;
+  const density = Number(density_g_ml) || 0;
+  const mw = Number(mol_weight) || 0;
+  const target = Number(target_m) || 0;
+  const finalVol = Number(final_volume_ml) || 0;
+  if (!(purity > 0)) return { error: "Assay / purity percent must be positive." };
+  if (purity > 100) return { error: "Purity percent cannot exceed 100." };
+  if (!(density > 0)) return { error: "Density must be positive (g/mL)." };
+  if (!(mw > 0)) return { error: "Molecular weight must be positive (g/mol)." };
+  const stock_m = 10 * purity * density / mw;
+  let volume_to_draw_ml = null;
+  if (target > 0 || finalVol > 0) {
+    if (!(target > 0)) return { error: "Target molarity must be positive when preparing a dilution." };
+    if (!(finalVol > 0)) return { error: "Final volume must be positive (mL) when preparing a dilution." };
+    if (target > stock_m) return { error: "Target molarity exceeds the stock molarity - you cannot concentrate by dilution." };
+    volume_to_draw_ml = target * finalVol / stock_m;
+  }
+  return {
+    stock_m,
+    volume_to_draw_ml,
+    note: "A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error); the 10 factor converts g per 100 mL to per liter. Always add concentrated acid to water, never the reverse. The reagent lot assay and lab safety procedures govern.",
+  };
+}
+export const molarityFromStockExample = { inputs: { purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 1.0, final_volume_ml: 1000 } };
+
+function renderMolarityFromStock(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard reagent preparation - stock molarity from assay and density, stock_M = 10 x purity_pct x density / MW; volume_to_draw = target_M x final_volume / stock_M. A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error). Always add concentrated acid to water, never the reverse. The reagent lot certificate of analysis and lab safety procedures govern.";
+  const purity = makeNumber("Assay / purity (% w/w)", "mfs-purity", { step: "any", min: "0", value: "37" }); purity.input.value = "37";
+  const density = makeNumber("Density (g/mL)", "mfs-density", { step: "any", min: "0", value: "1.19" }); density.input.value = "1.19";
+  const mw = makeNumber("Molecular weight (g/mol)", "mfs-mw", { step: "any", min: "0", value: "36.46" }); mw.input.value = "36.46";
+  const target = makeNumber("Target molarity (mol/L, optional)", "mfs-target", { step: "any", min: "0", value: "1" }); target.input.value = "1";
+  const finalVol = makeNumber("Final volume to prepare (mL, optional)", "mfs-vol", { step: "any", min: "0", value: "1000" }); finalVol.input.value = "1000";
+  for (const f of [purity, density, mw, target, finalVol]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { purity.input.value = "37"; density.input.value = "1.19"; mw.input.value = "36.46"; target.input.value = "1"; finalVol.input.value = "1000"; update(); });
+  const oStock = makeOutputLine(outputRegion, "Stock molarity", "mfs-out-stock");
+  const oDraw = makeOutputLine(outputRegion, "Volume of concentrate to draw", "mfs-out-draw");
+  const oNote = makeOutputLine(outputRegion, "Note", "mfs-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMolarityFromStock({ purity_pct: readNum(purity.input), density_g_ml: readNum(density.input), mol_weight: readNum(mw.input), target_m: readNum(target.input), final_volume_ml: readNum(finalVol.input) });
+    if (r.error) { oStock.textContent = r.error; oDraw.textContent = ""; oNote.textContent = ""; return; }
+    oStock.textContent = fmt(r.stock_m, 2) + " mol/L";
+    oDraw.textContent = r.volume_to_draw_ml !== null ? fmt(r.volume_to_draw_ml, 1) + " mL (into water)" : "- (enter a target molarity and final volume)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [purity.input, density.input, mw.input, target.input, finalVol.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["molarity-from-stock"] = renderMolarityFromStock;

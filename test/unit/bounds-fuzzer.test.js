@@ -17891,3 +17891,27 @@ test("bounds: spec-v531 computeUnitsOfProductionDepr pins the per-unit rate, the
   assert.ok("error" in _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 0 }));
   assert.ok("error" in _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: -1 }));
 });
+
+import { computeMolarityFromStock as _v532 } from "../../calc-lab.js";
+
+test("bounds: spec-v532 computeMolarityFromStock pins the 12 M HCl stock, the volume to draw, the acetic cross-check, and error seams", () => {
+  const r = _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 1.0, final_volume_ml: 1000 });
+  assert.ok(Math.abs(r.stock_m - 12.08) < 0.01); // 10 * 37 * 1.19 / 36.46
+  assert.ok(Math.abs(r.volume_to_draw_ml - 82.8) < 0.1); // 1.0 * 1000 / 12.08
+  // Glacial acetic acid: a different reagent, a different molarity, from its own percent/density/MW.
+  assert.ok(Math.abs(_v532({ purity_pct: 99.7, density_g_ml: 1.049, mol_weight: 60.05 }).stock_m - 17.4) < 0.05);
+  // Stock-only (no target): the draw volume is null.
+  assert.equal(_v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46 }).volume_to_draw_ml, null);
+  // The 10-percent-density-over-MW relation scales linearly with density.
+  const a = _v532({ purity_pct: 37, density_g_ml: 1.0, mol_weight: 36.46 }).stock_m;
+  const b = _v532({ purity_pct: 37, density_g_ml: 2.0, mol_weight: 36.46 }).stock_m;
+  assert.ok(Math.abs(b - 2 * a) < 1e-9);
+  // Error seams: non-finite, non-positive purity/density/MW, purity > 100, non-positive target/volume, target above stock.
+  assert.ok("error" in _v532({ purity_pct: Infinity, density_g_ml: 1.19, mol_weight: 36.46 }));
+  assert.ok("error" in _v532({ purity_pct: 0, density_g_ml: 1.19, mol_weight: 36.46 }));
+  assert.ok("error" in _v532({ purity_pct: 120, density_g_ml: 1.19, mol_weight: 36.46 }));
+  assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 0, mol_weight: 36.46 }));
+  assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 0 }));
+  assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 1.0, final_volume_ml: 0 }));
+  assert.ok("error" in _v532({ purity_pct: 37, density_g_ml: 1.19, mol_weight: 36.46, target_m: 20, final_volume_ml: 1000 })); // target > stock
+});

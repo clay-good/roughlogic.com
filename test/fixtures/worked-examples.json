@@ -17021,6 +17021,58 @@
    }
   },
   {
+   "tile_id": "molarity-from-stock",
+   "source_publisher": "Standard reagent preparation (stock molarity from assay and density)",
+   "source_title": "stock_M = 10 x purity_pct x density / MW",
+   "source_edition_or_year": "reagent lot COA",
+   "source_section_or_page": "Concentrated HCl: 37% w/w, 1.19 g/mL, MW 36.46 -> 12.08 M; draw 82.8 mL for 1.0 L of 1.0 M",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "purity_pct": 37,
+    "density_g_ml": 1.19,
+    "mol_weight": 36.46,
+    "target_m": 1.0,
+    "final_volume_ml": 1000
+   },
+   "outputs": {
+    "stock_m": {
+     "value": 12.08,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "volume_to_draw_ml": {
+     "value": 82.8,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "molarity-from-stock",
+   "source_publisher": "Standard reagent preparation (stock molarity from assay and density)",
+   "source_title": "stock_M = 10 x purity_pct x density / MW",
+   "source_edition_or_year": "reagent lot COA",
+   "source_section_or_page": "Glacial acetic acid: 99.7% w/w, 1.049 g/mL, MW 60.05 -> 17.4 M",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "purity_pct": 99.7,
+    "density_g_ml": 1.049,
+    "mol_weight": 60.05
+   },
+   "outputs": {
+    "stock_m": {
+     "value": 17.42,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gross-rent-multiplier",
    "source_publisher": "Appraisal Institute income-approach (GRM)",
    "source_title": "GRM = price / gross_annual_rent",

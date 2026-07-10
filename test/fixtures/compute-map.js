@@ -29,6 +29,7 @@ export const COMPUTE_MAP = {
   "rental-total-return": { module: "../../calc-realestate.js", fn: "computeRentalTotalReturn" },
   "primer-tm": { module: "../../calc-lab.js", fn: "computePrimerTm" },
   "cfu-plate-count": { module: "../../calc-lab.js", fn: "computeCfuPlateCount" },
+  "molarity-from-stock": { module: "../../calc-lab.js", fn: "computeMolarityFromStock" },
   "declining-balance-depreciation": { module: "../../calc-accounting.js", fn: "computeDecliningBalanceDepreciation" },
   "markup-vs-margin": { module: "../../calc-accounting.js", fn: "computeMarkupVsMargin" },
   "employer-payroll-tax": { module: "../../calc-accounting.js", fn: "computeEmployerPayrollTax" },

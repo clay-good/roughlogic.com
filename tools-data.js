@@ -510,6 +510,7 @@ export const TOOLS = [
 
   { id: "primer-tm", name: "Primer Melting Temperature", group: "T", trades: ["lab"], desc: "PCR primer melting temperature (Tm), length, and GC content by the Wallace short-oligo rule (<=14 nt) or the basic GC% formula." },
   { id: "cfu-plate-count", name: "CFU/mL Viable Plate Count", group: "T", trades: ["lab"], desc: "Colony-forming units per mL of the original sample from colonies counted, dilution factor, and volume plated, with a countable-range validity flag." },
+  { id: "molarity-from-stock", name: "Molarity from Concentrated Reagent", group: "T", trades: ["lab"], desc: "Stock molarity of a concentrated liquid reagent from its assay percent, density, and molecular weight (M = 10 x %w/w x density / MW), plus the volume of concentrate to draw for a target working solution. Add acid to water." },
   // v12 Group U: Veterinary. Math aids only; the attending
   // veterinarian governs. Every tile renders the §B.1 limitation
   // banner.

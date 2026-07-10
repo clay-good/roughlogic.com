@@ -296,6 +296,17 @@ export const CITATIONS = {
 
 
 
+  "molarity-from-stock": {
+    formula: "stock_M = 10 x purity_pct x density / MW (mol/L); volume_to_draw = target_M x final_volume / stock_M (mL).",
+    edition: "Standard reagent preparation - stock molarity from assay and density, by name.",
+    freeAccess: "Standard analytical-chemistry reagent-preparation relation; the reagent lot certificate of analysis governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "A concentrated liquid reagent is labeled by weight percent and density, not molarity, so both must be combined with the molecular weight (ignoring either is a 20-40% error); the 10 factor converts g per 100 mL to per liter. Always add concentrated acid to water, never the reverse. A prep aid, not a substitute for the certificate of analysis.",
+    assumptions: [
+      { name: "Assay and density", value: "the label weight percent and density are for the specific lot; verify against the certificate of analysis", source: "reagent lot COA" },
+    ],
+  },
+
   "declining-balance-depreciation": {
     formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",
     edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",

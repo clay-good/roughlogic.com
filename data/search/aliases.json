@@ -114,6 +114,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "molarity from stock",
+      "target": "molarity-from-stock",
+      "kind": "industry"
+    },
+    {
+      "term": "concentrated reagent molarity",
+      "target": "molarity-from-stock",
+      "kind": "industry"
+    },
+    {
+      "term": "percent to molarity",
+      "target": "molarity-from-stock",
+      "kind": "redirect"
+    },
+    {
+      "term": "stock concentration",
+      "target": "molarity-from-stock",
+      "kind": "adjacent"
+    },
+    {
+      "term": "12 m hcl",
+      "target": "molarity-from-stock",
+      "kind": "industry"
+    },
+    {
+      "term": "reagent prep molarity",
+      "target": "molarity-from-stock",
+      "kind": "industry"
+    },
+    {
+      "term": "w/w density molarity",
+      "target": "molarity-from-stock",
+      "kind": "redirect"
+    },
+    {
+      "term": "how to make molar solution",
+      "target": "molarity-from-stock",
+      "kind": "adjacent"
+    },
+    {
       "term": "declining balance",
       "target": "declining-balance-depreciation",
       "kind": "industry"
