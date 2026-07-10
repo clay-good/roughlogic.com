@@ -16936,6 +16936,78 @@
    }
   },
   {
+   "tile_id": "sweat-rate-hydration",
+   "source_publisher": "ACSM / NATA fluid-replacement (weigh-in/weigh-out method)",
+   "source_title": "sweat_loss = (pre - post) x 16 + fluid - urine; rate = loss / hours",
+   "source_edition_or_year": "ACSM / NATA",
+   "source_section_or_page": "180 lb pre, 177 lb post, 20 oz drunk, 2 hr -> 68 oz sweat, 34 oz/hr, 1.7% loss, 72 oz rehydration",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "pre_weight_lb": 180,
+    "post_weight_lb": 177,
+    "fluid_oz": 20,
+    "urine_oz": 0,
+    "duration_hr": 2
+   },
+   "outputs": {
+    "sweat_loss_oz": {
+     "value": 68,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sweat_rate_oz_hr": {
+     "value": 34,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "pct_bw_loss": {
+     "value": 1.667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "rehydration_oz": {
+     "value": 72,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sweat-rate-hydration",
+   "source_publisher": "ACSM / NATA fluid-replacement (weigh-in/weigh-out method)",
+   "source_title": "matched intake means no deficit (rehydration 0)",
+   "source_edition_or_year": "ACSM / NATA",
+   "source_section_or_page": "180 lb pre and post, 68 oz drunk, 2 hr -> 34 oz/hr, 0% loss, 0 oz rehydration",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "pre_weight_lb": 180,
+    "post_weight_lb": 180,
+    "fluid_oz": 68,
+    "urine_oz": 0,
+    "duration_hr": 2
+   },
+   "outputs": {
+    "pct_bw_loss": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "rehydration_oz": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "declining-balance-depreciation",
    "source_publisher": "GAAP book depreciation (ASC 360)",
    "source_title": "dep = book * factor/life, floored at salvage",

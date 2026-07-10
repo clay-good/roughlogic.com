@@ -18096,3 +18096,28 @@ test("bounds: spec-v540 computeSearchTrackSpacing pins coverage, the exponential
   assert.ok("error" in _v540({ sweep_width_m: 100, track_spacing_m: 0, target_pod: 1 }));
   assert.ok("error" in _v540({ sweep_width_m: 100, track_spacing_m: 0, target_pod: 1.5 }));
 });
+
+import { computeSweatRateHydration as _v541 } from "../../calc-rescue.js";
+
+test("bounds: spec-v541 computeSweatRateHydration pins the weigh-in/weigh-out sweat rate, the rehydration target, and error seams", () => {
+  const r = _v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: 20, urine_oz: 0, duration_hr: 2 });
+  assert.ok(Math.abs(r.sweat_loss_oz - 68) < 1e-9); // 3*16 + 20
+  assert.ok(Math.abs(r.sweat_rate_oz_hr - 34) < 1e-9); // 68/2
+  assert.ok(Math.abs(r.pct_bw_loss - 1.6667) < 0.001); // 3/180*100
+  assert.ok(Math.abs(r.rehydration_oz - 72) < 1e-9); // 1.5 * 48
+  // Matched intake (no weight change): rate holds but deficit and rehydration are zero.
+  const m = _v541({ pre_weight_lb: 180, post_weight_lb: 180, fluid_oz: 68, urine_oz: 0, duration_hr: 2 });
+  assert.ok(Math.abs(m.sweat_rate_oz_hr - 34) < 1e-9);
+  assert.equal(m.pct_bw_loss, 0);
+  assert.equal(m.rehydration_oz, 0);
+  // A 2%+ drop trips the performance-loss flag.
+  assert.equal(_v541({ pre_weight_lb: 180, post_weight_lb: 175, fluid_oz: 0, urine_oz: 0, duration_hr: 2 }).over_2pct, true);
+  // Urine subtracts from the sweat loss.
+  assert.ok(Math.abs(_v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: 20, urine_oz: 8, duration_hr: 2 }).sweat_loss_oz - 60) < 1e-9);
+  // Error seams: non-finite, non-positive pre-weight / duration, negative fluid / urine.
+  assert.ok("error" in _v541({ pre_weight_lb: Infinity, post_weight_lb: 177, fluid_oz: 20, duration_hr: 2 }));
+  assert.ok("error" in _v541({ pre_weight_lb: 0, post_weight_lb: 177, fluid_oz: 20, duration_hr: 2 }));
+  assert.ok("error" in _v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: 20, duration_hr: 0 }));
+  assert.ok("error" in _v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: -1, duration_hr: 2 }));
+  assert.ok("error" in _v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: 20, urine_oz: -1, duration_hr: 2 }));
+});

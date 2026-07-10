@@ -272,9 +272,62 @@ function renderSearchTrackSpacing(inputRegion, outputRegion, citationEl) {
   for (const el of [w.input, s.input, t.input]) el.addEventListener("input", update);
 }
 
+// --- spec-v541 P: Sweat rate and fluid replacement (`sweat-rate-hydration`) ---
+// sweat_loss = (pre-post)*16 + fluid - urine. rate = loss/hr. rehydration = 1.5 x max(0, deficit).
+// dims: in { pre_weight_lb: dimensionless, post_weight_lb: dimensionless, fluid_oz: L, urine_oz: L, duration_hr: T } out: { sweat_loss_oz: L, sweat_rate_oz_hr: dimensionless, pct_bw_loss: dimensionless, rehydration_oz: L }
+export function computeSweatRateHydration({ pre_weight_lb = 0, post_weight_lb = 0, fluid_oz = 0, urine_oz = 0, duration_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pre = Number(pre_weight_lb) || 0;
+  const post = Number(post_weight_lb) || 0;
+  const fluid = Number(fluid_oz) || 0;
+  const urine = Number(urine_oz) || 0;
+  const hrs = Number(duration_hr) || 0;
+  if (!(pre > 0)) return { error: "Pre-activity weight must be positive (lb)." };
+  if (post < 0) return { error: "Post-activity weight must be non-negative (lb)." };
+  if (fluid < 0) return { error: "Fluid consumed must be non-negative (fl oz)." };
+  if (urine < 0) return { error: "Urine output must be non-negative (fl oz)." };
+  if (!(hrs > 0)) return { error: "Duration must be positive (hours)." };
+  const weight_change_oz = (pre - post) * 16;
+  const sweat_loss_oz = weight_change_oz + fluid - urine;
+  const sweat_rate_oz_hr = sweat_loss_oz / hrs;
+  const pct_bw_loss = (pre - post) / pre * 100;
+  const rehydration_oz = 1.5 * Math.max(0, weight_change_oz);
+  return {
+    sweat_loss_oz, sweat_rate_oz_hr, pct_bw_loss, rehydration_oz,
+    over_2pct: pct_bw_loss >= 2,
+    note: "A stable body weight means intake matched sweat; a drop of even 2% of body weight measurably degrades performance and judgment. Rehydration targets about 1.25-1.5x the deficit because sweating continues and urine takes some. This is fluid volume, not electrolyte replacement. Individual and medical guidance governs.",
+  };
+}
+export const sweatRateHydrationExample = { inputs: { pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: 20, urine_oz: 0, duration_hr: 2 } };
+
+function renderSweatRateHydration(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: Individual and medical guidance governs all field-hydration decisions. Citation: ACSM / NATA position on fluid replacement, by name. sweat_loss = (pre - post) x 16 + fluid - urine; sweat_rate = sweat_loss / hours; pct_bw_loss = (pre - post) / pre x 100; rehydration = 1.5 x max(0, deficit). A drop of even 2% of body weight degrades performance and judgment. This is fluid volume, not electrolyte replacement.";
+  _aeF(inputRegion, () => fillExample(sweatRateHydrationExample.inputs));
+  const pre = _mnF("Pre-activity weight (lb)", "swr-pre", { step: "any", min: "0" });
+  const post = _mnF("Post-activity weight (lb)", "swr-post", { step: "any", min: "0" });
+  const fluid = _mnF("Fluid consumed (fl oz)", "swr-fluid", { step: "any", min: "0" });
+  const urine = _mnF("Urine output (fl oz, 0 if none)", "swr-urine", { step: "any", min: "0", value: "0" });
+  urine.input.value = "0";
+  const dur = _mnF("Duration (hr)", "swr-dur", { step: "any", min: "0" });
+  for (const f of [pre, post, fluid, urine, dur]) inputRegion.appendChild(f.wrap);
+  const oL = _moF(outputRegion, "Sweat loss / rate", "swr-out-l");
+  const oP = _moF(outputRegion, "Body-weight loss", "swr-out-p");
+  const oR = _moF(outputRegion, "Rehydration target", "swr-out-r");
+  function fillExample(x) { pre.input.value = x.pre_weight_lb; post.input.value = x.post_weight_lb; fluid.input.value = x.fluid_oz; urine.input.value = x.urine_oz; dur.input.value = x.duration_hr; update(); }
+  const update = _debF(() => {
+    const r = computeSweatRateHydration({ pre_weight_lb: Number(pre.input.value) || 0, post_weight_lb: Number(post.input.value) || 0, fluid_oz: Number(fluid.input.value) || 0, urine_oz: Number(urine.input.value) || 0, duration_hr: Number(dur.input.value) || 0 });
+    if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oR.textContent = "-"; return; }
+    oL.textContent = _fmtF(r.sweat_loss_oz, 0) + " oz (" + _fmtF(r.sweat_rate_oz_hr, 0) + " oz/hr)";
+    oP.textContent = _fmtF(r.pct_bw_loss, 1) + "%" + (r.over_2pct ? " - at or past the 2% performance-loss line" : "");
+    oR.textContent = _fmtF(r.rehydration_oz, 0) + " oz";
+  }, _DF);
+  for (const el of [pre.input, post.input, fluid.input, urine.input, dur.input]) el.addEventListener("input", update);
+}
+
 export const RESCUE_RENDERERS = {
   "confined-space-purge": renderConfinedSpacePurge,
   "rope-ma": renderRopeMA,
   "sling-angle": renderSlingAngle,
   "search-track-spacing": renderSearchTrackSpacing,
+  "sweat-rate-hydration": renderSweatRateHydration,
 };

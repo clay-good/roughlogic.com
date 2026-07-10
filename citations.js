@@ -4584,6 +4584,16 @@ export const CITATIONS = {
       { name: "Detection model", value: "exponential (random-search) POD = 1 - e^(-coverage); conservative vs parallel-track", source: "NSARC / USCG" },
     ],
   },
+  "sweat-rate-hydration": {
+    formula: "sweat_loss = (pre - post) x 16 + fluid - urine; sweat_rate = sweat_loss / hours; pct_bw_loss = (pre - post) / pre x 100; rehydration = 1.5 x max(0, deficit).",
+    edition: "ACSM / NATA position on fluid replacement (weigh-in/weigh-out method), by name.",
+    freeAccess: "ACSM / NATA position statements are public; individual and medical guidance governs.",
+    governance: GOVERNANCE.field,
+    editionNote: "A stable body weight means intake matched sweat; a drop of even 2% of body weight measurably degrades performance and judgment; rehydration targets about 1.25-1.5x the deficit because sweating continues and urine takes some; this is fluid volume, not electrolyte replacement. A planning aid, not medical advice.",
+    assumptions: [
+      { name: "Weight-to-volume", value: "a pound of body weight lost is about 16 fluid ounces of fluid", source: "ACSM / NATA" },
+    ],
+  },
 
   // --- Group G: Cross-Trade Utilities (priority 11) ---
   // Mostly pure arithmetic and unit conversions. Tiles cite NIST SP 811,

@@ -409,6 +409,46 @@
       "kind": "industry"
     },
     {
+      "term": "sweat rate",
+      "target": "sweat-rate-hydration",
+      "kind": "industry"
+    },
+    {
+      "term": "fluid replacement",
+      "target": "sweat-rate-hydration",
+      "kind": "industry"
+    },
+    {
+      "term": "hydration calculator",
+      "target": "sweat-rate-hydration",
+      "kind": "industry"
+    },
+    {
+      "term": "weigh in weigh out",
+      "target": "sweat-rate-hydration",
+      "kind": "redirect"
+    },
+    {
+      "term": "sweat loss",
+      "target": "sweat-rate-hydration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dehydration percent",
+      "target": "sweat-rate-hydration",
+      "kind": "redirect"
+    },
+    {
+      "term": "rehydration volume",
+      "target": "sweat-rate-hydration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fluid deficit",
+      "target": "sweat-rate-hydration",
+      "kind": "adjacent"
+    },
+    {
       "term": "brine concentration",
       "target": "brine-cure",
       "kind": "industry"

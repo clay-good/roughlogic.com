@@ -460,6 +460,7 @@ export const TOOLS = [
 
   { id: "search-probability", name: "Search Probability of Detection", group: "P", trades: ["field", "fire"], desc: "Cumulative probability of detection across search passes, probability of success (POS = POA x cumulative POD), and residual containment probability for SAR planning." },
   { id: "search-track-spacing", name: "Search Track Spacing and Coverage", group: "P", trades: ["field", "fire"], desc: "Single-pass probability of detection from corrected sweep width and track spacing (coverage = W/S, POD = 1 - e^-coverage), or the spacing that hits a target POD. The planning number a search segment's resources are set from." },
+  { id: "sweat-rate-hydration", name: "Sweat Rate and Fluid Replacement", group: "P", trades: ["field", "fire"], desc: "Personal sweat rate and rehydration target from a weigh-in/weigh-out (sweat_loss = (pre-post) x 16 + fluid - urine), with the percent body-weight loss flagged against the 2% performance-degradation line. Sets a drinking plan for the next shift." },
   // Group Q: Historical Reference Data (v4)
   { id: "historical-pricing", name: "Historical Pricing Context", group: "Q", trades: ["reference"], desc: "Bundled monthly history per commodity (BLS PPI / EIA / USDA NASS / FRED) with 25 / 50 / 75 / 90 percentile bands over a user-selected lookback. Reference only; no live fetch." },
 

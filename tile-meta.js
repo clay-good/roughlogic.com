@@ -229,6 +229,7 @@ const _TILES = [
   ["braking-distance", "F"], ["confined-space-purge", "F"], ["rope-ma", "F"],
   ["sling-angle", "F"], ["iso-nff", "F"],
   ["search-track-spacing", "P"],
+  ["sweat-rate-hydration", "P"],
   ["scba-cylinder-time", "F"], ["nfpa-1142-water-supply", "F"],
   ["confined-space-vent", "F"],
   ["standpipe-pdp", "F"], ["smoke-ejector-cfm", "F"],

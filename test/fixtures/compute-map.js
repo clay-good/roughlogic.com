@@ -480,6 +480,7 @@ export const COMPUTE_MAP = {
   "ppe": { module: "../../calc-restoration.js", fn: "computePPE" },
   "sling-angle": { module: "../../calc-rescue.js", fn: "computeSlingAngle" },
   "search-track-spacing": { module: "../../calc-rescue.js", fn: "computeSearchTrackSpacing" },
+  "sweat-rate-hydration": { module: "../../calc-rescue.js", fn: "computeSweatRateHydration" },
   "lab-dilution": { module: "../../calc-water.js", fn: "computeDilution" },
   "pump-eff-w2w": { module: "../../calc-water.js", fn: "computePumpEfficiency" },
   "osha-top10": { module: "../../calc-references.js", fn: "computeOSHATop10" },
