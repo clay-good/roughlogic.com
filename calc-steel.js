@@ -946,3 +946,46 @@ STEEL_RENDERERS["steel-camber"] = _simpleRenderer({
   ],
   compute: computeSteelCamber,
 });
+
+// ===================== spec-v547: steel floor walking vibration (AISC DG11) =====================
+
+// dims: in { natural_freq_hz: T^-1, effective_wt_lb: M L T^-2, damping_ratio: dimensionless, walker_force_lb: M L T^-2, limit_ratio: dimensionless } out: { ap_over_g: dimensionless, limit_ratio: dimensionless }
+export function computeSteelFloorVibration({ natural_freq_hz = 0, effective_wt_lb = 0, damping_ratio = 0.03, walker_force_lb = 65, limit_ratio = 0.005 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fn = Number(natural_freq_hz) || 0;
+  const W = Number(effective_wt_lb) || 0;
+  const beta = Number(damping_ratio) || 0;
+  const P0 = Number(walker_force_lb) || 0;
+  const limit = Number(limit_ratio) || 0;
+  if (!(fn > 0)) return { error: "Natural frequency must be positive (Hz)." };
+  if (!(W > 0)) return { error: "Effective panel weight must be positive (lb)." };
+  if (!(P0 > 0)) return { error: "Walker force P0 must be positive (lb)." };
+  if (!(beta > 0 && beta < 1)) return { error: "Damping ratio must be between 0 and 1 (0.02-0.05 typical)." };
+  if (!(limit > 0)) return { error: "Occupancy limit must be positive (e.g. 0.005 office)." };
+  const ap_over_g = P0 * Math.exp(-0.35 * fn) / (beta * W);
+  const pass = ap_over_g <= limit;
+  return {
+    ap_over_g, limit_ratio: limit, pass,
+    note: "Stiffer is not automatically better: the e^(-0.35 fn) term makes low-frequency floors (about 4-8 Hz) resonate with the walking harmonic, so a floor tuned into that band accelerates more, not less. Damping (beta) and the effective panel weight (W) matter as much as the frequency. The natural frequency comes from the combined beam-plus-girder deflection. A full DG11 evaluation and the engineer of record govern.",
+  };
+}
+
+export const steelFloorVibrationExample = { inputs: { natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 } };
+
+STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
+  citation: "Citation: AISC Design Guide 11 (2nd ed.) walking-vibration serviceability check: ap/g = P0 x e^(-0.35 fn) / (beta W), pass when ap/g <= ao/g. Common values: P0 ~ 65 lb (office), occupancy limit 0.5% g (office/residence), 1.5% g (mall). Stiffer is not automatically better - the exponential term makes low-frequency floors (~4-8 Hz) resonate with the walking harmonic. A serviceability screen; a full DG11 evaluation and the engineer of record govern.",
+  example: steelFloorVibrationExample.inputs,
+  fields: [
+    { key: "natural_freq_hz", label: "Floor natural frequency fn (Hz)", kind: "number" },
+    { key: "effective_wt_lb", label: "Effective panel weight W (lb)", kind: "number" },
+    { key: "damping_ratio", label: "Damping ratio beta", kind: "number", default: 0.03 },
+    { key: "walker_force_lb", label: "Walker force P0 (lb)", kind: "number", default: 65 },
+    { key: "limit_ratio", label: "Occupancy limit ao/g", kind: "number", default: 0.005 },
+  ],
+  outputs: [
+    { key: "a", id: "sfv-out-a", label: "Peak acceleration ap/g", value: (r) => fmt(r.ap_over_g * 100, 2) + "% g" },
+    { key: "p", id: "sfv-out-p", label: "Walking-vibration check", value: (r) => (r.pass ? "PASS" : "FAIL") + " (limit " + fmt(r.limit_ratio * 100, 2) + "% g)" },
+    { key: "n", id: "sfv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelFloorVibration,
+});

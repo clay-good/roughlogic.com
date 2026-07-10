@@ -33912,6 +33912,54 @@
    }
   },
   {
+   "tile_id": "steel-floor-vibration",
+   "source_publisher": "AISC Design Guide 11 (2nd ed.) walking-vibration check",
+   "source_title": "ap/g = P0 x e^(-0.35 fn) / (beta W); pass when ap/g <= ao/g",
+   "source_edition_or_year": "AISC DG11",
+   "source_section_or_page": "fn 5 Hz, W 30000 lb, beta 0.03, P0 65 lb, limit 0.5% -> 1.26% g, FAIL (in the resonant band)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "natural_freq_hz": 5,
+    "effective_wt_lb": 30000,
+    "damping_ratio": 0.03,
+    "walker_force_lb": 65,
+    "limit_ratio": 0.005
+   },
+   "outputs": {
+    "ap_over_g": {
+     "value": 0.01255,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-floor-vibration",
+   "source_publisher": "AISC Design Guide 11 (2nd ed.) walking-vibration check",
+   "source_title": "raising the frequency out of the walking band fixes it",
+   "source_edition_or_year": "AISC DG11",
+   "source_section_or_page": "Same floor at fn 8 Hz -> 0.44% g, PASS (escapes the harmonic)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "natural_freq_hz": 8,
+    "effective_wt_lb": 30000,
+    "damping_ratio": 0.03,
+    "walker_force_lb": 65,
+    "limit_ratio": 0.005
+   },
+   "outputs": {
+    "ap_over_g": {
+     "value": 0.00439,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fire-pump-curve",
    "source_publisher": "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection)",
    "source_title": "500 gpm at 100 psi pump, 128 psi churn / 72 psi at 750 gpm -> limit 140, floor 65, both pass (12% / 7% margins)",

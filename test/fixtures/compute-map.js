@@ -966,6 +966,7 @@ export const COMPUTE_MAP = {
   "shear-stud-strength": { module: "../../calc-steel.js", fn: "computeShearStudStrength" },
   "composite-beam-flexure": { module: "../../calc-steel.js", fn: "computeCompositeBeamFlexure" },
   "steel-camber": { module: "../../calc-steel.js", fn: "computeSteelCamber" },
+  "steel-floor-vibration": { module: "../../calc-steel.js", fn: "computeSteelFloorVibration" },
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (3 tiles, new calc-concrete.js)
   "rc-beam-flexure": { module: "../../calc-concrete.js", fn: "computeRcBeamFlexure" },
   "rc-beam-shear": { module: "../../calc-concrete.js", fn: "computeRcBeamShear" },

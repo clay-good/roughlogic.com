@@ -16834,6 +16834,46 @@
       "kind": "industry"
     },
     {
+      "term": "floor vibration",
+      "target": "steel-floor-vibration",
+      "kind": "industry"
+    },
+    {
+      "term": "walking vibration",
+      "target": "steel-floor-vibration",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc design guide 11",
+      "target": "steel-floor-vibration",
+      "kind": "redirect"
+    },
+    {
+      "term": "floor bounce",
+      "target": "steel-floor-vibration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "peak acceleration floor",
+      "target": "steel-floor-vibration",
+      "kind": "redirect"
+    },
+    {
+      "term": "vibration serviceability",
+      "target": "steel-floor-vibration",
+      "kind": "industry"
+    },
+    {
+      "term": "annoying floor",
+      "target": "steel-floor-vibration",
+      "kind": "adjacent"
+    },
+    {
+      "term": "natural frequency floor",
+      "target": "steel-floor-vibration",
+      "kind": "adjacent"
+    },
+    {
       "term": "consolidation time",
       "target": "consolidation-time-rate",
       "kind": "industry"

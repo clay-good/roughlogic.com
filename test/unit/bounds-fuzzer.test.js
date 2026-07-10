@@ -18240,3 +18240,27 @@ test("bounds: spec-v546 computeWindSolidSign pins F = qh G Cf As, the 0.2B eccen
   assert.ok("error" in _v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 0 }));
   assert.ok("error" in _v546({ velocity_pressure_psf: 17, gust_factor: 2.5, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 }));
 });
+
+import { computeSteelFloorVibration as _v547 } from "../../calc-steel.js";
+
+test("bounds: spec-v547 computeSteelFloorVibration pins the exponential frequency term, the 5-to-8 Hz pass/fail flip, and error seams", () => {
+  const f5 = _v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 });
+  assert.ok(Math.abs(f5.ap_over_g - 0.01255) < 0.0001); // 65*e^-1.75/(0.03*30000)
+  assert.equal(f5.pass, false); // 1.26% > 0.5%
+  // Raising the frequency out of the walking band clears the check.
+  const f8 = _v547({ natural_freq_hz: 8, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 });
+  assert.ok(Math.abs(f8.ap_over_g - 0.00439) < 0.0001);
+  assert.equal(f8.pass, true);
+  // Stiffer (higher fn) is better here: acceleration falls with frequency.
+  assert.ok(f8.ap_over_g < f5.ap_over_g);
+  // More damping and more weight both cut the acceleration proportionally.
+  assert.ok(Math.abs(_v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.06, walker_force_lb: 65, limit_ratio: 0.005 }).ap_over_g - f5.ap_over_g / 2) < 1e-9);
+  assert.ok(Math.abs(_v547({ natural_freq_hz: 5, effective_wt_lb: 60000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 }).ap_over_g - f5.ap_over_g / 2) < 1e-9);
+  // Error seams: non-finite, non-positive fn / W / P0, damping out of range, non-positive limit.
+  assert.ok("error" in _v547({ natural_freq_hz: Infinity, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 }));
+  assert.ok("error" in _v547({ natural_freq_hz: 0, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 }));
+  assert.ok("error" in _v547({ natural_freq_hz: 5, effective_wt_lb: 0, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0.005 }));
+  assert.ok("error" in _v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 0, limit_ratio: 0.005 }));
+  assert.ok("error" in _v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 1.5, walker_force_lb: 65, limit_ratio: 0.005 }));
+  assert.ok("error" in _v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0 }));
+});

@@ -10583,6 +10583,17 @@ export const CITATIONS = {
       { name: "Practical minimum", value: "not cambered below about 3/4 in", source: "fabrication practice" },
     ],
   },
+  "steel-floor-vibration": {
+    formula: "ap/g = P0 x e^(-0.35 x fn) / (beta x W); pass when ap/g <= ao/g.",
+    edition: "AISC Design Guide 11 (2nd ed.) walking-vibration serviceability check, by name.",
+    freeAccess: "AISC Design Guide 11 is available through AISC; the walking-vibration relation is a published serviceability check.",
+    governance: GOVERNANCE.general,
+    editionNote: "Stiffer is not automatically better because the exponential term makes low-frequency floors (about 4-8 Hz) resonate with the walking harmonic; damping (beta) and the effective panel weight (W) matter as much as the frequency; the natural frequency comes from the combined beam-plus-girder deflection. Common values: P0 ~ 65 lb (office), occupancy limit 0.5% g (office/residence), 1.5% g (mall). A serviceability screen, not the engineer of record.",
+    assumptions: [
+      { name: "Occupancy limits", value: "ao/g = 0.5% office/residence, 1.5% mall; P0 ~ 65 lb office walker", source: "AISC DG11" },
+      { name: "Resonant band", value: "low-frequency floors ~4-8 Hz resonate with the walking harmonic (e^(-0.35 fn) term)", source: "AISC DG11" },
+    ],
+  },
   "rc-beam-flexure": {
     formula: "a = As x fy / (0.85 x f'c x b); Mn = As x fy x (d - a/2); phi Mn = 0.90 x Mn (tension-controlled); util = Mu / phi Mn.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.2.2.4.1 (equivalent rectangular stress block), §22.2 (nominal flexural strength), §21.2.2 (phi = 0.90 tension-controlled).",
