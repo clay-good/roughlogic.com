@@ -19549,6 +19549,46 @@
       "kind": "industry"
     },
     {
+      "term": "moment magnifier",
+      "target": "rc-slender-column-magnify",
+      "kind": "industry"
+    },
+    {
+      "term": "slender column",
+      "target": "rc-slender-column-magnify",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 6.6.4",
+      "target": "rc-slender-column-magnify",
+      "kind": "redirect"
+    },
+    {
+      "term": "p-delta column",
+      "target": "rc-slender-column-magnify",
+      "kind": "adjacent"
+    },
+    {
+      "term": "nonsway magnification",
+      "target": "rc-slender-column-magnify",
+      "kind": "redirect"
+    },
+    {
+      "term": "delta ns",
+      "target": "rc-slender-column-magnify",
+      "kind": "redirect"
+    },
+    {
+      "term": "critical buckling load",
+      "target": "rc-slender-column-magnify",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column slenderness",
+      "target": "rc-slender-column-magnify",
+      "kind": "adjacent"
+    },
+    {
       "term": "glulam volume factor",
       "target": "glulam-volume-factor",
       "kind": "industry"

@@ -10102,6 +10102,17 @@ export const CITATIONS = {
       { name: "Sustained load", value: "the multiplier applies to the immediate deflection from the sustained load only", source: "ACI 318-19 24.2.4.1" },
     ],
   },
+  "rc-slender-column-magnify": {
+    formula: "Cm = max(0.6 + 0.4 M1/M2, 0.4); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03 h).",
+    edition: "The ACI 318-19 Section 6.6.4.5 nonsway (braced) slender-column moment magnifier, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Section 6.6.4 slenderness provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The critical buckling load Pc carries a 0.75 stiffness reduction in the magnifier denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h); a column just over the slenderness limit k lu/r <= 34 - 12(M1/M2) picks up an amplifier the flexure check never applies; M1/M2 is negative for double curvature (lowering Cm). This is the nonsway (braced-frame) magnifier only. A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Nonsway frame", value: "braced (nonsway) 6.6.4.5 magnifier; a sway frame uses the 6.6.4.6 delta_s procedure", source: "ACI 318-19 6.6.4.5" },
+      { name: "0.75 stiffness factor", value: "Pc appears as 0.75 Pc in the denominator (the stiffness-reduction factor)", source: "ACI 318-19 6.6.4.5.2" },
+    ],
+  },
   "concrete-anchor-breakout": {
     formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb.",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",

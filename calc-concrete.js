@@ -914,6 +914,60 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
 
 export const concreteAnchorBreakoutExample = { inputs: { embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in", lambda: 1.0 } };
 
+// ===================== spec-v552: slender column moment magnification, nonsway (ACI 318-19 6.6.4.5) =====================
+
+// dims: in { factored_axial_kip: M L T^-2, end_moment_m2_kft: M L^2 T^-2, end_moment_m1_kft: M L^2 T^-2, unbraced_len_ft: L, eff_length_k: dimensionless, eff_stiffness_ei: M L^3 T^-2, column_dim_h_in: L } out: { cm: dimensionless, pc_kip: M L T^-2, delta_ns: dimensionless, mc_kft: M L^2 T^-2 }
+export function computeRcSlenderColumnMagnify({ factored_axial_kip = 0, end_moment_m2_kft = 0, end_moment_m1_kft = 0, unbraced_len_ft = 0, eff_length_k = 1.0, eff_stiffness_ei = 0, column_dim_h_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Pu = Number(factored_axial_kip) || 0;
+  const M2 = Number(end_moment_m2_kft) || 0;
+  const M1 = Number(end_moment_m1_kft) || 0;
+  const lu = Number(unbraced_len_ft) || 0;
+  const k = Number(eff_length_k) || 0;
+  const EI = Number(eff_stiffness_ei) || 0;
+  const h = Number(column_dim_h_in) || 0;
+  if (!(Pu > 0)) return { error: "Factored axial load must be positive (kip)." };
+  if (!(M2 > 0)) return { error: "Larger end moment M2 must be positive (kip-ft)." };
+  if (!(lu > 0)) return { error: "Unbraced length must be positive (ft)." };
+  if (!(k > 0)) return { error: "Effective-length factor k must be positive." };
+  if (!(EI > 0)) return { error: "Effective stiffness EI must be positive (kip-in^2)." };
+  if (h < 0) return { error: "Column dimension h cannot be negative (in)." };
+  const cm = Math.max(0.6 + 0.4 * (M1 / M2), 0.4);
+  const lu_in = lu * 12;
+  const pc_kip = Math.PI * Math.PI * EI / Math.pow(k * lu_in, 2);
+  if (Pu >= 0.75 * pc_kip) return { error: "Axial load is at or above 0.75 x Pc - the column has buckled; increase the section or reduce the length." };
+  const delta_ns = Math.max(cm / (1 - Pu / (0.75 * pc_kip)), 1.0);
+  const m2_min_kft = Pu * (0.6 + 0.03 * h) / 12;
+  const mc_kft = Math.max(delta_ns * M2, m2_min_kft);
+  return {
+    cm, pc_kip, delta_ns, m2_min_kft, mc_kft,
+    note: "The critical buckling load Pc carries a 0.75 stiffness reduction in the denominator; the design moment is floored at M2,min = Pu(0.6 + 0.03h). A column just over the slenderness limit k lu/r <= 34 - 12(M1/M2) picks up a magnifier the flexure check never applies. M1/M2 is negative for double curvature (which lowers Cm). ACI 318 and the engineer of record govern.",
+  };
+}
+
+export const rcSlenderColumnMagnifyExample = { inputs: { factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 } };
+
+CONCRETE_RENDERERS["rc-slender-column-magnify"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 6.6.4.5 nonsway (braced) moment magnifier: Cm = max(0.6 + 0.4 M1/M2, 0.4); Pc = pi^2 EI / (k lu)^2; delta_ns = max(Cm / (1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min), M2,min = Pu(0.6 + 0.03h). The 0.75 stiffness reduction sits in the denominator; the moment is floored at M2,min. A column just over the slenderness limit picks up an amplifier the flexure check never applies. ACI 318 and the engineer of record govern.",
+  example: rcSlenderColumnMagnifyExample.inputs,
+  fields: [
+    { key: "factored_axial_kip", label: "Factored axial load Pu (kip)", kind: "number" },
+    { key: "end_moment_m2_kft", label: "Larger end moment M2 (kip-ft)", kind: "number" },
+    { key: "end_moment_m1_kft", label: "Smaller end moment M1 (kip-ft, - double curvature)", kind: "number" },
+    { key: "unbraced_len_ft", label: "Unbraced length lu (ft)", kind: "number" },
+    { key: "eff_length_k", label: "Effective-length factor k", kind: "number", default: 1.0 },
+    { key: "eff_stiffness_ei", label: "Effective stiffness EI (kip-in^2)", kind: "number" },
+    { key: "column_dim_h_in", label: "Column dimension h (in)", kind: "number" },
+  ],
+  outputs: [
+    { key: "cm", id: "scm-out-cm", label: "Cm", value: (r) => fmt(r.cm, 3) },
+    { key: "pc", id: "scm-out-pc", label: "Critical buckling load Pc", value: (r) => fmt(r.pc_kip, 1) + " kip" },
+    { key: "dns", id: "scm-out-dns", label: "Moment magnifier delta_ns", value: (r) => fmt(r.delta_ns, 2) },
+    { key: "mc", id: "scm-out-mc", label: "Magnified design moment Mc", value: (r) => fmt(r.mc_kft, 1) + " kip-ft (M2,min " + fmt(r.m2_min_kft, 1) + ")" },
+  ],
+  compute: computeRcSlenderColumnMagnify,
+});
+
 CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 Section 17.6.2 concrete breakout in tension (CCD method): Nb = kc lambda sqrt(f'c) hef^1.5 (kc = 24 cast-in, 17 post-installed), ANco = 9 hef^2, edge factor psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef, Ncb = (ANc/ANco) psi_ed Nb, phiNcb = 0.65 Ncb. The basic strength scales with embedment^1.5; a near-edge anchor loses capacity to the edge factor and a truncated projected area. Cracked-vs-uncracked psi_c applies (1.0 here). ACI 318 Chapter 17 and the engineer of record govern.",
   example: concreteAnchorBreakoutExample.inputs,

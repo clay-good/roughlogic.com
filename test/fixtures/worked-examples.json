@@ -37142,6 +37142,82 @@
    }
   },
   {
+   "tile_id": "rc-slender-column-magnify",
+   "source_publisher": "ACI 318-19 Section 6.6.4.5 (nonsway moment magnifier)",
+   "source_title": "delta_ns = max(Cm/(1 - Pu/(0.75 Pc)), 1.0); Mc = max(delta_ns M2, M2,min)",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "Pu 200, M2 80, M1 50, lu 14 ft, k 1, EI 1.5e6, h 16 -> Cm 0.85, Pc 524.5, delta_ns 1.73, Mc 138.3 kip-ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "factored_axial_kip": 200,
+    "end_moment_m2_kft": 80,
+    "end_moment_m1_kft": 50,
+    "unbraced_len_ft": 14,
+    "eff_length_k": 1.0,
+    "eff_stiffness_ei": 1500000,
+    "column_dim_h_in": 16
+   },
+   "outputs": {
+    "cm": {
+     "value": 0.85,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pc_kip": {
+     "value": 524.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "delta_ns": {
+     "value": 1.73,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "mc_kft": {
+     "value": 138.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rc-slender-column-magnify",
+   "source_publisher": "ACI 318-19 Section 6.6.4.5 (nonsway moment magnifier)",
+   "source_title": "a shorter, stiffer column barely magnifies",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "Same loads at lu 10 ft -> Pc 1028, delta_ns 1.15, Mc 91.8 kip-ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "factored_axial_kip": 200,
+    "end_moment_m2_kft": 80,
+    "end_moment_m1_kft": 50,
+    "unbraced_len_ft": 10,
+    "eff_length_k": 1.0,
+    "eff_stiffness_ei": 1500000,
+    "column_dim_h_in": 16
+   },
+   "outputs": {
+    "delta_ns": {
+     "value": 1.15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "mc_kft": {
+     "value": 91.8,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-punching-shear",
    "source_publisher": "ACI 318-19 Table 22.6.5.2",
    "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",

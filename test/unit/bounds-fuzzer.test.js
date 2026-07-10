@@ -18327,3 +18327,32 @@ test("bounds: spec-v550 computeCraneOutriggerReaction pins the even share, the o
   assert.ok("error" in _v550({ gross_load_kip: 40, load_radius_ft: 30, outrigger_spread_ft: 0 }));
   assert.ok("error" in _v550({ gross_load_kip: 40, counterweight_kip: -1, load_radius_ft: 30, outrigger_spread_ft: 20 }));
 });
+
+import { computeRcSlenderColumnMagnify as _v552 } from "../../calc-concrete.js";
+
+test("bounds: spec-v552 computeRcSlenderColumnMagnify pins Cm, the 0.75-Pc denominator, the M2,min floor, and error seams", () => {
+  const r = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
+  assert.ok(Math.abs(r.cm - 0.85) < 0.001); // 0.6 + 0.4*(50/80)
+  assert.ok(Math.abs(r.pc_kip - 524.5) < 0.5); // pi^2*1.5e6/168^2
+  assert.ok(Math.abs(r.delta_ns - 1.73) < 0.01);
+  assert.ok(Math.abs(r.mc_kft - 138.3) < 0.5);
+  // A shorter column magnifies far less.
+  const short = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 });
+  assert.ok(Math.abs(short.delta_ns - 1.15) < 0.01);
+  assert.ok(short.mc_kft < r.mc_kft);
+  // The magnifier is bounded below at 1.0 (a stocky column takes no amplification).
+  assert.equal(_v552({ factored_axial_kip: 10, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 5000000, column_dim_h_in: 16 }).delta_ns, 1.0);
+  // The M2,min floor governs when the magnified moment is tiny (small M2).
+  const floored = _v552({ factored_axial_kip: 200, end_moment_m2_kft: 0.1, end_moment_m1_kft: 0, unbraced_len_ft: 10, eff_length_k: 1.0, eff_stiffness_ei: 5000000, column_dim_h_in: 16 });
+  assert.ok(Math.abs(floored.mc_kft - floored.m2_min_kft) < 1e-9);
+  // Cm is floored at 0.4.
+  assert.ok(_v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: -80, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }).cm >= 0.4);
+  // Error seams: non-finite, non-positive Pu / M2 / lu / EI / k, Pu >= 0.75 Pc.
+  assert.ok("error" in _v552({ factored_axial_kip: Infinity, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 0, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 0, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 0, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 0, column_dim_h_in: 16 }));
+  assert.ok("error" in _v552({ factored_axial_kip: 600, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 })); // Pu >= 0.75 Pc
+});
