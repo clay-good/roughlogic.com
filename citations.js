@@ -628,6 +628,17 @@ export const CITATIONS = {
       { name: "Upset", value: "effluent above influent is a negative removal, reported not errored", source: "scope of this tile" },
     ],
   },
+  "digester-vs-loading": {
+    formula: "VS_fed = feed_gal x 8.34 x (%TS/100) x (%VS/100); VSLR = VS_fed / volume x 1000; DT = volume x 7.48 / feed_gal.",
+    edition: "Anaerobic digester volatile-solids loading rate (WEF; university operator courses), by name.",
+    freeAccess: "The volatile-solids loading and detention-time relations are public wastewater-operations results; the digester monitoring and the operator govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Overloading past about 400 lb VS/day per 1,000 ft^3 sours the digester as the acid-formers outrun the methane-formers and the pH and alkalinity crash (a slow failure that takes weeks to recover); the loading rate, not a full tank, is the health metric; a thin feed can hit the limit at high flow and a rich feed at low flow. The high-rate band is 100-400 lb VS/day per 1,000 ft^3. An operating aid, not a process design.",
+    assumptions: [
+      { name: "High-rate band", value: "100-400 lb VS/day per 1,000 ft^3; over ~400 the digester can sour", source: "WEF / operator courses" },
+      { name: "Loading is the metric", value: "the loading rate, not a full tank, sets digester health; concentration and flow both matter", source: "WEF" },
+    ],
+  },
   "tds-from-conductivity": {
     formula: "tds_mgl = k_factor x conductivity_us_cm; k commonly 0.55-0.75 (default 0.65).",
     edition: "Total dissolved solids from electrical conductivity (Standard Methods 2510), by name.",

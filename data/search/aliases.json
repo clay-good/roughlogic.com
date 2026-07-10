@@ -17224,6 +17224,46 @@
       "kind": "industry"
     },
     {
+      "term": "volatile solids loading",
+      "target": "digester-vs-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "vslr",
+      "target": "digester-vs-loading",
+      "kind": "redirect"
+    },
+    {
+      "term": "digester loading",
+      "target": "digester-vs-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "anaerobic digester",
+      "target": "digester-vs-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "digester souring",
+      "target": "digester-vs-loading",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lb vs per 1000 cf",
+      "target": "digester-vs-loading",
+      "kind": "redirect"
+    },
+    {
+      "term": "digester detention time",
+      "target": "digester-vs-loading",
+      "kind": "adjacent"
+    },
+    {
+      "term": "biosolids loading",
+      "target": "digester-vs-loading",
+      "kind": "adjacent"
+    },
+    {
       "term": "manual d friction rate",
       "target": "manual-d-friction-rate",
       "kind": "industry"

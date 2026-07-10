@@ -24813,6 +24813,64 @@
    }
   },
   {
+   "tile_id": "digester-vs-loading",
+   "source_publisher": "WEF / university operator courses",
+   "source_title": "VS_fed = gal x 8.34 x (%TS/100) x (%VS/100); VSLR = VS_fed / volume x 1000",
+   "source_edition_or_year": "WEF",
+   "source_section_or_page": "15000 gpd, 4% TS, 75% VS, 20000 ft^3 -> 3753 lb/day, 188 VSLR, 10.0 day DT",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "feed_flow_gpd": 15000,
+    "percent_ts": 4,
+    "percent_vs": 75,
+    "digester_ft3": 20000
+   },
+   "outputs": {
+    "vs_fed_lb_day": {
+     "value": 3753,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "vslr": {
+     "value": 188,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "dt_days": {
+     "value": 10.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "digester-vs-loading",
+   "source_publisher": "WEF / university operator courses",
+   "source_title": "a richer feed overloads at the same flow",
+   "source_edition_or_year": "WEF",
+   "source_section_or_page": "Same flow at 8% TS -> 7506 lb/day, VSLR 375 (near the 400 ceiling)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "feed_flow_gpd": 15000,
+    "percent_ts": 8,
+    "percent_vs": 75,
+    "digester_ft3": 20000
+   },
+   "outputs": {
+    "vslr": {
+     "value": 375,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",

@@ -100,6 +100,7 @@ const _TILES = [
   ["langelier-index", "M"],
   ["chemical-feed-pump", "M"],
   ["clarifier-surface-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"],
+  ["digester-vs-loading", "M"],
   ["growing-degree-days", "L"],
   ["pearson-square-ration", "L"],
   ["livestock-water-requirement", "L"],

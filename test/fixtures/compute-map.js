@@ -56,6 +56,7 @@ export const COMPUTE_MAP = {
   "clarifier-surface-loading": { module: "../../calc-treatment.js", fn: "computeClarifierSurfaceLoading" },
   "bod-tss-loading-removal": { module: "../../calc-treatment.js", fn: "computeBodTssLoadingRemoval" },
   "tds-from-conductivity": { module: "../../calc-treatment.js", fn: "computeTdsFromConductivity" },
+  "digester-vs-loading": { module: "../../calc-treatment.js", fn: "computeDigesterVsLoading" },
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },
   "pearson-square-ration": { module: "../../calc-agriculture.js", fn: "computePearsonSquareRation" },
   "livestock-water-requirement": { module: "../../calc-agriculture.js", fn: "computeLivestockWaterRequirement" },

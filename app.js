@@ -925,6 +925,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-treatment.js", "TREATMENT_RENDERERS", [
     "weir-flow", "langelier-index", "chemical-feed-pump",
     "clarifier-surface-loading", "bod-tss-loading-removal", "tds-from-conductivity",
+    // spec-v573
+    "digester-vs-loading",
     // v93 pool and spa chemical balance
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
     "pool-chlorine-dose", "pool-heater-btu", "breakpoint-chlorination",

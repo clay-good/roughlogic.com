@@ -18831,3 +18831,27 @@ test("bounds: spec-v572 computeWasSrtControl pins the system-solids and solids-t
   assert.ok("error" in _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 0 }));
   assert.ok("error" in _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000, effluent_flow_mgd: 100, effluent_tss_mg_l: 30 })); // effluent exceeds target wasting
 });
+
+import { computeDigesterVsLoading as _v573 } from "../../calc-treatment.js";
+
+test("bounds: spec-v573 computeDigesterVsLoading pins the VS-fed relation, the VSLR against the band, the detention time, and error seams", () => {
+  const r = _v573({ feed_flow_gpd: 15000, percent_ts: 4, percent_vs: 75, digester_ft3: 20000 });
+  assert.ok(Math.abs(r.vs_fed_lb_day - 3753) < 1); // 15000*8.34*0.04*0.75
+  assert.ok(Math.abs(r.vslr - 187.65) < 1); // 3753/20000*1000
+  assert.ok(Math.abs(r.dt_days - 10.0) < 0.05); // 20000*7.48/15000
+  assert.equal(r.in_band, true); // 188 in 100-400
+  assert.equal(r.over_limit, false);
+  // A richer feed doubles the loading at the same flow, nearing the 400 ceiling.
+  const rich = _v573({ feed_flow_gpd: 15000, percent_ts: 8, percent_vs: 75, digester_ft3: 20000 });
+  assert.ok(Math.abs(rich.vslr - 375.3) < 1);
+  assert.ok(Math.abs(rich.vs_fed_lb_day - 2 * r.vs_fed_lb_day) < 1e-6);
+  // Overloading past 400 flags the souring risk.
+  assert.equal(_v573({ feed_flow_gpd: 20000, percent_ts: 8, percent_vs: 75, digester_ft3: 20000 }).over_limit, true);
+  // Error seams: non-finite, non-positive flow / volume / percents, percent > 100.
+  assert.ok("error" in _v573({ feed_flow_gpd: Infinity, percent_ts: 4, percent_vs: 75, digester_ft3: 20000 }));
+  assert.ok("error" in _v573({ feed_flow_gpd: 0, percent_ts: 4, percent_vs: 75, digester_ft3: 20000 }));
+  assert.ok("error" in _v573({ feed_flow_gpd: 15000, percent_ts: 4, percent_vs: 75, digester_ft3: 0 }));
+  assert.ok("error" in _v573({ feed_flow_gpd: 15000, percent_ts: 0, percent_vs: 75, digester_ft3: 20000 }));
+  assert.ok("error" in _v573({ feed_flow_gpd: 15000, percent_ts: 4, percent_vs: 0, digester_ft3: 20000 }));
+  assert.ok("error" in _v573({ feed_flow_gpd: 15000, percent_ts: 101, percent_vs: 75, digester_ft3: 20000 }));
+});

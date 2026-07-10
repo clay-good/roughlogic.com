@@ -615,3 +615,45 @@ function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
   for (const f of [ec, k]) f.input.addEventListener("input", update);
 }
 TREATMENT_RENDERERS["tds-from-conductivity"] = renderTdsFromConductivity;
+
+// --- spec-v573 M: Anaerobic digester volatile-solids loading rate ---
+// VS_fed = gpd*8.34*(%TS/100)*(%VS/100). VSLR = VS_fed/ft3*1000. DT = ft3*7.48/gpd.
+// dims: in { feed_flow_gpd: L^3 T^-1, percent_ts: dimensionless, percent_vs: dimensionless, digester_ft3: L^3 } out: { vs_fed_lb_day: M T^-1, vslr: dimensionless, dt_days: T }
+export function computeDigesterVsLoading({ feed_flow_gpd = 0, percent_ts = 0, percent_vs = 0, digester_ft3 = 0 } = {}) {
+  const feed = Number(feed_flow_gpd) || 0;
+  const ts = Number(percent_ts) || 0;
+  const vs = Number(percent_vs) || 0;
+  const vol = Number(digester_ft3) || 0;
+  if (!(feed > 0 && Number.isFinite(feed))) return { error: "Feed flow must be positive (gpd)." };
+  if (!(vol > 0 && Number.isFinite(vol))) return { error: "Digester volume must be positive (ft^3)." };
+  if (!(ts > 0 && ts <= 100)) return { error: "Total solids percent must be over 0 and at most 100." };
+  if (!(vs > 0 && vs <= 100)) return { error: "Volatile solids percent must be over 0 and at most 100." };
+  const vs_fed_lb_day = feed * 8.34 * (ts / 100) * (vs / 100);
+  const vslr = vs_fed_lb_day / vol * 1000;
+  const dt_days = vol * 7.48 / feed;
+  const over_limit = vslr > 400;
+  const in_band = vslr >= 100 && vslr <= 400;
+  return {
+    vs_fed_lb_day, vslr, dt_days, over_limit, in_band,
+    note: "Overloading past about 400 lb VS/day per 1,000 ft^3 sours the digester as the acid-formers outrun the methane-formers and the pH and alkalinity crash - a slow failure that takes weeks to recover. The loading rate, not a full tank, is the health metric; a thin feed can hit the limit at high flow and a rich feed at low flow. The high-rate band is 100-400 lb VS/day per 1,000 ft^3. The digester monitoring (pH, alkalinity, gas) and the operator govern.",
+  };
+}
+export const digesterVsLoadingExample = { inputs: { feed_flow_gpd: 15000, percent_ts: 4, percent_vs: 75, digester_ft3: 20000 } };
+const renderDigesterVsLoading = _rPool({
+  citation: "Citation: anaerobic digester volatile-solids loading rate (WEF; university operator courses), by name. VS_fed = feed_gal x 8.34 x (%TS/100) x (%VS/100); VSLR = VS_fed / volume x 1000; DT = volume x 7.48 / feed_gal. Overloading past ~400 lb VS/day per 1,000 ft^3 sours the digester (acid-formers outrun the methane-formers, pH and alkalinity crash). The loading rate, not a full tank, is the health metric. The digester monitoring and the operator govern.",
+  example: digesterVsLoadingExample.inputs,
+  fields: [
+    { key: "feed_flow_gpd", label: "Sludge feed flow (gpd)", kind: "number" },
+    { key: "percent_ts", label: "Total solids (%)", kind: "number" },
+    { key: "percent_vs", label: "Volatile fraction of TS (%)", kind: "number" },
+    { key: "digester_ft3", label: "Digester volume (ft^3)", kind: "number" },
+  ],
+  outputs: [
+    { key: "vs", id: "dvl-out-vs", label: "Volatile solids fed", value: (r) => fmt(r.vs_fed_lb_day, 0) + " lb/day" },
+    { key: "l", id: "dvl-out-l", label: "VSLR (per 1,000 ft^3)", value: (r) => fmt(r.vslr, 0) + " lb VS/day - " + (r.over_limit ? "OVER ~400, digester may sour" : r.in_band ? "in the 100-400 healthy band" : "below the high-rate band") },
+    { key: "d", id: "dvl-out-d", label: "Hydraulic detention time", value: (r) => fmt(r.dt_days, 1) + " days" },
+    { key: "n", id: "dvl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDigesterVsLoading,
+});
+TREATMENT_RENDERERS["digester-vs-loading"] = renderDigesterVsLoading;
