@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): spec-v590 Phase 2 batch 4 -- Groups G/K/D/L question corpus; 2026-07-10
+
+2,016 question-phrase aliases covering all 192 previously uncovered Group G (cross-trade), K (mechanic/machining), D (trucking), and L (agriculture/landscape/arborist) tiles at 8-12 phrasings each, same pipeline (6 sibling-collision rows dropped by the top-3 rank check). Shard 11,595 -> 13,611 rows, 198.6 KB gz -- approaching the spec's ~250 KB per-shard threshold; the final small-groups batch closes Phase 2 and the per-group split remediation stays deferred-until-evidence per the spec.
+
 ### feat(search): spec-v590 Phase 2 batch 3 -- Groups C + B question corpus; 2026-07-10
 
 1,980 question-phrase aliases covering all 174 previously uncovered Group C (HVAC) and Group B (plumbing) tiles at 9-12 phrasings each, same pipeline (2 dupes and 5 sibling-collision rows dropped by the top-3 rank check). Shard 9,615 -> 11,595 rows, 165.3 KB gz.
