@@ -18855,3 +18855,27 @@ test("bounds: spec-v573 computeDigesterVsLoading pins the VS-fed relation, the V
   assert.ok("error" in _v573({ feed_flow_gpd: 15000, percent_ts: 4, percent_vs: 0, digester_ft3: 20000 }));
   assert.ok("error" in _v573({ feed_flow_gpd: 15000, percent_ts: 101, percent_vs: 75, digester_ft3: 20000 }));
 });
+
+import { computeAerationOxygenDemand as _v574 } from "../../calc-water.js";
+
+test("bounds: spec-v574 computeAerationOxygenDemand pins the oxygen-demand relation with the 4.6 nitrification term, the air-from-SOTE relation, and error seams", () => {
+  const r = _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 200, sote_pct: 20 });
+  assert.ok(Math.abs(r.o2_carbon_lb_day - 2200) < 1e-9); // 1.1*2000
+  assert.ok(Math.abs(r.o2_nitro_lb_day - 920) < 1e-9); // 4.6*200
+  assert.ok(Math.abs(r.o2_demand_lb_day - 3120) < 1e-9);
+  assert.ok(Math.abs(r.air_scfm - 623) < 1); // 3120 / (0.075*0.232*0.20*1440)
+  // Forgetting nitrification under-sizes the blower by ~30%.
+  const carb = _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 0, sote_pct: 20 });
+  assert.ok(Math.abs(carb.o2_demand_lb_day - 2200) < 1e-9);
+  assert.ok(Math.abs(carb.air_scfm - 439) < 1);
+  assert.ok(carb.air_scfm < r.air_scfm);
+  // A lower SOTE demands proportionally more air.
+  assert.ok(Math.abs(_v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 200, sote_pct: 10 }).air_scfm - 2 * r.air_scfm) < 1e-6);
+  // Error seams: non-finite, non-positive BOD / factor, negative NH3, SOTE out of range.
+  assert.ok("error" in _v574({ bod_removed_lb_day: Infinity, oxygen_factor: 1.1, sote_pct: 20 }));
+  assert.ok("error" in _v574({ bod_removed_lb_day: 0, oxygen_factor: 1.1, sote_pct: 20 }));
+  assert.ok("error" in _v574({ bod_removed_lb_day: 2000, oxygen_factor: 0, sote_pct: 20 }));
+  assert.ok("error" in _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: -1, sote_pct: 20 }));
+  assert.ok("error" in _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, sote_pct: 0 }));
+  assert.ok("error" in _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, sote_pct: 101 }));
+});

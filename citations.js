@@ -8614,6 +8614,17 @@ export const CITATIONS = {
       { name: "Short dose", value: "a short dose points to an aged lamp, a fouled sleeve, or low UV transmittance (turbidity)", source: "USEPA UVDGM" },
     ],
   },
+  "aeration-oxygen-demand": {
+    formula: "O2_demand = oxygen_factor x BOD_removed + 4.6 x NH3_nitrified; air_scfm = O2_demand / (0.075 x 0.232 x (SOTE/100) x 1440).",
+    edition: "Activated-sludge oxygen and air demand (WEF aeration design), by name.",
+    freeAccess: "The oxygen-demand and air-from-SOTE relations are public wastewater-design results; the aeration equipment and the field transfer efficiency govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Nitrification adds 4.6 lb of oxygen per pound of ammonia-nitrogen oxidized - a large term easy to forget that starves the process at high sludge age; the standard oxygen transfer efficiency of diffused aeration is only about 10-35%, so most blown air leaves unused and the air demand far exceeds what the oxygen pounds suggest; the oxygen factor rises 0.9 (short SRT) to 1.5 (extended aeration). A sizing aid, not a blower selection.",
+    assumptions: [
+      { name: "Nitrification term", value: "4.6 lb O2 per lb ammonia-N nitrified, added to the carbonaceous oxygen demand", source: "WEF aeration design" },
+      { name: "Air from SOTE", value: "air_scfm = O2 / (0.075 lb/ft^3 x 0.232 O2 fraction x SOTE x 1440); diffused SOTE ~10-35%", source: "WEF aeration design" },
+    ],
+  },
   "was-srt-control": {
     formula: "system_solids = V x MLSS x 8.34; solids_to_waste = system_solids / SRT; effluent_solids = Qeff x TSSeff x 8.34; Q_WAS = (solids_to_waste - effluent_solids) / (WAS x 8.34); Q_WAS_gpm = Q_WAS x 1e6 / 1440.",
     edition: "WAS rate for a target SRT (MCRT/SRT control; WEF operator training), by name.",

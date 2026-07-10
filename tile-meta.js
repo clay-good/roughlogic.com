@@ -649,6 +649,7 @@ const _TILES = [
   ["population-equivalent", "M"],
   ["ras-flow-rate", "M"],
   ["was-srt-control", "M"],
+  ["aeration-oxygen-demand", "M"],
   // spec-v117 rigging load / wire-rope (Group Z)
   ["multi-leg-sling", "Z"],
   ["wire-rope-strength", "Z"],

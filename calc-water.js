@@ -1465,3 +1465,44 @@ const renderWasSrtControl = _v23SimpleRenderer({
   compute: computeWasSrtControl,
 });
 WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;
+
+// --- spec-v574 M: Activated-sludge oxygen and blower air demand ---
+// O2 = factor*BOD_removed + 4.6*NH3. air_scfm = O2 / (0.075*0.232*(SOTE/100)*1440).
+// dims: in { bod_removed_lb_day: M T^-1, oxygen_factor: dimensionless, nh3_nitrified_lb_day: M T^-1, sote_pct: dimensionless } out: { o2_demand_lb_day: M T^-1, air_scfm: L^3 T^-1 }
+export function computeAerationOxygenDemand({ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bod = Number(bod_removed_lb_day) || 0;
+  const factor = Number(oxygen_factor) || 0;
+  const nh3 = Number(nh3_nitrified_lb_day) || 0;
+  const sote = Number(sote_pct) || 0;
+  if (!(bod > 0)) return { error: "BOD removed must be positive (lb/day)." };
+  if (!(factor > 0)) return { error: "Oxygen factor must be positive (lb O2 per lb BOD)." };
+  if (nh3 < 0) return { error: "Ammonia nitrified cannot be negative (lb/day)." };
+  if (!(sote > 0 && sote <= 100)) return { error: "SOTE must be over 0 and at most 100 (%)." };
+  const o2_carbon_lb_day = factor * bod;
+  const o2_nitro_lb_day = 4.6 * nh3;
+  const o2_demand_lb_day = o2_carbon_lb_day + o2_nitro_lb_day;
+  const air_scfm = o2_demand_lb_day / (0.075 * 0.232 * (sote / 100) * 1440);
+  return {
+    o2_carbon_lb_day, o2_nitro_lb_day, o2_demand_lb_day, air_scfm,
+    note: "Nitrification adds 4.6 lb of oxygen per pound of ammonia-nitrogen oxidized - a large term that is easy to forget and that starves the process at high sludge age. The standard oxygen transfer efficiency (SOTE) of diffused aeration is only about 10-35%, so most of the blown air leaves the tank unused and the air demand in scfm far exceeds what the oxygen pounds suggest. The oxygen factor rises 0.9 (short SRT) to 1.5 (extended aeration). The aeration equipment and the field transfer efficiency govern.",
+  };
+}
+export const aerationOxygenDemandExample = { inputs: { bod_removed_lb_day: 2000, oxygen_factor: 1.1, nh3_nitrified_lb_day: 200, sote_pct: 20 } };
+const renderAerationOxygenDemand = _v23SimpleRenderer({
+  citation: "Citation: activated-sludge oxygen and air demand (WEF aeration design), by name. O2_demand = factor x BOD_removed + 4.6 x NH3_nitrified; air_scfm = O2_demand / (0.075 x 0.232 x (SOTE/100) x 1440). Nitrification adds 4.6 lb O2 per lb ammonia-N (easy to forget). Diffused-aeration SOTE is only ~10-35%, so the air demand far exceeds the oxygen pounds. The aeration equipment and field transfer efficiency govern.",
+  example: aerationOxygenDemandExample.inputs,
+  fields: [
+    { key: "bod_removed_lb_day", label: "BOD removed (lb/day)", kind: "number" },
+    { key: "oxygen_factor", label: "Oxygen factor (lb O2 / lb BOD, 0.9-1.5)", kind: "number", default: 1.1 },
+    { key: "nh3_nitrified_lb_day", label: "Ammonia-N nitrified (lb/day, 0 to skip)", kind: "number", default: 0 },
+    { key: "sote_pct", label: "SOTE (%, ~10-35 diffused)", kind: "number", default: 20 },
+  ],
+  outputs: [
+    { key: "o", id: "aod-out-o", label: "Oxygen demand (carbon + nitrogen)", value: (r) => fmt(r.o2_demand_lb_day, 0) + " lb/day (" + fmt(r.o2_carbon_lb_day, 0) + " carbon + " + fmt(r.o2_nitro_lb_day, 0) + " nitrification)" },
+    { key: "a", id: "aod-out-a", label: "Blower air demand", value: (r) => fmt(r.air_scfm, 0) + " scfm" },
+    { key: "n", id: "aod-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeAerationOxygenDemand,
+});
+WATER_RENDERERS["aeration-oxygen-demand"] = renderAerationOxygenDemand;

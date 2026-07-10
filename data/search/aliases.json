@@ -6609,6 +6609,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "aeration oxygen demand",
+      "target": "aeration-oxygen-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "blower air scfm",
+      "target": "aeration-oxygen-demand",
+      "kind": "industry"
+    },
+    {
+      "term": "oxygen requirement activated sludge",
+      "target": "aeration-oxygen-demand",
+      "kind": "redirect"
+    },
+    {
+      "term": "sote",
+      "target": "aeration-oxygen-demand",
+      "kind": "redirect"
+    },
+    {
+      "term": "nitrification oxygen 4.6",
+      "target": "aeration-oxygen-demand",
+      "kind": "redirect"
+    },
+    {
+      "term": "aeration air demand",
+      "target": "aeration-oxygen-demand",
+      "kind": "adjacent"
+    },
+    {
+      "term": "diffuser air",
+      "target": "aeration-oxygen-demand",
+      "kind": "adjacent"
+    },
+    {
+      "term": "o2 per bod",
+      "target": "aeration-oxygen-demand",
+      "kind": "redirect"
+    },
+    {
       "term": "multi leg sling",
       "target": "multi-leg-sling",
       "kind": "industry"

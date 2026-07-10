@@ -24871,6 +24871,58 @@
    }
   },
   {
+   "tile_id": "aeration-oxygen-demand",
+   "source_publisher": "WEF aeration design",
+   "source_title": "O2 = factor x BOD + 4.6 x NH3; air_scfm = O2 / (0.075 x 0.232 x SOTE x 1440)",
+   "source_edition_or_year": "WEF",
+   "source_section_or_page": "2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE -> 3120 lb/day O2, 623 scfm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "bod_removed_lb_day": 2000,
+    "oxygen_factor": 1.1,
+    "nh3_nitrified_lb_day": 200,
+    "sote_pct": 20
+   },
+   "outputs": {
+    "o2_demand_lb_day": {
+     "value": 3120,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "air_scfm": {
+     "value": 623,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "aeration-oxygen-demand",
+   "source_publisher": "WEF aeration design",
+   "source_title": "forgetting nitrification under-sizes the blower 30%",
+   "source_edition_or_year": "WEF",
+   "source_section_or_page": "Same BOD, no ammonia term -> 2200 lb/day O2, only 439 scfm (starves the nitrifiers)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "bod_removed_lb_day": 2000,
+    "oxygen_factor": 1.1,
+    "nh3_nitrified_lb_day": 0,
+    "sote_pct": 20
+   },
+   "outputs": {
+    "air_scfm": {
+     "value": 439,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",

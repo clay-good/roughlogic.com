@@ -932,6 +932,7 @@ export const COMPUTE_MAP = {
   "population-equivalent": { module: "../../calc-water.js", fn: "computePopulationEquivalent" },
   "ras-flow-rate": { module: "../../calc-water.js", fn: "computeRasFlowRate" },
   "was-srt-control": { module: "../../calc-water.js", fn: "computeWasSrtControl" },
+  "aeration-oxygen-demand": { module: "../../calc-water.js", fn: "computeAerationOxygenDemand" },
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },

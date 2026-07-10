@@ -2627,6 +2627,7 @@ cross-check.
 | calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderPitotTraverseCfm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-water.js | `computeAerationOxygenDemand` | `{ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_p...` | _ | _ | _ |
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDecay` | `{ initial_mg_l = 0, decay_k_per_hr = 0.1, time_hr = 0, target_mg_l = 0.2, vel...` | _ | _ | _ |
 | calc-water.js | `computeChlorineDemand` | `{ applied_mg_l = 0, measured_residual_mg_l = 0, target_residual_mg_l = 0 } = {}` | _ | _ | _ |
@@ -2684,7 +2685,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1270.
+Row count: 1271.
 
 <!-- END function-corpus-v14 -->
 
@@ -3643,10 +3644,11 @@ per spec-v14 §13.1 second paragraph.
 | `trunk-decay-strength` | Hollow / Decayed Trunk Strength Loss | Wagener 1963 / Mattheck t/R / ISA TRAQ; 24 in trunk, 4 in sound shell (hollow 16) -> 29.6% loss, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (32 tiles)
+### Group M Water and wastewater (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
+| `aeration-oxygen-demand` | Activated-Sludge Oxygen and Blower Air Demand | WEF aeration design; 2000 lb BOD, factor 1.1, 200 lb NH3, 20% SOTE -> 3120 lb/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `backflow-test-psi` | Backflow Assembly Test Pass Criteria | USC FCCCHR Manual / AWWA C511; #1 check 8 psid, relief 4 psid -> buffer 4 psid, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bod-tss-loading-removal` | BOD/TSS Mass Loading and Percent Removal | wastewater operations (pounds formula); spec-v406 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `breakpoint-chlorination` | Breakpoint Chlorination Dose | Standard Methods 4500-Cl; spec-v355 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3896,6 +3898,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1026. Fixture-covered or reference-cadence: 1026 / 1026.
+Tile count: 1027. Fixture-covered or reference-cadence: 1027 / 1027.
 
 <!-- END tile-index-v14 -->

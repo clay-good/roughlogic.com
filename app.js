@@ -916,6 +916,8 @@ const TOOL_MODULES = (() => {
     "ras-flow-rate",
     // spec-v572
     "was-srt-control",
+    // spec-v574
+    "aeration-oxygen-demand",
   ]);
   // spec-v75 cap-relief split: the cohesive spec-v20 Phase M bench (weir-flow,
   // langelier-index, chemical-feed-pump) relocated out of calc-water.js (which had
