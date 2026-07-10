@@ -17304,6 +17304,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "velocity gradient",
+      "target": "flocculation-g-value",
+      "kind": "industry"
+    },
+    {
+      "term": "g value",
+      "target": "flocculation-g-value",
+      "kind": "industry"
+    },
+    {
+      "term": "gt value",
+      "target": "flocculation-g-value",
+      "kind": "redirect"
+    },
+    {
+      "term": "flocculation mixing",
+      "target": "flocculation-g-value",
+      "kind": "industry"
+    },
+    {
+      "term": "camp stein",
+      "target": "flocculation-g-value",
+      "kind": "industry"
+    },
+    {
+      "term": "rapid mix g",
+      "target": "flocculation-g-value",
+      "kind": "adjacent"
+    },
+    {
+      "term": "floc shear",
+      "target": "flocculation-g-value",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mixing intensity water",
+      "target": "flocculation-g-value",
+      "kind": "redirect"
+    },
+    {
       "term": "manual d friction rate",
       "target": "manual-d-friction-rate",
       "kind": "industry"

@@ -18879,3 +18879,27 @@ test("bounds: spec-v574 computeAerationOxygenDemand pins the oxygen-demand relat
   assert.ok("error" in _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, sote_pct: 0 }));
   assert.ok("error" in _v574({ bod_removed_lb_day: 2000, oxygen_factor: 1.1, sote_pct: 101 }));
 });
+
+import { computeFlocculationGValue as _v575 } from "../../calc-treatment.js";
+
+test("bounds: spec-v575 computeFlocculationGValue pins the sqrt relation, the viscosity-from-temperature dependence, the Gt product, and error seams", () => {
+  const r = _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 1200 });
+  assert.ok(Math.abs(r.g_value - 48) < 0.5); // sqrt(300/(0.001307*100))
+  assert.ok(Math.abs(r.gt_value - 57492) < 50); // G * 1200
+  assert.ok(/flocculation/.test(r.band));
+  // Warm water lowers the viscosity, raising G for the same power.
+  const warm = _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: 25, detention_time_s: 1200 });
+  assert.ok(Math.abs(warm.g_value - 58) < 0.5);
+  assert.ok(warm.g_value > r.g_value);
+  // A high power input classifies as rapid mix.
+  assert.ok(/rapid mix/.test(_v575({ power_input_w: 300000, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 60 }).band));
+  // The Gt product scales with the detention time.
+  assert.ok(Math.abs(_v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 600 }).gt_value - r.gt_value / 2) < 1e-6);
+  // Error seams: non-finite, non-positive power / volume / time, temp out of table.
+  assert.ok("error" in _v575({ power_input_w: Infinity, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 1200 }));
+  assert.ok("error" in _v575({ power_input_w: 0, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 1200 }));
+  assert.ok("error" in _v575({ power_input_w: 300, basin_volume_m3: 0, water_temp_c: 10, detention_time_s: 1200 }));
+  assert.ok("error" in _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 0 }));
+  assert.ok("error" in _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: 50, detention_time_s: 1200 }));
+  assert.ok("error" in _v575({ power_input_w: 300, basin_volume_m3: 100, water_temp_c: -5, detention_time_s: 1200 }));
+});

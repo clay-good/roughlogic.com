@@ -115,6 +115,7 @@ const RELATED = {
   "bod-tss-loading-removal": ["srt-fm-ratio", "clarifier-surface-loading", "chemical-feed-pump", "coagulant-dose"],
   "tds-from-conductivity": ["langelier-index", "softener-sizing", "bod-tss-loading-removal", "coagulant-dose"],
   "digester-vs-loading": ["bod-tss-loading-removal", "population-equivalent", "srt-fm-ratio"],
+  "flocculation-g-value": ["coagulant-dose", "detention-time", "clarifier-surface-loading"],
   "growing-degree-days": ["crop-yield", "thi-livestock", "irrigation-requirement"],
   "pearson-square-ration": ["tank-mix", "npk-blend", "crop-yield"],
   "livestock-water-requirement": ["thi-livestock", "cattle-stocking-rate", "irrigation-requirement"],

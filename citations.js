@@ -628,6 +628,17 @@ export const CITATIONS = {
       { name: "Upset", value: "effluent above influent is a negative removal, reported not errored", source: "scope of this tile" },
     ],
   },
+  "flocculation-g-value": {
+    formula: "G = sqrt(P / (mu x V)); Gt = G x detention_time; mu = water dynamic viscosity at the given temperature.",
+    edition: "Camp-Stein velocity gradient (Camp & Stein 1943; Ten States Standards), by name.",
+    freeAccess: "The velocity-gradient relation is a public water-treatment result; the viscosity comes from a standard water-property table and the treatment-process design governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "G depends on the water temperature through viscosity, so cold water yields a lower G for the same paddle power and can drop flocculation below the 20-per-second floor; too high a G in the flocculation basin shears the floc apart (why rapid mix G 500-1,000 and flocculation G 20-70 are staged, not merged); Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature. A design aid, not a process design.",
+    assumptions: [
+      { name: "Temperature-viscosity", value: "mu from a water-property table (0.001307 Pa-s at 10 C, 0.00089 at 25 C); cold water lowers G", source: "water properties" },
+      { name: "Target bands", value: "rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5", source: "Ten States Standards" },
+    ],
+  },
   "digester-vs-loading": {
     formula: "VS_fed = feed_gal x 8.34 x (%TS/100) x (%VS/100); VSLR = VS_fed / volume x 1000; DT = volume x 7.48 / feed_gal.",
     edition: "Anaerobic digester volatile-solids loading rate (WEF; university operator courses), by name.",

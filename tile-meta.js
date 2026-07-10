@@ -101,6 +101,7 @@ const _TILES = [
   ["chemical-feed-pump", "M"],
   ["clarifier-surface-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"],
   ["digester-vs-loading", "M"],
+  ["flocculation-g-value", "M"],
   ["growing-degree-days", "L"],
   ["pearson-square-ration", "L"],
   ["livestock-water-requirement", "L"],

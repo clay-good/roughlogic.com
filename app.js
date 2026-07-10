@@ -929,6 +929,8 @@ const TOOL_MODULES = (() => {
     "clarifier-surface-loading", "bod-tss-loading-removal", "tds-from-conductivity",
     // spec-v573
     "digester-vs-loading",
+    // spec-v575
+    "flocculation-g-value",
     // v93 pool and spa chemical balance
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
     "pool-chlorine-dose", "pool-heater-btu", "breakpoint-chlorination",

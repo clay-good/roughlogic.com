@@ -2589,6 +2589,7 @@ cross-check.
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
 | calc-treatment.js | `computeClarifierSurfaceLoading` | `{ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeDigesterVsLoading` | `{ feed_flow_gpd = 0, percent_ts = 0, percent_vs = 0, digester_ft3 = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeFlocculationGValue` | `{ power_input_w = 0, basin_volume_m3 = 0, water_temp_c = 15, detention_time_s...` | _ | _ | _ |
 | calc-treatment.js | `computeLangelierIndex` | `{ ph = 0, temp = 0, temp_unit = "C", ca_mgl = 0, alk_mgl = 0, tds_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolAlkalinityAdjust` | `{ gallons = 0, current_ta_ppm = 0, target_ta_ppm = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computePoolChlorineDose` | `{ ppm = 0, gallons = 0, product = "cal-hypo-65", avail = 0 } = {}` | _ | _ | _ |
@@ -2685,7 +2686,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1271.
+Row count: 1272.
 
 <!-- END function-corpus-v14 -->
 
@@ -3644,7 +3645,7 @@ per spec-v14 §13.1 second paragraph.
 | `trunk-decay-strength` | Hollow / Decayed Trunk Strength Loss | Wagener 1963 / Mattheck t/R / ISA TRAQ; 24 in trunk, 4 in sound shell (hollow 16) -> 29.6% loss, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group M Water and wastewater (33 tiles)
+### Group M Water and wastewater (34 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3662,6 +3663,7 @@ per spec-v14 §13.1 second paragraph.
 | `digester-vs-loading` | Anaerobic Digester Volatile Solids Loading | WEF / university operator courses; 15000 gpd, 4% TS, 75% VS, 20000 ft^3 -> 3753 lb/day, 188 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `disinfection-ct` | Disinfection CT (USEPA SWTR) | USEPA; Table A-1 (<=0.4 mg/L band): CT_required = 116 mg-min/L a... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `filter-loading` | Filter Loading Rate and Backwash | USEPA; Rapid-sand band 2-5 gpm/ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `flocculation-g-value` | Mixing Velocity Gradient (G / Gt) | Camp & Stein / Ten States Standards; 300 W, 100 m^3, 10 C, 1200 s -> G 48/s, Gt 57492 (floccul... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lab-dilution` | Lab Dilution and Serial Dilution | Project (first-principles) over stand...; C1=1000 / C2=50 / V2=100 -> V1=5, diluent=95 (computed by... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `langelier-index` | Langelier Saturation Index | Langelier (1936) / Standard Methods (...; pH 7.5, 25 C, Ca 200, alk 150, TDS 320 -> LSI ~+0.04 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pool-alkalinity-adjust` | Pool Total Alkalinity Adjustment | NSPF CPO Handbook / ANSI-APSP-ICC dos...; spec-v93 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3898,6 +3900,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1027. Fixture-covered or reference-cadence: 1027 / 1027.
+Tile count: 1028. Fixture-covered or reference-cadence: 1028 / 1028.
 
 <!-- END tile-index-v14 -->

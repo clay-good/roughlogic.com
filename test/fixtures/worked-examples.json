@@ -24923,6 +24923,58 @@
    }
   },
   {
+   "tile_id": "flocculation-g-value",
+   "source_publisher": "Camp & Stein / Ten States Standards",
+   "source_title": "G = sqrt(P / (mu x V)); Gt = G x detention_time",
+   "source_edition_or_year": "Camp-Stein",
+   "source_section_or_page": "300 W, 100 m^3, 10 C, 1200 s -> G 48/s, Gt 57492 (flocculation band)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "power_input_w": 300,
+    "basin_volume_m3": 100,
+    "water_temp_c": 10,
+    "detention_time_s": 1200
+   },
+   "outputs": {
+    "g_value": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "gt_value": {
+     "value": 57492,
+     "tolerance": {
+      "abs": 50
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flocculation-g-value",
+   "source_publisher": "Camp & Stein / Ten States Standards",
+   "source_title": "warm water raises G for the same power (lower viscosity)",
+   "source_edition_or_year": "Camp-Stein",
+   "source_section_or_page": "Same 300 W at 25 C -> G 58/s (20% higher from temperature alone)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "power_input_w": 300,
+    "basin_volume_m3": 100,
+    "water_temp_c": 25,
+    "detention_time_s": 1200
+   },
+   "outputs": {
+    "g_value": {
+     "value": 58,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",

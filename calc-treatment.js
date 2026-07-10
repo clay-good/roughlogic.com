@@ -657,3 +657,60 @@ const renderDigesterVsLoading = _rPool({
   compute: computeDigesterVsLoading,
 });
 TREATMENT_RENDERERS["digester-vs-loading"] = renderDigesterVsLoading;
+
+// --- spec-v575 M: Mixing velocity gradient (Camp-Stein G / Gt) ---
+// mu(T) from a water-property table; G = sqrt(P/(mu*V)); Gt = G*t.
+const _WATER_VISCOSITY_PAS = [
+  [0, 0.001792], [5, 0.001519], [10, 0.001307], [15, 0.001138], [20, 0.001002],
+  [25, 0.000890], [30, 0.000798], [35, 0.000719], [40, 0.000653],
+];
+function _waterViscosity(t) {
+  const T = _WATER_VISCOSITY_PAS;
+  if (t <= T[0][0]) return T[0][1];
+  if (t >= T[T.length - 1][0]) return T[T.length - 1][1];
+  for (let i = 0; i < T.length - 1; i++) {
+    if (t >= T[i][0] && t <= T[i + 1][0]) {
+      const f = (t - T[i][0]) / (T[i + 1][0] - T[i][0]);
+      return T[i][1] + f * (T[i + 1][1] - T[i][1]);
+    }
+  }
+  return null;
+}
+// dims: in { power_input_w: M L^2 T^-3, basin_volume_m3: L^3, water_temp_c: dimensionless, detention_time_s: T } out: { g_value: dimensionless, gt_value: dimensionless }
+export function computeFlocculationGValue({ power_input_w = 0, basin_volume_m3 = 0, water_temp_c = 15, detention_time_s = 0 } = {}) {
+  const p = Number(power_input_w) || 0;
+  const v = Number(basin_volume_m3) || 0;
+  const t = Number(water_temp_c);
+  const dt = Number(detention_time_s) || 0;
+  if (!(p > 0 && Number.isFinite(p))) return { error: "Power input must be positive (W)." };
+  if (!(v > 0 && Number.isFinite(v))) return { error: "Basin volume must be positive (m^3)." };
+  if (!(dt > 0 && Number.isFinite(dt))) return { error: "Detention time must be positive (s)." };
+  if (!Number.isFinite(t) || t < 0 || t > 40) return { error: "Water temperature must be between 0 and 40 C (viscosity-table range)." };
+  const mu = _waterViscosity(t);
+  const g_value = Math.sqrt(p / (mu * v));
+  const gt_value = g_value * dt;
+  if (![g_value, gt_value].every(Number.isFinite)) return { error: "G-value math is not a finite value." };
+  const band = g_value >= 500 ? "rapid mix (500-1,000 range)" : g_value >= 20 && g_value <= 70 ? "flocculation (20-70 band)" : g_value < 20 ? "below the flocculation floor (weak mixing)" : "between flocculation and rapid mix";
+  return {
+    mu, g_value, gt_value, band,
+    note: "G depends on the water temperature through viscosity, so cold water yields a LOWER G for the same paddle power and can drop flocculation below the 20-per-second floor. Too high a G in the flocculation basin shears the floc apart - the reason rapid mix (G 500-1,000) and flocculation (G 20-70) are staged, not merged. Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature; the treatment-process design governs.",
+  };
+}
+export const flocculationGValueExample = { inputs: { power_input_w: 300, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 1200 } };
+const renderFlocculationGValue = _rPool({
+  citation: "Citation: Camp-Stein velocity gradient (Camp & Stein; Ten States Standards), by name. G = sqrt(P / (mu x V)); Gt = G x detention_time; mu is water dynamic viscosity at the given temperature. Bands: rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5. Cold water is more viscous, so the same paddle delivers a lower G in winter; too high a G in flocculation shears the floc. The treatment-process design governs.",
+  example: flocculationGValueExample.inputs,
+  fields: [
+    { key: "power_input_w", label: "Net power to the water P (W)", kind: "number" },
+    { key: "basin_volume_m3", label: "Mixing basin volume V (m^3)", kind: "number" },
+    { key: "water_temp_c", label: "Water temperature (C)", kind: "number", default: 15 },
+    { key: "detention_time_s", label: "Detention time (s)", kind: "number" },
+  ],
+  outputs: [
+    { key: "g", id: "fgv-out-g", label: "Velocity gradient G", value: (r) => fmt(r.g_value, 0) + " /s - " + r.band },
+    { key: "gt", id: "fgv-out-gt", label: "Gt product", value: (r) => fmt(r.gt_value, 0) + " (mu " + r.mu.toFixed(6) + " Pa-s)" },
+    { key: "n", id: "fgv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFlocculationGValue,
+});
+TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
