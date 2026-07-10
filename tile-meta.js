@@ -449,6 +449,7 @@ const _TILES = [
   ["food-cost-percentage", "O"],
   ["prime-cost", "O"],
   ["pour-cost", "O"],
+  ["menu-engineering", "O"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

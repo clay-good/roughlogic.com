@@ -4694,6 +4694,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "menu engineering",
+      "target": "menu-engineering",
+      "kind": "industry"
+    },
+    {
+      "term": "kasavana smith",
+      "target": "menu-engineering",
+      "kind": "industry"
+    },
+    {
+      "term": "star plowhorse puzzle dog",
+      "target": "menu-engineering",
+      "kind": "industry"
+    },
+    {
+      "term": "menu matrix",
+      "target": "menu-engineering",
+      "kind": "redirect"
+    },
+    {
+      "term": "contribution margin menu",
+      "target": "menu-engineering",
+      "kind": "adjacent"
+    },
+    {
+      "term": "menu popularity",
+      "target": "menu-engineering",
+      "kind": "adjacent"
+    },
+    {
+      "term": "menu mix analysis",
+      "target": "menu-engineering",
+      "kind": "redirect"
+    },
+    {
+      "term": "70 percent rule menu",
+      "target": "menu-engineering",
+      "kind": "redirect"
+    },
+    {
       "term": "load profit",
       "target": "load-profitability",
       "kind": "industry"

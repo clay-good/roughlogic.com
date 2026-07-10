@@ -21088,6 +21088,68 @@
    }
   },
   {
+   "tile_id": "menu-engineering",
+   "source_publisher": "Kasavana & Smith menu-engineering model",
+   "source_title": "quadrant from contribution-margin dollars and popularity share vs (1/item_count) x 0.70",
+   "source_edition_or_year": "Kasavana & Smith",
+   "source_section_or_page": "200 of 1000 units, 10-item menu, price $12, food cost $4, avg margin $6 -> Star (margin $8, 20% vs 7%)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "units_sold": 200,
+    "menu_price": 12,
+    "food_cost": 4,
+    "total_units": 1000,
+    "item_count": 10,
+    "average_margin": 6
+   },
+   "outputs": {
+    "contribution_margin": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "popularity_share": {
+     "value": 0.2,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "popularity_threshold": {
+     "value": 0.07,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "menu-engineering",
+   "source_publisher": "Kasavana & Smith menu-engineering model",
+   "source_title": "contribution_margin = price - food_cost",
+   "source_edition_or_year": "Kasavana & Smith",
+   "source_section_or_page": "Same 20% popularity but margin dropped to $3 (below $6 avg) -> Plowhorse, not Star",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "units_sold": 200,
+    "menu_price": 7,
+    "food_cost": 4,
+    "total_units": 1000,
+    "item_count": 10,
+    "average_margin": 6
+   },
+   "outputs": {
+    "contribution_margin": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "load-profitability",
    "source_publisher": "First-principles owner-operator load economics; consumes the cost-per-mile structure.",
    "source_title": "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",

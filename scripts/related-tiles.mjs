@@ -870,6 +870,7 @@ const RELATED = {
   "food-cost-percentage": ["plate-cost","prime-cost","yield-ep"],
   "prime-cost": ["food-cost-percentage","plate-cost","overtime"],
   "pour-cost": ["plate-cost","food-cost-percentage","yield-ep"],
+  "menu-engineering": ["plate-cost","food-cost-percentage","prime-cost"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],
   "fuel-surcharge": ["load-profitability","cost-per-mile","fuel-tax-ifta"],
   "maintenance-reserve": ["cost-per-mile","load-profitability","fuel-surcharge"],

@@ -874,3 +874,54 @@ const renderPourCost = _r({
   compute: computePourCost,
 });
 KITCHEN_RENDERERS["pour-cost"] = renderPourCost;
+
+// --- spec-v537 O: Menu engineering matrix (`menu-engineering`) ---
+// Kasavana-Smith: quadrant from contribution-margin dollars vs average, popularity share vs (1/item_count)x0.70.
+// dims: in { units_sold: dimensionless, menu_price: dimensionless, food_cost: dimensionless, total_units: dimensionless, item_count: dimensionless, average_margin: dimensionless } out: { contribution_margin: dimensionless, popularity_share: dimensionless, popularity_threshold: dimensionless }
+export function computeMenuEngineering({ units_sold = 0, menu_price = 0, food_cost = 0, total_units = 0, item_count = 0, average_margin = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const units = Number(units_sold) || 0;
+  const price = Number(menu_price) || 0;
+  const fcost = Number(food_cost) || 0;
+  const total = Number(total_units) || 0;
+  const items = Number(item_count) || 0;
+  const avg = Number(average_margin) || 0;
+  if (!(total > 0)) return { error: "Total units sold must be positive." };
+  if (!(items > 0)) return { error: "Item count must be positive." };
+  if (units < 0) return { error: "Units sold must be non-negative." };
+  if (price < fcost) return { error: "Menu price cannot be below the food cost (negative margin)." };
+  const contribution_margin = price - fcost;
+  const popularity_share = units / total;
+  const popularity_threshold = (1 / items) * 0.70;
+  const high_margin = contribution_margin >= avg;
+  const high_pop = popularity_share >= popularity_threshold;
+  const quadrant = high_margin && high_pop ? "Star"
+    : !high_margin && high_pop ? "Plowhorse"
+    : high_margin && !high_pop ? "Puzzle" : "Dog";
+  const action = { Star: "Promote and protect the recipe.", Plowhorse: "Popular but thin - gently reprice or re-portion.", Puzzle: "Profitable but slow - reposition, rename, or feature it.", Dog: "Low margin and low sales - consider cutting or reworking." }[quadrant];
+  return {
+    contribution_margin, popularity_share, popularity_threshold, high_margin, high_pop, quadrant, action,
+    note: "The margin axis is contribution-margin dollars, not food-cost percent - a low-food-cost item can still be a Dog if it earns few dollars. Popularity is judged against the menu-average share times the 0.70 rule. The classification needs the full sales mix, not a single dish. The operator's cost and pricing data govern.",
+  };
+}
+const menuEngineeringExample = { inputs: { units_sold: 200, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 } };
+const renderMenuEngineering = _r({
+  citation: "Citation: Kasavana & Smith menu-engineering model, by name. contribution_margin = price - food_cost; popularity_share = units_sold / total_units; popularity_threshold = (1 / item_count) x 0.70; quadrant from margin vs average and popularity vs threshold. The margin axis is contribution-margin dollars, not food-cost percent. Needs the full sales mix; the operator's data govern.",
+  example: menuEngineeringExample.inputs,
+  fields: [
+    { key: "units_sold", label: "This item's units sold", kind: "number" },
+    { key: "menu_price", label: "Menu price ($)", kind: "number" },
+    { key: "food_cost", label: "Plate food cost ($)", kind: "number" },
+    { key: "total_units", label: "Total units sold (all items)", kind: "number" },
+    { key: "item_count", label: "Number of menu items", kind: "number" },
+    { key: "average_margin", label: "Menu average contribution margin ($)", kind: "number" },
+  ],
+  outputs: [
+    { key: "q", id: "menu-out-q", label: "Quadrant", value: (r) => r.quadrant + " - " + r.action },
+    { key: "m", id: "menu-out-m", label: "Contribution margin", value: (r) => "$" + fmt(r.contribution_margin, 2) + (r.high_margin ? " (high)" : " (low)") },
+    { key: "p", id: "menu-out-p", label: "Popularity share", value: (r) => fmt(r.popularity_share * 100, 1) + "% vs " + fmt(r.popularity_threshold * 100, 1) + "% threshold" + (r.high_pop ? " (high)" : " (low)") },
+    { key: "n", id: "menu-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMenuEngineering,
+});
+KITCHEN_RENDERERS["menu-engineering"] = renderMenuEngineering;

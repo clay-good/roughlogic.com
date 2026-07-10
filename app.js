@@ -904,6 +904,8 @@ const TOOL_MODULES = (() => {
     "brine-cure", "bakers-percentage",
     // v90 food-service cost control
     "food-cost-percentage", "prime-cost", "pour-cost",
+    // spec-v537
+    "menu-engineering",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [

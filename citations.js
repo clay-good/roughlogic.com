@@ -7582,6 +7582,16 @@ export const CITATIONS = {
       { name: "Spirit pour-cost band", value: "~18-24% (beer and wine higher) (advisory)", source: "bar-management practice" },
     ],
   },
+  "menu-engineering": {
+    formula: "contribution_margin = price - food_cost; popularity_share = units_sold / total_units; popularity_threshold = (1 / item_count) x 0.70; quadrant from margin >= average and share >= threshold.",
+    edition: "Kasavana & Smith menu-engineering model, by name.",
+    freeAccess: "Standard hospitality menu-analysis model; the operator's cost and pricing data govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The margin axis is contribution-margin dollars, not food-cost percent (a low-food-cost item can still be a Dog if it earns few dollars); popularity is judged against the menu-average share times the 0.70 rule; the classification needs the full sales mix, not a single dish. An analysis aid, not a pricing decision.",
+    assumptions: [
+      { name: "Popularity rule", value: "70% of the menu-average share (1/item_count x 0.70) is the high/low popularity cutoff", source: "Kasavana & Smith" },
+    ],
+  },
   "load-profitability": {
     formula: "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
     edition: "First-principles owner-operator load economics; consumes the cost-per-mile structure.",

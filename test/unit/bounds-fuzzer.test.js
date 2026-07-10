@@ -18003,3 +18003,27 @@ test("bounds: spec-v536 computeMichaelisMenten pins the half-Vmax at [S]=Km, the
   assert.ok("error" in _v536({ vmax: 100, km: 0, substrate: 25 }));
   assert.ok("error" in _v536({ vmax: 100, km: 25, substrate: -1 }));
 });
+
+import { computeMenuEngineering as _v537 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v537 computeMenuEngineering pins the four quadrants, the popularity threshold, and error seams", () => {
+  const star = _v537({ units_sold: 200, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 });
+  assert.ok(Math.abs(star.contribution_margin - 8) < 1e-9); // 12 - 4
+  assert.ok(Math.abs(star.popularity_share - 0.2) < 1e-9); // 200/1000
+  assert.ok(Math.abs(star.popularity_threshold - 0.07) < 1e-9); // (1/10)*0.70
+  assert.equal(star.quadrant, "Star"); // high margin, high popularity
+  // Same popularity, thin margin -> Plowhorse.
+  assert.equal(_v537({ units_sold: 200, menu_price: 7, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }).quadrant, "Plowhorse");
+  // High margin, low popularity -> Puzzle.
+  assert.equal(_v537({ units_sold: 50, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }).quadrant, "Puzzle");
+  // Low margin, low popularity -> Dog.
+  assert.equal(_v537({ units_sold: 50, menu_price: 7, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }).quadrant, "Dog");
+  // At exactly the threshold, popularity counts as high.
+  assert.equal(_v537({ units_sold: 70, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }).high_pop, true);
+  // Error seams: non-finite, non-positive total / item count, negative units, price < food cost.
+  assert.ok("error" in _v537({ units_sold: 200, menu_price: 12, food_cost: 4, total_units: Infinity, item_count: 10, average_margin: 6 }));
+  assert.ok("error" in _v537({ units_sold: 200, menu_price: 12, food_cost: 4, total_units: 0, item_count: 10, average_margin: 6 }));
+  assert.ok("error" in _v537({ units_sold: 200, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 0, average_margin: 6 }));
+  assert.ok("error" in _v537({ units_sold: -1, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }));
+  assert.ok("error" in _v537({ units_sold: 200, menu_price: 3, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }));
+});
