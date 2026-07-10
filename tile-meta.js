@@ -637,6 +637,7 @@ const _TILES = [
   ["spanline-sag-tension", "Z"],
   ["bridle-leg-tension", "Z"],
   ["winch-drum-line-pull", "Z"],
+  ["crane-outrigger-reaction", "Z"],
   // spec-v118 hay dry-matter (Group L)
   ["hay-dry-matter", "L"],
   // spec-v207..v211 landscape irrigation and planting install cluster (Group L)

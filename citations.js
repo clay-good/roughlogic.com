@@ -8529,6 +8529,17 @@ export const CITATIONS = {
       { name: "Layer ratings govern", value: "the winch manufacturer's published per-layer ratings are authoritative", source: "SAE winch rating" },
     ],
   },
+  "crane-outrigger-reaction": {
+    formula: "even = (W + Wc)/4; overturning M = W x R - Wc x Rc; R_max = even + M/(sqrt(2) x spread).",
+    edition: "Crane load-moment method / SAE J1063 stability, by name.",
+    freeAccess: "The over-corner outrigger-reaction estimate is a public statics result; the crane manufacturer's load-moment chart governs.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The maximum reaction is not a quarter of the total because swinging the boom over a corner concentrates the overturning into one diagonal outrigger (which can carry well over half the load); a wider outrigger spread lowers the reaction; this is a planning estimate that feeds crane-ground-bearing. A planning estimate, not the crane rating.",
+    assumptions: [
+      { name: "Over-corner concentration", value: "R_max = (W+Wc)/4 + M/(sqrt(2) x spread); the diagonal outrigger takes the overturning", source: "crane load-moment method" },
+      { name: "Chart governs", value: "the crane manufacturer's load-moment chart and published outrigger reaction data are authoritative", source: "SAE J1063" },
+    ],
+  },
   "hay-dry-matter": {
     formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18% large / 20% small).",
     edition: "First-principles dry-matter mass balance with USDA NRCS / land-grant extension safe-storage guidance (by name); no edition cycle.",

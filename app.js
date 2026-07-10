@@ -1062,6 +1062,8 @@ const TOOL_MODULES = (() => {
     "bridle-leg-tension",
     // spec-v545
     "winch-drum-line-pull",
+    // spec-v550
+    "crane-outrigger-reaction",
   ]);
   return map;
 })();

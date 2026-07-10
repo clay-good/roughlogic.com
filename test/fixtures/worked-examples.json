@@ -24531,6 +24531,66 @@
    }
   },
   {
+   "tile_id": "crane-outrigger-reaction",
+   "source_publisher": "Crane load-moment method / SAE J1063 stability",
+   "source_title": "R_max = (W+Wc)/4 + M/(sqrt(2) x spread); M = W R - Wc Rc",
+   "source_edition_or_year": "crane load-moment method",
+   "source_section_or_page": "40 kip at 30 ft, 30 kip CW at 12 ft, 20 ft spread -> even 17.5, M 840, R_max 47.2 kip",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "gross_load_kip": 40,
+    "counterweight_kip": 30,
+    "load_radius_ft": 30,
+    "cw_radius_ft": 12,
+    "outrigger_spread_ft": 20
+   },
+   "outputs": {
+    "even_share_kip": {
+     "value": 17.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "overturning_kipft": {
+     "value": 840,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "reaction_max_kip": {
+     "value": 47.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crane-outrigger-reaction",
+   "source_publisher": "Crane load-moment method / SAE J1063 stability",
+   "source_title": "a wider outrigger spread lowers the worst-corner reaction",
+   "source_edition_or_year": "crane load-moment method",
+   "source_section_or_page": "Same lift on a 30 ft spread -> R_max 37.3 kip (10 kip lighter on the corner)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "gross_load_kip": 40,
+    "counterweight_kip": 30,
+    "load_radius_ft": 30,
+    "cw_radius_ft": 12,
+    "outrigger_spread_ft": 30
+   },
+   "outputs": {
+    "reaction_max_kip": {
+     "value": 37.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hay-dry-matter",
    "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
    "source_title": "1,200 lb round bale at 22% -> 936 lb DM, 1,101 lb at 15%, flag",

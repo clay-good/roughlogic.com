@@ -18308,3 +18308,22 @@ test("bounds: spec-v549 computeDiaphragmCollectorForce pins the v x Lc accumulat
   assert.ok("error" in _v549({ unit_shear_plf: 300, collector_len_ft: 0, omega0: 2.5 }));
   assert.ok("error" in _v549({ unit_shear_plf: 300, collector_len_ft: 40, omega0: 0.9 }));
 });
+
+import { computeCraneOutriggerReaction as _v550 } from "../../calc-rigging.js";
+
+test("bounds: spec-v550 computeCraneOutriggerReaction pins the even share, the overturning moment, the over-corner concentration, and error seams", () => {
+  const r = _v550({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: 30, cw_radius_ft: 12, outrigger_spread_ft: 20 });
+  assert.ok(Math.abs(r.even_share_kip - 17.5) < 1e-9); // (40+30)/4
+  assert.ok(Math.abs(r.overturning_kipft - 840) < 1e-9); // 40*30 - 30*12
+  assert.ok(Math.abs(r.reaction_max_kip - 47.2) < 0.1); // 17.5 + 840/(sqrt2*20)
+  // The worst corner carries far more than the even quarter-share.
+  assert.ok(r.reaction_max_kip > 2.5 * r.even_share_kip);
+  // A wider spread lowers the reaction.
+  assert.ok(_v550({ gross_load_kip: 40, counterweight_kip: 30, load_radius_ft: 30, cw_radius_ft: 12, outrigger_spread_ft: 30 }).reaction_max_kip < r.reaction_max_kip);
+  // Error seams: non-finite, non-positive load / radius / spread, negative counterweight.
+  assert.ok("error" in _v550({ gross_load_kip: Infinity, load_radius_ft: 30, outrigger_spread_ft: 20 }));
+  assert.ok("error" in _v550({ gross_load_kip: 0, load_radius_ft: 30, outrigger_spread_ft: 20 }));
+  assert.ok("error" in _v550({ gross_load_kip: 40, load_radius_ft: 0, outrigger_spread_ft: 20 }));
+  assert.ok("error" in _v550({ gross_load_kip: 40, load_radius_ft: 30, outrigger_spread_ft: 0 }));
+  assert.ok("error" in _v550({ gross_load_kip: 40, counterweight_kip: -1, load_radius_ft: 30, outrigger_spread_ft: 20 }));
+});

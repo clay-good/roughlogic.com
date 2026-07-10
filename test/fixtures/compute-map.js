@@ -917,6 +917,7 @@ export const COMPUTE_MAP = {
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },
   "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },
   "winch-drum-line-pull": { module: "../../calc-rigging.js", fn: "computeWinchDrumLinePull" },
+  "crane-outrigger-reaction": { module: "../../calc-rigging.js", fn: "computeCraneOutriggerReaction" },
   "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
   "sprinkler-precip-rate": { module: "../../calc-agriculture.js", fn: "computeSprinklerPrecipRate" },
   "irrigation-zone-runtime": { module: "../../calc-agriculture.js", fn: "computeIrrigationZoneRuntime" },

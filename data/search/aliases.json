@@ -6414,6 +6414,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "outrigger reaction",
+      "target": "crane-outrigger-reaction",
+      "kind": "industry"
+    },
+    {
+      "term": "crane outrigger load",
+      "target": "crane-outrigger-reaction",
+      "kind": "industry"
+    },
+    {
+      "term": "over corner outrigger",
+      "target": "crane-outrigger-reaction",
+      "kind": "redirect"
+    },
+    {
+      "term": "crane mat load",
+      "target": "crane-outrigger-reaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "outrigger pad force",
+      "target": "crane-outrigger-reaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "crane overturning",
+      "target": "crane-outrigger-reaction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "maximum outrigger",
+      "target": "crane-outrigger-reaction",
+      "kind": "redirect"
+    },
+    {
+      "term": "boom over corner",
+      "target": "crane-outrigger-reaction",
+      "kind": "redirect"
+    },
+    {
       "term": "hay moisture",
       "target": "hay-dry-matter",
       "kind": "industry"

@@ -1043,3 +1043,50 @@ function renderWinchDrumLinePull(inputRegion, outputRegion, citationEl) {
   for (const f of [p, d, rr, bw, n]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["winch-drum-line-pull"] = renderWinchDrumLinePull;
+
+// --- spec-v550 Z: Crane outrigger reaction from lift geometry (`crane-outrigger-reaction`) ---
+// even = (W+Wc)/4. M = W*R - Wc*Rc. R_max = even + M/(sqrt(2)*spread).
+// dims: in { gross_load_kip: M L T^-2, counterweight_kip: M L T^-2, load_radius_ft: L, cw_radius_ft: L, outrigger_spread_ft: L } out: { even_share_kip: M L T^-2, overturning_kipft: M L^2 T^-2, reaction_max_kip: M L T^-2 }
+export function computeCraneOutriggerReaction({ gross_load_kip, counterweight_kip = 0, load_radius_ft, cw_radius_ft = 0, outrigger_spread_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(gross_load_kip);
+  const Wc = Number(counterweight_kip);
+  const R = Number(load_radius_ft);
+  const Rc = Number(cw_radius_ft);
+  const sp = Number(outrigger_spread_ft);
+  if (!Number.isFinite(W) || W <= 0) return { error: "Gross load must be a positive finite number (kip)." };
+  if (!Number.isFinite(Wc) || Wc < 0) return { error: "Counterweight must be a non-negative finite number (kip)." };
+  if (!Number.isFinite(R) || R <= 0) return { error: "Load radius must be a positive finite number (ft)." };
+  if (!Number.isFinite(Rc) || Rc < 0) return { error: "Counterweight radius must be a non-negative finite number (ft)." };
+  if (!Number.isFinite(sp) || sp <= 0) return { error: "Outrigger spread must be a positive finite number (ft)." };
+  const even_share_kip = (W + Wc) / 4;
+  const overturning_kipft = W * R - Wc * Rc;
+  const reaction_max_kip = even_share_kip + overturning_kipft / (Math.SQRT2 * sp);
+  return {
+    even_share_kip, overturning_kipft, reaction_max_kip,
+    note: "The maximum reaction is not a quarter of the total: swinging the boom over a corner concentrates the overturning into one diagonal outrigger (which can carry well over half the load). A wider outrigger spread lowers the reaction. This is a planning estimate that feeds crane-ground-bearing; the crane manufacturer's load-moment chart and outrigger reaction data govern.",
+  };
+}
+
+function renderCraneOutriggerReaction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Crane load-moment method / SAE J1063 stability, by name. even = (W + Wc)/4; overturning M = W R - Wc Rc; R_max = even + M/(sqrt(2) spread). The maximum outrigger reaction is not a quarter of the total - over a corner the overturning concentrates into one diagonal outrigger. A wider spread lowers it. A planning estimate feeding crane-ground-bearing; the crane load-moment chart and outrigger reaction data govern.";
+  const w = makeNumber("Gross suspended load (kip)", "cor-w", { step: "any", min: "0" });
+  const wc = makeNumber("Counterweight (kip)", "cor-wc", { step: "any", min: "0", value: "0" });
+  const r = makeNumber("Load radius R (ft)", "cor-r", { step: "any", min: "0" });
+  const rc = makeNumber("Counterweight radius Rc (ft)", "cor-rc", { step: "any", min: "0", value: "0" });
+  const sp = makeNumber("Outrigger spread (ft, center to center)", "cor-sp", { step: "any", min: "0" });
+  for (const f of [w, wc, r, rc, sp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "40"; wc.input.value = "30"; r.input.value = "30"; rc.input.value = "12"; sp.input.value = "20"; update(); });
+  const oE = makeOutputLine(outputRegion, "Even quarter-share", "cor-out-e");
+  const oM = makeOutputLine(outputRegion, "Net overturning moment", "cor-out-m");
+  const oR = makeOutputLine(outputRegion, "Max outrigger reaction (over corner)", "cor-out-r");
+  const update = debounce(() => {
+    const x = computeCraneOutriggerReaction({ gross_load_kip: Number(w.input.value) || 0, counterweight_kip: Number(wc.input.value) || 0, load_radius_ft: Number(r.input.value) || 0, cw_radius_ft: Number(rc.input.value) || 0, outrigger_spread_ft: Number(sp.input.value) || 0 });
+    if (x.error) { oE.textContent = x.error; for (const o of [oM, oR]) o.textContent = "-"; return; }
+    oE.textContent = fmt(x.even_share_kip, 1) + " kip";
+    oM.textContent = fmt(x.overturning_kipft, 0) + " kip-ft";
+    oR.textContent = fmt(x.reaction_max_kip, 1) + " kip";
+  }, DEBOUNCE_MS);
+  for (const f of [w, wc, r, rc, sp]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["crane-outrigger-reaction"] = renderCraneOutriggerReaction;
