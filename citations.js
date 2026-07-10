@@ -10091,6 +10091,18 @@ export const CITATIONS = {
       { name: "Sustained load", value: "the multiplier applies to the immediate deflection from the sustained load only", source: "ACI 318-19 24.2.4.1" },
     ],
   },
+  "concrete-anchor-breakout": {
+    formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb.",
+    edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the Chapter 17 anchoring provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The basic strength scales with the embedment to the 1.5 power (a deeper anchor gains fast); a near-edge anchor loses capacity to the edge factor psi_ed and a truncated projected area (a full cone needs 1.5 hef of edge on all sides); cast-in (kc = 24) and post-installed (kc = 17) anchors use different kc; the cracked-vs-uncracked factor psi_c applies (taken as 1.0 here). A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "kc constant", value: "24 cast-in, 17 post-installed (CCD basic-strength coefficient)", source: "ACI 318-19 17.6.2.2" },
+      { name: "Projected area", value: "ANco = 9 hef^2; a full breakout cone needs 1.5 hef of edge on all sides", source: "ACI 318-19 17.6.2.1" },
+      { name: "psi_c cracked factor", value: "taken as 1.0 (cracked); an uncracked section with supplementary reinforcement raises it", source: "ACI 318-19 17.6.2.6" },
+    ],
+  },
   "rc-compression-dev-length": {
     formula: "ldc = max( (fy x psi_r) / (50 x lambda x sqrt(f'c)) x db , 0.0003 x fy x psi_r x db , 8 in ).",
     edition: "The ACI 318-19 25.4.9.2 compression development length, with the 25.4.9.3 confining-reinforcement factor psi_r = 0.75 and the 8 in minimum, by name.",

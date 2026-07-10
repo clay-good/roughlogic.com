@@ -18264,3 +18264,30 @@ test("bounds: spec-v547 computeSteelFloorVibration pins the exponential frequenc
   assert.ok("error" in _v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 1.5, walker_force_lb: 65, limit_ratio: 0.005 }));
   assert.ok("error" in _v547({ natural_freq_hz: 5, effective_wt_lb: 30000, damping_ratio: 0.03, walker_force_lb: 65, limit_ratio: 0 }));
 });
+
+import { computeConcreteAnchorBreakout as _v548 } from "../../calc-concrete.js";
+
+test("bounds: spec-v548 computeConcreteAnchorBreakout pins the hef^1.5 cone, the edge knockdown, cast-in vs post-installed kc, and error seams", () => {
+  const far = _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in", lambda: 1.0 });
+  assert.ok(Math.abs(far.nb_lb - 22308) < 5); // 24*sqrt(4000)*6^1.5
+  assert.equal(far.psi_ed, 1.0); // away from edges
+  assert.ok(Math.abs(far.area_ratio - 1.0) < 1e-9);
+  assert.ok(Math.abs(far.phi_ncb_lb - 14500) < 5); // 0.65 * Ncb
+  // A near edge cuts capacity through psi_ed and a truncated projected area.
+  const near = _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 6, anchor_type: "cast-in", lambda: 1.0 });
+  assert.ok(Math.abs(near.psi_ed - 0.90) < 0.01);
+  assert.ok(Math.abs(near.area_ratio - 0.833) < 0.005);
+  assert.ok(Math.abs(near.phi_ncb_lb - 10875) < 10);
+  assert.ok(near.phi_ncb_lb < far.phi_ncb_lb);
+  // Post-installed uses kc = 17, weaker than cast-in's 24.
+  assert.equal(_v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "post-installed" }).kc, 17);
+  assert.ok(_v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "post-installed" }).nb_lb < far.nb_lb);
+  // hef^1.5 scaling: doubling embedment multiplies Nb by 2^1.5.
+  assert.ok(Math.abs(_v548({ embedment_in: 12, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in" }).nb_lb - far.nb_lb * Math.pow(2, 1.5)) < 1);
+  // Error seams: non-finite, non-positive embedment / f'c, negative edge, bad type.
+  assert.ok("error" in _v548({ embedment_in: Infinity, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in" }));
+  assert.ok("error" in _v548({ embedment_in: 0, fc_psi: 4000, edge_distance_in: 100, anchor_type: "cast-in" }));
+  assert.ok("error" in _v548({ embedment_in: 6, fc_psi: 0, edge_distance_in: 100, anchor_type: "cast-in" }));
+  assert.ok("error" in _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: -1, anchor_type: "cast-in" }));
+  assert.ok("error" in _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "foo" }));
+});

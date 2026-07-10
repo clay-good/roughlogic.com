@@ -19434,6 +19434,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "anchor breakout",
+      "target": "concrete-anchor-breakout",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete breakout tension",
+      "target": "concrete-anchor-breakout",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 318 chapter 17",
+      "target": "concrete-anchor-breakout",
+      "kind": "redirect"
+    },
+    {
+      "term": "ccd method",
+      "target": "concrete-anchor-breakout",
+      "kind": "redirect"
+    },
+    {
+      "term": "cast in anchor",
+      "target": "concrete-anchor-breakout",
+      "kind": "industry"
+    },
+    {
+      "term": "hef breakout",
+      "target": "concrete-anchor-breakout",
+      "kind": "adjacent"
+    },
+    {
+      "term": "anchor edge distance",
+      "target": "concrete-anchor-breakout",
+      "kind": "adjacent"
+    },
+    {
+      "term": "concrete cone failure",
+      "target": "concrete-anchor-breakout",
+      "kind": "industry"
+    },
+    {
       "term": "glulam volume factor",
       "target": "glulam-volume-factor",
       "kind": "industry"

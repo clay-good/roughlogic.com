@@ -526,6 +526,7 @@ const _TILES = [
   ["rc-compression-dev-length", "E"],
   // spec-v497 long-term deflection multiplier (ACI 318-19 §24.2.4.1)
   ["concrete-longterm-defl", "E"],
+  ["concrete-anchor-breakout", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
   ["time-of-concentration", "B"], ["orifice-flow", "B"], ["channel-froude-number", "B"],
   ["velocity-head", "B"], ["flow-continuity", "B"], ["bernoulli-head", "B"],

@@ -1114,6 +1114,7 @@ const RELATED = {
   "concrete-bearing-strength": ["rc-column-axial","column-base-plate","footing-eccentric-pressure"],
   "rc-compression-dev-length": ["rc-development-length","rc-hook-development","rc-column-axial"],
   "concrete-longterm-defl": ["joist-deflection","rc-beam-flexure","steel-camber"],
+  "concrete-anchor-breakout": ["anchor-embedment","column-base-plate","masonry-anchor-bolt"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
   // spec-v287..v289 geotechnical foundation depth batch (Group E)

@@ -726,6 +726,7 @@ export const COMPUTE_MAP = {
   "concrete-bearing-strength": { module: "../../calc-concrete.js", fn: "computeConcreteBearingStrength" },
   "rc-compression-dev-length": { module: "../../calc-concrete.js", fn: "computeRcCompressionDevLength" },
   "concrete-longterm-defl": { module: "../../calc-concrete.js", fn: "computeConcreteLongtermDefl" },
+  "concrete-anchor-breakout": { module: "../../calc-concrete.js", fn: "computeConcreteAnchorBreakout" },
   "pile-group-efficiency": { module: "../../calc-geotech.js", fn: "computePileGroupEfficiency" },
   "motor-locked-rotor-kva": { module: "../../calc-motor.js", fn: "computeMotorLockedRotorKva" },
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },

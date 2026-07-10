@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-concrete.js gzip cap 17000 -> 20000; 2026-07-09
+
+The spec-v548 `concrete-anchor-breakout` tile (ACI 318-19 Ch. 17 CCD breakout) pushes `calc-concrete.js` over the 17000 B cap (103.0%). Raised the `check-module-sizes` cap to **20000** with headroom for further Group E concrete tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-rigging.js gzip cap 18000 -> 21000; 2026-07-09
 
 The spec-v544..v545 Group Z batch (`bridle-leg-tension`, `winch-drum-line-pull`) adds two hand-written renderer tiles to `calc-rigging.js`, crossing the 18000 B cap at tile v545 (101.5%). Raised the `check-module-sizes` cap to **21000** with headroom for further Group Z tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

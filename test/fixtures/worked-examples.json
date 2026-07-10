@@ -36978,6 +36978,60 @@
    }
   },
   {
+   "tile_id": "concrete-anchor-breakout",
+   "source_publisher": "ACI 318-19 Section 17.6.2 (concrete breakout in tension, CCD method)",
+   "source_title": "Nb = kc lambda sqrt(f'c) hef^1.5; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "6 in cast-in, 4000 psi, away from edges -> Nb 22308 lb, Ncb 22308 lb, phiNcb 14500 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "embedment_in": 6,
+    "fc_psi": 4000,
+    "edge_distance_in": 100,
+    "anchor_type": "cast-in",
+    "lambda": 1.0
+   },
+   "outputs": {
+    "nb_lb": {
+     "value": 22308,
+     "tolerance": {
+      "abs": 5
+     }
+    },
+    "phi_ncb_lb": {
+     "value": 14500,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-anchor-breakout",
+   "source_publisher": "ACI 318-19 Section 17.6.2 (concrete breakout in tension, CCD method)",
+   "source_title": "a near edge cuts capacity via psi_ed and a truncated projected area",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "Same anchor 6 in from a free edge -> psi_ed 0.90, area ratio 0.833, phiNcb 10875 lb (25% loss)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "embedment_in": 6,
+    "fc_psi": 4000,
+    "edge_distance_in": 6,
+    "anchor_type": "cast-in",
+    "lambda": 1.0
+   },
+   "outputs": {
+    "phi_ncb_lb": {
+     "value": 10875,
+     "tolerance": {
+      "abs": 10
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-punching-shear",
    "source_publisher": "ACI 318-19 Table 22.6.5.2",
    "source_title": "interior 20 in square column, d = 6 in, 4,000 psi -> vc 253 psi, phi Vc 118.4 kip",

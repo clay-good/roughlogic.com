@@ -552,6 +552,8 @@ const TOOL_MODULES = (() => {
     "rc-compression-dev-length",
     // spec-v497 long-term deflection multiplier (ACI 318-19 §24.2.4.1)
     "concrete-longterm-defl",
+    // spec-v548
+    "concrete-anchor-breakout",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the
