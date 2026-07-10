@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-elecdesign.js gzip cap 8500 -> 11000; 2026-07-10
+
+The spec-v558 `step-touch-voltage` tile (IEEE Std 80 tolerable step/touch) pushes `calc-elecdesign.js` over the 8500 B cap. Raised the `check-module-sizes` cap to **11000** with headroom for further Group A electrical-design tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-motor.js gzip cap 10000 -> 12000; 2026-07-09
 
 The spec-v557 `vfd-reflected-wave` tile pushes `calc-motor.js` over the 10000 B cap. Raised the `check-module-sizes` cap to **12000** with headroom for further Group A motor tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

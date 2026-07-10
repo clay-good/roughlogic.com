@@ -194,6 +194,7 @@ const RELATED = {
   "harmonic-resonance": ["pf-correction", "transformer-k-factor", "power-factor-billing-savings"],
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],
+  "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],
   "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   "buck-boost-sizing": ["transformer-kva-sizing", "transformer-conductor-protection", "three-phase"],

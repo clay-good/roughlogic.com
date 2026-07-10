@@ -8214,6 +8214,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "step voltage",
+      "target": "step-touch-voltage",
+      "kind": "industry"
+    },
+    {
+      "term": "touch voltage",
+      "target": "step-touch-voltage",
+      "kind": "industry"
+    },
+    {
+      "term": "ieee 80",
+      "target": "step-touch-voltage",
+      "kind": "redirect"
+    },
+    {
+      "term": "tolerable step touch",
+      "target": "step-touch-voltage",
+      "kind": "redirect"
+    },
+    {
+      "term": "cs surface factor",
+      "target": "step-touch-voltage",
+      "kind": "adjacent"
+    },
+    {
+      "term": "grounding grid safety",
+      "target": "step-touch-voltage",
+      "kind": "industry"
+    },
+    {
+      "term": "crushed rock layer",
+      "target": "step-touch-voltage",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ground potential rise",
+      "target": "step-touch-voltage",
+      "kind": "adjacent"
+    },
+    {
       "term": "self excitation",
       "target": "motor-capacitor-max",
       "kind": "industry"

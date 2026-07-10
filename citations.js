@@ -6271,6 +6271,17 @@ export const CITATIONS = {
       { name: "Minimum ampacity", value: "the maximum current times another 125% before any conditions-of-use adjustment", source: "NEC 690.8(B)(1)" },
     ],
   },
+  "step-touch-voltage": {
+    formula: "Cs = 1 - 0.09 (1 - rho/rho_s)/(2 hs + 0.09); E_step = (1000 + 6 Cs rho_s) k/sqrt(ts); E_touch = (1000 + 1.5 Cs rho_s) k/sqrt(ts) (k = 0.116 for 50 kg, 0.157 for 70 kg).",
+    edition: "The IEEE Std 80 tolerable step and touch voltage limits with the surface-layer derating factor Cs, by name.",
+    freeAccess: "IEEE Std 80 is available through the IEEE; the tolerable-voltage relations are published safety criteria.",
+    governance: GOVERNANCE.general,
+    editionNote: "Meeting a grid resistance target does not make the yard safe - the step and touch potentials must stay below these tolerable limits. A high-resistivity surface layer (crushed rock) over native soil raises the tolerable voltage through Cs (installers who omit the rock layer under-state it). The limits scale inversely with the square root of the fault clearing time, so a faster relay allows more; touch is far more restrictive than step. A safety-criteria aid, not a grid design.",
+    assumptions: [
+      { name: "Surface factor Cs", value: "Cs = 1 - 0.09 (1 - rho/rho_s)/(2 hs + 0.09); a crushed-rock layer raises the tolerable voltage", source: "IEEE Std 80" },
+      { name: "Body-current constant", value: "k = 0.116 (50 kg) or 0.157 (70 kg); limits scale as 1/sqrt(ts)", source: "IEEE Std 80" },
+    ],
+  },
   "neutral-grounding-resistor": {
     formula: "V_LN = V_LL / sqrt(3); R = V_LN / I_ground; P = I_ground^2 x R (= V_LN x I_ground).",
     edition: "Neutral grounding resistor sizing (IEEE 142 grounding practice), first-principles, by name; IEEE 142 and the protection scheme govern.",

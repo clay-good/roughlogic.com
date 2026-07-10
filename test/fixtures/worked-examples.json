@@ -44231,6 +44231,66 @@
    }
   },
   {
+   "tile_id": "step-touch-voltage",
+   "source_publisher": "IEEE Std 80 (tolerable step and touch voltage)",
+   "source_title": "Cs = 1 - 0.09(1 - rho/rho_s)/(2 hs + 0.09); E = (1000 + K Cs rho_s) k/sqrt(ts)",
+   "source_edition_or_year": "IEEE Std 80",
+   "source_section_or_page": "0.5 s, 3000 ohm-m rock over 100, 0.1 m, 50 kg -> Cs 0.70, step 2231 V, touch 681 V",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "clearing_time_s": 0.5,
+    "surface_resistivity": 3000,
+    "native_resistivity": 100,
+    "layer_thickness_m": 0.1,
+    "body_weight": "50"
+   },
+   "outputs": {
+    "cs": {
+     "value": 0.700,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "e_step_v": {
+     "value": 2231,
+     "tolerance": {
+      "abs": 3
+     }
+    },
+    "e_touch_v": {
+     "value": 681,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "step-touch-voltage",
+   "source_publisher": "IEEE Std 80 (tolerable step and touch voltage)",
+   "source_title": "the limits scale inversely with the square root of the clearing time",
+   "source_edition_or_year": "IEEE Std 80",
+   "source_section_or_page": "Same yard cleared in 0.2 s -> step limit rises to 3528 V (faster relay allows more)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "clearing_time_s": 0.2,
+    "surface_resistivity": 3000,
+    "native_resistivity": 100,
+    "layer_thickness_m": 0.1,
+    "body_weight": "50"
+   },
+   "outputs": {
+    "e_step_v": {
+     "value": 3528,
+     "tolerance": {
+      "abs": 4
+     }
+    }
+   }
+  },
+  {
    "tile_id": "masonry-wall-weight",
    "source_publisher": "NCMA TEK",
    "source_title": "8 in CMU, hollow 55 psf, grout adder 29, grouted 48 in o.c., 10 ft -> 59.8 psf, 598 lb/ft",

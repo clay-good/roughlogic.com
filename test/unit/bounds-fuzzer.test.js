@@ -18486,3 +18486,26 @@ test("bounds: spec-v557 computeVfdReflectedWave pins the critical length, the pe
   assert.ok("error" in _v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 0, run_length_ft: 100 }));
   assert.ok("error" in _v557({ rise_time_us: 0.1, velocity_pct: 50, system_voltage_v: 480, run_length_ft: 0 }));
 });
+
+import { computeStepTouchVoltage as _v558 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v558 computeStepTouchVoltage pins Cs, the step-vs-touch ordering, the inverse-sqrt clearing-time scaling, the 50/70 kg constant, and error seams", () => {
+  const r = _v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" });
+  assert.ok(Math.abs(r.cs - 0.700) < 0.005); // 1 - 0.09*(1-100/3000)/(2*0.1+0.09)
+  assert.ok(Math.abs(r.e_step_v - 2231) < 3);
+  assert.ok(Math.abs(r.e_touch_v - 681) < 2);
+  assert.ok(r.e_touch_v < r.e_step_v); // touch is more restrictive
+  // A faster clearing time raises the tolerable voltage as 1/sqrt(ts).
+  const fast = _v558({ clearing_time_s: 0.2, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" });
+  assert.ok(Math.abs(fast.e_step_v - 3528) < 4);
+  assert.ok(Math.abs(fast.e_step_v / r.e_step_v - Math.sqrt(0.5 / 0.2)) < 1e-6);
+  // The 70 kg body constant (0.157) raises the limits vs the 50 kg (0.116).
+  assert.ok(Math.abs(_v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "70" }).e_step_v - r.e_step_v * 0.157 / 0.116) < 1);
+  // Error seams: non-finite, non-positive resistivities / thickness / time, bad body weight.
+  assert.ok("error" in _v558({ clearing_time_s: Infinity, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" }));
+  assert.ok("error" in _v558({ clearing_time_s: 0.5, surface_resistivity: 0, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" }));
+  assert.ok("error" in _v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 0, layer_thickness_m: 0.1, body_weight: "50" }));
+  assert.ok("error" in _v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0, body_weight: "50" }));
+  assert.ok("error" in _v558({ clearing_time_s: 0, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" }));
+  assert.ok("error" in _v558({ clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "60" }));
+});

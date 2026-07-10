@@ -371,3 +371,49 @@ ELECDESIGN_RENDERERS["neutral-grounding-resistor"] = _simpleRenderer({
   ],
   compute: computeNeutralGroundingResistor,
 });
+
+// ===================== spec-v558: tolerable step and touch voltage (IEEE Std 80) =====================
+
+// dims: in { clearing_time_s: T, surface_resistivity: dimensionless, native_resistivity: dimensionless, layer_thickness_m: L, body_weight: dimensionless } out: { cs: dimensionless, e_step_v: dimensionless, e_touch_v: dimensionless }
+export function computeStepTouchVoltage({ clearing_time_s = 0, surface_resistivity = 0, native_resistivity = 0, layer_thickness_m = 0, body_weight = "50" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ts = Number(clearing_time_s) || 0;
+  const rhos = Number(surface_resistivity) || 0;
+  const rho = Number(native_resistivity) || 0;
+  const hs = Number(layer_thickness_m) || 0;
+  const bw = Number(body_weight) || 0;
+  if (!(rhos > 0)) return { error: "Surface resistivity must be positive (ohm-m)." };
+  if (!(rho > 0)) return { error: "Native resistivity must be positive (ohm-m)." };
+  if (!(hs > 0)) return { error: "Surface layer thickness must be positive (m)." };
+  if (!(ts > 0)) return { error: "Clearing time must be positive (s)." };
+  if (bw !== 50 && bw !== 70) return { error: "Body weight must be 50 or 70 (kg)." };
+  const cs = 1 - 0.09 * (1 - rho / rhos) / (2 * hs + 0.09);
+  const k = bw === 70 ? 0.157 : 0.116;
+  const e_step_v = (1000 + 6 * cs * rhos) * k / Math.sqrt(ts);
+  const e_touch_v = (1000 + 1.5 * cs * rhos) * k / Math.sqrt(ts);
+  return {
+    cs, e_step_v, e_touch_v, k,
+    note: "Meeting a grid resistance target does not make the yard safe - the step and touch potentials must stay below these tolerable limits. A high-resistivity surface layer (crushed rock) over native soil raises the tolerable voltage through Cs (installers who omit the rock layer under-state it). The limits scale inversely with the square root of the fault clearing time, so a faster relay allows more. Touch is far more restrictive than step. IEEE 80 and a full grid analysis govern.",
+  };
+}
+
+export const stepTouchVoltageExample = { inputs: { clearing_time_s: 0.5, surface_resistivity: 3000, native_resistivity: 100, layer_thickness_m: 0.1, body_weight: "50" } };
+
+ELECDESIGN_RENDERERS["step-touch-voltage"] = _simpleRenderer({
+  citation: "Citation: IEEE Std 80 tolerable step and touch voltage: Cs = 1 - 0.09 (1 - rho/rho_s)/(2 hs + 0.09); E_step = (1000 + 6 Cs rho_s) k/sqrt(ts); E_touch = (1000 + 1.5 Cs rho_s) k/sqrt(ts) (k = 0.116 for 50 kg, 0.157 for 70 kg). Meeting a grid resistance target does not make the yard safe; the crushed-rock surface layer raises the tolerable voltage via Cs; the limits scale inversely with the square root of the clearing time. IEEE 80 and a full grid analysis govern.",
+  example: stepTouchVoltageExample.inputs,
+  fields: [
+    { key: "clearing_time_s", label: "Fault clearing time ts (s)", kind: "number" },
+    { key: "surface_resistivity", label: "Surface (crushed-rock) resistivity rho_s (ohm-m)", kind: "number" },
+    { key: "native_resistivity", label: "Native soil resistivity rho (ohm-m)", kind: "number" },
+    { key: "layer_thickness_m", label: "Surface layer thickness hs (m)", kind: "number" },
+    { key: "body_weight", label: "Body weight", kind: "select", default: "50", options: [{ value: "50", label: "50 kg (k = 0.116)" }, { value: "70", label: "70 kg (k = 0.157)" }] },
+  ],
+  outputs: [
+    { key: "cs", id: "stv-out-cs", label: "Surface derating factor Cs", value: (r) => fmt(r.cs, 3) },
+    { key: "es", id: "stv-out-es", label: "Tolerable step voltage", value: (r) => fmt(r.e_step_v, 0) + " V" },
+    { key: "et", id: "stv-out-et", label: "Tolerable touch voltage (governs)", value: (r) => fmt(r.e_touch_v, 0) + " V" },
+    { key: "n", id: "stv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeStepTouchVoltage,
+});
