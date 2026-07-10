@@ -66,7 +66,14 @@ const TILE_GZIP_CAP = 6 * 1024;
 // Bumped 39 -> 42 KB on 2026-07-04: the v375-v474 campaign close (fabrication
 // weld/bend, powered-attic-ventilator, ASCE 7 snow trio, ADA ramp) took
 // construction/index.html to ~40.1 KB gz; 42 KB restores headroom.
-const GROUP_GZIP_CAP = 42 * 1024;
+// Bumped 42 -> 48 KB on 2026-07-10: the v489-v588 single-tile campaign's
+// Group E structural singles (steel-floor-vibration v547,
+// concrete-anchor-breakout v548, diaphragm-collector-force v549, and the
+// rigging / concrete / snow tiles through v556) took
+// construction/index.html to ~43.4 KB gz, crossing the cap at v547 (this
+// gate runs only in CI's integration job, so push lint stayed green while
+// CI went red from v547 onward); 48 KB restores ~11% headroom.
+const GROUP_GZIP_CAP = 48 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",
