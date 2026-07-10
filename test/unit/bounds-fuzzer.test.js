@@ -17958,3 +17958,25 @@ test("bounds: spec-v534 computeLigationMolarRatio pins the length-scaled insert 
   assert.ok("error" in _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 0, molar_ratio: 3 }));
   assert.ok("error" in _v534({ vector_ng: 50, vector_length_bp: 5000, insert_length_bp: 1000, molar_ratio: 0 }));
 });
+
+import { computeDoublingTime as _v535 } from "../../calc-lab.js";
+
+test("bounds: spec-v535 computeDoublingTime pins Td / mu / doublings from the fold change and error seams", () => {
+  const r = _v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 24 });
+  assert.ok(Math.abs(r.doubling_time - 8.0) < 0.01); // 24 * ln2 / ln(8)
+  assert.ok(Math.abs(r.growth_rate - 0.0866) < 0.001); // ln(8) / 24
+  assert.ok(Math.abs(r.doublings - 3.0) < 1e-9); // log2(8)
+  // A slower culture: one doubling in the same interval -> Td equals the interval.
+  const slow = _v535({ initial_count: 1e5, final_count: 2e5, elapsed_time: 24 });
+  assert.ok(Math.abs(slow.doubling_time - 24.0) < 0.01);
+  assert.ok(Math.abs(slow.doublings - 1.0) < 1e-9);
+  // Td scales with the interval at fixed fold change.
+  assert.ok(Math.abs(_v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 48 }).doubling_time - 16.0) < 0.01);
+  // Error seams: non-finite, non-positive counts, final <= initial, non-positive time.
+  assert.ok("error" in _v535({ initial_count: Infinity, final_count: 8e5, elapsed_time: 24 }));
+  assert.ok("error" in _v535({ initial_count: 0, final_count: 8e5, elapsed_time: 24 }));
+  assert.ok("error" in _v535({ initial_count: 1e5, final_count: 0, elapsed_time: 24 }));
+  assert.ok("error" in _v535({ initial_count: 1e5, final_count: 1e5, elapsed_time: 24 })); // no growth
+  assert.ok("error" in _v535({ initial_count: 8e5, final_count: 1e5, elapsed_time: 24 })); // shrinking
+  assert.ok("error" in _v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 0 }));
+});

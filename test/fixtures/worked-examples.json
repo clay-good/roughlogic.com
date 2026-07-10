@@ -17182,6 +17182,68 @@
    }
   },
   {
+   "tile_id": "doubling-time",
+   "source_publisher": "Exponential-growth / population-doubling kinetics",
+   "source_title": "Td = elapsed x ln(2) / ln(N / N0)",
+   "source_edition_or_year": "growth-kinetics",
+   "source_section_or_page": "1e5 to 8e5 cells/mL in 24 h -> 8.0 h doubling, 0.087 /h, 3 doublings",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "initial_count": 100000,
+    "final_count": 800000,
+    "elapsed_time": 24
+   },
+   "outputs": {
+    "doubling_time": {
+     "value": 8.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "growth_rate": {
+     "value": 0.0866,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "doublings": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "doubling-time",
+   "source_publisher": "Exponential-growth / population-doubling kinetics",
+   "source_title": "doublings = log2(N / N0)",
+   "source_edition_or_year": "growth-kinetics",
+   "source_section_or_page": "1e5 to 2e5 in 24 h -> 24 h doubling, 1 doubling (the slow-culture contrast)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "initial_count": 100000,
+    "final_count": 200000,
+    "elapsed_time": 24
+   },
+   "outputs": {
+    "doubling_time": {
+     "value": 24.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "doublings": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gross-rent-multiplier",
    "source_publisher": "Appraisal Institute income-approach (GRM)",
    "source_title": "GRM = price / gross_annual_rent",

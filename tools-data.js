@@ -513,6 +513,7 @@ export const TOOLS = [
   { id: "molarity-from-stock", name: "Molarity from Concentrated Reagent", group: "T", trades: ["lab"], desc: "Stock molarity of a concentrated liquid reagent from its assay percent, density, and molecular weight (M = 10 x %w/w x density / MW), plus the volume of concentrate to draw for a target working solution. Add acid to water." },
   { id: "nucleic-acid-a260", name: "Nucleic Acid Concentration (A260)", group: "T", trades: ["lab"], desc: "DNA/RNA concentration from a 260 nm read using the mass extinction factor (50 dsDNA, 33 ssDNA/oligo, 40 RNA) and dilution, plus the 260/280 purity ratio that flags protein or phenol carryover. Off every NanoDrop or cuvette read." },
   { id: "ligation-molar-ratio", name: "Ligation Insert:Vector Molar Ratio", group: "T", trades: ["lab"], desc: "Insert mass to add for a target insert:vector molar ratio (insert_ng = ratio x insert_len/vector_len x vector_ng), plus each in picomoles at 650 g/mol per bp. A short insert needs less mass, not equal mass; equal masses over-represent small fragments." },
+  { id: "doubling-time", name: "Cell Culture Doubling Time", group: "T", trades: ["lab"], desc: "Doubling time, specific growth rate, and number of doublings from two counts (or ODs) and the elapsed time (Td = t x ln2 / ln(N/N0)). Valid only in log phase; a span across lag or stationary phase is meaningless." },
   // v12 Group U: Veterinary. Math aids only; the attending
   // veterinarian governs. Every tile renders the §B.1 limitation
   // banner.

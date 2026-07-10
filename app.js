@@ -967,6 +967,8 @@ const TOOL_MODULES = (() => {
     "nucleic-acid-a260",
     // spec-v534
     "ligation-molar-ratio",
+    // spec-v535
+    "doubling-time",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [

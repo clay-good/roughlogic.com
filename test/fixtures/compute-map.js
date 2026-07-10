@@ -32,6 +32,7 @@ export const COMPUTE_MAP = {
   "molarity-from-stock": { module: "../../calc-lab.js", fn: "computeMolarityFromStock" },
   "nucleic-acid-a260": { module: "../../calc-lab.js", fn: "computeNucleicAcidA260" },
   "ligation-molar-ratio": { module: "../../calc-lab.js", fn: "computeLigationMolarRatio" },
+  "doubling-time": { module: "../../calc-lab.js", fn: "computeDoublingTime" },
   "declining-balance-depreciation": { module: "../../calc-accounting.js", fn: "computeDecliningBalanceDepreciation" },
   "markup-vs-margin": { module: "../../calc-accounting.js", fn: "computeMarkupVsMargin" },
   "employer-payroll-tax": { module: "../../calc-accounting.js", fn: "computeEmployerPayrollTax" },

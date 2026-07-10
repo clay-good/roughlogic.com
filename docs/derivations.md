@@ -2087,6 +2087,7 @@ cross-check.
 | calc-lab.js | `computeBeerLambert` | `{ absorbance = 0, path_length_cm = 1, epsilon = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 25, high = 250 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeDilution` | `{ c1, v1, c2, v2 }` | _ | _ | _ |
+| calc-lab.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeGelPercentAgarose` | `{ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeHemocytometer` | `{ total_cells_counted = 0, squares_counted = 4, dilution_factor = 1, dead_cel...` | _ | _ | _ |
 | calc-lab.js | `computeHendersonHasselbalch` | `{ pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0, }` | _ | _ | _ |
@@ -2646,7 +2647,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1232.
+Row count: 1233.
 
 <!-- END function-corpus-v14 -->
 
@@ -3712,12 +3713,13 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (17 tiles)
+### Group T Lab (18 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `beer-lambert` | Beer-Lambert Concentration | Project (first-principles); Beer-Lambert law | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cfu-plate-count` | CFU/mL Viable Plate Count | FDA BAM Ch. 3 (Aerobic Plate Count) /...; 150 colonies, 10^-5 dilution, 0.1 mL -> 1.5e8 CFU/mL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `doubling-time` | Cell Culture Doubling Time | Exponential-growth / population-doubl...; 1e5 to 8e5 cells/mL in 24 h -> 8.0 h doubling, 0.087 /h, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gel-percent-agarose` | Agarose Gel Percent | Sambrook & Russell, Molecular Cloning; 10 kb max -> 0.8%; 100 mL -> 0.8 g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hemocytometer` | Hemocytometer Cell Count | Improved Neubauer hemocytometer (proj...; 240 cells / 4 squares / 1:2 dilution / 12 dead -> 60 avg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `henderson-hasselbalch` | Henderson-Hasselbalch Buffer | Project (first-principles); pH = pKa + log10([A-]/[HA]) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3820,6 +3822,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 988. Fixture-covered or reference-cadence: 988 / 988.
+Tile count: 989. Fixture-covered or reference-cadence: 989 / 989.
 
 <!-- END tile-index-v14 -->

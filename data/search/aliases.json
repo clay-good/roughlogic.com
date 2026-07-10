@@ -234,6 +234,46 @@
       "kind": "redirect"
     },
     {
+      "term": "doubling time",
+      "target": "doubling-time",
+      "kind": "industry"
+    },
+    {
+      "term": "growth rate",
+      "target": "doubling-time",
+      "kind": "industry"
+    },
+    {
+      "term": "population doubling",
+      "target": "doubling-time",
+      "kind": "redirect"
+    },
+    {
+      "term": "specific growth rate",
+      "target": "doubling-time",
+      "kind": "industry"
+    },
+    {
+      "term": "log phase growth",
+      "target": "doubling-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "generation time",
+      "target": "doubling-time",
+      "kind": "industry"
+    },
+    {
+      "term": "cell culture doubling",
+      "target": "doubling-time",
+      "kind": "industry"
+    },
+    {
+      "term": "mu growth",
+      "target": "doubling-time",
+      "kind": "redirect"
+    },
+    {
       "term": "declining balance",
       "target": "declining-balance-depreciation",
       "kind": "industry"

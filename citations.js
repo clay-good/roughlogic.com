@@ -329,6 +329,17 @@ export const CITATIONS = {
     ],
   },
 
+  "doubling-time": {
+    formula: "Td = elapsed x ln(2) / ln(N / N0); mu = ln(N / N0) / elapsed; doublings = log2(N / N0).",
+    edition: "Exponential-growth / population-doubling kinetics (standard growth analysis), by name.",
+    freeAccess: "Standard microbiology / cell-culture growth-kinetics relation; the culture and conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Doubling time is constant only during log (exponential) phase, so a measurement spanning lag or stationary phase is meaningless; if N is an optical density the ratio assumes OD stays proportional to cell count (which fails at high density). An analysis aid, not a validated growth assay.",
+    assumptions: [
+      { name: "Growth phase", value: "valid only during log (exponential) phase; lag / stationary spans are meaningless", source: "growth-kinetics" },
+    ],
+  },
+
   "declining-balance-depreciation": {
     formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",
     edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",

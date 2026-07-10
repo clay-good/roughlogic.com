@@ -1109,3 +1109,50 @@ function renderLigationMolarRatio(inputRegion, outputRegion, citationEl) {
   for (const f of [vng.input, vlen.input, ilen.input, ratio.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["ligation-molar-ratio"] = renderLigationMolarRatio;
+
+// --- spec-v535 T: Cell-culture doubling time (`doubling-time`) ---
+// Td = t x ln(2) / ln(N/N0). mu = ln(N/N0)/t. doublings = log2(N/N0).
+// dims: in { initial_count: dimensionless, final_count: dimensionless, elapsed_time: dimensionless } out: { doubling_time: dimensionless, growth_rate: dimensionless, doublings: dimensionless }
+export function computeDoublingTime({ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n0 = Number(initial_count) || 0;
+  const n = Number(final_count) || 0;
+  const t = Number(elapsed_time) || 0;
+  if (!(n0 > 0)) return { error: "Initial count (or OD) must be positive." };
+  if (!(n > 0)) return { error: "Final count (or OD) must be positive." };
+  if (!(n > n0)) return { error: "Final count must exceed the initial count (no growth to measure)." };
+  if (!(t > 0)) return { error: "Elapsed time must be positive." };
+  const ratio = n / n0;
+  const doubling_time = t * Math.LN2 / Math.log(ratio);
+  const growth_rate = Math.log(ratio) / t;
+  const doublings = Math.log2(ratio);
+  return {
+    doubling_time,
+    growth_rate,
+    doublings,
+    note: "Doubling time is constant only during log (exponential) phase - a measurement spanning lag or stationary phase is meaningless. If N is an optical density, the ratio assumes OD stays proportional to cell count (which fails at high density). The culture, medium, and conditions govern.",
+  };
+}
+export const doublingTimeExample = { inputs: { initial_count: 1e5, final_count: 8e5, elapsed_time: 24 } };
+
+function renderDoublingTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard exponential-growth / population-doubling kinetics; Td = elapsed x ln(2) / ln(N / N0); mu = ln(N / N0) / elapsed; doublings = log2(N / N0). Doubling time is constant only during log (exponential) phase; a measurement spanning lag or stationary phase is meaningless. If N is an optical density, the ratio assumes OD stays proportional to cell count (fails at high density). The culture, medium, and conditions govern.";
+  const n0 = makeNumber("Initial count or OD (N0)", "dt-n0", { step: "any", min: "0", value: "100000" }); n0.input.value = "100000";
+  const n = makeNumber("Final count or OD (N)", "dt-n", { step: "any", min: "0", value: "800000" }); n.input.value = "800000";
+  const t = makeNumber("Elapsed time (h)", "dt-t", { step: "any", min: "0", value: "24" }); t.input.value = "24";
+  for (const f of [n0, n, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n0.input.value = "100000"; n.input.value = "800000"; t.input.value = "24"; update(); });
+  const oTd = makeOutputLine(outputRegion, "Doubling time", "dt-out-td");
+  const oMu = makeOutputLine(outputRegion, "Specific growth rate / doublings", "dt-out-mu");
+  const oNote = makeOutputLine(outputRegion, "Note", "dt-out-note");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeDoublingTime({ initial_count: readNum(n0.input), final_count: readNum(n.input), elapsed_time: readNum(t.input) });
+    if (r.error) { oTd.textContent = r.error; oMu.textContent = ""; oNote.textContent = ""; return; }
+    oTd.textContent = fmt(r.doubling_time, 2) + " h";
+    oMu.textContent = fmt(r.growth_rate, 3) + " /h, " + fmt(r.doublings, 2) + " doublings";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n0.input, n.input, t.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["doubling-time"] = renderDoublingTime;
