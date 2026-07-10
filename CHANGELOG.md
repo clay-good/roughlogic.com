@@ -4,9 +4,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
-### chore(sizes): raise calc-arborist.js gzip cap 8000 -> 10000; 2026-07-10
+### chore(sizes): raise calc-arborist.js gzip cap 8000 -> 13000; 2026-07-10
 
-The spec-v563..v564 forestry batch (`basal-area-prism`, `reineke-sdi`) adds two hand-written renderer tiles to `calc-arborist.js`, crossing the 8000 B cap at tile v564 (107.1%). Raised the `check-module-sizes` cap to **10000** with headroom for further Group L forestry tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+The spec-v563..v566 forestry / tree-risk batch (`basal-area-prism`, `reineke-sdi`, `trunk-decay-strength`, `tree-protection-zone`) adds four hand-written renderer tiles to `calc-arborist.js`, taking it from 8000 B to over 10000 B (102.7% at v566). Raised the `check-module-sizes` cap to **13000** with headroom for further Group L forestry tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
 
 ### chore(sizes): raise calc-elecdesign.js gzip cap 8500 -> 11000; 2026-07-10
 

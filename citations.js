@@ -6811,6 +6811,17 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "tree-protection-zone": {
+    formula: "radius = radius_factor x DBH; area = pi x radius^2 (radius_factor 1.0 ft/in standard, 1.5 ft/in conservative/mature).",
+    edition: "Tree protection zone / critical root zone (ANSI A300 Part 5; ISA critical root zone), by name.",
+    freeAccess: "The one-foot-per-inch protection-radius rule is published arboricultural practice; a qualified arborist and the local ordinance govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The zone is set by trunk diameter, not the canopy dripline (a narrow-crowned tree still needs the full radius, so sizing the fence to the visible canopy under-protects the roots); the standard radius is 1.0 ft per inch of DBH, with 1.5 ft per inch for mature or sensitive trees; protection is cumulative over the whole circle (fencing plus no grade change, compaction, or trenching, to the protected soil depth). A planning aid, not an arborist's prescription.",
+    assumptions: [
+      { name: "Trunk-based radius", value: "radius = radius_factor x DBH, set by the trunk not the canopy; 1.0 ft/in standard, 1.5 ft/in mature", source: "ANSI A300 Part 5" },
+      { name: "Cumulative protection", value: "fencing plus no grade change, compaction, or trenching to the protected soil depth", source: "ISA critical root zone" },
+    ],
+  },
   "trunk-decay-strength": {
     formula: "hollow_d = D - 2t; loss_pct = (hollow_d^3 / D^3) x 100; t_over_R = t / (D / 2); concern when t/R < 0.30.",
     edition: "Hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name.",

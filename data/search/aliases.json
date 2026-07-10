@@ -4679,6 +4679,46 @@
       "kind": "redirect"
     },
     {
+      "term": "tree protection zone",
+      "target": "tree-protection-zone",
+      "kind": "industry"
+    },
+    {
+      "term": "critical root zone",
+      "target": "tree-protection-zone",
+      "kind": "industry"
+    },
+    {
+      "term": "crz",
+      "target": "tree-protection-zone",
+      "kind": "redirect"
+    },
+    {
+      "term": "tpz",
+      "target": "tree-protection-zone",
+      "kind": "redirect"
+    },
+    {
+      "term": "ansi a300 part 5",
+      "target": "tree-protection-zone",
+      "kind": "redirect"
+    },
+    {
+      "term": "root protection radius",
+      "target": "tree-protection-zone",
+      "kind": "adjacent"
+    },
+    {
+      "term": "construction tree fence",
+      "target": "tree-protection-zone",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dbh root zone",
+      "target": "tree-protection-zone",
+      "kind": "redirect"
+    },
+    {
       "term": "nozzle flow",
       "target": "nozzle-flow-pressure",
       "kind": "redirect"

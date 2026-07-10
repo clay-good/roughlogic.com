@@ -18674,3 +18674,22 @@ test("bounds: spec-v565 computeTrunkDecayStrength pins the cube-law loss, the t/
   assert.ok("error" in _v565({ diameter_in: 24, shell_thick_in: 0 }));
   assert.ok("error" in _v565({ diameter_in: 24, shell_thick_in: 12 })); // shell >= D/2
 });
+
+import { computeTreeProtectionZone as _v566 } from "../../calc-arborist.js";
+
+test("bounds: spec-v566 computeTreeProtectionZone pins the radius = factor x DBH relation, the fenced area, and error seams", () => {
+  const r = _v566({ dbh_in: 20, radius_factor: 1.0 });
+  assert.ok(Math.abs(r.radius_ft - 20) < 1e-9); // 1.0 * 20
+  assert.ok(Math.abs(r.area_ft2 - 1256.64) < 1); // pi * 20^2
+  // The conservative mature factor grows the radius and more than doubles the area.
+  const mature = _v566({ dbh_in: 20, radius_factor: 1.5 });
+  assert.ok(Math.abs(mature.radius_ft - 30) < 1e-9);
+  assert.ok(Math.abs(mature.area_ft2 - 2827.43) < 1);
+  assert.ok(mature.area_ft2 > 2 * r.area_ft2);
+  // The area scales with the square of the radius.
+  assert.ok(Math.abs(_v566({ dbh_in: 40, radius_factor: 1.0 }).area_ft2 - 4 * r.area_ft2) < 1e-6);
+  // Error seams: non-finite, non-positive DBH / factor.
+  assert.ok("error" in _v566({ dbh_in: Infinity, radius_factor: 1.0 }));
+  assert.ok("error" in _v566({ dbh_in: 0, radius_factor: 1.0 }));
+  assert.ok("error" in _v566({ dbh_in: 20, radius_factor: 0 }));
+});

@@ -449,3 +449,46 @@ function _v565renderTrunkDecayStrength(inputRegion, outputRegion, citationEl) {
   for (const f of [D, t]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["trunk-decay-strength"] = _v565renderTrunkDecayStrength;
+
+// --- spec-v566 L: Tree protection zone / critical root zone (ANSI A300 Part 5) ---
+// radius = radius_factor x DBH. area = pi x radius^2.
+// dims: in { dbh_in: L, radius_factor: dimensionless } out: { radius_ft: L, area_ft2: L^2 }
+export function computeTreeProtectionZone({ dbh_in = 0, radius_factor = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dbh = Number(dbh_in);
+  const factor = Number(radius_factor);
+  if (!Number.isFinite(dbh) || dbh <= 0) return { error: "DBH must be a positive finite number (in)." };
+  if (!Number.isFinite(factor) || factor <= 0) return { error: "Radius factor must be a positive finite number (ft/in)." };
+  const radius_ft = factor * dbh;
+  const area_ft2 = Math.PI * radius_ft * radius_ft;
+  if (![radius_ft, area_ft2].every(Number.isFinite)) return { error: "Protection-zone math is not a finite value." };
+  return {
+    radius_ft, area_ft2,
+    note: "The zone is set by trunk diameter, not the canopy dripline - a narrow-crowned tree still needs the full radius, so sizing the fence to the visible canopy under-protects the roots. The standard is 1.0 ft of radius per inch of DBH, with a conservative 1.5 ft/in for mature or sensitive trees. Protection is cumulative over the whole circle: fencing plus no grade change, no compaction, and no trenching, to the protected soil depth. A qualified arborist and the local ordinance govern.",
+  };
+}
+export const treeProtectionZoneExample = { inputs: { dbh_in: 20, radius_factor: 1.0 } };
+
+function _v566renderTreeProtectionZone(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: tree protection zone / critical root zone (ANSI A300 Part 5; ISA critical root zone), by name. radius = radius_factor x DBH; area = pi x radius^2. Factors: 1.0 ft per in of DBH (standard), 1.5 ft per in (conservative / mature). The zone is set by the trunk, not the canopy dripline; protection is cumulative (fence plus no grade change, compaction, or trenching). A qualified arborist and the local ordinance govern.";
+  const dbh = makeNumber("DBH (in)", "tpz-dbh", { step: "any", min: "0", value: "20" }); dbh.input.value = "20";
+  const factor = makeSelect("Radius factor", "tpz-factor", [
+    { value: "1.0", label: "1.0 ft/in (standard)", selected: true },
+    { value: "1.5", label: "1.5 ft/in (conservative / mature)" },
+  ]);
+  for (const f of [dbh, factor]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dbh.input.value = "20"; factor.select.value = "1.0"; update(); });
+  const oRad = makeOutputLine(outputRegion, "Protection radius", "tpz-out-rad");
+  const oArea = makeOutputLine(outputRegion, "Fenced area", "tpz-out-area");
+  const oNote = makeOutputLine(outputRegion, "Note", "tpz-out-note");
+  const update = debounce(() => {
+    const r = computeTreeProtectionZone({ dbh_in: Number(dbh.input.value) || 0, radius_factor: Number(factor.select.value) || 0 });
+    if (r.error) { oRad.textContent = r.error; oArea.textContent = "-"; oNote.textContent = ""; return; }
+    oRad.textContent = fmt(r.radius_ft, 1) + " ft (from the trunk)";
+    oArea.textContent = fmt(r.area_ft2, 0) + " ft^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  dbh.input.addEventListener("input", update);
+  factor.select.addEventListener("change", update);
+}
+ARBORIST_RENDERERS["tree-protection-zone"] = _v566renderTreeProtectionZone;

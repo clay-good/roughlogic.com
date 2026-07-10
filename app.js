@@ -887,6 +887,8 @@ const TOOL_MODULES = (() => {
     "reineke-sdi",
     // spec-v565
     "trunk-decay-strength",
+    // spec-v566
+    "tree-protection-zone",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

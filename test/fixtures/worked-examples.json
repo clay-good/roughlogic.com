@@ -20209,6 +20209,60 @@
    }
   },
   {
+   "tile_id": "tree-protection-zone",
+   "source_publisher": "ANSI A300 Part 5 / ISA critical root zone",
+   "source_title": "radius = radius_factor x DBH; area = pi x radius^2",
+   "source_edition_or_year": "ANSI A300 Part 5",
+   "source_section_or_page": "20 in DBH, 1.0 ft/in standard -> 20 ft radius, 1257 ft^2 fenced",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "dbh_in": 20,
+    "radius_factor": 1.0
+   },
+   "outputs": {
+    "radius_ft": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "area_ft2": {
+     "value": 1256.6,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tree-protection-zone",
+   "source_publisher": "ANSI A300 Part 5 / ISA critical root zone",
+   "source_title": "a mature tree gets the conservative 1.5 ft/in factor",
+   "source_edition_or_year": "ANSI A300 Part 5",
+   "source_section_or_page": "Same 20 in tree at 1.5 ft/in -> 30 ft radius, 2827 ft^2 (more than double)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "dbh_in": 20,
+    "radius_factor": 1.5
+   },
+   "outputs": {
+    "radius_ft": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "area_ft2": {
+     "value": 2827.4,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",
