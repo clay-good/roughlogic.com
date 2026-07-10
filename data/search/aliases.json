@@ -17029,6 +17029,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "panel zone",
+      "target": "steel-panel-zone-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "column web shear",
+      "target": "steel-panel-zone-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "aisc j10.6",
+      "target": "steel-panel-zone-shear",
+      "kind": "redirect"
+    },
+    {
+      "term": "doubler plate",
+      "target": "steel-panel-zone-shear",
+      "kind": "industry"
+    },
+    {
+      "term": "moment connection panel zone",
+      "target": "steel-panel-zone-shear",
+      "kind": "adjacent"
+    },
+    {
+      "term": "panel zone deformation",
+      "target": "steel-panel-zone-shear",
+      "kind": "redirect"
+    },
+    {
+      "term": "j10-9 j10-11",
+      "target": "steel-panel-zone-shear",
+      "kind": "redirect"
+    },
+    {
+      "term": "column panel shear",
+      "target": "steel-panel-zone-shear",
+      "kind": "adjacent"
+    },
+    {
       "term": "consolidation time",
       "target": "consolidation-time-rate",
       "kind": "industry"

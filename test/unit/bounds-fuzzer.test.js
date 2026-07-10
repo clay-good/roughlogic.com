@@ -18405,3 +18405,29 @@ test("bounds: spec-v554 computeLiftingLugDesign pins the three mode capacities, 
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 4.0, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 })); // w <= Dh
   assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, design_factor: 0.5 }));
 });
+
+import { computeSteelPanelZoneShear as _v555 } from "../../calc-steel.js";
+
+test("bounds: spec-v555 computeSteelPanelZoneShear pins the two branch strengths, the demand, the doubler flag flipping with pz_in_analysis, and error seams", () => {
+  const base = { fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_flange_bcf_in: 14.5, col_flange_tcf_in: 0.75, beam_depth_db_in: 24, beam_flange_tf_in: 1.0, demand_moment_kin: 5500, col_shear_kip: 40 };
+  const b = _v555({ ...base, pz_in_analysis: "no" });
+  assert.ok(Math.abs(b.rn_basic_kip - 210) < 0.5); // 0.60*50*14*0.5
+  assert.ok(Math.abs(b.phi_rn_kip - 189) < 0.5); // 0.90*210
+  assert.ok(Math.abs(b.demand_kip - 199.1) < 0.5); // 5500/23 - 40
+  assert.equal(b.doubler, true); // 199 > 189
+  // Including the panel-zone deformation unlocks the flange bonus and clears the doubler.
+  const y = _v555({ ...base, pz_in_analysis: "yes" });
+  assert.ok(Math.abs(y.bonus - 1.146) < 0.005);
+  assert.ok(Math.abs(y.rn_pz_kip - 241) < 1);
+  assert.ok(Math.abs(y.phi_rn_kip - 217) < 1);
+  assert.equal(y.doubler, false); // 199 < 217
+  // The same joint passes or fails purely on whether the analysis modeled the panel zone.
+  assert.notEqual(b.doubler, y.doubler);
+  // Error seams: non-finite, non-positive Fy / dc / tw / db, negative demand.
+  assert.ok("error" in _v555({ ...base, fy_ksi: Infinity, pz_in_analysis: "no" }));
+  assert.ok("error" in _v555({ ...base, fy_ksi: 0, pz_in_analysis: "no" }));
+  assert.ok("error" in _v555({ ...base, col_depth_dc_in: 0, pz_in_analysis: "no" }));
+  assert.ok("error" in _v555({ ...base, col_web_tw_in: 0, pz_in_analysis: "no" }));
+  assert.ok("error" in _v555({ ...base, beam_depth_db_in: 1.0, beam_flange_tf_in: 1.0, pz_in_analysis: "no" })); // db <= tf
+  assert.ok("error" in _v555({ ...base, demand_moment_kin: -1, pz_in_analysis: "no" }));
+});

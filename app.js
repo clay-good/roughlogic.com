@@ -535,6 +535,8 @@ const TOOL_MODULES = (() => {
     "shear-stud-strength", "composite-beam-flexure", "steel-camber",
     // spec-v547
     "steel-floor-vibration",
+    // spec-v555
+    "steel-panel-zone-shear",
   ]);
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio: a new lazy
   // Group E cluster, the RC companion to calc-steel.js one material over.

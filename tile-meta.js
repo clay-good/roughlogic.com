@@ -679,6 +679,7 @@ const _TILES = [
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],
   ["shear-stud-strength", "E"], ["composite-beam-flexure", "E"], ["steel-camber", "E"],
   ["steel-floor-vibration", "E"],
+  ["steel-panel-zone-shear", "E"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (calc-concrete.js)
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
   ["concrete-torsion-threshold", "E"], ["glulam-volume-factor", "E"], ["masonry-anchor-bolt", "E"],

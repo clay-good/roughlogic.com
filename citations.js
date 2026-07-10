@@ -10650,6 +10650,17 @@ export const CITATIONS = {
       { name: "Resonant band", value: "low-frequency floors ~4-8 Hz resonate with the walking harmonic (e^(-0.35 fn) term)", source: "AISC DG11" },
     ],
   },
+  "steel-panel-zone-shear": {
+    formula: "Rn_basic = 0.60 Fy dc tw (J10-9); Rn_pz = Rn_basic [1 + 3 bcf tcf^2/(db dc tw)] (J10-11); phiRn = 0.90 Rn; demand = sum(Mf)/(db - tf) - Vcol.",
+    edition: "The AISC 360-16 Section J10.6 panel-zone (web) shear strength, Eq. J10-9 and J10-11, by name.",
+    freeAccess: "AISC 360 is available through AISC; the J10.6 panel-zone provisions are published design equations.",
+    governance: GOVERNANCE.general,
+    editionNote: "The flange-stiffened bonus term (Eq. J10-11) is permitted only when the panel-zone deformation is accounted for in the frame analysis; otherwise use the basic strength (Eq. J10-9). A high column axial load (Pr > 0.4 Pc) reduces the strength by a further factor (this tile models the low-axial case). The moment-frame joint often fails here before the beam or column; a doubler plate is the fix. A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Two-branch strength", value: "basic J10-9 unless panel-zone deformation is in the analysis, then the J10-11 flange bonus applies", source: "AISC 360-16 J10.6" },
+      { name: "Low-axial case", value: "Pr <= 0.4 Pc; a higher axial load applies a further reduction not included here", source: "AISC 360-16 J10.6" },
+    ],
+  },
   "rc-beam-flexure": {
     formula: "a = As x fy / (0.85 x f'c x b); Mn = As x fy x (d - a/2); phi Mn = 0.90 x Mn (tension-controlled); util = Mu / phi Mn.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.2.2.4.1 (equivalent rectangular stress block), §22.2 (nominal flexural strength), §21.2.2 (phi = 0.90 tension-controlled).",

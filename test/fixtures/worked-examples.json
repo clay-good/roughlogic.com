@@ -34094,6 +34094,82 @@
    }
   },
   {
+   "tile_id": "steel-panel-zone-shear",
+   "source_publisher": "AISC 360-16 Section J10.6 (panel-zone shear)",
+   "source_title": "basic Rn = 0.60 Fy dc tw (J10-9); demand = sum(Mf)/(db - tf) - Vcol",
+   "source_edition_or_year": "AISC 360-16",
+   "source_section_or_page": "W14 Fy50 dc14 tw0.5, 24 in beam, Mf 5500, Vcol 40, basic branch -> phiRn 189, demand 199, doubler",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "fy_ksi": 50,
+    "col_depth_dc_in": 14,
+    "col_web_tw_in": 0.5,
+    "col_flange_bcf_in": 14.5,
+    "col_flange_tcf_in": 0.75,
+    "beam_depth_db_in": 24,
+    "beam_flange_tf_in": 1.0,
+    "demand_moment_kin": 5500,
+    "col_shear_kip": 40,
+    "pz_in_analysis": "no"
+   },
+   "outputs": {
+    "rn_basic_kip": {
+     "value": 210,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "phi_rn_kip": {
+     "value": 189,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "demand_kip": {
+     "value": 199.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-panel-zone-shear",
+   "source_publisher": "AISC 360-16 Section J10.6 (panel-zone shear)",
+   "source_title": "the flange bonus (J10-11) can save it if the panel-zone deformation was modeled",
+   "source_edition_or_year": "AISC 360-16",
+   "source_section_or_page": "Same joint with pz in analysis -> bonus 1.146, Rn 241, phiRn 217, no doubler",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "fy_ksi": 50,
+    "col_depth_dc_in": 14,
+    "col_web_tw_in": 0.5,
+    "col_flange_bcf_in": 14.5,
+    "col_flange_tcf_in": 0.75,
+    "beam_depth_db_in": 24,
+    "beam_flange_tf_in": 1.0,
+    "demand_moment_kin": 5500,
+    "col_shear_kip": 40,
+    "pz_in_analysis": "yes"
+   },
+   "outputs": {
+    "rn_pz_kip": {
+     "value": 241,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "phi_rn_kip": {
+     "value": 217,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fire-pump-curve",
    "source_publisher": "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection)",
    "source_title": "500 gpm at 100 psi pump, 128 psi churn / 72 psi at 750 gpm -> limit 140, floor 65, both pass (12% / 7% margins)",

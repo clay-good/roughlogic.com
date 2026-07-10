@@ -989,3 +989,62 @@ STEEL_RENDERERS["steel-floor-vibration"] = _simpleRenderer({
   ],
   compute: computeSteelFloorVibration,
 });
+
+// ===================== spec-v555: column web panel-zone shear (AISC 360-16 J10.6) =====================
+
+// dims: in { fy_ksi: M L^-1 T^-2, col_depth_dc_in: L, col_web_tw_in: L, col_flange_bcf_in: L, col_flange_tcf_in: L, beam_depth_db_in: L, beam_flange_tf_in: L, demand_moment_kin: M L^2 T^-2, col_shear_kip: M L T^-2, pz_in_analysis: dimensionless } out: { rn_basic_kip: M L T^-2, rn_pz_kip: M L T^-2, phi_rn_kip: M L T^-2, demand_kip: M L T^-2 }
+export function computeSteelPanelZoneShear({ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_flange_bcf_in = 0, col_flange_tcf_in = 0, beam_depth_db_in = 0, beam_flange_tf_in = 0, demand_moment_kin = 0, col_shear_kip = 0, pz_in_analysis = "no" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Fy = Number(fy_ksi) || 0;
+  const dc = Number(col_depth_dc_in) || 0;
+  const tw = Number(col_web_tw_in) || 0;
+  const bcf = Number(col_flange_bcf_in) || 0;
+  const tcf = Number(col_flange_tcf_in) || 0;
+  const db = Number(beam_depth_db_in) || 0;
+  const tf = Number(beam_flange_tf_in) || 0;
+  const Mf = Number(demand_moment_kin) || 0;
+  const Vcol = Number(col_shear_kip) || 0;
+  const included = pz_in_analysis === true || pz_in_analysis === "yes";
+  if (!(Fy > 0)) return { error: "Yield strength must be positive (ksi)." };
+  if (!(dc > 0)) return { error: "Column depth must be positive (in)." };
+  if (!(tw > 0)) return { error: "Column web thickness must be positive (in)." };
+  if (!(db > tf)) return { error: "Beam depth must exceed the flange thickness (in)." };
+  if (Mf < 0) return { error: "Demand moment cannot be negative (kip-in)." };
+  const rn_basic_kip = 0.60 * Fy * dc * tw;
+  const bonus = 1 + 3 * bcf * tcf * tcf / (db * dc * tw);
+  const rn_pz_kip = rn_basic_kip * bonus;
+  const rn_kip = included ? rn_pz_kip : rn_basic_kip;
+  const phi_rn_kip = 0.90 * rn_kip;
+  const demand_kip = Mf / (db - tf) - Vcol;
+  const doubler = demand_kip > phi_rn_kip;
+  return {
+    rn_basic_kip, rn_pz_kip, bonus, phi_rn_kip, demand_kip, doubler, included,
+    note: "The flange-stiffened bonus term (Eq. J10-11) is permitted only when the panel-zone deformation is accounted for in the frame analysis; otherwise use the basic strength (Eq. J10-9). A high column axial load (Pr > 0.4 Pc) reduces the strength by a further factor (not applied here - low-axial case). The moment-frame joint often fails here before the beam or column; a doubler plate is the fix. AISC 360 and the engineer of record govern.",
+  };
+}
+
+export const steelPanelZoneShearExample = { inputs: { fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_flange_bcf_in: 14.5, col_flange_tcf_in: 0.75, beam_depth_db_in: 24, beam_flange_tf_in: 1.0, demand_moment_kin: 5500, col_shear_kip: 40, pz_in_analysis: "no" } };
+
+STEEL_RENDERERS["steel-panel-zone-shear"] = _simpleRenderer({
+  citation: "Citation: AISC 360-16 Section J10.6 panel-zone shear: basic Rn = 0.60 Fy dc tw (Eq. J10-9); with panel-zone deformation in the analysis Rn = 0.60 Fy dc tw [1 + 3 bcf tcf^2/(db dc tw)] (Eq. J10-11); phiRn = 0.90 Rn; demand Vpz = sum(Mf)/(db - tf) - Vcol. The flange bonus is permitted only when the panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further. A doubler plate is the fix. AISC 360 and the engineer of record govern.",
+  example: steelPanelZoneShearExample.inputs,
+  fields: [
+    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", default: 50 },
+    { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
+    { key: "col_web_tw_in", label: "Column web tw (in)", kind: "number" },
+    { key: "col_flange_bcf_in", label: "Column flange width bcf (in)", kind: "number" },
+    { key: "col_flange_tcf_in", label: "Column flange thickness tcf (in)", kind: "number" },
+    { key: "beam_depth_db_in", label: "Beam depth db (in)", kind: "number" },
+    { key: "beam_flange_tf_in", label: "Beam flange tf (in)", kind: "number" },
+    { key: "demand_moment_kin", label: "Sum of beam flange moments (kip-in)", kind: "number" },
+    { key: "col_shear_kip", label: "Column shear Vcol (kip)", kind: "number" },
+    { key: "pz_in_analysis", label: "Panel-zone deformation in the frame analysis?", kind: "select", options: [{ value: "no", label: "No (use basic strength J10-9)" }, { value: "yes", label: "Yes (flange bonus J10-11 allowed)" }] },
+  ],
+  outputs: [
+    { key: "rb", id: "spz-out-rb", label: "Basic strength Rn (J10-9)", value: (r) => fmt(r.rn_basic_kip, 0) + " kip" },
+    { key: "rp", id: "spz-out-rp", label: "Flange-stiffened Rn (J10-11)", value: (r) => fmt(r.rn_pz_kip, 0) + " kip (bonus " + fmt(r.bonus, 3) + ")" },
+    { key: "phi", id: "spz-out-phi", label: "Design phiRn (used branch)", value: (r) => fmt(r.phi_rn_kip, 0) + " kip (" + (r.included ? "flange-stiffened" : "basic") + ")" },
+    { key: "d", id: "spz-out-d", label: "Panel-zone demand / doubler", value: (r) => fmt(r.demand_kip, 0) + " kip - " + (r.doubler ? "DOUBLER PLATE needed" : "OK, no doubler") },
+  ],
+  compute: computeSteelPanelZoneShear,
+});
