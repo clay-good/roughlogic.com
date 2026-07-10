@@ -4503,6 +4503,17 @@ export const CITATIONS = {
       { name: "Default coefficient", value: "0.90 (rounded outlet) unless user supplies", source: "AWWA M17 typical" },
     ],
   },
+  "draft-lift-max": {
+    formula: "theoretical_lift = 33.9 - site_elevation / 1000; attainable_lift = pump_factor x theoretical_lift - suction_losses (pump_factor about 2/3).",
+    edition: "IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name.",
+    freeAccess: "The drafting-lift relations are public fire-service / wildland training material; incident command governs the actual setup.",
+    governance: GOVERNANCE.general,
+    editionNote: "1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude shaves another foot. Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower - a planning aid, not incident command.",
+    assumptions: [
+      { name: "Practical ceiling", value: "about two-thirds of theoretical (about 22.5 ft at sea level); a perfect vacuum is unattainable", source: "IFSTA / NWCG" },
+      { name: "Altitude correction", value: "theoretical lift falls about 1 ft per 1,000 ft of elevation", source: "atmospheric pressure vs altitude" },
+    ],
+  },
   "relay-pump-distance": {
     formula: "budget = max_discharge - intake_residual - 0.434 x elevation; FL_per_100 = C x (target_flow / 100)^2; max_distance = budget / FL_per_100 x 100.",
     edition: "IFSTA Pumping Apparatus Driver/Operator relay pumping maximum distance, by name.",

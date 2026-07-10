@@ -16344,6 +16344,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "drafting lift",
+      "target": "draft-lift-max",
+      "kind": "industry"
+    },
+    {
+      "term": "maximum lift draft",
+      "target": "draft-lift-max",
+      "kind": "redirect"
+    },
+    {
+      "term": "draft altitude correction",
+      "target": "draft-lift-max",
+      "kind": "adjacent"
+    },
+    {
+      "term": "33.9 feet",
+      "target": "draft-lift-max",
+      "kind": "redirect"
+    },
+    {
+      "term": "fire pump draft",
+      "target": "draft-lift-max",
+      "kind": "industry"
+    },
+    {
+      "term": "vacuum lift water",
+      "target": "draft-lift-max",
+      "kind": "adjacent"
+    },
+    {
+      "term": "static source draft",
+      "target": "draft-lift-max",
+      "kind": "adjacent"
+    },
+    {
+      "term": "attainable lift",
+      "target": "draft-lift-max",
+      "kind": "redirect"
+    },
+    {
       "term": "work in progress",
       "target": "wip-percent-complete",
       "kind": "industry"

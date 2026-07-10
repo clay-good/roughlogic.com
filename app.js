@@ -642,6 +642,7 @@ const TOOL_MODULES = (() => {
     // spec-v577
     "nfa-fireground-flow",
     "relay-pump-distance",
+    "draft-lift-max",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
   // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.

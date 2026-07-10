@@ -1935,3 +1935,44 @@ function renderRelayPumpDistance(inputRegion, outputRegion, citationEl) {
   for (const f of [Q, C, maxD, intake, elev]) f.input.addEventListener("input", update);
 }
 FIRE_RENDERERS["relay-pump-distance"] = renderRelayPumpDistance;
+
+// --- spec-v579 F: Drafting maximum lift, altitude-corrected ---
+// theoretical = 33.9 - elevation/1000. attainable = factor*theoretical - suction_losses. factor ~2/3.
+// dims: in { site_elevation_ft: L, pump_factor: dimensionless, suction_losses_ft: L } out: { theoretical_lift_ft: L, attainable_lift_ft: L }
+export function computeDraftLiftMax({ site_elevation_ft = 0, pump_factor = 0.667, suction_losses_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const elev = Number(site_elevation_ft) || 0;
+  const factor = Number(pump_factor) || 0;
+  const loss = Number(suction_losses_ft) || 0;
+  if (elev < 0) return { error: "Site elevation cannot be negative (ft)." };
+  if (loss < 0) return { error: "Suction losses cannot be negative (ft)." };
+  if (!(factor > 0 && factor <= 1)) return { error: "Pump condition factor must be over 0 and at most 1." };
+  const theoretical_lift_ft = 33.9 - elev / 1000;
+  const attainable_lift_ft = factor * theoretical_lift_ft - loss;
+  return {
+    theoretical_lift_ft, attainable_lift_ft,
+    note: "A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical is the practical ceiling (about 22.5 ft at sea level), and every 1,000 ft of altitude shaves another foot. Lift is limited by atmospheric pressure pushing water up the suction, not the pump pulling it, so a bigger pump does not help; over the attainable lift you must resite the pump lower. 1 in Hg of vacuum is about 1.13 ft of lift. A planning aid, not incident command.",
+  };
+}
+export const draftLiftMaxExample = { inputs: { site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: 0 } };
+function renderDraftLiftMax(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not incident command. Citation: IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name. theoretical = 33.9 - elevation / 1000; attainable = factor x theoretical - suction losses (factor about 2/3). 1 in Hg of vacuum is about 1.13 ft of lift. A real pump cannot pull a perfect vacuum, so about two-thirds of theoretical (about 22.5 ft at sea level) is the ceiling, and every 1,000 ft of altitude shaves another foot; lift is set by atmosphere pushing water up the suction, not the pump.";
+  const elev = makeNumber("Site elevation (ft above sea level)", "draft-elev", { step: "any", min: "0", value: "3000" }); elev.input.value = "3000";
+  const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "draft-factor", { step: "any", min: "0", max: "1", value: "0.667" }); factor.input.value = "0.667";
+  const loss = makeNumber("Strainer / suction losses (ft, 0 if unknown)", "draft-loss", { step: "any", min: "0", value: "0" }); loss.input.value = "0";
+  for (const f of [elev, factor, loss]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { elev.input.value = "3000"; factor.input.value = "0.667"; loss.input.value = "0"; update(); });
+  const oTheo = makeOutputLine(outputRegion, "Theoretical lift", "draft-out-theo");
+  const oAtt = makeOutputLine(outputRegion, "Attainable lift", "draft-out-att");
+  const oNote = makeOutputLine(outputRegion, "Note", "draft-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDraftLiftMax({ site_elevation_ft: readNum(elev.input), pump_factor: factor.input.value === "" ? 0.667 : readNum(factor.input), suction_losses_ft: readNum(loss.input) });
+    if (r.error) { oTheo.textContent = r.error; oAtt.textContent = "-"; oNote.textContent = ""; return; }
+    oTheo.textContent = fmt(r.theoretical_lift_ft, 1) + " ft";
+    oAtt.textContent = fmt(r.attainable_lift_ft, 1) + " ft below the pump";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [elev, factor, loss]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["draft-lift-max"] = renderDraftLiftMax;

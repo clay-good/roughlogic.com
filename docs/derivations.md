@@ -1916,6 +1916,7 @@ cross-check.
 | calc-fire.js | `computeAerialLadderReach` | `{ angle_deg, extension_ft }` | _ | _ | _ |
 | calc-fire.js | `computeBrakingDistance` | `{ speed_mph, friction_coefficient, grade_percent = 0, reaction_time_s = 1.5 }` | _ | _ | _ |
 | calc-fire.js | `computeConfinedSpaceVent` | `{ length_ft = 0, width_ft = 0, height_ft = 0, volume_ft3 = null, blower_cfm =...` | _ | _ | _ |
+| calc-fire.js | `computeDraftLiftMax` | `{ site_elevation_ft = 0, pump_factor = 0.667, suction_losses_ft = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeElevationPressureLoss` | `{ mode = "floors", value = 0, floor_height_ft = 10, direction = "up" } = {}` | _ | _ | _ |
 | calc-fire.js | `computeFireFriction` | `{ hose_diameter, gpm, length_ft }` | _ | _ | _ |
 | calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
@@ -2689,7 +2690,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1275.
+Row count: 1276.
 
 <!-- END function-corpus-v14 -->
 
@@ -3394,7 +3395,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (34 tiles)
+### Group F Fire-ground (35 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3402,6 +3403,7 @@ per spec-v14 §13.1 second paragraph.
 | `braking-distance` | Vehicle Braking Distance | Project (first-principles); braking = v^2 / (30 * mu) = 55*55 / 21 = 144.0 ft; reacti... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confined-space-purge` | Confined Space Air Change Time | 29 CFR 1910.146 + ACGIH ventilation e...; 2000 ft^3 / 1000 cfm / 7 target purges -> 14 min purge | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `confined-space-vent` | Confined-Space Pre-Entry Ventilation (OSHA 1910.146) | OSHA / NIOSH; V=1000 ft^3; minutes_to_purge = 1000 * 7 / 200 = 35 min; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `draft-lift-max` | Drafting Maximum Lift (Altitude-Corrected) | IFSTA / NWCG firefighter math; 3,000 ft, 0.667 factor, no suction loss -> 30.9 ft theore... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `elevation-pressure-loss` | Elevation Pressure Loss / Gain | Hydrostatic head 0.434 psi/ft + IFSTA...; 9 floors above pump -> exact ~39.06 psi, rule 45 psi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-friction` | Fire Hose Friction Loss | National Fire Academy; FL = C * Q^2 * L; 2.5 in C = 2; FL = 2 * (2.5)^2 * 2 = 25... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fire-pump-curve` | Fire Pump Rated / Churn / Overload Curve Check (NFPA 20) | NFPA 20 (Standard for the Installatio...; spec-v248 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
@@ -3906,6 +3908,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1031. Fixture-covered or reference-cadence: 1031 / 1031.
+Tile count: 1032. Fixture-covered or reference-cadence: 1032 / 1032.
 
 <!-- END tile-index-v14 -->

@@ -18974,3 +18974,23 @@ test("bounds: spec-v578 computeRelayPumpDistance pins the budget, the loss per 1
   assert.ok("error" in _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 0 }));
   assert.ok("error" in _v578({ target_flow_gpm: 800, hose_coefficient: 0.08, max_discharge_psi: 200, intake_residual_psi: 250, elevation_ft: 0 }));
 });
+
+import { computeDraftLiftMax as _v579 } from "../../calc-fire.js";
+
+test("bounds: spec-v579 computeDraftLiftMax pins the theoretical lift, the attainable lift, the altitude correction, the suction-loss subtraction, and error seams", () => {
+  const r = _v579({ site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: 0 });
+  assert.ok(Math.abs(r.theoretical_lift_ft - 30.9) < 1e-9); // 33.9 - 3000/1000
+  assert.ok(Math.abs(r.attainable_lift_ft - 0.667 * 30.9) < 1e-9);
+  // Higher altitude loses more to the thinner atmosphere.
+  const high = _v579({ site_elevation_ft: 8000, pump_factor: 0.667, suction_losses_ft: 0 });
+  assert.ok(Math.abs(high.theoretical_lift_ft - 25.9) < 1e-9);
+  assert.ok(high.attainable_lift_ft < r.attainable_lift_ft);
+  // Suction losses subtract directly from the attainable lift.
+  assert.ok(Math.abs(_v579({ site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: 2 }).attainable_lift_ft - (0.667 * 30.9 - 2)) < 1e-9);
+  // Error seams: non-finite, negative elevation / losses, factor out of (0,1].
+  assert.ok("error" in _v579({ site_elevation_ft: Infinity, pump_factor: 0.667 }));
+  assert.ok("error" in _v579({ site_elevation_ft: -1, pump_factor: 0.667 }));
+  assert.ok("error" in _v579({ site_elevation_ft: 3000, pump_factor: 0.667, suction_losses_ft: -1 }));
+  assert.ok("error" in _v579({ site_elevation_ft: 3000, pump_factor: 0 }));
+  assert.ok("error" in _v579({ site_elevation_ft: 3000, pump_factor: 1.5 }));
+});

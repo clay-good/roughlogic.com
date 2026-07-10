@@ -43716,6 +43716,56 @@
    }
   },
   {
+   "tile_id": "draft-lift-max",
+   "source_publisher": "IFSTA / NWCG firefighter math",
+   "source_title": "theoretical = 33.9 - elevation/1000; attainable = factor x theoretical - suction losses",
+   "source_edition_or_year": "IFSTA / NWCG",
+   "source_section_or_page": "3,000 ft, 0.667 factor, no suction loss -> 30.9 ft theoretical, 20.6 ft attainable",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "site_elevation_ft": 3000,
+    "pump_factor": 0.667,
+    "suction_losses_ft": 0
+   },
+   "outputs": {
+    "theoretical_lift_ft": {
+     "value": 30.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "attainable_lift_ft": {
+     "value": 20.61,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "draft-lift-max",
+   "source_publisher": "IFSTA / NWCG firefighter math",
+   "source_title": "a high-mountain site loses more to the thinner atmosphere",
+   "source_edition_or_year": "IFSTA / NWCG",
+   "source_section_or_page": "8,000 ft -> theoretical 25.9 ft, attainable 0.667 x 25.9 = 17.3 ft (3 ft less than at 3,000 ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "site_elevation_ft": 8000,
+    "pump_factor": 0.667,
+    "suction_losses_ft": 0
+   },
+   "outputs": {
+    "attainable_lift_ft": {
+     "value": 17.28,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wip-percent-complete",
    "source_publisher": "construction accounting (cost-to-cost POC)",
    "source_title": "$500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled",
