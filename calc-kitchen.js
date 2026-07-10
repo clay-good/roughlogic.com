@@ -925,3 +925,51 @@ const renderMenuEngineering = _r({
   compute: computeMenuEngineering,
 });
 KITCHEN_RENDERERS["menu-engineering"] = renderMenuEngineering;
+
+// --- spec-v538 O: 3-compartment sink sanitizer dilution (`kitchen-sanitizer-ppm`) ---
+// oz_per_gal = 128 x target_ppm / (active_pct x 10000). FDA Food Code 4-501.114 bands.
+const SANITIZER_BANDS = {
+  chlorine: { lo: 50, hi: 100, label: "chlorine", contact: "at least 7 seconds at 100 ppm (longer at lower ppm / colder water)" },
+  quat: { lo: 150, hi: 400, label: "quaternary ammonium", contact: "per label, typically at least 30 seconds" },
+  iodine: { lo: 12.5, hi: 25, label: "iodine", contact: "at least 30 seconds" },
+};
+// dims: in { sanitizer_type: dimensionless, active_pct: dimensionless, target_ppm: dimensionless, batch_gallons: dimensionless } out: { oz_per_gal: dimensionless, total_oz: dimensionless }
+export function computeKitchenSanitizerPpm({ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const active = Number(active_pct) || 0;
+  const ppm = Number(target_ppm) || 0;
+  const gal = Number(batch_gallons) || 0;
+  const band = SANITIZER_BANDS[sanitizer_type];
+  if (!band) return { error: "Sanitizer type must be chlorine, quat, or iodine." };
+  if (!(active > 0)) return { error: "Active-ingredient percent must be positive." };
+  if (!(ppm > 0)) return { error: "Target ppm must be positive." };
+  if (!(gal > 0)) return { error: "Batch volume must be positive (gallons)." };
+  const oz_per_gal = 128 * ppm / (active * 10000);
+  const total_oz = oz_per_gal * gal;
+  const in_range = ppm >= band.lo && ppm <= band.hi;
+  return {
+    oz_per_gal, total_oz, in_range, band_lo: band.lo, band_hi: band.hi, contact_time: band.contact,
+    note: (in_range ? "" : "Target ppm is outside the FDA Food Code " + band.label + " band (" + band.lo + "-" + band.hi + " ppm). ")
+      + "Chlorine's required concentration rises as water gets colder or more alkaline (the Food Code table steps ppm up by temperature and pH, so a fixed dose can under-sanitize); quats are inactivated by hot or hard water. Confirm the concentration with test strips and observe the minimum contact time (" + band.contact + "). The EPA-registered product label is the legal authority.",
+  };
+}
+const kitchenSanitizerPpmExample = { inputs: { sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 } };
+const renderKitchenSanitizerPpm = _r({
+  citation: "Citation: FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations, by name. oz_per_gal = 128 x target_ppm / (active_pct x 10000); total_oz = oz_per_gal x gallons. Food Code bands: chlorine 50-100 ppm, quat ~200 ppm per label, iodine 12.5-25 ppm. Chlorine's required ppm rises with colder or more alkaline water; quats weaken in hot or hard water. Confirm with test strips; the EPA-registered product label is the legal authority.",
+  example: kitchenSanitizerPpmExample.inputs,
+  fields: [
+    { key: "sanitizer_type", label: "Sanitizer type", kind: "select", options: [{ value: "chlorine", label: "Chlorine (50-100 ppm)" }, { value: "quat", label: "Quaternary ammonium (~200 ppm)" }, { value: "iodine", label: "Iodine (12.5-25 ppm)" }] },
+    { key: "active_pct", label: "Concentrate active (%)", kind: "number" },
+    { key: "target_ppm", label: "Target concentration (ppm)", kind: "number" },
+    { key: "batch_gallons", label: "Sink compartment volume (gal)", kind: "number" },
+  ],
+  outputs: [
+    { key: "o", id: "ksan-out-o", label: "Concentrate per gallon", value: (r) => fmt(r.oz_per_gal, 2) + " fl oz/gal" },
+    { key: "t", id: "ksan-out-t", label: "Total concentrate", value: (r) => fmt(r.total_oz, 2) + " fl oz" },
+    { key: "r", id: "ksan-out-r", label: "Food Code range", value: (r) => r.in_range ? "In range (" + r.band_lo + "-" + r.band_hi + " ppm)" : "OUT of range (" + r.band_lo + "-" + r.band_hi + " ppm)" },
+    { key: "c", id: "ksan-out-c", label: "Minimum contact time", value: (r) => r.contact_time },
+    { key: "n", id: "ksan-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeKitchenSanitizerPpm,
+});
+KITCHEN_RENDERERS["kitchen-sanitizer-ppm"] = renderKitchenSanitizerPpm;

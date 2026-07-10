@@ -4734,6 +4734,46 @@
       "kind": "redirect"
     },
     {
+      "term": "sanitizer dilution",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "industry"
+    },
+    {
+      "term": "3 compartment sink",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "industry"
+    },
+    {
+      "term": "food code sanitizer",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "industry"
+    },
+    {
+      "term": "chlorine ppm sink",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "redirect"
+    },
+    {
+      "term": "quat sanitizer",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "industry"
+    },
+    {
+      "term": "bleach dilution food",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sanitizer concentration",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "adjacent"
+    },
+    {
+      "term": "4-501.114",
+      "target": "kitchen-sanitizer-ppm",
+      "kind": "redirect"
+    },
+    {
       "term": "load profit",
       "target": "load-profitability",
       "kind": "industry"

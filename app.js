@@ -906,6 +906,8 @@ const TOOL_MODULES = (() => {
     "food-cost-percentage", "prime-cost", "pour-cost",
     // spec-v537
     "menu-engineering",
+    // spec-v538
+    "kitchen-sanitizer-ppm",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [

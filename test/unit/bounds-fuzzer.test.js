@@ -18027,3 +18027,28 @@ test("bounds: spec-v537 computeMenuEngineering pins the four quadrants, the popu
   assert.ok("error" in _v537({ units_sold: -1, menu_price: 12, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }));
   assert.ok("error" in _v537({ units_sold: 200, menu_price: 3, food_cost: 4, total_units: 1000, item_count: 10, average_margin: 6 }));
 });
+
+import { computeKitchenSanitizerPpm as _v538 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v538 computeKitchenSanitizerPpm pins the oz-per-gallon dilution, the Food Code range flag, and error seams", () => {
+  const cl = _v538({ sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 });
+  assert.ok(Math.abs(cl.oz_per_gal - 0.2438) < 0.001); // 128*100/(5.25*10000)
+  assert.ok(Math.abs(cl.total_oz - 0.7314) < 0.001);
+  assert.equal(cl.in_range, true); // 100 is at the top of 50-100
+  // Quat at 200 ppm from a 10% concentrate.
+  const q = _v538({ sanitizer_type: "quat", active_pct: 10, target_ppm: 200, batch_gallons: 3 });
+  assert.ok(Math.abs(q.oz_per_gal - 0.256) < 0.001);
+  assert.equal(q.in_range, true);
+  // Chlorine above the band flags out of range.
+  assert.equal(_v538({ sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 150, batch_gallons: 3 }).in_range, false);
+  // Iodine band.
+  assert.equal(_v538({ sanitizer_type: "iodine", active_pct: 1.75, target_ppm: 20, batch_gallons: 3 }).in_range, true);
+  // Total scales with the batch volume.
+  assert.ok(Math.abs(_v538({ sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 6 }).total_oz - 2 * cl.total_oz) < 1e-9);
+  // Error seams: non-finite, non-positive active / ppm / gallons, bad type.
+  assert.ok("error" in _v538({ sanitizer_type: "chlorine", active_pct: Infinity, target_ppm: 100, batch_gallons: 3 }));
+  assert.ok("error" in _v538({ sanitizer_type: "chlorine", active_pct: 0, target_ppm: 100, batch_gallons: 3 }));
+  assert.ok("error" in _v538({ sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 0, batch_gallons: 3 }));
+  assert.ok("error" in _v538({ sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 0 }));
+  assert.ok("error" in _v538({ sanitizer_type: "foo", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 }));
+});

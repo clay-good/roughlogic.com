@@ -7592,6 +7592,16 @@ export const CITATIONS = {
       { name: "Popularity rule", value: "70% of the menu-average share (1/item_count x 0.70) is the high/low popularity cutoff", source: "Kasavana & Smith" },
     ],
   },
+  "kitchen-sanitizer-ppm": {
+    formula: "oz_per_gal = 128 x target_ppm / (active_pct x 10000); total_oz = oz_per_gal x batch_gallons.",
+    edition: "FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations, by name.",
+    freeAccess: "FDA Food Code is public/free at fda.gov; the EPA-registered product label is the legal authority.",
+    governance: GOVERNANCE.general,
+    editionNote: "Food Code bands: chlorine 50-100 ppm, quat ~200 ppm per label, iodine 12.5-25 ppm. Chlorine's required concentration rises as water gets colder or more alkaline (the Food Code table steps ppm up by temperature and pH, so a fixed dose can under-sanitize); quats are inactivated by hot or hard water; the concentration must be confirmed with test strips and the minimum contact time observed. A mixing aid, not a substitute for test strips and the label.",
+    assumptions: [
+      { name: "Sanitizer bands", value: "chlorine 50-100 ppm, quat ~150-400 (label, often 200), iodine 12.5-25 ppm", source: "FDA Food Code 4-501.114" },
+    ],
+  },
   "load-profitability": {
     formula: "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
     edition: "First-principles owner-operator load economics; consumes the cost-per-mile structure.",

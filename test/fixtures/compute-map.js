@@ -670,6 +670,7 @@ export const COMPUTE_MAP = {
   "prime-cost": { module: "../../calc-kitchen.js", fn: "computePrimeCost" },
   "pour-cost": { module: "../../calc-kitchen.js", fn: "computePourCost" },
   "menu-engineering": { module: "../../calc-kitchen.js", fn: "computeMenuEngineering" },
+  "kitchen-sanitizer-ppm": { module: "../../calc-kitchen.js", fn: "computeKitchenSanitizerPpm" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

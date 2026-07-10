@@ -21150,6 +21150,64 @@
    }
   },
   {
+   "tile_id": "kitchen-sanitizer-ppm",
+   "source_publisher": "FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations",
+   "source_title": "oz_per_gal = 128 x target_ppm / (active_pct x 10000)",
+   "source_edition_or_year": "FDA Food Code",
+   "source_section_or_page": "Bleach 5.25% active, 100 ppm, 3-gal compartment -> 0.24 oz/gal, 0.73 oz (top of the 50-100 ppm band)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "sanitizer_type": "chlorine",
+    "active_pct": 5.25,
+    "target_ppm": 100,
+    "batch_gallons": 3
+   },
+   "outputs": {
+    "oz_per_gal": {
+     "value": 0.2438,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_oz": {
+     "value": 0.7314,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "kitchen-sanitizer-ppm",
+   "source_publisher": "FDA Food Code Sec. 4-501.114 sanitizing-solution concentrations",
+   "source_title": "total_oz = oz_per_gal x batch_gallons",
+   "source_edition_or_year": "FDA Food Code",
+   "source_section_or_page": "Quat 10% active, 200 ppm, 3-gal compartment -> 0.26 oz/gal, 0.77 oz",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "sanitizer_type": "quat",
+    "active_pct": 10,
+    "target_ppm": 200,
+    "batch_gallons": 3
+   },
+   "outputs": {
+    "oz_per_gal": {
+     "value": 0.256,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_oz": {
+     "value": 0.768,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "load-profitability",
    "source_publisher": "First-principles owner-operator load economics; consumes the cost-per-mile structure.",
    "source_title": "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
