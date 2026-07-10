@@ -19103,3 +19103,22 @@ test("bounds: spec-v584 computeCoAirFree pins the correction, the 400/100 ppm fl
   assert.ok("error" in _v584({ measured_co_ppm: 60, measured_o2_pct: 20.9 }));
   assert.ok("error" in _v584({ measured_co_ppm: 60, measured_o2_pct: 21 }));
 });
+
+import { computeChimneyDraft as _v585 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v585 computeChimneyDraft pins the Rankine draft, the net factor, the altitude reduction, and error seams", () => {
+  const r = _v585({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 14.7, net_factor: 0.6 });
+  assert.ok(Math.abs(r.draft_theoretical_inwc - 0.52 * 14.7 * 30 * (1 / 520 - 1 / 860)) < 1e-9);
+  assert.ok(Math.abs(r.draft_net_inwc - 0.6 * r.draft_theoretical_inwc) < 1e-9);
+  assert.ok(Math.abs(r.draft_theoretical_inwc - 0.1743) < 0.001);
+  // Altitude (lower barometric pressure) cuts the draft.
+  const alt = _v585({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 12.2, net_factor: 0.6 });
+  assert.ok(alt.draft_theoretical_inwc < r.draft_theoretical_inwc);
+  assert.ok(Math.abs(alt.draft_theoretical_inwc - 0.1447) < 0.001);
+  // Error seams: non-finite, non-positive height / pressure, flue <= ambient.
+  assert.ok("error" in _v585({ stack_height_ft: Infinity, ambient_temp_f: 60, mean_flue_temp_f: 400 }));
+  assert.ok("error" in _v585({ stack_height_ft: 0, ambient_temp_f: 60, mean_flue_temp_f: 400 }));
+  assert.ok("error" in _v585({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 0 }));
+  assert.ok("error" in _v585({ stack_height_ft: 30, ambient_temp_f: 400, mean_flue_temp_f: 400 }));
+  assert.ok("error" in _v585({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: -500 }));
+});

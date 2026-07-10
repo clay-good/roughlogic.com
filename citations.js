@@ -1606,6 +1606,17 @@ export const CITATIONS = {
       { name: "Leakage classes", value: "3 / 6 / 12 / 24 / 48 cfm per 100 ft² at 1 in WC", source: "SMACNA Duct Leakage Test Manual" },
     ],
   },
+  "chimney-draft": {
+    formula: "T_o_R = ambient_temp_f + 460; T_m_R = mean_flue_temp_f + 460; D_t = 0.52 x baro_psia x stack_height_ft x (1/T_o_R - 1/T_m_R) [in wc]; D_net = net_factor x D_t.",
+    edition: "ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft, by name.",
+    freeAccess: "The theoretical-draft relation is standard chimney/vent design practice; the venting standard and appliance instructions govern the actual sign-off.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is the theoretical no-flow draft, so the net available after flow and fitting losses is far lower (apply about 0.5 to 0.8). The barometric pressure must be altitude-corrected because thinner air at elevation cuts the draft. The temperatures must be absolute (Rankine), and T_m is the mean flue temperature, not the outlet. The venting standard (NFPA 211) and the appliance instructions govern - a design aid, not a venting sign-off.",
+    assumptions: [
+      { name: "No-flow theoretical", value: "D_t is the no-flow draft; net available after flow/fitting losses is about 0.5 to 0.8 of it", source: "ASHRAE Handbook HVAC Systems" },
+      { name: "Altitude and absolute temps", value: "barometric pressure must be altitude-corrected; temperatures are absolute (Rankine), T_m the mean flue temp", source: "ASHRAE / NFPA 211" },
+    ],
+  },
   "co-air-free": {
     formula: "CO_air_free = measured_co_ppm x 20.9 / (20.9 - measured_o2_pct); over_ansi = CO_air_free > 400; over_field = CO_air_free > 100.",
     edition: "ANSI Z21 400 ppm air-free limit / BPI field practice air-free CO correction, by name.",

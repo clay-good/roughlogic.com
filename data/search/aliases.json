@@ -21224,6 +21224,46 @@
       "kind": "redirect"
     },
     {
+      "term": "chimney draft",
+      "target": "chimney-draft",
+      "kind": "industry"
+    },
+    {
+      "term": "theoretical draft",
+      "target": "chimney-draft",
+      "kind": "redirect"
+    },
+    {
+      "term": "stack draft",
+      "target": "chimney-draft",
+      "kind": "industry"
+    },
+    {
+      "term": "natural draft",
+      "target": "chimney-draft",
+      "kind": "industry"
+    },
+    {
+      "term": "flue draft in wc",
+      "target": "chimney-draft",
+      "kind": "adjacent"
+    },
+    {
+      "term": "draft altitude",
+      "target": "chimney-draft",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ashrae chimney",
+      "target": "chimney-draft",
+      "kind": "redirect"
+    },
+    {
+      "term": "vent draft",
+      "target": "chimney-draft",
+      "kind": "adjacent"
+    },
+    {
       "term": "prop pitch selection",
       "target": "prop-pitch-selection",
       "kind": "industry"

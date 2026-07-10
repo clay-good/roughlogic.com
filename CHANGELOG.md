@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-hvacservice.js 15500 -> 19000; 2026-07-10
+
+The spec-v583-v585 combustion/venting bench batch (`excess-air-o2`, `co-air-free`, `chimney-draft`) crossed `calc-hvacservice.js`'s 15500 B cap at v585 (102.6%); raised to **19000** with ~19% headroom. Lazy-loaded, absent from the home-view payload.
+
 ### chore(sizes): raise calc-fire.js 28000 -> 34000; 2026-07-10
 
 The spec-v577-v581 fire-ground water-supply batch (`nfa-fireground-flow`, `relay-pump-distance`, `draft-lift-max`, `tanker-shuttle-flow`, `foam-eductor-limit`) crossed `calc-fire.js`'s 28000 B cap at v581 (103.2%); raised to **34000** with ~18% headroom for the remaining Group F tail. Lazy-loaded, absent from the home-view payload.
