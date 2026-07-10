@@ -492,3 +492,52 @@ function _v566renderTreeProtectionZone(inputRegion, outputRegion, citationEl) {
   factor.select.addEventListener("change", update);
 }
 ARBORIST_RENDERERS["tree-protection-zone"] = _v566renderTreeProtectionZone;
+
+// --- spec-v567 L: Live crown removal limit / pruning dose (ANSI A300 Part 1) ---
+// removal_pct = removed / live x 100. cap: mature 25, young 15, over-mature 10, stressed 0.
+const _CROWN_CAP_PCT = { young: 15, mature: 25, "over-mature": 10, stressed: 0 };
+// dims: in { live_foliage: dimensionless, removed_foliage: dimensionless, maturity_class: dimensionless } out: { removal_pct: dimensionless, cap_pct: dimensionless }
+export function computeCrownPruningDose({ live_foliage = 0, removed_foliage = 0, maturity_class = "mature" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const live = Number(live_foliage);
+  const removed = Number(removed_foliage);
+  if (!Number.isFinite(live) || live <= 0) return { error: "Live foliage must be a positive finite number." };
+  if (!Number.isFinite(removed) || removed < 0) return { error: "Removed foliage must be a non-negative finite number." };
+  if (!(maturity_class in _CROWN_CAP_PCT)) return { error: "Maturity class must be young, mature, over-mature, or stressed." };
+  const removal_pct = removed / live * 100;
+  const cap_pct = _CROWN_CAP_PCT[maturity_class];
+  const within = removal_pct <= cap_pct;
+  if (!Number.isFinite(removal_pct)) return { error: "Pruning-dose math is not a finite value." };
+  return {
+    removal_pct, cap_pct, within, maturity_class,
+    note: "The 25% ceiling is the mature-tree maximum in a single season, NOT a target, and it drops for young (~15%), over-mature (~10%), or stressed (0%) trees - a stressed tree should not have live foliage removed until it recovers. Lion's-tailing (stripping interior foliage and leaving tufts at the branch ends) violates ANSI A300 even when the total removed is under the percent cap. Removing too much live foliage starves the tree. A planning aid; a qualified arborist governs.",
+  };
+}
+export const crownPruningDoseExample = { inputs: { live_foliage: 100, removed_foliage: 15, maturity_class: "mature" } };
+
+function _v567renderCrownPruningDose(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ANSI A300 Part 1 live-crown removal limit (ISA Best Management Practices), by name. removal_pct = removed / live x 100, compared to the class cap: mature <= 25% in a single season, young ~15%, over-mature ~10%, stressed 0%. The 25% is the mature maximum, not a target; lion's-tailing violates A300 even under the percent cap. A planning aid; a qualified arborist governs.";
+  const live = makeNumber("Live crown / foliage before pruning (ft^2 or %)", "cpd-live", { step: "any", min: "0", value: "100" }); live.input.value = "100";
+  const removed = makeNumber("Foliage proposed for removal (same units)", "cpd-removed", { step: "any", min: "0", value: "15" }); removed.input.value = "15";
+  const cls = makeSelect("Maturity class", "cpd-cls", [
+    { value: "young", label: "Young (~15% cap)" },
+    { value: "mature", label: "Mature (25% cap)", selected: true },
+    { value: "over-mature", label: "Over-mature (~10% cap)" },
+    { value: "stressed", label: "Stressed (0% cap)" },
+  ]);
+  for (const f of [live, removed, cls]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { live.input.value = "100"; removed.input.value = "15"; cls.select.value = "mature"; update(); });
+  const oPct = makeOutputLine(outputRegion, "Removal percent", "cpd-out-pct");
+  const oCap = makeOutputLine(outputRegion, "Class cap / within standard?", "cpd-out-cap");
+  const oNote = makeOutputLine(outputRegion, "Note", "cpd-out-note");
+  const update = debounce(() => {
+    const r = computeCrownPruningDose({ live_foliage: Number(live.input.value) || 0, removed_foliage: Number(removed.input.value) || 0, maturity_class: cls.select.value });
+    if (r.error) { oPct.textContent = r.error; oCap.textContent = "-"; oNote.textContent = ""; return; }
+    oPct.textContent = fmt(r.removal_pct, 1) + "%";
+    oCap.textContent = "cap " + fmt(r.cap_pct, 0) + "% -- " + (r.within ? "WITHIN the standard" : "OVER the limit; reduce the removal or defer");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [live, removed]) f.input.addEventListener("input", update);
+  cls.select.addEventListener("change", update);
+}
+ARBORIST_RENDERERS["crown-pruning-dose"] = _v567renderCrownPruningDose;

@@ -4719,6 +4719,46 @@
       "kind": "redirect"
     },
     {
+      "term": "pruning dose",
+      "target": "crown-pruning-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "crown removal limit",
+      "target": "crown-pruning-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "ansi a300 pruning",
+      "target": "crown-pruning-dose",
+      "kind": "redirect"
+    },
+    {
+      "term": "25 percent pruning",
+      "target": "crown-pruning-dose",
+      "kind": "redirect"
+    },
+    {
+      "term": "live crown ratio",
+      "target": "crown-pruning-dose",
+      "kind": "adjacent"
+    },
+    {
+      "term": "over pruning",
+      "target": "crown-pruning-dose",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lions tailing",
+      "target": "crown-pruning-dose",
+      "kind": "industry"
+    },
+    {
+      "term": "foliage removal limit",
+      "target": "crown-pruning-dose",
+      "kind": "redirect"
+    },
+    {
       "term": "nozzle flow",
       "target": "nozzle-flow-pressure",
       "kind": "redirect"

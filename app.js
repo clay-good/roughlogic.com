@@ -889,6 +889,8 @@ const TOOL_MODULES = (() => {
     "trunk-decay-strength",
     // spec-v566
     "tree-protection-zone",
+    // spec-v567
+    "crown-pruning-dose",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

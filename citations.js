@@ -6811,6 +6811,17 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "crown-pruning-dose": {
+    formula: "removal_pct = removed_foliage / live_foliage x 100; cap_pct = mature 25 / young 15 / over-mature 10 / stressed 0; within when removal_pct <= cap_pct.",
+    edition: "The ANSI A300 Part 1 live-crown removal limit (ISA Best Management Practices - Pruning), by name.",
+    freeAccess: "The A300 removal-limit percentages are published arboricultural practice; a qualified arborist governs the actual dose.",
+    governance: GOVERNANCE.general,
+    editionNote: "The 25% ceiling is the mature-tree maximum in a single season, not a target, and it drops for young (~15%), over-mature (~10%), or stressed (0%) trees - a stressed tree should not have live foliage removed until it recovers; lion's-tailing (stripping interior foliage, leaving tufts at the branch ends) violates A300 even when the total removed is under the percent cap; removing too much live foliage starves the tree. A planning aid, not an arborist's prescription.",
+    assumptions: [
+      { name: "Class caps", value: "mature <= 25% single season, young ~15%, over-mature ~10%, stressed 0%", source: "ANSI A300 Part 1" },
+      { name: "Lion's-tailing", value: "stripping interior foliage violates A300 even under the percent cap", source: "ISA BMP - Pruning" },
+    ],
+  },
   "tree-protection-zone": {
     formula: "radius = radius_factor x DBH; area = pi x radius^2 (radius_factor 1.0 ft/in standard, 1.5 ft/in conservative/mature).",
     edition: "Tree protection zone / critical root zone (ANSI A300 Part 5; ISA critical root zone), by name.",

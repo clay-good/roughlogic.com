@@ -18693,3 +18693,28 @@ test("bounds: spec-v566 computeTreeProtectionZone pins the radius = factor x DBH
   assert.ok("error" in _v566({ dbh_in: 0, radius_factor: 1.0 }));
   assert.ok("error" in _v566({ dbh_in: 20, radius_factor: 0 }));
 });
+
+import { computeCrownPruningDose as _v567 } from "../../calc-arborist.js";
+
+test("bounds: spec-v567 computeCrownPruningDose pins the removal percent, the class caps, the within-standard flag, and error seams", () => {
+  const r = _v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "mature" });
+  assert.ok(Math.abs(r.removal_pct - 15) < 1e-9); // 15/100*100
+  assert.equal(r.cap_pct, 25); // mature cap
+  assert.equal(r.within, true); // 15 <= 25
+  // The same dose on a stressed tree exceeds its 0% cap.
+  const stressed = _v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "stressed" });
+  assert.equal(stressed.cap_pct, 0);
+  assert.equal(stressed.within, false);
+  // The class caps step down: young 15, over-mature 10.
+  assert.equal(_v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "young" }).cap_pct, 15);
+  assert.equal(_v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "over-mature" }).cap_pct, 10);
+  // Exactly at the cap is within the standard.
+  assert.equal(_v567({ live_foliage: 100, removed_foliage: 25, maturity_class: "mature" }).within, true);
+  // A hair over the cap is not.
+  assert.equal(_v567({ live_foliage: 100, removed_foliage: 26, maturity_class: "mature" }).within, false);
+  // Error seams: non-finite, non-positive foliage, negative removal, bad class.
+  assert.ok("error" in _v567({ live_foliage: Infinity, removed_foliage: 15, maturity_class: "mature" }));
+  assert.ok("error" in _v567({ live_foliage: 0, removed_foliage: 15, maturity_class: "mature" }));
+  assert.ok("error" in _v567({ live_foliage: 100, removed_foliage: -1, maturity_class: "mature" }));
+  assert.ok("error" in _v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "foo" }));
+});

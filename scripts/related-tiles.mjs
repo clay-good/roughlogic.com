@@ -871,6 +871,7 @@ const RELATED = {
   "reineke-sdi": ["basal-area-prism", "timber-cruise", "log-limb-weight"],
   "trunk-decay-strength": ["char-depth-capacity", "felling-notch-hinge", "log-limb-weight"],
   "tree-protection-zone": ["trunk-decay-strength", "reineke-sdi", "log-limb-weight"],
+  "crown-pruning-dose": ["tree-protection-zone", "trunk-decay-strength", "felling-notch-hinge"],
 
   // spec-v69 surface prep, coatings, and abatement
   "coating-coverage-dft": ["paint-coverage", "abrasive-blast", "material-quantity"],

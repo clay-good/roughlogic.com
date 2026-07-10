@@ -664,6 +664,7 @@ export const COMPUTE_MAP = {
   "reineke-sdi": { module: "../../calc-arborist.js", fn: "computeReinekeSdi" },
   "trunk-decay-strength": { module: "../../calc-arborist.js", fn: "computeTrunkDecayStrength" },
   "tree-protection-zone": { module: "../../calc-arborist.js", fn: "computeTreeProtectionZone" },
+  "crown-pruning-dose": { module: "../../calc-arborist.js", fn: "computeCrownPruningDose" },
   "nozzle-flow-pressure": { module: "../../calc-agriculture.js", fn: "computeNozzleFlowPressure" },
   "spray-drift-buffer": { module: "../../calc-agriculture.js", fn: "computeSprayDriftBuffer" },
   "sprayer-field-capacity": { module: "../../calc-agriculture.js", fn: "computeSprayerFieldCapacity" },

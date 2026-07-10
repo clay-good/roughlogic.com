@@ -1477,6 +1477,7 @@ cross-check.
 | calc-agriculture.js | `computeUniformity` | `{ catch_volumes = [] }` | _ | _ | _ |
 | calc-arborist.js | `computeBasalAreaPrism` | `{ baf = 0, in_tree_count = 0, dbh_in = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeChipperDebris` | `{ green_weight_lb, chip_density_lcy = 550, box_capacity_cy } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeCrownPruningDose` | `{ live_foliage = 0, removed_foliage = 0, maturity_class = "mature" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeFellingNotchHinge` | `{ cut_dia_in, notch_pct = 22, open_face = 70 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-arborist.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
@@ -2677,7 +2678,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1263.
+Row count: 1264.
 
 <!-- END function-corpus-v14 -->
 
@@ -3585,7 +3586,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (43 tiles)
+### Group L Agriculture (44 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3594,6 +3595,7 @@ per spec-v14 §13.1 second paragraph.
 | `cattle-stocking-rate` | Cattle Stocking Rate (AUM) | USDA NRCS; available = 1500*160*0.40 = 96,000 lb; AUMs = 96,000/780 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chipper-debris` | Brush Chip Volume and Haul Loads | First-principles green-weight to chip...; 4,400 lb of green wood, 550 lb/lcy, 15 cy box -> 8.0 loos... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `crown-pruning-dose` | Live Crown Removal Limit (Pruning Dose) | ANSI A300 Part 1 / ISA BMP - Pruning; 15 of 100 live foliage, mature -> 15% removal, cap 25% (w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drawbar-power` | Tractor Drawbar Power | ASABE; DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `drip-zone-flow` | Drip Zone Flow and Valve Capacity | Irrigation Association low-volume / m...; spec-v209 section 2.1 pinned example (inline dripline) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3882,6 +3884,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1019. Fixture-covered or reference-cadence: 1019 / 1019.
+Tile count: 1020. Fixture-covered or reference-cadence: 1020 / 1020.
 
 <!-- END tile-index-v14 -->

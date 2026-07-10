@@ -20263,6 +20263,56 @@
    }
   },
   {
+   "tile_id": "crown-pruning-dose",
+   "source_publisher": "ANSI A300 Part 1 / ISA BMP - Pruning",
+   "source_title": "removal_pct = removed / live x 100 vs the maturity-class cap",
+   "source_edition_or_year": "ANSI A300 Part 1",
+   "source_section_or_page": "15 of 100 live foliage, mature -> 15% removal, cap 25% (within)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "live_foliage": 100,
+    "removed_foliage": 15,
+    "maturity_class": "mature"
+   },
+   "outputs": {
+    "removal_pct": {
+     "value": 15,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "cap_pct": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crown-pruning-dose",
+   "source_publisher": "ANSI A300 Part 1 / ISA BMP - Pruning",
+   "source_title": "the same dose on a stressed tree is over the 0% cap",
+   "source_edition_or_year": "ANSI A300 Part 1",
+   "source_section_or_page": "Same 15% removal, stressed -> cap 0% (over the limit; defer)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "live_foliage": 100,
+    "removed_foliage": 15,
+    "maturity_class": "stressed"
+   },
+   "outputs": {
+    "cap_pct": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",
