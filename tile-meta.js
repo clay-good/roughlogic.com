@@ -779,6 +779,7 @@ const _TILES = [
   ["battery-hydrogen-vent", "A"],
   // spec-v520 transformer inrush coordination point
   ["transformer-inrush-point", "A"],
+  ["termination-temp-ampacity", "A"],
   ["ada-ramp-slope", "E"],
   ["pool-bonding-680-26", "A"],
 ];

@@ -5257,3 +5257,63 @@ function _v520renderTransformerInrushPoint(inputRegion, outputRegion, citationEl
   ph.select.addEventListener("change", update);
 }
 ELECTRICAL_RENDERERS["transformer-inrush-point"] = _v520renderTransformerInrushPoint;
+
+// ===================== spec-v562: termination temperature ampacity limit (NEC 110.14(C)) =====================
+// dims: in { amp_90c: I, amp_75c: I, amp_60c: I, termination_rating: dimensionless, over_100a: dimensionless, derate_factor: dimensionless } out: { termination_ampacity_a: I, derated_90c_a: I, governing_a: I }
+export function computeTerminationTempAmpacity({ amp_90c = 0, amp_75c = 0, amp_60c = 0, termination_rating = 75, over_100a = false, derate_factor = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const a90 = Number(amp_90c) || 0;
+  const a75 = Number(amp_75c) || 0;
+  const a60 = Number(amp_60c) || 0;
+  const tr = Number(termination_rating) || 0;
+  const over = over_100a === true || over_100a === "yes";
+  const d = Number(derate_factor) || 0;
+  if (!(a90 > 0)) return { error: "90 C ampacity must be positive (A)." };
+  if (!(a75 > 0)) return { error: "75 C ampacity must be positive (A)." };
+  if (!(a60 > 0)) return { error: "60 C ampacity must be positive (A)." };
+  if (tr !== 60 && tr !== 75) return { error: "Termination rating must be 60 or 75 (C)." };
+  if (!(d > 0 && d <= 1)) return { error: "Derating factor must be over 0 and at most 1." };
+  const termination_ampacity_a = over ? a75 : (tr === 75 ? a75 : a60);
+  const derated_90c_a = a90 * d;
+  const governing_a = Math.min(termination_ampacity_a, derated_90c_a);
+  const governed_by = governing_a === termination_ampacity_a && termination_ampacity_a <= derated_90c_a ? "termination" : "derating";
+  return {
+    termination_ampacity_a, derated_90c_a, governing_a, governed_by,
+    note: "The 90 C column may be used only for the ambient and fill derating math, not for the final termination current. The usable ampacity is capped at the lowest-rated termination (60 or 75 C). Circuits at or below 100 A default to the 60 C column unless all terminations and conductors are listed for 75 C; circuits above 100 A use the 75 C column. NEC 110.14(C) and the equipment listing govern.",
+  };
+}
+export const terminationTempAmpacityExample = { inputs: { amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 } };
+
+function _v562renderTerminationTempAmpacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 110.14(C) temperature limitations with Table 310.16: the usable ampacity is capped at the lowest-rated termination (60 C at or below 100 A unless listed 75 C, else 75 C; 75 C above 100 A), and the 90 C column is used ONLY for the ambient/fill derating math (derated 90 C = amp_90c x derate), not the final termination current; governing = min(termination column, derated 90 C). The NEC and the equipment listing govern.";
+  const a90 = makeNumber("90 C ampacity (Table 310.16)", "tta-90", { step: "any", min: "0" }); a90.input.value = "260";
+  const a75 = makeNumber("75 C ampacity", "tta-75", { step: "any", min: "0" }); a75.input.value = "230";
+  const a60 = makeNumber("60 C ampacity", "tta-60", { step: "any", min: "0" }); a60.input.value = "195";
+  const tr = makeSelect("Lowest termination rating", "tta-tr", [
+    { value: "75", label: "75 C", selected: true },
+    { value: "60", label: "60 C" },
+  ]);
+  const over = makeSelect("Circuit over 100 A?", "tta-over", [
+    { value: "yes", label: "Yes (75 C column)", selected: true },
+    { value: "no", label: "No (<= 100 A)" },
+  ]);
+  const d = makeNumber("Combined ambient/fill derate (1.0 = none)", "tta-d", { step: "any", min: "0", max: "1" }); d.input.value = "0.8";
+  for (const f of [a90, a75, a60, tr, over, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a90.input.value = "260"; a75.input.value = "230"; a60.input.value = "195"; tr.select.value = "75"; over.select.value = "yes"; d.input.value = "0.8"; update(); });
+  const oTerm = makeOutputLine(outputRegion, "Termination-column ampacity", "tta-out-term");
+  const oDer = makeOutputLine(outputRegion, "Derated 90 C value", "tta-out-der");
+  const oGov = makeOutputLine(outputRegion, "Governing ampacity", "tta-out-gov");
+  const oNote = makeOutputLine(outputRegion, "Note", "tta-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTerminationTempAmpacity({ amp_90c: readNum(a90.input), amp_75c: readNum(a75.input), amp_60c: readNum(a60.input), termination_rating: Number(tr.select.value), over_100a: over.select.value === "yes", derate_factor: d.input.value === "" ? 1.0 : readNum(d.input) });
+    if (r.error) { oTerm.textContent = r.error; oDer.textContent = "-"; oGov.textContent = "-"; oNote.textContent = ""; return; }
+    oTerm.textContent = fmt(r.termination_ampacity_a, 0) + " A";
+    oDer.textContent = fmt(r.derated_90c_a, 0) + " A";
+    oGov.textContent = fmt(r.governing_a, 0) + " A (" + r.governed_by + " governs)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [a90, a75, a60, d]) f.input.addEventListener("input", update);
+  for (const s of [tr, over]) s.select.addEventListener("change", update);
+}
+ELECTRICAL_RENDERERS["termination-temp-ampacity"] = _v562renderTerminationTempAmpacity;

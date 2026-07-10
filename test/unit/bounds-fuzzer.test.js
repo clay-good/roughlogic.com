@@ -18585,3 +18585,27 @@ test("bounds: spec-v561 computeEvLoadManagementEms pins the un-managed sum, the 
   assert.ok("error" in _v561({ charger_count: 4, per_charger_a: 0, evems_limit_a: 80 }));
   assert.ok("error" in _v561({ charger_count: 4, per_charger_a: 40, evems_limit_a: -1 }));
 });
+
+import { computeTerminationTempAmpacity as _v562 } from "../../calc-electrical.js";
+
+test("bounds: spec-v562 computeTerminationTempAmpacity pins the termination-column selection, the derated 90C value, the governing minimum, and error seams", () => {
+  const r = _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 });
+  assert.equal(r.termination_ampacity_a, 230); // 75 C column
+  assert.ok(Math.abs(r.derated_90c_a - 208) < 1e-9); // 260 * 0.8
+  assert.equal(r.governing_a, 208); // derating governs
+  assert.equal(r.governed_by, "derating");
+  // With no derating the 75 C termination caps it, not the 90 C column.
+  const noDer = _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 1.0 });
+  assert.equal(noDer.governing_a, 230);
+  assert.equal(noDer.governed_by, "termination");
+  // At or below 100 A with a 60 C termination, the 60 C column governs.
+  assert.equal(_v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 60, over_100a: false, derate_factor: 1.0 }).termination_ampacity_a, 195);
+  // Over 100 A always uses the 75 C column regardless of the termination-rating select.
+  assert.equal(_v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 60, over_100a: true, derate_factor: 1.0 }).termination_ampacity_a, 230);
+  // Error seams: non-finite, non-positive ampacities, derate out of range, bad termination.
+  assert.ok("error" in _v562({ amp_90c: Infinity, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 }));
+  assert.ok("error" in _v562({ amp_90c: 0, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 }));
+  assert.ok("error" in _v562({ amp_90c: 260, amp_75c: 0, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 0.8 }));
+  assert.ok("error" in _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 1.5 }));
+  assert.ok("error" in _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 90, over_100a: true, derate_factor: 0.8 }));
+});

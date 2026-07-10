@@ -1188,6 +1188,17 @@ export const CITATIONS = {
       { name: "Demand factor for first 3 kVA general lighting", value: "100% (per NEC 220.42)", source: "NEC 2023" },
     ],
   },
+  "termination-temp-ampacity": {
+    formula: "termination_ampacity = over_100a ? amp_75c : (termination_rating == 75 ? amp_75c : amp_60c); derated_90c = amp_90c x derate_factor; governing = min(termination_ampacity, derated_90c).",
+    edition: NEC_2023 + " 110.14(C) (temperature limitations of terminations) with Table 310.16.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "90 C for derating only", value: "the 90 C column may be used only for the ambient and fill derating math, not for the final termination current", source: "NEC 2023 110.14(C)" },
+      { name: "Termination column by size", value: "at or below 100 A use 60 C unless all terminations and conductors are listed 75 C; above 100 A use 75 C", source: "NEC 2023 110.14(C)(1)" },
+    ],
+  },
   "transformer-inrush-point": {
     formula: "FLA = kVA x 1000 / (sqrt(3) x V) three-phase (kVA x 1000 / V single-phase); inrush_point = inrush_multiple x FLA at the stated duration.",
     edition: "Transformer energization-inrush coordination point (IEEE C57.109 through-fault / energization; NEC 450.3 context), first-principles, by name; the manufacturer's inrush data and a coordination study govern.",

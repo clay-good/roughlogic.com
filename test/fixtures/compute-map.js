@@ -754,6 +754,7 @@ export const COMPUTE_MAP = {
   "existing-load-220-87": { module: "../../calc-feeder.js", fn: "computeExistingLoad22087" },
   "ev-load-management-ems": { module: "../../calc-feeder.js", fn: "computeEvLoadManagementEms" },
   "transformer-inrush-point": { module: "../../calc-electrical.js", fn: "computeTransformerInrushPoint" },
+  "termination-temp-ampacity": { module: "../../calc-electrical.js", fn: "computeTerminationTempAmpacity" },
   "motor-fault-contribution": { module: "../../calc-motor.js", fn: "computeMotorFaultContribution" },
   "reduced-voltage-starter": { module: "../../calc-motor.js", fn: "computeReducedVoltageStarter" },
   "vfd-reflected-wave": { module: "../../calc-motor.js", fn: "computeVfdReflectedWave" },

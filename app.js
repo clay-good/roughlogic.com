@@ -62,6 +62,8 @@ const TOOL_MODULES = (() => {
     "battery-hydrogen-vent",
     // spec-v520 transformer inrush coordination point
     "transformer-inrush-point",
+    // spec-v562
+    "termination-temp-ampacity",
   ]);
   // spec-v129 cap-relief split: the cohesive spec-v121..v124 motor bench
   // (motor-synchronous-speed-slip, motor-shaft-torque, motor-operating-cost,

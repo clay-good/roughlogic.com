@@ -21344,6 +21344,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "110.14(c)",
+      "target": "termination-temp-ampacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "termination temperature",
+      "target": "termination-temp-ampacity",
+      "kind": "industry"
+    },
+    {
+      "term": "60 75 90 column",
+      "target": "termination-temp-ampacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "lug temperature rating",
+      "target": "termination-temp-ampacity",
+      "kind": "industry"
+    },
+    {
+      "term": "ampacity termination limit",
+      "target": "termination-temp-ampacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "90c derating only",
+      "target": "termination-temp-ampacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "table 310.16 column",
+      "target": "termination-temp-ampacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "conductor termination",
+      "target": "termination-temp-ampacity",
+      "kind": "industry"
+    },
+    {
       "term": "motor fault contribution",
       "target": "motor-fault-contribution",
       "kind": "industry"

@@ -36846,6 +36846,68 @@
    }
   },
   {
+   "tile_id": "termination-temp-ampacity",
+   "source_publisher": "NEC 2023 110.14(C) with Table 310.16",
+   "source_title": "governing = min(termination column, amp_90c x derate)",
+   "source_edition_or_year": "NEC 2023",
+   "source_section_or_page": "4/0 THHN: 90C 260, 75C 230, 60C 195; 75C term, over 100 A, 0.8 derate -> 208 A (derating governs)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "amp_90c": 260,
+    "amp_75c": 230,
+    "amp_60c": 195,
+    "termination_rating": 75,
+    "over_100a": true,
+    "derate_factor": 0.8
+   },
+   "outputs": {
+    "termination_ampacity_a": {
+     "value": 230,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "derated_90c_a": {
+     "value": 208,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "governing_a": {
+     "value": 208,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "termination-temp-ampacity",
+   "source_publisher": "NEC 2023 110.14(C) with Table 310.16",
+   "source_title": "with no derating the 75 C termination caps it, not the 90 C column",
+   "source_edition_or_year": "NEC 2023",
+   "source_section_or_page": "Same conductor, derate 1.0 -> derated 90C 260 but governing 230 A (75 C termination)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "amp_90c": 260,
+    "amp_75c": 230,
+    "amp_60c": 195,
+    "termination_rating": 75,
+    "over_100a": true,
+    "derate_factor": 1.0
+   },
+   "outputs": {
+    "governing_a": {
+     "value": 230,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-beam-ltb",
    "source_publisher": "AISC 360-22 Section F2 (AISC Manual W18x50 properties)",
    "source_title": "W18x50 A992 braced at 10 ft, Cb 1.0 -> inelastic zone, Mn 360.2 kip-ft (ASD 215.7)",

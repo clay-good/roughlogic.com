@@ -1817,6 +1817,7 @@ cross-check.
 | calc-electrical.js | `computeServiceLoadStandard` | `{ area_ft2 = 0, small_appliance_circuits = 2, laundry_circuit = 1, fixed_appl...` | _ | _ | _ |
 | calc-electrical.js | `computeShockApproachBoundary` | `{ nominal_v_ac = "151-750 V" } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeShortCircuitPP` | `{ utility_kVA = 0, utility_Z_pct = 0, secondary_V = 0, phase = "three", C_val...` | _ | _ | _ |
+| calc-electrical.js | `computeTerminationTempAmpacity` | `{ amp_90c = 0, amp_75c = 0, amp_60c = 0, termination_rating = 75, over_100a =...` | _ | _ | _ |
 | calc-electrical.js | `computeThreePhase` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerInrushPoint` | `{ kva = 0, primary_voltage_v = 0, phase = 3, inrush_multiple = 12, duration_s...` | _ | _ | _ |
 | calc-electrical.js | `computeTransformerKvaSizing` | `{ loads = [], primary_V = 480, secondary_V = 208, phase = "three", growth_res...` | _ | _ | _ |
@@ -2672,7 +2673,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1258.
+Row count: 1259.
 
 <!-- END function-corpus-v14 -->
 
@@ -2753,7 +2754,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (137 tiles)
+### Group A Electrical (138 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2878,6 +2879,7 @@ per spec-v14 §13.1 second paragraph.
 | `structured-cabling-channel` | Structured Cabling Channel Length (TIA-568) | ANSI/TIA-568; spec-v458 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `support-spacing` | Raceway / Cable Support-Spacing Lookup (NEC Chapter 3) | NEC 2023 (NFPA 70); EMT secure within 36 in of each box; support every 10 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tdd-ieee-519` | Total Demand Distortion Limit Check (IEEE 519-2022) | IEEE 519-2022 Table 1 current-distort...; spec-v524 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `termination-temp-ampacity` | Termination Temperature Ampacity Limit (NEC 110.14(C)) | NEC 2023 110.14(C) with Table 310.16; 4/0 THHN: 90C 260, 75C 230, 60C 195; 75C term, over 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `three-phase` | Three-Phase Power | Project (first-principles); V_LL=480 V / I_L=100 A / pf=0.9 -> kVA=83.14 / kW=74.82 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-conductor-protection` | Transformer Conductor and Overcurrent Protection | NEC Table 450.3(B) and 240.21(C) (by ...; 45 kVA 3-phase 480->208 V -> primary FLA 54.13 A, seconda... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `transformer-inrush-point` | Transformer Inrush Coordination Point | transformer energization-inrush coord...; spec-v520 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3872,6 +3874,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1014. Fixture-covered or reference-cadence: 1014 / 1014.
+Tile count: 1015. Fixture-covered or reference-cadence: 1015 / 1015.
 
 <!-- END tile-index-v14 -->
