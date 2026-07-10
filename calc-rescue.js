@@ -228,8 +228,53 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
   for (const el of [w.input, c.select, a.input, n.input, cap.input, dd.input]) el.addEventListener("input", update);
 }
 
+// --- spec-v540 P: Search track spacing and coverage (`search-track-spacing`) ---
+// coverage = W/S. POD = 1 - e^(-coverage). Inverse: spacing = W / (-ln(1 - target_POD)).
+// dims: in { sweep_width_m: L, track_spacing_m: L, target_pod: dimensionless } out: { coverage: dimensionless, pod: dimensionless, spacing_for_pod_m: L }
+export function computeSearchTrackSpacing({ sweep_width_m = 0, track_spacing_m = 0, target_pod = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(sweep_width_m) || 0;
+  const s = Number(track_spacing_m) || 0;
+  const tp = Number(target_pod) || 0;
+  if (!(w > 0)) return { error: "Sweep width must be positive." };
+  const solveSpacing = !(s > 0);
+  if (solveSpacing) {
+    if (!(tp > 0 && tp < 1)) return { error: "Provide a track spacing, or a target POD between 0 and 1 to solve the spacing." };
+  }
+  const coverage = s > 0 ? w / s : null;
+  const pod = coverage !== null ? 1 - Math.exp(-coverage) : null;
+  const spacing_for_pod_m = (tp > 0 && tp < 1) ? w / (-Math.log(1 - tp)) : null;
+  return {
+    coverage, pod, spacing_for_pod_m,
+    note: "The sweep width must first be corrected for weather, fatigue, terrain, and speed (the raw detection range overstates it). The exponential random-search model is conservative - parallel-track sweeps reach a higher POD at the same coverage. This is single-pass POD (multiple passes compound via search-probability). The incident commander and search plan govern.",
+  };
+}
+export const searchTrackSpacingExample = { inputs: { sweep_width_m: 100, track_spacing_m: 50, target_pod: 0.80 } };
+
+function renderSearchTrackSpacing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: The incident commander and search plan govern all SAR operations. Citation: NSARC / USCG search theory (exponential detection model) by name. coverage = W / S; POD = 1 - e^(-coverage); spacing = W / (-ln(1 - target_POD)). The sweep width must be corrected for weather, fatigue, terrain, and speed. The random-search model is conservative; parallel-track sweeps reach higher POD at the same coverage.";
+  _aeF(inputRegion, () => fillExample(searchTrackSpacingExample.inputs));
+  const w = _mnF("Corrected sweep width W (m)", "sts-w", { step: "any", min: "0" });
+  const s = _mnF("Track spacing S (m, 0 = solve from target POD)", "sts-s", { step: "any", min: "0" });
+  const t = _mnF("Target single-pass POD (0-1, used when spacing is 0)", "sts-t", { step: "any", min: "0", max: "1" });
+  for (const f of [w, s, t]) inputRegion.appendChild(f.wrap);
+  const oC = _moF(outputRegion, "Coverage", "sts-out-c");
+  const oP = _moF(outputRegion, "Single-pass POD", "sts-out-p");
+  const oS = _moF(outputRegion, "Spacing for target POD", "sts-out-s");
+  function fillExample(x) { w.input.value = x.sweep_width_m; s.input.value = x.track_spacing_m; t.input.value = x.target_pod; update(); }
+  const update = _debF(() => {
+    const r = computeSearchTrackSpacing({ sweep_width_m: Number(w.input.value) || 0, track_spacing_m: Number(s.input.value) || 0, target_pod: Number(t.input.value) || 0 });
+    if (r.error) { oC.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; return; }
+    oC.textContent = r.coverage !== null ? _fmtF(r.coverage, 2) : "- (enter a track spacing)";
+    oP.textContent = r.pod !== null ? _fmtF(r.pod * 100, 1) + "%" : "-";
+    oS.textContent = r.spacing_for_pod_m !== null ? _fmtF(r.spacing_for_pod_m, 1) + " m" : "- (enter a target POD)";
+  }, _DF);
+  for (const el of [w.input, s.input, t.input]) el.addEventListener("input", update);
+}
+
 export const RESCUE_RENDERERS = {
   "confined-space-purge": renderConfinedSpacePurge,
   "rope-ma": renderRopeMA,
   "sling-angle": renderSlingAngle,
+  "search-track-spacing": renderSearchTrackSpacing,
 };

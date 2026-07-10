@@ -228,6 +228,7 @@ const _TILES = [
   ["sprinkler-density", "F"], ["standpipe-friction", "F"], ["ladder-pipe-reach", "F"],
   ["braking-distance", "F"], ["confined-space-purge", "F"], ["rope-ma", "F"],
   ["sling-angle", "F"], ["iso-nff", "F"],
+  ["search-track-spacing", "P"],
   ["scba-cylinder-time", "F"], ["nfpa-1142-water-supply", "F"],
   ["confined-space-vent", "F"],
   ["standpipe-pdp", "F"], ["smoke-ejector-cfm", "F"],

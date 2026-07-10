@@ -374,6 +374,41 @@
       "kind": "adjacent"
     },
     {
+      "term": "track spacing",
+      "target": "search-track-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "search coverage",
+      "target": "search-track-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "sweep width",
+      "target": "search-track-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "pod search",
+      "target": "search-track-spacing",
+      "kind": "redirect"
+    },
+    {
+      "term": "search theory",
+      "target": "search-track-spacing",
+      "kind": "adjacent"
+    },
+    {
+      "term": "csv coverage",
+      "target": "search-track-spacing",
+      "kind": "redirect"
+    },
+    {
+      "term": "search line spacing",
+      "target": "search-track-spacing",
+      "kind": "industry"
+    },
+    {
       "term": "brine concentration",
       "target": "brine-cure",
       "kind": "industry"

@@ -619,6 +619,8 @@ const TOOL_MODULES = (() => {
   // changed.
   declare("./calc-rescue.js", "RESCUE_RENDERERS", [
     "confined-space-purge", "rope-ma", "sling-angle",
+    // spec-v540
+    "search-track-spacing",
   ]);
   // spec-v248..v250 fire-sprinkler system-design trio: a new lazy Group F
   // cluster split off beside calc-fire.js exactly as calc-rescue.js was (the

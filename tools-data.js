@@ -459,6 +459,7 @@ export const TOOLS = [
   { id: "magnetic-declination", name: "Magnetic Declination (WMM2025)", group: "P", trades: ["field"], desc: "Local magnetic declination, inclination, field intensity, and annual change from latitude, longitude, date, and (optional) altitude. NOAA NCEI World Magnetic Model 2025; valid 2025-2030. Bearing-correction helper built in." },
 
   { id: "search-probability", name: "Search Probability of Detection", group: "P", trades: ["field", "fire"], desc: "Cumulative probability of detection across search passes, probability of success (POS = POA x cumulative POD), and residual containment probability for SAR planning." },
+  { id: "search-track-spacing", name: "Search Track Spacing and Coverage", group: "P", trades: ["field", "fire"], desc: "Single-pass probability of detection from corrected sweep width and track spacing (coverage = W/S, POD = 1 - e^-coverage), or the spacing that hits a target POD. The planning number a search segment's resources are set from." },
   // Group Q: Historical Reference Data (v4)
   { id: "historical-pricing", name: "Historical Pricing Context", group: "Q", trades: ["reference"], desc: "Bundled monthly history per commodity (BLS PPI / EIA / USDA NASS / FRED) with 25 / 50 / 75 / 90 percentile bands over a user-selected lookback. Reference only; no live fetch." },
 

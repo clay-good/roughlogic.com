@@ -18074,3 +18074,25 @@ test("bounds: spec-v539 computeDrinkAbvDilution pins the melt-diluted ABV, the s
   assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "stirred", dilution_pct: -5 }));
   assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "foo" }));
 });
+
+import { computeSearchTrackSpacing as _v540 } from "../../calc-rescue.js";
+
+test("bounds: spec-v540 computeSearchTrackSpacing pins coverage, the exponential POD, the inverse spacing solve, and error seams", () => {
+  const r = _v540({ sweep_width_m: 100, track_spacing_m: 50, target_pod: 0.80 });
+  assert.ok(Math.abs(r.coverage - 2.0) < 1e-9); // 100/50
+  assert.ok(Math.abs(r.pod - 0.8647) < 0.001); // 1 - e^-2
+  assert.ok(Math.abs(r.spacing_for_pod_m - 62.13) < 0.1); // 100 / -ln(0.2)
+  // Spacing-only solve (no track spacing): coverage/POD null, spacing computed.
+  const solve = _v540({ sweep_width_m: 100, track_spacing_m: 0, target_pod: 0.80 });
+  assert.equal(solve.coverage, null);
+  assert.equal(solve.pod, null);
+  assert.ok(Math.abs(solve.spacing_for_pod_m - 62.13) < 0.1);
+  // Tighter spacing -> higher POD.
+  assert.ok(_v540({ sweep_width_m: 100, track_spacing_m: 25 }).pod > r.pod);
+  // Error seams: non-finite, non-positive sweep, no spacing and bad target POD.
+  assert.ok("error" in _v540({ sweep_width_m: Infinity, track_spacing_m: 50 }));
+  assert.ok("error" in _v540({ sweep_width_m: 0, track_spacing_m: 50 }));
+  assert.ok("error" in _v540({ sweep_width_m: 100, track_spacing_m: 0, target_pod: 0 }));
+  assert.ok("error" in _v540({ sweep_width_m: 100, track_spacing_m: 0, target_pod: 1 }));
+  assert.ok("error" in _v540({ sweep_width_m: 100, track_spacing_m: 0, target_pod: 1.5 }));
+});

@@ -711,6 +711,7 @@ const RELATED = {
   "braking-distance": ["stopping-sight-distance"],
   "confined-space-purge": ["confined-space-vent", "smoke-reading"],
   "sling-angle": ["rope-ma", "rigging-check", "ladder-angle"],
+  "search-track-spacing": ["search-probability", "area-by-coordinates", "pacing-distance"],
   "iso-nff": ["required-fire-flow", "hydrant-flow", "nfpa-1142-water-supply"],
   "scba-cylinder-time": ["confined-space-vent"],
   "nfpa-1142-water-supply": ["required-fire-flow", "iso-nff", "hydrant-flow"],

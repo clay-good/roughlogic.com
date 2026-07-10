@@ -4574,6 +4574,16 @@ export const CITATIONS = {
       { name: "Choker derate", value: "0.75 (ASME B30.9 typical)", source: "ASME B30.9" },
     ],
   },
+  "search-track-spacing": {
+    formula: "coverage = sweep_width / track_spacing; POD = 1 - e^(-coverage); track_spacing = sweep_width / (-ln(1 - target_POD)).",
+    edition: "NSARC / USCG search theory (exponential random-search detection model), by name.",
+    freeAccess: "Search-theory relations are public (US Coast Guard / NSARC references); the incident commander and search plan govern.",
+    governance: GOVERNANCE.fire,
+    editionNote: "The sweep width must first be corrected for weather, fatigue, terrain, and speed (the raw detection range overstates it); the exponential random-search model is conservative and parallel-track sweeps reach a higher POD at the same coverage; this is single-pass POD (multiple passes compound via search-probability). A planning aid, not a guarantee of detection.",
+    assumptions: [
+      { name: "Detection model", value: "exponential (random-search) POD = 1 - e^(-coverage); conservative vs parallel-track", source: "NSARC / USCG" },
+    ],
+  },
 
   // --- Group G: Cross-Trade Utilities (priority 11) ---
   // Mostly pure arithmetic and unit conversions. Tiles cite NIST SP 811,

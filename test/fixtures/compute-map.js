@@ -479,6 +479,7 @@ export const COMPUTE_MAP = {
   "drying-times": { module: "../../calc-restoration.js", fn: "computeDryingTime" },
   "ppe": { module: "../../calc-restoration.js", fn: "computePPE" },
   "sling-angle": { module: "../../calc-rescue.js", fn: "computeSlingAngle" },
+  "search-track-spacing": { module: "../../calc-rescue.js", fn: "computeSearchTrackSpacing" },
   "lab-dilution": { module: "../../calc-water.js", fn: "computeDilution" },
   "pump-eff-w2w": { module: "../../calc-water.js", fn: "computePumpEfficiency" },
   "osha-top10": { module: "../../calc-references.js", fn: "computeOSHATop10" },

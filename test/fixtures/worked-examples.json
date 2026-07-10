@@ -16880,6 +16880,62 @@
    }
   },
   {
+   "tile_id": "search-track-spacing",
+   "source_publisher": "NSARC / USCG search theory (exponential detection model)",
+   "source_title": "coverage = sweep_width / track_spacing; POD = 1 - e^(-coverage)",
+   "source_edition_or_year": "NSARC / USCG",
+   "source_section_or_page": "100 m sweep width, 50 m spacing -> coverage 2.0, POD 86%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "sweep_width_m": 100,
+    "track_spacing_m": 50,
+    "target_pod": 0.80
+   },
+   "outputs": {
+    "coverage": {
+     "value": 2.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pod": {
+     "value": 0.8647,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "spacing_for_pod_m": {
+     "value": 62.13,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "search-track-spacing",
+   "source_publisher": "NSARC / USCG search theory (exponential detection model)",
+   "source_title": "track_spacing = sweep_width / (-ln(1 - target_POD))",
+   "source_edition_or_year": "NSARC / USCG",
+   "source_section_or_page": "100 m sweep width, target POD 0.80, spacing solved -> 62.1 m",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "sweep_width_m": 100,
+    "track_spacing_m": 0,
+    "target_pod": 0.80
+   },
+   "outputs": {
+    "spacing_for_pod_m": {
+     "value": 62.13,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "declining-balance-depreciation",
    "source_publisher": "GAAP book depreciation (ASC 360)",
    "source_title": "dep = book * factor/life, floored at salvage",
