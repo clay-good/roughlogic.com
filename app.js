@@ -864,6 +864,8 @@ const TOOL_MODULES = (() => {
     "growing-degree-days", "pearson-square-ration", "livestock-water-requirement",
     // spec-v417..v419 landscape/agriculture
     "mulch-topsoil-volume", "grain-drying-energy", "manure-nutrient-application",
+    // spec-v568
+    "center-pivot-runtime",
     // v35
     "two-stroke-mix",
     // v84 sprayer nozzle / drift / field capacity

@@ -62,6 +62,7 @@ export const COMPUTE_MAP = {
   "mulch-topsoil-volume": { module: "../../calc-agriculture.js", fn: "computeMulchTopsoilVolume" },
   "grain-drying-energy": { module: "../../calc-agriculture.js", fn: "computeGrainDryingEnergy" },
   "manure-nutrient-application": { module: "../../calc-agriculture.js", fn: "computeManureNutrientApplication" },
+  "center-pivot-runtime": { module: "../../calc-agriculture.js", fn: "computeCenterPivotRuntime" },
   "two-stroke-mix": { module: "../../calc-agriculture.js", fn: "computeTwoStrokeMix" },
   "hp-from-torque": { module: "../../calc-mechanic.js", fn: "computeHpFromTorque" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },

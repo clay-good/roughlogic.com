@@ -18718,3 +18718,25 @@ test("bounds: spec-v567 computeCrownPruningDose pins the removal percent, the cl
   assert.ok("error" in _v567({ live_foliage: 100, removed_foliage: -1, maturity_class: "mature" }));
   assert.ok("error" in _v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "foo" }));
 });
+
+import { computeCenterPivotRuntime as _v568 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v568 computeCenterPivotRuntime pins the 452.6 runtime relation, the gross capacity, the net depth, and error seams", () => {
+  const r = _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 85 });
+  assert.ok(Math.abs(r.hours - 70.7) < 0.1); // 125*1*452.6/800
+  assert.ok(Math.abs(r.gross_gpm_per_acre - 6.4) < 0.1); // 800/125
+  assert.ok(Math.abs(r.net_depth_in - 0.85) < 1e-9); // 1*0.85
+  // A deeper pass scales the runtime linearly.
+  assert.ok(Math.abs(_v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 0.5, efficiency_pct: 85 }).hours - 35.4) < 0.1);
+  // Doubling the flow halves the runtime.
+  assert.ok(Math.abs(_v568({ system_flow_gpm: 1600, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 85 }).hours - r.hours / 2) < 1e-6);
+  // Full efficiency delivers the full gross depth net.
+  assert.ok(Math.abs(_v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 100 }).net_depth_in - 1.0) < 1e-9);
+  // Error seams: non-finite, non-positive flow / area / depth, efficiency out of range.
+  assert.ok("error" in _v568({ system_flow_gpm: Infinity, area_acres: 125, target_depth_in: 1.0 }));
+  assert.ok("error" in _v568({ system_flow_gpm: 0, area_acres: 125, target_depth_in: 1.0 }));
+  assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 0, target_depth_in: 1.0 }));
+  assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 0 }));
+  assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 0 }));
+  assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 101 }));
+});

@@ -16508,6 +16508,64 @@
    }
   },
   {
+   "tile_id": "center-pivot-runtime",
+   "source_publisher": "USDA-NRCS center-pivot design / university extension",
+   "source_title": "hours = area x depth x 452.6 / flow; gross_gpm_per_acre = flow / area",
+   "source_edition_or_year": "center-pivot design",
+   "source_section_or_page": "800 gpm, 125 ac, 1 in gross, 85% -> 70.7 hr, 6.4 gpm/ac, 0.85 in net",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "system_flow_gpm": 800,
+    "area_acres": 125,
+    "target_depth_in": 1.0,
+    "efficiency_pct": 85
+   },
+   "outputs": {
+    "hours": {
+     "value": 70.7,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "gross_gpm_per_acre": {
+     "value": 6.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "net_depth_in": {
+     "value": 0.85,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "center-pivot-runtime",
+   "source_publisher": "USDA-NRCS center-pivot design / university extension",
+   "source_title": "a deeper pass scales the runtime linearly",
+   "source_edition_or_year": "center-pivot design",
+   "source_section_or_page": "Same system applying 0.5 in -> 35.4 hr (half the time for half the depth)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "system_flow_gpm": 800,
+    "area_acres": 125,
+    "target_depth_in": 0.5,
+    "efficiency_pct": 85
+   },
+   "outputs": {
+    "hours": {
+     "value": 35.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "two-stroke-mix",
    "source_publisher": "First-principles volume arithmetic (small-engine mix convention)",
    "source_title": "oil = fuel / ratio; 1 US gal = 128 fl oz; 1 fl oz = 29.5735 mL",

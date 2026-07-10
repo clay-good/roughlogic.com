@@ -17669,6 +17669,46 @@
       "kind": "industry"
     },
     {
+      "term": "center pivot",
+      "target": "center-pivot-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "pivot runtime",
+      "target": "center-pivot-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "application depth pivot",
+      "target": "center-pivot-runtime",
+      "kind": "redirect"
+    },
+    {
+      "term": "gpm per acre",
+      "target": "center-pivot-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pivot capacity",
+      "target": "center-pivot-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "irrigation depth field",
+      "target": "center-pivot-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "percent timer pivot",
+      "target": "center-pivot-runtime",
+      "kind": "redirect"
+    },
+    {
+      "term": "pivot hours per inch",
+      "target": "center-pivot-runtime",
+      "kind": "redirect"
+    },
+    {
       "term": "cell temperature pv",
       "target": "pv-cell-temperature-power",
       "kind": "industry"

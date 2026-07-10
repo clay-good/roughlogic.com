@@ -709,6 +709,17 @@ export const CITATIONS = {
       { name: "P over-application", value: "an N-based rate usually over-applies phosphorus; the plan governs", source: "scope of this tile" },
     ],
   },
+  "center-pivot-runtime": {
+    formula: "hours = area_acres x target_depth_in x 452.6 / system_flow_gpm; gross_gpm_per_acre = system_flow_gpm / area_acres; net_depth_in = target_depth_in x efficiency_pct / 100.",
+    edition: "Center-pivot application depth and runtime (USDA-NRCS center-pivot design; university extension), by name.",
+    freeAccess: "The acre-inch-to-gallons runtime relation is public irrigation arithmetic; the pivot design and soil intake govern the actual schedule.",
+    governance: GOVERNANCE.general,
+    editionNote: "The depth is set by the outer-tower speed (percent timer), and the outer spans cover far more area than the inner ones, so a uniform depth needs increasing flow per foot outward; the instantaneous application rate under an outer span can exceed the soil intake rate and run off even when the daily depth is right (the depth sets the hours, not the runoff risk); the 452.6 factor converts acre-inches to gallons over minutes. A scheduling aid, not a pivot design.",
+    assumptions: [
+      { name: "452.6 factor", value: "converts acre-inches to gallons over minutes (hours = area x depth x 452.6 / gpm)", source: "irrigation arithmetic" },
+      { name: "Outer-span runoff", value: "the outer spans sweep more area; the instantaneous rate can exceed the soil intake rate even at the correct daily depth", source: "USDA-NRCS center-pivot design" },
+    ],
+  },
 
   "two-stroke-mix": {
     formula: "oil volume = fuel volume / ratio (gas:oil by volume); 1 US gallon = 128 fl oz; 1 fl oz = 29.5735 mL; oz per gallon = 128 / ratio.",

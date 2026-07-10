@@ -2507,3 +2507,51 @@ function renderManureNutrientApplication(inputRegion, outputRegion, citationEl) 
   for (const f of [need.input, totalN.input, avail.input, p2o5.input, k2o.input]) f.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["manure-nutrient-application"] = renderManureNutrientApplication;
+
+// --- spec-v568 L: Center-pivot application depth and runtime ---
+// hours = area x depth x 452.6 / flow. gross_gpm_per_acre = flow / area. net_depth = depth x eff / 100.
+// dims: in { system_flow_gpm: L^3 T^-1, area_acres: L^2, target_depth_in: L, efficiency_pct: dimensionless } out: { hours: T, gross_gpm_per_acre: dimensionless, net_depth_in: L }
+export function computeCenterPivotRuntime({ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = 85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const flow = Number(system_flow_gpm) || 0;
+  const area = Number(area_acres) || 0;
+  const depth = Number(target_depth_in) || 0;
+  const eff = Number(efficiency_pct) || 0;
+  if (!(flow > 0)) return { error: "System flow must be positive (gpm)." };
+  if (!(area > 0)) return { error: "Irrigated area must be positive (acres)." };
+  if (!(depth > 0)) return { error: "Target depth must be positive (in)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Efficiency must be over 0 and at most 100 (%)." };
+  const hours = area * depth * 452.6 / flow;
+  const gross_gpm_per_acre = flow / area;
+  const net_depth_in = depth * eff / 100;
+  return {
+    hours, gross_gpm_per_acre, net_depth_in,
+    note: "The depth is set by the outer-tower speed (percent timer), and the outer spans cover far more area than the inner ones, so a uniform depth needs increasing flow per foot outward. The instantaneous application rate under an outer span can exceed the soil intake rate and run off even when the daily depth is right - the depth sets the hours, not the runoff risk. The 452.6 factor converts acre-inches to gallons over minutes. The actual pivot design and soil intake govern.",
+  };
+}
+export const centerPivotRuntimeExample = { inputs: { system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 85 } };
+
+function _v568renderCenterPivotRuntime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: center-pivot application depth and runtime (USDA-NRCS center-pivot design; university extension), by name. hours = area x depth x 452.6 / flow; gross_gpm_per_acre = flow / area; net_depth = depth x efficiency / 100. The depth is set by the outer-tower speed; the outer spans cover more area, so the instantaneous application rate under an outer span can run off even when the daily depth is right. The pivot design and soil intake govern.";
+  const flow = makeNumber("System flow Q (gpm)", "cpr-flow", { step: "any", min: "0", value: "800" }); flow.input.value = "800";
+  const area = makeNumber("Irrigated area (acres)", "cpr-area", { step: "any", min: "0", value: "125" }); area.input.value = "125";
+  const depth = makeNumber("Gross target depth (in)", "cpr-depth", { step: "any", min: "0", value: "1.0" }); depth.input.value = "1.0";
+  const eff = makeNumber("Application efficiency (%)", "cpr-eff", { step: "any", min: "0", max: "100", value: "85" }); eff.input.value = "85";
+  for (const f of [flow, area, depth, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "800"; area.input.value = "125"; depth.input.value = "1.0"; eff.input.value = "85"; update(); });
+  const oHours = makeOutputLine(outputRegion, "Runtime per pass", "cpr-out-hours");
+  const oGross = makeOutputLine(outputRegion, "Gross capacity per acre", "cpr-out-gross");
+  const oNet = makeOutputLine(outputRegion, "Net depth applied", "cpr-out-net");
+  const oNote = makeOutputLine(outputRegion, "Note", "cpr-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCenterPivotRuntime({ system_flow_gpm: readNum(flow.input), area_acres: readNum(area.input), target_depth_in: readNum(depth.input), efficiency_pct: eff.input.value === "" ? 85 : readNum(eff.input) });
+    if (r.error) { oHours.textContent = r.error; oGross.textContent = "-"; oNet.textContent = "-"; oNote.textContent = ""; return; }
+    oHours.textContent = fmt(r.hours, 1) + " hr (" + fmt(r.hours / 24, 1) + " days)";
+    oGross.textContent = fmt(r.gross_gpm_per_acre, 1) + " gpm/ac";
+    oNet.textContent = fmt(r.net_depth_in, 2) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [flow, area, depth, eff]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["center-pivot-runtime"] = _v568renderCenterPivotRuntime;
