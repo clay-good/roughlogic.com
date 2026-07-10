@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): spec-v590 Phase 2 batch 2 -- Group E question corpus; 2026-07-10
+
+2,353 question-phrase aliases covering all 202 previously uncovered Group E (construction / structural) tiles at 10-13 phrasings each, same drafting-plus-mechanical-review pipeline (1 dupe and 5 sibling-collision rows dropped by the top-3 rank check). Shard 7,262 -> 9,615 rows, 132.6 KB gz -- still lazy-loaded, still under the spec's ~250 KB per-shard remediation threshold.
+
 ### feat(search): spec-v590 Phase 2 batch 1 -- Group A question corpus; 2026-07-10
 
 First group-sized Phase 2 batch under the landed spec-v590: 1,569 question-phrase aliases covering all 132 previously uncovered Group A (electrical) tiles at 9-12 phrasings each, drafted with AI at authoring time and mechanically reviewed by the same pipeline as Phase 1 (charset/style, live targets, global case-insensitive dedupe, stopword survival, top-3 rank check through the v589 ranker). Landing this batch also hardened the ranker: digit-led query tokens ("150", "120v") now add score but never coverage, so a number quoted in some tile's alias can no longer outrank the true target when the user's quantity coincides with it, and pure-number alias tokens are excluded from the match corpus; a full shard-wide re-audit under the corrected ranker then pruned the 13 question rows (0.5%) that no longer met the top-3 bar. Shard 5,706 -> 7,262 rows, 96.1 KB gz (lazy-loaded, not home payload; well under the spec's ~250 KB remediation threshold), logged in the manifest.
