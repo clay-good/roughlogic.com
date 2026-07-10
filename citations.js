@@ -10846,6 +10846,17 @@ export const CITATIONS = {
       { name: "Drift limit separate", value: "the computed deflection is checked against the ASCE 7 allowable story drift (amplified by Cd/I where the strength-level force is used)", source: "ASCE 7 §12.12" },
     ],
   },
+  "diaphragm-collector-force": {
+    formula: "collector_force = unit_shear x collector_length; collector_force_omega = Omega0 x collector_force.",
+    edition: "The ASCE 7-22 Section 12.10.1 / 12.10.2 collector (drag strut) axial force and the 12.10.2.1 overstrength demand, by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the Section 12.10 collector provisions are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The collector force accumulates along its length and peaks where the resisting wall begins - a separate load path from the diaphragm chord, sized for a different force. ASCE 7-22 Section 12.10.2.1 requires the collector, its splices, and its connections to be designed for the Omega0 overstrength force in the applicable seismic design categories (the amplification the chord never carries). The diaphragm may be flexible or rigid, which changes the shear distribution feeding this. A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Accumulated force", value: "collector_force = unit_shear x collector_length, peaking at the resisting wall", source: "ASCE 7-22 12.10.1" },
+      { name: "Overstrength", value: "Section 12.10.2.1 requires Omega0 amplification for the collector and its connections in the applicable SDCs", source: "ASCE 7-22 12.10.2.1" },
+    ],
+  },
   "fire-pump-curve": {
     formula: "churn_limit = 1.40 x rated_psi; overload_flow = 1.50 x rated_gpm; overload_min = 0.65 x rated_psi; churn_ok = churn <= churn_limit; overload_ok = measured >= overload_min; margins as % of rated pressure.",
     edition: "NFPA 20 (Standard for the Installation of Stationary Pumps for Fire Protection), 2022, by name; the 140% churn ceiling and the 65%-of-rated-at-150%-flow overload point are the listed centrifugal fire pump curve limits.",

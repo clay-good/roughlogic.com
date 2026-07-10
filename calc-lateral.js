@@ -197,3 +197,40 @@ LATERAL_RENDERERS["shearwall-deflection"] = _simpleRenderer({
   ],
   compute: computeShearwallDeflection,
 });
+
+// ===================== spec-v549: collector / drag strut axial force (ASCE 7-22 12.10) =====================
+
+// dims: in { unit_shear_plf: M T^-2, collector_len_ft: L, omega0: dimensionless } out: { collector_force_lb: M L T^-2, collector_force_omega_lb: M L T^-2 }
+export function computeDiaphragmCollectorForce({ unit_shear_plf = 0, collector_len_ft = 0, omega0 = 2.5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const v = Number(unit_shear_plf) || 0;
+  const Lc = Number(collector_len_ft) || 0;
+  const om = Number(omega0) || 0;
+  if (!(v > 0)) return { error: "Diaphragm unit shear must be positive (plf)." };
+  if (!(Lc > 0)) return { error: "Collector length must be positive (ft)." };
+  if (!(om >= 1)) return { error: "Overstrength factor must be at least 1 (2.5 typical, 1.0 to skip)." };
+  const collector_force_lb = v * Lc;
+  const collector_force_omega_lb = om * collector_force_lb;
+  return {
+    collector_force_lb, collector_force_omega_lb, omega0: om,
+    note: "The collector force accumulates along its length and peaks where the resisting wall begins - a separate load path from the diaphragm chord, sized for a different force. ASCE 7-22 Section 12.10.2.1 requires the collector, its splices, and its connections to be designed for the Omega0 overstrength force in the applicable seismic design categories. The diaphragm may be flexible or rigid (which changes the shear distribution feeding this). The engineer of record governs.",
+  };
+}
+
+export const diaphragmCollectorForceExample = { inputs: { unit_shear_plf: 300, collector_len_ft: 40, omega0: 2.5 } };
+
+LATERAL_RENDERERS["diaphragm-collector-force"] = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Section 12.10.1 / 12.10.2 (collectors and drag struts): collector_force = unit_shear x collector_length, accumulated at the resisting wall; the overstrength demand collector_force_omega = Omega0 x collector_force (12.10.2.1). The collector force is a separate load path from the chord and, in the applicable seismic design categories, the collector and its splices and connections must be designed for the Omega0 force. The diaphragm may be flexible or rigid. The engineer of record governs.",
+  example: diaphragmCollectorForceExample.inputs,
+  fields: [
+    { key: "unit_shear_plf", label: "Diaphragm unit shear v (plf)", kind: "number" },
+    { key: "collector_len_ft", label: "Collector length to wall Lc (ft)", kind: "number" },
+    { key: "omega0", label: "Overstrength factor Omega0 (1.0 to skip)", kind: "number", default: 2.5 },
+  ],
+  outputs: [
+    { key: "f", id: "dcf-out-f", label: "Collector force (strength level)", value: (r) => fmt(r.collector_force_lb, 0) + " lb axial" },
+    { key: "o", id: "dcf-out-o", label: "Overstrength demand (12.10.2.1)", value: (r) => fmt(r.collector_force_omega_lb, 0) + " lb (Omega0 = " + fmt(r.omega0, 1) + ")" },
+    { key: "n", id: "dcf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDiaphragmCollectorForce,
+});

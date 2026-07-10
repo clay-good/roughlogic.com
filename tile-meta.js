@@ -688,6 +688,7 @@ const _TILES = [
   ["masonry-wall-weight", "E"], ["brick-veneer-anchor-spacing", "E"], ["masonry-lintel-loading", "E"],
   // spec-v272..v274 SDPWS wood lateral-force-resisting-system trio (calc-lateral.js)
   ["diaphragm-shear", "E"], ["shearwall-overturning", "E"], ["shearwall-deflection", "E"],
+  ["diaphragm-collector-force", "E"],
   // spec-v119 equilibrium moisture content of wood (Group D)
   ["wood-emc", "D"],
   // spec-v136..v140 on-arrival water-loss bench (Group D)

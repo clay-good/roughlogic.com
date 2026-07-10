@@ -18291,3 +18291,20 @@ test("bounds: spec-v548 computeConcreteAnchorBreakout pins the hef^1.5 cone, the
   assert.ok("error" in _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: -1, anchor_type: "cast-in" }));
   assert.ok("error" in _v548({ embedment_in: 6, fc_psi: 4000, edge_distance_in: 100, anchor_type: "foo" }));
 });
+
+import { computeDiaphragmCollectorForce as _v549 } from "../../calc-lateral.js";
+
+test("bounds: spec-v549 computeDiaphragmCollectorForce pins the v x Lc accumulation, the Omega0 amplification, and error seams", () => {
+  const r = _v549({ unit_shear_plf: 300, collector_len_ft: 40, omega0: 2.5 });
+  assert.ok(Math.abs(r.collector_force_lb - 12000) < 1e-9); // 300 * 40
+  assert.ok(Math.abs(r.collector_force_omega_lb - 30000) < 1e-9); // 2.5 * 12000
+  // Omega0 = 1.0 skips the amplification.
+  assert.ok(Math.abs(_v549({ unit_shear_plf: 300, collector_len_ft: 40, omega0: 1.0 }).collector_force_omega_lb - 12000) < 1e-9);
+  // The force accumulates linearly with length.
+  assert.ok(Math.abs(_v549({ unit_shear_plf: 300, collector_len_ft: 80, omega0: 2.5 }).collector_force_lb - 2 * r.collector_force_lb) < 1e-9);
+  // Error seams: non-finite, non-positive shear / length, omega0 < 1.
+  assert.ok("error" in _v549({ unit_shear_plf: Infinity, collector_len_ft: 40, omega0: 2.5 }));
+  assert.ok("error" in _v549({ unit_shear_plf: 0, collector_len_ft: 40, omega0: 2.5 }));
+  assert.ok("error" in _v549({ unit_shear_plf: 300, collector_len_ft: 0, omega0: 2.5 }));
+  assert.ok("error" in _v549({ unit_shear_plf: 300, collector_len_ft: 40, omega0: 0.9 }));
+});

@@ -583,6 +583,8 @@ const TOOL_MODULES = (() => {
   // KEEP group "E" (module independent of group letter).
   declare("./calc-lateral.js", "LATERAL_RENDERERS", [
     "diaphragm-shear", "shearwall-overturning", "shearwall-deflection",
+    // spec-v549
+    "diaphragm-collector-force",
   ]);
   // spec-v70 cap-relief split: the spec-v67 earthwork / excavation bench
   // moved out of calc-construction.js (it sat at 97.6% of its size cap) into

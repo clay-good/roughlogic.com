@@ -10769,6 +10769,41 @@
       "kind": "redirect"
     },
     {
+      "term": "collector force",
+      "target": "diaphragm-collector-force",
+      "kind": "industry"
+    },
+    {
+      "term": "diaphragm collector",
+      "target": "diaphragm-collector-force",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 12.10",
+      "target": "diaphragm-collector-force",
+      "kind": "redirect"
+    },
+    {
+      "term": "overstrength collector",
+      "target": "diaphragm-collector-force",
+      "kind": "adjacent"
+    },
+    {
+      "term": "omega0 collector",
+      "target": "diaphragm-collector-force",
+      "kind": "redirect"
+    },
+    {
+      "term": "drag strut force",
+      "target": "diaphragm-collector-force",
+      "kind": "industry"
+    },
+    {
+      "term": "shear transfer",
+      "target": "diaphragm-collector-force",
+      "kind": "adjacent"
+    },
+    {
       "term": "solar heat gain",
       "target": "window-solar-heat-gain",
       "kind": "industry"

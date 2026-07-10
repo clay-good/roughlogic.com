@@ -993,6 +993,7 @@ export const COMPUTE_MAP = {
   "diaphragm-shear": { module: "../../calc-lateral.js", fn: "computeDiaphragmShear" },
   "shearwall-overturning": { module: "../../calc-lateral.js", fn: "computeShearwallOverturning" },
   "shearwall-deflection": { module: "../../calc-lateral.js", fn: "computeShearwallDeflection" },
+  "diaphragm-collector-force": { module: "../../calc-lateral.js", fn: "computeDiaphragmCollectorForce" },
   // spec-v248..v250 fire-sprinkler system-design trio (3 tiles, new calc-firesprinkler.js)
   "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
   "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },

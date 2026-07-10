@@ -35632,6 +35632,56 @@
    }
   },
   {
+   "tile_id": "diaphragm-collector-force",
+   "source_publisher": "ASCE 7-22 Section 12.10 (collectors and drag struts)",
+   "source_title": "collector_force = unit_shear x collector_length; collector_force_omega = Omega0 x collector_force",
+   "source_edition_or_year": "ASCE 7-22",
+   "source_section_or_page": "300 plf dragged 40 ft -> 12000 lb; Omega0 2.5 -> 30000 lb overstrength",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "unit_shear_plf": 300,
+    "collector_len_ft": 40,
+    "omega0": 2.5
+   },
+   "outputs": {
+    "collector_force_lb": {
+     "value": 12000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "collector_force_omega_lb": {
+     "value": 30000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "diaphragm-collector-force",
+   "source_publisher": "ASCE 7-22 Section 12.10 (collectors and drag struts)",
+   "source_title": "the strength-level force without overstrength (Omega0 = 1.0)",
+   "source_edition_or_year": "ASCE 7-22",
+   "source_section_or_page": "Same 300 plf x 40 ft with Omega0 1.0 -> 12000 lb (no amplification)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "unit_shear_plf": 300,
+    "collector_len_ft": 40,
+    "omega0": 1.0
+   },
+   "outputs": {
+    "collector_force_omega_lb": {
+     "value": 12000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "erv-sensible-recovery",
    "source_publisher": "ASHRAE Standard 84 / AHRI Standard 1060 sensible effectiveness",
    "source_title": "200 cfm at 75% on a 10 F day -> 55 F leaving, 9,720 Btu/h recovered",

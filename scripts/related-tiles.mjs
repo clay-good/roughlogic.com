@@ -1049,6 +1049,7 @@ const RELATED = {
   "diaphragm-shear": ["shearwall-overturning","shearwall-deflection","seismic-base-shear","wind-pressure"],
   "shearwall-overturning": ["diaphragm-shear","shearwall-deflection","seismic-base-shear","deck-ledger-fasteners"],
   "shearwall-deflection": ["shearwall-overturning","diaphragm-shear","seismic-base-shear","joist-deflection"],
+  "diaphragm-collector-force": ["diaphragm-shear","shearwall-overturning","shearwall-deflection"],
   // spec-v248..v250 fire-sprinkler system-design trio (Group F, calc-firesprinkler.js)
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],
