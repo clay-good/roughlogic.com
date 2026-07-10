@@ -47910,6 +47910,48 @@
    }
   },
   {
+   "tile_id": "co-air-free",
+   "source_publisher": "ANSI Z21 / BPI field practice",
+   "source_title": "CO_air_free = CO_measured x 20.9 / (20.9 - O2)",
+   "source_edition_or_year": "ANSI Z21",
+   "source_section_or_page": "60 ppm measured at 8% O2 -> 60 x 20.9 / 12.9 = 97 ppm air-free (just under the 100 ppm field target)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "measured_co_ppm": 60,
+    "measured_o2_pct": 8
+   },
+   "outputs": {
+    "co_air_free_ppm": {
+     "value": 97.2,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "co-air-free",
+   "source_publisher": "ANSI Z21 / BPI field practice",
+   "source_title": "less dilution corrects less (the O2 at the sample point drives the correction)",
+   "source_edition_or_year": "ANSI Z21",
+   "source_section_or_page": "Same 60 ppm at only 4% O2 -> 60 x 20.9 / 16.9 = 74 ppm air-free (a smaller correction, less air diluting it)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "measured_co_ppm": 60,
+    "measured_o2_pct": 4
+   },
+   "outputs": {
+    "co_air_free_ppm": {
+     "value": 74.2,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "prop-pitch-selection",
    "source_publisher": "outboard prop selection practice",
    "source_title": "19 in prop, 5000 rpm WOT, target 5400 -> 2 in less, 17 in new pitch",

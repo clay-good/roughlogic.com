@@ -633,6 +633,7 @@ const RELATED = {
   "duct-leakage": ["duct-sizing", "static-pressure-hvac", "duct-friction-static"],
   "duct-leakage-cfm25": ["duct-leakage", "blower-door-ach50", "duct-sizing", "infiltration-load"],
   "excess-air-o2": ["combustion-air", "furnace-temp-rise", "gas-meter-clock"],
+  "co-air-free": ["excess-air-o2", "combustion-air", "furnace-temp-rise"],
   "duct-friction-static": ["duct-sizing", "static-pressure-hvac", "equivalent-length"],
   "refrigerant-charging": ["refrigerant-pt", "superheat-subcool", "refrigerant-charge"],
   "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer", "chiller-tons"],

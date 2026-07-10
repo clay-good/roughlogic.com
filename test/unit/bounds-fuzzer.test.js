@@ -19082,3 +19082,24 @@ test("bounds: spec-v583 computeExcessAirO2 pins the O2 form, the CO2 form, the t
   assert.ok("error" in _v583({ measured_co2_pct: 9, co2max_pct: 0 }));
   assert.ok("error" in _v583({ measured_co2_pct: 13, co2max_pct: 11.7 }));
 });
+
+import { computeCoAirFree as _v584 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v584 computeCoAirFree pins the correction, the 400/100 ppm flags, and error seams", () => {
+  const r = _v584({ measured_co_ppm: 60, measured_o2_pct: 8 });
+  assert.ok(Math.abs(r.co_air_free_ppm - 60 * 20.9 / 12.9) < 1e-9);
+  assert.equal(r.over_field, false); // 97.2 < 100
+  assert.equal(r.over_ansi, false);
+  // Less dilution (lower O2) corrects less.
+  const tight = _v584({ measured_co_ppm: 60, measured_o2_pct: 4 });
+  assert.ok(tight.co_air_free_ppm < r.co_air_free_ppm);
+  // A high reading trips both flags.
+  const bad = _v584({ measured_co_ppm: 300, measured_o2_pct: 8 });
+  assert.equal(bad.over_field, true);
+  assert.equal(bad.over_ansi, true); // 486 > 400
+  // Error seams: non-finite, negative CO, O2 >= 20.9.
+  assert.ok("error" in _v584({ measured_co_ppm: Infinity, measured_o2_pct: 8 }));
+  assert.ok("error" in _v584({ measured_co_ppm: -1, measured_o2_pct: 8 }));
+  assert.ok("error" in _v584({ measured_co_ppm: 60, measured_o2_pct: 20.9 }));
+  assert.ok("error" in _v584({ measured_co_ppm: 60, measured_o2_pct: 21 }));
+});

@@ -676,3 +676,43 @@ function _v583renderExcessAirO2(inputRegion, outputRegion, citationEl) {
   for (const f of [o2, co2, co2max]) f.input.addEventListener("input", update);
 }
 HVACSERVICE_RENDERERS["excess-air-o2"] = _v583renderExcessAirO2;
+
+// ===================== spec-v584 C: air-free CO correction =====================
+// CO_air_free = CO_measured * 20.9 / (20.9 - O2).
+// dims: in { measured_co_ppm: dimensionless, measured_o2_pct: dimensionless } out: { co_air_free_ppm: dimensionless }
+export function computeCoAirFree({ measured_co_ppm = 0, measured_o2_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const co = Number(measured_co_ppm) || 0;
+  const o2 = Number(measured_o2_pct) || 0;
+  if (co < 0) return { error: "Measured CO cannot be negative (ppm)." };
+  if (!(o2 < 20.9)) return { error: "Oxygen at or above 20.9% means no combustion product to correct." };
+  if (o2 < 0) return { error: "Oxygen cannot be negative (%)." };
+  const co_air_free_ppm = co * 20.9 / (20.9 - o2);
+  const over_ansi = co_air_free_ppm > 400;
+  const over_field = co_air_free_ppm > 100;
+  return {
+    co_air_free_ppm, over_ansi, over_field,
+    note: "As-measured CO is diluted by excess and dilution air and reads deceptively low, so a dangerous appliance can look acceptable. The sample must be taken in the flue, before the draft hood or dilution air, or the correction over-inflates. The correction scales the reading to a no-dilution basis for comparison to the air-free limit (400 ppm ANSI Z21, under 100 ppm field target). The analyzer and the manufacturer instructions govern - a safety-screening aid, not a certified combustion test.",
+  };
+}
+export const coAirFreeExample = { inputs: { measured_co_ppm: 60, measured_o2_pct: 8 } };
+function _v584renderCoAirFree(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A safety-screening aid, not a certified combustion test; the analyzer and the manufacturer instructions govern. Citation: ANSI Z21 400 ppm air-free limit / BPI field practice air-free CO correction, by name. CO_air_free = CO_measured x 20.9 / (20.9 - measured_O2). As-measured CO is diluted by excess and dilution air and reads deceptively low; sample in the flue before the draft hood or dilution air. Limits: 400 ppm air-free (ANSI), under 100 ppm field target.";
+  const co = makeNumber("Measured CO (ppm)", "caf-co", { step: "any", min: "0", value: "60" }); co.input.value = "60";
+  const o2 = makeNumber("Flue-gas O2 at the same point (%)", "caf-o2", { step: "any", min: "0", max: "20.9", value: "8" }); o2.input.value = "8";
+  for (const f of [co, o2]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { co.input.value = "60"; o2.input.value = "8"; update(); });
+  const oCO = makeOutputLine(outputRegion, "Air-free CO", "caf-out-co");
+  const oFlag = makeOutputLine(outputRegion, "Against the limits", "caf-out-flag");
+  const oNote = makeOutputLine(outputRegion, "Note", "caf-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCoAirFree({ measured_co_ppm: readNum(co.input), measured_o2_pct: readNum(o2.input) });
+    if (r.error) { oCO.textContent = r.error; oFlag.textContent = "-"; oNote.textContent = ""; return; }
+    oCO.textContent = fmt(r.co_air_free_ppm, 0) + " ppm (air-free)";
+    oFlag.textContent = r.over_ansi ? "OVER the 400 ppm ANSI limit - shut down / red-tag per policy" : (r.over_field ? "Over the 100 ppm field target - investigate" : "Under the 100 ppm field target - acceptable, worth watching");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [co, o2]) f.input.addEventListener("input", update);
+}
+HVACSERVICE_RENDERERS["co-air-free"] = _v584renderCoAirFree;

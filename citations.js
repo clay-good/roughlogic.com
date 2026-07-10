@@ -1606,6 +1606,17 @@ export const CITATIONS = {
       { name: "Leakage classes", value: "3 / 6 / 12 / 24 / 48 cfm per 100 ft² at 1 in WC", source: "SMACNA Duct Leakage Test Manual" },
     ],
   },
+  "co-air-free": {
+    formula: "CO_air_free = measured_co_ppm x 20.9 / (20.9 - measured_o2_pct); over_ansi = CO_air_free > 400; over_field = CO_air_free > 100.",
+    edition: "ANSI Z21 400 ppm air-free limit / BPI field practice air-free CO correction, by name.",
+    freeAccess: "The air-free CO correction is standard combustion-analysis practice; the analyzer and appliance manufacturer instructions govern the actual screening.",
+    governance: GOVERNANCE.general,
+    editionNote: "As-measured CO is diluted by excess and dilution air and reads deceptively low, so a dangerous appliance can look acceptable. The sample must be taken in the flue, before the draft hood or dilution air, or the correction over-inflates. The correction scales the reading to a no-dilution basis for comparison to the air-free limit: 400 ppm air-free (ANSI Z21), under 100 ppm field target. The analyzer and the manufacturer instructions govern - a safety-screening aid, not a certified combustion test.",
+    assumptions: [
+      { name: "Air-free basis", value: "the ANSI Z21 400 ppm CO limit is air-free; measured CO must be corrected up to it", source: "ANSI Z21" },
+      { name: "Sample point", value: "sample in the flue, before the draft hood or dilution air, or the correction over-inflates", source: "BPI field practice" },
+    ],
+  },
   "excess-air-o2": {
     formula: "EA_pct = measured_co2 > 0 ? (co2max / measured_co2 - 1) x 100 : measured_o2 / (20.9 - measured_o2) x 100.",
     edition: "ASME PTC 4.1 / combustion analysis practice excess air from flue-gas oxygen, by name.",

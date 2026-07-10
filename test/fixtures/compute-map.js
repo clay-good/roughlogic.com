@@ -528,6 +528,7 @@ export const COMPUTE_MAP = {
   "duct-leakage": { module: "../../calc-hvac.js", fn: "computeDuctLeakage" },
   "duct-leakage-cfm25": { module: "../../calc-hvacservice.js", fn: "computeDuctLeakageCfm25" },
   "excess-air-o2": { module: "../../calc-hvacservice.js", fn: "computeExcessAirO2" },
+  "co-air-free": { module: "../../calc-hvacservice.js", fn: "computeCoAirFree" },
   "duct-friction-static": { module: "../../calc-hvac.js", fn: "computeDuctFrictionStatic" },
   "pallet-loadout": { module: "../../calc-trucking.js", fn: "computePalletLoadout" },
   "hos-math": { module: "../../calc-trucking.js", fn: "computeHOS" },

@@ -21184,6 +21184,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "air free co",
+      "target": "co-air-free",
+      "kind": "industry"
+    },
+    {
+      "term": "co correction",
+      "target": "co-air-free",
+      "kind": "redirect"
+    },
+    {
+      "term": "ansi z21 400 ppm",
+      "target": "co-air-free",
+      "kind": "redirect"
+    },
+    {
+      "term": "carbon monoxide flue",
+      "target": "co-air-free",
+      "kind": "adjacent"
+    },
+    {
+      "term": "co dilution correction",
+      "target": "co-air-free",
+      "kind": "adjacent"
+    },
+    {
+      "term": "air free carbon monoxide",
+      "target": "co-air-free",
+      "kind": "industry"
+    },
+    {
+      "term": "combustion co test",
+      "target": "co-air-free",
+      "kind": "adjacent"
+    },
+    {
+      "term": "co ppm correction",
+      "target": "co-air-free",
+      "kind": "redirect"
+    },
+    {
       "term": "prop pitch selection",
       "target": "prop-pitch-selection",
       "kind": "industry"

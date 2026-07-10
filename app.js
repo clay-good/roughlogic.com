@@ -518,6 +518,8 @@ const TOOL_MODULES = (() => {
     "duct-leakage-cfm25",
     // spec-v583 combustion excess air
     "excess-air-o2",
+    // spec-v584 air-free CO correction
+    "co-air-free",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".
