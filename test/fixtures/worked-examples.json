@@ -36191,7 +36191,7 @@
     "amax_g": 0.3,
     "sigma_v_psf": 2000,
     "sigma_vp_psf": 1200,
-    "depth_m": 5,
+    "depth_ft": 16.4042,
     "crr": 0.2,
     "msf": 1.0
    },
@@ -36228,7 +36228,7 @@
     "amax_g": 0.3,
     "sigma_v_psf": 2000,
     "sigma_vp_psf": 1200,
-    "depth_m": 5,
+    "depth_ft": 16.4042,
     "crr": 0.4,
     "msf": 1.0
    },

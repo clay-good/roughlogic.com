@@ -561,39 +561,40 @@ GEOTECH_RENDERERS["spt-bearing-capacity"] = _simpleRenderer({
   compute: computeSptBearingCapacity,
 });
 
-// dims: in { amax_g: dimensionless, sigma_v_psf: M L^-1 T^-2, sigma_vp_psf: M L^-1 T^-2, depth_m: L, crr: dimensionless, msf: dimensionless } out: { rd: dimensionless, csr: dimensionless, fs: dimensionless }
-export function computeLiquefactionScreening({ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_m = 0, crr = 0, msf = 1.0 } = {}) {
+// dims: in { amax_g: dimensionless, sigma_v_psf: M L^-1 T^-2, sigma_vp_psf: M L^-1 T^-2, depth_ft: L, crr: dimensionless, msf: dimensionless } out: { rd: dimensionless, csr: dimensionless, fs: dimensionless }
+export function computeLiquefactionScreening({ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const amax = Number(amax_g) || 0;
   const sv = Number(sigma_v_psf) || 0;
   const svp = Number(sigma_vp_psf) || 0;
-  const depth = Number(depth_m) || 0;
+  const depth = Number(depth_ft) || 0;
   const crrv = Number(crr) || 0;
   const msfv = Number(msf) || 0;
   if (!(amax > 0)) return { error: "Peak ground acceleration must be positive (g)." };
   if (!(sv > 0)) return { error: "Total vertical stress must be positive (psf)." };
   if (!(svp > 0)) return { error: "Effective vertical stress must be positive (psf)." };
   if (!(svp <= sv)) return { error: "Effective stress cannot exceed the total stress." };
-  if (!(depth > 0)) return { error: "Depth must be positive (m)." };
+  if (!(depth > 0)) return { error: "Depth must be positive (ft)." };
   if (!(crrv > 0)) return { error: "Cyclic resistance ratio CRR must be positive." };
   if (!(msfv > 0)) return { error: "Magnitude scaling factor must be positive." };
-  const rd = depth <= 9.15 ? 1 - 0.00765 * depth : 1.174 - 0.0267 * depth;
+  // Seed-Idriss rd restated per foot: 0.00233172 = 0.00765 x 0.3048, 0.00813816 = 0.0267 x 0.3048, breakpoint 9.15 m = 30.02 ft.
+  const rd = depth <= 30.02 ? 1 - 0.00233172 * depth : 1.174 - 0.00813816 * depth;
   const csr = 0.65 * amax * (sv / svp) * rd;
   const fs = (crrv / csr) * msfv;
   return {
     rd, csr, fs, liquefiable: fs < 1.0,
-    note: "Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction factor rd = 1 - 0.00765 z for z <= 9.15 m (else 1.174 - 0.0267 z), the cyclic stress ratio CSR = 0.65 amax (sigma_v/sigma'_v) rd, and the factor of safety FS = (CRR/CSR) x MSF, with liquefaction triggered when FS < 1. CRR comes from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor adjusts from the Mw 7.5 reference. This is a screening tool for level ground; a site-specific analysis, the fines correction, and the post-liquefaction settlement are the engineer's work. A design aid; the geotechnical engineer of record governs.",
+    note: "Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction factor rd = 1 - 0.00233172 z for a depth z <= 30.02 ft (else 1.174 - 0.00813816 z; the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048), the cyclic stress ratio CSR = 0.65 amax (sigma_v/sigma'_v) rd, and the factor of safety FS = (CRR/CSR) x MSF, with liquefaction triggered when FS < 1. CRR comes from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor adjusts from the Mw 7.5 reference. This is a screening tool for level ground; a site-specific analysis, the fines correction, and the post-liquefaction settlement are the engineer's work. A design aid; the geotechnical engineer of record governs.",
   };
 }
-export const liquefactionScreeningExample = { inputs: { amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20, msf: 1.0 } };
+export const liquefactionScreeningExample = { inputs: { amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.20, msf: 1.0 } };
 GEOTECH_RENDERERS["liquefaction-screening"] = _simpleRenderer({
-  citation: "Citation: Seed-Idriss simplified liquefaction triggering: rd = 1 - 0.00765 z (z <= 9.15 m) else 1.174 - 0.0267 z, CSR = 0.65 amax (sigma_v/sigma'_v) rd, FS = (CRR/CSR) MSF, liquefiable if FS < 1. A screening tool for level ground; the geotechnical engineer of record and a site-specific analysis govern.",
+  citation: "Citation: Seed-Idriss simplified liquefaction triggering: rd = 1 - 0.00233172 z (z in ft, <= 30.02 ft) else 1.174 - 0.00813816 z (the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048), CSR = 0.65 amax (sigma_v/sigma'_v) rd, FS = (CRR/CSR) MSF, liquefiable if FS < 1. A screening tool for level ground; the geotechnical engineer of record and a site-specific analysis govern.",
   example: liquefactionScreeningExample.inputs,
   fields: [
     { key: "amax_g", label: "Peak ground acceleration (g)", kind: "number", default: 0.30 },
     { key: "sigma_v_psf", label: "Total vertical stress (psf)", kind: "number", default: 2000 },
     { key: "sigma_vp_psf", label: "Effective vertical stress (psf)", kind: "number", default: 1200 },
-    { key: "depth_m", label: "Depth (m)", kind: "number", default: 5 },
+    { key: "depth_ft", label: "Depth (ft)", kind: "number", default: 16.4042 },
     { key: "crr", label: "Cyclic resistance ratio CRR", kind: "number", default: 0.20 },
     { key: "msf", label: "Magnitude scaling factor (Mw 7.5 = 1.0)", kind: "number", default: 1.0 },
   ],

@@ -4295,7 +4295,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.general,
     editionNote: "Single-edition (physics).",
     assumptions: [
-      { name: "Atmospheric pressure", value: "1013.25 mb (sea level) unless user supplies", source: "ICAO Standard Atmosphere" },
+      { name: "Atmospheric pressure", value: "29.92 in Hg (1013.2 mb sea level) unless user supplies", source: "ICAO Standard Atmosphere" },
       { name: "Conversion 7000 gr/lb", value: "physical fact (1 lb water = 7000 grains)", source: "Avoirdupois weight system" },
     ],
   },
@@ -5132,7 +5132,7 @@ export const CITATIONS = {
     governance: GOVERNANCE.rigging,
     editionNote: "Single-edition (physics).",
     assumptions: [
-      { name: "Default temperature", value: "20 °C unless user supplies", source: "engineering practice" },
+      { name: "Default temperature", value: "68 °F (20 °C) unless user supplies", source: "engineering practice" },
     ],
   },
   "dmx-planner": {
@@ -11124,11 +11124,11 @@ export const CITATIONS = {
     ],
   },
   "liquefaction-screening": {
-    formula: "rd = 1 - 0.00765 z (z <= 9.15 m) else 1.174 - 0.0267 z; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
+    formula: "rd = 1 - 0.00233172 z (z <= 30.02 ft) else 1.174 - 0.00813816 z; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
     edition: "The Seed-Idriss simplified liquefaction-triggering procedure (NCEER/NSF workshop consensus), by name.",
     freeAccess: "The Seed-Idriss simplified CSR/CRR procedure and the rd relation are standard published earthquake-geotechnical results.",
     governance: GOVERNANCE.general,
-    editionNote: "The Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction coefficient rd = 1 - 0.00765 z for a depth z <= 9.15 m (else 1.174 - 0.0267 z), the earthquake-induced cyclic stress ratio CSR = 0.65 amax (sigma_v / sigma'_v) rd, and the factor of safety FS = (CRR / CSR) x MSF, with liquefaction triggered when FS < 1. The cyclic resistance ratio CRR is read from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor MSF adjusts from the Mw 7.5 reference event. This is a screening tool for level ground; a site-specific triggering analysis, the fines-content correction, the overburden correction, and the post-liquefaction settlement/lateral-spread evaluation are the geotechnical engineer's work. A design aid; the geotechnical engineer of record governs.",
+    editionNote: "The Seed-Idriss simplified liquefaction-triggering screen: the stress-reduction coefficient rd = 1 - 0.00233172 z for a depth z <= 30.02 ft (else 1.174 - 0.00813816 z; the published per-meter constants 0.00765 and 0.0267 and the 9.15 m breakpoint restated per foot via 0.3048, spec-v593), the earthquake-induced cyclic stress ratio CSR = 0.65 amax (sigma_v / sigma'_v) rd, and the factor of safety FS = (CRR / CSR) x MSF, with liquefaction triggered when FS < 1. The cyclic resistance ratio CRR is read from the (N1)60 or CPT charts for the sand, and the magnitude scaling factor MSF adjusts from the Mw 7.5 reference event. This is a screening tool for level ground; a site-specific triggering analysis, the fines-content correction, the overburden correction, and the post-liquefaction settlement/lateral-spread evaluation are the geotechnical engineer's work. A design aid; the geotechnical engineer of record governs.",
     assumptions: [
       { name: "Cyclic stress ratio", value: "CSR = 0.65 amax (sigma_v/sigma'_v) rd", source: "Seed-Idriss" },
       { name: "Factor of safety", value: "FS = (CRR/CSR) x MSF; liquefiable if FS < 1", source: "Seed-Idriss / NCEER" },

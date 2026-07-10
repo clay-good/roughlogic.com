@@ -16510,21 +16510,21 @@ test("bounds: spec-v415 computeSptBearingCapacity pins both branches, the depth 
 });
 
 test("bounds: spec-v416 computeLiquefactionScreening pins CSR/FS, the trigger, and error seams", () => {
-  const r = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20, msf: 1.0 });
-  assert.ok(Math.abs(r.rd - (1 - 0.00765 * 5)) < 1e-9);
+  const r = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.20, msf: 1.0 });
+  assert.ok(Math.abs(r.rd - (1 - 0.00233172 * 16.4042)) < 1e-9);
   assert.ok(Math.abs(r.csr - 0.65 * 0.30 * (2000 / 1200) * r.rd) < 1e-9);
   assert.ok(Math.abs(r.fs - r.crr / r.csr) < 1e-9 || Math.abs(r.fs - (0.20 / r.csr)) < 1e-6);
   assert.ok(r.fs < 1 && r.liquefiable === true);
   // Denser sand (higher CRR) survives.
-  const dense = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.40, msf: 1.0 });
+  const dense = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.40, msf: 1.0 });
   assert.ok(dense.fs > 1 && dense.liquefiable === false);
   // The deep branch of rd applies below 9.15 m.
-  assert.ok(Math.abs(_v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 12, crr: 0.20 }).rd - (1.174 - 0.0267 * 12)) < 1e-9);
+  assert.ok(Math.abs(_v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 39.3701, crr: 0.20 }).rd - (1.174 - 0.00813816 * 39.3701)) < 1e-9);
   // Error seams: effective stress above total, non-positive, non-finite.
-  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 1000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20 }));
-  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 0, depth_m: 5, crr: 0.20 }));
-  assert.ok("error" in _v416({ amax_g: 0, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: 0.20 }));
-  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_m: 5, crr: Infinity }));
+  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 1000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.20 }));
+  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 0, depth_ft: 16.4042, crr: 0.20 }));
+  assert.ok("error" in _v416({ amax_g: 0, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.20 }));
+  assert.ok("error" in _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: Infinity }));
 });
 
 // ===================== spec-v417..v419 landscape/agriculture trio (calc-agriculture.js) =====================

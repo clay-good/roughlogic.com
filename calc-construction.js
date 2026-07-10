@@ -4455,15 +4455,18 @@ export function computeWallpaperRolls({ perimeter_in = 0, height_in = 0, roll_wi
     note: "Strips needed = ceil(perimeter / roll width). Strip length = wall height + one pattern repeat (one repeat wasted per strip to match the run). Strips per roll = floor(roll length / strip length). Rolls = ceil(strips needed / strips per roll). A large repeat drops the strips-per-roll yield and can nearly double the order for the same wall area - the area is identical, the repeat is what costs. The roll dimensions are the product's stated bolt size (single/double/Euro rolls vary), door and window openings are a manual strip credit on the perimeter, and this is a material takeoff, not a hang plan.",
   };
 }
-const wallpaperRollsExample = { inputs: { perimeter_in: 624, height_in: 108, roll_width_in: 20.5, roll_len_in: 396, repeat_in: 19 } };
+// spec-v593: defaults and the example fill are the US double-roll bolt
+// (27 in x 27 ft = 324 in); the Euro sizes stay named in the labels as the
+// alternative. Compute unchanged (inches in, counts out).
+const wallpaperRollsExample = { inputs: { perimeter_in: 624, height_in: 108, roll_width_in: 27, roll_len_in: 324, repeat_in: 19 } };
 const renderWallpaperRolls = _simpleRenderer({
   citation: "Citation: first-principles strips-and-rolls relations with wallcovering industry estimating practice (the strip method and the one-repeat-per-strip waste rule, by name). strips = ceil(perimeter / width); strip length = height + repeat; strips/roll = floor(roll length / strip length); rolls = ceil(strips / strips per roll). Roll dimensions are the product's bolt size; openings are a manual credit - an ordering aid, not an installation layout.",
   example: wallpaperRollsExample.inputs,
   fields: [
     { key: "perimeter_in", label: "Wall run to cover (in, less openings)", kind: "number" },
     { key: "height_in", label: "Wall height (in)", kind: "number" },
-    { key: "roll_width_in", label: "Roll width (in, Euro ~20.5 / US ~27)", kind: "number", default: 20.5 },
-    { key: "roll_len_in", label: "Roll length (in, Euro single ~396)", kind: "number", default: 396 },
+    { key: "roll_width_in", label: "Roll width (in, US ~27 / Euro ~20.5)", kind: "number", default: 27 },
+    { key: "roll_len_in", label: "Roll length (in, US double-roll bolt ~324 / Euro single ~396)", kind: "number", default: 324 },
     { key: "repeat_in", label: "Pattern repeat (in, 0 = random)", kind: "number" },
   ],
   outputs: [

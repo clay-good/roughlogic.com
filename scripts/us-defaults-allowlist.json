@@ -1,0 +1,282 @@
+{
+  "_comment": "spec-v593 section 2 exception class: metric that IS US trade practice. Each entry waives check-us-defaults findings whose label contains `match` in `module` (module \"*\" = any). Additions are reviewed like citations, against the section-2 acid test: would a US tradesperson read this number in this unit off their own instrument, code table, or product label?",
+  "entries": [
+    {
+      "module": "*",
+      "match": "mg/L",
+      "family": "water/wastewater operations",
+      "justification": "mg/L is the universal US water-ops unit (SDWA/SWTR reporting, jar tests, MLSS)."
+    },
+    {
+      "module": "*",
+      "match": "mL/L",
+      "family": "water/wastewater operations",
+      "justification": "SV30 settleometer reads mL/L on the cone itself."
+    },
+    {
+      "module": "*",
+      "match": "mg-min/L",
+      "family": "water/wastewater operations",
+      "justification": "CT tables (SWTR) are published in mg-min/L."
+    },
+    {
+      "module": "*",
+      "match": "uS/cm",
+      "family": "water/wastewater operations",
+      "justification": "Conductivity meters read uS/cm at 25 C."
+    },
+    {
+      "module": "*",
+      "match": "(L/x)",
+      "family": "not metric",
+      "justification": "Span deflection ratio L/x (L = span), not liters."
+    },
+    {
+      "module": "*",
+      "match": "(g)",
+      "family": "not metric (acceleration)",
+      "justification": "Peak ground / seismic acceleration in g (gravity), not grams: ASCE 7 and USGS publish in g.",
+      "note": "grams collisions are covered by module-scoped lab/kitchen entries"
+    },
+    {
+      "module": "calc-electrical.js",
+      "match": "(C)",
+      "family": "NEC/IEEE electrical",
+      "justification": "NEC 310/table ambients and conductor ratings are published in deg C columns."
+    },
+    {
+      "module": "calc-electrical.js",
+      "match": "(deg C)",
+      "family": "NEC/IEEE electrical",
+      "justification": "ICEA P-32-382 conductor short-circuit limits are published in deg C."
+    },
+    {
+      "module": "calc-lab.js",
+      "match": "",
+      "family": "lab and IH practice",
+      "justification": "US lab practice is SI throughout: mL, uL, mg, g/mol, M, g/mL, cm cuvette paths, mm rotors."
+    },
+    {
+      "module": "calc-kitchen.js",
+      "match": "(g",
+      "family": "lab and IH practice",
+      "justification": "Baker's percentage and equilibrium-cure recipes are written in grams in US kitchens."
+    },
+    {
+      "module": "calc-field.js",
+      "match": "Easting (m)",
+      "family": "standards defined in SI",
+      "justification": "UTM easting/northing are defined in meters (USGS quads print meters)."
+    },
+    {
+      "module": "calc-field.js",
+      "match": "Northing (m)",
+      "family": "standards defined in SI",
+      "justification": "UTM easting/northing are defined in meters."
+    },
+    {
+      "module": "calc-field.js",
+      "match": "(km, WMM",
+      "family": "standards defined in SI",
+      "justification": "The World Magnetic Model takes altitude in km."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Link length (m)",
+      "family": "standards defined in SI",
+      "justification": "TIA-568 defines the 90 m permanent link / 100 m channel in meters."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Permanent-link length (m)",
+      "family": "standards defined in SI",
+      "justification": "TIA-568 permanent link is specified in meters."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "cords (m)",
+      "family": "standards defined in SI",
+      "justification": "TIA-568 cord budgets are specified in meters."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "dB/km",
+      "family": "standards defined in SI",
+      "justification": "Fiber attenuation is specified in dB/km on every datasheet."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "cable temperature (deg C)",
+      "family": "standards defined in SI",
+      "justification": "TIA-568 temperature derating tables are published in deg C."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Sensor width (mm",
+      "family": "product/spec conventions",
+      "justification": "Camera sensor formats and lens focal lengths are sold in mm."
+    },
+    {
+      "module": "calc-lowvoltage.js",
+      "match": "Focal length (mm)",
+      "family": "product/spec conventions",
+      "justification": "Lens focal lengths are sold in mm."
+    },
+    {
+      "module": "calc-layout.js",
+      "match": "Metric pitch (mm)",
+      "family": "product/spec conventions",
+      "justification": "Metric thread pitch is the product spec on the box."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Metric pitch (mm)",
+      "family": "product/spec conventions",
+      "justification": "Metric thread pitch is the product spec on the box."
+    },
+    {
+      "module": "calc-shop.js",
+      "match": "Thread pitch (mm, metric)",
+      "family": "product/spec conventions",
+      "justification": "The tile's metric-thread entry path; US pitch field sits beside it."
+    },
+    {
+      "module": "calc-mechanic.js",
+      "match": "Pad thickness (mm)",
+      "family": "product/spec conventions",
+      "justification": "Brake pad thickness is published and measured in mm in US shops."
+    },
+    {
+      "module": "calc-mechanic.js",
+      "match": "Wear rate (mm/kJ",
+      "family": "product/spec conventions",
+      "justification": "Pad wear-rate shop data rides the mm pad-thickness convention."
+    },
+    {
+      "module": "calc-mechanic.js",
+      "match": "Offset ET (mm",
+      "family": "product/spec conventions",
+      "justification": "Wheel offset is stamped ET in mm on the wheel itself."
+    },
+    {
+      "module": "calc-stage.js",
+      "match": "Pixel pitch (mm)",
+      "family": "product/spec conventions",
+      "justification": "LED panel pixel pitch is sold in mm."
+    },
+    {
+      "module": "calc-solar.js",
+      "match": "temp (C)",
+      "family": "power and billing (solar datasheet)",
+      "justification": "Module datasheets publish record temps and coefficients in deg C."
+    },
+    {
+      "module": "calc-solar.js",
+      "match": "temperature (C)",
+      "family": "power and billing (solar datasheet)",
+      "justification": "Cell/ambient temperature model inputs are datasheet deg C."
+    },
+    {
+      "module": "calc-solar.js",
+      "match": "NOCT (C",
+      "family": "power and billing (solar datasheet)",
+      "justification": "NOCT is a datasheet deg C value."
+    },
+    {
+      "module": "calc-solar.js",
+      "match": "%/C",
+      "family": "power and billing (solar datasheet)",
+      "justification": "Power temperature coefficients are datasheet %/deg C."
+    },
+    {
+      "module": "calc-solar.js",
+      "match": "kWh/m2/day",
+      "family": "power and billing (solar datasheet)",
+      "justification": "Peak-sun-hours insolation data is published in kWh/m2/day (NREL)."
+    },
+    {
+      "module": "calc-solar.js",
+      "match": "W/m^2",
+      "family": "power and billing (solar datasheet)",
+      "justification": "Plane-of-array irradiance is published in W/m^2."
+    },
+    {
+      "module": "calc-restoration.js",
+      "match": "spores/m^3",
+      "family": "lab and IH practice",
+      "justification": "Spore-trap lab reports count spores per cubic meter."
+    },
+    {
+      "module": "calc-restoration.js",
+      "match": "Pump flow (L/min",
+      "family": "lab and IH practice",
+      "justification": "Air-sampling pumps are calibrated in L/min."
+    },
+    {
+      "module": "calc-restoration.js",
+      "match": "per cassette (L)",
+      "family": "lab and IH practice",
+      "justification": "Sampling cassette volumes are specified in liters."
+    },
+    {
+      "module": "calc-restoration.js",
+      "match": "Filter capacity (g)",
+      "family": "product/spec conventions",
+      "justification": "Carbon filter adsorption capacity is published in grams on the product sheet."
+    },
+    {
+      "module": "calc-agriculture.js",
+      "match": "Particle density (g/cc)",
+      "family": "lab and IH practice",
+      "justification": "Soil particle density is quoted in g/cc (2.65) in US soils practice and every geotech lab report."
+    },
+    {
+      "module": "calc-concrete.js",
+      "match": "(l/",
+      "family": "not metric",
+      "justification": "ACI 318 minimum-thickness span ratios l/20..l/28 (l = span), not liters."
+    },
+    {
+      "module": "calc-concrete.js",
+      "match": "(l / denominator)",
+      "family": "not metric",
+      "justification": "Span ratio result line (l = span), not liters."
+    },
+    {
+      "module": "calc-elecdesign.js",
+      "match": "Surface layer thickness hs (m)",
+      "family": "NEC/IEEE electrical",
+      "justification": "IEEE Std 80 step/touch equations take the crushed-rock layer hs in meters as published."
+    },
+    {
+      "module": "calc-kitchen.js",
+      "match": "Bottle size (mL)",
+      "family": "product/spec conventions",
+      "justification": "US beverage bottles are labeled in mL (750 mL)."
+    },
+    {
+      "module": "calc-realestate.js",
+      "match": "policy (C)",
+      "family": "not metric",
+      "justification": "Loan Estimate section C (services you can shop for), not Celsius."
+    },
+    {
+      "module": "calc-service.js",
+      "match": "220.61(C)",
+      "family": "not metric",
+      "justification": "NEC subsection letter in a code citation, not Celsius."
+    },
+    {
+      "module": "calc-water.js",
+      "match": "Water temperature (C; 0.5 - 25)",
+      "family": "water/wastewater operations",
+      "justification": "SWTR CT tables are published against deg C water temperature."
+    },
+    {
+      "module": "calc-field.js",
+      "match": "Distance (km)",
+      "family": "secondary output (spec-v593 section 1)",
+      "justification": "lightning-countdown secondary metric output line; the primary Distance (mi) output line precedes it -- the sanctioned US-primary + metric-secondary pattern."
+    }
+  ]
+}

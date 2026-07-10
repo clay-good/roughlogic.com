@@ -122,13 +122,13 @@ export const langelierIndexExample = { inputs: { ph: 7.5, temp: 25, temp_unit: "
 function renderLangelierIndex(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Langelier (1936) saturation index as standardized in Standard Methods for the Examination of Water and Wastewater (APHA/AWWA/WEF) and AWWA practice, by name; method cited, not reproduced. The user supplies measured water-quality values. LSI predicts tendency, not rate.";
   const ph = makeNumber("pH", "lsi-ph", { step: "any", min: "0", value: "7.5" }); ph.input.value = "7.5";
-  const temp = makeNumber("Water temperature", "lsi-temp", { step: "any", value: "25" }); temp.input.value = "25";
-  const unit = makeSelect("Temp unit", "lsi-unit", [{ value: "C", label: "Celsius", selected: true }, { value: "F", label: "Fahrenheit" }]);
+  const temp = makeNumber("Water temperature", "lsi-temp", { step: "any", value: "77" }); temp.input.value = "77";
+  const unit = makeSelect("Temp unit", "lsi-unit", [{ value: "F", label: "Fahrenheit", selected: true }, { value: "C", label: "Celsius" }]);
   const ca = makeNumber("Calcium hardness (mg/L CaCO3)", "lsi-ca", { step: "any", min: "0", value: "200" }); ca.input.value = "200";
   const alk = makeNumber("Total alkalinity (mg/L CaCO3)", "lsi-alk", { step: "any", min: "0", value: "150" }); alk.input.value = "150";
   const tds = makeNumber("TDS (mg/L)", "lsi-tds", { step: "any", min: "0", value: "320" }); tds.input.value = "320";
   for (const f of [ph, temp, unit, ca, alk, tds]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { ph.input.value = "7.5"; temp.input.value = "25"; unit.select.value = "C"; ca.input.value = "200"; alk.input.value = "150"; tds.input.value = "320"; update(); });
+  attachExampleButton(inputRegion, () => { ph.input.value = "7.5"; temp.input.value = "77"; unit.select.value = "F"; ca.input.value = "200"; alk.input.value = "150"; tds.input.value = "320"; update(); });
   const oLSI = makeOutputLine(outputRegion, "LSI", "lsi-out-lsi");
   const oInterp = makeOutputLine(outputRegion, "Interpretation", "lsi-out-int");
   const oNote = makeOutputLine(outputRegion, "Note", "lsi-out-note");
@@ -696,22 +696,43 @@ export function computeFlocculationGValue({ power_input_w = 0, basin_volume_m3 =
     note: "G depends on the water temperature through viscosity, so cold water yields a LOWER G for the same paddle power and can drop flocculation below the 20-per-second floor. Too high a G in the flocculation basin shears the floc apart - the reason rapid mix (G 500-1,000) and flocculation (G 20-70) are staged, not merged. Gt characterizes the whole basin (10^4 to 10^5 typical). The viscosity is taken from a water-property table at the given temperature; the treatment-process design governs.",
   };
 }
+// Correlation-native (SI) example -- the Camp-Stein compute keeps this signature
+// and the test fixtures stay in this form.
 export const flocculationGValueExample = { inputs: { power_input_w: 300, basin_volume_m3: 100, water_temp_c: 10, detention_time_s: 1200 } };
+// spec-v593: the USER-FACING fields are hp / gallons / deg F, converted to the
+// correlation's native W / m^3 / deg C at the renderer boundary. The math and
+// citation above stay metric-native; the SI equivalents are echoed as an output
+// line so the metric entry path stays one read away.
+const _FGV_W_PER_HP = 745.699872;
+const _FGV_M3_PER_GAL = 0.003785411784;
 const renderFlocculationGValue = _rPool({
   citation: "Citation: Camp-Stein velocity gradient (Camp & Stein; Ten States Standards), by name. G = sqrt(P / (mu x V)); Gt = G x detention_time; mu is water dynamic viscosity at the given temperature. Bands: rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5. Cold water is more viscous, so the same paddle delivers a lower G in winter; too high a G in flocculation shears the floc. The treatment-process design governs.",
-  example: flocculationGValueExample.inputs,
+  example: { power_input_hp: 0.4, basin_volume_gal: 26400, water_temp_f: 50, detention_time_s: 1200 },
   fields: [
-    { key: "power_input_w", label: "Net power to the water P (W)", kind: "number" },
-    { key: "basin_volume_m3", label: "Mixing basin volume V (m^3)", kind: "number" },
-    { key: "water_temp_c", label: "Water temperature (C)", kind: "number", default: 15 },
+    { key: "power_input_hp", label: "Net power to the water P (hp)", kind: "number" },
+    { key: "basin_volume_gal", label: "Mixing basin volume V (gal)", kind: "number" },
+    { key: "water_temp_f", label: "Water temperature (F)", kind: "number", default: 59 },
     { key: "detention_time_s", label: "Detention time (s)", kind: "number" },
   ],
   outputs: [
     { key: "g", id: "fgv-out-g", label: "Velocity gradient G", value: (r) => fmt(r.g_value, 0) + " /s - " + r.band },
     { key: "gt", id: "fgv-out-gt", label: "Gt product", value: (r) => fmt(r.gt_value, 0) + " (mu " + r.mu.toFixed(6) + " Pa-s)" },
+    { key: "si", id: "fgv-out-si", label: "SI equivalents", value: (r) => "P " + fmt(r.power_input_w, 1) + " W, V " + fmt(r.basin_volume_m3, 1) + " m^3, T " + fmt(r.water_temp_c, 1) + " C" },
     { key: "n", id: "fgv-out-n", label: "Note", value: (r) => r.note },
   ],
-  compute: computeFlocculationGValue,
+  compute: (inp = {}) => {
+    const hp = Number(inp.power_input_hp) || 0;
+    const gal = Number(inp.basin_volume_gal) || 0;
+    const tF = Number(inp.water_temp_f);
+    if (!(hp > 0 && Number.isFinite(hp))) return { error: "Power input must be positive (hp)." };
+    if (!(gal > 0 && Number.isFinite(gal))) return { error: "Basin volume must be positive (gal)." };
+    if (!Number.isFinite(tF) || tF < 32 || tF > 104) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
+    const power_input_w = hp * _FGV_W_PER_HP;
+    const basin_volume_m3 = gal * _FGV_M3_PER_GAL;
+    const water_temp_c = (tF - 32) * 5 / 9;
+    const r = computeFlocculationGValue({ power_input_w, basin_volume_m3, water_temp_c, detention_time_s: inp.detention_time_s });
+    return r.error ? r : Object.assign({ power_input_w, basin_volume_m3, water_temp_c }, r);
+  },
 });
 TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
 

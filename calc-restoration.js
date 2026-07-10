@@ -287,18 +287,20 @@ export function renderPsychrometric(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: August-Roche-Magnus saturation vapor pressure approximation; standard psychrometric definitions.";
   const T = makeNumber("Temperature (F)", "py-t", { step: "any" });
   const RH = makeNumber("Relative humidity (percent)", "py-rh", { step: "any", min: "0", max: "100" });
-  const P = makeNumber("Atmospheric pressure (hPa)", "py-p", { step: "any", min: "800", max: "1200", value: "1013.25" });
-  P.input.value = "1013.25";
+  // v593: US-facing in Hg field, converted at this boundary into the hPa-native
+  // compute (29.92 in Hg = 1013.21 hPa; 1 in Hg = 33.8638866667 hPa).
+  const P = makeNumber("Atmospheric pressure (in Hg)", "py-p", { step: "any", min: "23.6", max: "35.5", value: "29.92" });
+  P.input.value = "29.92";
   for (const f of [T, RH, P]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { T.input.value = "75"; RH.input.value = "50"; P.input.value = "1013.25"; update(); });
+  attachExampleButton(inputRegion, () => { T.input.value = "75"; RH.input.value = "50"; P.input.value = "29.92"; update(); });
   const oDP = makeOutputLine(outputRegion, "Dew point", "py-out-dp");
   const oGP = makeOutputLine(outputRegion, "Grains per pound", "py-out-gp");
   const oVP = makeOutputLine(outputRegion, "Vapor pressure", "py-out-vp");
   const update = debounce(() => {
-    const r = computePsychrometric({ temperature_F: Number(T.input.value) || 0, RH_percent: Number(RH.input.value) || 0, atmospheric_pressure_hPa: Number(P.input.value) || 1013.25 });
+    const r = computePsychrometric({ temperature_F: Number(T.input.value) || 0, RH_percent: Number(RH.input.value) || 0, atmospheric_pressure_hPa: (Number(P.input.value) || 29.92) * 33.8638866667 });
     oDP.textContent = fmt(r.dew_point_F, 1) + " F";
     oGP.textContent = fmt(r.GPP, 1);
-    oVP.textContent = fmt(r.vapor_pressure_hPa, 2) + " hPa";
+    oVP.textContent = fmt(r.vapor_pressure_hPa / 33.8638866667, 3) + " in Hg (" + fmt(r.vapor_pressure_hPa, 2) + " hPa)";
   }, DEBOUNCE_MS);
   for (const el of [T.input, RH.input, P.input]) el.addEventListener("input", update);
 }

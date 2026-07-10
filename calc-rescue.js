@@ -254,20 +254,20 @@ export const searchTrackSpacingExample = { inputs: { sweep_width_m: 100, track_s
 function renderSearchTrackSpacing(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Notice: The incident commander and search plan govern all SAR operations. Citation: NSARC / USCG search theory (exponential detection model) by name. coverage = W / S; POD = 1 - e^(-coverage); spacing = W / (-ln(1 - target_POD)). The sweep width must be corrected for weather, fatigue, terrain, and speed. The random-search model is conservative; parallel-track sweeps reach higher POD at the same coverage.";
   _aeF(inputRegion, () => fillExample(searchTrackSpacingExample.inputs));
-  const w = _mnF("Corrected sweep width W (m)", "sts-w", { step: "any", min: "0" });
-  const s = _mnF("Track spacing S (m, 0 = solve from target POD)", "sts-s", { step: "any", min: "0" });
+  const w = _mnF("Corrected sweep width W (ft)", "sts-w", { step: "any", min: "0" });
+  const s = _mnF("Track spacing S (ft, 0 = solve from target POD)", "sts-s", { step: "any", min: "0" });
   const t = _mnF("Target single-pass POD (0-1, used when spacing is 0)", "sts-t", { step: "any", min: "0", max: "1" });
   for (const f of [w, s, t]) inputRegion.appendChild(f.wrap);
   const oC = _moF(outputRegion, "Coverage", "sts-out-c");
   const oP = _moF(outputRegion, "Single-pass POD", "sts-out-p");
   const oS = _moF(outputRegion, "Spacing for target POD", "sts-out-s");
-  function fillExample(x) { w.input.value = x.sweep_width_m; s.input.value = x.track_spacing_m; t.input.value = x.target_pod; update(); }
+  function fillExample(x) { w.input.value = (x.sweep_width_m * 3.280839895).toFixed(1); s.input.value = (x.track_spacing_m * 3.280839895).toFixed(1); t.input.value = x.target_pod; update(); }
   const update = _debF(() => {
-    const r = computeSearchTrackSpacing({ sweep_width_m: Number(w.input.value) || 0, track_spacing_m: Number(s.input.value) || 0, target_pod: Number(t.input.value) || 0 });
+    const r = computeSearchTrackSpacing({ sweep_width_m: (Number(w.input.value) || 0) * 0.3048, track_spacing_m: (Number(s.input.value) || 0) * 0.3048, target_pod: Number(t.input.value) || 0 });
     if (r.error) { oC.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; return; }
     oC.textContent = r.coverage !== null ? _fmtF(r.coverage, 2) : "- (enter a track spacing)";
     oP.textContent = r.pod !== null ? _fmtF(r.pod * 100, 1) + "%" : "-";
-    oS.textContent = r.spacing_for_pod_m !== null ? _fmtF(r.spacing_for_pod_m, 1) + " m" : "- (enter a target POD)";
+    oS.textContent = r.spacing_for_pod_m !== null ? _fmtF(r.spacing_for_pod_m * 3.280839895, 1) + " ft" : "- (enter a target POD)";
   }, _DF);
   for (const el of [w.input, s.input, t.input]) el.addEventListener("input", update);
 }

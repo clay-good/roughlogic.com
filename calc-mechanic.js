@@ -564,9 +564,12 @@ const renderBrakePadLife = _simpleRenderer({
     { key: "pad_set_cost_usd", label: "Pad-set cost ($, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
-    { key: "ke", id: "bp-out-ke", label: "KE per stop", value: (r) => fmt(r.ke_kJ, 1) + " kJ" },
-    { key: "tr", id: "bp-out-tr", label: "Rotor temp rise per stop", value: (r) => fmt(r.rotor_temp_rise_C, 1) + " C" },
-    { key: "w", id: "bp-out-w", label: "Wear per stop", value: (r) => fmt(r.wear_per_stop_mm * 1000, 3) + " micrometres" },
+    // spec-v593: primary outputs restated US-customary (1 kJ = 737.562149 ft-lb;
+    // a rise of X deg C = X x 9/5 deg F rise; 1 mm = 39.3700787 mils); metric
+    // stays as the parenthetical. Compute unchanged.
+    { key: "ke", id: "bp-out-ke", label: "KE per stop", value: (r) => fmt(r.ke_kJ * 737.562149, 0) + " ft-lb (" + fmt(r.ke_kJ, 1) + " kJ)" },
+    { key: "tr", id: "bp-out-tr", label: "Rotor temp rise per stop", value: (r) => r.rotor_temp_rise_C === null ? "-" : fmt(r.rotor_temp_rise_C * 9 / 5, 1) + " deg F (" + fmt(r.rotor_temp_rise_C, 1) + " deg C)" },
+    { key: "w", id: "bp-out-w", label: "Wear per stop", value: (r) => fmt(r.wear_per_stop_mm * 39.3700787, 3) + " mils (" + fmt(r.wear_per_stop_mm * 1000, 3) + " um)" },
     { key: "m", id: "bp-out-m", label: "Estimated pad life", value: (r) => Number.isFinite(r.miles_until_worn) ? fmt(r.miles_until_worn, 0) + " mi" : "n/a" },
     { key: "ax", id: "bp-out-ax", label: "Per-axle life (front bias)", value: (r) => Number.isFinite(r.front_miles_until_worn) ? "front " + fmt(r.front_miles_until_worn, 0) + " mi / rear " + fmt(r.rear_miles_until_worn, 0) + " mi" : "n/a" },
     { key: "c", id: "bp-out-c", label: "Cost per 100k mi (if $/set supplied)", value: (r) => r.cost_per_100k_miles_usd === null ? "-" : "$" + fmt(r.cost_per_100k_miles_usd, 2) + " / 100,000 mi" },
@@ -1665,22 +1668,32 @@ export function computeDynoCorrectionSae({ observed_hp = 0, baro_mbar = 0, air_t
 }
 export const dynoCorrectionSaeExample = { inputs: { observed_hp: 400, baro_mbar: 980, air_temp_c: 30, humidity_pct: 0 } };
 
+// spec-v593: the tile faces the US user in in Hg / deg F and converts at the
+// renderer boundary to the metric reference the J1349 correlation is published
+// in (1 in Hg = 33.8638866667 mbar; deg C = (deg F - 32) x 5/9). The compute
+// keeps its metric-native signature; fixtures stay correlation-native.
+const _DCS_MBAR_PER_INHG = 33.8638866667;
 MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
   citation: "Citation: SAE J1349 dyno correction factor (STD per SAE J607): P_dry = baro - vapor(temp, RH); CF = 1.18 x (990 / P_dry_mbar) x sqrt((temp_C + 273)/298) - 0.18; corrected = observed x CF. Corrects to a standard dry day; the pressure must be dry (vapor removed); valid ~15-35 C, 900-1050 mbar; STD (J607) runs ~4% higher. A comparison aid; the dyno and correction basis govern.",
-  example: dynoCorrectionSaeExample.inputs,
+  example: { observed_hp: 400, baro_inhg: 28.94, air_temp_f: 86, humidity_pct: 0 },
   fields: [
     { key: "observed_hp", label: "Observed power (hp)", kind: "number", default: 400 },
-    { key: "baro_mbar", label: "Barometric pressure (mbar, absolute)", kind: "number", default: 980 },
-    { key: "air_temp_c", label: "Inlet air temperature (deg C)", kind: "number", default: 30 },
+    { key: "baro_inhg", label: "Barometric pressure (in Hg, absolute)", kind: "number", default: 28.94 },
+    { key: "air_temp_f", label: "Inlet air temperature (deg F)", kind: "number", default: 86 },
     { key: "humidity_pct", label: "Relative humidity (%)", kind: "number", default: 0 },
   ],
   outputs: [
-    { key: "pd", id: "dcs-out-pd", label: "Dry pressure (vapor removed)", value: (r) => fmt(r.p_dry_mbar, 1) + " mbar" },
-    { key: "cf", id: "dcs-out-cf", label: "SAE J1349 correction factor", value: (r) => fmt(r.cf, 4) + (r.in_window ? "" : " -- OUTSIDE the 15-35 C / 900-1050 mbar validity window") },
+    { key: "pd", id: "dcs-out-pd", label: "Dry pressure (vapor removed)", value: (r) => fmt(r.p_dry_mbar / _DCS_MBAR_PER_INHG, 2) + " in Hg (" + fmt(r.p_dry_mbar, 1) + " mbar)" },
+    { key: "cf", id: "dcs-out-cf", label: "SAE J1349 correction factor", value: (r) => fmt(r.cf, 4) + (r.in_window ? "" : " -- OUTSIDE the 59-95 F / 26.6-31.0 in Hg validity window") },
     { key: "cp", id: "dcs-out-cp", label: "Corrected power (SAE)", value: (r) => fmt(r.corrected_hp, 1) + " hp" },
     { key: "n", id: "dcs-out-n", label: "Note", value: (r) => r.note },
   ],
-  compute: computeDynoCorrectionSae,
+  compute: (p) => computeDynoCorrectionSae({
+    observed_hp: p.observed_hp,
+    baro_mbar: p.baro_inhg * _DCS_MBAR_PER_INHG,
+    air_temp_c: (p.air_temp_f - 32) * 5 / 9,
+    humidity_pct: p.humidity_pct,
+  }),
 });
 
 // ===================== spec-v516: aircraft weight and balance (CG envelope) =====================

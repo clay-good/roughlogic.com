@@ -1977,7 +1977,7 @@ cross-check.
 | calc-geotech.js | `computeConsolidationTimeRate` | `{ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeFootingEccentricPressure` | `{ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeLateralEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
-| calc-geotech.js | `computeLiquefactionScreening` | `{ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_m = 0, crr = 0, msf = ...` | _ | _ | _ |
+| calc-geotech.js | `computeLiquefactionScreening` | `{ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf =...` | _ | _ | _ |
 | calc-geotech.js | `computePileAxialCapacity` | `{ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computePileGroupEfficiency` | `{ rows_n = 0, cols_m = 0, diameter_in = 0, spacing_in = 0, single_allow_kip =...` | _ | _ | _ |
 | calc-geotech.js | `computeRetainingWallStability` | `{ h_ft = 0, b_ft = 0, t_base = 0, t_stem = 0, toe_ft = 0, gamma_s = 110, gamm...` | _ | _ | _ |

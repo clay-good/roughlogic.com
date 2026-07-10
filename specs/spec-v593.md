@@ -1,7 +1,18 @@
 # roughlogic.com Specification v593 -- US-Customary Defaults Everywhere (13 Tile Remediations + check-us-defaults Gate, 0 New Tiles)
 
-> **Status: PROPOSED (2026-07-10). Platform/policy spec.** No new tile, module, or dependency. Inherits spec.md through
+> **Status: LANDED (2026-07-10, package 0.180.0). Platform/policy spec.** No new tile, module, or dependency. Inherits spec.md through
 > spec-v592.md.
+>
+> **As-landed deltas.** (1) The gate scans three label surfaces, not one: direct make* calls, per-module ALIASES (any
+> `fn("Label", "dom-id")` call shape -- search-track-spacing renders via `_mnF` and evaded the named-function scan), and
+> factory `label:` field specs (5 of the 13 audit tiles are factory-rendered). (2) Pre-remediation red = **20 findings
+> across 11 tiles**; brake-pad-life and wallpaper-rolls are value-level cases the §4 honest-scope paragraph already
+> exempts. (3) The allowlist landed at 47 entries and also carries not-actually-metric waivers the audit table did not
+> anticipate: NEC subsection letters "220.61(C)", Loan Estimate section "(C)", ACI span ratios "(l/20)", and seismic
+> acceleration "(g)". (4) Remediation followed the §3 mechanics exactly: only liquefaction-screening changed its compute
+> signature (depth_ft; fixtures, fuzzer pins, corpus, citation formula/editionNote, and tools-data desc all restated;
+> per-foot rd verified against per-meter to 2e-12); the other twelve convert at the renderer boundary with fixtures
+> staying correlation-native.
 >
 > **The gap, and the evidence for it.** Every spec since v106 carries the line *"US standards only,"* but nothing in the
 > tree defines what that means for units, and nothing enforces it. A full-catalog audit (2026-07-10, all 56 calc

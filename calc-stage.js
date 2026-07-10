@@ -415,19 +415,21 @@ function renderTrussCapacity(inputRegion, outputRegion, citationEl) {
 
 const renderTimeAlignment = _r({
   citation: "Citation: Public speed-of-sound formula c (m/s) = 331.3 + 0.606 * T_C. Haas-window 10-30 ms keeps image at the stage.",
-  example: timeAlignmentExample.inputs,
+  // v593: US-facing deg F field; converted to deg C at the boundary for the
+  // published speed-of-sound form (71.6 F = 22 C, matching the metric fixture).
+  example: { ...timeAlignmentExample.inputs, ambient_F: 71.6 },
   fields: [
     { key: "d_main_ft", label: "Distance from mains (ft)", kind: "number" },
     { key: "d_delay_ft", label: "Distance from delay (ft)", kind: "number" },
-    { key: "ambient_C", label: "Ambient temp (C)", kind: "number", default: 20 },
+    { key: "ambient_F", label: "Ambient temp (F)", kind: "number", default: 68 },
     { key: "haas_offset_ms", label: "Haas offset (ms)", kind: "number", default: 15 },
   ],
   outputs: [
-    { key: "c", id: "ta-out-c", label: "Speed of sound", value: (r) => fmt(r.c_m_s, 1) + " m/s" },
+    { key: "c", id: "ta-out-c", label: "Speed of sound", value: (r) => fmt(r.c_m_s / 304.8, 2) + " ft/ms (" + fmt(r.c_m_s, 1) + " m/s)" },
     { key: "d", id: "ta-out-d", label: "Time difference", value: (r) => fmt(r.ms_difference, 2) + " ms" },
     { key: "r", id: "ta-out-r", label: "Recommended delay", value: (r) => fmt(r.recommended_delay_ms, 1) + " ms" },
   ],
-  compute: computeTimeAlignment,
+  compute: (p) => computeTimeAlignment({ d_main_ft: p.d_main_ft, d_delay_ft: p.d_delay_ft, ambient_C: (p.ambient_F - 32) * 5 / 9, haas_offset_ms: p.haas_offset_ms }),
 });
 
 function renderDMX(inputRegion, outputRegion, citationEl) {
@@ -491,8 +493,9 @@ const renderSPL = _r({
   example: splExample.inputs,
   fields: [
     { key: "L1_dB", label: "SPL at reference (dB)", kind: "number" },
-    { key: "d1", label: "Reference distance (m)", kind: "number", default: 1 },
-    { key: "d2", label: "Target distance (m)", kind: "number" },
+    // v593: labeled ft; the compute uses only the d2/d1 ratio, so no conversion.
+    { key: "d1", label: "Reference distance (ft)", kind: "number", default: 1 },
+    { key: "d2", label: "Target distance (ft)", kind: "number" },
     { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
     { key: "n_sources", label: "Identical sources", kind: "number", default: 1 },
   ],
@@ -602,17 +605,17 @@ export function computeSPLAtmospheric({
   const T_C = Number(temperature_C);
   const RH = Number(RH_percent);
   const P = Number(pressure_kPa) || 101.325;
-  if (!(d1 > 0)) return { error: "Reference distance must be positive (m)." };
-  if (!(d2 > 0)) return { error: "Target distance must be positive (m)." };
+  if (!(d1 > 0)) return { error: "Reference distance must be positive." };
+  if (!(d2 > 0)) return { error: "Target distance must be positive." };
   if (d2 < d1) return { error: "Target distance must not be below the reference distance (the source SPL is defined at the reference distance)." };
-  if (!Number.isFinite(T_C)) return { error: "Temperature must be numeric (C)." };
+  if (!Number.isFinite(T_C)) return { error: "Temperature must be numeric." };
   if (!Number.isFinite(RH) || RH < 0 || RH > 100) return { error: "Relative humidity must be 0 - 100 percent." };
-  if (!(P > 0)) return { error: "Pressure must be positive (kPa)." };
+  if (!(P > 0)) return { error: "Pressure must be positive." };
   const T_K = T_C + 273.15;
   const h_r = RH / 100;
 
   const warnings = [];
-  if (T_C < -20 || T_C > 50) warnings.push("Temperature outside the -20 to 50 C ANSI S1.26 typical-validity range; coefficients become less accurate at the extremes.");
+  if (T_C < -20 || T_C > 50) warnings.push("Temperature outside the ANSI S1.26 typical-validity range (-4 to 122 F, i.e. -20 to 50 C); coefficients become less accurate at the extremes.");
 
   const inverse_square_dB = 20 * Math.log10(d2 / d1);
   const bands = SPL_OCTAVE_BANDS_HZ.map((f) => {
@@ -644,26 +647,29 @@ export const splAtmosphericExample = {
 function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Inverse-square law for far-field distance attenuation. Atmospheric absorption per ANSI S1.26-2014 (R2019) - per-octave-band alpha (dB/m) at the operator-supplied temperature / RH / pressure, applied multiplicatively over distance. For closed venues, room acoustics dominate over inverse-square. AHJ governs final coverage. Free at ansi.org for TOC.";
 
+  // v593: US-facing ft / deg F / in Hg fields, converted at this boundary into
+  // the metric-native ANSI S1.26 compute (3.28 ft ~ 1 m; 68 F = 20 C;
+  // 29.92 in Hg = 101.32 kPa).
   const spl = makeNumber("Source SPL at reference distance (dB)", "spa-spl", { step: "any" });
-  const dref = makeNumber("Reference distance (m; typically 1)", "spa-dref", { step: "any", min: "0", value: "1" });
-  dref.input.value = "1";
-  const dfar = makeNumber("Target distance (m)", "spa-dfar", { step: "any", min: "0" });
-  const tC = makeNumber("Air temperature (C)", "spa-t", { step: "any", value: "20" });
-  tC.input.value = "20";
+  const dref = makeNumber("Reference distance (ft; typically 3.28)", "spa-dref", { step: "any", min: "0", value: "3.28" });
+  dref.input.value = "3.28";
+  const dfar = makeNumber("Target distance (ft)", "spa-dfar", { step: "any", min: "0" });
+  const tF = makeNumber("Air temperature (F)", "spa-t", { step: "any", value: "68" });
+  tF.input.value = "68";
   const rh = makeNumber("Relative humidity (percent)", "spa-rh", { step: "any", min: "0", max: "100", value: "50" });
   rh.input.value = "50";
-  const p = makeNumber("Ambient pressure (kPa; default 101.325)", "spa-p", { step: "any", min: "0", value: "101.325" });
-  p.input.value = "101.325";
-  for (const f of [spl, dref, dfar, tC, rh, p]) inputRegion.appendChild(f.wrap);
+  const p = makeNumber("Ambient pressure (in Hg; default 29.92)", "spa-p", { step: "any", min: "0", value: "29.92" });
+  p.input.value = "29.92";
+  for (const f of [spl, dref, dfar, tF, rh, p]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
-    spl.input.value = "95"; dref.input.value = "1"; dfar.input.value = "30";
-    tC.input.value = "20"; rh.input.value = "50"; p.input.value = "101.325"; update();
+    spl.input.value = "95"; dref.input.value = "3.28"; dfar.input.value = "98.4";
+    tF.input.value = "68"; rh.input.value = "50"; p.input.value = "29.92"; update();
   });
 
   const oISL = makeOutputLine(outputRegion, "Inverse-square attenuation (dB)", "spa-out-isl");
   const oSPL = makeOutputLine(outputRegion, "Far-field SPL at 1 kHz (dB)", "spa-out-spl");
-  const oA = makeOutputLine(outputRegion, "Absorption at 1 kHz (dB total / alpha dB/m)", "spa-out-a");
+  const oA = makeOutputLine(outputRegion, "Absorption at 1 kHz (dB total / alpha)", "spa-out-a");
   const oBands = makeOutputLine(outputRegion, "Per-octave SPL (dB)", "spa-out-bands");
   const oW = makeOutputLine(outputRegion, "Notes", "spa-out-w");
 
@@ -673,13 +679,17 @@ function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
     return Number.isFinite(n) ? n : null;
   }
   const update = debounce(() => {
+    const dRefFt = readNum(dref.input);
+    const dFarFt = readNum(dfar.input);
+    const tempF = readNum(tF.input);
+    const inHg = readNum(p.input);
     const r = computeSPLAtmospheric({
       source_SPL_dB: readNum(spl.input),
-      d_ref_m: readNum(dref.input),
-      d_far_m: readNum(dfar.input),
-      temperature_C: readNum(tC.input),
+      d_ref_m: dRefFt === null ? null : dRefFt * 0.3048,
+      d_far_m: dFarFt === null ? null : dFarFt * 0.3048,
+      temperature_C: tempF === null ? null : (tempF - 32) * 5 / 9,
       RH_percent: readNum(rh.input),
-      pressure_kPa: readNum(p.input),
+      pressure_kPa: inHg === null ? null : inHg * 3.38638866667,
     });
     if (r.error) {
       oISL.textContent = r.error; oSPL.textContent = ""; oA.textContent = ""; oBands.textContent = ""; oW.textContent = "";
@@ -687,11 +697,11 @@ function renderSPLAtmospheric(inputRegion, outputRegion, citationEl) {
     }
     oISL.textContent = fmt(r.inverse_square_dB, 2) + " dB";
     oSPL.textContent = fmt(r.SPL_far_1kHz_dB, 2) + " dB";
-    oA.textContent = fmt(r.absorption_1kHz_dB, 2) + " dB (alpha " + fmt(r.alpha_1kHz_dB_per_m, 5) + " dB/m)";
+    oA.textContent = fmt(r.absorption_1kHz_dB, 2) + " dB (alpha " + fmt(r.alpha_1kHz_dB_per_m * 30.48, 4) + " dB/100 ft = " + fmt(r.alpha_1kHz_dB_per_m, 5) + " dB/m)";
     oBands.textContent = r.bands.map((b) => b.f_Hz + " Hz: " + fmt(b.SPL_far_dB, 1)).join(", ");
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);
-  for (const el of [spl.input, dref.input, dfar.input, tC.input, rh.input, p.input]) el.addEventListener("input", update);
+  for (const el of [spl.input, dref.input, dfar.input, tF.input, rh.input, p.input]) el.addEventListener("input", update);
 }
 
 STAGE_RENDERERS["spl-atmospheric"] = renderSPLAtmospheric;
@@ -933,7 +943,7 @@ export function computeAmpPowerSpl({ sensitivity_db, power_w, distance_m, crest_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (typeof sensitivity_db !== "number") return { error: "Enter speaker sensitivity (dB @ 1 W / 1 m)." };
   if (!(power_w > 0)) return { error: "Amplifier power must be greater than zero (W)." };
-  if (!(distance_m > 0)) return { error: "Listening distance must be greater than zero (m)." };
+  if (!(distance_m > 0)) return { error: "Listening distance must be greater than zero." };
   const spl_db = sensitivity_db + 10 * Math.log10(power_w) - 20 * Math.log10(distance_m);
   if (!Number.isFinite(spl_db)) return { error: "Computed SPL is not finite." };
   let peak_spl_db = null;
@@ -953,13 +963,15 @@ function renderAmpPowerSpl(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: First-principles loudspeaker SPL from the 1 W / 1 m sensitivity reference, the 10log power term, and the inverse-square distance term (public; ANSI S1.1 decibel basis). Free-field estimate, room gain and power compression and excursion limits not modeled, the manufacturer max-SPL spec governs.";
   const sens = makeNumber("Speaker sensitivity (dB @ 1 W / 1 m)", "aps-sens", { step: "any", value: "90" }); sens.input.value = "90";
   const power = makeNumber("Amplifier power per channel (W)", "aps-power", { step: "any", min: "0", value: "100" }); power.input.value = "100";
-  const dist = makeNumber("Listening distance (m)", "aps-dist", { step: "any", min: "0", value: "1" }); dist.input.value = "1";
+  // v593: US-facing ft field, converted at this boundary into the metric-native
+  // compute (3.28 ft ~ 1 m); the dB @ 1 W / 1 m sensitivity reference stays.
+  const dist = makeNumber("Listening distance (ft)", "aps-dist", { step: "any", min: "0", value: "3.28" }); dist.input.value = "3.28";
   const crest = makeNumber("Crest factor / headroom (dB; optional)", "aps-crest", { step: "any", value: "12" }); crest.input.value = "12";
   const target = makeNumber("Target SPL for inverse power (dB; optional)", "aps-target", { step: "any" });
   const maxSpl = makeNumber("Rated max SPL (dB; optional)", "aps-max", { step: "any", min: "0" });
   for (const f of [sens, power, dist, crest, target, maxSpl]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
-    sens.input.value = "90"; power.input.value = "100"; dist.input.value = "1"; crest.input.value = "12";
+    sens.input.value = "90"; power.input.value = "100"; dist.input.value = "3.28"; crest.input.value = "12";
     target.input.value = ""; maxSpl.input.value = ""; update();
   });
   const oSpl = makeOutputLine(outputRegion, "Continuous SPL at listener", "aps-out-spl");
@@ -967,10 +979,11 @@ function renderAmpPowerSpl(inputRegion, outputRegion, citationEl) {
   const oInv = makeOutputLine(outputRegion, "Power needed for target SPL", "aps-out-inv");
   function readNum(i) { if (i.value === "") return null; const n = Number(i.value); return Number.isFinite(n) ? n : null; }
   const update = debounce(() => {
+    const distFt = readNum(dist.input);
     const r = computeAmpPowerSpl({
       sensitivity_db: readNum(sens.input),
       power_w: readNum(power.input),
-      distance_m: readNum(dist.input),
+      distance_m: distFt === null ? null : distFt * 0.3048,
       crest_db: readNum(crest.input),
       target_spl_db: readNum(target.input),
       max_spl_db: readNum(maxSpl.input),
