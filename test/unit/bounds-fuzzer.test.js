@@ -19122,3 +19122,21 @@ test("bounds: spec-v585 computeChimneyDraft pins the Rankine draft, the net fact
   assert.ok("error" in _v585({ stack_height_ft: 30, ambient_temp_f: 400, mean_flue_temp_f: 400 }));
   assert.ok("error" in _v585({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: -500 }));
 });
+
+import { computeFlashGasSubcool as _v586 } from "../../calc-refrigerant.js";
+
+test("bounds: spec-v586 computeFlashGasSubcool pins the lift and total drops, the required subcooling, the friction-only under-count, and error seams", () => {
+  const r = _v586({ vertical_lift_ft: 40, friction_dp_psi: 15, static_gradient: 0.43, pt_slope: 5 });
+  assert.ok(Math.abs(r.dp_lift_psi - 17.2) < 1e-9); // 0.43*40
+  assert.ok(Math.abs(r.dp_total_psi - 32.2) < 1e-9);
+  assert.ok(Math.abs(r.required_subcool_f - 32.2 / 5) < 1e-9);
+  // Forgetting the lift (friction only) badly under-subcools.
+  const fricOnly = _v586({ vertical_lift_ft: 0, friction_dp_psi: 15, static_gradient: 0.43, pt_slope: 5 });
+  assert.ok(Math.abs(fricOnly.required_subcool_f - 3) < 1e-9);
+  assert.ok(r.required_subcool_f > 2 * fricOnly.required_subcool_f);
+  // Error seams: non-finite, negative lift / friction, non-positive slope.
+  assert.ok("error" in _v586({ vertical_lift_ft: Infinity, friction_dp_psi: 15 }));
+  assert.ok("error" in _v586({ vertical_lift_ft: -1, friction_dp_psi: 15 }));
+  assert.ok("error" in _v586({ vertical_lift_ft: 40, friction_dp_psi: -1 }));
+  assert.ok("error" in _v586({ vertical_lift_ft: 40, friction_dp_psi: 15, pt_slope: 0 }));
+});

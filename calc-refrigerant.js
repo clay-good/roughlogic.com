@@ -864,3 +864,51 @@ function _v434renderEvaporatorTdDtd(inputRegion, outputRegion, citationEl) {
   for (const f of [box, sst]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["evaporator-td-dtd"] = _v434renderEvaporatorTdDtd;
+
+// ===================== spec-v586 C: liquid-line subcooling to prevent flash gas =====================
+// dP_lift = static_gradient*lift. dP_total = dP_lift + friction. required_subcool = dP_total/pt_slope.
+// dims: in { vertical_lift_ft: L, friction_dp_psi: M L^-1 T^-2, static_gradient: dimensionless, pt_slope: dimensionless } out: { dp_lift_psi: M L^-1 T^-2, dp_total_psi: M L^-1 T^-2, required_subcool_f: T }
+export function computeFlashGasSubcool({ vertical_lift_ft = 0, friction_dp_psi = 0, static_gradient = 0.43, pt_slope = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const lift = Number(vertical_lift_ft) || 0;
+  const friction = Number(friction_dp_psi) || 0;
+  const grad = Number(static_gradient) || 0;
+  const slope = Number(pt_slope) || 0;
+  if (lift < 0) return { error: "Vertical lift cannot be negative (ft)." };
+  if (friction < 0) return { error: "Friction pressure drop cannot be negative (psi)." };
+  if (grad < 0) return { error: "Static gradient cannot be negative (psi/ft)." };
+  if (!(slope > 0)) return { error: "Pressure-temperature slope must be positive (psi/degF)." };
+  const dp_lift_psi = grad * lift;
+  const dp_total_psi = dp_lift_psi + friction;
+  const required_subcool_f = dp_total_psi / slope;
+  const meets_target = required_subcool_f >= 8 && required_subcool_f <= 12;
+  return {
+    dp_lift_psi, dp_total_psi, required_subcool_f, meets_target,
+    note: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The 5 psi/degF P-T slope flattens at higher pressure (an approximation). Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
+  };
+}
+export const flashGasSubcoolExample = { inputs: { vertical_lift_ft: 40, friction_dp_psi: 15, static_gradient: 0.43, pt_slope: 5 } };
+function _v586renderFlashGasSubcool(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A design aid, not a commissioning measurement; the manufacturer data and the actual refrigerant govern. Citation: ASHRAE Refrigeration Handbook / refrigerant piping guides liquid-line subcooling to prevent flash gas, by name. dP_lift = static_gradient x lift (0.43 psi/ft R-410A liquid); dP_total = dP_lift + friction; required_subcool = dP_total / pt_slope (~5 psi/degF R-410A near condensing). Techs often forget the vertical-lift column that dominates on a tall riser; measure subcooling at the metering device, add margin to the 8-12 F field target.";
+  const lift = makeNumber("Vertical liquid lift (ft, evap above condenser)", "fgs-lift", { step: "any", min: "0", value: "40" }); lift.input.value = "40";
+  const friction = makeNumber("Liquid-line friction drop (psi)", "fgs-fric", { step: "any", min: "0", value: "15" }); friction.input.value = "15";
+  const grad = makeNumber("Static gradient (psi/ft, 0.43 R-410A liquid)", "fgs-grad", { step: "any", min: "0", value: "0.43" }); grad.input.value = "0.43";
+  const slope = makeNumber("P-T slope near condensing (psi/degF, ~5 R-410A)", "fgs-slope", { step: "any", min: "0", value: "5" }); slope.input.value = "5";
+  for (const f of [lift, friction, grad, slope]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lift.input.value = "40"; friction.input.value = "15"; grad.input.value = "0.43"; slope.input.value = "5"; update(); });
+  const oLift = makeOutputLine(outputRegion, "Static-lift pressure drop", "fgs-out-lift");
+  const oTotal = makeOutputLine(outputRegion, "Total pressure drop", "fgs-out-total");
+  const oSub = makeOutputLine(outputRegion, "Required subcooling", "fgs-out-sub");
+  const oNote = makeOutputLine(outputRegion, "Note", "fgs-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFlashGasSubcool({ vertical_lift_ft: readNum(lift.input), friction_dp_psi: readNum(friction.input), static_gradient: grad.input.value === "" ? 0.43 : readNum(grad.input), pt_slope: slope.input.value === "" ? 5 : readNum(slope.input) });
+    if (r.error) { oLift.textContent = r.error; oTotal.textContent = "-"; oSub.textContent = "-"; oNote.textContent = ""; return; }
+    oLift.textContent = fmt(r.dp_lift_psi, 1) + " psi";
+    oTotal.textContent = fmt(r.dp_total_psi, 1) + " psi";
+    oSub.textContent = fmt(r.required_subcool_f, 1) + " F minimum (add margin to 8-12 F target)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [lift, friction, grad, slope]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["flash-gas-subcool"] = _v586renderFlashGasSubcool;

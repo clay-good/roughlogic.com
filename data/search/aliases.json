@@ -19974,6 +19974,46 @@
       "kind": "industry"
     },
     {
+      "term": "flash gas",
+      "target": "flash-gas-subcool",
+      "kind": "industry"
+    },
+    {
+      "term": "liquid line subcooling",
+      "target": "flash-gas-subcool",
+      "kind": "redirect"
+    },
+    {
+      "term": "subcool vertical lift",
+      "target": "flash-gas-subcool",
+      "kind": "adjacent"
+    },
+    {
+      "term": "0.43 psi per foot",
+      "target": "flash-gas-subcool",
+      "kind": "adjacent"
+    },
+    {
+      "term": "liquid riser flash",
+      "target": "flash-gas-subcool",
+      "kind": "adjacent"
+    },
+    {
+      "term": "required subcooling",
+      "target": "flash-gas-subcool",
+      "kind": "redirect"
+    },
+    {
+      "term": "flash gas prevention",
+      "target": "flash-gas-subcool",
+      "kind": "industry"
+    },
+    {
+      "term": "liquid line pressure drop",
+      "target": "flash-gas-subcool",
+      "kind": "adjacent"
+    },
+    {
       "term": "insulation batts",
       "target": "insulation-batt-coverage",
       "kind": "industry"

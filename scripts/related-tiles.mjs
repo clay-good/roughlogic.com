@@ -1215,6 +1215,7 @@ const RELATED = {
   "walk-in-cooler-load": ["product-pull-down-load","evaporator-td-dtd","refrigeration-cop","condenser-heat-rejection"],
   "product-pull-down-load": ["walk-in-cooler-load","evaporator-td-dtd","refrigeration-cop","refrigerant-mass-flow"],
   "evaporator-td-dtd": ["approach-delta-t","superheat-subcool","walk-in-cooler-load","product-pull-down-load"],
+  "flash-gas-subcool": ["superheat-subcool", "refrigerant-velocity", "refrigerant-charge"],
   // spec-v323..v325 engine-build performance batch (Group K)
   "injector-size": ["volumetric-efficiency","displacement-cr","hp-from-torque"],
   "mean-piston-speed": ["displacement-cr","hp-from-torque","injector-size"],

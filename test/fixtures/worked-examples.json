@@ -46708,6 +46708,64 @@
    }
   },
   {
+   "tile_id": "flash-gas-subcool",
+   "source_publisher": "ASHRAE Refrigeration Handbook",
+   "source_title": "dP_lift = 0.43 x lift; required_subcool = (dP_lift + friction) / P-T slope",
+   "source_edition_or_year": "ASHRAE Refrigeration Handbook",
+   "source_section_or_page": "40 ft R-410A riser, 15 psi friction -> 17.2 psi lift, 32.2 psi total, 6.4 F required subcooling",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "vertical_lift_ft": 40,
+    "friction_dp_psi": 15,
+    "static_gradient": 0.43,
+    "pt_slope": 5
+   },
+   "outputs": {
+    "dp_lift_psi": {
+     "value": 17.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "dp_total_psi": {
+     "value": 32.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "required_subcool_f": {
+     "value": 6.44,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flash-gas-subcool",
+   "source_publisher": "ASHRAE Refrigeration Handbook",
+   "source_title": "crediting only friction badly under-subcools (forgetting the lift)",
+   "source_edition_or_year": "ASHRAE Refrigeration Handbook",
+   "source_section_or_page": "Counting only the 15 psi friction -> 3.0 F, less than half the true 6.4 F; the system flashes in the riser",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "vertical_lift_ft": 0,
+    "friction_dp_psi": 15,
+    "static_gradient": 0.43,
+    "pt_slope": 5
+   },
+   "outputs": {
+    "required_subcool_f": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "insulation-batt-coverage",
    "source_publisher": "manufacturer label",
    "source_title": "500 ft^2, R-13 batt (10.67 ft^2), 88 ft^2/bag -> 47 batts, 6 bags",

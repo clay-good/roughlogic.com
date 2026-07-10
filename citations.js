@@ -9904,6 +9904,17 @@ export const CITATIONS = {
       { name: "Property tables", value: "specific heats, freezing points, and latent heats from ASHRAE", source: "scope of this tile" },
     ],
   },
+  "flash-gas-subcool": {
+    formula: "dP_lift = static_gradient x vertical_lift_ft (0.43 psi/ft R-410A liquid); dP_total = dP_lift + friction_dp_psi; required_subcool = dP_total / pt_slope (about 5 psi/degF R-410A near condensing).",
+    edition: "ASHRAE Refrigeration Handbook / refrigerant piping guides liquid-line subcooling to prevent flash gas, by name.",
+    freeAccess: "The flash-gas relations are standard refrigerant-piping design practice; the manufacturer data and the actual refrigerant govern the commissioning.",
+    governance: GOVERNANCE.general,
+    editionNote: "Techs often credit only the friction and forget the 0.43 psi/ft vertical-lift static column, which dominates on a tall riser. Liquid-line heat gain also flashes liquid. Subcooling should be measured at the metering device, not the condenser outlet. The 5 psi/degF P-T slope flattens at higher pressure (an approximation). Add margin to reach the 8 to 12 F field target. The manufacturer data and the actual refrigerant govern - a design aid, not a commissioning measurement.",
+    assumptions: [
+      { name: "Vertical-lift column", value: "the 0.43 psi/ft static gradient for R-410A liquid dominates on a tall riser and is the term techs forget", source: "ASHRAE Refrigeration Handbook" },
+      { name: "P-T slope", value: "about 5 psi/degF for R-410A near condensing; it flattens at higher pressure", source: "refrigerant piping guides" },
+    ],
+  },
   "evaporator-td-dtd": {
     formula: "DTD = box_temp - saturated_suction_temp; humidity band by DTD (<=10 F ~90% RH ... >16 F <70% RH).",
     edition: "The evaporator design temperature difference (DTD) and the resulting box-humidity bands, from refrigeration coil-selection practice, by name.",
