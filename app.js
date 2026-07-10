@@ -898,6 +898,8 @@ const TOOL_MODULES = (() => {
     "room-acoustics",
     // spec-v542
     "counterweight-arbor-load",
+    // spec-v543
+    "led-tape-run",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [

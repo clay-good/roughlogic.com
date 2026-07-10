@@ -681,6 +681,7 @@ export const COMPUTE_MAP = {
   "projector-brightness": { module: "../../calc-stage.js", fn: "computeProjectorBrightness" },
   "room-acoustics": { module: "../../calc-stage.js", fn: "computeRoomAcoustics" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", fn: "computeCounterweightArborLoad" },
+  "led-tape-run": { module: "../../calc-stage.js", fn: "computeLedTapeRun" },
   "pool-alkalinity-adjust": { module: "../../calc-treatment.js", fn: "computePoolAlkalinityAdjust" },
   "pool-cya-dose": { module: "../../calc-treatment.js", fn: "computePoolCyaDose" },
   "pool-salt-dose": { module: "../../calc-treatment.js", fn: "computePoolSaltDose" },

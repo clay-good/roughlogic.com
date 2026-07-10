@@ -5079,6 +5079,46 @@
       "kind": "redirect"
     },
     {
+      "term": "led tape",
+      "target": "led-tape-run",
+      "kind": "industry"
+    },
+    {
+      "term": "led strip voltage drop",
+      "target": "led-tape-run",
+      "kind": "industry"
+    },
+    {
+      "term": "led strip max run",
+      "target": "led-tape-run",
+      "kind": "industry"
+    },
+    {
+      "term": "constant voltage led",
+      "target": "led-tape-run",
+      "kind": "redirect"
+    },
+    {
+      "term": "psu sizing led",
+      "target": "led-tape-run",
+      "kind": "adjacent"
+    },
+    {
+      "term": "power injection led",
+      "target": "led-tape-run",
+      "kind": "adjacent"
+    },
+    {
+      "term": "led tape length",
+      "target": "led-tape-run",
+      "kind": "industry"
+    },
+    {
+      "term": "12v 24v led strip",
+      "target": "led-tape-run",
+      "kind": "redirect"
+    },
+    {
       "term": "pool alkalinity",
       "target": "pool-alkalinity-adjust",
       "kind": "industry"

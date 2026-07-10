@@ -7703,6 +7703,16 @@ export const CITATIONS = {
       { name: "Purchase ratio", value: "1:1 single, 2:1 double (double travels half the distance, needs twice the counterweight)", source: "theatrical rigging" },
     ],
   },
+  "led-tape-run": {
+    formula: "load = power_per_ft x length; psu = load / (1 - headroom); current = load / voltage; end_drop = current x (resistance_per_ft x length) / 2; end_voltage = voltage - end_drop.",
+    edition: "Constant-voltage LED strip loading and voltage drop, by name.",
+    freeAccess: "Standard low-voltage LED-strip loading relation; the strip datasheet governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "A single end-fed run dims and color-shifts at the far end because the copper trace drops voltage (12 V strips typically wall out around 16-20 ft, 24 V roughly double); oversizing the PSU does not fix the drop (power-inject or feed both ends instead); the drop uses the uniform-load approximation (half the full-current drop); the PSU wants about 20% headroom for inrush and lifespan. A planning aid, not the manufacturer's spec.",
+    assumptions: [
+      { name: "Uniform-load drop", value: "end-fed uniform load drops half the full-current voltage (current x R / 2)", source: "constant-voltage LED loading" },
+    ],
+  },
   "pool-alkalinity-adjust": {
     formula: "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",
     edition: "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name).",

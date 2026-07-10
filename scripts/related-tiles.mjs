@@ -882,6 +882,7 @@ const RELATED = {
   "projector-brightness": ["led-video-wall","lighting-beam","power-distro"],
   "room-acoustics": ["spl-distance","spl-atmospheric","decibel-converter"],
   "counterweight-arbor-load": ["truss-capacity","rigging-check","sling-angle"],
+  "led-tape-run": ["voltage-drop","power-distro","led-video-wall"],
   "pool-alkalinity-adjust": ["pool-turnover","langelier-index","pool-cya-dose"],
   "pool-cya-dose": ["pool-turnover","pool-alkalinity-adjust","pool-salt-dose"],
   "pool-salt-dose": ["pool-turnover","pool-cya-dose","langelier-index"],

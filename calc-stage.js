@@ -1286,3 +1286,54 @@ const renderCounterweightArborLoad = _r({
   compute: computeCounterweightArborLoad,
 });
 STAGE_RENDERERS["counterweight-arbor-load"] = renderCounterweightArborLoad;
+
+// --- spec-v543 N: LED tape PSU and voltage-drop run (`led-tape-run`) ---
+// load = W/ft x ft. psu = load/(1-headroom). end_drop = current x (R/ft x ft) / 2.
+// dims: in { power_per_ft_w: M L T^-3, run_length_ft: L, supply_voltage_v: M L^2 T^-3 I^-1, resistance_per_ft: dimensionless, headroom_pct: dimensionless, drop_tolerance_pct: dimensionless } out: { load_w: M L^2 T^-3, psu_w: M L^2 T^-3, end_voltage_v: M L^2 T^-3 I^-1 }
+export function computeLedTapeRun({ power_per_ft_w = 0, run_length_ft = 0, supply_voltage_v = 0, resistance_per_ft = 0, headroom_pct = 20, drop_tolerance_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ppf = Number(power_per_ft_w) || 0;
+  const len = Number(run_length_ft) || 0;
+  const volt = Number(supply_voltage_v) || 0;
+  const rpf = Number(resistance_per_ft) || 0;
+  const head = Number(headroom_pct) || 0;
+  const tol = Number(drop_tolerance_pct) || 0;
+  if (!(ppf > 0)) return { error: "Power per foot must be positive (W/ft)." };
+  if (!(len > 0)) return { error: "Run length must be positive (ft)." };
+  if (!(volt > 0)) return { error: "Supply voltage must be positive (V)." };
+  if (rpf < 0) return { error: "Resistance per foot must be non-negative." };
+  if (!(head >= 0 && head < 100)) return { error: "Headroom percent must be between 0 and 100." };
+  if (!(tol >= 0 && tol < 100)) return { error: "Drop tolerance percent must be between 0 and 100." };
+  const load_w = ppf * len;
+  const psu_w = load_w / (1 - head / 100);
+  const current_a = load_w / volt;
+  const end_drop_v = current_a * (rpf * len) / 2;
+  const end_voltage_v = volt - end_drop_v;
+  const drop_pct = end_drop_v / volt * 100;
+  const too_long = drop_pct > tol;
+  return {
+    load_w, psu_w, current_a, end_drop_v, end_voltage_v, drop_pct, too_long,
+    note: "A single end-fed run dims and color-shifts at the far end because the copper trace drops voltage (12 V strips typically wall out around 16-20 ft, 24 V roughly double). Oversizing the PSU does not fix the drop - power-inject or feed both ends instead. The drop uses the uniform-load approximation (half the full-current drop). The PSU wants about 20% headroom for inrush and lifespan. The strip datasheet governs.",
+  };
+}
+const ledTapeRunExample = { inputs: { power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: 0.05, headroom_pct: 20, drop_tolerance_pct: 10 } };
+const renderLedTapeRun = _r({
+  citation: "Notice: The strip datasheet governs; verify against the manufacturer's spec. Citation: constant-voltage LED strip loading and voltage drop, by name. load = power_per_ft x length; psu = load / (1 - headroom); current = load / voltage; end_drop = current x (resistance_per_ft x length) / 2; end_voltage = voltage - end_drop. A single end-fed run dims at the far end (12 V walls out ~16-20 ft, 24 V ~double); oversizing the PSU does not fix it - power-inject or feed both ends.",
+  example: ledTapeRunExample.inputs,
+  fields: [
+    { key: "power_per_ft_w", label: "Strip power (W/ft)", kind: "number" },
+    { key: "run_length_ft", label: "Run length (ft)", kind: "number" },
+    { key: "supply_voltage_v", label: "Supply voltage (V, 12 / 24)", kind: "number" },
+    { key: "resistance_per_ft", label: "Round-trip resistance (ohm/ft)", kind: "number" },
+    { key: "headroom_pct", label: "PSU headroom (%)", kind: "number", default: 20 },
+    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "l", id: "ltr-out-l", label: "Total load / PSU size", value: (r) => fmt(r.load_w, 1) + " W (PSU >= " + fmt(r.psu_w, 0) + " W)" },
+    { key: "e", id: "ltr-out-e", label: "End-of-run voltage", value: (r) => fmt(r.end_voltage_v, 2) + " V (drop " + fmt(r.drop_pct, 1) + "%)" },
+    { key: "t", id: "ltr-out-t", label: "Run length verdict", value: (r) => r.too_long ? "TOO LONG - dims at the far end; feed both ends or power-inject" : "within tolerance" },
+    { key: "n", id: "ltr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLedTapeRun,
+});
+STAGE_RENDERERS["led-tape-run"] = renderLedTapeRun;

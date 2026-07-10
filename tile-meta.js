@@ -461,6 +461,7 @@ const _TILES = [
   ["projector-brightness", "N"],
   ["room-acoustics", "N"],
   ["counterweight-arbor-load", "N"],
+  ["led-tape-run", "N"],
   ["pool-alkalinity-adjust", "M"],
   ["pool-cya-dose", "M"],
   ["pool-salt-dose", "M"],

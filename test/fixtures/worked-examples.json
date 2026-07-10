@@ -21713,6 +21713,68 @@
    }
   },
   {
+   "tile_id": "led-tape-run",
+   "source_publisher": "Constant-voltage LED strip loading and voltage drop",
+   "source_title": "load = power_per_ft x length; end_drop = current x (resistance_per_ft x length) / 2",
+   "source_edition_or_year": "constant-voltage LED loading",
+   "source_section_or_page": "4.4 W/ft, 16 ft, 12 V, 0.05 ohm/ft -> 70.4 W load, 88 W PSU, 9.65 V end (19.6% drop, too long)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "power_per_ft_w": 4.4,
+    "run_length_ft": 16,
+    "supply_voltage_v": 12,
+    "resistance_per_ft": 0.05,
+    "headroom_pct": 20,
+    "drop_tolerance_pct": 10
+   },
+   "outputs": {
+    "load_w": {
+     "value": 70.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "psu_w": {
+     "value": 88,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "end_voltage_v": {
+     "value": 9.65,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "led-tape-run",
+   "source_publisher": "Constant-voltage LED strip loading and voltage drop",
+   "source_title": "24 V draws half the current for the same power, halving the end drop",
+   "source_edition_or_year": "constant-voltage LED loading",
+   "source_section_or_page": "Same strip on 24 V -> end drop 1.17 V, 4.9% (within tolerance, roughly double the reach)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "power_per_ft_w": 4.4,
+    "run_length_ft": 16,
+    "supply_voltage_v": 24,
+    "resistance_per_ft": 0.05,
+    "headroom_pct": 20,
+    "drop_tolerance_pct": 10
+   },
+   "outputs": {
+    "end_voltage_v": {
+     "value": 22.83,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-alkalinity-adjust",
    "source_publisher": "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables",
    "source_title": "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",

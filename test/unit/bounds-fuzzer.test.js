@@ -18146,3 +18146,29 @@ test("bounds: spec-v542 computeCounterweightArborLoad pins the purchase-ratio ba
   assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: -1 }));
   assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "triple", brick_weight_lb: 30 }));
 });
+
+import { computeLedTapeRun as _v543 } from "../../calc-stage.js";
+
+test("bounds: spec-v543 computeLedTapeRun pins the load, PSU headroom, uniform-load end drop, the 24 V halving, and error seams", () => {
+  const r = _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: 0.05, headroom_pct: 20, drop_tolerance_pct: 10 });
+  assert.ok(Math.abs(r.load_w - 70.4) < 1e-9); // 4.4 * 16
+  assert.ok(Math.abs(r.psu_w - 88) < 1e-9); // 70.4 / 0.8
+  assert.ok(Math.abs(r.current_a - 5.8667) < 0.001); // 70.4 / 12
+  assert.ok(Math.abs(r.end_drop_v - 2.3467) < 0.001); // 5.87 * 0.8 / 2
+  assert.ok(Math.abs(r.end_voltage_v - 9.653) < 0.01);
+  assert.equal(r.too_long, true); // 19.6% > 10%
+  // 24 V draws half the current, halving the drop and clearing the flag.
+  const v24 = _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 24, resistance_per_ft: 0.05, headroom_pct: 20, drop_tolerance_pct: 10 });
+  assert.ok(Math.abs(v24.end_drop_v - r.end_drop_v / 2) < 1e-9);
+  assert.equal(v24.too_long, false);
+  // Zero resistance -> no drop, full voltage at the far end.
+  assert.equal(_v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: 0 }).end_voltage_v, 12);
+  // Error seams: non-finite, non-positive power / length / voltage, negative resistance, headroom / tolerance out of range.
+  assert.ok("error" in _v543({ power_per_ft_w: Infinity, run_length_ft: 16, supply_voltage_v: 12 }));
+  assert.ok("error" in _v543({ power_per_ft_w: 0, run_length_ft: 16, supply_voltage_v: 12 }));
+  assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 0, supply_voltage_v: 12 }));
+  assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 0 }));
+  assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: -1 }));
+  assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, headroom_pct: 100 }));
+  assert.ok("error" in _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, drop_tolerance_pct: 100 }));
+});
