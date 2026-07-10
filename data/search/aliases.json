@@ -18554,6 +18554,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "reorder point",
+      "target": "reorder-point",
+      "kind": "industry"
+    },
+    {
+      "term": "safety stock",
+      "target": "reorder-point",
+      "kind": "industry"
+    },
+    {
+      "term": "service level inventory",
+      "target": "reorder-point",
+      "kind": "industry"
+    },
+    {
+      "term": "rop",
+      "target": "reorder-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "z score safety stock",
+      "target": "reorder-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lead time demand",
+      "target": "reorder-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stockout buffer",
+      "target": "reorder-point",
+      "kind": "adjacent"
+    },
+    {
+      "term": "when to reorder",
+      "target": "reorder-point",
+      "kind": "adjacent"
+    },
+    {
       "term": "concrete torsion",
       "target": "concrete-torsion-threshold",
       "kind": "industry"

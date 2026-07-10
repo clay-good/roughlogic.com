@@ -84,6 +84,8 @@ const _TILES = [
   ["surety-bond-premium", "R"], ["workers-comp-emr-premium", "R"], ["prevailing-wage-fringe", "R"],
   // spec-v529 economic order quantity (Wilson EOQ)
   ["eoq-order-quantity", "R"],
+  // spec-v530 reorder point and safety stock (service-level model)
+  ["reorder-point", "R"],
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],

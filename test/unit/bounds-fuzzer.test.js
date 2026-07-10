@@ -17850,3 +17850,24 @@ test("bounds: spec-v529 computeEoqOrderQuantity pins the Wilson EOQ, the equal-c
   assert.ok("error" in _v529({ annual_demand: 12000, order_cost: 0, holding_cost: 3 }));
   assert.ok("error" in _v529({ annual_demand: 12000, order_cost: 50, holding_cost: 0 }));
 });
+
+import { computeReorderPoint as _v530 } from "../../calc-accounting.js";
+
+test("bounds: spec-v530 computeReorderPoint pins the z-lookup, the sqrt(lead) buffer, the ROP identity, and error seams", () => {
+  const r = _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 95 });
+  assert.ok(Math.abs(r.z - 1.6449) < 0.005); // 95% service z-score
+  assert.ok(Math.abs(r.safety_stock - 87.04) < 0.5);
+  assert.ok(Math.abs(r.reorder_point - 787) < 1); // demand-during-lead (700) + buffer
+  assert.ok(Math.abs(r.reorder_point - (100 * 7 + r.safety_stock)) < 1e-6);
+  // 99% service raises the z-score and nearly doubles the buffer.
+  const s99 = _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 99 });
+  assert.ok(Math.abs(s99.z - 2.3263) < 0.005 && s99.safety_stock > r.safety_stock && Math.abs(s99.reorder_point - 823) < 1);
+  // Safety stock scales with sqrt(lead time): quadrupling the lead time doubles the buffer.
+  assert.ok(Math.abs(_v530({ avg_daily_demand: 100, lead_time_days: 28, demand_sd: 20, service_level_pct: 95 }).safety_stock - 2 * r.safety_stock) < 0.1);
+  // Error seams: non-finite, negative demand / sd, non-positive lead time, service level out of range.
+  assert.ok("error" in _v530({ avg_daily_demand: Infinity, lead_time_days: 7, demand_sd: 20 }));
+  assert.ok("error" in _v530({ avg_daily_demand: -1, lead_time_days: 7, demand_sd: 20 }));
+  assert.ok("error" in _v530({ avg_daily_demand: 100, lead_time_days: 0, demand_sd: 20 }));
+  assert.ok("error" in _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: -1 }));
+  assert.ok("error" in _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 100 }));
+});

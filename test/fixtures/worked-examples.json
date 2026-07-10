@@ -44220,6 +44220,70 @@
    }
   },
   {
+   "tile_id": "reorder-point",
+   "source_publisher": "reorder point and safety stock (service-level inventory control)",
+   "source_title": "100 units/day, 7-day lead, sd 20, 95% -> z 1.645, 87 units safety stock, reorder at 787",
+   "source_edition_or_year": "spec-v530 worked example (machine-verified)",
+   "source_section_or_page": "spec-v530 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "avg_daily_demand": 100,
+    "lead_time_days": 7,
+    "demand_sd": 20,
+    "service_level_pct": 95
+   },
+   "outputs": {
+    "z": {
+     "value": 1.645,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "safety_stock": {
+     "value": 87,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "reorder_point": {
+     "value": 787,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reorder-point",
+   "source_publisher": "reorder point and safety stock (service-level inventory control)",
+   "source_title": "cross-check: raising the target to 99% (z 2.326) nearly doubles the buffer to 123, reorder at 823",
+   "source_edition_or_year": "spec-v530 worked example (machine-verified)",
+   "source_section_or_page": "spec-v530 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "avg_daily_demand": 100,
+    "lead_time_days": 7,
+    "demand_sd": 20,
+    "service_level_pct": 99
+   },
+   "outputs": {
+    "z": {
+     "value": 2.326,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "reorder_point": {
+     "value": 823,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-torsion-threshold",
    "source_publisher": "ACI 318-19 §22.7",
    "source_title": "12x20 in, 4000 psi -> Tth 56,921 in-lb (4.74 ft-kip), neglect 3.56, Tcr 18.97 ft-kip",

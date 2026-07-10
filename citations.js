@@ -414,6 +414,18 @@ export const CITATIONS = {
       { name: "Bureau governs", value: "the rating bureau's published rate and official EMR govern", source: "scope of this tile" },
     ],
   },
+  "reorder-point": {
+    formula: "z = inverse_normal(service_level / 100); safety_stock = z x demand_sd x sqrt(lead_time_days); reorder_point = avg_daily_demand x lead_time_days + safety_stock.",
+    edition: "Reorder point and safety stock (standard service-level inventory control), first-principles, by name; the actual demand pattern and supplier reliability govern.",
+    freeAccess: "The service-level reorder-point and safety-stock relations are standard published inventory-management results; the demand, lead time, and variability come from the business's records.",
+    governance: GOVERNANCE.general,
+    editionNote: "Reorder point and safety stock (service-level model). z = the inverse-normal of the service level (95% = 1.645, 99% = 2.326), safety_stock = z x demand_sd x sqrt(lead_time), and reorder_point = avg_daily_demand x lead_time + safety_stock. The buffer scales with the SQUARE ROOT of the lead time and with the z-score, so chasing the last few points of service costs a disproportionate buffer -- moving from 95% to 99% roughly doubles the safety stock for a 4-point gain. The model assumes normally distributed demand and a fixed lead time; variable lead time adds a second variance term. A planning aid, not an inventory policy; the actual demand pattern and supplier reliability govern.",
+    assumptions: [
+      { name: "Two parts", value: "reorder point = demand during lead time + a safety-stock buffer", source: "service-level inventory control" },
+      { name: "Square-root scaling", value: "safety stock scales with sqrt(lead time) and the z-score; the last points cost a disproportionate buffer", source: "service-level model" },
+      { name: "Fixed lead time", value: "assumes normal demand and a fixed lead time; variable lead time adds a second variance term", source: "scope of this tile" },
+    ],
+  },
   "eoq-order-quantity": {
     formula: "EOQ = sqrt(2 x D x S / H); orders_per_year = D / EOQ; cycle_days = 365 / orders_per_year; total_annual = sqrt(2 x D x S x H).",
     edition: "The Wilson economic order quantity (EOQ) inventory model, by name; the actual demand, lead time, and supplier terms govern.",

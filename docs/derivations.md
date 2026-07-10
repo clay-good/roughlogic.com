@@ -1431,6 +1431,7 @@ cross-check.
 | calc-accounting.js | `computeOverheadRecoveryRate` | `{ annual_overhead = 0, basis = "per-hour", billable_hours = 0, annual_direct ...` | _ | _ | _ |
 | calc-accounting.js | `computePayrollWithholding` | `{ gross_per_period = 0, pay_frequency = "biweekly", filing_status = "single",...` | _ | _ | _ |
 | calc-accounting.js | `computePrevailingWageFringe` | `{ base_wage_hr = 0, fringe_hr = 0, payroll_tax = 0 } = {}` | _ | _ | _ |
+| calc-accounting.js | `computeReorderPoint` | `{ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct ...` | _ | _ | _ |
 | calc-accounting.js | `computeRetainageTracker` | `{ work_this_period_usd = 0, retainage_pct = 10, prior_retained_usd = 0 } = {}` | _ | _ | _ |
 | calc-accounting.js | `computeSETax` | `{ net_se_earnings = 0, w2_ss_wages = 0, tax_year = 2025, filing_status = "sin...` | _ | _ | _ |
 | calc-accounting.js | `computeSalesTaxCompound` | `{ pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0, }` | _ | _ | _ |
@@ -2641,7 +2642,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1227.
+Row count: 1228.
 
 <!-- END function-corpus-v14 -->
 
@@ -3674,7 +3675,7 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (26 tiles)
+### Group R Accounting (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3696,6 +3697,7 @@ per spec-v14 §13.1 second paragraph.
 | `overhead-recovery-rate` | Overhead Recovery Rate | contractor cost accounting; spec-v364 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `payroll-withholding` | Payroll Tax Withholding (Simplified) | IRS Pub 15-T percentage method (singl...; $1500 biweekly / single / 2025 -> annualized $39,000 / fe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `prevailing-wage-fringe` | Prevailing-Wage Package: Cash vs Bona-Fide Fringe | Davis-Bacon / state wage determination; spec-v446 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `reorder-point` | Reorder Point and Safety Stock (Service Level) | reorder point and safety stock (servi...; spec-v530 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `retainage-tracker` | Retainage Withheld and Net Payment (AIA G702/G703) | construction billing (AIA G702/G703); spec-v392 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sales-tax-compound` | Sales Tax Compounding and Reverse | Project (first-principles); $1,000 / 6.25% state + 1.5% local -> 7.75% combined / $77... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `se-tax` | Self-Employment Tax (Schedule SE) | IRS Schedule SE (Form 1040); $80,000 net SE earnings / no W-2 wages / single / 2025 ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3810,6 +3812,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 983. Fixture-covered or reference-cadence: 983 / 983.
+Tile count: 984. Fixture-covered or reference-cadence: 984 / 984.
 
 <!-- END tile-index-v14 -->

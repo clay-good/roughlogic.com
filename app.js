@@ -946,6 +946,8 @@ const TOOL_MODULES = (() => {
     "surety-bond-premium", "workers-comp-emr-premium", "prevailing-wage-fringe",
     // spec-v529 economic order quantity (Wilson EOQ)
     "eoq-order-quantity",
+    // spec-v530 reorder point and safety stock (service-level model)
+    "reorder-point",
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [

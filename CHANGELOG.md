@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise tools-data.js gzip cap 140000 -> 155000; 2026-07-09
+
+The spec-v489..v588 single-tile campaign grows the catalog registry (`tools-data.js`) by one row per tile; at tile 984 it crossed the 140000 B cap set earlier in the campaign. Raised the `check-module-sizes` cap to **155000** (~10% headroom for the ~55 remaining backlog tiles). Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-powerquality.js gzip cap 9500 -> 12000; 2026-07-09
 
 Two Group A tiles landed in `calc-powerquality.js` (spec-v523 `harmonic-resonance`, spec-v524 `tdd-ieee-519`), taking the built copy over the 9500 B cap (97.4% at v523). Raised the `check-module-sizes` cap to **12000**. Lazy-loaded, absent from the home-view payload.

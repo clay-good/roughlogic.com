@@ -1803,3 +1803,60 @@ function renderEoqOrderQuantity(inputRegion, outputRegion, citationEl) {
   for (const f of [d, s, h]) f.input.addEventListener("input", update);
 }
 ACCOUNTING_RENDERERS["eoq-order-quantity"] = renderEoqOrderQuantity;
+
+// Acklam's rational approximation of the inverse normal CDF (accurate to ~1e-9).
+function _invNorm(p) {
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  const pLow = 0.02425, pHigh = 1 - pLow;
+  if (p < pLow) { const q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  if (p <= pHigh) { const q = p - 0.5, r = q * q; return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1); }
+  const q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+}
+
+// ===================== spec-v530: reorder point and safety stock (service-level model) =====================
+// dims: in { avg_daily_demand: dimensionless, lead_time_days: T, demand_sd: dimensionless, service_level_pct: dimensionless } out: { z: dimensionless, safety_stock: dimensionless, reorder_point: dimensionless }
+export function computeReorderPoint({ avg_daily_demand = 0, lead_time_days = 0, demand_sd = 0, service_level_pct = 95 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dd = Number(avg_daily_demand) || 0;
+  const lt = Number(lead_time_days) || 0;
+  const sd = Number(demand_sd) || 0;
+  const sl = Number(service_level_pct) || 0;
+  if (dd < 0) return { error: "Average daily demand cannot be negative." };
+  if (sd < 0) return { error: "Demand standard deviation cannot be negative." };
+  if (!(lt > 0)) return { error: "Lead time must be positive (days)." };
+  if (!(sl > 0 && sl < 100)) return { error: "Service level must be over 0 and under 100 percent." };
+  const z = _invNorm(sl / 100);
+  const safety_stock = z * sd * Math.sqrt(lt);
+  const reorder_point = dd * lt + safety_stock;
+  if (![z, safety_stock, reorder_point].every(Number.isFinite)) return { error: "Reorder-point math is not a finite value." };
+  return {
+    z, safety_stock, reorder_point,
+    note: "Reorder point and safety stock (service-level model). The reorder point is the on-hand level that triggers a new order so stock does not run out before it arrives: reorder_point = demand during the lead time (avg_daily_demand x lead_time) PLUS a safety-stock buffer, safety_stock = z x demand_sd x sqrt(lead_time), where z is the service-level's inverse-normal z-score (95% = 1.645, 99% = 2.326). The buffer scales with the SQUARE ROOT of lead time and with the z-score, so chasing the last few points of service costs a disproportionate buffer -- moving from 95% to 99% roughly doubles the safety stock for a 4-point gain. The model assumes normally distributed demand and a fixed lead time (variable lead time adds a second variance term). A planning aid, not an inventory policy; the actual demand pattern and supplier reliability govern.",
+  };
+}
+export const reorderPointExample = { inputs: { avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 95 } };
+function renderReorderPoint(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: reorder point and safety stock (service-level inventory control): z = inverse_normal(service_level/100); safety_stock = z x demand_sd x sqrt(lead_time); reorder_point = avg_daily_demand x lead_time + safety_stock. Safety stock scales with sqrt(lead time) and the z-score, so the last few points of service cost a disproportionate buffer. A planning aid; the demand pattern and supplier reliability govern.";
+  const dd = makeNumber("Average daily demand (units/day)", "rop-dd", { step: "any", min: "0" }); dd.input.value = "100";
+  const lt = makeNumber("Supplier lead time (days)", "rop-lt", { step: "any", min: "0" }); lt.input.value = "7";
+  const sd = makeNumber("Daily demand std deviation (units/day)", "rop-sd", { step: "any", min: "0" }); sd.input.value = "20";
+  const sl = makeNumber("Target service level (%)", "rop-sl", { step: "any", min: "0", max: "100" }); sl.input.value = "95";
+  for (const f of [dd, lt, sd, sl]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dd.input.value = "100"; lt.input.value = "7"; sd.input.value = "20"; sl.input.value = "95"; update(); });
+  const oSafety = makeOutputLine(outputRegion, "Safety stock", "rop-out-safety");
+  const oRop = makeOutputLine(outputRegion, "Reorder point", "rop-out-rop");
+  const oNote = makeOutputLine(outputRegion, "Note", "rop-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeReorderPoint({ avg_daily_demand: readNum(dd.input), lead_time_days: readNum(lt.input), demand_sd: readNum(sd.input), service_level_pct: sl.input.value === "" ? 95 : readNum(sl.input) });
+    if (r.error) { oSafety.textContent = r.error; oRop.textContent = "-"; oNote.textContent = ""; return; }
+    oSafety.textContent = fmt(r.safety_stock, 0) + " units (z = " + fmt(r.z, 3) + ")";
+    oRop.textContent = fmt(r.reorder_point, 0) + " units -- reorder when stock drops here";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dd, lt, sd, sl]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["reorder-point"] = renderReorderPoint;
