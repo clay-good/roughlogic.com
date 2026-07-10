@@ -7693,6 +7693,16 @@ export const CITATIONS = {
       { name: "Speed of sound", value: "1130 ft/s at room temperature (default, editable)", source: "First-principles acoustics" },
     ],
   },
+  "counterweight-arbor-load": {
+    formula: "required = (batten_weight + attached_load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = ceil(|out_of_weight| / brick_weight).",
+    edition: "Theatrical counterweight rigging (single / double purchase), by name.",
+    freeAccess: "Standard stagecraft counterweight-balance relation; the venue rigging inspection and the AHJ govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "A double-purchase system needs two pounds of counterweight per pound on the batten (and the arbor travels half as far), so reversing the ratio lets the pipe run away; the arbor is loaded only when the batten is at the loading rail (an out-of-weight batten is the classic fly-rail hazard); arbor capacity is finite. A balancing aid, not a rigging inspection.",
+    assumptions: [
+      { name: "Purchase ratio", value: "1:1 single, 2:1 double (double travels half the distance, needs twice the counterweight)", source: "theatrical rigging" },
+    ],
+  },
   "pool-alkalinity-adjust": {
     formula: "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",
     edition: "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name).",

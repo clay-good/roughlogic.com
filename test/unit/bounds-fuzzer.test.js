@@ -18121,3 +18121,28 @@ test("bounds: spec-v541 computeSweatRateHydration pins the weigh-in/weigh-out sw
   assert.ok("error" in _v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: -1, duration_hr: 2 }));
   assert.ok("error" in _v541({ pre_weight_lb: 180, post_weight_lb: 177, fluid_oz: 20, urine_oz: -1, duration_hr: 2 }));
 });
+
+import { computeCounterweightArborLoad as _v542 } from "../../calc-stage.js";
+
+test("bounds: spec-v542 computeCounterweightArborLoad pins the purchase-ratio balance, the brick round-up, and error seams", () => {
+  const s = _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 200 });
+  assert.ok(Math.abs(s.required_cw_lb - 500) < 1e-9); // (100+400)*1
+  assert.ok(Math.abs(s.out_of_weight_lb - 300) < 1e-9); // 500 - 200
+  assert.equal(s.bricks, 10); // ceil(300/30)
+  assert.equal(s.action, "add");
+  // Double purchase needs twice the counterweight.
+  assert.ok(Math.abs(_v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "double", brick_weight_lb: 30, existing_cw_lb: 200 }).required_cw_lb - 1000) < 1e-9);
+  // Overweight arbor reports a remove action and rounds bricks up.
+  const heavy = _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 590 });
+  assert.equal(heavy.action, "remove");
+  assert.equal(heavy.bricks, 3); // ceil(90/30)
+  // Exact balance -> balanced, zero bricks.
+  assert.equal(_v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 500 }).action, "balanced");
+  // Error seams: non-finite, negative batten / load / existing, non-positive brick, bad type.
+  assert.ok("error" in _v542({ batten_weight_lb: Infinity, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30 }));
+  assert.ok("error" in _v542({ batten_weight_lb: -1, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30 }));
+  assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: -1, purchase_type: "single", brick_weight_lb: 30 }));
+  assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 0 }));
+  assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: -1 }));
+  assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "triple", brick_weight_lb: 30 }));
+});

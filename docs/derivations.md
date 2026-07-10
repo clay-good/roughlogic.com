@@ -2520,6 +2520,7 @@ cross-check.
 | calc-solar.js | `renderPvInterconnectionBusbar` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-stage.js | `_v9_atmosphericAbsorption` | `{ f_Hz, T_K, h_r, p_a_kPa }` | _ | _ | _ |
 | calc-stage.js | `computeAmpPowerSpl` | `{ sensitivity_db, power_w, distance_m, crest_db, target_spl_db, max_spl_db }` | _ | _ | _ |
+| calc-stage.js | `computeCounterweightArborLoad` | `{ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick...` | _ | _ | _ |
 | calc-stage.js | `computeDMX` | `{ fixtures = [] }` | _ | _ | _ |
 | calc-stage.js | `computeDecibelConverter` | `{ mode, p1, p2, v1, v2, level_db, ref_type, levels }` | _ | _ | _ |
 | calc-stage.js | `computeLedVideoWall` | `{ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm = 0, cols = 0, rows = 0, cab_wei...` | _ | _ | _ |
@@ -2653,7 +2654,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1239.
+Row count: 1240.
 
 <!-- END function-corpus-v14 -->
 
@@ -3624,11 +3625,12 @@ per spec-v14 §13.1 second paragraph.
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group N Stage (15 tiles)
+### Group N Stage (16 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `amp-power-spl` | Amplifier Power to SPL | first-principles loudspeaker SPL (ANS...; 90 dB sensitivity, 100 W, 1 m -> 110 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `counterweight-arbor-load` | Counterweight Fly System Balance | Theatrical counterweight rigging (sin...; 100 lb batten + 400 lb load, single, 30 lb bricks, 200 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `decibel-converter` | Decibel Converter | ANSI S1.1 (by name); P2/P1 = 2 -> 3.0103 dB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dmx-planner` | DMX-512 Address and Universe Planner | USITT DMX512-A / project bundled DMX ...; 12 PARs @ 8 ch starting at 1 + 4 movers @ 24 ch starting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `led-video-wall` | LED Video Wall Build | LED panel maker's spec sheet (native ...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3834,6 +3836,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 995. Fixture-covered or reference-cadence: 995 / 995.
+Tile count: 996. Fixture-covered or reference-cadence: 996 / 996.
 
 <!-- END tile-index-v14 -->

@@ -896,6 +896,8 @@ const TOOL_MODULES = (() => {
     "led-video-wall", "projector-brightness",
     // v120 room acoustics
     "room-acoustics",
+    // spec-v542
+    "counterweight-arbor-load",
   ]);
   // v4 Group O: Kitchen and Food Service.
   declare("./calc-kitchen.js", "KITCHEN_RENDERERS", [

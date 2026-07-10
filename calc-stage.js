@@ -1241,3 +1241,48 @@ const renderRoomAcoustics = _r({
   compute: computeRoomAcoustics,
 });
 STAGE_RENDERERS["room-acoustics"] = renderRoomAcoustics;
+
+// --- spec-v542 N: Counterweight fly-system balance (`counterweight-arbor-load`) ---
+// required = (batten + load) x purchase_ratio (1 single, 2 double). out_of_weight = required - existing.
+// dims: in { batten_weight_lb: M L T^-2, attached_load_lb: M L T^-2, purchase_type: dimensionless, brick_weight_lb: M L T^-2, existing_cw_lb: M L T^-2 } out: { required_cw_lb: M L T^-2, out_of_weight_lb: M L T^-2, bricks: dimensionless }
+export function computeCounterweightArborLoad({ batten_weight_lb = 0, attached_load_lb = 0, purchase_type = "single", brick_weight_lb = 0, existing_cw_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const batten = Number(batten_weight_lb) || 0;
+  const load = Number(attached_load_lb) || 0;
+  const brick = Number(brick_weight_lb) || 0;
+  const existing = Number(existing_cw_lb) || 0;
+  if (batten < 0) return { error: "Batten weight must be non-negative (lb)." };
+  if (load < 0) return { error: "Attached load must be non-negative (lb)." };
+  if (existing < 0) return { error: "Existing counterweight must be non-negative (lb)." };
+  if (!(brick > 0)) return { error: "Brick weight must be positive (lb)." };
+  const purchase_ratio = purchase_type === "double" ? 2 : purchase_type === "single" ? 1 : null;
+  if (purchase_ratio === null) return { error: "Purchase type must be single or double." };
+  const required_cw_lb = (batten + load) * purchase_ratio;
+  const out_of_weight_lb = required_cw_lb - existing;
+  const bricks = Math.ceil(Math.abs(out_of_weight_lb) / brick);
+  const action = out_of_weight_lb > 0 ? "add" : out_of_weight_lb < 0 ? "remove" : "balanced";
+  return {
+    required_cw_lb, out_of_weight_lb, bricks, purchase_ratio, action,
+    note: "A double-purchase system needs two pounds of counterweight per pound on the batten (and the arbor travels half as far), so reversing the ratio lets the pipe run away. Load the arbor only when the batten is at the loading rail - an out-of-weight batten is the classic fly-rail hazard. Arbor capacity is finite. The venue rigging inspection and the AHJ govern.",
+  };
+}
+const counterweightArborLoadExample = { inputs: { batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "single", brick_weight_lb: 30, existing_cw_lb: 200 } };
+const renderCounterweightArborLoad = _r({
+  citation: "Notice: Load the arbor only when the batten is at the loading rail; the venue rigging inspection and the AHJ govern. Citation: theatrical counterweight rigging (single/double purchase), by name. required = (batten + load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = ceil(|out_of_weight| / brick_weight). A double-purchase arbor needs twice the counterweight and travels half the distance.",
+  example: counterweightArborLoadExample.inputs,
+  fields: [
+    { key: "batten_weight_lb", label: "Batten pipe weight (lb)", kind: "number" },
+    { key: "attached_load_lb", label: "Attached load (scenery / electrics, lb)", kind: "number" },
+    { key: "purchase_type", label: "Purchase type", kind: "select", options: [{ value: "single", label: "Single purchase (1:1)" }, { value: "double", label: "Double purchase (2:1)" }] },
+    { key: "brick_weight_lb", label: "Counterweight brick unit (lb)", kind: "number" },
+    { key: "existing_cw_lb", label: "Counterweight already on arbor (lb)", kind: "number" },
+  ],
+  outputs: [
+    { key: "req", id: "cwa-out-req", label: "Required counterweight", value: (r) => fmt(r.required_cw_lb, 0) + " lb (" + (r.purchase_ratio === 2 ? "double 2:1" : "single 1:1") + ")" },
+    { key: "oow", id: "cwa-out-oow", label: "Out of weight", value: (r) => (r.action === "balanced" ? "balanced" : fmt(Math.abs(r.out_of_weight_lb), 0) + " lb " + (r.action === "add" ? "light - add" : "heavy - remove")) },
+    { key: "b", id: "cwa-out-b", label: "Bricks to " + "add/remove", value: (r) => r.action === "balanced" ? "0" : fmt(r.bricks, 0) + " bricks to " + r.action },
+    { key: "n", id: "cwa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCounterweightArborLoad,
+});
+STAGE_RENDERERS["counterweight-arbor-load"] = renderCounterweightArborLoad;

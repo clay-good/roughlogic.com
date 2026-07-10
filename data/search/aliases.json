@@ -5039,6 +5039,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "counterweight",
+      "target": "counterweight-arbor-load",
+      "kind": "industry"
+    },
+    {
+      "term": "fly system balance",
+      "target": "counterweight-arbor-load",
+      "kind": "industry"
+    },
+    {
+      "term": "arbor load",
+      "target": "counterweight-arbor-load",
+      "kind": "industry"
+    },
+    {
+      "term": "single double purchase",
+      "target": "counterweight-arbor-load",
+      "kind": "redirect"
+    },
+    {
+      "term": "counterweight bricks",
+      "target": "counterweight-arbor-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "batten balance",
+      "target": "counterweight-arbor-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fly rail",
+      "target": "counterweight-arbor-load",
+      "kind": "industry"
+    },
+    {
+      "term": "theatrical rigging balance",
+      "target": "counterweight-arbor-load",
+      "kind": "redirect"
+    },
+    {
       "term": "pool alkalinity",
       "target": "pool-alkalinity-adjust",
       "kind": "industry"

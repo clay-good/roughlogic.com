@@ -21653,6 +21653,66 @@
    }
   },
   {
+   "tile_id": "counterweight-arbor-load",
+   "source_publisher": "Theatrical counterweight rigging (single / double purchase)",
+   "source_title": "required = (batten + load) x purchase_ratio; out_of_weight = required - existing",
+   "source_edition_or_year": "theatrical rigging",
+   "source_section_or_page": "100 lb batten + 400 lb load, single, 30 lb bricks, 200 lb on -> 500 lb required, 300 lb light, 10 bricks",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "batten_weight_lb": 100,
+    "attached_load_lb": 400,
+    "purchase_type": "single",
+    "brick_weight_lb": 30,
+    "existing_cw_lb": 200
+   },
+   "outputs": {
+    "required_cw_lb": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "out_of_weight_lb": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bricks": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "counterweight-arbor-load",
+   "source_publisher": "Theatrical counterweight rigging (single / double purchase)",
+   "source_title": "a double-purchase arbor needs twice the counterweight",
+   "source_edition_or_year": "theatrical rigging",
+   "source_section_or_page": "Same batten and load on double purchase -> 1000 lb required (2x)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "batten_weight_lb": 100,
+    "attached_load_lb": 400,
+    "purchase_type": "double",
+    "brick_weight_lb": 30,
+    "existing_cw_lb": 200
+   },
+   "outputs": {
+    "required_cw_lb": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-alkalinity-adjust",
    "source_publisher": "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables",
    "source_title": "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",

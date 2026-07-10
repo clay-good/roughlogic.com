@@ -170,7 +170,7 @@ const CAPS = {
   // spec-v15 Group F close added F.2 standpipe-pdp and F.5 smoke-ejector-cfm,
   // taking the built module to ~19.8 KB gzipped.
   "calc-fire.js": 28000, // spec-v114 2026-06-20 (24500->28000): +1 smooth-bore-flow tile -> ~23.4 KB gz (95.4%); +~20% headroom. v82 2026-06-16 (was 27000 at 94.9%): v3 technical-rescue bench (confined-space-purge, rope-ma, sling-angle) relocated to calc-rescue.js (25.6->22.8 KB gz), lowered cap locks in the freed space; v20 2026-06-06 (24000)
-  "calc-rescue.js": 5500, // v82 2026-06-16: spec-v3 technical-rescue bench split out of calc-fire.js (built module ~4.4 KB gzipped, current + ~20% headroom); lazy-loaded, not in the home-view payload
+  "calc-rescue.js": 8000, // spec-v540..v541 Group P batch (search-track-spacing, sweat-rate-hydration) (5500) // v82 2026-06-16: spec-v3 technical-rescue bench split out of calc-fire.js (built module ~4.4 KB gzipped, current + ~20% headroom); lazy-loaded, not in the home-view payload
   "calc-references.js": 17500, // v187 2026-06-24 (15500->17500): +1 electrician second-pass tile (pool-bonding-680-26) takes the module to ~16.1 KB gz (92.0%); current + ~8% headroom
   // Bumped 25500 -> 35000 on 2026-06-01 (current + ~20% headroom rule) when the
   // spec-v15 Group G close added four cross-trade mechanical tiles (pump-tdh,
