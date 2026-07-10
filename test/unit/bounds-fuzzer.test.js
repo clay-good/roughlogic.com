@@ -18221,3 +18221,22 @@ test("bounds: spec-v545 computeWinchDrumLinePull pins the per-layer derate, the 
   assert.ok("error" in _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 0, target_layer: 4 }));
   assert.ok("error" in _v545({ rated_pull_lb: 10000, drum_dia_in: 10, rope_dia_in: 0.5, barrel_width_in: 12, target_layer: 0 }));
 });
+
+import { computeWindSolidSign as _v546 } from "../../calc-construction.js";
+
+test("bounds: spec-v546 computeWindSolidSign pins F = qh G Cf As, the 0.2B eccentric moment, and error seams", () => {
+  const r = _v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 });
+  assert.ok(Math.abs(r.wind_force_lb - 1248) < 1); // 17*0.85*1.35*64
+  assert.ok(Math.abs(r.moment_caseb_lbft - 1997) < 2); // F * 0.2 * 8
+  // A higher net force coefficient raises the force proportionally.
+  assert.ok(Math.abs(_v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.80, solid_area_ft2: 64, width_ft: 8 }).wind_force_lb - 1665) < 1);
+  // The eccentric moment scales with the width B.
+  assert.ok(Math.abs(_v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 16 }).moment_caseb_lbft - 2 * r.moment_caseb_lbft) < 1e-6);
+  // Error seams: non-finite, non-positive qh / area / width / Cf, gust out of range.
+  assert.ok("error" in _v546({ velocity_pressure_psf: Infinity, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 }));
+  assert.ok("error" in _v546({ velocity_pressure_psf: 0, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 }));
+  assert.ok("error" in _v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 0, solid_area_ft2: 64, width_ft: 8 }));
+  assert.ok("error" in _v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 0, width_ft: 8 }));
+  assert.ok("error" in _v546({ velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 0 }));
+  assert.ok("error" in _v546({ velocity_pressure_psf: 17, gust_factor: 2.5, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 }));
+});

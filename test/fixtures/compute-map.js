@@ -781,6 +781,7 @@ export const COMPUTE_MAP = {
   "sliding-snow-load": { module: "../../calc-construction.js", fn: "computeSlidingSnowLoad" },
   "minimum-roof-snow": { module: "../../calc-construction.js", fn: "computeMinimumRoofSnow" },
   "wind-mwfrs-pressure": { module: "../../calc-construction.js", fn: "computeWindMwfrsPressure" },
+  "wind-solid-sign": { module: "../../calc-construction.js", fn: "computeWindSolidSign" },
   // spec-v299..v301 reinforced-concrete depth-2 batch (3 tiles)
   "rc-slab-min-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMinThickness" },
   "rc-doubly-reinforced": { module: "../../calc-concrete.js", fn: "computeRcDoublyReinforced" },

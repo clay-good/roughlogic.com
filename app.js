@@ -464,6 +464,8 @@ const TOOL_MODULES = (() => {
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",
     "shaft-torsion", "thermal-stress-restrained", "hoop-stress-thin-wall",
     "seismic-design-spectral-acceleration", "seismic-story-drift", "seismic-pdelta-stability",
+    // spec-v546
+    "wind-solid-sign",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.

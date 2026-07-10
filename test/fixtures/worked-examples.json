@@ -37914,6 +37914,60 @@
    }
   },
   {
+   "tile_id": "wind-solid-sign",
+   "source_publisher": "ASCE 7-22 Section 29.3 (solid freestanding walls and signs)",
+   "source_title": "F = qh G Cf As; Case B moment M = F x 0.2 x B",
+   "source_edition_or_year": "ASCE 7-22 29.3",
+   "source_section_or_page": "qh 17 psf, G 0.85, Cf 1.35, As 64 ft^2, B 8 ft -> F 1248 lb, Case B 1997 lb-ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "velocity_pressure_psf": 17,
+    "gust_factor": 0.85,
+    "force_coefficient": 1.35,
+    "solid_area_ft2": 64,
+    "width_ft": 8
+   },
+   "outputs": {
+    "wind_force_lb": {
+     "value": 1248,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "moment_caseb_lbft": {
+     "value": 1997,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "wind-solid-sign",
+   "source_publisher": "ASCE 7-22 Section 29.3 (solid freestanding walls and signs)",
+   "source_title": "a tall narrow sign draws a higher net force coefficient",
+   "source_edition_or_year": "ASCE 7-22 29.3",
+   "source_section_or_page": "Same qh and area with Cf 1.80 -> F 1665 lb (a third more force from the shape)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "velocity_pressure_psf": 17,
+    "gust_factor": 0.85,
+    "force_coefficient": 1.80,
+    "solid_area_ft2": 64,
+    "width_ft": 8
+   },
+   "outputs": {
+    "wind_force_lb": {
+     "value": 1665,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-slab-min-thickness",
    "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
    "source_title": "simply supported one-way slab, 12 ft, Grade 60 normalweight -> 7.2 in",

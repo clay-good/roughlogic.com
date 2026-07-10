@@ -9060,6 +9060,17 @@ export const CITATIONS = {
       { name: "Low-slope, balanced", value: "applies to low-slope roofs, balanced case only", source: "ASCE 7 §7.3.4" },
     ],
   },
+  "wind-solid-sign": {
+    formula: "F = qh G Cf As; Case B eccentric moment M = F x 0.2 x B.",
+    edition: "The ASCE 7-22 Section 29.3 design wind force on solid freestanding walls and signs, F = qh G Cf As, with Cf from Figure 29.3-1, by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the Section 29.3 provisions are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "Cf here is a net two-face force coefficient from Figure 29.3-1 as a function of the aspect ratio B/s and the clearance ratio s/h (not the +/- GCp of a building wall); it rises for tall, narrow signs. Case B applies the resultant at a 0.2B eccentricity (the torsion that sizes the post and footing) and a wide sign (B/s >= 2) adds a Case C strip loading. A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Net force coefficient", value: "Cf ~1.2-2.0 from Fig 29.3-1 by B/s and s/h; net two-face, not building-wall GCp", source: "ASCE 7-22 Fig 29.3-1" },
+      { name: "Case B eccentricity", value: "the resultant acts at 0.2B, producing the torsion that sizes the post and footing", source: "ASCE 7-22 29.3" },
+    ],
+  },
   "wind-mwfrs-pressure": {
     formula: "p_ww = qz G Cp_ww +/- qh GCpi (worst sign); p_lw = qh G Cp_lw +/- qh GCpi (worst sign); p_net = qz G Cp_ww - qh G Cp_lw (internal cancels).",
     edition: "The ASCE 7-22 Chapter 27 MWFRS design wall pressure p = q G Cp - qi (GCpi), with G = 0.85 (rigid), the wall Cp (+0.8 windward, -0.5 leeward for L/B <= 1), and GCpi = +/-0.18 (enclosed), by name.",

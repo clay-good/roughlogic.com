@@ -12834,6 +12834,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "wind on sign",
+      "target": "wind-solid-sign",
+      "kind": "industry"
+    },
+    {
+      "term": "freestanding wall wind",
+      "target": "wind-solid-sign",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 29.3",
+      "target": "wind-solid-sign",
+      "kind": "redirect"
+    },
+    {
+      "term": "solid sign wind",
+      "target": "wind-solid-sign",
+      "kind": "industry"
+    },
+    {
+      "term": "pylon sign wind",
+      "target": "wind-solid-sign",
+      "kind": "adjacent"
+    },
+    {
+      "term": "monument sign wind load",
+      "target": "wind-solid-sign",
+      "kind": "industry"
+    },
+    {
+      "term": "case b eccentricity",
+      "target": "wind-solid-sign",
+      "kind": "redirect"
+    },
+    {
+      "term": "net force coefficient sign",
+      "target": "wind-solid-sign",
+      "kind": "adjacent"
+    },
+    {
       "term": "slab thickness",
       "target": "rc-slab-min-thickness",
       "kind": "industry"

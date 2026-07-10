@@ -6846,3 +6846,46 @@ const _v474renderAdaRampSlope = _simpleRenderer({
   compute: computeAdaRampSlope,
 });
 CONSTRUCTION_RENDERERS["ada-ramp-slope"] = _v474renderAdaRampSlope;
+
+// --- spec-v546 E: Wind force on solid freestanding wall / sign (`wind-solid-sign`) ---
+// F = qh G Cf As (ASCE 7-22 29.3). Case B eccentric moment M = F x 0.2 x B.
+// dims: in { velocity_pressure_psf: M L^-1 T^-2, gust_factor: dimensionless, force_coefficient: dimensionless, solid_area_ft2: L^2, width_ft: L } out: { wind_force_lb: M L T^-2, moment_caseb_lbft: M L^2 T^-2 }
+export function computeWindSolidSign({ velocity_pressure_psf = 0, gust_factor = 0.85, force_coefficient = 0, solid_area_ft2 = 0, width_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const qh = Number(velocity_pressure_psf) || 0;
+  const G = Number(gust_factor) || 0;
+  const Cf = Number(force_coefficient) || 0;
+  const As = Number(solid_area_ft2) || 0;
+  const B = Number(width_ft) || 0;
+  if (!(qh > 0)) return { error: "Velocity pressure must be positive (psf)." };
+  if (!(G > 0 && G <= 2)) return { error: "Gust factor must be between 0 and 2 (0.85 rigid default)." };
+  if (!(Cf > 0)) return { error: "Force coefficient Cf must be positive (net, ~1.2-2.0 from Fig 29.3-1)." };
+  if (!(As > 0)) return { error: "Solid area must be positive (ft^2)." };
+  if (!(B > 0)) return { error: "Width B must be positive (ft)." };
+  const wind_force_lb = qh * G * Cf * As;
+  const moment_caseb_lbft = wind_force_lb * 0.2 * B;
+  return {
+    wind_force_lb, moment_caseb_lbft,
+    note: "Cf here is a net two-face force coefficient from ASCE 7-22 Figure 29.3-1 as a function of the aspect ratio B/s and the clearance ratio s/h (not the +/- GCp of a building wall); it rises for tall, narrow signs. Case B applies the resultant at a 0.2B eccentricity (the torsion that sizes the post and footing), and a wide sign (B/s >= 2) adds a Case C strip loading. The ASCE 7 figures and the engineer of record govern.",
+  };
+}
+export const windSolidSignExample = { inputs: { velocity_pressure_psf: 17, gust_factor: 0.85, force_coefficient: 1.35, solid_area_ft2: 64, width_ft: 8 } };
+
+const _v546renderWindSolidSign = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Section 29.3 (solid freestanding walls and signs); F = qh G Cf As, Case B eccentric moment M = F x 0.2 x B. Cf is a net two-face coefficient from Fig 29.3-1 (a function of B/s and s/h, ~1.2-2.0), not the +/- GCp of a building wall; it rises for tall narrow signs. The Case B 0.2B eccentricity is the torsion that sizes the post and footing. The ASCE 7 figures and the engineer of record govern.",
+  example: windSolidSignExample.inputs,
+  fields: [
+    { key: "velocity_pressure_psf", label: "Velocity pressure qh (psf)", kind: "number" },
+    { key: "gust_factor", label: "Gust factor G", kind: "number", default: 0.85 },
+    { key: "force_coefficient", label: "Force coefficient Cf (net, Fig 29.3-1)", kind: "number" },
+    { key: "solid_area_ft2", label: "Solid area As (ft^2)", kind: "number" },
+    { key: "width_ft", label: "Width B (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "f", id: "wss-out-f", label: "Design wind force", value: (r) => fmt(r.wind_force_lb, 0) + " lb" },
+    { key: "m", id: "wss-out-m", label: "Case B eccentric moment (torsion)", value: (r) => fmt(r.moment_caseb_lbft, 0) + " lb-ft" },
+    { key: "n", id: "wss-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindSolidSign,
+});
+CONSTRUCTION_RENDERERS["wind-solid-sign"] = _v546renderWindSolidSign;
