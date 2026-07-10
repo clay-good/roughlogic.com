@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-stage.js gzip cap 21500 -> 24000; 2026-07-09
+
+The spec-v542 `counterweight-arbor-load` fly-system-balance tile pushes `calc-stage.js` just over the 21500 B cap (100.0%). Raised the `check-module-sizes` cap to **24000** with headroom for further Group N tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-rescue.js gzip cap 5500 -> 8000; 2026-07-09
 
 The spec-v540..v541 Group P batch (`search-track-spacing`, `sweat-rate-hydration`) adds two hand-written renderer tiles to `calc-rescue.js`, crossing the 5500 B cap at tile v541 (114.9%). Raised the `check-module-sizes` cap to **8000** with headroom for further Group P tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
