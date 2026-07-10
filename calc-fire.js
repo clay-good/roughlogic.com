@@ -1976,3 +1976,47 @@ function renderDraftLiftMax(inputRegion, outputRegion, citationEl) {
   for (const f of [elev, factor, loss]) f.input.addEventListener("input", update);
 }
 FIRE_RENDERERS["draft-lift-max"] = renderDraftLiftMax;
+
+// --- spec-v580 F: Tanker (water shuttle) sustained flow ---
+// usable = nominal*fraction. shuttle_flow = usable*tankers/cycle. cycle = fill+dump+2*travel.
+// dims: in { nominal_tank_gal: L^3, usable_fraction: dimensionless, tanker_count: dimensionless, cycle_time_min: T } out: { usable_gal: L^3, shuttle_flow_gpm: L^3 T^-1 }
+export function computeTankerShuttleFlow({ nominal_tank_gal = 0, usable_fraction = 0.9, tanker_count = 0, cycle_time_min = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const nom = Number(nominal_tank_gal) || 0;
+  const frac = Number(usable_fraction) || 0;
+  const count = Number(tanker_count) || 0;
+  const cycle = Number(cycle_time_min) || 0;
+  if (!(nom > 0)) return { error: "Nominal tank volume must be positive (gal)." };
+  if (!(frac > 0 && frac <= 1)) return { error: "Usable fraction must be over 0 and at most 1." };
+  if (!(count > 0)) return { error: "Tanker count must be positive." };
+  if (!(cycle > 0)) return { error: "Cycle time must be positive (min)." };
+  const usable_gal = nom * frac;
+  const shuttle_flow_gpm = usable_gal * count / cycle;
+  return {
+    usable_gal, shuttle_flow_gpm,
+    note: "The fleet flow is capped by the slowest link - usually the fill or dump site, not the tank size - so an extra tanker adds nothing if the fill pump cannot turn it around. ISO credits only about 90% of nominal tank volume. This is a sustained rate (water-supply-duration handles the drawdown of a fixed on-scene volume). The fill-site pump capacity and the operation govern - a planning aid, not incident command.",
+  };
+}
+export const tankerShuttleFlowExample = { inputs: { nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 12 } };
+function renderTankerShuttleFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not incident command; the fill-site pump capacity and the operation govern. Citation: ISO PPC hauled-water credit / NFPA 1142 water shuttle, by name. usable = nominal x fraction; shuttle_flow = usable x tankers / cycle (cycle = fill + dump + 2 x travel). ISO credits only about 90% of nominal tank volume, and the fleet flow is capped by the slowest link - usually the fill or dump site, not the tank size.";
+  const nom = makeNumber("Nominal tank volume (gal)", "shuttle-nom", { step: "any", min: "0", value: "3000" }); nom.input.value = "3000";
+  const frac = makeNumber("Usable fraction (ISO ~0.90)", "shuttle-frac", { step: "any", min: "0", max: "1", value: "0.9" }); frac.input.value = "0.9";
+  const count = makeNumber("Number of tankers", "shuttle-count", { step: "1", min: "0", value: "3" }); count.input.value = "3";
+  const cycle = makeNumber("Cycle time (min: fill + dump + round-trip)", "shuttle-cycle", { step: "any", min: "0", value: "12" }); cycle.input.value = "12";
+  for (const f of [nom, frac, count, cycle]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { nom.input.value = "3000"; frac.input.value = "0.9"; count.input.value = "3"; cycle.input.value = "12"; update(); });
+  const oUse = makeOutputLine(outputRegion, "Usable volume per tanker", "shuttle-out-use");
+  const oFlow = makeOutputLine(outputRegion, "Sustained shuttle flow", "shuttle-out-flow");
+  const oNote = makeOutputLine(outputRegion, "Note", "shuttle-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTankerShuttleFlow({ nominal_tank_gal: readNum(nom.input), usable_fraction: frac.input.value === "" ? 0.9 : readNum(frac.input), tanker_count: readNum(count.input), cycle_time_min: readNum(cycle.input) });
+    if (r.error) { oUse.textContent = r.error; oFlow.textContent = "-"; oNote.textContent = ""; return; }
+    oUse.textContent = fmt(r.usable_gal, 0) + " gal";
+    oFlow.textContent = fmt(r.shuttle_flow_gpm, 0) + " gpm sustained";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [nom, frac, count, cycle]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["tanker-shuttle-flow"] = renderTankerShuttleFlow;

@@ -18994,3 +18994,22 @@ test("bounds: spec-v579 computeDraftLiftMax pins the theoretical lift, the attai
   assert.ok("error" in _v579({ site_elevation_ft: 3000, pump_factor: 0 }));
   assert.ok("error" in _v579({ site_elevation_ft: 3000, pump_factor: 1.5 }));
 });
+
+import { computeTankerShuttleFlow as _v580 } from "../../calc-fire.js";
+
+test("bounds: spec-v580 computeTankerShuttleFlow pins the usable credit, the shuttle flow, the cycle-time sensitivity, and error seams", () => {
+  const r = _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 12 });
+  assert.ok(Math.abs(r.usable_gal - 2700) < 1e-9); // 3000*0.9
+  assert.ok(Math.abs(r.shuttle_flow_gpm - 675) < 1e-9); // 2700*3/12
+  // A longer cycle (slow fill site) cuts the flow.
+  const slow = _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 18 });
+  assert.ok(Math.abs(slow.shuttle_flow_gpm - 450) < 1e-9);
+  // Flow scales linearly with tanker count.
+  assert.ok(Math.abs(_v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 6, cycle_time_min: 12 }).shuttle_flow_gpm - 1350) < 1e-9);
+  // Error seams: non-finite, non-positive volume / fraction / count / cycle.
+  assert.ok("error" in _v580({ nominal_tank_gal: Infinity, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 12 }));
+  assert.ok("error" in _v580({ nominal_tank_gal: 0, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 12 }));
+  assert.ok("error" in _v580({ nominal_tank_gal: 3000, usable_fraction: 0, tanker_count: 3, cycle_time_min: 12 }));
+  assert.ok("error" in _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 0, cycle_time_min: 12 }));
+  assert.ok("error" in _v580({ nominal_tank_gal: 3000, usable_fraction: 0.9, tanker_count: 3, cycle_time_min: 0 }));
+});

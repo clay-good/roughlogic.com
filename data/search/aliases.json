@@ -16384,6 +16384,46 @@
       "kind": "redirect"
     },
     {
+      "term": "tanker shuttle",
+      "target": "tanker-shuttle-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "water shuttle flow",
+      "target": "tanker-shuttle-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "tender shuttle",
+      "target": "tanker-shuttle-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "rural water supply",
+      "target": "tanker-shuttle-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "iso hauled water",
+      "target": "tanker-shuttle-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "nfpa 1142 shuttle",
+      "target": "tanker-shuttle-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tanker fleet flow",
+      "target": "tanker-shuttle-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "fill site bottleneck",
+      "target": "tanker-shuttle-flow",
+      "kind": "adjacent"
+    },
+    {
       "term": "work in progress",
       "target": "wip-percent-complete",
       "kind": "industry"

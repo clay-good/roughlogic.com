@@ -78,6 +78,7 @@ const RELATED = {
   "nfa-fireground-flow": ["required-fire-flow", "iso-nff", "pdp"],
   "relay-pump-distance": ["reverse-lay-friction", "pdp", "standpipe-pdp"],
   "draft-lift-max": ["relay-pump-distance", "pump-tdh", "npsh-a"],
+  "tanker-shuttle-flow": ["nfpa-1142-water-supply", "water-supply-duration", "relay-pump-distance"],
   "debt-yield": ["cap-rate-dscr", "rental-worksheet", "break-even-occupancy", "loan-payment"],
   "break-even-occupancy": ["cap-rate-dscr", "debt-yield", "rental-worksheet", "rent-roll-vacancy"],
   "max-offer-70-rule": ["cap-rate-dscr", "rent-vs-buy", "seller-net-sheet", "material-cost"],

@@ -43766,6 +43766,58 @@
    }
   },
   {
+   "tile_id": "tanker-shuttle-flow",
+   "source_publisher": "ISO PPC hauled-water credit / NFPA 1142",
+   "source_title": "usable = nominal x fraction; shuttle_flow = usable x tankers / cycle",
+   "source_edition_or_year": "ISO / NFPA 1142",
+   "source_section_or_page": "3,000 gal tankers at 90%, 3 tankers, 12-min cycle -> 2,700 usable, 675 gpm sustained",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "nominal_tank_gal": 3000,
+    "usable_fraction": 0.9,
+    "tanker_count": 3,
+    "cycle_time_min": 12
+   },
+   "outputs": {
+    "usable_gal": {
+     "value": 2700,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "shuttle_flow_gpm": {
+     "value": 675,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tanker-shuttle-flow",
+   "source_publisher": "ISO PPC hauled-water credit / NFPA 1142",
+   "source_title": "a slow fill site caps the fleet (bottleneck)",
+   "source_edition_or_year": "ISO / NFPA 1142",
+   "source_section_or_page": "Same fleet with an 18-min cycle -> 2,700 x 3 / 18 = 450 gpm (a fourth tanker would not help)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "nominal_tank_gal": 3000,
+    "usable_fraction": 0.9,
+    "tanker_count": 3,
+    "cycle_time_min": 18
+   },
+   "outputs": {
+    "shuttle_flow_gpm": {
+     "value": 450,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wip-percent-complete",
    "source_publisher": "construction accounting (cost-to-cost POC)",
    "source_title": "$500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled",

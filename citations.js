@@ -4503,6 +4503,17 @@ export const CITATIONS = {
       { name: "Default coefficient", value: "0.90 (rounded outlet) unless user supplies", source: "AWWA M17 typical" },
     ],
   },
+  "tanker-shuttle-flow": {
+    formula: "usable_gal = nominal_tank_gal x usable_fraction; shuttle_flow = usable_gal x tanker_count / cycle_time_min (cycle = fill + dump + 2 x travel).",
+    edition: "ISO PPC hauled-water credit / NFPA 1142 water shuttle, by name.",
+    freeAccess: "The water-shuttle relations are public fire-service training material; the fill-site pump capacity and the operation govern the actual delivery.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fleet flow is capped by the slowest link - usually the fill or dump site, not the tank size - so an extra tanker adds nothing if the fill pump cannot turn it around. ISO credits only about 90% of nominal tank volume. This is a sustained rate (water-supply-duration handles the drawdown of a fixed on-scene volume). The fill-site pump capacity and the operation govern - a planning aid, not incident command.",
+    assumptions: [
+      { name: "Usable credit", value: "ISO credits about 90% of nominal tank volume as usable", source: "ISO PPC hauled-water credit" },
+      { name: "Bottleneck", value: "sustained flow is capped by the fill/dump site, not the number or size of tankers", source: "NFPA 1142 water shuttle" },
+    ],
+  },
   "draft-lift-max": {
     formula: "theoretical_lift = 33.9 - site_elevation / 1000; attainable_lift = pump_factor x theoretical_lift - suction_losses (pump_factor about 2/3).",
     edition: "IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name.",
