@@ -885,6 +885,8 @@ const TOOL_MODULES = (() => {
     "basal-area-prism",
     // spec-v564
     "reineke-sdi",
+    // spec-v565
+    "trunk-decay-strength",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

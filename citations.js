@@ -6811,6 +6811,17 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "trunk-decay-strength": {
+    formula: "hollow_d = D - 2t; loss_pct = (hollow_d^3 / D^3) x 100; t_over_R = t / (D / 2); concern when t/R < 0.30.",
+    edition: "Hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name.",
+    freeAccess: "The Wagener cube-law loss and the Mattheck t/R rule are published arboricultural results; a qualified arborist and a TRAQ assessment govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Strength loss goes as the cube of the hollow-to-diameter ratio, so a trunk can be about two-thirds hollow and keep most of its strength (the loss is small until the hollow is large, then rises sharply); the Mattheck t/R < 0.30 (sound shell below 30% of the radius) is the common concern trigger; an open cavity (a slot) is far weaker than this closed-hollow estimate. A screen, not a tree-risk determination.",
+    assumptions: [
+      { name: "Closed hollow", value: "the loss estimate assumes a central closed hollow; an open cavity (slot) is far weaker", source: "Wagener 1963" },
+      { name: "Concern trigger", value: "t/R < 0.30 (sound shell below 30% of the radius) flags escalation to a full TRAQ assessment", source: "Mattheck & Breloer" },
+    ],
+  },
   "reineke-sdi": {
     formula: "SDI = TPA x (QMD / 10)^1.605; percent_max = SDI / SDI_max x 100.",
     edition: "Reineke Stand Density Index (Reineke 1933; USDA FS RMRS), by name.",

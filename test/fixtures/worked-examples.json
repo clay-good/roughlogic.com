@@ -20155,6 +20155,60 @@
    }
   },
   {
+   "tile_id": "trunk-decay-strength",
+   "source_publisher": "Wagener 1963 / Mattheck t/R / ISA TRAQ",
+   "source_title": "loss_pct = (hollow_d^3 / D^3) x 100; t/R = t / (D/2)",
+   "source_edition_or_year": "Wagener 1963",
+   "source_section_or_page": "24 in trunk, 4 in sound shell (hollow 16) -> 29.6% loss, t/R 0.333 (no concern)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "diameter_in": 24,
+    "shell_thick_in": 4
+   },
+   "outputs": {
+    "loss_pct": {
+     "value": 29.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "t_over_r": {
+     "value": 0.333,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "trunk-decay-strength",
+   "source_publisher": "Wagener 1963 / Mattheck t/R / ISA TRAQ",
+   "source_title": "a thinner shell crosses the t/R < 0.30 concern trigger (cube-law sharp rise)",
+   "source_edition_or_year": "Wagener 1963",
+   "source_section_or_page": "Same trunk, 3 in shell (hollow 18) -> 42.2% loss, t/R 0.25 (concern fires)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "diameter_in": 24,
+    "shell_thick_in": 3
+   },
+   "outputs": {
+    "loss_pct": {
+     "value": 42.2,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "t_over_r": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",

@@ -4639,6 +4639,46 @@
       "kind": "redirect"
     },
     {
+      "term": "hollow tree strength",
+      "target": "trunk-decay-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "trunk decay",
+      "target": "trunk-decay-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "wagener strength loss",
+      "target": "trunk-decay-strength",
+      "kind": "redirect"
+    },
+    {
+      "term": "t/r ratio",
+      "target": "trunk-decay-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "mattheck",
+      "target": "trunk-decay-strength",
+      "kind": "industry"
+    },
+    {
+      "term": "tree risk decay",
+      "target": "trunk-decay-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sound shell",
+      "target": "trunk-decay-strength",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cavity strength loss",
+      "target": "trunk-decay-strength",
+      "kind": "redirect"
+    },
+    {
       "term": "nozzle flow",
       "target": "nozzle-flow-pressure",
       "kind": "redirect"

@@ -869,6 +869,7 @@ const RELATED = {
   "chipper-debris": ["log-limb-weight", "demo-debris"],
   "basal-area-prism": ["timber-cruise", "felling-notch-hinge", "log-limb-weight"],
   "reineke-sdi": ["basal-area-prism", "timber-cruise", "log-limb-weight"],
+  "trunk-decay-strength": ["char-depth-capacity", "felling-notch-hinge", "log-limb-weight"],
 
   // spec-v69 surface prep, coatings, and abatement
   "coating-coverage-dft": ["paint-coverage", "abrasive-blast", "material-quantity"],

@@ -405,3 +405,47 @@ function _v564renderReinekeSdi(inputRegion, outputRegion, citationEl) {
   for (const f of [tpa, qmd, smax]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["reineke-sdi"] = _v564renderReinekeSdi;
+
+// --- spec-v565 L: Hollow / decayed trunk strength loss (Wagener / Mattheck t/R) ---
+// hollow_d = D - 2t. loss% = (hollow_d^3 / D^3) x 100. t/R = t / (D/2). concern when t/R < 0.30.
+// dims: in { diameter_in: L, shell_thick_in: L } out: { hollow_d_in: L, loss_pct: dimensionless, t_over_r: dimensionless }
+export function computeTrunkDecayStrength({ diameter_in = 0, shell_thick_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(diameter_in);
+  const t = Number(shell_thick_in);
+  if (!Number.isFinite(D) || D <= 0) return { error: "Trunk diameter must be a positive finite number (in)." };
+  if (!Number.isFinite(t) || t <= 0) return { error: "Sound-shell thickness must be a positive finite number (in)." };
+  if (t >= D / 2) return { error: "Sound shell is at least half the diameter - no hollow to assess." };
+  const hollow_d_in = D - 2 * t;
+  const loss_pct = (Math.pow(hollow_d_in, 3) / Math.pow(D, 3)) * 100;
+  const t_over_r = t / (D / 2);
+  const concern = t_over_r < 0.30;
+  if (![hollow_d_in, loss_pct, t_over_r].every(Number.isFinite)) return { error: "Strength-loss math is not a finite value." };
+  return {
+    hollow_d_in, loss_pct, t_over_r, concern,
+    note: "Strength loss goes as the CUBE of the hollow-to-diameter ratio, so a trunk can be about two-thirds hollow and keep most of its strength - the loss is small until the hollow is large, then rises sharply. The Mattheck t/R < 0.30 (sound shell below 30% of the radius) is the common concern trigger. An OPEN cavity (a slot, not a closed pipe) is far weaker than this closed-hollow estimate. A screen, not a load rating; a qualified arborist and an ISA TRAQ assessment govern.",
+  };
+}
+export const trunkDecayStrengthExample = { inputs: { diameter_in: 24, shell_thick_in: 4 } };
+
+function _v565renderTrunkDecayStrength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name. hollow_d = D - 2t; loss% = (hollow_d^3 / D^3) x 100; t/R = t / (D/2), with the Mattheck concern trigger at t/R < 0.30. Strength loss goes as the cube of the hollow ratio (small until the hollow is large); an open cavity is far weaker. A screen, not a load rating; a qualified arborist and a TRAQ assessment govern.";
+  const D = makeNumber("Trunk diameter outside bark (in)", "tds-d", { step: "any", min: "0", value: "24" }); D.input.value = "24";
+  const t = makeNumber("Sound-wood shell thickness (in, radial)", "tds-t", { step: "any", min: "0", value: "4" }); t.input.value = "4";
+  for (const f of [D, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "24"; t.input.value = "4"; update(); });
+  const oLoss = makeOutputLine(outputRegion, "Strength loss (section modulus)", "tds-out-loss");
+  const oTr = makeOutputLine(outputRegion, "t/R ratio", "tds-out-tr");
+  const oConcern = makeOutputLine(outputRegion, "Mattheck concern?", "tds-out-concern");
+  const oNote = makeOutputLine(outputRegion, "Note", "tds-out-note");
+  const update = debounce(() => {
+    const r = computeTrunkDecayStrength({ diameter_in: Number(D.input.value) || 0, shell_thick_in: Number(t.input.value) || 0 });
+    if (r.error) { oLoss.textContent = r.error; oTr.textContent = "-"; oConcern.textContent = "-"; oNote.textContent = ""; return; }
+    oLoss.textContent = fmt(r.loss_pct, 1) + "% (hollow " + fmt(r.hollow_d_in, 1) + " in)";
+    oTr.textContent = fmt(r.t_over_r, 3);
+    oConcern.textContent = r.concern ? "YES - t/R below 0.30, escalate to a full TRAQ assessment" : "no - t/R at or above 0.30 (still a screen only)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, t]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["trunk-decay-strength"] = _v565renderTrunkDecayStrength;

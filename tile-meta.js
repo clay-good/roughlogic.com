@@ -446,6 +446,7 @@ const _TILES = [
   ["porta-wrap-friction", "L"], ["chipper-debris", "L"],
   ["basal-area-prism", "L"],
   ["reineke-sdi", "L"],
+  ["trunk-decay-strength", "L"],
   ["nozzle-flow-pressure", "L"], ["spray-drift-buffer", "L"], ["sprayer-field-capacity", "L"],
   // v69 surface prep, coatings, and abatement (Groups E and D)
   ["coating-coverage-dft", "E"], ["abrasive-blast", "E"], ["abatement-containment", "D"],

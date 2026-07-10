@@ -18652,3 +18652,25 @@ test("bounds: spec-v564 computeReinekeSdi pins the 1.605 exponent, the percent-o
   assert.ok("error" in _v564({ trees_per_acre: 300, qmd_in: 0, sdi_max: 400 }));
   assert.ok("error" in _v564({ trees_per_acre: 300, qmd_in: 10, sdi_max: -1 }));
 });
+
+import { computeTrunkDecayStrength as _v565 } from "../../calc-arborist.js";
+
+test("bounds: spec-v565 computeTrunkDecayStrength pins the cube-law loss, the t/R ratio, the concern trigger below 0.30, and error seams", () => {
+  const r = _v565({ diameter_in: 24, shell_thick_in: 4 });
+  assert.ok(Math.abs(r.loss_pct - 29.6) < 0.1); // (16^3 / 24^3) * 100
+  assert.ok(Math.abs(r.t_over_r - 0.333) < 0.005); // 4 / 12
+  assert.equal(r.concern, false); // 0.333 >= 0.30
+  // A thinner shell rises sharply (cube law) and crosses the concern trigger.
+  const thin = _v565({ diameter_in: 24, shell_thick_in: 3 });
+  assert.ok(Math.abs(thin.loss_pct - 42.2) < 0.1);
+  assert.ok(Math.abs(thin.t_over_r - 0.25) < 0.005);
+  assert.equal(thin.concern, true); // 0.25 < 0.30
+  assert.ok(thin.loss_pct > r.loss_pct);
+  // A thick shell has near-zero loss (small hollow).
+  assert.ok(_v565({ diameter_in: 24, shell_thick_in: 5 }).loss_pct < 20);
+  // Error seams: non-finite, non-positive diameter / shell, shell >= half diameter.
+  assert.ok("error" in _v565({ diameter_in: Infinity, shell_thick_in: 4 }));
+  assert.ok("error" in _v565({ diameter_in: 0, shell_thick_in: 4 }));
+  assert.ok("error" in _v565({ diameter_in: 24, shell_thick_in: 0 }));
+  assert.ok("error" in _v565({ diameter_in: 24, shell_thick_in: 12 })); // shell >= D/2
+});
