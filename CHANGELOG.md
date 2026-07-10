@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): spec-v592 follow-on -- preview map 17 -> 44 entries; 2026-07-10
+
+Answer previews now cover 44 of the 49 slot tiles (asphalt tonnage, breaker sizing, dim weight, drywall sheets, base plates, and peers). Five slot tiles stay preview-less on principle: four whose renderers convert US inputs into SI-native computes (the preview runtime maps args identically, so a direct mapping would show numerically wrong answers -- amp-power-spl, dyno-correction-sae, flocculation-g-value, spl-atmospheric; a conversion field in the schema is the recorded follow-on if demand appears), and tankless-gpm (its preview would need the inverse solve mode, which the worked-example gate check cannot verify). All 44 verified two ways: the check-slots worked-example run and a slot-mapped preview simulation (44/44 finite, leak-free).
+
 ### feat(search): spec-v591 follow-on -- slot batch 2 (factory tiles unlocked); 2026-07-10
 
 The slot table grows 17 -> 49 tiles / 85 slots, the first batch able to target factory-rendered tiles now that their inputs carry real ids (0.181.0): dim-weight, freight-density, breaker-sizing, transformer-sizing, asphalt-tonnage, rebar, sump-basin-sizing, brake-pad-life, and peers. `check-slots` learns the two legitimate param shapes -- an id-position literal of ANY field-builder call (aliases like `_mnF` included; the old make*-only regex missed the v593-remediated rescue renderer) or a factory field-spec `key:` literal (which IS the DOM id since the factory-id fix). Verified in-browser: "dim weight 40 in 25 lb" arrives on the factory tile as `#dim-weight?v=1&length_in=40&actual_weight_lb=25` with both inputs populated; same for "breaker for 3500w at 240v". Shard 1.6 KB gz.
