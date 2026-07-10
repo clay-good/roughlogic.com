@@ -8540,6 +8540,17 @@ export const CITATIONS = {
       { name: "Chart governs", value: "the crane manufacturer's load-moment chart and published outrigger reaction data are authoritative", source: "SAE J1063" },
     ],
   },
+  "lifting-lug-design": {
+    formula: "bearing = 1.25 Fy Dp t / Nd; net tension = Fu (w - Dh) t / Nd; shear tear-out = 0.70 Fu (2 t (a + Dp/2 - Dh/2)) / Nd; governing = min; DCR = load / governing.",
+    edition: "The ASME BTH-1 Section 3-3.3 pin-connected-plate (lifting lug / padeye) strength checks, by name.",
+    freeAccess: "ASME BTH-1 is available through ASME; the pin-plate strength relations are established design checks. An estimate; the engineer of record governs.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing, so a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category (A or B) and service class; cheek plates and weld design are separate checks. A screening aid, not the engineer of record.",
+    assumptions: [
+      { name: "Three checked modes", value: "bearing, net-section tension, and double-plane shear tear-out; the minimum governs", source: "ASME BTH-1 3-3.3" },
+      { name: "Design factor Nd", value: "1.67 (Cat A) or 2.0 (Cat B) times the service-class multiplier", source: "ASME BTH-1 3-1.3" },
+    ],
+  },
   "hay-dry-matter": {
     formula: "dry_matter = bale_weight x (1 - moisture/100); weight_at_target = dry_matter / (1 - target_moisture/100); flag set where moisture > safe_threshold (default 18% large / 20% small).",
     edition: "First-principles dry-matter mass balance with USDA NRCS / land-grant extension safe-storage guidance (by name); no edition cycle.",

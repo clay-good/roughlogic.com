@@ -6454,6 +6454,46 @@
       "kind": "redirect"
     },
     {
+      "term": "lifting lug",
+      "target": "lifting-lug-design",
+      "kind": "industry"
+    },
+    {
+      "term": "padeye",
+      "target": "lifting-lug-design",
+      "kind": "industry"
+    },
+    {
+      "term": "pin connected plate",
+      "target": "lifting-lug-design",
+      "kind": "redirect"
+    },
+    {
+      "term": "asme bth-1",
+      "target": "lifting-lug-design",
+      "kind": "industry"
+    },
+    {
+      "term": "lug bearing tearout",
+      "target": "lifting-lug-design",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lug design",
+      "target": "lifting-lug-design",
+      "kind": "industry"
+    },
+    {
+      "term": "hole edge distance lug",
+      "target": "lifting-lug-design",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shackle lug",
+      "target": "lifting-lug-design",
+      "kind": "adjacent"
+    },
+    {
       "term": "hay moisture",
       "target": "hay-dry-matter",
       "kind": "industry"

@@ -1090,3 +1090,60 @@ function renderCraneOutriggerReaction(inputRegion, outputRegion, citationEl) {
   for (const f of [w, wc, r, rc, sp]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["crane-outrigger-reaction"] = renderCraneOutriggerReaction;
+
+// --- spec-v554 Z: Lifting lug / padeye pin-hole check (ASME BTH-1 3-3.3) ---
+// bearing = 1.25 Fy Dp t/Nd. tension = Fu(w-Dh)t/Nd. tearout = 0.70 Fu (2t(a+Dp/2-Dh/2))/Nd.
+// dims: in { applied_load_kip: M L T^-2, plate_thick_in: L, hole_dia_in: L, pin_dia_in: L, edge_dist_in: L, plate_width_in: L, fy_ksi: M L^-1 T^-2, fu_ksi: M L^-1 T^-2, design_factor: dimensionless } out: { bearing_kip: M L T^-2, tension_kip: M L T^-2, tearout_kip: M L T^-2, dcr: dimensionless }
+export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, plate_width_in, fy_ksi = 36, fu_ksi = 58, design_factor = 2.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const P = Number(applied_load_kip), t = Number(plate_thick_in), Dh = Number(hole_dia_in), Dp = Number(pin_dia_in);
+  const a = Number(edge_dist_in), w = Number(plate_width_in), Fy = Number(fy_ksi), Fu = Number(fu_ksi), Nd = Number(design_factor);
+  if (!Number.isFinite(P) || P <= 0) return { error: "Applied load must be a positive finite number (kip)." };
+  if (!Number.isFinite(t) || t <= 0) return { error: "Plate thickness must be positive (in)." };
+  if (!Number.isFinite(Dh) || Dh <= 0) return { error: "Hole diameter must be positive (in)." };
+  if (!Number.isFinite(Dp) || Dp <= 0) return { error: "Pin diameter must be positive (in)." };
+  if (Dp > Dh) return { error: "Pin diameter cannot exceed the hole diameter." };
+  if (!Number.isFinite(a) || a <= 0) return { error: "Edge distance must be positive (in)." };
+  if (!Number.isFinite(w) || w <= 0) return { error: "Plate width must be positive (in)." };
+  if (!Number.isFinite(Fy) || Fy <= 0) return { error: "Yield strength must be positive (ksi)." };
+  if (!Number.isFinite(Fu) || Fu <= 0) return { error: "Ultimate strength must be positive (ksi)." };
+  if (!Number.isFinite(Nd) || Nd < 1) return { error: "Design factor Nd must be at least 1." };
+  if (w <= Dh) return { error: "Plate width must exceed the hole diameter (no net tension section)." };
+  const bearing_kip = 1.25 * Fy * Dp * t / Nd;
+  const tension_kip = Fu * (w - Dh) * t / Nd;
+  const tearout_kip = 0.70 * Fu * (2 * t * (a + Dp / 2 - Dh / 2)) / Nd;
+  const governing_kip = Math.min(bearing_kip, tension_kip, tearout_kip);
+  const governing_mode = governing_kip === bearing_kip ? "bearing" : governing_kip === tension_kip ? "net tension" : "shear tear-out";
+  const dcr = P / governing_kip;
+  return {
+    bearing_kip, tension_kip, tearout_kip, governing_kip, governing_mode, dcr, adequate: dcr <= 1.0,
+    note: "The four modes trade off through hole placement: moving the hole from the edge cures tear-out but shrinks the net tension width, and the pin-to-hole clearance drives bearing - a lug sized for gross tension alone can tear out at the pin. The design factor Nd depends on the ASME BTH-1 design category and service class. Cheek plates and weld design are separate checks. ASME BTH-1 and the engineer of record govern.",
+  };
+}
+
+function renderLiftingLugDesign(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME BTH-1 Section 3-3.3 pin-connected plates (lifting lug / padeye): bearing = 1.25 Fy Dp t/Nd; net tension = Fu(w-Dh)t/Nd; double-plane shear tear-out = 0.70 Fu(2t(a+Dp/2-Dh/2))/Nd; governing = the minimum. The four modes trade off through hole placement - a lug sized for gross tension alone can tear out at the pin. Nd depends on the BTH-1 design category and service class. ASME BTH-1 and the engineer of record govern.";
+  const P = makeNumber("Applied load (kip)", "llg-p", { step: "any", min: "0" });
+  const t = makeNumber("Plate thickness t (in)", "llg-t", { step: "any", min: "0" });
+  const Dh = makeNumber("Hole diameter Dh (in)", "llg-dh", { step: "any", min: "0" });
+  const Dp = makeNumber("Pin diameter Dp (in)", "llg-dp", { step: "any", min: "0" });
+  const a = makeNumber("Hole-center to edge a (in)", "llg-a", { step: "any", min: "0" });
+  const w = makeNumber("Plate width at hole w (in)", "llg-w", { step: "any", min: "0" });
+  const fy = makeNumber("Yield Fy (ksi)", "llg-fy", { step: "any", min: "0", value: "36" }); fy.input.value = "36";
+  const fu = makeNumber("Ultimate Fu (ksi)", "llg-fu", { step: "any", min: "0", value: "58" }); fu.input.value = "58";
+  const nd = makeNumber("Design factor Nd", "llg-nd", { step: "any", min: "1", value: "2.0" }); nd.input.value = "2.0";
+  for (const f of [P, t, Dh, Dp, a, w, fy, fu, nd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { P.input.value = "20"; t.input.value = "1.0"; Dh.input.value = "1.06"; Dp.input.value = "1.0"; a.input.value = "2.0"; w.input.value = "4.0"; fy.input.value = "36"; fu.input.value = "58"; nd.input.value = "2.0"; update(); });
+  const oCap = makeOutputLine(outputRegion, "Bearing / tension / tear-out", "llg-out-cap");
+  const oGov = makeOutputLine(outputRegion, "Governing mode / capacity", "llg-out-gov");
+  const oDcr = makeOutputLine(outputRegion, "Demand / capacity", "llg-out-dcr");
+  const update = debounce(() => {
+    const r = computeLiftingLugDesign({ applied_load_kip: Number(P.input.value) || 0, plate_thick_in: Number(t.input.value) || 0, hole_dia_in: Number(Dh.input.value) || 0, pin_dia_in: Number(Dp.input.value) || 0, edge_dist_in: Number(a.input.value) || 0, plate_width_in: Number(w.input.value) || 0, fy_ksi: Number(fy.input.value) || 0, fu_ksi: Number(fu.input.value) || 0, design_factor: Number(nd.input.value) || 0 });
+    if (r.error) { oCap.textContent = r.error; for (const o of [oGov, oDcr]) o.textContent = "-"; return; }
+    oCap.textContent = fmt(r.bearing_kip, 1) + " / " + fmt(r.tension_kip, 1) + " / " + fmt(r.tearout_kip, 1) + " kip";
+    oGov.textContent = r.governing_mode + " at " + fmt(r.governing_kip, 1) + " kip";
+    oDcr.textContent = fmt(r.dcr, 2) + (r.adequate ? " (adequate)" : " - OVER, fails by " + r.governing_mode);
+  }, DEBOUNCE_MS);
+  for (const f of [P, t, Dh, Dp, a, w, fy, fu, nd]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["lifting-lug-design"] = renderLiftingLugDesign;

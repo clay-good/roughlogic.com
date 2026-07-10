@@ -24591,6 +24591,80 @@
    }
   },
   {
+   "tile_id": "lifting-lug-design",
+   "source_publisher": "ASME BTH-1 Section 3-3.3 (pin-connected plates)",
+   "source_title": "governing = min(bearing, net tension, shear tear-out); DCR = load / governing",
+   "source_edition_or_year": "ASME BTH-1",
+   "source_section_or_page": "20 kip; t 1.0, hole 1.06, pin 1.0, edge 2.0, width 4.0, A36, Nd 2.0 -> bearing 22.5 governs, DCR 0.89",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "applied_load_kip": 20,
+    "plate_thick_in": 1.0,
+    "hole_dia_in": 1.06,
+    "pin_dia_in": 1.0,
+    "edge_dist_in": 2.0,
+    "plate_width_in": 4.0,
+    "fy_ksi": 36,
+    "fu_ksi": 58,
+    "design_factor": 2.0
+   },
+   "outputs": {
+    "bearing_kip": {
+     "value": 22.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "tearout_kip": {
+     "value": 80.0,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "dcr": {
+     "value": 0.89,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lifting-lug-design",
+   "source_publisher": "ASME BTH-1 Section 3-3.3 (pin-connected plates)",
+   "source_title": "moving the hole to the edge makes it tear out at the pin",
+   "source_edition_or_year": "ASME BTH-1",
+   "source_section_or_page": "Same plate, edge 0.4 in -> tear-out collapses to 15.0 kip (governs), DCR 1.33 (fails)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "applied_load_kip": 20,
+    "plate_thick_in": 1.0,
+    "hole_dia_in": 1.06,
+    "pin_dia_in": 1.0,
+    "edge_dist_in": 0.4,
+    "plate_width_in": 4.0,
+    "fy_ksi": 36,
+    "fu_ksi": 58,
+    "design_factor": 2.0
+   },
+   "outputs": {
+    "tearout_kip": {
+     "value": 15.0,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "dcr": {
+     "value": 1.33,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hay-dry-matter",
    "source_publisher": "First-principles dry-matter balance + USDA NRCS / extension",
    "source_title": "1,200 lb round bale at 22% -> 936 lb DM, 1,101 lb at 15%, flag",

@@ -2456,6 +2456,7 @@ cross-check.
 | calc-rigging.js | `computeCraneNetCapacity` | `{ gross_chart_lb, hook_block_lb = 0, jib_attach_lb = 0, wire_rope_lb = 0, bel...` | _ | _ | _ |
 | calc-rigging.js | `computeCraneOutriggerReaction` | `{ gross_load_kip, counterweight_kip = 0, load_radius_ft, cw_radius_ft = 0, ou...` | _ | _ | _ |
 | calc-rigging.js | `computeForkliftCapacityDerate` | `{ rated_cap_lb, rated_lc_in = 24, actual_lc_in, load_lb } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeLiftingLugDesign` | `{ applied_load_kip, plate_thick_in, hole_dia_in, pin_dia_in, edge_dist_in, pl...` | _ | _ | _ |
 | calc-rigging.js | `computeMultiLegSling` | `{ total_load_lb = 0, num_legs = 2, horizontal_angle_deg = 60 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeRollerJackForce` | `{ load_lb, roll_coef = 0.03, incline_deg = 0, skate_cap_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeShackleEyeboltWll` | `{ leg_load_lb, rated_wll_lb, angle_deg = 0, hardware = "shackle", design_fact...` | _ | _ | _ |
@@ -2664,7 +2665,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1250.
+Row count: 1251.
 
 <!-- END function-corpus-v14 -->
 
@@ -3832,7 +3833,7 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (19 tiles)
+### Group Z (unnamed) (20 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3844,6 +3845,7 @@ per spec-v14 §13.1 second paragraph.
 | `crane-net-capacity` | Crane Net Capacity After Deductions | OSHA 1926.1417(o) / ASME B30.5; gross 30,000, hook 800, wire 400, below-hook 600, load 22... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crane-outrigger-reaction` | Crane Outrigger Reaction from Lift Geometry | Crane load-moment method / SAE J1063 ...; 40 kip at 30 ft, 30 kip CW at 12 ft, 20 ft spread -> even... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `forklift-capacity-derate` | Forklift Load-Center Capacity Derate | ASME B56.1 / truck data plate; 5,000 lb @ 24 in handling a load at 36 in, 3,000 lb -> 3,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lifting-lug-design` | Lifting Lug / Padeye Pin-Hole Check | ASME BTH-1 Section 3-3.3 (pin-connect...; 20 kip; t 1.0, hole 1.06, pin 1.0, edge 2.0, width 4.0, A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `multi-leg-sling` | Multi-Leg Sling Load per Leg | ASME B30.9 (Slings, by name); spec-v117 section 2.1 pinned example (4,619 lb/leg, 2,309... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `roller-jack-force` | Roller / Skate / Jacking Push Force | Standard machinery-moving practice; 12,000 lb on skates (coef 0.03), level, 5,000 lb skate ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shackle-eyebolt-wll` | Shackle / Eye-Bolt WLL and Angular Derate | ASME B30.26 / B18.15 manufacturer data; shoulder eye bolt rated 7,000 lb, leg 3,000 lb, pull 45 d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3856,6 +3858,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1006. Fixture-covered or reference-cadence: 1006 / 1006.
+Tile count: 1007. Fixture-covered or reference-cadence: 1007 / 1007.
 
 <!-- END tile-index-v14 -->

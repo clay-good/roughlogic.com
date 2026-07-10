@@ -18380,3 +18380,28 @@ test("bounds: spec-v553 computeSnowUnbalancedGable pins the slope-band applicabi
   assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 0, eave_to_ridge_ft: 30 }));
   assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 0 }));
 });
+
+import { computeLiftingLugDesign as _v554 } from "../../calc-rigging.js";
+
+test("bounds: spec-v554 computeLiftingLugDesign pins the three mode capacities, the governing minimum, the near-edge tear-out collapse, and error seams", () => {
+  const r = _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
+  assert.ok(Math.abs(r.bearing_kip - 22.5) < 0.1); // 1.25*36*1*1/2
+  assert.ok(Math.abs(r.tension_kip - 85.3) < 0.1); // 58*(4-1.06)*1/2
+  assert.ok(Math.abs(r.tearout_kip - 80.0) < 0.2); // 0.70*58*(2*1*(2+0.5-0.53))/2
+  assert.equal(r.governing_mode, "bearing"); // 22.5 is the min
+  assert.ok(Math.abs(r.dcr - 0.89) < 0.01);
+  assert.equal(r.adequate, true);
+  // Sliding the hole to the edge collapses tear-out and it governs, failing the lug.
+  const near = _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 0.4, plate_width_in: 4.0, fy_ksi: 36, fu_ksi: 58, design_factor: 2.0 });
+  assert.ok(Math.abs(near.tearout_kip - 15.0) < 0.1);
+  assert.equal(near.governing_mode, "shear tear-out");
+  assert.ok(Math.abs(near.dcr - 1.33) < 0.01);
+  assert.equal(near.adequate, false);
+  // Error seams: non-finite, non-positive geometry, pin > hole, Nd < 1.
+  assert.ok("error" in _v554({ applied_load_kip: Infinity, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 }));
+  assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 }));
+  assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.0, pin_dia_in: 1.06, edge_dist_in: 2.0, plate_width_in: 4.0 })); // pin > hole
+  assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 0, plate_width_in: 4.0 }));
+  assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 4.0, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0 })); // w <= Dh
+  assert.ok("error" in _v554({ applied_load_kip: 20, plate_thick_in: 1.0, hole_dia_in: 1.06, pin_dia_in: 1.0, edge_dist_in: 2.0, plate_width_in: 4.0, design_factor: 0.5 }));
+});

@@ -1068,6 +1068,8 @@ const TOOL_MODULES = (() => {
     "winch-drum-line-pull",
     // spec-v550
     "crane-outrigger-reaction",
+    // spec-v554
+    "lifting-lug-design",
   ]);
   return map;
 })();
