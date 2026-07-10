@@ -18052,3 +18052,25 @@ test("bounds: spec-v538 computeKitchenSanitizerPpm pins the oz-per-gallon diluti
   assert.ok("error" in _v538({ sanitizer_type: "chlorine", active_pct: 5.25, target_ppm: 100, batch_gallons: 0 }));
   assert.ok("error" in _v538({ sanitizer_type: "foo", active_pct: 5.25, target_ppm: 100, batch_gallons: 3 }));
 });
+
+import { computeDrinkAbvDilution as _v539 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v539 computeDrinkAbvDilution pins the melt-diluted ABV, the standard-drink count, and error seams", () => {
+  const r = _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "stirred", dilution_pct: 25 });
+  assert.ok(Math.abs(r.pure_alcohol_oz - 0.98) < 0.005); // 3 * 32.67/100
+  assert.ok(Math.abs(r.final_abv_pct - 26.13) < 0.05); // 0.98 / 3.75 * 100
+  assert.ok(Math.abs(r.standard_drinks - 1.63) < 0.01); // 0.98 / 0.6
+  // Neat (0% dilution) overstates: final ABV equals the weighted ABV.
+  assert.ok(Math.abs(_v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "neat" }).final_abv_pct - 32.67) < 0.05);
+  // The method preset drives the melt when no explicit override is given (shaken > stirred > rocks).
+  const shaken = _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "shaken" });
+  const rocks = _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "rocks" });
+  assert.ok(shaken.final_abv_pct < rocks.final_abv_pct); // more melt -> lower ABV
+  // Error seams: non-finite, non-positive volume, ABV out of range, negative dilution, bad method.
+  assert.ok("error" in _v539({ total_volume_oz: Infinity, weighted_abv_pct: 32.67, method: "stirred" }));
+  assert.ok("error" in _v539({ total_volume_oz: 0, weighted_abv_pct: 32.67, method: "stirred" }));
+  assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 120, method: "stirred" }));
+  assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: -1, method: "stirred" }));
+  assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "stirred", dilution_pct: -5 }));
+  assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "foo" }));
+});

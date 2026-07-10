@@ -21208,6 +21208,57 @@
    }
   },
   {
+   "tile_id": "drink-abv-dilution",
+   "source_publisher": "Cocktail dilution model (Dave Arnold, Liquid Intelligence)",
+   "source_title": "final_abv = pure_alcohol / (total_volume + dilution_water) x 100",
+   "source_edition_or_year": "Liquid Intelligence",
+   "source_section_or_page": "Stirred Martini 3 oz at 32.67% ABV, 25% melt -> 26.1% ABV, 1.63 standard drinks",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "total_volume_oz": 3,
+    "weighted_abv_pct": 32.67,
+    "method": "stirred",
+    "dilution_pct": 25
+   },
+   "outputs": {
+    "final_abv_pct": {
+     "value": 26.13,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "standard_drinks": {
+     "value": 1.63,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drink-abv-dilution",
+   "source_publisher": "Cocktail dilution model (Dave Arnold, Liquid Intelligence)",
+   "source_title": "neat overstates the strength (0% dilution)",
+   "source_edition_or_year": "Liquid Intelligence",
+   "source_section_or_page": "Same 3 oz at 32.67% poured neat -> 32.67% ABV, six points higher",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "total_volume_oz": 3,
+    "weighted_abv_pct": 32.67,
+    "method": "neat"
+   },
+   "outputs": {
+    "final_abv_pct": {
+     "value": 32.67,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "load-profitability",
    "source_publisher": "First-principles owner-operator load economics; consumes the cost-per-mile structure.",
    "source_title": "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",

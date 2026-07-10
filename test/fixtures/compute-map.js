@@ -671,6 +671,7 @@ export const COMPUTE_MAP = {
   "pour-cost": { module: "../../calc-kitchen.js", fn: "computePourCost" },
   "menu-engineering": { module: "../../calc-kitchen.js", fn: "computeMenuEngineering" },
   "kitchen-sanitizer-ppm": { module: "../../calc-kitchen.js", fn: "computeKitchenSanitizerPpm" },
+  "drink-abv-dilution": { module: "../../calc-kitchen.js", fn: "computeDrinkAbvDilution" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

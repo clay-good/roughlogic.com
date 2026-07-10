@@ -2076,6 +2076,7 @@ cross-check.
 | calc-kitchen.js | `computeBakersPercentage` | `{ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0,...` | _ | _ | _ |
 | calc-kitchen.js | `computeBrineCure` | `{ mode = "brine", water_g = 0, salt_g = 0, meat_g = 0, cure_g = 0, target_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computeCoolingCurve` | `{ start_F = 135, ambient_F = 70, container = "full_pan_4in", product_type = "...` | _ | _ | _ |
+| calc-kitchen.js | `computeDrinkAbvDilution` | `{ total_volume_oz = 0, weighted_abv_pct = 0, method = "stirred", dilution_pct...` | _ | _ | _ |
 | calc-kitchen.js | `computeFoodCostPercentage` | `{ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = ...` | _ | _ | _ |
 | calc-kitchen.js | `computeKitchenSanitizerPpm` | `{ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons ...` | _ | _ | _ |
 | calc-kitchen.js | `computeMenuEngineering` | `{ units_sold = 0, menu_price = 0, food_cost = 0, total_units = 0, item_count ...` | _ | _ | _ |
@@ -2650,7 +2651,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1236.
+Row count: 1237.
 
 <!-- END function-corpus-v14 -->
 
@@ -3641,13 +3642,14 @@ per spec-v14 §13.1 second paragraph.
 | `time-alignment` | Audio Speaker Time Alignment | Project (first-principles) over Haas ...; Main 30 ft / delay 90 ft / 20 C / 15 ms Haas offset -> c ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truss-capacity` | Truss Point Load and Span Capacity | Tomcat 16 in box truss published tech...; 16 in box / 40 ft span / 200 + 400 + 200 lb point loads -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group O Kitchen (13 tiles)
+### Group O Kitchen (14 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `bakers-percentage` | Baker's Percentage | Baker's percentage (baker's math); flour 1000 g, 65% hydration, 2% salt, 1% yeast, 4 pieces ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `brine-cure` | Brine / Cure Concentration | Mass-fraction chemistry + USDA FSIS 9...; equilibrium: meat 1000 g, salt 25 g, cure 2.5 g -> 2.5% s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cooling-curve` | Food Safety Cooling Curve | FDA Food Code 2022 (project bundled t...; Full 4 in pan / thick liquid / start 135 F / ambient 70 F... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `drink-abv-dilution` | Cocktail ABV with Dilution | Cocktail dilution model (Dave Arnold,...; Stirred Martini 3 oz at 32.67% ABV, 25% melt -> 26.1% ABV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `food-cost-percentage` | Period Food-Cost Percentage | Standard restaurant-accounting identi...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kitchen-sanitizer-ppm` | 3-Compartment Sink Sanitizer Dilution | FDA Food Code Sec. 4-501.114 sanitizi...; Bleach 5.25% active, 100 ppm, 3-gal compartment -> 0.24 o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `menu-engineering` | Menu Engineering Matrix | Kasavana & Smith menu-engineering model; 200 of 1000 units, 10-item menu, price $12, food cost $4,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3828,6 +3830,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 992. Fixture-covered or reference-cadence: 992 / 992.
+Tile count: 993. Fixture-covered or reference-cadence: 993 / 993.
 
 <!-- END tile-index-v14 -->

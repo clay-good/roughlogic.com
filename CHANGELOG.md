@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-kitchen.js gzip cap 16000 -> 19000; 2026-07-09
+
+The spec-v537..v539 Group O batch (`menu-engineering`, `kitchen-sanitizer-ppm`, `drink-abv-dilution`) adds three hand-written renderer tiles to `calc-kitchen.js`, crossing the 16000 B cap at tile v539 (103.7%). Raised the `check-module-sizes` cap to **19000** with headroom for further Group O tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-lab.js gzip cap 17000 -> 21000; 2026-07-09
 
 The spec-v531..v534 Group T lab batch (`molarity-from-stock`, `nucleic-acid-a260`, `ligation-molar-ratio`, plus units-of-production) adds four hand-written renderer tiles to `calc-lab.js`, crossing the 17000 B cap at tile v534 (105%). Raised the `check-module-sizes` cap to **21000** with headroom for the remaining Group T campaign tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

@@ -973,3 +973,52 @@ const renderKitchenSanitizerPpm = _r({
   compute: computeKitchenSanitizerPpm,
 });
 KITCHEN_RENDERERS["kitchen-sanitizer-ppm"] = renderKitchenSanitizerPpm;
+
+// --- spec-v539 O: Cocktail final ABV with dilution (`drink-abv-dilution`) ---
+// final_abv = pure_alcohol / (total + melt) x 100. standard_drinks = pure_alcohol / 0.6.
+const DRINK_METHOD_DILUTION = { shaken: 28, stirred: 23, rocks: 15, neat: 0 };
+// dims: in { total_volume_oz: L, weighted_abv_pct: dimensionless, method: dimensionless, dilution_pct: dimensionless } out: { pure_alcohol_oz: L, final_volume_oz: L, final_abv_pct: dimensionless, standard_drinks: dimensionless }
+export function computeDrinkAbvDilution({ total_volume_oz = 0, weighted_abv_pct = 0, method = "stirred", dilution_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vol = Number(total_volume_oz) || 0;
+  const abv = Number(weighted_abv_pct) || 0;
+  const override = Number(dilution_pct) || 0;
+  if (!(vol > 0)) return { error: "Total ingredient volume must be positive (fl oz)." };
+  if (!(abv >= 0 && abv <= 100)) return { error: "Weighted ABV must be between 0 and 100 percent." };
+  if (override < 0) return { error: "Dilution percent must be non-negative." };
+  let method_pct;
+  if (override > 0) method_pct = override;
+  else {
+    method_pct = DRINK_METHOD_DILUTION[method];
+    if (method_pct === undefined) return { error: "Method must be shaken, stirred, rocks, or neat (or supply an explicit dilution percent)." };
+  }
+  const pure_alcohol_oz = vol * abv / 100;
+  const dilution_water_oz = vol * method_pct / 100;
+  const final_volume_oz = vol + dilution_water_oz;
+  const final_abv_pct = pure_alcohol_oz / final_volume_oz * 100;
+  const standard_drinks = pure_alcohol_oz / 0.6;
+  return {
+    pure_alcohol_oz, dilution_water_oz, final_volume_oz, final_abv_pct, standard_drinks, method_pct,
+    note: "Ice-melt dilution is not optional - shaking adds about 25-30% water, stirring 20-25%, lowering the ABV 15-25% and balancing the drink; a strength figure that ignores the melt overstates the pour. The serving temperature and ice type shift the actual dilution. Responsible-service practice governs (0.6 fl oz pure alcohol = one US standard drink).",
+  };
+}
+const drinkAbvDilutionExample = { inputs: { total_volume_oz: 3, weighted_abv_pct: 32.67, method: "stirred", dilution_pct: 25 } };
+const renderDrinkAbvDilution = _r({
+  citation: "Citation: Cocktail dilution model (per Dave Arnold, Liquid Intelligence, by name). pure_alcohol = total_volume x weighted_abv / 100; dilution_water = total_volume x method_pct / 100; final_abv = pure_alcohol / (total + dilution) x 100; standard_drinks = pure_alcohol / 0.6. Ice-melt dilution is not optional (shaken ~28%, stirred ~23%, rocks ~15%, neat 0%); a strength figure that ignores the melt overstates the pour. Responsible-service practice governs.",
+  example: drinkAbvDilutionExample.inputs,
+  fields: [
+    { key: "total_volume_oz", label: "Total ingredient volume (fl oz)", kind: "number" },
+    { key: "weighted_abv_pct", label: "Volume-weighted ABV (%)", kind: "number" },
+    { key: "method", label: "Prep method", kind: "select", options: [{ value: "shaken", label: "Shaken (~28%)" }, { value: "stirred", label: "Stirred (~23%)" }, { value: "rocks", label: "Built on rocks (~15%)" }, { value: "neat", label: "Neat / up, no ice (0%)" }] },
+    { key: "dilution_pct", label: "Explicit dilution % (0 = use method)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "abv-out-p", label: "Pure alcohol", value: (r) => fmt(r.pure_alcohol_oz, 2) + " fl oz" },
+    { key: "v", id: "abv-out-v", label: "Final volume", value: (r) => fmt(r.final_volume_oz, 2) + " fl oz (+" + fmt(r.dilution_water_oz, 2) + " melt)" },
+    { key: "a", id: "abv-out-a", label: "Final ABV", value: (r) => fmt(r.final_abv_pct, 1) + "%" },
+    { key: "d", id: "abv-out-d", label: "Standard drinks", value: (r) => fmt(r.standard_drinks, 2) },
+    { key: "n", id: "abv-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrinkAbvDilution,
+});
+KITCHEN_RENDERERS["drink-abv-dilution"] = renderDrinkAbvDilution;

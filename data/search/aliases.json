@@ -4774,6 +4774,46 @@
       "kind": "redirect"
     },
     {
+      "term": "cocktail abv",
+      "target": "drink-abv-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "drink dilution",
+      "target": "drink-abv-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "final abv",
+      "target": "drink-abv-dilution",
+      "kind": "redirect"
+    },
+    {
+      "term": "standard drinks",
+      "target": "drink-abv-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "ice melt dilution",
+      "target": "drink-abv-dilution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shaken stirred dilution",
+      "target": "drink-abv-dilution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drink strength",
+      "target": "drink-abv-dilution",
+      "kind": "redirect"
+    },
+    {
+      "term": "alcohol by volume cocktail",
+      "target": "drink-abv-dilution",
+      "kind": "adjacent"
+    },
+    {
       "term": "load profit",
       "target": "load-profitability",
       "kind": "industry"

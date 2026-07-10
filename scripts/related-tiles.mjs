@@ -872,6 +872,7 @@ const RELATED = {
   "pour-cost": ["plate-cost","food-cost-percentage","yield-ep"],
   "menu-engineering": ["plate-cost","food-cost-percentage","prime-cost"],
   "kitchen-sanitizer-ppm": ["antimicrobial-dilution","pool-chlorine-dose","food-cost-percentage"],
+  "drink-abv-dilution": ["pour-cost","bakers-percentage","recipe-scale"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],
   "fuel-surcharge": ["load-profitability","cost-per-mile","fuel-tax-ifta"],
   "maintenance-reserve": ["cost-per-mile","load-profitability","fuel-surcharge"],

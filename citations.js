@@ -7602,6 +7602,16 @@ export const CITATIONS = {
       { name: "Sanitizer bands", value: "chlorine 50-100 ppm, quat ~150-400 (label, often 200), iodine 12.5-25 ppm", source: "FDA Food Code 4-501.114" },
     ],
   },
+  "drink-abv-dilution": {
+    formula: "pure_alcohol = total_volume x weighted_abv / 100; dilution_water = total_volume x method_pct / 100; final_abv = pure_alcohol / (total_volume + dilution_water) x 100; standard_drinks = pure_alcohol / 0.6.",
+    edition: "Cocktail dilution model (Dave Arnold, Liquid Intelligence), by name.",
+    freeAccess: "Bartending-practice dilution figures; responsible-service practice governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Ice-melt dilution is not optional - shaking adds about 25-30% water, stirring 20-25%, lowering the ABV 15-25% and balancing the drink; a strength figure that ignores the melt overstates the pour; the serving temperature and ice type shift the actual dilution. 0.6 fl oz pure alcohol = one US standard drink. A planning estimate, not a lab measurement.",
+    assumptions: [
+      { name: "Method dilution", value: "shaken ~28%, stirred ~23%, rocks ~15%, neat 0% (or explicit percent)", source: "Liquid Intelligence" },
+    ],
+  },
   "load-profitability": {
     formula: "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
     edition: "First-principles owner-operator load economics; consumes the cost-per-mile structure.",

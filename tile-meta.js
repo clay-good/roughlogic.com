@@ -451,6 +451,7 @@ const _TILES = [
   ["pour-cost", "O"],
   ["menu-engineering", "O"],
   ["kitchen-sanitizer-ppm", "O"],
+  ["drink-abv-dilution", "O"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

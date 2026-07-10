@@ -908,6 +908,8 @@ const TOOL_MODULES = (() => {
     "menu-engineering",
     // spec-v538
     "kitchen-sanitizer-ppm",
+    // spec-v539
+    "drink-abv-dilution",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [
