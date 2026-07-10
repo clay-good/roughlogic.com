@@ -1392,9 +1392,9 @@ function _simpleRendererG(spec) {
     const fields = {};
     for (const f of spec.fields) {
       let field;
-      if (f.kind === "select") field = _msG(f.label, f.id, f.options);
-      else if (f.kind === "checkbox") field = _mcG(f.label, f.id);
-      else field = _mnG(f.label, f.id, f.attrs || { step: "any" });
+      if (f.kind === "select") field = _msG(f.label, f.id || f.key, f.options);
+      else if (f.kind === "checkbox") field = _mcG(f.label, f.id || f.key);
+      else field = _mnG(f.label, f.id || f.key, f.attrs || { step: "any" });
       fields[f.key] = field;
       if (f.default !== undefined) {
         if (f.kind === "select") field.select.value = f.default;

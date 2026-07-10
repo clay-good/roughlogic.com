@@ -2203,7 +2203,7 @@ function _v23SimpleRenderer(spec) {
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
     for (const f of spec.fields) {
-      const field = f.kind === "select" ? makeSelect(f.label, f.id, f.options) : makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      const field = f.kind === "select" ? makeSelect(f.label, f.id || f.key, f.options) : makeNumber(f.label, f.id || f.key, f.attrs || { step: "any" });
       fields[f.key] = field;
       if (f.default !== undefined) { if (f.kind === "select") field.select.value = f.default; else field.input.value = String(f.default); }
       inputRegion.appendChild(field.wrap);

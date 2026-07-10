@@ -44,8 +44,8 @@ function _simpleRenderer(spec) {
     const fields = {};
     for (const f of spec.fields) {
       let field;
-      if (f.kind === "select") field = makeSelect(f.label, f.id, f.options);
-      else field = makeNumber(f.label, f.id, f.attrs || { step: "any", min: "0" });
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
       fields[f.key] = field;
       if (f.default !== undefined) {
         if (f.kind === "select") field.select.value = f.default;

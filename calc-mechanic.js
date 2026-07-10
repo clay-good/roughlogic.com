@@ -370,8 +370,8 @@ function _simpleRenderer(spec) {
     const fields = {};
     for (const f of spec.fields) {
       let field;
-      if (f.kind === "select") field = makeSelect(f.label, f.id, f.options);
-      else if (f.kind === "checkbox") field = makeCheckbox(f.label, f.id);
+      if (f.kind === "select") field = makeSelect(f.label, f.id || f.key, f.options);
+      else if (f.kind === "checkbox") field = makeCheckbox(f.label, f.id || f.key);
       else if (f.kind === "text") {
         const wrap = document.createElement("div"); wrap.className = "field";
         const lab = document.createElement("label"); lab.htmlFor = f.id; lab.textContent = f.label;
@@ -379,7 +379,7 @@ function _simpleRenderer(spec) {
         wrap.appendChild(lab); wrap.appendChild(input);
         field = { wrap, input };
       }
-      else field = makeNumber(f.label, f.id, f.attrs || { step: "any" });
+      else field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any" });
       fields[f.key] = field;
       if (f.default !== undefined) {
         if (f.kind === "select") field.select.value = f.default;

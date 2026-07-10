@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### fix(a11y): give factory-rendered inputs real DOM ids (f.id || f.key); 2026-07-10
+
+Every `_simpleRenderer`-family factory passed `f.id` to makeNumber/makeSelect/makeCheckbox, but the field specs never define `id` -- so hundreds of factory-rendered tiles shipped inputs with `id="undefined"`: broken `label for` association (only the first field's label resolved), a latent `undefined=<value>` param in hash-state URLs, and no way for deep links or the spec-v591 search prefill to target those tiles. All 48 factory call sites across 25 modules now fall back to the field key (`f.id || f.key`; keys are unique within a tile, and one tool view renders at a time). Old shared links carrying the bogus `undefined=` param stay harmless (applyHashState ignores unknown ids). Verified in-browser: `#dim-weight` fields get real ids with matching labels, typing writes `length_in=48` (not `undefined=48`) into the hash, and a `?v=1&length_in=40&...` deep link arrives prefilled and computed. Unlocks slot/preview coverage for factory tiles as spec-v591/v592 follow-on batches.
+
 ### docs(readme): resync ungated catalog figures to the live tree; 2026-07-10
 
 The v489-v593 landings left the ungated documentation prose at the pre-campaign snapshot. Resynced (every value measured from the live scripts, not memory): README headline and prose 942 -> 1,041 tiles / 5,235 -> 5,353 tests / 28 -> 30 gates, tools-data and app.js size figures, home-payload 43.2% -> 48.0%, correctness mermaid + table denominators (corpus 1,285, dims 1,288, sources 167), sitemap/shell route totals 964 -> 1,063, and the "where the catalog stands" paragraph (now through spec-v593 / 0.180.0 with the v489-v588 campaign, the v589-v592 ask-a-question search series, and v593 US-defaults recorded as inflections 14-15); docs/mobile-responsive.md gains its per-expansion re-verification section (1,157 checks / 1,063 shells clean at 320 px); docs/performance.md current-state payload figures refreshed and the shard-count claim corrected to the live `data:verify` count (117 entries).

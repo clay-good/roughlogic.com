@@ -227,7 +227,7 @@ function _rPool(spec) {
     attachExampleButton(inputRegion, () => fillExample(spec.example));
     const fields = {};
     for (const f of spec.fields) {
-      const field = makeNumber(f.label, f.id, f.attrs || { step: "any", min: "0" });
+      const field = makeNumber(f.label, f.id || f.key, f.attrs || { step: "any", min: "0" });
       fields[f.key] = field;
       if (f.default !== undefined) field.input.value = String(f.default);
       inputRegion.appendChild(field.wrap);
