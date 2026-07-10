@@ -21144,6 +21144,46 @@
       "kind": "industry"
     },
     {
+      "term": "excess air",
+      "target": "excess-air-o2",
+      "kind": "industry"
+    },
+    {
+      "term": "flue gas o2",
+      "target": "excess-air-o2",
+      "kind": "redirect"
+    },
+    {
+      "term": "combustion excess air",
+      "target": "excess-air-o2",
+      "kind": "redirect"
+    },
+    {
+      "term": "o2 to excess air",
+      "target": "excess-air-o2",
+      "kind": "adjacent"
+    },
+    {
+      "term": "co2max combustion",
+      "target": "excess-air-o2",
+      "kind": "adjacent"
+    },
+    {
+      "term": "burner tuning air",
+      "target": "excess-air-o2",
+      "kind": "adjacent"
+    },
+    {
+      "term": "combustion analyzer",
+      "target": "excess-air-o2",
+      "kind": "industry"
+    },
+    {
+      "term": "air fuel ratio flue",
+      "target": "excess-air-o2",
+      "kind": "adjacent"
+    },
+    {
       "term": "prop pitch selection",
       "target": "prop-pitch-selection",
       "kind": "industry"

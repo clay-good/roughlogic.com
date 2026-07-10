@@ -190,6 +190,7 @@ const _TILES = [
   ["air-receiver", "C"], ["geothermal-loop", "C"], ["baseboard-output", "C"],
   ["npsh-a", "C"], ["duct-leakage", "C"], ["duct-friction-static", "C"],
   ["duct-leakage-cfm25", "C"],
+  ["excess-air-o2", "C"],
   ["refrigerant-charging", "C"], ["cooling-tower", "C"], ["insulation-heat-loss", "C"],
   ["chiller-tons", "C"], ["hx-lmtd-ntu", "C"], ["air-changes-hour", "C"],
   ["boiler-pipe-sizing", "C"], ["compressor-short-cycle", "C"],

@@ -19061,3 +19061,24 @@ test("bounds: spec-v582 computeManureStorageVolume pins the manure, precipitatio
   assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 120, net_precip_in: -1 }));
   assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 120, freeboard_in: -1 }));
 });
+
+import { computeExcessAirO2 as _v583 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v583 computeExcessAirO2 pins the O2 form, the CO2 form, the target band, and error seams", () => {
+  const r = _v583({ measured_o2_pct: 4, measured_co2_pct: 0, co2max_pct: 11.7 });
+  assert.ok(Math.abs(r.excess_air_pct - 4 / (20.9 - 4) * 100) < 1e-9);
+  assert.equal(r.method, "O2");
+  assert.equal(r.in_band, true); // 23.7% within 15-25
+  // The CO2 form (CO2 > 0) takes over.
+  const co2 = _v583({ measured_o2_pct: 0, measured_co2_pct: 9, co2max_pct: 11.7 });
+  assert.ok(Math.abs(co2.excess_air_pct - (11.7 / 9 - 1) * 100) < 1e-9);
+  assert.equal(co2.method, "CO2");
+  // Low excess air falls out of the band.
+  assert.equal(_v583({ measured_o2_pct: 1 }).in_band, false);
+  // Error seams: non-finite, O2 >= 20.9, non-positive CO2max, CO2 over CO2max.
+  assert.ok("error" in _v583({ measured_o2_pct: Infinity }));
+  assert.ok("error" in _v583({ measured_o2_pct: 20.9 }));
+  assert.ok("error" in _v583({ measured_o2_pct: 21 }));
+  assert.ok("error" in _v583({ measured_co2_pct: 9, co2max_pct: 0 }));
+  assert.ok("error" in _v583({ measured_co2_pct: 13, co2max_pct: 11.7 }));
+});

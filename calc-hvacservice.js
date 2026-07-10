@@ -630,3 +630,49 @@ HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
   ],
   compute: computeDuctLeakageCfm25,
 });
+
+// ===================== spec-v583 C: excess air from flue-gas O2 =====================
+// EA = CO2>0 ? (CO2max/CO2 - 1)*100 : O2/(20.9-O2)*100.
+// dims: in { measured_o2_pct: dimensionless, measured_co2_pct: dimensionless, co2max_pct: dimensionless } out: { excess_air_pct: dimensionless }
+export function computeExcessAirO2({ measured_o2_pct = 0, measured_co2_pct = 0, co2max_pct = 11.7 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const o2 = Number(measured_o2_pct) || 0;
+  const co2 = Number(measured_co2_pct) || 0;
+  const co2max = Number(co2max_pct) || 0;
+  const useCo2 = co2 > 0;
+  if (useCo2) {
+    if (!(co2max > 0)) return { error: "Ultimate CO2max must be positive (%)." };
+    if (co2 > co2max) return { error: "Measured CO2 cannot exceed the fuel's ultimate CO2max." };
+  } else {
+    if (!(o2 < 20.9)) return { error: "Oxygen at or above 20.9% means no combustion." };
+    if (o2 < 0) return { error: "Oxygen cannot be negative (%)." };
+  }
+  const excess_air_pct = useCo2 ? (co2max / co2 - 1) * 100 : o2 / (20.9 - o2) * 100;
+  const in_band = excess_air_pct >= 15 && excess_air_pct <= 25;
+  return {
+    excess_air_pct, method: useCo2 ? "CO2" : "O2", in_band,
+    note: "The oxygen form assumes complete combustion, so measurable CO understates the excess air (some oxygen went to CO, not to dilution) - confirm CO is low and sample dry, air-free oxygen in the flue. A gas appliance targets about 3 to 4% oxygen (about 15 to 25% excess air): too little makes CO, too much wastes heat up the flue. The analyzer, the appliance, and the manufacturer instructions govern - a tuning aid, not a certified combustion test.",
+  };
+}
+export const excessAirO2Example = { inputs: { measured_o2_pct: 4, measured_co2_pct: 0, co2max_pct: 11.7 } };
+function _v583renderExcessAirO2(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A tuning aid, not a certified combustion test; the analyzer, the appliance, and the manufacturer instructions govern. Citation: ASME PTC 4.1 / combustion analysis practice excess air from flue-gas oxygen, by name. EA = O2 / (20.9 - O2) x 100, or from carbon dioxide EA = (CO2max / CO2 - 1) x 100 (CO2max ~ 11.7% natural gas, 13.7% propane, 15.3% #2 oil). The oxygen form assumes complete combustion, so measurable CO understates the excess air; a gas appliance targets about 3 to 4% oxygen (15 to 25% excess air).";
+  const o2 = makeNumber("Flue-gas O2 (%, dry air-free)", "eao-o2", { step: "any", min: "0", max: "20.9", value: "4" }); o2.input.value = "4";
+  const co2 = makeNumber("Flue-gas CO2 (%, 0 to use the O2 form)", "eao-co2", { step: "any", min: "0", value: "0" }); co2.input.value = "0";
+  const co2max = makeNumber("Fuel CO2max (%: 11.7 gas / 13.7 propane / 15.3 oil)", "eao-co2max", { step: "any", min: "0", value: "11.7" }); co2max.input.value = "11.7";
+  for (const f of [o2, co2, co2max]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { o2.input.value = "4"; co2.input.value = "0"; co2max.input.value = "11.7"; update(); });
+  const oEA = makeOutputLine(outputRegion, "Excess air", "eao-out-ea");
+  const oBand = makeOutputLine(outputRegion, "Within the 15-25% target band?", "eao-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "eao-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeExcessAirO2({ measured_o2_pct: readNum(o2.input), measured_co2_pct: readNum(co2.input), co2max_pct: co2max.input.value === "" ? 11.7 : readNum(co2max.input) });
+    if (r.error) { oEA.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
+    oEA.textContent = fmt(r.excess_air_pct, 1) + "% (" + r.method + " method)";
+    oBand.textContent = r.in_band ? "YES - well-tuned" : "NO - " + (r.excess_air_pct < 15 ? "too little air, risks CO" : "too much air, wastes flue heat");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [o2, co2, co2max]) f.input.addEventListener("input", update);
+}
+HVACSERVICE_RENDERERS["excess-air-o2"] = _v583renderExcessAirO2;

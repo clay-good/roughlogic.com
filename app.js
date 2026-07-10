@@ -516,6 +516,8 @@ const TOOL_MODULES = (() => {
     "blower-door-ach50", "ashrae-622-ventilation", "infiltration-load",
     // spec-v461 residential duct leakage
     "duct-leakage-cfm25",
+    // spec-v583 combustion excess air
+    "excess-air-o2",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

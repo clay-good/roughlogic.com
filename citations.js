@@ -1606,6 +1606,17 @@ export const CITATIONS = {
       { name: "Leakage classes", value: "3 / 6 / 12 / 24 / 48 cfm per 100 ft² at 1 in WC", source: "SMACNA Duct Leakage Test Manual" },
     ],
   },
+  "excess-air-o2": {
+    formula: "EA_pct = measured_co2 > 0 ? (co2max / measured_co2 - 1) x 100 : measured_o2 / (20.9 - measured_o2) x 100.",
+    edition: "ASME PTC 4.1 / combustion analysis practice excess air from flue-gas oxygen, by name.",
+    freeAccess: "The excess-air relations are standard combustion-analysis practice; the analyzer and appliance manufacturer instructions govern the actual tune.",
+    governance: GOVERNANCE.general,
+    editionNote: "CO2max is about 11.7% natural gas, 13.7% propane, 15.3% #2 oil. The oxygen form assumes complete combustion, so measurable CO understates the excess air, and the reading must be dry, air-free, and sampled in the flue. A gas appliance targets about 3 to 4% oxygen (15 to 25% excess air): too little makes CO, too much wastes heat up the flue. The analyzer, the appliance, and the manufacturer instructions govern - a tuning aid, not a certified combustion test.",
+    assumptions: [
+      { name: "Complete combustion", value: "the O2 form assumes complete combustion; measurable CO understates the excess air", source: "combustion analysis practice" },
+      { name: "Ultimate CO2", value: "CO2max ~ 11.7% natural gas, 13.7% propane, 15.3% #2 oil", source: "fuel stoichiometry" },
+    ],
+  },
   "duct-leakage-cfm25": {
     formula: "normalized = leakage_cfm25 / cfa_ft2 x 100; passes = normalized <= limit (default 4 CFM25 per 100 ft^2).",
     edition: "IECC (International Energy Conservation Code) §R403.3.5 (duct testing) and RESNET / ANSI 380 duct-leakage test methods, by name.",

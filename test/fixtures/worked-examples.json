@@ -47866,6 +47866,50 @@
    }
   },
   {
+   "tile_id": "excess-air-o2",
+   "source_publisher": "ASME PTC 4.1 / combustion analysis practice",
+   "source_title": "EA = O2 / (20.9 - O2) x 100",
+   "source_edition_or_year": "ASME PTC 4.1",
+   "source_section_or_page": "Natural-gas appliance reading 4% O2 -> 4 / 16.9 x 100 = 23.7% excess air (top of the 15-25% band)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "measured_o2_pct": 4,
+    "measured_co2_pct": 0,
+    "co2max_pct": 11.7
+   },
+   "outputs": {
+    "excess_air_pct": {
+     "value": 23.7,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "excess-air-o2",
+   "source_publisher": "ASME PTC 4.1 / combustion analysis practice",
+   "source_title": "the carbon-dioxide form agrees: EA = (CO2max / CO2 - 1) x 100",
+   "source_edition_or_year": "ASME PTC 4.1",
+   "source_section_or_page": "9% CO2 against natural gas's 11.7% ultimate -> (11.7/9 - 1) x 100 = 30% excess air",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "measured_o2_pct": 0,
+    "measured_co2_pct": 9,
+    "co2max_pct": 11.7
+   },
+   "outputs": {
+    "excess_air_pct": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "prop-pitch-selection",
    "source_publisher": "outboard prop selection practice",
    "source_title": "19 in prop, 5000 rpm WOT, target 5400 -> 2 in less, 17 in new pitch",
