@@ -355,3 +355,53 @@ function _v563renderBasalAreaPrism(inputRegion, outputRegion, citationEl) {
   for (const f of [baf, count, dbh]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["basal-area-prism"] = _v563renderBasalAreaPrism;
+
+// --- spec-v564 L: Reineke Stand Density Index ---
+// SDI = TPA x (QMD/10)^1.605. percent_max = SDI / SDI_max x 100.
+// dims: in { trees_per_acre: dimensionless, qmd_in: L, sdi_max: dimensionless } out: { sdi: dimensionless, percent_max: dimensionless }
+export function computeReinekeSdi({ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tpa = Number(trees_per_acre);
+  const qmd = Number(qmd_in);
+  const smax = Number(sdi_max) || 0;
+  if (!Number.isFinite(tpa) || tpa <= 0) return { error: "Trees per acre must be a positive finite number." };
+  if (!Number.isFinite(qmd) || qmd <= 0) return { error: "Quadratic mean diameter must be a positive finite number (in)." };
+  const sdi = tpa * Math.pow(qmd / 10, 1.605);
+  let percent_max = null;
+  if (smax !== 0) {
+    if (!(smax > 0)) return { error: "Maximum SDI must be positive when a percent is requested." };
+    percent_max = sdi / smax * 100;
+  }
+  if (!Number.isFinite(sdi)) return { error: "SDI math is not a finite value." };
+  const zone = percent_max == null ? null
+    : percent_max >= 100 ? "self-thinning (mortality)"
+    : percent_max >= 55 ? "upper management zone (thinning candidate)"
+    : percent_max >= 35 ? "lower management zone"
+    : "below the onset of competition";
+  return {
+    sdi, percent_max, zone,
+    note: "SDI uses the QUADRATIC mean diameter (the diameter of the tree of average basal area, always >= the arithmetic mean), not a plain average, so using the arithmetic mean understates density and can leave a stand thinned too late. The 1.605 exponent is Reineke's empirical self-thinning slope. Zones: ~35% onset of competition, 55-60% lower management zone, ~100% self-thinning. The maximum SDI is species-specific. A management aid; a qualified silvicultural prescription governs.",
+  };
+}
+export const reinekeSdiExample = { inputs: { trees_per_acre: 300, qmd_in: 10, sdi_max: 400 } };
+
+function _v564renderReinekeSdi(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Reineke Stand Density Index (Reineke 1933; USDA FS RMRS), by name. SDI = TPA x (QMD/10)^1.605; percent of max = SDI / SDI_max x 100. SDI uses the quadratic mean diameter (the diameter of the tree of average basal area), not the arithmetic mean; the 1.605 exponent is the empirical self-thinning slope; the maximum SDI is species-specific. A management aid; a qualified silvicultural prescription governs.";
+  const tpa = makeNumber("Trees per acre (live stems)", "sdi-tpa", { step: "any", min: "0", value: "300" }); tpa.input.value = "300";
+  const qmd = makeNumber("Quadratic mean diameter (in)", "sdi-qmd", { step: "any", min: "0", value: "10" }); qmd.input.value = "10";
+  const smax = makeNumber("Species maximum SDI (0 to skip)", "sdi-max", { step: "any", min: "0", value: "400" }); smax.input.value = "400";
+  for (const f of [tpa, qmd, smax]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tpa.input.value = "300"; qmd.input.value = "10"; smax.input.value = "400"; update(); });
+  const oSdi = makeOutputLine(outputRegion, "Stand Density Index", "sdi-out-sdi");
+  const oPct = makeOutputLine(outputRegion, "Percent of maximum / zone", "sdi-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Note", "sdi-out-note");
+  const update = debounce(() => {
+    const r = computeReinekeSdi({ trees_per_acre: Number(tpa.input.value) || 0, qmd_in: Number(qmd.input.value) || 0, sdi_max: Number(smax.input.value) || 0 });
+    if (r.error) { oSdi.textContent = r.error; oPct.textContent = "-"; oNote.textContent = ""; return; }
+    oSdi.textContent = fmt(r.sdi, 0);
+    oPct.textContent = r.percent_max == null ? "(enter a maximum SDI)" : fmt(r.percent_max, 0) + "% -- " + r.zone;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tpa, qmd, smax]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["reineke-sdi"] = _v564renderReinekeSdi;

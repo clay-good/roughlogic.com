@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### chore(sizes): raise calc-arborist.js gzip cap 8000 -> 10000; 2026-07-10
+
+The spec-v563..v564 forestry batch (`basal-area-prism`, `reineke-sdi`) adds two hand-written renderer tiles to `calc-arborist.js`, crossing the 8000 B cap at tile v564 (107.1%). Raised the `check-module-sizes` cap to **10000** with headroom for further Group L forestry tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.
+
 ### chore(sizes): raise calc-elecdesign.js gzip cap 8500 -> 11000; 2026-07-10
 
 The spec-v558 `step-touch-voltage` tile (IEEE Std 80 tolerable step/touch) pushes `calc-elecdesign.js` over the 8500 B cap. Raised the `check-module-sizes` cap to **11000** with headroom for further Group A electrical-design tiles. Lazy-loaded (spec-v10 H.2), absent from the home-view payload.

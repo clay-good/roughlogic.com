@@ -18629,3 +18629,26 @@ test("bounds: spec-v563 computeBasalAreaPrism pins the BAF x count relation, the
   assert.ok("error" in _v563({ baf: 10, in_tree_count: -1, dbh_in: 14 }));
   assert.ok("error" in _v563({ baf: 10, in_tree_count: 8, dbh_in: 0 }));
 });
+
+import { computeReinekeSdi as _v564 } from "../../calc-arborist.js";
+
+test("bounds: spec-v564 computeReinekeSdi pins the 1.605 exponent, the percent-of-max, the QMD sensitivity, and error seams", () => {
+  const r = _v564({ trees_per_acre: 300, qmd_in: 10, sdi_max: 400 });
+  assert.ok(Math.abs(r.sdi - 300) < 0.5); // 300 * (10/10)^1.605
+  assert.ok(Math.abs(r.percent_max - 75) < 0.5); // 300/400*100
+  // A smaller QMD lowers the index via the 1.605 exponent.
+  const small = _v564({ trees_per_acre: 300, qmd_in: 8, sdi_max: 400 });
+  assert.ok(Math.abs(small.sdi - 210) < 1);
+  assert.ok(small.sdi < r.sdi);
+  // At QMD = 10 the SDI equals the TPA (the reference diameter).
+  assert.ok(Math.abs(_v564({ trees_per_acre: 450, qmd_in: 10, sdi_max: 0 }).sdi - 450) < 1e-9);
+  // The percent is null when no maximum is supplied.
+  assert.equal(_v564({ trees_per_acre: 300, qmd_in: 10, sdi_max: 0 }).percent_max, null);
+  // A larger QMD raises the index above the TPA.
+  assert.ok(_v564({ trees_per_acre: 300, qmd_in: 14, sdi_max: 400 }).sdi > 300);
+  // Error seams: non-finite, non-positive TPA / QMD / SDI_max.
+  assert.ok("error" in _v564({ trees_per_acre: Infinity, qmd_in: 10, sdi_max: 400 }));
+  assert.ok("error" in _v564({ trees_per_acre: 0, qmd_in: 10, sdi_max: 400 }));
+  assert.ok("error" in _v564({ trees_per_acre: 300, qmd_in: 0, sdi_max: 400 }));
+  assert.ok("error" in _v564({ trees_per_acre: 300, qmd_in: 10, sdi_max: -1 }));
+});

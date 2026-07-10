@@ -883,6 +883,8 @@ const TOOL_MODULES = (() => {
     "porta-wrap-friction", "chipper-debris",
     // spec-v563
     "basal-area-prism",
+    // spec-v564
+    "reineke-sdi",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

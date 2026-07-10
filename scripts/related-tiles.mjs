@@ -868,6 +868,7 @@ const RELATED = {
   "porta-wrap-friction": ["tree-rigging-shock", "block-redirect-load", "pulley-ma-gen"],
   "chipper-debris": ["log-limb-weight", "demo-debris"],
   "basal-area-prism": ["timber-cruise", "felling-notch-hinge", "log-limb-weight"],
+  "reineke-sdi": ["basal-area-prism", "timber-cruise", "log-limb-weight"],
 
   // spec-v69 surface prep, coatings, and abatement
   "coating-coverage-dft": ["paint-coverage", "abrasive-blast", "material-quantity"],

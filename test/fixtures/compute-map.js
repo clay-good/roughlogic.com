@@ -661,6 +661,7 @@ export const COMPUTE_MAP = {
   "porta-wrap-friction": { module: "../../calc-arborist.js", fn: "computePortaWrapFriction" },
   "chipper-debris": { module: "../../calc-arborist.js", fn: "computeChipperDebris" },
   "basal-area-prism": { module: "../../calc-arborist.js", fn: "computeBasalAreaPrism" },
+  "reineke-sdi": { module: "../../calc-arborist.js", fn: "computeReinekeSdi" },
   "nozzle-flow-pressure": { module: "../../calc-agriculture.js", fn: "computeNozzleFlowPressure" },
   "spray-drift-buffer": { module: "../../calc-agriculture.js", fn: "computeSprayDriftBuffer" },
   "sprayer-field-capacity": { module: "../../calc-agriculture.js", fn: "computeSprayerFieldCapacity" },

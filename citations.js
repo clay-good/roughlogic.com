@@ -6811,6 +6811,17 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "reineke-sdi": {
+    formula: "SDI = TPA x (QMD / 10)^1.605; percent_max = SDI / SDI_max x 100.",
+    edition: "Reineke Stand Density Index (Reineke 1933; USDA FS RMRS), by name.",
+    freeAccess: "The Reineke SDI relation is a public forest-mensuration result; the maximum SDI is species-specific from published tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "SDI uses the quadratic mean diameter (the diameter of the tree of average basal area, always >= the arithmetic mean), not a plain average, so using the arithmetic mean understates density and can leave a stand thinned too late; the 1.605 exponent is Reineke's empirical self-thinning slope; the maximum SDI is species-specific. Zones: ~35% onset of competition, 55-60% lower management zone, ~100% self-thinning. A management aid, not a prescription.",
+    assumptions: [
+      { name: "Quadratic mean diameter", value: "QMD = sqrt(sum(d^2)/n); always >= the arithmetic mean; the arithmetic mean understates SDI", source: "forest mensuration" },
+      { name: "Self-thinning slope", value: "the 1.605 exponent is Reineke's empirical maximum-density slope; SDI_max is species-specific", source: "Reineke 1933" },
+    ],
+  },
   "basal-area-prism": {
     formula: "basal_area_per_acre = BAF x in_tree_count; per_tree_ba = 0.005454 x DBH^2; trees_per_acre = BAF / per_tree_ba.",
     edition: "Prism (variable-radius / angle-gauge) point sampling, per USDA Forest Service mensuration and Bitterlich variable-radius plots, by name.",

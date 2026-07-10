@@ -20105,6 +20105,56 @@
    }
   },
   {
+   "tile_id": "reineke-sdi",
+   "source_publisher": "Reineke Stand Density Index (Reineke 1933; USDA FS RMRS)",
+   "source_title": "SDI = TPA x (QMD / 10)^1.605; percent_max = SDI / SDI_max x 100",
+   "source_edition_or_year": "Reineke 1933",
+   "source_section_or_page": "300 TPA, QMD 10 in, SDI_max 400 -> SDI 300, 75% of max (upper management zone)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "trees_per_acre": 300,
+    "qmd_in": 10,
+    "sdi_max": 400
+   },
+   "outputs": {
+    "sdi": {
+     "value": 300,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "percent_max": {
+     "value": 75,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "reineke-sdi",
+   "source_publisher": "Reineke Stand Density Index (Reineke 1933; USDA FS RMRS)",
+   "source_title": "a smaller quadratic mean diameter lowers the index",
+   "source_edition_or_year": "Reineke 1933",
+   "source_section_or_page": "Same 300 TPA at QMD 8 in -> SDI 210, ~52% of max (lower management zone)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "trees_per_acre": 300,
+    "qmd_in": 8,
+    "sdi_max": 400
+   },
+   "outputs": {
+    "sdi": {
+     "value": 210,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",
