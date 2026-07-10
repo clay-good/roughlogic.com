@@ -1438,6 +1438,7 @@ cross-check.
 | calc-accounting.js | `computeSection179` | `{ cost = 0, business_use_pct = 100, taxable_income = 0, tax_year = 2025, bonu...` | _ | _ | _ |
 | calc-accounting.js | `computeStraightLine` | `{ cost = 0, salvage = 0, life_years = 0, year_of_interest = 1 }` | _ | _ | _ |
 | calc-accounting.js | `computeSuretyBondPremium` | `{ contract_usd = 0, rate1_per_k = 25, rate2_per_k = 15, rate3_per_k = 10 } = {}` | _ | _ | _ |
+| calc-accounting.js | `computeUnitsOfProductionDepr` | `{ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accum...` | _ | _ | _ |
 | calc-accounting.js | `computeWipPercentComplete` | `{ contract_usd = 0, cost_to_date_usd = 0, est_total_cost_usd = 0, billed_to_d...` | _ | _ | _ |
 | calc-accounting.js | `computeWorkersCompEmrPremium` | `{ payroll_usd = 0, class_rate = 0, emr = 1.0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
@@ -2642,7 +2643,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1228.
+Row count: 1229.
 
 <!-- END function-corpus-v14 -->
 
@@ -3675,7 +3676,7 @@ per spec-v14 §13.1 second paragraph.
 | --- | --- | --- | --- |
 | `historical-pricing` | Historical Pricing Context | BLS PPI / EIA / USDA NASS / FRED fede...; copper / 12-month lookback over the bundled 2026-05-08 sh... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group R Accounting (27 tiles)
+### Group R Accounting (28 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3704,6 +3705,7 @@ per spec-v14 §13.1 second paragraph.
 | `section-179` | Section 179 and Bonus Depreciation | IRC sec. 179 (annual indexed limits; ...; $50,000 cost / 100% business use / $200k taxable income /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `straight-line-depreciation` | Straight-Line Depreciation | Project (first-principles); annual = (cost - salvage) / life | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `surety-bond-premium` | Surety Bond Premium (Tiered Rate) | surety pricing (tiered rate schedule); spec-v444 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `units-of-production-depr` | Units-of-Production Depreciation | units-of-production (activity) deprec...; spec-v531 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -3812,6 +3814,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 984. Fixture-covered or reference-cadence: 984 / 984.
+Tile count: 985. Fixture-covered or reference-cadence: 985 / 985.
 
 <!-- END tile-index-v14 -->

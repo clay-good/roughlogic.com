@@ -948,6 +948,8 @@ const TOOL_MODULES = (() => {
     "eoq-order-quantity",
     // spec-v530 reorder point and safety stock (service-level model)
     "reorder-point",
+    // spec-v531 units-of-production depreciation
+    "units-of-production-depr",
   ]);
   // v5 Group T: Bench Science and Laboratory Math (utilities 255-264).
   declare("./calc-lab.js", "LAB_RENDERERS", [

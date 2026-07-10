@@ -44284,6 +44284,66 @@
    }
   },
   {
+   "tile_id": "units-of-production-depr",
+   "source_publisher": "units-of-production (activity) depreciation (GAAP)",
+   "source_title": "$50,000 machine, $5,000 salvage, 100,000-unit life, 8,000 units -> $0.45/unit, $3,600, $46,400 book",
+   "source_edition_or_year": "spec-v531 worked example (machine-verified)",
+   "source_section_or_page": "spec-v531 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "cost_basis": 50000,
+    "salvage_value": 5000,
+    "total_units": 100000,
+    "period_units": 8000,
+    "accumulated_units": 8000
+   },
+   "outputs": {
+    "rate": {
+     "value": 0.45,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "period_depreciation": {
+     "value": 3600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "book_value": {
+     "value": 46400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "units-of-production-depr",
+   "source_publisher": "units-of-production (activity) depreciation (GAAP)",
+   "source_title": "cross-check: run to 110,000 units (past the 100,000 life) and the book value floors at salvage, $5,000",
+   "source_edition_or_year": "spec-v531 worked example (machine-verified)",
+   "source_section_or_page": "spec-v531 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "cost_basis": 50000,
+    "salvage_value": 5000,
+    "total_units": 100000,
+    "period_units": 8000,
+    "accumulated_units": 110000
+   },
+   "outputs": {
+    "book_value": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-torsion-threshold",
    "source_publisher": "ACI 318-19 §22.7",
    "source_title": "12x20 in, 4000 psi -> Tth 56,921 in-lb (4.74 ft-kip), neglect 3.56, Tcr 18.97 ft-kip",

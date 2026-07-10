@@ -747,6 +747,7 @@ export const COMPUTE_MAP = {
   "blended-mortgage-rate": { module: "../../calc-realestate.js", fn: "computeBlendedMortgageRate" },
   "eoq-order-quantity": { module: "../../calc-accounting.js", fn: "computeEoqOrderQuantity" },
   "reorder-point": { module: "../../calc-accounting.js", fn: "computeReorderPoint" },
+  "units-of-production-depr": { module: "../../calc-accounting.js", fn: "computeUnitsOfProductionDepr" },
   "rc-punching-shear": { module: "../../calc-concrete.js", fn: "computeRcPunchingShear" },
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)

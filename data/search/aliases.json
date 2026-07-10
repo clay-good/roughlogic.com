@@ -18594,6 +18594,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "units of production depreciation",
+      "target": "units-of-production-depr",
+      "kind": "industry"
+    },
+    {
+      "term": "activity method depreciation",
+      "target": "units-of-production-depr",
+      "kind": "industry"
+    },
+    {
+      "term": "usage depreciation",
+      "target": "units-of-production-depr",
+      "kind": "industry"
+    },
+    {
+      "term": "depreciation per unit",
+      "target": "units-of-production-depr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "machine hours depreciation",
+      "target": "units-of-production-depr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mileage depreciation",
+      "target": "units-of-production-depr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pub 946 activity",
+      "target": "units-of-production-depr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "book value usage",
+      "target": "units-of-production-depr",
+      "kind": "adjacent"
+    },
+    {
       "term": "concrete torsion",
       "target": "concrete-torsion-threshold",
       "kind": "industry"

@@ -1860,3 +1860,53 @@ function renderReorderPoint(inputRegion, outputRegion, citationEl) {
   for (const f of [dd, lt, sd, sl]) f.input.addEventListener("input", update);
 }
 ACCOUNTING_RENDERERS["reorder-point"] = renderReorderPoint;
+
+// ===================== spec-v531: units-of-production depreciation =====================
+// dims: in { cost_basis: dimensionless, salvage_value: dimensionless, total_units: dimensionless, period_units: dimensionless, accumulated_units: dimensionless } out: { rate: dimensionless, period_depreciation: dimensionless, book_value: dimensionless }
+export function computeUnitsOfProductionDepr({ cost_basis = 0, salvage_value = 0, total_units = 0, period_units = 0, accumulated_units = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cost = Number(cost_basis) || 0;
+  const salvage = Number(salvage_value) || 0;
+  const total = Number(total_units) || 0;
+  const period = Number(period_units) || 0;
+  const accum = Number(accumulated_units) || 0;
+  if (!(cost > 0)) return { error: "Cost basis must be positive ($)." };
+  if (salvage < 0) return { error: "Salvage value cannot be negative ($)." };
+  if (!(salvage < cost)) return { error: "Salvage value must be below the cost basis ($)." };
+  if (!(total > 0)) return { error: "Total estimated units must be positive." };
+  if (period < 0 || accum < 0) return { error: "Period and accumulated units cannot be negative." };
+  const rate = (cost - salvage) / total;
+  const period_depreciation = rate * period;
+  const book_value = Math.max(cost - rate * accum, salvage);
+  if (![rate, period_depreciation, book_value].every(Number.isFinite)) return { error: "Depreciation math is not a finite value." };
+  return {
+    rate, period_depreciation, book_value,
+    note: "Units-of-production (activity) depreciation depreciates by USAGE instead of calendar time: rate = (cost - salvage) / total_estimated_units, period_depreciation = rate x period_units, and book_value = max(cost - rate x accumulated_units, salvage). For a machine, truck, or tool whose wear tracks hours or miles, this gives a truer book expense than a time-based method. Two catches: an IDLE asset takes ZERO depreciation that period (time-based methods keep expensing it), which matters for a seasonal business; and the book value can NEVER fall below salvage even if the asset is run past its estimated unit life. This is a GAAP/book and income-forecasting method, not the tax MACRS method for most assets. A bookkeeping aid, not tax advice; the accounting policy and tax rules govern.",
+  };
+}
+export const unitsOfProductionDeprExample = { inputs: { cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 8000, accumulated_units: 8000 } };
+function renderUnitsOfProductionDepr(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: units-of-production (activity) depreciation (GAAP; IRS Pub 946 activity method): rate = (cost - salvage) / total_units; period_depreciation = rate x period_units; book_value = max(cost - rate x accumulated_units, salvage). Depreciation tracks usage, so an idle asset takes zero; book value is floored at salvage. A GAAP/book method, not tax MACRS. A bookkeeping aid; the accounting policy and tax rules govern.";
+  const cost = makeNumber("Cost basis ($)", "upd-cost", { step: "any", min: "0" }); cost.input.value = "50000";
+  const salvage = makeNumber("Salvage value ($)", "upd-salvage", { step: "any", min: "0" }); salvage.input.value = "5000";
+  const total = makeNumber("Total estimated lifetime units (hrs/mi/pcs)", "upd-total", { step: "any", min: "0" }); total.input.value = "100000";
+  const period = makeNumber("Units used this period", "upd-period", { step: "any", min: "0" }); period.input.value = "8000";
+  const accum = makeNumber("Units used to date (incl. this period)", "upd-accum", { step: "any", min: "0" }); accum.input.value = "8000";
+  for (const f of [cost, salvage, total, period, accum]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cost.input.value = "50000"; salvage.input.value = "5000"; total.input.value = "100000"; period.input.value = "8000"; accum.input.value = "8000"; update(); });
+  const oRate = makeOutputLine(outputRegion, "Depreciation rate per unit", "upd-out-rate");
+  const oDep = makeOutputLine(outputRegion, "This period's depreciation", "upd-out-dep");
+  const oBook = makeOutputLine(outputRegion, "Ending book value (floored at salvage)", "upd-out-book");
+  const oNote = makeOutputLine(outputRegion, "Note", "upd-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeUnitsOfProductionDepr({ cost_basis: readNum(cost.input), salvage_value: readNum(salvage.input), total_units: readNum(total.input), period_units: readNum(period.input), accumulated_units: readNum(accum.input) });
+    if (r.error) { oRate.textContent = r.error; oDep.textContent = "-"; oBook.textContent = "-"; oNote.textContent = ""; return; }
+    oRate.textContent = "$" + fmt(r.rate, 4) + " per unit";
+    oDep.textContent = "$" + fmt(r.period_depreciation, 2);
+    oBook.textContent = "$" + fmt(r.book_value, 2);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cost, salvage, total, period, accum]) f.input.addEventListener("input", update);
+}
+ACCOUNTING_RENDERERS["units-of-production-depr"] = renderUnitsOfProductionDepr;

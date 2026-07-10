@@ -414,6 +414,18 @@ export const CITATIONS = {
       { name: "Bureau governs", value: "the rating bureau's published rate and official EMR govern", source: "scope of this tile" },
     ],
   },
+  "units-of-production-depr": {
+    formula: "rate = (cost_basis - salvage_value) / total_units; period_depreciation = rate x period_units; book_value = max(cost_basis - rate x accumulated_units, salvage_value).",
+    edition: "Units-of-production (activity) depreciation per GAAP and the IRS Pub 946 activity method, by name; the accounting policy and tax rules govern.",
+    freeAccess: "The units-of-production depreciation method is a standard GAAP activity method; the cost, salvage, unit life, and usage come from the asset records.",
+    governance: GOVERNANCE.general,
+    editionNote: "Units-of-production (activity) depreciation. rate = (cost - salvage) / total_estimated_units, period_depreciation = rate x period_units, and book_value = max(cost - rate x accumulated_units, salvage). Depreciation tracks USAGE, not calendar time, so an idle asset takes zero depreciation that period (time-based methods keep expensing it), which matters for a seasonal business. The book value is floored at salvage and cannot go below it even if the asset is run past its estimated unit life. This is a GAAP/book and income-forecasting method, not the tax MACRS method used for most assets. A bookkeeping aid, not tax advice; the accounting policy and tax rules govern.",
+    assumptions: [
+      { name: "By usage", value: "depreciation is rate per unit times units used; an idle asset takes zero that period", source: "GAAP activity method" },
+      { name: "Salvage floor", value: "book value cannot fall below salvage even past the estimated unit life", source: "GAAP" },
+      { name: "Book not tax", value: "a GAAP/book method, not the tax MACRS method for most assets", source: "IRS Pub 946" },
+    ],
+  },
   "reorder-point": {
     formula: "z = inverse_normal(service_level / 100); safety_stock = z x demand_sd x sqrt(lead_time_days); reorder_point = avg_daily_demand x lead_time_days + safety_stock.",
     edition: "Reorder point and safety stock (standard service-level inventory control), first-principles, by name; the actual demand pattern and supplier reliability govern.",

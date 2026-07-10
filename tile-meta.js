@@ -86,6 +86,8 @@ const _TILES = [
   ["eoq-order-quantity", "R"],
   // spec-v530 reorder point and safety stock (service-level model)
   ["reorder-point", "R"],
+  // spec-v531 units-of-production depreciation
+  ["units-of-production-depr", "R"],
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],

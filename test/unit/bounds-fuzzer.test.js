@@ -17871,3 +17871,23 @@ test("bounds: spec-v530 computeReorderPoint pins the z-lookup, the sqrt(lead) bu
   assert.ok("error" in _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: -1 }));
   assert.ok("error" in _v530({ avg_daily_demand: 100, lead_time_days: 7, demand_sd: 20, service_level_pct: 100 }));
 });
+
+import { computeUnitsOfProductionDepr as _v531 } from "../../calc-accounting.js";
+
+test("bounds: spec-v531 computeUnitsOfProductionDepr pins the per-unit rate, the salvage floor, the idle-zero case, and error seams", () => {
+  const r = _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 8000, accumulated_units: 8000 });
+  assert.ok(Math.abs(r.rate - 0.45) < 1e-9); // (50000 - 5000) / 100000
+  assert.ok(Math.abs(r.period_depreciation - 3600) < 1e-9);
+  assert.ok(Math.abs(r.book_value - 46400) < 1e-9);
+  // The salvage floor holds past the estimated unit life.
+  const past = _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 8000, accumulated_units: 110000 });
+  assert.ok(Math.abs(past.book_value - 5000) < 1e-9); // floored at salvage, not 500
+  // An idle period (zero units) takes zero depreciation.
+  assert.ok(Math.abs(_v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: 0, accumulated_units: 8000 }).period_depreciation) < 1e-12);
+  // Error seams: non-finite, non-positive cost, salvage >= cost, non-positive total units, negative usage.
+  assert.ok("error" in _v531({ cost_basis: Infinity, salvage_value: 5000, total_units: 100000 }));
+  assert.ok("error" in _v531({ cost_basis: 0, salvage_value: 5000, total_units: 100000 }));
+  assert.ok("error" in _v531({ cost_basis: 50000, salvage_value: 50000, total_units: 100000 })); // salvage >= cost
+  assert.ok("error" in _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 0 }));
+  assert.ok("error" in _v531({ cost_basis: 50000, salvage_value: 5000, total_units: 100000, period_units: -1 }));
+});
