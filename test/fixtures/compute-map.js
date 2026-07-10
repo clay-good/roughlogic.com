@@ -63,6 +63,7 @@ export const COMPUTE_MAP = {
   "grain-drying-energy": { module: "../../calc-agriculture.js", fn: "computeGrainDryingEnergy" },
   "manure-nutrient-application": { module: "../../calc-agriculture.js", fn: "computeManureNutrientApplication" },
   "center-pivot-runtime": { module: "../../calc-agriculture.js", fn: "computeCenterPivotRuntime" },
+  "grain-aeration-airflow": { module: "../../calc-agriculture.js", fn: "computeGrainAerationAirflow" },
   "two-stroke-mix": { module: "../../calc-agriculture.js", fn: "computeTwoStrokeMix" },
   "hp-from-torque": { module: "../../calc-mechanic.js", fn: "computeHpFromTorque" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },

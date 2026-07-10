@@ -866,6 +866,8 @@ const TOOL_MODULES = (() => {
     "mulch-topsoil-volume", "grain-drying-energy", "manure-nutrient-application",
     // spec-v568
     "center-pivot-runtime",
+    // spec-v569
+    "grain-aeration-airflow",
     // v35
     "two-stroke-mix",
     // v84 sprayer nozzle / drift / field capacity

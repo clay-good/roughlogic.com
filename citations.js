@@ -709,6 +709,17 @@ export const CITATIONS = {
       { name: "P over-application", value: "an N-based rate usually over-applies phosphorus; the plan governs", source: "scope of this tile" },
     ],
   },
+  "grain-aeration-airflow": {
+    formula: "required_cfm = rate_cfm_per_bu x bushels; cooling_hours = 15 / rate_cfm_per_bu (per cooling front).",
+    edition: "Stored-grain aeration fan airflow (MWPS / university extension; Shedd airflow-resistance curves), by name.",
+    freeAccess: "The cfm-per-bushel airflow relation and the cooling-front rule are public MWPS / extension results; the fan selection at the design static pressure governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "Static pressure rises steeply with grain depth and the fan power grows about fourfold when the airflow rate or the depth doubles, so a fan sized on cfm/bu alone stalls against back-pressure in a tall bin and the fan curve must be read at the actual static pressure; aeration cooling (0.1-0.25 cfm/bu) is not the same job as natural-air drying (0.5-1.0 cfm/bu). A sizing aid, not a fan selection.",
+    assumptions: [
+      { name: "Airflow bands", value: "aeration cooling 0.1-0.25 cfm/bu, natural-air drying 0.5-1.0 cfm/bu", source: "MWPS / extension" },
+      { name: "Static-pressure stall", value: "power grows ~fourfold when the rate or depth doubles; read the fan curve at the design static pressure", source: "Shedd airflow-resistance curves" },
+    ],
+  },
   "center-pivot-runtime": {
     formula: "hours = area_acres x target_depth_in x 452.6 / system_flow_gpm; gross_gpm_per_acre = system_flow_gpm / area_acres; net_depth_in = target_depth_in x efficiency_pct / 100.",
     edition: "Center-pivot application depth and runtime (USDA-NRCS center-pivot design; university extension), by name.",

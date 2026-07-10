@@ -16566,6 +16566,54 @@
    }
   },
   {
+   "tile_id": "grain-aeration-airflow",
+   "source_publisher": "MWPS / university extension (Shedd airflow-resistance curves)",
+   "source_title": "required_cfm = rate x bushels; cooling_hours = 15 / rate",
+   "source_edition_or_year": "MWPS / extension",
+   "source_section_or_page": "20000 bu at 0.15 cfm/bu -> 3000 cfm, ~100 hr per cooling front",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "bin_capacity_bu": 20000,
+    "airflow_rate": 0.15
+   },
+   "outputs": {
+    "required_cfm": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "cooling_hours": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grain-aeration-airflow",
+   "source_publisher": "MWPS / university extension (Shedd airflow-resistance curves)",
+   "source_title": "natural-air drying takes five times the airflow",
+   "source_edition_or_year": "MWPS / extension",
+   "source_section_or_page": "Same bin at 0.75 cfm/bu (drying) -> 15000 cfm (5x the cooling airflow)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "bin_capacity_bu": 20000,
+    "airflow_rate": 0.75
+   },
+   "outputs": {
+    "required_cfm": {
+     "value": 15000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "two-stroke-mix",
    "source_publisher": "First-principles volume arithmetic (small-engine mix convention)",
    "source_title": "oil = fuel / ratio; 1 US gal = 128 fl oz; 1 fl oz = 29.5735 mL",

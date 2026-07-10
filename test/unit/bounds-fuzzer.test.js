@@ -18740,3 +18740,25 @@ test("bounds: spec-v568 computeCenterPivotRuntime pins the 452.6 runtime relatio
   assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 0 }));
   assert.ok("error" in _v568({ system_flow_gpm: 800, area_acres: 125, target_depth_in: 1.0, efficiency_pct: 101 }));
 });
+
+import { computeGrainAerationAirflow as _v569 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v569 computeGrainAerationAirflow pins the rate x bushels airflow, the cooling-time rule, the cooling-vs-drying bands, and error seams", () => {
+  const r = _v569({ bin_capacity_bu: 20000, airflow_rate: 0.15 });
+  assert.ok(Math.abs(r.required_cfm - 3000) < 1e-9); // 0.15 * 20000
+  assert.ok(Math.abs(r.cooling_hours - 100) < 1e-9); // 15 / 0.15
+  assert.equal(r.mode, "aeration cooling");
+  // Natural-air drying needs five times the airflow at 0.75 cfm/bu.
+  const dry = _v569({ bin_capacity_bu: 20000, airflow_rate: 0.75 });
+  assert.ok(Math.abs(dry.required_cfm - 15000) < 1e-9);
+  assert.equal(dry.mode, "natural-air drying");
+  assert.ok(Math.abs(dry.required_cfm - 5 * r.required_cfm) < 1e-6);
+  // A higher rate shortens the cooling front.
+  assert.ok(dry.cooling_hours < r.cooling_hours);
+  // The airflow scales with the bushels.
+  assert.ok(Math.abs(_v569({ bin_capacity_bu: 40000, airflow_rate: 0.15 }).required_cfm - 2 * r.required_cfm) < 1e-9);
+  // Error seams: non-finite, non-positive capacity / rate.
+  assert.ok("error" in _v569({ bin_capacity_bu: Infinity, airflow_rate: 0.15 }));
+  assert.ok("error" in _v569({ bin_capacity_bu: 0, airflow_rate: 0.15 }));
+  assert.ok("error" in _v569({ bin_capacity_bu: 20000, airflow_rate: 0 }));
+});

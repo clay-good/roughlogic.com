@@ -17709,6 +17709,46 @@
       "kind": "redirect"
     },
     {
+      "term": "grain aeration",
+      "target": "grain-aeration-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "aeration fan airflow",
+      "target": "grain-aeration-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "cfm per bushel",
+      "target": "grain-aeration-airflow",
+      "kind": "redirect"
+    },
+    {
+      "term": "grain cooling fan",
+      "target": "grain-aeration-airflow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aeration vs drying",
+      "target": "grain-aeration-airflow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "static pressure grain",
+      "target": "grain-aeration-airflow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "grain fan sizing",
+      "target": "grain-aeration-airflow",
+      "kind": "redirect"
+    },
+    {
+      "term": "stored grain airflow",
+      "target": "grain-aeration-airflow",
+      "kind": "industry"
+    },
+    {
       "term": "cell temperature pv",
       "target": "pv-cell-temperature-power",
       "kind": "industry"

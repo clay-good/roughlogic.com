@@ -2555,3 +2555,43 @@ function _v568renderCenterPivotRuntime(inputRegion, outputRegion, citationEl) {
   for (const f of [flow, area, depth, eff]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["center-pivot-runtime"] = _v568renderCenterPivotRuntime;
+
+// --- spec-v569 L: Stored-grain aeration fan airflow ---
+// required_cfm = rate x bushels. cooling_hours = 15 / rate.
+// dims: in { bin_capacity_bu: dimensionless, airflow_rate: dimensionless } out: { required_cfm: L^3 T^-1, cooling_hours: T }
+export function computeGrainAerationAirflow({ bin_capacity_bu = 0, airflow_rate = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bu = Number(bin_capacity_bu) || 0;
+  const rate = Number(airflow_rate) || 0;
+  if (!(bu > 0)) return { error: "Bin capacity must be positive (bushels)." };
+  if (!(rate > 0)) return { error: "Airflow rate must be positive (cfm/bu)." };
+  const required_cfm = rate * bu;
+  const cooling_hours = 15 / rate;
+  const mode = rate >= 0.5 ? "natural-air drying" : rate >= 0.1 ? "aeration cooling" : "low-rate aeration";
+  return {
+    required_cfm, cooling_hours, mode,
+    note: "Static pressure rises steeply with grain depth, and fan power grows about fourfold when the airflow rate or the depth doubles - so a fan sized on cfm/bu alone stalls against back-pressure in a tall bin, and the fan curve must be read at the actual static pressure. Aeration cooling (0.1-0.25 cfm/bu) is NOT the same job as natural-air drying (0.5-1.0 cfm/bu) - mixing them up either wastes fan or fails to dry. A sizing aid; the fan selection at the design static pressure and the grain condition govern.",
+  };
+}
+export const grainAerationAirflowExample = { inputs: { bin_capacity_bu: 20000, airflow_rate: 0.15 } };
+
+function _v569renderGrainAerationAirflow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: stored-grain aeration fan airflow (MWPS / university extension; Shedd airflow-resistance curves), by name. required_cfm = rate_cfm_per_bu x bushels; cooling_hours = 15 / rate (per cooling front). Bands: aeration cooling 0.1-0.25 cfm/bu, natural-air drying 0.5-1.0 cfm/bu. Static pressure rises steeply with depth and fan power grows ~fourfold when the rate or depth doubles - read the fan curve at the actual static pressure. The fan selection and grain condition govern.";
+  const bu = makeNumber("Stored grain (bushels)", "gaa-bu", { step: "any", min: "0", value: "20000" }); bu.input.value = "20000";
+  const rate = makeNumber("Target airflow (cfm/bu, 0.1-0.25 cool, 0.5-1.0 dry)", "gaa-rate", { step: "any", min: "0", value: "0.15" }); rate.input.value = "0.15";
+  for (const f of [bu, rate]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bu.input.value = "20000"; rate.input.value = "0.15"; update(); });
+  const oCfm = makeOutputLine(outputRegion, "Required fan airflow", "gaa-out-cfm");
+  const oHours = makeOutputLine(outputRegion, "Approx. cooling time / mode", "gaa-out-hours");
+  const oNote = makeOutputLine(outputRegion, "Note", "gaa-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGrainAerationAirflow({ bin_capacity_bu: readNum(bu.input), airflow_rate: readNum(rate.input) });
+    if (r.error) { oCfm.textContent = r.error; oHours.textContent = "-"; oNote.textContent = ""; return; }
+    oCfm.textContent = fmt(r.required_cfm, 0) + " cfm";
+    oHours.textContent = fmt(r.cooling_hours, 0) + " hr per cooling front (" + r.mode + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bu, rate]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["grain-aeration-airflow"] = _v569renderGrainAerationAirflow;
