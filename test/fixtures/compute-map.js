@@ -760,6 +760,7 @@ export const COMPUTE_MAP = {
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
   "neutral-grounding-resistor": { module: "../../calc-elecdesign.js", fn: "computeNeutralGroundingResistor" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", fn: "computeStepTouchVoltage" },
+  "sccr-combination": { module: "../../calc-elecdesign.js", fn: "computeSccrCombination" },
   "net-effective-rent": { module: "../../calc-realestate.js", fn: "computeNetEffectiveRent" },
   "commercial-load-factor": { module: "../../calc-realestate.js", fn: "computeCommercialLoadFactor" },
   "blended-mortgage-rate": { module: "../../calc-realestate.js", fn: "computeBlendedMortgageRate" },

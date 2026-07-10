@@ -8294,6 +8294,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "sccr",
+      "target": "sccr-combination",
+      "kind": "industry"
+    },
+    {
+      "term": "short circuit current rating",
+      "target": "sccr-combination",
+      "kind": "industry"
+    },
+    {
+      "term": "ul 508a",
+      "target": "sccr-combination",
+      "kind": "industry"
+    },
+    {
+      "term": "control panel sccr",
+      "target": "sccr-combination",
+      "kind": "industry"
+    },
+    {
+      "term": "weakest link sccr",
+      "target": "sccr-combination",
+      "kind": "redirect"
+    },
+    {
+      "term": "409.110",
+      "target": "sccr-combination",
+      "kind": "redirect"
+    },
+    {
+      "term": "available fault current",
+      "target": "sccr-combination",
+      "kind": "adjacent"
+    },
+    {
+      "term": "current limiting fuse sccr",
+      "target": "sccr-combination",
+      "kind": "adjacent"
+    },
+    {
       "term": "self excitation",
       "target": "motor-capacitor-max",
       "kind": "industry"

@@ -417,3 +417,52 @@ ELECDESIGN_RENDERERS["step-touch-voltage"] = _simpleRenderer({
   ],
   compute: computeStepTouchVoltage,
 });
+
+// ===================== spec-v560: industrial control panel SCCR (UL 508A SB) =====================
+
+// dims: in { component_sccrs_ka: dimensionless, feeder_ir_ka: I, available_fault_ka: I } out: { panel_sccr_ka: I, compliant: dimensionless }
+export function computeSccrCombination({ component_sccrs_ka = [], feeder_ir_ka = 0, available_fault_ka = 0 } = {}) {
+  let vals;
+  if (Array.isArray(component_sccrs_ka)) vals = component_sccrs_ka.map(Number);
+  else if (typeof component_sccrs_ka === "string") vals = component_sccrs_ka.split(/[\s,]+/).map((x) => x.trim()).filter((x) => x !== "").map(Number);
+  else return { error: "Enter the component SCCRs (kA), comma or space separated." };
+  if (!vals.length) return { error: "Enter at least one component SCCR (kA)." };
+  for (const v of vals) if (!Number.isFinite(v)) return { error: "All component SCCRs must be finite numbers (kA)." };
+  for (const v of vals) if (!(v > 0)) return { error: "Each component SCCR must be positive (kA)." };
+  const feeder = Number(feeder_ir_ka) || 0;
+  const fault = Number(available_fault_ka) || 0;
+  if (!Number.isFinite(feeder) || feeder < 0) return { error: "Feeder interrupting rating must be non-negative (kA)." };
+  if (!Number.isFinite(fault) || fault < 0) return { error: "Available fault current must be non-negative (kA)." };
+  const candidates = feeder > 0 ? vals.concat([feeder]) : vals;
+  const panel_sccr_ka = Math.min(...candidates);
+  const governing_is_feeder = feeder > 0 && feeder === panel_sccr_ka && feeder < Math.min(...vals);
+  const compliant = panel_sccr_ka >= fault;
+  return {
+    panel_sccr_ka, compliant, governing_is_feeder, n: vals.length,
+    note: "The panel SCCR is the lowest-rated power-circuit component (one 5 kA contactor caps the panel), not the main device; the feeder overcurrent device's interrupting rating also bounds it. A current-limiting fuse or breaker ahead of a weak component can raise the combination rating through its let-through energy (a listed combination) - re-enter that component at its qualified rating. NEC 409.110 requires the SCCR to be marked and to meet or exceed the available fault. UL 508A and the AHJ govern.",
+  };
+}
+const sccrCombinationExample = { inputs: { component_sccrs_ka: "65, 5, 5, 10", feeder_ir_ka: 0, available_fault_ka: 22 } };
+function renderSccrCombination(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: UL 508A Supplement SB industrial-control-panel SCCR (weakest-link method); NEC 409.110 / 110.10. The panel SCCR = min(component SCCRs, feeder OCPD interrupting rating), and it must meet or exceed the available fault current. One low-rated component caps the whole panel; a current-limiting fuse ahead of a weak component can raise the combination through its let-through. UL 508A and the AHJ govern.";
+  const comps = makeTextarea("Component SCCRs (kA, comma or space separated)", "sccr-comps", { rows: "2" });
+  comps.input.value = "65, 5, 5, 10";
+  const feeder = makeNumber("Feeder OCPD interrupting rating (kA, 0 to omit)", "sccr-feeder", { step: "any", min: "0", value: "0" });
+  feeder.input.value = "0";
+  const fault = makeNumber("Available fault current (kA)", "sccr-fault", { step: "any", min: "0", value: "22" });
+  fault.input.value = "22";
+  for (const f of [comps, feeder, fault]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { comps.input.value = "65, 5, 5, 10"; feeder.input.value = "0"; fault.input.value = "22"; update(); });
+  const oSccr = makeOutputLine(outputRegion, "Panel SCCR (weakest link)", "sccr-out-sccr");
+  const oComp = makeOutputLine(outputRegion, "Compliant with available fault?", "sccr-out-comp");
+  const oNote = makeOutputLine(outputRegion, "Note", "sccr-out-note");
+  const update = debounce(() => {
+    const r = computeSccrCombination({ component_sccrs_ka: comps.input.value, feeder_ir_ka: Number(feeder.input.value) || 0, available_fault_ka: Number(fault.input.value) || 0 });
+    if (r.error) { oSccr.textContent = r.error; oComp.textContent = "-"; oNote.textContent = ""; return; }
+    oSccr.textContent = fmt(r.panel_sccr_ka, 1) + " kA (" + r.n + " components" + (r.governing_is_feeder ? ", feeder IR governs" : "") + ")";
+    oComp.textContent = r.compliant ? "PASS (>= " + fmt(Number(fault.input.value) || 0, 1) + " kA fault)" : "FAIL - below the " + fmt(Number(fault.input.value) || 0, 1) + " kA fault; raise the weakest component";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [comps, feeder, fault]) f.input.addEventListener("input", update);
+}
+ELECDESIGN_RENDERERS["sccr-combination"] = renderSccrCombination;

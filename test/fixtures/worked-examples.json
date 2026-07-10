@@ -44341,6 +44341,50 @@
    }
   },
   {
+   "tile_id": "sccr-combination",
+   "source_publisher": "UL 508A Supplement SB / NEC 409.110",
+   "source_title": "panel_sccr = min(component SCCRs, feeder IR); compliant when >= available fault",
+   "source_edition_or_year": "UL 508A",
+   "source_section_or_page": "65/5/5/10 kA components, 22 kA fault -> panel SCCR 5 kA (the 5 kA devices cap it), non-compliant",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "component_sccrs_ka": "65, 5, 5, 10",
+    "feeder_ir_ka": 0,
+    "available_fault_ka": 22
+   },
+   "outputs": {
+    "panel_sccr_ka": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sccr-combination",
+   "source_publisher": "UL 508A Supplement SB / NEC 409.110",
+   "source_title": "a current-limiting fuse qualifies the weak components; the next weakest governs",
+   "source_edition_or_year": "UL 508A",
+   "source_section_or_page": "Fuse raises the 5 kA devices to 65; panel SCCR rises to the 10 kA terminal blocks -> still < 22 kA",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "component_sccrs_ka": "65, 65, 10",
+    "feeder_ir_ka": 0,
+    "available_fault_ka": 22
+   },
+   "outputs": {
+    "panel_sccr_ka": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "masonry-wall-weight",
    "source_publisher": "NCMA TEK",
    "source_title": "8 in CMU, hollow 55 psf, grout adder 29, grouted 48 in o.c., 10 ft -> 59.8 psf, 598 lb/ft",

@@ -18533,3 +18533,31 @@ test("bounds: spec-v559 computeSolarEgc69045 pins the OCPD-vs-Isc basis, the 14 
   assert.ok("error" in _v559({ ocpd_rating_a: Infinity, pv_isc_a: 0, vd_upsized: "no" }));
   assert.ok("error" in _v559({ ocpd_rating_a: 0, pv_isc_a: 0, vd_upsized: "no" }));
 });
+
+import { computeSccrCombination as _v560 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v560 computeSccrCombination pins the min-of-components rating, the feeder-IR bound, the pass/fail against the fault, and error seams", () => {
+  const r = _v560({ component_sccrs_ka: "65, 5, 5, 10", feeder_ir_ka: 0, available_fault_ka: 22 });
+  assert.equal(r.panel_sccr_ka, 5); // min(65,5,5,10) - the 5 kA devices cap it
+  assert.equal(r.compliant, false); // 5 < 22
+  assert.equal(r.n, 4);
+  // A current-limiting fuse raises the weak components; the next weakest governs.
+  const fixed = _v560({ component_sccrs_ka: "65, 65, 10", feeder_ir_ka: 0, available_fault_ka: 22 });
+  assert.equal(fixed.panel_sccr_ka, 10); // now the terminal blocks govern
+  assert.equal(fixed.compliant, false); // still 10 < 22
+  // Accepts an array as well as a string.
+  assert.equal(_v560({ component_sccrs_ka: [65, 20], feeder_ir_ka: 0, available_fault_ka: 10 }).panel_sccr_ka, 20);
+  // The feeder interrupting rating also bounds the panel.
+  const feeder = _v560({ component_sccrs_ka: "65, 20", feeder_ir_ka: 14, available_fault_ka: 10 });
+  assert.equal(feeder.panel_sccr_ka, 14);
+  assert.equal(feeder.governing_is_feeder, true);
+  assert.equal(feeder.compliant, true); // 14 >= 10
+  // A robust panel clears the fault.
+  assert.equal(_v560({ component_sccrs_ka: "65, 65, 65", feeder_ir_ka: 0, available_fault_ka: 22 }).compliant, true);
+  // Error seams: empty list, non-finite/non-positive component, negative fault.
+  assert.ok("error" in _v560({ component_sccrs_ka: "", feeder_ir_ka: 0, available_fault_ka: 22 }));
+  assert.ok("error" in _v560({ component_sccrs_ka: "65, abc", feeder_ir_ka: 0, available_fault_ka: 22 }));
+  assert.ok("error" in _v560({ component_sccrs_ka: "65, 0", feeder_ir_ka: 0, available_fault_ka: 22 }));
+  assert.ok("error" in _v560({ component_sccrs_ka: "65, 5", feeder_ir_ka: 0, available_fault_ka: -1 }));
+  assert.ok("error" in _v560({ component_sccrs_ka: "65, 5", feeder_ir_ka: -1, available_fault_ka: 22 }));
+});

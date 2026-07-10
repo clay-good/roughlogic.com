@@ -6283,6 +6283,17 @@ export const CITATIONS = {
       { name: "Minimum ampacity", value: "the maximum current times another 125% before any conditions-of-use adjustment", source: "NEC 690.8(B)(1)" },
     ],
   },
+  "sccr-combination": {
+    formula: "panel_sccr = min(component SCCRs, feeder OCPD interrupting rating); compliant when panel_sccr >= available_fault.",
+    edition: "The UL 508A Supplement SB industrial-control-panel short-circuit current rating (weakest-link method), with NEC 409.110 / 110.10, by name.",
+    freeAccess: "The weakest-link SCCR method is defined in UL 508A Supplement SB; NEC 409.110 is available through NFPA free online read-only access.",
+    governance: GOVERNANCE.general,
+    editionNote: "The panel rating is the lowest-rated power-circuit component, not the main device (one 5 kA contactor caps the panel); the feeder overcurrent device's interrupting rating also bounds it; a current-limiting fuse or breaker ahead of a weak component can raise the combination rating through its let-through energy (a listed combination). NEC 409.110 requires the SCCR to be marked and to meet or exceed the available fault. A compliance aid, not the AHJ.",
+    assumptions: [
+      { name: "Weakest link", value: "panel SCCR = min of the component SCCRs and the feeder OCPD interrupting rating", source: "UL 508A Supplement SB" },
+      { name: "Combination ratings", value: "a listed current-limiting device can raise a weak component's combination SCCR through its let-through", source: "UL 508A Supplement SB" },
+    ],
+  },
   "step-touch-voltage": {
     formula: "Cs = 1 - 0.09 (1 - rho/rho_s)/(2 hs + 0.09); E_step = (1000 + 6 Cs rho_s) k/sqrt(ts); E_touch = (1000 + 1.5 Cs rho_s) k/sqrt(ts) (k = 0.116 for 50 kg, 0.157 for 70 kg).",
     edition: "The IEEE Std 80 tolerable step and touch voltage limits with the surface-layer derating factor Cs, by name.",

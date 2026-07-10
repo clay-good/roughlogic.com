@@ -495,6 +495,8 @@ const TOOL_MODULES = (() => {
     "neutral-grounding-resistor",
     // spec-v558
     "step-touch-voltage",
+    // spec-v560
+    "sccr-combination",
   ]);
   // spec-v102 new HVAC field-service bench; relieves the standing
   // calc-hvac.js cap watch. Both tiles keep group "C".

@@ -195,6 +195,7 @@ const RELATED = {
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],
   "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],
+  "sccr-combination": ["short-circuit-pp", "breaker-sizing", "asymmetrical-fault-xr"],
   "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   "buck-boost-sizing": ["transformer-kva-sizing", "transformer-conductor-protection", "three-phase"],
