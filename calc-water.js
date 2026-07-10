@@ -1416,3 +1416,52 @@ const renderRasFlowRate = _v23SimpleRenderer({
   compute: computeRasFlowRate,
 });
 WATER_RENDERERS["ras-flow-rate"] = renderRasFlowRate;
+
+// --- spec-v572 M: WAS rate to hold target SRT (sludge age) ---
+// system_solids = V*MLSS*8.34. solids_to_waste = system_solids/SRT. Q_WAS = (stw - eff_solids)/(WAS*8.34).
+// dims: in { aeration_volume_mg: L^3, mlss_mg_l: M L^-3, target_srt_days: T, was_conc_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1, effluent_tss_mg_l: M L^-3 } out: { q_was_mgd: L^3 T^-1, q_was_gpm: L^3 T^-1 }
+export function computeWasSrtControl({ aeration_volume_mg = 0, mlss_mg_l = 0, target_srt_days = 0, was_conc_mg_l = 0, effluent_flow_mgd = 0, effluent_tss_mg_l = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(aeration_volume_mg) || 0;
+  const mlss = Number(mlss_mg_l) || 0;
+  const srt = Number(target_srt_days) || 0;
+  const wc = Number(was_conc_mg_l) || 0;
+  const qeff = Number(effluent_flow_mgd) || 0;
+  const teff = Number(effluent_tss_mg_l) || 0;
+  if (!(V > 0)) return { error: "Aeration volume must be positive (MG)." };
+  if (!(mlss > 0)) return { error: "Mixed-liquor solids must be positive (mg/L)." };
+  if (!(srt > 0)) return { error: "Target SRT must be positive (days)." };
+  if (!(wc > 0)) return { error: "WAS concentration must be positive (mg/L)." };
+  if (qeff < 0 || teff < 0) return { error: "Effluent flow and TSS must be non-negative." };
+  const system_solids_lb = V * mlss * 8.34;
+  const solids_to_waste_lb = system_solids_lb / srt;
+  const effluent_solids_lb = qeff * teff * 8.34;
+  const was_solids_lb = solids_to_waste_lb - effluent_solids_lb;
+  if (was_solids_lb <= 0) return { error: "The effluent solids already meet or exceed the target wasting - no WAS pumping is needed (or lengthen the SRT / check the effluent TSS)." };
+  const q_was_mgd = was_solids_lb / (wc * 8.34);
+  const q_was_gpm = q_was_mgd * 1e6 / 1440;
+  return {
+    system_solids_lb, solids_to_waste_lb, effluent_solids_lb, q_was_mgd, q_was_gpm,
+    note: "This is the inverse of a sludge-age readout - it answers how much to waste today. SRT responds over roughly one SRT (days), so over-correcting on a single reading chases the process; make changes gradually. The effluent solids carried over the weir count as wasted and reduce the WAS pump rate. The process trend and the operator govern.",
+  };
+}
+export const wasSrtControlExample = { inputs: { aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000, effluent_flow_mgd: 5, effluent_tss_mg_l: 15 } };
+const renderWasSrtControl = _v23SimpleRenderer({
+  citation: "Citation: WAS rate for a target SRT (MCRT/SRT control; WEF operator training), by name. system_solids = V x MLSS x 8.34; solids_to_waste = system_solids / SRT; effluent_solids = Qeff x TSSeff x 8.34; Q_WAS = (solids_to_waste - effluent_solids) / (WAS x 8.34); Q_WAS_gpm = Q_WAS x 1e6/1440. SRT responds over ~one SRT, so change gradually; effluent solids count as wasted. The process trend and the operator govern.",
+  example: wasSrtControlExample.inputs,
+  fields: [
+    { key: "aeration_volume_mg", label: "Aeration volume (MG)", kind: "number" },
+    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L)", kind: "number" },
+    { key: "target_srt_days", label: "Target SRT (days)", kind: "number" },
+    { key: "was_conc_mg_l", label: "WAS concentration (mg/L)", kind: "number" },
+    { key: "effluent_flow_mgd", label: "Effluent flow (MGD)", kind: "number", default: 0 },
+    { key: "effluent_tss_mg_l", label: "Effluent TSS (mg/L)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "s", id: "was-out-s", label: "System solids / to waste", value: (r) => fmt(r.system_solids_lb, 0) + " lb / " + fmt(r.solids_to_waste_lb, 0) + " lb-day (" + fmt(r.effluent_solids_lb, 0) + " lb-day over the weir)" },
+    { key: "q", id: "was-out-q", label: "WAS flow", value: (r) => fmt(r.q_was_mgd, 3) + " MGD (" + fmt(r.q_was_gpm, 0) + " gpm)" },
+    { key: "n", id: "was-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWasSrtControl,
+});
+WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;

@@ -18806,3 +18806,28 @@ test("bounds: spec-v571 computeRasFlowRate pins the mass-balance relation, the r
   assert.ok("error" in _v571({ plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 2500 })); // RAS_SS == MLSS
   assert.ok("error" in _v571({ plant_flow_mgd: 5, mlss_mg_l: 2500, ras_ss_mg_l: 2000 })); // RAS_SS < MLSS
 });
+
+import { computeWasSrtControl as _v572 } from "../../calc-water.js";
+
+test("bounds: spec-v572 computeWasSrtControl pins the system-solids and solids-to-waste relations, the effluent credit, the MGD-to-gpm conversion, and error seams", () => {
+  const r = _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000, effluent_flow_mgd: 5, effluent_tss_mg_l: 15 });
+  assert.ok(Math.abs(r.system_solids_lb - 50040) < 1); // 2*3000*8.34
+  assert.ok(Math.abs(r.solids_to_waste_lb - 5004) < 1); // 50040/10
+  assert.ok(Math.abs(r.effluent_solids_lb - 625.5) < 1); // 5*15*8.34
+  assert.ok(Math.abs(r.q_was_mgd - 0.0656) < 0.001);
+  assert.ok(Math.abs(r.q_was_gpm - 46) < 0.5); // MGD * 1e6/1440
+  // A longer target SRT wastes less.
+  const long = _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 15, was_conc_mg_l: 8000, effluent_flow_mgd: 5, effluent_tss_mg_l: 15 });
+  assert.ok(Math.abs(long.q_was_gpm - 28) < 0.5);
+  assert.ok(long.q_was_gpm < r.q_was_gpm);
+  // Zero effluent solids means the full solids-to-waste goes to the pump.
+  const noEff = _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000, effluent_flow_mgd: 0, effluent_tss_mg_l: 0 });
+  assert.ok(noEff.q_was_mgd > r.q_was_mgd);
+  // Error seams: non-finite, non-positive volume / MLSS / SRT / WAS; effluent already exceeds the target.
+  assert.ok("error" in _v572({ aeration_volume_mg: Infinity, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000 }));
+  assert.ok("error" in _v572({ aeration_volume_mg: 0, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000 }));
+  assert.ok("error" in _v572({ aeration_volume_mg: 2, mlss_mg_l: 0, target_srt_days: 10, was_conc_mg_l: 8000 }));
+  assert.ok("error" in _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 0, was_conc_mg_l: 8000 }));
+  assert.ok("error" in _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 0 }));
+  assert.ok("error" in _v572({ aeration_volume_mg: 2, mlss_mg_l: 3000, target_srt_days: 10, was_conc_mg_l: 8000, effluent_flow_mgd: 100, effluent_tss_mg_l: 30 })); // effluent exceeds target wasting
+});

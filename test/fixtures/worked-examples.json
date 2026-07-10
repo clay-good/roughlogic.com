@@ -24751,6 +24751,68 @@
    }
   },
   {
+   "tile_id": "was-srt-control",
+   "source_publisher": "MCRT/SRT control; WEF operator training",
+   "source_title": "Q_WAS = (system_solids/SRT - effluent_solids) / (WAS x 8.34)",
+   "source_edition_or_year": "SRT control",
+   "source_section_or_page": "2 MG, 3000 MLSS, SRT 10 d, WAS 8000, eff 5 MGD/15 mg/L -> 0.066 MGD, 46 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "aeration_volume_mg": 2,
+    "mlss_mg_l": 3000,
+    "target_srt_days": 10,
+    "was_conc_mg_l": 8000,
+    "effluent_flow_mgd": 5,
+    "effluent_tss_mg_l": 15
+   },
+   "outputs": {
+    "solids_to_waste_lb": {
+     "value": 5004,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "q_was_mgd": {
+     "value": 0.0656,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_was_gpm": {
+     "value": 46,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "was-srt-control",
+   "source_publisher": "MCRT/SRT control; WEF operator training",
+   "source_title": "a longer target SRT wastes less",
+   "source_edition_or_year": "SRT control",
+   "source_section_or_page": "Same plant at SRT 15 d -> 0.041 MGD, 28 gpm (grow an older sludge)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "aeration_volume_mg": 2,
+    "mlss_mg_l": 3000,
+    "target_srt_days": 15,
+    "was_conc_mg_l": 8000,
+    "effluent_flow_mgd": 5,
+    "effluent_tss_mg_l": 15
+   },
+   "outputs": {
+    "q_was_gpm": {
+     "value": 28,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "multi-leg-sling",
    "source_publisher": "ASME B30.9 (Slings, by name)",
    "source_title": "8,000 lb on 4 legs at 60 deg, conservative over 2 legs",

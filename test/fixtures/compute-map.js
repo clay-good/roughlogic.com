@@ -930,6 +930,7 @@ export const COMPUTE_MAP = {
   "uv-dose": { module: "../../calc-water.js", fn: "computeUvDose" },
   "population-equivalent": { module: "../../calc-water.js", fn: "computePopulationEquivalent" },
   "ras-flow-rate": { module: "../../calc-water.js", fn: "computeRasFlowRate" },
+  "was-srt-control": { module: "../../calc-water.js", fn: "computeWasSrtControl" },
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },

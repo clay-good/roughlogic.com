@@ -8603,6 +8603,17 @@ export const CITATIONS = {
       { name: "Short dose", value: "a short dose points to an aged lamp, a fouled sleeve, or low UV transmittance (turbidity)", source: "USEPA UVDGM" },
     ],
   },
+  "was-srt-control": {
+    formula: "system_solids = V x MLSS x 8.34; solids_to_waste = system_solids / SRT; effluent_solids = Qeff x TSSeff x 8.34; Q_WAS = (solids_to_waste - effluent_solids) / (WAS x 8.34); Q_WAS_gpm = Q_WAS x 1e6 / 1440.",
+    edition: "WAS rate for a target SRT (MCRT/SRT control; WEF operator training), by name.",
+    freeAccess: "The SRT-control solids-balance relation is a public wastewater-operations method; the process trend and the operator govern the actual set point.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is the inverse of a sludge-age readout - it answers how much to waste today. SRT responds over roughly one SRT (days), so over-correcting on a single reading chases the process; make changes gradually. The effluent solids carried over the weir count as wasted and reduce the WAS pump rate. An operating aid, not a process design.",
+    assumptions: [
+      { name: "Solids to waste", value: "solids_to_waste = system_solids / SRT; the effluent solids reduce the required WAS pumping", source: "SRT control" },
+      { name: "Slow response", value: "SRT reacts over roughly one SRT; change the wasting gradually rather than chasing a single reading", source: "WEF operator training" },
+    ],
+  },
   "ras-flow-rate": {
     formula: "Q_RAS = Q x MLSS / (RAS_SS - MLSS); ras_ratio = Q_RAS / Q x 100.",
     edition: "RAS flow from the activated-sludge solids mass balance (WEF MOP / Sacramento activated-sludge manuals), by name.",
