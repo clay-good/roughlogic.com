@@ -2595,3 +2595,65 @@ function _v569renderGrainAerationAirflow(inputRegion, outputRegion, citationEl) 
   for (const f of [bu, rate]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["grain-aeration-airflow"] = _v569renderGrainAerationAirflow;
+
+// --- spec-v582 L: NRCS 313 waste storage facility volume ---
+// manure = (daily_manure+wastewater+bedding)*storage_days. precip_storm = area*(net_precip+storm)/12. freeboard = area*freeboard/12. total = sum.
+// dims: in { daily_manure_ft3: L^3 T^-1, wastewater_ft3: L^3 T^-1, bedding_ft3: L^3 T^-1, storage_days: T, surface_area_ft2: L^2, net_precip_in: L, storm_in: L, freeboard_in: L } out: { manure_volume_ft3: L^3, precip_storm_ft3: L^3, freeboard_ft3: L^3, total_ft3: L^3, total_gal: L^3 }
+export function computeManureStorageVolume({ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0, surface_area_ft2 = 0, net_precip_in = 0, storm_in = 0, freeboard_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const manure = Number(daily_manure_ft3) || 0;
+  const ww = Number(wastewater_ft3) || 0;
+  const bed = Number(bedding_ft3) || 0;
+  const days = Number(storage_days) || 0;
+  const area = Number(surface_area_ft2) || 0;
+  const precip = Number(net_precip_in) || 0;
+  const storm = Number(storm_in) || 0;
+  const fb = Number(freeboard_in) || 0;
+  if (!(manure > 0)) return { error: "Daily manure production must be positive (ft3/day)." };
+  if (!(days > 0)) return { error: "Storage period must be positive (days)." };
+  if (ww < 0 || bed < 0) return { error: "Added wastewater and bedding cannot be negative (ft3/day)." };
+  if (area < 0) return { error: "Surface area cannot be negative (ft2)." };
+  if (precip < 0 || storm < 0) return { error: "Net precipitation and storm depth cannot be negative (in)." };
+  if (fb < 0) return { error: "Freeboard cannot be negative (in)." };
+  const manure_volume_ft3 = (manure + ww + bed) * days;
+  const precip_storm_ft3 = area * (precip + storm) / 12;
+  const freeboard_ft3 = area * fb / 12;
+  const total_ft3 = manure_volume_ft3 + precip_storm_ft3 + freeboard_ft3;
+  const total_gal = total_ft3 * 7.48052;
+  const short_days = days < 120;
+  return {
+    manure_volume_ft3, precip_storm_ft3, freeboard_ft3, total_ft3, total_gal, short_days,
+    note: "An uncovered liquid facility must bank the net precipitation and the 25-year, 24-hour storm falling on its own surface over the storage period - sizing to manure alone overtops in a wet spring. The minimum storage is 120 days (or the nutrient-management plan), and freeboard is 6 inches for a vertical-wall tank and 12 inches for other structures. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",
+  };
+}
+export const manureStorageVolumeExample = { inputs: { daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 } };
+function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not the engineer of record; NRCS 313 and the engineer/planner govern. Citation: NRCS Conservation Practice Standard 313 / ASABE D384 manure production, by name. manure = (daily + wastewater + bedding) x storage_days; precip_storm = area x (net_precip + storm) / 12; freeboard = area x freeboard_in / 12; total = the sum. An uncovered facility must bank the net precipitation and the 25-year, 24-hour storm over the storage period; minimum storage is 120 days; freeboard is 6 in (vertical wall) or 12 in (other).";
+  const manure = makeNumber("Daily manure (ft3/day = head x rate)", "msv-manure", { step: "any", min: "0", value: "150" }); manure.input.value = "150";
+  const ww = makeNumber("Added wastewater (ft3/day, 0 if none)", "msv-ww", { step: "any", min: "0", value: "0" }); ww.input.value = "0";
+  const bed = makeNumber("Added bedding (ft3/day, 0 if none)", "msv-bed", { step: "any", min: "0", value: "20" }); bed.input.value = "20";
+  const days = makeNumber("Storage period (days, >= 120)", "msv-days", { step: "any", min: "0", value: "120" }); days.input.value = "120";
+  const area = makeNumber("Surface area (ft2, 0 if roofed)", "msv-area", { step: "any", min: "0", value: "8000" }); area.input.value = "8000";
+  const precip = makeNumber("Net precipitation over period (in)", "msv-precip", { step: "any", min: "0", value: "6" }); precip.input.value = "6";
+  const storm = makeNumber("25-yr 24-hr storm depth (in)", "msv-storm", { step: "any", min: "0", value: "4" }); storm.input.value = "4";
+  const fb = makeNumber("Freeboard (in: 6 vertical wall / 12 other)", "msv-fb", { step: "any", min: "0", value: "12" }); fb.input.value = "12";
+  for (const f of [manure, ww, bed, days, area, precip, storm, fb]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { manure.input.value = "150"; ww.input.value = "0"; bed.input.value = "20"; days.input.value = "120"; area.input.value = "8000"; precip.input.value = "6"; storm.input.value = "4"; fb.input.value = "12"; update(); });
+  const oManure = makeOutputLine(outputRegion, "Manure + wastewater + bedding volume", "msv-out-manure");
+  const oPrecip = makeOutputLine(outputRegion, "Precipitation + 25-yr storm volume", "msv-out-precip");
+  const oFree = makeOutputLine(outputRegion, "Freeboard volume", "msv-out-free");
+  const oTotal = makeOutputLine(outputRegion, "Total required storage", "msv-out-total");
+  const oNote = makeOutputLine(outputRegion, "Note", "msv-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeManureStorageVolume({ daily_manure_ft3: readNum(manure.input), wastewater_ft3: readNum(ww.input), bedding_ft3: readNum(bed.input), storage_days: readNum(days.input), surface_area_ft2: readNum(area.input), net_precip_in: readNum(precip.input), storm_in: readNum(storm.input), freeboard_in: readNum(fb.input) });
+    if (r.error) { oManure.textContent = r.error; oPrecip.textContent = "-"; oFree.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
+    oManure.textContent = fmt(r.manure_volume_ft3, 0) + " ft3";
+    oPrecip.textContent = fmt(r.precip_storm_ft3, 0) + " ft3";
+    oFree.textContent = fmt(r.freeboard_ft3, 0) + " ft3";
+    oTotal.textContent = fmt(r.total_ft3, 0) + " ft3 (" + fmt(r.total_gal, 0) + " gal)" + (r.short_days ? " - under the 120-day minimum" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [manure, ww, bed, days, area, precip, storm, fb]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["manure-storage-volume"] = _v582renderManureStorageVolume;

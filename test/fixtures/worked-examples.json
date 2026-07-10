@@ -16614,6 +16614,78 @@
    }
   },
   {
+   "tile_id": "manure-storage-volume",
+   "source_publisher": "NRCS Conservation Practice Standard 313 / ASABE D384",
+   "source_title": "total = manure x days + area x (net precip + storm)/12 + freeboard",
+   "source_edition_or_year": "NRCS 313 / ASABE D384",
+   "source_section_or_page": "150 ft3/day manure + 20 bedding, 120 days, 8,000 ft2 open, 6 in precip, 4 in storm, 12 in freeboard -> 35,067 ft3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "daily_manure_ft3": 150,
+    "wastewater_ft3": 0,
+    "bedding_ft3": 20,
+    "storage_days": 120,
+    "surface_area_ft2": 8000,
+    "net_precip_in": 6,
+    "storm_in": 4,
+    "freeboard_in": 12
+   },
+   "outputs": {
+    "manure_volume_ft3": {
+     "value": 20400,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "precip_storm_ft3": {
+     "value": 6666.67,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "freeboard_ft3": {
+     "value": 8000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "total_ft3": {
+     "value": 35066.67,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manure-storage-volume",
+   "source_publisher": "NRCS Conservation Practice Standard 313 / ASABE D384",
+   "source_title": "sizing to manure alone badly undersizes (overtops in a wet spring)",
+   "source_edition_or_year": "NRCS 313 / ASABE D384",
+   "source_section_or_page": "The manure volume alone is 20,400 ft3 -- 14,667 ft3 short of the 35,067 ft3 NRCS 313 requires with the water banked",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "daily_manure_ft3": 150,
+    "wastewater_ft3": 0,
+    "bedding_ft3": 20,
+    "storage_days": 120,
+    "surface_area_ft2": 0,
+    "net_precip_in": 0,
+    "storm_in": 0,
+    "freeboard_in": 0
+   },
+   "outputs": {
+    "total_ft3": {
+     "value": 20400,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "two-stroke-mix",
    "source_publisher": "First-principles volume arithmetic (small-engine mix convention)",
    "source_title": "oil = fuel / ratio; 1 US gal = 128 fl oz; 1 fl oz = 29.5735 mL",

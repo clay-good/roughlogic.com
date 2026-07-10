@@ -130,6 +130,7 @@ const RELATED = {
   "manure-nutrient-application": ["npk-blend", "manure-application-rate", "grain-drying-energy", "mulch-topsoil-volume"],
   "center-pivot-runtime": ["irrigation-requirement", "sprinkler-precip-rate", "irrigation-zone-runtime"],
   "grain-aeration-airflow": ["grain-drying-energy", "grain-bin-capacity", "center-pivot-runtime"],
+  "manure-storage-volume": ["manure-application-rate", "manure-nutrient-application", "grain-bin-capacity"],
   "two-stroke-mix": ["gpa-rate", "tank-mix", "fuel-range"],
   "hp-from-torque": ["displacement-cr", "prop-slip", "tire-gearing"],
   "volumetric-efficiency": ["displacement-cr", "hp-from-torque", "prop-slip"],

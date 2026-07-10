@@ -18229,6 +18229,46 @@
       "kind": "industry"
     },
     {
+      "term": "manure storage",
+      "target": "manure-storage-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "waste storage facility",
+      "target": "manure-storage-volume",
+      "kind": "redirect"
+    },
+    {
+      "term": "nrcs 313",
+      "target": "manure-storage-volume",
+      "kind": "redirect"
+    },
+    {
+      "term": "manure pit volume",
+      "target": "manure-storage-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "25 year storm storage",
+      "target": "manure-storage-volume",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lagoon sizing",
+      "target": "manure-storage-volume",
+      "kind": "industry"
+    },
+    {
+      "term": "manure storage days",
+      "target": "manure-storage-volume",
+      "kind": "adjacent"
+    },
+    {
+      "term": "freeboard manure",
+      "target": "manure-storage-volume",
+      "kind": "adjacent"
+    },
+    {
       "term": "cell temperature pv",
       "target": "pv-cell-temperature-power",
       "kind": "industry"

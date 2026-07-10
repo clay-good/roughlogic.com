@@ -874,6 +874,8 @@ const TOOL_MODULES = (() => {
     "center-pivot-runtime",
     // spec-v569
     "grain-aeration-airflow",
+    // spec-v582
+    "manure-storage-volume",
     // v35
     "two-stroke-mix",
     // v84 sprayer nozzle / drift / field capacity

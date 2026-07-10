@@ -19036,3 +19036,28 @@ test("bounds: spec-v581 computeFoamEductorLimit pins the 65% ceiling, the Q^2 fr
   assert.ok("error" in _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 0, nozzle_pressure_psi: 100 }));
   assert.ok("error" in _v581({ inlet_pressure_psi: 200, eductor_flow_gpm: 95, hose_coefficient: 15.5, nozzle_pressure_psi: -1 }));
 });
+
+import { computeManureStorageVolume as _v582 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v582 computeManureStorageVolume pins the manure, precipitation-storm, and freeboard volumes, the total, the manure-only undersize, and error seams", () => {
+  const r = _v582({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 });
+  assert.ok(Math.abs(r.manure_volume_ft3 - 20400) < 1e-9); // (150+20)*120
+  assert.ok(Math.abs(r.precip_storm_ft3 - 8000 * 10 / 12) < 1e-9);
+  assert.ok(Math.abs(r.freeboard_ft3 - 8000) < 1e-9); // 8000*12/12
+  assert.ok(Math.abs(r.total_ft3 - (20400 + 8000 * 10 / 12 + 8000)) < 1e-9);
+  assert.ok(Math.abs(r.total_gal - r.total_ft3 * 7.48052) < 1e-6);
+  // Manure alone (no water banked) badly undersizes.
+  const dry = _v582({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 0, net_precip_in: 0, storm_in: 0, freeboard_in: 0 });
+  assert.ok(Math.abs(dry.total_ft3 - 20400) < 1e-9);
+  assert.ok(r.total_ft3 - dry.total_ft3 > 14000);
+  // A short storage period flags under the 120-day minimum.
+  assert.equal(_v582({ daily_manure_ft3: 150, bedding_ft3: 20, storage_days: 90, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 }).short_days, true);
+  // Error seams: non-finite, non-positive manure / storage, negative added / area / precip / freeboard.
+  assert.ok("error" in _v582({ daily_manure_ft3: Infinity, storage_days: 120 }));
+  assert.ok("error" in _v582({ daily_manure_ft3: 0, storage_days: 120 }));
+  assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 0 }));
+  assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 120, bedding_ft3: -1 }));
+  assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 120, surface_area_ft2: -1 }));
+  assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 120, net_precip_in: -1 }));
+  assert.ok("error" in _v582({ daily_manure_ft3: 150, storage_days: 120, freeboard_in: -1 }));
+});

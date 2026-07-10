@@ -742,6 +742,17 @@ export const CITATIONS = {
       { name: "P over-application", value: "an N-based rate usually over-applies phosphorus; the plan governs", source: "scope of this tile" },
     ],
   },
+  "manure-storage-volume": {
+    formula: "manure_volume = (daily_manure + wastewater + bedding) x storage_days; precip_storm_volume = surface_area x (net_precip + storm) / 12; freeboard_volume = surface_area x freeboard_in / 12; total = the sum.",
+    edition: "NRCS Conservation Practice Standard 313 / ASABE D384 manure production, by name.",
+    freeAccess: "NRCS 313 and ASABE D384 are public standards; the engineer/planner of record governs the actual design.",
+    governance: GOVERNANCE.general,
+    editionNote: "An uncovered liquid facility must bank the net precipitation and the 25-year, 24-hour storm falling on its own surface over the storage period - sizing to manure alone overtops in a wet spring. The minimum storage is 120 days (or the nutrient-management plan), and freeboard is 6 inches for a vertical-wall tank and 12 inches for other structures. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",
+    assumptions: [
+      { name: "Precipitation and storm", value: "an open facility banks net precipitation plus the 25-year, 24-hour storm on its surface over the period", source: "NRCS Conservation Practice Standard 313" },
+      { name: "Minimum storage / freeboard", value: "120-day minimum (or the NMP); freeboard 6 in vertical wall, 12 in other", source: "NRCS 313" },
+    ],
+  },
   "grain-aeration-airflow": {
     formula: "required_cfm = rate_cfm_per_bu x bushels; cooling_hours = 15 / rate_cfm_per_bu (per cooling front).",
     edition: "Stored-grain aeration fan airflow (MWPS / university extension; Shedd airflow-resistance curves), by name.",

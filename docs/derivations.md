@@ -1459,6 +1459,7 @@ cross-check.
 | calc-agriculture.js | `computeLivestockWaterRequirement` | `{ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f ...` | _ | _ | _ |
 | calc-agriculture.js | `computeManureApplicationRate` | `{ crop_need = 0, total_nutr = 0, availability = 0, form = "solid" } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeManureNutrientApplication` | `{ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_...` | _ | _ | _ |
+| calc-agriculture.js | `computeManureStorageVolume` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
 | calc-agriculture.js | `computeMulchTopsoilVolume` | `{ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, w...` | _ | _ | _ |
 | calc-agriculture.js | `computeNozzleFlowPressure` | `{ rated_gpm, rated_psi, new_psi, target_gpm = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeNpkBlend` | `{ crop = "corn", soil_n_lb_per_acre = 0, soil_p_lb_per_acre = 0, soil_k_lb_pe...` | _ | _ | _ |
@@ -2692,7 +2693,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1278.
+Row count: 1279.
 
 <!-- END function-corpus-v14 -->
 
@@ -3605,7 +3606,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (46 tiles)
+### Group L Agriculture (47 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3634,6 +3635,7 @@ per spec-v14 §13.1 second paragraph.
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Wood Handbook green density; 16 in butt / 16 in top, 8 ft red oak (density 64) -> 11.1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manure-application-rate` | Nutrient-Based Manure Application Rate | USDA NRCS Code 590; spec-v340 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manure-nutrient-application` | Manure Nutrient Application Rate | USDA NRCS Code 590; spec-v419 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `manure-storage-volume` | Waste Storage Facility Volume (NRCS 313) | NRCS Conservation Practice Standard 3...; 150 ft3/day manure + 20 bedding, 120 days, 8,000 ft2 open... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `mulch-topsoil-volume` | Mulch, Topsoil, and Aggregate Volume | landscape material take-off; spec-v417 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nozzle-flow-pressure` | Nozzle Flow vs Pressure and Tip Selection | Spray-nozzle hydraulics / USDA land-g...; 0.4 gpm tip at 40 psi run at 60 psi -> 0.49 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `npk-blend` | NPK Fertilizer Blend from Soil Test | USDA NRCS; rec = 130 N / 50 P2O5 / 25 K2O; DAP = 50/0.46 = 108.70 (N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3912,6 +3914,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1034. Fixture-covered or reference-cadence: 1034 / 1034.
+Tile count: 1035. Fixture-covered or reference-cadence: 1035 / 1035.
 
 <!-- END tile-index-v14 -->
