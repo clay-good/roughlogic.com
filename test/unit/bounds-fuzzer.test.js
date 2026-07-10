@@ -19140,3 +19140,24 @@ test("bounds: spec-v586 computeFlashGasSubcool pins the lift and total drops, th
   assert.ok("error" in _v586({ vertical_lift_ft: 40, friction_dp_psi: -1 }));
   assert.ok("error" in _v586({ vertical_lift_ft: 40, friction_dp_psi: 15, pt_slope: 0 }));
 });
+
+import { computeHydronicBufferTank as _v587 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v587 computeHydronicBufferTank pins the buffer volume, the worst-case-zero-load driver, the no-buffer case, and error seams", () => {
+  const r = _v587({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20 });
+  assert.ok(Math.abs(r.buffer_volume_gal - 60) < 1e-9); // 10*60000/(500*20)
+  // A standing minimum load shrinks the tank.
+  const loaded = _v587({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 40000, delta_t_f: 20 });
+  assert.ok(Math.abs(loaded.buffer_volume_gal - 20) < 1e-9);
+  assert.ok(loaded.buffer_volume_gal < r.buffer_volume_gal);
+  // Zone load >= source min -> no buffer required.
+  const none = _v587({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 60000, delta_t_f: 20 });
+  assert.equal(none.buffer_volume_gal, 0);
+  assert.equal(none.no_buffer, true);
+  // Error seams: non-finite, non-positive on-time / source / swing, negative load.
+  assert.ok("error" in _v587({ min_on_time_min: Infinity, source_min_btu: 60000, delta_t_f: 20 }));
+  assert.ok("error" in _v587({ min_on_time_min: 0, source_min_btu: 60000, delta_t_f: 20 }));
+  assert.ok("error" in _v587({ min_on_time_min: 10, source_min_btu: 0, delta_t_f: 20 }));
+  assert.ok("error" in _v587({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 0 }));
+  assert.ok("error" in _v587({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: -1, delta_t_f: 20 }));
+});

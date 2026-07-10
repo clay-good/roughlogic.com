@@ -17704,6 +17704,46 @@
       "kind": "industry"
     },
     {
+      "term": "buffer tank",
+      "target": "hydronic-buffer-tank",
+      "kind": "industry"
+    },
+    {
+      "term": "hydronic buffer",
+      "target": "hydronic-buffer-tank",
+      "kind": "redirect"
+    },
+    {
+      "term": "anti short cycle",
+      "target": "hydronic-buffer-tank",
+      "kind": "industry"
+    },
+    {
+      "term": "boiler buffer tank",
+      "target": "hydronic-buffer-tank",
+      "kind": "redirect"
+    },
+    {
+      "term": "chiller buffer",
+      "target": "hydronic-buffer-tank",
+      "kind": "adjacent"
+    },
+    {
+      "term": "minimum on time",
+      "target": "hydronic-buffer-tank",
+      "kind": "adjacent"
+    },
+    {
+      "term": "short cycle boiler",
+      "target": "hydronic-buffer-tank",
+      "kind": "adjacent"
+    },
+    {
+      "term": "buffer tank sizing",
+      "target": "hydronic-buffer-tank",
+      "kind": "redirect"
+    },
+    {
       "term": "shear stud strength",
       "target": "shear-stud-strength",
       "kind": "industry"

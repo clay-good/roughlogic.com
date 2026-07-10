@@ -27404,6 +27404,52 @@
    }
   },
   {
+   "tile_id": "hydronic-buffer-tank",
+   "source_publisher": "ASHRAE / Idronics (Caleffi)",
+   "source_title": "V = on_time x (source_min - zone_load) / (500 x delta_T)",
+   "source_edition_or_year": "Idronics / Caleffi",
+   "source_section_or_page": "10 min on-time, 60,000 Btu/hr boiler min, zero load, 20 F swing -> 60 gal",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "min_on_time_min": 10,
+    "source_min_btu": 60000,
+    "zone_min_load_btu": 0,
+    "delta_t_f": 20
+   },
+   "outputs": {
+    "buffer_volume_gal": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydronic-buffer-tank",
+   "source_publisher": "ASHRAE / Idronics (Caleffi)",
+   "source_title": "a standing minimum load shrinks the tank (why zero-load sizing matters)",
+   "source_edition_or_year": "Idronics / Caleffi",
+   "source_section_or_page": "Smallest zone draws 40,000 Btu/hr -> only 20,000 excess -> 20 gal, a third the size",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "min_on_time_min": 10,
+    "source_min_btu": 60000,
+    "zone_min_load_btu": 40000,
+    "delta_t_f": 20
+   },
+   "outputs": {
+    "buffer_volume_gal": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-emc",
    "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
    "source_title": "70 F, 50% RH -> EMC ~9.2% (standard interior conditions)",

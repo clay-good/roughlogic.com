@@ -9904,6 +9904,17 @@ export const CITATIONS = {
       { name: "Property tables", value: "specific heats, freezing points, and latent heats from ASHRAE", source: "scope of this tile" },
     ],
   },
+  "hydronic-buffer-tank": {
+    formula: "V_gal = min_on_time_min x (source_min_btu - zone_min_load_btu) / (500 x delta_t_f); no buffer when the zone load meets or exceeds the source minimum.",
+    edition: "ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name.",
+    freeAccess: "The buffer-tank sizing relation is standard hydronic design practice; the equipment minimum-cycle data and the manufacturer govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The driver is the source minimum output minus the load, worst case at about zero load - so sizing at the design load undersizes the tank badly. The same formula sizes a chiller buffer. The 500 factor is for water (adjust for glycol). The existing distribution-piping water may already supply part of the volume. The equipment minimum-cycle data and the manufacturer govern - a sizing aid, not the manufacturer's data.",
+    assumptions: [
+      { name: "Worst case at zero load", value: "size at near-zero simultaneous load, where the full source minimum has nowhere to go but the tank", source: "Idronics / Caleffi" },
+      { name: "500 factor", value: "8.33 lb/gal x 60 min/hr for water; adjust for glycol", source: "ASHRAE" },
+    ],
+  },
   "flash-gas-subcool": {
     formula: "dP_lift = static_gradient x vertical_lift_ft (0.43 psi/ft R-410A liquid); dP_total = dP_lift + friction_dp_psi; required_subcool = dP_total / pt_slope (about 5 psi/degF R-410A near condensing).",
     edition: "ASHRAE Refrigeration Handbook / refrigerant piping guides liquid-line subcooling to prevent flash gas, by name.",

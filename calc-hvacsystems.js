@@ -1202,3 +1202,45 @@ function _v410renderVavBoxAirflow(inputRegion, outputRegion, citationEl) {
   for (const el of [load.input, dt.input, vent.input, td.input]) el.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["vav-box-airflow"] = _v410renderVavBoxAirflow;
+
+// ===================== spec-v587 C: hydronic buffer tank sizing (anti-short-cycle) =====================
+// V = on_time * (source_min - zone_load) / (500 * delta_T). Worst case at zero load.
+// dims: in { min_on_time_min: T, source_min_btu: M L^2 T^-3, zone_min_load_btu: M L^2 T^-3, delta_t_f: T } out: { buffer_volume_gal: L^3 }
+export function computeHydronicBufferTank({ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(min_on_time_min) || 0;
+  const qMin = Number(source_min_btu) || 0;
+  const qLoad = Number(zone_min_load_btu) || 0;
+  const dt = Number(delta_t_f) || 0;
+  if (!(t > 0)) return { error: "Minimum on-time must be positive (min)." };
+  if (!(qMin > 0)) return { error: "Source minimum output must be positive (Btu/hr)." };
+  if (!(dt > 0)) return { error: "Temperature swing must be positive (degF)." };
+  if (qLoad < 0) return { error: "Zone load cannot be negative (Btu/hr)." };
+  if (qLoad >= qMin) return { buffer_volume_gal: 0, no_buffer: true, note: "The minimum zone load meets or exceeds the source minimum output, so the source runs its minimum on-time without short-cycling and no buffer tank is required. The equipment minimum-cycle data and the manufacturer govern." };
+  const buffer_volume_gal = t * (qMin - qLoad) / (500 * dt);
+  return {
+    buffer_volume_gal, no_buffer: false,
+    note: "The driver is the source minimum output minus the load, worst case at about zero load - so sizing at the design load undersizes the tank badly. The same formula sizes a chiller buffer. The 500 factor is for water (adjust for glycol). The existing distribution-piping water may already supply part of the volume. The equipment minimum-cycle data and the manufacturer govern - a sizing aid, not the manufacturer's data.",
+  };
+}
+export const hydronicBufferTankExample = { inputs: { min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20 } };
+function _v587renderHydronicBufferTank(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A sizing aid, not the manufacturer's data; the equipment minimum-cycle data and the manufacturer govern. Citation: ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name. V = on_time x (source_min - zone_load) / (500 x delta_T). The worst case is at about zero load, when the full minimum output has nowhere to go but the tank; sizing at the design load undersizes it badly. The 500 factor is for water (adjust for glycol); existing distribution-piping water may already supply part of the volume.";
+  const t = makeNumber("Minimum on-time (min)", "hbt-t", { step: "any", min: "0", value: "10" }); t.input.value = "10";
+  const qMin = makeNumber("Source minimum output (Btu/hr)", "hbt-qmin", { step: "any", min: "0", value: "60000" }); qMin.input.value = "60000";
+  const qLoad = makeNumber("Minimum simultaneous zone load (Btu/hr, 0 = worst case)", "hbt-qload", { step: "any", min: "0", value: "0" }); qLoad.input.value = "0";
+  const dt = makeNumber("Allowable temperature swing (degF)", "hbt-dt", { step: "any", min: "0", value: "20" }); dt.input.value = "20";
+  for (const f of [t, qMin, qLoad, dt]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "10"; qMin.input.value = "60000"; qLoad.input.value = "0"; dt.input.value = "20"; update(); });
+  const oV = makeOutputLine(outputRegion, "Required buffer volume", "hbt-out-v");
+  const oNote = makeOutputLine(outputRegion, "Note", "hbt-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeHydronicBufferTank({ min_on_time_min: readNum(t.input), source_min_btu: readNum(qMin.input), zone_min_load_btu: readNum(qLoad.input), delta_t_f: readNum(dt.input) });
+    if (r.error) { oV.textContent = r.error; oNote.textContent = ""; return; }
+    oV.textContent = r.no_buffer ? "0 gal - no buffer required" : fmt(r.buffer_volume_gal, 1) + " gal";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [t, qMin, qLoad, dt]) f.input.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["hydronic-buffer-tank"] = _v587renderHydronicBufferTank;
