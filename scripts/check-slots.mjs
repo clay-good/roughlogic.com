@@ -87,9 +87,15 @@ for (const row of shard.tiles || []) {
     if (seenParams.has(slot.param)) errors.push(where + ": duplicate param '" + slot.param + "'.");
     seenParams.add(slot.param);
     const esc = slot.param.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const idPosition = new RegExp('make[A-Za-z]*\\(\\s*"[^"]*",\\s*"' + esc + '"');
-    if (!idPosition.test(src)) {
-      errors.push(where + ": param '" + slot.param + "' is not the id-position literal of a make* call in " + rel + ".");
+    // Any call shaped fn("Label", "<param>", ...) -- covers makeNumber
+    // and every per-module alias (_mnF, _v7makeNumber, ...).
+    const idPosition = new RegExp('\\w+\\(\\s*"[^"]*",\\s*"' + esc + '"');
+    // Since the factory-id fix (f.id || f.key, 0.181.0), a factory field
+    // spec's `key:` literal IS the rendered DOM input id, so key-position
+    // literals are equally targetable.
+    const keyPosition = new RegExp('key:\\s*"' + esc + '"');
+    if (!idPosition.test(src) && !keyPosition.test(src)) {
+      errors.push(where + ": param '" + slot.param + "' is neither an id-position make* literal nor a field-spec key literal in " + rel + ".");
     }
     for (const u of slot.units) {
       if (typeof u !== "string" || !u || u !== u.toLowerCase()) {

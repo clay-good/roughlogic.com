@@ -3,6 +3,140 @@
   "_comment": "spec-v591 quantity-slot tables. One row per tile; param = the DOM input id (the literal passed to makeNumber in the renderer, the same key applyHashState reads), units = lowercase spellings accepted after a number in a search query. Consumed by mapSlots (search-discovery.js) to build prefilled hash deep links from the combobox. Gated by scripts/check-slots.mjs.",
   "tiles": [
     {
+      "tile": "amp-power-spl",
+      "slots": [
+        {
+          "param": "aps-power",
+          "units": [
+            "w",
+            "watt",
+            "watts"
+          ]
+        },
+        {
+          "param": "aps-dist",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "asphalt-tonnage",
+      "slots": [
+        {
+          "param": "area_ft2",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        },
+        {
+          "param": "depth_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "paving_width_ft",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "board-footage",
+      "slots": [
+        {
+          "param": "bf-t",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "bf-l",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "bolt-shear-bearing",
+      "slots": [
+        {
+          "param": "d_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "brake-pad-life",
+      "slots": [
+        {
+          "param": "vehicle_weight_lb",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
+          ]
+        },
+        {
+          "param": "speed_delta_mph",
+          "units": [
+            "mph"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "breaker-sizing",
+      "slots": [
+        {
+          "param": "bs-load",
+          "units": [
+            "a",
+            "amp",
+            "amps"
+          ]
+        },
+        {
+          "param": "bs-w",
+          "units": [
+            "w",
+            "watt",
+            "watts"
+          ]
+        },
+        {
+          "param": "bs-v",
+          "units": [
+            "v",
+            "volt",
+            "volts"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "camera-lens-fov",
       "slots": [
         {
@@ -38,6 +172,19 @@
       ]
     },
     {
+      "tile": "column-base-plate",
+      "slots": [
+        {
+          "param": "d_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "crane-net-capacity",
       "slots": [
         {
@@ -47,6 +194,41 @@
             "lbs",
             "pound",
             "pounds"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "dim-weight",
+      "slots": [
+        {
+          "param": "length_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "actual_weight_lb",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "displacement-cr",
+      "slots": [
+        {
+          "param": "bore_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
           ]
         }
       ]
@@ -67,12 +249,74 @@
       ]
     },
     {
+      "tile": "drywall",
+      "slots": [
+        {
+          "param": "wall_area_ft2",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "duct-sizing",
       "slots": [
         {
           "param": "ds-cfm",
           "units": [
             "cfm"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "dyno-correction-sae",
+      "slots": [
+        {
+          "param": "observed_hp",
+          "units": [
+            "hp"
+          ]
+        },
+        {
+          "param": "baro_inhg",
+          "units": [
+            "in hg",
+            "inhg"
+          ]
+        },
+        {
+          "param": "air_temp_f",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "filter-loading",
+      "slots": [
+        {
+          "param": "filter_area_ft2",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        },
+        {
+          "param": "flow_gpm",
+          "units": [
+            "gpm"
           ]
         }
       ]
@@ -97,6 +341,57 @@
       ]
     },
     {
+      "tile": "flocculation-g-value",
+      "slots": [
+        {
+          "param": "power_input_hp",
+          "units": [
+            "hp"
+          ]
+        },
+        {
+          "param": "basin_volume_gal",
+          "units": [
+            "gal",
+            "gallon",
+            "gallons"
+          ]
+        },
+        {
+          "param": "water_temp_f",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "freight-density",
+      "slots": [
+        {
+          "param": "length_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "weight_lb",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "friction-loss",
       "slots": [
         {
@@ -111,6 +406,31 @@
           "param": "fl-flow",
           "units": [
             "gpm"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "gpa-rate",
+      "slots": [
+        {
+          "param": "gpm",
+          "units": [
+            "gpm"
+          ]
+        },
+        {
+          "param": "spacing_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "speed_mph",
+          "units": [
+            "mph"
           ]
         }
       ]
@@ -177,6 +497,28 @@
       ]
     },
     {
+      "tile": "mulch-topsoil-volume",
+      "slots": [
+        {
+          "param": "mtv-area",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        },
+        {
+          "param": "mtv-depth",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "ohms-law",
       "slots": [
         {
@@ -206,6 +548,33 @@
       ]
     },
     {
+      "tile": "pacing-distance",
+      "slots": [
+        {
+          "param": "calibration_distance_ft",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "paint-coverage",
+      "slots": [
+        {
+          "param": "pc-a",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "pdp",
       "slots": [
         {
@@ -220,6 +589,32 @@
             "ft",
             "foot",
             "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "pipe-volume",
+      "slots": [
+        {
+          "param": "pv-len",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "prop-slip",
+      "slots": [
+        {
+          "param": "pitch_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
           ]
         }
       ]
@@ -240,6 +635,27 @@
       ]
     },
     {
+      "tile": "rebar",
+      "slots": [
+        {
+          "param": "rb-l",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        },
+        {
+          "param": "rb-sp",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "roof-pitch",
       "slots": [
         {
@@ -253,6 +669,77 @@
       ]
     },
     {
+      "tile": "search-track-spacing",
+      "slots": [
+        {
+          "param": "sts-w",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "service-load",
+      "slots": [
+        {
+          "param": "sl-area",
+          "units": [
+            "sqft",
+            "sq ft",
+            "sf",
+            "square feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "softener-sizing",
+      "slots": [
+        {
+          "param": "sof-salt",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "spl-atmospheric",
+      "slots": [
+        {
+          "param": "spa-dfar",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        },
+        {
+          "param": "spa-t",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        },
+        {
+          "param": "spa-p",
+          "units": [
+            "in hg",
+            "inhg"
+          ]
+        }
+      ]
+    },
+    {
       "tile": "stairs",
       "slots": [
         {
@@ -261,6 +748,101 @@
             "in",
             "inch",
             "inches"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "sump-basin-sizing",
+      "slots": [
+        {
+          "param": "sb-dia",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "sb-inflow",
+          "units": [
+            "gpm"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "tankless-gpm",
+      "slots": [
+        {
+          "param": "tl-tg",
+          "units": [
+            "gpm"
+          ]
+        },
+        {
+          "param": "tl-o",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "three-phase",
+      "slots": [
+        {
+          "param": "tp-v",
+          "units": [
+            "v",
+            "volt",
+            "volts"
+          ]
+        },
+        {
+          "param": "tp-i",
+          "units": [
+            "a",
+            "amp",
+            "amps"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "timber-cruise",
+      "slots": [
+        {
+          "param": "small_end_dib_in",
+          "units": [
+            "in",
+            "inch",
+            "inches"
+          ]
+        },
+        {
+          "param": "log_length_ft",
+          "units": [
+            "ft",
+            "foot",
+            "feet"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "transformer-sizing",
+      "slots": [
+        {
+          "param": "tx-pri",
+          "units": [
+            "v",
+            "volt",
+            "volts"
           ]
         }
       ]
@@ -303,6 +885,49 @@
             "v",
             "volt",
             "volts"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "water-heater-storage-sizing",
+      "slots": [
+        {
+          "param": "whss-tank",
+          "units": [
+            "gal",
+            "gallon",
+            "gallons"
+          ]
+        },
+        {
+          "param": "whss-in",
+          "units": [
+            "btu"
+          ]
+        },
+        {
+          "param": "whss-rise",
+          "units": [
+            "f",
+            "degf",
+            "deg f",
+            "degrees",
+            "degrees f"
+          ]
+        }
+      ]
+    },
+    {
+      "tile": "yield-ep",
+      "slots": [
+        {
+          "param": "ap_weight",
+          "units": [
+            "lb",
+            "lbs",
+            "pound",
+            "pounds"
           ]
         }
       ]

@@ -14,7 +14,7 @@
     {
       "file": "slots.json",
       "name": "Quantity slot tables (search prefill deep links, spec-v591)",
-      "gzip_size_bytes": 820
+      "gzip_size_bytes": 1566
     },
     {
       "file": "preview-map.json",

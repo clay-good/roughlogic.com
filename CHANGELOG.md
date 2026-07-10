@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(search): spec-v591 follow-on -- slot batch 2 (factory tiles unlocked); 2026-07-10
+
+The slot table grows 17 -> 49 tiles / 85 slots, the first batch able to target factory-rendered tiles now that their inputs carry real ids (0.181.0): dim-weight, freight-density, breaker-sizing, transformer-sizing, asphalt-tonnage, rebar, sump-basin-sizing, brake-pad-life, and peers. `check-slots` learns the two legitimate param shapes -- an id-position literal of ANY field-builder call (aliases like `_mnF` included; the old make*-only regex missed the v593-remediated rescue renderer) or a factory field-spec `key:` literal (which IS the DOM id since the factory-id fix). Verified in-browser: "dim weight 40 in 25 lb" arrives on the factory tile as `#dim-weight?v=1&length_in=40&actual_weight_lb=25` with both inputs populated; same for "breaker for 3500w at 240v". Shard 1.6 KB gz.
+
 ### feat(search): spec-v590 Phase 2 COMPLETE -- final small-groups batch; 2026-07-10
 
 2,548 question-phrase aliases covering the last 241 uncovered tiles (Groups F/H/J/M/N/O/P/R/T/X/Y/Z, 9-12 phrasings each; 8 rows dropped by the pipeline). **Every one of the catalog's 1,041 tiles now carries question-phrase coverage** -- the "ask it a question" search answers plain-language questions across the whole catalog, deterministically and offline. A full shard-wide top-3 re-audit after the merge pruned 20 older rows the bigger corpus outcompeted (one previously pinned phrase now correctly prefers the literal max-offer tile). The ranker also gains a verbatim-alias bonus (+4 when the normalized query IS a tile's committed alias phrase; terms are globally unique so at most one tile qualifies, and coverage still ranks first): a committed question phrase typed word-for-word now surfaces its own tile first for 99.8% of the 11,608 question rows. Shard 13,611 -> 16,139 rows, 240.8 KB gz: within but approaching the spec's ~250 KB per-shard threshold, so the next corpus growth should take the spec's designated remediation (per-group shard split) first.
