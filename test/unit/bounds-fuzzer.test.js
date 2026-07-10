@@ -17980,3 +17980,26 @@ test("bounds: spec-v535 computeDoublingTime pins Td / mu / doublings from the fo
   assert.ok("error" in _v535({ initial_count: 8e5, final_count: 1e5, elapsed_time: 24 })); // shrinking
   assert.ok("error" in _v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 0 }));
 });
+
+import { computeMichaelisMenten as _v536 } from "../../calc-lab.js";
+
+test("bounds: spec-v536 computeMichaelisMenten pins the half-Vmax at [S]=Km, the asymptotic approach, and error seams", () => {
+  const r = _v536({ vmax: 100, km: 25, substrate: 25 });
+  assert.ok(Math.abs(r.velocity - 50) < 1e-9); // exactly Vmax/2 at [S]=Km
+  assert.ok(Math.abs(r.percent_vmax - 50) < 1e-9);
+  assert.equal(r.at_half, true);
+  // 4x Km is still not saturated (asymptotic approach to Vmax).
+  const hi = _v536({ vmax: 100, km: 25, substrate: 100 });
+  assert.ok(Math.abs(hi.velocity - 80) < 1e-9);
+  assert.ok(Math.abs(hi.percent_vmax - 80) < 1e-9);
+  assert.equal(hi.at_half, false);
+  // Zero substrate -> zero velocity.
+  assert.equal(_v536({ vmax: 100, km: 25, substrate: 0 }).velocity, 0);
+  // The velocity never reaches Vmax for any finite [S].
+  assert.ok(_v536({ vmax: 100, km: 25, substrate: 1e9 }).percent_vmax < 100);
+  // Error seams: non-finite, non-positive Vmax / Km, negative substrate.
+  assert.ok("error" in _v536({ vmax: Infinity, km: 25, substrate: 25 }));
+  assert.ok("error" in _v536({ vmax: 0, km: 25, substrate: 25 }));
+  assert.ok("error" in _v536({ vmax: 100, km: 0, substrate: 25 }));
+  assert.ok("error" in _v536({ vmax: 100, km: 25, substrate: -1 }));
+});

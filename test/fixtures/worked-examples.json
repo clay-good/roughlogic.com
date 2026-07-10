@@ -17244,6 +17244,62 @@
    }
   },
   {
+   "tile_id": "michaelis-menten",
+   "source_publisher": "Enzyme kinetics (Michaelis-Menten equation)",
+   "source_title": "v = Vmax x [S] / (Km + [S])",
+   "source_edition_or_year": "Michaelis-Menten",
+   "source_section_or_page": "Vmax 100, Km 25, [S]=25=Km -> v 50 (exactly Vmax/2), 50% of Vmax",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "vmax": 100,
+    "km": 25,
+    "substrate": 25
+   },
+   "outputs": {
+    "velocity": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "percent_vmax": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "michaelis-menten",
+   "source_publisher": "Enzyme kinetics (Michaelis-Menten equation)",
+   "source_title": "percent_vmax = v / Vmax x 100",
+   "source_edition_or_year": "Michaelis-Menten",
+   "source_section_or_page": "Vmax 100, Km 25, [S]=100 (4x Km) -> v 80, only 80% of Vmax (asymptotic approach)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "vmax": 100,
+    "km": 25,
+    "substrate": 100
+   },
+   "outputs": {
+    "velocity": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "percent_vmax": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gross-rent-multiplier",
    "source_publisher": "Appraisal Institute income-approach (GRM)",
    "source_title": "GRM = price / gross_annual_rent",

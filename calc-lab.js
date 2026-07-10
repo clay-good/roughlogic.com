@@ -1156,3 +1156,48 @@ function renderDoublingTime(inputRegion, outputRegion, citationEl) {
   for (const f of [n0.input, n.input, t.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["doubling-time"] = renderDoublingTime;
+
+// --- spec-v536 T: Michaelis-Menten enzyme kinetics (`michaelis-menten`) ---
+// v = Vmax x [S] / (Km + [S]). percent_vmax = v/Vmax x 100. At [S]=Km, v = Vmax/2.
+// dims: in { vmax: dimensionless, km: dimensionless, substrate: dimensionless } out: { velocity: dimensionless, percent_vmax: dimensionless }
+export function computeMichaelisMenten({ vmax = 0, km = 0, substrate = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vm = Number(vmax) || 0;
+  const kmv = Number(km) || 0;
+  const s = Number(substrate) || 0;
+  if (!(vm > 0)) return { error: "Vmax must be positive." };
+  if (!(kmv > 0)) return { error: "Km must be positive." };
+  if (s < 0) return { error: "Substrate concentration must be non-negative." };
+  const velocity = vm * s / (kmv + s);
+  const percent_vmax = velocity / vm * 100;
+  const at_half = s === kmv;
+  return {
+    velocity,
+    percent_vmax,
+    at_half,
+    note: "Km is the substrate concentration at half of Vmax (an affinity proxy - a low Km means high affinity - not a rate). The hyperbola approaches but never reaches Vmax, so saturating substrate is an approximation. The equation assumes steady state with substrate far in excess of enzyme. The actual assay conditions govern.",
+  };
+}
+export const michaelisMentenExample = { inputs: { vmax: 100, km: 25, substrate: 25 } };
+
+function renderMichaelisMenten(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard enzyme kinetics - the Michaelis-Menten equation; v = Vmax x [S] / (Km + [S]); percent_vmax = v / Vmax x 100. At [S] = Km the velocity is exactly half of Vmax. Km is the substrate concentration at half of Vmax (an affinity proxy, a low Km means high affinity, not a rate). The hyperbola approaches but never reaches Vmax. Assumes steady state with substrate far in excess of enzyme. The assay conditions govern.";
+  const vmax = makeNumber("Vmax (maximum velocity)", "mm-vmax", { step: "any", min: "0", value: "100" }); vmax.input.value = "100";
+  const km = makeNumber("Km (substrate at half Vmax)", "mm-km", { step: "any", min: "0", value: "25" }); km.input.value = "25";
+  const sub = makeNumber("Substrate concentration [S]", "mm-sub", { step: "any", min: "0", value: "25" }); sub.input.value = "25";
+  for (const f of [vmax, km, sub]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vmax.input.value = "100"; km.input.value = "25"; sub.input.value = "25"; update(); });
+  const oV = makeOutputLine(outputRegion, "Velocity", "mm-out-v");
+  const oPct = makeOutputLine(outputRegion, "Percent of Vmax", "mm-out-pct");
+  const oNote = makeOutputLine(outputRegion, "Note", "mm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMichaelisMenten({ vmax: readNum(vmax.input), km: readNum(km.input), substrate: readNum(sub.input) });
+    if (r.error) { oV.textContent = r.error; oPct.textContent = ""; oNote.textContent = ""; return; }
+    oV.textContent = fmt(r.velocity, 3) + (r.at_half ? " (exactly Vmax/2 at [S]=Km)" : "");
+    oPct.textContent = fmt(r.percent_vmax, 1) + "% of Vmax";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [vmax.input, km.input, sub.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["michaelis-menten"] = renderMichaelisMenten;

@@ -274,6 +274,46 @@
       "kind": "redirect"
     },
     {
+      "term": "michaelis menten",
+      "target": "michaelis-menten",
+      "kind": "industry"
+    },
+    {
+      "term": "enzyme kinetics",
+      "target": "michaelis-menten",
+      "kind": "industry"
+    },
+    {
+      "term": "vmax km",
+      "target": "michaelis-menten",
+      "kind": "redirect"
+    },
+    {
+      "term": "reaction velocity enzyme",
+      "target": "michaelis-menten",
+      "kind": "adjacent"
+    },
+    {
+      "term": "km affinity",
+      "target": "michaelis-menten",
+      "kind": "industry"
+    },
+    {
+      "term": "half vmax",
+      "target": "michaelis-menten",
+      "kind": "redirect"
+    },
+    {
+      "term": "substrate velocity",
+      "target": "michaelis-menten",
+      "kind": "adjacent"
+    },
+    {
+      "term": "enzyme rate",
+      "target": "michaelis-menten",
+      "kind": "adjacent"
+    },
+    {
       "term": "declining balance",
       "target": "declining-balance-depreciation",
       "kind": "industry"

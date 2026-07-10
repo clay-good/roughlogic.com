@@ -340,6 +340,17 @@ export const CITATIONS = {
     ],
   },
 
+  "michaelis-menten": {
+    formula: "v = Vmax x [S] / (Km + [S]); percent_vmax = v / Vmax x 100. At [S] = Km, v = Vmax / 2.",
+    edition: "The Michaelis-Menten equation (enzyme kinetics), by name.",
+    freeAccess: "Standard biochemistry enzyme-kinetics relation; the assay conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Km is the substrate concentration at half of Vmax (an affinity proxy where a low Km means high affinity, not a rate); the hyperbola approaches but never reaches Vmax, so saturating substrate is an approximation; the equation assumes steady state with substrate far in excess of enzyme. An analysis aid, not a validated kinetic assay.",
+    assumptions: [
+      { name: "Steady state", value: "substrate far in excess of enzyme; single substrate, no cooperativity or inhibition", source: "Michaelis-Menten" },
+    ],
+  },
+
   "declining-balance-depreciation": {
     formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",
     edition: "GAAP book depreciation - ASC 360 (Property, Plant, and Equipment), by name; distinct from the macrs-depreciation tile (IRS Pub 946 tax method).",

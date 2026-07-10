@@ -80,6 +80,7 @@ const _TILES = [
   ["nucleic-acid-a260", "T"],
   ["ligation-molar-ratio", "T"],
   ["doubling-time", "T"],
+  ["michaelis-menten", "T"],
   ["declining-balance-depreciation", "R"],
   ["markup-vs-margin", "R"],
   ["employer-payroll-tax", "R"],
