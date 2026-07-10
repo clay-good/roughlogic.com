@@ -12949,6 +12949,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "unbalanced snow",
+      "target": "snow-unbalanced-gable",
+      "kind": "industry"
+    },
+    {
+      "term": "gable snow load",
+      "target": "snow-unbalanced-gable",
+      "kind": "industry"
+    },
+    {
+      "term": "asce 7 7.6",
+      "target": "snow-unbalanced-gable",
+      "kind": "redirect"
+    },
+    {
+      "term": "leeward snow drift",
+      "target": "snow-unbalanced-gable",
+      "kind": "adjacent"
+    },
+    {
+      "term": "windward 0.3 ps",
+      "target": "snow-unbalanced-gable",
+      "kind": "redirect"
+    },
+    {
+      "term": "snow ridge surcharge",
+      "target": "snow-unbalanced-gable",
+      "kind": "adjacent"
+    },
+    {
+      "term": "unbalanced roof snow",
+      "target": "snow-unbalanced-gable",
+      "kind": "industry"
+    },
+    {
+      "term": "gable drift",
+      "target": "snow-unbalanced-gable",
+      "kind": "adjacent"
+    },
+    {
       "term": "slab thickness",
       "target": "rc-slab-min-thickness",
       "kind": "industry"

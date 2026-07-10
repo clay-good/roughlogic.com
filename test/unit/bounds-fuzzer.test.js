@@ -18356,3 +18356,27 @@ test("bounds: spec-v552 computeRcSlenderColumnMagnify pins Cm, the 0.75-Pc denom
   assert.ok("error" in _v552({ factored_axial_kip: 200, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 0, column_dim_h_in: 16 }));
   assert.ok("error" in _v552({ factored_axial_kip: 600, end_moment_m2_kft: 80, end_moment_m1_kft: 50, unbraced_len_ft: 14, eff_length_k: 1.0, eff_stiffness_ei: 1500000, column_dim_h_in: 16 })); // Pu >= 0.75 Pc
 });
+
+import { computeSnowUnbalancedGable as _v553 } from "../../calc-construction.js";
+
+test("bounds: spec-v553 computeSnowUnbalancedGable pins the slope-band applicability, the density/drift relations, the windward and leeward loads, and error seams", () => {
+  const r = _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 });
+  assert.equal(r.applicable, true); // 18.4 deg in band, W > 20
+  assert.ok(Math.abs(r.gamma - 17.9) < 0.05); // 0.13*30 + 14
+  assert.ok(Math.abs(r.hd_ft - 1.86) < 0.02); // 0.43*30^(1/3)*40^(1/4) - 1.5
+  assert.ok(Math.abs(r.windward_psf - 7.5) < 1e-9); // 0.3*25
+  assert.ok(Math.abs(r.leeward_peak_psf - 44.2) < 0.2);
+  assert.ok(Math.abs(r.extent_ft - 8.6) < 0.1);
+  // A steep roof (8:12, 33.7 deg > 30.2) escapes the unbalanced case.
+  assert.equal(_v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 8, eave_to_ridge_ft: 30 }).applicable, false);
+  // A short eave-to-ridge (<= 20 ft) also escapes it.
+  assert.equal(_v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 15 }).applicable, false);
+  // The snow density caps at 30 pcf.
+  assert.equal(_v553({ ground_snow_pg_psf: 200, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 }).gamma, 30);
+  // Error seams: non-finite, non-positive pg / ps / rise / W.
+  assert.ok("error" in _v553({ ground_snow_pg_psf: Infinity, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 }));
+  assert.ok("error" in _v553({ ground_snow_pg_psf: 0, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 }));
+  assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 0, roof_rise_on_12: 4, eave_to_ridge_ft: 30 }));
+  assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 0, eave_to_ridge_ft: 30 }));
+  assert.ok("error" in _v553({ ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 0 }));
+});

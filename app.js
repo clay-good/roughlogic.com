@@ -466,6 +466,8 @@ const TOOL_MODULES = (() => {
     "seismic-design-spectral-acceleration", "seismic-story-drift", "seismic-pdelta-stability",
     // spec-v546
     "wind-solid-sign",
+    // spec-v553
+    "snow-unbalanced-gable",
   ]);
   // spec-v95 new finish-and-site-carpentry take-off module (the home named
   // in the spec-v94 module note); relieves the calc-construction.js cap watch.

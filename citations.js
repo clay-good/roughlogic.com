@@ -9071,6 +9071,17 @@ export const CITATIONS = {
       { name: "Low-slope, balanced", value: "applies to low-slope roofs, balanced case only", source: "ASCE 7 §7.3.4" },
     ],
   },
+  "snow-unbalanced-gable": {
+    formula: "gamma = min(0.13 pg + 14, 30); hd = 0.43 W^(1/3) (pg+10)^(1/4) - 1.5; windward = 0.3 ps; surcharge = hd gamma/sqrt(S) (S = 12/rise); leeward_peak = ps + surcharge; extent = 8 hd sqrt(S)/3.",
+    edition: "The ASCE 7-22 Section 7.6.1 unbalanced snow load on gable/hip roofs, by name.",
+    freeAccess: "ASCE 7 is available through the ASCE Library at ascelibrary.org; the Chapter 7 snow provisions are public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The unbalanced case applies only in the slope band of about 2.38 to 30.2 degrees (roughly 1/2-on-12 to 7-on-12) with an eave-to-ridge length over 20 ft; the windward slope drops to 0.3 ps while the leeward carries ps plus a ridge drift surcharge; this sizes the leeward rafter and ridge that the balanced case misses. A design aid, not the engineer of record.",
+    assumptions: [
+      { name: "Applicability band", value: "slope ~2.38-30.2 deg (1/2:12 to 7:12) and W > 20 ft; outside it only the balanced load governs", source: "ASCE 7-22 7.6.1" },
+      { name: "Leeward surcharge", value: "ps + hd gamma/sqrt(S), tapering over 8 hd sqrt(S)/3 from the ridge", source: "ASCE 7-22 7.6.1" },
+    ],
+  },
   "wind-solid-sign": {
     formula: "F = qh G Cf As; Case B eccentric moment M = F x 0.2 x B.",
     edition: "The ASCE 7-22 Section 29.3 design wind force on solid freestanding walls and signs, F = qh G Cf As, with Cf from Figure 29.3-1, by name.",

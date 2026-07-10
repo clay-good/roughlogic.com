@@ -515,6 +515,7 @@ const _TILES = [
   // spec-v296..v298 ASCE 7 wind-and-snow load depth batch
   ["wind-cc-pressure", "E"], ["snow-drift-load", "E"], ["wind-mwfrs-pressure", "E"],
   ["wind-solid-sign", "E"],
+  ["snow-unbalanced-gable", "E"],
   ["rain-on-snow-surcharge", "E"], ["sliding-snow-load", "E"], ["minimum-roof-snow", "E"],
   // spec-v299..v301 reinforced-concrete depth-2 batch
   ["rc-slab-min-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],

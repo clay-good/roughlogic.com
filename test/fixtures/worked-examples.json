@@ -38256,6 +38256,64 @@
    }
   },
   {
+   "tile_id": "snow-unbalanced-gable",
+   "source_publisher": "ASCE 7-22 Section 7.6.1 (unbalanced snow load, gable roofs)",
+   "source_title": "windward 0.3 ps; leeward ps + hd gamma/sqrt(S)",
+   "source_edition_or_year": "ASCE 7-22",
+   "source_section_or_page": "pg 30, ps 25, 4:12, W 30 ft -> applies; windward 7.5, leeward 44.2 psf, extent 8.6 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "ground_snow_pg_psf": 30,
+    "flat_roof_ps_psf": 25,
+    "roof_rise_on_12": 4,
+    "eave_to_ridge_ft": 30
+   },
+   "outputs": {
+    "windward_psf": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "leeward_peak_psf": {
+     "value": 44.2,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "extent_ft": {
+     "value": 8.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "snow-unbalanced-gable",
+   "source_publisher": "ASCE 7-22 Section 7.6.1 (unbalanced snow load, gable roofs)",
+   "source_title": "a steep roof escapes the unbalanced case",
+   "source_edition_or_year": "ASCE 7-22",
+   "source_section_or_page": "8:12 roof (33.7 deg > 30.2) -> not applicable; balanced load governs",
+   "verified_by": "rl",
+   "verified_on": "2026-07-09",
+   "inputs": {
+    "ground_snow_pg_psf": 30,
+    "flat_roof_ps_psf": 25,
+    "roof_rise_on_12": 8,
+    "eave_to_ridge_ft": 30
+   },
+   "outputs": {
+    "windward_psf": {
+     "value": 7.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-slab-min-thickness",
    "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
    "source_title": "simply supported one-way slab, 12 ft, Grade 60 normalweight -> 7.2 in",

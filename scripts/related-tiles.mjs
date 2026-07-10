@@ -1141,6 +1141,7 @@ const RELATED = {
   "minimum-roof-snow": ["snow-load","rain-on-snow-surcharge","sliding-snow-load","snow-drift-load"],
   "wind-mwfrs-pressure": ["wind-pressure","wind-cc-pressure","diaphragm-shear"],
   "wind-solid-sign": ["wind-mwfrs-pressure","wind-cc-pressure","wind-pressure"],
+  "snow-unbalanced-gable": ["snow-load","snow-drift-load","sliding-snow-load"],
   // spec-v299..v301 reinforced-concrete depth-2 batch (Group E)
   "rc-slab-min-thickness": ["rc-beam-flexure","rc-beam-shear","joist-deflection"],
   "rc-doubly-reinforced": ["rc-beam-flexure","rc-beam-shear","rc-column-axial"],

@@ -6889,3 +6889,54 @@ const _v546renderWindSolidSign = _simpleRenderer({
   compute: computeWindSolidSign,
 });
 CONSTRUCTION_RENDERERS["wind-solid-sign"] = _v546renderWindSolidSign;
+
+// --- spec-v553 E: Unbalanced snow load on gable roof (ASCE 7-22 7.6.1) ---
+// Applies for ~2.38-30.2 deg and W>20 ft. Windward 0.3 ps, leeward ps + hd*gamma/sqrt(S).
+// dims: in { ground_snow_pg_psf: M L^-1 T^-2, flat_roof_ps_psf: M L^-1 T^-2, roof_rise_on_12: dimensionless, eave_to_ridge_ft: L } out: { windward_psf: M L^-1 T^-2, leeward_peak_psf: M L^-1 T^-2, extent_ft: L }
+export function computeSnowUnbalancedGable({ ground_snow_pg_psf = 0, flat_roof_ps_psf = 0, roof_rise_on_12 = 0, eave_to_ridge_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const pg = Number(ground_snow_pg_psf) || 0;
+  const ps = Number(flat_roof_ps_psf) || 0;
+  const rise = Number(roof_rise_on_12) || 0;
+  const W = Number(eave_to_ridge_ft) || 0;
+  if (!(pg > 0)) return { error: "Ground snow load must be positive (psf)." };
+  if (!(ps > 0)) return { error: "Flat/sloped-roof snow load must be positive (psf)." };
+  if (!(rise > 0)) return { error: "Roof rise-on-12 must be positive." };
+  if (!(W > 0)) return { error: "Eave-to-ridge length must be positive (ft)." };
+  const slope_deg = Math.atan(rise / 12) * 180 / Math.PI;
+  const applicable = slope_deg >= 2.38 && slope_deg <= 30.2 && W > 20;
+  const gamma = Math.min(0.13 * pg + 14, 30);
+  const S = 12 / rise;
+  const hd = 0.43 * Math.pow(W, 1 / 3) * Math.pow(pg + 10, 1 / 4) - 1.5;
+  const windward_psf = 0.3 * ps;
+  const surcharge_psf = hd * gamma / Math.sqrt(S);
+  const leeward_peak_psf = ps + surcharge_psf;
+  const extent_ft = 8 * hd * Math.sqrt(S) / 3;
+  return {
+    slope_deg, applicable, gamma, hd_ft: hd, windward_psf, surcharge_psf, leeward_peak_psf, extent_ft,
+    note: applicable
+      ? "The windward slope drops to 0.3 ps while the leeward carries ps plus a ridge drift surcharge - this sizes the leeward rafter and the ridge, which the balanced case misses. ASCE 7-22 Section 7.6.1; the engineer of record governs."
+      : "The unbalanced case applies only in the slope band of about 2.38 to 30.2 degrees (roughly 1/2-on-12 to 7-on-12) with an eave-to-ridge length over 20 ft. Outside it, only the balanced load governs. ASCE 7-22 Section 7.6.1; the engineer of record governs.",
+  };
+}
+export const snowUnbalancedGableExample = { inputs: { ground_snow_pg_psf: 30, flat_roof_ps_psf: 25, roof_rise_on_12: 4, eave_to_ridge_ft: 30 } };
+
+const _v553renderSnowUnbalancedGable = _simpleRenderer({
+  citation: "Citation: ASCE 7-22 Section 7.6.1 unbalanced snow load on gable roofs: snow density gamma = min(0.13 pg + 14, 30); drift height hd = 0.43 W^(1/3) (pg+10)^(1/4) - 1.5; windward slope 0.3 ps; leeward peak ps + hd gamma/sqrt(S) (S = 12/rise); surcharge extent 8 hd sqrt(S)/3. Applies only in the ~2.38-30.2 degree band with W > 20 ft. This sizes the leeward rafter and ridge the balanced case misses. ASCE 7 and the engineer of record govern.",
+  example: snowUnbalancedGableExample.inputs,
+  fields: [
+    { key: "ground_snow_pg_psf", label: "Ground snow load pg (psf)", kind: "number" },
+    { key: "flat_roof_ps_psf", label: "Balanced sloped-roof snow ps (psf)", kind: "number" },
+    { key: "roof_rise_on_12", label: "Roof slope (rise on 12)", kind: "number" },
+    { key: "eave_to_ridge_ft", label: "Eave-to-ridge length W (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ap", id: "sug-out-ap", label: "Unbalanced case applies?", value: (r) => r.applicable ? "YES (slope " + fmt(r.slope_deg, 1) + " deg, in band)" : "NO (slope " + fmt(r.slope_deg, 1) + " deg / W - out of band; balanced governs)" },
+    { key: "ww", id: "sug-out-ww", label: "Windward slope load", value: (r) => fmt(r.windward_psf, 1) + " psf" },
+    { key: "lw", id: "sug-out-lw", label: "Leeward peak at ridge", value: (r) => fmt(r.leeward_peak_psf, 1) + " psf (surcharge +" + fmt(r.surcharge_psf, 1) + ")" },
+    { key: "ex", id: "sug-out-ex", label: "Surcharge extent from ridge", value: (r) => fmt(r.extent_ft, 1) + " ft" },
+    { key: "n", id: "sug-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSnowUnbalancedGable,
+});
+CONSTRUCTION_RENDERERS["snow-unbalanced-gable"] = _v553renderSnowUnbalancedGable;
