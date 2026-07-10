@@ -6811,6 +6811,17 @@ export const CITATIONS = {
       { name: "Chip density", value: "550 lb per loose cy default (typical green range 500-600)", source: "chip-hauling practice" },
     ],
   },
+  "basal-area-prism": {
+    formula: "basal_area_per_acre = BAF x in_tree_count; per_tree_ba = 0.005454 x DBH^2; trees_per_acre = BAF / per_tree_ba.",
+    edition: "Prism (variable-radius / angle-gauge) point sampling, per USDA Forest Service mensuration and Bitterlich variable-radius plots, by name.",
+    freeAccess: "Point-sampling relations are public forest-mensuration results; the 0.005454 constant converts DBH inches to basal-area square feet.",
+    governance: GOVERNANCE.general,
+    editionNote: "The prism counts a tree by its angular size, not its distance (a big far tree and a small near tree both count in), so the basal area per acre is independent of any plot radius; borderline trees must be checked with the limiting distance (the plot-radius factor times DBH) and only in trees count; a larger BAF counts fewer trees for the same stand. A field estimate, not a full inventory.",
+    assumptions: [
+      { name: "Angular sampling", value: "the prism selects trees by angular size, not distance; the per-acre basal area is BAF x count, independent of plot radius", source: "Bitterlich variable-radius plots" },
+      { name: "Per-tree constant", value: "per-tree basal area = 0.005454 x DBH^2 (DBH in inches, area in ft^2)", source: "forest mensuration" },
+    ],
+  },
   "nozzle-flow-pressure": {
     formula: "New flow = rated flow x sqrt(operating pressure / rated pressure); required pressure for a target flow = rated pressure x (target flow / rated flow)^2.",
     edition: "Nozzle-flow square-root relation (standard spray-nozzle hydraulics), by name; USDA / land-grant extension sprayer-calibration guidance.",

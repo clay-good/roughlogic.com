@@ -310,3 +310,48 @@ function _v68renderChipperDebris(inputRegion, outputRegion, citationEl) {
   for (const f of [weight, density, box]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["chipper-debris"] = _v68renderChipperDebris;
+
+// --- spec-v563 L: Basal area per acre, prism (variable-radius) cruise ---
+// basal_area_per_acre = BAF x in_tree_count. per_tree_ba = 0.005454 x DBH^2. trees_per_acre = BAF / per_tree_ba.
+// dims: in { baf: dimensionless, in_tree_count: dimensionless, dbh_in: L } out: { basal_area_per_acre: dimensionless, per_tree_ba: L^2, trees_per_acre: dimensionless }
+export function computeBasalAreaPrism({ baf = 0, in_tree_count = 0, dbh_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const factor = Number(baf);
+  const count = Number(in_tree_count);
+  const dbh = Number(dbh_in);
+  if (!Number.isFinite(factor) || factor <= 0) return { error: "Basal-area factor must be a positive finite number (ft^2/ac)." };
+  if (!Number.isFinite(count) || count < 0) return { error: "In-tree count must be a non-negative finite number." };
+  if (!Number.isFinite(dbh) || dbh <= 0) return { error: "DBH must be a positive finite number (in)." };
+  const basal_area_per_acre = factor * count;
+  const per_tree_ba = 0.005454 * dbh * dbh;
+  const trees_per_acre = factor / per_tree_ba;
+  if (![basal_area_per_acre, per_tree_ba, trees_per_acre].every(Number.isFinite)) return { error: "Basal-area math is not a finite value." };
+  return {
+    basal_area_per_acre, per_tree_ba, trees_per_acre,
+    note: "The prism counts a tree by its angular size, not its distance - a big far tree and a small near tree both count 'in', and the basal area per acre is independent of any plot radius. Borderline trees must be checked with the limiting distance (the plot-radius factor times DBH); only 'in' trees count. A larger BAF counts fewer trees for the same stand, so it is chosen for a workable tally, not the answer. A field estimate; a qualified cruise and the forester govern.",
+  };
+}
+export const basalAreaPrismExample = { inputs: { baf: 10, in_tree_count: 8, dbh_in: 14 } };
+
+function _v563renderBasalAreaPrism(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: prism (variable-radius / angle-gauge) point sampling, per USDA Forest Service mensuration and Bitterlich variable-radius plots, by name. basal_area_per_acre = BAF x in-tree count; per-tree basal area = 0.005454 x DBH^2; trees per acre = BAF / per-tree BA. The prism counts by angular size, not distance; the basal area per acre is independent of plot radius. A field estimate; a qualified cruise and the forester govern.";
+  const baf = makeNumber("Basal-area factor (BAF, ft^2/ac)", "bap-baf", { step: "any", min: "0", value: "10" }); baf.input.value = "10";
+  const count = makeNumber("Trees counted 'in'", "bap-count", { step: "1", min: "0", value: "8" }); count.input.value = "8";
+  const dbh = makeNumber("Tree DBH (in, for the expansion)", "bap-dbh", { step: "any", min: "0", value: "14" }); dbh.input.value = "14";
+  for (const f of [baf, count, dbh]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { baf.input.value = "10"; count.input.value = "8"; dbh.input.value = "14"; update(); });
+  const oBa = makeOutputLine(outputRegion, "Basal area per acre", "bap-out-ba");
+  const oPt = makeOutputLine(outputRegion, "Per-tree basal area", "bap-out-pt");
+  const oTpa = makeOutputLine(outputRegion, "Trees per acre (one in-tree)", "bap-out-tpa");
+  const oNote = makeOutputLine(outputRegion, "Note", "bap-out-note");
+  const update = debounce(() => {
+    const r = computeBasalAreaPrism({ baf: Number(baf.input.value) || 0, in_tree_count: Number(count.input.value) || 0, dbh_in: Number(dbh.input.value) || 0 });
+    if (r.error) { oBa.textContent = r.error; oPt.textContent = "-"; oTpa.textContent = "-"; oNote.textContent = ""; return; }
+    oBa.textContent = fmt(r.basal_area_per_acre, 0) + " ft^2/ac";
+    oPt.textContent = fmt(r.per_tree_ba, 3) + " ft^2";
+    oTpa.textContent = fmt(r.trees_per_acre, 1) + " trees/ac";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [baf, count, dbh]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["basal-area-prism"] = _v563renderBasalAreaPrism;

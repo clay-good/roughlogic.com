@@ -18609,3 +18609,23 @@ test("bounds: spec-v562 computeTerminationTempAmpacity pins the termination-colu
   assert.ok("error" in _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 75, over_100a: true, derate_factor: 1.5 }));
   assert.ok("error" in _v562({ amp_90c: 260, amp_75c: 230, amp_60c: 195, termination_rating: 90, over_100a: true, derate_factor: 0.8 }));
 });
+
+import { computeBasalAreaPrism as _v563 } from "../../calc-arborist.js";
+
+test("bounds: spec-v563 computeBasalAreaPrism pins the BAF x count relation, the per-tree basal area, the trees-per-acre expansion, and error seams", () => {
+  const r = _v563({ baf: 10, in_tree_count: 8, dbh_in: 14 });
+  assert.ok(Math.abs(r.basal_area_per_acre - 80) < 1e-9); // 10 * 8
+  assert.ok(Math.abs(r.per_tree_ba - 1.069) < 0.005); // 0.005454 * 14^2
+  assert.ok(Math.abs(r.trees_per_acre - 9.4) < 0.1); // 10 / 1.069
+  // A bigger BAF with proportionally fewer trees gives the same stand basal area.
+  assert.ok(Math.abs(_v563({ baf: 20, in_tree_count: 4, dbh_in: 14 }).basal_area_per_acre - 80) < 1e-9);
+  // The basal area per acre is independent of DBH (it only scales the per-tree expansion).
+  assert.equal(_v563({ baf: 10, in_tree_count: 8, dbh_in: 20 }).basal_area_per_acre, 80);
+  // Zero trees in -> zero basal area.
+  assert.equal(_v563({ baf: 10, in_tree_count: 0, dbh_in: 14 }).basal_area_per_acre, 0);
+  // Error seams: non-finite, non-positive BAF / DBH, negative count.
+  assert.ok("error" in _v563({ baf: Infinity, in_tree_count: 8, dbh_in: 14 }));
+  assert.ok("error" in _v563({ baf: 0, in_tree_count: 8, dbh_in: 14 }));
+  assert.ok("error" in _v563({ baf: 10, in_tree_count: -1, dbh_in: 14 }));
+  assert.ok("error" in _v563({ baf: 10, in_tree_count: 8, dbh_in: 0 }));
+});

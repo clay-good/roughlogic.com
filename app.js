@@ -881,6 +881,8 @@ const TOOL_MODULES = (() => {
   declare("./calc-arborist.js", "ARBORIST_RENDERERS", [
     "log-limb-weight", "tree-rigging-shock", "felling-notch-hinge",
     "porta-wrap-friction", "chipper-debris",
+    // spec-v563
+    "basal-area-prism",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

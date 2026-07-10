@@ -20049,6 +20049,62 @@
    }
   },
   {
+   "tile_id": "basal-area-prism",
+   "source_publisher": "USDA Forest Service mensuration / Bitterlich variable-radius plots",
+   "source_title": "basal_area_per_acre = BAF x in_tree_count; per_tree_ba = 0.005454 x DBH^2",
+   "source_edition_or_year": "forest mensuration",
+   "source_section_or_page": "BAF-10, 8 trees in, 14 in DBH -> 80 ft^2/ac, 1.069 ft^2/tree, 9.4 trees/ac",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "baf": 10,
+    "in_tree_count": 8,
+    "dbh_in": 14
+   },
+   "outputs": {
+    "basal_area_per_acre": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "per_tree_ba": {
+     "value": 1.069,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "trees_per_acre": {
+     "value": 9.4,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "basal-area-prism",
+   "source_publisher": "USDA Forest Service mensuration / Bitterlich variable-radius plots",
+   "source_title": "a bigger BAF counts fewer trees for the same stand",
+   "source_edition_or_year": "forest mensuration",
+   "source_section_or_page": "BAF-20, 4 trees in -> same 80 ft^2/ac (factor and count trade off)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "baf": 20,
+    "in_tree_count": 4,
+    "dbh_in": 14
+   },
+   "outputs": {
+    "basal_area_per_acre": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",

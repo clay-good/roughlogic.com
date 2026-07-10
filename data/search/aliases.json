@@ -4559,6 +4559,46 @@
       "kind": "adjacent"
     },
     {
+      "term": "basal area",
+      "target": "basal-area-prism",
+      "kind": "industry"
+    },
+    {
+      "term": "prism cruise",
+      "target": "basal-area-prism",
+      "kind": "industry"
+    },
+    {
+      "term": "variable radius plot",
+      "target": "basal-area-prism",
+      "kind": "industry"
+    },
+    {
+      "term": "baf",
+      "target": "basal-area-prism",
+      "kind": "redirect"
+    },
+    {
+      "term": "angle gauge",
+      "target": "basal-area-prism",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bitterlich",
+      "target": "basal-area-prism",
+      "kind": "industry"
+    },
+    {
+      "term": "point sampling forestry",
+      "target": "basal-area-prism",
+      "kind": "redirect"
+    },
+    {
+      "term": "stand density basal area",
+      "target": "basal-area-prism",
+      "kind": "adjacent"
+    },
+    {
       "term": "nozzle flow",
       "target": "nozzle-flow-pressure",
       "kind": "redirect"
