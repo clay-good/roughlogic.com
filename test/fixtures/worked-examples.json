@@ -43596,6 +43596,66 @@
    }
   },
   {
+   "tile_id": "nfa-fireground-flow",
+   "source_publisher": "National Fire Academy / IFSTA",
+   "source_title": "base = (L x W / 3) x (percent/100) x floors; exposures add 0.25 x base each",
+   "source_edition_or_year": "National Fire Academy",
+   "source_section_or_page": "40 x 60 ft, 50% involved, 1 floor, 2 exposures -> base 400, +200 exposures, 600 gpm total (valid)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "length_ft": 40,
+    "width_ft": 60,
+    "percent_involved": 50,
+    "floors_involved": 1,
+    "exposures": 2
+   },
+   "outputs": {
+    "base_gpm": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "exposure_gpm": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "total_gpm": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "nfa-fireground-flow",
+   "source_publisher": "National Fire Academy / IFSTA",
+   "source_title": "heavy involvement leaves the valid envelope (defensive fire)",
+   "source_edition_or_year": "National Fire Academy",
+   "source_section_or_page": "Same building at 90% involved -> base 720 gpm, valid flag drops (use ISO / required-fire-flow)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "length_ft": 40,
+    "width_ft": 60,
+    "percent_involved": 90,
+    "floors_involved": 1,
+    "exposures": 2
+   },
+   "outputs": {
+    "base_gpm": {
+     "value": 720,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wip-percent-complete",
    "source_publisher": "construction accounting (cost-to-cost POC)",
    "source_title": "$500K contract, $300K cost, $400K est, $350K billed -> 75%, $375K earned, +$25K underbilled",

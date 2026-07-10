@@ -872,6 +872,7 @@ export const COMPUTE_MAP = {
   "colebrook-friction-factor": { module: "../../calc-hvac.js", fn: "computeColebrookFrictionFactor" },
   "thrust-block-sizing": { module: "../../calc-plumbing.js", fn: "computeThrustBlockSizing" },
   "hydrant-available-flow": { module: "../../calc-fire.js", fn: "computeHydrantAvailableFlow" },
+  "nfa-fireground-flow": { module: "../../calc-fire.js", fn: "computeNfaFiregroundFlow" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },
   "wood-lag-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodLagWithdrawal" },

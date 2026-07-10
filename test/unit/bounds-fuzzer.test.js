@@ -18928,3 +18928,29 @@ test("bounds: spec-v576 computeChlorineCylinderWithdrawal pins the per-container
   assert.ok("error" in _v576({ feed_rate_lb_day: 100, container_type: "foo", room_temp_f: 70 }));
   assert.ok("error" in _v576({ feed_rate_lb_day: 100, container_type: "cylinder", room_temp_f: -30 }));
 });
+
+import { computeNfaFiregroundFlow as _v577 } from "../../calc-fire.js";
+
+test("bounds: spec-v577 computeNfaFiregroundFlow pins the base flow, the exposure addition, the floor multiply, the validity flag, and error seams", () => {
+  const r = _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 1, exposures: 2 });
+  assert.ok(Math.abs(r.base_gpm - 400) < 1e-9); // (40*60/3)*0.50
+  assert.ok(Math.abs(r.exposure_gpm - 200) < 1e-9); // 0.25*400*2
+  assert.ok(Math.abs(r.total_gpm - 600) < 1e-9);
+  assert.equal(r.valid, true); // 50% and 400 gpm within range
+  // Heavy involvement drops the validity flag (defensive fire).
+  const heavy = _v577({ length_ft: 40, width_ft: 60, percent_involved: 90, floors_involved: 1, exposures: 2 });
+  assert.ok(Math.abs(heavy.base_gpm - 720) < 1e-9);
+  assert.equal(heavy.valid, false);
+  // The floor count multiplies the base.
+  assert.ok(Math.abs(_v577({ length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 2, exposures: 0 }).base_gpm - 800) < 1e-9);
+  // A large base (> 1000 gpm) also drops the validity flag.
+  assert.equal(_v577({ length_ft: 100, width_ft: 100, percent_involved: 50, floors_involved: 1, exposures: 0 }).valid, false);
+  // Error seams: non-finite, non-positive dimensions, percent out of range, negative exposures / floors.
+  assert.ok("error" in _v577({ length_ft: Infinity, width_ft: 60, percent_involved: 50 }));
+  assert.ok("error" in _v577({ length_ft: 0, width_ft: 60, percent_involved: 50 }));
+  assert.ok("error" in _v577({ length_ft: 40, width_ft: 0, percent_involved: 50 }));
+  assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 0 }));
+  assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 101 }));
+  assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 0 }));
+  assert.ok("error" in _v577({ length_ft: 40, width_ft: 60, percent_involved: 50, exposures: -1 }));
+});

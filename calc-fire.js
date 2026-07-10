@@ -1834,3 +1834,54 @@ function renderHydrantAvailableFlow(inputRegion, outputRegion, citationEl) {
   for (const f of [s, res, qf]) f.input.addEventListener("input", update);
 }
 FIRE_RENDERERS["hydrant-available-flow"] = renderHydrantAvailableFlow;
+
+// --- spec-v577 F: National Fire Academy quick fire-flow ---
+// base = (L*W/3)*(pct/100)*floors. exposure = 0.25*base*exposures. valid: pct<=50 and base<=1000.
+// dims: in { length_ft: L, width_ft: L, percent_involved: dimensionless, floors_involved: dimensionless, exposures: dimensionless } out: { base_gpm: L^3 T^-1, exposure_gpm: L^3 T^-1, total_gpm: L^3 T^-1 }
+export function computeNfaFiregroundFlow({ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exposures = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const pct = Number(percent_involved) || 0;
+  const floors = Number(floors_involved) || 0;
+  const exp = Number(exposures) || 0;
+  if (!(L > 0)) return { error: "Length must be positive (ft)." };
+  if (!(W > 0)) return { error: "Width must be positive (ft)." };
+  if (!(pct > 0 && pct <= 100)) return { error: "Percent involved must be over 0 and at most 100." };
+  if (!(floors >= 1)) return { error: "Floors involved must be at least 1." };
+  if (exp < 0) return { error: "Exposures cannot be negative." };
+  const base_gpm = (L * W / 3) * (pct / 100) * floors;
+  const exposure_gpm = 0.25 * base_gpm * exp;
+  const total_gpm = base_gpm + exposure_gpm;
+  const valid = pct <= 50 && base_gpm <= 1000;
+  return {
+    base_gpm, exposure_gpm, total_gpm, valid,
+    note: "The NFA fireground formula is validated only for interior/offensive attack up to about 50% involvement and roughly 1,000 gpm - beyond that it under-predicts badly and the fight is defensive, where the ISO / required-fire-flow method belongs. It is a mental scene-size-up tool, not a water-supply design. Incident command governs.",
+  };
+}
+export const nfaFiregroundFlowExample = { inputs: { length_ft: 40, width_ft: 60, percent_involved: 50, floors_involved: 1, exposures: 2 } };
+function renderNfaFiregroundFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A size-up aid, not a water-supply design; incident command governs. Citation: National Fire Academy fireground fire-flow quick-calc (NFA; IFSTA), by name. base = (L x W / 3) x (percent/100) x floors; exposures add 0.25 x base each; total = base + exposures. Validated only for interior/offensive attack up to ~50% involvement and ~1,000 gpm - beyond that use the ISO / required-fire-flow method.";
+  const L = makeNumber("Building length (ft)", "nfa-l", { step: "any", min: "0", value: "40" }); L.input.value = "40";
+  const W = makeNumber("Building width (ft)", "nfa-w", { step: "any", min: "0", value: "60" }); W.input.value = "60";
+  const pct = makeNumber("Percent involved (%)", "nfa-pct", { step: "any", min: "0", max: "100", value: "50" }); pct.input.value = "50";
+  const floors = makeNumber("Involved floors", "nfa-floors", { step: "1", min: "1", value: "1" }); floors.input.value = "1";
+  const exp = makeNumber("Exposures to protect", "nfa-exp", { step: "1", min: "0", value: "2" }); exp.input.value = "2";
+  for (const f of [L, W, pct, floors, exp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { L.input.value = "40"; W.input.value = "60"; pct.input.value = "50"; floors.input.value = "1"; exp.input.value = "2"; update(); });
+  const oBase = makeOutputLine(outputRegion, "Base fire flow", "nfa-out-base");
+  const oExp = makeOutputLine(outputRegion, "Exposure addition / total", "nfa-out-exp");
+  const oValid = makeOutputLine(outputRegion, "Within the NFA valid range?", "nfa-out-valid");
+  const oNote = makeOutputLine(outputRegion, "Note", "nfa-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeNfaFiregroundFlow({ length_ft: readNum(L.input), width_ft: readNum(W.input), percent_involved: readNum(pct.input), floors_involved: floors.input.value === "" ? 1 : readNum(floors.input), exposures: readNum(exp.input) });
+    if (r.error) { oBase.textContent = r.error; oExp.textContent = "-"; oValid.textContent = "-"; oNote.textContent = ""; return; }
+    oBase.textContent = fmt(r.base_gpm, 0) + " gpm";
+    oExp.textContent = "+" + fmt(r.exposure_gpm, 0) + " gpm exposures -> " + fmt(r.total_gpm, 0) + " gpm total";
+    oValid.textContent = r.valid ? "YES - offensive attack within the formula's range" : "NO - over ~50% involved or ~1,000 gpm; go defensive, use ISO / required-fire-flow";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [L, W, pct, floors, exp]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["nfa-fireground-flow"] = renderNfaFiregroundFlow;

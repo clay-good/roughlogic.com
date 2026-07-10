@@ -639,6 +639,8 @@ const TOOL_MODULES = (() => {
     // spec-v114 smooth-bore nozzle flow (gpm = 29.7 d^2 sqrt(NP)).
     "smooth-bore-flow",
     "hydrant-available-flow",
+    // spec-v577
+    "nfa-fireground-flow",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out
   // of calc-fire.js (it sat at 94.9% of its size cap) into its own module.

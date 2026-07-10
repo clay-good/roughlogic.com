@@ -16264,6 +16264,46 @@
       "kind": "industry"
     },
     {
+      "term": "nfa fire flow",
+      "target": "nfa-fireground-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "national fire academy formula",
+      "target": "nfa-fireground-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "fireground flow",
+      "target": "nfa-fireground-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "fire flow quick calc",
+      "target": "nfa-fireground-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "length width divided by 3",
+      "target": "nfa-fireground-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "offensive fire flow",
+      "target": "nfa-fireground-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size up fire flow",
+      "target": "nfa-fireground-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "exposure fire flow",
+      "target": "nfa-fireground-flow",
+      "kind": "adjacent"
+    },
+    {
       "term": "work in progress",
       "target": "wip-percent-complete",
       "kind": "industry"

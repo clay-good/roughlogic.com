@@ -291,6 +291,7 @@ export const TOOLS = [
 
   { id: "elevation-pressure-loss", name: "Elevation Pressure Loss / Gain", group: "F", trades: ["fire"], desc: "Standpipe elevation pressure loss or gain shown both as the exact hydrostatic value (0.434 psi/ft) and the fire-ground 5-psi-per-floor rule of thumb, by floors or feet." },
   { id: "water-supply-duration", name: "Water-Supply Duration", group: "F", trades: ["fire"], desc: "Sustainable duration of an available water volume at a selected flow, with the net drawdown time and steady-state sustainable flow when a continuous resupply rate is entered." },
+  { id: "nfa-fireground-flow", name: "National Fire Academy Quick Fire-Flow", group: "F", trades: ["fire"], desc: "The fireground size-up quick-calc: NFF = (L x W / 3) x (percent involved / 100) x floors, plus 25% of the base per exposure. Validated only for interior/offensive attack up to ~50% involvement and ~1,000 gpm -- beyond that it under-predicts and the fight is defensive (use the ISO / required-fire-flow method). A mental scene-size-up tool, not a water-supply design." },
   // Group G: Cross-Trade
   { id: "unit-converter", name: "Unit Converter", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Length, area, volume, mass, force, pressure, temperature, energy, power, flow, electrical." },
   { id: "material-cost", name: "Material Cost Estimator", group: "G", trades: ["electrical", "plumbing", "hvac", "restoration", "carpentry", "fire"], desc: "Total cost from price per unit and quantity." },

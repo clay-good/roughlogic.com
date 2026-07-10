@@ -4503,6 +4503,17 @@ export const CITATIONS = {
       { name: "Default coefficient", value: "0.90 (rounded outlet) unless user supplies", source: "AWWA M17 typical" },
     ],
   },
+  "nfa-fireground-flow": {
+    formula: "base = (length x width / 3) x (percent_involved / 100) x floors_involved; exposure = 0.25 x base per exposure; total = base + exposure; valid when percent_involved <= 50 and base <= 1000 gpm.",
+    edition: "National Fire Academy fireground fire-flow quick-calc (NFA; IFSTA), by name.",
+    freeAccess: "The NFA quick-calc is public fire-service training material; incident command governs the actual attack.",
+    governance: GOVERNANCE.fire,
+    editionNote: "The formula is validated only for interior/offensive attack up to about 50% involvement and roughly 1,000 gpm - beyond that it under-predicts badly and the fight is defensive (use the ISO / required-fire-flow method); it is a mental scene-size-up tool, not a water-supply design. A size-up aid, not a water-supply design.",
+    assumptions: [
+      { name: "Validity envelope", value: "interior/offensive attack, <= 50% involvement, <= ~1,000 gpm base; outside it the fire is defensive", source: "National Fire Academy" },
+      { name: "Additions", value: "0.25 x base per exposure; multiply the base by the number of involved floors", source: "NFA / IFSTA" },
+    ],
+  },
   "required-fire-flow": {
     formula: "ISO Needed Fire Flow NFF = (C × O × X × P) where C = 18 × F × sqrt(A), F is construction-class factor, O is occupancy hazard, X is exposure factor, P is communication factor.",
     edition: "ISO Public Protection Classification (PPC) Schedule by name.",

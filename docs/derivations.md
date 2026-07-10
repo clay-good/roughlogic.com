@@ -1926,6 +1926,7 @@ cross-check.
 | calc-fire.js | `computeLadderPipeReach` | `{ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
 | calc-fire.js | `computeMasterStreamReach` | `{ nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
 | calc-fire.js | `computeNFPA1142WaterSupply` | `{ volume_ft3 = 0, occupancy_class = 1, construction_class = "V", exposure_wit...` | _ | _ | _ |
+| calc-fire.js | `computeNfaFiregroundFlow` | `{ length_ft = 0, width_ft = 0, percent_involved = 0, floors_involved = 1, exp...` | _ | _ | _ |
 | calc-fire.js | `computePDP` | `{ nozzle_pressure_psi, friction_loss_psi, elevation_ft = 0, appliance_loss_ps...` | _ | _ | _ |
 | calc-fire.js | `computeRequiredFireFlow` | `{ structure_area_ft2, construction_class = "ordinary", occupancy_factor = 1.0...` | _ | _ | _ |
 | calc-fire.js | `computeReverseLayFriction` | `{ hose_diameter, gpm, length_ft, n_pumps = 1 }` | _ | _ | _ |
@@ -2687,7 +2688,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1273.
+Row count: 1274.
 
 <!-- END function-corpus-v14 -->
 
@@ -3392,7 +3393,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (32 tiles)
+### Group F Fire-ground (33 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3410,6 +3411,7 @@ per spec-v14 §13.1 second paragraph.
 | `iso-nff` | ISO Needed Fire Flow | ISO Public Protection Classification ...; 5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-pipe-reach` | Ladder Pipe Reach | IFSTA Pumping Apparatus / ladder-pipe...; 70 deg / 100 ft extension / smooth_bore_1_75 / 80 psi -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `master-stream` | Master Stream Reach | IFSTA / fire-stream engineering practice; smooth_bore_1_75 / 80 psi -> 90 ft typical reach; pure ta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `nfa-fireground-flow` | National Fire Academy Quick Fire-Flow | National Fire Academy / IFSTA; 40 x 60 ft, 50% involved, 1 floor, 2 exposures -> base 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `nfpa-1142-water-supply` | NFPA 1142 Rural Water Supply | NFPA; §5 Q = (V * O * H) / 5 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pdp` | Pump Discharge Pressure | NFPA; PDP = NP + FL + elev_psi + appliance = 100 + 25 + 0.5*20 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `required-fire-flow` | Required Fire Flow | ISO / NFPA 1142 area-based simplified...; 5000 ft^2 / ordinary / occupancy 1.0 / exposure 1.0 / com... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3902,6 +3904,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1029. Fixture-covered or reference-cadence: 1029 / 1029.
+Tile count: 1030. Fixture-covered or reference-cadence: 1030 / 1030.
 
 <!-- END tile-index-v14 -->
