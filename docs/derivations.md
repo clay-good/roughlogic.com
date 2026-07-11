@@ -1946,6 +1946,7 @@ cross-check.
 | calc-fire.js | `computeSprinklerKFactor` | `{ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeStandpipeFriction` | `{ riser_height_ft, outlet_count, gpm_per_outlet, outlet_length_ft = 50, hose_...` | _ | _ | _ |
 | calc-fire.js | `computeStandpipePDP` | `{ standpipe_class = "I", highest_outlet_elevation_ft = 0, nozzle_pressure_psi...` | _ | _ | _ |
+| calc-fire.js | `computeTankerFleetSize` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
 | calc-fire.js | `computeTankerShuttleCycle` | `{ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } ...` | _ | _ | _ |
 | calc-fire.js | `computeTankerShuttleFlow` | `{ nominal_tank_gal = 0, usable_fraction = 0.9, tanker_count = 0, cycle_time_m...` | _ | _ | _ |
 | calc-fire.js | `computeVacuumLiftReading` | `{ vacuum_inhg = 0, site_elevation_ft = 0, pump_factor = 0.667 } = {}` | _ | _ | _ |
@@ -2710,7 +2711,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1296.
+Row count: 1297.
 
 <!-- END function-corpus-v14 -->
 
@@ -3423,7 +3424,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (40 tiles)
+### Group F Fire-ground (41 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3463,6 +3464,7 @@ per spec-v14 §13.1 second paragraph.
 | `sprinkler-system-demand` | Sprinkler System Demand and Water Supply (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v249 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tanker-fleet-size` | Tanker Shuttle Fill-Site-Limited Fleet Size | IFSTA / NFPA 1142 rural water-supply ...; 3,000 gal, 1,000 gpm fill and dump, 2 mi at 35 mph -> 12.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tanker-shuttle-cycle` | Tanker Shuttle Cycle Time | IFSTA / NFPA 1142 rural water-supply ...; 3,000 gal at 1,000 gpm fill and dump, 2 mi at 35 mph -> 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tanker-shuttle-flow` | Tanker (Water Shuttle) Flow Capability | ISO PPC hauled-water credit / NFPA 1142; 3,000 gal tankers at 90%, 3 tankers, 12-min cycle -> 2,70... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3948,6 +3950,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1052. Fixture-covered or reference-cadence: 1052 / 1052.
+Tile count: 1053. Fixture-covered or reference-cadence: 1053 / 1053.
 
 <!-- END tile-index-v14 -->

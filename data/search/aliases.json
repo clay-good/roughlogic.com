@@ -81252,6 +81252,56 @@
       "term": "pivot timer percent to application depth",
       "target": "pivot-timer-depth",
       "kind": "question"
+    },
+    {
+      "term": "tanker fleet size",
+      "target": "tanker-fleet-size",
+      "kind": "industry"
+    },
+    {
+      "term": "how many tankers",
+      "target": "tanker-fleet-size",
+      "kind": "redirect"
+    },
+    {
+      "term": "water shuttle fleet",
+      "target": "tanker-fleet-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fill site limit",
+      "target": "tanker-fleet-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tanker bottleneck",
+      "target": "tanker-fleet-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how many tankers do i need for a water shuttle",
+      "target": "tanker-fleet-size",
+      "kind": "question"
+    },
+    {
+      "term": "maximum useful tankers in a shuttle",
+      "target": "tanker-fleet-size",
+      "kind": "question"
+    },
+    {
+      "term": "when does adding a tanker stop helping",
+      "target": "tanker-fleet-size",
+      "kind": "question"
+    },
+    {
+      "term": "fill site limited shuttle flow",
+      "target": "tanker-fleet-size",
+      "kind": "question"
+    },
+    {
+      "term": "tanker fleet for a target fire flow",
+      "target": "tanker-fleet-size",
+      "kind": "question"
     }
   ]
 }

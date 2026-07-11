@@ -662,6 +662,7 @@ const TOOL_MODULES = (() => {
     "vacuum-lift-reading",
     "tanker-shuttle-flow",
     "tanker-shuttle-cycle",
+    "tanker-fleet-size",
     "foam-eductor-limit",
   ]);
   // spec-v82 cap-relief split: the spec-v3 technical-rescue bench moved out

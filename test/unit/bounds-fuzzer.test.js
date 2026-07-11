@@ -19527,3 +19527,36 @@ test("bounds: spec-v604 computePivotTimerDepth pins the revolution, depth, the i
   assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 0 }));
   assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 101 }));
 });
+
+import { computeTankerFleetSize as _v605 } from "../../calc-fire.js";
+
+test("bounds: spec-v605 computeTankerFleetSize pins the bottleneck, the fleet threshold, the ceiling flow, and error seams", () => {
+  // Pinned worked example: 3,000 gal, 1,000 gpm fill and dump, 2 mi at 35 mph.
+  const r = _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 });
+  assert.ok(Math.abs(r.cycle_min - 12.857143) < 1e-5);
+  assert.ok(Math.abs(r.bottleneck_min - 3) < 1e-9);
+  assert.equal(r.bottleneck_site, "fill");
+  assert.equal(r.fleet_for_max, 5); // ceil(12.857/3)
+  assert.ok(Math.abs(r.site_limited_flow_gpm - 1000) < 1e-9);
+  // Cross-check: a slow fill site becomes the bottleneck and caps the fleet.
+  const x = _v605({ tank_gal: 3000, fill_gpm: 500, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 });
+  assert.ok(Math.abs(x.bottleneck_min - 6) < 1e-9);
+  assert.equal(x.bottleneck_site, "fill");
+  assert.equal(x.fleet_for_max, 3); // ceil(15.857/6)
+  assert.ok(Math.abs(x.site_limited_flow_gpm - 500) < 1e-9);
+  // The dump becomes the bottleneck when it is slower than the fill.
+  const d = _v605({ tank_gal: 3000, fill_gpm: 1500, dump_gpm: 600, distance_mi: 2, speed_mph: 35 });
+  assert.equal(d.bottleneck_site, "dump");
+  assert.ok(Math.abs(d.site_limited_flow_gpm - 3000 / 5) < 1e-9); // dump_min = 5
+  // fleet_for_max is always the ceiling of cycle / bottleneck (a whole number of tankers).
+  assert.ok(Number.isInteger(r.fleet_for_max));
+  assert.ok(r.fleet_for_max >= r.cycle_min / r.bottleneck_min);
+  assert.ok(r.fleet_for_max - r.cycle_min / r.bottleneck_min < 1);
+  // Error seams: non-finite, non-positive tank / fill / dump / distance / speed.
+  assert.ok("error" in _v605({ tank_gal: Infinity, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v605({ tank_gal: 0, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 0, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 0, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 0, speed_mph: 35 }));
+  assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 0 }));
+});

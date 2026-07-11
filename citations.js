@@ -4602,6 +4602,17 @@ export const CITATIONS = {
       { name: "Flow match", value: "the eductor's rated flow must equal the nozzle's flow", source: "eductor manufacturer data (TFT/Elkhart)" },
     ],
   },
+  "tanker-fleet-size": {
+    formula: "fill_min = tank_gal / fill_gpm; dump_min = tank_gal / dump_gpm; travel_min = 2 x distance_mi / speed_mph x 60; cycle_min = fill_min + dump_min + travel_min; bottleneck_min = max(fill_min, dump_min); fleet_for_max = ceil(cycle_min / bottleneck_min); site_limited_flow_gpm = tank_gal / bottleneck_min.",
+    edition: "IFSTA / NFPA 1142 rural water-supply fill-site-limited fleet size, by name.",
+    freeAccess: "The shuttle fleet-size relation is public fire-service / rural water-supply training material; incident command governs the actual operation.",
+    governance: GOVERNANCE.general,
+    editionNote: "The bottleneck is the slower of the two fixed sites (fill or dump); the sustainable flow caps at the tank load over that service time no matter the fleet, so every tanker beyond the solved fleet queues and adds nothing. The fix for more water is a faster bottleneck site, not more trucks. The tank load is the usable water moved (ISO ~90% of nominal). The fill-site capacity and the operation govern - a planning aid, not incident command.",
+    assumptions: [
+      { name: "Bottleneck site", value: "the sustainable flow caps at tank / max(fill_min, dump_min); the slower fixed site sets it", source: "IFSTA / NFPA 1142" },
+      { name: "Fleet threshold", value: "ceil(cycle_min / bottleneck_min) tankers reach the cap; more just queue", source: "IFSTA / NFPA 1142" },
+    ],
+  },
   "tanker-shuttle-cycle": {
     formula: "fill_min = tank_gal / fill_gpm; dump_min = tank_gal / dump_gpm; travel_min = 2 x distance_mi / speed_mph x 60; cycle_min = fill_min + dump_min + travel_min; single_tanker_gpm = tank_gal / cycle_min.",
     edition: "IFSTA / NFPA 1142 rural water-supply shuttle cycle time, by name.",

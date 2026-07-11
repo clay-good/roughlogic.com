@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): spec-v605 tanker shuttle fill-site-limited fleet size; 2026-07-10
+
+Lands `tanker-fleet-size` (Group F, calc-fire.js), the follow-on spec-v580 named: how many tankers is enough. bottleneck = max(tank/fill_gpm, tank/dump_gpm); fleet = ceil(cycle / bottleneck); ceiling flow = tank / bottleneck. A 3,000-gal operation at 1,000 gpm fill and dump over a 2-mile haul needs 5 tankers to reach its 1,000-gpm ceiling; a sixth just queues. Completes the rural water-shuttle trio. Group F audit count 34 -> 35. Catalog 1,052 -> 1,053 (version 0.194.0).
+
 ### feat(irrigation): spec-v604 center-pivot percent-timer to depth; 2026-07-10
 
 Lands `pivot-timer-depth` (Group L, calc-agriculture.js), the follow-on spec-v568 named: the end-tower percent timer converted to applied depth. revolution = revolution_100_hr x 100 / timer_pct; depth = flow x revolution / (452.6 x area). The depth is inversely proportional to the timer - dropping it from 100% to 50% doubles the depth. Closes the center-pivot cluster (runtime, application-rate, timer). Group L audit count 28 -> 29. Catalog 1,051 -> 1,052 (version 0.193.0).

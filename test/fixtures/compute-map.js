@@ -891,6 +891,7 @@ export const COMPUTE_MAP = {
   "vacuum-lift-reading": { module: "../../calc-fire.js", fn: "computeVacuumLiftReading" },
   "tanker-shuttle-flow": { module: "../../calc-fire.js", fn: "computeTankerShuttleFlow" },
   "tanker-shuttle-cycle": { module: "../../calc-fire.js", fn: "computeTankerShuttleCycle" },
+  "tanker-fleet-size": { module: "../../calc-fire.js", fn: "computeTankerFleetSize" },
   "foam-eductor-limit": { module: "../../calc-fire.js", fn: "computeFoamEductorLimit" },
   // spec-v332..v334 wood-fastener withdrawal batch (3 tiles)
   "wood-nail-withdrawal": { module: "../../calc-construction.js", fn: "computeWoodNailWithdrawal" },

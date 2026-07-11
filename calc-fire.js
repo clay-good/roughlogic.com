@@ -2165,6 +2165,61 @@ function renderTankerShuttleCycle(inputRegion, outputRegion, citationEl) {
 }
 FIRE_RENDERERS["tanker-shuttle-cycle"] = renderTankerShuttleCycle;
 
+// --- spec-v605 F: Tanker shuttle fill-site-limited fleet size ---
+// bottleneck = max(fill_min, dump_min). fleet_for_max = ceil(cycle/bottleneck). site_flow = tank/bottleneck.
+// dims: in { tank_gal: L^3, fill_gpm: L^3 T^-1, dump_gpm: L^3 T^-1, distance_mi: L, speed_mph: L T^-1 } out: { cycle_min: T, bottleneck_min: T, fleet_for_max: dimensionless, site_limited_flow_gpm: L^3 T^-1 }
+export function computeTankerFleetSize({ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tank = Number(tank_gal) || 0;
+  const fill = Number(fill_gpm) || 0;
+  const dump = Number(dump_gpm) || 0;
+  const dist = Number(distance_mi) || 0;
+  const speed = Number(speed_mph) || 0;
+  if (!(tank > 0)) return { error: "Tank load must be positive (gal)." };
+  if (!(fill > 0)) return { error: "Fill rate must be positive (gpm)." };
+  if (!(dump > 0)) return { error: "Dump rate must be positive (gpm)." };
+  if (!(dist > 0)) return { error: "Haul distance must be positive (mi)." };
+  if (!(speed > 0)) return { error: "Road speed must be positive (mph)." };
+  const fill_min = tank / fill;
+  const dump_min = tank / dump;
+  const travel_min = 2 * dist / speed * 60;
+  const cycle_min = fill_min + dump_min + travel_min;
+  const bottleneck_min = Math.max(fill_min, dump_min);
+  const bottleneck_site = fill_min >= dump_min ? "fill" : "dump";
+  const fleet_for_max = Math.ceil(cycle_min / bottleneck_min);
+  const site_limited_flow_gpm = tank / bottleneck_min;
+  return {
+    fill_min, dump_min, travel_min, cycle_min, bottleneck_min, bottleneck_site, fleet_for_max, site_limited_flow_gpm,
+    note: "The bottleneck is the slower of the two fixed sites (fill or dump); the sustainable flow caps at the tank load over that service time no matter the fleet, so every tanker beyond the solved fleet queues and adds nothing. The fix for more water is a faster bottleneck site, not more trucks. The tank load is the usable water moved (ISO ~90% of nominal). The fill-site capacity and the operation govern - a planning aid, not incident command.",
+  };
+}
+export const tankerFleetSizeExample = { inputs: { tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 } };
+function renderTankerFleetSize(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not incident command; the fill-site capacity and the operation govern. Citation: IFSTA / NFPA 1142 rural water-supply fill-site-limited fleet size, by name. bottleneck_min = max(tank/fill_gpm, tank/dump_gpm); fleet_for_max = ceil(cycle_min / bottleneck_min); site_limited_flow_gpm = tank / bottleneck_min. The bottleneck is the slower fixed site; the flow caps at the tank load over that service time no matter the fleet, so tankers beyond the solved fleet just queue. The tank load is the usable water moved (ISO ~90% of nominal).";
+  const tank = makeNumber("Usable water per trip (gal)", "tfs-tank", { step: "any", min: "0", value: "3000" }); tank.input.value = "3000";
+  const fill = makeNumber("Fill-site rate (gpm)", "tfs-fill", { step: "any", min: "0", value: "1000" }); fill.input.value = "1000";
+  const dump = makeNumber("Dump / unload rate (gpm)", "tfs-dump", { step: "any", min: "0", value: "1000" }); dump.input.value = "1000";
+  const dist = makeNumber("One-way haul distance (mi)", "tfs-dist", { step: "any", min: "0", value: "2" }); dist.input.value = "2";
+  const speed = makeNumber("Average road speed (mph)", "tfs-speed", { step: "any", min: "0", value: "35" }); speed.input.value = "35";
+  for (const f of [tank, fill, dump, dist, speed]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tank.input.value = "3000"; fill.input.value = "1000"; dump.input.value = "1000"; dist.input.value = "2"; speed.input.value = "35"; update(); });
+  const oFleet = makeOutputLine(outputRegion, "Fleet to reach the ceiling", "tfs-out-fleet");
+  const oFlow = makeOutputLine(outputRegion, "Site-limited ceiling flow", "tfs-out-flow");
+  const oBottle = makeOutputLine(outputRegion, "Bottleneck", "tfs-out-bottle");
+  const oNote = makeOutputLine(outputRegion, "Note", "tfs-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTankerFleetSize({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) });
+    if (r.error) { oFleet.textContent = r.error; oFlow.textContent = "-"; oBottle.textContent = "-"; oNote.textContent = ""; return; }
+    oFleet.textContent = r.fleet_for_max + " tankers (a further tanker just queues)";
+    oFlow.textContent = fmt(r.site_limited_flow_gpm, 0) + " gpm";
+    oBottle.textContent = "the " + r.bottleneck_site + " site (" + fmt(r.bottleneck_min, 1) + " min per tanker)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tank, fill, dump, dist, speed]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["tanker-fleet-size"] = renderTankerFleetSize;
+
 // --- spec-v581 F: In-line foam eductor back-pressure / hose-lay limit ---
 // max_bp = 0.65*inlet. FL_per_100 = C*(Q/100)^2. max_length = (max_bp - nozzle - 0.434*elev)/FL_per_100*100 (>=0).
 // dims: in { inlet_pressure_psi: M L^-1 T^-2, eductor_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, nozzle_pressure_psi: M L^-1 T^-2, elevation_ft: L } out: { max_back_pressure_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_length_ft: L }
