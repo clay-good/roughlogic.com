@@ -40726,6 +40726,68 @@
    }
   },
   {
+   "tile_id": "hydraulic-jump",
+   "source_publisher": "Belanger sequent depth (Chow, Open-Channel Hydraulics)",
+   "source_title": "10 ft channel, 100 cfs, 0.8 ft (Fr1 2.46) -> sequent depth 2.42 ft, 0.55 ft head lost",
+   "source_edition_or_year": "spec-v632 worked example (machine-verified)",
+   "source_section_or_page": "spec-v632 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "b_ft": 10,
+    "q_cfs": 100,
+    "y1_ft": 0.8
+   },
+   "outputs": {
+    "fr1": {
+     "value": 2.4628,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "y2_ft": {
+     "value": 2.415,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "de_ft": {
+     "value": 0.545,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-jump",
+   "source_publisher": "Belanger sequent depth (Chow, Open-Channel Hydraulics)",
+   "source_title": "cross-check: 200 cfs at the same 0.8 ft (Fr1 4.93) jumps to 5.19 ft and kills 5.1 ft of head",
+   "source_edition_or_year": "spec-v632 worked example (machine-verified)",
+   "source_section_or_page": "spec-v632 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "b_ft": 10,
+    "q_cfs": 200,
+    "y1_ft": 0.8
+   },
+   "outputs": {
+    "fr1": {
+     "value": 4.9257,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "y2_ft": {
+     "value": 5.1871,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reynolds-number-pipe",
    "source_publisher": "Reynolds number Re = V D / nu",
    "source_title": "60 F water, 6 ft/s, 2 in line -> Re 82,600 turbulent",

@@ -10650,6 +10650,17 @@ export const CITATIONS = {
       { name: "Scope", value: "prismatic rectangular channel; normal depth (Manning) and the hydraulic jump are separate", source: "scope of this tile" },
     ],
   },
+  "hydraulic-jump": {
+    formula: "V1 = Q/(b y1); Fr1 = V1/sqrt(g y1) (> 1); y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1); dE = (y2 - y1)^3/(4 y1 y2); efficiency = (y2 + V2^2/2g)/(y1 + V1^2/2g).",
+    edition: "The Belanger momentum (sequent-depth) hydraulic-jump relation for a rectangular channel and the specific-energy loss, as compiled in Chow's Open-Channel Hydraulics, by name.",
+    freeAccess: "The Belanger sequent-depth relation and the jump energy-loss expression are public results in the standard open-channel-hydraulics references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Belanger momentum sequent (conjugate) depth y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1) for a rectangular horizontal channel (g = 32.2 ft/s^2), with the specific-energy loss dE = (y2 - y1)^3/(4 y1 y2) and the downstream/upstream energy efficiency, as compiled in Chow's open-channel-hydraulics reference. The upstream flow must be supercritical (Fr1 > 1) and the tailwater must supply the sequent depth for the jump to sit at this location; otherwise it sweeps downstream or drowns out. This assumes a rectangular, horizontal, prismatic channel with hydrostatic pressure and negligible boundary friction over the short jump. A design aid, not a substitute for a licensed engineer's stilling-basin design; the engineer of record governs.",
+    assumptions: [
+      { name: "Sequent depth", value: "y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1) is the momentum conjugate of the supercritical y1, not the downstream normal depth", source: "Belanger / Chow" },
+      { name: "Tailwater controls location", value: "the tailwater must supply the sequent depth for the jump to sit here; the energy loss grows steeply with Fr1", source: "Chow open-channel hydraulics" },
+    ],
+  },
   "rc-slab-min-thickness": {
     formula: "denom = {simply:20, one-end:24, both-ends:28, cantilever:10}; base = 12 l / denom; kfy = (fy == 60,000) ? 1 : 0.4 + fy/100,000; klw = (wc >= 145) ? 1 : max(1.65 - 0.005 wc, 1.09); hmin = base kfy klw.",
     edition: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) minimum thickness for deflection control, with the (0.4 + fy/100,000) non-Grade-60 modifier and the lightweight-concrete factor, by name.",

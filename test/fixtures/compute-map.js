@@ -842,6 +842,7 @@ export const COMPUTE_MAP = {
   "orifice-flow": { module: "../../calc-plumbing.js", fn: "computeOrificeFlow" },
   "tank-drain-time": { module: "../../calc-plumbing.js", fn: "computeTankDrainTime" },
   "channel-froude-number": { module: "../../calc-plumbing.js", fn: "computeChannelFroudeNumber" },
+  "hydraulic-jump": { module: "../../calc-plumbing.js", fn: "computeHydraulicJump" },
   "velocity-head": { module: "../../calc-plumbing.js", fn: "computeVelocityHead" },
   "flow-continuity": { module: "../../calc-plumbing.js", fn: "computeFlowContinuity" },
   "bernoulli-head": { module: "../../calc-plumbing.js", fn: "computeBernoulliHead" },

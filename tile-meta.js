@@ -570,7 +570,7 @@ const _TILES = [
   ["rc-slender-column-magnify", "E"],
   ["concrete-corbel-bracket", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)
-  ["time-of-concentration", "B"], ["orifice-flow", "B"], ["tank-drain-time", "B"], ["channel-froude-number", "B"],
+  ["time-of-concentration", "B"], ["orifice-flow", "B"], ["tank-drain-time", "B"], ["channel-froude-number", "B"], ["hydraulic-jump", "B"],
   ["velocity-head", "B"], ["flow-continuity", "B"], ["bernoulli-head", "B"],
   // spec-v305..v307 pump-and-fluid fundamentals batch (calc-hvac.js Group C)
   ["reynolds-number-pipe", "C"], ["hydronic-gpm-deltat", "C"], ["pump-specific-speed", "C"], ["pump-suction-specific-speed", "C"],

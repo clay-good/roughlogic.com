@@ -13910,7 +13910,7 @@
     },
     {
       "term": "hydraulic jump",
-      "target": "channel-froude-number",
+      "target": "hydraulic-jump",
       "kind": "adjacent"
     },
     {
@@ -82591,6 +82591,51 @@
     {
       "term": "balance a level circuit to the known elevation",
       "target": "level-loop-adjustment",
+      "kind": "question"
+    },
+    {
+      "term": "sequent depth",
+      "target": "hydraulic-jump",
+      "kind": "industry"
+    },
+    {
+      "term": "conjugate depth",
+      "target": "hydraulic-jump",
+      "kind": "redirect"
+    },
+    {
+      "term": "stilling basin energy loss",
+      "target": "hydraulic-jump",
+      "kind": "redirect"
+    },
+    {
+      "term": "supercritical to subcritical jump",
+      "target": "hydraulic-jump",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how deep is the water after a hydraulic jump",
+      "target": "hydraulic-jump",
+      "kind": "question"
+    },
+    {
+      "term": "sequent depth from the froude number",
+      "target": "hydraulic-jump",
+      "kind": "question"
+    },
+    {
+      "term": "how much energy does a hydraulic jump dissipate",
+      "target": "hydraulic-jump",
+      "kind": "question"
+    },
+    {
+      "term": "depth after a chute or spillway",
+      "target": "hydraulic-jump",
+      "kind": "question"
+    },
+    {
+      "term": "belanger equation for a hydraulic jump",
+      "target": "hydraulic-jump",
       "kind": "question"
     }
   ]

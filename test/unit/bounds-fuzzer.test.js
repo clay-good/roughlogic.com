@@ -20354,3 +20354,27 @@ test("bounds: spec-v631 computeLevelLoopAdjustment pins the misclosure distribut
   assert.ok("error" in _v631({ elevs: [1, 2], dists: [500, 600], known_close: Infinity }));
   assert.ok("error" in _v631({ elevs: "nope", dists: [500], known_close: 0 }));
 });
+
+import { computeHydraulicJump as _v632 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v632 computeHydraulicJump pins the Belanger sequent depth, the jump-crosses-critical property, the energy loss, and error seams", () => {
+  const r = _v632({ b_ft: 10, q_cfs: 100, y1_ft: 0.8 });
+  assert.ok(Math.abs(r.fr1 - 2.4628) < 1e-3);
+  assert.ok(Math.abs(r.y2_ft - 2.415) < 1e-3);
+  assert.ok(Math.abs(r.de_ft - 0.545) < 1e-3);
+  // A jump always carries supercritical up to subcritical: Fr2 < 1 < Fr1.
+  assert.ok(r.fr2 < 1 && r.fr1 > 1);
+  assert.ok(r.y2_ft > 0.8 && r.efficiency < 1); // deeper and dissipates energy
+  // Momentum symmetry: recomputing the jump from y2 (now the subcritical side) is not supercritical, so it errors.
+  assert.ok("error" in _v632({ b_ft: 10, q_cfs: 100, y1_ft: r.y2_ft }));
+  // Stronger jump: more discharge raises Fr1, y2, and the energy loss.
+  const strong = _v632({ b_ft: 10, q_cfs: 200, y1_ft: 0.8 });
+  assert.ok(Math.abs(strong.fr1 - 4.9257) < 1e-3);
+  assert.ok(strong.de_ft > r.de_ft && strong.y2_ft > r.y2_ft);
+  // Error seams: non-finite, non-positive width / discharge / depth, subcritical upstream.
+  assert.ok("error" in _v632({ b_ft: 0, q_cfs: 100, y1_ft: 0.8 }));
+  assert.ok("error" in _v632({ b_ft: 10, q_cfs: 0, y1_ft: 0.8 }));
+  assert.ok("error" in _v632({ b_ft: 10, q_cfs: 100, y1_ft: 0 }));
+  assert.ok("error" in _v632({ b_ft: 10, q_cfs: 100, y1_ft: 2 })); // Fr1 < 1, no jump
+  assert.ok("error" in _v632({ b_ft: Infinity, q_cfs: 100, y1_ft: 0.8 }));
+});

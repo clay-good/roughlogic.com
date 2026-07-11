@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): spec-v632 hydraulic jump sequent depth and energy loss; 2026-07-11
+
+Lands `hydraulic-jump` (Group B, calc-plumbing.js), the conjugate-depth follow-on spec-v304 named beside `channel-froude-number`. Belanger's momentum relation gives the sequent depth y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1) and the specific-energy loss dE = (y2 - y1)^3/(4 y1 y2). A 10 ft channel at 100 cfs and a shooting 0.8 ft depth (Fr1 2.46) jumps to 2.42 ft and throws away 0.55 ft of head; at 200 cfs (Fr1 4.93) it jumps to 5.19 ft killing 5.1 ft - why a stilling basin is sized to the Froude number. Pure Belanger momentum, universal g, no proprietary constants. Catalog 1,079 -> 1,080 (version 0.221.0).
+
 ### feat(survey): spec-v631 level-loop misclosure distribution (compass rule); 2026-07-11
 
 Lands `level-loop-adjustment` (Group P, calc-survey.js), the adjustment-distribution follow-on spec-v311 named inside `differential-leveling` ("a proportional adjustment is a follow-on"). Correction to each turning point = -misclosure x (distance leveled to it / total distance) - the vertical analog of the compass rule the `traverse-closure` tile applies to horizontal work. A three-leg loop closing 0.05 ft high over 2,000 ft puts -0.0125 ft on the first point at 500 ft and the full -0.05 ft on the last, so the adjusted elevations land exactly on the known benchmark. Pure distance-weighted arithmetic, no constants. Raises the calc-survey.js gzip cap 8,000 -> 9,000 (array in/out renderer). Catalog 1,078 -> 1,079 (version 0.220.0).

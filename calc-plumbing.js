@@ -3826,6 +3826,53 @@ function _v304renderChannelFroudeNumber(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["channel-froude-number"] = _v304renderChannelFroudeNumber;
 
+// dims: in { b_ft: L, q_cfs: L^3 T^-1, y1_ft: L } out: { v1_fps: L T^-1, fr1: dimensionless, y2_ft: L, fr2: dimensionless, de_ft: L, efficiency: dimensionless }
+export function computeHydraulicJump({ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_ft > 0)) return { error: "Channel width must be positive (ft)." };
+  if (!(q_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(y1_ft > 0)) return { error: "Upstream depth must be positive (ft)." };
+  const v1_fps = q_cfs / (b_ft * y1_ft);
+  const fr1 = v1_fps / Math.sqrt(32.2 * y1_ft);
+  if (!(fr1 > 1)) return { error: "Upstream flow must be supercritical (Fr1 > 1) for a hydraulic jump to form; this depth gives Fr1 = " + fr1.toFixed(2) + "." };
+  const y2_ft = (y1_ft / 2) * (Math.sqrt(1 + 8 * fr1 * fr1) - 1);
+  const v2_fps = q_cfs / (b_ft * y2_ft);
+  const fr2 = v2_fps / Math.sqrt(32.2 * y2_ft);
+  const de_ft = Math.pow(y2_ft - y1_ft, 3) / (4 * y1_ft * y2_ft);
+  const e1 = y1_ft + v1_fps * v1_fps / (2 * 32.2);
+  const e2 = y2_ft + v2_fps * v2_fps / (2 * 32.2);
+  const efficiency = e2 / e1;
+  const jump_type = fr1 < 1.7 ? "undular (Fr1 1-1.7, a rippled surface)" : (fr1 < 2.5 ? "weak (Fr1 1.7-2.5)" : (fr1 < 4.5 ? "oscillating (Fr1 2.5-4.5, an unstable surface jet)" : (fr1 < 9 ? "steady (Fr1 4.5-9, the best-performing basin range)" : "strong (Fr1 > 9, rough and choppy)")));
+  return {
+    v1_fps, fr1, y2_ft, v2_fps, fr2, de_ft, e1, e2, efficiency, jump_type, height_ft: y2_ft - y1_ft,
+    note: "Belanger momentum sequent (conjugate) depth y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1) for a rectangular horizontal channel, with the specific-energy loss dE = (y2 - y1)^3 / (4 y1 y2) and the downstream/upstream energy efficiency, as compiled in Chow (Open-Channel Hydraulics). The jump carries a supercritical (Fr1 > 1) flow up to its subcritical sequent depth, dissipating energy in the turbulence; the tailwater must actually supply that depth for the jump to sit at this location (otherwise it sweeps downstream or drowns out). Rectangular, horizontal, prismatic channel, hydrostatic pressure, negligible boundary friction over the short jump. A design aid; the engineer of record's stilling-basin design governs.",
+  };
+}
+export const hydraulicJumpExample = { inputs: { b_ft: 10, q_cfs: 100, y1_ft: 0.8 } };
+
+function _v632renderHydraulicJump(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Belanger sequent depth y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1) and the energy loss dE = (y2 - y1)^3/(4 y1 y2) for a rectangular channel, g = 32.2 ft/s^2, as compiled in Chow, by name. Supercritical upstream (Fr1 > 1); the tailwater must supply the sequent depth. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { b.input.value = "10"; q.input.value = "100"; y1.input.value = "0.8"; update(); });
+  const b = makeNumber("Channel width b (ft)", "hj-b", { step: "any", min: "0" });
+  const q = makeNumber("Discharge Q (cfs)", "hj-q", { step: "any", min: "0" });
+  const y1 = makeNumber("Upstream (supercritical) depth y1 (ft)", "hj-y1", { step: "any", min: "0" });
+  for (const f of [b, q, y1]) inputRegion.appendChild(f.wrap);
+  const oFr1 = makeOutputLine(outputRegion, "Upstream Fr1 / jump type", "hj-out-fr1");
+  const oY2 = makeOutputLine(outputRegion, "Sequent depth y2 / Fr2", "hj-out-y2");
+  const oDE = makeOutputLine(outputRegion, "Energy loss / efficiency", "hj-out-de");
+  const oNote = makeOutputLine(outputRegion, "Note", "hj-out-n");
+  const update = debounce(() => {
+    const r = computeHydraulicJump({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y1_ft: Number(y1.input.value) || 0 });
+    if (r.error) { oFr1.textContent = r.error; oY2.textContent = "-"; oDE.textContent = "-"; oNote.textContent = "-"; return; }
+    oFr1.textContent = fmt(r.fr1, 2) + " - " + r.jump_type;
+    oY2.textContent = fmt(r.y2_ft, 2) + " ft (rise " + fmt(r.height_ft, 2) + " ft), Fr2 " + fmt(r.fr2, 2);
+    oDE.textContent = fmt(r.de_ft, 3) + " ft of head lost (" + fmt(r.efficiency * 100, 0) + "% energy retained)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b, q, y1]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["hydraulic-jump"] = _v632renderHydraulicJump;
+
 // ===================== spec-v371..v373: pipe-flow energy batch (Group B) =====================
 // The Bernoulli energy pieces the friction and pressure tiles use but never
 // expose: the velocity head and dynamic pressure (v371), the continuity velocity
