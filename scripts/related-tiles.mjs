@@ -744,6 +744,7 @@ const RELATED = {
   "search-track-spacing": ["search-probability", "area-by-coordinates", "pacing-distance"],
   "sweat-rate-hydration": ["heat-stress", "wind-chill", "backcountry-needs"],
   "searcher-hours": ["search-track-spacing", "search-probability", "sweat-rate-hydration"],
+  "sweep-width-correction": ["search-track-spacing", "searcher-hours", "search-probability"],
   "iso-nff": ["required-fire-flow", "hydrant-flow", "nfpa-1142-water-supply"],
   "scba-cylinder-time": ["confined-space-vent"],
   "nfpa-1142-water-supply": ["required-fire-flow", "iso-nff", "hydrant-flow"],

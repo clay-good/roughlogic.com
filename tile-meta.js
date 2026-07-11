@@ -248,6 +248,7 @@ const _TILES = [
   ["search-track-spacing", "P"],
   ["sweat-rate-hydration", "P"],
   ["searcher-hours", "P"],
+  ["sweep-width-correction", "P"],
   ["scba-cylinder-time", "F"], ["nfpa-1142-water-supply", "F"],
   ["confined-space-vent", "F"],
   ["standpipe-pdp", "F"], ["smoke-ejector-cfm", "F"],

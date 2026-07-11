@@ -81692,6 +81692,56 @@
       "term": "how much power does a paddle flocculator use",
       "target": "flocculator-paddle-power",
       "kind": "question"
+    },
+    {
+      "term": "sweep width correction",
+      "target": "sweep-width-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "corrected sweep width",
+      "target": "sweep-width-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "effective sweep width",
+      "target": "sweep-width-correction",
+      "kind": "industry"
+    },
+    {
+      "term": "weather correction factor",
+      "target": "sweep-width-correction",
+      "kind": "adjacent"
+    },
+    {
+      "term": "detection range correction",
+      "target": "sweep-width-correction",
+      "kind": "redirect"
+    },
+    {
+      "term": "correct sweep width for weather and fatigue",
+      "target": "sweep-width-correction",
+      "kind": "question"
+    },
+    {
+      "term": "raw detection range to effective sweep width",
+      "target": "sweep-width-correction",
+      "kind": "question"
+    },
+    {
+      "term": "how much does fatigue cut sweep width",
+      "target": "sweep-width-correction",
+      "kind": "question"
+    },
+    {
+      "term": "sweep width weather speed fatigue factors",
+      "target": "sweep-width-correction",
+      "kind": "question"
+    },
+    {
+      "term": "effective sweep width after corrections",
+      "target": "sweep-width-correction",
+      "kind": "question"
     }
   ]
 }

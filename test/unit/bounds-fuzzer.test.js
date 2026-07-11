@@ -19826,3 +19826,37 @@ test("bounds: spec-v613 computeFlocculatorPaddlePower pins the drag power, the c
   assert.ok("error" in _v613({ paddle_radius_ft: 6, wheel_rpm: 3, paddle_area_ft2: 40, drag_coeff: 0 }));
   assert.ok("error" in _v613({ paddle_radius_ft: 6, wheel_rpm: 3, paddle_area_ft2: 40, drag_coeff: 1.8, slip_factor: 1 }));
 });
+
+import { computeSweepWidthCorrection as _v614 } from "../../calc-rescue.js";
+
+test("bounds: spec-v614 computeSweepWidthCorrection pins the corrected width, the per-factor scaling, the identity case, and error seams", () => {
+  // Pinned worked example: 120 ft raw width, weather 0.5, speed 1.0, fatigue 0.9.
+  const r = _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, speed_factor: 1, fatigue_factor: 0.9 });
+  assert.ok(Math.abs(r.total_factor - 0.45) < 1e-9);
+  assert.ok(Math.abs(r.corrected_width_ft - 54) < 1e-9);
+  assert.ok(Math.abs(r.reduction_pct - 55) < 1e-9);
+  // Cross-check: good visibility, fatigue only.
+  const x = _v614({ uncorrected_width_ft: 250, weather_factor: 0.9, speed_factor: 1, fatigue_factor: 0.9 });
+  assert.ok(Math.abs(x.total_factor - 0.81) < 1e-9);
+  assert.ok(Math.abs(x.corrected_width_ft - 202.5) < 1e-9);
+  assert.ok(Math.abs(x.reduction_pct - 19) < 1e-9);
+  // Identity: all factors 1 leaves the width unchanged with zero reduction.
+  const id = _v614({ uncorrected_width_ft: 120, weather_factor: 1, speed_factor: 1, fatigue_factor: 1 });
+  assert.ok(Math.abs(id.corrected_width_ft - 120) < 1e-9);
+  assert.ok(Math.abs(id.reduction_pct) < 1e-9);
+  // Each factor scales the width linearly and independently.
+  const halfW = _v614({ uncorrected_width_ft: 120, weather_factor: 0.25, speed_factor: 1, fatigue_factor: 0.9 });
+  assert.ok(Math.abs(halfW.corrected_width_ft - r.corrected_width_ft / 2) < 1e-9);
+  const slow = _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, speed_factor: 1.2, fatigue_factor: 0.9 });
+  assert.ok(Math.abs(slow.corrected_width_ft - r.corrected_width_ft * 1.2) < 1e-9);
+  // Defaults: speed and fatigue omitted are 1.
+  const d = _v614({ uncorrected_width_ft: 120, weather_factor: 0.5 });
+  assert.ok(Math.abs(d.corrected_width_ft - 60) < 1e-9);
+  // Error seams: non-finite, non-positive width, factors out of band.
+  assert.ok("error" in _v614({ uncorrected_width_ft: Infinity, weather_factor: 0.5 }));
+  assert.ok("error" in _v614({ uncorrected_width_ft: 0, weather_factor: 0.5 }));
+  assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 0 }));
+  assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 1.1 }));
+  assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, speed_factor: 1.6 }));
+  assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, fatigue_factor: 1.05 }));
+});

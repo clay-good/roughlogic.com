@@ -4914,6 +4914,16 @@ export const CITATIONS = {
       { name: "Grid-walking only", value: "effort counts track-line walking; briefing, travel, rest, and detours add on top", source: "NSARC / USCG search-planning practice" },
     ],
   },
+  "sweep-width-correction": {
+    formula: "total_factor = weather_factor x speed_factor x fatigue_factor; corrected_width_ft = uncorrected_width_ft x total_factor; reduction_pct = (1 - total_factor) x 100.",
+    edition: "IAMSAR Manual Vol. II / US National SAR Supplement sweep-width correction (W = Wu x f_weather x f_speed x f_fatigue), by name.",
+    freeAccess: "Sweep-width correction practice is public (IAMSAR / US National SAR Supplement references); the incident commander and search plan govern.",
+    governance: GOVERNANCE.fire,
+    editionNote: "The uncorrected width comes from published sweep-width tables or a detection-range experiment (the raw distance at which searchers spot the target class); the weather, speed, and fatigue factors come from the published correction tables for the conditions; the corrected width is the W that search-track-spacing expects. The incident commander and search plan govern - a planning aid, not a promise of detection.",
+    assumptions: [
+      { name: "Multiplicative correction", value: "each published factor scales the width linearly and independently; weather and fatigue only degrade (factors at or below 1)", source: "IAMSAR Manual Vol. II / US National SAR Supplement" },
+    ],
+  },
   "sweat-rate-hydration": {
     formula: "sweat_loss = (pre - post) x 16 + fluid - urine; sweat_rate = sweat_loss / hours; pct_bw_loss = (pre - post) / pre x 100; rehydration = 1.5 x max(0, deficit).",
     edition: "ACSM / NATA position on fluid replacement (weigh-in/weigh-out method), by name.",

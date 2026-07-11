@@ -51108,6 +51108,8 @@
      }
     }
    }
-  }
+  },
+  {"tile_id": "sweep-width-correction", "source_publisher": "IAMSAR Manual Vol. II / US National SAR Supplement", "source_title": "sweep-width correction W = Wu x f_weather x f_speed x f_fatigue (spec-v540's named follow-on)", "source_edition_or_year": "IAMSAR / US National SAR Supplement practice", "source_section_or_page": "120 ft raw width, weather 0.5, speed 1.0, fatigue 0.9 -> total 0.45, corrected 54 ft, 55% reduction", "verified_by": "rl", "verified_on": "2026-07-10", "inputs": {"uncorrected_width_ft": 120, "weather_factor": 0.5, "speed_factor": 1, "fatigue_factor": 0.9}, "outputs": {"corrected_width_ft": {"value": 54, "tolerance": {"abs": 0.001}}, "total_factor": {"value": 0.45, "tolerance": {"abs": 0.0001}}, "reduction_pct": {"value": 55, "tolerance": {"abs": 0.001}}}},
+  {"tile_id": "sweep-width-correction", "source_publisher": "IAMSAR Manual Vol. II / US National SAR Supplement", "source_title": "cross-check: good visibility, fatigue only", "source_edition_or_year": "IAMSAR / US National SAR Supplement practice", "source_section_or_page": "250 ft raw width, weather 0.9, speed 1.0, fatigue 0.9 -> total 0.81, corrected 202.5 ft, 19% reduction", "verified_by": "rl", "verified_on": "2026-07-10", "inputs": {"uncorrected_width_ft": 250, "weather_factor": 0.9, "speed_factor": 1, "fatigue_factor": 0.9}, "outputs": {"corrected_width_ft": {"value": 202.5, "tolerance": {"abs": 0.001}}, "total_factor": {"value": 0.81, "tolerance": {"abs": 0.0001}}, "reduction_pct": {"value": 19, "tolerance": {"abs": 0.001}}}}
  ]
 }

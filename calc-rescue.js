@@ -373,6 +373,53 @@ function renderSearcherHours(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, s.input, v.input, n.input]) el.addEventListener("input", update);
 }
 
+// --- spec-v614 P: Sweep width correction for weather, speed, and fatigue (`sweep-width-correction`) ---
+// W = Wu x f_weather x f_speed x f_fatigue; the corrected width is what search-track-spacing expects as W.
+// dims: in { uncorrected_width_ft: L, weather_factor: dimensionless, speed_factor: dimensionless, fatigue_factor: dimensionless } out: { corrected_width_ft: L, total_factor: dimensionless, reduction_pct: dimensionless }
+export function computeSweepWidthCorrection({ uncorrected_width_ft = 0, weather_factor = 1, speed_factor = 1, fatigue_factor = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const wu = Number(uncorrected_width_ft) || 0;
+  const fw = Number(weather_factor) || 0;
+  const fv = Number(speed_factor) || 0;
+  const ff = Number(fatigue_factor) || 0;
+  if (!(wu > 0)) return { error: "Uncorrected sweep width must be positive (ft)." };
+  if (!(fw > 0 && fw <= 1)) return { error: "Weather factor must be in (0, 1] - weather only degrades detection." };
+  if (!(fv > 0 && fv <= 1.5)) return { error: "Speed factor must be in (0, 1.5] - near 1 at the reference pace." };
+  if (!(ff > 0 && ff <= 1)) return { error: "Fatigue factor must be in (0, 1] - 1 fresh, 0.9 typical fatigued." };
+  const total_factor = fw * fv * ff;
+  const corrected_width_ft = wu * total_factor;
+  const reduction_pct = (1 - total_factor) * 100;
+  return {
+    corrected_width_ft, total_factor, reduction_pct,
+    note: "The corrected width is the W that search-track-spacing expects; the uncorrected width comes from published sweep-width tables or a detection-range experiment, and the factors from the published correction tables for the conditions. The incident commander and search plan govern - a planning aid, not a promise of detection.",
+  };
+}
+export const sweepWidthCorrectionExample = { inputs: { uncorrected_width_ft: 120, weather_factor: 0.5, speed_factor: 1, fatigue_factor: 0.9 } };
+
+function renderSweepWidthCorrection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: The incident commander and search plan govern all SAR operations; a planning aid, not a promise of detection. Citation: IAMSAR Manual Vol. II / US National SAR Supplement sweep-width correction (W = Wu x f_weather x f_speed x f_fatigue), by name. The uncorrected width comes from published sweep-width tables or a detection-range experiment; the factors come from the published correction tables for the conditions; the corrected width is the W that search-track-spacing expects.";
+  _aeF(inputRegion, () => fillExample(sweepWidthCorrectionExample.inputs));
+  const w = _mnF("Uncorrected sweep width (ft)", "swc-w", { step: "any", min: "0" });
+  const fw = _mnF("Weather factor (0-1, 1 = clear)", "swc-fw", { step: "any", min: "0" });
+  const fv = _mnF("Speed factor (1 = reference pace)", "swc-fv", { step: "any", min: "0", value: "1" });
+  fv.input.value = "1";
+  const ff = _mnF("Fatigue factor (1 fresh, 0.9 fatigued)", "swc-ff", { step: "any", min: "0", value: "1" });
+  ff.input.value = "1";
+  for (const f of [w, fw, fv, ff]) inputRegion.appendChild(f.wrap);
+  const oW = _moF(outputRegion, "Corrected sweep width", "swc-out-w");
+  const oF = _moF(outputRegion, "Combined factor", "swc-out-f");
+  const oN = _moF(outputRegion, "Note", "swc-out-n");
+  function fillExample(x) { w.input.value = x.uncorrected_width_ft; fw.input.value = x.weather_factor; fv.input.value = x.speed_factor; ff.input.value = x.fatigue_factor; update(); }
+  const update = _debF(() => {
+    const r = computeSweepWidthCorrection({ uncorrected_width_ft: Number(w.input.value) || 0, weather_factor: Number(fw.input.value) || 0, speed_factor: fv.input.value === "" ? 1 : Number(fv.input.value) || 0, fatigue_factor: ff.input.value === "" ? 1 : Number(ff.input.value) || 0 });
+    if (r.error) { oW.textContent = r.error; oF.textContent = "-"; oN.textContent = ""; return; }
+    oW.textContent = _fmtF(r.corrected_width_ft, 1) + " ft";
+    oF.textContent = _fmtF(r.total_factor, 2) + " (" + _fmtF(r.reduction_pct, 0) + "% reduction)";
+    oN.textContent = r.note;
+  }, _DF);
+  for (const el of [w.input, fw.input, fv.input, ff.input]) el.addEventListener("input", update);
+}
+
 export const RESCUE_RENDERERS = {
   "confined-space-purge": renderConfinedSpacePurge,
   "rope-ma": renderRopeMA,
@@ -380,4 +427,5 @@ export const RESCUE_RENDERERS = {
   "search-track-spacing": renderSearchTrackSpacing,
   "sweat-rate-hydration": renderSweatRateHydration,
   "searcher-hours": renderSearcherHours,
+  "sweep-width-correction": renderSweepWidthCorrection,
 };

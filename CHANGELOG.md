@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rescue): spec-v614 sweep width correction for weather, speed, and fatigue; 2026-07-10
+
+Lands `sweep-width-correction` (Group P, calc-rescue.js), the follow-on spec-v540 named and spec-v595 re-named: the corrected sweep width that search-track-spacing requires as its W input. W = Wu x f_weather x f_speed x f_fatigue (IAMSAR Manual Vol. II / US National SAR Supplement practice); weather and fatigue factors in (0, 1], speed in (0, 1.5]. A 120 ft raw detection width in rain with a tired crew (0.5 / 1.0 / 0.9) is a 54 ft effective width - a 55% haircut before spacing is chosen. Group P audit count 12 -> 13. Catalog 1,061 -> 1,062 (version 0.203.0).
+
 ### feat(water): spec-v613 paddle flocculator power from geometry; 2026-07-10
 
 Lands `flocculator-paddle-power` (Group M, calc-treatment.js), the follow-on spec-v575 named: the power flocculation-g-value needs, from the paddle wheel. P = 0.5 x Cd x rho x A x v_rel^3; v_rel = v_tip x (1 - k) (the water slips). Cd and slip are user inputs (references disagree); the drag is exact once chosen. A 6-ft wheel at 3 rpm with 40 ft2 of blade delivers ~267 W. Raises the calc-treatment.js gzip cap 18000 -> 21000 and the tools-data.js registry cap 155000 -> 170000. Group M audit count 29 -> 30. Catalog 1,060 -> 1,061 (version 0.202.0).

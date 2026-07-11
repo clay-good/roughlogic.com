@@ -682,6 +682,8 @@ const TOOL_MODULES = (() => {
     "sweat-rate-hydration",
     // spec-v595
     "searcher-hours",
+    // spec-v614
+    "sweep-width-correction",
   ]);
   // spec-v248..v250 fire-sprinkler system-design trio: a new lazy Group F
   // cluster split off beside calc-fire.js exactly as calc-rescue.js was (the
