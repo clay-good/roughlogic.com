@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(structural): spec-v634 required plastic section modulus for a steel beam; 2026-07-11
+
+Lands `required-section-modulus` (Group E, calc-steel.js), the design inverse of `steel-beam-flexure` (spec-v314). Enter the demand moment and Fy, get the plastic section modulus Zx to pick a W-shape: LRFD Zx >= 12 Mu/(0.90 Fy); ASD Zx >= 12(1.67)Ma/Fy (AISC 360 Ch. F, Mp = Fy Zx, inverted). A 200 kip-ft LRFD demand on 50 ksi steel needs Zx 53.3 in^3 (a W16x31 works); by ASD it jumps to 80.2. Feeding the result back into the forward tile returns the demand exactly (fuzzer pins the round-trip). Pure algebra; phi_b = 0.90 and Omega = 1.67 are the same universal factors the forward tile hardcodes. Catalog 1,081 -> 1,082 (version 0.223.0).
+
 ### feat(hvac): spec-v633 isolator static deflection for a target isolation efficiency; 2026-07-11
 
 Lands `isolator-deflection` (Group C, calc-hvac.js), the mount-selection inverse of `vibration-isolation` (spec-v483). Enter the running speed and the isolation efficiency you want, get the static deflection to specify: T = 1 - efficiency, ratio = sqrt(1 + 1/T), fn = (rpm/60)/ratio, deflection = (3.13/fn)^2 in. 90% isolation of a 900 rpm fan needs 0.48 in (a 4.5 Hz mount); tighten to 95% and it nearly doubles to 0.91 in. Feeding the result back into the forward tile returns the target efficiency exactly (fuzzer pins the round-trip). Pure single-DOF algebra, same universal constant (3.13 = (1/2pi)sqrt(g)) as the forward tile. Catalog 1,080 -> 1,081 (version 0.222.0).

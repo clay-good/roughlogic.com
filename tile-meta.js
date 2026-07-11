@@ -734,7 +734,7 @@ const _TILES = [
   // spec-v263..v265 NDS sawn-lumber design trio
   ["wood-beam-bending", "E"], ["wood-beam-shear", "E"], ["wood-bolt-connection", "E"],
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (calc-steel.js)
-  ["steel-beam-flexure", "E"], ["steel-beam-shear", "E"], ["steel-column-capacity", "E"],
+  ["steel-beam-flexure", "E"], ["required-section-modulus", "E"], ["steel-beam-shear", "E"], ["steel-column-capacity", "E"],
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],
   ["shear-stud-strength", "E"], ["composite-beam-flexure", "E"], ["steel-camber", "E"],
   ["steel-floor-vibration", "E"],

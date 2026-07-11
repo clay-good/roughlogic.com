@@ -117,6 +117,38 @@ STEEL_RENDERERS["steel-beam-flexure"] = _simpleRenderer({
   compute: computeSteelBeamFlexure,
 });
 
+// ===================== spec-v634: required plastic section modulus (design inverse) =====================
+
+// dims: in { fy: M L^-1 T^-2, moment_kipft: M L^2 T^-2, method: dimensionless } out: { zx_req: L^3 }
+export function computeRequiredSectionModulus({ fy = 50, moment_kipft = 0, method = "lrfd" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(fy > 0)) return { error: "Yield stress Fy must be positive (ksi)." };
+  if (!(moment_kipft > 0)) return { error: "Demand moment must be positive (kip-ft)." };
+  const m = method === "asd" ? "asd" : "lrfd";
+  const zx_req = m === "lrfd" ? (12 * moment_kipft) / (0.90 * fy) : (12 * 1.67 * moment_kipft) / fy;
+  const basis = m === "lrfd" ? "LRFD: Zx >= 12 Mu / (phi_b Fy), phi_b = 0.90" : "ASD: Zx >= 12 Omega Ma / Fy, Omega = 1.67";
+  return {
+    zx_req, method: m, basis,
+    note: "Required plastic section modulus for a compact, fully-braced steel beam in flexure (AISC 360 Chapter F, Mp = Fy Zx), the design inverse of the flexural-capacity check. LRFD: phi_b Mn >= Mu with phi_b = 0.90 gives Zx >= 12 Mu / (0.90 Fy); ASD: Mn/Omega >= Ma with Omega = 1.67 gives Zx >= 12 (1.67) Ma / Fy (the 12 converts kip-ft to kip-in). Select the lightest W-shape whose Zx meets or exceeds this - the shape lookup is the user's, exactly as the forward tile takes Zx as an input. Assumes a compact section fully braced against lateral-torsional buckling (Lb <= Lp, Mn = Mp); a noncompact or unbraced beam needs the LTB check. A design aid; the engineer of record governs.",
+  };
+}
+export const requiredSectionModulusExample = { inputs: { fy: 50, moment_kipft: 200, method: "lrfd" } };
+STEEL_RENDERERS["required-section-modulus"] = _simpleRenderer({
+  citation: "Citation: required plastic section modulus for a compact braced beam, AISC 360 Chapter F Mp = Fy Zx inverted -- LRFD Zx >= 12 Mu/(0.90 Fy), ASD Zx >= 12(1.67)Ma/Fy, by name. Compact, fully braced (Lb <= Lp, Mn = Mp); select the lightest W-shape with Zx >= this. A design aid; the engineer of record governs.",
+  example: requiredSectionModulusExample.inputs,
+  fields: [
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", default: 50 },
+    { key: "moment_kipft", label: "Demand moment Mu (LRFD) or Ma (ASD) (kip-ft)", kind: "number" },
+    { key: "method", label: "Design method", kind: "select", options: [{ value: "lrfd", label: "LRFD (phi_b = 0.90)" }, { value: "asd", label: "ASD (Omega = 1.67)" }], default: "lrfd" },
+  ],
+  outputs: [
+    { key: "zx", id: "rsm-out-zx", label: "Required plastic section modulus Zx", value: (r) => fmt(r.zx_req, 1) + " in^3" },
+    { key: "b", id: "rsm-out-b", label: "Basis", value: (r) => r.basis + " (pick the lightest W-shape with Zx >= this)" },
+    { key: "n", id: "rsm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRequiredSectionModulus,
+});
+
 // ===================== spec-v255: steel beam web shear capacity =====================
 
 // dims: in { fy: M L^-1 T^-2, d: L, tw: L, cv1: dimensionless, omega_v: dimensionless, vu: M L T^-2 } out: { aw: L^2, vn: M L T^-2, va: M L T^-2, phi_vn: M L T^-2, util_asd: dimensionless }

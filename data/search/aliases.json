@@ -82682,6 +82682,56 @@
       "term": "how soft a mount do i need to isolate a pump",
       "target": "isolator-deflection",
       "kind": "question"
+    },
+    {
+      "term": "required section modulus",
+      "target": "required-section-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "required zx",
+      "target": "required-section-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "size a steel beam",
+      "target": "required-section-modulus",
+      "kind": "redirect"
+    },
+    {
+      "term": "beam selection modulus",
+      "target": "required-section-modulus",
+      "kind": "redirect"
+    },
+    {
+      "term": "plastic section modulus needed",
+      "target": "required-section-modulus",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what zx do i need for a steel beam",
+      "target": "required-section-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "required section modulus from the moment",
+      "target": "required-section-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "size a w shape for a demand moment",
+      "target": "required-section-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "what plastic modulus for 200 kip-ft",
+      "target": "required-section-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "required zx lrfd vs asd",
+      "target": "required-section-modulus",
+      "kind": "question"
     }
   ]
 }

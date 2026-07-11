@@ -11269,6 +11269,17 @@ export const CITATIONS = {
       { name: "ASD / LRFD factors", value: "Omega_b = 1.67 (ASD) and phi_b = 0.90 (LRFD) per §B3", source: "AISC 360-22 B3" },
     ],
   },
+  "required-section-modulus": {
+    formula: "LRFD: Zx_req = 12 Mu / (0.90 Fy); ASD: Zx_req = 12 (1.67) Ma / Fy (in^3, the 12 converts kip-ft to kip-in).",
+    edition: "AISC 360-22 Chapter F (F2.1) Mp = Fy Zx and the §B3 resistance/safety factors, inverted for the required plastic section modulus, by name.",
+    freeAccess: "The Mp = Fy Zx relation and the Omega_b / phi_b factors are stated in AISC 360, whose provisions are published; inverting them for the required Zx is public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AISC 360-22 Chapter F plastic-moment relation Mp = Fy Zx inverted for the required plastic section modulus of a compact, laterally-braced beam: LRFD phi_b Mn >= Mu with phi_b = 0.90 gives Zx >= 12 Mu / (0.90 Fy); ASD Mn / Omega_b >= Ma with Omega_b = 1.67 gives Zx >= 12 (1.67) Ma / Fy (the 12 converts kip-ft to kip-in). The designer selects the lightest W-shape whose Zx meets or exceeds the result, exactly as the forward flexural-capacity tile takes Zx as an input. This assumes a compact section fully braced against lateral-torsional buckling (Lb <= Lp, Mn = Mp); a noncompact flange or an unbraced length reduces the capacity (F3 / F2.2) and needs its own check. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Inverse of the forward tile", value: "Zx_req solves phi_b Fy Zx / 12 = Mu (LRFD) or Fy Zx / (12 Omega_b) = Ma (ASD); feeding it into steel-beam-flexure returns the demand", source: "AISC 360-22 F2 / B3" },
+      { name: "Compact + braced", value: "Mn = Mp = Fy Zx (the plastic plateau); a noncompact or unbraced beam needs the F3 / F2.2 lateral-torsional-buckling check", source: "AISC 360-22 F2" },
+    ],
+  },
   "steel-beam-shear": {
     formula: "Aw = d x tw; Vn = 0.6 x Fy x Aw x Cv1; Va = Vn / Omega_v; phi_v Vn (phi_v paired to Omega_v: 1.50/1.00 or 1.67/0.90); util = Vu / Va.",
     edition: "AISC 360-22 Chapter G (G2.1) and §B3.1 / §B3.2, by name; d and tw are read from the AISC Manual for the actual shape.",

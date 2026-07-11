@@ -557,7 +557,7 @@ const TOOL_MODULES = (() => {
   // trio: a new lazy Group E cluster (the steel-member companion to the wood-framing
   // and steel-weld tiles). All six KEEP group "E" (module independent of group letter).
   declare("./calc-steel.js", "STEEL_RENDERERS", [
-    "steel-beam-flexure", "steel-beam-shear", "steel-column-capacity",
+    "steel-beam-flexure", "required-section-modulus", "steel-beam-shear", "steel-column-capacity",
     "bolt-group-eccentric", "bolt-shear-bearing", "column-base-plate",
     // spec-v281..v283 members-and-connections depth batch
     "steel-beam-ltb", "steel-block-shear", "steel-tension-member",

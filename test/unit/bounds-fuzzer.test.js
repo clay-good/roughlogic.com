@@ -20400,3 +20400,26 @@ test("bounds: spec-v633 computeIsolatorDeflection pins the required deflection, 
   assert.ok("error" in _v633({ equipment_rpm: 900, target_efficiency: -5 }));
   assert.ok("error" in _v633({ equipment_rpm: Infinity, target_efficiency: 90 }));
 });
+
+import { computeRequiredSectionModulus as _v634, computeSteelBeamFlexure as _v634fwd } from "../../calc-steel.js";
+
+test("bounds: spec-v634 computeRequiredSectionModulus pins the LRFD/ASD required Zx, the exact round-trip through the forward tile, and error seams", () => {
+  const r = _v634({ fy: 50, moment_kipft: 200, method: "lrfd" });
+  assert.ok(Math.abs(r.zx_req - 53.3333333333) < 1e-6); // 12*200/(0.90*50)
+  assert.equal(r.method, "lrfd");
+  // Exact inverse: the required Zx makes phi_b Mn equal the LRFD demand.
+  const back = _v634fwd({ fy: 50, zx: r.zx_req, mu: 200 });
+  assert.ok(Math.abs(back.phi_mn - 200) < 1e-6);
+  // ASD needs a larger Zx (1.5x here) and its Ma equals the demand.
+  const a = _v634({ fy: 50, moment_kipft: 200, method: "asd" });
+  assert.ok(Math.abs(a.zx_req - 80.16) < 1e-6);
+  assert.ok(a.zx_req > r.zx_req);
+  const backA = _v634fwd({ fy: 50, zx: a.zx_req, mu: 0 });
+  assert.ok(Math.abs(backA.ma_kipft - 200) < 1e-6);
+  // Unknown method defaults to LRFD.
+  assert.equal(_v634({ fy: 50, moment_kipft: 200, method: "xyz" }).method, "lrfd");
+  // Error seams: non-finite, non-positive Fy / moment.
+  assert.ok("error" in _v634({ fy: 0, moment_kipft: 200 }));
+  assert.ok("error" in _v634({ fy: 50, moment_kipft: 0 }));
+  assert.ok("error" in _v634({ fy: Infinity, moment_kipft: 200 }));
+});

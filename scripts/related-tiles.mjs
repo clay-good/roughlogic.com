@@ -1074,6 +1074,7 @@ const RELATED = {
   "wood-bolt-connection": ["fastener-pullout","wood-beam-shear","deck-ledger-fasteners"],
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (Group E)
   "steel-beam-flexure": ["steel-beam-shear","steel-column-capacity","beam-loading"],
+  "required-section-modulus": ["steel-beam-flexure","steel-beam-shear","steel-camber"],
   "steel-beam-shear": ["steel-beam-flexure","steel-column-capacity","fillet-weld-strength"],
   "steel-column-capacity": ["steel-beam-flexure","steel-beam-shear","column-buckling-wood"],
   "bolt-group-eccentric": ["weld-group-eccentric","bolt-shear-bearing","steel-column-capacity"],
