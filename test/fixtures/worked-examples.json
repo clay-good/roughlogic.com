@@ -50930,6 +50930,56 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "ev-charger-throttle",
+   "source_publisher": "NEC 2023 Article 625 (625.42(A) EVEMS)",
+   "source_title": "throttled = min(charger_max, aggregate_limit / active_chargers) (spec-v561's named follow-on)",
+   "source_edition_or_year": "NEC 2023 625.42(A)",
+   "source_section_or_page": "100-A EVEMS budget, four 40-A chargers, all active -> 25 A each throttled, 2 could run full",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "aggregate_limit_a": 100,
+    "charger_max_a": 40,
+    "active_chargers": 4
+   },
+   "outputs": {
+    "throttled_a": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "full_rate_count": {
+     "value": 2,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ev-charger-throttle",
+   "source_publisher": "NEC 2023 Article 625 (625.42(A) EVEMS)",
+   "source_title": "cross-check: fewer active chargers fit at full rate",
+   "source_edition_or_year": "NEC 2023 625.42(A)",
+   "source_section_or_page": "100-A budget, 40-A chargers, only 2 active -> 40 A each (full rate, all_full true, 20 A to spare)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "aggregate_limit_a": 100,
+    "charger_max_a": 40,
+    "active_chargers": 2
+   },
+   "outputs": {
+    "throttled_a": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

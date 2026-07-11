@@ -19734,3 +19734,33 @@ test("bounds: spec-v610 computeGroundPotentialRise pins the GPR, the IEEE 80 scr
   assert.ok("error" in _v610({ grid_current_a: 200, grid_resistance_ohm: 0, tolerable_touch_v: 200 }));
   assert.ok("error" in _v610({ grid_current_a: 200, grid_resistance_ohm: 0.5, tolerable_touch_v: -1 }));
 });
+
+import { computeEvChargerThrottle as _v611 } from "../../calc-feeder.js";
+
+test("bounds: spec-v611 computeEvChargerThrottle pins the throttled current, the full-rate count, the all-full case, and error seams", () => {
+  // Pinned worked example: 100-A budget, four 40-A chargers, all active.
+  const r = _v611({ aggregate_limit_a: 100, charger_max_a: 40, active_chargers: 4 });
+  assert.ok(Math.abs(r.throttled_a - 25) < 1e-9);
+  assert.equal(r.full_rate_count, 2);
+  assert.equal(r.all_full, false);
+  assert.ok(Math.abs(r.throttled_a - Math.min(40, 100 / 4)) < 1e-9);
+  // Cross-check: only two active -> both at full rate.
+  const x = _v611({ aggregate_limit_a: 100, charger_max_a: 40, active_chargers: 2 });
+  assert.ok(Math.abs(x.throttled_a - 40) < 1e-9);
+  assert.equal(x.all_full, true);
+  // Throttled current never exceeds the charger maximum.
+  const big = _v611({ aggregate_limit_a: 1000, charger_max_a: 40, active_chargers: 1 });
+  assert.ok(Math.abs(big.throttled_a - 40) < 1e-9);
+  // More active chargers lowers each one's share.
+  const many = _v611({ aggregate_limit_a: 100, charger_max_a: 40, active_chargers: 10 });
+  assert.ok(many.throttled_a < r.throttled_a);
+  assert.ok(Math.abs(many.throttled_a - 10) < 1e-9);
+  // full_rate_count is the floor of limit / charger_max.
+  const fr = _v611({ aggregate_limit_a: 130, charger_max_a: 40, active_chargers: 4 });
+  assert.equal(fr.full_rate_count, 3); // floor(130/40)
+  // Error seams: non-finite, non-positive limit / max, active < 1.
+  assert.ok("error" in _v611({ aggregate_limit_a: Infinity, charger_max_a: 40, active_chargers: 4 }));
+  assert.ok("error" in _v611({ aggregate_limit_a: 0, charger_max_a: 40, active_chargers: 4 }));
+  assert.ok("error" in _v611({ aggregate_limit_a: 100, charger_max_a: 0, active_chargers: 4 }));
+  assert.ok("error" in _v611({ aggregate_limit_a: 100, charger_max_a: 40, active_chargers: 0 }));
+});

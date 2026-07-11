@@ -81542,6 +81542,56 @@
       "term": "ground grid rise vs tolerable touch",
       "target": "ground-potential-rise",
       "kind": "question"
+    },
+    {
+      "term": "ev charger throttle",
+      "target": "ev-charger-throttle",
+      "kind": "industry"
+    },
+    {
+      "term": "evems throttle",
+      "target": "ev-charger-throttle",
+      "kind": "industry"
+    },
+    {
+      "term": "charger current sharing",
+      "target": "ev-charger-throttle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "throttled charging current",
+      "target": "ev-charger-throttle",
+      "kind": "redirect"
+    },
+    {
+      "term": "ev load share",
+      "target": "ev-charger-throttle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much current does each ev charger get",
+      "target": "ev-charger-throttle",
+      "kind": "question"
+    },
+    {
+      "term": "ev charger throttled current under evems",
+      "target": "ev-charger-throttle",
+      "kind": "question"
+    },
+    {
+      "term": "why do my ev chargers slow down",
+      "target": "ev-charger-throttle",
+      "kind": "question"
+    },
+    {
+      "term": "how many chargers can run at full rate",
+      "target": "ev-charger-throttle",
+      "kind": "question"
+    },
+    {
+      "term": "shared ev charging current per port",
+      "target": "ev-charger-throttle",
+      "kind": "question"
     }
   ]
 }

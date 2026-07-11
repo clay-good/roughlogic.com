@@ -557,3 +557,45 @@ function _v561renderEvLoadManagementEms(inputRegion, outputRegion, citationEl) {
   sp.select.addEventListener("change", update);
 }
 FEEDER_RENDERERS["ev-load-management-ems"] = _v561renderEvLoadManagementEms;
+
+// ===================== spec-v611 A: EV charger throttled-current schedule (NEC 625.42(A)) =====================
+// throttled = min(charger_max, limit/active). full_rate_count = floor(limit/charger_max). all_full = active*charger_max <= limit.
+// dims: in { aggregate_limit_a: I, charger_max_a: I, active_chargers: dimensionless } out: { throttled_a: I, full_rate_count: dimensionless, all_full: dimensionless }
+export function computeEvChargerThrottle({ aggregate_limit_a = 0, charger_max_a = 0, active_chargers = 0 } = {}) {
+  const _g = _finiteGuard({ aggregate_limit_a, charger_max_a, active_chargers }); if (_g) return _g;
+  const limit = Number(aggregate_limit_a) || 0;
+  const cmax = Number(charger_max_a) || 0;
+  const active = Number(active_chargers) || 0;
+  if (!(limit > 0)) return { error: "EVEMS aggregate limit must be positive (A)." };
+  if (!(cmax > 0)) return { error: "Per-charger maximum must be positive (A)." };
+  if (!(active >= 1)) return { error: "Active-charger count must be at least 1." };
+  const share_a = limit / active;
+  const throttled_a = Math.min(cmax, share_a);
+  const full_rate_count = Math.floor(limit / cmax);
+  const all_full = active * cmax <= limit;
+  return {
+    throttled_a, full_rate_count, all_full, share_a,
+    note: "The EVEMS shares the aggregate limit equally among the active chargers, never above a charger's own maximum. A listed and hardware-enforced EVEMS is what permits the sharing. This is the equal-share case; priority or round-robin schemes deliver different currents. The current is what each active car receives, so more cars plugged in slows all of them. NEC 625.42(A) permits the management; the NEC and the AHJ govern - a planning aid, not the EVEMS configuration.",
+  };
+}
+export const evChargerThrottleExample = { inputs: { aggregate_limit_a: 100, charger_max_a: 40, active_chargers: 4 } };
+function _v611renderEvChargerThrottle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 625.42(A) energy management systems (EVEMS) per-charger throttling: throttled = min(charger_max, aggregate_limit / active_chargers); full_rate_count = floor(aggregate_limit / charger_max); all_full = active_chargers x charger_max <= aggregate_limit. The EVEMS shares the aggregate limit equally among the active chargers, never above a charger's own maximum. This is the equal-share case; priority or round-robin schemes differ. The listed EVEMS must be enforced in hardware. The NEC and the AHJ govern.";
+  const limit = _v26makeNumber("EVEMS aggregate limit (A)", "evt-limit", { step: "any", min: "0" });
+  const cmax = _v26makeNumber("Per-charger maximum (A)", "evt-max", { step: "any", min: "0" });
+  const active = _v26makeNumber("Active chargers (drawing at once)", "evt-active", { step: "1", min: "1" });
+  for (const f of [limit, cmax, active]) inputRegion.appendChild(f.wrap);
+  _v26attachEx(inputRegion, () => { limit.input.value = "100"; cmax.input.value = "40"; active.input.value = "4"; update(); });
+  const oThrottle = _v26makeOut(outputRegion, "Throttled current per charger", "evt-out-throttle");
+  const oFull = _v26makeOut(outputRegion, "Chargers that can run at full rate", "evt-out-full");
+  const oNote = _v26makeOut(outputRegion, "Note", "evt-out-note");
+  const update = _v26debounce(() => {
+    const r = computeEvChargerThrottle({ aggregate_limit_a: Number(limit.input.value) || 0, charger_max_a: Number(cmax.input.value) || 0, active_chargers: Number(active.input.value) || 0 });
+    if (r.error) { oThrottle.textContent = r.error; oFull.textContent = "-"; oNote.textContent = "-"; return; }
+    oThrottle.textContent = _v26fmt(r.throttled_a, 1) + " A" + (r.all_full ? " (full rate - budget fits)" : " (throttled from " + _v26fmt(cmax.input.value, 0) + " A)");
+    oFull.textContent = r.full_rate_count + " at once (of " + Number(active.input.value) + " active)";
+    oNote.textContent = r.note;
+  }, _V26_DEB);
+  for (const f of [limit, cmax, active]) f.input.addEventListener("input", update);
+}
+FEEDER_RENDERERS["ev-charger-throttle"] = _v611renderEvChargerThrottle;

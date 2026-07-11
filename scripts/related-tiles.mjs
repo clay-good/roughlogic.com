@@ -1156,6 +1156,7 @@ const RELATED = {
   "generator-conductor-445": ["generator-sizing","service-conductor-sizing","wire-ampacity"],
   "existing-load-220-87": ["service-load-optional","service-load-standard","ev-charger-load"],
   "ev-load-management-ems": ["ev-charger-load","existing-load-220-87","ev-charge-time"],
+  "ev-charger-throttle": ["ev-load-management-ems","ev-charger-load","existing-load-220-87"],
   // spec-v281..v283 steel members-and-connections depth batch (Group E)
   "steel-beam-ltb": ["steel-beam-flexure","steel-beam-shear","steel-column-capacity"],
   "steel-block-shear": ["steel-beam-shear","bolt-shear-bearing","steel-tension-member"],

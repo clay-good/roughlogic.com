@@ -2304,6 +2304,17 @@ export const CITATIONS = {
     ],
   },
 
+  "ev-charger-throttle": {
+    formula: "throttled_a = min(charger_max_a, aggregate_limit_a / active_chargers); full_rate_count = floor(aggregate_limit_a / charger_max_a); all_full = active_chargers x charger_max_a <= aggregate_limit_a.",
+    edition: NEC_2023 + " Article 625 (625.42(A) energy management systems) per-charger current sharing.",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Equal share", value: "the EVEMS shares the aggregate limit equally among active chargers, never above a charger's maximum; priority/round-robin schemes differ", source: "NEC 2023 625.42(A)" },
+      { name: "Hardware enforced", value: "a listed EVEMS whose limit is enforced in hardware is what permits the sharing", source: "NEC 2023 625.42(A); the AHJ governs" },
+    ],
+  },
   "ev-load-management-ems": {
     formula: "unmanaged_sum = 1.25 x per_charger x count; managed_demand = evems_limit > 0 ? (setpoint125 ? 1.25 : 1.0) x evems_limit : unmanaged_sum; freed_headroom = unmanaged_sum - managed_demand.",
     edition: NEC_2023 + " Article 625 (625.42(A) energy management systems) with the 2026 625.48 continuous factor on the EVEMS setpoint.",

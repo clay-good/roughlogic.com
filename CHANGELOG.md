@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): spec-v611 EV charger throttled-current schedule; 2026-07-10
+
+Lands `ev-charger-throttle` (Group A, calc-feeder.js), the follow-on spec-v561 named: what each car gets when the EVEMS throttles. throttled = min(charger_max, aggregate_limit / active_chargers); full_rate_count = floor(aggregate_limit / charger_max). Four 40-A chargers on a 100-A budget throttle to 25 A each; drop to two active and both get their full 40 A. Catalog 1,058 -> 1,059 (version 0.200.0).
+
 ### feat(electrical): spec-v610 ground potential rise screen (IEEE 80); 2026-07-10
 
 Lands `ground-potential-rise` (Group A, calc-elecdesign.js), the follow-on spec-v558 named: the yard-voltage side of step-touch-voltage. GPR = grid_current x grid_resistance, screened against the tolerable touch voltage (the IEEE 80 shortcut: a GPR at or below the tolerable touch clears the whole yard without mesh/step analysis). Repoints the "ground potential rise" alias to the dedicated tile. Catalog 1,057 -> 1,058 (version 0.199.0).

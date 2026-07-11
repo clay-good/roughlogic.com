@@ -777,6 +777,7 @@ export const COMPUTE_MAP = {
   "battery-hydrogen-vent": { module: "../../calc-electrical.js", fn: "computeBatteryHydrogenVent" },
   "existing-load-220-87": { module: "../../calc-feeder.js", fn: "computeExistingLoad22087" },
   "ev-load-management-ems": { module: "../../calc-feeder.js", fn: "computeEvLoadManagementEms" },
+  "ev-charger-throttle": { module: "../../calc-feeder.js", fn: "computeEvChargerThrottle" },
   "transformer-inrush-point": { module: "../../calc-electrical.js", fn: "computeTransformerInrushPoint" },
   "termination-temp-ampacity": { module: "../../calc-electrical.js", fn: "computeTerminationTempAmpacity" },
   "motor-fault-contribution": { module: "../../calc-motor.js", fn: "computeMotorFaultContribution" },

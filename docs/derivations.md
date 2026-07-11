@@ -1891,6 +1891,7 @@ cross-check.
 | calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedDeposition` | `{ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeContinuousLoadOcpd` | `{ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}` | _ | _ | _ |
+| calc-feeder.js | `computeEvChargerThrottle` | `{ aggregate_limit_a = 0, charger_max_a = 0, active_chargers = 0 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeEvLoadManagementEms` | `{ charger_count = 0, per_charger_a = 0, evems_limit_a = 0, apply_125_setpoint...` | _ | _ | _ |
 | calc-feeder.js | `computeExistingLoad22087` | `{ recorded_peak_a = 0, new_load_a = 0, service_rating_a = 0, pv_or_peakshave ...` | _ | _ | _ |
 | calc-feeder.js | `computeFeederTapRule` | `{ feeder_ocpd_a = 0, tap_length_ft = 0, tap_ampacity_a = 0 } = {}` | _ | _ | _ |
@@ -2716,7 +2717,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1302.
+Row count: 1303.
 
 <!-- END function-corpus-v14 -->
 
@@ -2797,7 +2798,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (139 tiles)
+### Group A Electrical (140 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2841,6 +2842,7 @@ per spec-v14 §13.1 second paragraph.
 | `ev-charge-cost` | EV Charge Cost at the Meter | EV charge-cost-at-the-meter model (en...; spec-v489 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-charge-time` | EV Charge Time (AC Level 2) | AC Level 2 EV charge-time model (SAE ...; spec-v488 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-charger-load` | EV Charger Continuous Load and Panel Impact | NFPA; I_circuit = I_charger*1.25; new_load = existing + I_circuit | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `ev-charger-throttle` | EV Charger Throttled-Current Schedule (NEC 625.42) | NEC 2023 Article 625 (625.42(A) EVEMS); 100-A EVEMS budget, four 40-A chargers, all active -> 25 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-dcfc-time` | EV DC Fast-Charge Time (CC-CV Taper) | DC fast-charge CC-CV taper model (thr...; spec-v492 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `ev-load-management-ems` | EV Load-Management (EVEMS) Diversified Load (NEC 625.42) | NEC 2023 625.42(A) / 2026 625.48; Four 40 A chargers, 80 A EVEMS -> 200 A un-managed, 100 A... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `existing-load-220-87` | Existing-Facility Load by Peak Demand (NEC 220.87) | NEC 2023 220.87; spec-v519 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3960,6 +3962,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1058. Fixture-covered or reference-cadence: 1058 / 1058.
+Tile count: 1059. Fixture-covered or reference-cadence: 1059 / 1059.
 
 <!-- END tile-index-v14 -->
