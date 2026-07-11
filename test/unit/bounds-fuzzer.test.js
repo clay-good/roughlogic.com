@@ -19465,3 +19465,39 @@ test("bounds: spec-v602 computePivotApplicationRate pins the outer-span rate, th
   assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 0, soil_intake_in_hr: 0.5 }));
   assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0 }));
 });
+
+import { computeSteelDoublerPlate as _v603 } from "../../calc-steel.js";
+
+test("bounds: spec-v603 computeSteelDoublerPlate pins the two limits, the governance switch, the no-doubler case, and error seams", () => {
+  // Pinned worked example: W14, 300-kip demand -> stability governs.
+  const r = _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 });
+  assert.ok(Math.abs(r.phi_rn_bare_kip - 0.9 * 0.6 * 50 * 14 * 0.485) < 1e-9);
+  assert.ok(Math.abs(r.shortfall_kip - (300 - r.phi_rn_bare_kip)) < 1e-9);
+  assert.ok(Math.abs(r.t_strength_in - 0.3086508) < 1e-6);
+  assert.ok(Math.abs(r.t_stability_in - (22.64 + 12.44) / 90) < 1e-9);
+  assert.equal(r.governed_by, "stability (Eq. J10-12)");
+  assert.ok(Math.abs(r.t_required_in - r.t_stability_in) < 1e-9);
+  assert.ok(Math.abs(r.t_plate_in - 0.4375) < 1e-9); // 7/16
+  // Cross-check: 600-kip demand -> strength governs.
+  const x = _v603({ required_shear_kip: 600, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 });
+  assert.ok(Math.abs(x.t_strength_in - 1.1023016) < 1e-6);
+  assert.equal(x.governed_by, "strength (J10-9 shortfall)");
+  assert.ok(Math.abs(x.t_plate_in - 1.125) < 1e-9); // 1-1/8
+  // The plate always rounds UP to the next 1/16 in.
+  assert.ok(x.t_plate_in >= x.t_required_in);
+  assert.ok(x.t_plate_in - x.t_required_in < 1 / 16);
+  // When the bare web already covers the demand, no doubler is needed.
+  const none = _v603({ required_shear_kip: 150, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 });
+  assert.equal(none.needs_doubler, false);
+  assert.equal(none.t_required_in, 0);
+  assert.equal(none.t_plate_in, 0);
+  assert.equal(none.governed_by, "none");
+  // Error seams: non-finite, non-positive shear / Fy / dc / tw / dz / wz.
+  assert.ok("error" in _v603({ required_shear_kip: Infinity, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }));
+  assert.ok("error" in _v603({ required_shear_kip: 0, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }));
+  assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 0, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }));
+  assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 0, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }));
+  assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 }));
+  assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 0, pz_width_wz_in: 12.44 }));
+  assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 0 }));
+});

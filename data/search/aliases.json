@@ -17965,7 +17965,7 @@
     },
     {
       "term": "doubler plate",
-      "target": "steel-panel-zone-shear",
+      "target": "steel-doubler-plate",
       "kind": "industry"
     },
     {
@@ -81156,6 +81156,51 @@
     {
       "term": "peak application rate under a pivot",
       "target": "pivot-application-rate",
+      "kind": "question"
+    },
+    {
+      "term": "panel zone doubler",
+      "target": "steel-doubler-plate",
+      "kind": "industry"
+    },
+    {
+      "term": "doubler thickness",
+      "target": "steel-doubler-plate",
+      "kind": "redirect"
+    },
+    {
+      "term": "web doubler plate",
+      "target": "steel-doubler-plate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "panel zone reinforcement",
+      "target": "steel-doubler-plate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how thick a doubler plate",
+      "target": "steel-doubler-plate",
+      "kind": "question"
+    },
+    {
+      "term": "doubler plate thickness for a panel zone",
+      "target": "steel-doubler-plate",
+      "kind": "question"
+    },
+    {
+      "term": "size a doubler plate for a moment connection",
+      "target": "steel-doubler-plate",
+      "kind": "question"
+    },
+    {
+      "term": "panel zone shortfall doubler",
+      "target": "steel-doubler-plate",
+      "kind": "question"
+    },
+    {
+      "term": "minimum doubler plate thickness aisc",
+      "target": "steel-doubler-plate",
       "kind": "question"
     }
   ]

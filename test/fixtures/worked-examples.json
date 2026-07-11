@@ -50400,6 +50400,86 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "steel-doubler-plate",
+   "source_publisher": "AISC 360-16 Section J10.6 (panel-zone doubler plate)",
+   "source_title": "t_required = max(strength, stability Eq. J10-12) (spec-v555's named follow-on)",
+   "source_edition_or_year": "AISC 360-16",
+   "source_section_or_page": "W14 column, 300-kip demand: phiRn_bare 183 kip, shortfall 117 kip, t_strength 0.309 in, t_stability 0.390 in governs -> 7/16 in plate",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "required_shear_kip": 300,
+    "fy_ksi": 50,
+    "col_depth_dc_in": 14,
+    "col_web_tw_in": 0.485,
+    "pz_depth_dz_in": 22.64,
+    "pz_width_wz_in": 12.44
+   },
+   "outputs": {
+    "phi_rn_bare_kip": {
+     "value": 183.33,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "t_strength_in": {
+     "value": 0.308651,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "t_stability_in": {
+     "value": 0.389778,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "t_plate_in": {
+     "value": 0.4375,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steel-doubler-plate",
+   "source_publisher": "AISC 360-16 Section J10.6 (panel-zone doubler plate)",
+   "source_title": "cross-check: a big shortfall makes strength govern",
+   "source_edition_or_year": "AISC 360-16",
+   "source_section_or_page": "Same column, 600-kip demand: shortfall 417 kip, t_strength 1.102 in governs over the 0.390 in stability -> 1-1/8 in plate",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "required_shear_kip": 600,
+    "fy_ksi": 50,
+    "col_depth_dc_in": 14,
+    "col_web_tw_in": 0.485,
+    "pz_depth_dz_in": 22.64,
+    "pz_width_wz_in": 12.44
+   },
+   "outputs": {
+    "shortfall_kip": {
+     "value": 416.67,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "t_strength_in": {
+     "value": 1.102302,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "t_plate_in": {
+     "value": 1.125,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
   }
  ]
 }

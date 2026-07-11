@@ -1068,6 +1068,7 @@ const RELATED = {
   "steel-camber": ["composite-beam-flexure","steel-beam-flexure","shear-stud-strength","beam-loading"],
   "steel-floor-vibration": ["steel-camber","joist-deflection","concrete-longterm-defl"],
   "steel-panel-zone-shear": ["steel-web-local-strength","steel-beam-shear","steel-column-capacity"],
+  "steel-doubler-plate": ["steel-panel-zone-shear","steel-web-local-strength","steel-column-capacity"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (Group E, calc-concrete.js)
   "rc-beam-flexure": ["rc-beam-shear","rc-development-length","steel-beam-flexure"],
   "rc-beam-shear": ["rc-beam-flexure","rc-development-length","steel-beam-shear"],

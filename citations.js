@@ -11102,6 +11102,17 @@ export const CITATIONS = {
       { name: "Resonant band", value: "low-frequency floors ~4-8 Hz resonate with the walking harmonic (e^(-0.35 fn) term)", source: "AISC DG11" },
     ],
   },
+  "steel-doubler-plate": {
+    formula: "phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); t_stability = (dz + wz)/90 (Eq. J10-12); t_required = max(t_strength, t_stability) when a doubler is needed.",
+    edition: "The AISC 360-16 Section J10.6 panel-zone doubler-plate provisions, Eq. J10-9 and Eq. J10-12, by name.",
+    freeAccess: "AISC 360 is available through AISC; the J10.6 panel-zone and doubler-plate provisions are published design equations.",
+    governance: GOVERNANCE.general,
+    editionNote: "The stability minimum (Eq. J10-12) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
+    assumptions: [
+      { name: "Two limits", value: "the doubler is the greater of the strength thickness (shortfall / 0.90 x 0.60 Fy dc) and the stability minimum (dz + wz)/90", source: "AISC 360-16 J10.6 / Eq. J10-12" },
+      { name: "Not plug-welded", value: "Eq. J10-12 governs per plate unless the doubler is plug-welded to the web, when the combined thickness resists buckling", source: "AISC 360-16 J10.6" },
+    ],
+  },
   "steel-panel-zone-shear": {
     formula: "Rn_basic = 0.60 Fy dc tw (J10-9); Rn_pz = Rn_basic [1 + 3 bcf tcf^2/(db dc tw)] (J10-11); phiRn = 0.90 Rn; demand = sum(Mf)/(db - tf) - Vcol.",
     edition: "The AISC 360-16 Section J10.6 panel-zone (web) shear strength, Eq. J10-9 and J10-11, by name.",

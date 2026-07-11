@@ -1048,3 +1048,57 @@ STEEL_RENDERERS["steel-panel-zone-shear"] = _simpleRenderer({
   ],
   compute: computeSteelPanelZoneShear,
 });
+
+// --- spec-v603 E: Panel-zone doubler-plate thickness sizer (AISC 360-16 J10.6 / Eq. J10-12) ---
+// phiRn_bare = 0.90*0.6*Fy*dc*tw. shortfall = max(0, Vu - phiRn_bare). t_strength = shortfall/(0.90*0.6*Fy*dc).
+// t_stability = (dz+wz)/90. t_required = shortfall>0 ? max(t_strength, t_stability) : 0. t_plate = ceil to 1/16 in.
+// dims: in { required_shear_kip: M L T^-2, fy_ksi: M L^-1 T^-2, col_depth_dc_in: L, col_web_tw_in: L, pz_depth_dz_in: L, pz_width_wz_in: L } out: { phi_rn_bare_kip: M L T^-2, shortfall_kip: M L T^-2, t_strength_in: L, t_stability_in: L, t_required_in: L, t_plate_in: L }
+export function computeSteelDoublerPlate({ required_shear_kip = 0, fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, pz_depth_dz_in = 0, pz_width_wz_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Vu = Number(required_shear_kip) || 0;
+  const Fy = Number(fy_ksi) || 0;
+  const dc = Number(col_depth_dc_in) || 0;
+  const tw = Number(col_web_tw_in) || 0;
+  const dz = Number(pz_depth_dz_in) || 0;
+  const wz = Number(pz_width_wz_in) || 0;
+  if (!(Vu > 0)) return { error: "Required panel-zone shear must be positive (kip)." };
+  if (!(Fy > 0)) return { error: "Yield strength must be positive (ksi)." };
+  if (!(dc > 0)) return { error: "Column depth must be positive (in)." };
+  if (!(tw > 0)) return { error: "Column web thickness must be positive (in)." };
+  if (!(dz > 0)) return { error: "Panel-zone depth must be positive (in)." };
+  if (!(wz > 0)) return { error: "Panel-zone width must be positive (in)." };
+  const perInch = 0.90 * 0.60 * Fy * dc;
+  const phi_rn_bare_kip = perInch * tw;
+  const shortfall_kip = Math.max(0, Vu - phi_rn_bare_kip);
+  const t_strength_in = shortfall_kip / perInch;
+  const t_stability_in = (dz + wz) / 90;
+  const needs_doubler = shortfall_kip > 0;
+  const t_required_in = needs_doubler ? Math.max(t_strength_in, t_stability_in) : 0;
+  const t_plate_in = needs_doubler ? Math.ceil(t_required_in * 16) / 16 : 0;
+  const governed_by = !needs_doubler ? "none" : (t_stability_in > t_strength_in ? "stability (Eq. J10-12)" : "strength (J10-9 shortfall)");
+  return {
+    phi_rn_bare_kip, shortfall_kip, t_strength_in, t_stability_in, t_required_in, t_plate_in, needs_doubler, governed_by,
+    note: "The stability minimum (Eq. J10-12) applies per individual doubler plate when it is not plug-welded to the web; a plug-welded doubler lets the combined thickness resist buckling. The basic bare strength (J10-9) is used for the shortfall - the flange-stiffened bonus (J10-11) is only allowed when panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further and is not applied here. Above roughly a half-inch shortfall the engineer often chooses a heavier column or a pair of plates. AISC 360 and the engineer of record govern - a detailing aid, not a stamped connection design.",
+  };
+}
+export const steelDoublerPlateExample = { inputs: { required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 12.44 } };
+STEEL_RENDERERS["steel-doubler-plate"] = _simpleRenderer({
+  citation: "Citation: AISC 360-16 Section J10.6 panel-zone doubler plate: phiRn_bare = 0.90 x 0.60 Fy dc tw; t_strength = max(0, Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); the stability minimum (Eq. J10-12) is t >= (dz + wz)/90 per individual doubler not plug-welded to the web; t_required = max(t_strength, t_stability). The basic strength (J10-9) is used for the shortfall; a high column axial load (Pr > 0.4 Pc) reduces the strength further. AISC 360 and the engineer of record govern.",
+  example: steelDoublerPlateExample.inputs,
+  fields: [
+    { key: "required_shear_kip", label: "Panel-zone shear demand Vu (kip)", kind: "number" },
+    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", default: 50 },
+    { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
+    { key: "col_web_tw_in", label: "Existing column web tw (in)", kind: "number" },
+    { key: "pz_depth_dz_in", label: "Panel-zone depth dz (in, ~ beam depth between flanges)", kind: "number" },
+    { key: "pz_width_wz_in", label: "Panel-zone width wz (in, ~ column depth between flanges)", kind: "number" },
+  ],
+  outputs: [
+    { key: "phi", id: "sdp-out-phi", label: "Bare web design strength phiRn", value: (r) => fmt(r.phi_rn_bare_kip, 0) + " kip" },
+    { key: "short", id: "sdp-out-short", label: "Shortfall to make up", value: (r) => r.needs_doubler ? fmt(r.shortfall_kip, 0) + " kip" : "0 kip - the bare web suffices, no doubler" },
+    { key: "t", id: "sdp-out-t", label: "Doubler thickness (strength / stability)", value: (r) => r.needs_doubler ? fmt(r.t_strength_in, 3) + " / " + fmt(r.t_stability_in, 3) + " in - governed by " + r.governed_by : "-" },
+    { key: "plate", id: "sdp-out-plate", label: "Required plate (next 1/16 in)", value: (r) => r.needs_doubler ? fmt(r.t_required_in, 3) + " in -> use " + fmt(r.t_plate_in, 4) + " in" : "none" },
+    { key: "n", id: "sdp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelDoublerPlate,
+});

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(steel): spec-v603 panel-zone doubler-plate thickness sizer; 2026-07-10
+
+Lands `steel-doubler-plate` (Group E, calc-steel.js), the how-thick spec-v555 left open. Strength t = (Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); stability (AISC 360-16 Eq. J10-12) t >= (dz + wz)/90; t_required = max of the two, rounded up to the next 1/16-in plate. On a stocky column with a small shortfall the stability minimum governs; on a deep beam the strength governs. Repoints the "doubler plate" search alias from steel-panel-zone-shear to the dedicated tile; raises the calc-steel.js gzip cap 21000 -> 24000. Catalog 1,050 -> 1,051 (version 0.192.0).
+
 ### feat(irrigation): spec-v602 center-pivot outer-span application rate vs soil intake; 2026-07-10
 
 Lands `pivot-application-rate` (Group L, calc-agriculture.js), the runoff check spec-v568's note promised: the outer end sweeps the biggest circle fastest, so app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band). A 1-in pass on a quarter-mile pivot turning once a day through a 100-ft band applies 3.5 in/hr at the end tower - about 7x a silt loam's 0.5 in/hr intake. Group L audit count 27 -> 28. Catalog 1,049 -> 1,050 (version 0.191.0).
