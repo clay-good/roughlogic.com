@@ -2069,6 +2069,58 @@ function renderTankerShuttleFlow(inputRegion, outputRegion, citationEl) {
 }
 FIRE_RENDERERS["tanker-shuttle-flow"] = renderTankerShuttleFlow;
 
+// --- spec-v599 F: Tanker shuttle cycle time (fill + dump + round-trip travel) ---
+// fill = tank/fill_gpm. dump = tank/dump_gpm. travel = 2*dist/speed*60. cycle = fill+dump+travel. single = tank/cycle.
+// dims: in { tank_gal: L^3, fill_gpm: L^3 T^-1, dump_gpm: L^3 T^-1, distance_mi: L, speed_mph: L T^-1 } out: { fill_min: T, dump_min: T, travel_min: T, cycle_min: T, single_tanker_gpm: L^3 T^-1 }
+export function computeTankerShuttleCycle({ tank_gal = 0, fill_gpm = 0, dump_gpm = 0, distance_mi = 0, speed_mph = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tank = Number(tank_gal) || 0;
+  const fill = Number(fill_gpm) || 0;
+  const dump = Number(dump_gpm) || 0;
+  const dist = Number(distance_mi) || 0;
+  const speed = Number(speed_mph) || 0;
+  if (!(tank > 0)) return { error: "Tank load must be positive (gal)." };
+  if (!(fill > 0)) return { error: "Fill rate must be positive (gpm)." };
+  if (!(dump > 0)) return { error: "Dump rate must be positive (gpm)." };
+  if (!(dist > 0)) return { error: "Haul distance must be positive (mi)." };
+  if (!(speed > 0)) return { error: "Road speed must be positive (mph)." };
+  const fill_min = tank / fill;
+  const dump_min = tank / dump;
+  const travel_min = 2 * dist / speed * 60;
+  const cycle_min = fill_min + dump_min + travel_min;
+  const single_tanker_gpm = tank / cycle_min;
+  return {
+    fill_min, dump_min, travel_min, cycle_min, single_tanker_gpm,
+    note: "The travel is the round trip (both directions) - counting only one way understates the cycle and oversizes the flow. The tank load is the usable water actually moved (ISO credits about 90% of nominal - use that here); the fill and dump rates are the site-limited rates, not the pump nameplate. A single tanker sustains only tank / cycle, so rural supply needs a fleet - feed this cycle to tanker-shuttle-flow for the fleet flow. The fill-site capacity and the operation govern - a planning aid, not incident command.",
+  };
+}
+export const tankerShuttleCycleExample = { inputs: { tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 } };
+function renderTankerShuttleCycle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A planning aid, not incident command; the fill-site capacity and the operation govern. Citation: IFSTA / NFPA 1142 rural water-supply shuttle cycle time, by name. fill_min = tank_gal / fill_gpm; dump_min = tank_gal / dump_gpm; travel_min = 2 x distance_mi / speed_mph x 60 (round trip); cycle_min = fill + dump + travel; single_tanker_gpm = tank_gal / cycle_min. The travel is the round trip; the tank load is the usable water moved (ISO ~90% of nominal); fill and dump are the site-limited rates. Feed the cycle to tanker-shuttle-flow for the fleet flow.";
+  const tank = makeNumber("Usable water per trip (gal)", "tsc-tank", { step: "any", min: "0", value: "3000" }); tank.input.value = "3000";
+  const fill = makeNumber("Fill-site rate (gpm)", "tsc-fill", { step: "any", min: "0", value: "1000" }); fill.input.value = "1000";
+  const dump = makeNumber("Dump / unload rate (gpm)", "tsc-dump", { step: "any", min: "0", value: "1000" }); dump.input.value = "1000";
+  const dist = makeNumber("One-way haul distance (mi)", "tsc-dist", { step: "any", min: "0", value: "2" }); dist.input.value = "2";
+  const speed = makeNumber("Average road speed (mph)", "tsc-speed", { step: "any", min: "0", value: "35" }); speed.input.value = "35";
+  for (const f of [tank, fill, dump, dist, speed]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tank.input.value = "3000"; fill.input.value = "1000"; dump.input.value = "1000"; dist.input.value = "2"; speed.input.value = "35"; update(); });
+  const oBreak = makeOutputLine(outputRegion, "Fill / dump / travel", "tsc-out-break");
+  const oCycle = makeOutputLine(outputRegion, "Round-trip cycle time", "tsc-out-cycle");
+  const oSingle = makeOutputLine(outputRegion, "One tanker sustains", "tsc-out-single");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsc-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTankerShuttleCycle({ tank_gal: readNum(tank.input), fill_gpm: readNum(fill.input), dump_gpm: readNum(dump.input), distance_mi: readNum(dist.input), speed_mph: readNum(speed.input) });
+    if (r.error) { oBreak.textContent = r.error; oCycle.textContent = "-"; oSingle.textContent = "-"; oNote.textContent = ""; return; }
+    oBreak.textContent = fmt(r.fill_min, 1) + " / " + fmt(r.dump_min, 1) + " / " + fmt(r.travel_min, 1) + " min";
+    oCycle.textContent = fmt(r.cycle_min, 1) + " min";
+    oSingle.textContent = fmt(r.single_tanker_gpm, 0) + " gpm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tank, fill, dump, dist, speed]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["tanker-shuttle-cycle"] = renderTankerShuttleCycle;
+
 // --- spec-v581 F: In-line foam eductor back-pressure / hose-lay limit ---
 // max_bp = 0.65*inlet. FL_per_100 = C*(Q/100)^2. max_length = (max_bp - nozzle - 0.434*elev)/FL_per_100*100 (>=0).
 // dims: in { inlet_pressure_psi: M L^-1 T^-2, eductor_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, nozzle_pressure_psi: M L^-1 T^-2, elevation_ft: L } out: { max_back_pressure_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_length_ft: L }

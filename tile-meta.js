@@ -588,6 +588,7 @@ const _TILES = [
   ["draft-lift-max", "F"],
   ["vacuum-lift-reading", "F"],
   ["tanker-shuttle-flow", "F"],
+  ["tanker-shuttle-cycle", "F"],
   ["foam-eductor-limit", "F"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],

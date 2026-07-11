@@ -80957,6 +80957,56 @@
       "term": "quadratic vs arithmetic mean diameter",
       "target": "quadratic-mean-diameter",
       "kind": "question"
+    },
+    {
+      "term": "shuttle cycle time",
+      "target": "tanker-shuttle-cycle",
+      "kind": "industry"
+    },
+    {
+      "term": "tanker cycle",
+      "target": "tanker-shuttle-cycle",
+      "kind": "industry"
+    },
+    {
+      "term": "fill dump travel time",
+      "target": "tanker-shuttle-cycle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "water shuttle cycle",
+      "target": "tanker-shuttle-cycle",
+      "kind": "redirect"
+    },
+    {
+      "term": "tanker turnaround",
+      "target": "tanker-shuttle-cycle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how long is a tanker shuttle cycle",
+      "target": "tanker-shuttle-cycle",
+      "kind": "question"
+    },
+    {
+      "term": "tanker cycle time from fill dump and travel",
+      "target": "tanker-shuttle-cycle",
+      "kind": "question"
+    },
+    {
+      "term": "how much water can one tanker shuttle",
+      "target": "tanker-shuttle-cycle",
+      "kind": "question"
+    },
+    {
+      "term": "water shuttle turnaround time",
+      "target": "tanker-shuttle-cycle",
+      "kind": "question"
+    },
+    {
+      "term": "fill and dump cycle for a water tender",
+      "target": "tanker-shuttle-cycle",
+      "kind": "question"
     }
   ]
 }

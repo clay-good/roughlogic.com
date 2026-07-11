@@ -19347,3 +19347,34 @@ test("bounds: spec-v598 computeQuadraticMeanDiameter pins QMD, the class-tally e
   assert.ok("error" in _v598({ tally: "-5" }));
   assert.ok("error" in _v598({ tally: "10:0" }));
 });
+
+import { computeTankerShuttleCycle as _v599 } from "../../calc-fire.js";
+
+test("bounds: spec-v599 computeTankerShuttleCycle pins the cycle breakdown, the round-trip doubling, the fill-site sensitivity, and error seams", () => {
+  // Pinned worked example: 3,000 gal, 1,000 gpm fill and dump, 2 mi at 35 mph.
+  const r = _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 });
+  assert.ok(Math.abs(r.fill_min - 3) < 1e-9);
+  assert.ok(Math.abs(r.dump_min - 3) < 1e-9);
+  assert.ok(Math.abs(r.travel_min - 2 * 2 / 35 * 60) < 1e-9);
+  assert.ok(Math.abs(r.cycle_min - (3 + 3 + 2 * 2 / 35 * 60)) < 1e-9);
+  assert.ok(Math.abs(r.single_tanker_gpm - 3000 / r.cycle_min) < 1e-9);
+  assert.ok(Math.abs(r.single_tanker_gpm - 233.333333) < 1e-5);
+  // Cross-check: a slow fill site dominates.
+  const x = _v599({ tank_gal: 5000, fill_gpm: 750, dump_gpm: 1500, distance_mi: 3, speed_mph: 40 });
+  assert.ok(Math.abs(x.cycle_min - 19) < 1e-9);
+  assert.ok(Math.abs(x.single_tanker_gpm - 263.157895) < 1e-5);
+  // Travel is the round trip: doubling the distance adds 2x the one-way time.
+  const far = _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 4, speed_mph: 35 });
+  assert.ok(Math.abs(far.travel_min - 2 * r.travel_min) < 1e-9);
+  // A slower fill site lengthens the cycle and lowers the single-tanker flow.
+  const slow = _v599({ tank_gal: 3000, fill_gpm: 500, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 });
+  assert.ok(slow.cycle_min > r.cycle_min);
+  assert.ok(slow.single_tanker_gpm < r.single_tanker_gpm);
+  // Error seams: non-finite, non-positive tank / fill / dump / distance / speed.
+  assert.ok("error" in _v599({ tank_gal: Infinity, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v599({ tank_gal: 0, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v599({ tank_gal: 3000, fill_gpm: 0, dump_gpm: 1000, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 0, distance_mi: 2, speed_mph: 35 }));
+  assert.ok("error" in _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 0, speed_mph: 35 }));
+  assert.ok("error" in _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 0 }));
+});

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): spec-v599 tanker shuttle cycle time; 2026-07-10
+
+Lands `tanker-shuttle-cycle` (Group F, calc-fire.js), the follow-on spec-v580 named: builds the cycle time tanker-shuttle-flow needs. fill = tank/fill_gpm; dump = tank/dump_gpm; travel = 2 x distance/speed (round trip); cycle = fill + dump + travel; one tanker sustains tank/cycle. A 3,000-gal tanker over a 2-mile haul at 35 mph runs a 12.9-min cycle and sustains 233 gpm alone. Group F audit count 32 -> 33. Catalog 1,046 -> 1,047 (version 0.188.0).
+
 ### feat(forester): spec-v598 quadratic mean diameter from a tally; 2026-07-10
 
 Lands `quadratic-mean-diameter` (Group L, calc-arborist.js), the follow-on spec-v564 named: the QMD reineke-sdi requires, from the tally sheet. QMD = sqrt(sum(count x DBH^2) / trees); returns the QMD, the arithmetic mean beside it, the tree count, and the tallied basal area. Accepts a diameter tally (one token per tree "12" or per class "12:40" / "12 x 40", commas or new lines). Repoints the pre-existing "quadratic mean diameter" search alias from reineke-sdi to the dedicated tile. Catalog 1,045 -> 1,046 (version 0.187.0).

@@ -4580,6 +4580,17 @@ export const CITATIONS = {
       { name: "Flow match", value: "the eductor's rated flow must equal the nozzle's flow", source: "eductor manufacturer data (TFT/Elkhart)" },
     ],
   },
+  "tanker-shuttle-cycle": {
+    formula: "fill_min = tank_gal / fill_gpm; dump_min = tank_gal / dump_gpm; travel_min = 2 x distance_mi / speed_mph x 60; cycle_min = fill_min + dump_min + travel_min; single_tanker_gpm = tank_gal / cycle_min.",
+    edition: "IFSTA / NFPA 1142 rural water-supply shuttle cycle time, by name.",
+    freeAccess: "The shuttle cycle-time relation is public fire-service / rural water-supply training material; incident command governs the actual operation.",
+    governance: GOVERNANCE.general,
+    editionNote: "The travel is the round trip (both directions) - counting only one way understates the cycle and oversizes the flow. The tank load is the usable water actually moved (ISO credits about 90% of nominal - use that here); the fill and dump rates are the site-limited rates, not the pump nameplate. A single tanker sustains only tank / cycle, so rural supply needs a fleet - feed this cycle to tanker-shuttle-flow for the fleet flow. The fill-site capacity and the operation govern - a planning aid, not incident command.",
+    assumptions: [
+      { name: "Round-trip travel", value: "travel time counts both directions (2 x one-way); the tank load is the usable ~90% of nominal", source: "IFSTA / NFPA 1142" },
+      { name: "Site-limited rates", value: "fill and dump are the site-limited rates, not the pump nameplate; the slow site dominates the cycle", source: "IFSTA / NFPA 1142" },
+    ],
+  },
   "tanker-shuttle-flow": {
     formula: "usable_gal = nominal_tank_gal x usable_fraction; shuttle_flow = usable_gal x tanker_count / cycle_time_min (cycle = fill + dump + 2 x travel).",
     edition: "ISO PPC hauled-water credit / NFPA 1142 water shuttle, by name.",

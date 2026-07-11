@@ -50138,6 +50138,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tanker-shuttle-cycle",
+   "source_publisher": "IFSTA / NFPA 1142 rural water-supply practice",
+   "source_title": "cycle = fill + dump + round-trip travel (spec-v580's named follow-on)",
+   "source_edition_or_year": "IFSTA / NFPA 1142",
+   "source_section_or_page": "3,000 gal at 1,000 gpm fill and dump, 2 mi at 35 mph -> 3 + 3 + 6.86 = 12.86 min cycle, 233 gpm one tanker",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "tank_gal": 3000,
+    "fill_gpm": 1000,
+    "dump_gpm": 1000,
+    "distance_mi": 2,
+    "speed_mph": 35
+   },
+   "outputs": {
+    "cycle_min": {
+     "value": 12.857143,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "single_tanker_gpm": {
+     "value": 233.333333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tanker-shuttle-cycle",
+   "source_publisher": "IFSTA / NFPA 1142 rural water-supply practice",
+   "source_title": "cross-check: a slow fill site dominates the cycle",
+   "source_edition_or_year": "IFSTA / NFPA 1142",
+   "source_section_or_page": "5,000 gal, 750 gpm fill, 1,500 gpm dump, 3 mi at 40 mph -> 6.67 + 3.33 + 9 = 19.0 min cycle, 263 gpm one tanker",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "tank_gal": 5000,
+    "fill_gpm": 750,
+    "dump_gpm": 1500,
+    "distance_mi": 3,
+    "speed_mph": 40
+   },
+   "outputs": {
+    "cycle_min": {
+     "value": 19,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "single_tanker_gpm": {
+     "value": 263.157895,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }
