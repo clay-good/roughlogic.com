@@ -1102,3 +1102,71 @@ STEEL_RENDERERS["steel-doubler-plate"] = _simpleRenderer({
   ],
   compute: computeSteelDoublerPlate,
 });
+
+// ===================== spec-v618: panel-zone shear under high column axial (AISC 360-16 J10-10 / J10-12) =====================
+
+// dims: in { fy_ksi: M L^-1 T^-2, col_depth_dc_in: L, col_web_tw_in: L, col_area_ag_in2: L^2, pr_kip: M L T^-2, pz_in_analysis: dimensionless, col_flange_bcf_in: L, col_flange_tcf_in: L, beam_depth_db_in: L } out: { py_kip: M L T^-2, axial_ratio: dimensionless, reduction_factor: dimensionless, rn_kip: M L T^-2, phi_rn_kip: M L T^-2 }
+export function computeSteelPanelZoneAxial({ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_area_ag_in2 = 0, pr_kip = 0, pz_in_analysis = "no", col_flange_bcf_in = 0, col_flange_tcf_in = 0, beam_depth_db_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Fy = Number(fy_ksi) || 0;
+  const dc = Number(col_depth_dc_in) || 0;
+  const tw = Number(col_web_tw_in) || 0;
+  const Ag = Number(col_area_ag_in2) || 0;
+  const Pr = Number(pr_kip) || 0;
+  const included = pz_in_analysis === true || pz_in_analysis === "yes";
+  const bcf = Number(col_flange_bcf_in) || 0;
+  const tcf = Number(col_flange_tcf_in) || 0;
+  const db = Number(beam_depth_db_in) || 0;
+  if (!(Fy > 0)) return { error: "Yield strength must be positive (ksi)." };
+  if (!(dc > 0)) return { error: "Column depth must be positive (in)." };
+  if (!(tw > 0)) return { error: "Column web thickness must be positive (in)." };
+  if (!(Ag > 0)) return { error: "Column gross area must be positive (in^2)." };
+  if (!(Pr > 0)) return { error: "Axial demand must be positive (kip) - use steel-panel-zone-shear for the no-axial case." };
+  const py_kip = Fy * Ag;
+  const axial_ratio = Pr / py_kip;
+  if (axial_ratio >= 1) return { error: "Axial demand is at or above the column axial yield Py = Fy x Ag - the column itself is past yield." };
+  let bonus = 1;
+  if (included) {
+    if (!(bcf > 0)) return { error: "Column flange width is needed for the deformation-modeled branch (in)." };
+    if (!(tcf > 0)) return { error: "Column flange thickness is needed for the deformation-modeled branch (in)." };
+    if (!(db > 0)) return { error: "Beam depth is needed for the deformation-modeled branch (in)." };
+    bonus = 1 + 3 * bcf * tcf * tcf / (db * dc * tw);
+  }
+  const threshold = included ? 0.75 : 0.40;
+  const high_axial = axial_ratio > threshold;
+  const reduction_factor = !high_axial ? 1.0 : (included ? 1.9 - 1.2 * axial_ratio : 1.4 - axial_ratio);
+  const rn_kip = 0.60 * Fy * dc * tw * bonus * reduction_factor;
+  const phi_rn_kip = 0.90 * rn_kip;
+  return {
+    py_kip, axial_ratio, bonus, high_axial, reduction_factor, rn_kip, phi_rn_kip,
+    note: (high_axial
+      ? "High-axial branch: " + (included ? "Eq. J10-12, factor 1.9 - 1.2 Pr/Pc" : "Eq. J10-10, factor 1.4 - Pr/Pc") + " applies."
+      : "Below the " + (included ? "0.75" : "0.40") + " Pc threshold the factor is 1.0 - this matches steel-panel-zone-shear exactly.")
+      + " Pc = Py = Fy x Ag (LRFD). The flange-stiffened equations are permitted only when the panel-zone deformation is accounted for in the frame analysis. Compare the reduced phiRn against the joint demand from steel-panel-zone-shear; steel-doubler-plate sizes the fix. AISC 360 and the engineer of record govern - a design aid, not a connection design.",
+  };
+}
+
+export const steelPanelZoneAxialExample = { inputs: { fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 600, pz_in_analysis: "no", col_flange_bcf_in: 14.5, col_flange_tcf_in: 0.75, beam_depth_db_in: 24 } };
+
+STEEL_RENDERERS["steel-panel-zone-axial"] = _simpleRenderer({
+  citation: "Citation: AISC 360-16 Section J10.6 panel-zone shear with column axial load: Pr <= 0.4 Pc -> Rn = 0.60 Fy dc tw (Eq. J10-9); Pr > 0.4 Pc -> x (1.4 - Pr/Pc) (Eq. J10-10); deformation-modeled: Pr <= 0.75 Pc -> Rn = 0.60 Fy dc tw [1 + 3 bcf tcf^2/(db dc tw)] (Eq. J10-11); Pr > 0.75 Pc -> x (1.9 - 1.2 Pr/Pc) (Eq. J10-12). Pc = Py = Fy Ag (LRFD); phiRn = 0.90 Rn. The flange bonus is permitted only when the panel-zone deformation is modeled. AISC 360 and the engineer of record govern.",
+  example: steelPanelZoneAxialExample.inputs,
+  fields: [
+    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", default: 50 },
+    { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
+    { key: "col_web_tw_in", label: "Column web tw (in)", kind: "number" },
+    { key: "col_area_ag_in2", label: "Column gross area Ag (in^2)", kind: "number" },
+    { key: "pr_kip", label: "Axial demand Pr at the joint (kip)", kind: "number" },
+    { key: "pz_in_analysis", label: "Panel-zone deformation in the analysis?", kind: "select", options: [{ value: "no", label: "No (J10-9 / J10-10)", selected: true }, { value: "yes", label: "Yes (J10-11 / J10-12)" }] },
+    { key: "col_flange_bcf_in", label: "Column flange width bcf (in, yes-branch)", kind: "number", default: 0 },
+    { key: "col_flange_tcf_in", label: "Column flange thickness tcf (in, yes-branch)", kind: "number", default: 0 },
+    { key: "beam_depth_db_in", label: "Beam depth db (in, yes-branch)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "ratio", id: "pza-out-ratio", label: "Axial ratio Pr / Pc", value: (r) => fmt(r.axial_ratio, 3) + " (Py = " + fmt(r.py_kip, 0) + " kip)" + (r.high_axial ? " - high-axial branch" : " - below the threshold") },
+    { key: "factor", id: "pza-out-factor", label: "Axial reduction factor", value: (r) => fmt(r.reduction_factor, 4) },
+    { key: "rn", id: "pza-out-rn", label: "Reduced Rn / phiRn", value: (r) => fmt(r.rn_kip, 1) + " kip / " + fmt(r.phi_rn_kip, 1) + " kip" },
+    { key: "n", id: "pza-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelPanelZoneAxial,
+});

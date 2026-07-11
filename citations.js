@@ -11277,6 +11277,17 @@ export const CITATIONS = {
       { name: "Low-axial case", value: "Pr <= 0.4 Pc; a higher axial load applies a further reduction not included here", source: "AISC 360-16 J10.6" },
     ],
   },
+  "steel-panel-zone-axial": {
+    formula: "Py = Fy Ag; ratio = Pr/Py; not modeled: ratio <= 0.40 -> Rn = 0.60 Fy dc tw (J10-9), else x (1.4 - ratio) (J10-10); modeled: ratio <= 0.75 -> Rn = 0.60 Fy dc tw [1 + 3 bcf tcf^2/(db dc tw)] (J10-11), else x (1.9 - 1.2 ratio) (J10-12); phiRn = 0.90 Rn.",
+    edition: "The AISC 360-16 Section J10.6 panel-zone shear strength with column axial load, Eq. J10-10 and J10-12, by name.",
+    freeAccess: "AISC 360 is available through AISC; the J10.6 panel-zone provisions are published design equations.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pc = Py = Fy x Ag (LRFD). Below the 0.40 / 0.75 Pc thresholds the factor is 1.0 and the strengths match steel-panel-zone-shear exactly; the flange-stiffened equations are permitted only when the panel-zone deformation is accounted for in the frame analysis. Compare the reduced phiRn against the joint demand from steel-panel-zone-shear; steel-doubler-plate sizes the fix. AISC 360 and the engineer of record govern - a design aid, not a connection design.",
+    assumptions: [
+      { name: "Axial thresholds", value: "the reduction starts at Pr = 0.4 Pc (not modeled) or 0.75 Pc (modeled); Pc = Py = Fy Ag for LRFD", source: "AISC 360-16 J10.6" },
+      { name: "Capacity only", value: "the joint shear demand comes from the steel-panel-zone-shear sibling; this tile returns the reduced capacity", source: "AISC 360-16 J10.6" },
+    ],
+  },
   "rc-beam-flexure": {
     formula: "a = As x fy / (0.85 x f'c x b); Mn = As x fy x (d - a/2); phi Mn = 0.90 x Mn (tension-controlled); util = Mu / phi Mn.",
     edition: "ACI 318-19 (Building Code Requirements for Structural Concrete), by name: §22.2.2.4.1 (equivalent rectangular stress block), §22.2 (nominal flexural strength), §21.2.2 (phi = 0.90 tension-controlled).",

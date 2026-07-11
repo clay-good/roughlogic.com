@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(steel): spec-v618 panel-zone shear under high column axial (AISC 360-16 J10-10/J10-12); 2026-07-10
+
+Lands `steel-panel-zone-axial` (Group E, calc-steel.js), the follow-on spec-v555 named: the axial reduction its low-axial tile flags but does not carry. Py = Fy Ag; past Pr = 0.4 Pc the basic strength takes (1.4 - Pr/Pc) (Eq. J10-10), past 0.75 Pc the deformation-modeled strength takes (1.9 - 1.2 Pr/Pc) (Eq. J10-12); below the thresholds it reproduces steel-panel-zone-shear exactly. Pinned: a 14 in / 0.5 in web column at Pr 600 of Py 1,325 checks phiRn 179.0 kip. Catalog 1,065 -> 1,066 (version 0.207.0).
+
 ### feat(concrete): spec-v617 concrete anchor side-face blowout (ACI 318-19 17.6.4); 2026-07-10
 
 Lands `concrete-anchor-blowout` (Group E, calc-concrete.js), completing the headed-anchor tension triad spec-v548 named (breakout v548, pullout v612, blowout here): the deep-anchor-near-an-edge mode. Nsb = 160 x c_a1 x sqrt(Abrg) x lambda_a x sqrt(f'c); corner cut (1 + c_a2/c_a1)/4 where c_a2 < 3 c_a1; phiNsb = 0.70 x Nsb; applicability flag hef > 2.5 c_a1 (shallower anchors are governed by breakout). The v612 example anchor at a 3 in edge checks 17.2 kip design, 10.0 kip in a corner. Catalog 1,064 -> 1,065 (version 0.206.0).

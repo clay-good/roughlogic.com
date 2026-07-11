@@ -81892,6 +81892,56 @@
       "term": "when does side face blowout govern",
       "target": "concrete-anchor-blowout",
       "kind": "question"
+    },
+    {
+      "term": "panel zone high axial",
+      "target": "steel-panel-zone-axial",
+      "kind": "industry"
+    },
+    {
+      "term": "high axial panel zone",
+      "target": "steel-panel-zone-axial",
+      "kind": "industry"
+    },
+    {
+      "term": "panel zone axial reduction",
+      "target": "steel-panel-zone-axial",
+      "kind": "adjacent"
+    },
+    {
+      "term": "aisc j10-10",
+      "target": "steel-panel-zone-axial",
+      "kind": "redirect"
+    },
+    {
+      "term": "aisc j10-12",
+      "target": "steel-panel-zone-axial",
+      "kind": "redirect"
+    },
+    {
+      "term": "panel zone shear with high column axial load",
+      "target": "steel-panel-zone-axial",
+      "kind": "question"
+    },
+    {
+      "term": "does axial load reduce panel zone shear",
+      "target": "steel-panel-zone-axial",
+      "kind": "question"
+    },
+    {
+      "term": "1.4 minus pr over pc panel zone",
+      "target": "steel-panel-zone-axial",
+      "kind": "question"
+    },
+    {
+      "term": "panel zone strength above 0.4 pc",
+      "target": "steel-panel-zone-axial",
+      "kind": "question"
+    },
+    {
+      "term": "column axial effect on moment frame joint shear",
+      "target": "steel-panel-zone-axial",
+      "kind": "question"
     }
   ]
 }

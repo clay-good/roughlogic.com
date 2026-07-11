@@ -2609,6 +2609,7 @@ cross-check.
 | calc-steel.js | `computeSteelFilletWeldSize` | `{ t1_in = 0, t2_in = 0, w_in = 0 } = {}` | _ | _ | _ |
 | calc-steel.js | `computeSteelFloorVibration` | `{ natural_freq_hz = 0, effective_wt_lb = 0, damping_ratio = 0.03, walker_forc...` | _ | _ | _ |
 | calc-steel.js | `computeSteelH1Interaction` | `{ pr_kip = 0, pc_kip = 0, mrx_kft = 0, mcx_kft = 0, mry_kft = 0, mcy_kft = 0 ...` | _ | _ | _ |
+| calc-steel.js | `computeSteelPanelZoneAxial` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_area_ag_in2 = 0, p...` | _ | _ | _ |
 | calc-steel.js | `computeSteelPanelZoneShear` | `{ fy_ksi = 50, col_depth_dc_in = 0, col_web_tw_in = 0, col_flange_bcf_in = 0,...` | _ | _ | _ |
 | calc-steel.js | `computeSteelTensionMember` | `{ ag_in2 = 0, fy = 36, fu = 58, t_in = 0, dh_in = 0.875, nh = 0, xbar_in = 0,...` | _ | _ | _ |
 | calc-steel.js | `computeSteelWebLocalStrength` | `{ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interio...` | _ | _ | _ |
@@ -2723,7 +2724,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1309.
+Row count: 1310.
 
 <!-- END function-corpus-v14 -->
 
@@ -3213,7 +3214,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (223 tiles)
+### Group E Construction (224 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3402,6 +3403,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-fillet-weld-size` | Fillet Weld Size Limits and Effective Throat (AISC 360 J2.2b) | AISC 360-22 Table J2.4 / J2.2b; spec-v295 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-floor-vibration` | Steel Floor Walking Vibration (AISC DG11) | AISC Design Guide 11 (2nd ed.) walkin...; fn 5 Hz, W 30000 lb, beta 0.03, P0 65 lb, limit 0.5% -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-h1-interaction` | Steel Beam-Column Combined Axial and Flexure (AISC 360 H1.1) | AISC 360-22 H1.1; spec-v314 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `steel-panel-zone-axial` | Panel-Zone Shear Under High Column Axial (AISC 360 J10-10/J10-12) | AISC 360-16; Fy 50, dc 14, tw 0.5, Ag 26.5 (Py 1,325), Pr 600, not mod... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-panel-zone-shear` | Column Web Panel-Zone Shear (AISC 360 J10.6) | AISC 360-16 Section J10.6 (panel-zone...; W14 Fy50 dc14 tw0.5, 24 in beam, Mf 5500, Vcol 40, basic ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-tension-member` | Steel Tension Member: Yield and Rupture with Shear Lag (AISC 360 D2/D3) | AISC 360-22 Chapter D (D2 / D3, Table...; spec-v283 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `steel-web-local-strength` | Steel Web Local Yielding and Crippling (AISC 360 J10) | AISC 360-22 J10.2 / J10.3; spec-v293 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3974,6 +3976,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1065. Fixture-covered or reference-cadence: 1065 / 1065.
+Tile count: 1066. Fixture-covered or reference-cadence: 1066 / 1066.
 
 <!-- END tile-index-v14 -->

@@ -19962,3 +19962,38 @@ test("bounds: spec-v617 computeConcreteAnchorBlowout pins Nsb, the corner factor
   assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, lambda: 1.2 }));
   assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 2 }));
 });
+
+import { computeSteelPanelZoneAxial as _v618 } from "../../calc-steel.js";
+
+test("bounds: spec-v618 computeSteelPanelZoneAxial pins J10-10 and J10-12, the low-axial identity, the threshold seams, and error seams", () => {
+  // Pinned worked example: Eq. J10-10 (not modeled, ratio 0.4528).
+  const r = _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 600, pz_in_analysis: "no" });
+  assert.ok(Math.abs(r.py_kip - 1325) < 1e-9);
+  assert.ok(Math.abs(r.axial_ratio - 600 / 1325) < 1e-12);
+  assert.ok(Math.abs(r.reduction_factor - (1.4 - 600 / 1325)) < 1e-12);
+  assert.ok(Math.abs(r.rn_kip - 198.9057) < 0.001);
+  assert.ok(Math.abs(r.phi_rn_kip - 179.0151) < 0.001);
+  assert.ok(r.high_axial === true);
+  // Cross-check: Eq. J10-12 (modeled, ratio 0.8302).
+  const y = _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 1100, pz_in_analysis: "yes", col_flange_bcf_in: 14.5, col_flange_tcf_in: 0.75, beam_depth_db_in: 24 });
+  assert.ok(Math.abs(y.bonus - (1 + 3 * 14.5 * 0.75 * 0.75 / (24 * 14 * 0.5))) < 1e-12);
+  assert.ok(Math.abs(y.reduction_factor - (1.9 - 1.2 * 1100 / 1325)) < 1e-12);
+  assert.ok(Math.abs(y.rn_kip - 217.4352) < 0.001);
+  assert.ok(Math.abs(y.phi_rn_kip - 195.6917) < 0.001);
+  // Low-axial identity: below the threshold the factor is 1.0 and Rn matches the sibling's basic strength.
+  const lo = _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 400, pz_in_analysis: "no" });
+  assert.ok(lo.reduction_factor === 1 && lo.high_axial === false);
+  assert.ok(Math.abs(lo.rn_kip - 0.60 * 50 * 14 * 0.5) < 1e-9);
+  // Threshold seams: ratio exactly 0.40 (and 0.75 modeled) take factor 1.0.
+  const t1 = _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 530, pz_in_analysis: "no" });
+  assert.ok(t1.axial_ratio === 0.4 && t1.reduction_factor === 1);
+  const t2 = _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 993.75, pz_in_analysis: "yes", col_flange_bcf_in: 14.5, col_flange_tcf_in: 0.75, beam_depth_db_in: 24 });
+  assert.ok(t2.axial_ratio === 0.75 && t2.reduction_factor === 1);
+  // Error seams: non-finite, non-positive inputs, Pr >= Py, missing yes-branch geometry.
+  assert.ok("error" in _v618({ fy_ksi: Infinity, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 600 }));
+  assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 0, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 600 }));
+  assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 0, pr_kip: 600 }));
+  assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 0 }));
+  assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 1325 }));
+  assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 1100, pz_in_analysis: "yes" }));
+});
