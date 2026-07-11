@@ -82292,6 +82292,56 @@
       "term": "submerged backfill doubles the thrust on a wall",
       "target": "submerged-earth-pressure",
       "kind": "question"
+    },
+    {
+      "term": "sloped backfill pressure",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "inclined backfill earth pressure",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "rankine sloped ka",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "backfill slope thrust",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "sloping ground behind retaining wall",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how does a sloped backfill change the earth pressure",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "rankine coefficient for an inclined backfill surface",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "earth pressure when the ground slopes up behind the wall",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "why does the wall thrust tilt with a sloped backfill",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "backfill slope steeper than friction angle cannot be retained",
+      "target": "sloped-backfill-earth-pressure",
+      "kind": "question"
     }
   ]
 }

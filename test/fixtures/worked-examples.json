@@ -36182,6 +36182,76 @@
    }
   },
   {
+   "tile_id": "sloped-backfill-earth-pressure",
+   "source_publisher": "Rankine sloped-backfill as compiled in Das / NAVFAC DM-7.02",
+   "source_title": "15 deg bermed backfill: Ka 0.373 (vs 0.333 level), Pa 2,238 lb/ft parallel to slope, Pa_h 2,161 lb/ft",
+   "source_edition_or_year": "spec-v626 worked example (machine-verified)",
+   "source_section_or_page": "spec-v626 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "phi": 30,
+    "beta": 15,
+    "gamma": 120,
+    "h_ft": 10
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.3729,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pa": {
+     "value": 2237.7,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pa_h": {
+     "value": 2161.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pa_v": {
+     "value": 579.2,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sloped-backfill-earth-pressure",
+   "source_publisher": "Rankine sloped-backfill as compiled in Das / NAVFAC DM-7.02",
+   "source_title": "cross-check: beta 29 deg approaching phi 30 -> Ka 0.660, Pa 3,960 lb/ft, nearly 2x the level value",
+   "source_edition_or_year": "spec-v626 worked example (machine-verified)",
+   "source_section_or_page": "spec-v626 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "phi": 30,
+    "beta": 29,
+    "gamma": 120,
+    "h_ft": 10
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.66,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pa": {
+     "value": 3960.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "retaining-wall-stability",
    "source_publisher": "Das / NAVFAC DM-7.02 stability checks vs IBC 1807.2.3",
    "source_title": "10 ft cantilever wall, 6 ft base, phi 30 at 110 pcf, dry -> FS overturning 3.37, FS sliding 1.69, toe 1,731 psf, all pass",

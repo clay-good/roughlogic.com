@@ -11437,6 +11437,17 @@ export const CITATIONS = {
       { name: "Fully submerged, drainage relieves it", value: "the water table stands at the top of the retained height (worst case); a working drain that unsaturates the backfill removes the hydrostatic term", source: "Das / NAVFAC DM-7.02" },
     ],
   },
+  "sloped-backfill-earth-pressure": {
+    formula: "Ka = cos b (cos b - sqrt(cos^2 b - cos^2 phi)) / (cos b + sqrt(cos^2 b - cos^2 phi)); Pa = 0.5 Ka gamma H^2 parallel to the slope at H/3; Pa_h = Pa cos b, Pa_v = Pa sin b; Ka0 = (1 - sin phi)/(1 + sin phi) for contrast.",
+    edition: "Rankine sloped-backfill active pressure, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures), by name.",
+    freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual; the Rankine inclined-surface coefficient is public and printed in every soil-mechanics text.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rankine sloped-backfill active coefficient Ka = cos b (cos b - sqrt(cos^2 b - cos^2 phi))/(cos b + sqrt(cos^2 b - cos^2 phi)) for a backfill surface rising at beta above horizontal - the resultant Pa = 0.5 Ka gamma H^2 acts parallel to the slope at H/3, with a horizontal component Pa cos beta that overturns the wall and a vertical component Pa sin beta on the heel - as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). gamma defaults to 120 pcf, beta to 0. The cohesionless, vertical-wall, planar-sloping-surface case: beta must stay below phi (at or past the angle of repose the coefficient breaks down and the slope cannot be retained on Rankine terms), and the level-backfill Ka0 = (1 - sin phi)/(1 + sin phi) is shown for contrast. Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
+    assumptions: [
+      { name: "Resultant parallel to the slope", value: "the sloped-backfill Rankine thrust acts at the backfill inclination beta, not horizontally; only the Pa cos beta component overturns the wall while Pa sin beta bears on the heel", source: "Rankine / Das / NAVFAC DM-7.02" },
+      { name: "beta below phi", value: "a backfill steeper than the soil's own friction angle is at or past its angle of repose; the Rankine active state breaks down and a gravity/cantilever wall cannot retain it on these terms", source: "Das / NAVFAC DM-7.02" },
+    ],
+  },
   "retaining-wall-stability": {
     formula: "FS_ot = Mr / Mo; FS_sl = mu x sum(V) / Pa; e = B/2 - (Mr - Mo)/sum(V); q_max,min = (sum(V)/B) x (1 +/- 6e/B); Rankine Pa = 0.5 Ka gamma H^2 + Ka q H.",
     edition: "The standard cantilever-retaining-wall global-stability checks as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for sliding and overturning, by name.",

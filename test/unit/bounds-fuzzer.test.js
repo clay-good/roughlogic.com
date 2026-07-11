@@ -20197,3 +20197,33 @@ test("bounds: spec-v625 computeSubmergedEarthPressure pins the buoyant soil + hy
   assert.ok("error" in _v625({ phi: 50, gamma_sat: 125, h_ft: 10 }));
   assert.ok("error" in _v625({ phi: NaN, gamma_sat: 125, h_ft: 10 }));
 });
+
+import { computeSlopedBackfillEarthPressure as _v626 } from "../../calc-geotech.js";
+
+test("bounds: spec-v626 computeSlopedBackfillEarthPressure pins the sloped Ka, the parallel-resultant components, the beta=0 level reduction, and error seams", () => {
+  const r = _v626({ phi: 30, beta: 15, gamma: 120, h_ft: 10 });
+  assert.ok(Math.abs(r.ka - 0.3729498583707376) < 1e-9);
+  assert.ok(Math.abs(r.ka0 - 1 / 3) < 1e-12);
+  assert.ok(Math.abs(r.pa - 2237.6991502244255) < 1e-6);
+  assert.ok(Math.abs(r.pa_h - r.pa * Math.cos(15 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.pa_v - r.pa * Math.sin(15 * Math.PI / 180)) < 1e-9);
+  assert.ok(r.ka > r.ka0); // a slope raises the coefficient above the level value
+  // beta = 0 reduces exactly to the level Rankine coefficient with no vertical component.
+  const level = _v626({ phi: 30, beta: 0, gamma: 120, h_ft: 10 });
+  assert.ok(Math.abs(level.ka - level.ka0) < 1e-12);
+  assert.ok(Math.abs(level.pa_v) < 1e-12);
+  assert.ok(Math.abs(level.pa - 2000) < 1e-9);
+  // Cross-check: beta approaching phi runs the coefficient up.
+  const steep = _v626({ phi: 30, beta: 29, gamma: 120, h_ft: 10 });
+  assert.ok(Math.abs(steep.ka - 0.6600119781452246) < 1e-9);
+  assert.ok(steep.pa > 1.95 * level.pa); // nearly 2x the level thrust (1.98x)
+  // Error seams: non-finite, non-positive gamma / H, negative beta, phi out of range, beta >= phi.
+  assert.ok("error" in _v626({ phi: 30, beta: 15, gamma: 0, h_ft: 10 }));
+  assert.ok("error" in _v626({ phi: 30, beta: 15, gamma: 120, h_ft: 0 }));
+  assert.ok("error" in _v626({ phi: 30, beta: -1, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v626({ phi: 0, beta: 0, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v626({ phi: 50, beta: 15, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v626({ phi: 30, beta: 30, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v626({ phi: 30, beta: 35, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v626({ phi: NaN, beta: 15, gamma: 120, h_ft: 10 }));
+});

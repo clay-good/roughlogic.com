@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spec-v626 sloped-backfill Rankine earth pressure; 2026-07-11
+
+Lands `sloped-backfill-earth-pressure` (Group E, calc-geotech.js), the sloped-backfill Rankine coefficient spec-v261/v262 named beside `lateral-earth-pressure`. A backfill rising behind the wall at slope beta pushes harder than a level one: Ka = cos b (cos b - sqrt(cos^2 b - cos^2 phi)) / (cos b + sqrt(cos^2 b - cos^2 phi)), the thrust Pa = 0.5 x Ka x gamma x H^2 acting parallel to the slope, and its horizontal (overturning) and vertical (heel) components, with the level Ka0 for contrast. A 15 deg backfill on a phi = 30 sand raises Ka from 0.333 to 0.373 - 12% heavier and tilted; beta must stay below phi. Pure Rankine trig, no proprietary constants. Catalog 1,073 -> 1,074 (version 0.215.0).
+
 ### feat(construction): spec-v625 submerged-backfill earth pressure (buoyant + hydrostatic); 2026-07-11
 
 Lands `submerged-earth-pressure` (Group E, calc-geotech.js), the submerged-backfill companion spec-v261 named beside `lateral-earth-pressure` ("a submerged zone must be run with buoyant unit weight plus separate hydrostatic pressure"). Below the water table the soil skeleton pushes with its buoyant weight (gamma_sat - 62.4) at the Ka reduction while the water pushes with the full hydrostatic pressure at no reduction: Pa' = 0.5 x Ka x gamma_buoy x H^2, Pw = 0.5 x 62.4 x H^2, plus the Ka q H surcharge, combined resultant, and the dry-case thrust for contrast. A 10 ft phi = 30, 125 pcf sand pushes 2,083 lb/ft dry but 4,163 lb/ft submerged - almost exactly 2x, three-quarters of it water. Pure effective-stress soil mechanics, no proprietary constants. Catalog 1,072 -> 1,073 (version 0.214.0).

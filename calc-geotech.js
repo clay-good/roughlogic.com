@@ -255,6 +255,49 @@ GEOTECH_RENDERERS["submerged-earth-pressure"] = _simpleRenderer({
   compute: computeSubmergedEarthPressure,
 });
 
+// ===================== spec-v626: sloped-backfill Rankine earth pressure =====================
+
+// dims: in { phi: dimensionless, beta: dimensionless, gamma: M L^-2 T^-2, h_ft: L } out: { ka: dimensionless, ka0: dimensionless, pa: M T^-2, pa_h: M T^-2, pa_v: M T^-2 }
+export function computeSlopedBackfillEarthPressure({ phi = 0, beta = 0, gamma = 120, h_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };
+  if (!(h_ft > 0)) return { error: "Retained height must be positive (ft)." };
+  if (beta < 0) return { error: "Backfill slope angle cannot be negative (deg)." };
+  if (phi <= 0 || phi >= 50) return { error: "Friction angle must be between 0 and 50 degrees (exclusive)." };
+  if (!(beta < phi)) return { error: "Backfill slope must be less than the friction angle (deg); at or past it the Rankine active state breaks down." };
+  const phi_r = phi * Math.PI / 180;
+  const beta_r = beta * Math.PI / 180;
+  const cb = Math.cos(beta_r);
+  const cp = Math.cos(phi_r);
+  const root = Math.sqrt(cb * cb - cp * cp);
+  const ka = cb * (cb - root) / (cb + root);
+  const ka0 = (1 - Math.sin(phi_r)) / (1 + Math.sin(phi_r));
+  const pa = 0.5 * ka * gamma * h_ft * h_ft;
+  const pa_h = pa * Math.cos(beta_r);
+  const pa_v = pa * Math.sin(beta_r);
+  return { ka, ka0, pa, pa_h, pa_v };
+}
+
+export const slopedBackfillEarthPressureExample = { inputs: { phi: 30, beta: 15, gamma: 120, h_ft: 10 } };
+
+GEOTECH_RENDERERS["sloped-backfill-earth-pressure"] = _simpleRenderer({
+  citation: "Citation: Rankine sloped-backfill active pressure coefficient Ka = cos b x (cos b - sqrt(cos^2 b - cos^2 phi)) / (cos b + sqrt(cos^2 b - cos^2 phi)) for a backfill surface rising at beta above horizontal -- the resultant Pa = 0.5 x Ka x gamma x H^2 acts parallel to the backfill slope at H/3, with a horizontal component Pa cos beta that overturns the wall and a vertical component Pa sin beta on the heel -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). The cohesionless, vertical-wall, planar-sloping-surface case: beta must stay below phi (at or past the angle of repose the coefficient breaks down and the slope cannot be retained on Rankine terms), and the level-backfill Ka0 = (1 - sin phi)/(1 + sin phi) is shown for contrast. Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's recommendation governs.",
+  example: slopedBackfillEarthPressureExample.inputs,
+  fields: [
+    { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
+    { key: "beta", label: "Backfill slope beta (deg, above horizontal)", kind: "number", default: 0 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "k", id: "sbep-out-k", label: "Ka sloped / Ka level", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.ka0, 3) },
+    { key: "pa", id: "sbep-out-pa", label: "Active thrust Pa (parallel to slope)", value: (r) => fmt(r.pa, 0) + " lb/ft" },
+    { key: "ph", id: "sbep-out-ph", label: "Horizontal component Pa_h", value: (r) => fmt(r.pa_h, 0) + " lb/ft" },
+    { key: "pv", id: "sbep-out-pv", label: "Vertical component Pa_v (on the heel)", value: (r) => fmt(r.pa_v, 0) + " lb/ft" },
+  ],
+  compute: computeSlopedBackfillEarthPressure,
+});
+
 // ===================== spec-v262: cantilever retaining wall stability =====================
 
 // dims: in { h_ft: L, b_ft: L, t_base: L, t_stem: L, toe_ft: L, gamma_s: M L^-2 T^-2, gamma_c: M L^-2 T^-2, phi: dimensionless, mu: dimensionless, q: M L^-1 T^-2 } out: { sum_v: M T^-2, mr: M L T^-2, mo: M L T^-2, pa_tot: M T^-2, fs_ot: dimensionless, fs_sl: dimensionless, ecc: L, q_max: M L^-1 T^-2, q_min: M L^-1 T^-2 }
