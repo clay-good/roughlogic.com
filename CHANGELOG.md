@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v617 concrete anchor side-face blowout (ACI 318-19 17.6.4); 2026-07-10
+
+Lands `concrete-anchor-blowout` (Group E, calc-concrete.js), completing the headed-anchor tension triad spec-v548 named (breakout v548, pullout v612, blowout here): the deep-anchor-near-an-edge mode. Nsb = 160 x c_a1 x sqrt(Abrg) x lambda_a x sqrt(f'c); corner cut (1 + c_a2/c_a1)/4 where c_a2 < 3 c_a1; phiNsb = 0.70 x Nsb; applicability flag hef > 2.5 c_a1 (shallower anchors are governed by breakout). The v612 example anchor at a 3 in edge checks 17.2 kip design, 10.0 kip in a corner. Catalog 1,064 -> 1,065 (version 0.206.0).
+
 ### feat(rigging): spec-v616 beam clamp reaction and side-pull check; 2026-07-10
 
 Lands `beam-clamp-side-pull` (Group Z, calc-rigging.js), the last spec-v544-named follow-on: the check at the steel. V = T sin(angle), H = T cos(angle), each against the clamp's vertical WLL and the manufacturer's side-pull allowance (0 = not rated, the default); a horizontal component on an unrated clamp returns a re-rig verdict, not a pass. The steep 860 lb leg of the v544 example loads its clamp 38% vertically but 77% of a generous 500 lb side-pull rating. Catalog 1,063 -> 1,064 (version 0.205.0).

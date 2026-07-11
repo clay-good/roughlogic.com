@@ -19925,3 +19925,40 @@ test("bounds: spec-v616 computeBeamClampSidePull pins the components, utilizatio
   assert.ok("error" in _v616({ leg_tension_lb: 100, leg_angle_deg: 45, vertical_wll_lb: 0 }));
   assert.ok("error" in _v616({ leg_tension_lb: 100, leg_angle_deg: 45, vertical_wll_lb: 1000, side_pull_lb: -5 }));
 });
+
+import { computeConcreteAnchorBlowout as _v617 } from "../../calc-concrete.js";
+
+test("bounds: spec-v617 computeConcreteAnchorBlowout pins Nsb, the corner factor, the scalings, the applicability seam, and error seams", () => {
+  // Pinned worked example: 3/4-in heavy-hex, f'c 4000, ca1 3 in, hef 10 in.
+  const r = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 0, lambda: 1 });
+  assert.ok(Math.abs(r.nsb_lb - 24550.49) < 0.5);
+  assert.ok(r.corner_factor === 1);
+  assert.ok(Math.abs(r.phi_nsb_lb - 17185.34) < 0.5);
+  assert.ok(r.applicable === true);
+  assert.ok(Math.abs(r.phi_nsb_lb - 0.70 * r.nsbn_lb) < 1e-9);
+  // Cross-check: the corner modification.
+  const c = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 4, lambda: 1 });
+  assert.ok(Math.abs(c.corner_factor - (1 + 4 / 3) / 4) < 1e-9);
+  assert.ok(Math.abs(c.nsbn_lb - 14321.12) < 0.5);
+  assert.ok(Math.abs(c.phi_nsb_lb - 10024.78) < 0.5);
+  // Corner-factor bound: c_a2 = 3 c_a1 takes factor 1.0 exactly.
+  const b = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 9, lambda: 1 });
+  assert.ok(b.corner_factor === 1);
+  // Nsb scales linearly with ca1 and with sqrt(f'c).
+  const dblEdge = _v617({ edge_distance_in: 6, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 16, perp_edge_in: 0, lambda: 1 });
+  assert.ok(Math.abs(dblEdge.nsb_lb - 2 * r.nsb_lb) < 1e-6);
+  const strong = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 16000, embedment_in: 10, perp_edge_in: 0, lambda: 1 });
+  assert.ok(Math.abs(strong.nsb_lb - 2 * r.nsb_lb) < 1e-6);
+  // Applicability seam: hef <= 2.5 ca1 flags breakout as governing (same arithmetic, flag down).
+  const shallow = _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 7.5, perp_edge_in: 0, lambda: 1 });
+  assert.ok(shallow.applicable === false);
+  assert.ok(Math.abs(shallow.nsb_lb - r.nsb_lb) < 1e-9);
+  // Error seams: non-finite, non-positive inputs, lambda out of (0, 1], c_a2 in (0, c_a1).
+  assert.ok("error" in _v617({ edge_distance_in: Infinity, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10 }));
+  assert.ok("error" in _v617({ edge_distance_in: 0, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10 }));
+  assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0, fc_psi: 4000, embedment_in: 10 }));
+  assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 0, embedment_in: 10 }));
+  assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 0 }));
+  assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, lambda: 1.2 }));
+  assert.ok("error" in _v617({ edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 2 }));
+});

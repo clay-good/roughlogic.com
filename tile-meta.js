@@ -562,6 +562,7 @@ const _TILES = [
   ["concrete-longterm-defl", "E"],
   ["concrete-anchor-breakout", "E"],
   ["concrete-anchor-pullout", "E"],
+  ["concrete-anchor-blowout", "E"],
   ["rc-slender-column-magnify", "E"],
   ["concrete-corbel-bracket", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)

@@ -10729,6 +10729,17 @@ export const CITATIONS = {
       { name: "Uncracked bonus", value: "psi_cP = 1.4 only when analysis shows the concrete stays uncracked at service; else 1.0", source: "ACI 318-19 17.6.3.3" },
     ],
   },
+  "concrete-anchor-blowout": {
+    formula: "Nsb = 160 x c_a1 x sqrt(Abrg) x lambda_a x sqrt(f'c); corner modification (1 + c_a2/c_a1)/4 where c_a2 < 3 c_a1; phiNsb = 0.70 x Nsb; governs when hef > 2.5 c_a1.",
+    edition: "The ACI 318-19 Section 17.6.4 side-face blowout of a headed anchor in tension, by name.",
+    freeAccess: "ACI 318 is available through ACI; the 17.6.4 side-face blowout provisions are published design equations.",
+    governance: GOVERNANCE.general,
+    editionNote: "Side-face blowout applies to headed cast-in anchors with deep embedment close to an edge (hef > 2.5 c_a1; shallower anchors are governed by breakout) and does not depend on embedment - the edge distance is the knob. c_a1 is the minimum edge distance; a perpendicular second edge closer than 3 c_a1 cuts the strength by (1 + c_a2/c_a1)/4. Closely spaced anchors along the edge interact per 17.6.4.2 (not included). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    assumptions: [
+      { name: "Deep-embedment mode", value: "blowout is checked where hef > 2.5 c_a1; the strength scales with the edge distance, not the embedment", source: "ACI 318-19 17.6.4.1" },
+      { name: "Single anchor", value: "closely spaced anchors along the edge (s < 6 c_a1) interact per the group provision, not included here", source: "ACI 318-19 17.6.4.2" },
+    ],
+  },
   "concrete-anchor-breakout": {
     formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb.",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",

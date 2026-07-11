@@ -81842,6 +81842,56 @@
       "term": "side pull on an unrated clamp re rig",
       "target": "beam-clamp-side-pull",
       "kind": "question"
+    },
+    {
+      "term": "side face blowout",
+      "target": "concrete-anchor-blowout",
+      "kind": "industry"
+    },
+    {
+      "term": "anchor blowout",
+      "target": "concrete-anchor-blowout",
+      "kind": "industry"
+    },
+    {
+      "term": "blowout strength",
+      "target": "concrete-anchor-blowout",
+      "kind": "adjacent"
+    },
+    {
+      "term": "deep anchor near edge",
+      "target": "concrete-anchor-blowout",
+      "kind": "redirect"
+    },
+    {
+      "term": "aci 17.6.4",
+      "target": "concrete-anchor-blowout",
+      "kind": "redirect"
+    },
+    {
+      "term": "side face blowout of a headed anchor",
+      "target": "concrete-anchor-blowout",
+      "kind": "question"
+    },
+    {
+      "term": "anchor strength near a concrete edge deep embedment",
+      "target": "concrete-anchor-blowout",
+      "kind": "question"
+    },
+    {
+      "term": "nsb 160 ca1 sqrt abrg",
+      "target": "concrete-anchor-blowout",
+      "kind": "question"
+    },
+    {
+      "term": "corner factor for anchor blowout",
+      "target": "concrete-anchor-blowout",
+      "kind": "question"
+    },
+    {
+      "term": "when does side face blowout govern",
+      "target": "concrete-anchor-blowout",
+      "kind": "question"
     }
   ]
 }

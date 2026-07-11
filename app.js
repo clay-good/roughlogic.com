@@ -589,6 +589,8 @@ const TOOL_MODULES = (() => {
     // spec-v548
     "concrete-anchor-breakout",
     "concrete-anchor-pullout",
+    // spec-v617
+    "concrete-anchor-blowout",
     // spec-v552
     "rc-slender-column-magnify",
     // spec-v556

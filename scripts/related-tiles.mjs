@@ -1172,6 +1172,7 @@ const RELATED = {
   "concrete-longterm-defl": ["joist-deflection","rc-beam-flexure","steel-camber"],
   "concrete-anchor-breakout": ["anchor-embedment","column-base-plate","masonry-anchor-bolt"],
   "concrete-anchor-pullout": ["concrete-anchor-breakout","anchor-embedment","column-base-plate"],
+  "concrete-anchor-blowout": ["concrete-anchor-breakout","concrete-anchor-pullout","anchor-embedment"],
   "rc-slender-column-magnify": ["rc-column-axial","column-buckling-wood","concrete-longterm-defl"],
   "concrete-corbel-bracket": ["rc-shear-friction","rc-beam-shear","concrete-bearing-strength"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],

@@ -1088,3 +1088,55 @@ CONCRETE_RENDERERS["concrete-anchor-pullout"] = _simpleRenderer({
   ],
   compute: computeConcreteAnchorPullout,
 });
+
+// --- spec-v617 E: Concrete anchor side-face blowout (ACI 318-19 17.6.4) ---
+// Nsb = 160 * ca1 * sqrt(Abrg) * lambda * sqrt(f'c); corner (1 + ca2/ca1)/4 when ca2 < 3 ca1; phi = 0.70. Governs when hef > 2.5 ca1.
+// dims: in { edge_distance_in: L, head_bearing_area_in2: L^2, fc_psi: M L^-1 T^-2, embedment_in: L, perp_edge_in: L, lambda: dimensionless } out: { nsb_lb: M L T^-2, corner_factor: dimensionless, nsbn_lb: M L T^-2, phi_nsb_lb: M L T^-2 }
+export function computeConcreteAnchorBlowout({ edge_distance_in = 0, head_bearing_area_in2 = 0, fc_psi = 0, embedment_in = 0, perp_edge_in = 0, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ca1 = Number(edge_distance_in) || 0;
+  const abrg = Number(head_bearing_area_in2) || 0;
+  const fc = Number(fc_psi) || 0;
+  const hef = Number(embedment_in) || 0;
+  const ca2 = Number(perp_edge_in) || 0;
+  const lam = Number(lambda) || 0;
+  if (!(ca1 > 0)) return { error: "Edge distance c_a1 must be positive (in)." };
+  if (!(abrg > 0)) return { error: "Head bearing area must be positive (in^2)." };
+  if (!(fc > 0)) return { error: "Concrete strength must be positive (psi)." };
+  if (!(hef > 0)) return { error: "Embedment must be positive (in)." };
+  if (!(lam > 0 && lam <= 1)) return { error: "Lambda must be in (0, 1] (1.0 normal weight)." };
+  if (ca2 < 0) return { error: "Perpendicular edge distance must be zero (none) or positive (in)." };
+  if (ca2 > 0 && ca2 < ca1) return { error: "c_a1 must be the minimum edge distance - swap the edges so c_a1 <= c_a2." };
+  const nsb_lb = 160 * ca1 * Math.sqrt(abrg) * lam * Math.sqrt(fc);
+  const corner_factor = ca2 > 0 && ca2 < 3 * ca1 ? (1 + ca2 / ca1) / 4 : 1.0;
+  const nsbn_lb = nsb_lb * corner_factor;
+  const phi_nsb_lb = 0.70 * nsbn_lb;
+  const applicable = hef > 2.5 * ca1;
+  return {
+    nsb_lb, corner_factor, nsbn_lb, phi_nsb_lb, applicable,
+    note: (applicable
+      ? "Blowout governs at this embedment (hef > 2.5 c_a1) - the strength does not depend on embedment; the edge distance is the knob."
+      : "NOT the governing mode here: hef <= 2.5 c_a1, so concrete breakout (concrete-anchor-breakout) governs; the blowout numbers are shown for reference.")
+      + " Applies to headed cast-in anchors where the head bears on the concrete. Closely spaced anchors along the edge interact per ACI 318-19 17.6.4.2 (not included). phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+  };
+}
+export const concreteAnchorBlowoutExample = { inputs: { edge_distance_in: 3, head_bearing_area_in2: 0.654, fc_psi: 4000, embedment_in: 10, perp_edge_in: 0, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 17.6.4 side-face blowout: Nsb = 160 x c_a1 x sqrt(Abrg) x lambda_a x sqrt(f'c); corner modification (1 + c_a2/c_a1)/4 where c_a2 < 3 c_a1; phiNsb = 0.70 x Nsb (Condition B). Governs for headed cast-in anchors with deep embedment near an edge (hef > 2.5 c_a1; shallower anchors are governed by breakout) and does not depend on embedment. Closely spaced anchors along the edge interact per 17.6.4.2. ACI 318 Chapter 17 and the engineer of record govern.",
+  example: concreteAnchorBlowoutExample.inputs,
+  fields: [
+    { key: "edge_distance_in", label: "Nearest edge distance c_a1 (in)", kind: "number" },
+    { key: "head_bearing_area_in2", label: "Head/nut net bearing area Abrg (in^2)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "embedment_in", label: "Embedment hef (in)", kind: "number" },
+    { key: "perp_edge_in", label: "Perpendicular edge c_a2 (in, 0 = none)", kind: "number", default: 0 },
+    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "nsb", id: "cab-out-nsb", label: "Basic blowout Nsb", value: (r) => fmt(r.nsb_lb, 0) + " lb (" + fmt(r.nsb_lb / 1000, 1) + " kip)" },
+    { key: "nsbn", id: "cab-out-nsbn", label: "Nominal Nsbn (corner factor)", value: (r) => fmt(r.nsbn_lb, 0) + " lb (factor " + fmt(r.corner_factor, 3) + ")" },
+    { key: "phi", id: "cab-out-phi", label: "Design phiNsb", value: (r) => fmt(r.phi_nsb_lb, 0) + " lb (" + fmt(r.phi_nsb_lb / 1000, 1) + " kip)" + (r.applicable ? "" : " - breakout governs (hef <= 2.5 c_a1)") },
+    { key: "n", id: "cab-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteAnchorBlowout,
+});
