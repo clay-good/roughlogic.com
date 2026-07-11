@@ -1103,6 +1103,7 @@ const TOOL_MODULES = (() => {
     "doubling-time",
     // spec-v536
     "michaelis-menten",
+    "substrate-for-velocity",
   ]);
   // v12 Group X: Real Estate (spec-v12.md §8).
   declare("./calc-realestate.js", "REALESTATE_RENDERERS", [

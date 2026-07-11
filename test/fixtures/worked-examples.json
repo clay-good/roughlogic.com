@@ -17656,6 +17656,60 @@
    }
   },
   {
+   "tile_id": "substrate-for-velocity",
+   "source_publisher": "Enzyme kinetics (Michaelis-Menten equation, inverted)",
+   "source_title": "90% of Vmax at Km 25 needs [S] = 25 x 0.9/0.1 = 225 (9 x Km)",
+   "source_edition_or_year": "Michaelis-Menten",
+   "source_section_or_page": "spec-v635 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "km": 25,
+    "target_percent": 90
+   },
+   "outputs": {
+    "substrate": {
+     "value": 225,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fold_km": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "substrate-for-velocity",
+   "source_publisher": "Enzyme kinetics (Michaelis-Menten equation, inverted)",
+   "source_title": "cross-check: 50% of Vmax gives [S] = Km exactly (25); 99% needs 99 x Km",
+   "source_edition_or_year": "Michaelis-Menten",
+   "source_section_or_page": "spec-v635 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "km": 25,
+    "target_percent": 50
+   },
+   "outputs": {
+    "substrate": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "fold_km": {
+     "value": 1,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gross-rent-multiplier",
    "source_publisher": "Appraisal Institute income-approach (GRM)",
    "source_title": "GRM = price / gross_annual_rent",

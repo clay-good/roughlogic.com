@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lab): spec-v635 substrate for a target fraction of Vmax (Michaelis-Menten inverse); 2026-07-11
+
+Lands `substrate-for-velocity` (Group T, calc-lab.js), the assay-design inverse of `michaelis-menten`. Enter Km and the fraction of Vmax you want, get the substrate concentration: [S] = Km x f/(1 - f). Half of Vmax takes exactly one Km (its definition), but 90% takes 9 x Km and 99% takes 99 x Km - the runaway excess that shows why an enzyme approaches Vmax but never reaches it. Feeding the result back into the forward tile returns the target fraction exactly (fuzzer pins the round-trip and the [S]=Km-at-50% identity). Pure algebra, no constants. Catalog 1,082 -> 1,083 (version 0.224.0).
+
 ### feat(structural): spec-v634 required plastic section modulus for a steel beam; 2026-07-11
 
 Lands `required-section-modulus` (Group E, calc-steel.js), the design inverse of `steel-beam-flexure` (spec-v314). Enter the demand moment and Fy, get the plastic section modulus Zx to pick a W-shape: LRFD Zx >= 12 Mu/(0.90 Fy); ASD Zx >= 12(1.67)Ma/Fy (AISC 360 Ch. F, Mp = Fy Zx, inverted). A 200 kip-ft LRFD demand on 50 ksi steel needs Zx 53.3 in^3 (a W16x31 works); by ASD it jumps to 80.2. Feeding the result back into the forward tile returns the demand exactly (fuzzer pins the round-trip). Pure algebra; phi_b = 0.90 and Omega = 1.67 are the same universal factors the forward tile hardcodes. Catalog 1,081 -> 1,082 (version 0.223.0).

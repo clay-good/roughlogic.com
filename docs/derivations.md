@@ -2158,6 +2158,7 @@ cross-check.
 | calc-lab.js | `computeRcf` | `{ rotor_radius_mm = 0, rpm, rcf }` | _ | _ | _ |
 | calc-lab.js | `computeResuspension` | `{ mass_g = 0, target_concentration = 0 }` | _ | _ | _ |
 | calc-lab.js | `computeSerialDilution` | `{ starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001, ...` | _ | _ | _ |
+| calc-lab.js | `computeSubstrateForVelocity` | `{ km = 0, target_percent = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `renderOd600CellCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmCollectorForce` | `{ unit_shear_plf = 0, collector_len_ft = 0, omega0 = 2.5 } = {}` | _ | _ | _ |
 | calc-lateral.js | `computeDiaphragmShear` | `{ w_plf = 0, l_ft = 0, b_ft = 0 } = {}` | _ | _ | _ |
@@ -2740,7 +2741,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1326.
+Row count: 1327.
 
 <!-- END function-corpus-v14 -->
 
@@ -3892,7 +3893,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (19 tiles)
+### Group T Lab (20 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3915,6 +3916,7 @@ per spec-v14 §13.1 second paragraph.
 | `rcf-rpm` | Centrifuge RPM and RCF | Project (first-principles); Centrifuge G-force identity (r in cm, rpm in revolutions/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `resuspension-volume` | Resuspension Volume | Project (first-principles); 0.05 g lyophilized / 10 mg/mL target -> 0.005 (5 mL) resu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `substrate-for-velocity` | Substrate for a Target Fraction of Vmax (Michaelis-Menten Inverse) | Enzyme kinetics (Michaelis-Menten equ...; spec-v635 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group X Real Estate (33 tiles)
 
@@ -4008,6 +4010,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1082. Fixture-covered or reference-cadence: 1082 / 1082.
+Tile count: 1083. Fixture-covered or reference-cadence: 1083 / 1083.
 
 <!-- END tile-index-v14 -->

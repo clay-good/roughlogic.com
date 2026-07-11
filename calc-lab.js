@@ -1201,3 +1201,41 @@ function renderMichaelisMenten(inputRegion, outputRegion, citationEl) {
   for (const f of [vmax.input, km.input, sub.input]) f.addEventListener("input", update);
 }
 LAB_RENDERERS["michaelis-menten"] = renderMichaelisMenten;
+
+// [S] = Km x f/(1 - f) for a target fraction f = v/Vmax. At f = 0.5, [S] = Km.
+// dims: in { km: dimensionless, target_percent: dimensionless } out: { substrate: dimensionless, fold_km: dimensionless }
+export function computeSubstrateForVelocity({ km = 0, target_percent = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const kmv = Number(km) || 0;
+  const pct = Number(target_percent) || 0;
+  if (!(kmv > 0)) return { error: "Km must be positive." };
+  if (!(pct > 0 && pct < 100)) return { error: "Target velocity must be between 0 and 100 percent of Vmax (exclusive)." };
+  const f = pct / 100;
+  const fold_km = f / (1 - f);
+  const substrate = kmv * fold_km;
+  return {
+    substrate, fold_km, at_half: pct === 50,
+    note: "The Michaelis-Menten equation inverted for the substrate concentration that reaches a target fraction of Vmax: from v/Vmax = [S]/(Km + [S]), [S] = Km x f/(1 - f) with f = v/Vmax. At 50% of Vmax [S] = Km (the definition of Km); the hyperbola then demands rapidly more substrate - 90% needs 9 x Km and 99% needs 99 x Km, which is why saturating an enzyme takes a large excess and Vmax is approached, never reached. Steady state with substrate far in excess of enzyme; the actual assay conditions govern.",
+  };
+}
+export const substrateForVelocityExample = { inputs: { km: 25, target_percent: 90 } };
+function renderSubstrateForVelocity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: the Michaelis-Menten equation inverted - [S] = Km x f/(1 - f) for a target fraction f = v/Vmax. At [S] = Km the velocity is half of Vmax; 90% needs 9 x Km, 99% needs 99 x Km. Steady state, substrate in excess of enzyme; the assay conditions govern.";
+  const km = makeNumber("Km (substrate at half Vmax)", "sfv-km", { step: "any", min: "0", value: "25" }); km.input.value = "25";
+  const pct = makeNumber("Target velocity (% of Vmax)", "sfv-pct", { step: "any", min: "0", value: "90" }); pct.input.value = "90";
+  for (const f of [km, pct]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { km.input.value = "25"; pct.input.value = "90"; update(); });
+  const oS = makeOutputLine(outputRegion, "Required substrate [S]", "sfv-out-s");
+  const oFold = makeOutputLine(outputRegion, "As a multiple of Km", "sfv-out-fold");
+  const oNote = makeOutputLine(outputRegion, "Note", "sfv-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSubstrateForVelocity({ km: readNum(km.input), target_percent: readNum(pct.input) });
+    if (r.error) { oS.textContent = r.error; oFold.textContent = ""; oNote.textContent = ""; return; }
+    oS.textContent = fmt(r.substrate, 3) + (r.at_half ? " (= Km, the half-Vmax definition)" : "");
+    oFold.textContent = fmt(r.fold_km, 2) + " x Km";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [km.input, pct.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["substrate-for-velocity"] = renderSubstrateForVelocity;

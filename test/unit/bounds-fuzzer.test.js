@@ -20423,3 +20423,26 @@ test("bounds: spec-v634 computeRequiredSectionModulus pins the LRFD/ASD required
   assert.ok("error" in _v634({ fy: 50, moment_kipft: 0 }));
   assert.ok("error" in _v634({ fy: Infinity, moment_kipft: 200 }));
 });
+
+import { computeSubstrateForVelocity as _v635, computeMichaelisMenten as _v635fwd } from "../../calc-lab.js";
+
+test("bounds: spec-v635 computeSubstrateForVelocity pins [S] = Km f/(1-f), the [S]=Km-at-50% identity, the exact round-trip, and error seams", () => {
+  const r = _v635({ km: 25, target_percent: 90 });
+  assert.ok(Math.abs(r.substrate - 225) < 1e-6); // 25*0.9/0.1
+  assert.ok(Math.abs(r.fold_km - 9) < 1e-9);
+  // Exact inverse: the required substrate gives the target fraction back through the forward tile.
+  const back = _v635fwd({ vmax: 100, km: 25, substrate: r.substrate });
+  assert.ok(Math.abs(back.percent_vmax - 90) < 1e-6);
+  // The Km identity: 50% of Vmax needs exactly one Km.
+  const half = _v635({ km: 25, target_percent: 50 });
+  assert.ok(Math.abs(half.substrate - 25) < 1e-9);
+  assert.ok(half.at_half === true);
+  // The saturation tail: 99% needs 99 x Km.
+  assert.ok(Math.abs(_v635({ km: 25, target_percent: 99 }).fold_km - 99) < 1e-6);
+  // Error seams: non-finite, non-positive Km, target out of (0, 100).
+  assert.ok("error" in _v635({ km: 0, target_percent: 90 }));
+  assert.ok("error" in _v635({ km: 25, target_percent: 0 }));
+  assert.ok("error" in _v635({ km: 25, target_percent: 100 }));
+  assert.ok("error" in _v635({ km: 25, target_percent: 120 }));
+  assert.ok("error" in _v635({ km: Infinity, target_percent: 90 }));
+});

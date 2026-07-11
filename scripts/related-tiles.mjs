@@ -456,6 +456,7 @@ const RELATED = {
   "ligation-molar-ratio": ["nucleic-acid-a260", "mass-moles", "pcr-master-mix"],
   "doubling-time": ["od600-cell-count", "cfu-plate-count", "nucleic-acid-a260"],
   "michaelis-menten": ["beer-lambert", "linear-regression", "doubling-time"],
+  "substrate-for-velocity": ["michaelis-menten","doubling-time","beer-lambert"],
   "serial-dilution": ["molarity-dilution", "resuspension-volume"],
   "resuspension-volume": ["molarity-dilution", "serial-dilution"],
   "molecular-weight": ["mass-moles", "molarity-dilution"],

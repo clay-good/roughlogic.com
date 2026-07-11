@@ -350,6 +350,17 @@ export const CITATIONS = {
       { name: "Steady state", value: "substrate far in excess of enzyme; single substrate, no cooperativity or inhibition", source: "Michaelis-Menten" },
     ],
   },
+  "substrate-for-velocity": {
+    formula: "[S] = Km x f/(1 - f) with f = target_velocity/Vmax; at f = 0.5, [S] = Km; fold_km = f/(1 - f).",
+    edition: "The Michaelis-Menten equation inverted for the substrate concentration at a target fraction of Vmax, by name.",
+    freeAccess: "Standard biochemistry enzyme-kinetics relation solved for the substrate; the assay conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Michaelis-Menten hyperbola v/Vmax = [S]/(Km + [S]) inverted for the substrate concentration that reaches a target fraction f of Vmax: [S] = Km x f/(1 - f). At 50% of Vmax [S] = Km (the definition of Km); the required concentration climbs steeply toward saturation (9 x Km at 90%, 99 x Km at 99%), which is why Vmax is approached but never reached and saturating an enzyme takes a large excess. Assumes steady state with substrate far in excess of enzyme, a single substrate, and no cooperativity or inhibition. An analysis aid, not a validated kinetic assay; the actual assay conditions govern.",
+    assumptions: [
+      { name: "Inverse of the forward tile", value: "[S] = Km f/(1 - f); feeding the result into michaelis-menten with the same Km returns the target fraction of Vmax", source: "Michaelis-Menten" },
+      { name: "Steady state", value: "substrate far in excess of enzyme; single substrate, no cooperativity or inhibition", source: "Michaelis-Menten" },
+    ],
+  },
 
   "declining-balance-depreciation": {
     formula: "DB_rate = factor*(1/life); dep = book_begin*DB_rate, floored so book value never drops below salvage. Optional straight-line crossover when SL >= DDB.",

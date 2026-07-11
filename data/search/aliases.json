@@ -82732,6 +82732,56 @@
       "term": "required zx lrfd vs asd",
       "target": "required-section-modulus",
       "kind": "question"
+    },
+    {
+      "term": "substrate for velocity",
+      "target": "substrate-for-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "michaelis menten inverse",
+      "target": "substrate-for-velocity",
+      "kind": "industry"
+    },
+    {
+      "term": "substrate for 90 percent vmax",
+      "target": "substrate-for-velocity",
+      "kind": "redirect"
+    },
+    {
+      "term": "km multiple for saturation",
+      "target": "substrate-for-velocity",
+      "kind": "redirect"
+    },
+    {
+      "term": "substrate concentration for target rate",
+      "target": "substrate-for-velocity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much substrate to reach 90 percent of vmax",
+      "target": "substrate-for-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "substrate concentration from a target fraction of vmax",
+      "target": "substrate-for-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "how many times km to saturate an enzyme",
+      "target": "substrate-for-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "invert michaelis menten for substrate",
+      "target": "substrate-for-velocity",
+      "kind": "question"
+    },
+    {
+      "term": "substrate needed for a target reaction velocity",
+      "target": "substrate-for-velocity",
+      "kind": "question"
     }
   ]
 }
