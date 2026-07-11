@@ -893,6 +893,7 @@ const TOOL_MODULES = (() => {
     // spec-v568
     "center-pivot-runtime",
     "pivot-application-rate",
+    "pivot-timer-depth",
     // spec-v569
     "grain-aeration-airflow",
     // spec-v582

@@ -1466,6 +1466,7 @@ cross-check.
 | calc-agriculture.js | `computePearsonSquareRation` | `{ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computePesticideReiPhi` | `{ rei_hours = 0, phi_days = 0, hours_since_application = 0, days_since_applic...` | _ | _ | _ |
 | calc-agriculture.js | `computePivotApplicationRate` | `{ pass_depth_in = 0, pivot_length_ft = 0, revolution_hr = 0, wetted_band_ft =...` | _ | _ | _ |
+| calc-agriculture.js | `computePivotTimerDepth` | `{ system_flow_gpm = 0, area_acres = 0, revolution_100_hr = 0, timer_pct = 0 }...` | _ | _ | _ |
 | calc-agriculture.js | `computePlantSpacingCount` | `{ bed_ft2 = 0, spacing_in = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSeedRate` | `{ row_width_in = 0, in_row_spacing_in = 0, target_pop_per_acre = 0, seeds_per...` | _ | _ | _ |
 | calc-agriculture.js | `computeSodTakeoff` | `{ lawn_ft2 = 0, waste_pct = 0, slab_ft2 = 10, pallet_ft2 = 450 } = {}` | _ | _ | _ |
@@ -2709,7 +2710,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1295.
+Row count: 1296.
 
 <!-- END function-corpus-v14 -->
 
@@ -3633,7 +3634,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (49 tiles)
+### Group L Agriculture (50 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3669,6 +3670,7 @@ per spec-v14 §13.1 second paragraph.
 | `pearson-square-ration` | Pearson-Square Feed Ration | Pearson square (land-grant animal sci...; corn 9% / SBM 44% to 16% CP -> 80% corn, 20% SBM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pesticide-rei-phi` | Pesticide REI / PHI Clock | EPA WPS 40 CFR 170 + product label; REI 12 hr, 4 hr elapsed -> 8 hr remaining; PHI 7 d, 2 d e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pivot-application-rate` | Center-Pivot Outer-Span Application Rate vs Soil Intake | USDA-NRCS center-pivot design / unive...; 1-in pass, 1,320 ft pivot, 24-hr revolution, 100-ft band ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pivot-timer-depth` | Center-Pivot Percent-Timer to Depth | USDA-NRCS center-pivot design / unive...; 800 gpm, 125 ac, 20-hr full-speed pass, timer 50% -> 40-h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `plant-spacing-count` | Plant Spacing Count (Square and Triangular) | Nursery / landscape estimating refere...; spec-v210 section 2.1 pinned example (1 ft on center) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `porta-wrap-friction` | Friction-Device Hold Force by Wraps | Capstan (Euler-Eytelwein) / ANSI Z133...; 800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `quadratic-mean-diameter` | Quadratic Mean Diameter (from a Tally) | USDA Forest Service forest-mensuratio...; Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3946,6 +3948,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1051. Fixture-covered or reference-cadence: 1051 / 1051.
+Tile count: 1052. Fixture-covered or reference-cadence: 1052 / 1052.
 
 <!-- END tile-index-v14 -->

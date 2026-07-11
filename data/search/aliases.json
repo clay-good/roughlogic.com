@@ -81202,6 +81202,56 @@
       "term": "minimum doubler plate thickness aisc",
       "target": "steel-doubler-plate",
       "kind": "question"
+    },
+    {
+      "term": "percent timer depth",
+      "target": "pivot-timer-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "pivot timer setting",
+      "target": "pivot-timer-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "center pivot timer",
+      "target": "pivot-timer-depth",
+      "kind": "redirect"
+    },
+    {
+      "term": "timer to depth",
+      "target": "pivot-timer-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pivot speed depth",
+      "target": "pivot-timer-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what depth does my pivot timer apply",
+      "target": "pivot-timer-depth",
+      "kind": "question"
+    },
+    {
+      "term": "center pivot percent timer to inches",
+      "target": "pivot-timer-depth",
+      "kind": "question"
+    },
+    {
+      "term": "how does the pivot timer change the depth",
+      "target": "pivot-timer-depth",
+      "kind": "question"
+    },
+    {
+      "term": "set pivot timer for a target depth",
+      "target": "pivot-timer-depth",
+      "kind": "question"
+    },
+    {
+      "term": "pivot timer percent to application depth",
+      "target": "pivot-timer-depth",
+      "kind": "question"
     }
   ]
 }

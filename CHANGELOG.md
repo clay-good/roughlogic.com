@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(irrigation): spec-v604 center-pivot percent-timer to depth; 2026-07-10
+
+Lands `pivot-timer-depth` (Group L, calc-agriculture.js), the follow-on spec-v568 named: the end-tower percent timer converted to applied depth. revolution = revolution_100_hr x 100 / timer_pct; depth = flow x revolution / (452.6 x area). The depth is inversely proportional to the timer - dropping it from 100% to 50% doubles the depth. Closes the center-pivot cluster (runtime, application-rate, timer). Group L audit count 28 -> 29. Catalog 1,051 -> 1,052 (version 0.193.0).
+
 ### feat(steel): spec-v603 panel-zone doubler-plate thickness sizer; 2026-07-10
 
 Lands `steel-doubler-plate` (Group E, calc-steel.js), the how-thick spec-v555 left open. Strength t = (Vu - phiRn_bare) / (0.90 x 0.60 Fy dc); stability (AISC 360-16 Eq. J10-12) t >= (dz + wz)/90; t_required = max of the two, rounded up to the next 1/16-in plate. On a stocky column with a small shortfall the stability minimum governs; on a deep beam the strength governs. Repoints the "doubler plate" search alias from steel-panel-zone-shear to the dedicated tile; raises the calc-steel.js gzip cap 21000 -> 24000. Catalog 1,050 -> 1,051 (version 0.192.0).

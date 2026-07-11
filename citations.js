@@ -775,6 +775,17 @@ export const CITATIONS = {
       { name: "Static-pressure stall", value: "power grows ~fourfold when the rate or depth doubles; read the fan curve at the design static pressure", source: "Shedd airflow-resistance curves" },
     ],
   },
+  "pivot-timer-depth": {
+    formula: "revolution_hr = revolution_100_hr x 100 / timer_pct; depth_in = system_flow_gpm x revolution_hr / (452.6 x area_acres); pass_days = revolution_hr / 24.",
+    edition: "Center-pivot percent-timer to depth (USDA-NRCS center-pivot design; university extension), by name.",
+    freeAccess: "The percent-timer/depth relation is public irrigation-engineering material; the pivot design and panel calibration govern the actual application.",
+    governance: GOVERNANCE.general,
+    editionNote: "The timer sets the outer-tower speed, so the depth is inversely proportional to the setting - halving the timer doubles the depth, which irrigators get backwards constantly. The 452.6 factor converts acre-inches to gallons over minutes; the full-speed revolution time is the machine's rated maximum-speed pass. The pivot design, the actual field area under the machine, and the panel calibration govern - an operating aid, not a uniformity or scheduling design.",
+    assumptions: [
+      { name: "Inverse timer", value: "depth is proportional to 1 / timer% (100% is fastest and thinnest; 50% doubles the depth)", source: "USDA-NRCS / extension" },
+      { name: "Full-speed pass", value: "revolution_100_hr is the machine's rated maximum-speed revolution time; the 452.6 factor is acre-inches to gallons over minutes", source: "irrigation engineering" },
+    ],
+  },
   "pivot-application-rate": {
     formula: "speed_ft_min = 2 x pi x pivot_length_ft / (revolution_hr x 60); wetting_min = wetted_band_ft / speed_ft_min; app_rate_in_hr = pass_depth_in x 2 x pi x pivot_length_ft / (revolution_hr x wetted_band_ft); ratio = app_rate_in_hr / soil_intake_in_hr.",
     edition: "Center-pivot outer-span application rate (USDA-NRCS center-pivot design; university extension), by name.",

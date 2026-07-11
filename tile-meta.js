@@ -110,6 +110,7 @@ const _TILES = [
   ["mulch-topsoil-volume", "L"], ["grain-drying-energy", "L"], ["manure-nutrient-application", "L"],
   ["center-pivot-runtime", "L"],
   ["pivot-application-rate", "L"],
+  ["pivot-timer-depth", "L"],
   ["grain-aeration-airflow", "L"],
   ["manure-storage-volume", "L"],
   ["two-stroke-mix", "L"],

@@ -19501,3 +19501,29 @@ test("bounds: spec-v603 computeSteelDoublerPlate pins the two limits, the govern
   assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 0, pz_width_wz_in: 12.44 }));
   assert.ok("error" in _v603({ required_shear_kip: 300, fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.485, pz_depth_dz_in: 22.64, pz_width_wz_in: 0 }));
 });
+
+import { computePivotTimerDepth as _v604 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v604 computePivotTimerDepth pins the revolution, depth, the inverse-timer relation, and error seams", () => {
+  // Pinned worked example: 800 gpm, 125 ac, 20-hr full-speed pass, 50% timer.
+  const r = _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 50 });
+  assert.ok(Math.abs(r.revolution_hr - 40) < 1e-9);
+  assert.ok(Math.abs(r.depth_in - 800 * 40 / (452.6 * 125)) < 1e-9);
+  assert.ok(Math.abs(r.depth_in - 0.565621) < 1e-5);
+  assert.ok(Math.abs(r.pass_days - 40 / 24) < 1e-9);
+  // Cross-check: 75% timer.
+  const x = _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 75 });
+  assert.ok(Math.abs(x.revolution_hr - 80 / 3) < 1e-9);
+  assert.ok(Math.abs(x.depth_in - 0.377081) < 1e-5);
+  // Depth is inversely proportional to the timer: 50% gives exactly twice the depth of 100%.
+  const full = _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 100 });
+  assert.ok(Math.abs(r.depth_in - 2 * full.depth_in) < 1e-9);
+  assert.ok(Math.abs(r.revolution_hr - 2 * full.revolution_hr) < 1e-9);
+  // Error seams: non-finite, non-positive flow / area / revolution, timer out of 0-100.
+  assert.ok("error" in _v604({ system_flow_gpm: Infinity, area_acres: 125, revolution_100_hr: 20, timer_pct: 50 }));
+  assert.ok("error" in _v604({ system_flow_gpm: 0, area_acres: 125, revolution_100_hr: 20, timer_pct: 50 }));
+  assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 0, revolution_100_hr: 20, timer_pct: 50 }));
+  assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 0, timer_pct: 50 }));
+  assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 0 }));
+  assert.ok("error" in _v604({ system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 101 }));
+});

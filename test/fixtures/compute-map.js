@@ -68,6 +68,7 @@ export const COMPUTE_MAP = {
   "manure-nutrient-application": { module: "../../calc-agriculture.js", fn: "computeManureNutrientApplication" },
   "center-pivot-runtime": { module: "../../calc-agriculture.js", fn: "computeCenterPivotRuntime" },
   "pivot-application-rate": { module: "../../calc-agriculture.js", fn: "computePivotApplicationRate" },
+  "pivot-timer-depth": { module: "../../calc-agriculture.js", fn: "computePivotTimerDepth" },
   "grain-aeration-airflow": { module: "../../calc-agriculture.js", fn: "computeGrainAerationAirflow" },
   "manure-storage-volume": { module: "../../calc-agriculture.js", fn: "computeManureStorageVolume" },
   "two-stroke-mix": { module: "../../calc-agriculture.js", fn: "computeTwoStrokeMix" },

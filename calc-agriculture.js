@@ -2608,6 +2608,53 @@ function _v602renderPivotApplicationRate(inputRegion, outputRegion, citationEl) 
 }
 AGRICULTURE_RENDERERS["pivot-application-rate"] = _v602renderPivotApplicationRate;
 
+// --- spec-v604 L: Center-pivot percent-timer to depth ---
+// revolution = T100*100/timer. depth = Q*revolution/(452.6*A). pass_days = revolution/24.
+// dims: in { system_flow_gpm: L^3 T^-1, area_acres: L^2, revolution_100_hr: T, timer_pct: dimensionless } out: { revolution_hr: T, depth_in: L, pass_days: T }
+export function computePivotTimerDepth({ system_flow_gpm = 0, area_acres = 0, revolution_100_hr = 0, timer_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Q = Number(system_flow_gpm) || 0;
+  const A = Number(area_acres) || 0;
+  const T100 = Number(revolution_100_hr) || 0;
+  const timer = Number(timer_pct) || 0;
+  if (!(Q > 0)) return { error: "System flow must be positive (gpm)." };
+  if (!(A > 0)) return { error: "Irrigated area must be positive (acres)." };
+  if (!(T100 > 0)) return { error: "Full-speed revolution time must be positive (hr)." };
+  if (!(timer > 0 && timer <= 100)) return { error: "Timer setting must be over 0 and at most 100 (%)." };
+  const revolution_hr = T100 * 100 / timer;
+  const depth_in = Q * revolution_hr / (452.6 * A);
+  const pass_days = revolution_hr / 24;
+  return {
+    revolution_hr, depth_in, pass_days,
+    note: "The timer sets the outer-tower speed, so the depth is inversely proportional to the setting - halving the timer doubles the depth, which irrigators get backwards constantly. The 452.6 factor converts acre-inches to gallons over minutes; the full-speed revolution time is the machine's rated maximum-speed pass. The pivot design, the actual field area under the machine, and the panel calibration govern - an operating aid, not a uniformity or scheduling design.",
+  };
+}
+export const pivotTimerDepthExample = { inputs: { system_flow_gpm: 800, area_acres: 125, revolution_100_hr: 20, timer_pct: 50 } };
+function _v604renderPivotTimerDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: center-pivot percent-timer to depth (USDA-NRCS center-pivot design; university extension), by name. revolution = revolution_100_hr x 100 / timer_pct; depth = system_flow x revolution / (452.6 x area); pass_days = revolution / 24. The timer sets the outer-tower speed, so the depth is inversely proportional to the setting - halving the timer doubles the depth. The full-speed revolution time is the machine's rated maximum-speed pass.";
+  const Q = makeNumber("System flow Q (gpm)", "ptd-q", { step: "any", min: "0", value: "800" }); Q.input.value = "800";
+  const A = makeNumber("Irrigated area (acres)", "ptd-a", { step: "any", min: "0", value: "125" }); A.input.value = "125";
+  const T100 = makeNumber("Revolution time at 100% timer (hr)", "ptd-t", { step: "any", min: "0", value: "20" }); T100.input.value = "20";
+  const timer = makeNumber("End-tower timer setting (%)", "ptd-p", { step: "any", min: "0", max: "100", value: "50" }); timer.input.value = "50";
+  for (const f of [Q, A, T100, timer]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Q.input.value = "800"; A.input.value = "125"; T100.input.value = "20"; timer.input.value = "50"; update(); });
+  const oRev = makeOutputLine(outputRegion, "Revolution time", "ptd-out-rev");
+  const oDepth = makeOutputLine(outputRegion, "Gross depth per pass", "ptd-out-depth");
+  const oDays = makeOutputLine(outputRegion, "Days per pass", "ptd-out-days");
+  const oNote = makeOutputLine(outputRegion, "Note", "ptd-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePivotTimerDepth({ system_flow_gpm: readNum(Q.input), area_acres: readNum(A.input), revolution_100_hr: readNum(T100.input), timer_pct: readNum(timer.input) });
+    if (r.error) { oRev.textContent = r.error; oDepth.textContent = "-"; oDays.textContent = "-"; oNote.textContent = ""; return; }
+    oRev.textContent = fmt(r.revolution_hr, 1) + " hr";
+    oDepth.textContent = fmt(r.depth_in, 3) + " in";
+    oDays.textContent = fmt(r.pass_days, 2) + " days";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Q, A, T100, timer]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["pivot-timer-depth"] = _v604renderPivotTimerDepth;
+
 // --- spec-v569 L: Stored-grain aeration fan airflow ---
 // required_cfm = rate x bushels. cooling_hours = 15 / rate.
 // dims: in { bin_capacity_bu: dimensionless, airflow_rate: dimensionless } out: { required_cfm: L^3 T^-1, cooling_hours: T }
