@@ -241,7 +241,7 @@ test("Group M audit coverage: every water tile id has a CITATIONS entry", async 
   const re = /\{ id: "([a-z0-9-]+)"/g;
   let m;
   while ((m = re.exec(groupMBlock)) !== null) ids.push(m[1]);
-  assert.ok(ids.length === 30, "expected 30 Group M tile ids, got " + ids.length);
+  assert.ok(ids.length === 31, "expected 31 Group M tile ids, got " + ids.length);
   for (const id of ids) {
     assert.ok(CITATIONS[id], "Group M tile '" + id + "' missing CITATIONS entry");
   }

@@ -57,6 +57,7 @@ export const COMPUTE_MAP = {
   "bod-tss-loading-removal": { module: "../../calc-treatment.js", fn: "computeBodTssLoadingRemoval" },
   "tds-from-conductivity": { module: "../../calc-treatment.js", fn: "computeTdsFromConductivity" },
   "digester-vs-loading": { module: "../../calc-treatment.js", fn: "computeDigesterVsLoading" },
+  "va-alkalinity-ratio": { module: "../../calc-treatment.js", fn: "computeVaAlkalinityRatio" },
   "digester-gas-production": { module: "../../calc-treatment.js", fn: "computeDigesterGasProduction" },
   "flocculation-g-value": { module: "../../calc-treatment.js", fn: "computeFlocculationGValue" },
   "flocculator-paddle-power": { module: "../../calc-treatment.js", fn: "computeFlocculatorPaddlePower" },

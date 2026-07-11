@@ -101,6 +101,7 @@ const _TILES = [
   ["chemical-feed-pump", "M"],
   ["clarifier-surface-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"],
   ["digester-vs-loading", "M"],
+  ["va-alkalinity-ratio", "M"],
   ["digester-gas-production", "M"],
   ["flocculation-g-value", "M"],
   ["flocculator-paddle-power", "M"],

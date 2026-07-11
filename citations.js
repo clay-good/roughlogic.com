@@ -683,6 +683,17 @@ export const CITATIONS = {
       { name: "Loading is the metric", value: "the loading rate, not a full tank, sets digester health; concentration and flow both matter", source: "WEF" },
     ],
   },
+  "va-alkalinity-ratio": {
+    formula: "ratio = volatile_acids / alkalinity (both to a common CaCO3 basis); buffer_margin = alkalinity - volatile_acids.",
+    edition: "Volatile-acid to alkalinity ratio, anaerobic-digester stability index (WEF Manual of Practice; EPA operator practice), by name.",
+    freeAccess: "The VA/alkalinity stability ratio is a public wastewater-operations index; the digester monitoring and the operator govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "Bands: < 0.1 stable, 0.1-0.25 acceptable, 0.25-0.4 begin corrective action (cut the feed, add alkalinity), > 0.4 souring. The pH is a lagging indicator - the bicarbonate buffer holds the pH steady until the alkalinity is consumed, so the ratio flags the upset days before the pH moves. Both readings must be to the same CaCO3 basis. An operating aid, not a control setpoint.",
+    assumptions: [
+      { name: "Common basis", value: "volatile acids and alkalinity must be expressed to the same CaCO3 basis for the ratio to be meaningful", source: "WEF Manual of Practice" },
+      { name: "pH lags", value: "the ratio rises days before the pH falls; the bicarbonate buffer masks the upset until it is consumed", source: "EPA operator practice" },
+    ],
+  },
   "tds-from-conductivity": {
     formula: "tds_mgl = k_factor x conductivity_us_cm; k commonly 0.55-0.75 (default 0.65).",
     edition: "Total dissolved solids from electrical conductivity (Standard Methods 2510), by name.",

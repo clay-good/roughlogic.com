@@ -658,6 +658,43 @@ const renderDigesterVsLoading = _rPool({
 });
 TREATMENT_RENDERERS["digester-vs-loading"] = renderDigesterVsLoading;
 
+// --- spec-v620 M: Digester volatile-acid to alkalinity ratio (`va-alkalinity-ratio`) ---
+// ratio = volatile_acids / alkalinity (common CaCO3 basis). Bands: <0.1 stable, <=0.25 acceptable, <=0.4 corrective, >0.4 souring.
+// dims: in { volatile_acids_mgl: dimensionless, alkalinity_mgl: dimensionless } out: { ratio: dimensionless, buffer_margin_mgl: dimensionless }
+export function computeVaAlkalinityRatio({ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const va = Number(volatile_acids_mgl) || 0;
+  const alk = Number(alkalinity_mgl) || 0;
+  if (!(alk > 0)) return { error: "Alkalinity must be positive (mg/L as CaCO3)." };
+  if (va < 0) return { error: "Volatile acids cannot be negative (mg/L)." };
+  const ratio = va / alk;
+  const band = ratio < 0.1 ? "stable"
+    : ratio <= 0.25 ? "acceptable"
+    : ratio <= 0.4 ? "corrective action"
+    : "souring";
+  const buffer_margin_mgl = alk - va;
+  return {
+    ratio, band, buffer_margin_mgl,
+    note: "The volatile-acid to alkalinity ratio is the early-warning index of digester stability: below ~0.1 stable, 0.1-0.25 acceptable, 0.25-0.4 begin corrective action (cut the feed, add alkalinity), above ~0.4 the digester is going sour. The pH is a LAGGING indicator - the bicarbonate buffer holds the pH steady until the alkalinity is consumed, so the ratio flags the upset days before the pH moves. Both readings must be to the same CaCO3 basis. The digester monitoring and the operator govern.",
+  };
+}
+export const vaAlkalinityRatioExample = { inputs: { volatile_acids_mgl: 180, alkalinity_mgl: 2400 } };
+const renderVaAlkalinityRatio = _rPool({
+  citation: "Citation: volatile-acid to alkalinity ratio, digester stability index (WEF Manual of Practice; EPA anaerobic-digester operator practice), by name. ratio = volatile_acids / alkalinity (both to a common CaCO3 basis). Bands: < 0.1 stable, 0.1-0.25 acceptable, 0.25-0.4 corrective action, > 0.4 souring. The pH is a lagging indicator - the bicarbonate buffer holds the pH steady until the alkalinity is consumed, so the ratio flags the upset days before the pH moves. The digester monitoring and the operator govern.",
+  example: vaAlkalinityRatioExample.inputs,
+  fields: [
+    { key: "volatile_acids_mgl", label: "Volatile acids as acetic (mg/L)", kind: "number" },
+    { key: "alkalinity_mgl", label: "Total alkalinity as CaCO3 (mg/L)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "var-out-r", label: "VA / alkalinity ratio", value: (r) => fmt(r.ratio, 3) + " - " + r.band },
+    { key: "b", id: "var-out-b", label: "Bicarbonate buffer margin", value: (r) => fmt(r.buffer_margin_mgl, 0) + " mg/L not yet consumed" },
+    { key: "n", id: "var-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeVaAlkalinityRatio,
+});
+TREATMENT_RENDERERS["va-alkalinity-ratio"] = renderVaAlkalinityRatio;
+
 // --- spec-v596 M: Digester gas and methane production (`digester-gas-production`) ---
 // VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.
 // dims: in { vs_fed_lb_day: dimensionless, vs_reduction_pct: dimensionless, gas_yield_ft3_lb: dimensionless, methane_pct: dimensionless } out: { vs_destroyed_lb_day: dimensionless, gas_ft3_day: dimensionless, methane_ft3_day: dimensionless, energy_btu_day: dimensionless }

@@ -81992,6 +81992,51 @@
       "term": "stocking chart residual density",
       "target": "thinning-target-tpa",
       "kind": "question"
+    },
+    {
+      "term": "volatile acid alkalinity ratio",
+      "target": "va-alkalinity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "digester stability ratio",
+      "target": "va-alkalinity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "va alk ratio",
+      "target": "va-alkalinity-ratio",
+      "kind": "redirect"
+    },
+    {
+      "term": "vfa to alkalinity",
+      "target": "va-alkalinity-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "is my digester going sour",
+      "target": "va-alkalinity-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "volatile acids to alkalinity ratio digester",
+      "target": "va-alkalinity-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "early warning digester upset before ph drops",
+      "target": "va-alkalinity-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "what va alkalinity ratio is safe",
+      "target": "va-alkalinity-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "digester health from titration numbers",
+      "target": "va-alkalinity-ratio",
+      "kind": "question"
     }
   ]
 }

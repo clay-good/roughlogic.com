@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(wastewater): spec-v620 digester volatile-acid to alkalinity ratio; 2026-07-10
+
+Lands `va-alkalinity-ratio` (Group M, calc-treatment.js), the follow-on spec-v573 named: the early-warning stability index the pH meter misses. ratio = volatile acids / alkalinity (common CaCO3 basis); bands < 0.1 stable, 0.1-0.25 acceptable, 0.25-0.4 corrective action, > 0.4 souring; plus the bicarbonate buffer margin. The pH lags because the buffer holds it steady until the alkalinity is consumed. Group M audit count 30 -> 31. Catalog 1,067 -> 1,068 (version 0.209.0).
+
 ### feat(forestry): spec-v619 thinning target TPA from a target SDI; 2026-07-10
 
 Lands `thinning-target-tpa` (Group L, calc-arborist.js), the follow-on spec-v564 named: the Reineke relation inverted to the residual-stand number. TPA_target = (SDI_max x target%) / (QMD/10)^1.605, trees to cut, and the residual basal area; round-trips through reineke-sdi exactly. A ponderosa stand (SDI_max 450) at the 35% floor and 10 in QMD keeps 157.5 TPA. Catalog 1,066 -> 1,067 (version 0.208.0).

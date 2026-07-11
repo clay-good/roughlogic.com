@@ -20030,3 +20030,30 @@ test("bounds: spec-v619 computeThinningTargetTpa pins the target, the cut, the Q
   assert.ok("error" in _v619({ sdi_max: 450, target_pct: 35, qmd_in: 0 }));
   assert.ok("error" in _v619({ sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: -1 }));
 });
+
+import { computeVaAlkalinityRatio as _v620 } from "../../calc-treatment.js";
+
+test("bounds: spec-v620 computeVaAlkalinityRatio pins the ratio, the band boundaries, the clean case, and error seams", () => {
+  // Pinned worked example: a healthy digester.
+  const r = _v620({ volatile_acids_mgl: 180, alkalinity_mgl: 2400 });
+  assert.ok(Math.abs(r.ratio - 0.075) < 1e-9);
+  assert.ok(r.band === "stable");
+  assert.ok(Math.abs(r.buffer_margin_mgl - 2220) < 1e-9);
+  // Cross-check: the corrective-action band.
+  const x = _v620({ volatile_acids_mgl: 900, alkalinity_mgl: 3000 });
+  assert.ok(Math.abs(x.ratio - 0.30) < 1e-9);
+  assert.ok(x.band === "corrective action");
+  // Band boundaries: 0.1 -> acceptable, 0.25 -> acceptable, 0.4 -> corrective action, just past 0.4 -> souring.
+  assert.ok(_v620({ volatile_acids_mgl: 100, alkalinity_mgl: 1000 }).band === "acceptable");
+  assert.ok(_v620({ volatile_acids_mgl: 99, alkalinity_mgl: 1000 }).band === "stable");
+  assert.ok(_v620({ volatile_acids_mgl: 250, alkalinity_mgl: 1000 }).band === "acceptable");
+  assert.ok(_v620({ volatile_acids_mgl: 400, alkalinity_mgl: 1000 }).band === "corrective action");
+  assert.ok(_v620({ volatile_acids_mgl: 401, alkalinity_mgl: 1000 }).band === "souring");
+  // A very clean digester: zero volatile acids gives a ratio of 0 and the full alkalinity as buffer margin.
+  const clean = _v620({ volatile_acids_mgl: 0, alkalinity_mgl: 2000 });
+  assert.ok(clean.ratio === 0 && clean.band === "stable" && clean.buffer_margin_mgl === 2000);
+  // Error seams: non-finite, non-positive alkalinity, negative VA.
+  assert.ok("error" in _v620({ volatile_acids_mgl: 180, alkalinity_mgl: Infinity }));
+  assert.ok("error" in _v620({ volatile_acids_mgl: 180, alkalinity_mgl: 0 }));
+  assert.ok("error" in _v620({ volatile_acids_mgl: -1, alkalinity_mgl: 2000 }));
+});
