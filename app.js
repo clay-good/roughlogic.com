@@ -505,6 +505,7 @@ const TOOL_MODULES = (() => {
     "neutral-grounding-resistor",
     // spec-v558
     "step-touch-voltage",
+    "ground-potential-rise",
     // spec-v560
     "sccr-combination",
   ]);

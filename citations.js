@@ -6590,6 +6590,17 @@ export const CITATIONS = {
       { name: "Combination ratings", value: "a listed current-limiting device can raise a weak component's combination SCCR through its let-through", source: "UL 508A Supplement SB" },
     ],
   },
+  "ground-potential-rise": {
+    formula: "gpr_v = grid_current_a x grid_resistance_ohm; safe_by_gpr = tolerable_touch_v > 0 AND gpr_v <= tolerable_touch_v.",
+    edition: "IEEE Std 80 ground potential rise, by name.",
+    freeAccess: "IEEE 80 is available through IEEE; the ground-potential-rise relation is a published grounding-study screen.",
+    governance: GOVERNANCE.general,
+    editionNote: "The GPR is the whole grid's rise (grid current times grid resistance). The IEEE 80 shortcut: a GPR at or below the tolerable touch voltage means no yard point can exceed it, so no mesh or step analysis is needed. A GPR above the limit says nothing about any single footstep - the full mesh and step study is then required. The grid current is the portion of fault current returning through the grid to remote earth, not the total fault. IEEE Std 80 and a qualified grounding study govern - a screen, not a grounding design.",
+    assumptions: [
+      { name: "GPR shortcut", value: "a GPR <= the tolerable touch voltage clears the whole yard without mesh/step analysis", source: "IEEE Std 80" },
+      { name: "Grid current", value: "I_G is the portion of fault current returning through the grid to remote earth, not the total fault", source: "IEEE Std 80" },
+    ],
+  },
   "step-touch-voltage": {
     formula: "Cs = 1 - 0.09 (1 - rho/rho_s)/(2 hs + 0.09); E_step = (1000 + 6 Cs rho_s) k/sqrt(ts); E_touch = (1000 + 1.5 Cs rho_s) k/sqrt(ts) (k = 0.116 for 50 kg, 0.157 for 70 kg).",
     edition: "The IEEE Std 80 tolerable step and touch voltage limits with the surface-layer derating factor Cs, by name.",

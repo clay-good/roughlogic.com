@@ -50874,6 +50874,62 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "ground-potential-rise",
+   "source_publisher": "IEEE Std 80 (ground potential rise)",
+   "source_title": "GPR = grid_current x grid_resistance; safe when GPR <= tolerable touch (spec-v558's named follow-on)",
+   "source_edition_or_year": "IEEE Std 80",
+   "source_section_or_page": "200-A grid current, 0.5-ohm grid, 200-V tolerable touch -> 100 V GPR, SAFE (100-V margin, no mesh/step needed)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "grid_current_a": 200,
+    "grid_resistance_ohm": 0.5,
+    "tolerable_touch_v": 200
+   },
+   "outputs": {
+    "gpr_v": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "margin_v": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ground-potential-rise",
+   "source_publisher": "IEEE Std 80 (ground potential rise)",
+   "source_title": "cross-check: a large fault fails the screen",
+   "source_edition_or_year": "IEEE Std 80",
+   "source_section_or_page": "5,000-A fault, 1-ohm grid, 200-V tolerable touch -> 5,000 V GPR, FAILS (25x the limit, full mesh/step study required)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "grid_current_a": 5000,
+    "grid_resistance_ohm": 1.0,
+    "tolerable_touch_v": 200
+   },
+   "outputs": {
+    "gpr_v": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ratio": {
+     "value": 25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): spec-v610 ground potential rise screen (IEEE 80); 2026-07-10
+
+Lands `ground-potential-rise` (Group A, calc-elecdesign.js), the follow-on spec-v558 named: the yard-voltage side of step-touch-voltage. GPR = grid_current x grid_resistance, screened against the tolerable touch voltage (the IEEE 80 shortcut: a GPR at or below the tolerable touch clears the whole yard without mesh/step analysis). Repoints the "ground potential rise" alias to the dedicated tile. Catalog 1,057 -> 1,058 (version 0.199.0).
+
 ### feat(hvac): spec-v609 combustion lambda and air-fuel ratio; 2026-07-10
 
 Lands `combustion-lambda` (Group C, calc-hvacservice.js), the follow-on spec-v583 named: the lambda and air-fuel ratio a modern analyzer shows beside excess air. lambda = 20.9 / (20.9 - O2); excess air = (lambda - 1) x 100; AFR_actual = lambda x AFR_stoich (17.2 natural gas, 15.5 propane, 14.5 #2 oil, by mass). Completes the combustion-analysis readout set. Catalog 1,056 -> 1,057 (version 0.198.0).

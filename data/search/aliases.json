@@ -8690,7 +8690,7 @@
     },
     {
       "term": "ground potential rise",
-      "target": "step-touch-voltage",
+      "target": "ground-potential-rise",
       "kind": "adjacent"
     },
     {
@@ -81496,6 +81496,51 @@
     {
       "term": "combustion air fuel ratio by mass",
       "target": "combustion-lambda",
+      "kind": "question"
+    },
+    {
+      "term": "gpr grounding",
+      "target": "ground-potential-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "grid rise voltage",
+      "target": "ground-potential-rise",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ieee 80 gpr",
+      "target": "ground-potential-rise",
+      "kind": "redirect"
+    },
+    {
+      "term": "earth potential rise",
+      "target": "ground-potential-rise",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what is ground potential rise",
+      "target": "ground-potential-rise",
+      "kind": "question"
+    },
+    {
+      "term": "gpr from grid current and resistance",
+      "target": "ground-potential-rise",
+      "kind": "question"
+    },
+    {
+      "term": "is my grounding grid safe by gpr",
+      "target": "ground-potential-rise",
+      "kind": "question"
+    },
+    {
+      "term": "do i need a mesh step analysis",
+      "target": "ground-potential-rise",
+      "kind": "question"
+    },
+    {
+      "term": "ground grid rise vs tolerable touch",
+      "target": "ground-potential-rise",
       "kind": "question"
     }
   ]

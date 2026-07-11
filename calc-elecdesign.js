@@ -418,6 +418,44 @@ ELECDESIGN_RENDERERS["step-touch-voltage"] = _simpleRenderer({
   compute: computeStepTouchVoltage,
 });
 
+// ===================== spec-v610: ground potential rise screen (IEEE Std 80) =====================
+// GPR = grid_current * grid_resistance. safe_by_gpr = tolerable_touch > 0 && GPR <= tolerable_touch.
+// dims: in { grid_current_a: I, grid_resistance_ohm: dimensionless, tolerable_touch_v: dimensionless } out: { gpr_v: dimensionless, safe_by_gpr: dimensionless, margin_v: dimensionless }
+export function computeGroundPotentialRise({ grid_current_a = 0, grid_resistance_ohm = 0, tolerable_touch_v = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ig = Number(grid_current_a) || 0;
+  const rg = Number(grid_resistance_ohm) || 0;
+  const et = Number(tolerable_touch_v) || 0;
+  if (!(ig > 0)) return { error: "Grid current must be positive (A)." };
+  if (!(rg > 0)) return { error: "Grid resistance must be positive (ohm)." };
+  if (et < 0) return { error: "Tolerable touch voltage cannot be negative (V)." };
+  const gpr_v = ig * rg;
+  const has_limit = et > 0;
+  const safe_by_gpr = has_limit && gpr_v <= et;
+  const margin_v = has_limit ? et - gpr_v : null;
+  const ratio = has_limit ? gpr_v / et : null;
+  return {
+    gpr_v, has_limit, safe_by_gpr, margin_v, ratio,
+    note: "The GPR is the whole grid's rise (grid current times grid resistance). The IEEE 80 shortcut: a GPR at or below the tolerable touch voltage means no yard point can exceed it, so no mesh or step analysis is needed. A GPR above the limit says nothing about any single footstep - the full mesh and step study is then required. The grid current is the portion of fault current returning through the grid to remote earth, not the total fault. IEEE Std 80 and a qualified grounding study govern - a screen, not a grounding design.",
+  };
+}
+export const groundPotentialRiseExample = { inputs: { grid_current_a: 200, grid_resistance_ohm: 0.5, tolerable_touch_v: 200 } };
+ELECDESIGN_RENDERERS["ground-potential-rise"] = _simpleRenderer({
+  citation: "Citation: IEEE Std 80 ground potential rise: GPR = grid_current x grid_resistance; safe_by_gpr = GPR <= tolerable_touch. The GPR is the whole grid's rise; a GPR at or below the tolerable touch voltage means no yard point can exceed it (no mesh/step analysis needed), while a GPR above it requires the full mesh and step study. The grid current is the portion of fault current returning through the grid to remote earth, not the total fault. IEEE Std 80 and a qualified grounding study govern.",
+  example: groundPotentialRiseExample.inputs,
+  fields: [
+    { key: "grid_current_a", label: "Grid current I_G (A)", kind: "number" },
+    { key: "grid_resistance_ohm", label: "Grounding-grid resistance R_g (ohm)", kind: "number" },
+    { key: "tolerable_touch_v", label: "Tolerable touch voltage (V, from step-touch-voltage; 0 to skip)", kind: "number" },
+  ],
+  outputs: [
+    { key: "gpr", id: "gpr-out-gpr", label: "Ground potential rise", value: (r) => fmt(r.gpr_v, 0) + " V" },
+    { key: "screen", id: "gpr-out-screen", label: "IEEE 80 screen", value: (r) => !r.has_limit ? "(enter a tolerable touch voltage to screen)" : r.safe_by_gpr ? "SAFE - GPR at or below tolerable touch (" + fmt(r.margin_v, 0) + " V margin); no mesh/step analysis needed" : "FAILS - GPR is " + fmt(r.ratio, 1) + "x the tolerable touch; full mesh/step study required" },
+    { key: "n", id: "gpr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGroundPotentialRise,
+});
+
 // ===================== spec-v560: industrial control panel SCCR (UL 508A SB) =====================
 
 // dims: in { component_sccrs_ka: dimensionless, feeder_ir_ka: I, available_fault_ka: I } out: { panel_sccr_ka: I, compliant: dimensionless }

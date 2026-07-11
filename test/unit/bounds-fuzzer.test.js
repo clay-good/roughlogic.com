@@ -19699,3 +19699,38 @@ test("bounds: spec-v609 computeCombustionLambda pins lambda, AFR, the excess-air
   assert.ok("error" in _v609({ fuel: "natural_gas", flue_o2_pct: 21 }));
   assert.ok("error" in _v609({ fuel: "natural_gas", flue_o2_pct: -1 }));
 });
+
+import { computeGroundPotentialRise as _v610 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v610 computeGroundPotentialRise pins the GPR, the IEEE 80 screen, the skip case, and error seams", () => {
+  // Pinned worked example: 200-A grid current, 0.5-ohm grid, 200-V tolerable touch -> safe.
+  const r = _v610({ grid_current_a: 200, grid_resistance_ohm: 0.5, tolerable_touch_v: 200 });
+  assert.ok(Math.abs(r.gpr_v - 100) < 1e-9);
+  assert.equal(r.has_limit, true);
+  assert.equal(r.safe_by_gpr, true);
+  assert.ok(Math.abs(r.margin_v - 100) < 1e-9);
+  assert.ok(Math.abs(r.ratio - 0.5) < 1e-9);
+  // GPR is exactly grid_current x grid_resistance.
+  assert.ok(Math.abs(r.gpr_v - 200 * 0.5) < 1e-12);
+  // Cross-check: a large fault fails the screen.
+  const x = _v610({ grid_current_a: 5000, grid_resistance_ohm: 1.0, tolerable_touch_v: 200 });
+  assert.ok(Math.abs(x.gpr_v - 5000) < 1e-9);
+  assert.equal(x.safe_by_gpr, false);
+  assert.ok(Math.abs(x.ratio - 25) < 1e-9);
+  assert.ok(x.margin_v < 0);
+  // Exactly at the limit is safe (<=).
+  const edge = _v610({ grid_current_a: 400, grid_resistance_ohm: 0.5, tolerable_touch_v: 200 });
+  assert.equal(edge.safe_by_gpr, true);
+  assert.ok(Math.abs(edge.margin_v) < 1e-9);
+  // No tolerable touch given -> screen is skipped, GPR still reported.
+  const bare = _v610({ grid_current_a: 200, grid_resistance_ohm: 0.5, tolerable_touch_v: 0 });
+  assert.equal(bare.has_limit, false);
+  assert.equal(bare.safe_by_gpr, false);
+  assert.equal(bare.margin_v, null);
+  assert.ok(Math.abs(bare.gpr_v - 100) < 1e-9);
+  // Error seams: non-finite, non-positive current / resistance, negative tolerable.
+  assert.ok("error" in _v610({ grid_current_a: Infinity, grid_resistance_ohm: 0.5, tolerable_touch_v: 200 }));
+  assert.ok("error" in _v610({ grid_current_a: 0, grid_resistance_ohm: 0.5, tolerable_touch_v: 200 }));
+  assert.ok("error" in _v610({ grid_current_a: 200, grid_resistance_ohm: 0, tolerable_touch_v: 200 }));
+  assert.ok("error" in _v610({ grid_current_a: 200, grid_resistance_ohm: 0.5, tolerable_touch_v: -1 }));
+});
