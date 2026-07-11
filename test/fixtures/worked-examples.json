@@ -50814,6 +50814,66 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "combustion-lambda",
+   "source_publisher": "Combustion-analysis practice (lambda / air-fuel ratio)",
+   "source_title": "lambda = 20.9 / (20.9 - O2); AFR_actual = lambda x AFR_stoich (spec-v583's named follow-on)",
+   "source_edition_or_year": "combustion analysis practice",
+   "source_section_or_page": "Natural gas at 3% O2 -> lambda 1.168, 16.8% excess air, 20.1:1 AFR (17.2:1 stoichiometric)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "fuel": "natural_gas",
+    "flue_o2_pct": 3
+   },
+   "outputs": {
+    "lambda": {
+     "value": 1.167598,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "excess_air_pct": {
+     "value": 16.759777,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "afr_actual": {
+     "value": 20.082682,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "combustion-lambda",
+   "source_publisher": "Combustion-analysis practice (lambda / air-fuel ratio)",
+   "source_title": "cross-check: a propane appliance",
+   "source_edition_or_year": "combustion analysis practice",
+   "source_section_or_page": "Propane at 5% O2 -> lambda 1.314, 31.4% excess air, 20.4:1 AFR (15.5:1 stoichiometric)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "fuel": "propane",
+    "flue_o2_pct": 5
+   },
+   "outputs": {
+    "lambda": {
+     "value": 1.314465,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "afr_actual": {
+     "value": 20.374214,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
   }
  ]
 }

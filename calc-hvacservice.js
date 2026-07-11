@@ -827,3 +827,52 @@ function _v594renderFlueGasCombustionEff(inputRegion, outputRegion, citationEl) 
   fuel.select.addEventListener("change", update);
 }
 HVACSERVICE_RENDERERS["flue-gas-combustion-eff"] = _v594renderFlueGasCombustionEff;
+
+// ===================== spec-v609 C: combustion lambda and air-fuel ratio =====================
+// lambda = 20.9/(20.9-O2). EA = (lambda-1)*100. AFR = lambda * AFR_stoich(fuel).
+const _V609_AFR = { natural_gas: 17.2, propane: 15.5, oil2: 14.5 };
+// dims: in { fuel: dimensionless, flue_o2_pct: dimensionless } out: { lambda: dimensionless, excess_air_pct: dimensionless, afr_actual: dimensionless, afr_stoich: dimensionless }
+export function computeCombustionLambda({ fuel = "natural_gas", flue_o2_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const afr_stoich = _V609_AFR[fuel];
+  if (afr_stoich === undefined) return { error: "Fuel must be natural gas, propane, or #2 fuel oil." };
+  const o2 = Number(flue_o2_pct) || 0;
+  if (o2 < 0) return { error: "Oxygen cannot be negative (%)." };
+  if (!(o2 < 20.9)) return { error: "Oxygen at or above 20.9% means no combustion." };
+  const lambda = 20.9 / (20.9 - o2);
+  const excess_air_pct = (lambda - 1) * 100;
+  const afr_actual = lambda * afr_stoich;
+  return {
+    lambda, excess_air_pct, afr_actual, afr_stoich,
+    note: "Lambda is the same physics as excess air (lambda = 1 + excess_air/100), shown the way the instrument displays it. The air-fuel ratio is by mass; the stoichiometric ratio is a fuel property (17.2 natural gas, 15.5 propane, 14.5 #2 oil). The oxygen form assumes complete combustion, so measurable CO understates it; sample dry, air-free oxygen in the flue. The analyzer, the appliance, and the manufacturer instructions govern - a tuning aid, not a certified combustion test.",
+  };
+}
+export const combustionLambdaExample = { inputs: { fuel: "natural_gas", flue_o2_pct: 3 } };
+function _v609renderCombustionLambda(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A tuning aid, not a certified combustion test; the analyzer, the appliance, and the manufacturer instructions govern. Citation: combustion-analysis practice lambda and air-fuel ratio, by name. lambda = 20.9 / (20.9 - O2); excess_air = (lambda - 1) x 100; AFR_actual = lambda x AFR_stoich (17.2 natural gas, 15.5 propane, 14.5 #2 oil, by mass). Lambda is the same physics as excess air (lambda = 1 + excess_air/100), shown the way the instrument displays it. The oxygen form assumes complete combustion; sample dry, air-free oxygen in the flue.";
+  const fuel = makeSelect("Fuel", "clam-fuel", [
+    { value: "natural_gas", label: "Natural gas (AFR 17.2)", selected: true },
+    { value: "propane", label: "Propane (AFR 15.5)" },
+    { value: "oil2", label: "#2 fuel oil (AFR 14.5)" },
+  ]);
+  const o2 = makeNumber("Flue-gas O2 (%, dry, air-free)", "clam-o2", { step: "any", min: "0", max: "20.9", value: "3" }); o2.input.value = "3";
+  inputRegion.appendChild(fuel.wrap);
+  inputRegion.appendChild(o2.wrap);
+  attachExampleButton(inputRegion, () => { fuel.select.value = "natural_gas"; o2.input.value = "3"; update(); });
+  const oLambda = makeOutputLine(outputRegion, "Lambda", "clam-out-lambda");
+  const oEA = makeOutputLine(outputRegion, "Excess air", "clam-out-ea");
+  const oAfr = makeOutputLine(outputRegion, "Actual air-fuel ratio (by mass)", "clam-out-afr");
+  const oNote = makeOutputLine(outputRegion, "Note", "clam-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCombustionLambda({ fuel: fuel.select.value, flue_o2_pct: readNum(o2.input) });
+    if (r.error) { oLambda.textContent = r.error; oEA.textContent = "-"; oAfr.textContent = "-"; oNote.textContent = ""; return; }
+    oLambda.textContent = fmt(r.lambda, 3);
+    oEA.textContent = fmt(r.excess_air_pct, 1) + "%";
+    oAfr.textContent = fmt(r.afr_actual, 1) + ":1 (stoichiometric " + fmt(r.afr_stoich, 1) + ":1)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  fuel.select.addEventListener("change", update);
+  o2.input.addEventListener("input", update);
+}
+HVACSERVICE_RENDERERS["combustion-lambda"] = _v609renderCombustionLambda;

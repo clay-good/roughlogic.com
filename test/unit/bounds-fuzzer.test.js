@@ -19663,3 +19663,39 @@ test("bounds: spec-v608 computeTreeCrzEncroachment pins the segment encroachment
   assert.ok("error" in _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: -1, species_tolerance: "intermediate" }));
   assert.ok("error" in _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "unknown" }));
 });
+
+import { computeCombustionLambda as _v609 } from "../../calc-hvacservice.js";
+import { computeExcessAirO2 as _v609ea } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v609 computeCombustionLambda pins lambda, AFR, the excess-air identity, the fuel switch, and error seams", () => {
+  // Pinned worked example: natural gas at 3% O2.
+  const r = _v609({ fuel: "natural_gas", flue_o2_pct: 3 });
+  assert.ok(Math.abs(r.lambda - 20.9 / (20.9 - 3)) < 1e-12);
+  assert.ok(Math.abs(r.lambda - 1.167598) < 1e-5);
+  assert.ok(Math.abs(r.excess_air_pct - (r.lambda - 1) * 100) < 1e-9);
+  assert.ok(Math.abs(r.afr_actual - r.lambda * 17.2) < 1e-9);
+  assert.ok(Math.abs(r.afr_actual - 20.082682) < 1e-5);
+  assert.equal(r.afr_stoich, 17.2);
+  // Lambda's excess air matches excess-air-o2's O2 form exactly (lambda = 1 + EA/100).
+  const ea = _v609ea({ measured_o2_pct: 3, measured_co2_pct: 0, co2max_pct: 11.7 });
+  assert.ok(Math.abs(r.excess_air_pct - ea.excess_air_pct) < 1e-9);
+  assert.ok(Math.abs(r.lambda - (1 + ea.excess_air_pct / 100)) < 1e-9);
+  // Cross-check: propane at 5% O2.
+  const x = _v609({ fuel: "propane", flue_o2_pct: 5 });
+  assert.ok(Math.abs(x.lambda - 1.314465) < 1e-5);
+  assert.ok(Math.abs(x.afr_actual - 1.314465 * 15.5) < 1e-4);
+  assert.equal(x.afr_stoich, 15.5);
+  // #2 oil uses its own stoichiometric ratio.
+  const oil = _v609({ fuel: "oil2", flue_o2_pct: 4 });
+  assert.equal(oil.afr_stoich, 14.5);
+  // Lambda is 1.0 at perfect combustion (O2 = 0).
+  const stoich = _v609({ fuel: "natural_gas", flue_o2_pct: 0 });
+  assert.ok(Math.abs(stoich.lambda - 1) < 1e-12);
+  assert.ok(Math.abs(stoich.excess_air_pct) < 1e-9);
+  // Error seams: unknown fuel, non-finite, O2 >= 20.9, negative O2.
+  assert.ok("error" in _v609({ fuel: "diesel", flue_o2_pct: 3 }));
+  assert.ok("error" in _v609({ fuel: "natural_gas", flue_o2_pct: Infinity }));
+  assert.ok("error" in _v609({ fuel: "natural_gas", flue_o2_pct: 20.9 }));
+  assert.ok("error" in _v609({ fuel: "natural_gas", flue_o2_pct: 21 }));
+  assert.ok("error" in _v609({ fuel: "natural_gas", flue_o2_pct: -1 }));
+});

@@ -1683,6 +1683,17 @@ export const CITATIONS = {
       { name: "Sample point", value: "sample in the flue, before the draft hood or dilution air, or the correction over-inflates", source: "BPI field practice" },
     ],
   },
+  "combustion-lambda": {
+    formula: "lambda = 20.9 / (20.9 - flue_o2_pct); excess_air_pct = (lambda - 1) x 100; afr_actual = lambda x afr_stoich(fuel).",
+    edition: "Combustion-analysis practice lambda and air-fuel ratio, by name.",
+    freeAccess: "The lambda and air-fuel-ratio relations are standard combustion-analysis practice; the analyzer and appliance manufacturer instructions govern the actual tune.",
+    governance: GOVERNANCE.general,
+    editionNote: "Lambda is the same physics as excess air (lambda = 1 + excess_air/100), shown the way the instrument displays it. The air-fuel ratio is by mass; the stoichiometric ratio is a fuel property (17.2 natural gas, 15.5 propane, 14.5 #2 oil). The oxygen form assumes complete combustion, so measurable CO understates it; sample dry, air-free oxygen in the flue. The analyzer, the appliance, and the manufacturer instructions govern - a tuning aid, not a certified combustion test.",
+    assumptions: [
+      { name: "Lambda from O2", value: "lambda = 20.9 / (20.9 - O2) = 1 + excess_air/100; the same physics excess-air-o2 reports", source: "combustion analysis practice" },
+      { name: "Stoichiometric AFR", value: "by mass, 17.2 natural gas, 15.5 propane, 14.5 #2 oil", source: "fuel stoichiometry" },
+    ],
+  },
   "excess-air-o2": {
     formula: "EA_pct = measured_co2 > 0 ? (co2max / measured_co2 - 1) x 100 : measured_o2 / (20.9 - measured_o2) x 100.",
     edition: "ASME PTC 4.1 / combustion analysis practice excess air from flue-gas oxygen, by name.",

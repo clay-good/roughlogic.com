@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v609 combustion lambda and air-fuel ratio; 2026-07-10
+
+Lands `combustion-lambda` (Group C, calc-hvacservice.js), the follow-on spec-v583 named: the lambda and air-fuel ratio a modern analyzer shows beside excess air. lambda = 20.9 / (20.9 - O2); excess air = (lambda - 1) x 100; AFR_actual = lambda x AFR_stoich (17.2 natural gas, 15.5 propane, 14.5 #2 oil, by mass). Completes the combustion-analysis readout set. Catalog 1,056 -> 1,057 (version 0.198.0).
+
 ### feat(arborist): spec-v608 critical root zone encroachment percent; 2026-07-10
 
 Lands `tree-crz-encroachment` (Group L, calc-arborist.js), the follow-on spec-v566 named: how much of the CRZ a construction limit line cuts off, judged against species tolerance. A limit line at distance d slices a segment R^2 x acos(d/R) - d x sqrt(R^2 - d^2); encroach = segment / (pi x R^2) x 100, over when past the species threshold (tolerant 40 / intermediate 30 / sensitive 20). Catalog 1,055 -> 1,056 (version 0.197.0).

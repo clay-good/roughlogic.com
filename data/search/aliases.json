@@ -81447,6 +81447,56 @@
       "term": "species tolerance root disturbance",
       "target": "tree-crz-encroachment",
       "kind": "question"
+    },
+    {
+      "term": "combustion lambda",
+      "target": "combustion-lambda",
+      "kind": "industry"
+    },
+    {
+      "term": "air fuel ratio",
+      "target": "combustion-lambda",
+      "kind": "industry"
+    },
+    {
+      "term": "lambda from o2",
+      "target": "combustion-lambda",
+      "kind": "redirect"
+    },
+    {
+      "term": "afr combustion",
+      "target": "combustion-lambda",
+      "kind": "adjacent"
+    },
+    {
+      "term": "excess air lambda",
+      "target": "combustion-lambda",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what is lambda on a combustion analyzer",
+      "target": "combustion-lambda",
+      "kind": "question"
+    },
+    {
+      "term": "air fuel ratio from flue oxygen",
+      "target": "combustion-lambda",
+      "kind": "question"
+    },
+    {
+      "term": "convert o2 to lambda",
+      "target": "combustion-lambda",
+      "kind": "question"
+    },
+    {
+      "term": "lambda to excess air",
+      "target": "combustion-lambda",
+      "kind": "question"
+    },
+    {
+      "term": "combustion air fuel ratio by mass",
+      "target": "combustion-lambda",
+      "kind": "question"
     }
   ]
 }

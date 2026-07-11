@@ -530,6 +530,7 @@ const TOOL_MODULES = (() => {
     "chimney-draft",
     // spec-v594 flue-gas combustion efficiency (stack loss)
     "flue-gas-combustion-eff",
+    "combustion-lambda",
   ]);
   // spec-v103 new pipe/well disinfection bench; relieves the standing
   // calc-plumbing.js cap watch. Both tiles keep group "B".

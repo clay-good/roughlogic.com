@@ -644,6 +644,7 @@ const RELATED = {
   "co-air-free": ["excess-air-o2", "combustion-air", "furnace-temp-rise"],
   "chimney-draft": ["combustion-air", "excess-air-o2", "co-air-free"],
   "flue-gas-combustion-eff": ["excess-air-o2", "co-air-free", "chimney-draft"],
+  "combustion-lambda": ["excess-air-o2", "co-air-free", "flue-gas-combustion-eff"],
   "duct-friction-static": ["duct-sizing", "static-pressure-hvac", "equivalent-length"],
   "refrigerant-charging": ["refrigerant-pt", "superheat-subcool", "refrigerant-charge"],
   "cooling-tower": ["approach-delta-t", "wet-bulb-psychrometer", "chiller-tons"],
