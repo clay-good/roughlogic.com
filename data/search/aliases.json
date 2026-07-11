@@ -82087,6 +82087,56 @@
       "term": "velocity gradient per stage flocculation",
       "target": "tapered-flocculation-g",
       "kind": "question"
+    },
+    {
+      "term": "draft hood dilution",
+      "target": "draft-hood-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "dilution air",
+      "target": "draft-hood-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "vent connector dilution",
+      "target": "draft-hood-dilution",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dilution ratio combustion",
+      "target": "draft-hood-dilution",
+      "kind": "redirect"
+    },
+    {
+      "term": "draft hood dilution ratio",
+      "target": "draft-hood-dilution",
+      "kind": "industry"
+    },
+    {
+      "term": "how much dilution air did the draft hood pull in",
+      "target": "draft-hood-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "why is my co reading low after the draft hood",
+      "target": "draft-hood-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "dilution ratio from two oxygen readings",
+      "target": "draft-hood-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "flue gas dilution before and after draft hood",
+      "target": "draft-hood-dilution",
+      "kind": "question"
+    },
+    {
+      "term": "does the vent connector dilute co",
+      "target": "draft-hood-dilution",
+      "kind": "question"
     }
   ]
 }

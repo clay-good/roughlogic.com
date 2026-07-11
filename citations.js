@@ -1716,6 +1716,17 @@ export const CITATIONS = {
       { name: "Sample point", value: "sample in the flue, before the draft hood or dilution air, or the correction over-inflates", source: "BPI field practice" },
     ],
   },
+  "draft-hood-dilution": {
+    formula: "dilution_ratio = (20.9 - appliance_o2_pct) / (20.9 - diluted_o2_pct); dilution_air_fraction = (diluted_o2_pct - appliance_o2_pct) / (20.9 - appliance_o2_pct) x 100; co_read_fraction = 100 / dilution_ratio.",
+    edition: "Combustion-analysis practice; ambient-oxygen (20.9%) dilution mass balance, by name.",
+    freeAccess: "The dilution mass balance is standard combustion-analysis practice; the analyzer and appliance manufacturer instructions govern the actual diagnosis.",
+    governance: GOVERNANCE.general,
+    editionNote: "The appliance O2 is measured at the appliance flue outlet, before the draft hood; the diluted O2 in the vent connector, after it. Dilution with room air (20.9% O2) raises the O2, and a CO or efficiency reading taken in the diluted stream understates the real flue value by this same ratio - so the air-free CO sample (co-air-free) must be taken before the draft hood. The analyzer and the manufacturer instructions govern - a diagnostic aid, not a certified combustion test.",
+    assumptions: [
+      { name: "Ambient oxygen", value: "dilution air is ambient at 20.9% O2; the two flue O2 readings drive the whole mass balance", source: "combustion-analysis practice" },
+      { name: "Sample points", value: "appliance O2 before the draft hood, diluted O2 after it; dilution can only raise the O2", source: "combustion-analysis practice" },
+    ],
+  },
   "combustion-lambda": {
     formula: "lambda = 20.9 / (20.9 - flue_o2_pct); excess_air_pct = (lambda - 1) x 100; afr_actual = lambda x afr_stoich(fuel).",
     edition: "Combustion-analysis practice lambda and air-fuel ratio, by name.",

@@ -199,6 +199,7 @@ const _TILES = [
   ["duct-leakage-cfm25", "C"],
   ["excess-air-o2", "C"],
   ["co-air-free", "C"],
+  ["draft-hood-dilution", "C"],
   ["chimney-draft", "C"],
   ["flue-gas-combustion-eff", "C"],
   ["combustion-lambda", "C"],

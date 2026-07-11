@@ -20089,3 +20089,28 @@ test("bounds: spec-v621 computeTaperedFlocculationG pins the 3-stage powers, the
   assert.ok("error" in _v621({ stage1_g_per_s: 50, stage2_g_per_s: 30, stage_volume_m3: 100, total_detention_min: 0 }));
   assert.ok("error" in _v621({ stage1_g_per_s: 50, stage2_g_per_s: 30, stage_volume_m3: 100, water_temp_c: 45, total_detention_min: 30 }));
 });
+
+import { computeDraftHoodDilution as _v622 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v622 computeDraftHoodDilution pins the ratio, the dilution-air fraction, the reciprocal CO read, and error seams", () => {
+  // Pinned worked example: appliance O2 5%, diluted O2 12%.
+  const r = _v622({ appliance_o2_pct: 5, diluted_o2_pct: 12 });
+  assert.ok(Math.abs(r.dilution_ratio - (20.9 - 5) / (20.9 - 12)) < 1e-12);
+  assert.ok(Math.abs(r.dilution_ratio - 1.7865) < 0.001);
+  assert.ok(Math.abs(r.dilution_air_fraction_pct - 44.0252) < 0.01);
+  // CO-read fraction is the reciprocal of the dilution ratio.
+  assert.ok(Math.abs(r.co_read_fraction_pct - 100 / r.dilution_ratio) < 1e-9);
+  assert.ok(Math.abs(r.co_read_fraction_pct - 55.9748) < 0.01);
+  // Cross-check: appliance O2 8%, diluted O2 14%.
+  const x = _v622({ appliance_o2_pct: 8, diluted_o2_pct: 14 });
+  assert.ok(Math.abs(x.dilution_ratio - 1.8696) < 0.001);
+  assert.ok(Math.abs(x.dilution_air_fraction_pct - 46.5116) < 0.01);
+  // Consistency: ratio and fraction agree (fraction = (1 - 1/ratio) x 100).
+  assert.ok(Math.abs(x.dilution_air_fraction_pct - (1 - 1 / x.dilution_ratio) * 100) < 1e-9);
+  // Error seams: non-finite, O2 out of [0, 20.9), diluted not greater than appliance.
+  assert.ok("error" in _v622({ appliance_o2_pct: Infinity, diluted_o2_pct: 12 }));
+  assert.ok("error" in _v622({ appliance_o2_pct: 5, diluted_o2_pct: 20.9 }));
+  assert.ok("error" in _v622({ appliance_o2_pct: -1, diluted_o2_pct: 12 }));
+  assert.ok("error" in _v622({ appliance_o2_pct: 12, diluted_o2_pct: 5 }));
+  assert.ok("error" in _v622({ appliance_o2_pct: 5, diluted_o2_pct: 5 }));
+});

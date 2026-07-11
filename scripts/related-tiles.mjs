@@ -646,6 +646,7 @@ const RELATED = {
   "duct-leakage-cfm25": ["duct-leakage", "blower-door-ach50", "duct-sizing", "infiltration-load"],
   "excess-air-o2": ["combustion-air", "furnace-temp-rise", "gas-meter-clock"],
   "co-air-free": ["excess-air-o2", "combustion-air", "furnace-temp-rise"],
+  "draft-hood-dilution": ["co-air-free", "excess-air-o2", "flue-gas-combustion-eff"],
   "chimney-draft": ["combustion-air", "excess-air-o2", "co-air-free"],
   "flue-gas-combustion-eff": ["excess-air-o2", "co-air-free", "chimney-draft"],
   "combustion-lambda": ["excess-air-o2", "co-air-free", "flue-gas-combustion-eff"],

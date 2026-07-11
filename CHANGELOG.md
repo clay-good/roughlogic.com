@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v622 draft-hood dilution ratio; 2026-07-11
+
+Lands `draft-hood-dilution` (Group C, calc-hvacservice.js), the follow-on spec-v584 named: how much room air the draft hood pulled in, from two O2 readings. dilution_ratio = (20.9 - O2_appliance) / (20.9 - O2_diluted); dilution_air_fraction = (O2_diluted - O2_appliance) / (20.9 - O2_appliance) (the 20.9% ambient-oxygen mass balance). A clean appliance at 5% O2 reading 12% at the vent has 44% dilution air, so a CO reading there is only 56% of the true flue value - why the air-free CO sample belongs before the draft hood. Catalog 1,069 -> 1,070 (version 0.211.0).
+
 ### feat(water): spec-v621 tapered flocculation G schedule; 2026-07-10
 
 Lands `tapered-flocculation-g` (Group M, calc-treatment.js), the follow-on spec-v575 named: the multi-stage schedule the single-basin G tile can't give. P_stage = G_stage^2 x mu(T) x V (the Camp-Stein relation inverted, reusing the module's water-viscosity table) across 2-3 stages of decreasing G, with the composite Gt and a tapered/in-band check. A 50/30/20 per-second taper in three 100 m3 stages at 15 C needs 285 / 102 / 46 W. Group M audit count 31 -> 32. Catalog 1,068 -> 1,069 (version 0.210.0).

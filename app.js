@@ -528,6 +528,8 @@ const TOOL_MODULES = (() => {
     "excess-air-o2",
     // spec-v584 air-free CO correction
     "co-air-free",
+    // spec-v622 draft-hood dilution ratio
+    "draft-hood-dilution",
     // spec-v585 theoretical chimney draft
     "chimney-draft",
     // spec-v594 flue-gas combustion efficiency (stack loss)

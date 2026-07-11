@@ -717,6 +717,46 @@ function _v584renderCoAirFree(inputRegion, outputRegion, citationEl) {
 }
 HVACSERVICE_RENDERERS["co-air-free"] = _v584renderCoAirFree;
 
+// --- spec-v622 C: Draft-hood dilution ratio from two O2 readings ---
+// dilution_ratio = (20.9 - O2_appliance)/(20.9 - O2_diluted); dilution_air_fraction = (O2_diluted - O2_appliance)/(20.9 - O2_appliance).
+// dims: in { appliance_o2_pct: dimensionless, diluted_o2_pct: dimensionless } out: { dilution_ratio: dimensionless, dilution_air_fraction_pct: dimensionless, co_read_fraction_pct: dimensionless }
+export function computeDraftHoodDilution({ appliance_o2_pct = 0, diluted_o2_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const oa = Number(appliance_o2_pct);
+  const od = Number(diluted_o2_pct);
+  if (!Number.isFinite(oa) || oa < 0 || oa >= 20.9) return { error: "Appliance O2 must be in [0, 20.9) percent." };
+  if (!Number.isFinite(od) || od < 0 || od >= 20.9) return { error: "Diluted O2 must be in [0, 20.9) percent." };
+  if (!(od > oa)) return { error: "Diluted O2 must be greater than the appliance O2 - dilution only raises the O2 (check the sample points are not swapped)." };
+  const dilution_ratio = (20.9 - oa) / (20.9 - od);
+  const dilution_air_fraction_pct = (od - oa) / (20.9 - oa) * 100;
+  const co_read_fraction_pct = 1 / dilution_ratio * 100;
+  return {
+    dilution_ratio, dilution_air_fraction_pct, co_read_fraction_pct,
+    note: "The appliance O2 is measured at the appliance flue outlet, before the draft hood; the diluted O2 in the vent connector, after it. Dilution with room air (20.9% O2) raises the O2, and a CO or efficiency reading taken in the diluted stream understates the real flue value by this same ratio - so the air-free CO sample (co-air-free) must be taken before the draft hood. The analyzer and the manufacturer instructions govern - a diagnostic aid, not a certified combustion test.",
+  };
+}
+export const draftHoodDilutionExample = { inputs: { appliance_o2_pct: 5, diluted_o2_pct: 12 } };
+function _v622renderDraftHoodDilution(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A diagnostic aid, not a certified combustion test; the analyzer and the manufacturer instructions govern. Citation: combustion-analysis practice, ambient-oxygen (20.9%) dilution mass balance, by name. dilution_ratio = (20.9 - O2_appliance) / (20.9 - O2_diluted); dilution_air_fraction = (O2_diluted - O2_appliance) / (20.9 - O2_appliance). The appliance O2 is sampled at the flue outlet before the draft hood, the diluted O2 in the vent connector after it. A CO reading in the diluted stream understates the real flue value by this ratio - sample the air-free CO before the draft hood.";
+  const oa = makeNumber("Appliance O2, before the draft hood (%)", "dhd-oa", { step: "any", min: "0", max: "20.9", value: "5" }); oa.input.value = "5";
+  const od = makeNumber("Diluted O2, after the draft hood (%)", "dhd-od", { step: "any", min: "0", max: "20.9", value: "12" }); od.input.value = "12";
+  for (const f of [oa, od]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { oa.input.value = "5"; od.input.value = "12"; update(); });
+  const oR = makeOutputLine(outputRegion, "Dilution ratio", "dhd-out-r");
+  const oF = makeOutputLine(outputRegion, "Dilution air / CO under-read", "dhd-out-f");
+  const oNote = makeOutputLine(outputRegion, "Note", "dhd-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDraftHoodDilution({ appliance_o2_pct: readNum(oa.input), diluted_o2_pct: readNum(od.input) });
+    if (r.error) { oR.textContent = r.error; oF.textContent = "-"; oNote.textContent = ""; return; }
+    oR.textContent = fmt(r.dilution_ratio, 2) + "x (total flue to combustion products)";
+    oF.textContent = fmt(r.dilution_air_fraction_pct, 1) + "% room air - a CO reading here shows " + fmt(r.co_read_fraction_pct, 0) + "% of the true flue value";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [oa, od]) f.input.addEventListener("input", update);
+}
+HVACSERVICE_RENDERERS["draft-hood-dilution"] = _v622renderDraftHoodDilution;
+
 // ===================== spec-v585 C: theoretical chimney draft =====================
 // D_t = 0.52*B*H*(1/T_o_R - 1/T_m_R), Rankine. D_net = factor*D_t.
 // dims: in { stack_height_ft: L, ambient_temp_f: T, mean_flue_temp_f: T, baro_psia: M L^-1 T^-2, net_factor: dimensionless } out: { draft_theoretical_inwc: M L^-1 T^-2, draft_net_inwc: M L^-1 T^-2 }
