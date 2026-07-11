@@ -19997,3 +19997,36 @@ test("bounds: spec-v618 computeSteelPanelZoneAxial pins J10-10 and J10-12, the l
   assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 1325 }));
   assert.ok("error" in _v618({ fy_ksi: 50, col_depth_dc_in: 14, col_web_tw_in: 0.5, col_area_ag_in2: 26.5, pr_kip: 1100, pz_in_analysis: "yes" }));
 });
+
+import { computeThinningTargetTpa as _v619 } from "../../calc-arborist.js";
+import { computeReinekeSdi as _v619sdi } from "../../calc-arborist.js";
+
+test("bounds: spec-v619 computeThinningTargetTpa pins the target, the cut, the QMD-10 identity, the reineke round-trip, and error seams", () => {
+  // Pinned worked example: ponderosa to the 35% competition floor at QMD 10.
+  const r = _v619({ sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: 300 });
+  assert.ok(Math.abs(r.sdi_target - 157.5) < 1e-9);
+  assert.ok(Math.abs(r.tpa_target - 157.5) < 1e-9); // QMD-10 identity: (QMD/10)^1.605 = 1
+  assert.ok(Math.abs(r.cut_tpa - 142.5) < 1e-9);
+  assert.ok(Math.abs(r.ba_target - 157.5 * 0.005454 * 100) < 1e-9);
+  // Cross-check: Douglas-fir upper band at QMD 14.
+  const x = _v619({ sdi_max: 600, target_pct: 55, qmd_in: 14, current_tpa: 260 });
+  assert.ok(Math.abs(x.tpa_target - 192.2996) < 0.001);
+  assert.ok(Math.abs(x.cut_tpa - 67.7004) < 0.001);
+  // Round-trip: the target TPA at the same QMD reproduces the target SDI through the sibling.
+  const back = _v619sdi({ trees_per_acre: x.tpa_target, qmd_in: 14, sdi_max: 600 });
+  assert.ok(Math.abs(back.sdi - 330) < 1e-9);
+  assert.ok(Math.abs(back.percent_max - 55) < 1e-9);
+  // Already below target: the cut floors at zero.
+  const below = _v619({ sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: 100 });
+  assert.ok(below.cut_tpa === 0);
+  // Current TPA of 0 skips the cut count.
+  const skip = _v619({ sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: 0 });
+  assert.ok(skip.cut_tpa === null);
+  // Error seams: non-finite, non-positive SDI_max / QMD, percent out of (0, 100], negative current TPA.
+  assert.ok("error" in _v619({ sdi_max: Infinity, target_pct: 35, qmd_in: 10 }));
+  assert.ok("error" in _v619({ sdi_max: 0, target_pct: 35, qmd_in: 10 }));
+  assert.ok("error" in _v619({ sdi_max: 450, target_pct: 0, qmd_in: 10 }));
+  assert.ok("error" in _v619({ sdi_max: 450, target_pct: 101, qmd_in: 10 }));
+  assert.ok("error" in _v619({ sdi_max: 450, target_pct: 35, qmd_in: 0 }));
+  assert.ok("error" in _v619({ sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: -1 }));
+});

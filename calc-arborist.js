@@ -406,6 +406,52 @@ function _v564renderReinekeSdi(inputRegion, outputRegion, citationEl) {
 }
 ARBORIST_RENDERERS["reineke-sdi"] = _v564renderReinekeSdi;
 
+// --- spec-v619 L: Thinning target TPA from a target SDI ---
+// SDI_target = SDI_max x pct/100; TPA_target = SDI_target / (QMD/10)^1.605; cut = max(0, current - target); BA = TPA x 0.005454 x QMD^2.
+// dims: in { sdi_max: dimensionless, target_pct: dimensionless, qmd_in: L, current_tpa: dimensionless } out: { sdi_target: dimensionless, tpa_target: dimensionless, ba_target: dimensionless }
+export function computeThinningTargetTpa({ sdi_max = 0, target_pct = 0, qmd_in = 0, current_tpa = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const smax = Number(sdi_max);
+  const pct = Number(target_pct);
+  const qmd = Number(qmd_in);
+  const cur = Number(current_tpa) || 0;
+  if (!Number.isFinite(smax) || smax <= 0) return { error: "Maximum SDI must be a positive finite number (species-specific)." };
+  if (!Number.isFinite(pct) || !(pct > 0 && pct <= 100)) return { error: "Target percent of maximum SDI must be in (0, 100]." };
+  if (!Number.isFinite(qmd) || qmd <= 0) return { error: "Quadratic mean diameter must be a positive finite number (in)." };
+  if (cur < 0) return { error: "Current trees per acre cannot be negative (0 to skip the cut count)." };
+  const sdi_target = smax * pct / 100;
+  const tpa_target = sdi_target / Math.pow(qmd / 10, 1.605);
+  const cut_tpa = cur > 0 ? Math.max(0, cur - tpa_target) : null;
+  const ba_target = tpa_target * 0.005454 * qmd * qmd;
+  return {
+    sdi_target, tpa_target, cut_tpa, ba_target,
+    note: "The inverse of reineke-sdi: the residual stand that puts the density at the target percent of the species maximum. The common management band runs ~35% (onset of competition) to ~55-60% (lower limit of the self-thinning zone). Thinning from below raises the QMD, so the residual lands conservatively below the target density. A management aid; a qualified silvicultural prescription governs.",
+  };
+}
+export const thinningTargetTpaExample = { inputs: { sdi_max: 450, target_pct: 35, qmd_in: 10, current_tpa: 300 } };
+
+function _v619renderThinningTargetTpa(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Reineke Stand Density Index (Reineke 1933; USDA FS stocking-guide practice), by name. SDI_target = SDI_max x target% / 100; TPA_target = SDI_target / (QMD/10)^1.605; cut = max(0, current - target); BA_target = TPA_target x 0.005454 x QMD^2. The maximum SDI is species-specific; the management band runs ~35% to ~55-60% of it. Thinning from below raises the QMD, so the residual lands conservatively below the target. A management aid; a qualified silvicultural prescription governs.";
+  const smax = makeNumber("Species maximum SDI", "ttt-max", { step: "any", min: "0", value: "450" }); smax.input.value = "450";
+  const pct = makeNumber("Target percent of maximum (%)", "ttt-pct", { step: "any", min: "0", max: "100", value: "35" }); pct.input.value = "35";
+  const qmd = makeNumber("Quadratic mean diameter (in)", "ttt-qmd", { step: "any", min: "0" });
+  const cur = makeNumber("Current trees per acre (0 to skip)", "ttt-cur", { step: "any", min: "0", value: "0" }); cur.input.value = "0";
+  for (const f of [smax, pct, qmd, cur]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { smax.input.value = "450"; pct.input.value = "35"; qmd.input.value = "10"; cur.input.value = "300"; update(); });
+  const oT = makeOutputLine(outputRegion, "Residual target", "ttt-out-t");
+  const oC = makeOutputLine(outputRegion, "Trees to cut", "ttt-out-c");
+  const oN = makeOutputLine(outputRegion, "Note", "ttt-out-n");
+  const update = debounce(() => {
+    const r = computeThinningTargetTpa({ sdi_max: Number(smax.input.value) || 0, target_pct: Number(pct.input.value) || 0, qmd_in: Number(qmd.input.value) || 0, current_tpa: Number(cur.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oC.textContent = "-"; oN.textContent = ""; return; }
+    oT.textContent = fmt(r.tpa_target, 1) + " TPA at SDI " + fmt(r.sdi_target, 0) + " (" + fmt(r.ba_target, 1) + " ft2/acre basal area)";
+    oC.textContent = r.cut_tpa == null ? "(enter the current TPA)" : fmt(r.cut_tpa, 1) + " TPA to cut";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [smax, pct, qmd, cur]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["thinning-target-tpa"] = _v619renderThinningTargetTpa;
+
 // --- spec-v598 L: Quadratic mean diameter from a DBH tally ---
 // QMD = sqrt(sum(count*d^2)/sum(count)); amean = sum(count*d)/sum(count); BA = 0.005454*sum(count*d^2).
 // dims: in { tally: dimensionless } out: { qmd_in: L, arithmetic_mean_in: L, tree_count: dimensionless, basal_area_ft2: dimensionless }

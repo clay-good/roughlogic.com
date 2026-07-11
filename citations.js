@@ -7205,6 +7205,17 @@ export const CITATIONS = {
       { name: "Self-thinning slope", value: "the 1.605 exponent is Reineke's empirical maximum-density slope; SDI_max is species-specific", source: "Reineke 1933" },
     ],
   },
+  "thinning-target-tpa": {
+    formula: "SDI_target = SDI_max x target% / 100; TPA_target = SDI_target / (QMD/10)^1.605; cut = max(0, TPA_current - TPA_target); BA_target = TPA_target x 0.005454 x QMD^2.",
+    edition: "Reineke Stand Density Index inverted to a stocking target (Reineke 1933; USDA FS stocking-guide practice), by name.",
+    freeAccess: "The Reineke SDI relation is a public forest-mensuration result; the maximum SDI is species-specific from published tables.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum SDI is species-specific; the common management band runs ~35% (onset of competition) to ~55-60% (lower limit of the self-thinning zone) of it. Thinning from below raises the QMD, so the residual stand lands conservatively below the target density. The QMD comes from quadratic-mean-diameter and the diagnosis from reineke-sdi. A management aid; a qualified silvicultural prescription governs.",
+    assumptions: [
+      { name: "Inverse Reineke", value: "TPA_target = SDI_target / (QMD/10)^1.605 at the pre-thin QMD; thinning from below raises QMD, making the target conservative", source: "Reineke 1933" },
+      { name: "Species maximum", value: "SDI_max comes from published species tables (e.g. ~450 ponderosa pine, ~600 Douglas-fir)", source: "USDA FS stocking guides" },
+    ],
+  },
   "basal-area-prism": {
     formula: "basal_area_per_acre = BAF x in_tree_count; per_tree_ba = 0.005454 x DBH^2; trees_per_acre = BAF / per_tree_ba.",
     edition: "Prism (variable-radius / angle-gauge) point sampling, per USDA Forest Service mensuration and Bitterlich variable-radius plots, by name.",

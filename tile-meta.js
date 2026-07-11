@@ -464,6 +464,7 @@ const _TILES = [
   ["porta-wrap-friction", "L"], ["chipper-debris", "L"],
   ["basal-area-prism", "L"],
   ["reineke-sdi", "L"],
+  ["thinning-target-tpa", "L"],
   ["quadratic-mean-diameter", "L"],
   ["trunk-decay-strength", "L"],
   ["tree-open-cavity", "L"],

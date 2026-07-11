@@ -81942,6 +81942,56 @@
       "term": "column axial effect on moment frame joint shear",
       "target": "steel-panel-zone-axial",
       "kind": "question"
+    },
+    {
+      "term": "thinning target",
+      "target": "thinning-target-tpa",
+      "kind": "industry"
+    },
+    {
+      "term": "residual trees per acre",
+      "target": "thinning-target-tpa",
+      "kind": "industry"
+    },
+    {
+      "term": "leave trees",
+      "target": "thinning-target-tpa",
+      "kind": "adjacent"
+    },
+    {
+      "term": "stocking target",
+      "target": "thinning-target-tpa",
+      "kind": "industry"
+    },
+    {
+      "term": "trees to cut",
+      "target": "thinning-target-tpa",
+      "kind": "redirect"
+    },
+    {
+      "term": "how many trees per acre to leave after thinning",
+      "target": "thinning-target-tpa",
+      "kind": "question"
+    },
+    {
+      "term": "residual tpa at a target sdi",
+      "target": "thinning-target-tpa",
+      "kind": "question"
+    },
+    {
+      "term": "thin a stand to 35 percent of max sdi",
+      "target": "thinning-target-tpa",
+      "kind": "question"
+    },
+    {
+      "term": "how many trees to mark for cutting",
+      "target": "thinning-target-tpa",
+      "kind": "question"
+    },
+    {
+      "term": "stocking chart residual density",
+      "target": "thinning-target-tpa",
+      "kind": "question"
     }
   ]
 }

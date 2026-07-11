@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(forestry): spec-v619 thinning target TPA from a target SDI; 2026-07-10
+
+Lands `thinning-target-tpa` (Group L, calc-arborist.js), the follow-on spec-v564 named: the Reineke relation inverted to the residual-stand number. TPA_target = (SDI_max x target%) / (QMD/10)^1.605, trees to cut, and the residual basal area; round-trips through reineke-sdi exactly. A ponderosa stand (SDI_max 450) at the 35% floor and 10 in QMD keeps 157.5 TPA. Catalog 1,066 -> 1,067 (version 0.208.0).
+
 ### feat(steel): spec-v618 panel-zone shear under high column axial (AISC 360-16 J10-10/J10-12); 2026-07-10
 
 Lands `steel-panel-zone-axial` (Group E, calc-steel.js), the follow-on spec-v555 named: the axial reduction its low-axial tile flags but does not carry. Py = Fy Ag; past Pr = 0.4 Pc the basic strength takes (1.4 - Pr/Pc) (Eq. J10-10), past 0.75 Pc the deformation-modeled strength takes (1.9 - 1.2 Pr/Pc) (Eq. J10-12); below the thresholds it reproduces steel-panel-zone-shear exactly. Pinned: a 14 in / 0.5 in web column at Pr 600 of Py 1,325 checks phiRn 179.0 kip. Catalog 1,065 -> 1,066 (version 0.207.0).
