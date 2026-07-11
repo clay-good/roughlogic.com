@@ -9034,6 +9034,17 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.9" },
     ],
   },
+  "three-point-bridle": {
+    formula: "Li = sqrt(e^2 + n^2 + rise^2); ui = (e, n, rise)/Li; T1 u1 + T2 u2 + T3 u3 = (0, 0, W) solved by Cramer's rule; angle_i = asin(rise_i / Li).",
+    edition: "Entertainment rigging three-point bridle geometry (static 3-D resolution), by name.",
+    freeAccess: "Static bridle resolution is a public statics result; ASME B30.9 governs rigging practice. An ESTIMATE only; the hardware ratings and a qualified rigger govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The solution is physical only while every leg tension is positive (a rope can only pull - the apex must hang horizontally inside the triangle of its attachment points); an asymmetric hang splits the load far from evenly (the near, steep legs carry most of it); the in-plane two-leg case is bridle-leg-tension. A design aid, not a rigging sign-off.",
+    assumptions: [
+      { name: "Three-dimensional statics", value: "single apex, three straight legs to fixed points, load acts straight down; ropes carry tension only", source: "bridle statics" },
+      { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.9" },
+    ],
+  },
   "winch-drum-line-pull": {
     formula: "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia).",
     edition: "Wire-rope drum mechanics / SAE winch rating convention, by name.",

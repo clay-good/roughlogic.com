@@ -1147,3 +1147,83 @@ function renderLiftingLugDesign(inputRegion, outputRegion, citationEl) {
   for (const f of [P, t, Dh, Dp, a, w, fy, fu, nd]) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["lifting-lug-design"] = renderLiftingLugDesign;
+
+// --- spec-v615 Z: Three-point bridle leg tension, 3-D resolution (`three-point-bridle`) ---
+// Li = sqrt(e^2 + n^2 + rise^2); ui = (e, n, rise)/Li; solve T1 u1 + T2 u2 + T3 u3 = (0, 0, W) by Cramer's rule.
+// dims: in { apex_load_lb: M L T^-2, e1_ft: L, n1_ft: L, r1_ft: L, e2_ft: L, n2_ft: L, r2_ft: L, e3_ft: L, n3_ft: L, r3_ft: L } out: { len1_ft: L, len2_ft: L, len3_ft: L, angle1_deg: dimensionless, angle2_deg: dimensionless, angle3_deg: dimensionless, t1_lb: M L T^-2, t2_lb: M L T^-2, t3_lb: M L T^-2 }
+export function computeThreePointBridle({ apex_load_lb, e1_ft, n1_ft, r1_ft, e2_ft, n2_ft, r2_ft, e3_ft, n3_ft, r3_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(apex_load_lb);
+  if (!Number.isFinite(W) || W <= 0) return { error: "Apex load must be a positive finite number (lb)." };
+  const legs = [[e1_ft, n1_ft, r1_ft], [e2_ft, n2_ft, r2_ft], [e3_ft, n3_ft, r3_ft]].map((p) => p.map(Number));
+  const u = [], len = [];
+  for (let i = 0; i < 3; i++) {
+    const [e, n, r] = legs[i];
+    if (!Number.isFinite(e) || !Number.isFinite(n) || !Number.isFinite(r)) return { error: "Leg " + (i + 1) + " offsets must be finite numbers (ft)." };
+    if (!(r > 0)) return { error: "Leg " + (i + 1) + " rise must be positive (ft) - every leg goes up from the apex." };
+    const L = Math.hypot(e, n, r);
+    len.push(L);
+    u.push([e / L, n / L, r / L]);
+  }
+  // Columns of the 3x3 system are the leg unit vectors; RHS is (0, 0, W).
+  const det3 = (m) => m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+  const A = [[u[0][0], u[1][0], u[2][0]], [u[0][1], u[1][1], u[2][1]], [u[0][2], u[1][2], u[2][2]]];
+  const D = det3(A);
+  if (!(Math.abs(D) > 1e-9)) return { error: "Degenerate geometry - the three legs are coplanar with the load and cannot balance it." };
+  const b = [0, 0, W];
+  const T = [];
+  for (let i = 0; i < 3; i++) {
+    const M = A.map((row) => row.slice());
+    for (let r = 0; r < 3; r++) M[r][i] = b[r];
+    T.push(det3(M) / D);
+  }
+  if (T.some((t) => !(t > 0))) return { error: "A leg goes slack - the apex hangs horizontally outside the triangle of the attachment points (a rope can only pull). Move a point or use a different pick." };
+  const ang = u.map((v) => Math.asin(v[2]) * 180 / Math.PI);
+  return {
+    len1_ft: len[0], len2_ft: len[1], len3_ft: len[2],
+    angle1_deg: ang[0], angle2_deg: ang[1], angle3_deg: ang[2],
+    t1_lb: T[0], t2_lb: T[1], t3_lb: T[2],
+    note: "Exact static 3-D resolution. The solution is physical only while every leg tension is positive - the apex must hang horizontally inside the triangle of its attachment points. An asymmetric hang splits the load far from evenly (the near, steep legs carry most of it). The hardware ratings and a qualified rigger govern.",
+  };
+}
+
+function renderThreePointBridle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Entertainment rigging three-point bridle geometry (static 3-D resolution), by name. Li = sqrt(e^2 + n^2 + rise^2); ui = (e, n, rise)/Li; T1 u1 + T2 u2 + T3 u3 = (0, 0, W) solved by Cramer's rule. Physical only while every tension is positive (a rope can only pull - the apex must hang inside the triangle of its attachment points); an asymmetric hang splits the load far from evenly. The hardware ratings and a qualified rigger govern.";
+  const w = makeNumber("Apex load (lb)", "tpb-w", { step: "any", min: "0" });
+  const e1 = makeNumber("Leg 1 east offset (ft, - west)", "tpb-e1", { step: "any" });
+  const n1 = makeNumber("Leg 1 north offset (ft, - south)", "tpb-n1", { step: "any" });
+  const r1 = makeNumber("Leg 1 rise (ft)", "tpb-r1", { step: "any", min: "0" });
+  const e2 = makeNumber("Leg 2 east offset (ft)", "tpb-e2", { step: "any" });
+  const n2 = makeNumber("Leg 2 north offset (ft)", "tpb-n2", { step: "any" });
+  const r2 = makeNumber("Leg 2 rise (ft)", "tpb-r2", { step: "any", min: "0" });
+  const e3 = makeNumber("Leg 3 east offset (ft)", "tpb-e3", { step: "any" });
+  const n3 = makeNumber("Leg 3 north offset (ft)", "tpb-n3", { step: "any" });
+  const r3 = makeNumber("Leg 3 rise (ft)", "tpb-r3", { step: "any", min: "0" });
+  const fields = [w, e1, n1, r1, e2, n2, r2, e3, n3, r3];
+  for (const f of fields) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    w.input.value = "1200";
+    e1.input.value = "6"; n1.input.value = "0"; r1.input.value = "8";
+    e2.input.value = "-3"; n2.input.value = "5.196"; r2.input.value = "8";
+    e3.input.value = "-3"; n3.input.value = "-5.196"; r3.input.value = "8";
+    update();
+  });
+  const oT1 = makeOutputLine(outputRegion, "Leg 1 tension / angle", "tpb-out-t1");
+  const oT2 = makeOutputLine(outputRegion, "Leg 2 tension / angle", "tpb-out-t2");
+  const oT3 = makeOutputLine(outputRegion, "Leg 3 tension / angle", "tpb-out-t3");
+  const update = debounce(() => {
+    const r = computeThreePointBridle({
+      apex_load_lb: Number(w.input.value) || 0,
+      e1_ft: Number(e1.input.value) || 0, n1_ft: Number(n1.input.value) || 0, r1_ft: Number(r1.input.value) || 0,
+      e2_ft: Number(e2.input.value) || 0, n2_ft: Number(n2.input.value) || 0, r2_ft: Number(r2.input.value) || 0,
+      e3_ft: Number(e3.input.value) || 0, n3_ft: Number(n3.input.value) || 0, r3_ft: Number(r3.input.value) || 0,
+    });
+    if (r.error) { oT1.textContent = r.error; oT2.textContent = "-"; oT3.textContent = "-"; return; }
+    const W = Number(w.input.value) || 0;
+    oT1.textContent = fmt(r.t1_lb, 0) + " lb at " + fmt(r.angle1_deg, 0) + " deg (" + fmt(r.len1_ft, 2) + " ft)" + (r.t1_lb > W ? " - over the load" : "");
+    oT2.textContent = fmt(r.t2_lb, 0) + " lb at " + fmt(r.angle2_deg, 0) + " deg (" + fmt(r.len2_ft, 2) + " ft)" + (r.t2_lb > W ? " - over the load" : "");
+    oT3.textContent = fmt(r.t3_lb, 0) + " lb at " + fmt(r.angle3_deg, 0) + " deg (" + fmt(r.len3_ft, 2) + " ft)" + (r.t3_lb > W ? " - over the load" : "");
+  }, DEBOUNCE_MS);
+  for (const f of fields) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["three-point-bridle"] = renderThreePointBridle;

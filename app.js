@@ -1161,6 +1161,8 @@ const TOOL_MODULES = (() => {
     "crane-outrigger-reaction",
     // spec-v554
     "lifting-lug-design",
+    // spec-v615
+    "three-point-bridle",
   ]);
   return map;
 })();

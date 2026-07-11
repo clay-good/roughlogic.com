@@ -970,6 +970,7 @@ export const COMPUTE_MAP = {
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },
   "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },
+  "three-point-bridle": { module: "../../calc-rigging.js", fn: "computeThreePointBridle" },
   "winch-drum-line-pull": { module: "../../calc-rigging.js", fn: "computeWinchDrumLinePull" },
   "crane-outrigger-reaction": { module: "../../calc-rigging.js", fn: "computeCraneOutriggerReaction" },
   "lifting-lug-design": { module: "../../calc-rigging.js", fn: "computeLiftingLugDesign" },

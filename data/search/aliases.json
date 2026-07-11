@@ -81742,6 +81742,56 @@
       "term": "effective sweep width after corrections",
       "target": "sweep-width-correction",
       "kind": "question"
+    },
+    {
+      "term": "three point bridle",
+      "target": "three-point-bridle",
+      "kind": "industry"
+    },
+    {
+      "term": "three leg bridle",
+      "target": "three-point-bridle",
+      "kind": "industry"
+    },
+    {
+      "term": "3 leg bridle tension",
+      "target": "three-point-bridle",
+      "kind": "redirect"
+    },
+    {
+      "term": "bridle apex triangle",
+      "target": "three-point-bridle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "arena rigging bridle",
+      "target": "three-point-bridle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tension in each leg of a three point bridle",
+      "target": "three-point-bridle",
+      "kind": "question"
+    },
+    {
+      "term": "three leg bridle leg loads",
+      "target": "three-point-bridle",
+      "kind": "question"
+    },
+    {
+      "term": "solve a 3d rigging bridle",
+      "target": "three-point-bridle",
+      "kind": "question"
+    },
+    {
+      "term": "how much does each leg of a three point bridle carry",
+      "target": "three-point-bridle",
+      "kind": "question"
+    },
+    {
+      "term": "bridle with three attachment points",
+      "target": "three-point-bridle",
+      "kind": "question"
     }
   ]
 }

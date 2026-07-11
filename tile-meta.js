@@ -689,6 +689,7 @@ const _TILES = [
   // spec-v484 spanned cable sag and tension (Group Z)
   ["spanline-sag-tension", "Z"],
   ["bridle-leg-tension", "Z"],
+  ["three-point-bridle", "Z"],
   ["winch-drum-line-pull", "Z"],
   ["crane-outrigger-reaction", "Z"],
   ["lifting-lug-design", "Z"],

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): spec-v615 three-point bridle leg tension (3-D); 2026-07-10
+
+Lands `three-point-bridle` (Group Z, calc-rigging.js), the follow-on spec-v544 named: the out-of-plane three-point resolution its two-leg tile explicitly excludes. Li = sqrt(e^2 + n^2 + rise^2); ui = (e, n, rise)/Li; T1 u1 + T2 u2 + T3 u3 = (0, 0, W) by Cramer's rule; errors on coplanar geometry and on any non-positive tension (the apex must hang inside the attachment triangle - a rope can only pull). Symmetric check recovers W / (3 sin angle) exactly; the asymmetric example splits 1,000 lb as 497 / 419 / 244. Raises the calc-rigging.js gzip cap 21000 -> 24000. Catalog 1,062 -> 1,063 (version 0.204.0).
+
 ### feat(rescue): spec-v614 sweep width correction for weather, speed, and fatigue; 2026-07-10
 
 Lands `sweep-width-correction` (Group P, calc-rescue.js), the follow-on spec-v540 named and spec-v595 re-named: the corrected sweep width that search-track-spacing requires as its W input. W = Wu x f_weather x f_speed x f_fatigue (IAMSAR Manual Vol. II / US National SAR Supplement practice); weather and fatigue factors in (0, 1], speed in (0, 1.5]. A 120 ft raw detection width in rain with a tired crew (0.5 / 1.0 / 0.9) is a 54 ft effective width - a 55% haircut before spacing is chosen. Group P audit count 12 -> 13. Catalog 1,061 -> 1,062 (version 0.203.0).

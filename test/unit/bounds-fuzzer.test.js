@@ -19860,3 +19860,34 @@ test("bounds: spec-v614 computeSweepWidthCorrection pins the corrected width, th
   assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, speed_factor: 1.6 }));
   assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, fatigue_factor: 1.05 }));
 });
+
+import { computeThreePointBridle as _v615 } from "../../calc-rigging.js";
+
+test("bounds: spec-v615 computeThreePointBridle pins the symmetric closed form, the asymmetric split, vertical equilibrium, and error seams", () => {
+  // Pinned worked example: 1,200 lb, three legs 120 deg apart, 6 ft out / 8 ft up.
+  const r = _v615({ apex_load_lb: 1200, e1_ft: 6, n1_ft: 0, r1_ft: 8, e2_ft: -3, n2_ft: 5.196, r2_ft: 8, e3_ft: -3, n3_ft: -5.196, r3_ft: 8 });
+  assert.ok(Math.abs(r.t1_lb - 500) < 0.05);
+  assert.ok(Math.abs(r.t2_lb - 500) < 0.05);
+  assert.ok(Math.abs(r.t3_lb - 500) < 0.05);
+  assert.ok(Math.abs(r.angle1_deg - 53.13) < 0.01);
+  assert.ok(Math.abs(r.len1_ft - 10) < 1e-9);
+  // Cross-check: the asymmetric hang (python-verified).
+  const x = _v615({ apex_load_lb: 1000, e1_ft: 5, n1_ft: 0, r1_ft: 10, e2_ft: -4, n2_ft: 3, r2_ft: 8, e3_ft: -2, n3_ft: -6, r3_ft: 9 });
+  assert.ok(Math.abs(x.t1_lb - 496.904) < 0.001);
+  assert.ok(Math.abs(x.t2_lb - 419.2881) < 0.001);
+  assert.ok(Math.abs(x.t3_lb - 244.4444) < 0.001);
+  // Vertical equilibrium: the tensions' vertical components sum to the load.
+  const vert = x.t1_lb * (10 / x.len1_ft) + x.t2_lb * (8 / x.len2_ft) + x.t3_lb * (9 / x.len3_ft);
+  assert.ok(Math.abs(vert - 1000) < 1e-6);
+  // Tension scales linearly with the load.
+  const dbl = _v615({ apex_load_lb: 2000, e1_ft: 5, n1_ft: 0, r1_ft: 10, e2_ft: -4, n2_ft: 3, r2_ft: 8, e3_ft: -2, n3_ft: -6, r3_ft: 9 });
+  assert.ok(Math.abs(dbl.t1_lb - 2 * x.t1_lb) < 1e-6);
+  // Error seams: non-finite, non-positive load / rise, coplanar geometry, apex outside the triangle.
+  assert.ok("error" in _v615({ apex_load_lb: Infinity, e1_ft: 6, n1_ft: 0, r1_ft: 8, e2_ft: -3, n2_ft: 5, r2_ft: 8, e3_ft: -3, n3_ft: -5, r3_ft: 8 }));
+  assert.ok("error" in _v615({ apex_load_lb: 0, e1_ft: 6, n1_ft: 0, r1_ft: 8, e2_ft: -3, n2_ft: 5, r2_ft: 8, e3_ft: -3, n3_ft: -5, r3_ft: 8 }));
+  assert.ok("error" in _v615({ apex_load_lb: 1000, e1_ft: 6, n1_ft: 0, r1_ft: 0, e2_ft: -3, n2_ft: 5, r2_ft: 8, e3_ft: -3, n3_ft: -5, r3_ft: 8 }));
+  // Coplanar: all three legs in the east-vertical plane.
+  assert.ok("error" in _v615({ apex_load_lb: 1000, e1_ft: 2, n1_ft: 0, r1_ft: 8, e2_ft: -4, n2_ft: 0, r2_ft: 8, e3_ft: 3, n3_ft: 0, r3_ft: 8 }));
+  // Outside the triangle: all three points east of the apex -> a leg would have to push.
+  assert.ok("error" in _v615({ apex_load_lb: 1000, e1_ft: 2, n1_ft: 0, r1_ft: 8, e2_ft: 4, n2_ft: 3, r2_ft: 8, e3_ft: 3, n3_ft: -4, r3_ft: 8 }));
+});
