@@ -82187,6 +82187,61 @@
       "term": "buffer tank minus the water already in the pipes",
       "target": "buffer-tank-loop-credit",
       "kind": "question"
+    },
+    {
+      "term": "at rest earth pressure",
+      "target": "at-rest-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "k0 coefficient",
+      "target": "at-rest-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "jaky",
+      "target": "at-rest-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "braced wall soil pressure",
+      "target": "at-rest-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "basement wall lateral soil pressure",
+      "target": "at-rest-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "non yielding wall earth pressure",
+      "target": "at-rest-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what is the at rest coefficient k0 for a braced wall",
+      "target": "at-rest-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "soil pressure on a basement wall that cannot move",
+      "target": "at-rest-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "why is at rest pressure higher than active",
+      "target": "at-rest-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "at rest thrust from jaky k0 equals 1 minus sin phi",
+      "target": "at-rest-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "earth pressure on a braced excavation wall",
+      "target": "at-rest-earth-pressure",
+      "kind": "question"
     }
   ]
 }

@@ -20142,3 +20142,29 @@ test("bounds: spec-v623 computeBufferTankLoopCredit pins the gross buffer, the l
   assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 20, pipe_id_in: -1, loop_length_ft: 200 }));
   assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: -1 }));
 });
+
+import { computeAtRestEarthPressure as _v624, computeLateralEarthPressure as _v624active } from "../../calc-geotech.js";
+
+test("bounds: spec-v624 computeAtRestEarthPressure pins the Jaky K0, the thrusts, the 1.5x-active relation, the surcharge cross-check, and error seams", () => {
+  const r = _v624({ phi: 30, gamma: 120, h_ft: 10, q: 0 });
+  assert.ok(Math.abs(r.k0 - 0.5) < 1e-12); // 1 - sin 30
+  assert.ok(Math.abs(r.p0_base - 600) < 1e-9);
+  assert.ok(Math.abs(r.p0_soil - 3000) < 1e-9);
+  assert.ok(Math.abs(r.p0_tot - 3000) < 1e-9);
+  assert.ok(Math.abs(r.y_bar - 10 / 3) < 1e-12);
+  // At-rest is exactly 1.5x the Rankine active thrust for the same wall (braced walls carry more).
+  const active = _v624active({ phi: 30, gamma: 120, h_ft: 10, q: 0 });
+  assert.ok(Math.abs(r.p0_tot / active.pa_tot - 1.5) < 1e-9);
+  // Cross-check: a 250 psf surcharge adds 1,250 lb/ft at mid-height and lifts the resultant.
+  const r2 = _v624({ phi: 30, gamma: 120, h_ft: 10, q: 250 });
+  assert.ok(Math.abs(r2.p0_surch - 1250) < 1e-9);
+  assert.ok(Math.abs(r2.p0_tot - 4250) < 1e-9);
+  assert.ok(Math.abs(r2.y_bar - 3.823529411764706) < 1e-12);
+  // Error seams.
+  assert.ok("error" in _v624({ phi: 30, gamma: 0, h_ft: 10 }));
+  assert.ok("error" in _v624({ phi: 30, gamma: 120, h_ft: 0 }));
+  assert.ok("error" in _v624({ phi: 30, gamma: 120, h_ft: 10, q: -1 }));
+  assert.ok("error" in _v624({ phi: 0, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v624({ phi: 50, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v624({ phi: NaN, gamma: 120, h_ft: 10 }));
+});

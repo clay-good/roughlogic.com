@@ -11415,6 +11415,17 @@ export const CITATIONS = {
       { name: "Passive used cautiously", value: "the passive thrust is an upper bound needing large movement to develop; designs commonly reduce or neglect it", source: "NAVFAC DM-7.02" },
     ],
   },
+  "at-rest-earth-pressure": {
+    formula: "K0 = 1 - sin phi (Jaky, normally consolidated); P0 = 0.5 K0 gamma H^2 at H/3, plus surcharge K0 q H at H/2; P0_tot and its resultant height y_bar.",
+    edition: "Jaky (1944) at-rest earth pressure, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures), by name.",
+    freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual; Jaky's K0 = 1 - sin phi is public and printed in every soil-mechanics text.",
+    governance: GOVERNANCE.general,
+    editionNote: "Jaky (1944) at-rest coefficient K0 = 1 - sin phi - the resultant P0 = 0.5 K0 gamma H^2 at H/3 plus a uniform-surcharge term K0 q H at H/2 - as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). gamma defaults to 120 pcf, q to 0. This is the at-rest state of a non-yielding wall that cannot deflect to the active limit (a basement wall, a braced excavation, a rigid box culvert), and it is higher than the Rankine active pressure the same wall would carry if it could yield. The normally-consolidated cohesionless case only: an overconsolidated deposit carries a higher K0, and a cohesive or submerged backfill (which must be run with buoyant unit weight plus a separate hydrostatic pressure) needs its own analysis. Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
+    assumptions: [
+      { name: "Non-yielding wall", value: "the at-rest state governs only when the wall is restrained from deflecting to the active limit (braced cut, basement wall, rigid culvert); a wall free to yield sheds to the lower Rankine active", source: "Jaky 1944 / Das / NAVFAC DM-7.02" },
+      { name: "Normally consolidated cohesionless", value: "K0 = 1 - sin phi is the NC form; an overconsolidated deposit carries a higher K0 that rises with OCR", source: "Das / NAVFAC DM-7.02" },
+    ],
+  },
   "retaining-wall-stability": {
     formula: "FS_ot = Mr / Mo; FS_sl = mu x sum(V) / Pa; e = B/2 - (Mr - Mo)/sum(V); q_max,min = (sum(V)/B) x (1 +/- 6e/B); Rankine Pa = 0.5 Ka gamma H^2 + Ka q H.",
     edition: "The standard cantilever-retaining-wall global-stability checks as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for sliding and overturning, by name.",

@@ -170,6 +170,45 @@ GEOTECH_RENDERERS["lateral-earth-pressure"] = _simpleRenderer({
   compute: computeLateralEarthPressure,
 });
 
+// ===================== spec-v624: at-rest earth pressure (Jaky) for a braced wall =====================
+
+// dims: in { phi: dimensionless, gamma: M L^-2 T^-2, h_ft: L, q: M L^-1 T^-2 } out: { k0: dimensionless, p0_base: M L^-1 T^-2, p0_soil: M T^-2, p0_surch: M T^-2, p0_tot: M T^-2, y_bar: L }
+export function computeAtRestEarthPressure({ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };
+  if (!(h_ft > 0)) return { error: "Retained height must be positive (ft)." };
+  if (q < 0) return { error: "Surcharge cannot be negative (psf)." };
+  if (phi <= 0 || phi >= 50) return { error: "Friction angle must be between 0 and 50 degrees (exclusive)." };
+  const phi_r = phi * Math.PI / 180;
+  const k0 = 1 - Math.sin(phi_r);
+  const p0_base = k0 * gamma * h_ft;
+  const p0_soil = 0.5 * k0 * gamma * h_ft * h_ft;
+  const p0_surch = k0 * q * h_ft;
+  const p0_tot = p0_soil + p0_surch;
+  const y_bar = (p0_soil * (h_ft / 3) + p0_surch * (h_ft / 2)) / p0_tot;
+  return { k0, p0_base, p0_soil, p0_surch, p0_tot, y_bar };
+}
+
+export const atRestEarthPressureExample = { inputs: { phi: 30, gamma: 120, h_ft: 10, q: 0 } };
+
+GEOTECH_RENDERERS["at-rest-earth-pressure"] = _simpleRenderer({
+  citation: "Citation: Jaky (1944) at-rest earth pressure coefficient K0 = 1 - sin phi -- the resultant at-rest thrust P0 = 0.5 x K0 x gamma x H^2 acting at H/3 above the base, plus a uniform-surcharge thrust K0 x q x H at H/2 -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). This is the at-rest state of a non-yielding wall that cannot deflect to the active limit (a basement wall, a braced excavation, a rigid box culvert), and it is higher than the Rankine active pressure the wall would carry if it could yield. The normally-consolidated cohesionless case only: an overconsolidated deposit carries a higher K0 (K0 rises with OCR), a cohesive backfill and a submerged zone (which must be run with buoyant unit weight plus separate hydrostatic pressure) are not applied, and the soil must actually be restrained from yielding for the at-rest state to govern. Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's recommendation governs.",
+  example: atRestEarthPressureExample.inputs,
+  fields: [
+    { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "k0", id: "arep-out-k0", label: "At-rest coefficient K0", value: (r) => fmt(r.k0, 3) },
+    { key: "pb", id: "arep-out-pb", label: "At-rest pressure at base", value: (r) => fmt(r.p0_base, 0) + " psf" },
+    { key: "p0", id: "arep-out-p0", label: "At-rest thrust P0 (soil + surcharge)", value: (r) => fmt(r.p0_tot, 0) + " lb/ft (" + fmt(r.p0_soil, 0) + " + " + fmt(r.p0_surch, 0) + ")" },
+    { key: "yb", id: "arep-out-yb", label: "Resultant height above base", value: (r) => fmt(r.y_bar, 2) + " ft" },
+  ],
+  compute: computeAtRestEarthPressure,
+});
+
 // ===================== spec-v262: cantilever retaining wall stability =====================
 
 // dims: in { h_ft: L, b_ft: L, t_base: L, t_stem: L, toe_ft: L, gamma_s: M L^-2 T^-2, gamma_c: M L^-2 T^-2, phi: dimensionless, mu: dimensionless, q: M L^-1 T^-2 } out: { sum_v: M T^-2, mr: M L T^-2, mo: M L T^-2, pa_tot: M T^-2, fs_ot: dimensionless, fs_sl: dimensionless, ecc: L, q_max: M L^-1 T^-2, q_min: M L^-1 T^-2 }

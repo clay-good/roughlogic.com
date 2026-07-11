@@ -1988,6 +1988,7 @@ cross-check.
 | calc-gas.js | `renderGasLeakRate` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `renderGasPipeSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-gas.js | `spitzglassFlow` | `{ d_in, dP_in_wc, specific_gravity, L_ft }` | _ | _ | _ |
+| calc-geotech.js | `computeAtRestEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeBoussinesqSurchargeWall` | `{ ql_plf = 0, h_ft = 0, x_ft = 0, z_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeConsolidationTimeRate` | `{ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeFootingEccentricPressure` | `{ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}` | _ | _ | _ |
@@ -2729,7 +2730,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1315.
+Row count: 1316.
 
 <!-- END function-corpus-v14 -->
 
@@ -3221,7 +3222,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (224 tiles)
+### Group E Construction (225 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3232,6 +3233,7 @@ per spec-v14 §13.1 second paragraph.
 | `anchor-embedment` | Anchor Bolt Embedment | Project (public bond-strength formula); 5000 lb uplift / 5/8 in bolt / 3000 psi concrete -> 66.42... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `asce7-load-combinations` | ASCE 7 ASD Load Combinations: Governing Demand and Net Uplift | ASCE 7 §2.4.1 basic ASD combinations; spec-v225 section 2.1 pinned example (roof uplift) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `asphalt-tonnage` | Asphalt Tonnage | Project (first-principles); volume = 5000 * 3/12 = 1250 ft^3; tons = 1250 * 145 / 200... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `at-rest-earth-pressure` | At-Rest Earth Pressure on a Braced Wall (Jaky K0) | Jaky (1944) as compiled in Das / NAVF...; spec-v624 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `atterberg-indices` | Atterberg Plasticity Indices and A-Line Classification | Atterberg limits / USCS A-line; spec-v328 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `attic-ventilation` | Attic Ventilation Net Free Area | IRC R806 attic-ventilation rule; spec-v98 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `beam-loading` | Beam Loading | Project (first-principles); 200 plf / 12 ft / E = 1.6e6 psi / 4x10 -> M = 3600 lb-ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3986,6 +3988,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1071. Fixture-covered or reference-cadence: 1071 / 1071.
+Tile count: 1072. Fixture-covered or reference-cadence: 1072 / 1072.
 
 <!-- END tile-index-v14 -->

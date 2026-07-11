@@ -1045,6 +1045,7 @@ export const COMPUTE_MAP = {
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (3 tiles, new calc-geotech.js)
   "soil-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSoilBearingCapacity" },
   "lateral-earth-pressure": { module: "../../calc-geotech.js", fn: "computeLateralEarthPressure" },
+  "at-rest-earth-pressure": { module: "../../calc-geotech.js", fn: "computeAtRestEarthPressure" },
   "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
   "consolidation-time-rate": { module: "../../calc-geotech.js", fn: "computeConsolidationTimeRate" },
   "spt-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSptBearingCapacity" },

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spec-v624 at-rest earth pressure (Jaky K0) for a braced wall; 2026-07-11
+
+Lands `at-rest-earth-pressure` (Group E, calc-geotech.js), the at-rest limit-state follow-on spec-v261 named beside `lateral-earth-pressure`. A basement wall, braced excavation, or rigid culvert cannot deflect to the Rankine active limit, so it carries the higher at-rest pressure: Jaky's K0 = 1 - sin phi, the triangular thrust P0 = 0.5 x K0 x gamma x H^2 at H/3, the surcharge term K0 x q x H at H/2, the combined resultant and its height. A 10 ft phi = 30 sand wall carries 3,000 lb/ft at rest against only 2,000 lb/ft active - exactly 1.5x more, the error of reaching for the active tile on a braced wall. Pure first-principles soil mechanics, no proprietary constants. Catalog 1,071 -> 1,072 (version 0.213.0).
+
 ### feat(hvac): spec-v623 buffer tank with distribution-loop credit; 2026-07-11
 
 Lands `buffer-tank-loop-credit` (Group C, calc-hvacsystems.js), the distribution-volume-credit follow-on spec-v587 named beside `hydronic-buffer-tank`. It sizes the gross anti-short-cycle buffer (V = on_time x (source_min - zone_load) / (500 x delta_T)), then credits the water already circulating in the distribution loop (0.0408 x d^2 x L gal, the same pure-geometry constant the pipe-volume tile uses) to return the net tank actually needed. A 60 gal gross on a 1.5 in x 200 ft primary loop holds 18.36 gal, so only a 42 gal tank is required; a 2 in x 1000 ft loop holds 163 gal and wipes the requirement out entirely. Catalog 1,070 -> 1,071 (version 0.212.0).

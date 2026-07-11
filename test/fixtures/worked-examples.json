@@ -36030,6 +36030,82 @@
    }
   },
   {
+   "tile_id": "at-rest-earth-pressure",
+   "source_publisher": "Jaky (1944) as compiled in Das / NAVFAC DM-7.02",
+   "source_title": "braced basement wall: K0 = 1 - sin 30 = 0.5, base 600 psf, thrust 3,000 lb/ft at H/3 (1.5x the Rankine active)",
+   "source_edition_or_year": "spec-v624 worked example (machine-verified)",
+   "source_section_or_page": "spec-v624 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "phi": 30,
+    "gamma": 120,
+    "h_ft": 10,
+    "q": 0
+   },
+   "outputs": {
+    "k0": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "p0_base": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "p0_soil": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "y_bar": {
+     "value": 3.3333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "at-rest-earth-pressure",
+   "source_publisher": "Jaky (1944) as compiled in Das / NAVFAC DM-7.02",
+   "source_title": "cross-check: same wall with a 250 psf surcharge -> +1,250 lb/ft at mid-height, total 4,250 lb/ft, resultant rises to 3.82 ft",
+   "source_edition_or_year": "spec-v624 worked example (machine-verified)",
+   "source_section_or_page": "spec-v624 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "phi": 30,
+    "gamma": 120,
+    "h_ft": 10,
+    "q": 250
+   },
+   "outputs": {
+    "p0_surch": {
+     "value": 1250,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "p0_tot": {
+     "value": 4250,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "y_bar": {
+     "value": 3.8235,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "retaining-wall-stability",
    "source_publisher": "Das / NAVFAC DM-7.02 stability checks vs IBC 1807.2.3",
    "source_title": "10 ft cantilever wall, 6 ft base, phi 30 at 110 pcf, dry -> FS overturning 3.37, FS sliding 1.69, toe 1,731 psf, all pass",
