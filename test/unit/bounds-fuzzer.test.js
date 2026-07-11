@@ -19626,3 +19626,40 @@ test("bounds: spec-v607 computeTreeOpenCavity pins the open loss, the Wagener co
   assert.ok("error" in _v607({ diameter_in: 24, shell_thick_in: 12, opening_width_in: 8 }));
   assert.ok("error" in _v607({ diameter_in: 24, shell_thick_in: 3, opening_width_in: -1 }));
 });
+
+import { computeTreeCrzEncroachment as _v608 } from "../../calc-arborist.js";
+
+test("bounds: spec-v608 computeTreeCrzEncroachment pins the segment encroachment, the species-threshold switch, no-encroach, and error seams", () => {
+  // Pinned worked example: 20-in DBH, 1.0 ft/in, 5-ft limit, intermediate species.
+  const r = _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "intermediate" });
+  assert.ok(Math.abs(r.radius_ft - 20) < 1e-9);
+  const R = 20, d = 5;
+  const seg = R * R * Math.acos(d / R) - d * Math.sqrt(R * R - d * d);
+  assert.ok(Math.abs(r.encroach_pct - seg / (Math.PI * R * R) * 100) < 1e-9);
+  assert.ok(Math.abs(r.encroach_pct - 34.251882) < 1e-5);
+  assert.equal(r.threshold_pct, 30);
+  assert.equal(r.over_tolerance, true);
+  // Same cut, three verdicts by species tolerance.
+  const tol = _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "tolerant" });
+  const sen = _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "sensitive" });
+  assert.equal(tol.over_tolerance, false); // 34% < 40%
+  assert.equal(sen.over_tolerance, true);  // 34% > 20%
+  assert.ok(Math.abs(tol.encroach_pct - r.encroach_pct) < 1e-9); // encroachment unchanged, only the verdict
+  // Cross-check: pushing the limit line out lowers the encroachment.
+  const x = _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 12, species_tolerance: "intermediate" });
+  assert.ok(Math.abs(x.encroach_pct - 14.237849) < 1e-5);
+  assert.ok(x.encroach_pct < r.encroach_pct);
+  // A limit line at or beyond the CRZ radius is zero encroachment.
+  const none = _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 25, species_tolerance: "intermediate" });
+  assert.equal(none.encroach_pct, 0);
+  assert.equal(none.over_tolerance, false);
+  // A line at the trunk (d=0) removes half the CRZ (50%).
+  const half = _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 0, species_tolerance: "intermediate" });
+  assert.ok(Math.abs(half.encroach_pct - 50) < 1e-9);
+  // Error seams: non-finite, non-positive DBH / factor, negative distance, bad species.
+  assert.ok("error" in _v608({ dbh_in: Infinity, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "intermediate" }));
+  assert.ok("error" in _v608({ dbh_in: 0, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "intermediate" }));
+  assert.ok("error" in _v608({ dbh_in: 20, radius_factor: 0, limit_distance_ft: 5, species_tolerance: "intermediate" }));
+  assert.ok("error" in _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: -1, species_tolerance: "intermediate" }));
+  assert.ok("error" in _v608({ dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "unknown" }));
+});

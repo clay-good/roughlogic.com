@@ -465,6 +465,7 @@ const _TILES = [
   ["trunk-decay-strength", "L"],
   ["tree-open-cavity", "L"],
   ["tree-protection-zone", "L"],
+  ["tree-crz-encroachment", "L"],
   ["crown-pruning-dose", "L"],
   ["nozzle-flow-pressure", "L"], ["spray-drift-buffer", "L"], ["sprayer-field-capacity", "L"],
   // v69 surface prep, coatings, and abatement (Groups E and D)

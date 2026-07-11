@@ -681,6 +681,7 @@ export const COMPUTE_MAP = {
   "trunk-decay-strength": { module: "../../calc-arborist.js", fn: "computeTrunkDecayStrength" },
   "tree-open-cavity": { module: "../../calc-arborist.js", fn: "computeTreeOpenCavity" },
   "tree-protection-zone": { module: "../../calc-arborist.js", fn: "computeTreeProtectionZone" },
+  "tree-crz-encroachment": { module: "../../calc-arborist.js", fn: "computeTreeCrzEncroachment" },
   "crown-pruning-dose": { module: "../../calc-arborist.js", fn: "computeCrownPruningDose" },
   "nozzle-flow-pressure": { module: "../../calc-agriculture.js", fn: "computeNozzleFlowPressure" },
   "spray-drift-buffer": { module: "../../calc-agriculture.js", fn: "computeSprayDriftBuffer" },

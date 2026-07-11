@@ -898,6 +898,7 @@ const RELATED = {
   "trunk-decay-strength": ["char-depth-capacity", "felling-notch-hinge", "log-limb-weight"],
   "tree-open-cavity": ["trunk-decay-strength", "tree-protection-zone", "crown-pruning-dose"],
   "tree-protection-zone": ["trunk-decay-strength", "reineke-sdi", "log-limb-weight"],
+  "tree-crz-encroachment": ["tree-protection-zone", "trunk-decay-strength", "crown-pruning-dose"],
   "crown-pruning-dose": ["tree-protection-zone", "trunk-decay-strength", "felling-notch-hinge"],
 
   // spec-v69 surface prep, coatings, and abatement

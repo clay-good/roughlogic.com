@@ -81397,6 +81397,56 @@
       "term": "opening angle tree decay strength",
       "target": "tree-open-cavity",
       "kind": "question"
+    },
+    {
+      "term": "crz encroachment",
+      "target": "tree-crz-encroachment",
+      "kind": "industry"
+    },
+    {
+      "term": "root zone encroachment",
+      "target": "tree-crz-encroachment",
+      "kind": "industry"
+    },
+    {
+      "term": "tree protection encroachment",
+      "target": "tree-crz-encroachment",
+      "kind": "adjacent"
+    },
+    {
+      "term": "construction near a tree",
+      "target": "tree-crz-encroachment",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tpz intrusion",
+      "target": "tree-crz-encroachment",
+      "kind": "redirect"
+    },
+    {
+      "term": "how much of the root zone can i disturb",
+      "target": "tree-crz-encroachment",
+      "kind": "question"
+    },
+    {
+      "term": "critical root zone encroachment percent",
+      "target": "tree-crz-encroachment",
+      "kind": "question"
+    },
+    {
+      "term": "will construction kill my tree",
+      "target": "tree-crz-encroachment",
+      "kind": "question"
+    },
+    {
+      "term": "how close can i build to a tree",
+      "target": "tree-crz-encroachment",
+      "kind": "question"
+    },
+    {
+      "term": "species tolerance root disturbance",
+      "target": "tree-crz-encroachment",
+      "kind": "question"
     }
   ]
 }

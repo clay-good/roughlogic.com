@@ -7085,6 +7085,17 @@ export const CITATIONS = {
       { name: "Lion's-tailing", value: "stripping interior foliage violates A300 even under the percent cap", source: "ISA BMP - Pruning" },
     ],
   },
+  "tree-crz-encroachment": {
+    formula: "radius = radius_factor x DBH; segment = radius^2 x acos(d/radius) - d x sqrt(radius^2 - d^2) for a limit line at distance d; encroach_pct = segment / (pi x radius^2) x 100; over when encroach_pct > threshold (tolerant 40 / intermediate 30 / sensitive 20).",
+    edition: "Critical root zone encroachment (ANSI A300 Part 5 tree protection; arboriculture practice), by name.",
+    freeAccess: "The CRZ encroachment geometry and the species tolerance guides are published arboriculture practice; a qualified arborist and the local ordinance govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The encroachment is the CRZ area beyond a single straight construction limit line - a real footprint may cut more than one side and the impacts are cumulative. The CRZ radius is set by trunk diameter, not the canopy. The species threshold (tolerant ~40%, intermediate ~30%, sensitive ~20%, Matheny & Clark tolerance ratings) is a guide, not a guarantee. A qualified arborist and the local ordinance govern - a planning screen, not a tree-preservation permit.",
+    assumptions: [
+      { name: "Single limit line", value: "encroachment is the circular segment beyond one straight limit line; multiple sides are cumulative", source: "ANSI A300 Part 5 / arboriculture practice" },
+      { name: "Species tolerance", value: "acceptable encroachment ~40% tolerant, ~30% intermediate, ~20% sensitive (Matheny & Clark tolerance ratings)", source: "Matheny & Clark" },
+    ],
+  },
   "tree-protection-zone": {
     formula: "radius = radius_factor x DBH; area = pi x radius^2 (radius_factor 1.0 ft/in standard, 1.5 ft/in conservative/mature).",
     edition: "Tree protection zone / critical root zone (ANSI A300 Part 5; ISA critical root zone), by name.",

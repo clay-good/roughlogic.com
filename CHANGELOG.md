@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(arborist): spec-v608 critical root zone encroachment percent; 2026-07-10
+
+Lands `tree-crz-encroachment` (Group L, calc-arborist.js), the follow-on spec-v566 named: how much of the CRZ a construction limit line cuts off, judged against species tolerance. A limit line at distance d slices a segment R^2 x acos(d/R) - d x sqrt(R^2 - d^2); encroach = segment / (pi x R^2) x 100, over when past the species threshold (tolerant 40 / intermediate 30 / sensitive 20). Catalog 1,055 -> 1,056 (version 0.197.0).
+
 ### feat(arborist): spec-v607 open-cavity trunk strength loss (Smiley & Fraedrich); 2026-07-10
 
 Lands `tree-open-cavity` (Group L, calc-arborist.js), the follow-on spec-v565 named: the open-cavity correction the closed-hollow Wagener screen understates. loss = (hollow_d^3 + R x (D^3 - hollow_d^3)) / D^3 x 100, R = opening arc / circumference (Smiley & Fraedrich 1992). Collapses to Wagener at R=0; reproduces the paper's example (4-in stem 70% hollow, 2-in opening -> 45%). Repoints the "cavity strength loss" alias to the dedicated tile; raises the calc-arborist.js gzip cap 13000 -> 16000. Catalog 1,054 -> 1,055 (version 0.196.0).

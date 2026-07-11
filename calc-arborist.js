@@ -593,6 +593,71 @@ function _v566renderTreeProtectionZone(inputRegion, outputRegion, citationEl) {
 }
 ARBORIST_RENDERERS["tree-protection-zone"] = _v566renderTreeProtectionZone;
 
+// --- spec-v608 L: Critical root zone encroachment percent (ANSI A300 Part 5) ---
+// radius = factor*dbh. segment = R^2*acos(d/R) - d*sqrt(R^2-d^2). encroach = segment/(pi*R^2)*100. thresholds tolerant 40 / intermediate 30 / sensitive 20.
+const _V608_TOLERANCE = { tolerant: 40, intermediate: 30, sensitive: 20 };
+// dims: in { dbh_in: L, radius_factor: dimensionless, limit_distance_ft: L, species_tolerance: dimensionless } out: { radius_ft: L, encroach_pct: dimensionless, threshold_pct: dimensionless }
+export function computeTreeCrzEncroachment({ dbh_in = 0, radius_factor = 1.0, limit_distance_ft = 0, species_tolerance = "intermediate" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dbh = Number(dbh_in);
+  const factor = Number(radius_factor);
+  const d = Number(limit_distance_ft);
+  if (!Number.isFinite(dbh) || dbh <= 0) return { error: "DBH must be a positive finite number (in)." };
+  if (!Number.isFinite(factor) || factor <= 0) return { error: "Radius factor must be a positive finite number (ft/in)." };
+  if (!Number.isFinite(d) || d < 0) return { error: "Limit-line distance cannot be negative (ft)." };
+  const threshold_pct = _V608_TOLERANCE[species_tolerance];
+  if (threshold_pct === undefined) return { error: "Species tolerance must be tolerant, intermediate, or sensitive." };
+  const radius_ft = factor * dbh;
+  const area_ft2 = Math.PI * radius_ft * radius_ft;
+  let segment_ft2 = 0;
+  let encroach_pct = 0;
+  if (d < radius_ft) {
+    segment_ft2 = radius_ft * radius_ft * Math.acos(d / radius_ft) - d * Math.sqrt(radius_ft * radius_ft - d * d);
+    encroach_pct = segment_ft2 / area_ft2 * 100;
+  }
+  const over_tolerance = encroach_pct > threshold_pct;
+  if (![radius_ft, encroach_pct].every(Number.isFinite)) return { error: "Encroachment math is not a finite value." };
+  return {
+    radius_ft, area_ft2, segment_ft2, encroach_pct, threshold_pct, over_tolerance,
+    note: "The encroachment is the CRZ area beyond a single straight construction limit line - a real footprint may cut more than one side and the impacts are cumulative. The CRZ radius is set by trunk diameter, not the canopy. The species threshold (tolerant ~40%, intermediate ~30%, sensitive ~20%, Matheny & Clark tolerance ratings) is a guide, not a guarantee. A qualified arborist and the local ordinance govern - a planning screen, not a tree-preservation permit.",
+  };
+}
+export const treeCrzEncroachmentExample = { inputs: { dbh_in: 20, radius_factor: 1.0, limit_distance_ft: 5, species_tolerance: "intermediate" } };
+function _v608renderTreeCrzEncroachment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: critical root zone encroachment (ANSI A300 Part 5 tree protection; arboriculture practice), by name. radius = radius_factor x DBH; the construction limit line at distance d cuts a segment R^2 x acos(d/R) - d x sqrt(R^2 - d^2); encroach = segment / (pi x R^2) x 100. Species thresholds (Matheny & Clark tolerance): tolerant ~40%, intermediate ~30%, sensitive ~20%. The encroachment is for a single straight limit line; a real footprint may cut more than one side and the impacts are cumulative. The CRZ is set by the trunk, not the canopy.";
+  const dbh = makeNumber("DBH (in)", "tce-dbh", { step: "any", min: "0", value: "20" }); dbh.input.value = "20";
+  const factor = makeSelect("Radius factor", "tce-factor", [
+    { value: "1.0", label: "1.0 ft/in (standard)", selected: true },
+    { value: "1.5", label: "1.5 ft/in (conservative / mature)" },
+  ]);
+  const dist = makeNumber("Construction limit-line distance from trunk (ft)", "tce-dist", { step: "any", min: "0", value: "5" }); dist.input.value = "5";
+  const species = makeSelect("Species tolerance", "tce-species", [
+    { value: "tolerant", label: "Tolerant (~40%)" },
+    { value: "intermediate", label: "Intermediate (~30%)", selected: true },
+    { value: "sensitive", label: "Sensitive (~20%)" },
+  ]);
+  inputRegion.appendChild(dbh.wrap);
+  inputRegion.appendChild(factor.wrap);
+  inputRegion.appendChild(dist.wrap);
+  inputRegion.appendChild(species.wrap);
+  attachExampleButton(inputRegion, () => { dbh.input.value = "20"; factor.select.value = "1.0"; dist.input.value = "5"; species.select.value = "intermediate"; update(); });
+  const oEnc = makeOutputLine(outputRegion, "CRZ encroachment", "tce-out-enc");
+  const oRad = makeOutputLine(outputRegion, "Protection radius", "tce-out-rad");
+  const oVerdict = makeOutputLine(outputRegion, "Against species tolerance", "tce-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Note", "tce-out-note");
+  const update = debounce(() => {
+    const r = computeTreeCrzEncroachment({ dbh_in: Number(dbh.input.value) || 0, radius_factor: Number(factor.select.value) || 0, limit_distance_ft: Number(dist.input.value) || 0, species_tolerance: species.select.value });
+    if (r.error) { oEnc.textContent = r.error; oRad.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
+    oEnc.textContent = fmt(r.encroach_pct, 1) + "%";
+    oRad.textContent = fmt(r.radius_ft, 1) + " ft (from the trunk)";
+    oVerdict.textContent = r.over_tolerance ? "OVER the " + fmt(r.threshold_pct, 0) + "% threshold - decline / removal risk" : "within the " + fmt(r.threshold_pct, 0) + "% threshold";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [dbh.input, dist.input]) el.addEventListener("input", update);
+  for (const s of [factor.select, species.select]) s.addEventListener("change", update);
+}
+ARBORIST_RENDERERS["tree-crz-encroachment"] = _v608renderTreeCrzEncroachment;
+
 // --- spec-v567 L: Live crown removal limit / pruning dose (ANSI A300 Part 1) ---
 // removal_pct = removed / live x 100. cap: mature 25, young 15, over-mature 10, stressed 0.
 const _CROWN_CAP_PCT = { young: 15, mature: 25, "over-mature": 10, stressed: 0 };

@@ -50756,6 +50756,64 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tree-crz-encroachment",
+   "source_publisher": "ANSI A300 Part 5 tree protection / arboriculture practice",
+   "source_title": "encroach = segment / (pi x radius^2) x 100 (spec-v566's named follow-on)",
+   "source_edition_or_year": "ANSI A300 Part 5 / Matheny & Clark",
+   "source_section_or_page": "20-in DBH, 1.0 ft/in factor (R 20 ft), limit line 5 ft from trunk -> 34.3% encroachment (over the 30% intermediate threshold)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "dbh_in": 20,
+    "radius_factor": 1.0,
+    "limit_distance_ft": 5,
+    "species_tolerance": "intermediate"
+   },
+   "outputs": {
+    "radius_ft": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "encroach_pct": {
+     "value": 34.251882,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "threshold_pct": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tree-crz-encroachment",
+   "source_publisher": "ANSI A300 Part 5 tree protection / arboriculture practice",
+   "source_title": "cross-check: moving the limit line out more than halves the impact",
+   "source_edition_or_year": "ANSI A300 Part 5 / Matheny & Clark",
+   "source_section_or_page": "Same tree, limit line 12 ft from trunk -> 14.2% encroachment (under every threshold)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "dbh_in": 20,
+    "radius_factor": 1.0,
+    "limit_distance_ft": 12,
+    "species_tolerance": "intermediate"
+   },
+   "outputs": {
+    "encroach_pct": {
+     "value": 14.237849,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

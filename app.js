@@ -928,6 +928,7 @@ const TOOL_MODULES = (() => {
     "tree-open-cavity",
     // spec-v566
     "tree-protection-zone",
+    "tree-crz-encroachment",
     // spec-v567
     "crown-pruning-dose",
   ]);
