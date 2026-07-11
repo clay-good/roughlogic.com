@@ -10675,6 +10675,17 @@ export const CITATIONS = {
       { name: "Shear cap", value: "Vn <= min(0.2 f'c, 480 + 0.08 f'c, 1600) b d, not the usual sqrt(f'c) shear", source: "ACI 318-19 16.5.2.4" },
     ],
   },
+  "concrete-anchor-pullout": {
+    formula: "Np = 8 x head_bearing_area_in2 x fc_psi; Npn = psi_cP x Np (psi_cP = 1.4 uncracked at service, 1.0 cracked); phiNpn = 0.70 x Npn.",
+    edition: "The ACI 318-19 Section 17.6.3 headed-anchor pullout in tension, by name.",
+    freeAccess: "ACI 318 is available through ACI; the 17.6.3 pullout provisions are published design equations.",
+    governance: GOVERNANCE.general,
+    editionNote: "Pullout does not depend on embedment - deepening the anchor does not raise it (that is the breakout mode). It applies to headed anchors where the head bears on the concrete, not to adhesive or expansion anchors (which use a tested bond or slip value). Abrg is the net bearing area of the head or nut. The 1.4 uncracked factor applies only when analysis shows the concrete stays uncracked at service load; use 1.0 otherwise. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+    assumptions: [
+      { name: "Embedment-independent", value: "pullout Np = 8 Abrg f'c depends on the head area, not the embedment depth", source: "ACI 318-19 17.6.3.2" },
+      { name: "Uncracked bonus", value: "psi_cP = 1.4 only when analysis shows the concrete stays uncracked at service; else 1.0", source: "ACI 318-19 17.6.3.3" },
+    ],
+  },
   "concrete-anchor-breakout": {
     formula: "Nb = kc lambda sqrt(f'c) hef^1.5 (kc 24 cast-in, 17 post-installed); ANco = 9 hef^2; psi_ed = 0.7 + 0.3 ca1/(1.5 hef) when ca1 < 1.5 hef; Ncb = (ANc/ANco) psi_ed Nb; phiNcb = 0.65 Ncb.",
     edition: "The ACI 318-19 Section 17.6.2 concrete breakout strength in tension (CCD method), by name.",

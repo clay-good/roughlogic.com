@@ -81592,6 +81592,56 @@
       "term": "shared ev charging current per port",
       "target": "ev-charger-throttle",
       "kind": "question"
+    },
+    {
+      "term": "anchor pullout",
+      "target": "concrete-anchor-pullout",
+      "kind": "industry"
+    },
+    {
+      "term": "headed anchor pullout",
+      "target": "concrete-anchor-pullout",
+      "kind": "industry"
+    },
+    {
+      "term": "aci pullout",
+      "target": "concrete-anchor-pullout",
+      "kind": "redirect"
+    },
+    {
+      "term": "concrete anchor tension pullout",
+      "target": "concrete-anchor-pullout",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bolt pullout concrete",
+      "target": "concrete-anchor-pullout",
+      "kind": "adjacent"
+    },
+    {
+      "term": "headed anchor pullout strength",
+      "target": "concrete-anchor-pullout",
+      "kind": "question"
+    },
+    {
+      "term": "aci 318 anchor pullout formula",
+      "target": "concrete-anchor-pullout",
+      "kind": "question"
+    },
+    {
+      "term": "concrete anchor pullout vs breakout",
+      "target": "concrete-anchor-pullout",
+      "kind": "question"
+    },
+    {
+      "term": "does anchor pullout depend on embedment",
+      "target": "concrete-anchor-pullout",
+      "kind": "question"
+    },
+    {
+      "term": "cracked vs uncracked anchor pullout",
+      "target": "concrete-anchor-pullout",
+      "kind": "question"
     }
   ]
 }

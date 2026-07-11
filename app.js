@@ -588,6 +588,7 @@ const TOOL_MODULES = (() => {
     "concrete-longterm-defl",
     // spec-v548
     "concrete-anchor-breakout",
+    "concrete-anchor-pullout",
     // spec-v552
     "rc-slender-column-magnify",
     // spec-v556

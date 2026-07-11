@@ -559,6 +559,7 @@ const _TILES = [
   // spec-v497 long-term deflection multiplier (ACI 318-19 §24.2.4.1)
   ["concrete-longterm-defl", "E"],
   ["concrete-anchor-breakout", "E"],
+  ["concrete-anchor-pullout", "E"],
   ["rc-slender-column-magnify", "E"],
   ["concrete-corbel-bracket", "E"],
   // spec-v302..v304 site-hydraulics depth batch (calc-plumbing.js Group B)

@@ -50980,6 +50980,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "concrete-anchor-pullout",
+   "source_publisher": "ACI 318-19 Section 17.6.3 (headed-anchor pullout)",
+   "source_title": "Np = 8 x Abrg x f'c; phiNpn = 0.70 x psi_cP x Np (spec-v548's named companion)",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "3/4-in bolt, 0.654-in2 head, 4,000-psi cracked -> Np 20,928 lb, phiNpn 14,650 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "head_bearing_area_in2": 0.654,
+    "fc_psi": 4000,
+    "cracking": "cracked"
+   },
+   "outputs": {
+    "np_lb": {
+     "value": 20928,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "phi_npn_lb": {
+     "value": 14649.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-anchor-pullout",
+   "source_publisher": "ACI 318-19 Section 17.6.3 (headed-anchor pullout)",
+   "source_title": "cross-check: the uncracked 1.4 factor",
+   "source_edition_or_year": "ACI 318-19",
+   "source_section_or_page": "1-in bolt, 1.05-in2 head, 5,000-psi uncracked -> Np 42,000 lb, Npn 58,800 lb, phiNpn 41,160 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "head_bearing_area_in2": 1.05,
+    "fc_psi": 5000,
+    "cracking": "uncracked"
+   },
+   "outputs": {
+    "np_lb": {
+     "value": 42000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "npn_lb": {
+     "value": 58800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "phi_npn_lb": {
+     "value": 41160,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
   }
  ]
 }

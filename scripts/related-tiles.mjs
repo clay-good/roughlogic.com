@@ -1167,6 +1167,7 @@ const RELATED = {
   "rc-compression-dev-length": ["rc-development-length","rc-hook-development","rc-column-axial"],
   "concrete-longterm-defl": ["joist-deflection","rc-beam-flexure","steel-camber"],
   "concrete-anchor-breakout": ["anchor-embedment","column-base-plate","masonry-anchor-bolt"],
+  "concrete-anchor-pullout": ["concrete-anchor-breakout","anchor-embedment","column-base-plate"],
   "rc-slender-column-magnify": ["rc-column-axial","column-buckling-wood","concrete-longterm-defl"],
   "concrete-corbel-bracket": ["rc-shear-friction","rc-beam-shear","concrete-bearing-strength"],
   "rc-punching-shear": ["rc-beam-shear","rc-column-axial","footing-area"],

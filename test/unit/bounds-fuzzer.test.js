@@ -19764,3 +19764,33 @@ test("bounds: spec-v611 computeEvChargerThrottle pins the throttled current, the
   assert.ok("error" in _v611({ aggregate_limit_a: 100, charger_max_a: 0, active_chargers: 4 }));
   assert.ok("error" in _v611({ aggregate_limit_a: 100, charger_max_a: 40, active_chargers: 0 }));
 });
+
+import { computeConcreteAnchorPullout as _v612 } from "../../calc-concrete.js";
+
+test("bounds: spec-v612 computeConcreteAnchorPullout pins Np, the cracked/uncracked switch, embedment-independence, and error seams", () => {
+  // Pinned worked example: 3/4-in bolt, 0.654-in2 head, 4,000-psi cracked.
+  const r = _v612({ head_bearing_area_in2: 0.654, fc_psi: 4000, cracking: "cracked" });
+  assert.ok(Math.abs(r.np_lb - 8 * 0.654 * 4000) < 1e-6);
+  assert.ok(Math.abs(r.np_lb - 20928) < 1e-6);
+  assert.equal(r.psi_cP, 1.0);
+  assert.ok(Math.abs(r.npn_lb - r.np_lb) < 1e-9); // cracked -> psi_cP = 1
+  assert.ok(Math.abs(r.phi_npn_lb - 0.70 * r.npn_lb) < 1e-9);
+  assert.ok(Math.abs(r.phi_npn_lb - 14649.6) < 1e-6);
+  // Cross-check: uncracked applies the 1.4 factor.
+  const x = _v612({ head_bearing_area_in2: 1.05, fc_psi: 5000, cracking: "uncracked" });
+  assert.ok(Math.abs(x.np_lb - 42000) < 1e-6);
+  assert.equal(x.psi_cP, 1.4);
+  assert.ok(Math.abs(x.npn_lb - 58800) < 1e-6);
+  assert.ok(Math.abs(x.phi_npn_lb - 41160) < 1e-6);
+  // Uncracked is exactly 1.4x the cracked capacity for the same anchor.
+  const same_cracked = _v612({ head_bearing_area_in2: 1.05, fc_psi: 5000, cracking: "cracked" });
+  assert.ok(Math.abs(x.npn_lb - 1.4 * same_cracked.npn_lb) < 1e-6);
+  // Np scales linearly with head area and with f'c.
+  const dblArea = _v612({ head_bearing_area_in2: 1.308, fc_psi: 4000, cracking: "cracked" });
+  assert.ok(Math.abs(dblArea.np_lb - 2 * r.np_lb) < 1e-6);
+  // Error seams: non-finite, non-positive area / fc, bad cracking.
+  assert.ok("error" in _v612({ head_bearing_area_in2: Infinity, fc_psi: 4000, cracking: "cracked" }));
+  assert.ok("error" in _v612({ head_bearing_area_in2: 0, fc_psi: 4000, cracking: "cracked" }));
+  assert.ok("error" in _v612({ head_bearing_area_in2: 0.654, fc_psi: 0, cracking: "cracked" }));
+  assert.ok("error" in _v612({ head_bearing_area_in2: 0.654, fc_psi: 4000, cracking: "maybe" }));
+});

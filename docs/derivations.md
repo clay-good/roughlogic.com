@@ -1502,6 +1502,7 @@ cross-check.
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurveSightDistance` | `{ A_pct, S_ft, C } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBreakout` | `{ embedment_in = 0, fc_psi = 0, edge_distance_in = 0, anchor_type = "cast-in"...` | _ | _ | _ |
+| calc-concrete.js | `computeConcreteAnchorPullout` | `{ head_bearing_area_in2 = 0, fc_psi = 0, cracking = "cracked" } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteBeamMinFlexuralSteel` | `{ fc_psi = 4000, fy_psi = 60000, bw_in = 0, d_in = 0 } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteBearingStrength` | `{ loaded_area_in2 = 0, support_area_in2 = 0, fc_psi = 4000, factored_load_kip...` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteCorbelBracket` | `{ factored_shear_lb = 0, horiz_tension_lb = 0, shear_span_av_in = 0, eff_dept...` | _ | _ | _ |
@@ -2717,7 +2718,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1303.
+Row count: 1304.
 
 <!-- END function-corpus-v14 -->
 
@@ -3207,7 +3208,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (221 tiles)
+### Group E Construction (222 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3243,6 +3244,7 @@ per spec-v14 §13.1 second paragraph.
 | `compound-miter` | Compound Miter (Crown Molding) | First-principles compound-miter trigo...; 38 deg spring crown at a 90 deg corner -> 31.62 deg miter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete` | Concrete Volume | Project (first-principles); Volume identity; 20x10 footing 4 in deep | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-anchor-breakout` | Cast-In Anchor Tension Concrete Breakout (ACI 318-19 Ch. 17) | ACI 318-19 Section 17.6.2 (concrete b...; 6 in cast-in, 4000 psi, away from edges -> Nb 22308 lb, N... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-anchor-pullout` | Concrete Headed-Anchor Pullout (ACI 318-19 17.6.3) | ACI 318-19 Section 17.6.3 (headed-anc...; 3/4-in bolt, 0.654-in2 head, 4,000-psi cracked -> Np 20,9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-beam-min-flexural-steel` | Minimum Flexural Reinforcement As,min (ACI 318-19 9.6.1.2) | ACI 318-19 9.6.1.2; spec-v394 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-bearing-strength` | Concrete Bearing Strength (ACI 318-19 22.8) | ACI 318-19 22.8.3; spec-v490 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-corbel-bracket` | Concrete Corbel / Bracket Design (ACI 318-19 16.5) | ACI 318-19 Section 16.5 (brackets and...; Vu 40k, av 4, d 12, h 14, b 14, fc 4000, fy 60k -> Nuc 8k... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3962,6 +3964,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1059. Fixture-covered or reference-cadence: 1059 / 1059.
+Tile count: 1060. Fixture-covered or reference-cadence: 1060 / 1060.
 
 <!-- END tile-index-v14 -->

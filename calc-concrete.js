@@ -1050,3 +1050,41 @@ CONCRETE_RENDERERS["concrete-anchor-breakout"] = _simpleRenderer({
   ],
   compute: computeConcreteAnchorBreakout,
 });
+
+// --- spec-v612 E: Concrete headed-anchor pullout (ACI 318-19 17.6.3) ---
+// Np = 8 * Abrg * fc. Npn = psi_cP * Np (1.4 uncracked, 1.0 cracked). phiNpn = 0.70 * Npn.
+// dims: in { head_bearing_area_in2: L^2, fc_psi: M L^-1 T^-2, cracking: dimensionless } out: { np_lb: M L T^-2, npn_lb: M L T^-2, phi_npn_lb: M L T^-2 }
+export function computeConcreteAnchorPullout({ head_bearing_area_in2 = 0, fc_psi = 0, cracking = "cracked" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const abrg = Number(head_bearing_area_in2) || 0;
+  const fc = Number(fc_psi) || 0;
+  if (!(abrg > 0)) return { error: "Head bearing area must be positive (in^2)." };
+  if (!(fc > 0)) return { error: "Concrete strength must be positive (psi)." };
+  const uncracked = cracking === "uncracked";
+  if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
+  const psi_cP = uncracked ? 1.4 : 1.0;
+  const np_lb = 8 * abrg * fc;
+  const npn_lb = psi_cP * np_lb;
+  const phi_npn_lb = 0.70 * npn_lb;
+  return {
+    np_lb, npn_lb, phi_npn_lb, psi_cP,
+    note: "Pullout does not depend on embedment - deepening the anchor does not raise it (that is the breakout mode). It applies to headed anchors where the head bears on the concrete, not to adhesive or expansion anchors (which use a tested bond or slip value). Abrg is the net bearing area of the head or nut. The 1.4 uncracked factor applies only when analysis shows the concrete stays uncracked at service load; use 1.0 otherwise. phi = 0.70 is Condition B (no supplementary reinforcement). ACI 318 Chapter 17 and the engineer of record govern - a design check, not a stamped anchor design.",
+  };
+}
+export const concreteAnchorPulloutExample = { inputs: { head_bearing_area_in2: 0.654, fc_psi: 4000, cracking: "cracked" } };
+CONCRETE_RENDERERS["concrete-anchor-pullout"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Section 17.6.3 headed-anchor pullout: Np = 8 x Abrg x f'c; Npn = psi_cP x Np (psi_cP = 1.4 uncracked at service, 1.0 cracked); phiNpn = 0.70 x Npn (Condition B, no supplementary reinforcement). Pullout does not depend on embedment (that is the breakout mode); it applies to headed anchors where the head bears on the concrete, not adhesive or expansion anchors. Abrg is the net bearing area of the head or nut. ACI 318 Chapter 17 and the engineer of record govern.",
+  example: concreteAnchorPulloutExample.inputs,
+  fields: [
+    { key: "head_bearing_area_in2", label: "Head/nut net bearing area Abrg (in^2)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "cracking", label: "Concrete condition at service", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_cP = 1.0)", selected: true }, { value: "uncracked", label: "Uncracked (psi_cP = 1.4)" }] },
+  ],
+  outputs: [
+    { key: "np", id: "cap-out-np", label: "Basic pullout Np", value: (r) => fmt(r.np_lb, 0) + " lb (" + fmt(r.np_lb / 1000, 1) + " kip)" },
+    { key: "npn", id: "cap-out-npn", label: "Nominal pullout Npn", value: (r) => fmt(r.npn_lb, 0) + " lb (psi_cP " + fmt(r.psi_cP, 1) + ")" },
+    { key: "phi", id: "cap-out-phi", label: "Design pullout phiNpn", value: (r) => fmt(r.phi_npn_lb, 0) + " lb (" + fmt(r.phi_npn_lb / 1000, 1) + " kip)" },
+    { key: "n", id: "cap-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteAnchorPullout,
+});

@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v612 concrete headed-anchor pullout (ACI 318-19 17.6.3); 2026-07-10
+
+Lands `concrete-anchor-pullout` (Group E, calc-concrete.js), the companion spec-v548 named: the head-crushing tension failure mode. Np = 8 x Abrg x f'c; Npn = psi_cP x Np (1.4 uncracked, 1.0 cracked); phiNpn = 0.70 x Npn. Unlike breakout it does not depend on embedment. Raises the calc-concrete.js gzip cap 20000 -> 23000. Catalog 1,059 -> 1,060 (version 0.201.0).
+
 ### feat(electrical): spec-v611 EV charger throttled-current schedule; 2026-07-10
 
 Lands `ev-charger-throttle` (Group A, calc-feeder.js), the follow-on spec-v561 named: what each car gets when the EVEMS throttles. throttled = min(charger_max, aggregate_limit / active_chargers); full_rate_count = floor(aggregate_limit / charger_max). Four 40-A chargers on a 100-A budget throttle to 25 A each; drop to two active and both get their full 40 A. Catalog 1,058 -> 1,059 (version 0.200.0).
