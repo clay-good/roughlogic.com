@@ -20446,3 +20446,22 @@ test("bounds: spec-v635 computeSubstrateForVelocity pins [S] = Km f/(1-f), the [
   assert.ok("error" in _v635({ km: 25, target_percent: 120 }));
   assert.ok("error" in _v635({ km: Infinity, target_percent: 90 }));
 });
+
+import { computeSagVerticalCurve as _v636 } from "../../calc-civil.js";
+
+test("bounds: spec-v636 computeSagVerticalCurve pins the sag length, both branches, and error seams", () => {
+  const r = _v636({ A_pct: 4, S_ft: 400 });
+  assert.ok(Math.abs(r.L_ft - 350) < 1e-6); // 2*400 - 1800/4
+  assert.ok(Math.abs(r.K_ft_per_pct - 87.5) < 1e-9);
+  assert.equal(r.branch, "S > L");
+  // A sharper break at a longer sight distance stays on the S <= L branch.
+  const long = _v636({ A_pct: 6, S_ft: 600 });
+  assert.ok(Math.abs(long.L_ft - 864) < 1e-6); // 6*600^2/2500
+  assert.equal(long.branch, "S <= L");
+  assert.ok(Math.abs(long.K_ft_per_pct - 144) < 1e-9);
+  // Error seams: non-finite, non-positive A / S, and a degenerate (too-small-A) result.
+  assert.ok("error" in _v636({ A_pct: 0, S_ft: 400 }));
+  assert.ok("error" in _v636({ A_pct: 4, S_ft: 0 }));
+  assert.ok("error" in _v636({ A_pct: 2, S_ft: 200 })); // L <= 0, degenerate
+  assert.ok("error" in _v636({ A_pct: Infinity, S_ft: 400 }));
+});

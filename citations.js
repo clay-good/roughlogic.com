@@ -6281,6 +6281,18 @@ export const CITATIONS = {
       { name: "Crest SSD only", value: "sag curves use headlight/comfort/drainage criteria, not this relation", source: "scope of this tile" },
     ],
   },
+  "sag-vertical-curve": {
+    formula: "L = A S^2 / (400 + 3.5 S) for S <= L; L = 2 S - (400 + 3.5 S)/A for S > L; K = L/A. 400 and 3.5 embed the 2.0 ft headlight height and 1-degree beam divergence.",
+    edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) sag vertical-curve headlight sight-distance minimums, by name.",
+    freeAccess: "The AASHTO sag-curve headlight-criterion equations are published in the Green Book. The AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AASHTO Green Book sag vertical-curve headlight criterion L = A S^2 / (400 + 3.5 S) for S <= L and L = 2 S - (400 + 3.5 S)/A for S > L, where the 400 and 3.5 embed the 2.0 ft headlight height and 1-degree upward beam divergence (400 = 200 x 2.0, 3.5 ~ 200 x tan 1deg), with the K = L/A rate-of-vertical-curvature form. This returns the minimum sag vertical-curve length governed by headlight stopping sight distance - the controlling sag criterion for stopping. The comfort criterion L = A V^2 / 46.5 and the drainage maximum K <= 167 are separate checks not applied here, and passing sight distance does not govern a sag. A design aid, not a substitute for a licensed civil engineer's design.",
+    assumptions: [
+      { name: "Headlight criterion", value: "L from the 2.0 ft headlight beam reaching the road on the far grade; the 400/3.5 constants are the beam-height and 1-degree-divergence geometry", source: "AASHTO Green Book" },
+      { name: "Branch selection", value: "L = A S^2/(400 + 3.5 S) when S <= L, else L = 2 S - (400 + 3.5 S)/A; the governing branch is chosen by the S vs L comparison", source: "AASHTO Green Book" },
+      { name: "Headlight SSD only", value: "the comfort (A V^2/46.5) and drainage (K <= 167) criteria are separate checks", source: "scope of this tile" },
+    ],
+  },
   "horizontal-sightline-offset": {
     formula: "M = R (1 - cos(28.65 S / R)) [half-angle in degrees]; inverse S = (R/28.65) arccos(1 - M/R); R to the inside-lane centerline.",
     edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) horizontal sightline offset (middle ordinate), by name.",

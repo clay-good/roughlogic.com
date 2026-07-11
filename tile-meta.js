@@ -311,7 +311,7 @@ const _TILES = [
   ["conduit-offset", "A"], ["conduit-saddle", "A"], ["conduit-90-stub", "A"],
   ["weld-heat-input", "E"], ["metal-weight", "E"], ["layout-squaring", "E"],
   ["horizontal-curve", "E"], ["vertical-curve", "E"], ["earthwork-end-area", "E"], ["slope-stake-cut-fill", "E"],
-  ["superelevation", "E"], ["vertical-curve-sight-distance", "E"], ["horizontal-sightline-offset", "E"],
+  ["superelevation", "E"], ["vertical-curve-sight-distance", "E"], ["sag-vertical-curve", "E"], ["horizontal-sightline-offset", "E"],
   ["rolling-offset", "G"],
   ["speaker-impedance", "N"], ["decibel-converter", "N"], ["amp-power-spl", "N"], ["lighting-beam", "N"],
   ["area-by-coordinates", "P"], ["traverse-closure", "P"], ["hiking-time", "P"],

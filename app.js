@@ -552,6 +552,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-civil.js", "CIVIL_RENDERERS", [
     "horizontal-curve", "vertical-curve", "earthwork-end-area", "slope-stake-cut-fill",
     "superelevation", "vertical-curve-sight-distance", "horizontal-sightline-offset",
+    "sag-vertical-curve",
   ]);
   // spec-v254..v256 AISC 360 steel-member trio + spec-v266..v268 steel-connection
   // trio: a new lazy Group E cluster (the steel-member companion to the wood-framing

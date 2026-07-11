@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(civil): spec-v636 sag vertical curve minimum length (AASHTO); 2026-07-11
+
+Lands `sag-vertical-curve` (Group E, calc-civil.js), the sag (valley) companion the crest tile `vertical-curve-sight-distance` (spec-v337) explicitly hands off ("sag curves use headlight/comfort/drainage criteria"). A sag curve is limited at night by headlight reach: L = A S^2/(400 + 3.5 S) for S<=L, L = 2 S - (400 + 3.5 S)/A for S>L, K = L/A (400 and 3.5 embed the 2.0 ft headlight height and 1-degree beam divergence, the same class of Green Book constant the crest tile bakes into C = 2158). A 4% grade break needing 400 ft SSD wants a 350 ft sag curve (K 87.5). Headlight-SSD control; comfort and drainage are separate. Catalog 1,083 -> 1,084 (version 0.225.0).
+
 ### feat(lab): spec-v635 substrate for a target fraction of Vmax (Michaelis-Menten inverse); 2026-07-11
 
 Lands `substrate-for-velocity` (Group T, calc-lab.js), the assay-design inverse of `michaelis-menten`. Enter Km and the fraction of Vmax you want, get the substrate concentration: [S] = Km x f/(1 - f). Half of Vmax takes exactly one Km (its definition), but 90% takes 9 x Km and 99% takes 99 x Km - the runaway excess that shows why an enzyme approaches Vmax but never reaches it. Feeding the result back into the forward tile returns the target fraction exactly (fuzzer pins the round-trip and the [S]=Km-at-50% identity). Pure algebra, no constants. Catalog 1,082 -> 1,083 (version 0.224.0).

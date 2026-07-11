@@ -485,6 +485,47 @@ function renderVerticalCurveSightDistance(inputRegion, outputRegion, citationEl)
 }
 CIVIL_RENDERERS["vertical-curve-sight-distance"] = renderVerticalCurveSightDistance;
 
+// --- v636 E.x: Sag vertical curve minimum length for headlight SSD (`sag-vertical-curve`) ---
+// AASHTO Green Book sag headlight criterion: L = A S^2/(400 + 3.5 S) for S <= L,
+// L = 2 S - (400 + 3.5 S)/A for S > L. The 400/3.5 embed the 2.0 ft headlight
+// height and 1-degree beam divergence (400 = 200*2.0, 3.5 ~ 200*tan 1deg). K = L/A.
+// dims: in { A_pct: dimensionless, S_ft: L } out: { L_ft: L, K_ft_per_pct: L }
+export function computeSagVerticalCurve({ A_pct, S_ft } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(A_pct) || 0;
+  if (!(A > 0)) return { error: "Algebraic grade difference A must be greater than zero." };
+  const S = Number(S_ft) || 0;
+  if (!(S > 0)) return { error: "Sight distance S must be greater than zero." };
+  const denom = 400 + 3.5 * S;
+  const L1 = (A * S * S) / denom;
+  const L = S <= L1 ? L1 : 2 * S - denom / A;
+  if (!Number.isFinite(L) || !(L > 0)) return { error: "Minimum sag curve length is not valid for these inputs (the grade change may be too small to require a curve for this sight distance)." };
+  const K = L / A;
+  return { L_ft: L, K_ft_per_pct: K, branch: S <= L1 ? "S <= L" : "S > L", denom };
+}
+export const sagVerticalCurveExample = { inputs: { A_pct: 4, S_ft: 400 } };
+
+function renderSagVerticalCurve(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO sag vertical-curve minimums per A Policy on Geometric Design of Highways and Streets (the Green Book), headlight sight-distance criterion: L = A S^2 / (400 + 3.5 S) for S <= L and L = 2 S - (400 + 3.5 S)/A for S > L, where 400 and 3.5 embed the 2.0 ft headlight height and 1-degree beam divergence; K = L/A. This is the headlight-SSD control (the governing sag stopping criterion); the comfort criterion L = A V^2/46.5 and drainage K <= 167 are separate checks. A design aid, not a substitute for a licensed civil engineer's design.";
+  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "svc-a", { step: "any", min: "0", value: "4" });
+  A.input.value = "4";
+  const S = makeNumber("Stopping sight distance S (ft)", "svc-s", { step: "any", min: "0", value: "400" });
+  S.input.value = "400";
+  for (const fld of [A, S]) inputRegion.appendChild(fld.wrap);
+  const oL = makeOutputLine(outputRegion, "Minimum sag curve length L", "svc-out-l");
+  const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "svc-out-k");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSagVerticalCurve({ A_pct: readNum(A.input), S_ft: readNum(S.input) });
+    if (r.error) { oL.textContent = r.error; oK.textContent = ""; return; }
+    oL.textContent = fmt(r.L_ft, 0) + " ft (" + r.branch + " branch governs)";
+    oK.textContent = fmt(r.K_ft_per_pct, 0) + " ft/% (K = L/A)";
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { A.input.value = "4"; S.input.value = "400"; update(); });
+  for (const fld of [A.input, S.input]) fld.addEventListener("input", update);
+}
+CIVIL_RENDERERS["sag-vertical-curve"] = renderSagVerticalCurve;
+
 // --- v337 E.x: Horizontal sightline offset for SSD on a curve (`horizontal-sightline-offset`) ---
 // AASHTO middle ordinate: M = R (1 - cos(28.65 S / R)) with the half-angle in
 // degrees (28.65 = 90/pi). Inverse mode: S = (R/28.65) arccos(1 - M/R). R is to

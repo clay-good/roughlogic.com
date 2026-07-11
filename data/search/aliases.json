@@ -82782,6 +82782,56 @@
       "term": "substrate needed for a target reaction velocity",
       "target": "substrate-for-velocity",
       "kind": "question"
+    },
+    {
+      "term": "sag vertical curve",
+      "target": "sag-vertical-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "headlight sight distance",
+      "target": "sag-vertical-curve",
+      "kind": "industry"
+    },
+    {
+      "term": "valley curve length",
+      "target": "sag-vertical-curve",
+      "kind": "redirect"
+    },
+    {
+      "term": "sag curve k value",
+      "target": "sag-vertical-curve",
+      "kind": "redirect"
+    },
+    {
+      "term": "sag curve minimum length",
+      "target": "sag-vertical-curve",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how long a sag vertical curve for headlight sight distance",
+      "target": "sag-vertical-curve",
+      "kind": "question"
+    },
+    {
+      "term": "minimum sag curve length aashto",
+      "target": "sag-vertical-curve",
+      "kind": "question"
+    },
+    {
+      "term": "sag vertical curve k for a grade change",
+      "target": "sag-vertical-curve",
+      "kind": "question"
+    },
+    {
+      "term": "valley curve headlight criterion length",
+      "target": "sag-vertical-curve",
+      "kind": "question"
+    },
+    {
+      "term": "how long should a sag curve be",
+      "target": "sag-vertical-curve",
+      "kind": "question"
     }
   ]
 }

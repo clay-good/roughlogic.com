@@ -42854,6 +42854,54 @@
    }
   },
   {
+   "tile_id": "sag-vertical-curve",
+   "source_publisher": "AASHTO Green Book (sag headlight criterion)",
+   "source_title": "4% grade break at 400 ft SSD -> S>L branch, L 350 ft, K 87.5 ft/%",
+   "source_edition_or_year": "spec-v636 worked example (machine-verified)",
+   "source_section_or_page": "spec-v636 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "A_pct": 4,
+    "S_ft": 400
+   },
+   "outputs": {
+    "L_ft": {
+     "value": 350,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "K_ft_per_pct": {
+     "value": 87.5,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "sag-vertical-curve",
+   "source_publisher": "AASHTO Green Book (sag headlight criterion)",
+   "source_title": "cross-check: sharper 6% break at 600 ft SSD stays on the S<=L branch -> L 864 ft, K 144",
+   "source_edition_or_year": "spec-v636 worked example (machine-verified)",
+   "source_section_or_page": "spec-v636 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "A_pct": 6,
+    "S_ft": 600
+   },
+   "outputs": {
+    "L_ft": {
+     "value": 864,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "horizontal-sightline-offset",
    "source_publisher": "AASHTO Green Book",
    "source_title": "1,000 ft radius, 570 ft SSD -> M 40.3 ft inside clear-zone",
