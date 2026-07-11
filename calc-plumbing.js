@@ -3741,6 +3741,49 @@ function _v303renderOrificeFlow(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["orifice-flow"] = _v303renderOrificeFlow;
 
+// dims: in { tank_area_ft2: L^2, d_in: L, cd: dimensionless, h1_ft: L, h2_ft: L } out: { a_o_ft2: L^2, t_s: T, t_min: T }
+export function computeTankDrainTime({ tank_area_ft2 = 0, d_in = 0, cd = 0.60, h1_ft = 0, h2_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(tank_area_ft2 > 0)) return { error: "Tank cross-section area must be positive (ft^2)." };
+  if (!(d_in > 0)) return { error: "Orifice diameter must be positive (in)." };
+  if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
+  if (h2_ft < 0) return { error: "Ending head cannot be negative (ft)." };
+  if (!(h1_ft > h2_ft)) return { error: "Starting head must be greater than the ending head (ft)." };
+  const a_o_ft2 = (Math.PI / 4) * Math.pow(d_in / 12, 2);
+  const t_s = 2 * tank_area_ft2 * (Math.sqrt(h1_ft) - Math.sqrt(h2_ft)) / (cd * a_o_ft2 * Math.sqrt(2 * 32.2));
+  const t_min = t_s / 60;
+  return {
+    a_o_ft2, t_s, t_min,
+    note: "Falling-head (Torricelli) drain time t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2, integrating the orifice discharge Q = Cd A_o sqrt(2 g h) over the falling head of a constant-cross-section (prismatic) tank, with the head measured above the orifice. The flow slows as sqrt(h), so the last of the water drains slowest - draining to a residual h2 above the outlet takes far less than draining fully. Free discharge to atmosphere, small orifice, a steady discharge coefficient (~0.6 sharp-edged), a prismatic tank (constant area with depth). A design aid; the engineer of record governs.",
+  };
+}
+export const tankDrainTimeExample = { inputs: { tank_area_ft2: 100, d_in: 6, cd: 0.60, h1_ft: 9, h2_ft: 0 } };
+
+function _v630renderTankDrainTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: falling-head (Torricelli) drain time t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2, Cd ~ 0.6 sharp-edged, prismatic tank, head above the orifice, by name. Integrates the orifice equation over the falling head; the flow slows as sqrt(h). A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { at.input.value = "100"; d.input.value = "6"; cd.input.value = "0.60"; h1.input.value = "9"; h2.input.value = "0"; update(); });
+  const at = makeNumber("Tank cross-section area (ft^2)", "tdt-at", { step: "any", min: "0" });
+  const d = makeNumber("Orifice diameter (in)", "tdt-d", { step: "any", min: "0" });
+  const cd = makeNumber("Discharge coefficient Cd", "tdt-cd", { step: "any", min: "0" });
+  cd.input.value = "0.60";
+  const h1 = makeNumber("Starting head above orifice (ft)", "tdt-h1", { step: "any", min: "0" });
+  const h2 = makeNumber("Ending head above orifice (ft, 0 = empty)", "tdt-h2", { step: "any", min: "0" });
+  h2.input.value = "0";
+  for (const f of [at, d, cd, h1, h2]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Drain time", "tdt-out-t");
+  const oA = makeOutputLine(outputRegion, "Orifice area", "tdt-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "tdt-out-n");
+  const update = debounce(() => {
+    const r = computeTankDrainTime({ tank_area_ft2: Number(at.input.value) || 0, d_in: Number(d.input.value) || 0, cd: Number(cd.input.value) || 0, h1_ft: Number(h1.input.value) || 0, h2_ft: Number(h2.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oNote.textContent = "-"; return; }
+    oT.textContent = fmt(r.t_s, 0) + " s (" + fmt(r.t_min, 1) + " min)";
+    oA.textContent = fmt(r.a_o_ft2, 3) + " ft^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [at, d, cd, h1, h2]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["tank-drain-time"] = _v630renderTankDrainTime;
+
 // dims: in { b_ft: L, q_cfs: L^3 T^-1, y_ft: L } out: { v_fps: L T^-1, fr: dimensionless, q_unit: L^2 T^-1, yc_ft: L }
 export function computeChannelFroudeNumber({ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

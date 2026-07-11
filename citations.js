@@ -10580,6 +10580,17 @@ export const CITATIONS = {
       { name: "Steady head", value: "small orifice under a steady head; the falling-head drain time is separate", source: "scope of this tile" },
     ],
   },
+  "tank-drain-time": {
+    formula: "A_o = pi/4 (d/12)^2; t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2.",
+    edition: "The falling-head (Torricelli) tank drain-time integral of the orifice equation, a standard hydraulics result, by name.",
+    freeAccess: "The falling-head drain-time integral is a public closed-form hydraulics result; the discharge coefficient is in the standard references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The falling-head drain time t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2, integrating the orifice discharge Q = Cd A_o sqrt(2 g h) over the falling head of a constant-cross-section (prismatic) tank with the head measured above the orifice, Cd about 0.6 sharp-edged. Because the flow slows as sqrt(h), the last of the water drains slowest and draining to a residual head h2 above the outlet takes far less than draining fully. This assumes free discharge to atmosphere, a small orifice, a steady discharge coefficient, and a prismatic tank (constant cross-section area with depth); a non-prismatic tank needs its own integration. A design aid, not a substitute for a licensed engineer's design; the engineer of record governs.",
+    assumptions: [
+      { name: "Falling-head integral", value: "t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)); the sqrt(h) head makes the final drawdown the slowest", source: "Torricelli / orifice hydraulics" },
+      { name: "Prismatic tank", value: "constant cross-section area A_t with depth; a varying cross-section needs its own integration", source: "scope of this tile" },
+    ],
+  },
   "velocity-head": {
     formula: "h_v = V^2 / (2 g) (g = 32.2 ft/s^2); q = 1/2 rho V^2 (lb/ft^2); q_psi = q/144.",
     edition: "The velocity-head and dynamic-pressure relations from first-principles fluid mechanics, by name.",

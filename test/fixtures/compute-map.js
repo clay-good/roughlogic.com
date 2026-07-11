@@ -840,6 +840,7 @@ export const COMPUTE_MAP = {
   // spec-v302..v304 site-hydraulics depth batch (3 tiles)
   "time-of-concentration": { module: "../../calc-plumbing.js", fn: "computeTimeOfConcentration" },
   "orifice-flow": { module: "../../calc-plumbing.js", fn: "computeOrificeFlow" },
+  "tank-drain-time": { module: "../../calc-plumbing.js", fn: "computeTankDrainTime" },
   "channel-froude-number": { module: "../../calc-plumbing.js", fn: "computeChannelFroudeNumber" },
   "velocity-head": { module: "../../calc-plumbing.js", fn: "computeVelocityHead" },
   "flow-continuity": { module: "../../calc-plumbing.js", fn: "computeFlowContinuity" },

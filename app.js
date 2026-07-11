@@ -211,7 +211,7 @@ const TOOL_MODULES = (() => {
     // spec-v199 hydronic radiant floor loop sizing.
     "radiant-loop-sizing",
     // spec-v302..v304 site-hydraulics depth batch.
-    "time-of-concentration", "orifice-flow", "channel-froude-number",
+    "time-of-concentration", "orifice-flow", "tank-drain-time", "channel-froude-number",
     "velocity-head", "flow-continuity", "bernoulli-head",
     "thrust-block-sizing",
   ]);

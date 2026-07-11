@@ -82492,6 +82492,56 @@
       "term": "why does a pump cavitate at part load",
       "target": "pump-suction-specific-speed",
       "kind": "question"
+    },
+    {
+      "term": "tank drain time",
+      "target": "tank-drain-time",
+      "kind": "industry"
+    },
+    {
+      "term": "time to empty a tank",
+      "target": "tank-drain-time",
+      "kind": "industry"
+    },
+    {
+      "term": "falling head drain",
+      "target": "tank-drain-time",
+      "kind": "redirect"
+    },
+    {
+      "term": "torricelli drain time",
+      "target": "tank-drain-time",
+      "kind": "redirect"
+    },
+    {
+      "term": "how long to drain a tank",
+      "target": "tank-drain-time",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how long does a tank take to drain through an orifice",
+      "target": "tank-drain-time",
+      "kind": "question"
+    },
+    {
+      "term": "time to empty a tank through a hole",
+      "target": "tank-drain-time",
+      "kind": "question"
+    },
+    {
+      "term": "falling head orifice drain time formula",
+      "target": "tank-drain-time",
+      "kind": "question"
+    },
+    {
+      "term": "why does the last bit of a tank drain slowly",
+      "target": "tank-drain-time",
+      "kind": "question"
+    },
+    {
+      "term": "drain down time for a detention pond orifice",
+      "target": "tank-drain-time",
+      "kind": "question"
     }
   ]
 }

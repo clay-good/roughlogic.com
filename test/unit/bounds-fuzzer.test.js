@@ -20307,3 +20307,25 @@ test("bounds: spec-v629 computePumpSuctionSpecificSpeed pins Nss, the band thres
   assert.ok("error" in _v629({ n_rpm: 1750, q_gpm: 2000, npshr_ft: 0 }));
   assert.ok("error" in _v629({ n_rpm: Infinity, q_gpm: 2000, npshr_ft: 25 }));
 });
+
+import { computeTankDrainTime as _v630 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v630 computeTankDrainTime pins the falling-head drain time, the sqrt(h) slow tail, and error seams", () => {
+  const r = _v630({ tank_area_ft2: 100, d_in: 6, cd: 0.60, h1_ft: 9, h2_ft: 0 });
+  assert.ok(Math.abs(r.t_s - 634.6396127577782) < 1e-6);
+  assert.ok(Math.abs(r.t_min - r.t_s / 60) < 1e-12);
+  assert.ok(Math.abs(r.a_o_ft2 - (Math.PI / 4) * (0.5 ** 2)) < 1e-12);
+  // The sqrt(h) tail: draining 8 of the 9 ft (to h2=1) takes less than the fraction of head suggests.
+  const partial = _v630({ tank_area_ft2: 100, d_in: 6, cd: 0.60, h1_ft: 9, h2_ft: 1 });
+  assert.ok(Math.abs(partial.t_s - 423.0930751718521) < 1e-6);
+  assert.ok(partial.t_s < r.t_s); // draining to a residual head is faster than draining fully
+  assert.ok(r.t_s - partial.t_s > 0.25 * r.t_s); // the last foot alone is a large share of the total time
+  // Error seams: non-finite, non-positive area / diameter / Cd, negative end head, start head <= end head.
+  assert.ok("error" in _v630({ tank_area_ft2: 0, d_in: 6, cd: 0.6, h1_ft: 9 }));
+  assert.ok("error" in _v630({ tank_area_ft2: 100, d_in: 0, cd: 0.6, h1_ft: 9 }));
+  assert.ok("error" in _v630({ tank_area_ft2: 100, d_in: 6, cd: 0, h1_ft: 9 }));
+  assert.ok("error" in _v630({ tank_area_ft2: 100, d_in: 6, cd: 0.6, h1_ft: 9, h2_ft: -1 }));
+  assert.ok("error" in _v630({ tank_area_ft2: 100, d_in: 6, cd: 0.6, h1_ft: 1, h2_ft: 2 }));
+  assert.ok("error" in _v630({ tank_area_ft2: 100, d_in: 6, cd: 0.6, h1_ft: 5, h2_ft: 5 }));
+  assert.ok("error" in _v630({ tank_area_ft2: Infinity, d_in: 6, cd: 0.6, h1_ft: 9 }));
+});

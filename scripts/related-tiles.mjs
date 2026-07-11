@@ -1222,6 +1222,7 @@ const RELATED = {
   // spec-v302..v304 site-hydraulics depth batch (Group B)
   "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
   "orifice-flow": ["weir-flow","time-of-concentration","pipe-velocity"],
+  "tank-drain-time": ["orifice-flow","weir-flow","detention-time"],
   "channel-froude-number": ["manning-slope","weir-flow","orifice-flow"],
   // spec-v305..v307 pump-and-fluid fundamentals batch (Group C)
   "reynolds-number-pipe": ["friction-loss","pipe-velocity","refrigerant-velocity"],

@@ -40616,6 +40616,60 @@
    }
   },
   {
+   "tile_id": "tank-drain-time",
+   "source_publisher": "Falling-head (Torricelli) orifice drain time",
+   "source_title": "100 ft^2 tank, 6 in orifice, Cd 0.60, 9 ft to empty -> 634.6 s (10.6 min)",
+   "source_edition_or_year": "spec-v630 worked example (machine-verified)",
+   "source_section_or_page": "spec-v630 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "tank_area_ft2": 100,
+    "d_in": 6,
+    "cd": 0.6,
+    "h1_ft": 9,
+    "h2_ft": 0
+   },
+   "outputs": {
+    "t_s": {
+     "value": 634.64,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "t_min": {
+     "value": 10.577,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tank-drain-time",
+   "source_publisher": "Falling-head (Torricelli) orifice drain time",
+   "source_title": "cross-check: draining only to a 1 ft residual head takes 423.1 s (7.1 min) -- the last foot is the slow tail",
+   "source_edition_or_year": "spec-v630 worked example (machine-verified)",
+   "source_section_or_page": "spec-v630 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "tank_area_ft2": 100,
+    "d_in": 6,
+    "cd": 0.6,
+    "h1_ft": 9,
+    "h2_ft": 1
+   },
+   "outputs": {
+    "t_s": {
+     "value": 423.09,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "channel-froude-number",
    "source_publisher": "Chow, Open-Channel Hydraulics",
    "source_title": "4 ft channel, 50 cfs, 2 ft deep -> V 6.25 ft/s, Fr 0.78 subcritical, yc 1.69 ft",

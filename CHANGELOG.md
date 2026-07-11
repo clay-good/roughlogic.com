@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): spec-v630 tank drain time (falling-head orifice); 2026-07-11
+
+Lands `tank-drain-time` (Group B, calc-plumbing.js), the falling-head follow-on spec-v303 named inside `orifice-flow` ("the time-to-drain is a follow-on"). Integrating the orifice equation over the falling head of a prismatic tank gives t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2. A 100 ft^2 tank draining a 6 in orifice empties from 9 ft in 10.6 min, but reaches the last foot in only 7.1 - the flow slows as sqrt(h), so the final foot alone takes another 3.5. Pure Torricelli integration; g universal and Cd the same user-entered coefficient orifice-flow uses. Catalog 1,077 -> 1,078 (version 0.219.0).
+
 ### feat(hvac): spec-v629 pump suction specific speed (Nss); 2026-07-11
 
 Lands `pump-suction-specific-speed` (Group C, calc-hvac.js), the suction-side companion spec-v307 named as separate from `pump-specific-speed`. Nss = N sqrt(Q) / NPSHr^(3/4) - the same definitional form as Ns with required NPSH in place of head - indexes how hard a pump works its suction. The Hydraulic Institute guideline caps Nss near 8,500 (and ~11,000 marks a reliability concern). A 1,750 rpm, 2,000 gpm pump with 25 ft NPSHr sits at a safe 7,000, but on a tighter 16 ft NPSHr jumps to 9,783 - above the limit, nothing changed but the suction margin. Zero empirical constants (pure definitional index). Catalog 1,076 -> 1,077 (version 0.218.0).

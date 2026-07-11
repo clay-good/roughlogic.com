@@ -2294,6 +2294,7 @@ cross-check.
 | calc-plumbing.js | `computeStormwaterDetentionVolume` | `{ runoff_c = 0, intensity_in_hr = 0, area_ac = 0, q_allow_cfs = 0, duration_m...` | _ | _ | _ |
 | calc-plumbing.js | `computeStormwaterRational` | `{ area_ft2 = 0, surface = "asphalt", rainfall_in_per_hr = 0 }` | _ | _ | _ |
 | calc-plumbing.js | `computeSupplyPressureBudget` | `{ street_pressure, fixture_height = 0, meter_loss = 0, bfp_loss = 0, friction...` | _ | _ | _ |
+| calc-plumbing.js | `computeTankDrainTime` | `{ tank_area_ft2 = 0, d_in = 0, cd = 0.60, h1_ft = 0, h2_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeTanklessGPM` | `{ kbtu_input, climate_zone, target_outlet_F = 110, solve_for = "gpm", target_...` | _ | _ | _ |
 | calc-plumbing.js | `computeThermalExpansionVolume` | `{ volume_gal = 0, cold_f = 0, hot_f = 0, closed_system = true } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeThrustBlockSizing` | `{ pressure_psi = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}` | _ | _ | _ |
@@ -2735,7 +2736,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1321.
+Row count: 1322.
 
 <!-- END function-corpus-v14 -->
 
@@ -2961,7 +2962,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (86 tiles)
+### Group B Plumbing (87 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3033,6 +3034,7 @@ per spec-v14 §13.1 second paragraph.
 | `stormwater-rational` | Stormwater Rational Method | USEPA / NRCS; 5000 ft^2 asphalt (C=0.95), 2 in/hr -> 0.218 cfs / 97.9 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sump-basin-sizing` | Sump / Ejector Basin Drawdown and Cycle Check | IPC 2021 Section 712 / Hydraulic Inst...; 24 in basin, 12 in float spread, 10 GPM inflow, 30 GPM pu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `supply-pressure-budget` | Water-Supply Pressure Budget | IPC 2021 Section 604 / ASPE PEDH Vol. 2; street 60, 30 ft up, meter 8, friction 12, min 8 -> 12.99... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `tank-drain-time` | Tank Drain Time (Falling-Head Orifice) | Falling-head (Torricelli) orifice dra...; spec-v630 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tankless-gpm` | Tankless Water Heater GPM | Project (first-principles); 199 kBTU input, climate 5A (Chicago) inlet 50 F, target 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thermal-expansion-volume` | Water Thermal-Expansion Volume | NIST / standard steam tables (water d...; 50 gal, 50->140 F -> ~0.839 gal expansion | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thrust-block-sizing` | Thrust Block Bearing Area at a Pipe Bend (AWWA M41) | AWWA M41; spec-v388 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3998,6 +4000,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1077. Fixture-covered or reference-cadence: 1077 / 1077.
+Tile count: 1078. Fixture-covered or reference-cadence: 1078 / 1078.
 
 <!-- END tile-index-v14 -->
