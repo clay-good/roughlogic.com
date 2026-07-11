@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(arborist): spec-v607 open-cavity trunk strength loss (Smiley & Fraedrich); 2026-07-10
+
+Lands `tree-open-cavity` (Group L, calc-arborist.js), the follow-on spec-v565 named: the open-cavity correction the closed-hollow Wagener screen understates. loss = (hollow_d^3 + R x (D^3 - hollow_d^3)) / D^3 x 100, R = opening arc / circumference (Smiley & Fraedrich 1992). Collapses to Wagener at R=0; reproduces the paper's example (4-in stem 70% hollow, 2-in opening -> 45%). Repoints the "cavity strength loss" alias to the dedicated tile; raises the calc-arborist.js gzip cap 13000 -> 16000. Catalog 1,054 -> 1,055 (version 0.196.0).
+
 ### feat(agriculture): spec-v606 manure storage covered-vs-open roof savings; 2026-07-10
 
 Lands `manure-cover-savings` (Group L, calc-agriculture.js), the follow-on spec-v582 named: the storage a roof buys back. roof_saving = area x (net_precip + storm)/12 - the whole rainfall term an open pit banks on its own surface. An 8,000 ft2 pit in a 10-in wet season saves 6,667 ft3 (~50,000 gal, 19%); a bigger pit in a wetter climate saves a third. Group L audit count 29 -> 30. Catalog 1,053 -> 1,054 (version 0.195.0).

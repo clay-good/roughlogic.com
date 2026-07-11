@@ -7096,6 +7096,17 @@ export const CITATIONS = {
       { name: "Cumulative protection", value: "fencing plus no grade change, compaction, or trenching to the protected soil depth", source: "ISA critical root zone" },
     ],
   },
+  "tree-open-cavity": {
+    formula: "hollow_d = D - 2t; R = min(1, opening_width / (pi x D)); closed_loss = (hollow_d^3 / D^3) x 100; open_loss = (hollow_d^3 + R x (D^3 - hollow_d^3)) / D^3 x 100.",
+    edition: "Smiley & Fraedrich (1992) open-cavity strength-loss formula, by name.",
+    freeAccess: "The Smiley & Fraedrich open-cavity relation is published arboriculture research (ISA Arboriculture & Urban Forestry); a qualified arborist governs the assessment.",
+    governance: GOVERNANCE.general,
+    editionNote: "R is the cavity opening's arc as a fraction of the circumference - an open face makes the ring a broken tube, far weaker than a closed hollow. The formula collapses to Wagener's cube law when the opening closes. It can underestimate a large cavity with a deep wedge and a thick sound wall, so use it with caution there. The ISA 33% strength-loss guide is a common concern trigger, not a failure prediction. A qualified arborist and an ISA TRAQ assessment govern - a screen, not a load rating.",
+    assumptions: [
+      { name: "Opening ratio", value: "R = opening arc / circumference; the opening adds R of the remaining sound wood (D^3 - hollow_d^3) to the loss", source: "Smiley & Fraedrich 1992" },
+      { name: "Collapses to Wagener", value: "at R = 0 (closed hollow) the formula equals the Wagener (hollow_d/D)^3 loss", source: "Smiley & Fraedrich 1992" },
+    ],
+  },
   "trunk-decay-strength": {
     formula: "hollow_d = D - 2t; loss_pct = (hollow_d^3 / D^3) x 100; t_over_R = t / (D / 2); concern when t/R < 0.30.",
     edition: "Hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name.",

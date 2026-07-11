@@ -4675,7 +4675,7 @@
     },
     {
       "term": "cavity strength loss",
-      "target": "trunk-decay-strength",
+      "target": "tree-open-cavity",
       "kind": "redirect"
     },
     {
@@ -81351,6 +81351,51 @@
     {
       "term": "rainwater kept out of a manure storage",
       "target": "manure-cover-savings",
+      "kind": "question"
+    },
+    {
+      "term": "open cavity strength loss",
+      "target": "tree-open-cavity",
+      "kind": "industry"
+    },
+    {
+      "term": "smiley fraedrich",
+      "target": "tree-open-cavity",
+      "kind": "industry"
+    },
+    {
+      "term": "tree cavity opening",
+      "target": "tree-open-cavity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hollow tree opening",
+      "target": "tree-open-cavity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "open cavity tree strength",
+      "target": "tree-open-cavity",
+      "kind": "question"
+    },
+    {
+      "term": "strength loss of a tree with an open wound",
+      "target": "tree-open-cavity",
+      "kind": "question"
+    },
+    {
+      "term": "how much weaker is an open cavity in a tree",
+      "target": "tree-open-cavity",
+      "kind": "question"
+    },
+    {
+      "term": "smiley fraedrich cavity formula",
+      "target": "tree-open-cavity",
+      "kind": "question"
+    },
+    {
+      "term": "opening angle tree decay strength",
+      "target": "tree-open-cavity",
       "kind": "question"
     }
   ]

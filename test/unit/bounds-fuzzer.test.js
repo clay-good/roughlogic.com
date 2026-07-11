@@ -19591,3 +19591,38 @@ test("bounds: spec-v606 computeManureCoverSavings pins the open/covered/saving, 
   assert.ok("error" in _v606({ daily_manure_ft3: 150, storage_days: 120, surface_area_ft2: 8000, net_precip_in: -1 }));
   assert.ok("error" in _v606({ daily_manure_ft3: 150, storage_days: 120, surface_area_ft2: 8000, freeboard_in: -1 }));
 });
+
+import { computeTreeOpenCavity as _v607 } from "../../calc-arborist.js";
+
+test("bounds: spec-v607 computeTreeOpenCavity pins the open loss, the Wagener collapse, the paper validation, and error seams", () => {
+  // Pinned worked example: 24-in trunk, 3-in wall, 8-in opening.
+  const r = _v607({ diameter_in: 24, shell_thick_in: 3, opening_width_in: 8 });
+  assert.ok(Math.abs(r.hollow_d_in - 18) < 1e-9);
+  assert.ok(Math.abs(r.opening_ratio - 8 / (Math.PI * 24)) < 1e-9);
+  assert.ok(Math.abs(r.closed_loss_pct - 42.1875) < 1e-6);
+  assert.ok(Math.abs(r.open_loss_pct - 48.321597) < 1e-5);
+  assert.ok(Math.abs(r.opening_penalty_pct - (r.open_loss_pct - r.closed_loss_pct)) < 1e-9);
+  assert.equal(r.over_concern, true);
+  // Validation: the Smiley & Fraedrich published example (4-in stem, 70% hollow, 2-in opening) -> ~45%.
+  const paper = _v607({ diameter_in: 4, shell_thick_in: 0.6, opening_width_in: 2 });
+  assert.ok(Math.abs(paper.open_loss_pct - 44.75648) < 1e-4);
+  assert.ok(Math.abs(paper.open_loss_pct - 45) < 0.3);
+  // With no opening (R=0), the formula collapses exactly to the closed Wagener loss.
+  const closed = _v607({ diameter_in: 24, shell_thick_in: 3, opening_width_in: 0 });
+  assert.equal(closed.opening_ratio, 0);
+  assert.ok(Math.abs(closed.open_loss_pct - closed.closed_loss_pct) < 1e-12);
+  assert.ok(Math.abs(closed.open_loss_pct - 42.1875) < 1e-6);
+  // A wider opening always raises the loss.
+  const wide = _v607({ diameter_in: 24, shell_thick_in: 3, opening_width_in: 20 });
+  assert.ok(wide.open_loss_pct > r.open_loss_pct);
+  // An opening wider than the circumference is clamped to a fully open ring (R = 1, loss = 100%).
+  const full = _v607({ diameter_in: 24, shell_thick_in: 3, opening_width_in: 1000 });
+  assert.equal(full.opening_ratio, 1);
+  assert.ok(Math.abs(full.open_loss_pct - 100) < 1e-9);
+  // Error seams: non-finite, non-positive diameter / shell, shell >= half diameter, negative opening.
+  assert.ok("error" in _v607({ diameter_in: Infinity, shell_thick_in: 3, opening_width_in: 8 }));
+  assert.ok("error" in _v607({ diameter_in: 0, shell_thick_in: 3, opening_width_in: 8 }));
+  assert.ok("error" in _v607({ diameter_in: 24, shell_thick_in: 0, opening_width_in: 8 }));
+  assert.ok("error" in _v607({ diameter_in: 24, shell_thick_in: 12, opening_width_in: 8 }));
+  assert.ok("error" in _v607({ diameter_in: 24, shell_thick_in: 3, opening_width_in: -1 }));
+});

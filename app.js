@@ -925,6 +925,7 @@ const TOOL_MODULES = (() => {
     "quadratic-mean-diameter",
     // spec-v565
     "trunk-decay-strength",
+    "tree-open-cavity",
     // spec-v566
     "tree-protection-zone",
     // spec-v567

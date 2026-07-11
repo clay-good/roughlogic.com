@@ -50694,6 +50694,68 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "tree-open-cavity",
+   "source_publisher": "Smiley & Fraedrich (1992) open-cavity strength-loss formula",
+   "source_title": "open_loss = (hollow_d^3 + R x (D^3 - hollow_d^3)) / D^3 x 100 (spec-v565's named follow-on)",
+   "source_edition_or_year": "Smiley & Fraedrich 1992 (ISA Arboriculture)",
+   "source_section_or_page": "24-in trunk, 3-in wall, 8-in opening -> R 0.106, open loss 48.3% vs 42.2% closed (6.1-pt penalty)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "diameter_in": 24,
+    "shell_thick_in": 3,
+    "opening_width_in": 8
+   },
+   "outputs": {
+    "closed_loss_pct": {
+     "value": 42.1875,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "open_loss_pct": {
+     "value": 48.321597,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "opening_penalty_pct": {
+     "value": 6.134097,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "tree-open-cavity",
+   "source_publisher": "Smiley & Fraedrich (1992) open-cavity strength-loss formula",
+   "source_title": "validation against the paper's published example",
+   "source_edition_or_year": "Smiley & Fraedrich 1992 (ISA Arboriculture)",
+   "source_section_or_page": "4-in stem 70% hollow (2.8-in), 2-in opening -> 44.8% (paper reports 45%); closed Wagener 34.3%",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "diameter_in": 4,
+    "shell_thick_in": 0.6,
+    "opening_width_in": 2
+   },
+   "outputs": {
+    "open_loss_pct": {
+     "value": 44.75648,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "closed_loss_pct": {
+     "value": 34.3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

@@ -463,6 +463,7 @@ const _TILES = [
   ["reineke-sdi", "L"],
   ["quadratic-mean-diameter", "L"],
   ["trunk-decay-strength", "L"],
+  ["tree-open-cavity", "L"],
   ["tree-protection-zone", "L"],
   ["crown-pruning-dose", "L"],
   ["nozzle-flow-pressure", "L"], ["spray-drift-buffer", "L"], ["sprayer-field-capacity", "L"],

@@ -501,6 +501,55 @@ function _v565renderTrunkDecayStrength(inputRegion, outputRegion, citationEl) {
 }
 ARBORIST_RENDERERS["trunk-decay-strength"] = _v565renderTrunkDecayStrength;
 
+// --- spec-v607 L: Open-cavity trunk strength loss (Smiley & Fraedrich 1992) ---
+// hollow_d = D - 2t. R = min(1, opening/(pi*D)). open_loss = (hollow_d^3 + R*(D^3 - hollow_d^3))/D^3 * 100. Collapses to Wagener at R=0.
+// dims: in { diameter_in: L, shell_thick_in: L, opening_width_in: L } out: { hollow_d_in: L, opening_ratio: dimensionless, closed_loss_pct: dimensionless, open_loss_pct: dimensionless, opening_penalty_pct: dimensionless }
+export function computeTreeOpenCavity({ diameter_in = 0, shell_thick_in = 0, opening_width_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(diameter_in);
+  const t = Number(shell_thick_in);
+  const opening = Number(opening_width_in);
+  if (!Number.isFinite(D) || D <= 0) return { error: "Trunk diameter must be a positive finite number (in)." };
+  if (!Number.isFinite(t) || t <= 0) return { error: "Sound-shell thickness must be a positive finite number (in)." };
+  if (t >= D / 2) return { error: "Sound shell is at least half the diameter - no hollow to assess." };
+  if (!Number.isFinite(opening) || opening < 0) return { error: "Cavity opening width cannot be negative (in)." };
+  const hollow_d_in = D - 2 * t;
+  const circumference_in = Math.PI * D;
+  const opening_ratio = Math.min(1, opening / circumference_in);
+  const closed_loss_pct = (Math.pow(hollow_d_in, 3) / Math.pow(D, 3)) * 100;
+  const open_loss_pct = ((Math.pow(hollow_d_in, 3) + opening_ratio * (Math.pow(D, 3) - Math.pow(hollow_d_in, 3))) / Math.pow(D, 3)) * 100;
+  const opening_penalty_pct = open_loss_pct - closed_loss_pct;
+  const over_concern = open_loss_pct >= 33;
+  if (![hollow_d_in, opening_ratio, closed_loss_pct, open_loss_pct].every(Number.isFinite)) return { error: "Open-cavity math is not a finite value." };
+  return {
+    hollow_d_in, circumference_in, opening_ratio, closed_loss_pct, open_loss_pct, opening_penalty_pct, over_concern,
+    note: "R is the cavity opening's arc as a fraction of the circumference - an open face makes the ring a broken tube, far weaker than a closed hollow. The formula collapses to Wagener's cube law when the opening closes. It can underestimate a large cavity with a deep wedge and a thick sound wall, so use it with caution there. The ISA 33% strength-loss guide is a common concern trigger, not a failure prediction. A qualified arborist and an ISA TRAQ assessment govern - a screen, not a load rating.",
+  };
+}
+export const treeOpenCavityExample = { inputs: { diameter_in: 24, shell_thick_in: 3, opening_width_in: 8 } };
+function _v607renderTreeOpenCavity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Smiley & Fraedrich (1992) open-cavity strength-loss formula, by name. hollow_d = diameter - 2 x shell_thick; R = min(1, opening_width / (pi x diameter)); closed_loss = (hollow_d^3 / diameter^3) x 100 (Wagener closed hollow); open_loss = (hollow_d^3 + R x (diameter^3 - hollow_d^3)) / diameter^3 x 100. An open face makes the ring a broken tube, far weaker than a closed hollow; the formula collapses to Wagener at R = 0. The ISA 33% guide is a concern trigger, not a failure prediction.";
+  const D = makeNumber("Trunk diameter (in, inside bark)", "toc-d", { step: "any", min: "0", value: "24" }); D.input.value = "24";
+  const t = makeNumber("Sound-shell (wall) thickness (in)", "toc-t", { step: "any", min: "0", value: "3" }); t.input.value = "3";
+  const opening = makeNumber("Open cavity face width (in, 0 = closed hollow)", "toc-o", { step: "any", min: "0", value: "8" }); opening.input.value = "8";
+  for (const f of [D, t, opening]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "24"; t.input.value = "3"; opening.input.value = "8"; update(); });
+  const oOpen = makeOutputLine(outputRegion, "Open-cavity strength loss", "toc-out-open");
+  const oClosed = makeOutputLine(outputRegion, "Closed-hollow loss (Wagener)", "toc-out-closed");
+  const oPenalty = makeOutputLine(outputRegion, "Penalty for the opening", "toc-out-penalty");
+  const oNote = makeOutputLine(outputRegion, "Note", "toc-out-note");
+  const update = debounce(() => {
+    const r = computeTreeOpenCavity({ diameter_in: Number(D.input.value) || 0, shell_thick_in: Number(t.input.value) || 0, opening_width_in: Number(opening.input.value) || 0 });
+    if (r.error) { oOpen.textContent = r.error; oClosed.textContent = "-"; oPenalty.textContent = "-"; oNote.textContent = ""; return; }
+    oOpen.textContent = fmt(r.open_loss_pct, 1) + "%" + (r.over_concern ? " - at or past the ISA 33% concern line" : "");
+    oClosed.textContent = fmt(r.closed_loss_pct, 1) + "% (R = " + fmt(r.opening_ratio, 3) + ")";
+    oPenalty.textContent = "+" + fmt(r.opening_penalty_pct, 1) + " points from the opening";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, t, opening]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["tree-open-cavity"] = _v607renderTreeOpenCavity;
+
 // --- spec-v566 L: Tree protection zone / critical root zone (ANSI A300 Part 5) ---
 // radius = radius_factor x DBH. area = pi x radius^2.
 // dims: in { dbh_in: L, radius_factor: dimensionless } out: { radius_ft: L, area_ft2: L^2 }

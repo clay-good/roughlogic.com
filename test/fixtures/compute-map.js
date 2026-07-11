@@ -679,6 +679,7 @@ export const COMPUTE_MAP = {
   "reineke-sdi": { module: "../../calc-arborist.js", fn: "computeReinekeSdi" },
   "quadratic-mean-diameter": { module: "../../calc-arborist.js", fn: "computeQuadraticMeanDiameter" },
   "trunk-decay-strength": { module: "../../calc-arborist.js", fn: "computeTrunkDecayStrength" },
+  "tree-open-cavity": { module: "../../calc-arborist.js", fn: "computeTreeOpenCavity" },
   "tree-protection-zone": { module: "../../calc-arborist.js", fn: "computeTreeProtectionZone" },
   "crown-pruning-dose": { module: "../../calc-arborist.js", fn: "computeCrownPruningDose" },
   "nozzle-flow-pressure": { module: "../../calc-agriculture.js", fn: "computeNozzleFlowPressure" },
