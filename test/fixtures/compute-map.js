@@ -59,6 +59,7 @@ export const COMPUTE_MAP = {
   "digester-vs-loading": { module: "../../calc-treatment.js", fn: "computeDigesterVsLoading" },
   "digester-gas-production": { module: "../../calc-treatment.js", fn: "computeDigesterGasProduction" },
   "flocculation-g-value": { module: "../../calc-treatment.js", fn: "computeFlocculationGValue" },
+  "flocculator-paddle-power": { module: "../../calc-treatment.js", fn: "computeFlocculatorPaddlePower" },
   "chlorine-cylinder-withdrawal": { module: "../../calc-treatment.js", fn: "computeChlorineCylinderWithdrawal" },
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },
   "pearson-square-ration": { module: "../../calc-agriculture.js", fn: "computePearsonSquareRation" },

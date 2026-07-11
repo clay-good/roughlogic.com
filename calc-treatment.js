@@ -780,6 +780,56 @@ const renderFlocculationGValue = _rPool({
 });
 TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
 
+// --- spec-v613 M: Paddle flocculator power from geometry (Camp drag) ---
+// v_tip = 2*pi*r*rpm/60. v_rel = v_tip*(1-k). P = 0.5*Cd*1.937*A*v_rel^3 (ft-lb/s), *1.35582 W, /550 hp.
+// dims: in { paddle_radius_ft: L, wheel_rpm: dimensionless, paddle_area_ft2: L^2, drag_coeff: dimensionless, slip_factor: dimensionless } out: { v_tip_fps: dimensionless, v_rel_fps: dimensionless, power_ftlbs: dimensionless, power_w: dimensionless, power_hp: dimensionless }
+export function computeFlocculatorPaddlePower({ paddle_radius_ft = 0, wheel_rpm = 0, paddle_area_ft2 = 0, drag_coeff = 1.8, slip_factor = 0.25 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const r = Number(paddle_radius_ft) || 0;
+  const n = Number(wheel_rpm) || 0;
+  const a = Number(paddle_area_ft2) || 0;
+  const cd = Number(drag_coeff) || 0;
+  const k = Number(slip_factor);
+  if (!(r > 0)) return { error: "Paddle radius must be positive (ft)." };
+  if (!(n > 0)) return { error: "Wheel speed must be positive (rpm)." };
+  if (!(a > 0)) return { error: "Paddle area must be positive (ft^2)." };
+  if (!(cd > 0)) return { error: "Drag coefficient must be positive." };
+  if (!Number.isFinite(k) || k < 0 || k >= 1) return { error: "Slip factor must be at least 0 and less than 1." };
+  const v_tip_fps = 2 * Math.PI * r * n / 60;
+  const v_rel_fps = v_tip_fps * (1 - k);
+  const power_ftlbs = 0.5 * cd * 1.937 * a * Math.pow(v_rel_fps, 3);
+  const power_w = power_ftlbs * 1.35582;
+  const power_hp = power_ftlbs / 550;
+  return {
+    v_tip_fps, v_rel_fps, power_ftlbs, power_w, power_hp,
+    note: "The power goes as the CUBE of the relative velocity, so a small speed change swings it hard. The water slips (it rotates with the paddles) so the relative velocity is only (1 - k) of the tip speed - ignoring the slip roughly doubles the power. The drag coefficient (about 1.8, 1.0 to 1.8 reported) and the slip factor (about 0.25, 0.25 to 0.40 reported) are user inputs because the references disagree; the drag physics is exact once they are chosen. This power feeds flocculation-g-value for the mixing gradient. The flocculator design and the operator govern - a design aid, not a metered power.",
+  };
+}
+export const flocculatorPaddlePowerExample = { inputs: { paddle_radius_ft: 6, wheel_rpm: 3, paddle_area_ft2: 40, drag_coeff: 1.8, slip_factor: 0.25 } };
+function renderFlocculatorPaddlePower(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Camp paddle flocculator power (water-treatment design practice), by name. v_tip = 2 x pi x radius x rpm / 60; v_rel = v_tip x (1 - k); P = 0.5 x Cd x 1.937 x area x v_rel^3 (ft-lb/s, x 1.35582 for W, / 550 for hp). The power goes as the cube of the relative velocity; the water slips (rotates with the paddles) so v_rel is only (1 - k) of the tip speed - ignoring the slip roughly doubles the power. Cd (about 1.8, 1.0 to 1.8 reported) and k (about 0.25, 0.25 to 0.40 reported) are user inputs because references disagree. This power feeds flocculation-g-value.";
+  const r = makeNumber("Paddle radius to blade centroid (ft)", "fpp-r", { step: "any", min: "0", value: "6" }); r.input.value = "6";
+  const n = makeNumber("Wheel speed (rpm)", "fpp-n", { step: "any", min: "0", value: "3" }); n.input.value = "3";
+  const a = makeNumber("Total paddle-blade area (ft^2)", "fpp-a", { step: "any", min: "0", value: "40" }); a.input.value = "40";
+  const cd = makeNumber("Drag coefficient Cd (about 1.8)", "fpp-cd", { step: "any", min: "0", value: "1.8" }); cd.input.value = "1.8";
+  const k = makeNumber("Slip factor k (about 0.25)", "fpp-k", { step: "any", min: "0", max: "1", value: "0.25" }); k.input.value = "0.25";
+  for (const f of [r, n, a, cd, k]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { r.input.value = "6"; n.input.value = "3"; a.input.value = "40"; cd.input.value = "1.8"; k.input.value = "0.25"; update(); });
+  const oPower = makeOutputLine(outputRegion, "Power into the basin", "fpp-out-power");
+  const oVel = makeOutputLine(outputRegion, "Tip / relative velocity", "fpp-out-vel");
+  const oNote = makeOutputLine(outputRegion, "Note", "fpp-out-note");
+  function readNum(x) { if (x.value === "") return 0; const v = Number(x.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const res = computeFlocculatorPaddlePower({ paddle_radius_ft: readNum(r.input), wheel_rpm: readNum(n.input), paddle_area_ft2: readNum(a.input), drag_coeff: cd.input.value === "" ? 1.8 : readNum(cd.input), slip_factor: k.input.value === "" ? 0.25 : readNum(k.input) });
+    if (res.error) { oPower.textContent = res.error; oVel.textContent = "-"; oNote.textContent = ""; return; }
+    oPower.textContent = fmt(res.power_w, 0) + " W (" + fmt(res.power_hp, 2) + " hp, " + fmt(res.power_ftlbs, 0) + " ft-lb/s)";
+    oVel.textContent = fmt(res.v_tip_fps, 2) + " / " + fmt(res.v_rel_fps, 2) + " ft/s";
+    oNote.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of [r, n, a, cd, k]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["flocculator-paddle-power"] = renderFlocculatorPaddlePower;
+
 // --- spec-v576 M: Gas chlorine cylinder withdrawal rate ---
 // per_container = base(type) x temp-derate. containers = ceil(feed / per). Frost warn if cold or near ceiling.
 const _CL_WITHDRAWAL_BASE = { cylinder: 40, ton: 400 }; // lb/day at ~70 F

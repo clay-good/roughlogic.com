@@ -103,6 +103,7 @@ const _TILES = [
   ["digester-vs-loading", "M"],
   ["digester-gas-production", "M"],
   ["flocculation-g-value", "M"],
+  ["flocculator-paddle-power", "M"],
   ["chlorine-cylinder-withdrawal", "M"],
   ["growing-degree-days", "L"],
   ["pearson-square-ration", "L"],

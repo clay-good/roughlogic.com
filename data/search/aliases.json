@@ -81642,6 +81642,56 @@
       "term": "cracked vs uncracked anchor pullout",
       "target": "concrete-anchor-pullout",
       "kind": "question"
+    },
+    {
+      "term": "paddle power",
+      "target": "flocculator-paddle-power",
+      "kind": "industry"
+    },
+    {
+      "term": "flocculator power",
+      "target": "flocculator-paddle-power",
+      "kind": "industry"
+    },
+    {
+      "term": "paddle flocculator",
+      "target": "flocculator-paddle-power",
+      "kind": "adjacent"
+    },
+    {
+      "term": "camp paddle power",
+      "target": "flocculator-paddle-power",
+      "kind": "redirect"
+    },
+    {
+      "term": "flocculation power",
+      "target": "flocculator-paddle-power",
+      "kind": "adjacent"
+    },
+    {
+      "term": "paddle flocculator power from geometry",
+      "target": "flocculator-paddle-power",
+      "kind": "question"
+    },
+    {
+      "term": "power input for a flocculator",
+      "target": "flocculator-paddle-power",
+      "kind": "question"
+    },
+    {
+      "term": "paddle drag power water treatment",
+      "target": "flocculator-paddle-power",
+      "kind": "question"
+    },
+    {
+      "term": "flocculator paddle horsepower",
+      "target": "flocculator-paddle-power",
+      "kind": "question"
+    },
+    {
+      "term": "how much power does a paddle flocculator use",
+      "target": "flocculator-paddle-power",
+      "kind": "question"
     }
   ]
 }

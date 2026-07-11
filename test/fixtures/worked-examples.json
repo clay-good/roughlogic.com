@@ -51042,6 +51042,72 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "flocculator-paddle-power",
+   "source_publisher": "Camp paddle flocculator power (water-treatment design practice)",
+   "source_title": "P = 0.5 x Cd x rho x A x v_rel^3, v_rel = v_tip x (1 - k) (spec-v575's named follow-on)",
+   "source_edition_or_year": "Camp / water-treatment design practice",
+   "source_section_or_page": "6-ft wheel, 3 rpm, 40 ft2, Cd 1.8, slip 0.25 -> v_tip 1.885, v_rel 1.414 ft/s, 197 ft-lb/s = 267 W (0.36 hp)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "paddle_radius_ft": 6,
+    "wheel_rpm": 3,
+    "paddle_area_ft2": 40,
+    "drag_coeff": 1.8,
+    "slip_factor": 0.25
+   },
+   "outputs": {
+    "v_rel_fps": {
+     "value": 1.413717,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "power_ftlbs": {
+     "value": 197.024068,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "power_w": {
+     "value": 267.129171,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "flocculator-paddle-power",
+   "source_publisher": "Camp paddle flocculator power (water-treatment design practice)",
+   "source_title": "cross-check: a faster, smaller wheel",
+   "source_edition_or_year": "Camp / water-treatment design practice",
+   "source_section_or_page": "5-ft wheel, 4 rpm, 30 ft2, Cd 1.5, slip 0.30 -> v_tip 2.094, v_rel 1.466 ft/s, 137 ft-lb/s = 186 W (0.25 hp)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "paddle_radius_ft": 5,
+    "wheel_rpm": 4,
+    "paddle_area_ft2": 30,
+    "drag_coeff": 1.5,
+    "slip_factor": 0.30
+   },
+   "outputs": {
+    "power_w": {
+     "value": 186.201912,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "power_hp": {
+     "value": 0.2497,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
   }
  ]
 }

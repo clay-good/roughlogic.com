@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): spec-v613 paddle flocculator power from geometry; 2026-07-10
+
+Lands `flocculator-paddle-power` (Group M, calc-treatment.js), the follow-on spec-v575 named: the power flocculation-g-value needs, from the paddle wheel. P = 0.5 x Cd x rho x A x v_rel^3; v_rel = v_tip x (1 - k) (the water slips). Cd and slip are user inputs (references disagree); the drag is exact once chosen. A 6-ft wheel at 3 rpm with 40 ft2 of blade delivers ~267 W. Raises the calc-treatment.js gzip cap 18000 -> 21000 and the tools-data.js registry cap 155000 -> 170000. Group M audit count 29 -> 30. Catalog 1,060 -> 1,061 (version 0.202.0).
+
 ### feat(concrete): spec-v612 concrete headed-anchor pullout (ACI 318-19 17.6.3); 2026-07-10
 
 Lands `concrete-anchor-pullout` (Group E, calc-concrete.js), the companion spec-v548 named: the head-crushing tension failure mode. Np = 8 x Abrg x f'c; Npn = psi_cP x Np (1.4 uncracked, 1.0 cracked); phiNpn = 0.70 x Npn. Unlike breakout it does not depend on embedment. Raises the calc-concrete.js gzip cap 20000 -> 23000. Catalog 1,059 -> 1,060 (version 0.201.0).

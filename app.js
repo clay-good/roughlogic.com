@@ -975,6 +975,7 @@ const TOOL_MODULES = (() => {
     "digester-gas-production",
     // spec-v575
     "flocculation-g-value",
+    "flocculator-paddle-power",
     // spec-v576
     "chlorine-cylinder-withdrawal",
     // v93 pool and spa chemical balance

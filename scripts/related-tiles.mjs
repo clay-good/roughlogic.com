@@ -126,6 +126,7 @@ const RELATED = {
   "digester-vs-loading": ["bod-tss-loading-removal", "population-equivalent", "srt-fm-ratio"],
   "digester-gas-production": ["digester-vs-loading", "population-equivalent", "bod-tss-loading-removal"],
   "flocculation-g-value": ["coagulant-dose", "detention-time", "clarifier-surface-loading"],
+  "flocculator-paddle-power": ["flocculation-g-value", "coagulant-dose", "detention-time"],
   "chlorine-cylinder-withdrawal": ["chemical-feed-pump", "chlorine-demand", "disinfection-ct"],
   "growing-degree-days": ["crop-yield", "thi-livestock", "irrigation-requirement"],
   "pearson-square-ration": ["tank-mix", "npk-blend", "crop-yield"],

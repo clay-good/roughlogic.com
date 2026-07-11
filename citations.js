@@ -639,6 +639,17 @@ export const CITATIONS = {
       { name: "Latent-heat limit", value: "over-withdrawal frosts the container as vaporization cools the liquid and drops its vapor pressure; manifold or evaporate", source: "The Chlorine Institute" },
     ],
   },
+  "flocculator-paddle-power": {
+    formula: "v_tip = 2 x pi x paddle_radius_ft x wheel_rpm / 60; v_rel = v_tip x (1 - slip_factor); power_ftlbs = 0.5 x drag_coeff x 1.937 x paddle_area_ft2 x v_rel^3; power_w = power_ftlbs x 1.35582; power_hp = power_ftlbs / 550.",
+    edition: "Camp paddle flocculator power (water-treatment design practice), by name.",
+    freeAccess: "The Camp paddle-power drag relation is public water-treatment design material; the flocculator design and the operator govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The power goes as the CUBE of the relative velocity, so a small speed change swings it hard. The water slips (it rotates with the paddles) so the relative velocity is only (1 - k) of the tip speed - ignoring the slip roughly doubles the power. The drag coefficient (about 1.8, 1.0 to 1.8 reported) and the slip factor (about 0.25, 0.25 to 0.40 reported) are user inputs because the references disagree; the drag physics is exact once they are chosen. This power feeds flocculation-g-value for the mixing gradient. The flocculator design and the operator govern - a design aid, not a metered power.",
+    assumptions: [
+      { name: "Cube law and slip", value: "P scales with v_rel^3, and v_rel = (1 - k) x tip speed; ignoring the slip roughly doubles the power", source: "Camp / water-treatment design practice" },
+      { name: "User-chosen constants", value: "Cd (about 1.8, 1.0-1.8 reported) and k (about 0.25, 0.25-0.40 reported) are inputs because the references disagree", source: "flocculation literature" },
+    ],
+  },
   "flocculation-g-value": {
     formula: "G = sqrt(P / (mu x V)); Gt = G x detention_time; mu = water dynamic viscosity at the given temperature.",
     edition: "Camp-Stein velocity gradient (Camp & Stein 1943; Ten States Standards), by name.",
