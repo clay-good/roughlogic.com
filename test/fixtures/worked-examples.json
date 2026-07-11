@@ -36252,6 +36252,80 @@
    }
   },
   {
+   "tile_id": "coulomb-earth-pressure",
+   "source_publisher": "Coulomb (1776) as compiled in Das / NAVFAC DM-7.02",
+   "source_title": "rough vertical wall: Ka 0.297 (vs Rankine 0.333), Pa 1,784 lb/ft, Pa_h 1,676 lb/ft (16% below Rankine)",
+   "source_edition_or_year": "spec-v628 worked example (machine-verified)",
+   "source_section_or_page": "spec-v628 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "phi": 30,
+    "delta": 20,
+    "theta": 0,
+    "alpha": 0,
+    "gamma": 120,
+    "h_ft": 10
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.2973,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pa": {
+     "value": 1783.9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pa_h": {
+     "value": 1676.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "pa_v": {
+     "value": 610.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "coulomb-earth-pressure",
+   "source_publisher": "Coulomb (1776) as compiled in Das / NAVFAC DM-7.02",
+   "source_title": "cross-check: a 15 deg sloped backfill raises Ka to 0.371 and Pa to 2,224 lb/ft, more than cancelling the wall-friction credit",
+   "source_edition_or_year": "spec-v628 worked example (machine-verified)",
+   "source_section_or_page": "spec-v628 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "phi": 30,
+    "delta": 20,
+    "theta": 0,
+    "alpha": 15,
+    "gamma": 120,
+    "h_ft": 10
+   },
+   "outputs": {
+    "ka": {
+     "value": 0.3707,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "pa_h": {
+     "value": 2089.9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "retaining-wall-stability",
    "source_publisher": "Das / NAVFAC DM-7.02 stability checks vs IBC 1807.2.3",
    "source_title": "10 ft cantilever wall, 6 ft base, phi 30 at 110 pcf, dry -> FS overturning 3.37, FS sliding 1.69, toe 1,731 psf, all pass",

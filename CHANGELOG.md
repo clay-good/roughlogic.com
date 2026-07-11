@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spec-v628 Coulomb active earth pressure with wall friction and batter; 2026-07-11
+
+Lands `coulomb-earth-pressure` (Group E, calc-geotech.js), the Coulomb wall-friction form spec-v261 named beside `lateral-earth-pressure`, completing the five-tile earth-pressure limit-state cluster (at-rest, submerged, sloped-backfill, seepage-slope, Coulomb). Ka = cos^2(phi - theta) / [cos^2(theta) cos(delta + theta) (1 + sqrt(sin(phi + delta) sin(phi - alpha) / (cos(delta + theta) cos(theta - alpha))))^2] credits wall friction delta, a battered face theta, and a sloped backfill alpha; the thrust acts at delta + theta from horizontal with the horizontal (overturning) and downward (sliding-resisting) components reported. A rough vertical wall on a phi = 30 level backfill carries 1,676 lb/ft horizontal vs Rankine's 2,000 - a 16% cut; it reduces exactly to Rankine when smooth/vertical/level. Pure Coulomb trig (1776 / Das / NAVFAC DM-7.02), no proprietary constants. Raises the calc-geotech.js gzip cap 16,500 -> 18,000. Catalog 1,075 -> 1,076 (version 0.217.0).
+
 ### feat(construction): spec-v627 infinite-slope stability with seepage; 2026-07-11
 
 Lands `slope-stability-seepage` (Group E, calc-geotech.js), the seepage follow-on spec-v289 named inside `slope-stability-infinite` (the submerged gamma - gamma_w case). With steady seepage parallel to the slope and the water table at the surface, FS = (c' + (gamma_sat - 62.4) H cos^2 beta tan phi') / (gamma_sat H sin beta cos beta): the pore pressure cuts the friction term to the buoyant weight while the driving weight stays saturated, so a cohesionless factor of safety drops to (gamma_sat - 62.4)/gamma_sat of the dry value - about half. A phi = 32 sand at 18 degrees is a safe 1.92 dry but a failing 0.96 wet; the tile shows both. Pure effective-stress slope mechanics (Das / NAVFAC DM-7), no proprietary constants. Catalog 1,074 -> 1,075 (version 0.216.0).

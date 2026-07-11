@@ -20255,3 +20255,35 @@ test("bounds: spec-v627 computeSlopeStabilitySeepage pins the seepage vs dry FS,
   assert.ok("error" in _v627({ beta_deg: 18, phi_deg: 32, gamma_sat: 125, h_ft: 0 }));
   assert.ok("error" in _v627({ beta_deg: NaN, phi_deg: 32, gamma_sat: 125, h_ft: 8 }));
 });
+
+import { computeCoulombEarthPressure as _v628 } from "../../calc-geotech.js";
+
+test("bounds: spec-v628 computeCoulombEarthPressure pins the wall-friction Ka, the exact Rankine reduction, the thrust components, and error seams", () => {
+  const r = _v628({ phi: 30, delta: 20, theta: 0, alpha: 0, gamma: 120, h_ft: 10 });
+  assert.ok(Math.abs(r.ka - 0.29731385720545095) < 1e-9);
+  assert.ok(Math.abs(r.pa - 1783.8831432327058) < 1e-6);
+  assert.ok(Math.abs(r.pa_h - 1676.3018260401454) < 1e-6);
+  assert.ok(Math.abs(r.pa_v - 610.1239683246945) < 1e-6);
+  // Wall friction lowers the horizontal thrust below the Rankine level value (2,000 lb/ft here).
+  assert.ok(r.pa_h < 0.5 * r.ka0 * 120 * 100);
+  // Exact reduction to Rankine when the wall is smooth, vertical, and the fill level.
+  const rk = _v628({ phi: 30, delta: 0, theta: 0, alpha: 0, gamma: 120, h_ft: 10 });
+  assert.ok(Math.abs(rk.ka - rk.ka0) < 1e-12);
+  assert.ok(Math.abs(rk.ka - (1 - Math.sin(30 * Math.PI / 180)) / (1 + Math.sin(30 * Math.PI / 180))) < 1e-12);
+  assert.ok(Math.abs(rk.pa_v) < 1e-9);
+  // Cross-check: a 15 deg sloped backfill raises the coefficient above the level Coulomb value.
+  const rs = _v628({ phi: 30, delta: 20, theta: 0, alpha: 15, gamma: 120, h_ft: 10 });
+  assert.ok(Math.abs(rs.ka - 0.3706777459496564) < 1e-9);
+  assert.ok(rs.ka > r.ka);
+  // Error seams: non-finite, non-positive gamma / H, phi out of range, delta out of [0, phi], theta out of [0, 40), alpha out of [0, phi).
+  assert.ok("error" in _v628({ phi: 30, gamma: 0, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, gamma: 120, h_ft: 0 }));
+  assert.ok("error" in _v628({ phi: 0, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, delta: 31, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, delta: -1, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, theta: 40, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, theta: -1, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, alpha: 30, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: 30, alpha: -1, gamma: 120, h_ft: 10 }));
+  assert.ok("error" in _v628({ phi: NaN, gamma: 120, h_ft: 10 }));
+});

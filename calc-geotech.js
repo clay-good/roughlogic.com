@@ -298,6 +298,51 @@ GEOTECH_RENDERERS["sloped-backfill-earth-pressure"] = _simpleRenderer({
   compute: computeSlopedBackfillEarthPressure,
 });
 
+// ===================== spec-v628: Coulomb active earth pressure with wall friction and batter =====================
+
+// dims: in { phi: dimensionless, delta: dimensionless, theta: dimensionless, alpha: dimensionless, gamma: M L^-2 T^-2, h_ft: L } out: { ka: dimensionless, ka0: dimensionless, pa: M T^-2, pa_h: M T^-2, pa_v: M T^-2 }
+export function computeCoulombEarthPressure({ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma > 0)) return { error: "Soil unit weight must be positive (pcf)." };
+  if (!(h_ft > 0)) return { error: "Retained height must be positive (ft)." };
+  if (phi <= 0 || phi >= 50) return { error: "Friction angle must be between 0 and 50 degrees (exclusive)." };
+  if (delta < 0 || delta > phi) return { error: "Wall friction delta must be between 0 and the soil friction angle (deg)." };
+  if (theta < 0 || theta >= 40) return { error: "Wall batter theta must be between 0 and 40 degrees (deg)." };
+  if (alpha < 0 || alpha >= phi) return { error: "Backfill slope alpha must be at least 0 and less than the friction angle (deg)." };
+  const P = phi * Math.PI / 180, D = delta * Math.PI / 180, T = theta * Math.PI / 180, A = alpha * Math.PI / 180;
+  const radicand = Math.sin(P + D) * Math.sin(P - A) / (Math.cos(D + T) * Math.cos(T - A));
+  if (!(radicand >= 0) || !(Math.cos(D + T) > 0)) return { error: "The wall/backfill geometry is degenerate for Coulomb theory (check the angles)." };
+  const s = Math.sqrt(radicand);
+  const ka = Math.cos(P - T) ** 2 / (Math.cos(T) ** 2 * Math.cos(D + T) * (1 + s) ** 2);
+  const ka0 = (1 - Math.sin(P)) / (1 + Math.sin(P));
+  const pa = 0.5 * ka * gamma * h_ft * h_ft;
+  const pa_h = pa * Math.cos(D + T);
+  const pa_v = pa * Math.sin(D + T);
+  return { ka, ka0, pa, pa_h, pa_v };
+}
+
+export const coulombEarthPressureExample = { inputs: { phi: 30, delta: 20, theta: 0, alpha: 0, gamma: 120, h_ft: 10 } };
+
+GEOTECH_RENDERERS["coulomb-earth-pressure"] = _simpleRenderer({
+  citation: "Citation: Coulomb (1776) active earth pressure coefficient Ka = cos^2(phi - theta) / [cos^2(theta) cos(delta + theta) (1 + sqrt(sin(phi + delta) sin(phi - alpha) / (cos(delta + theta) cos(theta - alpha))))^2] for wall friction delta, wall-face batter theta from vertical, and backfill slope alpha -- the resultant Pa = 0.5 Ka gamma H^2 acts at (delta + theta) from horizontal, with a horizontal component Pa cos(delta + theta) that overturns the wall and a downward vertical component Pa sin(delta + theta) that drags on the face and resists sliding -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). Coulomb credits the shear a rough wall carries and gives a lower active thrust than Rankine; the level, frictionless, vertical case (delta = theta = alpha = 0) reduces exactly to the Rankine Ka0 = (1 - sin phi)/(1 + sin phi) shown for contrast. Cohesionless backfill, active limit state, planar failure surface (Coulomb overestimates passive but active is accurate). Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's recommendation governs.",
+  example: coulombEarthPressureExample.inputs,
+  fields: [
+    { key: "phi", label: "Soil friction angle phi (deg)", kind: "number" },
+    { key: "delta", label: "Wall friction delta (deg, ~2/3 phi, 0 smooth)", kind: "number", default: 0 },
+    { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number", default: 0 },
+    { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number", default: 0 },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "k", id: "cep-out-k", label: "Coulomb Ka / Rankine Ka0", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.ka0, 3) },
+    { key: "pa", id: "cep-out-pa", label: "Active thrust Pa", value: (r) => fmt(r.pa, 0) + " lb/ft" },
+    { key: "ph", id: "cep-out-ph", label: "Horizontal component Pa_h (overturning)", value: (r) => fmt(r.pa_h, 0) + " lb/ft" },
+    { key: "pv", id: "cep-out-pv", label: "Vertical component Pa_v (down on the face)", value: (r) => fmt(r.pa_v, 0) + " lb/ft" },
+  ],
+  compute: computeCoulombEarthPressure,
+});
+
 // ===================== spec-v262: cantilever retaining wall stability =====================
 
 // dims: in { h_ft: L, b_ft: L, t_base: L, t_stem: L, toe_ft: L, gamma_s: M L^-2 T^-2, gamma_c: M L^-2 T^-2, phi: dimensionless, mu: dimensionless, q: M L^-1 T^-2 } out: { sum_v: M T^-2, mr: M L T^-2, mo: M L T^-2, pa_tot: M T^-2, fs_ot: dimensionless, fs_sl: dimensionless, ecc: L, q_max: M L^-1 T^-2, q_min: M L^-1 T^-2 }

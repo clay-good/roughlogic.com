@@ -82392,6 +82392,56 @@
       "term": "slope safe dry but slides when saturated",
       "target": "slope-stability-seepage",
       "kind": "question"
+    },
+    {
+      "term": "coulomb earth pressure",
+      "target": "coulomb-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "wall friction active pressure",
+      "target": "coulomb-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "coulomb active coefficient",
+      "target": "coulomb-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "rough wall earth pressure",
+      "target": "coulomb-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "battered wall active thrust",
+      "target": "coulomb-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how does wall friction change the active thrust",
+      "target": "coulomb-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "coulomb vs rankine active pressure",
+      "target": "coulomb-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "active earth pressure with a sloped backfill and rough wall",
+      "target": "coulomb-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "does a rough wall reduce the earth pressure",
+      "target": "coulomb-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "coulomb ka with wall friction delta and batter theta",
+      "target": "coulomb-earth-pressure",
+      "kind": "question"
     }
   ]
 }

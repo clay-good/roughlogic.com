@@ -606,7 +606,7 @@ const TOOL_MODULES = (() => {
   // lazy Group E cluster, where the steel / RC member load path meets the
   // ground. All three KEEP group "E" (module independent of group letter).
   declare("./calc-geotech.js", "GEOTECH_RENDERERS", [
-    "soil-bearing-capacity", "lateral-earth-pressure", "at-rest-earth-pressure", "submerged-earth-pressure", "sloped-backfill-earth-pressure", "retaining-wall-stability",
+    "soil-bearing-capacity", "lateral-earth-pressure", "at-rest-earth-pressure", "submerged-earth-pressure", "sloped-backfill-earth-pressure", "coulomb-earth-pressure", "retaining-wall-stability",
     // spec-v287..v289 foundation depth batch
     "soil-settlement-elastic", "pile-axial-capacity", "slope-stability-infinite", "slope-stability-seepage",
     // spec-v308..v310 geotechnical depth-2 batch

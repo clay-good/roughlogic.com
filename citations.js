@@ -11459,6 +11459,17 @@ export const CITATIONS = {
       { name: "beta below phi", value: "a backfill steeper than the soil's own friction angle is at or past its angle of repose; the Rankine active state breaks down and a gravity/cantilever wall cannot retain it on these terms", source: "Das / NAVFAC DM-7.02" },
     ],
   },
+  "coulomb-earth-pressure": {
+    formula: "Ka = cos^2(phi - theta) / [cos^2(theta) cos(delta + theta) (1 + sqrt(sin(phi + delta) sin(phi - alpha) / (cos(delta + theta) cos(theta - alpha))))^2]; Pa = 0.5 Ka gamma H^2 at (delta + theta) from horizontal; Pa_h = Pa cos(delta + theta), Pa_v = Pa sin(delta + theta); reduces to Rankine (1 - sin phi)/(1 + sin phi) at delta = theta = alpha = 0.",
+    edition: "Coulomb (1776) active earth pressure with wall friction, wall batter, and sloped backfill, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures), by name.",
+    freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual; the Coulomb active coefficient is public and printed in every soil-mechanics text.",
+    governance: GOVERNANCE.general,
+    editionNote: "Coulomb (1776) active coefficient Ka = cos^2(phi - theta) / [cos^2(theta) cos(delta + theta) (1 + sqrt(sin(phi + delta) sin(phi - alpha) / (cos(delta + theta) cos(theta - alpha))))^2] for wall friction delta, wall-face batter theta from vertical, and backfill slope alpha - the resultant Pa = 0.5 Ka gamma H^2 acts at (delta + theta) from horizontal, with a horizontal component Pa cos(delta + theta) that overturns the wall and a downward vertical component Pa sin(delta + theta) that drags on the face and resists sliding - as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02. gamma defaults to 120 pcf, delta/theta/alpha to 0. Coulomb credits the shear a rough wall carries and gives a lower active thrust than Rankine; the level, frictionless, vertical case reduces exactly to the Rankine Ka0 = (1 - sin phi)/(1 + sin phi) shown for contrast. Cohesionless backfill, active limit state, planar failure surface (Coulomb is accurate for active pressure). Take phi and gamma from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
+    assumptions: [
+      { name: "Wall friction lowers the active thrust", value: "a rough wall (delta > 0) carries part of the backfill in shear, cutting the horizontal thrust below Rankine and adding a downward face drag that resists sliding", source: "Coulomb 1776 / Das / NAVFAC DM-7.02" },
+      { name: "Angle ranges keep it well-posed", value: "delta in [0, phi], theta in [0, 40), alpha in [0, phi) keep the Coulomb radical non-negative and the denominator positive; the active case uses a planar failure surface", source: "Das / NAVFAC DM-7.02" },
+    ],
+  },
   "retaining-wall-stability": {
     formula: "FS_ot = Mr / Mo; FS_sl = mu x sum(V) / Pa; e = B/2 - (Mr - Mo)/sum(V); q_max,min = (sum(V)/B) x (1 +/- 6e/B); Rankine Pa = 0.5 Ka gamma H^2 + Ka q H.",
     edition: "The standard cantilever-retaining-wall global-stability checks as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for sliding and overturning, by name.",
