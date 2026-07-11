@@ -674,6 +674,7 @@ export const COMPUTE_MAP = {
   "chipper-debris": { module: "../../calc-arborist.js", fn: "computeChipperDebris" },
   "basal-area-prism": { module: "../../calc-arborist.js", fn: "computeBasalAreaPrism" },
   "reineke-sdi": { module: "../../calc-arborist.js", fn: "computeReinekeSdi" },
+  "quadratic-mean-diameter": { module: "../../calc-arborist.js", fn: "computeQuadraticMeanDiameter" },
   "trunk-decay-strength": { module: "../../calc-arborist.js", fn: "computeTrunkDecayStrength" },
   "tree-protection-zone": { module: "../../calc-arborist.js", fn: "computeTreeProtectionZone" },
   "crown-pruning-dose": { module: "../../calc-arborist.js", fn: "computeCrownPruningDose" },

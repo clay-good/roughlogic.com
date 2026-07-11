@@ -19313,3 +19313,37 @@ test("bounds: spec-v597 computeVacuumLiftReading pins the 1.13 conversion, the a
   assert.ok("error" in _v597({ vacuum_inhg: 10, pump_factor: 0 }));
   assert.ok("error" in _v597({ vacuum_inhg: 10, pump_factor: 1.2 }));
 });
+
+import { computeQuadraticMeanDiameter as _v598 } from "../../calc-arborist.js";
+
+test("bounds: spec-v598 computeQuadraticMeanDiameter pins QMD, the class-tally equivalence, the QMD>=mean property, and error seams", () => {
+  // Pinned worked example: five-tree spot tally.
+  const r = _v598({ tally: "8, 10, 10, 12, 14" });
+  assert.ok(Math.abs(r.qmd_in - Math.sqrt(604 / 5)) < 1e-9);
+  assert.ok(Math.abs(r.qmd_in - 10.9909053) < 1e-6);
+  assert.ok(Math.abs(r.arithmetic_mean_in - 10.8) < 1e-9);
+  assert.equal(r.tree_count, 5);
+  assert.ok(Math.abs(r.basal_area_ft2 - 0.005454 * 604) < 1e-9);
+  // QMD is always at or above the arithmetic mean (equal only when all diameters equal).
+  assert.ok(r.qmd_in >= r.arithmetic_mean_in);
+  const uniform = _v598({ tally: "10, 10, 10" });
+  assert.ok(Math.abs(uniform.qmd_in - uniform.arithmetic_mean_in) < 1e-9);
+  // Class-tally notation matches the equivalent expanded list.
+  const cls = _v598({ tally: "10:100, 14:50, 18:20" });
+  assert.ok(Math.abs(cls.qmd_in - Math.sqrt(26280 / 170)) < 1e-9);
+  assert.ok(Math.abs(cls.qmd_in - 12.4333517) < 1e-6);
+  assert.equal(cls.tree_count, 170);
+  assert.ok(Math.abs(cls.basal_area_ft2 - 0.005454 * 26280) < 1e-9);
+  // "12 x 40" and "12:40" and "12*40" are the same class.
+  const a = _v598({ tally: "12 x 40" }), b = _v598({ tally: "12:40" }), c = _v598({ tally: "12*40" });
+  assert.equal(a.tree_count, 40); assert.equal(b.tree_count, 40); assert.equal(c.tree_count, 40);
+  assert.ok(Math.abs(a.qmd_in - 12) < 1e-9);
+  // Newlines and commas both separate tokens.
+  assert.ok(Math.abs(_v598({ tally: "8\n10\n10\n12\n14" }).qmd_in - r.qmd_in) < 1e-9);
+  // Error seams: empty, non-numeric token, non-positive diameter / count.
+  assert.ok("error" in _v598({ tally: "" }));
+  assert.ok("error" in _v598({ tally: "   " }));
+  assert.ok("error" in _v598({ tally: "10, abc" }));
+  assert.ok("error" in _v598({ tally: "-5" }));
+  assert.ok("error" in _v598({ tally: "10:0" }));
+});

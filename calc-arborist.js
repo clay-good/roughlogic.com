@@ -13,7 +13,7 @@
 // examples, dimensional annotations, and behavior are byte-for-byte unchanged.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect,
+  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -405,6 +405,57 @@ function _v564renderReinekeSdi(inputRegion, outputRegion, citationEl) {
   for (const f of [tpa, qmd, smax]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["reineke-sdi"] = _v564renderReinekeSdi;
+
+// --- spec-v598 L: Quadratic mean diameter from a DBH tally ---
+// QMD = sqrt(sum(count*d^2)/sum(count)); amean = sum(count*d)/sum(count); BA = 0.005454*sum(count*d^2).
+// dims: in { tally: dimensionless } out: { qmd_in: L, arithmetic_mean_in: L, tree_count: dimensionless, basal_area_ft2: dimensionless }
+export function computeQuadraticMeanDiameter({ tally = "" } = {}) {
+  const tokens = String(tally).split(/[\n,]+/).map((t) => t.trim()).filter(Boolean);
+  if (tokens.length === 0) return { error: "Enter a diameter tally: one token per tree (\"12\") or per class (\"12:40\")." };
+  let n = 0, sum_sq = 0, sum_d = 0;
+  for (const tok of tokens) {
+    const m = tok.match(/^([0-9]*\.?[0-9]+)\s*(?:[x:*]\s*([0-9]+))?$/i);
+    if (!m) return { error: "Bad tally token \"" + tok + "\" - use a diameter, or diameter:count (e.g. 12:40)." };
+    const d = parseFloat(m[1]);
+    const c = m[2] ? parseInt(m[2], 10) : 1;
+    if (!(d > 0) || !Number.isFinite(d)) return { error: "Each diameter must be a positive number (in)." };
+    if (!(c > 0)) return { error: "Each class count must be a positive whole number." };
+    n += c; sum_sq += c * d * d; sum_d += c * d;
+  }
+  if (!(n > 0)) return { error: "The tally has no trees." };
+  const qmd_in = Math.sqrt(sum_sq / n);
+  const arithmetic_mean_in = sum_d / n;
+  const basal_area_ft2 = 0.005454 * sum_sq;
+  return {
+    qmd_in, arithmetic_mean_in, tree_count: n, basal_area_ft2,
+    note: "QMD is the diameter of the tree of average basal area, always at or above the arithmetic mean - feed it to reineke-sdi, not the plain average, or the density is understated and the stand thins too late. The total basal area (0.005454 x sum(count x diameter^2)) is for the tallied trees, not a per-acre expansion; a fixed- or variable-radius plot factor gives per-acre. The forester and the cruise design govern - a mensuration helper, not a cruise compilation.",
+  };
+}
+export const quadraticMeanDiameterExample = { inputs: { tally: "8, 10, 10, 12, 14" } };
+function _v598renderQuadraticMeanDiameter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: USDA Forest Service forest-mensuration practice (quadratic mean diameter), by name. QMD = sqrt( sum(count x diameter^2) / sum(count) ); tally token is a diameter (\"12\") or a class (\"12:40\" or \"12 x 40\"), separated by commas or new lines. QMD is the diameter of the tree of average basal area, always at or above the arithmetic mean - it is the number reineke-sdi requires. The total basal area is 0.005454 x sum(count x diameter^2) ft^2 for the tallied trees, not a per-acre expansion.";
+  const tally = makeTextarea("DBH tally (one token per tree \"12\" or per class \"12:40\"; commas or new lines)", "qmd-tally", { rows: "4" });
+  tally.input.placeholder = "8, 10, 10, 12, 14";
+  tally.input.value = "8, 10, 10, 12, 14";
+  inputRegion.appendChild(tally.wrap);
+  attachExampleButton(inputRegion, () => { tally.input.value = "8, 10, 10, 12, 14"; update(); });
+  const oQmd = makeOutputLine(outputRegion, "Quadratic mean diameter", "qmd-out-qmd");
+  const oMean = makeOutputLine(outputRegion, "Arithmetic mean (for contrast)", "qmd-out-mean");
+  const oN = makeOutputLine(outputRegion, "Trees tallied", "qmd-out-n");
+  const oBa = makeOutputLine(outputRegion, "Total basal area (tallied trees)", "qmd-out-ba");
+  const oNote = makeOutputLine(outputRegion, "Note", "qmd-out-note");
+  const update = debounce(() => {
+    const r = computeQuadraticMeanDiameter({ tally: tally.input.value });
+    if (r.error) { oQmd.textContent = r.error; oMean.textContent = "-"; oN.textContent = "-"; oBa.textContent = "-"; oNote.textContent = ""; return; }
+    oQmd.textContent = fmt(r.qmd_in, 2) + " in";
+    oMean.textContent = fmt(r.arithmetic_mean_in, 2) + " in";
+    oN.textContent = String(r.tree_count);
+    oBa.textContent = fmt(r.basal_area_ft2, 2) + " ft^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  tally.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["quadratic-mean-diameter"] = _v598renderQuadraticMeanDiameter;
 
 // --- spec-v565 L: Hollow / decayed trunk strength loss (Wagener / Mattheck t/R) ---
 // hollow_d = D - 2t. loss% = (hollow_d^3 / D^3) x 100. t/R = t / (D/2). concern when t/R < 0.30.

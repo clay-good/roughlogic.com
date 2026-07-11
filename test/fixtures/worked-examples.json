@@ -50068,6 +50068,76 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "quadratic-mean-diameter",
+   "source_publisher": "USDA Forest Service forest-mensuration practice",
+   "source_title": "QMD = sqrt( sum(count x diameter^2) / sum(count) ) (spec-v564's named follow-on)",
+   "source_edition_or_year": "USDA FS forest mensuration",
+   "source_section_or_page": "Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD sqrt(120.8) = 10.99 in (above the 10.8 in arithmetic mean)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "tally": "8, 10, 10, 12, 14"
+   },
+   "outputs": {
+    "qmd_in": {
+     "value": 10.9909,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "arithmetic_mean_in": {
+     "value": 10.8,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "tree_count": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "basal_area_ft2": {
+     "value": 3.294216,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "quadratic-mean-diameter",
+   "source_publisher": "USDA Forest Service forest-mensuration practice",
+   "source_title": "cross-check: a class tally by DBH class and count",
+   "source_edition_or_year": "USDA FS forest mensuration",
+   "source_section_or_page": "100 at 10 in, 50 at 14 in, 20 at 18 in -> sum_sq 26,280, N 170, QMD sqrt(154.59) = 12.43 in vs 12.12 in arithmetic mean",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "tally": "10:100, 14:50, 18:20"
+   },
+   "outputs": {
+    "qmd_in": {
+     "value": 12.4334,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "tree_count": {
+     "value": 170,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "basal_area_ft2": {
+     "value": 143.33112,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

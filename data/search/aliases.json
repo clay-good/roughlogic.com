@@ -4610,7 +4610,7 @@
     },
     {
       "term": "quadratic mean diameter",
-      "target": "reineke-sdi",
+      "target": "quadratic-mean-diameter",
       "kind": "industry"
     },
     {
@@ -80911,6 +80911,51 @@
     {
       "term": "compound gauge reading to suction head",
       "target": "vacuum-lift-reading",
+      "kind": "question"
+    },
+    {
+      "term": "qmd forestry",
+      "target": "quadratic-mean-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "diameter tally",
+      "target": "quadratic-mean-diameter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "mean stand diameter",
+      "target": "quadratic-mean-diameter",
+      "kind": "redirect"
+    },
+    {
+      "term": "dbh tally",
+      "target": "quadratic-mean-diameter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how to compute quadratic mean diameter",
+      "target": "quadratic-mean-diameter",
+      "kind": "question"
+    },
+    {
+      "term": "qmd from a diameter tally",
+      "target": "quadratic-mean-diameter",
+      "kind": "question"
+    },
+    {
+      "term": "what quadratic mean diameter for reineke sdi",
+      "target": "quadratic-mean-diameter",
+      "kind": "question"
+    },
+    {
+      "term": "average stand diameter from a cruise",
+      "target": "quadratic-mean-diameter",
+      "kind": "question"
+    },
+    {
+      "term": "quadratic vs arithmetic mean diameter",
+      "target": "quadratic-mean-diameter",
       "kind": "question"
     }
   ]

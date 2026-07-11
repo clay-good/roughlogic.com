@@ -458,6 +458,7 @@ const _TILES = [
   ["porta-wrap-friction", "L"], ["chipper-debris", "L"],
   ["basal-area-prism", "L"],
   ["reineke-sdi", "L"],
+  ["quadratic-mean-diameter", "L"],
   ["trunk-decay-strength", "L"],
   ["tree-protection-zone", "L"],
   ["crown-pruning-dose", "L"],

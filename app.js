@@ -914,6 +914,8 @@ const TOOL_MODULES = (() => {
     "basal-area-prism",
     // spec-v564
     "reineke-sdi",
+    // spec-v598
+    "quadratic-mean-diameter",
     // spec-v565
     "trunk-decay-strength",
     // spec-v566

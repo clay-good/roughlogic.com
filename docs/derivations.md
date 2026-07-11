@@ -1484,6 +1484,7 @@ cross-check.
 | calc-arborist.js | `computeFellingNotchHinge` | `{ cut_dia_in, notch_pct = 22, open_face = 70 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-arborist.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeReinekeSdi` | `{ trees_per_acre = 0, qmd_in = 0, sdi_max = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeProtectionZone` | `{ dbh_in = 0, radius_factor = 1.0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeTreeRiggingShock` | `{ static_weight_lb, drop_ft, rope_length_ft, elong_pct = 5 } = {}` | _ | _ | _ |
@@ -2703,7 +2704,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1289.
+Row count: 1290.
 
 <!-- END function-corpus-v14 -->
 
@@ -3624,7 +3625,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (47 tiles)
+### Group L Agriculture (48 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3661,6 +3662,7 @@ per spec-v14 §13.1 second paragraph.
 | `pesticide-rei-phi` | Pesticide REI / PHI Clock | EPA WPS 40 CFR 170 + product label; REI 12 hr, 4 hr elapsed -> 8 hr remaining; PHI 7 d, 2 d e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plant-spacing-count` | Plant Spacing Count (Square and Triangular) | Nursery / landscape estimating refere...; spec-v210 section 2.1 pinned example (1 ft on center) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `porta-wrap-friction` | Friction-Device Hold Force by Wraps | Capstan (Euler-Eytelwein) / ANSI Z133...; 800 lb load side, friction 0.20 -> 1 wrap 227.7 lb, 2 wra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `quadratic-mean-diameter` | Quadratic Mean Diameter (from a Tally) | USDA Forest Service forest-mensuratio...; Five-tree tally 8, 10, 10, 12, 14 in -> sum_sq 604, QMD s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `reineke-sdi` | Reineke Stand Density Index | Reineke Stand Density Index (Reineke ...; 300 TPA, QMD 10 in, SDI_max 400 -> SDI 300, 75% of max (u... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seed-rate` | Planting Density and Seed Rate | Project (first-principles); 30 in rows / 32,000 plants/ac target / 1,500 seeds/lb / 9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sod-takeoff` | Sod Takeoff (Slabs and Pallets) | Turfgrass producer / landscape estima...; spec-v211 section 2.1 pinned example (residential lawn) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3934,6 +3936,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1045. Fixture-covered or reference-cadence: 1045 / 1045.
+Tile count: 1046. Fixture-covered or reference-cadence: 1046 / 1046.
 
 <!-- END tile-index-v14 -->

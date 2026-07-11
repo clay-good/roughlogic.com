@@ -7041,6 +7041,17 @@ export const CITATIONS = {
       { name: "Concern trigger", value: "t/R < 0.30 (sound shell below 30% of the radius) flags escalation to a full TRAQ assessment", source: "Mattheck & Breloer" },
     ],
   },
+  "quadratic-mean-diameter": {
+    formula: "QMD = sqrt( sum(count x diameter^2) / sum(count) ); arithmetic_mean = sum(count x diameter) / sum(count); basal_area_ft2 = 0.005454 x sum(count x diameter^2).",
+    edition: "USDA Forest Service forest-mensuration practice (quadratic mean diameter), by name.",
+    freeAccess: "The quadratic-mean-diameter definition is standard forest mensuration; the forester and the cruise design govern the compilation.",
+    governance: GOVERNANCE.general,
+    editionNote: "QMD is the diameter of the tree of average basal area, always at or above the arithmetic mean - it is the number reineke-sdi requires, and a plain average understates density and thins the stand too late. The tally token is a diameter (\"12\") or a class (\"12:40\" or \"12 x 40\"), separated by commas or new lines. The total basal area (0.005454 x sum(count x diameter^2)) is for the tallied trees, not a per-acre expansion; a fixed- or variable-radius plot factor gives per-acre. The forester and the cruise design govern - a mensuration helper, not a cruise compilation.",
+    assumptions: [
+      { name: "Quadratic vs arithmetic", value: "QMD is the diameter of the tree of average basal area, always >= the arithmetic mean", source: "USDA FS forest mensuration" },
+      { name: "Basal-area constant", value: "per-tree basal area is 0.005454 x DBH^2 ft^2 for DBH in inches", source: "forestry mensuration" },
+    ],
+  },
   "reineke-sdi": {
     formula: "SDI = TPA x (QMD / 10)^1.605; percent_max = SDI / SDI_max x 100.",
     edition: "Reineke Stand Density Index (Reineke 1933; USDA FS RMRS), by name.",

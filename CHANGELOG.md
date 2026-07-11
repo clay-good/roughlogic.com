@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(forester): spec-v598 quadratic mean diameter from a tally; 2026-07-10
+
+Lands `quadratic-mean-diameter` (Group L, calc-arborist.js), the follow-on spec-v564 named: the QMD reineke-sdi requires, from the tally sheet. QMD = sqrt(sum(count x DBH^2) / trees); returns the QMD, the arithmetic mean beside it, the tree count, and the tallied basal area. Accepts a diameter tally (one token per tree "12" or per class "12:40" / "12 x 40", commas or new lines). Repoints the pre-existing "quadratic mean diameter" search alias from reineke-sdi to the dedicated tile. Catalog 1,045 -> 1,046 (version 0.187.0).
+
 ### feat(fire): spec-v597 vacuum gauge to drafting lift readout; 2026-07-10
 
 Lands `vacuum-lift-reading` (Group F, calc-fire.js), the follow-on spec-v579 named: reads the compound (vacuum) gauge during a draft. suction_head_ft = vacuum_inhg x 1.13, against the altitude-corrected attainable ceiling (factor x (33.9 - elevation/1000)) with the margin left. 10 in Hg at sea level is 11.3 ft (half the ~22.6 ft ceiling); 18 in Hg at 3,000 ft is 98% of the ceiling. Group F audit count 31 -> 32. Catalog 1,044 -> 1,045 (version 0.186.0).

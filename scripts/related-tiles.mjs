@@ -888,6 +888,7 @@ const RELATED = {
   "chipper-debris": ["log-limb-weight", "demo-debris"],
   "basal-area-prism": ["timber-cruise", "felling-notch-hinge", "log-limb-weight"],
   "reineke-sdi": ["basal-area-prism", "timber-cruise", "log-limb-weight"],
+  "quadratic-mean-diameter": ["reineke-sdi", "basal-area-prism", "log-limb-weight"],
   "trunk-decay-strength": ["char-depth-capacity", "felling-notch-hinge", "log-limb-weight"],
   "tree-protection-zone": ["trunk-decay-strength", "reineke-sdi", "log-limb-weight"],
   "crown-pruning-dose": ["tree-protection-zone", "trunk-decay-strength", "felling-notch-hinge"],
