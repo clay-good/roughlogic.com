@@ -15,6 +15,12 @@
     },
     {
       "module": "*",
+      "match": "mL/g",
+      "family": "water/wastewater operations",
+      "justification": "Sludge Volume Index (SVI) is universally reported in mL/g in US wastewater ops (Standard Methods, WEF, operator-certification exams); there is no US-customary equivalent."
+    },
+    {
+      "module": "*",
       "match": "mg-min/L",
       "family": "water/wastewater operations",
       "justification": "CT tables (SWTR) are published in mg-min/L."

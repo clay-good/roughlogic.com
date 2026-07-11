@@ -667,6 +667,7 @@ const _TILES = [
   ["uv-dose", "M"],
   ["population-equivalent", "M"],
   ["ras-flow-rate", "M"],
+  ["ras-svi-settleability", "M"],
   ["was-srt-control", "M"],
   ["aeration-oxygen-demand", "M"],
   // spec-v117 rigging load / wire-rope (Group Z)

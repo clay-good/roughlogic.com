@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(wastewater): spec-v600 settleability-based RAS rate from SVI; 2026-07-10
+
+Lands `ras-svi-settleability` (Group M, calc-water.js), the follow-on spec-v571 named: the RAS number from the settleometer, no RAS_SS lab result needed. Xr = 1,000,000 / SVI; R = MLSS / (Xr - MLSS); Q_RAS = R x Q. A good SVI of 100 holding 2,500 mg/L needs a 33% return; a bulking sludge at SVI 150 wanting 3,000 mg/L needs 82%. Group M audit count 28 -> 29. Catalog 1,047 -> 1,048 (version 0.189.0).
+
 ### feat(fire): spec-v599 tanker shuttle cycle time; 2026-07-10
 
 Lands `tanker-shuttle-cycle` (Group F, calc-fire.js), the follow-on spec-v580 named: builds the cycle time tanker-shuttle-flow needs. fill = tank/fill_gpm; dump = tank/dump_gpm; travel = 2 x distance/speed (round trip); cycle = fill + dump + travel; one tanker sustains tank/cycle. A 3,000-gal tanker over a 2-mile haul at 35 mph runs a 12.9-min cycle and sustains 233 gpm alone. Group F audit count 32 -> 33. Catalog 1,046 -> 1,047 (version 0.188.0).

@@ -950,6 +950,7 @@ export const COMPUTE_MAP = {
   "uv-dose": { module: "../../calc-water.js", fn: "computeUvDose" },
   "population-equivalent": { module: "../../calc-water.js", fn: "computePopulationEquivalent" },
   "ras-flow-rate": { module: "../../calc-water.js", fn: "computeRasFlowRate" },
+  "ras-svi-settleability": { module: "../../calc-water.js", fn: "computeRasSviSettleability" },
   "was-srt-control": { module: "../../calc-water.js", fn: "computeWasSrtControl" },
   "aeration-oxygen-demand": { module: "../../calc-water.js", fn: "computeAerationOxygenDemand" },
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },

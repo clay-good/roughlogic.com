@@ -1005,6 +1005,7 @@ const RELATED = {
   "uv-dose": ["disinfection-ct","chlorine-demand"],
   "population-equivalent": ["bod-tss-loading-removal","pounds-formula","chlorine-demand"],
   "ras-flow-rate": ["srt-fm-ratio","svi-sludge-index","clarifier-surface-loading"],
+  "ras-svi-settleability": ["ras-flow-rate","svi-sludge-index","srt-fm-ratio"],
   "was-srt-control": ["srt-fm-ratio","ras-flow-rate","svi-sludge-index"],
   "aeration-oxygen-demand": ["bod-tss-loading-removal","ras-flow-rate","digester-vs-loading"],
   // spec-v117 rigging load / wire-rope (Group Z)

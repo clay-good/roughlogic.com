@@ -19378,3 +19378,31 @@ test("bounds: spec-v599 computeTankerShuttleCycle pins the cycle breakdown, the 
   assert.ok("error" in _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 0, speed_mph: 35 }));
   assert.ok("error" in _v599({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 0 }));
 });
+
+import { computeRasSviSettleability as _v600 } from "../../calc-water.js";
+
+test("bounds: spec-v600 computeRasSviSettleability pins the Xr ceiling, the return ratio, the SVI sensitivity, and error seams", () => {
+  // Pinned worked example: 4 MGD, 2,500 mg/L MLSS, SVI 100.
+  const r = _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 100 });
+  assert.ok(Math.abs(r.achievable_ras_ss_mg_l - 10000) < 1e-9);
+  assert.ok(Math.abs(r.ras_ratio_pct - 33.333333) < 1e-5);
+  assert.ok(Math.abs(r.q_ras_mgd - 4 / 3) < 1e-9);
+  // Cross-check: a bulking sludge (SVI 150) forces a much higher return.
+  const x = _v600({ plant_flow_mgd: 5, mlss_mg_l: 3000, svi_ml_g: 150 });
+  assert.ok(Math.abs(x.achievable_ras_ss_mg_l - 6666.666667) < 1e-5);
+  assert.ok(Math.abs(x.ras_ratio_pct - 81.818182) < 1e-5);
+  assert.ok(Math.abs(x.q_ras_mgd - 4.090909) < 1e-5);
+  // A higher SVI (worse settling) always demands a higher return ratio at the same MLSS.
+  const good = _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 80 });
+  const bad = _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 120 });
+  assert.ok(bad.ras_ratio_pct > good.ras_ratio_pct);
+  // Xr is exactly 1e6 / SVI.
+  assert.ok(Math.abs(good.achievable_ras_ss_mg_l - 1e6 / 80) < 1e-9);
+  // Error seams: non-finite, non-positive flow / MLSS / SVI, and an SVI too high to thicken past the MLSS.
+  assert.ok("error" in _v600({ plant_flow_mgd: Infinity, mlss_mg_l: 2500, svi_ml_g: 100 }));
+  assert.ok("error" in _v600({ plant_flow_mgd: 0, mlss_mg_l: 2500, svi_ml_g: 100 }));
+  assert.ok("error" in _v600({ plant_flow_mgd: 4, mlss_mg_l: 0, svi_ml_g: 100 }));
+  assert.ok("error" in _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 0 }));
+  // SVI 500 -> Xr 2,000 mg/L, below the 2,500 mg/L MLSS: cannot thicken.
+  assert.ok("error" in _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 500 }));
+});

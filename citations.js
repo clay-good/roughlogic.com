@@ -8822,6 +8822,17 @@ export const CITATIONS = {
       { name: "Slow response", value: "SRT reacts over roughly one SRT; change the wasting gradually rather than chasing a single reading", source: "WEF operator training" },
     ],
   },
+  "ras-svi-settleability": {
+    formula: "Xr = 1,000,000 / SVI; ras_ratio = MLSS / (Xr - MLSS); Q_RAS = ras_ratio x Q.",
+    edition: "Settleability-based RAS from the sludge volume index (WEF MOP / Sacramento activated-sludge manuals), by name.",
+    freeAccess: "The settleability-based RAS relation is public wastewater-operations material; the settleability and clarifier performance govern the actual return.",
+    governance: GOVERNANCE.general,
+    editionNote: "The achievable return concentration Xr = 1,000,000 / SVI is the settleability ceiling, not a guaranteed value - clarifier depth, loading, and temperature move it. Poor settling (a high SVI) forces a higher return rate, and a bulking sludge can make a target MLSS unreachable within the pump capacity. This is the settleometer path to the same mass balance ras-flow-rate does from a measured RAS_SS. The settleability and clarifier performance govern - an operating aid, not a process design.",
+    assumptions: [
+      { name: "Settleability ceiling", value: "the achievable return concentration is about Xr = 1,000,000 / SVI mg/L", source: "WEF / Sacramento manuals" },
+      { name: "Higher SVI, higher RAS", value: "poor settling forces a higher return ratio; a bulking sludge can make a target MLSS unreachable within pump capacity", source: "WEF / operator practice" },
+    ],
+  },
   "ras-flow-rate": {
     formula: "Q_RAS = Q x MLSS / (RAS_SS - MLSS); ras_ratio = Q_RAS / Q x 100.",
     edition: "RAS flow from the activated-sludge solids mass balance (WEF MOP / Sacramento activated-sludge manuals), by name.",

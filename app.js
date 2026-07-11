@@ -942,6 +942,8 @@ const TOOL_MODULES = (() => {
     "population-equivalent",
     // spec-v571
     "ras-flow-rate",
+    // spec-v600
+    "ras-svi-settleability",
     // spec-v572
     "was-srt-control",
     // spec-v574

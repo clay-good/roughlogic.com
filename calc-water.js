@@ -1417,6 +1417,46 @@ const renderRasFlowRate = _v23SimpleRenderer({
 });
 WATER_RENDERERS["ras-flow-rate"] = renderRasFlowRate;
 
+// --- spec-v600 M: Settleability-based RAS rate from SVI ---
+// Xr = 1e6/SVI. R = MLSS/(Xr-MLSS). Q_RAS = R*Q.
+// dims: in { plant_flow_mgd: L^3 T^-1, mlss_mg_l: M L^-3, svi_ml_g: dimensionless } out: { achievable_ras_ss_mg_l: M L^-3, ras_ratio_pct: dimensionless, q_ras_mgd: L^3 T^-1 }
+export function computeRasSviSettleability({ plant_flow_mgd = 0, mlss_mg_l = 0, svi_ml_g = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(plant_flow_mgd) || 0;
+  const mlss = Number(mlss_mg_l) || 0;
+  const svi = Number(svi_ml_g) || 0;
+  if (!(q > 0)) return { error: "Plant flow must be positive (MGD)." };
+  if (!(mlss > 0)) return { error: "Mixed-liquor solids must be positive (mg/L)." };
+  if (!(svi > 0)) return { error: "Sludge volume index must be positive (mL/g)." };
+  const achievable_ras_ss_mg_l = 1e6 / svi;
+  if (!(achievable_ras_ss_mg_l > mlss)) return { error: "At this SVI the clarifier cannot thicken past the mixed-liquor solids - the settling is too poor to return sludge at this MLSS." };
+  const ras_ratio = mlss / (achievable_ras_ss_mg_l - mlss);
+  const ras_ratio_pct = ras_ratio * 100;
+  const q_ras_mgd = ras_ratio * q;
+  return {
+    achievable_ras_ss_mg_l, ras_ratio_pct, q_ras_mgd,
+    note: "The achievable return concentration Xr = 1,000,000 / SVI is the settleability ceiling, not a guaranteed value - clarifier depth, loading, and temperature move it. Poor settling (a high SVI) forces a higher return rate, and a bulking sludge can make a target MLSS unreachable within the pump capacity. This is the settleometer path to the same mass balance ras-flow-rate does from a measured RAS_SS. The settleability and clarifier performance govern - an operating aid, not a process design.",
+  };
+}
+export const rasSviSettleabilityExample = { inputs: { plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 100 } };
+const renderRasSviSettleability = _v23SimpleRenderer({
+  citation: "Citation: settleability-based RAS from the sludge volume index (WEF / Sacramento activated-sludge manuals), by name. Xr = 1,000,000 / SVI; R = MLSS / (Xr - MLSS); Q_RAS = R x Q. The achievable return concentration is the settleability ceiling, not a guaranteed value; poor settling forces a higher return rate and a bulking sludge can make a target MLSS unreachable within the pump capacity. The settleability and clarifier performance govern.",
+  example: rasSviSettleabilityExample.inputs,
+  fields: [
+    { key: "plant_flow_mgd", label: "Plant influent flow Q (MGD)", kind: "number" },
+    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L, target)", kind: "number" },
+    { key: "svi_ml_g", label: "Sludge volume index SVI (mL/g, from the settleometer)", kind: "number" },
+  ],
+  outputs: [
+    { key: "xr", id: "rsvi-out-xr", label: "Achievable return solids (settleability ceiling)", value: (r) => fmt(r.achievable_ras_ss_mg_l, 0) + " mg/L" },
+    { key: "r", id: "rsvi-out-r", label: "Return ratio", value: (r) => fmt(r.ras_ratio_pct, 0) + "% of plant flow" },
+    { key: "q", id: "rsvi-out-q", label: "RAS flow rate", value: (r) => fmt(r.q_ras_mgd, 2) + " MGD" },
+    { key: "n", id: "rsvi-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRasSviSettleability,
+});
+WATER_RENDERERS["ras-svi-settleability"] = renderRasSviSettleability;
+
 // --- spec-v572 M: WAS rate to hold target SRT (sludge age) ---
 // system_solids = V*MLSS*8.34. solids_to_waste = system_solids/SRT. Q_WAS = (stw - eff_solids)/(WAS*8.34).
 // dims: in { aeration_volume_mg: L^3, mlss_mg_l: M L^-3, target_srt_days: T, was_conc_mg_l: M L^-3, effluent_flow_mgd: L^3 T^-1, effluent_tss_mg_l: M L^-3 } out: { q_was_mgd: L^3 T^-1, q_was_gpm: L^3 T^-1 }

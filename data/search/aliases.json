@@ -81007,6 +81007,56 @@
       "term": "fill and dump cycle for a water tender",
       "target": "tanker-shuttle-cycle",
       "kind": "question"
+    },
+    {
+      "term": "ras from svi",
+      "target": "ras-svi-settleability",
+      "kind": "redirect"
+    },
+    {
+      "term": "settleability ras",
+      "target": "ras-svi-settleability",
+      "kind": "industry"
+    },
+    {
+      "term": "sludge volume index ras",
+      "target": "ras-svi-settleability",
+      "kind": "adjacent"
+    },
+    {
+      "term": "return rate from svi",
+      "target": "ras-svi-settleability",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ras ratio settleometer",
+      "target": "ras-svi-settleability",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ras rate from the sludge volume index",
+      "target": "ras-svi-settleability",
+      "kind": "question"
+    },
+    {
+      "term": "how much ras for a bulking sludge",
+      "target": "ras-svi-settleability",
+      "kind": "question"
+    },
+    {
+      "term": "return rate when svi is high",
+      "target": "ras-svi-settleability",
+      "kind": "question"
+    },
+    {
+      "term": "settleometer to ras flow",
+      "target": "ras-svi-settleability",
+      "kind": "question"
+    },
+    {
+      "term": "achievable ras concentration from svi",
+      "target": "ras-svi-settleability",
+      "kind": "question"
     }
   ]
 }

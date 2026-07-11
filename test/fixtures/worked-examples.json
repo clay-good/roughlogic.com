@@ -50198,6 +50198,74 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "ras-svi-settleability",
+   "source_publisher": "WEF / Sacramento activated-sludge operator practice",
+   "source_title": "Xr = 1,000,000 / SVI; R = MLSS / (Xr - MLSS) (spec-v571's named follow-on)",
+   "source_edition_or_year": "WEF MOP / Sacramento manuals",
+   "source_section_or_page": "4 MGD, 2,500 mg/L MLSS, SVI 100 -> Xr 10,000 mg/L, 33% return, 1.33 MGD RAS",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "plant_flow_mgd": 4,
+    "mlss_mg_l": 2500,
+    "svi_ml_g": 100
+   },
+   "outputs": {
+    "achievable_ras_ss_mg_l": {
+     "value": 10000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ras_ratio_pct": {
+     "value": 33.333333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_ras_mgd": {
+     "value": 1.333333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ras-svi-settleability",
+   "source_publisher": "WEF / Sacramento activated-sludge operator practice",
+   "source_title": "cross-check: a bulking sludge forces a much higher return",
+   "source_edition_or_year": "WEF MOP / Sacramento manuals",
+   "source_section_or_page": "5 MGD, 3,000 mg/L MLSS, SVI 150 -> Xr 6,667 mg/L, 82% return, 4.09 MGD RAS",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "plant_flow_mgd": 5,
+    "mlss_mg_l": 3000,
+    "svi_ml_g": 150
+   },
+   "outputs": {
+    "achievable_ras_ss_mg_l": {
+     "value": 6666.666667,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ras_ratio_pct": {
+     "value": 81.818182,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "q_ras_mgd": {
+     "value": 4.090909,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }
