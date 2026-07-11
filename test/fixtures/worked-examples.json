@@ -50266,6 +50266,74 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "iowa-rate-of-flow",
+   "source_publisher": "Iowa rate-of-flow formula (Royer-Nelson / Iowa State fire behavior)",
+   "source_title": "rate_gpm = volume_ft3 / 100; total_gal = volume_ft3 / 200 (spec-v577's named follow-on)",
+   "source_edition_or_year": "Royer-Nelson / Iowa State",
+   "source_section_or_page": "20 x 30 x 10 ft room = 6,000 ft3 -> 30 gal to control, 60 gpm knockdown (vs the NFA's 200 gpm sustained)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "length_ft": 20,
+    "width_ft": 30,
+    "height_ft": 10
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_gal": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "rate_gpm": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "iowa-rate-of-flow",
+   "source_publisher": "Iowa rate-of-flow formula (Royer-Nelson / Iowa State fire behavior)",
+   "source_title": "cross-check: a small bedroom scales with the compartment volume",
+   "source_edition_or_year": "Royer-Nelson / Iowa State",
+   "source_section_or_page": "15 x 15 x 8 ft = 1,800 ft3 -> 9 gal, 18 gpm (a single interior line covers it)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "length_ft": 15,
+    "width_ft": 15,
+    "height_ft": 8
+   },
+   "outputs": {
+    "volume_ft3": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_gal": {
+     "value": 9,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "rate_gpm": {
+     "value": 18,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

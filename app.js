@@ -655,6 +655,7 @@ const TOOL_MODULES = (() => {
     "hydrant-available-flow",
     // spec-v577
     "nfa-fireground-flow",
+    "iowa-rate-of-flow",
     "relay-pump-distance",
     "draft-lift-max",
     "vacuum-lift-reading",

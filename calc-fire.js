@@ -1886,6 +1886,50 @@ function renderNfaFiregroundFlow(inputRegion, outputRegion, citationEl) {
 }
 FIRE_RENDERERS["nfa-fireground-flow"] = renderNfaFiregroundFlow;
 
+// --- spec-v601 F: Iowa rate-of-flow (Royer-Nelson volume method) ---
+// volume = L*W*H. total_gal = V/200. rate_gpm = V/100 (that water in the 30-second burst).
+// dims: in { length_ft: L, width_ft: L, height_ft: L } out: { volume_ft3: L^3, total_gal: L^3, rate_gpm: L^3 T^-1 }
+export function computeIowaRateOfFlow({ length_ft = 0, width_ft = 0, height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(length_ft) || 0;
+  const W = Number(width_ft) || 0;
+  const H = Number(height_ft) || 0;
+  if (!(L > 0)) return { error: "Length must be positive (ft)." };
+  if (!(W > 0)) return { error: "Width must be positive (ft)." };
+  if (!(H > 0)) return { error: "Height must be positive (ft)." };
+  const volume_ft3 = L * W * H;
+  const total_gal = volume_ft3 / 200;
+  const rate_gpm = volume_ft3 / 100;
+  return {
+    volume_ft3, total_gal, rate_gpm,
+    note: "The Iowa rate-of-flow is a 30-second confined-compartment knockdown burst for a single open area - not a sustained supply, which the NFA (nfa-fireground-flow) and ISO / required-fire-flow methods size, and which run much higher for the same footprint. It assumes fog application filling the space and a single undivided volume; the 200-cubic-feet-per-gallon steam basis carries the built-in margin. Incident command governs - a fire-behavior teaching and size-up aid, not a water-supply design.",
+  };
+}
+export const iowaRateOfFlowExample = { inputs: { length_ft: 20, width_ft: 30, height_ft: 10 } };
+function renderIowaRateOfFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A fire-behavior teaching and size-up aid, not a water-supply design; incident command governs. Citation: Iowa rate-of-flow formula (Royer-Nelson / Iowa State fire behavior), by name. volume_ft3 = length x width x height; total_gal = volume_ft3 / 200 (one gallon controls ~200 ft^3 of compartment); rate_gpm = volume_ft3 / 100 (that water applied in the 30-second knockdown burst). This is a confined-compartment interior burst for a single open area, not the sustained flow the NFA and ISO methods size.";
+  const L = makeNumber("Compartment length (ft)", "iowa-l", { step: "any", min: "0", value: "20" }); L.input.value = "20";
+  const W = makeNumber("Compartment width (ft)", "iowa-w", { step: "any", min: "0", value: "30" }); W.input.value = "30";
+  const H = makeNumber("Compartment height / ceiling (ft)", "iowa-h", { step: "any", min: "0", value: "10" }); H.input.value = "10";
+  for (const f of [L, W, H]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { L.input.value = "20"; W.input.value = "30"; H.input.value = "10"; update(); });
+  const oVol = makeOutputLine(outputRegion, "Compartment volume", "iowa-out-vol");
+  const oGal = makeOutputLine(outputRegion, "Water to control (total)", "iowa-out-gal");
+  const oRate = makeOutputLine(outputRegion, "Rate of flow (30-second knockdown)", "iowa-out-rate");
+  const oNote = makeOutputLine(outputRegion, "Note", "iowa-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeIowaRateOfFlow({ length_ft: readNum(L.input), width_ft: readNum(W.input), height_ft: readNum(H.input) });
+    if (r.error) { oVol.textContent = r.error; oGal.textContent = "-"; oRate.textContent = "-"; oNote.textContent = ""; return; }
+    oVol.textContent = fmt(r.volume_ft3, 0) + " ft^3";
+    oGal.textContent = fmt(r.total_gal, 0) + " gal";
+    oRate.textContent = fmt(r.rate_gpm, 0) + " gpm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [L, W, H]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["iowa-rate-of-flow"] = renderIowaRateOfFlow;
+
 // --- spec-v578 F: Relay pumping max distance ---
 // budget = max_discharge - intake_residual - 0.434*elevation. FL_per_100 = C*(Q/100)^2. max_distance = budget/FL_per_100*100.
 // dims: in { target_flow_gpm: L^3 T^-1, hose_coefficient: dimensionless, max_discharge_psi: M L^-1 T^-2, intake_residual_psi: M L^-1 T^-2, elevation_ft: L } out: { budget_psi: M L^-1 T^-2, fl_per_100_psi: M L^-1 T^-2, max_distance_ft: L }

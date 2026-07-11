@@ -4635,6 +4635,17 @@ export const CITATIONS = {
       { name: "Square-law spacing", value: "FL per 100 ft scales with (Q/100)^2, so doubling the flow quarters the distance", source: "IFSTA / Hazen-Williams family" },
     ],
   },
+  "iowa-rate-of-flow": {
+    formula: "volume_ft3 = length_ft x width_ft x height_ft; total_gal = volume_ft3 / 200; rate_gpm = volume_ft3 / 100.",
+    edition: "Iowa rate-of-flow formula (Royer-Nelson / Iowa State fire behavior), by name.",
+    freeAccess: "The Iowa rate-of-flow formula is public fire-service / fire-behavior training material; incident command governs the actual attack.",
+    governance: GOVERNANCE.general,
+    editionNote: "The Iowa rate-of-flow is a 30-second confined-compartment knockdown burst for a single open area - not a sustained supply, which the NFA (nfa-fireground-flow) and ISO / required-fire-flow methods size and which run much higher for the same footprint. It assumes fog application filling the space and a single undivided volume; the 200-cubic-feet-per-gallon steam basis carries the built-in margin. Incident command governs - a fire-behavior teaching and size-up aid, not a water-supply design.",
+    assumptions: [
+      { name: "Steam basis", value: "one gallon of water controls about 200 ft^3 of compartment (steam heat absorption, with margin)", source: "Royer-Nelson / Iowa State" },
+      { name: "30-second burst", value: "the rate is the control water applied in a 30-second knockdown, so gpm = volume / 100; not a sustained flow", source: "Royer-Nelson / Iowa State" },
+    ],
+  },
   "nfa-fireground-flow": {
     formula: "base = (length x width / 3) x (percent_involved / 100) x floors_involved; exposure = 0.25 x base per exposure; total = base + exposure; valid when percent_involved <= 50 and base <= 1000 gpm.",
     edition: "National Fire Academy fireground fire-flow quick-calc (NFA; IFSTA), by name.",

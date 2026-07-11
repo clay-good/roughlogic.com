@@ -76,6 +76,7 @@ const RELATED = {
   "thrust-block-sizing": ["pipe-expansion-loop", "water-hammer-surge", "colebrook-friction-factor", "hydrant-available-flow"],
   "hydrant-available-flow": ["hydrant-flow", "required-fire-flow", "standpipe-pdp", "thrust-block-sizing"],
   "nfa-fireground-flow": ["required-fire-flow", "iso-nff", "pdp"],
+  "iowa-rate-of-flow": ["nfa-fireground-flow", "required-fire-flow", "iso-nff"],
   "relay-pump-distance": ["reverse-lay-friction", "pdp", "standpipe-pdp"],
   "draft-lift-max": ["relay-pump-distance", "pump-tdh", "npsh-a"],
   "vacuum-lift-reading": ["draft-lift-max", "relay-pump-distance", "pump-tdh"],

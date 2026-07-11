@@ -1926,6 +1926,7 @@ cross-check.
 | calc-fire.js | `computeFoamEductorLimit` | `{ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_...` | _ | _ | _ |
 | calc-fire.js | `computeHydrantAvailableFlow` | `{ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeHydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
+| calc-fire.js | `computeIowaRateOfFlow` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeIsoNeededFireFlow` | `{ area_ft2 = 0, stories = 1, construction_class = 3, occupancy_factor = 1.0, ...` | _ | _ | _ |
 | calc-fire.js | `computeLadderPipeReach` | `{ angle_deg, extension_ft, nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
 | calc-fire.js | `computeMasterStreamReach` | `{ nozzle_type, nozzle_pressure_psi }` | _ | _ | _ |
@@ -2706,7 +2707,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1292.
+Row count: 1293.
 
 <!-- END function-corpus-v14 -->
 
@@ -3418,7 +3419,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (39 tiles)
+### Group F Fire-ground (40 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3435,6 +3436,7 @@ per spec-v14 §13.1 second paragraph.
 | `foam-eductor-limit` | Foam Eductor Back-Pressure / Hose-Lay Limit | IFSTA / eductor manufacturer data (TF...; 200 psi inlet, 95 gpm eductor, C 15.5, 100 psi nozzle, 30... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrant-available-flow` | Hydrant Rated Flow at 20 psi (NFPA 291) | NFPA 291; spec-v389 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `iowa-rate-of-flow` | Iowa Rate-of-Flow (Volume Method) | Iowa rate-of-flow formula (Royer-Nels...; 20 x 30 x 10 ft room = 6,000 ft3 -> 30 gal to control, 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `iso-nff` | ISO Needed Fire Flow | ISO Public Protection Classification ...; 5000 ft^2 / 2 stories / Class 2 / occupancy 1.0 / 50 ft e... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ladder-pipe-reach` | Ladder Pipe Reach | IFSTA Pumping Apparatus / ladder-pipe...; 70 deg / 100 ft extension / smooth_bore_1_75 / 80 psi -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `master-stream` | Master Stream Reach | IFSTA / fire-stream engineering practice; smooth_bore_1_75 / 80 psi -> 90 ft typical reach; pure ta... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -3940,6 +3942,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1048. Fixture-covered or reference-cadence: 1048 / 1048.
+Tile count: 1049. Fixture-covered or reference-cadence: 1049 / 1049.
 
 <!-- END tile-index-v14 -->

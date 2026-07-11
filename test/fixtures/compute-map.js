@@ -883,6 +883,7 @@ export const COMPUTE_MAP = {
   "thrust-block-sizing": { module: "../../calc-plumbing.js", fn: "computeThrustBlockSizing" },
   "hydrant-available-flow": { module: "../../calc-fire.js", fn: "computeHydrantAvailableFlow" },
   "nfa-fireground-flow": { module: "../../calc-fire.js", fn: "computeNfaFiregroundFlow" },
+  "iowa-rate-of-flow": { module: "../../calc-fire.js", fn: "computeIowaRateOfFlow" },
   "relay-pump-distance": { module: "../../calc-fire.js", fn: "computeRelayPumpDistance" },
   "draft-lift-max": { module: "../../calc-fire.js", fn: "computeDraftLiftMax" },
   "vacuum-lift-reading": { module: "../../calc-fire.js", fn: "computeVacuumLiftReading" },

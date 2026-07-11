@@ -19406,3 +19406,29 @@ test("bounds: spec-v600 computeRasSviSettleability pins the Xr ceiling, the retu
   // SVI 500 -> Xr 2,000 mg/L, below the 2,500 mg/L MLSS: cannot thicken.
   assert.ok("error" in _v600({ plant_flow_mgd: 4, mlss_mg_l: 2500, svi_ml_g: 500 }));
 });
+
+import { computeIowaRateOfFlow as _v601 } from "../../calc-fire.js";
+
+test("bounds: spec-v601 computeIowaRateOfFlow pins the volume-to-flow relation, the scaling, and error seams", () => {
+  // Pinned worked example: 20 x 30 x 10 ft room.
+  const r = _v601({ length_ft: 20, width_ft: 30, height_ft: 10 });
+  assert.ok(Math.abs(r.volume_ft3 - 6000) < 1e-9);
+  assert.ok(Math.abs(r.total_gal - 30) < 1e-9);
+  assert.ok(Math.abs(r.rate_gpm - 60) < 1e-9);
+  // rate is always volume / 100 and total is volume / 200 (rate is exactly 2x the total gallons).
+  assert.ok(Math.abs(r.rate_gpm - r.volume_ft3 / 100) < 1e-9);
+  assert.ok(Math.abs(r.total_gal - r.volume_ft3 / 200) < 1e-9);
+  assert.ok(Math.abs(r.rate_gpm - 2 * r.total_gal) < 1e-9);
+  // Cross-check: a small bedroom.
+  const x = _v601({ length_ft: 15, width_ft: 15, height_ft: 8 });
+  assert.ok(Math.abs(x.volume_ft3 - 1800) < 1e-9);
+  assert.ok(Math.abs(x.rate_gpm - 18) < 1e-9);
+  // Flow scales linearly with each dimension.
+  const tall = _v601({ length_ft: 20, width_ft: 30, height_ft: 20 });
+  assert.ok(Math.abs(tall.rate_gpm - 2 * r.rate_gpm) < 1e-9);
+  // Error seams: non-finite, non-positive length / width / height.
+  assert.ok("error" in _v601({ length_ft: Infinity, width_ft: 30, height_ft: 10 }));
+  assert.ok("error" in _v601({ length_ft: 0, width_ft: 30, height_ft: 10 }));
+  assert.ok("error" in _v601({ length_ft: 20, width_ft: 0, height_ft: 10 }));
+  assert.ok("error" in _v601({ length_ft: 20, width_ft: 30, height_ft: 0 }));
+});

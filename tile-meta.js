@@ -584,6 +584,7 @@ const _TILES = [
   ["fan-affinity-laws", "C"], ["pitot-traverse-cfm", "C"], ["outside-air-percent-temps", "C"],
   ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["hydrant-available-flow", "F"],
   ["nfa-fireground-flow", "F"],
+  ["iowa-rate-of-flow", "F"],
   ["relay-pump-distance", "F"],
   ["draft-lift-max", "F"],
   ["vacuum-lift-reading", "F"],

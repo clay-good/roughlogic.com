@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): spec-v601 Iowa rate-of-flow (volume method); 2026-07-10
+
+Lands `iowa-rate-of-flow` (Group F, calc-fire.js), the follow-on spec-v577 named: the Royer-Nelson volume-method fire flow beside the area-based NFA formula. volume = L x W x H; total_gal = volume / 200; rate_gpm = volume / 100 (the 30-second knockdown burst). A 20 x 30 x 10 ft room is 6,000 ft^3 -> 30 gal, 60 gpm (vs the NFA's 200 gpm sustained). Group F audit count 33 -> 34. Catalog 1,048 -> 1,049 (version 0.190.0).
+
 ### feat(wastewater): spec-v600 settleability-based RAS rate from SVI; 2026-07-10
 
 Lands `ras-svi-settleability` (Group M, calc-water.js), the follow-on spec-v571 named: the RAS number from the settleometer, no RAS_SS lab result needed. Xr = 1,000,000 / SVI; R = MLSS / (Xr - MLSS); Q_RAS = R x Q. A good SVI of 100 holding 2,500 mg/L needs a 33% return; a bulking sludge at SVI 150 wanting 3,000 mg/L needs 82%. Group M audit count 28 -> 29. Catalog 1,047 -> 1,048 (version 0.189.0).
