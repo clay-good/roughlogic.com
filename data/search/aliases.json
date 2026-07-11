@@ -81302,6 +81302,56 @@
       "term": "tanker fleet for a target fire flow",
       "target": "tanker-fleet-size",
       "kind": "question"
+    },
+    {
+      "term": "manure cover savings",
+      "target": "manure-cover-savings",
+      "kind": "industry"
+    },
+    {
+      "term": "roof over manure pit",
+      "target": "manure-cover-savings",
+      "kind": "redirect"
+    },
+    {
+      "term": "covered vs open manure",
+      "target": "manure-cover-savings",
+      "kind": "adjacent"
+    },
+    {
+      "term": "manure storage roof",
+      "target": "manure-cover-savings",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rainfall on a manure pit",
+      "target": "manure-cover-savings",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much storage does a manure pit roof save",
+      "target": "manure-cover-savings",
+      "kind": "question"
+    },
+    {
+      "term": "volume saved by roofing a manure pit",
+      "target": "manure-cover-savings",
+      "kind": "question"
+    },
+    {
+      "term": "covered vs open lagoon volume",
+      "target": "manure-cover-savings",
+      "kind": "question"
+    },
+    {
+      "term": "does a roof on a manure pit pay off",
+      "target": "manure-cover-savings",
+      "kind": "question"
+    },
+    {
+      "term": "rainwater kept out of a manure storage",
+      "target": "manure-cover-savings",
+      "kind": "question"
     }
   ]
 }

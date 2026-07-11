@@ -753,6 +753,17 @@ export const CITATIONS = {
       { name: "P over-application", value: "an N-based rate usually over-applies phosphorus; the plan governs", source: "scope of this tile" },
     ],
   },
+  "manure-cover-savings": {
+    formula: "open = (daily_manure + wastewater + bedding) x days + area x (net_precip + storm)/12 + area x freeboard/12; roof_saving = area x (net_precip + storm)/12; covered = open - roof_saving; percent_saved = roof_saving / open x 100.",
+    edition: "Manure storage covered-vs-open comparison (USDA-NRCS Conservation Practice 313 waste storage facility), by name.",
+    freeAccess: "NRCS Conservation Practice Standard 313 is public federal guidance; the engineer or planner governs the actual design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The roof saving is the net precipitation and the 25-year, 24-hour storm the open facility must otherwise bank on its own surface. The freeboard is held the same in both cases (a conservatism - a roofed structure can often carry less). The saving is clean rainwater the operation also avoids hauling and land-applying, so the payback is both smaller storage and less spreading. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",
+    assumptions: [
+      { name: "Roof removes rain", value: "a roof eliminates the area x (net_precip + storm)/12 term the open facility carries", source: "USDA-NRCS 313" },
+      { name: "Freeboard held equal", value: "freeboard is kept the same in both cases (conservative; a roofed structure can often carry less)", source: "USDA-NRCS 313" },
+    ],
+  },
   "manure-storage-volume": {
     formula: "manure_volume = (daily_manure + wastewater + bedding) x storage_days; precip_storm_volume = surface_area x (net_precip + storm) / 12; freeboard_volume = surface_area x freeboard_in / 12; total = the sum.",
     edition: "NRCS Conservation Practice Standard 313 / ASABE D384 manure production, by name.",

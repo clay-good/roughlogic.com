@@ -2756,3 +2756,64 @@ function _v582renderManureStorageVolume(inputRegion, outputRegion, citationEl) {
   for (const f of [manure, ww, bed, days, area, precip, storm, fb]) f.input.addEventListener("input", update);
 }
 AGRICULTURE_RENDERERS["manure-storage-volume"] = _v582renderManureStorageVolume;
+
+// --- spec-v606 L: Manure storage covered-vs-open roof savings ---
+// open = (manure+ww+bed)*days + area*(precip+storm)/12 + area*fb/12. roof_saving = area*(precip+storm)/12. covered = open - roof_saving.
+// dims: in { daily_manure_ft3: L^3 T^-1, wastewater_ft3: L^3 T^-1, bedding_ft3: L^3 T^-1, storage_days: T, surface_area_ft2: L^2, net_precip_in: L, storm_in: L, freeboard_in: L } out: { open_ft3: L^3, covered_ft3: L^3, roof_saving_ft3: L^3, roof_saving_gal: L^3, percent_saved: dimensionless }
+export function computeManureCoverSavings({ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0, surface_area_ft2 = 0, net_precip_in = 0, storm_in = 0, freeboard_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const manure = Number(daily_manure_ft3) || 0;
+  const ww = Number(wastewater_ft3) || 0;
+  const bed = Number(bedding_ft3) || 0;
+  const days = Number(storage_days) || 0;
+  const area = Number(surface_area_ft2) || 0;
+  const precip = Number(net_precip_in) || 0;
+  const storm = Number(storm_in) || 0;
+  const fb = Number(freeboard_in) || 0;
+  if (!(manure > 0)) return { error: "Daily manure production must be positive (ft3/day)." };
+  if (!(days > 0)) return { error: "Storage period must be positive (days)." };
+  if (!(area > 0)) return { error: "Surface area must be positive (ft2) - there is nothing for a roof to cover." };
+  if (ww < 0 || bed < 0) return { error: "Added wastewater and bedding cannot be negative (ft3/day)." };
+  if (precip < 0 || storm < 0) return { error: "Net precipitation and storm depth cannot be negative (in)." };
+  if (fb < 0) return { error: "Freeboard cannot be negative (in)." };
+  const manure_volume_ft3 = (manure + ww + bed) * days;
+  const roof_saving_ft3 = area * (precip + storm) / 12;
+  const freeboard_ft3 = area * fb / 12;
+  const open_ft3 = manure_volume_ft3 + roof_saving_ft3 + freeboard_ft3;
+  const covered_ft3 = open_ft3 - roof_saving_ft3;
+  const roof_saving_gal = roof_saving_ft3 * 7.48052;
+  const percent_saved = open_ft3 > 0 ? roof_saving_ft3 / open_ft3 * 100 : 0;
+  return {
+    open_ft3, covered_ft3, roof_saving_ft3, roof_saving_gal, percent_saved,
+    note: "The roof saving is the net precipitation and the 25-year, 24-hour storm the open facility must otherwise bank on its own surface. The freeboard is held the same in both cases (a conservatism - a roofed structure can often carry less). The saving is clean rainwater the operation also avoids hauling and land-applying, so the payback is both smaller storage and less spreading. NRCS 313 and the engineer/planner govern - a planning aid, not the engineer of record.",
+  };
+}
+export const manureCoverSavingsExample = { inputs: { daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 } };
+function _v606renderManureCoverSavings(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: manure storage covered-vs-open comparison (USDA-NRCS Conservation Practice 313 waste storage facility), by name. open = (manure + wastewater + bedding) x days + area x (net_precip + storm)/12 + area x freeboard/12; roof_saving = area x (net_precip + storm)/12; covered = open - roof_saving. The roof saving is the net precipitation and the 25-year, 24-hour storm the open facility must otherwise bank on its own surface; the freeboard is held the same in both cases. The saving is clean rainwater the operation also avoids hauling.";
+  const manure = makeNumber("Daily manure (ft3/day)", "mcs-manure", { step: "any", min: "0", value: "150" }); manure.input.value = "150";
+  const ww = makeNumber("Added wastewater (ft3/day)", "mcs-ww", { step: "any", min: "0", value: "0" }); ww.input.value = "0";
+  const bed = makeNumber("Added bedding (ft3/day)", "mcs-bed", { step: "any", min: "0", value: "20" }); bed.input.value = "20";
+  const days = makeNumber("Storage period (days)", "mcs-days", { step: "any", min: "0", value: "120" }); days.input.value = "120";
+  const area = makeNumber("Surface / roof area (ft2)", "mcs-area", { step: "any", min: "0", value: "8000" }); area.input.value = "8000";
+  const precip = makeNumber("Net precipitation over the period (in)", "mcs-precip", { step: "any", min: "0", value: "6" }); precip.input.value = "6";
+  const storm = makeNumber("25-yr 24-hr storm depth (in)", "mcs-storm", { step: "any", min: "0", value: "4" }); storm.input.value = "4";
+  const fb = makeNumber("Freeboard (in: 6 vertical wall, 12 other)", "mcs-fb", { step: "any", min: "0", value: "12" }); fb.input.value = "12";
+  for (const f of [manure, ww, bed, days, area, precip, storm, fb]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { manure.input.value = "150"; ww.input.value = "0"; bed.input.value = "20"; days.input.value = "120"; area.input.value = "8000"; precip.input.value = "6"; storm.input.value = "4"; fb.input.value = "12"; update(); });
+  const oOpen = makeOutputLine(outputRegion, "Open facility volume", "mcs-out-open");
+  const oCovered = makeOutputLine(outputRegion, "Covered (roofed) volume", "mcs-out-covered");
+  const oSave = makeOutputLine(outputRegion, "Volume a roof saves", "mcs-out-save");
+  const oNote = makeOutputLine(outputRegion, "Note", "mcs-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeManureCoverSavings({ daily_manure_ft3: readNum(manure.input), wastewater_ft3: readNum(ww.input), bedding_ft3: readNum(bed.input), storage_days: readNum(days.input), surface_area_ft2: readNum(area.input), net_precip_in: readNum(precip.input), storm_in: readNum(storm.input), freeboard_in: readNum(fb.input) });
+    if (r.error) { oOpen.textContent = r.error; oCovered.textContent = "-"; oSave.textContent = "-"; oNote.textContent = ""; return; }
+    oOpen.textContent = fmt(r.open_ft3, 0) + " ft3";
+    oCovered.textContent = fmt(r.covered_ft3, 0) + " ft3";
+    oSave.textContent = fmt(r.roof_saving_ft3, 0) + " ft3 (" + fmt(r.roof_saving_gal, 0) + " gal, " + fmt(r.percent_saved, 0) + "% of the facility)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [manure, ww, bed, days, area, precip, storm, fb]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["manure-cover-savings"] = _v606renderManureCoverSavings;

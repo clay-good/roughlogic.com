@@ -138,6 +138,7 @@ const RELATED = {
   "pivot-timer-depth": ["center-pivot-runtime", "pivot-application-rate", "irrigation-requirement"],
   "grain-aeration-airflow": ["grain-drying-energy", "grain-bin-capacity", "center-pivot-runtime"],
   "manure-storage-volume": ["manure-application-rate", "manure-nutrient-application", "grain-bin-capacity"],
+  "manure-cover-savings": ["manure-storage-volume", "manure-application-rate", "manure-nutrient-application"],
   "two-stroke-mix": ["gpa-rate", "tank-mix", "fuel-range"],
   "hp-from-torque": ["displacement-cr", "prop-slip", "tire-gearing"],
   "volumetric-efficiency": ["displacement-cr", "hp-from-torque", "prop-slip"],

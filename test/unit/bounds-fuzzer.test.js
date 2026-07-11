@@ -19560,3 +19560,34 @@ test("bounds: spec-v605 computeTankerFleetSize pins the bottleneck, the fleet th
   assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 0, speed_mph: 35 }));
   assert.ok("error" in _v605({ tank_gal: 3000, fill_gpm: 1000, dump_gpm: 1000, distance_mi: 2, speed_mph: 0 }));
 });
+
+import { computeManureCoverSavings as _v606 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v606 computeManureCoverSavings pins the open/covered/saving, the precip-term identity, wetter-pays-more, and error seams", () => {
+  // Pinned worked example: 8,000 ft2 pit, 6-in net precip + 4-in storm.
+  const r = _v606({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 6, storm_in: 4, freeboard_in: 12 });
+  assert.ok(Math.abs(r.open_ft3 - 35066.666667) < 1e-4);
+  assert.ok(Math.abs(r.roof_saving_ft3 - 6666.666667) < 1e-4);
+  assert.ok(Math.abs(r.covered_ft3 - (r.open_ft3 - r.roof_saving_ft3)) < 1e-9);
+  assert.ok(Math.abs(r.roof_saving_gal - 6666.666667 * 7.48052) < 1e-2);
+  assert.ok(Math.abs(r.percent_saved - 19.011407) < 1e-4);
+  // The roof saving is exactly the precip+storm term: area x (precip + storm)/12.
+  assert.ok(Math.abs(r.roof_saving_ft3 - 8000 * (6 + 4) / 12) < 1e-9);
+  // Cross-check: a wetter climate and a bigger pit save more, both absolutely and as a percent.
+  const x = _v606({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 12000, net_precip_in: 10, storm_in: 5, freeboard_in: 12 });
+  assert.ok(Math.abs(x.roof_saving_ft3 - 15000) < 1e-9);
+  assert.ok(Math.abs(x.open_ft3 - 47400) < 1e-9);
+  assert.ok(x.roof_saving_ft3 > r.roof_saving_ft3);
+  assert.ok(x.percent_saved > r.percent_saved);
+  // With no rain and no storm, a roof saves nothing (covered equals open).
+  const dry = _v606({ daily_manure_ft3: 150, wastewater_ft3: 0, bedding_ft3: 20, storage_days: 120, surface_area_ft2: 8000, net_precip_in: 0, storm_in: 0, freeboard_in: 12 });
+  assert.equal(dry.roof_saving_ft3, 0);
+  assert.ok(Math.abs(dry.covered_ft3 - dry.open_ft3) < 1e-9);
+  // Error seams: non-finite, non-positive manure / days / area, negative added / precip / storm / freeboard.
+  assert.ok("error" in _v606({ daily_manure_ft3: Infinity, storage_days: 120, surface_area_ft2: 8000 }));
+  assert.ok("error" in _v606({ daily_manure_ft3: 0, storage_days: 120, surface_area_ft2: 8000 }));
+  assert.ok("error" in _v606({ daily_manure_ft3: 150, storage_days: 0, surface_area_ft2: 8000 }));
+  assert.ok("error" in _v606({ daily_manure_ft3: 150, storage_days: 120, surface_area_ft2: 0 }));
+  assert.ok("error" in _v606({ daily_manure_ft3: 150, storage_days: 120, surface_area_ft2: 8000, net_precip_in: -1 }));
+  assert.ok("error" in _v606({ daily_manure_ft3: 150, storage_days: 120, surface_area_ft2: 8000, freeboard_in: -1 }));
+});

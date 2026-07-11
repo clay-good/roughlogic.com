@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): spec-v606 manure storage covered-vs-open roof savings; 2026-07-10
+
+Lands `manure-cover-savings` (Group L, calc-agriculture.js), the follow-on spec-v582 named: the storage a roof buys back. roof_saving = area x (net_precip + storm)/12 - the whole rainfall term an open pit banks on its own surface. An 8,000 ft2 pit in a 10-in wet season saves 6,667 ft3 (~50,000 gal, 19%); a bigger pit in a wetter climate saves a third. Group L audit count 29 -> 30. Catalog 1,053 -> 1,054 (version 0.195.0).
+
 ### feat(fire): spec-v605 tanker shuttle fill-site-limited fleet size; 2026-07-10
 
 Lands `tanker-fleet-size` (Group F, calc-fire.js), the follow-on spec-v580 named: how many tankers is enough. bottleneck = max(tank/fill_gpm, tank/dump_gpm); fleet = ceil(cycle / bottleneck); ceiling flow = tank / bottleneck. A 3,000-gal operation at 1,000 gpm fill and dump over a 2-mile haul needs 5 tankers to reach its 1,000-gpm ceiling; a sixth just queues. Completes the rural water-shuttle trio. Group F audit count 34 -> 35. Catalog 1,052 -> 1,053 (version 0.194.0).

@@ -113,6 +113,7 @@ const _TILES = [
   ["pivot-timer-depth", "L"],
   ["grain-aeration-airflow", "L"],
   ["manure-storage-volume", "L"],
+  ["manure-cover-savings", "L"],
   ["two-stroke-mix", "L"],
   ["hp-from-torque", "K"],
   ["volumetric-efficiency", "K"],

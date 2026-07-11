@@ -899,6 +899,7 @@ const TOOL_MODULES = (() => {
     "grain-aeration-airflow",
     // spec-v582
     "manure-storage-volume",
+    "manure-cover-savings",
     // v35
     "two-stroke-mix",
     // v84 sprayer nozzle / drift / field capacity
