@@ -41161,6 +41161,84 @@
    }
   },
   {
+   "tile_id": "level-loop-adjustment",
+   "source_publisher": "Compass-rule level-loop adjustment (Ghilani/Wolf)",
+   "source_title": "3-leg loop 0.05 ft high over 2,000 ft -> distance-weighted corrections, last point closes to 100.00 ft",
+   "source_edition_or_year": "spec-v631 worked example (machine-verified)",
+   "source_section_or_page": "spec-v631 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "elevs": [
+     105.2,
+     108.6,
+     100.05
+    ],
+    "dists": [
+     500,
+     800,
+     700
+    ],
+    "known_close": 100.0
+   },
+   "outputs": {
+    "misclosure": {
+     "value": 0.05,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "total_dist": {
+     "value": 2000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "last_adjusted": {
+     "value": 100.0,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "level-loop-adjustment",
+   "source_publisher": "Compass-rule level-loop adjustment (Ghilani/Wolf)",
+   "source_title": "cross-check: a loop that already closes (last computed = known) has zero misclosure and no correction",
+   "source_edition_or_year": "spec-v631 worked example (machine-verified)",
+   "source_section_or_page": "spec-v631 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "elevs": [
+     105.2,
+     108.6,
+     100.0
+    ],
+    "dists": [
+     500,
+     800,
+     700
+    ],
+    "known_close": 100.0
+   },
+   "outputs": {
+    "misclosure": {
+     "value": 0.0,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "last_adjusted": {
+     "value": 100.0,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "stadia-distance",
    "source_publisher": "Stadia tacheometry (K = 100)",
    "source_title": "1.50 ft interval at +5 deg, sta 500 / HI 4.50 / rod 5.20 -> H 148.86, V 13.02, elev 512.32",

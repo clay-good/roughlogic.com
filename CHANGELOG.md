@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): spec-v631 level-loop misclosure distribution (compass rule); 2026-07-11
+
+Lands `level-loop-adjustment` (Group P, calc-survey.js), the adjustment-distribution follow-on spec-v311 named inside `differential-leveling` ("a proportional adjustment is a follow-on"). Correction to each turning point = -misclosure x (distance leveled to it / total distance) - the vertical analog of the compass rule the `traverse-closure` tile applies to horizontal work. A three-leg loop closing 0.05 ft high over 2,000 ft puts -0.0125 ft on the first point at 500 ft and the full -0.05 ft on the last, so the adjusted elevations land exactly on the known benchmark. Pure distance-weighted arithmetic, no constants. Raises the calc-survey.js gzip cap 8,000 -> 9,000 (array in/out renderer). Catalog 1,078 -> 1,079 (version 0.220.0).
+
 ### feat(plumbing): spec-v630 tank drain time (falling-head orifice); 2026-07-11
 
 Lands `tank-drain-time` (Group B, calc-plumbing.js), the falling-head follow-on spec-v303 named inside `orifice-flow` ("the time-to-drain is a follow-on"). Integrating the orifice equation over the falling head of a prismatic tank gives t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2. A 100 ft^2 tank draining a 6 in orifice empties from 9 ft in 10.6 min, but reaches the last foot in only 7.1 - the flow slows as sqrt(h), so the final foot alone takes another 3.5. Pure Torricelli integration; g universal and Cd the same user-entered coefficient orifice-flow uses. Catalog 1,077 -> 1,078 (version 0.219.0).

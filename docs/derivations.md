@@ -2625,6 +2625,7 @@ cross-check.
 | calc-steel.js | `computeSteelWebLocalStrength` | `{ fy = 50, tw = 0, tf = 0, k_in = 0, d_in = 0, lb_in = 0, location = "interio...` | _ | _ | _ |
 | calc-survey.js | `computeAreaByCoordinates` | `{ points } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDifferentialLeveling` | `{ bm_elev = 0, bs, fs, known_close = null } = {}` | _ | _ | _ |
+| calc-survey.js | `computeLevelLoopAdjustment` | `{ elevs, dists, known_close = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeTapingCorrections` | `{ l_ft = 0, t_f = 68, t0_f = 68, h_ft = 0, p_lb = 0, p0_lb = 0, a_in2 = 0, w_...` | _ | _ | _ |
 | calc-survey.js | `computeTraverseClosure` | `{ courses, n0 = 0, e0 = 0 } = {}` | _ | _ | _ |
@@ -2736,7 +2737,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1322.
+Row count: 1323.
 
 <!-- END function-corpus-v14 -->
 
@@ -3821,7 +3822,7 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (19 tiles)
+### Group P Field (20 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3830,6 +3831,7 @@ per spec-v14 §13.1 second paragraph.
 | `bearing-conversion` | Magnetic Declination and Bearing Conversion | Project (first-principles); true = magnetic + east declination = 280 + 12 = 292 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `differential-leveling` | Differential Leveling (HI Method) and Loop Misclosure | Height-of-instrument leveling (Ghilan...; spec-v311 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hiking-time` | Hiking Time (Naismith's Rule) | Naismith's rule (W. W. Naismith, 1892); 10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `level-loop-adjustment` | Level-Loop Misclosure Distribution (Compass Rule) | Compass-rule level-loop adjustment (G...; spec-v631 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `lightning-countdown` | Lightning 30-30 Rule Countdown | NOAA / NWS; Public NWS lightning-safety guideline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `magnetic-declination` | Magnetic Declination (WMM2025) | NOAA NCEI; Bundled at data/field/wmm/coefficients.json (verbatim fro... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pacing-distance` | Pacing and Distance | Project (first-principles); 100 ft over 38 paces / 120 current paces / flat -> pace 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4000,6 +4002,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1078. Fixture-covered or reference-cadence: 1078 / 1078.
+Tile count: 1079. Fixture-covered or reference-cadence: 1079 / 1079.
 
 <!-- END tile-index-v14 -->

@@ -856,6 +856,7 @@ export const COMPUTE_MAP = {
   "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", fn: "computeBoussinesqSurchargeWall" },
   // spec-v311..v313 field-surveying depth batch (3 tiles)
   "differential-leveling": { module: "../../calc-survey.js", fn: "computeDifferentialLeveling" },
+  "level-loop-adjustment": { module: "../../calc-survey.js", fn: "computeLevelLoopAdjustment" },
   "stadia-distance": { module: "../../calc-survey.js", fn: "computeStadiaDistance" },
   "taping-corrections": { module: "../../calc-survey.js", fn: "computeTapingCorrections" },
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)

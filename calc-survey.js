@@ -277,6 +277,51 @@ function renderDifferentialLeveling(inputRegion, outputRegion, citationEl) {
 }
 SURVEY_RENDERERS["differential-leveling"] = renderDifferentialLeveling;
 
+// dims: in { elevs: dimensionless, dists: dimensionless, known_close: L } out: { misclosure: L, total_dist: L, last_adjusted: L }
+export function computeLevelLoopAdjustment({ elevs, dists, known_close = 0 } = {}) {
+  const _g = _finiteGuard({ known_close }); if (_g) return _g;
+  if (!Array.isArray(elevs) || !Array.isArray(dists)) return { error: "Elevations and distances must be lists." };
+  if (elevs.length < 1) return { error: "Need at least one turning point." };
+  if (elevs.length !== dists.length) return { error: "Each point needs one elevation and one leg distance (equal counts)." };
+  for (const v of [...elevs, ...dists]) { if (!Number.isFinite(v)) return { error: "Every elevation and distance must be a finite number." }; }
+  for (const d of dists) { if (!(d > 0)) return { error: "Each leg distance must be positive (ft)." }; }
+  const cum = [];
+  let s = 0;
+  for (const d of dists) { s += d; cum.push(s); }
+  const total_dist = s;
+  const misclosure = elevs[elevs.length - 1] - known_close;
+  const corrections = cum.map((c) => -misclosure * (c / total_dist));
+  const adjusted = elevs.map((e, i) => e + corrections[i]);
+  return {
+    misclosure, total_dist, cum, corrections, adjusted, last_adjusted: adjusted[adjusted.length - 1],
+    note: "Compass-rule (distance-weighted) level-loop adjustment: the misclosure = last computed elevation - known closing elevation is distributed to each turning point as correction = -misclosure x (cumulative distance to the point / total distance), so the correction grows with the distance leveled and the last point takes the full correction and closes exactly on its known elevation. This is the vertical analog of the compass rule used for horizontal traverses; it assumes error accumulates with the length leveled (equal-weight per setup is an alternative), the rod readings are already corrected, and the loop is one continuous run. A computational aid; the project survey control and specifications govern.",
+  };
+}
+export const levelLoopAdjustmentExample = { inputs: { elevs: [105.20, 108.60, 100.05], dists: [500, 800, 700], known_close: 100.00 } };
+function renderLevelLoopAdjustment(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: compass-rule (distance-weighted) level-loop adjustment, correction = -misclosure x cumulative-distance / total-distance, per the standard surveying references (Ghilani/Wolf), by name. The vertical analog of the horizontal compass rule; the project control and specs govern.";
+  const elevs = makeTextarea("Computed elevations, one per line (ft; last = closing point)", "lla-elevs", { rows: "3" }); elevs.input.value = "105.20\n108.60\n100.05";
+  const dists = makeTextarea("Leg distance to each point, one per line (ft)", "lla-dists", { rows: "3" }); dists.input.value = "500\n800\n700";
+  const kc = makeNumber("Known closing elevation (ft)", "lla-kc", { step: "any" }); kc.input.value = "100.00";
+  for (const f of [elevs, dists, kc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { elevs.input.value = "105.20\n108.60\n100.05"; dists.input.value = "500\n800\n700"; kc.input.value = "100.00"; update(); });
+  const oMis = makeOutputLine(outputRegion, "Misclosure", "lla-out-mis");
+  const oAdj = makeOutputLine(outputRegion, "Adjusted elevations", "lla-out-adj");
+  const oNote = makeOutputLine(outputRegion, "Note", "lla-out-note");
+  function parseNums(text) { const out = []; for (const raw of String(text).split("\n")) { const line = raw.trim(); if (!line) continue; const v = Number(line); if (!Number.isFinite(v)) return null; out.push(v); } return out; }
+  const update = debounce(() => {
+    const eArr = parseNums(elevs.input.value), dArr = parseNums(dists.input.value);
+    if (eArr === null || dArr === null) { oMis.textContent = "Each elevation and distance must be a finite number, one per line."; oAdj.textContent = "-"; oNote.textContent = "-"; return; }
+    const r = computeLevelLoopAdjustment({ elevs: eArr, dists: dArr, known_close: Number(kc.input.value) || 0 });
+    if (r.error) { oMis.textContent = r.error; oAdj.textContent = "-"; oNote.textContent = "-"; return; }
+    oMis.textContent = fmt(r.misclosure, 3) + " ft over " + fmt(r.total_dist, 0) + " ft leveled";
+    oAdj.textContent = r.adjusted.map((a) => fmt(a, 4)).join(", ") + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [elevs.input, dists.input, kc.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["level-loop-adjustment"] = renderLevelLoopAdjustment;
+
 // dims: in { s_ft: L, theta_deg: dimensionless, k_f: dimensionless, hi_ft: L, rod_ft: L, sta_elev: L } out: { h_ft: L, v_ft: L, elev_ft: L }
 export function computeStadiaDistance({ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

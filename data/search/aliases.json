@@ -82542,6 +82542,56 @@
       "term": "drain down time for a detention pond orifice",
       "target": "tank-drain-time",
       "kind": "question"
+    },
+    {
+      "term": "level loop adjustment",
+      "target": "level-loop-adjustment",
+      "kind": "industry"
+    },
+    {
+      "term": "misclosure distribution",
+      "target": "level-loop-adjustment",
+      "kind": "industry"
+    },
+    {
+      "term": "balance a level loop",
+      "target": "level-loop-adjustment",
+      "kind": "redirect"
+    },
+    {
+      "term": "compass rule leveling",
+      "target": "level-loop-adjustment",
+      "kind": "redirect"
+    },
+    {
+      "term": "distribute leveling error",
+      "target": "level-loop-adjustment",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how do i distribute a level loop misclosure",
+      "target": "level-loop-adjustment",
+      "kind": "question"
+    },
+    {
+      "term": "adjust benchmark elevations to close a loop",
+      "target": "level-loop-adjustment",
+      "kind": "question"
+    },
+    {
+      "term": "compass rule for differential leveling",
+      "target": "level-loop-adjustment",
+      "kind": "question"
+    },
+    {
+      "term": "spread leveling error across turning points",
+      "target": "level-loop-adjustment",
+      "kind": "question"
+    },
+    {
+      "term": "balance a level circuit to the known elevation",
+      "target": "level-loop-adjustment",
+      "kind": "question"
     }
   ]
 }

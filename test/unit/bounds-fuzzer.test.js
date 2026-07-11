@@ -20329,3 +20329,28 @@ test("bounds: spec-v630 computeTankDrainTime pins the falling-head drain time, t
   assert.ok("error" in _v630({ tank_area_ft2: 100, d_in: 6, cd: 0.6, h1_ft: 5, h2_ft: 5 }));
   assert.ok("error" in _v630({ tank_area_ft2: Infinity, d_in: 6, cd: 0.6, h1_ft: 9 }));
 });
+
+import { computeLevelLoopAdjustment as _v631 } from "../../calc-survey.js";
+
+test("bounds: spec-v631 computeLevelLoopAdjustment pins the misclosure distribution, the exact-closure property, the zero-misclosure case, and error seams", () => {
+  const r = _v631({ elevs: [105.20, 108.60, 100.05], dists: [500, 800, 700], known_close: 100.00 });
+  assert.ok(Math.abs(r.misclosure - 0.05) < 1e-9);
+  assert.equal(r.total_dist, 2000);
+  assert.ok(Math.abs(r.adjusted[0] - 105.1875) < 1e-9);
+  assert.ok(Math.abs(r.adjusted[1] - 108.5675) < 1e-9);
+  // The last point takes the full correction and closes exactly on the known elevation.
+  assert.ok(Math.abs(r.last_adjusted - 100.00) < 1e-9);
+  assert.ok(Math.abs(r.corrections[r.corrections.length - 1] - (-r.misclosure)) < 1e-9);
+  // A loop that already closes has zero misclosure and leaves the elevations unchanged.
+  const clean = _v631({ elevs: [105.20, 108.60, 100.00], dists: [500, 800, 700], known_close: 100.00 });
+  assert.ok(Math.abs(clean.misclosure) < 1e-9);
+  assert.ok(Math.abs(clean.adjusted[0] - 105.20) < 1e-9);
+  // Error seams: mismatched counts, empty, non-positive distance, non-finite, not-a-list.
+  assert.ok("error" in _v631({ elevs: [1, 2], dists: [500], known_close: 0 }));
+  assert.ok("error" in _v631({ elevs: [], dists: [], known_close: 0 }));
+  assert.ok("error" in _v631({ elevs: [1, 2], dists: [500, 0], known_close: 0 }));
+  assert.ok("error" in _v631({ elevs: [1, 2], dists: [500, -1], known_close: 0 }));
+  assert.ok("error" in _v631({ elevs: [1, NaN], dists: [500, 600], known_close: 0 }));
+  assert.ok("error" in _v631({ elevs: [1, 2], dists: [500, 600], known_close: Infinity }));
+  assert.ok("error" in _v631({ elevs: "nope", dists: [500], known_close: 0 }));
+});

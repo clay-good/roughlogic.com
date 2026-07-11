@@ -10281,6 +10281,17 @@ export const CITATIONS = {
       { name: "No adjustment", value: "the misclosure is not distributed back through the turning points here", source: "scope of this tile" },
     ],
   },
+  "level-loop-adjustment": {
+    formula: "misclosure = last_elev - known_close; cum_i = sum(dists[0..i]); correction_i = -misclosure x cum_i / cum_total; adjusted_i = elev_i + correction_i.",
+    edition: "The compass-rule (distance-weighted) distribution of a level-loop misclosure, the vertical analog of the horizontal compass rule, as compiled in the standard surveying references (Ghilani/Wolf, Elementary Surveying), by name.",
+    freeAccess: "The compass-rule adjustment is a public surveying result; FM 5-233 (Construction Surveying) is a public-domain US Government reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "The compass-rule level-loop adjustment: the misclosure = last computed elevation - known closing elevation is distributed to each turning point as correction = -misclosure x (cumulative distance to the point / total distance), so the correction grows with the distance leveled and the last point takes the full correction and closes exactly on its known elevation, as compiled in the standard surveying references. This is the vertical analog of the horizontal compass rule; it assumes the error accumulates with the length leveled (equal-weight-per-setup is an alternative weighting), the rod readings are already corrected, and the loop is one continuous run. A computational aid; the project survey control and specifications govern.",
+    assumptions: [
+      { name: "Distance weighting", value: "correction proportional to the cumulative distance leveled to each point; the last point takes the full misclosure and closes exactly", source: "compass rule (Ghilani/Wolf)" },
+      { name: "Single loop", value: "one continuous level run with corrected rod readings; a network needs a least-squares adjustment", source: "scope of this tile" },
+    ],
+  },
   "stadia-distance": {
     formula: "H = K s cos^2(theta); V = K s cos(theta) sin(theta) = (K s/2) sin(2 theta); elevation = station_elev + HI + V - rod_center. (K = 100)",
     edition: "The stadia-tacheometry distance and elevation reduction with the standard interval factor K = 100, as compiled in the standard surveying references, by name.",

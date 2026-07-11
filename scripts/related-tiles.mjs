@@ -1235,6 +1235,7 @@ const RELATED = {
   "boussinesq-surcharge-wall": ["lateral-earth-pressure","retaining-wall-stability","footing-eccentric-pressure"],
   // spec-v311..v313 field-surveying depth batch (Group P)
   "differential-leveling": ["traverse-closure","stadia-distance","drainage-invert"],
+  "level-loop-adjustment": ["differential-leveling","traverse-closure","stadia-distance"],
   "stadia-distance": ["differential-leveling","pacing-distance","traverse-closure"],
   "taping-corrections": ["differential-leveling","stadia-distance","traverse-closure"],
   // spec-v314..v316 steel beam-column-and-connection depth batch (Group E)
