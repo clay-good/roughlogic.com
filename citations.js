@@ -10045,6 +10045,17 @@ export const CITATIONS = {
       { name: "No seepage", value: "dry slope or water table below the plane; steady-seepage and seismic cases are separate", source: "scope of this tile" },
     ],
   },
+  "slope-stability-seepage": {
+    formula: "driving = gamma_sat H sin(beta) cos(beta); resisting = c' + (gamma_sat - 62.4) H cos^2(beta) tan(phi'); FS = resisting / driving. (c' = 0 gives FS = ((gamma_sat - 62.4)/gamma_sat) tan(phi')/tan(beta))",
+    edition: "The infinite-slope stability model with steady slope-parallel seepage on an effective-stress basis, as compiled in Das (Principles of Geotechnical Engineering) and the NAVFAC DM-7 slope-stability references, by name.",
+    freeAccess: "NAVFAC DM-7 is public-domain and free online; the seepage infinite-slope relations are public in the standard geotechnical texts; gamma_w = 62.4 pcf fresh water.",
+    governance: GOVERNANCE.general,
+    editionNote: "The infinite-slope factor of safety with steady seepage parallel to the slope and the water table at the surface, FS = (c' + (gamma_sat - gamma_w) H cos^2(beta) tan(phi')) / (gamma_sat H sin(beta) cos(beta)) with gamma_w = 62.4 pcf, and its cohesionless reduction FS = ((gamma_sat - gamma_w)/gamma_sat) tan(phi')/tan(beta), as compiled in the Das and NAVFAC slope-stability references. The pore pressure cuts the friction term to the buoyant weight while the driving weight stays saturated, so seepage roughly halves the cohesionless factor of safety versus the dry value (shown for contrast). Shallow translational slide, uniform infinite slope, drained effective-stress parameters, no seismic loading - not a circular Bishop/Spencer analysis; a working subdrain that relieves the seepage restores the dry value. A design/screening aid, not a substitute for a geotechnical engineer's stability analysis.",
+    assumptions: [
+      { name: "Steady seepage at the surface", value: "the water table is at the slope surface with flow parallel to it (worst case); the friction term uses the buoyant weight gamma_sat - gamma_w while the driving term uses gamma_sat", source: "infinite-slope seepage model (Das / NAVFAC)" },
+      { name: "Cohesionless halving", value: "c' = 0 gives FS = ((gamma_sat - gamma_w)/gamma_sat) tan(phi')/tan(beta), about half the dry value for common soils", source: "infinite-slope seepage model" },
+    ],
+  },
   "relative-compaction": {
     formula: "gd_field = wet / (1 + w/100); RC = gd_field / max x 100; pass when RC >= spec.",
     edition: "The relative-compaction relation RC = (gamma_d,field / gamma_d,max) x 100 with the moisture-back-out of field dry density and the ASTM D698/D1557 Proctor basis, a standard earthwork-QC result, by name.",

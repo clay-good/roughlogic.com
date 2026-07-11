@@ -809,6 +809,7 @@ export const COMPUTE_MAP = {
   "soil-settlement-elastic": { module: "../../calc-geotech.js", fn: "computeSoilSettlementElastic" },
   "pile-axial-capacity": { module: "../../calc-geotech.js", fn: "computePileAxialCapacity" },
   "slope-stability-infinite": { module: "../../calc-geotech.js", fn: "computeSlopeStabilityInfinite" },
+  "slope-stability-seepage": { module: "../../calc-geotech.js", fn: "computeSlopeStabilitySeepage" },
   // spec-v290..v292 NDS wood-member depth batch (3 tiles)
   "wood-bearing-perpendicular": { module: "../../calc-construction.js", fn: "computeWoodBearingPerpendicular" },
   "wood-tension-member": { module: "../../calc-construction.js", fn: "computeWoodTensionMember" },

@@ -1998,6 +1998,7 @@ cross-check.
 | calc-geotech.js | `computePileGroupEfficiency` | `{ rows_n = 0, cols_m = 0, diameter_in = 0, spacing_in = 0, single_allow_kip =...` | _ | _ | _ |
 | calc-geotech.js | `computeRetainingWallStability` | `{ h_ft = 0, b_ft = 0, t_base = 0, t_stem = 0, toe_ft = 0, gamma_s = 110, gamm...` | _ | _ | _ |
 | calc-geotech.js | `computeSlopeStabilityInfinite` | `{ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, h_ft = 0 } = {}` | _ | _ | _ |
+| calc-geotech.js | `computeSlopeStabilitySeepage` | `{ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_sat = 125, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSlopedBackfillEarthPressure` | `{ phi = 0, beta = 0, gamma = 120, h_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeSoilBearingCapacity` | `{ c = 0, phi = 0, gamma = 120, b_ft = 0, df_ft = 0, shape = "strip", fs = 3 }...` | _ | _ | _ |
 | calc-geotech.js | `computeSoilConsolidationSettlement` | `{ cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0, dsig_psf = 0 } = {}` | _ | _ | _ |
@@ -2732,7 +2733,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1318.
+Row count: 1319.
 
 <!-- END function-corpus-v14 -->
 
@@ -3224,7 +3225,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (227 tiles)
+### Group E Construction (228 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3384,6 +3385,7 @@ per spec-v14 §13.1 second paragraph.
 | `shore-post-load` | Formwork Shore Post Load and Spacing (ACI 347) | ACI 347 Guide to Formwork for Concrete; spec-v245 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sliding-snow-load` | Sliding Snow Load on a Lower Roof (ASCE 7 7.9) | ASCE 7 §7.9; spec-v469 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stability-infinite` | Infinite Slope Stability Factor of Safety | Infinite-slope stability (Das / NAVFA...; spec-v289 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `slope-stability-seepage` | Infinite Slope Stability with Seepage | Infinite-slope seepage stability (Das...; spec-v627 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `slope-stake-cut-fill` | Slope-Stake Cut and Fill | FM 5-233 / FHWA construction-survey g...; existing 104.5, design 100.0 -> 4.5 ft cut; 2:1 slope, of... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sloped-backfill-earth-pressure` | Sloped-Backfill Earth Pressure (Rankine Inclined Surface) | Rankine sloped-backfill as compiled i...; spec-v626 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `snow-drift-load` | Snow Drift Surcharge at a Roof Step or Parapet (ASCE 7 Ch. 7) | ASCE 7-22 Chapter 7; spec-v297 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -3992,6 +3994,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1074. Fixture-covered or reference-cadence: 1074 / 1074.
+Tile count: 1075. Fixture-covered or reference-cadence: 1075 / 1075.
 
 <!-- END tile-index-v14 -->

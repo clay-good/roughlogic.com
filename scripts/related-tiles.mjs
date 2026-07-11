@@ -1190,6 +1190,7 @@ const RELATED = {
   "pile-axial-capacity": ["helical-pile","soil-bearing-capacity","soil-settlement-elastic"],
   "pile-group-efficiency": ["pile-axial-capacity","helical-pile","soil-bearing-capacity"],
   "slope-stability-infinite": ["retaining-wall-stability","lateral-earth-pressure","trench-slope"],
+  "slope-stability-seepage": ["slope-stability-infinite","submerged-earth-pressure","soil-bearing-capacity"],
   // spec-v290..v292 NDS wood-member depth batch (Group E)
   "wood-bearing-perpendicular": ["wood-beam-shear","wood-beam-bending","deck-beam-post"],
   "wood-tension-member": ["wood-bolt-connection","column-buckling-wood","truss-capacity"],

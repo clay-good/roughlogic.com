@@ -82342,6 +82342,56 @@
       "term": "backfill slope steeper than friction angle cannot be retained",
       "target": "sloped-backfill-earth-pressure",
       "kind": "question"
+    },
+    {
+      "term": "slope stability with seepage",
+      "target": "slope-stability-seepage",
+      "kind": "industry"
+    },
+    {
+      "term": "seepage factor of safety",
+      "target": "slope-stability-seepage",
+      "kind": "industry"
+    },
+    {
+      "term": "slope with a water table",
+      "target": "slope-stability-seepage",
+      "kind": "redirect"
+    },
+    {
+      "term": "wet slope failure",
+      "target": "slope-stability-seepage",
+      "kind": "redirect"
+    },
+    {
+      "term": "pore pressure slope stability",
+      "target": "slope-stability-seepage",
+      "kind": "adjacent"
+    },
+    {
+      "term": "why does a slope fail when the water table rises",
+      "target": "slope-stability-seepage",
+      "kind": "question"
+    },
+    {
+      "term": "how much does seepage reduce the slope factor of safety",
+      "target": "slope-stability-seepage",
+      "kind": "question"
+    },
+    {
+      "term": "infinite slope factor of safety with groundwater",
+      "target": "slope-stability-seepage",
+      "kind": "question"
+    },
+    {
+      "term": "does seepage halve the slope safety factor",
+      "target": "slope-stability-seepage",
+      "kind": "question"
+    },
+    {
+      "term": "slope safe dry but slides when saturated",
+      "target": "slope-stability-seepage",
+      "kind": "question"
     }
   ]
 }

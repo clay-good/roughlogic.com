@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spec-v627 infinite-slope stability with seepage; 2026-07-11
+
+Lands `slope-stability-seepage` (Group E, calc-geotech.js), the seepage follow-on spec-v289 named inside `slope-stability-infinite` (the submerged gamma - gamma_w case). With steady seepage parallel to the slope and the water table at the surface, FS = (c' + (gamma_sat - 62.4) H cos^2 beta tan phi') / (gamma_sat H sin beta cos beta): the pore pressure cuts the friction term to the buoyant weight while the driving weight stays saturated, so a cohesionless factor of safety drops to (gamma_sat - 62.4)/gamma_sat of the dry value - about half. A phi = 32 sand at 18 degrees is a safe 1.92 dry but a failing 0.96 wet; the tile shows both. Pure effective-stress slope mechanics (Das / NAVFAC DM-7), no proprietary constants. Catalog 1,074 -> 1,075 (version 0.216.0).
+
 ### feat(construction): spec-v626 sloped-backfill Rankine earth pressure; 2026-07-11
 
 Lands `sloped-backfill-earth-pressure` (Group E, calc-geotech.js), the sloped-backfill Rankine coefficient spec-v261/v262 named beside `lateral-earth-pressure`. A backfill rising behind the wall at slope beta pushes harder than a level one: Ka = cos b (cos b - sqrt(cos^2 b - cos^2 phi)) / (cos b + sqrt(cos^2 b - cos^2 phi)), the thrust Pa = 0.5 x Ka x gamma x H^2 acting parallel to the slope, and its horizontal (overturning) and vertical (heel) components, with the level Ka0 for contrast. A 15 deg backfill on a phi = 30 sand raises Ka from 0.333 to 0.373 - 12% heavier and tilted; beta must stay below phi. Pure Rankine trig, no proprietary constants. Catalog 1,073 -> 1,074 (version 0.215.0).

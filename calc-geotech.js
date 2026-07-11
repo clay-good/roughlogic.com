@@ -491,6 +491,49 @@ GEOTECH_RENDERERS["slope-stability-infinite"] = _simpleRenderer({
   compute: computeSlopeStabilityInfinite,
 });
 
+// ===================== spec-v627: infinite-slope stability with seepage =====================
+
+// dims: in { beta_deg: dimensionless, phi_deg: dimensionless, c_psf: M L^-1 T^-2, gamma_sat: M L^-2 T^-2, h_ft: L } out: { driving_psf: M L^-1 T^-2, resisting_psf: M L^-1 T^-2, fs_seep: dimensionless, fs_dry: dimensionless }
+export function computeSlopeStabilitySeepage({ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_sat = 125, h_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(beta_deg > 0 && beta_deg < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
+  if (!(phi_deg >= 0 && phi_deg < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
+  if (c_psf < 0) return { error: "Effective cohesion cannot be negative (psf)." };
+  if (!(gamma_sat > _GAMMA_W)) return { error: "Saturated unit weight must exceed the water unit weight (62.4 pcf)." };
+  if (!(h_ft > 0)) return { error: "Failure-plane depth must be positive (ft)." };
+  const b = beta_deg * Math.PI / 180;
+  const p = phi_deg * Math.PI / 180;
+  const driving_psf = gamma_sat * h_ft * Math.sin(b) * Math.cos(b);
+  const resisting_psf = c_psf + (gamma_sat - _GAMMA_W) * h_ft * Math.cos(b) * Math.cos(b) * Math.tan(p);
+  const fs_seep = resisting_psf / driving_psf;
+  const fs_dry = (c_psf + gamma_sat * h_ft * Math.cos(b) * Math.cos(b) * Math.tan(p)) / driving_psf;
+  const verdict = fs_seep >= 1.5 ? "at or above the customary 1.5 - the slope holds under seepage" : (fs_seep >= 1.0 ? "between 1.0 and 1.5 - marginal; add a subdrain or flatten the slope" : "below 1.0 - the slope is predicted to slide under seepage");
+  return {
+    driving_psf, resisting_psf, fs_seep, fs_dry, verdict,
+    note: "Infinite-slope factor of safety with steady seepage parallel to the slope and the water table at the surface: FS = (c' + (gamma_sat - gamma_w) H cos^2 beta tan phi') / (gamma_sat H sin beta cos beta), gamma_w = 62.4 pcf, as compiled in the Das and NAVFAC slope-stability references. The pore pressure cuts the friction term to the buoyant weight while the driving weight stays saturated, so for a cohesionless soil the factor of safety drops to (gamma_sat - gamma_w)/gamma_sat of the dry value - about half. Shallow translational slide, drained effective-stress parameters, no seismic loading - not a circular Bishop/Spencer analysis. A working subdrain that relieves the seepage restores the dry value shown for contrast. A screening aid; the geotechnical engineer of record governs.",
+  };
+}
+export const slopeStabilitySeepageExample = { inputs: { beta_deg: 18, phi_deg: 32, c_psf: 0, gamma_sat: 125, h_ft: 8 } };
+
+GEOTECH_RENDERERS["slope-stability-seepage"] = _simpleRenderer({
+  citation: "Citation: infinite-slope stability with steady slope-parallel seepage FS = (c' + (gamma_sat - gamma_w) H cos^2 beta tan phi') / (gamma_sat H sin beta cos beta), gamma_w = 62.4 pcf, with the cohesionless reduction (gamma_sat - gamma_w)/gamma_sat x tan phi'/tan beta (Das / NAVFAC slope-stability references), by name. The pore pressure cuts the friction term to the buoyant weight while the driving weight stays saturated, so seepage roughly halves the cohesionless factor of safety versus the dry value shown for contrast; the water table is taken at the surface (worst case) and a working subdrain restores the dry value. Translational slide, drained parameters, no seismic. A screening aid, not a substitute for the geotechnical engineer's stability analysis.",
+  example: slopeStabilitySeepageExample.inputs,
+  fields: [
+    { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
+    { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
+    { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number", default: 0 },
+    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number", default: 125 },
+    { key: "h_ft", label: "Depth to failure plane H (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "drv", id: "sss-out-drv", label: "Driving shear stress", value: (r) => fmt(r.driving_psf, 1) + " psf" },
+    { key: "fs", id: "sss-out-fs", label: "FS with seepage", value: (r) => fmt(r.fs_seep, 2) + " (" + r.verdict + ")" },
+    { key: "fsd", id: "sss-out-fsd", label: "FS dry, for contrast", value: (r) => fmt(r.fs_dry, 2) + " (" + fmt(r.fs_seep / r.fs_dry, 2) + "x under seepage)" },
+    { key: "n", id: "sss-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlopeStabilitySeepage,
+});
+
 // ===================== spec-v308..v310: geotechnical depth-2 batch =====================
 // The settlement and pressure cases the first geotech batch deferred: primary
 // consolidation of clay (the time-dependent settlement soil-settlement-elastic

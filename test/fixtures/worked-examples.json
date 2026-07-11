@@ -39210,6 +39210,72 @@
    }
   },
   {
+   "tile_id": "slope-stability-seepage",
+   "source_publisher": "Infinite-slope seepage stability (Das / NAVFAC DM-7)",
+   "source_title": "cohesionless sand: FS 0.96 with seepage vs 1.92 dry (seepage halves it, (125-62.4)/125 = 0.50)",
+   "source_edition_or_year": "spec-v627 worked example (machine-verified)",
+   "source_section_or_page": "spec-v627 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "beta_deg": 18,
+    "phi_deg": 32,
+    "c_psf": 0,
+    "gamma_sat": 125,
+    "h_ft": 8
+   },
+   "outputs": {
+    "fs_seep": {
+     "value": 0.9631,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fs_dry": {
+     "value": 1.9232,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "driving_psf": {
+     "value": 293.89,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "slope-stability-seepage",
+   "source_publisher": "Infinite-slope seepage stability (Das / NAVFAC DM-7)",
+   "source_title": "cross-check: with c' 150 psf the fixed cohesion term lifts FS to 1.47 wet vs 2.43 dry",
+   "source_edition_or_year": "spec-v627 worked example (machine-verified)",
+   "source_section_or_page": "spec-v627 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "beta_deg": 18,
+    "phi_deg": 32,
+    "c_psf": 150,
+    "gamma_sat": 125,
+    "h_ft": 8
+   },
+   "outputs": {
+    "fs_seep": {
+     "value": 1.4735,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "fs_dry": {
+     "value": 2.4335,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-bearing-perpendicular",
    "source_publisher": "NDS 2018 3.10.2 / 3.10.4",
    "source_title": "2x joist, 1.5 in bearing, 800 lb, DF-L 625 psi -> Cb 1.25, DCR 0.46, 0.85 in required",

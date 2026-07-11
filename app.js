@@ -608,7 +608,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-geotech.js", "GEOTECH_RENDERERS", [
     "soil-bearing-capacity", "lateral-earth-pressure", "at-rest-earth-pressure", "submerged-earth-pressure", "sloped-backfill-earth-pressure", "retaining-wall-stability",
     // spec-v287..v289 foundation depth batch
-    "soil-settlement-elastic", "pile-axial-capacity", "slope-stability-infinite",
+    "soil-settlement-elastic", "pile-axial-capacity", "slope-stability-infinite", "slope-stability-seepage",
     // spec-v308..v310 geotechnical depth-2 batch
     "soil-consolidation-settlement", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
     // spec-v414..v416 settlement/foundation trio

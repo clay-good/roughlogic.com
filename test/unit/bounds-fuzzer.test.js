@@ -20227,3 +20227,31 @@ test("bounds: spec-v626 computeSlopedBackfillEarthPressure pins the sloped Ka, t
   assert.ok("error" in _v626({ phi: 30, beta: 35, gamma: 120, h_ft: 10 }));
   assert.ok("error" in _v626({ phi: NaN, beta: 15, gamma: 120, h_ft: 10 }));
 });
+
+import { computeSlopeStabilitySeepage as _v627 } from "../../calc-geotech.js";
+
+test("bounds: spec-v627 computeSlopeStabilitySeepage pins the seepage vs dry FS, the ~0.5x buoyant/saturated relation, the cohesion cross-check, and error seams", () => {
+  const r = _v627({ beta_deg: 18, phi_deg: 32, c_psf: 0, gamma_sat: 125, h_ft: 8 });
+  assert.ok(Math.abs(r.driving_psf - 293.8926261462365) < 1e-9);
+  assert.ok(Math.abs(r.fs_seep - 0.9631135787221589) < 1e-9);
+  assert.ok(Math.abs(r.fs_dry - 1.9231501172567071) < 1e-9);
+  // Cohesionless seepage FS is exactly (gamma_sat - gamma_w)/gamma_sat of the dry FS -- about half.
+  assert.ok(Math.abs(r.fs_seep / r.fs_dry - (125 - 62.4) / 125) < 1e-12);
+  assert.ok(r.fs_seep < 1 && r.fs_dry > 1.5); // safe dry, slides wet
+  // Cohesionless reduction equals ((gamma_sat - gamma_w)/gamma_sat) * tan(phi)/tan(beta).
+  const expect = ((125 - 62.4) / 125) * Math.tan(32 * Math.PI / 180) / Math.tan(18 * Math.PI / 180);
+  assert.ok(Math.abs(r.fs_seep - expect) < 1e-9);
+  // Cross-check: cohesion is a fixed resisting term, lifting both factors of safety.
+  const rc = _v627({ beta_deg: 18, phi_deg: 32, c_psf: 150, gamma_sat: 125, h_ft: 8 });
+  assert.ok(Math.abs(rc.fs_seep - 1.473504063733383) < 1e-9);
+  assert.ok(Math.abs(rc.fs_dry - 2.4335406022679313) < 1e-9);
+  assert.ok(rc.fs_seep > r.fs_seep);
+  // Error seams: non-finite, slope out of range, phi out of range, negative cohesion, gamma_sat <= gamma_w, non-positive depth.
+  assert.ok("error" in _v627({ beta_deg: 0, phi_deg: 32, gamma_sat: 125, h_ft: 8 }));
+  assert.ok("error" in _v627({ beta_deg: 90, phi_deg: 32, gamma_sat: 125, h_ft: 8 }));
+  assert.ok("error" in _v627({ beta_deg: 18, phi_deg: 90, gamma_sat: 125, h_ft: 8 }));
+  assert.ok("error" in _v627({ beta_deg: 18, phi_deg: 32, c_psf: -1, gamma_sat: 125, h_ft: 8 }));
+  assert.ok("error" in _v627({ beta_deg: 18, phi_deg: 32, gamma_sat: 62.4, h_ft: 8 }));
+  assert.ok("error" in _v627({ beta_deg: 18, phi_deg: 32, gamma_sat: 125, h_ft: 0 }));
+  assert.ok("error" in _v627({ beta_deg: NaN, phi_deg: 32, gamma_sat: 125, h_ft: 8 }));
+});
