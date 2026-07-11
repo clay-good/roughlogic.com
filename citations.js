@@ -661,6 +661,17 @@ export const CITATIONS = {
       { name: "Target bands", value: "rapid mix G 500-1,000/s, flocculation G 20-70/s, Gt 10^4-10^5", source: "Ten States Standards" },
     ],
   },
+  "tapered-flocculation-g": {
+    formula: "P_stage = G_stage^2 x mu(T) x V_stage (Camp-Stein inverted); Gt = mean(G) x total_time; mu = water dynamic viscosity at the given temperature.",
+    edition: "Camp-Stein velocity gradient, tapered multi-stage schedule (Camp & Stein 1943; Ten States Standards), by name.",
+    freeAccess: "The velocity-gradient relation is a public water-treatment result; the viscosity comes from a standard water-property table and the treatment-process design governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "A tapered schedule decreases G stage to stage - the vigorous first stage builds many small flocs and each gentler stage grows them without the shear that would tear them apart; each stage should sit in the 10-70 per-second flocculation band (rapid mix G 500-1,000 belongs in a separate basin). Cold water is more viscous, so the same G costs more power in winter. Gt characterizes the whole train (10^4-10^5 typical). A design aid, not a process design.",
+    assumptions: [
+      { name: "Equal stages", value: "each stage is taken at the same volume; the power is P = G^2 mu V per stage from the inverted Camp-Stein relation", source: "Camp & Stein 1943" },
+      { name: "Tapered band", value: "G decreases stage to stage, each in the 10-70/s flocculation band; merging rapid mix shears the floc", source: "Ten States Standards" },
+    ],
+  },
   "digester-gas-production": {
     formula: "VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield; methane = gas x methane_pct/100; energy = methane x 960 BTU/ft^3.",
     edition: "Anaerobic digester gas production (WEF; university operator courses), by name.",

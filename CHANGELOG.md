@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): spec-v621 tapered flocculation G schedule; 2026-07-10
+
+Lands `tapered-flocculation-g` (Group M, calc-treatment.js), the follow-on spec-v575 named: the multi-stage schedule the single-basin G tile can't give. P_stage = G_stage^2 x mu(T) x V (the Camp-Stein relation inverted, reusing the module's water-viscosity table) across 2-3 stages of decreasing G, with the composite Gt and a tapered/in-band check. A 50/30/20 per-second taper in three 100 m3 stages at 15 C needs 285 / 102 / 46 W. Group M audit count 31 -> 32. Catalog 1,068 -> 1,069 (version 0.210.0).
+
 ### feat(wastewater): spec-v620 digester volatile-acid to alkalinity ratio; 2026-07-10
 
 Lands `va-alkalinity-ratio` (Group M, calc-treatment.js), the follow-on spec-v573 named: the early-warning stability index the pH meter misses. ratio = volatile acids / alkalinity (common CaCO3 basis); bands < 0.1 stable, 0.1-0.25 acceptable, 0.25-0.4 corrective action, > 0.4 souring; plus the bicarbonate buffer margin. The pH lags because the buffer holds it steady until the alkalinity is consumed. Group M audit count 30 -> 31. Catalog 1,067 -> 1,068 (version 0.209.0).

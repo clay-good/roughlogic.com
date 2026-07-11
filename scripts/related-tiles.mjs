@@ -127,6 +127,7 @@ const RELATED = {
   "va-alkalinity-ratio": ["digester-vs-loading", "digester-gas-production", "population-equivalent"],
   "digester-gas-production": ["digester-vs-loading", "population-equivalent", "bod-tss-loading-removal"],
   "flocculation-g-value": ["coagulant-dose", "detention-time", "clarifier-surface-loading"],
+  "tapered-flocculation-g": ["flocculation-g-value", "flocculator-paddle-power", "detention-time"],
   "flocculator-paddle-power": ["flocculation-g-value", "coagulant-dose", "detention-time"],
   "chlorine-cylinder-withdrawal": ["chemical-feed-pump", "chlorine-demand", "disinfection-ct"],
   "growing-degree-days": ["crop-yield", "thi-livestock", "irrigation-requirement"],

@@ -986,6 +986,8 @@ const TOOL_MODULES = (() => {
     // spec-v575
     "flocculation-g-value",
     "flocculator-paddle-power",
+    // spec-v621
+    "tapered-flocculation-g",
     // spec-v576
     "chlorine-cylinder-withdrawal",
     // v93 pool and spa chemical balance

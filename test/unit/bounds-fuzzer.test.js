@@ -20057,3 +20057,35 @@ test("bounds: spec-v620 computeVaAlkalinityRatio pins the ratio, the band bounda
   assert.ok("error" in _v620({ volatile_acids_mgl: 180, alkalinity_mgl: 0 }));
   assert.ok("error" in _v620({ volatile_acids_mgl: -1, alkalinity_mgl: 2000 }));
 });
+
+import { computeTaperedFlocculationG as _v621 } from "../../calc-treatment.js";
+
+test("bounds: spec-v621 computeTaperedFlocculationG pins the 3-stage powers, the 2-stage case, the G^2 scaling, and error seams", () => {
+  // Pinned worked example: 3-stage 50/30/20 taper, 100 m^3 stages, 15 C, 30 min.
+  const r = _v621({ stage1_g_per_s: 50, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_m3: 100, water_temp_c: 15, total_detention_min: 30 });
+  assert.ok(Math.abs(r.stage1_power_w - 284.5) < 0.05);
+  assert.ok(Math.abs(r.stage2_power_w - 102.42) < 0.05);
+  assert.ok(Math.abs(r.stage3_power_w - 45.52) < 0.05);
+  assert.ok(Math.abs(r.total_power_w - 432.44) < 0.05);
+  assert.ok(Math.abs(r.mean_g - 100 / 3) < 1e-9);
+  assert.ok(Math.abs(r.gt_value - 60000) < 1);
+  assert.ok(r.tapered === true && r.in_band === true && r.stages === 3);
+  // Cross-check: 2-stage train (stage 3 = 0), cold water.
+  const x = _v621({ stage1_g_per_s: 40, stage2_g_per_s: 20, stage3_g_per_s: 0, stage_volume_m3: 150, water_temp_c: 5, total_detention_min: 20 });
+  assert.ok(Math.abs(x.stage1_power_w - 364.56) < 0.05);
+  assert.ok(Math.abs(x.stage2_power_w - 91.14) < 0.05);
+  assert.ok(x.stage3_power_w === 0 && x.stages === 2);
+  assert.ok(Math.abs(x.gt_value - 36000) < 1);
+  // Power scales with G^2: doubling stage-1 G quadruples its power.
+  const dbl = _v621({ stage1_g_per_s: 100, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_m3: 100, water_temp_c: 15, total_detention_min: 30 });
+  assert.ok(Math.abs(dbl.stage1_power_w - 4 * r.stage1_power_w) < 1e-6);
+  // A non-decreasing schedule is flagged not-tapered.
+  const flat = _v621({ stage1_g_per_s: 30, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_m3: 100, water_temp_c: 15, total_detention_min: 30 });
+  assert.ok(flat.tapered === false);
+  // Error seams: non-positive stage-1/2 G, volume, detention; temperature out of 0-40.
+  assert.ok("error" in _v621({ stage1_g_per_s: 0, stage2_g_per_s: 20, stage_volume_m3: 100, total_detention_min: 30 }));
+  assert.ok("error" in _v621({ stage1_g_per_s: 50, stage2_g_per_s: 0, stage_volume_m3: 100, total_detention_min: 30 }));
+  assert.ok("error" in _v621({ stage1_g_per_s: 50, stage2_g_per_s: 30, stage_volume_m3: 0, total_detention_min: 30 }));
+  assert.ok("error" in _v621({ stage1_g_per_s: 50, stage2_g_per_s: 30, stage_volume_m3: 100, total_detention_min: 0 }));
+  assert.ok("error" in _v621({ stage1_g_per_s: 50, stage2_g_per_s: 30, stage_volume_m3: 100, water_temp_c: 45, total_detention_min: 30 }));
+});

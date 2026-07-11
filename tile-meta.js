@@ -104,6 +104,7 @@ const _TILES = [
   ["va-alkalinity-ratio", "M"],
   ["digester-gas-production", "M"],
   ["flocculation-g-value", "M"],
+  ["tapered-flocculation-g", "M"],
   ["flocculator-paddle-power", "M"],
   ["chlorine-cylinder-withdrawal", "M"],
   ["growing-degree-days", "L"],

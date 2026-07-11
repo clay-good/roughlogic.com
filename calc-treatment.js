@@ -817,6 +817,71 @@ const renderFlocculationGValue = _rPool({
 });
 TREATMENT_RENDERERS["flocculation-g-value"] = renderFlocculationGValue;
 
+// --- spec-v621 M: Tapered flocculation multi-stage G schedule (`tapered-flocculation-g`) ---
+// P_stage = G_stage^2 x mu(T) x V_stage (Camp-Stein inverted). Stage 3 G = 0 models a 2-stage train. Gt = mean(G) x total_time.
+// dims: in { stage1_g_per_s: dimensionless, stage2_g_per_s: dimensionless, stage3_g_per_s: dimensionless, stage_volume_m3: L^3, water_temp_c: dimensionless, total_detention_min: T } out: { stage1_power_w: M L^2 T^-3, stage2_power_w: M L^2 T^-3, stage3_power_w: M L^2 T^-3, total_power_w: M L^2 T^-3, mean_g: dimensionless, gt_value: dimensionless }
+export function computeTaperedFlocculationG({ stage1_g_per_s = 0, stage2_g_per_s = 0, stage3_g_per_s = 0, stage_volume_m3 = 0, water_temp_c = 15, total_detention_min = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const g1 = Number(stage1_g_per_s) || 0;
+  const g2 = Number(stage2_g_per_s) || 0;
+  const g3 = Number(stage3_g_per_s) || 0;
+  const V = Number(stage_volume_m3) || 0;
+  const t = Number(water_temp_c);
+  const tmin = Number(total_detention_min) || 0;
+  if (!(g1 > 0)) return { error: "Stage 1 G must be positive (per second)." };
+  if (!(g2 > 0)) return { error: "Stage 2 G must be positive (per second)." };
+  if (g3 < 0) return { error: "Stage 3 G cannot be negative (enter 0 for a 2-stage train)." };
+  if (!(V > 0)) return { error: "Stage volume must be positive (m^3)." };
+  if (!Number.isFinite(t) || t < 0 || t > 40) return { error: "Water temperature must be between 0 and 40 C (viscosity-table range)." };
+  if (!(tmin > 0)) return { error: "Total detention time must be positive (min)." };
+  const mu = _waterViscosity(t);
+  const stage1_power_w = g1 * g1 * mu * V;
+  const stage2_power_w = g2 * g2 * mu * V;
+  const stage3_power_w = g3 > 0 ? g3 * g3 * mu * V : 0;
+  const total_power_w = stage1_power_w + stage2_power_w + stage3_power_w;
+  const gs = g3 > 0 ? [g1, g2, g3] : [g1, g2];
+  const mean_g = gs.reduce((a, b) => a + b, 0) / gs.length;
+  const gt_value = mean_g * (tmin * 60);
+  const tapered = g3 > 0 ? (g1 > g2 && g2 > g3) : (g1 > g2);
+  const in_band = gs.every((g) => g >= 10 && g <= 100);
+  return {
+    stage1_power_w, stage2_power_w, stage3_power_w, total_power_w, mean_g, gt_value, tapered, in_band, stages: gs.length,
+    note: (tapered ? "" : "Not tapered - a tapered schedule decreases G stage to stage (vigorous first stage builds floc, gentle last stage grows it without shear). ")
+      + (in_band ? "" : "A stage G is outside the 10-100 per-second flocculation band (rapid mix G 500-1,000 belongs in a separate basin - merging it shears the floc). ")
+      + "Each stage's power is P = G^2 x mu(T) x V; cold water is more viscous, so the same G costs more power in winter. Gt characterizes the whole train (10^4-10^5 typical). The treatment-process design governs.",
+  };
+}
+export const taperedFlocculationGExample = { inputs: { stage1_g_per_s: 50, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_m3: 100, water_temp_c: 15, total_detention_min: 30 } };
+const renderTaperedFlocculationG = _rPool({
+  citation: "Citation: Camp-Stein velocity gradient, tapered multi-stage schedule (Camp & Stein; Ten States Standards), by name. P_stage = G_stage^2 x mu(T) x V_stage; Gt = mean(G) x total_time; mu is water dynamic viscosity at the given temperature. A tapered schedule decreases G stage to stage (each in the 10-70/s flocculation band); the vigorous first stage builds floc and the gentle last stage grows it without shear. Cold water is more viscous, so the same G costs more power in winter. The treatment-process design governs.",
+  example: { stage1_g_per_s: 50, stage2_g_per_s: 30, stage3_g_per_s: 20, stage_volume_gal: 26417, water_temp_f: 59, total_detention_min: 30 },
+  fields: [
+    { key: "stage1_g_per_s", label: "Stage 1 target G (per s, highest)", kind: "number" },
+    { key: "stage2_g_per_s", label: "Stage 2 target G (per s)", kind: "number" },
+    { key: "stage3_g_per_s", label: "Stage 3 target G (per s, 0 for 2-stage)", kind: "number", default: 0 },
+    { key: "stage_volume_gal", label: "Each stage volume (gal)", kind: "number" },
+    { key: "water_temp_f", label: "Water temperature (F)", kind: "number", default: 59 },
+    { key: "total_detention_min", label: "Total detention time (min)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "tfg-out-p", label: "Power per stage", value: (r) => fmt(r.stage1_power_w, 1) + " / " + fmt(r.stage2_power_w, 1) + (r.stages === 3 ? " / " + fmt(r.stage3_power_w, 1) : "") + " W" },
+    { key: "t", id: "tfg-out-t", label: "Total mixing power", value: (r) => fmt(r.total_power_w, 1) + " W" + (r.tapered ? " (tapered)" : " - NOT tapered") },
+    { key: "g", id: "tfg-out-g", label: "Mean G / composite Gt", value: (r) => fmt(r.mean_g, 1) + " per s, Gt " + fmt(r.gt_value, 0) },
+    { key: "n", id: "tfg-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: (inp = {}) => {
+    const gal = Number(inp.stage_volume_gal) || 0;
+    const tF = Number(inp.water_temp_f);
+    if (!(gal > 0 && Number.isFinite(gal))) return { error: "Stage volume must be positive (gal)." };
+    if (!Number.isFinite(tF) || tF < 32 || tF > 104) return { error: "Water temperature must be between 32 and 104 F (the 0-40 C viscosity-table range)." };
+    return computeTaperedFlocculationG({
+      stage1_g_per_s: inp.stage1_g_per_s, stage2_g_per_s: inp.stage2_g_per_s, stage3_g_per_s: inp.stage3_g_per_s,
+      stage_volume_m3: gal * _FGV_M3_PER_GAL, water_temp_c: (tF - 32) * 5 / 9, total_detention_min: inp.total_detention_min,
+    });
+  },
+});
+TREATMENT_RENDERERS["tapered-flocculation-g"] = renderTaperedFlocculationG;
+
 // --- spec-v613 M: Paddle flocculator power from geometry (Camp drag) ---
 // v_tip = 2*pi*r*rpm/60. v_rel = v_tip*(1-k). P = 0.5*Cd*1.937*A*v_rel^3 (ft-lb/s), *1.35582 W, /550 hp.
 // dims: in { paddle_radius_ft: L, wheel_rpm: dimensionless, paddle_area_ft2: L^2, drag_coeff: dimensionless, slip_factor: dimensionless } out: { v_tip_fps: dimensionless, v_rel_fps: dimensionless, power_ftlbs: dimensionless, power_w: dimensionless, power_hp: dimensionless }

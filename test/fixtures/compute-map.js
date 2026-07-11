@@ -60,6 +60,7 @@ export const COMPUTE_MAP = {
   "va-alkalinity-ratio": { module: "../../calc-treatment.js", fn: "computeVaAlkalinityRatio" },
   "digester-gas-production": { module: "../../calc-treatment.js", fn: "computeDigesterGasProduction" },
   "flocculation-g-value": { module: "../../calc-treatment.js", fn: "computeFlocculationGValue" },
+  "tapered-flocculation-g": { module: "../../calc-treatment.js", fn: "computeTaperedFlocculationG" },
   "flocculator-paddle-power": { module: "../../calc-treatment.js", fn: "computeFlocculatorPaddlePower" },
   "chlorine-cylinder-withdrawal": { module: "../../calc-treatment.js", fn: "computeChlorineCylinderWithdrawal" },
   "growing-degree-days": { module: "../../calc-agriculture.js", fn: "computeGrowingDegreeDays" },

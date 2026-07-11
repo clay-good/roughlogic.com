@@ -82037,6 +82037,56 @@
       "term": "digester health from titration numbers",
       "target": "va-alkalinity-ratio",
       "kind": "question"
+    },
+    {
+      "term": "tapered flocculation",
+      "target": "tapered-flocculation-g",
+      "kind": "industry"
+    },
+    {
+      "term": "flocculation g schedule",
+      "target": "tapered-flocculation-g",
+      "kind": "industry"
+    },
+    {
+      "term": "multi stage flocculation",
+      "target": "tapered-flocculation-g",
+      "kind": "industry"
+    },
+    {
+      "term": "floc stage power",
+      "target": "tapered-flocculation-g",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tapered floc train",
+      "target": "tapered-flocculation-g",
+      "kind": "redirect"
+    },
+    {
+      "term": "power for each flocculation stage",
+      "target": "tapered-flocculation-g",
+      "kind": "question"
+    },
+    {
+      "term": "how to taper flocculation g values",
+      "target": "tapered-flocculation-g",
+      "kind": "question"
+    },
+    {
+      "term": "mixing power multi stage flocculator",
+      "target": "tapered-flocculation-g",
+      "kind": "question"
+    },
+    {
+      "term": "tapered g schedule water treatment",
+      "target": "tapered-flocculation-g",
+      "kind": "question"
+    },
+    {
+      "term": "velocity gradient per stage flocculation",
+      "target": "tapered-flocculation-g",
+      "kind": "question"
     }
   ]
 }
