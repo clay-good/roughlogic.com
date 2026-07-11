@@ -2053,6 +2053,7 @@ cross-check.
 | calc-hvac.js | `computeHydronicGpmDeltat` | `{ load = 0, unit_tons = 0, dt_f = 0, factor = 500 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationHeatLoss` | `{ pipe_OD_in = 0, surface_T_F = 0, ambient_T_F = 0, air_velocity_fpm = 0, ins...` | _ | _ | _ |
 | calc-hvac.js | `computeInsulationThickness` | `{ pipe_od_in, surface_temp_F, ambient_F, surface_limit_F, k_btu_in_per_hr_ft2...` | _ | _ | _ |
+| calc-hvac.js | `computeIsolatorDeflection` | `{ equipment_rpm = 0, target_efficiency = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeManualDFrictionRate` | `{ blower_esp_inwg = 0, component_drop_inwg = 0, tel_ft = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeMoistAirEnthalpy` | `{ t_db_f = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeMuaTemperingLoad` | `{ cfm = 0, t_oa_F = 0, t_target_F = 0, eta = 0.80, w_oa_gr = 0, w_target_gr =...` | _ | _ | _ |
@@ -2738,7 +2739,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1324.
+Row count: 1325.
 
 <!-- END function-corpus-v14 -->
 
@@ -3057,7 +3058,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (115 tiles)
+### Group C HVAC (116 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3137,6 +3138,7 @@ per spec-v14 §13.1 second paragraph.
 | `insulation-heat-loss` | Pipe Insulation Heat Loss (bare vs insulated) | ASHRAE Handbook (Fundamentals) / manu...; 2.375 in OD pipe at 200 F into 70 F still air with 1.5 in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `insulation-thickness` | Pipe Insulation Thickness | ASHRAE Handbook (Fundamentals); 1 in OD pipe at 250 F into 75 F ambient, 120 F surface li... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `internal-heat-gains` | Internal Heat Gains: People, Lighting, Equipment | ASHRAE / ACCA Manual J internal gains; spec-v228 section 2.1 pinned example (small office) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `isolator-deflection` | Isolator Static Deflection for a Target Isolation | ASHRAE Fundamentals, Sound and Vibrat...; spec-v633 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manual-d-friction-rate` | Manual D Friction Rate (Available Static Pressure) | ACCA Manual D; spec-v408 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `manual-j-cooling` | Manual J Cooling Load (Simplified) | ACCA Manual J residential cooling-loa...; 1500 ft^2 / 1200 wall / 200 window / 4 occupants / 95 out... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `manual-j-heating` | Manual J Heating Load (Simplified) | ACCA Manual J residential heating-loa...; 1500 ft^2 / 1200 wall / 200 window / 1500 ceiling / 10 ou... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4004,6 +4006,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1080. Fixture-covered or reference-cadence: 1080 / 1080.
+Tile count: 1081. Fixture-covered or reference-cadence: 1081 / 1081.
 
 <!-- END tile-index-v14 -->

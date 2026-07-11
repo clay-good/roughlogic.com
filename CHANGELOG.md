@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v633 isolator static deflection for a target isolation efficiency; 2026-07-11
+
+Lands `isolator-deflection` (Group C, calc-hvac.js), the mount-selection inverse of `vibration-isolation` (spec-v483). Enter the running speed and the isolation efficiency you want, get the static deflection to specify: T = 1 - efficiency, ratio = sqrt(1 + 1/T), fn = (rpm/60)/ratio, deflection = (3.13/fn)^2 in. 90% isolation of a 900 rpm fan needs 0.48 in (a 4.5 Hz mount); tighten to 95% and it nearly doubles to 0.91 in. Feeding the result back into the forward tile returns the target efficiency exactly (fuzzer pins the round-trip). Pure single-DOF algebra, same universal constant (3.13 = (1/2pi)sqrt(g)) as the forward tile. Catalog 1,080 -> 1,081 (version 0.222.0).
+
 ### feat(plumbing): spec-v632 hydraulic jump sequent depth and energy loss; 2026-07-11
 
 Lands `hydraulic-jump` (Group B, calc-plumbing.js), the conjugate-depth follow-on spec-v304 named beside `channel-froude-number`. Belanger's momentum relation gives the sequent depth y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1) and the specific-energy loss dE = (y2 - y1)^3/(4 y1 y2). A 10 ft channel at 100 cfs and a shooting 0.8 ft depth (Fr1 2.46) jumps to 2.42 ft and throws away 0.55 ft of head; at 200 cfs (Fr1 4.93) it jumps to 5.19 ft killing 5.1 ft - why a stilling basin is sized to the Froude number. Pure Belanger momentum, universal g, no proprietary constants. Catalog 1,079 -> 1,080 (version 0.221.0).

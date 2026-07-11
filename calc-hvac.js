@@ -3774,6 +3774,39 @@ function _renderVibrationIsolation(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["vibration-isolation"] = _renderVibrationIsolation;
 
+// dims: in { equipment_rpm: T^-1, target_efficiency: dimensionless } out: { transmissibility: dimensionless, ratio: dimensionless, fn_hz: T^-1, deflection_in: L }
+export function computeIsolatorDeflection({ equipment_rpm = 0, target_efficiency = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const rpm = Number(equipment_rpm) || 0;
+  const eff = Number(target_efficiency) || 0;
+  if (!(rpm > 0)) return { error: "Running speed must be positive (rpm)." };
+  if (!(eff > 0 && eff < 100)) return { error: "Target isolation efficiency must be between 0 and 100 percent (exclusive)." };
+  const transmissibility = 1 - eff / 100;
+  const ratio = Math.sqrt(1 + 1 / transmissibility);
+  const disturbing_hz = rpm / 60;
+  const fn_hz = disturbing_hz / ratio;
+  const deflection_in = Math.pow(3.13 / fn_hz, 2);
+  return {
+    transmissibility, ratio, disturbing_hz, fn_hz, deflection_in,
+    note: "ASHRAE / Den Hartog single-degree-of-freedom isolator inverted for the required static deflection: from the target transmissibility T = 1 - efficiency, the required frequency ratio is sqrt(1 + 1/T) (always > sqrt(2), so the mount isolates rather than amplifies), the required natural frequency is fn = (rpm/60)/ratio, and the required static deflection is (3.13/fn)^2 in (fn = 3.13/sqrt(deflection), the inverse of the forward tile). The softer the mount (more deflection, lower fn), the better the isolation. Undamped idealization; the result is the isolator's rated deflection under the actual load. The isolator selection, floor stiffness, and seismic restraint are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
+  };
+}
+const isolatorDeflectionExample = { inputs: { equipment_rpm: 900, target_efficiency: 90 } };
+HVAC_RENDERERS["isolator-deflection"] = _rEnv({
+  citation: "Citation: ASHRAE / Den Hartog single-DOF isolator inverted -- required static deflection = (3.13/fn)^2 in with fn = (rpm/60)/sqrt(1 + 1/T), T = 1 - efficiency, by name. The frequency ratio always exceeds sqrt(2). Undamped idealization; the isolator selection and floor stiffness are the mechanical engineer's. A design aid, not a stamped design.",
+  example: isolatorDeflectionExample.inputs,
+  fields: [
+    { key: "equipment_rpm", label: "Running speed (rpm)", kind: "number" },
+    { key: "target_efficiency", label: "Target isolation efficiency (%)", kind: "number" },
+  ],
+  outputs: [
+    { key: "defl", id: "isod-out-defl", label: "Required static deflection", value: (r) => fmt(r.deflection_in, 2) + " in" },
+    { key: "fn", id: "isod-out-fn", label: "Isolator natural frequency / ratio", value: (r) => fmt(r.fn_hz, 2) + " Hz (ratio " + fmt(r.ratio, 2) + ")" },
+    { key: "n", id: "isod-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeIsolatorDeflection,
+});
+
 // dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless }
 export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;

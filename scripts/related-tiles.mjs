@@ -65,6 +65,7 @@ const RELATED = {
   "grille-face-velocity": ["duct-sizing", "duct-heat-gain", "air-changes-hour", "outdoor-air-ventilation"],
   "adpi-diffuser-selection": ["grille-face-velocity", "window-solar-heat-gain", "duct-velocity-pressure"],
   "vibration-isolation": ["fan-affinity-laws", "grille-face-velocity", "pump-specific-speed"],
+  "isolator-deflection": ["vibration-isolation","fan-affinity-laws","pump-specific-speed"],
   "air-density-correction": ["gas-altitude-derate", "duct-heat-gain", "fan-motor-bhp", "manual-j-cooling"],
   "moist-air-enthalpy": ["outdoor-air-mix", "shr-latent", "wet-bulb-psychrometer", "humidifier-capacity"],
   "cooling-coil-total-load": ["moist-air-enthalpy", "shr-latent", "hydronic-gpm-deltat", "coil-bypass-factor"],

@@ -15890,7 +15890,7 @@
     },
     {
       "term": "isolator deflection",
-      "target": "vibration-isolation",
+      "target": "isolator-deflection",
       "kind": "industry"
     },
     {
@@ -82636,6 +82636,51 @@
     {
       "term": "belanger equation for a hydraulic jump",
       "target": "hydraulic-jump",
+      "kind": "question"
+    },
+    {
+      "term": "spring mount sizing",
+      "target": "isolator-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "required static deflection",
+      "target": "isolator-deflection",
+      "kind": "redirect"
+    },
+    {
+      "term": "select vibration isolator",
+      "target": "isolator-deflection",
+      "kind": "redirect"
+    },
+    {
+      "term": "isolation efficiency to deflection",
+      "target": "isolator-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much static deflection for 90 percent isolation",
+      "target": "isolator-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "what spring mount for a target vibration isolation",
+      "target": "isolator-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "size an isolator from the isolation efficiency",
+      "target": "isolator-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "required deflection for a fan vibration isolation",
+      "target": "isolator-deflection",
+      "kind": "question"
+    },
+    {
+      "term": "how soft a mount do i need to isolate a pump",
+      "target": "isolator-deflection",
       "kind": "question"
     }
   ]

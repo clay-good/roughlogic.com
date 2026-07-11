@@ -10388,6 +10388,17 @@ export const CITATIONS = {
       { name: "Undamped idealization", value: "the transmissibility neglects damping (which slightly reduces high-frequency isolation but limits the resonant peak); the disturbing frequency is taken as the running speed", source: "single-DOF vibration theory" },
     ],
   },
+  "isolator-deflection": {
+    formula: "T = 1 - efficiency/100; ratio = sqrt(1 + 1/T) (> sqrt(2)); fn = (rpm/60)/ratio Hz; deflection = (3.13/fn)^2 in.",
+    edition: "ASHRAE Handbook -- Fundamentals, Sound and Vibration chapter, the single-degree-of-freedom vibration isolator (the classical Den Hartog transmissibility relation) solved for the required static deflection, by name.",
+    freeAccess: "The single-DOF isolator relations are standard vibration theory published in the ASHRAE Handbook -- Fundamentals and every mechanical-vibration text; inverting them for the deflection is public arithmetic.",
+    governance: GOVERNANCE.general,
+    editionNote: "The single-degree-of-freedom vibration isolator (ASHRAE Handbook -- Fundamentals, Sound and Vibration) inverted for the required static deflection: from the target transmissibility T = 1 - efficiency, the required frequency ratio is sqrt(1 + 1/T) (always greater than sqrt(2), so the mount isolates rather than amplifies), the required natural frequency is fn = (rpm/60)/ratio, and the required static deflection is (3.13/fn)^2 in (with fn = 3.13/sqrt(deflection), g = 386.4 in/s^2, the inverse of the forward tile). The softer the mount (more deflection, lower fn), the better the isolation. This is the undamped idealization; the result is the isolator's rated static deflection under the actual equipment load. The isolator selection, floor stiffness, and seismic restraint are the mechanical engineer's. A design aid, not a stamped vibration-isolation design.",
+    assumptions: [
+      { name: "Inverse of the forward tile", value: "deflection = (3.13/fn)^2 with fn set so the frequency ratio meets the target transmissibility; feeding the result into vibration-isolation returns the target efficiency", source: "ASHRAE Fundamentals, Sound and Vibration" },
+      { name: "sqrt(2) floor", value: "any real target efficiency gives a frequency ratio above sqrt(2), inside the isolating region; the softer the mount, the higher the efficiency", source: "single-DOF vibration theory" },
+    ],
+  },
   "air-density-correction": {
     formula: "alt = (1 - 6.73e-6 elev)^5.258; temp = 530/(460 + T_F); DF = alt x temp; SCFM = ACFM x DF; const = 1.08 x DF; sp = rated_sp x DF.",
     edition: "The air density correction for altitude and temperature from the ASHRAE Handbook - Fundamentals, by name.",

@@ -20378,3 +20378,25 @@ test("bounds: spec-v632 computeHydraulicJump pins the Belanger sequent depth, th
   assert.ok("error" in _v632({ b_ft: 10, q_cfs: 100, y1_ft: 2 })); // Fr1 < 1, no jump
   assert.ok("error" in _v632({ b_ft: Infinity, q_cfs: 100, y1_ft: 0.8 }));
 });
+
+import { computeIsolatorDeflection as _v633, computeVibrationIsolation as _v633fwd } from "../../calc-hvac.js";
+
+test("bounds: spec-v633 computeIsolatorDeflection pins the required deflection, the exact round-trip through the forward tile, the ratio > sqrt(2) property, and error seams", () => {
+  const r = _v633({ equipment_rpm: 900, target_efficiency: 90 });
+  assert.ok(Math.abs(r.deflection_in - 0.479) < 1e-3);
+  assert.ok(Math.abs(r.fn_hz - 4.5227) < 1e-3);
+  assert.ok(r.ratio > Math.SQRT2); // always in the isolating region
+  // Exact inverse: feeding the required deflection into the forward tile returns the target efficiency.
+  const back = _v633fwd({ equipment_rpm: 900, static_deflection_in: r.deflection_in });
+  assert.ok(Math.abs(back.efficiency_pct - 90) < 1e-6);
+  // A tighter target needs more deflection (a softer mount).
+  const tight = _v633({ equipment_rpm: 900, target_efficiency: 95 });
+  assert.ok(Math.abs(tight.deflection_in - 0.9144) < 1e-3);
+  assert.ok(tight.deflection_in > r.deflection_in);
+  // Error seams: non-finite, non-positive rpm, efficiency out of (0, 100).
+  assert.ok("error" in _v633({ equipment_rpm: 0, target_efficiency: 90 }));
+  assert.ok("error" in _v633({ equipment_rpm: 900, target_efficiency: 0 }));
+  assert.ok("error" in _v633({ equipment_rpm: 900, target_efficiency: 100 }));
+  assert.ok("error" in _v633({ equipment_rpm: 900, target_efficiency: -5 }));
+  assert.ok("error" in _v633({ equipment_rpm: Infinity, target_efficiency: 90 }));
+});

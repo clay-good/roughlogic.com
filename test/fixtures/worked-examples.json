@@ -43885,6 +43885,40 @@
    }
   },
   {
+   "tile_id": "isolator-deflection",
+   "source_publisher": "ASHRAE Fundamentals, Sound and Vibration (single-DOF isolator, inverted)",
+   "source_title": "90% isolation of a 900 rpm fan needs 0.48 in static deflection (4.52 Hz mount, ratio 3.32)",
+   "source_edition_or_year": "spec-v633 worked example (machine-verified)",
+   "source_section_or_page": "spec-v633 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "equipment_rpm": 900,
+    "target_efficiency": 90
+   },
+   "outputs": {
+    "deflection_in": { "value": 0.479, "tolerance": { "abs": 0.001 } },
+    "fn_hz": { "value": 4.5227, "tolerance": { "abs": 0.001 } },
+    "ratio": { "value": 3.3166, "tolerance": { "abs": 0.001 } }
+   }
+  },
+  {
+   "tile_id": "isolator-deflection",
+   "source_publisher": "ASHRAE Fundamentals, Sound and Vibration (single-DOF isolator, inverted)",
+   "source_title": "cross-check: tightening to 95% nearly doubles the required deflection to 0.91 in",
+   "source_edition_or_year": "spec-v633 worked example (machine-verified)",
+   "source_section_or_page": "spec-v633 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "equipment_rpm": 900,
+    "target_efficiency": 95
+   },
+   "outputs": {
+    "deflection_in": { "value": 0.9144, "tolerance": { "abs": 0.001 } }
+   }
+  },
+  {
    "tile_id": "air-density-correction",
    "source_publisher": "ASHRAE Fundamentals",
    "source_title": "5,000 ft, 70 F, 1,000 ACFM -> DF 0.835, SCFM 835, static 0.42 in-wc",
