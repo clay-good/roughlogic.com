@@ -343,6 +343,8 @@ const TOOL_MODULES = (() => {
     "coil-face-velocity", "vav-box-airflow",
     // spec-v587 anti-short-cycle buffer tank
     "hydronic-buffer-tank",
+    // spec-v623 buffer tank with distribution-loop credit
+    "buffer-tank-loop-credit",
   ]);
   // spec-v74 cap-relief split: the two spec-v23 velocity tiles relocated out of
   // calc-hvac.js (which had reached 95.9% of cap -- the tightest remaining calc

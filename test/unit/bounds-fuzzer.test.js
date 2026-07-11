@@ -20114,3 +20114,31 @@ test("bounds: spec-v622 computeDraftHoodDilution pins the ratio, the dilution-ai
   assert.ok("error" in _v622({ appliance_o2_pct: 12, diluted_o2_pct: 5 }));
   assert.ok("error" in _v622({ appliance_o2_pct: 5, diluted_o2_pct: 5 }));
 });
+
+import { computeBufferTankLoopCredit as _v623 } from "../../calc-hvacsystems.js";
+
+test("bounds: spec-v623 computeBufferTankLoopCredit pins the gross buffer, the loop-water credit, the net tank, the loop-covers clamp, the no-buffer case, and error seams", () => {
+  const r = _v623({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 });
+  assert.ok(Math.abs(r.gross_buffer_gal - 60) < 1e-9); // 10*60000/(500*20)
+  assert.ok(Math.abs(r.loop_volume_gal - 18.36) < 1e-9); // 0.0408*2.25*200
+  assert.ok(Math.abs(r.net_tank_gal - 41.64) < 1e-9);
+  assert.equal(r.loop_covers, false);
+  // A fat, long primary loop can absorb the whole requirement -> net clamps to 0.
+  const covered = _v623({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20, pipe_id_in: 2, loop_length_ft: 1000 });
+  assert.ok(Math.abs(covered.loop_volume_gal - 163.2) < 1e-9);
+  assert.equal(covered.net_tank_gal, 0);
+  assert.equal(covered.loop_covers, true);
+  // Zone load >= source min -> no buffer required (gross and net both zero, loop still reported).
+  const none = _v623({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 60000, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 });
+  assert.equal(none.gross_buffer_gal, 0);
+  assert.equal(none.net_tank_gal, 0);
+  assert.equal(none.no_buffer, true);
+  // Error seams: non-finite, non-positive on-time / source / swing, negative load / diameter / length.
+  assert.ok("error" in _v623({ min_on_time_min: Infinity, source_min_btu: 60000, delta_t_f: 20 }));
+  assert.ok("error" in _v623({ min_on_time_min: 0, source_min_btu: 60000, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 }));
+  assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 0, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 }));
+  assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 0, pipe_id_in: 1.5, loop_length_ft: 200 }));
+  assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: -1, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 }));
+  assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 20, pipe_id_in: -1, loop_length_ft: 200 }));
+  assert.ok("error" in _v623({ min_on_time_min: 10, source_min_btu: 60000, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: -1 }));
+});

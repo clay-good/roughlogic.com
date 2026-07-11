@@ -10188,6 +10188,17 @@ export const CITATIONS = {
       { name: "500 factor", value: "8.33 lb/gal x 60 min/hr for water; adjust for glycol", source: "ASHRAE" },
     ],
   },
+  "buffer-tank-loop-credit": {
+    formula: "gross_buffer_gal = min_on_time_min x (source_min_btu - zone_min_load_btu) / (500 x delta_t_f); loop_volume_gal = 0.0408 x pipe_id_in^2 x loop_length_ft; net_tank_gal = max(0, gross_buffer_gal - loop_volume_gal).",
+    edition: "ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name.",
+    freeAccess: "The buffer-tank sizing relation and the pipe-volume geometry are standard hydronic design practice; the equipment minimum-cycle data and the manufacturer govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The gross buffer is sized worst-case at about zero load; the loop water already circulating in a common primary loop is credited against it (0.0408 x d^2 x L gal/ft, the same geometry the pipe-volume tile uses). The credit is valid only for water fully coupled to the buffer, not a decoupled secondary. The 500 factor is for water (adjust for glycol). The equipment minimum-cycle data and the manufacturer govern - a sizing aid, not the manufacturer's data.",
+    assumptions: [
+      { name: "Loop coupled to buffer", value: "credit only the water in a common primary loop hydraulically coupled to the buffer; a decoupled secondary does not count", source: "Idronics / Caleffi" },
+      { name: "0.0408 gal/ft/in^2", value: "pi/4 x (1/12)^2 ft^2 x 7.48 gal/ft^3 = 0.0408 gal per ft per square inch of internal diameter", source: "pipe geometry" },
+    ],
+  },
   "flash-gas-subcool": {
     formula: "dP_lift = static_gradient x vertical_lift_ft (0.43 psi/ft R-410A liquid); dP_total = dP_lift + friction_dp_psi; required_subcool = dP_total / pt_slope (about 5 psi/degF R-410A near condensing).",
     edition: "ASHRAE Refrigeration Handbook / refrigerant piping guides liquid-line subcooling to prevent flash gas, by name.",

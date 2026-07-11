@@ -27450,6 +27450,74 @@
    }
   },
   {
+   "tile_id": "buffer-tank-loop-credit",
+   "source_publisher": "ASHRAE / Idronics (Caleffi)",
+   "source_title": "net = gross - loop; loop = 0.0408 x d^2 x L",
+   "source_edition_or_year": "Idronics / Caleffi",
+   "source_section_or_page": "60 gal gross, 1.5 in x 200 ft loop holds 18.36 gal -> 41.64 gal net tank",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "min_on_time_min": 10,
+    "source_min_btu": 60000,
+    "zone_min_load_btu": 0,
+    "delta_t_f": 20,
+    "pipe_id_in": 1.5,
+    "loop_length_ft": 200
+   },
+   "outputs": {
+    "gross_buffer_gal": {
+     "value": 60,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "loop_volume_gal": {
+     "value": 18.36,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "net_tank_gal": {
+     "value": 41.64,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "buffer-tank-loop-credit",
+   "source_publisher": "ASHRAE / Idronics (Caleffi)",
+   "source_title": "a fat, long primary loop can absorb the whole requirement",
+   "source_edition_or_year": "Idronics / Caleffi",
+   "source_section_or_page": "Same 60 gal gross, 2 in x 1000 ft loop holds 163.2 gal -> 0 gal net (no tank)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "min_on_time_min": 10,
+    "source_min_btu": 60000,
+    "zone_min_load_btu": 0,
+    "delta_t_f": 20,
+    "pipe_id_in": 2,
+    "loop_length_ft": 1000
+   },
+   "outputs": {
+    "loop_volume_gal": {
+     "value": 163.2,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "net_tank_gal": {
+     "value": 0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wood-emc",
    "source_publisher": "USDA Forest Products Laboratory Wood Handbook (by name)",
    "source_title": "70 F, 50% RH -> EMC ~9.2% (standard interior conditions)",

@@ -1244,3 +1244,57 @@ function _v587renderHydronicBufferTank(inputRegion, outputRegion, citationEl) {
   for (const f of [t, qMin, qLoad, dt]) f.input.addEventListener("input", update);
 }
 HVACSYSTEMS_RENDERERS["hydronic-buffer-tank"] = _v587renderHydronicBufferTank;
+
+// ===================== spec-v623 C: buffer tank with distribution-loop credit =====================
+// V_gross = on_time*(source_min-zone_load)/(500*dt); loop = 0.0408*d^2*L gal; V_net = max(0, V_gross-loop).
+// dims: in { min_on_time_min: T, source_min_btu: M L^2 T^-3, zone_min_load_btu: M L^2 T^-3, delta_t_f: T, pipe_id_in: L, loop_length_ft: L } out: { gross_buffer_gal: L^3, loop_volume_gal: L^3, net_tank_gal: L^3 }
+export function computeBufferTankLoopCredit({ min_on_time_min = 0, source_min_btu = 0, zone_min_load_btu = 0, delta_t_f = 0, pipe_id_in = 0, loop_length_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(min_on_time_min) || 0;
+  const qMin = Number(source_min_btu) || 0;
+  const qLoad = Number(zone_min_load_btu) || 0;
+  const dt = Number(delta_t_f) || 0;
+  const d = Number(pipe_id_in) || 0;
+  const L = Number(loop_length_ft) || 0;
+  if (!(t > 0)) return { error: "Minimum on-time must be positive (min)." };
+  if (!(qMin > 0)) return { error: "Source minimum output must be positive (Btu/hr)." };
+  if (!(dt > 0)) return { error: "Temperature swing must be positive (degF)." };
+  if (qLoad < 0) return { error: "Zone load cannot be negative (Btu/hr)." };
+  if (d < 0) return { error: "Pipe internal diameter cannot be negative (in)." };
+  if (L < 0) return { error: "Loop length cannot be negative (ft)." };
+  const loop_volume_gal = 0.0408 * d * d * L; // 0.0408 gal per ft per in^2 of diameter (pi/4 x 7.48 gal/ft^3)
+  if (qLoad >= qMin) return { gross_buffer_gal: 0, loop_volume_gal, net_tank_gal: 0, no_buffer: true, note: "The minimum zone load meets or exceeds the source minimum output, so the source runs its minimum on-time without short-cycling and no buffer tank is required. The equipment minimum-cycle data and the manufacturer govern." };
+  const gross_buffer_gal = t * (qMin - qLoad) / (500 * dt);
+  const net_tank_gal = Math.max(0, gross_buffer_gal - loop_volume_gal);
+  return {
+    gross_buffer_gal, loop_volume_gal, net_tank_gal, no_buffer: false, loop_covers: net_tank_gal === 0,
+    note: "The gross buffer is sized worst-case at about zero load; the loop water already circulating in a common primary loop is credited against it (0.0408 x d^2 x L gal/ft). The credit is valid only for water fully coupled to the buffer, not a decoupled secondary. The 500 factor is for water (adjust for glycol). The equipment minimum-cycle data and the manufacturer govern - a sizing aid, not the manufacturer's data.",
+  };
+}
+export const bufferTankLoopCreditExample = { inputs: { min_on_time_min: 10, source_min_btu: 60000, zone_min_load_btu: 0, delta_t_f: 20, pipe_id_in: 1.5, loop_length_ft: 200 } };
+function _v623renderBufferTankLoopCredit(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A sizing aid, not the manufacturer's data; the equipment minimum-cycle data and the manufacturer govern. Citation: ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name. V_gross = on_time x (source_min - zone_load) / (500 x delta_T); loop_gal = 0.0408 x d^2 x L; V_net = max(0, V_gross - loop_gal). The loop credit is valid only for water fully coupled to the buffer (a common primary loop); the 500 factor is for water (adjust for glycol); existing distribution-piping water may cover part or all of the requirement.";
+  const t = makeNumber("Minimum on-time (min)", "btlc-t", { step: "any", min: "0", value: "10" }); t.input.value = "10";
+  const qMin = makeNumber("Source minimum output (Btu/hr)", "btlc-qmin", { step: "any", min: "0", value: "60000" }); qMin.input.value = "60000";
+  const qLoad = makeNumber("Minimum simultaneous zone load (Btu/hr, 0 = worst case)", "btlc-qload", { step: "any", min: "0", value: "0" }); qLoad.input.value = "0";
+  const dt = makeNumber("Allowable temperature swing (degF)", "btlc-dt", { step: "any", min: "0", value: "20" }); dt.input.value = "20";
+  const d = makeNumber("Loop internal diameter (in)", "btlc-d", { step: "any", min: "0", value: "1.5" }); d.input.value = "1.5";
+  const L = makeNumber("Loop developed length (ft)", "btlc-l", { step: "any", min: "0", value: "200" }); L.input.value = "200";
+  for (const f of [t, qMin, qLoad, dt, d, L]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "10"; qMin.input.value = "60000"; qLoad.input.value = "0"; dt.input.value = "20"; d.input.value = "1.5"; L.input.value = "200"; update(); });
+  const oGross = makeOutputLine(outputRegion, "Gross buffer required", "btlc-out-gross");
+  const oLoop = makeOutputLine(outputRegion, "Loop water credit", "btlc-out-loop");
+  const oNet = makeOutputLine(outputRegion, "Net tank to add", "btlc-out-net");
+  const oNote = makeOutputLine(outputRegion, "Note", "btlc-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeBufferTankLoopCredit({ min_on_time_min: readNum(t.input), source_min_btu: readNum(qMin.input), zone_min_load_btu: readNum(qLoad.input), delta_t_f: readNum(dt.input), pipe_id_in: readNum(d.input), loop_length_ft: readNum(L.input) });
+    if (r.error) { oGross.textContent = r.error; oLoop.textContent = ""; oNet.textContent = ""; oNote.textContent = ""; return; }
+    oGross.textContent = r.no_buffer ? "0 gal - no buffer required" : fmt(r.gross_buffer_gal, 1) + " gal";
+    oLoop.textContent = fmt(r.loop_volume_gal, 1) + " gal";
+    oNet.textContent = r.no_buffer ? "0 gal" : (fmt(r.net_tank_gal, 1) + " gal" + (r.loop_covers ? " - loop water covers it (no tank)" : ""));
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [t, qMin, qLoad, dt, d, L]) f.input.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["buffer-tank-loop-credit"] = _v623renderBufferTankLoopCredit;

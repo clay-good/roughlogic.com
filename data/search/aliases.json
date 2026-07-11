@@ -82137,6 +82137,56 @@
       "term": "does the vent connector dilute co",
       "target": "draft-hood-dilution",
       "kind": "question"
+    },
+    {
+      "term": "buffer tank piping credit",
+      "target": "buffer-tank-loop-credit",
+      "kind": "industry"
+    },
+    {
+      "term": "loop volume credit",
+      "target": "buffer-tank-loop-credit",
+      "kind": "industry"
+    },
+    {
+      "term": "net buffer tank",
+      "target": "buffer-tank-loop-credit",
+      "kind": "redirect"
+    },
+    {
+      "term": "distribution volume credit",
+      "target": "buffer-tank-loop-credit",
+      "kind": "redirect"
+    },
+    {
+      "term": "buffer tank loop water",
+      "target": "buffer-tank-loop-credit",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how big a buffer tank after crediting the loop water",
+      "target": "buffer-tank-loop-credit",
+      "kind": "question"
+    },
+    {
+      "term": "does the pipe volume count toward the buffer tank",
+      "target": "buffer-tank-loop-credit",
+      "kind": "question"
+    },
+    {
+      "term": "net buffer tank size crediting the distribution loop",
+      "target": "buffer-tank-loop-credit",
+      "kind": "question"
+    },
+    {
+      "term": "do i still need a buffer tank on a big primary loop",
+      "target": "buffer-tank-loop-credit",
+      "kind": "question"
+    },
+    {
+      "term": "buffer tank minus the water already in the pipes",
+      "target": "buffer-tank-loop-credit",
+      "kind": "question"
     }
   ]
 }

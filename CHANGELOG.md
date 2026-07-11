@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v623 buffer tank with distribution-loop credit; 2026-07-11
+
+Lands `buffer-tank-loop-credit` (Group C, calc-hvacsystems.js), the distribution-volume-credit follow-on spec-v587 named beside `hydronic-buffer-tank`. It sizes the gross anti-short-cycle buffer (V = on_time x (source_min - zone_load) / (500 x delta_T)), then credits the water already circulating in the distribution loop (0.0408 x d^2 x L gal, the same pure-geometry constant the pipe-volume tile uses) to return the net tank actually needed. A 60 gal gross on a 1.5 in x 200 ft primary loop holds 18.36 gal, so only a 42 gal tank is required; a 2 in x 1000 ft loop holds 163 gal and wipes the requirement out entirely. Catalog 1,070 -> 1,071 (version 0.212.0).
+
 ### feat(hvac): spec-v622 draft-hood dilution ratio; 2026-07-11
 
 Lands `draft-hood-dilution` (Group C, calc-hvacservice.js), the follow-on spec-v584 named: how much room air the draft hood pulled in, from two O2 readings. dilution_ratio = (20.9 - O2_appliance) / (20.9 - O2_diluted); dilution_air_fraction = (O2_diluted - O2_appliance) / (20.9 - O2_appliance) (the 20.9% ambient-oxygen mass balance). A clean appliance at 5% O2 reading 12% at the vent has 44% dilution air, so a CO reading there is only 56% of the true flue value - why the air-free CO sample belongs before the draft hood. Catalog 1,069 -> 1,070 (version 0.211.0).

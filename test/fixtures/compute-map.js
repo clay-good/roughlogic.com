@@ -872,6 +872,7 @@ export const COMPUTE_MAP = {
   "evaporator-td-dtd": { module: "../../calc-refrigerant.js", fn: "computeEvaporatorTdDtd" },
   "flash-gas-subcool": { module: "../../calc-refrigerant.js", fn: "computeFlashGasSubcool" },
   "hydronic-buffer-tank": { module: "../../calc-hvacsystems.js", fn: "computeHydronicBufferTank" },
+  "buffer-tank-loop-credit": { module: "../../calc-hvacsystems.js", fn: "computeBufferTankLoopCredit" },
   // spec-v323..v325 engine-build performance batch (3 tiles)
   "injector-size": { module: "../../calc-mechanic.js", fn: "computeInjectorSize" },
   "mean-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMeanPistonSpeed" },

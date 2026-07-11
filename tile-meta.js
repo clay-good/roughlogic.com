@@ -587,6 +587,7 @@ const _TILES = [
   ["walk-in-cooler-load", "C"], ["product-pull-down-load", "C"], ["evaporator-td-dtd", "C"],
   ["flash-gas-subcool", "C"],
   ["hydronic-buffer-tank", "C"],
+  ["buffer-tank-loop-credit", "C"],
   // spec-v323..v325 engine-build performance batch (calc-mechanic.js Group K)
   ["injector-size", "K"], ["mean-piston-speed", "K"], ["trap-speed-horsepower", "K"],
   // spec-v326..v328 soil characterization / QC batch (calc-earthwork.js Group E)
