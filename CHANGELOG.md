@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spec-v625 submerged-backfill earth pressure (buoyant + hydrostatic); 2026-07-11
+
+Lands `submerged-earth-pressure` (Group E, calc-geotech.js), the submerged-backfill companion spec-v261 named beside `lateral-earth-pressure` ("a submerged zone must be run with buoyant unit weight plus separate hydrostatic pressure"). Below the water table the soil skeleton pushes with its buoyant weight (gamma_sat - 62.4) at the Ka reduction while the water pushes with the full hydrostatic pressure at no reduction: Pa' = 0.5 x Ka x gamma_buoy x H^2, Pw = 0.5 x 62.4 x H^2, plus the Ka q H surcharge, combined resultant, and the dry-case thrust for contrast. A 10 ft phi = 30, 125 pcf sand pushes 2,083 lb/ft dry but 4,163 lb/ft submerged - almost exactly 2x, three-quarters of it water. Pure effective-stress soil mechanics, no proprietary constants. Catalog 1,072 -> 1,073 (version 0.214.0).
+
 ### feat(construction): spec-v624 at-rest earth pressure (Jaky K0) for a braced wall; 2026-07-11
 
 Lands `at-rest-earth-pressure` (Group E, calc-geotech.js), the at-rest limit-state follow-on spec-v261 named beside `lateral-earth-pressure`. A basement wall, braced excavation, or rigid culvert cannot deflect to the Rankine active limit, so it carries the higher at-rest pressure: Jaky's K0 = 1 - sin phi, the triangular thrust P0 = 0.5 x K0 x gamma x H^2 at H/3, the surcharge term K0 x q x H at H/2, the combined resultant and its height. A 10 ft phi = 30 sand wall carries 3,000 lb/ft at rest against only 2,000 lb/ft active - exactly 1.5x more, the error of reaching for the active tile on a braced wall. Pure first-principles soil mechanics, no proprietary constants. Catalog 1,071 -> 1,072 (version 0.213.0).

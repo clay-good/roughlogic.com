@@ -20168,3 +20168,32 @@ test("bounds: spec-v624 computeAtRestEarthPressure pins the Jaky K0, the thrusts
   assert.ok("error" in _v624({ phi: 50, gamma: 120, h_ft: 10 }));
   assert.ok("error" in _v624({ phi: NaN, gamma: 120, h_ft: 10 }));
 });
+
+import { computeSubmergedEarthPressure as _v625 } from "../../calc-geotech.js";
+
+test("bounds: spec-v625 computeSubmergedEarthPressure pins the buoyant soil + hydrostatic water split, the ~2x-dry relation, the surcharge cross-check, and error seams", () => {
+  const r = _v625({ phi: 30, gamma_sat: 125, h_ft: 10, q: 0 });
+  assert.ok(Math.abs(r.ka - 1 / 3) < 1e-12);
+  assert.ok(Math.abs(r.gamma_buoy - 62.6) < 1e-9); // 125 - 62.4
+  assert.ok(Math.abs(r.pa_soil - 1043.3333333333335) < 1e-9);
+  assert.ok(Math.abs(r.pw - 3120) < 1e-9); // 0.5 * 62.4 * 100
+  assert.ok(Math.abs(r.pa_tot - 4163.333333333334) < 1e-9);
+  assert.ok(Math.abs(r.dry_ref - 2083.333333333333) < 1e-9);
+  // Submergence roughly doubles the thrust, and the water alone exceeds the whole dry design.
+  assert.ok(Math.abs(r.pa_tot / r.dry_ref - 1.9984) < 1e-3);
+  assert.ok(r.pw > r.dry_ref);
+  assert.ok(Math.abs(r.y_bar - 10 / 3) < 1e-9); // both triangular terms act at H/3 when q=0
+  // Cross-check: a 300 psf surcharge adds 1,000 lb/ft at mid-height and lifts the resultant.
+  const r2 = _v625({ phi: 30, gamma_sat: 125, h_ft: 10, q: 300 });
+  assert.ok(Math.abs(r2.pa_surch - 1000) < 1e-9);
+  assert.ok(Math.abs(r2.pa_tot - 5163.333333333334) < 1e-9);
+  assert.ok(r2.y_bar > r.y_bar);
+  // Error seams: non-finite, gamma_sat <= gamma_w (non-positive buoyant weight), non-positive H, negative q, phi out of range.
+  assert.ok("error" in _v625({ phi: 30, gamma_sat: 62.4, h_ft: 10 }));
+  assert.ok("error" in _v625({ phi: 30, gamma_sat: 50, h_ft: 10 }));
+  assert.ok("error" in _v625({ phi: 30, gamma_sat: 125, h_ft: 0 }));
+  assert.ok("error" in _v625({ phi: 30, gamma_sat: 125, h_ft: 10, q: -1 }));
+  assert.ok("error" in _v625({ phi: 0, gamma_sat: 125, h_ft: 10 }));
+  assert.ok("error" in _v625({ phi: 50, gamma_sat: 125, h_ft: 10 }));
+  assert.ok("error" in _v625({ phi: NaN, gamma_sat: 125, h_ft: 10 }));
+});

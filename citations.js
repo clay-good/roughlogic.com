@@ -11426,6 +11426,17 @@ export const CITATIONS = {
       { name: "Normally consolidated cohesionless", value: "K0 = 1 - sin phi is the NC form; an overconsolidated deposit carries a higher K0 that rises with OCR", source: "Das / NAVFAC DM-7.02" },
     ],
   },
+  "submerged-earth-pressure": {
+    formula: "Ka = (1 - sin phi)/(1 + sin phi); Pa' = 0.5 Ka (gamma_sat - 62.4) H^2 at H/3; Pw = 0.5 x 62.4 x H^2 at H/3; surcharge Ka q H at H/2; total and resultant height, with the dry-case thrust for contrast.",
+    edition: "Rankine active pressure with effective-stress (buoyant) unit weight, as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures), by name.",
+    freeAccess: "NAVFAC DM-7.02 is a free public US Navy design manual; the effective-stress split of soil and water pressure is public and printed in every soil-mechanics text; gamma_w = 62.4 pcf fresh water.",
+    governance: GOVERNANCE.general,
+    editionNote: "Rankine active pressure below the water table on an effective-stress basis - the soil skeleton pushes with its buoyant weight Pa' = 0.5 Ka (gamma_sat - gamma_w) H^2 while the water pushes separately with the full hydrostatic Pw = 0.5 gamma_w H^2 (gamma_w = 62.4 pcf), plus a uniform-surcharge term Ka q H - as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). gamma_sat defaults to 125 pcf, q to 0. The fully-submerged active case (water table at the top of the retained height): cohesionless backfill, a vertical wall free to reach its active state, the soil and water thrusts both at H/3 and the surcharge at H/2. Submergence roughly doubles the total thrust versus the same soil dry, and most of it is water - a working drain that relieves the water is the intended design response. Take phi and gamma_sat from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report - the geotechnical engineer of record's recommendation governs.",
+    assumptions: [
+      { name: "Effective stress below the water table", value: "the soil contributes its buoyant weight (gamma_sat - gamma_w) at the Ka reduction; the water contributes full hydrostatic pressure at no reduction", source: "Das / NAVFAC DM-7.02" },
+      { name: "Fully submerged, drainage relieves it", value: "the water table stands at the top of the retained height (worst case); a working drain that unsaturates the backfill removes the hydrostatic term", source: "Das / NAVFAC DM-7.02" },
+    ],
+  },
   "retaining-wall-stability": {
     formula: "FS_ot = Mr / Mo; FS_sl = mu x sum(V) / Pa; e = B/2 - (Mr - Mo)/sum(V); q_max,min = (sum(V)/B) x (1 +/- 6e/B); Rankine Pa = 0.5 Ka gamma H^2 + Ka q H.",
     edition: "The standard cantilever-retaining-wall global-stability checks as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02, against the IBC 1807.2.3 minimum factor of safety of 1.5 for sliding and overturning, by name.",

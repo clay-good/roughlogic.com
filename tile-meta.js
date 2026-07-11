@@ -745,7 +745,7 @@ const _TILES = [
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
   ["concrete-torsion-threshold", "E"], ["glulam-volume-factor", "E"], ["masonry-anchor-bolt", "E"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)
-  ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["at-rest-earth-pressure", "E"], ["retaining-wall-stability", "E"],
+  ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["at-rest-earth-pressure", "E"], ["submerged-earth-pressure", "E"], ["retaining-wall-stability", "E"],
   ["consolidation-time-rate", "E"], ["spt-bearing-capacity", "E"], ["liquefaction-screening", "E"],
   // spec-v498 pile group efficiency (Converse-Labarre)
   ["pile-group-efficiency", "E"],

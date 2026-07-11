@@ -1096,6 +1096,7 @@ const RELATED = {
   "soil-bearing-capacity": ["footing-area","retaining-wall-stability","helical-pile"],
   "lateral-earth-pressure": ["retaining-wall-stability","soil-bearing-capacity","spoil-setback"],
   "at-rest-earth-pressure": ["lateral-earth-pressure","retaining-wall-stability","boussinesq-surcharge-wall"],
+  "submerged-earth-pressure": ["lateral-earth-pressure","at-rest-earth-pressure","retaining-wall-stability"],
   "retaining-wall-stability": ["lateral-earth-pressure","soil-bearing-capacity","retaining-wall-block"],
   "consolidation-time-rate": ["soil-consolidation-settlement","soil-settlement-elastic","soil-bearing-capacity","spt-bearing-capacity"],
   "spt-bearing-capacity": ["soil-bearing-capacity","soil-settlement-elastic","consolidation-time-rate","footing-area"],

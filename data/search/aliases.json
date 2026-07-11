@@ -82242,6 +82242,56 @@
       "term": "earth pressure on a braced excavation wall",
       "target": "at-rest-earth-pressure",
       "kind": "question"
+    },
+    {
+      "term": "submerged backfill pressure",
+      "target": "submerged-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "hydrostatic wall pressure",
+      "target": "submerged-earth-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "buoyant unit weight thrust",
+      "target": "submerged-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "water table behind retaining wall",
+      "target": "submerged-earth-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "effective stress earth pressure",
+      "target": "submerged-earth-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much does the water table add to wall pressure",
+      "target": "submerged-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "earth pressure below the water table",
+      "target": "submerged-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "buoyant soil plus hydrostatic thrust on a wall",
+      "target": "submerged-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "why does a wall drain matter for soil pressure",
+      "target": "submerged-earth-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "submerged backfill doubles the thrust on a wall",
+      "target": "submerged-earth-pressure",
+      "kind": "question"
     }
   ]
 }

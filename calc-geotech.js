@@ -33,6 +33,10 @@ const _finiteGuard = (o) => {
   return null;
 };
 
+// Freshwater unit weight (pcf), the universal constant used across the repo
+// (calc-earthwork.js soil-phase-relations); non-exported, adds no corpus row.
+const _GAMMA_W = 62.4;
+
 // Compact renderer factory (same shape as the calc-steel / calc-concrete
 // _simpleRenderer factories) supporting number and select inputs.
 function _simpleRenderer(spec) {
@@ -207,6 +211,48 @@ GEOTECH_RENDERERS["at-rest-earth-pressure"] = _simpleRenderer({
     { key: "yb", id: "arep-out-yb", label: "Resultant height above base", value: (r) => fmt(r.y_bar, 2) + " ft" },
   ],
   compute: computeAtRestEarthPressure,
+});
+
+// ===================== spec-v625: submerged-backfill earth pressure (buoyant + hydrostatic) =====================
+
+// dims: in { phi: dimensionless, gamma_sat: M L^-2 T^-2, h_ft: L, q: M L^-1 T^-2 } out: { ka: dimensionless, gamma_buoy: M L^-2 T^-2, pa_soil: M T^-2, pa_surch: M T^-2, pw: M T^-2, pa_tot: M T^-2, y_bar: L, dry_ref: M T^-2 }
+export function computeSubmergedEarthPressure({ phi = 0, gamma_sat = 125, h_ft = 0, q = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(gamma_sat > _GAMMA_W)) return { error: "Saturated unit weight must exceed the water unit weight (62.4 pcf)." };
+  if (!(h_ft > 0)) return { error: "Retained height must be positive (ft)." };
+  if (q < 0) return { error: "Surcharge cannot be negative (psf)." };
+  if (phi <= 0 || phi >= 50) return { error: "Friction angle must be between 0 and 50 degrees (exclusive)." };
+  const phi_r = phi * Math.PI / 180;
+  const ka = (1 - Math.sin(phi_r)) / (1 + Math.sin(phi_r));
+  const gamma_buoy = gamma_sat - _GAMMA_W;
+  const pa_soil = 0.5 * ka * gamma_buoy * h_ft * h_ft;
+  const pa_surch = ka * q * h_ft;
+  const pw = 0.5 * _GAMMA_W * h_ft * h_ft;
+  const pa_tot = pa_soil + pa_surch + pw;
+  const y_bar = (pa_soil * (h_ft / 3) + pa_surch * (h_ft / 2) + pw * (h_ft / 3)) / pa_tot;
+  const dry_ref = 0.5 * ka * gamma_sat * h_ft * h_ft;
+  return { ka, gamma_buoy, pa_soil, pa_surch, pw, pa_tot, y_bar, dry_ref };
+}
+
+export const submergedEarthPressureExample = { inputs: { phi: 30, gamma_sat: 125, h_ft: 10, q: 0 } };
+
+GEOTECH_RENDERERS["submerged-earth-pressure"] = _simpleRenderer({
+  citation: "Citation: Rankine active pressure with effective-stress (buoyant) unit weight below the water table -- Ka = (1 - sin phi)/(1 + sin phi), effective soil thrust Pa' = 0.5 x Ka x (gamma_sat - gamma_w) x H^2, a separate hydrostatic thrust Pw = 0.5 x gamma_w x H^2 (gamma_w = 62.4 pcf), and a uniform-surcharge thrust Ka x q x H -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.02 (Foundations and Earth Structures). The fully-submerged active case: the water table stands at the top of the retained height, the backfill is cohesionless, the wall is vertical and free to reach its active state, and the effective soil thrust and the hydrostatic water thrust both act at H/3 (surcharge at H/2). Submergence roughly doubles the total thrust versus the same soil dry, and most of it is water, not soil -- a working drain that relieves the water is the intended design response. Take phi and gamma_sat from the geotechnical report. A design aid, not a substitute for a geotechnical engineer's report -- the geotechnical engineer of record's recommendation governs.",
+  example: submergedEarthPressureExample.inputs,
+  fields: [
+    { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
+    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number", default: 125 },
+    { key: "h_ft", label: "Submerged retained height H (ft)", kind: "number" },
+    { key: "q", label: "Uniform surcharge q (psf)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "k", id: "sep-out-k", label: "Ka / buoyant unit weight", value: (r) => fmt(r.ka, 3) + " / " + fmt(r.gamma_buoy, 1) + " pcf" },
+    { key: "pw", id: "sep-out-pw", label: "Hydrostatic water thrust Pw", value: (r) => fmt(r.pw, 0) + " lb/ft" },
+    { key: "pt", id: "sep-out-pt", label: "Total thrust (soil + surcharge + water)", value: (r) => fmt(r.pa_tot, 0) + " lb/ft (" + fmt(r.pa_soil, 0) + " + " + fmt(r.pa_surch, 0) + " + " + fmt(r.pw, 0) + ")" },
+    { key: "yb", id: "sep-out-yb", label: "Resultant height above base", value: (r) => fmt(r.y_bar, 2) + " ft" },
+    { key: "dr", id: "sep-out-dr", label: "Same wall dry, for contrast", value: (r) => fmt(r.dry_ref, 0) + " lb/ft (" + fmt(r.pa_tot / r.dry_ref, 2) + "x dry)" },
+  ],
+  compute: computeSubmergedEarthPressure,
 });
 
 // ===================== spec-v262: cantilever retaining wall stability =====================
