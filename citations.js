@@ -4591,6 +4591,17 @@ export const CITATIONS = {
       { name: "Bottleneck", value: "sustained flow is capped by the fill/dump site, not the number or size of tankers", source: "NFPA 1142 water shuttle" },
     ],
   },
+  "vacuum-lift-reading": {
+    formula: "suction_head_ft = vacuum_inhg x 1.13; theoretical_ceiling = 33.9 - site_elevation / 1000; attainable_ceiling = pump_factor x theoretical_ceiling; margin = attainable_ceiling - suction_head_ft.",
+    edition: "IFSTA / NWCG fire-pump drafting practice vacuum-to-lift conversion, by name.",
+    freeAccess: "The vacuum-to-lift conversion is public fire-service / wildland training material; incident command governs the actual draft.",
+    governance: GOVERNANCE.general,
+    editionNote: "At steady flow the compound gauge reads the lift plus the suction-hose friction, so the readout is total suction head, not pure lift. A reading approaching the attainable ceiling means the pump is about to lose prime and cavitate - the fix is to resite the pump lower, not to throttle up, because lift is limited by the atmosphere pushing water up the hose (a bigger pump does not raise the ceiling). 1 in Hg is about 1.13 ft. The pump operator and incident command govern - a readout aid, not incident command.",
+    assumptions: [
+      { name: "Vacuum-to-feet", value: "1 in Hg of vacuum is about 1.13 ft of suction head", source: "IFSTA / NWCG" },
+      { name: "Total suction head", value: "at flow the gauge reads lift plus suction-hose friction, checked against the ~2/3 attainable, altitude-corrected ceiling", source: "IFSTA / NWCG" },
+    ],
+  },
   "draft-lift-max": {
     formula: "theoretical_lift = 33.9 - site_elevation / 1000; attainable_lift = pump_factor x theoretical_lift - suction_losses (pump_factor about 2/3).",
     edition: "IFSTA / NWCG firefighter math altitude-corrected drafting maximum lift, by name.",

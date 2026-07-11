@@ -657,6 +657,7 @@ const TOOL_MODULES = (() => {
     "nfa-fireground-flow",
     "relay-pump-distance",
     "draft-lift-max",
+    "vacuum-lift-reading",
     "tanker-shuttle-flow",
     "foam-eductor-limit",
   ]);

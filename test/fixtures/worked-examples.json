@@ -50000,6 +50000,74 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "vacuum-lift-reading",
+   "source_publisher": "IFSTA / NWCG fire-pump drafting practice",
+   "source_title": "suction_head_ft = vacuum_inhg x 1.13 against the altitude-corrected ceiling (spec-v579's named follow-on)",
+   "source_edition_or_year": "IFSTA / NWCG firefighter math",
+   "source_section_or_page": "10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.6 ft attainable ceiling, 11.3 ft margin",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "vacuum_inhg": 10,
+    "site_elevation_ft": 0,
+    "pump_factor": 0.667
+   },
+   "outputs": {
+    "suction_head_ft": {
+     "value": 11.3,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "attainable_ceiling_ft": {
+     "value": 22.6113,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "margin_ft": {
+     "value": 11.3113,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "vacuum-lift-reading",
+   "source_publisher": "IFSTA / NWCG fire-pump drafting practice",
+   "source_title": "cross-check: 18 in Hg at a 3,000 ft mountain lake is nearly at the ceiling",
+   "source_edition_or_year": "IFSTA / NWCG firefighter math",
+   "source_section_or_page": "18 in Hg at 3,000 ft -> 20.34 ft head, 20.61 ft attainable ceiling, 98.7% of ceiling, 0.27 ft margin (near cavitation)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "vacuum_inhg": 18,
+    "site_elevation_ft": 3000,
+    "pump_factor": 0.667
+   },
+   "outputs": {
+    "suction_head_ft": {
+     "value": 20.34,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "attainable_ceiling_ft": {
+     "value": 20.6103,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "margin_ft": {
+     "value": 0.2703,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

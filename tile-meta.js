@@ -585,6 +585,7 @@ const _TILES = [
   ["nfa-fireground-flow", "F"],
   ["relay-pump-distance", "F"],
   ["draft-lift-max", "F"],
+  ["vacuum-lift-reading", "F"],
   ["tanker-shuttle-flow", "F"],
   ["foam-eductor-limit", "F"],
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)

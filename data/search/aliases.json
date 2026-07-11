@@ -80862,6 +80862,56 @@
       "term": "cubic feet of gas per pound volatile solids",
       "target": "digester-gas-production",
       "kind": "question"
+    },
+    {
+      "term": "vacuum gauge lift",
+      "target": "vacuum-lift-reading",
+      "kind": "industry"
+    },
+    {
+      "term": "in hg to feet",
+      "target": "vacuum-lift-reading",
+      "kind": "redirect"
+    },
+    {
+      "term": "drafting vacuum reading",
+      "target": "vacuum-lift-reading",
+      "kind": "adjacent"
+    },
+    {
+      "term": "compound gauge feet",
+      "target": "vacuum-lift-reading",
+      "kind": "adjacent"
+    },
+    {
+      "term": "suction lift gauge",
+      "target": "vacuum-lift-reading",
+      "kind": "industry"
+    },
+    {
+      "term": "convert inches of mercury to feet of lift",
+      "target": "vacuum-lift-reading",
+      "kind": "question"
+    },
+    {
+      "term": "what does the vacuum gauge mean when drafting",
+      "target": "vacuum-lift-reading",
+      "kind": "question"
+    },
+    {
+      "term": "how many feet of lift is 10 in hg",
+      "target": "vacuum-lift-reading",
+      "kind": "question"
+    },
+    {
+      "term": "is my draft about to lose prime",
+      "target": "vacuum-lift-reading",
+      "kind": "question"
+    },
+    {
+      "term": "compound gauge reading to suction head",
+      "target": "vacuum-lift-reading",
+      "kind": "question"
     }
   ]
 }

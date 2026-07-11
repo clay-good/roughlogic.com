@@ -1977,6 +1977,54 @@ function renderDraftLiftMax(inputRegion, outputRegion, citationEl) {
 }
 FIRE_RENDERERS["draft-lift-max"] = renderDraftLiftMax;
 
+// --- spec-v597 F: Vacuum gauge to drafting lift readout ---
+// suction_head = vacuum_inhg * 1.13. ceiling = 33.9 - elev/1000 (theoretical), factor*that (attainable). margin = attainable - head.
+// dims: in { vacuum_inhg: dimensionless, site_elevation_ft: L, pump_factor: dimensionless } out: { suction_head_ft: L, theoretical_ceiling_ft: L, attainable_ceiling_ft: L, margin_ft: L, pct_of_attainable: dimensionless }
+export function computeVacuumLiftReading({ vacuum_inhg = 0, site_elevation_ft = 0, pump_factor = 0.667 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vac = Number(vacuum_inhg) || 0;
+  const elev = Number(site_elevation_ft) || 0;
+  const factor = Number(pump_factor) || 0;
+  if (vac < 0) return { error: "Vacuum reading cannot be negative (in Hg)." };
+  if (elev < 0) return { error: "Site elevation cannot be negative (ft)." };
+  if (!(factor > 0 && factor <= 1)) return { error: "Pump condition factor must be over 0 and at most 1." };
+  const suction_head_ft = vac * 1.13;
+  const theoretical_ceiling_ft = 33.9 - elev / 1000;
+  const attainable_ceiling_ft = factor * theoretical_ceiling_ft;
+  const margin_ft = attainable_ceiling_ft - suction_head_ft;
+  const pct_of_attainable = attainable_ceiling_ft > 0 ? suction_head_ft / attainable_ceiling_ft * 100 : null;
+  const over_ceiling = margin_ft < 0;
+  const near_ceiling = !over_ceiling && pct_of_attainable !== null && pct_of_attainable >= 90;
+  return {
+    suction_head_ft, theoretical_ceiling_ft, attainable_ceiling_ft, margin_ft, pct_of_attainable, over_ceiling, near_ceiling,
+    note: "At steady flow the compound gauge reads the lift plus the suction-hose friction, so this is total suction head, not pure lift. A reading approaching the attainable ceiling means the pump is about to lose prime and cavitate - the fix is to resite the pump lower, not to throttle up, because lift is limited by the atmosphere pushing water up the hose (a bigger pump does not raise the ceiling). 1 in Hg is about 1.13 ft. The pump operator and incident command govern - a readout aid, not incident command.",
+  };
+}
+export const vacuumLiftReadingExample = { inputs: { vacuum_inhg: 10, site_elevation_ft: 0, pump_factor: 0.667 } };
+function renderVacuumLiftReading(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A readout aid, not incident command; the pump operator and incident command govern. Citation: IFSTA / NWCG fire-pump drafting practice vacuum-to-lift conversion, by name. suction_head_ft = vacuum_inhg x 1.13; theoretical_ceiling = 33.9 - elevation/1000; attainable_ceiling = factor x theoretical (factor about 2/3); margin = attainable - suction_head. At steady flow the compound gauge reads the lift plus the suction-hose friction, so the readout is total suction head; a reading approaching the ceiling means the pump is about to lose prime and cavitate.";
+  const vac = makeNumber("Compound (vacuum) gauge reading (in Hg)", "vlr-vac", { step: "any", min: "0", value: "10" }); vac.input.value = "10";
+  const elev = makeNumber("Draft-site elevation (ft above sea level)", "vlr-elev", { step: "any", min: "0", value: "0" }); elev.input.value = "0";
+  const factor = makeNumber("Pump condition factor (0-1, default 0.667)", "vlr-factor", { step: "any", min: "0", max: "1", value: "0.667" }); factor.input.value = "0.667";
+  for (const f of [vac, elev, factor]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { vac.input.value = "10"; elev.input.value = "0"; factor.input.value = "0.667"; update(); });
+  const oHead = makeOutputLine(outputRegion, "Total suction head", "vlr-out-head");
+  const oCeil = makeOutputLine(outputRegion, "Attainable ceiling (altitude-corrected)", "vlr-out-ceil");
+  const oMargin = makeOutputLine(outputRegion, "Margin to the ceiling", "vlr-out-margin");
+  const oNote = makeOutputLine(outputRegion, "Note", "vlr-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeVacuumLiftReading({ vacuum_inhg: readNum(vac.input), site_elevation_ft: readNum(elev.input), pump_factor: factor.input.value === "" ? 0.667 : readNum(factor.input) });
+    if (r.error) { oHead.textContent = r.error; oCeil.textContent = "-"; oMargin.textContent = "-"; oNote.textContent = ""; return; }
+    oHead.textContent = fmt(r.suction_head_ft, 1) + " ft (" + (r.pct_of_attainable !== null ? fmt(r.pct_of_attainable, 0) + "% of ceiling" : "-") + ")";
+    oCeil.textContent = fmt(r.attainable_ceiling_ft, 1) + " ft";
+    oMargin.textContent = r.over_ceiling ? fmt(-r.margin_ft, 1) + " ft OVER the ceiling - the draft will break; resite the pump lower" : fmt(r.margin_ft, 1) + " ft" + (r.near_ceiling ? " - near the ceiling, watch for cavitation" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [vac, elev, factor]) f.input.addEventListener("input", update);
+}
+FIRE_RENDERERS["vacuum-lift-reading"] = renderVacuumLiftReading;
+
 // --- spec-v580 F: Tanker (water shuttle) sustained flow ---
 // usable = nominal*fraction. shuttle_flow = usable*tankers/cycle. cycle = fill+dump+2*travel.
 // dims: in { nominal_tank_gal: L^3, usable_fraction: dimensionless, tanker_count: dimensionless, cycle_time_min: T } out: { usable_gal: L^3, shuttle_flow_gpm: L^3 T^-1 }

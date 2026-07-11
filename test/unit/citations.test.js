@@ -86,7 +86,7 @@ async function _groupIds(blockMarker, nextMarker) {
 
 test("Group F audit coverage: every fire-ground tile has a CITATIONS entry", async () => {
   const ids = await _groupIds("// Group F: Fire-Ground", "// Group G");
-  assert.ok(ids.length === 31, "expected 31 Group F tile ids, got " + ids.length);
+  assert.ok(ids.length === 32, "expected 32 Group F tile ids, got " + ids.length);
   for (const id of ids) assert.ok(CITATIONS[id], "Group F tile '" + id + "' missing CITATIONS entry");
 });
 

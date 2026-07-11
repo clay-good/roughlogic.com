@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): spec-v597 vacuum gauge to drafting lift readout; 2026-07-10
+
+Lands `vacuum-lift-reading` (Group F, calc-fire.js), the follow-on spec-v579 named: reads the compound (vacuum) gauge during a draft. suction_head_ft = vacuum_inhg x 1.13, against the altitude-corrected attainable ceiling (factor x (33.9 - elevation/1000)) with the margin left. 10 in Hg at sea level is 11.3 ft (half the ~22.6 ft ceiling); 18 in Hg at 3,000 ft is 98% of the ceiling. Group F audit count 31 -> 32. Catalog 1,044 -> 1,045 (version 0.186.0).
+
 ### feat(wastewater): spec-v596 digester gas and methane production; 2026-07-10
 
 Lands `digester-gas-production` (Group M, calc-treatment.js), the follow-on spec-v573 named: the payoff side of anaerobic digestion. VS_destroyed = VS_fed x reduction/100; gas = VS_destroyed x yield (12-18 ft^3/lb, default 15); methane = gas x ~65%; energy = methane x 960 BTU/ft^3. A digester destroying 5,500 lb VS/day makes about 82,500 ft^3 of gas and 51.5 MMBtu/day. Group M audit count 27 -> 28. Catalog 1,043 -> 1,044 (version 0.185.0).

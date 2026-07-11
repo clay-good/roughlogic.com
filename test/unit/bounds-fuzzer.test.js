@@ -19277,3 +19277,39 @@ test("bounds: spec-v596 computeDigesterGasProduction pins gas/methane/energy, th
   assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, methane_pct: 0 }));
   assert.ok("error" in _v596({ vs_fed_lb_day: 10000, vs_reduction_pct: 55, methane_pct: 101 }));
 });
+
+import { computeVacuumLiftReading as _v597 } from "../../calc-fire.js";
+
+test("bounds: spec-v597 computeVacuumLiftReading pins the 1.13 conversion, the altitude ceiling, the margin, and error seams", () => {
+  // Pinned worked example: 10 in Hg, sea level, default factor.
+  const r = _v597({ vacuum_inhg: 10, site_elevation_ft: 0, pump_factor: 0.667 });
+  assert.ok(Math.abs(r.suction_head_ft - 11.3) < 1e-9);
+  assert.ok(Math.abs(r.theoretical_ceiling_ft - 33.9) < 1e-9);
+  assert.ok(Math.abs(r.attainable_ceiling_ft - 22.6113) < 1e-9);
+  assert.ok(Math.abs(r.margin_ft - 11.3113) < 1e-9);
+  assert.ok(Math.abs(r.pct_of_attainable - 49.97501249) < 1e-6);
+  assert.equal(r.over_ceiling, false);
+  assert.equal(r.near_ceiling, false);
+  // Cross-check: 18 in Hg at 3,000 ft is near the ceiling.
+  const x = _v597({ vacuum_inhg: 18, site_elevation_ft: 3000, pump_factor: 0.667 });
+  assert.ok(Math.abs(x.suction_head_ft - 20.34) < 1e-9);
+  assert.ok(Math.abs(x.attainable_ceiling_ft - 20.6103) < 1e-9);
+  assert.ok(Math.abs(x.margin_ft - 0.2703) < 1e-9);
+  assert.equal(x.near_ceiling, true);
+  // Head scales linearly with the vacuum reading.
+  const dbl = _v597({ vacuum_inhg: 20, site_elevation_ft: 0, pump_factor: 0.667 });
+  assert.ok(Math.abs(dbl.suction_head_ft - 2 * r.suction_head_ft) < 1e-9);
+  // Altitude lowers the ceiling.
+  const high = _v597({ vacuum_inhg: 10, site_elevation_ft: 5000, pump_factor: 0.667 });
+  assert.ok(high.attainable_ceiling_ft < r.attainable_ceiling_ft);
+  // A reading over the ceiling flags over_ceiling with a negative margin.
+  const over = _v597({ vacuum_inhg: 25, site_elevation_ft: 0, pump_factor: 0.667 });
+  assert.equal(over.over_ceiling, true);
+  assert.ok(over.margin_ft < 0);
+  // Error seams: non-finite, negative vacuum / elevation, factor out of 0-1.
+  assert.ok("error" in _v597({ vacuum_inhg: Infinity }));
+  assert.ok("error" in _v597({ vacuum_inhg: -1 }));
+  assert.ok("error" in _v597({ vacuum_inhg: 10, site_elevation_ft: -1 }));
+  assert.ok("error" in _v597({ vacuum_inhg: 10, pump_factor: 0 }));
+  assert.ok("error" in _v597({ vacuum_inhg: 10, pump_factor: 1.2 }));
+});
