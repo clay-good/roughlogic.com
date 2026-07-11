@@ -9045,6 +9045,17 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.9" },
     ],
   },
+  "beam-clamp-side-pull": {
+    formula: "V = T x sin(angle); H = T x cos(angle); pull_from_vertical = atan2(H, V); vertical_util = V / vertical_WLL x 100; horizontal_util = side_pull_rating > 0 ? H / side_pull_rating x 100 : flagged (no rating).",
+    edition: "Static force resolution; ASME B30.20 / beam-clamp manufacturer practice (the WLL is a vertical rating; side pull prohibited unless the manufacturer rates it), by name.",
+    freeAccess: "Force resolution is a public statics result; ASME B30.20 and the manufacturer's documentation govern below-the-hook hardware. An ESTIMATE only; the hardware ratings and a qualified rigger govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Most beam clamps carry no side-pull rating at all - when a horizontal component lands on an unrated clamp the answer is to re-rig (spot the attachment over the load, or use a trolley or spanner beam), not to accept the number. The leg tension and angle come from bridle-leg-tension or three-point-bridle. A design aid, not a rigging sign-off.",
+    assumptions: [
+      { name: "Vertical rating", value: "the clamp WLL applies to a straight-down pull; any documented side-pull allowance is the manufacturer's, not a default", source: "ASME B30.20 / manufacturer practice" },
+      { name: "Estimate only", value: "the hardware working load limits and a qualified rigger govern the actual pick", source: "ASME B30.20" },
+    ],
+  },
   "winch-drum-line-pull": {
     formula: "Dn = drum_dia + (2n - 1) x rope_dia; Pn = rated_pull x drum_dia / Dn; Vn = drum_speed x Dn / drum_dia; wraps_per_layer = floor(barrel_width / rope_dia).",
     edition: "Wire-rope drum mechanics / SAE winch rating convention, by name.",

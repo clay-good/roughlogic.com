@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): spec-v616 beam clamp reaction and side-pull check; 2026-07-10
+
+Lands `beam-clamp-side-pull` (Group Z, calc-rigging.js), the last spec-v544-named follow-on: the check at the steel. V = T sin(angle), H = T cos(angle), each against the clamp's vertical WLL and the manufacturer's side-pull allowance (0 = not rated, the default); a horizontal component on an unrated clamp returns a re-rig verdict, not a pass. The steep 860 lb leg of the v544 example loads its clamp 38% vertically but 77% of a generous 500 lb side-pull rating. Catalog 1,063 -> 1,064 (version 0.205.0).
+
 ### feat(rigging): spec-v615 three-point bridle leg tension (3-D); 2026-07-10
 
 Lands `three-point-bridle` (Group Z, calc-rigging.js), the follow-on spec-v544 named: the out-of-plane three-point resolution its two-leg tile explicitly excludes. Li = sqrt(e^2 + n^2 + rise^2); ui = (e, n, rise)/Li; T1 u1 + T2 u2 + T3 u3 = (0, 0, W) by Cramer's rule; errors on coplanar geometry and on any non-positive tension (the apex must hang inside the attachment triangle - a rope can only pull). Symmetric check recovers W / (3 sin angle) exactly; the asymmetric example splits 1,000 lb as 497 / 419 / 244. Raises the calc-rigging.js gzip cap 21000 -> 24000. Catalog 1,062 -> 1,063 (version 0.204.0).

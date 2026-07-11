@@ -1227,3 +1227,60 @@ function renderThreePointBridle(inputRegion, outputRegion, citationEl) {
   for (const f of fields) f.input.addEventListener("input", update);
 }
 RIGGING_RENDERERS["three-point-bridle"] = renderThreePointBridle;
+
+// --- spec-v616 Z: Beam clamp reaction and side-pull check (`beam-clamp-side-pull`) ---
+// V = T sin(angle), H = T cos(angle); utilizations vs the vertical WLL and the (often zero) side-pull rating.
+// dims: in { leg_tension_lb: M L T^-2, leg_angle_deg: dimensionless, vertical_wll_lb: M L T^-2, side_pull_lb: M L T^-2 } out: { vertical_lb: M L T^-2, horizontal_lb: M L T^-2, resultant_lb: M L T^-2, pull_from_vertical_deg: dimensionless, vertical_util_pct: dimensionless }
+export function computeBeamClampSidePull({ leg_tension_lb, leg_angle_deg, vertical_wll_lb, side_pull_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(leg_tension_lb);
+  const th = Number(leg_angle_deg);
+  const Vcap = Number(vertical_wll_lb);
+  const Hcap = Number(side_pull_lb) || 0;
+  if (!Number.isFinite(T) || T <= 0) return { error: "Leg tension must be a positive finite number (lb)." };
+  if (!Number.isFinite(th) || !(th > 0 && th <= 90)) return { error: "Leg angle must be in (0, 90] degrees above horizontal (90 = straight vertical)." };
+  if (!Number.isFinite(Vcap) || Vcap <= 0) return { error: "Vertical WLL must be a positive finite number (lb)." };
+  if (!Number.isFinite(Hcap) || Hcap < 0) return { error: "Side-pull rating must be zero (not rated) or positive (lb)." };
+  const rad = th * Math.PI / 180;
+  const vertical_lb = T * Math.sin(rad);
+  const horizontal_lb = th === 90 ? 0 : T * Math.cos(rad);
+  const resultant_lb = T;
+  const pull_from_vertical_deg = Math.atan2(horizontal_lb, vertical_lb) * 180 / Math.PI;
+  const vertical_util_pct = vertical_lb / Vcap * 100;
+  const horizontal_rated = Hcap > 0;
+  const horizontal_util_pct = horizontal_rated ? horizontal_lb / Hcap * 100 : null;
+  const needs_rerig = !horizontal_rated && horizontal_lb > 1e-9;
+  const vertical_ok = vertical_lb <= Vcap;
+  const horizontal_ok = horizontal_rated ? horizontal_lb <= Hcap : !needs_rerig;
+  const ok = vertical_ok && horizontal_ok;
+  return {
+    vertical_lb, horizontal_lb, resultant_lb, pull_from_vertical_deg, vertical_util_pct, horizontal_util_pct,
+    horizontal_rated, needs_rerig, ok,
+    note: needs_rerig
+      ? "A horizontal component lands on a clamp with no side-pull rating - re-rig (spot the attachment over the load, or use a trolley or spanner beam), do not accept the number. The hardware ratings and a qualified rigger govern."
+      : "The clamp WLL is a vertical rating; the side pull is checked against the manufacturer's documented allowance only. The hardware ratings and a qualified rigger govern.",
+  };
+}
+
+function renderBeamClampSidePull(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Static force resolution; ASME B30.20 / beam-clamp manufacturer practice (the WLL is a vertical rating and side pull is prohibited unless the manufacturer rates it), by name. V = T sin(angle); H = T cos(angle); utilizations V / V_WLL and H / H_allow. Most beam clamps carry no side-pull rating at all - when a horizontal component lands on an unrated clamp, re-rig (spot the attachment over the load, or use a trolley or spanner beam). The hardware ratings and a qualified rigger govern.";
+  const t = makeNumber("Leg tension (lb)", "bcs-t", { step: "any", min: "0" });
+  const a = makeNumber("Leg angle above horizontal (deg, 90 = vertical)", "bcs-a", { step: "any", min: "0", max: "90" });
+  const vc = makeNumber("Clamp vertical WLL (lb)", "bcs-vc", { step: "any", min: "0" });
+  const hc = makeNumber("Side-pull rating (lb, 0 = not rated)", "bcs-hc", { step: "any", min: "0", value: "0" });
+  hc.input.value = "0";
+  for (const f of [t, a, vc, hc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { t.input.value = "860.23"; a.input.value = "63.43"; vc.input.value = "2000"; hc.input.value = "500"; update(); });
+  const oV = makeOutputLine(outputRegion, "Vertical component", "bcs-out-v");
+  const oH = makeOutputLine(outputRegion, "Horizontal (side pull)", "bcs-out-h");
+  const oN = makeOutputLine(outputRegion, "Verdict", "bcs-out-n");
+  const update = debounce(() => {
+    const r = computeBeamClampSidePull({ leg_tension_lb: Number(t.input.value) || 0, leg_angle_deg: Number(a.input.value) || 0, vertical_wll_lb: Number(vc.input.value) || 0, side_pull_lb: Number(hc.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oH.textContent = "-"; oN.textContent = "-"; return; }
+    oV.textContent = fmt(r.vertical_lb, 1) + " lb (" + fmt(r.vertical_util_pct, 1) + "% of the WLL)";
+    oH.textContent = fmt(r.horizontal_lb, 1) + " lb" + (r.horizontal_rated ? " (" + fmt(r.horizontal_util_pct, 1) + "% of the side-pull rating)" : " - no side-pull rating") + ", pulling " + fmt(r.pull_from_vertical_deg, 1) + " deg off vertical";
+    oN.textContent = r.needs_rerig ? "RE-RIG - side pull on an unrated clamp" : (r.ok ? "Within both ratings" : "OVER a rating - do not make this pick");
+  }, DEBOUNCE_MS);
+  for (const f of [t, a, vc, hc]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["beam-clamp-side-pull"] = renderBeamClampSidePull;

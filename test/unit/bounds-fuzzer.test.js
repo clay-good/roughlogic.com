@@ -19891,3 +19891,37 @@ test("bounds: spec-v615 computeThreePointBridle pins the symmetric closed form, 
   // Outside the triangle: all three points east of the apex -> a leg would have to push.
   assert.ok("error" in _v615({ apex_load_lb: 1000, e1_ft: 2, n1_ft: 0, r1_ft: 8, e2_ft: 4, n2_ft: 3, r2_ft: 8, e3_ft: 3, n3_ft: -4, r3_ft: 8 }));
 });
+
+import { computeBeamClampSidePull as _v616 } from "../../calc-rigging.js";
+
+test("bounds: spec-v616 computeBeamClampSidePull pins the components, utilizations, the vertical-hang limit, the re-rig flag, and error seams", () => {
+  // Pinned worked example: the steep leg of the spec-v544 bridle on a rated clamp.
+  const r = _v616({ leg_tension_lb: 860.23, leg_angle_deg: 63.43, vertical_wll_lb: 2000, side_pull_lb: 500 });
+  assert.ok(Math.abs(r.vertical_lb - 769.38) < 0.01);
+  assert.ok(Math.abs(r.horizontal_lb - 384.77) < 0.01);
+  assert.ok(Math.abs(r.vertical_util_pct - 38.47) < 0.01);
+  assert.ok(Math.abs(r.horizontal_util_pct - 76.95) < 0.01);
+  assert.ok(Math.abs(r.pull_from_vertical_deg - 26.57) < 0.01);
+  assert.ok(r.ok && !r.needs_rerig);
+  // Pythagorean resultant: components recombine to the leg tension.
+  assert.ok(Math.abs(Math.hypot(r.vertical_lb, r.horizontal_lb) - 860.23) < 1e-9);
+  // Cross-check: the shallow leg on an unrated clamp returns the re-rig flag, not a pass.
+  const x = _v616({ leg_tension_lb: 1444, leg_angle_deg: 22.62, vertical_wll_lb: 4000, side_pull_lb: 0 });
+  assert.ok(Math.abs(x.vertical_lb - 555.39) < 0.01);
+  assert.ok(Math.abs(x.horizontal_lb - 1332.92) < 0.01);
+  assert.ok(x.needs_rerig && !x.ok && x.horizontal_util_pct === null);
+  // Vertical-hang limit: 90 degrees puts the full tension into V with exactly zero side pull.
+  const v = _v616({ leg_tension_lb: 1000, leg_angle_deg: 90, vertical_wll_lb: 2000 });
+  assert.ok(Math.abs(v.vertical_lb - 1000) < 1e-9);
+  assert.ok(v.horizontal_lb === 0 && v.ok && !v.needs_rerig);
+  // Over the vertical rating fails.
+  const over = _v616({ leg_tension_lb: 3000, leg_angle_deg: 90, vertical_wll_lb: 2000 });
+  assert.ok(!over.ok);
+  // Error seams: non-finite, non-positive tension / WLL, angle out of (0, 90], negative side-pull rating.
+  assert.ok("error" in _v616({ leg_tension_lb: Infinity, leg_angle_deg: 45, vertical_wll_lb: 1000 }));
+  assert.ok("error" in _v616({ leg_tension_lb: 0, leg_angle_deg: 45, vertical_wll_lb: 1000 }));
+  assert.ok("error" in _v616({ leg_tension_lb: 100, leg_angle_deg: 0, vertical_wll_lb: 1000 }));
+  assert.ok("error" in _v616({ leg_tension_lb: 100, leg_angle_deg: 91, vertical_wll_lb: 1000 }));
+  assert.ok("error" in _v616({ leg_tension_lb: 100, leg_angle_deg: 45, vertical_wll_lb: 0 }));
+  assert.ok("error" in _v616({ leg_tension_lb: 100, leg_angle_deg: 45, vertical_wll_lb: 1000, side_pull_lb: -5 }));
+});

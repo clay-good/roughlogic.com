@@ -81792,6 +81792,56 @@
       "term": "bridle with three attachment points",
       "target": "three-point-bridle",
       "kind": "question"
+    },
+    {
+      "term": "beam clamp",
+      "target": "beam-clamp-side-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "side pull",
+      "target": "beam-clamp-side-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "beam clamp side pull",
+      "target": "beam-clamp-side-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "clamp side load",
+      "target": "beam-clamp-side-pull",
+      "kind": "adjacent"
+    },
+    {
+      "term": "horizontal beam reaction",
+      "target": "beam-clamp-side-pull",
+      "kind": "redirect"
+    },
+    {
+      "term": "can a beam clamp take side pull",
+      "target": "beam-clamp-side-pull",
+      "kind": "question"
+    },
+    {
+      "term": "bridle leg force on a beam clamp",
+      "target": "beam-clamp-side-pull",
+      "kind": "question"
+    },
+    {
+      "term": "vertical and horizontal components of a rigging leg",
+      "target": "beam-clamp-side-pull",
+      "kind": "question"
+    },
+    {
+      "term": "check a beam clamp against its wll",
+      "target": "beam-clamp-side-pull",
+      "kind": "question"
+    },
+    {
+      "term": "side pull on an unrated clamp re rig",
+      "target": "beam-clamp-side-pull",
+      "kind": "question"
     }
   ]
 }

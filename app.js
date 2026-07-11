@@ -1163,6 +1163,8 @@ const TOOL_MODULES = (() => {
     "lifting-lug-design",
     // spec-v615
     "three-point-bridle",
+    // spec-v616
+    "beam-clamp-side-pull",
   ]);
   return map;
 })();
