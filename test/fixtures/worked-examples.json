@@ -50334,6 +50334,72 @@
      }
     }
    }
+  },
+  {
+   "tile_id": "pivot-application-rate",
+   "source_publisher": "USDA-NRCS center-pivot design / university extension",
+   "source_title": "app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band) (spec-v568's named follow-on)",
+   "source_edition_or_year": "USDA-NRCS center-pivot design",
+   "source_section_or_page": "1-in pass, 1,320 ft pivot, 24-hr revolution, 100-ft band -> 3.46 in/hr at the end tower, 6.9x a silt loam's 0.5 in/hr intake",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "pass_depth_in": 1.0,
+    "pivot_length_ft": 1320,
+    "revolution_hr": 24,
+    "wetted_band_ft": 100,
+    "soil_intake_in_hr": 0.5
+   },
+   "outputs": {
+    "app_rate_in_hr": {
+     "value": 3.455752,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "wetting_min": {
+     "value": 17.362357,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ratio": {
+     "value": 6.911504,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pivot-application-rate",
+   "source_publisher": "USDA-NRCS center-pivot design / university extension",
+   "source_title": "cross-check: a shorter pivot still overwhelms a tighter soil",
+   "source_edition_or_year": "USDA-NRCS center-pivot design",
+   "source_section_or_page": "0.75-in pass, 800 ft, 20-hr revolution, 80-ft band -> 2.36 in/hr, 7.9x a clay loam's 0.3 in/hr intake",
+   "verified_by": "rl",
+   "verified_on": "2026-07-10",
+   "inputs": {
+    "pass_depth_in": 0.75,
+    "pivot_length_ft": 800,
+    "revolution_hr": 20,
+    "wetted_band_ft": 80,
+    "soil_intake_in_hr": 0.3
+   },
+   "outputs": {
+    "app_rate_in_hr": {
+     "value": 2.356194,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "ratio": {
+     "value": 7.853982,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
   }
  ]
 }

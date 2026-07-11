@@ -81107,6 +81107,56 @@
       "term": "knockdown gpm for a compartment",
       "target": "iowa-rate-of-flow",
       "kind": "question"
+    },
+    {
+      "term": "pivot application rate",
+      "target": "pivot-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "outer span runoff",
+      "target": "pivot-application-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "instantaneous application rate",
+      "target": "pivot-application-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "sprinkler intake runoff",
+      "target": "pivot-application-rate",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pivot runoff",
+      "target": "pivot-application-rate",
+      "kind": "redirect"
+    },
+    {
+      "term": "will my center pivot run off",
+      "target": "pivot-application-rate",
+      "kind": "question"
+    },
+    {
+      "term": "outer span application rate vs soil intake",
+      "target": "pivot-application-rate",
+      "kind": "question"
+    },
+    {
+      "term": "why does the end of my pivot run off",
+      "target": "pivot-application-rate",
+      "kind": "question"
+    },
+    {
+      "term": "center pivot instantaneous rate",
+      "target": "pivot-application-rate",
+      "kind": "question"
+    },
+    {
+      "term": "peak application rate under a pivot",
+      "target": "pivot-application-rate",
+      "kind": "question"
     }
   ]
 }

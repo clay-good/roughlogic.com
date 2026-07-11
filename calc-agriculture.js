@@ -2556,6 +2556,58 @@ function _v568renderCenterPivotRuntime(inputRegion, outputRegion, citationEl) {
 }
 AGRICULTURE_RENDERERS["center-pivot-runtime"] = _v568renderCenterPivotRuntime;
 
+// --- spec-v602 L: Center-pivot outer-span application rate vs soil intake ---
+// speed = 2*pi*L/(T*60). wetting = W/speed. app_rate = D*2*pi*L/(T*W). exceeds if app_rate > intake.
+// dims: in { pass_depth_in: L, pivot_length_ft: L, revolution_hr: T, wetted_band_ft: L, soil_intake_in_hr: dimensionless } out: { speed_ft_min: dimensionless, wetting_min: T, app_rate_in_hr: dimensionless, ratio: dimensionless }
+export function computePivotApplicationRate({ pass_depth_in = 0, pivot_length_ft = 0, revolution_hr = 0, wetted_band_ft = 0, soil_intake_in_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(pass_depth_in) || 0;
+  const L = Number(pivot_length_ft) || 0;
+  const T = Number(revolution_hr) || 0;
+  const W = Number(wetted_band_ft) || 0;
+  const intake = Number(soil_intake_in_hr) || 0;
+  if (!(D > 0)) return { error: "Pass depth must be positive (in)." };
+  if (!(L > 0)) return { error: "Pivot length must be positive (ft)." };
+  if (!(T > 0)) return { error: "Revolution time must be positive (hr)." };
+  if (!(W > 0)) return { error: "Wetted band must be positive (ft)." };
+  if (!(intake > 0)) return { error: "Soil intake rate must be positive (in/hr)." };
+  const speed_ft_min = 2 * Math.PI * L / (T * 60);
+  const wetting_min = W / speed_ft_min;
+  const app_rate_in_hr = D * 2 * Math.PI * L / (T * W);
+  const exceeds_intake = app_rate_in_hr > intake;
+  const ratio = app_rate_in_hr / intake;
+  return {
+    speed_ft_min, wetting_min, app_rate_in_hr, exceeds_intake, ratio,
+    note: "This is the average rate over the wetted band at the outer span; the true peak of a bell-shaped pattern runs a little higher (about 6% for an elliptical package). The outer end always governs because it moves fastest. Runoff is avoided in practice only by the short wetting time and a little surface storage, so a slope or a crusted or tight soil will run off when the rate exceeds the intake - slow the pivot, narrow the band, or pick a lower-rate package. The pivot design, the sprinkler package, and the measured soil intake govern - a design screen, not a runoff model.",
+  };
+}
+export const pivotApplicationRateExample = { inputs: { pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 } };
+function _v602renderPivotApplicationRate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: center-pivot outer-span application rate (USDA-NRCS center-pivot design; university extension), by name. speed = 2 x pi x pivot_length / (revolution_hr x 60); wetting = wetted_band / speed; app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band). This is the average rate over the wetted band at the outer span (the true peak runs about 6% higher); the outer end governs because it moves fastest. Runoff is avoided only by the short wetting time and surface storage, so a slope or a tight soil runs off when the rate exceeds the intake.";
+  const D = makeNumber("Gross pass depth (in)", "par-d", { step: "any", min: "0", value: "1.0" }); D.input.value = "1.0";
+  const L = makeNumber("Pivot length to outer tower (ft)", "par-l", { step: "any", min: "0", value: "1320" }); L.input.value = "1320";
+  const T = makeNumber("Revolution time (hr)", "par-t", { step: "any", min: "0", value: "24" }); T.input.value = "24";
+  const W = makeNumber("Wetted band at outer span (ft)", "par-w", { step: "any", min: "0", value: "100" }); W.input.value = "100";
+  const intake = makeNumber("Soil intake rate (in/hr: sand ~1.0, loam ~0.5, clay ~0.15)", "par-i", { step: "any", min: "0", value: "0.5" }); intake.input.value = "0.5";
+  for (const f of [D, L, T, W, intake]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "1.0"; L.input.value = "1320"; T.input.value = "24"; W.input.value = "100"; intake.input.value = "0.5"; update(); });
+  const oRate = makeOutputLine(outputRegion, "Outer-span application rate", "par-out-rate");
+  const oWet = makeOutputLine(outputRegion, "Wetting time at a point", "par-out-wet");
+  const oCheck = makeOutputLine(outputRegion, "Against soil intake", "par-out-check");
+  const oNote = makeOutputLine(outputRegion, "Note", "par-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePivotApplicationRate({ pass_depth_in: readNum(D.input), pivot_length_ft: readNum(L.input), revolution_hr: readNum(T.input), wetted_band_ft: readNum(W.input), soil_intake_in_hr: readNum(intake.input) });
+    if (r.error) { oRate.textContent = r.error; oWet.textContent = "-"; oCheck.textContent = "-"; oNote.textContent = ""; return; }
+    oRate.textContent = fmt(r.app_rate_in_hr, 2) + " in/hr";
+    oWet.textContent = fmt(r.wetting_min, 1) + " min (" + fmt(r.speed_ft_min, 1) + " ft/min at the end tower)";
+    oCheck.textContent = r.exceeds_intake ? fmt(r.ratio, 1) + "x the intake - RUNOFF RISK on a slope or a tight soil" : fmt(r.ratio, 2) + "x the intake - within the soil's intake rate";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [D, L, T, W, intake]) f.input.addEventListener("input", update);
+}
+AGRICULTURE_RENDERERS["pivot-application-rate"] = _v602renderPivotApplicationRate;
+
 // --- spec-v569 L: Stored-grain aeration fan airflow ---
 // required_cfm = rate x bushels. cooling_hours = 15 / rate.
 // dims: in { bin_capacity_bu: dimensionless, airflow_rate: dimensionless } out: { required_cfm: L^3 T^-1, cooling_hours: T }

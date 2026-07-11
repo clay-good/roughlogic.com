@@ -19432,3 +19432,36 @@ test("bounds: spec-v601 computeIowaRateOfFlow pins the volume-to-flow relation, 
   assert.ok("error" in _v601({ length_ft: 20, width_ft: 0, height_ft: 10 }));
   assert.ok("error" in _v601({ length_ft: 20, width_ft: 30, height_ft: 0 }));
 });
+
+import { computePivotApplicationRate as _v602 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v602 computePivotApplicationRate pins the outer-span rate, the intake check, the sensitivities, and error seams", () => {
+  // Pinned worked example: 1-in pass, quarter-mile pivot, 24-hr revolution, 100-ft band, silt-loam intake.
+  const r = _v602({ pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 });
+  assert.ok(Math.abs(r.app_rate_in_hr - 1.0 * 2 * Math.PI * 1320 / (24 * 100)) < 1e-9);
+  assert.ok(Math.abs(r.app_rate_in_hr - 3.455752) < 1e-5);
+  assert.ok(Math.abs(r.wetting_min - 17.362357) < 1e-5);
+  assert.ok(Math.abs(r.ratio - 6.911504) < 1e-5);
+  assert.equal(r.exceeds_intake, true);
+  // Cross-check: shorter pivot, tighter soil.
+  const x = _v602({ pass_depth_in: 0.75, pivot_length_ft: 800, revolution_hr: 20, wetted_band_ft: 80, soil_intake_in_hr: 0.3 });
+  assert.ok(Math.abs(x.app_rate_in_hr - 2.356194) < 1e-5);
+  assert.ok(Math.abs(x.ratio - 7.853982) < 1e-5);
+  // Rate scales linearly with pass depth and pivot length, inversely with revolution time and band.
+  const deep = _v602({ pass_depth_in: 2.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 });
+  assert.ok(Math.abs(deep.app_rate_in_hr - 2 * r.app_rate_in_hr) < 1e-9);
+  const slow = _v602({ pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 48, wetted_band_ft: 100, soil_intake_in_hr: 0.5 });
+  assert.ok(Math.abs(slow.app_rate_in_hr - r.app_rate_in_hr / 2) < 1e-9);
+  const wide = _v602({ pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 200, soil_intake_in_hr: 0.5 });
+  assert.ok(Math.abs(wide.app_rate_in_hr - r.app_rate_in_hr / 2) < 1e-9);
+  // A high enough intake clears the exceeds flag.
+  const ok = _v602({ pass_depth_in: 1.0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 5 });
+  assert.equal(ok.exceeds_intake, false);
+  // Error seams: non-finite, non-positive depth / length / revolution / band / intake.
+  assert.ok("error" in _v602({ pass_depth_in: Infinity, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 }));
+  assert.ok("error" in _v602({ pass_depth_in: 0, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 }));
+  assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 0, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0.5 }));
+  assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 1320, revolution_hr: 0, wetted_band_ft: 100, soil_intake_in_hr: 0.5 }));
+  assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 0, soil_intake_in_hr: 0.5 }));
+  assert.ok("error" in _v602({ pass_depth_in: 1, pivot_length_ft: 1320, revolution_hr: 24, wetted_band_ft: 100, soil_intake_in_hr: 0 }));
+});

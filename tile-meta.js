@@ -109,6 +109,7 @@ const _TILES = [
   ["livestock-water-requirement", "L"],
   ["mulch-topsoil-volume", "L"], ["grain-drying-energy", "L"], ["manure-nutrient-application", "L"],
   ["center-pivot-runtime", "L"],
+  ["pivot-application-rate", "L"],
   ["grain-aeration-airflow", "L"],
   ["manure-storage-volume", "L"],
   ["two-stroke-mix", "L"],

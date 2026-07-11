@@ -133,6 +133,7 @@ const RELATED = {
   "grain-drying-energy": ["grain-shrink-moisture", "mulch-topsoil-volume", "livestock-dry-matter-intake", "manure-nutrient-application"],
   "manure-nutrient-application": ["npk-blend", "manure-application-rate", "grain-drying-energy", "mulch-topsoil-volume"],
   "center-pivot-runtime": ["irrigation-requirement", "sprinkler-precip-rate", "irrigation-zone-runtime"],
+  "pivot-application-rate": ["center-pivot-runtime", "sprinkler-precip-rate", "irrigation-requirement"],
   "grain-aeration-airflow": ["grain-drying-energy", "grain-bin-capacity", "center-pivot-runtime"],
   "manure-storage-volume": ["manure-application-rate", "manure-nutrient-application", "grain-bin-capacity"],
   "two-stroke-mix": ["gpa-rate", "tank-mix", "fuel-range"],

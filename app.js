@@ -891,6 +891,7 @@ const TOOL_MODULES = (() => {
     "mulch-topsoil-volume", "grain-drying-energy", "manure-nutrient-application",
     // spec-v568
     "center-pivot-runtime",
+    "pivot-application-rate",
     // spec-v569
     "grain-aeration-airflow",
     // spec-v582

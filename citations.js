@@ -775,6 +775,17 @@ export const CITATIONS = {
       { name: "Static-pressure stall", value: "power grows ~fourfold when the rate or depth doubles; read the fan curve at the design static pressure", source: "Shedd airflow-resistance curves" },
     ],
   },
+  "pivot-application-rate": {
+    formula: "speed_ft_min = 2 x pi x pivot_length_ft / (revolution_hr x 60); wetting_min = wetted_band_ft / speed_ft_min; app_rate_in_hr = pass_depth_in x 2 x pi x pivot_length_ft / (revolution_hr x wetted_band_ft); ratio = app_rate_in_hr / soil_intake_in_hr.",
+    edition: "Center-pivot outer-span application rate (USDA-NRCS center-pivot design; university extension), by name.",
+    freeAccess: "The center-pivot application-rate kinematics are public irrigation-engineering results; the pivot design and measured soil intake govern the actual runoff.",
+    governance: GOVERNANCE.general,
+    editionNote: "This is the average rate over the wetted band at the outer span; the true peak of a bell-shaped pattern runs a little higher (about 6% for an elliptical package). The outer end always governs because it moves fastest. Runoff is avoided in practice only by the short wetting time and a little surface storage, so a slope or a crusted or tight soil will run off when the rate exceeds the intake - slow the pivot, narrow the band, or pick a lower-rate package. The pivot design, the sprinkler package, and the measured soil intake govern - a design screen, not a runoff model.",
+    assumptions: [
+      { name: "Outer span governs", value: "the end tower moves fastest (2 x pi x L per revolution), so its instantaneous rate is the highest on the machine", source: "USDA-NRCS / extension" },
+      { name: "Average over the band", value: "reported as the average over the wetted band; the true elliptical-pattern peak is about 6% higher", source: "irrigation engineering" },
+    ],
+  },
   "center-pivot-runtime": {
     formula: "hours = area_acres x target_depth_in x 452.6 / system_flow_gpm; gross_gpm_per_acre = system_flow_gpm / area_acres; net_depth_in = target_depth_in x efficiency_pct / 100.",
     edition: "Center-pivot application depth and runtime (USDA-NRCS center-pivot design; university extension), by name.",

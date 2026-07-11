@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(irrigation): spec-v602 center-pivot outer-span application rate vs soil intake; 2026-07-10
+
+Lands `pivot-application-rate` (Group L, calc-agriculture.js), the runoff check spec-v568's note promised: the outer end sweeps the biggest circle fastest, so app_rate = pass_depth x 2 x pi x pivot_length / (revolution_hr x wetted_band). A 1-in pass on a quarter-mile pivot turning once a day through a 100-ft band applies 3.5 in/hr at the end tower - about 7x a silt loam's 0.5 in/hr intake. Group L audit count 27 -> 28. Catalog 1,049 -> 1,050 (version 0.191.0).
+
 ### feat(fire): spec-v601 Iowa rate-of-flow (volume method); 2026-07-10
 
 Lands `iowa-rate-of-flow` (Group F, calc-fire.js), the follow-on spec-v577 named: the Royer-Nelson volume-method fire flow beside the area-based NFA formula. volume = L x W x H; total_gal = volume / 200; rate_gpm = volume / 100 (the 30-second knockdown burst). A 20 x 30 x 10 ft room is 6,000 ft^3 -> 30 gal, 60 gpm (vs the NFA's 200 gpm sustained). Group F audit count 33 -> 34. Catalog 1,048 -> 1,049 (version 0.190.0).
