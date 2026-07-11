@@ -848,6 +848,7 @@ export const COMPUTE_MAP = {
   "reynolds-number-pipe": { module: "../../calc-hvac.js", fn: "computeReynoldsNumberPipe" },
   "hydronic-gpm-deltat": { module: "../../calc-hvac.js", fn: "computeHydronicGpmDeltat" },
   "pump-specific-speed": { module: "../../calc-hvac.js", fn: "computePumpSpecificSpeed" },
+  "pump-suction-specific-speed": { module: "../../calc-hvac.js", fn: "computePumpSuctionSpecificSpeed" },
   // spec-v308..v310 geotechnical depth-2 batch (3 tiles)
   "soil-consolidation-settlement": { module: "../../calc-geotech.js", fn: "computeSoilConsolidationSettlement" },
   "footing-eccentric-pressure": { module: "../../calc-geotech.js", fn: "computeFootingEccentricPressure" },

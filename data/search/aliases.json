@@ -82442,6 +82442,56 @@
       "term": "coulomb ka with wall friction delta and batter theta",
       "target": "coulomb-earth-pressure",
       "kind": "question"
+    },
+    {
+      "term": "suction specific speed",
+      "target": "pump-suction-specific-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "nss",
+      "target": "pump-suction-specific-speed",
+      "kind": "redirect"
+    },
+    {
+      "term": "npsh margin index",
+      "target": "pump-suction-specific-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "suction recirculation",
+      "target": "pump-suction-specific-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pump reliability suction index",
+      "target": "pump-suction-specific-speed",
+      "kind": "redirect"
+    },
+    {
+      "term": "what is the suction specific speed of a pump",
+      "target": "pump-suction-specific-speed",
+      "kind": "question"
+    },
+    {
+      "term": "is my pump nss above the 8500 limit",
+      "target": "pump-suction-specific-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how does npsh affect suction specific speed",
+      "target": "pump-suction-specific-speed",
+      "kind": "question"
+    },
+    {
+      "term": "nss from rpm flow and required npsh",
+      "target": "pump-suction-specific-speed",
+      "kind": "question"
+    },
+    {
+      "term": "why does a pump cavitate at part load",
+      "target": "pump-suction-specific-speed",
+      "kind": "question"
     }
   ]
 }

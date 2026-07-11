@@ -40812,6 +40812,50 @@
    }
   },
   {
+   "tile_id": "pump-suction-specific-speed",
+   "source_publisher": "Hydraulic Institute suction specific speed",
+   "source_title": "1,750 rpm, 2,000 gpm at BEP, 25 ft NPSHr -> Nss 7,000, within the 8,500 guideline",
+   "source_edition_or_year": "spec-v629 worked example (machine-verified)",
+   "source_section_or_page": "spec-v629 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "n_rpm": 1750,
+    "q_gpm": 2000,
+    "npshr_ft": 25
+   },
+   "outputs": {
+    "nss": {
+     "value": 7000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pump-suction-specific-speed",
+   "source_publisher": "Hydraulic Institute suction specific speed",
+   "source_title": "cross-check: same pump on a tighter 16 ft NPSHr -> Nss 9,783, above the 8,500 limit (16^0.75 = 8)",
+   "source_edition_or_year": "spec-v629 worked example (machine-verified)",
+   "source_section_or_page": "spec-v629 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-11",
+   "inputs": {
+    "n_rpm": 1750,
+    "q_gpm": 2000,
+    "npshr_ft": 16
+   },
+   "outputs": {
+    "nss": {
+     "value": 9782.8,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-consolidation-settlement",
    "source_publisher": "Terzaghi primary consolidation (Das / NAVFAC)",
    "source_title": "10 ft NC clay, Cc 0.25, e0 0.90, sig0 2,000, dsig 1,000 psf -> 2.78 in",

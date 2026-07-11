@@ -10545,6 +10545,17 @@ export const CITATIONS = {
       { name: "Per stage", value: "divide total head by the number of stages before applying", source: "pump design practice" },
     ],
   },
+  "pump-suction-specific-speed": {
+    formula: "Nss = N sqrt(Q) / NPSHr^(3/4) (N rpm, Q gpm at BEP, NPSHr ft); guideline Nss < 8,500, caution 8,500-11,000, concern >= 11,000.",
+    edition: "The US pump suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) and the Hydraulic Institute design guidelines, by name.",
+    freeAccess: "The suction-specific-speed definition and the ~8,500 / ~11,000 guidelines are public results in the standard Hydraulic Institute and pump references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The US suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) (rpm, gpm at the best-efficiency point, required NPSH in ft), the same definitional form as the specific speed Ns with the required NPSH in place of head, as compiled in the Hydraulic Institute and pump-handbook references. Q is the BEP flow (half the total for a double-suction impeller). The Hydraulic Institute design guideline caps Nss near 8,500 and a ~11,000 threshold marks a documented reliability concern (suction recirculation and wear at part-load). This is the customary dimensional US form and a screening index - it is not an NPSH-margin calculation (NPSHa vs NPSHr) or a pump selection. An engineering aid; the pump manufacturer's curves and a real NPSH-margin check govern.",
+    assumptions: [
+      { name: "Suction specific speed", value: "Nss = N sqrt(Q) / NPSHr^(3/4) at BEP (US dimensional form); half the total flow for a double-suction impeller", source: "Hydraulic Institute" },
+      { name: "Advisory guidelines", value: "~8,500 traditional design limit and ~11,000 reliability threshold are advisory practice, not a hard code limit", source: "Hydraulic Institute / pump-reliability studies" },
+    ],
+  },
   "time-of-concentration": {
     formula: "tc_min = 0.0078 L^0.77 S^(-0.385) (tc minutes, L feet, S ft/ft); tc_hr = tc_min / 60.",
     edition: "The Kirpich (1940) time-of-concentration equation tc = 0.0078 L^0.77 S^(-0.385), as compiled in the USDA TR-55 and NRCS drainage references, by name.",

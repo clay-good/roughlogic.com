@@ -3340,6 +3340,36 @@ HVAC_RENDERERS["pump-specific-speed"] = _rEnv({
   compute: computePumpSpecificSpeed,
 });
 
+// dims: in { n_rpm: T^-1, q_gpm: L^3 T^-1, npshr_ft: L } out: { nss: dimensionless }
+export function computePumpSuctionSpecificSpeed({ n_rpm = 0, q_gpm = 0, npshr_ft = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  if (!(n_rpm > 0)) return { error: "Pump speed must be positive (rpm)." };
+  if (!(q_gpm > 0)) return { error: "Flow at BEP must be positive (gpm)." };
+  if (!(npshr_ft > 0)) return { error: "Required NPSH must be positive (ft)." };
+  const nss = (n_rpm * Math.sqrt(q_gpm)) / Math.pow(npshr_ft, 0.75);
+  const band = nss < 8500 ? "within the traditional Hydraulic Institute 8,500 design guideline" : (nss < 11000 ? "above 8,500 - manage against suction recirculation and wear" : "above ~11,000 - a documented reliability concern; review the suction design");
+  return {
+    nss, band,
+    note: "US pump suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) (N rpm, Q gpm at the best-efficiency point - use half the total for a double-suction impeller - NPSHr the required NPSH in ft), the same definitional form as the specific speed Ns but with the required NPSH in place of head: it indexes how hard the pump works its suction. The Hydraulic Institute design guideline caps Nss near 8,500; above it (and especially above ~11,000) a pump shows suction-recirculation damage and shorter life at part-load. The customary dimensional US form; this is a screening index, not an NPSH-margin calculation (NPSHa vs NPSHr) or a pump selection. An engineering aid; the pump manufacturer's curves and a real NPSH-margin check govern.",
+  };
+}
+const pumpSuctionSpecificSpeedExample = { inputs: { n_rpm: 1750, q_gpm: 2000, npshr_ft: 25 } };
+HVAC_RENDERERS["pump-suction-specific-speed"] = _rEnv({
+  citation: "Citation: US pump suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) (rpm, gpm at BEP, ft) and the Hydraulic Institute design guidelines (~8,500 traditional limit, ~11,000 reliability threshold), by name. Q is the BEP flow (half the total for a double-suction impeller); US dimensional form. A screening index, not an NPSH-margin calculation; the manufacturer's curves govern.",
+  example: pumpSuctionSpecificSpeedExample.inputs,
+  fields: [
+    { key: "n_rpm", label: "Pump speed N (rpm)", kind: "number" },
+    { key: "q_gpm", label: "Flow at BEP Q (gpm, half total if double-suction)", kind: "number" },
+    { key: "npshr_ft", label: "Required NPSH at that flow (ft)", kind: "number" },
+  ],
+  outputs: [
+    { key: "nss", id: "psss-out-nss", label: "Suction specific speed Nss", value: (r) => fmt(r.nss, 0) },
+    { key: "band", id: "psss-out-band", label: "Reliability read", value: (r) => r.band },
+    { key: "n", id: "psss-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePumpSuctionSpecificSpeed,
+});
+
 // =====================================================================
 // spec-v329..v331: building-energy batch (Group C). The whole-house
 // numbers the single-assembly tiles never roll up: the building heat-loss

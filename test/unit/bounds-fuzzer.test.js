@@ -20287,3 +20287,23 @@ test("bounds: spec-v628 computeCoulombEarthPressure pins the wall-friction Ka, t
   assert.ok("error" in _v628({ phi: 30, alpha: -1, gamma: 120, h_ft: 10 }));
   assert.ok("error" in _v628({ phi: NaN, gamma: 120, h_ft: 10 }));
 });
+
+import { computePumpSuctionSpecificSpeed as _v629, computePumpSpecificSpeed as _v629ns } from "../../calc-hvac.js";
+
+test("bounds: spec-v629 computePumpSuctionSpecificSpeed pins Nss, the band thresholds, the shared definitional form with Ns, and error seams", () => {
+  const r = _v629({ n_rpm: 1750, q_gpm: 2000, npshr_ft: 25 });
+  assert.ok(Math.abs(r.nss - 7000) < 1e-6); // 1750*sqrt(2000)/25^0.75
+  assert.ok(r.band.includes("8,500"));
+  // The same pump on a tighter NPSHr crosses the 8,500 guideline (16^0.75 = 8 exactly).
+  const tight = _v629({ n_rpm: 1750, q_gpm: 2000, npshr_ft: 16 });
+  assert.ok(Math.abs(tight.nss - 9782.79740156158) < 1e-6);
+  assert.ok(tight.nss > r.nss);
+  // Nss is the specific-speed form with NPSHr in place of head: Nss(N,Q,x) === Ns(N,Q,x).
+  const ns = _v629ns({ n_rpm: 1750, q_gpm: 2000, h_ft: 25 });
+  assert.ok(Math.abs(r.nss - ns.ns) < 1e-9);
+  // Error seams: non-finite, non-positive speed / flow / NPSHr.
+  assert.ok("error" in _v629({ n_rpm: 0, q_gpm: 2000, npshr_ft: 25 }));
+  assert.ok("error" in _v629({ n_rpm: 1750, q_gpm: 0, npshr_ft: 25 }));
+  assert.ok("error" in _v629({ n_rpm: 1750, q_gpm: 2000, npshr_ft: 0 }));
+  assert.ok("error" in _v629({ n_rpm: Infinity, q_gpm: 2000, npshr_ft: 25 }));
+});

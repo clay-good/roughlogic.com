@@ -1227,6 +1227,7 @@ const RELATED = {
   "reynolds-number-pipe": ["friction-loss","pipe-velocity","refrigerant-velocity"],
   "hydronic-gpm-deltat": ["radiant-loop-sizing","pump-tdh","chiller-tons"],
   "pump-specific-speed": ["pump-tdh","pump-operating-point","affinity-laws"],
+  "pump-suction-specific-speed": ["pump-specific-speed","npsh-a","pump-tdh"],
   // spec-v308..v310 geotechnical depth-2 batch (Group E)
   "soil-consolidation-settlement": ["soil-settlement-elastic","soil-bearing-capacity","pile-axial-capacity"],
   "footing-eccentric-pressure": ["soil-bearing-capacity","retaining-wall-stability","footing-area"],

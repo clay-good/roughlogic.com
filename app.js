@@ -296,7 +296,7 @@ const TOOL_MODULES = (() => {
     // spec-v275..v277 ventilation-and-recovery batch
     "erv-sensible-recovery", "mua-tempering-load", "dcv-co2-ventilation",
     // spec-v305..v307 pump-and-fluid fundamentals batch
-    "reynolds-number-pipe", "hydronic-gpm-deltat", "pump-specific-speed",
+    "reynolds-number-pipe", "hydronic-gpm-deltat", "pump-specific-speed", "pump-suction-specific-speed",
     // spec-v329..v331 building-energy batch
     "building-ua", "degree-day-energy", "wall-condensation-gradient",
     "duct-heat-gain", "grille-face-velocity", "air-density-correction",

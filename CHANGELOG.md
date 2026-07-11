@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v629 pump suction specific speed (Nss); 2026-07-11
+
+Lands `pump-suction-specific-speed` (Group C, calc-hvac.js), the suction-side companion spec-v307 named as separate from `pump-specific-speed`. Nss = N sqrt(Q) / NPSHr^(3/4) - the same definitional form as Ns with required NPSH in place of head - indexes how hard a pump works its suction. The Hydraulic Institute guideline caps Nss near 8,500 (and ~11,000 marks a reliability concern). A 1,750 rpm, 2,000 gpm pump with 25 ft NPSHr sits at a safe 7,000, but on a tighter 16 ft NPSHr jumps to 9,783 - above the limit, nothing changed but the suction margin. Zero empirical constants (pure definitional index). Catalog 1,076 -> 1,077 (version 0.218.0).
+
 ### feat(construction): spec-v628 Coulomb active earth pressure with wall friction and batter; 2026-07-11
 
 Lands `coulomb-earth-pressure` (Group E, calc-geotech.js), the Coulomb wall-friction form spec-v261 named beside `lateral-earth-pressure`, completing the five-tile earth-pressure limit-state cluster (at-rest, submerged, sloped-backfill, seepage-slope, Coulomb). Ka = cos^2(phi - theta) / [cos^2(theta) cos(delta + theta) (1 + sqrt(sin(phi + delta) sin(phi - alpha) / (cos(delta + theta) cos(theta - alpha))))^2] credits wall friction delta, a battered face theta, and a sloped backfill alpha; the thrust acts at delta + theta from horizontal with the horizontal (overturning) and downward (sliding-resisting) components reported. A rough vertical wall on a phi = 30 level backfill carries 1,676 lb/ft horizontal vs Rankine's 2,000 - a 16% cut; it reduces exactly to Rankine when smooth/vertical/level. Pure Coulomb trig (1776 / Das / NAVFAC DM-7.02), no proprietary constants. Raises the calc-geotech.js gzip cap 16,500 -> 18,000. Catalog 1,075 -> 1,076 (version 0.217.0).
