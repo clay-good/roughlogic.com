@@ -1830,7 +1830,7 @@ export function computeNoiseDose({ rows = [] } = {}) {
     return { error: "Total exposure " + total_hours.toFixed(2) + " hr across all rows exceeds 24 hr; check the entries." };
   }
   // TWA: 16.61 * log10(D / 100) + 90. For D = 0 the formula is
-  // undefined; report TWA = 0 dBA as a placeholder with a flag.
+  // undefined (log10 of 0), so TWA is reported as null (no exposure).
   const twa = dose_pct > 0 ? 16.61 * Math.log10(dose_pct / 100) + 90 : null;
   const pass_action_level_85 = dose_pct <= 50;
   const pass_pel_90 = dose_pct <= 100;

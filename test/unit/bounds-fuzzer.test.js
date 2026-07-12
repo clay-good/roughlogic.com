@@ -15817,6 +15817,36 @@ test("bounds: spec-v449 computeMasonryAnchorBolt pins Bab/Bas, the governing swi
   assert.ok("error" in _v449({ fm_psi: Infinity, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
 });
 
+// ===================== spec-v551 masonry unit-strength f'm (calc-masonry.js) =====================
+import { computeMasonryPrismFm as _v551 } from "../../calc-masonry.js";
+
+test("bounds: spec-v551 computeMasonryPrismFm pins Table 2 rows, interpolation, the Type N reduction, the below-minimum flag, and error seams", () => {
+  // Pinned worked examples: a 2,000 psi concrete unit gives f'm 2,000 (Type M/S) but 1,750 (Type N).
+  const ms = _v551({ unit_type: "concrete", unit_strength_psi: 2000, mortar_type: "ms" });
+  assert.ok(Math.abs(ms.f_m_psi - 2000) < 1e-9 && ms.below_range === false && ms.above_range === false);
+  const n = _v551({ unit_type: "concrete", unit_strength_psi: 2000, mortar_type: "n" });
+  assert.ok(Math.abs(n.f_m_psi - 1750) < 1e-9);
+  // Type N yields a lower f'm than Type M/S for the same unit (the 12.5% mortar reduction).
+  assert.ok(n.f_m_psi < ms.f_m_psi && Math.abs((ms.f_m_psi - n.f_m_psi) / ms.f_m_psi - 0.125) < 1e-9);
+  // Exact Table 2 rows: 3,250 psi unit in Type M/S -> 2,500; 2,650 psi in Type N -> 2,000.
+  assert.ok(Math.abs(_v551({ unit_type: "concrete", unit_strength_psi: 3250, mortar_type: "ms" }).f_m_psi - 2500) < 1e-9);
+  assert.ok(Math.abs(_v551({ unit_type: "concrete", unit_strength_psi: 2650, mortar_type: "n" }).f_m_psi - 2000) < 1e-9);
+  // Linear interpolation between rows: 2,925 psi Type M/S is halfway from 2,600->3,250, so f'm 2,375.
+  assert.ok(Math.abs(_v551({ unit_type: "concrete", unit_strength_psi: 2925, mortar_type: "ms" }).f_m_psi - 2375) < 1e-9);
+  // Below the ASTM C90 2,000 psi minimum: flagged, and f'm is lower than the bottom row (not overstated).
+  const below = _v551({ unit_type: "concrete", unit_strength_psi: 1900, mortar_type: "ms" });
+  assert.ok(below.below_range === true && below.f_m_psi < 2000);
+  // Above the table: capped at the tabulated maximum and flagged.
+  const above = _v551({ unit_type: "concrete", unit_strength_psi: 5000, mortar_type: "ms" });
+  assert.ok(above.above_range === true && Math.abs(above.f_m_psi - 3000) < 1e-9);
+  // Error seams: clay (future), non-positive strength, bad unit/mortar type, non-finite.
+  assert.ok("error" in _v551({ unit_type: "clay", unit_strength_psi: 2000, mortar_type: "ms" }));
+  assert.ok("error" in _v551({ unit_type: "concrete", unit_strength_psi: 0, mortar_type: "ms" }));
+  assert.ok("error" in _v551({ unit_type: "wood", unit_strength_psi: 2000, mortar_type: "ms" }));
+  assert.ok("error" in _v551({ unit_type: "concrete", unit_strength_psi: 2000, mortar_type: "x" }));
+  assert.ok("error" in _v551({ unit_type: "concrete", unit_strength_psi: Infinity, mortar_type: "ms" }));
+});
+
 // ===================== spec-v450, v452 plumbing-systems (v451 cut as dupe of expansion-tank) =====================
 import { computeCrossConnectionAirGap as _v450 } from "../../calc-cross.js";
 import { computeHydronicFillPressure as _v452 } from "../../calc-plumbing.js";

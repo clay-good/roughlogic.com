@@ -37054,6 +37054,50 @@
    }
   },
   {
+   "tile_id": "masonry-prism-fm",
+   "source_publisher": "TMS 602-16 (ACI 530.1 / ASCE 6) Table 2 unit-strength method, concrete masonry",
+   "source_title": "2,000 psi net-area concrete unit in Type S mortar -> assumed f'm 2,000 psi",
+   "source_edition_or_year": "spec-v551 worked example (machine-verified)",
+   "source_section_or_page": "spec-v551 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-12",
+   "inputs": {
+    "unit_type": "concrete",
+    "unit_strength_psi": 2000,
+    "mortar_type": "ms"
+   },
+   "outputs": {
+    "f_m_psi": {
+     "value": 2000.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "masonry-prism-fm",
+   "source_publisher": "TMS 602-16 (ACI 530.1 / ASCE 6) Table 2 unit-strength method, concrete masonry",
+   "source_title": "cross-check: the same 2,000 psi unit in Type N mortar -> f'm 1,750 psi (12.5% lower from the mortar alone)",
+   "source_edition_or_year": "spec-v551 worked example (machine-verified)",
+   "source_section_or_page": "spec-v551 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-12",
+   "inputs": {
+    "unit_type": "concrete",
+    "unit_strength_psi": 2000,
+    "mortar_type": "n"
+   },
+   "outputs": {
+    "f_m_psi": {
+     "value": 1750.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "diaphragm-shear",
    "source_publisher": "AWC SDPWS flexible-diaphragm model (AWC/APA design guides, WoodWorks example)",
    "source_title": "192 x 120 ft diaphragm at 516 plf -> V 49,536 lb, unit shear 413 plf (the WoodWorks value), chord 19.8 kip",

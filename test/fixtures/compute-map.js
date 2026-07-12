@@ -1067,6 +1067,7 @@ export const COMPUTE_MAP = {
   "cmu-wall-flexure": { module: "../../calc-masonry.js", fn: "computeCmuWallFlexure" },
   "cmu-shear-wall": { module: "../../calc-masonry.js", fn: "computeCmuShearWall" },
   "cmu-wall-axial": { module: "../../calc-masonry.js", fn: "computeCmuWallAxial" },
+  "masonry-prism-fm": { module: "../../calc-masonry.js", fn: "computeMasonryPrismFm" },
   "masonry-wall-weight": { module: "../../calc-masonry.js", fn: "computeMasonryWallWeight" },
   "brick-veneer-anchor-spacing": { module: "../../calc-masonry.js", fn: "computeBrickVeneerAnchorSpacing" },
   "masonry-lintel-loading": { module: "../../calc-masonry.js", fn: "computeMasonryLintelLoading" },

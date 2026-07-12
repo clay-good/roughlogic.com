@@ -51,11 +51,41 @@ function checkPattern(readme, re, expected, label, errors) {
   return found;
 }
 
+// index.html states the exact tile count in two spots: the JSON-LD
+// `description` and the home hero lede. Both read "<N> free calculators for
+// ...". Anchor on that stable label and assert the (comma-grouped) number
+// equals the live tile count, so a landing that forgets to bump the home
+// view fails the lint chain instead of silently advertising a stale figure.
+async function checkIndexHtml(expectedTiles, errors) {
+  const html = await readFile(resolve(ROOT, "index.html"), "utf8");
+  const re = /([\d,]+) free calculators for/g;
+  let m, found = 0;
+  while ((m = re.exec(html))) {
+    found++;
+    const n = Number(m[1].replace(/,/g, ""));
+    if (n !== expectedTiles) {
+      errors.push(
+        `index.html: "${m[0].trim()}" states ${n}, but the live tile count is ${expectedTiles}. ` +
+          `Update both the JSON-LD description and the home lede in index.html.`,
+      );
+    }
+  }
+  if (found < 2) {
+    errors.push(
+      `index.html: expected 2 "<N> free calculators for" count strings (JSON-LD + hero lede), found ${found}. ` +
+        `Did the home copy change? Update this gate if so.`,
+    );
+  }
+  return found;
+}
+
 async function main() {
   const readme = await readFile(resolve(ROOT, "README.md"), "utf8");
   const live = await liveCounts();
   const errors = [];
   let checked = 0;
+
+  checked += await checkIndexHtml(live.tiles, errors);
 
   // Tile count: the /tools/ shell-diagram node and the prose "(N)".
   // ("static shells" also labels the /groups/ node, so anchor on the path.)

@@ -3,6 +3,14 @@
   "_updated": "2026-07-10",
   "_schema": "Each alias row: { term: string, target: tile-id, kind: 'industry' | 'redirect' | 'adjacent' }. Multiple aliases may map to the same target.",
   "aliases": [
+    { "term": "fm masonry", "target": "masonry-prism-fm", "kind": "industry" },
+    { "term": "unit strength method", "target": "masonry-prism-fm", "kind": "industry" },
+    { "term": "tms 602 table 2", "target": "masonry-prism-fm", "kind": "industry" },
+    { "term": "masonry compressive strength", "target": "masonry-prism-fm", "kind": "industry" },
+    { "term": "cmu fm", "target": "masonry-prism-fm", "kind": "industry" },
+    { "term": "mortar type fm", "target": "masonry-prism-fm", "kind": "adjacent" },
+    { "term": "assumed fm", "target": "masonry-prism-fm", "kind": "industry" },
+    { "term": "prism test alternative", "target": "masonry-prism-fm", "kind": "adjacent" },
     {
       "term": "final grade needed",
       "target": "final-grade-needed",

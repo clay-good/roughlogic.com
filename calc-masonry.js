@@ -382,3 +382,75 @@ MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
   ],
   compute: computeMasonryAnchorBolt,
 });
+
+// ===================== spec-v551: masonry unit-strength f'm (Group E) =====================
+// The upstream f'm the whole CMU wall bench (cmu-wall-axial / -flexure / -shear-wall /
+// masonry-anchor-bolt) consumes but none derives. TMS 602-16 Table 2 unit-strength
+// method: from the net-area unit compressive strength and the mortar type, read the
+// net-area masonry compressive strength f'm without a prism test. f'm is NOT the unit
+// strength -- Type N mortar yields a lower f'm than Type M or S for the same unit, and
+// at higher unit strengths f'm is only a fraction of the block strength.
+//
+// TMS 602-16 Table 2 (concrete masonry), stored as (net-area unit strength psi -> f'm psi):
+//   Type M or S:  2000->2000, 2600->2250, 3250->2500, 3900->2750, 4500->3000
+//   Type N:       2000->1750, 2650->2000, 3400->2250, 4350->2500
+// Linear interpolation between rows is permitted. 2,000 psi is the ASTM C90 net-area
+// minimum (a weaker unit does not qualify for the method), and the table caps design
+// f'm (a higher f'm needs a prism test / record of tests).
+const _PRISM_FM_TABLE = {
+  ms: [[2000, 2000], [2600, 2250], [3250, 2500], [3900, 2750], [4500, 3000]],
+  n: [[2000, 1750], [2650, 2000], [3400, 2250], [4350, 2500]],
+};
+
+// dims: in { unit_strength_psi: M L^-1 T^-2, unit_type: dimensionless, mortar_type: dimensionless } out: { f_m_psi: M L^-1 T^-2 }
+export function computeMasonryPrismFm({ unit_type = "concrete", unit_strength_psi = 2000, mortar_type = "ms" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const u = Number(unit_strength_psi) || 0;
+  if (!(u > 0)) return { error: "Net-area unit compressive strength must be positive (psi)." };
+  if (unit_type !== "concrete" && unit_type !== "clay") return { error: "Unit type must be concrete (CMU) or clay." };
+  if (unit_type === "clay") return { error: "This tile covers concrete (CMU) units; the clay-masonry Table 2 branch is a future addition." };
+  if (mortar_type !== "ms" && mortar_type !== "n") return { error: "Mortar type must be M or S, or N." };
+  const rows = _PRISM_FM_TABLE[mortar_type];
+  const uMin = rows[0][0], uMax = rows[rows.length - 1][0], fMax = rows[rows.length - 1][1];
+  let f_m_psi = 0, below_range = false, above_range = false;
+  if (u <= uMin) {
+    // At the C90 minimum, take the bottom row exactly; below it, extrapolate the bottom
+    // segment (a lower, conservative f'm) and flag that the unit does not qualify.
+    if (u === uMin) { f_m_psi = rows[0][1]; }
+    else {
+      below_range = true;
+      const [u0, f0] = rows[0], [u1, f1] = rows[1];
+      f_m_psi = f0 + (f1 - f0) * (u - u0) / (u1 - u0);
+    }
+  } else if (u >= uMax) {
+    // The unit-strength method caps f'm at the tabulated maximum; a higher f'm needs a
+    // prism test. Clamp and flag.
+    above_range = u > uMax;
+    f_m_psi = fMax;
+  } else {
+    for (let i = 0; i < rows.length - 1; i++) {
+      const [u0, f0] = rows[i], [u1, f1] = rows[i + 1];
+      if (u >= u0 && u <= u1) { f_m_psi = f0 + (f1 - f0) * (u - u0) / (u1 - u0); break; }
+    }
+  }
+  const mortarLabel = mortar_type === "ms" ? "Type M or S" : "Type N";
+  return {
+    f_m_psi, below_range, above_range,
+    note: "TMS 602-16 Table 2 unit-strength method (assumed f'm without a prism test): from the net-area unit strength and the mortar type, " + mortarLabel + " mortar gives f'm " + fmt(f_m_psi, 0) + " psi" + (below_range ? " (below the 2,000 psi ASTM C90 minimum -- the unit does not qualify; value extrapolated)" : "") + (above_range ? " (above the table -- capped; a higher f'm needs a prism test)" : "") + ". f'm is not the unit strength: a 2,000 psi concrete unit gives f'm 2,000 in Type M/S but only 1,750 in Type N, and a 3,250 psi unit in Type M/S gives 2,500 (77% of the block). Grouting and inspection requirements apply. A specification aid -- TMS 602 and the engineer of record (or a prism test) govern.",
+  };
+}
+export const masonryPrismFmExample = { inputs: { unit_type: "concrete", unit_strength_psi: 2000, mortar_type: "ms" } };
+MASONRY_RENDERERS["masonry-prism-fm"] = _simpleRenderer({
+  citation: "Citation: TMS 602-16 Table 2 unit-strength method for concrete masonry -- the assumed net-area masonry compressive strength f'm from the net-area unit compressive strength and the mortar type, without a prism test. A 2,000 psi (net) concrete unit gives f'm 2,000 psi in Type M or S mortar but only 1,750 psi in Type N; a 3,250 psi unit in Type M/S gives 2,500 psi. Linear interpolation between the Table 2 rows; 2,000 psi is the ASTM C90 net-area minimum and the table caps design f'm (a higher value needs a prism test). A specification aid, not a substitute for TMS 602 and the engineer of record.",
+  example: masonryPrismFmExample.inputs,
+  fields: [
+    { key: "unit_type", label: "Unit type", kind: "select", default: "concrete", options: [{ value: "concrete", label: "Concrete (CMU)" }, { value: "clay", label: "Clay (not yet supported)" }] },
+    { key: "unit_strength_psi", label: "Net-area unit strength (psi)", kind: "number", default: 2000 },
+    { key: "mortar_type", label: "Mortar type", kind: "select", default: "ms", options: [{ value: "ms", label: "Type M or S" }, { value: "n", label: "Type N" }] },
+  ],
+  outputs: [
+    { key: "fm", id: "mpf-out-fm", label: "Assumed f'm", value: (r) => fmt(r.f_m_psi, 0) + " psi" + (r.below_range ? " (below C90 minimum)" : r.above_range ? " (capped -- prism test for more)" : "") },
+    { key: "n", id: "mpf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryPrismFm,
+});

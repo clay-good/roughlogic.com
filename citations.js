@@ -11703,6 +11703,18 @@ export const CITATIONS = {
       { name: "Concentric only", value: "pure axial with no moment interaction; eccentric or combined loading runs through the unity check with the flexure tile", source: "TMS 402-16" },
     ],
   },
+  "masonry-prism-fm": {
+    formula: "f'm = TMS 602-16 Table 2 (concrete masonry, unit-strength method), interpolated on the net-area unit strength for the mortar type: Type M/S 2000->2000, 2600->2250, 3250->2500, 3900->2750, 4500->3000; Type N 2000->1750, 2650->2000, 3400->2250, 4350->2500 psi.",
+    edition: "TMS 602-16 (ACI 530.1 / ASCE 6) Specification for Masonry Structures, Article 1.4 B unit-strength method, Table 2 for concrete masonry, by name.",
+    freeAccess: "The unit-strength method and Table 2 relationship (2,000 psi unit -> f'm 2,000 in Type M/S, 1,750 in Type N) are reproduced free in CMHA/NCMA TEK notes and state-masonry-association technical bulletins; the interpolation arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "TMS 602-16 unit-strength method (assumed f'm without a prism test): reads the net-area masonry compressive strength f'm from Table 2 for concrete masonry given the net-area unit compressive strength and the mortar type (Type M or S, or Type N), interpolating linearly between the tabulated rows. Anchor points: a 2,000 psi net-area concrete unit gives f'm 2,000 psi with Type M or S mortar and 1,750 psi with Type N; a 3,250 psi unit with Type M/S gives 2,500 psi. f'm is not the unit strength -- Type N mortar yields a lower f'm than Type M or S for the same unit, and at higher unit strengths f'm is a fraction of the block strength. 2,000 psi is the ASTM C90 net-area minimum (a weaker unit does not qualify) and the table caps design f'm (a higher value needs a prism test / record of tests). Grouting and inspection requirements apply. A specification aid, not a substitute for TMS 602 and the engineer of record -- the engineer of record (or a prism test) governs.",
+    assumptions: [
+      { name: "Concrete masonry only", value: "the concrete-masonry Table 2 branch; the clay-masonry branch is a future addition", source: "TMS 602-16 Table 2" },
+      { name: "Mortar type matters", value: "for the same unit, Type N mortar yields a lower f'm than Type M or S (a 2,000 psi unit gives 2,000 vs 1,750 psi)", source: "TMS 602-16 Table 2" },
+      { name: "Method limits", value: "2,000 psi is the ASTM C90 net-area minimum; the table caps design f'm, and a higher f'm requires a prism test / record of tests", source: "TMS 602-16 / ASTM C90" },
+    ],
+  },
   "diaphragm-shear": {
     formula: "V = w L / 2; v = w L / (2 b); M = w L^2 / 8; chord T = C = M / b.",
     edition: "The AWC Special Design Provisions for Wind and Seismic (SDPWS) simple-span flexible-diaphragm deep-beam model, as compiled in the AWC/APA engineered-wood-diaphragm design guides, by name.",
