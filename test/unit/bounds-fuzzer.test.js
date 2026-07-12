@@ -20379,6 +20379,31 @@ test("bounds: spec-v632 computeHydraulicJump pins the Belanger sequent depth, th
   assert.ok("error" in _v632({ b_ft: Infinity, q_cfs: 100, y1_ft: 0.8 }));
 });
 
+import { computeSpecificEnergy as _v637 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v637 computeSpecificEnergy pins the specific energy, critical/minimum energy, the alternate-depth round-trip identity, the regime, and error seams", () => {
+  const r = _v637({ b_ft: 10, q_cfs: 100, y_ft: 3 });
+  assert.ok(Math.abs(r.e_ft - 3.1725) < 1e-3);
+  assert.ok(Math.abs(r.yc_ft - 1.459) < 1e-3);
+  assert.ok(Math.abs(r.ec_ft - 2.1885) < 1e-3);
+  assert.ok(Math.abs(r.y_alt_ft - 0.8109) < 1e-3);
+  // Minimum specific energy is exactly 1.5 x critical depth.
+  assert.ok(Math.abs(r.ec_ft - 1.5 * r.yc_ft) < 1e-9);
+  // y > yc, so this branch is subcritical (Fr < 1); the alternate is supercritical.
+  assert.ok(r.fr < 1 && r.y_alt_ft < r.yc_ft);
+  // Energy conjugacy is symmetric: feeding the alternate depth back returns the
+  // same specific energy and critical depth, and its alternate is the original y.
+  const back = _v637({ b_ft: 10, q_cfs: 100, y_ft: r.y_alt_ft });
+  assert.ok(Math.abs(back.e_ft - r.e_ft) < 1e-3);
+  assert.ok(Math.abs(back.yc_ft - r.yc_ft) < 1e-3);
+  assert.ok(Math.abs(back.y_alt_ft - 3) < 1e-2 && back.fr > 1);
+  // Error seams: non-finite, non-positive width / discharge / depth.
+  assert.ok("error" in _v637({ b_ft: 0, q_cfs: 100, y_ft: 3 }));
+  assert.ok("error" in _v637({ b_ft: 10, q_cfs: 0, y_ft: 3 }));
+  assert.ok("error" in _v637({ b_ft: 10, q_cfs: 100, y_ft: 0 }));
+  assert.ok("error" in _v637({ b_ft: Infinity, q_cfs: 100, y_ft: 3 }));
+});
+
 import { computeIsolatorDeflection as _v633, computeVibrationIsolation as _v633fwd } from "../../calc-hvac.js";
 
 test("bounds: spec-v633 computeIsolatorDeflection pins the required deflection, the exact round-trip through the forward tile, the ratio > sqrt(2) property, and error seams", () => {

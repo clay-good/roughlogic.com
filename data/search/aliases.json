@@ -82634,6 +82634,46 @@
       "kind": "question"
     },
     {
+      "term": "specific energy",
+      "target": "specific-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "alternate depth",
+      "target": "specific-energy",
+      "kind": "industry"
+    },
+    {
+      "term": "specific energy diagram",
+      "target": "specific-energy",
+      "kind": "redirect"
+    },
+    {
+      "term": "minimum specific energy",
+      "target": "specific-energy",
+      "kind": "redirect"
+    },
+    {
+      "term": "energy conjugate depth",
+      "target": "specific-energy",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what is the specific energy of open channel flow",
+      "target": "specific-energy",
+      "kind": "question"
+    },
+    {
+      "term": "how do i find the alternate depth",
+      "target": "specific-energy",
+      "kind": "question"
+    },
+    {
+      "term": "two open channel depths that carry the same energy",
+      "target": "specific-energy",
+      "kind": "question"
+    },
+    {
       "term": "belanger equation for a hydraulic jump",
       "target": "hydraulic-jump",
       "kind": "question"

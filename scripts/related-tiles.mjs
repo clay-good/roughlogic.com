@@ -1227,8 +1227,9 @@ const RELATED = {
   "time-of-concentration": ["stormwater-rational","manning-slope","orifice-flow"],
   "orifice-flow": ["weir-flow","time-of-concentration","pipe-velocity"],
   "tank-drain-time": ["orifice-flow","weir-flow","detention-time"],
-  "channel-froude-number": ["manning-slope","weir-flow","orifice-flow"],
-  "hydraulic-jump": ["channel-froude-number","weir-flow","manning-slope"],
+  "channel-froude-number": ["manning-slope","weir-flow","orifice-flow","specific-energy"],
+  "hydraulic-jump": ["channel-froude-number","weir-flow","manning-slope","specific-energy"],
+  "specific-energy": ["channel-froude-number","hydraulic-jump","manning-slope"],
   // spec-v305..v307 pump-and-fluid fundamentals batch (Group C)
   "reynolds-number-pipe": ["friction-loss","pipe-velocity","refrigerant-velocity"],
   "hydronic-gpm-deltat": ["radiant-loop-sizing","pump-tdh","chiller-tons"],

@@ -3873,6 +3873,56 @@ function _v632renderHydraulicJump(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["hydraulic-jump"] = _v632renderHydraulicJump;
 
+// dims: in { b_ft: L, q_cfs: L^3 T^-1, y_ft: L } out: { v_fps: L T^-1, e_ft: L, yc_ft: L, ec_ft: L, fr: dimensionless, y_alt_ft: L }
+export function computeSpecificEnergy({ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_ft > 0)) return { error: "Channel width must be positive (ft)." };
+  if (!(q_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(y_ft > 0)) return { error: "Flow depth must be positive (ft)." };
+  const q_unit = q_cfs / b_ft;
+  const v_fps = q_unit / y_ft;
+  const e_ft = y_ft + (q_unit * q_unit) / (2 * 32.2 * y_ft * y_ft);
+  const yc_ft = Math.cbrt((q_unit * q_unit) / 32.2);
+  const ec_ft = 1.5 * yc_ft;
+  const fr = v_fps / Math.sqrt(32.2 * y_ft);
+  const regime = fr < 0.995 ? "subcritical (tranquil, downstream-controlled)" : (fr > 1.005 ? "supercritical (rapid, upstream-controlled)" : "critical (Fr = 1)");
+  // The alternate depth is the second positive root of the specific-energy
+  // cubic y^3 - E y^2 + q^2/(2g) = 0; with y a known root, the remaining
+  // positive root is this closed form (the negative root is discarded).
+  const y_alt_ft = ((e_ft - y_ft) + Math.sqrt((e_ft - y_ft) * (e_ft - y_ft) + 2 * q_unit * q_unit / (32.2 * y_ft))) / 2;
+  const alt_regime = y_alt_ft > yc_ft ? "subcritical" : "supercritical";
+  return {
+    v_fps, e_ft, yc_ft, ec_ft, fr, regime, q_unit, y_alt_ft, alt_regime,
+    note: "Specific energy E = y + q^2/(2 g y^2) (g = 32.2 ft/s^2, q = Q/b the unit discharge) is the flow energy per unit weight measured from the channel bed. For one discharge the same E occurs at two alternate depths - a deep subcritical depth and a shallow supercritical depth - that meet at the critical depth yc = (q^2/g)^(1/3), where E is at its minimum Ec = 1.5 yc; the flow is subcritical when y > yc and supercritical when y < yc. The two alternate depths carry the SAME specific energy (an energy conjugate, no loss); this is not the momentum sequent depth across a hydraulic jump, which dissipates energy. Prismatic rectangular channel. A design aid; the engineer of record governs.",
+  };
+}
+export const specificEnergyExample = { inputs: { b_ft: 10, q_cfs: 100, y_ft: 3 } };
+
+function _v637renderSpecificEnergy(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: specific energy E = y + q^2/(2 g y^2), the rectangular critical depth yc = (q^2/g)^(1/3) with minimum specific energy Ec = 1.5 yc, and the alternate depth sharing the same E, as compiled in Chow, by name. Rectangular section; the alternate depth is the energy conjugate, not the momentum sequent depth of a jump. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { b.input.value = "10"; q.input.value = "100"; y.input.value = "3"; update(); });
+  const b = makeNumber("Channel width b (ft)", "spe-b", { step: "any", min: "0" });
+  const q = makeNumber("Discharge Q (cfs)", "spe-q", { step: "any", min: "0" });
+  const y = makeNumber("Flow depth y (ft)", "spe-y", { step: "any", min: "0" });
+  for (const f of [b, q, y]) inputRegion.appendChild(f.wrap);
+  const oV = makeOutputLine(outputRegion, "Mean velocity", "spe-out-v");
+  const oE = makeOutputLine(outputRegion, "Specific energy E / regime", "spe-out-e");
+  const oYc = makeOutputLine(outputRegion, "Critical depth yc / min energy Ec", "spe-out-yc");
+  const oAlt = makeOutputLine(outputRegion, "Alternate depth (same E)", "spe-out-alt");
+  const oNote = makeOutputLine(outputRegion, "Note", "spe-out-n");
+  const update = debounce(() => {
+    const r = computeSpecificEnergy({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, y_ft: Number(y.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oE.textContent = "-"; oYc.textContent = "-"; oAlt.textContent = "-"; oNote.textContent = "-"; return; }
+    oV.textContent = fmt(r.v_fps, 2) + " ft/s";
+    oE.textContent = fmt(r.e_ft, 3) + " ft - Fr " + fmt(r.fr, 2) + " " + r.regime;
+    oYc.textContent = fmt(r.yc_ft, 3) + " ft / " + fmt(r.ec_ft, 3) + " ft" + (r.e_ft < r.ec_ft - 1e-6 ? " (below minimum - check inputs)" : "");
+    oAlt.textContent = fmt(r.y_alt_ft, 3) + " ft (" + r.alt_regime + ", carries the same " + fmt(r.e_ft, 3) + " ft of energy)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b, q, y]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["specific-energy"] = _v637renderSpecificEnergy;
+
 // ===================== spec-v371..v373: pipe-flow energy batch (Group B) =====================
 // The Bernoulli energy pieces the friction and pressure tiles use but never
 // expose: the velocity head and dynamic pressure (v371), the continuity velocity

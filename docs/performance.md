@@ -34,7 +34,7 @@ The home-view payload budget (100 KB after gzip) is enforced separately by `scri
 
 ## v12 per-module budgets (spec-v12 §14.3)
 
-Each calc-* module has a `gzip` cap enforced by `scripts/check-module-sizes.mjs`. The five v12 group modules:
+Each calc-* module has a `gzip` cap enforced by `scripts/check-module-sizes.mjs`. The five v12 group modules were (the Veterinary, EMS, and Aviation benches were later retired in spec-v107, so `calc-vet.js` / `calc-ems.js` / `calc-aviation.js` no longer exist; the figures below are the v12-era snapshot):
 
 - `calc-vet.js`: 41,000 B cap (current ~33.6 KB gzipped at 83.8 %; covers all 25 Group U tiles plus bundled vaccine, heartworm, and toxicity tables).
 - `calc-ems.js`: 39,000 B cap (current ~32.2 KB gzipped at 84.5 %; covers all 27 Group V tiles plus bundled pediatric vitals ranges and the START / JumpSTART decision trees).

@@ -10695,6 +10695,18 @@ export const CITATIONS = {
       { name: "Tailwater controls location", value: "the tailwater must supply the sequent depth for the jump to sit here; the energy loss grows steeply with Fr1", source: "Chow open-channel hydraulics" },
     ],
   },
+  "specific-energy": {
+    formula: "q = Q/b; V = q/y; E = y + q^2/(2 g y^2); yc = (q^2/g)^(1/3); Ec = 1.5 yc; Fr = V/sqrt(g y); y_alt = ((E - y) + sqrt((E - y)^2 + 2 q^2/(g y)))/2.",
+    edition: "The open-channel specific-energy relation E = y + q^2/(2 g y^2), the rectangular critical depth yc = (q^2/g)^(1/3) with minimum specific energy Ec = 1.5 yc, and the alternate depth sharing the same E, as compiled in Chow's Open-Channel Hydraulics, by name.",
+    freeAccess: "The specific-energy relation, the critical-depth and minimum-energy results, and the alternate-depth (energy conjugate) are public results in the standard open-channel-hydraulics references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The specific energy E = y + q^2/(2 g y^2) (g = 32.2 ft/s^2, q = Q/b the unit discharge) measured from the channel bed, the rectangular critical depth yc = (q^2/g)^(1/3) where E is minimum at Ec = 1.5 yc, and the alternate depth (the second positive depth carrying the same E), as compiled in Chow's open-channel-hydraulics reference. The two alternate depths are the energy conjugate (they share the specific energy with no loss); the flow is subcritical above yc and supercritical below it. This is not the momentum sequent depth across a hydraulic jump, which dissipates energy. This assumes a rectangular, prismatic channel. A design aid, not a substitute for a licensed engineer's hydraulic design; the engineer of record governs.",
+    assumptions: [
+      { name: "Specific energy", value: "E = y + q^2/(2 g y^2) is the flow energy above the channel bed for the unit discharge q = Q/b", source: "Chow open-channel hydraulics" },
+      { name: "Alternate depth", value: "the second positive root of y^3 - E y^2 + q^2/(2g) = 0 is the energy conjugate, sharing E with no loss (not the momentum sequent depth of a jump)", source: "Chow open-channel hydraulics" },
+      { name: "Critical depth", value: "yc = (q^2/g)^(1/3) is where E is minimum at Ec = 1.5 yc; subcritical above yc, supercritical below", source: "Chow open-channel hydraulics" },
+    ],
+  },
   "rc-slab-min-thickness": {
     formula: "denom = {simply:20, one-end:24, both-ends:28, cantilever:10}; base = 12 l / denom; kfy = (fy == 60,000) ? 1 : 0.4 + fy/100,000; klw = (wc >= 145) ? 1 : max(1.65 - 0.005 wc, 1.09); hmin = base kfy klw.",
     edition: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) minimum thickness for deflection control, with the (0.4 + fy/100,000) non-Grade-60 modifier and the lightweight-concrete factor, by name.",

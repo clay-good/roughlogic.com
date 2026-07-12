@@ -15,15 +15,15 @@ DuckDuckBot, the AI-summary crawlers that respect robots.txt) fetch a
 URL path and read the HTML the server returns; fragments are not
 part of the canonicalization, and most non-Google crawlers do not
 execute JavaScript at all. Without a per-tile path-based URL, the
-385 tiles' worth of cited, deterministic reference content is
+full catalog's worth of cited, deterministic reference content is
 invisible to general web search.
 
 The fix, landed across spec-v13 Phases A through H, is one static
 prerendered HTML shell per tile and one per group, each at a
 path-based URL:
 
-- `/tools/<id>/index.html` -- one per tile (385 shells).
-- `/groups/<slug>/index.html` -- one per active group (24 shells).
+- `/tools/<id>/index.html` -- one per tile.
+- `/groups/<slug>/index.html` -- one per active group.
 
 Shells are generated at build time by
 [../scripts/build-shells.mjs](../scripts/build-shells.mjs) from the

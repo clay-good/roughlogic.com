@@ -4,7 +4,7 @@ roughlogic.com is a single-page static web application. There is no server, no a
 
 ## Runtime overview
 
-The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid organized into twenty-four group sections (A through H plus J through Y; the I letter is reserved per spec.md §5; v12 added Groups U Veterinary, V EMS / Pre-hospital, W Pilots / Aviation, X Real Estate, and Y Educators / K-12). The header search bar is the only filter; it live-filters all tile names and descriptions across every group section. (The original v1 trade-audience chip row was retired in favor of search-only navigation; the trade/group filter parameters in `routing.toolMatches` remain in the routing layer for programmatic / test use.) When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
+The user navigates to roughlogic.com. The browser receives index.html, styles.css, and app.js. The application boots, registers a service worker for offline use, and renders the home view with a tile grid organized into twenty-one group sections (A through H, J through R, plus T, X, Y, and Z; the I letter is reserved per spec.md §5, and the v12-era Legal, Veterinary, EMS / Pre-hospital, and Aviation benches were retired in spec-v107). The header search bar is the only filter; it live-filters all tile names and descriptions across every group section. (The original v1 trade-audience chip row was retired in favor of search-only navigation; the trade/group filter parameters in `routing.toolMatches` remain in the routing layer for programmatic / test use.) When non-empty, the user-curated Pinned region appears above the group sections. (The auto-tracked Recents region that previously sat above Pinned was retired in spec-v11.)
 
 Selecting a tile loads only the data shards relevant to that utility. No data is loaded eagerly. The largest shard is kept under one megabyte after gzip.
 
@@ -96,7 +96,7 @@ There is no sessionStorage, cookies, or IndexedDB. localStorage is used by `them
 
 The v2 expansion (spec-v2.md) added the first lazy-loaded module past
 the original seven trade calc-* modules. The set has since grown to 56
-modules (through spec-v475); the authoritative current inventory is the
+modules; the authoritative current inventory is the
 repo-root `calc-*.js` set, each with a documented gzip cap in
 `scripts/check-module-sizes.mjs`.
 
