@@ -1484,8 +1484,8 @@ function applyRoute() {
 // spec-v13 §5.5: SPA sets <title>, meta description, and
 // <link rel="canonical"> to match the per-tile shell at /tools/<id>/
 // when a tile opens; reverts to home values on return.
-const HOME_DESC = "600+ free calculators for electricians, plumbers, HVAC, restoration, carpentry, and fire crews. Everything runs in your browser. No signup, no tracking, no AI.";
-const HOME_TITLE = "Free Trade Calculators - 600+ Tools, No Signup · Rough Logic";
+const HOME_DESC = "Rough Logic";
+const HOME_TITLE = "Rough Logic";
 // Production origin for the canonical link. The SPA must emit an ABSOLUTE
 // canonical (matching the prerendered /tools/<id>/ and /groups/<slug>/
 // shells) or Lighthouse SEO flags it ("Is not an absolute URL"); a relative
