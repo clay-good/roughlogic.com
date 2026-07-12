@@ -87,6 +87,33 @@ flowchart TD
 
 The home-view payload (`index.html` + `styles.css` + `app.js` + the boot helpers) gzips to well under the 100 KB spec budget. Opening a calculator dynamic-imports only that trade's `calc-*.js` module and lazy-loads only the data shards it needs - nothing is fetched eagerly. The simplified Manual J heating/cooling load estimators and the duct-sizing calculator run in a Web Worker so the main thread stays responsive on multi-zone inputs.
 
+**Anatomy of one calculation.** The runtime view of the diagram above - what happens between a keystroke and a cited answer, entirely on-device:
+
+```mermaid
+sequenceDiagram
+    actor U as User (phone, maybe offline)
+    participant Shell as index.html + app.js
+    participant SW as Service Worker
+    participant Mod as calc-&lt;trade&gt;.js
+    participant Data as data/ shard
+
+    U->>Shell: type "voltage drop" or open /tools/voltage-drop/
+    Shell->>Shell: rank tiles + plain-English questions (search-discovery)
+    U->>Shell: pick a result (URL hash routes the view)
+    Shell->>SW: request the trade module + its data shards
+    alt already cached (works with no signal)
+        SW-->>Shell: serve from the shell/data cache
+    else first open
+        SW->>Mod: fetch, then cache keyed to the build hash
+        SW->>Data: fetch, then cache
+    end
+    Shell->>Mod: dynamic import, render the input fields
+    U->>Mod: type numbers (no submit button)
+    Mod->>Mod: debounced compute from the published formula
+    Mod-->>U: live result + Copy + citation + limitation note
+    Note over U,Data: all state lives in the URL hash - bookmarkable, shareable, no account
+```
+
 **Discoverability without JavaScript.** At build time, `build-shells.mjs` emits one zero-JS static shell per tile (`dist/tools/<id>/`) and per group (`dist/groups/<slug>/`), each carrying title, meta description, canonical link, Open Graph / Twitter Card tags, JSON-LD (`WebApplication` / `CollectionPage`), a breadcrumb, and a "Run the calculator" link into the SPA. A crawler or a no-JS visitor reads a complete static reference page; one click opens the live tool. See [docs/architecture.md](docs/architecture.md) and [docs/seo.md](docs/seo.md).
 
 ## How the answers earn trust
