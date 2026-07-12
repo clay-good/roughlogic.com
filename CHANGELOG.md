@@ -4,6 +4,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### docs: README overhaul + MCP catalog-count drift fix; 2026-07-12
+
+Rewrites `README.md` from a short overview into a full, drift-safe project reference: the 21-bench catalog map, a representative-calculator cheat sheet with the formula each tile is grounded in, a Mermaid architecture diagram (client-side runtime + build-time data/shell pipeline), the correctness-as-a-build-gate story (30+ static gates plus the four-job CI pipeline), and a design-decisions table. Exact tile/URL counts are kept out of the prose so it does not drift on every landing; the one count it does state (`56 per-group calculator modules`) is the gate-verified stable value. Also fixes stale catalog counts in `mcp/README.md` (`929` -> `1,000+`, made count-free so it stops rotting). No source or catalog change; version unchanged.
+
 ### feat(civil): spec-v636 sag vertical curve minimum length (AASHTO); 2026-07-11
 
 Lands `sag-vertical-curve` (Group E, calc-civil.js), the sag (valley) companion the crest tile `vertical-curve-sight-distance` (spec-v337) explicitly hands off ("sag curves use headlight/comfort/drainage criteria"). A sag curve is limited at night by headlight reach: L = A S^2/(400 + 3.5 S) for S<=L, L = 2 S - (400 + 3.5 S)/A for S>L, K = L/A (400 and 3.5 embed the 2.0 ft headlight height and 1-degree beam divergence, the same class of Green Book constant the crest tile bakes into C = 2158). A 4% grade break needing 400 ft SSD wants a 350 ft sag curve (K 87.5). Headlight-SSD control; comfort and drainage are separate. Catalog 1,083 -> 1,084 (version 0.225.0).
