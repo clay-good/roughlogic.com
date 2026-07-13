@@ -457,7 +457,14 @@ function groupShell(group, tools, groupNames) {
   const title = `${groupLabel} Calculators - Rough Logic`;
   const sample = tilesInGroup.slice(0, 3).map((t) => t.name).join(", ");
   let description = `Calculators and reference tools for ${groupLabel.toLowerCase()}: ${sample}, and more. Free, client-side, ad-free, account-free reference for the trades and adjacent professions.`;
-  if (description.length > 220) description = description.slice(0, 217) + "...";
+  // Cap against the escaped length (check-shells reads the escaped <meta
+  // content>), mirroring metaDescription and buildTitle: a sample tile name
+  // with an apostrophe or ampersand escapes to more bytes than its raw form,
+  // so a raw-length cap can let the rendered description slip past 220.
+  while (escapeHtml(description).length > 220 && description.length > 10) {
+    description = description.slice(0, -4) + "...";
+    description = description.replace(/\.\.\.+$/, "...");
+  }
   const canonical = `${SITE_URL}/groups/${groupSlug}/`;
   const head = shellHead({
     title,
