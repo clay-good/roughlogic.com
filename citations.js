@@ -11666,6 +11666,18 @@ export const CITATIONS = {
       { name: "Drainage path", value: "Hdr = full layer (single) or half (double drainage)", source: "scope of this tile" },
     ],
   },
+  "consolidation-degree": {
+    formula: "Tv = cv t / Hdr^2; U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%), else U = 100 - 10^((1.781 - Tv)/0.933).",
+    edition: "Terzaghi one-dimensional consolidation theory (time factor Tv), inverted for U, as compiled in Das, Principles of Geotechnical Engineering, by name.",
+    freeAccess: "The Terzaghi time-factor series and the Tv = cv t/Hdr^2 relation are standard published soil-mechanics results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of the consolidation-time tile: the degree of consolidation U reached after an elapsed time t, from the dimensionless time factor Tv = cv t / Hdr^2 inverted through Terzaghi's two-branch series - U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%) and U = 100 - 10^((1.781 - Tv)/0.933) above. The drainage path Hdr is the longest distance water travels to a drainage boundary - the full clay-layer thickness for single (one-way) drainage or half for double (two-way) drainage - so mis-identifying it changes Tv by a factor of four. Because the consolidation decelerates, U approaches 100% asymptotically and never quite reaches it. This returns Tv and U; it does not compute the settlement magnitude (see the settlement tiles) or secondary compression. A design aid; the engineer of record and the site-specific cv from an oedometer test govern.",
+    assumptions: [
+      { name: "Time factor", value: "Tv = cv t / Hdr^2", source: "Terzaghi consolidation theory" },
+      { name: "Degree of consolidation", value: "U = 100 sqrt(4 Tv/pi) (Tv <= 0.283), else 100 - 10^((1.781 - Tv)/0.933)", source: "Das, Principles of Geotechnical Engineering" },
+      { name: "Drainage path", value: "Hdr = full layer (single) or half (double drainage)", source: "scope of this tile" },
+    ],
+  },
   "spt-bearing-capacity": {
     formula: "qa_base = N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2; Kd = min(1 + 0.33 D/B, 1.33); qa = qa_base Kd (ksf, 1 in settlement).",
     edition: "The Meyerhof SPT settlement-based allowable bearing on sand, as compiled in Das, Principles of Foundation Engineering, by name.",

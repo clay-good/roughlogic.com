@@ -1067,6 +1067,7 @@ export const COMPUTE_MAP = {
   "coulomb-earth-pressure": { module: "../../calc-geotech.js", fn: "computeCoulombEarthPressure" },
   "retaining-wall-stability": { module: "../../calc-geotech.js", fn: "computeRetainingWallStability" },
   "consolidation-time-rate": { module: "../../calc-geotech.js", fn: "computeConsolidationTimeRate" },
+  "consolidation-degree": { module: "../../calc-geotech.js", fn: "computeConsolidationDegree" },
   "spt-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSptBearingCapacity" },
   "liquefaction-screening": { module: "../../calc-geotech.js", fn: "computeLiquefactionScreening" },
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (3 tiles, new calc-masonry.js)

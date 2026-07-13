@@ -47322,6 +47322,41 @@
       "kind": "question"
     },
     {
+      "term": "consolidation degree",
+      "target": "consolidation-degree",
+      "kind": "industry"
+    },
+    {
+      "term": "degree of consolidation",
+      "target": "consolidation-degree",
+      "kind": "industry"
+    },
+    {
+      "term": "consolidation progress",
+      "target": "consolidation-degree",
+      "kind": "redirect"
+    },
+    {
+      "term": "how consolidated is my fill",
+      "target": "consolidation-degree",
+      "kind": "question"
+    },
+    {
+      "term": "percent consolidation from time",
+      "target": "consolidation-degree",
+      "kind": "question"
+    },
+    {
+      "term": "settlement progress over time",
+      "target": "consolidation-degree",
+      "kind": "question"
+    },
+    {
+      "term": "u percent from elapsed time",
+      "target": "consolidation-degree",
+      "kind": "question"
+    },
+    {
       "term": "bearing capacity from blow count",
       "target": "spt-bearing-capacity",
       "kind": "question"

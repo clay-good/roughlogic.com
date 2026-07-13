@@ -742,6 +742,42 @@ GEOTECH_RENDERERS["consolidation-time-rate"] = _simpleRenderer({
   compute: computeConsolidationTimeRate,
 });
 
+// dims: in { cv_ft2_day: dimensionless, hdr_ft: L, t_days: dimensionless } out: { tv: dimensionless, u_percent: dimensionless }
+export function computeConsolidationDegree({ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cv = Number(cv_ft2_day) || 0;
+  const hdr = Number(hdr_ft) || 0;
+  const t = Number(t_days) || 0;
+  if (!(cv > 0)) return { error: "Coefficient of consolidation cv must be positive (ft^2/day)." };
+  if (!(hdr > 0)) return { error: "Drainage path Hdr must be positive (ft)." };
+  if (!(t > 0)) return { error: "Elapsed time must be positive (days)." };
+  const tv = cv * t / (hdr * hdr);
+  const TV_60 = (Math.PI / 4) * 0.36; // Tv at U = 60%
+  const u_percent = tv <= TV_60
+    ? 100 * Math.sqrt(4 * tv / Math.PI)
+    : 100 - Math.pow(10, (1.781 - tv) / 0.933);
+  return {
+    tv, u_percent,
+    note: "Inverse Terzaghi 1-D consolidation: the degree of consolidation U reached after an elapsed time t, from the time factor Tv = cv t / Hdr^2 inverted - U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%) and U = 100 - 10^((1.781 - Tv)/0.933) above. This is the inverse of the consolidation-time tile (which gives the time to reach a target U): the field/monitoring question of how far a surcharge or fill has consolidated so far. Hdr is the longest drainage path - the full layer for single (one-way) drainage, half for double - so mis-setting it changes Tv by a factor of four. The decelerating curve means U approaches 100% asymptotically and never quite reaches it. A design aid; the engineer of record and the site-specific cv govern.",
+  };
+}
+export const consolidationDegreeExample = { inputs: { cv_ft2_day: 0.1, hdr_ft: 10, t_days: 848 } };
+GEOTECH_RENDERERS["consolidation-degree"] = _simpleRenderer({
+  citation: "Citation: Terzaghi 1-D consolidation degree from elapsed time - Tv = cv t / Hdr^2, then U = 100 sqrt(4 Tv / pi) for Tv <= 0.283 (U <= 60%), else U = 100 - 10^((1.781 - Tv)/0.933); the inverse of the consolidation-time tile. Hdr is the longest drainage path (full layer for single, half for double drainage). A design aid; the engineer of record and the site cv govern.",
+  example: consolidationDegreeExample.inputs,
+  fields: [
+    { key: "cv_ft2_day", label: "Coefficient of consolidation cv (ft^2/day)", kind: "number", default: 0.1 },
+    { key: "hdr_ft", label: "Drainage path Hdr (ft)", kind: "number", default: 10 },
+    { key: "t_days", label: "Elapsed time (days)", kind: "number", default: 848 },
+  ],
+  outputs: [
+    { key: "tv", id: "ccd-out-tv", label: "Time factor Tv", value: (r) => fmt(r.tv, 3) },
+    { key: "u", id: "ccd-out-u", label: "Degree of consolidation U", value: (r) => fmt(r.u_percent, 1) + " %" },
+    { key: "n", id: "ccd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConsolidationDegree,
+});
+
 // dims: in { n60: dimensionless, b_ft: L, d_ft: L } out: { qa_base_ksf: M L^-1 T^-2, kd: dimensionless, qa_ksf: M L^-1 T^-2 }
 export function computeSptBearingCapacity({ n60 = 0, b_ft = 0, d_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

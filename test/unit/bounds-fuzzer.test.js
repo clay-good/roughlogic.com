@@ -16589,6 +16589,35 @@ test("bounds: spec-v414 computeConsolidationTimeRate pins the piecewise Tv, the 
   assert.ok("error" in _v414({ u_percent: 90, cv_ft2_day: Infinity, hdr_ft: 10 }));
 });
 
+import { computeConsolidationDegree as _v645 } from "../../calc-geotech.js";
+
+test("bounds: spec-v645 computeConsolidationDegree inverts Terzaghi for U, round-trips the time tile across both branches, and pins error seams", () => {
+  const r = _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: 848 });
+  assert.ok(Math.abs(r.tv - 0.848) < 1e-9);
+  assert.ok(Math.abs(r.u_percent - 90) < 1e-9); // upper branch, exact round-trip of the U=90 example
+  // Lower branch (Tv <= 0.283): the parabolic form gives ~50% at 196 days.
+  const low = _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: 196 });
+  assert.ok(Math.abs(low.tv - 0.196) < 1e-9);
+  assert.ok(Math.abs(low.u_percent - 100 * Math.sqrt(4 * 0.196 / Math.PI)) < 1e-12);
+  // Exact inverse of the consolidation-time tile on both branches: feed each U through
+  // the forward tile to get the time, then recover the same U here. (Values are kept off
+  // the U=60 branch seam, where Terzaghi's two-branch series has an inherent ~0.35% jump.)
+  for (const U of [30, 45, 75, 90]) {
+    const t = _v414({ u_percent: U, cv_ft2_day: 0.1, hdr_ft: 10 }).t_days;
+    assert.ok(Math.abs(_v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: t }).u_percent - U) < 1e-6);
+  }
+  // U approaches 100 asymptotically: strictly below at a realistic large time, and never
+  // above 100 even at the float-saturation extreme (where 100 - 10^(-huge) rounds to 100).
+  const late = _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: 2000 }).u_percent;
+  assert.ok(late > 99 && late < 100);
+  assert.ok(_v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: 100000 }).u_percent <= 100);
+  // Error seams: non-positive cv / Hdr / time, non-finite.
+  assert.ok("error" in _v645({ cv_ft2_day: 0, hdr_ft: 10, t_days: 848 }));
+  assert.ok("error" in _v645({ cv_ft2_day: 0.1, hdr_ft: 0, t_days: 848 }));
+  assert.ok("error" in _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: 0 }));
+  assert.ok("error" in _v645({ cv_ft2_day: 0.1, hdr_ft: 10, t_days: Infinity }));
+});
+
 test("bounds: spec-v415 computeSptBearingCapacity pins both branches, the depth factor, and error seams", () => {
   const r = _v415({ n60: 20, b_ft: 6, d_ft: 2 });
   assert.ok(Math.abs(r.qa_base_ksf - (20 / 6) * Math.pow(7 / 6, 2)) < 1e-9 && r.small_footing === false);

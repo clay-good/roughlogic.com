@@ -36806,6 +36806,56 @@
    }
   },
   {
+   "tile_id": "consolidation-degree",
+   "source_publisher": "Terzaghi consolidation theory (inverted for U)",
+   "source_title": "cv 0.1 ft^2/day, Hdr 10 ft, 848 days -> Tv 0.848, U 90% (round-trips the consolidation-time example)",
+   "source_edition_or_year": "spec-v645 worked example (machine-verified)",
+   "source_section_or_page": "spec-v645 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "cv_ft2_day": 0.1,
+    "hdr_ft": 10,
+    "t_days": 848
+   },
+   "outputs": {
+    "tv": {
+     "value": 0.848,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "u_percent": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "consolidation-degree",
+   "source_publisher": "Terzaghi consolidation theory (inverted for U)",
+   "source_title": "cross-check: at 196 days the same layer is only 50% consolidated (Tv 0.196, the lower branch)",
+   "source_edition_or_year": "spec-v645 worked example (machine-verified)",
+   "source_section_or_page": "spec-v645 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "cv_ft2_day": 0.1,
+    "hdr_ft": 10,
+    "t_days": 196
+   },
+   "outputs": {
+    "u_percent": {
+     "value": 49.96,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spt-bearing-capacity",
    "source_publisher": "Meyerhof / Das",
    "source_title": "N60 20, B 6 ft, D 2 ft -> base 4.54, Kd 1.11, qa 5.04 ksf",
