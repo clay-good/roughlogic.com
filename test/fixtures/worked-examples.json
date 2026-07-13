@@ -24453,6 +24453,62 @@
    }
   },
   {
+   "tile_id": "furnace-airflow-to-rise",
+   "source_publisher": "First-principles sensible-heat relation (inverse of furnace-temp-rise)",
+   "source_title": "100,000 BTU/hr at 80% on 1,200 CFM, 70 F return -> 61.7 F rise, 131.7 F supply (in the 40-70 band)",
+   "source_edition_or_year": "spec-v655 worked example (machine-verified)",
+   "source_section_or_page": "spec-v655 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "input_btuh": 100000,
+    "efficiency_pct": 80,
+    "cfm": 1200,
+    "return_air_F": 70,
+    "rise_min_F": 40,
+    "rise_max_F": 70
+   },
+   "outputs": {
+    "delta_T_F": {
+     "value": 61.73,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "supply_air_F": {
+     "value": 131.73,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "furnace-airflow-to-rise",
+   "source_publisher": "First-principles sensible-heat relation (inverse of furnace-temp-rise)",
+   "source_title": "round-trip: 1481.5 CFM (the temp-rise example's derived airflow) gives back a 50 F rise",
+   "source_edition_or_year": "spec-v655 worked example (machine-verified)",
+   "source_section_or_page": "spec-v655 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "input_btuh": 100000,
+    "efficiency_pct": 80,
+    "cfm": 1481.48,
+    "return_air_F": 70,
+    "rise_min_F": 40,
+    "rise_max_F": 70
+   },
+   "outputs": {
+    "delta_T_F": {
+     "value": 50.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gas-altitude-derate",
    "source_publisher": "NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name)",
    "source_title": "4 percent per 1000 ft above 2000 ft derate",

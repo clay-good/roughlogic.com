@@ -976,6 +976,7 @@ export const COMPUTE_MAP = {
   "gas-meter-clock": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClock" },
   "gas-meter-clock-target": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClockTarget" },
   "furnace-temp-rise": { module: "../../calc-hvacservice.js", fn: "computeFurnaceTempRise" },
+  "furnace-airflow-to-rise": { module: "../../calc-hvacservice.js", fn: "computeFurnaceAirflowToRise" },
   // spec-v218..v220 residential air-tightness and ventilation batch (3 tiles)
   "blower-door-ach50": { module: "../../calc-hvacservice.js", fn: "computeBlowerDoorAch50" },
   "ashrae-622-ventilation": { module: "../../calc-hvacservice.js", fn: "computeAshrae622Ventilation" },

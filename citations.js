@@ -8994,6 +8994,18 @@ export const CITATIONS = {
       { name: "Rise range", value: "default 40 to 70 F; the rating plate's stamped range is the governing limit", source: "rating plate" },
     ],
   },
+  "furnace-airflow-to-rise": {
+    formula: "output = input x efficiency / 100; delta_T = output / (1.08 x CFM); supply_air = return_air + delta_T. Verdict checks delta_T against the rating-plate rise range.",
+    edition: "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for the rise, the inverse of the temperature-rise tile (public); the 1.08 air factor and efficiency are editable.",
+    freeAccess: "The sensible-heat relation is public physics; the rating-plate rise range governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of the furnace temperature-rise tile: given a blower airflow (a tap or a target CFM), predict the temperature rise it produces so the blower can be set before measuring. From the sensible-heat relation the rise = output / (1.08 x CFM), the output = input x efficiency, and the supply-air temperature = return + rise. A lower airflow raises the rise and risks overheat and high-limit trips; a higher airflow lowers it and risks cold, clammy supply air and heat-exchanger condensation. The rating-plate rise range (commonly 40 to 70 F) is the governing limit and the 1.08 factor is sea-level standard air. The equipment manufacturer and the licensed tech govern.",
+    assumptions: [
+      { name: "Rise from airflow", value: "delta_T = output / (1.08 x CFM), output = input x efficiency", source: "first principles" },
+      { name: "Air factor", value: "1.08 BTU/hr per CFM per F is sea-level standard air; at altitude or high humidity it falls", source: "first principles" },
+      { name: "Rise range", value: "default 40 to 70 F; the rating plate's stamped range is the governing limit", source: "rating plate" },
+    ],
+  },
   "gas-altitude-derate": {
     formula: "steps = max(0, (elevation - threshold) / 1000); factor = max(0, 1 - (derate-per-1000ft / 100) x steps); derated input = nameplate x factor. A high-altitude-kit flag is set above the threshold.",
     edition: "NFPA 54 (National Fuel Gas Code) / IFGC high-altitude provision (by name, not reproduced); the derate basis is an editable convention.",

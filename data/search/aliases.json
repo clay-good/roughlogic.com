@@ -57142,6 +57142,36 @@
       "kind": "question"
     },
     {
+      "term": "furnace airflow to rise",
+      "target": "furnace-airflow-to-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature rise from airflow",
+      "target": "furnace-airflow-to-rise",
+      "kind": "industry"
+    },
+    {
+      "term": "set blower tap for rise",
+      "target": "furnace-airflow-to-rise",
+      "kind": "redirect"
+    },
+    {
+      "term": "predict temp rise from cfm",
+      "target": "furnace-airflow-to-rise",
+      "kind": "question"
+    },
+    {
+      "term": "rise from blower speed",
+      "target": "furnace-airflow-to-rise",
+      "kind": "question"
+    },
+    {
+      "term": "cfm to temp rise furnace",
+      "target": "furnace-airflow-to-rise",
+      "kind": "question"
+    },
+    {
       "term": "air changes per hour from a cfm50 reading",
       "target": "blower-door-ach50",
       "kind": "question"

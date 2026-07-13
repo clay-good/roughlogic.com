@@ -490,6 +490,50 @@ HVACSERVICE_RENDERERS["furnace-temp-rise"] = _simpleRenderer({
   compute: computeFurnaceTempRise,
 });
 
+// ===================== spec-v655: furnace airflow to rise (inverse of temp-rise) =====================
+// Pick a blower airflow, predict the temperature rise it produces: from the
+// sensible-heat relation, rise = output / (1.08 x CFM), output = input x eff.
+// dims: in { input_btuh: M L^2 T^-3, efficiency_pct: dimensionless, cfm: L^3 T^-1, return_air_F: T, rise_min_F: T, rise_max_F: T } out: { output_btuh: M L^2 T^-3, delta_T_F: T, supply_air_F: T }
+export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 80, cfm = 0, return_air_F = 70, rise_min_F = 40, rise_max_F = 70 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(input_btuh > 0)) return { error: "Furnace input must be positive (BTU/hr)." };
+  if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
+  if (!(cfm > 0)) return { error: "Blower airflow must be positive (CFM)." };
+  if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
+  const output_btuh = input_btuh * efficiency_pct / 100;
+  const delta_T_F = output_btuh / (_SENSIBLE_HEAT_FACTOR * cfm);
+  const supply_air_F = return_air_F + delta_T_F;
+  let verdict;
+  if (delta_T_F < rise_min_F) verdict = "rise low (" + fmt(delta_T_F, 0) + " F, below the " + fmt(rise_min_F, 0) + " F minimum) - this airflow is too high for the firing rate; drop to a lower blower tap";
+  else if (delta_T_F > rise_max_F) verdict = "rise high (" + fmt(delta_T_F, 0) + " F, above the " + fmt(rise_max_F, 0) + " F maximum) - this airflow is too low; raise the blower tap or clear the filter and ductwork";
+  else verdict = "rise in range (" + fmt(delta_T_F, 0) + " F, within " + fmt(rise_min_F, 0) + " to " + fmt(rise_max_F, 0) + " F)";
+  return {
+    output_btuh, delta_T_F, supply_air_F, verdict,
+    note: "The inverse of the temperature-rise tile: pick a blower airflow (a tap or a target CFM) and predict the temperature rise it produces, so the blower can be set before measuring. From the sensible-heat relation Qs = 1.08 x CFM x delta-T, the rise = output / (1.08 x CFM) with output = input x efficiency, and the supply-air temperature = return + rise. A lower airflow raises the rise (risking overheat and high-limit trips); a higher airflow lowers it (risking cold, clammy supply air and heat-exchanger condensation). The rating-plate rise range (commonly 40 to 70 F) is the governing limit. The 1.08 factor is sea-level standard air; at altitude or high humidity it falls. The equipment manufacturer and the licensed tech govern.",
+  };
+}
+const furnaceAirflowToRiseExample = { inputs: { input_btuh: 100000, efficiency_pct: 80, cfm: 1200, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 } };
+HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
+  citation: "Citation: first-principles sensible-heat relation Qs = 1.08 x CFM x delta-T solved for the rise, with output = input x efficiency (public), the inverse of the furnace temperature-rise tile; the 1.08 sea-level air factor and the default 80% efficiency are editable. The rating-plate temperature-rise range and the equipment manufacturer govern.",
+  example: furnaceAirflowToRiseExample.inputs,
+  fields: [
+    { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
+    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", default: 80 },
+    { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
+    { key: "return_air_F", label: "Return-air temp (F)", kind: "number", default: 70 },
+    { key: "rise_min_F", label: "Plate min rise (F)", kind: "number", default: 40 },
+    { key: "rise_max_F", label: "Plate max rise (F)", kind: "number", default: 70 },
+  ],
+  outputs: [
+    { key: "d", id: "far-out-d", label: "Predicted temperature rise", value: (r) => fmt(r.delta_T_F, 1) + " F" },
+    { key: "s", id: "far-out-s", label: "Supply-air temperature", value: (r) => fmt(r.supply_air_F, 1) + " F" },
+    { key: "o", id: "far-out-o", label: "Heat output", value: (r) => fmt(r.output_btuh, 0) + " BTU/hr" },
+    { key: "v", id: "far-out-v", label: "Verdict", value: (r) => r.verdict },
+    { key: "n", id: "far-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFurnaceAirflowToRise,
+});
+
 // ===================== spec-v218: blower-door air-tightness (ACH50) =====================
 
 // dims: in { cfm50: L^3 T^-1, volume_ft3: L^3, n_factor: dimensionless, target_ach50: dimensionless } out: { ach50: T^-1, ach_nat: T^-1, cfm_nat: L^3 T^-1 }

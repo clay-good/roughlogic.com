@@ -10578,6 +10578,28 @@ test("bounds: spec-v110 HVAC gas-heat start-up (gas-meter clocking + furnace tem
   assert.ok("error" in _v110b({ input_btuh: 0 }) && "error" in _v110b({ return_air_F: 120, supply_air_F: 70, input_btuh: 100000 }) && "error" in _v110b({ input_btuh: 100000, efficiency_pct: 0 }));
 });
 
+import { computeFurnaceAirflowToRise as _v655 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v655 computeFurnaceAirflowToRise inverts the temp-rise tile, round-trips it, flags out-of-range, and pins error seams", () => {
+  const r = _v655({ input_btuh: 100000, efficiency_pct: 80, cfm: 1200, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 });
+  assert.ok(Math.abs(r.output_btuh - 80000) < 1e-9);
+  assert.ok(Math.abs(r.delta_T_F - 80000 / (1.08 * 1200)) < 1e-9); // ~61.73
+  assert.ok(Math.abs(r.supply_air_F - (70 + r.delta_T_F)) < 1e-9);
+  assert.ok(r.verdict.includes("in range"));
+  // Exact inverse of furnace-temp-rise: the airflow that tile derives, fed back, reproduces the rise.
+  const cfm = _v110b({ return_air_F: 70, supply_air_F: 120, input_btuh: 100000, efficiency_pct: 80, rise_min_F: 40, rise_max_F: 70 }).cfm;
+  assert.ok(Math.abs(_v655({ input_btuh: 100000, efficiency_pct: 80, cfm, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 }).delta_T_F - 50) < 1e-9);
+  // A lower airflow raises the rise past the plate maximum (rise high).
+  assert.ok(_v655({ input_btuh: 100000, efficiency_pct: 80, cfm: 900, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 }).verdict.includes("rise high"));
+  // A very high airflow drops the rise below the minimum (rise low).
+  assert.ok(_v655({ input_btuh: 100000, efficiency_pct: 80, cfm: 3000, return_air_F: 70, rise_min_F: 40, rise_max_F: 70 }).verdict.includes("rise low"));
+  // Error seams: non-positive input / efficiency / cfm, non-finite.
+  assert.ok("error" in _v655({ input_btuh: 0, efficiency_pct: 80, cfm: 1200 }));
+  assert.ok("error" in _v655({ input_btuh: 100000, efficiency_pct: 0, cfm: 1200 }));
+  assert.ok("error" in _v655({ input_btuh: 100000, efficiency_pct: 80, cfm: 0 }));
+  assert.ok("error" in _v655({ input_btuh: Infinity, efficiency_pct: 80, cfm: 1200 }));
+});
+
 import { computeGasMeterClockTarget as _v652 } from "../../calc-hvacservice.js";
 
 test("bounds: spec-v652 computeGasMeterClockTarget inverts the meter clock, round-trips it, scales with the dial, and pins error seams", () => {

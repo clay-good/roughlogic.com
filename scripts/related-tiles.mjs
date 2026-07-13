@@ -1013,7 +1013,8 @@ const RELATED = {
   // spec-v110 HVAC gas-heat start-up (Group C)
   "gas-meter-clock": ["gas-meter-clock-target","furnace-temp-rise","combustion-air","gas-altitude-derate"],
   "gas-meter-clock-target": ["gas-meter-clock","furnace-temp-rise","combustion-air","gas-appliance-demand"],
-  "furnace-temp-rise": ["gas-meter-clock","cfm-per-ton","duct-static-pressure-total"],
+  "furnace-temp-rise": ["furnace-airflow-to-rise","gas-meter-clock","cfm-per-ton","duct-static-pressure-total"],
+  "furnace-airflow-to-rise": ["furnace-temp-rise","cfm-per-ton","gas-meter-clock","duct-static-pressure-total"],
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   "gas-altitude-derate": ["gas-fuel-conversion","gas-meter-clock","gas-appliance-demand"],
   "gas-fuel-conversion": ["gas-altitude-derate","gas-pipe-sizing","gas-meter-clock"],

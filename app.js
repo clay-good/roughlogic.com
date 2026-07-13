@@ -522,7 +522,7 @@ const TOOL_MODULES = (() => {
     // spec-v105 evacuation/leak-check field diagnostics (same module).
     "vacuum-decay-test", "nitrogen-pressure-test",
     // spec-v110 gas-heat start-up diagnostics (same module).
-    "gas-meter-clock", "gas-meter-clock-target", "furnace-temp-rise",
+    "gas-meter-clock", "gas-meter-clock-target", "furnace-temp-rise", "furnace-airflow-to-rise",
     // spec-v218..v220 residential air-tightness and ventilation batch.
     "blower-door-ach50", "ashrae-622-ventilation", "infiltration-load",
     // spec-v461 residential duct leakage
