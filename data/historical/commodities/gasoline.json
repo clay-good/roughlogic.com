@@ -3,7 +3,7 @@
   "agency": "EIA",
   "series_id": "PET.EMM_EPMR_PTE_NUS_DPG.M",
   "units": "USD/gal",
-  "fetched": "2026-07-06",
+  "fetched": "2026-07-13",
   "cadence": "monthly",
   "points": [
     {

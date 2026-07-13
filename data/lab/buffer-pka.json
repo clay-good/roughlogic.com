@@ -1,8 +1,8 @@
 {
   "source": "Good et al., Biochemistry 5(2): 467 (1966), for the Good's buffers (HEPES, MES, MOPS, PIPES); CRC Handbook of Chemistry and Physics 95th ed. for Tris, phosphate, acetate, bicarbonate.",
   "edition": "Good 1966 / CRC 95th",
-  "fetched": "2026-07-06",
-  "verified_on": "2026-07-06",
+  "fetched": "2026-07-13",
+  "verified_on": "2026-07-13",
   "free_access": "Good 1966 historical paper free at the journal archive; CRC Handbook is a commercial reference book. Bundled values are public physical constants.",
   "buffers_at_25C": {
     "Tris": {

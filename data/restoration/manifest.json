@@ -1,9 +1,9 @@
 {
   "name": "restoration",
-  "version": "2026-07-06",
-  "fetched": "2026-07-06",
-  "edition": "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of 2026-07-06.",
-  "asOf": "2026-07-06",
+  "version": "2026-07-13",
+  "fetched": "2026-07-13",
+  "edition": "IICRC S500 / S520 cited by name; psychrometrics from August-Roche-Magnus; manufacturer HEPA bulletins as of 2026-07-13.",
+  "asOf": "2026-07-13",
   "refresh_cadence": "annual",
   "shards": [
     {

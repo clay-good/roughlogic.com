@@ -1,5 +1,5 @@
 {
   "source": "First-principles outputs of the lumber-spans calculator using the bundled material properties. Values are derived in this build, not reproduced.",
   "notes": "See docs/derivations.md section 9 for the underlying mechanics.",
-  "derived_at": "2026-07-06"
+  "derived_at": "2026-07-13"
 }

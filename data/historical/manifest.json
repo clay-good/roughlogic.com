@@ -1,9 +1,9 @@
 {
   "name": "historical",
-  "version": "2026-07-06",
-  "fetched": "2026-07-06",
-  "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-07-06. Build fails if any shard's latest point is more than 30 days behind the build date.",
-  "asOf": "2026-07-06",
+  "version": "2026-07-13",
+  "fetched": "2026-07-13",
+  "edition": "BLS PPI / EIA / USDA NASS / FRED federal series; build-fetched 2026-07-13. Build fails if any shard's latest point is more than 30 days behind the build date.",
+  "asOf": "2026-07-13",
   "refresh_cadence": "monthly",
   "shards": [
     {
@@ -19,12 +19,12 @@
     {
       "file": "commodities/structural-steel.json",
       "name": "BLS PPI WPU101707 (Index 1982=100)",
-      "gzip_size_bytes": 455
+      "gzip_size_bytes": 456
     },
     {
       "file": "commodities/rebar.json",
       "name": "BLS PPI WPU101706 (Index 1982=100)",
-      "gzip_size_bytes": 466
+      "gzip_size_bytes": 467
     },
     {
       "file": "commodities/framing-lumber.json",
@@ -49,7 +49,7 @@
     {
       "file": "commodities/diesel.json",
       "name": "EIA PET.EMD_EPD2D_PTE_NUS_DPG.M (USD/gal)",
-      "gzip_size_bytes": 455
+      "gzip_size_bytes": 456
     },
     {
       "file": "commodities/gasoline.json",
@@ -64,12 +64,12 @@
     {
       "file": "commodities/wheat.json",
       "name": "USDA NASS PWHEAMTUSDM (USD/bushel)",
-      "gzip_size_bytes": 464
+      "gzip_size_bytes": 465
     },
     {
       "file": "commodities/corn.json",
       "name": "USDA NASS PMAIZMTUSDM (USD/bushel)",
-      "gzip_size_bytes": 452
+      "gzip_size_bytes": 455
     },
     {
       "file": "commodities/soybeans.json",
@@ -78,19 +78,19 @@
     }
   ],
   "hashes": {
-    "commodities/copper.json": "0334b215854e2cabc3b34c870daa46fc155209577577103972e4efee7d990f84",
-    "commodities/aluminum.json": "edc066a7efaec0f4a57db35dbcfc235e1819dd35348cd460f833b7bea6b8faec",
-    "commodities/structural-steel.json": "44e23e44c7e7c6672a695b06a4cc15ac17cc579fbbdad2b32aa2c5d86de93f56",
-    "commodities/rebar.json": "58a08372791194d9b7d72dade776cf9b65cd82658344eddba86f0099b340f703",
-    "commodities/framing-lumber.json": "f6d1d26f004a05e48a3545f58ccb22e16f49635c852e59df3d58b3131df94f36",
-    "commodities/osb.json": "740493c17ba6c1116fcbda9ccf613d43f8065af09f262640762dad8c55163eed",
-    "commodities/drywall.json": "e68367cb16eea858113a4189214afc303d9f8ca71e10acc6b637520d1a09143b",
-    "commodities/asphalt.json": "f0f1100e1ff51155e6e59ab90b15fd57741ebe743b6d1befa4dd1504b9c6fbf8",
-    "commodities/diesel.json": "99ca3c08ad04cb989bfde025fad2daef9c04db21b32b5a476fc663d71db683b1",
-    "commodities/gasoline.json": "ce959cc20d459041b8e33141637d0bc6fe57d891cb0dd8ca7661de3ea9a5e432",
-    "commodities/natural-gas.json": "dabb40c8771aa4d75d4eec344fb12223915edd3bdd0bb1dcee836c25b99a2bd5",
-    "commodities/wheat.json": "cf6bd64b75c21133335485e631e7119ff97551476bf90551c5beb92417370f35",
-    "commodities/corn.json": "58057daebdb55626f2b9a391dcaef6dc24fc6cb376ce820e4e14ef32ebf53c96",
-    "commodities/soybeans.json": "146225356dbfffe84b31049c0097252ea9f412ba2e19dfb8b40ab22c0e57d317"
+    "commodities/copper.json": "a484c93012784020cc1c36d364c3dcad7baf87b6a82ea19e5a4c9431adc5c6e4",
+    "commodities/aluminum.json": "b375bada5d37061b853b4d3d446c11337a6145aedad64fd2b2a579a5a4bedcf7",
+    "commodities/structural-steel.json": "a2d27dcefb7a64f418ef1b7671b7ba1682cadcf45ada0f300c2180aadbe70833",
+    "commodities/rebar.json": "42cad5272281177869bc4e310902b22b41b86891c0b4f1596a055252625023bd",
+    "commodities/framing-lumber.json": "f93332a1381f5061c3e856fa6aff1557399e4f5102bb13fadd3dbd350c33fba6",
+    "commodities/osb.json": "1f8e3499044ef837ca84af257766ffaca90337ba248c549408085a2202e09c36",
+    "commodities/drywall.json": "f3f1c918fca0adfc8670fbb409e1261706c627930b81b821999c04f3386382d2",
+    "commodities/asphalt.json": "a16bb567dc5a887c09b4f66ccf9457da54f3ea8d109168f9b4a416090a811f11",
+    "commodities/diesel.json": "15e513231aafdbb2627025de404e1364ebf8c7d8996ed62930375e775a68730a",
+    "commodities/gasoline.json": "8104258e43ef794a069a55810fe8e67daecc36031c3b6f8338bb7159930f2b91",
+    "commodities/natural-gas.json": "f5b19670aa6675f3dcaf084d8b4373d8ad4f833051b3e410630ca55ce5345311",
+    "commodities/wheat.json": "5296b35179cf2ea02306e9cc8caa03d44bed2e4277d24c6074204a74ecb9d5d5",
+    "commodities/corn.json": "8d6022888b704a9e6487d404b8411f00c1fed985280af24dc156abbf187adeac",
+    "commodities/soybeans.json": "304f8277400be786f19373f4d5c17469929211306169d6dba9d11c5e04921d40"
   }
 }

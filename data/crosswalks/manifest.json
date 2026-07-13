@@ -1,9 +1,9 @@
 {
   "name": "crosswalks",
-  "version": "2026-07-06",
-  "fetched": "2026-07-06",
-  "edition": "NIST SP 811 unit factors; IRS 2024 standard mileage rate; GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-07-06.",
-  "asOf": "2026-07-06",
+  "version": "2026-07-13",
+  "fetched": "2026-07-13",
+  "edition": "NIST SP 811 unit factors; IRS 2024 standard mileage rate; GSA FY2026 per-diem; NIOSH 1991 lifting equation; OSHA 29 CFR 1926 Subpart P + 1926.502 fall protection; NWS / OSHA heat-cold-stress formulas; manufacturer connector-decel benchmarks (3M / Capital Safety, MSA, Honeywell-Miller); state revenue rates verified 2026-07-13.",
+  "asOf": "2026-07-13",
   "refresh_cadence": "quarterly",
   "shards": [
     {
@@ -14,7 +14,7 @@
     {
       "file": "state-tax-rates.json",
       "name": "State sales tax rates",
-      "gzip_size_bytes": 400
+      "gzip_size_bytes": 401
     },
     {
       "file": "irs-mileage.json",
@@ -49,7 +49,7 @@
   ],
   "hashes": {
     "unit-conversions.json": "9a30ff3dd2f47b0d62f28cf4bc72363741156cb82f2f19a16289d59afaabf5b1",
-    "state-tax-rates.json": "2f39a76bfedf1917de691ea2a7d9e15dcf693b7c935bdf7be60fec0605451a4c",
+    "state-tax-rates.json": "599cab2ccd7a2028a6de5a9bf14e41abef8a7d441c646357f63b9f0004ad4749",
     "irs-mileage.json": "76c4d0e863fdd71a9d2b76047b0b69abb94c6133b225ce0e35a071a9d4a9c3e4",
     "gsa-perdiem.json": "a7578ff49317d32fda4779b32d5776e0c612513344d59d1af13725b374a06976",
     "niosh-coupling.json": "ceb2d1f4928d6c077f568fcff517b7c561899e932e93f9aad23d6097547f2cc5",
