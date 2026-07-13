@@ -57022,6 +57022,36 @@
       "kind": "question"
     },
     {
+      "term": "gas meter clock target",
+      "target": "gas-meter-clock-target",
+      "kind": "industry"
+    },
+    {
+      "term": "on rate meter time",
+      "target": "gas-meter-clock-target",
+      "kind": "industry"
+    },
+    {
+      "term": "expected seconds per revolution",
+      "target": "gas-meter-clock-target",
+      "kind": "redirect"
+    },
+    {
+      "term": "what should the meter clock",
+      "target": "gas-meter-clock-target",
+      "kind": "question"
+    },
+    {
+      "term": "stopwatch reading for firing rate",
+      "target": "gas-meter-clock-target",
+      "kind": "question"
+    },
+    {
+      "term": "target clock time gas meter",
+      "target": "gas-meter-clock-target",
+      "kind": "question"
+    },
+    {
       "term": "supply minus return temp furnace check",
       "target": "furnace-temp-rise",
       "kind": "question"

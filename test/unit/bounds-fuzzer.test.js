@@ -10555,6 +10555,26 @@ test("bounds: spec-v110 HVAC gas-heat start-up (gas-meter clocking + furnace tem
   assert.ok("error" in _v110b({ input_btuh: 0 }) && "error" in _v110b({ return_air_F: 120, supply_air_F: 70, input_btuh: 100000 }) && "error" in _v110b({ input_btuh: 100000, efficiency_pct: 0 }));
 });
 
+import { computeGasMeterClockTarget as _v652 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v652 computeGasMeterClockTarget inverts the meter clock, round-trips it, scales with the dial, and pins error seams", () => {
+  const r = _v652({ target_input_btuh: 100000, dial_size_cf: 1, heating_value_btu_cf: 1030 });
+  assert.ok(Math.abs(r.sec_per_rev - 3600 * 1 * 1030 / 100000) < 1e-9); // 37.08
+  assert.ok(Math.abs(r.cfh_target - 100000 / 1030) < 1e-9);
+  assert.ok(Math.abs(r.sec_per_rev_fast - r.sec_per_rev / 1.05) < 1e-12 && Math.abs(r.sec_per_rev_slow - r.sec_per_rev / 0.95) < 1e-12);
+  // Exact inverse of gas-meter-clock: clocking the returned time reproduces the target rate.
+  assert.ok(Math.abs(_v110a({ sec_per_rev: r.sec_per_rev, dial_size_cf: 1, heating_value_btu_cf: 1030 }).actual_input_btuh - 100000) < 1e-6);
+  // A larger dial takes proportionally longer per revolution at the same rate.
+  assert.ok(Math.abs(_v652({ target_input_btuh: 100000, dial_size_cf: 2, heating_value_btu_cf: 1030 }).sec_per_rev - 2 * r.sec_per_rev) < 1e-9);
+  // A higher firing rate clocks faster.
+  assert.ok(_v652({ target_input_btuh: 150000, dial_size_cf: 1, heating_value_btu_cf: 1030 }).sec_per_rev < r.sec_per_rev);
+  // Error seams: non-positive target / dial / heating value, non-finite.
+  assert.ok("error" in _v652({ target_input_btuh: 0, dial_size_cf: 1, heating_value_btu_cf: 1030 }));
+  assert.ok("error" in _v652({ target_input_btuh: 100000, dial_size_cf: 0, heating_value_btu_cf: 1030 }));
+  assert.ok("error" in _v652({ target_input_btuh: 100000, dial_size_cf: 1, heating_value_btu_cf: 0 }));
+  assert.ok("error" in _v652({ target_input_btuh: Infinity, dial_size_cf: 1, heating_value_btu_cf: 1030 }));
+});
+
 import { computeGasAltitudeDerate as _v111a, computeGasFuelConversion as _v111b } from "../../calc-gas.js";
 test("bounds: spec-v111 fuel-gas altitude derate and NG/LP conversion (NFPA 54 / orifice flow)", () => {
   const a = _v111a({ nameplate_input_btuh: 100000, elevation_ft: 6000, derate_pct_per_1000: 4, threshold_ft: 2000 });

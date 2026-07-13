@@ -24283,6 +24283,56 @@
    }
   },
   {
+   "tile_id": "gas-meter-clock-target",
+   "source_publisher": "First-principles meter-clocking arithmetic (inverse of gas-meter-clock)",
+   "source_title": "100,000 BTU/hr on a 1 cf dial at 1030 BTU/cf should clock 37.1 s (target flow 97.1 cfh)",
+   "source_edition_or_year": "spec-v652 worked example (machine-verified)",
+   "source_section_or_page": "spec-v652 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_input_btuh": 100000,
+    "dial_size_cf": 1,
+    "heating_value_btu_cf": 1030
+   },
+   "outputs": {
+    "sec_per_rev": {
+     "value": 37.08,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "cfh_target": {
+     "value": 97.09,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-meter-clock-target",
+   "source_publisher": "First-principles meter-clocking arithmetic (inverse of gas-meter-clock)",
+   "source_title": "cross-check: a 2 cf dial doubles the time to 74.2 s (the same rate takes twice as long per revolution)",
+   "source_edition_or_year": "spec-v652 worked example (machine-verified)",
+   "source_section_or_page": "spec-v652 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_input_btuh": 100000,
+    "dial_size_cf": 2,
+    "heating_value_btu_cf": 1030
+   },
+   "outputs": {
+    "sec_per_rev": {
+     "value": 74.16,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "furnace-temp-rise",
    "source_publisher": "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T",
    "source_title": "temperature rise and derived airflow",

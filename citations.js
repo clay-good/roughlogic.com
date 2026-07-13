@@ -8948,6 +8948,18 @@ export const CITATIONS = {
       { name: "Verdict band", value: "within 5% of the nameplate is firing on rate; above is overfired, below is underfired", source: "field practice" },
     ],
   },
+  "gas-meter-clock-target": {
+    formula: "seconds-per-rev = 3600 x dial size x heating value / target rate; on-rate window = sec/1.05 (fast) to sec/0.95 (slow); target cfh = target rate / heating value.",
+    edition: "First-principles meter-clocking arithmetic solved for the on-rate time, the inverse of the meter-clock tile (public); the heating value is an editable field.",
+    freeAccess: "The clocking arithmetic is public; the gas utility's actual heating value governs the result.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of gas-meter clocking: given the target/nameplate firing rate, this returns the seconds-per-revolution a known test dial should take when the appliance is firing on rate, so a tech knows the stopwatch reading to expect before clocking the meter. From cfh = (3600 / seconds-per-rev) x dial and rate = cfh x heating value, the on-rate time is 3600 x dial x heating value / target rate; a faster revolution is overfired, a slower one underfired, and the reported window is the +/-5% band. Clock with every other gas appliance off (pilots included). The equipment rating plate and the licensed tech govern.",
+    assumptions: [
+      { name: "On-rate time", value: "sec = 3600 x dial size x heating value / target rate (the inverse of the clock)", source: "field practice" },
+      { name: "Heating value", value: "default 1030 BTU/cf natural gas (about 2500 for LP), editable; the gas utility's actual value governs and varies by supply", source: "field practice" },
+      { name: "On-rate window", value: "+/-5% of the target: a faster revolution is overfired, a slower one underfired", source: "field practice" },
+    ],
+  },
   "furnace-temp-rise": {
     formula: "delta_T = supply_air - return_air; output = input x efficiency / 100; CFM = output / (1.08 x delta_T). Verdict checks delta_T against the rating-plate rise range.",
     edition: "First-principles sensible-heat relation Qs = 1.08 x CFM x delta-T (public); the 1.08 air factor and efficiency are editable.",

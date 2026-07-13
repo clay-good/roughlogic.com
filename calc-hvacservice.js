@@ -407,6 +407,42 @@ HVACSERVICE_RENDERERS["gas-meter-clock"] = _simpleRenderer({
   compute: computeGasMeterClock,
 });
 
+// ===================== spec-v652: gas-meter clock target (inverse of the meter clock) =====================
+// The on-rate stopwatch reading: given the target/nameplate firing rate, what
+// seconds-per-revolution a known dial SHOULD take. sec = 3600 x dial x HV / rate.
+// dims: in { target_input_btuh: M L^2 T^-3, dial_size_cf: L^3, heating_value_btu_cf: M L^-1 T^-2 } out: { sec_per_rev: T, cfh_target: L^3 T^-1, sec_per_rev_fast: T, sec_per_rev_slow: T }
+export function computeGasMeterClockTarget({ target_input_btuh = 0, dial_size_cf = 0, heating_value_btu_cf = 1030 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_input_btuh > 0)) return { error: "Target firing rate must be positive (BTU/hr)." };
+  if (!(dial_size_cf > 0)) return { error: "Test-dial size must be positive (cubic feet per revolution)." };
+  if (!(heating_value_btu_cf > 0)) return { error: "Heating value must be positive (BTU per cubic foot)." };
+  const cfh_target = target_input_btuh / heating_value_btu_cf;
+  const sec_per_rev = _SEC_PER_HR * dial_size_cf / cfh_target;
+  const sec_per_rev_fast = sec_per_rev / 1.05; // 5% overfired -> a faster revolution
+  const sec_per_rev_slow = sec_per_rev / 0.95; // 5% underfired -> a slower revolution
+  return {
+    sec_per_rev, cfh_target, sec_per_rev_fast, sec_per_rev_slow,
+    note: "The inverse of the meter-clocking tile: the seconds-per-revolution a known test dial SHOULD take if the appliance is firing at its target/nameplate rate, so you know the stopwatch reading to expect before you clock the meter. From cfh = (3600 / seconds-per-rev) x dial and rate = cfh x heating value, the on-rate time is sec = 3600 x dial x heating value / target rate. A faster revolution than this means overfired, a slower one underfired; the reported window is the +/-5% on-rate band. Clock with EVERY other gas appliance off (pilots included). The default 1030 BTU/cf is a typical natural-gas value; for LP set it to about 2500. The gas utility's actual heating value and the equipment rating plate govern; the licensed tech adjusts manifold pressure only within the stamped range.",
+  };
+}
+const gasMeterClockTargetExample = { inputs: { target_input_btuh: 100000, dial_size_cf: 1, heating_value_btu_cf: 1030 } };
+HVACSERVICE_RENDERERS["gas-meter-clock-target"] = _simpleRenderer({
+  citation: "Citation: first-principles meter-clocking arithmetic solved for the on-rate time - seconds-per-rev = 3600 x dial size x heating value / target firing rate (public), the inverse of the meter-clock tile. The default 1030 BTU/cf natural-gas (about 2500 for LP) heating value is editable; the gas utility's actual heating value and the equipment rating plate govern.",
+  example: gasMeterClockTargetExample.inputs,
+  fields: [
+    { key: "target_input_btuh", label: "Target / nameplate firing rate (BTU/hr)", kind: "number", default: 100000 },
+    { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number", default: 1 },
+    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", default: 1030 },
+  ],
+  outputs: [
+    { key: "s", id: "gmct-out-s", label: "On-rate seconds per revolution", value: (r) => fmt(r.sec_per_rev, 1) + " s" },
+    { key: "w", id: "gmct-out-w", label: "On-rate window (+/-5%)", value: (r) => fmt(r.sec_per_rev_fast, 1) + " to " + fmt(r.sec_per_rev_slow, 1) + " s (faster = overfired, slower = underfired)" },
+    { key: "c", id: "gmct-out-c", label: "Target gas flow", value: (r) => fmt(r.cfh_target, 1) + " cfh" },
+    { key: "n", id: "gmct-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGasMeterClockTarget,
+});
+
 // ===================== spec-v110: furnace temperature rise and derived airflow =====================
 
 const _SENSIBLE_HEAT_FACTOR = 1.08; // BTU/hr per CFM per F, sea level.

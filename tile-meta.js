@@ -661,7 +661,7 @@ const _TILES = [
   ["multi-motor-feeder", "A"], ["conductor-short-circuit-withstand", "A"], ["conduit-thermal-expansion", "A"],
   ["egc-upsize-proportional", "A"], ["delta-wye-line-phase", "A"],
   // spec-v110 HVAC gas-heat start-up (Group C)
-  ["gas-meter-clock", "C"],
+  ["gas-meter-clock", "C"], ["gas-meter-clock-target", "C"],
   ["furnace-temp-rise", "C"],
   // spec-v218..v220 residential air-tightness and ventilation batch
   ["blower-door-ach50", "C"], ["ashrae-622-ventilation", "C"], ["infiltration-load", "C"],

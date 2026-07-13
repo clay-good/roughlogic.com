@@ -972,6 +972,7 @@ export const COMPUTE_MAP = {
   "egc-upsize-proportional": { module: "../../calc-electrical.js", fn: "computeEgcUpsizeProportional" },
   "delta-wye-line-phase": { module: "../../calc-electrical.js", fn: "computeDeltaWyeLinePhase" },
   "gas-meter-clock": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClock" },
+  "gas-meter-clock-target": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClockTarget" },
   "furnace-temp-rise": { module: "../../calc-hvacservice.js", fn: "computeFurnaceTempRise" },
   // spec-v218..v220 residential air-tightness and ventilation batch (3 tiles)
   "blower-door-ach50": { module: "../../calc-hvacservice.js", fn: "computeBlowerDoorAch50" },

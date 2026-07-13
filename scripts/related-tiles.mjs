@@ -1009,7 +1009,8 @@ const RELATED = {
   "egc-upsize-proportional": ["egc-sizing", "voltage-drop", "parallel-conductor-derate"],
   "delta-wye-line-phase": ["three-phase", "power-triangle", "transformer-kva-sizing"],
   // spec-v110 HVAC gas-heat start-up (Group C)
-  "gas-meter-clock": ["furnace-temp-rise","combustion-air","gas-altitude-derate"],
+  "gas-meter-clock": ["gas-meter-clock-target","furnace-temp-rise","combustion-air","gas-altitude-derate"],
+  "gas-meter-clock-target": ["gas-meter-clock","furnace-temp-rise","combustion-air","gas-appliance-demand"],
   "furnace-temp-rise": ["gas-meter-clock","cfm-per-ton","duct-static-pressure-total"],
   // spec-v111 fuel-gas altitude derate / NG-LP conversion (Group B)
   "gas-altitude-derate": ["gas-fuel-conversion","gas-meter-clock","gas-appliance-demand"],
