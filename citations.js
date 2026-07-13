@@ -605,6 +605,17 @@ export const CITATIONS = {
       { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free-flow", source: "USBR Water Measurement Manual" },
     ],
   },
+  "weir-head-from-flow": {
+    formula: "90-degree V-notch: H = (Q/C)^(1/2.48), C=2.49. Suppressed rectangular: H = (Q/(C L))^(2/3), C=3.33. Contracted rectangular: L-0.2H solved by fixed-point from the suppressed seed. 1 cfs = 448.831 GPM.",
+    edition: "Per the USBR Water Measurement Manual (public domain) - the V-notch and Francis rectangular-weir equations solved for the head, the inverse of the weir-flow tile, by name.",
+    freeAccess: "Free at usbr.gov/tsc/techreferences/mands/wmm; the user confirms the calibrated weir coefficient.",
+    governance: GOVERNANCE.general,
+    editionNote: "The head over a sharp-crested weir needed to pass a target flow, the inverse of the weir-flow tile: a 90-degree V-notch inverts in closed form to H = (Q/C)^(1/2.48), a suppressed rectangular weir to H = (Q/(C L))^(2/3), and a contracted rectangular weir is solved by a few fixed-point passes because its effective crest length L - 0.2 H depends on the head. This sizes a weir box or sets a staff-gauge mark for a design flow. Requires a sharp-crested, ventilated, free-flow weir; a submerged/drowned condition is invalid, and a head below ~0.2 ft is a low-accuracy reading (flagged). An operations aid; the operator of record and the primacy agency govern compliance.",
+    assumptions: [
+      { name: "Weir condition", value: "fully-contracted, ventilated, sharp-crested, free-flow", source: "USBR Water Measurement Manual" },
+      { name: "Contracted solve", value: "the contracted weir's L - 0.2 H is solved by fixed-point iteration seeded from the suppressed form", source: "scope of this tile" },
+    ],
+  },
 
   "langelier-index": {
     formula: "LSI = pH - pHs; pHs = (9.3 + A + B) - (C + D), with A = (log10(TDS)-1)/10, B = -13.12*log10(T_K)+34.55, C = log10(Ca)-0.4, D = log10(alkalinity).",

@@ -96,7 +96,7 @@ const _TILES = [
   ["search-probability", "P"],
   ["brine-cure", "O"], ["bakers-percentage", "O"],
   ["power-distro", "N"],
-  ["weir-flow", "M"],
+  ["weir-flow", "M"], ["weir-head-from-flow", "M"],
   ["langelier-index", "M"],
   ["chemical-feed-pump", "M"],
   ["clarifier-surface-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"], ["conductivity-from-tds", "M"],

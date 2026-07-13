@@ -2674,6 +2674,7 @@ cross-check.
 | calc-treatment.js | `computeTdsFromConductivity` | `{ conductivity_us_cm = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeVaAlkalinityRatio` | `{ volatile_acids_mgl = 0, alkalinity_mgl = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeWeirHeadFromFlow` | `{ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0...` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormula` | `{ axle_weights_lb = [], axle_spacings_ft = [] }` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormulaMinSpacing` | `{ target_weight_lb = 0, num_axles = 0 } = {}` | _ | _ | _ |
@@ -2764,7 +2765,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1350.
+Row count: 1351.
 
 <!-- END function-corpus-v14 -->
 
@@ -3787,7 +3788,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (41 tiles)
+### Group M Water and wastewater (42 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3831,6 +3832,7 @@ per spec-v14 §13.1 second paragraph.
 | `va-alkalinity-ratio` | Digester Volatile-Acid to Alkalinity Ratio | WEF Manual of Practice / EPA operator...; VA 180 mg/L, alkalinity 2,400 mg/L -> ratio 0.075 (stable... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `was-srt-control` | WAS Rate to Hold Target SRT (Sludge Age) | MCRT/SRT control; WEF operator training; 2 MG, 3000 MLSS, SRT 10 d, WAS 8000, eff 5 MGD/15 mg/L ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `weir-head-from-flow` | Weir Head from a Target Flow | USBR Water Measurement Manual (invers...; spec-v658 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group N Stage (17 tiles)
@@ -4056,6 +4058,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1106. Fixture-covered or reference-cadence: 1106 / 1106.
+Tile count: 1107. Fixture-covered or reference-cadence: 1107 / 1107.
 
 <!-- END tile-index-v14 -->

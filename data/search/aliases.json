@@ -71962,6 +71962,36 @@
       "kind": "question"
     },
     {
+      "term": "weir head from flow",
+      "target": "weir-head-from-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "size a weir for flow",
+      "target": "weir-head-from-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "weir head required",
+      "target": "weir-head-from-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "head over weir for flow",
+      "target": "weir-head-from-flow",
+      "kind": "question"
+    },
+    {
+      "term": "staff gauge for design flow",
+      "target": "weir-head-from-flow",
+      "kind": "question"
+    },
+    {
+      "term": "notch head from cfs",
+      "target": "weir-head-from-flow",
+      "kind": "question"
+    },
+    {
       "term": "langelier saturation index water balance",
       "target": "langelier-index",
       "kind": "question"

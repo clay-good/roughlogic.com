@@ -81,6 +81,71 @@ function renderWeirFlow(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["weir-flow"] = renderWeirFlow;
 
+// --- spec-v658 M: weir head from a target flow (inverse of weir-flow) ---
+// V-notch H = (Q/C)^(1/2.48); rect suppressed H = (Q/(C L))^(2/3); rect
+// contracted solves L-0.2H by a few fixed-point passes seeded from suppressed.
+// dims: in { weir_type: dimensionless, target_flow_cfs: L^3*T^-1, crest_length_ft: L, coeff: dimensionless } out: { head_ft: L, flow_gpm: L^3*T^-1, flow_mgd: L^3*T^-1 }
+export function computeWeirHeadFromFlow({ weir_type = "vnotch90", target_flow_cfs = 0, crest_length_ft = 0, coeff = 0 } = {}) {
+  const Q = Number(target_flow_cfs) || 0;
+  const L = Number(crest_length_ft) || 0;
+  if (!(Q > 0 && Number.isFinite(Q))) return { error: "Target flow must be positive (cfs)." };
+  let head_ft;
+  if (weir_type === "vnotch90") {
+    const C = coeff > 0 ? coeff : 2.49;
+    head_ft = Math.pow(Q / C, 1 / 2.48);
+  } else {
+    if (!(L > 0 && Number.isFinite(L))) return { error: "Crest length must be positive (ft) for a rectangular weir." };
+    const C = coeff > 0 ? coeff : 3.33;
+    if (weir_type === "rect_suppressed") {
+      head_ft = Math.pow(Q / (C * L), 2 / 3);
+    } else {
+      let H = Math.pow(Q / (C * L), 2 / 3); // suppressed seed
+      for (let i = 0; i < 40; i++) {
+        const effL = L - 0.2 * H;
+        if (effL <= 0) return { error: "Target flow is too large for this crest length (the end contractions close the notch)." };
+        const Hn = Math.pow(Q / (C * effL), 2 / 3);
+        if (Math.abs(Hn - H) < 1e-12) { H = Hn; break; }
+        H = Hn;
+      }
+      head_ft = H;
+    }
+  }
+  const gpm = Q * 448.831;
+  return {
+    head_ft: Number.isFinite(head_ft) ? head_ft : null,
+    flow_gpm: gpm, flow_mgd: gpm * 1440 / 1e6, low_accuracy: head_ft < 0.2,
+    note: (head_ft < 0.2 ? "Head below ~0.2 ft - low-accuracy reading, flagged. " : "")
+      + "The head over a sharp-crested weir needed to pass a target flow, the inverse of the weir-flow tile: 90-degree V-notch H = (Q/C)^(1/2.48) (default C 2.49); suppressed rectangular H = (Q/(C L))^(2/3) (default C 3.33); the contracted rectangular weir's effective crest L - 0.2 H depends on H, so it is solved by a few fixed-point passes seeded from the suppressed form. Useful to size a weir box or set a staff-gauge mark for a design flow. Requires a fully-contracted, ventilated, sharp-crested weir with free (non-submerged) flow; the approach-velocity correction is ignored. An operations aid; the operator of record and the primacy agency govern compliance.",
+  };
+}
+export const weirHeadFromFlowExample = { inputs: { weir_type: "vnotch90", target_flow_cfs: 0.446, crest_length_ft: 0, coeff: 0 } };
+function renderWeirHeadFromFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the USBR Water Measurement Manual (public domain) - the V-notch and Francis rectangular-weir equations solved for the head over the crest, the inverse of the weir-flow tile; the contracted weir is solved by fixed-point iteration. Requires a sharp-crested, ventilated, free-flow weir. Free at usbr.gov/tsc/techreferences/mands/wmm.";
+  const type = makeSelect("Weir type", "whf-type", [
+    { value: "vnotch90", label: "90-degree V-notch", selected: true },
+    { value: "rect_contracted", label: "Rectangular (contracted)" },
+    { value: "rect_suppressed", label: "Rectangular (suppressed)" },
+  ]);
+  const Q = makeNumber("Target flow Q (cfs)", "whf-q", { step: "any", min: "0", value: "0.446" }); Q.input.value = "0.446";
+  const L = makeNumber("Crest length L (ft, rectangular)", "whf-l", { step: "any", min: "0" });
+  const coeff = makeNumber("Weir coefficient (0 = default)", "whf-c", { step: "any", min: "0" });
+  for (const f of [type, Q, L, coeff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { type.select.value = "vnotch90"; Q.input.value = "0.446"; L.input.value = ""; coeff.input.value = ""; update(); });
+  const oHead = makeOutputLine(outputRegion, "Required head over crest", "whf-out-head");
+  const oFlow = makeOutputLine(outputRegion, "Flow (GPM / MGD)", "whf-out-flow");
+  const oNote = makeOutputLine(outputRegion, "Note", "whf-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeWeirHeadFromFlow({ weir_type: type.select.value, target_flow_cfs: readNum(Q.input), crest_length_ft: readNum(L.input), coeff: readNum(coeff.input) });
+    if (r.error) { oHead.textContent = r.error; oFlow.textContent = ""; oNote.textContent = ""; return; }
+    oHead.textContent = fmt(r.head_ft, 3) + " ft";
+    oFlow.textContent = fmt(r.flow_gpm, 1) + " GPM (" + fmt(r.flow_mgd, 3) + " MGD)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [type.select, Q.input, L.input, coeff.input]) f.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["weir-head-from-flow"] = renderWeirHeadFromFlow;
+
 // --- v20 M.2: Langelier saturation index (`langelier-index`) ---
 // LSI = pH - pHs; pHs = (9.3 + A + B) - (C + D).
 // dims: in { ph: dimensionless, temp: T, temp_unit: dimensionless, ca_mgl: dimensionless, alk_mgl: dimensionless, tds_mgl: dimensionless } out: { lsi: dimensionless, phs: dimensionless }

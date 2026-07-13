@@ -9037,6 +9037,31 @@ test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + re
 
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
 import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
+
+import { computeWeirHeadFromFlow as _v658 } from "../../calc-treatment.js";
+
+test("bounds: spec-v658 computeWeirHeadFromFlow inverts the weir equations (closed form + fixed-point), round-trips weir-flow, flags low head, and rejects bad inputs", () => {
+  // V-notch closed form: H = (Q/2.49)^(1/2.48).
+  const v = _v658({ weir_type: "vnotch90", target_flow_cfs: 0.446 });
+  assert.ok(Math.abs(v.head_ft - Math.pow(0.446 / 2.49, 1 / 2.48)) < 1e-12);
+  assert.ok(Math.abs(v.head_ft - 0.5) < 0.003);
+  // Exact inverse of weir-flow (V-notch): feeding the head back reproduces the flow.
+  assert.ok(Math.abs(_m1({ weir_type: "vnotch90", head_ft: v.head_ft }).flow_cfs - 0.446) < 1e-9);
+  // Suppressed rectangular closed form: H = (Q/(3.33 L))^(2/3).
+  const s = _v658({ weir_type: "rect_suppressed", target_flow_cfs: 5, crest_length_ft: 3 });
+  assert.ok(Math.abs(s.head_ft - Math.pow(5 / (3.33 * 3), 2 / 3)) < 1e-12);
+  assert.ok(Math.abs(_m1({ weir_type: "rect_suppressed", head_ft: s.head_ft, crest_length_ft: 3 }).flow_cfs - 5) < 1e-9);
+  // Contracted rectangular fixed-point: round-trips the weir tile's 1 ft / 3 ft-crest flow.
+  const q = _m1({ weir_type: "rect_contracted", head_ft: 1.0, crest_length_ft: 3 }).flow_cfs;
+  assert.ok(Math.abs(_v658({ weir_type: "rect_contracted", target_flow_cfs: q, crest_length_ft: 3 }).head_ft - 1.0) < 1e-6);
+  // Low-head flag below ~0.2 ft (0.03 cfs solves to ~0.17 ft).
+  assert.ok(_v658({ weir_type: "vnotch90", target_flow_cfs: 0.03 }).low_accuracy === true);
+  // Error seams: non-positive flow, missing crest length for a rectangular weir, non-finite.
+  assert.ok("error" in _v658({ weir_type: "vnotch90", target_flow_cfs: 0 }));
+  assert.ok("error" in _v658({ weir_type: "rect_suppressed", target_flow_cfs: 5, crest_length_ft: 0 }));
+  assert.ok("error" in _v658({ weir_type: "vnotch90", target_flow_cfs: Infinity }));
+});
+
 test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + reject non-finite", () => {
   assert.strictEqual(_l1({ days_series: [{ tmax: 92, tmin: 64 }], base_f: 50, cutoff_f: 86, method: "modified" }).accumulated_gdd, 25);
   assert.ok("error" in _l1({ days_series: [], base_f: 50 }));

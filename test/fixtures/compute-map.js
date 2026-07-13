@@ -52,6 +52,7 @@ export const COMPUTE_MAP = {
   "bakers-percentage": { module: "../../calc-kitchen.js", fn: "computeBakersPercentage" },
   "power-distro": { module: "../../calc-stage.js", fn: "computePowerDistro" },
   "weir-flow": { module: "../../calc-treatment.js", fn: "computeWeirFlow" },
+  "weir-head-from-flow": { module: "../../calc-treatment.js", fn: "computeWeirHeadFromFlow" },
   "langelier-index": { module: "../../calc-treatment.js", fn: "computeLangelierIndex" },
   "chemical-feed-pump": { module: "../../calc-treatment.js", fn: "computeChemicalFeedPump" },
   "clarifier-surface-loading": { module: "../../calc-treatment.js", fn: "computeClarifierSurfaceLoading" },

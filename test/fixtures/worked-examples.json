@@ -17057,6 +17057,52 @@
    }
   },
   {
+   "tile_id": "weir-head-from-flow",
+   "source_publisher": "USBR Water Measurement Manual (inverse of weir-flow)",
+   "source_title": "90-degree V-notch passing 0.446 cfs -> 0.50 ft of head (round-trips the weir-flow example)",
+   "source_edition_or_year": "USBR (public domain); spec-v658 (machine-verified)",
+   "source_section_or_page": "spec-v658 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "weir_type": "vnotch90",
+    "target_flow_cfs": 0.446,
+    "crest_length_ft": 0,
+    "coeff": 0
+   },
+   "outputs": {
+    "head_ft": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.003
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "weir-head-from-flow",
+   "source_publisher": "USBR Water Measurement Manual (inverse of weir-flow)",
+   "source_title": "cross-check: a contracted rectangular weir, 3 ft crest, passing 9.324 cfs -> 1.00 ft head (fixed-point solve round-trips the weir tile)",
+   "source_edition_or_year": "USBR (public domain); spec-v658 (machine-verified)",
+   "source_section_or_page": "spec-v658 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "weir_type": "rect_contracted",
+    "target_flow_cfs": 9.324,
+    "crest_length_ft": 3,
+    "coeff": 0
+   },
+   "outputs": {
+    "head_ft": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "langelier-index",
    "source_publisher": "Langelier (1936) / Standard Methods (APHA/AWWA/WEF)",
    "source_title": "LSI = pH - pHs",

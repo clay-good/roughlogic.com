@@ -981,7 +981,7 @@ const TOOL_MODULES = (() => {
   // calc-treatment.js. They keep group: "M" (group letter independent of module,
   // the v42/v70..v74 precedent).
   declare("./calc-treatment.js", "TREATMENT_RENDERERS", [
-    "weir-flow", "langelier-index", "chemical-feed-pump",
+    "weir-flow", "weir-head-from-flow", "langelier-index", "chemical-feed-pump",
     "clarifier-surface-loading", "bod-tss-loading-removal", "tds-from-conductivity", "conductivity-from-tds",
     // spec-v573
     "digester-vs-loading",
