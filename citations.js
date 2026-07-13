@@ -8497,6 +8497,18 @@ export const CITATIONS = {
       { name: "Power", value: "output HP = torque x rpm / 63025", source: "fluid-power engineering" },
     ],
   },
+  "hydraulic-pump-flow": {
+    formula: "q_theo = disp x rpm / 231; q_actual = q_theo x vol_eff; q_slip = q_theo - q_actual.",
+    edition: "The fluid-power pump displacement-flow relation (theoretical flow = disp x rpm / 231), by name.",
+    freeAccess: "The displacement-based flow relation and the 231 in^3/gal constant are standard published fluid-power results.",
+    governance: GOVERNANCE.general,
+    editionNote: "Hydraulic pump delivered flow: the theoretical (displaced) flow = displacement x rpm / 231 (231 in^3 per gallon), and the delivered flow = theoretical x volumetric efficiency (typically 0.90-0.95 for gear/vane pumps, higher for piston pumps); the difference is internal slip that grows with pressure and wear. This is the algebraic inverse of the hydraulic-motor speed relation (231 x gpm / displacement x vol_eff), and the delivered gpm is exactly the flow the hydraulic-pump-horsepower tile takes as its input. It does not select the pump, account for the circuit's pressure-drop budget, or size the reservoir/cooling. A sizing aid; the pump manufacturer's data govern.",
+    assumptions: [
+      { name: "Theoretical flow", value: "disp x rpm / 231 (231 in^3 per gallon)", source: "fluid-power engineering" },
+      { name: "Delivered flow", value: "theoretical x volumetric efficiency; the slip grows with pressure and wear", source: "fluid-power engineering" },
+      { name: "Sizing only", value: "the delivered gpm feeds the pump-horsepower tile; the manufacturer data govern", source: "scope of this tile" },
+    ],
+  },
   "cooling-system-flow": {
     formula: "gpm = Q / (c x deltaT); c = 500 water, 427 (50/50 glycol).",
     edition: "The sensible-heat coolant-flow relation gpm = Q / (c x deltaT), by name.",

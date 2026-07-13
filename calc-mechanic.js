@@ -1100,6 +1100,40 @@ MECHANIC_RENDERERS["hydraulic-motor-torque-speed"] = _simpleRenderer({
   compute: computeHydraulicMotorTorqueSpeed,
 });
 
+// dims: in { disp_in3: L^3, rpm: T^-1, vol_eff: dimensionless } out: { q_theo_gpm: L^3 T^-1, q_actual_gpm: L^3 T^-1, q_slip_gpm: L^3 T^-1 }
+export function computeHydraulicPumpFlow({ disp_in3 = 0, rpm = 0, vol_eff = 0.95 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const disp = Number(disp_in3) || 0;
+  const n = Number(rpm) || 0;
+  const ve = Number(vol_eff) || 0;
+  if (!(disp > 0)) return { error: "Pump displacement must be positive (in^3/rev)." };
+  if (!(n > 0)) return { error: "Drive speed must be positive (rpm)." };
+  if (!(ve > 0 && ve <= 1)) return { error: "Volumetric efficiency must be between 0 and 1." };
+  const q_theo_gpm = disp * n / 231;
+  const q_actual_gpm = q_theo_gpm * ve;
+  const q_slip_gpm = q_theo_gpm - q_actual_gpm;
+  return {
+    q_theo_gpm, q_actual_gpm, q_slip_gpm,
+    note: "Hydraulic pump delivered flow: theoretical flow = displacement x rpm / 231 (231 in^3 per gallon), and the delivered flow = theoretical x volumetric efficiency (~0.90-0.95 gear/vane, higher for a piston pump); the difference is internal slip that grows with pressure and wear. This is the inverse of the hydraulic-motor speed relation (231 x gpm / displacement x vol_eff), and the delivered gpm is exactly the flow the hydraulic-pump-horsepower tile takes as its input. A sizing aid; the pump manufacturer's data govern.",
+  };
+}
+export const hydraulicPumpFlowExample = { inputs: { disp_in3: 2.0, rpm: 1800, vol_eff: 0.95 } };
+MECHANIC_RENDERERS["hydraulic-pump-flow"] = _simpleRenderer({
+  citation: "Citation: Hydraulic pump delivered flow (fluid-power engineering): theoretical flow = displacement x rpm / 231 (231 in^3 per gallon), delivered flow = theoretical x volumetric efficiency, the inverse of the hydraulic-motor speed relation. A sizing aid; the pump manufacturer's data govern.",
+  example: hydraulicPumpFlowExample.inputs,
+  fields: [
+    { key: "disp_in3", label: "Pump displacement (in^3/rev)", kind: "number", default: 2.0 },
+    { key: "rpm", label: "Drive speed (rpm)", kind: "number", default: 1800 },
+    { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number", default: 0.95 },
+  ],
+  outputs: [
+    { key: "qa", id: "hpf-out-qa", label: "Delivered flow", value: (r) => fmt(r.q_actual_gpm, 2) + " gpm" },
+    { key: "qt", id: "hpf-out-qt", label: "Theoretical flow", value: (r) => fmt(r.q_theo_gpm, 2) + " gpm (slip " + fmt(r.q_slip_gpm, 2) + " gpm)" },
+    { key: "n", id: "hpf-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicPumpFlow,
+});
+
 // dims: in { q_btuh: M L^2 T^-3, dt_f: T, coolant: dimensionless } out: { gpm: L^3 T^-1 }
 export function computeCoolingSystemFlow({ q_btuh = 0, dt_f = 0, coolant = "water" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

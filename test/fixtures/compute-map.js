@@ -937,6 +937,7 @@ export const COMPUTE_MAP = {
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "hydraulic-pump-horsepower": { module: "../../calc-mechanic.js", fn: "computeHydraulicPumpHorsepower" },
   "hydraulic-motor-torque-speed": { module: "../../calc-mechanic.js", fn: "computeHydraulicMotorTorqueSpeed" },
+  "hydraulic-pump-flow": { module: "../../calc-mechanic.js", fn: "computeHydraulicPumpFlow" },
   "cooling-system-flow": { module: "../../calc-mechanic.js", fn: "computeCoolingSystemFlow" },
   "prop-pitch-selection": { module: "../../calc-mechanic.js", fn: "computePropPitchSelection" },
   "engine-fuel-burn-gph": { module: "../../calc-mechanic.js", fn: "computeEngineFuelBurnGph" },

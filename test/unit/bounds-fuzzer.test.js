@@ -16250,6 +16250,28 @@ test("bounds: spec-v398 computeCoolingSystemFlow pins gpm = Q/(c dT), the coolan
   assert.ok("error" in _v398({ q_btuh: Infinity, dt_f: 10, coolant: "water" }));
 });
 
+import { computeHydraulicPumpFlow as _v642 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v642 computeHydraulicPumpFlow pins the displacement flow, the slip, the exact inverse of the motor speed relation, and error seams", () => {
+  const r = _v642({ disp_in3: 2.0, rpm: 1800, vol_eff: 0.95 });
+  assert.ok(Math.abs(r.q_theo_gpm - 15.584415584415584) < 1e-9);
+  assert.ok(Math.abs(r.q_actual_gpm - 14.805194805194805) < 1e-9);
+  assert.ok(Math.abs(r.q_slip_gpm - (r.q_theo_gpm - r.q_actual_gpm)) < 1e-12);
+  assert.ok(Math.abs(r.q_actual_gpm - r.q_theo_gpm * 0.95) < 1e-12);
+  // Exact inverse of the hydraulic-motor speed relation: the theoretical flow, fed
+  // through the motor's rpm = 231 gpm / disp (vol_eff 1), recovers the drive speed.
+  const back = _v397({ psi: 2000, disp_in3: 2.0, gpm: r.q_theo_gpm, mech_eff: 0.9, vol_eff: 1.0 });
+  assert.ok(Math.abs(back.rpm - 1800) < 1e-9);
+  // Delivered flow scales linearly with rpm and with displacement.
+  assert.ok(Math.abs(_v642({ disp_in3: 2.0, rpm: 3600, vol_eff: 0.95 }).q_actual_gpm - 2 * r.q_actual_gpm) < 1e-9);
+  // Error seams: non-positive displacement / rpm, out-of-range volumetric efficiency, non-finite.
+  assert.ok("error" in _v642({ disp_in3: 0, rpm: 1800, vol_eff: 0.95 }));
+  assert.ok("error" in _v642({ disp_in3: 2.0, rpm: 0, vol_eff: 0.95 }));
+  assert.ok("error" in _v642({ disp_in3: 2.0, rpm: 1800, vol_eff: 0 }));
+  assert.ok("error" in _v642({ disp_in3: 2.0, rpm: 1800, vol_eff: 1.5 }));
+  assert.ok("error" in _v642({ disp_in3: Infinity, rpm: 1800, vol_eff: 0.95 }));
+});
+
 // ===================== spec-v399..v401 fabrication shop-math trio (2 modules) =====================
 import { computeToleranceStackRss as _v399, computeConeFlatPattern as _v400 } from "../../calc-shop.js";
 import { computeSpurGearGeometry as _v401 } from "../../calc-machining.js";

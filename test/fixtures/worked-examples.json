@@ -23023,6 +23023,62 @@
    }
   },
   {
+   "tile_id": "hydraulic-pump-flow",
+   "source_publisher": "fluid-power engineering",
+   "source_title": "2.0 in^3/rev pump at 1800 rpm, 0.95 vol eff -> 15.58 theoretical, 14.81 delivered gpm (0.78 slip)",
+   "source_edition_or_year": "spec-v642 worked example (machine-verified)",
+   "source_section_or_page": "spec-v642 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "disp_in3": 2.0,
+    "rpm": 1800,
+    "vol_eff": 0.95
+   },
+   "outputs": {
+    "q_theo_gpm": {
+     "value": 15.584,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "q_actual_gpm": {
+     "value": 14.805,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "q_slip_gpm": {
+     "value": 0.779,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-pump-flow",
+   "source_publisher": "fluid-power engineering",
+   "source_title": "cross-check: the theoretical flow feeds the motor speed relation and recovers 1800 rpm exactly (ideal), confirming the inverse",
+   "source_edition_or_year": "spec-v642 worked example (machine-verified)",
+   "source_section_or_page": "spec-v642 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "disp_in3": 4.0,
+    "rpm": 1800,
+    "vol_eff": 1.0
+   },
+   "outputs": {
+    "q_actual_gpm": {
+     "value": 31.169,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cooling-system-flow",
    "source_publisher": "heat-transfer first principles",
    "source_title": "150,000 Btu/hr, 10 F rise, water -> 30 GPM",
