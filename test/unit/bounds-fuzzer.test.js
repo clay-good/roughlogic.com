@@ -10071,6 +10071,29 @@ test("bounds: spec-v40 taper-calc pins TPF/angle + rejects bad inputs", () => {
   assert.ok("error" in _cv40d({ large_dia_in: Infinity, small_dia_in: 0.75, length_in: 3 }));
 });
 
+import { computeTaperDiameter as _v650 } from "../../calc-shop.js";
+
+test("bounds: spec-v650 computeTaperDiameter inverts the taper, round-trips it, solves either end, and pins error seams", () => {
+  const r = _v650({ known_dia_in: 1.0, known_end: "large", taper_per_foot: 0.6, length_in: 3 });
+  assert.ok(Math.abs(r.small_dia_in - 0.85) < 1e-12); // 1.0 - (0.6/12)*3
+  assert.ok(Math.abs(r.missing_dia_in - 0.85) < 1e-12);
+  assert.ok(Math.abs(r.change_in - 0.15) < 1e-12);
+  assert.ok(Math.abs(r.angle_per_side_deg - Math.atan(0.6 / 24) * 180 / Math.PI) < 1e-12);
+  // Exact inverse of taper-calc: the TPF of the solved diameters is the input TPF.
+  assert.ok(Math.abs(_cv40d({ large_dia_in: r.large_dia_in, small_dia_in: r.small_dia_in, length_in: 3 }).tpf_in - 0.6) < 1e-12);
+  // Solving from the small end recovers the large end (the other direction).
+  assert.ok(Math.abs(_v650({ known_dia_in: 0.85, known_end: "small", taper_per_foot: 0.6, length_in: 3 }).large_dia_in - 1.0) < 1e-12);
+  // The compound angle depends only on TPF, not the length.
+  assert.ok(Math.abs(_v650({ known_dia_in: 2.0, known_end: "large", taper_per_foot: 0.6, length_in: 8 }).angle_per_side_deg - r.angle_per_side_deg) < 1e-12);
+  // A taper that eats the whole diameter errors.
+  assert.ok("error" in _v650({ known_dia_in: 0.1, known_end: "large", taper_per_foot: 0.6, length_in: 3 }));
+  // Error seams: non-positive known dia / TPF / length, non-finite.
+  assert.ok("error" in _v650({ known_dia_in: 0, known_end: "large", taper_per_foot: 0.6, length_in: 3 }));
+  assert.ok("error" in _v650({ known_dia_in: 1.0, known_end: "large", taper_per_foot: 0, length_in: 3 }));
+  assert.ok("error" in _v650({ known_dia_in: 1.0, known_end: "large", taper_per_foot: 0.6, length_in: 0 }));
+  assert.ok("error" in _v650({ known_dia_in: Infinity, known_end: "large", taper_per_foot: 0.6, length_in: 3 }));
+});
+
 test("bounds: spec-v40 dividing-head pins turns/holes + rejects bad inputs", () => {
   const a = _cv40e({ divisions: 9, worm_ratio: 40, circles: "27,54" });
   assert.ok(a.full_turns === 4 && Math.abs(a.fraction - 4 / 9) < 1e-9);

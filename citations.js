@@ -7637,6 +7637,17 @@ export const CITATIONS = {
       { name: "Diameters and length", value: "D is the large diameter, d the small, L the axial length over which the taper runs, all user-supplied", source: "taper geometry" },
     ],
   },
+  "taper-diameter": {
+    formula: "change = (TPF/12) x L; small end = known - change (large end = known + change); angle per side = atan(TPF/24); included = 2 x (angle per side).",
+    edition: "Taper setup inverse - the missing end diameter and the compound angle from the taper per foot - first-principles trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure trigonometry, public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The lathe-setup inverse of the taper tile: from the taper per foot TPF, one known end diameter, and the length L, the diameter changes by (TPF/12) x L over that length, so the small end = known - change (or the large end = known + change). The compound-slide angle per side = atan(TPF/24) depends only on the TPF, not the length or diameter, so the same compound setting cuts the taper at any length. First-principles trigonometry; the tool nose radius and setup govern the finished part.",
+    assumptions: [
+      { name: "Missing diameter", value: "missing end = known -/+ (TPF/12) x L (subtract for the small end, add for the large)", source: "taper geometry" },
+      { name: "Compound angle", value: "angle per side = atan(TPF/24), a function of TPF alone", source: "taper geometry" },
+    ],
+  },
   "dividing-head": {
     formula: "Turns per division = ratio / N (40/N on a standard 40:1 head). For a hole circle of H holes the move is the fractional part x H holes, reported when that product is a whole number.",
     edition: "Simple (plain) indexing on a 40:1 dividing head - first-principles ratio arithmetic as in Machinery's Handbook (Industrial Press), by name; public domain.",

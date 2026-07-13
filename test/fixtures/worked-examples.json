@@ -15474,6 +15474,58 @@
    }
   },
   {
+   "tile_id": "taper-diameter",
+   "source_publisher": "First-principles taper trigonometry (inverse of taper-calc)",
+   "source_title": "1.000 in large end, 0.600 in/ft taper over 3 in -> 0.850 in small end (drops 0.050 in/in); compound 1.432 deg/side",
+   "source_edition_or_year": "spec-v650 worked example (machine-verified)",
+   "source_section_or_page": "spec-v650 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "known_dia_in": 1.0,
+    "known_end": "large",
+    "taper_per_foot": 0.6,
+    "length_in": 3
+   },
+   "outputs": {
+    "missing_dia_in": {
+     "value": 0.85,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "angle_per_side_deg": {
+     "value": 1.432096,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "taper-diameter",
+   "source_publisher": "First-principles taper trigonometry (inverse of taper-calc)",
+   "source_title": "cross-check: known the 0.850 in small end instead -> 1.000 in large end (solving the other direction)",
+   "source_edition_or_year": "spec-v650 worked example (machine-verified)",
+   "source_section_or_page": "spec-v650 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "known_dia_in": 0.85,
+    "known_end": "small",
+    "taper_per_foot": 0.6,
+    "length_in": 3
+   },
+   "outputs": {
+    "missing_dia_in": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
    "tile_id": "dividing-head",
    "source_publisher": "First-principles indexing arithmetic + Machinery's Handbook",
    "source_title": "turns = ratio / N; holes = fraction x circle",

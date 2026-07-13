@@ -63677,6 +63677,36 @@
       "kind": "question"
     },
     {
+      "term": "taper diameter",
+      "target": "taper-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "taper setup diameter",
+      "target": "taper-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "lathe taper setup",
+      "target": "taper-diameter",
+      "kind": "redirect"
+    },
+    {
+      "term": "small end diameter from taper",
+      "target": "taper-diameter",
+      "kind": "question"
+    },
+    {
+      "term": "diameter from taper per foot",
+      "target": "taper-diameter",
+      "kind": "question"
+    },
+    {
+      "term": "solve taper end diameter",
+      "target": "taper-diameter",
+      "kind": "question"
+    },
+    {
       "term": "crank turns per division",
       "target": "dividing-head",
       "kind": "question"

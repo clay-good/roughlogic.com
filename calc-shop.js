@@ -267,6 +267,61 @@ function _v40renderTaperCalc(inputRegion, outputRegion, citationEl) {
 SHOP_RENDERERS["taper-calc"] = _v40renderTaperCalc;
 
 // =====================================================================
+// spec-v650 taper-diameter - the missing end diameter from a taper spec.
+// The inverse of taper-calc: given the taper per foot, one known diameter,
+// and the length, solve the other diameter (the lathe-setup direction).
+// =====================================================================
+
+// dims: in { known_dia_in: L, known_end: dimensionless, taper_per_foot: dimensionless, length_in: L } out: { large_dia_in: L, small_dia_in: L, change_in: L, angle_per_side_deg: dimensionless, included_angle_deg: dimensionless }
+export function computeTaperDiameter({ known_dia_in = 0, known_end = "large", taper_per_foot = 0, length_in = 0 } = {}) {
+  const _g = _finiteGuard({ known_dia_in, taper_per_foot, length_in }); if (_g) return _g;
+  const known = Number(known_dia_in) || 0;
+  const tpf = Number(taper_per_foot) || 0;
+  const L = Number(length_in) || 0;
+  const end = String(known_end);
+  if (!(known > 0)) return { error: "Known diameter must be positive (in)." };
+  if (!(tpf > 0)) return { error: "Taper per foot must be positive (in/ft)." };
+  if (!(L > 0)) return { error: "Length over taper must be positive (in)." };
+  const change_in = (tpf / 12) * L;
+  let large_dia_in, small_dia_in;
+  if (end === "small") { small_dia_in = known; large_dia_in = known + change_in; }
+  else { large_dia_in = known; small_dia_in = known - change_in; }
+  if (!(small_dia_in > 0)) return { error: "The taper removes more than the whole diameter over this length (small end <= 0) - check the taper spec or length." };
+  const angle_per_side_deg = Math.atan(tpf / 24) * 180 / Math.PI;
+  const included_angle_deg = 2 * angle_per_side_deg;
+  const missing_dia_in = end === "small" ? large_dia_in : small_dia_in;
+  return {
+    large_dia_in, small_dia_in, missing_dia_in, change_in, angle_per_side_deg, included_angle_deg,
+    note: "The lathe-setup inverse of the taper tile: given the taper per foot (TPF), one known end diameter, and the length over the taper, the missing end diameter is known -/+ (TPF/12) x L (subtract for the small end, add for the large end). The compound-slide angle per side = atan(TPF/24) depends only on the TPF, not the length or diameter - the same setting cuts the taper at any length. TPF = 12 x (D - d)/L, so a 0.600 in/ft taper drops 0.050 in of diameter per inch of length. First-principles trigonometry; the tool nose radius and setup govern the finished part. A shop aid.",
+  };
+}
+export const taperDiameterExample = { inputs: { known_dia_in: 1.0, known_end: "large", taper_per_foot: 0.6, length_in: 3 } };
+function _v650renderTaperDiameter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Taper setup inverse - the missing end diameter = known -/+ (TPF/12) x L, and the compound angle per side = atan(TPF/24) - first-principles trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.";
+  const kd = makeNumber("Known diameter (in)", "tdia-kd", { step: "any", min: "0" });
+  const end = makeSelect("Which end is known", "tdia-end", [{ value: "large", label: "Large end" }, { value: "small", label: "Small end" }]);
+  const tpf = makeNumber("Taper per foot (in/ft)", "tdia-tpf", { step: "any", min: "0" });
+  const len = makeNumber("Length over taper L (in)", "tdia-len", { step: "any", min: "0" });
+  for (const f of [kd, end, tpf, len]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kd.input.value = "1"; end.select.value = "large"; tpf.input.value = "0.6"; len.input.value = "3"; update(); });
+  const oMiss = makeOutputLine(outputRegion, "Missing end diameter", "tdia-out-miss");
+  const oEnds = makeOutputLine(outputRegion, "Large / small diameter", "tdia-out-ends");
+  const oAngle = makeOutputLine(outputRegion, "Angle per side (compound set)", "tdia-out-angle");
+  const oNote = makeOutputLine(outputRegion, "Note", "tdia-out-note");
+  const update = debounce(() => {
+    const r = computeTaperDiameter({ known_dia_in: _readNum(kd.input), known_end: end.select.value, taper_per_foot: _readNum(tpf.input), length_in: _readNum(len.input) });
+    if (r.error) { oMiss.textContent = r.error; oEnds.textContent = "-"; oAngle.textContent = "-"; oNote.textContent = ""; return; }
+    oMiss.textContent = fmt(r.missing_dia_in, 4) + " in";
+    oEnds.textContent = fmt(r.large_dia_in, 4) + " / " + fmt(r.small_dia_in, 4) + " in (drop " + fmt(r.change_in, 4) + " in)";
+    oAngle.textContent = fmt(r.angle_per_side_deg, 5) + " deg (included " + fmt(r.included_angle_deg, 5) + " deg)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  end.select.addEventListener("input", update);
+  for (const f of [kd.input, tpf.input, len.input]) f.addEventListener("input", update);
+}
+SHOP_RENDERERS["taper-diameter"] = _v650renderTaperDiameter;
+
+// =====================================================================
 // spec-v40 2.5 - dividing-head (Simple Indexing) - Group K
 // Turns per division = ratio / N (40/N for the standard head). The
 // fractional part times a hole-circle count gives the hole move when

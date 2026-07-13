@@ -787,7 +787,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-shop.js", "SHOP_RENDERERS", [
     // Group K (machinist)
     "machining-time", "material-removal-rate", "turning-surface-finish",
-    "taper-calc", "dividing-head",
+    "taper-calc", "taper-diameter", "dividing-head",
     // Group G (cross-trade)
     "thread-measure-wire", "punch-force",
     // Group E (welding / sheet-metal)
