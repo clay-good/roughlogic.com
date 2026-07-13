@@ -44282,6 +44282,58 @@
    }
   },
   {
+   "tile_id": "required-face-rent",
+   "source_publisher": "required face rent (inverse of the net-effective-rent spread)",
+   "source_title": "net $30/SF over 120 months with 20 free months, no credit -> $36.00/SF face (16.7% above effective)",
+   "source_edition_or_year": "spec-v646 worked example (machine-verified)",
+   "source_section_or_page": "spec-v646 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_ner": 30,
+    "term_periods": 120,
+    "free_periods": 20,
+    "one_time_credit": 0
+   },
+   "outputs": {
+    "face_rent": {
+     "value": 36.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "discount_pct": {
+     "value": 16.667,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "required-face-rent",
+   "source_publisher": "required face rent (inverse of the net-effective-rent spread)",
+   "source_title": "cross-check: a $240 one-time TI credit pushes the required face to $38.40/SF",
+   "source_edition_or_year": "spec-v646 worked example (machine-verified)",
+   "source_section_or_page": "spec-v646 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_ner": 30,
+    "term_periods": 120,
+    "free_periods": 20,
+    "one_time_credit": 240
+   },
+   "outputs": {
+    "face_rent": {
+     "value": 38.4,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "commercial-load-factor",
    "source_publisher": "BOMA rentable/usable load factor (ANSI/BOMA Z65.1)",
    "source_title": "10,000 usable SF, 15% factor, $30/rentable-SF -> 11,500 rentable SF, $345,000/yr, $34.50/usable SF",

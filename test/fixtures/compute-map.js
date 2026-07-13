@@ -803,6 +803,7 @@ export const COMPUTE_MAP = {
   "ground-potential-rise": { module: "../../calc-elecdesign.js", fn: "computeGroundPotentialRise" },
   "sccr-combination": { module: "../../calc-elecdesign.js", fn: "computeSccrCombination" },
   "net-effective-rent": { module: "../../calc-realestate.js", fn: "computeNetEffectiveRent" },
+  "required-face-rent": { module: "../../calc-realestate.js", fn: "computeRequiredFaceRent" },
   "commercial-load-factor": { module: "../../calc-realestate.js", fn: "computeCommercialLoadFactor" },
   "blended-mortgage-rate": { module: "../../calc-realestate.js", fn: "computeBlendedMortgageRate" },
   "eoq-order-quantity": { module: "../../calc-accounting.js", fn: "computeEoqOrderQuantity" },

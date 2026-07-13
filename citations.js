@@ -241,6 +241,18 @@ export const CITATIONS = {
       { name: "Excludes", value: "ignores escalations and operating-expense pass-throughs", source: "scope of this tile" },
     ],
   },
+  "required-face-rent": {
+    formula: "face_rent = (target_NER x term + one_time_credit) / (term - free_periods); paid = face x (term - free); discount_pct = (1 - NER / face) x 100.",
+    edition: "Required face rent (the inverse of the straight-line net-effective-rent spread), per the Appraisal Institute income approach and standard commercial-lease concession practice, by name; the executed lease governs.",
+    freeAccess: "Solving the straight-line effective-rent spread for the face rent is a standard commercial-real-estate calculation; the target rate, term, and concessions come from the deal.",
+    governance: GOVERNANCE.general,
+    editionNote: "Required face rent, the inverse of net effective rent. Given a target NET effective rate and the concessions to be offered, this returns the FACE (quoted) rent that still nets that target: face = (target_NER x term + one_time_credit) / (term - free_periods), with the quoted rate then sitting discount = (1 - NER/face) x 100 above the effective rate. More free months or a larger credit force a higher face to hold the same net. This is a straight-line spread, the common broker convention -- NOT a present-value (discounted) rent; escalations and operating-expense pass-throughs change the picture. A pricing aid, not lease terms; the executed lease governs.",
+    assumptions: [
+      { name: "Inverse spread", value: "face = (target_NER x term + one_time_credit) / (term - free_periods)", source: "commercial-lease practice" },
+      { name: "Straight-line", value: "a straight-line spread, not a present-value effective rent", source: "broker convention" },
+      { name: "Excludes", value: "ignores escalations and operating-expense pass-throughs", source: "scope of this tile" },
+    ],
+  },
   "rental-total-return": {
     formula: "total = cash_flow + principal_paydown + appreciation + tax_savings; each% = component/cash; total% = total/cash.",
     edition: "The four-component rental total return (cash flow, paydown, appreciation, tax shield) used by real-estate investors, by name.",

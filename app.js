@@ -1125,7 +1125,7 @@ const TOOL_MODULES = (() => {
     "debt-yield", "break-even-occupancy", "max-offer-70-rule",
     "fix-flip-profit", "brrrr-refi", "rental-total-return",
     // spec-v526 net effective rent (lease concessions)
-    "net-effective-rent",
+    "net-effective-rent", "required-face-rent",
     // spec-v527 rentable/usable load factor (BOMA)
     "commercial-load-factor",
     // spec-v528 blended mortgage rate (two loans)

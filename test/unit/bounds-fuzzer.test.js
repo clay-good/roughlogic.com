@@ -17917,6 +17917,30 @@ test("bounds: spec-v526 computeNetEffectiveRent pins the concession spread, the 
   assert.ok("error" in _v526({ face_rent: 40, term_periods: 120, free_periods: 10, one_time_credit: -1 }));
 });
 
+import { computeRequiredFaceRent as _v646 } from "../../calc-realestate.js";
+
+test("bounds: spec-v646 computeRequiredFaceRent inverts net-effective-rent, round-trips it, and pins the credit effect and error seams", () => {
+  const r = _v646({ target_ner: 30, term_periods: 120, free_periods: 20, one_time_credit: 0 });
+  assert.ok(Math.abs(r.face_rent - 36) < 1e-9); // (30 x 120) / (120-20)
+  assert.ok(Math.abs(r.paid - 3600) < 1e-9);
+  assert.ok(Math.abs(r.discount_pct - 100 * (1 - 30 / 36)) < 1e-9);
+  // A one-time TI credit forces a higher face to hold the same net.
+  const credit = _v646({ target_ner: 30, term_periods: 120, free_periods: 20, one_time_credit: 240 });
+  assert.ok(Math.abs(credit.face_rent - 38.4) < 1e-9 && credit.face_rent > r.face_rent);
+  // Exact inverse of net-effective-rent: the NER of the face this tile returns is the target NER.
+  for (const [term, free, cr] of [[120, 10, 0], [60, 6, 500], [84, 0, 0]]) {
+    const ner = 33.5;
+    const face = _v646({ target_ner: ner, term_periods: term, free_periods: free, one_time_credit: cr }).face_rent;
+    assert.ok(Math.abs(_v526({ face_rent: face, term_periods: term, free_periods: free, one_time_credit: cr }).ner - ner) < 1e-9);
+  }
+  // Error seams: non-positive NER / term, free >= term, negative credit, non-finite.
+  assert.ok("error" in _v646({ target_ner: 0, term_periods: 120, free_periods: 20 }));
+  assert.ok("error" in _v646({ target_ner: 30, term_periods: 0, free_periods: 0 }));
+  assert.ok("error" in _v646({ target_ner: 30, term_periods: 120, free_periods: 120 }));
+  assert.ok("error" in _v646({ target_ner: 30, term_periods: 120, free_periods: 20, one_time_credit: -1 }));
+  assert.ok("error" in _v646({ target_ner: Infinity, term_periods: 120, free_periods: 20 }));
+});
+
 import { computeCommercialLoadFactor as _v527 } from "../../calc-realestate.js";
 
 test("bounds: spec-v527 computeCommercialLoadFactor pins the rentable area, the load factor, the cost per usable SF, and error seams", () => {

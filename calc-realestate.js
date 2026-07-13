@@ -2827,6 +2827,53 @@ function renderNetEffectiveRent(inputRegion, outputRegion, citationEl) {
 }
 REALESTATE_RENDERERS["net-effective-rent"] = renderNetEffectiveRent;
 
+// ===================== spec-v646: required face rent (inverse of net effective rent) =====================
+// dims: in { target_ner: dimensionless, term_periods: dimensionless, free_periods: dimensionless, one_time_credit: dimensionless } out: { face_rent: dimensionless, paid: dimensionless, discount_pct: dimensionless }
+export function computeRequiredFaceRent({ target_ner = 0, term_periods = 0, free_periods = 0, one_time_credit = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ner = Number(target_ner) || 0;
+  const term = Number(term_periods) || 0;
+  const free = Number(free_periods) || 0;
+  const credit = Number(one_time_credit) || 0;
+  if (!(ner > 0)) return { error: "Target net effective rent must be positive." };
+  if (!(term > 0)) return { error: "Lease term must be positive." };
+  if (!(free >= 0 && free < term)) return { error: "Free-rent periods must be 0 or more and below the term." };
+  if (credit < 0) return { error: "One-time credit cannot be negative." };
+  const face_rent = (ner * term + credit) / (term - free);
+  const paid = face_rent * (term - free);
+  const discount_pct = (1 - ner / face_rent) * 100;
+  if (![face_rent, paid, discount_pct].every(Number.isFinite)) return { error: "Required-face-rent math is not a finite value." };
+  return {
+    face_rent, paid, discount_pct,
+    note: "The inverse of net effective rent: the FACE (quoted) rent a landlord must ask to still net a target effective rate after giving free rent and a one-time TI/concession credit. face = (target_NER x term + one_time_credit) / (term - free_periods); the quoted rate then sits discount = (1 - NER/face) x 100 above the effective rate. Giving more free months or a larger credit forces a higher face to hold the same net - the mechanic behind why concession-heavy markets quote inflated face rents. A straight-line (undiscounted) spread, the common broker convention, not a present-value rent; escalations and expense pass-throughs change the picture. A pricing aid, not lease terms; the executed lease governs.",
+  };
+}
+export const requiredFaceRentExample = { inputs: { target_ner: 30, term_periods: 120, free_periods: 20, one_time_credit: 0 } };
+function renderRequiredFaceRent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: required face rent (inverse of the straight-line net-effective-rent spread; Appraisal Institute income approach / commercial-lease concession practice): face = (target_NER x term + one-time credit) / (term - free); discount = (1 - NER/face) x 100. A straight-line average, not a present-value effective rent. A pricing aid; the executed lease governs.";
+  const ner = makeNumber("Target net effective rent ($/period, e.g. $/SF/yr)", "rfr-ner", { step: "any", min: "0" }); ner.input.value = "30";
+  const term = makeNumber("Lease term (periods)", "rfr-term", { step: "any", min: "0" }); term.input.value = "120";
+  const free = makeNumber("Free-rent periods", "rfr-free", { step: "any", min: "0" }); free.input.value = "20";
+  const credit = makeNumber("One-time TI / concession credit ($, 0 = none)", "rfr-credit", { step: "any", min: "0" }); credit.input.value = "0";
+  for (const f of [ner, term, free, credit]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ner.input.value = "30"; term.input.value = "120"; free.input.value = "20"; credit.input.value = "0"; update(); });
+  const oFace = makeOutputLine(outputRegion, "Required face rent", "rfr-out-face");
+  const oPaid = makeOutputLine(outputRegion, "Total paid over term", "rfr-out-paid");
+  const oDisc = makeOutputLine(outputRegion, "Face sits above effective by", "rfr-out-disc");
+  const oNote = makeOutputLine(outputRegion, "Note", "rfr-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeRequiredFaceRent({ target_ner: readNum(ner.input), term_periods: readNum(term.input), free_periods: readNum(free.input), one_time_credit: readNum(credit.input) });
+    if (r.error) { oFace.textContent = r.error; oPaid.textContent = "-"; oDisc.textContent = "-"; oNote.textContent = ""; return; }
+    oFace.textContent = "$" + fmt(r.face_rent, 2) + " per period";
+    oPaid.textContent = "$" + fmt(r.paid, 2);
+    oDisc.textContent = fmt(r.discount_pct, 1) + "% above effective";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ner, term, free, credit]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["required-face-rent"] = renderRequiredFaceRent;
+
 // ===================== spec-v527: rentable/usable load factor (BOMA) =====================
 // dims: in { usable_sf: L^2, common_area_factor: dimensionless, base_rent: dimensionless } out: { rentable_sf: L^2, load_factor: dimensionless, annual_rent: dimensionless, cost_per_usable: dimensionless }
 export function computeCommercialLoadFactor({ usable_sf = 0, common_area_factor = 0, base_rent = 0 } = {}) {

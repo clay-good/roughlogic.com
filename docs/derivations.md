@@ -2388,6 +2388,7 @@ cross-check.
 | calc-realestate.js | `computeRentVsBuy` | `inp` | _ | _ | _ |
 | calc-realestate.js | `computeRentalTotalReturn` | `{ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0,...` | _ | _ | _ |
 | calc-realestate.js | `computeRentalWorksheet` | `inputs` | _ | _ | _ |
+| calc-realestate.js | `computeRequiredFaceRent` | `{ target_ner = 0, term_periods = 0, free_periods = 0, one_time_credit = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeSection121` | `{ filing_status, sale_price, selling_costs, purchase_price, improvements, mee...` | _ | _ | _ |
 | calc-realestate.js | `computeSellerNetSheet` | `{ price = 0, payoff = 0, commission_pct = 0, transfer_tax_pct = 0, fees = 0, ...` | _ | _ | _ |
 | calc-realestate.js | `render1031Timeline` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2752,7 +2753,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1338.
+Row count: 1339.
 
 <!-- END function-corpus-v14 -->
 
@@ -3940,7 +3941,7 @@ per spec-v14 §13.1 second paragraph.
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `substrate-for-velocity` | Substrate for a Target Fraction of Vmax (Michaelis-Menten Inverse) | Enzyme kinetics (Michaelis-Menten equ...; spec-v635 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group X Real Estate (33 tiles)
+### Group X Real Estate (34 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3975,6 +3976,7 @@ per spec-v14 §13.1 second paragraph.
 | `rent-vs-buy` | Rent vs Buy NPV Comparison | New York Times rent-vs-buy methodolog...; $400k / $80k down / 6.5% 30yr / tax 1.2% / ins 1800 / mai... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rental-total-return` | Rental Total Return (Four Components) | real-estate-investing practice; spec-v404 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rental-worksheet` | Rental Income / Expense Worksheet (Schedule E) | IRS Schedule E (Form 1040) Part I (pu...; Worked example: $2200 monthly rent / 5% vacancy / $19,412... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `required-face-rent` | Required Face Rent from a Target Net Effective Rent | required face rent (inverse of the ne...; spec-v646 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seller-net-sheet` | Seller Net Proceeds Sheet | TILA-RESPA Closing Disclosure (12 CFR...; $400,000 sale, $250,000 payoff, 5.5% commission, 0.5% tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
@@ -4032,6 +4034,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1094. Fixture-covered or reference-cadence: 1094 / 1094.
+Tile count: 1095. Fixture-covered or reference-cadence: 1095 / 1095.
 
 <!-- END tile-index-v14 -->

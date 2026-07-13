@@ -69,7 +69,7 @@ const _TILES = [
   ["debt-yield", "X"], ["break-even-occupancy", "X"], ["max-offer-70-rule", "X"],
   ["fix-flip-profit", "X"], ["brrrr-refi", "X"], ["rental-total-return", "X"],
   // spec-v526 net effective rent (lease concessions)
-  ["net-effective-rent", "X"],
+  ["net-effective-rent", "X"], ["required-face-rent", "X"],
   // spec-v527 rentable/usable load factor (BOMA)
   ["commercial-load-factor", "X"],
   // spec-v528 blended mortgage rate (two loans)

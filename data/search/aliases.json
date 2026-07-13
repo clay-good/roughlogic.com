@@ -76637,6 +76637,36 @@
       "kind": "question"
     },
     {
+      "term": "required face rent",
+      "target": "required-face-rent",
+      "kind": "industry"
+    },
+    {
+      "term": "gross up net effective rent",
+      "target": "required-face-rent",
+      "kind": "industry"
+    },
+    {
+      "term": "face rent from net effective",
+      "target": "required-face-rent",
+      "kind": "redirect"
+    },
+    {
+      "term": "what face rent to quote",
+      "target": "required-face-rent",
+      "kind": "question"
+    },
+    {
+      "term": "face rent to hit a target ner",
+      "target": "required-face-rent",
+      "kind": "question"
+    },
+    {
+      "term": "quote rent with free months",
+      "target": "required-face-rent",
+      "kind": "question"
+    },
+    {
       "term": "rentable square feet versus usable",
       "target": "commercial-load-factor",
       "kind": "question"
