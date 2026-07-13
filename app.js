@@ -612,7 +612,7 @@ const TOOL_MODULES = (() => {
     // spec-v287..v289 foundation depth batch
     "soil-settlement-elastic", "pile-axial-capacity", "slope-stability-infinite", "slope-stability-seepage",
     // spec-v308..v310 geotechnical depth-2 batch
-    "soil-consolidation-settlement", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
+    "soil-consolidation-settlement", "settlement-limit-load", "footing-eccentric-pressure", "boussinesq-surcharge-wall",
     // spec-v414..v416 settlement/foundation trio
     "consolidation-time-rate", "consolidation-degree", "spt-bearing-capacity", "liquefaction-screening",
     // spec-v498 pile group efficiency (Converse-Labarre)

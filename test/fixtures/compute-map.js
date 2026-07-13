@@ -862,6 +862,7 @@ export const COMPUTE_MAP = {
   "pump-suction-specific-speed": { module: "../../calc-hvac.js", fn: "computePumpSuctionSpecificSpeed" },
   // spec-v308..v310 geotechnical depth-2 batch (3 tiles)
   "soil-consolidation-settlement": { module: "../../calc-geotech.js", fn: "computeSoilConsolidationSettlement" },
+  "settlement-limit-load": { module: "../../calc-geotech.js", fn: "computeSettlementLimitLoad" },
   "footing-eccentric-pressure": { module: "../../calc-geotech.js", fn: "computeFootingEccentricPressure" },
   "boussinesq-surcharge-wall": { module: "../../calc-geotech.js", fn: "computeBoussinesqSurchargeWall" },
   // spec-v311..v313 field-surveying depth batch (3 tiles)

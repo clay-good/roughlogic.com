@@ -10067,6 +10067,18 @@ export const CITATIONS = {
       { name: "Scope", value: "single NC layer, one mid-layer stress, no time rate or secondary creep", source: "scope of this tile" },
     ],
   },
+  "settlement-limit-load": {
+    formula: "d_sigma = sigma'0 (10^(Sc_ft (1 + e0) / (Cc H)) - 1), Sc_ft = Sc_in / 12; final_stress = sigma'0 + d_sigma.",
+    edition: "The Terzaghi primary consolidation relation solved for the allowable load increment, the inverse of the settlement tile, as compiled in the Das and NAVFAC references, by name.",
+    freeAccess: "The primary-consolidation relation is a public soil-mechanics result; NAVFAC DM-7 is public-domain and free online.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of the primary-consolidation settlement: the maximum load-induced effective-stress increase d_sigma that holds a normally-consolidated clay's primary settlement to an allowable limit, from Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0) solved for d_sigma = sigma'0 (10^(Sc(1 + e0)/(Cc H)) - 1). Because settlement grows with the log of the effective-stress RATIO, the allowable increment is a fraction of the existing stress and a tighter settlement limit allows disproportionately less load. It assumes a single normally-consolidated layer at one representative mid-layer stress (sublayer the profile for accuracy); it is not the immediate elastic settlement, secondary creep, or the time rate, and an OC clay needs the two-part Cr/Cc form. A design aid, not a substitute for the geotechnical engineer of record's report.",
+    assumptions: [
+      { name: "Inverse relation", value: "d_sigma = sigma'0 (10^(Sc(1 + e0)/(Cc H)) - 1) at mid-layer", source: "Terzaghi / Das" },
+      { name: "Log stress ratio", value: "settlement grows with the log of the stress ratio, so a tighter limit allows disproportionately less load", source: "soil-mechanics references" },
+      { name: "Scope", value: "single NC layer, one mid-layer stress, no time rate or secondary creep", source: "scope of this tile" },
+    ],
+  },
   "footing-eccentric-pressure": {
     formula: "e = M/P; e <= B/6: q = (P/BL)(1 +/- 6e/B); e > B/6: q_max = 2P/(3L(B/2 - e)), q_min = 0, bearing length = 3(B/2 - e).",
     edition: "The eccentric spread-footing bearing-pressure relations - the middle-third (kern) trapezoidal form and the resultant-outside-kern triangular form - a standard foundation-engineering result, by name.",

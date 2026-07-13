@@ -43912,6 +43912,36 @@
       "kind": "question"
     },
     {
+      "term": "settlement limit load",
+      "target": "settlement-limit-load",
+      "kind": "industry"
+    },
+    {
+      "term": "allowable surcharge for settlement",
+      "target": "settlement-limit-load",
+      "kind": "industry"
+    },
+    {
+      "term": "load limit from settlement",
+      "target": "settlement-limit-load",
+      "kind": "redirect"
+    },
+    {
+      "term": "max stress for a settlement limit",
+      "target": "settlement-limit-load",
+      "kind": "question"
+    },
+    {
+      "term": "how much load to stay under settlement",
+      "target": "settlement-limit-load",
+      "kind": "question"
+    },
+    {
+      "term": "allowable load for settlement",
+      "target": "settlement-limit-load",
+      "kind": "question"
+    },
+    {
       "term": "footing pressure when load is off center",
       "target": "footing-eccentric-pressure",
       "kind": "question"

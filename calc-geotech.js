@@ -619,6 +619,42 @@ GEOTECH_RENDERERS["soil-consolidation-settlement"] = _simpleRenderer({
   compute: computeSoilConsolidationSettlement,
 });
 
+// dims: in { sc_allow_in: L, cc: dimensionless, h_ft: L, e0: dimensionless, sig0_psf: M L^-1 T^-2 } out: { dsig_psf: M L^-1 T^-2, final_stress_psf: M L^-1 T^-2, stress_ratio: dimensionless }
+export function computeSettlementLimitLoad({ sc_allow_in = 0, cc = 0, h_ft = 0, e0 = 0, sig0_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(sc_allow_in > 0)) return { error: "Allowable settlement must be positive (in)." };
+  if (!(cc > 0)) return { error: "The compression index Cc must be positive." };
+  if (!(h_ft > 0)) return { error: "Layer thickness must be positive (ft)." };
+  if (!(1 + e0 > 0)) return { error: "The void ratio e0 must give a positive (1 + e0)." };
+  if (!(sig0_psf > 0)) return { error: "The initial effective stress must be positive (psf)." };
+  const sc_ft = sc_allow_in / 12;
+  const stress_ratio = Math.pow(10, sc_ft * (1 + e0) / (cc * h_ft));
+  const dsig_psf = sig0_psf * (stress_ratio - 1);
+  const final_stress_psf = sig0_psf + dsig_psf;
+  return {
+    dsig_psf, final_stress_psf, stress_ratio,
+    note: "The inverse of the primary-consolidation settlement tile: the maximum load-induced stress increase d_sigma that keeps a normally-consolidated clay's primary settlement within an allowable limit. Solving Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0) for d_sigma gives d_sigma = sigma'0 (10^(Sc(1 + e0)/(Cc H)) - 1). Because settlement grows with the log of the stress RATIO, the allowable increment is a fraction of the existing stress, and a tighter settlement limit allows disproportionately less load. Single normally-consolidated layer at one representative mid-layer stress (sublayer the profile for accuracy) - not the immediate elastic settlement, secondary creep, or the time rate. A design aid, not a substitute for the geotechnical engineer of record's report.",
+  };
+}
+export const settlementLimitLoadExample = { inputs: { sc_allow_in: 2, cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000 } };
+GEOTECH_RENDERERS["settlement-limit-load"] = _simpleRenderer({
+  citation: "Citation: Terzaghi primary consolidation solved for the allowable load: d_sigma = sigma'0 (10^(Sc(1 + e0)/(Cc H)) - 1), the inverse of Sc = (Cc H/(1 + e0)) log10((sigma'0 + d_sigma)/sigma'0), for a normally-consolidated clay, as compiled in Das / NAVFAC, by name. Single NC layer, one representative mid-layer stress. A design aid, not a substitute for the geotechnical engineer's report.",
+  example: settlementLimitLoadExample.inputs,
+  fields: [
+    { key: "sc_allow_in", label: "Allowable settlement (in)", kind: "number" },
+    { key: "cc", label: "Compression index Cc", kind: "number" },
+    { key: "h_ft", label: "Clay layer thickness H (ft)", kind: "number" },
+    { key: "e0", label: "Initial void ratio e0", kind: "number" },
+    { key: "sig0_psf", label: "Initial effective stress at mid-layer (psf)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ds", id: "sll-out-ds", label: "Max allowable stress increase", value: (r) => fmt(r.dsig_psf, 0) + " psf" },
+    { key: "fs", id: "sll-out-fs", label: "Resulting mid-layer stress", value: (r) => fmt(r.final_stress_psf, 0) + " psf (stress ratio " + fmt(r.stress_ratio, 3) + ")" },
+    { key: "n", id: "sll-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSettlementLimitLoad,
+});
+
 // dims: in { p_kip: M L T^-2, m_kft: M L^2 T^-2, b_ft: L, l_ft: L } out: { e_ft: L, q_max_ksf: M L^-1 T^-2, q_min_ksf: M L^-1 T^-2, bearing_len_ft: L }
 export function computeFootingEccentricPressure({ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

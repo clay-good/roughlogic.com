@@ -14173,6 +14173,29 @@ test("bounds: spec-v308 computeSoilConsolidationSettlement pins the settlement, 
   assert.ok("error" in _v308({ cc: Infinity, h_ft: 10, e0: 0.9, sig0_psf: 2000, dsig_psf: 1000 }));
 });
 
+import { computeSettlementLimitLoad as _v648 } from "../../calc-geotech.js";
+
+test("bounds: spec-v648 computeSettlementLimitLoad inverts the consolidation settlement, round-trips it, holds the tighter-limit-less-load property, and pins error seams", () => {
+  const r = _v648({ sc_allow_in: 2, cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000 });
+  assert.ok(Math.abs(r.dsig_psf - 2000 * (Math.pow(10, (2 / 12) * 1.9 / (0.25 * 10)) - 1)) < 1e-6);
+  assert.ok(Math.abs(r.dsig_psf - 677.3) < 0.5);
+  assert.ok(Math.abs(r.final_stress_psf - (2000 + r.dsig_psf)) < 1e-9);
+  // Exact inverse of the settlement tile: the settlement under the returned load is the allowable limit.
+  assert.ok(Math.abs(_v308({ cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: r.dsig_psf }).sc_in - 2) < 1e-9);
+  // Round-trip the settlement tile's own example: 2.7804 in -> 1000 psf.
+  const scEx = _v308({ cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000, dsig_psf: 1000 }).sc_in;
+  assert.ok(Math.abs(_v648({ sc_allow_in: scEx, cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000 }).dsig_psf - 1000) < 1e-6);
+  // Log-ratio: halving the settlement limit allows far less than half the load.
+  const tight = _v648({ sc_allow_in: 1, cc: 0.25, h_ft: 10, e0: 0.90, sig0_psf: 2000 });
+  assert.ok(tight.dsig_psf < r.dsig_psf / 2);
+  // Error seams: non-positive settlement / Cc / H / stress, non-finite.
+  assert.ok("error" in _v648({ sc_allow_in: 0, cc: 0.25, h_ft: 10, e0: 0.9, sig0_psf: 2000 }));
+  assert.ok("error" in _v648({ sc_allow_in: 2, cc: 0, h_ft: 10, e0: 0.9, sig0_psf: 2000 }));
+  assert.ok("error" in _v648({ sc_allow_in: 2, cc: 0.25, h_ft: 0, e0: 0.9, sig0_psf: 2000 }));
+  assert.ok("error" in _v648({ sc_allow_in: 2, cc: 0.25, h_ft: 10, e0: 0.9, sig0_psf: 0 }));
+  assert.ok("error" in _v648({ sc_allow_in: Infinity, cc: 0.25, h_ft: 10, e0: 0.9, sig0_psf: 2000 }));
+});
+
 test("bounds: spec-v309 computeFootingEccentricPressure pins the kern branch flip, the outside-kern triangle, and error seams", () => {
   const r = _v309({ p_kip: 60, m_kft: 60, b_ft: 8, l_ft: 8 });
   assert.strictEqual(r.e_ft, 1);
