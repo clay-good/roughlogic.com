@@ -335,7 +335,8 @@ const RELATED = {
   "freight-density": ["dim-weight", "pallet-loadout"],
   "pallet-loadout": ["dim-weight", "freight-density"],
   "hos-math": ["bridge-formula", "stopping-sight-distance"],
-  "bridge-formula": ["hos-math", "stopping-sight-distance"],
+  "bridge-formula": ["bridge-formula-min-spacing", "hos-math", "stopping-sight-distance"],
+  "bridge-formula-min-spacing": ["bridge-formula", "axle-load-distribution", "gcwr-check", "vehicle-load"],
 
   // Group K: Mechanic. weight-balance + prop-slip for marine /
   // aviation; displacement-cr + driveshaft-crit + fuel-range for auto.

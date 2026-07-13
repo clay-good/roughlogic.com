@@ -4237,6 +4237,17 @@ export const CITATIONS = {
       { name: "Gross-weight cap", value: "80 000 lb on Interstates unless permitted higher", source: "23 CFR 658.17" },
     ],
   },
+  "bridge-formula-min-spacing": {
+    formula: "Federal Bridge Formula B solved for the spread: L = ((W / 500) - 12 N - 36)(N - 1) / N, where W is the target group weight (lb) on N consecutive axles spaced L feet outer-to-outer.",
+    edition: "23 CFR 658.17 by section (Federal-aid Highway Act of 1956 / FHWA Bridge Formula), rearranged for the axle spread.",
+    freeAccess: "Free at ecfr.gov.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "The Federal Bridge Formula B, W = 500 (L N/(N-1) + 12 N + 36), solved for the minimum outer-to-outer axle spread L that legally carries a target group weight W across N consecutive axles: L = ((W/500) - 12 N - 36)(N-1)/N. When the result is zero or negative the axles satisfy the formula bunched together (the group weight is below the N-axle minimum). This is the spacing the bridge formula alone requires; the 20,000 lb single-axle and 34,000 lb tandem caps and the 80,000 lb Interstate gross limit apply independently, and a load above 80,000 lb needs an overweight permit. State limits may be lower on non-Interstate routes, and some states exceed federal limits via grandfathering or annual permits; the enforcing state DOT and the permit govern.",
+    assumptions: [
+      { name: "Spread inverse", value: "L = ((W/500) - 12 N - 36)(N-1)/N; zero when the axles satisfy the formula bunched together", source: "23 CFR 658.17" },
+      { name: "Independent caps", value: "the 20,000 lb single / 34,000 lb tandem / 80,000 lb gross limits still apply; over 80,000 lb needs a permit", source: "23 CFR 658.17" },
+    ],
+  },
   "reefer-burn": {
     formula: "Fuel burn (gal/hr) × ambient factor × hours = total fuel. Ambient factor 0.85 (cold) / 1.0 (moderate) / 1.20 (hot). Continuous vs. cycle-sentry / start-stop modes use different baseline GPH.",
     edition: "Manufacturer technical bulletins (Thermo King SB-series, Carrier Transicold Vector). Each entry attributes the publishing manufacturer.",

@@ -4136,6 +4136,32 @@ test("bounds: calc-trucking computeBridgeFormula rejects empty / mismatched-leng
   assert.ok("error" in computeBridgeFormula({ axle_weights_lb: [12000], axle_spacings_ft: [4] }));
 });
 
+import { computeBridgeFormulaMinSpacing as _v656 } from "../../calc-trucking.js";
+
+test("bounds: spec-v656 computeBridgeFormulaMinSpacing solves the bridge formula for the spread, satisfies the forward formula, cross-checks the array tile, and pins error seams", () => {
+  const r = _v656({ target_weight_lb: 80000, num_axles: 5 });
+  assert.ok(Math.abs(r.min_spacing_ft - 51.2) < 1e-9); // ((160)-60-36)*4/5
+  assert.ok(r.fits_at_zero === false);
+  assert.ok(Math.abs(r.avg_axle_lb - 16000) < 1e-9);
+  // The returned spread, fed into the forward Bridge Formula B, reproduces the target weight.
+  const W = 500 * (r.min_spacing_ft * 5 / 4 + 12 * 5 + 36);
+  assert.ok(Math.abs(W - 80000) < 1e-6);
+  // Cross-check against the array bridge-formula tile: a 2-axle group at 34,000 lb needs 4 ft,
+  // and a [17000,17000] pair at exactly 4 ft has no bridge or tandem violation.
+  const two = _v656({ target_weight_lb: 34000, num_axles: 2 });
+  assert.ok(Math.abs(two.min_spacing_ft - 4) < 1e-9);
+  const arr = computeBridgeFormula({ axle_weights_lb: [17000, 17000], axle_spacings_ft: [4] });
+  assert.ok(arr.bridge_violations.length === 0);
+  // A group weight below the N-axle minimum satisfies the formula at zero spread.
+  assert.ok(_v656({ target_weight_lb: 40000, num_axles: 5 }).fits_at_zero === true);
+  // Over 80,000 lb is flagged as requiring a permit.
+  assert.ok(_v656({ target_weight_lb: 105000, num_axles: 7 }).over_interstate_cap === true);
+  // Error seams: non-positive weight, fewer than 2 axles, non-finite.
+  assert.ok("error" in _v656({ target_weight_lb: 0, num_axles: 5 }));
+  assert.ok("error" in _v656({ target_weight_lb: 80000, num_axles: 1 }));
+  assert.ok("error" in _v656({ target_weight_lb: Infinity, num_axles: 5 }));
+});
+
 test("bounds: calc-trucking computeReeferBurn pins fuel_burned = gph * haul_hr and the per-ambient-band factor sweep", () => {
   for (const unit of ["thermo_king_continuous", "thermo_king_cycle", "carrier_continuous", "carrier_cycle"]) {
     for (const haul_hr of [4, 12, 24, 48]) {

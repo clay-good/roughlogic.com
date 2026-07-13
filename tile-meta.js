@@ -275,7 +275,7 @@ const _TILES = [
   ["sales-tax-nexus", "H"], ["osha-recordkeeping", "H"], ["lab-safety-quickread", "H"],
 
   ["dim-weight", "J"], ["freight-density", "J"], ["pallet-loadout", "J"],
-  ["hos-math", "J"], ["bridge-formula", "J"], ["reefer-burn", "J"],
+  ["hos-math", "J"], ["bridge-formula", "J"], ["bridge-formula-min-spacing", "J"], ["reefer-burn", "J"],
   ["incoterm-decoder", "J"], ["stopping-sight-distance", "J"],
 
   ["prop-slip", "K"], ["displacement-cr", "K"],

@@ -214,6 +214,48 @@
    }
   },
   {
+   "tile_id": "bridge-formula-min-spacing",
+   "source_publisher": "FHWA (Federal Bridge Formula B, solved for the spread)",
+   "source_title": "5-axle group at 80,000 lb -> 51.2 ft minimum outer-to-outer spread",
+   "source_edition_or_year": "23 CFR 658.17 (current); spec-v656 (machine-verified)",
+   "source_section_or_page": "spec-v656 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_weight_lb": 80000,
+    "num_axles": 5
+   },
+   "outputs": {
+    "min_spacing_ft": {
+     "value": 51.2,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bridge-formula-min-spacing",
+   "source_publisher": "FHWA (Federal Bridge Formula B, solved for the spread)",
+   "source_title": "cross-check: a 2-axle group at 34,000 lb needs 4 ft (round-trips the bridge-formula tile at 4 ft)",
+   "source_edition_or_year": "23 CFR 658.17 (current); spec-v656 (machine-verified)",
+   "source_section_or_page": "spec-v656 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_weight_lb": 34000,
+    "num_axles": 2
+   },
+   "outputs": {
+    "min_spacing_ft": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wind-chill",
    "source_publisher": "NWS",
    "source_title": "NWS wind chill formula (Osczevski-Bluestein 2001)",

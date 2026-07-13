@@ -70737,6 +70737,36 @@
       "kind": "question"
     },
     {
+      "term": "bridge formula min spacing",
+      "target": "bridge-formula-min-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum axle spread",
+      "target": "bridge-formula-min-spacing",
+      "kind": "industry"
+    },
+    {
+      "term": "axle spacing for bridge formula",
+      "target": "bridge-formula-min-spacing",
+      "kind": "redirect"
+    },
+    {
+      "term": "how far apart axles for weight",
+      "target": "bridge-formula-min-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "spread axles to be legal",
+      "target": "bridge-formula-min-spacing",
+      "kind": "question"
+    },
+    {
+      "term": "min spacing for group weight",
+      "target": "bridge-formula-min-spacing",
+      "kind": "question"
+    },
+    {
       "term": "reefer fuel consumption per hour",
       "target": "reefer-burn",
       "kind": "question"

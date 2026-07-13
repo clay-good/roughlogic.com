@@ -368,6 +368,40 @@ export const bridgeFormulaExample = {
   inputs: { axle_weights_lb: [12000, 17000, 17000, 17000, 17000], axle_spacings_ft: [12, 4, 30, 4] },
 };
 
+// --- spec-v656: bridge-formula minimum axle spread (inverse of the max-weight formula) ---
+// dims: in { target_weight_lb: M L T^-2, num_axles: dimensionless } out: { min_spacing_ft: L, avg_axle_lb: M L T^-2 }
+export function computeBridgeFormulaMinSpacing({ target_weight_lb = 0, num_axles = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(target_weight_lb) || 0;
+  const n = Math.round(Number(num_axles) || 0);
+  if (!(w > 0)) return { error: "Target group weight must be positive (lb)." };
+  if (!(n >= 2)) return { error: "The bridge formula needs a group of at least 2 axles." };
+  const raw = ((w / 500) - 12 * n - 36) * (n - 1) / n;
+  const min_spacing_ft = Math.max(0, raw);
+  const fits_at_zero = raw <= 0;
+  const over_interstate_cap = w > 80000;
+  const avg_axle_lb = w / n;
+  return {
+    min_spacing_ft, fits_at_zero, over_interstate_cap, avg_axle_lb,
+    note: "Federal Bridge Formula B solved for the minimum outer-to-outer axle spread: from W = 500 (L N/(N-1) + 12 N + 36), the spread that just carries a target group weight W across N axles is L = ((W/500) - 12 N - 36)(N-1)/N. A 5-axle group at 80,000 lb needs at least 51.2 ft outer-to-outer. If the result is zero the axles already satisfy the formula bunched together (the group weight is below the N-axle minimum). This is the spread the bridge formula alone requires; the 20,000 lb single-axle and 34,000 lb tandem caps and the 80,000 lb interstate gross limit apply independently, and a load above 80,000 lb needs an overweight permit. The enforcing state DOT and the permit govern.",
+  };
+}
+export const bridgeFormulaMinSpacingExample = { inputs: { target_weight_lb: 80000, num_axles: 5 } };
+const renderBridgeFormulaMinSpacing = _simpleRenderer({
+  citation: "Citation: Federal Bridge Formula B (23 CFR 658.17) solved for the minimum axle spread - L = ((W/500) - 12 N - 36)(N-1)/N from W = 500 (L N/(N-1) + 12 N + 36), by name. The 20,000 lb single / 34,000 lb tandem / 80,000 lb interstate caps apply independently; the enforcing state DOT and the permit govern.",
+  example: bridgeFormulaMinSpacingExample.inputs,
+  fields: [
+    { key: "target_weight_lb", label: "Target group weight (lb)", kind: "number", default: 80000 },
+    { key: "num_axles", label: "Number of axles in the group", kind: "number", default: 5 },
+  ],
+  outputs: [
+    { key: "l", id: "bfms-out-l", label: "Minimum outer-to-outer spread", value: (r) => r.fits_at_zero ? "0 ft (the axles already satisfy the formula bunched together)" : fmt(r.min_spacing_ft, 1) + " ft" },
+    { key: "a", id: "bfms-out-a", label: "Average per axle", value: (r) => fmt(r.avg_axle_lb, 0) + " lb" + (r.over_interstate_cap ? " - the group exceeds the 80,000 lb interstate cap; an overweight permit is required" : "") },
+    { key: "n", id: "bfms-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeBridgeFormulaMinSpacing,
+});
+
 // --- Utility 193: Reefer Fuel Burn ---
 
 export const REEFER_BURN_GPH = {
@@ -861,6 +895,7 @@ export const TRUCKING_RENDERERS = {
   "pallet-loadout":  renderPalletLoadout,
   "hos-math":        renderHOS,
   "bridge-formula":  renderBridgeFormula,
+  "bridge-formula-min-spacing": renderBridgeFormulaMinSpacing,
   "reefer-burn":     renderReeferBurn,
   "incoterm-decoder": renderIncoterm,
   // v9

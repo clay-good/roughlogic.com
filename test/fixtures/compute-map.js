@@ -106,6 +106,7 @@ export const COMPUTE_MAP = {
   "gas-pipe-max-flow": { module: "../../calc-gas.js", fn: "computeGasPipeMaxFlow" },
   "ohms-law": { module: "../../calc-electrical.js", fn: "computeOhmsLaw" },
   "bridge-formula": { module: "../../calc-trucking.js", fn: "computeBridgeFormula" },
+  "bridge-formula-min-spacing": { module: "../../calc-trucking.js", fn: "computeBridgeFormulaMinSpacing" },
   "wind-chill": { module: "../../calc-cross.js", fn: "computeWindChill" },
   "dim-weight": { module: "../../calc-trucking.js", fn: "computeDIM" },
   "material-cost": { module: "../../calc-cross.js", fn: "computeMaterialCost" },

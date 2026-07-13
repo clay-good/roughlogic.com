@@ -2675,6 +2675,7 @@ cross-check.
 | calc-treatment.js | `computeWeirFlow` | `{ weir_type = "vnotch90", head_ft = 0, crest_length_ft = 0, coeff = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeAxleLoadDistribution` | `{ drive_lb = 0, trailer_lb = 0, kingpin_to_tandem_in = 0, hole_spacing_in = 6...` | _ | _ | _ |
 | calc-trucking.js | `computeBridgeFormula` | `{ axle_weights_lb = [], axle_spacings_ft = [] }` | _ | _ | _ |
+| calc-trucking.js | `computeBridgeFormulaMinSpacing` | `{ target_weight_lb = 0, num_axles = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeCargoSecurementWLL` | `{ cargo_weight_lb = 0, tiedown_count = 0, wll_each_lb = 0, cargo_length_ft = ...` | _ | _ | _ |
 | calc-trucking.js | `computeCostPerMile` | `{ fixed_monthly = 0, miles_month = 0, fuel_price = 0, mpg = 0, maint_cpm = 0,...` | _ | _ | _ |
 | calc-trucking.js | `computeDIM` | `{ length_in = 0, width_in = 0, height_in = 0, actual_weight_lb = 0, carrier =...` | _ | _ | _ |
@@ -2762,7 +2763,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1348.
+Row count: 1349.
 
 <!-- END function-corpus-v14 -->
 
@@ -3636,12 +3637,13 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (23 tiles)
+### Group J Trucking (24 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `axle-load-distribution` | Axle-Load Tandem Slide | 23 CFR 658.17 federal weight limits +...; drive 35,200 (1200 over), trailer 32,000, L 400 in, 6-in ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bridge-formula` | Federal Bridge Formula and Axle Weights | FHWA; 23 CFR 658.17 Table B | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `bridge-formula-min-spacing` | Bridge Formula Minimum Axle Spread | FHWA (Federal Bridge Formula B, solve...; spec-v656 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cargo-securement-wll` | Cargo Securement Working-Load-Limit Check | FMCSA 49 CFR 393.100-393.136; 8000 lb, 4 tiedowns x 1500 lb -> 6000 lb aggregate >= 400... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cost-per-mile` | Operating Cost Per Mile | ATRI cost-per-mile bucket methodology; $6000/10,000 mi, $4.00/gal at 6.5 mpg, $0.18 maint, $0.65... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deadhead-percent` | Deadhead Percentage and Effective Rate | Freight-economics arithmetic + FMCSA ...; 800 loaded / 120 deadhead / $1840 -> 13.04% deadhead, $2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4052,6 +4054,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1104. Fixture-covered or reference-cadence: 1104 / 1104.
+Tile count: 1105. Fixture-covered or reference-cadence: 1105 / 1105.
 
 <!-- END tile-index-v14 -->

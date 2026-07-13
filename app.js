@@ -806,7 +806,7 @@ const TOOL_MODULES = (() => {
   // v4 Group J: Trucking and Logistics.
   declare("./calc-trucking.js", "TRUCKING_RENDERERS", [
     "dim-weight", "freight-density", "pallet-loadout",
-    "hos-math", "bridge-formula", "reefer-burn", "incoterm-decoder",
+    "hos-math", "bridge-formula", "bridge-formula-min-spacing", "reefer-burn", "incoterm-decoder",
     // v9
     "stopping-sight-distance",
     // v23
