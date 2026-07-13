@@ -3905,6 +3905,58 @@ function _v304renderChannelFroudeNumber(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["channel-froude-number"] = _v304renderChannelFroudeNumber;
 
+// dims: in { b_ft: L, q_cfs: L^3 T^-1, n: dimensionless, s_slope: dimensionless } out: { yn_ft: L, a_ft2: L^2, v_fps: L T^-1, fr: dimensionless, yc_ft: L }
+export function computeChannelNormalDepth({ b_ft = 0, q_cfs = 0, n = 0, s_slope = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_ft > 0)) return { error: "Channel width must be positive (ft)." };
+  if (!(q_cfs > 0)) return { error: "Discharge must be positive (cfs)." };
+  if (!(n > 0)) return { error: "Manning roughness n must be positive (~0.013 concrete, ~0.022 earth)." };
+  if (!(s_slope > 0)) return { error: "Channel slope must be positive (ft/ft)." };
+  const qOf = (y) => {
+    const A = b_ft * y;
+    const R = A / (b_ft + 2 * y);
+    return (1.486 / n) * A * Math.pow(R, 2 / 3) * Math.sqrt(s_slope);
+  };
+  let lo = 0, hi = 1;
+  while (qOf(hi) < q_cfs) { hi *= 2; if (hi > 1e7) return { error: "No normal depth converged; check the inputs." }; }
+  for (let i = 0; i < 100; i++) { const mid = (lo + hi) / 2; if (qOf(mid) < q_cfs) lo = mid; else hi = mid; }
+  const yn_ft = (lo + hi) / 2;
+  const a_ft2 = b_ft * yn_ft;
+  const v_fps = q_cfs / a_ft2;
+  const fr = v_fps / Math.sqrt(32.2 * yn_ft);
+  const regime = fr < 0.995 ? "subcritical (mild slope, tranquil)" : (fr > 1.005 ? "supercritical (steep slope, rapid)" : "critical (Fr = 1)");
+  const yc_ft = Math.cbrt(Math.pow(q_cfs / b_ft, 2) / 32.2);
+  return {
+    yn_ft, a_ft2, v_fps, fr, regime, yc_ft,
+    note: "Rectangular-channel normal (uniform-flow) depth: the depth yn at which Manning's Q = (1.486/n) A R^(2/3) sqrt(S) is satisfied for a rectangular section (A = b yn, R = A/(b + 2 yn)), solved by bisection. This is the Manning normal depth the Froude tile leaves out; comparing it to the critical depth yc = (q^2/g)^(1/3) gives the slope class - yn > yc is a mild slope (subcritical normal flow), yn < yc is steep (supercritical). The velocity and Froude number are reported at the normal depth. Steady uniform flow in a prismatic rectangular channel with Manning roughness n; it does not compute a trapezoidal or irregular section, a gradually-varied (backwater) profile, or the partial-flow depth of a closed conduit. A design aid; the engineer of record governs.",
+  };
+}
+export const channelNormalDepthExample = { inputs: { b_ft: 10, q_cfs: 200, n: 0.015, s_slope: 0.001 } };
+
+function _v641renderChannelNormalDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manning normal depth from Q = (1.486/n) A R^(2/3) S^(1/2) for a rectangular section (A = b y, R = A/(b + 2y)), solved by bisection, with the slope class from yc = (q^2/g)^(1/3), as compiled in Chow, by name. Prismatic rectangular channel, uniform flow; trapezoidal sections and backwater profiles are separate. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { b.input.value = "10"; q.input.value = "200"; nn.input.value = "0.015"; s.input.value = "0.001"; update(); });
+  const b = makeNumber("Channel width b (ft)", "cnd-b", { step: "any", min: "0" });
+  const q = makeNumber("Discharge Q (cfs)", "cnd-q", { step: "any", min: "0" });
+  const nn = makeNumber("Manning roughness n", "cnd-n", { step: "any", min: "0" });
+  const s = makeNumber("Channel slope S (ft/ft)", "cnd-s", { step: "any", min: "0" });
+  for (const f of [b, q, nn, s]) inputRegion.appendChild(f.wrap);
+  const oYn = makeOutputLine(outputRegion, "Normal depth yn", "cnd-out-yn");
+  const oV = makeOutputLine(outputRegion, "Velocity / Froude at yn", "cnd-out-v");
+  const oYc = makeOutputLine(outputRegion, "Critical depth yc / slope class", "cnd-out-yc");
+  const oNote = makeOutputLine(outputRegion, "Note", "cnd-out-n");
+  const update = debounce(() => {
+    const r = computeChannelNormalDepth({ b_ft: Number(b.input.value) || 0, q_cfs: Number(q.input.value) || 0, n: Number(nn.input.value) || 0, s_slope: Number(s.input.value) || 0 });
+    if (r.error) { oYn.textContent = r.error; oV.textContent = "-"; oYc.textContent = "-"; oNote.textContent = "-"; return; }
+    oYn.textContent = fmt(r.yn_ft, 3) + " ft";
+    oV.textContent = fmt(r.v_fps, 2) + " ft/s - Fr " + fmt(r.fr, 2) + " " + r.regime;
+    oYc.textContent = fmt(r.yc_ft, 3) + " ft (" + (r.yn_ft > r.yc_ft ? "yn > yc: mild slope" : "yn < yc: steep slope") + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [b, q, nn, s]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["channel-normal-depth"] = _v641renderChannelNormalDepth;
+
 // dims: in { b_ft: L, q_cfs: L^3 T^-1, y1_ft: L } out: { v1_fps: L T^-1, fr1: dimensionless, y2_ft: L, fr2: dimensionless, de_ft: L, efficiency: dimensionless }
 export function computeHydraulicJump({ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

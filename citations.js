@@ -10720,6 +10720,18 @@ export const CITATIONS = {
       { name: "Scope", value: "prismatic rectangular channel; normal depth (Manning) and the hydraulic jump are separate", source: "scope of this tile" },
     ],
   },
+  "channel-normal-depth": {
+    formula: "Q = (1.486/n) A R^(2/3) S^(1/2), rectangular A = b y, R = A/(b + 2y); solve for the normal depth y by bisection; slope class from yc = (q^2/g)^(1/3).",
+    edition: "The Manning normal (uniform-flow) depth of a rectangular channel and its slope class against the critical depth, as compiled in Chow's Open-Channel Hydraulics, by name.",
+    freeAccess: "Manning's equation and the rectangular critical-depth relation are public results in the standard open-channel-hydraulics references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The rectangular-channel normal (uniform-flow) depth: the depth yn at which Manning's Q = (1.486/n) A R^(2/3) sqrt(S) is satisfied for a rectangular section (A = b yn, R = A/(b + 2 yn)), found by bisection because A and R both rise monotonically with depth. This is the Manning normal depth the Froude tile leaves out; comparing yn to the critical depth yc = (q^2/g)^(1/3) gives the slope class - yn > yc is a mild slope (subcritical normal flow), yn < yc is steep (supercritical). The velocity and Froude number are reported at the normal depth. It assumes steady uniform flow in a prismatic rectangular channel with the entered Manning roughness n; it does not compute a trapezoidal or irregular section, a gradually-varied (backwater) profile, or the partial-flow depth of a closed conduit. A design aid, not a substitute for a licensed engineer's hydraulic design; the engineer of record governs.",
+    assumptions: [
+      { name: "Manning normal depth", value: "Q = (1.486/n) A R^(2/3) sqrt(S), rectangular A = b y, R = A/(b + 2y), solved for y", source: "Chow open-channel hydraulics" },
+      { name: "Slope class", value: "yc = (q^2/g)^(1/3); yn > yc mild (subcritical), yn < yc steep (supercritical)", source: "Chow open-channel hydraulics" },
+      { name: "Scope", value: "prismatic rectangular channel, uniform flow; trapezoidal sections and backwater profiles are separate", source: "scope of this tile" },
+    ],
+  },
   "hydraulic-jump": {
     formula: "V1 = Q/(b y1); Fr1 = V1/sqrt(g y1) (> 1); y2 = (y1/2)(sqrt(1 + 8 Fr1^2) - 1); dE = (y2 - y1)^3/(4 y1 y2); efficiency = (y2 + V2^2/2g)/(y1 + V1^2/2g).",
     edition: "The Belanger momentum (sequent-depth) hydraulic-jump relation for a rectangular channel and the specific-energy loss, as compiled in Chow's Open-Channel Hydraulics, by name.",

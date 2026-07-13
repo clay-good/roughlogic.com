@@ -26437,6 +26437,46 @@
       "kind": "question"
     },
     {
+      "term": "channel normal depth",
+      "target": "channel-normal-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "manning normal depth",
+      "target": "channel-normal-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "uniform flow depth",
+      "target": "channel-normal-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "mild or steep slope",
+      "target": "channel-normal-depth",
+      "kind": "redirect"
+    },
+    {
+      "term": "normal depth of a rectangular channel",
+      "target": "channel-normal-depth",
+      "kind": "question"
+    },
+    {
+      "term": "how deep does a channel flow at a slope",
+      "target": "channel-normal-depth",
+      "kind": "question"
+    },
+    {
+      "term": "manning depth for a given flow",
+      "target": "channel-normal-depth",
+      "kind": "question"
+    },
+    {
+      "term": "is the channel mild or steep",
+      "target": "channel-normal-depth",
+      "kind": "question"
+    },
+    {
       "term": "how many gpd per square foot on a clarifier",
       "target": "clarifier-surface-loading",
       "kind": "question"

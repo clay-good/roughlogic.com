@@ -20360,6 +20360,33 @@ test("bounds: spec-v630 computeTankDrainTime pins the falling-head drain time, t
   assert.ok("error" in _v630({ tank_area_ft2: Infinity, d_in: 6, cd: 0.6, h1_ft: 9 }));
 });
 
+import { computeChannelNormalDepth as _v641 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v641 computeChannelNormalDepth solves the Manning normal depth, round-trips the discharge, flags the slope class, and pins error seams", () => {
+  const r = _v641({ b_ft: 10, q_cfs: 200, n: 0.015, s_slope: 0.001 });
+  assert.ok(Math.abs(r.yn_ft - 3.8157208735775967) < 1e-6);
+  // Algorithm-independent proof: feeding the returned normal depth back through
+  // Manning's equation must reconstruct the input discharge.
+  const A = 10 * r.yn_ft, R = A / (10 + 2 * r.yn_ft);
+  const qBack = (1.486 / 0.015) * A * Math.pow(R, 2 / 3) * Math.sqrt(0.001);
+  assert.ok(Math.abs(qBack - 200) < 1e-4);
+  // Velocity, Froude, and critical depth at the normal depth.
+  assert.ok(Math.abs(r.v_fps - 200 / A) < 1e-9);
+  assert.ok(Math.abs(r.fr - r.v_fps / Math.sqrt(32.2 * r.yn_ft)) < 1e-12);
+  assert.ok(Math.abs(r.yc_ft - Math.cbrt((200 / 10) ** 2 / 32.2)) < 1e-12);
+  // Mild slope: normal depth exceeds critical depth, so Fr < 1.
+  assert.ok(r.yn_ft > r.yc_ft && r.fr < 1);
+  // Steepening the slope shrinks the normal depth and speeds the flow.
+  const steep = _v641({ b_ft: 10, q_cfs: 200, n: 0.015, s_slope: 0.004 });
+  assert.ok(steep.yn_ft < r.yn_ft && steep.v_fps > r.v_fps);
+  // Error seams: non-positive width / discharge / roughness / slope, non-finite.
+  assert.ok("error" in _v641({ b_ft: 0, q_cfs: 200, n: 0.015, s_slope: 0.001 }));
+  assert.ok("error" in _v641({ b_ft: 10, q_cfs: 0, n: 0.015, s_slope: 0.001 }));
+  assert.ok("error" in _v641({ b_ft: 10, q_cfs: 200, n: 0, s_slope: 0.001 }));
+  assert.ok("error" in _v641({ b_ft: 10, q_cfs: 200, n: 0.015, s_slope: 0 }));
+  assert.ok("error" in _v641({ b_ft: 10, q_cfs: Infinity, n: 0.015, s_slope: 0.001 }));
+});
+
 import { computeManningPipeCapacity as _v640 } from "../../calc-plumbing.js";
 
 test("bounds: spec-v640 computeManningPipeCapacity pins the full-bore Manning capacity, the sqrt(S) slope law, and error seams", () => {

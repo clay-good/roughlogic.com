@@ -40974,6 +40974,70 @@
    }
   },
   {
+   "tile_id": "channel-normal-depth",
+   "source_publisher": "Manning normal depth (Chow, Open-Channel Hydraulics)",
+   "source_title": "10 ft rectangular channel, 200 cfs, n 0.015, 0.1% slope -> normal depth 3.82 ft at 5.24 ft/s, Fr 0.47 (mild slope)",
+   "source_edition_or_year": "spec-v641 worked example (machine-verified)",
+   "source_section_or_page": "spec-v641 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "b_ft": 10,
+    "q_cfs": 200,
+    "n": 0.015,
+    "s_slope": 0.001
+   },
+   "outputs": {
+    "yn_ft": {
+     "value": 3.816,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "v_fps": {
+     "value": 5.241,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "fr": {
+     "value": 0.473,
+     "tolerance": {
+      "pct": 1
+     }
+    },
+    "yc_ft": {
+     "value": 2.316,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "channel-normal-depth",
+   "source_publisher": "Manning normal depth (Chow, Open-Channel Hydraulics)",
+   "source_title": "cross-check: steepening the slope to 0.4% shrinks the same channel's normal depth to 2.34 ft (nearly critical, Fr 0.99)",
+   "source_edition_or_year": "spec-v641 worked example (machine-verified)",
+   "source_section_or_page": "spec-v641 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "b_ft": 10,
+    "q_cfs": 200,
+    "n": 0.015,
+    "s_slope": 0.004
+   },
+   "outputs": {
+    "yn_ft": {
+     "value": 2.340,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydraulic-jump",
    "source_publisher": "Belanger sequent depth (Chow, Open-Channel Hydraulics)",
    "source_title": "10 ft channel, 100 cfs, 0.8 ft (Fr1 2.46) -> sequent depth 2.42 ft, 0.55 ft head lost",

@@ -1231,7 +1231,8 @@ const RELATED = {
   "orifice-flow": ["orifice-diameter-for-flow","weir-flow","time-of-concentration","pipe-velocity"],
   "orifice-diameter-for-flow": ["orifice-flow","tank-drain-time","weir-flow","time-of-concentration"],
   "tank-drain-time": ["orifice-flow","weir-flow","detention-time"],
-  "channel-froude-number": ["manning-slope","weir-flow","orifice-flow","specific-energy"],
+  "channel-froude-number": ["channel-normal-depth","manning-slope","weir-flow","specific-energy"],
+  "channel-normal-depth": ["channel-froude-number","manning-slope","manning-pipe-capacity","specific-energy"],
   "hydraulic-jump": ["channel-froude-number","weir-flow","manning-slope","specific-energy"],
   "specific-energy": ["channel-froude-number","hydraulic-jump","manning-slope"],
   // spec-v305..v307 pump-and-fluid fundamentals batch (Group C)

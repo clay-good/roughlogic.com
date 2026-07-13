@@ -2271,6 +2271,7 @@ cross-check.
 | calc-plumbing.js | `computeBackflowSizing` | `{ service_flow_gpm = 0, hazard = "high", assembly_type = "RP", pipe_size_in =...` | _ | _ | _ |
 | calc-plumbing.js | `computeBernoulliHead` | `{ P_psi = 0, V_fps = 0, z_ft = 0, gamma = 62.4 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeChannelFroudeNumber` | `{ b_ft = 0, q_cfs = 0, y_ft = 0 } = {}` | _ | _ | _ |
+| calc-plumbing.js | `computeChannelNormalDepth` | `{ b_ft = 0, q_cfs = 0, n = 0, s_slope = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeDrainageInvert` | `{ invert_in_ft = 0, slope = 0, slope_units = "in_per_ft", run_ft = 0, pipe_od...` | _ | _ | _ |
 | calc-plumbing.js | `computeExpansionTank` | `{ system_volume_gal = 0, fill_temperature_F = 60, max_temperature_F = 200, fi...` | _ | _ | _ |
 | calc-plumbing.js | `computeFlowContinuity` | `{ V1_fps = 0, D1_in = 0, D2_in = 0 } = {}` | _ | _ | _ |
@@ -2747,7 +2748,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1333.
+Row count: 1334.
 
 <!-- END function-corpus-v14 -->
 
@@ -2973,7 +2974,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (91 tiles)
+### Group B Plumbing (92 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2984,6 +2985,7 @@ per spec-v14 §13.1 second paragraph.
 | `branch-reinforcement` | Branch Connection Reinforcement (Area Replacement, ASME B31.1) | ASME B31.1 para 104.3.1 area replacem...; spec-v204 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `branch-saddle-cutback` | Branch Saddle Cutback Template (Pipe-on-Pipe) | Cylinder-intersection geometry; Pipe ...; spec-v201 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `channel-froude-number` | Open-Channel Froude Number, Regime, and Critical Depth | Chow, Open-Channel Hydraulics; spec-v304 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `channel-normal-depth` | Rectangular Channel Normal Depth (Manning) | Manning normal depth (Chow, Open-Chan...; spec-v641 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `condensate-return-sizing` | Condensate Return Line Size From the Flash Steam | Continuity; ASHRAE / Spirax Sarco ret...; spec-v200 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cross-connection-air-gap` | Cross-Connection Air Gap (IPC 608.15.1) | IPC 608.15.1 / ASME A112.1.2; spec-v450 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drainage-invert` | Drainage Invert Elevation, Drop, and Cover | Project (first-principles); slope = 0.25/12 = 0.020833 ft/ft; total_fall = 0.020833 x... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4022,6 +4024,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1089. Fixture-covered or reference-cadence: 1089 / 1089.
+Tile count: 1090. Fixture-covered or reference-cadence: 1090 / 1090.
 
 <!-- END tile-index-v14 -->
