@@ -318,6 +318,49 @@ function _renderSteamPipeVelocity(inputRegion, outputRegion, citationEl) {
 PIPEFIT_RENDERERS["steam-pipe-velocity"] = _renderSteamPipeVelocity;
 
 // ---------------------------------------------------------------------
+// v643 Steam main capacity from size and velocity (steam-pipe-capacity)
+// The inverse of steam-pipe-velocity: given an existing Sch 40 main, how
+// much steam it carries within an allowable velocity.
+// ---------------------------------------------------------------------
+// dims: in { nps: dimensionless, spec_vol_ft3lb: L^3 M^-1, vel_ceiling_fpm: L T^-1 } out: { id_in: L, area_in2: L^2, capacity_lbhr: M T^-1 }
+export function computeSteamPipeCapacity({ nps = "2", spec_vol_ft3lb = 0, vel_ceiling_fpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sv = Number(spec_vol_ft3lb);
+  const vc = Number(vel_ceiling_fpm);
+  const row = _SCH40_ID_IN.find(([n]) => n === nps);
+  if (!row) return { error: "Unknown nominal Sch 40 size." };
+  if (!(sv > 0)) return { error: "Specific volume must be positive (ft3/lb)." };
+  if (!(vc > 0)) return { error: "Velocity ceiling must be positive (ft/min)." };
+  const id_in = row[1];
+  const area_ft2 = (Math.PI / 4) * Math.pow(id_in / 12, 2);
+  const capacity_lbhr = vc * 60 * area_ft2 / sv;
+  return { id_in, area_in2: area_ft2 * 144, capacity_lbhr };
+}
+export const steamPipeCapacityExample = { inputs: { nps: "2", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 } };
+
+function _renderSteamPipeCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Steam main capacity by continuity - max flow = velocity x 60 x internal area / specific_volume, the area from the Sch 40 ID - the inverse of the steam-main sizer, with the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) per ASHRAE Fundamentals / Systems, by name. The specific volume is read from the saturated-steam table at the line pressure. The velocity band is a recommendation, not a code limit; noise, erosion, and condensate reverse-flow bear on the choice, which the engineer of record governs.";
+  const size = makeSelect("Existing Sch 40 size (in)", "sc-size", _SCH40_ID_IN.map(([n, id]) => ({ value: n, label: n + " in (ID " + id + ")" })));
+  size.select.value = "2";
+  const sv = makeNumber("Steam specific volume at pressure (ft3/lb)", "sc-sv", { step: "any", min: "0" });
+  const vc = makeNumber("Allowable velocity (ft/min)", "sc-vc", { step: "any", min: "0", value: "6000" });
+  vc.input.value = "6000";
+  for (const f of [size, sv, vc]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { size.select.value = "2"; sv.input.value = "13.7"; vc.input.value = "6000"; update(); });
+  const oCap = makeOutputLine(outputRegion, "Max steam capacity", "sc-out-cap");
+  const oArea = makeOutputLine(outputRegion, "Internal area", "sc-out-area");
+  const update = debounce(() => {
+    const r = computeSteamPipeCapacity({ nps: size.select.value, spec_vol_ft3lb: Number(sv.input.value) || 0, vel_ceiling_fpm: Number(vc.input.value) || 0 });
+    if (r.error) { oCap.textContent = r.error; oArea.textContent = "-"; return; }
+    oCap.textContent = fmt(r.capacity_lbhr, 0) + " lb/hr";
+    oArea.textContent = fmt(r.area_in2, 2) + " in^2 (ID " + fmt(r.id_in, 3) + " in)";
+  }, DEBOUNCE_MS);
+  size.select.addEventListener("input", update);
+  for (const f of [sv.input, vc.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["steam-pipe-capacity"] = _renderSteamPipeCapacity;
+
+// ---------------------------------------------------------------------
 // v159 Steam trap condensate load and required capacity (steam-trap-sizing)
 // ---------------------------------------------------------------------
 // dims: in { heat_duty_btuhr: M L^2 T^-3, hfg_btulb: L^2 T^-2, safety_factor: dimensionless } out: { condensate_lbhr: M T^-1, req_capacity_lbhr: M T^-1 }

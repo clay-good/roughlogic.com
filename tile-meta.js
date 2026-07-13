@@ -788,7 +788,7 @@ const _TILES = [
   ["mold-cleaning-labor", "D"],
   // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench (Group B)
   ["flash-steam-pct", "B"],
-  ["steam-pipe-velocity", "B"],
+  ["steam-pipe-velocity", "B"], ["steam-pipe-capacity", "B"],
   ["steam-trap-sizing", "B"],
   ["steam-prv-napier", "B"],
   ["pipe-pressure-rating", "B"],

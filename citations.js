@@ -12295,6 +12295,18 @@ export const CITATIONS = {
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
   },
+  "steam-pipe-capacity": {
+    formula: "area_ft2 = (pi/4)(ID_in/12)^2 from the Sch 40 ID; capacity_lbhr = vel_ceiling_fpm x 60 x area_ft2 / spec_vol_ft3lb.",
+    edition: "First-principles continuity, the inverse of the steam-main sizer; the recommended velocity band (supply mains ~6,000 to 12,000 ft/min) and the saturated-steam specific volumes are from ASHRAE Fundamentals / Systems, by name. Sch 40 IDs are ASME B36.10M nominal mill dimensions.",
+    freeAccess: "Continuity (volumetric flow / specific volume = mass flow) is public; the steam specific volume comes from the published saturated-steam table at the line pressure.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (continuity and the nominal pipe schedule do not roll). The max steam mass flow an existing Sch 40 main carries within an allowable velocity, the inverse of the steam-main sizer: the internal area from the ASME B36.10M Sch 40 ID, times the velocity ceiling, over the specific volume. The velocity band is a RECOMMENDATION, not a code limit - noise, erosion, and the condensate-loading reverse-flow case at low velocity all bear on the choice, which the engineer of record governs. ASHRAE supplies the band and specific volumes.",
+    assumptions: [
+      { name: "Continuity", value: "capacity = velocity x internal area / specific volume (the inverse of the main sizer)", source: "first-principles continuity" },
+      { name: "Specific volume", value: "saturated-steam specific volume from the steam table at the line pressure (user-supplied for an off-table pressure)", source: "ASHRAE Fundamentals" },
+      { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
+    ],
+  },
   "steam-prv-napier": {
     formula: "choked = downstream_p_psia < 0.58 x upstream_p_psia; capacity W = 51.43 x discharge_coeff x orifice_area_in2 x upstream_p_psia [lb/hr] (saturated, choked).",
     edition: "Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name.",

@@ -1089,6 +1089,7 @@ export const COMPUTE_MAP = {
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },
   "flash-steam-pct": { module: "../../calc-pipefit.js", fn: "computeFlashSteamPct" },
   "steam-pipe-velocity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeVelocity" },
+  "steam-pipe-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeCapacity" },
   "steam-trap-sizing": { module: "../../calc-pipefit.js", fn: "computeSteamTrapSizing" },
   "steam-prv-napier": { module: "../../calc-pipefit.js", fn: "computeSteamPrvNapier" },
   "pipe-pressure-rating": { module: "../../calc-pipefit.js", fn: "computePipePressureRating" },

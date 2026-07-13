@@ -28106,6 +28106,56 @@
    }
   },
   {
+   "tile_id": "steam-pipe-capacity",
+   "source_publisher": "Continuity; ASHRAE Fundamentals / Systems (by name)",
+   "source_title": "2 in Sch 40 main (ID 2.067), 6,000 ft/min ceiling, 13.7 ft3/lb -> 612 lb/hr max steam",
+   "source_edition_or_year": "spec-v643 worked example (machine-verified, continuity)",
+   "source_section_or_page": "spec-v643 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "nps": "2",
+    "spec_vol_ft3lb": 13.7,
+    "vel_ceiling_fpm": 6000
+   },
+   "outputs": {
+    "capacity_lbhr": {
+     "value": 612.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "area_in2": {
+     "value": 3.356,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "steam-pipe-capacity",
+   "source_publisher": "Continuity; ASHRAE Fundamentals / Systems (by name)",
+   "source_title": "cross-check: a 4 in main (ID 4.026) at the same 6,000 ft/min carries 2,323 lb/hr - so the sizer's 2,000 lb/hr fits with margin",
+   "source_edition_or_year": "spec-v643 worked example (machine-verified, continuity)",
+   "source_section_or_page": "spec-v643 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "nps": "4",
+    "spec_vol_ft3lb": 13.7,
+    "vel_ceiling_fpm": 6000
+   },
+   "outputs": {
+    "capacity_lbhr": {
+     "value": 2323,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steam-trap-sizing",
    "source_publisher": "Steam thermodynamics; safety-factor practice (by name)",
    "source_title": "400,000 Btu/hr on 15 psig steam (hfg 945), 2x -> 423 lb/hr load, 847 lb/hr capacity",

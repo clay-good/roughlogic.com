@@ -853,7 +853,8 @@ const RELATED = {
   "pipe-spacing-rack": ["pipe-cold-spring", "pipe-expansion-loop", "pipe-fitting-takeout"],
   // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench
   "flash-steam-pct": ["steam-pipe-velocity", "steam-trap-sizing", "tankless-gpm"],
-  "steam-pipe-velocity": ["flash-steam-pct", "steam-trap-sizing", "boiler-pipe-sizing"],
+  "steam-pipe-velocity": ["steam-pipe-capacity", "flash-steam-pct", "steam-trap-sizing", "boiler-pipe-sizing"],
+  "steam-pipe-capacity": ["steam-pipe-velocity", "flash-steam-pct", "steam-trap-sizing", "boiler-pipe-sizing"],
   "steam-trap-sizing": ["flash-steam-pct", "steam-pipe-velocity", "boiler-pipe-sizing"],
   "steam-prv-napier": ["valve-flow-coefficient", "flash-steam-pct", "steam-trap-sizing"],
   // spec-v199 radiant; spec-v200..v203 condensate return + fabrication/process layout

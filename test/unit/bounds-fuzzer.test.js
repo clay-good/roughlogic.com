@@ -10784,6 +10784,28 @@ test("bounds: spec-v158 steam-pipe-velocity pins the size + actual velocity + fl
   assert.ok("error" in _v158({ steam_flow_lbhr: Infinity, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 }));
 });
 
+import { computeSteamPipeCapacity as _v643 } from "../../calc-pipefit.js";
+
+test("bounds: spec-v643 computeSteamPipeCapacity pins the main capacity, round-trips through the sizer, scales with velocity, and rejects bad inputs", () => {
+  const r = _v643({ nps: "2", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 });
+  assert.ok(Math.abs(r.capacity_lbhr - 612.3366813386499) < 1e-6);
+  assert.ok(Math.abs(r.area_in2 - 3.3556050137358007) < 1e-9);
+  assert.ok(r.id_in === 2.067);
+  // Exact inverse of the steam-main sizer: feeding this capacity back at the same
+  // velocity and specific volume must re-pick the 2 in main at ~6000 ft/min.
+  const back = _v158({ steam_flow_lbhr: r.capacity_lbhr, spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 });
+  assert.equal(back.chosen_nps, "2");
+  assert.ok(Math.abs(back.actual_fpm - 6000) < 1e-6);
+  // Capacity scales linearly with the velocity ceiling and inversely with specific volume.
+  assert.ok(Math.abs(_v643({ nps: "2", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 12000 }).capacity_lbhr - 2 * r.capacity_lbhr) < 1e-6);
+  assert.ok(Math.abs(_v643({ nps: "2", spec_vol_ft3lb: 27.4, vel_ceiling_fpm: 6000 }).capacity_lbhr - r.capacity_lbhr / 2) < 1e-6);
+  // Error seams: unknown size, non-positive specific volume / velocity, non-finite.
+  assert.ok("error" in _v643({ nps: "99", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 6000 }));
+  assert.ok("error" in _v643({ nps: "2", spec_vol_ft3lb: 0, vel_ceiling_fpm: 6000 }));
+  assert.ok("error" in _v643({ nps: "2", spec_vol_ft3lb: 13.7, vel_ceiling_fpm: 0 }));
+  assert.ok("error" in _v643({ nps: "2", spec_vol_ft3lb: Infinity, vel_ceiling_fpm: 6000 }));
+});
+
 test("bounds: spec-v159 steam-trap-sizing pins the load + capacity + the factor sets the target + rejects bad inputs", () => {
   const a = _v159({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 2 });
   assert.ok(Math.abs(a.condensate_lbhr - 423) < 1);

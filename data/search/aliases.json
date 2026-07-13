@@ -57412,6 +57412,46 @@
       "kind": "question"
     },
     {
+      "term": "steam pipe capacity",
+      "target": "steam-pipe-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "steam main capacity",
+      "target": "steam-pipe-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "steam pipe flow capacity",
+      "target": "steam-pipe-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "steam carrying capacity by size",
+      "target": "steam-pipe-capacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "how much steam can a pipe carry",
+      "target": "steam-pipe-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "lb per hour a steam main carries",
+      "target": "steam-pipe-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "max steam flow for a pipe size",
+      "target": "steam-pipe-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "capacity of an existing steam main",
+      "target": "steam-pipe-capacity",
+      "kind": "question"
+    },
+    {
       "term": "pounds per hour through a trap",
       "target": "steam-trap-sizing",
       "kind": "question"
