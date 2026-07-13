@@ -526,6 +526,53 @@ function renderSagVerticalCurve(inputRegion, outputRegion, citationEl) {
 }
 CIVIL_RENDERERS["sag-vertical-curve"] = renderSagVerticalCurve;
 
+// --- v638 E.x: Sag vertical curve comfort + drainage criteria (`sag-vertical-curve-comfort`) ---
+// AASHTO Green Book comfort criterion: L = A V^2 / 46.5 (A in %, V in mph, L in ft),
+// the length that limits the vertical (centripetal) acceleration on the sag to about
+// 1 ft/s^2. K = L/A = V^2/46.5. The drainage maximum K <= 167 (a 0.30% minimum grade
+// within 50 ft of the low point: 50/0.30 = 166.7) bounds the curve from the other side
+// on curbed sections, so the drainage-max length is 167 A. The two criteria bracket the
+// acceptable length; the headlight-SSD control is the separate `sag-vertical-curve` tile.
+// dims: in { A_pct: dimensionless, V_mph: L T^-1 } out: { L_ft: L, K_ft_per_pct: L, L_drainage_max_ft: L }
+export function computeSagVerticalCurveComfort({ A_pct, V_mph } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const A = Number(A_pct) || 0;
+  if (!(A > 0)) return { error: "Algebraic grade difference A must be greater than zero." };
+  const V = Number(V_mph) || 0;
+  if (!(V > 0)) return { error: "Design speed V must be greater than zero." };
+  const L = (A * V * V) / 46.5;
+  if (!Number.isFinite(L) || !(L > 0)) return { error: "Comfort minimum sag curve length is not valid for these inputs." };
+  const K = L / A; // = V^2/46.5, the rate of vertical curvature at the comfort minimum
+  const DRAIN_K_MAX = 167;
+  const L_drainage_max = DRAIN_K_MAX * A; // longest curve before drainage needs attention (curbed sections)
+  const drainageOk = K <= DRAIN_K_MAX;
+  return { L_ft: L, K_ft_per_pct: K, L_drainage_max_ft: L_drainage_max, drainage_K_max: DRAIN_K_MAX, drainage_ok: drainageOk };
+}
+export const sagVerticalCurveComfortExample = { inputs: { A_pct: 4, V_mph: 60 } };
+
+function renderSagVerticalCurveComfort(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO comfort and drainage sag vertical-curve controls per A Policy on Geometric Design of Highways and Streets (the Green Book): the comfort criterion L = A V^2 / 46.5 (A in %, V in mph, L in ft) limits the vertical acceleration to about 1 ft/s^2, giving K = L/A = V^2/46.5; the drainage maximum K <= 167 (a 0.30% minimum grade within 50 ft of the low point) caps the length at 167 A on curbed sections. These bracket the acceptable length; headlight stopping sight distance is the separate governing control (the sag-vertical-curve tile). A design aid, not a substitute for a licensed civil engineer's design.";
+  const A = makeNumber("Algebraic grade difference A (%, |g2-g1|)", "svcc-a", { step: "any", min: "0", value: "4" });
+  A.input.value = "4";
+  const V = makeNumber("Design speed V (mph)", "svcc-v", { step: "any", min: "0", value: "60" });
+  V.input.value = "60";
+  for (const fld of [A, V]) inputRegion.appendChild(fld.wrap);
+  const oL = makeOutputLine(outputRegion, "Comfort minimum length L", "svcc-out-l");
+  const oK = makeOutputLine(outputRegion, "Rate of vertical curvature K", "svcc-out-k");
+  const oD = makeOutputLine(outputRegion, "Drainage maximum length (K<=167)", "svcc-out-d");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSagVerticalCurveComfort({ A_pct: readNum(A.input), V_mph: readNum(V.input) });
+    if (r.error) { oL.textContent = r.error; oK.textContent = ""; oD.textContent = ""; return; }
+    oL.textContent = fmt(r.L_ft, 0) + " ft (K = " + fmt(r.K_ft_per_pct, 1) + " ft/%)";
+    oK.textContent = fmt(r.K_ft_per_pct, 1) + " ft/% (= V^2/46.5, comfort minimum)";
+    oD.textContent = fmt(r.L_drainage_max_ft, 0) + " ft" + (r.drainage_ok ? " (comfort length drains OK)" : " (comfort length exceeds drainage max)");
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { A.input.value = "4"; V.input.value = "60"; update(); });
+  for (const fld of [A.input, V.input]) fld.addEventListener("input", update);
+}
+CIVIL_RENDERERS["sag-vertical-curve-comfort"] = renderSagVerticalCurveComfort;
+
 // --- v337 E.x: Horizontal sightline offset for SSD on a curve (`horizontal-sightline-offset`) ---
 // AASHTO middle ordinate: M = R (1 - cos(28.65 S / R)) with the half-angle in
 // degrees (28.65 = 90/pi). Inverse mode: S = (R/28.65) arccos(1 - M/R). R is to

@@ -82880,6 +82880,51 @@
       "term": "how long should a sag curve be",
       "target": "sag-vertical-curve",
       "kind": "question"
+    },
+    {
+      "term": "sag vertical curve comfort",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "industry"
+    },
+    {
+      "term": "sag curve comfort criterion",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "industry"
+    },
+    {
+      "term": "sag vertical curve drainage",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "industry"
+    },
+    {
+      "term": "sag curve drainage criterion",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "redirect"
+    },
+    {
+      "term": "comfort criterion sag curve length",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sag curve max length drainage",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "redirect"
+    },
+    {
+      "term": "how long a sag vertical curve for comfort",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "question"
+    },
+    {
+      "term": "sag vertical curve comfort length aashto",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "question"
+    },
+    {
+      "term": "sag curve drainage k 167",
+      "target": "sag-vertical-curve-comfort",
+      "kind": "question"
     }
   ]
 }

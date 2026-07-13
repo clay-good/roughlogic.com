@@ -577,6 +577,7 @@ export const COMPUTE_MAP = {
   "superelevation": { module: "../../calc-civil.js", fn: "computeSuperelevation" },
   "vertical-curve-sight-distance": { module: "../../calc-civil.js", fn: "computeVerticalCurveSightDistance" },
   "sag-vertical-curve": { module: "../../calc-civil.js", fn: "computeSagVerticalCurve" },
+  "sag-vertical-curve-comfort": { module: "../../calc-civil.js", fn: "computeSagVerticalCurveComfort" },
   "horizontal-sightline-offset": { module: "../../calc-civil.js", fn: "computeHorizontalSightlineOffset" },
   "vertical-curve": { module: "../../calc-civil.js", fn: "computeVerticalCurve" },
   "earthwork-end-area": { module: "../../calc-civil.js", fn: "computeEarthworkEndArea" },

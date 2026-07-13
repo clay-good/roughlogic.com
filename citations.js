@@ -6293,6 +6293,18 @@ export const CITATIONS = {
       { name: "Headlight SSD only", value: "the comfort (A V^2/46.5) and drainage (K <= 167) criteria are separate checks", source: "scope of this tile" },
     ],
   },
+  "sag-vertical-curve-comfort": {
+    formula: "Comfort: L = A V^2 / 46.5 (A in %, V in mph, L in ft), K = L/A = V^2/46.5. Drainage maximum K <= 167 (a 0.30% minimum grade within 50 ft of the low point, 50/0.30 = 166.7), so the drainage-max length is 167 A.",
+    edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) sag vertical-curve comfort and drainage controls, by name.",
+    freeAccess: "The AASHTO sag-curve comfort and drainage relations are published in the Green Book and mirrored in state DOT design manuals. The AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The AASHTO Green Book comfort criterion L = A V^2 / 46.5 (A the algebraic grade difference in percent, V the design speed in mph, L the curve length in ft), which limits the vertical (centripetal) acceleration on the sag to about 1 ft/s^2, with K = L/A = V^2/46.5. The drainage maximum K <= 167 corresponds to a 0.30% minimum grade reached within 50 ft of the low point (50/0.30 = 166.7), so the drainage-max length is 167 A; longer curves need drainage attention on curbed sections. These two criteria bracket the acceptable length. This tile does not apply the headlight stopping-sight-distance control, which is the governing sag criterion for stopping and typically the most restrictive (the separate sag-vertical-curve tile); the comfort length is only about half the headlight length in the normal range. A design aid, not a substitute for a licensed civil engineer's design.",
+    assumptions: [
+      { name: "Comfort criterion", value: "L = A V^2 / 46.5 limits the vertical acceleration to about 1 ft/s^2; the 46.5 embeds that acceleration limit with V in mph and L in ft", source: "AASHTO Green Book" },
+      { name: "Drainage maximum", value: "K <= 167 from a 0.30% minimum grade within 50 ft of the low point (50/0.30 = 166.7); the drainage-max length is 167 A, applicable to curbed sections", source: "AASHTO Green Book" },
+      { name: "Not the SSD control", value: "the headlight stopping-sight-distance criterion (the governing sag stopping control) is a separate check, typically the most restrictive", source: "scope of this tile" },
+    ],
+  },
   "horizontal-sightline-offset": {
     formula: "M = R (1 - cos(28.65 S / R)) [half-angle in degrees]; inverse S = (R/28.65) arccos(1 - M/R); R to the inside-lane centerline.",
     edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) horizontal sightline offset (middle ordinate), by name.",

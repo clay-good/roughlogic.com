@@ -1499,6 +1499,7 @@ cross-check.
 | calc-civil.js | `computeHorizontalCurve` | `{ mode, radius_ft, degree_of_curve, delta_deg, pi_station_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeHorizontalSightlineOffset` | `{ mode, R_ft, S_ft, M_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSagVerticalCurve` | `{ A_pct, S_ft } = {}` | _ | _ | _ |
+| calc-civil.js | `computeSagVerticalCurveComfort` | `{ A_pct, V_mph } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSuperelevation` | `{ mode, V_mph, R_ft, e_max, f } = {}` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
@@ -2744,7 +2745,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1330.
+Row count: 1331.
 
 <!-- END function-corpus-v14 -->
 
@@ -3241,7 +3242,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (232 tiles)
+### Group E Construction (233 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3390,6 +3391,7 @@ per spec-v14 §13.1 second paragraph.
 | `roof-pitch` | Roof Pitch | Project (first-principles); Pitch (rise / 12 run); angle = atan(rise/run) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `roofing-squares` | Roofing Squares and Bundles | Project (industry rule of thumb); 2200 ft^2 roof / 6:12 pitch (12% waste) / architectural s... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sag-vertical-curve` | Sag Vertical Curve Length for Headlight SSD (AASHTO) | AASHTO Green Book (sag headlight crit...; spec-v636 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sag-vertical-curve-comfort` | Sag Vertical Curve Comfort and Drainage (AASHTO) | AASHTO Green Book (sag comfort criter...; spec-v638 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `section-properties` | Cross-Section Properties (A, I, S, r) | mechanics of materials; spec-v342 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-base-shear` | Seismic Base Shear (ASCE 7 §12.8 Equivalent Lateral Force) | ASCE 7 §12.8 equivalent lateral force; spec-v226 section 2.1 pinned example (short period) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-design-spectral-acceleration` | Design Spectral Response Accelerations SDS / SD1 (ASCE 7-22 11.4) | ASCE 7-22 11.4; spec-v381 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4016,6 +4018,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1086. Fixture-covered or reference-cadence: 1086 / 1086.
+Tile count: 1087. Fixture-covered or reference-cadence: 1087 / 1087.
 
 <!-- END tile-index-v14 -->

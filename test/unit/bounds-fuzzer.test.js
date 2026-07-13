@@ -20520,3 +20520,26 @@ test("bounds: spec-v636 computeSagVerticalCurve pins the sag length, both branch
   assert.ok("error" in _v636({ A_pct: 2, S_ft: 200 })); // L <= 0, degenerate
   assert.ok("error" in _v636({ A_pct: Infinity, S_ft: 400 }));
 });
+
+import { computeSagVerticalCurveComfort as _v638 } from "../../calc-civil.js";
+
+test("bounds: spec-v638 computeSagVerticalCurveComfort pins the comfort length, K, drainage max, and error seams", () => {
+  const r = _v638({ A_pct: 4, V_mph: 60 });
+  assert.ok(Math.abs(r.L_ft - 309.6774193548387) < 1e-6); // 4*3600/46.5
+  assert.ok(Math.abs(r.K_ft_per_pct - 77.41935483870968) < 1e-9); // 3600/46.5 = V^2/46.5
+  assert.ok(Math.abs(r.L_drainage_max_ft - 668) < 1e-9); // 167*4
+  assert.equal(r.drainage_K_max, 167);
+  assert.equal(r.drainage_ok, true); // K 77.4 <= 167
+  // K depends only on V: 6% break at 70 mph -> same K as any A at 70 mph.
+  const faster = _v638({ A_pct: 6, V_mph: 70 });
+  assert.ok(Math.abs(faster.L_ft - 632.258064516129) < 1e-6); // 6*4900/46.5
+  assert.ok(Math.abs(faster.K_ft_per_pct - 105.37634408602151) < 1e-9); // 4900/46.5
+  // Only an unrealistic design speed (> ~88 mph) makes the comfort length exceed the drainage max.
+  const extreme = _v638({ A_pct: 4, V_mph: 100 });
+  assert.equal(extreme.drainage_ok, false); // K 215 > 167
+  // Error seams: non-finite, non-positive A / V.
+  assert.ok("error" in _v638({ A_pct: 0, V_mph: 60 }));
+  assert.ok("error" in _v638({ A_pct: 4, V_mph: 0 }));
+  assert.ok("error" in _v638({ A_pct: Infinity, V_mph: 60 }));
+  assert.ok("error" in _v638({ A_pct: 4, V_mph: -60 }));
+});
