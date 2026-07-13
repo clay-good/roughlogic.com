@@ -1480,6 +1480,7 @@ cross-check.
 | calc-agriculture.js | `computeTankMix` | `{ tank_gal = 0, spray_volume_gpa = 0, product_rate_per_acre = 0, product_unit...` | _ | _ | _ |
 | calc-agriculture.js | `computeTimberCruise` | `{ small_end_dib_in = 0, log_length_ft = 16, rule = "doyle", price_per_bf = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeTwoStrokeMix` | `{ ratio = 50, fuel_amount = 0, fuel_unit = "gallon" } = {}` | _ | _ | _ |
+| calc-agriculture.js | `computeTwoStrokeMixRatioCheck` | `{ fuel_amount = 0, fuel_unit = "gallon", oil_amount = 0, target_ratio = 50 } ...` | _ | _ | _ |
 | calc-agriculture.js | `computeUniformity` | `{ catch_volumes = [] }` | _ | _ | _ |
 | calc-arborist.js | `computeBasalAreaPrism` | `{ baf = 0, in_tree_count = 0, dbh_in = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeChipperDebris` | `{ green_weight_lb, chip_density_lcy = 550, box_capacity_cy } = {}` | _ | _ | _ |
@@ -2759,7 +2760,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1345.
+Row count: 1346.
 
 <!-- END function-corpus-v14 -->
 
@@ -3719,7 +3720,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (54 tiles)
+### Group L Agriculture (55 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3777,6 +3778,7 @@ per spec-v14 §13.1 second paragraph.
 | `tree-rigging-shock` | Tree Rigging Shock (Dynamic) Load | Arborist rigging research / ANSI Z133...; 500 lb, 3 ft drop, 30 ft rope at 5% -> 1.5 ft stretch, 1,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `trunk-decay-strength` | Hollow / Decayed Trunk Strength Loss | Wagener 1963 / Mattheck t/R / ISA TRAQ; 24 in trunk, 4 in sound shell (hollow 16) -> 29.6% loss, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
 ### Group M Water and wastewater (40 tiles)
 
@@ -4046,6 +4048,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1101. Fixture-covered or reference-cadence: 1101 / 1101.
+Tile count: 1102. Fixture-covered or reference-cadence: 1102 / 1102.
 
 <!-- END tile-index-v14 -->

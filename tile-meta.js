@@ -117,7 +117,7 @@ const _TILES = [
   ["grain-aeration-airflow", "L"],
   ["manure-storage-volume", "L"],
   ["manure-cover-savings", "L"],
-  ["two-stroke-mix", "L"],
+  ["two-stroke-mix", "L"], ["two-stroke-mix-ratio-check", "L"],
   ["hp-from-torque", "K"],
   ["volumetric-efficiency", "K"],
   ["gear-mph-rpm", "K"],

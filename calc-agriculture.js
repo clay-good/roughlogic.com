@@ -1779,6 +1779,65 @@ function renderTwoStrokeMix(inputRegion, outputRegion, citationEl) {
 }
 AGRICULTURE_RENDERERS["two-stroke-mix"] = renderTwoStrokeMix;
 
+// --- spec-v653 L: two-stroke mix ratio CHECK (`two-stroke-mix-ratio-check`) ---
+// The inverse of two-stroke-mix: the achieved gas:oil ratio from the oil you
+// actually poured, flagged against a target. ratio = fuel volume / oil volume.
+// dims: in { fuel_amount: L^3, fuel_unit: dimensionless, oil_amount: L^3, target_ratio: dimensionless } out: { ratio: dimensionless, oz_per_gallon: dimensionless, ml_per_liter: dimensionless }
+export function computeTwoStrokeMixRatioCheck({ fuel_amount = 0, fuel_unit = "gallon", oil_amount = 0, target_ratio = 50 } = {}) {
+  const _g = _finiteGuard({ fuel_amount, oil_amount, target_ratio }); if (_g) return _g;
+  const fuel = Number(fuel_amount);
+  const oil = Number(oil_amount);
+  const tr = Number(target_ratio);
+  if (!(fuel > 0)) return { error: "Fuel amount must be positive." };
+  if (!(oil > 0)) return { error: "Oil amount must be positive." };
+  const unit = String(fuel_unit) === "liter" ? "liter" : "gallon";
+  const OZ_PER_GAL = 128;
+  const ratio = unit === "liter" ? (fuel * 1000) / oil : (fuel * OZ_PER_GAL) / oil;
+  const oz_per_gallon = OZ_PER_GAL / ratio;
+  const ml_per_liter = 1000 / ratio;
+  let verdict;
+  if (!(tr > 0)) {
+    verdict = "Enter a target ratio to compare.";
+  } else {
+    const pct = (ratio / tr - 1) * 100;
+    if (Math.abs(pct) <= 5) verdict = "on spec - within 5% of the " + fmt(tr, 0) + ":1 target";
+    else if (ratio > tr) verdict = "LEAN (too little oil) - " + fmt(ratio, 0) + ":1 vs the " + fmt(tr, 0) + ":1 target; a lean mix starves the bearings and risks scoring or seizure - add oil";
+    else verdict = "RICH (too much oil) - " + fmt(ratio, 0) + ":1 vs the " + fmt(tr, 0) + ":1 target; a rich mix smokes and fouls the plug but is the safer error - thin with fuel";
+  }
+  return {
+    ratio, oz_per_gallon, ml_per_liter, verdict,
+    note: "The inverse of the two-stroke mix tile: the achieved gas:oil ratio from the oil actually poured, ratio = fuel volume / oil volume (both in the same units; 1 US gallon = 128 fl oz). This mix is " + fmt(oz_per_gallon, 2) + " oz per gallon (" + fmt(ml_per_liter, 1) + " mL per liter). A LEAN mix (a higher X:1 than the target, too little oil) starves the bearings and is the dangerous error; a RICH mix (a lower X:1, too much oil) smokes and fouls but protects the engine. Use the oil grade and ratio the equipment maker specifies (commonly 50:1 with a JASO/ISO oil on modern air-cooled two-strokes); the equipment manual governs.",
+  };
+}
+export const twoStrokeMixRatioCheckExample = { inputs: { fuel_amount: 1, fuel_unit: "gallon", oil_amount: 2.56, target_ratio: 50 } };
+function renderTwoStrokeMixRatioCheck(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Two-stroke mix ratio check - ratio = fuel volume / oil volume (gas:oil by volume); 1 US gallon = 128 fl oz - first-principles volume arithmetic, the inverse of the two-stroke mix tile, public. Use the oil grade and ratio the equipment maker specifies; the equipment manual governs.";
+  const fuel = makeNumber("Fuel amount", "tsmc-fuel", { step: "any", min: "0", value: "1" }); fuel.input.value = "1";
+  const unit = makeSelect("Fuel unit", "tsmc-unit", [
+    { value: "gallon", label: "US gallons", selected: true }, { value: "liter", label: "liters" },
+  ]);
+  const oil = makeNumber("Oil added (fl oz for gallons, mL for liters)", "tsmc-oil", { step: "any", min: "0", value: "2.56" }); oil.input.value = "2.56";
+  const tr = makeNumber("Target ratio (X in X:1)", "tsmc-tr", { step: "any", min: "0", value: "50" }); tr.input.value = "50";
+  for (const f of [fuel, unit, oil, tr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { fuel.input.value = "1"; unit.select.value = "gallon"; oil.input.value = "2.56"; tr.input.value = "50"; update(); });
+  const oRatio = makeOutputLine(outputRegion, "Achieved ratio", "tsmc-out-ratio");
+  const oDose = makeOutputLine(outputRegion, "Dose", "tsmc-out-dose");
+  const oVerdict = makeOutputLine(outputRegion, "Verdict", "tsmc-out-verdict");
+  const oNote = makeOutputLine(outputRegion, "Note", "tsmc-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeTwoStrokeMixRatioCheck({ fuel_amount: readNum(fuel.input), fuel_unit: unit.select.value, oil_amount: readNum(oil.input), target_ratio: readNum(tr.input) });
+    if (r.error) { oRatio.textContent = r.error; oDose.textContent = "-"; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
+    oRatio.textContent = fmt(r.ratio, 1) + ":1";
+    oDose.textContent = fmt(r.oz_per_gallon, 2) + " oz/gal (" + fmt(r.ml_per_liter, 1) + " mL/L)";
+    oVerdict.textContent = r.verdict;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [fuel.input, oil.input, tr.input]) f.addEventListener("input", update);
+  unit.select.addEventListener("change", update);
+}
+AGRICULTURE_RENDERERS["two-stroke-mix-ratio-check"] = renderTwoStrokeMixRatioCheck;
+
 // --- spec-v84 sprayer nozzle / drift / field-capacity bench (3 tiles, Group L) ---
 // gpa-rate takes the nozzle flow as an input; these three derive that flow from
 // the tip's rated flow and the operating pressure (the square-root law), size the

@@ -917,7 +917,7 @@ const TOOL_MODULES = (() => {
     "manure-storage-volume",
     "manure-cover-savings",
     // v35
-    "two-stroke-mix",
+    "two-stroke-mix", "two-stroke-mix-ratio-check",
     // v84 sprayer nozzle / drift / field capacity
     "nozzle-flow-pressure", "spray-drift-buffer", "sprayer-field-capacity",
     // spec-v118 hay dry-matter and safe-storage weight.

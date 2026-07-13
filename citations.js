@@ -886,6 +886,17 @@ export const CITATIONS = {
       { name: "Ratio by volume", value: "the X:1 ratio is gas:oil by volume, the small-engine convention", source: "equipment manufacturer specification" },
     ],
   },
+  "two-stroke-mix-ratio-check": {
+    formula: "ratio = fuel volume / oil volume (same units; 1 US gallon = 128 fl oz); oz per gallon = 128 / ratio; verdict vs the target ratio.",
+    edition: "Two-stroke fuel/oil mix ratio check by volume, the inverse of the mix tile; first-principles volume arithmetic, public domain. The oil grade and ratio are set by the equipment manufacturer.",
+    freeAccess: "Pure arithmetic, public; modern air-cooled two-strokes are commonly 50:1 with a JASO/ISO oil, but the equipment manual governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of the two-stroke mix tile: from the fuel amount and the oil actually poured, the achieved gas:oil ratio is fuel volume / oil volume (both in the same units), compared against a target ratio. A LEAN mix (a higher X:1 than the target, too little oil) starves the crankshaft and rod bearings and is the dangerous error - it risks scoring or seizure; a RICH mix (a lower X:1, too much oil) smokes and fouls the plug but protects the engine. The ratio (50:1, 40:1, etc.) and oil specification come from the chainsaw / trimmer / outboard manual.",
+    assumptions: [
+      { name: "Ratio by volume", value: "achieved ratio = fuel volume / oil volume, gas:oil by volume", source: "equipment manufacturer specification" },
+      { name: "Lean vs rich", value: "a higher X:1 (lean) is the dangerous under-oiled error; a lower X:1 (rich) smokes but protects", source: "small-engine practice" },
+    ],
+  },
 
   "hp-from-torque": {
     formula: "HP = Torque(lb-ft) * RPM / 5252 (5252 = 33,000 / 2*pi); kW = HP * 0.7457. Torque and HP are equal at 5252 RPM by definition. Solve for any of {HP, torque, RPM}.",

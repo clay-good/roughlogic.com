@@ -77,6 +77,7 @@ export const COMPUTE_MAP = {
   "manure-storage-volume": { module: "../../calc-agriculture.js", fn: "computeManureStorageVolume" },
   "manure-cover-savings": { module: "../../calc-agriculture.js", fn: "computeManureCoverSavings" },
   "two-stroke-mix": { module: "../../calc-agriculture.js", fn: "computeTwoStrokeMix" },
+  "two-stroke-mix-ratio-check": { module: "../../calc-agriculture.js", fn: "computeTwoStrokeMixRatioCheck" },
   "hp-from-torque": { module: "../../calc-mechanic.js", fn: "computeHpFromTorque" },
   "volumetric-efficiency": { module: "../../calc-mechanic.js", fn: "computeVolumetricEfficiency" },
   "gear-mph-rpm": { module: "../../calc-mechanic.js", fn: "computeGearMphRpm" },

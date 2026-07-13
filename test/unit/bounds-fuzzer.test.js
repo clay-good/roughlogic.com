@@ -9033,6 +9033,29 @@ test("bounds: calc-agriculture v20 L + calc-water v20 M tiles pin constants + re
   assert.ok("error" in _m3({ flow_mgd: 0, dose_mgl: 8, strength_pct: 12.5, sg: 1.16, pump_max_gpd: 50 }));
 });
 
+import { computeTwoStrokeMixRatioCheck as _v653 } from "../../calc-agriculture.js";
+
+test("bounds: spec-v653 computeTwoStrokeMixRatioCheck inverts the mix tile, round-trips it, flags lean/rich, and pins error seams", () => {
+  const r = _v653({ fuel_amount: 1, fuel_unit: "gallon", oil_amount: 2.56, target_ratio: 50 });
+  assert.ok(Math.abs(r.ratio - 50) < 1e-9); // 128 / 2.56
+  assert.ok(Math.abs(r.oz_per_gallon - 128 / 50) < 1e-9);
+  assert.ok(r.verdict.includes("on spec"));
+  // Exact inverse of two-stroke-mix: the oil the mix tile prescribes for 50:1 checks back to 50:1.
+  assert.ok(Math.abs(_v653({ fuel_amount: 1, fuel_unit: "gallon", oil_amount: _l4({ ratio: 50, fuel_amount: 1 }).oil_oz, target_ratio: 50 }).ratio - 50) < 1e-9);
+  // Too much oil (3.2 oz/gal) is a richer 40:1, flagged RICH against a 50:1 target.
+  const rich = _v653({ fuel_amount: 1, fuel_unit: "gallon", oil_amount: 3.2, target_ratio: 50 });
+  assert.ok(Math.abs(rich.ratio - 40) < 1e-9 && rich.verdict.includes("RICH"));
+  // Too little oil (2 oz/gal) is a leaner 64:1, flagged LEAN (the dangerous error).
+  const lean = _v653({ fuel_amount: 1, fuel_unit: "gallon", oil_amount: 2.0, target_ratio: 50 });
+  assert.ok(Math.abs(lean.ratio - 64) < 1e-9 && lean.verdict.includes("LEAN"));
+  // Liters: 5 L with 100 mL is 50:1.
+  assert.ok(Math.abs(_v653({ fuel_amount: 5, fuel_unit: "liter", oil_amount: 100, target_ratio: 50 }).ratio - 50) < 1e-9);
+  // Error seams: non-positive fuel / oil, non-finite.
+  assert.ok("error" in _v653({ fuel_amount: 0, fuel_unit: "gallon", oil_amount: 2.56 }));
+  assert.ok("error" in _v653({ fuel_amount: 1, fuel_unit: "gallon", oil_amount: 0 }));
+  assert.ok("error" in _v653({ fuel_amount: Infinity, fuel_unit: "gallon", oil_amount: 2.56 }));
+});
+
 import { computePowerDistro as _n1 } from "../../calc-stage.js";
 import { computeBrineCure as _o1 } from "../../calc-kitchen.js";
 import { computeBakersPercentage as _o2 } from "../../calc-kitchen.js";

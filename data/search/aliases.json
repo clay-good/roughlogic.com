@@ -63352,6 +63352,36 @@
       "kind": "question"
     },
     {
+      "term": "two stroke mix ratio check",
+      "target": "two-stroke-mix-ratio-check",
+      "kind": "industry"
+    },
+    {
+      "term": "achieved mix ratio",
+      "target": "two-stroke-mix-ratio-check",
+      "kind": "industry"
+    },
+    {
+      "term": "verify two stroke mix",
+      "target": "two-stroke-mix-ratio-check",
+      "kind": "redirect"
+    },
+    {
+      "term": "what ratio did i mix",
+      "target": "two-stroke-mix-ratio-check",
+      "kind": "question"
+    },
+    {
+      "term": "did i mix too much oil",
+      "target": "two-stroke-mix-ratio-check",
+      "kind": "question"
+    },
+    {
+      "term": "check my gas oil mix",
+      "target": "two-stroke-mix-ratio-check",
+      "kind": "question"
+    },
+    {
       "term": "gauge block stack for angle",
       "target": "sine-bar",
       "kind": "question"
