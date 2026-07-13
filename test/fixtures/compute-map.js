@@ -633,6 +633,7 @@ export const COMPUTE_MAP = {
   "tolerance-stack-rss": { module: "../../calc-shop.js", fn: "computeToleranceStackRss" },
   "cone-flat-pattern": { module: "../../calc-shop.js", fn: "computeConeFlatPattern" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
+  "gear-identification": { module: "../../calc-machining.js", fn: "computeGearIdentification" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
   "circular-arc": { module: "../../calc-layout.js", fn: "computeCircularArc" },

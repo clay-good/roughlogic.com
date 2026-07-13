@@ -64222,6 +64222,41 @@
       "kind": "question"
     },
     {
+      "term": "gear identification",
+      "target": "gear-identification",
+      "kind": "industry"
+    },
+    {
+      "term": "unknown gear pitch",
+      "target": "gear-identification",
+      "kind": "industry"
+    },
+    {
+      "term": "gear module from measurement",
+      "target": "gear-identification",
+      "kind": "redirect"
+    },
+    {
+      "term": "identify a gear",
+      "target": "gear-identification",
+      "kind": "question"
+    },
+    {
+      "term": "what pitch is my gear",
+      "target": "gear-identification",
+      "kind": "question"
+    },
+    {
+      "term": "diametral pitch from teeth and od",
+      "target": "gear-identification",
+      "kind": "question"
+    },
+    {
+      "term": "find gear pitch",
+      "target": "gear-identification",
+      "kind": "question"
+    },
+    {
       "term": "how long will a bearing last",
       "target": "bearing-l10-life",
       "kind": "question"

@@ -7941,6 +7941,18 @@ export const CITATIONS = {
       { name: "Geometry only", value: "no tooth-strength, backlash, or undercut check", source: "scope of this tile" },
     ],
   },
+  "gear-identification": {
+    formula: "Pd = (N + 2)/OD; pitch dia = N/Pd; module = 25.4/Pd; snap Pd to the nearest standard value.",
+    edition: "Spur gear identification in the diametral-pitch system (20-degree full-depth involute; Machinery's Handbook / AGMA), the inverse of OD = (N+2)/Pd, by name.",
+    freeAccess: "The diametral-pitch tooth proportions and the standard Pd series are standard published gear geometry (Machinery's Handbook).",
+    governance: GOVERNANCE.general,
+    editionNote: "Identifying an unknown spur gear from the counted tooth count N and the measured outside (tip) diameter OD, the inverse of the spur-gear-geometry tile. Because OD = (N + 2)/Pd for a standard 20-degree full-depth involute, the diametral pitch is Pd = (N + 2)/OD (teeth per inch), the pitch diameter is N/Pd, and the metric module equivalent is 25.4/Pd. The computed Pd is snapped to the nearest standard diametral pitch so a caliper reading slightly off still identifies the gear; a large percent-off suggests a worn tip, a stub-tooth form, or a metric-module gear measured in inches. This assumes standard full-depth proportions; a stub, high, or nonstandard tooth form shifts the OD-to-Pd relation. A shop aid; confirm against the gear drawing or a gear gauge.",
+    assumptions: [
+      { name: "Pitch from OD", value: "Pd = (N + 2)/OD for a standard full-depth involute", source: "gear geometry" },
+      { name: "Standard-pitch snap", value: "the measured Pd is matched to the nearest standard diametral pitch for identification", source: "Machinery's Handbook Pd series" },
+      { name: "Tooth form", value: "assumes 20-deg full-depth proportions; a stub/nonstandard form shifts the relation", source: "scope of this tile" },
+    ],
+  },
 
   // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
   "circular-arc": {

@@ -16014,6 +16014,60 @@
    }
   },
   {
+   "tile_id": "gear-identification",
+   "source_publisher": "Machinery's Handbook / AGMA (inverse of OD = (N+2)/Pd)",
+   "source_title": "40 teeth on a measured 4.200 in OD -> Pd 10 teeth/in, pitch dia 4.000 in, module 2.54 mm (round-trips the gear-geometry example)",
+   "source_edition_or_year": "spec-v649 worked example (machine-verified)",
+   "source_section_or_page": "spec-v649 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "teeth": 40,
+    "outside_dia_in": 4.2
+   },
+   "outputs": {
+    "pd": {
+     "value": 10,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "pitch_dia_in": {
+     "value": 4.0,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "module_mm": {
+     "value": 2.54,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gear-identification",
+   "source_publisher": "Machinery's Handbook / AGMA (inverse of OD = (N+2)/Pd)",
+   "source_title": "cross-check: a finer 20-tooth gear on a 1.100 in OD -> Pd 20 teeth/in (a coarse gear reads a larger OD for the same tooth count)",
+   "source_edition_or_year": "spec-v649 worked example (machine-verified)",
+   "source_section_or_page": "spec-v649 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "teeth": 20,
+    "outside_dia_in": 1.1
+   },
+   "outputs": {
+    "pd": {
+     "value": 20,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bearing-l10-life",
    "source_publisher": "ISO 281 basic rating life",
    "source_title": "ball bearing C 5,000 lbf, P 1,000 lbf, 1,750 rpm -> 125 million rev, 1,190 hr",

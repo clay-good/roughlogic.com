@@ -420,6 +420,51 @@ function renderSpurGearGeometry(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["spur-gear-geometry"] = renderSpurGearGeometry;
 
+// ===================== spec-v649: gear identification (inverse of spur gear geometry) =====================
+// Standard diametral-pitch series (Machinery's Handbook coarse + fine), used only
+// to snap a measured Pd to the nearest catalog value for identification.
+const _STD_PD = [2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 48, 64];
+// dims: in { teeth: dimensionless, outside_dia_in: L } out: { pd: dimensionless, pitch_dia_in: L, module_mm: L, nearest_std_pd: dimensionless, pct_off: dimensionless }
+export function computeGearIdentification({ teeth = 0, outside_dia_in = 0 } = {}) {
+  const _g = _finiteGuard({ teeth, outside_dia_in }); if (_g) return _g;
+  const n = Number(teeth) || 0;
+  const od = Number(outside_dia_in) || 0;
+  if (!(n > 0)) return { error: "Number of teeth must be positive." };
+  if (!(od > 0)) return { error: "Measured outside diameter must be positive (in)." };
+  const pd = (n + 2) / od;
+  const pitch_dia_in = n / pd;
+  const module_mm = 25.4 / pd;
+  let nearest_std_pd = _STD_PD[0];
+  for (const s of _STD_PD) { if (Math.abs(s - pd) < Math.abs(nearest_std_pd - pd)) nearest_std_pd = s; }
+  const pct_off = Math.abs(pd - nearest_std_pd) / nearest_std_pd * 100;
+  return {
+    pd, pitch_dia_in, module_mm, nearest_std_pd, pct_off,
+    note: "Identify an unknown spur gear from a tooth count and a measured outside (tip) diameter, the inverse of the spur-gear-geometry tile. Because OD = (N + 2)/Pd, the diametral pitch is Pd = (N + 2)/OD (teeth per inch), the pitch diameter is N/Pd, and the metric module equivalent is 25.4/Pd. The measured Pd is snapped to the nearest standard value so a caliper reading a hair off still identifies the gear; a large percent-off means a worn tip, a stub-tooth gear, or a metric-module gear read in inches. Standard 20-degree full-depth involute proportions; a stub, high, or nonstandard tooth form shifts the OD-to-Pd relation. A shop aid; confirm against the gear drawing or a gear gauge.",
+  };
+}
+export const gearIdentificationExample = { inputs: { teeth: 40, outside_dia_in: 4.2 } };
+function renderGearIdentification(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Spur gear identification (diametral-pitch system, 20-degree full-depth involute; AGMA / Machinery's Handbook), the inverse of OD = (N+2)/Pd: Pd = (N+2)/OD, pitch dia = N/Pd, module = 25.4/Pd, snapped to the nearest standard Pd. A shop aid; confirm against the gear drawing or a gear gauge.";
+  const n = makeNumber("Number of teeth N (counted)", "gid-n", { step: "any", min: "0" }); n.input.value = "40";
+  const od = makeNumber("Measured outside diameter (in)", "gid-od", { step: "any", min: "0" }); od.input.value = "4.2";
+  for (const f of [n, od]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n.input.value = "40"; od.input.value = "4.2"; update(); });
+  const oPd = makeOutputLine(outputRegion, "Diametral pitch Pd", "gid-out-pd");
+  const oDia = makeOutputLine(outputRegion, "Pitch diameter", "gid-out-dia");
+  const oMod = makeOutputLine(outputRegion, "Metric module equivalent", "gid-out-mod");
+  const oNote = makeOutputLine(outputRegion, "Note", "gid-out-n");
+  const update = debounce(() => {
+    const r = computeGearIdentification({ teeth: Number(n.input.value) || 0, outside_dia_in: Number(od.input.value) || 0 });
+    if (r.error) { oPd.textContent = r.error; oDia.textContent = "-"; oMod.textContent = "-"; oNote.textContent = ""; return; }
+    oPd.textContent = fmt(r.pd, 2) + " teeth/in (nearest standard " + fmt(r.nearest_std_pd, 2) + ", " + fmt(r.pct_off, 1) + "% off)";
+    oDia.textContent = fmt(r.pitch_dia_in, 3) + " in";
+    oMod.textContent = fmt(r.module_mm, 3) + " mm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n, od]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["gear-identification"] = renderGearIdentification;
+
 // ===================== spec-v504: rolling-bearing L10 rating life (ISO 281) =====================
 // dims: in { dynamic_rating_lbf: M L T^-2, equivalent_load_lbf: M L T^-2, speed_rpm: T^-1, bearing_type: dimensionless } out: { p_exp: dimensionless, l10_rev: dimensionless, l10_hr: T }
 export function computeBearingL10Life({ dynamic_rating_lbf = 0, equivalent_load_lbf = 0, speed_rpm = 0, bearing_type = "ball" } = {}) {

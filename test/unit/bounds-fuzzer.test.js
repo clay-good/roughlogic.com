@@ -16414,6 +16414,27 @@ test("bounds: spec-v401 computeSpurGearGeometry pins the tooth proportions, cent
   assert.ok("error" in _v401({ diametral_pitch: Infinity, teeth: 40 }));
 });
 
+import { computeGearIdentification as _v649 } from "../../calc-machining.js";
+
+test("bounds: spec-v649 computeGearIdentification inverts the gear geometry, round-trips it, snaps to the standard pitch, and pins error seams", () => {
+  const r = _v649({ teeth: 40, outside_dia_in: 4.2 });
+  assert.ok(Math.abs(r.pd - 10) < 1e-12); // (40 + 2) / 4.2
+  assert.ok(Math.abs(r.pitch_dia_in - 4.0) < 1e-12);
+  assert.ok(Math.abs(r.module_mm - 25.4 / 10) < 1e-12);
+  assert.ok(r.nearest_std_pd === 10 && Math.abs(r.pct_off) < 1e-9);
+  // Exact inverse of spur-gear-geometry: the OD of the identified gear is the measured OD.
+  assert.ok(Math.abs(_v401({ diametral_pitch: r.pd, teeth: 40 }).outside_dia_in - 4.2) < 1e-12);
+  // A finer gear reads a smaller OD for the same tooth count.
+  assert.ok(Math.abs(_v649({ teeth: 20, outside_dia_in: 1.1 }).pd - 20) < 1e-12);
+  // A caliper a hair off still snaps to the nearest standard pitch.
+  const off = _v649({ teeth: 40, outside_dia_in: 4.18 });
+  assert.ok(off.nearest_std_pd === 10 && off.pd > 10 && off.pct_off > 0);
+  // Error seams: non-positive teeth / OD, non-finite.
+  assert.ok("error" in _v649({ teeth: 0, outside_dia_in: 4.2 }));
+  assert.ok("error" in _v649({ teeth: 40, outside_dia_in: 0 }));
+  assert.ok("error" in _v649({ teeth: Infinity, outside_dia_in: 4.2 }));
+});
+
 // ===================== spec-v402..v404 real-estate-investing trio (calc-realestate.js) =====================
 import { computeFixFlipProfit as _v402, computeBrrrrRefi as _v403, computeRentalTotalReturn as _v404 } from "../../calc-realestate.js";
 
