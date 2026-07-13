@@ -687,6 +687,47 @@ function renderPvEnergyYield(inputRegion, outputRegion, citationEl) {
   for (const f of [dc, psh, pr]) f.input.addEventListener("input", update);
 }
 
+// ===================== spec-v647: PV array sizing (inverse of the energy yield) =====================
+
+// dims: in { target_annual_kwh: M L^2 T^-2, psh: T, perf_ratio: dimensionless } out: { dc_kw: M L^2 T^-3, specific_yield: T, monthly_kwh_avg: M L^2 T^-2 }
+export function computePvArraySizing({ target_annual_kwh = 0, psh = 5.0, perf_ratio = 0.77 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_annual_kwh > 0)) return { error: "Target annual energy must be positive (kWh)." };
+  if (!(psh > 0)) return { error: "Peak-sun-hours must be positive." };
+  if (!(perf_ratio > 0 && perf_ratio <= 1)) return { error: "Performance ratio must be in (0, 1]." };
+  const specific_yield = psh * 365 * perf_ratio;
+  const dc_kw = target_annual_kwh / specific_yield;
+  const monthly_kwh_avg = target_annual_kwh / 12;
+  return {
+    dc_kw, specific_yield, monthly_kwh_avg,
+    note: "The inverse of the NREL PVWatts energy model: the DC nameplate needed to hit a target annual production. From annual energy = DC x peak-sun-hours x 365 x performance ratio, the required DC = target_annual / (PSH x 365 x PR). The specific yield PSH x 365 x PR (kWh per kWp) is the site's annual production per installed kW, so dividing the target by it gives the array size. To size from a monthly bill, enter the annual total (monthly x 12). The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth (not a fixed 5); the performance ratio (default 0.77, the PVWatts all-loss default) is the single biggest lever, and the array must be oversized slightly to cover degradation over its life. A pre-design estimate, not a bankable production model; module count and roof area then follow.",
+  };
+}
+function renderPvArraySizing(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NREL PVWatts energy model E = Pdc x PSH x 365 x PR solved for the array size, Pdc = E_target / (PSH x 365 x PR) (by name). The peak-sun-hours is the plane-of-array daily irradiation from NREL NSRDB / PVWatts for the site, tilt, and azimuth; the performance ratio (default 0.77, the PVWatts all-loss default) is the single biggest lever. A pre-design estimate, not a bankable production model.";
+  const kwh = makeNumber("Target annual energy (kWh/yr)", "pas-kwh", { step: "any", min: "0", value: "12000" });
+  kwh.input.value = "12000";
+  const psh = makeNumber("Peak-sun-hours (kWh/m2/day)", "pas-psh", { step: "any", min: "0", value: "5" });
+  psh.input.value = "5";
+  const pr = makeNumber("Performance ratio (0-1)", "pas-pr", { step: "any", min: "0", value: "0.77" });
+  pr.input.value = "0.77";
+  for (const f of [kwh, psh, pr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { kwh.input.value = "12000"; psh.input.value = "5"; pr.input.value = "0.77"; update(); });
+  const oDc = makeOutputLine(outputRegion, "Required DC array size", "pas-out-dc");
+  const oYield = makeOutputLine(outputRegion, "Specific yield", "pas-out-yield");
+  const oMonthly = makeOutputLine(outputRegion, "Target monthly average", "pas-out-monthly");
+  const oNote = makeOutputLine(outputRegion, "Note", "pas-out-note");
+  const update = debounce(() => {
+    const r = computePvArraySizing({ target_annual_kwh: Number(kwh.input.value) || 0, psh: Number(psh.input.value) || 0, perf_ratio: Number(pr.input.value) || 0 });
+    if (r.error) { oDc.textContent = r.error; oYield.textContent = "-"; oMonthly.textContent = "-"; oNote.textContent = ""; return; }
+    oDc.textContent = fmt(r.dc_kw, 2) + " kW DC";
+    oYield.textContent = fmt(r.specific_yield, 0) + " kWh/kWp";
+    oMonthly.textContent = fmt(r.monthly_kwh_avg, 0) + " kWh/month";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [kwh, psh, pr]) f.input.addEventListener("input", update);
+}
+
 // ===================== spec-v222: PV inter-row spacing and GCR =====================
 
 // dims: in { module_length_ft: L, tilt_deg: dimensionless, profile_angle_deg: dimensionless } out: { rise_ft: L, base_ft: L, shadow_ft: L, pitch_ft: L, gap_ft: L, gcr: dimensionless }
@@ -1000,6 +1041,7 @@ export const SOLAR_RENDERERS = {
   "pv-circuit-ampacity": renderPvCircuitAmpacity,
   // spec-v221..v223 PV system-design batch
   "pv-energy-yield": renderPvEnergyYield,
+  "pv-array-sizing": renderPvArraySizing,
   "pv-row-spacing": renderPvRowSpacing,
   "pv-inverter-ratio": renderPvInverterRatio,
   // spec-v236..v238 grid-tied battery-economics batch

@@ -1134,7 +1134,8 @@ const RELATED = {
   "ashrae-622-ventilation": ["blower-door-ach50","outdoor-air-ventilation","air-changes-hour"],
   "infiltration-load": ["blower-door-ach50","manual-j-heating","manual-j-cooling"],
   // spec-v221..v223 PV system-design batch (Group A)
-  "pv-energy-yield": ["pv-string-sizing","pv-inverter-ratio","solar-times"],
+  "pv-energy-yield": ["pv-array-sizing","pv-string-sizing","pv-inverter-ratio","solar-times"],
+  "pv-array-sizing": ["pv-energy-yield","pv-inverter-ratio","off-grid-battery","solar-times"],
   "pv-row-spacing": ["solar-times","pv-energy-yield","pv-string-sizing"],
   "pv-inverter-ratio": ["pv-string-sizing","pv-energy-yield","pv-circuit-ampacity"],
   // spec-v224..v226 ASCE 7 structural design-loads batch (Group E)

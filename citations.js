@@ -9407,6 +9407,18 @@ export const CITATIONS = {
       { name: "Benchmarks", value: "specific yield = annual / DC (kWh per kW); capacity factor = annual / (DC x 8760)", source: "first principles" },
     ],
   },
+  "pv-array-sizing": {
+    formula: "specific_yield = psh x 365 x perf_ratio; dc_kw = target_annual_kwh / specific_yield; monthly_kwh_avg = target_annual_kwh / 12.",
+    edition: "NREL PVWatts energy model (E_annual = P_dc x PSH x 365 x PR) solved for the array size, the inverse of the PV energy-yield tile, by name; the relations are public.",
+    freeAccess: "The PVWatts energy model is a public NREL relation; PVWatts is free at pvwatts.nrel.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "The NREL PVWatts energy model inverted for the array size: P_dc = E_target / (PSH x 365 x PR). The specific yield PSH x 365 x PR (kWh per kWp) is the site's annual production per installed kW, so the required DC nameplate is the target annual energy divided by it. The peak-sun-hours is the plane-of-array daily irradiation from NREL's NSRDB / PVWatts for the site, tilt, and azimuth (not a fixed 5); the performance ratio (default 0.77, the PVWatts all-loss default) is the single biggest lever, and the array must be oversized slightly to cover degradation over its life. A pre-design estimate, not a bankable production model; module count and roof area then follow.",
+    assumptions: [
+      { name: "Array size", value: "dc_kw = target_annual_kwh / (psh x 365 x perf_ratio) (PVWatts inverted)", source: "NREL PVWatts" },
+      { name: "Performance ratio", value: "PR (default 0.77) rolls up soiling, shading, mismatch, wiring, inverter, and availability losses", source: "NREL PVWatts" },
+      { name: "Specific yield", value: "psh x 365 x PR is the site's kWh per installed kWp", source: "first principles" },
+    ],
+  },
   "pv-row-spacing": {
     formula: "rise = L x sin(tilt); base = L x cos(tilt); shadow = rise / tan(profile_angle); pitch = base + shadow; gap = shadow; gcr = L / pitch.",
     edition: "NREL / Sandia PV array row-spacing geometry (pitch = L x cos(tilt) + L x sin(tilt) / tan(profile_angle), GCR = L / pitch), by name; the relations are first-principles trigonometry.",

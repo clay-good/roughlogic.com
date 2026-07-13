@@ -11943,6 +11943,27 @@ test("bounds: spec-v221 computePvEnergyYield pins annual energy, specific yield,
   assert.ok("error" in _v221({ dc_kw: Infinity, psh: 5 }));
 });
 
+import { computePvArraySizing as _v647 } from "../../calc-solar.js";
+
+test("bounds: spec-v647 computePvArraySizing inverts the PVWatts yield, round-trips it, scales inversely with PR, and pins error seams", () => {
+  const r = _v647({ target_annual_kwh: 12000, psh: 5.0, perf_ratio: 0.77 });
+  assert.ok(Math.abs(r.specific_yield - 1405.25) < 1e-9); // 5 x 365 x 0.77
+  assert.ok(Math.abs(r.dc_kw - 12000 / 1405.25) < 1e-9);
+  assert.ok(Math.abs(r.monthly_kwh_avg - 1000) < 1e-9);
+  // Exact inverse of pv-energy-yield: the annual energy the sized array produces equals the target.
+  assert.ok(Math.abs(_v221({ dc_kw: r.dc_kw, psh: 5.0, perf_ratio: 0.77 }).annual_kwh - 12000) < 1e-9);
+  // Round-trip the energy tile's own desert example: 14235 kWh at 6.5 PSH, 0.75 PR sizes to exactly 8 kW.
+  assert.ok(Math.abs(_v647({ target_annual_kwh: 14235, psh: 6.5, perf_ratio: 0.75 }).dc_kw - 8) < 1e-9);
+  // A lower performance ratio needs a bigger array for the same target.
+  assert.ok(_v647({ target_annual_kwh: 12000, psh: 5.0, perf_ratio: 0.70 }).dc_kw > r.dc_kw);
+  // Error seams: non-positive target / psh, PR out of (0,1], non-finite.
+  assert.ok("error" in _v647({ target_annual_kwh: 0, psh: 5, perf_ratio: 0.77 }));
+  assert.ok("error" in _v647({ target_annual_kwh: 12000, psh: 0, perf_ratio: 0.77 }));
+  assert.ok("error" in _v647({ target_annual_kwh: 12000, psh: 5, perf_ratio: 0 }));
+  assert.ok("error" in _v647({ target_annual_kwh: 12000, psh: 5, perf_ratio: 1.1 }));
+  assert.ok("error" in _v647({ target_annual_kwh: Infinity, psh: 5, perf_ratio: 0.77 }));
+});
+
 test("bounds: spec-v222 computePvRowSpacing pins pitch, GCR, the shallow-tilt case, and error seams", () => {
   const r = _v222({ module_length_ft: 6.5, tilt_deg: 30, profile_angle_deg: 22 });
   assert.ok(Math.abs(r.rise_ft - 3.25) < 1e-9);

@@ -26954,6 +26954,56 @@
    }
   },
   {
+   "tile_id": "pv-array-sizing",
+   "source_publisher": "NREL PVWatts energy model (inverted for array size)",
+   "source_title": "offset 12,000 kWh/yr at 5 PSH, 0.77 PR -> 8.54 kW DC (specific yield 1,405 kWh/kWp)",
+   "source_edition_or_year": "spec-v647 worked example (machine-verified)",
+   "source_section_or_page": "spec-v647 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_annual_kwh": 12000,
+    "psh": 5,
+    "perf_ratio": 0.77
+   },
+   "outputs": {
+    "dc_kw": {
+     "value": 8.539,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "specific_yield": {
+     "value": 1405.25,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "pv-array-sizing",
+   "source_publisher": "NREL PVWatts energy model (inverted for array size)",
+   "source_title": "round-trip: the energy tile's 14,235 kWh (8 kW desert) sizes back to exactly 8.00 kW at 6.5 PSH, 0.75 PR",
+   "source_edition_or_year": "spec-v647 worked example (machine-verified)",
+   "source_section_or_page": "spec-v647 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_annual_kwh": 14235,
+    "psh": 6.5,
+    "perf_ratio": 0.75
+   },
+   "outputs": {
+    "dc_kw": {
+     "value": 8.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-row-spacing",
    "source_publisher": "NREL / Sandia row-spacing geometry",
    "source_title": "6.5 ft module, 30 deg tilt, 22 deg sun -> 13.67 ft pitch, 0.475 GCR",

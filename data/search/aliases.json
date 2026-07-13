@@ -34792,6 +34792,41 @@
       "kind": "question"
     },
     {
+      "term": "pv array sizing",
+      "target": "pv-array-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "solar array size",
+      "target": "pv-array-sizing",
+      "kind": "industry"
+    },
+    {
+      "term": "size a solar array",
+      "target": "pv-array-sizing",
+      "kind": "redirect"
+    },
+    {
+      "term": "how many kw of solar do i need",
+      "target": "pv-array-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "kw needed to offset my bill",
+      "target": "pv-array-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "array size from annual kwh",
+      "target": "pv-array-sizing",
+      "kind": "question"
+    },
+    {
+      "term": "solar system size from usage",
+      "target": "pv-array-sizing",
+      "kind": "question"
+    },
+    {
       "term": "how far apart solar rows",
       "target": "pv-row-spacing",
       "kind": "question"
