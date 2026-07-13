@@ -2659,6 +2659,7 @@ cross-check.
 | calc-treatment.js | `computeChemicalFeedPump` | `{ flow_mgd = 0, dose_mgl = 0, strength_pct = 100, sg = 1, pump_max_gpd = 0 } ...` | _ | _ | _ |
 | calc-treatment.js | `computeChlorineCylinderWithdrawal` | `{ feed_rate_lb_day = 0, container_type = "cylinder", room_temp_f = 70 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeClarifierSurfaceLoading` | `{ flow_mgd = 0, surface_ft2 = 0, weir_len_ft = 0, mlss_mgl = 0 } = {}` | _ | _ | _ |
+| calc-treatment.js | `computeConductivityFromTds` | `{ tds_mgl = 0, k_factor = 0.65 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeDigesterGasProduction` | `{ vs_fed_lb_day = 0, vs_reduction_pct = 0, gas_yield_ft3_lb = 15, methane_pct...` | _ | _ | _ |
 | calc-treatment.js | `computeDigesterVsLoading` | `{ feed_flow_gpd = 0, percent_ts = 0, percent_vs = 0, digester_ft3 = 0 } = {}` | _ | _ | _ |
 | calc-treatment.js | `computeFlocculationGValue` | `{ power_input_w = 0, basin_volume_m3 = 0, water_temp_c = 15, detention_time_s...` | _ | _ | _ |
@@ -2763,7 +2764,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1349.
+Row count: 1350.
 
 <!-- END function-corpus-v14 -->
 
@@ -3786,7 +3787,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (40 tiles)
+### Group M Water and wastewater (41 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3800,6 +3801,7 @@ per spec-v14 §13.1 second paragraph.
 | `chlorine-demand` | Chlorine Demand and Dose for a Target Residual | Standard Methods 4500-Cl / AWWA M14 (...; spec-v116 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `clarifier-surface-loading` | Clarifier Surface, Weir, and Solids Loading | Ten States Standards / Metcalf & Eddy; spec-v405 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `coagulant-dose` | Coagulant Dose from Jar Test | USEPA / WEF; pure_lb_day = 5 * 20 * 8.34 = 834; product_lb_day = 834 /... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `conductivity-from-tds` | Conductivity from Total Dissolved Solids | Standard Methods 2510 (inverse of tds...; spec-v657 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-water-makeup` | Cooling Water Makeup (Cycles of Concentration) | CTI / ASHRAE; evap = 1000*10/1000 = 10; blowdown = 10/(4-1) = 3.333; dr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `detention-time` | Detention Time | USEPA; Standard hydraulic retention identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `digester-gas-production` | Digester Gas and Methane Production | Anaerobic digester gas production (WE...; 10,000 lb/day VS fed at 55% reduction, 15 ft3/lb, 65% met... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4054,6 +4056,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1105. Fixture-covered or reference-cadence: 1105 / 1105.
+Tile count: 1106. Fixture-covered or reference-cadence: 1106 / 1106.
 
 <!-- END tile-index-v14 -->

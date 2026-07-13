@@ -16698,6 +16698,23 @@ test("bounds: spec-v407 computeTdsFromConductivity pins TDS, the k-band, and err
   assert.ok("error" in _v407({ conductivity_us_cm: Infinity, k_factor: 0.65 }));
 });
 
+import { computeConductivityFromTds as _v657 } from "../../calc-treatment.js";
+
+test("bounds: spec-v657 computeConductivityFromTds inverts the TDS estimate, round-trips it, pins the k-band, and rejects bad inputs", () => {
+  const r = _v657({ tds_mgl: 650, k_factor: 0.65 });
+  assert.ok(Math.abs(r.conductivity_us_cm - 1000) < 1e-9); // 650 / 0.65
+  assert.ok(Math.abs(r.ec_low - 650 / 0.75) < 1e-9 && Math.abs(r.ec_high - 650 / 0.55) < 1e-9);
+  // Exact inverse of tds-from-conductivity: feeding the EC back reproduces the TDS.
+  assert.ok(Math.abs(_v407({ conductivity_us_cm: r.conductivity_us_cm, k_factor: 0.65 }).tds_mgl - 650) < 1e-9);
+  // A lower factor gives a higher conductivity for the same TDS.
+  assert.ok(_v657({ tds_mgl: 650, k_factor: 0.55 }).conductivity_us_cm > r.conductivity_us_cm);
+  // Error seams: non-positive TDS, out-of-range factor, non-finite.
+  assert.ok("error" in _v657({ tds_mgl: 0, k_factor: 0.65 }));
+  assert.ok("error" in _v657({ tds_mgl: 650, k_factor: 1.5 }));
+  assert.ok("error" in _v657({ tds_mgl: 650, k_factor: 0.3 }));
+  assert.ok("error" in _v657({ tds_mgl: Infinity, k_factor: 0.65 }));
+});
+
 // ===================== spec-v408..v410 HVAC duct-design trio (2 modules) =====================
 import { computeManualDFrictionRate as _v408 } from "../../calc-hvac.js";
 import { computeCoilFaceVelocity as _v409, computeVavBoxAirflow as _v410 } from "../../calc-hvacsystems.js";

@@ -740,6 +740,18 @@ export const CITATIONS = {
       { name: "Estimate", value: "not a gravimetric TDS; calibrate k to a lab result", source: "scope of this tile" },
     ],
   },
+  "conductivity-from-tds": {
+    formula: "conductivity_us_cm = tds_mgl / k_factor; k commonly 0.55-0.75 (default 0.65); band EC = TDS/0.75 to TDS/0.55.",
+    edition: "Electrical conductivity from total dissolved solids (Standard Methods 2510), the inverse of the TDS estimate, by name.",
+    freeAccess: "The TDS = k x EC correlation is a standard published water-quality relation; the k factor is calibrated to the specific water.",
+    governance: GOVERNANCE.water,
+    editionNote: "Electrical conductivity from total dissolved solids, the inverse of the TDS-from-conductivity estimate: EC (uS/cm at 25 C) = TDS (mg/L) / k, with the correlation factor k commonly 0.55-0.75 (default 0.65) depending on the dominant dissolved ions. Because a fixed TDS maps to a range of conductivity as k varies, the band EC = TDS/0.75 to TDS/0.55 is reported so the number is not read as exact. This is useful to predict a conductivity-meter reading from a target or permit TDS, or to set an EC alarm setpoint. The result is an estimate, not a measurement; calibrate k against a paired laboratory TDS and EC for the specific source water. An operations aid; the operator of record and the primacy agency govern compliance.",
+    assumptions: [
+      { name: "Correlation", value: "EC (uS/cm at 25 C) = TDS (mg/L) / k", source: "Standard Methods 2510" },
+      { name: "Factor range", value: "k commonly 0.55-0.75 by ion makeup; default 0.65", source: "water-quality practice" },
+      { name: "Estimate", value: "not a measurement; calibrate k to a paired lab TDS and EC", source: "scope of this tile" },
+    ],
+  },
 
   "growing-degree-days": {
     formula: "GDD = ((min(Tmax,cutoff) + Tmin_adj)/2) - base, floored at 0. The modified method caps Tmax at the cutoff and floors Tmin at the base before averaging.",

@@ -72162,6 +72162,36 @@
       "kind": "question"
     },
     {
+      "term": "conductivity from tds",
+      "target": "conductivity-from-tds",
+      "kind": "industry"
+    },
+    {
+      "term": "ec from tds",
+      "target": "conductivity-from-tds",
+      "kind": "industry"
+    },
+    {
+      "term": "tds to conductivity",
+      "target": "conductivity-from-tds",
+      "kind": "redirect"
+    },
+    {
+      "term": "predict conductivity from tds",
+      "target": "conductivity-from-tds",
+      "kind": "question"
+    },
+    {
+      "term": "conductivity meter reading from tds",
+      "target": "conductivity-from-tds",
+      "kind": "question"
+    },
+    {
+      "term": "microsiemens from tds",
+      "target": "conductivity-from-tds",
+      "kind": "question"
+    },
+    {
       "term": "population equivalent of industrial discharge",
       "target": "population-equivalent",
       "kind": "question"

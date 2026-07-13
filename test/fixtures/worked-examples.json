@@ -17280,6 +17280,48 @@
    }
   },
   {
+   "tile_id": "conductivity-from-tds",
+   "source_publisher": "Standard Methods 2510 (inverse of tds-from-conductivity)",
+   "source_title": "650 mg/L TDS at k 0.65 -> 1000 uS/cm (round-trips the TDS estimate)",
+   "source_edition_or_year": "spec-v657 worked example (machine-verified)",
+   "source_section_or_page": "spec-v657 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "tds_mgl": 650,
+    "k_factor": 0.65
+   },
+   "outputs": {
+    "conductivity_us_cm": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conductivity-from-tds",
+   "source_publisher": "Standard Methods 2510 (inverse of tds-from-conductivity)",
+   "source_title": "cross-check: the factor sets the band -> 867 uS/cm at k 0.75, 1182 at k 0.55 for 650 mg/L",
+   "source_edition_or_year": "spec-v657 worked example (machine-verified)",
+   "source_section_or_page": "spec-v657 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "tds_mgl": 650,
+    "k_factor": 0.75
+   },
+   "outputs": {
+    "conductivity_us_cm": {
+     "value": 866.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "power-distro",
    "source_publisher": "First-principles AC power + NEC 80% continuous rule",
    "source_title": "3-phase I = W/(sqrt(3)*V_LL*PF)",

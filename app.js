@@ -982,7 +982,7 @@ const TOOL_MODULES = (() => {
   // the v42/v70..v74 precedent).
   declare("./calc-treatment.js", "TREATMENT_RENDERERS", [
     "weir-flow", "langelier-index", "chemical-feed-pump",
-    "clarifier-surface-loading", "bod-tss-loading-removal", "tds-from-conductivity",
+    "clarifier-surface-loading", "bod-tss-loading-removal", "tds-from-conductivity", "conductivity-from-tds",
     // spec-v573
     "digester-vs-loading",
     // spec-v620

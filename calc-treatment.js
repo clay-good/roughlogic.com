@@ -616,6 +616,41 @@ function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["tds-from-conductivity"] = renderTdsFromConductivity;
 
+// --- spec-v657 M: electrical conductivity from TDS (inverse of tds-from-conductivity) ---
+// dims: in { tds_mgl: dimensionless, k_factor: dimensionless } out: { conductivity_us_cm: dimensionless }
+export function computeConductivityFromTds({ tds_mgl = 0, k_factor = 0.65 } = {}) {
+  const tds = Number(tds_mgl) || 0;
+  const k = Number(k_factor) || 0;
+  if (!(tds > 0 && Number.isFinite(tds))) return { error: "TDS must be positive (mg/L)." };
+  if (!(k >= 0.4 && k <= 0.9)) return { error: "TDS/EC factor must be between 0.4 and 0.9." };
+  const conductivity_us_cm = tds / k;
+  return {
+    conductivity_us_cm, ec_low: tds / 0.75, ec_high: tds / 0.55,
+    note: "Electrical conductivity from total dissolved solids, the inverse of the TDS estimate: EC (uS/cm at 25 C) = TDS (mg/L) / k, with the correlation factor k commonly 0.55-0.75 (default 0.65) depending on the dominant ions. Because a fixed TDS maps to a range of EC as k varies, the band EC = TDS/0.75 to TDS/0.55 is shown so the number is not read as exact. Useful to predict a conductivity-meter reading from a target or permit TDS, or to set an EC alarm setpoint. An estimate, not a measurement; calibrate k against a paired lab TDS and EC for the specific water. An operations aid; the operator of record and the primacy agency govern compliance.",
+  };
+}
+export const conductivityFromTdsExample = { inputs: { tds_mgl: 650, k_factor: 0.65 } };
+function renderConductivityFromTds(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: conductivity from TDS (Standard Methods 2510 / operator practice), the inverse of the TDS estimate: EC (uS/cm at 25 C) = TDS (mg/L) / k, k commonly 0.55-0.75 by ion makeup. An estimate, not a measurement; calibrate k against a lab result. An operations aid; the operator of record and the primacy agency govern compliance.";
+  const tds = makeNumber("Total dissolved solids (mg/L)", "cft-tds", { step: "any", min: "0" }); tds.input.value = "650";
+  const k = makeNumber("TDS/EC factor (0.4-0.9, default 0.65)", "cft-k", { step: "any", min: "0" }); k.input.value = "0.65";
+  for (const f of [tds, k]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tds.input.value = "650"; k.input.value = "0.65"; update(); });
+  const oEc = makeOutputLine(outputRegion, "Electrical conductivity", "cft-out-ec");
+  const oBand = makeOutputLine(outputRegion, "Range (k 0.55-0.75)", "cft-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "cft-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeConductivityFromTds({ tds_mgl: readNum(tds.input), k_factor: readNum(k.input) });
+    if (r.error) { oEc.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
+    oEc.textContent = fmt(r.conductivity_us_cm, 0) + " uS/cm";
+    oBand.textContent = fmt(r.ec_low, 0) + " to " + fmt(r.ec_high, 0) + " uS/cm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tds, k]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["conductivity-from-tds"] = renderConductivityFromTds;
+
 // --- spec-v573 M: Anaerobic digester volatile-solids loading rate ---
 // VS_fed = gpd*8.34*(%TS/100)*(%VS/100). VSLR = VS_fed/ft3*1000. DT = ft3*7.48/gpd.
 // dims: in { feed_flow_gpd: L^3 T^-1, percent_ts: dimensionless, percent_vs: dimensionless, digester_ft3: L^3 } out: { vs_fed_lb_day: M T^-1, vslr: dimensionless, dt_days: T }
