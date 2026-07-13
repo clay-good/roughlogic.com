@@ -43312,6 +43312,36 @@
       "kind": "question"
     },
     {
+      "term": "concrete cracking moment",
+      "target": "concrete-cracking-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "cracking moment",
+      "target": "concrete-cracking-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum reinforcement moment",
+      "target": "concrete-cracking-moment",
+      "kind": "redirect"
+    },
+    {
+      "term": "when does concrete crack in bending",
+      "target": "concrete-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "moment to crack concrete",
+      "target": "concrete-cracking-moment",
+      "kind": "question"
+    },
+    {
+      "term": "mcr from fr and section",
+      "target": "concrete-cracking-moment",
+      "kind": "question"
+    },
+    {
       "term": "temp steel for a slab how much",
       "target": "concrete-shrinkage-temperature-steel",
       "kind": "question"

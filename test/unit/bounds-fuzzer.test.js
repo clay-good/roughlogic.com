@@ -15587,6 +15587,31 @@ test("bounds: spec-v379 computeConcreteModulusOfRupture pins fr = 7.5 lambda sqr
   assert.ok("error" in _v379({ fc_psi: 4000, lambda: NaN }));
 });
 
+import { computeConcreteCrackingMoment as _v651 } from "../../calc-concrete.js";
+
+test("bounds: spec-v651 computeConcreteCrackingMoment pins Mcr = fr b h^2/6, its consistency with the rupture tile, the h^2 growth, and error seams", () => {
+  const r = _v651({ b_in: 12, h_in: 20, fc_psi: 4000, lambda: 1.0 });
+  assert.ok(Math.abs(r.fr_psi - 7.5 * Math.sqrt(4000)) < 1e-9);
+  assert.ok(Math.abs(r.sm_in3 - 800) < 1e-9); // 12 x 20^2 / 6
+  assert.ok(Math.abs(r.mcr_lbin - r.fr_psi * r.sm_in3) < 1e-6);
+  assert.ok(Math.abs(r.mcr_kipft - r.mcr_lbin / 12000) < 1e-9);
+  assert.ok(Math.abs(r.mcr_kipft - 31.62) < 0.02);
+  // fr is exactly the modulus-of-rupture tile's value at the same inputs.
+  assert.ok(Math.abs(r.fr_psi - _v379({ fc_psi: 4000, lambda: 1.0 }).fr_psi) < 1e-12);
+  // Mcr grows with h^2: a 24 in section (1.2x depth) cracks at 1.44x the moment.
+  const deep = _v651({ b_in: 12, h_in: 24, fc_psi: 4000, lambda: 1.0 });
+  assert.ok(Math.abs(deep.mcr_kipft / r.mcr_kipft - 1.44) < 1e-9);
+  // Lightweight (lower lambda) lowers Mcr and flags the band.
+  const lw = _v651({ b_in: 12, h_in: 20, fc_psi: 4000, lambda: 0.5 });
+  assert.ok(lw.mcr_kipft < r.mcr_kipft && lw.out_of_band === true);
+  // Error seams: non-positive b / h / f'c / lambda, non-finite.
+  assert.ok("error" in _v651({ b_in: 0, h_in: 20, fc_psi: 4000, lambda: 1.0 }));
+  assert.ok("error" in _v651({ b_in: 12, h_in: 0, fc_psi: 4000, lambda: 1.0 }));
+  assert.ok("error" in _v651({ b_in: 12, h_in: 20, fc_psi: 0, lambda: 1.0 }));
+  assert.ok("error" in _v651({ b_in: 12, h_in: 20, fc_psi: 4000, lambda: 0 }));
+  assert.ok("error" in _v651({ b_in: 12, h_in: 20, fc_psi: Infinity, lambda: 1.0 }));
+});
+
 test("bounds: spec-v380 computeConcreteShrinkageTemperatureSteel pins the ratio, As,min, s_max, and error seams", () => {
   const r = _v380({ h_in: 6, b_in: 12, grade_ksi: 60 });
   assert.ok(Math.abs(r.ratio - 0.0018) < 1e-12);

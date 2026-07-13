@@ -10897,6 +10897,18 @@ export const CITATIONS = {
       { name: "Design value", value: "conservative cracking stress; test strength scatters above it", source: "scope of this tile" },
     ],
   },
+  "concrete-cracking-moment": {
+    formula: "fr = 7.5 x lambda x sqrt(f'c); S = b h^2 / 6; Mcr = fr x S (= fr Ig/yt); Mcr_kipft = Mcr_lbin / 12000.",
+    edition: "The ACI 318-19 cracking moment Mcr = fr Ig/yt with the 19.2.3.1 modulus of rupture, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the cracking-moment and 19.2.3 rupture provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The ACI 318-19 cracking moment Mcr = fr Ig/yt, the bending moment at which a plain (uncracked) section first cracks in flexure. With the modulus of rupture fr = 7.5 x lambda x sqrt(f'c) psi (19.2.3.1; lambda 1.0 normalweight, 0.75 all-lightweight) and the gross rectangular section modulus S = Ig/yt = b h^2/6, Mcr = fr b h^2/6. This is the value behind the effective-moment-of-inertia (Ie) deflection analysis and the minimum-flexural-reinforcement check (the design flexural strength must reach at least 1.2 Mcr). It uses the gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or a heavily reinforced section uses the transformed gross moment of inertia. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Cracking moment", value: "Mcr = fr Ig/yt = fr b h^2/6 for a gross rectangular section", source: "ACI 318-19" },
+      { name: "Rupture stress", value: "fr = 7.5 x lambda x sqrt(f'c) psi (lambda 1.0 NW, 0.75 LW)", source: "ACI 318-19 19.2.3.1" },
+      { name: "Gross section", value: "reinforcement transform neglected; a T-beam uses the transformed Ig", source: "scope of this tile" },
+    ],
+  },
   "concrete-shrinkage-temperature-steel": {
     formula: "ratio = 0.0018 (Grade 60) or 0.0020 (Grade 40/50), never below 0.0014; As,min = ratio x b x h; s_max = min(5h, 18 in).",
     edition: "The ACI 318-19 24.4 shrinkage and temperature reinforcement provisions, by name.",

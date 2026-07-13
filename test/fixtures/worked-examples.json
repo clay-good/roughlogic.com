@@ -41012,6 +41012,64 @@
    }
   },
   {
+   "tile_id": "concrete-cracking-moment",
+   "source_publisher": "ACI 318-19 (Mcr = fr Ig/yt, 19.2.3 modulus of rupture)",
+   "source_title": "12 x 20 in section, 4000 psi normalweight -> fr 474 psi, S 800 in^3, Mcr 31.6 kip-ft",
+   "source_edition_or_year": "spec-v651 worked example (machine-verified)",
+   "source_section_or_page": "spec-v651 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "b_in": 12,
+    "h_in": 20,
+    "fc_psi": 4000,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "fr_psi": {
+     "value": 474.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "sm_in3": {
+     "value": 800,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "mcr_kipft": {
+     "value": 31.62,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "concrete-cracking-moment",
+   "source_publisher": "ACI 318-19 (Mcr = fr Ig/yt, 19.2.3 modulus of rupture)",
+   "source_title": "cross-check: a deeper 24 in section (same width, strength) cracks at 45.5 kip-ft - Mcr grows with h^2",
+   "source_edition_or_year": "spec-v651 worked example (machine-verified)",
+   "source_section_or_page": "spec-v651 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "b_in": 12,
+    "h_in": 24,
+    "fc_psi": 4000,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "mcr_kipft": {
+     "value": 45.54,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-shrinkage-temperature-steel",
    "source_publisher": "ACI 318-19 24.4",
    "source_title": "6 in slab, 12 in strip, Grade 60 -> ratio 0.0018, As,min 0.130 in^2/ft, s_max 18 in",

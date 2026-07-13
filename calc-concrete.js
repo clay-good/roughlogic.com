@@ -560,6 +560,42 @@ CONCRETE_RENDERERS["concrete-modulus-of-rupture"] = _simpleRenderer({
   compute: computeConcreteModulusOfRupture,
 });
 
+// dims: in { b_in: L, h_in: L, fc_psi: M L^-1 T^-2, lambda: dimensionless } out: { fr_psi: M L^-1 T^-2, sm_in3: L^3, mcr_lbin: M L^2 T^-2, mcr_kipft: M L^2 T^-2 }
+export function computeConcreteCrackingMoment({ b_in = 0, h_in = 0, fc_psi = 4000, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(b_in > 0)) return { error: "Section width b must be positive (in)." };
+  if (!(h_in > 0)) return { error: "Section depth h must be positive (in)." };
+  if (!(fc_psi > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(lambda > 0)) return { error: "Lightweight factor lambda must be positive." };
+  const fr_psi = 7.5 * lambda * Math.sqrt(fc_psi);
+  const sm_in3 = b_in * h_in * h_in / 6;
+  const mcr_lbin = fr_psi * sm_in3;
+  const mcr_kipft = mcr_lbin / 12000;
+  const out_of_band = lambda < 0.75 || lambda > 1.0;
+  return {
+    fr_psi, sm_in3, mcr_lbin, mcr_kipft, out_of_band,
+    note: "ACI 318-19 cracking moment Mcr = fr Ig / yt, the bending moment at which a plain (uncracked) section first cracks in flexure. With the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1; lambda 1.0 normalweight, 0.75 all-lightweight) and the gross rectangular section modulus S = Ig/yt = b h^2/6, Mcr = fr b h^2/6. This is the value behind the effective-moment-of-inertia (Ie) deflection analysis and the minimum-flexural-reinforcement check (the design strength must reach at least 1.2 Mcr). Gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or a heavily reinforced section uses the transformed Ig. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteCrackingMomentExample = { inputs: { b_in: 12, h_in: 20, fc_psi: 4000, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-cracking-moment"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 cracking moment Mcr = fr Ig/yt = fr b h^2/6 for a gross rectangular section, with the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1). The value behind the Ie deflection analysis and the minimum-reinforcement check (design strength >= 1.2 Mcr). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteCrackingMomentExample.inputs,
+  fields: [
+    { key: "b_in", label: "Section width b (in)", kind: "number", default: 12 },
+    { key: "h_in", label: "Section total depth h (in)", kind: "number", default: 20 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "mcr", id: "ccm-out-mcr", label: "Cracking moment Mcr", value: (r) => fmt(r.mcr_kipft, 2) + " kip-ft (" + fmt(r.mcr_lbin, 0) + " lb-in)" },
+    { key: "fr", id: "ccm-out-fr", label: "Modulus of rupture fr", value: (r) => fmt(r.fr_psi, 0) + " psi" + (r.out_of_band ? " (lambda out of 0.75-1.0)" : "") },
+    { key: "sm", id: "ccm-out-sm", label: "Gross section modulus S = b h^2/6", value: (r) => fmt(r.sm_in3, 0) + " in^3" },
+    { key: "n", id: "ccm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteCrackingMoment,
+});
+
 // dims: in { h_in: L, b_in: L, grade_ksi: M L^-1 T^-2 } out: { ratio: dimensionless, as_min_in2: L^2, s_max_in: L }
 export function computeConcreteShrinkageTemperatureSteel({ h_in = 0, b_in = 12, grade_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
