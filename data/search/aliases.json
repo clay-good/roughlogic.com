@@ -32887,6 +32887,36 @@
       "kind": "question"
     },
     {
+      "term": "motor pole identification",
+      "target": "motor-pole-identification",
+      "kind": "industry"
+    },
+    {
+      "term": "pole count from rpm",
+      "target": "motor-pole-identification",
+      "kind": "industry"
+    },
+    {
+      "term": "poles from nameplate speed",
+      "target": "motor-pole-identification",
+      "kind": "redirect"
+    },
+    {
+      "term": "how many poles is my motor",
+      "target": "motor-pole-identification",
+      "kind": "question"
+    },
+    {
+      "term": "identify motor poles",
+      "target": "motor-pole-identification",
+      "kind": "question"
+    },
+    {
+      "term": "what pole motor",
+      "target": "motor-pole-identification",
+      "kind": "question"
+    },
+    {
       "term": "torque of a 10 hp motor at 1750 rpm",
       "target": "motor-shaft-torque",
       "kind": "question"

@@ -991,7 +991,8 @@ const RELATED = {
   "bonding-jumper": ["grounding-electrode-conductor","egc-sizing","service-load-standard"],
   "min-conductor-for-vd": ["voltage-drop","wire-ampacity","copper-resistance"],
   // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
-  "motor-synchronous-speed-slip": ["motor-fla", "motor-vd-starting", "motor-branch-from-nameplate"],
+  "motor-synchronous-speed-slip": ["motor-pole-identification", "motor-fla", "motor-vd-starting", "motor-branch-from-nameplate"],
+  "motor-pole-identification": ["motor-synchronous-speed-slip", "motor-shaft-torque", "motor-fla", "motor-operating-cost"],
   "motor-shaft-torque": ["motor-synchronous-speed-slip", "motor-fla", "motor-operating-cost"],
   "motor-operating-cost": ["motor-shaft-torque", "motor-fla", "pf-correction"],
   "motor-efficiency-upgrade-savings": ["motor-operating-cost", "vfd-energy-savings", "motor-fla", "transformer-loading-efficiency"],

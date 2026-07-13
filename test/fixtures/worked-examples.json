@@ -29272,6 +29272,66 @@
    }
   },
   {
+   "tile_id": "motor-pole-identification",
+   "source_publisher": "First-principles AC-machine theory (inverse of Ns = 120 f / P)",
+   "source_title": "1750 rpm nameplate at 60 Hz -> 4-pole (Ns 1800 rpm, 2.78% slip)",
+   "source_edition_or_year": "spec-v654 worked example (machine-verified)",
+   "source_section_or_page": "spec-v654 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "rated_rpm": 1750,
+    "line_freq_hz": 60
+   },
+   "outputs": {
+    "poles": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sync_rpm": {
+     "value": 1800,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "slip_pct": {
+     "value": 2.78,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "motor-pole-identification",
+   "source_publisher": "First-principles AC-machine theory (inverse of Ns = 120 f / P)",
+   "source_title": "cross-check: a 1150 rpm nameplate is a 6-pole motor (Ns 1200 rpm)",
+   "source_edition_or_year": "spec-v654 worked example (machine-verified)",
+   "source_section_or_page": "spec-v654 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "rated_rpm": 1150,
+    "line_freq_hz": 60
+   },
+   "outputs": {
+    "poles": {
+     "value": 6,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "sync_rpm": {
+     "value": 1200,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "motor-shaft-torque",
    "source_publisher": "First-principles rotational-power identity",
    "source_title": "10 HP at 1750 rpm -> 30.0 lb-ft",

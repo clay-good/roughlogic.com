@@ -78,6 +78,45 @@ function renderMotorSyncSlip(inputRegion, outputRegion, citationEl) {
 }
 MOTOR_RENDERERS["motor-synchronous-speed-slip"] = renderMotorSyncSlip;
 
+// dims: in { rated_rpm: T^-1, line_freq_hz: T^-1 } out: { poles: dimensionless, sync_rpm: T^-1, slip: dimensionless, slip_pct: dimensionless }
+export function computeMotorPoleIdentification({ rated_rpm = 0, line_freq_hz = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(rated_rpm > 0)) return { error: "Nameplate full-load speed must be positive (rpm)." };
+  if (!(line_freq_hz > 0)) return { error: "Line frequency must be positive (Hz)." };
+  const pole_pairs = Math.round((60 * line_freq_hz) / rated_rpm);
+  const poles = Math.max(2, 2 * pole_pairs);
+  const sync_rpm = (120 * line_freq_hz) / poles;
+  const slip = (sync_rpm - rated_rpm) / sync_rpm;
+  const slip_pct = slip * 100;
+  const at_or_above_sync = slip <= 0;
+  return {
+    poles, sync_rpm, slip, slip_pct, at_or_above_sync,
+    note: "Identify an induction motor's pole count from the nameplate full-load speed and the line frequency, the inverse of the synchronous-speed relation Ns = 120 x f / P. The synchronous speed sits just above the running speed, so the pole count is the nearest even integer: pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. A 1750 rpm 60 Hz motor is a 4-pole machine (Ns 1800, 2.78% slip); 1150 rpm is 6-pole, 3450 rpm is 2-pole. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows - recheck the rpm or frequency. The nameplate and the manufacturer govern.",
+  };
+}
+export const motorPoleIdentificationExample = { inputs: { rated_rpm: 1750, line_freq_hz: 60 } };
+function renderMotorPoleIdentification(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles AC-machine relation Ns = 120 x f / P inverted to identify the poles - pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs, then Ns = 120 x f / poles and slip = (Ns - rpm)/Ns. The motor nameplate and the manufacturer govern the rated full-load speed.";
+  const rpm = makeNumber("Nameplate full-load speed (rpm)", "mpi-rpm", { step: "any", min: "0", value: "1750" });
+  rpm.input.value = "1750";
+  const freq = makeNumber("Line frequency (Hz)", "mpi-freq", { step: "any", min: "0", value: "60" });
+  freq.input.value = "60";
+  for (const f of [rpm, freq]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { rpm.input.value = "1750"; freq.input.value = "60"; update(); });
+  const oPoles = makeOutputLine(outputRegion, "Poles / synchronous speed", "mpi-out-poles");
+  const oSlip = makeOutputLine(outputRegion, "Full-load slip", "mpi-out-slip");
+  const oNote = makeOutputLine(outputRegion, "Note", "mpi-out-note");
+  const update = debounce(() => {
+    const r = computeMotorPoleIdentification({ rated_rpm: Number(rpm.input.value) || 0, line_freq_hz: Number(freq.input.value) || 0 });
+    if (r.error) { oPoles.textContent = r.error; oSlip.textContent = "-"; oNote.textContent = "-"; return; }
+    oPoles.textContent = fmt(r.poles, 0) + "-pole (Ns " + fmt(r.sync_rpm, 0) + " rpm)";
+    oSlip.textContent = r.at_or_above_sync ? fmt(r.slip_pct, 2) + " % - at/above synchronous, recheck the rpm/frequency" : fmt(r.slip_pct, 2) + " % (slip " + fmt(r.slip, 4) + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [rpm.input, freq.input]) el.addEventListener("input", update);
+}
+MOTOR_RENDERERS["motor-pole-identification"] = renderMotorPoleIdentification;
+
 // dims: in { rpm: T^-1, hp: M L^2 T^-3, torque_lbft: M L^2 T^-2 } out: { hp: M L^2 T^-3, torque_lbft: M L^2 T^-2, rpm: T^-1 }
 export function computeMotorShaftTorque({ rpm = 0, hp = null, torque_lbft = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

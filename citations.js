@@ -2308,6 +2308,17 @@ export const CITATIONS = {
       { name: "Pole count", value: "the stator pole count is an even integer (2, 4, 6, 8, ...)", source: "AC-machine construction" },
     ],
   },
+  "motor-pole-identification": {
+    formula: "pole-pairs = round(60 x f / rpm); poles = 2 x pole-pairs; Ns = 120 x f / poles; slip = (Ns - rpm) / Ns.",
+    edition: "First-principles AC-machine speed relation Ns = 120 x f / P inverted to identify the poles; classical induction-machine theory.",
+    freeAccess: "First-principles physics; no licensed source required.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of the synchronous-speed relation: given the nameplate full-load speed and the line frequency, identify the pole count. Because the synchronous speed sits just above the running speed, the pole count is the nearest even integer to 120 x f / rpm - pole-pairs = round(60 x f / rpm), poles = 2 x pole-pairs - and then the synchronous speed Ns = 120 x f / poles and slip = (Ns - rpm)/Ns follow. If the entered speed is at or above the identified synchronous speed the slip is zero or negative, which an induction-motor nameplate never shows, so the rpm or frequency should be rechecked. The nameplate and the manufacturer govern.",
+    assumptions: [
+      { name: "Nearest even poles", value: "poles = 2 x round(60 x f / rpm); the synchronous speed sits just above the running speed", source: "AC-machine theory" },
+      { name: "Induction machine", value: "the nameplate speed is below synchronous; a zero/negative slip flags a bad rpm or frequency", source: "AC-machine construction" },
+    ],
+  },
 
   "motor-shaft-torque": {
     formula: "T = 5252 x HP / RPM (5252 = 33,000 ft-lb/min per HP divided by 2 pi, the rev/min-to-rad/s bridge); inverse HP = T x RPM / 5252. Supply exactly one of HP or torque; the tile solves for the other.",

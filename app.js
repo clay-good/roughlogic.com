@@ -73,7 +73,7 @@ const TOOL_MODULES = (() => {
   // independent of module, the v79/v88/v101 precedent); ids, citations,
   // examples, and behavior unchanged.
   declare("./calc-motor.js", "MOTOR_RENDERERS", [
-    "motor-synchronous-speed-slip", "motor-shaft-torque", "motor-operating-cost",
+    "motor-synchronous-speed-slip", "motor-pole-identification", "motor-shaft-torque", "motor-operating-cost",
     "multi-motor-feeder",
     // spec-v278 NEC 430.32 running overload
     "motor-overload-sizing",

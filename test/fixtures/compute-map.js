@@ -965,6 +965,7 @@ export const COMPUTE_MAP = {
   "bonding-jumper": { module: "../../calc-electrical.js", fn: "computeBondingJumper" },
   "min-conductor-for-vd": { module: "../../calc-electrical.js", fn: "computeMinConductorForVd" },
   "motor-synchronous-speed-slip": { module: "../../calc-motor.js", fn: "computeMotorSyncSlip" },
+  "motor-pole-identification": { module: "../../calc-motor.js", fn: "computeMotorPoleIdentification" },
   "motor-shaft-torque": { module: "../../calc-motor.js", fn: "computeMotorShaftTorque" },
   "motor-operating-cost": { module: "../../calc-motor.js", fn: "computeMotorOperatingCost" },
   "multi-motor-feeder": { module: "../../calc-motor.js", fn: "computeMultiMotorFeeder" },

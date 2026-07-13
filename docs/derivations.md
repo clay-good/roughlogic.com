@@ -2253,6 +2253,7 @@ cross-check.
 | calc-motor.js | `computeMotorLockedRotorKva` | `{ horsepower = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorOperatingCost` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rat...` | _ | _ | _ |
 | calc-motor.js | `computeMotorOverloadSizing` | `{ fla_A = 0, sf = 0, rise_C = 0 } = {}` | _ | _ | _ |
+| calc-motor.js | `computeMotorPoleIdentification` | `{ rated_rpm = 0, line_freq_hz = 60 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
@@ -2760,7 +2761,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1346.
+Row count: 1347.
 
 <!-- END function-corpus-v14 -->
 
@@ -2841,7 +2842,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (141 tiles)
+### Group A Electrical (142 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2918,6 +2919,7 @@ per spec-v14 §13.1 second paragraph.
 | `motor-locked-rotor-kva` | Motor Locked-Rotor Current from Code Letter (NEC 430.7(B)) | NEC 2023 Table 430.7(B); spec-v499 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-operating-cost` | Motor Input Power, Annual Energy, and Cost | First-principles motor input power; spec-v123 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-overload-sizing` | Motor Running Overload Protection (NEC 430.32) | NEC 2023 430.32(A)(1) / 430.32(C); spec-v278 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-pole-identification` | Motor Pole Count from Nameplate RPM | First-principles AC-machine theory (i...; spec-v654 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-shaft-torque` | Motor Shaft Torque, Horsepower, and Speed | First-principles rotational-power ide...; spec-v122 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-synchronous-speed-slip` | Motor Synchronous Speed, Slip, and Rotor Frequency | First-principles AC-machine theory; spec-v121 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-unbalance-derate` | Motor Derating for Voltage Unbalance (NEMA MG-1) | NEMA MG-1; avg 455, max dev 5 -> 1.10% unbalance -> derate ~0.977 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4048,6 +4050,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1102. Fixture-covered or reference-cadence: 1102 / 1102.
+Tile count: 1103. Fixture-covered or reference-cadence: 1103 / 1103.
 
 <!-- END tile-index-v14 -->

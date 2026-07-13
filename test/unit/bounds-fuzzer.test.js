@@ -11103,6 +11103,29 @@ test("bounds: calc-motor computeMotorSyncSlip pins Ns = 120 f / P, slip, and rot
   assert.ok("error" in computeMotorSyncSlip({ line_freq_hz: 60, poles: 4, rated_rpm: -10 }));
 });
 
+import { computeMotorPoleIdentification as _v654 } from "../../calc-motor.js";
+
+test("bounds: spec-v654 computeMotorPoleIdentification identifies the poles, round-trips the sync-slip tile, flags over-synchronous, and pins error seams", () => {
+  const r = _v654({ rated_rpm: 1750, line_freq_hz: 60 });
+  assert.equal(r.poles, 4); // round(3600/1750) = 2 pole-pairs
+  assert.ok(Math.abs(r.sync_rpm - 1800) < 1e-9);
+  assert.ok(Math.abs(r.slip_pct - 100 * (1800 - 1750) / 1800) < 1e-9);
+  assert.ok(r.at_or_above_sync === false);
+  // Exact inverse of the sync-slip tile: the identified poles reproduce the same Ns and slip.
+  const back = computeMotorSyncSlip({ line_freq_hz: 60, poles: r.poles, rated_rpm: 1750 });
+  assert.ok(Math.abs(back.sync_rpm - r.sync_rpm) < 1e-9 && Math.abs(back.slip_pct - r.slip_pct) < 1e-9);
+  // Common nameplates snap to the right pole count.
+  assert.equal(_v654({ rated_rpm: 1150, line_freq_hz: 60 }).poles, 6);
+  assert.equal(_v654({ rated_rpm: 3450, line_freq_hz: 60 }).poles, 2);
+  assert.equal(_v654({ rated_rpm: 1450, line_freq_hz: 50 }).poles, 4);
+  // A speed at/above the identified synchronous speed is flagged.
+  assert.ok(_v654({ rated_rpm: 1800, line_freq_hz: 60 }).at_or_above_sync === true);
+  // Error seams: non-positive rpm / frequency, non-finite.
+  assert.ok("error" in _v654({ rated_rpm: 0, line_freq_hz: 60 }));
+  assert.ok("error" in _v654({ rated_rpm: 1750, line_freq_hz: 0 }));
+  assert.ok("error" in _v654({ rated_rpm: Infinity, line_freq_hz: 60 }));
+});
+
 test("bounds: calc-motor computeMotorShaftTorque solves both directions + rejects both/neither and bad rpm", () => {
   const r = computeMotorShaftTorque({ rpm: 1750, hp: 10 });
   assert.ok(Math.abs(r.torque_lbft - 30.011) < 0.05);
