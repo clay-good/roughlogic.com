@@ -20360,6 +20360,28 @@ test("bounds: spec-v630 computeTankDrainTime pins the falling-head drain time, t
   assert.ok("error" in _v630({ tank_area_ft2: Infinity, d_in: 6, cd: 0.6, h1_ft: 9 }));
 });
 
+import { computeOrificeDiameterForFlow as _v639 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v639 computeOrificeDiameterForFlow inverts the orifice equation, round-trips the orifice-flow example, holds the 1/sqrt(h) area law, and pins error seams", () => {
+  const r = _v639({ q_cfs: 1.5, h_ft: 4, cd: 0.60 });
+  assert.ok(Math.abs(r.a_ft2 - 0.15576399571225835) < 1e-9);
+  assert.ok(Math.abs(r.d_in - 5.344041782593023) < 1e-9);
+  // Exact area/diameter relation d = 12 sqrt(4 A / pi).
+  assert.ok(Math.abs(r.d_in - 12 * Math.sqrt(4 * r.a_ft2 / Math.PI)) < 1e-12);
+  // Round-trip: the orifice-flow pinned example (d=6, h=4, cd=0.6) discharges 1.8908... cfs;
+  // feeding that flow back in must size the orifice to exactly 6 in.
+  const back = _v639({ q_cfs: 1.8908369031449066, h_ft: 4, cd: 0.60 });
+  assert.ok(Math.abs(back.d_in - 6) < 1e-9);
+  // The 1/sqrt(h) area law: quadrupling the head shrinks the diameter to (1/4)^(1/4) = 0.7071x.
+  const hi = _v639({ q_cfs: 1.5, h_ft: 16, cd: 0.60 });
+  assert.ok(Math.abs(hi.d_in / r.d_in - Math.SQRT1_2) < 1e-9);
+  // Error seams: non-finite, non-positive discharge / head / Cd.
+  assert.ok("error" in _v639({ q_cfs: 0, h_ft: 4, cd: 0.6 }));
+  assert.ok("error" in _v639({ q_cfs: 1.5, h_ft: 0, cd: 0.6 }));
+  assert.ok("error" in _v639({ q_cfs: 1.5, h_ft: 4, cd: 0 }));
+  assert.ok("error" in _v639({ q_cfs: Infinity, h_ft: 4, cd: 0.6 }));
+});
+
 import { computeLevelLoopAdjustment as _v631 } from "../../calc-survey.js";
 
 test("bounds: spec-v631 computeLevelLoopAdjustment pins the misclosure distribution, the exact-closure property, the zero-misclosure case, and error seams", () => {

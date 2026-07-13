@@ -40758,6 +40758,56 @@
    }
   },
   {
+   "tile_id": "orifice-diameter-for-flow",
+   "source_publisher": "Inverse orifice sizing A = Q / (Cd sqrt(2 g h)), d = sqrt(4 A / pi)",
+   "source_title": "release 1.5 cfs under a 4 ft head, Cd 0.60 -> 5.34 in orifice (0.156 ft^2)",
+   "source_edition_or_year": "spec-v639 worked example (machine-verified)",
+   "source_section_or_page": "spec-v639 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "q_cfs": 1.5,
+    "h_ft": 4,
+    "cd": 0.6
+   },
+   "outputs": {
+    "a_ft2": {
+     "value": 0.1558,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "d_in": {
+     "value": 5.344,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "orifice-diameter-for-flow",
+   "source_publisher": "Inverse orifice sizing A = Q / (Cd sqrt(2 g h)), d = sqrt(4 A / pi)",
+   "source_title": "round-trip: the orifice-flow example's 1.8908 cfs at 4 ft, Cd 0.60 sizes back to a 6.00 in orifice",
+   "source_edition_or_year": "spec-v639 worked example (machine-verified)",
+   "source_section_or_page": "spec-v639 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "q_cfs": 1.8908369031449066,
+    "h_ft": 4,
+    "cd": 0.6
+   },
+   "outputs": {
+    "d_in": {
+     "value": 6.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tank-drain-time",
    "source_publisher": "Falling-head (Torricelli) orifice drain time",
    "source_title": "100 ft^2 tank, 6 in orifice, Cd 0.60, 9 ft to empty -> 634.6 s (10.6 min)",

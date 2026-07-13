@@ -3741,6 +3741,43 @@ function _v303renderOrificeFlow(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["orifice-flow"] = _v303renderOrificeFlow;
 
+// dims: in { q_cfs: L^3 T^-1, h_ft: L, cd: dimensionless } out: { a_ft2: L^2, d_in: L }
+export function computeOrificeDiameterForFlow({ q_cfs = 0, h_ft = 0, cd = 0.60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(q_cfs > 0)) return { error: "Target discharge must be positive (cfs)." };
+  if (!(h_ft > 0)) return { error: "Head must be positive (ft)." };
+  if (!(cd > 0)) return { error: "The discharge coefficient must be positive (~0.6 sharp-edged)." };
+  const a_ft2 = q_cfs / (cd * Math.sqrt(2 * 32.2 * h_ft));
+  const d_in = 12 * Math.sqrt(4 * a_ft2 / Math.PI);
+  return {
+    a_ft2, d_in,
+    note: "Inverse orifice sizing: the diameter that passes a target discharge under a steady head, from Q = Cd A sqrt(2 g h) solved for A = Q / (Cd sqrt(2 g h)) and d = sqrt(4 A / pi), with g = 32.2 ft/s^2, Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded), and the head measured to the orifice centroid. This sizes a detention-outlet or restrictor plate to hold a release to a target rate; because the flow scales with the square root of the head, the required area scales as 1/sqrt(h), so a 4x head shrinks the diameter to 0.71x. Free/submerged discharge under a steady head for a small orifice - it does not integrate the falling head of a draining tank (the time-to-drain is separate). A design aid; the engineer of record governs.",
+  };
+}
+export const orificeDiameterForFlowExample = { inputs: { q_cfs: 1.5, h_ft: 4, cd: 0.60 } };
+
+function _v639renderOrificeDiameterForFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: inverse orifice sizing A = Q / (Cd sqrt(2 g h)), d = sqrt(4 A / pi), g = 32.2 ft/s^2, Cd ~ 0.6 sharp-edged, head to the centroid, by name. Small orifice, steady head; the falling-head time-to-drain is separate. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => { q.input.value = "1.5"; h.input.value = "4"; cd.input.value = "0.60"; update(); });
+  const q = makeNumber("Target discharge (cfs)", "ord-q", { step: "any", min: "0" });
+  const h = makeNumber("Head to orifice center (ft)", "ord-h", { step: "any", min: "0" });
+  const cd = makeNumber("Discharge coefficient Cd", "ord-cd", { step: "any", min: "0" });
+  cd.input.value = "0.60";
+  for (const f of [q, h, cd]) inputRegion.appendChild(f.wrap);
+  const oD = makeOutputLine(outputRegion, "Required orifice diameter", "ord-out-d");
+  const oA = makeOutputLine(outputRegion, "Orifice area", "ord-out-a");
+  const oNote = makeOutputLine(outputRegion, "Note", "ord-out-n");
+  const update = debounce(() => {
+    const r = computeOrificeDiameterForFlow({ q_cfs: Number(q.input.value) || 0, h_ft: Number(h.input.value) || 0, cd: Number(cd.input.value) || 0 });
+    if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oNote.textContent = "-"; return; }
+    oD.textContent = fmt(r.d_in, 2) + " in";
+    oA.textContent = fmt(r.a_ft2, 3) + " ft^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q, h, cd]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["orifice-diameter-for-flow"] = _v639renderOrificeDiameterForFlow;
+
 // dims: in { tank_area_ft2: L^2, d_in: L, cd: dimensionless, h1_ft: L, h2_ft: L } out: { a_o_ft2: L^2, t_s: T, t_min: T }
 export function computeTankDrainTime({ tank_area_ft2 = 0, d_in = 0, cd = 0.60, h1_ft = 0, h2_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

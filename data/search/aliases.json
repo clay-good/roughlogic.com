@@ -55158,7 +55158,52 @@
     },
     {
       "term": "size an orifice to release a set cfs",
-      "target": "orifice-flow",
+      "target": "orifice-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "orifice sizing",
+      "target": "orifice-diameter-for-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "size an orifice for a target flow",
+      "target": "orifice-diameter-for-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "orifice diameter for a given flow",
+      "target": "orifice-diameter-for-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "restrictor plate sizing",
+      "target": "orifice-diameter-for-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "detention outlet orifice sizing",
+      "target": "orifice-diameter-for-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what size orifice for a given cfs",
+      "target": "orifice-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "orifice diameter to pass a target discharge",
+      "target": "orifice-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "size a detention outlet orifice to a release rate",
+      "target": "orifice-diameter-for-flow",
+      "kind": "question"
+    },
+    {
+      "term": "how big an orifice to release so many cfs",
+      "target": "orifice-diameter-for-flow",
       "kind": "question"
     },
     {

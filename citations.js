@@ -10637,6 +10637,18 @@ export const CITATIONS = {
       { name: "Steady head", value: "small orifice under a steady head; the falling-head drain time is separate", source: "scope of this tile" },
     ],
   },
+  "orifice-diameter-for-flow": {
+    formula: "A = Q / (Cd sqrt(2 g h)) (g = 32.2 ft/s^2); d = 12 sqrt(4 A / pi) in.",
+    edition: "The orifice discharge equation Q = Cd A sqrt(2 g h) solved for the orifice diameter, the inverse of the orifice-discharge tile, a standard hydraulics result, by name.",
+    freeAccess: "The orifice equation is a public closed-form hydraulics result; the discharge coefficients are in the standard references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse orifice sizing: solving Q = Cd A sqrt(2 g h) (g = 32.2 ft/s^2) for the area A = Q / (Cd sqrt(2 g h)) and the diameter d = sqrt(4 A / pi), with Cd about 0.6 for a sharp-edged orifice (~0.8 short tube, ~0.98 rounded) and the head measured to the orifice centroid. This sizes a detention-outlet or restrictor plate to pass a target discharge; because the flow scales with the square root of the head, the required area scales as 1/sqrt(h), so a 4x head shrinks the diameter to 0.71x. It assumes a small orifice under a steady head (uniform velocity across it), uses the entered Cd, and does not integrate the falling head of a draining tank (the time-to-drain is separate) or account for a partially submerged or gated outlet. A design aid, not a substitute for a licensed engineer's drainage design; the engineer of record governs.",
+    assumptions: [
+      { name: "Inverse sizing", value: "A = Q / (Cd sqrt(2 g h)); d = sqrt(4 A / pi), head to the orifice centroid", source: "orifice hydraulics" },
+      { name: "Coefficient", value: "Cd about 0.6 sharp-edged (0.8 short tube, 0.98 rounded), entered", source: "standard hydraulics tables" },
+      { name: "Steady head", value: "small orifice under a steady head; the falling-head drain time is separate", source: "scope of this tile" },
+    ],
+  },
   "tank-drain-time": {
     formula: "A_o = pi/4 (d/12)^2; t = 2 A_t (sqrt(h1) - sqrt(h2)) / (Cd A_o sqrt(2 g)), g = 32.2 ft/s^2.",
     edition: "The falling-head (Torricelli) tank drain-time integral of the orifice equation, a standard hydraulics result, by name.",
