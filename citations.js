@@ -1154,6 +1154,17 @@ export const CITATIONS = {
       { name: "Inside diameter", value: "actual bore, not nominal pipe size", source: "Spitzglass equation" },
     ],
   },
+  "gas-pipe-max-flow": {
+    formula: "Spitzglass low-pressure solved for the flow: Q = 3550 * sqrt((dH * D^5) / (SG * L * K')), K' = 1 + 3.6/D + 0.03*D. dH (in w.c.), D (in actual bore), L (ft), SG. Velocity from Q and bore area.",
+    edition: "Published Spitzglass low-pressure gas-flow equation (public engineering formula); the inverse of the gas-pipe pressure-drop tile and a longhand alternative to the NFPA 54 / IFGC capacity tables, by name.",
+    freeAccess: "NFPA 54 free read-only at nfpa.org/freeaccess and codes.iccsafe.org; NFPA 54 governs the installation.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-formula (Spitzglass low-pressure regime, <= ~1.5 psi). This solves the same Spitzglass relation the pressure-drop tile uses for the flow a bore carries within an allowable drop, so the two are exact inverses; a drop above the ~1.5 psi validity range is flagged, and the high-pressure compressible form is a different equation.",
+    assumptions: [
+      { name: "Inside diameter", value: "actual bore, not nominal pipe size", source: "Spitzglass equation" },
+      { name: "Low-pressure regime", value: "valid to ~1.5 psi (41.5 in w.c.); a larger allowable drop is flagged", source: "Spitzglass equation" },
+    ],
+  },
   "ohms-law": {
     formula: "Ohm's Law: V = I * R; P = V * I. Derived identities for the missing two from any pair.",
     edition: "Classical electromagnetism; physical fact. Identities verified against IEEE 141 (Red Book).",

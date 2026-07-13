@@ -143,7 +143,7 @@ const _TILES = [
   ["fan-motor-bhp", "C"],
   ["thermal-expansion-volume", "B"],
   ["vent-sizing-stack", "B"],
-  ["gas-pipe-pressure-drop", "B"],
+  ["gas-pipe-pressure-drop", "B"], ["gas-pipe-max-flow", "B"],
   ["ohms-law", "A"], ["wire-ampacity", "A"], ["voltage-drop", "A"],
   ["conduit-fill", "A"], ["box-fill", "A"], ["breaker-sizing", "A"],
   ["motor-fla", "A"], ["transformer-sizing", "A"], ["three-phase", "A"],

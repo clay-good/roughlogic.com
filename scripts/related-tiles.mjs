@@ -201,7 +201,8 @@ const RELATED = {
   "fan-motor-bhp": ["duct-sizing", "cfm-per-ton", "duct-velocity-pressure"],
   "thermal-expansion-volume": ["expansion-tank", "wh-expansion-tank", "water-heater-recovery"],
   "vent-sizing-stack": ["sanitary-dfu", "trap-arm", "slope"],
-  "gas-pipe-pressure-drop": ["gas-pipe-sizing", "gas-leak-rate", "friction-loss"],
+  "gas-pipe-pressure-drop": ["gas-pipe-max-flow", "gas-pipe-sizing", "gas-leak-rate", "friction-loss"],
+  "gas-pipe-max-flow": ["gas-pipe-pressure-drop", "gas-pipe-sizing", "gas-leak-rate", "gas-appliance-demand"],
   // Group A: Electrical core loop. ohms-law is the gateway tile; the
   // surrounding tiles are the most-frequent "I came here for X, what's
   // next?" landing points across the v0.1.0 unit-test fixtures and the

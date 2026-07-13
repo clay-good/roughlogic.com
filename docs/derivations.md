@@ -1984,6 +1984,7 @@ cross-check.
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |
 | calc-gas.js | `computeGasLeakRate` | `{ orifice_diameter_in, upstream_psi, gas, c = 0.7 }` | _ | _ | _ |
+| calc-gas.js | `computeGasPipeMaxFlow` | `{ drop_inwc = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasPipePressureDrop` | `{ flow_cfh = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasPipeSizing` | `{ btu_load, length_ft, gas, dP_in_wc = 0.5, candidate_sizes = ["0.5", "0.75",...` | _ | _ | _ |
 | calc-gas.js | `computeMedgasDemand` | `{ stations = 0, per_station_scfm = 0, diversity = 1 } = {}` | _ | _ | _ |
@@ -2750,7 +2751,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1336.
+Row count: 1337.
 
 <!-- END function-corpus-v14 -->
 
@@ -2976,7 +2977,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (93 tiles)
+### Group B Plumbing (94 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3001,6 +3002,7 @@ per spec-v14 §13.1 second paragraph.
 | `gas-appliance-demand` | Gas Appliance Connected Load (CFH) | IFGC 2021 Section 402 / NFPA 54; furnace 100,000 + WH 40,000 + range 65,000 + dryer 35,000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-fuel-conversion` | Natural-Gas / Propane Conversion (Input and Orifice) | First-principles orifice flow Q ~ are...; spec-v111 section 2.2 pinned example (100k NG->LP -> 97.0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `gas-leak-rate` | Gas Leak Rate (Orifice) | Project (first-principles); 0.05 in orifice / 0.25 psi upstream natural gas -> ~3.15 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `gas-pipe-max-flow` | Fuel-Gas Pipe Capacity (Spitzglass) | Spitzglass low-pressure gas-flow equa...; 1.049-in ID, 100 ft, SG 0.60, 0.5 in w.c. allowable drop ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gas-pipe-pressure-drop` | Low-Pressure Fuel-Gas Pressure Drop (Spitzglass) | Spitzglass low-pressure gas-flow equa...; 1000 CFH, 1.049-in ID, 100 ft, SG 0.60 -> ~16.73 in w.c.,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-pipe-sizing` | Gas Pipe Sizing | NFPA; 100,000 BTU natural gas at 50 ft / 0.5 in w.c. drop -> 97... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glycol-mix` | Glycol Freeze Protection Mix | Dow; 50 gal system / -10 F target burst protection / propylene... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4028,6 +4030,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1092. Fixture-covered or reference-cadence: 1092 / 1092.
+Tile count: 1093. Fixture-covered or reference-cadence: 1093 / 1093.
 
 <!-- END tile-index-v14 -->

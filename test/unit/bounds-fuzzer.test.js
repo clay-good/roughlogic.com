@@ -8820,6 +8820,29 @@ test("bounds: calc-plumbing v20 B tiles pin constants + reject non-finite", () =
   assert.ok("error" in _b3({ flow_cfh: 1000, id_in: 0, length_ft: 100, sg: 0.6 }));
 });
 
+import { computeGasPipeMaxFlow as _v644 } from "../../calc-gas.js";
+
+test("bounds: spec-v644 computeGasPipeMaxFlow pins the Spitzglass capacity, round-trips the pressure-drop tile, flags the low-pressure range, and rejects bad inputs", () => {
+  const r = _v644({ drop_inwc: 0.5, id_in: 1.049, length_ft: 100, sg: 0.6 });
+  assert.ok(Math.abs(r.flow_cfh - 172.88126512010183) < 1e-6);
+  assert.ok(Math.abs(r.velocity_fpm - 480.0851979482188) < 1e-6);
+  assert.ok(r.exceeds_low_pressure === false);
+  // Exact inverse of gas-pipe-pressure-drop: the drop that tile computes for 1000 CFH,
+  // fed back here, recovers 1000 CFH.
+  const dH = _b3({ flow_cfh: 1000, id_in: 1.049, length_ft: 100, sg: 0.6 }).drop_inwc;
+  assert.ok(Math.abs(_v644({ drop_inwc: dH, id_in: 1.049, length_ft: 100, sg: 0.6 }).flow_cfh - 1000) < 1e-6);
+  // Flow scales with sqrt(dH): quadrupling the allowable drop doubles the capacity.
+  assert.ok(Math.abs(_v644({ drop_inwc: 2.0, id_in: 1.049, length_ft: 100, sg: 0.6 }).flow_cfh - 2 * r.flow_cfh) < 1e-6);
+  // A drop beyond the ~1.5 psi (41.5 in w.c.) range is flagged.
+  assert.ok(_v644({ drop_inwc: 50, id_in: 1.049, length_ft: 100, sg: 0.6 }).exceeds_low_pressure === true);
+  // Error seams: non-positive drop / diameter / length / SG, non-finite.
+  assert.ok("error" in _v644({ drop_inwc: 0, id_in: 1.049, length_ft: 100, sg: 0.6 }));
+  assert.ok("error" in _v644({ drop_inwc: 0.5, id_in: 0, length_ft: 100, sg: 0.6 }));
+  assert.ok("error" in _v644({ drop_inwc: 0.5, id_in: 1.049, length_ft: 0, sg: 0.6 }));
+  assert.ok("error" in _v644({ drop_inwc: 0.5, id_in: 1.049, length_ft: 100, sg: 0 }));
+  assert.ok("error" in _v644({ drop_inwc: Infinity, id_in: 1.049, length_ft: 100, sg: 0.6 }));
+});
+
 import {
   computeEconomizerSavingsHours as _c1,
   computePipeHeatLossRadial as _c2,

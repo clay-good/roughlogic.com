@@ -260,7 +260,7 @@ const TOOL_MODULES = (() => {
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They
   // keep group: "B" (group letter independent of module, the v36/v39 precedent).
   declare("./calc-gas.js", "GAS_RENDERERS", [
-    "gas-pipe-sizing", "gas-leak-rate", "gas-pipe-pressure-drop",
+    "gas-pipe-sizing", "gas-leak-rate", "gas-pipe-pressure-drop", "gas-pipe-max-flow",
     // spec-v111 high-altitude derate and NG/LP fuel conversion (same module).
     "gas-altitude-derate", "gas-fuel-conversion",
     // spec-v206 medical-gas system demand and diversity (NFPA 99).

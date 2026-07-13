@@ -243,6 +243,65 @@ function renderGasPipePressureDrop(inputRegion, outputRegion, citationEl) {
 GAS_RENDERERS["gas-pipe-pressure-drop"] = renderGasPipePressureDrop;
 
 // =====================================================================
+// spec-v644 gas-pipe-max-flow (Group B) - the Spitzglass capacity inverse.
+// The flow a bore carries within an allowable drop: solve the same
+// Spitzglass relation for Q. Q = 3550 * sqrt((dH * D^5) / (SG * L * K')),
+// K' = 1 + 3.6/D + 0.03*D. The inverse of gas-pipe-pressure-drop.
+// =====================================================================
+
+// dims: in { drop_inwc: M*L^-1*T^-2, id_in: L, length_ft: L, sg: dimensionless } out: { flow_cfh: L^3*T^-1, velocity_fpm: L*T^-1 }
+export function computeGasPipeMaxFlow({ drop_inwc = 0, id_in = 0, length_ft = 0, sg = 0.6 } = {}) {
+  const dH = Number(drop_inwc) || 0;
+  const D = Number(id_in) || 0;
+  const L = Number(length_ft) || 0;
+  const SG = Number(sg) || 0;
+  if (!(dH > 0 && Number.isFinite(dH))) return { error: "Allowable pressure drop must be positive (in w.c.)." };
+  if (!(D > 0 && Number.isFinite(D))) return { error: "Pipe inside diameter must be positive (in)." };
+  if (!(L > 0 && Number.isFinite(L))) return { error: "Pipe length must be positive (ft)." };
+  if (!(SG > 0 && Number.isFinite(SG))) return { error: "Gas specific gravity must be positive." };
+  const spitz = 1 + 3.6 / D + 0.03 * D;
+  const flow_cfh = 3550 * Math.sqrt(dH * Math.pow(D, 5) / (SG * L * spitz));
+  const areaFt2 = Math.PI / 4 * Math.pow(D / 12, 2);
+  const velocity = flow_cfh / areaFt2 / 60;
+  const LOW_PRESSURE_LIMIT_INWC = 41.5; // ~1.5 psi
+  return {
+    flow_cfh: Number.isFinite(flow_cfh) ? flow_cfh : null,
+    velocity_fpm: Number.isFinite(velocity) ? velocity : null,
+    exceeds_low_pressure: dH > LOW_PRESSURE_LIMIT_INWC,
+    note: (dH > LOW_PRESSURE_LIMIT_INWC ? "The allowable drop exceeds the ~1.5 psi low-pressure validity range - use the high-pressure compressible form. " : "")
+      + "Inside diameter must be the actual bore, not nominal. Longhand Spitzglass alternative to the NFPA 54 / IFGC capacity tables, the inverse of the gas-pipe pressure-drop tile; NFPA 54 governs the installation.",
+  };
+}
+export const gasPipeMaxFlowExample = { inputs: { drop_inwc: 0.5, id_in: 1.049, length_ft: 100, sg: 0.6 } };
+
+function renderGasPipeMaxFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the published Spitzglass low-pressure gas-flow equation (public engineering formula), solved for the flow - the capacity a bore carries within an allowable drop, the inverse of the gas-pipe pressure-drop tile and a longhand alternative to the NFPA 54 / IFGC capacity tables; NFPA 54 governs the installation. Inside diameter must be the actual bore. Free read-only at nfpa.org/freeaccess and codes.iccsafe.org.";
+  const dh = makeNumber("Allowable pressure drop (in w.c.)", "gmf-dh", { step: "any", min: "0", value: "0.5" });
+  dh.input.value = "0.5";
+  const d = makeNumber("Pipe inside diameter (in, actual bore)", "gmf-d", { step: "any", min: "0", value: "1.049" });
+  d.input.value = "1.049";
+  const len = makeNumber("Pipe length (ft)", "gmf-len", { step: "any", min: "0", value: "100" });
+  len.input.value = "100";
+  const sg = makeNumber("Gas specific gravity", "gmf-sg", { step: "any", min: "0", value: "0.6" });
+  sg.input.value = "0.6";
+  for (const f of [dh, d, len, sg]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dh.input.value = "0.5"; d.input.value = "1.049"; len.input.value = "100"; sg.input.value = "0.6"; update(); });
+  const oFlow = makeOutputLine(outputRegion, "Max flow", "gmf-out-flow");
+  const oVel = makeOutputLine(outputRegion, "Velocity at that flow", "gmf-out-vel");
+  const oNote = makeOutputLine(outputRegion, "Note", "gmf-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeGasPipeMaxFlow({ drop_inwc: readNum(dh.input), id_in: readNum(d.input), length_ft: readNum(len.input), sg: readNum(sg.input) });
+    if (r.error) { oFlow.textContent = r.error; oVel.textContent = ""; oNote.textContent = ""; return; }
+    oFlow.textContent = fmt(r.flow_cfh, 0) + " CFH" + (r.exceeds_low_pressure ? " (drop exceeds low-pressure range)" : "");
+    oVel.textContent = fmt(r.velocity_fpm, 0) + " fpm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dh.input, d.input, len.input, sg.input]) f.addEventListener("input", update);
+}
+GAS_RENDERERS["gas-pipe-max-flow"] = renderGasPipeMaxFlow;
+
+// =====================================================================
 // spec-v111: gas-altitude-derate (Group B) - high-altitude appliance input
 // derate (NFPA 54 / IFGC). The derated maximum input at altitude and the
 // kit flag. derate above a threshold elevation, the common

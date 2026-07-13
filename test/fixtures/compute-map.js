@@ -102,6 +102,7 @@ export const COMPUTE_MAP = {
   "thermal-expansion-volume": { module: "../../calc-plumbing.js", fn: "computeThermalExpansionVolume" },
   "vent-sizing-stack": { module: "../../calc-plumbing.js", fn: "computeVentSizingStack" },
   "gas-pipe-pressure-drop": { module: "../../calc-gas.js", fn: "computeGasPipePressureDrop" },
+  "gas-pipe-max-flow": { module: "../../calc-gas.js", fn: "computeGasPipeMaxFlow" },
   "ohms-law": { module: "../../calc-electrical.js", fn: "computeOhmsLaw" },
   "bridge-formula": { module: "../../calc-trucking.js", fn: "computeBridgeFormula" },
   "wind-chill": { module: "../../calc-cross.js", fn: "computeWindChill" },

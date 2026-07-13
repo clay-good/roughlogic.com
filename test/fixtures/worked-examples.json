@@ -14522,6 +14522,58 @@
    }
   },
   {
+   "tile_id": "gas-pipe-max-flow",
+   "source_publisher": "Spitzglass low-pressure gas-flow equation (public), solved for flow",
+   "source_title": "Q = 3550 sqrt(dH D^5 / (SG L (1+3.6/D+0.03D)))",
+   "source_edition_or_year": "public engineering formula",
+   "source_section_or_page": "1.049-in ID, 100 ft, SG 0.60, 0.5 in w.c. allowable drop -> ~173 CFH at ~480 fpm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "drop_inwc": 0.5,
+    "id_in": 1.049,
+    "length_ft": 100,
+    "sg": 0.6
+   },
+   "outputs": {
+    "flow_cfh": {
+     "value": 172.9,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "velocity_fpm": {
+     "value": 480,
+     "tolerance": {
+      "abs": 2
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "gas-pipe-max-flow",
+   "source_publisher": "Spitzglass low-pressure gas-flow equation (public), solved for flow",
+   "source_title": "cross-check (inverse of the drop tile): feeding the ~16.73 in w.c. drop the pressure-drop tile computes for 1000 CFH recovers ~1000 CFH",
+   "source_edition_or_year": "public engineering formula",
+   "source_section_or_page": "16.73 in w.c., 1.049-in ID, 100 ft, SG 0.60 -> ~1000 CFH",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "drop_inwc": 16.73,
+    "id_in": 1.049,
+    "length_ft": 100,
+    "sg": 0.6
+   },
+   "outputs": {
+    "flow_cfh": {
+     "value": 1000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "economizer-savings-hours",
    "source_publisher": "ASHRAE sensible-heat relation + Standard 90.1 economizer",
    "source_title": "Q_sens = 1.08 * CFM * dT; ton-hours = Q_sens * hours / 12000",

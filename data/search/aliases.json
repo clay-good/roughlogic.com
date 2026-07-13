@@ -50217,6 +50217,46 @@
       "kind": "question"
     },
     {
+      "term": "gas pipe capacity",
+      "target": "gas-pipe-max-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "gas pipe max flow",
+      "target": "gas-pipe-max-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "spitzglass capacity",
+      "target": "gas-pipe-max-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "gas line capacity from pressure drop",
+      "target": "gas-pipe-max-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "how much gas can a pipe carry",
+      "target": "gas-pipe-max-flow",
+      "kind": "question"
+    },
+    {
+      "term": "cfh a gas line carries",
+      "target": "gas-pipe-max-flow",
+      "kind": "question"
+    },
+    {
+      "term": "max cfh for a gas pipe",
+      "target": "gas-pipe-max-flow",
+      "kind": "question"
+    },
+    {
+      "term": "gas pipe flow from allowable drop",
+      "target": "gas-pipe-max-flow",
+      "kind": "question"
+    },
+    {
       "term": "dose volume per pump cycle",
       "target": "septic-dose-tank",
       "kind": "question"
