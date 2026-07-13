@@ -305,6 +305,7 @@ export const COMPUTE_MAP = {
   "approach-delta-t": { module: "../../calc-hvac.js", fn: "computeApproachDeltaT" },
   "outdoor-air-mix": { module: "../../calc-hvac.js", fn: "computeOutdoorAirMix" },
   "manning-slope": { module: "../../calc-plumbing.js", fn: "computeManningSlope" },
+  "manning-pipe-capacity": { module: "../../calc-plumbing.js", fn: "computeManningPipeCapacity" },
   "drainage-invert": { module: "../../calc-plumbing.js", fn: "computeDrainageInvert" },
   "radiant-loop-sizing": { module: "../../calc-plumbing.js", fn: "computeRadiantLoopSizing" },
   "water-hammer-arrestor": { module: "../../calc-plumbing.js", fn: "computeWaterHammerArrestor" },

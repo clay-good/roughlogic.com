@@ -48917,6 +48917,51 @@
       "kind": "question"
     },
     {
+      "term": "manning pipe capacity",
+      "target": "manning-pipe-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "full flow pipe capacity",
+      "target": "manning-pipe-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "gravity sewer capacity",
+      "target": "manning-pipe-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "pipe flow at a given slope",
+      "target": "manning-pipe-capacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "full bore flow",
+      "target": "manning-pipe-capacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "how much flow does a pipe carry at a slope",
+      "target": "manning-pipe-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "gpm a pipe carries flowing full",
+      "target": "manning-pipe-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "capacity of a sewer at a given slope",
+      "target": "manning-pipe-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "manning discharge for a full pipe",
+      "target": "manning-pipe-capacity",
+      "kind": "question"
+    },
+    {
       "term": "invert at the end of a run",
       "target": "drainage-invert",
       "kind": "question"

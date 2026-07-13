@@ -1294,6 +1294,47 @@ export function renderManningSlope(inputRegion, outputRegion, citationEl) {
   for (const el of [d.input, f.input, m.select]) el.addEventListener("input", update);
 }
 
+// dims: in { d_in: L, slope: dimensionless, material: dimensionless } out: { v_fps: L T^-1, q_cfs: L^3 T^-1, q_gpm: L^3 T^-1 }
+export function computeManningPipeCapacity({ d_in = 0, slope = 0, material = "pvc" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(d_in > 0)) return { error: "Pipe diameter must be positive (in)." };
+  if (!(slope > 0)) return { error: "Pipe slope must be positive (ft/ft)." };
+  const n = MANNING_ROUGHNESS[material];
+  if (!Number.isFinite(n)) return { error: "Unknown pipe material." };
+  const D_ft = d_in / 12;
+  const r_ft = D_ft / 4;
+  const a_ft2 = Math.PI * D_ft * D_ft / 4;
+  const v_fps = (1.486 / n) * Math.pow(r_ft, 2 / 3) * Math.sqrt(slope);
+  const q_cfs = v_fps * a_ft2;
+  const q_gpm = q_cfs * 448.831;
+  return {
+    n, a_ft2, r_ft, v_fps, q_cfs, q_gpm,
+    note: "Manning full-bore gravity-flow capacity: V = (1.486/n) R^(2/3) sqrt(S) with the hydraulic radius R = D/4 for a circular pipe flowing full and Q = V (pi/4) D^2 - the discharge side of the same Manning equation the manning-slope tile inverts. The roughness n is taken from the standard tables (PVC 0.009, cast iron / concrete 0.013, corrugated metal 0.024). Because Q scales with sqrt(S), doubling the slope raises the capacity only about 1.41x. A steady, uniform (normal-depth) full flow in a circular pipe; it does not compute the partial-flow depth, and a circular pipe actually carries a few percent more than full-bore at about 0.94 depth (the partial-flow curves are separate). A design aid; the engineer of record and the local plumbing/sewer code govern.",
+  };
+}
+export const manningPipeCapacityExample = { inputs: { d_in: 8, slope: 0.01, material: "concrete" } };
+
+function renderManningPipeCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), R = D/4, Q = V (pi/4) D^2, by name. Circular pipe flowing full; the roughness n is from the standard tables. The partial-flow depth is separate. A design aid; the engineer of record governs.";
+  attachExampleButton(inputRegion, () => fillExample(manningPipeCapacityExample.inputs));
+  const d = makeNumber("Pipe diameter (in)", "mpc-d", { step: "any", min: "0" });
+  const s = makeNumber("Pipe slope S (ft/ft)", "mpc-s", { step: "any", min: "0" });
+  const m = makeSelect("Pipe material", "mpc-m", Object.keys(MANNING_ROUGHNESS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  for (const x of [d, s, m]) inputRegion.appendChild(x.wrap);
+  const oQ = makeOutputLine(outputRegion, "Full-flow capacity", "mpc-out-q");
+  const oV = makeOutputLine(outputRegion, "Full-flow velocity", "mpc-out-v");
+  const oNote = makeOutputLine(outputRegion, "Note", "mpc-out-n");
+  function fillExample(v) { d.input.value = v.d_in; s.input.value = v.slope; m.select.value = v.material; update(); }
+  const update = debounce(() => {
+    const r = computeManningPipeCapacity({ d_in: Number(d.input.value) || 0, slope: Number(s.input.value) || 0, material: m.select.value });
+    if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oNote.textContent = "-"; return; }
+    oQ.textContent = fmt(r.q_cfs, 2) + " cfs (" + fmt(r.q_gpm, 0) + " gpm)";
+    oV.textContent = fmt(r.v_fps, 2) + " ft/s";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [d.input, s.input, m.select]) el.addEventListener("input", update);
+}
+
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderHydrostaticTest(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public engineering practice. Default multipliers 1.5 for water, 1.25 for fuel gas. Hold-time scales with system volume.";
@@ -1829,6 +1870,7 @@ export const PLUMBING_RENDERERS = {
   // v3
   "stormwater-rational": renderStormwaterRational,
   "manning-slope": renderManningSlope,
+  "manning-pipe-capacity": renderManningPipeCapacity,
   "hydrostatic-test": renderHydrostaticTest,
   "grease-trap": renderGreaseTrap,
   "glycol-mix": renderGlycolMix,

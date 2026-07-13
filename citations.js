@@ -3286,6 +3286,18 @@ export const CITATIONS = {
       { name: "Self-cleansing velocity", value: "2 ft/s for sanitary sewers", source: "public engineering practice" },
     ],
   },
+  "manning-pipe-capacity": {
+    formula: "English Manning V = (1.486 / n) R^(2/3) S^(1/2); full-bore circular pipe R = D/4, A = (pi/4) D^2, Q = V A; Q_gpm = 448.831 Q_cfs.",
+    edition: "Manning equation; n-values from USGS WSP-2339 (public domain).",
+    freeAccess: "USGS WSP-2339 free at pubs.usgs.gov.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The discharge side of the Manning equation for a circular pipe flowing full: V = (1.486/n) R^(2/3) sqrt(S) with the full-bore hydraulic radius R = D/4 and area A = (pi/4) D^2, so Q = V A. This is the inverse of the manning-slope tile, which solves the same equation for the slope; here the diameter, slope, and roughness are given and the capacity and velocity returned. The roughness n is from the standard tables (PVC 0.009, cast iron / concrete 0.013, corrugated metal 0.024). Because Q scales with sqrt(S), doubling the slope raises the capacity only about 1.41x. It assumes a steady, uniform (normal-depth) full flow; it does not compute the partial-flow depth, and a circular pipe carries a few percent more than full-bore at about 0.94 depth (the partial-flow curves are separate). A design aid, not a substitute for a licensed engineer's design; the engineer of record and the local plumbing/sewer code govern.",
+    assumptions: [
+      { name: "Full-bore hydraulic radius", value: "R = D/4, A = (pi/4) D^2 for a circular pipe flowing full", source: "circular cross-section geometry" },
+      { name: "Roughness", value: "n from the standard tables (PVC 0.009, concrete 0.013, corrugated metal 0.024), entered by material", source: "USGS WSP-2339" },
+      { name: "Uniform full flow", value: "steady normal-depth full flow; the partial-flow depth is separate", source: "scope of this tile" },
+    ],
+  },
   "drainage-invert": {
     formula: "Total fall = slope x run; invert-out = invert-in - fall; top of pipe = invert-out + OD; cover = surface - top of pipe. Slope entered as in/ft or percent, normalized to ft/ft.",
     edition: IPC_2021 + " Section 704 (drainage piping slope minimums).",

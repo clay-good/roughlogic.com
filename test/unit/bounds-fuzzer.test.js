@@ -20360,6 +20360,31 @@ test("bounds: spec-v630 computeTankDrainTime pins the falling-head drain time, t
   assert.ok("error" in _v630({ tank_area_ft2: Infinity, d_in: 6, cd: 0.6, h1_ft: 9 }));
 });
 
+import { computeManningPipeCapacity as _v640 } from "../../calc-plumbing.js";
+
+test("bounds: spec-v640 computeManningPipeCapacity pins the full-bore Manning capacity, the sqrt(S) slope law, and error seams", () => {
+  const r = _v640({ d_in: 8, slope: 0.01, material: "concrete" });
+  assert.ok(Math.abs(r.v_fps - 3.4618476935237945) < 1e-9);
+  assert.ok(Math.abs(r.q_cfs - 1.2084128090912356) < 1e-9);
+  assert.ok(Math.abs(r.q_gpm - r.q_cfs * 448.831) < 1e-9);
+  // Full-bore geometry: R = D/4, A = (pi/4) D^2, Q = V A.
+  assert.ok(Math.abs(r.a_ft2 - Math.PI * (8 / 12) ** 2 / 4) < 1e-12);
+  assert.ok(Math.abs(r.r_ft - (8 / 12) / 4) < 1e-12);
+  assert.ok(Math.abs(r.q_cfs - r.v_fps * r.a_ft2) < 1e-12);
+  // The sqrt(S) law: doubling the slope raises the capacity by exactly sqrt(2).
+  const hi = _v640({ d_in: 8, slope: 0.02, material: "concrete" });
+  assert.ok(Math.abs(hi.q_cfs / r.q_cfs - Math.SQRT2) < 1e-9);
+  // Roughness is read from the shared table: PVC (n=0.009) beats concrete (n=0.013) at the same slope.
+  const pvc = _v640({ d_in: 8, slope: 0.01, material: "pvc" });
+  assert.ok(pvc.q_cfs > r.q_cfs);
+  assert.ok(Math.abs(pvc.q_cfs - r.q_cfs * (0.013 / 0.009)) < 1e-9);
+  // Error seams: non-positive diameter / slope, unknown material, non-finite.
+  assert.ok("error" in _v640({ d_in: 0, slope: 0.01, material: "concrete" }));
+  assert.ok("error" in _v640({ d_in: 8, slope: 0, material: "concrete" }));
+  assert.ok("error" in _v640({ d_in: 8, slope: 0.01, material: "unobtainium" }));
+  assert.ok("error" in _v640({ d_in: Infinity, slope: 0.01, material: "concrete" }));
+});
+
 import { computeOrificeDiameterForFlow as _v639 } from "../../calc-plumbing.js";
 
 test("bounds: spec-v639 computeOrificeDiameterForFlow inverts the orifice equation, round-trips the orifice-flow example, holds the 1/sqrt(h) area law, and pins error seams", () => {

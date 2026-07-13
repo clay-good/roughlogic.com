@@ -5769,6 +5769,62 @@
    }
   },
   {
+   "tile_id": "manning-pipe-capacity",
+   "source_publisher": "Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), Q = V (pi/4) D^2",
+   "source_title": "8 in concrete pipe (n 0.013) flowing full at 1% slope -> 1.21 cfs (542 gpm) at 3.46 ft/s",
+   "source_edition_or_year": "spec-v640 worked example (machine-verified)",
+   "source_section_or_page": "spec-v640 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "d_in": 8,
+    "slope": 0.01,
+    "material": "concrete"
+   },
+   "outputs": {
+    "v_fps": {
+     "value": 3.462,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "q_cfs": {
+     "value": 1.208,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "q_gpm": {
+     "value": 542.4,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "manning-pipe-capacity",
+   "source_publisher": "Manning full-bore capacity V = (1.486/n) R^(2/3) S^(1/2), Q = V (pi/4) D^2",
+   "source_title": "cross-check: doubling the slope to 2% raises the same pipe's capacity to 1.71 cfs (1.41x = sqrt 2)",
+   "source_edition_or_year": "spec-v640 worked example (machine-verified)",
+   "source_section_or_page": "spec-v640 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "d_in": 8,
+    "slope": 0.02,
+    "material": "concrete"
+   },
+   "outputs": {
+    "q_cfs": {
+     "value": 1.709,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "water-hammer-arrestor",
    "source_publisher": "PDI",
    "source_title": "PDI WH-201: Water Hammer Arresters - Sizing by Total Branch WSFU",

@@ -184,7 +184,7 @@ const TOOL_MODULES = (() => {
     "water-hammer-arrestor", "recirc-pump-head", "trap-arm",
     "pipe-expansion", "tankless-gpm",
     // v3
-    "stormwater-rational", "manning-slope", "hydrostatic-test", "grease-trap",
+    "stormwater-rational", "manning-slope", "manning-pipe-capacity", "hydrostatic-test", "grease-trap",
     "stormwater-detention-volume",
     "glycol-mix", "expansion-tank", "backflow-loss",
     "hydronic-fill-pressure",
