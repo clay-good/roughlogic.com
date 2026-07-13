@@ -179,17 +179,29 @@ function metaDescription(tool, professionNoun) {
 // brand suffix (which establishes site identity); the profession noun
 // is the optional middle that gets dropped first.
 function buildTitle(tool, professionNoun, capChars) {
+  // The cap is enforced (by check-shells) against the *escaped* <title>
+  // text, so measure against escapeHtml length here too -- a tile name
+  // with an apostrophe/ampersand (e.g. "f'm") escapes to more bytes than
+  // its raw form and would otherwise slip past this cap and fail the gate.
+  const escLen = (s) => escapeHtml(s).length;
   const brand = " - Rough Logic";
   const middle = " - " + professionNoun;
   const full = tool.name + middle + brand;
-  if (full.length <= capChars) return full;
+  if (escLen(full) <= capChars) return full;
   const noProf = tool.name + brand;
-  if (noProf.length <= capChars) return noProf;
+  if (escLen(noProf) <= capChars) return noProf;
   // Truncate the tile name only if both fallbacks still overflow. Keep
-  // " - Rough Logic" so the brand is preserved.
-  const headRoom = capChars - brand.length - 3;
-  if (headRoom < 4) return tool.name + brand;
-  return tool.name.slice(0, headRoom) + "..." + brand;
+  // " - Rough Logic" so the brand is preserved. Grow the kept name one
+  // character at a time so an escaped char never pushes the rendered
+  // title over the cap (brand and "..." carry no escapable characters).
+  const budget = capChars - brand.length - 3;
+  if (budget < 4) return tool.name + brand;
+  let kept = "";
+  for (const ch of tool.name) {
+    if (escLen(kept + ch) > budget) break;
+    kept += ch;
+  }
+  return kept + "..." + brand;
 }
 
 // Pick 3-6 related tiles per spec-v13 §5.2 + §9.1. When the per-tile
