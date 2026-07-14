@@ -10650,7 +10650,7 @@ test("bounds: spec-v54 compound-miter pins chart values + rejects bad inputs", (
 // ---------------------------------------------------------------------------
 import {
   computeFiberLossBudget as _cv28z1, computeCableTrayFill as _cv28z2, computeCctvStorage as _cv28z3,
-  computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6,
+  computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6, computeStandbyBatteryRuntime as _v687,
 } from "../../calc-lowvoltage.js";
 
 test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-finite", () => {
@@ -10675,6 +10675,32 @@ test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-fini
   assert.strictEqual(_cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 100, source_level: 0 }).total_loss_db, 6);
   assert.ok("error" in _cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 0 }));
   assert.ok("error" in _cv28z6({ mode: "max-run", loss_per_100ft_db: 0, source_level: 0, target_level: -6 }));
+});
+
+test("bounds: spec-v687 computeStandbyBatteryRuntime pins Hs = (Ah/derate - alarm_Ah)/Is, round-trips through computeStandbyBatterySizing, and error seams", () => {
+  const r = _v687({ battery_ah: 14.6, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.standby_hours - (14.6 / 1.2 - 2.0 * 5 / 60) / 0.5) < 1e-9, `Hs identity: ${r.standby_hours}`);
+  assert.ok(Math.abs(r.standby_hours - 24) < 0.05, `pinned 24 h: ${r.standby_hours}`);
+  // A larger battery holds the standby load longer.
+  const big = _v687({ battery_ah: 18, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 });
+  assert.ok(big.standby_hours > r.standby_hours, `bigger longer: ${big.standby_hours}`);
+  // Round-trip: the standby hours, fed back through the forward tile, reproduce the battery capacity (as required_ah).
+  for (const battery_ah of [7, 14.6, 40]) {
+    for (const standby_current_a of [0.25, 0.5, 1.0]) {
+      const m = _v687({ battery_ah, standby_current_a, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 });
+      assert.ok(!m.error, `sweep Ah=${battery_ah} Is=${standby_current_a}: ${JSON.stringify(m)}`);
+      assertFinite(m.standby_hours, "Hs"); assert.ok(m.standby_hours > 0, "Hs positive");
+      const back = _cv28z5({ standby_current_a, standby_hours: m.standby_hours, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 });
+      assert.ok(Math.abs(back.required_ah - battery_ah) < 1e-6, `round-trip Ah=${battery_ah} Is=${standby_current_a}: ${back.required_ah}`);
+    }
+  }
+  // Error seams: non-positive capacity / standby current / derate, too-small battery (no standby time), non-finite.
+  assert.ok("error" in _v687({ battery_ah: 0, standby_current_a: 0.5 }));
+  assert.ok("error" in _v687({ battery_ah: 14.6, standby_current_a: 0 }));
+  assert.ok("error" in _v687({ battery_ah: 14.6, standby_current_a: 0.5, derate: 0 }));
+  assert.ok("error" in _v687({ battery_ah: 0.1, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 }));
+  assert.ok("error" in _v687({ battery_ah: NaN, standby_current_a: 0.5 }));
 });
 
 // ---------------------------------------------------------------------------

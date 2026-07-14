@@ -32187,6 +32187,31 @@
       "kind": "question"
     },
     {
+      "term": "standby battery runtime",
+      "target": "standby-battery-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "how long will a fire alarm battery last",
+      "target": "standby-battery-runtime",
+      "kind": "industry"
+    },
+    {
+      "term": "standby hours from battery ah",
+      "target": "standby-battery-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "runtime of an installed facp battery",
+      "target": "standby-battery-runtime",
+      "kind": "adjacent"
+    },
+    {
+      "term": "backup hours for an alarm panel battery",
+      "target": "standby-battery-runtime",
+      "kind": "adjacent"
+    },
+    {
       "term": "coax signal loss over distance",
       "target": "coax-rg-loss",
       "kind": "question"

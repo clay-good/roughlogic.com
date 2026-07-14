@@ -151,7 +151,7 @@ const TOOL_MODULES = (() => {
   // documented fallback).
   declare("./calc-lowvoltage.js", "LOWVOLTAGE_RENDERERS", [
     "fiber-loss-budget", "cable-tray-fill", "cctv-storage",
-    "speaker-70v-line", "standby-battery-sizing", "coax-rg-loss",
+    "speaker-70v-line", "standby-battery-sizing", "standby-battery-runtime", "coax-rg-loss",
     "camera-lens-fov", "ceiling-speaker-coverage", "structured-cabling-channel",
   ]);
   // spec-v29 pipe / raceway field-layout bench (deepens Groups B, A, G per

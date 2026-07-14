@@ -8289,6 +8289,17 @@ export const CITATIONS = {
       { name: "Derate factor", value: "aging/derate factor 1.2 default (>= 1.0 expected); user-supplied", source: "NFPA 72 / panel worksheet" },
     ],
   },
+  "standby-battery-runtime": {
+    formula: "Hs = (battery_Ah / derate - I_alarm * alarm_min/60) / I_standby; the inverse of required_Ah = [(I_standby * Hs) + (I_alarm * alarm_h)] * derate.",
+    edition: "Secondary (standby) battery runtime for a fire-alarm or security control unit - the sizing worksheet solved for the standby period - per NFPA 72 National Fire Alarm and Signaling Code §10.6 (secondary power supply), by name.",
+    freeAccess: "First-principles amp-hour accounting. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.",
+    governance: GOVERNANCE.fire,
+    editionNote: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of standby-battery-sizing: Hs = (battery_Ah/derate - alarm_Ah) / I_standby. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72 expects >= 1.0, commonly 1.2). The alarm reserve is subtracted first, then the remainder divides by the standby current; a battery too small to cover even the alarm reserve leaves no standby time and is rejected. A design check against a required standby period (commonly 24 h with 5 or 15 min alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern.",
+    assumptions: [
+      { name: "Derate on capacity", value: "the aging/derate factor divides the usable capacity (not credited); 1.2 default, >= 1.0 expected", source: "NFPA 72 / panel worksheet" },
+      { name: "Alarm reserve first", value: "the alarm amp-hour reserve is subtracted before dividing by the standby current", source: "NFPA 72 secondary-power method" },
+    ],
+  },
   "coax-rg-loss": {
     formula: "loss_dB = loss_per_100ft(type, frequency) * length / 100; end level = source - loss; inverse max run = 100 * (source - target) / loss_per_100ft.",
     edition: "Coaxial-cable attenuation from the per-100-ft loss at frequency (loss = per-100-ft * length/100), per the cable manufacturer's published loss curves (Belden / CommScope) and the standard CATV/CCTV/SDI practice, by name; first-principles.",

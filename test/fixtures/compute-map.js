@@ -665,6 +665,7 @@ export const COMPUTE_MAP = {
   "cctv-storage": { module: "../../calc-lowvoltage.js", fn: "computeCctvStorage" },
   "speaker-70v-line": { module: "../../calc-lowvoltage.js", fn: "computeSpeaker70vLine" },
   "standby-battery-sizing": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatterySizing" },
+  "standby-battery-runtime": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatteryRuntime" },
   "coax-rg-loss": { module: "../../calc-lowvoltage.js", fn: "computeCoaxRgLoss" },
   "camera-lens-fov": { module: "../../calc-lowvoltage.js", fn: "computeCameraLensFov" },
   "ceiling-speaker-coverage": { module: "../../calc-lowvoltage.js", fn: "computeCeilingSpeakerCoverage" },

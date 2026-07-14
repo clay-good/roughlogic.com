@@ -378,6 +378,51 @@ function _renderStandbyBatterySizing(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["standby-battery-sizing"] = _renderStandbyBatterySizing;
 
+// dims: in { battery_ah: dimensionless, standby_current_a: I, alarm_current_a: I, alarm_minutes: T, derate: dimensionless } out: { standby_hours: T }
+export function computeStandbyBatteryRuntime({ battery_ah = 0, standby_current_a = 0, alarm_current_a = 0, alarm_minutes = 0, derate = 1.2 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Ah = Number(battery_ah), Is = Number(standby_current_a);
+  const Ia = Number(alarm_current_a), Ma = Number(alarm_minutes);
+  const d = Number(derate);
+  if (!(Ah > 0)) return { error: "Battery capacity must be positive (Ah)." };
+  if (!(Is > 0)) return { error: "Standby current must be positive (A)." };
+  if (!(Ia >= 0) || !(Ma >= 0)) return { error: "Alarm current and period must be non-negative." };
+  if (!(d > 0)) return { error: "Derate factor must be positive." };
+  const alarm_ah = Ia * (Ma / 60);
+  const usable_ah = Ah / d;
+  // Inverse of required_ah = (Is x Hs + Ia x Ma/60) x derate: Hs = (Ah/derate - alarm_ah) / Is.
+  const standby_hours = (usable_ah - alarm_ah) / Is;
+  if (!Number.isFinite(standby_hours)) return { error: "Runtime math is not a finite value." };
+  if (!(standby_hours > 0)) return { error: "Battery is too small to cover even the alarm load after derating; no standby time remains." };
+  return {
+    standby_hours, alarm_ah, usable_ah, derate: d,
+    note: "The standby (supervisory) time an installed battery supports before the alarm load, the inverse of the standby-battery-sizing tile: from required_Ah = (Is x Hs + Ia x Ma/60) x derate, Hs = (battery_Ah/derate - alarm_Ah) / Is. The derate (aging) factor is applied to the battery capacity, not credited, so the usable Ah is the nameplate divided by the derate (NFPA 72 expects >= 1.0, commonly 1.2). The alarm reserve (alarm current x alarm minutes) is subtracted first, then the remainder divides by the standby current. This is a design check against an NFPA 72 required standby period (commonly 24 h with 5 or 15 min of alarm); the AHJ-adopted edition, the listed panel, and the battery manufacturer's derating govern."
+  };
+}
+export const standbyBatteryRuntimeExample = { inputs: { battery_ah: 14.6, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 } };
+
+function _renderStandbyBatteryRuntime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: secondary (standby) battery runtime for a fire-alarm or security control unit, the inverse of the sizing worksheet: Hs = (battery_Ah/derate - alarm_Ah) / standby_current, per NFPA 72 §10.6 (secondary power supply), by name. The AHJ-adopted NFPA 72 edition, the listed panel, and the battery manufacturer's derating govern.";
+  const ah = makeNumber("Installed battery capacity (Ah)", "sbr-ah", { step: "any", min: "0" });
+  const is = makeNumber("Standby (supervisory) current (A)", "sbr-is", { step: "any", min: "0" });
+  const ia = makeNumber("Alarm current (A)", "sbr-ia", { step: "any", min: "0" });
+  const ma = makeNumber("Alarm period (min)", "sbr-ma", { step: "any", min: "0", value: "5" });
+  const d = makeNumber("Derate / aging factor", "sbr-d", { step: "any", min: "0", value: "1.2" });
+  ma.input.value = "5"; d.input.value = "1.2";
+  for (const f of [ah, is, ia, ma, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ah.input.value = "14.6"; is.input.value = "0.5"; ia.input.value = "2.0"; ma.input.value = "5"; d.input.value = "1.2"; update(); });
+  const oHrs = makeOutputLine(outputRegion, "Standby time supported", "sbr-out-hrs");
+  const oNote = makeOutputLine(outputRegion, "Note", "sbr-out-note");
+  const update = debounce(() => {
+    const r = computeStandbyBatteryRuntime({ battery_ah: Number(ah.input.value) || 0, standby_current_a: Number(is.input.value) || 0, alarm_current_a: Number(ia.input.value) || 0, alarm_minutes: Number(ma.input.value) || 0, derate: Number(d.input.value) || 0 });
+    if (r.error) { oHrs.textContent = r.error; oNote.textContent = ""; return; }
+    oHrs.textContent = fmt(r.standby_hours, 1) + " h";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ah.input, is.input, ia.input, ma.input, d.input]) f.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["standby-battery-runtime"] = _renderStandbyBatteryRuntime;
+
 // ---------------------------------------------------------------------
 // Z.6 Coaxial cable attenuation (coax-rg-loss)
 // ---------------------------------------------------------------------

@@ -20215,6 +20215,54 @@
    }
   },
   {
+   "tile_id": "standby-battery-runtime",
+   "source_publisher": "NFPA 72 §10.6 (by name), inverse",
+   "source_title": "Hs = (battery_Ah/derate - alarm_Ah) / I_standby",
+   "source_edition_or_year": "spec-v687 worked example (machine-verified)",
+   "source_section_or_page": "14.6 Ah, 0.5 A standby, 2 A / 5 min alarm, derate 1.2 -> 24 h (round-trips standby-battery-sizing)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "battery_ah": 14.6,
+    "standby_current_a": 0.5,
+    "alarm_current_a": 2,
+    "alarm_minutes": 5,
+    "derate": 1.2
+   },
+   "outputs": {
+    "standby_hours": {
+     "value": 24,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "standby-battery-runtime",
+   "source_publisher": "NFPA 72 §10.6 (by name), inverse",
+   "source_title": "cross-check: a larger 18 Ah battery holds the standby load longer",
+   "source_edition_or_year": "spec-v687 cross-check (machine-verified)",
+   "source_section_or_page": "18 Ah, same loads and derate -> about 29.7 h",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "battery_ah": 18,
+    "standby_current_a": 0.5,
+    "alarm_current_a": 2,
+    "alarm_minutes": 5,
+    "derate": 1.2
+   },
+   "outputs": {
+    "standby_hours": {
+     "value": 29.67,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coax-rg-loss",
    "source_publisher": "Belden / CommScope loss curves (by name)",
    "source_title": "loss_dB = loss_per_100ft * length / 100; end level = source - loss",

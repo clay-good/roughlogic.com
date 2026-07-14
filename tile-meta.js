@@ -444,7 +444,7 @@ const _TILES = [
 
   // v28 low-voltage / data / security cabling (Group A pending Group-Z signoff)
   ["fiber-loss-budget", "A"], ["cable-tray-fill", "A"], ["cctv-storage", "A"],
-  ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["coax-rg-loss", "A"],
+  ["speaker-70v-line", "A"], ["standby-battery-sizing", "A"], ["standby-battery-runtime", "A"], ["coax-rg-loss", "A"],
   ["camera-lens-fov", "A"], ["ceiling-speaker-coverage", "A"], ["structured-cabling-channel", "A"],
 
   // v29 pipe / raceway field-layout bench (deepens Groups B, A, G)
