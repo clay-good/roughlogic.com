@@ -10680,6 +10680,18 @@ export const CITATIONS = {
       { name: "Humidity-ratio input", value: "W is the moisture input (lb/lb); get it from RH via outdoor-air-mix or a chart", source: "scope of this tile" },
     ],
   },
+  "drybulb-from-enthalpy": {
+    formula: "t = (h - 1061 W) / (0.240 + 0.444 W) deg F (the moist-air enthalpy h = 0.240 t + W (1061 + 0.444 t) solved for t).",
+    edition: "The I-P moist-air enthalpy relation from the ASHRAE Handbook - Fundamentals solved for the dry-bulb, the inverse of the moist-air-enthalpy tile, by name.",
+    freeAccess: "The moist-air enthalpy relation and its sea-level coefficients are standard ASHRAE psychrometric results. A measured chart state and the equipment ratings govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The dry-bulb temperature of a moist-air state from its enthalpy and humidity ratio, the inverse of the moist-air-enthalpy tile: solving h = 0.240 t + W (1061 + 0.444 t) for t gives t = (h - 1061 W) / (0.240 + 0.444 W) deg F, with 0.240 the dry-air specific heat, 1061 the latent heat at the 0 F datum, and 0.444 the water-vapor specific heat, all sea-level coefficients. Use it to recover the dry-bulb of a coil's entering or leaving state when a psychrometric analysis gives the enthalpy and the humidity ratio but not the temperature directly. The humidity ratio must come from the chart or the RH (pair with outdoor-air-mix); this returns the dry-bulb of one state, not the wet-bulb or dew point. A design aid, not a substitute for a measured chart state or the equipment ratings.",
+    assumptions: [
+      { name: "Inverse relation", value: "t = (h - 1061 W) / (0.240 + 0.444 W)", source: "ASHRAE Fundamentals" },
+      { name: "Sea-level coefficients", value: "0.240 dry-air cp, 1061 latent heat at the 0 F datum, 0.444 vapor cp", source: "ASHRAE" },
+      { name: "Humidity-ratio input", value: "W comes from the chart or RH; returns the dry-bulb, not the wet-bulb or dew point", source: "scope of this tile" },
+    ],
+  },
   "cooling-coil-total-load": {
     formula: "Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr; tons = Q / 12000.",
     edition: "The total-heat coil-load relation from the ASHRAE Handbook - Fundamentals, by name.",

@@ -45592,6 +45592,48 @@
    }
   },
   {
+   "tile_id": "drybulb-from-enthalpy",
+   "source_publisher": "ASHRAE Fundamentals (moist-air enthalpy inverted for dry-bulb)",
+   "source_title": "h 31.48 Btu/lb at W 0.0112 -> 80 F dry-bulb (round-trips the moist-air-enthalpy example)",
+   "source_edition_or_year": "spec-v663 worked example (machine-verified)",
+   "source_section_or_page": "spec-v663 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "enthalpy_btu": 31.48,
+    "w_lb_lb": 0.0112
+   },
+   "outputs": {
+    "t_db_f": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drybulb-from-enthalpy",
+   "source_publisher": "ASHRAE Fundamentals (moist-air enthalpy inverted for dry-bulb)",
+   "source_title": "cross-check: dry air (W 0) at 19.2 Btu/lb is 80 F (t = h / 0.240)",
+   "source_edition_or_year": "spec-v663 worked example (machine-verified)",
+   "source_section_or_page": "spec-v663 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "enthalpy_btu": 19.2,
+    "w_lb_lb": 0
+   },
+   "outputs": {
+    "t_db_f": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cooling-coil-total-load",
    "source_publisher": "ASHRAE Fundamentals",
    "source_title": "2000 CFM across a 31.48 -> 22.97 Btu/lb drop -> 76,590 Btu/hr, 6.38 tons",

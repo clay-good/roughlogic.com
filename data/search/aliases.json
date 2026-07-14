@@ -56312,6 +56312,36 @@
       "kind": "question"
     },
     {
+      "term": "drybulb from enthalpy",
+      "target": "drybulb-from-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "temperature from enthalpy",
+      "target": "drybulb-from-enthalpy",
+      "kind": "industry"
+    },
+    {
+      "term": "enthalpy to temperature",
+      "target": "drybulb-from-enthalpy",
+      "kind": "redirect"
+    },
+    {
+      "term": "dry bulb from enthalpy and humidity ratio",
+      "target": "drybulb-from-enthalpy",
+      "kind": "question"
+    },
+    {
+      "term": "recover dry bulb from enthalpy",
+      "target": "drybulb-from-enthalpy",
+      "kind": "question"
+    },
+    {
+      "term": "db from h and w",
+      "target": "drybulb-from-enthalpy",
+      "kind": "question"
+    },
+    {
       "term": "4.5 cfm delta h formula",
       "target": "cooling-coil-total-load",
       "kind": "question"

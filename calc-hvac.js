@@ -3882,6 +3882,37 @@ HVAC_RENDERERS["moist-air-enthalpy"] = _rEnv({
   compute: computeMoistAirEnthalpy,
 });
 
+// dims: in { enthalpy_btu: L^2 T^-2, w_lb_lb: dimensionless } out: { t_db_f: T, h_sensible: L^2 T^-2, h_latent: L^2 T^-2 }
+export function computeDrybulbFromEnthalpy({ enthalpy_btu = 0, w_lb_lb = 0 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const h = Number(enthalpy_btu);
+  const w = Number(w_lb_lb);
+  if (w < 0) return { error: "Humidity ratio must be non-negative (lb water / lb dry air)." };
+  const denom = 0.240 + 0.444 * w;
+  const t_db_f = (h - 1061 * w) / denom;
+  const h_latent = w * (1061 + 0.444 * t_db_f);
+  const h_sensible = h - h_latent;
+  return {
+    t_db_f, h_sensible, h_latent,
+    note: "The dry-bulb temperature of a moist-air state from its enthalpy and humidity ratio, the inverse of the moist-air-enthalpy tile: solving h = 0.240 t + W (1061 + 0.444 t) for t gives t = (h - 1061 W) / (0.240 + 0.444 W) deg F. Use it to recover the dry-bulb of a coil's entering or leaving state when a psychrometric analysis gives the enthalpy and the humidity ratio but not the temperature directly. 0.240 is the dry-air specific heat, 1061 the latent heat at the 0 F datum, and 0.444 the water-vapor specific heat (ASHRAE I-P, sea level). The humidity ratio must come from the chart or the RH; this returns the dry-bulb of one state, not the wet-bulb or dew point. A design aid, not a substitute for a measured chart state or equipment ratings.",
+  };
+}
+const drybulbFromEnthalpyExample = { inputs: { enthalpy_btu: 31.48, w_lb_lb: 0.0112 } };
+HVAC_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
+  citation: "Citation: Moist-air enthalpy (ASHRAE Handbook - Fundamentals) solved for the dry-bulb: t = (h - 1061 W) / (0.240 + 0.444 W) deg F, the inverse of h = 0.240 t + W (1061 + 0.444 t). 0.240 = dry-air specific heat, 1061 = latent heat at the 0 F datum, 0.444 = water-vapor specific heat. The humidity ratio comes from the chart or RH. Sea-level coefficients; a design aid, not a substitute for a measured chart state or equipment ratings.",
+  example: drybulbFromEnthalpyExample.inputs,
+  fields: [
+    { key: "enthalpy_btu", label: "Enthalpy h (Btu/lb dry air)", kind: "number", default: 31.48 },
+    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number", default: 0.0112 },
+  ],
+  outputs: [
+    { key: "t", id: "dbe-out-t", label: "Dry-bulb temperature", value: (r) => fmt(r.t_db_f, 1) + " F" },
+    { key: "split", id: "dbe-out-split", label: "Sensible + latent", value: (r) => fmt(r.h_sensible, 2) + " + " + fmt(r.h_latent, 2) + " Btu/lb" },
+    { key: "n", id: "dbe-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrybulbFromEnthalpy,
+});
+
 // dims: in { cfm: L^3 T^-1, h_ent_btu: L^2 T^-2, h_lvg_btu: L^2 T^-2 } out: { q_btuh: M L^2 T^-3, tons: dimensionless, dh: L^2 T^-2 }
 export function computeCoolingCoilTotalLoad({ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}) {
   const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;

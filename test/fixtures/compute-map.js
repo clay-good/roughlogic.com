@@ -917,6 +917,7 @@ export const COMPUTE_MAP = {
   "isolator-deflection": { module: "../../calc-hvac.js", fn: "computeIsolatorDeflection" },
   "air-density-correction": { module: "../../calc-hvac.js", fn: "computeAirDensityCorrection" },
   "moist-air-enthalpy": { module: "../../calc-hvac.js", fn: "computeMoistAirEnthalpy" },
+  "drybulb-from-enthalpy": { module: "../../calc-hvac.js", fn: "computeDrybulbFromEnthalpy" },
   "cooling-coil-total-load": { module: "../../calc-hvac.js", fn: "computeCoolingCoilTotalLoad" },
   "coil-bypass-factor": { module: "../../calc-hvac.js", fn: "computeCoilBypassFactor" },
   "fan-affinity-laws": { module: "../../calc-hvac.js", fn: "computeFanAffinityLaws" },

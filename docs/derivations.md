@@ -2039,6 +2039,7 @@ cross-check.
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDcvCo2Ventilation` | `{ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDegreeDayEnergy` | `{ ua_btuhf = 0, hdd = 0, eff = 0.80, fuel = "gas", price = 0 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeDrybulbFromEnthalpy` | `{ enthalpy_btu = 0, w_lb_lb = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDualFuelBalancePoint` | `{ rate_kwh = 0, rate_therm = 0, afue = 0.95, cop_now = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeDuctFrictionStatic` | `{ shape = "round", D_in = 0, W_in = 0, H_in = 0, material = "galv_smooth", cf...` | _ | _ | _ |
 | calc-hvac.js | `computeDuctHeatGain` | `{ R_duct = 0, A_ft2 = 0, dT_F = 0, cfm = 0 } = {}` | _ | _ | _ |
@@ -2769,7 +2770,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1355.
+Row count: 1356.
 
 <!-- END function-corpus-v14 -->
 
@@ -3096,7 +3097,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (118 tiles)
+### Group C HVAC (119 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3138,6 +3139,7 @@ per spec-v14 §13.1 second paragraph.
 | `dcv-co2-ventilation` | Demand-Controlled Ventilation Rate from a CO2 Setpoint | Steady-state single-zone CO2 mass bal...; spec-v277 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `degree-day-energy` | Annual Heating Energy and Fuel Cost from Degree-Days | Degree-day method (ASHRAE / RESNET); spec-v330 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `draft-hood-dilution` | Draft-Hood Dilution Ratio | Combustion-analysis practice; appliance O2 5%, diluted O2 12% -> ratio 1.79, 44.0% dilu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `drybulb-from-enthalpy` | Dry-Bulb from Enthalpy and Humidity Ratio | ASHRAE Fundamentals (moist-air enthal...; spec-v663 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `dual-fuel-balance-point` | Dual-Fuel Economic Switchover (Heat Pump vs Gas Balance Point) | Delivered-Btu fuel-cost comparison; spec-v234 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `duct-friction-static` | Duct Friction Loss and Static Pressure | ASHRAE Fundamentals Darcy-Weisbach + ...; 10 in round / 400 cfm / 30 ft / no fittings -> 733.39 fpm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `duct-heat-gain` | Duct Heat Gain/Loss Through Unconditioned Space | ASHRAE Fundamentals; spec-v347 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4066,6 +4068,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1111. Fixture-covered or reference-cadence: 1111 / 1111.
+Tile count: 1112. Fixture-covered or reference-cadence: 1112 / 1112.
 
 <!-- END tile-index-v14 -->

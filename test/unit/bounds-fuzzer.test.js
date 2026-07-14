@@ -15729,6 +15729,25 @@ test("bounds: spec-v375 computeMoistAirEnthalpy pins h = 0.240 t + W(1061 + 0.44
   assert.ok("error" in _v375({ t_db_f: 80, w_lb_lb: NaN }));
 });
 
+import { computeDrybulbFromEnthalpy as _v663 } from "../../calc-hvac.js";
+
+test("bounds: spec-v663 computeDrybulbFromEnthalpy inverts the moist-air enthalpy for the dry-bulb, round-trips it, handles dry air, and pins error seams", () => {
+  const r = _v663({ enthalpy_btu: 31.48, w_lb_lb: 0.0112 });
+  assert.ok(Math.abs(r.t_db_f - (31.48 - 1061 * 0.0112) / (0.240 + 0.444 * 0.0112)) < 1e-9);
+  assert.ok(Math.abs(r.t_db_f - 80) < 0.1);
+  // Exact inverse of moist-air-enthalpy: the enthalpy of the recovered dry-bulb at that W is the input h.
+  assert.ok(Math.abs(_v375({ t_db_f: r.t_db_f, w_lb_lb: 0.0112 }).h - 31.48) < 1e-9);
+  // Round-trip the sibling's own state: 80 F / W 0.0112 -> h -> back to 80 F.
+  const h80 = _v375({ t_db_f: 80, w_lb_lb: 0.0112 }).h;
+  assert.ok(Math.abs(_v663({ enthalpy_btu: h80, w_lb_lb: 0.0112 }).t_db_f - 80) < 1e-9);
+  // Dry air (W = 0): t = h / 0.240, so 19.2 Btu/lb -> 80 F.
+  assert.ok(Math.abs(_v663({ enthalpy_btu: 19.2, w_lb_lb: 0 }).t_db_f - 80) < 1e-9);
+  // Error seams: negative W, non-finite.
+  assert.ok("error" in _v663({ enthalpy_btu: 31.48, w_lb_lb: -0.001 }));
+  assert.ok("error" in _v663({ enthalpy_btu: Infinity, w_lb_lb: 0.0112 }));
+  assert.ok("error" in _v663({ enthalpy_btu: 31.48, w_lb_lb: NaN }));
+});
+
 test("bounds: spec-v376 computeCoolingCoilTotalLoad pins Q = 4.5 CFM dh, tons, the heating case, and error seams", () => {
   const r = _v376({ cfm: 2000, h_ent_btu: 31.48, h_lvg_btu: 22.97 });
   assert.ok(Math.abs(r.q_btuh - 76590) < 1e-6);
