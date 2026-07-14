@@ -2471,3 +2471,40 @@ MECHANIC_RENDERERS["turn-radius-bank"] = _simpleRenderer({
   ],
   compute: computeTurnRadiusBank,
 });
+
+// ===================== spec-v796: climb gradient to required rate of climb =====================
+// A departure gradient is feet of climb per nautical mile of ground track. Ground speed (kt = nm/hr)
+// times the gradient (ft/nm) is ft/hr; / 60 is the rate of climb in ft/min. The gradient as a percent
+// is ft_per_nm / 6076.12 x 100, and its angle is atan(ft_per_nm / 6076.12).
+// dims: in { climb_gradient_ft_per_nm: dimensionless, ground_speed_kt: L T^-1 } out: { roc_fpm: L T^-1, gradient_percent: dimensionless, gradient_deg: dimensionless }
+export function computeClimbGradientRoc({ climb_gradient_ft_per_nm = 0, ground_speed_kt = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const grad = Number(climb_gradient_ft_per_nm) || 0;
+  const gs = Number(ground_speed_kt) || 0;
+  if (!(grad > 0)) return { error: "Climb gradient must be positive (ft/nm)." };
+  if (!(gs > 0)) return { error: "Ground speed must be positive (kt)." };
+  const roc_fpm = grad * gs / 60;
+  const gradient_percent = grad / 6076.12 * 100;
+  const gradient_deg = Math.atan(grad / 6076.12) * 180 / Math.PI;
+  if (![roc_fpm, gradient_percent, gradient_deg].every(Number.isFinite)) return { error: "Climb-gradient math is not a finite value." };
+  return {
+    roc_fpm, gradient_percent, gradient_deg,
+    note: "Required rate of climb for a departure gradient: an obstacle departure procedure states the climb as a GRADIENT in feet per nautical mile (the obstacle-clearance surface's slope), but the cockpit vertical speed indicator reads in feet per MINUTE, so the two must be reconciled through the ground speed. Ground speed is nautical miles per hour, so ground speed x gradient is feet per hour, and dividing by 60 gives the feet-per-minute the VSI must show. The key trap: because it scales with GROUND speed, flying faster (or a tailwind) demands a HIGHER rate of climb to hold the same gradient, and a heavy, high-density-altitude departure that limits rate of climb may not make a steep required gradient at all -- the go/no-go a takeoff analysis turns on. The gradient as a percent is ft/nm over 6076.12; the default 200 ft/nm standard is about 3.3%. A planning aid, not a clearance; the departure procedure and the aircraft performance charts govern.",
+  };
+}
+export const climbGradientRocExample = { inputs: { climb_gradient_ft_per_nm: 300, ground_speed_kt: 120 } };
+
+MECHANIC_RENDERERS["climb-gradient-roc"] = _simpleRenderer({
+  citation: "Citation: climb gradient to rate of climb (FAA TERPS / AIM departure procedures): ROC(fpm) = climb_gradient(ft/nm) x ground_speed(kt) / 60; gradient percent = ft_per_nm / 6076.12 x 100. The gradient is fixed (obstacle clearance) but the required rate of climb scales with ground speed, so a tailwind or a faster climb speed demands more fpm. The 200 ft/nm default is ~3.3%. A planning aid; the departure procedure and the performance charts govern.",
+  example: climbGradientRocExample.inputs,
+  fields: [
+    { key: "climb_gradient_ft_per_nm", label: "Climb gradient (ft/nm, 200 default)", kind: "number", default: 300 },
+    { key: "ground_speed_kt", label: "Ground speed (kt)", kind: "number", default: 120 },
+  ],
+  outputs: [
+    { key: "r", id: "cgr-out-r", label: "Required rate of climb", value: (r) => fmt(r.roc_fpm, 0) + " ft/min" },
+    { key: "p", id: "cgr-out-p", label: "Gradient", value: (r) => fmt(r.gradient_percent, 2) + "% (" + fmt(r.gradient_deg, 2) + " deg)" },
+    { key: "n", id: "cgr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeClimbGradientRoc,
+});

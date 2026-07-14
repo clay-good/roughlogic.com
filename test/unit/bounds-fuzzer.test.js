@@ -21701,6 +21701,22 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
+import { computeClimbGradientRoc as _v796 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v796 computeClimbGradientRoc pins ROC, the gradient percent, monotonicity, and error seams", () => {
+  const r = _v796({ climb_gradient_ft_per_nm: 300, ground_speed_kt: 120 });
+  assert.ok(Math.abs(r.roc_fpm - 600) < 1e-9); // 300 * 120 / 60
+  assert.ok(Math.abs(r.gradient_percent - 4.9373) < 0.001); // 300 / 6076.12 * 100
+  // ROC scales linearly with both ground speed and gradient; the gradient percent is speed-independent.
+  assert.ok(Math.abs(_v796({ climb_gradient_ft_per_nm: 300, ground_speed_kt: 150 }).roc_fpm - 750) < 1e-9);
+  assert.ok(Math.abs(_v796({ climb_gradient_ft_per_nm: 200, ground_speed_kt: 120 }).roc_fpm - 400) < 1e-9);
+  assert.ok(Math.abs(_v796({ climb_gradient_ft_per_nm: 300, ground_speed_kt: 200 }).gradient_percent - r.gradient_percent) < 1e-9);
+  // Error seams: non-finite, non-positive gradient/ground speed.
+  assert.ok("error" in _v796({ climb_gradient_ft_per_nm: Infinity, ground_speed_kt: 120 }));
+  assert.ok("error" in _v796({ climb_gradient_ft_per_nm: 0, ground_speed_kt: 120 }));
+  assert.ok("error" in _v796({ climb_gradient_ft_per_nm: 300, ground_speed_kt: 0 }));
+});
+
 import { computeTurnRadiusBank as _v795 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v795 computeTurnRadiusBank pins the coordinated-turn radius, rate, V-squared scaling, and error seams", () => {

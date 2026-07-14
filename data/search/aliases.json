@@ -23922,6 +23922,31 @@
       "kind": "question"
     },
     {
+      "term": "climb gradient to feet per minute",
+      "target": "climb-gradient-roc",
+      "kind": "question"
+    },
+    {
+      "term": "required rate of climb departure",
+      "target": "climb-gradient-roc",
+      "kind": "question"
+    },
+    {
+      "term": "feet per nautical mile to fpm",
+      "target": "climb-gradient-roc",
+      "kind": "question"
+    },
+    {
+      "term": "climb gradient percent",
+      "target": "climb-gradient-roc",
+      "kind": "industry"
+    },
+    {
+      "term": "200 ft per nm climb",
+      "target": "climb-gradient-roc",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -512,6 +512,7 @@ const _TILES = [
   ["fresh-concrete-temp", "E"],
   ["glidepath-descent-rate", "K"],
   ["turn-radius-bank", "K"],
+  ["climb-gradient-roc", "K"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

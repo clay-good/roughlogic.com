@@ -1027,6 +1027,7 @@ const RELATED = {
   "engine-bmep": ["displacement-cr","volumetric-efficiency","hp-from-torque"],
   "glidepath-descent-rate": ["density-altitude","crosswind-component","aircraft-weight-balance"],
   "turn-radius-bank": ["glidepath-descent-rate","crosswind-component","density-altitude"],
+  "climb-gradient-roc": ["glidepath-descent-rate","density-altitude","turn-radius-bank"],
   "compressor-displacement": ["refrigerant-mass-flow","recovery-cylinder","evaporator-td-dtd"],
   "fresh-concrete-temp": ["concrete-evaporation-rate","concrete-strength-gain","concrete-maturity"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],

@@ -879,6 +879,7 @@ const TOOL_MODULES = (() => {
     "engine-bmep",
     "glidepath-descent-rate",
     "turn-radius-bank",
+    "climb-gradient-roc",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

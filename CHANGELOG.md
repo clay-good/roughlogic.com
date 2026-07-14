@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v796 climb gradient to rate of climb; 2026-07-14
+
+- New tile `climb-gradient-roc` (Group K, calc-mechanic.js aviation): reconciles a departure's climb gradient (feet per
+  nautical mile, the obstacle-clearance slope) with the cockpit rate of climb (feet per minute) through the ground speed.
+  `ROC = gradient x ground speed / 60`; gradient percent = `ft/nm / 6076.12 x 100`. A 300 ft/nm gradient at 120 kt needs
+  600 ft/min (4.94%). Scales with ground speed, so a tailwind demands a higher rate of climb for the same gradient.
+  Fuzzer pins ROC, the gradient percent, the monotonicity, and the error seams. Closes the sweep-22 aviation cluster.
+  Explore sweep #22 entry 6. Home count 1,244 -> 1,245.
+
 ### feat(mechanic): spec-v795 coordinated turn radius and rate; 2026-07-14
 
 - New tile `turn-radius-bank` (Group K, calc-mechanic.js aviation): the radius and rate of a coordinated level turn from

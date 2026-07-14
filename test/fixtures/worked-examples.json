@@ -24522,6 +24522,33 @@
    }
   },
   {
+   "tile_id": "climb-gradient-roc",
+   "source_publisher": "FAA TERPS / AIM (departure climb gradient)",
+   "source_title": "roc_fpm = climb_gradient_ft_per_nm x ground_speed_kt / 60",
+   "source_edition_or_year": "spec-v796 worked example (machine-verified)",
+   "source_section_or_page": "300 ft/nm gradient at 120 kt -> 300 x 120 / 60 = 600 ft/min (4.94%)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "climb_gradient_ft_per_nm": 300,
+    "ground_speed_kt": 120
+   },
+   "outputs": {
+    "roc_fpm": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "gradient_percent": {
+     "value": 4.94,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "turn-radius-bank",
    "source_publisher": "FAA Airplane Flying Handbook (coordinated turn)",
    "source_title": "radius = 0.08854 x airspeed_kt^2 / tan(bank)",

@@ -9661,6 +9661,17 @@ export const CITATIONS = {
       { name: "Reserve rate", value: "25 A draw to a 10.5 V cutoff at 80 F on a 12 V battery", source: "BCI / SAE J537" },
     ],
   },
+  "climb-gradient-roc": {
+    formula: "roc_fpm = climb_gradient_ft_per_nm x ground_speed_kt / 60; gradient_percent = climb_gradient_ft_per_nm / 6076.12 x 100; gradient_deg = atan(climb_gradient_ft_per_nm / 6076.12).",
+    edition: "Climb gradient to rate of climb (FAA TERPS / AIM departure procedures), by name; the departure procedure and aircraft performance charts govern.",
+    freeAccess: "The gradient-to-rate conversion is first-principles; the required gradient comes from the departure procedure and the ground speed from the flight instruments.",
+    governance: GOVERNANCE.general,
+    editionNote: "Required rate of climb for a departure gradient: an obstacle departure procedure states the climb as a gradient in feet per nautical mile (the obstacle-clearance surface's slope), but the cockpit vertical speed indicator reads feet per minute, so the two are reconciled through the ground speed -- ground speed (nm/hr) times the gradient (ft/nm) is ft/hr, and dividing by 60 gives ft/min. Because it scales with GROUND speed, flying faster or a tailwind demands a higher rate of climb to hold the same gradient, and a heavy, high-density-altitude departure that limits rate of climb may not make a steep required gradient at all -- the go/no-go a takeoff analysis turns on. The gradient as a percent is ft/nm over 6076.12; the default 200 ft/nm standard is about 3.3%. A planning aid, not a clearance.",
+    assumptions: [
+      { name: "Ground speed drives it", value: "the required rate of climb scales with ground speed for a fixed gradient", source: "FAA TERPS" },
+      { name: "Standard default", value: "the standard obstacle departure gradient is 200 ft/nm (~3.3%) unless a steeper one is published", source: "FAA AIM" },
+    ],
+  },
   "turn-radius-bank": {
     formula: "turn_radius_ft = (airspeed_kt x 1.68781)^2 / (32.174 x tan(bank)) = 0.08854 x airspeed_kt^2 / tan(bank); rate_of_turn_deg_s = (v_fps / radius) x 180/pi.",
     edition: "Coordinated-turn radius and rate (FAA Airplane Flying Handbook; classical flight-dynamics balanced-turn relation), by name; the flight manual and the pilot in command govern.",
