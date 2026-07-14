@@ -3526,6 +3526,18 @@ export const CITATIONS = {
       { name: "Default thermal efficiency", value: "0.82 unless user supplies a tested EF", source: "DOE federal minimum for gas tankless" },
     ],
   },
+  "gas-leak-hole-diameter": {
+    formula: "d = sqrt( 4 Q / (3550 x c x pi x sqrt(dP / SG)) ), the inverse of Q = 3550 x c x (pi d^2 / 4) x sqrt(dP / SG); orifice area A = Q / (3550 c sqrt(dP/SG)).",
+    edition: "Classical orifice-flow leak approximation (compressible small leak), solved for the diameter; the 3550 coefficient and gas specific gravity from public engineering references.",
+    freeAccess: "The orifice-flow leak relation is public; the gas specific gravity is a bundled property.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (physics). The equivalent orifice (hole) diameter for a measured gas leak, the inverse of Q = 3550 c A sqrt(dP/SG). This is the small-leak orifice-flow approximation (compressible, subsonic) and gives an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (about 0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked flow at high pressure ratios all shift it. Distinct from the water orifice-diameter tile, which inverts the incompressible Q = Cd A sqrt(2 g h) form. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
+    assumptions: [
+      { name: "Discharge coefficient c", value: "about 0.7 for a sharp orifice unless the user supplies otherwise", source: "engineering practice" },
+      { name: "Gas specific gravity", value: "bundled natural-gas / propane specific gravity", source: "engineering reference" },
+      { name: "Estimate only", value: "the small-leak orifice approximation, not a code leak-test method", source: "scope of this tile" },
+    ],
+  },
   "gas-leak-rate": {
     formula: "Orifice flow estimate Q = Cd × A × √(2 × ΔP / ρ); converted to scf/h with bundled natural-gas / propane density at standard conditions.",
     edition: "Classical fluid mechanics; orifice coefficient typical from public engineering references.",

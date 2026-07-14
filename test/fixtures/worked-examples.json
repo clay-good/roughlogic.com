@@ -6479,6 +6479,35 @@
    }
   },
   {
+   "tile_id": "gas-leak-hole-diameter",
+   "source_publisher": "Project (first-principles, solved for diameter)",
+   "source_title": "d = sqrt( 4 Q / (3550 * c * pi * sqrt(dP / SG)) )",
+   "source_edition_or_year": "n/a; standard orifice flow identity, SG natural gas 0.60, c = 0.7",
+   "source_section_or_page": "3.15 cfh natural-gas leak at 0.25 psi -> ~0.050 in equivalent hole",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "leak_rate_cfh": 3.15,
+    "upstream_psi": 0.25,
+    "gas": "natural_gas",
+    "c": 0.7
+   },
+   "outputs": {
+    "orifice_diameter_in": {
+     "value": 0.05,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "orifice_area_in2": {
+     "value": 0.001963,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shr",
    "source_publisher": "ASHRAE Handbook (Fundamentals)",
    "source_title": "Sensible heat ratio: SHR = sensible_load / total_load",

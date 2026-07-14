@@ -183,6 +183,67 @@ export function renderGasLeakRate(inputRegion, outputRegion, citationEl) {
 }
 GAS_RENDERERS["gas-leak-rate"] = renderGasLeakRate;
 
+// gas-leak-hole-diameter: inverse of gas-leak-rate. The forward tile gives the leak rate from the orifice diameter; the
+// inverse recovers the equivalent orifice (hole) diameter from a measured leak rate, so an estimator turns a clocked or
+// metered leak into a hole size. From Q = 3550 c (pi d^2 / 4) sqrt(dP / SG),
+// d = sqrt( 4 Q / (3550 c pi sqrt(dP / SG)) ). Distinct from orifice-diameter-for-flow (the WATER orifice-discharge
+// inverse); this uses the 3550-coefficient compressible small-leak form and the gas specific gravity.
+// dims: in { leak_rate_cfh: L^3 T^-1, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { orifice_diameter_in: L, orifice_area_in2: L^2 }
+export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c = 0.7 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const props = GAS_PROPERTIES[gas];
+  if (!props) return { error: "Unknown gas." };
+  const Q = Number(leak_rate_cfh) || 0;
+  const dP = Number(upstream_psi) || 0;
+  const cd = Number(c) || 0;
+  if (!(Q > 0)) return { error: "Provide a positive leak rate (cfh)." };
+  if (!(dP > 0)) return { error: "Provide a positive upstream pressure (psi)." };
+  if (!(cd > 0)) return { error: "Discharge coefficient must be positive." };
+  const orifice_area_in2 = Q / (3550 * cd * Math.sqrt(dP / props.specific_gravity));
+  const orifice_diameter_in = Math.sqrt(4 * orifice_area_in2 / Math.PI);
+  if (![orifice_area_in2, orifice_diameter_in].every(Number.isFinite)) return { error: "Hole-diameter math is not a finite value." };
+  return {
+    orifice_diameter_in,
+    orifice_area_in2,
+    discharge_coefficient: cd,
+    specific_gravity: props.specific_gravity,
+    note: "Equivalent orifice diameter for a measured gas leak: from Q = 3550 c A sqrt(dP / SG) with A = pi d^2 / 4, d = sqrt( 4 Q / (3550 c pi sqrt(dP / SG)) ). This is the small-leak orifice-flow approximation (compressible, subsonic) - an ESTIMATE of the effective hole size, not a code leak-test method. The discharge coefficient (~0.7 for a sharp orifice) and the actual crack geometry, temperature, and choked-flow at high pressure ratios all shift it. Any positive leak is a hazard: find and repair it, and follow the code test and the utility's procedure.",
+  };
+}
+export const gasLeakHoleDiameterExample = {
+  inputs: { leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 },
+  expectedRange: { orifice_diameter_in: { min: 0.01, max: 0.2 } },
+};
+function renderGasLeakHoleDiameter(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: d = sqrt( 4 Q / (3550 * c * pi * sqrt(dP / SG)) ), the orifice-flow leak approximation Q = 3550 c A sqrt(dP/SG) solved for the diameter. An estimate of the effective hole size, not a code leak-test method. Estimation only.";
+  const q = makeNumber("Measured leak rate (ft^3/hr)", "glh-q", { step: "any", min: "0" });
+  const psi = makeNumber("Upstream gauge pressure (psi)", "glh-p", { step: "any", min: "0" });
+  const c = makeNumber("Discharge coefficient", "glh-c", { step: "any", min: "0", max: "1", value: "0.7" });
+  c.input.value = "0.7";
+  const gas = makeSelect("Gas", "glh-g", [
+    { value: "natural_gas", label: "Natural gas" }, { value: "propane", label: "Propane" },
+  ]);
+  for (const f of [q, psi, c, gas]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "3.15"; psi.input.value = "0.25"; c.input.value = "0.7"; gas.select.value = "natural_gas"; update(); });
+  const oD = makeOutputLine(outputRegion, "Equivalent orifice diameter", "glh-out-d");
+  const oA = makeOutputLine(outputRegion, "Orifice area", "glh-out-a");
+  const oN = makeOutputLine(outputRegion, "Note", "glh-out-n");
+  const update = debounce(() => {
+    const r = computeGasLeakHoleDiameter({
+      leak_rate_cfh: Number(q.input.value) || 0,
+      upstream_psi: Number(psi.input.value) || 0,
+      c: Number(c.input.value) || 0.7,
+      gas: gas.select.value,
+    });
+    if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oN.textContent = ""; return; }
+    oD.textContent = fmt(r.orifice_diameter_in, 4) + " in";
+    oA.textContent = fmt(r.orifice_area_in2, 5) + " in^2";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [q.input, psi.input, c.input, gas.select]) el.addEventListener("input", update);
+}
+GAS_RENDERERS["gas-leak-hole-diameter"] = renderGasLeakHoleDiameter;
+
 // =====================================================================
 // gas-pipe-pressure-drop (Group B) - v20 B.3 longhand Spitzglass drop.
 // Spitzglass low-pressure: Q = 3550 * K * sqrt((dH * D^5) / (SG * L)), where

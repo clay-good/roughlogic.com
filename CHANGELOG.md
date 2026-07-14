@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(gas): spec-v755 gas leak equivalent hole diameter (gas-leak-rate inverse); 2026-07-14
+
+- New tile `gas-leak-hole-diameter` (Group B, calc-gas.js): the equivalent orifice (hole) diameter from a measured gas
+  leak rate. `d = sqrt( 4 Q / (3550 c pi sqrt(dP / SG)) )`. A 3.15 cfh natural-gas leak at 0.25 psi (c 0.7) is ~0.050 in.
+  An estimate of the effective hole, not a code leak-test method. Round-trips through `gas-leak-rate`. Closes Explore
+  sweep #14. Home tile count 1,203 -> 1,204.
+
 ### feat(steel): spec-v754 required moment of inertia for a deflection limit (steel-camber inverse); 2026-07-14
 
 - New tile `steel-inertia-for-deflection` (Group E, calc-steel.js): the moment of inertia a simple-span beam needs to

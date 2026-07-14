@@ -603,7 +603,7 @@ import {
   renderSepticTank,
 } from "../../calc-septic.js";
 import {
-  computeGasPipeSizing, computeGasLeakRate, spitzglassFlow,
+  computeGasPipeSizing, computeGasLeakRate, computeGasLeakHoleDiameter, spitzglassFlow,
   renderGasPipeSizing, renderGasLeakRate,
 } from "../../calc-gas.js";
 import {
@@ -7507,6 +7507,28 @@ test("bounds: calc-plumbing computeGasLeakRate pins Q = 3550*c*A*sqrt(dP/SG) on 
   assert.ok("error" in computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0.25, gas: "argon" }));
   assert.ok("error" in computeGasLeakRate({ orifice_diameter_in: 0, upstream_psi: 0.25, gas: "natural_gas" }));
   assert.ok("error" in computeGasLeakRate({ orifice_diameter_in: 0.05, upstream_psi: 0, gas: "natural_gas" }));
+});
+
+test("bounds: spec-v755 gas leak equivalent hole diameter (inverse of gas-leak-rate)", () => {
+  const p = computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas", c: 0.7 });
+  assert.ok(Math.abs(p.orifice_diameter_in - 0.05) < 0.001);
+  assert.strictEqual(p.specific_gravity, 0.6);
+  // round-trip: the recovered diameter fed to gas-leak-rate reproduces the leak rate
+  for (const [q, dP, gas, c] of [[3.15, 0.25, "natural_gas", 0.7], [8, 0.5, "propane", 0.7], [1.2, 0.25, "natural_gas", 0.6], [20, 2, "natural_gas", 0.8]]) {
+    const inv = computeGasLeakHoleDiameter({ leak_rate_cfh: q, upstream_psi: dP, gas, c });
+    const fwd = computeGasLeakRate({ orifice_diameter_in: inv.orifice_diameter_in, upstream_psi: dP, gas, c });
+    assert.ok(Math.abs(fwd.leak_rate_cfh - q) < 1e-6);
+    assert.ok(Math.abs(fwd.orifice_area_in2 - inv.orifice_area_in2) < 1e-9);
+  }
+  // a bigger leak or lower pressure implies a bigger hole
+  assert.ok(computeGasLeakHoleDiameter({ leak_rate_cfh: 10, upstream_psi: 0.25, gas: "natural_gas" }).orifice_diameter_in > computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas" }).orifice_diameter_in);
+  assert.ok(computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.1, gas: "natural_gas" }).orifice_diameter_in > computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas" }).orifice_diameter_in);
+  // error seams: unknown gas, non-positive leak / pressure / c, non-finite
+  assert.ok("error" in computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "argon" }));
+  assert.ok("error" in computeGasLeakHoleDiameter({ leak_rate_cfh: 0, upstream_psi: 0.25, gas: "natural_gas" }));
+  assert.ok("error" in computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0, gas: "natural_gas" }));
+  assert.ok("error" in computeGasLeakHoleDiameter({ leak_rate_cfh: 3.15, upstream_psi: 0.25, gas: "natural_gas", c: 0 }));
+  assert.ok("error" in computeGasLeakHoleDiameter({ leak_rate_cfh: Infinity, upstream_psi: 0.25, gas: "natural_gas" }));
 });
 
 test("bounds: calc-plumbing computeStormwaterRational pins Q = C*i*A (acres) and 1 cfs = 448.831 gpm on the spec asphalt example", () => {

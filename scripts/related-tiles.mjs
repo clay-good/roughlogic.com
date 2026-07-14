@@ -652,6 +652,7 @@ const RELATED = {
   "pipe-expansion": ["pipe-expansion-loop", "water-hammer-arrestor"],
   "tankless-gpm": ["pipe-sizing", "friction-loss"],
   "gas-leak-rate": ["gas-pipe-sizing", "hydrostatic-test"],
+  "gas-leak-hole-diameter": ["gas-leak-rate", "gas-pipe-sizing", "hydrostatic-test"],
   "stormwater-rational": ["manning-slope", "rainwater-yield"],
   "stormwater-max-drainage-area": ["stormwater-rational", "time-of-concentration", "stormwater-detention-volume", "roof-drain-sizing"],
   "manning-slope": ["manning-pipe-capacity", "slope", "stormwater-rational", "trap-arm"],

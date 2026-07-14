@@ -50692,6 +50692,31 @@
       "kind": "question"
     },
     {
+      "term": "gas leak hole size",
+      "target": "gas-leak-hole-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "hole size from leak rate",
+      "target": "gas-leak-hole-diameter",
+      "kind": "redirect"
+    },
+    {
+      "term": "gas leak hole diameter",
+      "target": "gas-leak-hole-diameter",
+      "kind": "industry"
+    },
+    {
+      "term": "equivalent hole for gas leak",
+      "target": "gas-leak-hole-diameter",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how big is the leak hole",
+      "target": "gas-leak-hole-diameter",
+      "kind": "adjacent"
+    },
+    {
       "term": "how much gas escapes from a leak",
       "target": "gas-leak-rate",
       "kind": "question"

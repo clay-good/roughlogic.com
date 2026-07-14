@@ -340,6 +340,7 @@ export const COMPUTE_MAP = {
   "transformer-kva-sizing": { module: "../../calc-electrical.js", fn: "computeTransformerKvaSizing" },
   "service-load-standard": { module: "../../calc-electrical.js", fn: "computeServiceLoadStandard" },
   "gas-leak-rate": { module: "../../calc-gas.js", fn: "computeGasLeakRate" },
+  "gas-leak-hole-diameter": { module: "../../calc-gas.js", fn: "computeGasLeakHoleDiameter" },
   "shr": { module: "../../calc-hvac.js", fn: "computeSHR" },
   "equivalent-length": { module: "../../calc-hvac.js", fn: "computeEquivalentLength" },
   "baseboard-output": { module: "../../calc-hvac.js", fn: "computeBaseboardOutput" },
