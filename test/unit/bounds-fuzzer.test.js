@@ -19755,7 +19755,34 @@ test("bounds: spec-v584 computeCoAirFree pins the correction, the 400/100 ppm fl
   assert.ok("error" in _v584({ measured_co_ppm: 60, measured_o2_pct: 21 }));
 });
 
-import { computeChimneyDraft as _v585 } from "../../calc-hvacservice.js";
+import { computeChimneyDraft as _v585, computeChimneyHeightForDraft as _v669 } from "../../calc-hvacservice.js";
+
+test("bounds: spec-v669 computeChimneyHeightForDraft pins H = D_net/(factor*0.52*B*(1/To-1/Tm)), the altitude increase, round-trips through computeChimneyDraft, and error seams", () => {
+  const r = _v669({ target_draft_net_inwc: 0.1046, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 14.7, net_factor: 0.6 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected = 0.1046 / (0.6 * 0.52 * 14.7 * (1 / 520 - 1 / 860));
+  assert.ok(Math.abs(r.required_height_ft - expected) < 1e-9, `H identity: ${r.required_height_ft}`);
+  // Altitude (lower barometric pressure) needs a taller stack for the same draft.
+  const alt = _v669({ target_draft_net_inwc: 0.1046, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 12.2, net_factor: 0.6 });
+  assert.ok(alt.required_height_ft > r.required_height_ft, `altitude taller: ${alt.required_height_ft}`);
+  // Round-trip: the required height, fed back through the forward tile, reproduces the target net draft.
+  for (const baro_psia of [10, 12.2, 14.7]) {
+    for (const mean_flue_temp_f of [300, 400, 600]) {
+      const target = 0.08;
+      const m = _v669({ target_draft_net_inwc: target, ambient_temp_f: 60, mean_flue_temp_f, baro_psia, net_factor: 0.6 });
+      assert.ok(!m.error, `sweep B=${baro_psia} Tm=${mean_flue_temp_f}: ${JSON.stringify(m)}`);
+      assertFinite(m.required_height_ft, "H"); assert.ok(m.required_height_ft > 0, "H positive");
+      const back = _v585({ stack_height_ft: m.required_height_ft, ambient_temp_f: 60, mean_flue_temp_f, baro_psia, net_factor: 0.6 });
+      assert.ok(Math.abs(back.draft_net_inwc - target) < 1e-9, `round-trip B=${baro_psia} Tm=${mean_flue_temp_f}: ${back.draft_net_inwc}`);
+    }
+  }
+  // Error seams: non-positive target, flue <= ambient, non-positive pressure / factor, non-finite.
+  assert.ok("error" in _v669({ target_draft_net_inwc: 0, ambient_temp_f: 60, mean_flue_temp_f: 400 }));
+  assert.ok("error" in _v669({ target_draft_net_inwc: 0.1, ambient_temp_f: 400, mean_flue_temp_f: 400 }));
+  assert.ok("error" in _v669({ target_draft_net_inwc: 0.1, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 0 }));
+  assert.ok("error" in _v669({ target_draft_net_inwc: 0.1, ambient_temp_f: 60, mean_flue_temp_f: 400, net_factor: 0 }));
+  assert.ok("error" in _v669({ target_draft_net_inwc: Infinity, ambient_temp_f: 60, mean_flue_temp_f: 400 }));
+});
 
 test("bounds: spec-v585 computeChimneyDraft pins the Rankine draft, the net factor, the altitude reduction, and error seams", () => {
   const r = _v585({ stack_height_ft: 30, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 14.7, net_factor: 0.6 });

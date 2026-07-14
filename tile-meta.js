@@ -200,7 +200,7 @@ const _TILES = [
   ["excess-air-o2", "C"],
   ["co-air-free", "C"],
   ["draft-hood-dilution", "C"],
-  ["chimney-draft", "C"],
+  ["chimney-draft", "C"], ["chimney-height-for-draft", "C"],
   ["flue-gas-combustion-eff", "C"],
   ["combustion-lambda", "C"],
   ["refrigerant-charging", "C"], ["cooling-tower", "C"], ["insulation-heat-loss", "C"],

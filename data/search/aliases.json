@@ -21497,6 +21497,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "chimney height",
+      "target": "chimney-height-for-draft",
+      "kind": "industry"
+    },
+    {
+      "term": "how tall a chimney",
+      "target": "chimney-height-for-draft",
+      "kind": "industry"
+    },
+    {
+      "term": "stack height for draft",
+      "target": "chimney-height-for-draft",
+      "kind": "industry"
+    },
+    {
+      "term": "flue height sizing",
+      "target": "chimney-height-for-draft",
+      "kind": "adjacent"
+    },
+    {
+      "term": "chimney height for appliance draft",
+      "target": "chimney-height-for-draft",
+      "kind": "adjacent"
+    },
+    {
       "term": "prop pitch selection",
       "target": "prop-pitch-selection",
       "kind": "industry"

@@ -50644,6 +50644,54 @@
    }
   },
   {
+   "tile_id": "chimney-height-for-draft",
+   "source_publisher": "ASHRAE Handbook HVAC Systems / NFPA 211 (inverse)",
+   "source_title": "H = D_net_target / (net_factor x 0.52 x B x (1/T_o - 1/T_m)), Rankine",
+   "source_edition_or_year": "spec-v669 worked example (machine-verified)",
+   "source_section_or_page": "0.1046 in wc net, 60 F ambient, 400 F mean flue, 14.7 psia, 0.6 -> 30 ft (round-trips the chimney-draft pinned example)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_draft_net_inwc": 0.1046,
+    "ambient_temp_f": 60,
+    "mean_flue_temp_f": 400,
+    "baro_psia": 14.7,
+    "net_factor": 0.6
+   },
+   "outputs": {
+    "required_height_ft": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chimney-height-for-draft",
+   "source_publisher": "ASHRAE Handbook HVAC Systems / NFPA 211 (inverse)",
+   "source_title": "cross-check: at 5,000 ft (~12.2 psia) the thinner air needs a taller stack for the same draft",
+   "source_edition_or_year": "spec-v669 cross-check (machine-verified)",
+   "source_section_or_page": "Same target and temps at 12.2 psia -> 36.1 ft, about 20% taller purely from altitude",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_draft_net_inwc": 0.1046,
+    "ambient_temp_f": 60,
+    "mean_flue_temp_f": 400,
+    "baro_psia": 12.2,
+    "net_factor": 0.6
+   },
+   "outputs": {
+    "required_height_ft": {
+     "value": 36.14,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "prop-pitch-selection",
    "source_publisher": "outboard prop selection practice",
    "source_title": "19 in prop, 5000 rpm WOT, target 5400 -> 2 in less, 17 in new pitch",

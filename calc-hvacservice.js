@@ -886,6 +886,55 @@ function _v585renderChimneyDraft(inputRegion, outputRegion, citationEl) {
 }
 HVACSERVICE_RENDERERS["chimney-draft"] = _v585renderChimneyDraft;
 
+// ===================== spec-v669 C: chimney height for a target draft (inverse of chimney-draft) =====================
+// H = D_net_target / (factor * 0.52 * B * (1/T_o_R - 1/T_m_R)), Rankine.
+// dims: in { target_draft_net_inwc: M L^-1 T^-2, ambient_temp_f: T, mean_flue_temp_f: T, baro_psia: M L^-1 T^-2, net_factor: dimensionless } out: { required_height_ft: L }
+export function computeChimneyHeightForDraft({ target_draft_net_inwc = 0, ambient_temp_f = 0, mean_flue_temp_f = 0, baro_psia = 14.7, net_factor = 0.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_draft_net_inwc) || 0;
+  const to_f = Number(ambient_temp_f);
+  const tm_f = Number(mean_flue_temp_f);
+  const B = Number(baro_psia) || 0;
+  const factor = Number(net_factor) || 0;
+  if (!(target > 0)) return { error: "Target net draft must be positive (in wc)." };
+  if (!(B > 0)) return { error: "Barometric pressure must be positive (psia)." };
+  const To_R = to_f + 460;
+  const Tm_R = tm_f + 460;
+  if (!(To_R > 0) || !(Tm_R > 0)) return { error: "Temperatures must be above absolute zero." };
+  if (!(tm_f > to_f)) return { error: "Mean flue temperature must be above ambient (no draft otherwise)." };
+  if (!(factor > 0)) return { error: "Net-available factor must be positive." };
+  // Inverse of D_net = factor * 0.52 * B * H * (1/T_o - 1/T_m): H = D_net_target / (factor * 0.52 * B * (1/T_o - 1/T_m)).
+  const draft_per_ft = factor * 0.52 * B * (1 / To_R - 1 / Tm_R);
+  const required_height_ft = target / draft_per_ft;
+  if (!Number.isFinite(required_height_ft) || !(required_height_ft > 0)) return { error: "Chimney-height math is not a finite positive value." };
+  return {
+    required_height_ft,
+    note: "The stack height needed to produce a target NET draft, the inverse of the chimney-draft tile: H = D_net_target / (net_factor x 0.52 x B x (1/T_o - 1/T_m)) with temperatures absolute (Rankine). Enter the net draft the appliance actually needs (the net_factor of 0.5-0.8 already accounts for flow and fitting losses off the theoretical no-flow draft). The barometric pressure must be altitude-corrected because thinner air at elevation cuts the draft, so a taller stack is needed higher up, and T_m is the mean flue temperature, not the outlet. The venting standard (NFPA 211) and the appliance instructions govern - a design aid, not a venting sign-off.",
+  };
+}
+export const chimneyHeightForDraftExample = { inputs: { target_draft_net_inwc: 0.1046, ambient_temp_f: 60, mean_flue_temp_f: 400, baro_psia: 14.7, net_factor: 0.6 } };
+function renderChimneyHeightForDraft(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A design aid, not a venting sign-off; the venting standard (NFPA 211) and the appliance instructions govern. Citation: ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft solved for the height: H = D_net_target / (net_factor x 0.52 x B x (1/T_o - 1/T_m)), temperatures in Rankine, D in inches of water column. Enter the NET draft the appliance needs (net_factor 0.5 to 0.8 accounts for flow and fitting losses). The barometric pressure must be altitude-corrected (thinner air at elevation cuts the draft), and T_m is the mean flue temperature, not the outlet.";
+  const dt = makeNumber("Target net draft (in wc)", "chhd-dt", { step: "any", min: "0", value: "0.1046" }); dt.input.value = "0.1046";
+  const to = makeNumber("Ambient temperature (F)", "chhd-to", { step: "any", value: "60" }); to.input.value = "60";
+  const tm = makeNumber("Mean flue-gas temperature (F)", "chhd-tm", { step: "any", value: "400" }); tm.input.value = "400";
+  const B = makeNumber("Barometric pressure (psia, altitude-corrected)", "chhd-b", { step: "any", min: "0", value: "14.7" }); B.input.value = "14.7";
+  const factor = makeNumber("Net-available factor (0.5-0.8)", "chhd-f", { step: "any", min: "0", value: "0.6" }); factor.input.value = "0.6";
+  for (const f of [dt, to, tm, B, factor]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dt.input.value = "0.1046"; to.input.value = "60"; tm.input.value = "400"; B.input.value = "14.7"; factor.input.value = "0.6"; update(); });
+  const oH = makeOutputLine(outputRegion, "Required stack height", "chhd-out-h");
+  const oNote = makeOutputLine(outputRegion, "Note", "chhd-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeChimneyHeightForDraft({ target_draft_net_inwc: readNum(dt.input), ambient_temp_f: readNum(to.input), mean_flue_temp_f: readNum(tm.input), baro_psia: B.input.value === "" ? 14.7 : readNum(B.input), net_factor: factor.input.value === "" ? 0.6 : readNum(factor.input) });
+    if (r.error) { oH.textContent = r.error; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.required_height_ft, 1) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dt, to, tm, B, factor]) f.input.addEventListener("input", update);
+}
+HVACSERVICE_RENDERERS["chimney-height-for-draft"] = renderChimneyHeightForDraft;
+
 // ===================== spec-v594 C: flue-gas combustion efficiency (stack loss) =====================
 // CO2 = CO2max x (1 - O2/20.9); qA = dT_C x (A1/CO2 + B); eff_net = 100 - qA; eff_gross ~ eff_net x LHV/HHV.
 const _V594_FUELS = {

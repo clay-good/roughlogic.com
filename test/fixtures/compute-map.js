@@ -548,6 +548,7 @@ export const COMPUTE_MAP = {
   "co-air-free": { module: "../../calc-hvacservice.js", fn: "computeCoAirFree" },
   "draft-hood-dilution": { module: "../../calc-hvacservice.js", fn: "computeDraftHoodDilution" },
   "chimney-draft": { module: "../../calc-hvacservice.js", fn: "computeChimneyDraft" },
+  "chimney-height-for-draft": { module: "../../calc-hvacservice.js", fn: "computeChimneyHeightForDraft" },
   "flue-gas-combustion-eff": { module: "../../calc-hvacservice.js", fn: "computeFlueGasCombustionEff" },
   "duct-friction-static": { module: "../../calc-hvac.js", fn: "computeDuctFrictionStatic" },
   "pallet-loadout": { module: "../../calc-trucking.js", fn: "computePalletLoadout" },

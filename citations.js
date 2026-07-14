@@ -1774,6 +1774,17 @@ export const CITATIONS = {
       { name: "Altitude and absolute temps", value: "barometric pressure must be altitude-corrected; temperatures are absolute (Rankine), T_m the mean flue temp", source: "ASHRAE / NFPA 211" },
     ],
   },
+  "chimney-height-for-draft": {
+    formula: "T_o_R = ambient_temp_f + 460; T_m_R = mean_flue_temp_f + 460; H = target_draft_net_inwc / (net_factor x 0.52 x baro_psia x (1/T_o_R - 1/T_m_R)) [ft]; the inverse of D_net = net_factor x 0.52 x B x H x (1/T_o - 1/T_m).",
+    edition: "ASHRAE Handbook HVAC Systems (chimney/vent) / NFPA 211 theoretical chimney draft solved for the stack height, by name.",
+    freeAccess: "The theoretical-draft relation is standard chimney/vent design practice; the venting standard and appliance instructions govern the actual sign-off.",
+    governance: GOVERNANCE.general,
+    editionNote: "The stack height needed to produce a target NET draft, the inverse of the chimney-draft tile: H = D_net_target / (net_factor x 0.52 x B x (1/T_o - 1/T_m)) with temperatures absolute (Rankine). Enter the net draft the appliance actually needs; the net_factor of 0.5 to 0.8 already accounts for flow and fitting losses off the theoretical no-flow draft. The barometric pressure must be altitude-corrected because thinner air at elevation cuts the draft, so a taller stack is needed higher up, and T_m is the mean flue temperature, not the outlet. The venting standard (NFPA 211) and the appliance instructions govern - a design aid, not a venting sign-off.",
+    assumptions: [
+      { name: "Net-draft target", value: "the target is the net available draft; the net_factor (0.5 to 0.8) already removes flow and fitting losses from the theoretical no-flow draft", source: "ASHRAE Handbook HVAC Systems" },
+      { name: "Altitude and absolute temps", value: "barometric pressure must be altitude-corrected; temperatures are absolute (Rankine), T_m the mean flue temp", source: "ASHRAE / NFPA 211" },
+    ],
+  },
   "flue-gas-combustion-eff": {
     formula: "co2_pct = CO2max x (1 - flue_o2_pct / 20.9); qa_pct = (stack_temp_f - air_temp_f) x 5/9 x (A1 / co2_pct + B); eff_net_pct = 100 - qa_pct; eff_gross_pct = eff_net_pct x LHV/HHV.",
     edition: "Siegert stack-loss method (DIN combustion-analysis practice as implemented by flue-gas analyzers), by name.",

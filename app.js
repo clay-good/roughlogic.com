@@ -534,7 +534,7 @@ const TOOL_MODULES = (() => {
     // spec-v622 draft-hood dilution ratio
     "draft-hood-dilution",
     // spec-v585 theoretical chimney draft
-    "chimney-draft",
+    "chimney-draft", "chimney-height-for-draft",
     // spec-v594 flue-gas combustion efficiency (stack loss)
     "flue-gas-combustion-eff",
     "combustion-lambda",
