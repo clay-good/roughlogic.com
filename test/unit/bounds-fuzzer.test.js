@@ -18745,7 +18745,34 @@ test("bounds: spec-v542 computeCounterweightArborLoad pins the purchase-ratio ba
   assert.ok("error" in _v542({ batten_weight_lb: 100, attached_load_lb: 400, purchase_type: "triple", brick_weight_lb: 30 }));
 });
 
-import { computeLedTapeRun as _v543 } from "../../calc-stage.js";
+import { computeLedTapeRun as _v543, computeLedTapeMaxRun as _v667 } from "../../calc-stage.js";
+
+test("bounds: spec-v667 computeLedTapeMaxRun pins len_max = V sqrt(2 (tol/100)/(ppf rpf)), the 24 V doubling, round-trips through computeLedTapeRun to the tolerance, and error seams", () => {
+  const r = _v667({ power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0.05, drop_tolerance_pct: 10 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_run_ft - 12 * Math.sqrt(2 * 0.10 / (4.4 * 0.05))) < 1e-9, `len_max identity: ${r.max_run_ft}`);
+  // 24 V doubles the reach for the same strip and tolerance (len scales with voltage).
+  const v24 = _v667({ power_per_ft_w: 4.4, supply_voltage_v: 24, resistance_per_ft: 0.05, drop_tolerance_pct: 10 });
+  assert.ok(Math.abs(v24.max_run_ft - 2 * r.max_run_ft) < 1e-9, `24 V doubles: ${v24.max_run_ft}`);
+  // Round-trip: the max run, fed back through the forward tile, drops exactly to the tolerance.
+  // (The too_long flag sits on the float boundary here, so assert the drop value, not the flag.)
+  for (const supply_voltage_v of [5, 12, 24]) {
+    for (const drop_tolerance_pct of [5, 10, 20]) {
+      const m = _v667({ power_per_ft_w: 4.4, supply_voltage_v, resistance_per_ft: 0.05, drop_tolerance_pct });
+      assert.ok(!m.error, `sweep V=${supply_voltage_v} tol=${drop_tolerance_pct}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_run_ft, "max_run"); assert.ok(m.max_run_ft > 0, "max_run positive");
+      const back = _v543({ power_per_ft_w: 4.4, run_length_ft: m.max_run_ft, supply_voltage_v, resistance_per_ft: 0.05, drop_tolerance_pct });
+      assert.ok(Math.abs(back.drop_pct - drop_tolerance_pct) < 1e-9, `round-trip V=${supply_voltage_v} tol=${drop_tolerance_pct}: ${back.drop_pct}`);
+    }
+  }
+  // Error seams: non-finite, non-positive power / voltage, non-positive resistance (no drop to bound), tolerance out of range.
+  assert.ok("error" in _v667({ power_per_ft_w: Infinity, supply_voltage_v: 12, resistance_per_ft: 0.05 }));
+  assert.ok("error" in _v667({ power_per_ft_w: 0, supply_voltage_v: 12, resistance_per_ft: 0.05 }));
+  assert.ok("error" in _v667({ power_per_ft_w: 4.4, supply_voltage_v: 0, resistance_per_ft: 0.05 }));
+  assert.ok("error" in _v667({ power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0 }));
+  assert.ok("error" in _v667({ power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0.05, drop_tolerance_pct: 0 }));
+  assert.ok("error" in _v667({ power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0.05, drop_tolerance_pct: 100 }));
+});
 
 test("bounds: spec-v543 computeLedTapeRun pins the load, PSU headroom, uniform-load end drop, the 24 V halving, and error seams", () => {
   const r = _v543({ power_per_ft_w: 4.4, run_length_ft: 16, supply_voltage_v: 12, resistance_per_ft: 0.05, headroom_pct: 20, drop_tolerance_pct: 10 });

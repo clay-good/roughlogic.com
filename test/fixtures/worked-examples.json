@@ -22775,6 +22775,52 @@
    }
   },
   {
+   "tile_id": "led-tape-max-run",
+   "source_publisher": "Constant-voltage LED strip voltage drop (inverse)",
+   "source_title": "len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft))",
+   "source_edition_or_year": "spec-v667 worked example (machine-verified)",
+   "source_section_or_page": "4.4 W/ft, 12 V, 0.05 ohm/ft, 10% -> 11.44 ft max end-fed run",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "power_per_ft_w": 4.4,
+    "supply_voltage_v": 12,
+    "resistance_per_ft": 0.05,
+    "drop_tolerance_pct": 10
+   },
+   "outputs": {
+    "max_run_ft": {
+     "value": 11.44,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "led-tape-max-run",
+   "source_publisher": "Constant-voltage LED strip voltage drop (inverse)",
+   "source_title": "24 V roughly doubles the reach for the same strip and tolerance",
+   "source_edition_or_year": "spec-v667 cross-check (machine-verified)",
+   "source_section_or_page": "Same strip on 24 V -> 22.88 ft max run (double the 12 V reach)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "power_per_ft_w": 4.4,
+    "supply_voltage_v": 24,
+    "resistance_per_ft": 0.05,
+    "drop_tolerance_pct": 10
+   },
+   "outputs": {
+    "max_run_ft": {
+     "value": 22.88,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-alkalinity-adjust",
    "source_publisher": "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables",
    "source_title": "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",

@@ -8404,6 +8404,17 @@ export const CITATIONS = {
       { name: "Uniform-load drop", value: "end-fed uniform load drops half the full-current voltage (current x R / 2)", source: "constant-voltage LED loading" },
     ],
   },
+  "led-tape-max-run": {
+    formula: "len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft)); the inverse of led-tape-run's drop_pct = power_per_ft x resistance_per_ft x length^2 / (2 x voltage^2) x 100.",
+    edition: "Constant-voltage LED strip voltage drop solved for the run length, by name.",
+    freeAccess: "Standard low-voltage LED-strip loading relation; the strip datasheet governs.",
+    governance: GOVERNANCE.general,
+    editionNote: "The longest single end-fed run before the far end dims past the drop tolerance, the inverse of led-tape-run: len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft)). A 12 V strip typically walls out around 16-20 ft, a 24 V strip roughly double (the run scales with the voltage); oversizing the PSU does not extend it (power-inject or feed both ends instead); the drop uses the uniform-load approximation (half the full-current drop). A planning aid, not the manufacturer's spec.",
+    assumptions: [
+      { name: "Uniform-load drop", value: "end-fed uniform load drops half the full-current voltage, so drop scales with length^2 and the max run with the voltage", source: "constant-voltage LED loading" },
+      { name: "Round-trip resistance", value: "resistance_per_ft must be positive; a zero-resistance strip has no far-end drop to bound the run", source: "strip datasheet" },
+    ],
+  },
   "pool-alkalinity-adjust": {
     formula: "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",
     edition: "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name).",

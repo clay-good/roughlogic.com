@@ -725,6 +725,7 @@ export const COMPUTE_MAP = {
   "room-absorption-target": { module: "../../calc-stage.js", fn: "computeRoomAbsorptionTarget" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", fn: "computeCounterweightArborLoad" },
   "led-tape-run": { module: "../../calc-stage.js", fn: "computeLedTapeRun" },
+  "led-tape-max-run": { module: "../../calc-stage.js", fn: "computeLedTapeMaxRun" },
   "pool-alkalinity-adjust": { module: "../../calc-treatment.js", fn: "computePoolAlkalinityAdjust" },
   "pool-cya-dose": { module: "../../calc-treatment.js", fn: "computePoolCyaDose" },
   "pool-salt-dose": { module: "../../calc-treatment.js", fn: "computePoolSaltDose" },

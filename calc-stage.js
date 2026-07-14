@@ -1388,3 +1388,43 @@ const renderLedTapeRun = _r({
   compute: computeLedTapeRun,
 });
 STAGE_RENDERERS["led-tape-run"] = renderLedTapeRun;
+
+// --- spec-v667 N: LED tape max run before the far end dims (inverse of led-tape-run) ---
+// drop_pct = power_per_ft x resistance_per_ft x len^2 / (2 x voltage^2) x 100; solved for len at the tolerance.
+// dims: in { power_per_ft_w: M L T^-3, supply_voltage_v: M L^2 T^-3 I^-1, resistance_per_ft: dimensionless, drop_tolerance_pct: dimensionless } out: { max_run_ft: L }
+export function computeLedTapeMaxRun({ power_per_ft_w = 0, supply_voltage_v = 0, resistance_per_ft = 0, drop_tolerance_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ppf = Number(power_per_ft_w) || 0;
+  const volt = Number(supply_voltage_v) || 0;
+  const rpf = Number(resistance_per_ft) || 0;
+  const tol = (drop_tolerance_pct === undefined || drop_tolerance_pct === null || drop_tolerance_pct === "") ? 10 : Number(drop_tolerance_pct);
+  if (!(ppf > 0)) return { error: "Power per foot must be positive (W/ft)." };
+  if (!(volt > 0)) return { error: "Supply voltage must be positive (V)." };
+  if (!(rpf > 0)) return { error: "Round-trip resistance must be positive (ohm/ft); a zero-resistance strip has no far-end drop to bound the run." };
+  if (!(tol > 0 && tol < 100)) return { error: "Drop tolerance percent must be between 0 and 100 (exclusive)." };
+  // end_drop uses the uniform-load half-current approximation: drop_pct = ppf x rpf x len^2 / (2 x volt^2) x 100.
+  // Solving for len at drop_pct = tol: len_max = volt x sqrt(2 x (tol/100) / (ppf x rpf)).
+  const max_run_ft = volt * Math.sqrt(2 * (tol / 100) / (ppf * rpf));
+  if (!Number.isFinite(max_run_ft)) return { error: "LED-tape run math is not a finite value." };
+  return {
+    max_run_ft,
+    note: "The longest single end-fed run before the far end dims past the tolerance, the inverse of the led-tape-run tile: len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft)). A 12 V strip typically walls out around 16-20 ft, a 24 V strip roughly double (the run scales with the voltage). Oversizing the PSU does not extend it - power-inject or feed both ends instead. Uses the uniform-load approximation (half the full-current drop). The strip datasheet governs.",
+  };
+}
+const ledTapeMaxRunExample = { inputs: { power_per_ft_w: 4.4, supply_voltage_v: 12, resistance_per_ft: 0.05, drop_tolerance_pct: 10 } };
+const renderLedTapeMaxRun = _r({
+  citation: "Notice: The strip datasheet governs; verify against the manufacturer's spec. Citation: constant-voltage LED strip voltage drop solved for the run length. drop_pct = power_per_ft x resistance_per_ft x length^2 / (2 x voltage^2) x 100; len_max = voltage x sqrt(2 x (tolerance/100) / (power_per_ft x resistance_per_ft)). A 12 V strip walls out ~16-20 ft, 24 V ~double; oversizing the PSU does not extend it - power-inject or feed both ends.",
+  example: ledTapeMaxRunExample.inputs,
+  fields: [
+    { key: "power_per_ft_w", label: "Strip power (W/ft)", kind: "number" },
+    { key: "supply_voltage_v", label: "Supply voltage (V, 12 / 24)", kind: "number" },
+    { key: "resistance_per_ft", label: "Round-trip resistance (ohm/ft)", kind: "number" },
+    { key: "drop_tolerance_pct", label: "Acceptable end drop (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "r", id: "ltmr-out-r", label: "Max single end-fed run", value: (r) => fmt(r.max_run_ft, 1) + " ft" },
+    { key: "n", id: "ltmr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLedTapeMaxRun,
+});
+STAGE_RENDERERS["led-tape-max-run"] = renderLedTapeMaxRun;

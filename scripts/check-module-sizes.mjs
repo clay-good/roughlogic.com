@@ -133,7 +133,7 @@ const CAPS = {
   // Bumped 8500 -> 10500 for v9 §H.2 spl-atmospheric (ANSI S1.26-2014
   // relaxation-frequency closed-form). Per spec-v10 §H.1 per-tile split
   // remains preferred long-term.
-  "calc-stage.js": 24000, // spec-v542 counterweight-arbor-load (21500) // v92 2026-06-18 (18500->21500): +2 video tiles (led-video-wall, projector-brightness); built ~19.3 KB gz // v51 2026-06-12 + lighting-beam stage photometry (was 17000 v24); lazy-loaded, not in home payload
+  "calc-stage.js": 26000, // v667 2026-07-13 (24000->26000): +2 inverse tiles (room-absorption-target v664, led-tape-max-run v667); built ~24.1 KB gz // spec-v542 counterweight-arbor-load (21500) // v92 2026-06-18 (18500->21500): +2 video tiles (led-video-wall, projector-brightness); built ~19.3 KB gz // v51 2026-06-12 + lighting-beam stage photometry (was 17000 v24); lazy-loaded, not in home payload
   // Bumped 11000 -> 13500 on 2026-05-20 for the spec-v14 §7.1 Phase C
   // dims-annotation closeout (~1500 bytes of inline annotation across
   // nine exports including the exported renderStoppingSightDistance

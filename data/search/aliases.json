@@ -5397,6 +5397,31 @@
       "kind": "redirect"
     },
     {
+      "term": "how far can i run led tape",
+      "target": "led-tape-max-run",
+      "kind": "industry"
+    },
+    {
+      "term": "max led tape run length",
+      "target": "led-tape-max-run",
+      "kind": "industry"
+    },
+    {
+      "term": "led strip run limit",
+      "target": "led-tape-max-run",
+      "kind": "industry"
+    },
+    {
+      "term": "when does led tape dim at the end",
+      "target": "led-tape-max-run",
+      "kind": "adjacent"
+    },
+    {
+      "term": "led tape length before power injection",
+      "target": "led-tape-max-run",
+      "kind": "adjacent"
+    },
+    {
       "term": "pool alkalinity",
       "target": "pool-alkalinity-adjust",
       "kind": "industry"
