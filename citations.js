@@ -11458,6 +11458,18 @@ export const CITATIONS = {
       { name: "Scope", value: "members not supporting partitions likely to be damaged by deflection; not a strength design", source: "ACI 318-19 7.3.1.1" },
     ],
   },
+  "rc-slab-max-span-for-thickness": {
+    formula: "max_span = available_thickness x denom / (12 x kfy x klw), the ACI 318-19 minimum-thickness relation hmin = 12 l / denom x kfy x klw solved for the span; denom = {simply:20, one-end:24, both-ends:28, cantilever:10}.",
+    edition: "The ACI 318-19 Table 7.3.1.1 (one-way slabs) and Table 9.3.1.1 (beams) minimum thickness for deflection control, solved for the span, with the (0.4 + fy/100,000) non-Grade-60 modifier and the lightweight-concrete factor, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the minimum-thickness tables are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of rc-slab-min-thickness: with the depth fixed, the longest span that still waives an explicit deflection calculation. A longer span needs a deflection calculation or a deeper member. It applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Span from depth", value: "max_span = h x denom / (12 kfy klw), the minimum-thickness table inverted", source: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1" },
+      { name: "Grade modifier", value: "(0.4 + fy/100,000) for fy other than 60,000 psi", source: "ACI 318-19 Table footnote" },
+      { name: "Scope", value: "members not supporting partitions likely to be damaged by deflection; not a strength design", source: "ACI 318-19 7.3.1.1" },
+    ],
+  },
   "rc-doubly-reinforced": {
     formula: "a = (As - A's) fy / (0.85 f'c b); c = a/beta1; eps's = 0.003 (c - d')/c; eps_t = 0.003 (d - c)/c; Mn = (As - A's) fy (d - a/2) + A's fy (d - d'); phi Mn (phi = 0.90 tension-controlled).",
     edition: "The ACI 318-19 doubly-reinforced rectangular-beam flexural capacity with the compression-steel yield check and the tension-controlled strength-reduction factor, by name.",

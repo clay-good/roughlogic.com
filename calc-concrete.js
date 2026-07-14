@@ -394,6 +394,49 @@ CONCRETE_RENDERERS["rc-slab-min-thickness"] = _simpleRenderer({
   compute: computeRcSlabMinThickness,
 });
 
+// rc-slab-max-span-for-thickness: inverse of rc-slab-min-thickness. The forward
+// tile gives hmin from a span; with the depth fixed, the max span that still
+// waives a deflection check is the inverse: hmin = l x (12/denom) x kfy x klw is
+// linear in l, so max_span = available_thickness / hmin(at l = 1 ft). Reuses the
+// forward at l = 1 ft to carry the denom / kfy / klw geometry in one place.
+// dims: in { available_thickness_in: L, support: dimensionless, fy_psi: M L^-1 T^-2, wc_pcf: M L^-2 T^-2 } out: { max_span_ft: L, kfy: dimensionless, klw: dimensionless, denom: dimensionless }
+export function computeRcSlabMaxSpanForThickness({ available_thickness_in = 0, support = "simply", fy_psi = 60000, wc_pcf = 145 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(available_thickness_in) || 0;
+  if (!(h > 0)) return { error: "Available thickness must be positive (in)." };
+  const base = computeRcSlabMinThickness({ l_ft: 1, support, fy_psi, wc_pcf });
+  if (base.error) return { error: base.error };
+  const hmin_per_ft = base.hmin_in;
+  const max_span_ft = h / hmin_per_ft;
+  const denoms = { simply: 20, "one-end": 24, "both-ends": 28, cantilever: 10 };
+  return {
+    max_span_ft, kfy: base.kfy, klw: base.klw, denom: denoms[support],
+    note: "ACI 318-19 Table 7.3.1.1 / 9.3.1.1 deflection-control minimum thickness solved for the span: with the depth fixed, this is the longest span that still WAIVES an explicit deflection calculation (max_span = h x denom / (12 kfy klw), denom 20 / 24 / 28 / 10). A longer span needs either a deflection calculation or a deeper member. It applies to normalweight (unless wc is set) members not supporting or attached to partitions or construction likely to be damaged by large deflections, uses the clear span, and is not the strength (flexure/shear) design. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcSlabMaxSpanForThicknessExample = { inputs: { available_thickness_in: 10, support: "both-ends", fy_psi: 60000, wc_pcf: 145 } };
+CONCRETE_RENDERERS["rc-slab-max-span-for-thickness"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 Table 7.3.1.1 (one-way slabs) / 9.3.1.1 (beams) deflection-control minimum thickness solved for the span, max_span = h x denom / (12 kfy klw), by name. The longest span the depth covers without a deflection check, not a strength design. A design aid, not a substitute for the engineer of record.",
+  example: rcSlabMaxSpanForThicknessExample.inputs,
+  fields: [
+    { key: "available_thickness_in", label: "Available thickness h (in)", kind: "number", default: 10 },
+    { key: "support", label: "Support condition", kind: "select", options: [
+      { value: "simply", label: "Simply supported (l/20)" },
+      { value: "one-end", label: "One end continuous (l/24)" },
+      { value: "both-ends", label: "Both ends continuous (l/28)" },
+      { value: "cantilever", label: "Cantilever (l/10)" },
+    ], default: "simply" },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+    { key: "wc_pcf", label: "Concrete unit weight (pcf)", kind: "number", default: 145 },
+  ],
+  outputs: [
+    { key: "span", id: "rms-out-span", label: "Max span (no deflection check)", value: (r) => fmt(r.max_span_ft, 2) + " ft" },
+    { key: "mods", id: "rms-out-mods", label: "Grade / lightweight modifiers", value: (r) => fmt(r.kfy, 3) + " / " + fmt(r.klw, 3) },
+    { key: "n", id: "rms-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcSlabMaxSpanForThickness,
+});
+
 // dims: in { b_in: L, d_in: L, dp_in: L, as_in2: L^2, asp_in2: L^2, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { a_in: L, c_in: L, eps_sp: dimensionless, eps_t: dimensionless, mn_kipft: M L^2 T^-2, phi_mn_kipft: M L^2 T^-2 }
 export function computeRcDoublyReinforced({ b_in = 0, d_in = 0, dp_in = 0, as_in2 = 0, asp_in2 = 0, fc_psi = 4000, fy_psi = 60000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

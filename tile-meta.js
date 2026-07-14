@@ -555,7 +555,7 @@ const _TILES = [
   ["snow-unbalanced-gable", "E"],
   ["rain-on-snow-surcharge", "E"], ["sliding-snow-load", "E"], ["minimum-roof-snow", "E"],
   // spec-v299..v301 reinforced-concrete depth-2 batch
-  ["rc-slab-min-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
+  ["rc-slab-min-thickness", "E"], ["rc-slab-max-span-for-thickness", "E"], ["rc-doubly-reinforced", "E"], ["rc-shear-friction", "E"],
   ["concrete-elastic-modulus", "E"], ["concrete-modulus-of-rupture", "E"], ["concrete-cracking-moment", "E"], ["concrete-shrinkage-temperature-steel", "E"],
   ["t-beam-effective-flange-width", "E"], ["concrete-beam-min-flexural-steel", "E"], ["concrete-crack-control-spacing", "E"],
   // spec-v490 concrete bearing strength (ACI 318-19 §22.8)

@@ -43882,6 +43882,31 @@
       "kind": "question"
     },
     {
+      "term": "max slab span for 10 inch depth",
+      "target": "rc-slab-max-span-for-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "how far can a beam span without deflection check",
+      "target": "rc-slab-max-span-for-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "longest span for slab thickness",
+      "target": "rc-slab-max-span-for-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "span limit from slab depth aci",
+      "target": "rc-slab-max-span-for-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "how long can my slab span for its thickness",
+      "target": "rc-slab-max-span-for-thickness",
+      "kind": "question"
+    },
+    {
       "term": "beam with rebar top and bottom capacity",
       "target": "rc-doubly-reinforced",
       "kind": "question"

@@ -14958,6 +14958,7 @@ test("bounds: spec-v298 computeWindMwfrsPressure pins the walls, the internal-ca
 
 // ===================== spec-v299..v301 reinforced-concrete depth-2 batch =====================
 import { computeRcSlabMinThickness as _v299, computeRcDoublyReinforced as _v300, computeRcShearFriction as _v301 } from "../../calc-concrete.js";
+import { computeRcSlabMaxSpanForThickness as _v707 } from "../../calc-concrete.js";
 
 test("bounds: spec-v299 computeRcSlabMinThickness pins the support denominators, the modifiers, and error seams", () => {
   const r = _v299({ l_ft: 12, support: "simply", fy_psi: 60000, wc_pcf: 145 });
@@ -14982,6 +14983,32 @@ test("bounds: spec-v299 computeRcSlabMinThickness pins the support denominators,
   assert.ok("error" in _v299({ l_ft: 12, support: "bogus" }));
   assert.ok("error" in _v299({ l_ft: 12, support: "simply", fy_psi: 0 }));
   assert.ok("error" in _v299({ l_ft: Infinity, support: "simply" }));
+});
+
+test("bounds: spec-v707 computeRcSlabMaxSpanForThickness pins max_span = h denom/(12 kfy klw), round-trips through computeRcSlabMinThickness, and error seams", () => {
+  const r = _v707({ available_thickness_in: 10, support: "both-ends", fy_psi: 60000, wc_pcf: 145 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_span_ft - 10 * 28 / (12 * 1 * 1)) < 1e-9, `span identity: ${r.max_span_ft}`);
+  assert.ok(Math.abs(r.max_span_ft - 23.333333) < 1e-4, `pinned 23.33 ft: ${r.max_span_ft}`);
+  // Round-trip: at the max span the forward tile's hmin equals the available thickness.
+  for (const available_thickness_in of [5, 10, 18]) {
+    for (const support of ["simply", "one-end", "both-ends", "cantilever"]) {
+      for (const fy_psi of [40000, 60000]) {
+        const m = _v707({ available_thickness_in, support, fy_psi, wc_pcf: 145 });
+        assert.ok(!m.error, `sweep h=${available_thickness_in} ${support} fy=${fy_psi}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_span_ft, "span"); assert.ok(m.max_span_ft > 0, "span positive");
+        const back = _v299({ l_ft: m.max_span_ft, support, fy_psi, wc_pcf: 145 });
+        assert.ok(Math.abs(back.hmin_in - available_thickness_in) < 1e-6, `round-trip h=${available_thickness_in} ${support} fy=${fy_psi}: ${back.hmin_in}`);
+      }
+    }
+  }
+  // A continuous support (larger denom) allows a longer span than simply supported.
+  assert.ok(_v707({ available_thickness_in: 10, support: "both-ends" }).max_span_ft > _v707({ available_thickness_in: 10, support: "simply" }).max_span_ft);
+  // Error seams: non-positive thickness, bad support, non-positive fy, non-finite.
+  assert.ok("error" in _v707({ available_thickness_in: 0, support: "simply" }));
+  assert.ok("error" in _v707({ available_thickness_in: 10, support: "bogus" }));
+  assert.ok("error" in _v707({ available_thickness_in: 10, support: "simply", fy_psi: 0 }));
+  assert.ok("error" in _v707({ available_thickness_in: Infinity, support: "simply" }));
 });
 
 test("bounds: spec-v300 computeRcDoublyReinforced pins the two couples, the yield/phi checks, and error seams", () => {

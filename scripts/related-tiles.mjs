@@ -1278,6 +1278,7 @@ const RELATED = {
   "snow-unbalanced-gable": ["snow-load","snow-drift-load","sliding-snow-load"],
   // spec-v299..v301 reinforced-concrete depth-2 batch (Group E)
   "rc-slab-min-thickness": ["rc-beam-flexure","rc-beam-shear","joist-deflection"],
+  "rc-slab-max-span-for-thickness": ["rc-slab-min-thickness","rc-beam-flexure","joist-deflection","rc-beam-shear"],
   "rc-doubly-reinforced": ["rc-beam-flexure","rc-beam-shear","rc-column-axial"],
   "rc-shear-friction": ["rc-beam-shear","rebar-lap-splice","anchor-embedment"],
   "concrete-elastic-modulus": ["rc-slab-min-thickness","rc-beam-flexure","concrete-modulus-of-rupture","rc-doubly-reinforced"],

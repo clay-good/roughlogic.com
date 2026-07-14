@@ -874,6 +874,7 @@ export const COMPUTE_MAP = {
   "snow-unbalanced-gable": { module: "../../calc-construction.js", fn: "computeSnowUnbalancedGable" },
   // spec-v299..v301 reinforced-concrete depth-2 batch (3 tiles)
   "rc-slab-min-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMinThickness" },
+  "rc-slab-max-span-for-thickness": { module: "../../calc-concrete.js", fn: "computeRcSlabMaxSpanForThickness" },
   "rc-doubly-reinforced": { module: "../../calc-concrete.js", fn: "computeRcDoublyReinforced" },
   "rc-shear-friction": { module: "../../calc-concrete.js", fn: "computeRcShearFriction" },
   "concrete-elastic-modulus": { module: "../../calc-concrete.js", fn: "computeConcreteElasticModulus" },

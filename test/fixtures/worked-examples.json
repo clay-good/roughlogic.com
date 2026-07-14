@@ -42566,6 +42566,35 @@
    }
   },
   {
+   "tile_id": "rc-slab-max-span-for-thickness",
+   "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
+   "source_title": "max_span = h x denom / (12 kfy klw); inverse of the minimum-thickness table",
+   "source_edition_or_year": "spec-v707 worked example (machine-verified; inverse of spec-v299)",
+   "source_section_or_page": "10 in, both ends continuous (l/28), Grade 60 normalweight -> 23.33 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_thickness_in": 10,
+    "support": "both-ends",
+    "fy_psi": 60000,
+    "wc_pcf": 145
+   },
+   "outputs": {
+    "max_span_ft": {
+     "value": 23.333333,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "kfy": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-slab-min-thickness",
    "source_publisher": "ACI 318-19 Table 7.3.1.1 / 9.3.1.1",
    "source_title": "cross-check: Grade 40 both-ends-continuous -> base 5.14, kfy 0.8, hmin 4.11 in",
