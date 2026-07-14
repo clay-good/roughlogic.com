@@ -45534,6 +45534,36 @@
    }
   },
   {
+   "tile_id": "edm-slope-reduction",
+   "source_publisher": "Ghilani, Elementary Surveying (plane-survey reduction)",
+   "source_title": "250 ft slope shot at an 86 deg zenith -> 249.39 ft horizontal, 17.44 ft up",
+   "source_edition_or_year": "H = S sin Z; V = S cos Z",
+   "source_section_or_page": "H = 250 sin86 = 249.391 ft; V = 250 cos86 = 17.439 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "angle_mode": "zenith",
+    "slope_distance_ft": 250,
+    "angle_deg": 86,
+    "hi_ft": 0,
+    "hr_ft": 0
+   },
+   "outputs": {
+    "horizontal_ft": {
+     "value": 249.391,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "vertical_ft": {
+     "value": 17.439,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-h1-interaction",
    "source_publisher": "AISC 360-22 H1.1",
    "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",

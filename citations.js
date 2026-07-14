@@ -11626,6 +11626,18 @@ export const CITATIONS = {
       { name: "Sign convention", value: "delta N positive north, delta E positive east", source: "surveying references" },
     ],
   },
+  "edm-slope-reduction": {
+    formula: "zenith angle Z: H = S sin(Z), V = S cos(Z). vertical angle a: H = S cos(a), V = S sin(a). ground-to-ground elevation difference = V + instrument_height - reflector_height.",
+    edition: "Standard plane-survey EDM/total-station slope reduction by right-triangle trigonometry, as compiled in the standard surveying references (Ghilani, Elementary Surveying), by name.",
+    freeAccess: "The slope-reduction relations are public surveying results in any elementary-surveying reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "Reduces a measured slope distance to the horizontal distance and vertical component from the vertical angle. The zenith angle is measured from vertical (90 deg = level); a vertical angle from horizontal (0 deg = level, + up). The elevation difference between the two ground points adds the instrument (trunnion) height and subtracts the reflector/rod height. It does not apply the earth curvature-and-refraction correction for long sights or a grid scale factor on a mapping-grid projection; a computational aid, and the instrument and project control govern.",
+    assumptions: [
+      { name: "Angle basis", value: "zenith from vertical (90 = level) or vertical from horizontal (0 = level)", source: "surveying convention" },
+      { name: "Elevation", value: "ground-to-ground = V + instrument height - reflector height", source: "total-station reduction" },
+      { name: "Plane reduction", value: "no earth curvature/refraction or grid scale factor applied", source: "plane-survey assumption" },
+    ],
+  },
   "building-ua": {
     formula: "cond = sum(A_i / R_i); UA_inf = 1.08 x CFM; UA = cond + UA_inf; design_load = UA x dT.",
     edition: "The whole-building heat-loss-coefficient roll-up UA = sum(A/R) + 1.08 x CFM with the design load Q = UA x dT, as compiled in the ASHRAE Fundamentals and RESNET energy-audit references, by name.",

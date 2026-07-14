@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): spec-v769 total-station slope-to-horizontal reduction; 2026-07-14
+
+- New tile `edm-slope-reduction` (Group P, calc-survey.js): the right-triangle reduction of an EDM/total-station slope
+  distance -- zenith angle `H = S sinZ`, `V = S cosZ`; vertical angle `H = S cosa`, `V = S sina`; ground-to-ground
+  elevation difference `= V + HI - HR`. A 250 ft slope shot at an 86 deg zenith is 249.39 ft horizontal and 17.44 ft up.
+  The step that feeds the horizontal distance to `cogo-forward-point`. Angle-type select (zenith or vertical). Fuzzer
+  pins H^2+V^2=S^2 and zenith/vertical equivalence. calc-survey.js gzip cap 10500 -> 12000 B. Home count 1,217 -> 1,218.
+
 ### feat(treatment): spec-v768 pool water volume by shape; 2026-07-14
 
 - New tile `pool-volume` (Group M, calc-treatment.js): the gallonage every pool dose and heater tile takes as its input

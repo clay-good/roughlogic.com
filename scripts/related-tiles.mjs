@@ -1372,6 +1372,7 @@ const RELATED = {
   "stadia-distance": ["differential-leveling","pacing-distance","traverse-closure"],
   "taping-corrections": ["differential-leveling","stadia-distance","traverse-closure"],
   "cogo-forward-point": ["traverse-closure","area-by-coordinates","bearing-conversion"],
+  "edm-slope-reduction": ["stadia-distance","cogo-forward-point","differential-leveling"],
   // spec-v314..v316 steel beam-column-and-connection depth batch (Group E)
   "steel-h1-interaction": ["steel-column-capacity","steel-beam-ltb","steel-effective-length-k"],
   "steel-effective-length-k": ["steel-column-capacity","steel-h1-interaction","steel-beam-ltb"],

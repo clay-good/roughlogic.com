@@ -16144,6 +16144,7 @@ test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the s
 // ===================== spec-v311..v313 field-surveying depth batch =====================
 import { computeDifferentialLeveling as _v311, computeStadiaDistance as _v312, computeTapingCorrections as _v313 } from "../../calc-survey.js";
 import { computeCogoForwardPoint as _v766 } from "../../calc-survey.js";
+import { computeEdmSlopeReduction as _v769 } from "../../calc-survey.js";
 
 test("bounds: spec-v311 computeDifferentialLeveling pins the HI reduction, the sum identity, the misclosure, and error seams", () => {
   const r = _v311({ bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 });
@@ -16243,6 +16244,44 @@ test("bounds: spec-v766 cogo-forward-point pins latitude/departure, the cardinal
   assert.ok("error" in _v766({ start_n: 0, start_e: 0, azimuth_deg: 361, distance_ft: 100 }));
   assert.ok("error" in _v766({ start_n: 0, start_e: 0, azimuth_deg: 45, distance_ft: Infinity }));
   assert.ok("error" in _v766({ start_n: NaN, start_e: 0, azimuth_deg: 45, distance_ft: 100 }));
+});
+
+test("bounds: spec-v769 edm-slope-reduction pins H = S sinZ / V = S cosZ, zenith/vertical equivalence, HI/HR, Pythagoras, and error seams", () => {
+  // Spec example: S 250, zenith 86 -> H = 250 sin86 = 249.391, V = 250 cos86 = 17.439.
+  const r = _v769({ angle_mode: "zenith", slope_distance_ft: 250, angle_deg: 86 });
+  assert.ok(Math.abs(r.horizontal_ft - 250 * Math.sin(86 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.horizontal_ft - 249.391) < 1e-3);
+  assert.ok(Math.abs(r.vertical_ft - 250 * Math.cos(86 * Math.PI / 180)) < 1e-9);
+  assert.ok(Math.abs(r.vertical_ft - 17.439) < 1e-3);
+  assert.ok(Math.abs(r.elev_diff_ft - r.vertical_ft) < 1e-12, "no HI/HR -> elev diff = V");
+  // Zenith Z and vertical angle a = 90 - Z give identical H and V.
+  for (let i = 0; i < 150; i++) {
+    const S = 20 + i * 3;
+    const Z = 60 + (i % 60);                 // zenith 60..119 deg
+    const a = 90 - Z;                         // matching vertical angle
+    const zr = _v769({ angle_mode: "zenith", slope_distance_ft: S, angle_deg: Z });
+    const vr = _v769({ angle_mode: "vertical", slope_distance_ft: S, angle_deg: a });
+    assert.ok(!zr.error && !vr.error, JSON.stringify({ S, Z, a }));
+    assert.ok(Math.abs(zr.horizontal_ft - vr.horizontal_ft) < 1e-9, "zenith/vertical H agree");
+    assert.ok(Math.abs(zr.vertical_ft - vr.vertical_ft) < 1e-9, "zenith/vertical V agree");
+    // Pythagoras: H^2 + V^2 = S^2.
+    assert.ok(Math.abs(Math.hypot(zr.horizontal_ft, zr.vertical_ft) - S) < 1e-6, "H^2 + V^2 = S^2");
+    // Horizontal distance never exceeds the slope distance.
+    assert.ok(zr.horizontal_ft <= S + 1e-9);
+  }
+  // Level shot (zenith 90): all horizontal, zero rise.
+  const level = _v769({ angle_mode: "zenith", slope_distance_ft: 100, angle_deg: 90 });
+  assert.ok(Math.abs(level.horizontal_ft - 100) < 1e-9 && Math.abs(level.vertical_ft) < 1e-9);
+  // HI/HR shift the elevation difference by (HI - HR).
+  const withHt = _v769({ angle_mode: "zenith", slope_distance_ft: 250, angle_deg: 86, hi_ft: 5.2, hr_ft: 6.0 });
+  assert.ok(Math.abs(withHt.elev_diff_ft - (r.vertical_ft + 5.2 - 6.0)) < 1e-9);
+  // Error seams.
+  assert.ok("error" in _v769({ angle_mode: "zenith", slope_distance_ft: 0, angle_deg: 86 }));
+  assert.ok("error" in _v769({ angle_mode: "zenith", slope_distance_ft: 250, angle_deg: 0 }));
+  assert.ok("error" in _v769({ angle_mode: "zenith", slope_distance_ft: 250, angle_deg: 180 }));
+  assert.ok("error" in _v769({ angle_mode: "vertical", slope_distance_ft: 250, angle_deg: 90 }));
+  assert.ok("error" in _v769({ angle_mode: "sideways", slope_distance_ft: 250, angle_deg: 45 }));
+  assert.ok("error" in _v769({ angle_mode: "zenith", slope_distance_ft: Infinity, angle_deg: 86 }));
 });
 
 // ===================== spec-v314..v316 steel beam-column-and-connection depth batch =====================

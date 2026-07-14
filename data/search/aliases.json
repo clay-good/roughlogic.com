@@ -15177,6 +15177,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "slope distance to horizontal",
+      "target": "edm-slope-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "reduce slope distance",
+      "target": "edm-slope-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "total station slope reduction",
+      "target": "edm-slope-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "horizontal distance from a zenith angle",
+      "target": "edm-slope-reduction",
+      "kind": "question"
+    },
+    {
+      "term": "zenith angle to horizontal distance",
+      "target": "edm-slope-reduction",
+      "kind": "question"
+    },
+    {
       "term": "coordinate from bearing and distance",
       "target": "cogo-forward-point",
       "kind": "question"

@@ -10,7 +10,7 @@
 // the home-view first-paint payload.
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeTextarea,
+  DEBOUNCE_MS, debounce, makeNumber, makeTextarea, makeSelect,
   makeOutputLine, attachExampleButton, fmt,
 } from "./ui-fields.js";
 
@@ -459,3 +459,70 @@ function renderCogoForwardPoint(inputRegion, outputRegion, citationEl) {
   for (const f of [n0.input, e0.input, az.input, d.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["cogo-forward-point"] = renderCogoForwardPoint;
+
+// dims: in { slope_distance_ft: L, angle_deg: dimensionless, angle_mode: dimensionless, hi_ft: L, hr_ft: L } out: { horizontal_ft: L, vertical_ft: L, elev_diff_ft: L }
+// Total-station / EDM slope-to-horizontal reduction (right-triangle trig).
+// Zenith angle Z (from vertical): H = S sin Z, V = S cos Z.
+// Vertical angle a (from horizontal, + up): H = S cos a, V = S sin a.
+// Ground-to-ground elevation difference = V + instrument height - reflector height.
+export function computeEdmSlopeReduction({ angle_mode, slope_distance_ft = 0, angle_deg = 0, hi_ft = 0, hr_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const S = Number(slope_distance_ft) || 0;
+  if (!(S > 0)) return { error: "Slope distance must be positive (ft)." };
+  const a = Number(angle_deg);
+  const m = String(angle_mode || "zenith").toLowerCase();
+  let H, V;
+  if (m === "zenith") {
+    if (!(a > 0 && a < 180)) return { error: "Zenith angle must be between 0 and 180 degrees (90 = level)." };
+    const z = (a * Math.PI) / 180;
+    H = S * Math.sin(z);
+    V = S * Math.cos(z);
+  } else if (m === "vertical") {
+    if (!(a > -90 && a < 90)) return { error: "Vertical angle must be between -90 and 90 degrees (0 = level)." };
+    const t = (a * Math.PI) / 180;
+    H = S * Math.cos(t);
+    V = S * Math.sin(t);
+  } else {
+    return { error: "Angle mode must be 'zenith' or 'vertical'." };
+  }
+  const elev_diff_ft = V + (Number(hi_ft) || 0) - (Number(hr_ft) || 0);
+  return {
+    horizontal_ft: H,
+    vertical_ft: V,
+    elev_diff_ft,
+    note: "Right-triangle reduction of an EDM/total-station slope distance. Zenith angle is measured from vertical (90 deg = level), a vertical angle from horizontal (0 deg = level, + up). The elevation difference between the two ground points adds the instrument height and subtracts the reflector (rod) height (V + HI - HR). Does not apply the earth curvature-and-refraction correction for long sights or a grid scale factor on a mapping projection. A computational aid; the instrument and the project control govern.",
+  };
+}
+export const edmSlopeReductionExample = { inputs: { angle_mode: "zenith", slope_distance_ft: 250, angle_deg: 86, hi_ft: 0, hr_ft: 0 } };
+
+function renderEdmSlopeReduction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: EDM / total-station slope reduction by right-triangle trigonometry - horizontal H = S sin(Z) = S cos(a), vertical V = S cos(Z) = S sin(a), where Z is the zenith angle (from vertical) and a the vertical angle (from horizontal); ground-to-ground elevation difference = V + instrument height - reflector height. Standard plane-survey reduction per Ghilani, Elementary Surveying, by name. No curvature/refraction or grid scale factor. A computational aid; the project control governs.";
+  const mode = makeSelect("Angle type", "edm-mode", [
+    { value: "zenith", label: "Zenith angle (from vertical, 90 = level)" },
+    { value: "vertical", label: "Vertical angle (from horizontal, 0 = level)" },
+  ]);
+  inputRegion.appendChild(mode.wrap);
+  const s = makeNumber("Slope distance S (ft)", "edm-s", { step: "any", min: "0", value: "250" });
+  s.input.value = "250";
+  const ang = makeNumber("Angle (deg)", "edm-a", { step: "any", value: "86" });
+  ang.input.value = "86";
+  const hi = makeNumber("Instrument height HI (ft, optional)", "edm-hi", { step: "any" });
+  const hr = makeNumber("Reflector/rod height HR (ft, optional)", "edm-hr", { step: "any" });
+  for (const f of [s, ang, hi, hr]) inputRegion.appendChild(f.wrap);
+  const oH = makeOutputLine(outputRegion, "Horizontal distance", "edm-out-h");
+  const oV = makeOutputLine(outputRegion, "Vertical distance", "edm-out-v");
+  const oE = makeOutputLine(outputRegion, "Elevation difference (with HI/HR)", "edm-out-e");
+  const oNote = makeOutputLine(outputRegion, "Note", "edm-out-note");
+  const update = debounce(() => {
+    const r = computeEdmSlopeReduction({ angle_mode: mode.select.value, slope_distance_ft: Number(s.input.value) || 0, angle_deg: Number(ang.input.value) || 0, hi_ft: Number(hi.input.value) || 0, hr_ft: Number(hr.input.value) || 0 });
+    if (r.error) { oH.textContent = r.error; oV.textContent = "-"; oE.textContent = "-"; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.horizontal_ft, 3) + " ft";
+    oV.textContent = fmt(r.vertical_ft, 3) + " ft";
+    oE.textContent = fmt(r.elev_diff_ft, 3) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { mode.select.value = "zenith"; s.input.value = "250"; ang.input.value = "86"; hi.input.value = ""; hr.input.value = ""; update(); });
+  mode.select.addEventListener("change", update);
+  for (const f of [s.input, ang.input, hi.input, hr.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["edm-slope-reduction"] = renderEdmSlopeReduction;
