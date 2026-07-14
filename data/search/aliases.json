@@ -21882,6 +21882,31 @@
       "kind": "industry"
     },
     {
+      "term": "camera max distance",
+      "target": "camera-max-distance-for-ppf",
+      "kind": "industry"
+    },
+    {
+      "term": "how far can camera identify",
+      "target": "camera-max-distance-for-ppf",
+      "kind": "redirect"
+    },
+    {
+      "term": "distance for pixel density",
+      "target": "camera-max-distance-for-ppf",
+      "kind": "adjacent"
+    },
+    {
+      "term": "dori distance",
+      "target": "camera-max-distance-for-ppf",
+      "kind": "adjacent"
+    },
+    {
+      "term": "camera distance for ppf",
+      "target": "camera-max-distance-for-ppf",
+      "kind": "adjacent"
+    },
+    {
       "term": "field of view camera",
       "target": "camera-lens-fov",
       "kind": "industry"

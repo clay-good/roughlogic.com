@@ -600,6 +600,7 @@ const RELATED = {
   "lv-dc-drop": ["voltage-drop", "battery-runtime", "wire-ampacity"],
   "poe-budget": ["battery-runtime", "voltage-drop"],
   "camera-lens-fov": ["cctv-storage", "fiber-loss-budget", "poe-budget", "structured-cabling-channel"],
+  "camera-max-distance-for-ppf": ["camera-lens-fov", "cctv-storage", "poe-budget"],
   "cctv-retention-days": ["cctv-storage", "camera-lens-fov", "poe-budget", "structured-cabling-channel"],
   "ceiling-speaker-coverage": ["speaker-70v-line", "speaker-impedance", "time-alignment", "poe-budget"],
   "ceiling-speaker-coverage-angle": ["ceiling-speaker-coverage", "speaker-70v-line", "time-alignment"],

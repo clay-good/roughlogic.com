@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lowvoltage): spec-v741 camera max distance for a pixel density (camera-lens-fov inverse); 2026-07-14
+
+- New tile `camera-max-distance-for-ppf` (Group A, calc-lowvoltage.js): the farthest distance a camera still meets a
+  target pixel density (a DORI task). `distance = px x focal / (target ppf x sensor)`. A 1920 px / 4 mm / 5.37 mm camera
+  holds 76 ppf (Identify) out to ~18.8 ft. Round-trips through `camera-lens-fov`. Home tile count 1,189 -> 1,190.
+
 ### feat(lowvoltage): spec-v740 ceiling speaker coverage angle for a target spacing (ceiling-speaker-coverage inverse); 2026-07-14
 
 - New tile `ceiling-speaker-coverage-angle` (Group A, calc-lowvoltage.js): the coverage angle a target coverage diameter

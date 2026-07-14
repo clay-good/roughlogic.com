@@ -17832,6 +17832,29 @@ test("bounds: spec-v456 computeCameraLensFov pins FOV, scene, pixel density / DO
   assert.ok("error" in _v456({ sensor_width_mm: Infinity, focal_length_mm: 4, distance_ft: 30, h_pixels: 1920 }));
 });
 
+import { computeCameraMaxDistanceForPpf as _v741 } from "../../calc-lowvoltage.js";
+test("bounds: spec-v741 camera max distance for a pixel density (inverse of camera-lens-fov)", () => {
+  const p = _v741({ sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 });
+  assert.ok(Math.abs(p.max_distance_ft - 18.818) < 0.01);
+  assert.ok(/Identify/.test(p.band));
+  // round-trip: the recovered distance fed to camera-lens-fov reproduces the target ppf, and the FOV matches
+  for (const [sensor, focal, px, ppf] of [[5.37, 4, 1920, 76], [5.37, 8, 1920, 38], [4.8, 6, 2560, 100], [6.4, 2.8, 1280, 19]]) {
+    const inv = _v741({ sensor_width_mm: sensor, focal_length_mm: focal, h_pixels: px, target_ppf: ppf });
+    const fwd = _v456({ sensor_width_mm: sensor, focal_length_mm: focal, distance_ft: inv.max_distance_ft, h_pixels: px });
+    assert.ok(Math.abs(fwd.ppf - ppf) < 1e-6);
+    assert.ok(Math.abs(fwd.fov_deg - inv.fov_deg) < 1e-9);
+  }
+  // a lower density target reaches farther; a longer lens reaches farther
+  assert.ok(_v741({ sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 38 }).max_distance_ft > _v741({ sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 }).max_distance_ft);
+  assert.ok(_v741({ sensor_width_mm: 5.37, focal_length_mm: 8, h_pixels: 1920, target_ppf: 76 }).max_distance_ft > _v741({ sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 }).max_distance_ft);
+  // error seams
+  assert.ok("error" in _v741({ sensor_width_mm: 0, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 }));
+  assert.ok("error" in _v741({ sensor_width_mm: 5.37, focal_length_mm: 0, h_pixels: 1920, target_ppf: 76 }));
+  assert.ok("error" in _v741({ sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 0, target_ppf: 76 }));
+  assert.ok("error" in _v741({ sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 0 }));
+  assert.ok("error" in _v741({ sensor_width_mm: Infinity, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 }));
+});
+
 test("bounds: spec-v457 computeCeilingSpeakerCoverage pins diameter, count, layouts, and error seams", () => {
   const r = _v457({ ceiling_ft: 10, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200, layout: "edge_to_edge" });
   assert.ok(Math.abs(r.diameter_ft - 12) < 1e-9 && Math.abs(r.spacing_ft - 12) < 1e-9 && r.count === 9);

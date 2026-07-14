@@ -52613,6 +52613,35 @@
    }
   },
   {
+   "tile_id": "camera-max-distance-for-ppf",
+   "source_publisher": "IEC 62676-4 DORI (solved for the distance)",
+   "source_title": "5.37 mm sensor, 4 mm lens, 1920 px, 76 ppf target -> 18.8 ft max distance (Identify)",
+   "source_edition_or_year": "spec-v741 worked example (machine-verified)",
+   "source_section_or_page": "spec-v741 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "sensor_width_mm": 5.37,
+    "focal_length_mm": 4,
+    "h_pixels": 1920,
+    "target_ppf": 76
+   },
+   "outputs": {
+    "max_distance_ft": {
+     "value": 18.818,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fov_deg": {
+     "value": 67.74,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "camera-lens-fov",
    "source_publisher": "IEC 62676-4 DORI",
    "source_title": "8 mm lens halves scene to 20.1 ft, doubles density to 95.3 ppf (Identify)",

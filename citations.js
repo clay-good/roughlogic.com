@@ -8663,6 +8663,18 @@ export const CITATIONS = {
       { name: "Per-100-ft loss", value: "type- and frequency-specific; RG6 ~ 6 dB, RG59 ~ 11 dB, RG11 ~ 3.5 dB per 100 ft at ~1 GHz default", source: "Belden / CommScope datasheets" },
     ],
   },
+  "camera-max-distance-for-ppf": {
+    formula: "max_distance = h_pixels x focal_length / (target_ppf x sensor_width), the inverse of ppf = h_pixels / (distance x sensor_width / focal_length); fov = 2 x atan(sensor_width / (2 x focal_length)); DORI band by ppf (8 Detect / 19 Observe / 38 Recognize / 76 Identify).",
+    edition: "IEC 62676-4 (Video surveillance systems - Application guidelines) DORI criteria, by name, solved for the distance; first-principles thin-lens field-of-view geometry.",
+    freeAccess: "The FOV and scene-width geometry is first-principles optics; the DORI pixel-density bands are published in IEC 62676-4 (and widely reproduced by camera manufacturers).",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The farthest distance a camera still meets a target pixel density, the inverse of the DORI density relation: max distance = horizontal pixel count x focal length / (target ppf x sensor width). Beyond this distance the density falls below the target and the DORI task is not met. IEC 62676-4 sets the DORI minimum densities: 25 / 63 / 125 / 250 pixels per meter, about 8 / 19 / 38 / 76 pixels per foot for Detect / Observe / Recognize / Identify. The horizontal FOV is fixed by the lens and does not change with distance; a longer focal length reaches farther for the same density but narrows the view. This uses the sensor's physical width; the effective sensor area, lens distortion, and low-light performance shift the real result, so verify against the manufacturer's lens chart and a live view.",
+    assumptions: [
+      { name: "Thin-lens density", value: "max distance = px x focal / (target ppf x sensor); fov = 2 atan(sensor / 2 focal)", source: "first-principles optics" },
+      { name: "DORI bands", value: "25 / 63 / 125 / 250 ppm (~8 / 19 / 38 / 76 ppf) for Detect / Observe / Recognize / Identify", source: "IEC 62676-4" },
+      { name: "Verify on site", value: "effective sensor width, lens distortion, and low light shift the real result; confirm with the lens chart and a live view", source: "scope of this tile" },
+    ],
+  },
   "camera-lens-fov": {
     formula: "fov = 2 x atan(sensor_width / (2 x focal_length)); scene = distance x sensor_width / focal_length; ppf = h_pixels / scene; DORI band by ppf (8 Detect / 19 Observe / 38 Recognize / 76 Identify).",
     edition: "IEC 62676-4 (Video surveillance systems - Application guidelines) DORI criteria, by name; first-principles thin-lens field-of-view geometry.",

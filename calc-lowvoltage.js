@@ -635,6 +635,54 @@ function _renderCameraLensFov(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["camera-lens-fov"] = _renderCameraLensFov;
 
+// camera-max-distance-for-ppf: inverse of camera-lens-fov. The forward tile gives the pixel density at a distance; the
+// inverse recovers the farthest distance at which a camera still meets a target pixel density (a DORI task), so a
+// designer places the camera to still Identify / Recognize at the target. From ppf = px x focal / (distance x sensor),
+// distance_max = px x focal / (target_ppf x sensor). It also reports the scene width and the constant horizontal FOV.
+// dims: in { sensor_width_mm: L, focal_length_mm: L, h_pixels: dimensionless, target_ppf: L^-1 } out: { max_distance_ft: L, scene_ft: L, fov_deg: dimensionless }
+export function computeCameraMaxDistanceForPpf({ sensor_width_mm = 0, focal_length_mm = 0, h_pixels = 0, target_ppf = 76 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sensor = Number(sensor_width_mm) || 0;
+  const focal = Number(focal_length_mm) || 0;
+  const px = Number(h_pixels) || 0;
+  const ppf = Number(target_ppf) || 0;
+  if (!(sensor > 0)) return { error: "Sensor width must be positive (mm)." };
+  if (!(focal > 0)) return { error: "Focal length must be positive (mm)." };
+  if (!(px > 0)) return { error: "Horizontal resolution must be positive (pixels)." };
+  if (!(ppf > 0)) return { error: "Target pixel density must be positive (ppf)." };
+  const max_distance_ft = (px * focal) / (ppf * sensor);
+  const scene_ft = max_distance_ft * sensor / focal;
+  const fov_deg = 2 * Math.atan(sensor / (2 * focal)) * 180 / Math.PI;
+  if (![max_distance_ft, scene_ft, fov_deg].every(Number.isFinite)) return { error: "Max-distance math is not a finite value." };
+  const band = ppf >= 76 ? "Identify (>= 76 ppf)" : ppf >= 38 ? "Recognize (>= 38 ppf)" : ppf >= 19 ? "Observe (>= 19 ppf)" : ppf >= 8 ? "Detect (>= 8 ppf)" : "below Detect (< 8 ppf)";
+  return {
+    max_distance_ft, scene_ft, fov_deg, band,
+    note: "Max distance for a pixel density = horizontal resolution x focal length / (target ppf x sensor width), the inverse of ppf = px x focal / (distance x sensor). Beyond this distance the density falls below the target and the DORI task (Detect 8, Observe 19, Recognize 38, Identify 76 ppf) is not met. The horizontal FOV = 2 x atan(sensor / (2 x focal)) is fixed by the lens and does not change with distance - a longer lens reaches farther for the same density but narrows the view. A design aid; verify against the manufacturer's lens chart, the low-light performance, and a live view.",
+  };
+}
+export const cameraMaxDistanceForPpfExample = { inputs: { sensor_width_mm: 5.37, focal_length_mm: 4, h_pixels: 1920, target_ppf: 76 } };
+function _renderCameraMaxDistanceForPpf(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Camera pixel density (IEC 62676-4 DORI): ppf = px x focal / (distance x sensor), solved for the distance: distance_max = px x focal / (target ppf x sensor). DORI bands Detect 8 / Observe 19 / Recognize 38 / Identify 76 ppf. A design aid; verify against the lens chart and a live view.";
+  const sw = makeNumber("Sensor width (mm, e.g. 1/2.7in = 5.37)", "cmd-sw", { step: "any", min: "0" }); sw.input.value = "5.37";
+  const fl = makeNumber("Focal length (mm)", "cmd-fl", { step: "any", min: "0" }); fl.input.value = "4";
+  const px = makeNumber("Horizontal resolution (pixels)", "cmd-px", { step: "1", min: "0" }); px.input.value = "1920";
+  const tp = makeNumber("Target pixel density (ppf, 76 = Identify)", "cmd-tp", { step: "any", min: "0" }); tp.input.value = "76";
+  for (const f of [sw, fl, px, tp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sw.input.value = "5.37"; fl.input.value = "4"; px.input.value = "1920"; tp.input.value = "76"; update(); });
+  const oDist = makeOutputLine(outputRegion, "Max distance for that density", "cmd-out-dist");
+  const oScene = makeOutputLine(outputRegion, "Scene width / FOV at that distance", "cmd-out-scene");
+  const oNote = makeOutputLine(outputRegion, "Note", "cmd-out-n");
+  const update = debounce(() => {
+    const r = computeCameraMaxDistanceForPpf({ sensor_width_mm: Number(sw.input.value) || 0, focal_length_mm: Number(fl.input.value) || 0, h_pixels: Number(px.input.value) || 0, target_ppf: Number(tp.input.value) || 0 });
+    if (r.error) { oDist.textContent = r.error; oScene.textContent = "-"; oNote.textContent = ""; return; }
+    oDist.textContent = fmt(r.max_distance_ft, 1) + " ft (" + r.band + ")";
+    oScene.textContent = fmt(r.scene_ft, 1) + " ft wide, " + fmt(r.fov_deg, 1) + " deg FOV";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sw, fl, px, tp]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["camera-max-distance-for-ppf"] = _renderCameraMaxDistanceForPpf;
+
 // ===================== spec-v457: ceiling speaker coverage and spacing =====================
 // dims: in { ceiling_ft: L, ear_ft: L, coverage_deg: dimensionless, room_area_ft2: L^2, layout: dimensionless } out: { diameter_ft: L, spacing_ft: L, count: dimensionless }
 export function computeCeilingSpeakerCoverage({ ceiling_ft = 0, ear_ft = 0, coverage_deg = 90, room_area_ft2 = 0, layout = "edge_to_edge" } = {}) {

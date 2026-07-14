@@ -693,6 +693,7 @@ export const COMPUTE_MAP = {
   "standby-battery-runtime": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatteryRuntime" },
   "coax-rg-loss": { module: "../../calc-lowvoltage.js", fn: "computeCoaxRgLoss" },
   "camera-lens-fov": { module: "../../calc-lowvoltage.js", fn: "computeCameraLensFov" },
+  "camera-max-distance-for-ppf": { module: "../../calc-lowvoltage.js", fn: "computeCameraMaxDistanceForPpf" },
   "ceiling-speaker-coverage": { module: "../../calc-lowvoltage.js", fn: "computeCeilingSpeakerCoverage" },
   "ceiling-speaker-coverage-angle": { module: "../../calc-lowvoltage.js", fn: "computeCeilingSpeakerCoverageAngle" },
   "structured-cabling-channel": { module: "../../calc-lowvoltage.js", fn: "computeStructuredCablingChannel" },
