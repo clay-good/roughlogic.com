@@ -623,6 +623,7 @@ const RELATED = {
   "septic-tank": ["septic-drainfield", "grease-trap"],
   "septic-dose-tank": ["septic-lpp-orifice", "pump-tdh", "septic-tank"],
   "septic-pumpout-interval": ["septic-tank", "grease-trap"],
+  "septic-tank-for-interval": ["septic-pumpout-interval", "septic-tank", "septic-drainfield-capacity"],
   "septic-lpp-orifice": ["septic-dose-tank", "pump-tdh", "septic-drainfield"],
   "recirc-loop-sizing": ["recirc-pump-head", "pump-sizing"],
   "trap-arm": ["slope", "manning-slope"],

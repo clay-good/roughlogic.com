@@ -172,6 +172,30 @@ export function computeSepticPumpoutInterval({ tank_gal, people, accum_gal_pp_yr
   };
 }
 
+// septic-tank-for-interval: inverse of septic-pumpout-interval. The forward
+// tile gives years = (tank x fill) / (people x accum); sizing a tank to a
+// target pumping interval is the inverse: tank = target_years x people x accum / fill.
+// dims: in { target_years: dimensionless, people: dimensionless, accum_gal_pp_yr: dimensionless, fill_fraction: dimensionless } out: { tank_gal: L^3, working_gal: L^3, annual_accum_gal: dimensionless }
+export function computeSepticTankForInterval({ target_years = 0, people = 0, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const yrs = Number(target_years);
+  const ppl = Number(people);
+  const accum = Number(accum_gal_pp_yr);
+  const fill = Number(fill_fraction);
+  if (!(yrs > 0)) return { error: "Target interval must be positive (years)." };
+  if (!(ppl > 0)) return { error: "Household occupants must be positive." };
+  if (!(accum > 0)) return { error: "Accumulation rate must be positive (gal/person/yr)." };
+  if (!(fill > 0 && fill < 1)) return { error: "Fill fraction must be between 0 and 1." };
+  const annual_accum_gal = ppl * accum;
+  const working_gal = yrs * annual_accum_gal;
+  const tank_gal = working_gal / fill;
+  return {
+    tank_gal, working_gal, annual_accum_gal,
+    note: "The tank working volume so a target number of years passes before the sludge and scum reach the pumping fill fraction: tank = years x people x accumulation / fill. Accumulation varies widely with diet, water use, and a garbage disposal (which roughly doubles the rate), so this is a planning estimate; state codes set a minimum tank size by bedroom count that usually governs the actual tank, and a sludge-judge measurement, not a calendar, governs the pumping call.",
+  };
+}
+export const septicTankForIntervalExample = { inputs: { target_years: 5, people: 4, accum_gal_pp_yr: 30, fill_fraction: 0.33 } };
+
 // dims: in { orifice_dia_in: L, squirt_ft: L, cd: dimensionless, orifices_per_lateral: dimensionless, num_laterals: dimensionless } out: { per_orifice_gpm: L^3, total_orifices: dimensionless, system_gpm: L^3, squirt_psi: M L^-1 T^-2 }
 export function computeSepticLppOrifice({ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
@@ -334,6 +358,37 @@ function renderSepticPumpoutInterval(inputRegion, outputRegion, citationEl) {
   for (const el of [tank.input, people.input, accum.input, fill.input]) el.addEventListener("input", update);
 }
 
+function renderSepticTankForInterval(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: USEPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008) and university onsite-wastewater extension pumping-frequency guidance, by name (years = tank x fill / (people x accumulation), solved for the tank). State minimum tank sizes by bedroom count usually govern the actual tank. Free at epa.gov/septic.";
+  const yrs = makeNumber("Target years between pump-outs", "sti-yrs", { step: "any", min: "0", value: "5" });
+  yrs.input.value = "5";
+  const people = makeNumber("Household occupants", "sti-ppl", { step: "1", min: "0" });
+  const accum = makeNumber("Accumulation (gal/person/yr)", "sti-accum", { step: "any", min: "0", value: "30" });
+  accum.input.value = "30";
+  const fill = makeNumber("Fill fraction before pumping", "sti-fill", { step: "any", min: "0", value: "0.33" });
+  fill.input.value = "0.33";
+  for (const f of [yrs, people, accum, fill]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { yrs.input.value = "5"; people.input.value = "4"; accum.input.value = "30"; fill.input.value = "0.33"; update(); });
+  const oTank = makeOutputLine(outputRegion, "Required tank working volume", "sti-out-tank");
+  const oWork = makeOutputLine(outputRegion, "Accumulation at interval", "sti-out-work");
+  const oAnnual = makeOutputLine(outputRegion, "Annual accumulation", "sti-out-annual");
+  const oNote = makeOutputLine(outputRegion, "Note", "sti-out-note");
+  const update = debounce(() => {
+    const r = computeSepticTankForInterval({
+      target_years: Number(yrs.input.value) || 0,
+      people: Number(people.input.value) || 0,
+      accum_gal_pp_yr: accum.input.value === "" ? 30 : Number(accum.input.value),
+      fill_fraction: fill.input.value === "" ? 0.33 : Number(fill.input.value),
+    });
+    if (r.error) { oTank.textContent = r.error; for (const o of [oWork, oAnnual, oNote]) o.textContent = "-"; return; }
+    oTank.textContent = fmt(r.tank_gal, 0) + " gal";
+    oWork.textContent = fmt(r.working_gal, 0) + " gal";
+    oAnnual.textContent = fmt(r.annual_accum_gal, 0) + " gal/yr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [yrs.input, people.input, accum.input, fill.input]) el.addEventListener("input", update);
+}
+
 function renderSepticLppOrifice(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: orifice-discharge equation Q = 19.63 x Cd x d^2 x sqrt(h) (gpm, inches, feet) and university onsite-wastewater extension low-pressure-pipe design guidance, by name. Cd 0.6 gives the familiar 11.79 coefficient. Orifice size, spacing, and lateral layout come from the permitted onsite design.";
   const dia = makeNumber("Orifice diameter (in)", "slo-dia", { step: "any", min: "0", value: "0.25" });
@@ -373,5 +428,6 @@ export const SEPTIC_RENDERERS = {
   "septic-drainfield-capacity": _v7p_renderSepticDrainfieldCapacity,
   "septic-dose-tank": renderSepticDoseTank,
   "septic-pumpout-interval": renderSepticPumpoutInterval,
+  "septic-tank-for-interval": renderSepticTankForInterval,
   "septic-lpp-orifice": renderSepticLppOrifice,
 };

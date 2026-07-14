@@ -3415,6 +3415,18 @@ export const CITATIONS = {
       { name: "Measurement governs", value: "a sludge-judge or core measurement of actual sludge and scum depth governs; never let sludge reach the outlet baffle; many states set a mandatory interval that overrides any estimate", source: "EPA/625/R-00/008; state onsite code" },
     ],
   },
+  "septic-tank-for-interval": {
+    formula: "Tank working volume = target_years x occupants x accumulation_per_person_per_year / fill_fraction (the inverse of years = tank x fill / (people x accumulation)).",
+    edition: "USEPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008); university onsite-wastewater extension pumping-frequency guidance, by name.",
+    freeAccess: "Free at epa.gov/septic. Extension pumping-frequency tables free on land-grant university extension sites.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The inverse of septic-pumpout-interval: the tank working volume that puts a target number of years between pumpings. A planning estimate -- the state minimum tank size by bedroom count usually governs the actual tank, and a sludge-judge measurement, not a calendar, governs the pumping call.",
+    assumptions: [
+      { name: "Default accumulation", value: "30 gal per person per year of net sludge + scum (a garbage disposal roughly doubles it); editable", source: "extension pumping-frequency guidance" },
+      { name: "Default fill fraction", value: "0.33 of the tank before pumping; editable", source: "extension pumping-frequency guidance" },
+      { name: "Code minimum governs", value: "state minimum tank sizes by bedroom count usually govern the actual tank, overriding this interval-based estimate", source: "state onsite code" },
+    ],
+  },
   "septic-lpp-orifice": {
     formula: "Per-orifice flow (gpm) = 19.63 x Cd x d_in^2 x sqrt(h_ft) (Cd 0.6 gives the familiar 11.79 coefficient); system flow = per-orifice flow x orifices per lateral x laterals.",
     edition: "Standard orifice-discharge equation; university onsite-wastewater extension low-pressure-pipe design guidance, by name.",

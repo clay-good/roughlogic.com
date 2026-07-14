@@ -9949,6 +9949,35 @@ test("bounds: calc-plumbing v83 septic dose-tank + pump-out interval + LPP orifi
   assert.ok("error" in _v83b3({ orifice_dia_in: Infinity, squirt_ft: 5, orifices_per_lateral: 10, num_laterals: 4 })); // non-finite
 });
 
+import { computeSepticTankForInterval as _v704 } from "../../calc-septic.js";
+test("bounds: spec-v704 computeSepticTankForInterval pins tank = years*people*accum/fill, round-trips through computeSepticPumpoutInterval, and error seams", () => {
+  const r = _v704({ target_years: 5, people: 4, accum_gal_pp_yr: 30, fill_fraction: 0.33 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.tank_gal - 600 / 0.33) < 1e-9, `tank identity: ${r.tank_gal}`);
+  assert.ok(Math.abs(r.working_gal - 600) < 1e-9, `working: ${r.working_gal}`);
+  // Round-trip: at the required tank the forward tile's interval equals the target years.
+  for (const target_years of [1, 5, 12]) {
+    for (const people of [2, 4, 8]) {
+      for (const fill_fraction of [0.25, 0.33, 0.5]) {
+        const m = _v704({ target_years, people, accum_gal_pp_yr: 30, fill_fraction });
+        assert.ok(!m.error, `sweep y=${target_years} p=${people} f=${fill_fraction}: ${JSON.stringify(m)}`);
+        assertFinite(m.tank_gal, "tank"); assert.ok(m.tank_gal > 0, "tank positive");
+        const back = _v83b2({ tank_gal: m.tank_gal, people, accum_gal_pp_yr: 30, fill_fraction });
+        assert.ok(Math.abs(back.years - target_years) < 1e-9, `round-trip y=${target_years} p=${people} f=${fill_fraction}: ${back.years}`);
+      }
+    }
+  }
+  // More people (faster fill) needs a bigger tank for the same interval.
+  assert.ok(_v704({ target_years: 5, people: 6, accum_gal_pp_yr: 30, fill_fraction: 0.33 }).tank_gal > r.tank_gal);
+  // Error seams: non-positive years, people, accumulation, fill outside (0,1), non-finite.
+  assert.ok("error" in _v704({ target_years: 0, people: 4 }));
+  assert.ok("error" in _v704({ target_years: 5, people: 0 }));
+  assert.ok("error" in _v704({ target_years: 5, people: 4, accum_gal_pp_yr: 0 }));
+  assert.ok("error" in _v704({ target_years: 5, people: 4, fill_fraction: 1 }));
+  assert.ok("error" in _v704({ target_years: 5, people: 4, fill_fraction: 0 }));
+  assert.ok("error" in _v704({ target_years: Infinity, people: 4 }));
+});
+
 import { computeNozzleFlowPressure as _v84b1, computeSprayDriftBuffer as _v84b2, computeSprayerFieldCapacity as _v84b3 } from "../../calc-agriculture.js";
 test("bounds: calc-agriculture v84 nozzle-flow-pressure + spray-drift-buffer + sprayer-field-capacity pin the square-root flow law, the drift buffer, and field capacity", () => {
   // 0.4 gpm tip at 40 psi run at 60 -> 0.4 * sqrt(1.5) = 0.489898

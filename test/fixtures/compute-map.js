@@ -274,6 +274,7 @@ export const COMPUTE_MAP = {
   "septic-tank": { module: "../../calc-septic.js", fn: "computeSepticTank" },
   "septic-dose-tank": { module: "../../calc-septic.js", fn: "computeSepticDoseTank" },
   "septic-pumpout-interval": { module: "../../calc-septic.js", fn: "computeSepticPumpoutInterval" },
+  "septic-tank-for-interval": { module: "../../calc-septic.js", fn: "computeSepticTankForInterval" },
   "septic-lpp-orifice": { module: "../../calc-septic.js", fn: "computeSepticLppOrifice" },
   "trap-arm": { module: "../../calc-plumbing.js", fn: "computeTrapArm" },
   "pipe-expansion": { module: "../../calc-plumbing.js", fn: "computePipeExpansion" },

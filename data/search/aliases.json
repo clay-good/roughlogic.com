@@ -51287,6 +51287,31 @@
       "kind": "question"
     },
     {
+      "term": "septic tank size for 5 year pumping",
+      "target": "septic-tank-for-interval",
+      "kind": "question"
+    },
+    {
+      "term": "how big a septic tank to pump every 5 years",
+      "target": "septic-tank-for-interval",
+      "kind": "question"
+    },
+    {
+      "term": "tank size for target pumpout interval",
+      "target": "septic-tank-for-interval",
+      "kind": "question"
+    },
+    {
+      "term": "size septic tank by pumping frequency",
+      "target": "septic-tank-for-interval",
+      "kind": "question"
+    },
+    {
+      "term": "septic tank gallons for family of 4",
+      "target": "septic-tank-for-interval",
+      "kind": "question"
+    },
+    {
       "term": "gpm per orifice on a septic lateral",
       "target": "septic-lpp-orifice",
       "kind": "question"

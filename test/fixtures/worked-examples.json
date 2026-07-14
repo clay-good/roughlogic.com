@@ -22270,6 +22270,35 @@
    }
   },
   {
+   "tile_id": "septic-tank-for-interval",
+   "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension pumping-frequency guidance",
+   "source_title": "tank = years x people x accumulation / fill (inverse of the pump-out interval)",
+   "source_edition_or_year": "EPA/625/R-00/008",
+   "source_section_or_page": "5 years, 4 people, 30 gal/pp/yr, 1/3 fill -> 600 gal accumulation -> 1,818 gal tank",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_years": 5,
+    "people": 4,
+    "accum_gal_pp_yr": 30,
+    "fill_fraction": 0.33
+   },
+   "outputs": {
+    "tank_gal": {
+     "value": 1818.181818,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "working_gal": {
+     "value": 600,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "septic-pumpout-interval",
    "source_publisher": "USEPA Onsite Wastewater Treatment Systems Manual / university extension pumping-frequency guidance",
    "source_title": "cross-check: a bigger tank stretches the interval",
