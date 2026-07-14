@@ -29910,6 +29910,50 @@
    }
   },
   {
+   "tile_id": "conduit-expansion-max-run",
+   "source_publisher": "NFPA",
+   "source_title": "50 F swing -> 12.33 ft max run before a 1/4-inch expansion fitting is required",
+   "source_edition_or_year": "NEC 2023 352.44; PVC coefficient 3.38e-5 in/in/F (inverse of conduit-thermal-expansion)",
+   "source_section_or_page": "spec-v665 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "temp_change_f": 50,
+    "coeff_in_per_in_f": 3.38e-05,
+    "trigger_in": 0.25
+   },
+   "outputs": {
+    "max_run_ft": {
+     "value": 12.327,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "conduit-expansion-max-run",
+   "source_publisher": "NFPA",
+   "source_title": "100 F swing halves the run to 6.16 ft; the length varies inversely with the swing",
+   "source_edition_or_year": "NEC 2023 352.44; PVC coefficient 3.38e-5 in/in/F",
+   "source_section_or_page": "spec-v665 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "temp_change_f": 100,
+    "coeff_in_per_in_f": 3.38e-05,
+    "trigger_in": 0.25
+   },
+   "outputs": {
+    "max_run_ft": {
+     "value": 6.164,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "egc-upsize-proportional",
    "source_publisher": "NFPA",
    "source_title": "Base EGC 26,240 cmil, phase 167,800 -> 250,000 cmil -> ratio 1.49, 39,094 cmil",

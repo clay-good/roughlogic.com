@@ -4189,6 +4189,48 @@ function renderConduitThermalExpansion(inputRegion, outputRegion, citationEl) {
 }
 ELECTRICAL_RENDERERS["conduit-thermal-expansion"] = renderConduitThermalExpansion;
 
+// dims: in { temp_change_f: T, coeff_in_per_in_f: dimensionless, trigger_in: L } out: { max_run_ft: L, delta_l_at_max_in: L }
+export function computeConduitExpansionMaxRun({ temp_change_f = 0, coeff_in_per_in_f = 0.0000338, trigger_in = 0.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dT = Math.abs(Number(temp_change_f) || 0);
+  const coeff = (coeff_in_per_in_f === undefined || coeff_in_per_in_f === null || coeff_in_per_in_f === "") ? 0.0000338 : Number(coeff_in_per_in_f);
+  const trig = (trigger_in === undefined || trigger_in === null || trigger_in === "") ? 0.25 : Number(trigger_in);
+  if (!(dT > 0)) return { error: "Temperature swing must be nonzero (deg F); a zero swing never reaches the trigger." };
+  if (!(coeff > 0)) return { error: "Coefficient of expansion must be positive (in/in/deg-F)." };
+  if (!(trig > 0)) return { error: "Trigger length must be positive (in)." };
+  // Longest straight run whose length change stays at or below the trigger:
+  // delta_L = coeff x (L x 12) x dT = trigger  =>  L = trigger / (coeff x 12 x dT).
+  const max_run_ft = trig / (coeff * 12 * dT);
+  const delta_l_at_max_in = coeff * (max_run_ft * 12) * dT;
+  return {
+    max_run_ft, delta_l_at_max_in,
+    note: "The longest straight run between anchors before a PVC expansion fitting is required: L_max = trigger / (coefficient x 12 in/ft x temperature swing), the inverse of the conduit-thermal-expansion tile. At L_max the length change equals the 1/4-inch trigger exactly; a longer run needs a fitting sized for that travel. The bundled PVC coefficient 3.38e-5 in/in/deg-F is the public property underlying NEC 352.44. The AHJ and the conduit manufacturer govern.",
+  };
+}
+export const conduitExpansionMaxRunExample = { inputs: { temp_change_f: 50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderConduitExpansionMaxRun(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 352.44 (expansion fittings for rigid PVC conduit), solved for the run length. L_max = trigger / (coefficient x 12 x temperature swing); the bundled 3.38e-5 in/in/deg-F PVC coefficient underlies NEC Table 352.44. The AHJ and the manufacturer govern. Free read-only at nfpa.org/freeaccess.";
+  const dt = makeNumber("Temperature swing (deg F)", "cxmr-dt", { step: "any" });
+  const coeff = makeNumber("PVC coefficient (in/in/deg-F)", "cxmr-coeff", { step: "any", min: "0", value: "0.0000338" });
+  coeff.input.value = "0.0000338";
+  const trig = makeNumber("Fitting trigger (in)", "cxmr-trig", { step: "any", min: "0", value: "0.25" });
+  trig.input.value = "0.25";
+  for (const f of [dt, coeff, trig]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dt.input.value = "50"; coeff.input.value = "0.0000338"; trig.input.value = "0.25"; update(); });
+  const oRun = makeOutputLine(outputRegion, "Max run before a fitting", "cxmr-out-run");
+  const oNote = makeOutputLine(outputRegion, "Note", "cxmr-out-note");
+  const update = debounce(() => {
+    const r = computeConduitExpansionMaxRun({ temp_change_f: Number(dt.input.value) || 0, coeff_in_per_in_f: Number(coeff.input.value) || 0, trigger_in: Number(trig.input.value) || 0 });
+    if (r.error) { oRun.textContent = r.error; oNote.textContent = "-"; return; }
+    oRun.textContent = fmt(r.max_run_ft, 1) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [dt.input, coeff.input, trig.input]) el.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["conduit-expansion-max-run"] = renderConduitExpansionMaxRun;
+
 // dims: in { base_egc_cmil: L^2, base_phase_cmil: L^2, installed_phase_cmil: L^2 } out: { ratio: dimensionless, upsized_egc_cmil: L^2 }
 export function computeEgcUpsizeProportional({ base_egc_cmil = 0, base_phase_cmil = 0, installed_phase_cmil = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

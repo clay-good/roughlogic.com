@@ -7147,6 +7147,31 @@
       "kind": "redirect"
     },
     {
+      "term": "max conduit run",
+      "target": "conduit-expansion-max-run",
+      "kind": "industry"
+    },
+    {
+      "term": "run length before expansion fitting",
+      "target": "conduit-expansion-max-run",
+      "kind": "industry"
+    },
+    {
+      "term": "how long a pvc run",
+      "target": "conduit-expansion-max-run",
+      "kind": "adjacent"
+    },
+    {
+      "term": "spacing between expansion fittings",
+      "target": "conduit-expansion-max-run",
+      "kind": "adjacent"
+    },
+    {
+      "term": "conduit anchor spacing",
+      "target": "conduit-expansion-max-run",
+      "kind": "adjacent"
+    },
+    {
       "term": "egc upsize",
       "target": "egc-upsize-proportional",
       "kind": "industry"

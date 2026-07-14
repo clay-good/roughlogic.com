@@ -2403,6 +2403,19 @@ export const CITATIONS = {
     ],
   },
 
+  "conduit-expansion-max-run": {
+    formula: "L_max = trigger_in / (coefficient x 12 x |temperature_change|); the longest straight run whose length change stays at or below the 1/4-inch (0.25 in) expansion-fitting trigger, the inverse of conduit-thermal-expansion. PVC coefficient 3.38e-5 in/in/deg-F.",
+    edition: NEC_2023 + " 352.44 (expansion fittings for rigid PVC conduit).",
+    freeAccess: NEC_FREE,
+    governance: GOVERNANCE.electrical,
+    editionNote: NEC_DISCLOSURE,
+    assumptions: [
+      { name: "PVC coefficient", value: "the bundled 3.38e-5 in/in/deg-F coefficient is the public PVC physical property underlying NEC Table 352.44; the manufacturer's published coefficient governs", source: "NEC 2023 Table 352.44 / PVC manufacturer" },
+      { name: "Temperature swing", value: "the run length varies inversely with the temperature swing; the magnitude of the max-minus-min swing is used, so the sign does not matter", source: "site temperature extremes; the AHJ governs" },
+      { name: "Trigger", value: "the 1/4-inch (0.25 in) default is the NEC 352.44 threshold at which a fitting is required; a longer run needs a fitting sized for the resulting travel", source: "NEC 2023 352.44" },
+    ],
+  },
+
   "egc-upsize-proportional": {
     formula: "ratio = max(1, installed_phase_cmil / base_phase_cmil); upsized_EGC_cmil = base_EGC_cmil x ratio, then select the next standard AWG/kcmil at or above this. A ratio below 1 is clamped to 1 (the EGC is never reduced below its table size).",
     edition: NEC_2023 + " 250.122(B) (increase in size of equipment grounding conductors).",

@@ -979,6 +979,7 @@ export const COMPUTE_MAP = {
   "multi-motor-feeder": { module: "../../calc-motor.js", fn: "computeMultiMotorFeeder" },
   "conductor-short-circuit-withstand": { module: "../../calc-electrical.js", fn: "computeConductorShortCircuitWithstand" },
   "conduit-thermal-expansion": { module: "../../calc-electrical.js", fn: "computeConduitThermalExpansion" },
+  "conduit-expansion-max-run": { module: "../../calc-electrical.js", fn: "computeConduitExpansionMaxRun" },
   "egc-upsize-proportional": { module: "../../calc-electrical.js", fn: "computeEgcUpsizeProportional" },
   "delta-wye-line-phase": { module: "../../calc-electrical.js", fn: "computeDeltaWyeLinePhase" },
   "gas-meter-clock": { module: "../../calc-hvacservice.js", fn: "computeGasMeterClock" },

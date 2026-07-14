@@ -5811,6 +5811,7 @@ import {
   computeLuxFootcandle,
   computeConductorShortCircuitWithstand,
   computeConduitThermalExpansion,
+  computeConduitExpansionMaxRun,
   computeEgcUpsizeProportional,
   computeDeltaWyeLinePhase,
   parseConductorShorthand,
@@ -11323,6 +11324,34 @@ test("bounds: calc-electrical computeConduitThermalExpansion pins delta_L, the 1
   // Error seams: run length <= 0, non-finite.
   assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: 0, temp_change_f: 50 }));
   assert.ok("error" in computeConduitThermalExpansion({ run_length_ft: Infinity, temp_change_f: 50 }));
+});
+
+test("bounds: calc-electrical computeConduitExpansionMaxRun pins L_max = trigger/(coeff*12*dT), round-trips through computeConduitThermalExpansion, and rejects non-positive inputs", () => {
+  // spec-v665 section 2.1 pinned example: 50 F swing -> 12.33 ft before the 1/4-inch trigger.
+  const r = computeConduitExpansionMaxRun({ temp_change_f: 50, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_run_ft - 0.25 / (0.0000338 * 12 * 50)) < 1e-9, `L_max identity: ${r.max_run_ft}`);
+  assert.ok(Math.abs(r.delta_l_at_max_in - 0.25) < 1e-9, `delta_l at max equals trigger: ${r.delta_l_at_max_in}`);
+  // Cross-check: doubling the swing halves the run.
+  const c = computeConduitExpansionMaxRun({ temp_change_f: 100, coeff_in_per_in_f: 0.0000338, trigger_in: 0.25 });
+  assert.ok(Math.abs(c.max_run_ft - r.max_run_ft / 2) < 1e-9, `inverse in dT: ${c.max_run_ft}`);
+  // Sign of the swing does not matter (magnitude is used).
+  assert.equal(computeConduitExpansionMaxRun({ temp_change_f: -50 }).max_run_ft, r.max_run_ft);
+  // Round-trip: feeding L_max back through the forward tile reproduces the trigger exactly.
+  for (const temp_change_f of [10, 50, 120]) {
+    for (const trigger_in of [0.25, 0.5]) {
+      const m = computeConduitExpansionMaxRun({ temp_change_f, coeff_in_per_in_f: 0.0000338, trigger_in });
+      assert.ok(!m.error, `sweep dT=${temp_change_f} trig=${trigger_in}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_run_ft, "max_run"); assert.ok(m.max_run_ft > 0, "max_run positive");
+      const back = computeConduitThermalExpansion({ run_length_ft: m.max_run_ft, temp_change_f, coeff_in_per_in_f: 0.0000338, trigger_in });
+      assert.ok(Math.abs(back.delta_l_in - trigger_in) < 1e-9, `round-trip dT=${temp_change_f} trig=${trigger_in}: ${back.delta_l_in}`);
+    }
+  }
+  // Error seams: zero swing (never reaches trigger), non-positive coefficient / trigger, non-finite.
+  assert.ok("error" in computeConduitExpansionMaxRun({ temp_change_f: 0 }));
+  assert.ok("error" in computeConduitExpansionMaxRun({ temp_change_f: 50, coeff_in_per_in_f: 0 }));
+  assert.ok("error" in computeConduitExpansionMaxRun({ temp_change_f: 50, trigger_in: 0 }));
+  assert.ok("error" in computeConduitExpansionMaxRun({ temp_change_f: Infinity }));
 });
 
 test("bounds: calc-electrical computeEgcUpsizeProportional pins the 250.122(B) ratio, the clamp, and the upsized size", () => {

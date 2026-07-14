@@ -1012,7 +1012,8 @@ const RELATED = {
   "termination-temp-ampacity": ["wire-ampacity", "ambient-ampacity-adjust", "generator-conductor-445"],
   "multi-motor-feeder": ["motor-branch-from-nameplate", "motor-fla", "breaker-sizing"],
   "conductor-short-circuit-withstand": ["short-circuit-pp", "egc-sizing", "copper-resistance"],
-  "conduit-thermal-expansion": ["conduit-fill", "cable-bend-radius", "copper-resistance"],
+  "conduit-thermal-expansion": ["conduit-expansion-max-run", "conduit-fill", "cable-bend-radius", "copper-resistance"],
+  "conduit-expansion-max-run": ["conduit-thermal-expansion", "raceway-expansion-fitting", "conduit-fill", "cable-bend-radius"],
   "egc-upsize-proportional": ["egc-sizing", "voltage-drop", "parallel-conductor-derate"],
   "delta-wye-line-phase": ["three-phase", "power-triangle", "transformer-kva-sizing"],
   // spec-v110 HVAC gas-heat start-up (Group C)

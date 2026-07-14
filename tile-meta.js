@@ -658,7 +658,7 @@ const _TILES = [
   ["min-conductor-for-vd", "A"],
   // spec-v121..v128 motors / feeders / fault / raceway / grounding / three-phase
   ["motor-synchronous-speed-slip", "A"], ["motor-pole-identification", "A"], ["motor-shaft-torque", "A"], ["motor-operating-cost", "A"],
-  ["multi-motor-feeder", "A"], ["conductor-short-circuit-withstand", "A"], ["conduit-thermal-expansion", "A"],
+  ["multi-motor-feeder", "A"], ["conductor-short-circuit-withstand", "A"], ["conduit-thermal-expansion", "A"], ["conduit-expansion-max-run", "A"],
   ["egc-upsize-proportional", "A"], ["delta-wye-line-phase", "A"],
   // spec-v110 HVAC gas-heat start-up (Group C)
   ["gas-meter-clock", "C"], ["gas-meter-clock-target", "C"],
