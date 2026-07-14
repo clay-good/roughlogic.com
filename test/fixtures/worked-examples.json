@@ -26049,6 +26049,56 @@
    }
   },
   {
+   "tile_id": "spanline-sag-for-tension",
+   "source_publisher": "Shallow-cable parabola statics (by name), inverse",
+   "source_title": "100 ft span, 1.0 lb/ft, 502.5 lb support-tension limit -> 2.5 ft minimum sag (round-trips the forward pinned example)",
+   "source_edition_or_year": "spec-v670 worked example (machine-verified)",
+   "source_section_or_page": "spec-v670 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "span_ft": 100,
+    "load_lb_per_ft": 1.0,
+    "allowable_tension_lb": 502.494
+   },
+   "outputs": {
+    "min_sag_ft": {
+     "value": 2.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "horizontal_tension_lb": {
+     "value": 500,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spanline-sag-for-tension",
+   "source_publisher": "Shallow-cable parabola statics (by name), inverse",
+   "source_title": "cross-check: a higher 2,500 lb limit lets you pull to just 0.5 ft of sag (more tension allowed -> less sag)",
+   "source_edition_or_year": "spec-v670 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v670 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "span_ft": 100,
+    "load_lb_per_ft": 1.0,
+    "allowable_tension_lb": 2500.5
+   },
+   "outputs": {
+    "min_sag_ft": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bridle-leg-tension",
    "source_publisher": "Entertainment rigging bridle geometry (asymmetric two-leg static resolution)",
    "source_title": "T1 = W a2/den, T2 = W a1/den, den = a2 b1 + a1 b2",

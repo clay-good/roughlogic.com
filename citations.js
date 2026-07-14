@@ -9323,6 +9323,19 @@ export const CITATIONS = {
       { name: "Estimate only", value: "the certified rope WLL, the anchor capacity, and the head rigger govern the actual pick", source: "ASME B30.9" },
     ],
   },
+  "spanline-sag-for-tension": {
+    formula: "d_min = w x L^2 / (8 x sqrt(T_allow^2 - (w x L / 2)^2)); the inverse of T_support = w L^2 / (8 d) sqrt(1 + (4 d / L)^2) solved for the sag.",
+    edition: "Shallow-cable parabola statics (by name) with ASME B30.9 / Wire Rope Users Manual rigging practice; first-principles, no edition cycle.",
+    freeAccess: "The shallow-cable parabola (H = w L^2 / 8d) is a public statics result; ASME B30.9 governs sling and rigging practice. An ESTIMATE only; the certified rope WLL and the head rigger govern.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The least sag a spanline can be pulled to before the support (anchor) tension reaches the allowable, the inverse of spanline-sag-tension. Squaring T = w L^2 / (8 d) sqrt(1 + (4 d / L)^2) gives d_min = w L^2 / (8 sqrt(T_allow^2 - (w L / 2)^2)). The allowable limits the SUPPORT tension - the true maximum in the cable, at the anchors - not the horizontal component, and it must exceed the support vertical reaction w L / 2 (each anchor carries at least that much) or no sag can carry the load. Tension is inversely proportional to the sag, so any tighter than d_min overloads the rope and anchors. Enter the allowable as the certified rope WLL or the anchor capacity, whichever is lower, with the design factor already applied. Valid where the resulting sag is under about a tenth of the span (a deep sag trends toward the catenary); uniform load, level supports. A planning screen; the wire-rope working load limit, the anchor capacity, and the head rigger govern.",
+    assumptions: [
+      { name: "Support-tension limit", value: "the allowable limits the support (anchor) tension and must exceed the w L / 2 vertical reaction; below that no sag can carry the load", source: "cable statics" },
+      { name: "Shallow parabola", value: "valid where the resulting sag is under about a tenth of the span; a deep sag trends toward the catenary", source: "cable statics" },
+      { name: "Uniform load, level supports", value: "the load is uniform along the horizontal span and the two supports are at the same height", source: "cable statics" },
+      { name: "Estimate only", value: "the certified rope WLL, the anchor capacity, and the head rigger govern the actual pick", source: "ASME B30.9" },
+    ],
+  },
   "bridle-leg-tension": {
     formula: "L = sqrt(run^2 + rise^2) per leg; a = run/L, b = rise/L; den = a2 b1 + a1 b2; T1 = W a2/den, T2 = W a1/den; H = T1 a1 = T2 a2.",
     edition: "Entertainment rigging bridle geometry (asymmetric two-leg static resolution), by name.",

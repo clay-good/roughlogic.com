@@ -17400,7 +17400,38 @@ test("bounds: spec-v443 computeEconomizerEnthalpyChangeover pins both modes, the
 });
 
 // ===================== spec-v484 spanned cable sag and tension (Group Z) =====================
-import { computeSpanlineSagTension as _v484 } from "../../calc-rigging.js";
+import { computeSpanlineSagTension as _v484, computeSpanlineSagForTension as _v670 } from "../../calc-rigging.js";
+
+test("bounds: spec-v670 computeSpanlineSagForTension pins d_min = wL^2/(8 sqrt(T^2-(wL/2)^2)), the vertical-reaction floor, round-trips through computeSpanlineSagTension to the support tension, and error seams", () => {
+  const r = _v670({ span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: 502.494 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const expected = 1.0 * 100 * 100 / (8 * Math.sqrt(502.494 * 502.494 - Math.pow(1.0 * 100 / 2, 2)));
+  assert.ok(Math.abs(r.min_sag_ft - expected) < 1e-9, `d_min identity: ${r.min_sag_ft}`);
+  assert.ok(Math.abs(r.min_sag_ft - 2.5) < 1e-4, `pinned 2.5 ft: ${r.min_sag_ft}`);
+  // A higher tension limit allows a smaller sag (pull tighter).
+  const tighter = _v670({ span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: 2500.5 });
+  assert.ok(tighter.min_sag_ft < r.min_sag_ft, `higher limit less sag: ${tighter.min_sag_ft}`);
+  assert.ok(Math.abs(tighter.min_sag_ft - 0.5) < 1e-4, `cross-check 0.5 ft: ${tighter.min_sag_ft}`);
+  // Round-trip: at d_min the forward support tension equals the allowable exactly.
+  for (const span_ft of [50, 100, 200]) {
+    for (const allowable_tension_lb of [600, 1500, 4000]) {
+      const load_lb_per_ft = 1.0;
+      const m = _v670({ span_ft, load_lb_per_ft, allowable_tension_lb });
+      assert.ok(!m.error, `sweep L=${span_ft} T=${allowable_tension_lb}: ${JSON.stringify(m)}`);
+      assertFinite(m.min_sag_ft, "min_sag"); assert.ok(m.min_sag_ft > 0, "min_sag positive");
+      const back = _v484({ span_ft, load_lb_per_ft, sag_ft: m.min_sag_ft });
+      assert.ok(Math.abs(back.support_tension_lb - allowable_tension_lb) < 1e-6, `round-trip L=${span_ft} T=${allowable_tension_lb}: ${back.support_tension_lb}`);
+    }
+  }
+  // The allowable must exceed the support vertical reaction w L / 2 (= 50 lb here) or no sag carries the load.
+  assert.ok("error" in _v670({ span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: 50 }));
+  assert.ok("error" in _v670({ span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: 40 }));
+  // Error seams: non-finite, non-positive span / load / tension.
+  assert.ok("error" in _v670({ span_ft: 0, load_lb_per_ft: 1.0, allowable_tension_lb: 500 }));
+  assert.ok("error" in _v670({ span_ft: 100, load_lb_per_ft: 0, allowable_tension_lb: 500 }));
+  assert.ok("error" in _v670({ span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: 0 }));
+  assert.ok("error" in _v670({ span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: Infinity }));
+});
 
 test("bounds: spec-v484 computeSpanlineSagTension pins H = wL^2/8d, the support tension, the developed length, the inverse-sag trap, and error seams", () => {
   const r = _v484({ span_ft: 100, load_lb_per_ft: 1.0, sag_ft: 2.5 });

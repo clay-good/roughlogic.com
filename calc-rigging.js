@@ -944,6 +944,61 @@ function renderSpanlineSagTension(inputRegion, outputRegion, citationEl) {
 }
 RIGGING_RENDERERS["spanline-sag-tension"] = renderSpanlineSagTension;
 
+// --- spanline-sag-for-tension: Minimum Sag to Keep a Spanline Under a Tension Limit ---
+//
+// Inverse of spanline-sag-tension solved for the support (anchor) tension, the
+// value the rope WLL and the anchor capacity actually limit. From
+// T = w L^2 / (8 d) sqrt(1 + (4 d / L)^2), squaring gives
+// T^2 = w^2 L^4 / (64 d^2) + w^2 L^2 / 4, so
+// d_min = w L^2 / (8 sqrt(T_allow^2 - (w L / 2)^2)). The vertical reaction at
+// each support is w L / 2, so the tension can never be below that; T_allow must
+// exceed it or no sag can carry the load.
+// dims: in { span_ft: L, load_lb_per_ft: M T^-2, allowable_tension_lb: M L T^-2 } out: { min_sag_ft: L, horizontal_tension_lb: M L T^-2, sag_ratio: dimensionless }
+export function computeSpanlineSagForTension({ span_ft, load_lb_per_ft, allowable_tension_lb } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(span_ft);
+  const w = Number(load_lb_per_ft);
+  const T = Number(allowable_tension_lb);
+  if (!Number.isFinite(L) || L <= 0) return { error: "Span must be a positive finite number (ft)." };
+  if (!Number.isFinite(w) || w <= 0) return { error: "Uniform load must be a positive finite number (lb/ft)." };
+  if (!Number.isFinite(T) || T <= 0) return { error: "Allowable tension must be a positive finite number (lb)." };
+  const vertical_reaction_lb = w * L / 2;
+  if (!(T > vertical_reaction_lb)) return { error: "Allowable tension must exceed the support vertical reaction w L / 2 = " + fmt(vertical_reaction_lb, 1) + " lb; below that no sag can carry the load." };
+  const min_sag_ft = w * L * L / (8 * Math.sqrt(T * T - vertical_reaction_lb * vertical_reaction_lb));
+  const horizontal_tension_lb = w * L * L / (8 * min_sag_ft);
+  const sag_ratio = min_sag_ft / L;
+  const shallow = sag_ratio <= 0.1;
+  if (![min_sag_ft, horizontal_tension_lb, sag_ratio].every(Number.isFinite) || !(min_sag_ft > 0)) return { error: "Spanline math is not a finite value." };
+  return {
+    min_sag_ft, horizontal_tension_lb, sag_ratio, shallow, vertical_reaction_lb,
+    note: "The least sag a spanline can be pulled to before the support (anchor) tension reaches the allowable, the inverse of the spanline-sag-tension tile: from T = w L^2 / (8 d) sqrt(1 + (4 d / L)^2), d_min = w L^2 / (8 sqrt(T_allow^2 - (w L / 2)^2)). Any tighter (less sag) and the tension exceeds the limit, because tension is inversely proportional to the sag. The allowable tension limits the SUPPORT tension - the true maximum in the cable, at the anchors - not the horizontal component, and it must exceed the support vertical reaction w L / 2 or no sag can carry the load. Enter the allowable as the rope working load limit (WLL) or the anchor capacity, whichever is lower, with your design factor already applied. Valid where the resulting sag is under about a tenth of the span (a deep sag trends toward the catenary; the shallow flag drops when exceeded); uniform load, level supports. A planning screen; the WLL chart, the anchor capacity, and the head rigger govern the actual pick.",
+  };
+}
+export const spanlineSagForTensionExample = { inputs: { span_ft: 100, load_lb_per_ft: 1.0, allowable_tension_lb: 502.5 } };
+
+function renderSpanlineSagForTension(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: shallow-cable parabola solved for the sag at a tension limit: d_min = w L^2 / (8 sqrt(T_allow^2 - (w L / 2)^2)), the inverse of T = w L^2 / (8 d) sqrt(1 + (4 d / L)^2). The allowable limits the SUPPORT (anchor) tension and must exceed the w L / 2 vertical reaction. Uniform load, level supports, sag under ~1/10 of the span. A planning screen; the WLL chart and the head rigger govern.";
+  const span = makeNumber("Horizontal span (ft)", "ssft-span", { step: "any", min: "0" });
+  const load = makeNumber("Uniform load along span (lb/ft)", "ssft-load", { step: "any", min: "0" });
+  const tension = makeNumber("Allowable tension (lb, WLL or anchor)", "ssft-t", { step: "any", min: "0" });
+  for (const f of [span, load, tension]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { span.input.value = "100"; load.input.value = "1.0"; tension.input.value = "502.5"; update(); });
+  const oSag = makeOutputLine(outputRegion, "Minimum sag at midspan", "ssft-out-sag");
+  const oH = makeOutputLine(outputRegion, "Horizontal tension at that sag", "ssft-out-h");
+  const oRatio = makeOutputLine(outputRegion, "Sag ratio", "ssft-out-ratio");
+  const oNote = makeOutputLine(outputRegion, "Note", "ssft-out-note");
+  const update = debounce(() => {
+    const r = computeSpanlineSagForTension({ span_ft: Number(span.input.value) || 0, load_lb_per_ft: Number(load.input.value) || 0, allowable_tension_lb: Number(tension.input.value) || 0 });
+    if (r.error) { oSag.textContent = r.error; oH.textContent = "-"; oRatio.textContent = "-"; oNote.textContent = "-"; return; }
+    oSag.textContent = fmt(r.min_sag_ft, 3) + " ft";
+    oH.textContent = fmt(r.horizontal_tension_lb, 1) + " lb";
+    oRatio.textContent = fmt(r.sag_ratio, 3) + (r.shallow ? " (shallow-parabola valid)" : " (deep - trends to catenary; treat as approximate)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [span, load, tension]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["spanline-sag-for-tension"] = renderSpanlineSagForTension;
+
 // --- spec-v544 Z: Two-leg asymmetric bridle leg tension (`bridle-leg-tension`) ---
 // L=sqrt(run^2+rise^2), a=run/L, b=rise/L. den = a2*b1 + a1*b2. T1 = W*a2/den, T2 = W*a1/den. H = T1*a1.
 // dims: in { apex_load_lb: M L T^-2, run1_ft: L, rise1_ft: L, run2_ft: L, rise2_ft: L } out: { t1_lb: M L T^-2, t2_lb: M L T^-2, horizontal_lb: M L T^-2 }

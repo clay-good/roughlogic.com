@@ -1169,7 +1169,7 @@ const TOOL_MODULES = (() => {
     // spec-v117 multi-leg sling load per leg + wire-rope strength estimate.
     "multi-leg-sling", "wire-rope-strength",
     // spec-v484 spanned cable sag and tension
-    "spanline-sag-tension",
+    "spanline-sag-tension", "spanline-sag-for-tension",
     // spec-v544
     "bridle-leg-tension",
     // spec-v545

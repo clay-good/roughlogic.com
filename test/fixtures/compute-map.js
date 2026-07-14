@@ -1013,6 +1013,7 @@ export const COMPUTE_MAP = {
   "multi-leg-sling": { module: "../../calc-rigging.js", fn: "computeMultiLegSling" },
   "wire-rope-strength": { module: "../../calc-rigging.js", fn: "computeWireRopeStrength" },
   "spanline-sag-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagTension" },
+  "spanline-sag-for-tension": { module: "../../calc-rigging.js", fn: "computeSpanlineSagForTension" },
   "bridle-leg-tension": { module: "../../calc-rigging.js", fn: "computeBridleLegTension" },
   "three-point-bridle": { module: "../../calc-rigging.js", fn: "computeThreePointBridle" },
   "beam-clamp-side-pull": { module: "../../calc-rigging.js", fn: "computeBeamClampSidePull" },

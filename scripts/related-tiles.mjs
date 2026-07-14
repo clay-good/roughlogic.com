@@ -1053,7 +1053,8 @@ const RELATED = {
   "multi-leg-sling": ["cg-load-share","shackle-eyebolt-wll","spreader-beam"],
   "wire-rope-strength": ["sling-d-d-efficiency","shackle-eyebolt-wll"],
   // spec-v484 spanned cable sag and tension (Group Z)
-  "spanline-sag-tension": ["sling-angle","wire-rope-strength","block-redirect-load"],
+  "spanline-sag-tension": ["spanline-sag-for-tension","sling-angle","wire-rope-strength","block-redirect-load"],
+  "spanline-sag-for-tension": ["spanline-sag-tension","wire-rope-strength","sling-angle","block-redirect-load"],
   "bridle-leg-tension": ["multi-leg-sling","sling-angle","counterweight-arbor-load"],
   "three-point-bridle": ["bridle-leg-tension","multi-leg-sling","sling-angle"],
   "beam-clamp-side-pull": ["bridle-leg-tension","three-point-bridle","shackle-eyebolt-wll"],

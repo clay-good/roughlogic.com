@@ -693,7 +693,7 @@ const _TILES = [
   ["multi-leg-sling", "Z"],
   ["wire-rope-strength", "Z"],
   // spec-v484 spanned cable sag and tension (Group Z)
-  ["spanline-sag-tension", "Z"],
+  ["spanline-sag-tension", "Z"], ["spanline-sag-for-tension", "Z"],
   ["bridle-leg-tension", "Z"],
   ["three-point-bridle", "Z"],
   ["beam-clamp-side-pull", "Z"],

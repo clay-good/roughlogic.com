@@ -6797,6 +6797,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "minimum sag",
+      "target": "spanline-sag-for-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "sag for a tension limit",
+      "target": "spanline-sag-for-tension",
+      "kind": "industry"
+    },
+    {
+      "term": "how much sag do i need",
+      "target": "spanline-sag-for-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sag for rope wll",
+      "target": "spanline-sag-for-tension",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how tight can i pull a span",
+      "target": "spanline-sag-for-tension",
+      "kind": "adjacent"
+    },
+    {
       "term": "bridle tension",
       "target": "bridle-leg-tension",
       "kind": "industry"
