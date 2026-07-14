@@ -123,6 +123,54 @@ export function renderRefrigerantVelocity(inputRegion, outputRegion, citationEl)
 }
 VELOCITY_RENDERERS["refrigerant-velocity"] = renderRefrigerantVelocity;
 
+// refrigerant-line-size: inverse of refrigerant-velocity. The forward tile
+// gives the velocity from a line ID; oil return needs a MINIMUM velocity, so
+// the design question is the largest line ID that still meets it. Solving
+// V = (m sv) / area / 60 for the diameter: area = m sv / (60 V),
+// d = 12 sqrt(4 area / pi).
+// dims: in { mass_flow_lb_hr: M T^-1, specific_volume_ft3_lb: L^3 M^-1, target_velocity_fpm: L T^-1 } out: { line_id_in: L, area_ft2: L^2, q_ft3_hr: L^3 T^-1 }
+export function computeRefrigerantLineSize({ mass_flow_lb_hr = 0, specific_volume_ft3_lb = 0, target_velocity_fpm = 1500 } = {}) {
+  const m = Number(mass_flow_lb_hr) || 0;
+  const sv = Number(specific_volume_ft3_lb) || 0;
+  const v = Number(target_velocity_fpm) > 0 ? Number(target_velocity_fpm) : 1500;
+  if (!(m > 0 && Number.isFinite(m))) return { error: "Mass flow must be positive (lb/hr)." };
+  if (!(sv > 0 && Number.isFinite(sv))) return { error: "Specific volume must be positive (ft^3/lb)." };
+  if (!(v > 0 && Number.isFinite(v))) return { error: "Target velocity must be positive (fpm)." };
+  const q_ft3_hr = m * sv;
+  const area_ft2 = q_ft3_hr / v / 60;
+  const line_id_in = 12 * Math.sqrt(area_ft2 * 4 / Math.PI);
+  return {
+    line_id_in, area_ft2, q_ft3_hr, target_velocity_fpm: v,
+    note: "The largest line inside diameter that still meets the target velocity: oil return needs a minimum velocity (about 1500 fpm in a suction riser, 700 fpm horizontal), so a line at or below this ID keeps the refrigerant moving fast enough to sweep oil back, while a larger line drops below the minimum and traps oil. A smaller line raises the velocity and the pressure drop. Specific volume is user-supplied at the line condition; the manufacturer's line-sizing tables govern.",
+  };
+}
+export const refrigerantLineSizeExample = { inputs: { mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 1500 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderRefrigerantLineSize(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Per the ASHRAE Refrigeration Handbook line-sizing and oil-return guidance, by name (the velocity relation solved for the line ID). Refrigerant specific volume at the line condition is user-supplied. Estimate; manufacturer line-sizing tables govern.";
+  const mf = _v23h_makeNumber("Mass flow (lb/hr)", "rls-mf", { step: "any", min: "0", value: "600" });
+  mf.input.value = "600";
+  const sv = _v23h_makeNumber("Specific volume (ft^3/lb)", "rls-sv", { step: "any", min: "0", value: "0.5" });
+  sv.input.value = "0.5";
+  const orient = _v23h_makeSelect("Oil-return minimum", "rls-or", [
+    { value: "1500", label: "Suction riser (~1500 fpm)", selected: true },
+    { value: "700", label: "Horizontal (~700 fpm)" },
+  ]);
+  for (const f of [mf, sv, orient]) inputRegion.appendChild(f.wrap);
+  _v23h_attachEx(inputRegion, () => { mf.input.value = "600"; sv.input.value = "0.5"; orient.select.value = "1500"; update(); });
+  const oD = _v23h_makeOut(outputRegion, "Max line inside diameter", "rls-out-d");
+  const oNote = _v23h_makeOut(outputRegion, "Note", "rls-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = _v23h_debounce(() => {
+    const r = computeRefrigerantLineSize({ mass_flow_lb_hr: readNum(mf.input), specific_volume_ft3_lb: readNum(sv.input), target_velocity_fpm: Number(orient.select.value) });
+    if (r.error) { oD.textContent = r.error; oNote.textContent = ""; return; }
+    oD.textContent = _v23h_fmt(r.line_id_in, 3) + " in (at " + _v23h_fmt(r.target_velocity_fpm, 0) + " fpm)";
+    oNote.textContent = r.note;
+  }, _V23H_DEB);
+  for (const f of [mf.input, sv.input, orient.select]) f.addEventListener("input", update);
+}
+VELOCITY_RENDERERS["refrigerant-line-size"] = renderRefrigerantLineSize;
+
 // ===================== spec-v385: pitot traverse airflow (HVAC airflow field-methods trio) =====================
 
 // dims: in { vp_avg_inwc: dimensionless, w_in: L, h_in: L } out: { v_fpm: L T^-1, area_ft2: L^2, cfm: L^3 T^-1 }

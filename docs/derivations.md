@@ -2745,9 +2745,11 @@ cross-check.
 | calc-trucking.js | `renderStoppingSightDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
 | calc-velocity.js | `computePitotTraverseCfm` | `{ vp_avg_inwc = 0, w_in = 0, h_in = 0 } = {}` | _ | _ | _ |
+| calc-velocity.js | `computeRefrigerantLineSize` | `{ mass_flow_lb_hr = 0, specific_volume_ft3_lb = 0, target_velocity_fpm = 1500...` | _ | _ | _ |
 | calc-velocity.js | `computeRefrigerantVelocity` | `{ mass_flow_lb_hr = 0, line_id_in = 0, specific_volume_ft3_lb = 0, orientatio...` | _ | _ | _ |
 | calc-velocity.js | `renderDuctVelocityPressure` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderPitotTraverseCfm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-velocity.js | `renderRefrigerantLineSize` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `renderRefrigerantVelocity` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-water.js | `computeAerationOxygenDemand` | `{ bod_removed_lb_day = 0, oxygen_factor = 0, nh3_nitrified_lb_day = 0, sote_p...` | _ | _ | _ |
 | calc-water.js | `computeBackflowTestPSI` | `{ assembly_type = "rp", check1_psid = 0, relief_open_psid = 0, check2_psi = 0...` | _ | _ | _ |
@@ -2811,7 +2813,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1397.
+Row count: 1399.
 
 <!-- END function-corpus-v14 -->
 
@@ -3147,7 +3149,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (125 tiles)
+### Group C HVAC (126 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3256,6 +3258,7 @@ per spec-v14 §13.1 second paragraph.
 | `recovery-cylinder` | Recovery-Cylinder 80% Fill | DOT / AHRI 700 / EPA Section 608 reco...; spec-v102 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `refrigerant-charge` | Refrigerant Charge Weighing | Chemours / Honeywell published refrig...; R-410A / 25 ft of 3/8 in + 5 ft of 1/2 in -> 15 + 4.75 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-charging` | Refrigerant Superheat / Subcooling (psig-psia toggle) | ACCA / NATE refrigerant-charging meth...; R_410A / 130 psig suction / 50 F suction-line / 350 psig ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `refrigerant-line-size` | Refrigerant Line Size for Oil Return | ASHRAE Refrigeration Handbook (line s...; 600 lb/hr, 0.5 ft^3/lb, 1500 fpm riser min -> 0.782 in ma... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-mass-flow` | Refrigerant Mass Flow from Capacity and Refrigeration Effect | Vapor-compression cycle (m_dot = Q/(h...; spec-v320 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `refrigerant-pt` | Refrigerant P-T Chart | Chemours / Honeywell published P-T bu...; R-410A / 118 psig -> 40 F sat temp; pure table lookup | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `refrigerant-velocity` | Refrigerant Line Velocity and Oil Return | ASHRAE Refrigeration Handbook (line s...; 600 lb/hr / 0.5 ft^3/lb / 0.75 in ID -> 1629.75 fpm (suct... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4148,6 +4151,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1151. Fixture-covered or reference-cadence: 1151 / 1151.
+Tile count: 1152. Fixture-covered or reference-cadence: 1152 / 1152.
 
 <!-- END tile-index-v14 -->

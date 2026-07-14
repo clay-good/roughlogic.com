@@ -54027,6 +54027,31 @@
       "kind": "question"
     },
     {
+      "term": "suction line size for oil return",
+      "target": "refrigerant-line-size",
+      "kind": "question"
+    },
+    {
+      "term": "what size refrigerant line for 1500 fpm",
+      "target": "refrigerant-line-size",
+      "kind": "question"
+    },
+    {
+      "term": "max suction pipe diameter for oil return",
+      "target": "refrigerant-line-size",
+      "kind": "question"
+    },
+    {
+      "term": "refrigerant line diameter from mass flow",
+      "target": "refrigerant-line-size",
+      "kind": "question"
+    },
+    {
+      "term": "size copper line for refrigerant velocity",
+      "target": "refrigerant-line-size",
+      "kind": "question"
+    },
+    {
       "term": "how much cooling do i get from outside air instead of the compressor",
       "target": "economizer-savings-hours",
       "kind": "question"

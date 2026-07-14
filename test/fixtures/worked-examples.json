@@ -8181,6 +8181,34 @@
    }
   },
   {
+   "tile_id": "refrigerant-line-size",
+   "source_publisher": "ASHRAE Refrigeration Handbook (line sizing / oil return)",
+   "source_title": "ID = 12 sqrt(4 (m sv / (60 V)) / pi); inverse of the line-velocity relation",
+   "source_edition_or_year": "ASHRAE Refrigeration Handbook line-sizing guidance",
+   "source_section_or_page": "600 lb/hr, 0.5 ft^3/lb, 1500 fpm riser min -> 0.782 in max ID",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "mass_flow_lb_hr": 600,
+    "specific_volume_ft3_lb": 0.5,
+    "target_velocity_fpm": 1500
+   },
+   "outputs": {
+    "line_id_in": {
+     "value": 0.781764,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "area_ft2": {
+     "value": 0.003333,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fire-stream-reaction",
    "source_publisher": "IFSTA Pumping Apparatus Driver/Operator (nozzle reaction)",
    "source_title": "Smooth bore NR = 1.57 * d^2 * NP; fog NR = 0.0505 * Q * sqrt(NP)",

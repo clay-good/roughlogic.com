@@ -9155,6 +9155,7 @@ test("bounds: calc-electrical render* renderers are exported as functions (DOM-b
 import {
   computeDuctVelocityPressure, renderDuctVelocityPressure,
   computeRefrigerantVelocity, renderRefrigerantVelocity,
+  computeRefrigerantLineSize, renderRefrigerantLineSize,
   renderPitotTraverseCfm,
 } from "../../calc-velocity.js";
 
@@ -9175,6 +9176,33 @@ test("bounds: calc-hvac computeRefrigerantVelocity pins the area/velocity chain 
   assert.ok("error" in computeRefrigerantVelocity({ mass_flow_lb_hr: 0, line_id_in: 0.75, specific_volume_ft3_lb: 0.5 }));
   assert.ok("error" in computeRefrigerantVelocity({ mass_flow_lb_hr: 600, line_id_in: 0, specific_volume_ft3_lb: 0.5 }));
   assert.ok("error" in computeRefrigerantVelocity({ mass_flow_lb_hr: 600, line_id_in: 0.75, specific_volume_ft3_lb: Infinity }));
+});
+
+test("bounds: spec-v703 computeRefrigerantLineSize pins ID = 12 sqrt(4 area/pi), round-trips through computeRefrigerantVelocity, and error seams", () => {
+  const r = computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 1500 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.line_id_in - 0.781764019) < 1e-6, `line ID: ${r.line_id_in}`);
+  assert.ok(Math.abs(r.area_ft2 - 300 / 1500 / 60) < 1e-12, `area: ${r.area_ft2}`);
+  // Round-trip: a line at the returned ID, fed the same flow, sits exactly at the target velocity.
+  for (const mass_flow_lb_hr of [200, 600, 2400]) {
+    for (const specific_volume_ft3_lb of [0.3, 0.5, 1.2]) {
+      for (const target_velocity_fpm of [700, 1500, 3000]) {
+        const m = computeRefrigerantLineSize({ mass_flow_lb_hr, specific_volume_ft3_lb, target_velocity_fpm });
+        assert.ok(!m.error, `sweep m=${mass_flow_lb_hr} sv=${specific_volume_ft3_lb} v=${target_velocity_fpm}: ${JSON.stringify(m)}`);
+        assertFinite(m.line_id_in, "ID"); assert.ok(m.line_id_in > 0, "ID positive");
+        const back = computeRefrigerantVelocity({ mass_flow_lb_hr, line_id_in: m.line_id_in, specific_volume_ft3_lb });
+        assert.ok(Math.abs(back.velocity_fpm - target_velocity_fpm) < 1e-6, `round-trip m=${mass_flow_lb_hr} sv=${specific_volume_ft3_lb} v=${target_velocity_fpm}: ${back.velocity_fpm}`);
+      }
+    }
+  }
+  // A lower target velocity allows a larger line.
+  assert.ok(computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 700 }).line_id_in > r.line_id_in);
+  // A non-positive target velocity defaults to 1500 fpm (mirrors the riser minimum), not an error.
+  assert.ok(Math.abs(computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 0 }).line_id_in - r.line_id_in) < 1e-9);
+  // Error seams: non-positive mass flow, non-positive specific volume, non-finite.
+  assert.ok("error" in computeRefrigerantLineSize({ mass_flow_lb_hr: 0, specific_volume_ft3_lb: 0.5 }));
+  assert.ok("error" in computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0 }));
+  assert.ok("error" in computeRefrigerantLineSize({ mass_flow_lb_hr: Infinity, specific_volume_ft3_lb: 0.5 }));
 });
 
 test("bounds: calc-fire computeFireStreamReaction pins smooth/fog NR + rejects NP<=0 (RC-1)", () => {
@@ -9231,7 +9259,7 @@ test("bounds: calc-edu computeCurveGradeScaler pins flat/sqrt/linear + clamp + r
 });
 
 test("bounds: v23 export-function renderers are callable functions (DOM-bound sentinel)", () => {
-  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderPitotTraverseCfm, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
+  for (const fn of [renderDuctVelocityPressure, renderRefrigerantVelocity, renderRefrigerantLineSize, renderPitotTraverseCfm, renderFireStreamReaction, renderSprinklerKFactor, renderOd600CellCount, renderCurveGradeScaler]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }
 });

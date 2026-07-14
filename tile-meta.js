@@ -213,7 +213,7 @@ const _TILES = [
   ["erv-total-enthalpy-recovery", "C"], ["radiant-floor-output", "C"], ["economizer-enthalpy-changeover", "C"],
   // spec-v478 hydronic snowmelt sizing
   ["snowmelt-load", "C"],
-  ["duct-velocity-pressure", "C"], ["refrigerant-velocity", "C"],
+  ["duct-velocity-pressure", "C"], ["refrigerant-velocity", "C"], ["refrigerant-line-size", "C"],
 
   ["psychrometric", "D"], ["drying-goal", "D"], ["dehumidifier", "D"],
   ["air-movers", "D"], ["water-classes", "D"], ["drying-times", "D"],

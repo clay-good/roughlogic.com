@@ -495,6 +495,7 @@ export const COMPUTE_MAP = {
   "vav-box-airflow": { module: "../../calc-hvacsystems.js", fn: "computeVavBoxAirflow" },
   "duct-velocity-pressure": { module: "../../calc-velocity.js", fn: "computeDuctVelocityPressure" },
   "refrigerant-velocity": { module: "../../calc-velocity.js", fn: "computeRefrigerantVelocity" },
+  "refrigerant-line-size": { module: "../../calc-velocity.js", fn: "computeRefrigerantLineSize" },
   "equipment-power-draw": { module: "../../calc-restoration.js", fn: "computeEquipmentCircuitLoad" },
   "backflow-sizing": { module: "../../calc-plumbing.js", fn: "computeBackflowSizing" },
   "cross-connection-air-gap": { module: "../../calc-cross.js", fn: "computeCrossConnectionAirGap" },

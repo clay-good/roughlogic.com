@@ -701,6 +701,7 @@ const RELATED = {
   "filter-pressure-drop": ["duct-friction-static", "static-pressure-hvac", "air-changes-hour"],
   "duct-velocity-pressure": ["duct-friction-static", "static-pressure-hvac"],
   "refrigerant-velocity": ["refrigerant-charge", "superheat-subcool"],
+  "refrigerant-line-size": ["refrigerant-velocity", "refrigerant-mass-flow", "superheat-subcool"],
 
   // Group D: Restoration (fill-in).
   "air-movers": ["drying-goal", "dehumidifier", "nam-sizing"],

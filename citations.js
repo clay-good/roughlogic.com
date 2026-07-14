@@ -2697,6 +2697,17 @@ export const CITATIONS = {
       { name: "Specific volume", value: "refrigerant specific volume at the line condition is strain-of-refrigerant- and state-specific and user-supplied", source: "manufacturer refrigerant property data" },
     ],
   },
+  "refrigerant-line-size": {
+    formula: "area_ft2 = (mass_flow_lb_hr * specific_volume_ft3_lb) / (60 * target_velocity_fpm); line ID_in = 12 * sqrt(4 * area / pi). The inverse of the line-velocity relation, solved for the diameter that meets the oil-return minimum velocity.",
+    edition: "ASHRAE Refrigeration Handbook line-sizing and oil-return guidance, by name.",
+    freeAccess: "ASHRAE licensed; refrigerant specific volume is read from the manufacturer's P-T / property data (user-supplied).",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The inverse of refrigerant-velocity: the largest line inside diameter that still meets the oil-return minimum velocity (about 1500 fpm in a suction riser, 700 fpm horizontal). A line at or below this ID keeps the refrigerant fast enough to sweep oil back; a larger line traps oil, and a smaller line raises the pressure drop. Single-edition; the oil-return minimums are advisory and manufacturer-table-governed.",
+    assumptions: [
+      { name: "Oil-return window", value: "horizontal min ~700 fpm, suction-riser min ~1500 fpm (advisory)", source: "ASHRAE Refrigeration Handbook line-sizing guidance" },
+      { name: "Specific volume", value: "refrigerant specific volume at the line condition is state-specific and user-supplied", source: "manufacturer refrigerant property data" },
+    ],
+  },
 
   "fire-stream-reaction": {
     formula: "Smooth bore: NR = 1.57 * d^2 * NP. Fog: NR = 0.0505 * Q * sqrt(NP). NR in lb, d in inches, NP in psi, Q in gpm.",
