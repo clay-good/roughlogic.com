@@ -637,6 +637,7 @@ const RELATED = {
   "drainage-invert": ["slope", "manning-slope", "trench-slope"],
   "hydrostatic-test": ["gas-leak-rate", "pressure-conversion"],
   "grease-trap": ["septic-tank", "septic-drainfield"],
+  "grease-interceptor-flow-capacity": ["grease-trap", "sanitary-dfu", "septic-tank"],
   "glycol-mix": ["expansion-tank", "geothermal-loop"],
   "expansion-tank": ["glycol-mix", "pipe-expansion"],
   "backflow-loss": ["backflow", "friction-loss"],

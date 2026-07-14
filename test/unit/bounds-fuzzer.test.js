@@ -547,6 +547,7 @@ import {
   computeDrainageInvert,
   computeGlycolMix,
   computeGreaseTrap,
+  computeGreaseInterceptorFlowCapacity,
   computeHydrostaticTest,
   computeManningSlope,
   computePipeExpansion,
@@ -7546,6 +7547,32 @@ test("bounds: calc-plumbing computeGreaseTrap pins V = peak*retention*loading an
   assert.ok("error" in computeGreaseTrap({ peak_flow_gpm: 0 }));
   assert.ok("error" in computeGreaseTrap({ peak_flow_gpm: 10, retention_minutes: 0 }));
   assert.ok("error" in computeGreaseTrap({ peak_flow_gpm: 10, retention_minutes: 30, loading_factor: 0 }));
+});
+
+test("bounds: spec-v715 computeGreaseInterceptorFlowCapacity pins flow = volume/(retention*loading), round-trips through computeGreaseTrap, and error seams", () => {
+  const r = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: 1000, retention_minutes: 30, loading_factor: 1.25 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.peak_flow_gpm - 1000 / (30 * 1.25)) < 1e-9, `flow identity: ${r.peak_flow_gpm}`);
+  assert.ok(Math.abs(r.peak_flow_gpm - 26.66667) < 1e-4, `pinned 26.7 gpm: ${r.peak_flow_gpm}`);
+  // Round-trip: at the served flow the forward tile's required volume equals the interceptor volume.
+  for (const interceptor_volume_gal of [500, 1000, 2000]) {
+    for (const retention_minutes of [20, 30, 60]) {
+      for (const loading_factor of [1.0, 1.25, 2.0]) {
+        const m = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal, retention_minutes, loading_factor });
+        assert.ok(!m.error, `sweep V=${interceptor_volume_gal} ret=${retention_minutes} lf=${loading_factor}: ${JSON.stringify(m)}`);
+        assertFinite(m.peak_flow_gpm, "flow"); assert.ok(m.peak_flow_gpm > 0, "flow positive");
+        const back = computeGreaseTrap({ peak_flow_gpm: m.peak_flow_gpm, retention_minutes, loading_factor });
+        assert.ok(Math.abs(back.volume_gal - interceptor_volume_gal) < 1e-6, `round-trip V=${interceptor_volume_gal} ret=${retention_minutes} lf=${loading_factor}: ${back.volume_gal}`);
+      }
+    }
+  }
+  // A longer retention (or higher loading) means the same interceptor serves a lower flow.
+  assert.ok(computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: 1000, retention_minutes: 60, loading_factor: 1.25 }).peak_flow_gpm < r.peak_flow_gpm);
+  // Error seams: non-positive volume, retention, loading, non-finite.
+  assert.ok("error" in computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: 0 }));
+  assert.ok("error" in computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: 1000, retention_minutes: 0 }));
+  assert.ok("error" in computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: 1000, retention_minutes: 30, loading_factor: 0 }));
+  assert.ok("error" in computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: Infinity }));
 });
 
 test("bounds: calc-plumbing computeGlycolMix interpolates between curve rows on the propylene / 0 F example", () => {

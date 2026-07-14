@@ -279,6 +279,7 @@ export const COMPUTE_MAP = {
   "trap-arm": { module: "../../calc-plumbing.js", fn: "computeTrapArm" },
   "pipe-expansion": { module: "../../calc-plumbing.js", fn: "computePipeExpansion" },
   "grease-trap": { module: "../../calc-plumbing.js", fn: "computeGreaseTrap" },
+  "grease-interceptor-flow-capacity": { module: "../../calc-plumbing.js", fn: "computeGreaseInterceptorFlowCapacity" },
   "aerial-ladder": { module: "../../calc-fire.js", fn: "computeAerialLadderReach" },
   "foam": { module: "../../calc-fire.js", fn: "computeFoam" },
   "sprinkler-density": { module: "../../calc-fire.js", fn: "computeSprinklerDensity" },

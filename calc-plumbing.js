@@ -1089,6 +1089,29 @@ export const greaseTrapExample = {
   inputs: { peak_flow_gpm: 25, retention_minutes: 30, loading_factor: 1.25 },
 };
 
+// grease-interceptor-flow-capacity: inverse of grease-trap. The forward tile sizes
+// the interceptor volume from a peak flow; given an in-place interceptor, the peak
+// flow it is rated to serve is the inverse: volume = peak_flow * retention * loading,
+// so peak_flow = volume / (retention * loading).
+// dims: in { interceptor_volume_gal: L^3, retention_minutes: T, loading_factor: dimensionless } out: { peak_flow_gpm: L^3 T^-1 }
+export function computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal = 0, retention_minutes = 30, loading_factor = 1.25 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vol = Number(interceptor_volume_gal) || 0;
+  const ret = Number(retention_minutes) || 0;
+  const lf = Number(loading_factor) || 0;
+  if (!(vol > 0)) return { error: "Interceptor volume must be positive (gal)." };
+  if (!(ret > 0)) return { error: "Retention time must be positive (min)." };
+  if (!(lf > 0)) return { error: "Loading factor must be positive." };
+  const peak_flow_gpm = vol / (ret * lf);
+  return {
+    peak_flow_gpm,
+    note: "The peak fixture flow an existing grease interceptor is rated to serve: the volume = peak flow x retention x loading relation solved for the flow, peak_flow = volume / (retention x loading). Compare it to the drainage-fixture-unit peak flow of the connected sinks and dishwasher (per IPC / PDI G101): if the fixtures can deliver more than this, the interceptor is undersized. The retention (commonly 30 min) and the loading factor come from the code and the AHJ. A sizing aid; the AHJ and the plumbing code govern.",
+  };
+}
+export const greaseInterceptorFlowCapacityExample = {
+  inputs: { interceptor_volume_gal: 1000, retention_minutes: 30, loading_factor: 1.25 },
+};
+
 // --- Utility 136: Glycol Freeze Protection Mix ---
 //
 // Manufacturer freeze-point curves (typical Dow / Dynalene / Houghton data;
@@ -1379,6 +1402,27 @@ export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
     oR.textContent = String(r.recommended_nominal_gal) + " gal";
   }, DEBOUNCE_MS);
   for (const el of [pf.input, rt.input, lf.input]) el.addEventListener("input", update);
+}
+
+function renderGreaseInterceptorFlowCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per IPC 2021 Table 1003.2 and PDI G101 by name, the sizing relation volume = peak_flow x retention x loading solved for the flow: peak_flow = volume / (retention x loading). Compare to the connected fixtures' DFU peak flow. AHJ governs. Free at codes.iccsafe.org.";
+  attachExampleButton(inputRegion, () => fillExample(greaseInterceptorFlowCapacityExample.inputs));
+  const vol = makeNumber("Interceptor volume (gal)", "gifc-v", { step: "any", min: "0" });
+  const rt = makeNumber("Retention time (min)", "gifc-rt", { step: "any", min: "0", value: "30" });
+  rt.input.value = "30";
+  const lf = makeNumber("Loading factor", "gifc-lf", { step: "any", min: "0", value: "1.25" });
+  lf.input.value = "1.25";
+  for (const f of [vol, rt, lf]) inputRegion.appendChild(f.wrap);
+  const oF = makeOutputLine(outputRegion, "Peak flow served", "gifc-out-f");
+  const oN = makeOutputLine(outputRegion, "Note", "gifc-out-n");
+  function fillExample(v) { vol.input.value = v.interceptor_volume_gal; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; update(); }
+  const update = debounce(() => {
+    const r = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: Number(vol.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 });
+    if (r.error) { oF.textContent = r.error; oN.textContent = "-"; return; }
+    oF.textContent = fmt(r.peak_flow_gpm, 1) + " gpm";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [vol.input, rt.input, lf.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1873,6 +1917,7 @@ export const PLUMBING_RENDERERS = {
   "manning-pipe-capacity": renderManningPipeCapacity,
   "hydrostatic-test": renderHydrostaticTest,
   "grease-trap": renderGreaseTrap,
+  "grease-interceptor-flow-capacity": renderGreaseInterceptorFlowCapacity,
   "glycol-mix": renderGlycolMix,
   "expansion-tank": renderExpansionTank,
   "backflow-loss": renderBackflowLoss,

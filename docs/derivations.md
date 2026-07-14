@@ -2326,6 +2326,7 @@ cross-check.
 | calc-plumbing.js | `computeFlowContinuity` | `{ V1_fps = 0, D1_in = 0, D2_in = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeFrictionLoss` | `{ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }` | _ | _ | _ |
 | calc-plumbing.js | `computeGlycolMix` | `{ system_volume_gal = 0, target_burst_F = 32, glycol_type = "propylene", prot...` | _ | _ | _ |
+| calc-plumbing.js | `computeGreaseInterceptorFlowCapacity` | `{ interceptor_volume_gal = 0, retention_minutes = 30, loading_factor = 1.25 }...` | _ | _ | _ |
 | calc-plumbing.js | `computeGreaseTrap` | `{ peak_flow_gpm = 0, retention_minutes = 30, loading_factor = 1.25 }` | _ | _ | _ |
 | calc-plumbing.js | `computeHydraulicJump` | `{ b_ft = 0, q_cfs = 0, y1_ft = 0 } = {}` | _ | _ | _ |
 | calc-plumbing.js | `computeHydronicFillPressure` | `{ height_ft = 0, margin_psi = 4 } = {}` | _ | _ | _ |
@@ -2824,7 +2825,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1410.
+Row count: 1411.
 
 <!-- END function-corpus-v14 -->
 
@@ -3060,7 +3061,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (97 tiles)
+### Group B Plumbing (98 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3089,6 +3090,7 @@ per spec-v14 §13.1 second paragraph.
 | `gas-pipe-pressure-drop` | Low-Pressure Fuel-Gas Pressure Drop (Spitzglass) | Spitzglass low-pressure gas-flow equa...; 1000 CFH, 1.049-in ID, 100 ft, SG 0.60 -> ~16.73 in w.c.,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gas-pipe-sizing` | Gas Pipe Sizing | NFPA; 100,000 BTU natural gas at 50 ft / 0.5 in w.c. drop -> 97... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `glycol-mix` | Glycol Freeze Protection Mix | Dow; 50 gal system / -10 F target burst protection / propylene... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `grease-interceptor-flow-capacity` | Grease Interceptor Flow Capacity | PDI; 1000 gal interceptor, 30 min retention, 1.25 loading -> 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grease-trap` | Grease Trap Sizing | PDI; 50 gpm peak / 30 min retention / 1.25 loading factor -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hanger-rod-sizing` | Minimum Hanger Rod Diameter from Load (MSS SP-58) | MSS SP-58 carbon-steel threaded-rod l...; spec-v162 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-jump` | Hydraulic Jump: Sequent Depth and Energy Loss | Belanger sequent depth (Chow, Open-Ch...; spec-v632 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4173,6 +4175,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1163. Fixture-covered or reference-cadence: 1163 / 1163.
+Tile count: 1164. Fixture-covered or reference-cadence: 1164 / 1164.
 
 <!-- END tile-index-v14 -->

@@ -50288,7 +50288,27 @@
     },
     {
       "term": "gpm rating for a grease interceptor",
-      "target": "grease-trap",
+      "target": "grease-interceptor-flow-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "flow capacity of grease interceptor",
+      "target": "grease-interceptor-flow-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how much flow does my grease trap handle",
+      "target": "grease-interceptor-flow-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "peak flow for existing grease trap",
+      "target": "grease-interceptor-flow-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "is my grease interceptor big enough",
+      "target": "grease-interceptor-flow-capacity",
       "kind": "question"
     },
     {

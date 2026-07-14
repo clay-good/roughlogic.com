@@ -179,7 +179,7 @@ const _TILES = [
   ["trap-arm", "B"], ["pipe-expansion", "B"], ["tankless-gpm", "B"],
   ["gas-leak-rate", "B"], ["stormwater-rational", "B"], ["manning-slope", "B"], ["manning-pipe-capacity", "B"],
   ["drainage-invert", "B"],
-  ["hydrostatic-test", "B"], ["grease-trap", "B"], ["glycol-mix", "B"],
+  ["hydrostatic-test", "B"], ["grease-trap", "B"], ["grease-interceptor-flow-capacity", "B"], ["glycol-mix", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],
   ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["septic-drainfield-capacity", "B"], ["pipe-expansion-loop", "B"],
   ["water-heater-recovery", "B"], ["water-heater-input", "B"], ["wh-expansion-tank", "B"],

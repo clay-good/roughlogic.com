@@ -3548,6 +3548,17 @@ export const CITATIONS = {
       { name: "Loading factor", value: "1.0 unless user supplies adjustment for high-grease use", source: "engineering practice" },
     ],
   },
+  "grease-interceptor-flow-capacity": {
+    formula: "peak_flow_gpm = interceptor_volume_gal / (retention_minutes × loading_factor), the PDI G101 / IPC sizing relation Volume = peak GPM × retention × loading solved for the flow.",
+    edition: "PDI G101 by name; " + IPC_2021 + " Section 1003.",
+    freeAccess: ICC_FREE + " PDI G101 licensed; manufacturer (Schier, Thermaco, Rockford) sizing tools free.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The inverse of grease-trap: the peak fixture flow an existing interceptor is rated to serve. Compare it to the drainage-fixture-unit peak flow of the connected sinks and dishwasher; if the fixtures can deliver more, the interceptor is undersized. The retention time (commonly 30 min) and the loading factor come from the code and the AHJ. " + IPC_DISCLOSURE,
+    assumptions: [
+      { name: "Retention time", value: "30 min unless user supplies", source: "PDI G101 by name" },
+      { name: "Loading factor", value: "1.25 unless user supplies adjustment for high-grease use", source: "engineering practice" },
+    ],
+  },
   "glycol-mix": {
     formula: "Linear interpolation across manufacturer freeze-point curves for propylene glycol and ethylene glycol; gallons of concentrate = system_volume × concentration_target.",
     edition: "Manufacturer freeze-point curves (Dow Dowfrost / Dowtherm SR-1) by name.",

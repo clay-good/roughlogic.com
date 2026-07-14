@@ -4678,6 +4678,28 @@
    }
   },
   {
+   "tile_id": "grease-interceptor-flow-capacity",
+   "source_publisher": "PDI",
+   "source_title": "peak_flow = volume / (retention x loading); inverse of grease-trap sizing",
+   "source_edition_or_year": "PDI G101 (current edition)",
+   "source_section_or_page": "1000 gal interceptor, 30 min retention, 1.25 loading -> 26.7 gpm",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "interceptor_volume_gal": 1000,
+    "retention_minutes": 30,
+    "loading_factor": 1.25
+   },
+   "outputs": {
+    "peak_flow_gpm": {
+     "value": 26.6667,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "aerial-ladder",
    "source_publisher": "Project (first-principles)",
    "source_title": "Aerial ladder reach: horizontal = L*cos(theta), vertical = L*sin(theta)",
