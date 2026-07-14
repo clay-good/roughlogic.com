@@ -1301,6 +1301,54 @@
    }
   },
   {
+   "tile_id": "spl-distance-for-level",
+   "source_publisher": "Project (inverse-square law, inverse)",
+   "source_title": "d2 = d1 * 10^((L1 + mode_factor + 10 log10(N) - L2) / 20)",
+   "source_edition_or_year": "spec-v673 worked example (machine-verified)",
+   "source_section_or_page": "110 dB at 1 ft free-field falls to 84 dB at about 20 ft (round-trips spl-distance)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "L1_dB": 110,
+    "d1": 1,
+    "target_L2_dB": 84,
+    "mode": "free_field",
+    "n_sources": 1
+   },
+   "outputs": {
+    "d2": {
+     "value": 19.95,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "spl-distance-for-level",
+   "source_publisher": "Project (inverse-square law, inverse)",
+   "source_title": "cross-check: hemispherical mode reinforcement pushes the same 84 dB target farther out",
+   "source_edition_or_year": "spec-v673 cross-check (machine-verified)",
+   "source_section_or_page": "110 dB at 1 ft, hemispherical, 84 dB target -> about 28.2 ft (mode reinforcement raises the level, extending the distance)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "L1_dB": 110,
+    "d1": 1,
+    "target_L2_dB": 84,
+    "mode": "hemispherical",
+    "n_sources": 1
+   },
+   "outputs": {
+    "d2": {
+     "value": 28.18,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "gpa-rate",
    "source_publisher": "Project (first-principles)",
    "source_title": "Sprayer rate: GPA = 5940 * GPM / (MPH * nozzle_spacing_in)",

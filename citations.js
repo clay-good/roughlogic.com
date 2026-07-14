@@ -5486,6 +5486,17 @@ export const CITATIONS = {
       { name: "Mode adjustments", value: "free-field 0 dB / hemispherical −3 dB / indoor user-supplied", source: "ISO 9613-2 typical" },
     ],
   },
+  "spl-distance-for-level": {
+    formula: "d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2) / 20); the inverse of L2 = L1 - 20 log10(d2/d1).",
+    edition: "Classical acoustics (inverse-square law); ISO 9613-2 (Acoustics - Attenuation of sound during propagation outdoors) by name.",
+    freeAccess: "Inverse-square principle free in physics texts; ISO 9613-2 licensed.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The distance at which the sound pressure level falls to a target, the inverse of spl-distance: d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2) / 20). Every doubling of distance drops the free-field level 6 dB. The target must be below the mode- and source-adjusted reference level (a louder target is only reached closer than the reference distance and is rejected). The mode factor approximates surface reinforcement (free-field 0 dB, hemispherical +3 dB reinforcement, indoor more) and N is the count of identical incoherent sources (+3 dB per doubling). Single-edition (physics). A planning estimate; the room and the measurement govern the real level.",
+    assumptions: [
+      { name: "Inverse-square inverse", value: "d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2)/20); the target must be below the adjusted reference level or it is rejected", source: "inverse-square law" },
+      { name: "Mode adjustments", value: "free-field 0 dB / hemispherical -3 dB / indoor user-supplied", source: "ISO 9613-2 typical" },
+    ],
+  },
   "spl-atmospheric": {
     formula: "SPL_far = SPL_ref - 20*log10(d_far/d_ref) - alpha(f, T, RH, P)*d_far. Per-octave alpha (dB/m) from the ANSI S1.26 relaxation-frequency formula: alpha = 8.686 * f^2 * { 1.84e-11 * (p_r/p_a) * sqrt(T/T_0) + (T/T_0)^-2.5 * [ 0.01275 * exp(-2239.1/T) / (frO + f^2/frO) + 0.1068 * exp(-3352/T) / (frN + f^2/frN) ] }.",
     edition: "ANSI S1.26-2014 (R2019) Method for Calculation of the Absorption of Sound by the Atmosphere. Inverse-square law from classical acoustics.",

@@ -73062,6 +73062,31 @@
       "kind": "question"
     },
     {
+      "term": "distance for a target spl",
+      "target": "spl-distance-for-level",
+      "kind": "industry"
+    },
+    {
+      "term": "how far to reach a sound level",
+      "target": "spl-distance-for-level",
+      "kind": "industry"
+    },
+    {
+      "term": "hearing safe distance from speaker",
+      "target": "spl-distance-for-level",
+      "kind": "adjacent"
+    },
+    {
+      "term": "distance to 85 db line",
+      "target": "spl-distance-for-level",
+      "kind": "adjacent"
+    },
+    {
+      "term": "noise spill distance",
+      "target": "spl-distance-for-level",
+      "kind": "adjacent"
+    },
+    {
       "term": "hemispherical spreading spl distance",
       "target": "spl-distance",
       "kind": "question"

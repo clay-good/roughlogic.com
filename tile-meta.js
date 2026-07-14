@@ -298,7 +298,7 @@ const _TILES = [
   ["cooling-water-makeup", "M"], ["chlorine-decay", "M"],
 
   ["truss-capacity", "N"], ["time-alignment", "N"], ["dmx-planner", "N"],
-  ["neutral-imbalance", "N"], ["spl-distance", "N"], ["rigging-check", "N"],
+  ["neutral-imbalance", "N"], ["spl-distance", "N"], ["spl-distance-for-level", "N"], ["rigging-check", "N"],
   ["spl-atmospheric", "N"],
 
   ["recipe-scale", "O"], ["yield-ep", "O"], ["cooling-curve", "O"],

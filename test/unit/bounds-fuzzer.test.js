@@ -1683,6 +1683,7 @@ import {
   computeSPLAtmospheric,
   computeRoomAcoustics,
   computeRoomAbsorptionTarget,
+  computeSPLDistanceForLevel,
 } from "../../calc-stage.js";
 
 test("bounds: calc-stage computeTimeAlignment pins ms = (d_main - d_delay) / (331.3 + 0.606 * T_C) * 1000 across the venue sweep", () => {
@@ -1738,6 +1739,36 @@ test("bounds: calc-stage computeSPL rejects unknown mode / non-positive distance
   assert.ok("error" in computeSPL({ L1_dB: 100, d1: 1, d2: 10, mode: "not-a-mode" }));
   assert.ok("error" in computeSPL({ L1_dB: 100, d1: 0, d2: 10, mode: "free_field" }));
   assert.ok("error" in computeSPL({ L1_dB: 100, d1: 1, d2: 0, mode: "free_field" }));
+});
+
+test("bounds: spec-v673 computeSPLDistanceForLevel pins d2 = d1 10^((L1+mode+10logN-L2)/20), round-trips through computeSPL across modes and sources, and error seams", () => {
+  const r = computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 84, mode: "free_field", n_sources: 1 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.d2 - Math.pow(10, (110 - 84) / 20)) < 1e-9, `d2 identity: ${r.d2}`);
+  // Round-trip: the forward level at d2 equals the target, across modes and source counts.
+  for (const mode of ["free_field", "hemispherical", "indoors"]) {
+    for (const n_sources of [1, 4]) {
+      for (const target_L2_dB of [70, 84, 95]) {
+        const m = computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB, mode, n_sources });
+        assert.ok(!m.error, `sweep ${mode} N=${n_sources} L2=${target_L2_dB}: ${JSON.stringify(m)}`);
+        assertFinite(m.d2, "d2"); assert.ok(m.d2 > 0, "d2 positive");
+        const back = computeSPL({ L1_dB: 110, d1: 1, d2: m.d2, mode, n_sources });
+        assert.ok(Math.abs(back.L2_combined_dB - target_L2_dB) < 1e-9, `round-trip ${mode} N=${n_sources} L2=${target_L2_dB}: ${back.L2_combined_dB}`);
+      }
+    }
+  }
+  // Hemispherical mode reinforcement pushes the same target farther than free field.
+  const free = computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 84, mode: "free_field" });
+  const hemi = computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 84, mode: "hemispherical" });
+  assert.ok(hemi.d2 > free.d2, `hemi farther: ${hemi.d2}`);
+  // Error seams: unknown mode, non-positive reference distance, sources < 1, non-finite, and an unreachable target above the source.
+  assert.ok("error" in computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 84, mode: "not-a-mode" }));
+  assert.ok("error" in computeSPLDistanceForLevel({ L1_dB: 110, d1: 0, target_L2_dB: 84, mode: "free_field" }));
+  assert.ok("error" in computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 84, mode: "free_field", n_sources: 0 }));
+  assert.ok("error" in computeSPLDistanceForLevel({ L1_dB: NaN, d1: 1, target_L2_dB: 84, mode: "free_field" }));
+  // A target at or above the adjusted reference level is rejected (it would sit closer than the reference distance).
+  assert.ok("error" in computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 120, mode: "free_field" }));
+  assert.ok("error" in computeSPLDistanceForLevel({ L1_dB: 110, d1: 1, target_L2_dB: 110, mode: "free_field" }));
 });
 
 test("bounds: calc-stage computeNeutralImbalance pins the balanced-zero and single-leg identities", () => {

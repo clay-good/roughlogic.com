@@ -404,7 +404,8 @@ const RELATED = {
   // rigging cluster (truss-capacity, rigging-check) via dmx-planner.
   "truss-capacity": ["rigging-check", "sling-angle", "beam-loading"],
   "rigging-check": ["truss-capacity", "sling-angle", "rope-ma"],
-  "spl-distance": ["spl-atmospheric", "time-alignment"],
+  "spl-distance": ["spl-distance-for-level", "spl-atmospheric", "time-alignment"],
+  "spl-distance-for-level": ["spl-distance", "spl-atmospheric", "time-alignment"],
   "spl-atmospheric": ["spl-distance", "time-alignment"],
   "time-alignment": ["spl-distance", "spl-atmospheric"],
   "dmx-planner": ["neutral-imbalance", "spl-distance"],

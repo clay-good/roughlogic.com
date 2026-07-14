@@ -177,6 +177,7 @@ export const COMPUTE_MAP = {
   "chlorine-decay": { module: "../../calc-water.js", fn: "computeChlorineDecay" },
   "detention-time": { module: "../../calc-water.js", fn: "computeDetentionTime" },
   "spl-distance": { module: "../../calc-stage.js", fn: "computeSPL" },
+  "spl-distance-for-level": { module: "../../calc-stage.js", fn: "computeSPLDistanceForLevel" },
   "gpa-rate": { module: "../../calc-agriculture.js", fn: "computeGPA" },
   "motor-fla": { module: "../../calc-electrical.js", fn: "computeMotorFLA" },
   "timber-cruise": { module: "../../calc-agriculture.js", fn: "computeTimberCruise" },

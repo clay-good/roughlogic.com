@@ -1428,3 +1428,45 @@ const renderLedTapeMaxRun = _r({
   compute: computeLedTapeMaxRun,
 });
 STAGE_RENDERERS["led-tape-max-run"] = renderLedTapeMaxRun;
+
+// --- spec-v673 N: distance at which SPL falls to a target level (inverse of spl-distance) ---
+// L2 = L1 - 20 log10(d2/d1) + mode_factor + 10 log10(n); solved for d2.
+// dims: in { L1_dB: dimensionless, d1: L, target_L2_dB: dimensionless, mode: dimensionless, n_sources: dimensionless } out: { d2: L, delta_dB: dimensionless }
+export function computeSPLDistanceForLevel({ L1_dB = 0, d1 = 1, target_L2_dB = 0, mode = "free_field", n_sources = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const m = SPL_MODES[mode];
+  if (!m) return { error: "Unknown mode." };
+  const ref = Number(d1) || 0;
+  const n = Number(n_sources) || 0;
+  if (!(ref > 0)) return { error: "Reference distance must be positive." };
+  if (!(n >= 1)) return { error: "Number of sources must be at least 1." };
+  // Inverse of L2 = L1 - 20 log10(d2/d1) + mode_factor + 10 log10(n):
+  // d2 = d1 x 10^((L1 + mode_factor + 10 log10(n) - L2) / 20).
+  const delta_dB = Number(L1_dB) + m.factor + 10 * Math.log10(n) - Number(target_L2_dB);
+  if (!Number.isFinite(delta_dB)) return { error: "Distance math is not a finite value." };
+  if (!(delta_dB > 0)) return { error: "Target level must be below the reference level (adjusted for mode and sources); a higher level is only reached closer than the reference distance." };
+  const d2 = ref * Math.pow(10, delta_dB / 20);
+  if (!Number.isFinite(d2) || !(d2 > 0)) return { error: "Distance math is not a finite positive value." };
+  return {
+    d2, delta_dB, mode_factor_dB: m.factor, n_sources: n,
+    note: "The distance at which the sound pressure level falls to a target, the inverse of the spl-distance tile: from L2 = L1 - 20 log10(d2/d1) + mode_factor + 10 log10(N), d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2) / 20). Every doubling of distance drops the free-field level 6 dB. The target must be below the mode- and source-adjusted reference level (a louder target is only reached closer than the reference and is rejected). The mode factor approximates surface reinforcement and N is the count of identical incoherent sources (+3 dB per doubling). A planning estimate; the room and the measurement govern the real level.",
+  };
+}
+export const splDistanceForLevelExample = { inputs: { L1_dB: 110, d1: 1, target_L2_dB: 84, mode: "free_field", n_sources: 1 } };
+const renderSPLDistanceForLevel = _r({
+  citation: "Citation: inverse-square law solved for distance: d2 = d1 x 10^((L1 + mode_factor + 10 log10(N) - L2) / 20), from L2 = L1 - 20 log10(d2/d1). Every doubling of distance drops the free-field level 6 dB. The mode factor approximates surface reinforcement. A planning estimate; the room and the measurement govern.",
+  example: splDistanceForLevelExample.inputs,
+  fields: [
+    { key: "L1_dB", label: "SPL at reference (dB)", kind: "number" },
+    { key: "d1", label: "Reference distance (ft)", kind: "number", default: 1 },
+    { key: "target_L2_dB", label: "Target SPL (dB)", kind: "number" },
+    { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
+    { key: "n_sources", label: "Identical sources", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "d", id: "sdfl-out-d", label: "Distance for the target level", value: (r) => fmt(r.d2, 1) + " ft" },
+    { key: "n", id: "sdfl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSPLDistanceForLevel,
+});
+STAGE_RENDERERS["spl-distance-for-level"] = renderSPLDistanceForLevel;

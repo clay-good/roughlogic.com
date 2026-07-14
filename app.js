@@ -1003,7 +1003,7 @@ const TOOL_MODULES = (() => {
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [
     "truss-capacity", "time-alignment", "dmx-planner",
-    "neutral-imbalance", "spl-distance", "rigging-check",
+    "neutral-imbalance", "spl-distance", "spl-distance-for-level", "rigging-check",
     // v9
     "spl-atmospheric",
   
