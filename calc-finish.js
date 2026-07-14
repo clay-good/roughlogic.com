@@ -387,3 +387,47 @@ FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
   ],
   compute: computeDeckBoardTakeoff,
 });
+
+// ===================== spec-v798: flat glass lite weight for handling =====================
+// Density x volume. Soda-lime float glass is SG 2.50 = 156.1 lb/ft^3, i.e. ~13.0 lb/ft^2 per inch of
+// thickness. weight = 156.1 x area(ft^2) x thickness(in)/12 x panes.
+// dims: in { width_in: L, height_in: L, thickness_in: L, panes: dimensionless } out: { area_ft2: L^2, weight_lb: M, weight_per_ft2: M L^-2 }
+export function computeGlassWeight({ width_in = 0, height_in = 0, thickness_in = 0, panes = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(width_in) || 0;
+  const h = Number(height_in) || 0;
+  const t = Number(thickness_in) || 0;
+  const n = Number(panes) || 0;
+  if (!(w > 0)) return { error: "Width must be positive (in)." };
+  if (!(h > 0)) return { error: "Height must be positive (in)." };
+  if (!(t > 0)) return { error: "Thickness must be positive (in)." };
+  if (!(n >= 1)) return { error: "Number of panes must be at least 1." };
+  const area_ft2 = (w * h) / 144;
+  const weight_per_ft2 = 156.1 * (t / 12);
+  const per_pane_lb = area_ft2 * weight_per_ft2;
+  const weight_lb = per_pane_lb * n;
+  if (![area_ft2, weight_lb].every(Number.isFinite)) return { error: "Glass-weight math is not a finite value." };
+  const two_person = weight_lb > 50;
+  return {
+    area_ft2, weight_lb, per_pane_lb, weight_per_ft2, two_person,
+    note: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (the standard window glass) runs about 13.0 lb per square foot per inch of thickness (specific gravity 2.50, 156.1 lb/ft^3), so a lite weighs 13.0 x thickness(in) x area(ft^2). Tempering and heat-strengthening do NOT change the weight (same glass, rearranged stress); an insulating unit (IGU) is the sum of its lites, and a laminated lite adds a thin plastic interlayer that is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.0 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate; the glass type, the lifter's rating, and safe-lifting practice govern.",
+  };
+}
+export const glassWeightExample = { inputs: { width_in: 60, height_in: 40, thickness_in: 0.25, panes: 1 } };
+FINISH_RENDERERS["glass-weight"] = _simpleRenderer({
+  citation: "Citation: flat glass lite weight (NGA Glazing Manual glass-weight table; ASTM C1036 flat glass): weight = 156.1 lb/ft^3 x area(ft^2) x thickness(in)/12, i.e. ~13.0 lb/ft^2 per inch for soda-lime float (SG 2.50). Tempering does not change the weight; an IGU is the sum of its lites. Sizes the two-person / vacuum-cup lift. A handling estimate; the glass type and the lifter's rating govern.",
+  example: glassWeightExample.inputs,
+  fields: [
+    { key: "width_in", label: "Width (in)", kind: "number", default: 60 },
+    { key: "height_in", label: "Height (in)", kind: "number", default: 40 },
+    { key: "thickness_in", label: "Thickness (in, e.g. 0.25 for 1/4\")", kind: "number", default: 0.25 },
+    { key: "panes", label: "Identical panes (1 lite; 2 for an equal IGU)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "a", id: "glw-out-a", label: "Area", value: (r) => fmt(r.area_ft2, 2) + " ft^2" },
+    { key: "w", id: "glw-out-w", label: "Weight", value: (r) => fmt(r.weight_lb, 1) + " lb" + (r.two_person ? " -- over ~50 lb, use two people or a lifter" : "") },
+    { key: "p", id: "glw-out-p", label: "Per square foot", value: (r) => fmt(r.weight_per_ft2, 2) + " lb/ft^2" },
+    { key: "n", id: "glw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGlassWeight,
+});

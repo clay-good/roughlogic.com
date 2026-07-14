@@ -21701,6 +21701,26 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
+import { computeGlassWeight as _v798 } from "../../calc-finish.js";
+
+test("bounds: spec-v798 computeGlassWeight pins the lite weight, per-sqft, two-person flag, and error seams", () => {
+  const r = _v798({ width_in: 60, height_in: 40, thickness_in: 0.25, panes: 1 });
+  assert.ok(Math.abs(r.area_ft2 - 16.6667) < 0.001); // 60*40/144
+  assert.ok(Math.abs(r.weight_lb - 54.2) < 0.2); // 156.1 * area * 0.25/12
+  assert.ok(Math.abs(r.weight_per_ft2 - 3.252) < 0.01); // 156.1 * 0.25/12
+  assert.strictEqual(r.two_person, true); // > 50 lb
+  // Weight is linear in thickness and in panes; a small thin lite is a one-person lift.
+  assert.ok(Math.abs(_v798({ width_in: 60, height_in: 40, thickness_in: 0.5, panes: 1 }).weight_lb - 2 * r.weight_lb) < 0.01);
+  assert.ok(Math.abs(_v798({ width_in: 60, height_in: 40, thickness_in: 0.25, panes: 2 }).weight_lb - 2 * r.weight_lb) < 0.01);
+  assert.strictEqual(_v798({ width_in: 24, height_in: 24, thickness_in: 0.125, panes: 1 }).two_person, false);
+  // Error seams: non-finite, non-positive width/height/thickness, panes < 1.
+  assert.ok("error" in _v798({ width_in: Infinity, height_in: 40, thickness_in: 0.25 }));
+  assert.ok("error" in _v798({ width_in: 0, height_in: 40, thickness_in: 0.25 }));
+  assert.ok("error" in _v798({ width_in: 60, height_in: 0, thickness_in: 0.25 }));
+  assert.ok("error" in _v798({ width_in: 60, height_in: 40, thickness_in: 0 }));
+  assert.ok("error" in _v798({ width_in: 60, height_in: 40, thickness_in: 0.25, panes: 0 }));
+});
+
 import { computeConcreteYield as _v797 } from "../../calc-construction.js";
 
 test("bounds: spec-v797 computeConcreteYield pins yield, relative yield, cement content, short-flag, and error seams", () => {

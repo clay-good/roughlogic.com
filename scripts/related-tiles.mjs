@@ -1056,6 +1056,7 @@ const RELATED = {
   "retaining-wall-block": ["paver-patio","aggregate","masonry-count"],
   "attic-ventilation": ["roofing-squares","gutter-downspout","blown-insulation-coverage"],
   "deck-board-takeoff": ["residential-framing","joist-deflection","fence-estimate"],
+  "glass-weight": ["metal-weight","deck-board-takeoff","gutter-downspout"],
   "shadow-length": ["pv-row-spacing","pv-row-shade-angle","pv-array-sizing"],
   "powered-attic-ventilator": ["attic-ventilation","ridge-cap-fasteners","blown-insulation-coverage","insulation-heat-loss"],
   "gutter-downspout": ["roofing-squares","attic-ventilation","roof-drain-sizing"],

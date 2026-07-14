@@ -514,6 +514,7 @@ const _TILES = [
   ["turn-radius-bank", "K"],
   ["climb-gradient-roc", "K"],
   ["concrete-yield", "E"],
+  ["glass-weight", "E"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

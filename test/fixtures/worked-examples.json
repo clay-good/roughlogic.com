@@ -24522,6 +24522,35 @@
    }
   },
   {
+   "tile_id": "glass-weight",
+   "source_publisher": "NGA Glazing Manual glass-weight table; ASTM C1036",
+   "source_title": "weight = 156.1 lb/ft3 x area_ft2 x thickness_in/12 (~13.0 lb/ft2 per inch)",
+   "source_edition_or_year": "spec-v798 worked example (machine-verified)",
+   "source_section_or_page": "60 x 40 in lite of 1/4 in soda-lime -> 16.67 ft2, 54.2 lb (NGA table 54.5, within 1%)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "width_in": 60,
+    "height_in": 40,
+    "thickness_in": 0.25,
+    "panes": 1
+   },
+   "outputs": {
+    "area_ft2": {
+     "value": 16.67,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "weight_lb": {
+     "value": 54.2,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-yield",
    "source_publisher": "ASTM C138 / AASHTO T121 (concrete yield)",
    "source_title": "yield_ft3 = total_batch_mass / measured_unit_weight; relative_yield = yield_yd3 / design",

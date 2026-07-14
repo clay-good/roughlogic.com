@@ -9490,6 +9490,17 @@ export const CITATIONS = {
       { name: "Reference intensity", value: "5 in/hr reference; 1 sq in of downspout per ~100 sq ft of roof (editable)", source: "SMACNA practice" },
     ],
   },
+  "glass-weight": {
+    formula: "weight_lb = 156.1 lb/ft^3 x area_ft2 x thickness_in/12 x panes; area_ft2 = width_in x height_in / 144; weight_per_ft2 = 156.1 x thickness_in/12 (~13.0 lb/ft^2 per inch).",
+    edition: "Flat glass lite weight (NGA Glazing Manual glass-weight table; ASTM C1036 flat glass), by name; the glass type and the lifter's rating govern.",
+    freeAccess: "The density x volume weight is first-principles; the soda-lime density (SG 2.50, 156.1 lb/ft^3) is the standard flat-glass value in every US glass-weight table.",
+    governance: GOVERNANCE.general,
+    editionNote: "Flat-glass weight for handling: glass weighs its density times its volume, and soda-lime float glass (standard window glass) runs about 13.0 lb per square foot per inch of thickness (specific gravity 2.50, 156.1 lb/ft^3), so a lite weighs 13.0 x thickness(in) x area(ft^2). Tempering and heat-strengthening do not change the weight; an insulating unit (IGU) is the sum of its lites, and a laminated lite's thin plastic interlayer is close enough to ignore for a lift estimate. This sizes the two-person or vacuum-cup lift and checks it against a suction lifter's rating -- OSHA and most shops flag a manual lift above about 50 lb per person. The 13.0 figure carries a ~1% material tolerance (published tables run 13.0-13.1). A handling estimate, not a structural glass design.",
+    assumptions: [
+      { name: "Soda-lime density", value: "SG 2.50, 156.1 lb/ft^3, ~13.0 lb/ft^2 per inch (published tables 13.0-13.1, ~1% tolerance)", source: "ASTM C1036 / NGA table" },
+      { name: "Tempering / IGU", value: "tempering does not change the weight; an IGU is the sum of its lites", source: "NGA Glazing Manual" },
+    ],
+  },
   "deck-board-takeoff": {
     formula: "boards = ceil((deck_width_ft x 12 + gap_in) / (board_face_in + gap_in)); lineal_ft = boards x deck_length_ft x (1 + waste_pct/100); joists = ceil(deck_length_ft x 12 / joist_spacing_in) + 1; screws = boards x joists x 2.",
     edition: "First-principles deck-surface takeoff (the same carpentry take-off basis as fence-estimate and residential-framing), by name; the deck plan and the lumber on the rack govern.",

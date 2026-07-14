@@ -44032,6 +44032,31 @@
       "kind": "industry"
     },
     {
+      "term": "glass weight",
+      "target": "glass-weight",
+      "kind": "industry"
+    },
+    {
+      "term": "how much does a glass lite weigh",
+      "target": "glass-weight",
+      "kind": "question"
+    },
+    {
+      "term": "window glass weight per square foot",
+      "target": "glass-weight",
+      "kind": "question"
+    },
+    {
+      "term": "can one person lift this glass",
+      "target": "glass-weight",
+      "kind": "question"
+    },
+    {
+      "term": "insulated glass unit weight",
+      "target": "glass-weight",
+      "kind": "adjacent"
+    },
+    {
       "term": "moment capacity with an unbraced flange",
       "target": "steel-beam-ltb",
       "kind": "question"

@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(carpentry): spec-v798 flat glass lite weight; 2026-07-14
+
+- New tile `glass-weight` (Group E, calc-finish.js): the weight of a glass lite for a safe lift. Soda-lime float glass is
+  ~13.0 lb/ft^2 per inch of thickness (SG 2.50, 156.1 lb/ft^3), so `weight = 13.0 x thickness(in) x area(ft^2)`. A 60 x
+  40 in lite of 1/4" glass is 16.7 ft^2 and 54 lb -- past the ~50 lb one-person limit, so a two-person or vacuum-cup lift
+  (flagged). Tempering does not change the weight; an IGU is the sum of its lites. Fuzzer pins the weight, the per-sqft,
+  the two-person flag, the thickness/panes linearity, and the error seams. Explore sweep #23 entry 2. Home count 1,246 ->
+  1,247. Raised the calc-finish.js module gzip cap 8500 -> 10000 B (deck-board-takeoff + glass-weight took it to ~9.0 KB).
+
 ### feat(concrete): spec-v797 concrete yield and relative yield (ASTM C138); 2026-07-14
 
 - New tile `concrete-yield` (Group E, calc-construction.js): whether a load delivered the yards ordered, from the batch
