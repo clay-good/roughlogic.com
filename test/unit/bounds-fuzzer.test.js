@@ -11512,6 +11512,39 @@ test("bounds: spec-v117 rigging (multi-leg sling + wire-rope strength)", () => {
   assert.ok("error" in _v117b({ diameter_in: 0 }) && "error" in _v117b({ diameter_in: 0.5, construction_factor: 0 }) && "error" in _v117b({ diameter_in: 0.5, construction_factor: 46, design_factor: 0 }));
 });
 
+import { computeWireRopeDiameterForWll as _v713 } from "../../calc-rigging.js";
+test("bounds: spec-v713 computeWireRopeDiameterForWll pins d = sqrt(WLL x DF / cf), the standard-size round-up, round-trips through computeWireRopeStrength, and error seams", () => {
+  const r = _v713({ wll_required_tons: 5, construction_factor: 46, design_factor: 5 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.diameter_in - Math.sqrt(5 * 5 / 46)) < 1e-9, `d identity: ${r.diameter_in}`);
+  assert.ok(Math.abs(r.diameter_in - 0.737210) < 1e-4, `pinned 0.737 in: ${r.diameter_in}`);
+  assert.strictEqual(r.selected_diameter_in, 0.75);
+  assert.ok(r.selected_wll_tons >= 5, `selected size clears the WLL: ${r.selected_wll_tons}`);
+  // Round-trip: at the exact diameter the forward tile's WLL equals the required WLL.
+  for (const wll_required_tons of [1, 5, 20]) {
+    for (const construction_factor of [40, 46, 52]) {
+      for (const design_factor of [4, 5, 6]) {
+        const m = _v713({ wll_required_tons, construction_factor, design_factor });
+        assert.ok(!m.error, `sweep wll=${wll_required_tons} cf=${construction_factor} df=${design_factor}: ${JSON.stringify(m)}`);
+        assertFinite(m.diameter_in, "d"); assert.ok(m.diameter_in > 0, "d positive");
+        const back = _v117b({ diameter_in: m.diameter_in, construction_factor, design_factor });
+        assert.ok(Math.abs(back.wll_tons - wll_required_tons) < 1e-9, `round-trip wll=${wll_required_tons} cf=${construction_factor} df=${design_factor}: ${back.wll_tons}`);
+        // The selected standard size, if any, always meets or exceeds the required WLL.
+        if (m.selected_diameter_in) assert.ok(m.selected_wll_tons >= wll_required_tons - 1e-9, `selected clears: ${m.selected_wll_tons} vs ${wll_required_tons}`);
+      }
+    }
+  }
+  // A higher required WLL needs a bigger rope.
+  assert.ok(_v713({ wll_required_tons: 20, construction_factor: 46, design_factor: 5 }).diameter_in > r.diameter_in);
+  // Beyond the largest standard size the selection is null (over the common range).
+  assert.strictEqual(_v713({ wll_required_tons: 200, construction_factor: 46, design_factor: 5 }).selected_diameter_in, null);
+  // Error seams: non-positive WLL, construction factor, design factor, non-finite.
+  assert.ok("error" in _v713({ wll_required_tons: 0, construction_factor: 46, design_factor: 5 }));
+  assert.ok("error" in _v713({ wll_required_tons: 5, construction_factor: 0, design_factor: 5 }));
+  assert.ok("error" in _v713({ wll_required_tons: 5, construction_factor: 46, design_factor: 0 }));
+  assert.ok("error" in _v713({ wll_required_tons: Infinity, construction_factor: 46, design_factor: 5 }));
+});
+
 import { computeHayDryMatter as _v118 } from "../../calc-agriculture.js";
 test("bounds: spec-v118 hay dry-matter and safe-storage weight", () => {
   const a = _v118({ bale_weight_lb: 1200, moisture_pct: 22, target_moisture_pct: 15, safe_threshold_pct: 18 });

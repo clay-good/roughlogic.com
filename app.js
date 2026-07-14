@@ -1167,7 +1167,7 @@ const TOOL_MODULES = (() => {
     "shackle-eyebolt-wll", "spreader-beam", "forklift-capacity-derate",
     "roller-jack-force", "chain-lever-hoist", "block-redirect-load",
     // spec-v117 multi-leg sling load per leg + wire-rope strength estimate.
-    "multi-leg-sling", "wire-rope-strength",
+    "multi-leg-sling", "wire-rope-strength", "wire-rope-diameter-for-wll",
     // spec-v484 spanned cable sag and tension
     "spanline-sag-tension", "spanline-sag-for-tension",
     // spec-v544

@@ -1085,6 +1085,7 @@ const RELATED = {
   // spec-v117 rigging load / wire-rope (Group Z)
   "multi-leg-sling": ["cg-load-share","shackle-eyebolt-wll","spreader-beam"],
   "wire-rope-strength": ["sling-d-d-efficiency","shackle-eyebolt-wll"],
+  "wire-rope-diameter-for-wll": ["wire-rope-strength","sling-d-d-efficiency","shackle-eyebolt-wll","winch-drum-line-pull"],
   // spec-v484 spanned cable sag and tension (Group Z)
   "spanline-sag-tension": ["spanline-sag-for-tension","sling-angle","wire-rope-strength","block-redirect-load"],
   "spanline-sag-for-tension": ["spanline-sag-tension","wire-rope-strength","sling-angle","block-redirect-load"],

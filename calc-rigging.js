@@ -888,6 +888,52 @@ function renderWireRopeStrength(inputRegion, outputRegion, citationEl) {
 }
 RIGGING_RENDERERS["wire-rope-strength"] = renderWireRopeStrength;
 
+// wire-rope-diameter-for-wll: inverse of wire-rope-strength. The forward tile
+// gives the WLL from a diameter; sizing the rope to a required load is the
+// inverse. From WLL = (construction_factor x d^2) / design_factor,
+// d = sqrt(WLL x design_factor / construction_factor); then round up to the next
+// standard rope diameter and report its actual WLL.
+const _WIRE_ROPE_STD_DIA = [0.25, 0.3125, 0.375, 0.4375, 0.5, 0.5625, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.375, 1.5];
+// dims: in { wll_required_tons: M L T^-2, construction_factor: dimensionless, design_factor: dimensionless } out: { diameter_in: L, selected_diameter_in: L, selected_wll_tons: M L T^-2 }
+export function computeWireRopeDiameterForWll({ wll_required_tons = 0, construction_factor = 46, design_factor = 5 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const wll = Number(wll_required_tons) || 0;
+  const cf = Number(construction_factor) || 0;
+  const df = Number(design_factor) || 0;
+  if (!(wll > 0)) return { error: "Required working load limit must be positive (tons)." };
+  if (!(cf > 0)) return { error: "Construction factor must be positive." };
+  if (!(df > 0)) return { error: "Design factor must be positive." };
+  const diameter_in = Math.sqrt(wll * df / cf);
+  const selected_diameter_in = _WIRE_ROPE_STD_DIA.find((d) => d >= diameter_in - 1e-9) || null;
+  const selected_wll_tons = selected_diameter_in ? cf * selected_diameter_in * selected_diameter_in / df : null;
+  return {
+    diameter_in, selected_diameter_in, selected_wll_tons,
+    note: "ESTIMATE only. From MBS = construction factor x diameter^2 and WLL = MBS / design factor, the exact diameter for the required WLL is sqrt(WLL x design factor / construction factor); round UP to the next standard rope diameter (a smaller rope is under-rated). The default construction factor 46 is the rule-of-thumb tons/in^2 for IPS 6x19 - bright IPS, EIPS, and other constructions/grades differ, so edit it, and 5:1 is the typical general-rigging design factor. Use the manufacturer's certified breaking strength for any real lift; do not place unmarked or uncertified rope in service. The certified rating and the qualified rigger govern.",
+  };
+}
+export const wireRopeDiameterForWllExample = { inputs: { wll_required_tons: 5, construction_factor: 46, design_factor: 5 } };
+function renderWireRopeDiameterForWll(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Wire Rope Users Manual rule-of-thumb solved for the diameter: d = sqrt(WLL x design factor / construction factor), from MBS = factor x d^2 (factor ~46 tons/in^2 for IPS 6x19, editable) and WLL = MBS / design factor (5:1 typical). ESTIMATE - the manufacturer's certified rating governs; never use unmarked rope.";
+  const wll = makeNumber("Required working load limit (tons)", "wrd-wll", { step: "any", min: "0", value: "5" });
+  const cf = makeNumber("Construction factor (tons/in^2)", "wrd-cf", { step: "any", min: "0", value: "46" });
+  const df = makeNumber("Design factor (safety factor)", "wrd-df", { step: "any", min: "0", value: "5" });
+  wll.input.value = "5"; cf.input.value = "46"; df.input.value = "5";
+  for (const f of [wll, cf, df]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { wll.input.value = "5"; cf.input.value = "46"; df.input.value = "5"; update(); });
+  const oD = makeOutputLine(outputRegion, "Exact diameter required", "wrd-out-d");
+  const oS = makeOutputLine(outputRegion, "Next standard size", "wrd-out-s");
+  const oN = makeOutputLine(outputRegion, "Note", "wrd-out-n");
+  const update = debounce(() => {
+    const r = computeWireRopeDiameterForWll({ wll_required_tons: Number(wll.input.value) || 0, construction_factor: Number(cf.input.value) || 0, design_factor: Number(df.input.value) || 0 });
+    if (r.error) { oD.textContent = r.error; oS.textContent = "-"; oN.textContent = "-"; return; }
+    oD.textContent = fmt(r.diameter_in, 3) + " in";
+    oS.textContent = r.selected_diameter_in ? fmt(r.selected_diameter_in, 4) + " in (WLL " + fmt(r.selected_wll_tons, 2) + " tons)" : "over 1-1/2 in -- use the manufacturer's table";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [wll, cf, df]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["wire-rope-diameter-for-wll"] = renderWireRopeDiameterForWll;
+
 // --- spanline-sag-tension: Sag and Tension on a Horizontally Spanned Cable ---
 //
 // Shallow-parabola statics: a uniform load w over a span L sagging d at

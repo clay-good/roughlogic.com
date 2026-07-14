@@ -82483,7 +82483,27 @@
     },
     {
       "term": "rope size for a required working load",
-      "target": "wire-rope-strength",
+      "target": "wire-rope-diameter-for-wll",
+      "kind": "question"
+    },
+    {
+      "term": "wire rope diameter for load",
+      "target": "wire-rope-diameter-for-wll",
+      "kind": "question"
+    },
+    {
+      "term": "what size cable for 5 tons",
+      "target": "wire-rope-diameter-for-wll",
+      "kind": "question"
+    },
+    {
+      "term": "pick rope size for wll",
+      "target": "wire-rope-diameter-for-wll",
+      "kind": "question"
+    },
+    {
+      "term": "cable diameter from working load limit",
+      "target": "wire-rope-diameter-for-wll",
       "kind": "question"
     },
     {

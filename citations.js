@@ -9647,6 +9647,18 @@ export const CITATIONS = {
       { name: "Estimate only", value: "use the certified breaking strength for any real lift; never use unmarked or uncertified rope", source: "manufacturer certification" },
     ],
   },
+  "wire-rope-diameter-for-wll": {
+    formula: "diameter_in = sqrt(wll_required_tons x design_factor / construction_factor), the MBS = factor x d^2 / WLL = MBS / design_factor rule-of-thumb solved for the diameter; round up to the next standard rope diameter.",
+    edition: "Wire Rope Users Manual rule-of-thumb (by name), solved for the diameter; MBS = factor x d^2, no edition cycle.",
+    freeAccess: "An ESTIMATE only; the manufacturer's certified breaking strength governs. Do not place unmarked or uncertified rope in service.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The inverse of wire-rope-strength: the rope diameter that meets a required working load limit, then rounded up to the next standard size (a smaller rope is under-rated). Single-edition (the MBS = factor x d^2 rule-of-thumb does not roll; the manufacturer's certified breaking strength governs - this is an estimate only).",
+    assumptions: [
+      { name: "Construction factor", value: "the default 46 is the rule-of-thumb tons/in^2 for IPS 6x19; bright IPS, EIPS, and other constructions/grades differ - edit it", source: "Wire Rope Users Manual" },
+      { name: "Design factor", value: "5:1 is typical for general rigging; the application and the AHJ set the required factor", source: "ASME B30.9" },
+      { name: "Estimate only", value: "round up to a standard size and use the certified breaking strength for any real lift; never use unmarked or uncertified rope", source: "manufacturer certification" },
+    ],
+  },
   "spanline-sag-tension": {
     formula: "H = w x L^2 / (8 x d); T_support = H x sqrt(1 + (4 d / L)^2); length = L + 8 d^2 / (3 L); slack = length - L; sag_ratio = d / L.",
     edition: "Shallow-cable parabola statics (by name) with ASME B30.9 / Wire Rope Users Manual rigging practice; first-principles, no edition cycle.",

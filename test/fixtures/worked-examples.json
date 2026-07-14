@@ -27085,6 +27085,34 @@
    }
   },
   {
+   "tile_id": "wire-rope-diameter-for-wll",
+   "source_publisher": "Wire Rope Users Manual rule-of-thumb (by name)",
+   "source_title": "d = sqrt(WLL x design factor / construction factor); inverse of the strength estimate",
+   "source_edition_or_year": "spec-v713 worked example (machine-verified; inverse of spec-v117)",
+   "source_section_or_page": "5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3/4 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "wll_required_tons": 5,
+    "construction_factor": 46,
+    "design_factor": 5
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.73721,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "selected_diameter_in": {
+     "value": 0.75,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wire-rope-strength",
    "source_publisher": "Wire Rope Users Manual rule-of-thumb (by name)",
    "source_title": "3/4 in same construction -> 25.9 ton MBS, 5.2 ton WLL",
