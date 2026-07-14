@@ -21569,6 +21569,30 @@ test("bounds: spec-v539 computeDrinkAbvDilution pins the melt-diluted ABV, the s
   assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "foo" }));
 });
 
+import { computeFloorAreaRatio as _v784 } from "../../calc-realestate.js";
+
+test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / remaining cap, the within flag, and error seams", () => {
+  const r = _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: 2.0 });
+  assert.ok(Math.abs(r.far - 1.5) < 1e-9); // 30000/20000
+  assert.ok(Math.abs(r.max_buildable_sf - 40000) < 1e-6); // 2.0 * 20000
+  assert.ok(Math.abs(r.remaining_sf - 10000) < 1e-6); // 40000 - 30000
+  assert.strictEqual(r.within, true); // 1.5 <= 2.0
+  // Over the cap: building exceeds the limit -> within false, negative remaining.
+  const over = _v784({ building_floor_area_sf: 50000, lot_area_sf: 20000, far_limit: 2.0 });
+  assert.strictEqual(over.within, false);
+  assert.ok(over.remaining_sf < 0);
+  // No limit given (0): cap fields null, FAR still computed.
+  const noLimit = _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: 0 });
+  assert.strictEqual(noLimit.has_limit, false);
+  assert.strictEqual(noLimit.max_buildable_sf, null);
+  assert.ok(Math.abs(noLimit.far - 1.5) < 1e-9);
+  // Error seams: non-finite, zero/negative lot, negative building, negative limit.
+  assert.ok("error" in _v784({ building_floor_area_sf: Infinity, lot_area_sf: 20000, far_limit: 2 }));
+  assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 0, far_limit: 2 }));
+  assert.ok("error" in _v784({ building_floor_area_sf: -1, lot_area_sf: 20000, far_limit: 2 }));
+  assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: -1 }));
+});
+
 import { computeReserveCapacityAmpHours as _v783 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v783 computeReserveCapacityAmpHours pins the RC-to-amp-hours conversion, monotonicity, and error seams", () => {

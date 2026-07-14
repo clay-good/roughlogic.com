@@ -80142,6 +80142,31 @@
       "kind": "question"
     },
     {
+      "term": "floor area ratio",
+      "target": "floor-area-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "far zoning limit",
+      "target": "floor-area-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "how much can i build on my lot",
+      "target": "floor-area-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "max buildable square footage",
+      "target": "floor-area-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "buildable area from far",
+      "target": "floor-area-ratio",
+      "kind": "question"
+    },
+    {
       "term": "roots of a x squared b x c",
       "target": "quadratic-formula",
       "kind": "question"

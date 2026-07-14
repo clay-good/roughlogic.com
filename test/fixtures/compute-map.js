@@ -783,6 +783,7 @@ export const COMPUTE_MAP = {
   "drink-abv-dilution": { module: "../../calc-kitchen.js", fn: "computeDrinkAbvDilution" },
   "overrun-percent": { module: "../../calc-kitchen.js", fn: "computeOverrunPercent" },
   "reserve-capacity-amp-hours": { module: "../../calc-mechanic.js", fn: "computeReserveCapacityAmpHours" },
+  "floor-area-ratio": { module: "../../calc-realestate.js", fn: "computeFloorAreaRatio" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

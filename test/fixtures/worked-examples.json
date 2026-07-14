@@ -24315,6 +24315,40 @@
    }
   },
   {
+   "tile_id": "floor-area-ratio",
+   "source_publisher": "Floor area ratio (municipal zoning intensity measure)",
+   "source_title": "FAR = building_floor_area / lot_area; max_buildable = FAR_limit x lot_area",
+   "source_edition_or_year": "spec-v784 worked example (machine-verified)",
+   "source_section_or_page": "30,000 SF building on a 20,000 SF lot -> FAR 1.5; 2.0 cap -> 40,000 SF max, 10,000 SF remaining",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "building_floor_area_sf": 30000,
+    "lot_area_sf": 20000,
+    "far_limit": 2.0
+   },
+   "outputs": {
+    "far": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "max_buildable_sf": {
+     "value": 40000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "remaining_sf": {
+     "value": 10000,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reserve-capacity-amp-hours",
    "source_publisher": "BCI / SAE J537 reserve capacity",
    "source_title": "amp_hours = 25 x reserve_capacity_minutes / 60",

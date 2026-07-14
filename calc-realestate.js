@@ -2965,3 +2965,49 @@ function renderBlendedMortgageRate(inputRegion, outputRegion, citationEl) {
   for (const f of [b1, r1, b2, r2]) f.input.addEventListener("input", update);
 }
 REALESTATE_RENDERERS["blended-mortgage-rate"] = renderBlendedMortgageRate;
+
+// ===================== spec-v784: floor area ratio (zoning) =====================
+// dims: in { building_floor_area_sf: L^2, lot_area_sf: L^2, far_limit: dimensionless } out: { far: dimensionless, max_buildable_sf: L^2, remaining_sf: L^2 }
+export function computeFloorAreaRatio({ building_floor_area_sf = 0, lot_area_sf = 0, far_limit = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bldg = Number(building_floor_area_sf) || 0;
+  const lot = Number(lot_area_sf) || 0;
+  const limit = Number(far_limit) || 0;
+  if (bldg < 0) return { error: "Building floor area cannot be negative (SF)." };
+  if (!(lot > 0)) return { error: "Lot area must be positive (SF)." };
+  if (limit < 0) return { error: "FAR limit cannot be negative." };
+  const far = bldg / lot;
+  const has_limit = limit > 0;
+  const max_buildable_sf = has_limit ? limit * lot : null;
+  const remaining_sf = has_limit ? max_buildable_sf - bldg : null;
+  const within = has_limit ? far <= limit : null;
+  if (![far].every(Number.isFinite)) return { error: "Floor-area-ratio math is not a finite value." };
+  return {
+    far, has_limit, far_limit: limit, max_buildable_sf, remaining_sf, within,
+    note: "Floor area ratio (FAR) is the standard zoning measure of building intensity: FAR = gross building floor area / lot area. A FAR of 1.0 is a building whose floor area equals the lot area -- one story covering the whole lot, two stories on half of it, and so on -- so FAR caps bulk without dictating the footprint or height directly. Where a limit is set, the maximum buildable floor area = FAR_limit x lot area, and the remaining capacity is that minus what is already built. The catch is the definition of \"floor area\": municipalities differ on whether parking, basements, mechanical space, and balconies count, so enter the gross figure your local zoning code defines as counting. A screening aid; the zoning ordinance, its exclusions, and the planning authority govern.",
+  };
+}
+export const floorAreaRatioExample = { inputs: { building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: 2.0 } };
+function renderFloorAreaRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: floor area ratio (municipal zoning intensity measure): FAR = gross building floor area / lot area; max buildable floor area = FAR_limit x lot area; remaining = max buildable - existing. What counts as floor area (parking, basements, mechanical) varies by municipality; enter the gross figure the local code defines. A screening aid; the zoning ordinance and planning authority govern.";
+  const bldg = makeNumber("Building gross floor area (SF)", "far-bldg", { step: "any", min: "0" }); bldg.input.value = "30000";
+  const lot = makeNumber("Lot area (SF)", "far-lot", { step: "any", min: "0" }); lot.input.value = "20000";
+  const limit = makeNumber("Zoning FAR limit (0 = skip the cap check)", "far-limit", { step: "any", min: "0" }); limit.input.value = "2.0";
+  for (const f of [bldg, lot, limit]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bldg.input.value = "30000"; lot.input.value = "20000"; limit.input.value = "2.0"; update(); });
+  const oFar = makeOutputLine(outputRegion, "Floor area ratio (FAR)", "far-out-far");
+  const oMax = makeOutputLine(outputRegion, "Maximum buildable floor area", "far-out-max");
+  const oRem = makeOutputLine(outputRegion, "Remaining capacity", "far-out-rem");
+  const oNote = makeOutputLine(outputRegion, "Note", "far-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFloorAreaRatio({ building_floor_area_sf: readNum(bldg.input), lot_area_sf: readNum(lot.input), far_limit: readNum(limit.input) });
+    if (r.error) { oFar.textContent = r.error; oMax.textContent = "-"; oRem.textContent = "-"; oNote.textContent = ""; return; }
+    oFar.textContent = fmt(r.far, 3) + (r.has_limit ? (r.within ? " (within the " + fmt(r.far_limit, 2) + " limit)" : " -- EXCEEDS the " + fmt(r.far_limit, 2) + " limit") : "");
+    oMax.textContent = r.has_limit ? fmt(r.max_buildable_sf, 0) + " SF (at FAR " + fmt(r.far_limit, 2) + ")" : "enter a FAR limit to size the cap";
+    oRem.textContent = r.has_limit ? (r.remaining_sf >= 0 ? fmt(r.remaining_sf, 0) + " SF left to build" : fmt(-r.remaining_sf, 0) + " SF over the cap") : "-";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bldg, lot, limit]) f.input.addEventListener("input", update);
+}
+REALESTATE_RENDERERS["floor-area-ratio"] = renderFloorAreaRatio;

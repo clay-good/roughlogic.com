@@ -205,6 +205,17 @@ export const CITATIONS = {
       { name: "Lender rules", value: "the appraised ARV and the lender's LTV/seasoning govern", source: "scope of this tile" },
     ],
   },
+  "floor-area-ratio": {
+    formula: "FAR = building_floor_area / lot_area; max_buildable = FAR_limit x lot_area; remaining = max_buildable - existing_floor_area.",
+    edition: "Floor area ratio, the municipal zoning intensity measure, by name; the zoning ordinance and planning authority govern.",
+    freeAccess: "FAR is a standard zoning ratio; the floor area and lot area come from the survey and the local zoning code's definition of countable floor area.",
+    governance: GOVERNANCE.general,
+    editionNote: "Floor area ratio (FAR) = gross building floor area / lot area, the standard zoning measure of building intensity. A FAR of 1.0 is a building whose floor area equals the lot area (one story over the whole lot, two over half), so FAR caps bulk without dictating footprint or height. Where a limit is set, the maximum buildable floor area = FAR_limit x lot area and the remaining capacity is that minus the existing floor area. What counts as floor area -- whether parking, basements, mechanical space, and balconies are included -- varies by municipality, so enter the gross figure the local code defines as countable. A screening aid, not a zoning determination; the ordinance, its exclusions, and the planning authority govern.",
+    assumptions: [
+      { name: "Countable floor area varies", value: "municipalities differ on whether parking, basements, and mechanical space count; enter the locally-defined gross figure", source: "local zoning code" },
+      { name: "Max buildable", value: "maximum buildable floor area = FAR_limit x lot area", source: "zoning convention" },
+    ],
+  },
   "blended-mortgage-rate": {
     formula: "combined = balance_1 + balance_2; blended = (balance_1 x rate_1 + balance_2 x rate_2) / combined; monthly_interest = (balance_1 x rate_1 + balance_2 x rate_2) / 1200.",
     edition: "Blended mortgage rate (the balance-weighted average cost of debt across two loans), by name; the actual loan documents govern.",

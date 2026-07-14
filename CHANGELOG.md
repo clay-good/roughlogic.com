@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(real-estate): spec-v784 floor area ratio (zoning); 2026-07-14
+
+- New tile `floor-area-ratio` (Group X, calc-realestate.js): the zoning intensity measure a site's buildable size turns
+  on. `FAR = gross building floor area / lot area`; where a limit is set, `max buildable = FAR_limit x lot area` and the
+  remaining capacity is that minus the existing floor area. A 30,000 SF building on a 20,000 SF lot is FAR 1.5; a 2.0 cap
+  allows 40,000 SF, so 10,000 SF remains. The note flags that what counts as floor area (parking, basements, mechanical)
+  varies by municipality, so the local code's definition governs. Fuzzer pins the FAR, the cap/remaining, the within
+  flag, the no-limit branch, and the error seams. Home count 1,232 -> 1,233.
+
 ### feat(mechanic): spec-v783 battery reserve capacity to amp-hours; 2026-07-14
 
 - New tile `reserve-capacity-amp-hours` (Group K, calc-mechanic.js): the amp-hours behind a battery's reserve-capacity

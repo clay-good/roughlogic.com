@@ -500,6 +500,7 @@ const _TILES = [
   ["drink-abv-dilution", "O"],
   ["overrun-percent", "O"],
   ["reserve-capacity-amp-hours", "K"],
+  ["floor-area-ratio", "X"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

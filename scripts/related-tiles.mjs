@@ -104,6 +104,7 @@ const RELATED = {
   "required-face-rent": ["net-effective-rent", "commercial-load-factor", "rental-worksheet", "cap-rate-dscr"],
   "commercial-load-factor": ["net-effective-rent", "square-footage", "rental-worksheet"],
   "blended-mortgage-rate": ["piti", "mortgage-point-breakeven", "loan-payment"],
+  "floor-area-ratio": ["square-footage", "commercial-load-factor", "required-face-rent"],
   "cantilever-beam": ["beam-loading", "beam-reactions", "section-properties", "joist-deflection"],
   "section-properties": ["cantilever-beam", "beam-loading", "combined-stress-axial-bending", "metal-weight"],
   "combined-stress-axial-bending": ["section-properties", "cantilever-beam", "wood-combined-bending-axial", "steel-h1-interaction"],

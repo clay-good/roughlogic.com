@@ -2466,6 +2466,7 @@ cross-check.
 | calc-realestate.js | `computeDebtYield` | `{ mode = "yield", noi = 0, loan = 0, dy_target = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeDepreciationRecapture` | `{ asset_class = "1250", accumulated_depreciation = 0, total_gain = 0, ordinar...` | _ | _ | _ |
 | calc-realestate.js | `computeFixFlipProfit` | `{ arv_usd = 0, purchase_usd = 0, rehab_usd = 0, holding_usd = 0, financing_us...` | _ | _ | _ |
+| calc-realestate.js | `computeFloorAreaRatio` | `{ building_floor_area_sf = 0, lot_area_sf = 0, far_limit = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeGrossRentMultiplier` | `{ price = 0, gross_rent = 0, rent_basis = "annual", market_grm = 0 } = {}` | _ | _ | _ |
 | calc-realestate.js | `computeHudFmr` | `input` | _ | _ | _ |
 | calc-realestate.js | `computeLTV` | `{ loan_amount, value }` | _ | _ | _ |
@@ -2893,7 +2894,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1479.
+Row count: 1480.
 
 <!-- END function-corpus-v14 -->
 
@@ -4212,7 +4213,7 @@ per spec-v14 §13.1 second paragraph.
 | `serial-dilution` | Serial Dilution Planner | Project (first-principles); 1.0 stock / DF 10 / volume 0.001 / 5 steps -> transfer 0.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `substrate-for-velocity` | Substrate for a Target Fraction of Vmax (Michaelis-Menten Inverse) | Enzyme kinetics (Michaelis-Menten equ...; spec-v635 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group X Real Estate (34 tiles)
+### Group X Real Estate (35 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4231,6 +4232,7 @@ per spec-v14 §13.1 second paragraph.
 | `dti` | Debt-to-Income (DTI) | FNMA / FHA / VA underwriting guidelin...; Worked example: $7500/mo income, $2100 housing, $600 othe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `exchange-1031-timeline` | IRC §1031 Exchange Timeline | 26 USC 1031 / Treas. Reg. 1.1031(k)-1...; Worked example: sale-close 2026-03-01 -> identification 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fix-flip-profit` | Fix-and-Flip Profit and Return | real-estate-investing practice; spec-v402 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `floor-area-ratio` | Floor Area Ratio (Zoning) | Floor area ratio (municipal zoning in...; 30,000 SF building on a 20,000 SF lot -> FAR 1.5; 2.0 cap... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gross-rent-multiplier` | Gross Rent Multiplier | Appraisal Institute income-approach (...; $300,000 / $36,000 annual -> GRM 8.33, yield 12% | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hud-fmr` | HUD Fair Market Rents | HUD PD&R Fair Market Rents FY2026 (fe...; Worked example: San Francisco-Oakland-Berkeley HUD Metro ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `loan-limits` | FHFA / FHA / VA Loan Limits by County | FHFA / HUD / VA (federal-published, 2...; Worked example: San Francisco, CA (FIPS 06075) returns th... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4311,6 +4313,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1232. Fixture-covered or reference-cadence: 1232 / 1232.
+Tile count: 1233. Fixture-covered or reference-cadence: 1233 / 1233.
 
 <!-- END tile-index-v14 -->
