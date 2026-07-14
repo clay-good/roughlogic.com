@@ -6247,6 +6247,50 @@ const _renderShaftTorsion = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["shaft-torsion"] = _renderShaftTorsion;
 
+// shaft-diameter-for-torsion: inverse of shaft-torsion (solid shaft). The forward tile gives the shear stress from the
+// diameter; the inverse recovers the minimum solid-shaft diameter that keeps the max surface shear stress within an
+// allowable, so a designer sizes the shaft to a torsional-stress limit. For a solid shaft tau = 16 T / (pi d^3), so
+// d = (16 T / (pi tau_allow))^(1/3). The angle of twist at that diameter is reported when a length and G are entered.
+// dims: in { T_lbin: M L^2 T^-2, tau_allow_psi: M L^-1 T^-2, L_in: L, G_psi: M L^-1 T^-2 } out: { d_in: L, J_in4: L^4, theta_deg: dimensionless }
+export function computeShaftDiameterForTorsion({ T_lbin = 0, tau_allow_psi = 0, L_in = 0, G_psi = 11.5e6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(T_lbin) || 0;
+  const tau = Number(tau_allow_psi) || 0;
+  const L = Number(L_in) || 0;
+  const G = Number(G_psi) || 0;
+  if (!(T > 0)) return { error: "Torque must be positive (lb-in)." };
+  if (!(tau > 0)) return { error: "Allowable shear stress must be positive (psi)." };
+  const d_in = Math.cbrt(16 * T / (Math.PI * tau));
+  const J_in4 = Math.PI * Math.pow(d_in, 4) / 32;
+  let theta_rad = null, theta_deg = null;
+  if (L > 0 && G > 0) { theta_rad = T * L / (J_in4 * G); theta_deg = theta_rad * 180 / Math.PI; }
+  if (![d_in, J_in4].every(Number.isFinite)) return { error: "Shaft-diameter math is not a finite value." };
+  return {
+    d_in, J_in4, theta_rad, theta_deg,
+    note: "Minimum SOLID-shaft diameter for an allowable torsional shear stress: from tau = 16 T / (pi d^3), d = (16 T / (pi tau_allow))^(1/3). Stress falls with the cube of the diameter, so a small size bump drops the stress fast; round UP to a stock size. Use an allowable that already includes the factor of safety (a common design value is a fraction of the yield shear). This sizes for STRESS only - a shaft can pass stress but still twist too much, so check the angle of twist (shown when a length and G are entered) against the service limit, and note this is pure torsion with no bending, axial load, or keyway/shoulder stress concentration. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const shaftDiameterForTorsionExample = { inputs: { T_lbin: 12000, tau_allow_psi: 8000, L_in: 24, G_psi: 11.5e6 } };
+
+const _renderShaftDiameterForTorsion = _simpleRenderer({
+  citation: "Citation: circular-shaft torsion first-principles (mechanics of materials), solid shaft, solved for the diameter: tau = 16 T / (pi d^3) -> d = (16 T / (pi tau_allow))^(1/3); J = pi d^4 / 32, theta = T L / (J G). Elastic prismatic circular section, pure torsion (no keyway stress concentration). A design aid, not a substitute for the engineer of record.",
+  example: shaftDiameterForTorsionExample.inputs,
+  fields: [
+    { key: "T_lbin", label: "Torque T (lb-in)", kind: "number" },
+    { key: "tau_allow_psi", label: "Allowable shear stress (psi)", kind: "number" },
+    { key: "L_in", label: "Length for twist L (in, optional)", kind: "number" },
+    { key: "G_psi", label: "Shear modulus G (psi; 11.5e6 steel)", kind: "number", default: 11500000 },
+  ],
+  outputs: [
+    { key: "d", id: "sdt-out-d", label: "Minimum solid-shaft diameter", value: (r) => fmt(r.d_in, 3) + " in" },
+    { key: "j", id: "sdt-out-j", label: "Polar moment J at that diameter", value: (r) => fmt(r.J_in4, 4) + " in^4" },
+    { key: "th", id: "sdt-out-th", label: "Angle of twist", value: (r) => r.theta_deg == null ? "(enter length and G)" : fmt(r.theta_deg, 2) + " deg (" + fmt(r.theta_rad, 4) + " rad)" },
+    { key: "n", id: "sdt-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeShaftDiameterForTorsion,
+});
+CONSTRUCTION_RENDERERS["shaft-diameter-for-torsion"] = _renderShaftDiameterForTorsion;
+
 // dims: in { E_psi: M L^-1 T^-2, alpha: dimensionless, dT_F: T, A_in2: L^2, L_in: L, restraint: dimensionless } out: { sigma_psi: M L^-1 T^-2, F_lb: M L T^-2, free_delta_in: L }
 export function computeThermalStressRestrained({ E_psi = 0, alpha = 0, dT_F = 0, A_in2 = 0, L_in = 0, restraint = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

@@ -49,6 +49,7 @@ const RELATED = {
   "reorder-point": ["eoq-order-quantity", "inventory-turnover", "equipment-hourly-rate"],
   "units-of-production-depr": ["straight-line-depreciation", "declining-balance-depreciation", "macrs-depreciation"],
   "shaft-torsion": ["driveshaft-crit", "section-properties", "motor-shaft-torque", "hp-from-torque"],
+  "shaft-diameter-for-torsion": ["shaft-torsion", "motor-shaft-torque", "hp-from-torque"],
   "thermal-stress-restrained": ["thermal-stress-max-deltat", "pipe-expansion", "pipe-expansion-loop", "conduit-thermal-expansion"],
   "thermal-stress-max-deltat": ["thermal-stress-restrained", "pipe-expansion", "pipe-expansion-loop", "conduit-thermal-expansion"],
   "hoop-stress-thin-wall": ["hoop-stress-mawp", "pipe-pressure-rating", "tank-volume", "combined-stress-axial-bending"],

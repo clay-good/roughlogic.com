@@ -49652,6 +49652,27 @@
    }
   },
   {
+   "tile_id": "shaft-diameter-for-torsion",
+   "source_publisher": "mechanics of materials (solid shaft, solved for diameter)",
+   "source_title": "12,000 lb-in torque, 8,000 psi allowable -> 1.97 in min solid shaft",
+   "source_edition_or_year": "spec-v747 worked example (machine-verified)",
+   "source_section_or_page": "spec-v747 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "T_lbin": 12000,
+    "tau_allow_psi": 8000
+   },
+   "outputs": {
+    "d_in": {
+     "value": 1.9695,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "shaft-torsion",
    "source_publisher": "mechanics of materials",
    "source_title": "cross-check: a 2 in shaft drops stress 58% and twist to a third -> 7,640 psi, 0.91 deg",

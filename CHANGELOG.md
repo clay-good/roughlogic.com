@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(construction): spec-v747 solid shaft diameter for an allowable torsion (shaft-torsion inverse); 2026-07-14
+
+- New tile `shaft-diameter-for-torsion` (Group E, calc-construction.js): the minimum solid-shaft diameter that keeps the
+  torsional shear stress within an allowable. `d = (16 T / (pi tau_allow))^(1/3)`. A 12,000 lb-in torque at an 8,000 psi
+  allowable needs ~1.97 in. Reports the angle of twist with a length and G. Round-trips through `shaft-torsion`. Opens
+  Explore sweep #14. Home tile count 1,195 -> 1,196.
+
 ### feat(hvac): spec-v746 pipe insulation thickness for a target heat loss (pipe-heat-loss-radial inverse); 2026-07-14
 
 - New tile `insulation-thickness-for-heat-loss` (Group C, calc-hvac.js): the insulation thickness that caps radial pipe

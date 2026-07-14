@@ -16906,6 +16906,31 @@ test("bounds: spec-v359 computeShaftTorsion pins J/tau/theta, the d^3/d^4 levera
   assert.ok("error" in _v359({ T_lbin: Infinity, d_in: 1.5 }));
 });
 
+import { computeShaftDiameterForTorsion as _v747 } from "../../calc-construction.js";
+test("bounds: spec-v747 solid shaft diameter for an allowable torsion (inverse of shaft-torsion)", () => {
+  const p = _v747({ T_lbin: 12000, tau_allow_psi: 8000 });
+  assert.ok(Math.abs(p.d_in - 1.9695) < 0.001);
+  assert.ok(Math.abs(p.J_in4 - Math.PI * Math.pow(p.d_in, 4) / 32) < 1e-9);
+  // round-trip: the recovered diameter fed to shaft-torsion (solid) reproduces the allowable stress
+  for (const [T, tau] of [[12000, 8000], [50000, 10000], [3000, 6000], [200000, 12000]]) {
+    const inv = _v747({ T_lbin: T, tau_allow_psi: tau });
+    const fwd = _v359({ T_lbin: T, d_in: inv.d_in, di_in: 0 });
+    assert.ok(Math.abs(fwd.tau_psi - tau) < 1e-6);
+  }
+  // twist reported when length and G given, and it matches the forward at that diameter
+  const tw = _v747({ T_lbin: 12000, tau_allow_psi: 8000, L_in: 24, G_psi: 11.5e6 });
+  const fwdTw = _v359({ T_lbin: 12000, d_in: tw.d_in, di_in: 0, L_in: 24, G_psi: 11.5e6 });
+  assert.ok(Math.abs(tw.theta_deg - fwdTw.theta_deg) < 1e-9);
+  assert.strictEqual(_v747({ T_lbin: 12000, tau_allow_psi: 8000 }).theta_deg, null);
+  // a lower allowable stress needs a bigger shaft; more torque needs a bigger shaft
+  assert.ok(_v747({ T_lbin: 12000, tau_allow_psi: 4000 }).d_in > _v747({ T_lbin: 12000, tau_allow_psi: 8000 }).d_in);
+  assert.ok(_v747({ T_lbin: 24000, tau_allow_psi: 8000 }).d_in > _v747({ T_lbin: 12000, tau_allow_psi: 8000 }).d_in);
+  // error seams
+  assert.ok("error" in _v747({ T_lbin: 0, tau_allow_psi: 8000 }));
+  assert.ok("error" in _v747({ T_lbin: 12000, tau_allow_psi: 0 }));
+  assert.ok("error" in _v747({ T_lbin: Infinity, tau_allow_psi: 8000 }));
+});
+
 test("bounds: spec-v360 computeThermalStressRestrained pins the length-independent stress, the sign, and error seams", () => {
   const r = _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 100, A_in2: 5, L_in: 240, restraint: 1 });
   assert.ok(Math.abs(r.sigma_psi - 18850) < 1);

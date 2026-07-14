@@ -1624,6 +1624,7 @@ cross-check.
 | calc-construction.js | `computeSeismicPdeltaStability` | `{ px_kip = 0, delta_in = 0, ie = 1.0, vx_kip = 0, hsx_in = 0, cd = 0, beta = ...` | _ | _ | _ |
 | calc-construction.js | `computeSeismicStoryDrift` | `{ delta_xe_in = 0, cd = 0, ie = 1.0, hsx_in = 0, drift_ratio = 0.020 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeSeismicVerticalDistribution` | `{ base_shear_kip = 0, period_s = 0, stories = [] } = {}` | _ | _ | _ |
+| calc-construction.js | `computeShaftDiameterForTorsion` | `{ T_lbin = 0, tau_allow_psi = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShaftTorsion` | `{ T_lbin = 0, d_in = 0, di_in = 0, L_in = 0, G_psi = 11.5e6 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeShorePostLoad` | `{ slab_in = 0, unit_weight = 150, form_load = 10, live_load = 50, spacing_x =...` | _ | _ | _ |
 | calc-construction.js | `computeSlidingSnowLoad` | `{ pf_upper_psf = 0, eave_ridge_ft = 0, lower_width_ft = 15 } = {}` | _ | _ | _ |
@@ -2856,7 +2857,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1442.
+Row count: 1443.
 
 <!-- END function-corpus-v14 -->
 
@@ -3392,7 +3393,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (249 tiles)
+### Group E Construction (250 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3561,6 +3562,7 @@ per spec-v14 §13.1 second paragraph.
 | `seismic-story-drift` | Seismic Design Story Drift and Allowable Limit (ASCE 7-22 12.8.6 / 12.12) | ASCE 7-22 12.8.6 / 12.12; spec-v382 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seismic-vertical-distribution` | Vertical Distribution of Seismic Forces (ASCE 7 §12.8.3) | ASCE 7-22 §12.8.3 / §12.8.4 (Eqs. 12....; spec-v477 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `settlement-limit-load` | Allowable Load for a Settlement Limit (NC Clay) | Terzaghi primary consolidation solved...; spec-v648 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `shaft-diameter-for-torsion` | Solid Shaft Diameter for an Allowable Torsion | mechanics of materials (solid shaft, ...; spec-v747 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shaft-torsion` | Shaft Torsional Shear Stress and Angle of Twist | mechanics of materials; spec-v359 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shear-stud-strength` | Composite Shear Stud Strength and Count (AISC 360-22 I8) | AISC 360-22 I8; spec-v411 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shearwall-deflection` | Wood Shear Wall Deflection (SDPWS Eq 4.3-1) | AWC SDPWS Equation 4.3-1 (AWC/APA des...; spec-v274 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4237,6 +4239,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1195. Fixture-covered or reference-cadence: 1195 / 1195.
+Tile count: 1196. Fixture-covered or reference-cadence: 1196 / 1196.
 
 <!-- END tile-index-v14 -->

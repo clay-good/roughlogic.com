@@ -10796,6 +10796,18 @@ export const CITATIONS = {
       { name: "Actual dimensions", value: "uses the entered actual (dressed) dimensions, not nominal", source: "scope of this tile" },
     ],
   },
+  "shaft-diameter-for-torsion": {
+    formula: "d = (16 T / (pi tau_allow))^(1/3) (solid shaft), the inverse of tau = 16 T / (pi d^3); J = pi d^4 / 32; theta = T L / (J G).",
+    edition: "The standard circular-shaft torsion relations (mechanics of materials), solid shaft, solved for the diameter, by name.",
+    freeAccess: "The torsion formulas are published free in any mechanics-of-materials reference. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The minimum solid-shaft diameter for an allowable torsional shear stress, the inverse of tau = 16 T / (pi d^3): d = (16 T / (pi tau_allow))^(1/3). Because stress falls with the cube of the diameter, a small size bump drops the stress fast; round up to a stock size and use an allowable that already includes the factor of safety. This sizes for STRESS only - a shaft can pass stress but still twist too much, so check the angle of twist (returned when a length and G are entered) against the service limit. Pure torsion on an elastic prismatic solid circular shaft: no bending or axial load, and no stress-concentration factor at a keyway, shoulder, or hole (which can multiply the local stress). A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Solid circular section", value: "d = (16 T / (pi tau_allow))^(1/3); J = pi d^4/32", source: "mechanics of materials" },
+      { name: "Pure torsion", value: "no bending or axial load; elastic and prismatic; check the twist separately", source: "mechanics of materials" },
+      { name: "No stress concentration", value: "keyways, shoulders, and holes raise the local stress; not included", source: "scope of this tile" },
+    ],
+  },
   "shaft-torsion": {
     formula: "J = pi(d^4 - di^4)/32; tau = T (d/2)/J (= 16T/(pi d^3) solid); theta = T L/(J G).",
     edition: "The standard circular-shaft torsion relations (mechanics of materials), by name.",

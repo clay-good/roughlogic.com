@@ -19587,6 +19587,31 @@
       "kind": "industry"
     },
     {
+      "term": "shaft diameter for torsion",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "industry"
+    },
+    {
+      "term": "shaft size for torque",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "redirect"
+    },
+    {
+      "term": "min shaft diameter",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "adjacent"
+    },
+    {
+      "term": "shaft diameter for shear stress",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size shaft for torsion",
+      "target": "shaft-diameter-for-torsion",
+      "kind": "adjacent"
+    },
+    {
       "term": "torsional shear stress",
       "target": "shaft-torsion",
       "kind": "industry"
