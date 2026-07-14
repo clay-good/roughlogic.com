@@ -405,6 +405,7 @@ const RELATED = {
   "well-max-yield": ["well-drawdown", "pump-tdh", "pump-eff-w2w", "detention-time"],
   "cooling-water-makeup": ["cooling-tower", "chiller-tons", "pounds-formula"],
   "chlorine-decay": ["disinfection-ct", "pool-turnover", "detention-time"],
+  "chlorine-decay-constant": ["chlorine-decay", "chlorine-demand", "disinfection-ct"],
 
   // Group U / V: Vet + EMS. The most-asked cross-references in the
   // worked-example fixtures.

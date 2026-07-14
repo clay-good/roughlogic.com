@@ -1249,6 +1249,7 @@ import {
   computeWellMaxYield,
   computeCoolingWaterMakeup,
   computeChlorineDecay,
+  computeChlorineDecayConstant,
 } from "../../calc-water.js";
 
 test("bounds: calc-water computePoundsFormula pins the lb/day = MGD * mg/L * 8.34 identity across the chemical sweep", () => {
@@ -1595,6 +1596,39 @@ test("bounds: calc-water computeChlorineDecay pins C(t) = C0*exp(-kt) and the ti
   assert.ok("error" in computeChlorineDecay({ initial_mg_l: 0, decay_k_per_hr: 0.1 }));
   assert.ok("error" in computeChlorineDecay({ initial_mg_l: 2, decay_k_per_hr: 0 }));
   assert.ok("error" in computeChlorineDecay({ initial_mg_l: 2, decay_k_per_hr: 0.1, target_mg_l: 0 }));
+});
+
+test("bounds: calc-water computeChlorineDecayConstant inverts k = ln(C0/C)/t and round-trips through computeChlorineDecay", () => {
+  // Spec example: C0 = 2.0 decays to 0.7358 over 10 hr -> k = ln(2/0.7358)/10 = 0.100 1/hr.
+  const r = computeChlorineDecayConstant({ initial_mg_l: 2.0, residual_mg_l: 0.7358, time_hr: 10 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.decay_k_per_hr - 0.1) < 1e-3, "k ~ 0.100 1/hr");
+  assert.ok(Math.abs(r.half_life_hr - Math.log(2) / r.decay_k_per_hr) < 1e-9, "half-life identity");
+  // Round-trip: recover k from a residual the forward model produces, across a C0/k/t sweep.
+  for (let i = 0; i < 300; i++) {
+    const C0 = 0.5 + (i % 10) * 0.4;              // 0.5 .. 4.1 mg/L
+    const k = 0.02 + ((i * 3) % 25) * 0.02;       // 0.02 .. 0.5 1/hr
+    const t = 1 + (i % 30);                        // 1 .. 30 hr
+    const fwd = computeChlorineDecay({ initial_mg_l: C0, decay_k_per_hr: k, time_hr: t, target_mg_l: 0.2 });
+    assert.ok(!fwd.error, JSON.stringify({ C0, k, t }));
+    const C = fwd.residual_mg_l;
+    if (!(C > 0 && C < C0)) continue;              // model floors are handled by the forward
+    const inv = computeChlorineDecayConstant({ initial_mg_l: C0, residual_mg_l: C, time_hr: t });
+    assert.ok(!inv.error, JSON.stringify({ C0, C, t, inv }));
+    assert.ok(Math.abs(inv.decay_k_per_hr - k) < 1e-6, "recovered k matches: " + inv.decay_k_per_hr + " vs " + k);
+  }
+  // Monotonicity: a lower measured residual (deeper decay) over the same time means a larger k.
+  const slow = computeChlorineDecayConstant({ initial_mg_l: 2.0, residual_mg_l: 1.5, time_hr: 10 });
+  const fast = computeChlorineDecayConstant({ initial_mg_l: 2.0, residual_mg_l: 0.5, time_hr: 10 });
+  assert.ok(fast.decay_k_per_hr > slow.decay_k_per_hr, "lower residual -> larger k");
+  // ... and a larger k means a shorter half-life.
+  assert.ok(fast.half_life_hr < slow.half_life_hr, "larger k -> shorter half-life");
+  // Documented rejections.
+  assert.ok("error" in computeChlorineDecayConstant({ initial_mg_l: 0, residual_mg_l: 0.5, time_hr: 10 }));
+  assert.ok("error" in computeChlorineDecayConstant({ initial_mg_l: 2, residual_mg_l: 0, time_hr: 10 }));
+  assert.ok("error" in computeChlorineDecayConstant({ initial_mg_l: 2, residual_mg_l: 0.5, time_hr: 0 }));
+  assert.ok("error" in computeChlorineDecayConstant({ initial_mg_l: 1, residual_mg_l: 1.5, time_hr: 10 }), "residual above initial rejected");
+  assert.ok("error" in computeChlorineDecayConstant({ initial_mg_l: 2, residual_mg_l: 2, time_hr: 10 }), "residual equal to initial rejected");
 });
 
 // --------------------------------------------------------------------

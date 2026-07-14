@@ -186,6 +186,7 @@ export const COMPUTE_MAP = {
   "well-max-yield": { module: "../../calc-water.js", fn: "computeWellMaxYield" },
   "cooling-water-makeup": { module: "../../calc-water.js", fn: "computeCoolingWaterMakeup" },
   "chlorine-decay": { module: "../../calc-water.js", fn: "computeChlorineDecay" },
+  "chlorine-decay-constant": { module: "../../calc-water.js", fn: "computeChlorineDecayConstant" },
   "detention-time": { module: "../../calc-water.js", fn: "computeDetentionTime" },
   "detention-basin-volume": { module: "../../calc-water.js", fn: "computeDetentionBasinVolume" },
   "spl-distance": { module: "../../calc-stage.js", fn: "computeSPL" },

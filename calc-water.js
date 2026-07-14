@@ -1300,6 +1300,73 @@ function _v16w_renderChlorineDecay(inputRegion, outputRegion, citationEl) {
 }
 WATER_RENDERERS["chlorine-decay"] = _v16w_renderChlorineDecay;
 
+// dims: in { initial_mg_l: dimensionless, residual_mg_l: dimensionless, time_hr: dimensionless } out: { decay_k_per_hr: dimensionless, half_life_hr: dimensionless }
+// Inverse of the chlorine-decay tile: given an initial residual and a
+// measured residual after an elapsed time (a distribution bottle test),
+// back out the first-order decay constant. C = C0 * exp(-k*t), so
+// k = ln(C0 / C) / t. Half-life = ln(2) / k.
+export function computeChlorineDecayConstant({
+  initial_mg_l = 0,
+  residual_mg_l = 0,
+  time_hr = 0,
+} = {}) {
+  const C0 = Number(initial_mg_l);
+  const C = Number(residual_mg_l);
+  const t = Number(time_hr);
+  if (!Number.isFinite(C0) || C0 <= 0) return { error: "Enter a positive initial free-chlorine residual (mg/L)." };
+  if (!Number.isFinite(C) || C <= 0) return { error: "Enter a positive measured residual (mg/L)." };
+  if (!Number.isFinite(t) || t <= 0) return { error: "Elapsed time must be positive (hr)." };
+  if (C >= C0) return { error: "Measured residual must be below the initial residual (chlorine decays over time)." };
+
+  const decay_k_per_hr = Math.log(C0 / C) / t;
+  const half_life_hr = Math.log(2) / decay_k_per_hr;
+
+  const warnings = [];
+  if (decay_k_per_hr > 0.5) warnings.push("Decay rate above 0.5 1/hr is outside the typical range and suggests a gross TOC or nitrification issue.");
+
+  return {
+    decay_k_per_hr,
+    half_life_hr,
+    warnings,
+  };
+}
+
+export const chlorineDecayConstantExample = {
+  // C0 = 2.0 mg/L decays to C = 0.7358 mg/L over t = 10 hr:
+  // k = ln(2.0 / 0.7358) / 10 = ln(2.7182) / 10 = 1.0 / 10 = 0.100 1/hr.
+  inputs: { initial_mg_l: 2.0, residual_mg_l: 0.7358, time_hr: 10 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function _v16w_renderChlorineDecayConstant(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-order decay C(t) = C0 x exp(-k x t) solved for the rate constant, k = ln(C0 / C) / t, from an initial and a measured residual over an elapsed time (a distribution bottle test); half-life = ln(2) / k. Per EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality) and AWWA M14. Free at epa.gov and awwa.org.";
+  const c0 = makeNumber("Initial free chlorine (mg/L)", "cdc-c0", { step: "any", min: "0", value: "2.0" });
+  const c = makeNumber("Measured residual after time (mg/L)", "cdc-c", { step: "any", min: "0", value: "0.7358" });
+  const t = makeNumber("Elapsed time (hr)", "cdc-t", { step: "any", min: "0", value: "10" });
+  for (const f of [c0, c, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    c0.input.value = "2.0"; c.input.value = "0.7358"; t.input.value = "10"; update();
+  });
+
+  const oK = makeOutputLine(outputRegion, "Decay-rate constant k", "cdc-out-k");
+  const oHl = makeOutputLine(outputRegion, "Half-life", "cdc-out-hl");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cdc-out-note");
+
+  const update = debounce(() => {
+    const r = computeChlorineDecayConstant({
+      initial_mg_l: _v16w_readNum(c0.input),
+      residual_mg_l: _v16w_readNum(c.input),
+      time_hr: _v16w_readNum(t.input),
+    });
+    if (r.error) { oK.textContent = r.error; oHl.textContent = "-"; oNote.textContent = ""; return; }
+    oK.textContent = fmt(r.decay_k_per_hr, 3) + " 1/hr";
+    oHl.textContent = fmt(r.half_life_hr, 1) + " hr";
+    oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "First-order model; field decay depends on temperature, TOC, and pipe material.";
+  }, DEBOUNCE_MS);
+  for (const el of [c0.input, c.input, t.input]) el.addEventListener("input", update);
+}
+WATER_RENDERERS["chlorine-decay-constant"] = _v16w_renderChlorineDecayConstant;
+
 // =====================================================================
 // v23 shared simple-renderer (select + number fields). Non-exported.
 // =====================================================================

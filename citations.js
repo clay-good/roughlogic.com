@@ -2120,6 +2120,19 @@ export const CITATIONS = {
     ],
   },
 
+  "chlorine-decay-constant": {
+    formula: "First-order decay C(t) = C0 x exp(-k x t) solved for the rate constant: k = ln(C0 / C) / t, from an initial residual C0 and a measured residual C over an elapsed time t (a distribution bottle test). Half-life = ln(2) / k.",
+    edition: "EPA 815-R-02-020 (Effects of Water Age on Distribution System Water Quality); AWWA M14.",
+    freeAccess: "epa.gov and awwa.org.",
+    governance: GOVERNANCE.water,
+    editionNote: "The back-calculated k is the field decay constant that feeds the forward chlorine-decay and booster-spacing model; it depends on temperature, TOC, and pipe material, so a bottle or pipe-loop test should reflect the actual water and conditions.",
+    assumptions: [
+      { name: "Decay model", value: "bulk first-order C(t) = C0 e^(-kt)", source: "EPA 815-R-02-020 water-age model" },
+      { name: "Measurement", value: "C is the residual measured after time t on the same water sample as C0", source: "AWWA M14 bottle-test method" },
+      { name: "Typical k", value: "0.05-0.20 1/hr depending on TOC and temperature", source: "AWWA M14 / EPA water-age studies" },
+    ],
+  },
+
   "sous-vide-pasteurization": {
     formula: "come_up_seconds = 0.4 * L_m^2 / alpha (Heisler-chart slab approximation at Fo ~ 0.4). hold_minutes from linear interpolation of FDA Food Code Annex 6 Table A at the bath temperature. total = come_up + hold.",
     edition: "FDA Food Code Annex 6 Table A (6.5-log Salmonella reduction). Heisler-chart thermal-diffusion approximation.",

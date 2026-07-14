@@ -3992,6 +3992,31 @@
       "kind": "redirect"
     },
     {
+      "term": "chlorine decay constant from a bottle test",
+      "target": "chlorine-decay-constant",
+      "kind": "question"
+    },
+    {
+      "term": "decay rate from two chlorine readings",
+      "target": "chlorine-decay-constant",
+      "kind": "question"
+    },
+    {
+      "term": "calculate chlorine decay rate",
+      "target": "chlorine-decay-constant",
+      "kind": "question"
+    },
+    {
+      "term": "chlorine decay rate from a field test",
+      "target": "chlorine-decay-constant",
+      "kind": "question"
+    },
+    {
+      "term": "half life of a chlorine residual",
+      "target": "chlorine-decay-constant",
+      "kind": "question"
+    },
+    {
       "term": "chlorine residual decay",
       "target": "chlorine-decay",
       "kind": "industry"

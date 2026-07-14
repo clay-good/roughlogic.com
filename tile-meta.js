@@ -299,7 +299,7 @@ const _TILES = [
   ["coagulant-dose", "M"], ["svi-sludge-index", "M"],
   ["disinfection-ct", "M"],
   ["pool-turnover", "M"], ["well-drawdown", "M"], ["well-max-yield", "M"],
-  ["cooling-water-makeup", "M"], ["chlorine-decay", "M"],
+  ["cooling-water-makeup", "M"], ["chlorine-decay", "M"], ["chlorine-decay-constant", "M"],
 
   ["truss-capacity", "N"], ["time-alignment", "N"], ["dmx-planner", "N"],
   ["neutral-imbalance", "N"], ["spl-distance", "N"], ["spl-distance-for-level", "N"], ["rigging-check", "N"],

@@ -14945,6 +14945,34 @@
    }
   },
   {
+   "tile_id": "chlorine-decay-constant",
+   "source_publisher": "EPA / AWWA",
+   "source_title": "Chlorine decay constant from a bottle test: C0 = 2.0 -> 0.7358 mg/L over 10 hr",
+   "source_edition_or_year": "EPA 815-R-02-020; AWWA M14",
+   "source_section_or_page": "k = ln(2.0/0.7358)/10 = ln(2.7182)/10 = 0.100 1/hr; half-life = ln(2)/0.1 = 6.93 hr",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "initial_mg_l": 2.0,
+    "residual_mg_l": 0.7358,
+    "time_hr": 10
+   },
+   "outputs": {
+    "decay_k_per_hr": {
+     "value": 0.1,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "half_life_hr": {
+     "value": 6.931,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wall-bracing-length",
    "source_publisher": "IRC R602.10 (wall bracing)",
    "source_title": "Required braced-panel length = bracing% x wall-line length",

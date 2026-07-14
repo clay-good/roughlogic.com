@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): spec-v764 chlorine decay constant from a bottle test (chlorine-decay inverse); 2026-07-14
+
+- New tile `chlorine-decay-constant` (Group M, calc-water.js): the first-order decay constant k from an initial and a
+  measured residual over an elapsed time, `k = ln(C0 / C) / t`, with the half-life. A residual falling 2.0 -> 0.7358 mg/L
+  in 10 h gives k = 0.100 1/hr (a 6.93 h half-life). Round-trips through `computeChlorineDecay` across a C0/k/t sweep.
+  calc-water.js gzip cap 28500 -> 30000 B. Home tile count 1,212 -> 1,213.
+
 ### feat(edu): spec-v763 sample size for a target margin of error (confidence-interval inverse); 2026-07-14
 
 - New tile `sample-size-for-margin` (Group Y, calc-edu.js): the sample size needed so a proportion Wald margin of error
