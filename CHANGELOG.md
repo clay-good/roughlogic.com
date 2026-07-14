@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v794 glidepath rate of descent; 2026-07-14
+
+- New tile `glidepath-descent-rate` (Group K, calc-mechanic.js aviation): the rate of descent that holds a glidepath
+  from the ground speed. `ROD = ground speed x 101.27 x tan(angle)` ft/min; path steepness = `6076.12 x tan(angle)` ft/nm
+  -- 318 ft/nm at a standard 3.00 deg ILS, the exact FAA TERPS figure that fixes the tangent form. 120 kt on a 3-degree
+  path is 637 ft/min (the "ground speed x 5" rule rounded). Scales with ground speed, so a tailwind demands a higher
+  descent rate. Fuzzer pins ROD, the TERPS 318 ft/nm, the monotonicity, and the error seams. Raised the calc-mechanic.js
+  gzip cap 46 -> 52 KB for engine-bmep + the aviation cluster (the module was at 99.4%). Explore sweep #22 entry 3. Home
+  count 1,242 -> 1,243.
+
 ### feat(concrete): spec-v793 fresh concrete temperature (ACI 305.1); 2026-07-14
 
 - New tile `fresh-concrete-temp` (Group E, calc-concrete.js): the batch temperature the concrete-evaporation-rate tile

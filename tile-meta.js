@@ -510,6 +510,7 @@ const _TILES = [
   ["engine-bmep", "K"],
   ["compressor-displacement", "C"],
   ["fresh-concrete-temp", "E"],
+  ["glidepath-descent-rate", "K"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

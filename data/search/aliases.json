@@ -23872,6 +23872,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "required rate of descent",
+      "target": "glidepath-descent-rate",
+      "kind": "question"
+    },
+    {
+      "term": "glidepath descent rate",
+      "target": "glidepath-descent-rate",
+      "kind": "industry"
+    },
+    {
+      "term": "fpm for a 3 degree glideslope",
+      "target": "glidepath-descent-rate",
+      "kind": "question"
+    },
+    {
+      "term": "feet per nautical mile descent",
+      "target": "glidepath-descent-rate",
+      "kind": "question"
+    },
+    {
+      "term": "descent rate from ground speed",
+      "target": "glidepath-descent-rate",
+      "kind": "question"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -1025,6 +1025,7 @@ const RELATED = {
   "reserve-capacity-amp-hours": ["standby-battery-sizing","fuel-range","abyc-dc-wire"],
   "sacrificial-anode-life": ["abyc-dc-wire","prop-slip","reserve-capacity-amp-hours"],
   "engine-bmep": ["displacement-cr","volumetric-efficiency","hp-from-torque"],
+  "glidepath-descent-rate": ["density-altitude","crosswind-component","aircraft-weight-balance"],
   "compressor-displacement": ["refrigerant-mass-flow","recovery-cylinder","evaporator-td-dtd"],
   "fresh-concrete-temp": ["concrete-evaporation-rate","concrete-strength-gain","concrete-maturity"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],

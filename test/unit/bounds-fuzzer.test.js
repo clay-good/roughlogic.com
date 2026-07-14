@@ -21701,6 +21701,23 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
+import { computeGlidepathDescentRate as _v794 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v794 computeGlidepathDescentRate pins ROD, the TERPS 318 ft/nm, monotonicity, and error seams", () => {
+  const r = _v794({ ground_speed_kt: 120, glidepath_angle_deg: 3 });
+  assert.ok(Math.abs(r.rod_fpm - 636.9) < 0.5); // 120 * 101.27 * tan(3)
+  assert.ok(Math.abs(r.ft_per_nm - 318.4) < 0.5); // 6076.12 * tan(3) -> TERPS 318
+  // ROD scales linearly with ground speed; steeper path descends faster; ft/nm is speed-independent.
+  assert.ok(Math.abs(_v794({ ground_speed_kt: 240, glidepath_angle_deg: 3 }).rod_fpm - 2 * r.rod_fpm) < 1);
+  assert.ok(_v794({ ground_speed_kt: 120, glidepath_angle_deg: 6 }).rod_fpm > r.rod_fpm);
+  assert.ok(Math.abs(_v794({ ground_speed_kt: 90, glidepath_angle_deg: 3 }).ft_per_nm - r.ft_per_nm) < 1e-9);
+  // Error seams: non-finite, non-positive ground speed, angle out of (0, 90).
+  assert.ok("error" in _v794({ ground_speed_kt: Infinity, glidepath_angle_deg: 3 }));
+  assert.ok("error" in _v794({ ground_speed_kt: 0, glidepath_angle_deg: 3 }));
+  assert.ok("error" in _v794({ ground_speed_kt: 120, glidepath_angle_deg: 0 }));
+  assert.ok("error" in _v794({ ground_speed_kt: 120, glidepath_angle_deg: 90 }));
+});
+
 import { computeEngineBmep as _v791 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v791 computeEngineBmep pins the 4-stroke / 2-stroke BMEP, monotonicity, and error seams", () => {

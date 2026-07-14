@@ -2393,3 +2393,41 @@ MECHANIC_RENDERERS["engine-bmep"] = _simpleRenderer({
   ],
   compute: computeEngineBmep,
 });
+
+// ===================== spec-v794: required rate of descent on a glidepath =====================
+// Ground speed is the horizontal velocity; the descent right triangle gives vertical drop per
+// horizontal unit = tan(gamma). ROD(ft/min) = GS(kt) x tan(gamma), converting nm/hr to ft/min by
+// x 6076.12 ft/nm / 60 min = x 101.269. Feet-per-nm = 6076.12 x tan(gamma) (TERPS: 318 ft/nm at 3.00 deg).
+// dims: in { ground_speed_kt: L T^-1, glidepath_angle_deg: dimensionless } out: { rod_fpm: L T^-1, ft_per_nm: dimensionless }
+export function computeGlidepathDescentRate({ ground_speed_kt = 0, glidepath_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const gs = Number(ground_speed_kt) || 0;
+  const ang = Number(glidepath_angle_deg) || 0;
+  if (!(gs > 0)) return { error: "Ground speed must be positive (kt)." };
+  if (!(ang > 0 && ang < 90)) return { error: "Glidepath angle must be over 0 and under 90 degrees." };
+  const rad = Math.PI / 180;
+  const tan = Math.tan(ang * rad);
+  const rod_fpm = gs * 101.269 * tan;
+  const ft_per_nm = 6076.12 * tan;
+  if (![rod_fpm, ft_per_nm].every(Number.isFinite)) return { error: "Glidepath descent-rate math is not a finite value." };
+  return {
+    rod_fpm, ft_per_nm, tan,
+    note: "Required rate of descent to hold a glidepath: ground speed is the horizontal velocity, and the glidepath angle sets the vertical drop per horizontal foot (tan of the angle), so ROD = ground speed x 101.27 x tan(angle) feet per minute (the 101.27 converts knots, which are nautical miles per hour, to feet per minute). The path steepness itself is 6076.12 x tan(angle) feet per nautical mile -- 318 ft/nm at a standard 3.00 degree ILS, the exact FAA TERPS figure that fixes the tangent (not sine) form. Because the descent rate scales with GROUND speed, a tailwind or a faster true airspeed demands a higher rate of descent to stay on the same path, and the handy 'ground speed x 5' rule (about 600 fpm at 120 kt on a 3-degree path) is this relation rounded. A planning aid, not a clearance; the approach chart, the flight director, and the pilot in command govern.",
+  };
+}
+export const glidepathDescentRateExample = { inputs: { ground_speed_kt: 120, glidepath_angle_deg: 3 } };
+
+MECHANIC_RENDERERS["glidepath-descent-rate"] = _simpleRenderer({
+  citation: "Citation: required rate of descent on a glidepath (FAA Instrument Flying Handbook; TERPS Order 8260.3): ROD(fpm) = ground_speed(kt) x 101.27 x tan(angle); path steepness = 6076.12 x tan(angle) ft/nm (318 ft/nm at 3.00 deg, the TERPS value fixing the tangent form). ROD scales with ground speed, so a tailwind demands a higher descent rate. A planning aid; the approach chart and the pilot in command govern.",
+  example: glidepathDescentRateExample.inputs,
+  fields: [
+    { key: "ground_speed_kt", label: "Ground speed (kt)", kind: "number", default: 120 },
+    { key: "glidepath_angle_deg", label: "Glidepath angle (deg, 3.0 typical ILS)", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "r", id: "gprd-out-r", label: "Required rate of descent", value: (r) => fmt(r.rod_fpm, 0) + " ft/min" },
+    { key: "g", id: "gprd-out-g", label: "Path steepness", value: (r) => fmt(r.ft_per_nm, 0) + " ft/nm" },
+    { key: "n", id: "gprd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeGlidepathDescentRate,
+});

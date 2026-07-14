@@ -24522,6 +24522,33 @@
    }
   },
   {
+   "tile_id": "glidepath-descent-rate",
+   "source_publisher": "FAA Instrument Flying Handbook; TERPS Order 8260.3",
+   "source_title": "rod_fpm = ground_speed_kt x 101.27 x tan(angle); ft_per_nm = 6076.12 x tan(angle)",
+   "source_edition_or_year": "spec-v794 worked example (machine-verified)",
+   "source_section_or_page": "120 kt on a 3.0 deg glidepath -> 637 ft/min, 318 ft/nm (TERPS)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "ground_speed_kt": 120,
+    "glidepath_angle_deg": 3
+   },
+   "outputs": {
+    "rod_fpm": {
+     "value": 636.9,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "ft_per_nm": {
+     "value": 318.4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "engine-bmep",
    "source_publisher": "Brake mean effective pressure (SAE; Heywood)",
    "source_title": "BMEP = 150.8 x torque(lb-ft) / displacement(CID), 4-stroke",

@@ -9661,6 +9661,17 @@ export const CITATIONS = {
       { name: "Reserve rate", value: "25 A draw to a 10.5 V cutoff at 80 F on a 12 V battery", source: "BCI / SAE J537" },
     ],
   },
+  "glidepath-descent-rate": {
+    formula: "rod_fpm = ground_speed_kt x 101.269 x tan(glidepath_angle); ft_per_nm = 6076.12 x tan(glidepath_angle). The 101.269 converts knots (nm/hr) to ft/min (x 6076.12 / 60).",
+    edition: "Required rate of descent on a glidepath (FAA Instrument Flying Handbook; TERPS Order 8260.3), by name; the approach chart and the pilot in command govern.",
+    freeAccess: "The descent-triangle trigonometry is first-principles; the glidepath angle and ground speed come from the approach and the flight instruments.",
+    governance: GOVERNANCE.general,
+    editionNote: "Required rate of descent to hold a glidepath: ground speed is the horizontal velocity, and the glidepath angle sets the vertical drop per horizontal foot (its tangent), so ROD = ground speed x 101.27 x tan(angle) feet per minute (101.27 converts knots -- nautical miles per hour -- to feet per minute). The path steepness is 6076.12 x tan(angle) feet per nautical mile: 318 ft/nm at a standard 3.00 degree ILS, the exact FAA TERPS figure that fixes the tangent (not sine) form. Because the descent rate scales with GROUND speed, a tailwind or a faster true airspeed demands a higher rate of descent to stay on the same path; the 'ground speed x 5' rule (about 600 fpm at 120 kt on a 3-degree path) is this relation rounded. A planning aid, not a clearance.",
+    assumptions: [
+      { name: "Tangent form", value: "the vertical rate uses tan(angle), fixed by TERPS's 318 ft/nm at 3.00 degrees (not sine)", source: "FAA TERPS 8260.3" },
+      { name: "Ground speed drives it", value: "ROD scales with ground speed, so wind and true airspeed change the required rate", source: "FAA IFH" },
+    ],
+  },
   "engine-bmep": {
     formula: "BMEP(psi) = 150.8 x torque(lb-ft) / displacement(CID) for a 4-stroke (75.4 for a 2-stroke); from BMEP = 2*pi*n_rev*T/V_d with T in lb-in and V_d in in^3.",
     edition: "Brake mean effective pressure (SAE; Heywood, Internal Combustion Engine Fundamentals), by name; the engine and its dyno sheet govern.",

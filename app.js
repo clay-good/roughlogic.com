@@ -877,6 +877,7 @@ const TOOL_MODULES = (() => {
     "reserve-capacity-amp-hours",
     "sacrificial-anode-life",
     "engine-bmep",
+    "glidepath-descent-rate",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached
