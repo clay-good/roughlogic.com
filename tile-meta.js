@@ -287,7 +287,7 @@ const _TILES = [
   ["drawbar-power", "L"], ["drawbar-pull", "L"], ["irrigation-uniformity", "L"], ["bulk-density", "L"],
   ["crop-yield", "L"], ["thi-livestock", "L"], ["sprayer-calibration", "L"],
   ["irrigation-requirement", "L"], ["cattle-stocking-rate", "L"],
-  ["grain-bin-capacity", "L"], ["npk-blend", "L"], ["tank-mix", "L"],
+  ["grain-bin-capacity", "L"], ["grain-bin-height-for-capacity", "L"], ["npk-blend", "L"], ["tank-mix", "L"],
   ["grain-shrink-moisture", "L"], ["livestock-dry-matter-intake", "L"], ["manure-application-rate", "L"],
 
   ["pounds-formula", "M"], ["filter-loading", "M"], ["detention-time", "M"],

@@ -1120,6 +1120,50 @@ export const grainBinExample = {
   inputs: { diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 },
 };
 
+// dims: in { target_bushels: dimensionless, diameter_ft: L, peak_height_ft: L, packing_factor: dimensionless } out: { eave_height_ft: L }
+export function computeGrainBinHeightForCapacity({ target_bushels = 0, diameter_ft = 0, peak_height_ft = 0, packing_factor = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_bushels) || 0;
+  const d = Number(diameter_ft) || 0;
+  const peak = Number(peak_height_ft) || 0;
+  const pack = Number(packing_factor) || 1.0;
+  if (!(target > 0)) return { error: "Target capacity must be positive (bushels)." };
+  if (!(d > 0)) return { error: "Bin diameter must be positive (ft)." };
+  if (peak < 0) return { error: "Peak height cannot be negative." };
+  if (!(pack > 0)) return { error: "Packing factor must be positive." };
+  const area_ft2 = Math.PI * (d / 2) * (d / 2);
+  const cone_ft3 = (1 / 3) * area_ft2 * peak;
+  const target_ft3 = target / BUSHELS_PER_FT3;
+  // Inverse of total_bushels = (area x eave + cone) x pack x 0.8036: eave = (target_ft3/pack - cone) / area.
+  const eave_height_ft = (target_ft3 / pack - cone_ft3) / area_ft2;
+  if (!Number.isFinite(eave_height_ft) || !(eave_height_ft > 0)) return { error: "The roof-cone capacity alone already meets the target at this diameter; no wall height is needed (lower the peak, narrow the bin, or raise the target)." };
+  return {
+    eave_height_ft, area_ft2, cone_bushels: cone_ft3 * pack * BUSHELS_PER_FT3,
+    note: "The eave (wall) height a round bin needs to hold a target capacity, the inverse of the grain-bin-capacity tile: from bushels = (floor_area x eave + roof_cone) x packing x 0.8036, eave = (target_ft3/packing - cone_ft3) / floor_area, with 1 ft^3 = 0.8036 bushels. If a peaked (coned) fill is entered, its volume is credited first, so the wall is shorter. Capacity grows with the SQUARE of the diameter but only linearly with the wall, which is why a wider bin holds far more per foot of steel - doubling the diameter quarters the wall height for the same bushels. This is the geometric fill volume, not a structural or aeration check; the bin manufacturer's rated capacity and the wall/foundation design govern."
+  };
+}
+export const grainBinHeightForCapacityExample = { inputs: { target_bushels: 12875, diameter_ft: 30, peak_height_ft: 8, packing_factor: 1.0 } };
+
+function renderGrainBinHeightForCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: bin geometry solved for the wall height: eave = (target_ft3/packing - roof_cone_ft3) / floor_area, from bushels = (area x eave + cone) x packing x 0.8036 (1 bushel = 1.2445 ft^3). A geometric fill volume; the bin manufacturer's rated capacity and the structure govern.";
+  const bu = makeNumber("Target capacity (bushels)", "gbh-bu", { step: "any", min: "0", value: "12875" });
+  const d = makeNumber("Bin diameter (ft)", "gbh-d", { step: "any", min: "0", value: "30" });
+  const peak = makeNumber("Roof/peak cone height (ft, 0 = flat)", "gbh-peak", { step: "any", min: "0", value: "8" });
+  const pack = makeNumber("Packing factor", "gbh-pack", { step: "any", min: "0", value: "1.0" });
+  bu.input.value = "12875"; d.input.value = "30"; peak.input.value = "8"; pack.input.value = "1.0";
+  for (const f of [bu, d, peak, pack]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bu.input.value = "12875"; d.input.value = "30"; peak.input.value = "8"; pack.input.value = "1.0"; update(); });
+  const oEave = makeOutputLine(outputRegion, "Required eave (wall) height", "gbh-out-eave");
+  const oNote = makeOutputLine(outputRegion, "Note", "gbh-out-note");
+  const update = debounce(() => {
+    const r = computeGrainBinHeightForCapacity({ target_bushels: Number(bu.input.value) || 0, diameter_ft: Number(d.input.value) || 0, peak_height_ft: Number(peak.input.value) || 0, packing_factor: Number(pack.input.value) || 1.0 });
+    if (r.error) { oEave.textContent = r.error; oNote.textContent = ""; return; }
+    oEave.textContent = fmt(r.eave_height_ft, 1) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bu, d, peak, pack]) f.input.addEventListener("input", update);
+}
+
 function renderGrainBin(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Bin geometry first-principles (cylinder + cone); bushels = ft^3 x 0.8036 (1 bushel = 1.2445 ft^3); test weights per USDA FGIS (Federal Grain Inspection Service) standards. Free at ams.usda.gov/services/grain-inspection.";
   const d = makeNumber("Bin diameter (ft)", "gb-d", { step: "any", min: "0", value: "30" });
@@ -1503,6 +1547,7 @@ export const AGRICULTURE_RENDERERS = {
   "irrigation-requirement": renderIrrigationRequirement,
   "cattle-stocking-rate":   renderStockingRate,
   "grain-bin-capacity":     renderGrainBin,
+  "grain-bin-height-for-capacity": renderGrainBinHeightForCapacity,
   "npk-blend":              renderNpkBlend,
   "tank-mix":               renderTankMix,
 };

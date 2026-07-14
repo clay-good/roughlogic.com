@@ -14086,6 +14086,52 @@
    }
   },
   {
+   "tile_id": "grain-bin-height-for-capacity",
+   "source_publisher": "Bin geometry first-principles (inverse)",
+   "source_title": "eave = (target_ft3/packing - roof_cone_ft3) / floor_area",
+   "source_edition_or_year": "spec-v690 worked example (machine-verified)",
+   "source_section_or_page": "12,875 bu, 30 ft dia, 8 ft cone, free-flow -> 20 ft wall (round-trips grain-bin-capacity)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_bushels": 12875.377667766263,
+    "diameter_ft": 30,
+    "peak_height_ft": 8,
+    "packing_factor": 1
+   },
+   "outputs": {
+    "eave_height_ft": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "grain-bin-height-for-capacity",
+   "source_publisher": "Bin geometry first-principles (inverse)",
+   "source_title": "cross-check: a wider 42 ft bin needs a much shorter wall for the same bushels",
+   "source_edition_or_year": "spec-v690 cross-check (machine-verified)",
+   "source_section_or_page": "12,875 bu, 42 ft dia, 8 ft cone -> about 8.9 ft wall (capacity scales with diameter squared)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_bushels": 12875.377667766263,
+    "diameter_ft": 42,
+    "peak_height_ft": 8,
+    "packing_factor": 1
+   },
+   "outputs": {
+    "eave_height_ft": {
+     "value": 8.9,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "npk-blend",
    "source_publisher": "USDA NRCS",
    "source_title": "NPK blend: corn (150-60-40 demand), soil credit 20-10-15 lb/acre, 80 acres, default straights",

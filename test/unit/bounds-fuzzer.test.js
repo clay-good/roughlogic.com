@@ -3132,6 +3132,7 @@ import {
   computeIrrigationRequirement,
   computeStockingRate,
   computeGrainBin,
+  computeGrainBinHeightForCapacity,
   computeNpkBlend,
   computeTankMix,
   computeTHI,
@@ -3391,6 +3392,32 @@ test("bounds: calc-agriculture computeGrainBin pins cylinder + cone geometry, th
   assert.ok(Math.abs(packed.total_bushels - r.total_bushels * 1.05) < 1e-3);
   assert.ok("error" in computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, grain: "quinoa" }));
   assert.ok("error" in computeGrainBin({ diameter_ft: 0, eave_height_ft: 20, grain: "corn" }));
+});
+
+test("bounds: spec-v690 computeGrainBinHeightForCapacity pins eave = (target_ft3/pack - cone)/area, round-trips through computeGrainBin, and error seams", () => {
+  const fwd = computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, peak_height_ft: 8, grain: "corn", packing_factor: 1.0 });
+  const r = computeGrainBinHeightForCapacity({ target_bushels: fwd.total_bushels, diameter_ft: 30, peak_height_ft: 8, packing_factor: 1.0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.eave_height_ft - 20) < 1e-6, `eave identity: ${r.eave_height_ft}`);
+  // A wider bin needs a shorter wall for the same capacity (area ~ d^2).
+  const wide = computeGrainBinHeightForCapacity({ target_bushels: fwd.total_bushels, diameter_ft: 42, peak_height_ft: 8, packing_factor: 1.0 });
+  assert.ok(wide.eave_height_ft < r.eave_height_ft, `wider shorter: ${wide.eave_height_ft}`);
+  // Round-trip: the eave, fed back through the forward tile, reproduces the target bushels.
+  for (const target_bushels of [3000, 12875, 40000]) {
+    for (const diameter_ft of [24, 30, 48]) {
+      const m = computeGrainBinHeightForCapacity({ target_bushels, diameter_ft, peak_height_ft: 0, packing_factor: 1.0 });
+      assert.ok(!m.error, `sweep bu=${target_bushels} d=${diameter_ft}: ${JSON.stringify(m)}`);
+      assertFinite(m.eave_height_ft, "eave"); assert.ok(m.eave_height_ft > 0, "eave positive");
+      const back = computeGrainBin({ diameter_ft, eave_height_ft: m.eave_height_ft, peak_height_ft: 0, grain: "corn", packing_factor: 1.0 });
+      assert.ok(Math.abs(back.total_bushels - target_bushels) < 1e-6, `round-trip bu=${target_bushels} d=${diameter_ft}: ${back.total_bushels}`);
+    }
+  }
+  // Error seams: non-positive target / diameter, negative packing, cone alone exceeds the target, non-finite.
+  assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: 0, diameter_ft: 30 }));
+  assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: 12875, diameter_ft: 0 }));
+  assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: 12875, diameter_ft: 30, packing_factor: -1 }));
+  assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: 100, diameter_ft: 30, peak_height_ft: 8 }));
+  assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: NaN, diameter_ft: 30 }));
 });
 
 test("bounds: calc-agriculture computeNpkBlend pins recommendation = max(0, demand - soil credit), the three-straight solve, and delivered = recommendation", () => {

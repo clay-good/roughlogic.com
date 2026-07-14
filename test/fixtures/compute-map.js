@@ -494,6 +494,7 @@ export const COMPUTE_MAP = {
   "irrigation-requirement": { module: "../../calc-agriculture.js", fn: "computeIrrigationRequirement" },
   "cattle-stocking-rate": { module: "../../calc-agriculture.js", fn: "computeStockingRate" },
   "grain-bin-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBin" },
+  "grain-bin-height-for-capacity": { module: "../../calc-agriculture.js", fn: "computeGrainBinHeightForCapacity" },
   "grain-shrink-moisture": { module: "../../calc-agriculture.js", fn: "computeGrainShrinkMoisture" },
   "livestock-dry-matter-intake": { module: "../../calc-agriculture.js", fn: "computeLivestockDryMatterIntake" },
   "manure-application-rate": { module: "../../calc-agriculture.js", fn: "computeManureApplicationRate" },

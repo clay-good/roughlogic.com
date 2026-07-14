@@ -2140,6 +2140,17 @@ export const CITATIONS = {
       { name: "Test weights", value: "corn 56, wheat 60, soybeans 60, oats 32 lb/bushel", source: "USDA FGIS" },
     ],
   },
+  "grain-bin-height-for-capacity": {
+    formula: "floor_area = pi x (d/2)^2; cone = (1/3) x floor_area x peak; eave = (target_bushels/0.8036/packing - cone) / floor_area. The inverse of bushels = (floor_area x eave + cone) x packing x 0.8036.",
+    edition: "Bin geometry first-principles; USDA FGIS standard bushel conversion by name.",
+    freeAccess: "Free at ams.usda.gov/services/grain-inspection.",
+    governance: GOVERNANCE.general,
+    editionNote: "The eave (wall) height a round bin needs to hold a target capacity, the inverse of grain-bin-capacity: eave = (target_ft3/packing - cone_ft3) / floor_area, with 1 ft^3 = 0.8036 bushels. A peaked (coned) fill is credited first, so its volume shortens the wall; if the cone alone meets the target, no wall height is needed and the tile reports it. Capacity grows with the SQUARE of the diameter but only linearly with the wall, so a wider bin holds far more per foot of steel (doubling the diameter quarters the wall for the same bushels). This is the geometric fill volume, not a structural or aeration check; the bin manufacturer's rated capacity and the wall/foundation design govern.",
+    assumptions: [
+      { name: "Bushel conversion", value: "1 ft^3 = 0.8036 bushels (1 bushel = 1.2445 ft^3)", source: "USDA standard" },
+      { name: "Geometry only", value: "the geometric fill volume; not a structural, aeration, or rated-capacity check", source: "scope of this tile" },
+    ],
+  },
 
   "npk-blend": {
     formula: "Nutrient recommendation = max(0, crop demand - soil-test credit) for each of N, P2O5, K2O. Three-straight blend: potash (lb/acre) = K2O rec / 0.60; DAP = P2O5 rec / 0.46 (carrying N = DAP x 0.18); urea = max(0, N rec - N from DAP) / 0.46. Total product = rate x acres.",

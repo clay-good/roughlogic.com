@@ -3437,6 +3437,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "bin wall height for a target capacity",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "how tall a grain bin for bushels",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "eave height for bin storage",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size a grain bin from bushels",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bin height from diameter and bushels",
+      "target": "grain-bin-height-for-capacity",
+      "kind": "adjacent"
+    },
+    {
       "term": "fertilizer blend",
       "target": "npk-blend",
       "kind": "industry"
