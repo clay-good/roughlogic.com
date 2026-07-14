@@ -628,7 +628,7 @@ const _TILES = [
   // spec-v505 anchor rode scope and swing radius
   ["anchor-rode-scope", "K"],
   // spec-v506 turbocharger pressure ratio and charge-air temp
-  ["turbo-pressure-ratio", "K"],
+  ["turbo-pressure-ratio", "K"], ["turbo-max-boost-for-charge-temp", "K"],
   // spec-v507 Crouch planing-speed estimate
   ["crouch-planing-speed", "K"], ["crouch-hp-for-speed", "K"],
   // spec-v510 wheel offset and backspacing

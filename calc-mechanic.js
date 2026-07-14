@@ -1834,6 +1834,52 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
   compute: computeTurboPressureRatio,
 });
 
+// turbo-max-boost-for-charge-temp: inverse of turbo-pressure-ratio. The forward
+// tile gives the charge-air temperature from a boost; keeping that temperature
+// under a limit is the inverse. From T_out = T_in x [1 + (PR^0.283 - 1)/eff],
+// PR = [1 + eff x (T_out/T_in - 1)]^(1/0.283) and boost = ambient x (PR - 1),
+// all temperatures absolute (Rankine).
+// dims: in { max_charge_temp_f: T, inlet_temp_f: T, compressor_eff_pct: dimensionless, ambient_psia: M L^-1 T^-2 } out: { max_boost_psi: M L^-1 T^-2, pressure_ratio: dimensionless }
+export function computeTurboMaxBoostForChargeTemp({ max_charge_temp_f = 0, inlet_temp_f = 0, compressor_eff_pct = 70, ambient_psia = 14.7 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tout = Number(max_charge_temp_f);
+  const tin = Number(inlet_temp_f);
+  const eff = Number(compressor_eff_pct) || 0;
+  const amb = Number(ambient_psia) || 0;
+  if (!Number.isFinite(tin) || tin <= -459.67) return { error: "Inlet temperature must be above absolute zero (-459.67 F)." };
+  if (!Number.isFinite(tout) || tout <= -459.67) return { error: "Charge-air temperature limit must be above absolute zero (-459.67 F)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Compressor efficiency must be over 0 and at most 100 percent." };
+  if (!(amb > 0)) return { error: "Ambient pressure must be positive (psia)." };
+  const tin_r = tin + 459.67, tout_r = tout + 459.67;
+  const ratio = tout_r / tin_r;
+  if (!(ratio > 1)) return { error: "The charge-air temperature limit must be above the inlet temperature; compressing air only heats it." };
+  const pr_pow = 1 + (eff / 100) * (ratio - 1);
+  const pressure_ratio = Math.pow(pr_pow, 1 / 0.283);
+  const max_boost_psi = amb * (pressure_ratio - 1);
+  if (![pressure_ratio, max_boost_psi].every(Number.isFinite)) return { error: "Turbo math is not a finite value." };
+  return {
+    max_boost_psi, pressure_ratio,
+    note: "The compressor-outlet-temperature model solved for the boost: the gauge boost at which the charge-air (compressor-outlet) temperature reaches the limit, boost = ambient x (PR - 1) with PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.283) (temperatures absolute). Above this boost the outlet air is hotter than the limit, so more intercooling (which resets this against the intercooler-outlet temp), a more efficient compressor, or a cooler inlet is needed to run more boost safely. This is the compressor-outlet temperature and ignores any intercooler and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
+  };
+}
+export const turboMaxBoostForChargeTempExample = { inputs: { max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 14.7 } };
+MECHANIC_RENDERERS["turbo-max-boost-for-charge-temp"] = _simpleRenderer({
+  citation: "Citation: turbocharger charge-air-temperature model solved for the boost: PR = [1 + efficiency x (T_out/T_in - 1)]^(1/0.283), boost = ambient x (PR - 1), temperatures absolute (compressor-map sizing; ideal-gas adiabatic compression). Compressor-outlet temperature (ignores any intercooler); gamma = 1.4 assumed. A planning estimate; the compressor map and engine build govern.",
+  example: turboMaxBoostForChargeTempExample.inputs,
+  fields: [
+    { key: "max_charge_temp_f", label: "Charge-air temperature limit (deg F)", kind: "number", default: 250 },
+    { key: "inlet_temp_f", label: "Compressor inlet air temp (deg F)", kind: "number", default: 80 },
+    { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number", default: 70 },
+    { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
+  ],
+  outputs: [
+    { key: "b", id: "tmb-out-b", label: "Max boost (gauge)", value: (r) => fmt(r.max_boost_psi, 1) + " psi" },
+    { key: "pr", id: "tmb-out-pr", label: "Pressure ratio at the limit", value: (r) => fmt(r.pressure_ratio, 2) },
+    { key: "n", id: "tmb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTurboMaxBoostForChargeTemp,
+});
+
 // ===================== spec-v507: Crouch planing-speed estimate =====================
 
 // dims: in { displacement_lb: M L T^-2, shaft_hp: M L^2 T^-3, hull_constant: dimensionless } out: { weight_to_power: dimensionless, speed_mph: L T^-1 }

@@ -68057,6 +68057,31 @@
       "kind": "question"
     },
     {
+      "term": "max boost before charge air too hot",
+      "target": "turbo-max-boost-for-charge-temp",
+      "kind": "question"
+    },
+    {
+      "term": "how much boost before intercooler needed",
+      "target": "turbo-max-boost-for-charge-temp",
+      "kind": "question"
+    },
+    {
+      "term": "boost limit for compressor outlet temp",
+      "target": "turbo-max-boost-for-charge-temp",
+      "kind": "question"
+    },
+    {
+      "term": "safe boost for charge temperature",
+      "target": "turbo-max-boost-for-charge-temp",
+      "kind": "question"
+    },
+    {
+      "term": "max psi before air too hot",
+      "target": "turbo-max-boost-for-charge-temp",
+      "kind": "question"
+    },
+    {
       "term": "planing boat top speed from horsepower",
       "target": "crouch-planing-speed",
       "kind": "question"

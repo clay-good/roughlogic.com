@@ -853,7 +853,7 @@ const TOOL_MODULES = (() => {
     // spec-v505 anchor rode scope and swing radius
     "anchor-rode-scope",
     // spec-v506 turbocharger pressure ratio and charge-air temp
-    "turbo-pressure-ratio",
+    "turbo-pressure-ratio", "turbo-max-boost-for-charge-temp",
     // spec-v507 Crouch planing-speed estimate
     "crouch-planing-speed", "crouch-hp-for-speed",
     // spec-v510 wheel offset and backspacing

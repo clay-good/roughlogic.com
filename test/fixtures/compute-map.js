@@ -822,6 +822,7 @@ export const COMPUTE_MAP = {
   "bearing-max-load": { module: "../../calc-machining.js", fn: "computeBearingMaxLoad" },
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
+  "turbo-max-boost-for-charge-temp": { module: "../../calc-mechanic.js", fn: "computeTurboMaxBoostForChargeTemp" },
   "crouch-planing-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchPlaningSpeed" },
   "crouch-hp-for-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchHpForSpeed" },
   "def-consumption": { module: "../../calc-trucking.js", fn: "computeDefConsumption" },

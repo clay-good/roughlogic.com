@@ -1020,6 +1020,7 @@ const RELATED = {
   "waterline-for-hull-speed": ["hull-speed","crouch-planing-speed","prop-pitch-selection","fuel-range"],
   "anchor-rode-scope": ["hull-speed","prop-slip","wire-rope-strength"],
   "turbo-pressure-ratio": ["volumetric-efficiency","density-altitude","air-density-correction"],
+  "turbo-max-boost-for-charge-temp": ["turbo-pressure-ratio","volumetric-efficiency","density-altitude","air-density-correction"],
   "crouch-planing-speed": ["crouch-hp-for-speed","hull-speed","prop-pitch-selection","prop-slip"],
   "crouch-hp-for-speed": ["crouch-planing-speed","hull-speed","prop-pitch-selection","prop-slip"],
   "wheel-offset-backspacing": ["tire-gearing","bolt-proof-load","brake-pad-life"],

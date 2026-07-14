@@ -53132,6 +53132,35 @@
    }
   },
   {
+   "tile_id": "turbo-max-boost-for-charge-temp",
+   "source_publisher": "turbocharger charge-air-temperature model",
+   "source_title": "boost = ambient x (PR - 1), PR = [1 + eff x (Tout/Tin - 1)]^(1/0.283); inverse of the pressure-ratio tile",
+   "source_edition_or_year": "spec-v726 worked example (machine-verified; inverse of spec-v506)",
+   "source_section_or_page": "250 F limit, 80 F inlet, 70% eff, 14.7 psia -> 15.0 psi max boost (PR 2.02)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "max_charge_temp_f": 250,
+    "inlet_temp_f": 80,
+    "compressor_eff_pct": 70,
+    "ambient_psia": 14.7
+   },
+   "outputs": {
+    "max_boost_psi": {
+     "value": 15.024,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "pressure_ratio": {
+     "value": 2.022,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "turbo-pressure-ratio",
    "source_publisher": "turbocharger pressure-ratio and charge-air-temperature model",
    "source_title": "cross-check: same 15 psi gauge boost a mile high (12.2 psia) -> PR 2.23, a higher ratio for the same boost",

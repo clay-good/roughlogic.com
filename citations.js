@@ -9239,6 +9239,18 @@ export const CITATIONS = {
       { name: "No intercooler", value: "reports the compressor-outlet temperature, not the post-intercooler manifold temperature", source: "scope of this tile" },
     ],
   },
+  "turbo-max-boost-for-charge-temp": {
+    formula: "PR = [1 + (efficiency/100) x (T_out/T_in - 1)]^(1/0.283); max_boost = ambient_psia x (PR - 1); temperatures absolute (Rankine). The charge-air-temperature model solved for the boost.",
+    edition: "Turbocharger charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression with gamma = 1.4) solved for the boost, first-principles, by name; the compressor map and the engine build govern.",
+    freeAccess: "The pressure-ratio and adiabatic-temperature relations are first-principles thermodynamics; the temperatures, efficiency, and ambient come from the application and the compressor map.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of turbo-pressure-ratio: the gauge boost at which the compressor-outlet charge-air temperature reaches a limit. Above it the outlet air is hotter than the limit, so more intercooling (which resets the check against the intercooler-outlet temperature), a more efficient compressor, or a cooler inlet is needed to run more boost safely. This is the compressor-OUTLET temperature (it ignores any intercooler) and assumes the gamma = 1.4 dry-air exponent. A planning estimate, not a tune; the compressor map and the engine build govern.",
+    assumptions: [
+      { name: "Gauge boost", value: "PR uses absolute pressures; max_boost = ambient x (PR - 1) recovers the gauge boost", source: "compressor-map sizing" },
+      { name: "Heat of compression", value: "solves T_out = T_in x [1 + (PR^0.283 - 1)/efficiency] for PR", source: "adiabatic compression (gamma = 1.4)" },
+      { name: "No intercooler", value: "the limit is the compressor-outlet temperature, not the post-intercooler manifold temperature", source: "scope of this tile" },
+    ],
+  },
   "anchor-rode-scope": {
     formula: "vertical = depth + bow_height (at high tide); rode = scope x vertical; actual_scope = rode / vertical; swing_radius = sqrt(rode^2 - vertical^2) + boat_length.",
     edition: "Anchor rode scope and swing-radius relations (seamanship convention -- Chapman Piloting, US Sailing, ABYC ground-tackle references), by name; local conditions, bottom type, and skipper judgment govern.",

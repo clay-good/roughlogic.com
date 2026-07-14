@@ -19412,6 +19412,34 @@ test("bounds: spec-v506 computeTurboPressureRatio pins the gauge-to-absolute PR,
   assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 120 }));
 });
 
+import { computeTurboMaxBoostForChargeTemp as _v726 } from "../../calc-mechanic.js";
+test("bounds: spec-v726 computeTurboMaxBoostForChargeTemp pins boost from the charge-temp limit, round-trips through computeTurboPressureRatio, and error seams", () => {
+  const r = _v726({ max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 14.7 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_boost_psi - 15.024) < 1e-2, `pinned 15.0 psi: ${r.max_boost_psi}`);
+  assert.ok(Math.abs(r.pressure_ratio - 2.022) < 1e-3, `PR: ${r.pressure_ratio}`);
+  // Round-trip: at the max boost the forward tile's compressor-outlet temp equals the limit.
+  for (const max_charge_temp_f of [180, 250, 350]) {
+    for (const inlet_temp_f of [60, 80, 110]) {
+      for (const compressor_eff_pct of [65, 70, 78]) {
+        const m = _v726({ max_charge_temp_f, inlet_temp_f, compressor_eff_pct, ambient_psia: 14.7 });
+        if (m.error) continue; // limit at/below inlet is legitimately rejected
+        assertFinite(m.max_boost_psi, "boost"); assert.ok(m.max_boost_psi > 0, "boost positive");
+        const back = _v506({ boost_psi: m.max_boost_psi, ambient_psia: 14.7, inlet_temp_f, compressor_eff_pct });
+        assert.ok(Math.abs(back.t_out_f - max_charge_temp_f) < 1e-6, `round-trip Tout=${max_charge_temp_f} Tin=${inlet_temp_f} eff=${compressor_eff_pct}: ${back.t_out_f}`);
+      }
+    }
+  }
+  // A more efficient compressor (heats less) allows more boost under the same limit.
+  assert.ok(_v726({ max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 78, ambient_psia: 14.7 }).max_boost_psi > r.max_boost_psi);
+  // Error seams: limit at/below inlet (no boost fits), bad efficiency, non-positive ambient, sub-absolute inlet, non-finite.
+  assert.ok("error" in _v726({ max_charge_temp_f: 80, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 14.7 }));
+  assert.ok("error" in _v726({ max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 0, ambient_psia: 14.7 }));
+  assert.ok("error" in _v726({ max_charge_temp_f: 250, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 0 }));
+  assert.ok("error" in _v726({ max_charge_temp_f: 250, inlet_temp_f: -500, compressor_eff_pct: 70, ambient_psia: 14.7 }));
+  assert.ok("error" in _v726({ max_charge_temp_f: Infinity, inlet_temp_f: 80, compressor_eff_pct: 70, ambient_psia: 14.7 }));
+});
+
 import { computeCrouchPlaningSpeed as _v507, computeCrouchHpForSpeed as _v671 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v671 computeCrouchHpForSpeed pins hp = weight (speed/C)^2, the square-law, round-trips through computeCrouchPlaningSpeed, and error seams", () => {
