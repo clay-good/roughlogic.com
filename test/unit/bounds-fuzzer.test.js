@@ -17106,7 +17106,7 @@ test("bounds: spec-v395 computeConcreteCrackControlSpacing pins s1/s2, the cap, 
 });
 
 // ===================== spec-v396..v398 fluid-power / cooling trio (calc-mechanic.js) =====================
-import { computeHydraulicPumpHorsepower as _v396, computeHydraulicMotorTorqueSpeed as _v397, computeCoolingSystemFlow as _v398 } from "../../calc-mechanic.js";
+import { computeHydraulicPumpHorsepower as _v396, computeHydraulicMotorTorqueSpeed as _v397, computeCoolingSystemFlow as _v398, computeHydraulicDriveFlowLimit as _v689 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v396 computeHydraulicPumpHorsepower pins fluid/drive HP and error seams", () => {
   const r = _v396({ gpm: 10, psi: 2000, efficiency: 0.85 });
@@ -17121,6 +17121,32 @@ test("bounds: spec-v396 computeHydraulicPumpHorsepower pins fluid/drive HP and e
   assert.ok("error" in _v396({ gpm: 10, psi: 2000, efficiency: 0 }));
   assert.ok("error" in _v396({ gpm: 10, psi: 2000, efficiency: 1.5 }));
   assert.ok("error" in _v396({ gpm: Infinity, psi: 2000, efficiency: 0.85 }));
+});
+
+test("bounds: spec-v689 computeHydraulicDriveFlowLimit pins gpm = 1714 drive_hp eff / psi, round-trips through computeHydraulicPumpHorsepower, and error seams", () => {
+  const r = _v689({ drive_hp: 13.727778159104949, psi: 2000, efficiency: 0.85 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_gpm - 1714 * 13.727778159104949 * 0.85 / 2000) < 1e-9, `gpm identity: ${r.max_gpm}`);
+  assert.ok(Math.abs(r.max_gpm - 10) < 1e-6, `pinned 10 gpm: ${r.max_gpm}`);
+  // Flow trades against pressure at fixed power: doubling the pressure halves the flow.
+  const high = _v689({ drive_hp: 13.727778159104949, psi: 4000, efficiency: 0.85 });
+  assert.ok(Math.abs(high.max_gpm - r.max_gpm / 2) < 1e-9, `pressure halves flow: ${high.max_gpm}`);
+  // Round-trip: the max flow, fed back through the forward tile, reproduces the drive HP.
+  for (const drive_hp of [5, 13.73, 40]) {
+    for (const psi of [1000, 2000, 3000]) {
+      const m = _v689({ drive_hp, psi, efficiency: 0.85 });
+      assert.ok(!m.error, `sweep hp=${drive_hp} psi=${psi}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_gpm, "gpm"); assert.ok(m.max_gpm > 0, "gpm positive");
+      const back = _v396({ gpm: m.max_gpm, psi, efficiency: 0.85 });
+      assert.ok(Math.abs(back.input_hp - drive_hp) < 1e-9, `round-trip hp=${drive_hp} psi=${psi}: ${back.input_hp}`);
+    }
+  }
+  // Error seams: non-positive drive HP / pressure, efficiency out of range, non-finite.
+  assert.ok("error" in _v689({ drive_hp: 0, psi: 2000 }));
+  assert.ok("error" in _v689({ drive_hp: 13.73, psi: 0 }));
+  assert.ok("error" in _v689({ drive_hp: 13.73, psi: 2000, efficiency: 0 }));
+  assert.ok("error" in _v689({ drive_hp: 13.73, psi: 2000, efficiency: 1.5 }));
+  assert.ok("error" in _v689({ drive_hp: Infinity, psi: 2000 }));
 });
 
 test("bounds: spec-v397 computeHydraulicMotorTorqueSpeed pins torque/speed/power and error seams", () => {

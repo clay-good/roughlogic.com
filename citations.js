@@ -8815,6 +8815,18 @@ export const CITATIONS = {
       { name: "Sizing only", value: "round up to a standard motor; the manufacturer data govern", source: "scope of this tile" },
     ],
   },
+  "hydraulic-drive-flow-limit": {
+    formula: "gpm = 1714 x drive_hp x efficiency / psi; the inverse of drive_hp = (gpm x psi / 1714) / efficiency.",
+    edition: "The fluid-power pump horsepower relation (fluid HP = gpm x psi / 1714) solved for flow, by name.",
+    freeAccess: "The gpm-psi-to-horsepower relation and the 1714 constant are standard published fluid-power results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The most flow a hydraulic power unit can deliver at a working pressure for a given drive horsepower, the inverse of hydraulic-pump-horsepower: gpm = 1714 x drive_hp x efficiency / psi. Flow trades directly against pressure at a fixed power (more force at the same motor gives up speed), the constant-horsepower curve a pressure-compensated pump rides. The overall efficiency (typically 0.80-0.90 gear/vane, higher for a piston pump) is the fraction of drive power that reaches the fluid. This is the power ceiling; the pump displacement and rpm set the actual flow, so treat it as the maximum the motor can support. A sizing aid; the pump and motor manufacturer's data govern.",
+    assumptions: [
+      { name: "Constant-power trade", value: "flow varies inversely with pressure at fixed drive power (gpm = 1714 x drive_hp x eff / psi)", source: "fluid-power engineering" },
+      { name: "Overall efficiency", value: "the fraction of drive power reaching the fluid; 0.80-0.90 gear/vane, higher for piston", source: "fluid-power engineering" },
+      { name: "Power ceiling", value: "the delivered flow is set by the pump displacement and rpm; this is the max the motor can support", source: "scope of this tile" },
+    ],
+  },
   "hydraulic-motor-torque-speed": {
     formula: "torque = psi x disp / (2 pi) x mech_eff; rpm = 231 x gpm / disp x vol_eff; hp = torque x rpm / 63025.",
     edition: "The fluid-power motor torque/speed relations (torque = psi x disp / 2 pi, speed = 231 gpm / disp), by name.",

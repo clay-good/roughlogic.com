@@ -24009,6 +24009,50 @@
    }
   },
   {
+   "tile_id": "hydraulic-drive-flow-limit",
+   "source_publisher": "fluid-power engineering (inverse)",
+   "source_title": "gpm = 1714 * drive_hp * efficiency / psi",
+   "source_edition_or_year": "spec-v689 worked example (machine-verified)",
+   "source_section_or_page": "13.73 drive HP, 2000 psi, 0.85 efficiency -> 10 GPM (round-trips hydraulic-pump-horsepower)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "drive_hp": 13.727778159104949,
+    "psi": 2000,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "max_gpm": {
+     "value": 10,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hydraulic-drive-flow-limit",
+   "source_publisher": "fluid-power engineering (inverse)",
+   "source_title": "cross-check: raising the pressure to 3,000 psi drops the flow the same motor can drive",
+   "source_edition_or_year": "spec-v689 cross-check (machine-verified)",
+   "source_section_or_page": "13.73 drive HP, 3000 psi, 0.85 efficiency -> 6.67 GPM (flow trades against pressure)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "drive_hp": 13.727778159104949,
+    "psi": 3000,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "max_gpm": {
+     "value": 6.667,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hydraulic-motor-torque-speed",
    "source_publisher": "fluid-power engineering",
    "source_title": "2000 psi, 2.0 in^3/rev, 10 GPM, 0.90/0.95 -> 573 in-lb, 1097 rpm, 9.98 HP",

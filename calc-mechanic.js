@@ -1206,6 +1206,41 @@ MECHANIC_RENDERERS["hydraulic-pump-horsepower"] = _simpleRenderer({
   compute: computeHydraulicPumpHorsepower,
 });
 
+// dims: in { drive_hp: M L^2 T^-3, psi: M L^-1 T^-2, efficiency: dimensionless } out: { max_gpm: L^3 T^-1, fluid_hp: M L^2 T^-3 }
+export function computeHydraulicDriveFlowLimit({ drive_hp = 0, psi = 0, efficiency = 0.85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hp = Number(drive_hp) || 0;
+  const p = Number(psi) || 0;
+  const eff = Number(efficiency) || 0;
+  if (!(hp > 0)) return { error: "Drive horsepower must be positive (HP)." };
+  if (!(p > 0)) return { error: "Working pressure must be positive (psi)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Efficiency must be between 0 and 1." };
+  // Inverse of input_hp = (gpm x psi / 1714) / efficiency: gpm = 1714 x drive_hp x efficiency / psi.
+  const fluid_hp = hp * eff;
+  const max_gpm = 1714 * fluid_hp / p;
+  if (!Number.isFinite(max_gpm) || !(max_gpm > 0)) return { error: "Flow math is not a finite positive value." };
+  return {
+    max_gpm, fluid_hp,
+    note: "The most flow a hydraulic power unit can deliver at a working pressure for a given drive horsepower, the inverse of the hydraulic-pump-horsepower tile: from drive_hp = (gpm x psi / 1714) / efficiency, gpm = 1714 x drive_hp x efficiency / psi. Flow trades directly against pressure at a fixed power, which is why a system that needs more force (pressure) at the same motor gives up speed (flow), the constant-horsepower curve a pressure-compensated pump rides. The overall efficiency (typically 0.80-0.90 gear/vane, higher for a piston pump) is the fraction of drive power that reaches the fluid. This is the power ceiling; the pump displacement and rpm set the actual flow, so use it as the maximum the motor can support. A sizing aid; the pump and motor manufacturer data govern."
+  };
+}
+export const hydraulicDriveFlowLimitExample = { inputs: { drive_hp: 13.73, psi: 2000, efficiency: 0.85 } };
+MECHANIC_RENDERERS["hydraulic-drive-flow-limit"] = _simpleRenderer({
+  citation: "Citation: hydraulic pump power solved for flow: gpm = 1714 x drive_hp x efficiency / psi, from fluid HP = gpm x psi / 1714 and drive HP = fluid HP / efficiency. Flow trades against pressure at fixed power. A sizing aid; the pump and motor manufacturer's data govern.",
+  example: hydraulicDriveFlowLimitExample.inputs,
+  fields: [
+    { key: "drive_hp", label: "Available drive horsepower (HP)", kind: "number", default: 13.73 },
+    { key: "psi", label: "Working pressure (psi)", kind: "number", default: 2000 },
+    { key: "efficiency", label: "Overall pump efficiency (0-1)", kind: "number", default: 0.85 },
+  ],
+  outputs: [
+    { key: "q", id: "hdfl-out-q", label: "Max flow", value: (r) => fmt(r.max_gpm, 1) + " gpm" },
+    { key: "fh", id: "hdfl-out-fh", label: "Fluid horsepower", value: (r) => fmt(r.fluid_hp, 1) + " HP" },
+    { key: "n", id: "hdfl-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHydraulicDriveFlowLimit,
+});
+
 // dims: in { psi: M L^-1 T^-2, disp_in3: L^3, gpm: L^3 T^-1, mech_eff: dimensionless, vol_eff: dimensionless } out: { torque_inlb: M L^2 T^-2, rpm: T^-1, output_hp: M L^2 T^-3 }
 export function computeHydraulicMotorTorqueSpeed({ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

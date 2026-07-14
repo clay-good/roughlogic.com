@@ -972,6 +972,7 @@ export const COMPUTE_MAP = {
   "seismic-pdelta-stability": { module: "../../calc-construction.js", fn: "computeSeismicPdeltaStability" },
   "paint-mix-ratio": { module: "../../calc-mechanic.js", fn: "computePaintMixRatio" },
   "hydraulic-pump-horsepower": { module: "../../calc-mechanic.js", fn: "computeHydraulicPumpHorsepower" },
+  "hydraulic-drive-flow-limit": { module: "../../calc-mechanic.js", fn: "computeHydraulicDriveFlowLimit" },
   "hydraulic-motor-torque-speed": { module: "../../calc-mechanic.js", fn: "computeHydraulicMotorTorqueSpeed" },
   "hydraulic-pump-flow": { module: "../../calc-mechanic.js", fn: "computeHydraulicPumpFlow" },
   "cooling-system-flow": { module: "../../calc-mechanic.js", fn: "computeCoolingSystemFlow" },

@@ -615,7 +615,7 @@ const _TILES = [
   ["shaft-torsion", "E"], ["thermal-stress-restrained", "E"], ["thermal-stress-max-deltat", "E"], ["hoop-stress-thin-wall", "E"], ["hoop-stress-mawp", "E"],
   ["seismic-design-spectral-acceleration", "E"], ["seismic-story-drift", "E"], ["seismic-pdelta-stability", "E"],
   ["paint-mix-ratio", "K"],
-  ["hydraulic-pump-horsepower", "K"], ["hydraulic-motor-torque-speed", "K"], ["hydraulic-pump-flow", "K"], ["cooling-system-flow", "K"],
+  ["hydraulic-pump-horsepower", "K"], ["hydraulic-drive-flow-limit", "K"], ["hydraulic-motor-torque-speed", "K"], ["hydraulic-pump-flow", "K"], ["cooling-system-flow", "K"],
   ["prop-pitch-selection", "K"], ["engine-fuel-burn-gph", "K"], ["alternator-charging-load", "K"],
   // spec-v485 torque wrench extension / crowfoot correction (Group K)
   ["torque-adapter-correction", "K"],
