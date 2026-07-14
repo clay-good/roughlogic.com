@@ -341,6 +341,17 @@ export const CITATIONS = {
     ],
   },
 
+  "growth-projected-count": {
+    formula: "N = N0 x 2^(elapsed / Td), the inverse of Td = elapsed x ln(2) / ln(N / N0); doublings = elapsed / Td; fold_increase = 2^(elapsed / Td).",
+    edition: "Exponential-growth / population-doubling kinetics (standard growth analysis), solved for the projected count, by name.",
+    freeAccess: "Standard microbiology / cell-culture growth-kinetics relation; the culture and conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The projected count from a known doubling time, the inverse of the doubling-time measurement: N = N0 x 2^(elapsed / Td), with the number of doublings elapsed / Td and the fold increase 2^(elapsed / Td). This holds only during log (exponential) phase - real cultures slow into stationary phase as the medium depletes and waste builds, so the projection over-predicts once the culture nears its carrying capacity. If N is an optical density, the ratio assumes OD stays proportional to cell count (which fails at high density). An analysis aid, not a validated growth assay.",
+    assumptions: [
+      { name: "Growth phase", value: "valid only during log (exponential) phase; the projection over-predicts near stationary phase", source: "growth-kinetics" },
+      { name: "OD proportionality", value: "if N is an optical density, the ratio assumes OD stays proportional to cell count", source: "growth-kinetics" },
+    ],
+  },
   "doubling-time": {
     formula: "Td = elapsed x ln(2) / ln(N / N0); mu = ln(N / N0) / elapsed; doublings = log2(N / N0).",
     edition: "Exponential-growth / population-doubling kinetics (standard growth analysis), by name.",

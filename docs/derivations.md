@@ -2194,6 +2194,7 @@ cross-check.
 | calc-lab.js | `computeDilution` | `{ c1, v1, c2, v2 }` | _ | _ | _ |
 | calc-lab.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeGelPercentAgarose` | `{ target_bp_high = 0, gel_percent = 0, buffer_volume_ml = 0 } = {}` | _ | _ | _ |
+| calc-lab.js | `computeGrowthProjectedCount` | `{ initial_count = 0, doubling_time = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-lab.js | `computeHemocytometer` | `{ total_cells_counted = 0, squares_counted = 4, dilution_factor = 1, dead_cel...` | _ | _ | _ |
 | calc-lab.js | `computeHendersonHasselbalch` | `{ pKa = 0, target_pH = 0, total_buffer_concentration = 0, total_volume = 0, }` | _ | _ | _ |
 | calc-lab.js | `computeLigationMolarRatio` | `{ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 ...` | _ | _ | _ |
@@ -2871,7 +2872,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1457.
+Row count: 1458.
 
 <!-- END function-corpus-v14 -->
 
@@ -4144,7 +4145,7 @@ per spec-v14 §13.1 second paragraph.
 | `wip-percent-complete` | Work-in-Progress Percent Complete and Over/Under Billing | construction accounting (cost-to-cost...; spec-v390 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `workers-comp-emr-premium` | Workers-Comp Premium and Experience Mod | workers-comp rating (NCCI-style); spec-v445 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group T Lab (20 tiles)
+### Group T Lab (21 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4152,6 +4153,7 @@ per spec-v14 §13.1 second paragraph.
 | `cfu-plate-count` | CFU/mL Viable Plate Count | FDA BAM Ch. 3 (Aerobic Plate Count) /...; 150 colonies, 10^-5 dilution, 0.1 mL -> 1.5e8 CFU/mL | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `doubling-time` | Cell Culture Doubling Time | Exponential-growth / population-doubl...; 1e5 to 8e5 cells/mL in 24 h -> 8.0 h doubling, 0.087 /h, ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gel-percent-agarose` | Agarose Gel Percent | Sambrook & Russell, Molecular Cloning; 10 kb max -> 0.8%; 100 mL -> 0.8 g | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `growth-projected-count` | Projected Cell Count from Doubling Time | Exponential-growth kinetics (solved f...; 1e5 cells, 8 h doubling, 24 h -> 8e5 (3 doublings, 8x) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hemocytometer` | Hemocytometer Cell Count | Improved Neubauer hemocytometer (proj...; 240 cells / 4 squares / 1:2 dilution / 12 dead -> 60 avg,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `henderson-hasselbalch` | Henderson-Hasselbalch Buffer | Project (first-principles); pH = pKa + log10([A-]/[HA]) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ligation-molar-ratio` | Ligation Insert:Vector Molar Ratio | Standard molecular cloning (ligation ...; 50 ng of a 5000 bp vector, 1000 bp insert, 3:1 -> 30 ng i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4267,6 +4269,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1210. Fixture-covered or reference-cadence: 1210 / 1210.
+Tile count: 1211. Fixture-covered or reference-cadence: 1211 / 1211.
 
 <!-- END tile-index-v14 -->

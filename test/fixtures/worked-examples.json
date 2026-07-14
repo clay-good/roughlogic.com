@@ -19218,6 +19218,34 @@
    }
   },
   {
+   "tile_id": "growth-projected-count",
+   "source_publisher": "Exponential-growth kinetics (solved for the count)",
+   "source_title": "N = N0 x 2^(elapsed / Td)",
+   "source_edition_or_year": "growth-kinetics",
+   "source_section_or_page": "1e5 cells, 8 h doubling, 24 h -> 8e5 (3 doublings, 8x)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "initial_count": 100000,
+    "doubling_time": 8,
+    "elapsed_time": 24
+   },
+   "outputs": {
+    "final_count": {
+     "value": 800000,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "doublings": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "doubling-time",
    "source_publisher": "Exponential-growth / population-doubling kinetics",
    "source_title": "doublings = log2(N / N0)",

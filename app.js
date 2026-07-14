@@ -1101,7 +1101,7 @@ const TOOL_MODULES = (() => {
     // spec-v534
     "ligation-molar-ratio",
     // spec-v535
-    "doubling-time",
+    "doubling-time", "growth-projected-count",
     // spec-v536
     "michaelis-menten",
     "substrate-for-velocity",

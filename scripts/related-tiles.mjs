@@ -502,6 +502,7 @@ const RELATED = {
   "nucleic-acid-a260": ["beer-lambert", "od600-cell-count", "molarity-from-stock"],
   "ligation-molar-ratio": ["nucleic-acid-a260", "mass-moles", "pcr-master-mix"],
   "doubling-time": ["od600-cell-count", "cfu-plate-count", "nucleic-acid-a260"],
+  "growth-projected-count": ["doubling-time", "od600-cell-count", "cfu-plate-count"],
   "michaelis-menten": ["beer-lambert", "linear-regression", "doubling-time"],
   "substrate-for-velocity": ["michaelis-menten","doubling-time","beer-lambert"],
   "serial-dilution": ["molarity-dilution", "resuspension-volume"],

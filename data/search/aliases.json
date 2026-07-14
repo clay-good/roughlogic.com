@@ -247,6 +247,26 @@
       "kind": "industry"
     },
     {
+      "term": "projected cell count",
+      "target": "growth-projected-count",
+      "kind": "industry"
+    },
+    {
+      "term": "cell count from doubling time",
+      "target": "growth-projected-count",
+      "kind": "redirect"
+    },
+    {
+      "term": "project population growth",
+      "target": "growth-projected-count",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cells after time",
+      "target": "growth-projected-count",
+      "kind": "adjacent"
+    },
+    {
       "term": "growth rate",
       "target": "doubling-time",
       "kind": "industry"

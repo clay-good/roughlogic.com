@@ -20895,6 +20895,27 @@ test("bounds: spec-v535 computeDoublingTime pins Td / mu / doublings from the fo
   assert.ok("error" in _v535({ initial_count: 1e5, final_count: 8e5, elapsed_time: 0 }));
 });
 
+import { computeGrowthProjectedCount as _v762 } from "../../calc-lab.js";
+test("bounds: spec-v762 projected cell count from doubling time (inverse of doubling-time)", () => {
+  const p = _v762({ initial_count: 1e5, doubling_time: 8, elapsed_time: 24 });
+  assert.ok(Math.abs(p.final_count - 8e5) < 1e-6);
+  assert.ok(Math.abs(p.doublings - 3) < 1e-9 && Math.abs(p.fold_increase - 8) < 1e-9);
+  // round-trip: the projected count fed to doubling-time recovers the doubling time
+  for (const [n0, td, t] of [[1e5, 8, 24], [5e4, 12, 36], [2e6, 0.5, 3], [1000, 20, 20]]) {
+    const inv = _v762({ initial_count: n0, doubling_time: td, elapsed_time: t });
+    const fwd = _v535({ initial_count: n0, final_count: inv.final_count, elapsed_time: t });
+    assert.ok(Math.abs(fwd.doubling_time - td) < 1e-6);
+  }
+  // more elapsed time grows the count; a shorter doubling time grows it faster
+  assert.ok(_v762({ initial_count: 1e5, doubling_time: 8, elapsed_time: 48 }).final_count > _v762({ initial_count: 1e5, doubling_time: 8, elapsed_time: 24 }).final_count);
+  assert.ok(_v762({ initial_count: 1e5, doubling_time: 4, elapsed_time: 24 }).final_count > _v762({ initial_count: 1e5, doubling_time: 8, elapsed_time: 24 }).final_count);
+  // error seams: non-positive N0/Td/t, non-finite
+  assert.ok("error" in _v762({ initial_count: 0, doubling_time: 8, elapsed_time: 24 }));
+  assert.ok("error" in _v762({ initial_count: 1e5, doubling_time: 0, elapsed_time: 24 }));
+  assert.ok("error" in _v762({ initial_count: 1e5, doubling_time: 8, elapsed_time: 0 }));
+  assert.ok("error" in _v762({ initial_count: Infinity, doubling_time: 8, elapsed_time: 24 }));
+});
+
 import { computeMichaelisMenten as _v536 } from "../../calc-lab.js";
 
 test("bounds: spec-v536 computeMichaelisMenten pins the half-Vmax at [S]=Km, the asymptotic approach, and error seams", () => {

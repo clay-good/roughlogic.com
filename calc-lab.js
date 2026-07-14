@@ -1157,6 +1157,49 @@ function renderDoublingTime(inputRegion, outputRegion, citationEl) {
 }
 LAB_RENDERERS["doubling-time"] = renderDoublingTime;
 
+// growth-projected-count: inverse of doubling-time. The doubling-time tile measures the doubling time from two counts;
+// the inverse projects the count forward from a KNOWN doubling time over an elapsed time. From Td = t x ln2 / ln(N/N0),
+// N = N0 x 2^(t / Td). It reports the number of doublings (t/Td) and the fold increase (2^(t/Td)).
+// dims: in { initial_count: dimensionless, doubling_time: dimensionless, elapsed_time: dimensionless } out: { final_count: dimensionless, doublings: dimensionless, fold_increase: dimensionless }
+export function computeGrowthProjectedCount({ initial_count = 0, doubling_time = 0, elapsed_time = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n0 = Number(initial_count) || 0;
+  const td = Number(doubling_time) || 0;
+  const t = Number(elapsed_time) || 0;
+  if (!(n0 > 0)) return { error: "Initial count (or OD) must be positive." };
+  if (!(td > 0)) return { error: "Doubling time must be positive." };
+  if (!(t > 0)) return { error: "Elapsed time must be positive." };
+  const doublings = t / td;
+  const fold_increase = Math.pow(2, doublings);
+  const final_count = n0 * fold_increase;
+  if (![doublings, fold_increase, final_count].every(Number.isFinite)) return { error: "Projected-count math is not a finite value." };
+  return {
+    final_count, doublings, fold_increase,
+    note: "Exponential-growth projection: N = N0 x 2^(t / Td), the number of doublings is t / Td, and the fold increase is 2^(t / Td), the inverse of the doubling-time measurement. This holds only in LOG (exponential) phase - real cultures slow into stationary phase as the medium depletes and waste builds, so the projection over-predicts once the culture nears its carrying capacity. If N is an optical density, the ratio assumes OD stays proportional to cell count (fails at high density). The culture, medium, and conditions govern.",
+  };
+}
+export const growthProjectedCountExample = { inputs: { initial_count: 1e5, doubling_time: 8, elapsed_time: 24 } };
+function renderGrowthProjectedCount(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Standard exponential-growth kinetics, Td = t x ln(2) / ln(N/N0) solved for N: N = N0 x 2^(t / Td); doublings = t / Td; fold = 2^(t / Td). Holds only in log (exponential) phase; a projection past stationary phase over-predicts. If N is an optical density, the ratio assumes OD stays proportional to cell count. The culture, medium, and conditions govern.";
+  const n0 = makeNumber("Initial count or OD (N0)", "gpc-n0", { step: "any", min: "0", value: "100000" }); n0.input.value = "100000";
+  const td = makeNumber("Doubling time (h)", "gpc-td", { step: "any", min: "0", value: "8" }); td.input.value = "8";
+  const t = makeNumber("Elapsed time (h)", "gpc-t", { step: "any", min: "0", value: "24" }); t.input.value = "24";
+  for (const f of [n0, td, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n0.input.value = "100000"; td.input.value = "8"; t.input.value = "24"; update(); });
+  const oN = makeOutputLine(outputRegion, "Projected count or OD", "gpc-out-n");
+  const oD = makeOutputLine(outputRegion, "Doublings / fold increase", "gpc-out-d");
+  const oNote = makeOutputLine(outputRegion, "Note", "gpc-out-note");
+  const update = debounce(() => {
+    const r = computeGrowthProjectedCount({ initial_count: Number(n0.input.value) || 0, doubling_time: Number(td.input.value) || 0, elapsed_time: Number(t.input.value) || 0 });
+    if (r.error) { oN.textContent = r.error; oD.textContent = "-"; oNote.textContent = ""; return; }
+    oN.textContent = fmt(r.final_count, r.final_count >= 1e6 ? 0 : 1) + (r.final_count >= 1e6 ? " (" + r.final_count.toExponential(2) + ")" : "");
+    oD.textContent = fmt(r.doublings, 2) + " doublings, " + fmt(r.fold_increase, 1) + "x";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [n0.input, td.input, t.input]) f.addEventListener("input", update);
+}
+LAB_RENDERERS["growth-projected-count"] = renderGrowthProjectedCount;
+
 // --- spec-v536 T: Michaelis-Menten enzyme kinetics (`michaelis-menten`) ---
 // v = Vmax x [S] / (Km + [S]). percent_vmax = v/Vmax x 100. At [S]=Km, v = Vmax/2.
 // dims: in { vmax: dimensionless, km: dimensionless, substrate: dimensionless } out: { velocity: dimensionless, percent_vmax: dimensionless }

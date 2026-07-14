@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lab): spec-v762 projected cell count from doubling time (doubling-time inverse); 2026-07-14
+
+- New tile `growth-projected-count` (Group T, calc-lab.js): the projected count (or OD) from a known doubling time over an
+  elapsed time. `N = N0 x 2^(t / Td)`. 100,000 cells at an 8 h doubling time reach 800,000 in 24 h (3 doublings, 8x).
+  Round-trips through `doubling-time`. Closes Explore sweep #15. Home tile count 1,210 -> 1,211.
+
 ### feat(refrigerant): spec-v761 COP implied by the heat of rejection (condenser-heat-rejection inverse); 2026-07-14
 
 - New tile `condenser-cop-for-heat-rejection` (Group C, calc-refrigerant.js): the COP implied by a measured/rated heat of

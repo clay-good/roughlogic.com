@@ -33,6 +33,7 @@ export const COMPUTE_MAP = {
   "nucleic-acid-a260": { module: "../../calc-lab.js", fn: "computeNucleicAcidA260" },
   "ligation-molar-ratio": { module: "../../calc-lab.js", fn: "computeLigationMolarRatio" },
   "doubling-time": { module: "../../calc-lab.js", fn: "computeDoublingTime" },
+  "growth-projected-count": { module: "../../calc-lab.js", fn: "computeGrowthProjectedCount" },
   "michaelis-menten": { module: "../../calc-lab.js", fn: "computeMichaelisMenten" },
   "substrate-for-velocity": { module: "../../calc-lab.js", fn: "computeSubstrateForVelocity" },
   "declining-balance-depreciation": { module: "../../calc-accounting.js", fn: "computeDecliningBalanceDepreciation" },
