@@ -16862,6 +16862,31 @@
       "kind": "industry"
     },
     {
+      "term": "thrust block max pressure",
+      "target": "thrust-block-max-pressure",
+      "kind": "industry"
+    },
+    {
+      "term": "max pressure for thrust block",
+      "target": "thrust-block-max-pressure",
+      "kind": "redirect"
+    },
+    {
+      "term": "thrust block pressure rating",
+      "target": "thrust-block-max-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much pressure thrust block",
+      "target": "thrust-block-max-pressure",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pressure for bearing area",
+      "target": "thrust-block-max-pressure",
+      "kind": "adjacent"
+    },
+    {
       "term": "pipe thrust",
       "target": "thrust-block-sizing",
       "kind": "industry"

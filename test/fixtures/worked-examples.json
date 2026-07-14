@@ -48314,6 +48314,35 @@
    }
   },
   {
+   "tile_id": "thrust-block-max-pressure",
+   "source_publisher": "AWWA M41 (solved for the pressure)",
+   "source_title": "4.13 ft^2 block, 8 in main (OD 8.625), 90-deg bend, 2000 psf soil -> 100 psi max",
+   "source_edition_or_year": "spec-v745 worked example (machine-verified)",
+   "source_section_or_page": "spec-v745 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "bearing_area_ft2": 4.13,
+    "od_in": 8.625,
+    "bend_deg": 90,
+    "soil_bearing_psf": 2000
+   },
+   "outputs": {
+    "max_pressure_psi": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "max_thrust_lb": {
+     "value": 8260,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "thrust-block-sizing",
    "source_publisher": "AWWA M41",
    "source_title": "cross-check: a 45-deg bend at the same pressure -> T 4,472 lb (about half, the sin(theta/2) term)",

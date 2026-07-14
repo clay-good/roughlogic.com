@@ -82,6 +82,7 @@ const RELATED = {
   "outside-air-percent-temps": ["outdoor-air-mix", "pitot-traverse-cfm", "economizer-savings-hours", "dcv-co2-ventilation"],
   "colebrook-friction-factor": ["reynolds-number-pipe", "friction-loss", "pitot-traverse-cfm", "pump-specific-speed"],
   "thrust-block-sizing": ["pipe-expansion-loop", "water-hammer-surge", "colebrook-friction-factor", "hydrant-available-flow"],
+  "thrust-block-max-pressure": ["thrust-block-sizing", "water-hammer-surge", "pipe-expansion-loop"],
   "hydrant-available-flow": ["hydrant-flow", "required-fire-flow", "standpipe-pdp", "thrust-block-sizing"],
   "nfa-fireground-flow": ["required-fire-flow", "iso-nff", "pdp"],
   "iowa-rate-of-flow": ["nfa-fireground-flow", "required-fire-flow", "iso-nff"],

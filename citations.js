@@ -11607,6 +11607,18 @@ export const CITATIONS = {
       { name: "Transition band", value: "2300-4000 is indeterminate; estimate flagged", source: "scope of this tile" },
     ],
   },
+  "thrust-block-max-pressure": {
+    formula: "A = (pi/4) OD^2; max_thrust = bearing_area x soil; max_pressure = max_thrust / (2 A sin(theta/2)). The inverse of Ab = 2 P A sin(theta/2) / soil.",
+    edition: "The AWWA M41 thrust-block resultant-thrust and bearing-area method for a pipe bend, by name, solved for the pressure.",
+    freeAccess: "The resultant-thrust T = 2 P A sin(theta/2) and the bearing-area check are the standard published AWWA thrust-restraint relations.",
+    governance: GOVERNANCE.general,
+    editionNote: "The highest pressure a thrust block of a given bearing-face area restrains at a bend, the inverse of the AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method. The soil takes at most Ab x allowable bearing of thrust, so the pressure ceiling at the bend is P = Ab x soil / (2 A sin(theta/2)), where A is the pipe cross-sectional area from the outside diameter. The sin(theta/2) term is why a 90-degree bend restrains a lower pressure than a 45 for the same block. Compare against the test or surge pressure (not the working pressure) and use a conservative geotechnical soil-bearing value. This checks the bearing face only; the block geometry, burial depth, and the restrained-joint or passive-restraint alternative are the engineer's design. A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Max thrust from soil", value: "max thrust = bearing area x allowable soil bearing", source: "AWWA M41" },
+      { name: "Pressure ceiling", value: "P = max_thrust / (2 A sin(theta/2)), A = (pi/4) OD^2", source: "AWWA M41" },
+      { name: "Design pressure", value: "compare against the test/surge pressure and use a geotechnical soil value", source: "scope of this tile" },
+    ],
+  },
   "thrust-block-sizing": {
     formula: "A = (pi/4) OD^2; T = 2 P A sin(theta/2); Ab = T / (allowable soil bearing).",
     edition: "The AWWA M41 thrust-block resultant-thrust and bearing-area method for a pipe bend, by name.",

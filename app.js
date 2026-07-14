@@ -214,7 +214,7 @@ const TOOL_MODULES = (() => {
     "time-of-concentration", "orifice-flow", "orifice-diameter-for-flow", "tank-drain-time", "channel-froude-number",
     "channel-normal-depth", "hydraulic-jump", "specific-energy",
     "velocity-head", "flow-continuity", "bernoulli-head",
-    "thrust-block-sizing",
+    "thrust-block-sizing", "thrust-block-max-pressure",
   ]);
   // spec-v86 cap-relief split: the cohesive onsite-wastewater / septic bench
   // (the v2 septic-tank, the v7 septic-drainfield, and the v83 pressure-

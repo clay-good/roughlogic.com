@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(plumbing): spec-v745 max line pressure for a thrust block (thrust-block-sizing inverse); 2026-07-14
+
+- New tile `thrust-block-max-pressure` (Group B, calc-plumbing.js): the highest test/surge pressure a thrust block of a
+  given bearing-face area restrains at a bend. `P = Ab x soil / (2 A sin(theta/2))`. A 4.13 ft^2 block on an 8 in main at
+  a 90-degree bend in 2,000 psf soil holds ~100 psi. Round-trips through `thrust-block-sizing`. Home tile count 1,193 ->
+  1,194.
+
 ### feat(rigging): spec-v744 spreader beam minimum top-point height (spreader-beam inverse); 2026-07-14
 
 - New tile `spreader-beam-min-height` (Group Z, calc-rigging.js): the minimum top-point height so the top-sling tension

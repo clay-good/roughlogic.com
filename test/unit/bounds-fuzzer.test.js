@@ -17556,6 +17556,30 @@ test("bounds: spec-v388 computeThrustBlockSizing pins T = 2 P A sin(theta/2), th
   assert.ok("error" in _v388({ pressure_psi: Infinity, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }));
 });
 
+import { computeThrustBlockMaxPressure as _v745 } from "../../calc-plumbing.js";
+test("bounds: spec-v745 thrust block max pressure for a bearing area (inverse of thrust-block-sizing)", () => {
+  const p = _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 });
+  assert.ok(Math.abs(p.max_pressure_psi - 100) < 0.1);
+  assert.ok(Math.abs(p.max_thrust_lb - 4.13 * 2000) < 1e-9);
+  // round-trip: the recovered max pressure fed to thrust-block-sizing reproduces the bearing area
+  for (const [Ab, od, bend, soil] of [[4.13, 8.625, 90, 2000], [6.0, 12.75, 45, 2500], [2.0, 6.625, 90, 1500], [10, 16, 22.5, 3000]]) {
+    const inv = _v745({ bearing_area_ft2: Ab, od_in: od, bend_deg: bend, soil_bearing_psf: soil });
+    const fwd = _v388({ pressure_psi: inv.max_pressure_psi, od_in: od, bend_deg: bend, soil_bearing_psf: soil });
+    assert.ok(Math.abs(fwd.bearing_area_ft2 - Ab) < 1e-9);
+    assert.ok(Math.abs(fwd.thrust_lb - inv.max_thrust_lb) < 1e-6);
+  }
+  // a bigger block or stronger soil holds more pressure; a sharper bend holds less
+  assert.ok(_v745({ bearing_area_ft2: 8, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }).max_pressure_psi > _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }).max_pressure_psi);
+  assert.ok(_v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 45, soil_bearing_psf: 2000 }).max_pressure_psi > _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }).max_pressure_psi);
+  // error seams
+  assert.ok("error" in _v745({ bearing_area_ft2: 0, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v745({ bearing_area_ft2: 4.13, od_in: 0, bend_deg: 90, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 0, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 180, soil_bearing_psf: 2000 }));
+  assert.ok("error" in _v745({ bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 0 }));
+  assert.ok("error" in _v745({ bearing_area_ft2: Infinity, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 }));
+});
+
 test("bounds: spec-v389 computeHydrantAvailableFlow pins QR, the color class, and error seams", () => {
   const r = _v389({ static_psi: 70, residual_psi: 50, qf_gpm: 1000 });
   assert.ok(Math.abs(r.qr_gpm - 1000 * (50 / 20) ** 0.54) < 1e-6);

@@ -4371,6 +4371,53 @@ function _v388renderThrustBlockSizing(inputRegion, outputRegion, citationEl) {
 }
 PLUMBING_RENDERERS["thrust-block-sizing"] = _v388renderThrustBlockSizing;
 
+// thrust-block-max-pressure: inverse of thrust-block-sizing. The forward tile gives the required bearing area from the
+// pressure; the inverse recovers the highest test/surge pressure a thrust block of a given bearing-face area restrains at
+// a bend, so a designer checks an existing or standard block against a line pressure. From
+// bearing_area = 2 P A sin(theta/2) / soil, P = bearing_area x soil / (2 A sin(theta/2)), with A the pipe area from the OD.
+// dims: in { bearing_area_ft2: L^2, od_in: L, bend_deg: dimensionless, soil_bearing_psf: M L^-1 T^-2 } out: { max_pressure_psi: M L^-1 T^-2, max_thrust_lb: M L T^-2, area_in2: L^2 }
+export function computeThrustBlockMaxPressure({ bearing_area_ft2 = 0, od_in = 0, bend_deg = 0, soil_bearing_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Ab = Number(bearing_area_ft2) || 0;
+  const od = Number(od_in) || 0;
+  const bend = Number(bend_deg) || 0;
+  const soil = Number(soil_bearing_psf) || 0;
+  if (!(Ab > 0)) return { error: "Bearing-face area must be positive (ft^2)." };
+  if (!(od > 0)) return { error: "Pipe outside diameter must be positive (in)." };
+  if (!(bend > 0 && bend < 180)) return { error: "Bend angle must be between 0 and 180 degrees." };
+  if (!(soil > 0)) return { error: "Allowable soil bearing must be positive (psf)." };
+  const area_in2 = (Math.PI / 4) * od * od;
+  const max_thrust_lb = Ab * soil;
+  const max_pressure_psi = max_thrust_lb / (2 * area_in2 * Math.sin((bend * Math.PI / 180) / 2));
+  if (![area_in2, max_thrust_lb, max_pressure_psi].every(Number.isFinite)) return { error: "Max-pressure math is not a finite value." };
+  return {
+    max_pressure_psi, max_thrust_lb, area_in2,
+    note: "Max pressure a thrust block restrains = bearing area x allowable soil bearing / (2 A sin(theta/2)), the inverse of the AWWA M41 thrust relation T = 2 P A sin(theta/2) with A the pipe area from the OD. The soil takes at most Ab x allowable bearing of thrust, which sets the pressure ceiling at the bend. Compare against the TEST or SURGE pressure, not the working pressure, and use a conservative geotechnical soil value. This checks the bearing face only; block geometry, depth, and the restrained-joint alternative are the engineer's design. A design aid; the engineer of record governs.",
+  };
+}
+export const thrustBlockMaxPressureExample = { inputs: { bearing_area_ft2: 4.13, od_in: 8.625, bend_deg: 90, soil_bearing_psf: 2000 } };
+function _v745renderThrustBlockMaxPressure(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AWWA M41 (Ductile-Iron Pipe and Fittings) thrust-block method -- T = 2 P A sin(theta/2), Ab = T / soil, solved for the pressure: P = Ab x soil / (2 A sin(theta/2)). Compare against the test/surge pressure and a geotechnical soil-bearing value. Checks the bearing face only; the engineer of record governs the block design.";
+  const Ab = makeNumber("Bearing-face area (ft^2)", "tbm-a", { step: "any", min: "0" }); Ab.input.value = "4.13";
+  const od = makeNumber("Pipe outside diameter (in)", "tbm-od", { step: "any", min: "0" }); od.input.value = "8.625";
+  const bend = makeNumber("Bend angle (deg)", "tbm-b", { step: "any", min: "0" }); bend.input.value = "90";
+  const soil = makeNumber("Allowable soil bearing (psf)", "tbm-s", { step: "any", min: "0" }); soil.input.value = "2000";
+  for (const f of [Ab, od, bend, soil]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Ab.input.value = "4.13"; od.input.value = "8.625"; bend.input.value = "90"; soil.input.value = "2000"; update(); });
+  const oP = makeOutputLine(outputRegion, "Max test / surge pressure", "tbm-out-p");
+  const oT = makeOutputLine(outputRegion, "Max thrust the soil takes", "tbm-out-t");
+  const oN = makeOutputLine(outputRegion, "Note", "tbm-out-n");
+  const update = debounce(() => {
+    const r = computeThrustBlockMaxPressure({ bearing_area_ft2: Number(Ab.input.value) || 0, od_in: Number(od.input.value) || 0, bend_deg: Number(bend.input.value) || 0, soil_bearing_psf: Number(soil.input.value) || 0 });
+    if (r.error) { oP.textContent = r.error; oT.textContent = "-"; oN.textContent = ""; return; }
+    oP.textContent = fmt(r.max_pressure_psi, 0) + " psi (pipe area " + fmt(r.area_in2, 1) + " in^2)";
+    oT.textContent = fmt(r.max_thrust_lb, 0) + " lb";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Ab, od, bend, soil]) f.input.addEventListener("input", update);
+}
+PLUMBING_RENDERERS["thrust-block-max-pressure"] = _v745renderThrustBlockMaxPressure;
+
 // ===================== spec-v428: stormwater detention volume (drainage trio) =====================
 
 // dims: in { runoff_c: dimensionless, intensity_in_hr: dimensionless, area_ac: dimensionless, q_allow_cfs: L^3 T^-1, duration_min: dimensionless } out: { q_in_cfs: L^3 T^-1, storage_cf: L^3, storage_ac_ft: L^3 }

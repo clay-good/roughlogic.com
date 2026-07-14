@@ -991,6 +991,7 @@ export const COMPUTE_MAP = {
   "outside-air-percent-temps": { module: "../../calc-hvacservice.js", fn: "computeOutsideAirPercentTemps" },
   "colebrook-friction-factor": { module: "../../calc-hvac.js", fn: "computeColebrookFrictionFactor" },
   "thrust-block-sizing": { module: "../../calc-plumbing.js", fn: "computeThrustBlockSizing" },
+  "thrust-block-max-pressure": { module: "../../calc-plumbing.js", fn: "computeThrustBlockMaxPressure" },
   "hydrant-available-flow": { module: "../../calc-fire.js", fn: "computeHydrantAvailableFlow" },
   "nfa-fireground-flow": { module: "../../calc-fire.js", fn: "computeNfaFiregroundFlow" },
   "iowa-rate-of-flow": { module: "../../calc-fire.js", fn: "computeIowaRateOfFlow" },

@@ -605,7 +605,7 @@ const _TILES = [
   ["vibration-isolation", "C"], ["isolator-deflection", "C"],
   ["moist-air-enthalpy", "C"], ["drybulb-from-enthalpy", "C"], ["cooling-coil-total-load", "C"], ["coil-bypass-factor", "C"],
   ["fan-affinity-laws", "C"], ["pitot-traverse-cfm", "C"], ["outside-air-percent-temps", "C"],
-  ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["hydrant-available-flow", "F"],
+  ["colebrook-friction-factor", "C"], ["thrust-block-sizing", "B"], ["thrust-block-max-pressure", "B"], ["hydrant-available-flow", "F"],
   ["nfa-fireground-flow", "F"],
   ["iowa-rate-of-flow", "F"],
   ["relay-pump-distance", "F"],
