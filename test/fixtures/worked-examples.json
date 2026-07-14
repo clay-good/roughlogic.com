@@ -51501,6 +51501,35 @@
    }
   },
   {
+   "tile_id": "masonry-anchor-embedment",
+   "source_publisher": "TMS 402 ASD",
+   "source_title": "lbe = sqrt(T / (1.25 pi sqrt(f'm))); inverse of the anchor-bolt breakout branch",
+   "source_edition_or_year": "spec-v705 worked example (machine-verified; inverse of spec-v449)",
+   "source_section_or_page": "5,000 lb tension, 1,500 psi masonry -> 5.73 in embedment; Bas 9,547 lb adequate",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "required_tension_lb": 5000,
+    "fm_psi": 1500,
+    "ab_in2": 0.442,
+    "fy_psi": 36000
+   },
+   "outputs": {
+    "lbe_in": {
+     "value": 5.733664,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "bas_lb": {
+     "value": 9547.2,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cross-connection-air-gap",
    "source_publisher": "IPC 608.15.1 / ASME A112.1.2",
    "source_title": "1 in opening, not near a wall -> 2 in air gap (3 in near a wall)",

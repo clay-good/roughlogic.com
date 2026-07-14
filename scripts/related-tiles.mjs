@@ -1151,6 +1151,7 @@ const RELATED = {
   "concrete-torsion-threshold": ["rc-beam-shear","rc-beam-flexure","concrete-beam-min-flexural-steel","combined-stress-axial-bending"],
   "glulam-volume-factor": ["wood-beam-bending","wood-beam-shear","beam-loading","lumber-spans"],
   "masonry-anchor-bolt": ["cmu-wall-flexure","cmu-wall-axial","anchor-embedment","brick-veneer-anchor-spacing"],
+  "masonry-anchor-embedment": ["masonry-anchor-bolt","anchor-embedment","masonry-prism-fm","cmu-wall-flexure"],
   "masonry-prism-fm": ["cmu-wall-axial","cmu-wall-flexure","cmu-shear-wall","masonry-anchor-bolt"],
   "rc-development-length": ["rebar-lap-splice","rc-beam-flexure","rebar-schedule"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (Group E, calc-geotech.js)

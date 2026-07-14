@@ -17077,6 +17077,35 @@ test("bounds: spec-v449 computeMasonryAnchorBolt pins Bab/Bas, the governing swi
   assert.ok("error" in _v449({ fm_psi: Infinity, lbe_in: 4, ab_in2: 0.442, fy_psi: 36000 }));
 });
 
+import { computeMasonryAnchorEmbedment as _v705 } from "../../calc-masonry.js";
+test("bounds: spec-v705 computeMasonryAnchorEmbedment pins lbe = sqrt(T/(1.25 pi sqrt(f'm))), round-trips through computeMasonryAnchorBolt, and error seams", () => {
+  const r = _v705({ required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.lbe_in - Math.sqrt(5000 / (1.25 * Math.PI * Math.sqrt(1500)))) < 1e-9, `lbe identity: ${r.lbe_in}`);
+  assert.ok(Math.abs(r.lbe_in - 5.733664) < 1e-4, `pinned 5.73 in: ${r.lbe_in}`);
+  assert.strictEqual(r.steel_adequate, true);
+  // Round-trip: at the returned embedment the forward tile's masonry breakout equals the required tension.
+  for (const required_tension_lb of [1000, 5000, 8000]) {
+    for (const fm_psi of [1500, 2500, 3500]) {
+      const m = _v705({ required_tension_lb, fm_psi, ab_in2: 0.442, fy_psi: 36000 });
+      assert.ok(!m.error, `sweep T=${required_tension_lb} fm=${fm_psi}: ${JSON.stringify(m)}`);
+      assertFinite(m.lbe_in, "lbe"); assert.ok(m.lbe_in > 0, "lbe positive");
+      const back = _v449({ fm_psi, lbe_in: m.lbe_in, ab_in2: 0.442, fy_psi: 36000 });
+      assert.ok(Math.abs(back.bab_lb - required_tension_lb) < 1e-6, `round-trip T=${required_tension_lb} fm=${fm_psi}: ${back.bab_lb}`);
+    }
+  }
+  // A stronger masonry needs less embedment for the same tension.
+  assert.ok(_v705({ required_tension_lb: 5000, fm_psi: 3000, ab_in2: 0.442, fy_psi: 36000 }).lbe_in < r.lbe_in);
+  // A tension above the steel ceiling is flagged (no embedment can reach it).
+  assert.strictEqual(_v705({ required_tension_lb: 12000, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 }).steel_adequate, false);
+  // Error seams: non-positive tension, f'm, area, yield, non-finite.
+  assert.ok("error" in _v705({ required_tension_lb: 0, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v705({ required_tension_lb: 5000, fm_psi: 0, ab_in2: 0.442, fy_psi: 36000 }));
+  assert.ok("error" in _v705({ required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0, fy_psi: 36000 }));
+  assert.ok("error" in _v705({ required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0.442, fy_psi: 0 }));
+  assert.ok("error" in _v705({ required_tension_lb: Infinity, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 }));
+});
+
 // ===================== spec-v551 masonry unit-strength f'm (calc-masonry.js) =====================
 import { computeMasonryPrismFm as _v551 } from "../../calc-masonry.js";
 

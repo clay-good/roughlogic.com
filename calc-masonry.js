@@ -383,6 +383,50 @@ MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
   compute: computeMasonryAnchorBolt,
 });
 
+// ===================== spec-v705: masonry anchor embedment for a tension (inverse) =====================
+// The inverse of masonry-anchor-bolt: given a required tension, solve the TMS 402
+// masonry-breakout branch for the embedment. Bab = 1.25 x (pi lbe^2) x sqrt(f'm),
+// so lbe = sqrt( T / (1.25 pi sqrt(f'm)) ). The steel branch Bas = 0.6 Ab fy is
+// checked separately: if it is below the target no embedment can reach it.
+// dims: in { required_tension_lb: M L T^-2, fm_psi: M L^-1 T^-2, ab_in2: L^2, fy_psi: M L^-1 T^-2 } out: { lbe_in: L, apt_in2: L^2, bas_lb: M L T^-2, steel_adequate: dimensionless }
+export function computeMasonryAnchorEmbedment({ required_tension_lb = 0, fm_psi = 1500, ab_in2 = 0.442, fy_psi = 36000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(required_tension_lb) || 0;
+  const fm = Number(fm_psi) || 0;
+  const ab = Number(ab_in2) || 0;
+  const fy = Number(fy_psi) || 0;
+  if (!(T > 0)) return { error: "Required tension must be positive (lb)." };
+  if (!(fm > 0)) return { error: "Masonry strength f'm must be positive (psi)." };
+  if (!(ab > 0)) return { error: "Bolt area Ab must be positive (in^2)." };
+  if (!(fy > 0)) return { error: "Bolt yield fy must be positive (psi)." };
+  const lbe_in = Math.sqrt(T / (1.25 * Math.PI * Math.sqrt(fm)));
+  const apt_in2 = Math.PI * lbe_in * lbe_in;
+  const bas_lb = 0.6 * ab * fy;
+  const steel_adequate = bas_lb >= T;
+  return {
+    lbe_in, apt_in2, bas_lb, steel_adequate,
+    note: "The effective embedment lbe that makes the TMS 402 masonry-breakout capacity Bab = 1.25 x (pi lbe^2) x sqrt(f'm) equal the required tension, the inverse of masonry-anchor-bolt. Deeper embedment pulls a larger 45-degree cone and carries more load. The steel branch Bas = 0.6 x Ab x fy is a separate ceiling: if it is below the required tension the bolt yields no matter how deep it is set, so a larger-diameter or higher-grade bolt is needed. Edge distance or overlapping cones reduce the projected area Apt (this full-cone value is an upper bound, so the real required embedment is deeper); anchor shear (pryout) is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  };
+}
+export const masonryAnchorEmbedmentExample = { inputs: { required_tension_lb: 5000, fm_psi: 1500, ab_in2: 0.442, fy_psi: 36000 } };
+MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
+  citation: "Citation: TMS 402 ASD headed anchor bolt tension solved for the embedment: lbe = sqrt(T / (1.25 pi sqrt(f'm))) from the masonry breakout branch Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi lbe^2). The steel branch Bas = 0.6 Ab fy is a separate ceiling. Edge distance reduces Apt; shear is a separate check. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: masonryAnchorEmbedmentExample.inputs,
+  fields: [
+    { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number", default: 5000 },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", default: 1500 },
+    { key: "ab_in2", label: "Bolt tensile area Ab (in^2, 3/4in = 0.442)", kind: "number", default: 0.442 },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
+  ],
+  outputs: [
+    { key: "lbe", id: "mae-out-lbe", label: "Required embedment lbe", value: (r) => fmt(r.lbe_in, 2) + " in" },
+    { key: "apt", id: "mae-out-apt", label: "Projected area Apt = pi lbe^2", value: (r) => fmt(r.apt_in2, 1) + " in^2" },
+    { key: "bas", id: "mae-out-bas", label: "Steel ceiling Bas = 0.6 Ab fy", value: (r) => fmt(r.bas_lb, 0) + " lb (" + (r.steel_adequate ? "adequate for T" : "BELOW T -- use a larger/stronger bolt") + ")" },
+    { key: "n", id: "mae-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMasonryAnchorEmbedment,
+});
+
 // ===================== spec-v551: masonry unit-strength f'm (Group E) =====================
 // The upstream f'm the whole CMU wall bench (cmu-wall-axial / -flexure / -shear-wall /
 // masonry-anchor-bolt) consumes but none derives. TMS 602-16 Table 2 unit-strength

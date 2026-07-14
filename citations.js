@@ -12394,6 +12394,18 @@ export const CITATIONS = {
       { name: "Tension only", value: "axial tension only; anchor shear (pryout) and combined shear-tension are separate checks", source: "TMS 402" },
     ],
   },
+  "masonry-anchor-embedment": {
+    formula: "lbe = sqrt( T / (1.25 x pi x sqrt(f'm)) ), the masonry-breakout branch Bab = 1.25 x (pi lbe^2) x sqrt(f'm) solved for the effective embedment; steel ceiling Bas = 0.6 x Ab x fy checked separately.",
+    edition: "TMS 402 (Building Code Requirements for Masonry Structures, ACI 530 / ASCE 5) allowable-stress anchor-bolt tension provisions, as compiled in the Masonry Designers' Guide and CMHA TEK notes, by name.",
+    freeAccess: "CMHA TEK notes on anchor-bolt design are free public CMHA technical notes; the 1.25 x Apt x sqrt(f'm) arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of masonry-anchor-bolt: the effective embedment lbe that makes the TMS 402 masonry-breakout capacity equal a required tension. Deeper embedment pulls a larger 45-degree cone and carries more; the steel Bas = 0.6 x Ab x fy is a separate ceiling, so if it is below the required tension the bolt yields no matter how deep it is set (a larger-diameter or higher-grade bolt is needed). The full-cone Apt = pi x lbe^2 is an upper bound - edge distance or overlapping cones reduce it, so the real required embedment is deeper. Anchor shear (pryout) is a separate check. fy defaults to 36,000 psi (ASTM A307 / F1554 Grade 36). A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Breakout branch inverted", value: "solves Bab = 1.25 x pi lbe^2 x sqrt(f'm) for lbe; the steel branch Bas = 0.6 x Ab x fy is a separate ceiling", source: "TMS 402 ASD" },
+      { name: "Full-cone projected area", value: "Apt = pi x lbe^2 assumes a full breakout cone; edge distance or overlapping cones deepen the required embedment", source: "TMS 402" },
+      { name: "Tension only", value: "axial tension only; anchor shear (pryout) and combined shear-tension are separate checks", source: "TMS 402" },
+    ],
+  },
   "cmu-shear-wall": {
     formula: "Fvm = 0.5 x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An); Fvs = 0.5 x (Av Fs dv)/(An s); Fv = Fvm + Fvs, capped at 3 sqrt(f'm) (M/(V dv) <= 0.25) grading to 2 sqrt(f'm) (>= 1.0); Va = Fv An.",
     edition: "TMS 402-16 (ACI 530 / ASCE 5) allowable-stress in-plane shear provisions, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C, by name.",

@@ -743,7 +743,7 @@ const _TILES = [
   ["steel-doubler-plate", "E"],
   // spec-v257..v259 ACI 318-19 reinforced-concrete member trio (calc-concrete.js)
   ["rc-beam-flexure", "E"], ["rc-beam-shear", "E"], ["rc-development-length", "E"],
-  ["concrete-torsion-threshold", "E"], ["glulam-volume-factor", "E"], ["masonry-anchor-bolt", "E"],
+  ["concrete-torsion-threshold", "E"], ["glulam-volume-factor", "E"], ["masonry-anchor-bolt", "E"], ["masonry-anchor-embedment", "E"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)
   ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["at-rest-earth-pressure", "E"], ["submerged-earth-pressure", "E"], ["sloped-backfill-earth-pressure", "E"], ["slope-stability-seepage", "E"], ["coulomb-earth-pressure", "E"], ["retaining-wall-stability", "E"],
   ["consolidation-time-rate", "E"], ["consolidation-degree", "E"], ["spt-bearing-capacity", "E"], ["liquefaction-screening", "E"],

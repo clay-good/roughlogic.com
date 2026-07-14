@@ -48492,6 +48492,31 @@
       "kind": "question"
     },
     {
+      "term": "how deep to embed a masonry anchor",
+      "target": "masonry-anchor-embedment",
+      "kind": "question"
+    },
+    {
+      "term": "anchor embedment for required tension in block",
+      "target": "masonry-anchor-embedment",
+      "kind": "question"
+    },
+    {
+      "term": "masonry breakout embedment depth",
+      "target": "masonry-anchor-embedment",
+      "kind": "question"
+    },
+    {
+      "term": "lbe for anchor pullout in cmu",
+      "target": "masonry-anchor-embedment",
+      "kind": "question"
+    },
+    {
+      "term": "embedment depth for masonry anchor bolt",
+      "target": "masonry-anchor-embedment",
+      "kind": "question"
+    },
+    {
       "term": "block shear wall capacity",
       "target": "cmu-shear-wall",
       "kind": "question"
