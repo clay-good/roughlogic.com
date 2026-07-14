@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): spec-v729 drill point angle from tip length (drill-point-depth inverse); 2026-07-14
+
+- New tile `drill-point-angle-from-length` (Group K, calc-machining.js): the included point angle from the diameter and a
+  measured or target tip length. `angle = 2 x atan( (diameter/2) / point_length )`. A 0.5 in drill with a 0.15 in tip is a
+  118-degree point. Round-trips through `drill-point-depth`. Opens Explore sweep #12. Home tile count 1,177 -> 1,178.
+
 ### feat(shop): spec-v728 interference for a target press-fit holding force (press-fit-pressure inverse); 2026-07-14
 
 - New tile `press-fit-interference-for-force` (Group G, calc-shop.js): the diametral interference that reaches a target

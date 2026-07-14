@@ -976,6 +976,17 @@ export const CITATIONS = {
     ],
   },
 
+  "drill-point-angle-from-length": {
+    formula: "included point angle = 2 x atan( (diameter / 2) / point length ); half (lip) angle = point angle / 2; the inverse of point length = (diameter / 2) / tan(point angle / 2).",
+    edition: "Drill-point geometry; the 118 / 135-degree drill-point relation as in Machinery's Handbook (Industrial Press), by name; first-principles trigonometry, solved for the angle.",
+    freeAccess: "Pure geometry, public; web thinning, drift, and the actual grind govern the drilled hole.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles tip-allowance identity solved for the angle; recovers the included point angle from the diameter and a measured or target point length (tip allowance).",
+    assumptions: [
+      { name: "Ideal conical point", value: "treats the point as an ideal cone; ignores web thinning and split-point geometry", source: "drill-point geometry" },
+    ],
+  },
+
   "cost-per-mile": {
     formula: "fixed_cpm = fixed_monthly / miles; fuel_cpm = price / mpg; total_cpm = fixed_cpm + fuel_cpm + maint_cpm + driver_cpm; break-even rate = total_cpm.",
     edition: "Cost-per-mile bucket methodology per ATRI (American Transportation Research Institute), 'An Analysis of the Operational Costs of Trucking', by name; arithmetic is public.",

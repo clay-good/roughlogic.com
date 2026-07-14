@@ -161,6 +161,7 @@ const RELATED = {
   "gear-mph-rpm": ["tire-gearing", "hp-from-torque", "displacement-cr"],
   "cutting-speed-rpm": ["hp-from-torque", "gear-mph-rpm", "bolt-stretch"],
   "drill-point-depth": ["cutting-speed-rpm", "bolt-circle", "decimal-to-fraction"],
+  "drill-point-angle-from-length": ["drill-point-depth", "cutting-speed-rpm", "countersink-depth"],
   "bolt-circle": ["flange-bolt-torque", "layout-squaring", "rolling-offset"],
   "decimal-to-fraction": ["unit-converter", "layout-squaring", "geometry"],
   "sine-bar": ["bolt-circle", "decimal-to-fraction", "cutting-speed-rpm"],

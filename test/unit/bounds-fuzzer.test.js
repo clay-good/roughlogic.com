@@ -9646,6 +9646,29 @@ test("bounds: calc-trucking v20 J + calc-mechanic v20 K tiles pin constants + re
   assert.ok("error" in _k5({ diameter_in: 0.5, point_angle_deg: 118, full_depth_in: Infinity }));
 });
 
+import { computeDrillPointAngleFromLength as _v729 } from "../../calc-machining.js";
+test("bounds: spec-v729 drill point angle from tip length (inverse of drill-point-depth)", () => {
+  const p = _v729({ diameter_in: 0.5, point_length_in: 0.15 });
+  assert.ok(Math.abs(p.point_angle_deg - 118.072) < 0.01);
+  assert.ok(Math.abs(p.half_angle_deg - 59.036) < 0.01);
+  assert.ok(Math.abs(p.length_per_diameter - 0.3) < 1e-9);
+  // round-trip: the recovered angle fed to drill-point-depth reproduces the point length
+  for (const [d, plen] of [[0.5, 0.15], [0.25, 0.075], [1.0, 0.5], [0.125, 0.02]]) {
+    const inv = _v729({ diameter_in: d, point_length_in: plen });
+    const fwd = _k5({ diameter_in: d, point_angle_deg: inv.point_angle_deg });
+    assert.ok(Math.abs(fwd.point_length_in - plen) < 1e-9);
+  }
+  // a shorter tip for the same diameter is a blunter (larger) angle
+  assert.ok(_v729({ diameter_in: 0.5, point_length_in: 0.10 }).point_angle_deg > _v729({ diameter_in: 0.5, point_length_in: 0.20 }).point_angle_deg);
+  // the recovered angle always lands in (0, 180)
+  const wide = _v729({ diameter_in: 1.0, point_length_in: 0.01 });
+  assert.ok(wide.point_angle_deg > 0 && wide.point_angle_deg < 180);
+  // error seams
+  assert.ok("error" in _v729({ diameter_in: 0, point_length_in: 0.15 }));
+  assert.ok("error" in _v729({ diameter_in: 0.5, point_length_in: 0 }));
+  assert.ok("error" in _v729({ diameter_in: Infinity, point_length_in: 0.15 }));
+});
+
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
 import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
 

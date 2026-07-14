@@ -15946,6 +15946,33 @@
    }
   },
   {
+   "tile_id": "drill-point-angle-from-length",
+   "source_publisher": "First-principles drill-point geometry + Machinery's Handbook",
+   "source_title": "included angle = 2 x atan( (dia/2) / point length ), the inverse of point length = (dia/2) / tan(angle/2)",
+   "source_edition_or_year": "geometric",
+   "source_section_or_page": "0.5-in drill, 0.15-in tip -> 118.1-deg point (59.0-deg lip)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "diameter_in": 0.5,
+    "point_length_in": 0.15
+   },
+   "outputs": {
+    "point_angle_deg": {
+     "value": 118.072,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "half_angle_deg": {
+     "value": 59.036,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bolt-circle",
    "source_publisher": "First-principles circle-of-holes trigonometry + Machinery's Handbook",
    "source_title": "x = cx + R cos(a), y = cy + R sin(a); chord = 2 R sin(180/N)",

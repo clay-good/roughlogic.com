@@ -667,6 +667,31 @@
       "kind": "industry"
     },
     {
+      "term": "drill point angle",
+      "target": "drill-point-angle-from-length",
+      "kind": "industry"
+    },
+    {
+      "term": "point angle from length",
+      "target": "drill-point-angle-from-length",
+      "kind": "redirect"
+    },
+    {
+      "term": "drill included angle",
+      "target": "drill-point-angle-from-length",
+      "kind": "industry"
+    },
+    {
+      "term": "what angle is my drill",
+      "target": "drill-point-angle-from-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drill point angle from tip",
+      "target": "drill-point-angle-from-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "drill tip length",
       "target": "drill-point-depth",
       "kind": "redirect"

@@ -123,6 +123,7 @@ const _TILES = [
   ["gear-mph-rpm", "K"],
   ["cutting-speed-rpm", "K"],
   ["drill-point-depth", "K"],
+  ["drill-point-angle-from-length", "K"],
   ["cost-per-mile", "J"],
   ["deadhead-percent", "J"],
   ["axle-load-distribution", "J"],

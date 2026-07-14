@@ -874,7 +874,7 @@ const TOOL_MODULES = (() => {
   // precedent).
   declare("./calc-machining.js", "MACHINING_RENDERERS", [
     // v31, v34
-    "cutting-speed-rpm", "drill-point-depth",
+    "cutting-speed-rpm", "drill-point-depth", "drill-point-angle-from-length",
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR

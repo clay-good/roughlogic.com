@@ -122,6 +122,54 @@ function renderDrillPointDepth(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["drill-point-depth"] = renderDrillPointDepth;
 
+// drill-point-angle-from-length: inverse of drill-point-depth. The forward tile
+// gives the point length (tip allowance) from the diameter and point angle; the
+// inverse recovers the included point angle from a measured or target point
+// length -- the number you back out when you sharpen to a length or measure a
+// tip on a comparator. From point_length = (d/2)/tan(angle/2),
+// angle = 2 x atan( (d/2) / point_length ).
+// dims: in { diameter_in: L, point_length_in: L } out: { point_angle_deg: dimensionless, half_angle_deg: dimensionless, length_per_diameter: dimensionless }
+export function computeDrillPointAngleFromLength({ diameter_in = 0, point_length_in = 0 } = {}) {
+  const _g = _finiteGuard({ diameter_in, point_length_in }); if (_g) return _g;
+  const d = Number(diameter_in);
+  const plen = Number(point_length_in);
+  if (!(d > 0)) return { error: "Drill diameter must be positive (in)." };
+  if (!(plen > 0)) return { error: "Point length must be positive (in)." };
+  const half_rad = Math.atan((d / 2) / plen);
+  const half_angle_deg = (half_rad * 180) / Math.PI;
+  const point_angle_deg = 2 * half_angle_deg;
+  const length_per_diameter = plen / d;
+  if (![point_angle_deg, half_angle_deg, length_per_diameter].every(Number.isFinite)) return { error: "Point-angle math is not a finite value." };
+  const notes = [];
+  notes.push("Included point angle = 2 x atan( (diameter / 2) / point length ), the inverse of point length = (diameter / 2) / tan(point angle / 2). A shorter tip for a given diameter means a blunter (larger) angle; the standard 118-degree point runs about 0.3 x diameter.");
+  if (point_angle_deg > 135.5) notes.push("Over ~135 degrees is a blunt, flat point (split-point / sheet-metal territory); confirm the grind.");
+  else if (point_angle_deg < 90) notes.push("Under 90 degrees is a very steep point (soft/plastic materials); confirm the grind.");
+  notes.push("Geometry only; web thinning, drift, and the actual grind govern the drilled hole.");
+  return { diameter_in: d, point_length_in: plen, point_angle_deg, half_angle_deg, length_per_diameter, notes };
+}
+export const drillPointAngleFromLengthExample = { inputs: { diameter_in: 0.5, point_length_in: 0.15 } };
+
+function renderDrillPointAngleFromLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Included point angle = 2 x atan( (diameter / 2) / point length ) - first-principles drill-point geometry (the standard 118-degree / 135-degree drill-point relation as in Machinery's Handbook, by name) solved for the angle. Geometry only; web thinning, drift, and the actual grind govern the drilled hole.";
+  const dia = makeNumber("Drill diameter (in)", "dpa-dia", { step: "any", min: "0", value: "0.5" }); dia.input.value = "0.5";
+  const plen = makeNumber("Point length / tip allowance (in)", "dpa-plen", { step: "any", min: "0", value: "0.15" }); plen.input.value = "0.15";
+  for (const f of [dia, plen]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "0.5"; plen.input.value = "0.15"; update(); });
+  const oAngle = makeOutputLine(outputRegion, "Included point angle", "dpa-out-angle");
+  const oHalf = makeOutputLine(outputRegion, "Half (lip) angle", "dpa-out-half");
+  const oNote = makeOutputLine(outputRegion, "Notes", "dpa-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeDrillPointAngleFromLength({ diameter_in: readNum(dia.input), point_length_in: readNum(plen.input) });
+    if (r.error) { oAngle.textContent = r.error; oHalf.textContent = "-"; oNote.textContent = ""; return; }
+    oAngle.textContent = fmt(r.point_angle_deg, 1) + " deg (tip about " + fmt(r.length_per_diameter, 2) + " x diameter)";
+    oHalf.textContent = fmt(r.half_angle_deg, 1) + " deg from the axis";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [dia.input, plen.input]) f.addEventListener("input", update);
+}
+MACHINING_RENDERERS["drill-point-angle-from-length"] = renderDrillPointAngleFromLength;
+
 // =====================================================================
 // spec-v100 K - cutting-fluid concentration and top-up (machine shop).
 // Running concentration from a refractometer Brix reading and the
