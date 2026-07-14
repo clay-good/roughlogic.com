@@ -31906,6 +31906,34 @@
    }
   },
   {
+   "tile_id": "spindle-max-mrr",
+   "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
+   "source_title": "max MRR = motor hp x efficiency / unit power (inverse of the cutting-power tile)",
+   "source_edition_or_year": "Machinery's Handbook (Industrial Press)",
+   "source_section_or_page": "5 hp motor, 80% eff, unit power 1.0 (carbon steel) -> 4.0 in3/min",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_motor_hp": 5,
+    "unit_power_hp": 1.0,
+    "efficiency_pct": 80
+   },
+   "outputs": {
+    "max_mrr_in3_min": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cutting_hp": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spindle-power-torque",
    "source_publisher": "first-principles specific-cutting-energy with Machinery's Handbook unit power",
    "source_title": "cross-check: aluminum (unit power 0.33) draws about a third the power and torque",

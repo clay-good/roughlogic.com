@@ -760,6 +760,7 @@ const RELATED = {
   "min-bend-radius": ["bend-allowance", "rolled-blank", "press-brake-tonnage"],
   "shrink-fit": ["metal-weight", "flange-bolt-torque", "conduit-thermal-expansion"],
   "spindle-power-torque": ["material-removal-rate", "cutting-speed-rpm", "machining-time"],
+  "spindle-max-mrr": ["spindle-power-torque", "material-removal-rate", "machining-time", "cutting-speed-rpm"],
   "demo-debris": ["excavation", "material-quantity"],
   "formwork-pressure": ["concrete", "wind-pressure"],
   "residential-framing": ["lumber-spans", "rafter", "joist-deflection"],

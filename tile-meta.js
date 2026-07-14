@@ -408,7 +408,7 @@ const _TILES = [
   ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["shrink-fit", "G"],
   ["weld-dilution", "E"], ["weld-passes-arc-time", "E"], ["weld-travel-speed", "E"],
   // v135 machining cut-planning (calc-machining.js)
-  ["spindle-power-torque", "K"],
+  ["spindle-power-torque", "K"], ["spindle-max-mrr", "K"],
 
   // v41 machine-shop & fab bench batch 2 (calc-shop.js; natural group letters K/G)
   ["tap-drill-size", "K"], ["rolled-blank", "G"],

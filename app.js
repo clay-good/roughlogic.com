@@ -878,7 +878,7 @@ const TOOL_MODULES = (() => {
     // v100 cutting-fluid concentration
     "cutting-fluid-concentration",
     // v135 cutting power and spindle torque from MRR
-    "spindle-power-torque",
+    "spindle-power-torque", "spindle-max-mrr",
     // spec-v317..v319 machining depth batch
     "radial-chip-thinning", "boring-bar-deflection", "boring-bar-max-overhang", "ballnose-scallop-height",
     // spec-v401 spur gear tooth geometry

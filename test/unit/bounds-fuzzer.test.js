@@ -12158,6 +12158,34 @@ test("bounds: calc-machining computeSpindlePowerTorque pins cutting/motor hp + t
   assert.ok("error" in _v135({ mrr_in3_min: 3.0, unit_power_hp: 1.0, efficiency_pct: 120, rpm: 800 }));
 });
 
+import { computeSpindleMaxMrr as _v711 } from "../../calc-machining.js";
+test("bounds: spec-v711 computeSpindleMaxMrr pins max MRR = motor hp x eff / unit power, round-trips through computeSpindlePowerTorque, and error seams", () => {
+  const r = _v711({ available_motor_hp: 5, unit_power_hp: 1.0, efficiency_pct: 80 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_mrr_in3_min - 4.0) < 1e-9, `max MRR: ${r.max_mrr_in3_min}`);
+  assert.ok(Math.abs(r.cutting_hp - 4.0) < 1e-9, `cutting hp: ${r.cutting_hp}`);
+  // Round-trip: at the max MRR the forward tile's motor hp equals the available motor.
+  for (const available_motor_hp of [1, 5, 20]) {
+    for (const unit_power_hp of [0.33, 1.0, 1.5]) {
+      for (const efficiency_pct of [70, 80, 90]) {
+        const m = _v711({ available_motor_hp, unit_power_hp, efficiency_pct });
+        assert.ok(!m.error, `sweep hp=${available_motor_hp} up=${unit_power_hp} eff=${efficiency_pct}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_mrr_in3_min, "mrr"); assert.ok(m.max_mrr_in3_min > 0, "mrr positive");
+        const back = _v135({ mrr_in3_min: m.max_mrr_in3_min, unit_power_hp, efficiency_pct, rpm: 800 });
+        assert.ok(Math.abs(back.motor_hp - available_motor_hp) < 1e-9, `round-trip hp=${available_motor_hp} up=${unit_power_hp} eff=${efficiency_pct}: ${back.motor_hp}`);
+      }
+    }
+  }
+  // Aluminum (lower unit power) allows a higher MRR than steel for the same motor.
+  assert.ok(_v711({ available_motor_hp: 5, unit_power_hp: 0.33, efficiency_pct: 80 }).max_mrr_in3_min > r.max_mrr_in3_min);
+  // Error seams: non-positive motor hp, unit power, efficiency outside (0,100], non-finite.
+  assert.ok("error" in _v711({ available_motor_hp: 0, unit_power_hp: 1.0 }));
+  assert.ok("error" in _v711({ available_motor_hp: 5, unit_power_hp: 0 }));
+  assert.ok("error" in _v711({ available_motor_hp: 5, unit_power_hp: 1.0, efficiency_pct: 0 }));
+  assert.ok("error" in _v711({ available_motor_hp: 5, unit_power_hp: 1.0, efficiency_pct: 120 }));
+  assert.ok("error" in _v711({ available_motor_hp: Infinity, unit_power_hp: 1.0 }));
+});
+
 // ---------------------------------------------------------------------------
 // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates
 // of egc-upsize-proportional / conductor-short-circuit-withstand / neutral-current-3ph).

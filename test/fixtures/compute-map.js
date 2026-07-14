@@ -451,6 +451,7 @@ export const COMPUTE_MAP = {
   "weld-passes-arc-time": { module: "../../calc-fab.js", fn: "computeWeldPassesArcTime" },
   "weld-travel-speed": { module: "../../calc-fab.js", fn: "computeWeldTravelSpeed" },
   "spindle-power-torque": { module: "../../calc-machining.js", fn: "computeSpindlePowerTorque" },
+  "spindle-max-mrr": { module: "../../calc-machining.js", fn: "computeSpindleMaxMrr" },
   "helical-pile": { module: "../../calc-construction.js", fn: "computeHelicalPile" },
   "helical-pile-torque": { module: "../../calc-construction.js", fn: "computeHelicalPileTorque" },
   "rebar-schedule": { module: "../../calc-construction.js", fn: "computeRebarSchedule" },

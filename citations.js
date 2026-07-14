@@ -9220,6 +9220,18 @@ export const CITATIONS = {
       { name: "Drive efficiency", value: "spindle drive efficiency; default 80%", source: "machine data" },
     ],
   },
+  "spindle-max-mrr": {
+    formula: "max MRR (in3/min) = available motor hp x (efficiency / 100) / unit power (hp per in3/min); the specific-cutting-energy relation solved for the removal rate.",
+    edition: "Cutting power solved for the removal rate - first-principles specific-cutting-energy relation with Machinery's Handbook (Industrial Press) unit-power values, by name.",
+    freeAccess: "The specific-cutting-energy arithmetic is public; the motor horsepower, unit power, and efficiency are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of spindle-power-torque: the spindle delivers cutting hp = motor hp x drive efficiency, and each in3/min costs the unit power, so the power-limited max removal rate is motor hp x efficiency / unit power. This is the power (stall) limit only - the depth/width/feed that reaches it, the tool strength, the rigidity, and the finish are separate limits, and a light finishing pass runs far below it. The unit-power values are Machinery's Handbook references; the tool and machine govern the real cut.",
+    assumptions: [
+      { name: "Power limit only", value: "the motor-stall ceiling; depth/feed, tool strength, and rigidity are separate limits", source: "machining practice" },
+      { name: "Unit power", value: "specific cutting energy, hp per in3/min: ~1.0 carbon steel, ~0.33 aluminum, ~1.5 stainless/titanium; default 1.0", source: "Machinery's Handbook" },
+      { name: "Drive efficiency", value: "spindle drive efficiency; default 80%", source: "machine data" },
+    ],
+  },
   "pull-box-sizing": {
     formula: "Straight pull: min = 8 x largest raceway. Angle/U pull: min = 6 x largest raceway + sum of same-row others. Between same-conductor entries: >= 6 x larger raceway.",
     edition: "NEC (NFPA 70) 314.28(A)(1) and (A)(2) (by name).",

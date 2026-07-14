@@ -227,6 +227,55 @@ function renderSpindlePowerTorque(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["spindle-power-torque"] = renderSpindlePowerTorque;
 
+// --- spec-v711 K: Max Material Removal Rate from Available Spindle Power (inverse) ---
+// The inverse of spindle-power-torque: the forward tile gives the motor hp a cut
+// needs; given the motor you have, the power-limited max removal rate is
+// max_MRR = motor_hp x (efficiency/100) / unit_power.
+// dims: in { available_motor_hp: M L^2 T^-3, unit_power_hp: dimensionless, efficiency_pct: dimensionless } out: { max_mrr_in3_min: L^3 T^-1, cutting_hp: M L^2 T^-3 }
+export function computeSpindleMaxMrr({ available_motor_hp = 0, unit_power_hp = 1.0, efficiency_pct = 80 } = {}) {
+  const _g = _finiteGuard({ available_motor_hp, unit_power_hp, efficiency_pct }); if (_g) return _g;
+  const motor = Number(available_motor_hp);
+  const unitPower = Number(unit_power_hp);
+  const eff = Number(efficiency_pct);
+  if (!(motor > 0)) return { error: "Available motor horsepower must be positive (hp)." };
+  if (!(unitPower > 0)) return { error: "Unit power must be positive (hp per in3/min)." };
+  if (!(eff > 0 && eff <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
+  const cutting_hp = motor * (eff / 100);
+  const max_mrr_in3_min = cutting_hp / unitPower;
+  return {
+    max_mrr_in3_min, cutting_hp,
+    note: "Specific cutting energy solved for the removal rate: the spindle can only deliver cutting hp = motor hp x drive efficiency, and each in3/min of stock costs the unit power (about 1.0 hp per in3/min for carbon steel, 0.33 aluminum, 1.5 stainless/titanium), so max MRR = motor hp x efficiency / unit power. This is the power (stall) limit only - the actual depth/width/feed that reaches it, tool strength, rigidity, and finish are separate limits, and a light finishing pass runs far below it. The unit-power values are Machinery's Handbook references; the tool and machine govern the real cut.",
+  };
+}
+export const spindleMaxMrrExample = { inputs: { available_motor_hp: 5, unit_power_hp: 1.0, efficiency_pct: 80 } };
+function renderSpindleMaxMrr(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles specific-cutting-energy relation solved for the removal rate, max MRR = motor hp x efficiency / unit power, with Machinery's Handbook unit-power values (tabular reference), by name. The power (stall) limit only; depth/feed, tool strength, and rigidity are separate limits. The tool and machine govern the real cut.";
+  const motor = makeNumber("Available motor horsepower (hp)", "smm-motor", { step: "any", min: "0", value: "5" });
+  motor.input.value = "5";
+  const unitPower = makeNumber("Unit power (hp per in3/min)", "smm-up", { step: "any", min: "0", value: "1.0" });
+  unitPower.input.value = "1.0";
+  const eff = makeNumber("Spindle drive efficiency (%)", "smm-eff", { step: "any", min: "0", value: "80" });
+  eff.input.value = "80";
+  for (const f of [motor, unitPower, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { motor.input.value = "5"; unitPower.input.value = "1.0"; eff.input.value = "80"; update(); });
+  const oMrr = makeOutputLine(outputRegion, "Max material removal rate", "smm-out-mrr");
+  const oCut = makeOutputLine(outputRegion, "Cutting hp at the limit", "smm-out-cut");
+  const oNote = makeOutputLine(outputRegion, "Note", "smm-out-note");
+  const update = debounce(() => {
+    const r = computeSpindleMaxMrr({
+      available_motor_hp: Number(motor.input.value) || 0,
+      unit_power_hp: unitPower.input.value === "" ? 1.0 : Number(unitPower.input.value),
+      efficiency_pct: eff.input.value === "" ? 80 : Number(eff.input.value),
+    });
+    if (r.error) { oMrr.textContent = r.error; oCut.textContent = "-"; oNote.textContent = ""; return; }
+    oMrr.textContent = fmt(r.max_mrr_in3_min, 2) + " in3/min";
+    oCut.textContent = fmt(r.cutting_hp, 2) + " hp";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [motor, unitPower, eff]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["spindle-max-mrr"] = renderSpindleMaxMrr;
+
 // ===================== spec-v317..v319: machining depth batch =====================
 // The cutting-geometry effects the speeds-and-feeds tile never captures: radial
 // chip thinning at light radial engagement, boring-bar/overhang deflection and
