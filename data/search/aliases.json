@@ -6697,6 +6697,31 @@
       "kind": "industry"
     },
     {
+      "term": "tip size for flow",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "smooth bore tip for gpm",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "nozzle tip diameter for flow",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what tip for gpm",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bore diameter for flow",
+      "target": "smooth-bore-diameter-for-flow",
+      "kind": "adjacent"
+    },
+    {
       "term": "solid stream flow",
       "target": "smooth-bore-flow",
       "kind": "industry"

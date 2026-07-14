@@ -666,7 +666,7 @@ const TOOL_MODULES = (() => {
     // v20
     "elevation-pressure-loss", "water-supply-duration",
     // spec-v114 smooth-bore nozzle flow (gpm = 29.7 d^2 sqrt(NP)).
-    "smooth-bore-flow",
+    "smooth-bore-flow", "smooth-bore-diameter-for-flow",
     "hydrant-available-flow",
     // spec-v577
     "nfa-fireground-flow",

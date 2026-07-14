@@ -9729,6 +9729,18 @@ export const CITATIONS = {
       { name: "Separate checks", value: "the 3/8 in flight uniformity limit, nosing, landings, winders, and the occupant-load egress width (the egress-capacity tile) are not checked here; the AHJ governs", source: "IBC 1011 / IRC R311" },
     ],
   },
+  "smooth-bore-diameter-for-flow": {
+    formula: "bore_in = sqrt( target_gpm / (29.7 x sqrt(nozzle_pressure_psi)) ), the inverse of gpm = 29.7 x bore_in^2 x sqrt(NP); companion nozzle reaction = 1.57 x bore_in^2 x NP.",
+    edition: "IFSTA Pumping Apparatus Driver/Operator Handbook smooth-bore discharge form (by name), solved for the diameter; classical orifice discharge, no edition cycle.",
+    freeAccess: "The discharge relation is public physics; standard nozzle pressures are 50 psi handline / 80 psi master. Incident command and the pump operator govern.",
+    governance: GOVERNANCE.fire,
+    editionNote: "Single-edition (the classical smooth-bore discharge form gpm = 29.7 d^2 sqrt(NP) does not roll; the standard 50 / 80 psi nozzle pressures are editable), solved for the tip diameter a target flow needs. Round to a stocked tip size; the nozzle reaction is reported so the crew can check handling.",
+    assumptions: [
+      { name: "Discharge coefficient", value: "the 29.7 constant bundles the standard smooth-bore discharge coefficient and unit conversion; the tip must be a true smooth bore", source: "IFSTA" },
+      { name: "Nozzle pressure", value: "default 50 psi handline / 80 psi master, editable to the tip in use", source: "IFSTA" },
+      { name: "Estimate", value: "a discharge estimate; incident command governs the flow target and the pump operator sets engine pressure", source: "incident command" },
+    ],
+  },
   "smooth-bore-flow": {
     formula: "gpm = 29.7 x bore_in^2 x sqrt(nozzle_pressure_psi); companion nozzle reaction = 1.57 x bore_in^2 x nozzle_pressure_psi.",
     edition: "IFSTA Pumping Apparatus Driver/Operator Handbook smooth-bore discharge form (by name); classical orifice discharge, no edition cycle.",

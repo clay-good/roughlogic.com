@@ -1845,6 +1845,48 @@ function renderSmoothBoreFlow(inputRegion, outputRegion, citationEl) {
 }
 FIRE_RENDERERS["smooth-bore-flow"] = renderSmoothBoreFlow;
 
+// smooth-bore-diameter-for-flow: inverse of smooth-bore-flow. The forward tile gives the flow from the tip diameter; the
+// inverse recovers the tip (bore) diameter a target flow needs at a nozzle pressure, so an officer picks a tip for a
+// target gpm. From gpm = 29.7 x d^2 x sqrt(NP), d = sqrt( gpm / (29.7 x sqrt(NP)) ). It also reports the nozzle reaction
+// at that tip so the operator can check handling.
+// dims: in { target_gpm: L^3 T^-1, nozzle_pressure_psi: M L^-1 T^-2 } out: { bore_in: L, reaction_lb: M L T^-2 }
+export function computeSmoothBoreDiameterForFlow({ target_gpm = 0, nozzle_pressure_psi = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const gpm = Number(target_gpm) || 0;
+  const np = Number(nozzle_pressure_psi) || 0;
+  if (!(gpm > 0)) return { error: "Target flow must be positive (gpm)." };
+  if (!(np > 0)) return { error: "Nozzle pressure must be positive (psi)." };
+  const bore_in = Math.sqrt(gpm / (29.7 * Math.sqrt(np)));
+  const reaction_lb = 1.57 * bore_in * bore_in * np;
+  if (![bore_in, reaction_lb].every(Number.isFinite)) return { error: "Bore-diameter math is not a finite value." };
+  return {
+    bore_in, reaction_lb,
+    note: "Tip (bore) diameter = sqrt( gpm / (29.7 x sqrt(NP)) ), the inverse of gpm = 29.7 x d^2 x sqrt(NP) with the standard smooth-bore discharge coefficient (IFSTA). Round to a stocked tip size (common handline tips 7/8, 15/16, 1, 1-1/8, 1-1/4 in); the nozzle reaction = 1.57 x d^2 x NP is reported so the crew can check handling (a handline over ~60-80 lb of reaction gets hard to hold). Standard nozzle pressure is 50 psi handline / 80 psi master (editable). A discharge estimate; incident command and the pump operator govern the flow target and engine pressure.",
+  };
+}
+export const smoothBoreDiameterForFlowExample = { inputs: { target_gpm: 250, nozzle_pressure_psi: 50 } };
+
+function renderSmoothBoreDiameterForFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IFSTA Pumping Apparatus Driver/Operator Handbook (by name, not reproduced) - smooth-bore discharge gpm = 29.7 x d^2 x sqrt(NP) solved for the diameter: d = sqrt( gpm / (29.7 x sqrt(NP)) ); reaction 1.57 x d^2 x NP. Standard nozzle pressure 50 psi handline / 80 psi master (editable). Incident command and the pump operator govern.";
+  const gpm = makeNumber("Target flow (gpm)", "sbd-gpm", { step: "any", min: "0", value: "250" });
+  const np = makeNumber("Nozzle pressure (psi)", "sbd-np", { step: "any", min: "0", value: "50" });
+  gpm.input.value = "250"; np.input.value = "50";
+  for (const f of [gpm, np]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { gpm.input.value = "250"; np.input.value = "50"; update(); });
+  const oB = makeOutputLine(outputRegion, "Required tip / bore diameter", "sbd-out-b");
+  const oR = makeOutputLine(outputRegion, "Nozzle reaction at that tip", "sbd-out-r");
+  const oN = makeOutputLine(outputRegion, "Note", "sbd-out-n");
+  const update = debounce(() => {
+    const r = computeSmoothBoreDiameterForFlow({ target_gpm: Number(gpm.input.value) || 0, nozzle_pressure_psi: Number(np.input.value) || 0 });
+    if (r.error) { oB.textContent = r.error; oR.textContent = "-"; oN.textContent = "-"; return; }
+    oB.textContent = fmt(r.bore_in, 3) + " in";
+    oR.textContent = fmt(r.reaction_lb, 0) + " lb";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [gpm.input, np.input]) f.addEventListener("input", update);
+}
+FIRE_RENDERERS["smooth-bore-diameter-for-flow"] = renderSmoothBoreDiameterForFlow;
+
 // ===================== spec-v389: hydrant rated flow at 20 psi (water-system hydraulics trio) =====================
 
 // dims: in { static_psi: M L^-1 T^-2, residual_psi: M L^-1 T^-2, qf_gpm: L^3 T^-1 } out: { hf_psi: M L^-1 T^-2, hr_psi: M L^-1 T^-2, qr_gpm: L^3 T^-1 }

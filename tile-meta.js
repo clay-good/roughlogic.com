@@ -681,6 +681,7 @@ const _TILES = [
   ["stair-code-check", "E"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   ["smooth-bore-flow", "F"],
+  ["smooth-bore-diameter-for-flow", "F"],
   // spec-v248..v250 fire-sprinkler system-design trio (calc-firesprinkler.js)
   ["fire-pump-curve", "F"], ["sprinkler-system-demand", "F"], ["sprinkler-protection-area-for-supply", "F"], ["sprinkler-head-layout", "F"],
   ["sprinkler-pressure-demand", "F"],

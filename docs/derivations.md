@@ -1972,6 +1972,7 @@ cross-check.
 | calc-fire.js | `computeScbaCylinderTime` | `{ V_rated_scf = 0, P_rated_psi = 0, P_start_psi = 0, P_alarm_psi = 0, consump...` | _ | _ | _ |
 | calc-fire.js | `computeSmokeEjector` | `{ length_ft = 0, width_ft = 0, height_ft = 0, room_volume_ft3 = null, target_...` | _ | _ | _ |
 | calc-fire.js | `computeSmokeReading` | `` | _ | _ | _ |
+| calc-fire.js | `computeSmoothBoreDiameterForFlow` | `{ target_gpm = 0, nozzle_pressure_psi = 50 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeSmoothBoreFlow` | `{ bore_in = 0, nozzle_pressure_psi = 50 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeSprinklerDensity` | `{ area_of_operation_ft2, density_gpm_per_ft2, hazard_category }` | _ | _ | _ |
 | calc-fire.js | `computeSprinklerKFactor` | `{ solve_for = "flow", flow_gpm = 0, pressure_psi = 0, k_factor = 0 } = {}` | _ | _ | _ |
@@ -2847,7 +2848,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1433.
+Row count: 1434.
 
 <!-- END function-corpus-v14 -->
 
@@ -3632,7 +3633,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (43 tiles)
+### Group F Fire-ground (44 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3665,6 +3666,7 @@ per spec-v14 §13.1 second paragraph.
 | `sling-angle` | Sling Angle Load Multiplier | OSHA 1926.251 + ASME B30.9 sling-angl...; 4000 lb / vertical / 2 legs -> 2000 lb per leg / choker_f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-ejector-cfm` | Smoke Ejector / Ventilation CFM (NFPA 1500) | NFPA 1500 / IFSTA; CFM = 12000 x 5 / 60 = 1000; 1 fan; time = 12000 / 4000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smoke-reading` | Smoke Reading Reference | IFSTA Building Construction for the F...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `smooth-bore-diameter-for-flow` | Smooth-Bore Tip Diameter for a Target Flow | IFSTA Pumping Apparatus Driver/Operat...; spec-v738 section 2.1 pinned example (250 gpm, 50 psi -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `smooth-bore-flow` | Smooth-Bore Nozzle Flow (GPM) | IFSTA Pumping Apparatus Driver/Operat...; spec-v114 section 2.1 pinned example (1.125 in, 50 psi ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprinkler-density` | Sprinkler GPM Density | NFPA; Ordinary Hazard Group 2 minimum density 0.20 gpm/ft^2; 15... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-head-layout` | Sprinkler Head Count and Spacing (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v250 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4219,6 +4221,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1186. Fixture-covered or reference-cadence: 1186 / 1186.
+Tile count: 1187. Fixture-covered or reference-cadence: 1187 / 1187.
 
 <!-- END tile-index-v14 -->

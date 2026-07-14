@@ -11724,6 +11724,26 @@ test("bounds: spec-v114 smooth-bore nozzle flow (29.7 d^2 sqrt(NP))", () => {
   assert.ok("error" in _v114({ bore_in: 0 }) && "error" in _v114({ bore_in: 1, nozzle_pressure_psi: 0 }) && "error" in _v114({ bore_in: Infinity, nozzle_pressure_psi: 50 }));
 });
 
+import { computeSmoothBoreDiameterForFlow as _v738 } from "../../calc-fire.js";
+test("bounds: spec-v738 smooth-bore tip diameter for a target flow (inverse of smooth-bore-flow)", () => {
+  const p = _v738({ target_gpm: 250, nozzle_pressure_psi: 50 });
+  assert.ok(Math.abs(p.bore_in - 1.0911) < 0.001);
+  // round-trip: the recovered bore fed to smooth-bore-flow reproduces the target flow and matches the reaction
+  for (const [gpm, np] of [[250, 50], [500, 80], [95, 50], [1000, 80]]) {
+    const inv = _v738({ target_gpm: gpm, nozzle_pressure_psi: np });
+    const fwd = _v114({ bore_in: inv.bore_in, nozzle_pressure_psi: np });
+    assert.ok(Math.abs(fwd.gpm - gpm) < 1e-6);
+    assert.ok(Math.abs(fwd.reaction_lb - inv.reaction_lb) < 1e-9);
+  }
+  // more flow -> bigger tip; higher NP -> smaller tip for the same flow
+  assert.ok(_v738({ target_gpm: 500, nozzle_pressure_psi: 50 }).bore_in > _v738({ target_gpm: 250, nozzle_pressure_psi: 50 }).bore_in);
+  assert.ok(_v738({ target_gpm: 250, nozzle_pressure_psi: 80 }).bore_in < _v738({ target_gpm: 250, nozzle_pressure_psi: 50 }).bore_in);
+  // error seams
+  assert.ok("error" in _v738({ target_gpm: 0, nozzle_pressure_psi: 50 }));
+  assert.ok("error" in _v738({ target_gpm: 250, nozzle_pressure_psi: 0 }));
+  assert.ok("error" in _v738({ target_gpm: Infinity, nozzle_pressure_psi: 50 }));
+});
+
 import { computeGcwrCheck as _v115a, computeTireLoadCheck as _v115b } from "../../calc-trucking.js";
 test("bounds: spec-v115 trucking weight compliance (GCWR + tire load)", () => {
   const a = _v115a({ gcwr_lb: 80000, tractor_weight_lb: 18000, trailer_weight_lb: 60000, federal_max_lb: 80000 });

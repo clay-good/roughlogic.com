@@ -1060,6 +1060,7 @@ export const COMPUTE_MAP = {
   "guard-handrail-check": { module: "../../calc-construction.js", fn: "computeGuardHandrailCheck" },
   "stair-code-check": { module: "../../calc-construction.js", fn: "computeStairCodeCheck" },
   "smooth-bore-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreFlow" },
+  "smooth-bore-diameter-for-flow": { module: "../../calc-fire.js", fn: "computeSmoothBoreDiameterForFlow" },
   "gcwr-check": { module: "../../calc-trucking.js", fn: "computeGcwrCheck" },
   "tire-load-check": { module: "../../calc-trucking.js", fn: "computeTireLoadCheck" },
   "chlorine-demand": { module: "../../calc-water.js", fn: "computeChlorineDemand" },

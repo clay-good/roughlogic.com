@@ -1090,6 +1090,7 @@ const RELATED = {
   "stair-code-check": ["stairs","guard-handrail-check","egress-capacity"],
   // spec-v114 smooth-bore nozzle flow (Group F)
   "smooth-bore-flow": ["fire-stream-reaction","master-stream","ladder-pipe-reach"],
+  "smooth-bore-diameter-for-flow": ["smooth-bore-flow","fire-stream-reaction","master-stream"],
   // spec-v115 trucking weight compliance (Group J)
   "gcwr-check": ["bridge-formula","axle-load-distribution","vehicle-load"],
   "tire-load-check": ["axle-load-distribution","bridge-formula","gcwr-check"],

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fire): spec-v738 smooth-bore tip diameter for a target flow (smooth-bore-flow inverse); 2026-07-14
+
+- New tile `smooth-bore-diameter-for-flow` (Group F, calc-fire.js): the tip (bore) diameter a target flow needs at a
+  nozzle pressure. `d = sqrt( gpm / (29.7 x sqrt(NP)) )`. 250 gpm at 50 psi wants a 1.09 in tip (~93 lb reaction).
+  Round-trips through `smooth-bore-flow`. Opens Explore sweep #13. Home tile count 1,186 -> 1,187.
+
 ### feat(fab): spec-v737 wire feed speed for a target deposition rate (wire-feed-deposition inverse); 2026-07-14
 
 - New tile `wire-feed-speed-for-deposition` (Group E, calc-fab.js): the wire feed speed a target deposition rate needs.
