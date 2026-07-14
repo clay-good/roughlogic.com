@@ -276,7 +276,7 @@ const _TILES = [
 
   ["dim-weight", "J"], ["freight-density", "J"], ["pallet-loadout", "J"],
   ["hos-math", "J"], ["bridge-formula", "J"], ["bridge-formula-min-spacing", "J"], ["reefer-burn", "J"],
-  ["incoterm-decoder", "J"], ["stopping-sight-distance", "J"],
+  ["incoterm-decoder", "J"], ["stopping-sight-distance", "J"], ["ssd-design-speed", "J"],
 
   ["prop-slip", "K"], ["displacement-cr", "K"], ["chamber-cc-for-cr", "K"],
   ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["driveshaft-max-length", "K"], ["fuel-range", "K"],

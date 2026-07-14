@@ -824,6 +824,32 @@ export const stoppingSightDistanceExample = {
   inputs: { speed_mph: 55, reaction_time_s: 2.5, friction: 0.35, grade: 0 },
 };
 
+// dims: in { sight_distance_ft: L, reaction_time_s: T, friction: dimensionless, grade: dimensionless } out: { design_speed_mph: L T^-1 }
+export function computeSsdDesignSpeed({ sight_distance_ft = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(sight_distance_ft) || 0;
+  const t = Number(reaction_time_s);
+  const f = Number(friction);
+  const g = Number(grade) || 0;
+  if (!(D > 0)) return { error: "Available sight distance must be positive (ft)." };
+  if (!Number.isFinite(t) || !(t > 0)) return { error: "Perception-reaction time must be positive (s)." };
+  if (!Number.isFinite(f) || !(f > -1)) return { error: "Friction coefficient must be a number > -1." };
+  if (f + g <= 0) return { error: "Effective deceleration (f + g) must be positive; the vehicle cannot stop under these conditions." };
+  // Inverse of D = 1.47 t v + v^2 / (30 (f+g)): solve a v^2 + b v - D = 0 for the positive root.
+  const a = 1 / (30 * (f + g));
+  const b = 1.47 * t;
+  const design_speed_mph = (-b + Math.sqrt(b * b + 4 * a * D)) / (2 * a);
+  if (!Number.isFinite(design_speed_mph) || !(design_speed_mph > 0)) return { error: "Speed math is not a finite positive value." };
+  const warnings = [];
+  if (design_speed_mph < 5) warnings.push("The resulting speed is below 5 mph, under the AASHTO design range; the formula is not calibrated for very low speeds.");
+  if (Math.abs(g) > 0.10) warnings.push("Grade magnitude above 10% is at the extreme of the AASHTO design range; consult the state-DOT specifics.");
+  return {
+    design_speed_mph, reaction_time_s: t, friction: f, grade: g, warnings,
+    note: "The fastest design speed a stretch of road can safely allow given the available stopping sight distance, the inverse of the stopping-sight-distance tile: from SSD = 1.47 x t x v + v^2 / (30 (f + g)), the speed is the positive root of a v^2 + b v - SSD = 0 with a = 1/(30(f+g)) and b = 1.47 x t. Use it to set a curve/crest advisory speed or to check whether a design speed is safe for the sight line to an intersection or over a hill. Braking distance grows with the square of speed while reaction distance grows linearly, so a modest sight-distance shortfall forces a larger speed cut than it seems. A downhill grade (negative) lengthens the stop and lowers the safe speed; wet or icy friction lowers it further. A design aid, not a posted-speed determination; the AASHTO Green Book and the state DOT govern."
+  };
+}
+export const ssdDesignSpeedExample = { inputs: { sight_distance_ft: 490, reaction_time_s: 2.5, friction: 0.35, grade: 0 } };
+
 // dims: in { inputRegion: dimensionless, outputRegion: dimensionless, citationEl: dimensionless }
 //        out: { dom_side_effect: dimensionless }
 // (DOM-mounting renderer: the three arguments are HTMLElement
@@ -889,7 +915,36 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   for (const fld of [v.input, tpr.input, f.input, g.input]) fld.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderSsdDesignSpeed(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO Green Book stopping sight distance solved for speed: v is the positive root of v^2/(30(f+g)) + 1.47 t v - SSD = 0. A design aid; the AASHTO Green Book and the state DOT govern posted and design speeds. Free at transportation.org for TOC.";
+  const d = makeNumber("Available sight distance (ft)", "sds-d", { step: "any", min: "0" });
+  const tpr = makeNumber("Perception-reaction time (s; default 2.5)", "sds-tpr", { step: "any", min: "0", value: "2.5" });
+  tpr.input.value = "2.5";
+  const cond = makeSelect("Pavement condition", "sds-cond",
+    Object.keys(SSD_FRICTION_DEFAULTS).map((k) => ({ value: k, label: SSD_FRICTION_DEFAULTS[k].label, selected: k === "dry" })),
+  );
+  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "sds-f", { step: "any", value: "0.35" });
+  f.input.value = "0.35";
+  const g = makeNumber("Grade (decimal; + uphill, - downhill)", "sds-g", { step: "any", value: "0" });
+  g.input.value = "0";
+  for (const fld of [d, tpr, cond, f, g]) inputRegion.appendChild(fld.wrap);
+  cond.select.addEventListener("change", () => { const p = SSD_FRICTION_DEFAULTS[cond.select.value]; if (p && p.f !== null) { f.input.value = String(p.f); update(); } });
+  attachExampleButton(inputRegion, () => { d.input.value = "490"; tpr.input.value = "2.5"; cond.select.value = "dry"; f.input.value = "0.35"; g.input.value = "0"; update(); });
+  const oSpeed = makeOutputLine(outputRegion, "Max safe design speed", "sds-out-speed");
+  const oNote = makeOutputLine(outputRegion, "Note", "sds-out-note");
+  function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
+  const update = debounce(() => {
+    const r = computeSsdDesignSpeed({ sight_distance_ft: readNum(d.input), reaction_time_s: readNum(tpr.input), friction: readNum(f.input), grade: readNum(g.input) });
+    if (r.error) { oSpeed.textContent = r.error; oNote.textContent = ""; return; }
+    oSpeed.textContent = fmt(r.design_speed_mph, 1) + " mph";
+    oNote.textContent = (r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note;
+  }, DEBOUNCE_MS);
+  for (const fld of [d.input, tpr.input, f.input, g.input]) fld.addEventListener("input", update);
+}
+
 export const TRUCKING_RENDERERS = {
+  "ssd-design-speed": renderSsdDesignSpeed,
   "dim-weight":      renderDIM,
   "freight-density": renderFreightDensity,
   "pallet-loadout":  renderPalletLoadout,

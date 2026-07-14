@@ -71802,6 +71802,31 @@
       "kind": "question"
     },
     {
+      "term": "max speed for available sight distance",
+      "target": "ssd-design-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "safe speed from sight distance",
+      "target": "ssd-design-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "advisory speed from stopping distance",
+      "target": "ssd-design-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "design speed for a sight line",
+      "target": "ssd-design-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how fast can i go for the sight distance",
+      "target": "ssd-design-speed",
+      "kind": "adjacent"
+    },
+    {
       "term": "how many straps for this load",
       "target": "cargo-securement-wll",
       "kind": "question"

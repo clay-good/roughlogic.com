@@ -213,6 +213,7 @@ export const COMPUTE_MAP = {
   "outdoor-air-ventilation": { module: "../../calc-hvac.js", fn: "computeOutdoorAirVentilation" },
   "scba-cylinder-time": { module: "../../calc-fire.js", fn: "computeScbaCylinderTime" },
   "stopping-sight-distance": { module: "../../calc-trucking.js", fn: "computeStoppingSightDistance" },
+  "ssd-design-speed": { module: "../../calc-trucking.js", fn: "computeSsdDesignSpeed" },
   "lightning-countdown": { module: "../../calc-field.js", fn: "computeLightningCountdown" },
   "magnetic-declination": { module: "../../calc-field.js", fn: "computeMagneticDeclination" },
   "thi-livestock": { module: "../../calc-agriculture.js", fn: "computeTHI" },

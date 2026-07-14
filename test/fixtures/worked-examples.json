@@ -3209,6 +3209,52 @@
    }
   },
   {
+   "tile_id": "ssd-design-speed",
+   "source_publisher": "AASHTO (inverse)",
+   "source_title": "v = (-b + sqrt(b^2 + 4 a SSD)) / (2 a), a = 1/(30(f+g)), b = 1.47 t",
+   "source_edition_or_year": "spec-v695 worked example (machine-verified)",
+   "source_section_or_page": "490.225 ft sight distance, dry level (f 0.35, t 2.5 s) -> 55 mph (round-trips stopping-sight-distance)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "sight_distance_ft": 490.225,
+    "reaction_time_s": 2.5,
+    "friction": 0.35,
+    "grade": 0
+   },
+   "outputs": {
+    "design_speed_mph": {
+     "value": 55,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "ssd-design-speed",
+   "source_publisher": "AASHTO (inverse)",
+   "source_title": "cross-check: a 6% downgrade lengthens the stop, so the safe speed drops",
+   "source_edition_or_year": "spec-v695 cross-check (machine-verified)",
+   "source_section_or_page": "same 490.225 ft on a -6% grade -> about 51.2 mph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "sight_distance_ft": 490.225,
+    "reaction_time_s": 2.5,
+    "friction": 0.35,
+    "grade": -0.06
+   },
+   "outputs": {
+    "design_speed_mph": {
+     "value": 51.25,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "scba-cylinder-time",
    "source_publisher": "NFPA / NIOSH",
    "source_title": "SCBA cylinder gas-law: scf to alarm and to empty (60-min 4500 psi rating at heavy work)",

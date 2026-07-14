@@ -4127,6 +4127,7 @@ import {
   computeReeferBurn,
   computeIncoterm,
   computeStoppingSightDistance,
+  computeSsdDesignSpeed,
 } from "../../calc-trucking.js";
 
 test("bounds: calc-trucking computeDIM pins dim_lb = L*W*H / divisor per carrier and the breakeven_in3 = actual_weight * divisor identity", () => {
@@ -4414,6 +4415,33 @@ test("bounds: calc-trucking computeStoppingSightDistance rejects non-positive sp
   assert.ok("error" in computeStoppingSightDistance({ speed_mph: 55, reaction_time_s: 2.5, friction: 0.05, grade: -0.10 }));
 });
 
+test("bounds: spec-v695 computeSsdDesignSpeed pins the SSD-quadratic positive root, round-trips through computeStoppingSightDistance, and error seams", () => {
+  const r = computeSsdDesignSpeed({ sight_distance_ft: 490.225, reaction_time_s: 2.5, friction: 0.35, grade: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const a = 1 / (30 * 0.35), b = 1.47 * 2.5;
+  assert.ok(Math.abs(r.design_speed_mph - (-b + Math.sqrt(b * b + 4 * a * 490.225)) / (2 * a)) < 1e-9, `root identity: ${r.design_speed_mph}`);
+  assert.ok(Math.abs(r.design_speed_mph - 55) < 0.01, `pinned 55 mph: ${r.design_speed_mph}`);
+  // A downhill grade lowers the safe speed for the same sight distance.
+  const down = computeSsdDesignSpeed({ sight_distance_ft: 490.225, reaction_time_s: 2.5, friction: 0.35, grade: -0.06 });
+  assert.ok(down.design_speed_mph < r.design_speed_mph, `downhill slower: ${down.design_speed_mph}`);
+  // Round-trip: the design speed, fed back through the forward tile, reproduces the sight distance.
+  for (const sight_distance_ft of [200, 490.225, 1200]) {
+    for (const grade of [-0.06, 0, 0.06]) {
+      const m = computeSsdDesignSpeed({ sight_distance_ft, reaction_time_s: 2.5, friction: 0.35, grade });
+      assert.ok(!m.error, `sweep D=${sight_distance_ft} g=${grade}: ${JSON.stringify(m)}`);
+      assertFinite(m.design_speed_mph, "v"); assert.ok(m.design_speed_mph > 0, "v positive");
+      const back = computeStoppingSightDistance({ speed_mph: m.design_speed_mph, reaction_time_s: 2.5, friction: 0.35, grade });
+      assert.ok(Math.abs(back.total_ssd_ft - sight_distance_ft) < 1e-6, `round-trip D=${sight_distance_ft} g=${grade}: ${back.total_ssd_ft}`);
+    }
+  }
+  // Error seams: non-positive sight distance / reaction time, friction <= -1, f+g <= 0, non-finite.
+  assert.ok("error" in computeSsdDesignSpeed({ sight_distance_ft: 0, reaction_time_s: 2.5, friction: 0.35 }));
+  assert.ok("error" in computeSsdDesignSpeed({ sight_distance_ft: 490, reaction_time_s: 0, friction: 0.35 }));
+  assert.ok("error" in computeSsdDesignSpeed({ sight_distance_ft: 490, reaction_time_s: 2.5, friction: -1.5 }));
+  assert.ok("error" in computeSsdDesignSpeed({ sight_distance_ft: 490, reaction_time_s: 2.5, friction: 0.05, grade: -0.10 }));
+  assert.ok("error" in computeSsdDesignSpeed({ sight_distance_ft: Infinity, reaction_time_s: 2.5, friction: 0.35 }));
+});
+
 test("bounds: calc-stage computeSPLAtmospheric pins inverse_square = 20 * log10(d2/d1) and rejects the documented out-of-domain inputs", () => {
   // Spec-v9 §H.2 worked example: 95 dB at 1 m, 20 C, 50% RH; report at 30 m.
   const r = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50 });
@@ -4514,6 +4542,11 @@ test("bounds: calc-stage computeRoomAbsorptionTarget pins A_required = 0.049 * V
 // underlying computeStoppingSightDistance physics row (1.47*v*t +
 // v^2 / (30*(f+g))) is already pinned at line ~4157 above, and the
 // renderer is a DOM-wiring wrapper exercised by the e2e suite.
+//
+// renderSsdDesignSpeed is the calc-trucking inverse renderer; its
+// computeSsdDesignSpeed physics row (SSD quadratic solved for speed) is
+// pinned by the spec-v695 test above, and the renderer is a DOM-wiring
+// wrapper exercised by the e2e suite.
 // --------------------------------------------------------------------
 
 import { interpolateRefrigerant } from "../../pure-math.js";

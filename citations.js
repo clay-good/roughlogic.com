@@ -2225,6 +2225,18 @@ export const CITATIONS = {
       { name: "Grade", value: "decimal; + uphill, - downhill", source: "standard convention" },
     ],
   },
+  "ssd-design-speed": {
+    formula: "v is the positive root of v^2 / (30 (f + g)) + 1.47 t_pr v - SSD = 0, i.e. v = (-b + sqrt(b^2 + 4 a SSD)) / (2 a) with a = 1/(30(f+g)), b = 1.47 t_pr. The inverse of SSD = 1.47 t v + v^2/(30(f+g)).",
+    edition: "AASHTO Green Book (Policy on Geometric Design of Highways and Streets, 7th ed.) Chapter 3.",
+    freeAccess: "transportation.org for TOC; AASHTO design SSD tables are licensed.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "The fastest design speed a stretch of road can safely allow given the available stopping sight distance, the inverse of stopping-sight-distance: the speed is the positive root of the SSD quadratic. Use it to set a curve/crest advisory speed or to check whether a design speed is safe for the sight line to an intersection or over a hill. Braking distance grows with the square of speed while reaction distance grows linearly, so a modest sight-distance shortfall forces a larger speed cut than it seems; a downhill (negative) grade and wet/icy friction lower the safe speed further. This tile outputs the underlying physics; AASHTO design SSD tables round these numbers. A design aid, not a posted-speed determination; the state DOT governs roadway design.",
+    assumptions: [
+      { name: "Quadratic inverse", value: "v = (-b + sqrt(b^2 + 4 a SSD))/(2 a), a = 1/(30(f+g)), b = 1.47 t_pr", source: "AASHTO Green Book Chapter 3" },
+      { name: "Friction coefficient", value: "0.35 dry / 0.20 wet / 0.10 ice", source: "engineering practice; AASHTO design values" },
+      { name: "Grade", value: "decimal; + uphill, - downhill lowers the safe speed", source: "standard convention" },
+    ],
+  },
 
   "excavation-bench-plan": {
     formula: "horizontal_offset = depth * ratio (A 0.75 / B 1.0 / C 1.5). top_width = bottom_width + 2 * offset. cross_section = (top + bottom) / 2 * depth. volume_yd3 = cross_section * length / 27. Bench layout (A/B): 4 ft per bench; horizontal_step = bench_height * ratio.",

@@ -827,7 +827,8 @@ const RELATED = {
   // Group J: Trucking (fill-in).
   "reefer-burn": ["fuel-range", "mileage-cost"],
   "incoterm-decoder": ["freight-density", "dim-weight"],
-  "stopping-sight-distance": ["braking-distance", "bridge-formula"],
+  "stopping-sight-distance": ["ssd-design-speed", "braking-distance", "bridge-formula"],
+  "ssd-design-speed": ["stopping-sight-distance", "braking-distance", "vertical-curve-sight-distance"],
 
   // Group K: Mechanic (fill-in).
   "bolt-stretch": ["bolt-torque", "displacement-cr"],
