@@ -437,6 +437,7 @@ const _TILES = [
 
   // v44 cross-trade circular-arc layout (calc-layout.js)
   ["circular-arc", "G"],
+  ["circular-arc-rise-from-radius", "G"],
 
   // v47 cross-trade circle-from-3-points layout (calc-layout.js)
   ["circle-from-3-points", "G"],

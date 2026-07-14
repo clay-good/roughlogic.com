@@ -679,6 +679,7 @@ export const COMPUTE_MAP = {
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
   "circular-arc": { module: "../../calc-layout.js", fn: "computeCircularArc" },
+  "circular-arc-rise-from-radius": { module: "../../calc-layout.js", fn: "computeCircularArcRiseFromRadius" },
   "circle-from-3-points": { module: "../../calc-layout.js", fn: "computeCircleFrom3Points" },
   // spec-v55 regular-polygon miter & layout (calc-layout.js).
   "polygon-miter": { module: "../../calc-layout.js", fn: "computePolygonMiter" },

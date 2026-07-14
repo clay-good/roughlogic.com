@@ -419,6 +419,53 @@ function renderCircularArc(inputRegion, outputRegion, citationEl) {
 }
 LAYOUT_RENDERERS["circular-arc"] = renderCircularArc;
 
+// circular-arc-rise-from-radius: inverse of circular-arc. The forward tile gives the radius from a chord and rise; the
+// inverse recovers the rise (sagitta / middle ordinate) from a known radius and chord, so a layout person marks the arc
+// height at midspan when the radius is set. From R = ((chord/2)^2 + rise^2) / (2 rise), rise^2 - 2 R rise + (chord/2)^2 = 0,
+// and the minor-arc root is rise = R - sqrt(R^2 - (chord/2)^2). The chord cannot exceed the diameter (R >= chord/2).
+// dims: in { chord_in: L, radius_in: L } out: { rise_in: L, arc_length_in: L, central_angle_deg: dimensionless }
+export function computeCircularArcRiseFromRadius({ chord_in = 0, radius_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const c = Number(chord_in) || 0, R = Number(radius_in) || 0;
+  if (!(c > 0)) return { error: "Chord (span) must be positive (in)." };
+  if (!(R > 0)) return { error: "Radius must be positive (in)." };
+  const a = c / 2;
+  if (!(R >= a)) return { error: "Chord cannot exceed the diameter (radius must be at least half the chord)." };
+  const rise_in = R - Math.sqrt(R * R - a * a);
+  const central_angle_rad = 2 * Math.asin(a / R);
+  const central_angle_deg = (central_angle_rad * 180) / Math.PI;
+  const arc_length_in = R * central_angle_rad;
+  if (![rise_in, central_angle_deg, arc_length_in].every(Number.isFinite)) return { error: "Arc-rise math is not a finite value." };
+  const notes = [];
+  notes.push("Rise (sagitta / middle ordinate) = R - sqrt(R^2 - (chord/2)^2), the inverse of R = (chord^2/4 + rise^2) / (2 rise). This is the perpendicular height of the MINOR arc at midspan; central angle = 2 x asin((chord/2)/R), arc length = R x angle. First-principles circle geometry.");
+  if (Math.abs(a - R) < 1e-9) notes.push("The chord equals the diameter: the rise equals the radius and the arc is a semicircle.");
+  notes.push("Lay it out by swinging the radius from the center, or offset " + rise_in.toFixed(3) + " in up from the chord midpoint and " + a.toFixed(3) + " in to each end; a trammel or string-line at this radius reproduces the curve.");
+  return { chord_in: c, radius_in: R, rise_in, central_angle_deg, arc_length_in, notes };
+}
+export const circularArcRiseFromRadiusExample = { inputs: { chord_in: 24, radius_in: 20 } };
+
+function renderCircularArcRiseFromRadius(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: First-principles circle geometry. Rise from a chord and radius R = (chord^2/4 + rise^2)/(2 rise) solved for the rise: rise = R - sqrt(R^2 - (chord/2)^2); central angle = 2 x asin((chord/2)/R); arc length = R x angle. Public-domain layout method (the sagitta / middle-ordinate relation) as in Machinery's Handbook (Industrial Press), by name.";
+  const chord = makeNumber("Chord / span (in)", "car-chord", { step: "any", min: "0" });
+  const radius = makeNumber("Radius (in)", "car-radius", { step: "any", min: "0" });
+  for (const f of [chord, radius]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { chord.input.value = "24"; radius.input.value = "20"; update(); });
+  const oRise = makeOutputLine(outputRegion, "Rise (sagitta) at midspan", "car-out-rise");
+  const oArc = makeOutputLine(outputRegion, "Arc length", "car-out-arc");
+  const oAngle = makeOutputLine(outputRegion, "Central angle", "car-out-angle");
+  const oNote = makeOutputLine(outputRegion, "Notes", "car-out-note");
+  const update = debounce(() => {
+    const r = computeCircularArcRiseFromRadius({ chord_in: Number(chord.input.value) || 0, radius_in: Number(radius.input.value) || 0 });
+    if (r.error) { oRise.textContent = r.error; oArc.textContent = "-"; oAngle.textContent = "-"; oNote.textContent = ""; return; }
+    oRise.textContent = fmt(r.rise_in, 4) + " in";
+    oArc.textContent = fmt(r.arc_length_in, 4) + " in";
+    oAngle.textContent = fmt(r.central_angle_deg, 4) + " deg";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [chord.input, radius.input]) f.addEventListener("input", update);
+}
+LAYOUT_RENDERERS["circular-arc-rise-from-radius"] = renderCircularArcRiseFromRadius;
+
 // =====================================================================
 // spec-v47 G - circle-from-3-points (Circle Through Three Points) - Group G
 // The inverse of bolt-circle: recover a circle's center and radius from

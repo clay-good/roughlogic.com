@@ -8570,6 +8570,17 @@ export const CITATIONS = {
   },
 
   // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
+  "circular-arc-rise-from-radius": {
+    formula: "Rise = R - sqrt(R^2 - (chord/2)^2), the inverse of R = (chord^2/4 + rise^2)/(2 rise); central angle = 2 x asin((chord/2)/R); arc length = R x angle. The chord cannot exceed the diameter (R >= chord/2).",
+    edition: "Circular arc from a chord and radius (the sagitta / middle-ordinate relation) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure circle geometry, public; the chord and radius are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles geometry solved for the rise: the perpendicular height of the MINOR arc at midspan (the sagitta / middle ordinate) from a known radius and chord. The chord cannot exceed the diameter (the radius must be at least half the chord); at the diameter the rise equals the radius (a semicircle). Reproduce the curve by swinging the radius from the center, or offset the rise up from the chord midpoint and half the chord to each end, then trammel/string-line at the radius.",
+    assumptions: [
+      { name: "Chord and radius", value: "the chord (span) and the radius are user-supplied; rise = R - sqrt(R^2 - (chord/2)^2)", source: "circle geometry" },
+      { name: "Minor arc", value: "returns the minor-arc rise; the chord must be no longer than the diameter", source: "circle geometry" },
+    ],
+  },
   "circular-arc": {
     formula: "Radius R = (chord^2 / 4 + rise^2) / (2 x rise); central angle = 2 x acos((R - rise) / R); arc length = R x angle. The rise is the sagitta (middle ordinate) at midspan.",
     edition: "Circular arc from a chord and rise (the sagitta / middle-ordinate relation) - first-principles circle geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

@@ -10854,6 +10854,31 @@ test("bounds: spec-v44 circular-arc pins radius/arc/angle from chord+rise + reje
   assert.ok("error" in _cv44g1({ chord_in: Infinity, rise_in: 4 }));
 });
 
+import { computeCircularArcRiseFromRadius as _v751 } from "../../calc-layout.js";
+test("bounds: spec-v751 arc rise (sagitta) from radius and chord (inverse of circular-arc)", () => {
+  const p = _v751({ chord_in: 24, radius_in: 20 });
+  assert.ok(Math.abs(p.rise_in - 4) < 1e-9);
+  assert.ok(Math.abs(p.central_angle_deg - 73.739795) < 1e-4);
+  // round-trip: the recovered rise fed to circular-arc reproduces the radius (minor-arc rise)
+  for (const [c, R] of [[24, 20], [40, 25], [10, 8], [30, 30]]) {
+    const inv = _v751({ chord_in: c, radius_in: R });
+    const fwd = _cv44g1({ chord_in: c, rise_in: inv.rise_in });
+    assert.ok(Math.abs(fwd.radius_in - R) < 1e-9);
+    assert.ok(Math.abs(fwd.arc_length_in - inv.arc_length_in) < 1e-9);
+  }
+  // chord = diameter -> rise = radius (semicircle)
+  const semi = _v751({ chord_in: 20, radius_in: 10 });
+  assert.ok(Math.abs(semi.rise_in - 10) < 1e-9 && Math.abs(semi.central_angle_deg - 180) < 1e-9);
+  // a bigger radius (flatter arc) on the same chord gives a smaller rise
+  assert.ok(_v751({ chord_in: 24, radius_in: 40 }).rise_in < _v751({ chord_in: 24, radius_in: 20 }).rise_in);
+  // chord exceeding the diameter is impossible
+  assert.ok("error" in _v751({ chord_in: 50, radius_in: 20 }));
+  // error seams
+  assert.ok("error" in _v751({ chord_in: 0, radius_in: 20 }));
+  assert.ok("error" in _v751({ chord_in: 24, radius_in: 0 }));
+  assert.ok("error" in _v751({ chord_in: Infinity, radius_in: 20 }));
+});
+
 import { computeCircleFrom3Points as _cv47g1 } from "../../calc-layout.js";
 test("bounds: spec-v47 circle-from-3-points pins circumcircle + rejects collinear/non-finite", () => {
   // (0,0),(4,0),(0,3): right triangle, hypotenuse is the diameter -> center (2,1.5), r 2.5

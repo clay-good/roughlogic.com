@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(layout): spec-v751 arc rise (sagitta) from radius and chord (circular-arc inverse); 2026-07-14
+
+- New tile `circular-arc-rise-from-radius` (Group G, calc-layout.js): the rise (sagitta / middle ordinate) of an arc from
+  a known radius and chord. `rise = R - sqrt(R^2 - (chord/2)^2)`. A 24 in chord on a 20 in radius rises 4.0 in at midspan;
+  also reports the arc length and central angle. Round-trips through `circular-arc`. **Catalog's 1,200th tile.** Home tile
+  count 1,199 -> 1,200.
+
 ### feat(elecdesign): spec-v750 luminaire mounting height for a target illuminance (point-illuminance inverse); 2026-07-14
 
 - New tile `luminaire-height-for-illuminance` (Group A, calc-elecdesign.js): the mounting height that lands a target

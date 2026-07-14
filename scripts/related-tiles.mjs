@@ -205,6 +205,7 @@ const RELATED = {
   "countersink-diameter-from-depth": ["countersink-depth", "drill-point-depth", "tap-drill-size"],
   "keyseat-key-size": ["countersink-depth", "shrink-fit", "press-fit-pressure"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
+  "circular-arc-rise-from-radius": ["circular-arc", "bolt-circle", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],
   "polygon-miter": ["compound-miter", "bolt-circle", "decimal-to-fraction"],
   "equal-spacing": ["decimal-to-fraction", "stair-stringer-layout", "square-footage"],

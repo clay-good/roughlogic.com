@@ -1432,6 +1432,31 @@
       "kind": "industry"
     },
     {
+      "term": "rise from radius",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "industry"
+    },
+    {
+      "term": "sagitta from radius",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "redirect"
+    },
+    {
+      "term": "arc height from radius",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "adjacent"
+    },
+    {
+      "term": "rise from radius and chord",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how high is the arc",
+      "target": "circular-arc-rise-from-radius",
+      "kind": "adjacent"
+    },
+    {
       "term": "sagitta",
       "target": "circular-arc",
       "kind": "redirect"
