@@ -789,7 +789,7 @@ const TOOL_MODULES = (() => {
     "machining-time", "material-removal-rate", "turning-surface-finish", "feed-for-surface-finish",
     "taper-calc", "taper-diameter", "dividing-head",
     // Group G (cross-trade)
-    "thread-measure-wire", "punch-force",
+    "thread-measure-wire", "punch-force", "punch-capacity",
     // Group E (welding / sheet-metal)
     "press-brake-tonnage", "weld-duty-cycle", "carbon-equivalent",
     // spec-v41 batch 2: Group K + Group G

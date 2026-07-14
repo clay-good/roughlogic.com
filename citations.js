@@ -7861,6 +7861,17 @@ export const CITATIONS = {
       { name: "Shear strength", value: "the material shear strength (~0.8 x UTS for mild steel) is user-supplied", source: "shear mechanics" },
     ],
   },
+  "punch-capacity": {
+    formula: "F = capacity_tons x 2000; max thickness = F / (pi x D x shear strength); max round diameter = F / (pi x T x shear strength). The inverse of F = perimeter x thickness x shear strength.",
+    edition: "Punching force as sheared area times shear strength solved for capacity - first-principles as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "First-principles shear; the shear strength (~0.8 x UTS for mild steel) is user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "The largest round hole (or the thickest material) a press of a given tonnage can punch, the inverse of punch-force: from F = perimeter x thickness x shear strength with a round perimeter pi x D, the max thickness is F / (pi x D x shear) and the max diameter is F / (pi x T x shear), where F is the capacity in pounds (tons x 2000). Keep margin: the press should exceed the punch force, the punch and die need adequate strength, and a shear-ground or stepped punch lowers the peak force. First-principles shear for a round hole; a rectangular or shaped hole uses its own perimeter. A shop aid; the press, tooling, and material govern.",
+    assumptions: [
+      { name: "Round hole", value: "solves a round hole (perimeter pi x D); a rectangular or shaped hole uses its own perimeter", source: "shear mechanics" },
+      { name: "Shear strength and margin", value: "the material shear strength (~0.8 x UTS for mild steel) is user-supplied; keep press and tooling margin", source: "shear mechanics" },
+    ],
+  },
   "press-brake-tonnage": {
     formula: "Air-bend tons/ft = 575 x (UTS/60) x T^2 / V; total = tons/ft x bend length. Recommended die ~8 x T; minimum flange ~0.7 x die opening.",
     edition: "Press-brake air-bend tonnage formula (the 575 mild-steel constant) as published in press-brake tonnage charts / Machinery's Handbook, by name; empirical method.",

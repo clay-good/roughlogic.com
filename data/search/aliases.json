@@ -1047,6 +1047,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "max hole a press can punch",
+      "target": "punch-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "biggest hole for press tonnage",
+      "target": "punch-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "thickest material my press can punch",
+      "target": "punch-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what can my ironworker punch",
+      "target": "punch-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "punch capacity for a tonnage",
+      "target": "punch-capacity",
+      "kind": "adjacent"
+    },
+    {
       "term": "press brake tonnage",
       "target": "press-brake-tonnage",
       "kind": "industry"

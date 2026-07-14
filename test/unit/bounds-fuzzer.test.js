@@ -10297,7 +10297,7 @@ import {
   computeMachiningTime as _cv40a, computeMaterialRemovalRate as _cv40b,
   computeTurningSurfaceFinish as _cv40c, computeTaperCalc as _cv40d, computeFeedForSurfaceFinish as _v680,
   computeDividingHead as _cv40e, computeThreadMeasureWire as _cv40f,
-  computePunchForce as _cv40g, computePressBrakeTonnage as _cv40h,
+  computePunchForce as _cv40g, computePressBrakeTonnage as _cv40h, computePunchCapacity as _v683,
   computeWeldDutyCycle as _cv40i, computeCarbonEquivalent as _cv40j,
   computeTapDrillSize as _cv41a, computeRolledBlank as _cv41b,
   computeCompoundMiter as _cv54a,
@@ -10443,6 +10443,32 @@ test("bounds: spec-v40 punch-force pins force/perimeter + rejects bad inputs", (
   assert.ok("error" in _cv40g({ shape: "round", diameter_in: 0.5, thickness_in: 0.25, shear_strength_psi: 0 }));
   assert.ok("error" in _cv40g({ shape: "rectangular", side_a_in: 0, side_b_in: 2, thickness_in: 0.25, shear_strength_psi: 50000 }));
   assert.ok("error" in _cv40g({ shape: "round", diameter_in: Infinity, thickness_in: 0.25, shear_strength_psi: 50000 }));
+});
+
+test("bounds: spec-v683 computePunchCapacity pins T_max = F/(pi D tau) and D_max = F/(pi T tau), round-trips through computePunchForce, and error seams", () => {
+  const t = _v683({ capacity_tons: 9.817477, shear_strength_psi: 50000, solve_for: "thickness", diameter_in: 0.5 });
+  assert.ok(!t.error, JSON.stringify(t));
+  assert.ok(Math.abs(t.max_thickness_in - (9.817477 * 2000) / (Math.PI * 0.5 * 50000)) < 1e-9, `T identity: ${t.max_thickness_in}`);
+  assert.ok(Math.abs(t.max_thickness_in - 0.25) < 1e-4, `pinned 0.25: ${t.max_thickness_in}`);
+  const d = _v683({ capacity_tons: 9.817477, shear_strength_psi: 50000, solve_for: "diameter", thickness_in: 0.25 });
+  assert.ok(Math.abs(d.max_diameter_in - 0.5) < 1e-4, `pinned 0.5: ${d.max_diameter_in}`);
+  // Round-trip: the max thickness, punched at the given diameter, uses exactly the press capacity.
+  for (const capacity_tons of [5, 9.817477, 30]) {
+    for (const diameter_in of [0.25, 0.5, 1.0]) {
+      const m = _v683({ capacity_tons, shear_strength_psi: 50000, solve_for: "thickness", diameter_in });
+      assert.ok(!m.error, `sweep cap=${capacity_tons} D=${diameter_in}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_thickness_in, "T"); assert.ok(m.max_thickness_in > 0, "T positive");
+      const back = _cv40g({ shape: "round", diameter_in, thickness_in: m.max_thickness_in, shear_strength_psi: 50000 });
+      assert.ok(Math.abs(back.force_tons - capacity_tons) < 1e-9, `round-trip cap=${capacity_tons} D=${diameter_in}: ${back.force_tons}`);
+    }
+  }
+  // Error seams: non-positive capacity / shear, bad solve_for, missing known dim, non-finite.
+  assert.ok("error" in _v683({ capacity_tons: 0, shear_strength_psi: 50000, diameter_in: 0.5 }));
+  assert.ok("error" in _v683({ capacity_tons: 10, shear_strength_psi: 0, diameter_in: 0.5 }));
+  assert.ok("error" in _v683({ capacity_tons: 10, shear_strength_psi: 50000, solve_for: "x", diameter_in: 0.5 }));
+  assert.ok("error" in _v683({ capacity_tons: 10, shear_strength_psi: 50000, solve_for: "thickness", diameter_in: 0 }));
+  assert.ok("error" in _v683({ capacity_tons: 10, shear_strength_psi: 50000, solve_for: "diameter", thickness_in: 0 }));
+  assert.ok("error" in _v683({ capacity_tons: Infinity, shear_strength_psi: 50000, diameter_in: 0.5 }));
 });
 
 test("bounds: spec-v40 press-brake-tonnage pins tonnage + rejects bad inputs", () => {

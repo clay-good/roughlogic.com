@@ -15958,6 +15958,54 @@
    }
   },
   {
+   "tile_id": "punch-capacity",
+   "source_publisher": "First-principles shear (inverse)",
+   "source_title": "max thickness = F / (pi x D x shear), F = capacity_tons x 2000",
+   "source_edition_or_year": "spec-v683 worked example (machine-verified)",
+   "source_section_or_page": "9.8175 ton press, 0.5 in hole, 50,000 psi shear -> 0.25 in max thickness (round-trips punch-force)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "capacity_tons": 9.817477,
+    "shear_strength_psi": 50000,
+    "solve_for": "thickness",
+    "diameter_in": 0.5,
+    "thickness_in": 0.25
+   },
+   "outputs": {
+    "max_thickness_in": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "punch-capacity",
+   "source_publisher": "First-principles shear (inverse)",
+   "source_title": "cross-check: same press solving for the max round diameter in 0.25 in stock",
+   "source_edition_or_year": "spec-v683 cross-check (machine-verified)",
+   "source_section_or_page": "9.8175 ton press, 0.25 in thick, 50,000 psi shear -> 0.5 in max diameter",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "capacity_tons": 9.817477,
+    "shear_strength_psi": 50000,
+    "solve_for": "diameter",
+    "diameter_in": 0.5,
+    "thickness_in": 0.25
+   },
+   "outputs": {
+    "max_diameter_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "press-brake-tonnage",
    "source_publisher": "Press-brake air-bend tonnage chart + Machinery's Handbook",
    "source_title": "tons/ft = 575 x (UTS/60) x T^2 / V",

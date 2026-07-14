@@ -399,7 +399,7 @@ const _TILES = [
   // v40 machine-shop & fab bench (new calc-shop.js module; mixed group letters K/G/E)
   ["machining-time", "K"], ["material-removal-rate", "K"], ["turning-surface-finish", "K"], ["feed-for-surface-finish", "K"],
   ["taper-calc", "K"], ["taper-diameter", "K"], ["dividing-head", "K"],
-  ["thread-measure-wire", "G"], ["punch-force", "G"],
+  ["thread-measure-wire", "G"], ["punch-force", "G"], ["punch-capacity", "G"],
   ["press-brake-tonnage", "E"], ["weld-duty-cycle", "E"], ["carbon-equivalent", "E"],
   ["shielding-gas-runtime", "E"], ["oxyfuel-cutting-gas", "E"], ["weld-preheat-fuel", "E"], ["weld-cost-per-foot", "E"],
 

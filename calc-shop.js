@@ -631,6 +631,61 @@ function _v40renderPunchForce(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["punch-force"] = _v40renderPunchForce;
 
+// spec-v683 - punch-capacity (inverse of punch-force) - Group G
+// F = perimeter x T x tau; solved for the max round-hole diameter or the max thickness a press can punch.
+// dims: in { capacity_tons: dimensionless, shear_strength_psi: dimensionless, solve_for: dimensionless, diameter_in: L, thickness_in: L } out: { max_thickness_in: L, max_diameter_in: L, force_lb: dimensionless }
+export function computePunchCapacity({ capacity_tons = 0, shear_strength_psi = 0, solve_for = "thickness", diameter_in = 0, thickness_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(capacity_tons) || 0;
+  const tau = Number(shear_strength_psi) || 0;
+  const mode = String(solve_for);
+  if (!(cap > 0)) return { error: "Press capacity must be positive (tons)." };
+  if (!(tau > 0)) return { error: "Shear strength must be positive (psi)." };
+  if (mode !== "thickness" && mode !== "diameter") return { error: "Solve for must be thickness or diameter." };
+  const force_lb = cap * 2000;
+  if (mode === "thickness") {
+    const D = Number(diameter_in) || 0;
+    if (!(D > 0)) return { error: "Hole diameter must be positive (in)." };
+    // Inverse of F = (pi D) x T x tau: T_max = F / (pi D tau).
+    const max_thickness_in = force_lb / (Math.PI * D * tau);
+    if (!(max_thickness_in > 0) || !Number.isFinite(max_thickness_in)) return { error: "Thickness math is not a finite positive value." };
+    return { solve_for: mode, max_thickness_in, force_lb, note: _PUNCH_CAP_NOTE };
+  }
+  const T = Number(thickness_in) || 0;
+  if (!(T > 0)) return { error: "Material thickness must be positive (in)." };
+  // Inverse of F = (pi D) x T x tau: D_max = F / (pi T tau).
+  const max_diameter_in = force_lb / (Math.PI * T * tau);
+  if (!(max_diameter_in > 0) || !Number.isFinite(max_diameter_in)) return { error: "Diameter math is not a finite positive value." };
+  return { solve_for: mode, max_diameter_in, force_lb, note: _PUNCH_CAP_NOTE };
+}
+const _PUNCH_CAP_NOTE = "The largest round hole (or the thickest material) a press of a given tonnage can punch, the inverse of the punch-force tile: from F = perimeter x thickness x shear strength with a round perimeter pi x D, the max thickness is F / (pi x D x shear) and the max diameter is F / (pi x T x shear), where F is the press capacity in pounds (tons x 2000). Use the shear strength (~0.8 x UTS for mild steel), and keep margin: the press should exceed the punch force, the punch and die need adequate strength, and a shear-ground or stepped punch lowers the peak force. First-principles shear for a round hole; a rectangular or shaped hole uses its own perimeter. A shop aid; the press, tooling, and material govern.";
+export const punchCapacityExample = { inputs: { capacity_tons: 9.82, shear_strength_psi: 50000, solve_for: "thickness", diameter_in: 0.5, thickness_in: 0.25 } };
+
+function renderPunchCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: punching force solved for capacity: max thickness = F / (pi x D x shear), max diameter = F / (pi x T x shear), from F = perimeter x thickness x shear strength (F = capacity_tons x 2000 lb) - first-principles as in Machinery's Handbook (Industrial Press), by name; public domain. The shear strength (~0.8 x UTS for mild steel) is user-supplied; keep press margin.";
+  const cap = makeNumber("Press capacity (tons)", "pc-cap", { step: "any", min: "0" });
+  const tau = makeNumber("Shear strength (psi, ~0.8 x UTS)", "pc-tau", { step: "any", min: "0" });
+  const mode = makeSelect("Solve for", "pc-mode", [
+    { value: "thickness", label: "Max thickness (given a hole diameter)", selected: true },
+    { value: "diameter", label: "Max round-hole diameter (given a thickness)" },
+  ]);
+  const dia = makeNumber("Hole diameter (in)", "pc-dia", { step: "any", min: "0" });
+  const t = makeNumber("Material thickness (in)", "pc-t", { step: "any", min: "0" });
+  for (const f of [cap, tau, mode, dia, t]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "9.82"; tau.input.value = "50000"; mode.select.value = "thickness"; dia.input.value = "0.5"; t.input.value = "0.25"; update(); });
+  const oMax = makeOutputLine(outputRegion, "Max the press can punch", "pc-out-max");
+  const oNote = makeOutputLine(outputRegion, "Note", "pc-out-note");
+  const update = debounce(() => {
+    const r = computePunchCapacity({ capacity_tons: _readNum(cap.input), shear_strength_psi: _readNum(tau.input), solve_for: mode.select.value, diameter_in: _readNum(dia.input), thickness_in: _readNum(t.input) });
+    if (r.error) { oMax.textContent = r.error; oNote.textContent = ""; return; }
+    oMax.textContent = r.solve_for === "thickness" ? (fmt(r.max_thickness_in, 4) + " in thick") : (fmt(r.max_diameter_in, 4) + " in diameter");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [cap.input, tau.input, dia.input, t.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["punch-capacity"] = renderPunchCapacity;
+
 // =====================================================================
 // spec-v40 2.9 - weld-duty-cycle (Welder Duty Cycle) - Group E
 // I^2-heating: DC2 = DC1 x (A1/A2)^2 (capped 100%); A100 = A1 x sqrt(DC1/100).
