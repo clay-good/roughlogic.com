@@ -683,6 +683,49 @@ function _renderCeilingSpeakerCoverage(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["ceiling-speaker-coverage"] = _renderCeilingSpeakerCoverage;
 
+// ===================== spec-v740: ceiling speaker coverage angle for a target diameter (inverse of ceiling-speaker-coverage) =====================
+// The forward tile gives the coverage diameter from the speaker's coverage angle; the inverse recovers the coverage
+// angle a target coverage diameter (or on-center spacing) needs at a mounting drop, so a designer specs a speaker whose
+// coverage angle hits the layout. From diameter = 2 x (ceiling - ear) x tan(angle/2),
+// angle = 2 x atan( diameter / (2 x (ceiling - ear)) ).
+// dims: in { ceiling_ft: L, ear_ft: L, target_diameter_ft: L } out: { coverage_deg: dimensionless, drop_ft: L }
+export function computeCeilingSpeakerCoverageAngle({ ceiling_ft = 0, ear_ft = 0, target_diameter_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ceiling = Number(ceiling_ft) || 0;
+  const ear = Number(ear_ft) || 0;
+  const dia = Number(target_diameter_ft) || 0;
+  if (!(ceiling > 0)) return { error: "Ceiling height must be positive (ft)." };
+  if (!(ear >= 0)) return { error: "Ear height must be non-negative (ft)." };
+  if (!(ceiling > ear)) return { error: "Ceiling must be above the listener ear height." };
+  if (!(dia > 0)) return { error: "Target coverage diameter must be positive (ft)." };
+  const drop_ft = ceiling - ear;
+  const coverage_deg = 2 * Math.atan(dia / (2 * drop_ft)) * 180 / Math.PI;
+  if (![coverage_deg, drop_ft].every(Number.isFinite)) return { error: "Coverage-angle math is not a finite value." };
+  return {
+    coverage_deg, drop_ft,
+    note: "Required coverage angle = 2 x atan( target diameter / (2 x (ceiling - ear)) ), the inverse of diameter = 2 x (ceiling - ear) x tan(angle/2). Spec a speaker whose rated coverage angle at the design frequency is at least this wide; the coverage angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing / 0.7. A layout aid; verify with the speaker's coverage-angle spec and the target SPL.",
+  };
+}
+export const ceilingSpeakerCoverageAngleExample = { inputs: { ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 } };
+function _renderCeilingSpeakerCoverageAngle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Ceiling speaker coverage: diameter = 2 x (ceiling - ear) x tan(angle/2), solved for the angle: coverage angle = 2 x atan( diameter / (2 x (ceiling - ear)) ). A layout aid; verify with the speaker's coverage angle at the design frequency and the target SPL.";
+  const ch = makeNumber("Ceiling height (ft)", "csa-ch", { step: "any", min: "0" }); ch.input.value = "10";
+  const ea = makeNumber("Listener ear height (ft, seated ~4)", "csa-ea", { step: "any", min: "0" }); ea.input.value = "4";
+  const dia = makeNumber("Target coverage diameter / spacing (ft)", "csa-dia", { step: "any", min: "0" }); dia.input.value = "8";
+  for (const f of [ch, ea, dia]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { ch.input.value = "10"; ea.input.value = "4"; dia.input.value = "8"; update(); });
+  const oAngle = makeOutputLine(outputRegion, "Required coverage angle", "csa-out-angle");
+  const oNote = makeOutputLine(outputRegion, "Note", "csa-out-n");
+  const update = debounce(() => {
+    const r = computeCeilingSpeakerCoverageAngle({ ceiling_ft: Number(ch.input.value) || 0, ear_ft: Number(ea.input.value) || 0, target_diameter_ft: Number(dia.input.value) || 0 });
+    if (r.error) { oAngle.textContent = r.error; oNote.textContent = ""; return; }
+    oAngle.textContent = fmt(r.coverage_deg, 1) + " deg (drop " + fmt(r.drop_ft, 1) + " ft)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [ch, ea, dia]) f.input.addEventListener("input", update);
+}
+LOWVOLTAGE_RENDERERS["ceiling-speaker-coverage-angle"] = _renderCeilingSpeakerCoverageAngle;
+
 // ===================== spec-v458: structured cabling channel length (TIA-568) =====================
 // dims: in { permanent_link_m: L, cords_m: L, temp_c: dimensionless, derate_per_c: dimensionless } out: { max_pl_m: L, channel_m: L }
 export function computeStructuredCablingChannel({ permanent_link_m = 0, cords_m = 0, temp_c = 20, derate_per_c = 0.004 } = {}) {

@@ -21932,6 +21932,31 @@
       "kind": "industry"
     },
     {
+      "term": "speaker coverage angle",
+      "target": "ceiling-speaker-coverage-angle",
+      "kind": "industry"
+    },
+    {
+      "term": "coverage angle for spacing",
+      "target": "ceiling-speaker-coverage-angle",
+      "kind": "redirect"
+    },
+    {
+      "term": "what coverage angle speaker",
+      "target": "ceiling-speaker-coverage-angle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ceiling speaker angle",
+      "target": "ceiling-speaker-coverage-angle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "coverage angle for diameter",
+      "target": "ceiling-speaker-coverage-angle",
+      "kind": "adjacent"
+    },
+    {
       "term": "speaker spacing",
       "target": "ceiling-speaker-coverage",
       "kind": "industry"

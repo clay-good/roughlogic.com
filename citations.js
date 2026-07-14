@@ -8675,6 +8675,18 @@ export const CITATIONS = {
       { name: "Verify on site", value: "effective sensor width and lens distortion shift the real FOV; confirm with the lens chart and a live view", source: "scope of this tile" },
     ],
   },
+  "ceiling-speaker-coverage-angle": {
+    formula: "coverage_deg = 2 x atan( target_diameter / (2 x (ceiling - ear)) ), the inverse of diameter = 2 x (ceiling - ear) x tan(coverage_deg / 2).",
+    edition: "Distributed ceiling-loudspeaker coverage geometry, standard commercial-audio design practice (manufacturer design guides, e.g. Bose / JBL / Atlas) by name, solved for the angle; first-principles cone geometry.",
+    freeAccess: "The coverage-cone geometry is first-principles; the spacing conventions are published in loudspeaker-manufacturer design guides.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The coverage angle a target coverage diameter (or on-center spacing) needs at a mounting drop, the inverse of the coverage-cone geometry. Spec a speaker whose rated coverage angle at the design frequency is at least this wide; the rated angle narrows at high frequency, so a speaker rated exactly here dims the highs at the edge of the pattern - use the 2-4 kHz coverage for speech. For edge-to-edge layout set the target diameter to the on-center spacing; for even (minimum-overlap) coverage set it to spacing / 0.7. Verify against the speaker's directivity data and the target SPL.",
+    assumptions: [
+      { name: "Coverage cone", value: "coverage angle = 2 x atan( diameter / (2 x (ceiling - ear)) ) at the listener plane", source: "cone geometry" },
+      { name: "Spacing convention", value: "edge-to-edge target = spacing; minimum overlap target = spacing / 0.7 (-6 dB overlap)", source: "commercial-audio design practice" },
+      { name: "Angle narrows with frequency", value: "the rated angle is broadest at low frequency; use the 2-4 kHz coverage for speech", source: "loudspeaker directivity data" },
+    ],
+  },
   "ceiling-speaker-coverage": {
     formula: "diameter = 2 x (ceiling - ear) x tan(coverage_deg / 2); spacing = diameter (edge-to-edge) or 0.7 x diameter (minimum overlap); count = ceil(area / spacing^2).",
     edition: "Distributed ceiling-loudspeaker coverage geometry, standard commercial-audio design practice (manufacturer design guides, e.g. Bose / JBL / Atlas) by name; first-principles cone geometry.",

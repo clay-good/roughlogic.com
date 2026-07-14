@@ -17845,6 +17845,28 @@ test("bounds: spec-v457 computeCeilingSpeakerCoverage pins diameter, count, layo
   assert.ok("error" in _v457({ ceiling_ft: Infinity, ear_ft: 4, coverage_deg: 90, room_area_ft2: 1200 }));
 });
 
+import { computeCeilingSpeakerCoverageAngle as _v740 } from "../../calc-lowvoltage.js";
+test("bounds: spec-v740 ceiling speaker coverage angle for a target diameter (inverse of ceiling-speaker-coverage)", () => {
+  const p = _v740({ ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 });
+  assert.ok(Math.abs(p.coverage_deg - 67.380) < 0.01 && Math.abs(p.drop_ft - 6) < 1e-9);
+  // round-trip: the recovered angle fed to ceiling-speaker-coverage reproduces the target diameter
+  for (const [ceiling, ear, dia] of [[10, 4, 8], [12, 4, 12], [9, 3, 6], [14, 4.5, 20]]) {
+    const inv = _v740({ ceiling_ft: ceiling, ear_ft: ear, target_diameter_ft: dia });
+    const fwd = _v457({ ceiling_ft: ceiling, ear_ft: ear, coverage_deg: inv.coverage_deg, room_area_ft2: 1000 });
+    assert.ok(Math.abs(fwd.diameter_ft - dia) < 1e-9);
+  }
+  // a larger target diameter needs a wider angle; a bigger drop needs a narrower angle
+  assert.ok(_v740({ ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 12 }).coverage_deg > _v740({ ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 }).coverage_deg);
+  assert.ok(_v740({ ceiling_ft: 16, ear_ft: 4, target_diameter_ft: 8 }).coverage_deg < _v740({ ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 8 }).coverage_deg);
+  // recovered angle always in (0, 180)
+  const wide = _v740({ ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 100 });
+  assert.ok(wide.coverage_deg > 0 && wide.coverage_deg < 180);
+  // error seams
+  assert.ok("error" in _v740({ ceiling_ft: 4, ear_ft: 4, target_diameter_ft: 8 }));
+  assert.ok("error" in _v740({ ceiling_ft: 10, ear_ft: 4, target_diameter_ft: 0 }));
+  assert.ok("error" in _v740({ ceiling_ft: Infinity, ear_ft: 4, target_diameter_ft: 8 }));
+});
+
 test("bounds: spec-v458 computeStructuredCablingChannel pins de-rated max, channel, pass/fail, and error seams", () => {
   const r = _v458({ permanent_link_m: 85, cords_m: 8, temp_c: 20, derate_per_c: 0.004 });
   assert.ok(Math.abs(r.max_pl_m - 90) < 1e-9 && Math.abs(r.channel_m - 93) < 1e-9);

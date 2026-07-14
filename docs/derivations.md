@@ -2218,6 +2218,7 @@ cross-check.
 | calc-lowvoltage.js | `computeCctvRetentionDays` | `{ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = ...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCctvStorage` | `{ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_d...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCeilingSpeakerCoverage` | `{ ceiling_ft = 0, ear_ft = 0, coverage_deg = 90, room_area_ft2 = 0, layout = ...` | _ | _ | _ |
+| calc-lowvoltage.js | `computeCeilingSpeakerCoverageAngle` | `{ ceiling_ft = 0, ear_ft = 0, target_diameter_ft = 0 } = {}` | _ | _ | _ |
 | calc-lowvoltage.js | `computeCoaxRgLoss` | `{ mode = "loss", loss_per_100ft_db = 0, length_ft = 0, source_level = null, t...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberLossBudget` | `{ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connecto...` | _ | _ | _ |
 | calc-lowvoltage.js | `computeFiberMaxLength` | `{ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_p...` | _ | _ | _ |
@@ -2849,7 +2850,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1435.
+Row count: 1436.
 
 <!-- END function-corpus-v14 -->
 
@@ -2930,7 +2931,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (153 tiles)
+### Group A Electrical (154 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2957,6 +2958,7 @@ per spec-v14 §13.1 second paragraph.
 | `cctv-retention-days` | CCTV Retention Days from Disk Capacity | first-principles NVR/VMS bitrate acco...; 16000 GB disk, 8 cameras at 4 Mbps, 24 h -> 16000 / (8 * ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ceiling-speaker-coverage` | Ceiling Speaker Coverage and Spacing | commercial-audio design practice; spec-v457 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `ceiling-speaker-coverage-angle` | Ceiling Speaker Coverage Angle for a Target Spacing | commercial-audio design practice (sol...; spec-v740 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `coax-rg-loss` | Coaxial Cable Attenuation | Belden / CommScope loss curves (by name); 100 ft RG6 @ 1000 MHz (6 dB/100 ft) -> 6 dB; source 0 dBm... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `commercial-lighting-load` | Commercial General-Lighting and Receptacle Load (NEC 220.12 / 220.44) | NEC 2023 (NFPA 70); 5,000 ft2 x 3 VA = 15,000 VA lighting; 60 x 180 = 10,800 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `conductor-short-circuit-withstand` | Conductor Short-Circuit Thermal Withstand (Onderdonk / ICEA) | ICEA / Onderdonk; spec-v125 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4223,6 +4225,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1188. Fixture-covered or reference-cadence: 1188 / 1188.
+Tile count: 1189. Fixture-covered or reference-cadence: 1189 / 1189.
 
 <!-- END tile-index-v14 -->

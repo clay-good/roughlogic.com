@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(lowvoltage): spec-v740 ceiling speaker coverage angle for a target spacing (ceiling-speaker-coverage inverse); 2026-07-14
+
+- New tile `ceiling-speaker-coverage-angle` (Group A, calc-lowvoltage.js): the coverage angle a target coverage diameter
+  (or on-center spacing) needs at a mounting drop. `angle = 2 x atan( diameter / (2 x (ceiling - ear)) )`. An 8 ft circle
+  under a 10 ft ceiling over 4 ft ears needs a 67 deg speaker. Round-trips through `ceiling-speaker-coverage`. Home tile
+  count 1,188 -> 1,189.
+
 ### feat(rigging): spec-v739 max redirect angle for a block WLL (block-redirect-load inverse); 2026-07-14
 
 - New tile `block-redirect-max-angle` (Group Z, calc-rigging.js): the largest direction change a block or anchor of a

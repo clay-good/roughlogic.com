@@ -694,6 +694,7 @@ export const COMPUTE_MAP = {
   "coax-rg-loss": { module: "../../calc-lowvoltage.js", fn: "computeCoaxRgLoss" },
   "camera-lens-fov": { module: "../../calc-lowvoltage.js", fn: "computeCameraLensFov" },
   "ceiling-speaker-coverage": { module: "../../calc-lowvoltage.js", fn: "computeCeilingSpeakerCoverage" },
+  "ceiling-speaker-coverage-angle": { module: "../../calc-lowvoltage.js", fn: "computeCeilingSpeakerCoverageAngle" },
   "structured-cabling-channel": { module: "../../calc-lowvoltage.js", fn: "computeStructuredCablingChannel" },
   // spec-v29 pipe / raceway field-layout bench.
   "pipe-cold-spring": { module: "../../calc-pipefit.js", fn: "computeColdSpring" },
