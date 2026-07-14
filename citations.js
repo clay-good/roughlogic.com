@@ -4453,6 +4453,18 @@ export const CITATIONS = {
       { name: "Operating margin", value: "0.65 × N_crit recommended", source: "AAM / Spicer engineering manuals" },
     ],
   },
+  "driveshaft-max-length": {
+    formula: "N_crit falls as 1/L^2, so L_max = L_ref × sqrt(0.65 × N_crit_ref / target_rpm), keeping the running speed at or below 0.65 × critical. The inverse of N_crit = (4.7/L^2) × sqrt(E I / (rho A)).",
+    edition: "Euler-Bernoulli beam theory by name; AAM (American Axle) and Spicer / Dana driveshaft engineering manuals by name.",
+    freeAccess: "Beam-theory principles free in mechanics-of-materials texts at university OCW.",
+    governance: GOVERNANCE.general,
+    editionNote: "The longest a driveshaft tube can be before it whips at a target operating speed, the inverse of driveshaft-crit: the first-mode critical speed falls as 1/length^2, so L_max = L_ref × sqrt(0.65 × N_crit_ref / target_rpm), keeping the running speed at or below 0.65 of critical (public guidance is 0.6-0.75). Halving the operating RPM lets the shaft grow by sqrt(2) = 41% before it whips, which is why a long run is split with a center support bearing or built from a larger, stiffer, or composite tube. This is a bare-tube first-mode estimate; the yokes, slip joint, balance, and support bearings shift the real critical speed, so keep margin. Single-edition (physics + manufacturer practice). The driveline manufacturer and a whirl analysis govern.",
+    assumptions: [
+      { name: "1/L^2 critical speed", value: "the first-mode critical speed scales as 1/length^2; L_max = L_ref x sqrt(0.65 x N_crit_ref / target_rpm)", source: "Euler-Bernoulli beam theory" },
+      { name: "Operating margin", value: "keeps the running speed at or below 0.65 x critical (guidance 0.6-0.75)", source: "AAM / Spicer engineering manuals" },
+      { name: "Bare-tube estimate", value: "yokes, slip joint, balance, and support bearings shift the real critical speed; keep margin", source: "driveline practice" },
+    ],
+  },
   "fuel-range": {
     formula: "Energy stored (BTU) = tank_gal × LHV; range = tank × mpg × load_factor for liquid fuels; conversion to kWh via 1 BTU = 0.000293 kWh.",
     edition: "DOE EERE Alternative Fuels Data Center fuel-property table (LHV per fuel) by name; ASTM D975 (#2 diesel), D4814 (gasoline), D2 (jet A) by name.",

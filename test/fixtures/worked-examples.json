@@ -9714,6 +9714,52 @@
    }
   },
   {
+   "tile_id": "driveshaft-max-length",
+   "source_publisher": "Project (first-principles, inverse) over Spicer / Dana driveshaft tables",
+   "source_title": "L_max = L_ref * sqrt(0.65 * N_crit_ref / target_rpm)",
+   "source_edition_or_year": "spec-v692 worked example (machine-verified)",
+   "source_section_or_page": "3.5 in OD / 0.083 in wall / steel, running at the 3,040.7 rpm safe limit -> 48 in max (round-trips driveshaft-crit)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_rpm": 3040.7074857215016,
+    "od_in": 3.5,
+    "wall_in": 0.083,
+    "material": "steel"
+   },
+   "outputs": {
+    "max_length_in": {
+     "value": 48,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "driveshaft-max-length",
+   "source_publisher": "Project (first-principles, inverse) over Spicer / Dana driveshaft tables",
+   "source_title": "cross-check: halving the operating RPM lets the tube grow by sqrt(2) = 41%",
+   "source_edition_or_year": "spec-v692 cross-check (machine-verified)",
+   "source_section_or_page": "same tube at half the RPM (1,520.4) -> about 67.9 in (sqrt(2) x 48)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_rpm": 1520.3537428607508,
+    "od_in": 3.5,
+    "wall_in": 0.083,
+    "material": "steel"
+   },
+   "outputs": {
+    "max_length_in": {
+     "value": 67.88,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "confined-space-purge",
    "source_publisher": "29 CFR 1910.146 + ACGIH ventilation engineering practice",
    "source_title": "Purge time (min) = ceil((volume * target_air_changes) / blower_cfm)",

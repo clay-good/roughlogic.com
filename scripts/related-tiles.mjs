@@ -828,7 +828,8 @@ const RELATED = {
 
   // Group K: Mechanic (fill-in).
   "bolt-stretch": ["bolt-torque", "displacement-cr"],
-  "driveshaft-crit": ["displacement-cr"],
+  "driveshaft-crit": ["driveshaft-max-length", "shaft-torsion", "displacement-cr"],
+  "driveshaft-max-length": ["driveshaft-crit", "shaft-torsion", "displacement-cr"],
   "tire-gearing": ["fuel-range", "displacement-cr"],
   "brake-pad-life": ["braking-distance", "fuel-range"],
   "valve-flow-coefficient": ["pump-tdh", "hydraulic-cylinder"],

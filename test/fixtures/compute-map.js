@@ -458,6 +458,7 @@ export const COMPUTE_MAP = {
   "npsh-a": { module: "../../calc-hvac.js", fn: "computeNPSHa" },
   "compare-refrigerants": { module: "../../calc-refrigerant.js", fn: "computeCompareRefrigerants" },
   "driveshaft-crit": { module: "../../calc-mechanic.js", fn: "computeDriveshaftCritical" },
+  "driveshaft-max-length": { module: "../../calc-mechanic.js", fn: "computeDriveshaftMaxLength" },
   "confined-space-purge": { module: "../../calc-rescue.js", fn: "computeConfinedSpacePurge" },
   "pacing-distance": { module: "../../calc-field.js", fn: "computePacing" },
   "backcountry-needs": { module: "../../calc-field.js", fn: "computeBackcountryNeeds" },

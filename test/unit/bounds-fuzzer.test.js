@@ -3797,6 +3797,7 @@ import {
   computeChamberCcForCr,
   computeBoltStretch,
   computeDriveshaftCritical,
+  computeDriveshaftMaxLength,
   computeFuelRange,
   parseTireSize,
   computeTireGearing,
@@ -3944,6 +3945,33 @@ test("bounds: calc-mechanic computeDriveshaftCritical rejects unknown material /
   assert.ok("error" in computeDriveshaftCritical({ od_in: 0, wall_in: 0.083, length_in: 50, material: "steel" }));
   assert.ok("error" in computeDriveshaftCritical({ od_in: 3.5, wall_in: 2.0, length_in: 50, material: "steel" }));
   assert.ok("error" in computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 0, material: "steel" }));
+});
+
+test("bounds: spec-v692 computeDriveshaftMaxLength pins L_max = L_ref sqrt(0.65 N_crit_ref/target), round-trips through computeDriveshaftCritical, and error seams", () => {
+  const fwd48 = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: 48, material: "steel" });
+  const r = computeDriveshaftMaxLength({ target_rpm: fwd48.recommended_max_rpm, od_in: 3.5, wall_in: 0.083, material: "steel" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_length_in - 48) < 1e-6, `max length identity: ${r.max_length_in}`);
+  assert.ok(Math.abs(r.critical_rpm - r.critical_rpm) < 1e-9); // finite
+  // Halving the operating RPM lets the tube grow by sqrt(2).
+  const half = computeDriveshaftMaxLength({ target_rpm: fwd48.recommended_max_rpm / 2, od_in: 3.5, wall_in: 0.083, material: "steel" });
+  assert.ok(Math.abs(half.max_length_in - 48 * Math.SQRT2) < 1e-6, `half rpm sqrt2 longer: ${half.max_length_in}`);
+  // Round-trip: at the max length, the forward tile's recommended-max speed equals the target RPM.
+  for (const target_rpm of [1500, 3000, 6000]) {
+    for (const material of ["steel", "aluminum", "carbon"]) {
+      const m = computeDriveshaftMaxLength({ target_rpm, od_in: 3.5, wall_in: 0.083, material });
+      assert.ok(!m.error, `sweep rpm=${target_rpm} ${material}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_length_in, "L"); assert.ok(m.max_length_in > 0, "L positive");
+      const back = computeDriveshaftCritical({ od_in: 3.5, wall_in: 0.083, length_in: m.max_length_in, material });
+      assert.ok(Math.abs(back.recommended_max_rpm - target_rpm) < 1e-6, `round-trip rpm=${target_rpm} ${material}: ${back.recommended_max_rpm}`);
+    }
+  }
+  // Error seams: non-positive target, non-positive OD, wall >= OD/2, unknown material, non-finite.
+  assert.ok("error" in computeDriveshaftMaxLength({ target_rpm: 0, od_in: 3.5, wall_in: 0.083 }));
+  assert.ok("error" in computeDriveshaftMaxLength({ target_rpm: 3000, od_in: 0, wall_in: 0.083 }));
+  assert.ok("error" in computeDriveshaftMaxLength({ target_rpm: 3000, od_in: 3.5, wall_in: 2.0, material: "steel" }));
+  assert.ok("error" in computeDriveshaftMaxLength({ target_rpm: 3000, od_in: 3.5, wall_in: 0.083, material: "unobtainium" }));
+  assert.ok("error" in computeDriveshaftMaxLength({ target_rpm: Infinity, od_in: 3.5, wall_in: 0.083 }));
 });
 
 test("bounds: calc-mechanic computeFuelRange pins range = tank * mpg * load_factor and the per-fuel BTU table", () => {

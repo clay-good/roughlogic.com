@@ -208,6 +208,43 @@ export function computeDriveshaftCritical({ od_in = 0, wall_in = 0, length_in = 
 
 export const driveshaftExample = { inputs: { od_in: 3.5, wall_in: 0.083, length_in: 50, material: "steel" } };
 
+// dims: in { target_rpm: T^-1, od_in: L, wall_in: L, material: dimensionless } out: { max_length_in: L, critical_rpm: T^-1 }
+export function computeDriveshaftMaxLength({ target_rpm = 0, od_in = 0, wall_in = 0, material = "steel" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rpm = Number(target_rpm) || 0;
+  if (!(rpm > 0)) return { error: "Target operating RPM must be positive." };
+  // Reuse the forward tile at a reference length to extract the geometry constant K (N_crit = K / L^2).
+  const L_ref = 100;
+  const ref = computeDriveshaftCritical({ od_in, wall_in, length_in: L_ref, material });
+  if (ref.error) return ref;
+  // N_crit(L) = N_crit_ref x (L_ref/L)^2; the safe limit is 0.65 x N_crit. Setting safe(L_max) = target_rpm:
+  // L_max = L_ref x sqrt(0.65 x N_crit_ref / target_rpm), and the critical speed there is target_rpm / 0.65.
+  const max_length_in = L_ref * Math.sqrt(0.65 * ref.critical_rpm / rpm);
+  const critical_rpm = rpm / 0.65;
+  if (!Number.isFinite(max_length_in) || !(max_length_in > 0)) return { error: "Length math is not a finite positive value." };
+  return {
+    max_length_in, critical_rpm, safety_factor: 0.65,
+    note: "The longest a driveshaft tube can be before it whips at a target operating speed, the inverse of the driveshaft-crit tile: the first-mode critical speed falls as 1/length^2 (Euler-Bernoulli), so L_max = L_ref x sqrt(0.65 x N_crit_ref / target_rpm), keeping the running speed at or below 0.65 of critical (the public guidance is to stay below 0.6-0.75). Halving the operating RPM lets the shaft grow by sqrt(2) = 41% before it whips, which is why a long run is split with a center support bearing or built from a larger, stiffer, or composite tube. This is a bare-tube first-mode estimate; the yokes, slip joint, balance, and support bearings shift the real critical speed, so keep margin. A design aid; the driveline manufacturer and a whirl analysis govern."
+  };
+}
+export const driveshaftMaxLengthExample = { inputs: { target_rpm: 3000, od_in: 3.5, wall_in: 0.083, material: "steel" } };
+const renderDriveshaftMaxLength = _simpleRenderer({
+  citation: "Citation: Euler-Bernoulli first-mode critical speed solved for length: the critical RPM falls as 1/length^2, so L_max = L_ref x sqrt(0.65 x N_crit_ref / target_rpm), keeping the running speed below 0.65 of critical (public guidance 0.6-0.75). A bare-tube estimate; the yokes, slip joint, balance, and support bearings shift the real critical speed. A design aid; the driveline manufacturer and a whirl analysis govern.",
+  example: driveshaftMaxLengthExample.inputs,
+  fields: [
+    { key: "target_rpm", label: "Operating speed (RPM)", kind: "number" },
+    { key: "od_in", label: "Tube outer diameter (in)", kind: "number" },
+    { key: "wall_in", label: "Tube wall thickness (in)", kind: "number" },
+    { key: "material", label: "Material", kind: "select", options: Object.keys(SHAFT_MATERIALS).map((k) => ({ value: k, label: k })) },
+  ],
+  outputs: [
+    { key: "l", id: "dml-out-l", label: "Max shaft length", value: (r) => fmt(r.max_length_in, 1) + " in" },
+    { key: "c", id: "dml-out-c", label: "Critical speed at that length", value: (r) => fmt(r.critical_rpm, 0) + " RPM (running at 0.65 of critical)" },
+    { key: "n", id: "dml-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDriveshaftMaxLength,
+});
+
 // --- 200: Fuel Energy and Range ---
 
 export const FUEL_PROPERTIES = {
@@ -634,6 +671,7 @@ export const MECHANIC_RENDERERS = {
   "chamber-cc-for-cr": renderChamberCcForCr,
   "bolt-stretch":     renderBoltStretch,
   "driveshaft-crit":  renderDriveshaft,
+  "driveshaft-max-length": renderDriveshaftMaxLength,
   "fuel-range":       renderFuelRange,
   "tire-gearing":     renderTireGearing,
   "brake-pad-life":   renderBrakePadLife,

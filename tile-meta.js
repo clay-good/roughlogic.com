@@ -279,7 +279,7 @@ const _TILES = [
   ["incoterm-decoder", "J"], ["stopping-sight-distance", "J"],
 
   ["prop-slip", "K"], ["displacement-cr", "K"], ["chamber-cc-for-cr", "K"],
-  ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["fuel-range", "K"],
+  ["bolt-stretch", "K"], ["driveshaft-crit", "K"], ["driveshaft-max-length", "K"], ["fuel-range", "K"],
   ["tire-gearing", "K"], ["brake-pad-life", "K"],
   ["valve-flow-coefficient", "K"],
 

@@ -61792,6 +61792,31 @@
       "kind": "question"
     },
     {
+      "term": "max driveshaft length for an rpm",
+      "target": "driveshaft-max-length",
+      "kind": "industry"
+    },
+    {
+      "term": "longest driveshaft before it whips",
+      "target": "driveshaft-max-length",
+      "kind": "industry"
+    },
+    {
+      "term": "shaft length limit at operating speed",
+      "target": "driveshaft-max-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how long a tube before critical speed",
+      "target": "driveshaft-max-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "driveshaft length for a target rpm",
+      "target": "driveshaft-max-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "how far can i go on a tank of diesel",
       "target": "fuel-range",
       "kind": "question"
