@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): spec-v775 gear-tooth chordal thickness (caliper); 2026-07-14
+
+- New tile `gear-chordal-thickness` (Group K, calc-machining.js): the gear-tooth caliper settings the geometry tile
+  leaves out -- chordal tooth thickness `tc = (N/Pd) sin(90/N deg)` and chordal addendum
+  `ac = 1/Pd + (N/2Pd)(1 - cos(90/N deg))` for a 20-degree full-depth involute spur gear. Pd 10, N 40 -> tc 0.1570 in,
+  ac 0.1015 in (arc thickness pi/2Pd = 0.15708). Fuzzer pins the chord-under-arc relation, the 1/Pd scaling, and the
+  large-N limit. calc-machining.js gzip cap 19500 -> 21000 B. Home count 1,223 -> 1,224.
+
 ### feat(trucking): spec-v774 low-speed off-tracking (swept path); 2026-07-14
 
 - New tile `truck-off-tracking` (Group J, calc-trucking.js): how far a turning truck's rear axle tracks inside the front

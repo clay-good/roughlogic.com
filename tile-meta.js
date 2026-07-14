@@ -422,7 +422,7 @@ const _TILES = [
 
   // v54 compound miter for crown molding (calc-shop.js; Group E carpentry)
   ["compound-miter", "E"],
-  ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["spur-gear-geometry", "K"], ["gear-identification", "K"],
+  ["tolerance-stack-rss", "G"], ["cone-flat-pattern", "G"], ["spur-gear-geometry", "K"], ["gear-identification", "K"], ["gear-chordal-thickness", "K"],
   // spec-v511 interference press-fit pressure and holding force
   ["press-fit-pressure", "G"],
   ["press-fit-interference-for-force", "G"],

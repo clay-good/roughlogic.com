@@ -687,6 +687,7 @@ export const COMPUTE_MAP = {
   "cone-flat-pattern": { module: "../../calc-shop.js", fn: "computeConeFlatPattern" },
   "spur-gear-geometry": { module: "../../calc-machining.js", fn: "computeSpurGearGeometry" },
   "gear-identification": { module: "../../calc-machining.js", fn: "computeGearIdentification" },
+  "gear-chordal-thickness": { module: "../../calc-machining.js", fn: "computeGearChordalThickness" },
   "tank-volume": { module: "../../calc-cross.js", fn: "computeTankVolume" },
   "linear-interpolation": { module: "../../calc-cross.js", fn: "computeLinearInterpolation" },
   "circular-arc": { module: "../../calc-layout.js", fn: "computeCircularArc" },

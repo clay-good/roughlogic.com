@@ -19074,6 +19074,42 @@ test("bounds: spec-v649 computeGearIdentification inverts the gear geometry, rou
   assert.ok("error" in _v649({ teeth: Infinity, outside_dia_in: 4.2 }));
 });
 
+import { computeGearChordalThickness as _v775 } from "../../calc-machining.js";
+
+test("bounds: spec-v775 gear-chordal-thickness pins tc/ac, the chord-under-arc relation, scaling, and error seams", () => {
+  // Spec example: Pd 10, N 40 -> half-angle 2.25 deg; tc = 4 sin(2.25) = 0.157039; ac = 0.1 + 2(1-cos2.25) = 0.101542.
+  const r = _v775({ diametral_pitch: 10, teeth: 40 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const half = Math.PI / 2 / 40;
+  assert.ok(Math.abs(r.chordal_thickness_in - (40 / 10) * Math.sin(half)) < 1e-12);
+  assert.ok(Math.abs(r.chordal_thickness_in - 0.157039) < 1e-5);
+  assert.ok(Math.abs(r.chordal_addendum_in - (1 / 10 + (40 / 20) * (1 - Math.cos(half)))) < 1e-12);
+  assert.ok(Math.abs(r.chordal_addendum_in - 0.101542) < 1e-5);
+  assert.ok(Math.abs(r.arc_thickness_in - Math.PI / 20) < 1e-12);
+  // The chord is always a hair less than the arc; the chordal addendum a hair more than the addendum 1/Pd.
+  for (let N = 6; N <= 200; N += 7) {
+    for (const Pd of [4, 8, 10, 16, 24, 32]) {
+      const m = _v775({ diametral_pitch: Pd, teeth: N });
+      assert.ok(!m.error, JSON.stringify({ Pd, N }));
+      assert.ok(m.chordal_thickness_in < m.arc_thickness_in, "chord < arc");
+      assert.ok(m.chordal_thickness_in > m.arc_thickness_in * 0.98, "chord close to arc");
+      assert.ok(m.chordal_addendum_in > 1 / Pd, "chordal addendum > 1/Pd");
+      // Both dimensions scale as 1/Pd for a fixed N (finer pitch, smaller teeth).
+      const finer = _v775({ diametral_pitch: 2 * Pd, teeth: N });
+      assert.ok(Math.abs(finer.chordal_thickness_in - m.chordal_thickness_in / 2) < 1e-12, "tc ~ 1/Pd");
+      assert.ok(Math.abs(finer.chordal_addendum_in - m.chordal_addendum_in / 2) < 1e-12, "ac ~ 1/Pd");
+    }
+  }
+  // As N grows the chord approaches the arc (a rack tooth is straight): tc/arc -> 1.
+  const many = _v775({ diametral_pitch: 10, teeth: 300 });
+  assert.ok(many.chordal_thickness_in / many.arc_thickness_in > 0.9999, "large N -> chord ~ arc");
+  // Error seams.
+  assert.ok("error" in _v775({ diametral_pitch: 0, teeth: 40 }));
+  assert.ok("error" in _v775({ diametral_pitch: 10, teeth: 2 }), "N < 3 rejected");
+  assert.ok("error" in _v775({ diametral_pitch: 10, teeth: 40.5 }), "non-integer teeth rejected");
+  assert.ok("error" in _v775({ diametral_pitch: Infinity, teeth: 40 }));
+});
+
 // ===================== spec-v402..v404 real-estate-investing trio (calc-realestate.js) =====================
 import { computeFixFlipProfit as _v402, computeBrrrrRefi as _v403, computeRentalTotalReturn as _v404 } from "../../calc-realestate.js";
 

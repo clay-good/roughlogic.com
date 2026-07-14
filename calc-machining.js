@@ -648,6 +648,52 @@ function renderGearIdentification(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["gear-identification"] = renderGearIdentification;
 
+// ===================== v775: gear-tooth chordal thickness for caliper inspection =====================
+// Standard 20-degree full-depth involute, no profile shift. Half-angle = 90/N deg.
+// chordal tooth thickness tc = (N/Pd) x sin(90/N deg); chordal addendum (caliper
+// tongue depth) ac = 1/Pd + (N/(2Pd)) x (1 - cos(90/N deg)). Arc thickness = pi/(2Pd).
+// dims: in { diametral_pitch: dimensionless, teeth: dimensionless } out: { chordal_thickness_in: L, chordal_addendum_in: L, arc_thickness_in: L }
+export function computeGearChordalThickness({ diametral_pitch = 0, teeth = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Pd = Number(diametral_pitch) || 0;
+  const N = Number(teeth) || 0;
+  if (!(Pd > 0)) return { error: "Diametral pitch must be positive (teeth/in)." };
+  if (!(N >= 3) || N !== Math.floor(N)) return { error: "Tooth count must be a whole number of at least 3." };
+  const halfAngleRad = (Math.PI / 2) / N; // 90 deg / N, in radians
+  const chordal_thickness_in = (N / Pd) * Math.sin(halfAngleRad);
+  const chordal_addendum_in = 1 / Pd + (N / (2 * Pd)) * (1 - Math.cos(halfAngleRad));
+  const arc_thickness_in = Math.PI / (2 * Pd);
+  return {
+    chordal_thickness_in, chordal_addendum_in, arc_thickness_in,
+    note: "Gear-tooth caliper (vernier gear-tooth caliper) inspection dimensions for a standard 20-degree full-depth involute spur gear: set the caliper tongue to the chordal addendum ac and read the chordal tooth thickness tc across the tooth at the pitch line. tc = (N/Pd) sin(90/N deg) is the straight chord of the circular tooth thickness (the arc thickness pi/(2Pd)), so tc is always a hair less than the arc; ac = 1/Pd + (N/(2Pd))(1 - cos(90/N deg)) is slightly more than the addendum 1/Pd because the chord sits below the outside circle. Assumes standard tooth proportions with no profile shift (addendum modification) and no backlash/tooth-thinning allowance - subtract the drawing's allowance from tc for a working gear. A shop inspection aid; the gear drawing and AGMA govern.",
+  };
+}
+export const gearChordalThicknessExample = { inputs: { diametral_pitch: 10, teeth: 40 } };
+
+function renderGearChordalThickness(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: gear-tooth caliper chordal dimensions for a 20-degree full-depth involute spur gear - chordal tooth thickness tc = (N/Pd) sin(90/N deg), chordal addendum ac = 1/Pd + (N/(2Pd))(1 - cos(90/N deg)), the standard Machinery's Handbook / AGMA gear-tooth-caliper method. Standard tooth, no profile shift or backlash allowance. A shop inspection aid; the gear drawing and AGMA govern.";
+  const pd = makeNumber("Diametral pitch Pd (teeth/in)", "gct-pd", { step: "any", min: "0", value: "10" });
+  pd.input.value = "10";
+  const n = makeNumber("Number of teeth N", "gct-n", { step: "1", min: "3", value: "40" });
+  n.input.value = "40";
+  for (const f of [pd, n]) inputRegion.appendChild(f.wrap);
+  const oTc = makeOutputLine(outputRegion, "Chordal tooth thickness (caliper reading)", "gct-out-tc");
+  const oAc = makeOutputLine(outputRegion, "Chordal addendum (caliper tongue depth)", "gct-out-ac");
+  const oArc = makeOutputLine(outputRegion, "Arc tooth thickness (reference)", "gct-out-arc");
+  const oNote = makeOutputLine(outputRegion, "Note", "gct-out-note");
+  const update = debounce(() => {
+    const r = computeGearChordalThickness({ diametral_pitch: Number(pd.input.value) || 0, teeth: Number(n.input.value) || 0 });
+    if (r.error) { oTc.textContent = r.error; oAc.textContent = "-"; oArc.textContent = "-"; oNote.textContent = ""; return; }
+    oTc.textContent = fmt(r.chordal_thickness_in, 4) + " in";
+    oAc.textContent = fmt(r.chordal_addendum_in, 4) + " in";
+    oArc.textContent = fmt(r.arc_thickness_in, 4) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { pd.input.value = "10"; n.input.value = "40"; update(); });
+  for (const f of [pd, n]) f.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["gear-chordal-thickness"] = renderGearChordalThickness;
+
 // ===================== spec-v504: rolling-bearing L10 rating life (ISO 281) =====================
 // dims: in { dynamic_rating_lbf: M L T^-2, equivalent_load_lbf: M L T^-2, speed_rpm: T^-1, bearing_type: dimensionless } out: { p_exp: dimensionless, l10_rev: dimensionless, l10_hr: T }
 export function computeBearingL10Life({ dynamic_rating_lbf = 0, equivalent_load_lbf = 0, speed_rpm = 0, bearing_type = "ball" } = {}) {

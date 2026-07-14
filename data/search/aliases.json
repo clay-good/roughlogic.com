@@ -18177,6 +18177,31 @@
       "kind": "industry"
     },
     {
+      "term": "gear tooth chordal thickness",
+      "target": "gear-chordal-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "gear tooth caliper setting",
+      "target": "gear-chordal-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "chordal addendum",
+      "target": "gear-chordal-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "measure a gear tooth",
+      "target": "gear-chordal-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "gear tooth thickness",
+      "target": "gear-chordal-thickness",
+      "kind": "question"
+    },
+    {
       "term": "gear tooth dimensions",
       "target": "spur-gear-geometry",
       "kind": "industry"

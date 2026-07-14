@@ -201,6 +201,7 @@ const RELATED = {
   "roller-chain-length": ["vbelt-drive", "bearing-l10-life", "gear-mph-rpm"],
   "spur-gear-geometry": ["gear-identification", "gear-cascade", "cutting-speed-rpm", "dividing-head"],
   "gear-identification": ["spur-gear-geometry", "gear-cascade", "dividing-head", "cutting-speed-rpm"],
+  "gear-chordal-thickness": ["spur-gear-geometry", "gear-identification", "dividing-head"],
   "bearing-l10-life": ["bearing-max-load", "vbelt-drive", "shrink-fit", "spur-gear-geometry"],
   "bearing-max-load": ["bearing-l10-life", "vbelt-drive", "shrink-fit", "press-fit-pressure"],
   "countersink-depth": ["drill-point-depth", "tap-drill-size", "cutting-speed-rpm"],

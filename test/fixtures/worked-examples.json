@@ -17427,6 +17427,33 @@
    }
   },
   {
+   "tile_id": "gear-chordal-thickness",
+   "source_publisher": "Machinery's Handbook / AGMA (gear-tooth caliper)",
+   "source_title": "Pd 10, N 40 -> chordal thickness 0.1570 in, chordal addendum 0.1015 in",
+   "source_edition_or_year": "tc = (N/Pd) sin(90/N deg); ac = 1/Pd + (N/2Pd)(1 - cos(90/N deg))",
+   "source_section_or_page": "half-angle 2.25 deg; tc = 4 sin(2.25) = 0.15704; ac = 0.1 + 2(1-cos2.25) = 0.10154",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "diametral_pitch": 10,
+    "teeth": 40
+   },
+   "outputs": {
+    "chordal_thickness_in": {
+     "value": 0.15704,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    },
+    "chordal_addendum_in": {
+     "value": 0.10154,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "bearing-l10-life",
    "source_publisher": "ISO 281 basic rating life",
    "source_title": "ball bearing C 5,000 lbf, P 1,000 lbf, 1,750 rpm -> 125 million rev, 1,190 hr",

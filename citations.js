@@ -8714,6 +8714,19 @@ export const CITATIONS = {
     ],
   },
 
+  "gear-chordal-thickness": {
+    formula: "chordal tooth thickness tc = (N/Pd) x sin(90/N deg); chordal addendum ac = 1/Pd + (N/(2Pd)) x (1 - cos(90/N deg)); arc tooth thickness = pi/(2Pd).",
+    edition: "Gear-tooth-caliper (vernier) inspection dimensions for a 20-degree full-depth involute spur gear, the standard Machinery's Handbook / AGMA method, by name.",
+    freeAccess: "The chordal-thickness and chordal-addendum relations are standard published gear geometry (Machinery's Handbook).",
+    governance: GOVERNANCE.general,
+    editionNote: "The two settings for measuring a spur-gear tooth with a gear-tooth (vernier) caliper: set the caliper's tongue to the chordal addendum ac and read the chordal tooth thickness tc across the tooth. tc = (N/Pd) sin(90/N deg) is the straight chord of the circular (arc) tooth thickness pi/(2Pd), so tc is always slightly less than the arc; ac = 1/Pd + (N/(2Pd))(1 - cos(90/N deg)) is slightly more than the addendum 1/Pd because the chord lies below the outside circle. Assumes standard full-depth tooth proportions with no profile shift (addendum modification) and no backlash or tooth-thinning allowance - for a working gear cut with backlash, subtract the drawing's tooth-thinning allowance from tc. A shop inspection aid; the gear drawing and AGMA govern.",
+    assumptions: [
+      { name: "Chordal thickness", value: "tc = (N/Pd) sin(90/N deg), the chord of the arc thickness pi/(2Pd)", source: "Machinery's Handbook gear-tooth caliper" },
+      { name: "Chordal addendum", value: "ac = 1/Pd + (N/(2Pd))(1 - cos(90/N deg)), the caliper tongue depth", source: "Machinery's Handbook" },
+      { name: "Standard tooth", value: "20-deg full-depth, no profile shift or backlash allowance; subtract the drawing tooth-thinning for a working gear", source: "scope of this tile" },
+    ],
+  },
+
   // ---- spec-v44 cross-trade circular-arc layout (calc-fab.js; group G) ----
   "circular-arc-rise-from-radius": {
     formula: "Rise = R - sqrt(R^2 - (chord/2)^2), the inverse of R = (chord^2/4 + rise^2)/(2 rise); central angle = 2 x asin((chord/2)/R); arc length = R x angle. The chord cannot exceed the diameter (R >= chord/2).",

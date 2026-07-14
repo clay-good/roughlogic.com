@@ -885,7 +885,7 @@ const TOOL_MODULES = (() => {
     // spec-v317..v319 machining depth batch
     "radial-chip-thinning", "boring-bar-deflection", "boring-bar-max-overhang", "ballnose-scallop-height",
     // spec-v401 spur gear tooth geometry
-    "spur-gear-geometry", "gear-identification",
+    "spur-gear-geometry", "gear-identification", "gear-chordal-thickness",
     // spec-v504 rolling-bearing L10 rating life (ISO 281)
     "bearing-l10-life", "bearing-max-load",
     // spec-v509 countersink diameter and cutting depth
