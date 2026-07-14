@@ -11997,6 +11997,18 @@ export const CITATIONS = {
       { name: "Equivalent strength", value: "a lower-bound equivalent f'c, not a cylinder-break value", source: "scope of this tile" },
     ],
   },
+  "concrete-depth-for-cracking-moment": {
+    formula: "fr = 7.5 x lambda x sqrt(f'c); h = sqrt( 6 x Mcr / (fr x b) ), the inverse of Mcr = fr b h^2/6; S = b h^2/6; Mcr_lbin = Mcr_kipft x 12000.",
+    edition: "The ACI 318-19 cracking moment Mcr = fr Ig/yt (19.2.3.1 modulus of rupture), solved for the section depth, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the cracking-moment and 19.2.3 rupture provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The total section depth that reaches a target ACI 318-19 cracking moment for a given width, the inverse of Mcr = fr b h^2/6: h = sqrt( 6 Mcr / (fr b) ), with the modulus of rupture fr = 7.5 x lambda x sqrt(f'c) psi (19.2.3.1; lambda 1.0 normalweight, 0.75 all-lightweight). A common use is to enter 1.2 Mcr for the minimum-flexural-reinforcement check (the design flexural strength must reach at least 1.2 Mcr). It uses the gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or heavily reinforced section uses the transformed gross moment of inertia, and the flexural, shear, and deflection design still govern the final depth. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Section depth", value: "h = sqrt( 6 Mcr / (fr b) ), the inverse of Mcr = fr b h^2/6", source: "ACI 318-19" },
+      { name: "Rupture stress", value: "fr = 7.5 x lambda x sqrt(f'c) psi (lambda 1.0 NW, 0.75 LW)", source: "ACI 318-19 19.2.3.1" },
+      { name: "Gross section", value: "reinforcement transform neglected; the flexure/shear/deflection design still governs the depth", source: "scope of this tile" },
+    ],
+  },
   "concrete-cracking-moment": {
     formula: "fr = 7.5 x lambda x sqrt(f'c); S = b h^2 / 6; Mcr = fr x S (= fr Ig/yt); Mcr_kipft = Mcr_lbin / 12000.",
     edition: "The ACI 318-19 cracking moment Mcr = fr Ig/yt with the 19.2.3.1 modulus of rupture, by name.",

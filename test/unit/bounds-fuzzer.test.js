@@ -17506,6 +17506,29 @@ test("bounds: spec-v651 computeConcreteCrackingMoment pins Mcr = fr b h^2/6, its
   assert.ok("error" in _v651({ b_in: 12, h_in: 20, fc_psi: Infinity, lambda: 1.0 }));
 });
 
+import { computeConcreteDepthForCrackingMoment as _v752 } from "../../calc-concrete.js";
+test("bounds: spec-v752 concrete section depth for a target cracking moment (inverse of concrete-cracking-moment)", () => {
+  const p = _v752({ target_mcr_kipft: 31.62, b_in: 12, fc_psi: 4000, lambda: 1.0 });
+  assert.ok(Math.abs(p.h_in - 20) < 0.01);
+  assert.ok(Math.abs(p.fr_psi - 7.5 * Math.sqrt(4000)) < 1e-9);
+  // round-trip: the recovered depth fed to concrete-cracking-moment reproduces the target Mcr
+  for (const [mcr, b, fc, lam] of [[31.62, 12, 4000, 1.0], [50, 16, 5000, 1.0], [12, 10, 3000, 0.85], [100, 20, 4500, 1.0]]) {
+    const inv = _v752({ target_mcr_kipft: mcr, b_in: b, fc_psi: fc, lambda: lam });
+    const fwd = _v651({ b_in: b, h_in: inv.h_in, fc_psi: fc, lambda: lam });
+    assert.ok(Math.abs(fwd.mcr_kipft - mcr) < 1e-6);
+    assert.ok(Math.abs(fwd.fr_psi - inv.fr_psi) < 1e-9);
+  }
+  // a larger target Mcr needs a deeper section; a wider section needs less depth for the same Mcr
+  assert.ok(_v752({ target_mcr_kipft: 60, b_in: 12, fc_psi: 4000 }).h_in > _v752({ target_mcr_kipft: 31.62, b_in: 12, fc_psi: 4000 }).h_in);
+  assert.ok(_v752({ target_mcr_kipft: 31.62, b_in: 24, fc_psi: 4000 }).h_in < _v752({ target_mcr_kipft: 31.62, b_in: 12, fc_psi: 4000 }).h_in);
+  // error seams
+  assert.ok("error" in _v752({ target_mcr_kipft: 0, b_in: 12, fc_psi: 4000 }));
+  assert.ok("error" in _v752({ target_mcr_kipft: 31.62, b_in: 0, fc_psi: 4000 }));
+  assert.ok("error" in _v752({ target_mcr_kipft: 31.62, b_in: 12, fc_psi: 0 }));
+  assert.ok("error" in _v752({ target_mcr_kipft: 31.62, b_in: 12, fc_psi: 4000, lambda: 0 }));
+  assert.ok("error" in _v752({ target_mcr_kipft: Infinity, b_in: 12, fc_psi: 4000 }));
+});
+
 test("bounds: spec-v380 computeConcreteShrinkageTemperatureSteel pins the ratio, As,min, s_max, and error seams", () => {
   const r = _v380({ h_in: 6, b_in: 12, grade_ksi: 60 });
   assert.ok(Math.abs(r.ratio - 0.0018) < 1e-12);

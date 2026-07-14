@@ -1328,6 +1328,7 @@ const RELATED = {
   "concrete-modulus-of-rupture": ["concrete-cracking-moment","concrete-elastic-modulus","rc-slab-min-thickness","rc-beam-flexure"],
   "concrete-strength-from-rupture": ["concrete-modulus-of-rupture","concrete-cracking-moment","concrete-strength-from-modulus","rc-beam-flexure"],
   "concrete-cracking-moment": ["concrete-modulus-of-rupture","concrete-elastic-modulus","rc-beam-flexure","rc-slab-min-thickness"],
+  "concrete-depth-for-cracking-moment": ["concrete-cracking-moment","concrete-modulus-of-rupture","rc-beam-flexure"],
   "concrete-shrinkage-temperature-steel": ["rc-slab-min-thickness","concrete-modulus-of-rupture","rc-beam-flexure","rebar-lap-splice"],
   "t-beam-effective-flange-width": ["rc-beam-flexure","rc-doubly-reinforced","concrete-beam-min-flexural-steel","rc-slab-min-thickness"],
   "concrete-beam-min-flexural-steel": ["rc-beam-flexure","t-beam-effective-flange-width","concrete-shrinkage-temperature-steel","rc-doubly-reinforced"],

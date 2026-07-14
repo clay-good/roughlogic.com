@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v752 concrete section depth for a target cracking moment (concrete-cracking-moment inverse); 2026-07-14
+
+- New tile `concrete-depth-for-cracking-moment` (Group E, calc-concrete.js): the total section depth that reaches a target
+  cracking moment for a given width. `h = sqrt( 6 Mcr / (fr b) )`, `fr = 7.5 lambda sqrt(f'c)`. A 12 in wide 4000 psi
+  section needs ~20 in to crack at 31.6 kip-ft (enter 1.2 Mcr for the minimum-reinforcement check). Round-trips through
+  `concrete-cracking-moment`. Home tile count 1,200 -> 1,201.
+
 ### feat(layout): spec-v751 arc rise (sagitta) from radius and chord (circular-arc inverse); 2026-07-14
 
 - New tile `circular-arc-rise-from-radius` (Group G, calc-layout.js): the rise (sagitta / middle ordinate) of an arc from

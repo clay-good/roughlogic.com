@@ -709,6 +709,51 @@ CONCRETE_RENDERERS["concrete-cracking-moment"] = _simpleRenderer({
   compute: computeConcreteCrackingMoment,
 });
 
+// concrete-depth-for-cracking-moment: inverse of concrete-cracking-moment. The forward tile gives the cracking moment
+// from the section depth; the inverse recovers the section depth that reaches a target cracking moment for a given width,
+// so a designer sizes the section to a target Mcr (e.g. 1.2 Mcr for minimum flexural reinforcement). From
+// Mcr = fr b h^2 / 6 with fr = 7.5 lambda sqrt(f'c), h = sqrt( 6 Mcr / (fr b) ).
+// dims: in { target_mcr_kipft: M L^2 T^-2, b_in: L, fc_psi: M L^-1 T^-2, lambda: dimensionless } out: { h_in: L, fr_psi: M L^-1 T^-2, sm_in3: L^3 }
+export function computeConcreteDepthForCrackingMoment({ target_mcr_kipft = 0, b_in = 0, fc_psi = 4000, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mcr = Number(target_mcr_kipft) || 0;
+  const b = Number(b_in) || 0;
+  const fc = Number(fc_psi) || 0;
+  const lam = Number(lambda) || 0;
+  if (!(mcr > 0)) return { error: "Target cracking moment must be positive (kip-ft)." };
+  if (!(b > 0)) return { error: "Section width b must be positive (in)." };
+  if (!(fc > 0)) return { error: "Concrete strength f'c must be positive (psi)." };
+  if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  const fr_psi = 7.5 * lam * Math.sqrt(fc);
+  const mcr_lbin = mcr * 12000;
+  const h_in = Math.sqrt(6 * mcr_lbin / (fr_psi * b));
+  const sm_in3 = b * h_in * h_in / 6;
+  const out_of_band = lam < 0.75 || lam > 1.0;
+  if (![fr_psi, h_in, sm_in3].every(Number.isFinite)) return { error: "Section-depth math is not a finite value." };
+  return {
+    h_in, fr_psi, sm_in3, out_of_band,
+    note: "ACI 318-19 cracking moment Mcr = fr b h^2/6 solved for the total depth: h = sqrt( 6 Mcr / (fr b) ), with the modulus of rupture fr = 7.5 lambda sqrt(f'c) (§19.2.3.1). Size to the target Mcr you need - for the minimum-flexural-reinforcement check the design strength must reach at least 1.2 Mcr, so a common use is to enter 1.2 Mcr and check the section against it. This is a gross rectangular section with the reinforcement transform neglected (the standard approximation); a T-beam or heavily reinforced section uses the transformed Ig, and the flexural, shear, and deflection design still govern the final depth. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteDepthForCrackingMomentExample = { inputs: { target_mcr_kipft: 31.6, b_in: 12, fc_psi: 4000, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-depth-for-cracking-moment"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 cracking moment Mcr = fr b h^2/6 (fr = 7.5 lambda sqrt(f'c), §19.2.3.1) solved for the depth: h = sqrt( 6 Mcr / (fr b) ). The value behind the minimum-reinforcement check (design strength >= 1.2 Mcr). A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
+  example: concreteDepthForCrackingMomentExample.inputs,
+  fields: [
+    { key: "target_mcr_kipft", label: "Target cracking moment Mcr (kip-ft)", kind: "number" },
+    { key: "b_in", label: "Section width b (in)", kind: "number", default: 12 },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "h", id: "cdcm-out-h", label: "Required total depth h", value: (r) => fmt(r.h_in, 2) + " in" },
+    { key: "fr", id: "cdcm-out-fr", label: "Modulus of rupture fr", value: (r) => fmt(r.fr_psi, 0) + " psi" + (r.out_of_band ? " (lambda out of 0.75-1.0)" : "") },
+    { key: "sm", id: "cdcm-out-sm", label: "Gross section modulus S = b h^2/6", value: (r) => fmt(r.sm_in3, 0) + " in^3" },
+    { key: "n", id: "cdcm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteDepthForCrackingMoment,
+});
+
 // dims: in { h_in: L, b_in: L, grade_ksi: M L^-1 T^-2 } out: { ratio: dimensionless, as_min_in2: L^2, s_max_in: L }
 export function computeConcreteShrinkageTemperatureSteel({ h_in = 0, b_in = 12, grade_ksi = 60 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

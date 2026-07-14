@@ -44957,6 +44957,31 @@
       "kind": "industry"
     },
     {
+      "term": "depth for cracking moment",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "industry"
+    },
+    {
+      "term": "section depth for mcr",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "redirect"
+    },
+    {
+      "term": "concrete depth for cracking",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "adjacent"
+    },
+    {
+      "term": "beam depth for mcr",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how deep for cracking moment",
+      "target": "concrete-depth-for-cracking-moment",
+      "kind": "adjacent"
+    },
+    {
       "term": "cracking moment",
       "target": "concrete-cracking-moment",
       "kind": "industry"

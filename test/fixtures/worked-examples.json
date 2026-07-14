@@ -43868,6 +43868,35 @@
    }
   },
   {
+   "tile_id": "concrete-depth-for-cracking-moment",
+   "source_publisher": "ACI 318-19 (Mcr = fr b h^2/6, solved for depth)",
+   "source_title": "target Mcr 31.62 kip-ft, b 12 in, 4000 psi normalweight -> 20.0 in depth",
+   "source_edition_or_year": "spec-v752 worked example (machine-verified)",
+   "source_section_or_page": "spec-v752 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_mcr_kipft": 31.62,
+    "b_in": 12,
+    "fc_psi": 4000,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "h_in": {
+     "value": 20.0,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "fr_psi": {
+     "value": 474.3,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-cracking-moment",
    "source_publisher": "ACI 318-19 (Mcr = fr Ig/yt, 19.2.3 modulus of rupture)",
    "source_title": "cross-check: a deeper 24 in section (same width, strength) cracks at 45.5 kip-ft - Mcr grows with h^2",

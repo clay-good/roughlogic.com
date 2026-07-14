@@ -914,6 +914,7 @@ export const COMPUTE_MAP = {
   "concrete-modulus-of-rupture": { module: "../../calc-concrete.js", fn: "computeConcreteModulusOfRupture" },
   "concrete-strength-from-rupture": { module: "../../calc-concrete.js", fn: "computeConcreteStrengthFromRupture" },
   "concrete-cracking-moment": { module: "../../calc-concrete.js", fn: "computeConcreteCrackingMoment" },
+  "concrete-depth-for-cracking-moment": { module: "../../calc-concrete.js", fn: "computeConcreteDepthForCrackingMoment" },
   "concrete-shrinkage-temperature-steel": { module: "../../calc-concrete.js", fn: "computeConcreteShrinkageTemperatureSteel" },
   "t-beam-effective-flange-width": { module: "../../calc-concrete.js", fn: "computeTBeamEffectiveFlangeWidth" },
   "concrete-beam-min-flexural-steel": { module: "../../calc-concrete.js", fn: "computeConcreteBeamMinFlexuralSteel" },
