@@ -830,7 +830,8 @@ const RELATED = {
 
   // Group L: Agriculture (fill-in).
   "timber-cruise": ["crop-yield", "board-footage"],
-  "drawbar-power": ["sprayer-calibration", "gpa-rate"],
+  "drawbar-power": ["drawbar-pull", "sprayer-calibration", "gpa-rate"],
+  "drawbar-pull": ["drawbar-power", "sprayer-calibration", "gpa-rate"],
   "bulk-density": ["seed-rate", "crop-yield"],
   "crop-yield": ["seed-rate", "bulk-density", "timber-cruise"],
   "thi-livestock": ["heat-stress"],

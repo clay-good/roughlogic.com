@@ -1445,6 +1445,7 @@ cross-check.
 | calc-agriculture.js | `computeCenterPivotRuntime` | `{ system_flow_gpm = 0, area_acres = 0, target_depth_in = 0, efficiency_pct = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in = 30, measured_length_ft =...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil" }` | _ | _ | _ |
+| calc-agriculture.js | `computeDrawbarPull` | `{ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil"...` | _ | _ | _ |
 | calc-agriculture.js | `computeDripZoneFlow` | `{ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_co...` | _ | _ | _ |
 | calc-agriculture.js | `computeGPA` | `{ gpm = 0, spacing_in = 0, speed_mph = 0, target_gpa = 0 }` | _ | _ | _ |
 | calc-agriculture.js | `computeGrainAerationAirflow` | `{ bin_capacity_bu = 0, airflow_rate = 0 } = {}` | _ | _ | _ |
@@ -2790,7 +2791,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1376.
+Row count: 1377.
 
 <!-- END function-corpus-v14 -->
 
@@ -3771,7 +3772,7 @@ per spec-v14 §13.1 second paragraph.
 | `volumetric-efficiency` | Volumetric Efficiency and Airflow | Classical four-stroke airflow derivat...; 350 ci at 5500 RPM 4-stroke -> 557 CFM theoretical | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (55 tiles)
+### Group L Agriculture (56 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3783,6 +3784,7 @@ per spec-v14 §13.1 second paragraph.
 | `crop-yield` | Crop Yield and Harvest Loss | USDA NASS yield-strip identity (proje...; Corn / 2 rows @ 30 in / 50 ft strip / 8 lb / 18% moisture... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `crown-pruning-dose` | Live Crown Removal Limit (Pruning Dose) | ANSI A300 Part 1 / ISA BMP - Pruning; 15 of 100 live foliage, mature -> 15% removal, cap 25% (w... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drawbar-power` | Tractor Drawbar Power | ASABE; DBHP = pull * mph / 375 = 4500 * 4.5 / 375 = 54; PTO ~= 5... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `drawbar-pull` | Tractor Drawbar Pull from Power | ASABE (inverse); 75 PTO hp at 4.5 mph on firm soil (0.72) -> 54 drawbar hp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drip-zone-flow` | Drip Zone Flow and Valve Capacity | Irrigation Association low-volume / m...; spec-v209 section 2.1 pinned example (inline dripline) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-rate` | Chemical Application Rate (GPA) | Project (first-principles); Standard agricultural-sprayer calibration identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4108,6 +4110,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1132. Fixture-covered or reference-cadence: 1132 / 1132.
+Tile count: 1133. Fixture-covered or reference-cadence: 1133 / 1133.
 
 <!-- END tile-index-v14 -->

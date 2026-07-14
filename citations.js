@@ -5448,6 +5448,17 @@ export const CITATIONS = {
       { name: "Tractive-efficiency table", value: "0.65 firm / 0.55 tilled / 0.45 soft (engineering-practice values)", source: "ASABE D497" },
     ],
   },
+  "drawbar-pull": {
+    formula: "pull_lb = 375 × drawbar_hp / speed_mph; a PTO rating converts first with drawbar_hp = pto_hp × tractive_efficiency. The inverse of drawbar_hp = (pull × speed) / 375.",
+    edition: "ASABE D497 (Agricultural Machinery Management Data) by name; Nebraska Tractor Test Lab publications.",
+    freeAccess: "Nebraska Tractor Test data free at tractortestlab.unl.edu.",
+    governance: GOVERNANCE.general,
+    editionNote: "The drawbar pull a tractor develops at a working speed for a given power, the inverse of drawbar-power: from drawbar_hp = pull × speed / 375, pull = 375 × drawbar_hp / speed. A PTO rating is converted to drawbar first with the ASABE D497 tractive efficiency (drawbar_hp = pto_hp × efficiency; concrete 0.87, firm soil 0.72, tilled soil 0.55, sand 0.50), because a soft surface wastes engine power as wheel slip. Pull rises as speed drops (why heavy tillage is pulled in a low gear). This is the steady-state pull the power supports; traction (weight × soil coefficient) can limit the usable pull below it, and the ballast, tires, and conditions govern. Single-edition (ASABE D497 + Nebraska Tractor Test).",
+    assumptions: [
+      { name: "Tractive efficiency", value: "concrete 0.87 / firm soil 0.72 / tilled 0.55 / sand 0.50; a soft surface wastes power as slip", source: "ASABE D497" },
+      { name: "Traction may limit", value: "the power-based pull can exceed the traction limit (weight x soil coefficient); ballast and tires govern the usable pull", source: "traction mechanics" },
+    ],
+  },
   "irrigation-uniformity": {
     formula: "Christiansen CU = 100 × (1 − Σ|x_i − mean| / (n × mean)). Distribution Uniformity DU = 100 × mean_lowest_quarter / mean_all. Pass / fail at CU 85 / DU 75.",
     edition: "Christiansen 1942 paper by name; USDA NRCS National Engineering Handbook (NEH) Part 623 (Irrigation) by name.",

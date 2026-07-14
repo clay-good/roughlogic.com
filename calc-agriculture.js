@@ -170,6 +170,29 @@ export function computeDrawbarPower({ pull_lb = 0, speed_mph = 0, surface = "fir
 
 export const drawbarPowerExample = { inputs: { pull_lb: 4500, speed_mph: 4.5, surface: "firm_soil" } };
 
+// dims: in { power_hp: M L^2 T^-3, power_basis: dimensionless, speed_mph: L T^-1, surface: dimensionless } out: { pull_lb: M L T^-2, drawbar_hp: M L^2 T^-3 }
+export function computeDrawbarPull({ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const power = Number(power_hp) || 0;
+  const basis = String(power_basis);
+  const speed = Number(speed_mph) || 0;
+  if (!(power > 0)) return { error: "Power must be positive (hp)." };
+  if (!(speed > 0)) return { error: "Speed must be positive (mph)." };
+  if (basis !== "drawbar" && basis !== "pto") return { error: "Power basis must be drawbar or pto." };
+  const eff = TRACTIVE_EFFICIENCY[surface];
+  if (!Number.isFinite(eff)) return { error: "Unknown surface." };
+  // Inverse of drawbar_hp = pull x speed / 375: pull = 375 x drawbar_hp / speed.
+  // A PTO rating converts to drawbar first: drawbar_hp = pto_hp x tractive_efficiency.
+  const drawbar_hp = basis === "pto" ? power * eff : power;
+  const pull_lb = 375 * drawbar_hp / speed;
+  if (!Number.isFinite(pull_lb) || !(pull_lb > 0)) return { error: "Drawbar-pull math is not a finite positive value." };
+  return {
+    pull_lb, drawbar_hp, tractive_efficiency: eff,
+    note: "The drawbar pull a tractor can develop at a working speed for a given power, the inverse of the drawbar-power tile: from drawbar_hp = pull x speed / 375, pull = 375 x drawbar_hp / speed. A PTO rating is converted to drawbar first with the ASABE D497 tractive efficiency (drawbar_hp = pto_hp x efficiency; concrete 0.87, firm soil 0.72, tilled soil 0.55, sand 0.50), because a soft surface wastes engine power as slip. Pull rises as speed drops, which is why heavy tillage is pulled in a low gear. This is the steady-state drawbar pull the power supports; traction (weight x soil coefficient) can limit the usable pull below this, and the ballast, tires, and conditions govern the real number."
+  };
+}
+export const drawbarPullExample = { inputs: { power_hp: 54, power_basis: "drawbar", speed_mph: 4.5, surface: "firm_soil" } };
+
 // --- 207: Irrigation Sprinkler Uniformity ---
 
 // dims: in { catch_volumes: dimensionless }
@@ -388,6 +411,23 @@ const renderDrawbarPower = _r({
     { key: "e", id: "tp-out-e", label: "Tractive efficiency", value: (r) => fmt(r.tractive_efficiency, 2) },
   ],
   compute: computeDrawbarPower,
+});
+
+const renderDrawbarPull = _r({
+  citation: "Citation: ASABE D497 by name only. Drawbar pull = 375 x drawbar_hp / speed, from drawbar HP = (pull * speed) / 375. A PTO rating converts to drawbar with the tractive efficiency (drawbar_hp = pto_hp x efficiency).",
+  example: drawbarPullExample.inputs,
+  fields: [
+    { key: "power_hp", label: "Power (hp)", kind: "number" },
+    { key: "power_basis", label: "Power basis", kind: "select", options: [{ value: "drawbar", label: "Drawbar HP" }, { value: "pto", label: "PTO HP" }] },
+    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" },
+    { key: "surface", label: "Surface", kind: "select", options: Object.keys(TRACTIVE_EFFICIENCY).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
+  ],
+  outputs: [
+    { key: "p", id: "dbp-out-p", label: "Drawbar pull", value: (r) => fmt(r.pull_lb, 0) + " lb" },
+    { key: "d", id: "dbp-out-d", label: "Drawbar HP used", value: (r) => fmt(r.drawbar_hp, 1) + " hp (tractive eff " + fmt(r.tractive_efficiency, 2) + ")" },
+    { key: "n", id: "dbp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDrawbarPull,
 });
 
 function renderUniformity(inputRegion, outputRegion, citationEl) {
@@ -1452,6 +1492,7 @@ export const AGRICULTURE_RENDERERS = {
   "timber-cruise": renderTimberCruise,
   "seed-rate":     renderSeedRate,
   "drawbar-power": renderDrawbarPower,
+  "drawbar-pull": renderDrawbarPull,
   "irrigation-uniformity": renderUniformity,
   "bulk-density":  renderBulkDensity,
   "crop-yield":    renderCropYield,

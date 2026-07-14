@@ -2034,6 +2034,52 @@
    }
   },
   {
+   "tile_id": "drawbar-pull",
+   "source_publisher": "ASABE (inverse)",
+   "source_title": "pull = 375 * drawbar_hp / speed; a PTO rating converts with drawbar_hp = pto_hp * tractive efficiency",
+   "source_edition_or_year": "spec-v684 worked example (machine-verified)",
+   "source_section_or_page": "75 PTO hp at 4.5 mph on firm soil (0.72) -> 54 drawbar hp -> 4,500 lb (round-trips drawbar-power)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "power_hp": 75,
+    "power_basis": "pto",
+    "speed_mph": 4.5,
+    "surface": "firm_soil"
+   },
+   "outputs": {
+    "pull_lb": {
+     "value": 4500,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "drawbar-pull",
+   "source_publisher": "ASABE (inverse)",
+   "source_title": "cross-check: the same power on sand (efficiency 0.50) develops less pull -- slip wastes power",
+   "source_edition_or_year": "spec-v684 cross-check (machine-verified)",
+   "source_section_or_page": "75 PTO hp at 4.5 mph on sand (0.50) -> 37.5 drawbar hp -> 3,125 lb",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "power_hp": 75,
+    "power_basis": "pto",
+    "speed_mph": 4.5,
+    "surface": "sand"
+   },
+   "outputs": {
+    "pull_lb": {
+     "value": 3125,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "chamber-turnover",
    "source_publisher": "IICRC",
    "source_title": "1500 ft^3 drying chamber, 60 ACH target, 1200 air-mover CFM + 250 dehu CFM",

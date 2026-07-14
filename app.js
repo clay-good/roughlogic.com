@@ -892,7 +892,7 @@ const TOOL_MODULES = (() => {
   ]);
   // v4 Group L: Agriculture and Forestry.
   declare("./calc-agriculture.js", "AGRICULTURE_RENDERERS", [
-    "gpa-rate", "timber-cruise", "seed-rate", "drawbar-power",
+    "gpa-rate", "timber-cruise", "seed-rate", "drawbar-power", "drawbar-pull",
     "irrigation-uniformity", "bulk-density", "crop-yield",
     // v9
     "thi-livestock", "sprayer-calibration",

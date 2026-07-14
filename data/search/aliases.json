@@ -62152,6 +62152,31 @@
       "kind": "question"
     },
     {
+      "term": "drawbar pull from horsepower",
+      "target": "drawbar-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "how much can a tractor pull",
+      "target": "drawbar-pull",
+      "kind": "industry"
+    },
+    {
+      "term": "pull from pto hp and speed",
+      "target": "drawbar-pull",
+      "kind": "adjacent"
+    },
+    {
+      "term": "tractor pull for an implement match",
+      "target": "drawbar-pull",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drawbar pull at a field speed",
+      "target": "drawbar-pull",
+      "kind": "adjacent"
+    },
+    {
       "term": "catch can test for sprinklers",
       "target": "irrigation-uniformity",
       "kind": "question"

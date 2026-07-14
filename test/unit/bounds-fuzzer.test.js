@@ -3124,6 +3124,7 @@ import {
   computeTimberCruise,
   computeSeedRate,
   computeDrawbarPower,
+  computeDrawbarPull,
   computeUniformity,
   computeBulkDensity,
   computeCropYield,
@@ -3235,6 +3236,35 @@ test("bounds: calc-agriculture computeDrawbarPower rejects non-positive pull / s
   assert.ok("error" in computeDrawbarPower({ pull_lb: 0, speed_mph: 4.5, surface: "firm_soil" }));
   assert.ok("error" in computeDrawbarPower({ pull_lb: 4500, speed_mph: 0, surface: "firm_soil" }));
   assert.ok("error" in computeDrawbarPower({ pull_lb: 4500, speed_mph: 4.5, surface: "not-a-surface" }));
+});
+
+test("bounds: spec-v684 computeDrawbarPull pins pull = 375 dbhp/speed, the PTO conversion, round-trips through computeDrawbarPower, and error seams", () => {
+  const r = computeDrawbarPull({ power_hp: 54, power_basis: "drawbar", speed_mph: 4.5, surface: "firm_soil" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.pull_lb - 375 * 54 / 4.5) < 1e-9, `pull identity: ${r.pull_lb}`);
+  assert.ok(Math.abs(r.pull_lb - 4500) < 1e-6, `pinned 4500: ${r.pull_lb}`);
+  // PTO basis converts with the surface tractive efficiency (firm soil 0.72): 75 pto -> 54 drawbar -> 4500 lb.
+  const pto = computeDrawbarPull({ power_hp: 75, power_basis: "pto", speed_mph: 4.5, surface: "firm_soil" });
+  assert.ok(Math.abs(pto.pull_lb - 4500) < 1e-6, `pto pinned 4500: ${pto.pull_lb}`);
+  // A softer surface wastes power as slip, so the same PTO power develops less pull.
+  const sand = computeDrawbarPull({ power_hp: 75, power_basis: "pto", speed_mph: 4.5, surface: "sand" });
+  assert.ok(sand.pull_lb < pto.pull_lb, `sand less pull: ${sand.pull_lb}`);
+  // Round-trip: the pull, fed back through the forward tile, reproduces the drawbar HP.
+  for (const power_hp of [20, 54, 120]) {
+    for (const speed_mph of [2, 4.5, 8]) {
+      const m = computeDrawbarPull({ power_hp, power_basis: "drawbar", speed_mph, surface: "firm_soil" });
+      assert.ok(!m.error, `sweep hp=${power_hp} mph=${speed_mph}: ${JSON.stringify(m)}`);
+      assertFinite(m.pull_lb, "pull"); assert.ok(m.pull_lb > 0, "pull positive");
+      const back = computeDrawbarPower({ pull_lb: m.pull_lb, speed_mph, surface: "firm_soil" });
+      assert.ok(Math.abs(back.drawbar_hp - power_hp) < 1e-9, `round-trip hp=${power_hp} mph=${speed_mph}: ${back.drawbar_hp}`);
+    }
+  }
+  // Error seams: non-positive power / speed, bad basis, unknown surface, non-finite.
+  assert.ok("error" in computeDrawbarPull({ power_hp: 0, speed_mph: 4.5 }));
+  assert.ok("error" in computeDrawbarPull({ power_hp: 54, speed_mph: 0 }));
+  assert.ok("error" in computeDrawbarPull({ power_hp: 54, power_basis: "x", speed_mph: 4.5 }));
+  assert.ok("error" in computeDrawbarPull({ power_hp: 54, speed_mph: 4.5, surface: "moon" }));
+  assert.ok("error" in computeDrawbarPull({ power_hp: NaN, speed_mph: 4.5 }));
 });
 
 test("bounds: calc-agriculture computeUniformity pins the Christiansen CU and the low-quartile DU identities, plus the pass/fail thresholds at 85 / 75", () => {
