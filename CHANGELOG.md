@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v791 engine BMEP; 2026-07-14
+
+- New tile `engine-bmep` (Group K, calc-mechanic.js): brake mean effective pressure, torque normalized by displacement
+  so engines of any size compare directly. `BMEP(psi) = 150.8 x torque(lb-ft) / displacement(CID)` for a 4-stroke (75.4
+  for a 2-stroke), from `BMEP = 2*pi*n_rev*T/V_d`. A 350 CID V8 at 400 lb-ft runs 172 psi -- healthy naturally-aspirated
+  gasoline; NA gas tops out near 180-190 psi so anything higher signals boost. Cycle selectable. Fuzzer pins the
+  4-stroke / 2-stroke factors, the monotonicity, and the error seams. First tile of Explore sweep #22. Home count 1,239
+  -> 1,240.
+
 ### feat(solar): spec-v790 sun shadow length; 2026-07-14
 
 - New tile `shadow-length` (Group A, calc-solar.js): the ground shadow a vertical object casts on level ground,

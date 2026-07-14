@@ -24467,6 +24467,28 @@
    }
   },
   {
+   "tile_id": "engine-bmep",
+   "source_publisher": "Brake mean effective pressure (SAE; Heywood)",
+   "source_title": "BMEP = 150.8 x torque(lb-ft) / displacement(CID), 4-stroke",
+   "source_edition_or_year": "spec-v791 worked example (machine-verified)",
+   "source_section_or_page": "350 CID at 400 lb-ft (4-stroke) -> 150.8 x 400 / 350 = 172.3 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "torque_lb_ft": 400,
+    "displacement_cid": 350,
+    "cycle_type": "four_stroke"
+   },
+   "outputs": {
+    "bmep_psi": {
+     "value": 172.3,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sacrificial-anode-life",
    "source_publisher": "Sacrificial-anode life by Faraday's law (ABYC E-2; DNV-RP-B401)",
    "source_title": "life = anode_mass x capacity x utilization / (current x 8760 h)",

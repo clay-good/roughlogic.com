@@ -21666,6 +21666,23 @@ test("bounds: spec-v788 computeRollingSphereProtection pins the rolling-sphere r
   assert.ok("error" in _v788({ mast_height_ft: 30, sphere_radius_ft: 0 }));
 });
 
+import { computeEngineBmep as _v791 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v791 computeEngineBmep pins the 4-stroke / 2-stroke BMEP, monotonicity, and error seams", () => {
+  const r = _v791({ torque_lb_ft: 400, displacement_cid: 350, cycle_type: "four_stroke" });
+  assert.ok(Math.abs(r.bmep_psi - 172.34) < 0.05); // 150.8 * 400 / 350
+  // A 2-stroke uses half the factor for the same torque/displacement.
+  assert.ok(Math.abs(_v791({ torque_lb_ft: 400, displacement_cid: 350, cycle_type: "two_stroke" }).bmep_psi - r.bmep_psi / 2) < 0.05);
+  // More torque raises BMEP; more displacement lowers it.
+  assert.ok(_v791({ torque_lb_ft: 500, displacement_cid: 350, cycle_type: "four_stroke" }).bmep_psi > r.bmep_psi);
+  assert.ok(_v791({ torque_lb_ft: 400, displacement_cid: 500, cycle_type: "four_stroke" }).bmep_psi < r.bmep_psi);
+  // Error seams: bad cycle, non-finite, non-positive torque/displacement.
+  assert.ok("error" in _v791({ torque_lb_ft: 400, displacement_cid: 350, cycle_type: "rotary" }));
+  assert.ok("error" in _v791({ torque_lb_ft: Infinity, displacement_cid: 350 }));
+  assert.ok("error" in _v791({ torque_lb_ft: 0, displacement_cid: 350 }));
+  assert.ok("error" in _v791({ torque_lb_ft: 400, displacement_cid: 0 }));
+});
+
 import { computeSacrificialAnodeLife as _v786 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v786 computeSacrificialAnodeLife pins Faraday's-law life, material capacity, monotonicity, and error seams", () => {

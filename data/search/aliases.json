@@ -23847,6 +23847,31 @@
       "kind": "industry"
     },
     {
+      "term": "brake mean effective pressure",
+      "target": "engine-bmep",
+      "kind": "industry"
+    },
+    {
+      "term": "bmep from torque and displacement",
+      "target": "engine-bmep",
+      "kind": "question"
+    },
+    {
+      "term": "engine bmep calculator",
+      "target": "engine-bmep",
+      "kind": "question"
+    },
+    {
+      "term": "how hard is my engine working per cycle",
+      "target": "engine-bmep",
+      "kind": "question"
+    },
+    {
+      "term": "cylinder pressure from torque",
+      "target": "engine-bmep",
+      "kind": "adjacent"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -9661,6 +9661,17 @@ export const CITATIONS = {
       { name: "Reserve rate", value: "25 A draw to a 10.5 V cutoff at 80 F on a 12 V battery", source: "BCI / SAE J537" },
     ],
   },
+  "engine-bmep": {
+    formula: "BMEP(psi) = 150.8 x torque(lb-ft) / displacement(CID) for a 4-stroke (75.4 for a 2-stroke); from BMEP = 2*pi*n_rev*T/V_d with T in lb-in and V_d in in^3.",
+    edition: "Brake mean effective pressure (SAE; Heywood, Internal Combustion Engine Fundamentals), by name; the engine and its dyno sheet govern.",
+    freeAccess: "BMEP's definition (work per displacement per cycle) is standard engine theory; the torque and displacement come from the dyno sheet and the engine spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "Brake mean effective pressure normalizes torque by displacement -- the average pressure that, acting on the piston through one power stroke, would produce the measured torque -- so it strips out engine SIZE and measures how hard each cycle works, letting engines of any displacement be compared directly. From Power = 2*pi*N*T and Power = BMEP x V_d x (N / n_rev), BMEP = 2*pi*n_rev*T/V_d, which with torque in lb-ft and displacement in cubic inches is 150.8 x T/CID for a 4-stroke (n_rev = 2) and 75.4 for a 2-stroke (n_rev = 1). It is evaluated at the torque peak, not peak power. Naturally-aspirated gasoline engines top out around 180-190 psi because they fill on a single atmosphere, so a higher BMEP is the signature of boost and a low one points to a mild cam, a restriction, or wear. Use the peak torque from a corrected dyno pull. A comparison metric, not a design limit.",
+    assumptions: [
+      { name: "Cycle factor", value: "150.8 for a 4-stroke (fires every 2 crank revs), 75.4 for a 2-stroke (every rev)", source: "engine theory" },
+      { name: "Evaluated at torque peak", value: "BMEP is taken at the rpm of maximum torque, using a standard-day corrected dyno figure", source: "SAE J1349 practice" },
+    ],
+  },
   "sacrificial-anode-life": {
     formula: "life_hours = anode_mass_lb x capacity_Ah_per_lb x utilization / current_A; life_years = life_hours / 8760. Capacity: zinc 354, aluminum (Al-Zn-In) 1150, magnesium 500 A-h/lb.",
     edition: "Sacrificial-anode life by Faraday's law of electrolysis (ABYC E-2 cathodic protection; DNV-RP-B401 anode capacities), by name; a corrosion survey and reference-cell reading govern.",

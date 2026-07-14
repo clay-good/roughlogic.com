@@ -507,6 +507,7 @@ const _TILES = [
   ["rolling-sphere-protection", "A"],
   ["deck-board-takeoff", "E"],
   ["shadow-length", "A"],
+  ["engine-bmep", "K"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

@@ -2348,3 +2348,48 @@ MECHANIC_RENDERERS["sacrificial-anode-life"] = _simpleRenderer({
   ],
   compute: computeSacrificialAnodeLife,
 });
+
+// ===================== spec-v791: engine brake mean effective pressure (BMEP) =====================
+// BMEP normalizes torque by displacement, letting engines of any size be compared on how hard each
+// cycle works. From Power = 2*pi*N*T and Power = BMEP*V_d*(N/n_rev): BMEP = 2*pi*n_rev*T/V_d.
+// A 4-stroke fires every 2 crank revs (n_rev = 2), a 2-stroke every rev (n_rev = 1). With T in lb-in
+// (= lb-ft*12) and V_d in in^3, BMEP(psi) = 2*pi*n_rev*12*T_lbft/CID -> 150.8 (4-stroke) / 75.4 (2-stroke).
+const _BMEP_FACTOR = { four_stroke: 150.796, two_stroke: 75.398 };
+// dims: in { torque_lb_ft: M L^2 T^-2, displacement_cid: L^3, cycle_type: dimensionless } out: { bmep_psi: M L^-1 T^-2 }
+export function computeEngineBmep({ torque_lb_ft = 0, displacement_cid = 0, cycle_type = "four_stroke" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(torque_lb_ft) || 0;
+  const cid = Number(displacement_cid) || 0;
+  const factor = _BMEP_FACTOR[cycle_type];
+  if (!factor) return { error: "Cycle type must be four_stroke or two_stroke." };
+  if (!(t > 0)) return { error: "Peak torque must be positive (lb-ft)." };
+  if (!(cid > 0)) return { error: "Displacement must be positive (cubic inches)." };
+  const bmep_psi = factor * t / cid;
+  if (!Number.isFinite(bmep_psi)) return { error: "BMEP math is not a finite value." };
+  let band;
+  if (bmep_psi < 125) band = "low -- a mild, understressed, or worn engine (or a naturally-aspirated diesel)";
+  else if (bmep_psi < 190) band = "typical of a healthy naturally-aspirated gasoline engine at its torque peak";
+  else if (bmep_psi < 300) band = "high -- boosted (turbo/supercharged) or a strong turbodiesel";
+  else band = "very high -- a heavily-boosted, race, or purpose-built engine";
+  return {
+    bmep_psi, band, factor, cycle_type,
+    note: "Brake mean effective pressure is torque normalized by displacement: BMEP = " + (cycle_type === "two_stroke" ? "75.4" : "150.8") + " x torque(lb-ft) / displacement(CID) for a " + (cycle_type === "two_stroke" ? "two" : "four") + "-stroke. It is the average pressure that, acting on the piston through one power stroke, would produce the measured torque -- so it strips engine SIZE out and measures how hard each cycle works, letting a 350 and a 2.0 L be compared directly. It is evaluated at the TORQUE peak (the rpm of maximum BMEP), not peak power. Naturally-aspirated gasoline engines top out around 180-190 psi because they can only fill the cylinder with one atmosphere; a BMEP above that is the signature of boost, and a low value points to a mild cam, restriction, or wear. Use the peak torque from the dyno, corrected to a standard day. A comparison metric, not a design limit; the engine and its dyno sheet govern.",
+  };
+}
+export const engineBmepExample = { inputs: { torque_lb_ft: 400, displacement_cid: 350, cycle_type: "four_stroke" } };
+
+MECHANIC_RENDERERS["engine-bmep"] = _simpleRenderer({
+  citation: "Citation: brake mean effective pressure (SAE; Heywood, Internal Combustion Engine Fundamentals): BMEP = 2*pi*n_rev*T/V_d, which for T in lb-ft and V_d in CID is 150.8 x torque / displacement (4-stroke, n_rev=2) or 75.4 (2-stroke, n_rev=1). Evaluated at the torque peak; naturally-aspirated gasoline tops out near 180-190 psi, boost runs higher. A comparison metric; the dyno sheet governs.",
+  example: engineBmepExample.inputs,
+  fields: [
+    { key: "torque_lb_ft", label: "Peak torque (lb-ft)", kind: "number", default: 400 },
+    { key: "displacement_cid", label: "Displacement (cubic inches)", kind: "number", default: 350 },
+    { key: "cycle_type", label: "Engine cycle", kind: "select", options: [{ value: "four_stroke", label: "4-stroke (150.8)" }, { value: "two_stroke", label: "2-stroke (75.4)" }] },
+  ],
+  outputs: [
+    { key: "b", id: "bmep-out-b", label: "BMEP", value: (r) => fmt(r.bmep_psi, 1) + " psi (" + fmt(r.bmep_psi / 14.5038, 1) + " bar)" },
+    { key: "i", id: "bmep-out-i", label: "Interpretation", value: (r) => r.band },
+    { key: "n", id: "bmep-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEngineBmep,
+});
