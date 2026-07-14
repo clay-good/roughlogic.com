@@ -436,6 +436,7 @@ export const COMPUTE_MAP = {
   "base-converter": { module: "../../calc-edu.js", fn: "computeBaseConvert" },
   "gpa-calculator": { module: "../../calc-edu.js", fn: "computeGPA" },
   "confidence-interval": { module: "../../calc-edu.js", fn: "computeConfidenceInterval" },
+  "sample-size-for-margin": { module: "../../calc-edu.js", fn: "computeSampleSizeForMargin" },
   "linear-system-2x2": { module: "../../calc-edu.js", fn: "computeLinearSystem2x2" },
   "lexile-band": { module: "../../calc-edu.js", fn: "computeLexileBand" },
   "standards-based-grade": { module: "../../calc-edu.js", fn: "computeStandardsBasedGrade" },

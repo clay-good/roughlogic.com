@@ -1142,6 +1142,7 @@ const TOOL_MODULES = (() => {
     "base-converter",
     "gpa-calculator",
     "confidence-interval",
+    "sample-size-for-margin",
     "linear-system-2x2",
     "lexile-band",
     "standards-based-grade",

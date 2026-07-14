@@ -284,7 +284,7 @@ const CAPS = {
   // 2026-05-16 when the Y.3 / Y.13 / Y.14 third expansion landed.
   // Bumped 26000 -> 30000 on 2026-06-05 for the spec-v17 Y.4
   // pearson-correlation tile; built module ~25.1 KB gzipped.
-  "calc-edu.js": 35000, // v20 2026-06-06 (30000)
+  "calc-edu.js": 37000, // v763 2026-07-14 sample-size-for-margin (35000)
 
   // pure-math.js: the shared physics/statistics kernel, lazy-loaded by
   // the calc-*.js modules (not in the home payload). Given an explicit

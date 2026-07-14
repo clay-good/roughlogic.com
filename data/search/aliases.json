@@ -79972,6 +79972,31 @@
       "kind": "question"
     },
     {
+      "term": "sample size for a margin of error",
+      "target": "sample-size-for-margin",
+      "kind": "question"
+    },
+    {
+      "term": "how many people do i need to survey",
+      "target": "sample-size-for-margin",
+      "kind": "question"
+    },
+    {
+      "term": "how many responses for a 3 percent margin",
+      "target": "sample-size-for-margin",
+      "kind": "question"
+    },
+    {
+      "term": "required sample size for a poll",
+      "target": "sample-size-for-margin",
+      "kind": "question"
+    },
+    {
+      "term": "sample size for a confidence interval",
+      "target": "sample-size-for-margin",
+      "kind": "question"
+    },
+    {
       "term": "confidence interval for a sample proportion",
       "target": "confidence-interval",
       "kind": "question"

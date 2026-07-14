@@ -13336,6 +13336,40 @@
    }
   },
   {
+   "tile_id": "sample-size-for-margin",
+   "source_publisher": "Cochran (1977); standard survey sampling",
+   "source_title": "Sample size for a +/- 3-point margin at 95%",
+   "source_edition_or_year": "Universal",
+   "source_section_or_page": "p = 0.5, E = 0.03, z = 1.96 -> n = 1.96^2 * 0.25 / 0.03^2 = 0.9604 / 0.0009 = 1067.1 -> round up to 1068",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "proportion": 0.5,
+    "target_moe": 0.03,
+    "confidence_pct": 95
+   },
+   "outputs": {
+    "required_n": {
+     "value": 1068,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "z_critical": {
+     "value": 1.96,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "exact_n": {
+     "value": 1067.11,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "linear-system-2x2",
    "source_publisher": "Cramer (1750); standard linear algebra",
    "source_title": "Cramer's rule for a 2x2 unique-solution system",

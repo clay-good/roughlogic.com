@@ -360,6 +360,7 @@ const _TILES = [
   ["base-converter", "Y"],
   ["gpa-calculator", "Y"],
   ["confidence-interval", "Y"],
+  ["sample-size-for-margin", "Y"],
   ["linear-system-2x2", "Y"],
   ["lexile-band", "Y"],
   ["standards-based-grade", "Y"],

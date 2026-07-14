@@ -6570,6 +6570,18 @@ export const CITATIONS = {
       { name: "Continuity correction", value: "not applied", source: "this tile is the Wald form; a continuity-corrected variant exists but is not bundled" },
     ],
   },
+  "sample-size-for-margin": {
+    formula: "n = z^2 * p * (1 - p) / E^2, rounded up to the next integer. Inverse of the proportion Wald margin of error E = z * sqrt(p*(1-p)/n). z critical values (two-tailed) from the standard normal: 80% = 1.2816, 90% = 1.6449, 95% = 1.9600, 98% = 2.3263, 99% = 2.5758. p = 0.5 maximizes p(1-p) and gives the conservative (largest) n.",
+    edition: "Standard survey-sampling / inferential statistics. Follows directly from inverting the Wald CI (Wald 1943); the p = 0.5 worst-case planning value is the textbook convention (Cochran, 'Sampling Techniques,' 3rd ed., 1977).",
+    freeAccess: "Universal reference; covered in any introductory statistics or survey-methods textbook (Moore, McCabe; Cochran; OpenIntro Statistics).",
+    governance: GOVERNANCE.education,
+    editionNote: "This is a planning figure for a Wald interval. For small p or small n a Wilson or Clopper-Pearson design gives a more exact size; a finite-population correction (n' = n / (1 + n/N)) reduces n when the sample is a large fraction of the population and is not applied here.",
+    assumptions: [
+      { name: "Two-tailed", value: "z critical values are two-tailed", source: "convention" },
+      { name: "Planning proportion", value: "p = 0.5 is the conservative default; a smaller planning p reduces n", source: "Cochran worst-case rule" },
+      { name: "Infinite population", value: "no finite-population correction applied", source: "this tile is the simple-random-sample form" },
+    ],
+  },
   "linear-system-2x2": {
     formula: "det = a1*b2 - a2*b1. If det != 0: x = (c1*b2 - c2*b1)/det, y = (a1*c2 - a2*c1)/det (Cramer's rule). If det = 0 and (a1*c2 = a2*c1) and (b1*c2 = b2*c1): infinitely many solutions (same line). If det = 0 otherwise: no solution (parallel lines).",
     edition: "Standard linear algebra; Cramer's rule per Gabriel Cramer, 'Introduction a l'analyse des lignes courbes algebriques,' 1750.",

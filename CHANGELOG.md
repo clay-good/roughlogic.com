@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(edu): spec-v763 sample size for a target margin of error (confidence-interval inverse); 2026-07-14
+
+- New tile `sample-size-for-margin` (Group Y, calc-edu.js): the sample size needed so a proportion Wald margin of error
+  meets a target. `n = z^2 * p(1-p) / E^2`, rounded up. A +/- 3-point survey at 95% with the worst-case p = 0.5 needs
+  1,068 responses. Inverts the proportion side of `confidence-interval`; the round-trip through `computeConfidenceInterval`
+  confirms the achieved margin meets the target. calc-edu.js gzip cap 35000 -> 37000 B. Home tile count 1,211 -> 1,212.
+
 ### feat(lab): spec-v762 projected cell count from doubling time (doubling-time inverse); 2026-07-14
 
 - New tile `growth-projected-count` (Group T, calc-lab.js): the projected count (or OD) from a known doubling time over an

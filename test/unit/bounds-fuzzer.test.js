@@ -5010,7 +5010,8 @@ test("bounds: calc-fire computeConfinedSpaceVent rejects unknown contaminant / n
 // this header): renderAlternateReadability, renderBaseConvert,
 // renderBellCurve, renderConfidenceInterval, renderGPA,
 // renderLexileBand, renderLinearSystem2x2, renderPeriodicElement,
-// renderQuadratic, renderReadability, renderScientificNotation,
+// renderQuadratic, renderReadability, renderSampleSizeForMargin,
+// renderScientificNotation,
 // renderSigFigs, renderStandardsBasedGrade, renderStatistics,
 // renderPearson (spec-v17 Y.4), renderChiSquareGof (spec-v17 Y.3),
 // renderLinearRegression (spec-v17 Y.2). The renderers are DOM-wiring
@@ -5047,6 +5048,7 @@ import {
   computeSigFigs,
   computeBaseConvert,
   computeConfidenceInterval,
+  computeSampleSizeForMargin,
   computeLinearSystem2x2,
   computeLexileBand,
   computeStandardsBasedGrade,
@@ -5345,6 +5347,52 @@ test("bounds: calc-edu computeConfidenceInterval pins Wald-proportion p +/- z*sq
   assert.ok("error" in computeConfidenceInterval({ mode: "proportion", n: 100, proportion: 1.5, confidence_pct: 95 }));
   assert.ok("error" in computeConfidenceInterval({ mode: "mean", n: 100, mean: 50, sd: -1, confidence_pct: 95 }));
   assert.ok("error" in computeConfidenceInterval({ mode: "wrong", n: 100, confidence_pct: 95 }));
+});
+
+test("bounds: calc-edu computeSampleSizeForMargin inverts the proportion Wald MOE (n = z^2 p(1-p)/E^2, round up) and round-trips through computeConfidenceInterval", () => {
+  // Spec example: p=0.5, E=0.03, 95% -> n = 1.96^2 * 0.25 / 0.0009 = 1067.1 -> 1068.
+  const r = computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.03, confidence_pct: 95 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.required_n, 1068);
+  assert.strictEqual(r.z_critical, 1.96);
+  assert.ok(Math.abs(r.exact_n - 1.96 * 1.96 * 0.25 / (0.03 * 0.03)) < 1e-9, "exact n identity");
+  // Round-trip: feed the rounded n back through the forward CI at the same p and
+  // confidence; the achieved MOE must be <= the target (rounding up can only tighten).
+  const CONF = [80, 90, 95, 98, 99];
+  for (let i = 0; i < 400; i++) {
+    const p = 0.02 + (i % 49) * 0.02;            // 0.02 .. 0.98
+    const E = 0.005 + ((i * 7) % 40) * 0.005;    // 0.005 .. 0.2
+    const conf = CONF[i % CONF.length];
+    const inv = computeSampleSizeForMargin({ proportion: p, target_moe: E, confidence_pct: conf });
+    assert.ok(!inv.error, JSON.stringify({ p, E, conf, inv }));
+    assert.ok(Number.isInteger(inv.required_n) && inv.required_n >= 1, "n is a positive integer");
+    assert.ok(inv.required_n >= inv.exact_n, "rounded up from exact");
+    assert.ok(inv.required_n < inv.exact_n + 1, "rounded up by less than one");
+    const fwd = computeConfidenceInterval({ mode: "proportion", n: inv.required_n, proportion: p, confidence_pct: conf });
+    assert.ok(!fwd.error, JSON.stringify(fwd));
+    assert.ok(fwd.margin_of_error <= E + 1e-12, "achieved MOE meets the target");
+    // one fewer sample would miss the target (n is the minimum), when n > 1.
+    if (inv.required_n > 1) {
+      const under = computeConfidenceInterval({ mode: "proportion", n: inv.required_n - 1, proportion: p, confidence_pct: conf });
+      assert.ok(under.margin_of_error > E - 1e-12, "n is the minimum that meets the target");
+    }
+  }
+  // Monotonicity: a tighter target needs more samples; higher confidence needs more; p=0.5 is the max.
+  const loose = computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.05, confidence_pct: 95 });
+  const tight = computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.02, confidence_pct: 95 });
+  assert.ok(tight.required_n > loose.required_n, "tighter margin -> more samples");
+  const c95 = computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.03, confidence_pct: 95 });
+  const c99 = computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.03, confidence_pct: 99 });
+  assert.ok(c99.required_n > c95.required_n, "higher confidence -> more samples");
+  const half = computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.03, confidence_pct: 95 });
+  const skew = computeSampleSizeForMargin({ proportion: 0.2, target_moe: 0.03, confidence_pct: 95 });
+  assert.ok(half.required_n >= skew.required_n, "p=0.5 is the conservative (largest) n");
+  // Documented rejections.
+  assert.ok("error" in computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0.03, confidence_pct: 93 }));
+  assert.ok("error" in computeSampleSizeForMargin({ proportion: 1.2, target_moe: 0.03, confidence_pct: 95 }));
+  assert.ok("error" in computeSampleSizeForMargin({ proportion: 0.5, target_moe: 0, confidence_pct: 95 }));
+  assert.ok("error" in computeSampleSizeForMargin({ proportion: 0.5, target_moe: 1, confidence_pct: 95 }));
+  assert.ok("error" in computeSampleSizeForMargin({ proportion: 0.5, target_moe: NaN, confidence_pct: 95 }));
 });
 
 test("bounds: calc-edu computeLinearSystem2x2 pins Cramer's-rule unique / infinite / no-solution branches on canonical fixtures", () => {

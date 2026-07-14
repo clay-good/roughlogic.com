@@ -1770,6 +1770,7 @@ cross-check.
 | calc-edu.js | `computePeriodicElement` | `{ query }` | _ | _ | _ |
 | calc-edu.js | `computeQuadratic` | `{ a, b, c }` | _ | _ | _ |
 | calc-edu.js | `computeReadability` | `{ text }` | _ | _ | _ |
+| calc-edu.js | `computeSampleSizeForMargin` | `{ proportion, target_moe, confidence_pct }` | _ | _ | _ |
 | calc-edu.js | `computeScientificNotation` | `{ value }` | _ | _ | _ |
 | calc-edu.js | `computeSigFigs` | `{ value, target_sig_figs }` | _ | _ | _ |
 | calc-edu.js | `computeStandardsBasedGrade` | `{ rows }` | _ | _ | _ |
@@ -1794,6 +1795,7 @@ cross-check.
 | calc-edu.js | `renderPeriodicElement` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderQuadratic` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderReadability` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-edu.js | `renderSampleSizeForMargin` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderScientificNotation` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderSigFigs` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-edu.js | `renderStandardsBasedGrade` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2872,7 +2874,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1458.
+Row count: 1460.
 
 <!-- END function-corpus-v14 -->
 
@@ -4210,7 +4212,7 @@ per spec-v14 §13.1 second paragraph.
 | `section-121-exclusion` | Home-Sale Capital-Gains Exclusion (§121) | 26 USC 121 / IRS Pub 523 (public); Worked example MFJ: sale $850k, costs $45k, basis $300k +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `seller-net-sheet` | Seller Net Proceeds Sheet | TILA-RESPA Closing Disclosure (12 CFR...; $400,000 sale, $250,000 payoff, 5.5% commission, 0.5% tra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Y Educators (22 tiles)
+### Group Y Educators (23 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4231,6 +4233,7 @@ per spec-v14 §13.1 second paragraph.
 | `periodic-element` | Periodic Element Reference (Electronegativity / Configuration / Oxidation) | IUPAC / NIST / Pauling (1960) / Green...; Fe (iron, Z=26): period 4 / group 8 / d-block; Pauling EN... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `quadratic-formula` | Quadratic Formula and Discriminant | Classical algebra; Worked example: x^2 - 3x + 2 = 0 -> roots 1 and 2; discri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `readability` | Readability Scores (Flesch-Kincaid) | Kincaid et al. (1975); Flesch (1948);...; 7-sentence ~65-word example paragraph from the renderer's... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sample-size-for-margin` | Sample Size for a Target Margin of Error | Cochran (1977); standard survey sampling; p = 0.5, E = 0.03, z = 1.96 -> n = 1.96^2 * 0.25 / 0.03^2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `scientific-notation` | Scientific Notation and Significant Figures | NIST SP 811 (Guide for the Use of the...; Worked example: 0.00347 -> mantissa 3.47, exponent -3, 3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `significant-figures` | Significant Figures (count + round) | NIST SP 811 §7 (public); Worked example 0.00347 -> 3 sig figs; rounded to 2 -> 0.0035 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standards-based-grade` | Standards-Based Grade (Mastery 1-4) | Marzano + Heflebower (2014); Achieve ...; Worked example: 4 standards (4 major / 3 major / 3 suppor... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4269,6 +4272,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1211. Fixture-covered or reference-cadence: 1211 / 1211.
+Tile count: 1212. Fixture-covered or reference-cadence: 1212 / 1212.
 
 <!-- END tile-index-v14 -->

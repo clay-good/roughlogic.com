@@ -1973,6 +1973,81 @@ export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
   for (const s of [T.select, A.select]) s.addEventListener("change", update);
 }
 
+// dims: in { proportion: dimensionless, target_moe: dimensionless, confidence: dimensionless } out: { required_n: dimensionless, exact_n: dimensionless, z: dimensionless }
+// Inverse of the proportion Wald CI: given a target margin of error E, a
+// planning proportion p, and a confidence level, solve MOE = z*sqrt(p(1-p)/n)
+// for the sample size. n = z^2 * p(1-p) / E^2, rounded UP so the achieved
+// margin is <= the target. p = 0.5 is the conservative (largest-n) planning value.
+export function computeSampleSizeForMargin({ proportion, target_moe, confidence_pct }) {
+  const conf = Math.round(Number(confidence_pct));
+  if (!(conf in Z_CRITICAL)) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
+  const z = Z_CRITICAL[conf];
+  const p = Number(proportion);
+  if (!Number.isFinite(p) || p < 0 || p > 1) return { error: "Planning proportion must be between 0 and 1." };
+  const E = Number(target_moe);
+  if (!Number.isFinite(E) || E <= 0) return { error: "Target margin of error must be greater than 0." };
+  if (E >= 1) return { error: "Target margin of error must be less than 1 (it is a proportion)." };
+  const exact = (z * z * p * (1 - p)) / (E * E);
+  const required = Math.max(1, Math.ceil(exact));
+  return {
+    required_n: required,
+    exact_n: exact,
+    z_critical: z,
+    confidence_pct: conf,
+    planning_proportion: p,
+    target_moe: E,
+  };
+}
+
+export const sampleSizeForMarginExample = {
+  // 95% margin of 0.03 at the worst-case p = 0.5: n = 1.96^2 * 0.25 / 0.03^2
+  // = 0.9604 / 0.0009 = 1067.1 -> round up to 1068.
+  inputs: { proportion: 0.5, target_moe: 0.03, confidence_pct: 95 },
+  expected: { required_n: 1068 },
+};
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderSampleSizeForMargin(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent =
+    "Citation: sample size for a target margin of error on a proportion, the inverse of the Wald interval MOE = z * sqrt(p * (1-p) / n). Solving for n gives n = z^2 * p * (1-p) / E^2, rounded up. p = 0.5 is the conservative planning value (it maximizes p(1-p), so it gives the largest n and covers any true proportion). z critical values from the standard normal: 80% = 1.2816, 90% = 1.6449, 95% = 1.96, 98% = 2.3263, 99% = 2.5758. For small p or small n a Wilson or Clopper-Pearson design is more exact; this is the standard planning figure.";
+  const P = makeNumber("Planning proportion (0 to 1; use 0.5 for worst case)", "ssm-p", { step: "any", min: "0", max: "1" });
+  const E = makeNumber("Target margin of error (0 to 1)", "ssm-e", { step: "any", min: "0", max: "1" });
+  const C = makeSelect("Confidence level", "ssm-c", [
+    { value: "80", label: "80%" }, { value: "90", label: "90%" },
+    { value: "95", label: "95%" }, { value: "98", label: "98%" },
+    { value: "99", label: "99%" },
+  ]);
+  C.select.value = "95";
+  P.input.value = "0.5";
+  for (const f of [P, E, C]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => {
+    P.input.value = String(sampleSizeForMarginExample.inputs.proportion);
+    E.input.value = String(sampleSizeForMarginExample.inputs.target_moe);
+    C.select.value = String(sampleSizeForMarginExample.inputs.confidence_pct);
+    update();
+  });
+  const oN = makeOutputLine(outputRegion, "Required sample size n", "ssm-out-n");
+  const oExact = makeOutputLine(outputRegion, "Unrounded n", "ssm-out-exact");
+  const oZ = makeOutputLine(outputRegion, "z critical (two-tailed)", "ssm-out-z");
+  const update = debounce(() => {
+    const r = computeSampleSizeForMargin({
+      proportion: P.input.value,
+      target_moe: E.input.value,
+      confidence_pct: C.select.value,
+    });
+    if (r.error) {
+      oN.textContent = r.error;
+      for (const o of [oExact, oZ]) o.textContent = "-";
+      return;
+    }
+    oN.textContent = fmt(r.required_n, 0);
+    oExact.textContent = fmt(r.exact_n, 2);
+    oZ.textContent = fmt(r.z_critical, 4);
+  }, DEBOUNCE_MS);
+  for (const el of [P.input, E.input]) el.addEventListener("input", update);
+  C.select.addEventListener("change", update);
+}
+
 export const EDU_RENDERERS = {
   "readability": renderReadability,
   "statistics-quickread": renderStatistics,
@@ -1983,6 +2058,7 @@ export const EDU_RENDERERS = {
   "base-converter": renderBaseConvert,
   "gpa-calculator": renderGPA,
   "confidence-interval": renderConfidenceInterval,
+  "sample-size-for-margin": renderSampleSizeForMargin,
   "linear-system-2x2": renderLinearSystem2x2,
   "lexile-band": renderLexileBand,
   "standards-based-grade": renderStandardsBasedGrade,
