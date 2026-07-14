@@ -3298,6 +3298,7 @@ import {
   computeGrainBin,
   computeGrainBinHeightForCapacity,
   computeBunkerSiloCapacity,
+  computeFeedConversionRatio,
   computeNpkBlend,
   computeTankMix,
   computeTHI,
@@ -3620,6 +3621,40 @@ test("bounds: spec-v773 computeBunkerSiloCapacity pins trapezoid volume, tons, t
   assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 0, length_ft: 100, density_lb_ft3: 44 }));
   assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 0 }));
   assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: Infinity, density_lb_ft3: 44 }));
+});
+
+test("bounds: spec-v778 feed-conversion-ratio pins ADG and FCR, the identities, and error seams", () => {
+  // Spec example: 650 -> 1250 over 200 days on 3900 lb feed -> gain 600, ADG 3.0, FCR 6.5.
+  const r = computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: 1250, days_on_feed: 200, total_feed_lb: 3900 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.total_gain_lb, 600);
+  assert.ok(Math.abs(r.average_daily_gain_lb - 3.0) < 1e-12);
+  assert.ok(Math.abs(r.feed_conversion_ratio - 6.5) < 1e-12);
+  // Identities across a sweep: ADG = gain/days, FCR = feed/gain.
+  for (let i = 0; i < 150; i++) {
+    const w0 = 300 + (i % 40) * 10;
+    const gain = 100 + (i % 60) * 15;
+    const w1 = w0 + gain;
+    const days = 30 + (i % 250);
+    const feed = gain * (3 + (i % 8) * 0.5);
+    const m = computeFeedConversionRatio({ initial_weight_lb: w0, final_weight_lb: w1, days_on_feed: days, total_feed_lb: feed });
+    assert.ok(!m.error, JSON.stringify({ w0, w1, days, feed }));
+    assert.strictEqual(m.total_gain_lb, gain);
+    assert.ok(Math.abs(m.average_daily_gain_lb - gain / days) < 1e-9, "ADG = gain/days");
+    assert.ok(Math.abs(m.feed_conversion_ratio - feed / gain) < 1e-9, "FCR = feed/gain");
+    assert.ok(m.feed_conversion_ratio > 0 && m.average_daily_gain_lb > 0);
+  }
+  // More feed for the same gain -> a worse (higher) FCR; the same feed over more days -> a lower ADG.
+  const hungry = computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: 1250, days_on_feed: 200, total_feed_lb: 5000 });
+  assert.ok(hungry.feed_conversion_ratio > r.feed_conversion_ratio, "more feed same gain -> higher FCR");
+  const slow = computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: 1250, days_on_feed: 300, total_feed_lb: 3900 });
+  assert.ok(slow.average_daily_gain_lb < r.average_daily_gain_lb, "more days same gain -> lower ADG");
+  // Error seams.
+  assert.ok("error" in computeFeedConversionRatio({ initial_weight_lb: 0, final_weight_lb: 1250, days_on_feed: 200, total_feed_lb: 3900 }));
+  assert.ok("error" in computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: 650, days_on_feed: 200, total_feed_lb: 3900 }), "no gain rejected");
+  assert.ok("error" in computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: 1250, days_on_feed: 0, total_feed_lb: 3900 }));
+  assert.ok("error" in computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: 1250, days_on_feed: 200, total_feed_lb: 0 }));
+  assert.ok("error" in computeFeedConversionRatio({ initial_weight_lb: 650, final_weight_lb: Infinity, days_on_feed: 200, total_feed_lb: 3900 }));
 });
 
 test("bounds: calc-agriculture computeNpkBlend pins recommendation = max(0, demand - soil credit), the three-straight solve, and delivered = recommendation", () => {

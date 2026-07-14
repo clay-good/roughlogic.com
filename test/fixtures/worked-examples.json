@@ -14603,6 +14603,35 @@
    }
   },
   {
+   "tile_id": "feed-conversion-ratio",
+   "source_publisher": "USDA / land-grant extension (animal science)",
+   "source_title": "650 -> 1250 lb over 200 days on 3900 lb feed -> ADG 3.0, FCR 6.5:1",
+   "source_edition_or_year": "ADG = gain/days; FCR = feed/gain",
+   "source_section_or_page": "gain = 1250-650 = 600 lb; ADG = 600/200 = 3.0 lb/day; FCR = 3900/600 = 6.5",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "initial_weight_lb": 650,
+    "final_weight_lb": 1250,
+    "days_on_feed": 200,
+    "total_feed_lb": 3900
+   },
+   "outputs": {
+    "average_daily_gain_lb": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "feed_conversion_ratio": {
+     "value": 6.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "npk-blend",
    "source_publisher": "USDA NRCS",
    "source_title": "NPK blend: corn (150-60-40 demand), soil credit 20-10-15 lb/acre, 80 acres, default straights",

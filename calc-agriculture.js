@@ -1266,6 +1266,56 @@ function renderBunkerSiloCapacity(inputRegion, outputRegion, citationEl) {
   for (const f of [b, t, h, L, rho]) f.input.addEventListener("input", update);
 }
 
+// --- v778: Livestock feed conversion ratio and average daily gain (`feed-conversion-ratio`) ---
+// ADG = (final - initial)/days; FCR = total feed / total gain (as-fed basis).
+// dims: in { initial_weight_lb: M, final_weight_lb: M, days_on_feed: T, total_feed_lb: M } out: { total_gain_lb: M, average_daily_gain_lb: M T^-1, feed_conversion_ratio: dimensionless }
+export function computeFeedConversionRatio({ initial_weight_lb = 0, final_weight_lb = 0, days_on_feed = 0, total_feed_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w0 = Number(initial_weight_lb) || 0;
+  const w1 = Number(final_weight_lb) || 0;
+  const days = Number(days_on_feed) || 0;
+  const feed = Number(total_feed_lb) || 0;
+  if (!(w0 > 0)) return { error: "Initial weight must be positive (lb)." };
+  if (!(w1 > w0)) return { error: "Final weight must be greater than the initial weight (the animal must gain)." };
+  if (!(days > 0)) return { error: "Days on feed must be positive." };
+  if (!(feed > 0)) return { error: "Total feed must be positive (lb)." };
+  const total_gain_lb = w1 - w0;
+  const average_daily_gain_lb = total_gain_lb / days;
+  const feed_conversion_ratio = feed / total_gain_lb;
+  return {
+    total_gain_lb, average_daily_gain_lb, feed_conversion_ratio,
+    note: "Two production metrics from a feeding period: average daily gain ADG = (final - initial weight) / days on feed, and feed conversion ratio FCR = total feed fed / total weight gained (lb of feed per lb of gain). Enter the feed on the basis you track - as-fed (the weight put in the bunk) is standard; convert to a dry-matter basis by multiplying as-fed by the ration DM fraction if you want DMI-based FCR. A lower FCR is more efficient. FCR rises as an animal finishes (fat gain costs more feed than lean), so a period FCR blends the growth curve. A benchmarking aid; the ration, breed, and environment drive the real numbers.",
+  };
+}
+export const feedConversionRatioExample = { inputs: { initial_weight_lb: 650, final_weight_lb: 1250, days_on_feed: 200, total_feed_lb: 3900 } };
+
+function renderFeedConversionRatio(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: livestock production metrics - average daily gain ADG = (final - initial weight)/days, and feed conversion ratio FCR = total feed / total gain (lb feed per lb gain). Standard USDA / land-grant extension animal-science definitions, by name. Enter feed on the as-fed basis (standard); a lower FCR is more efficient. A benchmarking aid; the ration and environment govern.";
+  const w0 = makeNumber("Initial weight (lb)", "fcr-w0", { step: "any", min: "0", value: "650" });
+  w0.input.value = "650";
+  const w1 = makeNumber("Final weight (lb)", "fcr-w1", { step: "any", min: "0", value: "1250" });
+  w1.input.value = "1250";
+  const days = makeNumber("Days on feed", "fcr-days", { step: "any", min: "0", value: "200" });
+  days.input.value = "200";
+  const feed = makeNumber("Total feed fed, as-fed (lb)", "fcr-feed", { step: "any", min: "0", value: "3900" });
+  feed.input.value = "3900";
+  for (const f of [w0, w1, days, feed]) inputRegion.appendChild(f.wrap);
+  const oADG = makeOutputLine(outputRegion, "Average daily gain", "fcr-out-adg");
+  const oFCR = makeOutputLine(outputRegion, "Feed conversion ratio", "fcr-out-fcr");
+  const oGain = makeOutputLine(outputRegion, "Total gain", "fcr-out-gain");
+  const oNote = makeOutputLine(outputRegion, "Note", "fcr-out-note");
+  const update = debounce(() => {
+    const r = computeFeedConversionRatio({ initial_weight_lb: Number(w0.input.value) || 0, final_weight_lb: Number(w1.input.value) || 0, days_on_feed: Number(days.input.value) || 0, total_feed_lb: Number(feed.input.value) || 0 });
+    if (r.error) { oADG.textContent = r.error; oFCR.textContent = "-"; oGain.textContent = "-"; oNote.textContent = ""; return; }
+    oADG.textContent = fmt(r.average_daily_gain_lb, 2) + " lb/day";
+    oFCR.textContent = fmt(r.feed_conversion_ratio, 2) + " : 1 (lb feed / lb gain)";
+    oGain.textContent = fmt(r.total_gain_lb, 0) + " lb";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { w0.input.value = "650"; w1.input.value = "1250"; days.input.value = "200"; feed.input.value = "3900"; update(); });
+  for (const f of [w0, w1, days, feed]) f.input.addEventListener("input", update);
+}
+
 // --- spec-v17 L.2 NPK blend from soil test --------------------------
 
 // Representative crop nutrient demand (lb/acre of N, P2O5, K2O) drawn from
@@ -1606,6 +1656,7 @@ export const AGRICULTURE_RENDERERS = {
   "grain-bin-capacity":     renderGrainBin,
   "grain-bin-height-for-capacity": renderGrainBinHeightForCapacity,
   "bunker-silo-capacity": renderBunkerSiloCapacity,
+  "feed-conversion-ratio": renderFeedConversionRatio,
   "npk-blend":              renderNpkBlend,
   "tank-mix":               renderTankMix,
 };

@@ -3642,6 +3642,31 @@
       "kind": "industry"
     },
     {
+      "term": "feed conversion ratio",
+      "target": "feed-conversion-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "average daily gain",
+      "target": "feed-conversion-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "pounds of feed per pound of gain",
+      "target": "feed-conversion-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "livestock feed efficiency",
+      "target": "feed-conversion-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "cattle gain per day",
+      "target": "feed-conversion-ratio",
+      "kind": "question"
+    },
+    {
       "term": "silage tonnage",
       "target": "bunker-silo-capacity",
       "kind": "question"

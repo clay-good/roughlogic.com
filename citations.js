@@ -2255,6 +2255,19 @@ export const CITATIONS = {
     ],
   },
 
+  "feed-conversion-ratio": {
+    formula: "total_gain = final_weight - initial_weight; ADG = total_gain / days_on_feed; FCR = total_feed / total_gain (lb feed per lb gain).",
+    edition: "Standard livestock production metrics (average daily gain, feed conversion ratio) per USDA / land-grant extension animal-science references, by name.",
+    freeAccess: "ADG and FCR are standard extension-published production formulas.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two performance metrics over a feeding period: average daily gain ADG = (final - initial weight) / days on feed (lb/day), and feed conversion ratio FCR = total feed fed / total weight gained (lb of feed per lb of gain, so a lower FCR is more efficient). Feed is entered on the basis the operation tracks: as-fed (bunk weight) is standard; multiply as-fed by the ration dry-matter fraction for a dry-matter-basis FCR. FCR is not constant - it rises as an animal finishes because fat gain costs more feed per pound than lean growth - so a whole-period FCR blends the growth curve, and the breed, ration energy, and environment (cold, heat, health) drive the real numbers. A benchmarking aid, not a ration formulation.",
+    assumptions: [
+      { name: "ADG", value: "(final - initial weight) / days on feed", source: "animal-science convention" },
+      { name: "FCR", value: "total feed / total gain, lb feed per lb gain; lower is more efficient", source: "animal-science convention" },
+      { name: "Feed basis", value: "as-fed is standard; convert to dry matter with the ration DM fraction", source: "feeding practice" },
+    ],
+  },
+
   "npk-blend": {
     formula: "Nutrient recommendation = max(0, crop demand - soil-test credit) for each of N, P2O5, K2O. Three-straight blend: potash (lb/acre) = K2O rec / 0.60; DAP = P2O5 rec / 0.46 (carrying N = DAP x 0.18); urea = max(0, N rec - N from DAP) / 0.46. Total product = rate x acres.",
     edition: "USDA NRCS Agronomy Technical Note ranges and the state Cooperative Extension Service published recommendations (state-keyed) by name.",

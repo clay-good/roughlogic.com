@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): spec-v778 feed conversion ratio and average daily gain; 2026-07-14
+
+- New tile `feed-conversion-ratio` (Group L, calc-agriculture.js): two livestock production metrics from a feeding
+  period -- average daily gain `ADG = (final - initial weight)/days` and feed conversion ratio `FCR = total feed / total
+  gain`. A steer 650 to 1,250 lb over 200 days on 3,900 lb of feed gains 3.0 lb/day at a 6.5:1 FCR. Fuzzer pins the ADG
+  and FCR identities and the more-feed/more-days monotonicity. calc-agriculture.js gzip cap 56000 -> 57500 B.
+  Home count 1,226 -> 1,227.
+
 ### feat(arborist): spec-v777 firewood cord volume; 2026-07-14
 
 - New tile `firewood-cord` (Group L, calc-arborist.js): how many cords a firewood stack holds -- a full (standard) cord
