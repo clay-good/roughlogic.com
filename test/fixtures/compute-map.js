@@ -517,6 +517,7 @@ export const COMPUTE_MAP = {
   "triage-quickread": { module: "../../calc-references.js", fn: "computeTriage" },
   "plate-cost": { module: "../../calc-kitchen.js", fn: "computePlateCost" },
   "displacement-cr": { module: "../../calc-mechanic.js", fn: "computeDisplacementCR" },
+  "chamber-cc-for-cr": { module: "../../calc-mechanic.js", fn: "computeChamberCcForCr" },
   "tire-gearing": { module: "../../calc-mechanic.js", fn: "computeTireGearing" },
   "gfci-afci-reference": { module: "../../calc-electrical.js", fn: "computeGFCIReference" },
   "backflow": { module: "../../calc-plumbing.js", fn: "computeBackflow" },

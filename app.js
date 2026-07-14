@@ -827,7 +827,7 @@ const TOOL_MODULES = (() => {
   ]);
   // v4 Group K: Mechanic - Auto, Marine, Aviation.
   declare("./calc-mechanic.js", "MECHANIC_RENDERERS", [
-    "prop-slip", "displacement-cr", "bolt-stretch",
+    "prop-slip", "displacement-cr", "chamber-cc-for-cr", "bolt-stretch",
     "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
     // v23
     "valve-flow-coefficient", "screw-conveyor",

@@ -11203,6 +11203,58 @@
    }
   },
   {
+   "tile_id": "chamber-cc-for-cr",
+   "source_publisher": "SAE engine-geometry identities (inverse)",
+   "source_title": "TDC_volume = cylinder_cc / (target_CR - 1); chamber = TDC - gasket - deck + dome",
+   "source_edition_or_year": "spec-v679 worked example (machine-verified)",
+   "source_section_or_page": "4.0 x 3.48 in cylinder, 10.73:1 target, 4.1 gasket bore / 0.040 thick / 0.005 deck / 0 dome -> 64.0 cc chamber (round-trips displacement-cr)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "bore_in": 4,
+    "stroke_in": 3.48,
+    "target_cr": 10.73,
+    "gasket_bore_in": 4.1,
+    "gasket_thickness_in": 0.04,
+    "deck_clearance_in": 0.005,
+    "dome_dish_cc": 0
+   },
+   "outputs": {
+    "chamber_cc": {
+     "value": 63.97,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "chamber-cc-for-cr",
+   "source_publisher": "SAE engine-geometry identities (inverse)",
+   "source_title": "cross-check: a lower 9.0:1 pump-gas target needs a bigger 79.9 cc chamber",
+   "source_edition_or_year": "spec-v679 cross-check (machine-verified)",
+   "source_section_or_page": "same cylinder, 9.0:1 target -> 79.9 cc chamber (lower CR, more chamber volume)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "bore_in": 4,
+    "stroke_in": 3.48,
+    "target_cr": 9.0,
+    "gasket_bore_in": 4.1,
+    "gasket_thickness_in": 0.04,
+    "deck_clearance_in": 0.005,
+    "dome_dish_cc": 0
+   },
+   "outputs": {
+    "chamber_cc": {
+     "value": 79.89,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tire-gearing",
    "source_publisher": "Project (first-principles) over Tire Rack / SAE tire-size identities",
    "source_title": "Tire OD from metric (P/W/R) and imperial (OD x W R) sizes; cruise mph from rev_per_mi * gear ratio",

@@ -348,7 +348,8 @@ const RELATED = {
   // Group K: Mechanic. weight-balance + prop-slip for marine /
   // aviation; displacement-cr + driveshaft-crit + fuel-range for auto.
   "prop-slip": ["displacement-cr"],
-  "displacement-cr": ["bolt-stretch", "driveshaft-crit"],
+  "displacement-cr": ["chamber-cc-for-cr", "bolt-stretch", "driveshaft-crit"],
+  "chamber-cc-for-cr": ["displacement-cr", "volumetric-efficiency", "hp-from-torque"],
   "fuel-range": ["mileage-cost"],
 
   // Group L: Agriculture. gpa-rate -> sprayer-calibration -> seed-rate

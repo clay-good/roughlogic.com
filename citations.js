@@ -4365,6 +4365,17 @@ export const CITATIONS = {
       { name: "Bore / stroke / chamber inputs", value: "user-supplied", source: "OEM service manual or measurement" },
     ],
   },
+  "chamber-cc-for-cr": {
+    formula: "TDC_volume = cylinder_cc / (target_CR − 1); chamber_cc = TDC_volume − gasket − deck + dome. The inverse of CR = (cylinder_cc + TDC_volume) / TDC_volume. 1 in³ = 16.387 cc.",
+    edition: "Classical engine-design geometry; SAE J604 displacement by name.",
+    freeAccess: "SAE standards licensed; principles free in published engine-design texts.",
+    governance: GOVERNANCE.general,
+    editionNote: "The combustion-chamber volume needed to hit a target static compression ratio, the inverse of displacement-cr: TDC_volume = cylinder_cc / (CR − 1) and chamber = TDC_volume − gasket − deck + dome. This is how much cc the head chambers must measure, or how much to mill, or how large a dished/domed piston to run (a dome subtracts volume and raises CR, a dish adds it). A target CR too high for the geometry drives the chamber volume to zero or negative and is rejected. Static CR only; it does not model dynamic CR, cam timing, or quench. Single-edition (geometry + SAE conventions); cc'ing the actual chambers and the engine builder govern.",
+    assumptions: [
+      { name: "Static CR only", value: "solves the static geometric CR; dynamic CR, cam timing, and quench are not modeled", source: "engine-design geometry" },
+      { name: "Bore / stroke / clearance inputs", value: "user-supplied", source: "OEM service manual or measurement" },
+    ],
+  },
   "bolt-stretch": {
     formula: "Clamp load F = (stretch × area × E) / grip. Stretch is residual elongation after torque; E is fastener elastic modulus per material.",
     edition: "ASTM A325 / A490 / SAE J429 by name; SAE bolt material moduli (steel ~ 30e6 psi, stainless A2/A4 ~ 28e6, Inconel 718 ~ 29.6e6, titanium 6Al-4V ~ 16.5e6, aluminum 2024 ~ 10.6e6).",

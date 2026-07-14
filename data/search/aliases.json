@@ -24492,6 +24492,31 @@
       "kind": "question"
     },
     {
+      "term": "chamber volume for a target compression ratio",
+      "target": "chamber-cc-for-cr",
+      "kind": "industry"
+    },
+    {
+      "term": "how much to mill the head for compression",
+      "target": "chamber-cc-for-cr",
+      "kind": "industry"
+    },
+    {
+      "term": "cc the heads for a target cr",
+      "target": "chamber-cc-for-cr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "piston dish for target compression",
+      "target": "chamber-cc-for-cr",
+      "kind": "adjacent"
+    },
+    {
+      "term": "combustion chamber size for compression ratio",
+      "target": "chamber-cc-for-cr",
+      "kind": "adjacent"
+    },
+    {
       "term": "gallons per acre from sprayer speed and nozzle",
       "target": "gpa-rate",
       "kind": "question"

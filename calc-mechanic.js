@@ -100,6 +100,37 @@ export const displacementCRExample = {
   inputs: { bore_in: 4.0, stroke_in: 3.48, cylinders: 8, chamber_cc: 64, gasket_bore_in: 4.1, gasket_thickness_in: 0.040, deck_clearance_in: 0.005, dome_dish_cc: 0 },
 };
 
+// dims: in { bore_in: L, stroke_in: L, target_cr: dimensionless, gasket_bore_in: L, gasket_thickness_in: L, deck_clearance_in: L, dome_dish_cc: L^3 } out: { chamber_cc: L^3, tdc_volume_cc: L^3, cyl_cc: L^3 }
+export function computeChamberCcForCr({
+  bore_in = 0, stroke_in = 0, target_cr = 0,
+  gasket_bore_in = 0, gasket_thickness_in = 0,
+  deck_clearance_in = 0, dome_dish_cc = 0,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(bore_in > 0 && stroke_in > 0)) return { error: "Bore and stroke must be positive (in)." };
+  if (!(target_cr > 1)) return { error: "Target compression ratio must be greater than 1." };
+  // Per-cylinder swept volume in cc (1 in^3 = 16.387 cc), matching displacement-cr.
+  const cyl_cc = Math.PI * 0.25 * bore_in * bore_in * stroke_in * 16.387;
+  const gasket_cc = gasket_bore_in > 0 && gasket_thickness_in > 0
+    ? Math.PI * 0.25 * gasket_bore_in * gasket_bore_in * gasket_thickness_in * 16.387
+    : 0;
+  const deck_cc = deck_clearance_in > 0
+    ? Math.PI * 0.25 * bore_in * bore_in * deck_clearance_in * 16.387
+    : 0;
+  const dome = Number(dome_dish_cc) || 0;
+  // Inverse of CR = (cyl_cc + tdc) / tdc: tdc = cyl_cc / (CR - 1);
+  // then chamber = tdc - gasket_cc - deck_cc + dome (from tdc = chamber + gasket + deck - dome).
+  const tdc_volume_cc = cyl_cc / (target_cr - 1);
+  const chamber_cc = tdc_volume_cc - gasket_cc - deck_cc + dome;
+  if (!Number.isFinite(chamber_cc)) return { error: "Chamber-volume math is not a finite value." };
+  if (!(chamber_cc > 0)) return { error: "Target CR is too high for this geometry: the chamber volume would be zero or negative. Lower the target CR, reduce deck/gasket, or add a dished piston." };
+  return {
+    chamber_cc, tdc_volume_cc, cyl_cc, gasket_cc, deck_cc,
+    note: "The combustion-chamber volume needed to hit a target static compression ratio, the inverse of the displacement-cr tile: from CR = (cylinder_cc + TDC_volume) / TDC_volume, TDC_volume = cylinder_cc / (CR - 1), and the chamber = TDC_volume - gasket - deck + dome. This is how much cc the head chambers must measure (or, comparing to a known chamber, how much to mill or how large a dished/domed piston to run). A domed piston subtracts volume (raises CR), a dished piston adds it; a thinner gasket or less deck clearance raises CR. Static CR only; it does not model dynamic CR, cam timing, or quench. A build aid; cc'ing the actual chambers and the engine builder govern."
+  };
+}
+export const chamberCcForCrExample = { inputs: { bore_in: 4.0, stroke_in: 3.48, target_cr: 10.73, gasket_bore_in: 4.1, gasket_thickness_in: 0.040, deck_clearance_in: 0.005, dome_dish_cc: 0 } };
+
 // --- 198: Bolt Stretch and Clamp Load ---
 
 export const FASTENER_MODULUS_PSI = {
@@ -461,6 +492,26 @@ const renderDisplacementCR = _simpleRenderer({
   compute: computeDisplacementCR,
 });
 
+const renderChamberCcForCr = _simpleRenderer({
+  citation: "Citation: static compression-ratio identity solved for the chamber volume: TDC_volume = cylinder_cc / (target_CR - 1), chamber = TDC_volume - gasket - deck + dome, from CR = (cylinder_cc + TDC_volume) / TDC_volume. 1 in^3 = 16.387 cc. Static CR only; cc'ing the actual chambers and the engine builder govern.",
+  example: chamberCcForCrExample.inputs,
+  fields: [
+    { key: "bore_in", label: "Bore (in)", kind: "number" },
+    { key: "stroke_in", label: "Stroke (in)", kind: "number" },
+    { key: "target_cr", label: "Target compression ratio (x:1)", kind: "number" },
+    { key: "gasket_bore_in", label: "Head-gasket bore (in)", kind: "number" },
+    { key: "gasket_thickness_in", label: "Head-gasket thickness (in)", kind: "number" },
+    { key: "deck_clearance_in", label: "Deck clearance (in)", kind: "number" },
+    { key: "dome_dish_cc", label: "Piston dome (-) / dish (+) volume (cc)", kind: "number" },
+  ],
+  outputs: [
+    { key: "ch", id: "cccr-out-ch", label: "Required chamber volume", value: (r) => fmt(r.chamber_cc, 1) + " cc" },
+    { key: "tdc", id: "cccr-out-tdc", label: "Total TDC volume", value: (r) => fmt(r.tdc_volume_cc, 1) + " cc (cylinder " + fmt(r.cyl_cc, 1) + " cc)" },
+    { key: "n", id: "cccr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeChamberCcForCr,
+});
+
 const renderBoltStretch = _simpleRenderer({
   citation: "Citation: Public engineering practice. Clamp load F = (stretch * area * E) / grip. Cross-check torque from utility 153 short form.",
   example: boltStretchExample.inputs,
@@ -580,6 +631,7 @@ const renderBrakePadLife = _simpleRenderer({
 export const MECHANIC_RENDERERS = {
   "prop-slip":        renderPropSlip,
   "displacement-cr":  renderDisplacementCR,
+  "chamber-cc-for-cr": renderChamberCcForCr,
   "bolt-stretch":     renderBoltStretch,
   "driveshaft-crit":  renderDriveshaft,
   "fuel-range":       renderFuelRange,

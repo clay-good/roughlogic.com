@@ -3735,6 +3735,7 @@ test("bounds: calc-lab computeHemocytometer rejects negative cell count / non-po
 import {
   computePropSlip,
   computeDisplacementCR,
+  computeChamberCcForCr,
   computeBoltStretch,
   computeDriveshaftCritical,
   computeFuelRange,
@@ -3806,6 +3807,32 @@ test("bounds: calc-mechanic computeDisplacementCR rejects non-positive bore/stro
   assert.ok("error" in computeDisplacementCR({ bore_in: 4, stroke_in: 3.5, cylinders: 0, chamber_cc: 64 }));
   // Dome > chamber + gasket + deck -> TDC volume <= 0.
   assert.ok("error" in computeDisplacementCR({ bore_in: 4, stroke_in: 3.5, cylinders: 8, chamber_cc: 64, dome_dish_cc: 200 }));
+});
+
+test("bounds: spec-v679 computeChamberCcForCr pins chamber = cyl_cc/(CR-1) - gasket - deck + dome, round-trips through computeDisplacementCR, and error seams", () => {
+  const geom = { bore_in: 4.0, stroke_in: 3.48, gasket_bore_in: 4.1, gasket_thickness_in: 0.040, deck_clearance_in: 0.005, dome_dish_cc: 0 };
+  const fwd = computeDisplacementCR({ ...geom, cylinders: 8, chamber_cc: 64 });
+  const r = computeChamberCcForCr({ ...geom, target_cr: fwd.compression_ratio });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.chamber_cc - 64) < 1e-6, `chamber identity: ${r.chamber_cc}`);
+  // A lower target CR needs a bigger chamber.
+  const low = computeChamberCcForCr({ ...geom, target_cr: 9.0 });
+  assert.ok(low.chamber_cc > r.chamber_cc, `lower CR bigger chamber: ${low.chamber_cc}`);
+  // Round-trip: the computed chamber, fed back through the forward tile, reproduces the target CR.
+  for (const target_cr of [8, 10.73, 13]) {
+    for (const dome_dish_cc of [0, 6]) {
+      const m = computeChamberCcForCr({ ...geom, target_cr, dome_dish_cc });
+      assert.ok(!m.error, `sweep CR=${target_cr} dome=${dome_dish_cc}: ${JSON.stringify(m)}`);
+      assertFinite(m.chamber_cc, "chamber"); assert.ok(m.chamber_cc > 0, "chamber positive");
+      const back = computeDisplacementCR({ ...geom, cylinders: 8, chamber_cc: m.chamber_cc, dome_dish_cc });
+      assert.ok(Math.abs(back.compression_ratio - target_cr) < 1e-9, `round-trip CR=${target_cr} dome=${dome_dish_cc}: ${back.compression_ratio}`);
+    }
+  }
+  // Error seams: non-positive bore/stroke, target CR <= 1, target too high (chamber <= 0), non-finite.
+  assert.ok("error" in computeChamberCcForCr({ ...geom, bore_in: 0, target_cr: 10 }));
+  assert.ok("error" in computeChamberCcForCr({ ...geom, target_cr: 1 }));
+  assert.ok("error" in computeChamberCcForCr({ ...geom, target_cr: 500 }));
+  assert.ok("error" in computeChamberCcForCr({ ...geom, target_cr: NaN }));
 });
 
 test("bounds: calc-mechanic computeBoltStretch pins F = stretch * A * E / L (Hooke's law) and the torque cross-check K*d*F/12", () => {
