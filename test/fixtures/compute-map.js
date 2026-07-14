@@ -762,6 +762,7 @@ export const COMPUTE_MAP = {
   "tree-crz-encroachment": { module: "../../calc-arborist.js", fn: "computeTreeCrzEncroachment" },
   "crown-pruning-dose": { module: "../../calc-arborist.js", fn: "computeCrownPruningDose" },
   "tree-height-clinometer": { module: "../../calc-arborist.js", fn: "computeTreeHeightClinometer" },
+  "firewood-cord": { module: "../../calc-arborist.js", fn: "computeFirewoodCord" },
   "nozzle-flow-pressure": { module: "../../calc-agriculture.js", fn: "computeNozzleFlowPressure" },
   "spray-drift-buffer": { module: "../../calc-agriculture.js", fn: "computeSprayDriftBuffer" },
   "sprayer-field-capacity": { module: "../../calc-agriculture.js", fn: "computeSprayerFieldCapacity" },

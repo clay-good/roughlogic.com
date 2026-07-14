@@ -22785,6 +22785,34 @@
    }
   },
   {
+   "tile_id": "firewood-cord",
+   "source_publisher": "NIST Handbook 130 (Method of Sale)",
+   "source_title": "8 x 4 x 4 ft stack = 128 ft^3 = 1.00 full cord",
+   "source_edition_or_year": "full cord = 128 stacked cubic feet",
+   "source_section_or_page": "cords = 8 x 4 x 4 / 128 = 128/128 = 1.00 cord",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "length_ft": 8,
+    "height_ft": 4,
+    "depth_ft": 4
+   },
+   "outputs": {
+    "cords": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "volume_ft3": {
+     "value": 128,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",

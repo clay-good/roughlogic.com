@@ -1490,6 +1490,7 @@ cross-check.
 | calc-arborist.js | `computeChipperDebris` | `{ green_weight_lb, chip_density_lcy = 550, box_capacity_cy } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeCrownPruningDose` | `{ live_foliage = 0, removed_foliage = 0, maturity_class = "mature" } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeFellingNotchHinge` | `{ cut_dia_in, notch_pct = 22, open_face = 70 } = {}` | _ | _ | _ |
+| calc-arborist.js | `computeFirewoodCord` | `{ length_ft = 0, height_ft = 0, depth_ft = 0 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeLogLimbWeight` | `{ butt_dia_in, top_dia_in, length_ft, species = "generic_hardwood", density =...` | _ | _ | _ |
 | calc-arborist.js | `computePortaWrapFriction` | `{ load_lb, mu = 0.20, wraps = 3 } = {}` | _ | _ | _ |
 | calc-arborist.js | `computeQuadraticMeanDiameter` | `{ tally = "" } = {}` | _ | _ | _ |
@@ -2886,7 +2887,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1472.
+Row count: 1473.
 
 <!-- END function-corpus-v14 -->
 
@@ -3937,7 +3938,7 @@ per spec-v14 §13.1 second paragraph.
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (61 tiles)
+### Group L Agriculture (62 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3953,6 +3954,7 @@ per spec-v14 §13.1 second paragraph.
 | `drawbar-pull` | Tractor Drawbar Pull from Power | ASABE (inverse); 75 PTO hp at 4.5 mph on firm soil (0.72) -> 54 drawbar hp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `drip-zone-flow` | Drip Zone Flow and Valve Capacity | Irrigation Association low-volume / m...; spec-v209 section 2.1 pinned example (inline dripline) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `felling-notch-hinge` | Felling Notch and Hinge Geometry | ANSI Z133-2017 open-face felling; 20 in cut, 22% notch, 70 deg -> 4.4 in notch, 2.0 in hing... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `firewood-cord` | Firewood Cord Volume | NIST Handbook 130 (Method of Sale); cords = 8 x 4 x 4 / 128 = 128/128 = 1.00 cord | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `gpa-rate` | Chemical Application Rate (GPA) | Project (first-principles); Standard agricultural-sprayer calibration identity | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `grain-aeration-airflow` | Stored-Grain Aeration Fan Airflow | MWPS / university extension (Shedd ai...; 20000 bu at 0.15 cfm/bu -> 3000 cfm, ~100 hr per cooling ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `grain-bin-capacity` | Grain Bin Capacity (Bushels) | USDA FGIS; area = pi*15^2 = 706.86; cyl = 14,137.2 ft^3; cone = (1/3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4297,6 +4299,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1225. Fixture-covered or reference-cadence: 1225 / 1225.
+Tile count: 1226. Fixture-covered or reference-cadence: 1226 / 1226.
 
 <!-- END tile-index-v14 -->

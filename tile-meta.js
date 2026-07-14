@@ -486,6 +486,7 @@ const _TILES = [
   ["tree-crz-encroachment", "L"],
   ["crown-pruning-dose", "L"],
   ["tree-height-clinometer", "L"],
+  ["firewood-cord", "L"],
   ["nozzle-flow-pressure", "L"], ["spray-drift-buffer", "L"], ["sprayer-field-capacity", "L"],
   // v69 surface prep, coatings, and abatement (Groups E and D)
   ["coating-coverage-dft", "E"], ["abrasive-blast", "E"], ["abatement-containment", "D"],

@@ -1001,6 +1001,7 @@ const RELATED = {
   "tree-crz-encroachment": ["tree-protection-zone", "trunk-decay-strength", "crown-pruning-dose"],
   "crown-pruning-dose": ["tree-protection-zone", "trunk-decay-strength", "felling-notch-hinge"],
   "tree-height-clinometer": ["log-limb-weight", "tree-protection-zone", "basal-area-prism"],
+  "firewood-cord": ["log-limb-weight", "chipper-debris", "tree-height-clinometer"],
 
   // spec-v69 surface prep, coatings, and abatement
   "coating-coverage-dft": ["paint-coverage", "abrasive-blast", "material-quantity"],

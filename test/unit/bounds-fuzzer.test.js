@@ -22166,6 +22166,7 @@ test("bounds: spec-v567 computeCrownPruningDose pins the removal percent, the cl
 });
 
 import { computeTreeHeightClinometer as _v772 } from "../../calc-arborist.js";
+import { computeFirewoodCord as _v777 } from "../../calc-arborist.js";
 
 test("bounds: spec-v772 tree-height-clinometer pins H = D(top-base)/100, the signed-base rule, linearity, and error seams", () => {
   // Spec example: D 100, top +58%, base -4% (base below eye) -> H = 100*(58-(-4))/100 = 62 ft.
@@ -22199,6 +22200,35 @@ test("bounds: spec-v772 tree-height-clinometer pins H = D(top-base)/100, the sig
   assert.ok("error" in _v772({ horizontal_distance_ft: 100, top_reading_pct: 20, base_reading_pct: 20 }), "top == base rejected");
   assert.ok("error" in _v772({ horizontal_distance_ft: Infinity, top_reading_pct: 58, base_reading_pct: -4 }));
   assert.ok("error" in _v772({ horizontal_distance_ft: 100, top_reading_pct: NaN, base_reading_pct: -4 }));
+});
+
+test("bounds: spec-v777 firewood-cord pins cords = L*H*D/128, the full-cord identity, linearity, and error seams", () => {
+  // A full cord = 128 ft^3: an 8 x 4 x 4 rick is exactly 1.00 cord.
+  const r = _v777({ length_ft: 8, height_ft: 4, depth_ft: 4 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.volume_ft3, 128);
+  assert.ok(Math.abs(r.cords - 1) < 1e-12);
+  // 16 x 4 x 2 also = 128 ft^3 = 1 cord; 20 x 4 x 4 = 320 -> 2.5 cords.
+  assert.ok(Math.abs(_v777({ length_ft: 16, height_ft: 4, depth_ft: 2 }).cords - 1) < 1e-12);
+  assert.ok(Math.abs(_v777({ length_ft: 20, height_ft: 4, depth_ft: 4 }).cords - 2.5) < 1e-12);
+  // cords = volume/128 across a sweep; linear in each dimension.
+  for (let i = 0; i < 120; i++) {
+    const L = 2 + (i % 24);
+    const H = 1 + (i % 8);
+    const D = 1 + (i % 6);
+    const m = _v777({ length_ft: L, height_ft: H, depth_ft: D });
+    assert.ok(!m.error);
+    assert.ok(Math.abs(m.volume_ft3 - L * H * D) < 1e-9, "volume = L*H*D");
+    assert.ok(Math.abs(m.cords - (L * H * D) / 128) < 1e-12, "cords = volume/128");
+    const dblL = _v777({ length_ft: 2 * L, height_ft: H, depth_ft: D });
+    assert.ok(Math.abs(dblL.cords - 2 * m.cords) < 1e-12, "linear in length");
+  }
+  // Error seams.
+  assert.ok("error" in _v777({ length_ft: 0, height_ft: 4, depth_ft: 4 }));
+  assert.ok("error" in _v777({ length_ft: 8, height_ft: 0, depth_ft: 4 }));
+  assert.ok("error" in _v777({ length_ft: 8, height_ft: 4, depth_ft: 0 }));
+  assert.ok("error" in _v777({ length_ft: Infinity, height_ft: 4, depth_ft: 4 }));
+  assert.ok("error" in _v777({ length_ft: 8, height_ft: 4, depth_ft: NaN }));
 });
 
 import { computeCenterPivotRuntime as _v568 } from "../../calc-agriculture.js";

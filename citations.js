@@ -7890,6 +7890,18 @@ export const CITATIONS = {
       { name: "Straight stem", value: "top directly above base; lean and hidden tops add error", source: "field-estimate caveat" },
     ],
   },
+  "firewood-cord": {
+    formula: "cords = length_ft x height_ft x depth_ft / 128; a full (standard) cord = 128 stacked cubic feet.",
+    edition: "NIST Handbook 130, Uniform Regulation for the Method of Sale of Commodities (firewood sold by the cord = 128 ft^3).",
+    freeAccess: "NIST Handbook 130 is free at nist.gov.",
+    governance: GOVERNANCE.general,
+    editionNote: "A full (standard) cord is 128 stacked cubic feet - a 4 ft x 4 ft x 8 ft rick of tightly stacked wood - so cords = length x height x depth (the log length) / 128. Under NIST Handbook 130 firewood must be advertised and sold by the cord or a fraction of a cord; 'face cord', 'rick', 'rack', and 'truckload' are not legal units of measure because they depend on the (unstated) log length. The 128 ft^3 is STACKED volume including the air gaps between pieces, so the solid wood content is roughly 70-90% depending on how straight and tightly stacked the pieces are; loosely thrown wood occupies more space than the same wood stacked. A measurement aid; the point-of-sale regulation and the state weights-and-measures office govern the legal sale.",
+    assumptions: [
+      { name: "Full cord", value: "128 stacked cubic feet (4 x 4 x 8 ft)", source: "NIST Handbook 130" },
+      { name: "Legal unit", value: "the cord or a fraction of a cord; 'face cord' / 'rick' are not legal units", source: "NIST Handbook 130" },
+      { name: "Stacked volume", value: "includes air gaps; solid wood is ~70-90% of the stacked volume", source: "stacking practice" },
+    ],
+  },
   "tree-crz-encroachment": {
     formula: "radius = radius_factor x DBH; segment = radius^2 x acos(d/radius) - d x sqrt(radius^2 - d^2) for a limit line at distance d; encroach_pct = segment / (pi x radius^2) x 100; over when encroach_pct > threshold (tolerant 40 / intermediate 30 / sensitive 20).",
     edition: "Critical root zone encroachment (ANSI A300 Part 5 tree protection; arboriculture practice), by name.",

@@ -849,3 +849,47 @@ function renderTreeHeightClinometer(inputRegion, outputRegion, citationEl) {
   for (const f of [d, top, base]) f.input.addEventListener("input", update);
 }
 ARBORIST_RENDERERS["tree-height-clinometer"] = renderTreeHeightClinometer;
+
+// --- v777: Firewood cord volume (`firewood-cord`) ---
+// A full (standard) cord is 128 stacked cubic feet. cords = L x H x D / 128.
+// dims: in { length_ft: L, height_ft: L, depth_ft: L } out: { cords: dimensionless, volume_ft3: L^3 }
+export function computeFirewoodCord({ length_ft = 0, height_ft = 0, depth_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(length_ft) || 0;
+  const H = Number(height_ft) || 0;
+  const D = Number(depth_ft) || 0;
+  if (!(L > 0)) return { error: "Stack length must be positive (ft)." };
+  if (!(H > 0)) return { error: "Stack height must be positive (ft)." };
+  if (!(D > 0)) return { error: "Stack depth (log length) must be positive (ft)." };
+  const volume_ft3 = L * H * D;
+  const cords = volume_ft3 / 128;
+  return {
+    cords, volume_ft3,
+    note: "A full (standard) cord is 128 stacked cubic feet - a 4 ft x 4 ft x 8 ft rick of tightly stacked round or split wood. cords = length x height x depth (log length) / 128. This is the legal cord under NIST Handbook 130 (Uniform Regulation for the Method of Sale of Commodities); firewood must be sold by the cord or fraction of a cord, not by 'face cord', 'rick', or 'truckload' (those are unregulated and depend on the log length). Stacked volume includes the air gaps, so the solid wood is roughly 70-90% of this; loose-thrown wood measures more than stacked. A measurement aid; the point-of-sale regulation and your state weights-and-measures office govern.",
+  };
+}
+export const firewoodCordExample = { inputs: { length_ft: 8, height_ft: 4, depth_ft: 4 } };
+
+function renderFirewoodCord(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: a full (standard) cord = 128 stacked cubic feet (a 4 x 4 x 8 ft rick); cords = length x height x depth / 128. Per NIST Handbook 130, Uniform Regulation for the Method of Sale of Commodities - firewood is sold by the cord, not 'face cord' or 'rick'. Stacked volume includes air gaps. A measurement aid; the state weights-and-measures office governs.";
+  const l = makeNumber("Stack length (ft)", "fwc-l", { step: "any", min: "0", value: "8" });
+  l.input.value = "8";
+  const h = makeNumber("Stack height (ft)", "fwc-h", { step: "any", min: "0", value: "4" });
+  h.input.value = "4";
+  const d = makeNumber("Stack depth / log length (ft)", "fwc-d", { step: "any", min: "0", value: "4" });
+  d.input.value = "4";
+  for (const f of [l, h, d]) inputRegion.appendChild(f.wrap);
+  const oC = makeOutputLine(outputRegion, "Cords (full cord = 128 ft^3)", "fwc-out-c");
+  const oV = makeOutputLine(outputRegion, "Stacked volume", "fwc-out-v");
+  const oNote = makeOutputLine(outputRegion, "Note", "fwc-out-note");
+  const update = debounce(() => {
+    const r = computeFirewoodCord({ length_ft: Number(l.input.value) || 0, height_ft: Number(h.input.value) || 0, depth_ft: Number(d.input.value) || 0 });
+    if (r.error) { oC.textContent = r.error; oV.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.cords, 3) + " cord" + (Math.abs(r.cords - 1) < 1e-9 ? "" : "s");
+    oV.textContent = fmt(r.volume_ft3, 1) + " ft^3";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { l.input.value = "8"; h.input.value = "4"; d.input.value = "4"; update(); });
+  for (const f of [l, h, d]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["firewood-cord"] = renderFirewoodCord;

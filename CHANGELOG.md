@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(arborist): spec-v777 firewood cord volume; 2026-07-14
+
+- New tile `firewood-cord` (Group L, calc-arborist.js): how many cords a firewood stack holds -- a full (standard) cord
+  is 128 stacked cubic feet, so `cords = length x height x depth / 128`. An 8 x 4 x 4 ft stack is exactly 1.00 cord; a
+  20 x 4 x 4 ft stack is 2.5. The legal cord under NIST Handbook 130 (not 'face cord' or 'rick'). Fuzzer pins the
+  full-cord identity and linearity. calc-arborist.js gzip cap 19000 -> 20500 B. Home count 1,225 -> 1,226.
+
 ### feat(survey): spec-v776 state-plane grid-to-ground distance; 2026-07-14
 
 - New tile `grid-to-ground` (Group P, calc-survey.js): the grid scale factor the COGO and slope tiles say they skip --

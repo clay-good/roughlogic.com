@@ -5002,6 +5002,31 @@
       "kind": "industry"
     },
     {
+      "term": "how many cords of firewood",
+      "target": "firewood-cord",
+      "kind": "question"
+    },
+    {
+      "term": "firewood cord",
+      "target": "firewood-cord",
+      "kind": "industry"
+    },
+    {
+      "term": "cord of wood",
+      "target": "firewood-cord",
+      "kind": "question"
+    },
+    {
+      "term": "firewood stack volume",
+      "target": "firewood-cord",
+      "kind": "question"
+    },
+    {
+      "term": "cords in a wood pile",
+      "target": "firewood-cord",
+      "kind": "question"
+    },
+    {
       "term": "tree height from a clinometer",
       "target": "tree-height-clinometer",
       "kind": "question"
