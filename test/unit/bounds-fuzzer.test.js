@@ -21569,6 +21569,22 @@ test("bounds: spec-v539 computeDrinkAbvDilution pins the melt-diluted ABV, the s
   assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "foo" }));
 });
 
+import { computeWinchFleetAngle as _v785 } from "../../calc-stage.js";
+
+test("bounds: spec-v785 computeWinchFleetAngle pins the atan fleet angle, monotonicity, and error seams", () => {
+  const r = _v785({ lateral_offset: 6, lead_distance: 240 });
+  assert.ok(Math.abs(r.fleet_angle_deg - 1.4321) < 0.001); // atan(6/240) in deg
+  // A longer lead lowers the angle; a bigger offset raises it.
+  assert.ok(_v785({ lateral_offset: 6, lead_distance: 480 }).fleet_angle_deg < r.fleet_angle_deg);
+  assert.ok(_v785({ lateral_offset: 12, lead_distance: 240 }).fleet_angle_deg > r.fleet_angle_deg);
+  // Zero offset is a zero angle (rope square to the drum).
+  assert.ok(Math.abs(_v785({ lateral_offset: 0, lead_distance: 240 }).fleet_angle_deg) < 1e-12);
+  // Error seams: non-finite, negative offset, non-positive lead.
+  assert.ok("error" in _v785({ lateral_offset: Infinity, lead_distance: 240 }));
+  assert.ok("error" in _v785({ lateral_offset: -1, lead_distance: 240 }));
+  assert.ok("error" in _v785({ lateral_offset: 6, lead_distance: 0 }));
+});
+
 import { computeFloorAreaRatio as _v784 } from "../../calc-realestate.js";
 
 test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / remaining cap, the within flag, and error seams", () => {

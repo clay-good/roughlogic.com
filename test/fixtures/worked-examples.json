@@ -24315,6 +24315,27 @@
    }
   },
   {
+   "tile_id": "winch-fleet-angle",
+   "source_publisher": "Winch drum fleet angle (Wire Rope Users Manual; ANSI E1.6)",
+   "source_title": "fleet_angle = atan(lateral_offset / lead_distance)",
+   "source_edition_or_year": "spec-v785 worked example (machine-verified)",
+   "source_section_or_page": "6 in offset over a 240 in lead -> atan(0.025) = 1.43 deg, inside the 1.5 deg grooved guideline",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "lateral_offset": 6,
+    "lead_distance": 240
+   },
+   "outputs": {
+    "fleet_angle_deg": {
+     "value": 1.4321,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "floor-area-ratio",
    "source_publisher": "Floor area ratio (municipal zoning intensity measure)",
    "source_title": "FAR = building_floor_area / lot_area; max_buildable = FAR_limit x lot_area",

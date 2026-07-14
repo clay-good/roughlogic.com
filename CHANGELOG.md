@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(stage): spec-v785 winch drum fleet angle; 2026-07-14
+
+- New tile `winch-fleet-angle` (Group N, calc-stage.js): the sideways angle a wire rope makes running from a fixed lead
+  sheave onto a winch drum, `fleet_angle = atan(lateral_offset / lead_distance)`. A 6 in offset over a 240 in lead is
+  atan(0.025) = 1.43 deg. Classifies the result against the Wire Rope Users Manual / ANSI E1.6 guideline (at or below
+  1.5 deg grooved, 2 deg smooth; under ~0.5 deg risks pile-up) as a reference status, keeping the thresholds out of the
+  computed value. Fuzzer pins the angle, the lead/offset monotonicity, the zero-offset case, and the error seams. Home
+  count 1,233 -> 1,234.
+
 ### feat(real-estate): spec-v784 floor area ratio (zoning); 2026-07-14
 
 - New tile `floor-area-ratio` (Group X, calc-realestate.js): the zoning intensity measure a site's buildable size turns

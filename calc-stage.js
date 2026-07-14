@@ -1560,3 +1560,46 @@ function renderLightingThrowForPool(inputRegion, outputRegion, citationEl) {
   unit.select.addEventListener("change", update);
 }
 STAGE_RENDERERS["lighting-throw-for-pool"] = renderLightingThrowForPool;
+
+// --- spec-v785 N: winch drum fleet angle (`winch-fleet-angle`) ---
+// fleet_angle = atan(lateral_offset / lead_distance), the angle the rope deviates
+// from perpendicular as it wraps onto the drum from a fixed lead sheave.
+// dims: in { lateral_offset: L, lead_distance: L } out: { fleet_angle_deg: dimensionless }
+export function computeWinchFleetAngle({ lateral_offset = 0, lead_distance = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const offset = Number(lateral_offset) || 0;
+  const lead = Number(lead_distance) || 0;
+  if (offset < 0) return { error: "Lateral offset cannot be negative." };
+  if (!(lead > 0)) return { error: "Lead distance must be positive." };
+  const fleet_angle_deg = Math.atan(offset / lead) * 180 / Math.PI;
+  if (!Number.isFinite(fleet_angle_deg)) return { error: "Fleet-angle math is not a finite value." };
+  let status;
+  if (fleet_angle_deg > 2) status = "over the 2 deg limit -- the rope will climb the flange or crush earlier wraps";
+  else if (fleet_angle_deg > 1.5) status = "within the 2 deg smooth-drum guideline, but over the 1.5 deg grooved-drum guideline";
+  else if (fleet_angle_deg < 0.5) status = "under about 0.5 deg -- so shallow the rope may not cross-wind and can pile up on a grooved drum";
+  else status = "within the 1.5 deg grooved and 2 deg smooth-drum guidelines";
+  return {
+    fleet_angle_deg, status,
+    note: "Fleet angle is the sideways angle the wire rope makes as it runs from a fixed lead sheave onto the moving drum: fleet_angle = atan(lateral_offset / lead_distance), where the lateral offset is the sideways distance from the sheave's groove plane to the point on the drum where the rope lands (largest at the drum ends) and the lead distance is the perpendicular distance from the drum to the sheave. Any consistent unit works because the ratio is dimensionless. The common industry guideline (Wire Rope Users Manual; ANSI E1.6 for entertainment rigging) keeps the fleet angle at or below 1.5 deg for a grooved drum and 2 deg for a smooth drum; too large and the rope crushes earlier wraps or climbs the flange, too small (under about 0.5 deg) and it will not cross-wind and can pile up. Lengthening the lead or centering the sheave lowers the angle. A design guideline, not a rating; the drum, rope, and equipment manufacturer govern.",
+  };
+}
+export const winchFleetAngleExample = { inputs: { lateral_offset: 6, lead_distance: 240 } };
+function renderWinchFleetAngle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: winch drum fleet angle (Wire Rope Users Manual; ANSI E1.6 entertainment rigging): fleet_angle = atan(lateral_offset / lead_distance). The lateral offset is the sideways distance from the lead sheave's groove plane to where the rope lands on the drum (largest at the drum ends); the lead distance is the perpendicular distance from drum to sheave; any consistent unit works. Keep at or below 1.5 deg (grooved) / 2 deg (smooth); under ~0.5 deg the rope may pile up. A guideline; the equipment manufacturer governs.";
+  const offset = makeNumber("Lateral offset (sheave groove to rope landing)", "wfa-offset", { step: "any", min: "0" });
+  const lead = makeNumber("Lead distance (drum to sheave, same unit)", "wfa-lead", { step: "any", min: "0" });
+  for (const f of [offset, lead]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { offset.input.value = "6"; lead.input.value = "240"; update(); });
+  const oA = makeOutputLine(outputRegion, "Fleet angle", "wfa-out-a");
+  const oS = makeOutputLine(outputRegion, "Against the guideline", "wfa-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "wfa-out-n");
+  const update = debounce(() => {
+    const r = computeWinchFleetAngle({ lateral_offset: Number(offset.input.value) || 0, lead_distance: Number(lead.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(r.fleet_angle_deg, 2) + " deg";
+    oS.textContent = r.status;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [offset.input, lead.input]) el.addEventListener("input", update);
+}
+STAGE_RENDERERS["winch-fleet-angle"] = renderWinchFleetAngle;

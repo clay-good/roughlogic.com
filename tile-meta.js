@@ -501,6 +501,7 @@ const _TILES = [
   ["overrun-percent", "O"],
   ["reserve-capacity-amp-hours", "K"],
   ["floor-area-ratio", "X"],
+  ["winch-fleet-angle", "N"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

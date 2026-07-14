@@ -447,6 +447,7 @@ const RELATED = {
   "dmx-planner": ["neutral-imbalance", "spl-distance"],
   "lighting-beam": ["lighting-throw-for-pool", "dmx-planner", "truss-capacity", "power-distro"],
   "lighting-throw-for-pool": ["lighting-beam", "dmx-planner", "truss-capacity", "projector-brightness"],
+  "winch-fleet-angle": ["block-redirect-max-angle", "counterweight-arbor-load", "truss-capacity"],
 
   // Group O: Kitchen and Food Service. recipe-scale -> yield-ep ->
   // plate-cost is the costing workflow; cooling-curve + sous-vide-

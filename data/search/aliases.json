@@ -1672,6 +1672,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "fleet angle",
+      "target": "winch-fleet-angle",
+      "kind": "industry"
+    },
+    {
+      "term": "winch drum fleet angle",
+      "target": "winch-fleet-angle",
+      "kind": "industry"
+    },
+    {
+      "term": "wire rope spooling angle",
+      "target": "winch-fleet-angle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "lead sheave angle to drum",
+      "target": "winch-fleet-angle",
+      "kind": "question"
+    },
+    {
+      "term": "how far to place a winch sheave",
+      "target": "winch-fleet-angle",
+      "kind": "question"
+    },
+    {
       "term": "bakers percentage",
       "target": "bakers-percentage",
       "kind": "industry"

@@ -7042,6 +7042,18 @@ export const CITATIONS = {
     ],
   },
 
+  "winch-fleet-angle": {
+    formula: "fleet_angle = atan(lateral_offset / lead_distance), in degrees.",
+    edition: "Winch drum fleet angle (the Wire Rope Users Manual; ANSI E1.6 entertainment rigging), by name; the drum, rope, and equipment manufacturer govern.",
+    freeAccess: "The atan fleet-angle geometry is a published wire-rope-practice relation; the offset and lead come from the drum and sheave layout.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "Fleet angle is the sideways angle the wire rope makes as it runs from a fixed lead sheave onto the moving drum: fleet_angle = atan(lateral_offset / lead_distance). The lateral offset is the sideways distance from the sheave's groove plane to where the rope lands on the drum (largest at the drum ends); the lead distance is the perpendicular distance from drum to sheave; any consistent unit works because the ratio is dimensionless. The common guideline keeps the fleet angle at or below 1.5 deg for a grooved drum and 2 deg for a smooth drum; too large and the rope crushes earlier wraps or climbs the flange, too small (under about 0.5 deg) and it will not cross-wind and can pile up. Lengthening the lead or centering the sheave lowers the angle. A design guideline, not a rating; the drum, rope, and equipment manufacturer govern.",
+    assumptions: [
+      { name: "Guideline limits", value: "at or below 1.5 deg grooved drum, 2 deg smooth drum; under ~0.5 deg risks pile-up", source: "Wire Rope Users Manual / ANSI E1.6" },
+      { name: "Offset location", value: "the lateral offset is largest at the drum ends (sheave groove plane to rope landing)", source: "wire-rope practice" },
+    ],
+  },
+
   // ---- spec-v25 coordinate / traverse surveying (Group P) ----
   "area-by-coordinates": {
     formula: "Shoelace / coordinate method: A = 1/2 * |sum (E_i * N_{i+1} - E_{i+1} * N_i)| over the closed ring; acres = ft^2 / 43560; m^2 = ft^2 * 0.0929. Coordinates are North/East (surveying order).",

@@ -1018,7 +1018,7 @@ const TOOL_MODULES = (() => {
     // v20
     "power-distro",
     // v24 audio electronics
-    "speaker-impedance", "decibel-converter", "amp-power-spl", "lighting-beam", "lighting-throw-for-pool",
+    "speaker-impedance", "decibel-converter", "amp-power-spl", "lighting-beam", "lighting-throw-for-pool", "winch-fleet-angle",
     // v92 LED video wall + projection
     "led-video-wall", "projector-brightness", "projector-max-screen-size",
     // v120 room acoustics
