@@ -122,6 +122,7 @@ const _TILES = [
   ["volumetric-efficiency", "K"],
   ["gear-mph-rpm", "K"],
   ["cutting-speed-rpm", "K"],
+  ["cutting-diameter-for-rpm", "K"],
   ["drill-point-depth", "K"],
   ["drill-point-angle-from-length", "K"],
   ["cost-per-mile", "J"],

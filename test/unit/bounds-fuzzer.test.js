@@ -9669,6 +9669,26 @@ test("bounds: spec-v729 drill point angle from tip length (inverse of drill-poin
   assert.ok("error" in _v729({ diameter_in: Infinity, point_length_in: 0.15 }));
 });
 
+import { computeCuttingDiameterForRpm as _v732 } from "../../calc-machining.js";
+test("bounds: spec-v732 cutter diameter for a spindle RPM (inverse of cutting-speed-rpm)", () => {
+  const p = _v732({ surface_speed_sfm: 100, target_rpm: 1000 });
+  assert.ok(Math.abs(p.diameter_in - 0.3820) < 0.0005);
+  // round-trip: the recovered diameter fed to cutting-speed-rpm reproduces the target RPM
+  for (const [sfm, rpm] of [[100, 1000], [300, 5000], [60, 250], [1200, 12000]]) {
+    const inv = _v732({ surface_speed_sfm: sfm, target_rpm: rpm });
+    const fwd = _k4({ surface_speed_sfm: sfm, diameter_in: inv.diameter_in });
+    assert.ok(Math.abs(fwd.rpm - rpm) < 1e-6);
+  }
+  // a higher RPM ceiling allows a smaller diameter (monotonic, inverse)
+  assert.ok(_v732({ surface_speed_sfm: 100, target_rpm: 2000 }).diameter_in < _v732({ surface_speed_sfm: 100, target_rpm: 1000 }).diameter_in);
+  // a higher SFM at the same RPM needs a larger diameter
+  assert.ok(_v732({ surface_speed_sfm: 200, target_rpm: 1000 }).diameter_in > _v732({ surface_speed_sfm: 100, target_rpm: 1000 }).diameter_in);
+  // error seams
+  assert.ok("error" in _v732({ surface_speed_sfm: 0, target_rpm: 1000 }));
+  assert.ok("error" in _v732({ surface_speed_sfm: 100, target_rpm: 0 }));
+  assert.ok("error" in _v732({ surface_speed_sfm: Infinity, target_rpm: 1000 }));
+});
+
 import { computeGrowingDegreeDays as _l1, computePearsonSquareRation as _l2, computeLivestockWaterRequirement as _l3, computeTwoStrokeMix as _l4 } from "../../calc-agriculture.js";
 import { computeWeirFlow as _m1, computeLangelierIndex as _m2, computeChemicalFeedPump as _m3 } from "../../calc-treatment.js"; // spec-v75: v20 Phase M bench relocated out of calc-water.js
 

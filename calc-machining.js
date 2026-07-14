@@ -170,6 +170,46 @@ function renderDrillPointAngleFromLength(inputRegion, outputRegion, citationEl) 
 }
 MACHINING_RENDERERS["drill-point-angle-from-length"] = renderDrillPointAngleFromLength;
 
+// cutting-diameter-for-rpm: inverse of cutting-speed-rpm. The forward tile gives the spindle RPM for a diameter at a
+// surface speed; the inverse recovers the cutter or work diameter that runs at a target (or the machine's maximum)
+// spindle RPM for a given surface speed. From RPM = 12 x SFM / (pi x diameter), diameter = 12 x SFM / (pi x RPM). At a
+// fixed SFM a larger diameter turns slower, so a machine RPM ceiling sets the SMALLEST diameter that still reaches the
+// full surface speed -- a smaller cutter tops out the spindle before it gets there.
+// dims: in { surface_speed_sfm: L T^-1, target_rpm: T^-1 } out: { diameter_in: L, sfm_to_rpm_const: dimensionless }
+export function computeCuttingDiameterForRpm({ surface_speed_sfm = 0, target_rpm = 0 } = {}) {
+  const _g = _finiteGuard({ surface_speed_sfm, target_rpm }); if (_g) return _g;
+  const sfm = Number(surface_speed_sfm) || 0;
+  const rpm = Number(target_rpm) || 0;
+  if (!(sfm > 0)) return { error: "Surface speed must be positive (SFM)." };
+  if (!(rpm > 0)) return { error: "Spindle RPM must be positive." };
+  const diameter_in = (12 * sfm) / (Math.PI * rpm);
+  if (!Number.isFinite(diameter_in)) return { error: "Diameter math is not a finite value." };
+  const notes = [];
+  notes.push("Diameter = 12 x SFM / (pi x RPM), the inverse of RPM = 12 x SFM / (pi x diameter). At a fixed surface speed a larger diameter turns slower, so if the RPM is your machine's maximum this is the SMALLEST cutter (or work) that still reaches the full surface speed - a smaller diameter would top out the spindle before hitting the recommended SFM, so it runs under-speed. For milling and drilling the diameter is the cutter or drill; for turning it is the workpiece.");
+  notes.push("The recommended surface speed (SFM) comes from the tool manufacturer's chart for the material and tool combination (user-supplied); the machine, setup, and rigidity govern the safe spindle speed.");
+  return { surface_speed_sfm: sfm, target_rpm: rpm, diameter_in, sfm_to_rpm_const: 12 / Math.PI, notes };
+}
+export const cuttingDiameterForRpmExample = { inputs: { surface_speed_sfm: 100, target_rpm: 1000 } };
+
+function renderCuttingDiameterForRpm(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Machining spindle speed RPM = 12 x SFM / (pi x diameter) - first-principles cutting geometry (the speeds-and-feeds method as in Machinery's Handbook, Industrial Press, by name) - solved for the diameter: diameter = 12 x SFM / (pi x RPM). The recommended surface speed (SFM) comes from the tool / material chart (user-supplied); the machine, fixturing, and rigidity govern the safe spindle speed.";
+  const sfm = makeNumber("Surface speed (SFM)", "cdr-sfm", { step: "any", min: "0", value: "100" }); sfm.input.value = "100";
+  const rpm = makeNumber("Spindle RPM (e.g. machine maximum)", "cdr-rpm", { step: "any", min: "0", value: "1000" }); rpm.input.value = "1000";
+  for (const f of [sfm, rpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sfm.input.value = "100"; rpm.input.value = "1000"; update(); });
+  const oDia = makeOutputLine(outputRegion, "Diameter at that RPM", "cdr-out-dia");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cdr-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCuttingDiameterForRpm({ surface_speed_sfm: readNum(sfm.input), target_rpm: readNum(rpm.input) });
+    if (r.error) { oDia.textContent = r.error; oNote.textContent = ""; return; }
+    oDia.textContent = fmt(r.diameter_in, 4) + " in (" + fmt(r.diameter_in * 25.4, 2) + " mm)";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [sfm.input, rpm.input]) f.addEventListener("input", update);
+}
+MACHINING_RENDERERS["cutting-diameter-for-rpm"] = renderCuttingDiameterForRpm;
+
 // =====================================================================
 // spec-v100 K - cutting-fluid concentration and top-up (machine shop).
 // Running concentration from a refractometer Brix reading and the

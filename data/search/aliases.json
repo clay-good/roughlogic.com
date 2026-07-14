@@ -647,6 +647,31 @@
       "kind": "industry"
     },
     {
+      "term": "diameter for rpm",
+      "target": "cutting-diameter-for-rpm",
+      "kind": "industry"
+    },
+    {
+      "term": "cutter diameter for rpm",
+      "target": "cutting-diameter-for-rpm",
+      "kind": "redirect"
+    },
+    {
+      "term": "max cutter diameter",
+      "target": "cutting-diameter-for-rpm",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sfm to diameter",
+      "target": "cutting-diameter-for-rpm",
+      "kind": "adjacent"
+    },
+    {
+      "term": "diameter from spindle speed",
+      "target": "cutting-diameter-for-rpm",
+      "kind": "adjacent"
+    },
+    {
       "term": "sfm to rpm",
       "target": "cutting-speed-rpm",
       "kind": "redirect"

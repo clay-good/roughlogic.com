@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): spec-v732 cutter diameter for a spindle RPM (cutting-speed-rpm inverse); 2026-07-14
+
+- New tile `cutting-diameter-for-rpm` (Group K, calc-machining.js): the cutter or work diameter that runs at a target (or
+  maximum) spindle RPM for a given surface speed. `diameter = 12 x SFM / (pi x RPM)`. 100 SFM at 1,000 RPM is a 0.382 in
+  diameter. A machine RPM ceiling sets the smallest cutter that still reaches the full SFM. Round-trips through
+  `cutting-speed-rpm`. Home tile count 1,180 -> 1,181.
+
 ### feat(drainage): spec-v731 scupper width for a required overflow flow (overflow-scupper-sizing inverse); 2026-07-14
 
 - New tile `scupper-width-for-flow` (Group B, calc-drainage.js): the scupper width for a required overflow flow at a

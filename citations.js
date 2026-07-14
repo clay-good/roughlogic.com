@@ -954,6 +954,16 @@ export const CITATIONS = {
     ],
   },
 
+  "cutting-diameter-for-rpm": {
+    formula: "diameter(in) = 12 * SFM / (pi * RPM); the inverse of RPM = 12 * SFM / (pi * dia); 12/pi = 3.8197.",
+    edition: "First-principles cutting geometry; the speeds-and-feeds method as in Machinery's Handbook (Industrial Press), by name, solved for the diameter.",
+    freeAccess: "Pure geometry, public; the surface speed (SFM) is user-supplied from the tool / material chart.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles RPM identity solved for the diameter: the cutter or work diameter that runs at a target (or maximum) spindle RPM for a given surface speed. Because a larger diameter turns slower at a fixed SFM, a machine RPM ceiling sets the smallest diameter that still reaches the full surface speed. Recommended SFM comes from the tool manufacturer chart, and the machine, setup, and rigidity govern the safe spindle speed.",
+    assumptions: [
+      { name: "Chart inputs", value: "recommended SFM is user-supplied from the tool/material chart", source: "tool manufacturer data" },
+    ],
+  },
   "cutting-speed-rpm": {
     formula: "RPM = 12 * SFM / (pi * dia(in)); feed IPM = RPM * flutes * chip_load(in/tooth); 12/pi = 3.8197.",
     edition: "First-principles cutting geometry; the speeds-and-feeds method as in Machinery's Handbook (Industrial Press), by name.",

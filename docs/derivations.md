@@ -2228,6 +2228,7 @@ cross-check.
 | calc-machining.js | `computeBoringBarDeflection` | `{ d_in = 0, l_in = 0, f_lb = 0, e_psi = 30e6 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeBoringBarMaxOverhang` | `{ d_in = 0, f_lb = 0, allowable_deflection_in = 0, e_psi = 30e6 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeCountersinkDepth` | `{ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}` | _ | _ | _ |
+| calc-machining.js | `computeCuttingDiameterForRpm` | `{ surface_speed_sfm = 0, target_rpm = 0 } = {}` | _ | _ | _ |
 | calc-machining.js | `computeCuttingFluidConcentration` | `{ brix_reading = 0, refractometer_factor = 0, sump_volume_gal = 0, target_pct...` | _ | _ | _ |
 | calc-machining.js | `computeCuttingSpeed` | `{ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } ...` | _ | _ | _ |
 | calc-machining.js | `computeDrillPointAngleFromLength` | `{ diameter_in = 0, point_length_in = 0 } = {}` | _ | _ | _ |
@@ -2841,7 +2842,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1427.
+Row count: 1428.
 
 <!-- END function-corpus-v14 -->
 
@@ -3787,7 +3788,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (70 tiles)
+### Group K Mechanic (71 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3809,6 +3810,7 @@ per spec-v14 §13.1 second paragraph.
 | `crosswind-component` | Crosswind and Headwind Component | runway wind-component resolution (FAA...; spec-v501 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crouch-hp-for-speed` | Horsepower for a Target Planing Speed | Crouch's planing-speed formula (inverse); spec-v671 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `crouch-planing-speed` | Crouch Planing-Speed Estimate | Crouch's planing-speed formula; spec-v507 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `cutting-diameter-for-rpm` | Cutter Diameter for a Spindle RPM | First-principles cutting geometry + M...; 100 SFM at 1000 RPM -> 0.382 in diameter | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cutting-fluid-concentration` | Cutting-Fluid Concentration | Metalworking-fluid refractometer method; spec-v100 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cutting-speed-rpm` | Machining Speed and Feed | First-principles cutting geometry + M...; 100 SFM, 0.5-in cutter, 2 flutes, 0.002 in/tooth -> 763.9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `density-altitude` | Density Altitude and Pressure Altitude | FAA density-altitude method (ISA laps...; spec-v500 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4207,6 +4209,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1180. Fixture-covered or reference-cadence: 1180 / 1180.
+Tile count: 1181. Fixture-covered or reference-cadence: 1181 / 1181.
 
 <!-- END tile-index-v14 -->

@@ -15918,6 +15918,27 @@
    }
   },
   {
+   "tile_id": "cutting-diameter-for-rpm",
+   "source_publisher": "First-principles cutting geometry + Machinery's Handbook method",
+   "source_title": "diameter = 12 * SFM / (pi * RPM), the inverse of RPM = 12 * SFM / (pi * dia)",
+   "source_edition_or_year": "geometric",
+   "source_section_or_page": "100 SFM at 1000 RPM -> 0.382 in diameter",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "surface_speed_sfm": 100,
+    "target_rpm": 1000
+   },
+   "outputs": {
+    "diameter_in": {
+     "value": 0.382,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drill-point-depth",
    "source_publisher": "First-principles drill-point geometry + Machinery's Handbook",
    "source_title": "point length = (dia/2) / tan(point angle / 2); tip depth = full depth + point length",
