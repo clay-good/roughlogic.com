@@ -15467,7 +15467,7 @@ test("bounds: spec-v352 computePvStringFusing pins the 1.56 Isc round-up, the la
 });
 
 // ===================== spec-v353..v355 pool chlorination & heating batch =====================
-import { computePoolChlorineDose as _v353, computePoolHeaterBtu as _v354, computeBreakpointChlorination as _v355 } from "../../calc-treatment.js";
+import { computePoolChlorineDose as _v353, computePoolHeaterBtu as _v354, computeBreakpointChlorination as _v355, computePoolHeaterSize as _v677 } from "../../calc-treatment.js";
 
 test("bounds: spec-v353 computePoolChlorineDose pins the mass balance, the dry/liquid split, and error seams", () => {
   const r = _v353({ ppm: 2, gallons: 15000, product: "cal-hypo-65" });
@@ -15501,6 +15501,32 @@ test("bounds: spec-v354 computePoolHeaterBtu pins the energy and time, and error
   assert.ok("error" in _v354({ gallons: 20000, dT_F: 10, output: 0 }));
   assert.ok("error" in _v354({ gallons: 20000, dT_F: 10, output: 400000, eff: 0 }));
   assert.ok("error" in _v354({ gallons: NaN, dT_F: 10, output: 400000 }));
+});
+
+test("bounds: spec-v677 computePoolHeaterSize pins output = Q/(hours*eff), round-trips through computePoolHeaterBtu, and error seams", () => {
+  const r = _v677({ gallons: 20000, dT_F: 10, target_hours: 5.2125, eff: 0.80 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.required_output_btu - (20000 * 8.34 * 10) / (5.2125 * 0.80)) < 1e-6, `output identity: ${r.required_output_btu}`);
+  assert.ok(Math.abs(r.required_output_btu - 400000) < 1e-3, `pinned 400000: ${r.required_output_btu}`);
+  // A faster target needs a bigger heater.
+  const fast = _v677({ gallons: 20000, dT_F: 10, target_hours: 3, eff: 0.80 });
+  assert.ok(fast.required_output_btu > r.required_output_btu, `faster bigger: ${fast.required_output_btu}`);
+  // Round-trip: the required output, fed back through the forward tile, reproduces the target time.
+  for (const gallons of [10000, 20000, 40000]) {
+    for (const target_hours of [2, 5.2125, 12]) {
+      const m = _v677({ gallons, dT_F: 10, target_hours, eff: 0.80 });
+      assert.ok(!m.error, `sweep gal=${gallons} hr=${target_hours}: ${JSON.stringify(m)}`);
+      assertFinite(m.required_output_btu, "output"); assert.ok(m.required_output_btu > 0, "output positive");
+      const back = _v354({ gallons, dT_F: 10, output: m.required_output_btu, eff: 0.80 });
+      assert.ok(Math.abs(back.hours - target_hours) < 1e-9, `round-trip gal=${gallons} hr=${target_hours}: ${back.hours}`);
+    }
+  }
+  // Error seams: non-positive gallons / rise / target hours / efficiency, non-finite.
+  assert.ok("error" in _v677({ gallons: 0, dT_F: 10, target_hours: 5 }));
+  assert.ok("error" in _v677({ gallons: 20000, dT_F: 0, target_hours: 5 }));
+  assert.ok("error" in _v677({ gallons: 20000, dT_F: 10, target_hours: 0 }));
+  assert.ok("error" in _v677({ gallons: 20000, dT_F: 10, target_hours: 5, eff: 0 }));
+  assert.ok("error" in _v677({ gallons: NaN, dT_F: 10, target_hours: 5 }));
 });
 
 test("bounds: spec-v355 computeBreakpointChlorination pins the combined chlorine, the 10x dose, and error seams", () => {

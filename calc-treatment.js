@@ -516,6 +516,44 @@ TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
   compute: computePoolHeaterBtu,
 });
 
+// dims: in { gallons: dimensionless, dT_F: T, target_hours: T, eff: dimensionless } out: { required_output_btu: M L^2 T^-3, Q_btu: M L^2 T^-2 }
+export function computePoolHeaterSize({ gallons = 0, dT_F = 0, target_hours = 0, eff = 0.80 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const gal = Number(gallons) || 0;
+  const dT = Number(dT_F) || 0;
+  const hrs = Number(target_hours) || 0;
+  const e = Number(eff) || 0;
+  if (!(gal > 0)) return { error: "Pool volume must be positive (gallons)." };
+  if (!(dT > 0)) return { error: "Temperature rise must be positive (F)." };
+  if (!(hrs > 0)) return { error: "Target heat-up time must be positive (h)." };
+  if (!(e > 0)) return { error: "Efficiency (or COP-equivalent) must be positive." };
+  const Q_btu = gal * 8.34 * dT;
+  // Inverse of hours = (gallons x 8.34 x dT) / (output x eff): output = (gallons x 8.34 x dT) / (target_hours x eff).
+  const required_output_btu = Q_btu / (hrs * e);
+  if (!(required_output_btu > 0) || !Number.isFinite(required_output_btu)) return { error: "Heater-size math is not a finite positive value." };
+  return {
+    required_output_btu, Q_btu,
+    note: "The heater output needed to warm a pool by a temperature rise in a target time, the inverse of the pool-heater-btu tile: output = (gallons x 8.34 x rise) / (target_hours x efficiency). At about 80% a gas heater is sized off this directly; for a heat pump enter its COP-equivalent Btu/h (the output required will look large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw heat-up size and ignores cover, evaporation, and standby losses, so add margin. A sizing estimate; the equipment ratings and site conditions govern."
+  };
+}
+const poolHeaterSizeExample = { inputs: { gallons: 20000, dT_F: 10, target_hours: 5.2125, eff: 0.80 } };
+TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
+  citation: "Citation: pool heater sizing solved for output: output = (gallons x 8.34 x rise) / (target_hours x efficiency), from time = energy / (output x efficiency). Gas ~80%; enter a heat pump's COP-equivalent Btu/h. Ignores cover/evaporation/standby losses. A sizing estimate; the equipment ratings govern.",
+  example: poolHeaterSizeExample.inputs,
+  fields: [
+    { key: "gallons", label: "Pool volume (gallons)", default: 20000 },
+    { key: "dT_F", label: "Temperature rise (F)", default: 10 },
+    { key: "target_hours", label: "Target heat-up time (h)", default: 5.2 },
+    { key: "eff", label: "Efficiency (0.80 gas; COP-equiv HP)", default: 0.80 },
+  ],
+  outputs: [
+    { key: "o", id: "phs-out-o", label: "Required heater output", value: (r) => fmt(r.required_output_btu, 0) + " Btu/h" },
+    { key: "q", id: "phs-out-q", label: "Heat-up energy", value: (r) => fmt(r.Q_btu, 0) + " Btu" },
+    { key: "n", id: "phs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePoolHeaterSize,
+});
+
 // dims: in { total_ppm: dimensionless, free_ppm: dimensionless, ratio: dimensionless, gallons: dimensionless, avail: dimensionless } out: { combined_ppm: dimensionless, dose_ppm: dimensionless, lb_product: dimensionless }
 export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;

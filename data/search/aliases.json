@@ -18722,6 +18722,31 @@
       "kind": "industry"
     },
     {
+      "term": "heater output for target heat up time",
+      "target": "pool-heater-size",
+      "kind": "industry"
+    },
+    {
+      "term": "what size pool heater do i need",
+      "target": "pool-heater-size",
+      "kind": "industry"
+    },
+    {
+      "term": "btu per hour to heat pool in time",
+      "target": "pool-heater-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pool heater output sizing",
+      "target": "pool-heater-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "heater capacity for pool warm up",
+      "target": "pool-heater-size",
+      "kind": "adjacent"
+    },
+    {
       "term": "pool heater btu",
       "target": "pool-heater-btu",
       "kind": "industry"

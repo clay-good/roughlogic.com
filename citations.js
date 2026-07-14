@@ -8515,6 +8515,18 @@ export const CITATIONS = {
       { name: "No standby loss", value: "ignores cover/evaporation/standby losses; real heat-up runs longer", source: "scope of this tile" },
     ],
   },
+  "pool-heater-size": {
+    formula: "Q_btu = gallons x 8.34 x dT; required_output_btu = Q_btu / (target_hours x eff); the inverse of hours = Q_btu / (output x eff).",
+    edition: "The sensible water-heating relation (1 Btu raises 1 lb of water 1 F) solved for the heater output, by name.",
+    freeAccess: "The water-heating energy relation and the 8.34 lb/gal constant are standard published values. The equipment ratings and site conditions govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The heater output needed to warm a pool by a temperature rise in a target time, the inverse of pool-heater-btu: output = (gallons x 8.34 x rise) / (target_hours x efficiency). At about 80% a gas heater is sized off this directly; for a heat pump enter its COP-equivalent Btu/h (the required output looks large because a heat pump is left on to hold temperature, not for a quick warm-up). This is the raw sensible heat-up size and ignores the cover, evaporation, and standby losses, so add margin, and it does not size the gas line or verify the electrical service. A sizing estimate; the equipment ratings and site conditions govern.",
+    assumptions: [
+      { name: "Sensible heat", value: "Btu = gallons x 8.34 x dT; 1 Btu raises 1 lb water 1 F", source: "thermodynamics" },
+      { name: "Output inverse", value: "output = energy / (target_hours x efficiency); enter COP-equiv Btu/h for a heat pump", source: "equipment ratings" },
+      { name: "No standby loss", value: "ignores cover/evaporation/standby losses; add margin for real heat-up", source: "scope of this tile" },
+    ],
+  },
   "breakpoint-chlorination": {
     formula: "combined = total - free; dose_ppm = ratio x combined (ratio ~10); optional lb_product = dose_ppm x (gal/1e6) x 8.34 / (avail/100).",
     edition: "The breakpoint (superchlorination) chlorination rule and Standard Methods 4500-Cl, by name.",

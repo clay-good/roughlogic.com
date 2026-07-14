@@ -998,7 +998,7 @@ const TOOL_MODULES = (() => {
     "chlorine-cylinder-withdrawal",
     // v93 pool and spa chemical balance
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
-    "pool-chlorine-dose", "pool-heater-btu", "breakpoint-chlorination",
+    "pool-chlorine-dose", "pool-heater-btu", "pool-heater-size", "breakpoint-chlorination",
   ]);
   // v4 Group N: Stage and Live Production.
   declare("./calc-stage.js", "STAGE_RENDERERS", [

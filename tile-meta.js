@@ -496,7 +496,7 @@ const _TILES = [
   ["pool-alkalinity-adjust", "M"],
   ["pool-cya-dose", "M"],
   ["pool-salt-dose", "M"],
-  ["pool-chlorine-dose", "M"], ["pool-heater-btu", "M"], ["breakpoint-chlorination", "M"],
+  ["pool-chlorine-dose", "M"], ["pool-heater-btu", "M"], ["pool-heater-size", "M"], ["breakpoint-chlorination", "M"],
   ["fence-estimate", "E"],
   ["post-hole-concrete", "E"],
   ["thinset-coverage", "E"],

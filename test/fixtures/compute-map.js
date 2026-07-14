@@ -735,6 +735,7 @@ export const COMPUTE_MAP = {
   "pool-salt-dose": { module: "../../calc-treatment.js", fn: "computePoolSaltDose" },
   "pool-chlorine-dose": { module: "../../calc-treatment.js", fn: "computePoolChlorineDose" },
   "pool-heater-btu": { module: "../../calc-treatment.js", fn: "computePoolHeaterBtu" },
+  "pool-heater-size": { module: "../../calc-treatment.js", fn: "computePoolHeaterSize" },
   "breakpoint-chlorination": { module: "../../calc-treatment.js", fn: "computeBreakpointChlorination" },
   "fence-estimate": { module: "../../calc-construction.js", fn: "computeFenceEstimate" },
   "post-hole-concrete": { module: "../../calc-construction.js", fn: "computePostHoleConcrete" },
