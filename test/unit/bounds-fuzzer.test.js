@@ -18585,6 +18585,29 @@ test("bounds: spec-v426 computeOverflowScupperSizing pins the weir flow, contrac
   assert.ok("error" in _v426({ length_in: Infinity, head_in: 3.5 }));
 });
 
+import { computeScupperWidthForFlow as _v731 } from "../../calc-drainage.js";
+test("bounds: spec-v731 scupper width for a required overflow flow (inverse of overflow-scupper-sizing)", () => {
+  const p = _v731({ required_gpm: 118, head_in: 3.5 });
+  assert.ok(Math.abs(p.width_suppressed_in - 6.0) < 0.05);
+  assert.ok(Math.abs(p.width_contracted_in - 6.7) < 0.05);
+  assert.ok(p.width_contracted_in > p.width_suppressed_in); // contracted needs a wider opening
+  // round-trip: the suppressed width fed to overflow-scupper-sizing reproduces the required flow (suppressed),
+  // and the contracted width reproduces it under the contracted form
+  for (const [gpm, head] of [[118, 3.5], [50, 2], [300, 5], [30, 1.5]]) {
+    const inv = _v731({ required_gpm: gpm, head_in: head });
+    const fwdS = _v426({ length_in: inv.width_suppressed_in, head_in: head });
+    assert.ok(Math.abs(fwdS.q_gpm - gpm) < 1e-6);
+    const fwdC = _v426({ length_in: inv.width_contracted_in, head_in: head });
+    assert.ok(Math.abs(fwdC.q_gpm_contracted - gpm) < 1e-6);
+  }
+  // more flow needs a wider scupper (monotonic)
+  assert.ok(_v731({ required_gpm: 200, head_in: 3.5 }).width_suppressed_in > _v731({ required_gpm: 100, head_in: 3.5 }).width_suppressed_in);
+  // error seams
+  assert.ok("error" in _v731({ required_gpm: 0, head_in: 3.5 }));
+  assert.ok("error" in _v731({ required_gpm: 118, head_in: 0 }));
+  assert.ok("error" in _v731({ required_gpm: Infinity, head_in: 3.5 }));
+});
+
 test("bounds: spec-v427 computeSewageForceMainVelocity pins V, the scour ID, the flag, and error seams", () => {
   const r = _v427({ gpm: 50, id_in: 2 });
   assert.ok(Math.abs(r.velocity_fps - 0.4085 * 50 / 4) < 1e-9 && r.scours === true);

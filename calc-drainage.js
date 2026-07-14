@@ -246,6 +246,50 @@ function renderOverflowScupperSizing(inputRegion, outputRegion, citationEl) {
 }
 DRAINAGE_RENDERERS["overflow-scupper-sizing"] = renderOverflowScupperSizing;
 
+// scupper-width-for-flow: inverse of overflow-scupper-sizing. The forward tile gives the overflow capacity from the
+// width and head; the inverse recovers the scupper width for a required overflow flow at a design head. From the
+// rectangular (Francis) weir Q = 3.33 L H^1.5 (cfs, feet), L = Q / (3.33 H^1.5) (suppressed), and from the contracted
+// form Q = 3.33 (L - 0.2 H) H^1.5, L = Q / (3.33 H^1.5) + 0.2 H -- a scupper narrower than the wall needs the wider
+// contracted opening for the same flow. The head is the blocked-primary design condition.
+// dims: in { required_gpm: L^3 T^-1, head_in: L } out: { width_suppressed_in: L, width_contracted_in: L, q_cfs: L^3 T^-1 }
+export function computeScupperWidthForFlow({ required_gpm = 0, head_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const gpm = Number(required_gpm) || 0;
+  const head = Number(head_in) || 0;
+  if (!(gpm > 0)) return { error: "Required overflow flow must be positive (gpm)." };
+  if (!(head > 0)) return { error: "Head must be positive (in)." };
+  const q_cfs = gpm / 448.8;
+  const H = head / 12;
+  const base_ft = q_cfs / (3.33 * Math.pow(H, 1.5));
+  const width_suppressed_in = base_ft * 12;
+  const width_contracted_in = (base_ft + 0.2 * H) * 12;
+  if (![q_cfs, width_suppressed_in, width_contracted_in].every(Number.isFinite)) return { error: "Scupper-width math is not a finite value." };
+  return {
+    q_cfs, width_suppressed_in, width_contracted_in,
+    note: "Scupper width for a required overflow flow as a rectangular (Francis) weir: L = Q / (3.33 H^1.5) for the suppressed (full-wall-width) case, or L = Q / (3.33 H^1.5) + 0.2 H for the contracted case (a scupper narrower than the wall, which needs the wider opening for the same flow). The head H is measured above the scupper invert at the design (blocked-primary) condition, and the overflow scuppers must pass the design rainfall with the primary system assumed plugged (IPC 1108 / FM Global). Round the width UP and keep the parapet high enough for the head; use the contracted width to be safe. A design aid; the plumbing code and the structural roof-loading check govern.",
+  };
+}
+export const scupperWidthForFlowExample = { inputs: { required_gpm: 118, head_in: 3.5 } };
+function renderScupperWidthForFlow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Overflow scupper as a rectangular weir Q = 3.33 L H^1.5 (cfs, feet) solved for the width: L = Q / (3.33 H^1.5) suppressed, L = Q / (3.33 H^1.5) + 0.2 H contracted (IPC 1108 secondary drainage / FM Global). Head at the blocked-primary condition. A design aid; the plumbing code and roof-loading check govern.";
+  const gpm = makeNumber("Required overflow flow (gpm)", "swf-gpm", { step: "any", min: "0" }); gpm.input.value = "118";
+  const head = makeNumber("Head above scupper invert (in)", "swf-head", { step: "any", min: "0" }); head.input.value = "3.5";
+  for (const f of [gpm, head]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { gpm.input.value = "118"; head.input.value = "3.5"; update(); });
+  const oS = makeOutputLine(outputRegion, "Width (suppressed / full wall)", "swf-out-s");
+  const oC = makeOutputLine(outputRegion, "Width (contracted / narrow scupper)", "swf-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "swf-out-n");
+  const update = debounce(() => {
+    const r = computeScupperWidthForFlow({ required_gpm: Number(gpm.input.value) || 0, head_in: Number(head.input.value) || 0 });
+    if (r.error) { oS.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oS.textContent = fmt(r.width_suppressed_in, 1) + " in (" + fmt(r.q_cfs, 3) + " cfs)";
+    oC.textContent = fmt(r.width_contracted_in, 1) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [gpm.input, head.input]) f.addEventListener("input", update);
+}
+DRAINAGE_RENDERERS["scupper-width-for-flow"] = renderScupperWidthForFlow;
+
 // dims: in { gpm: L^3 T^-1, id_in: L } out: { velocity_fps: L T^-1, d_max_scour_in: L }
 export function computeSewageForceMainVelocity({ gpm = 0, id_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

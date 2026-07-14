@@ -7293,6 +7293,18 @@ export const CITATIONS = {
       { name: "Capacity tables", value: "editable [size, GPM] breakpoints for the vertical leader and the horizontal storm drain at each slope; tune to IPC Tables 1106.2 / 1106.3 / 1106.6", source: "IPC 2021 Section 1106" },
     ],
   },
+  "scupper-width-for-flow": {
+    formula: "L = Q / (3.33 H^1.5) (suppressed); L = Q / (3.33 H^1.5) + 0.2 H (contracted); Q_cfs = required_gpm / 448.8; L and H in ft, width reported in inches.",
+    edition: "The rectangular (Francis) weir capacity of an overflow scupper (secondary roof drainage per IPC 1108 / FM Global), by name, solved for the width.",
+    freeAccess: "The Francis rectangular-weir formula is public; the secondary-drainage requirement is in the published IPC (Section 1108) and FM Global data sheets.",
+    governance: GOVERNANCE.general,
+    editionNote: "The scupper width for a required overflow flow, the inverse of the Francis rectangular-weir capacity: L = Q / (3.33 H^1.5) for the suppressed (full-wall-width) case, or L = Q / (3.33 H^1.5) + 0.2 H for the end-contracted case (a scupper narrower than the wall needs the wider opening for the same flow). The head H is the depth above the scupper invert at the design condition, evaluated with the primary drains assumed blocked (IPC 1108 / FM Global). Round the width UP; this sizes the weir flow, not the invert height, the number of scuppers, or the ponding depth for the structural roof-load check. A design aid; the plumbing code, the AHJ, and the structural engineer govern.",
+    assumptions: [
+      { name: "Weir flow", value: "L = Q / (3.33 H^1.5) suppressed, + 0.2 H contracted (cfs, ft)", source: "Francis rectangular weir" },
+      { name: "Blocked-primary head", value: "H evaluated with the primary drainage assumed plugged", source: "IPC 1108 / FM Global" },
+      { name: "Structural check separate", value: "the ponding depth and roof load are the structural engineer's", source: "scope of this tile" },
+    ],
+  },
   "overflow-scupper-sizing": {
     formula: "Q = 3.33 L H^1.5 (cfs, L and H in ft); contracted Q = 3.33 (L - 0.2 H) H^1.5; gpm = cfs x 448.8.",
     edition: "The rectangular (Francis) weir capacity of an overflow scupper, secondary roof drainage per IPC 1108 / FM Global, by name.",

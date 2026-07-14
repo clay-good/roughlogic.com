@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(drainage): spec-v731 scupper width for a required overflow flow (overflow-scupper-sizing inverse); 2026-07-14
+
+- New tile `scupper-width-for-flow` (Group B, calc-drainage.js): the scupper width for a required overflow flow at a
+  design head, from the Francis rectangular weir. `L = Q / (3.33 H^1.5)` suppressed, `+ 0.2 H` contracted. 118 gpm at a
+  3.5 in head needs a 6.0 in opening (6.7 in contracted). Round-trips through `overflow-scupper-sizing` (both forms).
+  Home tile count 1,179 -> 1,180.
+
 ### feat(arborist): spec-v730 minimum sound shell for an allowable trunk strength loss (trunk-decay-strength inverse); 2026-07-14
 
 - New tile `trunk-min-shell-thickness` (Group L, calc-arborist.js): the minimum radial sound-wood shell thickness for a

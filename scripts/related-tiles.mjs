@@ -279,6 +279,7 @@ const RELATED = {
   "supply-pressure-budget": ["friction-loss", "static-pressure-piping", "wsfu-demand"],
   "roof-drain-sizing": ["stormwater-rational", "rainwater-yield", "slope"],
   "overflow-scupper-sizing": ["roof-drain-sizing", "rain-load-ponding", "stormwater-detention-volume", "weir-flow"],
+  "scupper-width-for-flow": ["overflow-scupper-sizing", "roof-drain-sizing", "rain-load-ponding", "weir-flow"],
   "sewage-force-main-velocity": ["sump-basin-sizing", "roof-drain-sizing", "friction-loss", "overflow-scupper-sizing"],
   "stormwater-detention-volume": ["stormwater-rational", "time-of-concentration", "overflow-scupper-sizing", "roof-drain-sizing"],
   "sump-basin-sizing": ["pump-sizing", "pump-tdh", "sanitary-dfu"],

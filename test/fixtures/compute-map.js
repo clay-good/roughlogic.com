@@ -626,6 +626,7 @@ export const COMPUTE_MAP = {
   "supply-pressure-budget": { module: "../../calc-plumbing.js", fn: "computeSupplyPressureBudget" },
   "roof-drain-sizing": { module: "../../calc-drainage.js", fn: "computeRoofDrainSizing" },
   "overflow-scupper-sizing": { module: "../../calc-drainage.js", fn: "computeOverflowScupperSizing" },
+  "scupper-width-for-flow": { module: "../../calc-drainage.js", fn: "computeScupperWidthForFlow" },
   "sewage-force-main-velocity": { module: "../../calc-drainage.js", fn: "computeSewageForceMainVelocity" },
   "stormwater-detention-volume": { module: "../../calc-plumbing.js", fn: "computeStormwaterDetentionVolume" },
   "sump-basin-sizing": { module: "../../calc-drainage.js", fn: "computeSumpBasinSizing" },

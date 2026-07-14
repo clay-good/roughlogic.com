@@ -254,7 +254,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-drainage.js", "DRAINAGE_RENDERERS", [
     "roof-drain-sizing", "sump-basin-sizing",
     // spec-v426..v427 drainage
-    "overflow-scupper-sizing", "sewage-force-main-velocity",
+    "overflow-scupper-sizing", "scupper-width-for-flow", "sewage-force-main-velocity",
   ]);
   // spec-v42 cap-relief split: the three fuel-gas tiles relocated out of
   // calc-plumbing.js (which had reached 98.9% of cap) into calc-gas.js. They

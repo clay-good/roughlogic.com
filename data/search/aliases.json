@@ -20297,6 +20297,31 @@
       "kind": "industry"
     },
     {
+      "term": "scupper width",
+      "target": "scupper-width-for-flow",
+      "kind": "industry"
+    },
+    {
+      "term": "scupper width for flow",
+      "target": "scupper-width-for-flow",
+      "kind": "redirect"
+    },
+    {
+      "term": "how wide scupper",
+      "target": "scupper-width-for-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "scupper size for gpm",
+      "target": "scupper-width-for-flow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size scupper opening",
+      "target": "scupper-width-for-flow",
+      "kind": "adjacent"
+    },
+    {
       "term": "secondary roof drain",
       "target": "overflow-scupper-sizing",
       "kind": "industry"
