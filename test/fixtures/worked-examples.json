@@ -43308,6 +43308,48 @@
    }
   },
   {
+   "tile_id": "max-rpm-from-piston-speed",
+   "source_publisher": "Mean piston speed (engine building), inverse",
+   "source_title": "3.48 in stroke at a 4,000 ft/min street ceiling -> 6,897 rpm redline (round-trips the mean-piston-speed relation)",
+   "source_edition_or_year": "spec-v660 worked example (machine-verified)",
+   "source_section_or_page": "spec-v660 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "stroke_in": 3.48,
+    "mps_limit_fpm": 4000
+   },
+   "outputs": {
+    "rpm_max": {
+     "value": 6897,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "max-rpm-from-piston-speed",
+   "source_publisher": "Mean piston speed (engine building), inverse",
+   "source_title": "cross-check: a longer 4.00 in stroke at the same 4,000 ft/min ceiling caps lower at 6,000 rpm",
+   "source_edition_or_year": "spec-v660 worked example (machine-verified)",
+   "source_section_or_page": "spec-v660 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "stroke_in": 4.0,
+    "mps_limit_fpm": 4000
+   },
+   "outputs": {
+    "rpm_max": {
+     "value": 6000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "trap-speed-horsepower",
    "source_publisher": "Hale quarter-mile trap-speed relation",
    "source_title": "3,200 lb car trapping 108 mph -> 315 hp (companion ET 12.6 s)",

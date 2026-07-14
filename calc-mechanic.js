@@ -990,6 +990,35 @@ function renderMeanPistonSpeed(inputRegion, outputRegion, citationEl) {
 }
 MECHANIC_RENDERERS["mean-piston-speed"] = renderMeanPistonSpeed;
 
+// dims: in { stroke_in: L, mps_limit_fpm: L T^-1 } out: { rpm_max: T^-1, mps_limit_ms: L T^-1 }
+export function computeMaxRpmFromPistonSpeed({ stroke_in = 0, mps_limit_fpm = 4000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(stroke_in > 0)) return { error: "Stroke must be positive (in)." };
+  if (!(mps_limit_fpm > 0)) return { error: "Mean-piston-speed limit must be positive (ft/min)." };
+  const rpm_max = 6 * mps_limit_fpm / stroke_in;
+  const mps_limit_ms = mps_limit_fpm * 0.00508;
+  const band = mps_limit_fpm < 4000 ? "a conservative street / endurance ceiling" : (mps_limit_fpm <= 4500 ? "a performance-build ceiling" : "a race-only ceiling that needs exotic parts");
+  return {
+    rpm_max, mps_limit_ms, band,
+    note: "The maximum engine speed for a mean-piston-speed ceiling, the inverse of the mean-piston-speed tile: from MPS = stroke x RPM / 6 (ft/min), the RPM cap is 6 x MPS_limit / stroke. Mean piston speed sets the inertial load on the rods, pins, and bearings independent of bore, so a chosen ceiling gives a safe redline for the stroke - street and endurance builds cap around 4,000 ft/min, well-built performance engines 4,000-4,500, and only race engines with exotic parts exceed 4,500. A longer stroke lowers the RPM cap for the same piston-speed limit (the trade a stroker accepts). This is the AVERAGE (not peak) piston speed; the bands are guidance for typical materials, and a specific assembly's limit depends on the rods, pistons, and pins. A shop aid; the component makers' rpm ratings govern.",
+  };
+}
+export const maxRpmFromPistonSpeedExample = { inputs: { stroke_in: 3.48, mps_limit_fpm: 4000 } };
+MECHANIC_RENDERERS["max-rpm-from-piston-speed"] = _simpleRenderer({
+  citation: "Citation: the mean-piston-speed relation MPS = stroke x RPM / 6 (ft/min) solved for the RPM cap, rpm_max = 6 x MPS_limit / stroke, with the practical ceiling bands (street/endurance ~4,000, performance 4,000-4,500, race over 4,500 ft/min), per the engine-building references, by name. Average, not peak. A shop aid; the component ratings govern.",
+  example: maxRpmFromPistonSpeedExample.inputs,
+  fields: [
+    { key: "stroke_in", label: "Crankshaft stroke (in)", kind: "number", default: 3.48 },
+    { key: "mps_limit_fpm", label: "Mean-piston-speed limit (ft/min)", kind: "number", default: 4000 },
+  ],
+  outputs: [
+    { key: "r", id: "mrps-out-r", label: "Maximum safe RPM", value: (r) => fmt(r.rpm_max, 0) + " rpm" },
+    { key: "l", id: "mrps-out-l", label: "Limit", value: (r) => fmt(r.mps_limit_ms, 1) + " m/s - " + r.band },
+    { key: "n", id: "mrps-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMaxRpmFromPistonSpeed,
+});
+
 // dims: in { weight_lb: M L T^-2, trap_mph: L T^-1 } out: { hp: M L^2 T^-3, et_s: T }
 export function computeTrapSpeedHorsepower({ weight_lb = 0, trap_mph = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

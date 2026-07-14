@@ -10337,6 +10337,18 @@ export const CITATIONS = {
       { name: "Average not peak", value: "peak is roughly pi/2 higher and rod-ratio-dependent; not computed here", source: "kinematics" },
     ],
   },
+  "max-rpm-from-piston-speed": {
+    formula: "rpm_max = 6 x mps_limit_fpm / stroke_in (the mean-piston-speed relation MPS = stroke x RPM / 6 solved for RPM); mps_limit_ms = mps_limit_fpm x 0.00508.",
+    edition: "The mean-piston-speed relation MPS = 2 x stroke x RPM solved for the RPM cap, the inverse of the mean-piston-speed tile, as compiled in the engine-building references, by name.",
+    freeAccess: "The mean-piston-speed relation is a public engine-building result; the regime bands are standard builder guidance.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum safe engine speed for a chosen mean-piston-speed ceiling, the inverse of the mean-piston-speed tile: from MPS = stroke_in x RPM / 6 (ft/min), the RPM cap is 6 x MPS_limit / stroke. Mean piston speed sets the inertial load on the rods, pins, and bearings independent of bore, so a chosen ceiling gives a safe redline for the stroke, and a longer stroke lowers the cap for the same limit. The practical ceilings are ~4,000 ft/min street/endurance, 4,000-4,500 performance, over 4,500 race (exotic parts). This uses the average (not peak) piston speed; the bands are guidance for typical materials, and a specific assembly's limit depends on the rods, pistons, and pins. A shop aid; the component makers' rpm ratings govern.",
+    assumptions: [
+      { name: "RPM cap", value: "rpm_max = 6 x mps_limit_fpm / stroke_in", source: "engine-building references" },
+      { name: "Regime bands", value: "street/endurance ~4,000, performance 4,000-4,500, race over 4,500 ft/min", source: "builder guidance" },
+      { name: "Average not peak", value: "uses the average piston speed; a specific assembly's limit depends on the rods, pistons, and pins", source: "kinematics" },
+    ],
+  },
   "trap-speed-horsepower": {
     formula: "HP = weight x (mph/234)^3; ET = 5.825 x (weight/HP)^(1/3).",
     edition: "Hale's empirical quarter-mile relations HP = weight x (mph/234)^3 and ET = 5.825 x (weight/HP)^(1/3), as compiled in the drag-racing references, by name.",

@@ -65867,6 +65867,36 @@
       "kind": "question"
     },
     {
+      "term": "max rpm from piston speed",
+      "target": "max-rpm-from-piston-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "rpm limit from piston speed",
+      "target": "max-rpm-from-piston-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "safe redline for stroke",
+      "target": "max-rpm-from-piston-speed",
+      "kind": "redirect"
+    },
+    {
+      "term": "max rpm for a stroke",
+      "target": "max-rpm-from-piston-speed",
+      "kind": "question"
+    },
+    {
+      "term": "redline from mean piston speed",
+      "target": "max-rpm-from-piston-speed",
+      "kind": "question"
+    },
+    {
+      "term": "rpm cap for stroke",
+      "target": "max-rpm-from-piston-speed",
+      "kind": "question"
+    },
+    {
       "term": "hp from my timeslip mph",
       "target": "trap-speed-horsepower",
       "kind": "question"

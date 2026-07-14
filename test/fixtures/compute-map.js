@@ -898,6 +898,7 @@ export const COMPUTE_MAP = {
   // spec-v323..v325 engine-build performance batch (3 tiles)
   "injector-size": { module: "../../calc-mechanic.js", fn: "computeInjectorSize" },
   "mean-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMeanPistonSpeed" },
+  "max-rpm-from-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMaxRpmFromPistonSpeed" },
   "trap-speed-horsepower": { module: "../../calc-mechanic.js", fn: "computeTrapSpeedHorsepower" },
   // spec-v326..v328 soil characterization / QC batch (3 tiles)
   "relative-compaction": { module: "../../calc-earthwork.js", fn: "computeRelativeCompaction" },

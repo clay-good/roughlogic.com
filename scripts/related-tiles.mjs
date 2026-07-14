@@ -1287,7 +1287,8 @@ const RELATED = {
   "buffer-tank-loop-credit": ["hydronic-buffer-tank", "pipe-volume", "expansion-tank"],
   // spec-v323..v325 engine-build performance batch (Group K)
   "injector-size": ["volumetric-efficiency","displacement-cr","hp-from-torque"],
-  "mean-piston-speed": ["displacement-cr","hp-from-torque","injector-size"],
+  "mean-piston-speed": ["max-rpm-from-piston-speed","displacement-cr","hp-from-torque","injector-size"],
+  "max-rpm-from-piston-speed": ["mean-piston-speed","displacement-cr","hp-from-torque","injector-size"],
   "trap-speed-horsepower": ["hp-from-torque","injector-size","mean-piston-speed"],
   // spec-v326..v328 soil characterization / QC batch (Group E)
   "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],

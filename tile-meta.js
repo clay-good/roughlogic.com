@@ -589,7 +589,7 @@ const _TILES = [
   ["hydronic-buffer-tank", "C"],
   ["buffer-tank-loop-credit", "C"],
   // spec-v323..v325 engine-build performance batch (calc-mechanic.js Group K)
-  ["injector-size", "K"], ["mean-piston-speed", "K"], ["trap-speed-horsepower", "K"],
+  ["injector-size", "K"], ["mean-piston-speed", "K"], ["max-rpm-from-piston-speed", "K"], ["trap-speed-horsepower", "K"],
   // spec-v326..v328 soil characterization / QC batch (calc-earthwork.js Group E)
   ["relative-compaction", "E"], ["soil-phase-relations", "E"], ["atterberg-indices", "E"],
   // spec-v329..v331 building-energy batch (calc-hvac.js Group C)

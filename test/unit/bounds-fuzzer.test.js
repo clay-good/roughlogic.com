@@ -14703,6 +14703,24 @@ test("bounds: spec-v324 computeMeanPistonSpeed pins the ft/min, the m/s conversi
   assert.ok("error" in _v324({ stroke_in: NaN, rpm: 6000 }));
 });
 
+import { computeMaxRpmFromPistonSpeed as _v660 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v660 computeMaxRpmFromPistonSpeed inverts the mean-piston-speed relation, round-trips it, scales inversely with stroke, and pins error seams", () => {
+  const r = _v660({ stroke_in: 3.48, mps_limit_fpm: 4000 });
+  assert.ok(Math.abs(r.rpm_max - 6 * 4000 / 3.48) < 1e-9); // ~6897
+  assert.ok(Math.abs(r.mps_limit_ms - 4000 * 0.00508) < 1e-9);
+  // Exact inverse of mean-piston-speed: the RPM cap, fed back, gives exactly the limit.
+  assert.ok(Math.abs(_v324({ stroke_in: 3.48, rpm: r.rpm_max }).mps_fpm - 4000) < 1e-9);
+  // A longer stroke lowers the cap for the same limit (4.0 in at 4000 -> 6000 rpm).
+  assert.ok(Math.abs(_v660({ stroke_in: 4.0, mps_limit_fpm: 4000 }).rpm_max - 6000) < 1e-9);
+  // A higher piston-speed ceiling raises the cap proportionally.
+  assert.ok(Math.abs(_v660({ stroke_in: 3.48, mps_limit_fpm: 4500 }).rpm_max - r.rpm_max * 4500 / 4000) < 1e-6);
+  // Error seams: non-positive stroke / limit, non-finite.
+  assert.ok("error" in _v660({ stroke_in: 0, mps_limit_fpm: 4000 }));
+  assert.ok("error" in _v660({ stroke_in: 3.48, mps_limit_fpm: 0 }));
+  assert.ok("error" in _v660({ stroke_in: NaN, mps_limit_fpm: 4000 }));
+});
+
 test("bounds: spec-v325 computeTrapSpeedHorsepower pins the cube law, the ET companion, and error seams", () => {
   const r = _v325({ weight_lb: 3200, trap_mph: 108 });
   assert.ok(Math.abs(r.hp - 3200 * Math.pow(108 / 234, 3)) < 1e-9);
