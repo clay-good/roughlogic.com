@@ -42888,6 +42888,27 @@
    }
   },
   {
+   "tile_id": "concrete-strength-from-rupture",
+   "source_publisher": "ACI 318-19 19.2.3",
+   "source_title": "f'c = (fr / (7.5 x lambda))^2; inverse of the modulus of rupture",
+   "source_edition_or_year": "spec-v709 worked example (machine-verified; inverse of spec-v379)",
+   "source_section_or_page": "fr 474.342 psi, lambda 1.0 -> ~4,000 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "fr_psi": 474.342,
+    "lambda": 1.0
+   },
+   "outputs": {
+    "fc_psi": {
+     "value": 4000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-modulus-of-rupture",
    "source_publisher": "ACI 318-19 19.2.3",
    "source_title": "cross-check: all-lightweight lambda 0.75 -> fr 356 psi",

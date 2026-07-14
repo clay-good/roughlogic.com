@@ -11530,6 +11530,18 @@ export const CITATIONS = {
       { name: "Design value", value: "conservative cracking stress; test strength scatters above it", source: "scope of this tile" },
     ],
   },
+  "concrete-strength-from-rupture": {
+    formula: "f'c = (fr / (7.5 x lambda))^2, the ACI 318-19 19.2.3.1 relation fr = 7.5 x lambda x sqrt(f'c) solved for the compressive strength; lambda = 1.0 normalweight, 0.75 all-lightweight.",
+    edition: "The ACI 318-19 19.2.3.1 modulus of rupture of concrete, solved for f'c, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 19.2.3 rupture provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of concrete-modulus-of-rupture: the equivalent compressive strength implied by a flexural-beam (modulus-of-rupture) test, with lambda = 1.0 normalweight and 0.75 all-lightweight. The code fr is a conservative lower bound and a real beam test scatters above it, so the implied f'c is a lower-bound equivalent, not a cylinder-break value. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Rupture stress inverted", value: "f'c = (fr / (7.5 x lambda))^2", source: "ACI 318-19 19.2.3.1" },
+      { name: "Lightweight factor", value: "lambda = 1.0 normalweight, 0.75 all-lightweight", source: "ACI 318-19 19.2.4" },
+      { name: "Equivalent strength", value: "a lower-bound equivalent f'c, not a cylinder-break value", source: "scope of this tile" },
+    ],
+  },
   "concrete-cracking-moment": {
     formula: "fr = 7.5 x lambda x sqrt(f'c); S = b h^2 / 6; Mcr = fr x S (= fr Ig/yt); Mcr_kipft = Mcr_lbin / 12000.",
     edition: "The ACI 318-19 cracking moment Mcr = fr Ig/yt with the 19.2.3.1 modulus of rupture, by name.",

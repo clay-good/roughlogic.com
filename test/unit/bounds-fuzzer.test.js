@@ -16794,6 +16794,30 @@ test("bounds: spec-v379 computeConcreteModulusOfRupture pins fr = 7.5 lambda sqr
   assert.ok("error" in _v379({ fc_psi: 4000, lambda: NaN }));
 });
 
+import { computeConcreteStrengthFromRupture as _v709 } from "../../calc-concrete.js";
+test("bounds: spec-v709 computeConcreteStrengthFromRupture pins f'c = (fr/(7.5 lambda))^2, round-trips through computeConcreteModulusOfRupture, and error seams", () => {
+  const r = _v709({ fr_psi: 474.3416490252569, lambda: 1.0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.fc_psi - 4000) < 1e-3, `pinned 4000 psi: ${r.fc_psi}`);
+  // Round-trip: the strength, fed back through the forward tile, reproduces the rupture stress.
+  for (const fc of [2500, 4000, 6000, 8000]) {
+    for (const lambda of [0.75, 0.85, 1.0]) {
+      const fwd = _v379({ fc_psi: fc, lambda });
+      const m = _v709({ fr_psi: fwd.fr_psi, lambda });
+      assert.ok(!m.error, `sweep fc=${fc} lam=${lambda}: ${JSON.stringify(m)}`);
+      assertFinite(m.fc_psi, "fc"); assert.ok(m.fc_psi > 0, "fc positive");
+      assert.ok(Math.abs(m.fc_psi - fc) < 1e-6, `round-trip fc=${fc} lam=${lambda}: ${m.fc_psi}`);
+    }
+  }
+  // A higher rupture stress at the same lambda implies a higher strength.
+  assert.ok(_v709({ fr_psi: 600, lambda: 1.0 }).fc_psi > r.fc_psi);
+  // Lambda outside 0.75..1.0 is flagged but still returns a number.
+  assert.ok(_v709({ fr_psi: 474, lambda: 0.5 }).out_of_band === true);
+  // Error seams: non-positive rupture stress, non-finite.
+  assert.ok("error" in _v709({ fr_psi: 0, lambda: 1.0 }));
+  assert.ok("error" in _v709({ fr_psi: Infinity, lambda: 1.0 }));
+});
+
 import { computeConcreteCrackingMoment as _v651 } from "../../calc-concrete.js";
 
 test("bounds: spec-v651 computeConcreteCrackingMoment pins Mcr = fr b h^2/6, its consistency with the rupture tile, the h^2 growth, and error seams", () => {

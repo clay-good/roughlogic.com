@@ -638,6 +638,41 @@ CONCRETE_RENDERERS["concrete-modulus-of-rupture"] = _simpleRenderer({
   compute: computeConcreteModulusOfRupture,
 });
 
+// concrete-strength-from-rupture: inverse of concrete-modulus-of-rupture. The
+// forward tile gives fr from f'c; backing out the strength from a flexural-beam
+// (modulus-of-rupture) test is the inverse: fr = 7.5 x lambda x sqrt(f'c), so
+// f'c = (fr / (7.5 x lambda))^2.
+// dims: in { fr_psi: M L^-1 T^-2, lambda: dimensionless } out: { fc_psi: M L^-1 T^-2, fc_ksi: M L^-1 T^-2 }
+export function computeConcreteStrengthFromRupture({ fr_psi = 0, lambda = 1.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const fr = Number(fr_psi) || 0;
+  const lam = Number(lambda) > 0 ? Number(lambda) : 1.0;
+  if (!(fr > 0)) return { error: "Modulus of rupture fr must be positive (psi)." };
+  if (!(lam > 0)) return { error: "Lightweight factor lambda must be positive." };
+  const root = fr / (7.5 * lam);
+  const fc_psi = root * root;
+  const out_of_band = lam < 0.75 || lam > 1.0;
+  return {
+    fc_psi, fc_ksi: fc_psi / 1000, out_of_band,
+    note: "ACI 318-19 §19.2.3.1 fr = 7.5 x lambda x sqrt(f'c) solved for the strength: f'c = (fr / (7.5 x lambda))^2. Backs out the equivalent f'c implied by a flexural-beam (modulus-of-rupture) test, with lambda 1.0 normalweight and 0.75 all-lightweight. The code fr is a conservative lower bound and a real beam test scatters above it, so the implied f'c is a lower-bound equivalent, not a cylinder-break value. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteStrengthFromRuptureExample = { inputs: { fr_psi: 474.342, lambda: 1.0 } };
+CONCRETE_RENDERERS["concrete-strength-from-rupture"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §19.2.3.1 fr = 7.5 x lambda x sqrt(f'c) solved for f'c = (fr / (7.5 x lambda))^2, by name, with lambda = 1.0 normalweight and 0.75 all-lightweight. The equivalent f'c from a flexural-beam test; the code fr is a conservative lower bound the true rupture strength scatters above. A design aid, not a substitute for the engineer of record.",
+  example: concreteStrengthFromRuptureExample.inputs,
+  fields: [
+    { key: "fr_psi", label: "Modulus of rupture fr (psi)", kind: "number", default: 474.342 },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1.0 },
+  ],
+  outputs: [
+    { key: "fc", id: "csr-out-fc", label: "Equivalent strength f'c", value: (r) => fmt(r.fc_psi, 0) + " psi (" + fmt(r.fc_ksi, 2) + " ksi)" },
+    { key: "ob", id: "csr-out-ob", label: "Lambda range", value: (r) => r.out_of_band ? "OUT OF BAND (lambda outside 0.75-1.0)" : "within 0.75-1.0" },
+    { key: "n", id: "csr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteStrengthFromRupture,
+});
+
 // dims: in { b_in: L, h_in: L, fc_psi: M L^-1 T^-2, lambda: dimensionless } out: { fr_psi: M L^-1 T^-2, sm_in3: L^3, mcr_lbin: M L^2 T^-2, mcr_kipft: M L^2 T^-2 }
 export function computeConcreteCrackingMoment({ b_in = 0, h_in = 0, fc_psi = 4000, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

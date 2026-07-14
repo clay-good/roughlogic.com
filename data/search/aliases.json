@@ -44152,6 +44152,31 @@
       "kind": "question"
     },
     {
+      "term": "fc from modulus of rupture",
+      "target": "concrete-strength-from-rupture",
+      "kind": "question"
+    },
+    {
+      "term": "concrete strength from flexural test",
+      "target": "concrete-strength-from-rupture",
+      "kind": "question"
+    },
+    {
+      "term": "back out fc from rupture",
+      "target": "concrete-strength-from-rupture",
+      "kind": "question"
+    },
+    {
+      "term": "compressive strength from beam test",
+      "target": "concrete-strength-from-rupture",
+      "kind": "question"
+    },
+    {
+      "term": "fc from mor",
+      "target": "concrete-strength-from-rupture",
+      "kind": "question"
+    },
+    {
       "term": "concrete cracking moment",
       "target": "concrete-cracking-moment",
       "kind": "industry"
