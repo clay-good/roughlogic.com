@@ -1019,6 +1019,7 @@ const RELATED = {
   "counterweight-arbor-load": ["truss-capacity","rigging-check","sling-angle"],
   "led-tape-run": ["led-tape-max-run","voltage-drop","power-distro","led-video-wall"],
   "led-tape-max-run": ["led-tape-run","voltage-drop","power-distro","led-video-wall"],
+  "pool-volume": ["pool-turnover","pool-chlorine-dose","pool-heater-btu"],
   "pool-alkalinity-adjust": ["pool-turnover","langelier-index","pool-cya-dose"],
   "pool-cya-dose": ["pool-turnover","pool-alkalinity-adjust","pool-salt-dose"],
   "pool-salt-dose": ["pool-turnover","pool-cya-dose","langelier-index"],

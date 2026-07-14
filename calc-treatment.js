@@ -554,6 +554,86 @@ TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
   compute: computePoolHeaterSize,
 });
 
+// dims: in { shape: dimensionless, length_ft: L, width_ft: L, diameter_ft: L, shallow_ft: L, deep_ft: L } out: { area_ft2: L^2, avg_depth_ft: L, volume_ft3: L^3, gallons: dimensionless }
+// Pool water volume from the surface shape and the average depth: gallons =
+// surface area x average depth x 7.48052 gal/ft^3, average depth =
+// (shallow + deep)/2. Rectangle area = L x W, round = pi (D/2)^2, oval =
+// (pi/4) L x W. This is the gallons every pool dose/heater tile takes as input.
+export function computePoolVolume({ shape = "rectangle", length_ft = 0, width_ft = 0, diameter_ft = 0, shallow_ft = 0, deep_ft = 0 } = {}) {
+  const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;
+  const s = String(shape || "rectangle").toLowerCase();
+  const shallow = Number(shallow_ft) || 0;
+  const deep = Number(deep_ft) || 0;
+  if (!(shallow > 0) || !(deep > 0)) return { error: "Shallow and deep depths must be positive (ft). For a constant-depth pool enter the same value in both." };
+  const avg_depth_ft = (shallow + deep) / 2;
+  let area_ft2;
+  if (s === "rectangle" || s === "oval") {
+    const L = Number(length_ft) || 0;
+    const W = Number(width_ft) || 0;
+    if (!(L > 0) || !(W > 0)) return { error: "Length and width must be positive (ft)." };
+    area_ft2 = s === "oval" ? (Math.PI / 4) * L * W : L * W;
+  } else if (s === "round") {
+    const D = Number(diameter_ft) || 0;
+    if (!(D > 0)) return { error: "Diameter must be positive (ft)." };
+    area_ft2 = Math.PI * (D / 2) * (D / 2);
+  } else {
+    return { error: "Shape must be rectangle, round, or oval." };
+  }
+  const volume_ft3 = area_ft2 * avg_depth_ft;
+  const gallons = volume_ft3 * 7.48052;
+  return {
+    area_ft2, avg_depth_ft, volume_ft3, gallons,
+    note: "Pool volume = surface area x average depth x 7.48052 gal/ft^3, with average depth = (shallow + deep)/2 for a linearly sloping floor. Rectangle area = L x W, round = pi (D/2)^2, oval = (pi/4) L x W. A pool with a deep-end hopper, spa, or steps holds a bit less than the straight prism; measure or estimate the average depth carefully, since every chemical dose is figured per this gallonage. A field estimate; a metered fill or a plan takeoff is more exact.",
+  };
+}
+const poolVolumeExample = { inputs: { shape: "rectangle", length_ft: 32, width_ft: 16, shallow_ft: 3, deep_ft: 8 } };
+
+function renderPoolVolume(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: pool water volume - gallons = surface area x average depth x 7.48052 gal/ft^3, average depth = (shallow + deep)/2. Rectangle area = L x W, round = pi (D/2)^2, oval = (pi/4) L x W. First-principles geometry with the standard 7.48052 gal/ft^3 conversion, per the NSPF CPO Handbook pool-volume method, by name. A field estimate; a metered fill or plan takeoff is more exact.";
+  const shape = makeSelect("Pool shape", "pv-shape", [
+    { value: "rectangle", label: "Rectangle (L x W)" },
+    { value: "round", label: "Round (diameter)" },
+    { value: "oval", label: "Oval (L x W)" },
+  ]);
+  const len = makeNumber("Length (ft)", "pv-l", { step: "any", min: "0" });
+  const wid = makeNumber("Width (ft)", "pv-w", { step: "any", min: "0" });
+  const dia = makeNumber("Diameter (ft)", "pv-d", { step: "any", min: "0" });
+  const shallow = makeNumber("Shallow-end depth (ft)", "pv-sh", { step: "any", min: "0" });
+  const deep = makeNumber("Deep-end depth (ft)", "pv-dp", { step: "any", min: "0" });
+  inputRegion.appendChild(shape.wrap);
+  for (const f of [len, wid, dia, shallow, deep]) inputRegion.appendChild(f.wrap);
+  const oGal = makeOutputLine(outputRegion, "Pool volume", "pv-out-gal");
+  const oArea = makeOutputLine(outputRegion, "Surface area", "pv-out-area");
+  const oAvg = makeOutputLine(outputRegion, "Average depth", "pv-out-avg");
+  const oNote = makeOutputLine(outputRegion, "Note", "pv-out-note");
+  function syncFields() {
+    const isRound = shape.select.value === "round";
+    len.wrap.style.display = isRound ? "none" : "";
+    wid.wrap.style.display = isRound ? "none" : "";
+    dia.wrap.style.display = isRound ? "" : "none";
+  }
+  const update = debounce(() => {
+    const r = computePoolVolume({
+      shape: shape.select.value,
+      length_ft: Number(len.input.value) || 0,
+      width_ft: Number(wid.input.value) || 0,
+      diameter_ft: Number(dia.input.value) || 0,
+      shallow_ft: Number(shallow.input.value) || 0,
+      deep_ft: Number(deep.input.value) || 0,
+    });
+    if (r.error) { oGal.textContent = r.error; oArea.textContent = "-"; oAvg.textContent = "-"; oNote.textContent = ""; return; }
+    oGal.textContent = fmt(r.gallons, 0) + " gal (" + fmt(r.volume_ft3, 0) + " ft^3)";
+    oArea.textContent = fmt(r.area_ft2, 1) + " ft^2";
+    oAvg.textContent = fmt(r.avg_depth_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { shape.select.value = "rectangle"; len.input.value = "32"; wid.input.value = "16"; dia.input.value = ""; shallow.input.value = "3"; deep.input.value = "8"; syncFields(); update(); });
+  shape.select.addEventListener("change", () => { syncFields(); update(); });
+  for (const f of [len, wid, dia, shallow, deep]) f.input.addEventListener("input", update);
+  syncFields();
+}
+TREATMENT_RENDERERS["pool-volume"] = renderPoolVolume;
+
 // dims: in { total_ppm: dimensionless, free_ppm: dimensionless, ratio: dimensionless, gallons: dimensionless, avail: dimensionless } out: { combined_ppm: dimensionless, dose_ppm: dimensionless, lb_product: dimensionless }
 export function computeBreakpointChlorination({ total_ppm = 0, free_ppm = 0, ratio = 10, gallons = 0, avail = 0 } = {}) {
   const _g = _finiteGuardPool(arguments[0]); if (_g) return _g;

@@ -17172,6 +17172,7 @@ test("bounds: spec-v352 computePvStringFusing pins the 1.56 Isc round-up, the la
 
 // ===================== spec-v353..v355 pool chlorination & heating batch =====================
 import { computePoolChlorineDose as _v353, computePoolHeaterBtu as _v354, computeBreakpointChlorination as _v355, computePoolHeaterSize as _v677 } from "../../calc-treatment.js";
+import { computePoolVolume as _v768 } from "../../calc-treatment.js";
 
 test("bounds: spec-v353 computePoolChlorineDose pins the mass balance, the dry/liquid split, and error seams", () => {
   const r = _v353({ ppm: 2, gallons: 15000, product: "cal-hypo-65" });
@@ -17205,6 +17206,34 @@ test("bounds: spec-v354 computePoolHeaterBtu pins the energy and time, and error
   assert.ok("error" in _v354({ gallons: 20000, dT_F: 10, output: 0 }));
   assert.ok("error" in _v354({ gallons: 20000, dT_F: 10, output: 400000, eff: 0 }));
   assert.ok("error" in _v354({ gallons: NaN, dT_F: 10, output: 400000 }));
+});
+
+test("bounds: spec-v768 computePoolVolume pins area/avg-depth/gallons per shape, the shape ratios, and error seams", () => {
+  // Spec example: 32 x 16 rectangle, 3->8 ft -> avg 5.5, area 512, vol 2816, gal 21065.5.
+  const r = _v768({ shape: "rectangle", length_ft: 32, width_ft: 16, shallow_ft: 3, deep_ft: 8 });
+  assert.strictEqual(r.area_ft2, 512);
+  assert.strictEqual(r.avg_depth_ft, 5.5);
+  assert.ok(Math.abs(r.volume_ft3 - 2816) < 1e-9);
+  assert.ok(Math.abs(r.gallons - 2816 * 7.48052) < 1e-6);
+  assert.ok(Math.abs(r.gallons - 21065.1) < 0.5);
+  // Round area = pi (D/2)^2: a 20 ft round pool, 5 ft constant depth.
+  const round = _v768({ shape: "round", diameter_ft: 20, shallow_ft: 5, deep_ft: 5 });
+  assert.ok(Math.abs(round.area_ft2 - Math.PI * 100) < 1e-9);
+  assert.ok(Math.abs(round.gallons - Math.PI * 100 * 5 * 7.48052) < 1e-6);
+  // Oval area = (pi/4) L W = the rectangle's area x pi/4 for the same L, W and depth.
+  const rect = _v768({ shape: "rectangle", length_ft: 40, width_ft: 20, shallow_ft: 4, deep_ft: 4 });
+  const oval = _v768({ shape: "oval", length_ft: 40, width_ft: 20, shallow_ft: 4, deep_ft: 4 });
+  assert.ok(Math.abs(oval.area_ft2 / rect.area_ft2 - Math.PI / 4) < 1e-12);
+  assert.ok(oval.gallons < rect.gallons);
+  // Gallons scale linearly with average depth: doubling both depths doubles the volume.
+  const deep = _v768({ shape: "rectangle", length_ft: 32, width_ft: 16, shallow_ft: 6, deep_ft: 16 });
+  assert.ok(Math.abs(deep.gallons - 2 * r.gallons) < 1e-6);
+  // Error seams.
+  assert.ok("error" in _v768({ shape: "rectangle", length_ft: 0, width_ft: 16, shallow_ft: 3, deep_ft: 8 }));
+  assert.ok("error" in _v768({ shape: "round", diameter_ft: 0, shallow_ft: 5, deep_ft: 5 }));
+  assert.ok("error" in _v768({ shape: "rectangle", length_ft: 32, width_ft: 16, shallow_ft: 0, deep_ft: 8 }));
+  assert.ok("error" in _v768({ shape: "hexagon", length_ft: 32, width_ft: 16, shallow_ft: 3, deep_ft: 8 }));
+  assert.ok("error" in _v768({ shape: "rectangle", length_ft: Infinity, width_ft: 16, shallow_ft: 3, deep_ft: 8 }));
 });
 
 test("bounds: spec-v677 computePoolHeaterSize pins output = Q/(hours*eff), round-trips through computePoolHeaterBtu, and error seams", () => {

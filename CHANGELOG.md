@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(treatment): spec-v768 pool water volume by shape; 2026-07-14
+
+- New tile `pool-volume` (Group M, calc-treatment.js): the gallonage every pool dose and heater tile takes as its input
+  -- `gallons = surface area x average depth x 7.48052`, `average depth = (shallow + deep)/2`; rectangle `L x W`, round
+  `pi(D/2)^2`, oval `(pi/4)L x W`. A 32 x 16 ft rectangle 3 to 8 ft deep is 512 ft^2 x 5.5 ft = 2,816 ft^3 = 21,065 gal.
+  Shape select. calc-treatment.js gzip cap 26000 -> 27500 B. Home count 1,216 -> 1,217.
+
 ### feat(civil): spec-v767 curve deflection-angle stakeout; 2026-07-14
 
 - New tile `curve-deflection-stakeout` (Group E, calc-civil.js): the deflection-angle method horizontal-curve leaves out

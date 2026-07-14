@@ -9120,6 +9120,18 @@ export const CITATIONS = {
       { name: "Round-trip resistance", value: "resistance_per_ft must be positive; a zero-resistance strip has no far-end drop to bound the run", source: "strip datasheet" },
     ],
   },
+  "pool-volume": {
+    formula: "gallons = surface_area x avg_depth x 7.48052 gal/ft^3; avg_depth = (shallow + deep)/2. Rectangle area = L x W; round = pi (D/2)^2; oval = (pi/4) L x W.",
+    edition: "First-principles geometry with the 7.48052 gal/ft^3 conversion; the pool-volume method per the NSPF CPO Handbook (by name).",
+    freeAccess: "The area formulas and the gal/ft^3 conversion are public; CPO course materials proprietary.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (geometry and a fixed unit conversion). Average depth = (shallow + deep)/2 assumes a floor that slopes linearly from the shallow to the deep end; a deep-end hopper, spa, steps, or a constant-radius bowl holds a bit less than the straight prism, so the gallonage is a field estimate. Every chemical dose is figured per this volume, so a metered fill or a plan takeoff is preferable when accuracy matters.",
+    assumptions: [
+      { name: "Conversion", value: "7.48052 gal per cubic foot", source: "US customary" },
+      { name: "Average depth", value: "(shallow + deep)/2 for a linearly sloping floor", source: "NSPF CPO pool-volume method" },
+      { name: "Shape area", value: "rectangle L x W; round pi (D/2)^2; oval (pi/4) L x W", source: "plane geometry" },
+    ],
+  },
   "pool-alkalinity-adjust": {
     formula: "Raise: ~1.5 lb sodium bicarbonate per 10,000 gal per 10 ppm; lower: ~25 fl oz of 31.45% (20 Baume) muriatic acid per 10,000 gal per 10 ppm.",
     edition: "NSPF CPO Handbook / ANSI-APSP-ICC dosing tables (by name).",

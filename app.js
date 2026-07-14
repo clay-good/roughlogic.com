@@ -999,6 +999,7 @@ const TOOL_MODULES = (() => {
     // spec-v576
     "chlorine-cylinder-withdrawal",
     // v93 pool and spa chemical balance
+    "pool-volume",
     "pool-alkalinity-adjust", "pool-cya-dose", "pool-salt-dose",
     "pool-chlorine-dose", "pool-heater-btu", "pool-heater-size", "breakpoint-chlorination",
   ]);

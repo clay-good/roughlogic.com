@@ -49951,6 +49951,42 @@
    }
   },
   {
+   "tile_id": "pool-volume",
+   "source_publisher": "NSPF CPO pool-volume method / plane geometry",
+   "source_title": "32 x 16 ft rectangle, 3 to 8 ft deep -> 21,065 gal",
+   "source_edition_or_year": "gallons = area x avg depth x 7.48052",
+   "source_section_or_page": "avg = (3+8)/2 = 5.5; area = 512; vol = 2816 ft^3; gal = 2816 x 7.48052 = 21065.1",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "shape": "rectangle",
+    "length_ft": 32,
+    "width_ft": 16,
+    "shallow_ft": 3,
+    "deep_ft": 8
+   },
+   "outputs": {
+    "area_ft2": {
+     "value": 512,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "avg_depth_ft": {
+     "value": 5.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "gallons": {
+     "value": 21065.1,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pool-heater-size",
    "source_publisher": "thermodynamics (inverse)",
    "source_title": "20,000 gal, +10 F, in 5.2 h at 80% -> 400,000 Btu/h (round-trips pool-heater-btu)",

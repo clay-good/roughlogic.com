@@ -3907,6 +3907,31 @@
       "kind": "redirect"
     },
     {
+      "term": "pool volume in gallons",
+      "target": "pool-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how many gallons is my pool",
+      "target": "pool-volume",
+      "kind": "question"
+    },
+    {
+      "term": "pool water volume",
+      "target": "pool-volume",
+      "kind": "question"
+    },
+    {
+      "term": "gallons in a pool",
+      "target": "pool-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how big is my pool",
+      "target": "pool-volume",
+      "kind": "question"
+    },
+    {
       "term": "pool turnover",
       "target": "pool-turnover",
       "kind": "industry"
