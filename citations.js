@@ -5142,6 +5142,17 @@ export const CITATIONS = {
       { name: "Application-rate defaults", value: "0.10 gpm/ft² Class A; 0.16 gpm/ft² Class B AFFF (NFPA 11 typical)", source: "NFPA 11" },
     ],
   },
+  "foam-max-coverage-area": {
+    formula: "max_area_ft2 = available_concentrate_gal / (application_rate_gpm_per_ft2 × (foam_percentage/100) × duration_min), the NFPA 11 concentrate = area × rate × pct × duration relation solved for the area.",
+    edition: "NFPA 11 (Standard for Low-, Medium-, and High-Expansion Foam) by name; manufacturer foam-concentrate technical data (National Foam, Chemguard, Solberg) by name.",
+    freeAccess: "NFPA 11 read-only at nfpa.org/freeaccess.",
+    governance: GOVERNANCE.fire,
+    editionNote: "The inverse of foam: the largest fire area the concentrate on the apparatus can cover for the full duration. A lower application rate, a leaner concentrate percentage, or a shorter duration stretches the same load over more area, but the rate and duration come from the fuel (hydrocarbon vs polar solvent) and the department SOP, not convenience. A master-stream / fixed-supply planning number; the foam type, the burnback resistance, and the incident commander govern.",
+    assumptions: [
+      { name: "Application-rate defaults", value: "0.10 gpm/ft² Class A; 0.16 gpm/ft² Class B AFFF (NFPA 11 typical)", source: "NFPA 11" },
+      { name: "Fixed supply", value: "the concentrate on hand is the constraint; rate and duration are set by the fuel and SOP", source: "NFPA 11 / department SOP" },
+    ],
+  },
   "smoke-reading": {
     formula: "(reference page; no compute) Volume / velocity / density / color interpretation framework from Dave Dodson's 'Reading Smoke' methodology, by name.",
     edition: "Dave Dodson 'Reading Smoke' fire-service training materials by name; NFA Tactical-Decision-Making materials.",

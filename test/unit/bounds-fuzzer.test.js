@@ -462,6 +462,7 @@ import {
   computeRequiredFireFlow,
   computeAerialLadderReach,
   computeFoam,
+  computeFoamMaxCoverageArea,
   computeMasterStreamReach,
   computeReverseLayFriction,
   computeSprinklerDensity,
@@ -843,6 +844,33 @@ test("bounds: calc-fire computeFoam is finite-positive across typical fire areas
       }
     }
   }
+});
+
+test("bounds: spec-v723 computeFoamMaxCoverageArea pins area = conc/(rate*pct*dur), round-trips through computeFoam, and error seams", () => {
+  const r = computeFoamMaxCoverageArea({ available_concentrate_gal: 100, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_area_ft2 - 100 / (0.10 * 0.03 * 15)) < 1e-6, `area identity: ${r.max_area_ft2}`);
+  assert.ok(Math.abs(r.max_area_ft2 - 2222.2222) < 1e-2, `pinned 2222 ft^2: ${r.max_area_ft2}`);
+  // Round-trip: at the max area the forward tile's concentrate equals the available concentrate.
+  for (const available_concentrate_gal of [50, 100, 500]) {
+    for (const application_rate_gpm_per_ft2 of [0.10, 0.16, 0.24]) {
+      for (const foam_percentage of [1, 3, 6]) {
+        const m = computeFoamMaxCoverageArea({ available_concentrate_gal, application_rate_gpm_per_ft2, foam_percentage, duration_min: 15 });
+        assert.ok(!m.error, `sweep c=${available_concentrate_gal} r=${application_rate_gpm_per_ft2} p=${foam_percentage}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_area_ft2, "area"); assert.ok(m.max_area_ft2 > 0, "area positive");
+        const back = computeFoam({ fire_area_ft2: m.max_area_ft2, application_rate_gpm_per_ft2, foam_percentage, duration_min: 15 });
+        assert.ok(Math.abs(back.total_concentrate_gallons - available_concentrate_gal) < 1e-6, `round-trip c=${available_concentrate_gal} r=${application_rate_gpm_per_ft2} p=${foam_percentage}: ${back.total_concentrate_gallons}`);
+      }
+    }
+  }
+  // A leaner concentrate percentage stretches the same load over more area.
+  assert.ok(computeFoamMaxCoverageArea({ available_concentrate_gal: 100, application_rate_gpm_per_ft2: 0.10, foam_percentage: 1, duration_min: 15 }).max_area_ft2 > r.max_area_ft2);
+  // Error seams: non-positive concentrate, rate, percentage, duration, non-finite.
+  assert.ok("error" in computeFoamMaxCoverageArea({ available_concentrate_gal: 0, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 }));
+  assert.ok("error" in computeFoamMaxCoverageArea({ available_concentrate_gal: 100, application_rate_gpm_per_ft2: 0, foam_percentage: 3, duration_min: 15 }));
+  assert.ok("error" in computeFoamMaxCoverageArea({ available_concentrate_gal: 100, application_rate_gpm_per_ft2: 0.10, foam_percentage: 0, duration_min: 15 }));
+  assert.ok("error" in computeFoamMaxCoverageArea({ available_concentrate_gal: 100, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 0 }));
+  assert.ok("error" in computeFoamMaxCoverageArea({ available_concentrate_gal: Infinity, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 }));
 });
 
 test("bounds: calc-fire computeMasterStreamReach rejects unknown nozzle type (documented)", () => {

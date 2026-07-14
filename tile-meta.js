@@ -244,7 +244,7 @@ const _TILES = [
 
   ["fire-friction", "F"], ["pdp", "F"], ["hydrant-flow", "F"],
   ["required-fire-flow", "F"], ["master-stream", "F"], ["aerial-ladder", "F"],
-  ["foam", "F"], ["smoke-reading", "F"], ["reverse-lay-friction", "F"],
+  ["foam", "F"], ["foam-max-coverage-area", "F"], ["smoke-reading", "F"], ["reverse-lay-friction", "F"],
   ["sprinkler-density", "F"], ["standpipe-friction", "F"], ["ladder-pipe-reach", "F"],
   ["braking-distance", "F"], ["confined-space-purge", "F"], ["rope-ma", "F"],
   ["sling-angle", "F"], ["iso-nff", "F"],

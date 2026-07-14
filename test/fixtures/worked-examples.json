@@ -4796,6 +4796,29 @@
    }
   },
   {
+   "tile_id": "foam-max-coverage-area",
+   "source_publisher": "NFPA",
+   "source_title": "max_area = concentrate / (rate * pct * duration); inverse of the foam-concentrate tile",
+   "source_edition_or_year": "NFPA 11 (current edition)",
+   "source_section_or_page": "100 gal concentrate, 0.10 gpm/ft^2, 3%, 15 min -> 2,222 ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_concentrate_gal": 100,
+    "application_rate_gpm_per_ft2": 0.1,
+    "foam_percentage": 3,
+    "duration_min": 15
+   },
+   "outputs": {
+    "max_area_ft2": {
+     "value": 2222.2222,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sprinkler-density",
    "source_publisher": "NFPA",
    "source_title": "Sprinkler total flow = area_of_operation * density_gpm_per_ft^2; hazard density floors per occupancy table",

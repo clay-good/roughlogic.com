@@ -312,6 +312,7 @@ const RELATED = {
   "required-fire-flow": ["hydrant-flow", "fire-friction", "iso-nff", "sprinkler-density"],
   "master-stream": ["fire-friction", "pdp", "ladder-pipe-reach"],
   "foam": ["fire-friction", "pdp"],
+  "foam-max-coverage-area": ["foam", "foam-eductor-limit", "master-stream", "pdp"],
   "rope-ma": ["pulley-ma-gen", "sling-angle"],
 
   // Group E: Construction. The framing ladder runs rafter ->

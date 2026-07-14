@@ -648,7 +648,7 @@ const TOOL_MODULES = (() => {
   ]);
   declare("./calc-fire.js", "FIRE_RENDERERS", [
     "fire-friction", "pdp", "hydrant-flow", "required-fire-flow",
-    "master-stream", "aerial-ladder", "foam", "smoke-reading",
+    "master-stream", "aerial-ladder", "foam", "foam-max-coverage-area", "smoke-reading",
     // v2
     "reverse-lay-friction", "sprinkler-density", "standpipe-friction",
     "ladder-pipe-reach", "braking-distance",

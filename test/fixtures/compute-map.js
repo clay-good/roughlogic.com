@@ -283,6 +283,7 @@ export const COMPUTE_MAP = {
   "grease-interceptor-flow-capacity": { module: "../../calc-plumbing.js", fn: "computeGreaseInterceptorFlowCapacity" },
   "aerial-ladder": { module: "../../calc-fire.js", fn: "computeAerialLadderReach" },
   "foam": { module: "../../calc-fire.js", fn: "computeFoam" },
+  "foam-max-coverage-area": { module: "../../calc-fire.js", fn: "computeFoamMaxCoverageArea" },
   "sprinkler-density": { module: "../../calc-fire.js", fn: "computeSprinklerDensity" },
   "rope-ma": { module: "../../calc-rescue.js", fn: "computeRopeMA" },
   "pulley-ma-gen": { module: "../../calc-cross.js", fn: "computePulleyMA" },

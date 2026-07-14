@@ -70202,6 +70202,31 @@
       "kind": "question"
     },
     {
+      "term": "how big an area can my foam cover",
+      "target": "foam-max-coverage-area",
+      "kind": "question"
+    },
+    {
+      "term": "max area from foam concentrate",
+      "target": "foam-max-coverage-area",
+      "kind": "question"
+    },
+    {
+      "term": "foam coverage from gallons on hand",
+      "target": "foam-max-coverage-area",
+      "kind": "question"
+    },
+    {
+      "term": "biggest spill my foam load handles",
+      "target": "foam-max-coverage-area",
+      "kind": "question"
+    },
+    {
+      "term": "area a foam supply covers",
+      "target": "foam-max-coverage-area",
+      "kind": "question"
+    },
+    {
       "term": "foam concentrate gallons for a fuel spill",
       "target": "foam",
       "kind": "question"

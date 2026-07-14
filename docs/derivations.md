@@ -1952,6 +1952,7 @@ cross-check.
 | calc-fire.js | `computeFireStreamReaction` | `{ nozzle_type = "smooth", bore_in = 0, flow_gpm = 0, nozzle_pressure_psi = 0 ...` | _ | _ | _ |
 | calc-fire.js | `computeFoam` | `{ fire_area_ft2, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, du...` | _ | _ | _ |
 | calc-fire.js | `computeFoamEductorLimit` | `{ inlet_pressure_psi = 0, eductor_flow_gpm = 0, hose_coefficient = 0, nozzle_...` | _ | _ | _ |
+| calc-fire.js | `computeFoamMaxCoverageArea` | `{ available_concentrate_gal = 0, application_rate_gpm_per_ft2 = 0.10, foam_pe...` | _ | _ | _ |
 | calc-fire.js | `computeHydrantAvailableFlow` | `{ static_psi = 0, residual_psi = 0, qf_gpm = 0 } = {}` | _ | _ | _ |
 | calc-fire.js | `computeHydrantFlow` | `{ pitot_psi, outlet_diameter_in, c = 0.9 }` | _ | _ | _ |
 | calc-fire.js | `computeIowaRateOfFlow` | `{ length_ft = 0, width_ft = 0, height_ft = 0 } = {}` | _ | _ | _ |
@@ -2832,7 +2833,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1418.
+Row count: 1419.
 
 <!-- END function-corpus-v14 -->
 
@@ -3613,7 +3614,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (42 tiles)
+### Group F Fire-ground (43 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3628,6 +3629,7 @@ per spec-v14 §13.1 second paragraph.
 | `fire-stream-reaction` | Nozzle / Fire-Stream Reaction Force | IFSTA Pumping Apparatus Driver/Operat...; 1.0 in smooth bore @ 50 psi -> NR = 1.57 * 1 * 50 = 78.5 lb | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam` | Foam Concentrate | NFPA; 1500 ft^2 fire / 0.10 gpm/ft^2 application / 3% concentra... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `foam-eductor-limit` | Foam Eductor Back-Pressure / Hose-Lay Limit | IFSTA / eductor manufacturer data (TF...; 200 psi inlet, 95 gpm eductor, C 15.5, 100 psi nozzle, 30... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `foam-max-coverage-area` | Max Fire Area from Available Foam Concentrate | NFPA; 100 gal concentrate, 0.10 gpm/ft^2, 3%, 15 min -> 2,222 ft^2 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hydrant-available-flow` | Hydrant Rated Flow at 20 psi (NFPA 291) | NFPA 291; spec-v389 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydrant-flow` | Hydrant Flow | NFPA; Q = 29.83 * c * d^2 * sqrt(P) = 29.83 * 0.9 * 6.25 * sqrt... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `iowa-rate-of-flow` | Iowa Rate-of-Flow (Volume Method) | Iowa rate-of-flow formula (Royer-Nels...; 20 x 30 x 10 ft room = 6,000 ft3 -> 30 gal to control, 60... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4189,6 +4191,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1171. Fixture-covered or reference-cadence: 1171 / 1171.
+Tile count: 1172. Fixture-covered or reference-cadence: 1172 / 1172.
 
 <!-- END tile-index-v14 -->

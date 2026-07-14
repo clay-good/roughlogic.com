@@ -223,6 +223,58 @@ export const foamExample = {
   inputs: { fire_area_ft2: 1500, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 },
 };
 
+// foam-max-coverage-area: inverse of foam. The forward tile gives the concentrate
+// needed for a fire area; on the fireground the concentrate on the apparatus is
+// fixed and the question is how big an area it can cover. From
+// concentrate = area x rate x (pct/100) x duration,
+// max_area = concentrate / (rate x (pct/100) x duration).
+// dims: in { available_concentrate_gal: L^3, application_rate_gpm_per_ft2: L T^-1, foam_percentage: dimensionless, duration_min: T } out: { max_area_ft2: L^2 }
+export function computeFoamMaxCoverageArea({ available_concentrate_gal = 0, application_rate_gpm_per_ft2 = 0.10, foam_percentage = 3, duration_min = 15 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const conc = Number(available_concentrate_gal) || 0;
+  const rate = Number(application_rate_gpm_per_ft2) || 0;
+  const pct = Number(foam_percentage) || 0;
+  const dur = Number(duration_min) || 0;
+  if (!(conc > 0)) return { error: "Available concentrate must be positive (gal)." };
+  if (!(rate > 0)) return { error: "Application rate must be positive." };
+  if (!(pct > 0)) return { error: "Foam percentage must be positive." };
+  if (!(dur > 0)) return { error: "Duration must be positive (min)." };
+  const max_area_ft2 = conc / (rate * (pct / 100) * dur);
+  return {
+    max_area_ft2,
+    note: "The largest fire area the concentrate on hand can cover for the full duration: max area = concentrate / (application rate x foam percentage x duration). A lower application rate, a leaner concentrate percentage, or a shorter duration stretches the same load over more area - but the rate and duration come from the fuel (hydrocarbon vs polar solvent) and the department SOP, not convenience. This is the master-stream / fixed-supply planning number; the actual foam type, the burnback resistance, and the incident commander govern.",
+  };
+}
+export const foamMaxCoverageAreaExample = {
+  inputs: { available_concentrate_gal: 100, application_rate_gpm_per_ft2: 0.10, foam_percentage: 3, duration_min: 15 },
+};
+function renderFoamMaxCoverageArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Foam concentrate = area * application rate * foam percentage * duration, solved for the area: max area = concentrate / (rate * pct * duration). Application rate and duration from the fuel type and departmental SOP.";
+  const conc = makeNumber("Available concentrate (gal)", "fma-c", { step: "any", min: "0" });
+  const r = makeNumber("Application rate (gpm/ft^2)", "fma-r", { step: "any", min: "0", value: "0.10" });
+  r.input.value = "0.10";
+  const pct = makeNumber("Foam concentrate (percent)", "fma-pct", { step: "any", min: "0", max: "10", value: "3" });
+  pct.input.value = "3";
+  const dur = makeNumber("Duration (min)", "fma-d", { step: "any", min: "0", value: "15" });
+  dur.input.value = "15";
+  for (const f of [conc, r, pct, dur]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { conc.input.value = "100"; r.input.value = "0.10"; pct.input.value = "3"; dur.input.value = "15"; update(); });
+  const oA = makeOutputLine(outputRegion, "Max coverage area", "fma-out-a");
+  const oN = makeOutputLine(outputRegion, "Note", "fma-out-n");
+  const update = debounce(() => {
+    const x = computeFoamMaxCoverageArea({
+      available_concentrate_gal: Number(conc.input.value) || 0,
+      application_rate_gpm_per_ft2: Number(r.input.value) || 0,
+      foam_percentage: Number(pct.input.value) || 0,
+      duration_min: Number(dur.input.value) || 0,
+    });
+    if (x.error) { oA.textContent = x.error; oN.textContent = "-"; return; }
+    oA.textContent = fmt(x.max_area_ft2, 0) + " ft^2";
+    oN.textContent = x.note;
+  }, DEBOUNCE_MS);
+  for (const el of [conc.input, r.input, pct.input, dur.input]) el.addEventListener("input", update);
+}
+
 // --- Utility 58: Smoke Reading Reference ---
 
 export const SMOKE_READING = [
@@ -773,6 +825,7 @@ export const FIRE_RENDERERS = {
   "master-stream": renderMasterStream,
   "aerial-ladder": renderAerialLadder,
   "foam": renderFoam,
+  "foam-max-coverage-area": renderFoamMaxCoverageArea,
   "smoke-reading": renderSmokeReading,
   // v2
   "reverse-lay-friction": renderReverseLayFriction,
