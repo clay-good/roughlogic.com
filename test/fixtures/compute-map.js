@@ -115,6 +115,7 @@ export const COMPUTE_MAP = {
   "bridge-formula": { module: "../../calc-trucking.js", fn: "computeBridgeFormula" },
   "bridge-formula-min-spacing": { module: "../../calc-trucking.js", fn: "computeBridgeFormulaMinSpacing" },
   "wind-chill": { module: "../../calc-cross.js", fn: "computeWindChill" },
+  "wind-chill-wind-speed": { module: "../../calc-cross.js", fn: "computeWindChillWindSpeed" },
   "dim-weight": { module: "../../calc-trucking.js", fn: "computeDIM" },
   "material-cost": { module: "../../calc-cross.js", fn: "computeMaterialCost" },
   "loan-payment": { module: "../../calc-cross.js", fn: "computeLoanPayment" },

@@ -1227,6 +1227,32 @@ export function computeWindChill({ T_F = 0, wind_mph = 0 }) {
 
 export const windChillExample = { inputs: { T_F: 5, wind_mph: 25 } };
 
+// wind-chill-wind-speed: inverse of wind-chill. The forward tile gives the wind chill from the temperature and wind speed;
+// the inverse recovers the wind speed that produces a target (or reported) wind chill at a known air temperature. From
+// the NWS 2001 formula WC = 35.74 + 0.6215 T - 35.75 w^0.16 + 0.4275 T w^0.16, group the w^0.16 term:
+// w^0.16 = (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75), so w = [ ... ]^(1/0.16). Valid for T <= 50 F and the resulting
+// w >= 3 mph (the formula's domain).
+// dims: in { T_F: T, target_wc_F: T } out: { wind_mph: L T^-1 }
+export function computeWindChillWindSpeed({ T_F = 0, target_wc_F = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const T = Number(T_F);
+  const WC = Number(target_wc_F);
+  if (!Number.isFinite(T) || !Number.isFinite(WC)) return { error: "Temperatures must be finite (F)." };
+  if (T > 50) return { error: "Wind chill formula is valid for T <= 50 F." };
+  const num = WC - 35.74 - 0.6215 * T;
+  const den = 0.4275 * T - 35.75; // negative for T <= 50 F
+  const ratio = num / den;
+  if (!(ratio > 0)) return { error: "The target wind chill is warmer than the still-air value at this temperature; no wind produces it." };
+  const wind_mph = Math.pow(ratio, 1 / 0.16);
+  if (!Number.isFinite(wind_mph)) return { error: "Wind-speed math is not a finite value." };
+  if (wind_mph < 3) return { error: "At this air temperature the wind chill does not reach the target until below 3 mph, where the NWS formula does not apply (the ambient temperature governs). Enter a colder target or a lower air temperature." };
+  return {
+    wind_mph,
+    note: "Wind speed for a target wind chill: from the NWS 2001 formula, w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16). Valid for an air temperature at or below 50 F and a resulting wind speed of at least 3 mph (below 3 mph the formula does not apply and the ambient temperature governs). Wind chill is a felt-temperature index for exposed skin, not a measured temperature, and the formula assumes a standard face height and clear skies; blowing snow, sun, and wet skin all shift the real exposure risk. A reference estimate; the NWS advisory and local conditions govern.",
+  };
+}
+export const windChillWindSpeedExample = { inputs: { T_F: 5, target_wc_F: -19 } };
+
 // --- Utility 166: Ladder Placement Angle ---
 
 // dims: in { ladder_length_ft: L, working_height_ft: L } out: { angle_deg: dimensionless, base_distance_ft: L }
@@ -1523,6 +1549,20 @@ const renderWindChill = _simpleRendererG({
   compute: computeWindChill,
 });
 
+const renderWindChillWindSpeed = _simpleRendererG({
+  citation: "Citation: NWS 2001 wind chill formula solved for the wind speed: w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16). Valid for T <= 50 F and w >= 3 mph. A reference estimate; the NWS advisory governs.",
+  example: windChillWindSpeedExample.inputs,
+  fields: [
+    { key: "T_F", label: "Ambient temp (F, <= 50)", kind: "number" },
+    { key: "target_wc_F", label: "Target / reported wind chill (F)", kind: "number" },
+  ],
+  outputs: [
+    { key: "w", id: "wcw-out-w", label: "Wind speed", value: (r) => _fmtG(r.wind_mph, 1) + " mph" },
+    { key: "n", id: "wcw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWindChillWindSpeed,
+});
+
 const renderLadderAngle = _simpleRendererG({
   citation: "Citation: OSHA 1926.1053 by section number only. 4:1 rule; pass/fail at 75.5 deg +/- 3 deg.",
   example: ladderAngleExample.inputs,
@@ -1695,6 +1735,7 @@ export const CROSS_RENDERERS = {
   "niosh-lifting": renderNIOSHLifting,
   "heat-stress": renderHeatStress,
   "wind-chill": renderWindChill,
+  "wind-chill-wind-speed": renderWindChillWindSpeed,
   "ladder-angle": renderLadderAngle,
   "pulley-ma-gen": renderPulleyMAGen,
   "ramp-slope": renderRampSlope,

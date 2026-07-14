@@ -6068,6 +6068,7 @@ import {
   computeNIOSHLifting,
   computeHeatStress,
   computeWindChill,
+  computeWindChillWindSpeed,
   computeLadderAngle,
   computePulleyMA,
   computeRampSlope,
@@ -6481,6 +6482,27 @@ test("bounds: calc-cross computeWindChill pins NWS 2001 wind chill formula on th
   assert.strictEqual(calm.frostbite_minutes, null);
   // Temperature > 50 F rejected (formula not valid).
   assert.ok("error" in computeWindChill({ T_F: 60, wind_mph: 10 }));
+});
+
+test("bounds: spec-v758 wind speed from wind chill and temperature (inverse of wind-chill)", () => {
+  const p = computeWindChillWindSpeed({ T_F: 5, target_wc_F: -19 });
+  assert.ok(Math.abs(p.wind_mph - 29.76) < 0.1);
+  // round-trip: the recovered wind speed fed to wind-chill reproduces the target wind chill
+  for (const [T, wc] of [[5, -19], [20, 5], [-10, -35], [40, 30]]) {
+    const inv = computeWindChillWindSpeed({ T_F: T, target_wc_F: wc });
+    if (inv.error) continue;
+    const fwd = computeWindChill({ T_F: T, wind_mph: inv.wind_mph });
+    assert.ok(Math.abs(fwd.wind_chill_F - wc) < 1e-6);
+    assert.ok(inv.wind_mph >= 3);
+  }
+  // a colder target wind chill at the same temperature needs more wind
+  assert.ok(computeWindChillWindSpeed({ T_F: 5, target_wc_F: -25 }).wind_mph > computeWindChillWindSpeed({ T_F: 5, target_wc_F: -19 }).wind_mph);
+  // a target warmer than the still-air value has no wind solution (or needs < 3 mph)
+  assert.ok("error" in computeWindChillWindSpeed({ T_F: 5, target_wc_F: 4 })); // ~2 mph would be needed -> below 3
+  // temperature over 50 F is out of the formula domain
+  assert.ok("error" in computeWindChillWindSpeed({ T_F: 60, target_wc_F: 40 }));
+  // non-finite
+  assert.ok("error" in computeWindChillWindSpeed({ T_F: Infinity, target_wc_F: -19 }));
 });
 
 test("bounds: calc-cross computeLadderAngle pins OSHA 4:1 base distance + sin(angle) = height/length + 75.5 +/- 3 deg pass band on the spec 24 ft / 23 ft example", () => {

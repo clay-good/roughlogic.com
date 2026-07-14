@@ -5579,6 +5579,17 @@ export const CITATIONS = {
       { name: "Default acclimatization", value: "user-supplied (acclimatized vs. unacclimatized worker)", source: "OSHA Heat Illness Prevention" },
     ],
   },
+  "wind-chill-wind-speed": {
+    formula: "w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16), the inverse of the NWS 2001 wind chill WC = 35.74 + 0.6215 T - 35.75 w^0.16 + 0.4275 T w^0.16 (T in F). Valid for T <= 50 F and w >= 3 mph.",
+    edition: "NWS Wind Chill Temperature Index, 2001 revision, solved for the wind speed.",
+    freeAccess: "Free at weather.gov/safety/cold-wind-chill.",
+    governance: GOVERNANCE.general,
+    editionNote: "The wind speed that produces a target or reported wind chill at a known air temperature, the inverse of the NWS 2001 formula: group the w^0.16 term to get w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16). Valid for an air temperature at or below 50 F and a resulting wind speed of at least 3 mph (below 3 mph the formula does not apply and the ambient temperature governs). Wind chill is a felt-temperature index for exposed skin at a standard face height under clear skies, not a measured temperature; blowing snow, sun, and wet skin shift the real exposure risk. A reference estimate; the NWS advisory and local conditions govern.",
+    assumptions: [
+      { name: "Domain", value: "valid for T <= 50 F and w >= 3 mph; below 3 mph the ambient temperature governs", source: "NWS 2001 formula" },
+      { name: "Felt-temperature index", value: "wind chill is a felt-temperature index for exposed skin, not a measured temperature", source: "NWS Wind Chill Chart" },
+    ],
+  },
   "wind-chill": {
     formula: "NWS 2001 Wind Chill: WC = 35.74 + 0.6215 × T − 35.75 × V^0.16 + 0.4275 × T × V^0.16 (T °F, V mph, valid V ≥ 3 mph).",
     edition: "NWS Wind Chill Temperature Index, 2001 revision.",

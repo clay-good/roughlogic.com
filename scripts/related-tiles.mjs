@@ -834,6 +834,7 @@ const RELATED = {
   "slope-from-level": ["slope", "ramp-slope", "trench-slope"],
   "trench-slope": ["slope", "slope-from-level", "excavation-bench-plan"],
   "wind-chill": ["heat-stress", "noise-dose"],
+  "wind-chill-wind-speed": ["wind-chill", "heat-stress", "noise-dose"],
   "ramp-slope": ["slope-from-level", "slope"],
   "ada-ramp-slope": ["ramp-slope", "stair-stringer", "egress-capacity", "egress-travel-distance"],
   "rainwater-yield": ["rainwater-catchment-area", "stormwater-rational"],

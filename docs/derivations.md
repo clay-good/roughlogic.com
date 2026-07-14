@@ -1718,6 +1718,7 @@ cross-check.
 | calc-cross.js | `computeVbeltDrive` | `{ driver_rpm = 0, driven_rpm = 0, driver_hp = 0, driver_pitch_diameter_in = 0...` | _ | _ | _ |
 | calc-cross.js | `computeVehicleLoad` | `{ wheelbase_in = 0, payload_lb = 0, payload_position_from_cab_in = 0, gvwr_lb...` | _ | _ | _ |
 | calc-cross.js | `computeWindChill` | `{ T_F = 0, wind_mph = 0 }` | _ | _ | _ |
+| calc-cross.js | `computeWindChillWindSpeed` | `{ T_F = 0, target_wc_F = 0 } = {}` | _ | _ | _ |
 | calc-cross.js | `convertTemperature` | `{ value, from, to }` | _ | _ | _ |
 | calc-cross.js | `convertUnit` | `{ category, value, from, to }` | _ | _ | _ |
 | calc-cross.js | `renderDilution` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2867,7 +2868,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1453.
+Row count: 1454.
 
 <!-- END function-corpus-v14 -->
 
@@ -3716,7 +3717,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (61 tiles)
+### Group G Cross-trade (62 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3781,6 +3782,7 @@ per spec-v14 §13.1 second paragraph.
 | `vbelt-drive` | V-Belt Sheave and Drive Sizing | ANSI/RMA / Gates; L = 2C + (pi/2)(D1+D2) + (D2-D1)^2/(4C); design_HP = HP*SF | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `vehicle-load` | Vehicle Load Distribution | Project (first-principles) over FMVSS...; 140 in wheelbase / 1000 lb payload at 60 in from cab / 88... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wind-chill` | Wind Chill Exposure | NWS; T_wc = 35.74 + 0.6215 T - 35.75 V^0.16 + 0.4275 T V^0.16 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `wind-chill-wind-speed` | Wind Speed from Wind Chill and Temperature | NWS (2001 formula, solved for wind sp...; spec-v758 pinned example: 5 F air, -19 F wind chill -> ~2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group H References (15 tiles)
 
@@ -4259,6 +4261,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1206. Fixture-covered or reference-cadence: 1206 / 1206.
+Tile count: 1207. Fixture-covered or reference-cadence: 1207 / 1207.
 
 <!-- END tile-index-v14 -->

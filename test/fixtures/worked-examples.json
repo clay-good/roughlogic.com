@@ -277,6 +277,27 @@
    }
   },
   {
+   "tile_id": "wind-chill-wind-speed",
+   "source_publisher": "NWS (2001 formula, solved for wind speed)",
+   "source_title": "w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16)",
+   "source_edition_or_year": "2001",
+   "source_section_or_page": "spec-v758 pinned example: 5 F air, -19 F wind chill -> ~29.8 mph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "T_F": 5,
+    "target_wc_F": -19
+   },
+   "outputs": {
+    "wind_mph": {
+     "value": 29.76,
+     "tolerance": {
+      "abs": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "egc-sizing",
    "source_publisher": "NFPA",
    "source_title": "NEC Table 250.122",

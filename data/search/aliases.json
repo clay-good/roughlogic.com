@@ -3367,6 +3367,26 @@
       "kind": "adjacent"
     },
     {
+      "term": "wind speed from wind chill",
+      "target": "wind-chill-wind-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "wind from wind chill",
+      "target": "wind-chill-wind-speed",
+      "kind": "redirect"
+    },
+    {
+      "term": "what wind for wind chill",
+      "target": "wind-chill-wind-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "wind speed from felt temp",
+      "target": "wind-chill-wind-speed",
+      "kind": "adjacent"
+    },
+    {
       "term": "freeze warning",
       "target": "wind-chill",
       "kind": "adjacent"

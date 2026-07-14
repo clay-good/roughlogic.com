@@ -723,7 +723,7 @@ const TOOL_MODULES = (() => {
     "loan-payment", "upgrade-roi", "mileage-cost", "overtime", "per-diem",
     "geometry", "dilution", "slope-from-level", "haversine",
     // v3 (meta-utilities 170 and 172 are registered separately below; the rest live here)
-    "trench-slope", "niosh-lifting", "heat-stress", "wind-chill", "ladder-angle",
+    "trench-slope", "niosh-lifting", "heat-stress", "wind-chill", "wind-chill-wind-speed", "ladder-angle",
     "pulley-ma-gen", "ramp-slope", "rainwater-yield", "rainwater-catchment-area", "timesheet", "vehicle-load",
     // v7
     "fall-protection-clearance",

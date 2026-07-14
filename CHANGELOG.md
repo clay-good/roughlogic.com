@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(cross): spec-v758 wind speed from wind chill and temperature (wind-chill inverse); 2026-07-14
+
+- New tile `wind-chill-wind-speed` (Group G, calc-cross.js): the wind speed that produces a target/reported wind chill at
+  a known air temperature. `w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16)` (NWS 2001). At 5 F air, a -19 F
+  wind chill implies ~30 mph. Valid for T <= 50 F and w >= 3 mph. Round-trips through `wind-chill`. Home tile count 1,206
+  -> 1,207.
+
 ### feat(septic): spec-v757 septic LPP squirt head for a target orifice flow (septic-lpp-orifice inverse); 2026-07-14
 
 - New tile `septic-lpp-squirt-head` (Group B, calc-septic.js): the squirt head (residual pressure) that produces a target
