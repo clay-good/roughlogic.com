@@ -950,6 +950,7 @@ const RELATED = {
   // spec-v66 Group Z hardware and below-the-hook
   "shackle-eyebolt-wll": ["sling-angle", "rigging-check", "cg-load-share"],
   "spreader-beam": ["cg-load-share", "sling-angle", "crane-net-capacity"],
+  "spreader-beam-min-height": ["spreader-beam", "sling-angle", "cg-load-share"],
   "forklift-capacity-derate": ["pallet-loadout", "axle-load-distribution", "crane-net-capacity"],
   "roller-jack-force": ["block-redirect-load", "chain-lever-hoist", "ramp-slope"],
   "chain-lever-hoist": ["pulley-ma-gen", "rope-ma", "block-redirect-load"],

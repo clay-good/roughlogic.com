@@ -1164,7 +1164,7 @@ const TOOL_MODULES = (() => {
     "cg-load-share", "crane-net-capacity", "crane-ground-bearing",
     "sling-d-d-efficiency", "wind-on-load", "max-wind-speed-for-lift", "tagline-force", "tandem-lift-share",
     // v66 hardware and below-the-hook
-    "shackle-eyebolt-wll", "spreader-beam", "forklift-capacity-derate",
+    "shackle-eyebolt-wll", "spreader-beam", "spreader-beam-min-height", "forklift-capacity-derate",
     "roller-jack-force", "chain-lever-hoist", "block-redirect-load", "block-redirect-max-angle",
     // spec-v117 multi-leg sling load per leg + wire-rope strength estimate.
     "multi-leg-sling", "wire-rope-strength", "wire-rope-diameter-for-wll",

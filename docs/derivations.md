@@ -2602,6 +2602,7 @@ cross-check.
 | calc-rigging.js | `computeSpanlineSagForTension` | `{ span_ft, load_lb_per_ft, allowable_tension_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeSpanlineSagTension` | `{ span_ft, load_lb_per_ft, sag_ft } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeSpreaderBeam` | `{ load_lb, bar_length_ft, top_height_ft } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeSpreaderBeamMinHeight` | `{ load_lb, bar_length_ft, sling_wll_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeTaglineForce` | `{ lateral_force_lb, tagline_angle_deg, per_person_lb = 50 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeTandemLiftShare` | `{ total_weight_lb, span_in, cg_from_c1_in, derate_pct = 75, c1_chart_lb, c2_c...` | _ | _ | _ |
 | calc-rigging.js | `computeThreePointBridle` | `{ apex_load_lb, e1_ft, n1_ft, r1_ft, e2_ft, n2_ft, r2_ft, e3_ft, n3_ft, r3_ft...` | _ | _ | _ |
@@ -2853,7 +2854,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1439.
+Row count: 1440.
 
 <!-- END function-corpus-v14 -->
 
@@ -4200,7 +4201,7 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (26 tiles)
+### Group Z (unnamed) (27 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4223,6 +4224,7 @@ per spec-v14 §13.1 second paragraph.
 | `spanline-sag-for-tension` | Spanned Cable Minimum Sag for a Tension Limit | Shallow-cable parabola statics (by na...; spec-v670 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spanline-sag-tension` | Spanned Cable Sag and Tension | Shallow-cable parabola statics (by name); spec-v484 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `spreader-beam` | Spreader Bar vs Lifting Beam Below the Hook | ASME BTH-1 / B30.20; 10,000 lb on a 10 ft bar, top 6 ft -> 50.2 deg, 6,509 lb ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `spreader-beam-min-height` | Spreader Beam Minimum Top-Point Height | ASME BTH-1 / B30.20 (solved for the h...; 10,000 lb on a 10 ft bar, 6,000 lb slings -> 56.4 deg, 7.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tagline-force` | Tag Line Pull and Handler Count | OSHA 1926 Subpart CC / rigging practice; 328 lb wind force, tag at 30 deg, 50 lb per person -> 378... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tandem-lift-share` | Tandem (Two-Crane) Lift Load Share | ASME B30.5 / OSHA 1926 Subpart CC; 40,000 lb, picks 300 in apart, CG 120 from crane 1, 75% d... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `three-point-bridle` | Three-Point Bridle Leg Tension (3-D) | Entertainment rigging bridle statics; 1,200 lb on three legs 120 deg apart, 6 ft out / 8 ft up ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4231,6 +4233,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1192. Fixture-covered or reference-cadence: 1192 / 1192.
+Tile count: 1193. Fixture-covered or reference-cadence: 1193 / 1193.
 
 <!-- END tile-index-v14 -->

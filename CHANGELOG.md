@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): spec-v744 spreader beam minimum top-point height (spreader-beam inverse); 2026-07-14
+
+- New tile `spreader-beam-min-height` (Group Z, calc-rigging.js): the minimum top-point height so the top-sling tension
+  stays within the sling WLL. `angle = asin( load / (2 x WLL) )`, then `top = (bar/2) x tan(angle)`. A 10,000 lb load on
+  a 10 ft bar with 6,000 lb slings needs at least 7.54 ft. Round-trips through `spreader-beam`. Home tile count 1,192 ->
+  1,193.
+
 ### feat(solar): spec-v743 PV max ambient temperature for a target power (pv-cell-temperature-power inverse); 2026-07-14
 
 - New tile `pv-max-ambient-for-power` (Group A, calc-solar.js): the highest ambient temperature a module still makes a

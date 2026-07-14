@@ -4482,6 +4482,31 @@
       "kind": "industry"
     },
     {
+      "term": "spreader beam height",
+      "target": "spreader-beam-min-height",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum headroom spreader",
+      "target": "spreader-beam-min-height",
+      "kind": "redirect"
+    },
+    {
+      "term": "spreader min height",
+      "target": "spreader-beam-min-height",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much headroom for spreader",
+      "target": "spreader-beam-min-height",
+      "kind": "adjacent"
+    },
+    {
+      "term": "top point height spreader",
+      "target": "spreader-beam-min-height",
+      "kind": "adjacent"
+    },
+    {
       "term": "lifting beam",
       "target": "spreader-beam",
       "kind": "industry"

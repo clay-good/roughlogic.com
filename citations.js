@@ -7535,6 +7535,17 @@ export const CITATIONS = {
       { name: "Design factor", value: "5:1 on the WLL (reported as MBS)", source: "ASME B30.26 / B30.9" },
     ],
   },
+  "spreader-beam-min-height": {
+    formula: "angle_min = asin( load / (2 x sling_wll) ); min_top_height = (bar_length/2) x tan(angle_min); bar_compression = (load/2) / tan(angle_min). The inverse of top_sling_tension = (load/2)/sin(angle) with angle = atan(top/(bar/2)); solvable only when sling_wll > load/2.",
+    edition: "ASME BTH-1 (Design of Below-the-Hook Lifting Devices) and ASME B30.20 by name, solved for the top-point height; first-principles statics.",
+    freeAccess: "ASME BTH-1 and B30.20 are published consensus standards. The statics are public.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The minimum top-point height so the top-sling tension stays within the sling WLL: a taller rig makes a steeper (nearer-vertical) sling that carries less tension, so this is a floor - build to at least this height, and more is safer. Each top sling still carries at least half the load even hung vertical, so the WLL must exceed W/2 or no height works. The spreader bar carries the axial compression reported - check it for buckling. Both spreader bars and lifting beams are engineered below-the-hook devices marked with a rated capacity; the rating plate governs. This tile sizes the demand, not the device.",
+    assumptions: [
+      { name: "Load split", value: "load split equally to two end pick points (W/2 each)", source: "first-principles" },
+      { name: "WLL floor", value: "the sling WLL must exceed half the load; each top sling carries at least W/2 even vertical", source: "statics" },
+    ],
+  },
   "spreader-beam": {
     formula: "sling_angle = atan(top_height / (bar_length/2)); top_sling_tension = (load/2)/sin(angle); bar_compression = (load/2)/tan(angle); beam_moment = (load/2)(bar_length/2); headroom = top_height.",
     edition: "ASME BTH-1 (Design of Below-the-Hook Lifting Devices) and ASME B30.20 by name; first-principles statics.",

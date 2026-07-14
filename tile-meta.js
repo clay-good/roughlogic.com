@@ -461,7 +461,7 @@ const _TILES = [
   ["cg-load-share", "Z"], ["crane-net-capacity", "Z"], ["crane-ground-bearing", "Z"],
   ["sling-d-d-efficiency", "Z"], ["wind-on-load", "Z"], ["max-wind-speed-for-lift", "Z"], ["tagline-force", "Z"], ["tandem-lift-share", "Z"],
   // v66 Group Z hardware and below-the-hook
-  ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["forklift-capacity-derate", "Z"],
+  ["shackle-eyebolt-wll", "Z"], ["spreader-beam", "Z"], ["spreader-beam-min-height", "Z"], ["forklift-capacity-derate", "Z"],
   ["roller-jack-force", "Z"], ["chain-lever-hoist", "Z"], ["block-redirect-load", "Z"], ["block-redirect-max-angle", "Z"],
   // v67 Group E earthwork and excavation deepening
   ["soil-swell-shrink", "E"], ["haul-cycle-production", "E"], ["dewatering-rate", "E"],

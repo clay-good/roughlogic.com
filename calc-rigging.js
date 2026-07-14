@@ -645,6 +645,56 @@ function renderSpreaderBeam(inputRegion, outputRegion, citationEl) {
 }
 RIGGING_RENDERERS["spreader-beam"] = renderSpreaderBeam;
 
+// spreader-beam-min-height: inverse of spreader-beam. The forward tile gives the top-sling tension from the top-point
+// height; the inverse recovers the minimum top-point height so the top-sling tension stays within the sling WLL, since a
+// taller rig makes a steeper (nearer-vertical) sling that carries less tension. From
+// top_sling_tension = (load/2) / sin(angle) and angle = atan(top / (bar/2)),
+// angle_min = asin( load / (2 x WLL) ) and top_min = (bar/2) x tan(angle_min). Only solvable when WLL > load/2, since
+// each top sling carries at least half the load even hung vertical.
+// dims: in { load_lb: M L T^-2, bar_length_ft: L, sling_wll_lb: M L T^-2 } out: { min_top_height_ft: L, sling_angle_deg: dimensionless, bar_compression_lb: M L T^-2 }
+export function computeSpreaderBeamMinHeight({ load_lb, bar_length_ft, sling_wll_lb } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const load = Number(load_lb);
+  const bar = Number(bar_length_ft);
+  const wll = Number(sling_wll_lb);
+  if (!Number.isFinite(load) || load <= 0) return { error: "Load must be a positive finite number (lb)." };
+  if (!Number.isFinite(bar) || bar <= 0) return { error: "Bar length must be a positive finite number (ft)." };
+  if (!Number.isFinite(wll) || wll <= 0) return { error: "Sling WLL must be a positive finite number (lb)." };
+  const ratio = load / (2 * wll);
+  if (!(ratio < 1)) return { error: "Sling WLL must exceed half the load (each top sling carries at least W/2 even hung vertical)." };
+  const angleRad = Math.asin(ratio);
+  const sling_angle_deg = angleRad * 180 / Math.PI;
+  const min_top_height_ft = (bar / 2) * Math.tan(angleRad);
+  const bar_compression_lb = (load / 2) / Math.tan(angleRad);
+  if (![sling_angle_deg, min_top_height_ft, bar_compression_lb].every(Number.isFinite)) return { error: "Min-height math is not a finite value." };
+  return {
+    min_top_height_ft, sling_angle_deg, bar_compression_lb,
+    note: "Minimum top-point height so the top-sling tension stays within the sling WLL: angle = asin( load / (2 x WLL) ), then top = (bar/2) x tan(angle). A taller rig makes a steeper (nearer-vertical) sling that carries less tension, so this is a floor - build to at least this height, and more is safer. Each top sling still carries at least half the load even hung vertical, so the WLL must exceed W/2 or no height works. The spreader bar carries the axial compression shown - check it for buckling. Both spreader bars and lifting beams are engineered below-the-hook devices; ASME BTH-1 / B30.20 and the rating plate govern. This tile sizes the demand, not the device.",
+  };
+}
+function renderSpreaderBeamMinHeight(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME BTH-1 (Design of Below-the-Hook Lifting Devices) and ASME B30.20 by name; top sling tension = (W/2)/sin(angle) solved for the height: angle = asin( W / (2 x WLL) ), top = (bar/2) x tan(angle). Estimate - the rating plate governs.";
+  const load = makeNumber("Total load (lb)", "sbm-load", { step: "any", min: "0" });
+  const bar = makeNumber("Bar length, pick to pick (ft)", "sbm-bar", { step: "any", min: "0" });
+  const wll = makeNumber("Top sling WLL, each (lb)", "sbm-wll", { step: "any", min: "0" });
+  for (const f of [load, bar, wll]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { load.input.value = "10000"; bar.input.value = "10"; wll.input.value = "6000"; update(); });
+  const oHeight = makeOutputLine(outputRegion, "Minimum top-point height", "sbm-out-height");
+  const oAngle = makeOutputLine(outputRegion, "Sling angle at that height", "sbm-out-angle");
+  const oBar = makeOutputLine(outputRegion, "Spreader bar compression", "sbm-out-bar");
+  const oNote = makeOutputLine(outputRegion, "Note", "sbm-out-note");
+  const update = debounce(() => {
+    const r = computeSpreaderBeamMinHeight({ load_lb: Number(load.input.value) || 0, bar_length_ft: Number(bar.input.value) || 0, sling_wll_lb: Number(wll.input.value) || 0 });
+    if (r.error) { oHeight.textContent = r.error; for (const o of [oAngle, oBar, oNote]) o.textContent = o === oNote ? "" : "-"; return; }
+    oHeight.textContent = fmt(r.min_top_height_ft, 2) + " ft";
+    oAngle.textContent = fmt(r.sling_angle_deg, 1) + " deg";
+    oBar.textContent = fmt(r.bar_compression_lb, 0) + " lb";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [load, bar, wll]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["spreader-beam-min-height"] = renderSpreaderBeamMinHeight;
+
 // --- forklift-capacity-derate: Load-Center and Attachment Derating ---
 //
 // net_capacity = rated_cap x rated_lc / actual_lc (data-plate method);

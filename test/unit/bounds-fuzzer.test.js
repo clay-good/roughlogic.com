@@ -10500,6 +10500,29 @@ test("bounds: spec-v739 block redirect max angle for a WLL (inverse of block-red
   assert.ok("error" in _v739({ line_tension_lb: Infinity, block_wll_lb: 5000 }));
 });
 
+import { computeSpreaderBeamMinHeight as _v744 } from "../../calc-rigging.js";
+test("bounds: spec-v744 spreader beam minimum top-point height (inverse of spreader-beam)", () => {
+  const p = _v744({ load_lb: 10000, bar_length_ft: 10, sling_wll_lb: 6000 });
+  assert.ok(Math.abs(p.min_top_height_ft - 7.538) < 0.01 && Math.abs(p.sling_angle_deg - 56.44) < 0.01);
+  // round-trip: at the recovered min height, the top-sling tension equals the sling WLL
+  for (const [load, bar, wll] of [[10000, 10, 6000], [8000, 12, 5000], [20000, 8, 12000], [4000, 6, 2500]]) {
+    const inv = _v744({ load_lb: load, bar_length_ft: bar, sling_wll_lb: wll });
+    const fwd = _v66b({ load_lb: load, bar_length_ft: bar, top_height_ft: inv.min_top_height_ft });
+    assert.ok(Math.abs(fwd.top_sling_tension_lb - wll) < 1e-6);
+    assert.ok(Math.abs(fwd.bar_compression_lb - inv.bar_compression_lb) < 1e-6);
+  }
+  // a higher-WLL sling allows a lower min height (monotonic)
+  assert.ok(_v744({ load_lb: 10000, bar_length_ft: 10, sling_wll_lb: 8000 }).min_top_height_ft < _v744({ load_lb: 10000, bar_length_ft: 10, sling_wll_lb: 6000 }).min_top_height_ft);
+  // WLL <= load/2 is impossible (even a vertical sling overloads)
+  assert.ok("error" in _v744({ load_lb: 10000, bar_length_ft: 10, sling_wll_lb: 5000 }));
+  assert.ok("error" in _v744({ load_lb: 10000, bar_length_ft: 10, sling_wll_lb: 4000 }));
+  // error seams
+  assert.ok("error" in _v744({ load_lb: 0, bar_length_ft: 10, sling_wll_lb: 6000 }));
+  assert.ok("error" in _v744({ load_lb: 10000, bar_length_ft: 0, sling_wll_lb: 6000 }));
+  assert.ok("error" in _v744({ load_lb: 10000, bar_length_ft: 10, sling_wll_lb: 0 }));
+  assert.ok("error" in _v744({ load_lb: Infinity, bar_length_ft: 10, sling_wll_lb: 6000 }));
+});
+
 import {
   computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
   computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e,

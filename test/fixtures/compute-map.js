@@ -718,6 +718,7 @@ export const COMPUTE_MAP = {
   // spec-v66 Group Z hardware and below-the-hook.
   "shackle-eyebolt-wll": { module: "../../calc-rigging.js", fn: "computeShackleEyeboltWll" },
   "spreader-beam": { module: "../../calc-rigging.js", fn: "computeSpreaderBeam" },
+  "spreader-beam-min-height": { module: "../../calc-rigging.js", fn: "computeSpreaderBeamMinHeight" },
   "forklift-capacity-derate": { module: "../../calc-rigging.js", fn: "computeForkliftCapacityDerate" },
   "roller-jack-force": { module: "../../calc-rigging.js", fn: "computeRollerJackForce" },
   "chain-lever-hoist": { module: "../../calc-rigging.js", fn: "computeChainLeverHoist" },

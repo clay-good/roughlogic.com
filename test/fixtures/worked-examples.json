@@ -21562,6 +21562,34 @@
    }
   },
   {
+   "tile_id": "spreader-beam-min-height",
+   "source_publisher": "ASME BTH-1 / B30.20 (solved for the height)",
+   "source_title": "angle = asin( W / (2 x WLL) ); min_top = (bar/2) x tan(angle)",
+   "source_edition_or_year": "ASME BTH-1",
+   "source_section_or_page": "10,000 lb on a 10 ft bar, 6,000 lb slings -> 56.4 deg, 7.54 ft min top height",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "load_lb": 10000,
+    "bar_length_ft": 10,
+    "sling_wll_lb": 6000
+   },
+   "outputs": {
+    "min_top_height_ft": {
+     "value": 7.538,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sling_angle_deg": {
+     "value": 56.44,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "forklift-capacity-derate",
    "source_publisher": "ASME B56.1 / truck data plate",
    "source_title": "net_capacity = rated_cap x rated_lc / actual_lc; pass = load <= net; margin = (net - load) / net",
