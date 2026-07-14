@@ -830,6 +830,7 @@ export const COMPUTE_MAP = {
   "countersink-depth": { module: "../../calc-machining.js", fn: "computeCountersinkDepth" },
   "wheel-offset-backspacing": { module: "../../calc-mechanic.js", fn: "computeWheelOffsetBackspacing" },
   "press-fit-pressure": { module: "../../calc-shop.js", fn: "computePressFitPressure" },
+  "press-fit-interference-for-force": { module: "../../calc-shop.js", fn: "computePressFitInterferenceForForce" },
   "roller-chain-length": { module: "../../calc-shop.js", fn: "computeRollerChainLength" },
   "keyseat-key-size": { module: "../../calc-machining.js", fn: "computeKeyseatKeySize" },
   "brake-pedal-hydraulic": { module: "../../calc-mechanic.js", fn: "computeBrakePedalHydraulic" },

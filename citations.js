@@ -7931,6 +7931,18 @@ export const CITATIONS = {
       { name: "Same material solid shaft", value: "assumes elastic same-material parts and a solid shaft; hollow or dissimilar changes the coefficients", source: "scope of this tile" },
     ],
   },
+  "press-fit-interference-for-force": {
+    formula: "interference = holding_force x 2 Do^2 / (E x (Do^2 - D^2) x pi x D x length x friction); p = (E x interference / D) x (Do^2 - D^2) / (2 Do^2); hub_bore_stress = p x (Do^2 + D^2) / (Do^2 - D^2).",
+    edition: "Lame interference-fit model (Machinery's Handbook 'Forces and Fits'; the Lame thick-cylinder equations, same-material solid shaft) solved for the interference, by name; the actual materials, surface finish, and assembly method govern.",
+    freeAccess: "The Lame thick-cylinder press-fit relations are published in standard machine-design references; the target force, interface diameters, and modulus come from the fit and the material.",
+    governance: GOVERNANCE.general,
+    editionNote: "Inverse Lame interference-fit model (same-material solid shaft). The axial holding force = p x pi x D x length x friction is linear in the diametral interference (the interface diameter D cancels from the pressure/force ratio), so interference = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x D x length x friction). The contact pressure and hub bore hoop stress at that interference are reported, and a hub yield input flags a burst. A thin hub (Do close to D) needs far more interference for the same force, which raises the bore stress fast. The model assumes elastic same-material parts and a solid shaft; a hollow shaft or dissimilar metals change the coefficients. A design aid, not the engineer of record; the actual materials, surface finish, and assembly method govern.",
+    assumptions: [
+      { name: "Linear in interference", value: "the holding force is linear in the diametral interference; the interface diameter D cancels", source: "Lame thick-cylinder" },
+      { name: "Hub stress", value: "the interference raises a hoop stress at the hub bore that must stay below yield", source: "Lame thick-cylinder" },
+      { name: "Same material solid shaft", value: "assumes elastic same-material parts and a solid shaft; hollow or dissimilar changes the coefficients", source: "scope of this tile" },
+    ],
+  },
   "keyseat-key-size": {
     formula: "key_width = standard width from the ANSI B17.1 shaft-diameter band; shaft_keyseat_depth = key_height/2; shear_stress = 2T/(D x W x L); bearing_stress = 4T/(D x H x L).",
     edition: "The ANSI B17.1 Keys and Keyseats standard key and keyseat sizing (Machinery's Handbook), by name; the material allowables and the fit class govern.",

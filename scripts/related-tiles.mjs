@@ -189,6 +189,7 @@ const RELATED = {
   "tolerance-stack-rss": ["rolled-blank", "sine-bar", "decimal-to-fraction", "cone-flat-pattern"],
   "cone-flat-pattern": ["rolled-blank", "circular-arc", "tolerance-stack-rss", "circle-from-3-points"],
   "press-fit-pressure": ["shrink-fit", "bearing-l10-life", "bolt-proof-load"],
+  "press-fit-interference-for-force": ["press-fit-pressure", "shrink-fit", "bearing-l10-life", "bolt-proof-load"],
   "roller-chain-length": ["vbelt-drive", "bearing-l10-life", "gear-mph-rpm"],
   "spur-gear-geometry": ["gear-identification", "gear-cascade", "cutting-speed-rpm", "dividing-head"],
   "gear-identification": ["spur-gear-geometry", "gear-cascade", "dividing-head", "cutting-speed-rpm"],

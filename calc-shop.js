@@ -1212,6 +1212,67 @@ function _v511renderPressFitPressure(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["press-fit-pressure"] = _v511renderPressFitPressure;
 
+// press-fit-interference-for-force: inverse of press-fit-pressure. The forward
+// tile gives the holding force from an interference; the shop question is the
+// inverse -- what interference produces a target holding force. The holding
+// force = i x E x (Do^2 - D^2)/(2 Do^2) x pi x L x mu is linear in i (the
+// interface diameter D cancels out of the ratio), so
+// i = holding x 2 x Do^2 / (E x (Do^2 - D^2) x pi x L x mu). The resulting
+// contact pressure and hub bore stress are reported so the burst risk is visible.
+// dims: in { target_holding_lb: M L T^-2, shaft_dia_in: L, hub_od_in: L, modulus_psi: M L^-1 T^-2, friction_coeff: dimensionless, engagement_in: L, hub_yield_psi: M L^-1 T^-2 } out: { interference_in: L, p_psi: M L^-1 T^-2, hub_stress_psi: M L^-1 T^-2 }
+export function computePressFitInterferenceForForce({ target_holding_lb = 0, shaft_dia_in = 0, hub_od_in = 0, modulus_psi = 30e6, friction_coeff = 0.12, engagement_in = 0, hub_yield_psi = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const hold = Number(target_holding_lb) || 0;
+  const d = Number(shaft_dia_in) || 0;
+  const dout = Number(hub_od_in) || 0;
+  const e = Number(modulus_psi) || 0;
+  const mu = Number(friction_coeff) || 0;
+  const len = Number(engagement_in) || 0;
+  const yld = Number(hub_yield_psi) || 0;
+  if (!(hold > 0)) return { error: "Target holding force must be positive (lb)." };
+  if (!(d > 0)) return { error: "Shaft diameter must be positive (in)." };
+  if (!(e > 0)) return { error: "Elastic modulus must be positive (psi)." };
+  if (!(len > 0)) return { error: "Engagement length must be positive (in)." };
+  if (!(dout > d)) return { error: "Hub outer diameter must exceed the shaft diameter (in)." };
+  if (!(mu > 0)) return { error: "Friction coefficient must be positive (a zero-friction fit holds nothing)." };
+  const interference_in = hold * 2 * dout * dout / (e * (dout * dout - d * d) * Math.PI * len * mu);
+  const p_psi = (e * interference_in / d) * (dout * dout - d * d) / (2 * dout * dout);
+  const hub_stress_psi = p_psi * (dout * dout + d * d) / (dout * dout - d * d);
+  if (![interference_in, p_psi, hub_stress_psi].every(Number.isFinite)) return { error: "Press-fit math is not a finite value." };
+  const yield_flag = yld > 0 ? (hub_stress_psi > yld ? "EXCEEDS hub yield -- risk of bursting the hub" : "within hub yield") : null;
+  return {
+    interference_in, p_psi, hub_stress_psi, yield_flag,
+    note: "Inverse Lame interference-fit model (same-material solid shaft): the target axial holding force is linear in the diametral interference, so i = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x D x L x mu) -- the interface diameter D cancels from the pressure/force ratio and appears only through (Do^2 - D^2) and Do. The contact pressure and hub bore (hoop) stress at that interference are reported: the same interference that reaches the holding force also stresses the hub bore, and too much interference yields or bursts the hub, so enter the hub yield to flag it and keep the bore stress below yield. A THIN hub (Do close to D) needs far more interference for the same force, which drives the bore stress up fast. The model assumes elastic same-material parts and a solid shaft; a hollow shaft or dissimilar metals change the coefficients. A design aid, not the engineer of record; the actual materials, surface finish, and assembly method govern.",
+  };
+}
+export const pressFitInterferenceForForceExample = { inputs: { target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3, hub_yield_psi: 0 } };
+function _v728renderPressFitInterferenceForForce(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Lame interference-fit relations (Machinery's Handbook 'Forces and Fits'; Lame thick-cylinder equations, same-material solid shaft) solved for the interference: i = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x D x L x mu); contact pressure and hub bore stress reported at that interference. A design aid; the materials, surface finish, and assembly method govern.";
+  const hold = makeNumber("Target holding force (lb)", "pfi-h", { step: "any", min: "0" }); hold.input.value = "25447";
+  const d = makeNumber("Interface diameter D (in)", "pfi-d", { step: "any", min: "0" }); d.input.value = "2";
+  const dout = makeNumber("Hub outer diameter Do (in)", "pfi-do", { step: "any", min: "0" }); dout.input.value = "4";
+  const e = makeNumber("Elastic modulus E (psi, steel ~30e6)", "pfi-e", { step: "any", min: "0" }); e.input.value = "30000000";
+  const mu = makeNumber("Friction coefficient (~0.12 dry steel)", "pfi-mu", { step: "any", min: "0" }); mu.input.value = "0.12";
+  const len = makeNumber("Engagement length L (in)", "pfi-l", { step: "any", min: "0" }); len.input.value = "3";
+  const yld = makeNumber("Hub yield strength (psi, optional flag)", "pfi-y", { step: "any", min: "0" }); yld.input.value = "";
+  for (const f of [hold, d, dout, e, mu, len, yld]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hold.input.value = "25447"; d.input.value = "2"; dout.input.value = "4"; e.input.value = "30000000"; mu.input.value = "0.12"; len.input.value = "3"; yld.input.value = ""; update(); });
+  const oI = makeOutputLine(outputRegion, "Required interference", "pfi-out-i");
+  const oP = makeOutputLine(outputRegion, "Resulting contact pressure", "pfi-out-p");
+  const oS = makeOutputLine(outputRegion, "Resulting hub bore (hoop) stress", "pfi-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "pfi-out-n");
+  const update = debounce(() => {
+    const r = computePressFitInterferenceForForce({ target_holding_lb: _readNum(hold.input), shaft_dia_in: _readNum(d.input), hub_od_in: _readNum(dout.input), modulus_psi: _readNum(e.input), friction_coeff: _readNum(mu.input), engagement_in: _readNum(len.input), hub_yield_psi: _readNum(yld.input) });
+    if (r.error) { oI.textContent = r.error; oP.textContent = "-"; oS.textContent = "-"; oNote.textContent = ""; return; }
+    oI.textContent = fmt(r.interference_in, 4) + " in";
+    oP.textContent = fmt(r.p_psi, 0) + " psi";
+    oS.textContent = fmt(r.hub_stress_psi, 0) + " psi" + (r.yield_flag ? " (" + r.yield_flag + ")" : " (keep below hub yield)");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [hold, d, dout, e, mu, len, yld]) f.input.addEventListener("input", update);
+}
+SHOP_RENDERERS["press-fit-interference-for-force"] = _v728renderPressFitInterferenceForForce;
+
 // ===================== spec-v512: roller chain length in pitches (ANSI B29.1) =====================
 // dims: in { small_teeth_n1: dimensionless, large_teeth_n2: dimensionless, center_distance_in: L, pitch_in: L } out: { length_pitches: dimensionless, length_even: dimensionless, center_corrected_in: L }
 export function computeRollerChainLength({ small_teeth_n1 = 0, large_teeth_n2 = 0, center_distance_in = 0, pitch_in = 0 } = {}) {

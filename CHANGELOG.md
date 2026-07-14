@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(shop): spec-v728 interference for a target press-fit holding force (press-fit-pressure inverse); 2026-07-14
+
+- New tile `press-fit-interference-for-force` (Group G, calc-shop.js): the diametral interference that reaches a target
+  axial holding force. `i = holding x 2 Do^2 / (E x (Do^2 - D^2) x pi x D x L x mu)` (linear in interference; the
+  interface diameter D cancels). Reports the resulting contact pressure and hub bore stress, and flags a burst against an
+  optional hub yield. A 25,447 lb target on a 2 in shaft / 4 in steel hub wants 0.0020 in. Round-trips through
+  `press-fit-pressure`. Closes the sweep-11 inverse queue. Home tile count 1,176 -> 1,177.
+
 ### feat(stage): spec-v727 max screen size for a projector (projector-brightness inverse); 2026-07-14
 
 - New tile `projector-max-screen-size` (Group N, calc-stage.js): the largest screen a projector lights to a target

@@ -799,7 +799,7 @@ const TOOL_MODULES = (() => {
     // spec-v399..v400 fabrication shop-math
     "tolerance-stack-rss", "cone-flat-pattern",
     // spec-v511 interference press-fit pressure and holding force
-    "press-fit-pressure",
+    "press-fit-pressure", "press-fit-interference-for-force",
     // spec-v512 roller chain length in pitches (ANSI B29.1)
     "roller-chain-length",
   ]);

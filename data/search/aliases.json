@@ -767,6 +767,31 @@
       "kind": "industry"
     },
     {
+      "term": "interference for holding force",
+      "target": "press-fit-interference-for-force",
+      "kind": "industry"
+    },
+    {
+      "term": "press fit interference",
+      "target": "press-fit-interference-for-force",
+      "kind": "industry"
+    },
+    {
+      "term": "how much interference press fit",
+      "target": "press-fit-interference-for-force",
+      "kind": "redirect"
+    },
+    {
+      "term": "interference for press fit force",
+      "target": "press-fit-interference-for-force",
+      "kind": "adjacent"
+    },
+    {
+      "term": "press fit for target force",
+      "target": "press-fit-interference-for-force",
+      "kind": "adjacent"
+    },
+    {
       "term": "interference fit force",
       "target": "press-fit-pressure",
       "kind": "industry"

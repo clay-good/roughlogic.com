@@ -19586,6 +19586,35 @@ test("bounds: spec-v511 computePressFitPressure pins the Lame pressure, the thin
   assert.ok("error" in _v511({ shaft_dia_in: 2, interference_in: 0.002, hub_od_in: 4, friction_coeff: -0.1, engagement_in: 3 }));
 });
 
+import { computePressFitInterferenceForForce as _v728 } from "../../calc-shop.js";
+test("bounds: spec-v728 press-fit interference for a target force (inverse of press-fit-pressure)", () => {
+  const p = _v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, modulus_psi: 30e6, friction_coeff: 0.12, engagement_in: 3 });
+  assert.ok(Math.abs(p.interference_in - 0.002) < 1e-6);
+  assert.ok(Math.abs(p.p_psi - 11250) < 1 && Math.abs(p.hub_stress_psi - 18750) < 1);
+  assert.ok(p.yield_flag === null); // no hub yield entered
+  // round-trip: the returned interference fed to press-fit-pressure reaches the target force
+  for (const [hold, D, Do, E, mu, L] of [[25447, 2, 4, 30e6, 0.12, 3], [8000, 1, 2.5, 30e6, 0.15, 2], [50000, 3, 5, 28e6, 0.1, 4], [1200, 0.75, 1.5, 30e6, 0.2, 1.5]]) {
+    const inv = _v728({ target_holding_lb: hold, shaft_dia_in: D, hub_od_in: Do, modulus_psi: E, friction_coeff: mu, engagement_in: L });
+    const fwd = _v511({ shaft_dia_in: D, interference_in: inv.interference_in, hub_od_in: Do, modulus_psi: E, friction_coeff: mu, engagement_in: L });
+    assert.ok(Math.abs(fwd.holding_lb - hold) < 1e-6);
+    // reported pressure and bore stress match the forward tile at that interference
+    assert.ok(Math.abs(fwd.p_psi - inv.p_psi) < 1e-6 && Math.abs(fwd.hub_stress_psi - inv.hub_stress_psi) < 1e-6);
+  }
+  // more holding force needs more interference (monotonic)
+  assert.ok(_v728({ target_holding_lb: 40000, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 3 }).interference_in > _v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 3 }).interference_in);
+  // hub-yield flag fires when the bore stress exceeds yield
+  assert.ok(_v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 3, hub_yield_psi: 15000 }).yield_flag.startsWith("EXCEEDS"));
+  assert.ok(_v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 3, hub_yield_psi: 25000 }).yield_flag === "within hub yield");
+  // error seams: non-finite, non-positive force/diameter/modulus/length, hub OD <= shaft, non-positive friction
+  assert.ok("error" in _v728({ target_holding_lb: Infinity, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 3 }));
+  assert.ok("error" in _v728({ target_holding_lb: 0, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 3 }));
+  assert.ok("error" in _v728({ target_holding_lb: 25447, shaft_dia_in: 0, hub_od_in: 4, engagement_in: 3 }));
+  assert.ok("error" in _v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, modulus_psi: 0, engagement_in: 3 }));
+  assert.ok("error" in _v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, engagement_in: 0 }));
+  assert.ok("error" in _v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 2, engagement_in: 3 })); // hub OD <= shaft
+  assert.ok("error" in _v728({ target_holding_lb: 25447, shaft_dia_in: 2, hub_od_in: 4, friction_coeff: 0, engagement_in: 3 }));
+});
+
 import { computeRollerChainLength as _v512 } from "../../calc-shop.js";
 
 test("bounds: spec-v512 computeRollerChainLength pins the pitch count, the even round-up, the corrected center, and error seams", () => {
