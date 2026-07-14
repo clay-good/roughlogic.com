@@ -12634,6 +12634,18 @@ export const CITATIONS = {
       { name: "Selection aid", value: "the coil manufacturer's rated face velocity governs", source: "scope of this tile" },
     ],
   },
+  "coil-face-area": {
+    formula: "Required face_area_ft2 = CFM / target_face_velocity_fpm (the inverse of face_velocity = CFM / area); square side = sqrt(face_area x 144).",
+    edition: "The cooling-coil face area from a target face velocity, standard coil-selection practice (ASHRAE), by name.",
+    freeAccess: "Face area = airflow / face velocity and the ~500 fpm wet-coil carryover limit are standard published coil-selection results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of coil-face-velocity: it sizes the coil face to hold a target velocity, typically the ~500 fpm wet-coil moisture-carryover limit. A lower target buys carryover margin at the cost of a larger, more expensive coil. This returns the required area and a suggested square face; the coil manufacturer's rated face velocity and moisture-carryover limit govern the actual selection.",
+    assumptions: [
+      { name: "Face area", value: "CFM / target face velocity", source: "coil-selection practice" },
+      { name: "Carryover limit", value: "~500 fpm target for a wet cooling coil (editable)", source: "ASHRAE / coil practice" },
+      { name: "Selection aid", value: "the coil manufacturer's rated face velocity governs", source: "scope of this tile" },
+    ],
+  },
   "vav-box-airflow": {
     formula: "cfm_max = load / (1.08 x supply_dt); cfm_min = max(ventilation_cfm, turndown x cfm_max).",
     edition: "The VAV box maximum and minimum airflow from the zone load and the ASHRAE 62.1 ventilation minimum, by name.",

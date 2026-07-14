@@ -29281,6 +29281,33 @@
    }
   },
   {
+   "tile_id": "coil-face-area",
+   "source_publisher": "coil-selection practice",
+   "source_title": "2000 CFM at the 500 fpm wet-coil limit -> 4.0 ft^2 (about 24 x 24 in)",
+   "source_edition_or_year": "spec-v701 worked example (machine-verified; inverse of spec-v409)",
+   "source_section_or_page": "spec-v701 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "cfm": 2000,
+    "target_fpm": 500
+   },
+   "outputs": {
+    "face_area_ft2": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "square_side_in": {
+     "value": 24,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
    "tile_id": "vav-box-airflow",
    "source_publisher": "VAV design / ASHRAE 62.1",
    "source_title": "12,000 Btu/hr, 20 F, 100 CFM vent, 0.30 turndown -> 556 max, 167 min (turndown governs)",

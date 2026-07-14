@@ -17667,7 +17667,7 @@ test("bounds: spec-v657 computeConductivityFromTds inverts the TDS estimate, rou
 
 // ===================== spec-v408..v410 HVAC duct-design trio (2 modules) =====================
 import { computeManualDFrictionRate as _v408 } from "../../calc-hvac.js";
-import { computeCoilFaceVelocity as _v409, computeVavBoxAirflow as _v410 } from "../../calc-hvacsystems.js";
+import { computeCoilFaceVelocity as _v409, computeVavBoxAirflow as _v410, computeCoilFaceArea as _v701 } from "../../calc-hvacsystems.js";
 
 test("bounds: spec-v408 computeManualDFrictionRate pins ASP/FR, the unworkable case, and error seams", () => {
   const r = _v408({ blower_esp_inwg: 0.60, component_drop_inwg: 0.42, tel_ft: 180 });
@@ -17696,6 +17696,30 @@ test("bounds: spec-v409 computeCoilFaceVelocity pins the velocity, the carryover
   assert.ok("error" in _v409({ cfm: 2000, face_width_in: 0, face_height_in: 18 }));
   assert.ok("error" in _v409({ cfm: 2000, face_width_in: 24, face_height_in: 0 }));
   assert.ok("error" in _v409({ cfm: Infinity, face_width_in: 24, face_height_in: 18 }));
+});
+
+test("bounds: spec-v701 computeCoilFaceArea pins area = CFM / target_fpm, round-trips through computeCoilFaceVelocity, and error seams", () => {
+  const r = _v701({ cfm: 2000, target_fpm: 500 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.face_area_ft2 - 4.0) < 1e-9, `area identity: ${r.face_area_ft2}`);
+  assert.ok(Math.abs(r.square_side_in - 24) < 1e-9, `square side: ${r.square_side_in}`);
+  // Round-trip: a square coil at the returned side, fed the same airflow, sits exactly at the target velocity.
+  for (const cfm of [800, 2000, 6000]) {
+    for (const target_fpm of [350, 500, 700]) {
+      const m = _v701({ cfm, target_fpm });
+      assert.ok(!m.error, `sweep cfm=${cfm} v=${target_fpm}: ${JSON.stringify(m)}`);
+      assertFinite(m.face_area_ft2, "area"); assert.ok(m.face_area_ft2 > 0, "area positive");
+      const back = _v409({ cfm, face_width_in: m.square_side_in, face_height_in: m.square_side_in });
+      assert.ok(Math.abs(back.face_velocity_fpm - target_fpm) < 1e-6, `round-trip cfm=${cfm} v=${target_fpm}: ${back.face_velocity_fpm}`);
+    }
+  }
+  // A lower target velocity demands a larger face.
+  assert.ok(_v701({ cfm: 2000, target_fpm: 400 }).face_area_ft2 > r.face_area_ft2);
+  // A non-positive target velocity defaults to 500 fpm (mirrors the forward threshold default), not an error.
+  assert.ok(Math.abs(_v701({ cfm: 2000, target_fpm: 0 }).face_area_ft2 - 4.0) < 1e-9);
+  // Error seams: non-positive airflow, non-finite.
+  assert.ok("error" in _v701({ cfm: 0, target_fpm: 500 }));
+  assert.ok("error" in _v701({ cfm: Infinity, target_fpm: 500 }));
 });
 
 test("bounds: spec-v410 computeVavBoxAirflow pins max/min, the governing branch, and error seams", () => {

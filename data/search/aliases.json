@@ -53807,6 +53807,31 @@
       "kind": "question"
     },
     {
+      "term": "coil size for 2000 cfm",
+      "target": "coil-face-area",
+      "kind": "question"
+    },
+    {
+      "term": "how big a cooling coil for the airflow",
+      "target": "coil-face-area",
+      "kind": "question"
+    },
+    {
+      "term": "coil face area for 500 fpm",
+      "target": "coil-face-area",
+      "kind": "question"
+    },
+    {
+      "term": "cooling coil dimensions to avoid carryover",
+      "target": "coil-face-area",
+      "kind": "question"
+    },
+    {
+      "term": "minimum coil size for cfm",
+      "target": "coil-face-area",
+      "kind": "question"
+    },
+    {
       "term": "vav max cfm from zone load",
       "target": "vav-box-airflow",
       "kind": "question"

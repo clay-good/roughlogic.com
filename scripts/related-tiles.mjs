@@ -1202,6 +1202,7 @@ const RELATED = {
   "snowmelt-load": ["radiant-loop-sizing","radiant-floor-output","boiler-pipe-sizing"],
   "economizer-enthalpy-changeover": ["economizer-savings-hours","moist-air-enthalpy","outside-air-percent-temps","erv-total-enthalpy-recovery"],
   "coil-face-velocity": ["grille-face-velocity","filter-pressure-drop","cooling-coil-total-load","coil-bypass-factor"],
+  "coil-face-area": ["coil-face-velocity","cooling-coil-total-load","grille-face-velocity","coil-bypass-factor"],
   "vav-box-airflow": ["duct-sizing","grille-face-velocity","shr-latent","dcv-co2-ventilation"],
   // spec-v230..v232 electrical energy-cost-savings batch (Group A)
   "vfd-energy-savings": ["affinity-laws","motor-operating-cost","fan-motor-bhp"],

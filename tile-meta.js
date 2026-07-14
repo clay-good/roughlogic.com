@@ -209,7 +209,7 @@ const _TILES = [
   ["humidifier-capacity", "C"], ["filter-pressure-drop", "C"],
   // spec-v227..v229 cooling-load-components batch
   ["window-solar-heat-gain", "C"], ["internal-heat-gains", "C"], ["envelope-conduction-load", "C"],
-  ["manual-d-friction-rate", "C"], ["coil-face-velocity", "C"], ["vav-box-airflow", "C"],
+  ["manual-d-friction-rate", "C"], ["coil-face-velocity", "C"], ["coil-face-area", "C"], ["vav-box-airflow", "C"],
   ["erv-total-enthalpy-recovery", "C"], ["radiant-floor-output", "C"], ["economizer-enthalpy-changeover", "C"],
   // spec-v478 hydronic snowmelt sizing
   ["snowmelt-load", "C"],

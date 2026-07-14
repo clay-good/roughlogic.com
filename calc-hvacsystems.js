@@ -1161,6 +1161,45 @@ function _v409renderCoilFaceVelocity(inputRegion, outputRegion, citationEl) {
 }
 HVACSYSTEMS_RENDERERS["coil-face-velocity"] = _v409renderCoilFaceVelocity;
 
+// coil-face-area: inverse of coil-face-velocity. The forward tile gives
+// velocity = CFM / face_area; sizing a coil to stay under the wet-coil
+// carryover limit is the inverse: required face_area = CFM / target_velocity.
+// dims: in { cfm: L^3 T^-1, target_fpm: L T^-1 } out: { face_area_ft2: L^2, face_area_in2: L^2, square_side_in: L }
+export function computeCoilFaceArea({ cfm = 0, target_fpm = 500 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(cfm) || 0;
+  const v = Number(target_fpm) > 0 ? Number(target_fpm) : 500;
+  if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
+  if (!(v > 0)) return { error: "Target face velocity must be positive (fpm)." };
+  const face_area_ft2 = q / v;
+  const face_area_in2 = face_area_ft2 * 144;
+  const square_side_in = Math.sqrt(face_area_in2);
+  return {
+    face_area_ft2, face_area_in2, square_side_in, target_fpm: v,
+    note: "Required cooling-coil face area = airflow / the target face velocity, the inverse of the face-velocity check. Sizing to about 500 fpm keeps a wet coil below the moisture-carryover point where droplets blow off the fins past the drain pan; a lower target buys margin at the cost of a larger, more expensive coil. A selection aid; the coil manufacturer's rated face velocity and moisture-carryover limit govern.",
+  };
+}
+export const coilFaceAreaExample = { inputs: { cfm: 2000, target_fpm: 500 } };
+function _v701renderCoilFaceArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Required coil face area = CFM / target face velocity (the inverse of face velocity = CFM / area), sized to the ~500 fpm wet-coil moisture-carryover limit (ASHRAE / coil-selection practice). A selection aid; the coil manufacturer's rated face velocity governs.";
+  const cfm = makeNumber("Airflow (cfm)", "cfa-cfm", { step: "any", min: "0", value: "2000" });
+  const v = makeNumber("Target face velocity (fpm, default 500)", "cfa-v", { step: "any", min: "0", value: "500" });
+  for (const f of [cfm, v]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cfm.input.value = "2000"; v.input.value = "500"; update(); });
+  const oA = makeOutputLine(outputRegion, "Required face area", "cfa-out-a");
+  const oS = makeOutputLine(outputRegion, "Square face (approx)", "cfa-out-s");
+  const oNote = makeOutputLine(outputRegion, "Note", "cfa-out-note");
+  const update = debounce(() => {
+    const r = computeCoilFaceArea({ cfm: Number(cfm.input.value) || 0, target_fpm: Number(v.input.value) || 0 });
+    if (r.error) { oA.textContent = r.error; oS.textContent = ""; oNote.textContent = ""; return; }
+    oA.textContent = fmt(r.face_area_ft2, 2) + " ft^2 (" + fmt(r.face_area_in2, 0) + " in^2)";
+    oS.textContent = "~" + fmt(r.square_side_in, 1) + " in x " + fmt(r.square_side_in, 1) + " in at " + fmt(r.target_fpm, 0) + " fpm";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [cfm.input, v.input]) el.addEventListener("input", update);
+}
+HVACSYSTEMS_RENDERERS["coil-face-area"] = _v701renderCoilFaceArea;
+
 // dims: in { zone_sensible_btuh: M L^2 T^-3, supply_dt_f: T, ventilation_cfm: L^3 T^-1, turndown: dimensionless } out: { cfm_max: L^3 T^-1, cfm_min: L^3 T^-1 }
 export function computeVavBoxAirflow({ zone_sensible_btuh = 0, supply_dt_f = 0, ventilation_cfm = 0, turndown = 0.30 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

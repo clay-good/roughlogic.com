@@ -491,6 +491,7 @@ export const COMPUTE_MAP = {
   "snowmelt-load": { module: "../../calc-hvac.js", fn: "computeSnowmeltLoad" },
   "economizer-enthalpy-changeover": { module: "../../calc-hvac.js", fn: "computeEconomizerEnthalpyChangeover" },
   "coil-face-velocity": { module: "../../calc-hvacsystems.js", fn: "computeCoilFaceVelocity" },
+  "coil-face-area": { module: "../../calc-hvacsystems.js", fn: "computeCoilFaceArea" },
   "vav-box-airflow": { module: "../../calc-hvacsystems.js", fn: "computeVavBoxAirflow" },
   "duct-velocity-pressure": { module: "../../calc-velocity.js", fn: "computeDuctVelocityPressure" },
   "refrigerant-velocity": { module: "../../calc-velocity.js", fn: "computeRefrigerantVelocity" },

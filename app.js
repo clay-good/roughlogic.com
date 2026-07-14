@@ -341,7 +341,7 @@ const TOOL_MODULES = (() => {
     // spec-v227..v229 cooling-load-components batch
     "window-solar-heat-gain", "internal-heat-gains", "envelope-conduction-load",
     // spec-v409..v410 HVAC duct-design
-    "coil-face-velocity", "vav-box-airflow",
+    "coil-face-velocity", "coil-face-area", "vav-box-airflow",
     // spec-v587 anti-short-cycle buffer tank
     "hydronic-buffer-tank",
     // spec-v623 buffer tank with distribution-loop credit
