@@ -326,6 +326,7 @@ export const COMPUTE_MAP = {
   "shr": { module: "../../calc-hvac.js", fn: "computeSHR" },
   "equivalent-length": { module: "../../calc-hvac.js", fn: "computeEquivalentLength" },
   "baseboard-output": { module: "../../calc-hvac.js", fn: "computeBaseboardOutput" },
+  "baseboard-length-for-load": { module: "../../calc-hvac.js", fn: "computeBaseboardLengthForLoad" },
   "water-hammer-surge": { module: "../../calc-plumbing.js", fn: "computeWaterHammerSurge" },
   "backflow-loss": { module: "../../calc-plumbing.js", fn: "computeBackflowLoss" },
   "pipe-expansion-loop": { module: "../../calc-plumbing.js", fn: "computePipeExpansionLoop" },

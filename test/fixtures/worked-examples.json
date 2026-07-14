@@ -6305,6 +6305,52 @@
    }
   },
   {
+   "tile_id": "baseboard-length-for-load",
+   "source_publisher": "Slant/Fin (inverse)",
+   "source_title": "length = target_load / (btu_per_ft x flow_factor)",
+   "source_edition_or_year": "spec-v685 worked example (machine-verified)",
+   "source_section_or_page": "4,800 BTU/hr, 180 F water, 1 gpm, Fine Line 30 (600 BTU/ft) -> 8 ft (round-trips baseboard-output)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_btuhr": 4800,
+    "water_temp_F": 180,
+    "flow_gpm": 1,
+    "model": "slant_fin_baseline"
+   },
+   "outputs": {
+    "length_ft": {
+     "value": 8,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "baseboard-length-for-load",
+   "source_publisher": "Slant/Fin (inverse)",
+   "source_title": "cross-check: hotter 200 F water (690 BTU/ft) shortens the run for the same load",
+   "source_edition_or_year": "spec-v685 cross-check (machine-verified)",
+   "source_section_or_page": "4,800 BTU/hr at 200 F -> about 7.0 ft (hotter water, shorter baseboard)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_btuhr": 4800,
+    "water_temp_F": 200,
+    "flow_gpm": 1,
+    "model": "slant_fin_baseline"
+   },
+   "outputs": {
+    "length_ft": {
+     "value": 6.96,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "water-hammer-surge",
    "source_publisher": "Project (first-principles)",
    "source_title": "Joukowsky surge: dP (psi) = rho * a * dV (Pa) / 6895 with elastic-coupling-adjusted celerity a",

@@ -3874,6 +3874,17 @@ export const CITATIONS = {
       { name: "Curve table", value: "data/hvac/baseboard-output.json keyed to model and water temperature", source: "Slant/Fin technical literature" },
     ],
   },
+  "baseboard-length-for-load": {
+    formula: "length_ft = target_load / (btu_per_ft(water_temp) x flow_factor); the inverse of btu_total = btu_per_ft x length x flow_factor. btu_per_ft from manufacturer tables interpolated by water temperature.",
+    edition: "Slant/Fin Fine Line 30 typical-curve and high-output reference (manufacturer-attributed).",
+    freeAccess: "Free at slantfin.com.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The active length of hydronic baseboard a room's heat load needs, the inverse of baseboard-output: length = target_load / (btu_per_ft x flow_factor), with btu_per_ft the manufacturer table value interpolated at the average water temperature. Hotter water raises the output per foot and shortens the run (the main lever when a wall is too short). This is the fin-tube active length; add for the inactive ends, and the water cools along a long run so the far end puts out less (split into loops or upsize for a big load). Single-edition (manufacturer curves; quarterly recheck). The manufacturer rating at the design water temperature and the room heat loss govern.",
+    assumptions: [
+      { name: "Curve table", value: "data/hvac/baseboard-output.json keyed to model and water temperature", source: "Slant/Fin technical literature" },
+      { name: "Active length", value: "returns the active fin-tube length; add inactive ends, and the water cools along a long run", source: "hydronic practice" },
+    ],
+  },
   "npsh-a": {
     formula: "NPSHa = H_atm + H_static_source − H_friction − H_vapor (all in ft of pumped fluid). H_atm from elevation-lapse; H_vapor from a public engineering psi-by-temperature table converted via 2.31 ft/psi.",
     edition: "Hydraulic Institute by name; ASHRAE Fundamentals water-property tables.",

@@ -498,6 +498,7 @@ import {
   computeAirReceiver,
   computeGeothermalLoop,
   computeBaseboardOutput,
+  computeBaseboardLengthForLoad,
   computeNPSHa,
   computeDuctFrictionStatic,
   computeCoolingTower,
@@ -6670,6 +6671,31 @@ test("bounds: calc-hvac computeBaseboardOutput interpolates Slant/Fin Fine Line 
   assert.ok("error" in computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "bogus" }));
   assert.ok("error" in computeBaseboardOutput({ water_temp_F: 0, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" }));
   assert.ok("error" in computeBaseboardOutput({ water_temp_F: 180, flow_gpm: 1, length_ft: -1, model: "slant_fin_baseline" }));
+});
+
+test("bounds: spec-v685 computeBaseboardLengthForLoad pins length = target/(btu_per_ft*flow_factor), round-trips through computeBaseboardOutput, and error seams", () => {
+  const r = computeBaseboardLengthForLoad({ target_btuhr: 4800, water_temp_F: 180, flow_gpm: 1, model: "slant_fin_baseline" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.length_ft - 8) < 1e-9, `length identity: ${r.length_ft}`);
+  assert.strictEqual(r.btu_per_ft, 600);
+  // Hotter water raises btu/ft and shortens the run.
+  const hot = computeBaseboardLengthForLoad({ target_btuhr: 4800, water_temp_F: 200, flow_gpm: 1, model: "slant_fin_baseline" });
+  assert.ok(hot.length_ft < r.length_ft, `hotter shorter: ${hot.length_ft}`);
+  // Round-trip: the length, fed back through the forward tile, reproduces the target load.
+  for (const target_btuhr of [1200, 4800, 12000]) {
+    for (const water_temp_F of [140, 180, 220]) {
+      const m = computeBaseboardLengthForLoad({ target_btuhr, water_temp_F, flow_gpm: 1, model: "slant_fin_baseline" });
+      assert.ok(!m.error, `sweep Q=${target_btuhr} T=${water_temp_F}: ${JSON.stringify(m)}`);
+      assertFinite(m.length_ft, "length"); assert.ok(m.length_ft > 0, "length positive");
+      const back = computeBaseboardOutput({ water_temp_F, flow_gpm: 1, length_ft: m.length_ft, model: "slant_fin_baseline" });
+      assert.ok(Math.abs(back.btu_total - target_btuhr) < 1e-6, `round-trip Q=${target_btuhr} T=${water_temp_F}: ${back.btu_total}`);
+    }
+  }
+  // Error seams: non-positive target, non-positive water temp, unknown model, non-finite.
+  assert.ok("error" in computeBaseboardLengthForLoad({ target_btuhr: 0, water_temp_F: 180 }));
+  assert.ok("error" in computeBaseboardLengthForLoad({ target_btuhr: 4800, water_temp_F: 0 }));
+  assert.ok("error" in computeBaseboardLengthForLoad({ target_btuhr: 4800, water_temp_F: 180, model: "bogus" }));
+  assert.ok("error" in computeBaseboardLengthForLoad({ target_btuhr: NaN, water_temp_F: 180 }));
 });
 
 test("bounds: calc-hvac computeNPSHa pins NPSHa = H_atm - H_vapor + H_static - H_friction on the spec sea-level 60 F / 5 ft / 2 ft example", () => {

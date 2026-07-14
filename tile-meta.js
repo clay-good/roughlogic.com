@@ -194,7 +194,7 @@ const _TILES = [
   ["refrigerant-charge", "C"], ["approach-delta-t", "C"], ["outdoor-air-mix", "C"],
   ["equivalent-length", "C"], ["wet-bulb-psychrometer", "C"], ["insulation-thickness", "C"],
   ["evaporative-cooling", "C"], ["affinity-laws", "C"], ["belt-pulley", "C"],
-  ["air-receiver", "C"], ["geothermal-loop", "C"], ["baseboard-output", "C"],
+  ["air-receiver", "C"], ["geothermal-loop", "C"], ["baseboard-output", "C"], ["baseboard-length-for-load", "C"],
   ["npsh-a", "C"], ["duct-leakage", "C"], ["duct-friction-static", "C"],
   ["duct-leakage-cfm25", "C"],
   ["excess-air-o2", "C"],

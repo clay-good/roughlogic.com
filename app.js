@@ -276,7 +276,7 @@ const TOOL_MODULES = (() => {
     "insulation-thickness", "evaporative-cooling",
     // v3
     "affinity-laws", "belt-pulley", "air-receiver", "geothermal-loop",
-    "baseboard-output", "npsh-a",
+    "baseboard-output", "baseboard-length-for-load", "npsh-a",
     // v7
     "duct-friction-static", "cooling-tower",
     "insulation-heat-loss",

@@ -52122,6 +52122,31 @@
       "kind": "question"
     },
     {
+      "term": "baseboard length for a target load",
+      "target": "baseboard-length-for-load",
+      "kind": "industry"
+    },
+    {
+      "term": "feet of fin tube to size a room",
+      "target": "baseboard-length-for-load",
+      "kind": "industry"
+    },
+    {
+      "term": "how much baseboard for the heat load",
+      "target": "baseboard-length-for-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "size baseboard from btu load",
+      "target": "baseboard-length-for-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "linear feet of baseboard for a room load",
+      "target": "baseboard-length-for-load",
+      "kind": "adjacent"
+    },
+    {
       "term": "copper fin baseboard btu rating",
       "target": "baseboard-output",
       "kind": "question"

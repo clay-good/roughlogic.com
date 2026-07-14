@@ -1326,6 +1326,26 @@ export const baseboardOutputExample = {
   inputs: { water_temp_F: 180, flow_gpm: 1, length_ft: 8, model: "slant_fin_baseline" },
 };
 
+// dims: in { target_btuhr: M L^2 T^-3, water_temp_F: T, flow_gpm: L^3 T^-1, model: dimensionless } out: { length_ft: L, btu_per_ft: M L T^-3 }
+export function computeBaseboardLengthForLoad({ target_btuhr = 0, water_temp_F = 0, flow_gpm = 1, model = "slant_fin_baseline" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_btuhr) || 0;
+  if (!(target > 0)) return { error: "Target heat load must be positive (BTU/hr)." };
+  // Reuse the forward tile's temperature interpolation and flow correction (length 1 ft).
+  const per = computeBaseboardOutput({ water_temp_F, flow_gpm, length_ft: 1, model });
+  if (per.error) return per;
+  const btu_per_ft = per.btu_per_ft, flow_factor = per.flow_factor;
+  if (!(btu_per_ft > 0)) return { error: "Baseboard output per foot must be positive." };
+  // Inverse of btu_total = btu_per_ft x length x flow_factor: length = target / (btu_per_ft x flow_factor).
+  const length_ft = target / (btu_per_ft * flow_factor);
+  if (!Number.isFinite(length_ft) || !(length_ft > 0)) return { error: "Length math is not a finite positive value." };
+  return {
+    length_ft, btu_per_ft, flow_factor, attribution: per.attribution,
+    note: "The active length of hydronic baseboard a room's heat load needs, the inverse of the baseboard-output tile: length = target_load / (btu_per_ft x flow_factor), where btu_per_ft is the manufacturer table value interpolated at the average water temperature. Hotter water raises the output per foot, so a higher supply temperature shortens the run - the main lever when a wall is too short for the load. This is the fin-tube ACTIVE length; add for the inactive ends, and remember the water cools along a long run so the far end puts out less (split into multiple loops or upsize the loop for a big load). A sizing aid; the manufacturer's rating at the design water temperature and the room heat loss govern."
+  };
+}
+export const baseboardLengthForLoadExample = { inputs: { target_btuhr: 4800, water_temp_F: 180, flow_gpm: 1, model: "slant_fin_baseline" } };
+
 // --- Utility 144: Pump NPSH Available ---
 //
 // NPSHa = H_atm - H_vapor +/- H_static - H_friction (feet)
@@ -1533,6 +1553,27 @@ function renderBaseboardOutput(inputRegion, outputRegion, citationEl) {
   for (const el of [t.input, fw.input, l.input, m.select]) el.addEventListener("input", update);
 }
 
+function renderBaseboardLengthForLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: manufacturer-attributed BTU-per-foot baseboard tables interpolated by water temperature, solved for length: length = target_load / (btu_per_ft x flow_factor). Attribution included with output. A sizing aid; the manufacturer rating and the room heat loss govern.";
+  attachExampleButton(inputRegion, () => { q.input.value = "4800"; t.input.value = "180"; fw.input.value = "1"; m.select.value = "slant_fin_baseline"; update(); });
+  const q = makeNumber("Target room load (BTU/hr)", "bll-q", { step: "any", min: "0" });
+  const t = makeNumber("Avg water temp (F)", "bll-t", { step: "any", min: "0" });
+  const fw = makeNumber("Flow (gpm)", "bll-f", { step: "any", min: "0", value: "1" }); fw.input.value = "1";
+  const m = makeSelect("Model", "bll-m", Object.keys(BASEBOARD_OUTPUT).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  for (const f of [q, t, fw, m]) inputRegion.appendChild(f.wrap);
+  const oL = makeOutputLine(outputRegion, "Active baseboard length", "bll-out-l");
+  const oP = makeOutputLine(outputRegion, "BTU/ft at this temp", "bll-out-p");
+  const oNote = makeOutputLine(outputRegion, "Note", "bll-out-n");
+  const update = debounce(() => {
+    const r = computeBaseboardLengthForLoad({ target_btuhr: Number(q.input.value) || 0, water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1, model: m.select.value });
+    if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = fmt(r.length_ft, 1) + " ft";
+    oP.textContent = fmt(r.btu_per_ft, 0) + " BTU/ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [q.input, t.input, fw.input, m.select]) el.addEventListener("input", update);
+}
+
 function renderNPSHa(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: NPSHa = H_atm - H_vapor +/- H_static - H_friction (feet). Atmospheric head from elevation lapse; vapor pressure from public engineering table.";
   attachExampleButton(inputRegion, () => fillExample(npshaExample.inputs));
@@ -1591,6 +1632,7 @@ export const HVAC_RENDERERS = {
   "air-receiver": renderAirReceiver,
   "geothermal-loop": renderGeothermalLoop,
   "baseboard-output": renderBaseboardOutput,
+  "baseboard-length-for-load": renderBaseboardLengthForLoad,
   "npsh-a": renderNPSHa,
 };
 
