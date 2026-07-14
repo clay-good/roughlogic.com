@@ -1213,6 +1213,7 @@ export const COMPUTE_MAP = {
   "pv-energy-yield": { module: "../../calc-solar.js", fn: "computePvEnergyYield" },
   "pv-array-sizing": { module: "../../calc-solar.js", fn: "computePvArraySizing" },
   "pv-row-spacing": { module: "../../calc-solar.js", fn: "computePvRowSpacing" },
+  "pv-row-shade-angle": { module: "../../calc-solar.js", fn: "computePvRowShadeAngle" },
   "pv-inverter-ratio": { module: "../../calc-solar.js", fn: "computePvInverterRatio" },
   "pv-cell-temperature-power": { module: "../../calc-solar.js", fn: "computePvCellTemperaturePower" },
   "pv-performance-ratio": { module: "../../calc-solar.js", fn: "computePvPerformanceRatio" },

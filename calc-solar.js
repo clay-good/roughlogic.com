@@ -775,6 +775,58 @@ function renderPvRowSpacing(inputRegion, outputRegion, citationEl) {
   for (const f of [len, tilt, prof]) f.input.addEventListener("input", update);
 }
 
+// pv-row-shade-angle: inverse of pv-row-spacing. The forward tile gives the
+// pitch from a design profile angle; on a constrained roof the pitch is fixed
+// and the question is the lowest sun elevation the layout stays shade-free to.
+// From pitch = L cos(tilt) + L sin(tilt) / tan(prof), solving for prof:
+// prof = atan( L sin(tilt) / (pitch - L cos(tilt)) ), valid when pitch exceeds
+// the module footprint L cos(tilt) (otherwise the rows overlap).
+// dims: in { module_length_ft: L, tilt_deg: dimensionless, row_pitch_ft: L } out: { profile_angle_deg: dimensionless, base_ft: L, rise_ft: L, shadow_ft: L, gcr: dimensionless }
+export function computePvRowShadeAngle({ module_length_ft = 0, tilt_deg = 0, row_pitch_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const L = Number(module_length_ft) || 0;
+  const tilt = Number(tilt_deg);
+  const pitch = Number(row_pitch_ft) || 0;
+  if (!(L > 0)) return { error: "Module slope length must be positive (ft)." };
+  if (!(tilt > 0 && tilt <= 90)) return { error: "Tilt must be over 0 and up to 90 degrees." };
+  if (!(pitch > 0)) return { error: "Row pitch must be positive (ft)." };
+  const rad = Math.PI / 180;
+  const base_ft = L * Math.cos(tilt * rad);
+  const rise_ft = L * Math.sin(tilt * rad);
+  if (!(pitch > base_ft)) return { error: "Row pitch must exceed the module footprint (" + base_ft.toFixed(2) + " ft) or the rows overlap." };
+  const shadow_ft = pitch - base_ft;
+  const profile_angle_deg = Math.atan(rise_ft / shadow_ft) / rad;
+  const gcr = L / pitch;
+  return {
+    profile_angle_deg, base_ft, rise_ft, shadow_ft, gcr,
+    note: "NREL / Sandia row-spacing geometry solved for the profile angle: with the pitch fixed by the roof, this is the lowest solar profile (elevation) angle the layout stays shade-free to -- rows shade each other only when the sun drops below it. Compare it to the winter-design sun elevation at the site (the 9 a.m.-to-3 p.m. solstice altitude from latitude or solar-times): if the shade angle is at or below that, the winter window is clear. Assumes due-south rows and a level field; an azimuth offset or a graded slope is a separate correction.",
+  };
+}
+function renderPvRowShadeAngle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NREL / Sandia PV row-spacing geometry solved for the profile angle: prof = atan(L sin(tilt) / (pitch - L cos(tilt))) (by name). With the pitch fixed by the roof, this is the lowest sun elevation the layout stays shade-free to; compare it to the winter-design sun elevation. Assumes due-south rows and a level field.";
+  const len = makeNumber("Module slope length (ft)", "prsa-len", { step: "any", min: "0", value: "6.5" });
+  len.input.value = "6.5";
+  const tilt = makeNumber("Array tilt (degrees)", "prsa-tilt", { step: "any", min: "0", value: "30" });
+  tilt.input.value = "30";
+  const pitch = makeNumber("Available row pitch (ft)", "prsa-pitch", { step: "any", min: "0", value: "12" });
+  pitch.input.value = "12";
+  for (const f of [len, tilt, pitch]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { len.input.value = "6.5"; tilt.input.value = "30"; pitch.input.value = "12"; update(); });
+  const oProf = makeOutputLine(outputRegion, "Shade-free down to (profile angle)", "prsa-out-prof");
+  const oGcr = makeOutputLine(outputRegion, "Ground-coverage ratio", "prsa-out-gcr");
+  const oGeom = makeOutputLine(outputRegion, "Footprint / clear gap", "prsa-out-geom");
+  const oNote = makeOutputLine(outputRegion, "Note", "prsa-out-note");
+  const update = debounce(() => {
+    const r = computePvRowShadeAngle({ module_length_ft: Number(len.input.value) || 0, tilt_deg: Number(tilt.input.value) || 0, row_pitch_ft: Number(pitch.input.value) || 0 });
+    if (r.error) { oProf.textContent = r.error; oGcr.textContent = "-"; oGeom.textContent = "-"; oNote.textContent = ""; return; }
+    oProf.textContent = fmt(r.profile_angle_deg, 1) + "° solar elevation";
+    oGcr.textContent = fmt(r.gcr, 3);
+    oGeom.textContent = fmt(r.base_ft, 2) + " ft footprint / " + fmt(r.shadow_ft, 2) + " ft gap";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [len, tilt, pitch]) f.input.addEventListener("input", update);
+}
+
 // ===================== spec-v223: PV inverter loading ratio (DC:AC) =====================
 
 // dims: in { dc_kw: M L^2 T^-3, ac_kw: M L^2 T^-3, inv_eff: dimensionless } out: { ilr: dimensionless, clip_dc_kw: M L^2 T^-3, clip_fraction: dimensionless }
@@ -1043,6 +1095,7 @@ export const SOLAR_RENDERERS = {
   "pv-energy-yield": renderPvEnergyYield,
   "pv-array-sizing": renderPvArraySizing,
   "pv-row-spacing": renderPvRowSpacing,
+  "pv-row-shade-angle": renderPvRowShadeAngle,
   "pv-inverter-ratio": renderPvInverterRatio,
   // spec-v236..v238 grid-tied battery-economics batch
   "battery-tou-arbitrage": renderBatteryTouArbitrage,

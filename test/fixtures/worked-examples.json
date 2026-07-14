@@ -28739,6 +28739,34 @@
    }
   },
   {
+   "tile_id": "pv-row-shade-angle",
+   "source_publisher": "NREL / Sandia row-spacing geometry",
+   "source_title": "6.5 ft module, 30 deg tilt, 12 ft pitch -> shade-free down to a 27.0 deg sun",
+   "source_edition_or_year": "spec-v702 worked example (machine-verified; inverse of spec-v222)",
+   "source_section_or_page": "spec-v702 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "module_length_ft": 6.5,
+    "tilt_deg": 30,
+    "row_pitch_ft": 12
+   },
+   "outputs": {
+    "profile_angle_deg": {
+     "value": 27.027821,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "gcr": {
+     "value": 0.541667,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-inverter-ratio",
    "source_publisher": "Inverter loading ratio + NREL guidance",
    "source_title": "8 kW on 6.6 kW inverter -> 1.21 ILR, clips above 85.9%",

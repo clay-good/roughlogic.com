@@ -12803,7 +12803,7 @@ test("bounds: spec-v220 computeInfiltrationLoad pins sensible/latent loads, the 
 });
 
 // ===================== spec-v221..v223 PV system-design batch =====================
-import { computePvEnergyYield as _v221, computePvRowSpacing as _v222, computePvInverterRatio as _v223 } from "../../calc-solar.js";
+import { computePvEnergyYield as _v221, computePvRowSpacing as _v222, computePvInverterRatio as _v223, computePvRowShadeAngle as _v702 } from "../../calc-solar.js";
 
 test("bounds: spec-v221 computePvEnergyYield pins annual energy, specific yield, capacity factor, and error seams", () => {
   const r = _v221({ dc_kw: 8, psh: 5.0, perf_ratio: 0.77 });
@@ -12857,6 +12857,34 @@ test("bounds: spec-v222 computePvRowSpacing pins pitch, GCR, the shallow-tilt ca
   assert.ok("error" in _v222({ module_length_ft: 6.5, tilt_deg: 30, profile_angle_deg: 0 }));
   assert.ok("error" in _v222({ module_length_ft: 6.5, tilt_deg: 30, profile_angle_deg: 91 }));
   assert.ok("error" in _v222({ module_length_ft: Infinity, tilt_deg: 30, profile_angle_deg: 22 }));
+});
+
+test("bounds: spec-v702 computePvRowShadeAngle pins prof = atan(rise/(pitch-base)), round-trips through computePvRowSpacing, and error seams", () => {
+  const r = _v702({ module_length_ft: 6.5, tilt_deg: 30, row_pitch_ft: 12 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.profile_angle_deg - 27.02782059) < 1e-6, `profile angle: ${r.profile_angle_deg}`);
+  assert.ok(Math.abs(r.gcr - 6.5 / 12) < 1e-9, `gcr: ${r.gcr}`);
+  // Round-trip: the profile angle, fed back through the forward tile, reproduces the pitch.
+  for (const module_length_ft of [4, 6.5, 10]) {
+    for (const tilt_deg of [10, 30, 60]) {
+      const base = module_length_ft * Math.cos(tilt_deg * Math.PI / 180);
+      for (const row_pitch_ft of [base + 1, base + 6, base + 20]) {
+        const m = _v702({ module_length_ft, tilt_deg, row_pitch_ft });
+        assert.ok(!m.error, `sweep L=${module_length_ft} tilt=${tilt_deg} pitch=${row_pitch_ft}: ${JSON.stringify(m)}`);
+        assertFinite(m.profile_angle_deg, "prof"); assert.ok(m.profile_angle_deg > 0 && m.profile_angle_deg < 90, "prof in (0,90)");
+        const back = _v222({ module_length_ft, tilt_deg, profile_angle_deg: m.profile_angle_deg });
+        assert.ok(Math.abs(back.pitch_ft - row_pitch_ft) < 1e-6, `round-trip L=${module_length_ft} tilt=${tilt_deg} pitch=${row_pitch_ft}: ${back.pitch_ft}`);
+      }
+    }
+  }
+  // More pitch means a lower (more forgiving) shade angle.
+  assert.ok(_v702({ module_length_ft: 6.5, tilt_deg: 30, row_pitch_ft: 20 }).profile_angle_deg < r.profile_angle_deg);
+  // Error seams: non-positive length, out-of-range tilt, pitch at/below the footprint, non-finite.
+  assert.ok("error" in _v702({ module_length_ft: 0, tilt_deg: 30, row_pitch_ft: 12 }));
+  assert.ok("error" in _v702({ module_length_ft: 6.5, tilt_deg: 0, row_pitch_ft: 12 }));
+  assert.ok("error" in _v702({ module_length_ft: 6.5, tilt_deg: 91, row_pitch_ft: 12 }));
+  assert.ok("error" in _v702({ module_length_ft: 6.5, tilt_deg: 30, row_pitch_ft: 5 }));
+  assert.ok("error" in _v702({ module_length_ft: 6.5, tilt_deg: 30, row_pitch_ft: Infinity }));
 });
 
 test("bounds: spec-v223 computePvInverterRatio pins ILR, clipping onset, the three verdict bands, and error seams", () => {

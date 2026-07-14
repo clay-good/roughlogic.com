@@ -35602,6 +35602,31 @@
       "kind": "question"
     },
     {
+      "term": "what sun angle is my array shade free to",
+      "target": "pv-row-shade-angle",
+      "kind": "question"
+    },
+    {
+      "term": "profile angle from row pitch",
+      "target": "pv-row-shade-angle",
+      "kind": "question"
+    },
+    {
+      "term": "lowest sun elevation before panels shade",
+      "target": "pv-row-shade-angle",
+      "kind": "question"
+    },
+    {
+      "term": "shade free angle for solar rows",
+      "target": "pv-row-shade-angle",
+      "kind": "question"
+    },
+    {
+      "term": "how low a sun with my row spacing",
+      "target": "pv-row-shade-angle",
+      "kind": "question"
+    },
+    {
       "term": "how much can i oversize my solar array",
       "target": "pv-inverter-ratio",
       "kind": "question"

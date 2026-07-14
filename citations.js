@@ -9920,6 +9920,18 @@ export const CITATIONS = {
       { name: "Ground-coverage ratio", value: "GCR = collector length / pitch drives both the land area and the inter-row shading", source: "first principles" },
     ],
   },
+  "pv-row-shade-angle": {
+    formula: "profile_angle = atan( L x sin(tilt) / (row_pitch - L x cos(tilt)) ) (the inverse of pitch = L cos(tilt) + L sin(tilt)/tan(profile_angle)); valid when pitch exceeds the footprint L cos(tilt).",
+    edition: "NREL / Sandia PV array row-spacing geometry solved for the profile angle, by name; the relations are first-principles trigonometry.",
+    freeAccess: "The row-spacing geometry and the ground-coverage-ratio definition are public NREL / Sandia relations and first-principles trigonometry.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of pv-row-spacing: with the pitch fixed by the roof or lot, it returns the lowest solar profile (elevation) angle the layout stays shade-free to -- rows shade each other only when the sun drops below it. Compare it to the winter-design sun elevation at the site (the 9 a.m.-to-3 p.m. solstice altitude from latitude or solar-times): if the shade angle is at or below that, the winter window is clear. Assumes due-south rows and a level field; an azimuth offset or a graded slope is a separate correction.",
+    assumptions: [
+      { name: "Shade angle", value: "the sun elevation at which adjacent rows just begin to shade; below it the array self-shades", source: "NREL / Sandia" },
+      { name: "Pitch constraint", value: "the pitch must exceed the module footprint L cos(tilt) or the rows overlap", source: "first principles" },
+      { name: "Assumptions", value: "due-south rows and a level field; azimuth or slope is a separate correction", source: "scope of this tile" },
+    ],
+  },
   "pv-cell-temperature-power": {
     formula: "T_cell = T_amb + (NOCT - 20) x G/800; P = P_stc x (1 + (gamma/100)(T_cell - 25)); loss = (1 - P/P_stc) x 100.",
     edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name.",

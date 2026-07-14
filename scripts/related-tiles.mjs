@@ -1185,6 +1185,7 @@ const RELATED = {
   "pv-energy-yield": ["pv-array-sizing","pv-string-sizing","pv-inverter-ratio","solar-times"],
   "pv-array-sizing": ["pv-energy-yield","pv-inverter-ratio","off-grid-battery","solar-times"],
   "pv-row-spacing": ["solar-times","pv-energy-yield","pv-string-sizing"],
+  "pv-row-shade-angle": ["pv-row-spacing","solar-times","pv-energy-yield"],
   "pv-inverter-ratio": ["pv-string-sizing","pv-energy-yield","pv-circuit-ampacity"],
   // spec-v224..v226 ASCE 7 structural design-loads batch (Group E)
   "rain-load-ponding": ["snow-load","roof-drain-sizing","gutter-downspout"],
