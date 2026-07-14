@@ -9160,6 +9160,18 @@ export const CITATIONS = {
       { name: "Short dose", value: "a short dose points to an aged lamp, a fouled sleeve, or low UV transmittance (turbidity)", source: "USEPA UVDGM" },
     ],
   },
+  "uv-required-exposure": {
+    formula: "required_time_s = target_dose_mj_cm2 / intensity_mw_cm2; or required_intensity_mw_cm2 = target_dose_mj_cm2 / exposure_time_s (mW.s/cm^2 = mJ/cm^2).",
+    edition: "USEPA UV Disinfection Guidance Manual (EPA 815-R-06-007) by name, the inverse of dose = intensity x time; no edition cycle.",
+    freeAccess: "The dose relation is public; the validated reactor dose and the state primacy agency govern compliance.",
+    governance: GOVERNANCE.water,
+    editionNote: "The inverse of the UV-dose tile: from a target dose, solve the operand that is missing. Leave the intensity blank for the required contact time = dose / intensity, or leave the time blank for the required intensity = dose / time (mW.s/cm^2 = mJ/cm^2). A common validated target is 40 mJ/cm^2, editable to the validated reactor value. This answers how long a lamp of a known intensity must expose the flow, or how strong a lamp must be for a fixed contact time, to reach the target dose. A short delivered dose in service points to an aged lamp, a fouled sleeve, or low UV transmittance. Single-edition (the dose relation does not roll); the validated reactor dose and the state primacy agency govern compliance.",
+    assumptions: [
+      { name: "Inverse relation", value: "time = dose / intensity, or intensity = dose / time; mW.s/cm^2 equals mJ/cm^2", source: "USEPA UVDGM" },
+      { name: "Target", value: "a common validated target is 40 mJ/cm^2, editable to the validated reactor dose", source: "USEPA UVDGM" },
+      { name: "One unknown", value: "enter exactly one of intensity or time; the tile solves for the other", source: "scope of this tile" },
+    ],
+  },
   "aeration-oxygen-demand": {
     formula: "O2_demand = oxygen_factor x BOD_removed + 4.6 x NH3_nitrified; air_scfm = O2_demand / (0.075 x 0.232 x (SOTE/100) x 1440).",
     edition: "Activated-sludge oxygen and air demand (WEF aeration design), by name.",

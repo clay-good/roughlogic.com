@@ -25323,6 +25323,50 @@
    }
   },
   {
+   "tile_id": "uv-required-exposure",
+   "source_publisher": "USEPA UV Disinfection Guidance Manual (inverse of uv-dose)",
+   "source_title": "40 mJ/cm^2 target at 10 mW/cm^2 -> 4 s of contact time (round-trips the uv-dose example)",
+   "source_edition_or_year": "spec-v659 worked example (machine-verified)",
+   "source_section_or_page": "spec-v659 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_dose_mj_cm2": 40,
+    "intensity_mw_cm2": 10,
+    "exposure_time_s": 0
+   },
+   "outputs": {
+    "required_time_s": {
+     "value": 4,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "uv-required-exposure",
+   "source_publisher": "USEPA UV Disinfection Guidance Manual (inverse of uv-dose)",
+   "source_title": "cross-check: leave intensity blank at a fixed 8 s -> a 5 mW/cm^2 lamp is required for the 40 mJ/cm^2 target",
+   "source_edition_or_year": "spec-v659 worked example (machine-verified)",
+   "source_section_or_page": "spec-v659 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_dose_mj_cm2": 40,
+    "intensity_mw_cm2": 0,
+    "exposure_time_s": 8
+   },
+   "outputs": {
+    "required_intensity_mw_cm2": {
+     "value": 5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "population-equivalent",
    "source_publisher": "Population equivalent (organic load), standard sanitary engineering",
    "source_title": "PE_bod = MGD x BOD x 8.34 / 0.17; PE = max(PE_bod, PE_flow, PE_ss)",

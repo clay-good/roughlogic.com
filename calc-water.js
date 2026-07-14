@@ -1339,6 +1339,41 @@ const renderUvDose = _v23SimpleRenderer({
 });
 WATER_RENDERERS["uv-dose"] = renderUvDose;
 
+// dims: in { target_dose_mj_cm2: M T^-2, intensity_mw_cm2: M T^-3, exposure_time_s: T } out: { required_time_s: T, required_intensity_mw_cm2: M T^-3 }
+export function computeUvRequiredExposure({ target_dose_mj_cm2 = 40, intensity_mw_cm2 = 0, exposure_time_s = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_dose_mj_cm2) || 0;
+  const I = Number(intensity_mw_cm2) || 0;
+  const t = Number(exposure_time_s) || 0;
+  if (!(target > 0)) return { error: "Target dose must be positive (mJ/cm^2)." };
+  const haveI = I > 0, haveT = t > 0;
+  if (haveI === haveT) return { error: "Enter exactly one of intensity or exposure time (leave the unknown blank)." };
+  let required_time_s = null, required_intensity_mw_cm2 = null;
+  if (haveI) required_time_s = target / I;
+  else required_intensity_mw_cm2 = target / t;
+  return {
+    required_time_s, required_intensity_mw_cm2,
+    note: "UV dose = intensity x exposure time (mW.s/cm^2 = mJ/cm^2), solved for the operand you are missing: leave intensity blank to get the required intensity = dose / time, or leave time blank to get the required contact time = dose / intensity. A common validated target is 40 mJ/cm^2 (editable to the validated reactor value). It answers how long a lamp of a known intensity must expose the flow, or how strong a lamp must be for a fixed contact time, to reach the target dose. A short delivered dose usually means an aged lamp, a fouled sleeve, or low UV transmittance (turbidity). The validated reactor dose and the state primacy agency govern compliance.",
+  };
+}
+export const uvRequiredExposureExample = { inputs: { target_dose_mj_cm2: 40, intensity_mw_cm2: 10, exposure_time_s: 0 } };
+const renderUvRequiredExposure = _v23SimpleRenderer({
+  citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2) solved for the missing operand: required time = dose / intensity, or required intensity = dose / time; common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
+  example: uvRequiredExposureExample.inputs,
+  fields: [
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm^2)", kind: "number", default: 40 },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm^2, 0 = solve for it)", kind: "number", default: 10 },
+    { key: "exposure_time_s", label: "Exposure time (s, 0 = solve for it)", kind: "number", default: 0 },
+  ],
+  outputs: [
+    { key: "t", id: "uvr-out-t", label: "Required exposure time", value: (r) => r.required_time_s == null ? "(time was given)" : fmt(r.required_time_s, 2) + " s" },
+    { key: "i", id: "uvr-out-i", label: "Required UV intensity", value: (r) => r.required_intensity_mw_cm2 == null ? "(intensity was given)" : fmt(r.required_intensity_mw_cm2, 2) + " mW/cm^2" },
+    { key: "n", id: "uvr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeUvRequiredExposure,
+});
+WATER_RENDERERS["uv-required-exposure"] = renderUvRequiredExposure;
+
 // --- spec-v570 M: Population equivalent (organic load) ---
 // PE_bod = MGD*BOD*8.34/0.17. PE_flow = MGD*1e6/100. PE_ss = MGD*SS*8.34/0.20. PE = max.
 // dims: in { flow_mgd: L^3 T^-1, bod_mg_l: M L^-3, ss_mg_l: M L^-3 } out: { pe_bod: dimensionless, pe_flow: dimensionless, pe_governing: dimensionless }

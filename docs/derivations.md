@@ -2725,6 +2725,7 @@ cross-check.
 | calc-water.js | `computeSRTandFM` | `{ aeration_volume_gal = 0, mlss_mg_l = 0, mlvss_mg_l = 0, was_flow_mgd = 0, w...` | _ | _ | _ |
 | calc-water.js | `computeSVI` | `{ sv30_ml_per_l = 0, mlss_mg_per_l = 0, } = {}` | _ | _ | _ |
 | calc-water.js | `computeUvDose` | `{ intensity_mw_cm2 = 0, exposure_time_s = 0, target_dose_mj_cm2 = 40 } = {}` | _ | _ | _ |
+| calc-water.js | `computeUvRequiredExposure` | `{ target_dose_mj_cm2 = 40, intensity_mw_cm2 = 0, exposure_time_s = 0 } = {}` | _ | _ | _ |
 | calc-water.js | `computeWasSrtControl` | `{ aeration_volume_mg = 0, mlss_mg_l = 0, target_srt_days = 0, was_conc_mg_l =...` | _ | _ | _ |
 | calc-water.js | `computeWellDrawdown` | `{ static_level_ft = 0, pumping_level_ft = 0, discharge_gpm = 0, pump_offset_f...` | _ | _ | _ |
 | pure-math.js | `C_to_F` | `C` | _ | _ | _ |
@@ -2765,7 +2766,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1351.
+Row count: 1352.
 
 <!-- END function-corpus-v14 -->
 
@@ -3788,7 +3789,7 @@ per spec-v14 §13.1 second paragraph.
 | `two-stroke-mix` | Two-Stroke Fuel Mix | First-principles volume arithmetic (s...; 50:1, 1 US gallon -> 2.56 fl oz (75.71 mL) of oil | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-stroke-mix-ratio-check` | Two-Stroke Mix Ratio Check | First-principles volume arithmetic (i...; spec-v653 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group M Water and wastewater (42 tiles)
+### Group M Water and wastewater (43 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3829,6 +3830,7 @@ per spec-v14 §13.1 second paragraph.
 | `tapered-flocculation-g` | Tapered Flocculation G Schedule | Camp & Stein 1943 / Ten States Standards; G 50/30/20 per s, three 100 m3 stages, 15 C (mu 1.138e-3)... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tds-from-conductivity` | Total Dissolved Solids from Conductivity | Standard Methods 2510; spec-v407 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `uv-dose` | UV Dose and Target Check | USEPA UV Disinfection Guidance Manual...; spec-v116 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `uv-required-exposure` | UV Required Intensity or Contact Time | USEPA UV Disinfection Guidance Manual...; spec-v659 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `va-alkalinity-ratio` | Digester Volatile-Acid to Alkalinity Ratio | WEF Manual of Practice / EPA operator...; VA 180 mg/L, alkalinity 2,400 mg/L -> ratio 0.075 (stable... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `was-srt-control` | WAS Rate to Hold Target SRT (Sludge Age) | MCRT/SRT control; WEF operator training; 2 MG, 3000 MLSS, SRT 10 d, WAS 8000, eff 5 MGD/15 mg/L ->... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `weir-flow` | Weir / Flume Open-Channel Flow | USBR Water Measurement Manual (V-notc...; 90-degree V-notch, H 0.5 ft -> ~0.446 cfs ~200 GPM | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4058,6 +4060,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1107. Fixture-covered or reference-cadence: 1107 / 1107.
+Tile count: 1108. Fixture-covered or reference-cadence: 1108 / 1108.
 
 <!-- END tile-index-v14 -->

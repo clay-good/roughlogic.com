@@ -80997,6 +80997,36 @@
       "kind": "question"
     },
     {
+      "term": "uv required exposure",
+      "target": "uv-required-exposure",
+      "kind": "industry"
+    },
+    {
+      "term": "uv contact time",
+      "target": "uv-required-exposure",
+      "kind": "industry"
+    },
+    {
+      "term": "required uv intensity",
+      "target": "uv-required-exposure",
+      "kind": "redirect"
+    },
+    {
+      "term": "how long for uv dose",
+      "target": "uv-required-exposure",
+      "kind": "question"
+    },
+    {
+      "term": "lamp intensity for uv dose",
+      "target": "uv-required-exposure",
+      "kind": "question"
+    },
+    {
+      "term": "uv dose contact time",
+      "target": "uv-required-exposure",
+      "kind": "question"
+    },
+    {
       "term": "tension in each leg of a four leg lift",
       "target": "multi-leg-sling",
       "kind": "question"

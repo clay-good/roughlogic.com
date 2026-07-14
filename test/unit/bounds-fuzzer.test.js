@@ -10778,6 +10778,25 @@ test("bounds: spec-v116 disinfection (chlorine demand + UV dose)", () => {
   assert.ok("error" in _v116b({ intensity_mw_cm2: 0 }) && "error" in _v116b({ intensity_mw_cm2: 10, exposure_time_s: 0 }) && "error" in _v116b({ intensity_mw_cm2: 10, exposure_time_s: 5, target_dose_mj_cm2: 0 }));
 });
 
+import { computeUvRequiredExposure as _v659 } from "../../calc-water.js";
+
+test("bounds: spec-v659 computeUvRequiredExposure solves the missing UV operand, round-trips the dose tile, and pins error seams", () => {
+  // Given intensity, solve the required contact time.
+  const t = _v659({ target_dose_mj_cm2: 40, intensity_mw_cm2: 10, exposure_time_s: 0 });
+  assert.ok(Math.abs(t.required_time_s - 4) < 1e-9 && t.required_intensity_mw_cm2 === null);
+  // Given time, solve the required intensity.
+  const i = _v659({ target_dose_mj_cm2: 40, intensity_mw_cm2: 0, exposure_time_s: 8 });
+  assert.ok(Math.abs(i.required_intensity_mw_cm2 - 5) < 1e-9 && i.required_time_s === null);
+  // Exact inverse of uv-dose: the solved time at that intensity delivers the target dose.
+  assert.ok(Math.abs(_v116b({ intensity_mw_cm2: 10, exposure_time_s: t.required_time_s, target_dose_mj_cm2: 40 }).dose_mj_cm2 - 40) < 1e-9);
+  assert.ok(_v116b({ intensity_mw_cm2: 10, exposure_time_s: t.required_time_s, target_dose_mj_cm2: 40 }).meets === true);
+  // Error seams: both given, neither given, non-positive target, non-finite.
+  assert.ok("error" in _v659({ target_dose_mj_cm2: 40, intensity_mw_cm2: 10, exposure_time_s: 5 }));
+  assert.ok("error" in _v659({ target_dose_mj_cm2: 40, intensity_mw_cm2: 0, exposure_time_s: 0 }));
+  assert.ok("error" in _v659({ target_dose_mj_cm2: 0, intensity_mw_cm2: 10, exposure_time_s: 0 }));
+  assert.ok("error" in _v659({ target_dose_mj_cm2: Infinity, intensity_mw_cm2: 10, exposure_time_s: 0 }));
+});
+
 import { computeMultiLegSling as _v117a, computeWireRopeStrength as _v117b } from "../../calc-rigging.js";
 test("bounds: spec-v117 rigging (multi-leg sling + wire-rope strength)", () => {
   const a = _v117a({ total_load_lb: 8000, num_legs: 4, horizontal_angle_deg: 60 });

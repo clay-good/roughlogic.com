@@ -994,6 +994,7 @@ export const COMPUTE_MAP = {
   "tire-load-check": { module: "../../calc-trucking.js", fn: "computeTireLoadCheck" },
   "chlorine-demand": { module: "../../calc-water.js", fn: "computeChlorineDemand" },
   "uv-dose": { module: "../../calc-water.js", fn: "computeUvDose" },
+  "uv-required-exposure": { module: "../../calc-water.js", fn: "computeUvRequiredExposure" },
   "population-equivalent": { module: "../../calc-water.js", fn: "computePopulationEquivalent" },
   "ras-flow-rate": { module: "../../calc-water.js", fn: "computeRasFlowRate" },
   "ras-svi-settleability": { module: "../../calc-water.js", fn: "computeRasSviSettleability" },

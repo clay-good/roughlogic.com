@@ -1035,7 +1035,8 @@ const RELATED = {
   "def-consumption": ["reefer-burn","cost-per-mile","fuel-surcharge"],
   // spec-v116 water disinfection (Group M)
   "chlorine-demand": ["pounds-formula","chlorine-decay","disinfection-ct"],
-  "uv-dose": ["disinfection-ct","chlorine-demand"],
+  "uv-dose": ["uv-required-exposure","disinfection-ct","chlorine-demand"],
+  "uv-required-exposure": ["uv-dose","disinfection-ct","chlorine-demand"],
   "population-equivalent": ["bod-tss-loading-removal","pounds-formula","chlorine-demand"],
   "ras-flow-rate": ["srt-fm-ratio","svi-sludge-index","clarifier-surface-loading"],
   "ras-svi-settleability": ["ras-flow-rate","svi-sludge-index","srt-fm-ratio"],
