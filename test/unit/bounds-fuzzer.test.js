@@ -14678,6 +14678,34 @@ test("bounds: spec-v287 computeSoilSettlementElastic pins the medium-sand case, 
   assert.ok("error" in _v287({ q_ksf: Infinity, b_ft: 6, es_ksf: 250 }));
 });
 
+import { computeElasticSettlementAllowablePressure as _v710 } from "../../calc-geotech.js";
+test("bounds: spec-v710 computeElasticSettlementAllowablePressure pins q = Se Es/(B(1-nu^2)Is), round-trips through computeSoilSettlementElastic, and error seams", () => {
+  const r = _v710({ settlement_limit_in: 1, b_ft: 6, es_ksf: 250, nu: 0.3, is_f: 0.82 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.allowable_pressure_ksf - (1 / 12) * 250 / (6 * (1 - 0.09) * 0.82)) < 1e-9, `q identity: ${r.allowable_pressure_ksf}`);
+  assert.ok(Math.abs(r.allowable_pressure_ksf - 4.653206) < 1e-4, `pinned 4.65 ksf: ${r.allowable_pressure_ksf}`);
+  // Round-trip: at the allowable pressure the forward tile's settlement equals the limit.
+  for (const settlement_limit_in of [0.5, 1, 2]) {
+    for (const b_ft of [4, 6, 12]) {
+      for (const es_ksf of [125, 250, 500]) {
+        const m = _v710({ settlement_limit_in, b_ft, es_ksf, nu: 0.3, is_f: 0.82 });
+        assert.ok(!m.error, `sweep se=${settlement_limit_in} B=${b_ft} Es=${es_ksf}: ${JSON.stringify(m)}`);
+        assertFinite(m.allowable_pressure_ksf, "q"); assert.ok(m.allowable_pressure_ksf > 0, "q positive");
+        const back = _v287({ q_ksf: m.allowable_pressure_ksf, b_ft, es_ksf, nu: 0.3, is_f: 0.82 });
+        assert.ok(Math.abs(back.se_in - settlement_limit_in) < 1e-6, `round-trip se=${settlement_limit_in} B=${b_ft} Es=${es_ksf}: ${back.se_in}`);
+      }
+    }
+  }
+  // A wider footing settles more, so the allowable pressure falls.
+  assert.ok(_v710({ settlement_limit_in: 1, b_ft: 12, es_ksf: 250 }).allowable_pressure_ksf < r.allowable_pressure_ksf);
+  // Error seams: non-positive limit, width, modulus, nu at/above 0.5, non-finite.
+  assert.ok("error" in _v710({ settlement_limit_in: 0, b_ft: 6, es_ksf: 250 }));
+  assert.ok("error" in _v710({ settlement_limit_in: 1, b_ft: 0, es_ksf: 250 }));
+  assert.ok("error" in _v710({ settlement_limit_in: 1, b_ft: 6, es_ksf: 0 }));
+  assert.ok("error" in _v710({ settlement_limit_in: 1, b_ft: 6, es_ksf: 250, nu: 0.5 }));
+  assert.ok("error" in _v710({ settlement_limit_in: Infinity, b_ft: 6, es_ksf: 250 }));
+});
+
 test("bounds: spec-v288 computePileAxialCapacity pins the friction pile, the shaft-vs-tip scaling, and error seams", () => {
   const D = 16 / 12;
   const r = _v288({ d_ft: D, l_ft: 40, cu_ksf: 1, alpha: 0.55, fs: 3 });

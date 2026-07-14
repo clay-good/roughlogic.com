@@ -2010,6 +2010,7 @@ cross-check.
 | calc-geotech.js | `computeConsolidationDegree` | `{ cv_ft2_day = 0, hdr_ft = 0, t_days = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeConsolidationTimeRate` | `{ u_percent = 0, cv_ft2_day = 0, hdr_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeCoulombEarthPressure` | `{ phi = 0, delta = 0, theta = 0, alpha = 0, gamma = 120, h_ft = 0 } = {}` | _ | _ | _ |
+| calc-geotech.js | `computeElasticSettlementAllowablePressure` | `{ settlement_limit_in = 1, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeFootingEccentricPressure` | `{ p_kip = 0, m_kft = 0, b_ft = 0, l_ft = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeLateralEarthPressure` | `{ phi = 0, gamma = 120, h_ft = 0, q = 0 } = {}` | _ | _ | _ |
 | calc-geotech.js | `computeLiquefactionScreening` | `{ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf =...` | _ | _ | _ |
@@ -2819,7 +2820,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1405.
+Row count: 1406.
 
 <!-- END function-corpus-v14 -->
 
@@ -3343,7 +3344,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (244 tiles)
+### Group E Construction (245 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3413,6 +3414,7 @@ per spec-v14 §13.1 second paragraph.
 | `earthwork-end-area` | Earthwork Volume (End-Area) | FHWA / state-DOT earthwork references...; two 100 ft^2 sections 100 ft apart -> 10000 ft^3 (370.37 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `egress-capacity` | Egress Exit Count and Required Width (IBC 1005.3 / 1006.2) | IBC 2021 §1005.3 / §1006.2 / §1010.1.1; spec-v243 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `egress-travel-distance` | Egress Travel Distance, Common Path, and Dead-End Check (IBC Chapter 10) | IBC 2021 §1017 / §1006.2.1 / §1020.5; spec-v252 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `elastic-settlement-allowable-pressure` | Allowable Bearing Pressure for a Settlement Limit | Theory-of-elasticity immediate settle...; 1 in limit, 6 ft footing, Es 250 ksf, nu 0.3, Is 0.82 -> ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation` | Excavation Volume | Project (first-principles); vertical (90 deg) -> setback=0; A1=A2=100 ft^2; V = D/3 *... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `excavation-bench-plan` | Excavation Slope and Bench-Step Plan | OSHA; Type B ratio 1:1; bench 4 ft per layer; bottom width 2 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `exterior-opening-protection` | Exterior Wall Opening Limit by Fire Separation Distance (IBC Table 705.8) | IBC 2021 Table 705.8; spec-v253 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4163,6 +4165,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1158. Fixture-covered or reference-cadence: 1158 / 1158.
+Tile count: 1159. Fixture-covered or reference-cadence: 1159 / 1159.
 
 <!-- END tile-index-v14 -->

@@ -851,6 +851,7 @@ export const COMPUTE_MAP = {
   "rc-hook-development": { module: "../../calc-concrete.js", fn: "computeRcHookDevelopment" },
   // spec-v287..v289 geotechnical foundation depth batch (3 tiles)
   "soil-settlement-elastic": { module: "../../calc-geotech.js", fn: "computeSoilSettlementElastic" },
+  "elastic-settlement-allowable-pressure": { module: "../../calc-geotech.js", fn: "computeElasticSettlementAllowablePressure" },
   "pile-axial-capacity": { module: "../../calc-geotech.js", fn: "computePileAxialCapacity" },
   "pile-length-for-capacity": { module: "../../calc-geotech.js", fn: "computePileLengthForCapacity" },
   "slope-stability-infinite": { module: "../../calc-geotech.js", fn: "computeSlopeStabilityInfinite" },

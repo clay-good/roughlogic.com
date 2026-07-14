@@ -1254,6 +1254,7 @@ const RELATED = {
   "rc-hook-development": ["rc-development-length","rebar-lap-splice","rebar"],
   // spec-v287..v289 geotechnical foundation depth batch (Group E)
   "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],
+  "elastic-settlement-allowable-pressure": ["soil-settlement-elastic","soil-bearing-capacity","footing-area","soil-consolidation-settlement"],
   "pile-axial-capacity": ["helical-pile","soil-bearing-capacity","soil-settlement-elastic"],
   "pile-length-for-capacity": ["pile-axial-capacity","helical-pile","pile-group-efficiency","soil-bearing-capacity"],
   "pile-group-efficiency": ["pile-axial-capacity","helical-pile","soil-bearing-capacity"],

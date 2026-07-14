@@ -42802,6 +42802,31 @@
       "kind": "question"
     },
     {
+      "term": "allowable pressure for 1 inch settlement",
+      "target": "elastic-settlement-allowable-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "max bearing pressure for settlement limit",
+      "target": "elastic-settlement-allowable-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "footing pressure to limit settlement",
+      "target": "elastic-settlement-allowable-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "how much load before footing settles too much",
+      "target": "elastic-settlement-allowable-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "settlement based allowable bearing",
+      "target": "elastic-settlement-allowable-pressure",
+      "kind": "question"
+    },
+    {
       "term": "how much can a pile carry in clay",
       "target": "pile-axial-capacity",
       "kind": "question"

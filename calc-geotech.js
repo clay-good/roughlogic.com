@@ -454,6 +454,50 @@ GEOTECH_RENDERERS["soil-settlement-elastic"] = _simpleRenderer({
   compute: computeSoilSettlementElastic,
 });
 
+// elastic-settlement-allowable-pressure: inverse of soil-settlement-elastic. The
+// forward tile gives the settlement from a contact pressure; the design question
+// is the largest pressure that keeps immediate settlement within a limit. From
+// Se = q B (1 - nu^2) Is / Es, solving for the pressure (with the width fixed):
+// q = Se Es / (B (1 - nu^2) Is), Se in feet = limit_in / 12.
+// dims: in { settlement_limit_in: L, b_ft: L, es_ksf: M L^-1 T^-2, nu: dimensionless, is_f: dimensionless } out: { allowable_pressure_ksf: M L^-1 T^-2, allowable_pressure_psf: M L^-1 T^-2 }
+export function computeElasticSettlementAllowablePressure({ settlement_limit_in = 1, b_ft = 0, es_ksf = 0, nu = 0.3, is_f = 0.82 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const seIn = Number(settlement_limit_in) || 0;
+  const B = Number(b_ft) || 0;
+  const es = Number(es_ksf) || 0;
+  const nuv = Number(nu);
+  const isf = Number(is_f) || 0;
+  if (!(seIn > 0)) return { error: "Settlement limit must be positive (in)." };
+  if (!(B > 0)) return { error: "Footing width must be positive (ft)." };
+  if (!(es > 0)) return { error: "Soil elastic modulus must be positive (ksf)." };
+  if (!(nuv >= 0 && nuv < 0.5)) return { error: "Poisson's ratio must be at least 0 and below 0.5." };
+  if (!(isf > 0)) return { error: "The influence factor must be positive (0.82 rigid square)." };
+  const se_ft = seIn / 12;
+  const allowable_pressure_ksf = (se_ft * es) / (B * (1 - nuv * nuv) * isf);
+  const allowable_pressure_psf = allowable_pressure_ksf * 1000;
+  return {
+    allowable_pressure_ksf, allowable_pressure_psf, settlement_limit_in: seIn,
+    note: "Theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es solved for the pressure: the largest net contact pressure that keeps immediate (elastic) settlement within the limit is q = Se Es / (B (1 - nu^2) Is). A wider footing settles more at the same pressure, so the allowable pressure drops as B grows. Immediate settlement on a deep uniform elastic layer only - not the consolidation settlement of a clay, one homogeneous modulus, the influence factor as entered, no embedment correction, and this is a settlement (serviceability) limit, not the bearing-capacity (strength) limit, which is a separate check. A design aid, not a substitute for the geotechnical engineer of record's report.",
+  };
+}
+export const elasticSettlementAllowablePressureExample = { inputs: { settlement_limit_in: 1, b_ft: 6, es_ksf: 250, nu: 0.3, is_f: 0.82 } };
+GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
+  citation: "Citation: theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es solved for the pressure, q = Se Es / (B (1 - nu^2) Is), with the shape/rigidity influence factor Is (Bowles), by name. A settlement (serviceability) limit, not the bearing-capacity strength check. A design aid, not a substitute for the geotechnical engineer's report.",
+  example: elasticSettlementAllowablePressureExample.inputs,
+  fields: [
+    { key: "settlement_limit_in", label: "Settlement limit Se (in)", kind: "number", default: 1 },
+    { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
+    { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
+    { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
+    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number", default: 0.82 },
+  ],
+  outputs: [
+    { key: "q", id: "esap-out-q", label: "Allowable pressure (settlement limit)", value: (r) => fmt(r.allowable_pressure_ksf, 2) + " ksf (" + fmt(r.allowable_pressure_psf, 0) + " psf)" },
+    { key: "n", id: "esap-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeElasticSettlementAllowablePressure,
+});
+
 // dims: in { d_ft: L, l_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { as_ft2: L^2, ap_ft2: L^2, qs_kip: M T^-2, qp_kip: M T^-2, qult_kip: M T^-2, qall_kip: M T^-2 }
 export function computePileAxialCapacity({ d_ft = 0, l_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

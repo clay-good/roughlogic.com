@@ -41501,6 +41501,30 @@
    }
   },
   {
+   "tile_id": "elastic-settlement-allowable-pressure",
+   "source_publisher": "Theory-of-elasticity immediate settlement (Bowles)",
+   "source_title": "q = Se Es / (B (1 - nu^2) Is); inverse of the elastic settlement",
+   "source_edition_or_year": "spec-v710 worked example (machine-verified; inverse of spec-v287)",
+   "source_section_or_page": "1 in limit, 6 ft footing, Es 250 ksf, nu 0.3, Is 0.82 -> 4.65 ksf",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "settlement_limit_in": 1,
+    "b_ft": 6,
+    "es_ksf": 250,
+    "nu": 0.3,
+    "is_f": 0.82
+   },
+   "outputs": {
+    "allowable_pressure_ksf": {
+     "value": 4.653206,
+     "tolerance": {
+      "pct": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-settlement-elastic",
    "source_publisher": "Theory-of-elasticity immediate settlement (Bowles)",
    "source_title": "cross-check: half the modulus (Es 125) doubles it to 1.29 in - over the 1 in limit",

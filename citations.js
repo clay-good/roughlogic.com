@@ -10663,6 +10663,18 @@ export const CITATIONS = {
       { name: "Scope", value: "immediate settlement only; consolidation, layering, and embedment are separate", source: "customary geotechnical practice" },
     ],
   },
+  "elastic-settlement-allowable-pressure": {
+    formula: "q = Se Es / (B (1 - nu^2) Is), the theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es solved for the pressure (Se in feet = limit_in / 12).",
+    edition: "The theory-of-elasticity immediate (elastic) settlement of a shallow foundation solved for the allowable pressure, with the shape-and-rigidity influence factor Is (Bowles, Foundation Analysis and Design), by name.",
+    freeAccess: "The elasticity-based settlement form and the influence-factor tables are public in the standard foundation-engineering references; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of soil-settlement-elastic: the largest net contact pressure that keeps the immediate (elastic) settlement of a footing on a deep uniform elastic layer within a limit. A wider footing settles more at the same pressure, so the allowable pressure falls as B grows. This is a settlement (serviceability) limit, not the bearing-capacity (strength) limit, which is a separate check; it is not consolidation settlement, assumes one homogeneous modulus, takes the influence factor as entered, and excludes the embedment correction. A design aid, not a substitute for the geotechnical engineer of record's report.",
+    assumptions: [
+      { name: "Elastic form inverted", value: "q = Se Es / (B (1 - nu^2) Is) on a deep uniform elastic layer", source: "theory of elasticity / Bowles" },
+      { name: "Serviceability limit", value: "a settlement-controlled pressure, not the bearing-capacity strength limit", source: "customary geotechnical practice" },
+      { name: "Scope", value: "immediate settlement only; consolidation, layering, and embedment are separate", source: "customary geotechnical practice" },
+    ],
+  },
   "pile-group-efficiency": {
     formula: "theta = atan(d/s) [deg]; Eg = 1 - theta x ((n-1)m + (m-1)n) / (90 m n); group_allowable = Eg x (m x n) x Q_single.",
     edition: "Converse-Labarre pile-group efficiency (standard geotechnical practice), an empirical friction-pile group hand check, by name; the geotechnical engineer of record and a load test govern.",
