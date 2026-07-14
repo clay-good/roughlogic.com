@@ -724,7 +724,7 @@ const TOOL_MODULES = (() => {
     "geometry", "dilution", "slope-from-level", "haversine",
     // v3 (meta-utilities 170 and 172 are registered separately below; the rest live here)
     "trench-slope", "niosh-lifting", "heat-stress", "wind-chill", "ladder-angle",
-    "pulley-ma-gen", "ramp-slope", "rainwater-yield", "timesheet", "vehicle-load",
+    "pulley-ma-gen", "ramp-slope", "rainwater-yield", "rainwater-catchment-area", "timesheet", "vehicle-load",
     // v7
     "fall-protection-clearance",
     // v9

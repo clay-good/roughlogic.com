@@ -5340,6 +5340,17 @@ export const CITATIONS = {
       { name: "Default collection efficiency", value: "0.85 (asphalt-shingle roof) unless user supplies", source: "ARCSA typical" },
     ],
   },
+  "rainwater-catchment-area": {
+    formula: "catchment_ft2 = target_annual_gal / (annual_in x 0.6233 x efficiency); the inverse of annual_gal = area x rainfall x 0.6233 x efficiency.",
+    edition: "ARCSA (American Rainwater Catchment Systems Association) Rainwater Harvesting Manual by name; NOAA precipitation data.",
+    freeAccess: "ARCSA materials free at arcsa.org. NOAA precipitation data free at hdsc.nws.noaa.gov.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The catchment (roof) footprint needed to harvest a target annual volume, the inverse of rainwater-yield: area = target_gal / (annual_in x 0.6233 x efficiency). The 0.6233 converts one inch of rain over one square foot to gallons; efficiency (about 0.62 for a sloped shingle roof, higher for metal) accounts for first-flush, splash, and evaporation losses. The area is the horizontal footprint the rain falls on, not the sloped surface. Single-edition (ARCSA + NOAA precipitation data). A planning estimate; local rainfall records, the storage tank size, and the demand pattern govern the real system.",
+    assumptions: [
+      { name: "Conversion and efficiency", value: "0.6233 gal per in-ft^2; collection efficiency about 0.62 sloped shingle to 0.85 metal", source: "ARCSA typical" },
+      { name: "Horizontal footprint", value: "the area is the horizontal projected footprint, not the sloped roof surface", source: "ARCSA method" },
+    ],
+  },
   "timesheet": {
     formula: "Per-job hours summed; OT = max(total − 40, 0) × rate × 1.5; reimbursable miles × IRS rate.",
     edition: "FLSA 29 USC 207 by section + IRS standard mileage rate.",

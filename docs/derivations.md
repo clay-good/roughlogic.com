@@ -1690,6 +1690,7 @@ cross-check.
 | calc-cross.js | `computePerDiem` | `{ state, type = "lodging" }` | _ | _ | _ |
 | calc-cross.js | `computePulleyMA` | `{ rig = "block_2", efficiency = 0.95 }` | _ | _ | _ |
 | calc-cross.js | `computePumpTdh` | `{ flow_gpm = 0, internal_diameter_in = 0, hw_c = 150, static_suction_lift_ft ...` | _ | _ | _ |
+| calc-cross.js | `computeRainwaterCatchmentArea` | `{ target_annual_gal = 0, annual_in = 0, efficiency = 0.62 } = {}` | _ | _ | _ |
 | calc-cross.js | `computeRainwaterYield` | `{ catchment_ft2 = 0, monthly_in = [], annual_in = null, efficiency = 0.62 }` | _ | _ | _ |
 | calc-cross.js | `computeRampSlope` | `{ rise_in = 0, run_in = 0 }` | _ | _ | _ |
 | calc-cross.js | `computeRollingOffset` | `{ rise_in, roll_in, angle_deg }` | _ | _ | _ |
@@ -2781,7 +2782,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1367.
+Row count: 1368.
 
 <!-- END function-corpus-v14 -->
 
@@ -3580,7 +3581,7 @@ per spec-v14 §13.1 second paragraph.
 | `vacuum-lift-reading` | Vacuum Gauge to Drafting Lift Readout | IFSTA / NWCG fire-pump drafting practice; 10 in Hg at sea level -> 11.3 ft of head, 50% of the ~22.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `water-supply-duration` | Water-Supply Duration | Volume/flow continuity + NFPA 1142 co...; 3000 gal, 250 GPM, no resupply -> 12 min | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group G Cross-trade (56 tiles)
+### Group G Cross-trade (57 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3619,6 +3620,7 @@ per spec-v14 §13.1 second paragraph.
 | `pulley-ma-gen` | Pulley System Mechanical Advantage | Project (first-principles); Triple block (block_3, 3 pulleys), efficiency 0.95 -> the... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-tdh` | Pump Total Dynamic Head (TDH) | Crane / Hazen-Williams; TDH = static + suction + discharge + fittings friction; h... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `punch-force` | Punch / Shear Force | First-principles shear + Machinery's ...; round 0.5 in hole, T 0.25 in, tau 50,000 psi -> 19,634.95... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `rainwater-catchment-area` | Catchment Area for a Target Harvest | ARCSA / NOAA (inverse); 11,593 gal target, 30 in, 0.62 efficiency -> about 1,000 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `rainwater-yield` | Rainwater Harvesting Yield | Project (first-principles); Standard 0.6233 gal-per-in-per-ft^2 conversion factor | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `ramp-slope` | Ramp Slope (ADA) | Project (first-principles); ADA 4.8.2 1:12 maximum running slope (cited by name) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rolled-blank` | Rolled Plate Blank Length | First-principles arc-length geometry ...; OD 12 in, T 0.25 in, k 0.5 -> neutral 11.75 in, L 36.9137... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4090,6 +4092,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1123. Fixture-covered or reference-cadence: 1123 / 1123.
+Tile count: 1124. Fixture-covered or reference-cadence: 1124 / 1124.
 
 <!-- END tile-index-v14 -->

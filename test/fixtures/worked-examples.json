@@ -881,6 +881,50 @@
    }
   },
   {
+   "tile_id": "rainwater-catchment-area",
+   "source_publisher": "ARCSA / NOAA (inverse)",
+   "source_title": "catchment_ft2 = target_gal / (annual_in * 0.6233 * efficiency)",
+   "source_edition_or_year": "spec-v675 worked example (machine-verified)",
+   "source_section_or_page": "11,593 gal target, 30 in, 0.62 efficiency -> about 1,000 ft^2 (round-trips rainwater-yield)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_annual_gal": 11593,
+    "annual_in": 30,
+    "efficiency": 0.62
+   },
+   "outputs": {
+    "catchment_ft2": {
+     "value": 999.97,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "rainwater-catchment-area",
+   "source_publisher": "ARCSA / NOAA (inverse)",
+   "source_title": "cross-check: a metal roof at 0.85 efficiency needs less area for the same target",
+   "source_edition_or_year": "spec-v675 cross-check (machine-verified)",
+   "source_section_or_page": "11,593 gal, 30 in, 0.85 efficiency -> about 729 ft^2 (higher efficiency, smaller roof)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_annual_gal": 11593,
+    "annual_in": 30,
+    "efficiency": 0.85
+   },
+   "outputs": {
+    "catchment_ft2": {
+     "value": 729.39,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "henderson-hasselbalch",
    "source_publisher": "Project (first-principles)",
    "source_title": "At pH = pKa the base:acid ratio is 1:1",

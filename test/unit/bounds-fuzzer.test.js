@@ -5794,6 +5794,7 @@ import {
   computePulleyMA,
   computeRampSlope,
   computeRainwaterYield,
+  computeRainwaterCatchmentArea,
   computeTimesheet,
   computeVehicleLoad,
   computeFallProtectionClearance,
@@ -6261,6 +6262,32 @@ test("bounds: calc-cross computeRainwaterYield pins gal = area * rain * 0.6233 *
   assert.ok("error" in computeRainwaterYield({ catchment_ft2: 0, annual_in: 38 }));
   assert.ok("error" in computeRainwaterYield({ catchment_ft2: 1500, annual_in: -1 }));
   assert.ok("error" in computeRainwaterYield({ catchment_ft2: 1500, monthly_in: "not-array" }));
+});
+
+test("bounds: spec-v675 computeRainwaterCatchmentArea pins area = target/(rain*0.6233*eff), round-trips through computeRainwaterYield, and error seams", () => {
+  const r = computeRainwaterCatchmentArea({ target_annual_gal: 11593, annual_in: 30, efficiency: 0.62 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.catchment_ft2 - 11593 / (30 * 0.6233 * 0.62)) < 1e-9, `area identity: ${r.catchment_ft2}`);
+  assert.ok(Math.abs(r.catchment_ft2 - 1000) < 1, `pinned ~1000 ft^2: ${r.catchment_ft2}`);
+  // A more efficient roof needs less area for the same target.
+  const metal = computeRainwaterCatchmentArea({ target_annual_gal: 11593, annual_in: 30, efficiency: 0.85 });
+  assert.ok(metal.catchment_ft2 < r.catchment_ft2, `metal roof smaller: ${metal.catchment_ft2}`);
+  // Round-trip: the required area, fed back through the forward tile, reproduces the target harvest.
+  for (const target_annual_gal of [2000, 11593, 50000]) {
+    for (const annual_in of [12, 30, 60]) {
+      const m = computeRainwaterCatchmentArea({ target_annual_gal, annual_in, efficiency: 0.62 });
+      assert.ok(!m.error, `sweep g=${target_annual_gal} rain=${annual_in}: ${JSON.stringify(m)}`);
+      assertFinite(m.catchment_ft2, "area"); assert.ok(m.catchment_ft2 > 0, "area positive");
+      const back = computeRainwaterYield({ catchment_ft2: m.catchment_ft2, annual_in, efficiency: 0.62 });
+      assert.ok(Math.abs(back.annual_gal - target_annual_gal) < 1e-6, `round-trip g=${target_annual_gal} rain=${annual_in}: ${back.annual_gal}`);
+    }
+  }
+  // Error seams: non-positive target / rainfall, efficiency out of range, non-finite.
+  assert.ok("error" in computeRainwaterCatchmentArea({ target_annual_gal: 0, annual_in: 30 }));
+  assert.ok("error" in computeRainwaterCatchmentArea({ target_annual_gal: 11593, annual_in: 0 }));
+  assert.ok("error" in computeRainwaterCatchmentArea({ target_annual_gal: 11593, annual_in: 30, efficiency: 0 }));
+  assert.ok("error" in computeRainwaterCatchmentArea({ target_annual_gal: 11593, annual_in: 30, efficiency: 1.5 }));
+  assert.ok("error" in computeRainwaterCatchmentArea({ target_annual_gal: Infinity, annual_in: 30 }));
 });
 
 test("bounds: calc-cross computeTimesheet pins total hours = sum(end - start - lunch/60), regular up to 40 + 1.5x OT, gross + reimbursable on the spec two-job example", () => {

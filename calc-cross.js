@@ -1310,6 +1310,26 @@ export const rainwaterYieldExample = {
   inputs: { catchment_ft2: 1500, monthly_in: [3, 3, 4, 4, 4, 3, 2, 2, 2, 3, 4, 4], efficiency: 0.62 },
 };
 
+// --- spec-v675: catchment area for a target rainwater harvest (inverse of rainwater-yield) ---
+// dims: in { target_annual_gal: L^3, annual_in: L, efficiency: dimensionless } out: { catchment_ft2: L^2 }
+export function computeRainwaterCatchmentArea({ target_annual_gal = 0, annual_in = 0, efficiency = 0.62 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_annual_gal) || 0;
+  const rain = Number(annual_in) || 0;
+  const eff = (efficiency === undefined || efficiency === null || efficiency === "") ? 0.62 : Number(efficiency);
+  if (!(target > 0)) return { error: "Target annual harvest must be positive (gal)." };
+  if (!(rain > 0)) return { error: "Annual rainfall must be positive (in)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Collection efficiency must be over 0 and up to 1." };
+  // Inverse of annual_gal = area x annual_in x 0.6233 x efficiency: area = target / (annual_in x 0.6233 x efficiency).
+  const catchment_ft2 = target / (rain * 0.6233 * eff);
+  if (!Number.isFinite(catchment_ft2) || !(catchment_ft2 > 0)) return { error: "Catchment-area math is not a finite positive value." };
+  return {
+    catchment_ft2,
+    note: "The catchment (roof) area needed to harvest a target volume of rainwater a year, the inverse of the rainwater-yield tile: area = target_gal / (annual_in x 0.6233 x efficiency). The 0.6233 converts one inch of rain over one square foot to gallons; efficiency (about 0.62 for a sloped roof, higher for metal) accounts for first-flush, splash, and evaporation losses. The area is the horizontal footprint the rain falls on, not the sloped surface. A planning estimate; local rainfall records, the storage tank size, and the demand pattern govern the real system."
+  };
+}
+export const rainwaterCatchmentAreaExample = { inputs: { target_annual_gal: 11593, annual_in: 30, efficiency: 0.62 } };
+
 // --- Utility 171: Daily Multi-Job Timesheet ---
 
 // dims: in { jobs: dimensionless, regular_rate: dimensionless, weekly_overtime_threshold_hr: T, irs_rate_per_mile: dimensionless } out: { gross_pay: dimensionless, overtime_pay: dimensionless, mileage_deduction: dimensionless }
@@ -1570,6 +1590,25 @@ function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
   for (const el of [a.input, e.input, an.input]) el.addEventListener("input", update);
 }
 
+function renderRainwaterCatchmentArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: public engineering form solved for area: area = target_gal / (annual_in * 0.6233 * efficiency), from gallons = area * rainfall * 0.6233 * efficiency. Default efficiency 0.62 for sloped roofs. A planning estimate; local rainfall, storage, and demand govern.";
+  _aeG(inputRegion, () => { g.input.value = "11593"; an.input.value = "30"; e.input.value = "0.62"; update(); });
+  const g = _mnG("Target annual harvest (gal)", "rwca-g", { step: "any", min: "0" });
+  const an = _mnG("Annual rainfall (in)", "rwca-an", { step: "any", min: "0" });
+  const e = _mnG("Collection efficiency (0-1)", "rwca-e", { step: "any", min: "0", max: "1", value: "0.62" });
+  e.input.value = "0.62";
+  for (const f of [g, an, e]) inputRegion.appendChild(f.wrap);
+  const oA = _moG(outputRegion, "Catchment area needed", "rwca-out-a");
+  const oN = _moG(outputRegion, "Note", "rwca-out-n");
+  const update = _debG(() => {
+    const r = computeRainwaterCatchmentArea({ target_annual_gal: Number(g.input.value) || 0, annual_in: Number(an.input.value) || 0, efficiency: e.input.value === "" ? 0.62 : Number(e.input.value) });
+    if (r.error) { oA.textContent = r.error; oN.textContent = ""; return; }
+    oA.textContent = _fmtG(r.catchment_ft2, 0) + " ft^2";
+    oN.textContent = r.note;
+  }, _DG);
+  for (const el of [g.input, an.input, e.input]) el.addEventListener("input", update);
+}
+
 function renderTimesheet(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Standard payroll math; reuses overtime utility logic and IRS standard mileage rate.";
   _aeG(inputRegion, () => fillExample(timesheetExample.inputs));
@@ -1660,6 +1699,7 @@ export const CROSS_RENDERERS = {
   "pulley-ma-gen": renderPulleyMAGen,
   "ramp-slope": renderRampSlope,
   "rainwater-yield": renderRainwaterYield,
+  "rainwater-catchment-area": renderRainwaterCatchmentArea,
   "timesheet": renderTimesheet,
   "vehicle-load": renderVehicleLoad,
 };

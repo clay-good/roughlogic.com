@@ -60842,6 +60842,31 @@
       "kind": "question"
     },
     {
+      "term": "catchment area for a target harvest",
+      "target": "rainwater-catchment-area",
+      "kind": "industry"
+    },
+    {
+      "term": "how much roof to collect rainwater",
+      "target": "rainwater-catchment-area",
+      "kind": "industry"
+    },
+    {
+      "term": "roof size for cistern",
+      "target": "rainwater-catchment-area",
+      "kind": "adjacent"
+    },
+    {
+      "term": "catchment area from target gallons",
+      "target": "rainwater-catchment-area",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sizing rainwater collection area",
+      "target": "rainwater-catchment-area",
+      "kind": "adjacent"
+    },
+    {
       "term": "collection efficiency rainwater gallons",
       "target": "rainwater-yield",
       "kind": "question"

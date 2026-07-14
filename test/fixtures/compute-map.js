@@ -159,6 +159,7 @@ export const COMPUTE_MAP = {
   "upgrade-roi": { module: "../../calc-cross.js", fn: "computeUpgradeROI" },
   "trench-slope": { module: "../../calc-cross.js", fn: "computeTrenchSlope" },
   "rainwater-yield": { module: "../../calc-cross.js", fn: "computeRainwaterYield" },
+  "rainwater-catchment-area": { module: "../../calc-cross.js", fn: "computeRainwaterCatchmentArea" },
   "henderson-hasselbalch": { module: "../../calc-lab.js", fn: "computeHendersonHasselbalch" },
   "dilution": { module: "../../calc-cross.js", fn: "computeDilution" },
   "straight-line-depreciation": { module: "../../calc-accounting.js", fn: "computeStraightLine" },

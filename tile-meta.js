@@ -264,7 +264,7 @@ const _TILES = [
   ["dilution", "G"], ["slope-from-level", "G"], ["haversine", "G"],
   ["trench-slope", "G"], ["niosh-lifting", "G"], ["heat-stress", "G"],
   ["wind-chill", "G"], ["ladder-angle", "G"], ["pulley-ma-gen", "G"],
-  ["ramp-slope", "G"], ["rainwater-yield", "G"], ["timesheet", "G"],
+  ["ramp-slope", "G"], ["rainwater-yield", "G"], ["rainwater-catchment-area", "G"], ["timesheet", "G"],
   ["fall-protection-clearance", "G"], ["vehicle-load", "G"], ["noise-dose", "G"],
   ["pump-tdh", "G"], ["hydraulic-cylinder", "G"], ["vbelt-drive", "G"], ["gear-cascade", "G"],
 
