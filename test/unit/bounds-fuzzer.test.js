@@ -21569,6 +21569,20 @@ test("bounds: spec-v539 computeDrinkAbvDilution pins the melt-diluted ABV, the s
   assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "foo" }));
 });
 
+import { computeReserveCapacityAmpHours as _v783 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v783 computeReserveCapacityAmpHours pins the RC-to-amp-hours conversion, monotonicity, and error seams", () => {
+  const r = _v783({ rc_minutes: 120 });
+  assert.ok(Math.abs(r.amp_hours - 50) < 1e-9); // 25 * 120/60
+  // Linear in RC: double the minutes, double the amp-hours.
+  assert.ok(Math.abs(_v783({ rc_minutes: 240 }).amp_hours - 100) < 1e-9);
+  assert.ok(_v783({ rc_minutes: 90 }).amp_hours < r.amp_hours); // fewer minutes -> fewer Ah
+  // Error seams: non-finite and non-positive reserve capacity.
+  assert.ok("error" in _v783({ rc_minutes: Infinity }));
+  assert.ok("error" in _v783({ rc_minutes: 0 }));
+  assert.ok("error" in _v783({ rc_minutes: -5 }));
+});
+
 import { computeOverrunPercent as _v782 } from "../../calc-kitchen.js";
 
 test("bounds: spec-v782 computeOverrunPercent pins overrun by weight, the air fraction, the FDA density flag, and error seams", () => {

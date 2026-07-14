@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v783 battery reserve capacity to amp-hours; 2026-07-14
+
+- New tile `reserve-capacity-amp-hours` (Group K, calc-mechanic.js): the amp-hours behind a battery's reserve-capacity
+  minutes. BCI / SAE J537 reserve capacity is the minutes a fully charged 12 V battery at 80 F sustains a 25 A draw to a
+  10.5 V cutoff, so `amp_hours = 25 x RC/60` -- RC 120 min is 50 Ah. The note flags that the RC-rate capacity is lower
+  than the 20-hour-rate amp-hours on a deep-cycle label (Peukert's effect) and so is not interchangeable. Fuzzer pins
+  the conversion, linear monotonicity, and the error seams. Home count 1,231 -> 1,232.
+
 ### feat(kitchen): spec-v782 ice cream overrun by weight; 2026-07-14
 
 - New tile `overrun-percent` (Group O, calc-kitchen.js): the air whipped into frozen dessert, measured by weight.

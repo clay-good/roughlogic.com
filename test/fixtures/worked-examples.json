@@ -24315,6 +24315,26 @@
    }
   },
   {
+   "tile_id": "reserve-capacity-amp-hours",
+   "source_publisher": "BCI / SAE J537 reserve capacity",
+   "source_title": "amp_hours = 25 x reserve_capacity_minutes / 60",
+   "source_edition_or_year": "spec-v783 worked example (machine-verified)",
+   "source_section_or_page": "RC 120 min at the 25 A / 10.5 V / 80 F reserve rate -> 50.0 Ah",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "rc_minutes": 120
+   },
+   "outputs": {
+    "amp_hours": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "overrun-percent",
    "source_publisher": "Goff & Hartel, Ice Cream, 7th ed.; FDA 21 CFR 135.110",
    "source_title": "overrun% = (mix_weight - finished_weight) / finished_weight x 100 for equal volumes",

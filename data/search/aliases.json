@@ -23747,6 +23747,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "reserve capacity to amp hours",
+      "target": "reserve-capacity-amp-hours",
+      "kind": "question"
+    },
+    {
+      "term": "battery reserve capacity",
+      "target": "reserve-capacity-amp-hours",
+      "kind": "industry"
+    },
+    {
+      "term": "rc minutes to ah",
+      "target": "reserve-capacity-amp-hours",
+      "kind": "question"
+    },
+    {
+      "term": "car battery amp hours",
+      "target": "reserve-capacity-amp-hours",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sae j537 reserve capacity",
+      "target": "reserve-capacity-amp-hours",
+      "kind": "industry"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

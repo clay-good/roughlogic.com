@@ -9595,6 +9595,16 @@ export const CITATIONS = {
       { name: "Ampacity floor", value: "the ABYC ampacity table with engine-space and bundling derates sets a separate floor", source: "ABYC E-11" },
     ],
   },
+  "reserve-capacity-amp-hours": {
+    formula: "amp_hours = 25 x reserve_capacity_minutes / 60.",
+    edition: "BCI / SAE J537 reserve capacity, by name; the battery's published rating and a load test govern.",
+    freeAccess: "The 25 A / 10.5 V / 80 F reserve-capacity definition is a published BCI / SAE J537 rating basis; the reserve minutes come from the battery spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "BCI / SAE J537 reserve capacity is the number of minutes a fully charged 12 V battery at 80 F can deliver 25 A before the terminal voltage falls to 10.5 V; the amp-hours at that reserve rate are 25 x RC/60. This RC-rate capacity is smaller than the 20-hour-rate amp-hours printed on a deep-cycle label, because a higher discharge current delivers less capacity (Peukert's effect), so the two figures are not interchangeable. Cold reduces the available capacity further. A comparison aid, not a substitute for the battery's published rating and a load test.",
+    assumptions: [
+      { name: "Reserve rate", value: "25 A draw to a 10.5 V cutoff at 80 F on a 12 V battery", source: "BCI / SAE J537" },
+    ],
+  },
   "aircraft-weight-balance": {
     formula: "total_weight = sum(w); total_moment = sum(w x arm); CG = total_moment / total_weight; in_envelope = weight <= max_gross AND fwd_limit <= CG <= aft_limit.",
     edition: "The station-moment weight-and-balance check of the FAA Weight & Balance Handbook (FAA-H-8083-1; AC 91-23), by name; the specific aircraft flight manual and the pilot in command govern.",

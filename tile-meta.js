@@ -499,6 +499,7 @@ const _TILES = [
   ["kitchen-sanitizer-ppm", "O"],
   ["drink-abv-dilution", "O"],
   ["overrun-percent", "O"],
+  ["reserve-capacity-amp-hours", "K"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

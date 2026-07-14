@@ -2272,3 +2272,34 @@ MECHANIC_RENDERERS["abyc-dc-wire"] = _simpleRenderer({
   ],
   compute: computeAbycDcWire,
 });
+
+// ===================== spec-v783: BCI reserve capacity to amp-hours =====================
+// Reserve capacity (RC) is the minutes a fully charged 12 V battery at 80 F sustains a
+// 25 A draw before terminal voltage falls to 10.5 V (BCI / SAE J537). Ah at the RC rate
+// = 25 x RC/60.
+// dims: in { rc_minutes: T } out: { amp_hours: I T }
+export function computeReserveCapacityAmpHours({ rc_minutes = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const rc = Number(rc_minutes) || 0;
+  if (!(rc > 0)) return { error: "Reserve capacity must be positive (minutes)." };
+  const amp_hours = 25 * (rc / 60);
+  if (!Number.isFinite(amp_hours)) return { error: "Reserve-capacity math is not a finite value." };
+  return {
+    amp_hours, rc_minutes: rc,
+    note: "BCI / SAE J537 reserve capacity is the number of minutes a fully charged 12 V battery at 80 F can deliver 25 A before the terminal voltage falls to 10.5 V; the amp-hours at that reserve rate are 25 x RC/60. This RC-rate capacity is smaller than the 20-hour-rate amp-hours printed on a deep-cycle label, because a higher discharge current delivers less capacity (Peukert's effect), so the two figures are not interchangeable. Cold cuts the available capacity further. A comparison aid; the battery's published rating and a load test govern.",
+  };
+}
+export const reserveCapacityAmpHoursExample = { inputs: { rc_minutes: 120 } };
+
+MECHANIC_RENDERERS["reserve-capacity-amp-hours"] = _simpleRenderer({
+  citation: "Citation: BCI / SAE J537 reserve capacity: RC is the minutes a fully charged 12 V battery at 80 F sustains a 25 A draw to a 10.5 V cutoff; amp-hours at the reserve rate = 25 x RC/60. The RC-rate capacity is lower than the 20-hour-rate amp-hours on a deep-cycle label (Peukert's effect), so the two are not interchangeable; cold reduces capacity further. A comparison aid; the battery rating and a load test govern.",
+  example: reserveCapacityAmpHoursExample.inputs,
+  fields: [
+    { key: "rc_minutes", label: "Reserve capacity (minutes)", kind: "number", default: 120 },
+  ],
+  outputs: [
+    { key: "ah", id: "rcah-out-ah", label: "Amp-hours (at the 25 A reserve rate)", value: (r) => fmt(r.amp_hours, 1) + " Ah" },
+    { key: "n", id: "rcah-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeReserveCapacityAmpHours,
+});

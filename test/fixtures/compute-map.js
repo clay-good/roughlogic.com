@@ -782,6 +782,7 @@ export const COMPUTE_MAP = {
   "kitchen-sanitizer-ppm": { module: "../../calc-kitchen.js", fn: "computeKitchenSanitizerPpm" },
   "drink-abv-dilution": { module: "../../calc-kitchen.js", fn: "computeDrinkAbvDilution" },
   "overrun-percent": { module: "../../calc-kitchen.js", fn: "computeOverrunPercent" },
+  "reserve-capacity-amp-hours": { module: "../../calc-mechanic.js", fn: "computeReserveCapacityAmpHours" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },
