@@ -10893,6 +10893,32 @@ test("bounds: spec-v40 thread-measure-wire pins best wire/M + rejects bad inputs
   assert.ok("error" in _cv40f({ thread_standard: "metric", pitch_mm: Infinity, pitch_diameter_in: 0.45 }));
 });
 
+import { computeThreadPitchDiaFromWires as _v721 } from "../../calc-shop.js";
+test("bounds: spec-v721 computeThreadPitchDiaFromWires pins E = M - 3W + 1.51553 P, round-trips through computeThreadMeasureWire, and error seams", () => {
+  const r = _v721({ thread_standard: "inch", tpi: 13, measurement_over_wires_in: 0.49, wire_dia_in: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const P = 1 / 13, W = 0.5773502691896258 * P;
+  assert.ok(Math.abs(r.pitch_diameter_in - (0.49 - 3 * W + 1.51553 * P)) < 1e-9, `E identity: ${r.pitch_diameter_in}`);
+  assert.ok(Math.abs(r.pitch_diameter_in - 0.47334455) < 1e-6, `pinned 0.4733 in: ${r.pitch_diameter_in}`);
+  // Round-trip: the pitch diameter, fed back through the forward tile with the same wire, reproduces the measurement.
+  for (const tpi of [8, 13, 20]) {
+    for (const measurement_over_wires_in of [0.3, 0.49, 1.2]) {
+      const m = _v721({ thread_standard: "inch", tpi, measurement_over_wires_in, wire_dia_in: 0 });
+      if (m.error) continue; // some tiny-M/coarse-pitch combos give a non-positive E and are legitimately rejected
+      assertFinite(m.pitch_diameter_in, "E"); assert.ok(m.pitch_diameter_in > 0, "E positive");
+      const back = _cv40f({ thread_standard: "inch", tpi, pitch_diameter_in: m.pitch_diameter_in, wire_dia_in: m.wire_dia_in });
+      assert.ok(Math.abs(back.measurement_over_wires_in - measurement_over_wires_in) < 1e-9, `round-trip tpi=${tpi} M=${measurement_over_wires_in}: ${back.measurement_over_wires_in}`);
+    }
+  }
+  // Metric path works.
+  assert.ok(_v721({ thread_standard: "metric", pitch_mm: 1.5, measurement_over_wires_in: 10.5, wire_dia_in: 0 }).pitch_diameter_in > 0);
+  // Error seams: non-positive M, TPI, metric pitch, non-finite.
+  assert.ok("error" in _v721({ thread_standard: "inch", tpi: 13, measurement_over_wires_in: 0 }));
+  assert.ok("error" in _v721({ thread_standard: "inch", tpi: 0, measurement_over_wires_in: 0.49 }));
+  assert.ok("error" in _v721({ thread_standard: "metric", pitch_mm: 0, measurement_over_wires_in: 10 }));
+  assert.ok("error" in _v721({ thread_standard: "inch", tpi: 13, measurement_over_wires_in: Infinity }));
+});
+
 test("bounds: spec-v40 punch-force pins force/perimeter + rejects bad inputs", () => {
   const a = _cv40g({ shape: "round", diameter_in: 0.5, thickness_in: 0.25, shear_strength_psi: 50000 });
   assert.ok(Math.abs(a.perimeter_in - Math.PI * 0.5) < 1e-12);

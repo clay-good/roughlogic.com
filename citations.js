@@ -8074,6 +8074,16 @@ export const CITATIONS = {
       { name: "Thread form", value: "60-degree included angle (UN / ISO metric); the pitch diameter E is user-supplied", source: "three-wire geometry" },
     ],
   },
+  "thread-pitch-dia-from-wires": {
+    formula: "E = M - 3W + 1.51553 x P, the three-wire relation M = E + 3W - 1.51553 x P solved for the pitch diameter; best wire W = 0.57735 x P (range 0.560P to 0.650P) for a 60-degree thread.",
+    edition: "The three-wire measurement-over-wires method for 60-degree threads solved for the pitch diameter, and the best-wire / 1.51553 constant - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure geometry, public; compare the resulting pitch diameter E to the thread-class limits for the fit.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of thread-measure-wire and the way the method is used on the bench: the machinist reads the measurement M over three wires on the micrometer and wants the pitch diameter E. First-principles 60-degree thread geometry; a wire outside the acceptable range is flagged, not blocked; compare E to the thread-class pitch-diameter limits.",
+    assumptions: [
+      { name: "Thread form", value: "60-degree included angle (UN / ISO metric); M is measured over three wires", source: "three-wire geometry" },
+    ],
+  },
   "punch-force": {
     formula: "Cut perimeter (pi x D round, 2(a+b) rectangular, or entered); force F = perimeter x T x shear strength; tons = F / 2000; stripping ~= 3.5% of F.",
     edition: "Punching force as sheared area times shear strength - first-principles as in Machinery's Handbook (Industrial Press), by name; public domain.",

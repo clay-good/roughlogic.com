@@ -514,6 +514,72 @@ function _v40renderThreadMeasureWire(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["thread-measure-wire"] = _v40renderThreadMeasureWire;
 
+// thread-pitch-dia-from-wires: inverse of thread-measure-wire. The forward tile
+// gives the measurement over wires M from a pitch diameter E; the machinist
+// actually measures M on the mic and wants E, so E = M - 3W + 1.51553 P is the
+// working direction. Same 60-degree geometry, best-wire default, and range check.
+// dims: in { thread_standard: dimensionless, tpi: T^-1, pitch_mm: L, measurement_over_wires_in: L, wire_dia_in: L } out: { pitch_diameter_in: L, best_wire_in: L, pitch_in: L }
+export function computeThreadPitchDiaFromWires({ thread_standard = "inch", tpi = 0, pitch_mm = 0, measurement_over_wires_in = 0, wire_dia_in = 0 } = {}) {
+  const _g = _finiteGuard({ tpi, pitch_mm, measurement_over_wires_in, wire_dia_in }); if (_g) return _g;
+  const isMetric = String(thread_standard) === "metric";
+  let P_in;
+  if (isMetric) {
+    const pmm = Number(pitch_mm) || 0;
+    if (!(pmm > 0)) return { error: "Metric thread pitch must be positive (mm)." };
+    P_in = pmm / 25.4;
+  } else {
+    const t = Number(tpi) || 0;
+    if (!(t > 0)) return { error: "Threads per inch (TPI) must be positive." };
+    P_in = 1 / t;
+  }
+  const M = Number(measurement_over_wires_in) || 0;
+  if (!(M > 0)) return { error: "Measurement over wires M must be positive (in)." };
+  const best_wire_in = _V40_BESTWIRE * P_in;
+  const wire_min_in = 0.560 * P_in, wire_max_in = 0.650 * P_in;
+  let W = Number(wire_dia_in) || 0;
+  let used_best = false;
+  if (!(W > 0)) { W = best_wire_in; used_best = true; }
+  const wire_out_of_range = W < wire_min_in || W > wire_max_in;
+  const E = M - 3 * W + _V40_MOW_K * P_in;
+  if (!(E > 0)) return { error: "Computed pitch diameter is not positive; check the measurement, the wire size, and the thread pitch." };
+  const notes = [];
+  notes.push("For a 60-degree thread, best wire W = 0.57735 x P (acceptable range 0.560P to 0.650P); the pitch diameter from a measurement over three wires is E = M - 3W + 1.51553 x P. First-principles thread geometry; compare E to the thread-class pitch-diameter limits for the fit.");
+  if (used_best) notes.push("Using the best-wire size " + fmt(best_wire_in, 6) + " in.");
+  if (wire_out_of_range) notes.push("The entered wire " + fmt(W, 6) + " in is outside the acceptable range " + fmt(wire_min_in, 6) + " to " + fmt(wire_max_in, 6) + " in - the contact point moves off the pitch line and E is less reliable.");
+  return {
+    pitch_in: P_in, best_wire_in, wire_min_in, wire_max_in,
+    wire_dia_in: W, wire_out_of_range, used_best,
+    pitch_diameter_in: E, notes,
+  };
+}
+export const threadPitchDiaFromWiresExample = { inputs: { thread_standard: "inch", tpi: 13, pitch_mm: 0, measurement_over_wires_in: 0.49, wire_dia_in: 0 } };
+function _v721renderThreadPitchDiaFromWires(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: The three-wire method for 60-degree threads solved for the pitch diameter - E = M - 3W + 1.51553 x P, best wire W = 0.57735 x P - first-principles geometry as in Machinery's Handbook (Industrial Press), by name; public domain. Compare E to the thread-class limits.";
+  const std = makeSelect("Thread standard", "tpd-std", [
+    { value: "inch", label: "Inch (enter TPI)" },
+    { value: "metric", label: "Metric (enter pitch in mm)" },
+  ]);
+  const tpi = makeNumber("Threads per inch (TPI)", "tpd-tpi", { step: "any", min: "0" });
+  const pmm = makeNumber("Metric pitch (mm)", "tpd-pmm", { step: "any", min: "0" });
+  const m = makeNumber("Measurement over 3 wires M (in)", "tpd-m", { step: "any", min: "0" });
+  const wire = makeNumber("Wire diameter (in, blank = best wire)", "tpd-wire", { step: "any", min: "0" });
+  for (const f of [std, tpi, pmm, m, wire]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { std.select.value = "inch"; tpi.input.value = "13"; pmm.input.value = ""; m.input.value = "0.49"; wire.input.value = ""; update(); });
+  const oBest = makeOutputLine(outputRegion, "Best wire", "tpd-out-best");
+  const oE = makeOutputLine(outputRegion, "Pitch diameter E", "tpd-out-e");
+  const oNote = makeOutputLine(outputRegion, "Notes", "tpd-out-note");
+  const update = debounce(() => {
+    const r = computeThreadPitchDiaFromWires({ thread_standard: std.select.value, tpi: _readNum(tpi.input), pitch_mm: _readNum(pmm.input), measurement_over_wires_in: _readNum(m.input), wire_dia_in: _readNum(wire.input) });
+    if (r.error) { oBest.textContent = r.error; oE.textContent = "-"; oNote.textContent = ""; return; }
+    oBest.textContent = fmt(r.best_wire_in, 6) + " in (range " + fmt(r.wire_min_in, 6) + " to " + fmt(r.wire_max_in, 6) + " in)";
+    oE.textContent = fmt(r.pitch_diameter_in, 6) + " in (" + fmt(r.pitch_diameter_in * 25.4, 4) + " mm)" + (r.wire_out_of_range ? " - wire out of range" : "");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [tpi.input, pmm.input, m.input, wire.input]) f.addEventListener("input", update);
+  std.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["thread-pitch-dia-from-wires"] = _v721renderThreadPitchDiaFromWires;
+
 // =====================================================================
 // spec-v40 2.7 - press-brake-tonnage (Air-Bend Tonnage) - Group E
 // Industry air-bend rule tons/ft = 575 x (UTS/60) x T^2 / V (the 575

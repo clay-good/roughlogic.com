@@ -174,6 +174,7 @@ const RELATED = {
   "taper-diameter": ["taper-calc", "sine-bar", "cutting-speed-rpm", "decimal-to-fraction"],
   "dividing-head": ["bolt-circle", "cutting-speed-rpm", "machining-time"],
   "thread-measure-wire": ["thread-pitch", "sine-bar", "decimal-to-fraction"],
+  "thread-pitch-dia-from-wires": ["thread-measure-wire", "thread-pitch", "bolt-proof-load", "sine-bar"],
   "punch-force": ["punch-capacity", "press-brake-tonnage", "metal-weight", "bend-allowance"],
   "punch-capacity": ["punch-force", "press-brake-tonnage", "metal-weight", "bend-allowance"],
   "press-brake-tonnage": ["bend-allowance", "punch-force", "metal-weight"],

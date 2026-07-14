@@ -652,6 +652,7 @@ export const COMPUTE_MAP = {
   "taper-diameter": { module: "../../calc-shop.js", fn: "computeTaperDiameter" },
   "dividing-head": { module: "../../calc-shop.js", fn: "computeDividingHead" },
   "thread-measure-wire": { module: "../../calc-shop.js", fn: "computeThreadMeasureWire" },
+  "thread-pitch-dia-from-wires": { module: "../../calc-shop.js", fn: "computeThreadPitchDiaFromWires" },
   "punch-force": { module: "../../calc-shop.js", fn: "computePunchForce" },
   "punch-capacity": { module: "../../calc-shop.js", fn: "computePunchCapacity" },
   "press-brake-tonnage": { module: "../../calc-shop.js", fn: "computePressBrakeTonnage" },

@@ -65277,6 +65277,31 @@
       "kind": "question"
     },
     {
+      "term": "pitch diameter from three wire measurement",
+      "target": "thread-pitch-dia-from-wires",
+      "kind": "question"
+    },
+    {
+      "term": "thread pitch diameter from mic reading",
+      "target": "thread-pitch-dia-from-wires",
+      "kind": "question"
+    },
+    {
+      "term": "e from measurement over wires",
+      "target": "thread-pitch-dia-from-wires",
+      "kind": "question"
+    },
+    {
+      "term": "check thread pitch diameter with wires",
+      "target": "thread-pitch-dia-from-wires",
+      "kind": "question"
+    },
+    {
+      "term": "pd from over wire measurement",
+      "target": "thread-pitch-dia-from-wires",
+      "kind": "question"
+    },
+    {
       "term": "tons to punch a hole",
       "target": "punch-force",
       "kind": "question"
