@@ -928,6 +928,7 @@ const RELATED = {
   "steam-pipe-capacity": ["steam-pipe-velocity", "flash-steam-pct", "steam-trap-sizing", "boiler-pipe-sizing"],
   "steam-trap-sizing": ["flash-steam-pct", "steam-pipe-velocity", "boiler-pipe-sizing"],
   "steam-prv-napier": ["valve-flow-coefficient", "flash-steam-pct", "steam-trap-sizing"],
+  "steam-prv-area-for-capacity": ["steam-prv-napier", "flash-steam-pct", "steam-trap-sizing"],
   // spec-v199 radiant; spec-v200..v203 condensate return + fabrication/process layout
   "radiant-loop-sizing": ["boiler-pipe-sizing", "expansion-tank", "recirc-loop-sizing"],
   "condensate-return-sizing": ["flash-steam-pct", "steam-trap-sizing", "steam-pipe-velocity"],

@@ -970,3 +970,47 @@ function _renderSteamPrvNapier(inputRegion, outputRegion, citationEl) {
   for (const f of [A, P1, P2, Cd]) f.input.addEventListener("input", update);
 }
 PIPEFIT_RENDERERS["steam-prv-napier"] = _renderSteamPrvNapier;
+
+// steam-prv-area-for-capacity: inverse of steam-prv-napier. The forward tile gives the relief capacity from the orifice
+// area; the inverse recovers the orifice / seat area a required relief capacity needs, so a sizer picks an API orifice
+// letter. From the choked Napier capacity W = 51.43 Cd A P1, A = W / (51.43 Cd P1). Assumes choked flow (the standard
+// relief condition, P2 < 0.58 P1); the choke threshold is reported for the check.
+// dims: in { required_capacity_lb_hr: M T^-1, upstream_p_psia: M L^-1 T^-2, discharge_coeff: dimensionless } out: { required_area_in2: L^2, choke_threshold_psia: M L^-1 T^-2 }
+export function computeSteamPrvAreaForCapacity({ required_capacity_lb_hr = 0, upstream_p_psia = 0, discharge_coeff = 0.9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(required_capacity_lb_hr) || 0;
+  const P1 = Number(upstream_p_psia) || 0;
+  const Cd = Number(discharge_coeff) || 0;
+  if (!(W > 0)) return { error: "Required relief capacity must be positive (lb/hr)." };
+  if (!(P1 > 0)) return { error: "Upstream pressure must be positive (psia)." };
+  if (!(Cd > 0 && Cd <= 1)) return { error: "Discharge coefficient must be over 0 and at most 1." };
+  const required_area_in2 = W / (51.43 * Cd * P1);
+  const choke_threshold_psia = 0.58 * P1;
+  if (![required_area_in2, choke_threshold_psia].every(Number.isFinite)) return { error: "Orifice-area math is not a finite value." };
+  return {
+    required_area_in2, choke_threshold_psia,
+    note: "Orifice / seat area for a required steam relief capacity: from the choked Napier capacity W = 51.43 Cd A P1, A = W / (51.43 Cd P1). Round UP to a standard API 526 orifice letter (D, E, F, ... which are areas of 0.110, 0.196, 0.307 in^2 and up). This assumes CHOKED flow - the standard relief condition where the downstream absolute pressure is below 58% of the upstream (threshold shown); the capacity then depends only on the upstream pressure, and a liquid Cv (which scales with the square root of the pressure drop) is wrong. Napier is for saturated steam; superheat needs a Ksh correction. The discharge coefficient (~0.6 sharp orifice, ~1 nozzle) must match the device. A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern.",
+  };
+}
+export const steamPrvAreaForCapacityExample = { inputs: { required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0.9 } };
+function _renderSteamPrvAreaForCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Notice: A sizing aid, not a relief-valve certification; ASME/API and the valve manufacturer govern. Citation: Napier's formula / ASME/API 520 choked steam capacity W = 51.43 x Cd x A x P1 solved for the area: A = W / (51.43 x Cd x P1). Assumes choked flow (P2 < 0.58 x P1); round up to a standard API 526 orifice letter. Saturated steam (superheat needs Ksh); apply the discharge coefficient (~0.6 orifice, ~1 nozzle).";
+  const W = makeNumber("Required relief capacity (lb/hr)", "spa-w", { step: "any", min: "0", value: "5000" }); W.input.value = "5000";
+  const P1 = makeNumber("Upstream absolute pressure (psia)", "spa-p1", { step: "any", min: "0", value: "100" }); P1.input.value = "100";
+  const Cd = makeNumber("Discharge coefficient Cd (~0.6 orifice, ~1 nozzle)", "spa-cd", { step: "any", min: "0", max: "1", value: "0.9" }); Cd.input.value = "0.9";
+  for (const f of [W, P1, Cd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { W.input.value = "5000"; P1.input.value = "100"; Cd.input.value = "0.9"; update(); });
+  const oA = makeOutputLine(outputRegion, "Required orifice / seat area", "spa-out-a");
+  const oT = makeOutputLine(outputRegion, "Choke threshold (0.58 x P1)", "spa-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "spa-out-note");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSteamPrvAreaForCapacity({ required_capacity_lb_hr: readNum(W.input), upstream_p_psia: readNum(P1.input), discharge_coeff: Cd.input.value === "" ? 0.9 : readNum(Cd.input) });
+    if (r.error) { oA.textContent = r.error; oT.textContent = "-"; oNote.textContent = ""; return; }
+    oA.textContent = fmt(r.required_area_in2, 3) + " in^2";
+    oT.textContent = fmt(r.choke_threshold_psia, 1) + " psia (choked below this downstream)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [W.input, P1.input, Cd.input]) f.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["steam-prv-area-for-capacity"] = _renderSteamPrvAreaForCapacity;

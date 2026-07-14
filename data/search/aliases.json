@@ -8277,6 +8277,31 @@
       "kind": "redirect"
     },
     {
+      "term": "prv orifice area",
+      "target": "steam-prv-area-for-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "relief valve orifice size",
+      "target": "steam-prv-area-for-capacity",
+      "kind": "redirect"
+    },
+    {
+      "term": "steam prv area",
+      "target": "steam-prv-area-for-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "orifice area for relief capacity",
+      "target": "steam-prv-area-for-capacity",
+      "kind": "adjacent"
+    },
+    {
+      "term": "prv sizing area",
+      "target": "steam-prv-area-for-capacity",
+      "kind": "adjacent"
+    },
+    {
       "term": "steam orifice capacity",
       "target": "steam-prv-napier",
       "kind": "industry"

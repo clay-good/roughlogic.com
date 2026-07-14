@@ -1202,6 +1202,7 @@ export const COMPUTE_MAP = {
   "steam-pipe-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPipeCapacity" },
   "steam-trap-sizing": { module: "../../calc-pipefit.js", fn: "computeSteamTrapSizing" },
   "steam-prv-napier": { module: "../../calc-pipefit.js", fn: "computeSteamPrvNapier" },
+  "steam-prv-area-for-capacity": { module: "../../calc-pipefit.js", fn: "computeSteamPrvAreaForCapacity" },
   "pipe-pressure-rating": { module: "../../calc-pipefit.js", fn: "computePipePressureRating" },
   "pipe-filled-support-load": { module: "../../calc-pipefit.js", fn: "computePipeFilledSupportLoad" },
   "hanger-rod-sizing": { module: "../../calc-pipefit.js", fn: "computeHangerRodSizing" },

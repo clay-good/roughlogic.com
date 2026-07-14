@@ -22124,6 +22124,28 @@ test("bounds: spec-v588 computeSteamPrvNapier pins the choke test, the Napier ca
   assert.ok("error" in _v588({ orifice_area_in2: 0.5, upstream_p_psia: 100, downstream_p_psia: 30, discharge_coeff: 1.5 }));
 });
 
+import { computeSteamPrvAreaForCapacity as _v759 } from "../../calc-pipefit.js";
+test("bounds: spec-v759 steam PRV orifice area for a required capacity (inverse of steam-prv-napier)", () => {
+  const p = _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0.9 });
+  assert.ok(Math.abs(p.required_area_in2 - 1.0802) < 0.001);
+  assert.ok(Math.abs(p.choke_threshold_psia - 58) < 1e-9);
+  // round-trip: the recovered area fed to steam-prv-napier (choked) reproduces the required capacity
+  for (const [W, P1, Cd] of [[5000, 100, 0.9], [12000, 250, 0.975], [800, 60, 0.6], [30000, 400, 0.9]]) {
+    const inv = _v759({ required_capacity_lb_hr: W, upstream_p_psia: P1, discharge_coeff: Cd });
+    const fwd = _v588({ orifice_area_in2: inv.required_area_in2, upstream_p_psia: P1, downstream_p_psia: 0.1 * P1, discharge_coeff: Cd });
+    assert.ok(Math.abs(fwd.steam_capacity_lb_hr - W) < 1e-6);
+  }
+  // more capacity needs more area; a higher upstream pressure needs less area for the same capacity
+  assert.ok(_v759({ required_capacity_lb_hr: 10000, upstream_p_psia: 100 }).required_area_in2 > _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100 }).required_area_in2);
+  assert.ok(_v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 200 }).required_area_in2 < _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100 }).required_area_in2);
+  // error seams: non-positive capacity/pressure, Cd out of (0,1], non-finite
+  assert.ok("error" in _v759({ required_capacity_lb_hr: 0, upstream_p_psia: 100 }));
+  assert.ok("error" in _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 0 }));
+  assert.ok("error" in _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 0 }));
+  assert.ok("error" in _v759({ required_capacity_lb_hr: 5000, upstream_p_psia: 100, discharge_coeff: 1.5 }));
+  assert.ok("error" in _v759({ required_capacity_lb_hr: Infinity, upstream_p_psia: 100 }));
+});
+
 import { computeFlueGasCombustionEff as _v594 } from "../../calc-hvacservice.js";
 
 test("bounds: spec-v594 computeFlueGasCombustionEff pins the Siegert loss, both efficiency bases, the TSI oil cross-check, and error seams", () => {

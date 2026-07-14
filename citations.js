@@ -13632,6 +13632,18 @@ export const CITATIONS = {
       { name: "Pipe schedule", value: "Sch 40 nominal inside diameters per ASME B36.10M mill dimensions", source: "ASME B36.10M" },
     ],
   },
+  "steam-prv-area-for-capacity": {
+    formula: "required_area_in2 = required_capacity_lb_hr / (51.43 x discharge_coeff x upstream_p_psia), the inverse of the choked Napier capacity W = 51.43 x Cd x A x P1; choke_threshold = 0.58 x upstream_p_psia.",
+    edition: "Napier's formula / ASME/API 520 choked steam capacity, solved for the orifice area, by name.",
+    freeAccess: "Napier's formula is a classical, published steam-flow relation; ASME/API and the valve manufacturer govern the actual certification.",
+    governance: GOVERNANCE.general,
+    editionNote: "The orifice / seat area a required steam relief capacity needs, the inverse of the choked Napier capacity: A = W / (51.43 Cd P1). Round up to a standard API 526 orifice letter (D, E, F ... = 0.110, 0.196, 0.307 in^2 and up). This assumes choked flow (the standard relief condition, downstream absolute pressure below 58% of the upstream, threshold reported); the capacity then depends only on the upstream pressure, and a liquid Cv (which scales with the square root of the pressure drop) is wrong. Napier is for saturated steam (superheat needs a Ksh factor). The discharge coefficient (about 0.6 sharp-edged orifice, near 1 nozzle) must match the device. ASME/API and the valve manufacturer govern - a sizing aid, not a relief-valve certification.",
+    assumptions: [
+      { name: "Choked flow", value: "assumes choked flow (P2 < 0.58 x P1); capacity depends only on the upstream pressure", source: "Napier / Grashof" },
+      { name: "Round up to API letter", value: "round A up to a standard API 526 orifice letter", source: "API 526" },
+      { name: "Saturated steam", value: "Napier is for saturated steam; superheat needs a Ksh factor; apply the discharge coefficient", source: "ASME/API 520" },
+    ],
+  },
   "steam-prv-napier": {
     formula: "choked = downstream_p_psia < 0.58 x upstream_p_psia; capacity W = 51.43 x discharge_coeff x orifice_area_in2 x upstream_p_psia [lb/hr] (saturated, choked).",
     edition: "Napier's formula / ASME/API 520 / Grashof steam orifice / PRV capacity, by name.",

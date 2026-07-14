@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pipefit): spec-v759 steam PRV orifice area for a required capacity (steam-prv-napier inverse); 2026-07-14
+
+- New tile `steam-prv-area-for-capacity` (Group B, calc-pipefit.js): the orifice / seat area a required steam relief
+  capacity needs. `A = W / (51.43 Cd P1)` (choked Napier). A 5,000 lb/hr relief at 100 psia (Cd 0.9) wants ~1.08 in^2 --
+  round up to an API 526 orifice letter. Round-trips through `steam-prv-napier`. Home tile count 1,207 -> 1,208.
+
 ### feat(cross): spec-v758 wind speed from wind chill and temperature (wind-chill inverse); 2026-07-14
 
 - New tile `wind-chill-wind-speed` (Group G, calc-cross.js): the wind speed that produces a target/reported wind chill at
