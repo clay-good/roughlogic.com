@@ -1236,6 +1236,7 @@ test("bounds: calc-hvac computeOutdoorAirMix clamps OA fraction to [0, 1] (docum
 import {
   computePoundsFormula,
   computeFilterLoading,
+  computeFilterAreaForLoading,
   computeDetentionTime,
   computeDetentionBasinVolume,
   computeDilution as computeWaterDilution,
@@ -1313,6 +1314,30 @@ test("bounds: calc-water computeFilterLoading rejects non-positive area / flow /
   assert.ok("error" in computeFilterLoading({ filter_area_ft2: 0, flow_gpm: 800 }));
   assert.ok("error" in computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 0 }));
   assert.ok("error" in computeFilterLoading({ filter_area_ft2: 200, flow_gpm: 800, backwash_rate_gpm_ft2: 0 }));
+});
+
+test("bounds: spec-v734 filter area for a target loading rate (inverse of filter-loading)", () => {
+  const p = computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 4 });
+  assert.ok(Math.abs(p.required_area_ft2 - 200) < 1e-9);
+  assert.ok(Math.abs(p.backwash_gpm - 15 * 200) < 1e-9); // default backwash 15 gpm/ft^2
+  assert.ok(/rapid sand/.test(p.category));
+  // round-trip: the recovered area fed to filter-loading reproduces the target loading
+  for (const [flow, target, bw] of [[800, 4, 15], [1400, 7, 20], [250, 1.5, 12], [3000, 5, 15]]) {
+    const inv = computeFilterAreaForLoading({ flow_gpm: flow, target_loading_gpm_ft2: target, backwash_rate_gpm_ft2: bw });
+    const fwd = computeFilterLoading({ filter_area_ft2: inv.required_area_ft2, flow_gpm: flow, backwash_rate_gpm_ft2: bw });
+    assert.ok(Math.abs(fwd.loading_gpm_per_ft2 - target) < 1e-9);
+    assert.ok(Math.abs(fwd.backwash_gpm - inv.backwash_gpm) < 1e-9);
+    assert.equal(fwd.category, inv.category);
+  }
+  // a higher target loading needs less area (monotonic, inverse)
+  assert.ok(computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 8 }).required_area_ft2 < computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 4 }).required_area_ft2);
+  // band pins
+  assert.ok(/high-rate/.test(computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 7 }).category));
+  assert.ok(/below typical/.test(computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 1.5 }).category));
+  // error seams
+  assert.ok("error" in computeFilterAreaForLoading({ flow_gpm: 0, target_loading_gpm_ft2: 4 }));
+  assert.ok("error" in computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 0 }));
+  assert.ok("error" in computeFilterAreaForLoading({ flow_gpm: 800, target_loading_gpm_ft2: 4, backwash_rate_gpm_ft2: 0 }));
 });
 
 test("bounds: calc-water computeDetentionTime pins minutes = volume / flow and the hours / days unit chain", () => {

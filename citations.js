@@ -4706,6 +4706,16 @@ export const CITATIONS = {
       { name: "Default backwash rate", value: "15 gpm/ft² unless user supplies", source: "Ten States Standards typical" },
     ],
   },
+  "filter-area-for-loading": {
+    formula: "Required filter area (ft²) = design_flow / target_loading. Backwash flow = backwash_rate × area. Bands: rapid sand 2-5 gpm/ft², high-rate 4-8 gpm/ft².",
+    edition: "Ten States Standards (Recommended Standards for Water Works), Great Lakes - Upper Mississippi River Board of State and Provincial Public Health and Environmental Managers, current edition by name. AWWA B100 / B130 (filter media) by name.",
+    freeAccess: "Ten States Standards licensed; principles free in published water-treatment texts.",
+    governance: GOVERNANCE.water,
+    editionNote: "Single-edition (Ten States Standards + AWWA filter-design conventions), the loading-rate relation solved for the area: the filter area needed to hold a target loading rate at the design flow, with the backwash flow that area draws and the loading band named.",
+    assumptions: [
+      { name: "Default backwash rate", value: "15 gpm/ft² unless user supplies", source: "Ten States Standards typical" },
+    ],
+  },
   "detention-time": {
     formula: "Detention time = volume / flow. Used for chlorine contact (CT for Giardia / virus inactivation per EPA SWTR), flocculation, sedimentation. CT = concentration (mg/L) × T_10 contact time (min).",
     edition: "EPA Surface Water Treatment Rule (SWTR) 40 CFR 141 Subpart H by section. EPA Disinfection Profiling and Benchmarking Guidance Manual by name.",

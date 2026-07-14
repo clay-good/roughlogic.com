@@ -4063,6 +4063,34 @@
    }
   },
   {
+   "tile_id": "filter-area-for-loading",
+   "source_publisher": "USEPA / AWWA general practice",
+   "source_title": "Required filter area = flow_gpm / target_loading; the inverse of loading = flow / area",
+   "source_edition_or_year": "current water-operator manuals",
+   "source_section_or_page": "Rapid-sand band 2-5 gpm/ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "flow_gpm": 800,
+    "target_loading_gpm_ft2": 4,
+    "backwash_rate_gpm_ft2": 15
+   },
+   "outputs": {
+    "required_area_ft2": {
+     "value": 200,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "backwash_gpm": {
+     "value": 3000,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "conduit-fill",
    "source_publisher": "NFPA",
    "source_title": "NEC Chapter 9 Table 4 (raceway areas) and Table 5 (conductor areas); Table 1 fill thresholds",

@@ -83,6 +83,29 @@ export function computeFilterLoading({ filter_area_ft2 = 0, flow_gpm = 0, backwa
 
 export const filterLoadingExample = { inputs: { filter_area_ft2: 200, flow_gpm: 800, backwash_rate_gpm_ft2: 15 } };
 
+// filter-area-for-loading: inverse of filter-loading. The forward tile gives the loading rate from the area; the inverse
+// sizes the filter area for a target loading rate at the design flow, area = flow_gpm / target_loading. It reports the
+// backwash flow that area draws and names the loading band, so a designer picks the area that lands in the rapid-sand or
+// high-rate range instead of reading the rate off a fixed area.
+// dims: in { flow_gpm: L^3 T^-1, target_loading_gpm_ft2: L T^-1, backwash_rate_gpm_ft2: L T^-1 } out: { required_area_ft2: L^2, backwash_gpm: L^3 T^-1 }
+export function computeFilterAreaForLoading({ flow_gpm = 0, target_loading_gpm_ft2 = 0, backwash_rate_gpm_ft2 = 15 }) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(flow_gpm > 0)) return { error: "Flow must be positive." };
+  if (!(target_loading_gpm_ft2 > 0)) return { error: "Target loading rate must be positive." };
+  if (!(backwash_rate_gpm_ft2 > 0)) return { error: "Backwash rate must be positive." };
+  const loading = target_loading_gpm_ft2;
+  const required_area_ft2 = flow_gpm / loading;
+  const backwash_gpm = backwash_rate_gpm_ft2 * required_area_ft2;
+  let category = "outside typical bands";
+  if (loading >= 2 && loading <= 5) category = "rapid sand (2-5 gpm/ft^2)";
+  else if (loading > 5 && loading <= 8) category = "high-rate (4-8 gpm/ft^2)";
+  else if (loading < 2) category = "below typical (low loading)";
+  else category = "above high-rate (verify design)";
+  return { required_area_ft2, backwash_gpm, category };
+}
+
+export const filterAreaForLoadingExample = { inputs: { flow_gpm: 800, target_loading_gpm_ft2: 4, backwash_rate_gpm_ft2: 15 } };
+
 // --- 212: Detention Time ---
 
 // dims: in { tank_volume_gal: L^3, flow_gpm: L^3 T^-1, target_minutes: T }
@@ -323,6 +346,22 @@ const renderFilterLoading = _r({
     { key: "c", id: "fl-out-c", label: "Category",     value: (r) => r.category },
   ],
   compute: computeFilterLoading,
+});
+
+const renderFilterAreaForLoading = _r({
+  citation: "Citation: AWWA general practice by name only. Filter area = flow / target loading rate. Backwash flow = backwash rate * area.",
+  example: filterAreaForLoadingExample.inputs,
+  fields: [
+    { key: "flow_gpm",               label: "Design flow (GPM)", kind: "number" },
+    { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft^2)", kind: "number" },
+    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft^2)", kind: "number", default: 15 },
+  ],
+  outputs: [
+    { key: "a", id: "fal-out-a", label: "Required filter area", value: (r) => fmt(r.required_area_ft2, 1) + " ft^2" },
+    { key: "b", id: "fal-out-b", label: "Backwash flow",        value: (r) => fmt(r.backwash_gpm, 0) + " GPM" },
+    { key: "c", id: "fal-out-c", label: "Loading band",         value: (r) => r.category },
+  ],
+  compute: computeFilterAreaForLoading,
 });
 
 const renderDetentionTime = _r({
@@ -621,6 +660,7 @@ function renderSVI(inputRegion, outputRegion, citationEl) {
 export const WATER_RENDERERS = {
   "pounds-formula":   renderPounds,
   "filter-loading":   renderFilterLoading,
+  "filter-area-for-loading": renderFilterAreaForLoading,
   "detention-time":   renderDetentionTime,
   "detention-basin-volume": renderDetentionBasinVolume,
   "lab-dilution":     renderDilution,

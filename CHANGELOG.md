@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(water): spec-v734 filter area for a target loading rate (filter-loading inverse); 2026-07-14
+
+- New tile `filter-area-for-loading` (Group M, calc-water.js): the filter area needed for a target loading rate at the
+  design flow. `area = flow / target_loading`. 800 GPM at 4 gpm/ft^2 needs 200 ft^2 (3,000 GPM backwash). Reports the
+  backwash flow and names the loading band. Round-trips through `filter-loading`. Home tile count 1,182 -> 1,183.
+
 ### feat(machining): spec-v733 countersink diameter from a plunge depth (countersink-depth inverse); 2026-07-14
 
 - New tile `countersink-diameter-from-depth` (Group K, calc-machining.js): the finished countersink diameter a set plunge

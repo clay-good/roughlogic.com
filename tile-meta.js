@@ -292,7 +292,7 @@ const _TILES = [
   ["grain-bin-capacity", "L"], ["grain-bin-height-for-capacity", "L"], ["npk-blend", "L"], ["tank-mix", "L"],
   ["grain-shrink-moisture", "L"], ["livestock-dry-matter-intake", "L"], ["manure-application-rate", "L"],
 
-  ["pounds-formula", "M"], ["filter-loading", "M"], ["detention-time", "M"], ["detention-basin-volume", "M"],
+  ["pounds-formula", "M"], ["filter-loading", "M"], ["filter-area-for-loading", "M"], ["detention-time", "M"], ["detention-basin-volume", "M"],
   ["lab-dilution", "M"], ["pump-eff-w2w", "M"], ["srt-fm-ratio", "M"],
   ["coagulant-dose", "M"], ["svi-sludge-index", "M"],
   ["disinfection-ct", "M"],

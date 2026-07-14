@@ -191,6 +191,7 @@ export const COMPUTE_MAP = {
   "timber-cruise": { module: "../../calc-agriculture.js", fn: "computeTimberCruise" },
   "neutral-imbalance": { module: "../../calc-stage.js", fn: "computeNeutralImbalance" },
   "filter-loading": { module: "../../calc-water.js", fn: "computeFilterLoading" },
+  "filter-area-for-loading": { module: "../../calc-water.js", fn: "computeFilterAreaForLoading" },
   "arc-flash-screen": { module: "../../calc-electrical.js", fn: "computeArcFlashScreen" },
   "motor-branch-from-nameplate": { module: "../../calc-electrical.js", fn: "computeMotorBranchFromNameplate" },
   "grounding-electrode": { module: "../../calc-electrical.js", fn: "computeGroundingElectrodeResistance" },
