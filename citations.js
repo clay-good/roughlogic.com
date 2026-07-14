@@ -7342,6 +7342,17 @@ export const CITATIONS = {
       { name: "Minimum ampacity", value: "the maximum current times another 125% before any conditions-of-use adjustment", source: "NEC 690.8(B)(1)" },
     ],
   },
+  "rolling-sphere-protection": {
+    formula: "protected_radius = sqrt(2 x R x h - h^2) for mast height h <= sphere radius R (capped at R for h >= R); protected_area = pi x radius^2. R = 150 ft standard.",
+    edition: "NFPA 780 Standard for the Installation of Lightning Protection Systems (the rolling-sphere method, 150 ft standard radius), by name; NFPA 780 and a lightning-protection engineer govern.",
+    freeAccess: "The rolling-sphere geometry is the published NFPA 780 method; the mast height and sphere radius come from the design and the protection level.",
+    governance: GOVERNANCE.general,
+    editionNote: "NFPA 780 rolling-sphere method: a sphere of radius R (150 ft for the standard protection level; smaller radii for higher levels) is rolled over the structure, and lightning strikes wherever it touches, so a mast or air terminal shields the ground circle the sphere cannot reach. For a mast height h no taller than R, the protected ground radius is d = sqrt(2 R h - h^2). This is a single-mast estimate; two or more masts protect the overlapping zone between them, which reaches higher than either alone, and a mast taller than R caps the ground radius at R while its upper portion can still take side flashes. The method sizes the zone, not the down-conductor, bonding, or grounding a complete system also requires. A design aid, not a stamped lightning-protection design.",
+    assumptions: [
+      { name: "Standard sphere radius", value: "150 ft for the standard protection level; smaller radii for higher protection levels", source: "NFPA 780" },
+      { name: "Single-mast estimate", value: "multiple masts protect the overlapping zone; a mast taller than R caps at R with side-flash exposure above", source: "NFPA 780 rolling-sphere" },
+    ],
+  },
   "sccr-combination": {
     formula: "panel_sccr = min(component SCCRs, feeder OCPD interrupting rating); compliant when panel_sccr >= available_fault.",
     edition: "The UL 508A Supplement SB industrial-control-panel short-circuit current rating (weakest-link method), with NEC 409.110 / 110.10, by name.",

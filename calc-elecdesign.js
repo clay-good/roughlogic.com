@@ -615,3 +615,42 @@ function renderSccrCombination(inputRegion, outputRegion, citationEl) {
   for (const f of [comps, feeder, fault]) f.input.addEventListener("input", update);
 }
 ELECDESIGN_RENDERERS["sccr-combination"] = renderSccrCombination;
+
+// ===================== spec-v788: lightning rolling-sphere zone of protection =====================
+// NFPA 780 rolling-sphere method: a strike terminates where a sphere of radius R (150 ft
+// standard) touches. A single mast of height h shields a ground-level circle of radius
+// d = sqrt(2 R h - h^2) for h <= R; for h >= R the ground-protected radius is capped at R
+// (upper mast portions may need separate side-flash protection).
+// dims: in { mast_height_ft: L, sphere_radius_ft: L } out: { protected_radius_ft: L, protected_area_ft2: L^2 }
+export function computeRollingSphereProtection({ mast_height_ft = 0, sphere_radius_ft = 150 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(mast_height_ft) || 0;
+  const R = Number(sphere_radius_ft) || 0;
+  if (!(h > 0)) return { error: "Mast (air-terminal) height must be positive (ft)." };
+  if (!(R > 0)) return { error: "Rolling-sphere radius must be positive (ft)." };
+  const capped = h >= R;
+  const protected_radius_ft = capped ? R : Math.sqrt(2 * R * h - h * h);
+  const protected_area_ft2 = Math.PI * protected_radius_ft * protected_radius_ft;
+  if (![protected_radius_ft, protected_area_ft2].every(Number.isFinite)) return { error: "Rolling-sphere math is not a finite value." };
+  return {
+    protected_radius_ft, protected_area_ft2, sphere_radius_ft: R, capped,
+    note: "NFPA 780 rolling-sphere method: imagine a sphere of radius R (150 ft for the standard protection level; smaller radii, e.g. 100 or 150 ft down to about 30 m, apply for higher protection levels) rolled over the structure -- lightning strikes wherever the sphere touches, and a mast or air terminal shields the ground circle the sphere cannot reach. For a mast of height h no taller than R, the protected ground radius is d = sqrt(2 R h - h^2); this is a single-mast estimate, and two or more masts protect the overlapping zone between them, which reaches higher than either alone. "
+      + (capped ? "Because the mast is at least as tall as the sphere radius, the ground-protected radius is capped at R, and mast sections above height R can still take side flashes that need their own air terminals. " : "")
+      + "The method sizes the zone, not the down-conductor, bonding, or grounding that a complete system also requires. A design aid; NFPA 780 and a lightning-protection engineer govern.",
+  };
+}
+export const rollingSphereProtectionExample = { inputs: { mast_height_ft: 30, sphere_radius_ft: 150 } };
+ELECDESIGN_RENDERERS["rolling-sphere-protection"] = _simpleRenderer({
+  citation: "Citation: NFPA 780 rolling-sphere method: a strike terminates where a sphere of radius R (150 ft standard) touches; a single mast of height h <= R shields a ground circle of radius d = sqrt(2 R h - h^2). For h >= R the ground radius is capped at R and upper mast portions may need side-flash protection. A single-mast estimate; multiple masts protect the overlapping zone. Sizes the zone only, not the down-conductor / bonding / grounding. NFPA 780 and a lightning-protection engineer govern.",
+  example: rollingSphereProtectionExample.inputs,
+  fields: [
+    { key: "mast_height_ft", label: "Mast / air-terminal height (ft)", kind: "number" },
+    { key: "sphere_radius_ft", label: "Rolling-sphere radius (ft, 150 standard)", kind: "number" },
+  ],
+  outputs: [
+    { key: "r", id: "rsp-out-r", label: "Protected ground radius", value: (r) => fmt(r.protected_radius_ft, 1) + " ft" + (r.capped ? " (capped at R; see note)" : "") },
+    { key: "a", id: "rsp-out-a", label: "Protected ground area", value: (r) => fmt(r.protected_area_ft2, 0) + " ft^2" },
+    { key: "n", id: "rsp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRollingSphereProtection,
+});

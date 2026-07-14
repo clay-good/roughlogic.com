@@ -85457,6 +85457,31 @@
       "kind": "question"
     },
     {
+      "term": "rolling sphere method",
+      "target": "rolling-sphere-protection",
+      "kind": "industry"
+    },
+    {
+      "term": "lightning protection zone",
+      "target": "rolling-sphere-protection",
+      "kind": "question"
+    },
+    {
+      "term": "lightning mast coverage radius",
+      "target": "rolling-sphere-protection",
+      "kind": "question"
+    },
+    {
+      "term": "nfpa 780 rolling sphere",
+      "target": "rolling-sphere-protection",
+      "kind": "industry"
+    },
+    {
+      "term": "air terminal protected area",
+      "target": "rolling-sphere-protection",
+      "kind": "adjacent"
+    },
+    {
       "term": "ev charger throttle",
       "target": "ev-charger-throttle",
       "kind": "industry"

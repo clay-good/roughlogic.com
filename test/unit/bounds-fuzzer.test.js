@@ -21609,6 +21609,26 @@ test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / rema
   assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: -1 }));
 });
 
+import { computeRollingSphereProtection as _v788 } from "../../calc-elecdesign.js";
+
+test("bounds: spec-v788 computeRollingSphereProtection pins the rolling-sphere radius, the h>=R cap, and error seams", () => {
+  const r = _v788({ mast_height_ft: 30, sphere_radius_ft: 150 });
+  assert.ok(Math.abs(r.protected_radius_ft - 90) < 1e-9); // sqrt(2*150*30 - 30^2)
+  assert.ok(Math.abs(r.protected_area_ft2 - Math.PI * 8100) < 1e-6);
+  assert.strictEqual(r.capped, false);
+  // A taller mast (up to R) protects more; at h = R the radius equals R.
+  assert.ok(_v788({ mast_height_ft: 60, sphere_radius_ft: 150 }).protected_radius_ft > r.protected_radius_ft);
+  assert.ok(Math.abs(_v788({ mast_height_ft: 150, sphere_radius_ft: 150 }).protected_radius_ft - 150) < 1e-9);
+  // h > R: radius caps at R with the side-flash flag.
+  const tall = _v788({ mast_height_ft: 200, sphere_radius_ft: 150 });
+  assert.strictEqual(tall.capped, true);
+  assert.ok(Math.abs(tall.protected_radius_ft - 150) < 1e-9);
+  // Error seams: non-finite, non-positive mast, non-positive radius.
+  assert.ok("error" in _v788({ mast_height_ft: Infinity, sphere_radius_ft: 150 }));
+  assert.ok("error" in _v788({ mast_height_ft: 0, sphere_radius_ft: 150 }));
+  assert.ok("error" in _v788({ mast_height_ft: 30, sphere_radius_ft: 0 }));
+});
+
 import { computeSacrificialAnodeLife as _v786 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v786 computeSacrificialAnodeLife pins Faraday's-law life, material capacity, monotonicity, and error seams", () => {

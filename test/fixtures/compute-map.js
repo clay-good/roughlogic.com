@@ -787,6 +787,7 @@ export const COMPUTE_MAP = {
   "winch-fleet-angle": { module: "../../calc-stage.js", fn: "computeWinchFleetAngle" },
   "sacrificial-anode-life": { module: "../../calc-mechanic.js", fn: "computeSacrificialAnodeLife" },
   "draft-beer-line-balance": { module: "../../calc-kitchen.js", fn: "computeDraftBeerLineBalance" },
+  "rolling-sphere-protection": { module: "../../calc-elecdesign.js", fn: "computeRollingSphereProtection" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

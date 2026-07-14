@@ -24370,6 +24370,33 @@
    }
   },
   {
+   "tile_id": "rolling-sphere-protection",
+   "source_publisher": "NFPA 780 (rolling-sphere method)",
+   "source_title": "protected_radius = sqrt(2 x R x h - h^2)",
+   "source_edition_or_year": "spec-v788 worked example (machine-verified)",
+   "source_section_or_page": "30 ft mast, 150 ft sphere -> sqrt(9000 - 900) = sqrt(8100) = 90 ft radius, ~25,447 ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "mast_height_ft": 30,
+    "sphere_radius_ft": 150
+   },
+   "outputs": {
+    "protected_radius_ft": {
+     "value": 90,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "protected_area_ft2": {
+     "value": 25446.9,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sacrificial-anode-life",
    "source_publisher": "Sacrificial-anode life by Faraday's law (ABYC E-2; DNV-RP-B401)",
    "source_title": "life = anode_mass x capacity x utilization / (current x 8760 h)",

@@ -510,7 +510,7 @@ const TOOL_MODULES = (() => {
     "neutral-grounding-resistor",
     // spec-v558
     "step-touch-voltage",
-    "ground-potential-rise", "max-grid-resistance-for-touch",
+    "ground-potential-rise", "max-grid-resistance-for-touch", "rolling-sphere-protection",
     // spec-v560
     "sccr-combination",
   ]);

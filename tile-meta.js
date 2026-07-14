@@ -504,6 +504,7 @@ const _TILES = [
   ["winch-fleet-angle", "N"],
   ["sacrificial-anode-life", "K"],
   ["draft-beer-line-balance", "O"],
+  ["rolling-sphere-protection", "A"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

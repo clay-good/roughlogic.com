@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(electrical): spec-v788 lightning rolling-sphere zone of protection; 2026-07-14
+
+- New tile `rolling-sphere-protection` (Group A, calc-elecdesign.js): the ground area a lightning mast or air terminal
+  shields, by the NFPA 780 rolling-sphere method. Roll a sphere of radius R (150 ft standard) over the structure --
+  lightning strikes wherever it touches, and a mast of height h <= R protects a ground circle of radius
+  `d = sqrt(2 R h - h^2)`. A 30 ft mast with the 150 ft sphere protects a 90 ft radius (~25,400 ft^2). A mast taller
+  than R caps at R with a side-flash flag above. Fuzzer pins the radius, the h>=R cap, the monotonicity, and the error
+  seams. Explore sweep #21 entry 3. Home count 1,236 -> 1,237.
+
 ### feat(kitchen): spec-v787 draft beer line balancing; 2026-07-14
 
 - New tile `draft-beer-line-balance` (Group O, calc-kitchen.js): the beer-line length that balances a draft system so it
