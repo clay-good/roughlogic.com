@@ -73,7 +73,12 @@ const TILE_GZIP_CAP = 6 * 1024;
 // construction/index.html to ~43.4 KB gz, crossing the cap at v547 (this
 // gate runs only in CI's integration job, so push lint stayed green while
 // CI went red from v547 onward); 48 KB restores ~11% headroom.
-const GROUP_GZIP_CAP = 48 * 1024;
+// Bumped 48 -> 52 KB on 2026-07-13: the v664-v684 inverse-tile campaign added
+// Group E construction inverses (hoop-stress-mawp v668, thermal-stress-max-deltat
+// v674, helical-pile-torque v681), taking construction/index.html to ~48.2 KB gz
+// and crossing the cap at v681 (again CI-only, so push lint stayed green while CI
+// went red from v681 onward); 52 KB restores ~8% headroom.
+const GROUP_GZIP_CAP = 52 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",
