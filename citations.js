@@ -11775,6 +11775,18 @@ export const CITATIONS = {
       { name: "Ellipsoid height", value: "h = orthometric elevation H + geoid height N (N negative in the conterminous US)", source: "geodetic convention" },
     ],
   },
+  "cogo-inverse-locate": {
+    formula: "dN = N2 - N1; dE = E2 - E1; distance = sqrt(dN^2 + dE^2); azimuth = atan2(dE, dN) x 180/pi, normalized to 0-360 deg (clockwise from north).",
+    edition: "First-principles coordinate geometry (the COGO inverse) as compiled in the standard route-surveying references (Ghilani & Wolf, Elementary Surveying; FM 5-233), by name.",
+    freeAccess: "The point-to-point inverse (distance and azimuth from two coordinates) is a public surveying result.",
+    governance: GOVERNANCE.general,
+    editionNote: "From two known points, the straight-line distance and the azimuth of the line from the first to the second - the exact inverse of the cogo-forward-point tile. distance = sqrt(dN^2 + dE^2), azimuth = atan2(dE, dN) measured clockwise from north and normalized to 0-360 deg. Running cogo-forward-point from the first point on this azimuth and distance lands on the second point (the round-trip). Read the azimuth as a quadrant bearing (N45E, S30W) with the bearing-conversion tile. This is plane (grid) geometry, not geodetic; it ignores earth curvature and any grid scale factor, so on a mapping-grid projection reduce the ground distance with the combined factor first. A computational aid; the project control and datum govern.",
+    assumptions: [
+      { name: "Azimuth basis", value: "atan2(dE, dN) clockwise from north, 0-360 deg", source: "surveying convention" },
+      { name: "Plane geometry", value: "flat-earth distance and azimuth; no curvature or grid scale factor", source: "plane-survey assumption" },
+      { name: "Distinct points", value: "the two points must differ; a zero-length line has no bearing", source: "scope of this tile" },
+    ],
+  },
   "building-ua": {
     formula: "cond = sum(A_i / R_i); UA_inf = 1.08 x CFM; UA = cond + UA_inf; design_load = UA x dT.",
     edition: "The whole-building heat-loss-coefficient roll-up UA = sum(A/R) + 1.08 x CFM with the design load Q = UA x dT, as compiled in the ASHRAE Fundamentals and RESNET energy-audit references, by name.",

@@ -16323,6 +16323,7 @@ import { computeCogoForwardPoint as _v766 } from "../../calc-survey.js";
 import { computeEdmSlopeReduction as _v769 } from "../../calc-survey.js";
 import { computeLevelingCurvatureRefraction as _v771 } from "../../calc-survey.js";
 import { computeGridToGround as _v776 } from "../../calc-survey.js";
+import { computeCogoInverseLocate as _v781 } from "../../calc-survey.js";
 
 test("bounds: spec-v311 computeDifferentialLeveling pins the HI reduction, the sum identity, the misclosure, and error seams", () => {
   const r = _v311({ bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 });
@@ -16526,6 +16527,36 @@ test("bounds: spec-v776 grid-to-ground pins EF = R/(R+h), CF = GSF*EF, ground = 
   assert.ok("error" in _v776({ grid_distance_ft: 10000, grid_scale_factor: 0, ellipsoid_height_ft: 5280 }));
   assert.ok("error" in _v776({ grid_distance_ft: 10000, grid_scale_factor: 0.9999, ellipsoid_height_ft: NaN }));
   assert.ok("error" in _v776({ grid_distance_ft: Infinity, grid_scale_factor: 0.9999, ellipsoid_height_ft: 5280 }));
+});
+
+test("bounds: spec-v781 cogo-inverse-locate pins distance/azimuth, the cardinal directions, the forward round-trip, and error seams", () => {
+  // Spec example: N5000/E5000 -> N5141.42/E5141.42 -> 200 ft at azimuth 45 deg.
+  const r = _v781({ start_n: 5000, start_e: 5000, end_n: 5141.42, end_e: 5141.42 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.distance_ft - Math.hypot(141.42, 141.42)) < 1e-9);
+  assert.ok(Math.abs(r.distance_ft - 200) < 0.01);
+  assert.ok(Math.abs(r.azimuth_deg - 45) < 1e-3);
+  // Cardinal directions: due north az 0, east 90, south 180, west 270.
+  assert.ok(Math.abs(_v781({ start_n: 0, start_e: 0, end_n: 100, end_e: 0 }).azimuth_deg - 0) < 1e-9);
+  assert.ok(Math.abs(_v781({ start_n: 0, start_e: 0, end_n: 0, end_e: 100 }).azimuth_deg - 90) < 1e-9);
+  assert.ok(Math.abs(_v781({ start_n: 0, start_e: 0, end_n: -100, end_e: 0 }).azimuth_deg - 180) < 1e-9);
+  assert.ok(Math.abs(_v781({ start_n: 0, start_e: 0, end_n: 0, end_e: -100 }).azimuth_deg - 270) < 1e-9);
+  // Round-trip against the forward tile: inverse -> forward reproduces the end point.
+  for (let i = 0; i < 250; i++) {
+    const n1 = 1000 + i * 3, e1 = 2000 - i * 2;
+    const n2 = n1 + (((i * 7) % 200) - 100) + 0.5, e2 = e1 + (((i * 11) % 200) - 100) + 0.5;
+    const inv = _v781({ start_n: n1, start_e: e1, end_n: n2, end_e: e2 });
+    if (inv.error) continue; // identical points skipped
+    assert.ok(Math.abs(inv.distance_ft - Math.hypot(n2 - n1, e2 - e1)) < 1e-9, "distance identity");
+    assert.ok(inv.azimuth_deg >= 0 && inv.azimuth_deg < 360, "azimuth normalized");
+    const fwd = _v766({ start_n: n1, start_e: e1, azimuth_deg: inv.azimuth_deg, distance_ft: inv.distance_ft });
+    assert.ok(!fwd.error, JSON.stringify({ n1, e1, inv }));
+    assert.ok(Math.abs(fwd.end_n - n2) < 1e-6 && Math.abs(fwd.end_e - e2) < 1e-6, "inverse->forward returns the end point");
+  }
+  // Error seams.
+  assert.ok("error" in _v781({ start_n: 5000, start_e: 5000, end_n: 5000, end_e: 5000 }), "identical points rejected");
+  assert.ok("error" in _v781({ start_n: NaN, start_e: 5000, end_n: 5100, end_e: 5100 }));
+  assert.ok("error" in _v781({ start_n: 5000, start_e: 5000, end_n: Infinity, end_e: 5100 }));
 });
 
 // ===================== spec-v314..v316 steel beam-column-and-connection depth batch =====================

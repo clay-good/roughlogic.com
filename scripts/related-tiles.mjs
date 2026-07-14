@@ -1384,6 +1384,7 @@ const RELATED = {
   "edm-slope-reduction": ["stadia-distance","cogo-forward-point","differential-leveling"],
   "leveling-curvature-refraction": ["differential-leveling","edm-slope-reduction","stadia-distance"],
   "grid-to-ground": ["edm-slope-reduction","cogo-forward-point","traverse-closure"],
+  "cogo-inverse-locate": ["cogo-forward-point","bearing-conversion","traverse-closure"],
   // spec-v314..v316 steel beam-column-and-connection depth batch (Group E)
   "steel-h1-interaction": ["steel-column-capacity","steel-beam-ltb","steel-effective-length-k"],
   "steel-effective-length-k": ["steel-column-capacity","steel-h1-interaction","steel-beam-ltb"],

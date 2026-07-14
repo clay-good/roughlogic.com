@@ -45845,6 +45845,35 @@
    }
   },
   {
+   "tile_id": "cogo-inverse-locate",
+   "source_publisher": "Coordinate geometry (Ghilani & Wolf; FM 5-233)",
+   "source_title": "N5000/E5000 to N5141.42/E5141.42 -> 200.00 ft at azimuth 45.00 deg",
+   "source_edition_or_year": "distance = sqrt(dN^2+dE^2); azimuth = atan2(dE,dN)",
+   "source_section_or_page": "dN = 141.42, dE = 141.42; distance = sqrt(141.42^2 x 2) = 200.00 ft; azimuth = atan2(141.42,141.42) = 45.00 deg",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "start_n": 5000,
+    "start_e": 5000,
+    "end_n": 5141.42,
+    "end_e": 5141.42
+   },
+   "outputs": {
+    "distance_ft": {
+     "value": 200.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "azimuth_deg": {
+     "value": 45.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-h1-interaction",
    "source_publisher": "AISC 360-22 H1.1",
    "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",

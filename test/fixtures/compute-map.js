@@ -970,6 +970,7 @@ export const COMPUTE_MAP = {
   "edm-slope-reduction": { module: "../../calc-survey.js", fn: "computeEdmSlopeReduction" },
   "leveling-curvature-refraction": { module: "../../calc-survey.js", fn: "computeLevelingCurvatureRefraction" },
   "grid-to-ground": { module: "../../calc-survey.js", fn: "computeGridToGround" },
+  "cogo-inverse-locate": { module: "../../calc-survey.js", fn: "computeCogoInverseLocate" },
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },

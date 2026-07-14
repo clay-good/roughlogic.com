@@ -620,3 +620,54 @@ function renderGridToGround(inputRegion, outputRegion, citationEl) {
   for (const f of [grid.input, gsf.input, h.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["grid-to-ground"] = renderGridToGround;
+
+// dims: in { start_n: L, start_e: L, end_n: L, end_e: L } out: { distance_ft: L, azimuth_deg: dimensionless, delta_n: L, delta_e: L }
+// COGO inverse (two points -> bearing and distance): dN = N2-N1, dE = E2-E1,
+// distance = hypot(dN, dE), azimuth = atan2(dE, dN) clockwise from north.
+export function computeCogoInverseLocate({ start_n = 0, start_e = 0, end_n = 0, end_e = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n1 = Number(start_n);
+  const e1 = Number(start_e);
+  const n2 = Number(end_n);
+  const e2 = Number(end_e);
+  if (![n1, e1, n2, e2].every(Number.isFinite)) return { error: "All coordinates must be numbers (ft)." };
+  const delta_n = n2 - n1;
+  const delta_e = e2 - e1;
+  const distance_ft = Math.hypot(delta_n, delta_e);
+  if (!(distance_ft > 0)) return { error: "The two points are identical; a zero-length line has no bearing." };
+  let azimuth_deg = (Math.atan2(delta_e, delta_n) * 180) / Math.PI;
+  if (azimuth_deg < 0) azimuth_deg += 360;
+  return {
+    distance_ft, azimuth_deg, delta_n, delta_e,
+    note: "The COGO inverse: from two known points, the straight-line distance and the azimuth of the line from the first to the second. Distance = sqrt(dN^2 + dE^2), azimuth = atan2(dE, dN) measured clockwise from north (0-360 deg). This is the exact inverse of the cogo-forward-point tile (a point plus a bearing and distance): running the forward tile from the first point on this azimuth and distance lands on the second. To read it as a quadrant bearing (N45E, S30W), the bearing-conversion tile takes the azimuth. Plane (grid) geometry - no earth curvature or grid scale factor; the project control and datum govern.",
+  };
+}
+export const cogoInverseLocateExample = { inputs: { start_n: 5000, start_e: 5000, end_n: 5141.42, end_e: 5141.42 } };
+
+function renderCogoInverseLocate(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: coordinate geometry inverse - distance = sqrt(dN^2 + dE^2), azimuth = atan2(dE, dN) clockwise from north, dN = N2-N1, dE = E2-E1. First-principles latitude/departure per the standard route-surveying references (Ghilani & Wolf; FM 5-233), by name. The exact inverse of cogo-forward-point. Plane geometry - no curvature or grid scale factor; the project control and datum govern.";
+  const n1 = makeNumber("Start northing N1 (ft)", "cil-n1", { step: "any", value: "5000" });
+  n1.input.value = "5000";
+  const e1 = makeNumber("Start easting E1 (ft)", "cil-e1", { step: "any", value: "5000" });
+  e1.input.value = "5000";
+  const n2 = makeNumber("End northing N2 (ft)", "cil-n2", { step: "any", value: "5141.42" });
+  n2.input.value = "5141.42";
+  const e2 = makeNumber("End easting E2 (ft)", "cil-e2", { step: "any", value: "5141.42" });
+  e2.input.value = "5141.42";
+  for (const f of [n1, e1, n2, e2]) inputRegion.appendChild(f.wrap);
+  const oD = makeOutputLine(outputRegion, "Distance", "cil-out-d");
+  const oA = makeOutputLine(outputRegion, "Azimuth (clockwise from north)", "cil-out-a");
+  const oDelta = makeOutputLine(outputRegion, "Latitude / departure (dN / dE)", "cil-out-delta");
+  const oNote = makeOutputLine(outputRegion, "Note", "cil-out-note");
+  const update = debounce(() => {
+    const r = computeCogoInverseLocate({ start_n: Number(n1.input.value), start_e: Number(e1.input.value), end_n: Number(n2.input.value), end_e: Number(e2.input.value) });
+    if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oDelta.textContent = "-"; oNote.textContent = ""; return; }
+    oD.textContent = fmt(r.distance_ft, 3) + " ft";
+    oA.textContent = fmt(r.azimuth_deg, 4) + " deg";
+    oDelta.textContent = fmt(r.delta_n, 3) + " ft / " + fmt(r.delta_e, 3) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { n1.input.value = "5000"; e1.input.value = "5000"; n2.input.value = "5141.42"; e2.input.value = "5141.42"; update(); });
+  for (const f of [n1.input, e1.input, n2.input, e2.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["cogo-inverse-locate"] = renderCogoInverseLocate;

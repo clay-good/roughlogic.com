@@ -15427,6 +15427,31 @@
       "kind": "question"
     },
     {
+      "term": "distance and bearing between two points",
+      "target": "cogo-inverse-locate",
+      "kind": "question"
+    },
+    {
+      "term": "cogo inverse",
+      "target": "cogo-inverse-locate",
+      "kind": "industry"
+    },
+    {
+      "term": "bearing between two coordinates",
+      "target": "cogo-inverse-locate",
+      "kind": "question"
+    },
+    {
+      "term": "azimuth between two points",
+      "target": "cogo-inverse-locate",
+      "kind": "question"
+    },
+    {
+      "term": "inverse two points",
+      "target": "cogo-inverse-locate",
+      "kind": "question"
+    },
+    {
       "term": "coordinate from bearing and distance",
       "target": "cogo-forward-point",
       "kind": "question"

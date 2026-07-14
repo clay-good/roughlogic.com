@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): spec-v781 COGO inverse (two points to bearing and distance); 2026-07-14
+
+- New tile `cogo-inverse-locate` (Group P, calc-survey.js): the exact inverse of `cogo-forward-point` -- from two known
+  points, the distance and azimuth of the line between them. `distance = sqrt(dN^2 + dE^2)`, `azimuth = atan2(dE, dN)`
+  clockwise from north. N5000/E5000 to N5141.42/E5141.42 runs 200.00 ft at azimuth 45.00 deg. Fuzzer pins the cardinal
+  directions and the inverse->forward round-trip against `computeCogoForwardPoint`. Home count 1,229 -> 1,230.
+
 ### feat(hvac): spec-v780 evaporative (swamp) cooler leaving temperature; 2026-07-14
 
 - New tile `evaporative-cooler-effectiveness` (Group C, calc-hvac.js): the supply-air temperature a direct-evaporative
