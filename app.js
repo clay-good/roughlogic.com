@@ -503,7 +503,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-elecdesign.js", "ELECDESIGN_RENDERERS", [
     "pull-box-sizing", "lumen-method",
     // spec-v175 electrician batch
-    "point-illuminance",
+    "point-illuminance", "point-method-required-candela",
     "lighting-light-loss-factor", "lighting-uniformity-ratio", "egress-lighting-check",
     // spec-v525 neutral grounding resistor sizing (IEEE 142)
     "neutral-grounding-resistor",

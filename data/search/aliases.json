@@ -8562,6 +8562,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "required candela for a footcandle target",
+      "target": "point-method-required-candela",
+      "kind": "industry"
+    },
+    {
+      "term": "candela needed to hit footcandles",
+      "target": "point-method-required-candela",
+      "kind": "industry"
+    },
+    {
+      "term": "intensity for a target illuminance",
+      "target": "point-method-required-candela",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fixture candlepower for a lux target",
+      "target": "point-method-required-candela",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what candela for a point illuminance",
+      "target": "point-method-required-candela",
+      "kind": "adjacent"
+    },
+    {
       "term": "burial depth",
       "target": "burial-depth-300-5",
       "kind": "industry"

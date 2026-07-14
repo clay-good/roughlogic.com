@@ -192,6 +192,45 @@ ELECDESIGN_RENDERERS["point-illuminance"] = _simpleRenderer({
   compute: computePointIlluminance,
 });
 
+// dims: in { target_illuminance: L^-2, illuminance_unit: dimensionless, mount_height_ft: L, angle_deg: dimensionless } out: { required_cd: J }
+export function computePointMethodRequiredCandela({ target_illuminance = 0, illuminance_unit = "fc", mount_height_ft = 0, angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_illuminance) || 0;
+  const unit = String(illuminance_unit);
+  const h = Number(mount_height_ft) || 0;
+  const ang = Number(angle_deg) || 0;
+  if (!(target > 0)) return { error: "Target illuminance must be positive." };
+  if (unit !== "fc" && unit !== "lux") return { error: "Illuminance unit must be fc or lux." };
+  if (!(h > 0)) return { error: "Mounting height must be positive (ft)." };
+  if (ang < 0 || ang >= 90) return { error: "Angle from nadir must be in [0, 90) degrees." };
+  const e_fc = unit === "lux" ? target / 10.764 : target;
+  const cosA = Math.cos(ang * Math.PI / 180);
+  // Inverse of E_fc = I x cos^3(angle) / h^2: I = E_fc x h^2 / cos^3(angle).
+  const required_cd = e_fc * h * h / (cosA * cosA * cosA);
+  if (!Number.isFinite(required_cd) || !(required_cd > 0)) return { error: "Candela math is not a finite positive value." };
+  return {
+    required_cd, e_fc, e_lux: e_fc * 10.764,
+    note: "The luminous intensity a fixture must aim toward a point to hit a target illuminance, the inverse of the point-illuminance tile: from E = I x cos^3(angle) / height^2 (the IES point method, inverse-square + cosine), I = E x height^2 / cos^3(angle) with E in footcandles (lux / 10.764). The candela climbs steeply off-nadir - the cos^3 in the denominator means a point 30 deg to the side needs about 54% more candlepower than the point straight below for the same footcandles, which is why the aiming angle and the fixture's candela at that angle (from its photometric file) matter as much as its rating. This is the direct component from one source, ignoring interreflection. The photometric file and the IES target level govern."
+  };
+}
+const pointMethodRequiredCandelaExample = { inputs: { target_illuminance: 10, illuminance_unit: "fc", mount_height_ft: 10, angle_deg: 0 } };
+ELECDESIGN_RENDERERS["point-method-required-candela"] = _simpleRenderer({
+  citation: "Citation: IES point method solved for intensity: I = E x height^2 / cos^3(angle), from E_fc = I x cos^3(angle) / height^2 (inverse-square + cosine). E in footcandles (lux / 10.764). Direct component from one source, ignoring interreflection. The photometric file and the IES target govern.",
+  example: pointMethodRequiredCandelaExample.inputs,
+  fields: [
+    { key: "target_illuminance", label: "Target illuminance at the point", kind: "number" },
+    { key: "illuminance_unit", label: "Unit", kind: "select", options: [{ value: "fc", label: "Footcandles (fc)" }, { value: "lux", label: "Lux" }] },
+    { key: "mount_height_ft", label: "Mounting height above work plane (ft)", kind: "number" },
+    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" }, default: 0 },
+  ],
+  outputs: [
+    { key: "i", id: "pmrc-out-i", label: "Required intensity toward point", value: (r) => fmt(r.required_cd, 0) + " cd" },
+    { key: "e", id: "pmrc-out-e", label: "Target", value: (r) => fmt(r.e_fc, 2) + " fc (" + fmt(r.e_lux, 1) + " lux)" },
+    { key: "n", id: "pmrc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePointMethodRequiredCandela,
+});
+
 // ===================== spec-v365..v367: lighting light-loss & compliance batch (Group A) =====================
 // The maintained-light and code numbers the lumen-method tile assumes: the
 // light-loss factor stack that turns initial into maintained lumens (v365), the

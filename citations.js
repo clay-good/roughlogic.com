@@ -6841,6 +6841,17 @@ export const CITATIONS = {
       { name: "Single source", value: "direct illuminance from one luminaire, ignoring interreflected light", source: "IES Lighting Handbook" },
     ],
   },
+  "point-method-required-candela": {
+    formula: "E_fc = target (lux / 10.764); required intensity I = E_fc x mount_height^2 / cos(angle)^3. The inverse of E_fc = I x cos(angle)^3 / mount_height^2.",
+    edition: "Point-by-point (inverse-square and cosine) method solved for the luminous intensity, IES Lighting Handbook / IESNA point method, by name.",
+    freeAccess: "The result is the intensity toward the point for the direct component from one source, ignoring interreflection; lux = fc x 10.764. A design relies on the manufacturer's photometric file and the IES target level.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The luminous intensity a fixture must aim toward a point to hit a target illuminance, the inverse of point-illuminance: I = E x mount_height^2 / cos(angle)^3 with E in footcandles (lux / 10.764). The candela climbs steeply off-nadir because of the cos^3 in the denominator (a point 30 deg to the side needs about 54% more candlepower than the point straight below for the same footcandles), so the aiming angle and the fixture's candela at that angle (from its photometric file) matter as much as its rating. This is the direct component from one source, ignoring interreflection. Single-edition (first-principles). The photometric file and the IES target level govern.",
+    assumptions: [
+      { name: "Inverse-square + cosine", value: "the required intensity rises with mount_height^2 and with 1/cos^3(angle) off-nadir", source: "IES point method" },
+      { name: "Single source", value: "the intensity for the direct component from one luminaire, ignoring interreflected light", source: "IES Lighting Handbook" },
+    ],
+  },
   "burial-depth-300-5": {
     formula: "min_cover (in) = Table 300.5 cell for (wiring method, location); cover is measured to the top of the raceway/cable. General earth: direct burial 24, RMC/IMC 6, PVC 18, residential GFCI branch 12, low-voltage 6.",
     edition: "Minimum cover requirements, 0 to 1000 volts, NEC 2023 Table 300.5, by name.",

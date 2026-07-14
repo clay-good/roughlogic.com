@@ -11843,7 +11843,7 @@ import {
   computeNeutralDemand22061 as _cv169,
 } from "../../calc-service.js";
 import { computeMotorUnbalanceDerate as _cv172 } from "../../calc-powerquality.js";
-import { computePointIlluminance as _cv175 } from "../../calc-elecdesign.js";
+import { computePointIlluminance as _cv175, computePointMethodRequiredCandela as _v688 } from "../../calc-elecdesign.js";
 import {
   computeBurialDepth3005 as _cv177, computeSupportSpacing as _cv178,
 } from "../../calc-references.js";
@@ -11955,6 +11955,35 @@ test("bounds: spec-v175 point-illuminance pins the nadir, the off-axis cosine, a
   assert.ok("error" in _cv175({ intensity_cd: 1000, mount_height_ft: 0, angle_deg: 0 }));
   assert.ok("error" in _cv175({ intensity_cd: 1000, mount_height_ft: 10, angle_deg: 90 }));
   assert.ok("error" in _cv175({ intensity_cd: Infinity, mount_height_ft: 10, angle_deg: 0 }));
+});
+
+test("bounds: spec-v688 computePointMethodRequiredCandela pins I = E h^2 / cos^3(angle), the fc/lux unit, round-trips through computePointIlluminance, and error seams", () => {
+  const r = _v688({ target_illuminance: 10, illuminance_unit: "fc", mount_height_ft: 10, angle_deg: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.required_cd - 1000) < 1e-6, `nadir 1000 cd: ${r.required_cd}`);
+  // Off-nadir needs more candela (cos^3 penalty).
+  const off = _v688({ target_illuminance: 10, illuminance_unit: "fc", mount_height_ft: 10, angle_deg: 30 });
+  assert.ok(Math.abs(off.required_cd - 10 * 100 / Math.pow(Math.cos(30 * Math.PI / 180), 3)) < 1e-6, `30deg identity: ${off.required_cd}`);
+  assert.ok(off.required_cd > r.required_cd, `off-nadir more cd: ${off.required_cd}`);
+  // Lux input converts (107.64 lux = 10 fc -> same 1000 cd).
+  const lux = _v688({ target_illuminance: 107.64, illuminance_unit: "lux", mount_height_ft: 10, angle_deg: 0 });
+  assert.ok(Math.abs(lux.required_cd - 1000) < 1, `lux -> 1000 cd: ${lux.required_cd}`);
+  // Round-trip: the required candela, fed back through the forward tile, reproduces the target footcandles.
+  for (const target_fc of [2, 10, 50]) {
+    for (const angle_deg of [0, 30, 60]) {
+      const m = _v688({ target_illuminance: target_fc, illuminance_unit: "fc", mount_height_ft: 12, angle_deg });
+      assert.ok(!m.error, `sweep E=${target_fc} ang=${angle_deg}: ${JSON.stringify(m)}`);
+      assertFinite(m.required_cd, "cd"); assert.ok(m.required_cd > 0, "cd positive");
+      const back = _cv175({ intensity_cd: m.required_cd, mount_height_ft: 12, angle_deg });
+      assert.ok(Math.abs(back.e_fc - target_fc) < 1e-6, `round-trip E=${target_fc} ang=${angle_deg}: ${back.e_fc}`);
+    }
+  }
+  // Error seams: non-positive target, bad unit, non-positive height, angle out of range, non-finite.
+  assert.ok("error" in _v688({ target_illuminance: 0, mount_height_ft: 10 }));
+  assert.ok("error" in _v688({ target_illuminance: 10, illuminance_unit: "x", mount_height_ft: 10 }));
+  assert.ok("error" in _v688({ target_illuminance: 10, mount_height_ft: 0 }));
+  assert.ok("error" in _v688({ target_illuminance: 10, mount_height_ft: 10, angle_deg: 90 }));
+  assert.ok("error" in _v688({ target_illuminance: Infinity, mount_height_ft: 10 }));
 });
 
 test("bounds: spec-v176 working-space-110-26 pins the depth table, the width override, and the error seam", () => {

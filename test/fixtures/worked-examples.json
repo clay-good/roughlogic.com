@@ -31982,6 +31982,52 @@
    }
   },
   {
+   "tile_id": "point-method-required-candela",
+   "source_publisher": "IES Lighting Handbook (point method), inverse",
+   "source_title": "I = E x height^2 / cos(angle)^3",
+   "source_edition_or_year": "spec-v688 worked example (machine-verified)",
+   "source_section_or_page": "10 fc target, 10 ft up, nadir -> 1,000 cd (round-trips point-illuminance)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_illuminance": 10,
+    "illuminance_unit": "fc",
+    "mount_height_ft": 10,
+    "angle_deg": 0
+   },
+   "outputs": {
+    "required_cd": {
+     "value": 1000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "point-method-required-candela",
+   "source_publisher": "IES Lighting Handbook (point method), inverse",
+   "source_title": "cross-check: the same 10 fc at 30 deg off nadir needs about 54% more candela",
+   "source_edition_or_year": "spec-v688 cross-check (machine-verified)",
+   "source_section_or_page": "10 fc, 10 ft, 30 deg -> ~1,540 cd (the cos^3 off-nadir penalty)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_illuminance": 10,
+    "illuminance_unit": "fc",
+    "mount_height_ft": 10,
+    "angle_deg": 30
+   },
+   "outputs": {
+    "required_cd": {
+     "value": 1539.6,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "burial-depth-300-5",
    "source_publisher": "NEC 2023 (NFPA 70)",
    "source_title": "Minimum cover Table 300.5, PVC in general earth",

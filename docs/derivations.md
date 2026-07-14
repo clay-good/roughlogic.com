@@ -1793,6 +1793,7 @@ cross-check.
 | calc-elecdesign.js | `computeLumenMethod` | `{ target_fc = 0, area_sqft = 0, lumens_per_lum = 0, cu = 0.7, llf = 0.8 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeNeutralGroundingResistor` | `{ system_voltage_ll_v = 0, target_fault_a = 0, duty = "hrg" } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computePointIlluminance` | `{ intensity_cd = 0, mount_height_ft = 0, angle_deg = 0 } = {}` | _ | _ | _ |
+| calc-elecdesign.js | `computePointMethodRequiredCandela` | `{ target_illuminance = 0, illuminance_unit = "fc", mount_height_ft = 0, angle...` | _ | _ | _ |
 | calc-elecdesign.js | `computePullBoxSizing` | `{ pull_type = "straight", largest_raceway_in = 0, other_raceways_in = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeSccrCombination` | `{ component_sccrs_ka = [], feeder_ir_ka = 0, available_fault_ka = 0 } = {}` | _ | _ | _ |
 | calc-elecdesign.js | `computeStepTouchVoltage` | `{ clearing_time_s = 0, surface_resistivity = 0, native_resistivity = 0, layer...` | _ | _ | _ |
@@ -2794,7 +2795,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1380.
+Row count: 1381.
 
 <!-- END function-corpus-v14 -->
 
@@ -2875,7 +2876,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (145 tiles)
+### Group A Electrical (146 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2973,6 +2974,7 @@ per spec-v14 §13.1 second paragraph.
 | `phase-balance` | Phase Balance Across Panels | Project (first-principles); Four circuits {A:1500, A:800, B:600, C:700} -> 141.67% in... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `poe-budget` | PoE Budget and Run Distance | IEEE; Type 2 PSE = 30 W, PD min 25.5 W; 200 ft Cat6 @ 25 C -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `point-illuminance` | Point-Method Illuminance (Inverse-Square + Cosine) | IES Lighting Handbook (point method); angle 0: E = 1000 x cos(0) / 10^2 = 10.0 fc (107.6 lux) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `point-method-required-candela` | Point-Method Required Candela for a Target | IES Lighting Handbook (point method),...; 10 fc target, 10 ft up, nadir -> 1,000 cd (round-trips po... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pool-bonding-680-26` | Swimming-Pool Equipotential Bonding Checklist (NEC 680.26) | NEC 2023 (NFPA 70); permanent pool/spa -> full 8-component 680.26(B)/(C) bond... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-factor-billing-savings` | Power-Factor Correction Demand-Billing Savings | Power-triangle demand-billing method; spec-v232 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `power-triangle` | Power Triangle Solver (kW / kVA / kVAR / PF) | IEEE; kVA^2 = kW^2 + kVAR^2; PF = kW/kVA; theta = arccos(PF) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4116,6 +4118,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1136. Fixture-covered or reference-cadence: 1136 / 1136.
+Tile count: 1137. Fixture-covered or reference-cadence: 1137 / 1137.
 
 <!-- END tile-index-v14 -->
