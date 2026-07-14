@@ -10373,6 +10373,18 @@ export const CITATIONS = {
       { name: "Empirical", value: "a statistical fit reflecting wheel power at the traps; not a dyno measurement", source: "drag-racing practice" },
     ],
   },
+  "et-horsepower": {
+    formula: "HP = weight x (5.825 / ET)^3 (the inverse of ET = 5.825 x (weight/HP)^(1/3)).",
+    edition: "Hale's empirical quarter-mile ET relation ET = 5.825 x (weight/HP)^(1/3) solved for power, the ET companion of the trap-speed tile, as compiled in the drag-racing references, by name.",
+    freeAccess: "Hale's quarter-mile relations are public empirical results widely used in the drag-racing community.",
+    governance: GOVERNANCE.general,
+    editionNote: "Horsepower from the quarter-mile elapsed time, the inverse of Hale's ET relation: HP = weight x (5.825/ET)^3, with weight the race weight including driver (lb) and ET the quarter-mile time (s). Because ET depends on power by a cube-root law, HP scales with the cube of 1/ET, so a small ET drop implies a large power gain. ET is the input a timeslip gives directly, but it is corrupted by traction and the launch (a car that spins or bogs runs a slower ET at the same power), so the trap-speed estimate is the cleaner power indicator when it is available. This is a statistical fit to typical cars (the 5.825 constant averages out weight transfer, driveline loss, and the 60-foot time; a very slippery or very draggy car deviates) and reflects the power reaching the wheels; it is not a substitute for a dyno. A hobbyist estimate; the actual dyno measurement governs.",
+    assumptions: [
+      { name: "ET power", value: "HP = weight x (5.825/ET)^3, the inverse of the ET cube-root relation", source: "Hale quarter-mile relation" },
+      { name: "Trap cleaner", value: "ET is corrupted by traction and the launch; trap speed is the cleaner indicator when available", source: "drag-racing practice" },
+      { name: "Empirical", value: "a statistical fit reflecting wheel power; not a dyno measurement", source: "drag-racing practice" },
+    ],
+  },
   "refrigerant-mass-flow": {
     formula: "Q_btumin = (unit == tons) ? Q x 200 : Q/60; RE = h1 - h4; m_dot = Q_btumin / RE; m_dot_lbh = 60 m_dot.",
     edition: "The refrigerant mass-flow-from-capacity relation m_dot = Q / (h1 - h4) with the refrigeration effect off the pressure-enthalpy diagram, a standard refrigeration-cycle result, by name.",

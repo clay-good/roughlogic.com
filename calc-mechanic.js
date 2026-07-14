@@ -1091,6 +1091,34 @@ function renderTrapSpeedHorsepower(inputRegion, outputRegion, citationEl) {
 }
 MECHANIC_RENDERERS["trap-speed-horsepower"] = renderTrapSpeedHorsepower;
 
+// dims: in { weight_lb: M L T^-2, et_s: T } out: { hp: M L^2 T^-3 }
+export function computeEtHorsepower({ weight_lb = 0, et_s = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(weight_lb) || 0;
+  const et = Number(et_s) || 0;
+  if (!(w > 0)) return { error: "Vehicle weight must be positive (lb)." };
+  if (!(et > 0)) return { error: "Elapsed time must be positive (s)." };
+  const hp = w * Math.pow(5.825 / et, 3);
+  return {
+    hp,
+    note: "Horsepower from the quarter-mile elapsed time, the inverse of the trap-speed tile's ET relation ET = 5.825 x (weight/HP)^(1/3): HP = weight x (5.825/ET)^3, with weight the race weight including driver (lb) and ET the quarter-mile time (s). Because ET depends on power by a cube-root law, HP scales with the cube of 1/ET, so a small ET drop implies a large power gain. ET is what a timeslip gives directly, but it is corrupted by traction and the launch (a car that spins or bogs runs a slower ET at the same power), so trap speed is the cleaner power indicator when it is available. A statistical fit to typical cars (the 5.825 constant averages out weight transfer, driveline loss, and the 60-foot time; a very slippery or very draggy car deviates); a hobbyist estimate, not a substitute for a dyno. The actual dyno measurement governs.",
+  };
+}
+export const etHorsepowerExample = { inputs: { weight_lb: 3200, et_s: 12.63 } };
+MECHANIC_RENDERERS["et-horsepower"] = _simpleRenderer({
+  citation: "Citation: Hale's quarter-mile relation ET = 5.825 x (weight/HP)^(1/3) solved for power, HP = weight x (5.825/ET)^3, weight including driver (lb), ET the quarter-mile time (s), per the drag-racing references, by name. Empirical fit, ET corrupted by traction/launch, not a dyno. A hobbyist estimate; the dyno governs.",
+  example: etHorsepowerExample.inputs,
+  fields: [
+    { key: "weight_lb", label: "Vehicle weight incl. driver (lb)", kind: "number", default: 3200 },
+    { key: "et_s", label: "Quarter-mile elapsed time (s)", kind: "number", default: 12.63 },
+  ],
+  outputs: [
+    { key: "hp", id: "eth-out-hp", label: "Estimated horsepower", value: (r) => fmt(r.hp, 0) + " hp (at the wheels)" },
+    { key: "n", id: "eth-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeEtHorsepower,
+});
+
 // ===================== spec-v396..v398: fluid-power / cooling trio (Group K) =====================
 
 // dims: in { gpm: L^3 T^-1, psi: M L^-1 T^-2, efficiency: dimensionless } out: { fluid_hp: M L^2 T^-3, input_hp: M L^2 T^-3 }

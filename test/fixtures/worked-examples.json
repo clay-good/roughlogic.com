@@ -43446,6 +43446,48 @@
    }
   },
   {
+   "tile_id": "et-horsepower",
+   "source_publisher": "Hale quarter-mile ET relation (inverse for power)",
+   "source_title": "3,200 lb car running a 12.63 s quarter -> ~314 hp",
+   "source_edition_or_year": "spec-v662 worked example (machine-verified)",
+   "source_section_or_page": "spec-v662 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "weight_lb": 3200,
+    "et_s": 12.63
+   },
+   "outputs": {
+    "hp": {
+     "value": 314,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "et-horsepower",
+   "source_publisher": "Hale quarter-mile ET relation (inverse for power)",
+   "source_title": "cross-check: a quicker 11.5 s ET implies ~416 hp (the cube law - a small ET drop, a big power gain)",
+   "source_edition_or_year": "spec-v662 worked example (machine-verified)",
+   "source_section_or_page": "spec-v662 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "weight_lb": 3200,
+    "et_s": 11.5
+   },
+   "outputs": {
+    "hp": {
+     "value": 416,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "relative-compaction",
    "source_publisher": "Relative compaction (earthwork QC)",
    "source_title": "128 pcf wet at 12%, Proctor 120 pcf, 95% spec -> 114.3 pcf dry, 95.2% pass",

@@ -843,7 +843,7 @@ const TOOL_MODULES = (() => {
     // spec-v485 torque wrench extension / crowfoot correction
     "torque-adapter-correction",
     // spec-v323..v325 engine-build performance batch
-    "injector-size", "injector-max-hp", "mean-piston-speed", "max-rpm-from-piston-speed", "trap-speed-horsepower",
+    "injector-size", "injector-max-hp", "mean-piston-speed", "max-rpm-from-piston-speed", "trap-speed-horsepower", "et-horsepower",
     // spec-v500 density altitude and pressure altitude
     "density-altitude",
     // spec-v501 crosswind and headwind component

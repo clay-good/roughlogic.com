@@ -14755,6 +14755,24 @@ test("bounds: spec-v325 computeTrapSpeedHorsepower pins the cube law, the ET com
   assert.ok("error" in _v325({ weight_lb: Infinity, trap_mph: 108 }));
 });
 
+import { computeEtHorsepower as _v662 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v662 computeEtHorsepower inverts the ET relation, round-trips the trap-speed tile, follows the cube law, and pins error seams", () => {
+  const r = _v662({ weight_lb: 3200, et_s: 12.63 });
+  assert.ok(Math.abs(r.hp - 3200 * Math.pow(5.825 / 12.63, 3)) < 1e-9); // ~314
+  assert.ok(Math.abs(r.hp - 314) < 1);
+  // Exact inverse of the trap-speed tile's ET: feed its computed ET back and recover the HP.
+  const fwd = _v325({ weight_lb: 3200, trap_mph: 108 });
+  assert.ok(Math.abs(_v662({ weight_lb: 3200, et_s: fwd.et_s }).hp - fwd.hp) < 1e-9);
+  // Cube law: a quicker ET implies more power.
+  assert.ok(_v662({ weight_lb: 3200, et_s: 11.5 }).hp > r.hp);
+  assert.ok(Math.abs(_v662({ weight_lb: 3200, et_s: 11.5 }).hp - 416) < 1);
+  // Error seams: non-positive weight / ET, non-finite.
+  assert.ok("error" in _v662({ weight_lb: 0, et_s: 12.63 }));
+  assert.ok("error" in _v662({ weight_lb: 3200, et_s: 0 }));
+  assert.ok("error" in _v662({ weight_lb: 3200, et_s: Infinity }));
+});
+
 // ===================== spec-v326..v328 soil characterization / QC batch =====================
 import { computeRelativeCompaction as _v326, computeSoilPhaseRelations as _v327, computeAtterbergIndices as _v328 } from "../../calc-earthwork.js";
 

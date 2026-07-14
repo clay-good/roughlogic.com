@@ -2226,6 +2226,7 @@ cross-check.
 | calc-mechanic.js | `computeDriveshaftCritical` | `{ od_in = 0, wall_in = 0, length_in = 0, material = "steel" }` | _ | _ | _ |
 | calc-mechanic.js | `computeDynoCorrectionSae` | `{ observed_hp = 0, baro_mbar = 0, air_temp_c = 25, humidity_pct = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeEngineFuelBurnGph` | `{ horsepower = 0, bsfc_lb_hp_hr = 0, density_lb_gal = 0, tank_gal = 0 } = {}` | _ | _ | _ |
+| calc-mechanic.js | `computeEtHorsepower` | `{ weight_lb = 0, et_s = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeFuelRange` | `{ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", l...` | _ | _ | _ |
 | calc-mechanic.js | `computeGearMphRpm` | `{ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = ...` | _ | _ | _ |
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
@@ -2768,7 +2769,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1354.
+Row count: 1355.
 
 <!-- END function-corpus-v14 -->
 
@@ -3671,7 +3672,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (57 tiles)
+### Group K Mechanic (58 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3698,6 +3699,7 @@ per spec-v14 §13.1 second paragraph.
 | `driveshaft-crit` | Driveshaft Critical Speed | Project (first-principles) over Spice...; 3.5 in OD / 0.083 in wall / 48 in long / steel -> 4678 rp... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dyno-correction-sae` | SAE J1349 Dyno Correction Factor | SAE J1349 dyno correction factor; spec-v515 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `et-horsepower` | Horsepower from Quarter-Mile ET | Hale quarter-mile ET relation (invers...; spec-v662 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-identification` | Gear Identification (Pitch from Teeth and OD) | Machinery's Handbook / AGMA (inverse ...; spec-v649 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-mph-rpm` | Gear-Ratio MPH from RPM | Drivetrain kinematics + SAE J267 tire...; 2500 RPM, 1:1, 3.55 axle, 28.5-in tire -> 59.71 MPH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4064,6 +4066,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1110. Fixture-covered or reference-cadence: 1110 / 1110.
+Tile count: 1111. Fixture-covered or reference-cadence: 1111 / 1111.
 
 <!-- END tile-index-v14 -->

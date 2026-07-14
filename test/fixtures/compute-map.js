@@ -901,6 +901,7 @@ export const COMPUTE_MAP = {
   "mean-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMeanPistonSpeed" },
   "max-rpm-from-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMaxRpmFromPistonSpeed" },
   "trap-speed-horsepower": { module: "../../calc-mechanic.js", fn: "computeTrapSpeedHorsepower" },
+  "et-horsepower": { module: "../../calc-mechanic.js", fn: "computeEtHorsepower" },
   // spec-v326..v328 soil characterization / QC batch (3 tiles)
   "relative-compaction": { module: "../../calc-earthwork.js", fn: "computeRelativeCompaction" },
   "soil-phase-relations": { module: "../../calc-earthwork.js", fn: "computeSoilPhaseRelations" },

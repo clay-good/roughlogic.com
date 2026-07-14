@@ -1290,7 +1290,8 @@ const RELATED = {
   "injector-max-hp": ["injector-size","volumetric-efficiency","hp-from-torque","displacement-cr"],
   "mean-piston-speed": ["max-rpm-from-piston-speed","displacement-cr","hp-from-torque","injector-size"],
   "max-rpm-from-piston-speed": ["mean-piston-speed","displacement-cr","hp-from-torque","injector-size"],
-  "trap-speed-horsepower": ["hp-from-torque","injector-size","mean-piston-speed"],
+  "trap-speed-horsepower": ["et-horsepower","hp-from-torque","injector-size","mean-piston-speed"],
+  "et-horsepower": ["trap-speed-horsepower","hp-from-torque","dyno-correction-sae","injector-size"],
   // spec-v326..v328 soil characterization / QC batch (Group E)
   "relative-compaction": ["soil-swell-shrink","soil-phase-relations","soil-bearing-capacity"],
   "soil-phase-relations": ["relative-compaction","soil-consolidation-settlement","atterberg-indices"],

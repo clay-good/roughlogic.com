@@ -65982,6 +65982,36 @@
       "kind": "question"
     },
     {
+      "term": "et horsepower",
+      "target": "et-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "hp from et",
+      "target": "et-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "power from elapsed time",
+      "target": "et-horsepower",
+      "kind": "redirect"
+    },
+    {
+      "term": "horsepower from quarter mile time",
+      "target": "et-horsepower",
+      "kind": "question"
+    },
+    {
+      "term": "hp from timeslip et",
+      "target": "et-horsepower",
+      "kind": "question"
+    },
+    {
+      "term": "estimate hp from et",
+      "target": "et-horsepower",
+      "kind": "question"
+    },
+    {
       "term": "how much hardener for a quart of paint",
       "target": "paint-mix-ratio",
       "kind": "question"
