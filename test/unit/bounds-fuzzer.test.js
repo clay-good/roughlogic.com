@@ -1188,6 +1188,7 @@ import {
   computeDisinfectionCT,
   computePoolTurnover,
   computeWellDrawdown,
+  computeWellMaxYield,
   computeCoolingWaterMakeup,
   computeChlorineDecay,
 } from "../../calc-water.js";
@@ -1433,6 +1434,30 @@ test("bounds: calc-water computeWellDrawdown pins drawdown, specific capacity, a
   // Rejections: pumping above static, non-positive discharge.
   assert.ok("error" in computeWellDrawdown({ static_level_ft: 80, pumping_level_ft: 50, discharge_gpm: 30 }));
   assert.ok("error" in computeWellDrawdown({ static_level_ft: 50, pumping_level_ft: 80, discharge_gpm: 0 }));
+});
+
+test("bounds: spec-v694 computeWellMaxYield pins yield = specific_capacity x allowable_drawdown, round-trips through computeWellDrawdown, and error seams", () => {
+  const r = computeWellMaxYield({ specific_capacity_gpm_ft: 1.0, allowable_drawdown_ft: 30 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_yield_gpm - 30) < 1e-9, `yield identity: ${r.max_yield_gpm}`);
+  assert.strictEqual(r.marginal, false);
+  // A marginal well (< 0.5 GPM/ft) is flagged.
+  const marg = computeWellMaxYield({ specific_capacity_gpm_ft: 0.3, allowable_drawdown_ft: 40 });
+  assert.ok(Math.abs(marg.max_yield_gpm - 12) < 1e-9 && marg.marginal === true);
+  // Round-trip: pumping the max yield produces the allowable drawdown at the given specific capacity.
+  for (const specific_capacity_gpm_ft of [0.4, 1.0, 3.0]) {
+    for (const allowable_drawdown_ft of [10, 30, 60]) {
+      const m = computeWellMaxYield({ specific_capacity_gpm_ft, allowable_drawdown_ft });
+      assert.ok(!m.error, `sweep Sc=${specific_capacity_gpm_ft} s=${allowable_drawdown_ft}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_yield_gpm, "yield"); assert.ok(m.max_yield_gpm > 0, "yield positive");
+      const back = computeWellDrawdown({ static_level_ft: 50, pumping_level_ft: 50 + allowable_drawdown_ft, discharge_gpm: m.max_yield_gpm });
+      assert.ok(Math.abs(back.specific_capacity_gpm_ft - specific_capacity_gpm_ft) < 1e-9, `round-trip Sc=${specific_capacity_gpm_ft} s=${allowable_drawdown_ft}: ${back.specific_capacity_gpm_ft}`);
+    }
+  }
+  // Error seams: non-positive specific capacity / allowable drawdown, non-finite.
+  assert.ok("error" in computeWellMaxYield({ specific_capacity_gpm_ft: 0, allowable_drawdown_ft: 30 }));
+  assert.ok("error" in computeWellMaxYield({ specific_capacity_gpm_ft: 1.0, allowable_drawdown_ft: 0 }));
+  assert.ok("error" in computeWellMaxYield({ specific_capacity_gpm_ft: NaN, allowable_drawdown_ft: 30 }));
 });
 
 test("bounds: calc-water computeCoolingWaterMakeup pins evaporation / blowdown / drift / makeup", () => {

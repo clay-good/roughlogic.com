@@ -2018,6 +2018,17 @@ export const CITATIONS = {
       { name: "Pump-setting offset", value: "20 ft below the pumping level (default; user overrides)", source: "well-pump field practice" },
     ],
   },
+  "well-max-yield": {
+    formula: "max_yield_gpm = specific_capacity_gpm_ft x allowable_drawdown_ft. The inverse of specific_capacity = discharge / drawdown.",
+    edition: "AWWA A100 (Water Wells) standard; USGS well-testing methods (USGS Open-File Report 02-197).",
+    freeAccess: "awwa.org for the A100 TOC; pubs.usgs.gov for the USGS report.",
+    governance: GOVERNANCE.water,
+    editionNote: "The sustainable pumping rate a well can give up without pulling the water below the pump, the inverse of well-drawdown: max_yield = specific_capacity x allowable_drawdown. The specific capacity (GPM per foot of drawdown) comes from a step-drawdown test or the well-drawdown tile; the allowable drawdown is the head from the static level down to a safe level above the pump intake or the top of the screen (leave a margin so the pump never breaks suction). Specific capacity DECLINES at higher rates from well losses, so this linear estimate holds near the tested rate and overstates the yield well above it - confirm with a constant-rate test. A specific capacity below 0.5 GPM/ft is a marginal well and is flagged. A planning estimate; a pumping test and a licensed well driller govern.",
+    assumptions: [
+      { name: "Linear near the test rate", value: "specific capacity declines with rate (well losses); the linear yield holds near the tested rate, overstates it far above", source: "USGS / AWWA field practice" },
+      { name: "Specific-capacity floor", value: "< 0.5 GPM/ft flagged as a marginal well", source: "AWWA A100 / USGS field practice" },
+    ],
+  },
   "cooling-water-makeup": {
     formula: "Evaporation (GPM) = recirculation x delta-T / 1000. Blowdown (GPM) = evaporation / (COC - 1). Drift (GPM) = recirculation x drift fraction. Makeup (GPM) = evaporation + blowdown + drift.",
     edition: "Cooling Technology Institute (CTI) publications; ASHRAE Systems and Equipment 2020 Chapter 40 (cooling towers).",

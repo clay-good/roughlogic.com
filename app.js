@@ -959,7 +959,7 @@ const TOOL_MODULES = (() => {
     // v9
     "svi-sludge-index", "disinfection-ct",
     // v16
-    "pool-turnover", "well-drawdown", "cooling-water-makeup", "chlorine-decay",
+    "pool-turnover", "well-drawdown", "well-max-yield", "cooling-water-makeup", "chlorine-decay",
     // v23
     "backflow-test-psi",
     // spec-v116 disinfection: chlorine demand/breakpoint + UV dose.

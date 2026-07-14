@@ -3757,6 +3757,31 @@
       "kind": "redirect"
     },
     {
+      "term": "sustainable well yield",
+      "target": "well-max-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "max gpm from specific capacity",
+      "target": "well-max-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "how hard can i pump a well",
+      "target": "well-max-yield",
+      "kind": "adjacent"
+    },
+    {
+      "term": "well pump sizing from drawdown",
+      "target": "well-max-yield",
+      "kind": "adjacent"
+    },
+    {
+      "term": "safe yield from allowable drawdown",
+      "target": "well-max-yield",
+      "kind": "adjacent"
+    },
+    {
       "term": "cooling tower makeup",
       "target": "cooling-water-makeup",
       "kind": "industry"

@@ -14466,6 +14466,48 @@
    }
   },
   {
+   "tile_id": "well-max-yield",
+   "source_publisher": "AWWA / USGS (inverse)",
+   "source_title": "max_yield = specific_capacity x allowable_drawdown",
+   "source_edition_or_year": "spec-v694 worked example (machine-verified)",
+   "source_section_or_page": "1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-trips well-drawdown)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "specific_capacity_gpm_ft": 1.0,
+    "allowable_drawdown_ft": 30
+   },
+   "outputs": {
+    "max_yield_gpm": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "well-max-yield",
+   "source_publisher": "AWWA / USGS (inverse)",
+   "source_title": "cross-check: a marginal 0.3 GPM/ft well yields little even with a deep allowable drawdown",
+   "source_edition_or_year": "spec-v694 cross-check (machine-verified)",
+   "source_section_or_page": "0.3 GPM/ft, 40 ft allowable drawdown -> 12 GPM (flagged marginal, < 0.5 GPM/ft)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "specific_capacity_gpm_ft": 0.3,
+    "allowable_drawdown_ft": 40
+   },
+   "outputs": {
+    "max_yield_gpm": {
+     "value": 12,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cooling-water-makeup",
    "source_publisher": "CTI / ASHRAE",
    "source_title": "Cooling water makeup: 1,000 GPM recirc, 10 F range, COC 4, drift 0.002",

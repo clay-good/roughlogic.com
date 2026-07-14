@@ -294,7 +294,7 @@ const _TILES = [
   ["lab-dilution", "M"], ["pump-eff-w2w", "M"], ["srt-fm-ratio", "M"],
   ["coagulant-dose", "M"], ["svi-sludge-index", "M"],
   ["disinfection-ct", "M"],
-  ["pool-turnover", "M"], ["well-drawdown", "M"],
+  ["pool-turnover", "M"], ["well-drawdown", "M"], ["well-max-yield", "M"],
   ["cooling-water-makeup", "M"], ["chlorine-decay", "M"],
 
   ["truss-capacity", "N"], ["time-alignment", "N"], ["dmx-planner", "N"],

@@ -379,7 +379,8 @@ const RELATED = {
   "filter-loading": ["detention-time", "pump-eff-w2w"],
   // v16 Group M first-principles batch.
   "pool-turnover": ["chlorine-decay", "pounds-formula", "disinfection-ct"],
-  "well-drawdown": ["pump-eff-w2w", "pump-tdh", "detention-time"],
+  "well-drawdown": ["well-max-yield", "pump-eff-w2w", "pump-tdh", "detention-time"],
+  "well-max-yield": ["well-drawdown", "pump-tdh", "pump-eff-w2w", "detention-time"],
   "cooling-water-makeup": ["cooling-tower", "chiller-tons", "pounds-formula"],
   "chlorine-decay": ["disinfection-ct", "pool-turnover", "detention-time"],
 

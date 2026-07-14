@@ -1016,6 +1016,43 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
 }
 WATER_RENDERERS["well-drawdown"] = _v16w_renderWellDrawdown;
 
+// dims: in { specific_capacity_gpm_ft: L^2 T^-1, allowable_drawdown_ft: L } out: { max_yield_gpm: L^3 T^-1 }
+export function computeWellMaxYield({ specific_capacity_gpm_ft = 0, allowable_drawdown_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sc = Number(specific_capacity_gpm_ft) || 0;
+  const s = Number(allowable_drawdown_ft) || 0;
+  if (!(sc > 0)) return { error: "Specific capacity must be positive (GPM per ft)." };
+  if (!(s > 0)) return { error: "Allowable drawdown must be positive (ft)." };
+  // Inverse of specific_capacity = discharge / drawdown: max_yield = specific_capacity x allowable_drawdown.
+  const max_yield_gpm = sc * s;
+  if (!Number.isFinite(max_yield_gpm) || !(max_yield_gpm > 0)) return { error: "Yield math is not a finite positive value." };
+  const marginal = sc < 0.5;
+  return {
+    max_yield_gpm, marginal,
+    note: "The sustainable pumping rate a well can give up without pulling the water below the pump, the inverse of the well-drawdown tile: max_yield = specific_capacity x allowable_drawdown. The specific capacity (GPM per foot of drawdown) comes from a step-drawdown test or the well-drawdown tile; the allowable drawdown is the head you can spend, from the static level down to a safe level above the pump intake or the top of the screen (leave a margin so the pump never breaks suction). Specific capacity DECLINES at higher rates because of well losses, so this linear estimate holds near the tested rate and overstates the yield far above it - confirm with a constant-rate test. A specific capacity below 0.5 GPM/ft is a marginal well and is flagged. A planning estimate; a pumping test and the well driller govern."
+  };
+}
+export const wellMaxYieldExample = { inputs: { specific_capacity_gpm_ft: 1.0, allowable_drawdown_ft: 30 } };
+
+function _renderWellMaxYield(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: sustainable well yield from specific capacity: max_yield = specific_capacity x allowable_drawdown (GPM). Specific capacity (GPM per ft) from a step-drawdown test or the well-drawdown tile; the allowable drawdown is static level to a safe level above the pump intake. Per AWWA A100 and USGS well-testing methods; a constant-rate test governs. Free at awwa.org / pubs.usgs.gov.";
+  const sc = makeNumber("Specific capacity (GPM per ft of drawdown)", "wmy-sc", { step: "any", min: "0", value: "1.0" });
+  const s = makeNumber("Allowable drawdown (ft, static to safe level)", "wmy-s", { step: "any", min: "0", value: "30" });
+  sc.input.value = "1.0"; s.input.value = "30";
+  for (const f of [sc, s]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sc.input.value = "1.0"; s.input.value = "30"; update(); });
+  const oY = makeOutputLine(outputRegion, "Max sustainable yield", "wmy-out-y");
+  const oNote = makeOutputLine(outputRegion, "Note", "wmy-out-note");
+  const update = debounce(() => {
+    const r = computeWellMaxYield({ specific_capacity_gpm_ft: _v16w_readNum(sc.input), allowable_drawdown_ft: _v16w_readNum(s.input) });
+    if (r.error) { oY.textContent = r.error; oNote.textContent = ""; return; }
+    oY.textContent = fmt(r.max_yield_gpm, 1) + " GPM" + (r.marginal ? " (marginal well - specific capacity below 0.5 GPM/ft)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [sc.input, s.input]) el.addEventListener("input", update);
+}
+WATER_RENDERERS["well-max-yield"] = _renderWellMaxYield;
+
 // --- N.4 Cooling water makeup from cycles of concentration -----------
 
 // dims: in { recirculation_gpm: L^3 T^-1, delta_T_F: T, coc: dimensionless, drift_fraction: dimensionless }

@@ -177,6 +177,7 @@ export const COMPUTE_MAP = {
   "pounds-formula": { module: "../../calc-water.js", fn: "computePoundsFormula" },
   "pool-turnover": { module: "../../calc-water.js", fn: "computePoolTurnover" },
   "well-drawdown": { module: "../../calc-water.js", fn: "computeWellDrawdown" },
+  "well-max-yield": { module: "../../calc-water.js", fn: "computeWellMaxYield" },
   "cooling-water-makeup": { module: "../../calc-water.js", fn: "computeCoolingWaterMakeup" },
   "chlorine-decay": { module: "../../calc-water.js", fn: "computeChlorineDecay" },
   "detention-time": { module: "../../calc-water.js", fn: "computeDetentionTime" },
