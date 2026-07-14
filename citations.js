@@ -638,6 +638,18 @@ export const CITATIONS = {
       { name: "8.34 lb/gal", value: "weight of one gallon of water", source: "pounds formula" },
     ],
   },
+  "clarifier-area-for-loading": {
+    formula: "required_area = flow x 1e6 / target_SOR (ft^2), the inverse of SOR = flow x 1e6 / area; equivalent circular diameter = sqrt(4 x area / pi).",
+    edition: "Clarifier surface loading rate, standard wastewater-operations practice (Ten States Standards / Metcalf & Eddy), by name, solved for the area.",
+    freeAccess: "The overflow-rate relation is a standard published wastewater result; the state design criteria govern the limits.",
+    governance: GOVERNANCE.water,
+    editionNote: "The clarifier surface area a target surface overflow rate needs at the design flow, the inverse of SOR = flow / area, with the equivalent circular clarifier diameter. Typical design SOR ceilings are roughly 700-1000 gpd/ft^2 (lower for a secondary clarifier carrying floc); size below the limit for peak flow, not just average. A separate weir-length and (for a secondary clarifier) solids-loading check governs alongside. The Ten States Standards and the state design criteria govern the actual limits. An operations aid; the operator of record and the primacy agency govern.",
+    assumptions: [
+      { name: "Surface area for SOR", value: "required area = flow x 1e6 / target SOR (gpd/ft^2)", source: "wastewater operations" },
+      { name: "Equivalent diameter", value: "circular clarifier diameter = sqrt(4 x area / pi)", source: "geometry" },
+      { name: "Design limits", value: "state design criteria govern the actual ceilings; size for peak flow", source: "scope of this tile" },
+    ],
+  },
   "clarifier-surface-loading": {
     formula: "SOR = flow x 1e6 / area (gpd/ft^2); weir = flow x 1e6 / weir_len (gpd/ft); solids = flow x MLSS x 8.34 / area (lb/ft^2/day).",
     edition: "Clarifier surface, weir, and solids loading rates, standard wastewater-operations practice (Ten States Standards / Metcalf & Eddy), by name.",

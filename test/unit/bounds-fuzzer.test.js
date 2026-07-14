@@ -18386,6 +18386,26 @@ test("bounds: spec-v405 computeClarifierSurfaceLoading pins SOR/weir/solids, the
   assert.ok("error" in _v405({ flow_mgd: 1.0, surface_ft2: 1256.6, weir_len_ft: 125.7, mlss_mgl: Infinity }));
 });
 
+import { computeClarifierAreaForLoading as _v742 } from "../../calc-treatment.js";
+test("bounds: spec-v742 clarifier surface area for a target SOR (inverse of clarifier-surface-loading)", () => {
+  const p = _v742({ flow_mgd: 1.0, target_sor_gpd_ft2: 800 });
+  assert.ok(Math.abs(p.required_area_ft2 - 1250) < 1e-6);
+  assert.ok(Math.abs(p.equiv_diameter_ft - Math.sqrt(4 * 1250 / Math.PI)) < 1e-9);
+  // round-trip: the recovered area fed to clarifier-surface-loading reproduces the target SOR
+  for (const [flow, sor] of [[1.0, 800], [2.5, 700], [0.5, 1000], [4.0, 600]]) {
+    const inv = _v742({ flow_mgd: flow, target_sor_gpd_ft2: sor });
+    const fwd = _v405({ flow_mgd: flow, surface_ft2: inv.required_area_ft2, weir_len_ft: 100 });
+    assert.ok(Math.abs(fwd.sor_gpd_ft2 - sor) < 1e-6);
+  }
+  // a lower target SOR needs more area; a higher flow needs more area (monotonic)
+  assert.ok(_v742({ flow_mgd: 1.0, target_sor_gpd_ft2: 700 }).required_area_ft2 > _v742({ flow_mgd: 1.0, target_sor_gpd_ft2: 1000 }).required_area_ft2);
+  assert.ok(_v742({ flow_mgd: 2.0, target_sor_gpd_ft2: 800 }).required_area_ft2 > _v742({ flow_mgd: 1.0, target_sor_gpd_ft2: 800 }).required_area_ft2);
+  // error seams
+  assert.ok("error" in _v742({ flow_mgd: 0, target_sor_gpd_ft2: 800 }));
+  assert.ok("error" in _v742({ flow_mgd: 1.0, target_sor_gpd_ft2: 0 }));
+  assert.ok("error" in _v742({ flow_mgd: Infinity, target_sor_gpd_ft2: 800 }));
+});
+
 test("bounds: spec-v406 computeBodTssLoadingRemoval pins the loads, removal, the upset case, and error seams", () => {
   const r = _v406({ flow_mgd: 1.0, influent_mgl: 200, effluent_mgl: 20 });
   assert.ok(Math.abs(r.influent_lb_day - 1668) < 1e-6);

@@ -18309,6 +18309,33 @@
    }
   },
   {
+   "tile_id": "clarifier-area-for-loading",
+   "source_publisher": "Ten States Standards / Metcalf & Eddy (solved for the area)",
+   "source_title": "1.0 MGD at 800 gpd/ft^2 -> 1,250 ft^2 (39.9 ft equivalent circular diameter)",
+   "source_edition_or_year": "spec-v742 worked example (machine-verified)",
+   "source_section_or_page": "spec-v742 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "flow_mgd": 1.0,
+    "target_sor_gpd_ft2": 800
+   },
+   "outputs": {
+    "required_area_ft2": {
+     "value": 1250,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "equiv_diameter_ft": {
+     "value": 39.89,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "clarifier-surface-loading",
    "source_publisher": "Ten States Standards / Metcalf & Eddy",
    "source_title": "cross-check: double the flow -> SOR 1,592 gpd/ft^2, past the ~1000 limit",

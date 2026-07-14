@@ -99,7 +99,7 @@ const _TILES = [
   ["weir-flow", "M"], ["weir-head-from-flow", "M"],
   ["langelier-index", "M"],
   ["chemical-feed-pump", "M"],
-  ["clarifier-surface-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"], ["conductivity-from-tds", "M"],
+  ["clarifier-surface-loading", "M"], ["clarifier-area-for-loading", "M"], ["bod-tss-loading-removal", "M"], ["tds-from-conductivity", "M"], ["conductivity-from-tds", "M"],
   ["digester-vs-loading", "M"],
   ["va-alkalinity-ratio", "M"],
   ["digester-gas-production", "M"],

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(treatment): spec-v742 clarifier surface area for a target SOR (clarifier-surface-loading inverse); 2026-07-14
+
+- New tile `clarifier-area-for-loading` (Group M, calc-treatment.js): the clarifier surface area a target surface
+  overflow rate needs at the design flow. `area = flow x 1e6 / SOR`, plus the equivalent circular diameter. 1 MGD at 800
+  gpd/ft^2 needs 1,250 ft^2 (~40 ft diameter). Round-trips through `clarifier-surface-loading`. Home tile count 1,190 ->
+  1,191.
+
 ### feat(lowvoltage): spec-v741 camera max distance for a pixel density (camera-lens-fov inverse); 2026-07-14
 
 - New tile `camera-max-distance-for-ppf` (Group A, calc-lowvoltage.js): the farthest distance a camera still meets a

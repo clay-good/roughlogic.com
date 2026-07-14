@@ -132,6 +132,7 @@ const RELATED = {
   "langelier-index": ["chlorine-decay", "coagulant-dose", "disinfection-ct"],
   "chemical-feed-pump": ["pounds-formula", "coagulant-dose", "disinfection-ct"],
   "clarifier-surface-loading": ["filter-loading", "srt-fm-ratio", "weir-flow", "bod-tss-loading-removal"],
+  "clarifier-area-for-loading": ["clarifier-surface-loading", "detention-basin-volume", "bod-tss-loading-removal"],
   "bod-tss-loading-removal": ["srt-fm-ratio", "clarifier-surface-loading", "chemical-feed-pump", "coagulant-dose"],
   "tds-from-conductivity": ["conductivity-from-tds", "langelier-index", "softener-sizing", "coagulant-dose"],
   "conductivity-from-tds": ["tds-from-conductivity", "langelier-index", "softener-sizing", "coagulant-dose"],

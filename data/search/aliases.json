@@ -18072,6 +18072,31 @@
       "kind": "industry"
     },
     {
+      "term": "clarifier area for sor",
+      "target": "clarifier-area-for-loading",
+      "kind": "industry"
+    },
+    {
+      "term": "clarifier size for flow",
+      "target": "clarifier-area-for-loading",
+      "kind": "redirect"
+    },
+    {
+      "term": "how big a clarifier",
+      "target": "clarifier-area-for-loading",
+      "kind": "adjacent"
+    },
+    {
+      "term": "clarifier area for loading",
+      "target": "clarifier-area-for-loading",
+      "kind": "adjacent"
+    },
+    {
+      "term": "clarifier diameter for flow",
+      "target": "clarifier-area-for-loading",
+      "kind": "adjacent"
+    },
+    {
       "term": "surface overflow rate",
       "target": "clarifier-surface-loading",
       "kind": "industry"

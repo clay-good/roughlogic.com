@@ -56,6 +56,7 @@ export const COMPUTE_MAP = {
   "langelier-index": { module: "../../calc-treatment.js", fn: "computeLangelierIndex" },
   "chemical-feed-pump": { module: "../../calc-treatment.js", fn: "computeChemicalFeedPump" },
   "clarifier-surface-loading": { module: "../../calc-treatment.js", fn: "computeClarifierSurfaceLoading" },
+  "clarifier-area-for-loading": { module: "../../calc-treatment.js", fn: "computeClarifierAreaForLoading" },
   "bod-tss-loading-removal": { module: "../../calc-treatment.js", fn: "computeBodTssLoadingRemoval" },
   "tds-from-conductivity": { module: "../../calc-treatment.js", fn: "computeTdsFromConductivity" },
   "conductivity-from-tds": { module: "../../calc-treatment.js", fn: "computeConductivityFromTds" },

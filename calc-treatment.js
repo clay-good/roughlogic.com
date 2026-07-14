@@ -642,6 +642,45 @@ function renderClarifierSurfaceLoading(inputRegion, outputRegion, citationEl) {
 }
 TREATMENT_RENDERERS["clarifier-surface-loading"] = renderClarifierSurfaceLoading;
 
+// clarifier-area-for-loading: inverse of clarifier-surface-loading. The forward tile gives the surface overflow rate from
+// the area; the inverse sizes the clarifier surface area for a target SOR at the design flow, area = flow x 1e6 / SOR,
+// and the equivalent circular clarifier diameter, so a designer picks a tank that lands within the design SOR limit.
+// dims: in { flow_mgd: dimensionless, target_sor_gpd_ft2: dimensionless } out: { required_area_ft2: L^2, equiv_diameter_ft: L }
+export function computeClarifierAreaForLoading({ flow_mgd = 0, target_sor_gpd_ft2 = 0 } = {}) {
+  const flow = Number(flow_mgd) || 0;
+  const sor = Number(target_sor_gpd_ft2) || 0;
+  if (!(flow > 0 && Number.isFinite(flow))) return { error: "Flow must be positive (MGD)." };
+  if (!(sor > 0 && Number.isFinite(sor))) return { error: "Target surface overflow rate must be positive (gpd/ft^2)." };
+  const required_area_ft2 = (flow * 1e6) / sor;
+  const equiv_diameter_ft = Math.sqrt(4 * required_area_ft2 / Math.PI);
+  if (![required_area_ft2, equiv_diameter_ft].every(Number.isFinite)) return { error: "Clarifier-area math is not a finite value." };
+  return {
+    required_area_ft2, equiv_diameter_ft,
+    note: "Required surface area = flow x 1e6 / target SOR, the inverse of SOR = flow / area (gpd/ft^2), with the equivalent circular clarifier diameter = sqrt(4 x area / pi). Typical design SOR limits are roughly 700-1000 gpd/ft^2 (lower for a secondary clarifier carrying floc); size below the limit for peak flow, not just average. A separate weir-length and (for a secondary clarifier) solids-loading check governs alongside this. Ten States Standards and the state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.",
+  };
+}
+export const clarifierAreaForLoadingExample = { inputs: { flow_mgd: 1.0, target_sor_gpd_ft2: 800 } };
+function renderClarifierAreaForLoading(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Clarifier hydraulic loading (Ten States Standards / Metcalf & Eddy, Wastewater Engineering): surface overflow rate = flow/area, solved for the area: area = flow x 1e6 / SOR; equivalent circular diameter = sqrt(4 x area / pi). The state design criteria govern the limits. An operations aid; the operator of record and the primacy agency govern compliance.";
+  const flow = makeNumber("Design flow (MGD)", "cal-flow", { step: "any", min: "0" }); flow.input.value = "1.0";
+  const sor = makeNumber("Target surface overflow rate (gpd/ft^2, ~700-1000)", "cal-sor", { step: "any", min: "0" }); sor.input.value = "800";
+  for (const f of [flow, sor]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "1.0"; sor.input.value = "800"; update(); });
+  const oArea = makeOutputLine(outputRegion, "Required surface area", "cal-out-area");
+  const oDia = makeOutputLine(outputRegion, "Equivalent circular diameter", "cal-out-dia");
+  const oNote = makeOutputLine(outputRegion, "Note", "cal-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeClarifierAreaForLoading({ flow_mgd: readNum(flow.input), target_sor_gpd_ft2: readNum(sor.input) });
+    if (r.error) { oArea.textContent = r.error; oDia.textContent = "-"; oNote.textContent = ""; return; }
+    oArea.textContent = fmt(r.required_area_ft2, 0) + " ft^2";
+    oDia.textContent = fmt(r.equiv_diameter_ft, 1) + " ft (round circular clarifier)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [flow, sor]) f.input.addEventListener("input", update);
+}
+TREATMENT_RENDERERS["clarifier-area-for-loading"] = renderClarifierAreaForLoading;
+
 // dims: in { flow_mgd: dimensionless, influent_mgl: dimensionless, effluent_mgl: dimensionless } out: { influent_lb_day: dimensionless, effluent_lb_day: dimensionless, removed_lb_day: dimensionless, removal_pct: dimensionless }
 export function computeBodTssLoadingRemoval({ flow_mgd = 0, influent_mgl = 0, effluent_mgl = 0 } = {}) {
   const flow = Number(flow_mgd) || 0;
