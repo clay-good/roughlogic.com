@@ -923,7 +923,7 @@ const TOOL_MODULES = (() => {
     // spec-v118 hay dry-matter and safe-storage weight.
     "hay-dry-matter",
     // spec-v207..v211 landscape irrigation and planting install cluster.
-    "sprinkler-precip-rate", "irrigation-zone-runtime", "drip-zone-flow",
+    "sprinkler-precip-rate", "sprinkler-gpm-for-precip", "irrigation-zone-runtime", "drip-zone-flow",
     "plant-spacing-count", "sod-takeoff",
   ]);
   // v87 cap-relief split: the v68 tree-care / arborist-rigging bench moved out

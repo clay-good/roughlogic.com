@@ -1120,6 +1120,7 @@ const RELATED = {
   "hay-dry-matter": ["pearson-square-ration","grain-bin-capacity","livestock-water-requirement"],
   // spec-v207..v211 landscape irrigation and planting install cluster (Group L)
   "sprinkler-precip-rate": ["irrigation-zone-runtime","irrigation-uniformity","drip-zone-flow"],
+  "sprinkler-gpm-for-precip": ["sprinkler-precip-rate","irrigation-zone-runtime","drip-zone-flow"],
   "irrigation-zone-runtime": ["sprinkler-precip-rate","irrigation-requirement","irrigation-uniformity"],
   "drip-zone-flow": ["sprinkler-precip-rate","irrigation-zone-runtime","nozzle-flow-pressure"],
   "plant-spacing-count": ["sod-takeoff","square-footage","material-quantity"],

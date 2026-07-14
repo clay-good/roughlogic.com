@@ -9985,6 +9985,18 @@ export const CITATIONS = {
       { name: "Combustion risk", value: "very wet, tightly stacked hay can heat enough to spontaneously combust; monitor and do not store tight above the ceiling", source: "extension guidance" },
     ],
   },
+  "sprinkler-gpm-for-precip": {
+    formula: "required_gpm = target_precip_in_hr x zone_ft2 / 96.3, the inverse of precip_in_hr = 96.3 x zone_gpm / zone_ft2 (the 96.3 constant = 231 in^3/gal / 144 in^2/ft^2 x 60 min/hr spreads 1 gpm over 1 ft^2).",
+    edition: "First-principles precipitation-rate relation with the Irrigation Association design references and the Rain Bird / Hunter design manuals (by name), solved for the flow; no edition cycle.",
+    freeAccess: "The precipitation-rate relation and the 96.3 constant are public irrigation-design practice. The nozzle chart and the matched-precipitation rule are in the manufacturer's design manuals.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the 96.3 conversion and the matched-precipitation rule do not roll), solved for the zone flow: the total head flow a target precipitation rate needs over the covered area, so the designer picks nozzles from the manufacturer's chart at the operating pressure that sum to about this gpm. This is a design-rate estimate, not a system audit (irrigation-uniformity audits the installed result).",
+    assumptions: [
+      { name: "Precipitation-rate relation", value: "required gpm = target PR (in/hr) x zone area (ft^2) / 96.3", source: "Irrigation Association / manufacturer design manuals" },
+      { name: "Head flows", value: "the per-head flows are the manufacturer's nozzle-chart values at the operating pressure", source: "Rain Bird / Hunter nozzle charts" },
+      { name: "Matched precipitation", value: "sprays (~1.5-2 in/hr) and rotors (~0.4-0.8 in/hr) apply water at very different rates and must not share a valve", source: "Irrigation Association design references" },
+    ],
+  },
   "sprinkler-precip-rate": {
     formula: "precip_in_hr = 96.3 x zone_gpm / zone_ft2 (the 96.3 constant = 231 in^3/gal / 144 in^2/ft^2 x 60 min/hr spreads 1 gpm over 1 ft^2).",
     edition: "First-principles precipitation-rate relation with the Irrigation Association design references and the Rain Bird / Hunter design manuals (by name); no edition cycle.",

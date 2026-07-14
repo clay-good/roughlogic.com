@@ -9582,6 +9582,31 @@
       "kind": "industry"
     },
     {
+      "term": "sprinkler gpm for precip",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "industry"
+    },
+    {
+      "term": "flow for precip rate",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "redirect"
+    },
+    {
+      "term": "gpm for precipitation rate",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "adjacent"
+    },
+    {
+      "term": "zone flow for precip",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sprinkler flow for rate",
+      "target": "sprinkler-gpm-for-precip",
+      "kind": "adjacent"
+    },
+    {
       "term": "precip rate",
       "target": "sprinkler-precip-rate",
       "kind": "industry"

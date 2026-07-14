@@ -2191,6 +2191,38 @@ const renderSprinklerPrecipRate = _v23SimpleRenderer({
 });
 AGRICULTURE_RENDERERS["sprinkler-precip-rate"] = renderSprinklerPrecipRate;
 
+// --- spec-v736: sprinkler zone gpm for a target precip rate (inverse of sprinkler-precip-rate) ---
+// The forward tile gives the precip rate from the zone gpm and area; the inverse recovers the zone gpm a target precip
+// rate needs over a covered area, which is how a designer picks the nozzles: from PR = 96.3 x gpm / area,
+// gpm = PR x area / 96.3.
+// dims: in { target_precip_in_hr: L T^-1, zone_ft2: L^2 } out: { required_gpm: L^3 T^-1 }
+export function computeSprinklerGpmForPrecip({ target_precip_in_hr = 0, zone_ft2 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(target_precip_in_hr > 0)) return { error: "Target precipitation rate must be positive (in/hr)." };
+  if (!(zone_ft2 > 0)) return { error: "Zone area must be positive (ft^2)." };
+  const required_gpm = target_precip_in_hr * zone_ft2 / 96.3;
+  if (!Number.isFinite(required_gpm)) return { error: "Zone-flow math is not a finite value." };
+  return {
+    required_gpm,
+    note: "Required zone gpm = target precip rate x zone area (ft^2) / 96.3, the inverse of PR = 96.3 x gpm / area. The 96.3 constant spreads 1 gpm over 1 ft^2 (231 in^3/gal / 144 in^2/ft^2 x 60 min/hr). This is the total head flow the zone needs to hit the design rate over the area the heads cover, so pick nozzles from the manufacturer's chart at the operating pressure that sum to about this gpm. Keep spray heads (~1.5-2 in/hr) and rotors (~0.4-0.8 in/hr) on separate valves - the same gpm applies water roughly three times faster from sprays. The zone gpm must also fit the supply and the valve; a design estimate, not a system audit.",
+  };
+}
+export const sprinklerGpmForPrecipExample = { inputs: { target_precip_in_hr: 1.5, zone_ft2: 1200 } };
+const renderSprinklerGpmForPrecip = _v23SimpleRenderer({
+  citation: "Citation: first-principles precipitation-rate relation with the Irrigation Association design references and the Rain Bird / Hunter design manuals (by name), solved for the flow: gpm = PR x zone area (ft^2) / 96.3. The 96.3 constant is the standard irrigation conversion. Head flows come from the nozzle chart at the operating pressure; this is a design-rate estimate, not a system audit.",
+  example: sprinklerGpmForPrecipExample.inputs,
+  fields: [
+    { key: "target_precip_in_hr", label: "Target precipitation rate (in/hr)", kind: "number" },
+    { key: "zone_ft2", label: "Zone area covered (ft^2)", kind: "number" },
+  ],
+  outputs: [
+    { key: "gpm", id: "sgp-out-gpm", label: "Required zone flow", value: (r) => fmt(r.required_gpm, 1) + " gpm" },
+    { key: "n", id: "sgp-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprinklerGpmForPrecip,
+});
+AGRICULTURE_RENDERERS["sprinkler-gpm-for-precip"] = renderSprinklerGpmForPrecip;
+
 // --- spec-v208: irrigation-zone-runtime ---
 // dims: in { target_in: L, precip_in_hr: L T^-1, du: dimensionless, max_cycle_min: T } out: { net_min: T, gross_min: T, cycles: dimensionless, per_cycle_min: T }
 export function computeIrrigationZoneRuntime({ target_in = 0, precip_in_hr = 0, du = 1.0, max_cycle_min = 0 } = {}) {

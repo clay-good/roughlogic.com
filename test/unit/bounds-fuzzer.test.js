@@ -13073,6 +13073,25 @@ test("bounds: spec-v207 sprinkler-precip-rate pins PR = 96.3 x gpm / area + reje
   assert.ok("error" in _v207({ zone_gpm: Infinity, zone_ft2: 1200 }));
 });
 
+import { computeSprinklerGpmForPrecip as _v736 } from "../../calc-agriculture.js";
+test("bounds: spec-v736 sprinkler zone flow for a target precip rate (inverse of sprinkler-precip-rate)", () => {
+  const p = _v736({ target_precip_in_hr: 1.5, zone_ft2: 1200 });
+  assert.ok(Math.abs(p.required_gpm - 18.692) < 0.005);
+  // round-trip: the recovered gpm fed to sprinkler-precip-rate reproduces the target rate
+  for (const [pr, area] of [[1.5, 1200], [0.5, 3000], [2.0, 450], [0.8, 5000]]) {
+    const inv = _v736({ target_precip_in_hr: pr, zone_ft2: area });
+    const fwd = _v207({ zone_gpm: inv.required_gpm, zone_ft2: area });
+    assert.ok(Math.abs(fwd.precip_in_hr - pr) < 1e-9);
+  }
+  // a higher target rate or a larger area needs more flow (monotonic)
+  assert.ok(_v736({ target_precip_in_hr: 2.0, zone_ft2: 1200 }).required_gpm > _v736({ target_precip_in_hr: 1.0, zone_ft2: 1200 }).required_gpm);
+  assert.ok(_v736({ target_precip_in_hr: 1.5, zone_ft2: 2400 }).required_gpm > _v736({ target_precip_in_hr: 1.5, zone_ft2: 1200 }).required_gpm);
+  // error seams
+  assert.ok("error" in _v736({ target_precip_in_hr: 0, zone_ft2: 1200 }));
+  assert.ok("error" in _v736({ target_precip_in_hr: 1.5, zone_ft2: 0 }));
+  assert.ok("error" in _v736({ target_precip_in_hr: Infinity, zone_ft2: 1200 }));
+});
+
 test("bounds: spec-v208 irrigation-zone-runtime pins net/gross/cycles, the single-cycle path, and DU/error seams", () => {
   const a = _v208({ target_in: 0.75, precip_in_hr: 1.20, du: 0.75, max_cycle_min: 10 });
   assert.ok(Math.abs(a.net_min - 37.5) < 1e-9 && Math.abs(a.gross_min - 50) < 1e-9 && a.cycles === 5 && Math.abs(a.per_cycle_min - 10) < 1e-9);

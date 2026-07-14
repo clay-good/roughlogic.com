@@ -710,6 +710,7 @@ const _TILES = [
   ["hay-dry-matter", "L"],
   // spec-v207..v211 landscape irrigation and planting install cluster (Group L)
   ["sprinkler-precip-rate", "L"],
+  ["sprinkler-gpm-for-precip", "L"],
   ["irrigation-zone-runtime", "L"],
   ["drip-zone-flow", "L"],
   ["plant-spacing-count", "L"],

@@ -27940,6 +27940,27 @@
    }
   },
   {
+   "tile_id": "sprinkler-gpm-for-precip",
+   "source_publisher": "Irrigation Association / Rain Bird / Hunter design manuals (solved for the flow)",
+   "source_title": "1.5 in/hr target over 1,200 ft^2 -> 18.7 gpm of heads (gpm = PR x area / 96.3)",
+   "source_edition_or_year": "spec-v736 worked example (machine-verified)",
+   "source_section_or_page": "spec-v736 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_precip_in_hr": 1.5,
+    "zone_ft2": 1200
+   },
+   "outputs": {
+    "required_gpm": {
+     "value": 18.692,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sprinkler-precip-rate",
    "source_publisher": "Irrigation Association / Rain Bird / Hunter design manuals",
    "source_title": "6 sprays at 2.0 gpm (12 gpm) over 300 ft^2 -> 3.85 in/hr",

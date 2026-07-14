@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): spec-v736 sprinkler zone flow for a target precip rate (sprinkler-precip-rate inverse); 2026-07-14
+
+- New tile `sprinkler-gpm-for-precip` (Group L, calc-agriculture.js): the total zone flow a target precipitation rate
+  needs over a covered area. `gpm = PR x area / 96.3`. A 1.5 in/hr rate over 1,200 ft^2 needs ~18.7 gpm of heads.
+  Round-trips through `sprinkler-precip-rate`. Home tile count 1,184 -> 1,185.
+
 ### feat(motor): spec-v735 motor run hours for an energy budget (motor-operating-cost inverse); 2026-07-14
 
 - New tile `motor-run-hours-for-budget` (Group A, calc-motor.js): the run hours an annual energy budget buys.

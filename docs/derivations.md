@@ -1476,6 +1476,7 @@ cross-check.
 | calc-agriculture.js | `computeSprayDriftBuffer` | `{ base_buffer_ft = 0, droplet_class = "medium", wind_mph, boom_height_in = 20...` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayerCalibration` | `{ boom_width_ft = 0, oz_per_nozzle = 0, time_s = 0, target_gpa = 0, field_acr...` | _ | _ | _ |
 | calc-agriculture.js | `computeSprayerFieldCapacity` | `{ boom_width_ft, speed_mph, field_efficiency_pct = 70, field_acres, tank_gal,...` | _ | _ | _ |
+| calc-agriculture.js | `computeSprinklerGpmForPrecip` | `{ target_precip_in_hr = 0, zone_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeSprinklerPrecipRate` | `{ zone_gpm = 0, zone_ft2 = 0 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeStockingRate` | `{ area_acres = 0, forage_lb_per_acre = 0, utilization_pct = 40, animal_class ...` | _ | _ | _ |
 | calc-agriculture.js | `computeTHI` | `{ temperature = 0, unit = "F", rh_percent = 0, animal = "dairy-cow", ventilat...` | _ | _ | _ |
@@ -2845,7 +2846,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1431.
+Row count: 1432.
 
 <!-- END function-corpus-v14 -->
 
@@ -3869,7 +3870,7 @@ per spec-v14 §13.1 second paragraph.
 | `waterline-for-hull-speed` | Waterline Length for a Target Hull Speed | displacement hull-speed relation (Fro...; 8 kn target displacement hull -> 35.6 ft waterline | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (58 tiles)
+### Group L Agriculture (59 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3918,6 +3919,7 @@ per spec-v14 §13.1 second paragraph.
 | `spray-drift-buffer` | Downwind Spray Drift Buffer | USDA land-grant extension drift-manag...; Medium droplets (base 20 ft), 15 mph, 30 in boom, 20 in r... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `sprayer-calibration` | Sprayer 1/128-Acre Calibration | USDA Cooperative Extension Service; travel_distance_ft = 43560/128 / boom_width; gpa = oz_per... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprayer-field-capacity` | Sprayer Field Capacity and Spray Time | USDA land-grant extension sprayer fie...; 30 ft boom, 6 mph, 70% eff, 80 acres, 300 gal tank, 15 GP... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `sprinkler-gpm-for-precip` | Sprinkler Zone Flow for a Target Precip Rate | Irrigation Association / Rain Bird / ...; spec-v736 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-precip-rate` | Sprinkler Precipitation Rate | Irrigation Association / Rain Bird / ...; spec-v207 section 2.1 pinned example (rotor lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `tank-mix` | Pesticide Tank-Mix and Acres per Tank | EPA / USDA NRCS; acres/tank = 300/15 = 20; product/tank = 20*1.5 = 30 pt; ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `thi-livestock` | Temperature-Humidity Index (Livestock) | USDA-ARS / K-State Extension; THI = T_F - (0.55 - 0.0055*RH) * (T_F - 58) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4215,6 +4217,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1184. Fixture-covered or reference-cadence: 1184 / 1184.
+Tile count: 1185. Fixture-covered or reference-cadence: 1185 / 1185.
 
 <!-- END tile-index-v14 -->

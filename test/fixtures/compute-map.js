@@ -1082,6 +1082,7 @@ export const COMPUTE_MAP = {
   "lifting-lug-design": { module: "../../calc-rigging.js", fn: "computeLiftingLugDesign" },
   "hay-dry-matter": { module: "../../calc-agriculture.js", fn: "computeHayDryMatter" },
   "sprinkler-precip-rate": { module: "../../calc-agriculture.js", fn: "computeSprinklerPrecipRate" },
+  "sprinkler-gpm-for-precip": { module: "../../calc-agriculture.js", fn: "computeSprinklerGpmForPrecip" },
   "irrigation-zone-runtime": { module: "../../calc-agriculture.js", fn: "computeIrrigationZoneRuntime" },
   "drip-zone-flow": { module: "../../calc-agriculture.js", fn: "computeDripZoneFlow" },
   "plant-spacing-count": { module: "../../calc-agriculture.js", fn: "computePlantSpacingCount" },
