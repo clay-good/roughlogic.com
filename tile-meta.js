@@ -518,7 +518,7 @@ const _TILES = [
   // spec-v278..v280 NEC conductor-and-overcurrent-sizing batch
   ["motor-overload-sizing", "A"], ["service-conductor-sizing", "A"], ["continuous-load-ocpd", "A"],
   // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
-  ["motor-locked-rotor-kva", "A"],
+  ["motor-locked-rotor-kva", "A"], ["motor-max-hp-for-starting-current", "A"],
   // spec-v521 motor short-circuit contribution (first cycle)
   ["motor-fault-contribution", "A"],
   // spec-v523 harmonic parallel-resonance order

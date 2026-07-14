@@ -32762,6 +32762,31 @@
       "kind": "question"
     },
     {
+      "term": "biggest motor a generator can start",
+      "target": "motor-max-hp-for-starting-current",
+      "kind": "question"
+    },
+    {
+      "term": "max motor hp for breaker",
+      "target": "motor-max-hp-for-starting-current",
+      "kind": "question"
+    },
+    {
+      "term": "largest motor for starting current",
+      "target": "motor-max-hp-for-starting-current",
+      "kind": "question"
+    },
+    {
+      "term": "motor size for inrush limit",
+      "target": "motor-max-hp-for-starting-current",
+      "kind": "question"
+    },
+    {
+      "term": "max hp before breaker trips on start",
+      "target": "motor-max-hp-for-starting-current",
+      "kind": "question"
+    },
+    {
       "term": "do motors add to fault current",
       "target": "motor-fault-contribution",
       "kind": "question"

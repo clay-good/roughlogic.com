@@ -40224,6 +40224,35 @@
    }
   },
   {
+   "tile_id": "motor-max-hp-for-starting-current",
+   "source_publisher": "NEC 2023 Table 430.7(B)",
+   "source_title": "max_hp = LRA / (kVA/hp x 1000 / (sqrt(3) x V)); inverse of the locked-rotor tile",
+   "source_edition_or_year": "spec-v722 worked example (machine-verified; inverse of spec-v499)",
+   "source_section_or_page": "300 A budget, code G, 460 V three-phase -> 38.0 hp",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "max_starting_current_a": 300,
+    "code_letter": "G",
+    "voltage_v": 460,
+    "phase": 3
+   },
+   "outputs": {
+    "max_horsepower": {
+     "value": 38.0,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "kva_per_hp": {
+     "value": 6.29,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "motor-locked-rotor-kva",
    "source_publisher": "NEC 2023 Table 430.7(B)",
    "source_title": "cross-check: same 25 hp / 460 V as code J (7.99 kVA/hp) -> 250.7 A LRA, 7.4x FLA",

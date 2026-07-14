@@ -231,6 +231,7 @@ const RELATED = {
   "breaker-sizing": ["wire-ampacity", "motor-fla", "service-load"],
   "motor-fla": ["wire-ampacity", "breaker-sizing", "three-phase", "voltage-imbalance"],
   "motor-locked-rotor-kva": ["motor-fla", "generator-motor-starting", "motor-vd-starting"],
+  "motor-max-hp-for-starting-current": ["motor-locked-rotor-kva", "generator-motor-starting", "reduced-voltage-starter", "motor-vd-starting"],
   "motor-fault-contribution": ["short-circuit-pp", "motor-fla", "asymmetrical-fault-xr"],
   "reduced-voltage-starter": ["motor-locked-rotor-kva", "motor-vd-starting", "generator-motor-starting"],
   "vfd-reflected-wave": ["vfd-energy-savings", "cable-bend-radius", "reduced-voltage-starter"],

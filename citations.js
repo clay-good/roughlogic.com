@@ -10300,6 +10300,18 @@ export const CITATIONS = {
       { name: "Rule of thumb", value: "'6x FLA' holds only for mid-range code letters; high-code motors draw 7-8x", source: "engineering practice" },
     ],
   },
+  "motor-max-hp-for-starting-current": {
+    formula: "max_hp = max_starting_current / (kVA/hp x 1000 / (sqrt(3) x V)) three-phase (kVA/hp x 1000 / V single-phase); the LRA = hp x kVA/hp x 1000 / (sqrt(3) x V) relation solved for the horsepower.",
+    edition: "The NEC 2023 Table 430.7(B) locked-rotor indicating code letters, solved for the horsepower, by name; the motor nameplate and measured inrush govern.",
+    freeAccess: "NEC is free to read at nfpa.org/freeaccess. Table 430.7(B) and the kVA/hp bands are in the published code; the LRA relation is first-principles.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The inverse of motor-locked-rotor-kva: the largest motor whose starting (locked-rotor) current stays within a budget - an instantaneous-trip breaker, a generator's starting-kVA limit, or an SCCR / voltage-dip ceiling. LRA is linear in horsepower for a given code letter and voltage. The code letter is the STARTING-kVA letter, not the design (A/B/C/D torque) letter, and this uses the conservative upper end of the band; a soft starter or wye-delta start lowers the real starting current. " + NEC_DISCLOSURE,
+    assumptions: [
+      { name: "Band", value: "uses the upper end of each code-letter kVA/hp band for a conservative starting current", source: "NEC Table 430.7(B)" },
+      { name: "Linear in hp", value: "LRA scales linearly with horsepower for a given code letter and voltage", source: "first principles" },
+      { name: "Not the design letter", value: "the code letter is about starting kVA; the design letter (A/B/C/D) describes the torque-speed curve", source: "NEC 430.7" },
+    ],
+  },
   "motor-overload-sizing": {
     formula: "hi_class = (sf >= 1.15) or (marked rise <= 40 degC); mult = hi_class ? 1.25 : 1.15; mult_max = hi_class ? 1.40 : 1.30; ol_A = fla_A x mult; ol_max_A = fla_A x mult_max.",
     edition: "Motor running-overload sizing on the nameplate full-load current under NEC 2023 430.32(A)(1) (125% for a marked service factor of 1.15 or more or a marked temperature rise of 40 degC or less, 115% otherwise) with the 430.32(C) will-not-start ceiling (140%/130%), by name. A computational aid; the AHJ-adopted NEC edition governs.",

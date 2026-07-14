@@ -78,7 +78,7 @@ const TOOL_MODULES = (() => {
     // spec-v278 NEC 430.32 running overload
     "motor-overload-sizing",
     // spec-v499 motor locked-rotor kVA from code letter (NEC 430.7(B))
-    "motor-locked-rotor-kva",
+    "motor-locked-rotor-kva", "motor-max-hp-for-starting-current",
     // spec-v521 motor short-circuit contribution (first cycle)
     "motor-fault-contribution",
     // spec-v522 reduced-voltage starter current and torque

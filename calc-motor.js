@@ -361,6 +361,55 @@ function renderMotorLockedRotorKva(inputRegion, outputRegion, citationEl) {
 }
 MOTOR_RENDERERS["motor-locked-rotor-kva"] = renderMotorLockedRotorKva;
 
+// motor-max-hp-for-starting-current: inverse of motor-locked-rotor-kva. The
+// forward tile gives the locked-rotor amps from a horsepower; sizing the largest
+// motor a starting-current budget (a breaker, a generator, a soft-start rating)
+// can start is the inverse. Since LRA is linear in hp for a given code letter and
+// voltage, max_hp = target_LRA / LRA(at hp = 1); the forward is reused at hp = 1
+// to carry the code-letter band and the 1-/3-phase current relation.
+// dims: in { max_starting_current_a: I, code_letter: dimensionless, voltage_v: M L^2 T^-3 I^-1, phase: dimensionless } out: { max_horsepower: M L^2 T^-3, kva_per_hp: dimensionless, lra_per_hp_a: I }
+export function computeMotorMaxHpForStartingCurrent({ max_starting_current_a = 0, code_letter = "G", voltage_v = 0, phase = 3 } = {}) {
+  const _g = _finiteGuard({ max_starting_current_a, voltage_v }); if (_g) return _g;
+  const lra = Number(max_starting_current_a) || 0;
+  if (!(lra > 0)) return { error: "Max starting current must be positive (A)." };
+  const base = computeMotorLockedRotorKva({ horsepower: 1, code_letter, voltage_v, phase });
+  if (base.error) return { error: base.error };
+  const lra_per_hp_a = base.lra_a;
+  const max_horsepower = lra / lra_per_hp_a;
+  if (![max_horsepower, lra_per_hp_a].every(Number.isFinite)) return { error: "Locked-rotor math is not a finite value." };
+  return {
+    max_horsepower, kva_per_hp: base.kva_per_hp, lra_per_hp_a,
+    note: "NEC Table 430.7(B) locked-rotor code letter solved for the horsepower: the largest motor whose starting (locked-rotor) current stays within the budget, since LRA = hp x kVA/hp x 1000 / (sqrt(3) x V) three-phase is linear in hp. Use it to size a motor against an instantaneous-trip breaker, a generator's starting-kVA limit, or an SCCR / voltage-dip ceiling. The code letter is the STARTING-kVA letter, not the design (A/B/C/D torque) letter - the two are routinely confused - and this uses the conservative upper end of the band. The nameplate code letter and the measured inrush govern; a soft starter or wye-delta start lowers the real starting current. A design aid, not a substitute for the nameplate.",
+  };
+}
+export const motorMaxHpForStartingCurrentExample = { inputs: { max_starting_current_a: 300, code_letter: "G", voltage_v: 460, phase: 3 } };
+function _v722renderMotorMaxHpForStartingCurrent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: NEC 2023 Table 430.7(B) locked-rotor code letters solved for the horsepower: max hp = starting-current budget / (kVA/hp x 1000 / (sqrt(3) x V)) three-phase. The code letter is the starting-kVA letter, not the design letter. A design aid; the nameplate and measured inrush govern.";
+  const lra = makeNumber("Max starting current budget (A)", "mmh-lra", { step: "any", min: "0" }); lra.input.value = "300";
+  const code = makeSelect("Code letter (NEC 430.7(B))", "mmh-code", Object.keys(_NEC_430_7B_KVA_PER_HP).map((k) => ({ value: k, label: k + " (" + _NEC_430_7B_KVA_PER_HP[k] + " kVA/hp)", selected: k === "G" })));
+  const v = makeNumber("Voltage (V)", "mmh-v", { step: "any", min: "0" }); v.input.value = "460";
+  const ph = makeSelect("Phase", "mmh-ph", [
+    { value: "3", label: "Three-phase", selected: true },
+    { value: "1", label: "Single-phase" },
+  ]);
+  for (const f of [lra, code, v, ph]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { lra.input.value = "300"; code.select.value = "G"; v.input.value = "460"; ph.select.value = "3"; update(); });
+  const oHp = makeOutputLine(outputRegion, "Max motor horsepower", "mmh-out-hp");
+  const oLra = makeOutputLine(outputRegion, "Starting current per hp", "mmh-out-lra");
+  const oNote = makeOutputLine(outputRegion, "Note", "mmh-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeMotorMaxHpForStartingCurrent({ max_starting_current_a: readNum(lra.input), code_letter: code.select.value, voltage_v: readNum(v.input), phase: Number(ph.select.value) });
+    if (r.error) { oHp.textContent = r.error; oLra.textContent = "-"; oNote.textContent = ""; return; }
+    oHp.textContent = fmt(r.max_horsepower, 1) + " hp (" + fmt(r.kva_per_hp, 2) + " kVA/hp)";
+    oLra.textContent = fmt(r.lra_per_hp_a, 1) + " A/hp";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [lra, v]) f.input.addEventListener("input", update);
+  for (const f of [code, ph]) f.select.addEventListener("change", update);
+}
+MOTOR_RENDERERS["motor-max-hp-for-starting-current"] = _v722renderMotorMaxHpForStartingCurrent;
+
 // ===================== spec-v521: motor short-circuit contribution (first cycle) =====================
 // dims: in { motor_fla_a: I, x_subtransient_pu: dimensionless, utility_fault_a: I } out: { contribution_a: I, total_a: I, multiple: dimensionless }
 export function computeMotorFaultContribution({ motor_fla_a = 0, x_subtransient_pu = 0.167, utility_fault_a = 0 } = {}) {

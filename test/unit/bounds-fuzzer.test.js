@@ -19119,6 +19119,34 @@ test("bounds: spec-v499 computeMotorLockedRotorKva pins the code-letter kVA/hp, 
   assert.ok("error" in _v499({ horsepower: 25, code_letter: "G", voltage_v: 460, phase: 2 }));
 });
 
+import { computeMotorMaxHpForStartingCurrent as _v722 } from "../../calc-motor.js";
+test("bounds: spec-v722 computeMotorMaxHpForStartingCurrent pins max_hp = LRA / LRA(hp=1), round-trips through computeMotorLockedRotorKva, and error seams", () => {
+  const r = _v722({ max_starting_current_a: 300, code_letter: "G", voltage_v: 460, phase: 3 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_horsepower - 300 / (6.29 * 1000 / (Math.sqrt(3) * 460))) < 1e-6, `hp identity: ${r.max_horsepower}`);
+  assert.ok(Math.abs(r.max_horsepower - 38.0) < 0.05, `pinned 38 hp: ${r.max_horsepower}`);
+  // Round-trip: at the max hp the forward tile's LRA equals the starting-current budget (both phases).
+  for (const max_starting_current_a of [50, 300, 1200]) {
+    for (const code_letter of ["B", "G", "L"]) {
+      for (const [voltage_v, phase] of [[460, 3], [240, 1]]) {
+        const m = _v722({ max_starting_current_a, code_letter, voltage_v, phase });
+        assert.ok(!m.error, `sweep A=${max_starting_current_a} ${code_letter} ${voltage_v}/${phase}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_horsepower, "hp"); assert.ok(m.max_horsepower > 0, "hp positive");
+        const back = _v499({ horsepower: m.max_horsepower, code_letter, voltage_v, phase });
+        assert.ok(Math.abs(back.lra_a - max_starting_current_a) < 1e-6, `round-trip A=${max_starting_current_a} ${code_letter} ${voltage_v}/${phase}: ${back.lra_a}`);
+      }
+    }
+  }
+  // A higher code letter (more starting kVA/hp) allows a smaller motor for the same budget.
+  assert.ok(_v722({ max_starting_current_a: 300, code_letter: "J", voltage_v: 460, phase: 3 }).max_horsepower < r.max_horsepower);
+  // Error seams: non-positive current, bad code letter, non-positive voltage, bad phase, non-finite.
+  assert.ok("error" in _v722({ max_starting_current_a: 0, code_letter: "G", voltage_v: 460, phase: 3 }));
+  assert.ok("error" in _v722({ max_starting_current_a: 300, code_letter: "Z", voltage_v: 460, phase: 3 }));
+  assert.ok("error" in _v722({ max_starting_current_a: 300, code_letter: "G", voltage_v: 0, phase: 3 }));
+  assert.ok("error" in _v722({ max_starting_current_a: 300, code_letter: "G", voltage_v: 460, phase: 2 }));
+  assert.ok("error" in _v722({ max_starting_current_a: Infinity, code_letter: "G", voltage_v: 460, phase: 3 }));
+});
+
 import { computeDensityAltitude as _v500 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v500 computeDensityAltitude pins the hot-day DA, the ISA lapse, the cold-day sign, and error seams", () => {

@@ -810,6 +810,7 @@ export const COMPUTE_MAP = {
   "concrete-corbel-bracket": { module: "../../calc-concrete.js", fn: "computeConcreteCorbelBracket" },
   "pile-group-efficiency": { module: "../../calc-geotech.js", fn: "computePileGroupEfficiency" },
   "motor-locked-rotor-kva": { module: "../../calc-motor.js", fn: "computeMotorLockedRotorKva" },
+  "motor-max-hp-for-starting-current": { module: "../../calc-motor.js", fn: "computeMotorMaxHpForStartingCurrent" },
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },
   "crosswind-component": { module: "../../calc-mechanic.js", fn: "computeCrosswindComponent" },
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
