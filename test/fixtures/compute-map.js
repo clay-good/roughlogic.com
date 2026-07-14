@@ -326,6 +326,7 @@ export const COMPUTE_MAP = {
   "water-hammer-arrestor": { module: "../../calc-plumbing.js", fn: "computeWaterHammerArrestor" },
   "expansion-tank": { module: "../../calc-plumbing.js", fn: "computeExpansionTank" },
   "septic-drainfield": { module: "../../calc-septic.js", fn: "computeSepticDrainfield" },
+  "septic-drainfield-capacity": { module: "../../calc-septic.js", fn: "computeSepticDrainfieldCapacity" },
   "transformer-kva-sizing": { module: "../../calc-electrical.js", fn: "computeTransformerKvaSizing" },
   "service-load-standard": { module: "../../calc-electrical.js", fn: "computeServiceLoadStandard" },
   "gas-leak-rate": { module: "../../calc-gas.js", fn: "computeGasLeakRate" },

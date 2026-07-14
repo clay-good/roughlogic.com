@@ -595,6 +595,7 @@ import {
 // spec-v86 cap-relief split: septic bench moved to calc-septic.js
 import {
   computeSepticDrainfield,
+  computeSepticDrainfieldCapacity,
   computeSepticTank,
   renderSepticTank,
 } from "../../calc-septic.js";
@@ -7662,6 +7663,34 @@ test("bounds: calc-plumbing computeSepticDrainfield pins required_area = gpd/rat
   assert.ok("error" in computeSepticDrainfield({ design_flow_gpd: 0, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 }));
   assert.ok("error" in computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0, trench_width_ft: 3 }));
   assert.ok("error" in computeSepticDrainfield({ design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 0 }));
+});
+
+test("bounds: spec-v700 computeSepticDrainfieldCapacity pins flow = trench*width*rate, bedrooms = floor(flow/perBed), round-trips through computeSepticDrainfield, and error seams", () => {
+  const r = computeSepticDrainfieldCapacity({ available_trench_ft: 300, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3, gpd_per_bedroom: 150 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.absorption_area_ft2, 900);
+  assert.ok(Math.abs(r.design_flow_gpd - 540) < 1e-9, `flow: ${r.design_flow_gpd}`);
+  assert.strictEqual(r.bedrooms, 3);
+  // Round-trip: at the supported flow the forward tile's trench length equals the input length.
+  for (const available_trench_ft of [50, 300, 1200]) {
+    for (const application_rate_gpd_per_ft2 of [0.2, 0.6, 1.2]) {
+      for (const trench_width_ft of [2, 3, 5]) {
+        const m = computeSepticDrainfieldCapacity({ available_trench_ft, application_rate_gpd_per_ft2, trench_width_ft });
+        assert.ok(!m.error, `sweep L=${available_trench_ft} rate=${application_rate_gpd_per_ft2} w=${trench_width_ft}: ${JSON.stringify(m)}`);
+        assertFinite(m.design_flow_gpd, "flow"); assert.ok(m.design_flow_gpd > 0, "flow positive");
+        const back = computeSepticDrainfield({ design_flow_gpd: m.design_flow_gpd, application_rate_gpd_per_ft2, trench_width_ft });
+        assert.ok(Math.abs(back.trench_feet - available_trench_ft) < 1e-6, `round-trip L=${available_trench_ft} rate=${application_rate_gpd_per_ft2} w=${trench_width_ft}: ${back.trench_feet}`);
+      }
+    }
+  }
+  // A lower per-bedroom design flow permits more bedrooms for the same field.
+  assert.ok(computeSepticDrainfieldCapacity({ available_trench_ft: 300, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3, gpd_per_bedroom: 120 }).bedrooms >= r.bedrooms);
+  // Error seams: non-positive length, rate, width, per-bedroom flow, non-finite.
+  assert.ok("error" in computeSepticDrainfieldCapacity({ available_trench_ft: 0, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 }));
+  assert.ok("error" in computeSepticDrainfieldCapacity({ available_trench_ft: 300, application_rate_gpd_per_ft2: 0, trench_width_ft: 3 }));
+  assert.ok("error" in computeSepticDrainfieldCapacity({ available_trench_ft: 300, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 0 }));
+  assert.ok("error" in computeSepticDrainfieldCapacity({ available_trench_ft: 300, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3, gpd_per_bedroom: -1 }));
+  assert.ok("error" in computeSepticDrainfieldCapacity({ available_trench_ft: Infinity, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 }));
 });
 
 test("bounds: calc-plumbing computePipeExpansionLoop pins dL = alpha*L*12*dT and L_loop = sqrt(3*E*D*|dL|/S_a) on the steel example", () => {

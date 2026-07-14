@@ -87,6 +87,37 @@ export const septicDrainfieldExample = {
   inputs: { design_flow_gpd: 600, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3 },
 };
 
+// septic-drainfield-capacity: inverse of septic-drainfield. The forward tile
+// sizes the absorption area from a design flow; given the trench a lot can fit,
+// this returns the design flow the field supports and the bedroom count it
+// permits. design_flow = trench_length x trench_width x application_rate;
+// bedrooms = floor(design_flow / gpd_per_bedroom), EPA 150 gpd/bedroom default.
+// dims: in { args: dimensionless } out: { design_flow_gpd: dimensionless, absorption_area_ft2: L^2, bedrooms: dimensionless }
+export function computeSepticDrainfieldCapacity({
+  available_trench_ft = 0,
+  application_rate_gpd_per_ft2 = 0,
+  trench_width_ft = 3,
+  gpd_per_bedroom = 150,
+} = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const len = Number(available_trench_ft);
+  const rate = Number(application_rate_gpd_per_ft2);
+  const w = Number(trench_width_ft);
+  const perBed = Number(gpd_per_bedroom) || 150;
+  if (!(len > 0)) return { error: "Available trench length must be positive (ft)." };
+  if (!(rate > 0)) return { error: "Application rate must be positive." };
+  if (!(w > 0)) return { error: "Trench width must be positive." };
+  if (!(perBed > 0)) return { error: "Design flow per bedroom must be positive (gpd)." };
+  const absorption_area_ft2 = len * w;
+  const design_flow_gpd = absorption_area_ft2 * rate;
+  const bedrooms = Math.floor(design_flow_gpd / perBed);
+  return { design_flow_gpd, absorption_area_ft2, bedrooms, gpd_per_bedroom: perBed };
+}
+
+export const septicDrainfieldCapacityExample = {
+  inputs: { available_trench_ft: 300, application_rate_gpd_per_ft2: 0.6, trench_width_ft: 3, gpd_per_bedroom: 150 },
+};
+
 // --- spec-v83 onsite-septic pressure-distribution bench (3 tiles, Group B) ---
 // septic-tank sizes a static tank, septic-drainfield a soil absorption area;
 // these three equip the pressurized / pump-to-mound field a gravity bed cannot
@@ -217,6 +248,36 @@ function _v7p_renderSepticDrainfield(inputRegion, outputRegion, citationEl) {
   for (const f of [flow.input, rate.input, wid.input]) f.addEventListener("input", update);
 }
 
+function _v7p_renderSepticDrainfieldCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Design flow a field supports = trench length x trench width x application rate (the inverse of the required-area sizing); bedrooms = flow / the code's per-bedroom design flow (EPA baseline 150 gpd/bedroom). State and county codes set the application rate and the per-bedroom flow. AHJ governs.";
+  renderLimitationBanner(inputRegion, getLimitationCopy("septic-drainfield"));
+  _v7p_attachEx(inputRegion, () => fillExample(septicDrainfieldCapacityExample.inputs));
+  const len = _v7p_makeNumber("Available trench length (ft)", "sdc-len", { step: "any", min: "0" });
+  const rate = _v7p_makeNumber("Application rate (gpd / ft²)", "sdc-rate", { step: "any", min: "0" });
+  const wid = _v7p_makeNumber("Trench width (ft)", "sdc-w", { step: "any", min: "0" });
+  wid.input.value = "3";
+  const perBed = _v7p_makeNumber("Design flow per bedroom (gpd)", "sdc-pb", { step: "any", min: "0" });
+  perBed.input.value = "150";
+  for (const f of [len, rate, wid, perBed]) inputRegion.appendChild(f.wrap);
+  const oF = _v7p_makeOut(outputRegion, "Design flow supported", "sdc-out-f");
+  const oA = _v7p_makeOut(outputRegion, "Absorption area", "sdc-out-a");
+  const oB = _v7p_makeOut(outputRegion, "Bedrooms permitted", "sdc-out-b");
+  function fillExample(x) { len.input.value = x.available_trench_ft; rate.input.value = x.application_rate_gpd_per_ft2; wid.input.value = x.trench_width_ft; perBed.input.value = x.gpd_per_bedroom; update(); }
+  const update = _v7p_debounce(() => {
+    const r = computeSepticDrainfieldCapacity({
+      available_trench_ft: Number(len.input.value) || 0,
+      application_rate_gpd_per_ft2: Number(rate.input.value) || 0,
+      trench_width_ft: Number(wid.input.value) || 0,
+      gpd_per_bedroom: perBed.input.value === "" ? 150 : Number(perBed.input.value),
+    });
+    if (r.error) { oF.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; return; }
+    oF.textContent = _v7p_fmt(r.design_flow_gpd, 0) + " gpd";
+    oA.textContent = _v7p_fmt(r.absorption_area_ft2, 0) + " ft²";
+    oB.textContent = String(r.bedrooms) + " bedroom" + (r.bedrooms === 1 ? "" : "s") + " (at " + _v7p_fmt(r.gpd_per_bedroom, 0) + " gpd each)";
+  }, _V7P_DEB);
+  for (const f of [len.input, rate.input, wid.input, perBed.input]) f.addEventListener("input", update);
+}
+
 function renderSepticDoseTank(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: USEPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008) and university onsite-wastewater extension low-pressure-pipe design guidance, by name. Net dose = daily flow / doses; the pump moves the net dose plus the drainback each cycle. Dose count, dose volume, and float settings on the permit drawing govern. Free at epa.gov/septic.";
   const flow = makeNumber("Design daily flow (gpd)", "sdt-flow", { step: "any", min: "0" });
@@ -309,6 +370,7 @@ function renderSepticLppOrifice(inputRegion, outputRegion, citationEl) {
 export const SEPTIC_RENDERERS = {
   "septic-tank": renderSepticTank,
   "septic-drainfield": _v7p_renderSepticDrainfield,
+  "septic-drainfield-capacity": _v7p_renderSepticDrainfieldCapacity,
   "septic-dose-tank": renderSepticDoseTank,
   "septic-pumpout-interval": renderSepticPumpoutInterval,
   "septic-lpp-orifice": renderSepticLppOrifice,

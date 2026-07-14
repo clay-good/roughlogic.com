@@ -181,7 +181,7 @@ const _TILES = [
   ["drainage-invert", "B"],
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["glycol-mix", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],
-  ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["pipe-expansion-loop", "B"],
+  ["pump-operating-point", "B"], ["septic-drainfield", "B"], ["septic-drainfield-capacity", "B"], ["pipe-expansion-loop", "B"],
   ["water-heater-recovery", "B"], ["water-heater-input", "B"], ["wh-expansion-tank", "B"],
   ["sanitary-dfu", "B"], ["trap-primer", "B"], ["backflow-sizing", "B"],
   ["cross-connection-air-gap", "B"], ["hydronic-fill-pressure", "B"],

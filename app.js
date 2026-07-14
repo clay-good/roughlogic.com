@@ -224,7 +224,7 @@ const TOOL_MODULES = (() => {
   // v42/v70..v82 precedent).
   declare("./calc-septic.js", "SEPTIC_RENDERERS", [
     // v2 / v7
-    "septic-tank", "septic-drainfield",
+    "septic-tank", "septic-drainfield", "septic-drainfield-capacity",
     // v83 onsite-septic pressure distribution
     "septic-dose-tank", "septic-pumpout-interval", "septic-lpp-orifice",
   ]);

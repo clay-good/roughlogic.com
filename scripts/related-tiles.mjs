@@ -641,6 +641,7 @@ const RELATED = {
   "water-hammer-surge": ["water-hammer-arrestor", "pipe-expansion"],
   "pump-operating-point": ["pump-sizing", "npsh-a", "friction-loss"],
   "septic-drainfield": ["septic-tank", "grease-trap"],
+  "septic-drainfield-capacity": ["septic-drainfield", "septic-tank", "septic-pumpout-interval"],
   "pipe-expansion-loop": ["pipe-expansion", "expansion-tank"],
   "water-heater-recovery": ["water-heater-input", "wh-expansion-tank", "tankless-gpm", "recirc-loop-sizing"],
   "water-heater-input": ["water-heater-recovery", "water-heater-storage-sizing", "tankless-gpm", "gas-appliance-demand"],

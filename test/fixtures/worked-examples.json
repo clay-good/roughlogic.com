@@ -6202,6 +6202,41 @@
    }
   },
   {
+   "tile_id": "septic-drainfield-capacity",
+   "source_publisher": "Project (first-principles) / USEPA OWTS",
+   "source_title": "design_flow = trench_length * width * rate; bedrooms = floor(flow / 150)",
+   "source_edition_or_year": "n/a; inverse of the classical septic-system identity over state-published rates",
+   "source_section_or_page": "300 ft of 3 ft trench at 0.6 gpd/ft^2 -> 900 ft^2 -> 540 gpd -> floor(540/150) = 3 bedrooms",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_trench_ft": 300,
+    "application_rate_gpd_per_ft2": 0.6,
+    "trench_width_ft": 3,
+    "gpd_per_bedroom": 150
+   },
+   "outputs": {
+    "design_flow_gpd": {
+     "value": 540,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "absorption_area_ft2": {
+     "value": 900,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "bedrooms": {
+     "value": 3,
+     "tolerance": {
+      "abs": 0
+     }
+    }
+   }
+  },
+  {
    "tile_id": "transformer-kva-sizing",
    "source_publisher": "NFPA / ANSI/IEEE C57",
    "source_title": "Sum loads, apply growth reserve, round up to ANSI standard step (15, 30, 45, 75, 112.5, 150, ...)",

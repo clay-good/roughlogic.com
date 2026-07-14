@@ -50422,6 +50422,31 @@
       "kind": "question"
     },
     {
+      "term": "how many bedrooms can my leach field support",
+      "target": "septic-drainfield-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "flow capacity of a drainfield",
+      "target": "septic-drainfield-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "bedrooms allowed for septic field size",
+      "target": "septic-drainfield-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how big a house can this lot support",
+      "target": "septic-drainfield-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "drainfield capacity from trench length",
+      "target": "septic-drainfield-capacity",
+      "kind": "question"
+    },
+    {
       "term": "expansion loop size for a copper riser",
       "target": "pipe-expansion-loop",
       "kind": "question"

@@ -1718,6 +1718,17 @@ export const CITATIONS = {
       { name: "Application rate", value: "user-supplied from local code (this tool deliberately does not bundle a per-state shard)", source: "local AHJ" },
     ],
   },
+  "septic-drainfield-capacity": {
+    formula: "Design flow supported = available_trench_ft × trench_width_ft × application_rate_gpd_per_ft² (the inverse of the required-area sizing). Bedrooms = floor(design_flow / gpd_per_bedroom); EPA baseline 150 gpd/bedroom.",
+    edition: "U.S. EPA Onsite Wastewater Treatment Systems Manual (EPA/625/R-00/008) by name; per-state and per-county application rates and per-bedroom design flows set by local code (not bundled).",
+    freeAccess: "Free at epa.gov/septic. State application-rate and per-bedroom-flow tables free on each state department of health / DEQ site.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (EPA OWTS Manual + AHJ-supplied rates). The inverse of septic-drainfield: it answers how big a house a lot's field can serve. State and county codes set the application rate and the per-bedroom design flow (commonly 120-150 gpd); enter the values from your local code.",
+    assumptions: [
+      { name: "Application rate", value: "user-supplied from local code (this tool deliberately does not bundle a per-state shard)", source: "local AHJ" },
+      { name: "Per-bedroom flow", value: "EPA baseline 150 gpd/bedroom; states vary (often 120)", source: "local AHJ" },
+    ],
+  },
   "pipe-expansion-loop": {
     formula: "Linear expansion: dL = alpha × L × dT (alpha in 1/°F). Guided-cantilever expansion loop leg: L_loop = sqrt(3 × E × D × |dL| / S_a) where E is Young's modulus (psi), D is pipe OD (in), S_a is the allowable stress (psi).",
     edition: "ASME B31.1 / B31.9 (Power and Building Services Piping) guided-cantilever method by name. Per-material alpha / E / S_a from data/plumbing/thermal-expansion-coefficients.json.",
