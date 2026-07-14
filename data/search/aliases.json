@@ -17157,6 +17157,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "max bearing load",
+      "target": "bearing-max-load",
+      "kind": "industry"
+    },
+    {
+      "term": "load for target bearing life",
+      "target": "bearing-max-load",
+      "kind": "industry"
+    },
+    {
+      "term": "how hard can i load a bearing",
+      "target": "bearing-max-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "allowable bearing load",
+      "target": "bearing-max-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "bearing load for l10",
+      "target": "bearing-max-load",
+      "kind": "adjacent"
+    },
+    {
       "term": "countersink depth",
       "target": "countersink-depth",
       "kind": "industry"

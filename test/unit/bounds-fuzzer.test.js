@@ -17921,7 +17921,35 @@ test("bounds: spec-v503 computeBoltProofLoad pins the stress area, the grade loa
   assert.ok("error" in _v503({ nominal_diameter_in: 0.5, threads_per_inch: 13, grade: "10" }));
 });
 
-import { computeBearingL10Life as _v504 } from "../../calc-machining.js";
+import { computeBearingL10Life as _v504, computeBearingMaxLoad as _v672 } from "../../calc-machining.js";
+
+test("bounds: spec-v672 computeBearingMaxLoad pins P_max = C (1e6/L10rev)^(1/p), the ball/roller exponent, round-trips through computeBearingL10Life, and error seams", () => {
+  const r = _v672({ dynamic_rating_lbf: 5000, target_life_hr: 1190, speed_rpm: 1750, bearing_type: "ball" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.p_exp, 3);
+  const expected = 5000 * Math.pow(1e6 / (1190 * 60 * 1750), 1 / 3);
+  assert.ok(Math.abs(r.max_equivalent_load_lbf - expected) < 1e-9, `P_max identity: ${r.max_equivalent_load_lbf}`);
+  assert.ok(Math.abs(r.max_equivalent_load_lbf - 1000.1) < 0.5, `pinned ~1000 lbf: ${r.max_equivalent_load_lbf}`);
+  // Roller (p = 10/3) can carry more load than a ball bearing for the same C and target life.
+  const roller = _v672({ dynamic_rating_lbf: 5000, target_life_hr: 1190, speed_rpm: 1750, bearing_type: "roller" });
+  assert.ok(Math.abs(roller.p_exp - 10 / 3) < 1e-9 && roller.max_equivalent_load_lbf > r.max_equivalent_load_lbf, `roller carries more: ${roller.max_equivalent_load_lbf}`);
+  // Round-trip: the max load, fed back through the forward tile, reproduces the target life.
+  for (const target_life_hr of [500, 1190, 5000]) {
+    for (const type of ["ball", "roller"]) {
+      const m = _v672({ dynamic_rating_lbf: 5000, target_life_hr, speed_rpm: 1750, bearing_type: type });
+      assert.ok(!m.error, `sweep hr=${target_life_hr} ${type}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_equivalent_load_lbf, "P_max"); assert.ok(m.max_equivalent_load_lbf > 0, "P_max positive");
+      const back = _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: m.max_equivalent_load_lbf, speed_rpm: 1750, bearing_type: type });
+      assert.ok(Math.abs(back.l10_hr - target_life_hr) < 1e-6, `round-trip hr=${target_life_hr} ${type}: ${back.l10_hr}`);
+    }
+  }
+  // Error seams: non-finite, non-positive C / target life / speed, unknown type.
+  assert.ok("error" in _v672({ dynamic_rating_lbf: Infinity, target_life_hr: 1190, speed_rpm: 1750 }));
+  assert.ok("error" in _v672({ dynamic_rating_lbf: 0, target_life_hr: 1190, speed_rpm: 1750 }));
+  assert.ok("error" in _v672({ dynamic_rating_lbf: 5000, target_life_hr: 0, speed_rpm: 1750 }));
+  assert.ok("error" in _v672({ dynamic_rating_lbf: 5000, target_life_hr: 1190, speed_rpm: 0 }));
+  assert.ok("error" in _v672({ dynamic_rating_lbf: 5000, target_life_hr: 1190, speed_rpm: 1750, bearing_type: "needle" }));
+});
 
 test("bounds: spec-v504 computeBearingL10Life pins the cube law, the ball/roller exponent, the hours, and error seams", () => {
   const r = _v504({ dynamic_rating_lbf: 5000, equivalent_load_lbf: 1000, speed_rpm: 1750, bearing_type: "ball" });

@@ -514,6 +514,54 @@ function renderBearingL10Life(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["bearing-l10-life"] = renderBearingL10Life;
 
+// ===================== spec-v672: max bearing load for a target L10 life (inverse of bearing-l10-life) =====================
+// dims: in { dynamic_rating_lbf: M L T^-2, target_life_hr: T, speed_rpm: T^-1, bearing_type: dimensionless } out: { max_equivalent_load_lbf: M L T^-2, p_exp: dimensionless, l10_rev: dimensionless }
+export function computeBearingMaxLoad({ dynamic_rating_lbf = 0, target_life_hr = 0, speed_rpm = 0, bearing_type = "ball" } = {}) {
+  const _g = _finiteGuard({ dynamic_rating_lbf, target_life_hr, speed_rpm }); if (_g) return _g;
+  const c = Number(dynamic_rating_lbf) || 0;
+  const hr = Number(target_life_hr) || 0;
+  const rpm = Number(speed_rpm) || 0;
+  const type = String(bearing_type);
+  if (!(c > 0)) return { error: "Dynamic load rating C must be positive (lbf)." };
+  if (!(hr > 0)) return { error: "Target life must be positive (hr)." };
+  if (!(rpm > 0)) return { error: "Speed must be positive (rpm)." };
+  if (type !== "ball" && type !== "roller") return { error: "Bearing type must be ball or roller." };
+  const p_exp = type === "roller" ? 10 / 3 : 3;
+  // Inverse of L10 = (C/P)^p x 1e6 with L10 = target_hr x 60 x rpm: P_max = C x (1e6 / L10_rev)^(1/p).
+  const l10_rev = hr * 60 * rpm;
+  const max_equivalent_load_lbf = c * Math.pow(1e6 / l10_rev, 1 / p_exp);
+  if (![p_exp, l10_rev, max_equivalent_load_lbf].every(Number.isFinite) || !(max_equivalent_load_lbf > 0)) return { error: "Bearing-load math is not a finite value." };
+  return {
+    max_equivalent_load_lbf, p_exp, l10_rev,
+    note: "The largest equivalent dynamic load a bearing can carry and still reach a target L10 life, the inverse of the bearing-l10-life tile: from L10 = (C/P)^p x 10^6 rev with L10 = target_hr x 60 x rpm, P_max = C x (10^6 / L10_rev)^(1/p), p = 3 ball / 10/3 roller. Because life scales as the cube (ball) of the load ratio, the load limit is only weakly sensitive to the target life - doubling the required hours cuts the allowable load by about 20% (ball) - so a bearing sized for a long life still carries a fair load. The basic L10 assumes clean, well-lubricated operation (contamination needs the modified aISO life) and is the life at which 10% have failed, not the average. A planning estimate, not a warranty; the mounting, lubrication, and application govern.",
+  };
+}
+export const bearingMaxLoadExample = { inputs: { dynamic_rating_lbf: 5000, target_life_hr: 1190, speed_rpm: 1750, bearing_type: "ball" } };
+function renderBearingMaxLoad(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ISO 281 / ABMA 9 & 11 basic rating life solved for the load: P_max = C x (10^6 / L10_rev)^(1/p) with L10_rev = target_hr x 60 x rpm, p = 3 ball / 10/3 roller. Life scales as the cube (ball) of the load ratio. Basic L10 assumes clean, well-lubricated operation; L10 is the life at which 10% have failed, not the average. A planning estimate; the mounting, lubrication, and application govern.";
+  const c = makeNumber("Basic dynamic load rating C (lbf)", "bml-c", { step: "any", min: "0" }); c.input.value = "5000";
+  const hr = makeNumber("Target rating life L10h (hr)", "bml-hr", { step: "any", min: "0" }); hr.input.value = "1190";
+  const rpm = makeNumber("Operating speed (rpm)", "bml-rpm", { step: "any", min: "0" }); rpm.input.value = "1750";
+  const type = makeSelect("Bearing type", "bml-type", [
+    { value: "ball", label: "Ball (p = 3)", selected: true },
+    { value: "roller", label: "Roller (p = 10/3)" },
+  ]);
+  for (const f of [c, hr, rpm, type]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { c.input.value = "5000"; hr.input.value = "1190"; rpm.input.value = "1750"; type.select.value = "ball"; update(); });
+  const oLoad = makeOutputLine(outputRegion, "Max equivalent load P", "bml-out-load");
+  const oNote = makeOutputLine(outputRegion, "Note", "bml-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBearingMaxLoad({ dynamic_rating_lbf: readNum(c.input), target_life_hr: readNum(hr.input), speed_rpm: readNum(rpm.input), bearing_type: type.select.value });
+    if (r.error) { oLoad.textContent = r.error; oNote.textContent = ""; return; }
+    oLoad.textContent = fmt(r.max_equivalent_load_lbf, 0) + " lbf (p = " + fmt(r.p_exp, 3) + ")";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [c, hr, rpm]) f.input.addEventListener("input", update);
+  type.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["bearing-max-load"] = renderBearingMaxLoad;
+
 // ===================== spec-v509: countersink diameter and cutting depth =====================
 // dims: in { countersink_dia_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { z_in: L, z_full_in: L }
 export function computeCountersinkDepth({ countersink_dia_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {

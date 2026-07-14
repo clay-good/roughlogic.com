@@ -884,7 +884,7 @@ const TOOL_MODULES = (() => {
     // spec-v401 spur gear tooth geometry
     "spur-gear-geometry", "gear-identification",
     // spec-v504 rolling-bearing L10 rating life (ISO 281)
-    "bearing-l10-life",
+    "bearing-l10-life", "bearing-max-load",
     // spec-v509 countersink diameter and cutting depth
     "countersink-depth",
     // spec-v513 shaft key and keyseat size (ANSI B17.1)

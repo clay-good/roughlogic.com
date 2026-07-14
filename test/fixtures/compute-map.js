@@ -783,6 +783,7 @@ export const COMPUTE_MAP = {
   "hull-speed": { module: "../../calc-mechanic.js", fn: "computeHullSpeed" },
   "bolt-proof-load": { module: "../../calc-cross.js", fn: "computeBoltProofLoad" },
   "bearing-l10-life": { module: "../../calc-machining.js", fn: "computeBearingL10Life" },
+  "bearing-max-load": { module: "../../calc-machining.js", fn: "computeBearingMaxLoad" },
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "crouch-planing-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchPlaningSpeed" },

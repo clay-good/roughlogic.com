@@ -16220,6 +16220,52 @@
    }
   },
   {
+   "tile_id": "bearing-max-load",
+   "source_publisher": "ISO 281 basic rating life (inverse)",
+   "source_title": "ball bearing C 5,000 lbf at 1,750 rpm for a 1,190 hr L10 -> 1,000 lbf max load (round-trips the forward pinned example)",
+   "source_edition_or_year": "spec-v672 worked example (machine-verified)",
+   "source_section_or_page": "spec-v672 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "dynamic_rating_lbf": 5000,
+    "target_life_hr": 1190,
+    "speed_rpm": 1750,
+    "bearing_type": "ball"
+   },
+   "outputs": {
+    "max_equivalent_load_lbf": {
+     "value": 1000.1,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "bearing-max-load",
+   "source_publisher": "ISO 281 basic rating life (inverse)",
+   "source_title": "cross-check: a roller bearing (p = 10/3) carries more, 1,175 lbf, for the same C and target life",
+   "source_edition_or_year": "spec-v672 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v672 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "dynamic_rating_lbf": 5000,
+    "target_life_hr": 1190,
+    "speed_rpm": 1750,
+    "bearing_type": "roller"
+   },
+   "outputs": {
+    "max_equivalent_load_lbf": {
+     "value": 1174.8,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "countersink-depth",
    "source_publisher": "Machinery's Handbook countersinking",
    "source_title": "0.500 in countersink, 82 deg inch head, 0.250 in pilot -> 0.1438 in plunge depth",

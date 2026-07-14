@@ -421,7 +421,7 @@ const _TILES = [
   // spec-v512 roller chain length in pitches (ANSI B29.1)
   ["roller-chain-length", "K"],
   // spec-v504 rolling-bearing L10 rating life (ISO 281)
-  ["bearing-l10-life", "K"],
+  ["bearing-l10-life", "K"], ["bearing-max-load", "K"],
   // spec-v509 countersink diameter and cutting depth
   ["countersink-depth", "K"],
   // spec-v513 shaft key and keyseat size (ANSI B17.1)

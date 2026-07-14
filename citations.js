@@ -7665,6 +7665,18 @@ export const CITATIONS = {
       { name: "10% definition", value: "L10 is the life at which 10% have failed, not the average (L50 is ~5x)", source: "ABMA 9 & 11" },
     ],
   },
+  "bearing-max-load": {
+    formula: "p = 3 (ball) or 10/3 (roller); L10_rev = target_hr x 60 x rpm; P_max = C x (10^6 / L10_rev)^(1/p); the inverse of L10 = (C/P)^p x 10^6.",
+    edition: "The ISO 281 / ABMA 9 & 11 basic rating life (L10) solved for the maximum equivalent load, by name; the mounting, lubrication, and application govern.",
+    freeAccess: "The L10 rating-life relation is a published ISO 281 / ABMA result; the dynamic load rating C comes from the bearing catalog and the target life from the application.",
+    governance: GOVERNANCE.general,
+    editionNote: "The largest equivalent dynamic load a bearing can carry and still reach a target L10 life, the inverse of bearing-l10-life: from L10 = (C/P)^p x 10^6 rev with L10 = target_hr x 60 x rpm, P_max = C x (10^6 / L10_rev)^(1/p), p = 3 ball / 10/3 roller. Because life scales as the cube (ball) of the load ratio, the load limit is only weakly sensitive to the target life (doubling the required hours cuts the allowable load by about 20% for ball), so a bearing sized for a long life still carries a fair load. The basic L10 assumes clean, well-lubricated operation; contamination, misalignment, and lubricant condition are handled by the modified aISO life. L10 is the life at which 10% has failed, not the average. A planning estimate, not a warranty; the mounting, lubrication, and application govern.",
+    assumptions: [
+      { name: "Cube law inverse", value: "P_max scales as (10^6/L10_rev)^(1/p), p = 3 ball / 10/3 roller; the load limit is weakly sensitive to the target life", source: "ISO 281" },
+      { name: "Basic L10", value: "assumes clean, well-lubricated operation; contamination needs the modified aISO life", source: "ISO 281" },
+      { name: "10% definition", value: "L10 is the life at which 10% have failed, not the average (L50 is ~5x)", source: "ABMA 9 & 11" },
+    ],
+  },
   "bolt-proof-load": {
     formula: "At = 0.7854 x (D - 0.9743/n)^2; proof_load = At x proof_strength; yield_load = At x yield_strength; tensile_load = At x tensile_strength; rec_clamp = 0.75 x proof_load.",
     edition: "The SAE J429 inch-series bolt strength model (tensile stress area x grade strength), with the ASME B1.1 tensile stress area, by name; the joint design, torque method, and preload requirement govern.",
