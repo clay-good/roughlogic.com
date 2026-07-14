@@ -11001,6 +11001,34 @@ test("bounds: spec-v40 press-brake-tonnage pins tonnage + rejects bad inputs", (
   assert.ok("error" in _cv40h({ thickness_in: Infinity, bend_length_ft: 4, die_opening_in: 1, uts_ksi: 60 }));
 });
 
+import { computePressBrakeMaxThickness as _v724 } from "../../calc-shop.js";
+test("bounds: spec-v724 computePressBrakeMaxThickness pins T = sqrt(tons V/(575 (UTS/60) L)), round-trips through computePressBrakeTonnage, and error seams", () => {
+  const r = _v724({ available_tonnage_tons: 100, die_opening_in: 0.5, bend_length_ft: 4, uts_ksi: 60 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_thickness_in - Math.sqrt(100 * 0.5 / (575 * 1 * 4))) < 1e-9, `T identity: ${r.max_thickness_in}`);
+  assert.ok(Math.abs(r.max_thickness_in - 0.147442) < 1e-4, `pinned 0.1474 in: ${r.max_thickness_in}`);
+  // Round-trip: at the max thickness the forward tile's total tonnage equals the available tonnage.
+  for (const available_tonnage_tons of [30, 100, 400]) {
+    for (const die_opening_in of [0.25, 0.5, 1.0]) {
+      for (const uts_ksi of [45, 60, 90]) {
+        const m = _v724({ available_tonnage_tons, die_opening_in, bend_length_ft: 4, uts_ksi });
+        assert.ok(!m.error, `sweep tons=${available_tonnage_tons} V=${die_opening_in} UTS=${uts_ksi}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_thickness_in, "T"); assert.ok(m.max_thickness_in > 0, "T positive");
+        const back = _cv40h({ thickness_in: m.max_thickness_in, bend_length_ft: 4, die_opening_in, uts_ksi });
+        assert.ok(Math.abs(back.total_tons - available_tonnage_tons) < 1e-6, `round-trip tons=${available_tonnage_tons} V=${die_opening_in} UTS=${uts_ksi}: ${back.total_tons}`);
+      }
+    }
+  }
+  // A stronger material (higher UTS) drops the max thickness for the same press.
+  assert.ok(_v724({ available_tonnage_tons: 100, die_opening_in: 0.5, bend_length_ft: 4, uts_ksi: 90 }).max_thickness_in < r.max_thickness_in);
+  // Error seams: non-positive tonnage, die opening, bend length, UTS, non-finite.
+  assert.ok("error" in _v724({ available_tonnage_tons: 0, die_opening_in: 0.5, bend_length_ft: 4, uts_ksi: 60 }));
+  assert.ok("error" in _v724({ available_tonnage_tons: 100, die_opening_in: 0, bend_length_ft: 4, uts_ksi: 60 }));
+  assert.ok("error" in _v724({ available_tonnage_tons: 100, die_opening_in: 0.5, bend_length_ft: 0, uts_ksi: 60 }));
+  assert.ok("error" in _v724({ available_tonnage_tons: 100, die_opening_in: 0.5, bend_length_ft: 4, uts_ksi: 0 }));
+  assert.ok("error" in _v724({ available_tonnage_tons: Infinity, die_opening_in: 0.5, bend_length_ft: 4, uts_ksi: 60 }));
+});
+
 test("bounds: spec-v40 weld-duty-cycle pins duty/A100 + caps + rejects bad inputs", () => {
   const a = _cv40i({ rated_amps: 250, rated_duty_pct: 60, target_amps: 300 });
   assert.ok(Math.abs(a.duty_at_target_pct - 60 * (250 / 300) ** 2) < 1e-9);

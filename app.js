@@ -791,7 +791,7 @@ const TOOL_MODULES = (() => {
     // Group G (cross-trade)
     "thread-measure-wire", "thread-pitch-dia-from-wires", "punch-force", "punch-capacity",
     // Group E (welding / sheet-metal)
-    "press-brake-tonnage", "weld-duty-cycle", "carbon-equivalent",
+    "press-brake-tonnage", "press-brake-max-thickness", "weld-duty-cycle", "carbon-equivalent",
     // spec-v41 batch 2: Group K + Group G
     "tap-drill-size", "rolled-blank",
     // spec-v54: Group E carpentry compound miter

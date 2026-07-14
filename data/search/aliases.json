@@ -40512,6 +40512,31 @@
       "kind": "question"
     },
     {
+      "term": "thickest material my press brake can bend",
+      "target": "press-brake-max-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "max plate thickness for press tonnage",
+      "target": "press-brake-max-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "how thick can a 100 ton brake bend",
+      "target": "press-brake-max-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "press brake capacity thickness",
+      "target": "press-brake-max-thickness",
+      "kind": "question"
+    },
+    {
+      "term": "max bend thickness for tonnage",
+      "target": "press-brake-max-thickness",
+      "kind": "question"
+    },
+    {
       "term": "how long can i weld before the machine overheats",
       "target": "weld-duty-cycle",
       "kind": "question"

@@ -630,6 +630,53 @@ function _v40renderPressBrakeTonnage(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["press-brake-tonnage"] = _v40renderPressBrakeTonnage;
 
+// press-brake-max-thickness: inverse of press-brake-tonnage. The forward tile
+// gives the tonnage a bend needs; the everyday shop question is the reverse --
+// the thickest material a given press can air-bend. From
+// total_tons = 575 x (UTS/60) x T^2 / V x L, solving for T:
+// T = sqrt( total_tons x V / (575 x (UTS/60) x L) ).
+// dims: in { available_tonnage_tons: dimensionless, die_opening_in: L, bend_length_ft: L, uts_ksi: dimensionless } out: { max_thickness_in: L, recommended_die_in: L }
+export function computePressBrakeMaxThickness({ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi = 60 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tons = Number(available_tonnage_tons) || 0;
+  const V = Number(die_opening_in) || 0;
+  const L = Number(bend_length_ft) || 0;
+  const UTS = Number(uts_ksi) || 0;
+  if (!(tons > 0)) return { error: "Available press tonnage must be positive (tons)." };
+  if (!(V > 0)) return { error: "V-die opening must be positive (in)." };
+  if (!(L > 0)) return { error: "Bend length must be positive (ft)." };
+  if (!(UTS > 0)) return { error: "Ultimate tensile strength must be positive (ksi)." };
+  const max_thickness_in = Math.sqrt(tons * V / (575 * (UTS / 60) * L));
+  const recommended_die_in = 8 * max_thickness_in;
+  const notes = [];
+  notes.push("Air-bend tonnage tons/ft = 575 x (UTS/60) x T^2 / V solved for the thickness: the thickest material the press can air-bend over the full bend length is T = sqrt(tons x V / (575 x (UTS/60) x L)); the 575 constant is the published mild-steel (60 ksi) value, scaled by strength.");
+  notes.push("Air bending only - bottoming and coining need several times the tonnage, so back off for those. A die opening near 8 x T (recommended " + fmt(recommended_die_in, 3) + " in for this thickness) keeps the part on the die shoulders; a wider die lowers the tonnage but opens the bend radius. The die maker's tonnage chart governs the final setup.");
+  return { max_thickness_in, recommended_die_in, notes };
+}
+export const pressBrakeMaxThicknessExample = { inputs: { available_tonnage_tons: 100, die_opening_in: 0.5, bend_length_ft: 4, uts_ksi: 60 } };
+function _v724renderPressBrakeMaxThickness(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Press-brake air-bend tonnage formula (the 575 mild-steel constant) solved for the thickness: T = sqrt(tons x V / (575 x (UTS/60) x L)), as published in press-brake tonnage charts / Machinery's Handbook, by name; empirical method. Air bending only; bottoming and coining run higher and the die maker's chart governs.";
+  const tons = makeNumber("Available press tonnage (tons)", "pbm-t", { step: "any", min: "0" });
+  const v = makeNumber("V-die opening (in, ~8 x T)", "pbm-v", { step: "any", min: "0" });
+  const len = makeNumber("Bend length (ft)", "pbm-len", { step: "any", min: "0" });
+  const uts = makeNumber("Ultimate tensile strength (ksi)", "pbm-uts", { step: "any", min: "0", value: "60" }); uts.input.value = "60";
+  for (const f of [tons, v, len, uts]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tons.input.value = "100"; v.input.value = "0.5"; len.input.value = "4"; uts.input.value = "60"; update(); });
+  const oT = makeOutputLine(outputRegion, "Max material thickness", "pbm-out-t");
+  const oDie = makeOutputLine(outputRegion, "Recommended die (8 x T)", "pbm-out-die");
+  const oNote = makeOutputLine(outputRegion, "Notes", "pbm-out-note");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computePressBrakeMaxThickness({ available_tonnage_tons: readNum(tons.input), die_opening_in: readNum(v.input), bend_length_ft: readNum(len.input), uts_ksi: uts.input.value === "" ? 60 : readNum(uts.input) });
+    if (r.error) { oT.textContent = r.error; oDie.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.max_thickness_in, 4) + " in (" + fmt(r.max_thickness_in * 25.4, 2) + " mm)";
+    oDie.textContent = fmt(r.recommended_die_in, 3) + " in";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [tons.input, v.input, len.input, uts.input]) f.addEventListener("input", update);
+}
+SHOP_RENDERERS["press-brake-max-thickness"] = _v724renderPressBrakeMaxThickness;
+
 // =====================================================================
 // spec-v40 2.8 - punch-force (Punch / Shear Force) - Group G
 // First-principles shear: F = perimeter x T x shear strength.

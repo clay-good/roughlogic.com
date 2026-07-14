@@ -657,6 +657,7 @@ export const COMPUTE_MAP = {
   "punch-force": { module: "../../calc-shop.js", fn: "computePunchForce" },
   "punch-capacity": { module: "../../calc-shop.js", fn: "computePunchCapacity" },
   "press-brake-tonnage": { module: "../../calc-shop.js", fn: "computePressBrakeTonnage" },
+  "press-brake-max-thickness": { module: "../../calc-shop.js", fn: "computePressBrakeMaxThickness" },
   "weld-duty-cycle": { module: "../../calc-shop.js", fn: "computeWeldDutyCycle" },
   "carbon-equivalent": { module: "../../calc-shop.js", fn: "computeCarbonEquivalent" },
   // spec-v41 machine-shop & fab bench batch 2 (calc-shop.js).

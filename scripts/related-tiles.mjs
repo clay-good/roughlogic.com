@@ -178,6 +178,7 @@ const RELATED = {
   "punch-force": ["punch-capacity", "press-brake-tonnage", "metal-weight", "bend-allowance"],
   "punch-capacity": ["punch-force", "press-brake-tonnage", "metal-weight", "bend-allowance"],
   "press-brake-tonnage": ["bend-allowance", "punch-force", "metal-weight"],
+  "press-brake-max-thickness": ["press-brake-tonnage", "bend-allowance", "min-bend-radius", "metal-weight"],
   "weld-duty-cycle": ["weld-heat-input", "fillet-weld-strength", "carbon-equivalent"],
   "carbon-equivalent": ["weld-heat-input", "fillet-weld-strength", "weld-duty-cycle"],
   "tap-drill-size": ["thread-pitch", "drill-point-depth", "cutting-speed-rpm"],

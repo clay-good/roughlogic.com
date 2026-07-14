@@ -8126,6 +8126,17 @@ export const CITATIONS = {
       { name: "Air bending", value: "the 575 rule is the air-bend form; bottoming and coining run several times higher", source: "press-brake tonnage chart" },
     ],
   },
+  "press-brake-max-thickness": {
+    formula: "T = sqrt( total_tons x V / (575 x (UTS/60) x L) ), the air-bend tonnage rule tons/ft = 575 x (UTS/60) x T^2 / V solved for the thickness; recommended die ~8 x T.",
+    edition: "Press-brake air-bend tonnage formula (the 575 mild-steel constant) solved for the thickness, as published in press-brake tonnage charts / Machinery's Handbook, by name; empirical method.",
+    freeAccess: "Empirical air-bend rule, cited; the user supplies the geometry and may override the strength. Bottoming and coining run substantially higher.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of press-brake-tonnage: the thickest material a press can air-bend over the full bend length. Air bending only - bottoming and coining need several times the tonnage, so back off for those; a die opening near 8 x T keeps the part on the die shoulders, and a wider die lowers the tonnage but opens the bend radius. The 575 constant is the published mild-steel (60 ksi) value, scaled by tensile strength. The die maker's tonnage chart governs the final setup.",
+    assumptions: [
+      { name: "Air bending", value: "the 575 rule is the air-bend form; bottoming and coining run several times higher", source: "press-brake tonnage chart" },
+      { name: "Die opening", value: "recommended V-die ~8 x T; a wider die lowers the tonnage and opens the radius", source: "press-brake practice" },
+    ],
+  },
   "weld-duty-cycle": {
     formula: "DC2 = DC1 x (A1/A2)^2 (capped at 100%); minutes-on per 10-min window = DC2 x 10; maximum continuous amperage A100 = A1 x sqrt(DC1/100).",
     edition: "The inverse-square duty-cycle relation (NEMA EW-1 arc-welding power-source convention), by name; first-principles I^2-heating, public domain.",

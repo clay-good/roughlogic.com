@@ -16642,6 +16642,29 @@
    }
   },
   {
+   "tile_id": "press-brake-max-thickness",
+   "source_publisher": "Press-brake air-bend tonnage chart + Machinery's Handbook",
+   "source_title": "T = sqrt(tons x V / (575 x (UTS/60) x L)); inverse of the tonnage rule",
+   "source_edition_or_year": "empirical 575 mild-steel constant",
+   "source_section_or_page": "100 tons, V 0.5 in, L 4 ft, mild steel -> 0.1474 in max thickness",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_tonnage_tons": 100,
+    "die_opening_in": 0.5,
+    "bend_length_ft": 4,
+    "uts_ksi": 60
+   },
+   "outputs": {
+    "max_thickness_in": {
+     "value": 0.147442,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "weld-duty-cycle",
    "source_publisher": "NEMA EW-1 inverse-square duty-cycle relation",
    "source_title": "DC2 = DC1 (A1/A2)^2; A100 = A1 sqrt(DC1/100)",

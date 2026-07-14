@@ -2623,6 +2623,7 @@ cross-check.
 | calc-shop.js | `computeFeedForSurfaceFinish` | `{ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
+| calc-shop.js | `computePressBrakeMaxThickness` | `{ available_tonnage_tons = 0, die_opening_in = 0, bend_length_ft = 0, uts_ksi...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
 | calc-shop.js | `computePressFitPressure` | `{ shaft_dia_in = 0, interference_in = 0, hub_od_in = 0, modulus_psi = 30e6, f...` | _ | _ | _ |
 | calc-shop.js | `computePunchCapacity` | `{ capacity_tons = 0, shear_strength_psi = 0, solve_for = "thickness", diamete...` | _ | _ | _ |
@@ -2833,7 +2834,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1419.
+Row count: 1420.
 
 <!-- END function-corpus-v14 -->
 
@@ -3362,7 +3363,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (247 tiles)
+### Group E Construction (248 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3491,6 +3492,7 @@ per spec-v14 §13.1 second paragraph.
 | `point-load-bearing` | Bearing Length on a Wood Plate | NDS compression perpendicular to grai...; 4000 lb, 3.0-in width, Fc-perp 625 psi -> ~2.133 in bearing | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `post-hole-concrete` | Concrete per Post Hole | Cylinder-volume geometry less post di...; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `powered-attic-ventilator` | Powered Attic Ventilator Sizing | attic-fan sizing practice; spec-v467 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `press-brake-max-thickness` | Press-Brake Max Bendable Thickness | Press-brake air-bend tonnage chart + ...; 100 tons, V 0.5 in, L 4 ft, mild steel -> 0.1474 in max t... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `press-brake-tonnage` | Press-Brake Air-Bend Tonnage | Press-brake air-bend tonnage chart + ...; T 0.125 in, L 4 ft, V 1 in, mild steel -> 8.9844 tons/ft,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rafter` | Rafter Length | Project (first-principles); Pythagoras on rise / 12 run with overhang | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rain-load-ponding` | Roof Rain Load and Secondary-Drainage Flow (ASCE 7 Ch. 8) | ASCE 7 Ch. 8 + IPC drainage; spec-v224 section 2.1 pinned example (typical scupper) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4191,6 +4193,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1172. Fixture-covered or reference-cadence: 1172 / 1172.
+Tile count: 1173. Fixture-covered or reference-cadence: 1173 / 1173.
 
 <!-- END tile-index-v14 -->
