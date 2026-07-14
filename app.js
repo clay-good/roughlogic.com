@@ -583,7 +583,7 @@ const TOOL_MODULES = (() => {
     "rc-beam-flexure", "rc-beam-shear", "rc-development-length",
     "concrete-torsion-threshold",
     // spec-v284..v286 member depth batch
-    "rc-column-axial", "rc-punching-shear", "rc-hook-development",
+    "rc-column-axial", "rc-column-steel-for-load", "rc-punching-shear", "rc-hook-development",
     // spec-v299..v301 depth-2 batch
     "rc-slab-min-thickness", "rc-slab-max-span-for-thickness", "rc-doubly-reinforced", "rc-shear-friction",
     "concrete-elastic-modulus", "concrete-strength-from-modulus", "concrete-modulus-of-rupture", "concrete-strength-from-rupture", "concrete-cracking-moment", "concrete-depth-for-cracking-moment", "concrete-shrinkage-temperature-steel",

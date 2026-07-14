@@ -15171,6 +15171,34 @@ test("bounds: spec-v284 computeRcColumnAxial pins the 16-in column, the concrete
   assert.ok("error" in _v284({ b_in: 16, h_in: 16, fc_psi: Infinity, ast_in2: 6.32 }));
 });
 
+import { computeRcColumnSteelForLoad as _v753 } from "../../calc-concrete.js";
+test("bounds: spec-v753 RC column longitudinal steel for a target load (inverse of rc-column-axial)", () => {
+  const p = _v753({ target_load_kip: 639, b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000 });
+  assert.ok(Math.abs(p.ast_required_in2 - 6.333) < 0.01 && p.governs === "strength");
+  assert.strictEqual(p.ag_in2, 256);
+  // round-trip: at the recovered steel, rc-column-axial gives exactly the target design load (strength-governed cases)
+  for (const [tgt, b, h, fc, fy] of [[638.61824, 16, 16, 4000, 60000], [800, 18, 18, 5000, 60000], [500, 14, 14, 4000, 60000], [1200, 20, 20, 5000, 75000]]) {
+    const inv = _v753({ target_load_kip: tgt, b_in: b, h_in: h, fc_psi: fc, fy_psi: fy });
+    if (inv.governs !== "strength") continue; // 1% minimum cases don't round-trip to the target
+    const fwd = _v284({ b_in: b, h_in: h, fc_psi: fc, fy_psi: fy, ast_in2: inv.ast_required_in2 });
+    assert.ok(Math.abs(fwd.phi_pn_kip - tgt) < 1e-6);
+  }
+  // a bigger load needs more steel; a bigger column needs less steel for the same load
+  assert.ok(_v753({ target_load_kip: 800, b_in: 16, h_in: 16 }).ast_required_in2 > _v753({ target_load_kip: 639, b_in: 16, h_in: 16 }).ast_required_in2);
+  assert.ok(_v753({ target_load_kip: 639, b_in: 20, h_in: 20 }).ast_required_in2 < _v753({ target_load_kip: 639, b_in: 16, h_in: 16 }).ast_required_in2);
+  // a small load on a big column: the 1% minimum governs
+  const light = _v753({ target_load_kip: 300, b_in: 20, h_in: 20 });
+  assert.ok(light.governs.includes("1%") && Math.abs(light.ast_required_in2 - 0.01 * 400) < 1e-9);
+  // a huge load flags over-8%
+  assert.ok(_v753({ target_load_kip: 2000, b_in: 14, h_in: 14 }).over_max === true);
+  // error seams
+  assert.ok("error" in _v753({ target_load_kip: 0, b_in: 16, h_in: 16 }));
+  assert.ok("error" in _v753({ target_load_kip: 639, b_in: 0, h_in: 16 }));
+  assert.ok("error" in _v753({ target_load_kip: 639, b_in: 16, h_in: 16, fc_psi: 0 }));
+  assert.ok("error" in _v753({ target_load_kip: 639, b_in: 16, h_in: 16, fy_psi: 3000 })); // fy <= 0.85 f'c
+  assert.ok("error" in _v753({ target_load_kip: Infinity, b_in: 16, h_in: 16 }));
+});
+
 test("bounds: spec-v285 computeRcPunchingShear pins the three-term least, the alpha_s map, and error seams", () => {
   const r = _v285({ c1_in: 20, c2_in: 20, d_in: 6, fc_psi: 4000, position: "interior", lambda: 1.0 });
   assert.strictEqual(r.bo_in, 104);

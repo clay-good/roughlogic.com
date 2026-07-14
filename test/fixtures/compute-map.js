@@ -816,6 +816,7 @@ export const COMPUTE_MAP = {
   "steel-tension-member": { module: "../../calc-steel.js", fn: "computeSteelTensionMember" },
   // spec-v284..v286 reinforced-concrete member depth batch (3 tiles)
   "rc-column-axial": { module: "../../calc-concrete.js", fn: "computeRcColumnAxial" },
+  "rc-column-steel-for-load": { module: "../../calc-concrete.js", fn: "computeRcColumnSteelForLoad" },
   "concrete-bearing-strength": { module: "../../calc-concrete.js", fn: "computeConcreteBearingStrength" },
   "rc-compression-dev-length": { module: "../../calc-concrete.js", fn: "computeRcCompressionDevLength" },
   "concrete-longterm-defl": { module: "../../calc-concrete.js", fn: "computeConcreteLongtermDefl" },

@@ -41750,6 +41750,36 @@
    }
   },
   {
+   "tile_id": "rc-column-steel-for-load",
+   "source_publisher": "ACI 318-19 22.4.2 (solved for the steel)",
+   "source_title": "16 in square, 4,000 psi, 639 kip design load -> 6.33 in^2 (2.47%)",
+   "source_edition_or_year": "spec-v753 worked example (machine-verified)",
+   "source_section_or_page": "spec-v753 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_load_kip": 639,
+    "b_in": 16,
+    "h_in": 16,
+    "fc_psi": 4000,
+    "fy_psi": 60000
+   },
+   "outputs": {
+    "ast_required_in2": {
+     "value": 6.333,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "rho_g": {
+     "value": 0.0247,
+     "tolerance": {
+      "abs": 0.0002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rc-column-axial",
    "source_publisher": "ACI 318-19 22.4.2 / 22.4.2.1",
    "source_title": "cross-check: 5,000 psi concrete lifts the same column to Po 1,440 kip, 749 kip design",

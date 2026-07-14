@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v753 RC column longitudinal steel for a target load (rc-column-axial inverse); 2026-07-14
+
+- New tile `rc-column-steel-for-load` (Group E, calc-concrete.js): the longitudinal steel a target factored axial load
+  needs for a given tied column. `Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c)`. A 16 in square 4,000 psi column
+  at 639 kip needs ~6.33 in^2 (2.47%). Reports max(strength, 1% min) and flags loads over 8% (section too small).
+  Round-trips through `rc-column-axial`. Home tile count 1,201 -> 1,202.
+
 ### feat(concrete): spec-v752 concrete section depth for a target cracking moment (concrete-cracking-moment inverse); 2026-07-14
 
 - New tile `concrete-depth-for-cracking-moment` (Group E, calc-concrete.js): the total section depth that reaches a target

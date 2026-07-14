@@ -13557,6 +13557,31 @@
       "kind": "industry"
     },
     {
+      "term": "column steel for load",
+      "target": "rc-column-steel-for-load",
+      "kind": "industry"
+    },
+    {
+      "term": "rc column steel",
+      "target": "rc-column-steel-for-load",
+      "kind": "redirect"
+    },
+    {
+      "term": "longitudinal steel for column",
+      "target": "rc-column-steel-for-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "column reinforcement for load",
+      "target": "rc-column-steel-for-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much steel column",
+      "target": "rc-column-steel-for-load",
+      "kind": "adjacent"
+    },
+    {
       "term": "tied column capacity",
       "target": "rc-column-axial",
       "kind": "industry"

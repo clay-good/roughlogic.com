@@ -12069,6 +12069,18 @@ export const CITATIONS = {
       { name: "Serviceability", value: "crack-control limit, not a strength check", source: "scope of this tile" },
     ],
   },
+  "rc-column-steel-for-load": {
+    formula: "Ag = b x h; Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c), the inverse of phi Pn = 0.80 x 0.65 x [0.85 f'c (Ag - Ast) + fy Ast]; reported Ast = max(strength, 0.01 Ag); flag over 0.08 Ag.",
+    edition: "The ACI 318-19 22.4.2 concentric tied-column axial strength (22.4.2.1 cap 0.80 phi Po, phi = 0.65) with the 10.6.1 ratio limits, solved for the longitudinal steel, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 22.4 axial provisions and 10.6.1 limits are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The longitudinal steel a target factored axial load needs for a given tied column, the inverse of phi Pn = 0.80 x 0.65 x Po: Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c). The reported Ast is the LARGER of the strength requirement and the ACI 10.6.1 1% minimum (0.01 Ag); a strength requirement above the 8% maximum (0.08 Ag) means the section is too small for the load (enlarge the column or raise f'c). Round up to a whole-bar layout that satisfies the tie and clear-cover detailing. Concentric short tied column only - no P-M interaction (the P-M diagram), slenderness or second-order effects, spiral-column variant, or tie detailing. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Required steel", value: "Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c), the inverse of the axial cap", source: "ACI 318-19 22.4.2" },
+      { name: "1% minimum governs", value: "reported Ast = max(strength requirement, 0.01 Ag)", source: "ACI 318-19 10.6.1.1" },
+      { name: "8% maximum", value: "a strength requirement over 0.08 Ag means the section is too small; enlarge it", source: "ACI 318-19 10.6.1.1" },
+    ],
+  },
   "rc-column-axial": {
     formula: "Ag = b x h; rho_g = Ast / Ag (flagged outside 0.01..0.08); Po = 0.85 f'c (Ag - Ast) + fy Ast; phi Pn,max = 0.80 x 0.65 x Po.",
     edition: "The ACI 318-19 22.4.2 nominal axial strength of a non-prestressed compression member and the 22.4.2.1 tied-column maximum (0.80 phi Po, phi = 0.65 compression-controlled tied), with the 10.6.1 longitudinal-reinforcement ratio limits, by name.",

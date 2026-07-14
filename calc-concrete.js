@@ -236,6 +236,55 @@ export function computeRcColumnAxial({ b_in = 0, h_in = 0, fc_psi = 4000, fy_psi
 }
 export const rcColumnAxialExample = { inputs: { b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000, ast_in2: 6.32 } };
 
+// rc-column-steel-for-load: inverse of rc-column-axial. The forward tile gives the design axial strength from the steel
+// area; the inverse recovers the longitudinal steel a target factored axial load needs for a given column size. From
+// phi Pn = 0.80 x 0.65 x [0.85 f'c (Ag - Ast) + fy Ast] = 0.52 x Po,
+// Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c). The 1% minimum governs the minimum and 8% the maximum (ACI 10.6.1).
+// dims: in { target_load_kip: M L T^-2, b_in: L, h_in: L, fc_psi: M L^-1 T^-2, fy_psi: M L^-1 T^-2 } out: { ast_required_in2: L^2, ag_in2: L^2, rho_g: dimensionless }
+export function computeRcColumnSteelForLoad({ target_load_kip = 0, b_in = 0, h_in = 0, fc_psi = 4000, fy_psi = 60000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_load_kip) || 0;
+  const b = Number(b_in) || 0;
+  const h = Number(h_in) || 0;
+  const fc = Number(fc_psi) || 0;
+  const fy = Number(fy_psi) || 0;
+  if (!(target > 0)) return { error: "Target factored axial load must be positive (kip)." };
+  if (!(b > 0) || !(h > 0)) return { error: "Column dimensions must be positive (in)." };
+  if (!(fc > 0) || !(fy > 0)) return { error: "Concrete and steel strengths must be positive (psi)." };
+  if (!(fy > 0.85 * fc)) return { error: "Steel yield must exceed 0.85 f'c." };
+  const ag_in2 = b * h;
+  const ast_strength = (target * 1000 / 0.52 - 0.85 * fc * ag_in2) / (fy - 0.85 * fc);
+  const ast_min = 0.01 * ag_in2;
+  const ast_max = 0.08 * ag_in2;
+  const ast_required_in2 = Math.max(ast_strength, ast_min);
+  const rho_g = ast_required_in2 / ag_in2;
+  const governs = ast_strength <= ast_min ? "the ACI 10.6.1 1% minimum" : "strength";
+  const over_max = ast_required_in2 > ast_max;
+  if (![ast_required_in2, ag_in2, rho_g].every(Number.isFinite)) return { error: "Column-steel math is not a finite value." };
+  return {
+    ast_required_in2, ag_in2, rho_g, ast_min_in2: ast_min, ast_max_in2: ast_max, governs, over_max,
+    note: "ACI 318-19 22.4.2 concentric tied column solved for the steel: Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c), with phi Pn = 0.80 x 0.65 x Po the tied-column design cap. The reported Ast is the LARGER of the strength requirement and the ACI 10.6.1 1% minimum (Ast_min = 0.01 Ag); if the strength requirement exceeds the 8% maximum (0.08 Ag), the section is too small for the load - enlarge the column or raise f'c. Round UP to a whole-bar layout that also satisfies the tie and clear-cover detailing. Concentric short tied column only - no P-M interaction, slenderness, or second-order effects, and a spiral column uses different phi factors. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const rcColumnSteelForLoadExample = { inputs: { target_load_kip: 639, b_in: 16, h_in: 16, fc_psi: 4000, fy_psi: 60000 } };
+CONCRETE_RENDERERS["rc-column-steel-for-load"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 22.4.2 concentric tied column phi Pn = 0.80 x 0.65 x [0.85 f'c (Ag - Ast) + fy Ast] solved for the steel: Ast = (phi Pn / 0.52 - 0.85 f'c Ag) / (fy - 0.85 f'c), with the 10.6.1 1-8% band. Concentric short tied column; no P-M interaction or slenderness. A design aid, not a substitute for the engineer of record.",
+  example: rcColumnSteelForLoadExample.inputs,
+  fields: [
+    { key: "target_load_kip", label: "Target factored axial load phi Pn (kip)", kind: "number" },
+    { key: "b_in", label: "Column width b (in)", kind: "number" },
+    { key: "h_in", label: "Column depth h (in)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", default: 4000 },
+    { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", default: 60000 },
+  ],
+  outputs: [
+    { key: "ast", id: "rcs-out-ast", label: "Required longitudinal steel Ast", value: (r) => fmt(r.ast_required_in2, 2) + " in^2 (" + fmt(r.rho_g * 100, 2) + "%, governed by " + r.governs + ")" + (r.over_max ? " -- OVER 8%, section too small" : "") },
+    { key: "band", id: "rcs-out-band", label: "ACI 1-8% band", value: (r) => fmt(r.ast_min_in2, 2) + " to " + fmt(r.ast_max_in2, 2) + " in^2 (Ag " + fmt(r.ag_in2, 0) + " in^2)" },
+    { key: "n", id: "rcs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRcColumnSteelForLoad,
+});
+
 CONCRETE_RENDERERS["rc-column-axial"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 22.4.2 nominal axial strength Po = 0.85 f'c (Ag - Ast) + fy Ast with the 22.4.2.1 tied-column cap phi Pn,max = 0.80 phi Po (phi = 0.65) and the 10.6.1 1-8% longitudinal ratio, by name. Concentric short tied column; no P-M interaction or slenderness. A design aid, not a substitute for the engineer of record.",
   example: rcColumnAxialExample.inputs,
