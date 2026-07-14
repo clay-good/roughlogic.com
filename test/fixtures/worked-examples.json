@@ -39707,6 +39707,35 @@
    }
   },
   {
+   "tile_id": "pile-group-spacing-for-efficiency",
+   "source_publisher": "Converse-Labarre pile-group efficiency (solved for the spacing)",
+   "source_title": "3x3 group, 12 in piles, target Eg 0.75 -> theta 16.88 deg, 39.6 in (3.3d) spacing",
+   "source_edition_or_year": "spec-v748 worked example (machine-verified)",
+   "source_section_or_page": "spec-v748 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "rows_n": 3,
+    "cols_m": 3,
+    "diameter_in": 12,
+    "target_eg": 0.75
+   },
+   "outputs": {
+    "spacing_in": {
+     "value": 39.56,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "theta_deg": {
+     "value": 16.875,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pile-group-efficiency",
    "source_publisher": "Converse-Labarre pile-group efficiency",
    "source_title": "cross-check: tighten the same 9 piles to 2d = 24 in -> Eg 0.606, 546 kip (108 kip lost for zero added piles)",

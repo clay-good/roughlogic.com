@@ -758,6 +758,7 @@ const _TILES = [
   ["consolidation-time-rate", "E"], ["consolidation-degree", "E"], ["spt-bearing-capacity", "E"], ["spt-required-n60", "E"], ["liquefaction-screening", "E"],
   // spec-v498 pile group efficiency (Converse-Labarre)
   ["pile-group-efficiency", "E"],
+  ["pile-group-spacing-for-efficiency", "E"],
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (calc-masonry.js)
   ["cmu-wall-flexure", "E"], ["cmu-shear-wall", "E"], ["cmu-wall-axial", "E"],
   ["masonry-prism-fm", "E"],

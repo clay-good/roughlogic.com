@@ -11060,6 +11060,18 @@ export const CITATIONS = {
       { name: "Scope", value: "immediate settlement only; consolidation, layering, and embedment are separate", source: "customary geotechnical practice" },
     ],
   },
+  "pile-group-spacing-for-efficiency": {
+    formula: "theta = (1 - Eg) x 90 m n / ((n-1)m + (m-1)n) [deg]; s = d / tan(theta). The inverse of Eg = 1 - atan(d/s) x ((n-1)m + (m-1)n) / (90 m n); spacing must be at least one diameter (theta <= 45 deg).",
+    edition: "Converse-Labarre pile-group efficiency (standard geotechnical practice), solved for the spacing, by name; the geotechnical engineer of record and a load test govern.",
+    freeAccess: "The Converse-Labarre efficiency is a published empirical relation in standard foundation-engineering texts; the target efficiency comes from the group design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The center-to-center spacing for a target Converse-Labarre efficiency, the inverse of the group-efficiency relation: theta = (1 - Eg) x 90 m n / ((n-1)m + (m-1)n), then s = d / tan(theta). A looser (higher) target efficiency needs a wider spacing; below about 3d efficiency falls under 0.7, so a common layout target is 3d. The spacing must be at least one diameter (piles touching), which sets the lowest efficiency a given group can reach. This is an empirical friction-pile hand check; a block (pier) failure of the group acting as a unit and group settlement are separate checks this tile does not replace. A design aid, not a substitute for the geotechnical engineer of record.",
+    assumptions: [
+      { name: "Spacing for efficiency", value: "s = d / tan((1 - Eg) x 90 m n / ((n-1)m + (m-1)n))", source: "Converse-Labarre" },
+      { name: "Minimum spacing", value: "spacing must be at least one diameter; that sets the lowest reachable efficiency", source: "Converse-Labarre" },
+      { name: "Scope", value: "friction-pile hand check; block failure and settlement are separate", source: "scope of this tile" },
+    ],
+  },
   "pile-group-efficiency": {
     formula: "theta = atan(d/s) [deg]; Eg = 1 - theta x ((n-1)m + (m-1)n) / (90 m n); group_allowable = Eg x (m x n) x Q_single.",
     edition: "Converse-Labarre pile-group efficiency (standard geotechnical practice), an empirical friction-pile group hand check, by name; the geotechnical engineer of record and a load test govern.",

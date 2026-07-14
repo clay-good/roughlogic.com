@@ -19554,6 +19554,30 @@ test("bounds: spec-v498 computePileGroupEfficiency pins the Converse-Labarre eff
   assert.ok("error" in _v498({ rows_n: 3, cols_m: 3, diameter_in: 12, spacing_in: 36, single_allow_kip: -1 }));
 });
 
+import { computePileGroupSpacingForEfficiency as _v748 } from "../../calc-geotech.js";
+test("bounds: spec-v748 pile group spacing for a target efficiency (inverse of pile-group-efficiency)", () => {
+  const p = _v748({ rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 0.75 });
+  assert.ok(Math.abs(p.spacing_in - 39.56) < 0.05 && Math.abs(p.spacing_diameters - 3.30) < 0.01);
+  // round-trip: the recovered spacing fed to pile-group-efficiency reproduces the target Eg
+  for (const [n, m, d, eg] of [[3, 3, 12, 0.75], [2, 4, 14, 0.8], [4, 4, 16, 0.7], [2, 2, 10, 0.85]]) {
+    const inv = _v748({ rows_n: n, cols_m: m, diameter_in: d, target_eg: eg });
+    const fwd = _v498({ rows_n: n, cols_m: m, diameter_in: d, spacing_in: inv.spacing_in, single_allow_kip: 100 });
+    assert.ok(Math.abs(fwd.eg - eg) < 1e-9);
+  }
+  // a higher target efficiency needs a wider spacing (monotonic)
+  assert.ok(_v748({ rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 0.85 }).spacing_in > _v748({ rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 0.75 }).spacing_in);
+  // a 1x1 group has no group effect -> no spacing solution
+  assert.ok("error" in _v748({ rows_n: 1, cols_m: 1, diameter_in: 12, target_eg: 0.75 }));
+  // too low a target (would need s < d) errors
+  assert.ok("error" in _v748({ rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 0.3 }));
+  // error seams: rows/cols < 1, non-positive diameter, Eg out of (0,1), non-finite
+  assert.ok("error" in _v748({ rows_n: 0, cols_m: 3, diameter_in: 12, target_eg: 0.75 }));
+  assert.ok("error" in _v748({ rows_n: 3, cols_m: 3, diameter_in: 0, target_eg: 0.75 }));
+  assert.ok("error" in _v748({ rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 1 }));
+  assert.ok("error" in _v748({ rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 0 }));
+  assert.ok("error" in _v748({ rows_n: Infinity, cols_m: 3, diameter_in: 12, target_eg: 0.75 }));
+});
+
 import { computeMotorLockedRotorKva as _v499 } from "../../calc-motor.js";
 
 test("bounds: spec-v499 computeMotorLockedRotorKva pins the code-letter kVA/hp, the LRA, the single-phase path, and error seams", () => {

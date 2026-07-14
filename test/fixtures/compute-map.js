@@ -824,6 +824,7 @@ export const COMPUTE_MAP = {
   "rc-slender-column-magnify": { module: "../../calc-concrete.js", fn: "computeRcSlenderColumnMagnify" },
   "concrete-corbel-bracket": { module: "../../calc-concrete.js", fn: "computeConcreteCorbelBracket" },
   "pile-group-efficiency": { module: "../../calc-geotech.js", fn: "computePileGroupEfficiency" },
+  "pile-group-spacing-for-efficiency": { module: "../../calc-geotech.js", fn: "computePileGroupSpacingForEfficiency" },
   "motor-locked-rotor-kva": { module: "../../calc-motor.js", fn: "computeMotorLockedRotorKva" },
   "motor-max-hp-for-starting-current": { module: "../../calc-motor.js", fn: "computeMotorMaxHpForStartingCurrent" },
   "density-altitude": { module: "../../calc-mechanic.js", fn: "computeDensityAltitude" },

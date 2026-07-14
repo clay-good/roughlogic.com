@@ -13702,6 +13702,31 @@
       "kind": "industry"
     },
     {
+      "term": "pile group spacing",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "industry"
+    },
+    {
+      "term": "pile spacing for efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "redirect"
+    },
+    {
+      "term": "how far apart piles",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pile spacing for eg",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "adjacent"
+    },
+    {
+      "term": "spacing for pile efficiency",
+      "target": "pile-group-spacing-for-efficiency",
+      "kind": "adjacent"
+    },
+    {
       "term": "converse labarre",
       "target": "pile-group-efficiency",
       "kind": "industry"

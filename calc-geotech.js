@@ -1074,3 +1074,52 @@ GEOTECH_RENDERERS["pile-group-efficiency"] = _simpleRenderer({
   ],
   compute: computePileGroupEfficiency,
 });
+
+// ===================== spec-v748: pile group spacing for a target efficiency (inverse of pile-group-efficiency) =====================
+
+// The forward tile gives the Converse-Labarre efficiency from the spacing; the inverse recovers the center-to-center
+// spacing that reaches a target efficiency, so a designer lays out the group to a required Eg. From
+// Eg = 1 - theta x K / (90 m n) with theta = atan(d/s) and K = (n-1)m + (m-1)n, theta = (1 - Eg) x 90 m n / K, then
+// s = d / tan(theta). Solvable only when the group has more than one pile (K > 0) and Eg is between the minimum at
+// touching spacing (theta = 45 deg) and 1.
+// dims: in { rows_n: dimensionless, cols_m: dimensionless, diameter_in: L, target_eg: dimensionless } out: { spacing_in: L, spacing_diameters: dimensionless, theta_deg: dimensionless }
+export function computePileGroupSpacingForEfficiency({ rows_n = 0, cols_m = 0, diameter_in = 0, target_eg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const n = Number(rows_n) || 0;
+  const m = Number(cols_m) || 0;
+  const d = Number(diameter_in) || 0;
+  const eg = Number(target_eg) || 0;
+  if (!(n >= 1)) return { error: "Number of rows must be at least 1." };
+  if (!(m >= 1)) return { error: "Number of columns must be at least 1." };
+  if (!(d > 0)) return { error: "Pile diameter must be positive (in)." };
+  if (!(eg > 0 && eg < 1)) return { error: "Target efficiency must be between 0 and 1 (a group always loses some efficiency at finite spacing)." };
+  const K = (n - 1) * m + (m - 1) * n;
+  if (!(K > 0)) return { error: "A single pile has no group effect (efficiency is always 1); enter a group of more than one pile." };
+  const theta_deg = (1 - eg) * 90 * m * n / K;
+  if (!(theta_deg < 45)) return { error: "Target efficiency is too low to reach with a spacing of at least one diameter; loosen the target or reduce the group size." };
+  const spacing_in = d / Math.tan(theta_deg * Math.PI / 180);
+  const spacing_diameters = spacing_in / d;
+  if (![theta_deg, spacing_in, spacing_diameters].every(Number.isFinite)) return { error: "Pile-spacing math is not a finite value." };
+  return {
+    spacing_in, spacing_diameters, theta_deg,
+    note: "Center-to-center spacing for a target Converse-Labarre efficiency: theta = (1 - Eg) x 90 m n / ((n-1)m + (m-1)n), then s = d / tan(theta). A looser (higher) target efficiency needs a wider spacing; below about 3d efficiency falls under 0.7, so a common layout target is 3d. The spacing must be at least one diameter (piles touching), which sets the lowest efficiency a given group can reach. A wider spacing lifts the group capacity but grows the cap and the footprint. This is an empirical friction-pile hand check; block (pier) failure and group settlement are separate checks. A design aid, not a substitute for the geotechnical engineer of record.",
+  };
+}
+export const pileGroupSpacingForEfficiencyExample = { inputs: { rows_n: 3, cols_m: 3, diameter_in: 12, target_eg: 0.75 } };
+
+GEOTECH_RENDERERS["pile-group-spacing-for-efficiency"] = _simpleRenderer({
+  citation: "Citation: Converse-Labarre pile-group efficiency (standard geotechnical practice) solved for the spacing: theta = (1 - Eg) x 90 m n / ((n-1)m + (m-1)n) in degrees, s = d / tan(theta). The spacing must be at least one diameter. An empirical friction-pile hand check; block failure and settlement are separate. A design aid; the geotechnical engineer of record governs.",
+  example: pileGroupSpacingForEfficiencyExample.inputs,
+  fields: [
+    { key: "rows_n", label: "Pile rows n", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "cols_m", label: "Pile columns m", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "diameter_in", label: "Pile diameter d (in)", kind: "number" },
+    { key: "target_eg", label: "Target efficiency Eg (0-1, e.g. 0.75)", kind: "number" },
+  ],
+  outputs: [
+    { key: "s", id: "pgs-out-s", label: "Required center-to-center spacing", value: (r) => fmt(r.spacing_in, 1) + " in (" + fmt(r.spacing_diameters, 2) + " x diameter)" },
+    { key: "th", id: "pgs-out-th", label: "Angle theta = atan(d/s)", value: (r) => fmt(r.theta_deg, 2) + " deg" },
+    { key: "n", id: "pgs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePileGroupSpacingForEfficiency,
+});

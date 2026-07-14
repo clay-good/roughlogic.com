@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): spec-v748 pile group spacing for a target efficiency (pile-group-efficiency inverse); 2026-07-14
+
+- New tile `pile-group-spacing-for-efficiency` (Group E, calc-geotech.js): the center-to-center spacing that reaches a
+  target Converse-Labarre efficiency. `theta = (1-Eg) x 90 m n / ((n-1)m+(m-1)n)`, then `s = d / tan(theta)`. A 3x3 group
+  of 12 in piles at Eg 0.75 needs ~39.6 in (3.3d). Round-trips through `pile-group-efficiency`. Home tile count 1,196 ->
+  1,197.
+
 ### feat(construction): spec-v747 solid shaft diameter for an allowable torsion (shaft-torsion inverse); 2026-07-14
 
 - New tile `shaft-diameter-for-torsion` (Group E, calc-construction.js): the minimum solid-shaft diameter that keeps the
