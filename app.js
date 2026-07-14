@@ -567,7 +567,7 @@ const TOOL_MODULES = (() => {
     // spec-v314..v316 beam-column-and-connection depth batch
     "steel-h1-interaction", "steel-effective-length-k", "steel-bolt-tension-shear",
     // spec-v411..v413 composite-beam trio
-    "shear-stud-strength", "composite-beam-flexure", "steel-camber",
+    "shear-stud-strength", "composite-beam-flexure", "steel-camber", "steel-inertia-for-deflection",
     // spec-v547
     "steel-floor-vibration",
     // spec-v555

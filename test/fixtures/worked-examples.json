@@ -38086,6 +38086,35 @@
    }
   },
   {
+   "tile_id": "steel-inertia-for-deflection",
+   "source_publisher": "AISC / mechanics of materials (solved for I)",
+   "source_title": "1.0 kip/ft, 40 ft, allow 1.0 in -> Ix ~1,986 in^4",
+   "source_edition_or_year": "spec-v754 worked example (machine-verified)",
+   "source_section_or_page": "spec-v754 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "w_kip_ft": 1.0,
+    "span_ft": 40,
+    "allow_defl_in": 1.0,
+    "e_ksi": 29000
+   },
+   "outputs": {
+    "required_moi_in4": {
+     "value": 1986.2,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "span_over_defl": {
+     "value": 480,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-camber",
    "source_publisher": "AISC / fabrication practice",
    "source_title": "cross-check: a stiff 20 ft beam deflecting 0.05 in is left flat (camber 0)",

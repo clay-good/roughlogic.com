@@ -1147,6 +1147,7 @@ export const COMPUTE_MAP = {
   "shear-stud-strength": { module: "../../calc-steel.js", fn: "computeShearStudStrength" },
   "composite-beam-flexure": { module: "../../calc-steel.js", fn: "computeCompositeBeamFlexure" },
   "steel-camber": { module: "../../calc-steel.js", fn: "computeSteelCamber" },
+  "steel-inertia-for-deflection": { module: "../../calc-steel.js", fn: "computeSteelInertiaForDeflection" },
   "steel-floor-vibration": { module: "../../calc-steel.js", fn: "computeSteelFloorVibration" },
   "steel-panel-zone-shear": { module: "../../calc-steel.js", fn: "computeSteelPanelZoneShear" },
   "steel-panel-zone-axial": { module: "../../calc-steel.js", fn: "computeSteelPanelZoneAxial" },

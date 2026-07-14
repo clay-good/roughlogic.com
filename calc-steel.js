@@ -979,6 +979,50 @@ STEEL_RENDERERS["steel-camber"] = _simpleRenderer({
   compute: computeSteelCamber,
 });
 
+// ===================== spec-v754: required moment of inertia for a deflection limit (inverse of steel-camber) =====================
+
+// The steel-camber tile gives the dead-load deflection from the moment of inertia; the inverse recovers the moment of
+// inertia a beam needs to hold the uniform-load midspan deflection to a limit, so a designer sizes the section to a
+// deflection ceiling (L/240, L/360, etc.). From delta = 5 w L^4 / (384 E I) (L = span x 12),
+// I = 5 w L^4 / (384 E delta_allow). It reports the span-to-deflection ratio for context.
+// dims: in { w_kip_ft: M T^-2, span_ft: L, allow_defl_in: L, e_ksi: M L^-1 T^-2 } out: { required_moi_in4: L^4, span_over_defl: dimensionless }
+export function computeSteelInertiaForDeflection({ w_kip_ft = 0, span_ft = 0, allow_defl_in = 0, e_ksi = 29000 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const w = Number(w_kip_ft) || 0;
+  const span = Number(span_ft) || 0;
+  const defl = Number(allow_defl_in) || 0;
+  const e = Number(e_ksi) || 0;
+  if (!(w > 0)) return { error: "Uniform load must be positive (kip/ft)." };
+  if (!(span > 0)) return { error: "Span must be positive (ft)." };
+  if (!(defl > 0)) return { error: "Allowable deflection must be positive (in)." };
+  if (!(e > 0)) return { error: "Modulus must be positive (ksi)." };
+  const L = span * 12;
+  const required_moi_in4 = 5 * (w / 12) * Math.pow(L, 4) / (384 * e * defl);
+  const span_over_defl = L / defl;
+  if (![required_moi_in4, span_over_defl].every(Number.isFinite)) return { error: "Required-inertia math is not a finite value." };
+  return {
+    required_moi_in4, span_over_defl,
+    note: "Required moment of inertia to hold the simple-span midspan deflection to a limit: I = 5 w L^4 / (384 E delta_allow), the inverse of delta = 5 w L^4 / (384 E I) for a uniform load. Common deflection limits are span/360 (live load, plaster) and span/240 (total load); for a span of L inches, delta_allow = L / 360 or L / 240 - the L^4 in the numerator makes a longer span demand a much stiffer section. Pick a rolled shape with at least this Ix from the AISC tables, then verify strength (flexure and shear) and the actual load combination separately; this sizes for STIFFNESS only, and the entered load must be the deflection-causing service load, not the factored load. A design aid, not a substitute for the structural engineer of record's stamped design.",
+  };
+}
+export const steelInertiaForDeflectionExample = { inputs: { w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 1.0, e_ksi: 29000 } };
+STEEL_RENDERERS["steel-inertia-for-deflection"] = _simpleRenderer({
+  citation: "Citation: simple-span uniform-load midspan deflection delta = 5 w L^4 / (384 E I) solved for the moment of inertia: I = 5 w L^4 / (384 E delta_allow), L = span x 12 (AISC / mechanics of materials). Common limits span/360 (LL) and span/240 (total). Sizes for stiffness; verify strength separately. A design aid; the structural drawings govern.",
+  example: steelInertiaForDeflectionExample.inputs,
+  fields: [
+    { key: "w_kip_ft", label: "Uniform (service) load (kip/ft)", kind: "number", default: 1.0 },
+    { key: "span_ft", label: "Simple span (ft)", kind: "number", default: 40 },
+    { key: "allow_defl_in", label: "Allowable deflection (in; e.g. span-in / 360)", kind: "number" },
+    { key: "e_ksi", label: "Modulus E (ksi)", kind: "number", default: 29000 },
+  ],
+  outputs: [
+    { key: "i", id: "sid-out-i", label: "Required moment of inertia Ix", value: (r) => fmt(r.required_moi_in4, 0) + " in^4" },
+    { key: "r", id: "sid-out-r", label: "Deflection limit (span/delta)", value: (r) => "span/" + fmt(r.span_over_defl, 0) },
+    { key: "n", id: "sid-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSteelInertiaForDeflection,
+});
+
 // ===================== spec-v547: steel floor walking vibration (AISC DG11) =====================
 
 // dims: in { natural_freq_hz: T^-1, effective_wt_lb: M L T^-2, damping_ratio: dimensionless, walker_force_lb: M L T^-2, limit_ratio: dimensionless } out: { ap_over_g: dimensionless, limit_ratio: dimensionless }

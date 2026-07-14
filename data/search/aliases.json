@@ -18787,6 +18787,31 @@
       "kind": "industry"
     },
     {
+      "term": "moment of inertia for deflection",
+      "target": "steel-inertia-for-deflection",
+      "kind": "industry"
+    },
+    {
+      "term": "required ix for deflection",
+      "target": "steel-inertia-for-deflection",
+      "kind": "redirect"
+    },
+    {
+      "term": "beam stiffness for deflection limit",
+      "target": "steel-inertia-for-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "inertia for l360",
+      "target": "steel-inertia-for-deflection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much inertia for deflection",
+      "target": "steel-inertia-for-deflection",
+      "kind": "adjacent"
+    },
+    {
       "term": "beam camber",
       "target": "steel-camber",
       "kind": "industry"

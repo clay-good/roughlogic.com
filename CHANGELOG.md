@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(steel): spec-v754 required moment of inertia for a deflection limit (steel-camber inverse); 2026-07-14
+
+- New tile `steel-inertia-for-deflection` (Group E, calc-steel.js): the moment of inertia a simple-span beam needs to
+  hold the uniform-load midspan deflection to a limit. `I = 5 w L^4 / (384 E delta_allow)`. A 1.0 kip/ft, 40 ft beam held
+  to 1.0 in needs Ix ~1,986 in^4 (span/360 = span x 12 / 360). Round-trips through `steel-camber`. Home tile count 1,202
+  -> 1,203.
+
 ### feat(concrete): spec-v753 RC column longitudinal steel for a target load (rc-column-axial inverse); 2026-07-14
 
 - New tile `rc-column-steel-for-load` (Group E, calc-concrete.js): the longitudinal steel a target factored axial load

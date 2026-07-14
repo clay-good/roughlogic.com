@@ -18813,6 +18813,28 @@ test("bounds: spec-v413 computeSteelCamber pins the deflection, the 1/4-in round
   assert.ok("error" in _v413({ w_kip_ft: Infinity, span_ft: 40, moi_in4: 2100 }));
 });
 
+import { computeSteelInertiaForDeflection as _v754 } from "../../calc-steel.js";
+test("bounds: spec-v754 required moment of inertia for a deflection limit (inverse of steel-camber)", () => {
+  const p = _v754({ w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 1.0, e_ksi: 29000 });
+  assert.ok(Math.abs(p.required_moi_in4 - 1986.2) < 1);
+  assert.ok(Math.abs(p.span_over_defl - 480) < 1e-9);
+  // round-trip: the recovered Ix fed to steel-camber reproduces the deflection limit
+  for (const [w, span, defl, e] of [[1.0, 40, 1.0, 29000], [0.8, 30, 30 * 12 / 360, 29000], [2.0, 50, 50 * 12 / 240, 29000], [1.5, 24, 0.6, 29000]]) {
+    const inv = _v754({ w_kip_ft: w, span_ft: span, allow_defl_in: defl, e_ksi: e });
+    const fwd = _v413({ w_kip_ft: w, span_ft: span, moi_in4: inv.required_moi_in4, e_ksi: e });
+    assert.ok(Math.abs(fwd.defl_in - defl) < 1e-6);
+  }
+  // a tighter (smaller) allowable deflection needs a stiffer section; a longer span needs much more (L^4)
+  assert.ok(_v754({ w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 0.5 }).required_moi_in4 > _v754({ w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 1.0 }).required_moi_in4);
+  assert.ok(_v754({ w_kip_ft: 1.0, span_ft: 50, allow_defl_in: 1.0 }).required_moi_in4 > 2 * _v754({ w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 1.0 }).required_moi_in4);
+  // error seams
+  assert.ok("error" in _v754({ w_kip_ft: 0, span_ft: 40, allow_defl_in: 1.0 }));
+  assert.ok("error" in _v754({ w_kip_ft: 1.0, span_ft: 0, allow_defl_in: 1.0 }));
+  assert.ok("error" in _v754({ w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 0 }));
+  assert.ok("error" in _v754({ w_kip_ft: 1.0, span_ft: 40, allow_defl_in: 1.0, e_ksi: 0 }));
+  assert.ok("error" in _v754({ w_kip_ft: Infinity, span_ft: 40, allow_defl_in: 1.0 }));
+});
+
 // ===================== spec-v414..v416 geotechnical settlement/foundation trio (calc-geotech.js) =====================
 import { computeConsolidationTimeRate as _v414, computeSptBearingCapacity as _v415, computeLiquefactionScreening as _v416 } from "../../calc-geotech.js";
 

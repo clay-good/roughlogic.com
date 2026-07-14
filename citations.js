@@ -12665,6 +12665,18 @@ export const CITATIONS = {
       { name: "PNA-in-slab only", value: "valid while a <= slab thickness; else the general method applies", source: "scope of this tile" },
     ],
   },
+  "steel-inertia-for-deflection": {
+    formula: "I = 5 w L^4 / (384 E delta_allow), L = span x 12, the inverse of delta = 5 w L^4 / (384 E I); span_over_defl = L / delta_allow.",
+    edition: "Simple-span uniform-load midspan deflection (AISC / mechanics of materials), solved for the moment of inertia, by name.",
+    freeAccess: "The simple-span deflection relation is a standard published structural result; the deflection limits (span/240, span/360) are in the building code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The moment of inertia a simple-span beam needs to hold the uniform-load midspan deflection to a limit, the inverse of delta = 5 w L^4 / (384 E I): I = 5 w L^4 / (384 E delta_allow). Common deflection limits are span/360 (live load, plaster) and span/240 (total load); for a span of L inches, delta_allow = L / 360 or L / 240, and the L^4 in the numerator makes a longer span demand a much stiffer section. Pick a rolled shape with at least this Ix from the AISC tables, then verify strength (flexure and shear) and the actual load combination separately - this sizes for STIFFNESS only, and the entered load must be the deflection-causing service load, not the factored load. A design aid, not a substitute for the engineer of record's stamped design.",
+    assumptions: [
+      { name: "Required inertia", value: "I = 5 w L^4 / (384 E delta_allow) simple span, uniform load", source: "beam theory" },
+      { name: "Deflection limit", value: "delta_allow from the code (span/360 LL, span/240 total) at service load", source: "building code" },
+      { name: "Stiffness only", value: "verify flexure and shear strength separately with the factored load", source: "scope of this tile" },
+    ],
+  },
   "steel-camber": {
     formula: "delta = 5 w L^4 / (384 E I); camber = round(fraction x delta to nearest 1/4 in).",
     edition: "Steel beam camber from the dead-load deflection, standard AISC / fabrication practice, by name.",

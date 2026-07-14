@@ -1178,6 +1178,7 @@ const RELATED = {
   "shear-stud-strength": ["composite-beam-flexure","steel-beam-flexure","concrete-elastic-modulus","fillet-weld-strength"],
   "composite-beam-flexure": ["shear-stud-strength","steel-beam-flexure","t-beam-effective-flange-width","steel-camber"],
   "steel-camber": ["composite-beam-flexure","steel-beam-flexure","shear-stud-strength","beam-loading"],
+  "steel-inertia-for-deflection": ["steel-camber","steel-beam-flexure","beam-loading"],
   "steel-floor-vibration": ["steel-camber","joist-deflection","concrete-longterm-defl"],
   "steel-panel-zone-shear": ["steel-web-local-strength","steel-beam-shear","steel-column-capacity"],
   "steel-doubler-plate": ["steel-panel-zone-shear","steel-web-local-strength","steel-column-capacity"],

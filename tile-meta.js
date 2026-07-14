@@ -746,7 +746,7 @@ const _TILES = [
   // spec-v254..v256 + v266..v268 AISC 360 steel member + connection trio (calc-steel.js)
   ["steel-beam-flexure", "E"], ["required-section-modulus", "E"], ["steel-beam-shear", "E"], ["steel-column-capacity", "E"],
   ["bolt-group-eccentric", "E"], ["bolt-shear-bearing", "E"], ["column-base-plate", "E"],
-  ["shear-stud-strength", "E"], ["composite-beam-flexure", "E"], ["steel-camber", "E"],
+  ["shear-stud-strength", "E"], ["composite-beam-flexure", "E"], ["steel-camber", "E"], ["steel-inertia-for-deflection", "E"],
   ["steel-floor-vibration", "E"],
   ["steel-panel-zone-shear", "E"],
   ["steel-panel-zone-axial", "E"],
