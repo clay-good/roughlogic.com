@@ -10145,6 +10145,18 @@ export const CITATIONS = {
       { name: "No buckling check", value: "fully restrained is the worst case; buckling under the compression is not checked", source: "scope of this tile" },
     ],
   },
+  "thermal-stress-max-deltat": {
+    formula: "dT_max = allowable_stress_psi / (E x alpha x restraint); the inverse of sigma = E alpha dT x restraint.",
+    edition: "The standard restrained thermal-stress relation (mechanics of materials) solved for the temperature change, by name.",
+    freeAccess: "The restrained thermal-stress relation is published free in any mechanics-of-materials reference. The engineer of record governs the design.",
+    governance: GOVERNANCE.general,
+    editionNote: "The largest temperature change a restrained member can take before its thermal stress reaches the allowable, the inverse of thermal-stress-restrained: dT_max = sigma_allow / (E x alpha x restraint). The stress is independent of length, so the limit depends only on the material (modulus E, expansion coefficient alpha), the restraint factor, and the allowable stress. Heating a restrained member is compression and cooling is tension; if the allowable differs by direction, use the governing (smaller) one. A lower modulus or expansion coefficient, or partial restraint, raises the tolerable swing, which is why aluminum can take a larger temperature change than steel for the same stress. Fully restrained (factor 1) is the worst case; it does not check member buckling under the induced compression. A design aid, not a substitute for the engineer of record.",
+    assumptions: [
+      { name: "Restrained-stress inverse", value: "dT_max = sigma_allow / (E alpha restraint), independent of length", source: "mechanics of materials" },
+      { name: "Sign", value: "heating a restrained member -> compression; cooling -> tension; use the governing allowable", source: "mechanics of materials" },
+      { name: "No buckling check", value: "fully restrained is the worst case; buckling under the compression is not checked", source: "scope of this tile" },
+    ],
+  },
   "hoop-stress-thin-wall": {
     formula: "sigma_h = P D/(2 t); sigma_l = P D/(4 t); D/t (thin-wall if >= 20); DCR = sigma_h / S_allow.",
     edition: "The thin-wall pressure-vessel membrane-stress relations (Barlow / mechanics of materials), by name.",

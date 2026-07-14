@@ -951,6 +951,7 @@ export const COMPUTE_MAP = {
   "combined-stress-axial-bending": { module: "../../calc-construction.js", fn: "computeCombinedStressAxialBending" },
   "shaft-torsion": { module: "../../calc-construction.js", fn: "computeShaftTorsion" },
   "thermal-stress-restrained": { module: "../../calc-construction.js", fn: "computeThermalStressRestrained" },
+  "thermal-stress-max-deltat": { module: "../../calc-construction.js", fn: "computeThermalStressMaxDeltaT" },
   "hoop-stress-thin-wall": { module: "../../calc-construction.js", fn: "computeHoopStressThinWall" },
   "hoop-stress-mawp": { module: "../../calc-construction.js", fn: "computeHoopStressMawp" },
   "seismic-design-spectral-acceleration": { module: "../../calc-construction.js", fn: "computeSeismicDesignSpectralAcceleration" },

@@ -15519,7 +15519,7 @@ test("bounds: spec-v358 computeWeldTravelSpeed pins the inverse relation, the ro
 });
 
 // ===================== spec-v359..v361 applied-mechanics batch =====================
-import { computeShaftTorsion as _v359, computeThermalStressRestrained as _v360, computeHoopStressThinWall as _v361, computeHoopStressMawp as _v668 } from "../../calc-construction.js";
+import { computeShaftTorsion as _v359, computeThermalStressRestrained as _v360, computeHoopStressThinWall as _v361, computeHoopStressMawp as _v668, computeThermalStressMaxDeltaT as _v674 } from "../../calc-construction.js";
 
 test("bounds: spec-v359 computeShaftTorsion pins J/tau/theta, the d^3/d^4 leverage, and error seams", () => {
   const r = _v359({ T_lbin: 12000, d_in: 1.5, di_in: 0, L_in: 24, G_psi: 11.5e6 });
@@ -15555,6 +15555,35 @@ test("bounds: spec-v360 computeThermalStressRestrained pins the length-independe
   assert.ok("error" in _v360({ E_psi: 29e6, alpha: 0, dT_F: 100 }));
   assert.ok("error" in _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 0 }));
   assert.ok("error" in _v360({ E_psi: 29e6, alpha: 6.5e-6, dT_F: 100, restraint: 1.5 }));
+});
+
+test("bounds: spec-v674 computeThermalStressMaxDeltaT pins dT_max = S/(E alpha restraint), round-trips through computeThermalStressRestrained, and error seams", () => {
+  const r = _v674({ allowable_stress_psi: 18850, E_psi: 29e6, alpha: 6.5e-6, restraint: 1 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_dT_F - 18850 / (29e6 * 6.5e-6 * 1)) < 1e-9, `dT identity: ${r.max_dT_F}`);
+  assert.ok(Math.abs(r.max_dT_F - 100) < 1e-6, `pinned 100 F: ${r.max_dT_F}`);
+  // Aluminum (lower modulus) tolerates a larger swing for the same allowable.
+  const alum = _v674({ allowable_stress_psi: 18850, E_psi: 10e6, alpha: 13e-6, restraint: 1 });
+  assert.ok(alum.max_dT_F > r.max_dT_F, `aluminum larger swing: ${alum.max_dT_F}`);
+  // Half restraint doubles the tolerable swing.
+  const half = _v674({ allowable_stress_psi: 18850, E_psi: 29e6, alpha: 6.5e-6, restraint: 0.5 });
+  assert.ok(Math.abs(half.max_dT_F - 2 * r.max_dT_F) < 1e-9, `half restraint doubles: ${half.max_dT_F}`);
+  // Round-trip: the max dT, fed back through the forward tile, reproduces the allowable stress.
+  for (const allowable_stress_psi of [5000, 18850, 30000]) {
+    for (const [E_psi, alpha] of [[29e6, 6.5e-6], [10e6, 13e-6]]) {
+      const m = _v674({ allowable_stress_psi, E_psi, alpha, restraint: 1 });
+      assert.ok(!m.error, `sweep S=${allowable_stress_psi} E=${E_psi}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_dT_F, "dT"); assert.ok(m.max_dT_F > 0, "dT positive");
+      const back = _v360({ E_psi, alpha, dT_F: m.max_dT_F, restraint: 1 });
+      assert.ok(Math.abs(back.sigma_psi - allowable_stress_psi) < 1e-6, `round-trip S=${allowable_stress_psi} E=${E_psi}: ${back.sigma_psi}`);
+    }
+  }
+  // Error seams: non-finite, non-positive allowable / E / alpha, restraint out of range.
+  assert.ok("error" in _v674({ allowable_stress_psi: 0, E_psi: 29e6, alpha: 6.5e-6 }));
+  assert.ok("error" in _v674({ allowable_stress_psi: 18850, E_psi: 0, alpha: 6.5e-6 }));
+  assert.ok("error" in _v674({ allowable_stress_psi: 18850, E_psi: 29e6, alpha: 0 }));
+  assert.ok("error" in _v674({ allowable_stress_psi: 18850, E_psi: 29e6, alpha: 6.5e-6, restraint: 1.5 }));
+  assert.ok("error" in _v674({ allowable_stress_psi: Infinity, E_psi: 29e6, alpha: 6.5e-6 }));
 });
 
 test("bounds: spec-v361 computeHoopStressThinWall pins hoop = 2x longitudinal, the D/t flag, and error seams", () => {

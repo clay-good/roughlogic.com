@@ -47570,6 +47570,52 @@
    }
   },
   {
+   "tile_id": "thermal-stress-max-deltat",
+   "source_publisher": "mechanics of materials (inverse)",
+   "source_title": "structural steel, fully restrained, 18,850 psi allowable -> 100 F max swing (round-trips the forward pinned example)",
+   "source_edition_or_year": "spec-v674 worked example (machine-verified)",
+   "source_section_or_page": "spec-v674 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "allowable_stress_psi": 18850,
+    "E_psi": 29000000,
+    "alpha": 6.5e-06,
+    "restraint": 1
+   },
+   "outputs": {
+    "max_dT_F": {
+     "value": 100,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "thermal-stress-max-deltat",
+   "source_publisher": "mechanics of materials (inverse)",
+   "source_title": "cross-check: aluminum (lower modulus) tolerates a larger 145 F swing for the same allowable stress",
+   "source_edition_or_year": "spec-v674 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v674 section 2.1 cross-check: E 10e6, alpha 13e-6, 18,850 psi -> 145 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "allowable_stress_psi": 18850,
+    "E_psi": 10000000,
+    "alpha": 1.3e-05,
+    "restraint": 1
+   },
+   "outputs": {
+    "max_dT_F": {
+     "value": 144.99,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hoop-stress-thin-wall",
    "source_publisher": "thin-wall / Barlow",
    "source_title": "12 in tank, 0.25 in wall, 150 psi -> 3,600 psi hoop, 1,800 psi long, D/t 48, DCR 0.24",

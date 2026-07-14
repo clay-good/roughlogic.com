@@ -6214,6 +6214,45 @@ const _renderThermalStressRestrained = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["thermal-stress-restrained"] = _renderThermalStressRestrained;
 
+// dims: in { allowable_stress_psi: M L^-1 T^-2, E_psi: M L^-1 T^-2, alpha: dimensionless, restraint: dimensionless } out: { max_dT_F: T }
+export function computeThermalStressMaxDeltaT({ allowable_stress_psi = 0, E_psi = 0, alpha = 0, restraint = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const S = Number(allowable_stress_psi) || 0;
+  const E = Number(E_psi) || 0;
+  const a = Number(alpha) || 0;
+  let r = Number(restraint);
+  if (!Number.isFinite(r) || r === 0) r = 1;
+  if (!(S > 0)) return { error: "Allowable stress must be positive (psi)." };
+  if (!(E > 0)) return { error: "Modulus of elasticity must be positive (psi)." };
+  if (!(a > 0)) return { error: "Thermal expansion coefficient must be positive (/F)." };
+  if (!(r > 0 && r <= 1)) return { error: "Restraint factor must be over 0 and up to 1." };
+  // Inverse of sigma = E x alpha x dT x restraint: dT_max = sigma_allow / (E x alpha x restraint).
+  const max_dT_F = S / (E * a * r);
+  if (!Number.isFinite(max_dT_F) || !(max_dT_F > 0)) return { error: "Temperature-change math is not a finite positive value." };
+  return {
+    max_dT_F,
+    note: "The largest temperature change a restrained member can take before its thermal stress reaches the allowable, the inverse of the thermal-stress-restrained tile: dT_max = sigma_allow / (E x alpha x restraint). The stress is independent of length, so the limit depends only on the material (E, alpha), the restraint, and the allowable. Heating a restrained member is compression, cooling is tension - if the allowable differs by direction, use the governing (smaller) one. A lower modulus or expansion coefficient (or partial restraint) raises the tolerable swing, which is why aluminum can take a larger temperature change than steel for the same stress. Fully restrained is the worst case; real supports give partial restraint. A design aid, not a substitute for the engineer of record.",
+  };
+}
+export const thermalStressMaxDeltaTExample = { inputs: { allowable_stress_psi: 18850, E_psi: 29e6, alpha: 6.5e-6, restraint: 1 } };
+
+const _renderThermalStressMaxDeltaT = _simpleRenderer({
+  citation: "Citation: restrained thermal stress solved for the temperature change: dT_max = sigma_allow / (E x alpha x restraint), from sigma = E alpha dT x restraint. Heating is compression, cooling is tension. Fully restrained is the worst case; real supports give partial restraint. A design aid, not a substitute for the engineer of record.",
+  example: thermalStressMaxDeltaTExample.inputs,
+  fields: [
+    { key: "allowable_stress_psi", label: "Allowable stress (psi)", kind: "number" },
+    { key: "E_psi", label: "Modulus E (psi; 29e6 steel, 10e6 alum)", kind: "number", default: 29000000 },
+    { key: "alpha", label: "Thermal expansion alpha (/F; 6.5e-6 steel)", kind: "number" },
+    { key: "restraint", label: "Restraint factor (0-1, default 1)", kind: "number", default: 1 },
+  ],
+  outputs: [
+    { key: "dt", id: "tsmd-out-dt", label: "Max temperature change", value: (r) => fmt(r.max_dT_F, 1) + " F" },
+    { key: "n", id: "tsmd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeThermalStressMaxDeltaT,
+});
+CONSTRUCTION_RENDERERS["thermal-stress-max-deltat"] = _renderThermalStressMaxDeltaT;
+
 // dims: in { P_psi: M L^-1 T^-2, D_in: L, t_in: L, S_allow: M L^-1 T^-2 } out: { sigma_h_psi: M L^-1 T^-2, sigma_l_psi: M L^-1 T^-2, Dt: dimensionless, DCR: dimensionless }
 export function computeHoopStressThinWall({ P_psi = 0, D_in = 0, t_in = 0, S_allow = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

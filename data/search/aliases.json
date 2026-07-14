@@ -18962,6 +18962,31 @@
       "kind": "industry"
     },
     {
+      "term": "max temperature change for stress",
+      "target": "thermal-stress-max-deltat",
+      "kind": "industry"
+    },
+    {
+      "term": "allowable temperature swing",
+      "target": "thermal-stress-max-deltat",
+      "kind": "industry"
+    },
+    {
+      "term": "how big a temperature change can a pipe take",
+      "target": "thermal-stress-max-deltat",
+      "kind": "adjacent"
+    },
+    {
+      "term": "delta t for a stress limit",
+      "target": "thermal-stress-max-deltat",
+      "kind": "adjacent"
+    },
+    {
+      "term": "temperature swing before yield",
+      "target": "thermal-stress-max-deltat",
+      "kind": "adjacent"
+    },
+    {
       "term": "temperature stress",
       "target": "thermal-stress-restrained",
       "kind": "industry"
