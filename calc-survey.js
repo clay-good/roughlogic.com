@@ -415,3 +415,47 @@ function renderTapingCorrections(inputRegion, outputRegion, citationEl) {
   for (const f of [l.input, t.input, t0.input, h.input, p.input, p0.input, a.input, w.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["taping-corrections"] = renderTapingCorrections;
+
+// dims: in { start_n: L, start_e: L, azimuth_deg: dimensionless, distance_ft: L } out: { delta_n: L, delta_e: L, end_n: L, end_e: L }
+// Coordinate geometry forward locate (radial): from a known point, an
+// azimuth (clockwise from north), and a distance, compute the new point.
+// latitude (dN) = D cos(Az), departure (dE) = D sin(Az); N2 = N1 + dN,
+// E2 = E1 + dE. The single forward step traverse-closure sums over a loop.
+export function computeCogoForwardPoint({ start_n = 0, start_e = 0, azimuth_deg = 0, distance_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const az = Number(azimuth_deg);
+  const d = Number(distance_ft);
+  if (!(az >= 0 && az <= 360)) return { error: "Azimuth must be between 0 and 360 degrees (clockwise from north)." };
+  if (!(d > 0)) return { error: "Distance must be positive (ft)." };
+  const r = (az * Math.PI) / 180;
+  const delta_n = d * Math.cos(r);
+  const delta_e = d * Math.sin(r);
+  const end_n = Number(start_n) + delta_n;
+  const end_e = Number(start_e) + delta_e;
+  return { delta_n, delta_e, end_n, end_e };
+}
+export const cogoForwardPointExample = { inputs: { start_n: 5000, start_e: 5000, azimuth_deg: 45, distance_ft: 200 } };
+
+function renderCogoForwardPoint(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: coordinate geometry forward locate - latitude (delta N) = D cos(Az), departure (delta E) = D sin(Az), with the azimuth measured clockwise from north; N2 = N1 + delta N, E2 = E1 + delta E. First-principles latitude/departure per the standard route-surveying references (Ghilani & Wolf; FM 5-233), by name. For a quadrant bearing (N45E) convert to azimuth first (the bearing-conversion tile handles the quadrant / declination). A computational aid; the project control and datum govern.";
+  const n0 = makeNumber("Start northing N (ft)", "cf-n", { step: "any" });
+  const e0 = makeNumber("Start easting E (ft)", "cf-e", { step: "any" });
+  const az = makeNumber("Azimuth (deg, clockwise from north)", "cf-az", { step: "any", min: "0", max: "360" });
+  const d = makeNumber("Distance (ft)", "cf-d", { step: "any", min: "0" });
+  for (const f of [n0, e0, az, d]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { n0.input.value = "5000"; e0.input.value = "5000"; az.input.value = "45"; d.input.value = "200"; update(); });
+  const oDn = makeOutputLine(outputRegion, "Latitude (delta N)", "cf-out-dn");
+  const oDe = makeOutputLine(outputRegion, "Departure (delta E)", "cf-out-de");
+  const oN = makeOutputLine(outputRegion, "End northing N", "cf-out-n");
+  const oE = makeOutputLine(outputRegion, "End easting E", "cf-out-e");
+  const update = debounce(() => {
+    const r = computeCogoForwardPoint({ start_n: Number(n0.input.value) || 0, start_e: Number(e0.input.value) || 0, azimuth_deg: Number(az.input.value) || 0, distance_ft: Number(d.input.value) || 0 });
+    if (r.error) { oDn.textContent = r.error; oDe.textContent = "-"; oN.textContent = "-"; oE.textContent = "-"; return; }
+    oDn.textContent = fmt(r.delta_n, 3) + " ft";
+    oDe.textContent = fmt(r.delta_e, 3) + " ft";
+    oN.textContent = fmt(r.end_n, 3) + " ft";
+    oE.textContent = fmt(r.end_e, 3) + " ft";
+  }, DEBOUNCE_MS);
+  for (const f of [n0.input, e0.input, az.input, d.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["cogo-forward-point"] = renderCogoForwardPoint;

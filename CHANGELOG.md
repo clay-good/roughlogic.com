@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): spec-v766 COGO forward locate from bearing and distance; 2026-07-14
+
+- New tile `cogo-forward-point` (Group P, calc-survey.js): the coordinate-geometry forward step -- from a known point, an
+  azimuth (clockwise from north), and a distance, the new coordinates. `dN = D cos(Az)`, `dE = D sin(Az)`;
+  `N2 = N1 + dN`, `E2 = E1 + dE`. N5000/E5000 at azimuth 45 deg, 200 ft lands N5141.42/E5141.42. The single forward
+  step traverse-closure only ever sums over a whole loop. calc-survey.js gzip cap 9000 -> 10500 B. Home count 1,214 -> 1,215.
+
 ### feat(pipefit): spec-v765 boiler horsepower, steam output, and EDR (ABMA/ASME ratings); 2026-07-14
 
 - New tile `boiler-horsepower` (Group B, calc-pipefit.js): the ABMA/ASME boiler ratings from a gross output --

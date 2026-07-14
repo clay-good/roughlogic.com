@@ -11591,6 +11591,18 @@ export const CITATIONS = {
       { name: "Tension and sag", value: "Cp = (P - P0) L/(A E); Cs = -w^2 L^3/(24 P^2) for an unsupported span", source: "surveying references" },
     ],
   },
+  "cogo-forward-point": {
+    formula: "latitude (delta N) = D cos(Az); departure (delta E) = D sin(Az); N2 = N1 + delta N; E2 = E1 + delta E. Az is the azimuth clockwise from north.",
+    edition: "First-principles coordinate geometry (latitude / departure) as compiled in the standard route-surveying references (Ghilani & Wolf, Elementary Surveying; FM 5-233), by name.",
+    freeAccess: "The latitude/departure forward-locate relation is a public surveying result.",
+    governance: GOVERNANCE.general,
+    editionNote: "The forward step of a traverse: from a known point, an azimuth (clockwise from north), and a distance, the new coordinates. Az must be a whole-circle azimuth - convert a quadrant bearing (N45E) to azimuth first (the bearing-conversion tile handles the quadrant and magnetic declination). This is plane (grid) geometry, not geodetic; it ignores earth curvature and any grid scale factor, so on a mapping-grid projection apply the combined scale factor to the distance first. A computational aid; the project control and datum govern.",
+    assumptions: [
+      { name: "Azimuth basis", value: "azimuth measured clockwise from north (0-360 deg)", source: "surveying convention" },
+      { name: "Plane geometry", value: "flat-earth latitude/departure; no curvature or grid scale factor applied", source: "plane-survey assumption" },
+      { name: "Sign convention", value: "delta N positive north, delta E positive east", source: "surveying references" },
+    ],
+  },
   "building-ua": {
     formula: "cond = sum(A_i / R_i); UA_inf = 1.08 x CFM; UA = cond + UA_inf; design_load = UA x dT.",
     edition: "The whole-building heat-loss-coefficient roll-up UA = sum(A/R) + 1.08 x CFM with the design load Q = UA x dT, as compiled in the ASHRAE Fundamentals and RESNET energy-audit references, by name.",

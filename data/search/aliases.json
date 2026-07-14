@@ -15152,6 +15152,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "coordinate from bearing and distance",
+      "target": "cogo-forward-point",
+      "kind": "question"
+    },
+    {
+      "term": "new coordinate from azimuth and distance",
+      "target": "cogo-forward-point",
+      "kind": "question"
+    },
+    {
+      "term": "forward locate a point",
+      "target": "cogo-forward-point",
+      "kind": "question"
+    },
+    {
+      "term": "radial stakeout point",
+      "target": "cogo-forward-point",
+      "kind": "question"
+    },
+    {
+      "term": "northing and easting from azimuth",
+      "target": "cogo-forward-point",
+      "kind": "question"
+    },
+    {
       "term": "stadia",
       "target": "stadia-distance",
       "kind": "industry"

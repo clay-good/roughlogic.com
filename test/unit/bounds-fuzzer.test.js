@@ -16107,6 +16107,7 @@ test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the s
 
 // ===================== spec-v311..v313 field-surveying depth batch =====================
 import { computeDifferentialLeveling as _v311, computeStadiaDistance as _v312, computeTapingCorrections as _v313 } from "../../calc-survey.js";
+import { computeCogoForwardPoint as _v766 } from "../../calc-survey.js";
 
 test("bounds: spec-v311 computeDifferentialLeveling pins the HI reduction, the sum identity, the misclosure, and error seams", () => {
   const r = _v311({ bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 });
@@ -16170,6 +16171,42 @@ test("bounds: spec-v313 computeTapingCorrections pins the temp sign flip, the om
   assert.ok("error" in _v313({ l_ft: 0 }));
   assert.ok("error" in _v313({ l_ft: 100, w_plf: 1.5, p_lb: 0 })); // sag needs positive pull
   assert.ok("error" in _v313({ l_ft: Infinity }));
+});
+
+test("bounds: spec-v766 cogo-forward-point pins latitude/departure, the cardinal directions, closure round-trip, and error seams", () => {
+  // Spec example: N5000/E5000, azimuth 45, 200 ft -> dN = dE = 141.421; N2 = E2 = 5141.421.
+  const r = _v766({ start_n: 5000, start_e: 5000, azimuth_deg: 45, distance_ft: 200 });
+  assert.ok(Math.abs(r.delta_n - 200 * Math.cos(Math.PI / 4)) < 1e-9);
+  assert.ok(Math.abs(r.delta_e - 200 * Math.sin(Math.PI / 4)) < 1e-9);
+  assert.ok(Math.abs(r.delta_n - 141.42136) < 1e-4 && Math.abs(r.delta_e - 141.42136) < 1e-4);
+  assert.ok(Math.abs(r.end_n - 5141.42136) < 1e-4 && Math.abs(r.end_e - 5141.42136) < 1e-4);
+  // Cardinal azimuths: due north puts all distance in +dN, east in +dE, south -dN, west -dE.
+  const north = _v766({ start_n: 0, start_e: 0, azimuth_deg: 0, distance_ft: 100 });
+  assert.ok(Math.abs(north.delta_n - 100) < 1e-9 && Math.abs(north.delta_e) < 1e-9);
+  const east = _v766({ start_n: 0, start_e: 0, azimuth_deg: 90, distance_ft: 100 });
+  assert.ok(Math.abs(east.delta_e - 100) < 1e-9 && Math.abs(east.delta_n) < 1e-9);
+  const south = _v766({ start_n: 0, start_e: 0, azimuth_deg: 180, distance_ft: 100 });
+  assert.ok(Math.abs(south.delta_n + 100) < 1e-9);
+  const west = _v766({ start_n: 0, start_e: 0, azimuth_deg: 270, distance_ft: 100 });
+  assert.ok(Math.abs(west.delta_e + 100) < 1e-9);
+  // Round-trip: locate forward, then the reverse azimuth over the same distance returns to the start.
+  for (let i = 0; i < 200; i++) {
+    const az = (i * 1.7) % 360;
+    const d = 10 + (i % 40) * 25;
+    const n0 = 1000 + i * 3, e0 = 2000 - i * 2;
+    const out = _v766({ start_n: n0, start_e: e0, azimuth_deg: az, distance_ft: d });
+    assert.ok(!out.error, JSON.stringify({ az, d }));
+    const back = _v766({ start_n: out.end_n, start_e: out.end_e, azimuth_deg: (az + 180) % 360, distance_ft: d });
+    assert.ok(Math.abs(back.end_n - n0) < 1e-6 && Math.abs(back.end_e - e0) < 1e-6, "reverse azimuth returns to start");
+    // Distance identity: the leg length equals sqrt(dN^2 + dE^2).
+    assert.ok(Math.abs(Math.hypot(out.delta_n, out.delta_e) - d) < 1e-6, "leg length = distance");
+  }
+  // Error seams.
+  assert.ok("error" in _v766({ start_n: 0, start_e: 0, azimuth_deg: 45, distance_ft: 0 }));
+  assert.ok("error" in _v766({ start_n: 0, start_e: 0, azimuth_deg: -5, distance_ft: 100 }));
+  assert.ok("error" in _v766({ start_n: 0, start_e: 0, azimuth_deg: 361, distance_ft: 100 }));
+  assert.ok("error" in _v766({ start_n: 0, start_e: 0, azimuth_deg: 45, distance_ft: Infinity }));
+  assert.ok("error" in _v766({ start_n: NaN, start_e: 0, azimuth_deg: 45, distance_ft: 100 }));
 });
 
 // ===================== spec-v314..v316 steel beam-column-and-connection depth batch =====================

@@ -45459,6 +45459,47 @@
    }
   },
   {
+   "tile_id": "cogo-forward-point",
+   "source_publisher": "Coordinate geometry (Ghilani & Wolf; FM 5-233)",
+   "source_title": "Forward locate: N5000/E5000, azimuth 45 deg, 200 ft -> N5141.42/E5141.42",
+   "source_edition_or_year": "latitude/departure forward-locate",
+   "source_section_or_page": "dN = 200 cos45 = 141.421; dE = 200 sin45 = 141.421; N2 = 5141.421; E2 = 5141.421",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "start_n": 5000,
+    "start_e": 5000,
+    "azimuth_deg": 45,
+    "distance_ft": 200
+   },
+   "outputs": {
+    "delta_n": {
+     "value": 141.421,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "delta_e": {
+     "value": 141.421,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "end_n": {
+     "value": 5141.421,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "end_e": {
+     "value": 5141.421,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-h1-interaction",
    "source_publisher": "AISC 360-22 H1.1",
    "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",

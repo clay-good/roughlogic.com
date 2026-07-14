@@ -955,6 +955,7 @@ export const COMPUTE_MAP = {
   "level-loop-adjustment": { module: "../../calc-survey.js", fn: "computeLevelLoopAdjustment" },
   "stadia-distance": { module: "../../calc-survey.js", fn: "computeStadiaDistance" },
   "taping-corrections": { module: "../../calc-survey.js", fn: "computeTapingCorrections" },
+  "cogo-forward-point": { module: "../../calc-survey.js", fn: "computeCogoForwardPoint" },
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },

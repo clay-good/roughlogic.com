@@ -588,6 +588,7 @@ const _TILES = [
   ["soil-consolidation-settlement", "E"], ["settlement-limit-load", "E"], ["footing-eccentric-pressure", "E"], ["boussinesq-surcharge-wall", "E"],
   // spec-v311..v313 field-surveying depth batch (calc-survey.js Group P)
   ["differential-leveling", "P"], ["level-loop-adjustment", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"],
+  ["cogo-forward-point", "P"],
   // spec-v314..v316 steel beam-column-and-connection depth batch
   ["steel-h1-interaction", "E"], ["steel-effective-length-k", "E"], ["steel-bolt-tension-shear", "E"],
   // spec-v317..v319 machining depth batch (calc-machining.js Group K)
