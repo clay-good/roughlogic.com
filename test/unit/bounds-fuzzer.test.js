@@ -10730,7 +10730,7 @@ test("bounds: spec-v54 compound-miter pins chart values + rejects bad inputs", (
 // V^2/P impedance, battery period, coax loss-coefficient seams).
 // ---------------------------------------------------------------------------
 import {
-  computeFiberLossBudget as _cv28z1, computeCableTrayFill as _cv28z2, computeCctvStorage as _cv28z3,
+  computeFiberLossBudget as _cv28z1, computeCableTrayFill as _cv28z2, computeCctvStorage as _cv28z3, computeFiberMaxLength as _v693,
   computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6, computeStandbyBatteryRuntime as _v687,
 } from "../../calc-lowvoltage.js";
 
@@ -10756,6 +10756,32 @@ test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-fini
   assert.strictEqual(_cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 100, source_level: 0 }).total_loss_db, 6);
   assert.ok("error" in _cv28z6({ mode: "loss", loss_per_100ft_db: 6, length_ft: 0 }));
   assert.ok("error" in _cv28z6({ mode: "max-run", loss_per_100ft_db: 0, source_level: 0, target_level: -6 }));
+});
+
+test("bounds: spec-v693 computeFiberMaxLength pins len = 1000(budget - fixed)/att, round-trips through computeFiberLossBudget, and error seams", () => {
+  const r = _v693({ max_channel_loss_db: 2.6, attenuation_db_km: 3.0, connector_count: 2, loss_per_connector_db: 0.75, splice_count: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_length_m - 1000 * (2.6 - 1.5) / 3.0) < 1e-9, `length identity: ${r.max_length_m}`);
+  assert.ok(Math.abs(r.max_length_m - 366.6667) < 1e-3, `pinned 366.7 m: ${r.max_length_m}`);
+  // Single-mode's lower attenuation reaches farther for the same budget.
+  const smf = _v693({ max_channel_loss_db: 2.6, attenuation_db_km: 0.4, connector_count: 2, loss_per_connector_db: 0.75 });
+  assert.ok(smf.max_length_m > r.max_length_m, `smf farther: ${smf.max_length_m}`);
+  // Round-trip: at the max length the forward tile's total loss equals the budget (margin 0).
+  for (const max_channel_loss_db of [1.5, 2.6, 5.0]) {
+    for (const attenuation_db_km of [0.4, 1.5, 3.5]) {
+      // 1 connector (0.75 dB fixed) keeps room under the smallest 1.5 dB budget.
+      const m = _v693({ max_channel_loss_db, attenuation_db_km, connector_count: 1, loss_per_connector_db: 0.75, splice_count: 0, loss_per_splice_db: 0.3 });
+      assert.ok(!m.error, `sweep max=${max_channel_loss_db} att=${attenuation_db_km}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_length_m, "len"); assert.ok(m.max_length_m > 0, "len positive");
+      const back = _cv28z1({ length_m: m.max_length_m, attenuation_db_km, connector_count: 1, loss_per_connector_db: 0.75, splice_count: 0, loss_per_splice_db: 0.3, max_channel_loss_db });
+      assert.ok(Math.abs(back.total_loss_db - max_channel_loss_db) < 1e-9, `round-trip max=${max_channel_loss_db} att=${attenuation_db_km}: ${back.total_loss_db}`);
+    }
+  }
+  // Error seams: non-positive budget / attenuation, fixed losses alone meet the budget, non-finite.
+  assert.ok("error" in _v693({ max_channel_loss_db: 0, attenuation_db_km: 3 }));
+  assert.ok("error" in _v693({ max_channel_loss_db: 2.6, attenuation_db_km: 0 }));
+  assert.ok("error" in _v693({ max_channel_loss_db: 1.0, attenuation_db_km: 3, connector_count: 2, loss_per_connector_db: 0.75 }));
+  assert.ok("error" in _v693({ max_channel_loss_db: NaN, attenuation_db_km: 3 }));
 });
 
 test("bounds: spec-v687 computeStandbyBatteryRuntime pins Hs = (Ah/derate - alarm_Ah)/Is, round-trips through computeStandbyBatterySizing, and error seams", () => {

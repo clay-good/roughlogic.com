@@ -8294,6 +8294,17 @@ export const CITATIONS = {
       { name: "Component losses", value: "per-connector 0.75 dB and per-splice 0.3 dB defaults; user-supplied", source: "TIA-568 component data" },
     ],
   },
+  "fiber-max-length": {
+    formula: "len_max_m = 1000 x (max_channel_loss - connectors x loss_per_connector - splices x loss_per_splice) / attenuation_dB_km. The inverse of loss = attenuation x length_km + connectors + splices.",
+    edition: "Optical link loss budget solved for length, per the TIA-568 / TIA-526 fiber-test methods and the IEEE 802.3 channel-loss limits, by name; first-principles.",
+    freeAccess: "First-principles dB accounting. Attenuation coefficients and component losses are component-specific and user-supplied; the OTDR/power-meter field test governs the certified link.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "The longest fiber run that still passes the channel loss budget, the inverse of fiber-loss-budget: the connector and splice losses are subtracted from the budget first, and the remainder is divided by the attenuation for the fiber length: len_max = 1000 x (max_channel_loss - connector_loss - splice_loss) / attenuation. Every connector or splice eats budget that would otherwise buy distance, so a link with many patch points reaches less far than the raw fiber attenuation suggests; if the fixed losses alone meet the budget, no fiber length is available. Use the application's channel-loss limit (TIA-568 / IEEE 802.3) and the component-specific loss values; a real link is certified by an OTDR/power-meter field test, not this budget.",
+    assumptions: [
+      { name: "Fixed losses subtracted first", value: "connector and splice losses come off the budget before dividing by attenuation; if they alone meet the budget, no length remains", source: "TIA-568 loss-budget method" },
+      { name: "Component losses", value: "per-connector 0.75 dB and per-splice 0.3 dB defaults; user-supplied", source: "TIA-568 component data" },
+    ],
+  },
   "cable-tray-fill": {
     formula: "NEC 392.22(A): cables 4/0 and larger, sum of diameters <= tray inside width; smaller cables, sum of cross-sectional areas <= the column-2 allowable (~1.167 * width ladder/ventilated, ~0.917 * width solid bottom); mixed loads reduce the smaller-cable allowance by the large-cable diameters.",
     edition: "Cable-tray fill per NEC Article 392.22 (the sum-of-diameters rule for cables 4/0 and larger and the cross-sectional-area allowance for smaller cables), by name.",

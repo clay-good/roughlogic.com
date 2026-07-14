@@ -587,6 +587,8 @@ const RELATED = {
   "camera-lens-fov": ["cctv-storage", "fiber-loss-budget", "poe-budget", "structured-cabling-channel"],
   "ceiling-speaker-coverage": ["speaker-70v-line", "speaker-impedance", "time-alignment", "poe-budget"],
   "structured-cabling-channel": ["fiber-loss-budget", "poe-budget", "lv-dc-drop", "coax-rg-loss"],
+  "fiber-loss-budget": ["fiber-max-length", "poe-budget", "structured-cabling-channel", "coax-rg-loss"],
+  "fiber-max-length": ["fiber-loss-budget", "poe-budget", "structured-cabling-channel", "coax-rg-loss"],
   "transformer-kva-sizing": ["transformer-sizing", "service-load", "three-phase"],
   "short-circuit-pp": ["transformer-kva-sizing", "breaker-sizing", "arc-flash-screen"],
   "generator-motor-starting": ["generator-sizing", "motor-fla", "transformer-kva-sizing"],

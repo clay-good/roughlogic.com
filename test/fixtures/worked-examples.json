@@ -20226,6 +20226,54 @@
    }
   },
   {
+   "tile_id": "fiber-max-length",
+   "source_publisher": "TIA-568 / IEEE 802.3 (by name), inverse",
+   "source_title": "len_max = 1000 * (max_channel_loss - connector_loss - splice_loss) / attenuation",
+   "source_edition_or_year": "spec-v693 worked example (machine-verified)",
+   "source_section_or_page": "2.6 dB budget, OM4 3.0 dB/km, 2 connectors @ 0.75 dB -> 366.7 m (round-trips fiber-loss-budget)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "max_channel_loss_db": 2.6,
+    "attenuation_db_km": 3,
+    "connector_count": 2,
+    "loss_per_connector_db": 0.75,
+    "splice_count": 0
+   },
+   "outputs": {
+    "max_length_m": {
+     "value": 366.67,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fiber-max-length",
+   "source_publisher": "TIA-568 / IEEE 802.3 (by name), inverse",
+   "source_title": "cross-check: single-mode's lower attenuation reaches much farther for the same budget",
+   "source_edition_or_year": "spec-v693 cross-check (machine-verified)",
+   "source_section_or_page": "2.6 dB budget, SMF 0.4 dB/km, 2 connectors @ 0.75 dB -> 2,750 m",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "max_channel_loss_db": 2.6,
+    "attenuation_db_km": 0.4,
+    "connector_count": 2,
+    "loss_per_connector_db": 0.75,
+    "splice_count": 0
+   },
+   "outputs": {
+    "max_length_m": {
+     "value": 2750,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "cable-tray-fill",
    "source_publisher": "NEC Article 392.22(A) (by name)",
    "source_title": "cables 4/0 and larger: sum of diameters <= tray inside width",

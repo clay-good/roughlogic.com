@@ -664,6 +664,7 @@ export const COMPUTE_MAP = {
   "equal-spacing": { module: "../../calc-layout.js", fn: "computeEqualSpacing" },
   // spec-v28 low-voltage / data / security cabling.
   "fiber-loss-budget": { module: "../../calc-lowvoltage.js", fn: "computeFiberLossBudget" },
+  "fiber-max-length": { module: "../../calc-lowvoltage.js", fn: "computeFiberMaxLength" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },
   "cctv-storage": { module: "../../calc-lowvoltage.js", fn: "computeCctvStorage" },
   "speaker-70v-line": { module: "../../calc-lowvoltage.js", fn: "computeSpeaker70vLine" },

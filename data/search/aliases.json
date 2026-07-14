@@ -32047,6 +32047,31 @@
       "kind": "question"
     },
     {
+      "term": "max fiber length for a loss budget",
+      "target": "fiber-max-length",
+      "kind": "industry"
+    },
+    {
+      "term": "how far can i run this fiber",
+      "target": "fiber-max-length",
+      "kind": "industry"
+    },
+    {
+      "term": "longest fiber run to pass loss spec",
+      "target": "fiber-max-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fiber distance from db budget",
+      "target": "fiber-max-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "max cable distance for a channel loss",
+      "target": "fiber-max-length",
+      "kind": "adjacent"
+    },
+    {
       "term": "how many cables in a cable tray",
       "target": "cable-tray-fill",
       "kind": "question"

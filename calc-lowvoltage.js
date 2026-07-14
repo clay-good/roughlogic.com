@@ -101,6 +101,62 @@ function _renderFiberLossBudget(inputRegion, outputRegion, citationEl) {
 }
 LOWVOLTAGE_RENDERERS["fiber-loss-budget"] = _renderFiberLossBudget;
 
+// dims: in { max_channel_loss_db: dimensionless, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless } out: { max_length_m: L, max_length_ft: L }
+export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const maxch = Number(max_channel_loss_db);
+  const att = Number(attenuation_db_km);
+  if (!(maxch > 0)) return { error: "Max channel loss must be positive (dB)." };
+  if (!(att > 0)) return { error: "Attenuation coefficient must be positive (dB/km)." };
+  const nc = Math.max(0, Number(connector_count) || 0);
+  const ns = Math.max(0, Number(splice_count) || 0);
+  const lpc = Number(loss_per_connector_db) || 0;
+  const lps = Number(loss_per_splice_db) || 0;
+  const fixed_loss_db = nc * lpc + ns * lps;
+  const fiber_budget_db = maxch - fixed_loss_db;
+  if (!(fiber_budget_db > 0)) return { error: "The connector and splice losses alone (" + fmt(fixed_loss_db, 2) + " dB) meet or exceed the channel budget; no fiber length is available (reduce connectors/splices or raise the budget)." };
+  // Inverse of total_loss = (len/1000) x att + connectors + splices, at total_loss = max_channel_loss:
+  // len_max = 1000 x (max_channel_loss - fixed_loss) / att.
+  const max_length_m = 1000 * fiber_budget_db / att;
+  if (!Number.isFinite(max_length_m) || !(max_length_m > 0)) return { error: "Length math is not a finite positive value." };
+  return {
+    max_length_m, max_length_ft: max_length_m * 3.280839895013123, fixed_loss_db, fiber_budget_db,
+    note: "The longest fiber run that still passes the channel loss budget, the inverse of the fiber-loss-budget tile: the connector and splice losses are subtracted from the budget first, and the remainder divided by the attenuation gives the fiber length: len_max = 1000 x (max_channel_loss - connector_loss - splice_loss) / attenuation. Every connector or splice you add eats budget that would otherwise buy distance, which is why a link with many patch points reaches less far than the raw fiber attenuation suggests. Use the application's channel-loss limit (TIA-568 / IEEE 802.3) and the component-specific loss values; a real link is certified by an OTDR/power-meter field test, not this budget. A planning estimate; the field test governs."
+  };
+}
+export const fiberMaxLengthExample = { inputs: { max_channel_loss_db: 2.6, attenuation_db_km: 3.0, connector_count: 2, loss_per_connector_db: 0.75, splice_count: 0, loss_per_splice_db: 0.3 } };
+
+function _renderFiberMaxLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: optical link loss budget solved for length: len_max = 1000 x (max_channel_loss - connector_loss - splice_loss) / attenuation, per TIA-568 / TIA-526 fiber-test methods and IEEE 802.3 channel-loss limits, by name. Component losses user-supplied; the OTDR/power-meter field test governs the certified link.";
+  const fiber = makeSelect("Fiber / wavelength (sets default dB/km)", "fml-fiber", [
+    { value: "om4-850", label: "OM4 @ 850 nm", selected: true }, { value: "om3-850", label: "OM3 @ 850 nm" },
+    { value: "om5-850", label: "OM5 @ 850 nm" }, { value: "om4-1300", label: "OM4 @ 1300 nm" },
+    { value: "smf-1310", label: "Single-mode @ 1310 nm" }, { value: "smf-1550", label: "Single-mode @ 1550 nm" },
+  ]);
+  const maxch = makeNumber("Max channel loss (dB)", "fml-max", { step: "any", min: "0" });
+  const att = makeNumber("Attenuation (dB/km)", "fml-att", { step: "any", min: "0" });
+  const nc = makeNumber("Connector pairs", "fml-nc", { step: "1", min: "0" });
+  const lpc = makeNumber("Loss per connector (dB)", "fml-lpc", { step: "any", min: "0", value: "0.75" });
+  const ns = makeNumber("Splices", "fml-ns", { step: "1", min: "0" });
+  const lps = makeNumber("Loss per splice (dB)", "fml-lps", { step: "any", min: "0", value: "0.3" });
+  lpc.input.value = "0.75"; lps.input.value = "0.3";
+  for (const f of [fiber, maxch, att, nc, lpc, ns, lps]) inputRegion.appendChild(f.wrap);
+  function fillAtt() { const d = _FIBER_DEFAULT_ATT[fiber.select.value]; if (d) att.input.value = String(d); }
+  fillAtt();
+  attachExampleButton(inputRegion, () => { fiber.select.value = "om4-850"; fillAtt(); maxch.input.value = "2.6"; nc.input.value = "2"; lpc.input.value = "0.75"; ns.input.value = "0"; lps.input.value = "0.3"; update(); });
+  const oLen = makeOutputLine(outputRegion, "Max fiber length", "fml-out-len");
+  const oNote = makeOutputLine(outputRegion, "Note", "fml-out-note");
+  const update = debounce(() => {
+    const r = computeFiberMaxLength({ max_channel_loss_db: Number(maxch.input.value) || 0, attenuation_db_km: Number(att.input.value) || 0, connector_count: Number(nc.input.value) || 0, loss_per_connector_db: Number(lpc.input.value) || 0, splice_count: Number(ns.input.value) || 0, loss_per_splice_db: Number(lps.input.value) || 0 });
+    if (r.error) { oLen.textContent = r.error; oNote.textContent = ""; return; }
+    oLen.textContent = fmt(r.max_length_m, 0) + " m (" + fmt(r.max_length_ft, 0) + " ft)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [maxch.input, att.input, nc.input, lpc.input, ns.input, lps.input]) f.addEventListener("input", update);
+  fiber.select.addEventListener("change", () => { fillAtt(); update(); });
+}
+LOWVOLTAGE_RENDERERS["fiber-max-length"] = _renderFiberMaxLength;
+
 // ---------------------------------------------------------------------
 // Z.2 Cable tray fill (cable-tray-fill) - NEC 392.22(A)
 // ---------------------------------------------------------------------
