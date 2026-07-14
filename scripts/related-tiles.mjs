@@ -817,6 +817,7 @@ const RELATED = {
   "ladder-pipe-reach": ["master-stream", "aerial-ladder"],
   "braking-distance": ["stopping-sight-distance"],
   "confined-space-purge": ["confined-space-vent", "smoke-reading"],
+  "fall-arrest-clearance": ["sling-angle", "rope-ma", "confined-space-purge"],
   "sling-angle": ["rope-ma", "rigging-check", "ladder-angle"],
   "search-track-spacing": ["search-probability", "area-by-coordinates", "pacing-distance"],
   "sweat-rate-hydration": ["heat-stress", "wind-chill", "backcountry-needs"],

@@ -696,6 +696,8 @@ const TOOL_MODULES = (() => {
     "searcher-hours",
     // spec-v614
     "sweep-width-correction",
+    // spec-v779
+    "fall-arrest-clearance",
   ]);
   // spec-v248..v250 fire-sprinkler system-design trio: a new lazy Group F
   // cluster split off beside calc-fire.js exactly as calc-rescue.js was (the

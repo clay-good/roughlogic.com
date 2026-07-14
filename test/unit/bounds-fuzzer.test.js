@@ -23481,6 +23481,43 @@ test("bounds: spec-v614 computeSweepWidthCorrection pins the corrected width, th
   assert.ok("error" in _v614({ uncorrected_width_ft: 120, weather_factor: 0.5, fatigue_factor: 1.05 }));
 });
 
+import { computeFallArrestClearance as _v779 } from "../../calc-rescue.js";
+
+test("bounds: spec-v779 fall-arrest-clearance pins RFC = FF+DD+HH+SF, the adequacy check, additivity, and error seams", () => {
+  // Spec example: 6 + 3.5 + 5 + 3 = 17.5 ft required; no available -> margin null.
+  const r = _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.required_clearance_ft - 17.5) < 1e-12);
+  assert.strictEqual(r.margin_ft, null);
+  assert.strictEqual(r.adequate, null);
+  // Adequacy: 20 ft available clears (margin 2.5, adequate); 15 ft does not.
+  const ok = _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 20 });
+  assert.ok(Math.abs(ok.margin_ft - 2.5) < 1e-12 && ok.adequate === true);
+  const bad = _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 15 });
+  assert.ok(Math.abs(bad.margin_ft - (-2.5)) < 1e-12 && bad.adequate === false);
+  // Exactly at RFC is adequate (margin 0).
+  const edge = _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 3, available_clearance_ft: 17.5 });
+  assert.ok(Math.abs(edge.margin_ft) < 1e-12 && edge.adequate === true);
+  // Additivity: RFC is exactly the sum of the four terms across a sweep; each term adds one-for-one.
+  for (let i = 0; i < 120; i++) {
+    const ff = (i % 12) * 0.5;
+    const dd = (i % 8) * 0.4;
+    const hh = 4 + (i % 4) * 0.5;
+    const sf = (i % 5);
+    const m = _v779({ free_fall_distance_ft: ff, deceleration_distance_ft: dd, worker_height_ft: hh, safety_margin_ft: sf });
+    assert.ok(!m.error, JSON.stringify({ ff, dd, hh, sf }));
+    assert.ok(Math.abs(m.required_clearance_ft - (ff + dd + hh + sf)) < 1e-9, "RFC = sum");
+    const more = _v779({ free_fall_distance_ft: ff + 1, deceleration_distance_ft: dd, worker_height_ft: hh, safety_margin_ft: sf });
+    assert.ok(Math.abs(more.required_clearance_ft - (m.required_clearance_ft + 1)) < 1e-9, "one-for-one in free fall");
+  }
+  // Error seams.
+  assert.ok("error" in _v779({ free_fall_distance_ft: -1, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 2 }));
+  assert.ok("error" in _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: -1, worker_height_ft: 5, safety_margin_ft: 2 }));
+  assert.ok("error" in _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 0, safety_margin_ft: 2 }));
+  assert.ok("error" in _v779({ free_fall_distance_ft: 6, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: -1 }));
+  assert.ok("error" in _v779({ free_fall_distance_ft: Infinity, deceleration_distance_ft: 3.5, worker_height_ft: 5, safety_margin_ft: 2 }));
+});
+
 import { computeThreePointBridle as _v615 } from "../../calc-rigging.js";
 
 test("bounds: spec-v615 computeThreePointBridle pins the symmetric closed form, the asymmetric split, vertical equilibrium, and error seams", () => {

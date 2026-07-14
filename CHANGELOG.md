@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rescue): spec-v779 required fall-arrest clearance (ANSI Z359); 2026-07-14
+
+- New tile `fall-arrest-clearance` (Group F, calc-rescue.js): the clearance a personal fall-arrest system needs below the
+  anchor -- `RFC = free-fall distance + deceleration distance + worker height (D-ring to feet) + safety margin`. A 6 ft
+  free fall, 3.5 ft deceleration (the Z359 lanyard cap), 5 ft worker, and 3 ft margin needs 17.5 ft; an optional available
+  clearance flags adequate / not-adequate. All four terms are explicit inputs. Fuzzer pins the additivity and the
+  adequacy check. calc-rescue.js gzip cap 8000 -> 9500 B. Home count 1,227 -> 1,228.
+
 ### feat(agriculture): spec-v778 feed conversion ratio and average daily gain; 2026-07-14
 
 - New tile `feed-conversion-ratio` (Group L, calc-agriculture.js): two livestock production metrics from a feeding

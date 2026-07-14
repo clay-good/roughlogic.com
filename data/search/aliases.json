@@ -5027,6 +5027,31 @@
       "kind": "industry"
     },
     {
+      "term": "fall arrest clearance",
+      "target": "fall-arrest-clearance",
+      "kind": "industry"
+    },
+    {
+      "term": "required fall clearance",
+      "target": "fall-arrest-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "fall clearance below anchor",
+      "target": "fall-arrest-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "how much clearance for a harness",
+      "target": "fall-arrest-clearance",
+      "kind": "question"
+    },
+    {
+      "term": "z359 fall clearance",
+      "target": "fall-arrest-clearance",
+      "kind": "question"
+    },
+    {
       "term": "how many cords of firewood",
       "target": "firewood-cord",
       "kind": "question"

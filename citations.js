@@ -5452,6 +5452,18 @@ export const CITATIONS = {
       { name: "Detection model", value: "exponential (random-search) POD = 1 - e^(-coverage); conservative vs parallel-track", source: "NSARC / USCG" },
     ],
   },
+  "fall-arrest-clearance": {
+    formula: "required_clearance = free_fall_distance + deceleration_distance + worker_height (D-ring to feet) + safety_margin; margin = available_clearance - required_clearance; adequate when margin >= 0.",
+    edition: "ANSI Z359.1 (Fall Protection Code) and OSHA 1926 Subpart M fall-clearance calculation, by name.",
+    freeAccess: "The additive fall-clearance model is public (ANSI Z359 / OSHA 1926 Subpart M); OSHA standards are free at osha.gov, the Z359 standards are licensed.",
+    governance: GOVERNANCE.fire,
+    editionNote: "The vertical clearance a personal fall-arrest system needs below the anchor so the worker does not strike a lower level: RFC = free-fall distance + deceleration distance + worker height (harness D-ring to the feet) + a safety margin. Each term is entered explicitly because the free-fall distance depends on the anchor position relative to the D-ring (a foot-level anchor produces a large free fall, an overhead anchor a small one) and the connector length; the deceleration distance is the energy absorber's stroke, capped at 3.5 ft for a shock-absorbing lanyard per ANSI Z359.1 (a self-retracting lifeline is far less); the worker height D-ring-to-feet is about 5 ft; and the safety margin (commonly 2-3 ft) keeps the feet off the level. If the available clearance is less than RFC the worker contacts the lower level before arrest. A planning aid; the equipment manufacturer's instructions and a qualified/competent person govern the actual system.",
+    assumptions: [
+      { name: "Additive model", value: "RFC = free fall + deceleration + worker height + safety margin", source: "ANSI Z359 / OSHA 1926 Subpart M" },
+      { name: "Deceleration cap", value: "3.5 ft max energy-absorber stroke for a shock-absorbing lanyard; an SRL is much less", source: "ANSI Z359.1" },
+      { name: "Free-fall basis", value: "depends on the anchor position relative to the D-ring and the connector length", source: "fall-protection practice" },
+    ],
+  },
   "searcher-hours": {
     formula: "track_ft = 43,560 x area_acres / track_spacing_ft; searcher_hours = track_ft / (speed_mph x 5,280); team_clock_hr = searcher_hours / searchers.",
     edition: "NSARC / USCG search-planning practice (effort = area over spacing over speed), by name.",
