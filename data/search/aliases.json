@@ -15992,6 +15992,26 @@
       "kind": "industry"
     },
     {
+      "term": "safe curve speed",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "max speed for curve",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "redirect"
+    },
+    {
+      "term": "speed from radius and bank",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how fast can I take a curve",
+      "target": "superelevation-safe-curve-speed",
+      "kind": "adjacent"
+    },
+    {
       "term": "minimum curve radius",
       "target": "superelevation",
       "kind": "industry"

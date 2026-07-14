@@ -614,6 +614,7 @@ export const COMPUTE_MAP = {
   "hiking-time": { module: "../../calc-field.js", fn: "computeHikingTime" },
   "horizontal-curve": { module: "../../calc-civil.js", fn: "computeHorizontalCurve" },
   "superelevation": { module: "../../calc-civil.js", fn: "computeSuperelevation" },
+  "superelevation-safe-curve-speed": { module: "../../calc-civil.js", fn: "computeSuperelevationSafeCurveSpeed" },
   "vertical-curve-sight-distance": { module: "../../calc-civil.js", fn: "computeVerticalCurveSightDistance" },
   "sag-vertical-curve": { module: "../../calc-civil.js", fn: "computeSagVerticalCurve" },
   "sag-vertical-curve-comfort": { module: "../../calc-civil.js", fn: "computeSagVerticalCurveComfort" },

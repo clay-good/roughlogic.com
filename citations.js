@@ -6706,6 +6706,18 @@ export const CITATIONS = {
   },
 
   // ---- spec-v25 civil curve / earthwork / grading (Group E) ----
+  "superelevation-safe-curve-speed": {
+    formula: "V = sqrt( 15 R (e + f) ) mph, the inverse of the AASHTO point-mass e + f = V^2/(15 R). R in ft.",
+    edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) point-mass curve model, solved for the speed, by name.",
+    freeAccess: "The AASHTO point-mass relation is published in the Green Book; the side-friction design factors are in its speed table. AHJ, state DOT design manual, and the licensed civil engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum safe speed a curve supports, the inverse of the AASHTO Green Book point-mass relation: V = sqrt( 15 R (e + f) ) mph from the radius R, the superelevation e, and the side-friction factor f. The side-friction factor f decreases with design speed (about 0.16 at 30 mph to 0.08 at 80 mph), so use the f for the resulting speed band and iterate once if the answer lands in a different band - a higher f borrowed from a lower speed over-predicts the safe speed. This is the point-mass model; it ignores grade, the superelevation runoff/transition and spiral, and the driver comfort a full geometric design covers. A design/check aid, not a substitute for a licensed civil engineer's geometric design.",
+    assumptions: [
+      { name: "Point-mass model", value: "V = sqrt( 15 R (e + f) ), V in mph and R in ft", source: "AASHTO Green Book" },
+      { name: "Side-friction factor", value: "use the AASHTO f for the resulting speed band (about 0.16 at 30 mph to 0.08 at 80 mph); iterate once", source: "AASHTO Green Book speed table" },
+      { name: "Not a runoff/spiral design", value: "ignores grade, the transition/spiral, and driver comfort", source: "scope of this tile" },
+    ],
+  },
   "superelevation": {
     formula: "e + f = V^2/(15 R); required e = V^2/(15 R) - f; minimum radius R_min = V^2/(15(e_max + f)). V in mph, R in ft.",
     edition: "The AASHTO A Policy on Geometric Design of Highways and Streets (the Green Book) point-mass curve model, by name.",

@@ -442,6 +442,47 @@ function renderSuperelevation(inputRegion, outputRegion, citationEl) {
 }
 CIVIL_RENDERERS["superelevation"] = renderSuperelevation;
 
+// superelevation-safe-curve-speed: inverse of superelevation. The forward tile solves for the superelevation or the
+// minimum radius from the design speed; the inverse recovers the maximum safe speed a curve supports from its radius,
+// superelevation (bank), and side-friction factor. From the AASHTO point-mass relation e + f = V^2 / (15 R),
+// V = sqrt( 15 R (e + f) ). V in mph, R in ft.
+// dims: in { R_ft: L, e: dimensionless, f: dimensionless } out: { v_mph: dimensionless }
+export function computeSuperelevationSafeCurveSpeed({ R_ft, e, f } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(R_ft) || 0;
+  const ee = Number(e) || 0;
+  const ff = Number(f) || 0;
+  if (!(R > 0)) return { error: "Curve radius must be greater than zero (ft)." };
+  if (!(ee + ff > 0)) return { error: "The superelevation plus the side-friction factor (e + f) must be positive." };
+  const v_mph = Math.sqrt(15 * R * (ee + ff));
+  if (!Number.isFinite(v_mph)) return { error: "Safe-speed math is not a finite value." };
+  return {
+    v_mph,
+    note: "AASHTO point-mass safe-curve speed: from e + f = V^2 / (15 R), V = sqrt( 15 R (e + f) ) mph, the maximum speed the superelevation e plus the side-friction f supports on a curve of radius R. The side-friction factor f is the AASHTO design value that DECREASES with speed, so use the f for the resulting speed range (iterate once if it lands in a different band) - a higher f borrowed from a lower speed over-predicts the safe speed. This is the point-mass model; it ignores grade, the runoff/transition, and the driver comfort a full geometric design covers. A design/check aid, not a substitute for a licensed civil engineer's geometric design.",
+  };
+}
+export const superelevationSafeCurveSpeedExample = { inputs: { R_ft: 1500, e: 0.08, f: 0.12 } };
+
+function renderSuperelevationSafeCurveSpeed(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO point-mass curve model e + f = V^2/(15 R) (A Policy on Geometric Design of Highways and Streets, the Green Book) solved for the speed: V = sqrt( 15 R (e + f) ) mph. The side-friction factor f is from the AASHTO design-speed table and decreases with speed. A design aid, not a substitute for a licensed civil engineer's geometric design.";
+  const R = makeNumber("Curve radius R (ft)", "ses-r", { step: "any", min: "0", value: "1500" }); R.input.value = "1500";
+  const e = makeNumber("Superelevation e (e.g. 0.08)", "ses-e", { step: "any", value: "0.08" }); e.input.value = "0.08";
+  const f = makeNumber("Side-friction factor f", "ses-f", { step: "any", min: "0", value: "0.12" }); f.input.value = "0.12";
+  for (const fld of [R, e, f]) inputRegion.appendChild(fld.wrap);
+  attachExampleButton(inputRegion, () => { R.input.value = "1500"; e.input.value = "0.08"; f.input.value = "0.12"; update(); });
+  const oV = makeOutputLine(outputRegion, "Maximum safe speed", "ses-out-v");
+  const oNote = makeOutputLine(outputRegion, "Note", "ses-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeSuperelevationSafeCurveSpeed({ R_ft: readNum(R.input), e: readNum(e.input), f: readNum(f.input) });
+    if (r.error) { oV.textContent = r.error; oNote.textContent = ""; return; }
+    oV.textContent = fmt(r.v_mph, 1) + " mph";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const fld of [R.input, e.input, f.input]) fld.addEventListener("input", update);
+}
+CIVIL_RENDERERS["superelevation-safe-curve-speed"] = renderSuperelevationSafeCurveSpeed;
+
 // --- v336 E.x: Minimum crest vertical-curve length for SSD (`vertical-curve-sight-distance`) ---
 // AASHTO crest curve: L = A S^2 / C when S <= L, else L = 2 S - C/A, where C is
 // the sight constant (2158 SSD crest, 2800 passing) embedding a 3.5 ft eye and

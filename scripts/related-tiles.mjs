@@ -111,6 +111,7 @@ const RELATED = {
   "livestock-dry-matter-intake": ["pearson-square-ration", "livestock-water-requirement", "hay-dry-matter", "cattle-stocking-rate"],
   "manure-application-rate": ["npk-blend", "livestock-dry-matter-intake", "crop-yield", "irrigation-requirement"],
   "superelevation": ["horizontal-curve", "vertical-curve-sight-distance", "horizontal-sightline-offset", "stopping-sight-distance"],
+  "superelevation-safe-curve-speed": ["superelevation", "horizontal-curve", "stopping-sight-distance"],
   "vertical-curve-sight-distance": ["vertical-curve", "stopping-sight-distance", "superelevation", "horizontal-sightline-offset"],
   "sag-vertical-curve": ["vertical-curve-sight-distance","stopping-sight-distance","superelevation","sag-vertical-curve-comfort"],
   "sag-vertical-curve-comfort": ["sag-vertical-curve","vertical-curve-sight-distance","stopping-sight-distance","superelevation"],

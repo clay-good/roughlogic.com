@@ -16496,6 +16496,26 @@ test("bounds: spec-v335 computeSuperelevation pins both modes, the no-bank case,
   assert.ok("error" in _v335({ mode: "e", V_mph: Infinity, R_ft: 1500, f: 0.12 }));
 });
 
+import { computeSuperelevationSafeCurveSpeed as _v756 } from "../../calc-civil.js";
+test("bounds: spec-v756 safe curve speed from radius and superelevation (inverse of superelevation)", () => {
+  const p = _v756({ R_ft: 1500, e: 0.08, f: 0.12 });
+  assert.ok(Math.abs(p.v_mph - 67.082) < 0.01);
+  // round-trip: the recovered speed fed to superelevation (mode e) at the same radius/f gives back e
+  for (const [R, e, f] of [[1500, 0.08, 0.12], [1000, 0.06, 0.14], [2500, 0.04, 0.10], [800, 0.10, 0.16]]) {
+    const inv = _v756({ R_ft: R, e, f });
+    const fwd = _v335({ mode: "e", V_mph: inv.v_mph, R_ft: R, f });
+    assert.ok(Math.abs(fwd.e_req - e) < 1e-9);
+  }
+  // a larger radius or a higher bank+friction supports a higher speed
+  assert.ok(_v756({ R_ft: 3000, e: 0.08, f: 0.12 }).v_mph > _v756({ R_ft: 1500, e: 0.08, f: 0.12 }).v_mph);
+  assert.ok(_v756({ R_ft: 1500, e: 0.10, f: 0.14 }).v_mph > _v756({ R_ft: 1500, e: 0.08, f: 0.12 }).v_mph);
+  // error seams: non-positive radius, e+f <= 0, non-finite
+  assert.ok("error" in _v756({ R_ft: 0, e: 0.08, f: 0.12 }));
+  assert.ok("error" in _v756({ R_ft: 1500, e: -0.12, f: 0.12 })); // e + f = 0
+  assert.ok("error" in _v756({ R_ft: 1500, e: -0.2, f: 0.1 })); // e + f < 0
+  assert.ok("error" in _v756({ R_ft: Infinity, e: 0.08, f: 0.12 }));
+});
+
 test("bounds: spec-v336 computeVerticalCurveSightDistance pins the branch switch, K, and error seams", () => {
   const a = _v336({ A_pct: 5, S_ft: 570, C: 2158 });
   assert.ok(Math.abs(a.L_ft - 752.8) < 1);

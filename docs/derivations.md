@@ -1507,6 +1507,7 @@ cross-check.
 | calc-civil.js | `computeSagVerticalCurveComfort` | `{ A_pct, V_mph } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSlopeStakeCutFill` | `{ existing_elev_ft, design_elev_ft, slope_ratio_h, offset_at_hinge_ft } = {}` | _ | _ | _ |
 | calc-civil.js | `computeSuperelevation` | `{ mode, V_mph, R_ft, e_max, f } = {}` | _ | _ | _ |
+| calc-civil.js | `computeSuperelevationSafeCurveSpeed` | `{ R_ft, e, f } = {}` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurve` | `{ g1_pct, g2_pct, length_ft, pvi_station_ft, pvi_elevation_ft, eval_station_f...` | _ | _ | _ |
 | calc-civil.js | `computeVerticalCurveSightDistance` | `{ A_pct, S_ft, C } = {}` | _ | _ | _ |
 | calc-concrete.js | `computeConcreteAnchorBlowout` | `{ edge_distance_in = 0, head_bearing_area_in2 = 0, fc_psi = 0, embedment_in =...` | _ | _ | _ |
@@ -2865,7 +2866,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1451.
+Row count: 1452.
 
 <!-- END function-corpus-v14 -->
 
@@ -3403,7 +3404,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (255 tiles)
+### Group E Construction (256 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3625,6 +3626,7 @@ per spec-v14 §13.1 second paragraph.
 | `steel-web-local-strength` | Steel Web Local Yielding and Crippling (AISC 360 J10) | AISC 360-22 J10.2 / J10.3; spec-v293 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `submerged-earth-pressure` | Submerged-Backfill Earth Pressure (Buoyant + Hydrostatic) | Rankine effective-stress as compiled ...; spec-v625 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `superelevation` | Superelevation / Min Curve Radius (AASHTO) | AASHTO Green Book; spec-v335 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `superelevation-safe-curve-speed` | Safe Curve Speed from Radius and Superelevation | AASHTO Green Book (solved for speed); spec-v756 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `t-beam-effective-flange-width` | T-Beam Effective Flange Width (ACI 318-19 6.3.2) | ACI 318-19 6.3.2; spec-v393 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermal-stress-max-deltat` | Max Temperature Change for a Stress Limit | mechanics of materials (inverse); spec-v674 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `thermal-stress-restrained` | Restrained Thermal Stress and Force | mechanics of materials; spec-v360 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4255,6 +4257,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1204. Fixture-covered or reference-cadence: 1204 / 1204.
+Tile count: 1205. Fixture-covered or reference-cadence: 1205 / 1205.
 
 <!-- END tile-index-v14 -->

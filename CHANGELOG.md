@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(civil): spec-v756 safe curve speed from radius and superelevation (superelevation speed inverse); 2026-07-14
+
+- New tile `superelevation-safe-curve-speed` (Group E, calc-civil.js): the maximum safe speed a curve supports from its
+  radius, superelevation, and side-friction factor. `V = sqrt( 15 R (e + f) )`. A 1,500 ft radius at e 0.08, f 0.12
+  supports ~67 mph. The speed is always an input in the forward tile's modes; this solves the remaining variable.
+  Round-trips through `superelevation`. Opens Explore sweep #15. Home tile count 1,204 -> 1,205.
+- citations.js gzip cap 410000 -> 440000 B: the 30 inverse-tile citation blocks added this session (v727-v756) crossed
+  the old cap (100.1%). Lazy-loaded (prerendered into shells at build), not in the home-view payload.
+
 ### feat(gas): spec-v755 gas leak equivalent hole diameter (gas-leak-rate inverse); 2026-07-14
 
 - New tile `gas-leak-hole-diameter` (Group B, calc-gas.js): the equivalent orifice (hole) diameter from a measured gas
