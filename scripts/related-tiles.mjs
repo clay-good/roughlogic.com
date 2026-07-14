@@ -1318,6 +1318,7 @@ const RELATED = {
   "condenser-heat-rejection": ["refrigeration-cop","refrigerant-mass-flow","cooling-tower"],
   "walk-in-cooler-load": ["product-pull-down-load","evaporator-td-dtd","refrigeration-cop","condenser-heat-rejection"],
   "product-pull-down-load": ["walk-in-cooler-load","evaporator-td-dtd","refrigeration-cop","refrigerant-mass-flow"],
+  "product-pull-down-time": ["product-pull-down-load","walk-in-cooler-load","evaporator-td-dtd","refrigeration-cop"],
   "evaporator-td-dtd": ["approach-delta-t","superheat-subcool","walk-in-cooler-load","product-pull-down-load"],
   "flash-gas-subcool": ["superheat-subcool", "refrigerant-velocity", "refrigerant-charge"],
   "hydronic-buffer-tank": ["expansion-tank", "boiler-pipe-sizing", "compressor-short-cycle"],

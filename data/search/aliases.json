@@ -56807,6 +56807,31 @@
       "kind": "question"
     },
     {
+      "term": "how long to pull down the walk in cooler",
+      "target": "product-pull-down-time",
+      "kind": "question"
+    },
+    {
+      "term": "product pulldown time from capacity",
+      "target": "product-pull-down-time",
+      "kind": "question"
+    },
+    {
+      "term": "hours to cool product to storage",
+      "target": "product-pull-down-time",
+      "kind": "question"
+    },
+    {
+      "term": "will the box pull down in 24 hours",
+      "target": "product-pull-down-time",
+      "kind": "question"
+    },
+    {
+      "term": "pull down time from btu capacity",
+      "target": "product-pull-down-time",
+      "kind": "question"
+    },
+    {
       "term": "will my sheathing get wet in winter",
       "target": "wall-condensation-gradient",
       "kind": "question"

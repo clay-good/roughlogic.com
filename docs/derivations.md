@@ -2474,6 +2474,7 @@ cross-check.
 | calc-refrigerant.js | `computeEvaporatorTdDtd` | `{ box_temp_f = 0, sst_f = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeFlashGasSubcool` | `{ vertical_lift_ft = 0, friction_dp_psi = 0, static_gradient = 0.43, pt_slope...` | _ | _ | _ |
 | calc-refrigerant.js | `computeProductPullDownLoad` | `{ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, ...` | _ | _ | _ |
+| calc-refrigerant.js | `computeProductPullDownTime` | `{ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, ...` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantCharge` | `{ refrigerant, sections = [] }` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantCharging` | `{ refrigerant = "R_410A", suction_pressure = 0, suction_unit = "psig", suctio...` | _ | _ | _ |
 | calc-refrigerant.js | `computeRefrigerantMassFlow` | `{ q = 0, unit_tons = 0, h1_btulb = 0, h4_btulb = 0 } = {}` | _ | _ | _ |
@@ -2806,7 +2807,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1392.
+Row count: 1393.
 
 <!-- END function-corpus-v14 -->
 
@@ -3140,7 +3141,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (123 tiles)
+### Group C HVAC (124 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3241,6 +3242,7 @@ per spec-v14 §13.1 second paragraph.
 | `pipe-heat-loss-radial` | Insulated Pipe Heat Loss (Radial) | Fourier cylindrical-shell conduction ...; r1=1 in, r2=2 in, k=0.25, 200 vs 70 F -> ~24.55 BTU/hr-ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pitot-traverse-cfm` | Pitot Traverse Airflow (Velocity Pressure to CFM) | ASHRAE Fundamentals / AABC-NEBB; spec-v385 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `product-pull-down-load` | Product Pull-Down Load | ASHRAE Refrigeration; spec-v433 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `product-pull-down-time` | Product Pull-Down Time | ASHRAE Refrigeration; spec-v698 section 2.1 pinned example (inverse of spec-v433) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pump-specific-speed` | Pump Specific Speed and Impeller Type | Hydraulic Institute specific speed; spec-v307 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pump-suction-specific-speed` | Pump Suction Specific Speed (Nss) | Hydraulic Institute suction specific ...; spec-v629 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `radiant-floor-output` | Radiant Floor Heat Output | radiant-panel practice; spec-v442 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4138,6 +4140,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1146. Fixture-covered or reference-cadence: 1146 / 1146.
+Tile count: 1147. Fixture-covered or reference-cadence: 1147 / 1147.
 
 <!-- END tile-index-v14 -->

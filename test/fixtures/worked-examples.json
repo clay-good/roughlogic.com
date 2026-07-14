@@ -50493,6 +50493,36 @@
    }
   },
   {
+   "tile_id": "product-pull-down-time",
+   "source_publisher": "ASHRAE Refrigeration",
+   "source_title": "2000 lb produce, cp 0.9, 80->35 F, 3,375 Btu/hr product capacity -> 24 hr",
+   "source_edition_or_year": "spec worked example (machine-verified)",
+   "source_section_or_page": "spec-v698 section 2.1 pinned example (inverse of spec-v433)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "mass_lb": 2000,
+    "cp_above": 0.9,
+    "t_enter_f": 80,
+    "t_storage_f": 35,
+    "capacity_btuh": 3375
+   },
+   "outputs": {
+    "hours": {
+     "value": 24,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "q_btu": {
+     "value": 81000,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    }
+   }
+  },
+  {
    "tile_id": "evaporator-td-dtd",
    "source_publisher": "ASHRAE Refrigeration",
    "source_title": "35 F box, 25 F SST -> 10 F TD, ~90% RH (produce)",

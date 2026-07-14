@@ -919,6 +919,7 @@ export const COMPUTE_MAP = {
   "condenser-heat-rejection": { module: "../../calc-refrigerant.js", fn: "computeCondenserHeatRejection" },
   "walk-in-cooler-load": { module: "../../calc-refrigerant.js", fn: "computeWalkInCoolerLoad" },
   "product-pull-down-load": { module: "../../calc-refrigerant.js", fn: "computeProductPullDownLoad" },
+  "product-pull-down-time": { module: "../../calc-refrigerant.js", fn: "computeProductPullDownTime" },
   "evaporator-td-dtd": { module: "../../calc-refrigerant.js", fn: "computeEvaporatorTdDtd" },
   "flash-gas-subcool": { module: "../../calc-refrigerant.js", fn: "computeFlashGasSubcool" },
   "hydronic-buffer-tank": { module: "../../calc-hvacsystems.js", fn: "computeHydronicBufferTank" },

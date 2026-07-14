@@ -825,6 +825,52 @@ function _v433renderProductPullDownLoad(inputRegion, outputRegion, citationEl) {
 }
 REFRIGERANT_RENDERERS["product-pull-down-load"] = _v433renderProductPullDownLoad;
 
+// product-pull-down-time: inverse of product-pull-down-load. The forward tile
+// gives rate = Q / hours; given the refrigeration capacity dedicated to the
+// product load, the pull-down time is hours = Q / capacity. Q (with the freezer
+// latent branch) is reused from computeProductPullDownLoad at hours = 1.
+// dims: in { mass_lb: M, cp_above: dimensionless, t_enter_f: T, t_storage_f: T, t_freeze_f: T, hif_btu_lb: dimensionless, cp_below: dimensionless, capacity_btuh: M L^2 T^-3 } out: { hours: dimensionless, q_btu: M L^2 T^-2 }
+export function computeProductPullDownTime({ mass_lb = 0, cp_above = 0, t_enter_f = 0, t_storage_f = 0, t_freeze_f = 0, hif_btu_lb = 0, cp_below = 0, capacity_btuh = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(capacity_btuh) || 0;
+  if (!(cap > 0)) return { error: "Available refrigeration capacity must be positive (Btu/hr)." };
+  const base = computeProductPullDownLoad({ mass_lb, cp_above, t_enter_f, t_storage_f, t_freeze_f, hif_btu_lb, cp_below, hours: 1 });
+  if (base.error) return { error: base.error };
+  if (!(base.q_btu > 0)) return { error: "Pull-down heat is not positive; the product must enter warmer than storage." };
+  const hours = base.q_btu / cap;
+  return {
+    hours, q_btu: base.q_btu, rate_btuh: cap, freezing: base.freezing,
+    note: "Pull-down time = total product heat / the refrigeration capacity dedicated to product load. Q above freezing is a single sensible term m x cp x deltaT; for a freezer it adds the latent heat of fusion (the bulk) plus the sensible cooling of the frozen product. If the time exceeds the design window (commonly 24 h), add capacity or stage the loading. A sizing aid; the product property tables (ASHRAE Refrigeration) govern.",
+  };
+}
+export const productPullDownTimeExample = { inputs: { mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: 3375 } };
+function _v698renderProductPullDownTime(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Product pull-down time (ASHRAE Refrigeration): hours = Q / capacity, with Q = m cp deltaT above freezing, or sensible-to-freezing + m x latent heat of fusion + sensible-of-frozen for a freezer. A sizing aid; the product property tables govern.";
+  const mass = makeNumber("Product mass (lb)", "ppt-m", { step: "any", min: "0" }); mass.input.value = "2000";
+  const cpa = makeNumber("Specific heat above freezing (Btu/lb-F)", "ppt-cpa", { step: "any", min: "0" }); cpa.input.value = "0.9";
+  const tEnter = makeNumber("Entering temperature (F)", "ppt-te", { step: "any" }); tEnter.input.value = "80";
+  const tStore = makeNumber("Storage (target) temperature (F)", "ppt-ts", { step: "any" }); tStore.input.value = "35";
+  const tFreeze = makeNumber("Freezing point (F, optional for freezers)", "ppt-tf", { step: "any" }); tFreeze.input.value = "";
+  const hif = makeNumber("Latent heat of fusion (Btu/lb, optional)", "ppt-hif", { step: "any", min: "0" }); hif.input.value = "";
+  const cpb = makeNumber("Specific heat below freezing (Btu/lb-F, optional)", "ppt-cpb", { step: "any", min: "0" }); cpb.input.value = "";
+  const cap = makeNumber("Refrigeration capacity for product (Btu/hr)", "ppt-cap", { step: "any", min: "0" }); cap.input.value = "3375";
+  for (const f of [mass, cpa, tEnter, tStore, tFreeze, hif, cpb, cap]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { mass.input.value = "2000"; cpa.input.value = "0.9"; tEnter.input.value = "80"; tStore.input.value = "35"; tFreeze.input.value = ""; hif.input.value = ""; cpb.input.value = ""; cap.input.value = "3375"; update(); });
+  const oH = makeOutputLine(outputRegion, "Pull-down time", "ppt-out-h");
+  const oQ = makeOutputLine(outputRegion, "Total heat to remove", "ppt-out-q");
+  const oNote = makeOutputLine(outputRegion, "Note", "ppt-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeProductPullDownTime({ mass_lb: readNum(mass.input), cp_above: readNum(cpa.input), t_enter_f: readNum(tEnter.input), t_storage_f: readNum(tStore.input), t_freeze_f: readNum(tFreeze.input), hif_btu_lb: readNum(hif.input), cp_below: readNum(cpb.input), capacity_btuh: readNum(cap.input) });
+    if (r.error) { oH.textContent = r.error; oQ.textContent = "-"; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.hours, 1) + " hr";
+    oQ.textContent = fmt(r.q_btu, 0) + " Btu" + (r.freezing ? " (incl. latent freezing)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [mass, cpa, tEnter, tStore, tFreeze, hif, cpb, cap]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["product-pull-down-time"] = _v698renderProductPullDownTime;
+
 // dims: in { box_temp_f: T, sst_f: T } out: { dtd: T }
 export function computeEvaporatorTdDtd({ box_temp_f = 0, sst_f = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

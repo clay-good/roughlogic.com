@@ -10822,6 +10822,18 @@ export const CITATIONS = {
       { name: "Property tables", value: "specific heats, freezing points, and latent heats from ASHRAE", source: "scope of this tile" },
     ],
   },
+  "product-pull-down-time": {
+    formula: "hours = Q / capacity_btuh, with Q from the product pull-down relation (above freezing Q = m cp (t_enter - t_storage); freezing Q = m cp_above (t_enter - t_freeze) + m hif + m cp_below (t_freeze - t_storage)). The inverse of product-pull-down-load (which returns rate = Q / hours).",
+    edition: "The product pull-down time from the sensible-plus-latent cooling load and the available capacity, from ASHRAE Refrigeration, by name.",
+    freeAccess: "The sensible-plus-latent product-cooling load is standard published refrigeration practice; the property tables are in the ASHRAE Handbook - Refrigeration.",
+    governance: GOVERNANCE.general,
+    editionNote: "The pull-down time = the total product heat / the refrigeration capacity dedicated to the product load. Q is the same sensible (and, for a freezer, latent-plus-frozen-sensible) heat as product-pull-down-load. When the returned time exceeds the design window (commonly 24 h), add capacity or stage the loading. A sizing aid; the ASHRAE Refrigeration product-property tables govern.",
+    assumptions: [
+      { name: "Time", value: "hours = Q / capacity, the inverse of rate = Q / hours", source: "algebra" },
+      { name: "Heat Q", value: "same sensible + latent product load as product-pull-down-load", source: "ASHRAE Refrigeration" },
+      { name: "Property tables", value: "specific heats, freezing points, and latent heats from ASHRAE", source: "scope of this tile" },
+    ],
+  },
   "hydronic-buffer-tank": {
     formula: "V_gal = min_on_time_min x (source_min_btu - zone_min_load_btu) / (500 x delta_t_f); no buffer when the zone load meets or exceeds the source minimum.",
     edition: "ASHRAE / Idronics (Caleffi) anti-short-cycle buffer-tank practice, by name.",

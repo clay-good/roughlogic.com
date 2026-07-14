@@ -584,7 +584,7 @@ const _TILES = [
   ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["boring-bar-max-overhang", "K"], ["ballnose-scallop-height", "K"],
   // spec-v320..v322 refrigeration-cycle batch (calc-refrigerant.js Group C)
   ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"],
-  ["walk-in-cooler-load", "C"], ["product-pull-down-load", "C"], ["evaporator-td-dtd", "C"],
+  ["walk-in-cooler-load", "C"], ["product-pull-down-load", "C"], ["product-pull-down-time", "C"], ["evaporator-td-dtd", "C"],
   ["flash-gas-subcool", "C"],
   ["hydronic-buffer-tank", "C"],
   ["buffer-tank-loop-credit", "C"],

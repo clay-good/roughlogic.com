@@ -17972,7 +17972,7 @@ test("bounds: spec-v431 computeReadyMixConcreteOrder pins the order, trucks, sho
 });
 
 // ===================== spec-v432..v434 walk-in refrigeration trio (calc-refrigerant.js) =====================
-import { computeWalkInCoolerLoad as _v432, computeProductPullDownLoad as _v433, computeEvaporatorTdDtd as _v434 } from "../../calc-refrigerant.js";
+import { computeWalkInCoolerLoad as _v432, computeProductPullDownLoad as _v433, computeEvaporatorTdDtd as _v434, computeProductPullDownTime as _v698 } from "../../calc-refrigerant.js";
 
 test("bounds: spec-v432 computeWalkInCoolerLoad pins the components, the safety factor, and error seams", () => {
   const r = _v432({ u_factor: 0.05, area_ft2: 800, delta_t_f: 60, infiltration_btuh: 3000, product_btuh: 5000, internal_btuh: 1500, safety: 1.10 });
@@ -17999,6 +17999,32 @@ test("bounds: spec-v433 computeProductPullDownLoad pins sensible and freezing pa
   assert.ok("error" in _v433({ mass_lb: 2000, cp_above: 0, t_enter_f: 80, t_storage_f: 35, hours: 24 }));
   assert.ok("error" in _v433({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: 0 }));
   assert.ok("error" in _v433({ mass_lb: Infinity, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: 24 }));
+});
+
+test("bounds: spec-v698 computeProductPullDownTime pins hours = Q / capacity, round-trips through computeProductPullDownLoad, and error seams", () => {
+  const r = _v698({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: 3375 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.q_btu - 81000) < 1e-6 && Math.abs(r.hours - 24) < 1e-9 && r.freezing === false, `sensible: ${JSON.stringify(r)}`);
+  // Round-trip: the reported hours, fed back through the forward tile, reproduce the capacity as the rate.
+  for (const capacity_btuh of [1500, 3375, 9000]) {
+    for (const mass_lb of [500, 2000, 8000]) {
+      const m = _v698({ mass_lb, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh });
+      assert.ok(!m.error, `sweep cap=${capacity_btuh} m=${mass_lb}: ${JSON.stringify(m)}`);
+      assertFinite(m.hours, "hours"); assert.ok(m.hours > 0, "hours positive");
+      const back = _v433({ mass_lb, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, hours: m.hours });
+      assert.ok(Math.abs(back.rate_btuh - capacity_btuh) < 1e-6, `round-trip cap=${capacity_btuh} m=${mass_lb}: ${back.rate_btuh}`);
+    }
+  }
+  // The freezing path carries the latent load into the time (same Q as the forward freezer example).
+  const fr = _v698({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 0, t_freeze_f: 28, hif_btu_lb: 120, cp_below: 0.45, capacity_btuh: 3375 });
+  assert.ok(fr.freezing === true && Math.abs(fr.q_btu - 358800) < 1e-6 && Math.abs(fr.hours - 358800 / 3375) < 1e-6, `freezer: ${JSON.stringify(fr)}`);
+  // More capacity, less time.
+  assert.ok(_v698({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: 6750 }).hours < r.hours);
+  // Error seams: non-positive capacity, product not warmer than storage, upstream guards, non-finite.
+  assert.ok("error" in _v698({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: 0 }));
+  assert.ok("error" in _v698({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 30, t_storage_f: 35, capacity_btuh: 3375 }));
+  assert.ok("error" in _v698({ mass_lb: 0, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: 3375 }));
+  assert.ok("error" in _v698({ mass_lb: 2000, cp_above: 0.9, t_enter_f: 80, t_storage_f: 35, capacity_btuh: Infinity }));
 });
 
 test("bounds: spec-v434 computeEvaporatorTdDtd pins the TD, the humidity band, and error seams", () => {
