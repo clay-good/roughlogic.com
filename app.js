@@ -480,7 +480,7 @@ const TOOL_MODULES = (() => {
     // spec-v332..v334 wood-fastener withdrawal batch.
     "wood-nail-withdrawal", "wood-lag-withdrawal", "wood-screw-withdrawal",
     "cantilever-beam", "section-properties", "combined-stress-axial-bending",
-    "shaft-torsion", "thermal-stress-restrained", "hoop-stress-thin-wall",
+    "shaft-torsion", "thermal-stress-restrained", "hoop-stress-thin-wall", "hoop-stress-mawp",
     "seismic-design-spectral-acceleration", "seismic-story-drift", "seismic-pdelta-stability",
     // spec-v546
     "wind-solid-sign",

@@ -6256,6 +6256,45 @@ const _renderHoopStressThinWall = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["hoop-stress-thin-wall"] = _renderHoopStressThinWall;
 
+// dims: in { t_in: L, D_in: L, S_allow: M L^-1 T^-2 } out: { p_max_psi: M L^-1 T^-2, p_max_long_psi: M L^-1 T^-2, Dt: dimensionless }
+export function computeHoopStressMawp({ t_in = 0, D_in = 0, S_allow = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(t_in) || 0;
+  const D = Number(D_in) || 0;
+  const S = Number(S_allow) || 0;
+  if (!(t > 0)) return { error: "Wall thickness must be positive (in)." };
+  if (!(D > 0)) return { error: "Diameter must be positive (in)." };
+  if (!(S > 0)) return { error: "Allowable stress must be positive (psi)." };
+  // Inverse of sigma_h = P D / (2 t) at sigma_h = S_allow: P_max = 2 t S_allow / D.
+  const p_max_psi = 2 * t * S / D;
+  const p_max_long_psi = 4 * t * S / D;
+  const Dt = D / t;
+  const thin_wall_ok = Dt >= 20;
+  return {
+    p_max_psi, p_max_long_psi, Dt, thin_wall_ok,
+    note: "The maximum allowable working pressure of a thin-wall cylinder, the inverse of the hoop-stress-thin-wall tile: solving sigma_h = P D / (2 t) for the pressure at the allowable stress gives P_max = 2 t S_allow / D (hoop-governed). The longitudinal stress is half the hoop, so the longitudinal limit allows twice the pressure (4 t S_allow / D) -- the hoop governs, which is why a cylinder splits along its length. To size the wall for a known design pressure instead, rearrange to t_min = P D / (2 S_allow). The thin-wall formula assumes D/t >= 20; below that use a Lame thick-wall check. D is the mean/inner diameter, static internal pressure only. A design aid, not a substitute for a pressure-vessel code (ASME BPVC) or the engineer of record.",
+  };
+}
+export const hoopStressMawpExample = { inputs: { t_in: 0.25, D_in: 12, S_allow: 15000 } };
+
+const _renderHoopStressMawp = _simpleRenderer({
+  citation: "Citation: thin-wall pressure-vessel MAWP first-principles: solving hoop sigma_h = P D / (2 t) for the pressure at the allowable stress gives P_max = 2 t S_allow / D (hoop-governed; the longitudinal limit is double). Valid for D/t >= 20. Not a substitute for the ASME BPVC or the engineer of record.",
+  example: hoopStressMawpExample.inputs,
+  fields: [
+    { key: "t_in", label: "Wall thickness t (in)", kind: "number" },
+    { key: "D_in", label: "Diameter D (in, mean/inner)", kind: "number" },
+    { key: "S_allow", label: "Allowable stress S (psi)", kind: "number" },
+  ],
+  outputs: [
+    { key: "p", id: "hsm-out-p", label: "Max allowable pressure (hoop-governed)", value: (r) => fmt(r.p_max_psi, 0) + " psi" },
+    { key: "pl", id: "hsm-out-pl", label: "Longitudinal-limited pressure", value: (r) => fmt(r.p_max_long_psi, 0) + " psi (double the hoop; hoop governs)" },
+    { key: "dt", id: "hsm-out-dt", label: "D/t (thin-wall if >= 20)", value: (r) => fmt(r.Dt, 1) + (r.thin_wall_ok ? " (thin-wall valid)" : " -- thick wall; a Lame check is advisable") },
+    { key: "n", id: "hsm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHoopStressMawp,
+});
+CONSTRUCTION_RENDERERS["hoop-stress-mawp"] = _renderHoopStressMawp;
+
 // ===================== spec-v381..v383: seismic-parameters trio (ASCE 7-22) =====================
 
 // dims: in { ss: dimensionless, s1: dimensionless, fa: dimensionless, fv: dimensionless } out: { sms: dimensionless, sm1: dimensionless, sds: dimensionless, sd1: dimensionless }

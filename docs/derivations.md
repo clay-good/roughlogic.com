@@ -1573,6 +1573,7 @@ cross-check.
 | calc-construction.js | `computeHeaderSizing` | `{ header_span_ft = 0, tributary_width_ft = 0, floors_above = 0, ground_snow_p...` | _ | _ | _ |
 | calc-construction.js | `computeHelicalPile` | `{ shaft = "1.5_inch_solid", torque_ft_lb = 0, factor_of_safety = 2.0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHipValleyRafter` | `{ run_ft = 0, pitch = 6, pitch_irregular = 0, overhang_in = 12, jack_oc_in = ...` | _ | _ | _ |
+| calc-construction.js | `computeHoopStressMawp` | `{ t_in = 0, D_in = 0, S_allow = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeHoopStressThinWall` | `{ P_psi = 0, D_in = 0, t_in = 0, S_allow = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeIceBarrierCoverage` | `{ eave_length_ft = 0, overhang_in = 0, pitch_rise = 0, roll_width_in = 36, ro...` | _ | _ | _ |
 | calc-construction.js | `computeInsulationBattCoverage` | `{ area_ft2 = 0, coverage_per_batt = 0, coverage_per_bag = 0, waste_pct = 0 } ...` | _ | _ | _ |
@@ -2774,7 +2775,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1360.
+Row count: 1361.
 
 <!-- END function-corpus-v14 -->
 
@@ -3283,7 +3284,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (236 tiles)
+### Group E Construction (237 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3369,6 +3370,7 @@ per spec-v14 §13.1 second paragraph.
 | `header-sizing` | Window / Door Header Sizing (IRC R602.7) | IRC / AWC NDS; w = (snow + 15 dead) x trib = 45 x 14 = 630 plf; double 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `helical-pile` | Helical Pile Torque-to-Capacity | Project (first-principles) over IBC s...; 1.5 in solid square shaft / 5000 ft-lb torque / FOS 2.0 -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hip-valley-rafter` | Hip / Valley / Jack Rafter Schedule | Project (first-principles); 14 ft run / 6:12 pitch / 12 in overhang -> common 15.65 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `hoop-stress-mawp` | Thin-Wall Vessel Max Allowable Working Pressure | thin-wall / Barlow (inverse); spec-v668 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hoop-stress-thin-wall` | Thin-Wall Pressure Vessel Hoop and Longitudinal Stress | thin-wall / Barlow; spec-v361 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `horizontal-curve` | Horizontal Curve Layout | AASHTO Green Book / FM 5-233 (by name); R = 1000 ft, delta = 30 deg -> T 267.95, L 523.60, LC 517... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `horizontal-sightline-offset` | Horizontal Sightline Offset on a Curve (AASHTO) | AASHTO Green Book; spec-v337 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4076,6 +4078,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1116. Fixture-covered or reference-cadence: 1116 / 1116.
+Tile count: 1117. Fixture-covered or reference-cadence: 1117 / 1117.
 
 <!-- END tile-index-v14 -->

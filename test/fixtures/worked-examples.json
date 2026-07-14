@@ -47484,6 +47484,56 @@
    }
   },
   {
+   "tile_id": "hoop-stress-mawp",
+   "source_publisher": "thin-wall / Barlow (inverse)",
+   "source_title": "12 in vessel, 0.25 in wall, 15,000 psi allowable -> 625 psi MAWP (hoop-governed), 1,250 psi longitudinal",
+   "source_edition_or_year": "spec-v668 worked example (machine-verified)",
+   "source_section_or_page": "spec-v668 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "t_in": 0.25,
+    "D_in": 12,
+    "S_allow": 15000
+   },
+   "outputs": {
+    "p_max_psi": {
+     "value": 625,
+     "tolerance": {
+      "abs": 1
+     }
+    },
+    "p_max_long_psi": {
+     "value": 1250,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "hoop-stress-mawp",
+   "source_publisher": "thin-wall / Barlow (inverse)",
+   "source_title": "cross-check: doubling the wall to 0.5 in on a 24 in shell at 20,000 psi -> 833 psi MAWP",
+   "source_edition_or_year": "spec-v668 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v668 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "t_in": 0.5,
+    "D_in": 24,
+    "S_allow": 20000
+   },
+   "outputs": {
+    "p_max_psi": {
+     "value": 833.33,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "seismic-design-spectral-acceleration",
    "source_publisher": "ASCE 7-22 11.4",
    "source_title": "Ss 1.0, S1 0.4, Site Class D (Fa 1.1, Fv 1.6) -> SDS 0.733g, SD1 0.427g",

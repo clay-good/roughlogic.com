@@ -15488,7 +15488,7 @@ test("bounds: spec-v358 computeWeldTravelSpeed pins the inverse relation, the ro
 });
 
 // ===================== spec-v359..v361 applied-mechanics batch =====================
-import { computeShaftTorsion as _v359, computeThermalStressRestrained as _v360, computeHoopStressThinWall as _v361 } from "../../calc-construction.js";
+import { computeShaftTorsion as _v359, computeThermalStressRestrained as _v360, computeHoopStressThinWall as _v361, computeHoopStressMawp as _v668 } from "../../calc-construction.js";
 
 test("bounds: spec-v359 computeShaftTorsion pins J/tau/theta, the d^3/d^4 leverage, and error seams", () => {
   const r = _v359({ T_lbin: 12000, d_in: 1.5, di_in: 0, L_in: 24, G_psi: 11.5e6 });
@@ -15543,6 +15543,32 @@ test("bounds: spec-v361 computeHoopStressThinWall pins hoop = 2x longitudinal, t
   assert.ok("error" in _v361({ P_psi: 150, D_in: 0, t_in: 0.25 }));
   assert.ok("error" in _v361({ P_psi: 150, D_in: 12, t_in: 0 }));
   assert.ok("error" in _v361({ P_psi: Infinity, D_in: 12, t_in: 0.25 }));
+});
+
+test("bounds: spec-v668 computeHoopStressMawp pins P_max = 2 t S/D, the longitudinal doubling, round-trips through computeHoopStressThinWall to DCR 1, and error seams", () => {
+  const r = _v668({ t_in: 0.25, D_in: 12, S_allow: 15000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.p_max_psi, 625); // 2 * 0.25 * 15000 / 12
+  assert.strictEqual(r.p_max_long_psi, 1250); // double the hoop-governed MAWP
+  assert.ok(Math.abs(r.p_max_long_psi - 2 * r.p_max_psi) < 1e-9);
+  assert.strictEqual(r.Dt, 48);
+  // Round-trip: feeding P_max back through the forward tile lands hoop stress exactly at S_allow (DCR 1).
+  for (const t_in of [0.125, 0.25, 0.5]) {
+    for (const D_in of [6, 12, 24]) {
+      const S_allow = 15000;
+      const m = _v668({ t_in, D_in, S_allow });
+      assert.ok(!m.error, `sweep t=${t_in} D=${D_in}: ${JSON.stringify(m)}`);
+      assertFinite(m.p_max_psi, "p_max"); assert.ok(m.p_max_psi > 0, "p_max positive");
+      const back = _v361({ P_psi: m.p_max_psi, D_in, t_in, S_allow });
+      assert.ok(Math.abs(back.sigma_h_psi - S_allow) < 1e-6, `round-trip sigma t=${t_in} D=${D_in}: ${back.sigma_h_psi}`);
+      assert.ok(Math.abs(back.DCR - 1) < 1e-9, `round-trip DCR t=${t_in} D=${D_in}: ${back.DCR}`);
+    }
+  }
+  // Error seams: non-positive wall / diameter / allowable, non-finite.
+  assert.ok("error" in _v668({ t_in: 0, D_in: 12, S_allow: 15000 }));
+  assert.ok("error" in _v668({ t_in: 0.25, D_in: 0, S_allow: 15000 }));
+  assert.ok("error" in _v668({ t_in: 0.25, D_in: 12, S_allow: 0 }));
+  assert.ok("error" in _v668({ t_in: Infinity, D_in: 12, S_allow: 15000 }));
 });
 
 // ===================== spec-v362..v364 contractor cost-recovery batch =====================

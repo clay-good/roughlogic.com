@@ -612,7 +612,7 @@ const _TILES = [
   // spec-v332..v334 wood-fastener withdrawal batch (calc-construction.js Group E)
   ["wood-nail-withdrawal", "E"], ["wood-lag-withdrawal", "E"], ["wood-screw-withdrawal", "E"],
   ["cantilever-beam", "E"], ["section-properties", "E"], ["combined-stress-axial-bending", "E"],
-  ["shaft-torsion", "E"], ["thermal-stress-restrained", "E"], ["hoop-stress-thin-wall", "E"],
+  ["shaft-torsion", "E"], ["thermal-stress-restrained", "E"], ["hoop-stress-thin-wall", "E"], ["hoop-stress-mawp", "E"],
   ["seismic-design-spectral-acceleration", "E"], ["seismic-story-drift", "E"], ["seismic-pdelta-stability", "E"],
   ["paint-mix-ratio", "K"],
   ["hydraulic-pump-horsepower", "K"], ["hydraulic-motor-torque-speed", "K"], ["hydraulic-pump-flow", "K"], ["cooling-system-flow", "K"],

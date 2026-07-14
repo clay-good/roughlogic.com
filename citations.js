@@ -10098,6 +10098,18 @@ export const CITATIONS = {
       { name: "Not a code check", value: "no external pressure, discontinuity/nozzle stress, joint efficiency, or corrosion allowance", source: "scope of this tile" },
     ],
   },
+  "hoop-stress-mawp": {
+    formula: "P_max = 2 t S_allow / D (hoop-governed); P_max_long = 4 t S_allow / D = double; the inverse of sigma_h = P D / (2 t).",
+    edition: "The thin-wall pressure-vessel membrane-stress relation (Barlow / mechanics of materials) solved for the pressure, by name.",
+    freeAccess: "The thin-wall hoop stress formula (Barlow's) is published free in any mechanics-of-materials reference. The ASME BPVC and the engineer of record govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum allowable working pressure of a thin-wall cylinder, the inverse of hoop-stress-thin-wall: solving the hoop stress sigma_h = P D / (2 t) for the pressure at the allowable stress gives P_max = 2 t S_allow / D (hoop-governed). The longitudinal stress is half the hoop, so the longitudinal limit allows twice the pressure (4 t S_allow / D); the hoop governs, which is why a cylinder splits along its length. To size the wall for a known design pressure instead, rearrange to t_min = P D / (2 S_allow). The thin-wall (membrane) formula assumes D/t >= 20; below that use a Lame thick-wall check. D is the mean/inner diameter, static internal pressure only, no joint efficiency or corrosion allowance. A design aid, not a substitute for a pressure-vessel code (ASME BPVC) or the engineer of record.",
+    assumptions: [
+      { name: "Membrane stress inverse", value: "P_max = 2 t S_allow / D from sigma_h = P D/(2 t); the longitudinal limit is double, so the hoop governs", source: "thin-wall / Barlow" },
+      { name: "Thin-wall validity", value: "valid for D/t >= 20; below that use a Lame thick-wall check", source: "mechanics of materials" },
+      { name: "Not a code check", value: "no external pressure, discontinuity/nozzle stress, joint efficiency, or corrosion allowance", source: "scope of this tile" },
+    ],
+  },
   "seismic-design-spectral-acceleration": {
     formula: "SMS = Fa Ss; SM1 = Fv S1; SDS = (2/3) SMS; SD1 = (2/3) SM1.",
     edition: "The ASCE 7-22 11.4 site-adjusted MCER and design spectral response accelerations, by name.",

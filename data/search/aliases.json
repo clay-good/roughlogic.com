@@ -18967,6 +18967,31 @@
       "kind": "industry"
     },
     {
+      "term": "vessel mawp",
+      "target": "hoop-stress-mawp",
+      "kind": "industry"
+    },
+    {
+      "term": "vessel max allowable working pressure",
+      "target": "hoop-stress-mawp",
+      "kind": "industry"
+    },
+    {
+      "term": "pressure rating from wall thickness",
+      "target": "hoop-stress-mawp",
+      "kind": "industry"
+    },
+    {
+      "term": "minimum wall thickness for pressure",
+      "target": "hoop-stress-mawp",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much pressure can this tank hold",
+      "target": "hoop-stress-mawp",
+      "kind": "adjacent"
+    },
+    {
       "term": "design spectral acceleration",
       "target": "seismic-design-spectral-acceleration",
       "kind": "industry"
