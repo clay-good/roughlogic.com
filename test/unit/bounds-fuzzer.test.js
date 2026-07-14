@@ -14813,7 +14813,7 @@ test("bounds: spec-v316 computeSteelBoltTensionShear pins the reduction, the cap
 });
 
 // ===================== spec-v317..v319 machining depth batch =====================
-import { computeRadialChipThinning as _v317, computeBoringBarDeflection as _v318, computeBallnoseScallopHeight as _v319 } from "../../calc-machining.js";
+import { computeRadialChipThinning as _v317, computeBoringBarDeflection as _v318, computeBallnoseScallopHeight as _v319, computeBoringBarMaxOverhang as _v682 } from "../../calc-machining.js";
 
 test("bounds: spec-v317 computeRadialChipThinning pins the thinning factor, the half-immersion crossover, and error seams", () => {
   const r = _v317({ ae_in: 0.05, d_in: 0.5, fz_target: 0.004 });
@@ -14853,6 +14853,33 @@ test("bounds: spec-v318 computeBoringBarDeflection pins the cantilever, the L^3 
   assert.ok("error" in _v318({ d_in: 0.75, l_in: 6, f_lb: 0 }));
   assert.ok("error" in _v318({ d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 0 }));
   assert.ok("error" in _v318({ d_in: NaN, l_in: 6, f_lb: 100 }));
+});
+
+test("bounds: spec-v682 computeBoringBarMaxOverhang pins L_max = (3 E I delta / F)^(1/3), round-trips through computeBoringBarDeflection, and error seams", () => {
+  const fwd = _v318({ d_in: 0.75, l_in: 6, f_lb: 100, e_psi: 30e6 });
+  const r = _v682({ d_in: 0.75, f_lb: 100, allowable_deflection_in: fwd.delta_in, e_psi: 30e6 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_overhang_in - 6) < 1e-6, `L_max identity: ${r.max_overhang_in}`);
+  assert.ok(Math.abs(r.ld - 8) < 1e-6, `L/d at max: ${r.ld}`);
+  // A stiffer carbide bar can stick out farther for the same deflection.
+  const carbide = _v682({ d_in: 0.75, f_lb: 100, allowable_deflection_in: fwd.delta_in, e_psi: 90e6 });
+  assert.ok(carbide.max_overhang_in > r.max_overhang_in, `carbide farther: ${carbide.max_overhang_in}`);
+  // Round-trip: the max overhang, fed back through the forward tile, reproduces the allowable deflection.
+  for (const d_in of [0.5, 0.75, 1.0]) {
+    for (const allowable_deflection_in of [0.002, 0.01, 0.03]) {
+      const m = _v682({ d_in, f_lb: 100, allowable_deflection_in, e_psi: 30e6 });
+      assert.ok(!m.error, `sweep d=${d_in} delta=${allowable_deflection_in}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_overhang_in, "L"); assert.ok(m.max_overhang_in > 0, "L positive");
+      const back = _v318({ d_in, l_in: m.max_overhang_in, f_lb: 100, e_psi: 30e6 });
+      assert.ok(Math.abs(back.delta_in - allowable_deflection_in) < 1e-9, `round-trip d=${d_in} delta=${allowable_deflection_in}: ${back.delta_in}`);
+    }
+  }
+  // Error seams: non-positive diameter / force / allowable deflection / modulus, non-finite.
+  assert.ok("error" in _v682({ d_in: 0, f_lb: 100, allowable_deflection_in: 0.01 }));
+  assert.ok("error" in _v682({ d_in: 0.75, f_lb: 0, allowable_deflection_in: 0.01 }));
+  assert.ok("error" in _v682({ d_in: 0.75, f_lb: 100, allowable_deflection_in: 0 }));
+  assert.ok("error" in _v682({ d_in: 0.75, f_lb: 100, allowable_deflection_in: 0.01, e_psi: 0 }));
+  assert.ok("error" in _v682({ d_in: NaN, f_lb: 100, allowable_deflection_in: 0.01 }));
 });
 
 test("bounds: spec-v319 computeBallnoseScallopHeight pins the forward/inverse round-trip, the s^2 scaling, and error seams", () => {

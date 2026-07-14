@@ -316,6 +316,52 @@ function renderBoringBarDeflection(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["boring-bar-deflection"] = renderBoringBarDeflection;
 
+// dims: in { d_in: L, f_lb: M L T^-2, allowable_deflection_in: L, e_psi: M L^-1 T^-2 } out: { max_overhang_in: L, i_in4: L^4, ld: dimensionless }
+export function computeBoringBarMaxOverhang({ d_in = 0, f_lb = 0, allowable_deflection_in = 0, e_psi = 30e6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(d_in) || 0;
+  const f = Number(f_lb) || 0;
+  const delta = Number(allowable_deflection_in) || 0;
+  const e = (e_psi === undefined || e_psi === null || e_psi === "") ? 30e6 : Number(e_psi);
+  if (!(d > 0)) return { error: "Bar diameter must be positive (in)." };
+  if (!(f > 0)) return { error: "Cutting force must be positive (lb)." };
+  if (!(delta > 0)) return { error: "Allowable tip deflection must be positive (in)." };
+  if (!(e > 0)) return { error: "Modulus must be positive (psi)." };
+  const i_in4 = (Math.PI * Math.pow(d, 4)) / 64;
+  // Inverse of delta = F L^3 / (3 E I): L_max = (3 E I delta / F)^(1/3).
+  const max_overhang_in = Math.cbrt(3 * e * i_in4 * delta / f);
+  if (!Number.isFinite(max_overhang_in) || !(max_overhang_in > 0)) return { error: "Overhang math is not a finite positive value." };
+  const ld = max_overhang_in / d;
+  const chatter_note = ld <= 4 ? "L/d <= 4: within the steel-bar chatter limit" : (ld <= 8 ? "L/d 4-8: past the steel limit - use carbide or a damped bar, or shorten further" : "L/d > 8: chatter-prone even for carbide; the chatter limit, not deflection, governs - shorten the overhang");
+  return {
+    max_overhang_in, i_in4, ld, chatter_note,
+    note: "The longest overhang a boring bar or tool can stick out before its tip deflection reaches the allowable, the inverse of the boring-bar-deflection tile: from delta = F L^3 / (3 E I) with I = pi d^4 / 64, L_max = (3 E I delta / F)^(1/3). Deflection is only half the story: check the reported L/d against the chatter limit (a steel bar is stable to about 4:1, solid carbide to 6:1-8:1). If the deflection-limited overhang exceeds the chatter L/d, chatter governs and the real max overhang is the shorter one. Because deflection scales with L^3, this length is a hard wall - a little more stickout blows the tolerance. Static solid-round cantilever; a real cut adds dynamic/regenerative chatter this does not model. A shop aid; the tool and setup govern."
+  };
+}
+export const boringBarMaxOverhangExample = { inputs: { d_in: 0.75, f_lb: 100, allowable_deflection_in: 0.015, e_psi: 30e6 } };
+
+function renderBoringBarMaxOverhang(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: cantilever deflection solved for overhang: L_max = (3 E I delta / F)^(1/3), I = pi d^4/64, E = 30e6 psi steel / ~90e6 carbide, with the practical L/d chatter limits, by name. Static solid-round model, not a stability-lobe analysis. A shop aid; the tool and setup govern.";
+  const d = makeNumber("Bar / tool diameter d (in)", "bbmo-d", { step: "any", min: "0" });
+  const f = makeNumber("Radial cutting force F (lb)", "bbmo-f", { step: "any", min: "0" });
+  const delta = makeNumber("Allowable tip deflection (in)", "bbmo-delta", { step: "any", min: "0" });
+  const e = makeNumber("Modulus E (psi: 30e6 steel, ~90e6 carbide)", "bbmo-e", { step: "any", min: "0" }); e.input.value = "30000000";
+  for (const x of [d, f, delta, e]) inputRegion.appendChild(x.wrap);
+  attachExampleButton(inputRegion, () => { d.input.value = "0.75"; f.input.value = "100"; delta.input.value = "0.015"; e.input.value = "30000000"; update(); });
+  const oL = makeOutputLine(outputRegion, "Max overhang (deflection-limited)", "bbmo-out-l");
+  const oLd = makeOutputLine(outputRegion, "L/d at that overhang", "bbmo-out-ld");
+  const oNote = makeOutputLine(outputRegion, "Note", "bbmo-out-note");
+  const update = debounce(() => {
+    const r = computeBoringBarMaxOverhang({ d_in: Number(d.input.value) || 0, f_lb: Number(f.input.value) || 0, allowable_deflection_in: Number(delta.input.value) || 0, e_psi: e.input.value === "" ? 30e6 : Number(e.input.value) });
+    if (r.error) { oL.textContent = r.error; oLd.textContent = "-"; oNote.textContent = "-"; return; }
+    oL.textContent = fmt(r.max_overhang_in, 3) + " in";
+    oLd.textContent = fmt(r.ld, 1) + " - " + r.chatter_note;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const x of [d, f, delta, e]) x.input.addEventListener("input", update);
+}
+MACHINING_RENDERERS["boring-bar-max-overhang"] = renderBoringBarMaxOverhang;
+
 // dims: in { r_in: L, mode: dimensionless, s_in: L, h_in: L } out: { out_in: L }
 export function computeBallnoseScallopHeight({ r_in = 0, mode = "scallop-from-stepover", s_in = 0, h_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

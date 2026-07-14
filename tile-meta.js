@@ -581,7 +581,7 @@ const _TILES = [
   // spec-v314..v316 steel beam-column-and-connection depth batch
   ["steel-h1-interaction", "E"], ["steel-effective-length-k", "E"], ["steel-bolt-tension-shear", "E"],
   // spec-v317..v319 machining depth batch (calc-machining.js Group K)
-  ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["ballnose-scallop-height", "K"],
+  ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["boring-bar-max-overhang", "K"], ["ballnose-scallop-height", "K"],
   // spec-v320..v322 refrigeration-cycle batch (calc-refrigerant.js Group C)
   ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"],
   ["walk-in-cooler-load", "C"], ["product-pull-down-load", "C"], ["evaporator-td-dtd", "C"],

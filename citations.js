@@ -10725,6 +10725,18 @@ export const CITATIONS = {
       { name: "L/d limits", value: "~4:1 steel, 6-8:1 carbide; a static estimate, not a stability-lobe analysis", source: "machining practice" },
     ],
   },
+  "boring-bar-max-overhang": {
+    formula: "I = pi d^4/64; L_max = (3 E I delta_allow / F)^(1/3); L/d ratio for chatter risk. (E = 30e6 psi steel, ~90e6 carbide)",
+    edition: "The cantilever tip-deflection model delta = F L^3/(3 E I) with I = pi d^4/64 solved for the overhang, a standard mechanics-of-materials result applied to tool overhang, by name.",
+    freeAccess: "The cantilever deflection formula is a public mechanics-of-materials result; the L/d overhang limits are standard machining guidance.",
+    governance: GOVERNANCE.general,
+    editionNote: "The longest overhang before the tip deflection reaches the allowable, the inverse of boring-bar-deflection: from delta = F L^3/(3 E I), L_max = (3 E I delta / F)^(1/3), with I = pi d^4/64 and E = 30e6 psi steel / ~90e6 carbide. Deflection is only half the story: the reported L/d must be checked against the chatter limit (~4:1 steel, ~6:1 to 8:1 carbide); if the deflection-limited overhang exceeds the chatter L/d, chatter governs and the real max overhang is the shorter one. Because deflection scales with L^3, this length is a hard wall. A uniform solid round cantilever under a tip point load (a stepped or hollow bar changes I; a real cut adds a dynamic/regenerative-chatter component this static estimate does not capture). A shop aid; the tool and setup govern.",
+    assumptions: [
+      { name: "Cantilever inverse", value: "L_max = (3 E I delta / F)^(1/3), I = pi d^4/64, uniform solid round bar under a tip load", source: "mechanics of materials" },
+      { name: "Chatter may govern", value: "check the L/d against ~4:1 steel / 6-8:1 carbide; if exceeded, the chatter limit sets a shorter max overhang", source: "machining practice" },
+      { name: "Static estimate", value: "static solid-round model, not a stability-lobe analysis", source: "machining practice" },
+    ],
+  },
   "ballnose-scallop-height": {
     formula: "scallop mode: h = R - sqrt(R^2 - (s/2)^2); stepover mode: s = 2 sqrt(R^2 - (R - h)^2); approx h ~ s^2/(8R).",
     edition: "The ballnose scallop (cusp) height geometry and its inverse, with the small-scallop approximation, as compiled in the CAM and mold-machining references, by name.",

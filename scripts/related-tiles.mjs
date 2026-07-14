@@ -1292,7 +1292,8 @@ const RELATED = {
   "steel-bolt-tension-shear": ["bolt-shear-bearing","steel-bolt-slip-critical","bolt-group-eccentric"],
   // spec-v317..v319 machining depth batch (Group K)
   "radial-chip-thinning": ["cutting-speed-rpm","material-removal-rate","spindle-power-torque"],
-  "boring-bar-deflection": ["spindle-power-torque","radial-chip-thinning","turning-surface-finish"],
+  "boring-bar-deflection": ["boring-bar-max-overhang","spindle-power-torque","radial-chip-thinning","turning-surface-finish"],
+  "boring-bar-max-overhang": ["boring-bar-deflection","spindle-power-torque","radial-chip-thinning","feed-for-surface-finish"],
   "ballnose-scallop-height": ["turning-surface-finish","radial-chip-thinning","cutting-speed-rpm"],
   // spec-v320..v322 refrigeration-cycle batch (Group C)
   "refrigerant-mass-flow": ["refrigerant-velocity","refrigeration-cop","condenser-heat-rejection"],

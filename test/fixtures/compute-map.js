@@ -898,6 +898,7 @@ export const COMPUTE_MAP = {
   // spec-v317..v319 machining depth batch (3 tiles)
   "radial-chip-thinning": { module: "../../calc-machining.js", fn: "computeRadialChipThinning" },
   "boring-bar-deflection": { module: "../../calc-machining.js", fn: "computeBoringBarDeflection" },
+  "boring-bar-max-overhang": { module: "../../calc-machining.js", fn: "computeBoringBarMaxOverhang" },
   "ballnose-scallop-height": { module: "../../calc-machining.js", fn: "computeBallnoseScallopHeight" },
   // spec-v320..v322 refrigeration-cycle batch (3 tiles)
   "refrigerant-mass-flow": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantMassFlow" },

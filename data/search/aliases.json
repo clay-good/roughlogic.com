@@ -14722,6 +14722,31 @@
       "kind": "industry"
     },
     {
+      "term": "max overhang for deflection",
+      "target": "boring-bar-max-overhang",
+      "kind": "industry"
+    },
+    {
+      "term": "how far can i stick out a boring bar",
+      "target": "boring-bar-max-overhang",
+      "kind": "industry"
+    },
+    {
+      "term": "max stickout before deflection",
+      "target": "boring-bar-max-overhang",
+      "kind": "adjacent"
+    },
+    {
+      "term": "longest tool overhang for a tolerance",
+      "target": "boring-bar-max-overhang",
+      "kind": "adjacent"
+    },
+    {
+      "term": "overhang limit boring bar",
+      "target": "boring-bar-max-overhang",
+      "kind": "adjacent"
+    },
+    {
       "term": "scallop height",
       "target": "ballnose-scallop-height",
       "kind": "industry"
