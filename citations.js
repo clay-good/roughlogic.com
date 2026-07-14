@@ -9152,6 +9152,17 @@ export const CITATIONS = {
       { name: "FDA minimum density", value: "finished ice cream >= 4.5 lb/gal and >= 1.6 lb total solids/gal", source: "21 CFR 135.110" },
     ],
   },
+  "draft-beer-line-balance": {
+    formula: "line_length_ft = (applied_pressure_psi - 0.5 x rise_ft - 1) / R, where R is the tubing restriction (psi/ft): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 3/16\" barrier 2.2, 5/16\" vinyl 0.4.",
+    edition: "Draft-beer line balancing (the Brewers Association Draught Beer Quality Manual system-balance equation), by name; the dispense system and the beer govern.",
+    freeAccess: "The system-balance relation (applied pressure = total restriction) is published draught-beer practice; the tubing restriction is a nominal material property.",
+    governance: GOVERNANCE.general,
+    editionNote: "Draft-beer line balancing: at balance the applied CO2 pressure equals the total restriction -- the line (restriction R per foot times length), plus 0.5 psi per foot of vertical rise, plus about 1 psi at the faucet -- so line = (pressure - 0.5 x rise - 1) / R. Set the applied pressure to the beer's carbonation level first (fixed by style and serving temperature); then choose the line to balance it so the pour is neither foamy (line too short/fast) nor flat and slow (too long). Restriction values are nominal for the listed tubing at cellar temperature; the actual pour rate (a 12-16 second fill of a 12 oz glass) should be measured and the line trimmed to tune it. A design aid, not a guarantee; the dispense system and the beer govern.",
+    assumptions: [
+      { name: "Tubing restriction", value: "3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 3/16\" barrier 2.2, 5/16\" vinyl 0.4 psi/ft (nominal, cellar temp)", source: "Brewers Association" },
+      { name: "Rise and faucet", value: "0.5 psi per foot of vertical rise, plus ~1 psi faucet allowance", source: "Draught Beer Quality Manual" },
+    ],
+  },
   "load-profitability": {
     formula: "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
     edition: "First-principles owner-operator load economics; consumes the cost-per-mile structure.",

@@ -1047,6 +1047,7 @@ const TOOL_MODULES = (() => {
     // spec-v539
     "drink-abv-dilution",
     "overrun-percent",
+    "draft-beer-line-balance",
   ]);
   // v4 Group P: Field, Backcountry, and SAR.
   declare("./calc-field.js", "FIELD_RENDERERS", [

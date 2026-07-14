@@ -15502,6 +15502,31 @@
       "kind": "industry"
     },
     {
+      "term": "draft beer line length",
+      "target": "draft-beer-line-balance",
+      "kind": "question"
+    },
+    {
+      "term": "beer line balancing",
+      "target": "draft-beer-line-balance",
+      "kind": "industry"
+    },
+    {
+      "term": "kegerator line length",
+      "target": "draft-beer-line-balance",
+      "kind": "question"
+    },
+    {
+      "term": "foamy draft beer fix",
+      "target": "draft-beer-line-balance",
+      "kind": "question"
+    },
+    {
+      "term": "draught system restriction",
+      "target": "draft-beer-line-balance",
+      "kind": "adjacent"
+    },
+    {
       "term": "coordinate from bearing and distance",
       "target": "cogo-forward-point",
       "kind": "question"

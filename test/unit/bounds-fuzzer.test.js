@@ -21642,6 +21642,27 @@ test("bounds: spec-v783 computeReserveCapacityAmpHours pins the RC-to-amp-hours 
   assert.ok("error" in _v783({ rc_minutes: -5 }));
 });
 
+import { computeDraftBeerLineBalance as _v787 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v787 computeDraftBeerLineBalance pins the balanced line length, resistance, and error seams", () => {
+  const r = _v787({ applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_316" });
+  assert.ok(Math.abs(r.line_length_ft - 3.0) < 1e-9); // (12 - 0.5*4 - 1)/3.0
+  assert.strictEqual(r.resistance_psi_per_ft, 3.0);
+  assert.strictEqual(r.balanced, true);
+  // A less-restrictive line needs more length for the same pressure; more rise shortens it.
+  const wide = _v787({ applied_pressure_psi: 12, rise_ft: 4, tubing_type: "vinyl_14" });
+  assert.ok(wide.line_length_ft > r.line_length_ft); // 0.85 psi/ft -> longer line
+  assert.ok(_v787({ applied_pressure_psi: 12, rise_ft: 10, tubing_type: "vinyl_316" }).line_length_ft < r.line_length_ft);
+  // Under-pressured: applied barely exceeds rise + faucet -> non-positive length, balanced false.
+  const low = _v787({ applied_pressure_psi: 3, rise_ft: 4, tubing_type: "vinyl_316" });
+  assert.strictEqual(low.balanced, false);
+  assert.ok(low.line_length_ft <= 0);
+  // Error seams: bad tubing, non-finite, non-positive pressure.
+  assert.ok("error" in _v787({ applied_pressure_psi: 12, rise_ft: 4, tubing_type: "garden_hose" }));
+  assert.ok("error" in _v787({ applied_pressure_psi: Infinity, rise_ft: 4, tubing_type: "vinyl_316" }));
+  assert.ok("error" in _v787({ applied_pressure_psi: 0, rise_ft: 4, tubing_type: "vinyl_316" }));
+});
+
 import { computeOverrunPercent as _v782 } from "../../calc-kitchen.js";
 
 test("bounds: spec-v782 computeOverrunPercent pins overrun by weight, the air fraction, the FDA density flag, and error seams", () => {

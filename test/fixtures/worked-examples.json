@@ -24419,6 +24419,28 @@
    }
   },
   {
+   "tile_id": "draft-beer-line-balance",
+   "source_publisher": "Draft-beer line balancing (Brewers Association Draught Beer Quality Manual)",
+   "source_title": "line = (applied_pressure - 0.5 x rise - 1) / R",
+   "source_edition_or_year": "spec-v787 worked example (machine-verified)",
+   "source_section_or_page": "12 psi, 4 ft rise, 3/16 in vinyl (3.0 psi/ft) -> (12 - 2 - 1)/3 = 3.0 ft of line",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "applied_pressure_psi": 12,
+    "rise_ft": 4,
+    "tubing_type": "vinyl_316"
+   },
+   "outputs": {
+    "line_length_ft": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "overrun-percent",
    "source_publisher": "Goff & Hartel, Ice Cream, 7th ed.; FDA 21 CFR 135.110",
    "source_title": "overrun% = (mix_weight - finished_weight) / finished_weight x 100 for equal volumes",

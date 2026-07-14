@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(kitchen): spec-v787 draft beer line balancing; 2026-07-14
+
+- New tile `draft-beer-line-balance` (Group O, calc-kitchen.js): the beer-line length that balances a draft system so it
+  pours right. At balance the applied CO2 pressure equals the line restriction (R/ft x length) plus the rise (0.5 psi/ft)
+  plus the faucet (~1 psi), so `line = (pressure - 0.5 x rise - 1) / R`. A 12 psi system with a 4 ft rise on 3/16" vinyl
+  (3.0 psi/ft) needs 3.0 ft of line. Tubing restrictions selectable (3/16" vinyl 3.0, 1/4" 0.85, 3/16" barrier 2.2,
+  5/16" 0.4 psi/ft). Per the Brewers Association Draught Beer Quality Manual. Fuzzer pins the length, the tubing
+  monotonicity, the under-pressured branch, and the error seams. Explore sweep #21 entry 2. Home count 1,235 -> 1,236.
+  Raised the calc-kitchen.js module gzip cap 19000 -> 21000 B (built ~19.8 KB gz) for the overrun + beer-line additions.
+
 ### feat(mechanic): spec-v786 sacrificial anode service life; 2026-07-14
 
 - New tile `sacrificial-anode-life` (Group K, calc-mechanic.js): how long a boat's zinc, aluminum, or magnesium anode

@@ -1020,6 +1020,7 @@ const RELATED = {
   "kitchen-sanitizer-ppm": ["antimicrobial-dilution","pool-chlorine-dose","food-cost-percentage"],
   "drink-abv-dilution": ["pour-cost","bakers-percentage","recipe-scale"],
   "overrun-percent": ["bakers-percentage","yield-ep","recipe-scale"],
+  "draft-beer-line-balance": ["pour-cost","drink-abv-dilution","kitchen-sanitizer-ppm"],
   "reserve-capacity-amp-hours": ["standby-battery-sizing","fuel-range","abyc-dc-wire"],
   "sacrificial-anode-life": ["abyc-dc-wire","prop-slip","reserve-capacity-amp-hours"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],
