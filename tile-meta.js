@@ -370,7 +370,7 @@ const _TILES = [
   ["drying-chamber-co2", "D"],
   ["wall-bracing-length", "E"], ["deck-ledger-fasteners", "E"],
   ["cargo-securement-wll", "J"], ["fuel-tax-ifta", "J"],
-  ["screw-conveyor", "K"],
+  ["screw-conveyor", "K"], ["screw-conveyor-rpm", "K"],
   ["pesticide-rei-phi", "L"],
   ["backflow-test-psi", "M"],
   ["gel-percent-agarose", "T"],

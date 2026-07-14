@@ -9080,7 +9080,33 @@ test("bounds: v23 export-function renderers are callable functions (DOM-bound se
 // ---------------------------------------------------------------------------
 import { computeWallBracingLength, computeDeckLedgerFasteners } from "../../calc-construction.js";
 import { computeCargoSecurementWLL, computeFuelTaxIFTA } from "../../calc-trucking.js";
-import { computeScrewConveyor } from "../../calc-mechanic.js";
+import { computeScrewConveyor, computeScrewConveyorRpm as _v691 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v691 computeScrewConveyorRpm pins rpm = target/(area*(pitch/12)*60*loading), round-trips through computeScrewConveyor, and error seams", () => {
+  const fwd = computeScrewConveyor({ screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, rpm: 40, loading_fraction: 0.30 });
+  const r = _v691({ target_ft3_hr: fwd.capacity_ft3_hr, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.30 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.rpm - 40) < 1e-6, `rpm identity: ${r.rpm}`);
+  // Capacity is linear in speed: double the target doubles the RPM.
+  const dbl = _v691({ target_ft3_hr: fwd.capacity_ft3_hr * 2, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.30 });
+  assert.ok(Math.abs(dbl.rpm - 80) < 1e-6, `double target double rpm: ${dbl.rpm}`);
+  // Round-trip: the RPM, fed back through the forward tile, reproduces the target capacity.
+  for (const target_ft3_hr of [50, 220, 800]) {
+    for (const loading_fraction of [0.15, 0.30, 0.45]) {
+      const m = _v691({ target_ft3_hr, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction });
+      assert.ok(!m.error, `sweep Q=${target_ft3_hr} load=${loading_fraction}: ${JSON.stringify(m)}`);
+      assertFinite(m.rpm, "rpm"); assert.ok(m.rpm > 0, "rpm positive");
+      const back = computeScrewConveyor({ screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, rpm: m.rpm, loading_fraction });
+      assert.ok(Math.abs(back.capacity_ft3_hr - target_ft3_hr) < 1e-6, `round-trip Q=${target_ft3_hr} load=${loading_fraction}: ${back.capacity_ft3_hr}`);
+    }
+  }
+  // Error seams: non-positive target, bad geometry, loading out of range, non-finite.
+  assert.ok("error" in _v691({ target_ft3_hr: 0, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.3 }));
+  assert.ok("error" in _v691({ target_ft3_hr: 220, screw_diameter_in: 0, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.3 }));
+  assert.ok("error" in _v691({ target_ft3_hr: 220, screw_diameter_in: 9, shaft_diameter_in: 9, pitch_in: 9, loading_fraction: 0.3 }));
+  assert.ok("error" in _v691({ target_ft3_hr: 220, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 1.5 }));
+  assert.ok("error" in _v691({ target_ft3_hr: Infinity, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.3 }));
+});
 import { computeTrapSealLoss, computeWaterMeterSizing } from "../../calc-plumbing.js";
 import { computeDryingChamberCO2 } from "../../calc-restoration.js";
 import { computePesticideReiPhi } from "../../calc-agriculture.js";

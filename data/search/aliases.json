@@ -4012,6 +4012,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "auger rpm for a capacity",
+      "target": "screw-conveyor-rpm",
+      "kind": "industry"
+    },
+    {
+      "term": "screw speed for target throughput",
+      "target": "screw-conveyor-rpm",
+      "kind": "industry"
+    },
+    {
+      "term": "how fast to run an auger",
+      "target": "screw-conveyor-rpm",
+      "kind": "adjacent"
+    },
+    {
+      "term": "conveyor rpm for tons per hour",
+      "target": "screw-conveyor-rpm",
+      "kind": "adjacent"
+    },
+    {
+      "term": "auger speed from capacity",
+      "target": "screw-conveyor-rpm",
+      "kind": "adjacent"
+    },
+    {
       "term": "rei",
       "target": "pesticide-rei-phi",
       "kind": "industry"

@@ -2810,6 +2810,17 @@ export const CITATIONS = {
       { name: "Loading fraction", value: "per the CEMA material class (light ~30-45%, heavy/abrasive lower); user-supplied", source: "CEMA Book No. 350" },
     ],
   },
+  "screw-conveyor-rpm": {
+    formula: "rpm = target_ft3_hr / ((pi/4)(D^2 - d^2) x (pitch/12) x 60 x loading), all lengths in feet. The inverse of Q = (pi/4)(D^2-d^2) x pitch x RPM x loading x 60.",
+    edition: "CEMA Screw Conveyor standard (Book No. 350) capacity method solved for speed, by name.",
+    freeAccess: "CEMA-published; the swept-volume capacity relation is public. CEMA and the manufacturer govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The screw speed a conveyor must turn to hit a target volumetric capacity, the inverse of screw-conveyor: rpm = target / (flight_area x (pitch/12) x 60 x loading). To hit a mass rate, divide it by the bulk density for the volumetric target first. Capacity is linear in speed (double the RPM, double the throughput), but CEMA caps the speed by screw diameter (large augers run slower), and running past the class limit accelerates wear and can flood the trough - a flagged high RPM means step up a screw size instead. Single-edition (geometric swept-volume); the trough loading fraction is per the CEMA material class and is user-supplied.",
+    assumptions: [
+      { name: "Linear in speed", value: "capacity is proportional to RPM; CEMA caps the speed by screw diameter", source: "CEMA Book No. 350" },
+      { name: "Loading fraction", value: "per the CEMA material class (light ~30-45%, heavy/abrasive lower); user-supplied", source: "CEMA Book No. 350" },
+    ],
+  },
 
   "pesticide-rei-phi": {
     formula: "REI remaining = max(0, REI_hours - hours since application); PHI remaining = max(0, PHI_days - days since application); early-entry / early-harvest violation when not yet clear.",

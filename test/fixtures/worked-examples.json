@@ -14631,6 +14631,54 @@
    }
   },
   {
+   "tile_id": "screw-conveyor-rpm",
+   "source_publisher": "CEMA Screw Conveyor standard (Book No. 350), inverse",
+   "source_title": "rpm = target / (flight_area x (pitch/12) x 60 x loading)",
+   "source_edition_or_year": "spec-v691 worked example (machine-verified)",
+   "source_section_or_page": "220.157 ft^3/hr, 9 in screw, 2.5 in shaft, 9 in pitch, 0.30 loading -> 40 RPM (round-trips screw-conveyor)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_ft3_hr": 220.15692267734724,
+    "screw_diameter_in": 9,
+    "shaft_diameter_in": 2.5,
+    "pitch_in": 9,
+    "loading_fraction": 0.3
+   },
+   "outputs": {
+    "rpm": {
+     "value": 40,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "screw-conveyor-rpm",
+   "source_publisher": "CEMA Screw Conveyor standard (Book No. 350), inverse",
+   "source_title": "cross-check: capacity is linear in speed, so double the target doubles the RPM",
+   "source_edition_or_year": "spec-v691 cross-check (machine-verified)",
+   "source_section_or_page": "440.3 ft^3/hr, same geometry and loading -> 80 RPM",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_ft3_hr": 440.3138453546945,
+    "screw_diameter_in": 9,
+    "shaft_diameter_in": 2.5,
+    "pitch_in": 9,
+    "loading_fraction": 0.3
+   },
+   "outputs": {
+    "rpm": {
+     "value": 80,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "trap-seal-loss",
    "source_publisher": "IPC/UPC §1002 (trap-to-vent)",
    "source_title": "Pass if developed distance <= permitted maximum; percent used",

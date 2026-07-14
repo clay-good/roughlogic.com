@@ -752,6 +752,48 @@ const renderScrewConveyor = _simpleRenderer({
 });
 MECHANIC_RENDERERS["screw-conveyor"] = renderScrewConveyor;
 
+// dims: in { target_ft3_hr: dimensionless, screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, loading_fraction: dimensionless } out: { rpm: dimensionless }
+export function computeScrewConveyorRpm({ target_ft3_hr = 0, screw_diameter_in = 0, shaft_diameter_in = 0, pitch_in = 0, loading_fraction = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_ft3_hr) || 0;
+  const D = Number(screw_diameter_in) || 0;
+  const d = Number(shaft_diameter_in) || 0;
+  const pitch = Number(pitch_in) || 0;
+  const load = Number(loading_fraction) || 0;
+  if (!(target > 0)) return { error: "Target capacity must be positive (ft^3/hr)." };
+  if (!(D > 0)) return { error: "Screw diameter must be positive (in)." };
+  if (!(d >= 0 && d < D)) return { error: "Shaft diameter must be in [0, screw diameter)." };
+  if (!(pitch > 0)) return { error: "Pitch must be positive (in)." };
+  if (!(load > 0 && load <= 1)) return { error: "Loading fraction must be in (0, 1]." };
+  const area_ft2 = (Math.PI / 4) * (((D / 12) ** 2) - ((d / 12) ** 2));
+  const per_rpm = area_ft2 * (pitch / 12) * 60 * load; // ft^3/hr per RPM
+  // Inverse of capacity_ft3_hr = area x (pitch/12) x (rpm x 60) x loading: rpm = target / per_rpm.
+  const rpm = target / per_rpm;
+  if (!Number.isFinite(rpm) || !(rpm > 0)) return { error: "RPM math is not a finite positive value." };
+  const over_speed = rpm > 100;
+  return {
+    rpm, per_rpm, area_ft2, over_speed,
+    note: "The screw speed a conveyor must turn to hit a target volumetric capacity, the inverse of the screw-conveyor tile: from capacity = flight_area x (pitch/12) x (rpm x 60) x loading, rpm = target / (flight_area x (pitch/12) x 60 x loading). To hit a mass rate instead, divide the mass rate by the bulk density to get the volumetric target first. Capacity is linear in speed, so doubling the RPM doubles the throughput - but CEMA caps the speed by screw diameter (large augers run slower), and running faster than the class limit accelerates wear and can flood the trough, so a flagged high RPM means step up a screw size instead. Per the CEMA Screw Conveyor standard (Book No. 350); the loading fraction is per the material class. An estimate; CEMA and the manufacturer govern."
+  };
+}
+export const screwConveyorRpmExample = { inputs: { target_ft3_hr: 220.2, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.30 } };
+MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
+  citation: "Citation: CEMA Screw Conveyor standard (Book No. 350) capacity method solved for speed: rpm = target / (flight_area x (pitch/12) x 60 x loading). Divide a mass rate by the bulk density for the volumetric target. CEMA caps speed by screw diameter. Estimate; CEMA and the manufacturer govern.",
+  example: screwConveyorRpmExample.inputs,
+  fields: [
+    { key: "target_ft3_hr", label: "Target capacity (ft^3/hr)", kind: "number" },
+    { key: "screw_diameter_in", label: "Screw diameter (in)", kind: "number" },
+    { key: "shaft_diameter_in", label: "Shaft / pipe diameter (in)", kind: "number" },
+    { key: "pitch_in", label: "Pitch (in)", kind: "number" },
+    { key: "loading_fraction", label: "Trough loading fraction (CEMA class)", kind: "number" },
+  ],
+  outputs: [
+    { key: "rpm", id: "scr-out-rpm", label: "Required screw speed", value: (r) => fmt(r.rpm, 1) + " RPM" + (r.over_speed ? " (high - CEMA caps speed by diameter; step up a screw size)" : "") },
+    { key: "n", id: "scr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeScrewConveyorRpm,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================

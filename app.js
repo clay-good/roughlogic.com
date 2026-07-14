@@ -830,7 +830,7 @@ const TOOL_MODULES = (() => {
     "prop-slip", "displacement-cr", "chamber-cc-for-cr", "bolt-stretch",
     "driveshaft-crit", "fuel-range", "tire-gearing", "brake-pad-life",
     // v23
-    "valve-flow-coefficient", "screw-conveyor",
+    "valve-flow-coefficient", "screw-conveyor", "screw-conveyor-rpm",
   
     // v20
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
