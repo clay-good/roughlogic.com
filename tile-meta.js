@@ -508,6 +508,7 @@ const _TILES = [
   ["deck-board-takeoff", "E"],
   ["shadow-length", "A"],
   ["engine-bmep", "K"],
+  ["compressor-displacement", "C"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

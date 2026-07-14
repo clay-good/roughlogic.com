@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(refrigeration): spec-v792 compressor theoretical displacement; 2026-07-14
+
+- New tile `compressor-displacement` (Group C, calc-refrigerant.js): the swept-volume pumping ceiling of a reciprocating
+  compressor -- the figure the refrigerant-mass-flow tile's own note names as a gap. `displacement = (pi/4) x bore^2 x
+  stroke x cylinders x RPM`, /1728 for CFM. A 2.0" bore, 1.5" stroke, 4-cylinder compressor at 1750 RPM sweeps 18.85
+  in^3/rev, 19.1 CFM at 100% VE; the actual delivered volume is that times the volumetric efficiency. Fuzzer pins the
+  swept volume, CFM, the bore-squared / RPM-linear scaling, and the error seams. Explore sweep #22 entry 2. Home count
+  1,240 -> 1,241.
+
 ### feat(mechanic): spec-v791 engine BMEP; 2026-07-14
 
 - New tile `engine-bmep` (Group K, calc-mechanic.js): brake mean effective pressure, torque normalized by displacement

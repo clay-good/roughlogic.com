@@ -1007,3 +1007,50 @@ function _v586renderFlashGasSubcool(inputRegion, outputRegion, citationEl) {
   for (const f of [lift, friction, grad, slope]) f.input.addEventListener("input", update);
 }
 REFRIGERANT_RENDERERS["flash-gas-subcool"] = _v586renderFlashGasSubcool;
+
+// ===================== spec-v792 C: compressor theoretical displacement =====================
+// Swept-volume geometry: each cylinder sweeps (pi/4) D^2 L per revolution; times cylinders times
+// RPM is the volumetric flow rate at 100% volumetric efficiency. Divide in^3/min by 1728 for CFM.
+// dims: in { bore_in: L, stroke_in: L, cylinders: dimensionless, rpm: T^-1 } out: { displacement_cid_per_rev: L^3, displacement_cfm: L^3 T^-1 }
+export function computeCompressorDisplacement({ bore_in = 0, stroke_in = 0, cylinders = 0, rpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const bore = Number(bore_in) || 0;
+  const stroke = Number(stroke_in) || 0;
+  const n = Number(cylinders) || 0;
+  const speed = Number(rpm) || 0;
+  if (!(bore > 0)) return { error: "Bore must be positive (in)." };
+  if (!(stroke > 0)) return { error: "Stroke must be positive (in)." };
+  if (!(n >= 1)) return { error: "Cylinder count must be at least 1." };
+  if (!(speed > 0)) return { error: "Speed must be positive (RPM)." };
+  const displacement_cid_per_rev = (Math.PI / 4) * bore * bore * stroke * n;
+  const displacement_cid_per_min = displacement_cid_per_rev * speed;
+  const displacement_cfm = displacement_cid_per_min / 1728;
+  if (![displacement_cid_per_rev, displacement_cfm].every(Number.isFinite)) return { error: "Compressor-displacement math is not a finite value." };
+  return {
+    displacement_cid_per_rev, displacement_cid_per_min, displacement_cfm,
+    note: "Theoretical (swept) displacement of a reciprocating compressor: each cylinder sweeps (pi/4) x bore^2 x stroke per revolution, so the pumped volume is (pi/4) x bore^2 x stroke x cylinders x RPM, converted to CFM by dividing in^3/min by 1728. This is the DISPLACEMENT at 100% volumetric efficiency -- the actual delivered (suction) volume is this times the volumetric efficiency, which falls as the compression ratio rises (clearance-volume re-expansion), as valves and rings leak, and as the suction gas heats up, so a real compressor moves noticeably less. It is the geometric ceiling the pumping capacity is measured against and the number to compare two compressors on. Reciprocating positive-displacement only; scroll, screw, and rotary machines have their own displacement definitions. A comparison figure; the compressor's rated capacity at the operating condition governs.",
+  };
+}
+export const compressorDisplacementExample = { inputs: { bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 1750 } };
+function _v792renderCompressorDisplacement(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: reciprocating compressor theoretical displacement (ASHRAE Refrigeration; positive-displacement swept-volume geometry): displacement = (pi/4) x bore^2 x stroke x cylinders x RPM, / 1728 for CFM. This is the 100%-volumetric-efficiency ceiling; actual delivered volume = displacement x volumetric efficiency, which drops with compression ratio, leakage, and suction superheat. Reciprocating only. A comparison figure; the rated capacity at the operating condition governs.";
+  const bore = makeNumber("Bore (in)", "cdisp-bore", { step: "any", min: "0" }); bore.input.value = "2.0";
+  const stroke = makeNumber("Stroke (in)", "cdisp-stroke", { step: "any", min: "0" }); stroke.input.value = "1.5";
+  const cyl = makeNumber("Number of cylinders", "cdisp-cyl", { step: "1", min: "1" }); cyl.input.value = "4";
+  const rpm = makeNumber("Speed (RPM)", "cdisp-rpm", { step: "any", min: "0" }); rpm.input.value = "1750";
+  for (const f of [bore, stroke, cyl, rpm]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { bore.input.value = "2.0"; stroke.input.value = "1.5"; cyl.input.value = "4"; rpm.input.value = "1750"; update(); });
+  const oR = makeOutputLine(outputRegion, "Displacement per revolution", "cdisp-out-r");
+  const oC = makeOutputLine(outputRegion, "Theoretical displacement", "cdisp-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "cdisp-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCompressorDisplacement({ bore_in: readNum(bore.input), stroke_in: readNum(stroke.input), cylinders: readNum(cyl.input), rpm: readNum(rpm.input) });
+    if (r.error) { oR.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oR.textContent = fmt(r.displacement_cid_per_rev, 2) + " in^3/rev";
+    oC.textContent = fmt(r.displacement_cfm, 2) + " CFM (" + fmt(r.displacement_cid_per_min, 0) + " in^3/min) at 100% VE";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [bore, stroke, cyl, rpm]) f.input.addEventListener("input", update);
+}
+REFRIGERANT_RENDERERS["compressor-displacement"] = _v792renderCompressorDisplacement;

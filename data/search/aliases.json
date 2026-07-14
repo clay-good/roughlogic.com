@@ -58537,6 +58537,26 @@
       "kind": "question"
     },
     {
+      "term": "compressor displacement",
+      "target": "compressor-displacement",
+      "kind": "industry"
+    },
+    {
+      "term": "compressor cfm from bore and stroke",
+      "target": "compressor-displacement",
+      "kind": "question"
+    },
+    {
+      "term": "swept volume of a compressor",
+      "target": "compressor-displacement",
+      "kind": "question"
+    },
+    {
+      "term": "reciprocating compressor pumping capacity",
+      "target": "compressor-displacement",
+      "kind": "adjacent"
+    },
+    {
       "term": "how efficient is my refrigeration cycle really",
       "target": "refrigeration-cop",
       "kind": "question"

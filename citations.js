@@ -11612,6 +11612,17 @@ export const CITATIONS = {
       { name: "Empirical", value: "a statistical fit reflecting wheel power; not a dyno measurement", source: "drag-racing practice" },
     ],
   },
+  "compressor-displacement": {
+    formula: "displacement_cfm = (pi/4) x bore_in^2 x stroke_in x cylinders x rpm / 1728; displacement_cid_per_rev = (pi/4) x bore^2 x stroke x cylinders.",
+    edition: "Reciprocating compressor theoretical (swept-volume) displacement (ASHRAE Refrigeration; positive-displacement compressor geometry), by name; the rated capacity at the operating condition governs.",
+    freeAccess: "The swept-volume geometry is first-principles; the bore, stroke, cylinder count, and speed come from the compressor nameplate and spec.",
+    governance: GOVERNANCE.general,
+    editionNote: "Theoretical (swept) displacement of a reciprocating compressor: each cylinder sweeps (pi/4) x bore^2 x stroke per revolution, so the pumped volume is (pi/4) x bore^2 x stroke x cylinders x RPM, converted to CFM by dividing in^3/min by 1728. This is the displacement at 100% volumetric efficiency; the actual delivered (suction) volume is this times the volumetric efficiency, which falls as the compression ratio rises (clearance re-expansion), as valves and rings leak, and as the suction gas superheats, so a real machine moves noticeably less. It is the geometric ceiling the pumping capacity is measured against and the figure to compare two compressors on. Reciprocating positive-displacement only; scroll, screw, and rotary machines have their own displacement definitions. A comparison figure, not the rated capacity.",
+    assumptions: [
+      { name: "100% volumetric efficiency", value: "the theoretical displacement is the ceiling; actual delivered volume = displacement x volumetric efficiency", source: "compressor theory" },
+      { name: "Reciprocating only", value: "swept-volume geometry applies to piston compressors; scroll/screw/rotary differ", source: "ASHRAE Refrigeration" },
+    ],
+  },
   "refrigerant-mass-flow": {
     formula: "Q_btumin = (unit == tons) ? Q x 200 : Q/60; RE = h1 - h4; m_dot = Q_btumin / RE; m_dot_lbh = 60 m_dot.",
     edition: "The refrigerant mass-flow-from-capacity relation m_dot = Q / (h1 - h4) with the refrigeration effect off the pressure-enthalpy diagram, a standard refrigeration-cycle result, by name.",

@@ -21666,6 +21666,23 @@ test("bounds: spec-v788 computeRollingSphereProtection pins the rolling-sphere r
   assert.ok("error" in _v788({ mast_height_ft: 30, sphere_radius_ft: 0 }));
 });
 
+import { computeCompressorDisplacement as _v792 } from "../../calc-refrigerant.js";
+
+test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, monotonicity, and error seams", () => {
+  const r = _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 1750 });
+  assert.ok(Math.abs(r.displacement_cid_per_rev - 18.8496) < 0.001); // (pi/4)*4*1.5*4
+  assert.ok(Math.abs(r.displacement_cfm - 19.09) < 0.01); // *1750/1728
+  // Bore enters squared: doubling the bore quadruples the displacement; RPM scales it linearly.
+  assert.ok(Math.abs(_v792({ bore_in: 4.0, stroke_in: 1.5, cylinders: 4, rpm: 1750 }).displacement_cfm - 4 * r.displacement_cfm) < 0.01);
+  assert.ok(Math.abs(_v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 3500 }).displacement_cfm - 2 * r.displacement_cfm) < 0.01);
+  // Error seams: non-finite, non-positive bore/stroke, cylinders < 1, non-positive rpm.
+  assert.ok("error" in _v792({ bore_in: Infinity, stroke_in: 1.5, cylinders: 4, rpm: 1750 }));
+  assert.ok("error" in _v792({ bore_in: 0, stroke_in: 1.5, cylinders: 4, rpm: 1750 }));
+  assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 0, cylinders: 4, rpm: 1750 }));
+  assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 0, rpm: 1750 }));
+  assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
+});
+
 import { computeEngineBmep as _v791 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v791 computeEngineBmep pins the 4-stroke / 2-stroke BMEP, monotonicity, and error seams", () => {

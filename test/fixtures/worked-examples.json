@@ -24467,6 +24467,35 @@
    }
   },
   {
+   "tile_id": "compressor-displacement",
+   "source_publisher": "Reciprocating compressor theoretical displacement (ASHRAE Refrigeration)",
+   "source_title": "displacement = (pi/4) x bore^2 x stroke x cylinders x rpm / 1728",
+   "source_edition_or_year": "spec-v792 worked example (machine-verified)",
+   "source_section_or_page": "2.0 in bore, 1.5 in stroke, 4 cyl, 1750 rpm -> 18.85 in^3/rev, 19.09 CFM at 100% VE",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "bore_in": 2.0,
+    "stroke_in": 1.5,
+    "cylinders": 4,
+    "rpm": 1750
+   },
+   "outputs": {
+    "displacement_cid_per_rev": {
+     "value": 18.85,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "displacement_cfm": {
+     "value": 19.09,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "engine-bmep",
    "source_publisher": "Brake mean effective pressure (SAE; Heywood)",
    "source_title": "BMEP = 150.8 x torque(lb-ft) / displacement(CID), 4-stroke",
