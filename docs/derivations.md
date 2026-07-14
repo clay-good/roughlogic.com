@@ -2044,6 +2044,7 @@ cross-check.
 | calc-hvac.js | `computeCoilBypassFactor` | `{ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeColebrookFrictionFactor` | `{ reynolds = 0, rel_roughness = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCombustionAir` | `{ btu_input, room_volume_ft3 }` | _ | _ | _ |
+| calc-hvac.js | `computeCombustionAirMaxInput` | `{ room_volume_ft3 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCompressedAirPower` | `{ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75...` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingCoilTotalLoad` | `{ cfm = 0, h_ent_btu = 0, h_lvg_btu = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeCoolingTower` | `{ T_in_F = 0, T_out_F = 0, T_wb_F = 0, gpm = 0, fan_kW = 0 } = {}` | _ | _ | _ |
@@ -2099,6 +2100,7 @@ cross-check.
 | calc-hvac.js | `renderBalancePoint` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderCfmPerTon` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderCombustionAir` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-hvac.js | `renderCombustionAirMaxInput` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderDuctSizing` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEquivalentLength` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-hvac.js | `renderEvaporativeCooling` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2804,7 +2806,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1390.
+Row count: 1392.
 
 <!-- END function-corpus-v14 -->
 
@@ -3138,7 +3140,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (122 tiles)
+### Group C HVAC (123 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3170,6 +3172,7 @@ per spec-v14 §13.1 second paragraph.
 | `coil-face-velocity` | Cooling Coil Face Velocity and Carryover Check | coil-selection practice; spec-v409 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `colebrook-friction-factor` | Darcy Friction Factor (Swamee-Jain / Colebrook) | Swamee-Jain / Moody; spec-v387 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `combustion-air` | Combustion Air | ICC; required_volume = 50 ft^3 per 1000 Btu/hr = 5000 ft^3; 40... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `combustion-air-max-input` | Max Appliance Input from Room Volume | ICC; max input = (4000 / 50) * 1000 = 80,000 Btu/hr; at that i... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `combustion-lambda` | Combustion Lambda and Air-Fuel Ratio | Combustion-analysis practice (lambda ...; Natural gas at 3% O2 -> lambda 1.168, 16.8% excess air, 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `compare-refrigerants` | Compare Two Refrigerants | Chemours / Honeywell / Daikin publish...; R-410A vs R-32 at 118 psig -> 40 F vs 43.2 F sat-temp; pr... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressed-air-power` | Compressed-Air Compression Power (Isentropic) and Energy Cost | Single-stage adiabatic (isentropic) c...; spec-v240 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4135,6 +4138,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1145. Fixture-covered or reference-cadence: 1145 / 1145.
+Tile count: 1146. Fixture-covered or reference-cadence: 1146 / 1146.
 
 <!-- END tile-index-v14 -->

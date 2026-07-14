@@ -242,6 +242,7 @@ export const COMPUTE_MAP = {
   "copper-resistance": { module: "../../calc-electrical.js", fn: "computeConductorResistance" },
   "balance-point": { module: "../../calc-hvac.js", fn: "computeBalancePoint" },
   "combustion-air": { module: "../../calc-hvac.js", fn: "computeCombustionAir" },
+  "combustion-air-max-input": { module: "../../calc-hvac.js", fn: "computeCombustionAirMaxInput" },
   "coagulant-dose": { module: "../../calc-water.js", fn: "computeCoagulantDose" },
   "box-fill": { module: "../../calc-electrical.js", fn: "computeBoxFill" },
   "braking-distance": { module: "../../calc-fire.js", fn: "computeBrakingDistance" },

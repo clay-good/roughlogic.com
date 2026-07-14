@@ -485,6 +485,7 @@ import {
   computeBalancePoint,
   computeCfmPerTon,
   computeCombustionAir,
+  computeCombustionAirMaxInput,
   computeApproachDeltaT,
   computeEvaporativeCooling,
   computeAffinityLaws,
@@ -522,6 +523,7 @@ import {
   renderSHR,
   renderCfmPerTon,
   renderCombustionAir,
+  renderCombustionAirMaxInput,
   renderOutdoorAirVentilation,
 } from "../../calc-hvac.js";
 // spec-v89: refrigerant-circuit bench relocated to calc-refrigerant.js.
@@ -1069,6 +1071,28 @@ test("bounds: calc-hvac computeCombustionAir pins the 50/1000 volume threshold a
       assert.ok(Math.abs(r.opening_indoor_in2 - btu_input / 4000) < 1e-9, `indoor opening`);
     }
   }
+});
+
+test("bounds: spec-v697 computeCombustionAirMaxInput pins max_btu = volume/50*1000, round-trips through computeCombustionAir, and error seams", () => {
+  const r = computeCombustionAirMaxInput({ room_volume_ft3: 4000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_btu_input - (4000 / 50) * 1000) < 1e-9, `max identity: ${r.max_btu_input}`);
+  assert.strictEqual(r.max_btu_input, 80000);
+  // Round-trip: at the max input the forward tile's required volume equals the room and it is exactly adequate.
+  for (const room_volume_ft3 of [500, 4000, 20000, 100000]) {
+    const m = computeCombustionAirMaxInput({ room_volume_ft3 });
+    assert.ok(!m.error, `sweep V=${room_volume_ft3}: ${JSON.stringify(m)}`);
+    assertFinite(m.max_btu_input, "max"); assert.ok(m.max_btu_input > 0, "max positive");
+    const back = computeCombustionAir({ btu_input: m.max_btu_input, room_volume_ft3 });
+    assert.ok(Math.abs(back.required_volume_ft3 - room_volume_ft3) < 1e-6, `round-trip V=${room_volume_ft3}: ${back.required_volume_ft3}`);
+    assert.strictEqual(back.adequate_by_volume, true, `boundary adequate V=${room_volume_ft3}`);
+  }
+  // A bigger space supports a bigger appliance.
+  assert.ok(computeCombustionAirMaxInput({ room_volume_ft3: 10000 }).max_btu_input > r.max_btu_input);
+  // Error seams: non-positive volume, non-finite.
+  assert.ok("error" in computeCombustionAirMaxInput({ room_volume_ft3: 0 }));
+  assert.ok("error" in computeCombustionAirMaxInput({ room_volume_ft3: -100 }));
+  assert.ok("error" in computeCombustionAirMaxInput({ room_volume_ft3: Infinity }));
 });
 
 test("bounds: calc-hvac computeApproachDeltaT pins the approach = sat - outdoor and delta_T = return - supply identities", () => {
@@ -7127,7 +7151,7 @@ test("bounds: calc-hvac render* sentinels - every exported renderer is a callabl
     renderManualJHeating, renderDuctSizing, renderStaticPressureHvac,
     renderRefrigerantPT, renderSuperheatSubcool, renderSeerEer,
     renderBalancePoint, renderSHR, renderCfmPerTon, renderCombustionAir,
-    renderOutdoorAirVentilation,
+    renderCombustionAirMaxInput, renderOutdoorAirVentilation,
   ]) {
     assert.strictEqual(typeof fn, "function", "render symbol must be a function");
   }

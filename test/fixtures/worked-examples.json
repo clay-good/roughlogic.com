@@ -2412,6 +2412,32 @@
    }
   },
   {
+   "tile_id": "combustion-air-max-input",
+   "source_publisher": "ICC",
+   "source_title": "max appliance input in a 4,000 ft^3 room by the standard volume method",
+   "source_edition_or_year": "IFGC 2021 §304.5 (50 ft^3 per 1000 Btu/hr), solved for input",
+   "source_section_or_page": "max input = (4000 / 50) * 1000 = 80,000 Btu/hr; at that input required_volume = 4000 ft^3, exactly adequate",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "room_volume_ft3": 4000
+   },
+   "outputs": {
+    "max_btu_input": {
+     "value": 80000,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "max_kbtu_input": {
+     "value": 80,
+     "tolerance": {
+      "abs": 1e-09
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coagulant-dose",
    "source_publisher": "USEPA / WEF",
    "source_title": "5 MGD plant, 20 mg/L alum liquid (48.5%, SG 1.33) jar-test dose",

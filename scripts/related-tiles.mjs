@@ -660,6 +660,7 @@ const RELATED = {
   "shr": ["shr-latent", "manual-j-cooling", "cfm-per-ton"],
   "cfm-per-ton": ["manual-j-cooling", "duct-sizing", "shr"],
   "combustion-air": ["outdoor-air-ventilation", "outdoor-air-mix"],
+  "combustion-air-max-input": ["combustion-air", "excess-air-o2", "outdoor-air-ventilation"],
   "compare-refrigerants": ["refrigerant-pt", "refrigerant-charge"],
   "refrigerant-charge": ["refrigerant-pt", "superheat-subcool", "refrigerant-charging"],
   "approach-delta-t": ["superheat-subcool", "cooling-tower"],

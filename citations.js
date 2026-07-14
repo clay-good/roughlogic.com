@@ -3799,6 +3799,16 @@ export const CITATIONS = {
       { name: "Standard method", value: "IFGC §304.5; known-air-infiltration method §304.6 not applied unless user supplies", source: "IFGC 2021" },
     ],
   },
+  "combustion-air-max-input": {
+    formula: "Standard volume method solved for input (inverse of combustion-air): max appliance BTU/hr = (room_volume_ft3 / 50) * 1000, since IFGC 2021 §304.5 treats a space as adequate at 50 ft^3 per 1000 BTU/hr.",
+    edition: IFGC_2021 + " §304.",
+    freeAccess: ICC_FREE,
+    governance: GOVERNANCE.mechanical,
+    editionNote: IFGC_DISCLOSURE,
+    assumptions: [
+      { name: "Standard method", value: "IFGC §304.5 volume rule; above the returned input the space is confined and needs openings, or use the known-air-infiltration method §304.6", source: "IFGC 2021" },
+    ],
+  },
   "compare-refrigerants": {
     formula: "Side-by-side P-T lookup for two refrigerants at the same temperature or pressure, plus GWP / safety-class comparison.",
     edition: "Manufacturer P-T tables (as per refrigerant-pt). ASHRAE 34 safety classifications by name.",

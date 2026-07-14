@@ -398,6 +398,27 @@ export const combustionAirExample = {
   inputs: { btu_input: 100000, room_volume_ft3: 4000 },
 };
 
+// combustion-air-max-input: the inverse of combustion-air. The standard
+// (volume) method treats a space as adequate at 50 ft^3 per 1000 BTU/hr, so
+// the largest appliance input a confined space supports WITHOUT added
+// combustion-air openings is (room_volume_ft3 / 50) * 1000.
+// dims: in { room_volume_ft3: dimensionless } out: { max_btu_input: dimensionless, max_kbtu_input: dimensionless }
+export function computeCombustionAirMaxInput({ room_volume_ft3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(room_volume_ft3);
+  if (!(V > 0)) return { error: "Room volume must be positive (ft^3)." };
+  const max_btu_input = (V / 50) * 1000;
+  return {
+    max_btu_input,
+    max_kbtu_input: max_btu_input / 1000,
+    note: "Standard (volume) method: 50 ft^3 per 1000 BTU/hr. Above this input the space is 'confined' and needs combustion-air openings (1 in^2 per 1000 BTU/hr from outdoors, 1 in^2 per 4000 BTU/hr from adjacent indoor spaces), or use the known-air-infiltration-rate method. AHJ governs.",
+  };
+}
+
+export const combustionAirMaxInputExample = {
+  inputs: { room_volume_ft3: 4000 },
+};
+
 // =====================================================================
 // v2 utilities (79-85): spec-v2.md section 2 Group C extensions.
 // =====================================================================
@@ -1132,6 +1153,23 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
   for (const el of [btu.input, vol.input]) el.addEventListener("input", update);
 }
 
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+export function renderCombustionAirMaxInput(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: per IMC 2021 §304 (combustion air), the standard volume method solved for input. A space is adequate by volume at 50 ft^3 per 1000 BTU/hr, so the max appliance input is (room volume / 50) * 1000; above it, combustion-air openings are required. AHJ governs. Free at codes.iccsafe.org.";
+  const vol = makeNumber("Room volume (ft^3)", "cam-v", { step: "any", min: "0" });
+  inputRegion.appendChild(vol.wrap);
+  attachExampleButton(inputRegion, () => { vol.input.value = "4000"; update(); });
+  const oMax = makeOutputLine(outputRegion, "Max appliance input (by volume)", "cam-out-max");
+  const oNote = makeOutputLine(outputRegion, "Note", "cam-out-note");
+  const update = debounce(() => {
+    const r = computeCombustionAirMaxInput({ room_volume_ft3: Number(vol.input.value) || 0 });
+    if (r.error) { oMax.textContent = r.error; oNote.textContent = ""; return; }
+    oMax.textContent = fmt(r.max_btu_input, 0) + " BTU/hr (" + fmt(r.max_kbtu_input, 1) + " kBTU/hr)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  vol.input.addEventListener("input", update);
+}
+
 // =====================================================================
 // v3 utilities (139 through 144). See spec-v3.md section 2.3.
 // =====================================================================
@@ -1619,6 +1657,7 @@ export const HVAC_RENDERERS = {
   "shr": renderSHR,
   "cfm-per-ton": renderCfmPerTon,
   "combustion-air": renderCombustionAir,
+  "combustion-air-max-input": renderCombustionAirMaxInput,
   // v2
   "approach-delta-t": renderApproachDeltaT,
   "outdoor-air-mix": renderOutdoorAirMix,

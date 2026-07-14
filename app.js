@@ -269,7 +269,7 @@ const TOOL_MODULES = (() => {
   declare("./calc-hvac.js", "HVAC_RENDERERS", [
     "manual-j-cooling", "manual-j-heating", "duct-sizing",
     "static-pressure-hvac",
-    "seer-eer", "balance-point", "shr", "cfm-per-ton", "combustion-air",
+    "seer-eer", "balance-point", "shr", "cfm-per-ton", "combustion-air", "combustion-air-max-input",
     // v2
     "approach-delta-t",
     "outdoor-air-mix", "equivalent-length", "wet-bulb-psychrometer",

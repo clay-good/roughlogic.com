@@ -51632,6 +51632,31 @@
       "kind": "question"
     },
     {
+      "term": "biggest furnace for my mechanical closet",
+      "target": "combustion-air-max-input",
+      "kind": "question"
+    },
+    {
+      "term": "max appliance btu for room size",
+      "target": "combustion-air-max-input",
+      "kind": "question"
+    },
+    {
+      "term": "how big a water heater fits this space",
+      "target": "combustion-air-max-input",
+      "kind": "question"
+    },
+    {
+      "term": "confined space combustion air limit",
+      "target": "combustion-air-max-input",
+      "kind": "question"
+    },
+    {
+      "term": "max gas input from room volume",
+      "target": "combustion-air-max-input",
+      "kind": "question"
+    },
+    {
       "term": "compare r410a and r32 pressures",
       "target": "compare-refrigerants",
       "kind": "question"

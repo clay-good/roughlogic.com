@@ -129,6 +129,7 @@ export const TOOLS = [
   { id: "shr", name: "Sensible Heat Ratio", group: "C", trades: ["hvac"], desc: "SHR from total and sensible cooling loads." },
   { id: "cfm-per-ton", name: "CFM per Ton", group: "C", trades: ["hvac"], desc: "Standard 400 CFM per ton with humidity adjustments." },
   { id: "combustion-air", name: "Combustion Air", group: "C", trades: ["hvac"], desc: "Required combustion air opening from BTU input and room volume." },
+  { id: "combustion-air-max-input", name: "Max Appliance Input from Room Volume", group: "C", trades: ["hvac"], desc: "Largest appliance BTU input a confined space supports by the standard volume method, before combustion-air openings are required (the inverse of Combustion Air)." },
   { id: "compare-refrigerants", name: "Compare Two Refrigerants", group: "C", trades: ["hvac"], desc: "Side-by-side P-T at a chosen pressure or temperature with manufacturer attribution." },
   { id: "refrigerant-charge", name: "Refrigerant Charge Weighing", group: "C", trades: ["hvac"], desc: "Charge in oz from line-set length, diameter, and refrigerant." },
   { id: "approach-delta-t", name: "Approach and Delta-T Diagnostics", group: "C", trades: ["hvac"], desc: "Condenser approach and supply/return delta-T with band labels." },
