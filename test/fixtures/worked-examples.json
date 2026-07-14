@@ -22595,6 +22595,64 @@
    }
   },
   {
+   "tile_id": "room-absorption-target",
+   "source_publisher": "W.C. Sabine reverberation equation (public domain), solved for the required absorption.",
+   "source_title": "A_required = 0.049 x V / RT60_target; A_additional = max(0, required - existing).",
+   "source_edition_or_year": "spec-v664 worked example (machine-verified)",
+   "source_section_or_page": "spec-v664 section 2 pinned example: 5,000 ft^3 targeting 0.6 s with 250 sabins already present",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "volume_ft3": 5000,
+    "target_rt60_s": 0.6,
+    "existing_sabins": 250,
+    "sabine_coeff": 0.049
+   },
+   "outputs": {
+    "required_sabins": {
+     "value": 408.33,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "additional_sabins": {
+     "value": 158.33,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "room-absorption-target",
+   "source_publisher": "W.C. Sabine reverberation equation (public domain).",
+   "source_title": "Cross-check: a tighter 0.4 s target needs more absorption; round-trips to RT60 through room-acoustics.",
+   "source_edition_or_year": "spec-v664 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v664 section 2 cross-check: 5,000 ft^3 targeting 0.4 s with 250 sabins already -> 612.5 required, 362.5 additional",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "volume_ft3": 5000,
+    "target_rt60_s": 0.4,
+    "existing_sabins": 250,
+    "sabine_coeff": 0.049
+   },
+   "outputs": {
+    "required_sabins": {
+     "value": 612.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "additional_sabins": {
+     "value": 362.5,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "counterweight-arbor-load",
    "source_publisher": "Theatrical counterweight rigging (single / double purchase)",
    "source_title": "required = (batten + load) x purchase_ratio; out_of_weight = required - existing",

@@ -1255,6 +1255,44 @@ const renderRoomAcoustics = _r({
 });
 STAGE_RENDERERS["room-acoustics"] = renderRoomAcoustics;
 
+// --- spec-v664 N: absorption needed for a target RT60 (inverse of room-acoustics) ---
+// dims: in { volume_ft3: L^3, target_rt60_s: T, existing_sabins: L^2, sabine_coeff: dimensionless } out: { required_sabins: L^2, additional_sabins: L^2 }
+export function computeRoomAbsorptionTarget({ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.049 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const V = Number(volume_ft3) || 0;
+  const rt = Number(target_rt60_s) || 0;
+  const existing = Number(existing_sabins) || 0;
+  const k = (sabine_coeff === undefined || sabine_coeff === null || sabine_coeff === "") ? 0.049 : Number(sabine_coeff);
+  if (!(V > 0)) return { error: "Room volume must be positive (ft^3)." };
+  if (!(rt > 0)) return { error: "Target RT60 must be positive (s)." };
+  if (existing < 0) return { error: "Existing absorption cannot be negative (sabins)." };
+  if (!(k > 0)) return { error: "Sabine coefficient must be positive." };
+  const required_sabins = k * V / rt;
+  const additional_sabins = Math.max(0, required_sabins - existing);
+  return {
+    required_sabins, additional_sabins, meets_already: existing >= required_sabins,
+    note: "The total absorption (sabins) a room needs to hit a target RT60, the inverse of the Sabine RT60 = 0.049 x V / A relation: A_required = 0.049 x V / RT60_target. If you enter the room's current absorption, it also gives the additional treatment to ADD (required - existing, floored at zero). One sabin is one square foot of perfect absorption, so the added sabins convert to treated area by dividing by the material's absorption coefficient (a panel at coefficient 0.8 covers required/0.8 square feet). Speech wants a short RT60 (~0.4-0.8 s in a small room); music runs longer. This sizes the absorption; it does not move the axial room modes (geometry sets those - see room-acoustics) or place the treatment. The acoustician and the venue govern.",
+  };
+}
+const roomAbsorptionTargetExample = { inputs: { volume_ft3: 5000, target_rt60_s: 0.6, existing_sabins: 250, sabine_coeff: 0.049 } };
+const renderRoomAbsorptionTarget = _r({
+  citation: "Citation: Sabine reverberation equation solved for absorption A_required = 0.049 x V / RT60_target (W.C. Sabine, public domain; imperial 0.049 coefficient, editable), and the additional treatment = required - existing. One sabin = 1 ft^2 of perfect absorption. The acoustician and the venue govern treatment.",
+  example: roomAbsorptionTargetExample.inputs,
+  fields: [
+    { key: "volume_ft3", label: "Room volume (ft^3)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "target_rt60_s", label: "Target RT60 (s)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "existing_sabins", label: "Existing absorption (sabins, 0 = none)", kind: "number", default: 0, attrs: { step: "any", min: "0" } },
+    { key: "sabine_coeff", label: "Sabine coefficient (default 0.049)", kind: "number", default: 0.049, attrs: { step: "any", min: "0" } },
+  ],
+  outputs: [
+    { key: "req", id: "rat-out-req", label: "Total absorption required", value: (r) => fmt(r.required_sabins, 0) + " sabins" },
+    { key: "add", id: "rat-out-add", label: "Additional treatment to add", value: (r) => r.meets_already ? "0 sabins (the room already meets the target)" : fmt(r.additional_sabins, 0) + " sabins" },
+    { key: "n", id: "rat-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeRoomAbsorptionTarget,
+});
+STAGE_RENDERERS["room-absorption-target"] = renderRoomAbsorptionTarget;
+
 // --- spec-v542 N: Counterweight fly-system balance (`counterweight-arbor-load`) ---
 // required = (batten + load) x purchase_ratio (1 single, 2 double). out_of_weight = required - existing.
 // dims: in { batten_weight_lb: M L T^-2, attached_load_lb: M L T^-2, purchase_type: dimensionless, brick_weight_lb: M L T^-2, existing_cw_lb: M L T^-2 } out: { required_cw_lb: M L T^-2, out_of_weight_lb: M L T^-2, bricks: dimensionless }

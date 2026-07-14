@@ -5287,6 +5287,36 @@
       "kind": "adjacent"
     },
     {
+      "term": "absorption needed",
+      "target": "room-absorption-target",
+      "kind": "industry"
+    },
+    {
+      "term": "sabins required",
+      "target": "room-absorption-target",
+      "kind": "industry"
+    },
+    {
+      "term": "acoustic treatment sizing",
+      "target": "room-absorption-target",
+      "kind": "industry"
+    },
+    {
+      "term": "target rt60",
+      "target": "room-absorption-target",
+      "kind": "industry"
+    },
+    {
+      "term": "how much absorption",
+      "target": "room-absorption-target",
+      "kind": "adjacent"
+    },
+    {
+      "term": "panels to add",
+      "target": "room-absorption-target",
+      "kind": "adjacent"
+    },
+    {
       "term": "counterweight",
       "target": "counterweight-arbor-load",
       "kind": "industry"

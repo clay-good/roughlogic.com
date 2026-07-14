@@ -1014,7 +1014,7 @@ const TOOL_MODULES = (() => {
     // v92 LED video wall + projection
     "led-video-wall", "projector-brightness",
     // v120 room acoustics
-    "room-acoustics",
+    "room-acoustics", "room-absorption-target",
     // spec-v542
     "counterweight-arbor-load",
     // spec-v543

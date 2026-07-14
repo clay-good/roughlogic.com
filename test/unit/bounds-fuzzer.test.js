@@ -1682,6 +1682,7 @@ import {
   computeRiggingCheck,
   computeSPLAtmospheric,
   computeRoomAcoustics,
+  computeRoomAbsorptionTarget,
 } from "../../calc-stage.js";
 
 test("bounds: calc-stage computeTimeAlignment pins ms = (d_main - d_delay) / (331.3 + 0.606 * T_C) * 1000 across the venue sweep", () => {
@@ -4290,6 +4291,39 @@ test("bounds: calc-stage computeRoomAcoustics pins rt60 = 0.049 * V / A and mode
   assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: -1, height_ft: 10 }));
   assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10, sabine_coeff: 0 }));
   assert.ok("error" in computeRoomAcoustics({ volume_ft3: 5000, total_sabins: 500, length_ft: 20, width_ft: 15, height_ft: 10, speed_of_sound_fts: 0 }));
+});
+
+test("bounds: calc-stage computeRoomAbsorptionTarget pins A_required = 0.049 * V / RT60 and round-trips through computeRoomAcoustics across the venue sweep, and rejects non-positive inputs", () => {
+  // spec-v664 section 2 pinned example: 5,000 ft^3 targeting 0.6 s with 250 sabins already present.
+  const ex = computeRoomAbsorptionTarget({ volume_ft3: 5000, target_rt60_s: 0.6, existing_sabins: 250, sabine_coeff: 0.049 });
+  assert.ok(!ex.error, JSON.stringify(ex));
+  assert.ok(Math.abs(ex.required_sabins - 0.049 * 5000 / 0.6) < 1e-9, `required identity: ${ex.required_sabins}`);
+  assert.ok(Math.abs(ex.additional_sabins - (0.049 * 5000 / 0.6 - 250)) < 1e-9, `additional identity: ${ex.additional_sabins}`);
+  assert.equal(ex.meets_already, false);
+  // Cross-check: a tighter 0.4 s target needs more absorption.
+  const tight = computeRoomAbsorptionTarget({ volume_ft3: 5000, target_rt60_s: 0.4, existing_sabins: 250, sabine_coeff: 0.049 });
+  assert.ok(Math.abs(tight.required_sabins - 612.5) < 1e-9, `tighter target: ${tight.required_sabins}`);
+  assert.ok(Math.abs(tight.additional_sabins - 362.5) < 1e-9, `tighter additional: ${tight.additional_sabins}`);
+  // Already met: existing absorption exceeds required floors additional at zero.
+  const met = computeRoomAbsorptionTarget({ volume_ft3: 5000, target_rt60_s: 2.0, existing_sabins: 250, sabine_coeff: 0.049 });
+  assert.equal(met.additional_sabins, 0, `floored: ${met.additional_sabins}`);
+  assert.equal(met.meets_already, true);
+  // Round-trip: the required absorption, fed back through room-acoustics, reproduces the target RT60.
+  for (const volume_ft3 of [500, 5000, 50000]) {
+    for (const target_rt60_s of [0.3, 0.8, 2.5]) {
+      const r = computeRoomAbsorptionTarget({ volume_ft3, target_rt60_s, existing_sabins: 0, sabine_coeff: 0.049 });
+      assert.ok(!r.error, `sweep V=${volume_ft3} RT=${target_rt60_s}: ${JSON.stringify(r)}`);
+      assertFinite(r.required_sabins, "required"); assert.ok(r.required_sabins > 0, "required positive");
+      const back = computeRoomAcoustics({ volume_ft3, total_sabins: r.required_sabins, length_ft: 20, width_ft: 15, height_ft: 10 });
+      assert.ok(Math.abs(back.rt60_s - target_rt60_s) < 1e-9, `round-trip RT60 V=${volume_ft3} RT=${target_rt60_s}: ${back.rt60_s}`);
+    }
+  }
+  // Documented rejections: non-finite, non-positive volume / target / coefficient, and negative existing.
+  assert.ok("error" in computeRoomAbsorptionTarget({ volume_ft3: NaN, target_rt60_s: 0.6, existing_sabins: 250 }));
+  assert.ok("error" in computeRoomAbsorptionTarget({ volume_ft3: 0, target_rt60_s: 0.6, existing_sabins: 250 }));
+  assert.ok("error" in computeRoomAbsorptionTarget({ volume_ft3: 5000, target_rt60_s: 0, existing_sabins: 250 }));
+  assert.ok("error" in computeRoomAbsorptionTarget({ volume_ft3: 5000, target_rt60_s: 0.6, existing_sabins: -1 }));
+  assert.ok("error" in computeRoomAbsorptionTarget({ volume_ft3: 5000, target_rt60_s: 0.6, existing_sabins: 250, sabine_coeff: 0 }));
 });
 
 // --------------------------------------------------------------------

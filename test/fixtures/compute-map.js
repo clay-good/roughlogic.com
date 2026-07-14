@@ -722,6 +722,7 @@ export const COMPUTE_MAP = {
   "led-video-wall": { module: "../../calc-stage.js", fn: "computeLedVideoWall" },
   "projector-brightness": { module: "../../calc-stage.js", fn: "computeProjectorBrightness" },
   "room-acoustics": { module: "../../calc-stage.js", fn: "computeRoomAcoustics" },
+  "room-absorption-target": { module: "../../calc-stage.js", fn: "computeRoomAbsorptionTarget" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", fn: "computeCounterweightArborLoad" },
   "led-tape-run": { module: "../../calc-stage.js", fn: "computeLedTapeRun" },
   "pool-alkalinity-adjust": { module: "../../calc-treatment.js", fn: "computePoolAlkalinityAdjust" },

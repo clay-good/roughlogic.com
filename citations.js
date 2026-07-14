@@ -8347,6 +8347,18 @@ export const CITATIONS = {
       { name: "Speed of sound", value: "1130 ft/s at room temperature (default, editable)", source: "First-principles acoustics" },
     ],
   },
+  "room-absorption-target": {
+    formula: "A_required = 0.049 x V / RT60_target (sabins); A_additional = max(0, A_required - A_existing).",
+    edition: "W.C. Sabine reverberation equation (public domain) solved for the required absorption, the inverse of the room-acoustics tile.",
+    freeAccess: "Sabine's collected papers and the RT60 = 0.049 V / A relation are public-domain physics.",
+    governance: GOVERNANCE.general,
+    editionNote: "The total absorption a room needs to hit a target RT60, the inverse of the Sabine relation: A_required = 0.049 x V / RT60_target sabins, and, given the room's current absorption, the additional treatment to add is required - existing (floored at zero). One sabin is one square foot of perfect absorption, so the added sabins convert to treated area by dividing by the material's absorption coefficient. This sizes the absorption to meet the RT60 target; it does not move the axial room modes (geometry sets those) or place the treatment. Single-edition (public-domain physics; the 0.049 constant is a bundled editable field). The acoustician and the venue govern.",
+    assumptions: [
+      { name: "Required absorption", value: "A_required = 0.049 x V / RT60_target (sabins)", source: "Sabine equation" },
+      { name: "Additional treatment", value: "A_additional = max(0, required - existing); convert sabins to area by / the material coefficient", source: "scope of this tile" },
+      { name: "Sabine coefficient", value: "0.049 (imperial, ft and ft^3; default, editable)", source: "Sabine equation" },
+    ],
+  },
   "counterweight-arbor-load": {
     formula: "required = (batten_weight + attached_load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = ceil(|out_of_weight| / brick_weight).",
     edition: "Theatrical counterweight rigging (single / double purchase), by name.",
