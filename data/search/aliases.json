@@ -5462,6 +5462,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "max screen size",
+      "target": "projector-max-screen-size",
+      "kind": "industry"
+    },
+    {
+      "term": "biggest screen for projector",
+      "target": "projector-max-screen-size",
+      "kind": "redirect"
+    },
+    {
+      "term": "projector screen size",
+      "target": "projector-max-screen-size",
+      "kind": "industry"
+    },
+    {
+      "term": "screen size for projector",
+      "target": "projector-max-screen-size",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how big a screen",
+      "target": "projector-max-screen-size",
+      "kind": "adjacent"
+    },
+    {
       "term": "reverberation time",
       "target": "room-acoustics",
       "kind": "industry"

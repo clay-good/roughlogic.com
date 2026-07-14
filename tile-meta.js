@@ -490,6 +490,7 @@ const _TILES = [
   ["maintenance-reserve", "J"],
   ["led-video-wall", "N"],
   ["projector-brightness", "N"],
+  ["projector-max-screen-size", "N"],
   ["room-acoustics", "N"], ["room-absorption-target", "N"],
   ["counterweight-arbor-load", "N"],
   ["led-tape-run", "N"], ["led-tape-max-run", "N"],

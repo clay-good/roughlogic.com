@@ -23768,6 +23768,48 @@
    }
   },
   {
+   "tile_id": "projector-max-screen-size",
+   "source_publisher": "Standard AV screen-luminance identity (SMPTE-style targets, by name); foot-lamberts = lumens x gain / area, solved for the area.",
+   "source_title": "Max screen area = lumens x gain / target foot-lamberts; width = sqrt(area x aspect_w / aspect_h), diagonal = sqrt(width^2 + height^2).",
+   "source_edition_or_year": "spec-v727 worked example (machine-verified)",
+   "source_section_or_page": "spec-v727 section 2 pinned example: 5,000 lm, gain 1.0, 16 fL, 16:9",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_lumens": 5000,
+    "screen_gain": 1,
+    "target_foot_lamberts": 16,
+    "aspect_w": 16,
+    "aspect_h": 9
+   },
+   "outputs": {
+    "max_area_sqft": {
+     "value": 312.5,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "max_width_ft": {
+     "value": 23.57,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "max_height_ft": {
+     "value": 13.26,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "max_diagonal_ft": {
+     "value": 27.04,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "room-acoustics",
    "source_publisher": "W.C. Sabine reverberation equation (public domain); axial room-mode relation f = c / (2 x L).",
    "source_title": "RT60 = 0.049 x V / A; first axial mode = 1130 / (2 x dimension), c = 1130 ft/s.",

@@ -1012,7 +1012,7 @@ const TOOL_MODULES = (() => {
     // v24 audio electronics
     "speaker-impedance", "decibel-converter", "amp-power-spl", "lighting-beam", "lighting-throw-for-pool",
     // v92 LED video wall + projection
-    "led-video-wall", "projector-brightness",
+    "led-video-wall", "projector-brightness", "projector-max-screen-size",
     // v120 room acoustics
     "room-acoustics", "room-absorption-target",
     // spec-v542

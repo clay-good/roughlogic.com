@@ -983,6 +983,7 @@ const RELATED = {
   "maintenance-reserve": ["cost-per-mile","load-profitability","fuel-surcharge"],
   "led-video-wall": ["power-distro","truss-capacity","projector-brightness"],
   "projector-brightness": ["led-video-wall","lighting-beam","power-distro"],
+  "projector-max-screen-size": ["projector-brightness","led-video-wall","lighting-beam","power-distro"],
   "room-acoustics": ["room-absorption-target","spl-distance","spl-atmospheric","decibel-converter"],
   "room-absorption-target": ["room-acoustics","spl-distance","decibel-converter","spl-atmospheric"],
   "counterweight-arbor-load": ["truss-capacity","rigging-check","sling-angle"],

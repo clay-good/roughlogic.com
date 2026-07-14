@@ -1184,6 +1184,53 @@ const renderProjectorBrightness = _r({
 });
 STAGE_RENDERERS["projector-brightness"] = renderProjectorBrightness;
 
+// projector-max-screen-size: inverse of projector-brightness. The forward tile
+// gives the lumens a screen needs; given the projector you own, the largest
+// screen it lights to a target brightness is the inverse. From
+// required_lumens = target_fL x area / gain, max_area = lumens x gain / target_fL,
+// then the width / height / diagonal at a chosen aspect ratio.
+// dims: in { available_lumens: dimensionless, screen_gain: dimensionless, target_foot_lamberts: dimensionless, aspect_w: dimensionless, aspect_h: dimensionless } out: { max_area_sqft: L^2, max_width_ft: L, max_height_ft: L, max_diagonal_ft: L }
+export function computeProjectorMaxScreenSize({ available_lumens = 0, screen_gain = 1.0, target_foot_lamberts = 16, aspect_w = 16, aspect_h = 9 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const lm = Number(available_lumens) || 0;
+  const gain = Number(screen_gain) || 0;
+  const fL = Number(target_foot_lamberts) || 0;
+  const aw = Number(aspect_w) || 0;
+  const ah = Number(aspect_h) || 0;
+  if (!(lm > 0)) return { error: "Available lumens must be positive." };
+  if (!(gain > 0)) return { error: "Screen gain must be positive." };
+  if (!(fL > 0)) return { error: "Target foot-lamberts must be positive." };
+  if (!(aw > 0) || !(ah > 0)) return { error: "Aspect-ratio dimensions must be positive." };
+  const max_area_sqft = (lm * gain) / fL;
+  const max_width_ft = Math.sqrt(max_area_sqft * aw / ah);
+  const max_height_ft = max_width_ft * ah / aw;
+  const max_diagonal_ft = Math.sqrt(max_width_ft * max_width_ft + max_height_ft * max_height_ft);
+  return {
+    max_area_sqft, max_width_ft, max_height_ft, max_diagonal_ft,
+    note: "The largest screen the projector lights to the target brightness: max area = lumens x gain / target foot-lamberts, then the width, height, and diagonal at the aspect ratio. About 16 fL is the dark-room baseline; a lit or ambient room wants 30-50, which shrinks the screen. Size the projector 20-30% over the minimum for lamp aging and a dirty filter, so plan for a screen a step smaller than this ceiling. A high-gain screen covers more area on-axis but narrows the good seats. Check the throw distance and lens range against the room separately.",
+  };
+}
+const projectorMaxScreenSizeExample = { inputs: { available_lumens: 5000, screen_gain: 1.0, target_foot_lamberts: 16, aspect_w: 16, aspect_h: 9 } };
+const renderProjectorMaxScreenSize = _r({
+  citation: "Citation: Standard AV screen-luminance identity foot-lamberts = lumens x gain / area (SMPTE-style targets, by name) solved for the area: max area = lumens x gain / target fL, then width / height / diagonal at the aspect ratio.",
+  example: projectorMaxScreenSizeExample.inputs,
+  fields: [
+    { key: "available_lumens", label: "Projector brightness (ANSI lumens)", kind: "number" },
+    { key: "screen_gain", label: "Screen gain", kind: "number", default: 1.0 },
+    { key: "target_foot_lamberts", label: "Target foot-lamberts (16 dark, 30-50 lit)", kind: "number", default: 16 },
+    { key: "aspect_w", label: "Aspect ratio width (e.g. 16)", kind: "number", default: 16 },
+    { key: "aspect_h", label: "Aspect ratio height (e.g. 9)", kind: "number", default: 9 },
+  ],
+  outputs: [
+    { key: "d", id: "pms-out-d", label: "Max screen diagonal", value: (r) => fmt(r.max_diagonal_ft, 1) + " ft (" + fmt(r.max_diagonal_ft * 12, 0) + " in)" },
+    { key: "wh", id: "pms-out-wh", label: "Max width x height", value: (r) => fmt(r.max_width_ft, 1) + " x " + fmt(r.max_height_ft, 1) + " ft" },
+    { key: "a", id: "pms-out-a", label: "Max screen area", value: (r) => fmt(r.max_area_sqft, 1) + " sq ft" },
+    { key: "n", id: "pms-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeProjectorMaxScreenSize,
+});
+STAGE_RENDERERS["projector-max-screen-size"] = renderProjectorMaxScreenSize;
+
 // ===========================================================================
 // spec-v120 Group N - room acoustics: Sabine RT60 + axial room modes.
 // ===========================================================================

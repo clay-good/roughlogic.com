@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(stage): spec-v727 max screen size for a projector (projector-brightness inverse); 2026-07-14
+
+- New tile `projector-max-screen-size` (Group N, calc-stage.js): the largest screen a projector lights to a target
+  brightness. `max_area = lumens x gain / target_fL`, then width / height / diagonal at the aspect ratio. A 5,000-lumen
+  projector on a unity-gain screen at 16 fL tops out near a 27 ft (16:9) diagonal. Round-trips through
+  `projector-brightness`. Home tile count 1,175 -> 1,176.
+
 ### feat(mechanic): spec-v726 max boost before a charge-air temperature limit (turbo-pressure-ratio inverse); 2026-07-14
 
 Lands `turbo-max-boost-for-charge-temp` (Group K, calc-mechanic.js), the inverse of `turbo-pressure-ratio`. The forward tile gives the charge-air (compressor-outlet) temperature from a boost; the tuning question is the reverse: how much boost before the charge-air temperature hits a limit. From `T_out = T_in x [1 + (PR^0.283 - 1)/eff]`, the inverse is `PR = [1 + eff x (T_out/T_in - 1)]^(1/0.283)` and `boost = ambient x (PR - 1)` (temperatures absolute). The pinned example: an 80 F inlet, 70% compressor, 250 F charge-air limit tops out near **15 psi**; a more efficient 78% compressor allows ~17 psi. The bounds-fuzzer proves the exact inverse across a limit/inlet/efficiency sweep by feeding the max boost back through `computeTurboPressureRatio` and confirming the compressor-outlet temp equals the limit. A limit at or below the inlet is guarded (compressing air only heats it). Full wiring: `tools-data` (beside turbo-pressure-ratio, past the Group K exact-12 audit block), `tile-meta`, `citations` (model solved for the boost, GOVERNANCE.general), compute-map, 1 machine-verified worked example, 5 collision-checked aliases, related-tiles, the `app.js` mechanic declare, the `_simpleRenderer` factory renderer, the `// dims:` annotation, regenerated corpus + tile-index + citation-strings, and the fuzzer block. Verified locally with the CI-only shell gates. Lazy-loaded, absent from home first paint. Catalog 1,174 -> 1,175 (version 0.316.0).

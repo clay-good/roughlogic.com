@@ -755,6 +755,7 @@ export const COMPUTE_MAP = {
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },
   "led-video-wall": { module: "../../calc-stage.js", fn: "computeLedVideoWall" },
   "projector-brightness": { module: "../../calc-stage.js", fn: "computeProjectorBrightness" },
+  "projector-max-screen-size": { module: "../../calc-stage.js", fn: "computeProjectorMaxScreenSize" },
   "room-acoustics": { module: "../../calc-stage.js", fn: "computeRoomAcoustics" },
   "room-absorption-target": { module: "../../calc-stage.js", fn: "computeRoomAbsorptionTarget" },
   "counterweight-arbor-load": { module: "../../calc-stage.js", fn: "computeCounterweightArborLoad" },

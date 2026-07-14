@@ -11317,6 +11317,28 @@ test("bounds: spec-v92 LED video wall + projection", () => {
   assert.ok("error" in _v92b({ screen_w_ft: 0 }));
 });
 
+import { computeProjectorMaxScreenSize as _v727 } from "../../calc-stage.js";
+test("bounds: spec-v727 projector max screen size (inverse of projector-brightness)", () => {
+  const p = _v727({ available_lumens: 5000, screen_gain: 1.0, target_foot_lamberts: 16, aspect_w: 16, aspect_h: 9 });
+  assert.ok(Math.abs(p.max_area_sqft - 312.5) < 0.01);
+  assert.ok(Math.abs(p.max_width_ft - 23.57) < 0.02 && Math.abs(p.max_height_ft - 13.26) < 0.02 && Math.abs(p.max_diagonal_ft - 27.04) < 0.02);
+  // round-trip: the returned screen fed back to projector-brightness needs exactly the input lumens
+  for (const [lm, gain, fL, aw, ah] of [[5000, 1.0, 16, 16, 9], [3000, 1.3, 30, 4, 3], [8000, 0.8, 50, 16, 10], [12000, 1.0, 16, 1, 1]]) {
+    const inv = _v727({ available_lumens: lm, screen_gain: gain, target_foot_lamberts: fL, aspect_w: aw, aspect_h: ah });
+    const fwd = _v92b({ screen_w_ft: inv.max_width_ft, screen_h_ft: inv.max_height_ft, screen_gain: gain, target_foot_lamberts: fL });
+    assert.ok(Math.abs(fwd.required_lumens - lm) < 1e-6);
+    // aspect ratio preserved
+    assert.ok(Math.abs(inv.max_width_ft / inv.max_height_ft - aw / ah) < 1e-9);
+  }
+  // more lumens -> bigger screen (monotonic)
+  assert.ok(_v727({ available_lumens: 8000, target_foot_lamberts: 16 }).max_area_sqft > _v727({ available_lumens: 5000, target_foot_lamberts: 16 }).max_area_sqft);
+  // error seams
+  assert.ok("error" in _v727({ available_lumens: 0 }));
+  assert.ok("error" in _v727({ available_lumens: 5000, screen_gain: 0 }));
+  assert.ok("error" in _v727({ available_lumens: 5000, target_foot_lamberts: 0 }));
+  assert.ok("error" in _v727({ available_lumens: 5000, aspect_w: 0 }));
+});
+
 import { computePoolAlkalinityAdjust as _v93a, computePoolCyaDose as _v93b, computePoolSaltDose as _v93c } from "../../calc-treatment.js";
 test("bounds: spec-v93 pool chemical balance", () => {
   assert.ok(_v93a({ gallons: 20000, current_ta_ppm: 60, target_ta_ppm: 100 }).bicarb_lb === 12);

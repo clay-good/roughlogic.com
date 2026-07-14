@@ -2679,6 +2679,7 @@ cross-check.
 | calc-stage.js | `computeNeutralImbalance` | `{ I_A = 0, I_B = 0, I_C = 0, harmonic_loads = false }` | _ | _ | _ |
 | calc-stage.js | `computePowerDistro` | `{ watts = 0, voltage_v = 208, phase = "three", rating_a = 0, pf = 1, derate =...` | _ | _ | _ |
 | calc-stage.js | `computeProjectorBrightness` | `{ screen_w_ft = 0, screen_h_ft = 0, screen_gain = 1.0, target_foot_lamberts =...` | _ | _ | _ |
+| calc-stage.js | `computeProjectorMaxScreenSize` | `{ available_lumens = 0, screen_gain = 1.0, target_foot_lamberts = 16, aspect_...` | _ | _ | _ |
 | calc-stage.js | `computeRiggingCheck` | `{ hardware = "sling_5_8_steel", configuration = "vertical", load_lb = 0, incl...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAbsorptionTarget` | `{ volume_ft3 = 0, target_rt60_s = 0, existing_sabins = 0, sabine_coeff = 0.04...` | _ | _ | _ |
 | calc-stage.js | `computeRoomAcoustics` | `{ volume_ft3 = 0, total_sabins = 0, length_ft = 0, width_ft = 0, height_ft = ...` | _ | _ | _ |
@@ -2836,7 +2837,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1422.
+Row count: 1423.
 
 <!-- END function-corpus-v14 -->
 
@@ -3967,7 +3968,7 @@ per spec-v14 §13.1 second paragraph.
 | `well-drawdown` | Well Drawdown and Specific Capacity | AWWA / USGS; drawdown = 80 - 50 = 30 ft; specific capacity = 30/30 = 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `well-max-yield` | Well Sustainable Yield from Specific Capacity | AWWA / USGS (inverse); 1.0 GPM/ft, 30 ft allowable drawdown -> 30 GPM (round-tri... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group N Stage (21 tiles)
+### Group N Stage (22 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3983,6 +3984,7 @@ per spec-v14 §13.1 second paragraph.
 | `neutral-imbalance` | Three-Phase Neutral Imbalance and Distro | Project (first-principles); Standard symmetric-components root for balanced magnitude... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `power-distro` | Power Distro Per-Leg Loading | First-principles AC power + NEC 80% c...; 12,000 W on 120/208 3-phase, 60 A/leg -> 33.3 A/leg, pass | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `projector-brightness` | Projector Brightness and Throw | Standard AV screen-luminance identity...; spec-v92 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `projector-max-screen-size` | Max Screen Size for a Projector | Standard AV screen-luminance identity...; spec-v727 section 2 pinned example: 5,000 lm, gain 1.0, 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `rigging-check` | Rigging Capacity Quick Check | OSHA 1926.251 + ASME B30.9 sling capa...; 5/8 in steel / vertical / 1500 lb / 2 legs -> WLL 6700 / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `room-absorption-target` | Absorption Needed for a Target RT60 | W.C. Sabine reverberation equation (p...; spec-v664 section 2 pinned example: 5,000 ft^3 targeting ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `room-acoustics` | Room Acoustics: RT60 and Axial Modes | W.C. Sabine reverberation equation (p...; spec-v120 section 2 pinned example: 5,000 ft^3 / 500 sabi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4197,6 +4199,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1175. Fixture-covered or reference-cadence: 1175 / 1175.
+Tile count: 1176. Fixture-covered or reference-cadence: 1176 / 1176.
 
 <!-- END tile-index-v14 -->

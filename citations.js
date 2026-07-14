@@ -8751,6 +8751,16 @@ export const CITATIONS = {
       { name: "Average-power factor", value: "~0.30-0.40 of peak for real content (default 0.35, editable)", source: "panel engineering practice" },
     ],
   },
+  "projector-max-screen-size": {
+    formula: "Max screen area = lumens x gain / target foot-lamberts; width = sqrt(area x aspect_w / aspect_h), height = width x aspect_h / aspect_w, diagonal = sqrt(width^2 + height^2).",
+    edition: "Standard AV screen-luminance identity (SMPTE-style targets, by name); foot-lamberts = lumens x gain / area, solved for the area.",
+    freeAccess: "Screen-luminance methods free at projector and screen maker technical pages.",
+    governance: GOVERNANCE.worker_safety,
+    editionNote: "Single-edition (engineering-practice / first-principles take-off; refresh as practice and product data shift).",
+    assumptions: [
+      { name: "Target luminance band", value: "~16 fL dark room, ~30-50 fL ambient (default 16, editable)", source: "SMPTE-style AV practice" },
+    ],
+  },
   "projector-brightness": {
     formula: "Required lumens = target foot-lamberts x screen area / gain; throw distance = throw ratio x screen width.",
     edition: "Standard AV screen-luminance identity (SMPTE-style targets, by name); foot-lamberts = lumens x gain / area.",
