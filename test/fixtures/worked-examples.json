@@ -3329,6 +3329,34 @@
    }
   },
   {
+   "tile_id": "truck-off-tracking",
+   "source_publisher": "AASHTO Green Book (low-speed off-tracking)",
+   "source_title": "20 ft wheelbase on a 50 ft turn radius -> 4.17 ft off-tracking",
+   "source_edition_or_year": "OT = R - sqrt(R^2 - sum(L^2))",
+   "source_section_or_page": "OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effective wheelbase 20 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "turn_radius_ft": 50,
+    "wheelbase1_ft": 20,
+    "wheelbase2_ft": 0
+   },
+   "outputs": {
+    "off_tracking_ft": {
+     "value": 4.174,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "effective_wheelbase_ft": {
+     "value": 20,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "scba-cylinder-time",
    "source_publisher": "NFPA / NIOSH",
    "source_title": "SCBA cylinder gas-law: scf to alarm and to empty (60-min 4500 psi rating at heavy work)",

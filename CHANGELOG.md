@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(trucking): spec-v774 low-speed off-tracking (swept path); 2026-07-14
+
+- New tile `truck-off-tracking` (Group J, calc-trucking.js): how far a turning truck's rear axle tracks inside the front
+  axle's path -- `OT = R - sqrt(R^2 - sum(L^2))`, R the turn radius and L each unit's wheelbase (tractor wheelbase +
+  trailer kingpin-to-axle, summed in quadrature). A 20 ft wheelbase on a 50 ft radius off-tracks 4.2 ft. Fuzzer pins the
+  closed form, the quadrature equivalence, and the tighter-radius/longer-wheelbase monotonicity. calc-trucking.js gzip
+  cap 30000 -> 32000 B. Home count 1,222 -> 1,223.
+
 ### feat(agriculture): spec-v773 bunker (horizontal) silo forage capacity; 2026-07-14
 
 - New tile `bunker-silo-capacity` (Group L, calc-agriculture.js): the forage a horizontal bunker or trench silo holds --

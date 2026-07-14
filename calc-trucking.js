@@ -943,7 +943,54 @@ export function renderSsdDesignSpeed(inputRegion, outputRegion, citationEl) {
   for (const fld of [d.input, tpr.input, f.input, g.input]) fld.addEventListener("input", update);
 }
 
+// --- v774: Low-speed off-tracking (`truck-off-tracking`) ---
+// The rear axle of a turning vehicle tracks inside the front axle's path by
+// OT = R - sqrt(R^2 - sum(L_i^2)), R the turn radius and L_i each unit's
+// wheelbase (tractor wheelbase + trailer kingpin-to-axle for a combination).
+// dims: in { turn_radius_ft: L, wheelbase1_ft: L, wheelbase2_ft: L } out: { off_tracking_ft: L, effective_wheelbase_ft: L, sum_wb_sq_ft2: L^2 }
+export function computeTruckOffTracking({ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const R = Number(turn_radius_ft) || 0;
+  const L1 = Number(wheelbase1_ft) || 0;
+  const L2 = Number(wheelbase2_ft) || 0;
+  if (!(R > 0)) return { error: "Turn radius must be positive (ft)." };
+  if (!(L1 > 0)) return { error: "The first (tractor) wheelbase must be positive (ft)." };
+  if (L2 < 0) return { error: "The second wheelbase cannot be negative (ft)." };
+  const sum_wb_sq_ft2 = L1 * L1 + L2 * L2;
+  const effective_wheelbase_ft = Math.sqrt(sum_wb_sq_ft2);
+  if (!(R > effective_wheelbase_ft)) return { error: "Turn radius must exceed the effective wheelbase (sqrt of the sum of squared wheelbases); the vehicle cannot hold this turn." };
+  const off_tracking_ft = R - Math.sqrt(R * R - sum_wb_sq_ft2);
+  return {
+    off_tracking_ft, effective_wheelbase_ft, sum_wb_sq_ft2,
+    note: "Low-speed (geometric) off-tracking: the rearmost axle tracks OT = R - sqrt(R^2 - sum(L_i^2)) inside the front axle's turn radius R, where each L_i is a unit's wheelbase - for a tractor-trailer, the tractor wheelbase and the trailer's kingpin-to-rear-axle distance, summed in quadrature. Enter the turn radius your path reference uses (centerline or outer wheelpath) consistently. This is the steady-state low-speed value used to check whether a truck stays in its lane on a turn or intersection; high-speed off-tracking (which swings the rear OUTward) and the trailer swept-path width (add the vehicle width) are separate. Per the AASHTO Green Book low-speed off-tracking relation; the design vehicle and the agency govern.",
+  };
+}
+export const truckOffTrackingExample = { inputs: { turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 0 } };
+
+function renderTruckOffTracking(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AASHTO Green Book low-speed off-tracking OT = R - sqrt(R^2 - sum(L_i^2)), R the turn radius and L_i each unit's wheelbase (tractor wheelbase + trailer kingpin-to-axle for a combination), summed in quadrature. Steady-state low-speed value; high-speed off-tracking and swept-path width are separate. The design vehicle and the agency govern.";
+  const R = makeNumber("Turn radius R (ft)", "tot-r", { step: "any", min: "0", value: "50" });
+  R.input.value = "50";
+  const l1 = makeNumber("Tractor / unit wheelbase (ft)", "tot-l1", { step: "any", min: "0", value: "20" });
+  l1.input.value = "20";
+  const l2 = makeNumber("Trailer kingpin-to-axle (ft; 0 if single unit)", "tot-l2", { step: "any", min: "0" });
+  for (const f of [R, l1, l2]) inputRegion.appendChild(f.wrap);
+  const oOT = makeOutputLine(outputRegion, "Off-tracking (rear inside front)", "tot-out-ot");
+  const oWB = makeOutputLine(outputRegion, "Effective wheelbase", "tot-out-wb");
+  const oNote = makeOutputLine(outputRegion, "Note", "tot-out-note");
+  const update = debounce(() => {
+    const r = computeTruckOffTracking({ turn_radius_ft: Number(R.input.value) || 0, wheelbase1_ft: Number(l1.input.value) || 0, wheelbase2_ft: Number(l2.input.value) || 0 });
+    if (r.error) { oOT.textContent = r.error; oWB.textContent = "-"; oNote.textContent = ""; return; }
+    oOT.textContent = fmt(r.off_tracking_ft, 2) + " ft";
+    oWB.textContent = fmt(r.effective_wheelbase_ft, 2) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { R.input.value = "50"; l1.input.value = "20"; l2.input.value = ""; update(); });
+  for (const f of [R.input, l1.input, l2.input]) f.addEventListener("input", update);
+}
+
 export const TRUCKING_RENDERERS = {
+  "truck-off-tracking": renderTruckOffTracking,
   "ssd-design-speed": renderSsdDesignSpeed,
   "dim-weight":      renderDIM,
   "freight-density": renderFreightDensity,

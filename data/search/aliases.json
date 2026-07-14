@@ -73552,6 +73552,31 @@
       "kind": "question"
     },
     {
+      "term": "truck off tracking",
+      "target": "truck-off-tracking",
+      "kind": "industry"
+    },
+    {
+      "term": "trailer swept path",
+      "target": "truck-off-tracking",
+      "kind": "question"
+    },
+    {
+      "term": "how much a trailer cuts the corner",
+      "target": "truck-off-tracking",
+      "kind": "question"
+    },
+    {
+      "term": "off tracking radius",
+      "target": "truck-off-tracking",
+      "kind": "question"
+    },
+    {
+      "term": "truck turning offset",
+      "target": "truck-off-tracking",
+      "kind": "question"
+    },
+    {
       "term": "sight distance from design speed",
       "target": "stopping-sight-distance",
       "kind": "question"

@@ -224,6 +224,7 @@ export const COMPUTE_MAP = {
   "scba-cylinder-time": { module: "../../calc-fire.js", fn: "computeScbaCylinderTime" },
   "stopping-sight-distance": { module: "../../calc-trucking.js", fn: "computeStoppingSightDistance" },
   "ssd-design-speed": { module: "../../calc-trucking.js", fn: "computeSsdDesignSpeed" },
+  "truck-off-tracking": { module: "../../calc-trucking.js", fn: "computeTruckOffTracking" },
   "lightning-countdown": { module: "../../calc-field.js", fn: "computeLightningCountdown" },
   "magnetic-declination": { module: "../../calc-field.js", fn: "computeMagneticDeclination" },
   "thi-livestock": { module: "../../calc-agriculture.js", fn: "computeTHI" },

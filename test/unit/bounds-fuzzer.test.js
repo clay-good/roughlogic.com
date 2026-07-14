@@ -4619,6 +4619,44 @@ test("bounds: spec-v695 computeSsdDesignSpeed pins the SSD-quadratic positive ro
   assert.ok("error" in computeSsdDesignSpeed({ sight_distance_ft: Infinity, reaction_time_s: 2.5, friction: 0.35 }));
 });
 
+import { computeTruckOffTracking as _v774 } from "../../calc-trucking.js";
+
+test("bounds: spec-v774 truck-off-tracking pins OT = R - sqrt(R^2 - sum(L^2)), quadrature, monotonicity, and error seams", () => {
+  // Spec example: single unit WB 20, R 50 -> OT = 50 - sqrt(2500-400) = 50 - 45.826 = 4.174 ft.
+  const r = _v774({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: 0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.off_tracking_ft - (50 - Math.sqrt(2500 - 400))) < 1e-9);
+  assert.ok(Math.abs(r.off_tracking_ft - 4.1742) < 1e-3);
+  assert.ok(Math.abs(r.effective_wheelbase_ft - 20) < 1e-9);
+  // Two units sum in quadrature: WB 12 and 16 give an effective sqrt(144+256)=20, same as a single 20.
+  const combo = _v774({ turn_radius_ft: 50, wheelbase1_ft: 12, wheelbase2_ft: 16 });
+  assert.ok(Math.abs(combo.effective_wheelbase_ft - 20) < 1e-9);
+  assert.ok(Math.abs(combo.off_tracking_ft - r.off_tracking_ft) < 1e-9, "quadrature equivalence");
+  // Monotonicity: a tighter radius off-tracks more; a longer wheelbase off-tracks more.
+  const tight = _v774({ turn_radius_ft: 30, wheelbase1_ft: 20, wheelbase2_ft: 0 });
+  assert.ok(tight.off_tracking_ft > r.off_tracking_ft, "tighter radius -> more off-tracking");
+  const longer = _v774({ turn_radius_ft: 50, wheelbase1_ft: 30, wheelbase2_ft: 0 });
+  assert.ok(longer.off_tracking_ft > r.off_tracking_ft, "longer wheelbase -> more off-tracking");
+  // Identity across a sweep; off-tracking is always positive and less than the effective wheelbase.
+  for (let i = 0; i < 120; i++) {
+    const L1 = 8 + (i % 25);
+    const L2 = (i % 3) * 6;
+    const eff = Math.sqrt(L1 * L1 + L2 * L2);
+    const R = eff + 2 + (i % 40);
+    const m = _v774({ turn_radius_ft: R, wheelbase1_ft: L1, wheelbase2_ft: L2 });
+    assert.ok(!m.error, JSON.stringify({ R, L1, L2 }));
+    assert.ok(Math.abs(m.off_tracking_ft - (R - Math.sqrt(R * R - (L1 * L1 + L2 * L2)))) < 1e-9, "closed form");
+    assert.ok(m.off_tracking_ft > 0 && m.off_tracking_ft < eff, "0 < OT < effective wheelbase");
+  }
+  // Error seams: radius must exceed the effective wheelbase, positive inputs.
+  assert.ok("error" in _v774({ turn_radius_ft: 15, wheelbase1_ft: 20, wheelbase2_ft: 0 }), "R must exceed effective wheelbase");
+  assert.ok("error" in _v774({ turn_radius_ft: 20, wheelbase1_ft: 20, wheelbase2_ft: 0 }), "R = effective wheelbase rejected");
+  assert.ok("error" in _v774({ turn_radius_ft: 0, wheelbase1_ft: 20, wheelbase2_ft: 0 }));
+  assert.ok("error" in _v774({ turn_radius_ft: 50, wheelbase1_ft: 0, wheelbase2_ft: 0 }));
+  assert.ok("error" in _v774({ turn_radius_ft: 50, wheelbase1_ft: 20, wheelbase2_ft: -5 }));
+  assert.ok("error" in _v774({ turn_radius_ft: Infinity, wheelbase1_ft: 20, wheelbase2_ft: 0 }));
+});
+
 test("bounds: calc-stage computeSPLAtmospheric pins inverse_square = 20 * log10(d2/d1) and rejects the documented out-of-domain inputs", () => {
   // Spec-v9 §H.2 worked example: 95 dB at 1 m, 20 C, 50% RH; report at 30 m.
   const r = computeSPLAtmospheric({ source_SPL_dB: 95, d_ref_m: 1, d_far_m: 30, temperature_C: 20, RH_percent: 50 });

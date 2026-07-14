@@ -2330,6 +2330,19 @@ export const CITATIONS = {
     ],
   },
 
+  "truck-off-tracking": {
+    formula: "OT = R - sqrt(R^2 - sum(L_i^2)); effective wheelbase = sqrt(sum(L_i^2)). R the turn radius, L_i each unit's wheelbase (tractor wheelbase + trailer kingpin-to-rear-axle).",
+    edition: "AASHTO Green Book (Policy on Geometric Design of Highways and Streets) low-speed off-tracking; standard swept-path geometry.",
+    freeAccess: "transportation.org for TOC; the geometric off-tracking relation is public. AASHTO design-vehicle tables are licensed.",
+    governance: GOVERNANCE.trucking,
+    editionNote: "Low-speed (geometric) off-tracking: the rearmost axle of a turning vehicle tracks OT = R - sqrt(R^2 - sum(L_i^2)) INSIDE the front axle's turn radius, where each L_i is a unit's wheelbase summed in quadrature - for a tractor-semitrailer, the tractor wheelbase and the trailer kingpin-to-rear-axle distance. Enter the turn radius on the reference the path uses (front-axle centerline is common) consistently. This is the steady-state low-speed value that decides whether a rig stays in its lane through a turn or intersection; HIGH-speed off-tracking (which swings the rear OUTward) and the full swept-path width (add the vehicle width and the front overhang) are separate analyses. A design aid; the design vehicle and the roadway agency govern.",
+    assumptions: [
+      { name: "Low-speed geometric", value: "steady-state OT = R - sqrt(R^2 - sum(L_i^2)); rear tracks inside", source: "AASHTO Green Book" },
+      { name: "Effective wheelbase", value: "units summed in quadrature; tractor WB + trailer kingpin-to-axle", source: "swept-path geometry" },
+      { name: "Scope", value: "not high-speed off-tracking (rear swings out) or swept-path width (add vehicle width)", source: "analysis scope" },
+    ],
+  },
+
   "excavation-bench-plan": {
     formula: "horizontal_offset = depth * ratio (A 0.75 / B 1.0 / C 1.5). top_width = bottom_width + 2 * offset. cross_section = (top + bottom) / 2 * depth. volume_yd3 = cross_section * length / 27. Bench layout (A/B): 4 ft per bench; horizontal_step = bench_height * ratio.",
     edition: "OSHA 29 CFR 1926 Subpart P Appendix B and §1926.652.",

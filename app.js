@@ -810,7 +810,7 @@ const TOOL_MODULES = (() => {
     "dim-weight", "freight-density", "pallet-loadout",
     "hos-math", "bridge-formula", "bridge-formula-min-spacing", "reefer-burn", "incoterm-decoder",
     // v9
-    "stopping-sight-distance", "ssd-design-speed",
+    "stopping-sight-distance", "ssd-design-speed", "truck-off-tracking",
     // v23
     "cargo-securement-wll", "fuel-tax-ifta",
   

@@ -2810,6 +2810,7 @@ cross-check.
 | calc-trucking.js | `computeStoppingSightDistance` | `{ speed_mph = 0, reaction_time_s = 2.5, friction = 0.35, grade = 0.0, } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeTireLoadCheck` | `{ axle_weight_lb = 0, tires_on_axle = 2, tire_max_load_lb = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `computeTrailerTongueWeight` | `{ trailer_gross_weight_lb = 0, tongue_weight_lb = 0, hitch_type = "convention...` | _ | _ | _ |
+| calc-trucking.js | `computeTruckOffTracking` | `{ turn_radius_ft = 0, wheelbase1_ft = 0, wheelbase2_ft = 0 } = {}` | _ | _ | _ |
 | calc-trucking.js | `renderSsdDesignSpeed` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-trucking.js | `renderStoppingSightDistance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-velocity.js | `computeDuctVelocityPressure` | `{ solve_for = "velocity", vp_inwc = 0, velocity_fpm = 0 } = {}` | _ | _ | _ |
@@ -2883,7 +2884,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1469.
+Row count: 1470.
 
 <!-- END function-corpus-v14 -->
 
@@ -3824,7 +3825,7 @@ per spec-v14 §13.1 second paragraph.
 | `tool-maintenance` | Tool Maintenance Intervals | Project bundled tool maintenance sche...; Reference compute returns the per-attribute table; runner... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 | `triage-quickread` | Field First Aid Triage Quick-Read | START / SALT triage protocols (projec...; Returns 4 categories + notice + citation; tested on the n... | [docs/v6-audit.md](v6-audit.md) (reference cadence) |
 
-### Group J Trucking (25 tiles)
+### Group J Trucking (26 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3853,6 +3854,7 @@ per spec-v14 §13.1 second paragraph.
 | `stopping-sight-distance` | Stopping Sight Distance (AASHTO) | AASHTO; d_pr = 1.47*v*t_pr; d_br = v^2 / (30*(f+g)) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `truck-off-tracking` | Low-Speed Off-Tracking (Swept Path) | AASHTO Green Book (low-speed off-trac...; OT = 50 - sqrt(2500 - 400) = 50 - 45.826 = 4.174 ft; effe... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
 ### Group K Mechanic (73 tiles)
 
@@ -4291,6 +4293,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1222. Fixture-covered or reference-cadence: 1222 / 1222.
+Tile count: 1223. Fixture-covered or reference-cadence: 1223 / 1223.
 
 <!-- END tile-index-v14 -->
