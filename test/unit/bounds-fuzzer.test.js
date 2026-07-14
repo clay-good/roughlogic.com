@@ -6156,6 +6156,7 @@ import {
   computeMotorSyncSlip,
   computeMotorShaftTorque,
   computeMotorOperatingCost,
+  computeMotorRunHoursForBudget,
   computeMultiMotorFeeder,
 } from "../../calc-motor.js";
 // spec-v88 cap-relief split: the solar-PV / battery-storage / EV-charging bench
@@ -12250,6 +12251,29 @@ test("bounds: calc-motor computeMotorOperatingCost pins input kW, annual kWh, co
   assert.ok("error" in computeMotorOperatingCost({ hp: 25, efficiency_pct: 0, hours_per_year: 4000 }));
   assert.ok("error" in computeMotorOperatingCost({ hp: 25, efficiency_pct: 101, hours_per_year: 4000 }));
   assert.ok("error" in computeMotorOperatingCost({ hp: Infinity, hours_per_year: 4000 }));
+});
+
+test("bounds: spec-v735 motor run hours for an energy budget (inverse of motor-operating-cost)", () => {
+  const p = computeMotorRunHoursForBudget({ hp: 25, efficiency_pct: 93, load_factor_pct: 100, rate_usd_per_kwh: 0.12, cost_budget_usd: 5000 });
+  assert.ok(Math.abs(p.input_kw - 20.054) < 0.05);
+  assert.ok(Math.abs(p.max_hours_per_year - 2077.7) < 1);
+  // round-trip: the recovered hours fed to motor-operating-cost reproduce the budget
+  for (const [hp, eff, load, rate, budget] of [[25, 93, 100, 0.12, 5000], [10, 90, 75, 0.15, 1200], [100, 95, 100, 0.08, 40000], [5, 88, 50, 0.2, 300]]) {
+    const inv = computeMotorRunHoursForBudget({ hp, efficiency_pct: eff, load_factor_pct: load, rate_usd_per_kwh: rate, cost_budget_usd: budget });
+    const fwd = computeMotorOperatingCost({ hp, efficiency_pct: eff, load_factor_pct: load, hours_per_year: inv.max_hours_per_year, rate_usd_per_kwh: rate });
+    assert.ok(Math.abs(fwd.annual_cost - budget) < 1e-6);
+    assert.ok(Math.abs(fwd.input_kw - inv.input_kw) < 1e-9);
+  }
+  // a bigger budget buys more hours; a higher rate buys fewer (monotonic)
+  assert.ok(computeMotorRunHoursForBudget({ hp: 25, cost_budget_usd: 10000 }).max_hours_per_year > computeMotorRunHoursForBudget({ hp: 25, cost_budget_usd: 5000 }).max_hours_per_year);
+  assert.ok(computeMotorRunHoursForBudget({ hp: 25, rate_usd_per_kwh: 0.2, cost_budget_usd: 5000 }).max_hours_per_year < computeMotorRunHoursForBudget({ hp: 25, rate_usd_per_kwh: 0.12, cost_budget_usd: 5000 }).max_hours_per_year);
+  // error seams: hp <= 0, budget <= 0, efficiency out of range, load <= 0, rate <= 0, non-finite
+  assert.ok("error" in computeMotorRunHoursForBudget({ hp: 0, cost_budget_usd: 5000 }));
+  assert.ok("error" in computeMotorRunHoursForBudget({ hp: 25, cost_budget_usd: 0 }));
+  assert.ok("error" in computeMotorRunHoursForBudget({ hp: 25, efficiency_pct: 101, cost_budget_usd: 5000 }));
+  assert.ok("error" in computeMotorRunHoursForBudget({ hp: 25, load_factor_pct: 0, cost_budget_usd: 5000 }));
+  assert.ok("error" in computeMotorRunHoursForBudget({ hp: 25, rate_usd_per_kwh: 0, cost_budget_usd: 5000 }));
+  assert.ok("error" in computeMotorRunHoursForBudget({ hp: Infinity, cost_budget_usd: 5000 }));
 });
 
 test("bounds: calc-motor computeMultiMotorFeeder pins 430.24 ampacity, 430.62 ceiling, and round-down sizing", () => {

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(motor): spec-v735 motor run hours for an energy budget (motor-operating-cost inverse); 2026-07-14
+
+- New tile `motor-run-hours-for-budget` (Group A, calc-motor.js): the run hours an annual energy budget buys.
+  `hours = budget / (input_kW x rate)`, `input_kW = HP x 0.746 x load / efficiency`. A 25 HP motor at 93% and $0.12/kWh
+  draws 20.05 kW, so a $5,000 budget covers ~2,078 hours. Round-trips through `motor-operating-cost`. Home tile count
+  1,183 -> 1,184.
+
 ### feat(water): spec-v734 filter area for a target loading rate (filter-loading inverse); 2026-07-14
 
 - New tile `filter-area-for-loading` (Group M, calc-water.js): the filter area needed for a target loading rate at the

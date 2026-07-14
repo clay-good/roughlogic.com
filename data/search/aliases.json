@@ -7412,6 +7412,31 @@
       "kind": "industry"
     },
     {
+      "term": "motor run hours for budget",
+      "target": "motor-run-hours-for-budget",
+      "kind": "industry"
+    },
+    {
+      "term": "run hours for energy budget",
+      "target": "motor-run-hours-for-budget",
+      "kind": "redirect"
+    },
+    {
+      "term": "how long can I run motor",
+      "target": "motor-run-hours-for-budget",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hours for energy budget",
+      "target": "motor-run-hours-for-budget",
+      "kind": "adjacent"
+    },
+    {
+      "term": "motor hours budget",
+      "target": "motor-run-hours-for-budget",
+      "kind": "adjacent"
+    },
+    {
       "term": "operating cost",
       "target": "motor-operating-cost",
       "kind": "industry"

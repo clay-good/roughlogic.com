@@ -1038,6 +1038,7 @@ export const COMPUTE_MAP = {
   "motor-pole-identification": { module: "../../calc-motor.js", fn: "computeMotorPoleIdentification" },
   "motor-shaft-torque": { module: "../../calc-motor.js", fn: "computeMotorShaftTorque" },
   "motor-operating-cost": { module: "../../calc-motor.js", fn: "computeMotorOperatingCost" },
+  "motor-run-hours-for-budget": { module: "../../calc-motor.js", fn: "computeMotorRunHoursForBudget" },
   "multi-motor-feeder": { module: "../../calc-motor.js", fn: "computeMultiMotorFeeder" },
   "conductor-short-circuit-withstand": { module: "../../calc-electrical.js", fn: "computeConductorShortCircuitWithstand" },
   "conduit-thermal-expansion": { module: "../../calc-electrical.js", fn: "computeConduitThermalExpansion" },

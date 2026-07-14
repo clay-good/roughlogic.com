@@ -1056,6 +1056,7 @@ const RELATED = {
   "motor-pole-identification": ["motor-synchronous-speed-slip", "motor-shaft-torque", "motor-fla", "motor-operating-cost"],
   "motor-shaft-torque": ["motor-synchronous-speed-slip", "motor-fla", "motor-operating-cost"],
   "motor-operating-cost": ["motor-shaft-torque", "motor-fla", "pf-correction"],
+  "motor-run-hours-for-budget": ["motor-operating-cost", "motor-shaft-torque", "pf-correction"],
   "motor-efficiency-upgrade-savings": ["motor-operating-cost", "vfd-energy-savings", "motor-fla", "transformer-loading-efficiency"],
   "transformer-loading-efficiency": ["transformer-sizing", "transformer-k-factor", "transformer-kva-sizing", "motor-efficiency-upgrade-savings"],
   "economic-conductor-sizing": ["voltage-drop", "min-conductor-for-vd", "motor-efficiency-upgrade-savings", "transformer-loading-efficiency"],

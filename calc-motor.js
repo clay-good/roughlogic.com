@@ -209,6 +209,58 @@ function renderMotorOperatingCost(inputRegion, outputRegion, citationEl) {
 }
 MOTOR_RENDERERS["motor-operating-cost"] = renderMotorOperatingCost;
 
+// motor-run-hours-for-budget: inverse of motor-operating-cost. The forward tile gives the annual cost from the run-hours;
+// the inverse recovers the run-hours a cost budget buys, hours = budget / (input_kW x rate), with
+// input_kW = HP x 0.746 x load / efficiency. It answers "how many hours can I run before I hit the energy budget" and
+// reports the input power and the annual kWh at that budget.
+// dims: in { hp: dimensionless, efficiency_pct: dimensionless, load_factor_pct: dimensionless, rate_usd_per_kwh: dimensionless, cost_budget_usd: dimensionless } out: { max_hours_per_year: T, input_kw: dimensionless, annual_kwh: dimensionless }
+export function computeMotorRunHoursForBudget({ hp = 0, efficiency_pct = 93, load_factor_pct = 100, rate_usd_per_kwh = 0.12, cost_budget_usd = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(hp > 0)) return { error: "Horsepower must be positive." };
+  if (!(cost_budget_usd > 0)) return { error: "Cost budget must be positive ($)." };
+  if (!(efficiency_pct > 0 && efficiency_pct <= 100)) return { error: "Efficiency must be in (0, 100] percent." };
+  if (!(load_factor_pct > 0)) return { error: "Load factor must be positive (a motor at zero load draws no billable energy)." };
+  if (!(rate_usd_per_kwh > 0)) return { error: "Energy rate must be positive ($/kWh)." };
+  const input_kw = (hp * 0.746 * (load_factor_pct / 100)) / (efficiency_pct / 100);
+  const max_hours_per_year = cost_budget_usd / (input_kw * rate_usd_per_kwh);
+  const annual_kwh = input_kw * max_hours_per_year;
+  if (![input_kw, max_hours_per_year, annual_kwh].every(Number.isFinite)) return { error: "Run-hours math is not a finite value." };
+  return {
+    input_kw, max_hours_per_year, annual_kwh,
+    note: "max run-hours = budget / (input_kW x rate), input_kW = HP x 0.746 x load / efficiency. This is the energy charge only -- the utility tariff (demand charges, time-of-use, power-factor penalties) governs the full bill, so the real hours before a bill target are fewer. There are about 8,760 hours in a year; if this exceeds that, the budget covers continuous running with room to spare.",
+  };
+}
+export const motorRunHoursForBudgetExample = { inputs: { hp: 25, efficiency_pct: 93, load_factor_pct: 100, rate_usd_per_kwh: 0.12, cost_budget_usd: 5000 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderMotorRunHoursForBudget(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles run-hours = budget / (input_kW x rate), input_kW = HP x 0.746 x load / efficiency. The 0.746 kW/HP is the mechanical-to-electrical conversion; the result is the energy-charge component only and excludes demand / time-of-use / power-factor penalties. The utility tariff governs the bill.";
+  const hp = makeNumber("Rated horsepower", "mrh-hp", { step: "any", min: "0" });
+  const eff = makeNumber("Full-load efficiency (%)", "mrh-eff", { step: "any", min: "0", max: "100", value: "93" });
+  eff.input.value = "93";
+  const load = makeNumber("Average load (% of rated)", "mrh-load", { step: "any", min: "0", value: "100" });
+  load.input.value = "100";
+  const rate = makeNumber("Energy rate ($/kWh)", "mrh-rate", { step: "any", min: "0", value: "0.12" });
+  rate.input.value = "0.12";
+  const budget = makeNumber("Annual energy budget ($)", "mrh-budget", { step: "any", min: "0" });
+  for (const f of [hp, eff, load, rate, budget]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { hp.input.value = "25"; eff.input.value = "93"; load.input.value = "100"; rate.input.value = "0.12"; budget.input.value = "5000"; update(); });
+  const oHours = makeOutputLine(outputRegion, "Max run hours per year", "mrh-out-hours");
+  const oKw = makeOutputLine(outputRegion, "Input power", "mrh-out-kw");
+  const oKwh = makeOutputLine(outputRegion, "Energy at that budget", "mrh-out-kwh");
+  const oNote = makeOutputLine(outputRegion, "Note", "mrh-out-note");
+  const update = debounce(() => {
+    const r = computeMotorRunHoursForBudget({ hp: Number(hp.input.value) || 0, efficiency_pct: Number(eff.input.value) || 0, load_factor_pct: Number(load.input.value) || 0, rate_usd_per_kwh: Number(rate.input.value) || 0, cost_budget_usd: Number(budget.input.value) || 0 });
+    if (r.error) { oHours.textContent = r.error; oKw.textContent = "-"; oKwh.textContent = "-"; oNote.textContent = "-"; return; }
+    oHours.textContent = fmt(r.max_hours_per_year, 0) + " hr/yr";
+    oKw.textContent = fmt(r.input_kw, 2) + " kW";
+    oKwh.textContent = fmt(r.annual_kwh, 0) + " kWh/yr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [hp.input, eff.input, load.input, rate.input, budget.input]) el.addEventListener("input", update);
+}
+MOTOR_RENDERERS["motor-run-hours-for-budget"] = renderMotorRunHoursForBudget;
+
 const _OCPD_STANDARD_SIZES = [15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250, 300, 350, 400, 450, 500, 600, 700, 800, 1000, 1200, 1600, 2000, 2500, 3000, 4000, 5000, 6000];
 function _standardOcpdAtOrBelow(a) {
   let chosen = null;

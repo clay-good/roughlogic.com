@@ -2455,6 +2455,17 @@ export const CITATIONS = {
     ],
   },
 
+  "motor-run-hours-for-budget": {
+    formula: "input_kW = HP x 0.746 x (load_factor/100) / (efficiency/100); max_hours = cost_budget / (input_kW x rate); annual_kWh = input_kW x max_hours. The inverse of annual_cost = input_kW x run_hours x rate.",
+    edition: "First-principles electrical-input power and the 0.746 kW-per-HP identity, solved for the run hours.",
+    freeAccess: "First-principles physics; no licensed source required.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (input power and energy cost are physical relations; the 0.746 constant is a fixed unit bridge), solved for the run hours a cost budget buys.",
+    assumptions: [
+      { name: "Energy charge only", value: "the result is the energy-charge component only and excludes demand charges, time-of-use rates, and power-factor penalties, so the real hours before a bill target are fewer", source: "utility tariff governs the full bill" },
+      { name: "Efficiency basis", value: "efficiency is the full-load efficiency; partial-load efficiency differs and the load factor scales the input power linearly as a first approximation", source: "motor nameplate / manufacturer curve" },
+    ],
+  },
   "motor-operating-cost": {
     formula: "input_kW = HP x 0.746 x (load_factor/100) / (efficiency/100); annual_kWh = input_kW x run_hours; annual_cost = annual_kWh x rate. The 0.746 kW/HP is the mechanical-to-electrical conversion.",
     edition: "First-principles electrical-input power and the 0.746 kW-per-HP identity.",

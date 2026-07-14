@@ -2304,6 +2304,7 @@ cross-check.
 | calc-motor.js | `computeMotorOperatingCost` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, hours_per_year = 0, rat...` | _ | _ | _ |
 | calc-motor.js | `computeMotorOverloadSizing` | `{ fla_A = 0, sf = 0, rise_C = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorPoleIdentification` | `{ rated_rpm = 0, line_freq_hz = 60 } = {}` | _ | _ | _ |
+| calc-motor.js | `computeMotorRunHoursForBudget` | `{ hp = 0, efficiency_pct = 93, load_factor_pct = 100, rate_usd_per_kwh = 0.12...` | _ | _ | _ |
 | calc-motor.js | `computeMotorShaftTorque` | `{ rpm = 0, hp = null, torque_lbft = null } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMotorSyncSlip` | `{ line_freq_hz = 60, poles = 4, rated_rpm = 0 } = {}` | _ | _ | _ |
 | calc-motor.js | `computeMultiMotorFeeder` | `{ largest_flc_a = 0, sum_other_flc_a = 0, largest_branch_ocpd_a = 0 } = {}` | _ | _ | _ |
@@ -2844,7 +2845,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1430.
+Row count: 1431.
 
 <!-- END function-corpus-v14 -->
 
@@ -2925,7 +2926,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (152 tiles)
+### Group A Electrical (153 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3010,6 +3011,7 @@ per spec-v14 §13.1 second paragraph.
 | `motor-operating-cost` | Motor Input Power, Annual Energy, and Cost | First-principles motor input power; spec-v123 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-overload-sizing` | Motor Running Overload Protection (NEC 430.32) | NEC 2023 430.32(A)(1) / 430.32(C); spec-v278 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-pole-identification` | Motor Pole Count from Nameplate RPM | First-principles AC-machine theory (i...; spec-v654 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `motor-run-hours-for-budget` | Motor Run Hours for an Energy Budget | First-principles motor input power (s...; spec-v735 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `motor-shaft-torque` | Motor Shaft Torque, Horsepower, and Speed | First-principles rotational-power ide...; spec-v122 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-synchronous-speed-slip` | Motor Synchronous Speed, Slip, and Rotor Frequency | First-principles AC-machine theory; spec-v121 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `motor-unbalance-derate` | Motor Derating for Voltage Unbalance (NEMA MG-1) | NEMA MG-1; avg 455, max dev 5 -> 1.10% unbalance -> derate ~0.977 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4213,6 +4215,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1183. Fixture-covered or reference-cadence: 1183 / 1183.
+Tile count: 1184. Fixture-covered or reference-cadence: 1184 / 1184.
 
 <!-- END tile-index-v14 -->

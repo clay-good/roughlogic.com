@@ -31357,6 +31357,36 @@
    }
   },
   {
+   "tile_id": "motor-run-hours-for-budget",
+   "source_publisher": "First-principles motor input power (solved for the hours)",
+   "source_title": "25 HP, 93% eff, 100% load, $0.12/kWh, $5000 budget -> 20.05 kW, 2,078 hr/yr",
+   "source_edition_or_year": "n/a; hours = budget / (input_kW x rate)",
+   "source_section_or_page": "spec-v735 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "hp": 25,
+    "efficiency_pct": 93,
+    "load_factor_pct": 100,
+    "rate_usd_per_kwh": 0.12,
+    "cost_budget_usd": 5000
+   },
+   "outputs": {
+    "input_kw": {
+     "value": 20.054,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_hours_per_year": {
+     "value": 2077.7,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "motor-operating-cost",
    "source_publisher": "First-principles motor input power",
    "source_title": "Premium motor: same duty at 95% eff -> 19.63 kW, $9,423",
