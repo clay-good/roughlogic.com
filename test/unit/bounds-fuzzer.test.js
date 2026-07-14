@@ -21666,6 +21666,24 @@ test("bounds: spec-v788 computeRollingSphereProtection pins the rolling-sphere r
   assert.ok("error" in _v788({ mast_height_ft: 30, sphere_radius_ft: 0 }));
 });
 
+import { computeFreshConcreteTemp as _v793 } from "../../calc-concrete.js";
+
+test("bounds: spec-v793 computeFreshConcreteTemp pins the ACI 305.1 heat balance, water leverage, and error seams", () => {
+  const r = _v793({ agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 70, agg_moisture_weight_lb: 60 });
+  assert.ok(Math.abs(r.concrete_temp_f - 85.80) < 0.05); // 93012 / 1084.08
+  assert.strictEqual(r.hot, false);
+  // Chilling the mix water lowers the batch; the hot flag trips above 90 F.
+  const chilled = _v793({ agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 35, agg_moisture_weight_lb: 60 });
+  assert.ok(chilled.concrete_temp_f < r.concrete_temp_f);
+  assert.strictEqual(_v793({ agg_weight_lb: 3000, agg_temp_f: 95, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 90, agg_moisture_weight_lb: 60 }).hot, true);
+  // Error seams: non-finite, non-positive aggregate/cement/water, negative moisture.
+  assert.ok("error" in _v793({ agg_weight_lb: Infinity, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 70 }));
+  assert.ok("error" in _v793({ agg_weight_lb: 0, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 70 }));
+  assert.ok("error" in _v793({ agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 0, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 70 }));
+  assert.ok("error" in _v793({ agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 0, water_temp_f: 70 }));
+  assert.ok("error" in _v793({ agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 70, agg_moisture_weight_lb: -5 }));
+});
+
 import { computeCompressorDisplacement as _v792 } from "../../calc-refrigerant.js";
 
 test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, monotonicity, and error seams", () => {

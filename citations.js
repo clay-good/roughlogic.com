@@ -12812,6 +12812,17 @@ export const CITATIONS = {
       { name: "Rated capacity", value: "the manufacturer's allowable for the extended height and bracing governs; reshoring is a separate analysis", source: "ACI 347.2R" },
     ],
   },
+  "fresh-concrete-temp": {
+    formula: "T = [0.22(Ta x Wa + Tc x Wc) + Tw x Ww + Ta x Wwa] / [0.22(Wa + Wc) + Ww + Wwa]; solids specific heat 0.22 Btu/lb-F, water 1.0, aggregate free moisture at the aggregate temperature.",
+    edition: "ACI 305.1 Specification for Hot Weather Concreting (the batch heat-balance for fresh concrete temperature); PCA Design and Control of Concrete Mixtures, by name; the mix design and project specification govern.",
+    freeAccess: "The mass-weighted heat balance is first-principles; the 0.22 solids specific heat is the standard ACI value. Ingredient weights and temperatures come from the batch ticket.",
+    governance: GOVERNANCE.general,
+    editionNote: "ACI 305.1 fresh-concrete temperature by heat balance: the mix temperature is the mass-weighted average of its ingredients, weighting the solids (cement and aggregate) by their specific heat ~0.22 Btu/lb-F and water by 1.0, so T = [0.22(Ta Wa + Tc Wc) + Tw Ww + Twa Wwa] / [0.22(Wa + Wc) + Ww + Wwa]. Because water's heat capacity is over four times the solids', the mix water is the cheapest lever -- chilling it, or replacing part of it with ice (crediting the 144 Btu/lb heat of fusion), pulls the batch down the most per pound. The aggregate, the largest mass, sets the baseline, and its free surface moisture rides at the aggregate temperature. Hot-weather concreting (ACI 305) commonly caps the placing temperature near 90 F; above it, set time shortens, slump loss and plastic-shrinkage cracking rise, and 28-day strength can drop. Cement heat of hydration and mixer friction add a few degrees this static balance omits. A batching aid, not the mix design.",
+    assumptions: [
+      { name: "Specific heats", value: "solids (cement + aggregate) ~0.22 Btu/lb-F, water 1.0; aggregate free moisture at the aggregate temperature", source: "ACI 305.1" },
+      { name: "Omits", value: "cement heat of hydration and mixer friction, which add a few degrees", source: "scope of this tile" },
+    ],
+  },
   "concrete-evaporation-rate": {
     formula: "Tc = (concrete_temp_f - 32) / 1.8; Ta = (air_temp_f - 32) / 1.8; V = wind_mph x 1.609; E_metric = 5 x [(Tc + 18)^2.5 - (rh/100)(Ta + 18)^2.5](V + 4) x 1e-6; E_us = E_metric x 0.2048.",
     edition: "ACI 305 (Hot Weather Concreting) nomograph and the Menzel / NRMCA evaporation equation, by name; the F-to-C and mph-to-km/h conversions are exact.",

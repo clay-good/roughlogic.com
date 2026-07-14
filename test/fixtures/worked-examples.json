@@ -24467,6 +24467,32 @@
    }
   },
   {
+   "tile_id": "fresh-concrete-temp",
+   "source_publisher": "ACI 305.1 Hot Weather Concreting (batch heat balance); PCA",
+   "source_title": "T = [0.22(Ta Wa + Tc Wc) + Tw Ww + Twa Wwa] / [0.22(Wa + Wc) + Ww + Wwa]",
+   "source_edition_or_year": "spec-v793 worked example (machine-verified)",
+   "source_section_or_page": "agg 3000 lb@80F, cement 564 lb@150F, water 240 lb@70F, agg moisture 60 lb -> 85.8 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "agg_weight_lb": 3000,
+    "agg_temp_f": 80,
+    "cement_weight_lb": 564,
+    "cement_temp_f": 150,
+    "water_weight_lb": 240,
+    "water_temp_f": 70,
+    "agg_moisture_weight_lb": 60
+   },
+   "outputs": {
+    "concrete_temp_f": {
+     "value": 85.8,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "compressor-displacement",
    "source_publisher": "Reciprocating compressor theoretical displacement (ASHRAE Refrigeration)",
    "source_title": "displacement = (pi/4) x bore^2 x stroke x cylinders x rpm / 1728",

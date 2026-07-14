@@ -4,6 +4,17 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v793 fresh concrete temperature (ACI 305.1); 2026-07-14
+
+- New tile `fresh-concrete-temp` (Group E, calc-concrete.js): the batch temperature the concrete-evaporation-rate tile
+  takes as a given, from the ACI 305.1 ingredient heat balance. `T = [0.22(Ta Wa + Tc Wc) + Tw Ww + Twa Wwa] / [0.22(Wa
+  + Wc) + Ww + Wwa]`, weighting solids by their ~0.22 specific heat and water by 1.0. Aggregate 3000 lb@80F, cement 564
+  lb@150F, 240 lb of 70F water, 60 lb aggregate moisture -> 85.8F. Because water's heat capacity is 4x the solids',
+  chilling the mix water or adding ice is the cheapest way to beat the ~90F hot-weather ceiling (flagged). Fuzzer pins
+  the balance, the water leverage, the hot flag, and the error seams. Explore sweep #22 entry 5. Home count 1,241 ->
+  1,242. Raised the group-shell gzip cap 52 -> 54 KB (the new tile's bidirectional related-tiles chip took the
+  construction group shell to ~52.2 KB).
+
 ### feat(refrigeration): spec-v792 compressor theoretical displacement; 2026-07-14
 
 - New tile `compressor-displacement` (Group C, calc-refrigerant.js): the swept-volume pumping ceiling of a reciprocating

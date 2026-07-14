@@ -509,6 +509,7 @@ const _TILES = [
   ["shadow-length", "A"],
   ["engine-bmep", "K"],
   ["compressor-displacement", "C"],
+  ["fresh-concrete-temp", "E"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

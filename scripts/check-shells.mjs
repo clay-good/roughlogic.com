@@ -78,7 +78,10 @@ const TILE_GZIP_CAP = 6 * 1024;
 // v674, helical-pile-torque v681), taking construction/index.html to ~48.2 KB gz
 // and crossing the cap at v681 (again CI-only, so push lint stayed green while CI
 // went red from v681 onward); 52 KB restores ~8% headroom.
-const GROUP_GZIP_CAP = 52 * 1024;
+// Bumped 52 -> 54 KB on 2026-07-14: spec-v793 fresh-concrete-temp (Group E concrete)
+// added a bidirectional related-tiles chip to the construction group members, taking
+// construction/index.html to ~52.2 KB gz (over the 52 KB cap); 54 KB restores ~3.5% headroom.
+const GROUP_GZIP_CAP = 54 * 1024;
 
 const ALLOWED_JSONLD_TYPES = new Set([
   "WebApplication",

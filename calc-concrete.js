@@ -1383,3 +1383,53 @@ CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
   ],
   compute: computeConcreteAnchorBlowout,
 });
+
+// ===================== spec-v793: fresh (batch) concrete temperature (ACI 305.1) =====================
+// Mass-weighted thermal-energy balance: mixture T = sum(c_i m_i T_i) / sum(c_i m_i), with the specific
+// heat of solids (cement + aggregate) ~0.22 Btu/lb-F and water = 1.0. Free surface moisture on the
+// aggregate is water at the aggregate temperature.
+// dims: in { agg_weight_lb: M, agg_temp_f: T, cement_weight_lb: M, cement_temp_f: T, water_weight_lb: M, water_temp_f: T, agg_moisture_weight_lb: M } out: { concrete_temp_f: T }
+export function computeFreshConcreteTemp({ agg_weight_lb = 0, agg_temp_f = 0, cement_weight_lb = 0, cement_temp_f = 0, water_weight_lb = 0, water_temp_f = 0, agg_moisture_weight_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Wa = Number(agg_weight_lb) || 0;
+  const Ta = Number(agg_temp_f);
+  const Wc = Number(cement_weight_lb) || 0;
+  const Tc = Number(cement_temp_f);
+  const Ww = Number(water_weight_lb) || 0;
+  const Tw = Number(water_temp_f);
+  const Wwa = Number(agg_moisture_weight_lb) || 0;
+  if (!(Wa > 0)) return { error: "Aggregate weight must be positive (lb)." };
+  if (!(Wc > 0)) return { error: "Cement weight must be positive (lb)." };
+  if (!(Ww > 0)) return { error: "Added (mix) water weight must be positive (lb)." };
+  if (Wwa < 0) return { error: "Aggregate free-moisture weight cannot be negative (lb)." };
+  if (![Ta, Tc, Tw].every(Number.isFinite)) return { error: "Enter valid temperatures (F)." };
+  const num = 0.22 * (Ta * Wa + Tc * Wc) + Tw * Ww + Ta * Wwa;
+  const den = 0.22 * (Wa + Wc) + Ww + Wwa;
+  if (!(den > 0)) return { error: "The total heat-capacity weight must be positive." };
+  const concrete_temp_f = num / den;
+  if (!Number.isFinite(concrete_temp_f)) return { error: "Fresh-concrete-temperature math is not a finite value." };
+  const hot = concrete_temp_f > 90;
+  return {
+    concrete_temp_f, hot,
+    note: "ACI 305.1 fresh-concrete temperature by heat balance: the mix temperature is the mass-weighted average of its ingredients, weighting the solids (cement and aggregate) by their specific heat ~0.22 Btu/lb-F and water by 1.0, so T = [0.22(Ta Wa + Tc Wc) + Tw Ww + Twa Wwa] / [0.22(Wa + Wc) + Ww + Wwa]. Because water's heat capacity is over four times the solids', the MIX WATER is the cheapest lever -- chilling it, or replacing part of it with ice (crediting the 144 Btu/lb heat of fusion), pulls the batch down the most per pound. The aggregate, being the largest mass, sets the baseline, and its free surface moisture rides at the aggregate temperature. Hot-weather concreting (ACI 305) commonly caps the placing temperature near 90 F; above it, set time shortens, slump loss and plastic-shrinkage cracking rise, and 28-day strength can drop. Cement heat of hydration and mixer friction add a few degrees this static balance omits. A batching aid; the mix design and the project specification govern.",
+  };
+}
+export const freshConcreteTempExample = { inputs: { agg_weight_lb: 3000, agg_temp_f: 80, cement_weight_lb: 564, cement_temp_f: 150, water_weight_lb: 240, water_temp_f: 70, agg_moisture_weight_lb: 60 } };
+CONCRETE_RENDERERS["fresh-concrete-temp"] = _simpleRenderer({
+  citation: "Citation: ACI 305.1 hot-weather fresh-concrete temperature (heat balance): T = [0.22(Ta Wa + Tc Wc) + Tw Ww + Twa Wwa] / [0.22(Wa + Wc) + Ww + Wwa], solids specific heat ~0.22 Btu/lb-F, water 1.0, free aggregate moisture at the aggregate temperature. Water is the cheapest lever (chill it or add ice, 144 Btu/lb of fusion). ACI 305 commonly caps placing near 90 F. Omits hydration heat and mixer friction. A batching aid; the mix design and spec govern.",
+  example: freshConcreteTempExample.inputs,
+  fields: [
+    { key: "agg_weight_lb", label: "Aggregate weight (lb)", kind: "number", default: 3000 },
+    { key: "agg_temp_f", label: "Aggregate temperature (F)", kind: "number", default: 80 },
+    { key: "cement_weight_lb", label: "Cement weight (lb)", kind: "number", default: 564 },
+    { key: "cement_temp_f", label: "Cement temperature (F)", kind: "number", default: 150 },
+    { key: "water_weight_lb", label: "Added (mix) water weight (lb)", kind: "number", default: 240 },
+    { key: "water_temp_f", label: "Mix water temperature (F)", kind: "number", default: 70 },
+    { key: "agg_moisture_weight_lb", label: "Free moisture on aggregate (lb)", kind: "number", default: 60 },
+  ],
+  outputs: [
+    { key: "t", id: "fct-out-t", label: "Fresh concrete temperature", value: (r) => fmt(r.concrete_temp_f, 1) + " F" + (r.hot ? " -- above the ~90 F hot-weather ceiling" : "") },
+    { key: "n", id: "fct-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeFreshConcreteTemp,
+});

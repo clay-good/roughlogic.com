@@ -48427,6 +48427,31 @@
       "kind": "question"
     },
     {
+      "term": "fresh concrete temperature",
+      "target": "fresh-concrete-temp",
+      "kind": "industry"
+    },
+    {
+      "term": "concrete batch temperature",
+      "target": "fresh-concrete-temp",
+      "kind": "question"
+    },
+    {
+      "term": "how much ice to cool concrete",
+      "target": "fresh-concrete-temp",
+      "kind": "question"
+    },
+    {
+      "term": "hot weather concrete mix water temperature",
+      "target": "fresh-concrete-temp",
+      "kind": "question"
+    },
+    {
+      "term": "aci 305 placing temperature",
+      "target": "fresh-concrete-temp",
+      "kind": "industry"
+    },
+    {
       "term": "how strong is concrete at three days",
       "target": "concrete-strength-gain",
       "kind": "question"

@@ -792,6 +792,7 @@ export const COMPUTE_MAP = {
   "shadow-length": { module: "../../calc-solar.js", fn: "computeShadowLength" },
   "engine-bmep": { module: "../../calc-mechanic.js", fn: "computeEngineBmep" },
   "compressor-displacement": { module: "../../calc-refrigerant.js", fn: "computeCompressorDisplacement" },
+  "fresh-concrete-temp": { module: "../../calc-concrete.js", fn: "computeFreshConcreteTemp" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

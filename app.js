@@ -606,6 +606,8 @@ const TOOL_MODULES = (() => {
     "rc-slender-column-magnify",
     // spec-v556
     "concrete-corbel-bracket",
+    // spec-v793 fresh (batch) concrete temperature (ACI 305.1)
+    "fresh-concrete-temp",
   ]);
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio: a new
   // lazy Group E cluster, where the steel / RC member load path meets the
