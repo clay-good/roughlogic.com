@@ -32217,6 +32217,31 @@
       "kind": "question"
     },
     {
+      "term": "how many days will my nvr record",
+      "target": "cctv-retention-days",
+      "kind": "question"
+    },
+    {
+      "term": "cctv retention from disk size",
+      "target": "cctv-retention-days",
+      "kind": "question"
+    },
+    {
+      "term": "days of footage from hard drive size",
+      "target": "cctv-retention-days",
+      "kind": "question"
+    },
+    {
+      "term": "how long can cameras record on 16tb",
+      "target": "cctv-retention-days",
+      "kind": "question"
+    },
+    {
+      "term": "nvr storage to recording days",
+      "target": "cctv-retention-days",
+      "kind": "question"
+    },
+    {
       "term": "70 volt speaker system wattage",
       "target": "speaker-70v-line",
       "kind": "question"

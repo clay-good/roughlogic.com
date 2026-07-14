@@ -669,6 +669,7 @@ export const COMPUTE_MAP = {
   "fiber-max-length": { module: "../../calc-lowvoltage.js", fn: "computeFiberMaxLength" },
   "cable-tray-fill": { module: "../../calc-lowvoltage.js", fn: "computeCableTrayFill" },
   "cctv-storage": { module: "../../calc-lowvoltage.js", fn: "computeCctvStorage" },
+  "cctv-retention-days": { module: "../../calc-lowvoltage.js", fn: "computeCctvRetentionDays" },
   "speaker-70v-line": { module: "../../calc-lowvoltage.js", fn: "computeSpeaker70vLine" },
   "standby-battery-sizing": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatterySizing" },
   "standby-battery-runtime": { module: "../../calc-lowvoltage.js", fn: "computeStandbyBatteryRuntime" },

@@ -8348,6 +8348,16 @@ export const CITATIONS = {
       { name: "Bitrate", value: "per-camera bitrate is user-supplied or estimated from resolution/fps/codec", source: "VMS sizing practice" },
     ],
   },
+  "cctv-retention-days": {
+    formula: "Retention days = disk_capacity_GB / (cameras * bitrate_Mbps * 0.45 * recording_hours); the algebraic inverse of the NVR storage relation (1 Mbps for 24 h = 10.8 GB/day). Recording hours = 24 continuous, or 24 * duty% for motion.",
+    edition: "IP-video retention from available disk, camera count, bitrate, and recording hours (days = disk_GB / (cameras x bitrate x 0.45 x hours); 1 Mbps for 24 h is about 10.8 GB/day), per the standard NVR/VMS sizing practice; first-principles bitrate accounting.",
+    freeAccess: "First-principles bitrate accounting. The H.264/H.265 bitrate estimates are scene- and vendor-specific and user-supplied; the VMS calculator and the installed cameras govern.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "First-principles (no edition). The inverse of cctv-storage; a motion duty-cycle scales the recording hours, and the result assumes usable (post-overhead) disk capacity is entered.",
+    assumptions: [
+      { name: "Bitrate", value: "per-camera bitrate is user-supplied or estimated from resolution/fps/codec", source: "VMS sizing practice" },
+    ],
+  },
   "speaker-70v-line": {
     formula: "Constant-voltage line: total tap load = sum of tap watts; budget verdict total <= rating*(1 - headroom); reflected impedance Z = V^2 / P_total; line loss from wire resistance and the line current I = P_total/V.",
     edition: "Constant-voltage (70 V / 100 V) distributed-audio line design - tap-wattage budget, reflected line impedance Z = V^2/P, and run line-loss - per the standard 70 V distributed-system practice and NEC Article 640 / 725 (Class 2/3 audio) wiring, by name; first-principles Ohm's law.",

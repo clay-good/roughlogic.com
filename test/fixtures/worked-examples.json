@@ -20425,6 +20425,59 @@
    }
   },
   {
+   "tile_id": "cctv-retention-days",
+   "source_publisher": "first-principles NVR/VMS bitrate accounting (by name)",
+   "source_title": "days = disk_GB / (cameras * bitrate_Mbps * 0.45 * hours); the inverse of the storage relation",
+   "source_edition_or_year": "first-principles bitrate accounting",
+   "source_section_or_page": "16000 GB disk, 8 cameras at 4 Mbps, 24 h -> 16000 / (8 * 4 * 0.45 * 24) = 16000 / 345.6 = 46.30 days",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "disk_capacity_gb": 16000,
+    "camera_count": 8,
+    "bitrate_mbps": 4,
+    "recording_mode": "continuous"
+   },
+   "outputs": {
+    "retention_days": {
+     "value": 46.29629629629629,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "daily_total_gb": {
+     "value": 345.6,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "cctv-retention-days",
+   "source_publisher": "first-principles NVR/VMS bitrate accounting (by name)",
+   "source_title": "motion recording halves the hours, so the same disk holds twice the days",
+   "source_edition_or_year": "first-principles bitrate accounting",
+   "source_section_or_page": "16000 GB, 8 cameras at 4 Mbps, motion 50% (12 h) -> 16000 / (8 * 4 * 0.45 * 12) = 16000 / 172.8 = 92.59 days",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "disk_capacity_gb": 16000,
+    "camera_count": 8,
+    "bitrate_mbps": 4,
+    "recording_mode": "motion",
+    "motion_duty_percent": 50
+   },
+   "outputs": {
+    "retention_days": {
+     "value": 92.59259259259258,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "speaker-70v-line",
    "source_publisher": "constant-voltage distributed audio practice / NEC 640 (by name)",
    "source_title": "total tap load = sum of tap watts; reflected Z = V^2 / P_total",

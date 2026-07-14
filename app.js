@@ -150,7 +150,7 @@ const TOOL_MODULES = (() => {
   // under Group A pending the Group-Z maintainer signoff, per the spec's
   // documented fallback).
   declare("./calc-lowvoltage.js", "LOWVOLTAGE_RENDERERS", [
-    "fiber-loss-budget", "fiber-max-length", "cable-tray-fill", "cctv-storage",
+    "fiber-loss-budget", "fiber-max-length", "cable-tray-fill", "cctv-storage", "cctv-retention-days",
     "speaker-70v-line", "standby-battery-sizing", "standby-battery-runtime", "coax-rg-loss",
     "camera-lens-fov", "ceiling-speaker-coverage", "structured-cabling-channel",
   ]);

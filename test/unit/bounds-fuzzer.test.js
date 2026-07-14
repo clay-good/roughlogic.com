@@ -10790,6 +10790,7 @@ test("bounds: spec-v54 compound-miter pins chart values + rejects bad inputs", (
 import {
   computeFiberLossBudget as _cv28z1, computeCableTrayFill as _cv28z2, computeCctvStorage as _cv28z3, computeFiberMaxLength as _v693,
   computeSpeaker70vLine as _cv28z4, computeStandbyBatterySizing as _cv28z5, computeCoaxRgLoss as _cv28z6, computeStandbyBatteryRuntime as _v687,
+  computeCctvRetentionDays as _v696,
 } from "../../calc-lowvoltage.js";
 
 test("bounds: spec-v28 low-voltage cabling tiles pin constants + reject non-finite", () => {
@@ -10866,6 +10867,34 @@ test("bounds: spec-v687 computeStandbyBatteryRuntime pins Hs = (Ah/derate - alar
   assert.ok("error" in _v687({ battery_ah: 14.6, standby_current_a: 0.5, derate: 0 }));
   assert.ok("error" in _v687({ battery_ah: 0.1, standby_current_a: 0.5, alarm_current_a: 2.0, alarm_minutes: 5, derate: 1.2 }));
   assert.ok("error" in _v687({ battery_ah: NaN, standby_current_a: 0.5 }));
+});
+
+test("bounds: spec-v696 computeCctvRetentionDays pins days = disk/(n*br*0.45*hours), round-trips through computeCctvStorage, and error seams", () => {
+  const r = _v696({ disk_capacity_gb: 16000, camera_count: 8, bitrate_mbps: 4, recording_mode: "continuous" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.retention_days - 16000 / (8 * 4 * 0.45 * 24)) < 1e-9, `days identity: ${r.retention_days}`);
+  assert.ok(Math.abs(r.retention_days - 46.2963) < 1e-3, `pinned 46.30 days: ${r.retention_days}`);
+  // Motion recording halves the hours, so the same disk holds twice the days.
+  const m = _v696({ disk_capacity_gb: 16000, camera_count: 8, bitrate_mbps: 4, recording_mode: "motion", motion_duty_percent: 50 });
+  assert.ok(Math.abs(m.retention_days - 2 * r.retention_days) < 1e-6, `motion doubles: ${m.retention_days}`);
+  // Round-trip: at the reported retention the forward tile's total storage equals the disk capacity.
+  for (const disk_capacity_gb of [2000, 16000, 100000]) {
+    for (const bitrate_mbps of [1, 4, 12]) {
+      for (const camera_count of [1, 8, 64]) {
+        const s = _v696({ disk_capacity_gb, camera_count, bitrate_mbps, recording_mode: "continuous" });
+        assert.ok(!s.error, `sweep disk=${disk_capacity_gb} br=${bitrate_mbps} n=${camera_count}: ${JSON.stringify(s)}`);
+        assertFinite(s.retention_days, "days"); assert.ok(s.retention_days > 0, "days positive");
+        const back = _cv28z3({ camera_count, bitrate_mbps, recording_mode: "continuous", retention_days: s.retention_days });
+        assert.ok(Math.abs(back.total_storage_gb - disk_capacity_gb) < 1e-6, `round-trip disk=${disk_capacity_gb} br=${bitrate_mbps} n=${camera_count}: ${back.total_storage_gb}`);
+      }
+    }
+  }
+  // Error seams: non-positive disk, zero bitrate, zero cameras, bad motion duty, non-finite.
+  assert.ok("error" in _v696({ disk_capacity_gb: 0, camera_count: 8, bitrate_mbps: 4 }));
+  assert.ok("error" in _v696({ disk_capacity_gb: 16000, camera_count: 8, bitrate_mbps: 0 }));
+  assert.ok("error" in _v696({ disk_capacity_gb: 16000, camera_count: 0, bitrate_mbps: 4 }));
+  assert.ok("error" in _v696({ disk_capacity_gb: 16000, camera_count: 8, bitrate_mbps: 4, recording_mode: "motion", motion_duty_percent: 0 }));
+  assert.ok("error" in _v696({ disk_capacity_gb: Infinity, camera_count: 8, bitrate_mbps: 4 }));
 });
 
 // ---------------------------------------------------------------------------

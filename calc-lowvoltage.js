@@ -314,6 +314,57 @@ function _renderCctvStorage(inputRegion, outputRegion, citationEl) {
 LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
 
 // ---------------------------------------------------------------------
+// Z.3b CCTV retention days from available disk (cctv-retention-days)
+// ---------------------------------------------------------------------
+// Inverse of cctv-storage: total_storage_gb = n * (br * 0.45 * hours) * days,
+// so days = disk_capacity_gb / (n * br * 0.45 * hours). Reuses computeCctvStorage
+// at retention_days = 1 to get the daily total, keeping the daily-rate geometry
+// in one place.
+// dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: dimensionless, per_camera_day_gb: dimensionless }
+export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent = 100 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cap = Number(disk_capacity_gb);
+  if (!(cap > 0)) return { error: "Available disk capacity must be positive (GB)." };
+  const base = computeCctvStorage({ camera_count, bitrate_mbps, recording_mode, motion_duty_percent, retention_days: 1 });
+  if (base.error) return { error: base.error };
+  const daily_total_gb = base.total_storage_gb;
+  const retention_days = cap / daily_total_gb;
+  const notes = [];
+  if (retention_days < 1) notes.push("Under one day of retention -- add disk, lower the bitrate, or switch to motion recording.");
+  notes.push("H.264/H.265 bitrate estimates are scene- and vendor-specific and user-supplied; the VMS calculator and the installed cameras govern.");
+  return { retention_days, retention_weeks: retention_days / 7, daily_total_gb, per_camera_day_gb: base.per_camera_day_gb, aggregate_bandwidth_mbps: base.aggregate_bandwidth_mbps, recording_hours_per_day: base.recording_hours_per_day, notes };
+}
+export const cctvRetentionDaysExample = { inputs: { disk_capacity_gb: 16000, camera_count: 8, bitrate_mbps: 4, recording_mode: "continuous" } };
+
+function _renderCctvRetentionDays(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IP-video retention from available disk, camera count, bitrate, and recording hours (days = disk_GB / (cameras x bitrate x 0.45 x hours); 1 Mbps for 24 h is about 10.8 GB/day), per the standard NVR/VMS sizing practice (first-principles bitrate accounting); the H.264/H.265 bitrate estimates are scene- and vendor-specific and user-supplied. The VMS calculator and the installed cameras govern.";
+  const cap = makeNumber("Usable disk capacity (GB)", "cr-cap", { step: "any", min: "0" });
+  const n = makeNumber("Camera count", "cr-n", { step: "1", min: "1" });
+  const br = makeNumber("Per-camera bitrate (Mbps)", "cr-br", { step: "any", min: "0" });
+  const mode = makeSelect("Recording mode", "cr-mode", [
+    { value: "continuous", label: "Continuous 24 h", selected: true }, { value: "motion", label: "Motion duty-cycle" },
+  ]);
+  const duty = makeNumber("Motion duty-cycle (%)", "cr-duty", { step: "any", min: "0", max: "100", value: "50" });
+  for (const f of [cap, n, br, mode, duty]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { cap.input.value = "16000"; n.input.value = "8"; br.input.value = "4"; mode.select.value = "continuous"; duty.input.value = "50"; update(); });
+  const oDays = makeOutputLine(outputRegion, "Retention", "cr-out-days");
+  const oDaily = makeOutputLine(outputRegion, "Daily total", "cr-out-daily");
+  const oBw = makeOutputLine(outputRegion, "Aggregate bandwidth", "cr-out-bw");
+  const oNote = makeOutputLine(outputRegion, "Notes", "cr-out-note");
+  const update = debounce(() => {
+    const r = computeCctvRetentionDays({ disk_capacity_gb: Number(cap.input.value) || 0, camera_count: Number(n.input.value) || 0, bitrate_mbps: Number(br.input.value) || 0, recording_mode: mode.select.value, motion_duty_percent: Number(duty.input.value) || 0 });
+    if (r.error) { oDays.textContent = r.error; oDaily.textContent = "-"; oBw.textContent = "-"; oNote.textContent = ""; return; }
+    oDays.textContent = fmt(r.retention_days, 1) + " days (" + fmt(r.retention_weeks, 1) + " weeks)";
+    oDaily.textContent = fmt(r.daily_total_gb, 1) + " GB/day (" + fmt(r.per_camera_day_gb, 2) + " GB/day/camera, " + fmt(r.recording_hours_per_day, 1) + " h)";
+    oBw.textContent = fmt(r.aggregate_bandwidth_mbps, 1) + " Mbps";
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [cap.input, n.input, br.input, duty.input]) f.addEventListener("input", update);
+  mode.select.addEventListener("change", update);
+}
+LOWVOLTAGE_RENDERERS["cctv-retention-days"] = _renderCctvRetentionDays;
+
+// ---------------------------------------------------------------------
 // Z.4 70-volt distributed speaker line (speaker-70v-line)
 // ---------------------------------------------------------------------
 // dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: dimensionless } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: dimensionless }
