@@ -753,7 +753,7 @@ const TOOL_MODULES = (() => {
     // v85 welding gas / cutting / consumable cost (group E)
     "shielding-gas-runtime", "oxyfuel-cutting-gas", "weld-preheat-fuel", "weld-cost-per-foot",
     // v129..v134 metal-trades batch: weld estimating + plate forming (group E), shrink fit (group G)
-    "weld-metal-volume", "wire-feed-deposition", "weld-transverse-shrinkage",
+    "weld-metal-volume", "wire-feed-deposition", "wire-feed-speed-for-deposition", "weld-transverse-shrinkage",
     "weld-group-eccentric", "min-bend-radius", "shrink-fit",
     "weld-dilution", "weld-passes-arc-time", "weld-travel-speed",
   ]);

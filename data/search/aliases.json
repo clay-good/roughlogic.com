@@ -7667,6 +7667,31 @@
       "kind": "industry"
     },
     {
+      "term": "wire feed speed for deposition",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "industry"
+    },
+    {
+      "term": "wfs for deposition rate",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "redirect"
+    },
+    {
+      "term": "wire speed for deposit",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "adjacent"
+    },
+    {
+      "term": "what wfs to set",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "adjacent"
+    },
+    {
+      "term": "feed speed for lb per hour",
+      "target": "wire-feed-speed-for-deposition",
+      "kind": "adjacent"
+    },
+    {
       "term": "wfs",
       "target": "wire-feed-deposition",
       "kind": "redirect"

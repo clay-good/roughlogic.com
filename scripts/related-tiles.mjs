@@ -770,6 +770,7 @@ const RELATED = {
   // v129..v135 metal-trades batch
   "weld-metal-volume": ["weld-cost-per-foot", "wire-feed-deposition", "metal-weight"],
   "wire-feed-deposition": ["weld-metal-volume", "weld-heat-input", "weld-cost-per-foot"],
+  "wire-feed-speed-for-deposition": ["wire-feed-deposition", "weld-metal-volume", "weld-cost-per-foot"],
   "weld-transverse-shrinkage": ["weld-metal-volume", "weld-heat-input", "metal-weight"],
   "weld-group-eccentric": ["fillet-weld-strength", "groove-weld-strength", "flange-bolt-torque"],
   "min-bend-radius": ["bend-allowance", "rolled-blank", "press-brake-tonnage"],

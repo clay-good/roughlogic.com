@@ -961,6 +961,56 @@ function _v130renderWireFeedDeposition(inputRegion, outputRegion, citationEl) {
 }
 FAB_RENDERERS["wire-feed-deposition"] = _v130renderWireFeedDeposition;
 
+// v737 wire-feed-speed-for-deposition (Group E): inverse of wire-feed-deposition. The forward tile gives the deposition
+// rate from the wire feed speed; the inverse recovers the wire feed speed a target deposition rate needs, so a welder
+// dials in the WFS to hit a production rate. From deposit = WFS x 60 x (pi/4 x dia^2) x 0.2836 x eff,
+// WFS = deposit / (60 x (pi/4 x dia^2) x 0.2836 x eff).
+// dims: in { target_deposit_lb_hr: M T^-1, wire_dia_in: L, deposition_eff: dimensionless } out: { wfs_in_min: L T^-1, melt_lb_hr: M T^-1, wire_area_in2: L^2 }
+export function computeWireFeedSpeedForDeposition({ target_deposit_lb_hr = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const dep = Number(target_deposit_lb_hr);
+  const dia = Number(wire_dia_in);
+  const eff = Number(deposition_eff);
+  if (!(dep > 0)) return { error: "Target deposition rate must be positive (lb/hr)." };
+  if (!(dia > 0)) return { error: "Wire diameter must be positive (in)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Deposition efficiency must be in (0, 1]." };
+  const wireArea = (Math.PI / 4) * dia * dia;
+  const wfs_in_min = dep / (60 * wireArea * 0.2836 * eff);
+  const melt_lb_hr = dep / eff;
+  if (![wireArea, wfs_in_min, melt_lb_hr].every(Number.isFinite)) return { error: "Wire-feed-speed math is not a finite value." };
+  return {
+    wfs_in_min, melt_lb_hr, wire_area_in2: wireArea,
+    note: "Wire feed speed = target deposit / (60 x wire cross-section x steel density (0.2836 lb/in3) x efficiency), the inverse of deposit = WFS x 60 x area x density x efficiency. The melt-off rate is deposit / efficiency (more wire melts than lands, the difference is spatter and slag; solid wire about 0.92, FCAW about 0.85). A smaller-diameter wire needs a much higher feed speed for the same deposit (the rate goes as diameter squared). The WFS must be within the WPS-qualified range and the machine's capability, and the WPS governs the qualified parameters (process, gas, electrode extension).",
+  };
+}
+export const wireFeedSpeedForDepositionExample = { inputs: { target_deposit_lb_hr: 6, wire_dia_in: 0.035, deposition_eff: 0.92 } };
+
+function _v737renderWireFeedSpeedForDeposition(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles wire-volume geometry and steel density (0.2836 lb/in3), by name, solved for the feed speed: WFS = deposit / (60 x area x density x efficiency). The WPS and the process (spray vs short-circuit, gas, electrode extension) govern the real efficiency and the qualified WFS range.";
+  const dep = makeNumber("Target deposition rate (lb/hr)", "wfs-dep", { step: "any", min: "0" });
+  const dia = makeNumber("Wire diameter (in)", "wfs-dia", { step: "any", min: "0" });
+  const eff = makeNumber("Deposition efficiency (0-1)", "wfs-eff", { step: "any", min: "0", value: "0.92" });
+  eff.input.value = "0.92";
+  for (const f of [dep, dia, eff]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dep.input.value = "6"; dia.input.value = "0.035"; eff.input.value = "0.92"; update(); });
+  const oWfs = makeOutputLine(outputRegion, "Required wire feed speed", "wfs-out-wfs");
+  const oMelt = makeOutputLine(outputRegion, "Melt-off rate", "wfs-out-melt");
+  const oNote = makeOutputLine(outputRegion, "Note", "wfs-out-note");
+  const update = debounce(() => {
+    const r = computeWireFeedSpeedForDeposition({
+      target_deposit_lb_hr: Number(dep.input.value) || 0,
+      wire_dia_in: Number(dia.input.value) || 0,
+      deposition_eff: eff.input.value === "" ? 0.92 : Number(eff.input.value),
+    });
+    if (r.error) { oWfs.textContent = r.error; oMelt.textContent = "-"; oNote.textContent = ""; return; }
+    oWfs.textContent = fmt(r.wfs_in_min, 0) + " in/min";
+    oMelt.textContent = fmt(r.melt_lb_hr, 2) + " lb/hr";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [dep, dia, eff]) f.input.addEventListener("input", update);
+}
+FAB_RENDERERS["wire-feed-speed-for-deposition"] = _v737renderWireFeedSpeedForDeposition;
+
 // v131 weld-transverse-shrinkage (Group E): Blodgett transverse shrinkage and pre-set.
 // dims: in { weld_area_in2: L^2, thickness_in: L, weld_count: dimensionless } out: { shrink_per_weld_in: L, total_shrink_in: L, recommended_preset_in: L }
 export function computeWeldTransverseShrinkage({ weld_area_in2 = 0, thickness_in = 0, weld_count = 1 } = {}) {

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(fab): spec-v737 wire feed speed for a target deposition rate (wire-feed-deposition inverse); 2026-07-14
+
+- New tile `wire-feed-speed-for-deposition` (Group E, calc-fab.js): the wire feed speed a target deposition rate needs.
+  `WFS = deposit / (60 x (pi/4 x dia^2) x 0.2836 x eff)`. A 6 lb/hr target on 0.035 in wire at 92% needs ~398 in/min.
+  Round-trips through `wire-feed-deposition`. Home tile count 1,185 -> 1,186.
+
 ### feat(agriculture): spec-v736 sprinkler zone flow for a target precip rate (sprinkler-precip-rate inverse); 2026-07-14
 
 - New tile `sprinkler-gpm-for-precip` (Group L, calc-agriculture.js): the total zone flow a target precipitation rate

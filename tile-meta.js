@@ -406,7 +406,7 @@ const _TILES = [
   ["shielding-gas-runtime", "E"], ["oxyfuel-cutting-gas", "E"], ["weld-preheat-fuel", "E"], ["weld-cost-per-foot", "E"],
 
   // v129..v134 metal-trades batch (calc-fab.js): weld estimating + plate forming (E) + shrink fit (G)
-  ["weld-metal-volume", "E"], ["wire-feed-deposition", "E"], ["weld-transverse-shrinkage", "E"],
+  ["weld-metal-volume", "E"], ["wire-feed-deposition", "E"], ["wire-feed-speed-for-deposition", "E"], ["weld-transverse-shrinkage", "E"],
   ["weld-group-eccentric", "E"], ["min-bend-radius", "E"], ["shrink-fit", "G"],
   ["weld-dilution", "E"], ["weld-passes-arc-time", "E"], ["weld-travel-speed", "E"],
   // v135 machining cut-planning (calc-machining.js)

@@ -31890,6 +31890,34 @@
    }
   },
   {
+   "tile_id": "wire-feed-speed-for-deposition",
+   "source_publisher": "first-principles wire-volume geometry and steel density (solved for WFS)",
+   "source_title": "WFS = deposit / (60 x (pi/4 dia2) x 0.2836 x efficiency)",
+   "source_edition_or_year": "first-principles (public domain)",
+   "source_section_or_page": "6 lb/hr, 0.035 in wire, 0.92 eff -> ~398 in/min, 6.52 lb/hr melt",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_deposit_lb_hr": 6,
+    "wire_dia_in": 0.035,
+    "deposition_eff": 0.92
+   },
+   "outputs": {
+    "wfs_in_min": {
+     "value": 398.36,
+     "tolerance": {
+      "abs": 0.2
+     }
+    },
+    "melt_lb_hr": {
+     "value": 6.5217,
+     "tolerance": {
+      "abs": 0.02
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wire-feed-deposition",
    "source_publisher": "first-principles wire-volume geometry and steel density",
    "source_title": "cross-check: bigger 0.045 in wire deposits more even at a lower feed",

@@ -1914,6 +1914,7 @@ cross-check.
 | calc-fab.js | `computeWeldTransverseShrinkage` | `{ weld_area_in2 = 0, thickness_in = 0, weld_count = 1 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWeldTravelSpeed` | `{ V_volts = 0, I_amps = 0, eta = 0.8, HI_kjin = 0 } = {}` | _ | _ | _ |
 | calc-fab.js | `computeWireFeedDeposition` | `{ wfs_in_min = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
+| calc-fab.js | `computeWireFeedSpeedForDeposition` | `{ target_deposit_lb_hr = 0, wire_dia_in = 0, deposition_eff = 0.92 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeContinuousLoadOcpd` | `{ l_cont_A = 0, l_noncont_A = 0, rated_100 = false } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeEvChargerThrottle` | `{ aggregate_limit_a = 0, charger_max_a = 0, active_chargers = 0 } = {}` | _ | _ | _ |
 | calc-feeder.js | `computeEvLoadManagementEms` | `{ charger_count = 0, per_charger_a = 0, evems_limit_a = 0, apply_125_setpoint...` | _ | _ | _ |
@@ -2846,7 +2847,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1432.
+Row count: 1433.
 
 <!-- END function-corpus-v14 -->
 
@@ -3377,7 +3378,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (248 tiles)
+### Group E Construction (249 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3620,6 +3621,7 @@ per spec-v14 §13.1 second paragraph.
 | `wind-solid-sign` | Wind Force on Solid Freestanding Wall / Sign | ASCE 7-22 Section 29.3 (solid freesta...; qh 17 psf, G 0.85, Cf 1.35, As 64 ft^2, B 8 ft -> F 1248 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wind-speed-from-velocity-pressure` | Basic Wind Speed from Velocity Pressure | ASCE; 25 psf bare velocity pressure -> 98.8 mph equivalent basi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-feed-deposition` | Wire Feed Speed to Deposition Rate | first-principles wire-volume geometry...; 0.035 in wire, 300 in/min, 0.92 eff -> 4.91 lb/hr melt, 4... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `wire-feed-speed-for-deposition` | Wire Feed Speed for a Target Deposition Rate | first-principles wire-volume geometry...; 6 lb/hr, 0.035 in wire, 0.92 eff -> ~398 in/min, 6.52 lb/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-beam-bending` | Wood Bending Member (NDS Beam Stability Factor CL and Adjusted Fb') | NDS 3.3.3 (National Design Specificat...; spec-v263 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-beam-shear` | Wood Bending Member Shear (fv and the NDS Tension-Side End-Notch Reduction) | NDS 3.4.2 / 3.4.3.2 (National Design ...; spec-v264 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-bearing-perpendicular` | Wood Bearing Perpendicular to Grain (NDS 3.10) | NDS 2018 3.10.2 / 3.10.4; spec-v290 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4217,6 +4219,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1185. Fixture-covered or reference-cadence: 1185 / 1185.
+Tile count: 1186. Fixture-covered or reference-cadence: 1186 / 1186.
 
 <!-- END tile-index-v14 -->

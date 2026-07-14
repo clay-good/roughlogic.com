@@ -12420,6 +12420,30 @@ test("bounds: calc-fab computeWireFeedDeposition pins melt-off/deposition for 0.
   assert.ok("error" in _v130({ wfs_in_min: 300, wire_dia_in: 0.035, deposition_eff: 0 }));
 });
 
+import { computeWireFeedSpeedForDeposition as _v737 } from "../../calc-fab.js";
+test("bounds: spec-v737 wire feed speed for a target deposition rate (inverse of wire-feed-deposition)", () => {
+  const p = _v737({ target_deposit_lb_hr: 6, wire_dia_in: 0.035, deposition_eff: 0.92 });
+  assert.ok(Math.abs(p.wfs_in_min - 398.36) < 0.1);
+  assert.ok(Math.abs(p.melt_lb_hr - 6 / 0.92) < 1e-9);
+  // round-trip: the recovered WFS fed to wire-feed-deposition reproduces the target deposit
+  for (const [dep, dia, eff] of [[6, 0.035, 0.92], [10, 0.045, 0.9], [3, 0.030, 0.85], [15, 0.0625, 0.88]]) {
+    const inv = _v737({ target_deposit_lb_hr: dep, wire_dia_in: dia, deposition_eff: eff });
+    const fwd = _v130({ wfs_in_min: inv.wfs_in_min, wire_dia_in: dia, deposition_eff: eff });
+    assert.ok(Math.abs(fwd.deposit_lb_hr - dep) < 1e-9);
+    assert.ok(Math.abs(fwd.melt_lb_hr - inv.melt_lb_hr) < 1e-9);
+  }
+  // a smaller-diameter wire needs a much higher feed speed for the same deposit (rate ~ dia^2)
+  assert.ok(_v737({ target_deposit_lb_hr: 6, wire_dia_in: 0.030 }).wfs_in_min > _v737({ target_deposit_lb_hr: 6, wire_dia_in: 0.045 }).wfs_in_min);
+  // more deposit -> more feed speed
+  assert.ok(_v737({ target_deposit_lb_hr: 12, wire_dia_in: 0.035 }).wfs_in_min > _v737({ target_deposit_lb_hr: 6, wire_dia_in: 0.035 }).wfs_in_min);
+  // error seams: non-finite, deposit/dia <= 0, efficiency outside (0,1]
+  assert.ok("error" in _v737({ target_deposit_lb_hr: Infinity, wire_dia_in: 0.035 }));
+  assert.ok("error" in _v737({ target_deposit_lb_hr: 0, wire_dia_in: 0.035 }));
+  assert.ok("error" in _v737({ target_deposit_lb_hr: 6, wire_dia_in: -0.035 }));
+  assert.ok("error" in _v737({ target_deposit_lb_hr: 6, wire_dia_in: 0.035, deposition_eff: 0 }));
+  assert.ok("error" in _v737({ target_deposit_lb_hr: 6, wire_dia_in: 0.035, deposition_eff: 1.5 }));
+});
+
 test("bounds: calc-fab computeWeldTransverseShrinkage pins Blodgett shrink + thicker-plate cross-check + error seams", () => {
   const r = _v131({ weld_area_in2: 0.10, thickness_in: 0.5, weld_count: 3 });
   assert.ok(Math.abs(r.shrink_per_weld_in - 0.04) < 1e-6 && Math.abs(r.total_shrink_in - 0.12) < 1e-6);

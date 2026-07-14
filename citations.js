@@ -8307,6 +8307,17 @@ export const CITATIONS = {
       { name: "Max single-pass area", value: "default 0.05 in2; passes = ceil(weld area / max pass area)", source: "welding practice" },
     ],
   },
+  "wire-feed-speed-for-deposition": {
+    formula: "Wire cross-section = pi/4 x diameter2; wire feed speed (in/min) = target_deposit (lb/hr) / (60 x area x 0.2836 lb/in3 x efficiency); melt-off = deposit / efficiency. The inverse of deposit = WFS x 60 x area x density x efficiency.",
+    edition: "Wire feed speed for a target deposition rate - first-principles wire-volume geometry and steel density (0.2836 lb/in3), by name, solved for the feed speed; public domain.",
+    freeAccess: "Pure volume-rate geometry, public; the target deposition rate, diameter, and deposition efficiency are user-supplied.",
+    governance: GOVERNANCE.general,
+    editionNote: "First-principles wire-volume geometry and steel density, solved for the wire feed speed a target deposition rate needs. A smaller-diameter wire needs a much higher feed speed for the same deposit (the rate goes as diameter squared). The WFS must be within the WPS-qualified range; deposition efficiency (solid wire about 0.92, FCAW about 0.85) is the melted/deposited ratio, and the WPS and the process (spray vs short-circuit, gas, electrode extension) govern the real efficiency.",
+    assumptions: [
+      { name: "Steel density", value: "0.2836 lb/in3 (carbon steel); editable", source: "first-principles" },
+      { name: "Deposition efficiency", value: "deposited / melted; default 0.92 solid wire", source: "WPS / process" },
+    ],
+  },
   "wire-feed-deposition": {
     formula: "Wire cross-section = pi/4 x diameter2; melt-off rate (lb/hr) = wire feed speed (in/min) x 60 x area x 0.2836 lb/in3; deposition rate = melt-off x deposition efficiency.",
     edition: "Melt-off and deposition rate from wire feed speed - first-principles wire-volume geometry and steel density (0.2836 lb/in3), by name; public domain.",

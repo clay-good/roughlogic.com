@@ -450,6 +450,7 @@ export const COMPUTE_MAP = {
   "weld-cost-per-foot": { module: "../../calc-fab.js", fn: "computeWeldCostPerFoot" },
   "weld-metal-volume": { module: "../../calc-fab.js", fn: "computeWeldMetalVolume" },
   "wire-feed-deposition": { module: "../../calc-fab.js", fn: "computeWireFeedDeposition" },
+  "wire-feed-speed-for-deposition": { module: "../../calc-fab.js", fn: "computeWireFeedSpeedForDeposition" },
   "weld-transverse-shrinkage": { module: "../../calc-fab.js", fn: "computeWeldTransverseShrinkage" },
   "weld-group-eccentric": { module: "../../calc-fab.js", fn: "computeWeldGroupEccentric" },
   "min-bend-radius": { module: "../../calc-fab.js", fn: "computeMinBendRadius" },
