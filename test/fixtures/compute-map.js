@@ -884,6 +884,7 @@ export const COMPUTE_MAP = {
   "pile-axial-capacity": { module: "../../calc-geotech.js", fn: "computePileAxialCapacity" },
   "pile-length-for-capacity": { module: "../../calc-geotech.js", fn: "computePileLengthForCapacity" },
   "slope-stability-infinite": { module: "../../calc-geotech.js", fn: "computeSlopeStabilityInfinite" },
+  "slope-failure-depth-for-fs": { module: "../../calc-geotech.js", fn: "computeSlopeFailureDepthForFs" },
   "slope-stability-seepage": { module: "../../calc-geotech.js", fn: "computeSlopeStabilitySeepage" },
   // spec-v290..v292 NDS wood-member depth batch (3 tiles)
   "wood-bearing-perpendicular": { module: "../../calc-construction.js", fn: "computeWoodBearingPerpendicular" },

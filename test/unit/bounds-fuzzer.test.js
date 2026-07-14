@@ -15296,6 +15296,32 @@ test("bounds: spec-v289 computeSlopeStabilityInfinite pins the cohesive cut, the
   assert.ok("error" in _v289({ beta_deg: NaN, phi_deg: 30, h_ft: 8 }));
 });
 
+import { computeSlopeFailureDepthForFs as _v749 } from "../../calc-geotech.js";
+test("bounds: spec-v749 slope critical failure depth for a target FS (inverse of slope-stability-infinite)", () => {
+  const p = _v749({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, target_fs: 1.5 });
+  assert.ok(Math.abs(p.critical_depth_ft - 16.62) < 0.05);
+  assert.ok(Math.abs(p.deep_fs_limit - Math.tan(30 * Math.PI / 180) / Math.tan(25 * Math.PI / 180)) < 1e-9);
+  // round-trip: at the recovered depth, slope-stability-infinite gives exactly the target FS
+  // each target FS is above the deep limit tan(phi')/tan(beta) so a critical depth exists
+  for (const [beta, phi, c, gamma, fs] of [[25, 30, 200, 120, 1.5], [20, 28, 300, 115, 1.6], [30, 34, 500, 125, 1.3], [18, 30, 150, 110, 1.9]]) {
+    const inv = _v749({ beta_deg: beta, phi_deg: phi, c_psf: c, gamma_pcf: gamma, target_fs: fs });
+    const fwd = _v289({ beta_deg: beta, phi_deg: phi, c_psf: c, gamma_pcf: gamma, h_ft: inv.critical_depth_ft });
+    assert.ok(Math.abs(fwd.fs_slope - fs) < 1e-9);
+  }
+  // a lower target FS reaches deeper (higher critical depth), since FS falls with depth
+  assert.ok(_v749({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, target_fs: 1.3 }).critical_depth_ft > _v749({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, target_fs: 1.5 }).critical_depth_ft);
+  // a target at/below the deep (cohesionless) limit has no critical depth
+  assert.ok("error" in _v749({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, target_fs: 1.2 })); // deep limit ~1.238
+  // cohesionless (c'=0) has no critical depth
+  assert.ok("error" in _v749({ beta_deg: 25, phi_deg: 30, c_psf: 0, gamma_pcf: 120, target_fs: 1.5 }));
+  // error seams
+  assert.ok("error" in _v749({ beta_deg: 0, phi_deg: 30, c_psf: 200, target_fs: 1.5 }));
+  assert.ok("error" in _v749({ beta_deg: 95, phi_deg: 30, c_psf: 200, target_fs: 1.5 }));
+  assert.ok("error" in _v749({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 0, target_fs: 1.5 }));
+  assert.ok("error" in _v749({ beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, target_fs: 0 }));
+  assert.ok("error" in _v749({ beta_deg: NaN, phi_deg: 30, c_psf: 200, target_fs: 1.5 }));
+});
+
 // ===================== spec-v290..v292 NDS wood-member depth batch =====================
 import { computeWoodBearingPerpendicular as _v290, computeWoodTensionMember as _v291, computeWoodCombinedBendingAxial as _v292 } from "../../calc-construction.js";
 

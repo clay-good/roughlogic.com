@@ -13767,6 +13767,31 @@
       "kind": "industry"
     },
     {
+      "term": "slope failure depth",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "industry"
+    },
+    {
+      "term": "critical depth for factor of safety",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "redirect"
+    },
+    {
+      "term": "how deep before slope fails",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "adjacent"
+    },
+    {
+      "term": "slope critical depth",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "adjacent"
+    },
+    {
+      "term": "depth for target fs",
+      "target": "slope-failure-depth-for-fs",
+      "kind": "adjacent"
+    },
+    {
       "term": "infinite slope",
       "target": "slope-stability-infinite",
       "kind": "industry"

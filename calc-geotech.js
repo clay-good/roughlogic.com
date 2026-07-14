@@ -1123,3 +1123,55 @@ GEOTECH_RENDERERS["pile-group-spacing-for-efficiency"] = _simpleRenderer({
   ],
   compute: computePileGroupSpacingForEfficiency,
 });
+
+// ===================== spec-v749: infinite-slope critical failure depth for a target FS (inverse of slope-stability-infinite) =====================
+
+// The forward tile gives the factor of safety from the failure-plane depth; the inverse recovers the critical depth at
+// which the FS drops to a target, so a designer finds how deep a slide plane can be before the slope falls below the
+// required FS. From FS = (c' + gamma H cos^2 beta tan phi') / (gamma H sin beta cos beta),
+// H = c' / (gamma cos beta (FS sin beta - cos beta tan phi')). Because FS decreases with depth toward the cohesionless
+// limit tan(phi')/tan(beta), a finite critical depth exists only for c' > 0 and a target FS above that deep limit.
+// dims: in { beta_deg: dimensionless, phi_deg: dimensionless, c_psf: M L^-1 T^-2, gamma_pcf: M L^-2 T^-2, target_fs: dimensionless } out: { critical_depth_ft: L, deep_fs_limit: dimensionless }
+export function computeSlopeFailureDepthForFs({ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, target_fs = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const beta = Number(beta_deg) || 0;
+  const phi = Number(phi_deg) || 0;
+  const c = Number(c_psf) || 0;
+  const gamma = Number(gamma_pcf) || 0;
+  const fs = Number(target_fs) || 0;
+  if (!(beta > 0 && beta < 90)) return { error: "Slope angle must be between 0 and 90 degrees (exclusive)." };
+  if (!(phi >= 0 && phi < 90)) return { error: "Friction angle must be at least 0 and below 90 degrees." };
+  if (!(c > 0)) return { error: "Effective cohesion must be positive (psf); a cohesionless slope has a depth-independent FS, so there is no critical depth." };
+  if (!(gamma > 0)) return { error: "Unit weight must be positive (pcf)." };
+  if (!(fs > 0)) return { error: "Target factor of safety must be positive." };
+  const b = (beta * Math.PI) / 180;
+  const p = (phi * Math.PI) / 180;
+  const deep_fs_limit = Math.tan(p) / Math.tan(b);
+  const denom = gamma * Math.cos(b) * (fs * Math.sin(b) - Math.cos(b) * Math.tan(p));
+  if (!(denom > 0)) return { error: "Target FS is at or below the deep (cohesionless) limit tan(phi')/tan(beta); the slope holds this FS at any depth, so no critical depth exists." };
+  const critical_depth_ft = c / denom;
+  if (![critical_depth_ft, deep_fs_limit].every(Number.isFinite)) return { error: "Critical-depth math is not a finite value." };
+  return {
+    critical_depth_ft, deep_fs_limit,
+    note: "Critical failure-plane depth for a target FS on an infinite slope: H = c' / (gamma cos beta (FS sin beta - cos beta tan phi')), the inverse of FS = (c' + gamma H cos^2 beta tan phi') / (gamma H sin beta cos beta). The cohesion helps most near the surface, so FS is high at shallow depth and falls with depth toward the cohesionless limit tan(phi')/tan(beta) - a target below that limit is met at any depth (no critical depth). If the soil is deeper than this critical depth, the slope falls below the target FS on that plane; flatten the slope, retain it, or improve the strength. Shallow translational slide, dry (no seepage), drained effective-stress parameters, no seismic loading - not a circular Bishop/Spencer analysis. A screening aid; the geotechnical engineer of record governs.",
+  };
+}
+export const slopeFailureDepthForFsExample = { inputs: { beta_deg: 25, phi_deg: 30, c_psf: 200, gamma_pcf: 120, target_fs: 1.5 } };
+
+GEOTECH_RENDERERS["slope-failure-depth-for-fs"] = _simpleRenderer({
+  citation: "Citation: infinite-slope stability FS = (c' + gamma H cos^2 beta tan phi') / (gamma H sin beta cos beta) (Das / NAVFAC), solved for the depth: H = c' / (gamma cos beta (FS sin beta - cos beta tan phi')). FS falls with depth toward the cohesionless limit tan(phi')/tan(beta). Translational slide, no seepage, uniform soil. A screening aid, not a substitute for the geotechnical engineer's stability analysis.",
+  example: slopeFailureDepthForFsExample.inputs,
+  fields: [
+    { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
+    { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
+    { key: "c_psf", label: "Effective cohesion c' (psf, must be > 0)", kind: "number" },
+    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number", default: 120 },
+    { key: "target_fs", label: "Target factor of safety (e.g. 1.5)", kind: "number" },
+  ],
+  outputs: [
+    { key: "h", id: "sfd-out-h", label: "Critical failure-plane depth", value: (r) => fmt(r.critical_depth_ft, 1) + " ft" },
+    { key: "dl", id: "sfd-out-dl", label: "Deep (cohesionless) FS limit", value: (r) => fmt(r.deep_fs_limit, 2) + " (tan phi' / tan beta)" },
+    { key: "n", id: "sfd-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSlopeFailureDepthForFs,
+});

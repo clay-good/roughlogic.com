@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(geotech): spec-v749 infinite slope critical depth for a target FS (slope-stability-infinite inverse); 2026-07-14
+
+- New tile `slope-failure-depth-for-fs` (Group E, calc-geotech.js): the critical failure-plane depth at which the
+  infinite-slope FS drops to a target. `H = c' / (gamma cos beta (FS sin beta - cos beta tan phi'))`. A 25 deg cut in
+  c' 200 psf, phi' 30, gamma 120 soil reaches FS 1.5 at ~16.6 ft. Guards c' > 0 and a target above the deep limit
+  tan phi'/tan beta. Round-trips through `slope-stability-infinite`. Home tile count 1,197 -> 1,198.
+
 ### feat(geotech): spec-v748 pile group spacing for a target efficiency (pile-group-efficiency inverse); 2026-07-14
 
 - New tile `pile-group-spacing-for-efficiency` (Group E, calc-geotech.js): the center-to-center spacing that reaches a

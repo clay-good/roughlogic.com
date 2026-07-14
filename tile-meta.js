@@ -551,7 +551,7 @@ const _TILES = [
   // spec-v284..v286 reinforced-concrete member depth batch
   ["rc-column-axial", "E"], ["rc-punching-shear", "E"], ["rc-hook-development", "E"],
   // spec-v287..v289 geotechnical foundation depth batch
-  ["soil-settlement-elastic", "E"], ["elastic-settlement-allowable-pressure", "E"], ["pile-axial-capacity", "E"], ["pile-length-for-capacity", "E"], ["slope-stability-infinite", "E"],
+  ["soil-settlement-elastic", "E"], ["elastic-settlement-allowable-pressure", "E"], ["pile-axial-capacity", "E"], ["pile-length-for-capacity", "E"], ["slope-stability-infinite", "E"], ["slope-failure-depth-for-fs", "E"],
   // spec-v290..v292 NDS wood-member depth batch
   ["wood-bearing-perpendicular", "E"], ["wood-tension-member", "E"], ["wood-combined-bending-axial", "E"],
   // spec-v293..v295 steel connection/detailing depth batch

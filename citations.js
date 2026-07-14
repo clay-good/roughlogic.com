@@ -11108,6 +11108,18 @@ export const CITATIONS = {
       { name: "Safety factor", value: "the customary 2 to 3 on ultimate without a static load test", source: "FHWA driven-pile practice" },
     ],
   },
+  "slope-failure-depth-for-fs": {
+    formula: "H = c' / (gamma cos(beta) (FS sin(beta) - cos(beta) tan(phi'))), the inverse of FS = (c' + gamma H cos^2(beta) tan(phi')) / (gamma H sin(beta) cos(beta)); a finite depth exists only for c' > 0 and a target FS above the deep limit tan(phi')/tan(beta).",
+    edition: "The infinite-slope stability model (Das, Principles of Geotechnical Engineering; NAVFAC DM-7), solved for the critical failure-plane depth, by name.",
+    freeAccess: "NAVFAC DM-7 is public-domain and free online; the infinite-slope relations are public in the standard geotechnical texts.",
+    governance: GOVERNANCE.general,
+    editionNote: "The critical failure-plane depth at which the infinite-slope factor of safety drops to a target: H = c' / (gamma cos(beta) (FS sin(beta) - cos(beta) tan(phi'))), the inverse of the infinite-slope FS. The cohesion helps most near the surface, so FS is high at shallow depth and falls with depth toward the cohesionless limit tan(phi')/tan(beta); a target FS at or below that limit is met at any depth (no critical depth), and a cohesionless soil (c' = 0) has a depth-independent FS with no critical depth. If the soil is deeper than the critical depth, the slope falls below the target FS on that plane. Shallow translational slide on a plane parallel to a long uniform slope, no seepage, drained effective-stress parameters, no seismic loading - not a circular/rotational (Bishop/Spencer) analysis. A design/screening aid, not a substitute for a geotechnical engineer's stability analysis.",
+    assumptions: [
+      { name: "Critical depth", value: "H = c' / (gamma cos(beta) (FS sin(beta) - cos(beta) tan(phi')))", source: "infinite-slope model (Das / NAVFAC)" },
+      { name: "Deep limit", value: "FS falls with depth toward tan(phi')/tan(beta); a target below it is met at any depth", source: "infinite-slope model" },
+      { name: "No seepage", value: "dry slope or water table below the plane; needs c' > 0; steady-seepage and seismic cases are separate", source: "scope of this tile" },
+    ],
+  },
   "slope-stability-infinite": {
     formula: "driving = gamma H sin(beta) cos(beta); resisting = c' + gamma H cos^2(beta) tan(phi'); FS = resisting / driving. (c' = 0 collapses to FS = tan(phi')/tan(beta))",
     edition: "The infinite-slope stability model -- the factor of safety of a shallow translational slide on a plane parallel to a long uniform slope, with its cohesionless reduction tan(phi')/tan(beta) -- as compiled in Das (Principles of Geotechnical Engineering) and the NAVFAC DM-7 slope-stability references, by name.",
