@@ -789,6 +789,7 @@ export const COMPUTE_MAP = {
   "draft-beer-line-balance": { module: "../../calc-kitchen.js", fn: "computeDraftBeerLineBalance" },
   "rolling-sphere-protection": { module: "../../calc-elecdesign.js", fn: "computeRollingSphereProtection" },
   "deck-board-takeoff": { module: "../../calc-finish.js", fn: "computeDeckBoardTakeoff" },
+  "shadow-length": { module: "../../calc-solar.js", fn: "computeShadowLength" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

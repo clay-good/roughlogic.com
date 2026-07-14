@@ -10643,6 +10643,17 @@ export const CITATIONS = {
       { name: "Assumptions", value: "due-south rows and a level field; azimuth or slope is a separate correction", source: "scope of this tile" },
     ],
   },
+  "shadow-length": {
+    formula: "shadow_length = object_height / tan(sun_altitude); shadow_ratio = 1 / tan(sun_altitude) = cot(sun_altitude).",
+    edition: "Sun shadow-length geometry (first-principles trigonometry), by name; the sun path and terrain govern.",
+    freeAccess: "First-principles trigonometry; the sun altitude comes from the site latitude, date, and time (or a solar-position source).",
+    governance: GOVERNANCE.general,
+    editionNote: "The ground shadow a vertical object casts on level ground: shadow = height / tan(sun altitude), so the shadow is height x cot(altitude) and the shadow-to-height ratio depends only on the sun angle. At a 45 degree sun the shadow equals the height; a low winter sun (around 20 degrees) throws a shadow nearly three times the height, while a high summer noon sun throws a short one. Use the winter-design sun elevation (the lowest midday altitude, at the winter solstice from the site latitude or a solar-position source) to size the worst-case shade -- the case a solar-access, tree-planting, or building-setback study turns on. Level ground and a vertical object are assumed; a slope or a tilted object is a separate correction. A site-planning geometry, not a full sun-path shading study.",
+    assumptions: [
+      { name: "Level ground, vertical object", value: "the object is vertical and the shadow falls on level ground; a slope or tilt is a separate correction", source: "scope of this tile" },
+      { name: "Worst-case sun angle", value: "use the winter-design (lowest midday) sun elevation for the longest shadow", source: "solar-access practice" },
+    ],
+  },
   "pv-max-ambient-for-power": {
     formula: "T_cell = 25 + (target_power/P_stc - 1) x 100/gamma; max_ambient = T_cell - (NOCT - 20) x G/800. The inverse of P = P_stc x (1 + gamma/100 x (T_cell - 25)) and T_cell = T_amb + (NOCT - 20) x G/800.",
     edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name, solved for the ambient temperature.",

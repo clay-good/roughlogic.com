@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): spec-v790 sun shadow length; 2026-07-14
+
+- New tile `shadow-length` (Group A, calc-solar.js): the ground shadow a vertical object casts on level ground,
+  `shadow = object height / tan(sun altitude)`, with the shadow-to-height ratio = cot(altitude). A 10 ft object under a
+  30 deg sun throws a 17.3 ft shadow (1.73 x height); at 45 deg the shadow equals the height. Use the winter-design sun
+  elevation for the worst-case shade a solar-access, tree-planting, or setback study turns on. Fuzzer pins the shadow,
+  the ratio, the altitude monotonicity, and the error seams. Explore sweep #21 entry 6 (dovetail entry 4 rejected on
+  review for a tan-vs-cot convention ambiguity). Home count 1,238 -> 1,239.
+
 ### feat(carpentry): spec-v789 deck board and fastener takeoff; 2026-07-14
 
 - New tile `deck-board-takeoff` (Group E, calc-finish.js): the decking surface takeoff a deck builder orders from.

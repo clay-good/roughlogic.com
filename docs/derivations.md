@@ -2711,6 +2711,7 @@ cross-check.
 | calc-solar.js | `computePvRowShadeAngle` | `{ module_length_ft = 0, tilt_deg = 0, row_pitch_ft = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvRowSpacing` | `{ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvStringFusing` | `{ Isc_A = 0, max_fuse_A = 0, n_strings = 1 } = {}` | _ | _ | _ |
+| calc-solar.js | `computeShadowLength` | `{ object_height_ft = 0, sun_altitude_deg = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computeSolarEgc69045` | `{ ocpd_rating_a = 0, pv_isc_a = 0, vd_upsized = "no" } = {}` | _ | _ | _ |
 | calc-solar.js | `renderBatteryRuntime` | `inputRegion, outputRegion, citationEl, params` | _ | _ | _ |
 | calc-solar.js | `renderEvChargerLoad` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
@@ -2899,7 +2900,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1485.
+Row count: 1486.
 
 <!-- END function-corpus-v14 -->
 
@@ -2980,7 +2981,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (158 tiles)
+### Group A Electrical (159 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3115,6 +3116,7 @@ per spec-v14 §13.1 second paragraph.
 | `service-load` | Service Load Calculation (Residential) | NFPA; 2000 ft^2 dwelling with 2 small-appliance + 1 laundry + 6... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-optional` | Service Load Calculation (NEC 220.82 Optional Method) | NFPA; general demand = 10kVA + 40%*(general-10kVA); + larger HV... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `service-load-standard` | Service Entrance Demand Load (Standard Method) | NFPA; 2500 ft^2 dwelling + 2 small-appliance + 1 laundry + 5 fi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `shadow-length` | Sun Shadow Length | Sun shadow-length geometry (first-pri...; 10 ft object under a 30 deg sun -> 10 / tan(30) = 17.32 f... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shock-approach-boundary` | Shock Approach Boundaries (NFPA 70E Table 130.4) | NFPA 70E-2024; 151-750 V: limited fixed 3 ft 6 in, limited movable 10 ft... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `short-circuit-pp` | Short-Circuit Current at Panel (Point-to-Point) | NEMA / Bussmann (Cooper); 1500 kVA / 5.75 %Z / 480 V three-phase utility -> 31,379 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `solar-egc-690-45` | PV Equipment Grounding Conductor (NEC 690.45) | NFPA; 20 A OCPD -> 12 AWG copper EGC (above the 14 AWG floor) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4323,6 +4325,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1238. Fixture-covered or reference-cadence: 1238 / 1238.
+Tile count: 1239. Fixture-covered or reference-cadence: 1239 / 1239.
 
 <!-- END tile-index-v14 -->

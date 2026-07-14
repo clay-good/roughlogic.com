@@ -21609,6 +21609,23 @@ test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / rema
   assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: -1 }));
 });
 
+import { computeShadowLength as _v790 } from "../../calc-solar.js";
+
+test("bounds: spec-v790 computeShadowLength pins shadow = h/tan(altitude), monotonicity, and error seams", () => {
+  const r = _v790({ object_height_ft: 10, sun_altitude_deg: 30 });
+  assert.ok(Math.abs(r.shadow_length_ft - 17.320508) < 1e-5); // 10 / tan(30)
+  assert.ok(Math.abs(r.shadow_ratio - 1.7320508) < 1e-6); // cot(30)
+  // At 45 deg the shadow equals the height; a lower sun casts a longer shadow; near-vertical sun casts a short one.
+  assert.ok(Math.abs(_v790({ object_height_ft: 10, sun_altitude_deg: 45 }).shadow_length_ft - 10) < 1e-6);
+  assert.ok(_v790({ object_height_ft: 10, sun_altitude_deg: 20 }).shadow_length_ft > r.shadow_length_ft);
+  assert.ok(_v790({ object_height_ft: 10, sun_altitude_deg: 80 }).shadow_length_ft < r.shadow_length_ft);
+  // Error seams: non-finite, non-positive height, altitude out of (0, 90].
+  assert.ok("error" in _v790({ object_height_ft: Infinity, sun_altitude_deg: 30 }));
+  assert.ok("error" in _v790({ object_height_ft: 0, sun_altitude_deg: 30 }));
+  assert.ok("error" in _v790({ object_height_ft: 10, sun_altitude_deg: 0 }));
+  assert.ok("error" in _v790({ object_height_ft: 10, sun_altitude_deg: 95 }));
+});
+
 import { computeDeckBoardTakeoff as _v789 } from "../../calc-finish.js";
 
 test("bounds: spec-v789 computeDeckBoardTakeoff pins the board / joist / screw counts, waste scaling, and error seams", () => {

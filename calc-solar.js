@@ -1485,3 +1485,43 @@ function renderSolarEgc69045(inputRegion, outputRegion, citationEl) {
   vd.select.addEventListener("change", update);
 }
 SOLAR_RENDERERS["solar-egc-690-45"] = renderSolarEgc69045;
+
+// ===================== spec-v790: sun shadow length =====================
+// shadow = object_height / tan(sun_altitude). The shadow-to-height ratio is cot(altitude).
+// dims: in { object_height_ft: L, sun_altitude_deg: dimensionless } out: { shadow_length_ft: L, shadow_ratio: dimensionless }
+export function computeShadowLength({ object_height_ft = 0, sun_altitude_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const h = Number(object_height_ft) || 0;
+  const a = Number(sun_altitude_deg) || 0;
+  if (!(h > 0)) return { error: "Object height must be positive." };
+  if (!(a > 0 && a <= 90)) return { error: "Sun altitude must be over 0 and up to 90 degrees (a sun on the horizon throws an infinite shadow)." };
+  const rad = Math.PI / 180;
+  const shadow_length_ft = a >= 90 ? 0 : h / Math.tan(a * rad);
+  const shadow_ratio = a >= 90 ? 0 : 1 / Math.tan(a * rad);
+  if (![shadow_length_ft, shadow_ratio].every(Number.isFinite)) return { error: "Shadow-length math is not a finite value." };
+  return {
+    shadow_length_ft, shadow_ratio,
+    note: "The ground shadow a vertical object casts on level ground: shadow = height / tan(sun altitude), and the shadow is height x cot(altitude), so the shadow-to-height ratio depends only on the sun angle. At a 45 degree sun the shadow equals the height; a low winter sun (say 20 degrees) throws a shadow nearly three times the height, while a high summer noon sun throws a short one. Use the winter-design sun elevation (lowest midday altitude, at the winter solstice from the site latitude, or from a solar-position source) to size the worst-case shade -- the case a solar-access, tree-planting, or building-setback study turns on. Level ground and a vertical object are assumed; a slope or a tilted object is a separate correction. A site-planning geometry; the actual sun path and terrain govern.",
+  };
+}
+export const shadowLengthExample = { inputs: { object_height_ft: 10, sun_altitude_deg: 30 } };
+function renderShadowLength(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: sun shadow-length geometry (first-principles trigonometry): shadow = object height / tan(sun altitude); shadow-to-height ratio = cot(altitude). At 45 degrees the shadow equals the height; a low sun throws a long shadow. Use the winter-design sun elevation for the worst-case shade. Level ground and a vertical object assumed; the sun path and terrain govern.";
+  const h = makeNumber("Object height (ft)", "shad-h", { step: "any", min: "0" }); h.input.value = "10";
+  const a = makeNumber("Sun altitude above horizon (deg)", "shad-a", { step: "any", min: "0", max: "90" }); a.input.value = "30";
+  for (const f of [h, a]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { h.input.value = "10"; a.input.value = "30"; update(); });
+  const oL = makeOutputLine(outputRegion, "Shadow length", "shad-out-l");
+  const oR = makeOutputLine(outputRegion, "Shadow-to-height ratio", "shad-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "shad-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeShadowLength({ object_height_ft: readNum(h.input), sun_altitude_deg: readNum(a.input) });
+    if (r.error) { oL.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oL.textContent = fmt(r.shadow_length_ft, 2) + " ft";
+    oR.textContent = fmt(r.shadow_ratio, 2) + " x height";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [h, a]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["shadow-length"] = renderShadowLength;

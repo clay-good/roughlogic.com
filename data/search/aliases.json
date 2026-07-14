@@ -37027,6 +37027,31 @@
       "kind": "question"
     },
     {
+      "term": "shadow length calculator",
+      "target": "shadow-length",
+      "kind": "question"
+    },
+    {
+      "term": "how long is a shadow at a sun angle",
+      "target": "shadow-length",
+      "kind": "question"
+    },
+    {
+      "term": "flagpole shadow length",
+      "target": "shadow-length",
+      "kind": "question"
+    },
+    {
+      "term": "sun altitude shadow ratio",
+      "target": "shadow-length",
+      "kind": "adjacent"
+    },
+    {
+      "term": "solar access shade study",
+      "target": "shadow-length",
+      "kind": "industry"
+    },
+    {
       "term": "how much can i oversize my solar array",
       "target": "pv-inverter-ratio",
       "kind": "question"

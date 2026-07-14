@@ -112,6 +112,7 @@ const TOOL_MODULES = (() => {
     "ev-dcfc-time",
     // spec-v559
     "solar-egc-690-45",
+    "shadow-length",
   ]);
   // spec-v79 cap-relief split: the cohesive spec-v20 §A advanced-analysis trio
   // (parallel-conductor-derate, neutral-current-3ph, motor-vd-starting)

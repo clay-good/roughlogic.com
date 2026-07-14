@@ -506,6 +506,7 @@ const _TILES = [
   ["draft-beer-line-balance", "O"],
   ["rolling-sphere-protection", "A"],
   ["deck-board-takeoff", "E"],
+  ["shadow-length", "A"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],
