@@ -327,6 +327,7 @@ const RELATED = {
   "footing-area": ["concrete", "anchor-embedment", "helical-pile"],
   "snow-load": ["wind-pressure", "roof-pitch", "rafter"],
   "wind-pressure": ["snow-load", "anchor-embedment"],
+  "wind-speed-from-velocity-pressure": ["wind-pressure", "snow-load", "wind-on-load"],
 
   // Group G: Cross-trade. unit-converter is the gateway; the geometry
   // / haversine / slope cluster supports the field tiles in Group P;

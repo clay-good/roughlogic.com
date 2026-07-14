@@ -37962,6 +37962,31 @@
       "kind": "question"
     },
     {
+      "term": "wind speed from velocity pressure",
+      "target": "wind-speed-from-velocity-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "mph behind a psf wind pressure",
+      "target": "wind-speed-from-velocity-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "basic wind speed from q",
+      "target": "wind-speed-from-velocity-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "what wind speed gives 25 psf",
+      "target": "wind-speed-from-velocity-pressure",
+      "kind": "question"
+    },
+    {
+      "term": "convert velocity pressure to wind speed",
+      "target": "wind-speed-from-velocity-pressure",
+      "kind": "question"
+    },
+    {
       "term": "roof snow load in psf",
       "target": "snow-load",
       "kind": "question"

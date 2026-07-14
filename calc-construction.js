@@ -1003,6 +1003,40 @@ export const windPressureExample = {
   expectedRange: { q_psf: { min: 25, max: 26 } },
 };
 
+// wind-speed-from-velocity-pressure: inverse of wind-pressure's base velocity
+// pressure. The forward tile gives q = 0.00256 V^2 (before the Kz/Kzt/Kd/G/Cp
+// factors); backing out the equivalent basic wind speed from a bare velocity
+// pressure is the inverse: V = sqrt(q / 0.00256). This inverts the VELOCITY
+// pressure, not a Cp-loaded design surface pressure.
+// dims: in { velocity_pressure_psf: M L^-1 T^-2 } out: { wind_speed_mph: L T^-1 }
+export function computeWindSpeedFromVelocityPressure({ velocity_pressure_psf = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(velocity_pressure_psf) || 0;
+  if (!(q > 0)) return { error: "Velocity pressure must be positive (psf)." };
+  const wind_speed_mph = Math.sqrt(q / 0.00256);
+  return {
+    wind_speed_mph,
+    note: "The equivalent basic wind speed behind a velocity pressure: V = sqrt(q / 0.00256), the ASCE 7 q = 0.00256 V^2 relation solved for V. Enter the BARE velocity pressure q (psf); this is not a Cp-loaded surface design pressure -- to work back from a component/cladding or MWFRS design pressure, first divide out the exposure/height Kz, topographic Kzt, directionality Kd, gust G, and pressure Cp factors to recover q. Useful to read the wind speed a rated q corresponds to, or to sanity-check a q against the site basic wind speed. A design aid; ASCE 7 and the engineer of record govern.",
+  };
+}
+export const windSpeedFromVelocityPressureExample = { inputs: { velocity_pressure_psf: 25 } };
+function renderWindSpeedFromVelocityPressure(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASCE 7 velocity pressure q = 0.00256 V^2 (V mph, q psf) solved for the wind speed, V = sqrt(q / 0.00256). Enter the bare velocity pressure, not a Cp-loaded design surface pressure. A design aid; ASCE 7 and the engineer of record govern.";
+  const q = makeNumber("Velocity pressure q (psf)", "wsv-q", { step: "any", min: "0", value: "25" });
+  q.input.value = "25";
+  inputRegion.appendChild(q.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "25"; update(); });
+  const oV = makeOutputLine(outputRegion, "Equivalent basic wind speed", "wsv-out-v");
+  const oN = makeOutputLine(outputRegion, "Note", "wsv-out-n");
+  const update = debounce(() => {
+    const r = computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: Number(q.input.value) || 0 });
+    if (r.error) { oV.textContent = r.error; oN.textContent = "-"; return; }
+    oV.textContent = fmt(r.wind_speed_mph, 1) + " mph";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  q.input.addEventListener("input", update);
+}
+
 // --- Utility 98: Snow Load (ASCE 7 flat-roof) ---
 //
 // Pf = 0.7 * Ce * Ct * Is * Pg  (psf)  [public ASCE 7 formula]
@@ -2004,6 +2038,7 @@ export const CONSTRUCTION_RENDERERS = {
   "excavation": renderExcavation,
   "masonry-count": renderMasonryCount,
   "wind-pressure": renderWindPressure,
+  "wind-speed-from-velocity-pressure": renderWindSpeedFromVelocityPressure,
   "snow-load": renderSnowLoad,
   "anchor-embedment": renderAnchorEmbedment,
   // v3

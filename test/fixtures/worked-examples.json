@@ -4982,6 +4982,26 @@
    }
   },
   {
+   "tile_id": "wind-speed-from-velocity-pressure",
+   "source_publisher": "ASCE",
+   "source_title": "V = sqrt(q / 0.00256); inverse of the base velocity pressure",
+   "source_edition_or_year": "ASCE 7 (current edition); public formula",
+   "source_section_or_page": "25 psf bare velocity pressure -> 98.8 mph equivalent basic wind speed",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "velocity_pressure_psf": 25
+   },
+   "outputs": {
+    "wind_speed_mph": {
+     "value": 98.8212,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "snow-load",
    "source_publisher": "ASCE",
    "source_title": "Flat-roof snow load: Pf = 0.7 * Ce * Ct * Is * Pg",

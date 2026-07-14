@@ -230,7 +230,7 @@ const _TILES = [
   ["beam-loading", "E"], ["material-quantity", "E"], ["stair-stringer", "E"],
   ["joist-deflection", "E"], ["footing-area", "E"], ["tile-count", "E"],
   ["paint-coverage", "E"], ["excavation", "E"], ["masonry-count", "E"],
-  ["wind-pressure", "E"], ["snow-load", "E"], ["anchor-embedment", "E"],
+  ["wind-pressure", "E"], ["wind-speed-from-velocity-pressure", "E"], ["snow-load", "E"], ["anchor-embedment", "E"],
   ["drywall", "E"], ["roofing-squares", "E"], ["asphalt-tonnage", "E"],
   ["aggregate", "E"], ["mortar-mix", "E"], ["concrete-mix-design", "E"],
   ["bolt-torque", "E"], ["bend-allowance", "E"], ["speeds-feeds", "E"],

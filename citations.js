@@ -4237,6 +4237,17 @@ export const CITATIONS = {
       { name: "Exposure / Kz / Kzt / Kd / Ke", value: "user-supplied or from data/construction/wind-snow-zones.json", source: "ASCE 7-22" },
     ],
   },
+  "wind-speed-from-velocity-pressure": {
+    formula: "V = sqrt(velocity_pressure_psf / 0.00256), the ASCE 7 base velocity pressure q = 0.00256 V^2 solved for the wind speed.",
+    edition: ASCE_7 + " Section 26.10 (the base 0.00256 V^2 velocity pressure), solved for V. Public formula; licensed text not reproduced.",
+    freeAccess: "ASCE 7 licensed; the 0.00256 velocity-pressure relation is public. NOAA basic wind speeds free at hazards.atcouncil.org.",
+    governance: GOVERNANCE.structural,
+    editionNote: "The inverse of wind-pressure's base velocity pressure: the equivalent basic wind speed behind a BARE velocity pressure q. This inverts the velocity pressure only, not a Cp-loaded design surface pressure - to work back from a component/cladding or MWFRS design pressure, first divide out the exposure/height Kz, topographic Kzt, directionality Kd, gust G, and pressure Cp factors to recover q. " + IBC_DISCLOSURE,
+    assumptions: [
+      { name: "Air-density factor 0.00256", value: "ASCE 7-22 Section 26.10; V = sqrt(q / 0.00256)", source: "ASCE 7-22 by name" },
+      { name: "Bare velocity pressure", value: "enter q before Kz/Kzt/Kd/G/Cp; not a Cp-loaded design surface pressure", source: "ASCE 7-22" },
+    ],
+  },
   "snow-load": {
     formula: "Flat-roof snow load Pf = 0.7 × Ce × Ct × Is × Pg (psf). Public ASCE 7-22 formula. Pg from NOAA ground-snow maps.",
     edition: ASCE_7 + " Section 7.3.",

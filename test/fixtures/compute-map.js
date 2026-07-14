@@ -288,6 +288,7 @@ export const COMPUTE_MAP = {
   "pulley-ma-gen": { module: "../../calc-cross.js", fn: "computePulleyMA" },
   "paint-coverage": { module: "../../calc-construction.js", fn: "computePaintCoverage" },
   "wind-pressure": { module: "../../calc-construction.js", fn: "computeWindPressure" },
+  "wind-speed-from-velocity-pressure": { module: "../../calc-construction.js", fn: "computeWindSpeedFromVelocityPressure" },
   "snow-load": { module: "../../calc-construction.js", fn: "computeSnowLoad" },
   "three-phase": { module: "../../calc-electrical.js", fn: "computeThreePhase" },
   "slope": { module: "../../calc-plumbing.js", fn: "computeSlope" },

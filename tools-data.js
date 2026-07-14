@@ -247,6 +247,7 @@ export const TOOLS = [
   { id: "excavation", name: "Excavation Volume", group: "E", trades: ["carpentry"], desc: "Cubic yards of soil for a sloped excavation." },
   { id: "masonry-count", name: "Brick and CMU Count", group: "E", trades: ["carpentry"], desc: "Unit count from wall area, unit size, and mortar joint." },
   { id: "wind-pressure", name: "Wind Velocity Pressure", group: "E", trades: ["carpentry"], desc: "q = 0.00256 * V^2 with windward and leeward Cp." },
+  { id: "wind-speed-from-velocity-pressure", name: "Basic Wind Speed from Velocity Pressure", group: "E", trades: ["carpentry"], desc: "The inverse of the wind velocity-pressure tile: the equivalent basic wind speed behind a bare velocity pressure, V = sqrt(q / 0.00256). A 25-psf velocity pressure corresponds to a ~98.8 mph basic wind speed. Enter the bare q (not a Cp-loaded design surface pressure). A design aid; ASCE 7 and the engineer of record govern." },
   { id: "snow-load", name: "Flat-Roof Snow Load", group: "E", trades: ["carpentry"], desc: "Pf = 0.7 * Ce * Ct * Is * Pg per public ASCE 7." },
   { id: "anchor-embedment", name: "Anchor Bolt Embedment", group: "E", trades: ["carpentry"], desc: "Required embedment depth from public bond strength formula." },
   { id: "drywall", name: "Drywall Sheet Count and Mud", group: "E", trades: ["carpentry"], desc: "Sheets, mud gallons, tape lf, and screws from wall and ceiling area." },

@@ -409,7 +409,7 @@ const TOOL_MODULES = (() => {
     "beam-loading", "material-quantity",
     // v2
     "stair-stringer", "joist-deflection", "footing-area", "tile-count",
-    "paint-coverage", "excavation", "masonry-count", "wind-pressure",
+    "paint-coverage", "excavation", "masonry-count", "wind-pressure", "wind-speed-from-velocity-pressure",
     "snow-load", "anchor-embedment",
     // v3
     "drywall", "roofing-squares", "asphalt-tonnage", "aggregate", "mortar-mix",

@@ -651,6 +651,7 @@ import {
   computeTileCount,
   computeWeldUsage,
   computeWindPressure,
+  computeWindSpeedFromVelocityPressure,
   renderAnchorEmbedment,
   renderArea,
   renderBeamLoading,
@@ -8182,6 +8183,26 @@ test("bounds: calc-construction computeWindPressure pins q = 0.00256*V^2 and Kz 
   const b = computeWindPressure({ V_mph: 100, exposure: "B" });
   assert.ok(Math.abs(b.qz_at_30ft_psf - b.q_psf * 0.70) < 1e-9);
   assert.ok("error" in computeWindPressure({ V_mph: 0 }));
+});
+
+test("bounds: spec-v720 computeWindSpeedFromVelocityPressure pins V = sqrt(q/0.00256), round-trips through computeWindPressure's base q, and error seams", () => {
+  const r = computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: 25 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.wind_speed_mph - Math.sqrt(25 / 0.00256)) < 1e-9, `V identity: ${r.wind_speed_mph}`);
+  assert.ok(Math.abs(r.wind_speed_mph - 98.8212) < 1e-3, `pinned 98.8 mph: ${r.wind_speed_mph}`);
+  // Round-trip: at the returned wind speed the forward tile's base velocity pressure equals the input q.
+  for (const velocity_pressure_psf of [5, 25, 60, 120]) {
+    const m = computeWindSpeedFromVelocityPressure({ velocity_pressure_psf });
+    assert.ok(!m.error, `sweep q=${velocity_pressure_psf}: ${JSON.stringify(m)}`);
+    assertFinite(m.wind_speed_mph, "V"); assert.ok(m.wind_speed_mph > 0, "V positive");
+    const back = computeWindPressure({ V_mph: m.wind_speed_mph });
+    assert.ok(Math.abs(back.q_psf - velocity_pressure_psf) < 1e-6, `round-trip q=${velocity_pressure_psf}: ${back.q_psf}`);
+  }
+  // A higher velocity pressure implies a higher wind speed.
+  assert.ok(computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: 60 }).wind_speed_mph > r.wind_speed_mph);
+  // Error seams: non-positive q, non-finite.
+  assert.ok("error" in computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: 0 }));
+  assert.ok("error" in computeWindSpeedFromVelocityPressure({ velocity_pressure_psf: Infinity }));
 });
 
 test("bounds: calc-construction computeSnowLoad pins Pf = 0.7*Ce*Ct*Is*Pg per ASCE 7", () => {
