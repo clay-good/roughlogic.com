@@ -8887,6 +8887,31 @@
       "kind": "industry"
     },
     {
+      "term": "mounting height for illuminance",
+      "target": "luminaire-height-for-illuminance",
+      "kind": "industry"
+    },
+    {
+      "term": "luminaire height for footcandles",
+      "target": "luminaire-height-for-illuminance",
+      "kind": "redirect"
+    },
+    {
+      "term": "how high to mount light",
+      "target": "luminaire-height-for-illuminance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "fixture height for fc",
+      "target": "luminaire-height-for-illuminance",
+      "kind": "adjacent"
+    },
+    {
+      "term": "light mounting height",
+      "target": "luminaire-height-for-illuminance",
+      "kind": "adjacent"
+    },
+    {
       "term": "inverse square",
       "target": "point-illuminance",
       "kind": "adjacent"

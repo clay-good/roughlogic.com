@@ -12754,6 +12754,27 @@ test("bounds: spec-v175 point-illuminance pins the nadir, the off-axis cosine, a
   assert.ok("error" in _cv175({ intensity_cd: Infinity, mount_height_ft: 10, angle_deg: 0 }));
 });
 
+import { computeLuminaireHeightForIlluminance as _v750 } from "../../calc-elecdesign.js";
+test("bounds: spec-v750 luminaire mounting height for a target illuminance (inverse of point-illuminance)", () => {
+  const p = _v750({ intensity_cd: 1000, target_fc: 10, angle_deg: 0 });
+  assert.ok(Math.abs(p.mount_height_ft - 10) < 1e-9 && Math.abs(p.distance_ft - 10) < 1e-9);
+  // round-trip: the recovered height fed to point-illuminance reproduces the target fc
+  for (const [cd, fc, ang] of [[1000, 10, 0], [1500, 8, 30], [5000, 20, 45], [800, 5, 15]]) {
+    const inv = _v750({ intensity_cd: cd, target_fc: fc, angle_deg: ang });
+    const fwd = _cv175({ intensity_cd: cd, mount_height_ft: inv.mount_height_ft, angle_deg: ang });
+    assert.ok(Math.abs(fwd.e_fc - fc) < 1e-9);
+    assert.ok(Math.abs(fwd.distance_ft - inv.distance_ft) < 1e-9);
+  }
+  // more candela allows a higher mount for the same fc; a higher target fc needs a lower mount
+  assert.ok(_v750({ intensity_cd: 4000, target_fc: 10, angle_deg: 0 }).mount_height_ft > _v750({ intensity_cd: 1000, target_fc: 10, angle_deg: 0 }).mount_height_ft);
+  assert.ok(_v750({ intensity_cd: 1000, target_fc: 40, angle_deg: 0 }).mount_height_ft < _v750({ intensity_cd: 1000, target_fc: 10, angle_deg: 0 }).mount_height_ft);
+  // error seams
+  assert.ok("error" in _v750({ intensity_cd: 0, target_fc: 10, angle_deg: 0 }));
+  assert.ok("error" in _v750({ intensity_cd: 1000, target_fc: 0, angle_deg: 0 }));
+  assert.ok("error" in _v750({ intensity_cd: 1000, target_fc: 10, angle_deg: 90 }));
+  assert.ok("error" in _v750({ intensity_cd: Infinity, target_fc: 10, angle_deg: 0 }));
+});
+
 test("bounds: spec-v688 computePointMethodRequiredCandela pins I = E h^2 / cos^3(angle), the fc/lux unit, round-trips through computePointIlluminance, and error seams", () => {
   const r = _v688({ target_illuminance: 10, illuminance_unit: "fc", mount_height_ft: 10, angle_deg: 0 });
   assert.ok(!r.error, JSON.stringify(r));

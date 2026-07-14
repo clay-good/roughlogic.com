@@ -263,6 +263,7 @@ const RELATED = {
   "motor-unbalance-derate": ["voltage-imbalance", "motor-fla", "motor-vd-starting"],
   "rooftop-temp-adder": ["ambient-ampacity-adjust", "wire-ampacity", "pv-string-sizing"],
   "point-illuminance": ["point-method-required-candela", "lumen-method", "lux-to-footcandle", "lighting-density"],
+  "luminaire-height-for-illuminance": ["point-illuminance", "point-method-required-candela", "lumen-method"],
   "point-method-required-candela": ["point-illuminance", "lumen-method", "lux-to-footcandle", "lighting-beam"],
   "working-space-110-26": ["gfci-afci-reference", "pull-box-sizing", "service-load"],
   "burial-depth-300-5": ["working-space-110-26", "conduit-fill", "cable-bend-radius"],

@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(elecdesign): spec-v750 luminaire mounting height for a target illuminance (point-illuminance inverse); 2026-07-14
+
+- New tile `luminaire-height-for-illuminance` (Group A, calc-elecdesign.js): the mounting height that lands a target
+  horizontal illuminance at a point. `h = sqrt( I x cos^3(angle) / E )`. A 1,000 cd source needs a 10 ft mount for 10 fc
+  directly below. Solves for height (distinct from `point-method-required-candela`, which solves for the intensity).
+  Round-trips through `point-illuminance`. Home tile count 1,198 -> 1,199.
+
 ### feat(geotech): spec-v749 infinite slope critical depth for a target FS (slope-stability-infinite inverse); 2026-07-14
 
 - New tile `slope-failure-depth-for-fs` (Group E, calc-geotech.js): the critical failure-plane depth at which the

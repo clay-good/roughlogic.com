@@ -1240,6 +1240,7 @@ export const COMPUTE_MAP = {
   "neutral-demand-220-61": { module: "../../calc-service.js", fn: "computeNeutralDemand22061" },
   "motor-unbalance-derate": { module: "../../calc-powerquality.js", fn: "computeMotorUnbalanceDerate" },
   "point-illuminance": { module: "../../calc-elecdesign.js", fn: "computePointIlluminance" },
+  "luminaire-height-for-illuminance": { module: "../../calc-elecdesign.js", fn: "computeLuminaireHeightForIlluminance" },
   "point-method-required-candela": { module: "../../calc-elecdesign.js", fn: "computePointMethodRequiredCandela" },
   "lighting-light-loss-factor": { module: "../../calc-elecdesign.js", fn: "computeLightingLightLossFactor" },
   "lighting-uniformity-ratio": { module: "../../calc-elecdesign.js", fn: "computeLightingUniformityRatio" },

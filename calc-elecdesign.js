@@ -192,6 +192,46 @@ ELECDESIGN_RENDERERS["point-illuminance"] = _simpleRenderer({
   compute: computePointIlluminance,
 });
 
+// ===================== spec-v750: luminaire mounting height for a target illuminance (inverse of point-illuminance) =====================
+// The forward tile gives the illuminance from the mounting height; the inverse recovers the mounting height that lands a
+// target horizontal illuminance at a point, given the candela toward the point and the angle from nadir. From
+// E = I x cos^3(angle) / h^2, h = sqrt( I x cos^3(angle) / E ). (This solves for HEIGHT; the separate
+// point-method-required-candela tile solves for the candela.)
+// dims: in { intensity_cd: J, target_fc: L^-2, angle_deg: dimensionless } out: { mount_height_ft: L, distance_ft: L }
+export function computeLuminaireHeightForIlluminance({ intensity_cd = 0, target_fc = 0, angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const cd = Number(intensity_cd) || 0;
+  const E = Number(target_fc) || 0;
+  const ang = Number(angle_deg) || 0;
+  if (!(cd > 0)) return { error: "Luminous intensity must be positive (candela)." };
+  if (!(E > 0)) return { error: "Target illuminance must be positive (fc)." };
+  if (ang < 0 || ang >= 90) return { error: "Angle from nadir must be in [0, 90) degrees." };
+  const cosA = Math.cos(ang * Math.PI / 180);
+  const mount_height_ft = Math.sqrt(cd * Math.pow(cosA, 3) / E);
+  const distance_ft = mount_height_ft / cosA;
+  if (![mount_height_ft, distance_ft].every(Number.isFinite)) return { error: "Mounting-height math is not a finite value." };
+  return {
+    mount_height_ft, distance_ft,
+    note: "IES point method solved for the height: from E = I x cos^3(angle) / h^2, h = sqrt( I x cos^3(angle) / E ). This is the mounting height above the work plane that lands the target horizontal illuminance at a point directly at the given angle from nadir; a higher mount spreads the same candela over more area, so it lowers the illuminance (mounting lower raises it). This is the DIRECT illuminance from one source, ignoring interreflection and any other luminaires; the real design sums many sources and applies the light-loss factor. Enter the candela toward the point from the manufacturer's photometric file at the aiming angle, and check the result against the IES target level and the layout. A design aid; the photometric file and the IES target govern.",
+  };
+}
+const luminaireHeightForIlluminanceExample = { inputs: { intensity_cd: 1000, target_fc: 10, angle_deg: 0 } };
+ELECDESIGN_RENDERERS["luminaire-height-for-illuminance"] = _simpleRenderer({
+  citation: "Citation: IES point method (by name) solved for the height - from E_fc = I x cos^3(angle) / height^2, height = sqrt( I x cos^3(angle) / E ). Direct illuminance from one source, ignoring interreflection. Enter the candela from the photometric file; the photometric file and the IES target govern.",
+  example: luminaireHeightForIlluminanceExample.inputs,
+  fields: [
+    { key: "intensity_cd", label: "Luminous intensity toward point (candela)", kind: "number" },
+    { key: "target_fc", label: "Target horizontal illuminance (fc)", kind: "number" },
+    { key: "angle_deg", label: "Angle from straight-down / nadir (deg)", kind: "number", attrs: { step: "any", min: "0", max: "89.9" }, default: 0 },
+  ],
+  outputs: [
+    { key: "h", id: "lhi-out-h", label: "Mounting height above work plane", value: (r) => fmt(r.mount_height_ft, 2) + " ft" },
+    { key: "d", id: "lhi-out-d", label: "Slant distance to point", value: (r) => fmt(r.distance_ft, 2) + " ft" },
+    { key: "n", id: "lhi-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLuminaireHeightForIlluminance,
+});
+
 // dims: in { target_illuminance: L^-2, illuminance_unit: dimensionless, mount_height_ft: L, angle_deg: dimensionless } out: { required_cd: J }
 export function computePointMethodRequiredCandela({ target_illuminance = 0, illuminance_unit = "fc", mount_height_ft = 0, angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

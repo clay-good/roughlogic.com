@@ -7050,6 +7050,17 @@ export const CITATIONS = {
       { name: "40:1 ratio", value: "maximum-to-minimum must not exceed 40:1; verify the adopted edition", source: "scope of this tile" },
     ],
   },
+  "luminaire-height-for-illuminance": {
+    formula: "mount_height = sqrt( intensity_cd x cos(angle)^3 / target_fc ), the inverse of E_fc = intensity_cd x cos(angle)^3 / mount_height^2; distance = mount_height / cos(angle).",
+    edition: "Point-by-point (inverse-square and cosine) method for horizontal illuminance (IES Lighting Handbook / IESNA point method), solved for the mounting height, by name.",
+    freeAccess: "The result is the mounting height for the direct horizontal illuminance from one source, ignoring interreflection. A design relies on the manufacturer's photometric file and the IES target level.",
+    governance: GOVERNANCE.electrical,
+    editionNote: "Single-edition (engineering-practice / first-principles; refresh as practice shifts). The mounting height above the work plane that lands a target horizontal illuminance at a point, the inverse of the point method solved for the height (distinct from the required-candela inverse, which solves for the intensity). A higher mount spreads the same candela over more area, lowering the illuminance; this is the direct illuminance from one source, ignoring interreflection and any other luminaires, so the real design sums many sources and applies the light-loss factor.",
+    assumptions: [
+      { name: "Inverse-square + cosine", value: "mount_height = sqrt(I cos^3(angle) / E); a higher mount lowers the illuminance", source: "IES point method" },
+      { name: "Single source", value: "direct illuminance from one luminaire, ignoring interreflected light", source: "IES Lighting Handbook" },
+    ],
+  },
   "point-illuminance": {
     formula: "distance = mount_height / cos(angle); E_fc = intensity_cd x cos(angle) / distance^2 = intensity_cd x cos(angle)^3 / mount_height^2; E_lux = E_fc x 10.764.",
     edition: "Point-by-point (inverse-square and cosine) method for horizontal illuminance from a source of known candlepower, IES Lighting Handbook / IESNA point method, by name.",

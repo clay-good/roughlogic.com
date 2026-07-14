@@ -817,7 +817,7 @@ const _TILES = [
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)
   ["buck-boost-sizing", "A"], ["wireway-fill", "A"], ["rooftop-temp-adder", "A"], ["working-space-110-26", "A"],
   ["range-demand-220-55", "A"], ["dryer-demand-220-54", "A"], ["neutral-demand-220-61", "A"],
-  ["motor-unbalance-derate", "A"], ["point-illuminance", "A"], ["point-method-required-candela", "A"],
+  ["motor-unbalance-derate", "A"], ["point-illuminance", "A"], ["luminaire-height-for-illuminance", "A"], ["point-method-required-candela", "A"],
   ["lighting-light-loss-factor", "A"], ["lighting-uniformity-ratio", "A"], ["egress-lighting-check", "A"],
   ["burial-depth-300-5", "A"], ["support-spacing", "A"],
   // spec-v179..v187 electrician second-pass batch (9 tiles)

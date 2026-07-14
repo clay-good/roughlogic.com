@@ -33180,6 +33180,34 @@
    }
   },
   {
+   "tile_id": "luminaire-height-for-illuminance",
+   "source_publisher": "IES Lighting Handbook (point method, solved for height)",
+   "source_title": "Mounting height for a target fc from a 1000 cd source directly below",
+   "source_edition_or_year": "IES point method",
+   "source_section_or_page": "angle 0: h = sqrt(1000 x cos(0)^3 / 10) = 10.0 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "intensity_cd": 1000,
+    "target_fc": 10,
+    "angle_deg": 0
+   },
+   "outputs": {
+    "mount_height_ft": {
+     "value": 10.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "distance_ft": {
+     "value": 10.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "point-illuminance",
    "source_publisher": "IES Lighting Handbook (point method)",
    "source_title": "cross-check (off-axis): same source at 30 deg off nadir",
