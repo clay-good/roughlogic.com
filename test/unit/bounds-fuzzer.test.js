@@ -18165,7 +18165,30 @@ test("bounds: spec-v517 computeAbycDcWire pins the round-trip circular mils, the
   assert.ok("error" in _v517({ current_a: 20, run_length_ft: 25, system_voltage_v: 12, drop_pct: 120 }));
 });
 
-import { computeBatteryHydrogenVent as _v518 } from "../../calc-electrical.js";
+import { computeBatteryHydrogenVent as _v518, computeBatteryVentMaxCurrent as _v666 } from "../../calc-electrical.js";
+
+test("bounds: spec-v666 computeBatteryVentMaxCurrent pins I_max = Q/(0.054 N), the cells-not-jars scaling, round-trips through computeBatteryHydrogenVent, and error seams", () => {
+  const r = _v666({ available_cfm: 100, cell_count: 24 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_charge_current_a - 100 / (0.054 * 24)) < 1e-9, `I_max identity: ${r.max_charge_current_a}`);
+  // Counting jars (6x the cells) cuts the safe current to one-sixth.
+  const jars = _v666({ available_cfm: 100, cell_count: 144 });
+  assert.ok(Math.abs(jars.max_charge_current_a - r.max_charge_current_a / 6) < 1e-9, `jars sixth: ${jars.max_charge_current_a}`);
+  // Round-trip: the max current, fed back through the forward tile at the same cells, reproduces the airflow.
+  for (const available_cfm of [10, 100, 500]) {
+    for (const cell_count of [12, 24, 144]) {
+      const m = _v666({ available_cfm, cell_count });
+      assert.ok(!m.error, `sweep Q=${available_cfm} N=${cell_count}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_charge_current_a, "I_max"); assert.ok(m.max_charge_current_a > 0, "I_max positive");
+      const back = _v518({ cell_count, charge_current_a: m.max_charge_current_a, room_volume_ft3: 800 });
+      assert.ok(Math.abs(back.q_cfm - available_cfm) < 1e-9, `round-trip Q=${available_cfm} N=${cell_count}: ${back.q_cfm}`);
+    }
+  }
+  // Error seams: non-finite, non-positive airflow, cell count < 1.
+  assert.ok("error" in _v666({ available_cfm: Infinity, cell_count: 24 }));
+  assert.ok("error" in _v666({ available_cfm: 0, cell_count: 24 }));
+  assert.ok("error" in _v666({ available_cfm: 100, cell_count: 0 }));
+});
 
 test("bounds: spec-v518 computeBatteryHydrogenVent pins the 0.054 I N rate, the cells-not-jars scaling, the ACH, and error seams", () => {
   const r = _v518({ cell_count: 24, charge_current_a: 20, room_volume_ft3: 800 });

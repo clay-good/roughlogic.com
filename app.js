@@ -59,7 +59,7 @@ const TOOL_MODULES = (() => {
     // spec-v496 asymmetrical and peak fault current from X/R
     "asymmetrical-fault-xr",
     // spec-v518 battery room hydrogen ventilation (IEEE 1635)
-    "battery-hydrogen-vent",
+    "battery-hydrogen-vent", "battery-vent-max-current",
     // spec-v520 transformer inrush coordination point
     "transformer-inrush-point",
     // spec-v562

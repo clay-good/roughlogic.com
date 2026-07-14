@@ -22402,6 +22402,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "max charge current for ventilation",
+      "target": "battery-vent-max-current",
+      "kind": "industry"
+    },
+    {
+      "term": "battery charge current limit",
+      "target": "battery-vent-max-current",
+      "kind": "industry"
+    },
+    {
+      "term": "current from exhaust airflow",
+      "target": "battery-vent-max-current",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much charge current can my fan handle",
+      "target": "battery-vent-max-current",
+      "kind": "adjacent"
+    },
+    {
+      "term": "safe charge rate battery room",
+      "target": "battery-vent-max-current",
+      "kind": "adjacent"
+    },
+    {
       "term": "vrla ventilation",
       "target": "battery-hydrogen-vent",
       "kind": "adjacent"

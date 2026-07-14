@@ -833,7 +833,7 @@ const _TILES = [
   // spec-v496 asymmetrical and peak fault current from X/R
   ["asymmetrical-fault-xr", "A"],
   // spec-v518 battery room hydrogen ventilation (IEEE 1635)
-  ["battery-hydrogen-vent", "A"],
+  ["battery-hydrogen-vent", "A"], ["battery-vent-max-current", "A"],
   // spec-v520 transformer inrush coordination point
   ["transformer-inrush-point", "A"],
   ["termination-temp-ampacity", "A"],

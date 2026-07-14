@@ -1434,6 +1434,18 @@ export const CITATIONS = {
       { name: "Bounding case", value: "sealed VRLA in normal float gasses far less than this vented-cell bounding rate", source: "battery practice" },
     ],
   },
+  "battery-vent-max-current": {
+    formula: "I_max = available_cfm / (0.054 x N) (N = individual 2 V cells); the inverse of Q = 0.054 x I x N.",
+    edition: "The IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation relation solved for the maximum charge current a given exhaust rate can support, holding the room-average hydrogen below 1% (NFPA 855 4% LEL), by name; the applicable code and the room design govern.",
+    freeAccess: "The Q = 0.054 x I x N ventilation relation is a published IEEE 1635 result; the available airflow and cell count come from the room and battery installation.",
+    governance: GOVERNANCE.general,
+    editionNote: "IEEE 1635 battery-room hydrogen ventilation solved for the current: I_max = Q / (0.054 x N), the highest maximum charge current an exhaust rate Q can safely support while holding the room-average hydrogen below 1% by volume (a 75% margin under the 4% lower explosive limit). N is the number of individual 2 V CELLS -- not jars or modules; a 12 V jar contains six 2 V cells, so twenty-four 12 V jars is 144 cells, and counting jars overstates the safe current several-fold. Local spots near cells can exceed the room average, so diffusion and inlet placement matter. A design aid, not the fire and building code; the applicable code and the room design govern.",
+    assumptions: [
+      { name: "Cells not jars", value: "N counts individual 2 V cells; a 12 V jar is six cells, so counting jars overstates the safe current six-fold", source: "IEEE 1635" },
+      { name: "1% target", value: "the current is bounded so the room-average hydrogen stays below 1%, a 75% margin under the 4% LEL", source: "IEEE 1635 / NFPA 855" },
+      { name: "Bounding case", value: "sealed VRLA in normal float gasses far less, so this is a conservative current limit", source: "battery practice" },
+    ],
+  },
   "asymmetrical-fault-xr": {
     formula: "I_peak = sqrt(2) x I_sym x (1 + e^(-pi/(X/R))); MF_rms = sqrt(1 + 2 e^(-2 pi/(X/R))); I_asym = I_sym x MF_rms.",
     edition: "First-cycle fault-asymmetry model (DC offset from X/R), an IEEE C37 / NEMA AB-4 first-cycle relation, by name; the interrupting-duty rating and coordination study govern the applied duty.",

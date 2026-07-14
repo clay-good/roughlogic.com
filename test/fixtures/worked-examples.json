@@ -51948,6 +51948,48 @@
    }
   },
   {
+   "tile_id": "battery-vent-max-current",
+   "source_publisher": "IEEE 1635 battery-room hydrogen ventilation (inverse)",
+   "source_title": "100 cfm over a 24-cell string supports 77.2 A max charge current",
+   "source_edition_or_year": "spec-v666 worked example (machine-verified)",
+   "source_section_or_page": "spec-v666 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "available_cfm": 100,
+    "cell_count": 24
+   },
+   "outputs": {
+    "max_charge_current_a": {
+     "value": 77.16,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "battery-vent-max-current",
+   "source_publisher": "IEEE 1635 battery-room hydrogen ventilation (inverse)",
+   "source_title": "cross-check: counting jars as 144 cells drops the safe current to 12.86 A, one-sixth",
+   "source_edition_or_year": "spec-v666 worked example (machine-verified)",
+   "source_section_or_page": "spec-v666 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "available_cfm": 100,
+    "cell_count": 144
+   },
+   "outputs": {
+    "max_charge_current_a": {
+     "value": 12.86,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "transformer-inrush-point",
    "source_publisher": "transformer energization-inrush coordination",
    "source_title": "75 kVA, 480 V three-phase, 12x at 0.1 s -> 90.2 A FLA, 1,083 A inrush point",

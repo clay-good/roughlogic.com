@@ -795,6 +795,7 @@ export const COMPUTE_MAP = {
   "aircraft-weight-balance": { module: "../../calc-mechanic.js", fn: "computeAircraftWeightBalance" },
   "abyc-dc-wire": { module: "../../calc-mechanic.js", fn: "computeAbycDcWire" },
   "battery-hydrogen-vent": { module: "../../calc-electrical.js", fn: "computeBatteryHydrogenVent" },
+  "battery-vent-max-current": { module: "../../calc-electrical.js", fn: "computeBatteryVentMaxCurrent" },
   "existing-load-220-87": { module: "../../calc-feeder.js", fn: "computeExistingLoad22087" },
   "ev-load-management-ems": { module: "../../calc-feeder.js", fn: "computeEvLoadManagementEms" },
   "ev-charger-throttle": { module: "../../calc-feeder.js", fn: "computeEvChargerThrottle" },

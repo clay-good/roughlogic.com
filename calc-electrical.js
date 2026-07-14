@@ -5249,6 +5249,42 @@ function _v518renderBatteryHydrogenVent(inputRegion, outputRegion, citationEl) {
 }
 ELECTRICAL_RENDERERS["battery-hydrogen-vent"] = _v518renderBatteryHydrogenVent;
 
+// dims: in { available_cfm: L^3 T^-1, cell_count: dimensionless } out: { max_charge_current_a: I }
+export function computeBatteryVentMaxCurrent({ available_cfm = 0, cell_count = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(available_cfm) || 0;
+  const n = Number(cell_count) || 0;
+  if (!(q > 0)) return { error: "Available exhaust airflow must be positive (cfm)." };
+  if (!(n >= 1)) return { error: "Cell count must be at least 1 (individual 2 V cells, not jars)." };
+  // IEEE 1635 Q = 0.054 x I x N solved for the current the airflow can safely support.
+  const max_charge_current_a = q / (0.054 * n);
+  if (!Number.isFinite(max_charge_current_a)) return { error: "Battery-vent math is not a finite value." };
+  return {
+    max_charge_current_a,
+    note: "The highest maximum charge current a room's exhaust can safely support, the inverse of the battery-hydrogen-vent tile: from IEEE 1635 Q = 0.054 x I x N, I_max = Q / (0.054 x N), where N is the number of individual 2 V CELLS -- not jars or modules. A 12 V AGM/flooded jar contains six 2 V cells, so twenty-four 12 V jars is 144 cells, not 24; counting jars overstates the safe current six-fold. Holding to I_max keeps the room-average hydrogen below 1% by volume (a 75% margin under the 4% lower explosive limit); local spots near cells can still exceed the average, so diffusion and inlet placement matter. A design aid, not the fire and building code; the applicable code and the room design govern.",
+  };
+}
+export const batteryVentMaxCurrentExample = { inputs: { available_cfm: 100, cell_count: 24 } };
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderBatteryVentMaxCurrent(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: IEEE 1635 / IEEE-ASHRAE Guide 21 battery-room hydrogen ventilation (NFPA 855 4% LEL), solved for the current: I_max = Q / (0.054 x N), N = individual 2 V CELLS (not jars). Holds the average hydrogen below 1% (75% margin under the 4% LEL). A design aid; the applicable code and room design govern.";
+  const q = makeNumber("Available exhaust airflow (cfm)", "bvmc-q", { step: "any", min: "0" }); q.input.value = "100";
+  const n = makeNumber("Cell count (individual 2 V cells, NOT jars)", "bvmc-n", { step: "1", min: "1" }); n.input.value = "24";
+  for (const f of [q, n]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "100"; n.input.value = "24"; update(); });
+  const oI = makeOutputLine(outputRegion, "Max charge current", "bvmc-out-i");
+  const oNote = makeOutputLine(outputRegion, "Note", "bvmc-out-n");
+  function readNum(x) { if (x.value === "") return 0; const v = Number(x.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeBatteryVentMaxCurrent({ available_cfm: readNum(q.input), cell_count: readNum(n.input) });
+    if (r.error) { oI.textContent = r.error; oNote.textContent = ""; return; }
+    oI.textContent = fmt(r.max_charge_current_a, 1) + " A";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q, n]) f.input.addEventListener("input", update);
+}
+ELECTRICAL_RENDERERS["battery-vent-max-current"] = renderBatteryVentMaxCurrent;
+
 // ===================== spec-v520: transformer inrush coordination point =====================
 // dims: in { kva: M L^2 T^-3, primary_voltage_v: M L^2 T^-3 I^-1, phase: dimensionless, inrush_multiple: dimensionless, duration_s: T } out: { fla_a: I, inrush_point_a: I }
 export function computeTransformerInrushPoint({ kva = 0, primary_voltage_v = 0, phase = 3, inrush_multiple = 12, duration_s = 0.1 } = {}) {
