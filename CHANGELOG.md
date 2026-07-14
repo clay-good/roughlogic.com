@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v795 coordinated turn radius and rate; 2026-07-14
+
+- New tile `turn-radius-bank` (Group K, calc-mechanic.js aviation): the radius and rate of a coordinated level turn from
+  airspeed and bank. `tan(bank) = V^2/(g x radius)` -> `radius = 0.08854 x airspeed(kt)^2 / tan(bank)`, depending only on
+  speed and bank, not weight. 120 kt at 30 deg is about 2,208 ft (0.36 nm) at 5.25 deg/s. Speed enters squared so
+  doubling it quadruples the radius; a standard-rate turn is 3 deg/s. Fuzzer pins the radius, the rate, the V-squared
+  scaling, and the error seams. Explore sweep #22 entry 4 (aviation cluster). Home count 1,243 -> 1,244.
+
 ### feat(mechanic): spec-v794 glidepath rate of descent; 2026-07-14
 
 - New tile `glidepath-descent-rate` (Group K, calc-mechanic.js aviation): the rate of descent that holds a glidepath

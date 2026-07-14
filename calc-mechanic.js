@@ -2431,3 +2431,43 @@ MECHANIC_RENDERERS["glidepath-descent-rate"] = _simpleRenderer({
   ],
   compute: computeGlidepathDescentRate,
 });
+
+// ===================== spec-v795: coordinated-turn radius and rate =====================
+// In a coordinated level turn, horizontal lift = centripetal force: L sin(phi) = m V^2 / R and
+// L cos(phi) = m g, so tan(phi) = V^2/(g R) -> R = V^2/(g tan(phi)). With V in kt -> ft/s (x1.68781)
+// and g = 32.174 ft/s^2, R = 0.08854 x V_kt^2 / tan(phi). Rate of turn = V/R (rad/s) in deg/s.
+// dims: in { airspeed_kt: L T^-1, bank_angle_deg: dimensionless } out: { turn_radius_ft: L, rate_of_turn_deg_s: T^-1 }
+export function computeTurnRadiusBank({ airspeed_kt = 0, bank_angle_deg = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const v = Number(airspeed_kt) || 0;
+  const phi = Number(bank_angle_deg) || 0;
+  if (!(v > 0)) return { error: "Airspeed must be positive (kt)." };
+  if (!(phi > 0 && phi < 90)) return { error: "Bank angle must be over 0 and under 90 degrees." };
+  const rad = Math.PI / 180;
+  const tan = Math.tan(phi * rad);
+  const v_fps = v * 1.68781;
+  const turn_radius_ft = (v_fps * v_fps) / (32.174 * tan);
+  const rate_of_turn_deg_s = (v_fps / turn_radius_ft) / rad;
+  if (![turn_radius_ft, rate_of_turn_deg_s].every(Number.isFinite)) return { error: "Turn-radius math is not a finite value." };
+  return {
+    turn_radius_ft, rate_of_turn_deg_s, turn_diameter_ft: 2 * turn_radius_ft,
+    note: "Coordinated level-turn geometry: banking tilts the lift so its horizontal component pulls the aircraft around the turn, and setting that equal to the centripetal force gives tan(bank) = V^2/(g x radius), so radius = V^2/(g x tan(bank)) and it depends ONLY on airspeed and bank, not weight or aircraft type. Speed enters squared -- doubling the speed quadruples the radius -- which is why a fast jet needs miles to turn and a trainer needs yards, and why holding a tight radius at speed demands a steep bank. The rate of turn (degrees per second) is the flip side: for a given bank, a slower aircraft turns a smaller circle faster, and a 'standard rate' turn is 3 deg/s (a 2-minute 360). The bank for a target rate rises with speed (the rule of thumb: bank ~ TAS/10 + 7 for standard rate). Level, coordinated flight assumed; a slip or climb changes it. A planning aid; the flight manual and the pilot in command govern.",
+  };
+}
+export const turnRadiusBankExample = { inputs: { airspeed_kt: 120, bank_angle_deg: 30 } };
+
+MECHANIC_RENDERERS["turn-radius-bank"] = _simpleRenderer({
+  citation: "Citation: coordinated-turn radius (FAA Airplane Flying Handbook; classical flight dynamics): tan(bank) = V^2/(g x radius), so radius = V^2/(g x tan(bank)) = 0.08854 x V_kt^2 / tan(bank); rate of turn = V/radius. Depends only on airspeed and bank, not weight; speed enters squared. A standard-rate turn is 3 deg/s. Level coordinated flight assumed. A planning aid; the flight manual and the pilot in command govern.",
+  example: turnRadiusBankExample.inputs,
+  fields: [
+    { key: "airspeed_kt", label: "True airspeed (kt)", kind: "number", default: 120 },
+    { key: "bank_angle_deg", label: "Bank angle (deg)", kind: "number", default: 30 },
+  ],
+  outputs: [
+    { key: "r", id: "trb-out-r", label: "Turn radius", value: (r) => fmt(r.turn_radius_ft, 0) + " ft (" + fmt(r.turn_radius_ft / 6076.12, 2) + " nm)" },
+    { key: "d", id: "trb-out-d", label: "Turn diameter", value: (r) => fmt(r.turn_diameter_ft, 0) + " ft" },
+    { key: "t", id: "trb-out-t", label: "Rate of turn", value: (r) => fmt(r.rate_of_turn_deg_s, 2) + " deg/s" + (r.rate_of_turn_deg_s >= 3 ? " (>= standard rate)" : " (below standard rate)") },
+    { key: "n", id: "trb-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeTurnRadiusBank,
+});

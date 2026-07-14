@@ -24522,6 +24522,33 @@
    }
   },
   {
+   "tile_id": "turn-radius-bank",
+   "source_publisher": "FAA Airplane Flying Handbook (coordinated turn)",
+   "source_title": "radius = 0.08854 x airspeed_kt^2 / tan(bank)",
+   "source_edition_or_year": "spec-v795 worked example (machine-verified)",
+   "source_section_or_page": "120 kt at 30 deg bank -> 2208 ft radius, 5.25 deg/s rate of turn",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "airspeed_kt": 120,
+    "bank_angle_deg": 30
+   },
+   "outputs": {
+    "turn_radius_ft": {
+     "value": 2208,
+     "tolerance": {
+      "abs": 2
+     }
+    },
+    "rate_of_turn_deg_s": {
+     "value": 5.25,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "glidepath-descent-rate",
    "source_publisher": "FAA Instrument Flying Handbook; TERPS Order 8260.3",
    "source_title": "rod_fpm = ground_speed_kt x 101.27 x tan(angle); ft_per_nm = 6076.12 x tan(angle)",

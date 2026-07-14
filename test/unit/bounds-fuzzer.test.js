@@ -21701,6 +21701,22 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
+import { computeTurnRadiusBank as _v795 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v795 computeTurnRadiusBank pins the coordinated-turn radius, rate, V-squared scaling, and error seams", () => {
+  const r = _v795({ airspeed_kt: 120, bank_angle_deg: 30 });
+  assert.ok(Math.abs(r.turn_radius_ft - 2208) < 2); // 0.08854 * 120^2 / tan(30)
+  assert.ok(Math.abs(r.rate_of_turn_deg_s - 5.25) < 0.05);
+  // Speed enters squared: doubling the airspeed quadruples the radius; more bank tightens it.
+  assert.ok(Math.abs(_v795({ airspeed_kt: 240, bank_angle_deg: 30 }).turn_radius_ft - 4 * r.turn_radius_ft) < 10);
+  assert.ok(_v795({ airspeed_kt: 120, bank_angle_deg: 45 }).turn_radius_ft < r.turn_radius_ft);
+  // Error seams: non-finite, non-positive airspeed, bank out of (0, 90).
+  assert.ok("error" in _v795({ airspeed_kt: Infinity, bank_angle_deg: 30 }));
+  assert.ok("error" in _v795({ airspeed_kt: 0, bank_angle_deg: 30 }));
+  assert.ok("error" in _v795({ airspeed_kt: 120, bank_angle_deg: 0 }));
+  assert.ok("error" in _v795({ airspeed_kt: 120, bank_angle_deg: 90 }));
+});
+
 import { computeGlidepathDescentRate as _v794 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v794 computeGlidepathDescentRate pins ROD, the TERPS 318 ft/nm, monotonicity, and error seams", () => {

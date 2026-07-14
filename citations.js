@@ -9661,6 +9661,17 @@ export const CITATIONS = {
       { name: "Reserve rate", value: "25 A draw to a 10.5 V cutoff at 80 F on a 12 V battery", source: "BCI / SAE J537" },
     ],
   },
+  "turn-radius-bank": {
+    formula: "turn_radius_ft = (airspeed_kt x 1.68781)^2 / (32.174 x tan(bank)) = 0.08854 x airspeed_kt^2 / tan(bank); rate_of_turn_deg_s = (v_fps / radius) x 180/pi.",
+    edition: "Coordinated-turn radius and rate (FAA Airplane Flying Handbook; classical flight-dynamics balanced-turn relation), by name; the flight manual and the pilot in command govern.",
+    freeAccess: "The balanced-turn force balance is first-principles Newtonian mechanics; the airspeed and bank come from the flight instruments.",
+    governance: GOVERNANCE.general,
+    editionNote: "Coordinated level-turn geometry: banking tilts the lift so its horizontal component supplies the centripetal force, and setting that equal gives tan(bank) = V^2/(g x radius), so radius = V^2/(g x tan(bank)) and depends only on airspeed and bank, not weight or aircraft type. Speed enters squared -- doubling the speed quadruples the radius -- which is why a fast jet needs miles to turn and a trainer needs yards. The rate of turn (degrees per second) is the flip side: for a given bank a slower aircraft turns a smaller circle faster, and a standard-rate turn is 3 deg/s (a 2-minute 360). The bank for a target rate rises with speed. Level, coordinated flight assumed; a slip or a climb changes it. A planning aid, not a clearance.",
+    assumptions: [
+      { name: "Depends only on V and bank", value: "radius = V^2/(g tan bank) is independent of weight and aircraft type in coordinated level flight", source: "flight dynamics" },
+      { name: "Standard rate", value: "3 degrees per second (a 2-minute 360-degree turn)", source: "FAA AFH" },
+    ],
+  },
   "glidepath-descent-rate": {
     formula: "rod_fpm = ground_speed_kt x 101.269 x tan(glidepath_angle); ft_per_nm = 6076.12 x tan(glidepath_angle). The 101.269 converts knots (nm/hr) to ft/min (x 6076.12 / 60).",
     edition: "Required rate of descent on a glidepath (FAA Instrument Flying Handbook; TERPS Order 8260.3), by name; the approach chart and the pilot in command govern.",

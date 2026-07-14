@@ -23897,6 +23897,31 @@
       "kind": "question"
     },
     {
+      "term": "turn radius from bank angle",
+      "target": "turn-radius-bank",
+      "kind": "question"
+    },
+    {
+      "term": "coordinated turn radius",
+      "target": "turn-radius-bank",
+      "kind": "industry"
+    },
+    {
+      "term": "standard rate turn bank angle",
+      "target": "turn-radius-bank",
+      "kind": "question"
+    },
+    {
+      "term": "rate of turn from airspeed",
+      "target": "turn-radius-bank",
+      "kind": "question"
+    },
+    {
+      "term": "how tight can an aircraft turn",
+      "target": "turn-radius-bank",
+      "kind": "question"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"
