@@ -14660,6 +14660,7 @@ test("bounds: spec-v286 computeRcHookDevelopment pins the db^1.5 scaling, the ps
 
 // ===================== spec-v287..v289 geotechnical foundation depth batch =====================
 import { computeSoilSettlementElastic as _v287, computePileAxialCapacity as _v288, computeSlopeStabilityInfinite as _v289 } from "../../calc-geotech.js";
+import { computePileLengthForCapacity as _v706 } from "../../calc-geotech.js";
 
 test("bounds: spec-v287 computeSoilSettlementElastic pins the medium-sand case, the 1/Es scaling, and error seams", () => {
   const r = _v287({ q_ksf: 3, b_ft: 6, es_ksf: 250, nu: 0.3, is_f: 0.82 });
@@ -14695,6 +14696,37 @@ test("bounds: spec-v288 computePileAxialCapacity pins the friction pile, the sha
   assert.ok("error" in _v288({ d_ft: D, l_ft: 40, cu_ksf: 1, alpha: 1.2 }));
   assert.ok("error" in _v288({ d_ft: D, l_ft: 40, cu_ksf: 1, fs: 0 }));
   assert.ok("error" in _v288({ d_ft: NaN, l_ft: 40, cu_ksf: 1 }));
+});
+
+test("bounds: spec-v706 computePileLengthForCapacity pins L=(Qall FS - Qp)/(alpha cu pi D), round-trips through computePileAxialCapacity, and error seams", () => {
+  const D = 16 / 12;
+  const r = _v706({ qall_target_kip: 50, d_ft: D, cu_ksf: 1, alpha: 0.55, fs: 3 });
+  assert.ok(!r.error, JSON.stringify(r));
+  const qp = 9 * Math.PI * D * D / 4;
+  assert.ok(Math.abs(r.l_ft - (50 * 3 - qp) / (0.55 * 1 * Math.PI * D)) < 1e-9, `L identity: ${r.l_ft}`);
+  assert.ok(Math.abs(r.l_ft - 59.656) < 1e-2, `pinned 59.7 ft: ${r.l_ft}`);
+  // Round-trip: at the required length the forward tile's allowable equals the target.
+  for (const qall_target_kip of [20, 50, 120]) {
+    for (const d_ft of [1, 1.3333, 2]) {
+      for (const cu_ksf of [0.5, 1, 2]) {
+        const m = _v706({ qall_target_kip, d_ft, cu_ksf, alpha: 0.55, fs: 3 });
+        if (m.error) continue; // tip-alone-suffices cases are legitimately rejected
+        assertFinite(m.l_ft, "L"); assert.ok(m.l_ft > 0, "L positive");
+        const back = _v288({ d_ft, l_ft: m.l_ft, cu_ksf, alpha: 0.55, fs: 3 });
+        assert.ok(Math.abs(back.qall_kip - qall_target_kip) < 1e-6, `round-trip q=${qall_target_kip} D=${d_ft} cu=${cu_ksf}: ${back.qall_kip}`);
+      }
+    }
+  }
+  // A higher target needs more length.
+  assert.ok(_v706({ qall_target_kip: 80, d_ft: D, cu_ksf: 1, alpha: 0.55, fs: 3 }).l_ft > r.l_ft);
+  // End bearing alone meeting the demand is rejected (a fat, short, high-cu pile).
+  assert.ok("error" in _v706({ qall_target_kip: 3, d_ft: 3, cu_ksf: 2, alpha: 0.55, fs: 3 }));
+  // Error seams: non-positive target, diameter, cu, alpha out of range, non-finite.
+  assert.ok("error" in _v706({ qall_target_kip: 0, d_ft: D, cu_ksf: 1 }));
+  assert.ok("error" in _v706({ qall_target_kip: 50, d_ft: 0, cu_ksf: 1 }));
+  assert.ok("error" in _v706({ qall_target_kip: 50, d_ft: D, cu_ksf: 0 }));
+  assert.ok("error" in _v706({ qall_target_kip: 50, d_ft: D, cu_ksf: 1, alpha: 1.2 }));
+  assert.ok("error" in _v706({ qall_target_kip: Infinity, d_ft: D, cu_ksf: 1 }));
 });
 
 test("bounds: spec-v289 computeSlopeStabilityInfinite pins the cohesive cut, the cohesionless identity, the repose point, and error seams", () => {

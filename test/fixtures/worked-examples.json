@@ -41567,6 +41567,36 @@
    }
   },
   {
+   "tile_id": "pile-length-for-capacity",
+   "source_publisher": "Alpha (total-stress) pile method (FHWA / Das)",
+   "source_title": "L = (Qall FS - Qp) / (alpha cu pi D); inverse of the alpha-method capacity",
+   "source_edition_or_year": "spec-v706 worked example (machine-verified; inverse of spec-v288)",
+   "source_section_or_page": "50 kip target, 16 in pile, cu 1 ksf, alpha 0.55, FS 3 -> 59.7 ft",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "qall_target_kip": 50,
+    "d_ft": 1.333333,
+    "cu_ksf": 1,
+    "alpha": 0.55,
+    "fs": 3
+   },
+   "outputs": {
+    "l_ft": {
+     "value": 59.656,
+     "tolerance": {
+      "pct": 0.2
+     }
+    },
+    "qp_kip": {
+     "value": 12.57,
+     "tolerance": {
+      "pct": 0.2
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pile-axial-capacity",
    "source_publisher": "Alpha (total-stress) pile method (FHWA / Das)",
    "source_title": "cross-check: double the length to 80 ft -> shaft doubles, tip stays, Qall 65.6 kip",

@@ -42862,6 +42862,31 @@
       "kind": "question"
     },
     {
+      "term": "how long a pile for 50 kip",
+      "target": "pile-length-for-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "pile length for target capacity",
+      "target": "pile-length-for-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how deep to drive a friction pile",
+      "target": "pile-length-for-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "embedment length for pile load",
+      "target": "pile-length-for-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "pile length in clay for allowable load",
+      "target": "pile-length-for-capacity",
+      "kind": "question"
+    },
+    {
       "term": "will my cut slope hold",
       "target": "slope-stability-infinite",
       "kind": "question"

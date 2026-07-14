@@ -496,6 +496,56 @@ GEOTECH_RENDERERS["pile-axial-capacity"] = _simpleRenderer({
   compute: computePileAxialCapacity,
 });
 
+// pile-length-for-capacity: inverse of pile-axial-capacity. The forward tile
+// gives Qall from a length; sizing the embedment for a target load is the
+// inverse. Qult = Qall x FS; the tip Qp = 9 cu (pi D^2/4) is independent of L,
+// so the skin friction must supply Qult - Qp, giving
+// L = (Qall x FS - Qp) / (alpha cu pi D).
+// dims: in { qall_target_kip: M T^-2, d_ft: L, cu_ksf: M L^-1 T^-2, alpha: dimensionless, fs: dimensionless } out: { l_ft: L, qp_kip: M T^-2, qs_required_kip: M T^-2, qult_kip: M T^-2 }
+export function computePileLengthForCapacity({ qall_target_kip = 0, d_ft = 0, cu_ksf = 0, alpha = 0.55, fs = 3 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const qall = Number(qall_target_kip) || 0;
+  const D = Number(d_ft) || 0;
+  const cu = Number(cu_ksf) || 0;
+  const a = Number(alpha) || 0;
+  const FS = Number(fs) || 0;
+  if (!(qall > 0)) return { error: "Target allowable capacity must be positive (kip)." };
+  if (!(D > 0)) return { error: "Pile diameter must be positive (ft)." };
+  if (!(cu > 0)) return { error: "Undrained shear strength must be positive (ksf)." };
+  if (!(a > 0 && a <= 1)) return { error: "The adhesion factor alpha is over 0 and up to 1.0." };
+  if (!(FS > 0)) return { error: "The factor of safety must be positive." };
+  const qult_kip = qall * FS;
+  const ap_ft2 = (Math.PI * D * D) / 4;
+  const qp_kip = 9 * cu * ap_ft2;
+  const qs_required_kip = qult_kip - qp_kip;
+  if (!(qs_required_kip > 0)) return { error: "End bearing alone (" + qp_kip.toFixed(1) + " kip) already meets the ultimate target; reduce the target load or the diameter -- a real pile still needs minimum embedment and a load test." };
+  const l_ft = qs_required_kip / (a * cu * Math.PI * D);
+  return {
+    l_ft, qp_kip, qs_required_kip, qult_kip,
+    note: "Alpha (total-stress) method solved for the embedment: the ultimate demand is Qall x FS, the end bearing Qp = 9 cu (pi D^2/4) is fixed by the diameter, and the skin friction alpha cu (pi D L) must supply the rest, so L = (Qall x FS - Qp) / (alpha cu pi D). Single straight-shaft pile in one uniform cohesive layer - not the beta method for sand, no group efficiency, no negative skin friction or uplift, no driving/dynamic capacity. A design aid; the geotechnical engineer of record and, where required, a load test govern.",
+  };
+}
+export const pileLengthForCapacityExample = { inputs: { qall_target_kip: 50, d_ft: 1.3333, cu_ksf: 1, alpha: 0.55, fs: 3 } };
+GEOTECH_RENDERERS["pile-length-for-capacity"] = _simpleRenderer({
+  citation: "Citation: alpha (total-stress) pile capacity Qult = alpha cu (pi D L) + 9 cu (pi D^2/4) solved for the embedment L = (Qall FS - Qp) / (alpha cu pi D), with the adhesion factor and Nc = 9 per the FHWA / Das foundation references, by name. Single pile, uniform clay. A design aid; the geotechnical engineer and a load test govern.",
+  example: pileLengthForCapacityExample.inputs,
+  fields: [
+    { key: "qall_target_kip", label: "Target allowable capacity Qall (kip)", kind: "number", default: 50 },
+    { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
+    { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
+    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
+    { key: "fs", label: "Factor of safety FS", kind: "number", default: 3 },
+  ],
+  outputs: [
+    { key: "l", id: "plc-out-l", label: "Required embedded length L", value: (r) => fmt(r.l_ft, 1) + " ft" },
+    { key: "qp", id: "plc-out-qp", label: "End bearing Qp (Nc = 9)", value: (r) => fmt(r.qp_kip, 1) + " kip" },
+    { key: "qs", id: "plc-out-qs", label: "Skin friction required", value: (r) => fmt(r.qs_required_kip, 1) + " kip" },
+    { key: "qu", id: "plc-out-qu", label: "Ultimate demand Qall x FS", value: (r) => fmt(r.qult_kip, 1) + " kip" },
+    { key: "n", id: "plc-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computePileLengthForCapacity,
+});
+
 // dims: in { beta_deg: dimensionless, phi_deg: dimensionless, c_psf: M L^-1 T^-2, gamma_pcf: M L^-2 T^-2, h_ft: L } out: { driving_psf: M L^-1 T^-2, resisting_psf: M L^-1 T^-2, fs_slope: dimensionless }
 export function computeSlopeStabilityInfinite({ beta_deg = 0, phi_deg = 0, c_psf = 0, gamma_pcf = 120, h_ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

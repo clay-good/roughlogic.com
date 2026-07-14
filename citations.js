@@ -10687,6 +10687,18 @@ export const CITATIONS = {
       { name: "Safety factor", value: "the customary 2 to 3 on ultimate without a static load test", source: "FHWA driven-pile practice" },
     ],
   },
+  "pile-length-for-capacity": {
+    formula: "L = (Qall x FS - Qp) / (alpha cu pi D), with Qp = 9 cu (pi D^2/4); the alpha-method Qult = alpha cu (pi D L) + Qp solved for the embedded length.",
+    edition: "The alpha (total-stress) method for a pile in clay, as compiled in the FHWA driven-pile manual and Das (Principles of Foundation Engineering), with the customary factor of safety of 2 to 3 without a load test, by name.",
+    freeAccess: "The FHWA driven-pile design manuals are free at fhwa.dot.gov; the alpha-method relations are public in the standard foundation texts.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of pile-axial-capacity: the embedded length that carries a target allowable load. The ultimate demand is Qall x FS; the end bearing Qp = 9 cu (pi D^2/4) is fixed by the diameter, so the skin friction alpha cu (pi D L) must supply the remainder. If the tip alone already meets the demand the tool flags it (a real pile still needs minimum embedment). Single straight-shaft pile in one uniform cohesive layer, total-stress method - no beta method for sand, group efficiency, negative skin friction, uplift, or driving capacity. A design aid; the geotechnical engineer of record and, where required, a load test govern.",
+    assumptions: [
+      { name: "Skin friction supplies the remainder", value: "L sized so alpha cu (pi D L) = Qall x FS - Qp", source: "FHWA / Das alpha method" },
+      { name: "End bearing", value: "qp = 9 cu over the tip area (Nc = 9 for a deep foundation in clay)", source: "Skempton / FHWA" },
+      { name: "Safety factor", value: "the customary 2 to 3 on ultimate without a static load test", source: "FHWA driven-pile practice" },
+    ],
+  },
   "slope-stability-infinite": {
     formula: "driving = gamma H sin(beta) cos(beta); resisting = c' + gamma H cos^2(beta) tan(phi'); FS = resisting / driving. (c' = 0 collapses to FS = tan(phi')/tan(beta))",
     edition: "The infinite-slope stability model -- the factor of safety of a shallow translational slide on a plane parallel to a long uniform slope, with its cohesionless reduction tan(phi')/tan(beta) -- as compiled in Das (Principles of Geotechnical Engineering) and the NAVFAC DM-7 slope-stability references, by name.",

@@ -1255,6 +1255,7 @@ const RELATED = {
   // spec-v287..v289 geotechnical foundation depth batch (Group E)
   "soil-settlement-elastic": ["soil-bearing-capacity","footing-area","pile-axial-capacity"],
   "pile-axial-capacity": ["helical-pile","soil-bearing-capacity","soil-settlement-elastic"],
+  "pile-length-for-capacity": ["pile-axial-capacity","helical-pile","pile-group-efficiency","soil-bearing-capacity"],
   "pile-group-efficiency": ["pile-axial-capacity","helical-pile","soil-bearing-capacity"],
   "slope-stability-infinite": ["retaining-wall-stability","lateral-earth-pressure","trench-slope"],
   "slope-stability-seepage": ["slope-stability-infinite","submerged-earth-pressure","soil-bearing-capacity"],
