@@ -142,6 +142,7 @@ const _TILES = [
   ["evaporation-load", "D"],
   ["economizer-savings-hours", "C"],
   ["pipe-heat-loss-radial", "C"],
+  ["insulation-thickness-for-heat-loss", "C"],
   ["fan-motor-bhp", "C"], ["fan-motor-max-airflow", "C"],
   ["thermal-expansion-volume", "B"],
   ["vent-sizing-stack", "B"],

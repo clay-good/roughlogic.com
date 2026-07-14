@@ -15470,6 +15470,36 @@
    }
   },
   {
+   "tile_id": "insulation-thickness-for-heat-loss",
+   "source_publisher": "Fourier cylindrical-shell conduction + ASTM C335 k-values (solved for thickness)",
+   "source_title": "thickness = (od/2) x (exp(2*pi*(k/12)*(hot-amb)/q) - 1)",
+   "source_edition_or_year": "public heat-transfer formula",
+   "source_section_or_page": "od 2 in, k 0.25, 200 vs 70 F, target 40 BTU/hr-ft -> 0.530 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "od_in": 2,
+    "k_value": 0.25,
+    "hot_f": 200,
+    "amb_f": 70,
+    "target_q_per_ft_btuh": 40
+   },
+   "outputs": {
+    "thickness_in": {
+     "value": 0.5302,
+     "tolerance": {
+      "abs": 0.002
+     }
+    },
+    "r2_in": {
+     "value": 1.5302,
+     "tolerance": {
+      "abs": 0.002
+     }
+    }
+   }
+  },
+  {
    "tile_id": "fan-motor-bhp",
    "source_publisher": "AMCA / ASHRAE fan-power relation + NEMA MG 1 sizes",
    "source_title": "AHP = CFM*TSP/6356; BHP = AHP/eta_fan",

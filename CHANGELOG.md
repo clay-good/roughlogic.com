@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v746 pipe insulation thickness for a target heat loss (pipe-heat-loss-radial inverse); 2026-07-14
+
+- New tile `insulation-thickness-for-heat-loss` (Group C, calc-hvac.js): the insulation thickness that caps radial pipe
+  heat loss at a target rate. `thickness = (od/2) x (exp(2*pi*(k/12)*(hot-amb)/q) - 1)`. A 2 in pipe at 200 F in 70 F air
+  with k 0.25 held to 40 BTU/hr/ft needs ~0.53 in. Targets a heat-loss budget (distinct from the surface-temperature
+  `insulation-thickness` tile). Round-trips through `pipe-heat-loss-radial`. Closes Explore sweep #13. Home tile count
+  1,194 -> 1,195.
+
 ### feat(plumbing): spec-v745 max line pressure for a thrust block (thrust-block-sizing inverse); 2026-07-14
 
 - New tile `thrust-block-max-pressure` (Group B, calc-plumbing.js): the highest test/surge pressure a thrust block of a

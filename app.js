@@ -285,7 +285,7 @@ const TOOL_MODULES = (() => {
     // v9
     "outdoor-air-ventilation", "hood-exhaust", "shr-latent",
     // v20
-    "economizer-savings-hours", "pipe-heat-loss-radial", "fan-motor-bhp", "fan-motor-max-airflow",
+    "economizer-savings-hours", "pipe-heat-loss-radial", "insulation-thickness-for-heat-loss", "fan-motor-bhp", "fan-motor-max-airflow",
     // v27 round-to-rectangular duct equivalent
     "round-to-rect-duct",
     // v99 building-envelope insulation

@@ -1937,6 +1937,31 @@
       "kind": "industry"
     },
     {
+      "term": "insulation thickness for heat loss",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "industry"
+    },
+    {
+      "term": "insulation for heat loss budget",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "redirect"
+    },
+    {
+      "term": "thickness to cap heat loss",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "adjacent"
+    },
+    {
+      "term": "insulation thickness for btu",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "adjacent"
+    },
+    {
+      "term": "how much insulation for heat loss",
+      "target": "insulation-thickness-for-heat-loss",
+      "kind": "adjacent"
+    },
+    {
       "term": "insulation heat loss",
       "target": "pipe-heat-loss-radial",
       "kind": "redirect"

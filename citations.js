@@ -1179,6 +1179,17 @@ export const CITATIONS = {
     ],
   },
 
+  "insulation-thickness-for-heat-loss": {
+    formula: "thickness = (OD/2) x (exp(2*pi*k'*(T_hot - T_amb)/q) - 1), the inverse of q = 2*pi*k'*(T_hot - T_amb)/ln(r2/r1), where r1 = OD/2, k' = k_value/12 (BTU/(hr.ft.F)), and q is the target heat loss per foot.",
+    edition: "Fourier conduction through a cylindrical shell (public heat-transfer formula), solved for the thickness; insulation k-values per ASHRAE Fundamentals / ASTM C335, by name.",
+    freeAccess: "Free principles in published HVAC texts; k-values user-supplied.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "Single-formula radial log-mean conduction solved for the insulation thickness that caps the heat loss at a target rate per foot. This targets a HEAT-LOSS budget (energy code, process, freeze protection), distinct from the insulation-thickness tile that targets a surface temperature. Round up to a stocked wall thickness and re-check. The k-value rises with temperature (use k at the mean insulation temperature); this is conduction only and ignores the outer-surface air film (which reduces the loss a little, so the thickness is conservative).",
+    assumptions: [
+      { name: "k at mean temperature", value: "insulation conductivity rises with temperature; the value entered is at the mean insulation temperature", source: "ASTM C335" },
+      { name: "Conduction only", value: "ignores the outer-surface air film, so the required thickness is slightly conservative", source: "scope of this tile" },
+    ],
+  },
   "pipe-heat-loss-radial": {
     formula: "Q/L = 2*pi*k'*(T_hot - T_amb) / ln(r2/r1), where r1 = OD/2, r2 = r1 + thickness, and k' = k_value / 12 converts BTU-in/(hr.ft2.F) to BTU/(hr.ft.F).",
     edition: "Fourier conduction through a cylindrical shell (public heat-transfer formula); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name.",

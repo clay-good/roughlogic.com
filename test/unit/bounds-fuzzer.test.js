@@ -9494,6 +9494,26 @@ test("bounds: calc-hvac v20 C tiles pin constants + reject non-finite", () => {
   assert.ok("error" in _c3({ cfm: Infinity, tsp_inwc: 2.0, eta_fan: 0.65 }));
 });
 
+import { computeInsulationThicknessForHeatLoss as _v746 } from "../../calc-hvac.js";
+test("bounds: spec-v746 insulation thickness for a target heat loss (inverse of pipe-heat-loss-radial)", () => {
+  const p = _v746({ od_in: 2, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 40 });
+  assert.ok(Math.abs(p.thickness_in - 0.5302) < 0.001);
+  // round-trip: the recovered thickness fed to pipe-heat-loss-radial reproduces the target heat-loss rate
+  for (const [od, k, hot, amb, q] of [[2, 0.25, 200, 70, 40], [4, 0.3, 350, 60, 60], [1.5, 0.22, 180, 70, 25], [6, 0.4, 250, 40, 100]]) {
+    const inv = _v746({ od_in: od, k_value: k, hot_f: hot, amb_f: amb, target_q_per_ft_btuh: q });
+    const fwd = _c2({ od_in: od, thickness_in: inv.thickness_in, k_value: k, hot_f: hot, amb_f: amb, length_ft: 1 });
+    assert.ok(Math.abs(fwd.q_per_ft_btuh - q) < 1e-6);
+  }
+  // a tighter (lower) heat-loss target needs more insulation; a higher target needs less
+  assert.ok(_v746({ od_in: 2, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 20 }).thickness_in > _v746({ od_in: 2, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 40 }).thickness_in);
+  // error seams: non-positive od/k/q, hot <= amb, non-finite
+  assert.ok("error" in _v746({ od_in: 0, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 40 }));
+  assert.ok("error" in _v746({ od_in: 2, k_value: 0, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 40 }));
+  assert.ok("error" in _v746({ od_in: 2, k_value: 0.25, hot_f: 60, amb_f: 70, target_q_per_ft_btuh: 40 }));
+  assert.ok("error" in _v746({ od_in: 2, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 0 }));
+  assert.ok("error" in _v746({ od_in: 2, k_value: 0.25, hot_f: Infinity, amb_f: 70, target_q_per_ft_btuh: 40 }));
+});
+
 test("bounds: spec-v686 computeFanMotorMaxAirflow pins CFM = 6356 BHP eta_fan / TSP, the motor/brake basis, round-trips through computeFanMotorBhp, and error seams", () => {
   const r = _v686({ power_hp: 1.9363896015878395, power_basis: "brake", tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 1 });
   assert.ok(!r.error, JSON.stringify(r));

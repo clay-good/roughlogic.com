@@ -2682,6 +2682,57 @@ function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["pipe-heat-loss-radial"] = renderPipeHeatLossRadial;
 
+// --- v746 C: insulation thickness for a target radial heat-loss rate (inverse of pipe-heat-loss-radial) ---
+// The forward tile gives the heat loss from the insulation thickness; the inverse recovers the insulation thickness that
+// caps the radial heat loss at a target rate per foot, so a designer sizes insulation to a heat-loss (energy-code /
+// process) budget rather than a surface temperature (the separate insulation-thickness tile does that). From
+// q = 2*pi*(k/12)*(hot - amb) / ln(r2/r1) with r1 = od/2, ln(r2/r1) = 2*pi*(k/12)*(hot - amb)/q, so
+// r2 = r1*exp(...) and thickness = r2 - r1.
+// dims: in { od_in: L, k_value: dimensionless, hot_f: T, amb_f: T, target_q_per_ft_btuh: M*L*T^-3 } out: { thickness_in: L, r2_in: L }
+export function computeInsulationThicknessForHeatLoss({ od_in = 0, k_value = 0, hot_f = 0, amb_f = 0, target_q_per_ft_btuh = 0 } = {}) {
+  const od = Number(od_in) || 0;
+  const k = Number(k_value) || 0;
+  const hot = Number(hot_f), amb = Number(amb_f);
+  const q = Number(target_q_per_ft_btuh) || 0;
+  if (!(od > 0 && Number.isFinite(od))) return { error: "Pipe outer diameter must be positive (in)." };
+  if (!(k > 0 && Number.isFinite(k))) return { error: "Insulation k-value must be positive (BTU-in/hr-ft2-F)." };
+  if (!Number.isFinite(hot) || !Number.isFinite(amb)) return { error: "Temperatures must be finite (F)." };
+  if (!(hot > amb)) return { error: "Hot surface must be above ambient (no outward heat loss to cap otherwise)." };
+  if (!(q > 0)) return { error: "Target heat-loss rate must be positive (BTU/hr per ft)." };
+  const r1 = od / 2;
+  const kFt = k / 12;
+  const r2_in = r1 * Math.exp(2 * Math.PI * kFt * (hot - amb) / q);
+  const thickness_in = r2_in - r1;
+  if (![r2_in, thickness_in].every(Number.isFinite)) return { error: "Insulation-thickness math is not a finite value." };
+  return {
+    thickness_in, r2_in,
+    note: "Insulation thickness to cap radial heat loss at a target rate: thickness = (od/2) x (exp(2*pi*(k/12)*(hot - amb) / q) - 1), the inverse of the log-mean cylindrical conduction q = 2*pi*(k/12)*(hot - amb)/ln(r2/r1). This targets a HEAT-LOSS budget (energy code, process, freeze protection), not a surface temperature (the separate insulation-thickness tile does that). Round UP to a stocked wall thickness and re-check. The k-value rises with temperature - use k at the mean insulation temperature - and this is conduction only, ignoring the outer-surface air film (which reduces the loss a little, so this is conservative). A design aid; ASHRAE Fundamentals / ASTM C335 and the insulation manufacturer govern.",
+  };
+}
+export const insulationThicknessForHeatLossExample = { inputs: { od_in: 2, k_value: 0.25, hot_f: 200, amb_f: 70, target_q_per_ft_btuh: 40 } };
+function renderInsulationThicknessForHeatLoss(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Fourier conduction through a cylindrical shell (public heat-transfer formula) solved for the thickness: thickness = (od/2) x (exp(2*pi*(k/12)*(hot - amb)/q) - 1); insulation k-values per ASHRAE Fundamentals / ASTM C335, by name (user-supplied). Targets a heat-loss budget, not a surface temperature. k is at the mean insulation temperature; conduction only (ignores the outer air film, so conservative).";
+  const od = makeNumber("Pipe outer diameter (in)", "itl-od", { step: "any", min: "0", value: "2" }); od.input.value = "2";
+  const k = makeNumber("Insulation k (BTU-in/hr-ft2-F)", "itl-k", { step: "any", min: "0", value: "0.25" }); k.input.value = "0.25";
+  const hot = makeNumber("Hot surface temp (F)", "itl-hot", { step: "any", value: "200" }); hot.input.value = "200";
+  const amb = makeNumber("Ambient temp (F)", "itl-amb", { step: "any", value: "70" }); amb.input.value = "70";
+  const q = makeNumber("Target heat loss (BTU/hr per ft)", "itl-q", { step: "any", min: "0", value: "40" }); q.input.value = "40";
+  for (const f of [od, k, hot, amb, q]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { od.input.value = "2"; k.input.value = "0.25"; hot.input.value = "200"; amb.input.value = "70"; q.input.value = "40"; update(); });
+  const oTh = makeOutputLine(outputRegion, "Required insulation thickness", "itl-out-th");
+  const oR = makeOutputLine(outputRegion, "Outer radius over insulation", "itl-out-r");
+  const oNote = makeOutputLine(outputRegion, "Note", "itl-out-n");
+  const update = debounce(() => {
+    const r = computeInsulationThicknessForHeatLoss({ od_in: Number(od.input.value) || 0, k_value: Number(k.input.value) || 0, hot_f: Number(hot.input.value), amb_f: Number(amb.input.value), target_q_per_ft_btuh: Number(q.input.value) || 0 });
+    if (r.error) { oTh.textContent = r.error; oR.textContent = "-"; oNote.textContent = ""; return; }
+    oTh.textContent = fmt(r.thickness_in, 3) + " in";
+    oR.textContent = fmt(r.r2_in, 3) + " in (" + fmt(r.r2_in * 2, 3) + " in OD over insulation)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [od, k, hot, amb, q]) f.input.addEventListener("input", update);
+}
+HVAC_RENDERERS["insulation-thickness-for-heat-loss"] = renderInsulationThicknessForHeatLoss;
+
 // --- v20 C.3: Fan brake horsepower (`fan-motor-bhp`) ---
 // AHP = CFM * TSP / 6356; BHP = AHP / eta_fan; motor HP = BHP / eta_drive,
 // rounded up to the next standard NEMA size.
