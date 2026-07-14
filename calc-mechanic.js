@@ -1671,6 +1671,44 @@ MECHANIC_RENDERERS["crouch-planing-speed"] = _simpleRenderer({
   compute: computeCrouchPlaningSpeed,
 });
 
+// ===================== spec-v671: horsepower for a target planing speed (inverse of crouch-planing-speed) =====================
+
+// dims: in { target_speed_mph: L T^-1, displacement_lb: M L T^-2, hull_constant: dimensionless } out: { required_hp: M L^2 T^-3, weight_to_power: dimensionless }
+export function computeCrouchHpForSpeed({ target_speed_mph = 0, displacement_lb = 0, hull_constant = 190 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const v = Number(target_speed_mph) || 0;
+  const wt = Number(displacement_lb) || 0;
+  const c = Number(hull_constant) || 0;
+  if (!(v > 0)) return { error: "Target speed must be positive (mph)." };
+  if (!(wt > 0)) return { error: "Displacement must be positive (lb)." };
+  if (!(c > 0)) return { error: "Hull constant C must be positive." };
+  // Inverse of speed = C sqrt(hp / weight): hp = weight x (speed / C)^2.
+  const required_hp = wt * Math.pow(v / c, 2);
+  const weight_to_power = wt / required_hp;
+  if (![required_hp, weight_to_power].every(Number.isFinite) || !(required_hp > 0)) return { error: "Crouch-power math is not a finite value." };
+  return {
+    required_hp, weight_to_power,
+    note: "The shaft horsepower Crouch's formula says a planing hull needs for a target speed, the inverse of the crouch-planing-speed tile: from speed_mph = C / sqrt(weight / hp), hp = weight x (speed / C)^2. Because speed rises only with the square root of the power-to-weight ratio, the horsepower rises with the SQUARE of the target speed - going 40% faster needs about twice the power, and the last few mph are the most expensive. The answer is for speed in MILES PER HOUR (not knots) with the conventional hull constant C (about 150 heavy cruiser, 190 runabout, 210 race), chosen by hull type. The formula assumes the boat is on plane; below the planing threshold it does not apply. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+  };
+}
+export const crouchHpForSpeedExample = { inputs: { target_speed_mph: 34.7, displacement_lb: 6000, hull_constant: 190 } };
+
+MECHANIC_RENDERERS["crouch-hp-for-speed"] = _simpleRenderer({
+  citation: "Citation: Crouch's planing-speed formula solved for the power: hp = weight x (speed / C)^2, from speed_mph = C / sqrt(weight / hp), with the hull constant C about 150 heavy cruiser / 190 runabout / 210 race. Speed is mph, not knots; horsepower rises with the square of the target speed. Assumes the boat is on plane. A planning estimate; the hull, propeller, and conditions govern.",
+  example: crouchHpForSpeedExample.inputs,
+  fields: [
+    { key: "target_speed_mph", label: "Target planing speed (mph)", kind: "number", default: 34.7 },
+    { key: "displacement_lb", label: "Loaded displacement (lb)", kind: "number", default: 6000 },
+    { key: "hull_constant", label: "Hull constant C (150 cruiser / 190 runabout / 210 race)", kind: "number", default: 190 },
+  ],
+  outputs: [
+    { key: "hp", id: "chfs-out-hp", label: "Required shaft horsepower", value: (r) => fmt(r.required_hp, 0) + " hp" },
+    { key: "wp", id: "chfs-out-wp", label: "Weight-to-power ratio", value: (r) => fmt(r.weight_to_power, 1) + " lb/hp" },
+    { key: "n", id: "chfs-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeCrouchHpForSpeed,
+});
+
 // ===================== spec-v510: wheel offset and backspacing =====================
 
 // dims: in { rim_width_in: L, offset_mm: L, backspacing_in: L } out: { overall_width_in: L, backspacing_out_in: L, offset_mm_out: L, frontspacing_in: L }

@@ -855,7 +855,7 @@ const TOOL_MODULES = (() => {
     // spec-v506 turbocharger pressure ratio and charge-air temp
     "turbo-pressure-ratio",
     // spec-v507 Crouch planing-speed estimate
-    "crouch-planing-speed",
+    "crouch-planing-speed", "crouch-hp-for-speed",
     // spec-v510 wheel offset and backspacing
     "wheel-offset-backspacing",
     // spec-v514 brake pedal ratio and line pressure

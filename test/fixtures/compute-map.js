@@ -786,6 +786,7 @@ export const COMPUTE_MAP = {
   "anchor-rode-scope": { module: "../../calc-mechanic.js", fn: "computeAnchorRodeScope" },
   "turbo-pressure-ratio": { module: "../../calc-mechanic.js", fn: "computeTurboPressureRatio" },
   "crouch-planing-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchPlaningSpeed" },
+  "crouch-hp-for-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchHpForSpeed" },
   "def-consumption": { module: "../../calc-trucking.js", fn: "computeDefConsumption" },
   "countersink-depth": { module: "../../calc-machining.js", fn: "computeCountersinkDepth" },
   "wheel-offset-backspacing": { module: "../../calc-mechanic.js", fn: "computeWheelOffsetBackspacing" },

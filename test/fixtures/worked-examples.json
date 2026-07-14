@@ -51292,6 +51292,50 @@
    }
   },
   {
+   "tile_id": "crouch-hp-for-speed",
+   "source_publisher": "Crouch's planing-speed formula (inverse)",
+   "source_title": "6,000 lb runabout targeting 34.7 mph at C = 190 -> 200 hp (round-trips the forward pinned example)",
+   "source_edition_or_year": "spec-v671 worked example (machine-verified)",
+   "source_section_or_page": "spec-v671 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_speed_mph": 34.7,
+    "displacement_lb": 6000,
+    "hull_constant": 190
+   },
+   "outputs": {
+    "required_hp": {
+     "value": 200.1,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "crouch-hp-for-speed",
+   "source_publisher": "Crouch's planing-speed formula (inverse)",
+   "source_title": "cross-check: 49.1 mph needs about 400 hp -- 40% more speed roughly doubles the power (square law)",
+   "source_edition_or_year": "spec-v671 cross-check (machine-verified)",
+   "source_section_or_page": "spec-v671 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_speed_mph": 49.1,
+    "displacement_lb": 6000,
+    "hull_constant": 190
+   },
+   "outputs": {
+    "required_hp": {
+     "value": 400.7,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "wheel-offset-backspacing",
    "source_publisher": "wheel offset / backspacing conversion (Tire & Rim Association)",
    "source_title": "8 in wheel at +45 mm offset -> 9 in overall, 6.27 in backspacing, 2.73 in frontspacing",

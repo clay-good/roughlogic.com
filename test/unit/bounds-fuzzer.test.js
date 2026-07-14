@@ -17989,7 +17989,33 @@ test("bounds: spec-v506 computeTurboPressureRatio pins the gauge-to-absolute PR,
   assert.ok("error" in _v506({ boost_psi: 15, ambient_psia: 14.7, inlet_temp_f: 80, compressor_eff_pct: 120 }));
 });
 
-import { computeCrouchPlaningSpeed as _v507 } from "../../calc-mechanic.js";
+import { computeCrouchPlaningSpeed as _v507, computeCrouchHpForSpeed as _v671 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v671 computeCrouchHpForSpeed pins hp = weight (speed/C)^2, the square-law, round-trips through computeCrouchPlaningSpeed, and error seams", () => {
+  const r = _v671({ target_speed_mph: 34.7, displacement_lb: 6000, hull_constant: 190 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.required_hp - 6000 * Math.pow(34.7 / 190, 2)) < 1e-9, `hp identity: ${r.required_hp}`);
+  assert.ok(Math.abs(r.required_hp - 200.1) < 0.5, `pinned ~200 hp: ${r.required_hp}`);
+  // Square-law: sqrt(2) times the speed needs 2x the power.
+  const faster = _v671({ target_speed_mph: 34.7 * Math.SQRT2, displacement_lb: 6000, hull_constant: 190 });
+  assert.ok(Math.abs(faster.required_hp - 2 * r.required_hp) < 1e-6, `square-law power: ${faster.required_hp}`);
+  // Round-trip: the required hp, fed back through the forward tile, reproduces the target speed.
+  for (const target_speed_mph of [20, 34.7, 60]) {
+    for (const displacement_lb of [3000, 6000, 12000]) {
+      const hull_constant = 190;
+      const m = _v671({ target_speed_mph, displacement_lb, hull_constant });
+      assert.ok(!m.error, `sweep v=${target_speed_mph} W=${displacement_lb}: ${JSON.stringify(m)}`);
+      assertFinite(m.required_hp, "hp"); assert.ok(m.required_hp > 0, "hp positive");
+      const back = _v507({ displacement_lb, shaft_hp: m.required_hp, hull_constant });
+      assert.ok(Math.abs(back.speed_mph - target_speed_mph) < 1e-9, `round-trip v=${target_speed_mph} W=${displacement_lb}: ${back.speed_mph}`);
+    }
+  }
+  // Error seams: non-finite, non-positive speed / displacement / hull constant.
+  assert.ok("error" in _v671({ target_speed_mph: Infinity, displacement_lb: 6000, hull_constant: 190 }));
+  assert.ok("error" in _v671({ target_speed_mph: 0, displacement_lb: 6000, hull_constant: 190 }));
+  assert.ok("error" in _v671({ target_speed_mph: 34.7, displacement_lb: 0, hull_constant: 190 }));
+  assert.ok("error" in _v671({ target_speed_mph: 34.7, displacement_lb: 6000, hull_constant: 0 }));
+});
 
 test("bounds: spec-v507 computeCrouchPlaningSpeed pins the Crouch speed, the sqrt(2) power return, and error seams", () => {
   const r = _v507({ displacement_lb: 6000, shaft_hp: 200, hull_constant: 190 });

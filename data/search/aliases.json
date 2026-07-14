@@ -21947,6 +21947,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "horsepower for speed",
+      "target": "crouch-hp-for-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "how much power for target speed",
+      "target": "crouch-hp-for-speed",
+      "kind": "industry"
+    },
+    {
+      "term": "boat repower horsepower",
+      "target": "crouch-hp-for-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "power needed to plane faster",
+      "target": "crouch-hp-for-speed",
+      "kind": "adjacent"
+    },
+    {
+      "term": "hp to hit a speed",
+      "target": "crouch-hp-for-speed",
+      "kind": "adjacent"
+    },
+    {
       "term": "wheel offset",
       "target": "wheel-offset-backspacing",
       "kind": "industry"

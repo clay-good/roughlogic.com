@@ -8802,6 +8802,18 @@ export const CITATIONS = {
       { name: "Hull constant", value: "C ~150 heavy cruiser, ~190 runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
     ],
   },
+  "crouch-hp-for-speed": {
+    formula: "hp = weight_lb x (speed_mph / C)^2, with the hull constant C ~150 heavy cruiser / ~190 runabout / ~210 race; the inverse of speed_mph = C / sqrt(weight / hp).",
+    edition: "Crouch's planing-speed formula (naval-architecture back-of-envelope) solved for the power, by name; the actual hull, propeller, and conditions govern.",
+    freeAccess: "Crouch's formula is a published naval-architecture estimate; the displacement, target speed, and hull constant come from the boat and its class.",
+    governance: GOVERNANCE.general,
+    editionNote: "The horsepower Crouch's formula says a planing hull needs for a target speed, the inverse of crouch-planing-speed: hp = weight x (speed / C)^2. Because speed rises only with the square root of the power-to-weight ratio, the horsepower rises with the SQUARE of the target speed - going 40% faster needs about twice the power, and the last few mph are the most expensive. The speed is MILES PER HOUR, not knots, for the conventional hull constant C (about 150 heavy cruiser, 190 runabout, 210 race), chosen by hull type. The formula assumes the boat is on plane; below the planing threshold it does not apply. A planning estimate, not a performance prediction; the actual hull, propeller, and conditions govern.",
+    assumptions: [
+      { name: "Square-law power", value: "horsepower scales with the square of the target speed, since speed scales with sqrt(hp/weight)", source: "Crouch's formula" },
+      { name: "Units", value: "the target speed is mph, not knots; do not enter a displacement hull speed in knots", source: "Crouch's formula convention" },
+      { name: "Hull constant", value: "C ~150 heavy cruiser, ~190 runabout, ~210 race; it dominates the estimate", source: "naval-architecture practice" },
+    ],
+  },
   "turbo-pressure-ratio": {
     formula: "PR = (ambient_psia + boost_psi) / ambient_psia; T_out = T_in x [1 + (PR^0.283 - 1) / (efficiency/100)] with temperatures absolute (Rankine); temp_rise = T_out - T_in.",
     edition: "Turbocharger pressure-ratio and charge-air-temperature model (compressor-map sizing; ideal-gas adiabatic compression with gamma = 1.4), first-principles, by name; the compressor map and the engine build govern.",

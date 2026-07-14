@@ -630,7 +630,7 @@ const _TILES = [
   // spec-v506 turbocharger pressure ratio and charge-air temp
   ["turbo-pressure-ratio", "K"],
   // spec-v507 Crouch planing-speed estimate
-  ["crouch-planing-speed", "K"],
+  ["crouch-planing-speed", "K"], ["crouch-hp-for-speed", "K"],
   // spec-v510 wheel offset and backspacing
   ["wheel-offset-backspacing", "K"],
   // spec-v514 brake pedal ratio and line pressure
