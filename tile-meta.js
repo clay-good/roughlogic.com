@@ -377,6 +377,7 @@ const _TILES = [
   ["wall-bracing-length", "E"], ["deck-ledger-fasteners", "E"],
   ["cargo-securement-wll", "J"], ["fuel-tax-ifta", "J"],
   ["screw-conveyor", "K"], ["screw-conveyor-rpm", "K"],
+  ["helical-spring-rate", "K"],
   ["pesticide-rei-phi", "L"],
   ["backflow-test-psi", "M"],
   ["gel-percent-agarose", "T"],

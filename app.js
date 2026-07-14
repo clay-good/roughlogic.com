@@ -833,7 +833,8 @@ const TOOL_MODULES = (() => {
     "driveshaft-crit", "driveshaft-max-length", "fuel-range", "tire-gearing", "brake-pad-life",
     // v23
     "valve-flow-coefficient", "screw-conveyor", "screw-conveyor-rpm",
-  
+    "helical-spring-rate",
+
     // v20
     "hp-from-torque", "volumetric-efficiency", "gear-mph-rpm",
     // v100 auto-body 2K paint mix

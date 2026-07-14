@@ -622,6 +622,31 @@
       "kind": "industry"
     },
     {
+      "term": "spring rate of a coil spring",
+      "target": "helical-spring-rate",
+      "kind": "question"
+    },
+    {
+      "term": "helical spring stiffness",
+      "target": "helical-spring-rate",
+      "kind": "question"
+    },
+    {
+      "term": "compression spring rate",
+      "target": "helical-spring-rate",
+      "kind": "question"
+    },
+    {
+      "term": "spring constant from wire diameter",
+      "target": "helical-spring-rate",
+      "kind": "question"
+    },
+    {
+      "term": "coil spring rate",
+      "target": "helical-spring-rate",
+      "kind": "industry"
+    },
+    {
       "term": "hp torque rpm",
       "target": "hp-from-torque",
       "kind": "redirect"

@@ -15162,6 +15162,35 @@
    }
   },
   {
+   "tile_id": "helical-spring-rate",
+   "source_publisher": "Machinery's Handbook / Shigley",
+   "source_title": "0.080 in hard-drawn wire, 0.75 in mean coil, 8 active coils -> 17.4 lb/in",
+   "source_edition_or_year": "k = G d^4 / (8 D^3 Na)",
+   "source_section_or_page": "k = 11.5e6 x 0.080^4 / (8 x 0.75^3 x 8) = 471.04 / 27.0 = 17.446 lb/in; index D/d = 9.375",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "wire_diameter_in": 0.080,
+    "mean_coil_diameter_in": 0.75,
+    "active_coils": 8,
+    "material": "hard-drawn"
+   },
+   "outputs": {
+    "spring_rate_lb_in": {
+     "value": 17.446,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "spring_index": {
+     "value": 9.375,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "trap-seal-loss",
    "source_publisher": "IPC/UPC §1002 (trap-to-vent)",
    "source_title": "Pass if developed distance <= permitted maximum; percent used",

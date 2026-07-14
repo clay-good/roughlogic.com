@@ -9527,6 +9527,7 @@ test("bounds: v23 export-function renderers are callable functions (DOM-bound se
 import { computeWallBracingLength, computeDeckLedgerFasteners } from "../../calc-construction.js";
 import { computeCargoSecurementWLL, computeFuelTaxIFTA } from "../../calc-trucking.js";
 import { computeScrewConveyor, computeScrewConveyorRpm as _v691 } from "../../calc-mechanic.js";
+import { computeHelicalSpringRate as _v770 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v691 computeScrewConveyorRpm pins rpm = target/(area*(pitch/12)*60*loading), round-trips through computeScrewConveyor, and error seams", () => {
   const fwd = computeScrewConveyor({ screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, rpm: 40, loading_fraction: 0.30 });
@@ -9552,6 +9553,38 @@ test("bounds: spec-v691 computeScrewConveyorRpm pins rpm = target/(area*(pitch/1
   assert.ok("error" in _v691({ target_ft3_hr: 220, screw_diameter_in: 9, shaft_diameter_in: 9, pitch_in: 9, loading_fraction: 0.3 }));
   assert.ok("error" in _v691({ target_ft3_hr: 220, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 1.5 }));
   assert.ok("error" in _v691({ target_ft3_hr: Infinity, screw_diameter_in: 9, shaft_diameter_in: 2.5, pitch_in: 9, loading_fraction: 0.3 }));
+});
+
+test("bounds: spec-v770 helical-spring-rate pins k = G d^4/(8 D^3 Na), the scaling laws, spring index, and error seams", () => {
+  // Spec example: d 0.080, D 0.75, Na 8, hard-drawn (G 11.5e6) -> k = 471.04/27 = 17.446 lb/in; index 9.375.
+  const r = _v770({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.spring_rate_lb_in - (11.5e6 * Math.pow(0.080, 4)) / (8 * Math.pow(0.75, 3) * 8)) < 1e-9);
+  assert.ok(Math.abs(r.spring_rate_lb_in - 17.446) < 1e-3);
+  assert.ok(Math.abs(r.spring_index - 9.375) < 1e-9);
+  assert.strictEqual(r.index_flag, null);
+  assert.strictEqual(r.shear_modulus_psi, 11.5e6);
+  // Scaling laws: k ~ d^4 (double d -> 16x), k ~ 1/D^3 (double D -> 1/8), k ~ 1/Na (double Na -> 1/2).
+  const base = _v770({ wire_diameter_in: 0.100, mean_coil_diameter_in: 1.0, active_coils: 10, material: "music-wire" });
+  const dbl_d = _v770({ wire_diameter_in: 0.200, mean_coil_diameter_in: 1.0, active_coils: 10, material: "music-wire" });
+  assert.ok(Math.abs(dbl_d.spring_rate_lb_in / base.spring_rate_lb_in - 16) < 1e-6, "k ~ d^4");
+  const dbl_D = _v770({ wire_diameter_in: 0.100, mean_coil_diameter_in: 2.0, active_coils: 10, material: "music-wire" });
+  assert.ok(Math.abs(dbl_D.spring_rate_lb_in / base.spring_rate_lb_in - 1 / 8) < 1e-9, "k ~ 1/D^3");
+  const dbl_Na = _v770({ wire_diameter_in: 0.100, mean_coil_diameter_in: 1.0, active_coils: 20, material: "music-wire" });
+  assert.ok(Math.abs(dbl_Na.spring_rate_lb_in / base.spring_rate_lb_in - 0.5) < 1e-9, "k ~ 1/Na");
+  // Material G scales the rate: music wire is stiffer than phosphor bronze in the ratio of G.
+  const mw = _v770({ wire_diameter_in: 0.1, mean_coil_diameter_in: 1, active_coils: 10, material: "music-wire" });
+  const pb = _v770({ wire_diameter_in: 0.1, mean_coil_diameter_in: 1, active_coils: 10, material: "phosphor-bronze" });
+  assert.ok(Math.abs(mw.spring_rate_lb_in / pb.spring_rate_lb_in - 11.85e6 / 6.0e6) < 1e-6);
+  // Spring-index flags at the extremes.
+  assert.ok(/< 4/.test(_v770({ wire_diameter_in: 0.25, mean_coil_diameter_in: 0.8, active_coils: 6, material: "music-wire" }).index_flag));
+  assert.ok(/> 12/.test(_v770({ wire_diameter_in: 0.05, mean_coil_diameter_in: 1.0, active_coils: 6, material: "music-wire" }).index_flag));
+  // Error seams.
+  assert.ok("error" in _v770({ wire_diameter_in: 0, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
+  assert.ok("error" in _v770({ wire_diameter_in: 0.8, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
+  assert.ok("error" in _v770({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 0, material: "hard-drawn" }));
+  assert.ok("error" in _v770({ wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "unobtanium" }));
+  assert.ok("error" in _v770({ wire_diameter_in: Infinity, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" }));
 });
 import { computeTrapSealLoss, computeWaterMeterSizing } from "../../calc-plumbing.js";
 import { computeDryingChamberCO2 } from "../../calc-restoration.js";

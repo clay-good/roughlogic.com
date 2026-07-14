@@ -2290,6 +2290,7 @@ cross-check.
 | calc-mechanic.js | `computeEtHorsepower` | `{ weight_lb = 0, et_s = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeFuelRange` | `{ fuel = "gasoline_E10", tank_gal = 0, mpg = 0, mpg_basis = "gasoline_E10", l...` | _ | _ | _ |
 | calc-mechanic.js | `computeGearMphRpm` | `{ solve_for = "mph", rpm = 0, trans_ratio = 1, axle_ratio = 0, tire_dia_in = ...` | _ | _ | _ |
+| calc-mechanic.js | `computeHelicalSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material...` | _ | _ | _ |
 | calc-mechanic.js | `computeHpFromTorque` | `{ solve_for = "hp", torque_lbft = 0, rpm = 0, hp = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHullSpeed` | `{ lwl_ft = 0, actual_speed_kn = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeHydraulicDriveFlowLimit` | `{ drive_hp = 0, psi = 0, efficiency = 0.85 } = {}` | _ | _ | _ |
@@ -2879,7 +2880,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1465.
+Row count: 1466.
 
 <!-- END function-corpus-v14 -->
 
@@ -3850,7 +3851,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (72 tiles)
+### Group K Mechanic (73 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3890,6 +3891,7 @@ per spec-v14 §13.1 second paragraph.
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-identification` | Gear Identification (Pitch from Teeth and OD) | Machinery's Handbook / AGMA (inverse ...; spec-v649 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-mph-rpm` | Gear-Ratio MPH from RPM | Drivetrain kinematics + SAE J267 tire...; 2500 RPM, 1:1, 3.55 axle, 28.5-in tire -> 59.71 MPH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `helical-spring-rate` | Helical Compression Spring Rate | Machinery's Handbook / Shigley; k = 11.5e6 x 0.080^4 / (8 x 0.75^3 x 8) = 471.04 / 27.0 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hp-from-torque` | Horsepower from Torque and RPM | Classical mechanical power (Watt) + S...; 400 lb-ft at 5000 RPM -> 380.8 HP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hull-speed` | Displacement Hull Speed and Speed/Length Ratio | displacement hull-speed relation (Fro...; spec-v502 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `hydraulic-drive-flow-limit` | Hydraulic Flow Limit from Drive Power | fluid-power engineering (inverse); 13.73 drive HP, 2000 psi, 0.85 efficiency -> 10 GPM (roun... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4283,6 +4285,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1218. Fixture-covered or reference-cadence: 1218 / 1218.
+Tile count: 1219. Fixture-covered or reference-cadence: 1219 / 1219.
 
 <!-- END tile-index-v14 -->

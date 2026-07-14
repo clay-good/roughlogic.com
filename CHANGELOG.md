@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v770 helical compression spring rate; 2026-07-14
+
+- New tile `helical-spring-rate` (Group K, calc-mechanic.js): the axial rate of a coil spring from its geometry --
+  `k = G d^4 / (8 D^3 Na)`, with the wire shear modulus G by material (music wire, hard-drawn, chrome-silicon, stainless,
+  phosphor bronze). A 0.080 in hard-drawn wire, 0.75 in mean coil, 8 active coils is 17.4 lb/in (spring index 9.4). Flags
+  a spring index outside 4-12. Fuzzer pins the d^4 / 1/D^3 / 1/Na scaling laws. calc-mechanic.js gzip cap 44000 -> 46000 B.
+  tools-data.js registry cap 185000 -> 200000 B (the eight forward tiles this batch grew the shared registry past the old
+  cap). Home count 1,218 -> 1,219.
+
 ### feat(survey): spec-v769 total-station slope-to-horizontal reduction; 2026-07-14
 
 - New tile `edm-slope-reduction` (Group P, calc-survey.js): the right-triangle reduction of an EDM/total-station slope

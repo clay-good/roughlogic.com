@@ -916,6 +916,7 @@ const RELATED = {
   "fuel-tax-ifta": ["fuel-range", "mileage-cost", "hos-math"],
   "screw-conveyor": ["screw-conveyor-rpm", "affinity-laws", "belt-pulley"],
   "screw-conveyor-rpm": ["screw-conveyor", "affinity-laws", "belt-pulley"],
+  "helical-spring-rate": ["bolt-stretch", "driveshaft-crit", "hp-from-torque"],
   "pesticide-rei-phi": ["tank-mix", "sprayer-calibration", "gpa-rate"],
   "backflow-test-psi": ["backflow", "backflow-sizing", "backflow-loss"],
   "gel-percent-agarose": ["pcr-master-mix", "molarity-dilution", "serial-dilution"],

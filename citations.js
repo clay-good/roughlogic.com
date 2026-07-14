@@ -2946,6 +2946,19 @@ export const CITATIONS = {
     ],
   },
 
+  "helical-spring-rate": {
+    formula: "k = G d^4 / (8 D^3 Na); spring index = D / d. G by material: music wire 11.85e6, hard-drawn 11.5e6, chrome-silicon 11.2e6, stainless 302 10.0e6, phosphor bronze 6.0e6 psi.",
+    edition: "Standard helical-spring rate per Machinery's Handbook and Shigley's Mechanical Engineering Design, by name; shear modulus G values from the ASTM spring-wire standards (A228 music wire, A227 hard-drawn, A401 chrome-silicon, A313 stainless, B159 phosphor bronze).",
+    freeAccess: "The rate formula is a public machine-design result; the per-material shear modulus is a published material constant.",
+    governance: GOVERNANCE.general,
+    editionNote: "The axial rate of a round-wire helical compression (or extension) spring: k = G d^4 / (8 D^3 Na), from the wire shear modulus G, wire diameter d, mean coil diameter D (= OD - d, measured to the wire centers), and the number of ACTIVE coils Na. Get Na from the total coils by the end condition (squared-and-ground Na = Nt - 2; plain Na = Nt). A good spring index D/d is 4-12 (below 4 is hard to coil, above 12 tangles/buckles). The rate is linear only away from solid height and this tile does not check wire stress (add the Wahl correction), solid height, or buckling; the spring maker's design governs.",
+    assumptions: [
+      { name: "Rate formula", value: "k = G d^4 / (8 D^3 Na), round wire, active coils Na", source: "Machinery's Handbook / Shigley" },
+      { name: "Shear modulus", value: "G by material (music wire 11.85e6 psi ... phosphor bronze 6.0e6 psi)", source: "ASTM spring-wire standards" },
+      { name: "Spring index", value: "D/d of 4-12 recommended for manufacturability", source: "spring-design practice" },
+    ],
+  },
+
   "pesticide-rei-phi": {
     formula: "REI remaining = max(0, REI_hours - hours since application); PHI remaining = max(0, PHI_days - days since application); early-entry / early-harvest violation when not yet clear.",
     edition: "EPA Worker Protection Standard 40 CFR 170 (REI) and the product label's PHI, by name.",

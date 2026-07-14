@@ -832,6 +832,59 @@ MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
   compute: computeScrewConveyorRpm,
 });
 
+// --- v770: Helical compression spring rate (`helical-spring-rate`) ---
+// Rate k = G d^4 / (8 D^3 Na), G the wire shear modulus, d the wire diameter,
+// D the mean coil diameter, Na the number of ACTIVE coils. Spring index D/d.
+export const SPRING_MATERIALS = {
+  "music-wire": { label: "Music wire (ASTM A228)", G_psi: 11850000 },
+  "hard-drawn": { label: "Hard-drawn steel (ASTM A227)", G_psi: 11500000 },
+  "chrome-silicon": { label: "Chrome-silicon (ASTM A401)", G_psi: 11200000 },
+  "stainless-302": { label: "Stainless 302/304 (ASTM A313)", G_psi: 10000000 },
+  "phosphor-bronze": { label: "Phosphor bronze (ASTM B159)", G_psi: 6000000 },
+};
+
+// dims: in { wire_diameter_in: L, mean_coil_diameter_in: L, active_coils: dimensionless, material: dimensionless } out: { spring_rate_lb_in: M T^-2, spring_index: dimensionless, shear_modulus_psi: M L^-1 T^-2 }
+export function computeHelicalSpringRate({ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, material = "music-wire" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(wire_diameter_in) || 0;
+  const D = Number(mean_coil_diameter_in) || 0;
+  const Na = Number(active_coils) || 0;
+  const m = SPRING_MATERIALS[material];
+  if (!m) return { error: "Unknown spring material." };
+  if (!(d > 0)) return { error: "Wire diameter must be positive (in)." };
+  if (!(D > d)) return { error: "Mean coil diameter must be greater than the wire diameter (in)." };
+  if (!(Na > 0)) return { error: "Active coils must be positive." };
+  const G = m.G_psi;
+  const spring_rate_lb_in = (G * Math.pow(d, 4)) / (8 * Math.pow(D, 3) * Na);
+  const spring_index = D / d;
+  const index_flag = spring_index < 4
+    ? "Spring index D/d < 4: hard to coil and high stress concentration."
+    : spring_index > 12
+      ? "Spring index D/d > 12: the spring tangles and buckles easily."
+      : null;
+  return {
+    spring_rate_lb_in, spring_index, shear_modulus_psi: G, index_flag,
+    note: "Helical compression (or extension) spring rate k = G d^4 / (8 D^3 Na), from the wire shear modulus G, wire diameter d, mean coil diameter D (measured to the wire centers, = OD - d), and the number of ACTIVE coils Na. Get Na from the total coils by the end condition: squared-and-ground Na = Nt - 2, plain Na = Nt. A good spring index D/d is 4-12. The rate is linear only away from solid height; add wire-stress and buckling checks for a full design. Machinery's Handbook / Shigley; the spring maker governs.",
+  };
+}
+export const helicalSpringRateExample = { inputs: { wire_diameter_in: 0.080, mean_coil_diameter_in: 0.75, active_coils: 8, material: "hard-drawn" } };
+MECHANIC_RENDERERS["helical-spring-rate"] = _simpleRenderer({
+  citation: "Citation: helical compression spring rate k = G d^4 / (8 D^3 Na), the standard Machinery's Handbook / Shigley formula, with the wire shear modulus G by material (music wire 11.85e6, hard-drawn 11.5e6, chrome-silicon 11.2e6, stainless 302 10.0e6, phosphor bronze 6.0e6 psi). d = wire diameter, D = mean coil diameter (OD - d), Na = active coils. A good spring index D/d is 4-12. Rate only (not stress, solid height, or buckling); the spring maker governs.",
+  example: helicalSpringRateExample.inputs,
+  fields: [
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "mean_coil_diameter_in", label: "Mean coil diameter D = OD - d (in)", kind: "number" },
+    { key: "active_coils", label: "Active coils Na", kind: "number" },
+    { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
+  ],
+  outputs: [
+    { key: "k", id: "hsr-out-k", label: "Spring rate", value: (r) => fmt(r.spring_rate_lb_in, 2) + " lb/in (G " + fmt(r.shear_modulus_psi / 1e6, 2) + "e6 psi)" },
+    { key: "c", id: "hsr-out-c", label: "Spring index D/d", value: (r) => fmt(r.spring_index, 2) + (r.index_flag ? " - " + r.index_flag : " (good, 4-12)") },
+    { key: "n", id: "hsr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeHelicalSpringRate,
+});
+
 // ===========================================================================
 // spec-v20 Phase K - three new mechanic tiles (v18/v21 tile contract).
 // ===========================================================================
