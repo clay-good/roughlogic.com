@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(metalair): spec-v760 groove weld length for an applied load (groove-weld-strength inverse); 2026-07-14
+
+- New tile `groove-weld-length-for-load` (Group E, calc-metalair.js): the weld length an applied load needs at a given
+  effective throat. `L = load / (stress_ksi x 1000 x throat)` (AISC J2, ASD 0.30 FEXX / LRFD 0.75 x 0.60 FEXX). A
+  100,000 lb LRFD load on a 0.25 in E70 PJP throat needs ~12.7 in. Round-trips through `groove-weld-strength`. Home tile
+  count 1,208 -> 1,209.
+
 ### feat(pipefit): spec-v759 steam PRV orifice area for a required capacity (steam-prv-napier inverse); 2026-07-14
 
 - New tile `steam-prv-area-for-capacity` (Group B, calc-pipefit.js): the orifice / seat area a required steam relief

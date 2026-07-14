@@ -174,7 +174,7 @@ const TOOL_MODULES = (() => {
   // spec-v28 §7 roadmap; own module since calc-construction and calc-hvac are
   // at their size caps).
   declare("./calc-metalair.js", "METALAIR_RENDERERS", [
-    "groove-weld-strength", "duct-static-pressure-total", "compression-ratio-refrig",
+    "groove-weld-strength", "groove-weld-length-for-load", "duct-static-pressure-total", "compression-ratio-refrig",
   ]);
   declare("./calc-plumbing.js", "PLUMBING_RENDERERS", [
     "pipe-sizing", "friction-loss", "pipe-volume", "pump-sizing",

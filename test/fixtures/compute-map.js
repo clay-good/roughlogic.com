@@ -710,6 +710,7 @@ export const COMPUTE_MAP = {
   "pipe-spacing-rack": { module: "../../calc-pipefit.js", fn: "computePipeSpacingRack" },
   // spec-v30 metal / air / refrigerant bench.
   "groove-weld-strength": { module: "../../calc-metalair.js", fn: "computeGrooveWeldStrength" },
+  "groove-weld-length-for-load": { module: "../../calc-metalair.js", fn: "computeGrooveWeldLengthForLoad" },
   "duct-static-pressure-total": { module: "../../calc-metalair.js", fn: "computeDuctStaticTotal" },
   "compression-ratio-refrig": { module: "../../calc-metalair.js", fn: "computeCompressionRatio" },
   // spec-v65 Group Z (Rigging and Heavy Lift).

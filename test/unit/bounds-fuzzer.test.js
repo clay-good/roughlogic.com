@@ -11478,6 +11478,7 @@ test("bounds: spec-v29 pipe/raceway field-layout tiles pin constants + reject ba
 // ---------------------------------------------------------------------------
 import {
   computeGrooveWeldStrength as _cv30m1, computeDuctStaticTotal as _cv30m2, computeCompressionRatio as _cv30m3,
+  computeGrooveWeldLengthForLoad as _v760,
 } from "../../calc-metalair.js";
 
 test("bounds: spec-v30 metal/air/refrigerant tiles pin constants + reject bad input", () => {
@@ -11494,6 +11495,28 @@ test("bounds: spec-v30 metal/air/refrigerant tiles pin constants + reject bad in
   assert.ok(Math.abs(_cv30m3({ suction_psig: 70, discharge_psig: 260, atmospheric_psia: 14.696 }).compression_ratio - 3.2433) < 1e-3);
   assert.ok("error" in _cv30m3({ suction_psig: -20, discharge_psig: 260, atmospheric_psia: 14.696 }));
   assert.ok("error" in _cv30m3({ suction_psig: 100, discharge_psig: 50, atmospheric_psia: 14.696 }));
+});
+
+test("bounds: spec-v760 groove weld length for an applied load (inverse of groove-weld-strength)", () => {
+  const p = _v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.25, electrode: "E70", method: "LRFD" });
+  assert.ok(Math.abs(p.required_length_in - 12.698) < 0.01);
+  assert.ok(Math.abs(p.stress_ksi - 31.5) < 1e-9);
+  // round-trip: the recovered length fed to groove-weld-strength reproduces the applied load as the capacity (util 1.0)
+  for (const [load, type, throat, base, elec, method] of [[100000, "PJP", 0.25, 0, "E70", "LRFD"], [60000, "PJP", 0.3125, 0, "E80", "ASD"], [200000, "CJP", 0.5, 0.5, "E70", "LRFD"], [40000, "CJP", 0, 0.375, "E70", "ASD"]]) {
+    const inv = _v760({ applied_load_lb: load, weld_type: type, effective_throat_in: throat, base_thickness_in: base, electrode: elec, method: method });
+    const fwd = _cv30m1({ weld_type: type, effective_throat_in: throat, base_thickness_in: base, length_in: inv.required_length_in, electrode: elec, method: method, applied_load_lb: load });
+    assert.ok(Math.abs(fwd.capacity_lb - load) < 1e-3);
+    assert.ok(Math.abs(fwd.utilization - 1) < 1e-9);
+  }
+  // more load needs more length; a thicker throat needs less; LRFD (higher stress) needs less than ASD
+  assert.ok(_v760({ applied_load_lb: 200000, weld_type: "PJP", effective_throat_in: 0.25 }).required_length_in > _v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.25 }).required_length_in);
+  assert.ok(_v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.5 }).required_length_in < _v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.25 }).required_length_in);
+  assert.ok(_v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.25, method: "LRFD" }).required_length_in < _v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0.25, method: "ASD" }).required_length_in);
+  // error seams: non-positive load, missing throat for the weld type, non-finite
+  assert.ok("error" in _v760({ applied_load_lb: 0, weld_type: "PJP", effective_throat_in: 0.25 }));
+  assert.ok("error" in _v760({ applied_load_lb: 100000, weld_type: "PJP", effective_throat_in: 0 }));
+  assert.ok("error" in _v760({ applied_load_lb: 100000, weld_type: "CJP", base_thickness_in: 0 }));
+  assert.ok("error" in _v760({ applied_load_lb: Infinity, weld_type: "PJP", effective_throat_in: 0.25 }));
 });
 
 // =====================================================================

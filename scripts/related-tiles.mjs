@@ -944,6 +944,7 @@ const RELATED = {
 
   // spec-v30 metal / air / refrigerant bench
   "groove-weld-strength": ["fillet-weld-strength", "weld-heat-input", "metal-weight"],
+  "groove-weld-length-for-load": ["groove-weld-strength", "fillet-weld-strength", "weld-heat-input"],
   "duct-static-pressure-total": ["duct-sizing", "round-to-rect-duct", "cfm-per-ton"],
   "compression-ratio-refrig": ["superheat-subcool", "refrigerant-pt", "duct-static-pressure-total"],
 

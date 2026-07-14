@@ -8856,6 +8856,17 @@ export const CITATIONS = {
       { name: "Insulated OD", value: "pipe OD plus twice the nominal insulation thickness (ASTM C585 sizing); the actual jacket OD is read off the insulation", source: "ASTM C585" },
     ],
   },
+  "groove-weld-length-for-load": {
+    formula: "required_length = applied_load / (stress_ksi x 1000 x throat), the inverse of capacity = stress_ksi x 1000 x throat x length; stress_ksi = 0.30*FEXX (ASD) or 0.75*0.60*FEXX (LRFD); throat = CJP thinner part thickness or PJP WPS effective throat.",
+    edition: "Groove weld (CJP / PJP) shear capacity (AISC 360 Table J2.5 weld-metal shear 0.60*FEXX on the effective throat), solved for the length, per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name.",
+    freeAccess: "First-principles AISC J2 shear. A CJP weld with matching filler develops the base metal in tension/compression; the PJP effective throat is read off the qualified WPS. The WPS, weld inspector, and engineer of record govern.",
+    governance: GOVERNANCE.structural,
+    editionNote: "The weld length an applied load needs at a given effective throat, the inverse of the groove-weld shear capacity: L = load / (stress_ksi x 1000 x throat). Round up and split the length between the two sides of the joint where the detail allows, and add for weld returns and any minimum-length or minimum-size rule (AWS D1.1). A CJP groove weld with matching filler develops the base metal in tension/compression; this shear length governs only the shear case. ASD vs LRFD is a labeled toggle matching the fillet-weld-strength tile.",
+    assumptions: [
+      { name: "Effective throat", value: "CJP uses the thinner part thickness; PJP uses the WPS effective throat (groove depth less the AWS Table 3.1 reduction); user-supplied", source: "AWS D1.1 Table 3.1" },
+      { name: "Round up and detail", value: "round the length up, split between joint sides, add for returns and minimum-length rules", source: "AWS D1.1" },
+    ],
+  },
   "groove-weld-strength": {
     formula: "Effective throat: CJP = thinner connected part thickness, PJP = WPS effective throat; weld-metal shear (AISC Table J2.5) Fnw = 0.60*FEXX; ASD allowable 0.30*FEXX, LRFD design 0.75*0.60*FEXX; capacity = stress * throat * length.",
     edition: "Groove weld (CJP / PJP) shear capacity - the AISC 360 Table J2.5 weld-metal shear strength 0.60*FEXX on the effective throat - per AWS D1.1 Structural Welding Code and AISC 360 §J2, by name; first-principles.",

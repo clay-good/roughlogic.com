@@ -4357,6 +4357,26 @@
       "kind": "industry"
     },
     {
+      "term": "groove weld length",
+      "target": "groove-weld-length-for-load",
+      "kind": "industry"
+    },
+    {
+      "term": "weld length for load",
+      "target": "groove-weld-length-for-load",
+      "kind": "redirect"
+    },
+    {
+      "term": "how long a groove weld",
+      "target": "groove-weld-length-for-load",
+      "kind": "adjacent"
+    },
+    {
+      "term": "required weld length",
+      "target": "groove-weld-length-for-load",
+      "kind": "adjacent"
+    },
+    {
       "term": "cjp pjp weld strength",
       "target": "groove-weld-strength",
       "kind": "redirect"

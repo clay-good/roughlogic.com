@@ -21252,6 +21252,36 @@
    }
   },
   {
+   "tile_id": "groove-weld-length-for-load",
+   "source_publisher": "AWS D1.1 / AISC 360 §J2 (solved for length)",
+   "source_title": "L = load / (stress_ksi x 1000 x throat)",
+   "source_edition_or_year": "AISC 360 (first-principles J2)",
+   "source_section_or_page": "100,000 lb LRFD, E70, PJP throat 0.25 in -> 31.5 ksi -> 12.70 in",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "applied_load_lb": 100000,
+    "weld_type": "PJP",
+    "effective_throat_in": 0.25,
+    "electrode": "E70",
+    "method": "LRFD"
+   },
+   "outputs": {
+    "required_length_in": {
+     "value": 12.698,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "stress_ksi": {
+     "value": 31.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "duct-static-pressure-total",
    "source_publisher": "ACCA Manual D / SMACNA (by name)",
    "source_title": "total external static = sum of component drops (in. w.c.); remaining = rated - total",
