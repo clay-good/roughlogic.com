@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(rigging): spec-v739 max redirect angle for a block WLL (block-redirect-load inverse); 2026-07-14
+
+- New tile `block-redirect-max-angle` (Group Z, calc-rigging.js): the largest direction change a block or anchor of a
+  rated WLL can turn a line without the resultant exceeding the rating. `angle = 2 x asin( WLL / (2 x line tension) )`,
+  capped at 180 deg when WLL >= 2T. A 3,000 lb line through a 5,000 lb block can turn up to 112.9 deg. Round-trips through
+  `block-redirect-load`. Home tile count 1,187 -> 1,188.
+
 ### feat(fire): spec-v738 smooth-bore tip diameter for a target flow (smooth-bore-flow inverse); 2026-07-14
 
 - New tile `smooth-bore-diameter-for-flow` (Group F, calc-fire.js): the tip (bore) diameter a target flow needs at a

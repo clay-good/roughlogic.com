@@ -7564,6 +7564,16 @@ export const CITATIONS = {
       { name: "Drivetrain efficiency", value: "0.85 default (gear + chain-fall losses)", source: "hoist manufacturer data" },
     ],
   },
+  "block-redirect-max-angle": {
+    formula: "max_direction_change = 2 x asin( block_wll / (2 x line_tension) ), the inverse of resultant = 2 x line_tension x sin(angle / 2); solvable only when WLL < 2 x line_tension, else any turn up to 180 degrees is within rating.",
+    edition: "ASME B30.26 and standard rigging statics by name; first-principles vector resultant, solved for the angle.",
+    freeAccess: "The vector-resultant statics are public. The block's rated capacity comes from the manufacturer.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The largest direction change a block or anchor of a rated WLL can turn a line without the resultant exceeding the rating. The resultant peaks at twice the line tension at a 180-degree turn, so a block rated for at least 2 x line tension handles any redirect; past the max angle, resize the block, the anchor sling, and the attachment point for the resultant. Shock loading multiplies this further - keep margin. The qualified rigger and the block / anchor tags govern.",
+    assumptions: [
+      { name: "Max angle", value: "2 x asin( WLL / (2 x line tension) ), capped at 180 degrees when WLL >= 2 x line tension", source: "first-principles statics" },
+    ],
+  },
   "block-redirect-load": {
     formula: "resultant = 2 x line_tension x sin(direction_change / 2). A 180-degree turn doubles the line tension on the anchor.",
     edition: "ASME B30.26 and standard rigging statics by name; first-principles vector resultant.",

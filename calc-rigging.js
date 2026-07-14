@@ -851,6 +851,49 @@ function renderBlockRedirectLoad(inputRegion, outputRegion, citationEl) {
 }
 RIGGING_RENDERERS["block-redirect-load"] = renderBlockRedirectLoad;
 
+// block-redirect-max-angle: inverse of block-redirect-load. The forward tile gives the resultant on the block/anchor from
+// the direction change; the inverse recovers the largest direction change a block or anchor of a rated WLL can turn the
+// line without the resultant exceeding the rating. From resultant = 2 x T x sin(angle/2), angle = 2 x asin( WLL / (2T) ),
+// which only has a solution when WLL < 2T (a 180-degree turn peaks the resultant at 2T); if WLL >= 2T any turn up to 180
+// degrees is within rating.
+// dims: in { line_tension_lb: M L T^-2, block_wll_lb: M L T^-2 } out: { max_angle_deg: dimensionless, resultant_at_max_lb: M L T^-2 }
+export function computeBlockRedirectMaxAngle({ line_tension_lb, block_wll_lb } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const tension = Number(line_tension_lb);
+  const wll = Number(block_wll_lb);
+  if (!Number.isFinite(tension) || tension <= 0) return { error: "Line tension must be a positive finite number (lb)." };
+  if (!Number.isFinite(wll) || wll <= 0) return { error: "Block / anchor WLL must be a positive finite number (lb)." };
+  const ratio = wll / (2 * tension);
+  const unlimited = ratio >= 1;
+  const max_angle_deg = unlimited ? 180 : 2 * Math.asin(ratio) * 180 / Math.PI;
+  const resultant_at_max_lb = 2 * tension * Math.sin(max_angle_deg * Math.PI / 360);
+  if (![max_angle_deg, resultant_at_max_lb].every(Number.isFinite)) return { error: "Max-angle math is not a finite value." };
+  return {
+    max_angle_deg, resultant_at_max_lb, unlimited,
+    note: "Max direction change = 2 x asin( WLL / (2 x line tension) ), the inverse of resultant = 2 x T x sin(angle/2). A block that turns the line 180 degrees sees twice the line tension on its anchor, so the resultant peaks at 2T; if the block and anchor are rated for at least 2T, any redirect up to 180 degrees is within rating. Below the max angle the block is within its rating; past it, resize the block, the anchor sling, and the attachment point for the resultant. Shock loading (a line snapping taut) multiplies this further - keep margin. A design aid; the qualified rigger and the block / anchor tags govern.",
+  };
+}
+
+function renderBlockRedirectMaxAngle(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASME B30.26 and standard rigging statics by name. resultant = 2 x line tension x sin(direction change / 2), solved for the angle: max direction change = 2 x asin( WLL / (2 x line tension) ); the resultant peaks at 2T at a 180-degree turn. Estimate - size for the resultant.";
+  const tension = makeNumber("Line tension through the block (lb)", "bra-tension", { step: "any", min: "0" });
+  const wll = makeNumber("Block / anchor rated WLL (lb)", "bra-wll", { step: "any", min: "0" });
+  for (const f of [tension, wll]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { tension.input.value = "3000"; wll.input.value = "5000"; update(); });
+  const oAngle = makeOutputLine(outputRegion, "Max direction change", "bra-out-angle");
+  const oResultant = makeOutputLine(outputRegion, "Resultant at that angle", "bra-out-resultant");
+  const oNote = makeOutputLine(outputRegion, "Note", "bra-out-note");
+  const update = debounce(() => {
+    const r = computeBlockRedirectMaxAngle({ line_tension_lb: Number(tension.input.value) || 0, block_wll_lb: Number(wll.input.value) || 0 });
+    if (r.error) { oAngle.textContent = r.error; oResultant.textContent = "-"; oNote.textContent = ""; return; }
+    oAngle.textContent = fmt(r.max_angle_deg, 1) + " deg" + (r.unlimited ? " (any turn up to 180 deg is within rating)" : "");
+    oResultant.textContent = fmt(r.resultant_at_max_lb, 0) + " lb";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [tension, wll]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["block-redirect-max-angle"] = renderBlockRedirectMaxAngle;
+
 // =====================================================================
 // spec-v117: multi-leg-sling + wire-rope-strength (Group Z) - rigging.
 // multi-leg-sling returns the tension per sling leg (conservatively over the

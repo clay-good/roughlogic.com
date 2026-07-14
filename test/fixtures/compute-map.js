@@ -719,6 +719,7 @@ export const COMPUTE_MAP = {
   "roller-jack-force": { module: "../../calc-rigging.js", fn: "computeRollerJackForce" },
   "chain-lever-hoist": { module: "../../calc-rigging.js", fn: "computeChainLeverHoist" },
   "block-redirect-load": { module: "../../calc-rigging.js", fn: "computeBlockRedirectLoad" },
+  "block-redirect-max-angle": { module: "../../calc-rigging.js", fn: "computeBlockRedirectMaxAngle" },
   // spec-v67 Group E earthwork and excavation deepening.
   "soil-swell-shrink": { module: "../../calc-earthwork.js", fn: "computeSoilSwellShrink" },
   "haul-cycle-production": { module: "../../calc-earthwork.js", fn: "computeHaulCycleProduction" },

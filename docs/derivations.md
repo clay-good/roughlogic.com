@@ -2583,6 +2583,7 @@ cross-check.
 | calc-restoration.js | `renderWaterClasses` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-rigging.js | `computeBeamClampSidePull` | `{ leg_tension_lb, leg_angle_deg, vertical_wll_lb, side_pull_lb = 0 } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeBlockRedirectLoad` | `{ line_tension_lb, direction_chg_deg } = {}` | _ | _ | _ |
+| calc-rigging.js | `computeBlockRedirectMaxAngle` | `{ line_tension_lb, block_wll_lb } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeBridleLegTension` | `{ apex_load_lb, run1_ft, rise1_ft, run2_ft, rise2_ft } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeCgLoadShare` | `{ total_weight_lb, span_in, cg_from_p1_in } = {}` | _ | _ | _ |
 | calc-rigging.js | `computeChainLeverHoist` | `{ load_lb, rated_wll_lb, mech_adv, efficiency = 0.85, lift_ft = 1 } = {}` | _ | _ | _ |
@@ -2848,7 +2849,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1434.
+Row count: 1435.
 
 <!-- END function-corpus-v14 -->
 
@@ -4191,12 +4192,13 @@ per spec-v14 §13.1 second paragraph.
 | `statistics-quickread` | Statistics Quick-Read | Standard descriptive statistics (clas...; Wikipedia worked example list 2, 4, 4, 4, 5, 5, 7, 9 -> m... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `two-sample-t-test` | Two-Sample t-Test | OpenIntro Statistics Ch. 7 (Welch's t...; 82/6/25 vs 78/7/22 -> t ~2.09, df ~41.7, two-sided p ~0.043 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group Z (unnamed) (25 tiles)
+### Group Z (unnamed) (26 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
 | `beam-clamp-side-pull` | Beam Clamp Reaction and Side-Pull Check | ASME B30.20 / beam-clamp manufacturer...; 860.23 lb at 63.43 deg on a 2,000 lb WLL clamp with a 500... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `block-redirect-load` | Rigging Block Redirect Resultant Load | ASME B30.26 / rigging statics; 3,000 lb line turning 90 deg through a block -> 2 x 3,000... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `block-redirect-max-angle` | Max Redirect Angle for a Block WLL | ASME B30.26 / rigging statics (solved...; 3,000 lb line, 5,000 lb block -> 2 x asin(0.8333) = 112.9... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `bridle-leg-tension` | Two-Leg Bridle Leg Tension | Entertainment rigging bridle geometry...; 1000 lb; leg1 4 out/8 up (steep), leg2 10 out/6 up (shall... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cg-load-share` | Center of Gravity and Pick-Point Load Share | ASME B30.9 / ITI rigging practice; 12,000 lb skid, picks 120 in apart, CG 40 in from pick 1 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `chain-lever-hoist` | Chain / Lever Hoist Effort and Travel | ASME B30.16 / B30.21; 2,000 lb, 2,000 lb hoist, MA 32, eff 0.85, lift 4 ft -> 7... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4221,6 +4223,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1187. Fixture-covered or reference-cadence: 1187 / 1187.
+Tile count: 1188. Fixture-covered or reference-cadence: 1188 / 1188.
 
 <!-- END tile-index-v14 -->

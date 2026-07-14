@@ -21656,6 +21656,33 @@
    }
   },
   {
+   "tile_id": "block-redirect-max-angle",
+   "source_publisher": "ASME B30.26 / rigging statics (solved for the angle)",
+   "source_title": "max angle = 2 x asin( WLL / (2 x line_tension) )",
+   "source_edition_or_year": "vector resultant statics",
+   "source_section_or_page": "3,000 lb line, 5,000 lb block -> 2 x asin(0.8333) = 112.9 deg",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "line_tension_lb": 3000,
+    "block_wll_lb": 5000
+   },
+   "outputs": {
+    "max_angle_deg": {
+     "value": 112.885,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "resultant_at_max_lb": {
+     "value": 5000,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "soil-swell-shrink",
    "source_publisher": "Caterpillar Performance Handbook soil-conversion method",
    "source_title": "loose = bank x (1 + swell/100); load_factor = 1/(1+swell/100); compacted = bank x (1 - shrink/100)",

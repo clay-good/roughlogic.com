@@ -10478,6 +10478,28 @@ test("bounds: calc-rigging v66 hardware and below-the-hook pins every worked exa
   assert.ok("error" in _v66f({ line_tension_lb: 3000, direction_chg_deg: 181 }));
 });
 
+import { computeBlockRedirectMaxAngle as _v739 } from "../../calc-rigging.js";
+test("bounds: spec-v739 block redirect max angle for a WLL (inverse of block-redirect-load)", () => {
+  const p = _v739({ line_tension_lb: 3000, block_wll_lb: 5000 });
+  assert.ok(Math.abs(p.max_angle_deg - 112.885) < 0.01 && p.unlimited === false);
+  assert.ok(Math.abs(p.resultant_at_max_lb - 5000) < 1e-6);
+  // round-trip: the resultant at the recovered max angle equals the WLL (when limited)
+  for (const [T, WLL] of [[3000, 5000], [2000, 3000], [5000, 4000], [1000, 1900]]) {
+    const inv = _v739({ line_tension_lb: T, block_wll_lb: WLL });
+    const fwd = _v66f({ line_tension_lb: T, direction_chg_deg: inv.max_angle_deg });
+    assert.ok(Math.abs(fwd.resultant_lb - WLL) < 1e-6);
+  }
+  // WLL >= 2T -> any turn up to 180 deg is within rating (capped)
+  const wide = _v739({ line_tension_lb: 3000, block_wll_lb: 7000 });
+  assert.ok(wide.unlimited === true && wide.max_angle_deg === 180);
+  // a higher WLL allows a larger max angle (monotonic, until capped)
+  assert.ok(_v739({ line_tension_lb: 3000, block_wll_lb: 5500 }).max_angle_deg > _v739({ line_tension_lb: 3000, block_wll_lb: 5000 }).max_angle_deg);
+  // error seams
+  assert.ok("error" in _v739({ line_tension_lb: 0, block_wll_lb: 5000 }));
+  assert.ok("error" in _v739({ line_tension_lb: 3000, block_wll_lb: 0 }));
+  assert.ok("error" in _v739({ line_tension_lb: Infinity, block_wll_lb: 5000 }));
+});
+
 import {
   computeSoilSwellShrink as _v67a, computeHaulCycleProduction as _v67b, computeDewateringRate as _v67c,
   computeSpoilSetback as _v67d, computePipeBeddingBackfill as _v67e,

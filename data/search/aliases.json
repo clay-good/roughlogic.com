@@ -4572,6 +4572,31 @@
       "kind": "industry"
     },
     {
+      "term": "max redirect angle",
+      "target": "block-redirect-max-angle",
+      "kind": "industry"
+    },
+    {
+      "term": "block redirect max angle",
+      "target": "block-redirect-max-angle",
+      "kind": "redirect"
+    },
+    {
+      "term": "how far can I turn a block",
+      "target": "block-redirect-max-angle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "max angle for block",
+      "target": "block-redirect-max-angle",
+      "kind": "adjacent"
+    },
+    {
+      "term": "redirect angle for wll",
+      "target": "block-redirect-max-angle",
+      "kind": "adjacent"
+    },
+    {
       "term": "redirect",
       "target": "block-redirect-load",
       "kind": "redirect"
