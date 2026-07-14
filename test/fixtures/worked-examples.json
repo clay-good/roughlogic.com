@@ -24576,6 +24576,35 @@
    }
   },
   {
+   "tile_id": "water-cement-ratio",
+   "source_publisher": "ACI 318 Table 19.3.2.1; ACI 211.1 (water-cementitious ratio)",
+   "source_title": "w/cm = water / (cement + scm)",
+   "source_edition_or_year": "spec-v800 worked example (machine-verified)",
+   "source_section_or_page": "282 lb water / (470 cement + 94 fly ash = 564) = 0.50, exceeds the 0.45 F2 cap",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "water_lb": 282,
+    "cement_lb": 470,
+    "scm_lb": 94,
+    "exposure_class": "f2_s2"
+   },
+   "outputs": {
+    "wcm": {
+     "value": 0.500,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cementitious_lb": {
+     "value": 564,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-yield",
    "source_publisher": "ASTM C138 / AASHTO T121 (concrete yield)",
    "source_title": "yield_ft3 = total_batch_mass / measured_unit_weight; relative_yield = yield_yd3 / design",

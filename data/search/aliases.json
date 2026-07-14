@@ -48837,6 +48837,31 @@
       "kind": "question"
     },
     {
+      "term": "water cement ratio",
+      "target": "water-cement-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "w/cm ratio",
+      "target": "water-cement-ratio",
+      "kind": "industry"
+    },
+    {
+      "term": "aci 318 exposure class max water cement",
+      "target": "water-cement-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "water cementitious ratio with fly ash",
+      "target": "water-cement-ratio",
+      "kind": "question"
+    },
+    {
+      "term": "max w/c for freeze thaw concrete",
+      "target": "water-cement-ratio",
+      "kind": "question"
+    },
+    {
       "term": "how many bags of insulation for a wall",
       "target": "insulation-batt-coverage",
       "kind": "question"

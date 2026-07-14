@@ -516,6 +516,7 @@ const _TILES = [
   ["concrete-yield", "E"],
   ["glass-weight", "E"],
   ["fineness-modulus", "E"],
+  ["water-cement-ratio", "E"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

@@ -7190,3 +7190,60 @@ const _v797renderConcreteYield = _simpleRenderer({
   compute: computeConcreteYield,
 });
 CONSTRUCTION_RENDERERS["concrete-yield"] = _v797renderConcreteYield;
+
+// ===================== spec-v800: water-cementitious (w/cm) ratio with exposure cap (ACI 318) =====================
+// w/cm = mass of mixing water / mass of cementitious (cement + supplementary cementitious materials).
+// ACI 318 Table 19.3.2.1 sets exposure-class maxima; equal caps are grouped in the selector.
+const _WCM_EXPOSURE_CAPS = {
+  none: { cap: null, label: "No durability w/cm cap" },
+  f1: { cap: 0.55, label: "F1 freeze-thaw (0.55)" },
+  w_s1: { cap: 0.50, label: "W low-permeability / S1 sulfate (0.50)" },
+  f2_s2: { cap: 0.45, label: "F2 freeze-thaw / S2-S3 sulfate (0.45)" },
+  f3_c2: { cap: 0.40, label: "F3 freeze-thaw / C2 corrosion (0.40)" },
+};
+// dims: in { water_lb: M, cement_lb: M, scm_lb: M, exposure_class: dimensionless } out: { wcm: dimensionless, cementitious_lb: M }
+export function computeWaterCementRatio({ water_lb = 0, cement_lb = 0, scm_lb = 0, exposure_class = "none" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const water = Number(water_lb) || 0;
+  const cement = Number(cement_lb) || 0;
+  const scm = Number(scm_lb) || 0;
+  const exp = _WCM_EXPOSURE_CAPS[exposure_class];
+  if (!exp) return { error: "Choose a valid exposure class." };
+  if (!(water > 0)) return { error: "Mixing water must be positive (lb)." };
+  if (!(cement > 0)) return { error: "Cement must be positive (lb)." };
+  if (scm < 0) return { error: "Supplementary cementitious materials cannot be negative (lb)." };
+  const cementitious_lb = cement + scm;
+  const wcm = water / cementitious_lb;
+  if (!Number.isFinite(wcm)) return { error: "Water-cementitious-ratio math is not a finite value." };
+  const cap = exp.cap;
+  const passes = cap === null ? null : wcm <= cap + 1e-9;
+  return {
+    wcm, cementitious_lb, cap, passes, scm_fraction: scm / cementitious_lb,
+    note: "Water-cementitious ratio (ACI 318 / ACI 211.1): w/cm = the mass of mixing water divided by the TOTAL cementitious mass -- cement plus every supplementary cementitious material (fly ash, slag cement, silica fume, natural pozzolans). It is the single strongest lever on hardened concrete: lower w/cm means higher strength and, more importantly for durability, lower permeability, so ACI 318 Table 19.3.2.1 caps the w/cm by exposure class -- 0.55 for moderate freeze-thaw (F1), down to 0.40 for severe freeze-thaw (F3) or external-chloride corrosion (C2). Count the water in the aggregate's free surface moisture and any admixture water, not just the batch water at the plant, or the real w/cm is higher than the ticket shows. This checks the ratio against the durability cap only; the strength requirement, the minimum cementitious content, and the air content are separate ACI 318 / mix-design limits. A durability screen; the project specification and the mix design govern.",
+  };
+}
+export const waterCementRatioExample = { inputs: { water_lb: 282, cement_lb: 470, scm_lb: 94, exposure_class: "f2_s2" } };
+const _v800renderWaterCementRatio = _simpleRenderer({
+  citation: "Citation: water-cementitious (w/cm) ratio (ACI 318 Table 19.3.2.1 exposure caps; ACI 211.1): w/cm = mixing water / total cementitious (cement + fly ash + slag + pozzolans). Exposure maxima: F1 0.55, W/S1 0.50, F2/S2-S3 0.45, F3/C2 0.40. Count aggregate free-moisture and admixture water, not just batch water. Checks the durability cap only; strength, minimum cementitious, and air are separate. A durability screen; the spec and mix design govern.",
+  example: waterCementRatioExample.inputs,
+  fields: [
+    { key: "water_lb", label: "Total mixing water (lb, incl. aggregate free moisture)", kind: "number", default: 282 },
+    { key: "cement_lb", label: "Portland cement (lb)", kind: "number", default: 470 },
+    { key: "scm_lb", label: "Supplementary cementitious -- fly ash/slag/etc (lb)", kind: "number", default: 94 },
+    { key: "exposure_class", label: "Exposure class (ACI 318 cap)", kind: "select", options: [
+      { value: "none", label: "No durability cap" },
+      { value: "f1", label: "F1 freeze-thaw (0.55)" },
+      { value: "w_s1", label: "W low-permeability / S1 sulfate (0.50)" },
+      { value: "f2_s2", label: "F2 freeze-thaw / S2-S3 sulfate (0.45)" },
+      { value: "f3_c2", label: "F3 freeze-thaw / C2 corrosion (0.40)" },
+    ] },
+  ],
+  outputs: [
+    { key: "w", id: "wcm-out-w", label: "Water-cementitious ratio", value: (r) => fmt(r.wcm, 3) },
+    { key: "c", id: "wcm-out-c", label: "Total cementitious", value: (r) => fmt(r.cementitious_lb, 0) + " lb (" + fmt(r.scm_fraction * 100, 0) + "% SCM)" },
+    { key: "p", id: "wcm-out-p", label: "Against exposure cap", value: (r) => r.cap === null ? "(no durability cap selected)" : (r.passes ? "PASSES the " + fmt(r.cap, 2) + " cap" : "EXCEEDS the " + fmt(r.cap, 2) + " cap -- reduce water or add cementitious") },
+    { key: "n", id: "wcm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWaterCementRatio,
+});
+CONSTRUCTION_RENDERERS["water-cement-ratio"] = _v800renderWaterCementRatio;

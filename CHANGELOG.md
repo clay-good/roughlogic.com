@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v800 water-cementitious ratio and exposure cap (ACI 318); 2026-07-14
+
+- New tile `water-cement-ratio` (Group E, calc-construction.js): the single strongest lever on concrete strength and
+  durability. `w/cm = mixing water / total cementitious (cement + fly ash + slag + pozzolans)`, checked against the ACI
+  318 Table 19.3.2.1 exposure-class caps (F1 0.55, W/S1 0.50, F2/S2-S3 0.45, F3/C2 0.40). 282 lb water over 564 lb
+  cementitious is 0.50 -- exceeds the 0.45 severe-exposure cap. Reminds the user to count aggregate free-moisture and
+  admixture water. Fuzzer pins the ratio, the SCM-in-denominator behavior, the cap pass/fail, and the error seams.
+  Closes the sweep-23 concrete-QC cluster (yield / fineness-modulus / w-cm) at the v800 milestone. Explore sweep #23
+  entry 4. Home count 1,248 -> 1,249.
+
 ### feat(concrete): spec-v799 aggregate fineness modulus (ASTM C136); 2026-07-14
 
 - New tile `fineness-modulus` (Group E, calc-earthwork.js): the single number that captures how coarse a sand is for

@@ -21735,6 +21735,26 @@ test("bounds: spec-v798 computeGlassWeight pins the lite weight, per-sqft, two-p
   assert.ok("error" in _v798({ width_in: 60, height_in: 40, thickness_in: 0.25, panes: 0 }));
 });
 
+import { computeWaterCementRatio as _v800 } from "../../calc-construction.js";
+
+test("bounds: spec-v800 computeWaterCementRatio pins w/cm over total cementitious, the exposure cap, and error seams", () => {
+  const r = _v800({ water_lb: 282, cement_lb: 470, scm_lb: 94, exposure_class: "f2_s2" });
+  assert.ok(Math.abs(r.wcm - 0.5) < 1e-9); // 282 / (470 + 94)
+  assert.strictEqual(r.cementitious_lb, 564);
+  assert.strictEqual(r.cap, 0.45);
+  assert.strictEqual(r.passes, false); // 0.50 > 0.45
+  // SCM counts in the denominator (lowers w/cm vs cement alone); no cap -> passes null; a low ratio passes.
+  assert.ok(_v800({ water_lb: 282, cement_lb: 470, scm_lb: 0, exposure_class: "f2_s2" }).wcm > r.wcm);
+  assert.strictEqual(_v800({ water_lb: 282, cement_lb: 470, scm_lb: 94, exposure_class: "none" }).passes, null);
+  assert.strictEqual(_v800({ water_lb: 225, cement_lb: 470, scm_lb: 94, exposure_class: "f2_s2" }).passes, true); // 0.399
+  // Error seams: bad class, non-finite, non-positive water/cement, negative scm.
+  assert.ok("error" in _v800({ water_lb: 282, cement_lb: 470, scm_lb: 94, exposure_class: "x9" }));
+  assert.ok("error" in _v800({ water_lb: Infinity, cement_lb: 470, scm_lb: 94 }));
+  assert.ok("error" in _v800({ water_lb: 0, cement_lb: 470, scm_lb: 94 }));
+  assert.ok("error" in _v800({ water_lb: 282, cement_lb: 0, scm_lb: 94 }));
+  assert.ok("error" in _v800({ water_lb: 282, cement_lb: 470, scm_lb: -1 }));
+});
+
 import { computeConcreteYield as _v797 } from "../../calc-construction.js";
 
 test("bounds: spec-v797 computeConcreteYield pins yield, relative yield, cement content, short-flag, and error seams", () => {

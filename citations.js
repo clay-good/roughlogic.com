@@ -12938,6 +12938,17 @@ export const CITATIONS = {
       { name: "Supplier governs", value: "truck size, minimum, and short-load/standby fees are the supplier's", source: "scope of this tile" },
     ],
   },
+  "water-cement-ratio": {
+    formula: "w/cm = water_lb / (cement_lb + scm_lb); checked against the ACI 318 Table 19.3.2.1 exposure-class maximum (F1 0.55, W/S1 0.50, F2/S2-S3 0.45, F3/C2 0.40).",
+    edition: "Water-cementitious ratio and exposure caps (ACI 318 Table 19.3.2.1; ACI 211.1), by name; the project specification and the mix design govern.",
+    freeAccess: "The w/cm ratio is a simple mass ratio; the exposure-class maxima are the published ACI 318 Table 19.3.2.1 values. The batch masses come from the mix design / ticket.",
+    governance: GOVERNANCE.general,
+    editionNote: "Water-cementitious ratio: w/cm = the mass of mixing water divided by the total cementitious mass -- cement plus every supplementary cementitious material (fly ash, slag cement, silica fume, natural pozzolans). It is the single strongest lever on hardened concrete: lower w/cm means higher strength and, more importantly for durability, lower permeability, so ACI 318 Table 19.3.2.1 caps the w/cm by exposure class -- 0.55 for moderate freeze-thaw (F1) down to 0.40 for severe freeze-thaw (F3) or external-chloride corrosion (C2). The mixing water must include the aggregate's free surface moisture and any admixture water, not just the plant batch water, or the real w/cm is higher than the ticket shows. This checks the ratio against the durability cap only; the strength requirement, the minimum cementitious content, and the air content are separate ACI 318 / mix-design limits. A durability screen, not a mix design.",
+    assumptions: [
+      { name: "Total cementitious", value: "w/cm uses cement + all supplementary cementitious materials, not cement alone", source: "ACI 318 / 211.1" },
+      { name: "Exposure caps", value: "ACI 318 Table 19.3.2.1: F1 0.55, W/S1 0.50, F2/S2-S3 0.45, F3/C2 0.40", source: "ACI 318 Table 19.3.2.1" },
+    ],
+  },
   "concrete-yield": {
     formula: "yield_ft3 = total_batch_mass_lb / measured_unit_weight_lb_ft3; yield_yd3 = yield_ft3 / 27; relative_yield = yield_yd3 / design_volume_yd3; cement_content_lb_yd3 = cement_mass_lb / yield_yd3.",
     edition: "ASTM C138 / AASHTO T121 (Density (Unit Weight), Yield, and Air Content of Concrete); ACI 211.1, by name; the mix design, the C138 measurement, and the mix producer govern.",
