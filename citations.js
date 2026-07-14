@@ -7691,6 +7691,17 @@ export const CITATIONS = {
       { name: "Concern trigger", value: "t/R < 0.30 (sound shell below 30% of the radius) flags escalation to a full TRAQ assessment", source: "Mattheck & Breloer" },
     ],
   },
+  "trunk-min-shell-thickness": {
+    formula: "min_shell t = (D/2) x (1 - (loss/100)^(1/3)); the inverse of loss_pct = ((D - 2t)/D)^3 x 100; t_over_R = t / (D/2); concern when t/R < 0.30.",
+    edition: "Hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name, solved for the shell thickness.",
+    freeAccess: "The Wagener cube-law loss and the Mattheck t/R rule are published arboricultural results; a qualified arborist and a TRAQ assessment govern.",
+    governance: GOVERNANCE.general,
+    editionNote: "The minimum radial sound-wood shell for a maximum acceptable strength loss, the inverse of the Wagener cube law. Because loss goes as the cube of the hollow-to-diameter ratio, the minimum shell is small (a thin shell still holds most of the strength); a shell below the Mattheck t/R < 0.30 trigger is flagged; an open cavity (a slot) is far weaker than this closed-hollow estimate. A screen, not a tree-risk determination.",
+    assumptions: [
+      { name: "Closed hollow", value: "the loss estimate assumes a central closed hollow; an open cavity (slot) is far weaker", source: "Wagener 1963" },
+      { name: "Concern trigger", value: "t/R < 0.30 (sound shell below 30% of the radius) flags escalation to a full TRAQ assessment", source: "Mattheck & Breloer" },
+    ],
+  },
   "quadratic-mean-diameter": {
     formula: "QMD = sqrt( sum(count x diameter^2) / sum(count) ); arithmetic_mean = sum(count x diameter) / sum(count); basal_area_ft2 = 0.005454 x sum(count x diameter^2).",
     edition: "USDA Forest Service forest-mensuration practice (quadratic mean diameter), by name.",

@@ -732,6 +732,7 @@ export const COMPUTE_MAP = {
   "thinning-target-tpa": { module: "../../calc-arborist.js", fn: "computeThinningTargetTpa" },
   "quadratic-mean-diameter": { module: "../../calc-arborist.js", fn: "computeQuadraticMeanDiameter" },
   "trunk-decay-strength": { module: "../../calc-arborist.js", fn: "computeTrunkDecayStrength" },
+  "trunk-min-shell-thickness": { module: "../../calc-arborist.js", fn: "computeTrunkMinShellThickness" },
   "tree-open-cavity": { module: "../../calc-arborist.js", fn: "computeTreeOpenCavity" },
   "tree-protection-zone": { module: "../../calc-arborist.js", fn: "computeTreeProtectionZone" },
   "tree-crz-encroachment": { module: "../../calc-arborist.js", fn: "computeTreeCrzEncroachment" },

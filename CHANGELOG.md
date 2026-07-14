@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(arborist): spec-v730 minimum sound shell for an allowable trunk strength loss (trunk-decay-strength inverse); 2026-07-14
+
+- New tile `trunk-min-shell-thickness` (Group L, calc-arborist.js): the minimum radial sound-wood shell thickness for a
+  maximum acceptable strength loss. `t = (D/2) x (1 - (loss/100)^(1/3))`. A 24-in trunk held to a 29.6% loss needs a
+  4.0-in shell (t/R 0.33). Flags a shell below the Mattheck t/R 0.30 concern. Round-trips through `trunk-decay-strength`.
+  Home tile count 1,178 -> 1,179.
+
 ### feat(machining): spec-v729 drill point angle from tip length (drill-point-depth inverse); 2026-07-14
 
 - New tile `drill-point-angle-from-length` (Group K, calc-machining.js): the included point angle from the diameter and a

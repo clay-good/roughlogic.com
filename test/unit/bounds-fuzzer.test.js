@@ -20932,6 +20932,29 @@ test("bounds: spec-v565 computeTrunkDecayStrength pins the cube-law loss, the t/
   assert.ok("error" in _v565({ diameter_in: 24, shell_thick_in: 12 })); // shell >= D/2
 });
 
+import { computeTrunkMinShellThickness as _v730 } from "../../calc-arborist.js";
+test("bounds: spec-v730 trunk min shell thickness for allowable loss (inverse of trunk-decay-strength)", () => {
+  const p = _v730({ diameter_in: 24, allow_loss_pct: 29.6 });
+  assert.ok(Math.abs(p.min_shell_in - 4.0) < 0.01);
+  assert.ok(Math.abs(p.min_t_over_r - 0.333) < 0.005);
+  assert.equal(p.below_mattheck, false); // 0.333 >= 0.30
+  // round-trip: the recovered shell fed to trunk-decay-strength reproduces the allowable loss
+  for (const [D, loss] of [[24, 29.6], [18, 42.2], [36, 10], [12, 75]]) {
+    const inv = _v730({ diameter_in: D, allow_loss_pct: loss });
+    const fwd = _v565({ diameter_in: D, shell_thick_in: inv.min_shell_in });
+    assert.ok(Math.abs(fwd.loss_pct - loss) < 1e-6);
+  }
+  // a larger allowable loss permits a thinner shell (monotonic)
+  assert.ok(_v730({ diameter_in: 24, allow_loss_pct: 50 }).min_shell_in < _v730({ diameter_in: 24, allow_loss_pct: 20 }).min_shell_in);
+  // a large allowable loss drops the shell below the Mattheck 0.30 trigger
+  assert.equal(_v730({ diameter_in: 24, allow_loss_pct: 42.2 }).below_mattheck, true); // t/R ~0.25
+  // error seams: non-finite, non-positive diameter/loss, loss >= 100
+  assert.ok("error" in _v730({ diameter_in: 0, allow_loss_pct: 29.6 }));
+  assert.ok("error" in _v730({ diameter_in: 24, allow_loss_pct: 0 }));
+  assert.ok("error" in _v730({ diameter_in: 24, allow_loss_pct: 100 }));
+  assert.ok("error" in _v730({ diameter_in: Infinity, allow_loss_pct: 29.6 }));
+});
+
 import { computeTreeProtectionZone as _v566 } from "../../calc-arborist.js";
 
 test("bounds: spec-v566 computeTreeProtectionZone pins the radius = factor x DBH relation, the fenced area, and error seams", () => {

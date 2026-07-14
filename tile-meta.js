@@ -472,6 +472,7 @@ const _TILES = [
   ["thinning-target-tpa", "L"],
   ["quadratic-mean-diameter", "L"],
   ["trunk-decay-strength", "L"],
+  ["trunk-min-shell-thickness", "L"],
   ["tree-open-cavity", "L"],
   ["tree-protection-zone", "L"],
   ["tree-crz-encroachment", "L"],

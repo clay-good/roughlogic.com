@@ -547,6 +547,54 @@ function _v565renderTrunkDecayStrength(inputRegion, outputRegion, citationEl) {
 }
 ARBORIST_RENDERERS["trunk-decay-strength"] = _v565renderTrunkDecayStrength;
 
+// --- spec-v730 L: Minimum sound-shell thickness for an allowable strength loss (inverse of trunk-decay-strength) ---
+// The forward tile gives the strength loss from the shell thickness; the inverse recovers the minimum radial
+// sound-wood shell thickness for a maximum acceptable loss. From loss% = ((D - 2t)/D)^3 x 100,
+// (D - 2t)/D = (loss/100)^(1/3), so t = (D/2) x (1 - (loss/100)^(1/3)). The strength loss goes as the CUBE of the
+// hollow ratio, so a small shell still holds a lot: about a third of the radius keeps most of the strength.
+// dims: in { diameter_in: L, allow_loss_pct: dimensionless } out: { min_shell_in: L, min_t_over_r: dimensionless, hollow_d_in: L }
+export function computeTrunkMinShellThickness({ diameter_in = 0, allow_loss_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(diameter_in);
+  const loss = Number(allow_loss_pct);
+  if (!Number.isFinite(D) || D <= 0) return { error: "Trunk diameter must be a positive finite number (in)." };
+  if (!Number.isFinite(loss) || loss <= 0) return { error: "Allowable strength loss must be a positive finite percent." };
+  if (loss >= 100) return { error: "Allowable strength loss must be below 100% (a 100% loss means no sound wood)." };
+  const ratio = Math.pow(loss / 100, 1 / 3);
+  const min_shell_in = (D / 2) * (1 - ratio);
+  const hollow_d_in = D - 2 * min_shell_in;
+  const min_t_over_r = min_shell_in / (D / 2);
+  if (![min_shell_in, hollow_d_in, min_t_over_r].every(Number.isFinite)) return { error: "Shell-thickness math is not a finite value." };
+  const below_mattheck = min_t_over_r < 0.30;
+  const notes = [];
+  notes.push("Minimum radial sound-wood shell for the allowable loss: t = (D/2) x (1 - (loss/100)^(1/3)), the inverse of loss% = ((D - 2t)/D)^3 x 100. Because strength loss goes as the CUBE of the hollow ratio, a thin shell still holds most of the strength - so the minimum shell for a given loss is small, and a modest measured shell often passes.");
+  if (below_mattheck) notes.push("This minimum shell is below the Mattheck t/R = 0.30 concern trigger, so accepting this much loss also means accepting a t/R the common screen would flag - escalate to a full TRAQ assessment.");
+  else notes.push("This minimum shell is at or above the Mattheck t/R = 0.30 trigger, so the allowable loss keeps the shell within the common screen.");
+  notes.push("An OPEN cavity (a slot, not a closed pipe) is far weaker than this closed-hollow estimate. A screen, not a load rating; a qualified arborist and an ISA TRAQ assessment govern.");
+  return { min_shell_in, min_t_over_r, hollow_d_in, below_mattheck, notes };
+}
+export const trunkMinShellThicknessExample = { inputs: { diameter_in: 24, allow_loss_pct: 29.6 } };
+
+function _v730renderTrunkMinShellThickness(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: hollow-trunk strength-loss screen (Wagener 1963; Smiley & Fraedrich 1992; Mattheck & Breloer t/R; ISA TRAQ), by name, solved for the shell: t = (D/2) x (1 - (loss/100)^(1/3)), the inverse of loss% = ((D - 2t)/D)^3 x 100, with the Mattheck concern trigger at t/R < 0.30. Strength loss goes as the cube of the hollow ratio; an open cavity is far weaker. A screen, not a load rating; a qualified arborist and a TRAQ assessment govern.";
+  const D = makeNumber("Trunk diameter outside bark (in)", "tms-d", { step: "any", min: "0", value: "24" }); D.input.value = "24";
+  const loss = makeNumber("Allowable strength loss (%)", "tms-loss", { step: "any", min: "0", value: "29.6" }); loss.input.value = "29.6";
+  for (const f of [D, loss]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { D.input.value = "24"; loss.input.value = "29.6"; update(); });
+  const oShell = makeOutputLine(outputRegion, "Minimum sound-shell thickness", "tms-out-shell");
+  const oTr = makeOutputLine(outputRegion, "t/R at that shell", "tms-out-tr");
+  const oNote = makeOutputLine(outputRegion, "Note", "tms-out-note");
+  const update = debounce(() => {
+    const r = computeTrunkMinShellThickness({ diameter_in: Number(D.input.value) || 0, allow_loss_pct: Number(loss.input.value) || 0 });
+    if (r.error) { oShell.textContent = r.error; oTr.textContent = "-"; oNote.textContent = ""; return; }
+    oShell.textContent = fmt(r.min_shell_in, 2) + " in (hollow " + fmt(r.hollow_d_in, 1) + " in)";
+    oTr.textContent = fmt(r.min_t_over_r, 3) + (r.below_mattheck ? " (below Mattheck 0.30)" : " (at/above Mattheck 0.30)");
+    oNote.textContent = r.notes.join(" ");
+  }, DEBOUNCE_MS);
+  for (const f of [D, loss]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["trunk-min-shell-thickness"] = _v730renderTrunkMinShellThickness;
+
 // --- spec-v607 L: Open-cavity trunk strength loss (Smiley & Fraedrich 1992) ---
 // hollow_d = D - 2t. R = min(1, opening/(pi*D)). open_loss = (hollow_d^3 + R*(D^3 - hollow_d^3))/D^3 * 100. Collapses to Wagener at R=0.
 // dims: in { diameter_in: L, shell_thick_in: L, opening_width_in: L } out: { hollow_d_in: L, opening_ratio: dimensionless, closed_loss_pct: dimensionless, open_loss_pct: dimensionless, opening_penalty_pct: dimensionless }

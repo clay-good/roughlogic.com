@@ -22059,6 +22059,33 @@
    }
   },
   {
+   "tile_id": "trunk-min-shell-thickness",
+   "source_publisher": "Wagener 1963 / Mattheck t/R / ISA TRAQ (solved for the shell)",
+   "source_title": "min shell t = (D/2) x (1 - (loss/100)^(1/3)), the inverse of loss_pct = ((D - 2t)/D)^3 x 100",
+   "source_edition_or_year": "Wagener 1963",
+   "source_section_or_page": "24 in trunk held to 29.6% loss -> 4.0 in min shell, t/R 0.333",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "diameter_in": 24,
+    "allow_loss_pct": 29.6
+   },
+   "outputs": {
+    "min_shell_in": {
+     "value": 4.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "min_t_over_r": {
+     "value": 0.333,
+     "tolerance": {
+      "abs": 0.005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "trunk-decay-strength",
    "source_publisher": "Wagener 1963 / Mattheck t/R / ISA TRAQ",
    "source_title": "a thinner shell crosses the t/R < 0.30 concern trigger (cube-law sharp rise)",

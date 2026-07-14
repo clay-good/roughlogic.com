@@ -964,6 +964,7 @@ const RELATED = {
   "quadratic-mean-diameter": ["reineke-sdi", "basal-area-prism", "log-limb-weight"],
   "thinning-target-tpa": ["reineke-sdi", "quadratic-mean-diameter", "basal-area-prism"],
   "trunk-decay-strength": ["char-depth-capacity", "felling-notch-hinge", "log-limb-weight"],
+  "trunk-min-shell-thickness": ["trunk-decay-strength", "tree-open-cavity", "log-limb-weight"],
   "tree-open-cavity": ["trunk-decay-strength", "tree-protection-zone", "crown-pruning-dose"],
   "tree-protection-zone": ["trunk-decay-strength", "reineke-sdi", "log-limb-weight"],
   "tree-crz-encroachment": ["tree-protection-zone", "trunk-decay-strength", "crown-pruning-dose"],

@@ -4902,6 +4902,31 @@
       "kind": "industry"
     },
     {
+      "term": "minimum sound shell",
+      "target": "trunk-min-shell-thickness",
+      "kind": "industry"
+    },
+    {
+      "term": "shell thickness for strength loss",
+      "target": "trunk-min-shell-thickness",
+      "kind": "redirect"
+    },
+    {
+      "term": "how thick sound wood",
+      "target": "trunk-min-shell-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "minimum wall thickness tree",
+      "target": "trunk-min-shell-thickness",
+      "kind": "adjacent"
+    },
+    {
+      "term": "sound wood needed",
+      "target": "trunk-min-shell-thickness",
+      "kind": "adjacent"
+    },
+    {
       "term": "trunk decay",
       "target": "trunk-decay-strength",
       "kind": "industry"
