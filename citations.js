@@ -4101,6 +4101,18 @@ export const CITATIONS = {
       { name: "Default effectiveness ε", value: "0.85 indirect / 0.70 direct unless user supplies", source: "manufacturer typical" },
     ],
   },
+  "evaporative-cooler-effectiveness": {
+    formula: "T_out = T_db - saturation_effectiveness x (T_db - T_wb); temp_drop = effectiveness x (T_db - T_wb); wet_bulb_depression = T_db - T_wb.",
+    edition: "ASHRAE Fundamentals direct-evaporative (saturation) effectiveness relation, by name; classical psychrometrics.",
+    freeAccess: "The saturation-effectiveness relation is free in published engineering texts.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The leaving dry-bulb of a direct-evaporative (swamp) cooler from its pad saturation effectiveness: T_out = T_db - effectiveness x (T_db - T_wb). The wet-bulb depression (T_db - T_wb) is the maximum achievable drop - a 100%-effective pad would saturate the air to its wet-bulb; a real rigid-media pad runs about 0.80-0.90 and an aspen pad less. Because the drop is bounded by the wet-bulb, a dry climate (large depression) cools far more than a humid one. It is a sensible-cooling process that ADDS moisture: the leaving state rides the constant-wet-bulb line, so the leaving relative humidity is high (which limits how much of this cooling is comfortable indoors). Direct single-stage only; an indirect or indirect/direct (two-stage) cooler is a separate analysis, and the pad effectiveness is a manufacturer rating. A shop estimate; the equipment data govern.",
+    assumptions: [
+      { name: "Saturation effectiveness", value: "eff = (T_db - T_out)/(T_db - T_wb); user-entered, ~0.80-0.90 rigid media", source: "ASHRAE / manufacturer rating" },
+      { name: "Wet-bulb floor", value: "the leaving dry-bulb cannot fall below the entering wet-bulb", source: "psychrometrics" },
+      { name: "Direct single-stage", value: "adds moisture (constant wet-bulb line); indirect / two-stage is separate", source: "scope of this tile" },
+    ],
+  },
   "affinity-laws": {
     formula: "Q2/Q1 = (N2/N1); H2/H1 = (N2/N1)²; P2/P1 = (N2/N1)³. Laws apply for geometrically similar fans / pumps at the same point of operation.",
     edition: "Hydraulic Institute / AMCA by name; classical pump and fan theory.",

@@ -15327,6 +15327,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "swamp cooler temperature",
+      "target": "evaporative-cooler-effectiveness",
+      "kind": "question"
+    },
+    {
+      "term": "evaporative cooler leaving temperature",
+      "target": "evaporative-cooler-effectiveness",
+      "kind": "question"
+    },
+    {
+      "term": "swamp cooler output temp",
+      "target": "evaporative-cooler-effectiveness",
+      "kind": "question"
+    },
+    {
+      "term": "pad saturation effectiveness",
+      "target": "evaporative-cooler-effectiveness",
+      "kind": "industry"
+    },
+    {
+      "term": "evaporative cooler supply air",
+      "target": "evaporative-cooler-effectiveness",
+      "kind": "question"
+    },
+    {
       "term": "grid to ground distance",
       "target": "grid-to-ground",
       "kind": "question"

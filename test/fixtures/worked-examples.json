@@ -2048,6 +2048,34 @@
    }
   },
   {
+   "tile_id": "evaporative-cooler-effectiveness",
+   "source_publisher": "ASHRAE Fundamentals (saturation effectiveness)",
+   "source_title": "95 F db, 65 F wb, 85% pad -> 69.5 F leaving air",
+   "source_edition_or_year": "T_out = T_db - eff x (T_db - T_wb)",
+   "source_section_or_page": "depression = 95 - 65 = 30; drop = 0.85 x 30 = 25.5; leaving = 95 - 25.5 = 69.5 F",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "dry_bulb_F": 95,
+    "wet_bulb_F": 65,
+    "effectiveness": 0.85
+   },
+   "outputs": {
+    "leaving_db_F": {
+     "value": 69.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "temp_drop_F": {
+     "value": 25.5,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "drawbar-power",
    "source_publisher": "ASABE",
    "source_title": "4500 lb pull at 4.5 mph on firm soil (tractive eff 0.72)",

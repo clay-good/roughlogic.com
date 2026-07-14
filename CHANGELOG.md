@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(hvac): spec-v780 evaporative (swamp) cooler leaving temperature; 2026-07-14
+
+- New tile `evaporative-cooler-effectiveness` (Group C, calc-hvac.js): the supply-air temperature a direct-evaporative
+  (swamp) cooler delivers -- `T_out = T_db - saturation effectiveness x (T_db - T_wb)`. 95 F dry-bulb, 65 F wet-bulb, and
+  an 85% pad give 69.5 F. The wet-bulb depression is the maximum drop; pad effectiveness is a user input (~0.80-0.90 rigid
+  media). Distinct from the latent-heat `evaporative-cooling` tile, which the existing citation named but never computed.
+  Fuzzer pins the closed form, the wet-bulb floor, and the effectiveness monotonicity. calc-hvac.js gzip cap
+  77000 -> 79000 B. Home count 1,228 -> 1,229.
+
 ### feat(rescue): spec-v779 required fall-arrest clearance (ANSI Z359); 2026-07-14
 
 - New tile `fall-arrest-clearance` (Group F, calc-rescue.js): the clearance a personal fall-arrest system needs below the

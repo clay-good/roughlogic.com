@@ -274,7 +274,7 @@ const TOOL_MODULES = (() => {
     // v2
     "approach-delta-t",
     "outdoor-air-mix", "equivalent-length", "wet-bulb-psychrometer",
-    "insulation-thickness", "evaporative-cooling",
+    "insulation-thickness", "evaporative-cooling", "evaporative-cooler-effectiveness",
     // v3
     "affinity-laws", "belt-pulley", "air-receiver", "geothermal-loop",
     "baseboard-output", "baseboard-length-for-load", "npsh-a",

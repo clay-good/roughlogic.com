@@ -627,6 +627,54 @@ export const evaporativeCoolingExample = {
   expected: { cooling_btu_hr: 10540 },
 };
 
+// dims: in { dry_bulb_F: T, wet_bulb_F: T, effectiveness: dimensionless } out: { leaving_db_F: T, wet_bulb_depression_F: T, temp_drop_F: T }
+// Direct-evaporative (swamp) cooler leaving dry-bulb from pad saturation
+// effectiveness: T_out = T_db - eff x (T_db - T_wb). The wet-bulb is the floor.
+export function computeEvaporativeCoolerEffectiveness({ dry_bulb_F, wet_bulb_F, effectiveness = 0.85 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const db = Number(dry_bulb_F);
+  const wb = Number(wet_bulb_F);
+  const eff = Number(effectiveness);
+  if (!Number.isFinite(db)) return { error: "Dry-bulb temperature must be a number (F)." };
+  if (!Number.isFinite(wb)) return { error: "Wet-bulb temperature must be a number (F)." };
+  if (!(db > wb)) return { error: "Dry-bulb must be greater than wet-bulb (the wet-bulb is the evaporation floor)." };
+  if (!(eff > 0 && eff <= 1)) return { error: "Saturation effectiveness must be in (0, 1] (a fraction, e.g. 0.85)." };
+  const wet_bulb_depression_F = db - wb;
+  const temp_drop_F = eff * wet_bulb_depression_F;
+  const leaving_db_F = db - temp_drop_F;
+  return {
+    leaving_db_F, wet_bulb_depression_F, temp_drop_F,
+    note: "Direct-evaporative (swamp) cooler leaving dry-bulb: T_out = T_db - saturation_effectiveness x (T_db - T_wb). The wet-bulb depression (T_db - T_wb) is the maximum possible drop - a 100%-effective pad would cool the air all the way to the wet-bulb; a real rigid-media pad runs about 80-90% (eff 0.80-0.90), an aspen pad less. Cooling is limited by the wet-bulb, so a dry climate (large depression) cools far more than a humid one. This is a sensible-cooling process that ADDS moisture: the leaving air rides up the constant-wet-bulb line, so the leaving relative humidity is high. Direct (single-stage) only; an indirect or indirect/direct stage is separate. The pad effectiveness is a manufacturer rating; a shop estimate, and the equipment data govern.",
+  };
+}
+export const evaporativeCoolerEffectivenessExample = { inputs: { dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 0.85 } };
+
+// dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
+function renderEvaporativeCoolerEffectiveness(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: direct-evaporative (swamp) cooler leaving dry-bulb T_out = T_db - saturation_effectiveness x (T_db - T_wb), the standard ASHRAE Fundamentals saturation-effectiveness relation. Pad effectiveness ~0.80-0.90 for rigid media, less for aspen; the leaving air rides the constant-wet-bulb line so its RH is high. Direct single-stage only. A shop estimate; the equipment data govern.";
+  const db = makeNumber("Entering dry-bulb (F)", "ece-db", { step: "any", value: "95" });
+  db.input.value = "95";
+  const wb = makeNumber("Entering wet-bulb (F)", "ece-wb", { step: "any", value: "65" });
+  wb.input.value = "65";
+  const eff = makeNumber("Pad saturation effectiveness (0-1)", "ece-eff", { step: "any", min: "0", max: "1", value: "0.85" });
+  eff.input.value = "0.85";
+  for (const f of [db, wb, eff]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Leaving dry-bulb", "ece-out-t");
+  const oD = makeOutputLine(outputRegion, "Temperature drop", "ece-out-d");
+  const oW = makeOutputLine(outputRegion, "Wet-bulb depression (max drop)", "ece-out-w");
+  const oNote = makeOutputLine(outputRegion, "Note", "ece-out-note");
+  const update = debounce(() => {
+    const r = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: Number(db.input.value), wet_bulb_F: Number(wb.input.value), effectiveness: Number(eff.input.value) });
+    if (r.error) { oT.textContent = r.error; oD.textContent = "-"; oW.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.leaving_db_F, 1) + " F";
+    oD.textContent = fmt(r.temp_drop_F, 1) + " F";
+    oW.textContent = fmt(r.wet_bulb_depression_F, 1) + " F";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { db.input.value = "95"; wb.input.value = "65"; eff.input.value = "0.85"; update(); });
+  for (const f of [db.input, wb.input, eff.input]) f.addEventListener("input", update);
+}
+
 // --- v2 view renderers ---
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1665,6 +1713,7 @@ export const HVAC_RENDERERS = {
   "wet-bulb-psychrometer": renderWetBulbPsychrometer,
   "insulation-thickness": renderInsulationThickness,
   "evaporative-cooling": renderEvaporativeCooling,
+  "evaporative-cooler-effectiveness": renderEvaporativeCoolerEffectiveness,
   // v3
   "affinity-laws": renderAffinityLaws,
   "belt-pulley": renderBeltAndPulley,

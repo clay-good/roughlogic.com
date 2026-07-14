@@ -2092,6 +2092,7 @@ cross-check.
 | calc-hvac.js | `computeEquivalentLength` | `{ items = [] }` | _ | _ | _ |
 | calc-hvac.js | `computeErvSensibleRecovery` | `{ cfm = 0, t_oa_F = 0, t_ra_F = 0, eps_s = 0.75 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeErvTotalEnthalpyRecovery` | `{ cfm = 0, effectiveness = 0, h_outdoor = 0, h_return = 0 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeEvaporativeCoolerEffectiveness` | `{ dry_bulb_F, wet_bulb_F, effectiveness = 0.85 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFanAffinityLaws` | `{ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
@@ -2889,7 +2890,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1475.
+Row count: 1476.
 
 <!-- END function-corpus-v14 -->
 
@@ -3242,7 +3243,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (128 tiles)
+### Group C HVAC (129 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3304,6 +3305,7 @@ per spec-v14 §13.1 second paragraph.
 | `equivalent-length` | Equivalent Length of Fittings | ASHRAE / SMACNA fitting tables; Four long-radius 90-degree elbows at 1 in (1.7 ft each) +... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `erv-sensible-recovery` | ERV/HRV Sensible Effectiveness and Recovered Load | ASHRAE Standard 84 / AHRI Standard 10...; spec-v275 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `erv-total-enthalpy-recovery` | ERV Total Enthalpy Recovery | ASHRAE Fundamentals; spec-v441 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `evaporative-cooler-effectiveness` | Evaporative (Swamp) Cooler Leaving Temperature | ASHRAE Fundamentals (saturation effec...; depression = 95 - 65 = 30; drop = 0.85 x 30 = 25.5; leavi... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporative-cooling` | Latent Heat Evaporative Cooling | Project (first-principles); Q = m * hfg = 10 * 1054 = 10540 Btu/hr = 0.878 tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `evaporator-td-dtd` | Evaporator Design TD and Humidity Band | ASHRAE Refrigeration; spec-v434 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `excess-air-o2` | Excess Air from Flue-Gas O2 | ASME PTC 4.1 / combustion analysis pr...; Natural-gas appliance reading 4% O2 -> 4 / 16.9 x 100 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4303,6 +4305,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1228. Fixture-covered or reference-cadence: 1228 / 1228.
+Tile count: 1229. Fixture-covered or reference-cadence: 1229 / 1229.
 
 <!-- END tile-index-v14 -->

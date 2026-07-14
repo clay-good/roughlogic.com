@@ -270,6 +270,7 @@ export const COMPUTE_MAP = {
   "pdp": { module: "../../calc-fire.js", fn: "computePDP" },
   "excavation": { module: "../../calc-construction.js", fn: "computeExcavationVolume" },
   "evaporative-cooling": { module: "../../calc-hvac.js", fn: "computeEvaporativeCooling" },
+  "evaporative-cooler-effectiveness": { module: "../../calc-hvac.js", fn: "computeEvaporativeCoolerEffectiveness" },
   "conduit-fill": { module: "../../calc-electrical.js", fn: "computeConduitFill" },
   "battery-runtime": { module: "../../calc-solar.js", fn: "computeBatteryRuntime" },
   "loan-amortization": { module: "../../calc-accounting.js", fn: "computeAmortization" },

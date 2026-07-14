@@ -704,6 +704,7 @@ const RELATED = {
   "wet-bulb-psychrometer": ["psychrometric", "evaporative-cooling"],
   "insulation-thickness": ["insulation-heat-loss", "thermal-delta-t"],
   "evaporative-cooling": ["wet-bulb-psychrometer", "psychrometric"],
+  "evaporative-cooler-effectiveness": ["wet-bulb-psychrometer", "evaporative-cooling", "psychrometric"],
   "affinity-laws": ["pump-sizing", "belt-pulley", "pump-operating-point"],
   "belt-pulley": ["affinity-laws", "pump-sizing"],
   "air-receiver": ["combustion-air", "static-pressure-hvac"],

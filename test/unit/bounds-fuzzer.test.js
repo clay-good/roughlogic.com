@@ -489,6 +489,7 @@ import {
   computeCombustionAirMaxInput,
   computeApproachDeltaT,
   computeEvaporativeCooling,
+  computeEvaporativeCoolerEffectiveness,
   computeAffinityLaws,
   computeOutdoorAirMix,
   bandLabel,
@@ -1161,6 +1162,37 @@ test("bounds: calc-hvac computeEvaporativeCooling pins the Q = m * hfg identity 
   }
   assert.ok("error" in computeEvaporativeCooling({ evaporation_rate_lb_hr: 0 }));
   assert.ok("error" in computeEvaporativeCooling({ evaporation_rate_lb_hr: -5 }));
+});
+
+test("bounds: spec-v780 evaporative-cooler-effectiveness pins T_out = T_db - eff*(T_db-T_wb), the wet-bulb floor, and error seams", () => {
+  // Spec example: 95 db, 65 wb, eff 0.85 -> depression 30, drop 25.5, leaving 69.5.
+  const r = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 0.85 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.wet_bulb_depression_F - 30) < 1e-12);
+  assert.ok(Math.abs(r.temp_drop_F - 25.5) < 1e-12);
+  assert.ok(Math.abs(r.leaving_db_F - 69.5) < 1e-12);
+  // Effectiveness 1.0 saturates all the way to the wet-bulb; 0 (rejected) but near-0 barely cools.
+  const full = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 1.0 });
+  assert.ok(Math.abs(full.leaving_db_F - 65) < 1e-12, "eff 1.0 -> leaving = wet-bulb");
+  // Identity and floor across a sweep: leaving = db - eff*depression, and wb <= leaving < db.
+  for (let i = 0; i < 200; i++) {
+    const wb = 40 + (i % 30);
+    const db = wb + 1 + (i % 45);
+    const eff = 0.1 + (i % 9) * 0.1;
+    const m = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: db, wet_bulb_F: wb, effectiveness: eff });
+    assert.ok(!m.error, JSON.stringify({ db, wb, eff }));
+    assert.ok(Math.abs(m.leaving_db_F - (db - eff * (db - wb))) < 1e-9, "closed form");
+    assert.ok(m.leaving_db_F >= wb - 1e-9 && m.leaving_db_F < db + 1e-9, "wet-bulb floor, below dry-bulb");
+    // Higher effectiveness -> lower leaving temperature.
+    const more = computeEvaporativeCoolerEffectiveness({ dry_bulb_F: db, wet_bulb_F: wb, effectiveness: Math.min(1, eff + 0.05) });
+    assert.ok(more.leaving_db_F <= m.leaving_db_F + 1e-12, "more effective -> cooler");
+  }
+  // Error seams.
+  assert.ok("error" in computeEvaporativeCoolerEffectiveness({ dry_bulb_F: 65, wet_bulb_F: 65, effectiveness: 0.85 }), "db must exceed wb");
+  assert.ok("error" in computeEvaporativeCoolerEffectiveness({ dry_bulb_F: 60, wet_bulb_F: 65, effectiveness: 0.85 }), "wb > db rejected");
+  assert.ok("error" in computeEvaporativeCoolerEffectiveness({ dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 0 }));
+  assert.ok("error" in computeEvaporativeCoolerEffectiveness({ dry_bulb_F: 95, wet_bulb_F: 65, effectiveness: 1.2 }));
+  assert.ok("error" in computeEvaporativeCoolerEffectiveness({ dry_bulb_F: Infinity, wet_bulb_F: 65, effectiveness: 0.85 }));
 });
 
 test("bounds: calc-hvac computeAffinityLaws obeys Q ~ N, SP ~ N^2, kW ~ N^3 exactly across the RPM-target sweep", () => {
