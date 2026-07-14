@@ -72337,6 +72337,31 @@
       "kind": "question"
     },
     {
+      "term": "basin size for chlorine contact time",
+      "target": "detention-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "how big a contact basin for 120 minutes",
+      "target": "detention-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "sedimentation basin volume for detention",
+      "target": "detention-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "tank volume for target detention time",
+      "target": "detention-basin-volume",
+      "kind": "question"
+    },
+    {
+      "term": "clearwell size for ct",
+      "target": "detention-basin-volume",
+      "kind": "question"
+    },
+    {
       "term": "c1v1 equals c2v2 solve for missing volume",
       "target": "lab-dilution",
       "kind": "question"

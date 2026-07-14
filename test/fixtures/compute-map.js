@@ -181,6 +181,7 @@ export const COMPUTE_MAP = {
   "cooling-water-makeup": { module: "../../calc-water.js", fn: "computeCoolingWaterMakeup" },
   "chlorine-decay": { module: "../../calc-water.js", fn: "computeChlorineDecay" },
   "detention-time": { module: "../../calc-water.js", fn: "computeDetentionTime" },
+  "detention-basin-volume": { module: "../../calc-water.js", fn: "computeDetentionBasinVolume" },
   "spl-distance": { module: "../../calc-stage.js", fn: "computeSPL" },
   "spl-distance-for-level": { module: "../../calc-stage.js", fn: "computeSPLDistanceForLevel" },
   "gpa-rate": { module: "../../calc-agriculture.js", fn: "computeGPA" },

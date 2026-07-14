@@ -1205,6 +1205,7 @@ import {
   computePoundsFormula,
   computeFilterLoading,
   computeDetentionTime,
+  computeDetentionBasinVolume,
   computeDilution as computeWaterDilution,
   computePumpEfficiency,
   computeCoagulantDose,
@@ -1307,6 +1308,29 @@ test("bounds: calc-water computeDetentionTime pins minutes = volume / flow and t
 test("bounds: calc-water computeDetentionTime rejects negative volume or non-positive flow (documented)", () => {
   assert.ok("error" in computeDetentionTime({ tank_volume_gal: -1, flow_gpm: 100 }));
   assert.ok("error" in computeDetentionTime({ tank_volume_gal: 1000, flow_gpm: 0 }));
+});
+
+test("bounds: spec-v699 computeDetentionBasinVolume pins volume = target_minutes * flow, round-trips through computeDetentionTime, and error seams", () => {
+  const r = computeDetentionBasinVolume({ target_minutes: 120, flow_gpm: 350 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.tank_volume_gal - 42000) < 1e-9, `volume identity: ${r.tank_volume_gal}`);
+  assert.ok(Math.abs(r.tank_volume_ft3 - 42000 / 7.48052) < 1e-6, `ft3: ${r.tank_volume_ft3}`);
+  // Round-trip: at the required volume the forward tile's detention time equals the target.
+  for (const target_minutes of [15, 120, 600]) {
+    for (const flow_gpm of [10, 350, 2000]) {
+      const m = computeDetentionBasinVolume({ target_minutes, flow_gpm });
+      assert.ok(!m.error, `sweep t=${target_minutes} Q=${flow_gpm}: ${JSON.stringify(m)}`);
+      assertFinite(m.tank_volume_gal, "vol"); assert.ok(m.tank_volume_gal > 0, "vol positive");
+      const back = computeDetentionTime({ tank_volume_gal: m.tank_volume_gal, flow_gpm });
+      assert.ok(Math.abs(back.minutes - target_minutes) < 1e-9, `round-trip t=${target_minutes} Q=${flow_gpm}: ${back.minutes}`);
+    }
+  }
+  // More flow at the same target needs a bigger basin.
+  assert.ok(computeDetentionBasinVolume({ target_minutes: 120, flow_gpm: 700 }).tank_volume_gal > r.tank_volume_gal);
+  // Error seams: non-positive target, non-positive flow, non-finite.
+  assert.ok("error" in computeDetentionBasinVolume({ target_minutes: 0, flow_gpm: 350 }));
+  assert.ok("error" in computeDetentionBasinVolume({ target_minutes: 120, flow_gpm: 0 }));
+  assert.ok("error" in computeDetentionBasinVolume({ target_minutes: Infinity, flow_gpm: 350 }));
 });
 
 test("bounds: calc-water computeDilution single mode solves C1V1 = C2V2 for every missing variable", () => {

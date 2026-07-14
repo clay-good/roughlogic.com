@@ -952,7 +952,7 @@ const TOOL_MODULES = (() => {
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [
-    "pounds-formula", "filter-loading", "detention-time",
+    "pounds-formula", "filter-loading", "detention-time", "detention-basin-volume",
     "lab-dilution", "pump-eff-w2w", "srt-fm-ratio",
     // v8
     "coagulant-dose",

@@ -1322,6 +1322,33 @@
    }
   },
   {
+   "tile_id": "detention-basin-volume",
+   "source_publisher": "Ten States Standards / USEPA",
+   "source_title": "Required volume = target_minutes * flow_gpm (inverse of detention time)",
+   "source_edition_or_year": "Recommended Standards for Water Works",
+   "source_section_or_page": "120 min contact at 350 GPM -> 42,000 gal",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_minutes": 120,
+    "flow_gpm": 350
+   },
+   "outputs": {
+    "tank_volume_gal": {
+     "value": 42000,
+     "tolerance": {
+      "abs": 1e-06
+     }
+    },
+    "tank_volume_ft3": {
+     "value": 5614.583,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spl-distance",
    "source_publisher": "Project (first-principles)",
    "source_title": "Inverse-square law: L2 = L1 - 20 * log10(d2/d1)",

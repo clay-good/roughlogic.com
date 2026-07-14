@@ -4628,6 +4628,16 @@ export const CITATIONS = {
       { name: "Plug-flow assumption", value: "T_10 ≈ 0.5-0.7 × theoretical detention time unless user supplies a tracer-study value", source: "EPA Disinfection Profiling Guidance" },
     ],
   },
+  "detention-basin-volume": {
+    formula: "Required volume = target detention time × flow (the inverse of detention time = volume / flow). Sizes chlorine-contact (CT), flocculation, and sedimentation basins to a target contact/detention time.",
+    edition: "Recommended Standards for Water Works (Ten States Standards), latest edition, by name. EPA Surface Water Treatment Rule (SWTR) 40 CFR 141 Subpart H by section for CT.",
+    freeAccess: "40 CFR 141 free at ecfr.gov. Ten States Standards published by the Great Lakes - Upper Mississippi River Board.",
+    governance: GOVERNANCE.water,
+    editionNote: "The theoretical (plug-flow) basin volume from a target detention time. Real basins realize only T_10 ≈ 0.5-0.7 × the theoretical time due to short-circuiting, so a CT basin is typically oversized against the theoretical volume; a tracer study governs the design factor. The state primacy agency governs.",
+    assumptions: [
+      { name: "Plug-flow assumption", value: "returns the theoretical volume; apply a baffling/T_10 factor for CT credit", source: "EPA Disinfection Profiling Guidance" },
+    ],
+  },
   "lab-dilution": {
     formula: "C1V1 = C2V2 single-mode missing-side solve. Serial-mode: each step divides by the dilution factor; final concentration = C1 × DF^(-n_steps).",
     edition: "Standard Methods for the Examination of Water and Wastewater (APHA / AWWA / WEF), 24th edition by name.",

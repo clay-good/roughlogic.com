@@ -110,6 +110,26 @@ export function computeDetentionTime({ tank_volume_gal = 0, flow_gpm = 0, target
 
 export const detentionTimeExample = { inputs: { tank_volume_gal: 50000, flow_gpm: 350, target_minutes: 120 } };
 
+// --- 212b: Detention Basin Volume (inverse of Detention Time) ---
+//
+// The forward tile gives minutes = volume / flow; sizing a chlorine-contact,
+// flocculation, or sedimentation basin to a target time is the inverse:
+// required volume = target_minutes x flow.
+// dims: in { target_minutes: T, flow_gpm: L^3 T^-1 }
+//        out: { tank_volume_gal: L^3, tank_volume_ft3: L^3, hours: T }
+// (Time x volumetric flow = volume; the ft^3 form divides gallons by 7.48052.)
+export function computeDetentionBasinVolume({ target_minutes = 0, flow_gpm = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const t = Number(target_minutes);
+  const q = Number(flow_gpm);
+  if (!(t > 0)) return { error: "Target detention time must be positive (min)." };
+  if (!(q > 0)) return { error: "Flow must be positive (GPM)." };
+  const tank_volume_gal = t * q;
+  return { tank_volume_gal, tank_volume_ft3: tank_volume_gal / 7.48052, hours: t / 60 };
+}
+
+export const detentionBasinVolumeExample = { inputs: { target_minutes: 120, flow_gpm: 350 } };
+
 // --- 213: Lab Dilution and Serial Dilution ---
 //
 // C1V1 = C2V2; serial: each step divides by the dilution factor.
@@ -322,6 +342,20 @@ const renderDetentionTime = _r({
     { key: "wor", id: "dt-out-wor", label: "Weir overflow rate", value: (r) => r.weir_overflow_rate_gpd_ft == null ? "(enter weir length)" : fmt(r.weir_overflow_rate_gpd_ft, 0) + " gpd/ft" },
   ],
   compute: computeDetentionTime,
+});
+
+const renderDetentionBasinVolume = _r({
+  citation: "Citation: Required basin volume = target detention time x flow (the inverse of detention time = volume / flow). Sizes chlorine-contact, flocculation, and sedimentation basins to a target time (Ten States Standards).",
+  example: detentionBasinVolumeExample.inputs,
+  fields: [
+    { key: "target_minutes", label: "Target detention time (min)", kind: "number" },
+    { key: "flow_gpm",       label: "Flow (GPM)", kind: "number" },
+  ],
+  outputs: [
+    { key: "v", id: "dbv-out-v", label: "Required volume", value: (r) => fmt(r.tank_volume_gal, 0) + " gal (" + fmt(r.tank_volume_ft3, 1) + " ft^3)" },
+    { key: "h", id: "dbv-out-h", label: "Target time",     value: (r) => fmt(r.hours, 2) + " hr" },
+  ],
+  compute: computeDetentionBasinVolume,
 });
 
 function renderDilution(inputRegion, outputRegion, citationEl) {
@@ -588,6 +622,7 @@ export const WATER_RENDERERS = {
   "pounds-formula":   renderPounds,
   "filter-loading":   renderFilterLoading,
   "detention-time":   renderDetentionTime,
+  "detention-basin-volume": renderDetentionBasinVolume,
   "lab-dilution":     renderDilution,
   "pump-eff-w2w":     renderPumpEff,
   "srt-fm-ratio":     renderSRTFM,

@@ -374,6 +374,7 @@ const RELATED = {
   // worked examples walk it.
   "pounds-formula": ["detention-time", "disinfection-ct", "coagulant-dose"],
   "detention-time": ["pounds-formula", "disinfection-ct", "filter-loading"],
+  "detention-basin-volume": ["detention-time", "disinfection-ct", "clarifier-surface-loading", "flocculation-g-value"],
   "disinfection-ct": ["detention-time", "pounds-formula", "coagulant-dose"],
   "coagulant-dose": ["pounds-formula", "disinfection-ct"],
   "filter-loading": ["detention-time", "pump-eff-w2w"],
