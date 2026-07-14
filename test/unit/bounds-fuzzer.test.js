@@ -560,6 +560,7 @@ import {
   computeRecircPumpHead,
   computeStaticPressureLossPiping,
   computeStormwaterRational,
+  computeStormwaterMaxDrainageArea,
   computeTanklessGPM,
   computeTrapArm,
   computeWaterHammerArrestor,
@@ -7465,6 +7466,32 @@ test("bounds: calc-plumbing computeStormwaterRational pins Q = C*i*A (acres) and
   assert.ok("error" in computeStormwaterRational({ area_ft2: 0, surface: "asphalt", rainfall_in_per_hr: 2 }));
   assert.ok("error" in computeStormwaterRational({ area_ft2: 100, surface: "asphalt", rainfall_in_per_hr: -1 }));
   assert.ok("error" in computeStormwaterRational({ area_ft2: 100, surface: "moonrock", rainfall_in_per_hr: 1 }));
+});
+
+test("bounds: spec-v716 computeStormwaterMaxDrainageArea pins A = Q/(C*i)*43560, round-trips through computeStormwaterRational, and error seams", () => {
+  const r = computeStormwaterMaxDrainageArea({ allowable_flow_cfs: 2, surface: "asphalt", rainfall_in_per_hr: 2 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_area_acres - 2 / (0.95 * 2)) < 1e-9, `acres identity: ${r.max_area_acres}`);
+  assert.ok(Math.abs(r.max_area_ft2 - 45852.6316) < 1e-2, `pinned 45,853 ft^2: ${r.max_area_ft2}`);
+  // Round-trip: at the max area the forward tile's peak flow equals the allowable flow.
+  for (const allowable_flow_cfs of [0.5, 2, 10]) {
+    for (const surface of ["asphalt", "gravel", "lawn", "forest"]) {
+      for (const rainfall_in_per_hr of [1, 2, 4]) {
+        const m = computeStormwaterMaxDrainageArea({ allowable_flow_cfs, surface, rainfall_in_per_hr });
+        assert.ok(!m.error, `sweep Q=${allowable_flow_cfs} ${surface} i=${rainfall_in_per_hr}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_area_ft2, "area"); assert.ok(m.max_area_ft2 > 0, "area positive");
+        const back = computeStormwaterRational({ area_ft2: m.max_area_ft2, surface, rainfall_in_per_hr });
+        assert.ok(Math.abs(back.peak_flow_cfs - allowable_flow_cfs) < 1e-6, `round-trip Q=${allowable_flow_cfs} ${surface} i=${rainfall_in_per_hr}: ${back.peak_flow_cfs}`);
+      }
+    }
+  }
+  // A rougher (lower C) surface accepts a larger area for the same outlet.
+  assert.ok(computeStormwaterMaxDrainageArea({ allowable_flow_cfs: 2, surface: "lawn", rainfall_in_per_hr: 2 }).max_area_ft2 > r.max_area_ft2);
+  // Error seams: non-positive flow, rainfall, unknown surface, non-finite.
+  assert.ok("error" in computeStormwaterMaxDrainageArea({ allowable_flow_cfs: 0, surface: "asphalt", rainfall_in_per_hr: 2 }));
+  assert.ok("error" in computeStormwaterMaxDrainageArea({ allowable_flow_cfs: 2, surface: "asphalt", rainfall_in_per_hr: 0 }));
+  assert.ok("error" in computeStormwaterMaxDrainageArea({ allowable_flow_cfs: 2, surface: "moonrock", rainfall_in_per_hr: 2 }));
+  assert.ok("error" in computeStormwaterMaxDrainageArea({ allowable_flow_cfs: Infinity, surface: "asphalt", rainfall_in_per_hr: 2 }));
 });
 
 test("bounds: calc-plumbing computeManningSlope pins half-full Manning slope with R=D/4 on the 4\" PVC example", () => {

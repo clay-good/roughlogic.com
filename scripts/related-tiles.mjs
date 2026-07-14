@@ -632,6 +632,7 @@ const RELATED = {
   "tankless-gpm": ["pipe-sizing", "friction-loss"],
   "gas-leak-rate": ["gas-pipe-sizing", "hydrostatic-test"],
   "stormwater-rational": ["manning-slope", "rainwater-yield"],
+  "stormwater-max-drainage-area": ["stormwater-rational", "time-of-concentration", "stormwater-detention-volume", "roof-drain-sizing"],
   "manning-slope": ["manning-pipe-capacity", "slope", "stormwater-rational", "trap-arm"],
   "manning-pipe-capacity": ["manning-slope", "channel-froude-number", "stormwater-rational", "weir-flow"],
   "drainage-invert": ["slope", "manning-slope", "trench-slope"],

@@ -989,6 +989,30 @@ export const stormwaterRationalExample = {
   inputs: { area_ft2: 5000, surface: "asphalt", rainfall_in_per_hr: 2 },
 };
 
+// stormwater-max-drainage-area: inverse of stormwater-rational. The forward tile
+// gives the peak runoff from a catchment area; sizing the tributary area to an
+// allowable outlet/inlet capacity is the inverse. From Q = C x i x A_acres,
+// A_acres = Q / (C x i), then A_ft2 = A_acres x 43560.
+// dims: in { allowable_flow_cfs: L^3 T^-1, surface: dimensionless, rainfall_in_per_hr: L T^-1 } out: { max_area_ft2: L^2, max_area_acres: L^2, runoff_coefficient: dimensionless }
+export function computeStormwaterMaxDrainageArea({ allowable_flow_cfs = 0, surface = "asphalt", rainfall_in_per_hr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Q = Number(allowable_flow_cfs) || 0;
+  const i = Number(rainfall_in_per_hr) || 0;
+  if (!(Q > 0)) return { error: "Allowable flow must be positive (cfs)." };
+  if (!(i > 0)) return { error: "Rainfall intensity must be positive (in/hr)." };
+  const C = RUNOFF_COEFFICIENTS[surface];
+  if (!Number.isFinite(C)) return { error: "Unknown surface type." };
+  const max_area_acres = Q / (C * i);
+  const max_area_ft2 = max_area_acres * 43560;
+  return {
+    max_area_ft2, max_area_acres, runoff_coefficient: C,
+    note: "The Rational method Q = C x i x A solved for the area: the largest tributary catchment of this surface that an inlet, pipe, or outlet rated for the allowable flow can accept at the design rainfall intensity. A rougher (lower C) surface or a lower rainfall intensity lets a larger area drain to the same outlet. The Rational method suits small (< about 200-acre) uniform catchments; the runoff coefficient and the design storm (intensity-duration-frequency at the time of concentration) are set by the local drainage code. A design aid; the AHJ and the civil engineer of record govern.",
+  };
+}
+export const stormwaterMaxDrainageAreaExample = {
+  inputs: { allowable_flow_cfs: 2, surface: "asphalt", rainfall_in_per_hr: 2 },
+};
+
 // --- Utility 133: Manning's Equation Drainage Slope ---
 //
 // Manning: V = (1.486 / n) * R^(2/3) * S^(1/2) (English units, ft, ft/s).
@@ -1295,6 +1319,27 @@ export function renderStormwaterRational(inputRegion, outputRegion, citationEl) 
     oGpm.textContent = fmt(x.peak_flow_gpm, 1) + " gpm";
   }, DEBOUNCE_MS);
   for (const el of [a.input, s.select, r.input]) el.addEventListener("input", update);
+}
+
+function renderStormwaterMaxDrainageArea(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Rational method Q = C * i * A solved for the area, A_acres = Q / (C * i) (cfs / in-per-hr / acres). Public engineering practice; runoff coefficients bundled per surface from public engineering tables. A design aid; the AHJ and the civil engineer govern.";
+  attachExampleButton(inputRegion, () => fillExample(stormwaterMaxDrainageAreaExample.inputs));
+  const q = makeNumber("Allowable outlet/inlet flow (cfs)", "swm-q", { step: "any", min: "0" });
+  const s = makeSelect("Surface", "swm-s", Object.keys(RUNOFF_COEFFICIENTS).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
+  const r = makeNumber("Rainfall intensity (in/hr)", "swm-r", { step: "any", min: "0" });
+  for (const f of [q, s, r]) inputRegion.appendChild(f.wrap);
+  const oC = makeOutputLine(outputRegion, "Runoff coefficient", "swm-out-c");
+  const oFt2 = makeOutputLine(outputRegion, "Max tributary area", "swm-out-ft2");
+  const oN = makeOutputLine(outputRegion, "Note", "swm-out-n");
+  function fillExample(v) { q.input.value = v.allowable_flow_cfs; s.select.value = v.surface; r.input.value = v.rainfall_in_per_hr; update(); }
+  const update = debounce(() => {
+    const x = computeStormwaterMaxDrainageArea({ allowable_flow_cfs: Number(q.input.value) || 0, surface: s.select.value, rainfall_in_per_hr: Number(r.input.value) || 0 });
+    if (x.error) { oC.textContent = x.error; oFt2.textContent = "-"; oN.textContent = "-"; return; }
+    oC.textContent = fmt(x.runoff_coefficient, 2);
+    oFt2.textContent = fmt(x.max_area_ft2, 0) + " ft^2 (" + fmt(x.max_area_acres, 3) + " acres)";
+    oN.textContent = x.note;
+  }, DEBOUNCE_MS);
+  for (const el of [q.input, s.select, r.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1918,6 +1963,7 @@ export const PLUMBING_RENDERERS = {
   "hydrostatic-test": renderHydrostaticTest,
   "grease-trap": renderGreaseTrap,
   "grease-interceptor-flow-capacity": renderGreaseInterceptorFlowCapacity,
+  "stormwater-max-drainage-area": renderStormwaterMaxDrainageArea,
   "glycol-mix": renderGlycolMix,
   "expansion-tank": renderExpansionTank,
   "backflow-loss": renderBackflowLoss,

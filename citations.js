@@ -3493,6 +3493,17 @@ export const CITATIONS = {
       { name: "Time of concentration", value: "user-supplied; method assumes Q peaks at Tc", source: "rational method assumption" },
     ],
   },
+  "stormwater-max-drainage-area": {
+    formula: "A_acres = Q / (C × i); A_ft2 = A_acres × 43560. The Rational method Q = C × i × A solved for the area, C from bundled runoff coefficients per surface.",
+    edition: "Rational method by name (public hydrology), solved for the area. C-values from public engineering practice.",
+    freeAccess: "Rainfall intensity / IDF curves free at hdsc.nws.noaa.gov (NOAA Atlas 14).",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "The inverse of stormwater-rational: the largest tributary catchment of a given surface that an inlet, pipe, or outlet rated for the allowable flow can accept at the design rainfall intensity. A rougher (lower C) surface or a lower rainfall intensity lets a larger area drain to the same outlet. The Rational method suits small (< about 200-acre) uniform catchments; the runoff coefficient and the design storm (intensity-duration-frequency at the time of concentration) are set by the local drainage code. A design aid; the AHJ and the civil engineer of record govern.",
+    assumptions: [
+      { name: "C-values", value: "data/plumbing/runoff-coefficients.json keyed to surface", source: "public engineering practice" },
+      { name: "Small uniform catchment", value: "Rational method valid for < ~200-acre uniform catchments; peaks at Tc", source: "rational method assumption" },
+    ],
+  },
   "manning-slope": {
     formula: "English Manning V = (1.486 / n) × R^(2/3) × S^(1/2), solved for self-cleansing slope at 2 ft/s and the slope to carry target flow at half-full with R = D / 4.",
     edition: "Manning equation; n-values from USGS WSP-2339 (public domain).",

@@ -268,6 +268,7 @@ export const COMPUTE_MAP = {
   "tip-out": { module: "../../calc-cross.js", fn: "computeTipOut" },
   "pipe-volume": { module: "../../calc-plumbing.js", fn: "computePipeVolume" },
   "stormwater-rational": { module: "../../calc-plumbing.js", fn: "computeStormwaterRational" },
+  "stormwater-max-drainage-area": { module: "../../calc-plumbing.js", fn: "computeStormwaterMaxDrainageArea" },
   "tankless-gpm": { module: "../../calc-plumbing.js", fn: "computeTanklessGPM" },
   "glycol-mix": { module: "../../calc-plumbing.js", fn: "computeGlycolMix" },
   "pump-sizing": { module: "../../calc-plumbing.js", fn: "computePumpSize" },

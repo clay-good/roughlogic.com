@@ -4366,6 +4366,34 @@
    }
   },
   {
+   "tile_id": "stormwater-max-drainage-area",
+   "source_publisher": "USEPA / NRCS",
+   "source_title": "A_acres = Q / (C * i); inverse of the Rational method",
+   "source_edition_or_year": "current public stormwater design references",
+   "source_section_or_page": "2 cfs allowable, asphalt (C=0.95), 2 in/hr -> 1.053 acres = 45,853 ft^2",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "allowable_flow_cfs": 2,
+    "surface": "asphalt",
+    "rainfall_in_per_hr": 2
+   },
+   "outputs": {
+    "max_area_acres": {
+     "value": 1.05263,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "max_area_ft2": {
+     "value": 45852.6,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tankless-gpm",
    "source_publisher": "Project (first-principles)",
    "source_title": "Tankless GPM = (kBTU * 1000) / (8.33 lb/gal * 60 min/hr * dT_F)",

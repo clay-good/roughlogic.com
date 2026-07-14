@@ -177,7 +177,7 @@ const _TILES = [
   ["water-hammer-arrestor", "B"], ["recirc-pump-head", "B"], ["septic-tank", "B"],
   ["recirc-loop-sizing", "B"],
   ["trap-arm", "B"], ["pipe-expansion", "B"], ["tankless-gpm", "B"],
-  ["gas-leak-rate", "B"], ["stormwater-rational", "B"], ["manning-slope", "B"], ["manning-pipe-capacity", "B"],
+  ["gas-leak-rate", "B"], ["stormwater-rational", "B"], ["stormwater-max-drainage-area", "B"], ["manning-slope", "B"], ["manning-pipe-capacity", "B"],
   ["drainage-invert", "B"],
   ["hydrostatic-test", "B"], ["grease-trap", "B"], ["grease-interceptor-flow-capacity", "B"], ["glycol-mix", "B"],
   ["expansion-tank", "B"], ["backflow-loss", "B"], ["water-hammer-surge", "B"],

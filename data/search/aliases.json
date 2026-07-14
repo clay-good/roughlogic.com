@@ -49972,6 +49972,31 @@
       "kind": "question"
     },
     {
+      "term": "max drainage area for an outlet",
+      "target": "stormwater-max-drainage-area",
+      "kind": "question"
+    },
+    {
+      "term": "how big a catchment for 2 cfs",
+      "target": "stormwater-max-drainage-area",
+      "kind": "question"
+    },
+    {
+      "term": "tributary area for allowable flow",
+      "target": "stormwater-max-drainage-area",
+      "kind": "question"
+    },
+    {
+      "term": "max area draining to an inlet",
+      "target": "stormwater-max-drainage-area",
+      "kind": "question"
+    },
+    {
+      "term": "catchment size from allowable runoff",
+      "target": "stormwater-max-drainage-area",
+      "kind": "question"
+    },
+    {
       "term": "mannings formula sewer slope",
       "target": "manning-slope",
       "kind": "question"
