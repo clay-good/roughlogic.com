@@ -943,6 +943,46 @@ GEOTECH_RENDERERS["spt-bearing-capacity"] = _simpleRenderer({
   compute: computeSptBearingCapacity,
 });
 
+// spt-required-n60: inverse of spt-bearing-capacity. The forward tile gives the
+// allowable bearing from an SPT N60; checking whether the boring supports a
+// design pressure is the inverse. Since qa is linear in N60 for both footing
+// branches (and Kd is independent of N60), the required N60 = qa_target /
+// qa(at N60 = 1); the forward is reused at N60 = 1 to carry the branch + Kd.
+// dims: in { qa_target_ksf: M L^-1 T^-2, b_ft: L, d_ft: L } out: { n60: dimensionless, kd: dimensionless, qa_per_n60_ksf: M L^-1 T^-2 }
+export function computeSptRequiredN60({ qa_target_ksf = 0, b_ft = 0, d_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const qa = Number(qa_target_ksf) || 0;
+  const b = Number(b_ft) || 0;
+  const d = Number(d_ft) || 0;
+  if (!(qa > 0)) return { error: "Target allowable bearing must be positive (ksf)." };
+  if (!(b > 0)) return { error: "Footing width B must be positive (ft)." };
+  if (!(d > 0)) return { error: "Embedment depth D must be positive (ft)." };
+  const base = computeSptBearingCapacity({ n60: 1, b_ft: b, d_ft: d });
+  if (base.error) return { error: base.error };
+  const qa_per_n60_ksf = base.qa_ksf;
+  const n60 = qa / qa_per_n60_ksf;
+  return {
+    n60, n60_design: Math.ceil(n60), kd: base.kd, small_footing: base.small_footing, qa_per_n60_ksf,
+    note: "Meyerhof SPT allowable bearing solved for the blow count: the energy-corrected N60 the sand must show to carry a target pressure at a 1 in settlement, N60 = qa_target / qa(N60=1), with qa = N60/4 (ksf) for B <= 4 ft or (N60/6)((B+1)/B)^2 for wider footings, times Kd = min(1 + 0.33 D/B, 1.33). Round up to the next whole blow count for design. This is a settlement-controlled (serviceability) check against the boring's N-value, not the ultimate bearing capacity; N60 must be energy-corrected, and a shallow water table roughly halves the capacity (so it raises the required N60, not applied here). A design aid; the engineer of record and the geotechnical report govern.",
+  };
+}
+export const sptRequiredN60Example = { inputs: { qa_target_ksf: 5, b_ft: 6, d_ft: 2 } };
+GEOTECH_RENDERERS["spt-required-n60"] = _simpleRenderer({
+  citation: "Citation: Meyerhof SPT allowable bearing on sand solved for the blow count, N60 = qa_target / qa(N60=1), with qa = N60/4 ksf (B <= 4 ft) or (N60/6)((B+1)/B)^2 times Kd = min(1 + 0.33 D/B, 1.33), by name. A settlement-controlled (serviceability) check; N60 must be energy-corrected. A design aid; the engineer of record and the geotechnical report govern.",
+  example: sptRequiredN60Example.inputs,
+  fields: [
+    { key: "qa_target_ksf", label: "Target allowable bearing qa (ksf)", kind: "number", default: 5 },
+    { key: "b_ft", label: "Footing width B (ft)", kind: "number", default: 6 },
+    { key: "d_ft", label: "Embedment depth D (ft)", kind: "number", default: 2 },
+  ],
+  outputs: [
+    { key: "n60", id: "srn-out-n60", label: "Required N60 (round up for design)", value: (r) => fmt(r.n60, 1) + " (design " + r.n60_design + ")" },
+    { key: "kd", id: "srn-out-kd", label: "Depth factor Kd", value: (r) => fmt(r.kd, 2) + (r.small_footing ? " (B <= 4 branch)" : " (wide-footing branch)") },
+    { key: "n", id: "srn-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSptRequiredN60,
+});
+
 // dims: in { amax_g: dimensionless, sigma_v_psf: M L^-1 T^-2, sigma_vp_psf: M L^-1 T^-2, depth_ft: L, crr: dimensionless, msf: dimensionless } out: { rd: dimensionless, csr: dimensionless, fs: dimensionless }
 export function computeLiquefactionScreening({ amax_g = 0, sigma_v_psf = 0, sigma_vp_psf = 0, depth_ft = 0, crr = 0, msf = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

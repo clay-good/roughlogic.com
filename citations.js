@@ -12430,6 +12430,18 @@ export const CITATIONS = {
       { name: "Settlement-controlled", value: "1 in settlement allowable; no added FS; N60 energy-corrected", source: "scope of this tile" },
     ],
   },
+  "spt-required-n60": {
+    formula: "N60 = qa_target / qa(N60=1), the Meyerhof SPT allowable qa = [N60/4 (B <= 4 ft) or (N60/6)((B+1)/B)^2] x Kd solved for the blow count; Kd = min(1 + 0.33 D/B, 1.33).",
+    edition: "The Meyerhof SPT settlement-based allowable bearing on sand solved for the blow count, as compiled in Das, Principles of Foundation Engineering, by name.",
+    freeAccess: "The Meyerhof N-value allowable-bearing correlations are standard published foundation-engineering results.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of spt-bearing-capacity: the energy-corrected SPT N60 the sand must show to carry a target allowable pressure at a 1 inch settlement. Because qa is linear in N60 (both footing branches) and the depth factor Kd is independent of N60, the required N60 is the target pressure divided by the allowable at N60 = 1; round up to the next whole blow count for design. This is a settlement-controlled (serviceability) check against the boring's N-value, not the ultimate bearing capacity; N60 must be energy-corrected, and a high water table near the footing roughly halves the capacity (raising the required N60) and is not applied here. A design aid; the engineer of record and the geotechnical report govern.",
+    assumptions: [
+      { name: "Blow count from pressure", value: "N60 = qa_target / qa(N60=1), qa linear in N60 in both branches", source: "Meyerhof / Das" },
+      { name: "Depth factor", value: "Kd = min(1 + 0.33 D/B, 1.33), independent of N60", source: "Meyerhof" },
+      { name: "Settlement-controlled", value: "1 in settlement check; N60 energy-corrected; round up for design", source: "scope of this tile" },
+    ],
+  },
   "liquefaction-screening": {
     formula: "rd = 1 - 0.00233172 z (z <= 30.02 ft) else 1.174 - 0.00813816 z; CSR = 0.65 amax (sigma_v/sigma'_v) rd; FS = (CRR/CSR) MSF; liquefiable if FS < 1.",
     edition: "The Seed-Idriss simplified liquefaction-triggering procedure (NCEER/NSF workshop consensus), by name.",

@@ -1132,6 +1132,7 @@ export const COMPUTE_MAP = {
   "consolidation-time-rate": { module: "../../calc-geotech.js", fn: "computeConsolidationTimeRate" },
   "consolidation-degree": { module: "../../calc-geotech.js", fn: "computeConsolidationDegree" },
   "spt-bearing-capacity": { module: "../../calc-geotech.js", fn: "computeSptBearingCapacity" },
+  "spt-required-n60": { module: "../../calc-geotech.js", fn: "computeSptRequiredN60" },
   "liquefaction-screening": { module: "../../calc-geotech.js", fn: "computeLiquefactionScreening" },
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (3 tiles, new calc-masonry.js)
   "cmu-wall-flexure": { module: "../../calc-masonry.js", fn: "computeCmuWallFlexure" },

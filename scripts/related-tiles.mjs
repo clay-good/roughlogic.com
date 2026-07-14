@@ -1166,6 +1166,7 @@ const RELATED = {
   "consolidation-time-rate": ["consolidation-degree","soil-consolidation-settlement","soil-settlement-elastic","spt-bearing-capacity"],
   "consolidation-degree": ["consolidation-time-rate","soil-consolidation-settlement","soil-settlement-elastic","spt-bearing-capacity"],
   "spt-bearing-capacity": ["soil-bearing-capacity","soil-settlement-elastic","consolidation-time-rate","footing-area"],
+  "spt-required-n60": ["spt-bearing-capacity","soil-bearing-capacity","soil-settlement-elastic","footing-area"],
   "liquefaction-screening": ["spt-bearing-capacity","soil-bearing-capacity","seismic-design-spectral-acceleration","consolidation-time-rate"],
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (Group E, calc-masonry.js)
   "cmu-wall-flexure": ["cmu-shear-wall","cmu-wall-axial","cmu-grout-volume","rc-beam-flexure"],

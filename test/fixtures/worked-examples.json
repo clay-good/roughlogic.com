@@ -38885,6 +38885,34 @@
    }
   },
   {
+   "tile_id": "spt-required-n60",
+   "source_publisher": "Meyerhof / Das",
+   "source_title": "N60 = qa_target / qa(N60=1); inverse of the SPT allowable bearing",
+   "source_edition_or_year": "spec-v712 worked example (machine-verified; inverse of spec-v415)",
+   "source_section_or_page": "5 ksf target, B 6 ft, D 2 ft -> N60 ~19.86 (design 20)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "qa_target_ksf": 5,
+    "b_ft": 6,
+    "d_ft": 2
+   },
+   "outputs": {
+    "n60": {
+     "value": 19.856591,
+     "tolerance": {
+      "pct": 0.5
+     }
+    },
+    "kd": {
+     "value": 1.11,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "spt-bearing-capacity",
    "source_publisher": "Meyerhof / Das",
    "source_title": "cross-check: a narrow B 3 ft footing uses the N60/4 branch -> 5.00 ksf base",

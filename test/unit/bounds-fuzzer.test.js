@@ -18131,6 +18131,35 @@ test("bounds: spec-v415 computeSptBearingCapacity pins both branches, the depth 
   assert.ok("error" in _v415({ n60: Infinity, b_ft: 6, d_ft: 2 }));
 });
 
+import { computeSptRequiredN60 as _v712 } from "../../calc-geotech.js";
+test("bounds: spec-v712 computeSptRequiredN60 pins N60 = qa_target/qa(N60=1), round-trips through computeSptBearingCapacity, and error seams", () => {
+  const r = _v712({ qa_target_ksf: 5, b_ft: 6, d_ft: 2 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.n60 - 19.856591) < 1e-4, `pinned N60 ~19.86: ${r.n60}`);
+  assert.strictEqual(r.n60_design, 20);
+  // Round-trip: at the required N60 the forward tile's allowable equals the target (both footing branches).
+  for (const qa_target_ksf of [1.5, 5, 12]) {
+    for (const b_ft of [3, 6, 12]) {
+      for (const d_ft of [1, 2, 8]) {
+        const m = _v712({ qa_target_ksf, b_ft, d_ft });
+        assert.ok(!m.error, `sweep qa=${qa_target_ksf} B=${b_ft} D=${d_ft}: ${JSON.stringify(m)}`);
+        assertFinite(m.n60, "n60"); assert.ok(m.n60 > 0, "n60 positive");
+        const back = _v415({ n60: m.n60, b_ft, d_ft });
+        assert.ok(Math.abs(back.qa_ksf - qa_target_ksf) < 1e-6, `round-trip qa=${qa_target_ksf} B=${b_ft} D=${d_ft}: ${back.qa_ksf}`);
+      }
+    }
+  }
+  // A narrow footing uses the N60/4 branch (flagged like the forward).
+  assert.strictEqual(_v712({ qa_target_ksf: 5, b_ft: 3, d_ft: 2 }).small_footing, true);
+  // A higher target pressure needs a higher N60.
+  assert.ok(_v712({ qa_target_ksf: 8, b_ft: 6, d_ft: 2 }).n60 > r.n60);
+  // Error seams: non-positive target, width, depth, non-finite.
+  assert.ok("error" in _v712({ qa_target_ksf: 0, b_ft: 6, d_ft: 2 }));
+  assert.ok("error" in _v712({ qa_target_ksf: 5, b_ft: 0, d_ft: 2 }));
+  assert.ok("error" in _v712({ qa_target_ksf: 5, b_ft: 6, d_ft: 0 }));
+  assert.ok("error" in _v712({ qa_target_ksf: Infinity, b_ft: 6, d_ft: 2 }));
+});
+
 test("bounds: spec-v416 computeLiquefactionScreening pins CSR/FS, the trigger, and error seams", () => {
   const r = _v416({ amax_g: 0.30, sigma_v_psf: 2000, sigma_vp_psf: 1200, depth_ft: 16.4042, crr: 0.20, msf: 1.0 });
   assert.ok(Math.abs(r.rd - (1 - 0.00233172 * 16.4042)) < 1e-9);

@@ -48397,6 +48397,31 @@
       "kind": "question"
     },
     {
+      "term": "required n value for bearing pressure",
+      "target": "spt-required-n60",
+      "kind": "question"
+    },
+    {
+      "term": "what spt n60 do i need",
+      "target": "spt-required-n60",
+      "kind": "question"
+    },
+    {
+      "term": "blow count for allowable bearing",
+      "target": "spt-required-n60",
+      "kind": "question"
+    },
+    {
+      "term": "does my boring support the design pressure",
+      "target": "spt-required-n60",
+      "kind": "question"
+    },
+    {
+      "term": "minimum n60 for footing",
+      "target": "spt-required-n60",
+      "kind": "question"
+    },
+    {
       "term": "will the sand liquefy in an earthquake",
       "target": "liquefaction-screening",
       "kind": "question"

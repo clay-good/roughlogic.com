@@ -746,7 +746,7 @@ const _TILES = [
   ["concrete-torsion-threshold", "E"], ["glulam-volume-factor", "E"], ["masonry-anchor-bolt", "E"], ["masonry-anchor-embedment", "E"],
   // spec-v260..v262 geotechnical foundation-and-earth-retaining trio (calc-geotech.js)
   ["soil-bearing-capacity", "E"], ["lateral-earth-pressure", "E"], ["at-rest-earth-pressure", "E"], ["submerged-earth-pressure", "E"], ["sloped-backfill-earth-pressure", "E"], ["slope-stability-seepage", "E"], ["coulomb-earth-pressure", "E"], ["retaining-wall-stability", "E"],
-  ["consolidation-time-rate", "E"], ["consolidation-degree", "E"], ["spt-bearing-capacity", "E"], ["liquefaction-screening", "E"],
+  ["consolidation-time-rate", "E"], ["consolidation-degree", "E"], ["spt-bearing-capacity", "E"], ["spt-required-n60", "E"], ["liquefaction-screening", "E"],
   // spec-v498 pile group efficiency (Converse-Labarre)
   ["pile-group-efficiency", "E"],
   // spec-v269..v271 TMS 402-16 reinforced-masonry member trio (calc-masonry.js)
