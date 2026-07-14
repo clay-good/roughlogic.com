@@ -718,6 +718,55 @@ function _v322renderCondenserHeatRejection(inputRegion, outputRegion, citationEl
 }
 REFRIGERANT_RENDERERS["condenser-heat-rejection"] = _v322renderCondenserHeatRejection;
 
+// condenser-cop-for-heat-rejection: inverse of condenser-heat-rejection. The forward tile gives the total heat of
+// rejection from the COP; the inverse backs out the implied COP from a measured or rated heat of rejection and the
+// evaporator capacity, so a commissioning tech reads the operating efficiency off the condenser duty. From
+// THR = Q_evap (1 + 1/COP), COP = Q_evap / (THR - Q_evap). THR must exceed Q_evap (compressor work adds heat).
+// dims: in { q_evap: M L^2 T^-3, target_thr: M L^2 T^-3, unit_tons: dimensionless } out: { cop: dimensionless, w_comp_btuh: M L^2 T^-3, factor: dimensionless }
+export function computeCondenserCopForHeatRejection({ q_evap = 0, target_thr = 0, unit_tons = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(q_evap) || 0;
+  const thr = Number(target_thr) || 0;
+  if (!(q > 0)) return { error: "Evaporator capacity must be positive." };
+  if (!(thr > 0)) return { error: "Total heat of rejection must be positive." };
+  if (!(thr > q)) return { error: "The heat of rejection must exceed the evaporator capacity (the compressor work adds heat)." };
+  const q_btuh = unit_tons === 1 ? q * 12000 : q;
+  const thr_btuh = unit_tons === 1 ? thr * 12000 : thr;
+  const w_comp_btuh = thr_btuh - q_btuh;
+  const cop = q_btuh / w_comp_btuh;
+  const factor = thr_btuh / q_btuh;
+  if (![cop, w_comp_btuh, factor].every(Number.isFinite)) return { error: "COP math is not a finite value." };
+  return {
+    cop, w_comp_btuh, factor,
+    note: "Implied COP from the heat of rejection: from THR = Q_evap + W_comp = Q_evap (1 + 1/COP), the compressor work is W_comp = THR - Q_evap and COP = Q_evap / (THR - Q_evap). This reads the operating efficiency off the condenser duty and the cooling capacity - a low COP means a large heat-rejection factor (THR/Q_evap), so a struggling system overloads its own condenser and drives head pressure higher still. This uses the compressor work implied by the heat balance; motor heat rejected outside the refrigerant (a hermetic compressor adds it) inflates the measured THR and lowers the apparent COP, and any desuperheater / heat-recovery split must be added back. An engineering aid; the equipment's rated data govern.",
+  };
+}
+export const condenserCopForHeatRejectionExample = { inputs: { q_evap: 60000, target_thr: 100000, unit_tons: 0 } };
+
+function _renderCondenserCopForHeatRejection(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: total heat of rejection THR = Q_evap (1 + 1/COP) solved for the COP: COP = Q_evap / (THR - Q_evap); compressor work W_comp = THR - Q_evap. Hermetic motor heat inflates the measured THR and lowers the apparent COP. An engineering aid; the rated heat-of-rejection data govern.";
+  const q = makeNumber("Evaporator capacity (tons, or Btu/h if unit set to 0)", "ccp-q", { step: "any", min: "0" });
+  const unit = makeSelect("Capacity unit", "ccp-unit", [{ value: "1", label: "Tons" }, { value: "0", label: "Btu/h" }]);
+  const thr = makeNumber("Total heat of rejection (same unit as capacity)", "ccp-thr", { step: "any", min: "0" });
+  for (const f of [q, unit, thr]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "60000"; unit.select.value = "0"; thr.input.value = "100000"; update(); });
+  const oCop = makeOutputLine(outputRegion, "Implied COP", "ccp-out-cop");
+  const oW = makeOutputLine(outputRegion, "Compressor work", "ccp-out-w");
+  const oFactor = makeOutputLine(outputRegion, "Heat-rejection factor", "ccp-out-factor");
+  const oNote = makeOutputLine(outputRegion, "Note", "ccp-out-note");
+  const update = debounce(() => {
+    const r = computeCondenserCopForHeatRejection({ q_evap: Number(q.input.value) || 0, target_thr: Number(thr.input.value) || 0, unit_tons: Number(unit.select.value) });
+    if (r.error) { oCop.textContent = r.error; oW.textContent = "-"; oFactor.textContent = "-"; oNote.textContent = "-"; return; }
+    oCop.textContent = fmt(r.cop, 2);
+    oW.textContent = fmt(r.w_comp_btuh, 0) + " Btu/h";
+    oFactor.textContent = fmt(r.factor, 3) + " (THR / Q_evap)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [q.input, thr.input]) f.addEventListener("input", update);
+  unit.select.addEventListener("change", update);
+}
+REFRIGERANT_RENDERERS["condenser-cop-for-heat-rejection"] = _renderCondenserCopForHeatRejection;
+
 // ===================== spec-v432..v434: walk-in refrigeration trio (Group C) =====================
 
 // dims: in { u_factor: dimensionless, area_ft2: L^2, delta_t_f: T, infiltration_btuh: M L^2 T^-3, product_btuh: M L^2 T^-3, internal_btuh: M L^2 T^-3, safety: dimensionless } out: { transmission_btuh: M L^2 T^-3, total_btuh: M L^2 T^-3, tons: dimensionless }

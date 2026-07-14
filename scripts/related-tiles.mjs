@@ -1378,6 +1378,7 @@ const RELATED = {
   "refrigerant-mass-flow": ["refrigerant-velocity","refrigeration-cop","condenser-heat-rejection"],
   "refrigeration-cop": ["refrigerant-mass-flow","condenser-heat-rejection","seer-eer"],
   "condenser-heat-rejection": ["refrigeration-cop","refrigerant-mass-flow","cooling-tower"],
+  "condenser-cop-for-heat-rejection": ["condenser-heat-rejection","refrigeration-cop","refrigerant-mass-flow"],
   "walk-in-cooler-load": ["product-pull-down-load","evaporator-td-dtd","refrigeration-cop","condenser-heat-rejection"],
   "product-pull-down-load": ["walk-in-cooler-load","evaporator-td-dtd","refrigeration-cop","refrigerant-mass-flow"],
   "product-pull-down-time": ["product-pull-down-load","walk-in-cooler-load","evaporator-td-dtd","refrigeration-cop"],

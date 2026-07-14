@@ -15542,6 +15542,26 @@
       "kind": "industry"
     },
     {
+      "term": "cop from heat of rejection",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "industry"
+    },
+    {
+      "term": "implied cop",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "redirect"
+    },
+    {
+      "term": "cop from condenser duty",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "adjacent"
+    },
+    {
+      "term": "efficiency from heat rejection",
+      "target": "condenser-cop-for-heat-rejection",
+      "kind": "adjacent"
+    },
+    {
       "term": "total heat of rejection",
       "target": "condenser-heat-rejection",
       "kind": "industry"

@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(refrigerant): spec-v761 COP implied by the heat of rejection (condenser-heat-rejection inverse); 2026-07-14
+
+- New tile `condenser-cop-for-heat-rejection` (Group C, calc-refrigerant.js): the COP implied by a measured/rated heat of
+  rejection and the evaporator capacity. `COP = Q_evap / (THR - Q_evap)`. A system absorbing 60,000 Btu/h and rejecting
+  100,000 runs a COP of 1.5. Round-trips through `condenser-heat-rejection`. Home tile count 1,209 -> 1,210.
+
 ### feat(metalair): spec-v760 groove weld length for an applied load (groove-weld-strength inverse); 2026-07-14
 
 - New tile `groove-weld-length-for-load` (Group E, calc-metalair.js): the weld length an applied load needs at a given

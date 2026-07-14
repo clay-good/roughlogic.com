@@ -323,7 +323,7 @@ const TOOL_MODULES = (() => {
     // v7
     "refrigerant-charging",
     // spec-v320..v322 refrigeration-cycle batch
-    "refrigerant-mass-flow", "refrigeration-cop", "condenser-heat-rejection",
+    "refrigerant-mass-flow", "refrigeration-cop", "condenser-heat-rejection", "condenser-cop-for-heat-rejection",
     // spec-v432..v434 walk-in refrigeration
     "walk-in-cooler-load", "product-pull-down-load", "product-pull-down-time", "evaporator-td-dtd",
     // spec-v586 liquid-line subcooling / flash gas

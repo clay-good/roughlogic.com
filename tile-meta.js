@@ -591,7 +591,7 @@ const _TILES = [
   // spec-v317..v319 machining depth batch (calc-machining.js Group K)
   ["radial-chip-thinning", "K"], ["boring-bar-deflection", "K"], ["boring-bar-max-overhang", "K"], ["ballnose-scallop-height", "K"],
   // spec-v320..v322 refrigeration-cycle batch (calc-refrigerant.js Group C)
-  ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"],
+  ["refrigerant-mass-flow", "C"], ["refrigeration-cop", "C"], ["condenser-heat-rejection", "C"], ["condenser-cop-for-heat-rejection", "C"],
   ["walk-in-cooler-load", "C"], ["product-pull-down-load", "C"], ["product-pull-down-time", "C"], ["evaporator-td-dtd", "C"],
   ["flash-gas-subcool", "C"],
   ["hydronic-buffer-tank", "C"],

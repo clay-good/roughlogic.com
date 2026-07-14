@@ -2514,6 +2514,7 @@ cross-check.
 | calc-references.js | `renderKnotReference` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-references.js | `renderToolMaintenance` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-refrigerant.js | `computeCompareRefrigerants` | `{ refrigerant_a, refrigerant_b, pressure_psig = null, temperature_F = null }` | _ | _ | _ |
+| calc-refrigerant.js | `computeCondenserCopForHeatRejection` | `{ q_evap = 0, target_thr = 0, unit_tons = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeCondenserHeatRejection` | `{ q_evap = 0, unit_tons = 0, cop = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeEvaporatorTdDtd` | `{ box_temp_f = 0, sst_f = 0 } = {}` | _ | _ | _ |
 | calc-refrigerant.js | `computeFlashGasSubcool` | `{ vertical_lift_ft = 0, friction_dp_psi = 0, static_gradient = 0.43, pt_slope...` | _ | _ | _ |
@@ -2870,7 +2871,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1456.
+Row count: 1457.
 
 <!-- END function-corpus-v14 -->
 
@@ -3222,7 +3223,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (127 tiles)
+### Group C HVAC (128 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3262,6 +3263,7 @@ per spec-v14 §13.1 second paragraph.
 | `compression-ratio-refrig` | Refrigeration Compression Ratio | ASHRAE Handbook Refrigeration (by name); suction 70 psig, discharge 260 psig, atm 14.696 -> 274.69... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `compressor-short-cycle` | Compressor Short-Cycle Protection | Copeland / ASHRAE; N = 6*4*0.5*0.5 = 6 cph; on = 0.5*60/6 = 5 min < 10 min o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condensate-drain` | Condensate Rate and Drain Size | IMC 307.2.2 (drain size by capacity) ...; spec-v102 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `condenser-cop-for-heat-rejection` | COP Implied by the Heat of Rejection | THR = Q_evap (1 + 1/COP), solved for COP; spec-v761 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `condenser-heat-rejection` | Condenser Total Heat of Rejection | Total heat of rejection THR = Q_evap ...; spec-v322 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-coil-total-load` | Cooling Coil Total Load from Enthalpy Difference | ASHRAE Fundamentals; spec-v376 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cooling-tower` | Cooling Tower Approach and Range | CTI ATC-105 cooling-tower test code; 95 F in / 85 F out / 75 F wet-bulb / 300 gpm / 15 kW fan ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4265,6 +4267,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1209. Fixture-covered or reference-cadence: 1209 / 1209.
+Tile count: 1210. Fixture-covered or reference-cadence: 1210 / 1210.
 
 <!-- END tile-index-v14 -->

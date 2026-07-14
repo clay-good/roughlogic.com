@@ -965,6 +965,7 @@ export const COMPUTE_MAP = {
   "refrigerant-mass-flow": { module: "../../calc-refrigerant.js", fn: "computeRefrigerantMassFlow" },
   "refrigeration-cop": { module: "../../calc-refrigerant.js", fn: "computeRefrigerationCop" },
   "condenser-heat-rejection": { module: "../../calc-refrigerant.js", fn: "computeCondenserHeatRejection" },
+  "condenser-cop-for-heat-rejection": { module: "../../calc-refrigerant.js", fn: "computeCondenserCopForHeatRejection" },
   "walk-in-cooler-load": { module: "../../calc-refrigerant.js", fn: "computeWalkInCoolerLoad" },
   "product-pull-down-load": { module: "../../calc-refrigerant.js", fn: "computeProductPullDownLoad" },
   "product-pull-down-time": { module: "../../calc-refrigerant.js", fn: "computeProductPullDownTime" },

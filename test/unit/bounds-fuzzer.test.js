@@ -16273,6 +16273,31 @@ test("bounds: spec-v322 computeCondenserHeatRejection pins the 1 + 1/COP factor,
   assert.ok("error" in _v322({ q_evap: Infinity, cop: 2.4 }));
 });
 
+import { computeCondenserCopForHeatRejection as _v761 } from "../../calc-refrigerant.js";
+test("bounds: spec-v761 COP implied by the heat of rejection (inverse of condenser-heat-rejection)", () => {
+  const p = _v761({ q_evap: 60000, target_thr: 100000, unit_tons: 0 });
+  assert.ok(Math.abs(p.cop - 1.5) < 1e-9);
+  assert.ok(Math.abs(p.w_comp_btuh - 40000) < 1e-9);
+  assert.ok(Math.abs(p.factor - 100000 / 60000) < 1e-9);
+  // round-trip: the recovered COP fed to condenser-heat-rejection reproduces the target THR
+  for (const [q, thr, unit] of [[60000, 100000, 0], [5, 7.0833, 1], [36000, 51000, 0], [10, 12.5, 1]]) {
+    const inv = _v761({ q_evap: q, target_thr: thr, unit_tons: unit });
+    const fwd = _v322({ q_evap: q, unit_tons: unit, cop: inv.cop });
+    const thr_btuh = unit === 1 ? thr * 12000 : thr;
+    assert.ok(Math.abs(fwd.thr_btuh - thr_btuh) < 1e-3);
+  }
+  // a higher heat of rejection (more compressor work) means a lower COP
+  assert.ok(_v761({ q_evap: 60000, target_thr: 120000 }).cop < _v761({ q_evap: 60000, target_thr: 100000 }).cop);
+  // tons unit path matches the Btu/h path (COP is a ratio)
+  assert.ok(Math.abs(_v761({ q_evap: 5, target_thr: 8.3333, unit_tons: 1 }).cop - _v761({ q_evap: 60000, target_thr: 100000, unit_tons: 0 }).cop) < 1e-3);
+  // error seams: non-positive q/thr, thr <= q, non-finite
+  assert.ok("error" in _v761({ q_evap: 0, target_thr: 100000 }));
+  assert.ok("error" in _v761({ q_evap: 60000, target_thr: 0 }));
+  assert.ok("error" in _v761({ q_evap: 60000, target_thr: 60000 })); // thr == q (no compressor work)
+  assert.ok("error" in _v761({ q_evap: 60000, target_thr: 50000 })); // thr < q
+  assert.ok("error" in _v761({ q_evap: Infinity, target_thr: 100000 }));
+});
+
 // ===================== spec-v323..v325 engine-build performance batch =====================
 import { computeInjectorSize as _v323, computeMeanPistonSpeed as _v324, computeTrapSpeedHorsepower as _v325 } from "../../calc-mechanic.js";
 

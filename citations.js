@@ -11355,6 +11355,18 @@ export const CITATIONS = {
       { name: "EER", value: "EER = 3.412 x COP (Btu/Wh per unit COP)", source: "unit conversion" },
     ],
   },
+  "condenser-cop-for-heat-rejection": {
+    formula: "COP = Q_evap / (THR - Q_evap), the inverse of THR = Q_evap (1 + 1/COP); W_comp = THR - Q_evap; factor = THR / Q_evap. Requires THR > Q_evap.",
+    edition: "The condenser total heat of rejection THR = Q_evap (1 + 1/COP), a standard refrigeration-cycle result, solved for the COP, by name.",
+    freeAccess: "The total-heat-of-rejection relation is a public refrigeration-cycle result; the ASHRAE Handbook covers condenser sizing.",
+    governance: GOVERNANCE.general,
+    editionNote: "The COP implied by a measured or rated heat of rejection and the evaporator capacity, the inverse of THR = Q_evap (1 + 1/COP): the compressor work is W_comp = THR - Q_evap and COP = Q_evap / (THR - Q_evap). This reads the operating efficiency off the condenser duty and the cooling capacity; a low COP means a large heat-rejection factor (THR/Q_evap), so a struggling system overloads its own condenser and drives head pressure higher still. It uses the compressor work implied by the heat balance; motor heat rejected outside the refrigerant (a hermetic compressor adds it, a belt-drive does not) inflates the measured THR and lowers the apparent COP, and any desuperheater / heat-recovery split must be added back. An engineering aid; the equipment's rated heat-of-rejection data govern.",
+    assumptions: [
+      { name: "Implied COP", value: "COP = Q_evap / (THR - Q_evap); requires THR > Q_evap", source: "energy balance" },
+      { name: "Rejection factor", value: "THR / Q_evap = 1 + 1/COP; a low COP gives a large factor", source: "refrigeration practice" },
+      { name: "Motor heat", value: "hermetic-motor heat inflates the measured THR and lowers the apparent COP; no desuperheater split", source: "scope of this tile" },
+    ],
+  },
   "condenser-heat-rejection": {
     formula: "Q_btuh = (unit == tons) ? Q x 12,000 : Q; W_comp = Q_btuh/COP; THR = Q_btuh (1 + 1/COP); factor = 1 + 1/COP; THR_tons = THR/12,000.",
     edition: "The condenser total heat of rejection THR = Q_evap + W_comp = Q_evap (1 + 1/COP), a standard refrigeration-cycle result, by name.",

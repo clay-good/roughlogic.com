@@ -45879,6 +45879,34 @@
    }
   },
   {
+   "tile_id": "condenser-cop-for-heat-rejection",
+   "source_publisher": "THR = Q_evap (1 + 1/COP), solved for COP",
+   "source_title": "COP = Q_evap / (THR - Q_evap); 60,000 Btu/h evap, 100,000 THR -> COP 1.5",
+   "source_edition_or_year": "spec-v761 worked example (machine-verified)",
+   "source_section_or_page": "spec-v761 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "q_evap": 60000,
+    "target_thr": 100000,
+    "unit_tons": 0
+   },
+   "outputs": {
+    "cop": {
+     "value": 1.5,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "w_comp_btuh": {
+     "value": 40000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "condenser-heat-rejection",
    "source_publisher": "Total heat of rejection THR = Q_evap (1 + 1/COP)",
    "source_title": "cross-check: a low-efficiency COP 1.5 cycle rejects 100,000 Btu/h (8.33 tons)",
