@@ -329,6 +329,60 @@ function renderWindOnLoad(inputRegion, outputRegion, citationEl) {
 }
 RIGGING_RENDERERS["wind-on-load"] = renderWindOnLoad;
 
+// max-wind-speed-for-lift: inverse of wind-on-load. The forward tile gives the
+// swing angle from a wind speed; the in-service shutdown question is the inverse
+// -- the wind speed at which a suspended load reaches a maximum allowable swing.
+// From swing = atan(wind_lb / weight) and wind_lb = 0.00256 V^2 x area x shape,
+// V = sqrt( weight x tan(swing) / (0.00256 x area x shape) ).
+// dims: in { max_swing_deg: dimensionless, load_weight_lb: M L T^-2, sail_area_ft2: L^2, shape_coef: dimensionless } out: { max_wind_mph: L T^-1, wind_lb: M L T^-2 }
+export function computeMaxWindSpeedForLift({ max_swing_deg = 5, load_weight_lb, sail_area_ft2, shape_coef = 1.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const swing = Number(max_swing_deg);
+  const weight = Number(load_weight_lb);
+  const area = Number(sail_area_ft2);
+  const shape = Number(shape_coef);
+  if (!Number.isFinite(swing) || !(swing > 0 && swing < 90)) return { error: "Max swing angle must be over 0 and under 90 degrees." };
+  if (!Number.isFinite(weight) || weight <= 0) return { error: "Load weight must be a positive finite number (lb)." };
+  if (!Number.isFinite(area) || area <= 0) return { error: "Sail area must be a positive finite number (ft^2)." };
+  if (!Number.isFinite(shape) || shape <= 0) return { error: "Shape coefficient must be a positive finite number." };
+  const wind_lb = weight * Math.tan(swing * Math.PI / 180);
+  const max_wind_mph = Math.sqrt(wind_lb / (0.00256 * area * shape));
+  if (![wind_lb, max_wind_mph].every(Number.isFinite)) return { error: "Wind math is not a finite value." };
+  return {
+    max_wind_mph, wind_lb,
+    note: "The sustained wind speed at which a suspended load reaches the chosen swing limit (about 5 degrees is a common in-service planning threshold; the load chart and manufacturer set the real limit). Large-area, light loads (panels, tanks, ductwork, wind-turbine blades) reach it at low wind and are the most dangerous. This is a planning estimate off the sustained wind and the projected sail area; gusts exceed the sustained number, a tag-line crew controls the rest, and the manufacturer's maximum permissible in-service wind speed and the load chart's wind/area limits govern -- many large lifts shut down well below storm wind.",
+  };
+}
+export const maxWindSpeedForLiftExample = { inputs: { max_swing_deg: 5, load_weight_lb: 4000, sail_area_ft2: 200, shape_coef: 1.6 } };
+function renderMaxWindSpeedForLift(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ASCE velocity-pressure q = 0.00256 V^2 and the swing relation swing = atan(wind force / weight) solved for the wind speed, V = sqrt(weight x tan(swing) / (0.00256 x area x shape)); OSHA 1926 Subpart CC by name. Estimate - the manufacturer's in-service wind limit governs.";
+  const swing = makeNumber("Max allowable swing (deg, ~5 planning)", "mws-swing", { step: "any", min: "0", value: "5" });
+  swing.input.value = "5";
+  const weight = makeNumber("Load weight (lb)", "mws-weight", { step: "any", min: "0" });
+  const area = makeNumber("Projected sail area (ft^2)", "mws-area", { step: "any", min: "0" });
+  const shape = makeNumber("Shape coefficient (flat panel ~1.2-2.0)", "mws-shape", { step: "any", min: "0", value: "1.6" });
+  shape.input.value = "1.6";
+  for (const f of [swing, weight, area, shape]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { swing.input.value = "5"; weight.input.value = "4000"; area.input.value = "200"; shape.input.value = "1.6"; update(); });
+  const oV = makeOutputLine(outputRegion, "Max sustained wind speed", "mws-out-v");
+  const oF = makeOutputLine(outputRegion, "Lateral force at the limit", "mws-out-f");
+  const oN = makeOutputLine(outputRegion, "Note", "mws-out-n");
+  const update = debounce(() => {
+    const r = computeMaxWindSpeedForLift({
+      max_swing_deg: swing.input.value === "" ? 5 : Number(swing.input.value),
+      load_weight_lb: Number(weight.input.value) || 0,
+      sail_area_ft2: Number(area.input.value) || 0,
+      shape_coef: shape.input.value === "" ? 1.6 : Number(shape.input.value),
+    });
+    if (r.error) { oV.textContent = r.error; oF.textContent = "-"; oN.textContent = "-"; return; }
+    oV.textContent = fmt(r.max_wind_mph, 1) + " mph";
+    oF.textContent = fmt(r.wind_lb, 1) + " lb";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [swing, weight, area, shape]) f.input.addEventListener("input", update);
+}
+RIGGING_RENDERERS["max-wind-speed-for-lift"] = renderMaxWindSpeedForLift;
+
 // --- tagline-force: Tag Line Pull to Control a Suspended Load ---
 //
 // tag_tension = lateral_force / cos(angle); handlers = ceil(tension /

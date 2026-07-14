@@ -927,6 +927,7 @@ const RELATED = {
   "crane-ground-bearing": ["crane-net-capacity", "helical-pile", "excavation-bench-plan"],
   "sling-d-d-efficiency": ["sling-angle", "rigging-check", "crane-net-capacity"],
   "wind-on-load": ["tagline-force", "wind-pressure", "crane-net-capacity"],
+  "max-wind-speed-for-lift": ["wind-on-load", "tagline-force", "crane-net-capacity", "wind-pressure"],
   "tagline-force": ["wind-on-load", "pulley-ma-gen"],
   "tandem-lift-share": ["cg-load-share", "crane-net-capacity"],
 

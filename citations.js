@@ -7404,6 +7404,18 @@ export const CITATIONS = {
       { name: "Shape coefficient", value: "flat panel ~1.2-2.0 (default 1.6)", source: "ASCE 7 force coefficients" },
     ],
   },
+  "max-wind-speed-for-lift": {
+    formula: "V = sqrt( load_weight x tan(max_swing) / (0.00256 x sail_area x shape_coef) ), the swing relation swing = atan(0.00256 V^2 x area x shape / weight) solved for the wind speed.",
+    edition: "ASCE 7 velocity-pressure constant (the same 0.00256 the wind-pressure tile uses) and OSHA 1926 Subpart CC by name; first-principles.",
+    freeAccess: "The 0.00256 velocity-pressure constant is public (ASCE 7). OSHA 1926 Subpart CC is free at osha.gov.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The inverse of wind-on-load: the sustained wind speed at which a suspended load reaches a chosen swing limit (about 5 degrees is a common in-service planning threshold). Large-area, light loads reach it at low wind and are the most dangerous. A planning estimate off the sustained wind and the projected sail area; gusts exceed the sustained number, a tag-line crew controls the rest, and the manufacturer's maximum permissible in-service wind speed and the load chart's wind/area limits govern - many large lifts shut down well below storm wind.",
+    assumptions: [
+      { name: "Swing limit inverted", value: "V from weight x tan(swing) = 0.00256 V^2 x area x shape", source: "ASCE 7 / first principles" },
+      { name: "Shape coefficient", value: "flat panel ~1.2-2.0 (default 1.6)", source: "ASCE 7 force coefficients" },
+      { name: "In-service limit governs", value: "the manufacturer's max in-service wind speed and the load chart set the real limit; gusts exceed the sustained number", source: "OSHA 1926 Subpart CC" },
+    ],
+  },
   "tagline-force": {
     formula: "tag_tension = lateral_force / cos(angle); handlers = ceil(tag_tension / per_person); mechanical_help when tag_tension > 2 x per_person.",
     edition: "OSHA 1926 Subpart CC and standard rigging practice by name; first-principles statics on the tag-line geometry.",

@@ -21172,6 +21172,29 @@
    }
   },
   {
+   "tile_id": "max-wind-speed-for-lift",
+   "source_publisher": "ASCE 7 velocity pressure / OSHA 1926 Subpart CC",
+   "source_title": "V = sqrt(weight x tan(swing) / (0.00256 x area x shape)); inverse of wind-on-load",
+   "source_edition_or_year": "ASCE 7; q = 0.00256 V^2",
+   "source_section_or_page": "4,000 lb, 200 ft^2, shape 1.6, 5 deg swing cap -> 20.7 mph",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "max_swing_deg": 5,
+    "load_weight_lb": 4000,
+    "sail_area_ft2": 200,
+    "shape_coef": 1.6
+   },
+   "outputs": {
+    "max_wind_mph": {
+     "value": 20.6686,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "tagline-force",
    "source_publisher": "OSHA 1926 Subpart CC / rigging practice",
    "source_title": "tag_tension = lateral_force / cos(angle); handlers = ceil(tension / per_person)",

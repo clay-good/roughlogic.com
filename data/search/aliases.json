@@ -80442,6 +80442,31 @@
       "kind": "question"
     },
     {
+      "term": "max wind speed to lift a panel",
+      "target": "max-wind-speed-for-lift",
+      "kind": "question"
+    },
+    {
+      "term": "wind limit for crane pick",
+      "target": "max-wind-speed-for-lift",
+      "kind": "question"
+    },
+    {
+      "term": "when to stop lifting for wind",
+      "target": "max-wind-speed-for-lift",
+      "kind": "question"
+    },
+    {
+      "term": "shutdown wind speed for load swing",
+      "target": "max-wind-speed-for-lift",
+      "kind": "question"
+    },
+    {
+      "term": "wind speed for 5 degree swing",
+      "target": "max-wind-speed-for-lift",
+      "kind": "question"
+    },
+    {
       "term": "how many people to hold a tag rope",
       "target": "tagline-force",
       "kind": "question"

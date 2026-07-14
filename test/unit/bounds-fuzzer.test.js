@@ -10273,6 +10273,34 @@ test("bounds: calc-rigging v65 Group Z lift-planning core pins every worked exam
   assert.ok("error" in _v65g({ total_weight_lb: 40000, span_in: 300, cg_from_c1_in: 120, c1_chart_lb: 0, c2_chart_lb: 24000 }));
 });
 
+import { computeMaxWindSpeedForLift as _v719 } from "../../calc-rigging.js";
+test("bounds: spec-v719 computeMaxWindSpeedForLift pins V = sqrt(weight tan(swing)/(0.00256 area shape)), round-trips through computeWindOnLoad, and error seams", () => {
+  const r = _v719({ max_swing_deg: 5, load_weight_lb: 4000, sail_area_ft2: 200, shape_coef: 1.6 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_wind_mph - Math.sqrt(4000 * Math.tan(5 * Math.PI / 180) / (0.00256 * 200 * 1.6))) < 1e-9, `V identity: ${r.max_wind_mph}`);
+  assert.ok(Math.abs(r.max_wind_mph - 20.6686) < 1e-3, `pinned 20.7 mph: ${r.max_wind_mph}`);
+  // Round-trip: at the max wind speed the forward tile's swing equals the target.
+  for (const max_swing_deg of [2, 5, 15]) {
+    for (const load_weight_lb of [1000, 4000, 20000]) {
+      for (const sail_area_ft2 of [50, 200, 600]) {
+        const m = _v719({ max_swing_deg, load_weight_lb, sail_area_ft2, shape_coef: 1.6 });
+        assert.ok(!m.error, `sweep swing=${max_swing_deg} w=${load_weight_lb} a=${sail_area_ft2}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_wind_mph, "V"); assert.ok(m.max_wind_mph > 0, "V positive");
+        const back = _v65e({ sail_area_ft2, wind_mph: m.max_wind_mph, shape_coef: 1.6, load_weight_lb });
+        assert.ok(Math.abs(back.swing_deg - max_swing_deg) < 1e-6, `round-trip swing=${max_swing_deg} w=${load_weight_lb} a=${sail_area_ft2}: ${back.swing_deg}`);
+      }
+    }
+  }
+  // A lighter load (or bigger sail) reaches the swing limit at a lower wind.
+  assert.ok(_v719({ max_swing_deg: 5, load_weight_lb: 1000, sail_area_ft2: 200, shape_coef: 1.6 }).max_wind_mph < r.max_wind_mph);
+  // Error seams: swing outside (0,90), non-positive weight/area/shape, non-finite.
+  assert.ok("error" in _v719({ max_swing_deg: 0, load_weight_lb: 4000, sail_area_ft2: 200 }));
+  assert.ok("error" in _v719({ max_swing_deg: 90, load_weight_lb: 4000, sail_area_ft2: 200 }));
+  assert.ok("error" in _v719({ max_swing_deg: 5, load_weight_lb: 0, sail_area_ft2: 200 }));
+  assert.ok("error" in _v719({ max_swing_deg: 5, load_weight_lb: 4000, sail_area_ft2: 0 }));
+  assert.ok("error" in _v719({ max_swing_deg: 5, load_weight_lb: Infinity, sail_area_ft2: 200 }));
+});
+
 import {
   computeShackleEyeboltWll as _v66a, computeSpreaderBeam as _v66b, computeForkliftCapacityDerate as _v66c,
   computeRollerJackForce as _v66d, computeChainLeverHoist as _v66e, computeBlockRedirectLoad as _v66f,

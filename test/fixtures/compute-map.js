@@ -700,6 +700,7 @@ export const COMPUTE_MAP = {
   "crane-ground-bearing": { module: "../../calc-rigging.js", fn: "computeCraneGroundBearing" },
   "sling-d-d-efficiency": { module: "../../calc-rigging.js", fn: "computeSlingDdEfficiency" },
   "wind-on-load": { module: "../../calc-rigging.js", fn: "computeWindOnLoad" },
+  "max-wind-speed-for-lift": { module: "../../calc-rigging.js", fn: "computeMaxWindSpeedForLift" },
   "tagline-force": { module: "../../calc-rigging.js", fn: "computeTaglineForce" },
   "tandem-lift-share": { module: "../../calc-rigging.js", fn: "computeTandemLiftShare" },
   // spec-v66 Group Z hardware and below-the-hook.
