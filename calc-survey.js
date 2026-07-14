@@ -526,3 +526,48 @@ function renderEdmSlopeReduction(inputRegion, outputRegion, citationEl) {
   for (const f of [s.input, ang.input, hi.input, hr.input]) f.addEventListener("input", update);
 }
 SURVEY_RENDERERS["edm-slope-reduction"] = renderEdmSlopeReduction;
+
+// dims: in { sight_distance_ft: L } out: { correction_ft: L, curvature_ft: L, refraction_ft: L }
+// Combined earth-curvature-and-refraction correction for a leveling sight.
+// With K = sight distance in thousands of feet: curvature = 0.0239 K^2,
+// refraction = 0.0033 K^2 (about 1/7 of curvature, opposite sign), and the
+// combined correction h_cr = 0.0206 K^2 ft is SUBTRACTED from the far rod.
+export function computeLevelingCurvatureRefraction({ sight_distance_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const d = Number(sight_distance_ft) || 0;
+  if (!(d > 0)) return { error: "Sight distance must be positive (ft)." };
+  const K = d / 1000;
+  const K2 = K * K;
+  const curvature_ft = 0.0239 * K2;
+  const refraction_ft = 0.0033 * K2;
+  const correction_ft = 0.0206 * K2;
+  return {
+    correction_ft,
+    curvature_ft,
+    refraction_ft,
+    note: "Combined earth-curvature-and-refraction correction for a single leveling (or trig-leveling) sight: with K = sight distance in thousands of feet, curvature raises the correction 0.0239 K^2 ft and atmospheric refraction bends the line back by about 0.0033 K^2 ft, leaving a net 0.0206 K^2 ft that is SUBTRACTED from the far rod reading (a distant point reads too high). Balanced backsight/foresight distances in differential leveling cancel this automatically - the correction matters for a long or unbalanced sight and for reciprocal/trig leveling. The 0.0206 coefficient assumes the standard refraction coefficient k ~ 0.14; strong temperature gradients near the ground change it. A computational aid; the project procedure governs.",
+  };
+}
+export const levelingCurvatureRefractionExample = { inputs: { sight_distance_ft: 2000 } };
+
+function renderLevelingCurvatureRefraction(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: combined earth curvature-and-refraction correction h_cr = 0.0206 K^2 ft, K the sight distance in thousands of feet (curvature 0.0239 K^2 minus refraction 0.0033 K^2); equivalently 0.574 M^2 with M in miles. Standard leveling reduction per Ghilani, Elementary Surveying, by name. Assumes a refraction coefficient k ~ 0.14. A computational aid; the project procedure governs.";
+  const d = makeNumber("Sight distance (ft)", "lcr-d", { step: "any", min: "0", value: "2000" });
+  d.input.value = "2000";
+  inputRegion.appendChild(d.wrap);
+  const oC = makeOutputLine(outputRegion, "Combined correction (subtract from far rod)", "lcr-out-c");
+  const oCurv = makeOutputLine(outputRegion, "Curvature component", "lcr-out-curv");
+  const oRef = makeOutputLine(outputRegion, "Refraction component", "lcr-out-ref");
+  const oNote = makeOutputLine(outputRegion, "Note", "lcr-out-note");
+  const update = debounce(() => {
+    const r = computeLevelingCurvatureRefraction({ sight_distance_ft: Number(d.input.value) || 0 });
+    if (r.error) { oC.textContent = r.error; oCurv.textContent = "-"; oRef.textContent = "-"; oNote.textContent = ""; return; }
+    oC.textContent = fmt(r.correction_ft, 4) + " ft";
+    oCurv.textContent = fmt(r.curvature_ft, 4) + " ft";
+    oRef.textContent = fmt(r.refraction_ft, 4) + " ft";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { d.input.value = "2000"; update(); });
+  d.input.addEventListener("input", update);
+}
+SURVEY_RENDERERS["leveling-curvature-refraction"] = renderLevelingCurvatureRefraction;

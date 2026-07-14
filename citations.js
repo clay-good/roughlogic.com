@@ -11651,6 +11651,18 @@ export const CITATIONS = {
       { name: "Plane reduction", value: "no earth curvature/refraction or grid scale factor applied", source: "plane-survey assumption" },
     ],
   },
+  "leveling-curvature-refraction": {
+    formula: "h_cr = 0.0206 K^2 ft, K = sight distance in thousands of feet (curvature 0.0239 K^2 minus refraction 0.0033 K^2); equivalently 0.574 M^2 with M in miles. Subtracted from the far rod reading.",
+    edition: "Standard leveling curvature-and-refraction correction as compiled in the standard surveying references (Ghilani, Elementary Surveying), by name.",
+    freeAccess: "The 0.0206 K^2 (ft) / 0.574 M^2 (mi) correction is a public surveying result in any elementary-surveying reference.",
+    governance: GOVERNANCE.general,
+    editionNote: "The combined earth-curvature-and-refraction correction for a single leveling or trig-leveling sight: curvature makes a distant point appear 0.0239 K^2 ft too high and atmospheric refraction bends the line back about 0.0033 K^2 ft, leaving a net 0.0206 K^2 ft (K in thousands of feet) subtracted from the far rod. In differential leveling with balanced backsight and foresight distances the correction cancels; it matters for a long or unbalanced sight and for reciprocal/trig leveling. The 0.0206 coefficient assumes the standard refraction coefficient k ~ 0.14, which strong near-ground temperature gradients change. A computational aid; the project procedure governs.",
+    assumptions: [
+      { name: "Coefficient", value: "0.0206 K^2 ft (K in thousands of feet); = curvature 0.0239 minus refraction 0.0033", source: "surveying references" },
+      { name: "Refraction", value: "assumes the standard refraction coefficient k ~ 0.14", source: "standard atmosphere" },
+      { name: "Balanced sights", value: "cancels with equal backsight/foresight distances in differential leveling", source: "leveling practice" },
+    ],
+  },
   "building-ua": {
     formula: "cond = sum(A_i / R_i); UA_inf = 1.08 x CFM; UA = cond + UA_inf; design_load = UA x dT.",
     edition: "The whole-building heat-loss-coefficient roll-up UA = sum(A/R) + 1.08 x CFM with the design load Q = UA x dT, as compiled in the ASHRAE Fundamentals and RESNET energy-audit references, by name.",

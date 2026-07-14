@@ -593,6 +593,7 @@ const _TILES = [
   ["differential-leveling", "P"], ["level-loop-adjustment", "P"], ["stadia-distance", "P"], ["taping-corrections", "P"],
   ["cogo-forward-point", "P"],
   ["edm-slope-reduction", "P"],
+  ["leveling-curvature-refraction", "P"],
   // spec-v314..v316 steel beam-column-and-connection depth batch
   ["steel-h1-interaction", "E"], ["steel-effective-length-k", "E"], ["steel-bolt-tension-shear", "E"],
   // spec-v317..v319 machining depth batch (calc-machining.js Group K)

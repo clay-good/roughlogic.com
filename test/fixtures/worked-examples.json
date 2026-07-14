@@ -45593,6 +45593,32 @@
    }
   },
   {
+   "tile_id": "leveling-curvature-refraction",
+   "source_publisher": "Ghilani, Elementary Surveying (leveling reduction)",
+   "source_title": "2,000 ft leveling sight -> 0.0824 ft combined correction",
+   "source_edition_or_year": "h_cr = 0.0206 K^2 ft (K in thousands of feet)",
+   "source_section_or_page": "K = 2.0; h_cr = 0.0206 x 4 = 0.0824 ft (curvature 0.0956 - refraction 0.0132)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "sight_distance_ft": 2000
+   },
+   "outputs": {
+    "correction_ft": {
+     "value": 0.0824,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    },
+    "curvature_ft": {
+     "value": 0.0956,
+     "tolerance": {
+      "abs": 0.0005
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-h1-interaction",
    "source_publisher": "AISC 360-22 H1.1",
    "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",

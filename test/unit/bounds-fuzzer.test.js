@@ -16178,6 +16178,7 @@ test("bounds: spec-v310 computeBoussinesqSurchargeWall pins both branches, the s
 import { computeDifferentialLeveling as _v311, computeStadiaDistance as _v312, computeTapingCorrections as _v313 } from "../../calc-survey.js";
 import { computeCogoForwardPoint as _v766 } from "../../calc-survey.js";
 import { computeEdmSlopeReduction as _v769 } from "../../calc-survey.js";
+import { computeLevelingCurvatureRefraction as _v771 } from "../../calc-survey.js";
 
 test("bounds: spec-v311 computeDifferentialLeveling pins the HI reduction, the sum identity, the misclosure, and error seams", () => {
   const r = _v311({ bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 });
@@ -16315,6 +16316,34 @@ test("bounds: spec-v769 edm-slope-reduction pins H = S sinZ / V = S cosZ, zenith
   assert.ok("error" in _v769({ angle_mode: "vertical", slope_distance_ft: 250, angle_deg: 90 }));
   assert.ok("error" in _v769({ angle_mode: "sideways", slope_distance_ft: 250, angle_deg: 45 }));
   assert.ok("error" in _v769({ angle_mode: "zenith", slope_distance_ft: Infinity, angle_deg: 86 }));
+});
+
+test("bounds: spec-v771 leveling-curvature-refraction pins h_cr = 0.0206 K^2, component split, quadratic scaling, and error seams", () => {
+  // Spec example: 2000 ft -> K = 2 -> correction = 0.0206*4 = 0.0824 ft.
+  const r = _v771({ sight_distance_ft: 2000 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.correction_ft - 0.0824) < 1e-6);
+  assert.ok(Math.abs(r.curvature_ft - 0.0239 * 4) < 1e-9);
+  assert.ok(Math.abs(r.refraction_ft - 0.0033 * 4) < 1e-9);
+  // The combined correction is exactly curvature minus refraction.
+  assert.ok(Math.abs(r.correction_ft - (r.curvature_ft - r.refraction_ft)) < 1e-12);
+  // Cross-check the mile form: 1 mile = 5280 ft -> 0.574 M^2 with M=1 -> 0.574 ft.
+  const mile = _v771({ sight_distance_ft: 5280 });
+  assert.ok(Math.abs(mile.correction_ft - 0.574) < 1e-3, "mile form: " + mile.correction_ft);
+  // Quadratic in distance: double the sight -> 4x the correction.
+  for (let i = 1; i <= 40; i++) {
+    const d = i * 150;
+    const a = _v771({ sight_distance_ft: d });
+    const b = _v771({ sight_distance_ft: 2 * d });
+    assert.ok(!a.error && !b.error);
+    assert.ok(Math.abs(b.correction_ft / a.correction_ft - 4) < 1e-9, "quadratic scaling");
+    assert.ok(a.correction_ft > 0 && a.curvature_ft > a.refraction_ft, "curvature dominates");
+  }
+  // Error seams.
+  assert.ok("error" in _v771({ sight_distance_ft: 0 }));
+  assert.ok("error" in _v771({ sight_distance_ft: -100 }));
+  assert.ok("error" in _v771({ sight_distance_ft: Infinity }));
+  assert.ok("error" in _v771({ sight_distance_ft: NaN }));
 });
 
 // ===================== spec-v314..v316 steel beam-column-and-connection depth batch =====================

@@ -15202,6 +15202,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "curvature and refraction correction",
+      "target": "leveling-curvature-refraction",
+      "kind": "question"
+    },
+    {
+      "term": "earth curvature correction",
+      "target": "leveling-curvature-refraction",
+      "kind": "question"
+    },
+    {
+      "term": "leveling curvature correction",
+      "target": "leveling-curvature-refraction",
+      "kind": "question"
+    },
+    {
+      "term": "curvature refraction leveling",
+      "target": "leveling-curvature-refraction",
+      "kind": "question"
+    },
+    {
+      "term": "rod reading curvature correction",
+      "target": "leveling-curvature-refraction",
+      "kind": "question"
+    },
+    {
       "term": "slope distance to horizontal",
       "target": "edm-slope-reduction",
       "kind": "question"

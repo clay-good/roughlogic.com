@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): spec-v771 leveling curvature-and-refraction correction; 2026-07-14
+
+- New tile `leveling-curvature-refraction` (Group P, calc-survey.js): the correction the leveling and slope-reduction
+  tiles say they skip -- `h_cr = 0.0206 K^2` ft (K = sight distance in thousands of feet), the curvature `0.0239 K^2`
+  minus refraction `0.0033 K^2`, subtracted from the far rod. A 2,000 ft sight is 0.0824 ft; a 1-mile sight is 0.574 ft.
+  Fuzzer pins the component split, the mile form, and the quadratic scaling. calc-survey.js gzip cap 12000 -> 13500 B.
+  Home count 1,219 -> 1,220.
+
 ### feat(mechanic): spec-v770 helical compression spring rate; 2026-07-14
 
 - New tile `helical-spring-rate` (Group K, calc-mechanic.js): the axial rate of a coil spring from its geometry --
