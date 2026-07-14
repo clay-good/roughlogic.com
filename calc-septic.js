@@ -422,8 +422,53 @@ function renderSepticLppOrifice(inputRegion, outputRegion, citationEl) {
   for (const el of [dia.input, squirt.input, cd.input, perLat.input, laterals.input]) el.addEventListener("input", update);
 }
 
+// septic-lpp-squirt-head: inverse of septic-lpp-orifice. The forward tile gives the per-orifice discharge from the squirt
+// head; the inverse recovers the squirt head (residual pressure) that produces a target per-orifice discharge for a given
+// orifice size, so a designer checks that the head lands in the LPP 2.5-5 ft range. From
+// Q = 19.63 Cd d^2 sqrt(h), h = ( Q / (19.63 Cd d^2) )^2. Squirt pressure = h x 0.433 psi/ft.
+// dims: in { per_orifice_gpm: L^3, orifice_dia_in: L, cd: dimensionless } out: { squirt_ft: L, squirt_psi: M L^-1 T^-2 }
+export function computeSepticLppSquirtHead({ per_orifice_gpm, orifice_dia_in, cd = 0.6 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const q = Number(per_orifice_gpm);
+  const dia = Number(orifice_dia_in);
+  const c = Number(cd);
+  if (!(q > 0)) return { error: "Per-orifice discharge must be positive (gpm)." };
+  if (!(dia > 0)) return { error: "Orifice diameter must be positive (in)." };
+  if (!(c > 0)) return { error: "Discharge coefficient must be positive." };
+  const root = q / (19.63 * c * dia * dia);
+  const squirt_ft = root * root;
+  const squirt_psi = squirt_ft * 0.433;
+  if (![squirt_ft, squirt_psi].every(Number.isFinite)) return { error: "Squirt-head math is not a finite value." };
+  const in_lpp_band = squirt_ft >= 2.5 && squirt_ft <= 5;
+  return {
+    squirt_ft, squirt_psi, in_lpp_band,
+    note: "Required squirt head for a target per-orifice discharge: from the orifice equation Q = 19.63 Cd d^2 sqrt(h), h = ( Q / (19.63 Cd d^2) )^2 (Cd 0.6 gives the familiar 11.79 coefficient), and squirt pressure = h x 0.433 psi/ft. For a low-pressure-pipe (LPP) field the squirt-head target is roughly 2.5 to 5 ft (about 1 to 2 psi), which the ten-percent distal-to-proximal rule keeps uniform end to end; a mound or drip system runs higher. This head is the RESIDUAL at the orifice, so the pump total dynamic head must add the manifold and lateral friction, the elevation lift, and the transport loss (pair with pump-tdh and septic-dose-tank). Orifice size, spacing, and lateral layout come from the permitted onsite design; the state primacy agency governs.",
+  };
+}
+export const septicLppSquirtHeadExample = { inputs: { per_orifice_gpm: 1.275, orifice_dia_in: 0.25, cd: 0.6 } };
+function renderSepticLppSquirtHead(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: LPP orifice discharge Q = 19.63 Cd d^2 sqrt(h) (Cd 0.6 gives the 11.79 coefficient) solved for the head: h = ( Q / (19.63 Cd d^2) )^2; squirt pressure = h x 0.433 psi/ft. Target squirt 2.5-5 ft (LPP). The permitted onsite design and the state primacy agency govern.";
+  const q = makeNumber("Target per-orifice discharge (gpm)", "lsh-q", { step: "any", min: "0" });
+  const dia = makeNumber("Orifice diameter (in)", "lsh-d", { step: "any", min: "0" });
+  const cd = makeNumber("Discharge coefficient", "lsh-c", { step: "any", min: "0", value: "0.6" }); cd.input.value = "0.6";
+  for (const f of [q, dia, cd]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { q.input.value = "1.275"; dia.input.value = "0.25"; cd.input.value = "0.6"; update(); });
+  const oH = makeOutputLine(outputRegion, "Required squirt head", "lsh-out-h");
+  const oP = makeOutputLine(outputRegion, "Squirt pressure", "lsh-out-p");
+  const oN = makeOutputLine(outputRegion, "Note", "lsh-out-n");
+  const update = debounce(() => {
+    const r = computeSepticLppSquirtHead({ per_orifice_gpm: Number(q.input.value) || 0, orifice_dia_in: Number(dia.input.value) || 0, cd: Number(cd.input.value) || 0 });
+    if (r.error) { oH.textContent = r.error; oP.textContent = "-"; oN.textContent = ""; return; }
+    oH.textContent = fmt(r.squirt_ft, 2) + " ft" + (r.in_lpp_band ? " (within the LPP 2.5-5 ft band)" : " (outside the LPP 2.5-5 ft band)");
+    oP.textContent = fmt(r.squirt_psi, 2) + " psi";
+    oN.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [q.input, dia.input, cd.input]) el.addEventListener("input", update);
+}
+
 export const SEPTIC_RENDERERS = {
   "septic-tank": renderSepticTank,
+  "septic-lpp-squirt-head": renderSepticLppSquirtHead,
   "septic-drainfield": _v7p_renderSepticDrainfield,
   "septic-drainfield-capacity": _v7p_renderSepticDrainfieldCapacity,
   "septic-dose-tank": renderSepticDoseTank,

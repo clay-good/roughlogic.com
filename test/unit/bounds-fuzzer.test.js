@@ -10163,6 +10163,30 @@ test("bounds: calc-plumbing v83 septic dose-tank + pump-out interval + LPP orifi
   assert.ok("error" in _v83b3({ orifice_dia_in: Infinity, squirt_ft: 5, orifices_per_lateral: 10, num_laterals: 4 })); // non-finite
 });
 
+import { computeSepticLppSquirtHead as _v757 } from "../../calc-septic.js";
+test("bounds: spec-v757 septic LPP squirt head for a target orifice flow (inverse of septic-lpp-orifice)", () => {
+  const p = _v757({ per_orifice_gpm: 1.275, orifice_dia_in: 0.25, cd: 0.6 });
+  assert.ok(Math.abs(p.squirt_ft - 3.0) < 0.01);
+  assert.ok(Math.abs(p.squirt_psi - 3.0 * 0.433) < 0.01);
+  assert.strictEqual(p.in_lpp_band, true); // 3.0 ft is in the 2.5-5 band
+  // round-trip: the recovered head fed to septic-lpp-orifice (per-orifice) reproduces the target discharge
+  for (const [q, d, c] of [[1.275, 0.25, 0.6], [0.9, 0.1875, 0.6], [2.0, 0.25, 0.7], [1.5, 0.3125, 0.6]]) {
+    const inv = _v757({ per_orifice_gpm: q, orifice_dia_in: d, cd: c });
+    const fwd = _v83b3({ orifice_dia_in: d, squirt_ft: inv.squirt_ft, cd: c, orifices_per_lateral: 1, num_laterals: 1 });
+    assert.ok(Math.abs(fwd.per_orifice_gpm - q) < 1e-6);
+  }
+  // more flow through the same orifice needs more head (as the square); a bigger orifice needs less head
+  assert.ok(_v757({ per_orifice_gpm: 2.0, orifice_dia_in: 0.25 }).squirt_ft > _v757({ per_orifice_gpm: 1.275, orifice_dia_in: 0.25 }).squirt_ft);
+  assert.ok(_v757({ per_orifice_gpm: 1.275, orifice_dia_in: 0.3125 }).squirt_ft < _v757({ per_orifice_gpm: 1.275, orifice_dia_in: 0.25 }).squirt_ft);
+  // a small flow lands below the LPP band
+  assert.strictEqual(_v757({ per_orifice_gpm: 0.5, orifice_dia_in: 0.25 }).in_lpp_band, false);
+  // error seams
+  assert.ok("error" in _v757({ per_orifice_gpm: 0, orifice_dia_in: 0.25 }));
+  assert.ok("error" in _v757({ per_orifice_gpm: 1.275, orifice_dia_in: 0 }));
+  assert.ok("error" in _v757({ per_orifice_gpm: 1.275, orifice_dia_in: 0.25, cd: 0 }));
+  assert.ok("error" in _v757({ per_orifice_gpm: Infinity, orifice_dia_in: 0.25 }));
+});
+
 import { computeSepticTankForInterval as _v704 } from "../../calc-septic.js";
 test("bounds: spec-v704 computeSepticTankForInterval pins tank = years*people*accum/fill, round-trips through computeSepticPumpoutInterval, and error seams", () => {
   const r = _v704({ target_years: 5, people: 4, accum_gal_pp_yr: 30, fill_fraction: 0.33 });

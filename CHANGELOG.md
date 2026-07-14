@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(septic): spec-v757 septic LPP squirt head for a target orifice flow (septic-lpp-orifice inverse); 2026-07-14
+
+- New tile `septic-lpp-squirt-head` (Group B, calc-septic.js): the squirt head (residual pressure) that produces a target
+  per-orifice discharge. `h = ( Q / (19.63 Cd d^2) )^2`. A 0.25 in orifice at Cd 0.6 delivering 1.28 gpm needs ~3.0 ft
+  (1.3 psi); flags whether it lands in the LPP 2.5-5 ft band. Round-trips through `septic-lpp-orifice`. Home tile count
+  1,205 -> 1,206.
+
 ### feat(civil): spec-v756 safe curve speed from radius and superelevation (superelevation speed inverse); 2026-07-14
 
 - New tile `superelevation-safe-curve-speed` (Group E, calc-civil.js): the maximum safe speed a curve supports from its

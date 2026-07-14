@@ -226,7 +226,7 @@ const TOOL_MODULES = (() => {
     // v2 / v7
     "septic-tank", "septic-drainfield", "septic-drainfield-capacity",
     // v83 onsite-septic pressure distribution
-    "septic-dose-tank", "septic-pumpout-interval", "septic-tank-for-interval", "septic-lpp-orifice",
+    "septic-dose-tank", "septic-pumpout-interval", "septic-tank-for-interval", "septic-lpp-orifice", "septic-lpp-squirt-head",
   ]);
   // spec-v78 cap-relief split: the cohesive spec-v63 + spec-v64 service bench
   // (gas-appliance-demand, tpr-discharge, pipe-support-spacing, softener-sizing)

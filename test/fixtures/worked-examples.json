@@ -22867,6 +22867,34 @@
    }
   },
   {
+   "tile_id": "septic-lpp-squirt-head",
+   "source_publisher": "Orifice-discharge equation / university extension LPP design guidance (solved for head)",
+   "source_title": "h = ( Q / (19.63 Cd d^2) )^2; 1.275 gpm, 1/4 in orifice, Cd 0.6 -> 3.0 ft (1.3 psi)",
+   "source_edition_or_year": "standard orifice hydraulics",
+   "source_section_or_page": "spec-v757 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "per_orifice_gpm": 1.275,
+    "orifice_dia_in": 0.25,
+    "cd": 0.6
+   },
+   "outputs": {
+    "squirt_ft": {
+     "value": 3.0,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "squirt_psi": {
+     "value": 1.299,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "septic-lpp-orifice",
    "source_publisher": "Orifice-discharge equation / university extension LPP design guidance",
    "source_title": "cross-check: a 3/16 in orifice flows less per orifice",

@@ -282,6 +282,7 @@ export const COMPUTE_MAP = {
   "septic-pumpout-interval": { module: "../../calc-septic.js", fn: "computeSepticPumpoutInterval" },
   "septic-tank-for-interval": { module: "../../calc-septic.js", fn: "computeSepticTankForInterval" },
   "septic-lpp-orifice": { module: "../../calc-septic.js", fn: "computeSepticLppOrifice" },
+  "septic-lpp-squirt-head": { module: "../../calc-septic.js", fn: "computeSepticLppSquirtHead" },
   "trap-arm": { module: "../../calc-plumbing.js", fn: "computeTrapArm" },
   "pipe-expansion": { module: "../../calc-plumbing.js", fn: "computePipeExpansion" },
   "grease-trap": { module: "../../calc-plumbing.js", fn: "computeGreaseTrap" },

@@ -2902,6 +2902,31 @@
       "kind": "industry"
     },
     {
+      "term": "squirt head",
+      "target": "septic-lpp-squirt-head",
+      "kind": "industry"
+    },
+    {
+      "term": "lpp squirt head",
+      "target": "septic-lpp-squirt-head",
+      "kind": "redirect"
+    },
+    {
+      "term": "septic squirt pressure",
+      "target": "septic-lpp-squirt-head",
+      "kind": "adjacent"
+    },
+    {
+      "term": "head for orifice flow",
+      "target": "septic-lpp-squirt-head",
+      "kind": "adjacent"
+    },
+    {
+      "term": "residual pressure lpp",
+      "target": "septic-lpp-squirt-head",
+      "kind": "adjacent"
+    },
+    {
       "term": "LPP",
       "target": "septic-lpp-orifice",
       "kind": "industry"

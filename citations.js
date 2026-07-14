@@ -3482,6 +3482,18 @@ export const CITATIONS = {
       { name: "Code minimum governs", value: "state minimum tank sizes by bedroom count usually govern the actual tank, overriding this interval-based estimate", source: "state onsite code" },
     ],
   },
+  "septic-lpp-squirt-head": {
+    formula: "h_ft = ( per_orifice_gpm / (19.63 x Cd x d_in^2) )^2, the inverse of Q = 19.63 Cd d^2 sqrt(h); squirt pressure = h x 0.433 psi/ft.",
+    edition: "Standard orifice-discharge equation, solved for the head; university onsite-wastewater extension low-pressure-pipe design guidance, by name.",
+    freeAccess: "Extension LPP design guidance free on land-grant university extension sites.",
+    governance: GOVERNANCE.plumbing,
+    editionNote: "Single-edition (orifice-discharge equation + extension LPP design guidance), solved for the squirt head: the residual pressure at the orifice that produces a target per-orifice discharge, h = ( Q / (19.63 Cd d^2) )^2, with the squirt pressure h x 0.433 psi/ft. The LPP squirt-head target is roughly 2.5 to 5 ft (about 1 to 2 psi), which the ten-percent distal-to-proximal rule keeps uniform end to end; a mound or drip system runs higher. This is the residual at the orifice, so the pump total dynamic head must add the manifold and lateral friction, the elevation lift, and the transport loss. Orifice size, spacing, and layout come from the permitted onsite design; the state primacy agency governs.",
+    assumptions: [
+      { name: "Discharge coefficient", value: "Cd 0.6 default (gives the 11.79 / 19.63x0.6 orifice coefficient); editable", source: "orifice-discharge equation" },
+      { name: "Squirt height target", value: "roughly 2.5 to 5 ft (about 1 to 2 psi) for LPP, higher for mound or drip", source: "extension LPP design guidance" },
+      { name: "Residual only", value: "the pump TDH adds friction, lift, and transport loss on top of this squirt head", source: "extension LPP design guidance" },
+    ],
+  },
   "septic-lpp-orifice": {
     formula: "Per-orifice flow (gpm) = 19.63 x Cd x d_in^2 x sqrt(h_ft) (Cd 0.6 gives the familiar 11.79 coefficient); system flow = per-orifice flow x orifices per lateral x laterals.",
     edition: "Standard orifice-discharge equation; university onsite-wastewater extension low-pressure-pipe design guidance, by name.",

@@ -2625,6 +2625,7 @@ cross-check.
 | calc-septic.js | `computeSepticDrainfield` | `{ design_flow_gpd = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft = 3,...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDrainfieldCapacity` | `{ available_trench_ft = 0, application_rate_gpd_per_ft2 = 0, trench_width_ft ...` | _ | _ | _ |
 | calc-septic.js | `computeSepticLppOrifice` | `{ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}` | _ | _ | _ |
+| calc-septic.js | `computeSepticLppSquirtHead` | `{ per_orifice_gpm, orifice_dia_in, cd = 0.6 } = {}` | _ | _ | _ |
 | calc-septic.js | `computeSepticPumpoutInterval` | `{ tank_gal, people, accum_gal_pp_yr = 30, fill_fraction = 0.33 } = {}` | _ | _ | _ |
 | calc-septic.js | `computeSepticTank` | `{ bedrooms, gallons_per_day }` | _ | _ | _ |
 | calc-septic.js | `computeSepticTankForInterval` | `{ target_years = 0, people = 0, accum_gal_pp_yr = 30, fill_fraction = 0.33 } ...` | _ | _ | _ |
@@ -2866,7 +2867,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1452.
+Row count: 1453.
 
 <!-- END function-corpus-v14 -->
 
@@ -3109,7 +3110,7 @@ per spec-v14 §13.1 second paragraph.
 | `wireway-fill` | Wireway / Auxiliary Gutter 20% Fill (NEC 376.22) | NEC 2023 (NFPA 70); 4x4 in interior 16 in^2, allowed 0.20 x 16 = 3.2 in^2; 2.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `working-space-110-26` | Working-Space Clearance Lookup (NEC 110.26) | NEC 2023 (NFPA 70); 480Y/277 V (151-600 V) Condition 2 -> 3.5 ft depth; width... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group B Plumbing (102 tiles)
+### Group B Plumbing (103 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3177,6 +3178,7 @@ per spec-v14 §13.1 second paragraph.
 | `septic-drainfield` | Septic Drainfield Trench Length | Project (first-principles); 600 gpd design flow / 0.6 gpd/ft^2 application rate -> 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-drainfield-capacity` | Septic Drainfield Capacity (Flow / Bedrooms) | Project (first-principles) / USEPA OWTS; 300 ft of 3 ft trench at 0.6 gpd/ft^2 -> 900 ft^2 -> 540 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-lpp-orifice` | Septic LPP Orifice Flow and Squirt Height | Orifice-discharge equation / universi...; 1/4 in orifice, 5 ft squirt, Cd 0.6, 10 orifices x 4 late... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
+| `septic-lpp-squirt-head` | Septic LPP Squirt Head for a Target Orifice Flow | Orifice-discharge equation / universi...; spec-v757 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-pumpout-interval` | Septic Tank Pump-Out Interval | USEPA Onsite Wastewater Treatment Sys...; 1,000 gal tank, 4 people, 30 gal/pp/yr, 1/3 fill -> 330 g... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `septic-tank` | Septic Tank Sizing | IPC / state primacy agency; 4 bedrooms -> 4 x 150 = 600 gpd, 2 x retention = 1200 gal... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `septic-tank-for-interval` | Septic Tank Size for a Target Pump-Out Interval | USEPA Onsite Wastewater Treatment Sys...; 5 years, 4 people, 30 gal/pp/yr, 1/3 fill -> 600 gal accu... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4257,6 +4259,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1205. Fixture-covered or reference-cadence: 1205 / 1205.
+Tile count: 1206. Fixture-covered or reference-cadence: 1206 / 1206.
 
 <!-- END tile-index-v14 -->
