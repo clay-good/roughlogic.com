@@ -571,3 +571,52 @@ function renderLevelingCurvatureRefraction(inputRegion, outputRegion, citationEl
   d.input.addEventListener("input", update);
 }
 SURVEY_RENDERERS["leveling-curvature-refraction"] = renderLevelingCurvatureRefraction;
+
+// State-plane grid-to-ground: elevation factor EF = R/(R+h) with R = 20,906,000 ft
+// (NGS mean earth radius), combined factor CF = GSF x EF, ground = grid / CF.
+const _NGS_MEAN_RADIUS_FT = 20906000;
+// dims: in { grid_distance_ft: L, grid_scale_factor: dimensionless, ellipsoid_height_ft: L } out: { ground_distance_ft: L, combined_factor: dimensionless, elevation_factor: dimensionless }
+export function computeGridToGround({ grid_distance_ft = 0, grid_scale_factor = 1, ellipsoid_height_ft = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const grid = Number(grid_distance_ft) || 0;
+  const gsf = Number(grid_scale_factor) || 0;
+  const h = Number(ellipsoid_height_ft);
+  if (!(grid > 0)) return { error: "Grid distance must be positive (ft)." };
+  if (!(gsf > 0)) return { error: "Grid scale factor must be positive (near 1.0)." };
+  if (!Number.isFinite(h)) return { error: "Ellipsoid height must be a number (ft)." };
+  if (!(_NGS_MEAN_RADIUS_FT + h > 0)) return { error: "Ellipsoid height is out of range." };
+  const elevation_factor = _NGS_MEAN_RADIUS_FT / (_NGS_MEAN_RADIUS_FT + h);
+  const combined_factor = gsf * elevation_factor;
+  const ground_distance_ft = grid / combined_factor;
+  return {
+    ground_distance_ft, combined_factor, elevation_factor,
+    note: "State-plane grid-to-ground reduction: the elevation (sea-level) factor EF = R/(R+h) with R = 20,906,000 ft (NGS mean earth radius) and h the ellipsoid height, the combined factor CF = grid-scale-factor x EF, and ground = grid / CF (reverse: grid = ground x CF). The grid scale factor comes from the projection at the point (a state-plane or UTM zone value near 1.0, from software or the NGS tool) and h is the ELLIPSOID height = orthometric elevation H + geoid height N (N is negative in the conterminous US, ~ -30 m), so enter H + N, not the elevation alone. Above the ellipsoid the ground is longer than the grid (CF < 1). A computational aid; the published control and the datum govern.",
+  };
+}
+export const gridToGroundExample = { inputs: { grid_distance_ft: 10000, grid_scale_factor: 0.9999, ellipsoid_height_ft: 5280 } };
+
+function renderGridToGround(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: state-plane grid-to-ground reduction - elevation factor EF = R/(R+h), R = 20,906,000 ft (NGS mean earth radius), combined factor CF = grid-scale-factor x EF, ground = grid / CF. Standard NGS/NOAA State Plane Coordinate System practice, by name. The grid scale factor is a projection value near 1.0; h is the ELLIPSOID height (orthometric H + geoid N). A computational aid; the published control governs.";
+  const grid = makeNumber("Grid (map) distance (ft)", "g2g-d", { step: "any", min: "0", value: "10000" });
+  grid.input.value = "10000";
+  const gsf = makeNumber("Grid scale factor (near 1.0)", "g2g-gsf", { step: "any", min: "0", value: "0.9999" });
+  gsf.input.value = "0.9999";
+  const h = makeNumber("Ellipsoid height h = H + N (ft)", "g2g-h", { step: "any", value: "5280" });
+  h.input.value = "5280";
+  for (const f of [grid, gsf, h]) inputRegion.appendChild(f.wrap);
+  const oG = makeOutputLine(outputRegion, "Ground distance", "g2g-out-ground");
+  const oCF = makeOutputLine(outputRegion, "Combined factor", "g2g-out-cf");
+  const oEF = makeOutputLine(outputRegion, "Elevation factor", "g2g-out-ef");
+  const oNote = makeOutputLine(outputRegion, "Note", "g2g-out-note");
+  const update = debounce(() => {
+    const r = computeGridToGround({ grid_distance_ft: Number(grid.input.value) || 0, grid_scale_factor: Number(gsf.input.value) || 0, ellipsoid_height_ft: Number(h.input.value) || 0 });
+    if (r.error) { oG.textContent = r.error; oCF.textContent = "-"; oEF.textContent = "-"; oNote.textContent = ""; return; }
+    oG.textContent = fmt(r.ground_distance_ft, 3) + " ft";
+    oCF.textContent = fmt(r.combined_factor, 7);
+    oEF.textContent = fmt(r.elevation_factor, 7);
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { grid.input.value = "10000"; gsf.input.value = "0.9999"; h.input.value = "5280"; update(); });
+  for (const f of [grid.input, gsf.input, h.input]) f.addEventListener("input", update);
+}
+SURVEY_RENDERERS["grid-to-ground"] = renderGridToGround;

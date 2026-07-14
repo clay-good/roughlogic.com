@@ -15252,6 +15252,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "grid to ground distance",
+      "target": "grid-to-ground",
+      "kind": "question"
+    },
+    {
+      "term": "combined scale factor",
+      "target": "grid-to-ground",
+      "kind": "industry"
+    },
+    {
+      "term": "grid distance to ground",
+      "target": "grid-to-ground",
+      "kind": "question"
+    },
+    {
+      "term": "state plane scale factor",
+      "target": "grid-to-ground",
+      "kind": "question"
+    },
+    {
+      "term": "sea level factor survey",
+      "target": "grid-to-ground",
+      "kind": "question"
+    },
+    {
       "term": "curvature and refraction correction",
       "target": "leveling-curvature-refraction",
       "kind": "question"

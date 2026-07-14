@@ -595,6 +595,7 @@ const _TILES = [
   ["cogo-forward-point", "P"],
   ["edm-slope-reduction", "P"],
   ["leveling-curvature-refraction", "P"],
+  ["grid-to-ground", "P"],
   // spec-v314..v316 steel beam-column-and-connection depth batch
   ["steel-h1-interaction", "E"], ["steel-effective-length-k", "E"], ["steel-bolt-tension-shear", "E"],
   // spec-v317..v319 machining depth batch (calc-machining.js Group K)

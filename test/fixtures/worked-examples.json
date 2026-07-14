@@ -45732,6 +45732,34 @@
    }
   },
   {
+   "tile_id": "grid-to-ground",
+   "source_publisher": "NGS State Plane Coordinate System",
+   "source_title": "10,000 ft grid at 0.9999 scale factor, 5,280 ft ellipsoid height -> 10,003.53 ft ground",
+   "source_edition_or_year": "EF = R/(R+h), CF = GSF x EF, ground = grid/CF",
+   "source_section_or_page": "EF = 20906000/20911280 = 0.9997475; CF = 0.9999 x 0.9997475 = 0.9996475; ground = 10000/0.9996475 = 10003.53",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "grid_distance_ft": 10000,
+    "grid_scale_factor": 0.9999,
+    "ellipsoid_height_ft": 5280
+   },
+   "outputs": {
+    "ground_distance_ft": {
+     "value": 10003.53,
+     "tolerance": {
+      "abs": 0.02
+     }
+    },
+    "combined_factor": {
+     "value": 0.9996475,
+     "tolerance": {
+      "abs": 0.000001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steel-h1-interaction",
    "source_publisher": "AISC 360-22 H1.1",
    "source_title": "Pr 100 / Pc 400, Mrx 80 / Mcx 200 -> ratio 0.25, interaction 0.61 passes",

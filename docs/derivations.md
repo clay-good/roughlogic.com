@@ -2757,6 +2757,7 @@ cross-check.
 | calc-survey.js | `computeCogoForwardPoint` | `{ start_n = 0, start_e = 0, azimuth_deg = 0, distance_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeDifferentialLeveling` | `{ bm_elev = 0, bs, fs, known_close = null } = {}` | _ | _ | _ |
 | calc-survey.js | `computeEdmSlopeReduction` | `{ angle_mode, slope_distance_ft = 0, angle_deg = 0, hi_ft = 0, hr_ft = 0 } = {}` | _ | _ | _ |
+| calc-survey.js | `computeGridToGround` | `{ grid_distance_ft = 0, grid_scale_factor = 1, ellipsoid_height_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelLoopAdjustment` | `{ elevs, dists, known_close = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeLevelingCurvatureRefraction` | `{ sight_distance_ft = 0 } = {}` | _ | _ | _ |
 | calc-survey.js | `computeStadiaDistance` | `{ s_ft = 0, theta_deg = 0, k_f = 100, hi_ft = 0, rod_ft = 0, sta_elev = 0 } = {}` | _ | _ | _ |
@@ -2885,7 +2886,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1471.
+Row count: 1472.
 
 <!-- END function-corpus-v14 -->
 
@@ -4103,7 +4104,7 @@ per spec-v14 §13.1 second paragraph.
 | `sous-vide-pasteurization` | Sous-Vide Pasteurization Time | FDA / Baldwin; Heisler-slab approximation Fo ~ 0.4; Annex 6 hold at 140 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `yield-ep` | Yield Percentage and Edible Portion | Project (first-principles) over Culin...; 10 lb AP / 1.5 lb trim / 15% cooking loss / $8/lb -> 72.2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group P Field (23 tiles)
+### Group P Field (24 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4113,6 +4114,7 @@ per spec-v14 §13.1 second paragraph.
 | `cogo-forward-point` | COGO Forward Locate (Bearing and Distance) | Coordinate geometry (Ghilani & Wolf; ...; dN = 200 cos45 = 141.421; dE = 200 sin45 = 141.421; N2 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `differential-leveling` | Differential Leveling (HI Method) and Loop Misclosure | Height-of-instrument leveling (Ghilan...; spec-v311 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `edm-slope-reduction` | Total-Station Slope-to-Horizontal Reduction | Ghilani, Elementary Surveying (plane-...; H = 250 sin86 = 249.391 ft; V = 250 cos86 = 17.439 ft | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `grid-to-ground` | State-Plane Grid-to-Ground Distance | NGS State Plane Coordinate System; EF = 20906000/20911280 = 0.9997475; CF = 0.9999 x 0.99974... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `hiking-time` | Hiking Time (Naismith's Rule) | Naismith's rule (W. W. Naismith, 1892); 10 km, 600 m ascent, 5 km/h -> 2 hr flat + 1 hr ascent = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `level-loop-adjustment` | Level-Loop Misclosure Distribution (Compass Rule) | Compass-rule level-loop adjustment (G...; spec-v631 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `leveling-curvature-refraction` | Leveling Curvature-and-Refraction Correction | Ghilani, Elementary Surveying (leveli...; K = 2.0; h_cr = 0.0206 x 4 = 0.0824 ft (curvature 0.0956 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4295,6 +4297,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1224. Fixture-covered or reference-cadence: 1224 / 1224.
+Tile count: 1225. Fixture-covered or reference-cadence: 1225 / 1225.
 
 <!-- END tile-index-v14 -->

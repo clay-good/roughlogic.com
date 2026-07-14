@@ -1064,7 +1064,7 @@ const TOOL_MODULES = (() => {
     "area-by-coordinates", "traverse-closure",
     // spec-v311..v313 field-surveying depth batch
     "differential-leveling", "level-loop-adjustment", "stadia-distance", "taping-corrections",
-    "cogo-forward-point", "edm-slope-reduction", "leveling-curvature-refraction",
+    "cogo-forward-point", "edm-slope-reduction", "leveling-curvature-refraction", "grid-to-ground",
   ]);
   // v4 Group Q: Historical Reference Data (utility 233).
   declare("./calc-historical.js", "HISTORICAL_RENDERERS", [

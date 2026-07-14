@@ -11714,6 +11714,18 @@ export const CITATIONS = {
       { name: "Balanced sights", value: "cancels with equal backsight/foresight distances in differential leveling", source: "leveling practice" },
     ],
   },
+  "grid-to-ground": {
+    formula: "elevation factor EF = R/(R+h), R = 20,906,000 ft (NGS mean earth radius); combined factor CF = grid_scale_factor x EF; ground = grid / CF (grid = ground x CF).",
+    edition: "NGS / NOAA State Plane Coordinate System grid-to-ground reduction, by name; first-principles.",
+    freeAccess: "The elevation-factor and combined-factor relations are public NGS results; the grid scale factor is available from the free NGS SPC/UTM tools.",
+    governance: GOVERNANCE.general,
+    editionNote: "Converts a projection (grid) distance to a ground distance: the elevation (sea-level) factor EF = R/(R+h) with R = 20,906,000 ft and h the ELLIPSOID height, the combined factor CF = grid-scale-factor x EF, and ground = grid / CF (reverse: grid = ground x CF). The grid scale factor is the projection value at the point (a state-plane or UTM zone number near 1.0, from survey software or the NGS tool). Critically, h is the ellipsoid height = orthometric elevation H + geoid height N, and N is negative in the conterminous US (about -30 m), so enter H + N, not the elevation - using the elevation alone introduces a ~1 ppm-per-30-m error. Above the ellipsoid the ground distance exceeds the grid distance (CF < 1). A computational aid; the published control and the datum govern.",
+    assumptions: [
+      { name: "Mean radius", value: "R = 20,906,000 ft (NGS mean earth radius)", source: "NGS" },
+      { name: "Grid scale factor", value: "the projection value at the point, near 1.0, user-supplied from NGS tools/software", source: "State Plane Coordinate System" },
+      { name: "Ellipsoid height", value: "h = orthometric elevation H + geoid height N (N negative in the conterminous US)", source: "geodetic convention" },
+    ],
+  },
   "building-ua": {
     formula: "cond = sum(A_i / R_i); UA_inf = 1.08 x CFM; UA = cond + UA_inf; design_load = UA x dT.",
     edition: "The whole-building heat-loss-coefficient roll-up UA = sum(A/R) + 1.08 x CFM with the design load Q = UA x dT, as compiled in the ASHRAE Fundamentals and RESNET energy-audit references, by name.",

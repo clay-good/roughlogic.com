@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(survey): spec-v776 state-plane grid-to-ground distance; 2026-07-14
+
+- New tile `grid-to-ground` (Group P, calc-survey.js): the grid scale factor the COGO and slope tiles say they skip --
+  elevation factor `EF = R/(R+h)` (R = 20,906,000 ft), combined factor `CF = grid-scale-factor x EF`, `ground = grid/CF`.
+  A 10,000 ft grid distance at a 0.9999 scale factor and 5,280 ft ellipsoid height is 10,003.53 ft on the ground. h is
+  the ellipsoid height (orthometric H + geoid N). Fuzzer pins the CF identity, the reverse, and linearity.
+  calc-survey.js gzip cap 13500 -> 15500 B. Home count 1,224 -> 1,225.
+
 ### feat(machining): spec-v775 gear-tooth chordal thickness (caliper); 2026-07-14
 
 - New tile `gear-chordal-thickness` (Group K, calc-machining.js): the gear-tooth caliper settings the geometry tile

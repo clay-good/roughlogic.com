@@ -16255,6 +16255,7 @@ import { computeDifferentialLeveling as _v311, computeStadiaDistance as _v312, c
 import { computeCogoForwardPoint as _v766 } from "../../calc-survey.js";
 import { computeEdmSlopeReduction as _v769 } from "../../calc-survey.js";
 import { computeLevelingCurvatureRefraction as _v771 } from "../../calc-survey.js";
+import { computeGridToGround as _v776 } from "../../calc-survey.js";
 
 test("bounds: spec-v311 computeDifferentialLeveling pins the HI reduction, the sum identity, the misclosure, and error seams", () => {
   const r = _v311({ bm_elev: 100.00, bs: [4.32, 5.60], fs: [2.15, 3.40], known_close: 104.40 });
@@ -16420,6 +16421,44 @@ test("bounds: spec-v771 leveling-curvature-refraction pins h_cr = 0.0206 K^2, co
   assert.ok("error" in _v771({ sight_distance_ft: -100 }));
   assert.ok("error" in _v771({ sight_distance_ft: Infinity }));
   assert.ok("error" in _v771({ sight_distance_ft: NaN }));
+});
+
+test("bounds: spec-v776 grid-to-ground pins EF = R/(R+h), CF = GSF*EF, ground = grid/CF, reverse, and error seams", () => {
+  const R = 20906000;
+  // Spec example: GSF 0.9999, h 5280, grid 10000 -> EF 0.9997475, CF 0.9996475, ground 10003.53.
+  const r = _v776({ grid_distance_ft: 10000, grid_scale_factor: 0.9999, ellipsoid_height_ft: 5280 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.elevation_factor - R / (R + 5280)) < 1e-12);
+  assert.ok(Math.abs(r.combined_factor - 0.9999 * (R / (R + 5280))) < 1e-12);
+  assert.ok(Math.abs(r.ground_distance_ft - 10000 / r.combined_factor) < 1e-9);
+  assert.ok(Math.abs(r.ground_distance_ft - 10003.53) < 0.02);
+  // At sea level (h=0) the elevation factor is exactly 1; ground = grid / GSF.
+  const sea = _v776({ grid_distance_ft: 10000, grid_scale_factor: 0.9999, ellipsoid_height_ft: 0 });
+  assert.ok(Math.abs(sea.elevation_factor - 1) < 1e-12);
+  assert.ok(Math.abs(sea.ground_distance_ft - 10000 / 0.9999) < 1e-9);
+  // Above the ellipsoid the ground exceeds the grid (CF < 1 when GSF and EF < 1).
+  assert.ok(r.ground_distance_ft > 10000, "ground > grid above the ellipsoid");
+  // Round-trip and scalings across a sweep; ground = grid / CF exactly, linear in grid distance.
+  for (let i = 0; i < 200; i++) {
+    const grid = 100 + i * 137;
+    const gsf = 0.9996 + (i % 9) * 0.0001;
+    const h = -500 + (i % 40) * 300;
+    const m = _v776({ grid_distance_ft: grid, grid_scale_factor: gsf, ellipsoid_height_ft: h });
+    assert.ok(!m.error, JSON.stringify({ grid, gsf, h }));
+    const cf = gsf * (R / (R + h));
+    assert.ok(Math.abs(m.combined_factor - cf) < 1e-12, "CF identity");
+    assert.ok(Math.abs(m.ground_distance_ft - grid / cf) < 1e-6, "ground = grid/CF");
+    // Reverse: ground x CF returns the grid distance.
+    assert.ok(Math.abs(m.ground_distance_ft * m.combined_factor - grid) < 1e-6, "reverse grid = ground x CF");
+    // Linear in grid distance.
+    const dbl = _v776({ grid_distance_ft: 2 * grid, grid_scale_factor: gsf, ellipsoid_height_ft: h });
+    assert.ok(Math.abs(dbl.ground_distance_ft - 2 * m.ground_distance_ft) < 1e-6, "linear in grid");
+  }
+  // Error seams.
+  assert.ok("error" in _v776({ grid_distance_ft: 0, grid_scale_factor: 0.9999, ellipsoid_height_ft: 5280 }));
+  assert.ok("error" in _v776({ grid_distance_ft: 10000, grid_scale_factor: 0, ellipsoid_height_ft: 5280 }));
+  assert.ok("error" in _v776({ grid_distance_ft: 10000, grid_scale_factor: 0.9999, ellipsoid_height_ft: NaN }));
+  assert.ok("error" in _v776({ grid_distance_ft: Infinity, grid_scale_factor: 0.9999, ellipsoid_height_ft: 5280 }));
 });
 
 // ===================== spec-v314..v316 steel beam-column-and-connection depth batch =====================

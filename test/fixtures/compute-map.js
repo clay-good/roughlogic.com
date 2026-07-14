@@ -965,6 +965,7 @@ export const COMPUTE_MAP = {
   "cogo-forward-point": { module: "../../calc-survey.js", fn: "computeCogoForwardPoint" },
   "edm-slope-reduction": { module: "../../calc-survey.js", fn: "computeEdmSlopeReduction" },
   "leveling-curvature-refraction": { module: "../../calc-survey.js", fn: "computeLevelingCurvatureRefraction" },
+  "grid-to-ground": { module: "../../calc-survey.js", fn: "computeGridToGround" },
   // spec-v314..v316 steel beam-column-and-connection depth batch (3 tiles)
   "steel-h1-interaction": { module: "../../calc-steel.js", fn: "computeSteelH1Interaction" },
   "steel-effective-length-k": { module: "../../calc-steel.js", fn: "computeSteelEffectiveLengthK" },
