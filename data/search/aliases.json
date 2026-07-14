@@ -942,6 +942,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "feed for a target finish",
+      "target": "feed-for-surface-finish",
+      "kind": "industry"
+    },
+    {
+      "term": "feed rate for surface finish",
+      "target": "feed-for-surface-finish",
+      "kind": "industry"
+    },
+    {
+      "term": "how fast can i feed for ra",
+      "target": "feed-for-surface-finish",
+      "kind": "adjacent"
+    },
+    {
+      "term": "ipr for a target ra",
+      "target": "feed-for-surface-finish",
+      "kind": "adjacent"
+    },
+    {
+      "term": "max feed to hold finish",
+      "target": "feed-for-surface-finish",
+      "kind": "adjacent"
+    },
+    {
       "term": "taper per foot",
       "target": "taper-calc",
       "kind": "industry"

@@ -628,6 +628,7 @@ export const COMPUTE_MAP = {
   "machining-time": { module: "../../calc-shop.js", fn: "computeMachiningTime" },
   "material-removal-rate": { module: "../../calc-shop.js", fn: "computeMaterialRemovalRate" },
   "turning-surface-finish": { module: "../../calc-shop.js", fn: "computeTurningSurfaceFinish" },
+  "feed-for-surface-finish": { module: "../../calc-shop.js", fn: "computeFeedForSurfaceFinish" },
   "taper-calc": { module: "../../calc-shop.js", fn: "computeTaperCalc" },
   "taper-diameter": { module: "../../calc-shop.js", fn: "computeTaperDiameter" },
   "dividing-head": { module: "../../calc-shop.js", fn: "computeDividingHead" },

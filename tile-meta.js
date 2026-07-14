@@ -397,7 +397,7 @@ const _TILES = [
   ["bolt-proof-load", "G"],
 
   // v40 machine-shop & fab bench (new calc-shop.js module; mixed group letters K/G/E)
-  ["machining-time", "K"], ["material-removal-rate", "K"], ["turning-surface-finish", "K"],
+  ["machining-time", "K"], ["material-removal-rate", "K"], ["turning-surface-finish", "K"], ["feed-for-surface-finish", "K"],
   ["taper-calc", "K"], ["taper-diameter", "K"], ["dividing-head", "K"],
   ["thread-measure-wire", "G"], ["punch-force", "G"],
   ["press-brake-tonnage", "E"], ["weld-duty-cycle", "E"], ["carbon-equivalent", "E"],

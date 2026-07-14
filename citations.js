@@ -7787,6 +7787,17 @@ export const CITATIONS = {
       { name: "Round-nose tool", value: "the feed is fast enough that the round nose scallops the surface (the dominant regime); Ra ~= Rt / 4 is an estimate", source: "scallop geometry" },
     ],
   },
+  "feed-for-surface-finish": {
+    formula: "f = sqrt(8 x nose_radius x Rt); Rt = 4 x Ra if the target is an Ra. The inverse of Rt = f^2 / (8 x r).",
+    edition: "Theoretical surface roughness from feed and nose radius - first-principles scallop geometry as in Machinery's Handbook (Industrial Press), by name; public domain.",
+    freeAccess: "Pure geometry, public; the measured finish is rougher than this theoretical value, so leave margin.",
+    governance: GOVERNANCE.general,
+    editionNote: "The fastest feed per revolution that still holds a target theoretical surface finish, the inverse of turning-surface-finish: f = sqrt(8 x nose_radius x Rt), with an Ra target converted by Rt = 4 x Ra (the tile's Ra ~= Rt/4 estimate). The finish improves as the square of the feed, so a larger nose radius lets you feed faster for the same finish (why a wiper insert holds a fine finish at production feed). This is the theoretical scallop feed; built-up edge, tool wear, deflection, and vibration make the measured finish rougher, so leave margin. The print, the insert, and a measured finish govern.",
+    assumptions: [
+      { name: "Round-nose scallop", value: "the round nose scallops the surface (the dominant regime); Ra ~= Rt / 4 converts an Ra target to Rt", source: "scallop geometry" },
+      { name: "Theoretical only", value: "built-up edge, tool wear, deflection, and vibration roughen the measured finish; leave feed margin", source: "machining practice" },
+    ],
+  },
   "taper-calc": {
     formula: "Taper per inch = (D - d) / L; taper per foot = TPI x 12; angle per side = atan((D - d) / (2L)); included angle = 2 x (angle per side).",
     edition: "Taper definitions and the taper-per-foot / angle relations - first-principles trigonometry as in Machinery's Handbook (Industrial Press), by name; public domain.",

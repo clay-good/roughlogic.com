@@ -220,6 +220,52 @@ function _v40renderTurningSurfaceFinish(inputRegion, outputRegion, citationEl) {
 }
 SHOP_RENDERERS["turning-surface-finish"] = _v40renderTurningSurfaceFinish;
 
+// spec-v680 - feed-for-surface-finish (inverse of turning-surface-finish) - Group K
+// Rt = f^2 / (8 r); solved for feed: f = sqrt(8 r Rt), with Rt = 4 Ra if the target is an Ra.
+// dims: in { target_finish_uin: L, finish_basis: dimensionless, nose_radius_in: L } out: { max_feed_ipr: L, rt_in: L }
+export function computeFeedForSurfaceFinish({ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const target = Number(target_finish_uin) || 0;
+  const r = Number(nose_radius_in) || 0;
+  const basis = String(finish_basis);
+  if (!(target > 0)) return { error: "Target surface finish must be positive (microinches)." };
+  if (!(r > 0)) return { error: "Tool nose radius must be positive (in)." };
+  if (basis !== "ra" && basis !== "rt") return { error: "Finish basis must be Ra or Rt." };
+  // Convert the target to Rt in inches. Ra ~= Rt/4, so Rt = 4 Ra.
+  const rt_in = (basis === "ra" ? 4 * target : target) * 1e-6;
+  // Inverse of Rt = f^2 / (8 r): f = sqrt(8 r Rt).
+  const max_feed_ipr = Math.sqrt(8 * r * rt_in);
+  if (!Number.isFinite(max_feed_ipr) || !(max_feed_ipr > 0)) return { error: "Feed math is not a finite positive value." };
+  return {
+    max_feed_ipr, rt_in, rt_uin: rt_in * 1e6, ra_uin: rt_in * 1e6 / 4,
+    note: "The fastest feed per revolution that still holds a target theoretical surface finish, the inverse of the turning-surface-finish tile: from Rt = f^2 / (8 x nose_radius), f = sqrt(8 x nose_radius x Rt). A finish spec'd as Ra is converted with Rt = 4 x Ra (the tile's Ra ~= Rt/4 estimate). A larger nose radius lets you feed faster for the same finish (the finish improves as the square of the feed), which is why a wiper insert holds a fine finish at production feed rates. This is the theoretical scallop feed; built-up edge, tool wear, deflection, and vibration make the measured finish rougher, so leave margin. A shop aid; the print, the insert, and a measured finish govern."
+  };
+}
+export const feedForSurfaceFinishExample = { inputs: { target_finish_uin: 25, finish_basis: "ra", nose_radius_in: 0.03125 } };
+
+function renderFeedForSurfaceFinish(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: theoretical surface roughness solved for feed: f = sqrt(8 x nose_radius x Rt), from Rt = f^2 / (8 x r), Ra ~= Rt / 4 - first-principles scallop geometry as in Machinery's Handbook (Industrial Press), by name; public domain. The measured finish is rougher than this theoretical value, so leave margin.";
+  const target = makeNumber("Target finish (microinches)", "ffsf-t", { step: "any", min: "0", value: "25" });
+  const basis = makeSelect("Finish basis", "ffsf-basis", [
+    { value: "ra", label: "Ra (arithmetic average)", selected: true },
+    { value: "rt", label: "Rt (peak-to-valley)" },
+  ]);
+  const rad = makeNumber("Tool nose radius r (in)", "ffsf-rad", { step: "any", min: "0" });
+  for (const f of [target, basis, rad]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { target.input.value = "25"; basis.select.value = "ra"; rad.input.value = "0.03125"; update(); });
+  const oFeed = makeOutputLine(outputRegion, "Max feed per rev", "ffsf-out-feed");
+  const oNote = makeOutputLine(outputRegion, "Note", "ffsf-out-note");
+  const update = debounce(() => {
+    const r = computeFeedForSurfaceFinish({ target_finish_uin: _readNum(target.input), finish_basis: basis.select.value, nose_radius_in: _readNum(rad.input) });
+    if (r.error) { oFeed.textContent = r.error; oNote.textContent = ""; return; }
+    oFeed.textContent = fmt(r.max_feed_ipr, 4) + " IPR";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [target.input, rad.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
+}
+SHOP_RENDERERS["feed-for-surface-finish"] = renderFeedForSurfaceFinish;
+
 // =====================================================================
 // spec-v40 2.4 - taper-calc (Taper per Foot and Angle) - Group K
 // TPI = (D - d) / L; TPF = TPI x 12; angle per side = atan((D-d)/(2L)).

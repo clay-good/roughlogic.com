@@ -10266,7 +10266,7 @@ test("bounds: spec-v57 equal-spacing pins gap/count + rejects bad inputs", () =>
 // ---------------------------------------------------------------------------
 import {
   computeMachiningTime as _cv40a, computeMaterialRemovalRate as _cv40b,
-  computeTurningSurfaceFinish as _cv40c, computeTaperCalc as _cv40d,
+  computeTurningSurfaceFinish as _cv40c, computeTaperCalc as _cv40d, computeFeedForSurfaceFinish as _v680,
   computeDividingHead as _cv40e, computeThreadMeasureWire as _cv40f,
   computePunchForce as _cv40g, computePressBrakeTonnage as _cv40h,
   computeWeldDutyCycle as _cv40i, computeCarbonEquivalent as _cv40j,
@@ -10305,6 +10305,34 @@ test("bounds: spec-v40 turning-surface-finish pins Rt/Ra + rejects bad inputs", 
   assert.ok("error" in _cv40c({ feed_ipr_in: 0, nose_radius_in: 0.03125 }));
   assert.ok("error" in _cv40c({ feed_ipr_in: 0.005, nose_radius_in: 0 }));
   assert.ok("error" in _cv40c({ feed_ipr_in: Infinity, nose_radius_in: 0.03125 }));
+});
+
+test("bounds: spec-v680 computeFeedForSurfaceFinish pins f = sqrt(8 r Rt), the Ra/Rt basis, round-trips through computeTurningSurfaceFinish, and error seams", () => {
+  const r = _v680({ target_finish_uin: 25, finish_basis: "ra", nose_radius_in: 0.03125 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_feed_ipr - Math.sqrt(8 * 0.03125 * 4 * 25e-6)) < 1e-12, `feed identity: ${r.max_feed_ipr}`);
+  assert.ok(Math.abs(r.max_feed_ipr - 0.005) < 1e-9, `pinned 0.005: ${r.max_feed_ipr}`);
+  // Ra 25 and Rt 100 give the same feed (Rt = 4 Ra).
+  const rt = _v680({ target_finish_uin: 100, finish_basis: "rt", nose_radius_in: 0.03125 });
+  assert.ok(Math.abs(rt.max_feed_ipr - r.max_feed_ipr) < 1e-12, `Ra/Rt equivalence: ${rt.max_feed_ipr}`);
+  // A finer finish needs a slower feed.
+  const finer = _v680({ target_finish_uin: 16, finish_basis: "ra", nose_radius_in: 0.03125 });
+  assert.ok(finer.max_feed_ipr < r.max_feed_ipr, `finer slower: ${finer.max_feed_ipr}`);
+  // Round-trip: the max feed, fed back through the forward tile, reproduces the target Ra.
+  for (const target_finish_uin of [8, 25, 63]) {
+    for (const nose_radius_in of [0.015625, 0.03125, 0.0625]) {
+      const m = _v680({ target_finish_uin, finish_basis: "ra", nose_radius_in });
+      assert.ok(!m.error, `sweep Ra=${target_finish_uin} r=${nose_radius_in}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_feed_ipr, "feed"); assert.ok(m.max_feed_ipr > 0, "feed positive");
+      const back = _cv40c({ feed_ipr_in: m.max_feed_ipr, nose_radius_in });
+      assert.ok(Math.abs(back.ra_uin - target_finish_uin) < 1e-6, `round-trip Ra=${target_finish_uin} r=${nose_radius_in}: ${back.ra_uin}`);
+    }
+  }
+  // Error seams: non-positive target / radius, bad basis, non-finite.
+  assert.ok("error" in _v680({ target_finish_uin: 0, nose_radius_in: 0.03125 }));
+  assert.ok("error" in _v680({ target_finish_uin: 25, nose_radius_in: 0 }));
+  assert.ok("error" in _v680({ target_finish_uin: 25, finish_basis: "x", nose_radius_in: 0.03125 }));
+  assert.ok("error" in _v680({ target_finish_uin: Infinity, nose_radius_in: 0.03125 }));
 });
 
 test("bounds: spec-v40 taper-calc pins TPF/angle + rejects bad inputs", () => {

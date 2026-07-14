@@ -786,7 +786,7 @@ const TOOL_MODULES = (() => {
   // SHOP_RENDERERS (group letter independent of module, the v28/v36 precedent).
   declare("./calc-shop.js", "SHOP_RENDERERS", [
     // Group K (machinist)
-    "machining-time", "material-removal-rate", "turning-surface-finish",
+    "machining-time", "material-removal-rate", "turning-surface-finish", "feed-for-surface-finish",
     "taper-calc", "taper-diameter", "dividing-head",
     // Group G (cross-trade)
     "thread-measure-wire", "punch-force",

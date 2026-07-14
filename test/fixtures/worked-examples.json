@@ -15668,6 +15668,50 @@
    }
   },
   {
+   "tile_id": "feed-for-surface-finish",
+   "source_publisher": "First-principles scallop geometry (inverse)",
+   "source_title": "f = sqrt(8 x nose_radius x Rt); Rt = 4 x Ra",
+   "source_edition_or_year": "spec-v680 worked example (machine-verified)",
+   "source_section_or_page": "25 uin Ra target, 1/32 in nose radius -> 0.005 IPR (round-trips turning-surface-finish)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_finish_uin": 25,
+    "finish_basis": "ra",
+    "nose_radius_in": 0.03125
+   },
+   "outputs": {
+    "max_feed_ipr": {
+     "value": 0.005,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "feed-for-surface-finish",
+   "source_publisher": "First-principles scallop geometry (inverse)",
+   "source_title": "cross-check: a finer 16 uin Ra target needs a slower feed",
+   "source_edition_or_year": "spec-v680 cross-check (machine-verified)",
+   "source_section_or_page": "16 uin Ra, 1/32 in nose radius -> 0.004 IPR (finer finish, slower feed)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_finish_uin": 16,
+    "finish_basis": "ra",
+    "nose_radius_in": 0.03125
+   },
+   "outputs": {
+    "max_feed_ipr": {
+     "value": 0.004,
+     "tolerance": {
+      "abs": 1e-05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "taper-calc",
    "source_publisher": "First-principles taper trigonometry + Machinery's Handbook",
    "source_title": "TPF = 12 (D-d)/L; angle/side = atan((D-d)/2L)",

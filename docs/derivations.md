@@ -2583,6 +2583,7 @@ cross-check.
 | calc-shop.js | `computeCompoundMiter` | `{ spring_angle_deg = 38, corner_angle_deg = 90 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeConeFlatPattern` | `{ base_radius_in = 0, height_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeDividingHead` | `{ divisions = 0, worm_ratio = 40, circles = "" } = {}` | _ | _ | _ |
+| calc-shop.js | `computeFeedForSurfaceFinish` | `{ target_finish_uin = 0, finish_basis = "ra", nose_radius_in = 0 } = {}` | _ | _ | _ |
 | calc-shop.js | `computeMachiningTime` | `{ feed_mode = "rpm-ipr", cut_length_in = 0, rpm = 0, feed_ipr_in = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computeMaterialRemovalRate` | `{ mode = "milling", woc_in = 0, doc_in = 0, feed_ipm_in = 0, sfm = 0, feed_ip...` | _ | _ | _ |
 | calc-shop.js | `computePressBrakeTonnage` | `{ thickness_in = 0, bend_length_ft = 0, die_opening_in = 0, uts_ksi = 60 } = {}` | _ | _ | _ |
@@ -2786,7 +2787,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1372.
+Row count: 1373.
 
 <!-- END function-corpus-v14 -->
 
@@ -3697,7 +3698,7 @@ per spec-v14 §13.1 second paragraph.
 | `tire-load-check` | Tire Load-Rating Check (per Axle) | 49 CFR 393.75 + DOT sidewall marking; spec-v115 section 2.2 pinned example (capacity 12,350, ut... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `trailer-tongue-weight` | Trailer Tongue Weight and Sway Check | NHTSA / SAE J2807 towing tongue-weigh...; spec-v486 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group K Mechanic (61 tiles)
+### Group K Mechanic (62 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3728,6 +3729,7 @@ per spec-v14 §13.1 second paragraph.
 | `dyno-correction-sae` | SAE J1349 Dyno Correction Factor | SAE J1349 dyno correction factor; spec-v515 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `engine-fuel-burn-gph` | Engine Fuel Burn from Horsepower (BSFC) | BSFC engine-performance practice; spec-v463 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `et-horsepower` | Horsepower from Quarter-Mile ET | Hale quarter-mile ET relation (invers...; spec-v662 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `feed-for-surface-finish` | Feed for a Target Turned Finish | First-principles scallop geometry (in...; 25 uin Ra target, 1/32 in nose radius -> 0.005 IPR (round... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fuel-range` | Fuel Energy and Range | Project (first-principles); range = 18 * 28 * 1.0 = 504 mi; total_btu = 18 * 112000 =... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-identification` | Gear Identification (Pitch from Teeth and OD) | Machinery's Handbook / AGMA (inverse ...; spec-v649 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `gear-mph-rpm` | Gear-Ratio MPH from RPM | Drivetrain kinematics + SAE J267 tire...; 2500 RPM, 1:1, 3.55 axle, 28.5-in tire -> 59.71 MPH | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4100,6 +4102,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1128. Fixture-covered or reference-cadence: 1128 / 1128.
+Tile count: 1129. Fixture-covered or reference-cadence: 1129 / 1129.
 
 <!-- END tile-index-v14 -->
