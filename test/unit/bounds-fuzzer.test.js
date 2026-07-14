@@ -21569,6 +21569,25 @@ test("bounds: spec-v539 computeDrinkAbvDilution pins the melt-diluted ABV, the s
   assert.ok("error" in _v539({ total_volume_oz: 3, weighted_abv_pct: 32.67, method: "foo" }));
 });
 
+import { computeOverrunPercent as _v782 } from "../../calc-kitchen.js";
+
+test("bounds: spec-v782 computeOverrunPercent pins overrun by weight, the air fraction, the FDA density flag, and error seams", () => {
+  const r = _v782({ mix_weight_lb: 9.0, finished_weight_lb: 4.5 });
+  assert.ok(Math.abs(r.overrun_pct - 100) < 1e-9); // (9 - 4.5) / 4.5 * 100
+  assert.ok(Math.abs(r.air_pct - 50) < 1e-9); // (9 - 4.5) / 9 * 100
+  assert.strictEqual(r.meets_fda, true); // 4.5 >= 4.5 lb/gal
+  // Denser finished product = lower overrun (gelato); the flag trips below 4.5 lb/gal.
+  const gelato = _v782({ mix_weight_lb: 9.0, finished_weight_lb: 7.0 });
+  assert.ok(gelato.overrun_pct < r.overrun_pct); // less air -> lower overrun
+  assert.strictEqual(_v782({ mix_weight_lb: 9.0, finished_weight_lb: 4.0 }).meets_fda, false);
+  // Error seams: non-finite, non-positive weights, and finished >= mix (no air incorporated).
+  assert.ok("error" in _v782({ mix_weight_lb: Infinity, finished_weight_lb: 4.5 }));
+  assert.ok("error" in _v782({ mix_weight_lb: 0, finished_weight_lb: 4.5 }));
+  assert.ok("error" in _v782({ mix_weight_lb: 9.0, finished_weight_lb: 0 }));
+  assert.ok("error" in _v782({ mix_weight_lb: 4.5, finished_weight_lb: 4.5 }));
+  assert.ok("error" in _v782({ mix_weight_lb: 4.0, finished_weight_lb: 4.5 }));
+});
+
 import { computeSearchTrackSpacing as _v540 } from "../../calc-rescue.js";
 
 test("bounds: spec-v540 computeSearchTrackSpacing pins coverage, the exponential POD, the inverse spacing solve, and error seams", () => {

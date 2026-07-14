@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(kitchen): spec-v782 ice cream overrun by weight; 2026-07-14
+
+- New tile `overrun-percent` (Group O, calc-kitchen.js): the air whipped into frozen dessert, measured by weight.
+  `overrun% = (mix weight - finished weight) / finished weight x 100` for equal volumes; `air% = (mix - finished) / mix
+  x 100`. A gallon of mix at 9.0 lb frozen to 4.5 lb/gal is 100% overrun (half the finished volume is air). Reports the
+  air fraction, the overrun band (gelato/premium low, economy/soft-serve near 100%), and whether the finished density
+  meets the FDA 4.5 lb/gal minimum to be labeled ice cream (21 CFR 135.110). Fuzzer pins the example, the air fraction,
+  the density flag, and the denser-is-lower monotonicity. Home count 1,230 -> 1,231.
+
 ### feat(survey): spec-v781 COGO inverse (two points to bearing and distance); 2026-07-14
 
 - New tile `cogo-inverse-locate` (Group P, calc-survey.js): the exact inverse of `cogo-forward-point` -- from two known

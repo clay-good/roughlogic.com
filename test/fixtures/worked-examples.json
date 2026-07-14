@@ -24315,6 +24315,33 @@
    }
   },
   {
+   "tile_id": "overrun-percent",
+   "source_publisher": "Goff & Hartel, Ice Cream, 7th ed.; FDA 21 CFR 135.110",
+   "source_title": "overrun% = (mix_weight - finished_weight) / finished_weight x 100 for equal volumes",
+   "source_edition_or_year": "spec-v782 worked example (machine-verified)",
+   "source_section_or_page": "Mix 9.0 lb/gal frozen to 4.5 lb/gal -> 100% overrun, 50% air, meets the FDA 4.5 lb/gal minimum",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "mix_weight_lb": 9.0,
+    "finished_weight_lb": 4.5
+   },
+   "outputs": {
+    "overrun_pct": {
+     "value": 100,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "air_pct": {
+     "value": 50,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "load-profitability",
    "source_publisher": "First-principles owner-operator load economics; consumes the cost-per-mile structure.",
    "source_title": "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",

@@ -498,6 +498,7 @@ const _TILES = [
   ["menu-engineering", "O"],
   ["kitchen-sanitizer-ppm", "O"],
   ["drink-abv-dilution", "O"],
+  ["overrun-percent", "O"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

@@ -9119,6 +9119,16 @@ export const CITATIONS = {
       { name: "Method dilution", value: "shaken ~28%, stirred ~23%, rocks ~15%, neat 0% (or explicit percent)", source: "Liquid Intelligence" },
     ],
   },
+  "overrun-percent": {
+    formula: "overrun% = (mix_weight - finished_weight) / finished_weight x 100 for equal volumes; air% = (mix_weight - finished_weight) / mix_weight x 100.",
+    edition: "Goff & Hartel, Ice Cream, 7th ed.; FDA 21 CFR 135.110 standard of identity, by name.",
+    freeAccess: "21 CFR 135.110 is public/free at ecfr.gov; the food-science overrun definition is standard.",
+    governance: GOVERNANCE.general,
+    editionNote: "Overrun is the air whipped into frozen dessert, measured by weighing equal volumes of mix and finished product. Federal standard: finished ice cream must weigh at least 4.5 lb/gal and carry at least 1.6 lb of total solids per gallon. Bands: gelato/premium ~20-35%, standard ~50-90%, economy/soft-serve ~90-100%. Freezer type, fat, solids, and draw temperature all move the number; the weighed cup is the shop measurement of record.",
+    assumptions: [
+      { name: "FDA minimum density", value: "finished ice cream >= 4.5 lb/gal and >= 1.6 lb total solids/gal", source: "21 CFR 135.110" },
+    ],
+  },
   "load-profitability": {
     formula: "Net = revenue - (total miles/MPG x fuel + total miles x variable cpm + fixed/day x days + tolls + other); profit per loaded mile = net / loaded miles.",
     edition: "First-principles owner-operator load economics; consumes the cost-per-mile structure.",

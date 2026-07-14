@@ -2190,6 +2190,7 @@ cross-check.
 | calc-kitchen.js | `computeFoodCostPercentage` | `{ beginning_inventory = 0, purchases = 0, ending_inventory = 0, food_sales = ...` | _ | _ | _ |
 | calc-kitchen.js | `computeKitchenSanitizerPpm` | `{ sanitizer_type = "chlorine", active_pct = 0, target_ppm = 0, batch_gallons ...` | _ | _ | _ |
 | calc-kitchen.js | `computeMenuEngineering` | `{ units_sold = 0, menu_price = 0, food_cost = 0, total_units = 0, item_count ...` | _ | _ | _ |
+| calc-kitchen.js | `computeOverrunPercent` | `{ mix_weight_lb = 0, finished_weight_lb = 0 } = {}` | _ | _ | _ |
 | calc-kitchen.js | `computePanConversion` | `{ target_qt = 0, target_servings = 0, portion_oz = 0, pan_size = "full", pan_...` | _ | _ | _ |
 | calc-kitchen.js | `computePlateCost` | `{ ingredients = [], target_food_cost_pct = 30 }` | _ | _ | _ |
 | calc-kitchen.js | `computePourCost` | `{ bottle_cost = 0, bottle_size_ml = 0, pour_size_oz = 0, target_pour_cost_pct...` | _ | _ | _ |
@@ -2891,7 +2892,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1477.
+Row count: 1478.
 
 <!-- END function-corpus-v14 -->
 
@@ -4094,7 +4095,7 @@ per spec-v14 §13.1 second paragraph.
 | `time-alignment` | Audio Speaker Time Alignment | Project (first-principles) over Haas ...; Main 30 ft / delay 90 ft / 20 C / 15 ms Haas offset -> c ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `truss-capacity` | Truss Point Load and Span Capacity | Tomcat 16 in box truss published tech...; 16 in box / 40 ft span / 200 + 400 + 200 lb point loads -... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group O Kitchen (14 tiles)
+### Group O Kitchen (15 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4105,6 +4106,7 @@ per spec-v14 §13.1 second paragraph.
 | `food-cost-percentage` | Period Food-Cost Percentage | Standard restaurant-accounting identi...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `kitchen-sanitizer-ppm` | 3-Compartment Sink Sanitizer Dilution | FDA Food Code Sec. 4-501.114 sanitizi...; Bleach 5.25% active, 100 ppm, 3-gal compartment -> 0.24 o... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `menu-engineering` | Menu Engineering Matrix | Kasavana & Smith menu-engineering model; 200 of 1000 units, 10-item menu, price $12, food cost $4,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `overrun-percent` | Ice Cream Overrun | Goff & Hartel, Ice Cream, 7th ed.; FD...; Mix 9.0 lb/gal frozen to 4.5 lb/gal -> 100% overrun, 50% ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pan-conversion` | Steam Table and Pan Conversion | ServSafe / hotel-pan capacity tables ...; 120 servings * 6 oz / full pan @ 4 in -> 22.5 qt total / ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `plate-cost` | Plate Cost and Menu Pricing | NRA / CIA menu-engineering practice; ribeye 0.5 lb @ $16/lb + potato 0.4 lb @ $1.20/lb + veg 0... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pour-cost` | Beverage Pour Cost and Drink Price | First-principles bar cost control; US...; spec-v90 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4307,6 +4309,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1230. Fixture-covered or reference-cadence: 1230 / 1230.
+Tile count: 1231. Fixture-covered or reference-cadence: 1231 / 1231.
 
 <!-- END tile-index-v14 -->

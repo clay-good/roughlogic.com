@@ -1022,3 +1022,45 @@ const renderDrinkAbvDilution = _r({
   compute: computeDrinkAbvDilution,
 });
 KITCHEN_RENDERERS["drink-abv-dilution"] = renderDrinkAbvDilution;
+
+// --- spec-v782 O: Ice cream overrun by weight (`overrun-percent`) ---
+// overrun% = (mix_weight - finished_weight) / finished_weight x 100 for equal volumes.
+// air% = (mix_weight - finished_weight) / mix_weight x 100 (air fraction of the finished volume).
+// dims: in { mix_weight_lb: M, finished_weight_lb: M } out: { overrun_pct: dimensionless, air_pct: dimensionless, meets_fda: dimensionless }
+export function computeOverrunPercent({ mix_weight_lb = 0, finished_weight_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mix = Number(mix_weight_lb) || 0;
+  const finished = Number(finished_weight_lb) || 0;
+  if (!(mix > 0)) return { error: "Mix weight must be positive (weight of a gallon of unfrozen mix)." };
+  if (!(finished > 0)) return { error: "Finished weight must be positive (weight of a gallon of frozen product)." };
+  if (mix <= finished) return { error: "The mix must weigh more than the finished product for equal volumes: freezing whips in air, which lowers density." };
+  const overrun_pct = (mix - finished) / finished * 100;
+  const air_pct = (mix - finished) / mix * 100;
+  const meets_fda = finished >= 4.5;
+  let band = "economy / soft-serve";
+  if (overrun_pct < 35) band = "gelato / premium (dense)";
+  else if (overrun_pct < 80) band = "standard ice cream";
+  return {
+    overrun_pct, air_pct, meets_fda, finished_lb_per_gal: finished, band,
+    note: (meets_fda ? "" : "The finished product weighs less than the FDA minimum of 4.5 lb/gal, so it cannot be labeled \"ice cream\" (21 CFR 135.110). ")
+      + "Overrun is the volume of air whipped into the mix, measured here by weighing equal volumes of mix and finished product. This " + fmt(overrun_pct, 0) + "% overrun sits in the " + band + " range (gelato and premium run low, economy and soft-serve run high near 100%). Air fraction is the share of the finished volume that is air. Overrun also depends on freezer type, fat and solids, and draw temperature; the weighed cup is the shop measurement of record.",
+  };
+}
+const overrunPercentExample = { inputs: { mix_weight_lb: 9.0, finished_weight_lb: 4.5 } };
+const renderOverrunPercent = _r({
+  citation: "Citation: Ice cream overrun by weight (Goff & Hartel, Ice Cream, 7th ed., by name; FDA 21 CFR 135.110 standard of identity). overrun% = (weight of mix - weight of finished) / weight of finished x 100 for equal volumes; air% = (mix - finished) / mix x 100. Federal standard: finished ice cream must weigh at least 4.5 lb/gal and contain at least 1.6 lb of total solids per gallon. Overrun bands: gelato/premium ~20-35%, standard ~50-90%, economy/soft-serve ~90-100%. The weighed cup governs; freezer type, fat, solids, and draw temperature all move the number.",
+  example: overrunPercentExample.inputs,
+  fields: [
+    { key: "mix_weight_lb", label: "Mix weight (lb per gallon)", kind: "number" },
+    { key: "finished_weight_lb", label: "Finished weight (lb per gallon)", kind: "number" },
+  ],
+  outputs: [
+    { key: "o", id: "ovr-out-o", label: "Overrun", value: (r) => fmt(r.overrun_pct, 1) + "%" },
+    { key: "a", id: "ovr-out-a", label: "Air fraction of volume", value: (r) => fmt(r.air_pct, 1) + "%" },
+    { key: "f", id: "ovr-out-f", label: "Meets FDA ice-cream density", value: (r) => r.meets_fda ? "Yes (>= 4.5 lb/gal)" : "No (< 4.5 lb/gal)" },
+    { key: "b", id: "ovr-out-b", label: "Overrun range", value: (r) => r.band },
+    { key: "n", id: "ovr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeOverrunPercent,
+});
+KITCHEN_RENDERERS["overrun-percent"] = renderOverrunPercent;
