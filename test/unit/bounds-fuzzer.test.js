@@ -9106,6 +9106,7 @@ import {
   computeEconomizerSavingsHours as _c1,
   computePipeHeatLossRadial as _c2,
   computeFanMotorBhp as _c3,
+  computeFanMotorMaxAirflow as _v686,
 } from "../../calc-hvac.js";
 test("bounds: calc-hvac v20 C tiles pin constants + reject non-finite", () => {
   assert.ok(Math.abs(_c1({ cfm: 4000, delta_t_f: 20, hours: 1500 }).q_sens_btuh - 86400) < 1);
@@ -9118,6 +9119,36 @@ test("bounds: calc-hvac v20 C tiles pin constants + reject non-finite", () => {
   assert.ok(Number.isFinite(c3.bhp) && c3.next_nema_hp === 2);
   assert.ok("error" in _c3({ cfm: 4000, tsp_inwc: 2.0, eta_fan: 0 }));
   assert.ok("error" in _c3({ cfm: Infinity, tsp_inwc: 2.0, eta_fan: 0.65 }));
+});
+
+test("bounds: spec-v686 computeFanMotorMaxAirflow pins CFM = 6356 BHP eta_fan / TSP, the motor/brake basis, round-trips through computeFanMotorBhp, and error seams", () => {
+  const r = _v686({ power_hp: 1.9363896015878395, power_basis: "brake", tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 1 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_cfm - 6356 * 1.9363896015878395 * 0.65 / 2.0) < 1e-6, `CFM identity: ${r.max_cfm}`);
+  assert.ok(Math.abs(r.max_cfm - 4000) < 1e-3, `pinned 4000: ${r.max_cfm}`);
+  // Motor basis converts nameplate HP with the drive efficiency (0.95 -> less brake HP -> less CFM).
+  const belted = _v686({ power_hp: 2, power_basis: "motor", tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 0.95 });
+  const direct = _v686({ power_hp: 2, power_basis: "brake", tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 1 });
+  assert.ok(belted.max_cfm < direct.max_cfm, `belt loss less cfm: ${belted.max_cfm}`);
+  // Higher static drops the airflow the same motor can move.
+  const high = _v686({ power_hp: 1.9363896015878395, power_basis: "brake", tsp_inwc: 3.0, eta_fan: 0.65 });
+  assert.ok(high.max_cfm < r.max_cfm, `higher static less cfm: ${high.max_cfm}`);
+  // Round-trip: the max CFM, fed back through the forward tile at the same static and efficiencies, reproduces the brake HP.
+  for (const power_hp of [0.5, 1.94, 5]) {
+    for (const tsp_inwc of [1, 2, 4]) {
+      const m = _v686({ power_hp, power_basis: "brake", tsp_inwc, eta_fan: 0.65, eta_drive: 1 });
+      assert.ok(!m.error, `sweep hp=${power_hp} tsp=${tsp_inwc}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_cfm, "cfm"); assert.ok(m.max_cfm > 0, "cfm positive");
+      const back = _c3({ cfm: m.max_cfm, tsp_inwc, eta_fan: 0.65, eta_drive: 1 });
+      assert.ok(Math.abs(back.bhp - power_hp) < 1e-6, `round-trip hp=${power_hp} tsp=${tsp_inwc}: ${back.bhp}`);
+    }
+  }
+  // Error seams: non-positive power / static, bad basis, efficiency out of range, non-finite.
+  assert.ok("error" in _v686({ power_hp: 0, tsp_inwc: 2 }));
+  assert.ok("error" in _v686({ power_hp: 2, power_basis: "x", tsp_inwc: 2 }));
+  assert.ok("error" in _v686({ power_hp: 2, tsp_inwc: 0 }));
+  assert.ok("error" in _v686({ power_hp: 2, tsp_inwc: 2, eta_fan: 0 }));
+  assert.ok("error" in _v686({ power_hp: Infinity, tsp_inwc: 2 }));
 });
 
 import { computeGrainsRemoved as _d1, computeEvaporationLoad as _d2 } from "../../calc-restoration.js";

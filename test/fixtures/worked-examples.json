@@ -15034,6 +15034,54 @@
    }
   },
   {
+   "tile_id": "fan-motor-max-airflow",
+   "source_publisher": "AMCA / ASHRAE fan-power relation (inverse)",
+   "source_title": "CFM_max = 6356 * BHP * eta_fan / TSP",
+   "source_edition_or_year": "spec-v686 worked example (machine-verified)",
+   "source_section_or_page": "1.936 BHP, 2.0 in w.c., eta_fan 0.65 -> ~4,000 CFM (round-trips fan-motor-bhp)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "power_hp": 1.936,
+    "power_basis": "brake",
+    "tsp_inwc": 2.0,
+    "eta_fan": 0.65,
+    "eta_drive": 1
+   },
+   "outputs": {
+    "max_cfm": {
+     "value": 3999,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "fan-motor-max-airflow",
+   "source_publisher": "AMCA / ASHRAE fan-power relation (inverse)",
+   "source_title": "cross-check: raising the static to 3 in w.c. drops the airflow the same motor can move",
+   "source_edition_or_year": "spec-v686 cross-check (machine-verified)",
+   "source_section_or_page": "1.936 BHP, 3.0 in w.c., eta_fan 0.65 -> ~2,666 CFM (higher static, less air)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "power_hp": 1.936,
+    "power_basis": "brake",
+    "tsp_inwc": 3.0,
+    "eta_fan": 0.65,
+    "eta_drive": 1
+   },
+   "outputs": {
+    "max_cfm": {
+     "value": 2666,
+     "tolerance": {
+      "abs": 5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "grains-removed",
    "source_publisher": "Psychrometric mass balance + IICRC S500 grain-depression method",
    "source_title": "water lb/hr = (CFM*60/13.33) * dG / 7000",

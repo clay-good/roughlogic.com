@@ -1167,6 +1167,17 @@ export const CITATIONS = {
       { name: "Total static pressure", value: "external + internal static, not just external", source: "AMCA fan-rating convention" },
     ],
   },
+  "fan-motor-max-airflow": {
+    formula: "CFM_max = 6356 * BHP * eta_fan / TSP; a motor (nameplate) HP converts to brake HP first with BHP = motor_hp * eta_drive. The inverse of BHP = (CFM * TSP) / (6356 * eta_fan).",
+    edition: "AMCA / ASHRAE fan-power relation BHP = (CFM * SP) / (6356 * eta) (public); standard motor HP sizes per NEMA MG 1, by name.",
+    freeAccess: "Free principles in published HVAC texts; the 6356 constant is a pure unit derivation.",
+    governance: GOVERNANCE.mechanical,
+    editionNote: "The most airflow a fan motor can move against a total static pressure, the inverse of fan-motor-bhp: CFM_max = 6356 * BHP * fan efficiency / TSP, and a nameplate (motor) HP converts to brake HP with the drive efficiency (BHP = motor_hp * eta_drive) because the belt loses a few percent. Airflow falls as the static rises (a dirty filter or throttled damper cuts the CFM at a fixed motor). This is the power ceiling; the actual airflow is where the system curve crosses the fan curve, so treat it as the maximum a motor can support, not a guaranteed delivery. TSP must be the total (external + internal) static at the duty point. Fan curve and motor data govern.",
+    assumptions: [
+      { name: "Power ceiling only", value: "the delivered airflow is set by the system-curve/fan-curve intersection; this is the max the motor can support", source: "fan-system interaction" },
+      { name: "Total static pressure", value: "external + internal static at the duty point, not just external", source: "AMCA fan-rating convention" },
+    ],
+  },
 
   "thermal-expansion-volume": {
     formula: "dV = V * (rho_cold / rho_hot - 1), where rho is water density (g/mL) at the cold inlet and set hot temperature, interpolated from bundled NIST water-density points within 32-212 F.",

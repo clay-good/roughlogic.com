@@ -102,6 +102,7 @@ export const COMPUTE_MAP = {
   "economizer-savings-hours": { module: "../../calc-hvac.js", fn: "computeEconomizerSavingsHours" },
   "pipe-heat-loss-radial": { module: "../../calc-hvac.js", fn: "computePipeHeatLossRadial" },
   "fan-motor-bhp": { module: "../../calc-hvac.js", fn: "computeFanMotorBhp" },
+  "fan-motor-max-airflow": { module: "../../calc-hvac.js", fn: "computeFanMotorMaxAirflow" },
   "thermal-expansion-volume": { module: "../../calc-plumbing.js", fn: "computeThermalExpansionVolume" },
   "vent-sizing-stack": { module: "../../calc-plumbing.js", fn: "computeVentSizingStack" },
   "gas-pipe-pressure-drop": { module: "../../calc-gas.js", fn: "computeGasPipePressureDrop" },

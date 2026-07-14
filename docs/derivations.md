@@ -2061,6 +2061,7 @@ cross-check.
 | calc-hvac.js | `computeEvaporativeCooling` | `{ evaporation_rate_lb_hr, hfg_btu_per_lb = HFG_WATER_BTU_PER_LB }` | _ | _ | _ |
 | calc-hvac.js | `computeFanAffinityLaws` | `{ q1_cfm = 0, sp1_inwg = 0, bhp1_hp = 0, n1 = 0, n2 = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeFanMotorBhp` | `{ cfm = 0, tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}` | _ | _ | _ |
+| calc-hvac.js | `computeFanMotorMaxAirflow` | `{ power_hp = 0, power_basis = "motor", tsp_inwc = 0, eta_fan = 0.65, eta_driv...` | _ | _ | _ |
 | calc-hvac.js | `computeGeothermalLoop` | `{ heating_btu = 0, cooling_btu = 0, soil = "clay", loop_type = "vertical" }` | _ | _ | _ |
 | calc-hvac.js | `computeGrilleFaceVelocity` | `{ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}` | _ | _ | _ |
 | calc-hvac.js | `computeHeatPumpColdCapacity` | `{ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = 0, design_load_btuh = 0 }...` | _ | _ | _ |
@@ -2792,7 +2793,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1378.
+Row count: 1379.
 
 <!-- END function-corpus-v14 -->
 
@@ -3122,7 +3123,7 @@ per spec-v14 §13.1 second paragraph.
 | `wh-expansion-tank` | Water Heater Thermal Expansion Tank | ASPE / ASME; factor = (62.41-61.71)/61.71 = 0.01134; V_exp = 40*0.0113... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve between (100,55) and (150,66) -> 59.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (121 tiles)
+### Group C HVAC (122 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3186,6 +3187,7 @@ per spec-v14 §13.1 second paragraph.
 | `excess-air-o2` | Excess Air from Flue-Gas O2 | ASME PTC 4.1 / combustion analysis pr...; Natural-gas appliance reading 4% O2 -> 4 / 16.9 x 100 = 2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fan-affinity-laws` | Fan Affinity Laws (Speed / Diameter Change) | AMCA / ASHRAE Fundamentals; spec-v384 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `fan-motor-bhp` | Fan Brake Horsepower | AMCA / ASHRAE fan-power relation + NE...; 4000 CFM, 2.0 in w.c., eta_fan 0.65 -> BHP ~1.94 -> 2 HP | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fan-motor-max-airflow` | Fan Max Airflow from Motor Power | AMCA / ASHRAE fan-power relation (inv...; 1.936 BHP, 2.0 in w.c., eta_fan 0.65 -> ~4,000 CFM (round... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `filter-pressure-drop` | Filter Pressure Drop and Fan-Energy Penalty | ASHRAE / manufacturer cut sheets; airflow = 4*300 = 1200 CFM; clean 0.35 / change-out 0.70 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flash-gas-subcool` | Liquid-Line Subcooling to Prevent Flash Gas | ASHRAE Refrigeration Handbook; 40 ft R-410A riser, 15 psi friction -> 17.2 psi lift, 32.... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `flue-gas-combustion-eff` | Flue-Gas Combustion Efficiency (Stack Loss) | Siegert stack-loss method (DIN combus...; Natural gas, 5% O2, 400 F stack over 70 F air -> CO2 8.90... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4112,6 +4114,6 @@ per spec-v14 §13.1 second paragraph.
 | `wind-on-load` | Wind Force and Swing on a Suspended Load | ASCE 7 velocity pressure / OSHA 1926 ...; 200 ft^2 panel, 20 mph, shape 1.6, 4,000 lb -> 1.024 psf,... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1134. Fixture-covered or reference-cadence: 1134 / 1134.
+Tile count: 1135. Fixture-covered or reference-cadence: 1135 / 1135.
 
 <!-- END tile-index-v14 -->

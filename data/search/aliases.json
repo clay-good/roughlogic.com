@@ -1887,6 +1887,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "max airflow from motor power",
+      "target": "fan-motor-max-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "how much cfm can a motor push",
+      "target": "fan-motor-max-airflow",
+      "kind": "industry"
+    },
+    {
+      "term": "cfm from fan horsepower and static",
+      "target": "fan-motor-max-airflow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "airflow ceiling for a fan motor",
+      "target": "fan-motor-max-airflow",
+      "kind": "adjacent"
+    },
+    {
+      "term": "max cfm at a static pressure",
+      "target": "fan-motor-max-airflow",
+      "kind": "adjacent"
+    },
+    {
       "term": "thermal expansion",
       "target": "thermal-expansion-volume",
       "kind": "industry"

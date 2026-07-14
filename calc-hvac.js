@@ -2699,6 +2699,54 @@ function renderFanMotorBhp(inputRegion, outputRegion, citationEl) {
 }
 HVAC_RENDERERS["fan-motor-bhp"] = renderFanMotorBhp;
 
+// dims: in { power_hp: dimensionless, power_basis: dimensionless, tsp_inwc: M*L^-1*T^-2, eta_fan: dimensionless, eta_drive: dimensionless } out: { max_cfm: L^3*T^-1, bhp: dimensionless }
+export function computeFanMotorMaxAirflow({ power_hp = 0, power_basis = "motor", tsp_inwc = 0, eta_fan = 0.65, eta_drive = 1 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const power = Number(power_hp) || 0;
+  const basis = String(power_basis);
+  const TSP = Number(tsp_inwc) || 0;
+  const ef = Number(eta_fan) || 0;
+  const ed = Number(eta_drive) || 0;
+  if (!(power > 0)) return { error: "Power must be positive (hp)." };
+  if (basis !== "brake" && basis !== "motor") return { error: "Power basis must be brake or motor." };
+  if (!(TSP > 0)) return { error: "Total static pressure must be positive (in. w.c.)." };
+  if (!(ef > 0 && ef <= 1)) return { error: "Fan total efficiency must be in (0, 1]." };
+  if (!(ed > 0 && ed <= 1)) return { error: "Drive/belt efficiency must be in (0, 1]." };
+  // Inverse of bhp = (CFM x TSP / 6356) / eta_fan and motor_hp = bhp / eta_drive:
+  // brake hp -> bhp = power; motor (nameplate) hp -> bhp = power x eta_drive.
+  const bhp = basis === "motor" ? power * ed : power;
+  const max_cfm = 6356 * bhp * ef / TSP;
+  if (!Number.isFinite(max_cfm) || !(max_cfm > 0)) return { error: "Airflow math is not a finite positive value." };
+  return {
+    max_cfm, bhp,
+    note: "The most airflow a fan motor can move against a total static pressure, the inverse of the fan-motor-bhp tile: from BHP = (CFM x TSP) / (6356 x fan efficiency), CFM_max = 6356 x BHP x fan efficiency / TSP. A nameplate (motor) HP converts to brake HP first with the drive efficiency (BHP = motor_hp x drive efficiency), because the belt loses a few percent. Airflow falls as the static rises, which is why a dirty filter or a throttled damper cuts the CFM at a fixed motor. This is the power ceiling; the actual airflow is set by where the system curve crosses the fan curve, so use it as the maximum a motor can support, not a guaranteed delivery. TSP is the total (external + internal) static at the duty point. A screening estimate; the fan curve and motor data govern."
+  };
+}
+export const fanMotorMaxAirflowExample = { inputs: { power_hp: 1.936, power_basis: "brake", tsp_inwc: 2.0, eta_fan: 0.65, eta_drive: 1 } };
+
+function renderFanMotorMaxAirflow(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: AMCA / ASHRAE fan-power relation solved for airflow: CFM_max = 6356 x BHP x fan efficiency / TSP, from BHP = (CFM x SP) / (6356 x eta) (public). A motor (nameplate) HP converts to brake HP with the drive efficiency. Estimate; the fan curve and motor data govern. TSP must be total (external + internal).";
+  const power = makeNumber("Motor / brake power (hp)", "fma-p", { step: "any", min: "0", value: "1.936" }); power.input.value = "1.936";
+  const basis = makeSelect("Power basis", "fma-basis", [{ value: "motor", label: "Motor (nameplate) HP", selected: true }, { value: "brake", label: "Brake HP" }]);
+  const tsp = makeNumber("Total static pressure (in. w.c.)", "fma-tsp", { step: "any", min: "0", value: "2.0" }); tsp.input.value = "2.0";
+  const ef = makeNumber("Fan total efficiency (0-1)", "fma-ef", { step: "any", min: "0", max: "1", value: "0.65" }); ef.input.value = "0.65";
+  const ed = makeNumber("Drive/belt efficiency (0-1)", "fma-ed", { step: "any", min: "0", max: "1", value: "1" }); ed.input.value = "1";
+  for (const f of [power, basis, tsp, ef, ed]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { power.input.value = "1.936"; basis.select.value = "brake"; tsp.input.value = "2.0"; ef.input.value = "0.65"; ed.input.value = "1"; update(); });
+  const oCfm = makeOutputLine(outputRegion, "Max airflow", "fma-out-cfm");
+  const oNote = makeOutputLine(outputRegion, "Note", "fma-out-n");
+  function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeFanMotorMaxAirflow({ power_hp: readNum(power.input), power_basis: basis.select.value, tsp_inwc: readNum(tsp.input), eta_fan: readNum(ef.input), eta_drive: readNum(ed.input) });
+    if (r.error) { oCfm.textContent = r.error; oNote.textContent = ""; return; }
+    oCfm.textContent = fmt(r.max_cfm, 0) + " CFM (" + fmt(r.bhp, 2) + " BHP)";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [power.input, tsp.input, ef.input, ed.input]) f.addEventListener("input", update);
+  basis.select.addEventListener("change", update);
+}
+HVAC_RENDERERS["fan-motor-max-airflow"] = renderFanMotorMaxAirflow;
+
 // =====================================================================
 // spec-v27 Part II - Group C: round-to-rectangular duct equivalent
 // ASHRAE equal-friction circular equivalent D_e = 1.30*(a*b)^0.625/(a+b)^0.250.
