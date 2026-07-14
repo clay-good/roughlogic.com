@@ -952,6 +952,7 @@ const TOOL_MODULES = (() => {
     "tree-crz-encroachment",
     // spec-v567
     "crown-pruning-dose",
+    "tree-height-clinometer",
   ]);
   // v4 Group M: Water and Wastewater Operations.
   declare("./calc-water.js", "WATER_RENDERERS", [

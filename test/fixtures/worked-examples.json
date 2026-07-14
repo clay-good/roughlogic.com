@@ -22672,6 +22672,34 @@
    }
   },
   {
+   "tile_id": "tree-height-clinometer",
+   "source_publisher": "USDA Forest Service mensuration / hypsometry",
+   "source_title": "100 ft distance, +58% top, -4% base (below eye) -> 62 ft tree",
+   "source_edition_or_year": "H = D x (top% - base%)/100",
+   "source_section_or_page": "H = 100 x (58 - (-4))/100 = 62 ft (58 ft above eye + 4 ft below)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "horizontal_distance_ft": 100,
+    "top_reading_pct": 58,
+    "base_reading_pct": -4
+   },
+   "outputs": {
+    "tree_height_ft": {
+     "value": 62,
+     "tolerance": {
+      "abs": 0.05
+     }
+    },
+    "above_eye_ft": {
+     "value": 58,
+     "tolerance": {
+      "abs": 0.05
+     }
+    }
+   }
+  },
+  {
    "tile_id": "coating-coverage-dft",
    "source_publisher": "SSPC / AMPP PA 2",
    "source_title": "theoretical = 1604 x volume-solids / DFT; practical = theoretical x (1 - loss); gallons = area / practical; WFT = DFT / volume-solids",

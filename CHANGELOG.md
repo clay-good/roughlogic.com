@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(arborist): spec-v772 clinometer tree height (percent-slope); 2026-07-14
+
+- New tile `tree-height-clinometer` (Group L, calc-arborist.js): tree height from a clinometer's percent scale --
+  `H = D x (top% - base%)/100`, both readings signed (+ above eye level, - below). At 100 ft with a +58% top and a -4%
+  base (below eye) the tree is 62 ft. When the base is below eye its height adds; uphill it subtracts. Fuzzer pins the
+  closed form, the signed-base rule, and linearity in distance. calc-arborist.js gzip cap 17500 -> 19000 B.
+  Home count 1,220 -> 1,221.
+
 ### feat(survey): spec-v771 leveling curvature-and-refraction correction; 2026-07-14
 
 - New tile `leveling-curvature-refraction` (Group P, calc-survey.js): the correction the leveling and slope-reduction

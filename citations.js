@@ -7852,6 +7852,18 @@ export const CITATIONS = {
       { name: "Lion's-tailing", value: "stripping interior foliage violates A300 even under the percent cap", source: "ISA BMP - Pruning" },
     ],
   },
+  "tree-height-clinometer": {
+    formula: "H = D x (top% - base%)/100, D the horizontal distance and top%/base% the signed percent-slope clinometer readings (+ above eye level, - below). above_eye = D x top%/100; below_eye = D x base%/100. Percent = 100 x tan(angle).",
+    edition: "Standard forest mensuration / hypsometry (percent-slope clinometer method), USDA Forest Service practice, by name.",
+    freeAccess: "The percent-slope tree-height relation is public forestry mensuration.",
+    governance: GOVERNANCE.general,
+    editionNote: "Tree height from a clinometer's percent scale: from a horizontal distance D, read the percent slope to the top and to the base, each signed (+ above the observer's eye, - below). Height = D x (top% - base%)/100 - when the base is below eye level its reading is negative and its height adds, and when the base is uphill above eye level the reading is positive and subtracts. A degree-scale reading of a degrees converts to 100 tan(a) percent. It assumes the sighted top is directly above the base and D is the TRUE horizontal distance (use the horizontal component on sloping ground); tree lean, a hidden top, and an off-vertical stem add error. A field estimate, not a felling-height guarantee.",
+    assumptions: [
+      { name: "Signed readings", value: "percent slope, + above eye level and - below; height = D x (top - base)/100", source: "forest mensuration" },
+      { name: "Horizontal distance", value: "D is the true horizontal distance to the trunk", source: "hypsometry method" },
+      { name: "Straight stem", value: "top directly above base; lean and hidden tops add error", source: "field-estimate caveat" },
+    ],
+  },
   "tree-crz-encroachment": {
     formula: "radius = radius_factor x DBH; segment = radius^2 x acos(d/radius) - d x sqrt(radius^2 - d^2) for a limit line at distance d; encroach_pct = segment / (pi x radius^2) x 100; over when encroach_pct > threshold (tolerant 40 / intermediate 30 / sensitive 20).",
     edition: "Critical root zone encroachment (ANSI A300 Part 5 tree protection; arboriculture practice), by name.",

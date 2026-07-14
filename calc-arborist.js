@@ -800,3 +800,52 @@ function _v567renderCrownPruningDose(inputRegion, outputRegion, citationEl) {
   cls.select.addEventListener("change", update);
 }
 ARBORIST_RENDERERS["crown-pruning-dose"] = _v567renderCrownPruningDose;
+
+// --- v772: Clinometer / percent-slope tree height (`tree-height-clinometer`) ---
+// From a horizontal distance D and two SIGNED percent-slope readings (+ above
+// eye level, - below), tree height H = D x (top% - base%)/100. The base reading
+// is negative when the tree base is below the observer's eye (add its height).
+// dims: in { horizontal_distance_ft: L, top_reading_pct: dimensionless, base_reading_pct: dimensionless } out: { tree_height_ft: L, above_eye_ft: L, below_eye_ft: L }
+export function computeTreeHeightClinometer({ horizontal_distance_ft = 0, top_reading_pct = 0, base_reading_pct = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(horizontal_distance_ft) || 0;
+  if (!(D > 0)) return { error: "Horizontal distance to the tree must be positive (ft)." };
+  const top = Number(top_reading_pct);
+  const base = Number(base_reading_pct);
+  if (!Number.isFinite(top) || !Number.isFinite(base)) return { error: "Readings must be numbers (percent slope; + above eye, - below)." };
+  if (!(top > base)) return { error: "The top reading must be greater than the base reading (the top of the tree is higher than its base)." };
+  const above_eye_ft = (D * top) / 100;
+  const below_eye_ft = (D * base) / 100;
+  const tree_height_ft = above_eye_ft - below_eye_ft;
+  return {
+    tree_height_ft, above_eye_ft, below_eye_ft,
+    note: "Tree height from a clinometer's percent scale: standing a measured HORIZONTAL distance D from the trunk, read the percent slope to the top and to the base, both signed (+ above eye level, - below). Height = D x (top% - base%)/100. When the base is below your eye (looking down the trunk) the base reading is negative and its height adds; when the base is uphill above your eye the reading is positive and subtracts. Percent = 100 x tan(angle), so a degree-scale reading of a deg converts to 100 tan(a). Assumes the top sighted is directly above the base and D is the true horizontal distance (on a slope, use the horizontal component). A field estimate; lean, a hidden top, and off-vertical stems add error.",
+  };
+}
+export const treeHeightClinometerExample = { inputs: { horizontal_distance_ft: 100, top_reading_pct: 58, base_reading_pct: -4 } };
+
+function renderTreeHeightClinometer(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: clinometer / percent-slope tree height H = D x (top% - base%)/100, both readings signed (+ above eye level, - below), standard USDA Forest Service mensuration / hypsometry, by name. Percent = 100 x tan(angle) for a degree-scale instrument. Assumes the top is above the base and D is the true horizontal distance. A field estimate; lean and a hidden top add error.";
+  const d = makeNumber("Horizontal distance to trunk (ft)", "thc-d", { step: "any", min: "0", value: "100" });
+  d.input.value = "100";
+  const top = makeNumber("Top reading (% slope, + above eye)", "thc-top", { step: "any", value: "58" });
+  top.input.value = "58";
+  const base = makeNumber("Base reading (% slope, - below eye)", "thc-base", { step: "any", value: "-4" });
+  base.input.value = "-4";
+  for (const f of [d, top, base]) inputRegion.appendChild(f.wrap);
+  const oH = makeOutputLine(outputRegion, "Tree height", "thc-out-h");
+  const oA = makeOutputLine(outputRegion, "Height above eye level", "thc-out-a");
+  const oB = makeOutputLine(outputRegion, "Base offset from eye level", "thc-out-b");
+  const oNote = makeOutputLine(outputRegion, "Note", "thc-out-note");
+  const update = debounce(() => {
+    const r = computeTreeHeightClinometer({ horizontal_distance_ft: Number(d.input.value) || 0, top_reading_pct: Number(top.input.value) || 0, base_reading_pct: Number(base.input.value) || 0 });
+    if (r.error) { oH.textContent = r.error; oA.textContent = "-"; oB.textContent = "-"; oNote.textContent = ""; return; }
+    oH.textContent = fmt(r.tree_height_ft, 1) + " ft";
+    oA.textContent = fmt(r.above_eye_ft, 1) + " ft";
+    oB.textContent = fmt(r.below_eye_ft, 1) + " ft" + (r.below_eye_ft < 0 ? " (base below eye)" : r.below_eye_ft > 0 ? " (base above eye)" : "");
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { d.input.value = "100"; top.input.value = "58"; base.input.value = "-4"; update(); });
+  for (const f of [d, top, base]) f.input.addEventListener("input", update);
+}
+ARBORIST_RENDERERS["tree-height-clinometer"] = renderTreeHeightClinometer;

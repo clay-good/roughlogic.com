@@ -22014,6 +22014,42 @@ test("bounds: spec-v567 computeCrownPruningDose pins the removal percent, the cl
   assert.ok("error" in _v567({ live_foliage: 100, removed_foliage: 15, maturity_class: "foo" }));
 });
 
+import { computeTreeHeightClinometer as _v772 } from "../../calc-arborist.js";
+
+test("bounds: spec-v772 tree-height-clinometer pins H = D(top-base)/100, the signed-base rule, linearity, and error seams", () => {
+  // Spec example: D 100, top +58%, base -4% (base below eye) -> H = 100*(58-(-4))/100 = 62 ft.
+  const r = _v772({ horizontal_distance_ft: 100, top_reading_pct: 58, base_reading_pct: -4 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.tree_height_ft - 62) < 1e-9);
+  assert.ok(Math.abs(r.above_eye_ft - 58) < 1e-9);
+  assert.ok(Math.abs(r.below_eye_ft - (-4)) < 1e-9);
+  // Base at eye level (0%): height is just the top component.
+  const flat = _v772({ horizontal_distance_ft: 100, top_reading_pct: 58, base_reading_pct: 0 });
+  assert.ok(Math.abs(flat.tree_height_ft - 58) < 1e-9);
+  // Base uphill above eye (+%): subtracts, so the tree is shorter than the top component.
+  const uphill = _v772({ horizontal_distance_ft: 100, top_reading_pct: 58, base_reading_pct: 10 });
+  assert.ok(Math.abs(uphill.tree_height_ft - 48) < 1e-9);
+  // Height is exactly D*(top-base)/100 across a sweep, and linear in distance.
+  for (let i = 0; i < 120; i++) {
+    const D = 20 + i * 2;
+    const top = 30 + (i % 70);
+    const base = -20 + (i % 40);
+    if (!(top > base)) continue;
+    const a = _v772({ horizontal_distance_ft: D, top_reading_pct: top, base_reading_pct: base });
+    assert.ok(!a.error, JSON.stringify({ D, top, base }));
+    assert.ok(Math.abs(a.tree_height_ft - (D * (top - base)) / 100) < 1e-9, "closed form");
+    const dbl = _v772({ horizontal_distance_ft: 2 * D, top_reading_pct: top, base_reading_pct: base });
+    assert.ok(Math.abs(dbl.tree_height_ft - 2 * a.tree_height_ft) < 1e-9, "linear in distance");
+    assert.ok(a.tree_height_ft > 0, "positive height when top > base");
+  }
+  // Error seams.
+  assert.ok("error" in _v772({ horizontal_distance_ft: 0, top_reading_pct: 58, base_reading_pct: -4 }));
+  assert.ok("error" in _v772({ horizontal_distance_ft: 100, top_reading_pct: -4, base_reading_pct: 58 }), "top must exceed base");
+  assert.ok("error" in _v772({ horizontal_distance_ft: 100, top_reading_pct: 20, base_reading_pct: 20 }), "top == base rejected");
+  assert.ok("error" in _v772({ horizontal_distance_ft: Infinity, top_reading_pct: 58, base_reading_pct: -4 }));
+  assert.ok("error" in _v772({ horizontal_distance_ft: 100, top_reading_pct: NaN, base_reading_pct: -4 }));
+});
+
 import { computeCenterPivotRuntime as _v568 } from "../../calc-agriculture.js";
 
 test("bounds: spec-v568 computeCenterPivotRuntime pins the 452.6 runtime relation, the gross capacity, the net depth, and error seams", () => {

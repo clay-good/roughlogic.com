@@ -4977,6 +4977,31 @@
       "kind": "industry"
     },
     {
+      "term": "tree height from a clinometer",
+      "target": "tree-height-clinometer",
+      "kind": "question"
+    },
+    {
+      "term": "measure tree height",
+      "target": "tree-height-clinometer",
+      "kind": "question"
+    },
+    {
+      "term": "how tall is a tree",
+      "target": "tree-height-clinometer",
+      "kind": "question"
+    },
+    {
+      "term": "clinometer tree height",
+      "target": "tree-height-clinometer",
+      "kind": "industry"
+    },
+    {
+      "term": "tree height with percent slope",
+      "target": "tree-height-clinometer",
+      "kind": "question"
+    },
+    {
       "term": "limb weight",
       "target": "log-limb-weight",
       "kind": "industry"
