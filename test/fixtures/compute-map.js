@@ -1256,6 +1256,7 @@ export const COMPUTE_MAP = {
   "pv-row-shade-angle": { module: "../../calc-solar.js", fn: "computePvRowShadeAngle" },
   "pv-inverter-ratio": { module: "../../calc-solar.js", fn: "computePvInverterRatio" },
   "pv-cell-temperature-power": { module: "../../calc-solar.js", fn: "computePvCellTemperaturePower" },
+  "pv-max-ambient-for-power": { module: "../../calc-solar.js", fn: "computePvMaxAmbientForPower" },
   "pv-performance-ratio": { module: "../../calc-solar.js", fn: "computePvPerformanceRatio" },
   "pv-string-fusing": { module: "../../calc-solar.js", fn: "computePvStringFusing" },
   // spec-v236..v238 grid-tied battery-economics batch (3 tiles)

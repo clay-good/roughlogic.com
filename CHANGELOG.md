@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(solar): spec-v743 PV max ambient temperature for a target power (pv-cell-temperature-power inverse); 2026-07-14
+
+- New tile `pv-max-ambient-for-power` (Group A, calc-solar.js): the highest ambient temperature a module still makes a
+  target power. `T_cell = 25 + (P/P_stc - 1) x 100/gamma`, then `T_amb = T_cell - (NOCT-20) x G/800`. A 400 W module
+  holding 358 W at 800 W/m^2 tops out at 30 C air (55 C cell). Round-trips through `pv-cell-temperature-power`. Home tile
+  count 1,191 -> 1,192.
+
 ### feat(treatment): spec-v742 clarifier surface area for a target SOR (clarifier-surface-loading inverse); 2026-07-14
 
 - New tile `clarifier-area-for-loading` (Group M, calc-treatment.js): the clarifier surface area a target surface

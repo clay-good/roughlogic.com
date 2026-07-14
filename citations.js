@@ -10282,6 +10282,18 @@ export const CITATIONS = {
       { name: "Assumptions", value: "due-south rows and a level field; azimuth or slope is a separate correction", source: "scope of this tile" },
     ],
   },
+  "pv-max-ambient-for-power": {
+    formula: "T_cell = 25 + (target_power/P_stc - 1) x 100/gamma; max_ambient = T_cell - (NOCT - 20) x G/800. The inverse of P = P_stc x (1 + gamma/100 x (T_cell - 25)) and T_cell = T_amb + (NOCT - 20) x G/800.",
+    edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name, solved for the ambient temperature.",
+    freeAccess: "The NOCT model and temperature-coefficient derate are standard PV design relations (NREL / module datasheets). The module datasheet governs the coefficients.",
+    governance: GOVERNANCE.general,
+    editionNote: "The highest ambient temperature a module still makes a target power, the inverse of the NOCT cell-temperature and power-derate model. Because the power coefficient gamma is negative (a hotter cell makes less power), this is a ceiling: above this ambient the module falls below the target. Cells run well above air temperature in sun (the NOCT rise), so the max ambient is well below the cell temperature. A target above the STC nameplate gives a max ambient below a 25 C cell (a cold-day-only output). This is the temperature derate only: it uses the entered NOCT and gamma and does not include soiling, wiring, inverter, or shading losses (see the performance-ratio tile). A design aid; the module datasheet governs.",
+    assumptions: [
+      { name: "NOCT model", value: "max ambient = T_cell - (NOCT - 20) x G/800", source: "PV design practice / NREL" },
+      { name: "Power derate inverse", value: "T_cell = 25 + (target/P_stc - 1) x 100/gamma; gamma ~ -0.35%/C silicon", source: "module datasheet" },
+      { name: "Temperature only", value: "no irradiance scaling and no soiling/wiring/inverter/shading losses", source: "scope of this tile" },
+    ],
+  },
   "pv-cell-temperature-power": {
     formula: "T_cell = T_amb + (NOCT - 20) x G/800; P = P_stc x (1 + (gamma/100)(T_cell - 25)); loss = (1 - P/P_stc) x 100.",
     edition: "The PV NOCT cell-temperature model and the datasheet power temperature coefficient, by name.",

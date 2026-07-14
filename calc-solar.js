@@ -1156,6 +1156,56 @@ function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
 }
 SOLAR_RENDERERS["pv-cell-temperature-power"] = renderPvCellTemperaturePower;
 
+// pv-max-ambient-for-power: inverse of pv-cell-temperature-power. The forward tile gives the temperature-derated power at
+// an ambient temperature; the inverse recovers the highest ambient temperature at which the module still makes a target
+// power, since a real module's power coefficient is negative (hotter cell -> less power). From
+// P = P_stc x (1 + gamma/100 x (T_cell - 25)), T_cell = 25 + (P/P_stc - 1) x 100/gamma, then from
+// T_cell = T_amb + (NOCT - 20) x G/800, T_amb_max = T_cell - (NOCT - 20) x G/800.
+// dims: in { target_power_W: M L^2 T^-3, P_stc_W: M L^2 T^-3, G_wm2: M T^-3, NOCT_C: T, gamma: dimensionless } out: { max_ambient_C: T, max_cell_C: T }
+export function computePvMaxAmbientForPower({ target_power_W = 0, P_stc_W = 0, G_wm2 = 0, NOCT_C = 45, gamma = -0.35 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const Ptgt = Number(target_power_W) || 0;
+  const Pstc = Number(P_stc_W) || 0;
+  const G = Number(G_wm2) || 0;
+  const noct = Number(NOCT_C) || 0;
+  const g = Number(gamma);
+  if (!(Ptgt > 0)) return { error: "Target power must be positive (W)." };
+  if (!(Pstc > 0)) return { error: "Module STC power must be positive (W)." };
+  if (!(G > 0)) return { error: "Plane-of-array irradiance must be positive (W/m^2)." };
+  if (!(noct > 0)) return { error: "NOCT must be positive (C)." };
+  if (!(Number.isFinite(g) && g < 0)) return { error: "Power temperature coefficient must be negative (real modules lose power as they heat)." };
+  const max_cell_C = 25 + (Ptgt / Pstc - 1) * 100 / g;
+  const max_ambient_C = max_cell_C - (noct - 20) * G / 800;
+  if (![max_cell_C, max_ambient_C].every(Number.isFinite)) return { error: "Max-ambient math is not a finite value." };
+  return {
+    max_ambient_C, max_cell_C,
+    note: "Highest ambient temperature the module still makes the target power: T_cell = 25 + (P/P_stc - 1) x 100/gamma, then T_amb = T_cell - (NOCT - 20) x G/800, the inverse of the NOCT cell-temperature and power-derate model. Because the power coefficient is negative, a hotter cell makes less power, so this is a ceiling - above this ambient the module falls below the target. Cells run well above air temperature in sun (the NOCT rise), so the max ambient is well below the cell temperature. A target above the module's STC nameplate gives a max ambient below 25 C cell (a cold-day-only output). Temperature derate only (no soiling, wiring, inverter, or shading losses); the module datasheet governs.",
+  };
+}
+const pvMaxAmbientForPowerExample = { inputs: { target_power_W: 358, P_stc_W: 400, G_wm2: 800, NOCT_C: 45, gamma: -0.35 } };
+function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: PV NOCT cell-temperature model and the datasheet power temperature coefficient (about -0.35%/C for crystalline silicon), by name, solved for the ambient: T_cell = 25 + (P/P_stc - 1) x 100/gamma, T_amb = T_cell - (NOCT - 20) x G/800. Temperature derate only (no soiling/wiring/inverter/shading). A design aid; the module datasheet governs.";
+  const Ptgt = makeNumber("Target power (W)", "pma-pt", { step: "any", min: "0", value: "358" }); Ptgt.input.value = "358";
+  const Pstc = makeNumber("Module STC power (W)", "pma-p", { step: "any", min: "0", value: "400" }); Pstc.input.value = "400";
+  const G = makeNumber("Plane-of-array irradiance (W/m^2)", "pma-g", { step: "any", min: "0", value: "800" }); G.input.value = "800";
+  const noct = makeNumber("NOCT (C, datasheet, default 45)", "pma-noct", { step: "any", min: "0", value: "45" }); noct.input.value = "45";
+  const g = makeNumber("Power temp coefficient (%/C, e.g. -0.35)", "pma-gamma", { step: "any", value: "-0.35" }); g.input.value = "-0.35";
+  for (const f of [Ptgt, Pstc, G, noct, g]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { Ptgt.input.value = "358"; Pstc.input.value = "400"; G.input.value = "800"; noct.input.value = "45"; g.input.value = "-0.35"; update(); });
+  const oTa = makeOutputLine(outputRegion, "Max ambient temperature", "pma-out-ta");
+  const oTc = makeOutputLine(outputRegion, "Cell temperature at that point", "pma-out-tc");
+  const oNote = makeOutputLine(outputRegion, "Note", "pma-out-note");
+  const update = debounce(() => {
+    const r = computePvMaxAmbientForPower({ target_power_W: Number(Ptgt.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, gamma: Number(g.input.value) });
+    if (r.error) { oTa.textContent = r.error; oTc.textContent = "-"; oNote.textContent = ""; return; }
+    oTa.textContent = fmt(r.max_ambient_C, 1) + " C (" + fmt(r.max_ambient_C * 9 / 5 + 32, 0) + " F)";
+    oTc.textContent = fmt(r.max_cell_C, 1) + " C";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [Ptgt, Pstc, G, noct, g]) f.input.addEventListener("input", update);
+}
+SOLAR_RENDERERS["pv-max-ambient-for-power"] = renderPvMaxAmbientForPower;
+
 // dims: in { soiling: dimensionless, temperature: dimensionless, wiring_dc: dimensionless, wiring_ac: dimensionless, inverter: dimensionless, mismatch: dimensionless, shading: dimensionless, availability: dimensionless, nameplate: dimensionless, lid: dimensionless, connections: dimensionless } out: { pr: dimensionless, total_loss_pct: dimensionless }
 export function computePvPerformanceRatio(inputs = {}) {
   const _g = _finiteGuard(inputs); if (_g) return _g;

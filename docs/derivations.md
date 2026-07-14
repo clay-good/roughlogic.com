@@ -2669,6 +2669,7 @@ cross-check.
 | calc-solar.js | `computePvEnergyYield` | `{ dc_kw = 0, psh = 5.0, perf_ratio = 0.77 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvInterconnectionBusbar` | `{ main_breaker_a = 0, busbar_rating_a = 0, pv_existing_a = 0, pv_proposed_a =...` | _ | _ | _ |
 | calc-solar.js | `computePvInverterRatio` | `{ dc_kw = 0, ac_kw = 0, inv_eff = 0.96 } = {}` | _ | _ | _ |
+| calc-solar.js | `computePvMaxAmbientForPower` | `{ target_power_W = 0, P_stc_W = 0, G_wm2 = 0, NOCT_C = 45, gamma = -0.35 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvPerformanceRatio` | `inputs = {}` | _ | _ | _ |
 | calc-solar.js | `computePvRowShadeAngle` | `{ module_length_ft = 0, tilt_deg = 0, row_pitch_ft = 0 } = {}` | _ | _ | _ |
 | calc-solar.js | `computePvRowSpacing` | `{ module_length_ft = 0, tilt_deg = 0, profile_angle_deg = 0 } = {}` | _ | _ | _ |
@@ -2852,7 +2853,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1438.
+Row count: 1439.
 
 <!-- END function-corpus-v14 -->
 
@@ -2933,7 +2934,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (155 tiles)
+### Group A Electrical (156 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3051,6 +3052,7 @@ per spec-v14 §13.1 second paragraph.
 | `pv-energy-yield` | PV Annual Energy, Specific Yield, and Capacity Factor | NREL PVWatts energy model; spec-v221 section 2.1 pinned example (average US site) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-interconnection-busbar` | PV Interconnection 120% Busbar Rule | NFPA; 705.12(B)(3)(2): sum = main + PV <= 1.20 * busbar | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-inverter-ratio` | PV Inverter Loading Ratio (DC:AC) and Clipping Onset | Inverter loading ratio + NREL guidance; spec-v223 section 2.1 pinned example (in-band) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `pv-max-ambient-for-power` | PV Max Ambient Temperature for a Target Power | PV design practice / NREL (solved for...; spec-v743 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-performance-ratio` | PV Performance Ratio from Stacked Losses | NREL PVWatts; spec-v351 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `pv-row-shade-angle` | PV Shade-Free Sun Angle from Row Pitch | NREL / Sandia row-spacing geometry; spec-v702 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `pv-row-spacing` | PV Inter-Row Spacing and Ground-Coverage Ratio | NREL / Sandia row-spacing geometry; spec-v222 section 2.1 pinned example (30-degree ground mo... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4229,6 +4231,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1191. Fixture-covered or reference-cadence: 1191 / 1191.
+Tile count: 1192. Fixture-covered or reference-cadence: 1192 / 1192.
 
 <!-- END tile-index-v14 -->

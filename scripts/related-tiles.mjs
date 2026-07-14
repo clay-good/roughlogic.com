@@ -64,6 +64,7 @@ const RELATED = {
   "pool-heater-size": ["pool-heater-btu", "pool-turnover", "water-heater-recovery", "gas-appliance-demand"],
   "breakpoint-chlorination": ["chlorine-demand", "pool-chlorine-dose", "chlorine-decay", "disinfection-ct"],
   "pv-cell-temperature-power": ["pv-string-sizing", "pv-energy-yield", "pv-performance-ratio", "pv-inverter-ratio"],
+  "pv-max-ambient-for-power": ["pv-cell-temperature-power", "pv-performance-ratio", "pv-energy-yield"],
   "pv-performance-ratio": ["pv-energy-yield", "pv-cell-temperature-power", "pv-string-sizing", "voltage-drop"],
   "pv-string-fusing": ["pv-circuit-ampacity", "pv-interconnection-busbar", "pv-string-sizing", "continuous-load-ocpd"],
   "duct-heat-gain": ["duct-sizing", "duct-leakage", "insulation-heat-loss", "grille-face-velocity"],

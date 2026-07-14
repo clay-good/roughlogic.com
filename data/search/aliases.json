@@ -19067,6 +19067,31 @@
       "kind": "industry"
     },
     {
+      "term": "max ambient for pv power",
+      "target": "pv-max-ambient-for-power",
+      "kind": "industry"
+    },
+    {
+      "term": "pv max temperature",
+      "target": "pv-max-ambient-for-power",
+      "kind": "redirect"
+    },
+    {
+      "term": "hottest air for module power",
+      "target": "pv-max-ambient-for-power",
+      "kind": "adjacent"
+    },
+    {
+      "term": "max ambient temp solar",
+      "target": "pv-max-ambient-for-power",
+      "kind": "adjacent"
+    },
+    {
+      "term": "pv temperature limit for output",
+      "target": "pv-max-ambient-for-power",
+      "kind": "adjacent"
+    },
+    {
       "term": "module temperature power",
       "target": "pv-cell-temperature-power",
       "kind": "industry"

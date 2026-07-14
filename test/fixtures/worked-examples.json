@@ -49003,6 +49003,36 @@
    }
   },
   {
+   "tile_id": "pv-max-ambient-for-power",
+   "source_publisher": "PV design practice / NREL (solved for the ambient)",
+   "source_title": "400 W module, 358 W target, 800 W/m^2, NOCT 45, gamma -0.35 -> 30 C max air (55 C cell)",
+   "source_edition_or_year": "spec-v743 worked example (machine-verified)",
+   "source_section_or_page": "spec-v743 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_power_W": 358,
+    "P_stc_W": 400,
+    "G_wm2": 800,
+    "NOCT_C": 45,
+    "gamma": -0.35
+   },
+   "outputs": {
+    "max_ambient_C": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.1
+     }
+    },
+    "max_cell_C": {
+     "value": 55,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "pv-cell-temperature-power",
    "source_publisher": "PV design practice / NREL",
    "source_title": "cross-check: a cool 10 C morning -> 35 C cell, 386 W (3.5% loss)",

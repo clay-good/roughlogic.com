@@ -16653,6 +16653,28 @@ test("bounds: spec-v350 computePvCellTemperaturePower pins the NOCT model, the d
   assert.ok("error" in _v350({ T_amb_C: Infinity, G_wm2: 800, NOCT_C: 45, P_stc_W: 400 }));
 });
 
+import { computePvMaxAmbientForPower as _v743 } from "../../calc-solar.js";
+test("bounds: spec-v743 PV max ambient temperature for a target power (inverse of pv-cell-temperature-power)", () => {
+  const p = _v743({ target_power_W: 358, P_stc_W: 400, G_wm2: 800, NOCT_C: 45, gamma: -0.35 });
+  assert.ok(Math.abs(p.max_cell_C - 55) < 0.05 && Math.abs(p.max_ambient_C - 30) < 0.05);
+  // round-trip: at the recovered max ambient, pv-cell-temperature-power makes exactly the target power
+  for (const [tgt, pstc, G, noct, g] of [[358, 400, 800, 45, -0.35], [300, 350, 1000, 47, -0.4], [500, 480, 800, 44, -0.3], [200, 250, 600, 45, -0.38]]) {
+    const inv = _v743({ target_power_W: tgt, P_stc_W: pstc, G_wm2: G, NOCT_C: noct, gamma: g });
+    const fwd = _v350({ T_amb_C: inv.max_ambient_C, G_wm2: G, NOCT_C: noct, P_stc_W: pstc, gamma: g });
+    assert.ok(Math.abs(fwd.P_W - tgt) < 1e-6);
+    assert.ok(Math.abs(fwd.T_cell_C - inv.max_cell_C) < 1e-9);
+  }
+  // a lower target power allows a higher max ambient (monotonic)
+  assert.ok(_v743({ target_power_W: 340, P_stc_W: 400, G_wm2: 800 }).max_ambient_C > _v743({ target_power_W: 358, P_stc_W: 400, G_wm2: 800 }).max_ambient_C);
+  // error seams: non-positive target/stc/G/NOCT, non-negative gamma, non-finite
+  assert.ok("error" in _v743({ target_power_W: 0, P_stc_W: 400, G_wm2: 800 }));
+  assert.ok("error" in _v743({ target_power_W: 358, P_stc_W: 0, G_wm2: 800 }));
+  assert.ok("error" in _v743({ target_power_W: 358, P_stc_W: 400, G_wm2: 0 }));
+  assert.ok("error" in _v743({ target_power_W: 358, P_stc_W: 400, G_wm2: 800, gamma: 0 }));
+  assert.ok("error" in _v743({ target_power_W: 358, P_stc_W: 400, G_wm2: 800, gamma: 0.35 }));
+  assert.ok("error" in _v743({ target_power_W: Infinity, P_stc_W: 400, G_wm2: 800 }));
+});
+
 test("bounds: spec-v351 computePvPerformanceRatio pins the multiplicative product, the leverage, and error seams", () => {
   const r = _v351({ soiling: 2, temperature: 8, wiring_dc: 2, inverter: 4, mismatch: 2, shading: 3 });
   assert.ok(Math.abs(r.pr - 0.98 * 0.92 * 0.98 * 0.96 * 0.98 * 0.97) < 1e-12);
