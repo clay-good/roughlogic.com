@@ -1209,6 +1209,63 @@ function renderGrainBin(inputRegion, outputRegion, citationEl) {
   for (const s of [grain.select, pack.select]) s.addEventListener("change", update);
 }
 
+// --- v773: Horizontal (bunker) silo forage capacity (`bunker-silo-capacity`) ---
+// Trapezoidal cross-section A = (bottom + top)/2 x depth; volume = A x length;
+// tons = volume x density / 2000. Silage as-fed density is user-entered because
+// it varies with dry matter and packing (~40-50 lb/ft^3 for corn silage).
+// dims: in { bottom_width_ft: L, top_width_ft: L, average_depth_ft: L, length_ft: L, density_lb_ft3: M L^-3 } out: { cross_section_ft2: L^2, volume_ft3: L^3, volume_yd3: L^3, tons: dimensionless }
+export function computeBunkerSiloCapacity({ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0, density_lb_ft3 = 44 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const b = Number(bottom_width_ft) || 0;
+  const t = Number(top_width_ft) || 0;
+  const h = Number(average_depth_ft) || 0;
+  const L = Number(length_ft) || 0;
+  const rho = Number(density_lb_ft3) || 0;
+  if (!(b > 0)) return { error: "Bottom width must be positive (ft)." };
+  if (!(t > 0)) return { error: "Top width must be positive (ft)." };
+  if (!(h > 0)) return { error: "Average settled depth must be positive (ft)." };
+  if (!(L > 0)) return { error: "Length must be positive (ft)." };
+  if (!(rho > 0)) return { error: "As-fed density must be positive (lb/ft^3)." };
+  const cross_section_ft2 = ((b + t) / 2) * h;
+  const volume_ft3 = cross_section_ft2 * L;
+  const volume_yd3 = volume_ft3 / 27;
+  const tons = (volume_ft3 * rho) / 2000;
+  return {
+    cross_section_ft2, volume_ft3, volume_yd3, tons,
+    note: "Horizontal (bunker or trench) silo capacity: the trapezoidal cross-section (bottom + top)/2 x average settled depth, times the length, times the as-fed density, over 2000 lb/ton. Enter equal bottom and top widths for a vertical-walled bunker; a wider top models sloped walls. The as-fed density is user-entered because it swings with dry matter and packing - corn silage runs about 40-50 lb/ft^3 as fed (denser deeper in the pile), haylage less. Use the SETTLED depth after packing, not the fill height. A planning estimate; the actual density from a core or a weigh-back governs the real inventory.",
+  };
+}
+export const bunkerSiloCapacityExample = { inputs: { bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 44 } };
+
+function renderBunkerSiloCapacity(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: horizontal (bunker/trench) silo capacity - trapezoidal cross-section (bottom + top)/2 x average depth, times length, times as-fed density, over 2000 lb/ton. Per NRCS / MWPS forage storage sizing, by name. As-fed silage density is user-entered (corn silage ~40-50 lb/ft^3, varies with dry matter and packing). Use the settled depth; a core sample or weigh-back governs the real inventory.";
+  const b = makeNumber("Bottom width (ft)", "bsc-b", { step: "any", min: "0", value: "30" });
+  b.input.value = "30";
+  const t = makeNumber("Top width (ft; = bottom for vertical walls)", "bsc-t", { step: "any", min: "0", value: "30" });
+  t.input.value = "30";
+  const h = makeNumber("Average settled depth (ft)", "bsc-h", { step: "any", min: "0", value: "8" });
+  h.input.value = "8";
+  const L = makeNumber("Length (ft)", "bsc-l", { step: "any", min: "0", value: "100" });
+  L.input.value = "100";
+  const rho = makeNumber("As-fed density (lb/ft^3)", "bsc-rho", { step: "any", min: "0", value: "44" });
+  rho.input.value = "44";
+  for (const f of [b, t, h, L, rho]) inputRegion.appendChild(f.wrap);
+  const oT = makeOutputLine(outputRegion, "Forage capacity", "bsc-out-tons");
+  const oV = makeOutputLine(outputRegion, "Volume", "bsc-out-vol");
+  const oA = makeOutputLine(outputRegion, "Cross-section area", "bsc-out-area");
+  const oNote = makeOutputLine(outputRegion, "Note", "bsc-out-note");
+  const update = debounce(() => {
+    const r = computeBunkerSiloCapacity({ bottom_width_ft: Number(b.input.value) || 0, top_width_ft: Number(t.input.value) || 0, average_depth_ft: Number(h.input.value) || 0, length_ft: Number(L.input.value) || 0, density_lb_ft3: Number(rho.input.value) || 0 });
+    if (r.error) { oT.textContent = r.error; oV.textContent = "-"; oA.textContent = "-"; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.tons, 1) + " tons as fed";
+    oV.textContent = fmt(r.volume_ft3, 0) + " ft^3 (" + fmt(r.volume_yd3, 0) + " yd^3)";
+    oA.textContent = fmt(r.cross_section_ft2, 1) + " ft^2";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  attachExampleButton(inputRegion, () => { b.input.value = "30"; t.input.value = "30"; h.input.value = "8"; L.input.value = "100"; rho.input.value = "44"; update(); });
+  for (const f of [b, t, h, L, rho]) f.input.addEventListener("input", update);
+}
+
 // --- spec-v17 L.2 NPK blend from soil test --------------------------
 
 // Representative crop nutrient demand (lb/acre of N, P2O5, K2O) drawn from
@@ -1548,6 +1605,7 @@ export const AGRICULTURE_RENDERERS = {
   "cattle-stocking-rate":   renderStockingRate,
   "grain-bin-capacity":     renderGrainBin,
   "grain-bin-height-for-capacity": renderGrainBinHeightForCapacity,
+  "bunker-silo-capacity": renderBunkerSiloCapacity,
   "npk-blend":              renderNpkBlend,
   "tank-mix":               renderTankMix,
 };

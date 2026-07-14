@@ -889,6 +889,7 @@ const RELATED = {
   "cattle-stocking-rate": ["crop-yield", "thi-livestock", "seed-rate"],
   "grain-bin-capacity": ["grain-bin-height-for-capacity", "crop-yield", "seed-rate", "grain-shrink-moisture"],
   "grain-bin-height-for-capacity": ["grain-bin-capacity", "grain-aeration-airflow", "crop-yield"],
+  "bunker-silo-capacity": ["grain-bin-capacity", "cattle-stocking-rate", "crop-yield"],
   "npk-blend": ["crop-yield", "seed-rate", "bulk-density"],
   "tank-mix": ["gpa-rate", "sprayer-calibration", "seed-rate"],
 

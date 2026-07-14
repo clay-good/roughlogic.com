@@ -14545,6 +14545,36 @@
    }
   },
   {
+   "tile_id": "bunker-silo-capacity",
+   "source_publisher": "NRCS / MWPS forage storage sizing",
+   "source_title": "30 ft wide, 8 ft deep, 100 ft bunker at 44 lb/ft^3 -> 528 tons",
+   "source_edition_or_year": "trapezoidal prism; tons = V x density / 2000",
+   "source_section_or_page": "A = (30+30)/2 x 8 = 240 ft^2; V = 240 x 100 = 24000 ft^3; tons = 24000 x 44 / 2000 = 528",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "bottom_width_ft": 30,
+    "top_width_ft": 30,
+    "average_depth_ft": 8,
+    "length_ft": 100,
+    "density_lb_ft3": 44
+   },
+   "outputs": {
+    "tons": {
+     "value": 528,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "volume_ft3": {
+     "value": 24000,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "npk-blend",
    "source_publisher": "USDA NRCS",
    "source_title": "NPK blend: corn (150-60-40 demand), soil credit 20-10-15 lb/acre, 80 acres, default straights",

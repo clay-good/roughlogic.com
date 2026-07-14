@@ -2242,6 +2242,19 @@ export const CITATIONS = {
     ],
   },
 
+  "bunker-silo-capacity": {
+    formula: "cross_section = (bottom_width + top_width)/2 x average_depth; volume = cross_section x length; tons = volume x density / 2000.",
+    edition: "Horizontal (bunker/trench) silo sizing per NRCS / MWPS (Midwest Plan Service) forage storage references, by name; trapezoidal-prism geometry.",
+    freeAccess: "The trapezoidal-prism volume and the tons = volume x density / 2000 relation are public; forage density references are extension-published.",
+    governance: GOVERNANCE.general,
+    editionNote: "The as-fed tons a horizontal bunker or trench silo holds: the trapezoidal cross-section (equal bottom and top widths for vertical walls, a wider top for sloped) times the length times the as-fed density, over 2000 lb/ton. The as-fed density is user-entered because it swings with dry matter and packing - corn silage runs about 40-50 lb/ft^3 as fed and is denser deeper in the pile, haylage less. Use the SETTLED depth after packing, not the fill height. A planning estimate; a core sample or a scale weigh-back governs the real inventory.",
+    assumptions: [
+      { name: "Cross-section", value: "trapezoid (bottom + top)/2 x average settled depth; vertical walls = equal widths", source: "bunker geometry" },
+      { name: "As-fed density", value: "user-entered; corn silage ~40-50 lb/ft^3, varies with dry matter and packing", source: "NRCS / MWPS forage references" },
+      { name: "Settled depth", value: "use the depth after packing, not the fill height", source: "forage-storage practice" },
+    ],
+  },
+
   "npk-blend": {
     formula: "Nutrient recommendation = max(0, crop demand - soil-test credit) for each of N, P2O5, K2O. Three-straight blend: potash (lb/acre) = K2O rec / 0.60; DAP = P2O5 rec / 0.46 (carrying N = DAP x 0.18); urea = max(0, N rec - N from DAP) / 0.46. Total product = rate x acres.",
     edition: "USDA NRCS Agronomy Technical Note ranges and the state Cooperative Extension Service published recommendations (state-keyed) by name.",

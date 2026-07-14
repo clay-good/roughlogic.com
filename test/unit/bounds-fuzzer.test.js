@@ -3297,6 +3297,7 @@ import {
   computeStockingRate,
   computeGrainBin,
   computeGrainBinHeightForCapacity,
+  computeBunkerSiloCapacity,
   computeNpkBlend,
   computeTankMix,
   computeTHI,
@@ -3582,6 +3583,43 @@ test("bounds: spec-v690 computeGrainBinHeightForCapacity pins eave = (target_ft3
   assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: 12875, diameter_ft: 30, packing_factor: -1 }));
   assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: 100, diameter_ft: 30, peak_height_ft: 8 }));
   assert.ok("error" in computeGrainBinHeightForCapacity({ target_bushels: NaN, diameter_ft: 30 }));
+});
+
+test("bounds: spec-v773 computeBunkerSiloCapacity pins trapezoid volume, tons, the linear scalings, and error seams", () => {
+  // Spec example: 30x30 (vertical), 8 ft deep, 100 ft, 44 lb/ft^3 -> A 240, V 24000, 528 tons.
+  const r = computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 44 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.cross_section_ft2, 240);
+  assert.strictEqual(r.volume_ft3, 24000);
+  assert.ok(Math.abs(r.volume_yd3 - 24000 / 27) < 1e-9);
+  assert.ok(Math.abs(r.tons - 528) < 1e-9);
+  // Sloped walls: a wider top averages in. bottom 20, top 40 -> mean 30, same as the 30/30 case.
+  const sloped = computeBunkerSiloCapacity({ bottom_width_ft: 20, top_width_ft: 40, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 44 });
+  assert.ok(Math.abs(sloped.tons - r.tons) < 1e-9, "trapezoid uses the mean width");
+  // Linear in length, depth, and density; quadratic-free.
+  const dblL = computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: 200, density_lb_ft3: 44 });
+  assert.ok(Math.abs(dblL.tons - 2 * r.tons) < 1e-9, "linear in length");
+  const dblRho = computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 88 });
+  assert.ok(Math.abs(dblRho.tons - 2 * r.tons) < 1e-9, "linear in density");
+  const dblH = computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 16, length_ft: 100, density_lb_ft3: 44 });
+  assert.ok(Math.abs(dblH.tons - 2 * r.tons) < 1e-9, "linear in depth");
+  // tons = volume * density / 2000 across a sweep.
+  for (let i = 0; i < 100; i++) {
+    const b = 10 + (i % 30);
+    const t = b + (i % 15);
+    const h = 4 + (i % 12);
+    const L = 40 + i * 3;
+    const rho = 35 + (i % 20);
+    const m = computeBunkerSiloCapacity({ bottom_width_ft: b, top_width_ft: t, average_depth_ft: h, length_ft: L, density_lb_ft3: rho });
+    assert.ok(!m.error);
+    assert.ok(Math.abs(m.tons - (m.volume_ft3 * rho) / 2000) < 1e-9, "tons identity");
+    assert.ok(Math.abs(m.volume_ft3 - ((b + t) / 2) * h * L) < 1e-6, "trapezoidal-prism volume");
+  }
+  // Error seams.
+  assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 0, top_width_ft: 30, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 44 }));
+  assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 0, length_ft: 100, density_lb_ft3: 44 }));
+  assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: 100, density_lb_ft3: 0 }));
+  assert.ok("error" in computeBunkerSiloCapacity({ bottom_width_ft: 30, top_width_ft: 30, average_depth_ft: 8, length_ft: Infinity, density_lb_ft3: 44 }));
 });
 
 test("bounds: calc-agriculture computeNpkBlend pins recommendation = max(0, demand - soil credit), the three-straight solve, and delivered = recommendation", () => {

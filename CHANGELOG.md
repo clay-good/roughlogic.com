@@ -4,6 +4,14 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(agriculture): spec-v773 bunker (horizontal) silo forage capacity; 2026-07-14
+
+- New tile `bunker-silo-capacity` (Group L, calc-agriculture.js): the forage a horizontal bunker or trench silo holds --
+  trapezoidal cross-section `(bottom + top)/2 x average depth`, times length, times as-fed density, over 2,000 lb/ton. A
+  30 ft wide, 8 ft deep, 100 ft bunker at 44 lb/ft^3 holds ~528 tons. As-fed density is a user input (corn silage
+  ~40-50 lb/ft^3). Fuzzer pins the trapezoidal-prism volume and the linear scalings. calc-agriculture.js gzip cap
+  54000 -> 56000 B. Home count 1,221 -> 1,222.
+
 ### feat(arborist): spec-v772 clinometer tree height (percent-slope); 2026-07-14
 
 - New tile `tree-height-clinometer` (Group L, calc-arborist.js): tree height from a clinometer's percent scale --

@@ -3637,6 +3637,31 @@
       "kind": "industry"
     },
     {
+      "term": "bunker silo capacity",
+      "target": "bunker-silo-capacity",
+      "kind": "industry"
+    },
+    {
+      "term": "silage tonnage",
+      "target": "bunker-silo-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "how much silage fits",
+      "target": "bunker-silo-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "trench silo tons",
+      "target": "bunker-silo-capacity",
+      "kind": "question"
+    },
+    {
+      "term": "forage storage capacity",
+      "target": "bunker-silo-capacity",
+      "kind": "question"
+    },
+    {
       "term": "silo capacity",
       "target": "grain-bin-capacity",
       "kind": "adjacent"
