@@ -19611,6 +19611,29 @@ test("bounds: spec-v509 computeCountersinkDepth pins the plunge depth, the angle
   assert.ok("error" in _v509({ countersink_dia_in: 0.5, included_angle_deg: 180, pilot_hole_dia_in: 0.25 }));
 });
 
+import { computeCountersinkDiameterFromDepth as _v733 } from "../../calc-machining.js";
+test("bounds: spec-v733 countersink diameter from a plunge depth (inverse of countersink-depth)", () => {
+  const p = _v733({ plunge_depth_in: 0.1438, included_angle_deg: 82, pilot_hole_dia_in: 0.25 });
+  assert.ok(Math.abs(p.countersink_dia_in - 0.5) < 0.001);
+  assert.ok(Math.abs(p.cone_dia_in - 0.25) < 0.001); // countersink - pilot
+  // round-trip: the recovered diameter fed to countersink-depth reproduces the plunge depth
+  for (const [z, ang, hole] of [[0.1438, 82, 0.25], [0.2165, 60, 0.25], [0.1, 90, 0.125], [0.3, 100, 0]]) {
+    const inv = _v733({ plunge_depth_in: z, included_angle_deg: ang, pilot_hole_dia_in: hole });
+    const fwd = _v509({ countersink_dia_in: inv.countersink_dia_in, included_angle_deg: ang, pilot_hole_dia_in: hole });
+    assert.ok(Math.abs(fwd.z_in - z) < 1e-9);
+  }
+  // a shallower (larger) angle opens a wider diameter for the same depth
+  assert.ok(_v733({ plunge_depth_in: 0.15, included_angle_deg: 100, pilot_hole_dia_in: 0.25 }).countersink_dia_in > _v733({ plunge_depth_in: 0.15, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }).countersink_dia_in);
+  // deeper plunge -> larger diameter
+  assert.ok(_v733({ plunge_depth_in: 0.2, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }).countersink_dia_in > _v733({ plunge_depth_in: 0.1, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }).countersink_dia_in);
+  // error seams: non-finite, non-positive depth, negative pilot, angle out of range
+  assert.ok("error" in _v733({ plunge_depth_in: Infinity, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }));
+  assert.ok("error" in _v733({ plunge_depth_in: 0, included_angle_deg: 82, pilot_hole_dia_in: 0.25 }));
+  assert.ok("error" in _v733({ plunge_depth_in: 0.1438, included_angle_deg: 82, pilot_hole_dia_in: -0.1 }));
+  assert.ok("error" in _v733({ plunge_depth_in: 0.1438, included_angle_deg: 0, pilot_hole_dia_in: 0.25 }));
+  assert.ok("error" in _v733({ plunge_depth_in: 0.1438, included_angle_deg: 180, pilot_hole_dia_in: 0.25 }));
+});
+
 import { computeWheelOffsetBackspacing as _v510 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v510 computeWheelOffsetBackspacing pins the offset->backspacing conversion, the round-trip, and error seams", () => {

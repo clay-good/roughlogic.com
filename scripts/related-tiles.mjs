@@ -198,6 +198,7 @@ const RELATED = {
   "bearing-l10-life": ["bearing-max-load", "vbelt-drive", "shrink-fit", "spur-gear-geometry"],
   "bearing-max-load": ["bearing-l10-life", "vbelt-drive", "shrink-fit", "press-fit-pressure"],
   "countersink-depth": ["drill-point-depth", "tap-drill-size", "cutting-speed-rpm"],
+  "countersink-diameter-from-depth": ["countersink-depth", "drill-point-depth", "tap-drill-size"],
   "keyseat-key-size": ["countersink-depth", "shrink-fit", "press-fit-pressure"],
   "circular-arc": ["bolt-circle", "rolling-offset", "pipe-template-wrap"],
   "circle-from-3-points": ["circular-arc", "bolt-circle", "rolling-offset"],

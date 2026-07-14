@@ -886,7 +886,7 @@ const TOOL_MODULES = (() => {
     // spec-v504 rolling-bearing L10 rating life (ISO 281)
     "bearing-l10-life", "bearing-max-load",
     // spec-v509 countersink diameter and cutting depth
-    "countersink-depth",
+    "countersink-depth", "countersink-diameter-from-depth",
     // spec-v513 shaft key and keyseat size (ANSI B17.1)
     "keyseat-key-size",
   ]);

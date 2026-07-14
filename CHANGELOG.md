@@ -4,6 +4,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(machining): spec-v733 countersink diameter from a plunge depth (countersink-depth inverse); 2026-07-14
+
+- New tile `countersink-diameter-from-depth` (Group K, calc-machining.js): the finished countersink diameter a set plunge
+  depth opens. `D_cs = 2 Z tan(angle/2) + d_hole`. A 0.1438 in plunge with an 82 deg tool and a 0.250 in pilot opens a
+  0.500 in countersink. Round-trips through `countersink-depth`. Home tile count 1,181 -> 1,182.
+
 ### feat(machining): spec-v732 cutter diameter for a spindle RPM (cutting-speed-rpm inverse); 2026-07-14
 
 - New tile `cutting-diameter-for-rpm` (Group K, calc-machining.js): the cutter or work diameter that runs at a target (or

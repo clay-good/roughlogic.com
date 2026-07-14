@@ -17587,6 +17587,31 @@
       "kind": "industry"
     },
     {
+      "term": "countersink diameter from depth",
+      "target": "countersink-diameter-from-depth",
+      "kind": "industry"
+    },
+    {
+      "term": "countersink diameter from plunge",
+      "target": "countersink-diameter-from-depth",
+      "kind": "redirect"
+    },
+    {
+      "term": "diameter from countersink depth",
+      "target": "countersink-diameter-from-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "countersink dia from z",
+      "target": "countersink-diameter-from-depth",
+      "kind": "adjacent"
+    },
+    {
+      "term": "read countersink diameter",
+      "target": "countersink-diameter-from-depth",
+      "kind": "adjacent"
+    },
+    {
       "term": "countersink diameter",
       "target": "countersink-depth",
       "kind": "industry"

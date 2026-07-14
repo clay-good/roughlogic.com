@@ -7999,6 +7999,18 @@ export const CITATIONS = {
       { name: "Hub limits length", value: "a key longer than the hub adds no capacity; the hub length is the effective length", source: "key-stress model" },
     ],
   },
+  "countersink-diameter-from-depth": {
+    formula: "D_cs = 2 x Z x tan(angle/2) + d_hole; cone_dia = 2 x Z x tan(angle/2); the inverse of Z = (D_cs - d_hole) / (2 x tan(angle/2)).",
+    edition: "Countersink diameter-to-depth relation (Machinery's Handbook countersinking; 82 deg inch and 90 deg metric flat-head standards), first-principles trigonometry, by name, solved for the diameter; the tool geometry and the fastener callout govern.",
+    freeAccess: "The countersink depth-to-diameter relation is first-principles cone trigonometry; the depth, angle, and pilot hole come from the setup and the tool.",
+    governance: GOVERNANCE.general,
+    editionNote: "Countersink depth-to-diameter relation, the inverse of the plunge-depth calc. D_cs = 2 x Z x tan(angle/2) + d_hole is the finished (major) diameter the cone opens to at a plunge depth Z below the surface, so a machinist reading a dial or a Z stop can check the diameter the print calls out. A small over-plunge sits a flat-head screw proud or sunken. 82 degree inch flat-head heads and 90 degree metric heads are not interchangeable in the same sink, and a shallower (larger) angle opens a wider diameter for the same depth. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
+    assumptions: [
+      { name: "Depth to diameter", value: "the finished diameter is read back from the plunge depth the machine is set to", source: "Machinery's Handbook" },
+      { name: "Angle standard", value: "82 deg inch flat-head and 90 deg metric are not interchangeable", source: "flat-head fastener standards" },
+      { name: "Angle drives depth", value: "a shallower included angle opens a wider diameter for the same depth", source: "cone geometry" },
+    ],
+  },
   "countersink-depth": {
     formula: "Z = (D_cs - d_hole) / (2 x tan(angle/2)); Z_full = D_cs / (2 x tan(angle/2)).",
     edition: "Countersink diameter-to-depth relation (Machinery's Handbook countersinking; 82 deg inch and 90 deg metric flat-head standards), first-principles trigonometry, by name; the tool geometry and the fastener callout govern.",

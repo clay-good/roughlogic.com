@@ -17296,6 +17296,34 @@
    }
   },
   {
+   "tile_id": "countersink-diameter-from-depth",
+   "source_publisher": "Machinery's Handbook countersinking (solved for the diameter)",
+   "source_title": "0.1438 in plunge, 82 deg inch head, 0.250 in pilot -> 0.500 in countersink diameter",
+   "source_edition_or_year": "spec-v733 worked example (machine-verified)",
+   "source_section_or_page": "spec-v733 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "plunge_depth_in": 0.1438,
+    "included_angle_deg": 82,
+    "pilot_hole_dia_in": 0.25
+   },
+   "outputs": {
+    "countersink_dia_in": {
+     "value": 0.5,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cone_dia_in": {
+     "value": 0.25,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "countersink-depth",
    "source_publisher": "Machinery's Handbook countersinking",
    "source_title": "cross-check: same 0.500 in diameter with a 60 deg tool sinks deeper -> 0.2165 in plunge",

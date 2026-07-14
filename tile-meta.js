@@ -427,6 +427,7 @@ const _TILES = [
   ["bearing-l10-life", "K"], ["bearing-max-load", "K"],
   // spec-v509 countersink diameter and cutting depth
   ["countersink-depth", "K"],
+  ["countersink-diameter-from-depth", "K"],
   // spec-v513 shaft key and keyseat size (ANSI B17.1)
   ["keyseat-key-size", "K"],
 

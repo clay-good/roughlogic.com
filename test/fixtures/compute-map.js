@@ -832,6 +832,7 @@ export const COMPUTE_MAP = {
   "crouch-hp-for-speed": { module: "../../calc-mechanic.js", fn: "computeCrouchHpForSpeed" },
   "def-consumption": { module: "../../calc-trucking.js", fn: "computeDefConsumption" },
   "countersink-depth": { module: "../../calc-machining.js", fn: "computeCountersinkDepth" },
+  "countersink-diameter-from-depth": { module: "../../calc-machining.js", fn: "computeCountersinkDiameterFromDepth" },
   "wheel-offset-backspacing": { module: "../../calc-mechanic.js", fn: "computeWheelOffsetBackspacing" },
   "press-fit-pressure": { module: "../../calc-shop.js", fn: "computePressFitPressure" },
   "press-fit-interference-for-force": { module: "../../calc-shop.js", fn: "computePressFitInterferenceForForce" },

@@ -796,6 +796,60 @@ function renderCountersinkDepth(inputRegion, outputRegion, citationEl) {
 }
 MACHINING_RENDERERS["countersink-depth"] = renderCountersinkDepth;
 
+// ===================== spec-v733: countersink diameter from a plunge depth (inverse of countersink-depth) =====================
+// The forward tile gives the plunge depth from the finished countersink diameter; the inverse recovers the finished
+// (major) diameter a set plunge depth opens, so a machinist checking a dial or a Z stop can read off the diameter.
+// From Z = (D_cs - d_hole) / (2 tan(angle/2)), D_cs = 2 Z tan(angle/2) + d_hole. A shallower (larger) angle opens a
+// wider diameter for the same depth. cone_dia = 2 Z tan(angle/2) is the diameter the plunge alone opens (pilot at zero).
+// dims: in { plunge_depth_in: L, included_angle_deg: dimensionless, pilot_hole_dia_in: L } out: { countersink_dia_in: L, cone_dia_in: L }
+export function computeCountersinkDiameterFromDepth({ plunge_depth_in = 0, included_angle_deg = 82, pilot_hole_dia_in = 0 } = {}) {
+  const _g = _finiteGuard({ plunge_depth_in, included_angle_deg, pilot_hole_dia_in }); if (_g) return _g;
+  const z = Number(plunge_depth_in) || 0;
+  const ang = Number(included_angle_deg) || 0;
+  const dhole = Number(pilot_hole_dia_in) || 0;
+  if (!(z > 0)) return { error: "Plunge depth must be positive (in)." };
+  if (dhole < 0) return { error: "Pilot-hole diameter cannot be negative (in)." };
+  if (!(ang > 0 && ang < 180)) return { error: "Included angle must be between 0 and 180 degrees." };
+  const halfRad = (ang / 2) * Math.PI / 180;
+  const tanHalf = Math.tan(halfRad);
+  const cone_dia_in = 2 * z * tanHalf;
+  const countersink_dia_in = cone_dia_in + dhole;
+  if (![cone_dia_in, countersink_dia_in].every(Number.isFinite)) return { error: "Countersink-diameter math is not a finite value." };
+  return {
+    countersink_dia_in, cone_dia_in,
+    note: "Countersink depth-to-diameter: the machine is set to a plunge DEPTH, but the print calls out the finished (major) DIAMETER -- D_cs = 2 Z tan(angle/2) + d_hole, the diameter the cone opens to at that depth below the surface. A few thousandths of over-plunge sits a flat-head screw proud or buried, so read the diameter back from the actual Z. The included angle is not interchangeable: 82 degrees is the inch flat-head standard and 90 degrees is the metric standard, and a screw and a sink of mismatched angles never seat flush. A shallower (larger) angle opens a wider diameter for the same depth. A setup aid, not the print; the actual tool geometry and the fastener callout govern.",
+  };
+}
+export const countersinkDiameterFromDepthExample = { inputs: { plunge_depth_in: 0.1438, included_angle_deg: 82, pilot_hole_dia_in: 0.25 } };
+function renderCountersinkDiameterFromDepth(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: countersink depth-to-diameter (Machinery's Handbook countersinking) solved for the diameter: D_cs = 2 Z tan(angle/2) + d_hole. 82 deg inch flat-head and 90 deg metric heads are not interchangeable. A setup aid; the tool geometry and the fastener callout govern.";
+  const z = makeNumber("Plunge depth below surface Z (in)", "cdd-z", { step: "any", min: "0" }); z.input.value = "0.1438";
+  const ang = makeSelect("Included angle (deg)", "cdd-ang", [
+    { value: "82", label: "82 (inch flat-head)", selected: true },
+    { value: "90", label: "90 (metric flat-head)" },
+    { value: "100", label: "100 (aircraft flush)" },
+    { value: "120", label: "120" },
+    { value: "60", label: "60 (lathe center)" },
+  ]);
+  const hole = makeNumber("Pilot / through-hole diameter (in)", "cdd-hole", { step: "any", min: "0" }); hole.input.value = "0.25";
+  for (const f of [z, ang, hole]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { z.input.value = "0.1438"; ang.select.value = "82"; hole.input.value = "0.25"; update(); });
+  const oD = makeOutputLine(outputRegion, "Finished countersink diameter D_cs", "cdd-out-d");
+  const oC = makeOutputLine(outputRegion, "Cone diameter from the plunge alone", "cdd-out-c");
+  const oNote = makeOutputLine(outputRegion, "Note", "cdd-out-n");
+  function readNum(i) { if (i.value === "") return 0; const v = Number(i.value); return Number.isFinite(v) ? v : 0; }
+  const update = debounce(() => {
+    const r = computeCountersinkDiameterFromDepth({ plunge_depth_in: readNum(z.input), included_angle_deg: Number(ang.select.value), pilot_hole_dia_in: readNum(hole.input) });
+    if (r.error) { oD.textContent = r.error; oC.textContent = "-"; oNote.textContent = ""; return; }
+    oD.textContent = fmt(r.countersink_dia_in, 4) + " in";
+    oC.textContent = fmt(r.cone_dia_in, 4) + " in";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [z, hole]) f.input.addEventListener("input", update);
+  ang.select.addEventListener("change", update);
+}
+MACHINING_RENDERERS["countersink-diameter-from-depth"] = renderCountersinkDiameterFromDepth;
+
 // ===================== spec-v513: shaft key and keyseat size (ANSI B17.1) =====================
 // ANSI B17.1 standard square-key width by shaft-diameter band (upper bound inclusive, in).
 const _B17_1_KEY_BANDS = [
