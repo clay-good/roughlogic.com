@@ -27842,6 +27842,26 @@
       "kind": "question"
     },
     {
+      "term": "fineness modulus",
+      "target": "fineness-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "sand fineness modulus from sieve analysis",
+      "target": "fineness-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "astm c33 concrete sand gradation",
+      "target": "fineness-modulus",
+      "kind": "industry"
+    },
+    {
+      "term": "how coarse is my concrete sand",
+      "target": "fineness-modulus",
+      "kind": "question"
+    },
+    {
       "term": "total head from pressure velocity and elevation",
       "target": "bernoulli-head",
       "kind": "question"

@@ -11572,6 +11572,17 @@ export const CITATIONS = {
       { name: "Saturation", value: "S = w Gs/e; gamma_w = 62.4 pcf fresh water, Gs ~ 2.65-2.72", source: "soil mechanics" },
     ],
   },
+  "fineness-modulus": {
+    formula: "FM = (cumulative % retained on #4 + #8 + #16 + #30 + #50 + #100) / 100.",
+    edition: "Aggregate fineness modulus (ASTM C136 sieve analysis; ASTM C125 definition; ASTM C33 concrete-sand limits), by name; the sieve analysis and the mix design govern.",
+    freeAccess: "FM is a defined sum of published standard-sieve retained percentages; the values come from the C136 sieve analysis of the sample.",
+    governance: GOVERNANCE.general,
+    editionNote: "Fineness modulus (ASTM C136 / C125) = the sum of the cumulative percent retained on the standard sieves, divided by 100 -- a single number capturing how coarse a sand is (a higher FM is coarser). For fine aggregate the contributing sieves are #4, #8, #16, #30, #50, and #100; coarser sieves retain essentially none of a sand and add 0. ASTM C33 holds concrete sand to an FM of 2.3-3.1, and the sand a mix was designed for should not drift more than 0.20 from batch to batch without a mix adjustment, because a coarser sand needs less paste and a finer one needs more water for the same slump. It is a gradation summary, not the full sieve analysis -- it does not check whether each sieve meets its C33 grading band, and two different gradations can share an FM. A QC / mix-proportioning aid, not a full gradation acceptance.",
+    assumptions: [
+      { name: "Contributing sieves", value: "fine-aggregate FM sums the cumulative % retained on #4, #8, #16, #30, #50, #100 (coarser sieves add 0 for a sand)", source: "ASTM C125" },
+      { name: "C33 band", value: "concrete sand FM 2.3-3.1; drift limited to 0.20 without a mix adjustment", source: "ASTM C33" },
+    ],
+  },
   "atterberg-indices": {
     formula: "PI = LL - PL; LI = (w - PL)/PI; A-line PI = 0.73(LL - 20); above A-line -> clay (CL/CH), below -> silt (ML/MH), split at LL = 50.",
     edition: "The Atterberg-limit indices (plasticity index, liquidity index) and the USCS A-line classification, with the ASTM D4318 limit tests, by name.",

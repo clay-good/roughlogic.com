@@ -798,6 +798,7 @@ export const COMPUTE_MAP = {
   "climb-gradient-roc": { module: "../../calc-mechanic.js", fn: "computeClimbGradientRoc" },
   "concrete-yield": { module: "../../calc-construction.js", fn: "computeConcreteYield" },
   "glass-weight": { module: "../../calc-finish.js", fn: "computeGlassWeight" },
+  "fineness-modulus": { module: "../../calc-earthwork.js", fn: "computeFinenessModulus" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

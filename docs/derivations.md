@@ -1755,6 +1755,7 @@ cross-check.
 | calc-drainage.js | `computeSumpBasinSizing` | `{ basin_dia, drawdown_in, inflow_gpm, pump_gpm, min_run_s = 60 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeAtterbergIndices` | `{ ll = 0, pl = 0, w_pct = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeDewateringRate` | `{ pit_len_ft, pit_wid_ft, drawdown_ft = 0, drawdown_min, inflow_gpm = 0, safe...` | _ | _ | _ |
+| calc-earthwork.js | `computeFinenessModulus` | `{ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}` | _ | _ | _ |
 | calc-earthwork.js | `computeHaulCycleProduction` | `{ truck_cap_lcy, load_min, haul_min = 0, dump_min = 0, return_min = 0, spot_m...` | _ | _ | _ |
 | calc-earthwork.js | `computePipeBeddingBackfill` | `{ trench_width_ft, pipe_od_in, bedding_depth_in = 0, cover_ft = 0, length_ft,...` | _ | _ | _ |
 | calc-earthwork.js | `computeRelativeCompaction` | `{ wet_pcf = 0, w_pct = 0, max_pcf = 0, spec_pct = 95 } = {}` | _ | _ | _ |
@@ -2908,7 +2909,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1494.
+Row count: 1495.
 
 <!-- END function-corpus-v14 -->
 
@@ -3454,7 +3455,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (262 tiles)
+### Group E Construction (263 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3535,6 +3536,7 @@ per spec-v14 §13.1 second paragraph.
 | `fastener-pullout` | Nail and Screw Pull-Out | Project (public fastener-engineering ...; 16d common nail (D=0.162 in) in DF-L (G=0.50), 1.5 in pen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fence-estimate` | Fence Material Takeoff | Standard fence-layout identities.; spec-v94 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `fillet-weld-strength` | Fillet Weld Strength and Size | AWS D1.1 / AISC 360 §J2 (by name); 1/4 in E70 fillet, 6 in long, ASD -> throat 0.1768 in, 21... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `fineness-modulus` | Aggregate Fineness Modulus (ASTM C136) | ASTM C136 / C125 (aggregate fineness ...; cumulative retained 2/12/32/57/82/95 -> sum 280 -> FM 2.8... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `flooring-takeoff` | Resilient / LVP Flooring Takeoff | Published flooring waste rules of thu...; spec-v95 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-area` | Footing Area for Soil Bearing | Project (first-principles); ASCE 7 / IRC R401 conceptual basis; bundled allowable bea... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `footing-eccentric-pressure` | Eccentric Footing Bearing Pressure and Kern Check | Eccentric footing bearing pressure (k...; spec-v309 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -4341,6 +4343,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1247. Fixture-covered or reference-cadence: 1247 / 1247.
+Tile count: 1248. Fixture-covered or reference-cadence: 1248 / 1248.
 
 <!-- END tile-index-v14 -->

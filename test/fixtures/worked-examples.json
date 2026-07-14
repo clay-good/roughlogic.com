@@ -24522,6 +24522,31 @@
    }
   },
   {
+   "tile_id": "fineness-modulus",
+   "source_publisher": "ASTM C136 / C125 (aggregate fineness modulus)",
+   "source_title": "FM = sum of cumulative % retained on #4,#8,#16,#30,#50,#100 / 100",
+   "source_edition_or_year": "spec-v799 worked example (machine-verified)",
+   "source_section_or_page": "cumulative retained 2/12/32/57/82/95 -> sum 280 -> FM 2.80 (ASTM C33 band 2.3-3.1)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "r4": 2,
+    "r8": 12,
+    "r16": 32,
+    "r30": 57,
+    "r50": 82,
+    "r100": 95
+   },
+   "outputs": {
+    "fm": {
+     "value": 2.80,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "glass-weight",
    "source_publisher": "NGA Glazing Manual glass-weight table; ASTM C1036",
    "source_title": "weight = 156.1 lb/ft3 x area_ft2 x thickness_in/12 (~13.0 lb/ft2 per inch)",

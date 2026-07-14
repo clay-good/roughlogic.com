@@ -479,3 +479,49 @@ function _v328renderAtterbergIndices(inputRegion, outputRegion, citationEl) {
   for (const f of [ll, pl, w]) f.input.addEventListener("input", update);
 }
 EARTHWORK_RENDERERS["atterberg-indices"] = _v328renderAtterbergIndices;
+
+// ===================== spec-v799: aggregate fineness modulus (ASTM C136/C125) =====================
+// FM = sum of the cumulative percent retained on the standard sieves / 100. For fine aggregate the
+// contributing sieves are #4, #8, #16, #30, #50, #100 (coarser sieves retain ~0% of a sand).
+// dims: in { r4: dimensionless, r8: dimensionless, r16: dimensionless, r30: dimensionless, r50: dimensionless, r100: dimensionless } out: { fm: dimensionless }
+export function computeFinenessModulus({ r4 = 0, r8 = 0, r16 = 0, r30 = 0, r50 = 0, r100 = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const vals = [Number(r4), Number(r8), Number(r16), Number(r30), Number(r50), Number(r100)];
+  if (!vals.every(Number.isFinite)) return { error: "Enter valid cumulative percent-retained values." };
+  if (!vals.every((v) => v >= 0 && v <= 100)) return { error: "Each cumulative percent retained must be between 0 and 100." };
+  for (let i = 1; i < vals.length; i++) {
+    if (vals[i] < vals[i - 1]) return { error: "Cumulative percent retained must not decrease from the coarse (#4) to the fine (#100) sieve." };
+  }
+  const fm = vals.reduce((a, b) => a + b, 0) / 100;
+  if (!Number.isFinite(fm)) return { error: "Fineness-modulus math is not a finite value." };
+  let band;
+  if (fm < 2.3) band = "fine sand (below the ASTM C33 2.3-3.1 concrete-sand band -- more paste/water demand)";
+  else if (fm <= 3.1) band = "within the ASTM C33 concrete-sand band (2.3-3.1)";
+  else band = "coarse sand (above the ASTM C33 2.3-3.1 band -- harsh, less workable mix)";
+  return {
+    fm, band,
+    note: "Fineness modulus (ASTM C136 / C125) = the sum of the cumulative percent retained on the standard sieves, divided by 100 -- a single number that captures how coarse or fine a sand is (a higher FM is coarser). For fine aggregate the contributing sieves are #4, #8, #16, #30, #50, and #100; coarser sieves retain essentially none of a sand, so they add 0. ASTM C33 holds concrete sand to an FM of 2.3-3.1, and the sand a mix was designed for should not drift more than 0.20 from batch to batch without a mix adjustment, because a coarser sand (higher FM) needs less paste and a finer one needs more water for the same slump. It is a gradation SUMMARY, not the full sieve analysis -- it does not check whether each sieve meets its C33 grading band, and two very different gradations can share an FM. A QC / mix-proportioning aid; the sieve analysis and the mix design govern.",
+  };
+}
+export const finenessModulusExample = { inputs: { r4: 2, r8: 12, r16: 32, r30: 57, r50: 82, r100: 95 } };
+
+function _v799renderFinenessModulus(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: aggregate fineness modulus (ASTM C136 sieve analysis / C125 definition): FM = sum of the cumulative percent retained on the #4, #8, #16, #30, #50, #100 sieves / 100. ASTM C33 holds concrete sand to FM 2.3-3.1, and it should not drift more than 0.20 without a mix adjustment. A gradation summary, not the full sieve check. A QC aid; the sieve analysis and mix design govern.";
+  const defs = [["r4", "Cumulative % retained, #4"], ["r8", "#8"], ["r16", "#16"], ["r30", "#30"], ["r50", "#50"], ["r100", "#100"]];
+  const fields = {};
+  for (const [key, label] of defs) { fields[key] = makeNumber(label, "fm-" + key, { step: "any", min: "0", max: "100" }); inputRegion.appendChild(fields[key].wrap); }
+  attachExampleButton(inputRegion, () => { fields.r4.input.value = "2"; fields.r8.input.value = "12"; fields.r16.input.value = "32"; fields.r30.input.value = "57"; fields.r50.input.value = "82"; fields.r100.input.value = "95"; update(); });
+  const oFm = makeOutputLine(outputRegion, "Fineness modulus", "fm-out-fm");
+  const oBand = makeOutputLine(outputRegion, "Against ASTM C33", "fm-out-band");
+  const oNote = makeOutputLine(outputRegion, "Note", "fm-out-note");
+  const update = debounce(() => {
+    const args = {}; for (const [key] of defs) args[key] = Number(fields[key].input.value) || 0;
+    const r = computeFinenessModulus(args);
+    if (r.error) { oFm.textContent = r.error; oBand.textContent = "-"; oNote.textContent = "-"; return; }
+    oFm.textContent = fmt(r.fm, 2);
+    oBand.textContent = r.band;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const [key] of defs) fields[key].input.addEventListener("input", update);
+}
+EARTHWORK_RENDERERS["fineness-modulus"] = _v799renderFinenessModulus;

@@ -515,6 +515,7 @@ const _TILES = [
   ["climb-gradient-roc", "K"],
   ["concrete-yield", "E"],
   ["glass-weight", "E"],
+  ["fineness-modulus", "E"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

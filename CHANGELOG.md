@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v799 aggregate fineness modulus (ASTM C136); 2026-07-14
+
+- New tile `fineness-modulus` (Group E, calc-earthwork.js): the single number that captures how coarse a sand is for
+  concrete mix proportioning. `FM = sum of the cumulative % retained on the #4, #8, #16, #30, #50, #100 sieves / 100`.
+  Cumulative retained 2/12/32/57/82/95 -> FM 2.80, within the ASTM C33 concrete-sand band of 2.3-3.1. A higher FM is
+  coarser (less paste); drift beyond 0.20 needs a mix adjustment. Validates the cumulative-retained monotonicity. Fuzzer
+  pins the FM sum, the coarser-is-higher direction, and the error seams (out-of-range, non-monotonic). Explore sweep #23
+  entry 3. Home count 1,247 -> 1,248.
+
 ### feat(carpentry): spec-v798 flat glass lite weight; 2026-07-14
 
 - New tile `glass-weight` (Group E, calc-finish.js): the weight of a glass lite for a safe lift. Soda-lime float glass is

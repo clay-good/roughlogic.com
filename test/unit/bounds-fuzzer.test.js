@@ -21701,6 +21701,20 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
+import { computeFinenessModulus as _v799 } from "../../calc-earthwork.js";
+
+test("bounds: spec-v799 computeFinenessModulus pins the FM sum, the C33 band, and error seams", () => {
+  const r = _v799({ r4: 2, r8: 12, r16: 32, r30: 57, r50: 82, r100: 95 });
+  assert.ok(Math.abs(r.fm - 2.80) < 1e-9); // 280 / 100
+  // A coarser sand (higher retained) raises the FM.
+  assert.ok(_v799({ r4: 5, r8: 25, r16: 50, r30: 72, r50: 90, r100: 98 }).fm > r.fm);
+  // Error seams: non-finite, out-of-[0,100], and non-monotonic (finer sieve retains less than a coarser one).
+  assert.ok("error" in _v799({ r4: Infinity, r8: 12, r16: 32, r30: 57, r50: 82, r100: 95 }));
+  assert.ok("error" in _v799({ r4: 2, r8: 12, r16: 32, r30: 57, r50: 82, r100: 120 }));
+  assert.ok("error" in _v799({ r4: 2, r8: 12, r16: 32, r30: 57, r50: 82, r100: -5 }));
+  assert.ok("error" in _v799({ r4: 2, r8: 12, r16: 32, r30: 20, r50: 82, r100: 95 })); // r30 < r16
+});
+
 import { computeGlassWeight as _v798 } from "../../calc-finish.js";
 
 test("bounds: spec-v798 computeGlassWeight pins the lite weight, per-sqft, two-person flag, and error seams", () => {
