@@ -48767,6 +48767,31 @@
       "kind": "question"
     },
     {
+      "term": "concrete yield",
+      "target": "concrete-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "relative yield astm c138",
+      "target": "concrete-yield",
+      "kind": "industry"
+    },
+    {
+      "term": "did the concrete truck short me",
+      "target": "concrete-yield",
+      "kind": "question"
+    },
+    {
+      "term": "concrete unit weight to cubic yards",
+      "target": "concrete-yield",
+      "kind": "question"
+    },
+    {
+      "term": "actual cement content per yard",
+      "target": "concrete-yield",
+      "kind": "question"
+    },
+    {
       "term": "how many bags of insulation for a wall",
       "target": "insulation-batt-coverage",
       "kind": "question"

@@ -12916,6 +12916,17 @@ export const CITATIONS = {
       { name: "Supplier governs", value: "truck size, minimum, and short-load/standby fees are the supplier's", source: "scope of this tile" },
     ],
   },
+  "concrete-yield": {
+    formula: "yield_ft3 = total_batch_mass_lb / measured_unit_weight_lb_ft3; yield_yd3 = yield_ft3 / 27; relative_yield = yield_yd3 / design_volume_yd3; cement_content_lb_yd3 = cement_mass_lb / yield_yd3.",
+    edition: "ASTM C138 / AASHTO T121 (Density (Unit Weight), Yield, and Air Content of Concrete); ACI 211.1, by name; the mix design, the C138 measurement, and the mix producer govern.",
+    freeAccess: "The yield = mass / density mass balance is first-principles; the batch weights come from the ticket and the unit weight from the C138 measurement.",
+    governance: GOVERNANCE.general,
+    editionNote: "ASTM C138 concrete yield: the volume a batch actually makes is its total mass divided by the measured fresh unit weight (density), and the relative yield is that over the design volume. A relative yield below 1.0 means the load ran short -- the concrete is denser than designed (low air, heavy or extra aggregate, too little water), so the customer got fewer cubic yards than ordered and the actual cement content per yard is higher than the mix design. Above 1.0 is over-yield -- lighter or higher-air concrete diluting the cement content, which can cost strength. A relative yield within about 1% of 1.0 is a good, honest batch. The unit weight must be measured per C138 (a rodded, struck-off known-volume measure), not estimated. This checks the batch's volume and cement content, not its air content (which needs the theoretical density from the material specific gravities) or its strength. A QC check, not a mix design.",
+    assumptions: [
+      { name: "Yield is mass / density", value: "the produced volume = total batch mass / the measured fresh unit weight (C138)", source: "ASTM C138" },
+      { name: "Relative yield reading", value: "below 1.0 = short / denser (more cement per yard); above 1.0 = over-yield / lighter (cement diluted)", source: "ASTM C138" },
+    ],
+  },
   "insulation-batt-coverage": {
     formula: "net = area x (1 + waste%); batts = ceil(net / coverage_per_batt); bags = ceil(net / coverage_per_bag).",
     edition: "Batt insulation takeoff from the manufacturer's label coverage per batt and per bag, by name.",

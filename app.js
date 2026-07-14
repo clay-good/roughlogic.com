@@ -463,7 +463,7 @@ const TOOL_MODULES = (() => {
     // spec-v476 maturity method (the v247 follow-on).
     "concrete-maturity",
     // spec-v430..v431 concrete field-work (v429 cut as dupe)
-    "rebar-weight-takeoff", "ready-mix-concrete-order",
+    "rebar-weight-takeoff", "ready-mix-concrete-order", "concrete-yield",
     // spec-v439..v440 finish-carpentry takeoff (v438 cut as dupe)
     "insulation-batt-coverage", "trim-linear-footage",
     "glulam-volume-factor",

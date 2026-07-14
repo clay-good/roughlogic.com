@@ -24522,6 +24522,41 @@
    }
   },
   {
+   "tile_id": "concrete-yield",
+   "source_publisher": "ASTM C138 / AASHTO T121 (concrete yield)",
+   "source_title": "yield_ft3 = total_batch_mass / measured_unit_weight; relative_yield = yield_yd3 / design",
+   "source_edition_or_year": "spec-v797 worked example (machine-verified)",
+   "source_section_or_page": "3993 lb batch at 148 lb/ft3, 1.0 yd3 design, 564 lb cement -> 0.999 yd3, Ry 0.999, 564.4 lb/yd3",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "total_batch_mass_lb": 3993,
+    "measured_unit_weight_lb_ft3": 148.0,
+    "design_volume_yd3": 1.0,
+    "cement_mass_lb": 564
+   },
+   "outputs": {
+    "yield_yd3": {
+     "value": 0.9992,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "relative_yield": {
+     "value": 0.9992,
+     "tolerance": {
+      "abs": 0.001
+     }
+    },
+    "cement_content_lb_yd3": {
+     "value": 564.4,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "climb-gradient-roc",
    "source_publisher": "FAA TERPS / AIM (departure climb gradient)",
    "source_title": "roc_fpm = climb_gradient_ft_per_nm x ground_speed_kt / 60",

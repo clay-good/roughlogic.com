@@ -796,6 +796,7 @@ export const COMPUTE_MAP = {
   "glidepath-descent-rate": { module: "../../calc-mechanic.js", fn: "computeGlidepathDescentRate" },
   "turn-radius-bank": { module: "../../calc-mechanic.js", fn: "computeTurnRadiusBank" },
   "climb-gradient-roc": { module: "../../calc-mechanic.js", fn: "computeClimbGradientRoc" },
+  "concrete-yield": { module: "../../calc-construction.js", fn: "computeConcreteYield" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

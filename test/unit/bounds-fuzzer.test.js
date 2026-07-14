@@ -21701,6 +21701,28 @@ test("bounds: spec-v792 computeCompressorDisplacement pins swept volume, CFM, mo
   assert.ok("error" in _v792({ bore_in: 2.0, stroke_in: 1.5, cylinders: 4, rpm: 0 }));
 });
 
+import { computeConcreteYield as _v797 } from "../../calc-construction.js";
+
+test("bounds: spec-v797 computeConcreteYield pins yield, relative yield, cement content, short-flag, and error seams", () => {
+  const r = _v797({ total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 148.0, design_volume_yd3: 1.0, cement_mass_lb: 564 });
+  assert.ok(Math.abs(r.yield_yd3 - 0.99925) < 0.001); // 3993/148/27
+  assert.ok(Math.abs(r.relative_yield - 0.99925) < 0.001);
+  assert.ok(Math.abs(r.cement_content_lb_yd3 - 564.4) < 0.5); // 564 / yield_yd3
+  assert.strictEqual(r.short, true); // Ry < 1
+  // A lower unit weight yields more volume (over-yield) and dilutes cement; cement 0 -> null content.
+  const light = _v797({ total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 145.0, design_volume_yd3: 1.0, cement_mass_lb: 564 });
+  assert.ok(light.relative_yield > 1);
+  assert.strictEqual(light.short, false);
+  assert.ok(light.cement_content_lb_yd3 < r.cement_content_lb_yd3);
+  assert.strictEqual(_v797({ total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 148, design_volume_yd3: 1, cement_mass_lb: 0 }).cement_content_lb_yd3, null);
+  // Error seams: non-finite, non-positive mass/unit-weight/design, negative cement.
+  assert.ok("error" in _v797({ total_batch_mass_lb: Infinity, measured_unit_weight_lb_ft3: 148, design_volume_yd3: 1 }));
+  assert.ok("error" in _v797({ total_batch_mass_lb: 0, measured_unit_weight_lb_ft3: 148, design_volume_yd3: 1 }));
+  assert.ok("error" in _v797({ total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 0, design_volume_yd3: 1 }));
+  assert.ok("error" in _v797({ total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 148, design_volume_yd3: 0 }));
+  assert.ok("error" in _v797({ total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 148, design_volume_yd3: 1, cement_mass_lb: -1 }));
+});
+
 import { computeClimbGradientRoc as _v796 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v796 computeClimbGradientRoc pins ROC, the gradient percent, monotonicity, and error seams", () => {

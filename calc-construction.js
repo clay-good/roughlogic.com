@@ -7144,3 +7144,49 @@ const _v553renderSnowUnbalancedGable = _simpleRenderer({
   compute: computeSnowUnbalancedGable,
 });
 CONSTRUCTION_RENDERERS["snow-unbalanced-gable"] = _v553renderSnowUnbalancedGable;
+
+// ===================== spec-v797: concrete yield, relative yield, cement content (ASTM C138) =====================
+// Mass conservation: the batched materials have a fixed total mass; the fresh unit weight (density) is
+// measured per ASTM C138, so the volume actually produced is total mass / density. Relative yield compares
+// that to the design volume, and the actual cement content is the batched cement over the produced yards.
+// dims: in { total_batch_mass_lb: M, measured_unit_weight_lb_ft3: M L^-3, design_volume_yd3: L^3, cement_mass_lb: M } out: { yield_ft3: L^3, yield_yd3: L^3, relative_yield: dimensionless, cement_content_lb_yd3: M L^-3 }
+export function computeConcreteYield({ total_batch_mass_lb = 0, measured_unit_weight_lb_ft3 = 0, design_volume_yd3 = 0, cement_mass_lb = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const mass = Number(total_batch_mass_lb) || 0;
+  const uw = Number(measured_unit_weight_lb_ft3) || 0;
+  const design = Number(design_volume_yd3) || 0;
+  const cement = Number(cement_mass_lb) || 0;
+  if (!(mass > 0)) return { error: "Total batch mass must be positive (lb)." };
+  if (!(uw > 0)) return { error: "Measured unit weight must be positive (lb/ft^3)." };
+  if (!(design > 0)) return { error: "Design (batched) volume must be positive (yd^3)." };
+  if (cement < 0) return { error: "Cement mass cannot be negative (lb)." };
+  const yield_ft3 = mass / uw;
+  const yield_yd3 = yield_ft3 / 27;
+  const relative_yield = yield_yd3 / design;
+  const cement_content_lb_yd3 = cement > 0 ? cement / yield_yd3 : null;
+  if (![yield_ft3, yield_yd3, relative_yield].every(Number.isFinite)) return { error: "Concrete-yield math is not a finite value." };
+  const short = relative_yield < 1;
+  return {
+    yield_ft3, yield_yd3, relative_yield, cement_content_lb_yd3, short,
+    note: "ASTM C138 concrete yield: the volume a batch actually makes is its total mass divided by the measured fresh unit weight (density), and the relative yield is that over the design volume. A relative yield BELOW 1.0 means the load ran short -- the concrete is denser than designed (low air, heavy or extra aggregate, too little water), so the customer got fewer cubic yards than ordered and the actual cement content per yard is HIGHER than the mix design. Above 1.0 is over-yield -- lighter or higher-air concrete diluting the cement content, which can cost strength. A relative yield within about 1% of 1.0 is a good, honest batch. The unit weight must be measured per C138 (a rodded, struck-off known-volume measure), not estimated. This checks the batch's volume and cement content, not its air content (which needs the theoretical density from the material specific gravities) or its strength. A QC check; the mix design, the C138 measurement, and the mix producer govern.",
+  };
+}
+export const concreteYieldExample = { inputs: { total_batch_mass_lb: 3993, measured_unit_weight_lb_ft3: 148.0, design_volume_yd3: 1.0, cement_mass_lb: 564 } };
+const _v797renderConcreteYield = _simpleRenderer({
+  citation: "Citation: ASTM C138 / AASHTO T121 concrete yield: yield(ft^3) = total batch mass / measured unit weight; yield(yd^3) = yield/27; relative yield = yield / design volume; actual cement content = cement batched / yield(yd^3). Relative yield below 1.0 = short load (denser than designed, more cement per yard); above 1.0 = over-yield (lighter/high-air, cement diluted). Unit weight measured per C138. A QC check; the mix design and the measurement govern.",
+  example: concreteYieldExample.inputs,
+  fields: [
+    { key: "total_batch_mass_lb", label: "Total batch mass (lb, sum of all materials)", kind: "number", default: 3993 },
+    { key: "measured_unit_weight_lb_ft3", label: "Measured fresh unit weight (lb/ft^3, per C138)", kind: "number", default: 148 },
+    { key: "design_volume_yd3", label: "Design (batched) volume (yd^3)", kind: "number", default: 1 },
+    { key: "cement_mass_lb", label: "Cementitious in the batch (lb, 0 to skip)", kind: "number", default: 564 },
+  ],
+  outputs: [
+    { key: "y", id: "cyld-out-y", label: "Yield produced", value: (r) => fmt(r.yield_yd3, 3) + " yd^3 (" + fmt(r.yield_ft3, 2) + " ft^3)" },
+    { key: "r", id: "cyld-out-r", label: "Relative yield", value: (r) => fmt(r.relative_yield, 3) + (r.short ? " -- SHORT load (denser than designed)" : (r.relative_yield > 1.01 ? " -- over-yield (light / high air)" : " -- on target") ) },
+    { key: "c", id: "cyld-out-c", label: "Actual cement content", value: (r) => r.cement_content_lb_yd3 === null ? "(enter cementitious mass)" : fmt(r.cement_content_lb_yd3, 1) + " lb/yd^3" },
+    { key: "n", id: "cyld-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteYield,
+});
+CONSTRUCTION_RENDERERS["concrete-yield"] = _v797renderConcreteYield;

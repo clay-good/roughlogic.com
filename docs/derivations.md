@@ -1569,6 +1569,7 @@ cross-check.
 | calc-construction.js | `computeConcreteMixDesign` | `{ strength_psi = 3000, exposure = "interior", max_aggregate_in = 1, slump_in ...` | _ | _ | _ |
 | calc-construction.js | `computeConcreteStrengthGain` | `{ fc28 = 0, age_days = 0, a = 4.0, b = 0.85, target_pct = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeConcreteVolume` | `{ shape, waste_factor = 0.10, ...d }` | _ | _ | _ |
+| calc-construction.js | `computeConcreteYield` | `{ total_batch_mass_lb = 0, measured_unit_weight_lb_ft3 = 0, design_volume_yd3...` | _ | _ | _ |
 | calc-construction.js | `computeControlJointSpacing` | `{ slab_thickness_in = 0, spacing_factor = 2.5, max_spacing_ft = 18, slab_leng...` | _ | _ | _ |
 | calc-construction.js | `computeCraneLiftCheck` | `{ load_lb = 0, rigging_lb = 0, block_lb = 0, jib_deduct_lb = 0, sling_legs = ...` | _ | _ | _ |
 | calc-construction.js | `computeDeckBeamPost` | `{ joist_span_ft = 0, beam_span_ft = 0, post_height_ft = 8, live_load_psf = 40...` | _ | _ | _ |
@@ -2906,7 +2907,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1492.
+Row count: 1493.
 
 <!-- END function-corpus-v14 -->
 
@@ -3452,7 +3453,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (260 tiles)
+### Group E Construction (261 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3508,6 +3509,7 @@ per spec-v14 §13.1 second paragraph.
 | `concrete-strength-from-rupture` | Concrete f'c from Modulus of Rupture (ACI 318-19 19.2.3) | ACI 318-19 19.2.3; fr 474.342 psi, lambda 1.0 -> ~4,000 psi | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `concrete-strength-gain` | Concrete Age-Strength Gain for Form Stripping (ACI 209) | ACI 209R strength-development model; spec-v247 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `concrete-torsion-threshold` | Concrete Threshold and Cracking Torsion (ACI 318-19 22.7) | ACI 318-19 §22.7; spec-v447 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `concrete-yield` | Concrete Yield and Relative Yield (ASTM C138) | ASTM C138 / AASHTO T121 (concrete yield); 3993 lb batch at 148 lb/ft3, 1.0 yd3 design, 564 lb cemen... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `consolidation-degree` | Consolidation Degree from Elapsed Time (Terzaghi) | Terzaghi consolidation theory (invert...; spec-v645 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `consolidation-time-rate` | Consolidation Time Rate (Terzaghi) | Terzaghi consolidation theory; spec-v414 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `control-joint-spacing` | Concrete Control Joint Spacing | ACI 302.1R / 360R slab-on-ground guid...; spec-v96 section 2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4337,6 +4339,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1245. Fixture-covered or reference-cadence: 1245 / 1245.
+Tile count: 1246. Fixture-covered or reference-cadence: 1246 / 1246.
 
 <!-- END tile-index-v14 -->

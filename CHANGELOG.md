@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(concrete): spec-v797 concrete yield and relative yield (ASTM C138); 2026-07-14
+
+- New tile `concrete-yield` (Group E, calc-construction.js): whether a load delivered the yards ordered, from the batch
+  weights and the measured fresh unit weight. `yield = total batch mass / unit weight`, `relative yield = yield / design
+  volume`, `actual cement content = cement / yield`. A 3,993 lb batch at 148 lb/ft^3 makes 0.999 yd^3 (564 lb/yd^3
+  cement). Relative yield below 1.0 = short load (denser, more cement per yard); above 1.0 = over-yield (lighter/high-air,
+  cement diluted, strength at risk). Fuzzer pins the yield, relative yield, cement content, the short flag, and the error
+  seams. First tile of Explore sweep #23. Home count 1,245 -> 1,246.
+
 ### feat(mechanic): spec-v796 climb gradient to rate of climb; 2026-07-14
 
 - New tile `climb-gradient-roc` (Group K, calc-mechanic.js aviation): reconciles a departure's climb gradient (feet per
