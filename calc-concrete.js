@@ -573,6 +573,41 @@ CONCRETE_RENDERERS["concrete-elastic-modulus"] = _simpleRenderer({
   compute: computeConcreteElasticModulus,
 });
 
+// concrete-strength-from-modulus: inverse of concrete-elastic-modulus. The forward
+// tile gives Ec from f'c; backing out the in-place strength from a measured (or
+// specified) stiffness is the inverse: Ec = wc^1.5 x 33 x sqrt(f'c), so
+// f'c = (Ec / (wc^1.5 x 33))^2.
+// dims: in { ec_psi: M L^-1 T^-2, wc_pcf: M L^-3 } out: { fc_psi: M L^-1 T^-2, fc_ksi: M L^-1 T^-2 }
+export function computeConcreteStrengthFromModulus({ ec_psi = 0, wc_pcf = 145 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const ec = Number(ec_psi) || 0;
+  const wc = Number(wc_pcf) || 0;
+  if (!(ec > 0)) return { error: "Elastic modulus Ec must be positive (psi)." };
+  if (!(wc > 0)) return { error: "Unit weight wc must be positive (pcf)." };
+  const root = ec / (Math.pow(wc, 1.5) * 33);
+  const fc_psi = root * root;
+  const out_of_band = wc < 90 || wc > 160;
+  return {
+    fc_psi, fc_ksi: fc_psi / 1000, out_of_band,
+    note: "ACI 318-19 §19.2.2.1(a) Ec = wc^1.5 x 33 x sqrt(f'c) solved for the strength: f'c = (Ec / (wc^1.5 x 33))^2. Useful for backing out the equivalent in-place f'c from a resonance / sonic modulus test or a specified stiffness. The relation is valid for 90 <= wc <= 160 pcf; the in-place modulus scatters with aggregate and mix, so this is an equivalent strength, not a cylinder-break value. A design aid; the engineer of record's stamped design governs.",
+  };
+}
+export const concreteStrengthFromModulusExample = { inputs: { ec_psi: 3644147, wc_pcf: 145 } };
+CONCRETE_RENDERERS["concrete-strength-from-modulus"] = _simpleRenderer({
+  citation: "Citation: ACI 318-19 §19.2.2.1(a) Ec = wc^1.5 x 33 x sqrt(f'c) solved for f'c = (Ec / (wc^1.5 x 33))^2, by name. Backs out an equivalent in-place strength from a measured or specified modulus; the in-place modulus scatters with aggregate and mix, so this is not a cylinder-break value. A design aid, not a substitute for the engineer of record.",
+  example: concreteStrengthFromModulusExample.inputs,
+  fields: [
+    { key: "ec_psi", label: "Elastic modulus Ec (psi)", kind: "number", default: 3644147 },
+    { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number", default: 145 },
+  ],
+  outputs: [
+    { key: "fc", id: "csm-out-fc", label: "Equivalent strength f'c", value: (r) => fmt(r.fc_psi, 0) + " psi (" + fmt(r.fc_ksi, 2) + " ksi)" },
+    { key: "ob", id: "csm-out-ob", label: "Unit-weight range", value: (r) => r.out_of_band ? "OUT OF BAND (wc outside 90-160 pcf; ACI eq. not applicable)" : "within ACI 90-160 pcf" },
+    { key: "n", id: "csm-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeConcreteStrengthFromModulus,
+});
+
 // dims: in { fc_psi: M L^-1 T^-2, lambda: dimensionless } out: { fr_psi: M L^-1 T^-2, fr_fraction: dimensionless }
 export function computeConcreteModulusOfRupture({ fc_psi = 4000, lambda = 1.0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

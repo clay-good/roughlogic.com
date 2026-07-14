@@ -42819,6 +42819,27 @@
    }
   },
   {
+   "tile_id": "concrete-strength-from-modulus",
+   "source_publisher": "ACI 318-19 19.2.2",
+   "source_title": "f'c = (Ec / (wc^1.5 x 33))^2; inverse of the modulus of elasticity",
+   "source_edition_or_year": "spec-v708 worked example (machine-verified; inverse of spec-v378)",
+   "source_section_or_page": "Ec 3,644,147 psi at 145 pcf -> ~4,000 psi",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "ec_psi": 3644147,
+    "wc_pcf": 145
+   },
+   "outputs": {
+    "fc_psi": {
+     "value": 4000,
+     "tolerance": {
+      "pct": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "concrete-elastic-modulus",
    "source_publisher": "ACI 318-19 19.2.2",
    "source_title": "cross-check: lightweight 115 pcf -> Ec 2,573,000 psi (~70% of normalweight)",

@@ -16732,6 +16732,7 @@ test("bounds: spec-v377 computeCoilBypassFactor pins BF/CF, the shallow-coil cas
 
 // ===================== spec-v378..v380 concrete material-properties trio =====================
 import { computeConcreteElasticModulus as _v378, computeConcreteModulusOfRupture as _v379, computeConcreteShrinkageTemperatureSteel as _v380 } from "../../calc-concrete.js";
+import { computeConcreteStrengthFromModulus as _v708 } from "../../calc-concrete.js";
 
 test("bounds: spec-v378 computeConcreteElasticModulus pins Ec = wc^1.5 x 33 x sqrt(f'c), the shortcut, and error seams", () => {
   const r = _v378({ fc_psi: 4000, wc_pcf: 145 });
@@ -16749,6 +16750,30 @@ test("bounds: spec-v378 computeConcreteElasticModulus pins Ec = wc^1.5 x 33 x sq
   assert.ok("error" in _v378({ fc_psi: 0, wc_pcf: 145 }));
   assert.ok("error" in _v378({ fc_psi: 4000, wc_pcf: 0 }));
   assert.ok("error" in _v378({ fc_psi: Infinity, wc_pcf: 145 }));
+});
+
+test("bounds: spec-v708 computeConcreteStrengthFromModulus pins f'c = (Ec/(wc^1.5 x 33))^2, round-trips through computeConcreteElasticModulus, and error seams", () => {
+  const r = _v708({ ec_psi: 3644147.4311558804, wc_pcf: 145 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.fc_psi - 4000) < 1e-3, `pinned 4000 psi: ${r.fc_psi}`);
+  // Round-trip: the strength, fed back through the forward tile, reproduces the modulus.
+  for (const fc of [2500, 4000, 6000, 8000]) {
+    for (const wc_pcf of [110, 145, 155]) {
+      const fwd = _v378({ fc_psi: fc, wc_pcf });
+      const m = _v708({ ec_psi: fwd.ec_psi, wc_pcf });
+      assert.ok(!m.error, `sweep fc=${fc} wc=${wc_pcf}: ${JSON.stringify(m)}`);
+      assertFinite(m.fc_psi, "fc"); assert.ok(m.fc_psi > 0, "fc positive");
+      assert.ok(Math.abs(m.fc_psi - fc) < 1e-6, `round-trip fc=${fc} wc=${wc_pcf}: ${m.fc_psi}`);
+    }
+  }
+  // A stiffer modulus at the same unit weight implies a higher strength.
+  assert.ok(_v708({ ec_psi: 4.5e6, wc_pcf: 145 }).fc_psi > r.fc_psi);
+  // Out-of-band unit weight is flagged but still returns a number.
+  assert.ok(_v708({ ec_psi: 3.6e6, wc_pcf: 80 }).out_of_band === true);
+  // Error seams: non-positive modulus, unit weight, non-finite.
+  assert.ok("error" in _v708({ ec_psi: 0, wc_pcf: 145 }));
+  assert.ok("error" in _v708({ ec_psi: 3.6e6, wc_pcf: 0 }));
+  assert.ok("error" in _v708({ ec_psi: Infinity, wc_pcf: 145 }));
 });
 
 test("bounds: spec-v379 computeConcreteModulusOfRupture pins fr = 7.5 lambda sqrt(f'c), the LW penalty, and error seams", () => {

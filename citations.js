@@ -11506,6 +11506,18 @@ export const CITATIONS = {
       { name: "Design value", value: "code secant modulus; the in-place value varies with aggregate and mix", source: "scope of this tile" },
     ],
   },
+  "concrete-strength-from-modulus": {
+    formula: "f'c = (Ec / (wc^1.5 x 33))^2, the ACI 318-19 19.2.2.1(a) relation Ec = wc^1.5 x 33 x sqrt(f'c) solved for the compressive strength (90 <= wc <= 160 pcf).",
+    edition: "The ACI 318-19 19.2.2.1 modulus of elasticity of concrete, solved for f'c, by name.",
+    freeAccess: "ACI 318 is readable free through the ACI online reading room at concrete.org; the 19.2.2 modulus provisions are in the published code.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of concrete-elastic-modulus: the equivalent in-place compressive strength implied by a measured or specified elastic modulus. Useful for backing out f'c from a resonance / sonic-modulus test or a specified stiffness. The relation is the code secant value for 90 <= wc <= 160 pcf; the in-place modulus scatters with aggregate stiffness and moisture, so this is an equivalent strength, not a cylinder-break value. A design aid, not a substitute for the structural engineer of record's stamped design.",
+    assumptions: [
+      { name: "Secant modulus inverted", value: "f'c = (Ec / (wc^1.5 x 33))^2 for 90 <= wc <= 160 pcf", source: "ACI 318-19 19.2.2.1(a)" },
+      { name: "Equivalent strength", value: "an equivalent in-place f'c from a stiffness, not a cylinder-break value", source: "scope of this tile" },
+      { name: "Design value", value: "the in-place modulus varies with aggregate and mix", source: "scope of this tile" },
+    ],
+  },
   "concrete-modulus-of-rupture": {
     formula: "fr = 7.5 x lambda x sqrt(f'c) psi; lambda = 1.0 normalweight, 0.75 all-lightweight.",
     edition: "The ACI 318-19 19.2.3.1 modulus of rupture of concrete, by name.",

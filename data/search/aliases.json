@@ -44072,6 +44072,31 @@
       "kind": "question"
     },
     {
+      "term": "fc from elastic modulus",
+      "target": "concrete-strength-from-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "concrete strength from stiffness",
+      "target": "concrete-strength-from-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "back out fc from ec",
+      "target": "concrete-strength-from-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "compressive strength from modulus test",
+      "target": "concrete-strength-from-modulus",
+      "kind": "question"
+    },
+    {
+      "term": "equivalent fc from sonic modulus",
+      "target": "concrete-strength-from-modulus",
+      "kind": "question"
+    },
+    {
       "term": "stress when concrete first cracks",
       "target": "concrete-modulus-of-rupture",
       "kind": "question"

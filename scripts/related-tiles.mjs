@@ -1282,6 +1282,7 @@ const RELATED = {
   "rc-doubly-reinforced": ["rc-beam-flexure","rc-beam-shear","rc-column-axial"],
   "rc-shear-friction": ["rc-beam-shear","rebar-lap-splice","anchor-embedment"],
   "concrete-elastic-modulus": ["rc-slab-min-thickness","rc-beam-flexure","concrete-modulus-of-rupture","rc-doubly-reinforced"],
+  "concrete-strength-from-modulus": ["concrete-elastic-modulus","concrete-modulus-of-rupture","rc-beam-flexure","concrete-cracking-moment"],
   "concrete-modulus-of-rupture": ["concrete-cracking-moment","concrete-elastic-modulus","rc-slab-min-thickness","rc-beam-flexure"],
   "concrete-cracking-moment": ["concrete-modulus-of-rupture","concrete-elastic-modulus","rc-beam-flexure","rc-slab-min-thickness"],
   "concrete-shrinkage-temperature-steel": ["rc-slab-min-thickness","concrete-modulus-of-rupture","rc-beam-flexure","rebar-lap-splice"],

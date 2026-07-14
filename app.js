@@ -586,7 +586,7 @@ const TOOL_MODULES = (() => {
     "rc-column-axial", "rc-punching-shear", "rc-hook-development",
     // spec-v299..v301 depth-2 batch
     "rc-slab-min-thickness", "rc-slab-max-span-for-thickness", "rc-doubly-reinforced", "rc-shear-friction",
-    "concrete-elastic-modulus", "concrete-modulus-of-rupture", "concrete-cracking-moment", "concrete-shrinkage-temperature-steel",
+    "concrete-elastic-modulus", "concrete-strength-from-modulus", "concrete-modulus-of-rupture", "concrete-cracking-moment", "concrete-shrinkage-temperature-steel",
     "t-beam-effective-flange-width", "concrete-beam-min-flexural-steel", "concrete-crack-control-spacing",
     // spec-v490 concrete bearing strength (ACI 318-19 §22.8)
     "concrete-bearing-strength",
