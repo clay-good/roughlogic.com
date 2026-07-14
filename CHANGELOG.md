@@ -4,6 +4,15 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(carpentry): spec-v789 deck board and fastener takeoff; 2026-07-14
+
+- New tile `deck-board-takeoff` (Group E, calc-finish.js): the decking surface takeoff a deck builder orders from.
+  Boards run the length, so the count across the width is `ceil((width_in + gap) / (board face + gap))`; lineal feet =
+  boards x length x (1 + waste); joists = `ceil(length x 12 / spacing) + 1`; screws = boards x joists x 2. A 12 x 16 ft
+  deck of 5.5" boards at a 0.25" gap needs 26 boards, 458 lineal ft (10% waste), 13 joists, and 676 screws. Sizes the
+  surface and fasteners only, not the structure. Fuzzer pins the counts, the waste scaling, the narrower-board board
+  count, and the error seams. Explore sweep #21 entry 4. Home count 1,237 -> 1,238.
+
 ### feat(electrical): spec-v788 lightning rolling-sphere zone of protection; 2026-07-14
 
 - New tile `rolling-sphere-protection` (Group A, calc-elecdesign.js): the ground area a lightning mast or air terminal

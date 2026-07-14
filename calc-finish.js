@@ -336,3 +336,54 @@ FINISH_RENDERERS["gutter-downspout"] = _simpleRenderer({
   ],
   compute: computeGutterDownspout,
 });
+
+// ===================== spec-v789: deck board and fastener takeoff =====================
+// Boards run the length; their count is set by the width they cover (allowing the gap
+// between boards, none after the last): N = ceil((width_in + gap) / (face + gap)).
+// dims: in { deck_width_ft: L, deck_length_ft: L, board_face_width_in: L, gap_in: L, joist_spacing_in: L, waste_pct: dimensionless } out: { boards: dimensionless, lineal_ft: L, joists: dimensionless, screws: dimensionless }
+export function computeDeckBoardTakeoff({ deck_width_ft = 0, deck_length_ft = 0, board_face_width_in = 5.5, gap_in = 0.25, joist_spacing_in = 16, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const W = Number(deck_width_ft) || 0;
+  const L = Number(deck_length_ft) || 0;
+  const face = Number(board_face_width_in) || 0;
+  const gap = Number(gap_in) || 0;
+  const spacing = Number(joist_spacing_in) || 0;
+  const waste = Number(waste_pct) || 0;
+  if (!(W > 0)) return { error: "Deck width must be positive (ft)." };
+  if (!(L > 0)) return { error: "Deck length must be positive (ft)." };
+  if (!(face > 0)) return { error: "Board face width must be positive (in)." };
+  if (gap < 0) return { error: "Board gap cannot be negative (in)." };
+  if (!(spacing > 0)) return { error: "Joist spacing must be positive (in)." };
+  if (waste < 0) return { error: "Waste percent cannot be negative." };
+  const width_in = W * 12;
+  const boards = Math.ceil((width_in + gap) / (face + gap));
+  const lineal_ft = boards * L * (1 + waste / 100);
+  const joists = Math.ceil(L * 12 / spacing) + 1;
+  const screws = boards * joists * 2;
+  if (![boards, lineal_ft, joists, screws].every(Number.isFinite)) return { error: "Deck-takeoff math is not a finite value." };
+  return {
+    boards, lineal_ft, joists, screws, waste_pct: waste,
+    note: "Deck surface takeoff: the boards run the length, so the count across the width is ceil((width + gap) / (board face + gap)) -- the gap falls between boards, not after the last. Lineal feet = boards x length x (1 + waste); order full-length boards for a clean look (butt joints must land on a joist and are staggered), and the waste covers cutoffs, culls, and the crook you set aside. Joists carrying the deck run across the width at the given spacing, so their count along the length is ceil(length x 12 / spacing) + 1, and two deck screws (or hidden clips) per board at every joist gives boards x joists x 2 fasteners. This is the surface only -- it does not size the joists, beam, posts, or footings, which come from the span tables and the load. A takeoff estimate; the deck plan and the lumber on the rack govern.",
+  };
+}
+const deckBoardTakeoffExample = { inputs: { deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 5.5, gap_in: 0.25, joist_spacing_in: 16, waste_pct: 10 } };
+FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
+  citation: "Citation: deck board and fastener takeoff (first-principles carpentry takeoff): boards = ceil((width_in + gap) / (face + gap)); lineal_ft = boards x length x (1 + waste); joists = ceil(length x 12 / spacing) + 1; screws = boards x joists x 2. The gap falls between boards, not after the last; butt joints land on a joist and are staggered. Sizes the surface only, not the joists / beam / posts / footings. A takeoff estimate; the deck plan governs.",
+  example: deckBoardTakeoffExample.inputs,
+  fields: [
+    { key: "deck_width_ft", label: "Deck width across the boards (ft)", kind: "number" },
+    { key: "deck_length_ft", label: "Board run length (ft)", kind: "number" },
+    { key: "board_face_width_in", label: "Board face width (in, 5.5 for 5/4x6 or 2x6)", kind: "number", default: 5.5 },
+    { key: "gap_in", label: "Gap between boards (in)", kind: "number", default: 0.25 },
+    { key: "joist_spacing_in", label: "Joist spacing on center (in)", kind: "number", default: 16 },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
+  ],
+  outputs: [
+    { key: "b", id: "deck-out-b", label: "Deck boards", value: (r) => String(r.boards) + " boards across" },
+    { key: "l", id: "deck-out-l", label: "Lineal feet (with waste)", value: (r) => fmt(r.lineal_ft, 0) + " lf" },
+    { key: "j", id: "deck-out-j", label: "Joists carrying the deck", value: (r) => String(r.joists) },
+    { key: "s", id: "deck-out-s", label: "Deck screws (2 per board per joist)", value: (r) => fmt(r.screws, 0) },
+    { key: "n", id: "deck-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeDeckBoardTakeoff,
+});

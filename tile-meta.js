@@ -505,6 +505,7 @@ const _TILES = [
   ["sacrificial-anode-life", "K"],
   ["draft-beer-line-balance", "O"],
   ["rolling-sphere-protection", "A"],
+  ["deck-board-takeoff", "E"],
   ["load-profitability", "J"],
   ["fuel-surcharge", "J"],
   ["maintenance-reserve", "J"],

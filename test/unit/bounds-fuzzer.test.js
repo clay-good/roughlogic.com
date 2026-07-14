@@ -21609,6 +21609,26 @@ test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / rema
   assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: -1 }));
 });
 
+import { computeDeckBoardTakeoff as _v789 } from "../../calc-finish.js";
+
+test("bounds: spec-v789 computeDeckBoardTakeoff pins the board / joist / screw counts, waste scaling, and error seams", () => {
+  const r = _v789({ deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 5.5, gap_in: 0.25, joist_spacing_in: 16, waste_pct: 10 });
+  assert.strictEqual(r.boards, 26); // ceil((144 + 0.25) / 5.75)
+  assert.strictEqual(r.joists, 13); // ceil(16*12/16) + 1
+  assert.strictEqual(r.screws, 676); // 26 * 13 * 2
+  assert.ok(Math.abs(r.lineal_ft - 457.6) < 0.01); // 26 * 16 * 1.10
+  // Waste scales lineal feet but not the integer counts; a narrower board raises the board count.
+  assert.ok(Math.abs(_v789({ deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 5.5, gap_in: 0.25, joist_spacing_in: 16, waste_pct: 0 }).lineal_ft - 416) < 0.01);
+  assert.ok(_v789({ deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 3.5, gap_in: 0.25, joist_spacing_in: 16, waste_pct: 10 }).boards > r.boards);
+  // Error seams: non-finite, non-positive width/length/face/spacing, negative gap/waste.
+  assert.ok("error" in _v789({ deck_width_ft: Infinity, deck_length_ft: 16 }));
+  assert.ok("error" in _v789({ deck_width_ft: 0, deck_length_ft: 16 }));
+  assert.ok("error" in _v789({ deck_width_ft: 12, deck_length_ft: 0 }));
+  assert.ok("error" in _v789({ deck_width_ft: 12, deck_length_ft: 16, board_face_width_in: 0 }));
+  assert.ok("error" in _v789({ deck_width_ft: 12, deck_length_ft: 16, joist_spacing_in: 0 }));
+  assert.ok("error" in _v789({ deck_width_ft: 12, deck_length_ft: 16, gap_in: -1 }));
+});
+
 import { computeRollingSphereProtection as _v788 } from "../../calc-elecdesign.js";
 
 test("bounds: spec-v788 computeRollingSphereProtection pins the rolling-sphere radius, the h>=R cap, and error seams", () => {

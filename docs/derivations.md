@@ -1956,6 +1956,7 @@ cross-check.
 | calc-field.js | `timerRemainingSeconds` | `t, now_s` | _ | _ | _ |
 | calc-field.js | `utmToLatLon` | `zone, hemisphere, easting, northing` | _ | _ | _ |
 | calc-finish.js | `computeAtticVentilation` | `{ attic_floor_area_sqft = 0, ratio = "150", intake_vent_nfa_sqin = 9, ridge_n...` | _ | _ | _ |
+| calc-finish.js | `computeDeckBoardTakeoff` | `{ deck_width_ft = 0, deck_length_ft = 0, board_face_width_in = 5.5, gap_in = ...` | _ | _ | _ |
 | calc-finish.js | `computeFlooringTakeoff` | `{ room_length_ft = 0, room_width_ft = 0, box_coverage_sqft = 20, pattern = "s...` | _ | _ | _ |
 | calc-finish.js | `computeGutterDownspout` | `{ roof_area_sqft = 0, pitch_factor = "1.00", rainfall_in_hr = 5, downspout_sq...` | _ | _ | _ |
 | calc-finish.js | `computePaverPatio` | `{ area_sqft = 0, paver_length_in = 0, paver_width_in = 0, base_depth_in = 6, ...` | _ | _ | _ |
@@ -2898,7 +2899,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1484.
+Row count: 1485.
 
 <!-- END function-corpus-v14 -->
 
@@ -3442,7 +3443,7 @@ per spec-v14 §13.1 second paragraph.
 | `water-classes` | Water Loss Class and Category | IICRC S500-2021 water-damage category...; Reference compute returns the per-attribute table; runner... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wood-emc` | Equilibrium Moisture Content of Wood | USDA Forest Products Laboratory Wood ...; spec-v119 section 2.1 pinned example (textbook ~9.1%) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group E Construction (258 tiles)
+### Group E Construction (259 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3505,6 +3506,7 @@ per spec-v14 §13.1 second paragraph.
 | `crane-lift-quick` | Crane Lift Plan Quick-Math | ASME B30.5 / manufacturer load-chart ...; 8000 lb load / 2-leg sling at 60 deg included / 12,000 lb... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `curve-deflection-stakeout` | Curve Deflection-Angle Stakeout | AASHTO Green Book / FM 5-233 (by name); delta = (100/1000)(180/pi) = 5.7296 deg; chord = 1000 sin... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-beam-post` | Deck Beam and Post Sizing (IRC R507) | IRC / AWC NDS; trib = 6 ft; w = 50 x 6 = 300 plf; double 2x8 beam, 4x4 p... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `deck-board-takeoff` | Deck Board and Fastener Takeoff | First-principles deck-surface takeoff; 12 x 16 ft deck, 5.5 in boards, 0.25 in gap, 16 in OC, 10... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `deck-ledger-fasteners` | Deck Ledger Fastener Spacing (IRC R507.9) | IRC R507.9 (deck ledger connection); 16 ft ledger at 16 in OC -> floor(192/16)+1 = 13 fasteners | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `demo-debris` | Demolition Debris Weight | Project (industry debris-density rules); Wood-frame demo / 25 yd^3 -> 675 ft^3 / 16.875 tons / 30 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `dewatering-rate` | Excavation Dewatering Pump Rate | First-principles volume / pumping rate; 20 x 12 pit, draw 3 ft in 30 min, inflow 40 gpm, 25% marg... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4321,6 +4323,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1237. Fixture-covered or reference-cadence: 1237 / 1237.
+Tile count: 1238. Fixture-covered or reference-cadence: 1238 / 1238.
 
 <!-- END tile-index-v14 -->

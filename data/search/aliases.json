@@ -43882,6 +43882,31 @@
       "kind": "question"
     },
     {
+      "term": "how many deck boards do i need",
+      "target": "deck-board-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "deck board calculator",
+      "target": "deck-board-takeoff",
+      "kind": "industry"
+    },
+    {
+      "term": "deck screw count",
+      "target": "deck-board-takeoff",
+      "kind": "question"
+    },
+    {
+      "term": "decking lineal feet",
+      "target": "deck-board-takeoff",
+      "kind": "adjacent"
+    },
+    {
+      "term": "deck material takeoff",
+      "target": "deck-board-takeoff",
+      "kind": "industry"
+    },
+    {
       "term": "moment capacity with an unbraced flange",
       "target": "steel-beam-ltb",
       "kind": "question"

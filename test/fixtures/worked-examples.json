@@ -24370,6 +24370,49 @@
    }
   },
   {
+   "tile_id": "deck-board-takeoff",
+   "source_publisher": "First-principles deck-surface takeoff",
+   "source_title": "boards = ceil((width_in + gap) / (face + gap)); screws = boards x joists x 2",
+   "source_edition_or_year": "spec-v789 worked example (machine-verified)",
+   "source_section_or_page": "12 x 16 ft deck, 5.5 in boards, 0.25 in gap, 16 in OC, 10% waste -> 26 boards, 458 lf, 13 joists, 676 screws",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "deck_width_ft": 12,
+    "deck_length_ft": 16,
+    "board_face_width_in": 5.5,
+    "gap_in": 0.25,
+    "joist_spacing_in": 16,
+    "waste_pct": 10
+   },
+   "outputs": {
+    "boards": {
+     "value": 26,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "joists": {
+     "value": 13,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "screws": {
+     "value": 676,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "lineal_ft": {
+     "value": 457.6,
+     "tolerance": {
+      "abs": 0.1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "rolling-sphere-protection",
    "source_publisher": "NFPA 780 (rolling-sphere method)",
    "source_title": "protected_radius = sqrt(2 x R x h - h^2)",

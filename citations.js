@@ -9490,6 +9490,17 @@ export const CITATIONS = {
       { name: "Reference intensity", value: "5 in/hr reference; 1 sq in of downspout per ~100 sq ft of roof (editable)", source: "SMACNA practice" },
     ],
   },
+  "deck-board-takeoff": {
+    formula: "boards = ceil((deck_width_ft x 12 + gap_in) / (board_face_in + gap_in)); lineal_ft = boards x deck_length_ft x (1 + waste_pct/100); joists = ceil(deck_length_ft x 12 / joist_spacing_in) + 1; screws = boards x joists x 2.",
+    edition: "First-principles deck-surface takeoff (the same carpentry take-off basis as fence-estimate and residential-framing), by name; the deck plan and the lumber on the rack govern.",
+    freeAccess: "First-principles arithmetic; no proprietary source reproduced. The board width, gap, spacing, and waste come from the deck plan and the product.",
+    governance: GOVERNANCE.general,
+    editionNote: "Deck surface takeoff: the boards run the length, so the count across the width is ceil((width + gap) / (board face + gap)) -- the gap falls between boards, not after the last. Lineal feet = boards x length x (1 + waste); butt joints must land on a joist and are staggered, and the waste covers cutoffs, culls, and crook. The joists carrying the deck run across the width at the given spacing, so their count along the length is ceil(length x 12 / spacing) + 1, and two deck screws (or hidden clips) per board at every joist gives boards x joists x 2 fasteners. Sizes the surface and fasteners only, not the joists, beam, posts, or footings, which come from the span tables and the load. A takeoff estimate, not a structural design.",
+    assumptions: [
+      { name: "Gap placement", value: "the gap falls between boards, not after the last: boards = ceil((width + gap) / (face + gap))", source: "takeoff geometry" },
+      { name: "Fastener count", value: "two deck screws per board at every joist crossing (hidden clips are one system per board per joist)", source: "carpentry practice" },
+    ],
+  },
   "assembly-r-value": {
     formula: "U_assembly = framing factor x 1/R_framing-path + (1 - factor) x 1/R_cavity-path; R = 1/U; framing path adds stud depth x 1.25 R/in.",
     edition: "ASHRAE Handbook of Fundamentals parallel-path (isothermal-planes) method (by name).",

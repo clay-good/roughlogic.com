@@ -497,7 +497,7 @@ const TOOL_MODULES = (() => {
     // v97 hardscape
     "paver-patio", "retaining-wall-block",
     // v98 roofing trim-out
-    "attic-ventilation", "gutter-downspout",
+    "attic-ventilation", "gutter-downspout", "deck-board-takeoff",
   ]);
   // spec-v101 new electrician design/layout bench; relieves the standing
   // calc-electrical.js cap watch. Both tiles keep group "A".
