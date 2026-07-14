@@ -161,6 +161,7 @@ const TOOL_MODULES = (() => {
     "pipe-cold-spring", "raceway-expansion-fitting", "pipe-spacing-rack",
     // spec-v157..v162 steamfitting / pressure-piping / pipe-support bench.
     "flash-steam-pct", "steam-pipe-velocity", "steam-pipe-capacity", "steam-trap-sizing",
+    "boiler-horsepower",
     "pipe-pressure-rating", "pipe-filled-support-load", "hanger-rod-sizing",
     // spec-v200..v203 condensate return + fabrication/process layout tiles.
     "condensate-return-sizing", "branch-saddle-cutback", "reducer-offset",

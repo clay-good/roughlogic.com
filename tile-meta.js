@@ -803,6 +803,7 @@ const _TILES = [
   ["flash-steam-pct", "B"],
   ["steam-pipe-velocity", "B"], ["steam-pipe-capacity", "B"],
   ["steam-trap-sizing", "B"],
+  ["boiler-horsepower", "B"],
   ["steam-prv-napier", "B"], ["steam-prv-area-for-capacity", "B"],
   ["pipe-pressure-rating", "B"],
   ["pipe-filled-support-load", "B"],

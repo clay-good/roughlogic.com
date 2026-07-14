@@ -30842,6 +30842,38 @@
    }
   },
   {
+   "tile_id": "boiler-horsepower",
+   "source_publisher": "ABMA / ASME boiler-horsepower definition",
+   "source_title": "500,000 Btu/hr gross output -> 14.94 BHP, 515 lb/hr, 2,076 sq ft EDR",
+   "source_edition_or_year": "1 BHP = 33,475 Btu/hr = 34.5 lb/hr from and at 212 F = 139 sq ft EDR",
+   "source_section_or_page": "BHP = 500000/33475 = 14.937; steam = 14.937 x 34.5 = 515.3; EDR = 14.937 x 139 = 2076",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "output_btuhr": 500000
+   },
+   "outputs": {
+    "boiler_hp": {
+     "value": 14.937,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "steam_lbhr": {
+     "value": 515.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    },
+    "edr_sqft": {
+     "value": 2076.2,
+     "tolerance": {
+      "abs": 1
+     }
+    }
+   }
+  },
+  {
    "tile_id": "steam-prv-napier",
    "source_publisher": "Napier's formula / ASME/API 520",
    "source_title": "choked when P2 < 0.58 x P1; W = 51.43 x Cd x A x P1",

@@ -398,6 +398,40 @@ function _renderSteamTrapSizing(inputRegion, outputRegion, citationEl) {
 }
 PIPEFIT_RENDERERS["steam-trap-sizing"] = _renderSteamTrapSizing;
 
+// dims: in { output_btuhr: M L^2 T^-3 } out: { boiler_hp: M L^2 T^-3, steam_lbhr: M T^-1, edr_sqft: L^2 }
+// Boiler ratings by the ABMA/ASME definitions anchored on 1 boiler
+// horsepower = 33,475 Btu/hr gross output = 34.5 lb/hr of steam
+// "from and at" 212 F = 139 sq ft of equivalent direct radiation (EDR).
+export function computeBoilerHorsepower({ output_btuhr = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const out = Number(output_btuhr);
+  if (!(out > 0)) return { error: "Boiler gross output must be positive (Btu/hr)." };
+  const boiler_hp = out / 33475;
+  const steam_lbhr = boiler_hp * 34.5;
+  const edr_sqft = boiler_hp * 139;
+  return { boiler_hp, steam_lbhr, edr_sqft };
+}
+export const boilerHorsepowerExample = { inputs: { output_btuhr: 500000 } };
+
+function _renderBoilerHorsepower(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: ABMA / ASME boiler-horsepower definitions - 1 BHP = 33,475 Btu/hr gross output = 34.5 lb/hr of steam evaporated 'from and at' 212 F = 139 sq ft of equivalent direct radiation (EDR). BHP = output / 33,475; steam = BHP x 34.5; EDR = BHP x 139. The 'from and at 212 F' basis assumes feedwater at 212 F and steam at 0 psig; a real plant with cooler feedwater and higher pressure evaporates less per BHP, so apply the boiler maker's factor of evaporation for the actual conditions.";
+  const out = makeNumber("Boiler gross output (Btu/hr)", "bhp-out", { step: "any", min: "0" });
+  for (const f of [out]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { out.input.value = "500000"; update(); });
+  const oHp = makeOutputLine(outputRegion, "Boiler horsepower", "bhp-out-hp");
+  const oSteam = makeOutputLine(outputRegion, "Steam output (from and at 212 F)", "bhp-out-steam");
+  const oEdr = makeOutputLine(outputRegion, "Equivalent direct radiation", "bhp-out-edr");
+  const update = debounce(() => {
+    const r = computeBoilerHorsepower({ output_btuhr: Number(out.input.value) || 0 });
+    if (r.error) { oHp.textContent = r.error; oSteam.textContent = "-"; oEdr.textContent = "-"; return; }
+    oHp.textContent = fmt(r.boiler_hp, 2) + " BHP";
+    oSteam.textContent = fmt(r.steam_lbhr, 0) + " lb/hr";
+    oEdr.textContent = fmt(r.edr_sqft, 0) + " sq ft EDR";
+  }, DEBOUNCE_MS);
+  out.input.addEventListener("input", update);
+}
+PIPEFIT_RENDERERS["boiler-horsepower"] = _renderBoilerHorsepower;
+
 // ---------------------------------------------------------------------
 // v160 ASME B31.1 pipe pressure rating / required wall (pipe-pressure-rating)
 // ---------------------------------------------------------------------

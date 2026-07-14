@@ -4,6 +4,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(pipefit): spec-v765 boiler horsepower, steam output, and EDR (ABMA/ASME ratings); 2026-07-14
+
+- New tile `boiler-horsepower` (Group B, calc-pipefit.js): the ABMA/ASME boiler ratings from a gross output --
+  `BHP = output / 33,475`, `steam = BHP x 34.5` lb/hr (from and at 212 F), and `EDR = BHP x 139` sq ft. A 500,000 Btu/hr
+  boiler is 14.94 BHP, 515 lb/hr, and 2,076 sq ft of radiation. First non-inverse tile after the inverse campaign closed.
+  calc-pipefit.js gzip cap 21000 -> 22500 B. Home tile count 1,213 -> 1,214.
+
 ### feat(water): spec-v764 chlorine decay constant from a bottle test (chlorine-decay inverse); 2026-07-14
 
 - New tile `chlorine-decay-constant` (Group M, calc-water.js): the first-order decay constant k from an initial and a

@@ -12229,6 +12229,7 @@ import {
   computeFlashSteamPct as _v157, computeSteamPipeVelocity as _v158,
   computeSteamTrapSizing as _v159, computePipePressureRating as _v160,
   computePipeFilledSupportLoad as _v161, computeHangerRodSizing as _v162,
+  computeBoilerHorsepower as _v765,
 } from "../../calc-pipefit.js";
 
 test("bounds: spec-v157 flash-steam-pct pins the flash fraction + scales with the drop + rejects bad inputs", () => {
@@ -12287,6 +12288,30 @@ test("bounds: spec-v159 steam-trap-sizing pins the load + capacity + the factor 
   assert.ok("error" in _v159({ heat_duty_btuhr: 400000, hfg_btulb: 0, safety_factor: 2 }));
   assert.ok("error" in _v159({ heat_duty_btuhr: 400000, hfg_btulb: 945, safety_factor: 0.5 }));
   assert.ok("error" in _v159({ heat_duty_btuhr: Infinity, hfg_btulb: 945, safety_factor: 2 }));
+});
+
+test("bounds: spec-v765 boiler-horsepower pins the ABMA factors + linear scaling + rejects bad inputs", () => {
+  // 500,000 Btu/hr -> 14.937 BHP -> 515.3 lb/hr -> 2,076 sq ft EDR.
+  const a = _v765({ output_btuhr: 500000 });
+  assert.ok(Math.abs(a.boiler_hp - 500000 / 33475) < 1e-9, "BHP = output / 33475");
+  assert.ok(Math.abs(a.boiler_hp - 14.9366) < 1e-3);
+  assert.ok(Math.abs(a.steam_lbhr - a.boiler_hp * 34.5) < 1e-9, "steam = BHP x 34.5");
+  assert.ok(Math.abs(a.steam_lbhr - 515.31) < 0.05);
+  assert.ok(Math.abs(a.edr_sqft - a.boiler_hp * 139) < 1e-9, "EDR = BHP x 139");
+  assert.ok(Math.abs(a.edr_sqft - 2076.2) < 0.5);
+  // Exactly one BHP at the definition point.
+  const one = _v765({ output_btuhr: 33475 });
+  assert.ok(Math.abs(one.boiler_hp - 1) < 1e-9 && Math.abs(one.steam_lbhr - 34.5) < 1e-9 && Math.abs(one.edr_sqft - 139) < 1e-9);
+  // Linear in output: doubling the output doubles every rating.
+  const b = _v765({ output_btuhr: 1000000 });
+  assert.ok(Math.abs(b.boiler_hp - 2 * a.boiler_hp) < 1e-9);
+  assert.ok(Math.abs(b.steam_lbhr - 2 * a.steam_lbhr) < 1e-9);
+  assert.ok(Math.abs(b.edr_sqft - 2 * a.edr_sqft) < 1e-9);
+  // Rejections.
+  assert.ok("error" in _v765({ output_btuhr: 0 }));
+  assert.ok("error" in _v765({ output_btuhr: -1 }));
+  assert.ok("error" in _v765({ output_btuhr: Infinity }));
+  assert.ok("error" in _v765({ output_btuhr: NaN }));
 });
 
 test("bounds: spec-v160 pipe-pressure-rating pins both modes + the inverse relation + rejects bad inputs", () => {

@@ -13726,6 +13726,18 @@ export const CITATIONS = {
       { name: "Selection", value: "the trap is sized from the manufacturer's capacity chart at the actual differential pressure", source: "manufacturer capacity chart" },
     ],
   },
+  "boiler-horsepower": {
+    formula: "boiler_hp = output_btuhr / 33,475; steam_lbhr = boiler_hp x 34.5; edr_sqft = boiler_hp x 139. From the ABMA / ASME definition: 1 boiler horsepower = 33,475 Btu/hr gross output = 34.5 lb/hr of steam evaporated 'from and at' 212 F = 139 sq ft of equivalent direct radiation.",
+    edition: "ABMA / ASME boiler-horsepower definition (33,475 Btu/hr; 34.5 lb/hr from and at 212 F). Not edition-bound.",
+    freeAccess: "The three factors (33,475 Btu/hr, 34.5 lb/hr, 139 sq ft EDR per BHP) are the standard published boiler-rating conversions.",
+    governance: GOVERNANCE.general,
+    editionNote: "Single-edition (the definition does not roll). The 'from and at 212 F' basis assumes feedwater at 212 F and steam at 0 psig; a real plant with cooler feedwater and higher operating pressure evaporates less steam per BHP, so apply the boiler maker's factor of evaporation for the actual feedwater temperature and pressure.",
+    assumptions: [
+      { name: "BHP definition", value: "1 BHP = 33,475 Btu/hr gross output", source: "ABMA / ASME" },
+      { name: "Steam basis", value: "34.5 lb/hr per BHP evaporated 'from and at' 212 F (212 F feedwater, 0 psig)", source: "ABMA from-and-at rating" },
+      { name: "EDR", value: "139 sq ft of equivalent direct radiation per BHP", source: "steam-heating radiation practice" },
+    ],
+  },
   "pipe-pressure-rating": {
     formula: "allowable: P = 2 S E (t_avail - A) / (D - 2 y (t_avail - A)), t_avail = wall x (1 - mill_tol). required wall: t = P D / (2 (S E + P y)) + A. ASME B31.1 internal-pressure design.",
     edition: "ASME B31.1 Power Piping pressure-design relation, by name (B31.3 Process Piping uses the same form with its own allowables). The allowable stress S, joint factor E, and y-coefficient are read from the code edition's tables.",

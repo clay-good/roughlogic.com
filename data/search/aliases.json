@@ -8247,6 +8247,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "boiler horsepower",
+      "target": "boiler-horsepower",
+      "kind": "industry"
+    },
+    {
+      "term": "boiler btu to horsepower",
+      "target": "boiler-horsepower",
+      "kind": "question"
+    },
+    {
+      "term": "how much steam does my boiler make",
+      "target": "boiler-horsepower",
+      "kind": "question"
+    },
+    {
+      "term": "square feet of radiation from a boiler",
+      "target": "boiler-horsepower",
+      "kind": "question"
+    },
+    {
+      "term": "boiler edr",
+      "target": "boiler-horsepower",
+      "kind": "industry"
+    },
+    {
       "term": "flash steam",
       "target": "flash-steam-pct",
       "kind": "industry"
