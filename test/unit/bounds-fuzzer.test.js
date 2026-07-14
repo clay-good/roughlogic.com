@@ -21631,6 +21631,30 @@ test("bounds: spec-v610 computeGroundPotentialRise pins the GPR, the IEEE 80 scr
   assert.ok("error" in _v610({ grid_current_a: 200, grid_resistance_ohm: 0.5, tolerable_touch_v: -1 }));
 });
 
+import { computeMaxGridResistanceForTouch as _v714 } from "../../calc-elecdesign.js";
+test("bounds: spec-v714 computeMaxGridResistanceForTouch pins R_max = touch/current, round-trips through computeGroundPotentialRise (safe at the limit), and error seams", () => {
+  const r = _v714({ tolerable_touch_v: 200, grid_current_a: 200 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_grid_resistance_ohm - 1.0) < 1e-12, `R identity: ${r.max_grid_resistance_ohm}`);
+  // Round-trip: a grid at the max resistance sits exactly at the tolerable touch (safe by the <= screen).
+  for (const tolerable_touch_v of [75, 200, 650]) {
+    for (const grid_current_a of [50, 200, 5000]) {
+      const m = _v714({ tolerable_touch_v, grid_current_a });
+      assert.ok(!m.error, `sweep touch=${tolerable_touch_v} ig=${grid_current_a}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_grid_resistance_ohm, "R"); assert.ok(m.max_grid_resistance_ohm > 0, "R positive");
+      const back = _v610({ grid_current_a, grid_resistance_ohm: m.max_grid_resistance_ohm, tolerable_touch_v });
+      assert.ok(Math.abs(back.gpr_v - tolerable_touch_v) < 1e-6, `round-trip touch=${tolerable_touch_v} ig=${grid_current_a}: ${back.gpr_v}`);
+      assert.strictEqual(back.safe_by_gpr, true);
+    }
+  }
+  // A larger grid current forces a lower resistance target.
+  assert.ok(_v714({ tolerable_touch_v: 200, grid_current_a: 400 }).max_grid_resistance_ohm < r.max_grid_resistance_ohm);
+  // Error seams: non-positive touch voltage, grid current, non-finite.
+  assert.ok("error" in _v714({ tolerable_touch_v: 0, grid_current_a: 200 }));
+  assert.ok("error" in _v714({ tolerable_touch_v: 200, grid_current_a: 0 }));
+  assert.ok("error" in _v714({ tolerable_touch_v: Infinity, grid_current_a: 200 }));
+});
+
 import { computeEvChargerThrottle as _v611 } from "../../calc-feeder.js";
 
 test("bounds: spec-v611 computeEvChargerThrottle pins the throttled current, the full-rate count, the all-full case, and error seams", () => {

@@ -495,6 +495,38 @@ ELECDESIGN_RENDERERS["ground-potential-rise"] = _simpleRenderer({
   compute: computeGroundPotentialRise,
 });
 
+// max-grid-resistance-for-touch: inverse of ground-potential-rise. The forward
+// tile checks whether GPR = I_G x R_g clears the tolerable touch voltage; sizing
+// the grid resistance target to pass that screen is the inverse:
+// max_R_g = tolerable_touch_v / grid_current_a.
+// dims: in { tolerable_touch_v: dimensionless, grid_current_a: I } out: { max_grid_resistance_ohm: dimensionless }
+export function computeMaxGridResistanceForTouch({ tolerable_touch_v = 0, grid_current_a = 0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const et = Number(tolerable_touch_v) || 0;
+  const ig = Number(grid_current_a) || 0;
+  if (!(et > 0)) return { error: "Tolerable touch voltage must be positive (V)." };
+  if (!(ig > 0)) return { error: "Grid current must be positive (A)." };
+  const max_grid_resistance_ohm = et / ig;
+  return {
+    max_grid_resistance_ohm,
+    note: "The IEEE 80 GPR screen solved for the grid resistance: since GPR = grid current x grid resistance and the screen passes when GPR is at or below the tolerable touch voltage, the grid resistance must be at or below tolerable_touch / grid_current for the whole yard to clear without a mesh/step study. The grid current is the portion of fault current returning through the grid to remote earth, not the total fault; a lower grid resistance (more rods, a larger mesh, or better soil) or a lower grid current is needed if the target is impractical. IEEE Std 80 and a qualified grounding study govern - a screen, not a grounding design.",
+  };
+}
+export const maxGridResistanceForTouchExample = { inputs: { tolerable_touch_v: 200, grid_current_a: 200 } };
+ELECDESIGN_RENDERERS["max-grid-resistance-for-touch"] = _simpleRenderer({
+  citation: "Citation: IEEE Std 80 ground potential rise GPR = grid_current x grid_resistance solved for the resistance: max_R_g = tolerable_touch / grid_current, the grid resistance target that keeps GPR at or below the tolerable touch voltage (no mesh/step analysis needed). The grid current is the portion of fault current returning through the grid, not the total fault. IEEE Std 80 and a qualified grounding study govern.",
+  example: maxGridResistanceForTouchExample.inputs,
+  fields: [
+    { key: "tolerable_touch_v", label: "Tolerable touch voltage (V, from step-touch-voltage)", kind: "number" },
+    { key: "grid_current_a", label: "Grid current I_G (A)", kind: "number" },
+  ],
+  outputs: [
+    { key: "rg", id: "mgr-out-rg", label: "Max grid resistance to pass the screen", value: (r) => fmt(r.max_grid_resistance_ohm, 3) + " ohm" },
+    { key: "n", id: "mgr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeMaxGridResistanceForTouch,
+});
+
 // ===================== spec-v560: industrial control panel SCCR (UL 508A SB) =====================
 
 // dims: in { component_sccrs_ka: dimensionless, feeder_ir_ka: I, available_fault_ka: I } out: { panel_sccr_ka: I, compliant: dimensionless }

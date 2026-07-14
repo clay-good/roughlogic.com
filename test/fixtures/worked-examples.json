@@ -55215,6 +55215,27 @@
    }
   },
   {
+   "tile_id": "max-grid-resistance-for-touch",
+   "source_publisher": "IEEE Std 80 (ground potential rise)",
+   "source_title": "max_R_g = tolerable_touch / grid_current; inverse of the GPR screen",
+   "source_edition_or_year": "IEEE Std 80",
+   "source_section_or_page": "200-V tolerable touch, 200-A grid current -> 1.0 ohm max grid resistance",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "tolerable_touch_v": 200,
+    "grid_current_a": 200
+   },
+   "outputs": {
+    "max_grid_resistance_ohm": {
+     "value": 1.0,
+     "tolerance": {
+      "abs": 0.0001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "ground-potential-rise",
    "source_publisher": "IEEE Std 80 (ground potential rise)",
    "source_title": "cross-check: a large fault fails the screen",

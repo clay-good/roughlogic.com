@@ -528,7 +528,7 @@ const _TILES = [
   // spec-v525 neutral grounding resistor sizing (IEEE 142)
   ["neutral-grounding-resistor", "A"],
   ["step-touch-voltage", "A"],
-  ["ground-potential-rise", "A"],
+  ["ground-potential-rise", "A"], ["max-grid-resistance-for-touch", "A"],
   ["sccr-combination", "A"],
   // spec-v522 reduced-voltage starter current and torque
   ["reduced-voltage-starter", "A"],

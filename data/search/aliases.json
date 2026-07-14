@@ -83637,6 +83637,31 @@
       "kind": "question"
     },
     {
+      "term": "max grid resistance for touch voltage",
+      "target": "max-grid-resistance-for-touch",
+      "kind": "question"
+    },
+    {
+      "term": "target grounding grid resistance",
+      "target": "max-grid-resistance-for-touch",
+      "kind": "question"
+    },
+    {
+      "term": "what grid resistance passes ieee 80",
+      "target": "max-grid-resistance-for-touch",
+      "kind": "question"
+    },
+    {
+      "term": "grounding grid ohms for gpr screen",
+      "target": "max-grid-resistance-for-touch",
+      "kind": "question"
+    },
+    {
+      "term": "max ground resistance for fault current",
+      "target": "max-grid-resistance-for-touch",
+      "kind": "question"
+    },
+    {
       "term": "ev charger throttle",
       "target": "ev-charger-throttle",
       "kind": "industry"

@@ -238,6 +238,7 @@ const RELATED = {
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],
   "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],
   "ground-potential-rise": ["step-touch-voltage", "neutral-grounding-resistor", "grounding-electrode"],
+  "max-grid-resistance-for-touch": ["ground-potential-rise", "step-touch-voltage", "neutral-grounding-resistor", "grounding-electrode"],
   "sccr-combination": ["short-circuit-pp", "breaker-sizing", "asymmetrical-fault-xr"],
   "feeder-tap-rule": ["transformer-conductor-protection", "wire-ampacity", "breaker-sizing"],
   // spec-v165..v178 electrician batch (11 tiles; v166/v171/v173 cut as duplicates)

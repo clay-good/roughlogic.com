@@ -7051,6 +7051,17 @@ export const CITATIONS = {
       { name: "Grid current", value: "I_G is the portion of fault current returning through the grid to remote earth, not the total fault", source: "IEEE Std 80" },
     ],
   },
+  "max-grid-resistance-for-touch": {
+    formula: "max_grid_resistance_ohm = tolerable_touch_v / grid_current_a, the IEEE 80 GPR screen GPR = grid_current x grid_resistance solved for the resistance that keeps GPR at or below the tolerable touch voltage.",
+    edition: "IEEE Std 80 ground potential rise, solved for the grid resistance, by name.",
+    freeAccess: "IEEE 80 is available through IEEE; the ground-potential-rise relation is a published grounding-study screen.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of ground-potential-rise: the grid resistance target that keeps the whole yard's ground potential rise at or below the tolerable touch voltage, so the IEEE 80 screen passes without a mesh/step study. A lower grid resistance (more rods, a larger mesh, or better soil) or a lower grid current is needed if the target is impractical. The grid current is the portion of fault current returning through the grid to remote earth, not the total fault. IEEE Std 80 and a qualified grounding study govern - a screen, not a grounding design.",
+    assumptions: [
+      { name: "Resistance target", value: "max_R_g = tolerable_touch / grid_current clears the yard without mesh/step analysis", source: "IEEE Std 80" },
+      { name: "Grid current", value: "I_G is the portion of fault current returning through the grid to remote earth, not the total fault", source: "IEEE Std 80" },
+    ],
+  },
   "step-touch-voltage": {
     formula: "Cs = 1 - 0.09 (1 - rho/rho_s)/(2 hs + 0.09); E_step = (1000 + 6 Cs rho_s) k/sqrt(ts); E_touch = (1000 + 1.5 Cs rho_s) k/sqrt(ts) (k = 0.116 for 50 kg, 0.157 for 70 kg).",
     edition: "The IEEE Std 80 tolerable step and touch voltage limits with the surface-layer derating factor Cs, by name.",
