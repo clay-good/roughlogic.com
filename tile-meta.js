@@ -624,7 +624,7 @@ const _TILES = [
   // spec-v501 crosswind and headwind component
   ["crosswind-component", "K"],
   // spec-v502 displacement hull speed and speed/length ratio
-  ["hull-speed", "K"],
+  ["hull-speed", "K"], ["waterline-for-hull-speed", "K"],
   // spec-v505 anchor rode scope and swing radius
   ["anchor-rode-scope", "K"],
   // spec-v506 turbocharger pressure ratio and charge-air temp

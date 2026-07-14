@@ -1715,6 +1715,39 @@ MECHANIC_RENDERERS["hull-speed"] = _simpleRenderer({
   compute: computeHullSpeed,
 });
 
+// waterline-for-hull-speed: inverse of hull-speed. The forward tile gives the
+// displacement hull speed from a waterline length; sizing the waterline a hull
+// needs to reach a target speed is the inverse. From hull_speed = 1.34 x sqrt(LWL),
+// LWL = (target_speed / 1.34)^2 (the coefficient is editable, ~1.34-1.4).
+// dims: in { target_hull_speed_kn: L T^-1, coefficient: dimensionless } out: { waterline_length_ft: L }
+export function computeWaterlineForHullSpeed({ target_hull_speed_kn = 0, coefficient = 1.34 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const sp = Number(target_hull_speed_kn) || 0;
+  const c = Number(coefficient) > 0 ? Number(coefficient) : 1.34;
+  if (!(sp > 0)) return { error: "Target hull speed must be positive (kn)." };
+  if (!(c > 0)) return { error: "Speed-length coefficient must be positive." };
+  const ratio = sp / c;
+  const waterline_length_ft = ratio * ratio;
+  return {
+    waterline_length_ft, coefficient: c,
+    note: "Displacement hull-speed relation solved for the waterline: LWL = (target speed / 1.34)^2, since hull_speed = 1.34 x sqrt(LWL). This is the waterline a PURE DISPLACEMENT hull needs to reach the target without climbing its own bow wave - near the speed-length ratio of 1.34 the bow and stern waves merge and the hull hits a practical wall. A semi-displacement or planing hull exceeds it with enough power and the right form, so this is the displacement ceiling, not a hard limit. The coefficient is an approximation (some references use 1.34 to 1.4, editable). A planning estimate; the actual hull form, displacement, and power govern.",
+  };
+}
+export const waterlineForHullSpeedExample = { inputs: { target_hull_speed_kn: 8, coefficient: 1.34 } };
+MECHANIC_RENDERERS["waterline-for-hull-speed"] = _simpleRenderer({
+  citation: "Citation: displacement hull-speed relation (Froude speed-length theory) solved for the waterline: LWL = (target speed / 1.34)^2, from hull_speed = 1.34 x sqrt(LWL). The 1.34 ceiling is a practical wall for a pure displacement hull; the coefficient is editable (~1.34-1.4). A planning estimate; the hull form, displacement, and power govern.",
+  example: waterlineForHullSpeedExample.inputs,
+  fields: [
+    { key: "target_hull_speed_kn", label: "Target hull speed (kn)", kind: "number", default: 8 },
+    { key: "coefficient", label: "Speed-length coefficient (~1.34)", kind: "number", default: 1.34 },
+  ],
+  outputs: [
+    { key: "lwl", id: "wlh-out-lwl", label: "Required waterline length", value: (r) => fmt(r.waterline_length_ft, 1) + " ft" },
+    { key: "n", id: "wlh-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWaterlineForHullSpeed,
+});
+
 // ===================== spec-v505: anchor rode scope and swing radius =====================
 
 // dims: in { water_depth_ft: L, bow_height_ft: L, scope_ratio: dimensionless, boat_loa_ft: L } out: { vertical_ft: L, rode_ft: L, actual_scope: dimensionless, swing_radius_ft: L }

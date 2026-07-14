@@ -52991,6 +52991,27 @@
    }
   },
   {
+   "tile_id": "waterline-for-hull-speed",
+   "source_publisher": "displacement hull-speed relation (Froude speed-length theory)",
+   "source_title": "LWL = (target speed / 1.34)^2; inverse of the hull-speed relation",
+   "source_edition_or_year": "spec-v725 worked example (machine-verified; inverse of spec-v502)",
+   "source_section_or_page": "8 kn target displacement hull -> 35.6 ft waterline",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "target_hull_speed_kn": 8,
+    "coefficient": 1.34
+   },
+   "outputs": {
+    "waterline_length_ft": {
+     "value": 35.6427,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "hull-speed",
    "source_publisher": "displacement hull-speed relation (Froude speed-length theory)",
    "source_title": "cross-check: same 25 ft hull at 18 kn is SL 3.6 -> planing, off the displacement wall",

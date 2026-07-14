@@ -1017,6 +1017,7 @@ const RELATED = {
   "density-altitude": ["air-density-correction","prop-pitch-selection","engine-fuel-burn-gph"],
   "crosswind-component": ["density-altitude","prop-pitch-selection","wind-chill"],
   "hull-speed": ["prop-slip","prop-pitch-selection","fuel-range"],
+  "waterline-for-hull-speed": ["hull-speed","crouch-planing-speed","prop-pitch-selection","fuel-range"],
   "anchor-rode-scope": ["hull-speed","prop-slip","wire-rope-strength"],
   "turbo-pressure-ratio": ["volumetric-efficiency","density-altitude","air-density-correction"],
   "crouch-planing-speed": ["crouch-hp-for-speed","hull-speed","prop-pitch-selection","prop-slip"],

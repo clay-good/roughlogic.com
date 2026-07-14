@@ -19272,6 +19272,27 @@ test("bounds: spec-v502 computeHullSpeed pins the 1.34 sqrt(LWL) ceiling, the re
   assert.ok("error" in _v502({ lwl_ft: 25, actual_speed_kn: -1 }));
 });
 
+import { computeWaterlineForHullSpeed as _v725 } from "../../calc-mechanic.js";
+test("bounds: spec-v725 computeWaterlineForHullSpeed pins LWL = (speed/1.34)^2, round-trips through computeHullSpeed, and error seams", () => {
+  const r = _v725({ target_hull_speed_kn: 8, coefficient: 1.34 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.waterline_length_ft - (8 / 1.34) ** 2) < 1e-9, `LWL identity: ${r.waterline_length_ft}`);
+  assert.ok(Math.abs(r.waterline_length_ft - 35.6427) < 1e-3, `pinned 35.6 ft: ${r.waterline_length_ft}`);
+  // Round-trip (default 1.34 coefficient matches the forward's hardcoded 1.34): at the LWL the forward hull speed equals the target.
+  for (const target_hull_speed_kn of [5, 8, 15]) {
+    const m = _v725({ target_hull_speed_kn, coefficient: 1.34 });
+    assert.ok(!m.error, `sweep v=${target_hull_speed_kn}: ${JSON.stringify(m)}`);
+    assertFinite(m.waterline_length_ft, "LWL"); assert.ok(m.waterline_length_ft > 0, "LWL positive");
+    const back = _v502({ lwl_ft: m.waterline_length_ft });
+    assert.ok(Math.abs(back.hull_speed_kn - target_hull_speed_kn) < 1e-9, `round-trip v=${target_hull_speed_kn}: ${back.hull_speed_kn}`);
+  }
+  // A faster target needs a longer waterline (quadratically).
+  assert.ok(_v725({ target_hull_speed_kn: 12, coefficient: 1.34 }).waterline_length_ft > r.waterline_length_ft);
+  // Error seams: non-positive speed, non-finite.
+  assert.ok("error" in _v725({ target_hull_speed_kn: 0, coefficient: 1.34 }));
+  assert.ok("error" in _v725({ target_hull_speed_kn: Infinity, coefficient: 1.34 }));
+});
+
 import { computeBoltProofLoad as _v503 } from "../../calc-cross.js";
 
 test("bounds: spec-v503 computeBoltProofLoad pins the stress area, the grade loads, the proof<yield<tensile order, and error seams", () => {

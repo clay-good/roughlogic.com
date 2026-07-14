@@ -67932,6 +67932,31 @@
       "kind": "question"
     },
     {
+      "term": "waterline length for hull speed",
+      "target": "waterline-for-hull-speed",
+      "kind": "question"
+    },
+    {
+      "term": "how long a boat for 8 knots",
+      "target": "waterline-for-hull-speed",
+      "kind": "question"
+    },
+    {
+      "term": "lwl for target speed",
+      "target": "waterline-for-hull-speed",
+      "kind": "question"
+    },
+    {
+      "term": "boat length for displacement speed",
+      "target": "waterline-for-hull-speed",
+      "kind": "question"
+    },
+    {
+      "term": "waterline needed for a speed",
+      "target": "waterline-for-hull-speed",
+      "kind": "question"
+    },
+    {
       "term": "how much anchor rode to let out",
       "target": "anchor-rode-scope",
       "kind": "question"

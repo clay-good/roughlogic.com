@@ -9263,6 +9263,17 @@ export const CITATIONS = {
       { name: "Approximation", value: "the coefficient varies 1.34 to 1.4; hull form and displacement govern", source: "scope of this tile" },
     ],
   },
+  "waterline-for-hull-speed": {
+    formula: "waterline_length_ft = (target_hull_speed_kn / coefficient)^2, the displacement hull-speed relation hull_speed = 1.34 x sqrt(LWL) solved for the waterline; coefficient default 1.34.",
+    edition: "Displacement hull-speed relation (Froude speed-length theory), solved for the waterline, by name; the actual hull form, displacement, and power govern.",
+    freeAccess: "The speed-length relation is a published empirical result of displacement-hull / Froude theory.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of hull-speed: the waterline a PURE DISPLACEMENT hull needs to reach a target speed without climbing its own bow wave. Near the speed-length ratio of 1.34 the bow and stern waves merge and the hull hits a practical wall, so this is the displacement ceiling, not a hard limit - a semi-displacement or planing hull exceeds it with enough power and the right form. The coefficient is an approximation (some references use 1.34 to 1.4, editable). A planning estimate; the hull form, displacement, and power govern.",
+    assumptions: [
+      { name: "Displacement wall", value: "LWL = (speed / 1.34)^2 is the waterline for the displacement ceiling", source: "Froude speed-length theory" },
+      { name: "Approximation", value: "the coefficient varies 1.34 to 1.4; a planing hull breaks the ceiling", source: "scope of this tile" },
+    ],
+  },
   "crosswind-component": {
     formula: "angle = fold(|wind_dir - runway_heading|, 0..180); crosswind = speed x sin(angle); headwind = speed x cos(angle) (negative = tailwind); gust_xwind = (gust > 0 ? gust : speed) x sin(angle).",
     edition: "Runway wind-component resolution (the FAA vector method / POH crosswind chart), first-principles trigonometry, by name; the pilot in command and the aircraft flight manual govern.",

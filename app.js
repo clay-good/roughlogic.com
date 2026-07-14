@@ -849,7 +849,7 @@ const TOOL_MODULES = (() => {
     // spec-v501 crosswind and headwind component
     "crosswind-component",
     // spec-v502 displacement hull speed and speed/length ratio
-    "hull-speed",
+    "hull-speed", "waterline-for-hull-speed",
     // spec-v505 anchor rode scope and swing radius
     "anchor-rode-scope",
     // spec-v506 turbocharger pressure ratio and charge-air temp
