@@ -9628,6 +9628,17 @@ export const CITATIONS = {
       { name: "Reserve rate", value: "25 A draw to a 10.5 V cutoff at 80 F on a 12 V battery", source: "BCI / SAE J537" },
     ],
   },
+  "sacrificial-anode-life": {
+    formula: "life_hours = anode_mass_lb x capacity_Ah_per_lb x utilization / current_A; life_years = life_hours / 8760. Capacity: zinc 354, aluminum (Al-Zn-In) 1150, magnesium 500 A-h/lb.",
+    edition: "Sacrificial-anode life by Faraday's law of electrolysis (ABYC E-2 cathodic protection; DNV-RP-B401 anode capacities), by name; a corrosion survey and reference-cell reading govern.",
+    freeAccess: "Faraday's law is public; the electrochemical capacities are published anode-material properties. The protective current comes from a reference-electrode measurement of the boat.",
+    governance: GOVERNANCE.general,
+    editionNote: "Sacrificial-anode life by Faraday's law: the charge an anode can deliver (net mass x electrochemical capacity x utilization) divided by the charge the protective current draws per year (current x 8760 h). Electrochemical capacity is a material property -- zinc ~354 A-h/lb, aluminum Al-Zn-In ~1150, magnesium ~500 -- so an aluminum anode of equal mass lasts far longer per amp and works in brackish water where zinc passivates, which is why aluminum has largely replaced zinc on modern boats. The utilization factor (~0.85 for a slender standoff anode) accounts for the anode becoming ineffective before it is fully consumed. The protective current depends on the wetted area, coating, and water, so it must be measured with a reference electrode or bonding-system meter. Replace an anode at about half consumed. A planning estimate, not a corrosion survey; the reference-cell reading governs.",
+    assumptions: [
+      { name: "Electrochemical capacity", value: "zinc ~354, aluminum (Al-Zn-In) ~1150, magnesium ~500 A-h/lb", source: "DNV-RP-B401 / ABYC E-2" },
+      { name: "Utilization factor", value: "~0.85 for a slender standoff anode (the anode is ineffective before fully consumed)", source: "DNV-RP-B401" },
+    ],
+  },
   "aircraft-weight-balance": {
     formula: "total_weight = sum(w); total_moment = sum(w x arm); CG = total_moment / total_weight; in_envelope = weight <= max_gross AND fwd_limit <= CG <= aft_limit.",
     edition: "The station-moment weight-and-balance check of the FAA Weight & Balance Handbook (FAA-H-8083-1; AC 91-23), by name; the specific aircraft flight manual and the pilot in command govern.",

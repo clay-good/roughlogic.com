@@ -24370,6 +24370,35 @@
    }
   },
   {
+   "tile_id": "sacrificial-anode-life",
+   "source_publisher": "Sacrificial-anode life by Faraday's law (ABYC E-2; DNV-RP-B401)",
+   "source_title": "life = anode_mass x capacity x utilization / (current x 8760 h)",
+   "source_edition_or_year": "spec-v786 worked example (machine-verified)",
+   "source_section_or_page": "5 lb zinc (354 A-h/lb), 0.85 utilization, 0.15 A -> 1.14 years, 4.37 lb/yr consumption",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "anode_material": "zinc",
+    "anode_mass_lb": 5,
+    "current_draw_a": 0.15,
+    "utilization_factor": 0.85
+   },
+   "outputs": {
+    "life_years": {
+     "value": 1.145,
+     "tolerance": {
+      "abs": 0.005
+     }
+    },
+    "consumption_lb_per_year": {
+     "value": 4.367,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "reserve-capacity-amp-hours",
    "source_publisher": "BCI / SAE J537 reserve capacity",
    "source_title": "amp_hours = 25 x reserve_capacity_minutes / 60",

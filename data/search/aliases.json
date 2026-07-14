@@ -23797,6 +23797,31 @@
       "kind": "industry"
     },
     {
+      "term": "how long does a boat zinc last",
+      "target": "sacrificial-anode-life",
+      "kind": "question"
+    },
+    {
+      "term": "sacrificial anode life",
+      "target": "sacrificial-anode-life",
+      "kind": "industry"
+    },
+    {
+      "term": "zinc anode replacement interval",
+      "target": "sacrificial-anode-life",
+      "kind": "question"
+    },
+    {
+      "term": "galvanic anode sizing",
+      "target": "sacrificial-anode-life",
+      "kind": "adjacent"
+    },
+    {
+      "term": "cathodic protection anode life",
+      "target": "sacrificial-anode-life",
+      "kind": "industry"
+    },
+    {
       "term": "powered attic ventilator",
       "target": "powered-attic-ventilator",
       "kind": "industry"

@@ -872,6 +872,7 @@ const TOOL_MODULES = (() => {
     // spec-v517 ABYC E-11 marine DC wire sizing
     "abyc-dc-wire",
     "reserve-capacity-amp-hours",
+    "sacrificial-anode-life",
   ]);
   // spec-v76 cap-relief split: the cohesive machining bench (cutting-speed-rpm,
   // drill-point-depth) relocated out of calc-mechanic.js (which had reached

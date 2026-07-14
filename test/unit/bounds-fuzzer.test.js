@@ -21609,6 +21609,25 @@ test("bounds: spec-v784 computeFloorAreaRatio pins FAR, the max buildable / rema
   assert.ok("error" in _v784({ building_floor_area_sf: 30000, lot_area_sf: 20000, far_limit: -1 }));
 });
 
+import { computeSacrificialAnodeLife as _v786 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v786 computeSacrificialAnodeLife pins Faraday's-law life, material capacity, monotonicity, and error seams", () => {
+  const r = _v786({ anode_material: "zinc", anode_mass_lb: 5, current_draw_a: 0.15, utilization_factor: 0.85 });
+  assert.ok(Math.abs(r.life_years - 1.145) < 0.005); // 5*354*0.85/(0.15*8760)
+  assert.ok(Math.abs(r.consumption_lb_per_year - 4.367) < 0.01); // 0.15*8760/(354*0.85)
+  assert.strictEqual(r.capacity, 354);
+  // Aluminum of equal mass lasts far longer per amp (higher capacity); more current shortens life.
+  const alum = _v786({ anode_material: "aluminum", anode_mass_lb: 5, current_draw_a: 0.15, utilization_factor: 0.85 });
+  assert.ok(alum.life_years > r.life_years);
+  assert.ok(_v786({ anode_material: "zinc", anode_mass_lb: 5, current_draw_a: 0.30, utilization_factor: 0.85 }).life_years < r.life_years);
+  // Error seams: bad material, non-finite, non-positive mass/current, utilization out of (0,1].
+  assert.ok("error" in _v786({ anode_material: "titanium", anode_mass_lb: 5, current_draw_a: 0.15 }));
+  assert.ok("error" in _v786({ anode_material: "zinc", anode_mass_lb: Infinity, current_draw_a: 0.15 }));
+  assert.ok("error" in _v786({ anode_material: "zinc", anode_mass_lb: 0, current_draw_a: 0.15 }));
+  assert.ok("error" in _v786({ anode_material: "zinc", anode_mass_lb: 5, current_draw_a: 0 }));
+  assert.ok("error" in _v786({ anode_material: "zinc", anode_mass_lb: 5, current_draw_a: 0.15, utilization_factor: 1.5 }));
+});
+
 import { computeReserveCapacityAmpHours as _v783 } from "../../calc-mechanic.js";
 
 test("bounds: spec-v783 computeReserveCapacityAmpHours pins the RC-to-amp-hours conversion, monotonicity, and error seams", () => {

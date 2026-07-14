@@ -4,6 +4,16 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ## Unreleased
 
+### feat(mechanic): spec-v786 sacrificial anode service life; 2026-07-14
+
+- New tile `sacrificial-anode-life` (Group K, calc-mechanic.js): how long a boat's zinc, aluminum, or magnesium anode
+  lasts, by Faraday's law -- `life = anode mass x electrochemical capacity x utilization / (protective current x
+  8760 h)`, with capacities zinc ~354, aluminum (Al-Zn-In) ~1150, magnesium ~500 A-h/lb. A 5 lb zinc at 0.85 utilization
+  drawing 0.15 A lasts about 1.14 years (4.37 lb/yr). Reports the life, the consumption rate, and the capacity used, and
+  the note explains why aluminum has largely replaced zinc. Fuzzer pins the life, consumption, material capacity, the
+  aluminum-longer / more-current-shorter monotonicity, and the error seams. First tile of Explore sweep #21. Home count
+  1,234 -> 1,235.
+
 ### feat(stage): spec-v785 winch drum fleet angle; 2026-07-14
 
 - New tile `winch-fleet-angle` (Group N, calc-stage.js): the sideways angle a wire rope makes running from a fixed lead

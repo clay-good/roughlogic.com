@@ -785,6 +785,7 @@ export const COMPUTE_MAP = {
   "reserve-capacity-amp-hours": { module: "../../calc-mechanic.js", fn: "computeReserveCapacityAmpHours" },
   "floor-area-ratio": { module: "../../calc-realestate.js", fn: "computeFloorAreaRatio" },
   "winch-fleet-angle": { module: "../../calc-stage.js", fn: "computeWinchFleetAngle" },
+  "sacrificial-anode-life": { module: "../../calc-mechanic.js", fn: "computeSacrificialAnodeLife" },
   "load-profitability": { module: "../../calc-trucking.js", fn: "computeLoadProfitability" },
   "fuel-surcharge": { module: "../../calc-trucking.js", fn: "computeFuelSurcharge" },
   "maintenance-reserve": { module: "../../calc-trucking.js", fn: "computeMaintenanceReserve" },

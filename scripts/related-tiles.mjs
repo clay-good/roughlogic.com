@@ -1021,6 +1021,7 @@ const RELATED = {
   "drink-abv-dilution": ["pour-cost","bakers-percentage","recipe-scale"],
   "overrun-percent": ["bakers-percentage","yield-ep","recipe-scale"],
   "reserve-capacity-amp-hours": ["standby-battery-sizing","fuel-range","abyc-dc-wire"],
+  "sacrificial-anode-life": ["abyc-dc-wire","prop-slip","reserve-capacity-amp-hours"],
   "load-profitability": ["cost-per-mile","deadhead-percent","fuel-surcharge"],
   "fuel-surcharge": ["load-profitability","cost-per-mile","fuel-tax-ifta"],
   "maintenance-reserve": ["cost-per-mile","load-profitability","fuel-surcharge"],
