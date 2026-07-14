@@ -2231,6 +2231,29 @@ export const helicalPileExample = {
   inputs: { shaft: "1.5_inch_solid", torque_ft_lb: 4500, factor_of_safety: 2.0 },
 };
 
+// dims: in { shaft: dimensionless, target_capacity_lb: M L T^-2, capacity_basis: dimensionless, factor_of_safety: dimensionless } out: { torque_ft_lb: M L^2 T^-2 }
+export function computeHelicalPileTorque({ shaft = "1.5_inch_solid", target_capacity_lb = 0, capacity_basis = "allowable", factor_of_safety = 2.0 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const e = HELICAL_PILE_KT[shaft];
+  if (!e) return { error: "Unknown shaft type." };
+  const cap = Number(target_capacity_lb) || 0;
+  const basis = String(capacity_basis);
+  const fs = Number(factor_of_safety) || 0;
+  if (!(cap > 0)) return { error: "Target capacity must be positive (lb)." };
+  if (basis !== "allowable" && basis !== "ultimate") return { error: "Capacity basis must be allowable or ultimate." };
+  if (!(fs >= 1)) return { error: "Factor of safety must be >= 1." };
+  // Inverse of ultimate = Kt x torque and allowable = ultimate / FS:
+  // ultimate = (basis == allowable ? capacity x FS : capacity); torque = ultimate / Kt.
+  const ultimate_lb = basis === "allowable" ? cap * fs : cap;
+  const torque_ft_lb = ultimate_lb / e.Kt;
+  if (!Number.isFinite(torque_ft_lb) || !(torque_ft_lb > 0)) return { error: "Torque math is not a finite positive value." };
+  return {
+    torque_ft_lb, ultimate_lb, Kt: e.Kt, description: e.description,
+    note: "The installation torque a helical pile must reach to confirm a target capacity, the inverse of the helical-pile tile: from ultimate = Kt x torque and allowable = ultimate / FS, torque = (allowable x FS) / Kt = ultimate / Kt. This is the field-acceptance torque the crew watches on the drive-head gauge as the pile advances; reaching it verifies the correlated capacity. Kt is a shaft-specific empirical torque-to-capacity factor (larger shafts have a lower Kt), and the correlation is an installation check, not a substitute for a load test. The engineer of record specifies the project Kt, the factor of safety, and the acceptance torque; a load test governs the true capacity."
+  };
+}
+export const helicalPileTorqueExample = { inputs: { shaft: "1.5_inch_solid", target_capacity_lb: 22500, capacity_basis: "allowable", factor_of_safety: 2.0 } };
+
 // --- 251: Crane Lift Plan Quick-Math ---
 
 // dims: in { args: dimensionless } out: { radius_ft: L, capacity_lb: M L T^-2, utilization: dimensionless }
@@ -2432,6 +2455,26 @@ function _v7c_renderHelicalPile(inputRegion, outputRegion, citationEl) {
   for (const f of [sh.select, tq.input, fs.input]) f.addEventListener("input", update);
 }
 
+function renderHelicalPileTorque(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: torque correlation solved for the acceptance torque: torque = (allowable x FS) / Kt = ultimate / Kt, from ultimate = Kt x torque. Kt benchmarks from data/construction/helical-pile-kt.json (manufacturer-attributed). Engineer of record governs the design capacity and acceptance; a load test governs the true capacity.";
+  _v7c_attachEx(inputRegion, () => { sh.select.value = "1.5_inch_solid"; cap.input.value = "22500"; basis.select.value = "allowable"; fs.input.value = "2.0"; update(); });
+  const sh = _v7c_makeSelect("Shaft type", "hpt-sh", Object.keys(HELICAL_PILE_KT).map((k) => ({ value: k, label: HELICAL_PILE_KT[k].description + " (Kt=" + HELICAL_PILE_KT[k].Kt + ")" })));
+  const cap = _v7c_makeNumber("Target capacity (lb)", "hpt-cap", { step: "any", min: "0" });
+  const basis = _v7c_makeSelect("Capacity basis", "hpt-basis", [{ value: "allowable", label: "Allowable (design)" }, { value: "ultimate", label: "Ultimate" }]);
+  const fs = _v7c_makeNumber("Factor of safety", "hpt-fs", { step: "any", min: "1" });
+  fs.input.value = "2.0";
+  for (const f of [sh, cap, basis, fs]) inputRegion.appendChild(f.wrap);
+  const oT = _v7c_makeOut(outputRegion, "Required installation torque", "hpt-out-t");
+  const oN = _v7c_makeOut(outputRegion, "Note", "hpt-out-n");
+  const update = _v7c_debounce(() => {
+    const r = computeHelicalPileTorque({ shaft: sh.select.value, target_capacity_lb: Number(cap.input.value) || 0, capacity_basis: basis.select.value, factor_of_safety: Number(fs.input.value) || 2.0 });
+    if (r.error) { oT.textContent = r.error; oN.textContent = ""; return; }
+    oT.textContent = _v7c_fmt(r.torque_ft_lb, 0) + " ft-lb (Kt=" + r.Kt + ", ultimate " + _v7c_fmt(r.ultimate_lb, 0) + " lb)";
+    oN.textContent = r.note;
+  }, _V7C_DEB);
+  for (const f of [sh.select, cap.input, basis.select, fs.input]) f.addEventListener("input", update);
+}
+
 function _v7c_renderCraneLiftCheck(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: ASME B30.5 by section. The crane manufacturer's load chart governs. The qualified lift director governs. Math aid only. Do not attempt a lift over 75% of chart capacity without a written critical-lift plan.";
   _v7c_attachEx(inputRegion, () => fillExample(craneLiftCheckExample.inputs));
@@ -2476,6 +2519,7 @@ CONSTRUCTION_RENDERERS["hip-valley-rafter"] = _v7c_renderHipValleyRafter;
 CONSTRUCTION_RENDERERS["rebar-schedule"] = _v7c_renderRebarSchedule;
 CONSTRUCTION_RENDERERS["plywood-span"] = _v7c_renderPlywoodSpan;
 CONSTRUCTION_RENDERERS["helical-pile"] = _v7c_renderHelicalPile;
+CONSTRUCTION_RENDERERS["helical-pile-torque"] = renderHelicalPileTorque;
 CONSTRUCTION_RENDERERS["crane-lift-quick"] = _v7c_renderCraneLiftCheck;
 
 // =====================================================================

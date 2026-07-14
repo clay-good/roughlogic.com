@@ -442,6 +442,7 @@ export const COMPUTE_MAP = {
   "weld-travel-speed": { module: "../../calc-fab.js", fn: "computeWeldTravelSpeed" },
   "spindle-power-torque": { module: "../../calc-machining.js", fn: "computeSpindlePowerTorque" },
   "helical-pile": { module: "../../calc-construction.js", fn: "computeHelicalPile" },
+  "helical-pile-torque": { module: "../../calc-construction.js", fn: "computeHelicalPileTorque" },
   "rebar-schedule": { module: "../../calc-construction.js", fn: "computeRebarSchedule" },
   "hip-valley-rafter": { module: "../../calc-construction.js", fn: "computeHipValleyRafter" },
   "plywood-span": { module: "../../calc-construction.js", fn: "computePlywoodSpan" },

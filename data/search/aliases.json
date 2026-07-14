@@ -39137,6 +39137,31 @@
       "kind": "question"
     },
     {
+      "term": "acceptance torque for a target capacity",
+      "target": "helical-pile-torque",
+      "kind": "industry"
+    },
+    {
+      "term": "install torque to confirm pile capacity",
+      "target": "helical-pile-torque",
+      "kind": "industry"
+    },
+    {
+      "term": "torque to hit a helical pile allowable",
+      "target": "helical-pile-torque",
+      "kind": "adjacent"
+    },
+    {
+      "term": "field acceptance torque helical pier",
+      "target": "helical-pile-torque",
+      "kind": "adjacent"
+    },
+    {
+      "term": "drive torque for a pile design load",
+      "target": "helical-pile-torque",
+      "kind": "adjacent"
+    },
+    {
       "term": "gross load for a crane pick",
       "target": "crane-lift-quick",
       "kind": "question"

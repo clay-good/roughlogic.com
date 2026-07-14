@@ -419,7 +419,7 @@ const TOOL_MODULES = (() => {
     "weld-usage", "demo-debris", "formwork-pressure",
     // v7
     "stair-stringer-layout", "hip-valley-rafter", "rebar-schedule",
-    "plywood-span", "helical-pile", "crane-lift-quick",
+    "plywood-span", "helical-pile", "helical-pile-torque", "crane-lift-quick",
     // v8
     "residential-framing",
     // v9

@@ -618,6 +618,7 @@ import {
   computeFootingArea,
   computeFormworkPressure,
   computeHelicalPile,
+  computeHelicalPileTorque,
   computeHipValleyRafter,
   computeIceBarrierCoverage,
   computeJoistDeflection,
@@ -8240,6 +8241,34 @@ test("bounds: calc-construction computeHelicalPile pins ultimate = Kt*torque and
   assert.ok("error" in computeHelicalPile({ shaft: "moon" }));
   assert.ok("error" in computeHelicalPile({ torque_ft_lb: 0 }));
   assert.ok("error" in computeHelicalPile({ torque_ft_lb: 1000, factor_of_safety: 0.5 }));
+});
+
+test("bounds: spec-v681 computeHelicalPileTorque pins torque = allowable*FS/Kt = ultimate/Kt, round-trips through computeHelicalPile, and error seams", () => {
+  const r = computeHelicalPileTorque({ shaft: "1.5_inch_solid", target_capacity_lb: 22500, capacity_basis: "allowable", factor_of_safety: 2.0 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.strictEqual(r.torque_ft_lb, 4500); // 22500 * 2 / 10
+  assert.strictEqual(r.ultimate_lb, 45000);
+  // Ultimate basis: torque = ultimate / Kt directly (no FS).
+  assert.strictEqual(computeHelicalPileTorque({ shaft: "1.5_inch_solid", target_capacity_lb: 45000, capacity_basis: "ultimate", factor_of_safety: 2.0 }).torque_ft_lb, 4500);
+  // A lower-Kt shaft needs more torque for the same capacity.
+  const pipe = computeHelicalPileTorque({ shaft: "3.5_inch_pipe", target_capacity_lb: 22500, capacity_basis: "allowable", factor_of_safety: 2.0 });
+  assert.ok(pipe.torque_ft_lb > r.torque_ft_lb, `lower Kt more torque: ${pipe.torque_ft_lb}`);
+  // Round-trip: the acceptance torque, fed back through the forward tile, reproduces the allowable capacity.
+  for (const shaft of ["1.5_inch_solid", "2.875_inch_pipe", "3.5_inch_pipe"]) {
+    for (const target_capacity_lb of [10000, 22500, 40000]) {
+      const m = computeHelicalPileTorque({ shaft, target_capacity_lb, capacity_basis: "allowable", factor_of_safety: 2.0 });
+      assert.ok(!m.error, `sweep ${shaft} cap=${target_capacity_lb}: ${JSON.stringify(m)}`);
+      assertFinite(m.torque_ft_lb, "torque"); assert.ok(m.torque_ft_lb > 0, "torque positive");
+      const back = computeHelicalPile({ shaft, torque_ft_lb: m.torque_ft_lb, factor_of_safety: 2.0 });
+      assert.ok(Math.abs(back.allowable_lb - target_capacity_lb) < 1e-6, `round-trip ${shaft} cap=${target_capacity_lb}: ${back.allowable_lb}`);
+    }
+  }
+  // Error seams: unknown shaft, non-positive capacity, bad basis, FS < 1, non-finite.
+  assert.ok("error" in computeHelicalPileTorque({ shaft: "moon", target_capacity_lb: 22500 }));
+  assert.ok("error" in computeHelicalPileTorque({ shaft: "1.5_inch_solid", target_capacity_lb: 0 }));
+  assert.ok("error" in computeHelicalPileTorque({ shaft: "1.5_inch_solid", target_capacity_lb: 22500, capacity_basis: "x" }));
+  assert.ok("error" in computeHelicalPileTorque({ shaft: "1.5_inch_solid", target_capacity_lb: 22500, factor_of_safety: 0.5 }));
+  assert.ok("error" in computeHelicalPileTorque({ shaft: "1.5_inch_solid", target_capacity_lb: Infinity }));
 });
 
 test("bounds: calc-construction computeCraneLiftCheck pins gross_load, per-leg sling tension, and RED/YELLOW/GREEN flag", () => {

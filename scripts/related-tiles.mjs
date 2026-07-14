@@ -752,7 +752,8 @@ const RELATED = {
   "hip-valley-rafter": ["rafter", "roof-pitch"],
   "rebar-schedule": ["rebar", "concrete", "footing-area"],
   "plywood-span": ["lumber-spans", "joist-deflection"],
-  "helical-pile": ["footing-area", "anchor-embedment"],
+  "helical-pile": ["helical-pile-torque", "footing-area", "anchor-embedment"],
+  "helical-pile-torque": ["helical-pile", "pile-axial-capacity", "footing-area"],
   "crane-lift-quick": ["rigging-check", "sling-angle", "truss-capacity"],
   "excavation-bench-plan": ["excavation", "trench-slope"],
 

@@ -238,7 +238,7 @@ const _TILES = [
   ["weld-usage", "E"], ["demo-debris", "E"], ["formwork-pressure", "E"],
   ["residential-framing", "E"], ["stair-stringer-layout", "E"],
   ["hip-valley-rafter", "E"], ["rebar-schedule", "E"], ["plywood-span", "E"],
-  ["helical-pile", "E"], ["crane-lift-quick", "E"],
+  ["helical-pile", "E"], ["helical-pile-torque", "E"], ["crane-lift-quick", "E"],
   ["excavation-bench-plan", "E"],
   ["header-sizing", "E"], ["deck-beam-post", "E"],
 

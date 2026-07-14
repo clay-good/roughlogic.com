@@ -2930,6 +2930,18 @@ export const CITATIONS = {
       { name: "Default factor of safety", value: "2.0 unless user supplies (engineering-practice default for axial helical piers)", source: "ICC-ES AC358 typical" },
     ],
   },
+  "helical-pile-torque": {
+    formula: "Installation torque = ultimate / Kt = (allowable × factor_of_safety) / Kt (lb-ft). Kt by shaft type: 1.5 in solid 10, 1.75 in solid 9, 2.875 in pipe 7, 3.5 in pipe 5.",
+    edition: "ICC-ES Acceptance Criteria AC358 (helical foundation systems) by name; manufacturer technical bulletins (CHANCE, Magnum, Ram Jack, AB Chance) by name.",
+    freeAccess: "ICC-ES AC358 free at icc-es.org. Manufacturer Kt values free in each manufacturer's published evaluation report.",
+    governance: GOVERNANCE.engineer_of_record,
+    editionNote: "The installation torque a helical pile must reach to confirm a target capacity, the inverse of helical-pile: from ultimate = Kt × torque and allowable = ultimate / FS, torque = (allowable × FS) / Kt = ultimate / Kt. This is the field-acceptance torque the crew watches on the drive-head gauge as the pile advances; reaching it verifies the correlated capacity. Kt is a shaft-specific empirical torque-to-capacity factor (larger shafts have a lower Kt), and the correlation is an installation check, not a substitute for a load test. Single-edition (manufacturer Kt benchmarks; quarterly recheck per spec-v7 §8). The engineer of record specifies the project Kt, the factor of safety, and the acceptance torque; a load test governs the true capacity.",
+    assumptions: [
+      { name: "Kt table", value: "data/construction/helical-pile-kt.json keyed to shaft type", source: "manufacturer technical bulletins" },
+      { name: "Acceptance check only", value: "the torque correlation is an installation acceptance check, not a substitute for a load test", source: "ICC-ES AC358" },
+      { name: "Default factor of safety", value: "2.0 unless user supplies (engineering-practice default for axial helical piers)", source: "ICC-ES AC358 typical" },
+    ],
+  },
   "crane-lift-quick": {
     formula: "Gross load = load + rigging + block + jib_deduct. Per-leg sling tension L = W / (n × sin(theta/2)) (basket / bridle form). Percent of chart = gross / chart_capacity × 100. Flags: < 75% green, 75-90% yellow, ≥ 90% red. Refuses to render an output without the user-entered chart capacity (the tool never reproduces a load chart).",
     edition: "ASME B30.5 (Mobile and Locomotive Cranes) by name and section. ASME B30.9 (Slings) for the per-leg formula. OSHA 29 CFR 1926 Subpart CC (cranes and derricks) by section.",
