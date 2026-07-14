@@ -234,6 +234,7 @@ const RELATED = {
   "reduced-voltage-starter": ["motor-locked-rotor-kva", "motor-vd-starting", "generator-motor-starting"],
   "vfd-reflected-wave": ["vfd-energy-savings", "cable-bend-radius", "reduced-voltage-starter"],
   "harmonic-resonance": ["pf-correction", "transformer-k-factor", "power-factor-billing-savings"],
+  "capacitor-bank-for-resonance-order": ["harmonic-resonance", "pf-correction", "transformer-k-factor", "tdd-ieee-519"],
   "tdd-ieee-519": ["transformer-k-factor", "harmonic-resonance", "voltage-imbalance"],
   "neutral-grounding-resistor": ["grounding-electrode", "egc-sizing", "grounding-electrode-conductor"],
   "step-touch-voltage": ["grounding-electrode", "neutral-grounding-resistor", "grounding-electrode-conductor"],

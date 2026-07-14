@@ -2397,6 +2397,7 @@ cross-check.
 | calc-plumbing.js | `renderTanklessGPM` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderTrapArm` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
 | calc-plumbing.js | `renderWaterHammerArrestor` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
+| calc-powerquality.js | `computeCapacitorBankForResonanceOrder` | `{ short_circuit_mva = 0, target_resonant_order = 4.7 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeHarmonicResonance` | `{ short_circuit_mva = 0, cap_bank_mvar = 0 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeMotorCapacitorMax` | `{ v_ll = 0, i_noload_a = 0, safety_factor = 0.90 } = {}` | _ | _ | _ |
 | calc-powerquality.js | `computeMotorUnbalanceDerate` | `{ v_ab = 0, v_bc = 0, v_ca = 0 } = {}` | _ | _ | _ |
@@ -2826,7 +2827,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1412.
+Row count: 1413.
 
 <!-- END function-corpus-v14 -->
 
@@ -2907,7 +2908,7 @@ spec-v14 §12.1) record the v6 source-stamp recheck row in
 [docs/v6-audit.md](v6-audit.md) rather than a formula derivation,
 per spec-v14 §13.1 second paragraph.
 
-### Group A Electrical (150 tiles)
+### Group A Electrical (151 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -2929,6 +2930,7 @@ per spec-v14 §13.1 second paragraph.
 | `cable-bend-radius` | Cable Bend Radius Minimum | Southwire; Single-conductor THHN: 8x multiple; 0.5 in OD -> 4 in min... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `cable-tray-fill` | Cable Tray Fill | NEC Article 392.22(A) (by name); six 1.5 in 4/0 cables in a 12 in ladder tray -> 9 in of 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `camera-lens-fov` | Camera Lens FOV and Pixel Density (DORI) | IEC 62676-4 DORI; spec-v456 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `capacitor-bank-for-resonance-order` | Max PF Capacitor Bank to Keep Resonance Off a Harmonic | parallel-resonance order of a PF capa...; 200 MVA bus, target order 4.7 (below the 5th) -> 9.05 MVA... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `capacitor-discharge-time` | Capacitor Discharge Time and Bleed Resistor (NEC 460.6) | NEC 2023 460.6; spec-v495 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-retention-days` | CCTV Retention Days from Disk Capacity | first-principles NVR/VMS bitrate acco...; 16000 GB disk, 8 cameras at 4 Mbps, 24 h -> 16000 / (8 * ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `cctv-storage` | IP Camera / NVR Storage and Bandwidth | first-principles NVR/VMS bitrate acco...; 1 camera at 4 Mbps, 24 h, 30 days -> 4 * 10.8 * 30 = 1296 GB | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4177,6 +4179,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1165. Fixture-covered or reference-cadence: 1165 / 1165.
+Tile count: 1166. Fixture-covered or reference-cadence: 1166 / 1166.
 
 <!-- END tile-index-v14 -->

@@ -472,6 +472,44 @@ function _v523renderHarmonicResonance(inputRegion, outputRegion, citationEl) {
 }
 POWERQUALITY_RENDERERS["harmonic-resonance"] = _v523renderHarmonicResonance;
 
+// capacitor-bank-for-resonance-order: inverse of harmonic-resonance. The forward
+// tile gives the parallel-resonance order from a bank size; keeping that order at
+// or above a target (away from the low harmonics) is the inverse. Since a bigger
+// bank LOWERS the order, h = sqrt(MVA_sc / MVAR_cap) solved for the bank gives the
+// MAXIMUM bank: MVAR_cap = MVA_sc / h_target^2.
+// dims: in { short_circuit_mva: M L^2 T^-3, target_resonant_order: dimensionless } out: { max_cap_bank_mvar: M L^2 T^-3 }
+export function computeCapacitorBankForResonanceOrder({ short_circuit_mva = 0, target_resonant_order = 4.7 } = {}) {
+  const sc = Number(short_circuit_mva);
+  const h = Number(target_resonant_order);
+  if (!Number.isFinite(sc) || !Number.isFinite(h)) return { error: "All numeric inputs must be finite numbers." };
+  if (!(sc > 0)) return { error: "Short-circuit MVA must be positive." };
+  if (!(h > 0)) return { error: "Target resonant order must be positive." };
+  const max_cap_bank_mvar = sc / (h * h);
+  return {
+    max_cap_bank_mvar,
+    note: "The harmonic parallel-resonance relation h = sqrt(MVA_sc / MVAR_cap) solved for the bank: the LARGEST power-factor capacitor bank that keeps the resonant order at or above the target. A bigger bank lowers the resonant order toward the strong low-order harmonics (the 5th, 7th, ...), so a target just below the lowest harmonic of concern (about 4.7 to stay under the 5th) sets a ceiling on the bank. Split the correction into smaller banks, add a detuning reactor (making it a filter), or run a harmonic study if power factor needs more than this. This uses the bus short-circuit level and ignores load and resistive damping. A screening aid, not a harmonic study.",
+  };
+}
+export const capacitorBankForResonanceOrderExample = { inputs: { short_circuit_mva: 200, target_resonant_order: 4.7 } };
+function _v717renderCapacitorBankForResonanceOrder(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: parallel-resonance order of a PF capacitor bank (IEEE 519 / IEEE 1531) solved for the bank: MVAR_cap = MVA_sc / h_target^2, the largest bank that keeps the resonant order at or above the target (a bigger bank lowers the order toward the low harmonics). A screening aid; a harmonic study governs.";
+  const sc = makeNumber("Short-circuit power at the bus (MVA)", "cbr-sc", { step: "any", min: "0" }); sc.input.value = "200";
+  const h = makeNumber("Target min resonant order (e.g. 4.7 to stay below the 5th)", "cbr-h", { step: "any", min: "0" }); h.input.value = "4.7";
+  for (const f of [sc, h]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { sc.input.value = "200"; h.input.value = "4.7"; update(); });
+  const oM = makeOutputLine(outputRegion, "Max capacitor bank", "cbr-out-m");
+  const oNote = makeOutputLine(outputRegion, "Note", "cbr-out-n");
+  function readNum(x) { if (x.value === "") return 0; const n = Number(x.value); return Number.isFinite(n) ? n : 0; }
+  const update = debounce(() => {
+    const r = computeCapacitorBankForResonanceOrder({ short_circuit_mva: readNum(sc.input), target_resonant_order: readNum(h.input) });
+    if (r.error) { oM.textContent = r.error; oNote.textContent = ""; return; }
+    oM.textContent = fmt(r.max_cap_bank_mvar, 3) + " MVAR";
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const f of [sc, h]) f.input.addEventListener("input", update);
+}
+POWERQUALITY_RENDERERS["capacitor-bank-for-resonance-order"] = _v717renderCapacitorBankForResonanceOrder;
+
 // ===================== spec-v524: total demand distortion limit check (IEEE 519-2022) =====================
 // dims: in { isc_a: I, il_a: I, measured_tdd_pct: dimensionless } out: { ratio: dimensionless, limit_pct: dimensionless, pass: dimensionless }
 export function computeTddIeee519({ isc_a = 0, il_a = 0, measured_tdd_pct = 0 } = {}) {

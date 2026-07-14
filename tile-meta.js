@@ -522,7 +522,7 @@ const _TILES = [
   // spec-v521 motor short-circuit contribution (first cycle)
   ["motor-fault-contribution", "A"],
   // spec-v523 harmonic parallel-resonance order
-  ["harmonic-resonance", "A"],
+  ["harmonic-resonance", "A"], ["capacitor-bank-for-resonance-order", "A"],
   // spec-v524 total demand distortion limit check (IEEE 519)
   ["tdd-ieee-519", "A"],
   // spec-v525 neutral grounding resistor sizing (IEEE 142)

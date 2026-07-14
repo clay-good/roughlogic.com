@@ -838,6 +838,7 @@ export const COMPUTE_MAP = {
   "reduced-voltage-starter": { module: "../../calc-motor.js", fn: "computeReducedVoltageStarter" },
   "vfd-reflected-wave": { module: "../../calc-motor.js", fn: "computeVfdReflectedWave" },
   "harmonic-resonance": { module: "../../calc-powerquality.js", fn: "computeHarmonicResonance" },
+  "capacitor-bank-for-resonance-order": { module: "../../calc-powerquality.js", fn: "computeCapacitorBankForResonanceOrder" },
   "tdd-ieee-519": { module: "../../calc-powerquality.js", fn: "computeTddIeee519" },
   "neutral-grounding-resistor": { module: "../../calc-elecdesign.js", fn: "computeNeutralGroundingResistor" },
   "step-touch-voltage": { module: "../../calc-elecdesign.js", fn: "computeStepTouchVoltage" },

@@ -125,7 +125,7 @@ const TOOL_MODULES = (() => {
     // spec-v183/v184 electrician second-pass batch
     "transformer-k-factor", "motor-capacitor-max",
     // spec-v523 harmonic parallel-resonance order
-    "harmonic-resonance",
+    "harmonic-resonance", "capacitor-bank-for-resonance-order",
     // spec-v524 total demand distortion limit check (IEEE 519)
     "tdd-ieee-519",
   ]);

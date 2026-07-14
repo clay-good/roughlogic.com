@@ -33212,6 +33212,27 @@
    }
   },
   {
+   "tile_id": "capacitor-bank-for-resonance-order",
+   "source_publisher": "parallel-resonance order of a PF capacitor bank (IEEE 1531)",
+   "source_title": "MVAR_cap = MVA_sc / h^2; inverse of the resonance-order tile",
+   "source_edition_or_year": "spec-v717 worked example (machine-verified; inverse of spec-v523)",
+   "source_section_or_page": "200 MVA bus, target order 4.7 (below the 5th) -> 9.05 MVAR max bank",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "short_circuit_mva": 200,
+    "target_resonant_order": 4.7
+   },
+   "outputs": {
+    "max_cap_bank_mvar": {
+     "value": 9.0539,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "harmonic-resonance",
    "source_publisher": "parallel-resonance order of a PF capacitor bank (IEEE 1531)",
    "source_title": "cross-check: doubling the bank to 2.4 MVAR walks the resonance down to the 9.13th order",

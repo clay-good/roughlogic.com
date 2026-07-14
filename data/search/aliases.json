@@ -36227,6 +36227,31 @@
       "kind": "question"
     },
     {
+      "term": "max capacitor bank to avoid resonance",
+      "target": "capacitor-bank-for-resonance-order",
+      "kind": "question"
+    },
+    {
+      "term": "biggest pf bank without harmonic resonance",
+      "target": "capacitor-bank-for-resonance-order",
+      "kind": "question"
+    },
+    {
+      "term": "cap bank size to stay off the 5th",
+      "target": "capacitor-bank-for-resonance-order",
+      "kind": "question"
+    },
+    {
+      "term": "mvar limit for harmonic resonance",
+      "target": "capacitor-bank-for-resonance-order",
+      "kind": "question"
+    },
+    {
+      "term": "how much power factor capacitor is safe",
+      "target": "capacitor-bank-for-resonance-order",
+      "kind": "question"
+    },
+    {
       "term": "harmonic limits at point of common coupling",
       "target": "tdd-ieee-519",
       "kind": "question"

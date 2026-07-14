@@ -7131,6 +7131,18 @@ export const CITATIONS = {
       { name: "Idealized", value: "ignores load and resistive damping; a detuning reactor or harmonic study is the fix", source: "scope of this tile" },
     ],
   },
+  "capacitor-bank-for-resonance-order": {
+    formula: "MVAR_cap = MVA_sc / h_target^2, the parallel-resonance relation h = sqrt(MVA_sc / MVAR_cap) solved for the bank (the maximum bank that keeps the resonant order at or above the target).",
+    edition: "Parallel-resonance order of a power-factor capacitor bank (IEEE 519 / IEEE 1531) solved for the bank, first-principles, by name; a harmonic study governs.",
+    freeAccess: "The h = sqrt(MVA_sc / MVAR_cap) resonance relation is a published first-principles result; the bus short-circuit level comes from the system data.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of harmonic-resonance: the largest power-factor capacitor bank that keeps the parallel-resonance order at or above a target. Because a bigger bank lowers the resonant order toward the strong low-order harmonics, a target just below the lowest harmonic of concern (about 4.7 to stay under the 5th) sets a ceiling on the bank; split the correction into smaller banks, add a detuning reactor (making it a filter), or run a harmonic study if power factor needs more. The estimate uses the bus short-circuit level and ignores load and resistive damping. A screening aid, not a harmonic study.",
+    assumptions: [
+      { name: "Bank ceiling", value: "MVAR_cap = MVA_sc / h_target^2 keeps the resonant order at or above the target", source: "IEEE 1531" },
+      { name: "Bigger bank, lower order", value: "a larger capacitor bank lowers the resonant order toward the strong low harmonics", source: "IEEE 519" },
+      { name: "Idealized", value: "ignores load and resistive damping; a detuning reactor or harmonic study is the fix", source: "scope of this tile" },
+    ],
+  },
   "transformer-k-factor": {
     formula: "K = sum(Ih^2 x h^2) / sum(Ih^2) over h = 1,3,5,7,9,11,13 with harmonics in per-unit of the fundamental; round up to the next standard K-rating (K-1, K-4, K-9, K-13, K-20, K-30, K-40).",
     edition: "Transformer K-factor for nonlinear loads, UL 1561 and IEEE C57.110, by name.",

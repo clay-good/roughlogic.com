@@ -19603,6 +19603,30 @@ test("bounds: spec-v523 computeHarmonicResonance pins the resonant order, the pr
   assert.ok("error" in _v523({ short_circuit_mva: 200, cap_bank_mvar: 0 }));
 });
 
+import { computeCapacitorBankForResonanceOrder as _v717 } from "../../calc-powerquality.js";
+test("bounds: spec-v717 computeCapacitorBankForResonanceOrder pins MVAR = MVA_sc / h^2, round-trips through computeHarmonicResonance, and error seams", () => {
+  const r = _v717({ short_circuit_mva: 200, target_resonant_order: 4.7 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_cap_bank_mvar - 200 / (4.7 * 4.7)) < 1e-9, `MVAR identity: ${r.max_cap_bank_mvar}`);
+  assert.ok(Math.abs(r.max_cap_bank_mvar - 9.05387) < 1e-4, `pinned 9.05 MVAR: ${r.max_cap_bank_mvar}`);
+  // Round-trip: at the max bank the forward tile's resonant order equals the target.
+  for (const short_circuit_mva of [50, 200, 1000]) {
+    for (const target_resonant_order of [4.7, 6.7, 10.7]) {
+      const m = _v717({ short_circuit_mva, target_resonant_order });
+      assert.ok(!m.error, `sweep sc=${short_circuit_mva} h=${target_resonant_order}: ${JSON.stringify(m)}`);
+      assertFinite(m.max_cap_bank_mvar, "mvar"); assert.ok(m.max_cap_bank_mvar > 0, "mvar positive");
+      const back = _v523({ short_circuit_mva, cap_bank_mvar: m.max_cap_bank_mvar });
+      assert.ok(Math.abs(back.h_resonant - target_resonant_order) < 1e-9, `round-trip sc=${short_circuit_mva} h=${target_resonant_order}: ${back.h_resonant}`);
+    }
+  }
+  // A higher target order forces a smaller bank.
+  assert.ok(_v717({ short_circuit_mva: 200, target_resonant_order: 6.7 }).max_cap_bank_mvar < r.max_cap_bank_mvar);
+  // Error seams: non-positive MVA, target order, non-finite.
+  assert.ok("error" in _v717({ short_circuit_mva: 0, target_resonant_order: 4.7 }));
+  assert.ok("error" in _v717({ short_circuit_mva: 200, target_resonant_order: 0 }));
+  assert.ok("error" in _v717({ short_circuit_mva: Infinity, target_resonant_order: 4.7 }));
+});
+
 import { computeTddIeee519 as _v524 } from "../../calc-powerquality.js";
 
 test("bounds: spec-v524 computeTddIeee519 pins the ratio-banded limit, the same-distortion flip, and error seams", () => {
