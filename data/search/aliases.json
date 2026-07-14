@@ -1452,6 +1452,31 @@
       "kind": "adjacent"
     },
     {
+      "term": "throw distance for a pool size",
+      "target": "lighting-throw-for-pool",
+      "kind": "industry"
+    },
+    {
+      "term": "how far to hang a light",
+      "target": "lighting-throw-for-pool",
+      "kind": "industry"
+    },
+    {
+      "term": "hang distance for beam diameter",
+      "target": "lighting-throw-for-pool",
+      "kind": "adjacent"
+    },
+    {
+      "term": "throw for a target pool",
+      "target": "lighting-throw-for-pool",
+      "kind": "adjacent"
+    },
+    {
+      "term": "distance to get a pool of light",
+      "target": "lighting-throw-for-pool",
+      "kind": "adjacent"
+    },
+    {
       "term": "bakers percentage",
       "target": "bakers-percentage",
       "kind": "industry"

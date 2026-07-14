@@ -1470,3 +1470,46 @@ const renderSPLDistanceForLevel = _r({
   compute: computeSPLDistanceForLevel,
 });
 STAGE_RENDERERS["spl-distance-for-level"] = renderSPLDistanceForLevel;
+
+// --- spec-v676 N: throw distance for a target beam (pool) diameter (inverse of lighting-beam) ---
+// beam_diameter = 2 x throw x tan(angle/2); solved for throw.
+// dims: in { target_pool_diameter: L, beam_angle_deg: dimensionless, distance_unit: dimensionless } out: { throw_distance: L }
+export function computeLightingThrowForPool({ target_pool_diameter = 0, beam_angle_deg = 0, distance_unit = "ft" } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const D = Number(target_pool_diameter) || 0;
+  const ang = Number(beam_angle_deg) || 0;
+  if (!(D > 0)) return { error: "Target pool diameter must be positive." };
+  if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
+  const isFt = String(distance_unit) !== "m";
+  const half = (ang / 2) * Math.PI / 180;
+  // Inverse of D = 2 x throw x tan(angle/2): throw = D / (2 x tan(angle/2)).
+  const throw_distance = D / (2 * Math.tan(half));
+  if (!Number.isFinite(throw_distance) || !(throw_distance > 0)) return { error: "Throw-distance math is not a finite positive value." };
+  return {
+    throw_distance, distance_unit: isFt ? "ft" : "m",
+    note: "The throw distance a fixture needs to cast a target beam (pool) diameter, the inverse of the lighting-beam tile: from D = 2 x throw x tan(beam angle / 2), throw = D / (2 x tan(beam angle / 2)), in the entered unit. A wider beam angle reaches the same pool from a shorter throw. This is the geometry only - the center-beam illuminance still falls off with the square of the throw, so a farther hang for a big pool is also a dimmer one (check the level with the lighting-beam tile). Enter the beam angle you are designing to (beam angle to 50% intensity, or the wider field angle to 10%). First-principles photometry; the fixture cut sheet governs."
+  };
+}
+export const lightingThrowForPoolExample = { inputs: { target_pool_diameter: 10.58, beam_angle_deg: 20, distance_unit: "ft" } };
+function renderLightingThrowForPool(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: first-principles theatrical photometry solved for throw: throw = D / (2 x tan(beam angle / 2)), from beam diameter = 2 x throw x tan(beam angle / 2); public domain. The illuminance still falls with the square of the throw (check the lighting-beam tile). A wider beam reaches the same pool from a shorter throw.";
+  const dia = makeNumber("Target beam (pool) diameter", "ltp-dia", { step: "any", min: "0" });
+  const ang = makeNumber("Beam angle (full cone, deg)", "ltp-ang", { step: "any", min: "0", max: "180" });
+  const unit = makeSelect("Distance unit", "ltp-unit", [
+    { value: "ft", label: "Feet" },
+    { value: "m", label: "Metres" },
+  ]);
+  for (const f of [dia, ang, unit]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { dia.input.value = "10.58"; ang.input.value = "20"; unit.select.value = "ft"; update(); });
+  const oT = makeOutputLine(outputRegion, "Throw distance needed", "ltp-out-t");
+  const oNote = makeOutputLine(outputRegion, "Note", "ltp-out-n");
+  const update = debounce(() => {
+    const r = computeLightingThrowForPool({ target_pool_diameter: Number(dia.input.value) || 0, beam_angle_deg: Number(ang.input.value) || 0, distance_unit: unit.select.value });
+    if (r.error) { oT.textContent = r.error; oNote.textContent = ""; return; }
+    oT.textContent = fmt(r.throw_distance, 2) + " " + r.distance_unit;
+    oNote.textContent = r.note;
+  }, DEBOUNCE_MS);
+  for (const el of [dia.input, ang.input]) el.addEventListener("input", update);
+  unit.select.addEventListener("change", update);
+}
+STAGE_RENDERERS["lighting-throw-for-pool"] = renderLightingThrowForPool;

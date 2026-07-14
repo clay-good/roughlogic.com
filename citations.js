@@ -6561,6 +6561,17 @@ export const CITATIONS = {
       { name: "Point source", value: "single aimed fixture, inverse-square from the photometric center; no field falloff or atmospheric loss modeled", source: "method" },
     ],
   },
+  "lighting-throw-for-pool": {
+    formula: "throw = target_pool_diameter / (2 x tan(beam angle / 2)); the inverse of beam_diameter = 2 x throw x tan(beam angle / 2).",
+    edition: "First-principles theatrical photometry - the beam-spread geometry the form fixture photometric charts (manufacturer cut sheets) publish, solved for the throw, by name; public domain.",
+    freeAccess: "Public first-principles photometry. The beam / field angle comes from the fixture's photometric data.",
+    governance: GOVERNANCE.rigging,
+    editionNote: "The throw distance a fixture needs to cast a target beam (pool) diameter, the inverse of lighting-beam: throw = D / (2 x tan(beam angle / 2)), in the entered unit. A wider beam angle reaches the same pool from a shorter throw. This is the geometry only; the center-beam illuminance still falls off with the square of the throw, so a farther hang for a larger pool is also a dimmer one (check the level with the lighting-beam tile). Enter the beam angle you are designing to (beam angle to 50% intensity, or the wider field angle to 10%). Single-edition (physics); the fixture cut sheet governs.",
+    assumptions: [
+      { name: "Geometry only", value: "throw from beam spread; the illuminance still falls with the square of the throw (use lighting-beam for the level)", source: "method" },
+      { name: "Beam vs field angle", value: "enter the angle being designed to; beam angle is to 50% intensity, field angle to 10%", source: "fixture photometrics" },
+    ],
+  },
 
   // ---- spec-v25 coordinate / traverse surveying (Group P) ----
   "area-by-coordinates": {

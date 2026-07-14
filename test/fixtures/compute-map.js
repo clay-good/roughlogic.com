@@ -578,6 +578,7 @@ export const COMPUTE_MAP = {
   "decibel-converter": { module: "../../calc-stage.js", fn: "computeDecibelConverter" },
   "amp-power-spl": { module: "../../calc-stage.js", fn: "computeAmpPowerSpl" },
   "lighting-beam": { module: "../../calc-stage.js", fn: "computeLightingBeam" },
+  "lighting-throw-for-pool": { module: "../../calc-stage.js", fn: "computeLightingThrowForPool" },
   // spec-v25 surveying coordinate/traverse + civil curve/earthwork/grading.
   "area-by-coordinates": { module: "../../calc-survey.js", fn: "computeAreaByCoordinates" },
   "traverse-closure": { module: "../../calc-survey.js", fn: "computeTraverseClosure" },

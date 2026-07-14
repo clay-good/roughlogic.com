@@ -9267,7 +9267,7 @@ test("bounds: spec-v53 linear-interpolation pins y + slope + extrapolation flag 
   assert.ok("error" in _cli({ x1: Infinity, y1: 1, x2: 10, y2: 2, x: 5 }));
 });
 import { computeSpeakerImpedance as _cn1, computeDecibelConverter as _cn2, computeAmpPowerSpl as _cn3 } from "../../calc-stage.js";
-import { computeLightingBeam as _cn4 } from "../../calc-stage.js";
+import { computeLightingBeam as _cn4, computeLightingThrowForPool as _v676 } from "../../calc-stage.js";
 import { computeAreaByCoordinates as _cp1, computeTraverseClosure as _cp2 } from "../../calc-survey.js";
 import { computeHikingTime as _cp3 } from "../../calc-field.js";
 test("bounds: spec-v52 hiking-time pins Naismith time + reject non-finite", () => {
@@ -9301,6 +9301,32 @@ test("bounds: spec-v51 lighting-beam pins beam diameter + inverse-square illumin
   assert.ok("error" in _cn4({ beam_angle_deg: 20, throw_distance: 30, source: "candela", candela: 0 }));
   assert.ok("error" in _cn4({ beam_angle_deg: 20, throw_distance: 30, source: "lumens", lumens: 0 }));
   assert.ok("error" in _cn4({ beam_angle_deg: Infinity, throw_distance: 30, candela: 100 }));
+});
+
+test("bounds: spec-v676 computeLightingThrowForPool pins throw = D/(2 tan(angle/2)), round-trips through computeLightingBeam across angles and units, and error seams", () => {
+  const r = _v676({ target_pool_diameter: 10.579619, beam_angle_deg: 20, distance_unit: "ft" });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.throw_distance - 10.579619 / (2 * Math.tan(10 * Math.PI / 180))) < 1e-9, `throw identity: ${r.throw_distance}`);
+  assert.ok(Math.abs(r.throw_distance - 30) < 1e-4, `pinned 30 ft: ${r.throw_distance}`);
+  // A wider beam reaches the same pool from a shorter throw.
+  const wide = _v676({ target_pool_diameter: 10.579619, beam_angle_deg: 40, distance_unit: "ft" });
+  assert.ok(wide.throw_distance < r.throw_distance, `wider beam shorter throw: ${wide.throw_distance}`);
+  // Round-trip: the throw, fed back through the forward tile, reproduces the target pool diameter (in the same unit).
+  for (const beam_angle_deg of [10, 26, 50]) {
+    for (const [unit, key] of [["ft", "beam_diameter_ft"], ["m", "beam_diameter_m"]]) {
+      const D = 8;
+      const m = _v676({ target_pool_diameter: D, beam_angle_deg, distance_unit: unit });
+      assert.ok(!m.error, `sweep ang=${beam_angle_deg} ${unit}: ${JSON.stringify(m)}`);
+      assertFinite(m.throw_distance, "throw"); assert.ok(m.throw_distance > 0, "throw positive");
+      const back = _cn4({ beam_angle_deg, throw_distance: m.throw_distance, distance_unit: unit, source: "candela", candela: 1000 });
+      assert.ok(Math.abs(back[key] - D) < 1e-9, `round-trip ang=${beam_angle_deg} ${unit}: ${back[key]}`);
+    }
+  }
+  // Error seams: non-positive diameter, beam angle out of range, non-finite.
+  assert.ok("error" in _v676({ target_pool_diameter: 0, beam_angle_deg: 20 }));
+  assert.ok("error" in _v676({ target_pool_diameter: 10, beam_angle_deg: 0 }));
+  assert.ok("error" in _v676({ target_pool_diameter: 10, beam_angle_deg: 180 }));
+  assert.ok("error" in _v676({ target_pool_diameter: Infinity, beam_angle_deg: 20 }));
 });
 
 test("bounds: spec-v43 tank-volume pins horizontal segment + vertical + reject non-finite", () => {

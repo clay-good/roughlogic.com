@@ -410,7 +410,8 @@ const RELATED = {
   "spl-atmospheric": ["spl-distance", "time-alignment"],
   "time-alignment": ["spl-distance", "spl-atmospheric"],
   "dmx-planner": ["neutral-imbalance", "spl-distance"],
-  "lighting-beam": ["dmx-planner", "truss-capacity", "power-distro"],
+  "lighting-beam": ["lighting-throw-for-pool", "dmx-planner", "truss-capacity", "power-distro"],
+  "lighting-throw-for-pool": ["lighting-beam", "dmx-planner", "truss-capacity", "projector-brightness"],
 
   // Group O: Kitchen and Food Service. recipe-scale -> yield-ep ->
   // plate-cost is the costing workflow; cooling-curve + sous-vide-

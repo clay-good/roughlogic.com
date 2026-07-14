@@ -18861,6 +18861,50 @@
    }
   },
   {
+   "tile_id": "lighting-throw-for-pool",
+   "source_publisher": "first-principles theatrical photometry (inverse)",
+   "source_title": "throw = D / (2 * tan(angle/2))",
+   "source_edition_or_year": "spec-v676 worked example (machine-verified)",
+   "source_section_or_page": "10.58 ft pool from a 20 deg beam -> 30 ft throw (round-trips lighting-beam)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_pool_diameter": 10.579619,
+    "beam_angle_deg": 20,
+    "distance_unit": "ft"
+   },
+   "outputs": {
+    "throw_distance": {
+     "value": 30,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "lighting-throw-for-pool",
+   "source_publisher": "first-principles theatrical photometry (inverse)",
+   "source_title": "cross-check: a wider 40 deg beam casts the same pool from a shorter throw",
+   "source_edition_or_year": "spec-v676 cross-check (machine-verified)",
+   "source_section_or_page": "10.58 ft pool from a 40 deg beam -> 14.53 ft throw (wider beam, shorter hang)",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "target_pool_diameter": 10.579619,
+    "beam_angle_deg": 40,
+    "distance_unit": "ft"
+   },
+   "outputs": {
+    "throw_distance": {
+     "value": 14.5336,
+     "tolerance": {
+      "abs": 0.01
+     }
+    }
+   }
+  },
+  {
    "tile_id": "area-by-coordinates",
    "source_publisher": "FM 5-233 Construction Surveying (by name)",
    "source_title": "Coordinate (shoelace) area of a closed traverse",
