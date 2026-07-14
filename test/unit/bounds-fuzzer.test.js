@@ -14688,6 +14688,25 @@ test("bounds: spec-v323 computeInjectorSize pins the injector flow, the BSFC sca
   assert.ok("error" in _v323({ hp: Infinity, bsfc: 0.5, n_cyl: 8, duty: 0.8 }));
 });
 
+import { computeInjectorMaxHp as _v661 } from "../../calc-mechanic.js";
+
+test("bounds: spec-v661 computeInjectorMaxHp inverts the injector sizing, round-trips it, handles cc/min, and pins error seams", () => {
+  const r = _v661({ inj_flow: 31.25, flow_unit: "lbh", n_cyl: 8, duty: 0.80, bsfc: 0.50 });
+  assert.ok(Math.abs(r.hp_max - 400) < 1e-9); // 31.25 * 8 * 0.8 / 0.5
+  assert.ok(Math.abs(r.total_lbh - 200) < 1e-9);
+  // Exact inverse of injector-size: the per-injector flow for that HP is the entered flow.
+  assert.ok(Math.abs(_v323({ hp: r.hp_max, bsfc: 0.50, n_cyl: 8, duty: 0.80 }).inj_lbh - 31.25) < 1e-9);
+  // A richer boosted tune (higher BSFC) supports less power for the same injectors.
+  assert.ok(Math.abs(_v661({ inj_flow: 31.25, flow_unit: "lbh", n_cyl: 8, duty: 0.80, bsfc: 0.60 }).hp_max - 200 / 0.60) < 1e-9);
+  // cc/min input converts by 10.5: 328.125 cc/min = 31.25 lb/h -> the same 400 hp.
+  assert.ok(Math.abs(_v661({ inj_flow: 328.125, flow_unit: "ccmin", n_cyl: 8, duty: 0.80, bsfc: 0.50 }).hp_max - 400) < 1e-9);
+  // Error seams: non-positive flow, bad injector count, out-of-range duty, non-finite.
+  assert.ok("error" in _v661({ inj_flow: 0, flow_unit: "lbh", n_cyl: 8, duty: 0.80, bsfc: 0.50 }));
+  assert.ok("error" in _v661({ inj_flow: 31.25, flow_unit: "lbh", n_cyl: 0, duty: 0.80, bsfc: 0.50 }));
+  assert.ok("error" in _v661({ inj_flow: 31.25, flow_unit: "lbh", n_cyl: 8, duty: 1.5, bsfc: 0.50 }));
+  assert.ok("error" in _v661({ inj_flow: Infinity, flow_unit: "lbh", n_cyl: 8, duty: 0.80, bsfc: 0.50 }));
+});
+
 test("bounds: spec-v324 computeMeanPistonSpeed pins the ft/min, the m/s conversion, the regime bands, and error seams", () => {
   const r = _v324({ stroke_in: 3.48, rpm: 6000 });
   assert.ok(Math.abs(r.mps_fpm - 3.48 * 6000 / 6) < 1e-9);

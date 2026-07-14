@@ -43260,6 +43260,54 @@
    }
   },
   {
+   "tile_id": "injector-max-hp",
+   "source_publisher": "Fuel injector power capacity (inverse of injector-size)",
+   "source_title": "eight 31.25 lb/h injectors at 80% duty, BSFC 0.50 -> 400 hp (round-trips the injector-size example)",
+   "source_edition_or_year": "spec-v661 worked example (machine-verified)",
+   "source_section_or_page": "spec-v661 section 2.1 pinned example",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "inj_flow": 31.25,
+    "flow_unit": "lbh",
+    "n_cyl": 8,
+    "duty": 0.8,
+    "bsfc": 0.5
+   },
+   "outputs": {
+    "hp_max": {
+     "value": 400,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
+   "tile_id": "injector-max-hp",
+   "source_publisher": "Fuel injector power capacity (inverse of injector-size)",
+   "source_title": "cross-check: the same injectors on boost (BSFC 0.60) fall to 333 hp - a richer tune caps power",
+   "source_edition_or_year": "spec-v661 worked example (machine-verified)",
+   "source_section_or_page": "spec-v661 section 2.1 cross-check",
+   "verified_by": "rl",
+   "verified_on": "2026-07-13",
+   "inputs": {
+    "inj_flow": 31.25,
+    "flow_unit": "lbh",
+    "n_cyl": 8,
+    "duty": 0.8,
+    "bsfc": 0.6
+   },
+   "outputs": {
+    "hp_max": {
+     "value": 333.3,
+     "tolerance": {
+      "abs": 0.5
+     }
+    }
+   }
+  },
+  {
    "tile_id": "mean-piston-speed",
    "source_publisher": "Mean piston speed (engine building)",
    "source_title": "3.48 in stroke at 6,000 rpm -> 3,480 ft/min (17.7 m/s), street/endurance",

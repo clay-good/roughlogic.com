@@ -955,6 +955,44 @@ function renderInjectorSize(inputRegion, outputRegion, citationEl) {
 }
 MECHANIC_RENDERERS["injector-size"] = renderInjectorSize;
 
+// dims: in { inj_flow: M T^-1, flow_unit: dimensionless, n_cyl: dimensionless, duty: dimensionless, bsfc: T^2 L^-2 } out: { inj_lbh: M T^-1, total_lbh: M T^-1, hp_max: M L^2 T^-3 }
+export function computeInjectorMaxHp({ inj_flow = 0, flow_unit = "lbh", n_cyl = 0, duty = 0.80, bsfc = 0.50 } = {}) {
+  const _g = _finiteGuard({ inj_flow, n_cyl, duty, bsfc }); if (_g) return _g;
+  const flow = Number(inj_flow) || 0;
+  const n = Number(n_cyl) || 0;
+  const d = Number(duty) || 0;
+  const b = Number(bsfc) || 0;
+  if (!(flow > 0)) return { error: "Injector flow must be positive." };
+  if (!(n >= 1) || !Number.isInteger(n)) return { error: "Injector count must be a whole number of at least 1." };
+  if (!(d > 0 && d <= 1)) return { error: "The duty cycle must be over 0 and up to 1 (0.80 typical)." };
+  if (!(b > 0)) return { error: "BSFC must be positive (lb/hp-h; ~0.50 NA, 0.55-0.65 boosted)." };
+  const inj_lbh = String(flow_unit) === "ccmin" ? flow / 10.5 : flow;
+  const total_lbh = inj_lbh * n * d;
+  const hp_max = total_lbh / b;
+  return {
+    inj_lbh, total_lbh, hp_max,
+    note: "The maximum horsepower a fuel-injector set supports, the inverse of the injector-sizing tile: HP_max = injector lb/h x n_cyl x duty / BSFC, the fuel the injectors can flow at a safe maximum duty cycle divided by the brake-specific fuel consumption. Enter the injector static flow in lb/h or cc/min (lb/h x 10.5 = cc/min for gasoline). BSFC runs about 0.45-0.50 naturally aspirated and 0.55-0.65 boosted, so the SAME injectors support meaningfully less power once boost richens the tune; the customary maximum duty cycle is 80% (headroom above that risks a lean fuel cut at redline). Evenly-distributed port injection, one injector per cylinder - not rail pressure (which sets the static flow), a return/returnless system, or direct injection. A tuning aid; the engine's measured fueling and the tuner's judgment govern.",
+  };
+}
+export const injectorMaxHpExample = { inputs: { inj_flow: 31.25, flow_unit: "lbh", n_cyl: 8, duty: 0.80, bsfc: 0.50 } };
+MECHANIC_RENDERERS["injector-max-hp"] = _simpleRenderer({
+  citation: "Citation: fuel-injector power capacity HP_max = injector lb/h x n_cyl x duty / BSFC, the inverse of the injector-sizing relation, with BSFC ~0.50 NA / 0.55-0.65 boosted, the 80% maximum duty cycle, and lb/h x 10.5 = cc/min for gasoline, by name. Port injection, entered BSFC. A tuning aid; the measured fueling governs.",
+  example: injectorMaxHpExample.inputs,
+  fields: [
+    { key: "inj_flow", label: "Injector static flow", kind: "number", default: 31.25 },
+    { key: "flow_unit", label: "Flow unit", kind: "select", options: [{ value: "lbh", label: "lb/h" }, { value: "ccmin", label: "cc/min" }], default: "lbh" },
+    { key: "n_cyl", label: "Number of injectors", kind: "number", default: 8, attrs: { step: "1", min: "1" } },
+    { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number", default: 0.80 },
+    { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number", default: 0.50 },
+  ],
+  outputs: [
+    { key: "hp", id: "imh-out-hp", label: "Maximum supported horsepower", value: (r) => fmt(r.hp_max, 0) + " hp" },
+    { key: "f", id: "imh-out-f", label: "Total fuel at max duty", value: (r) => fmt(r.total_lbh, 1) + " lb/h (" + fmt(r.inj_lbh, 1) + " lb/h per injector)" },
+    { key: "n", id: "imh-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeInjectorMaxHp,
+});
+
 // dims: in { stroke_in: L, rpm: T^-1 } out: { mps_fpm: L T^-1, mps_ms: L T^-1 }
 export function computeMeanPistonSpeed({ stroke_in = 0, rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;

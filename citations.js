@@ -10325,6 +10325,18 @@ export const CITATIONS = {
       { name: "Conversion", value: "lb/h x 10.5 = cc/min for gasoline (SG ~0.72)", source: "unit conversion" },
     ],
   },
+  "injector-max-hp": {
+    formula: "inj_lbh = flow (or cc/min / 10.5); total_lbh = inj_lbh x n_cyl x duty; hp_max = total_lbh / BSFC.",
+    edition: "The fuel-injector-sizing relation solved for the supported power, the inverse of the injector-size tile, a standard tuning-reference result, by name.",
+    freeAccess: "The injector-sizing relation and the BSFC ranges are public results in the engine-tuning references.",
+    governance: GOVERNANCE.general,
+    editionNote: "The maximum horsepower a fuel-injector set supports, the inverse of the injector-sizing tile: HP_max = injector lb/h x n_cyl x duty / BSFC, the fuel the injectors can flow at a safe maximum duty cycle divided by the brake-specific fuel consumption. The injector static flow is entered in lb/h or cc/min (lb/h x 10.5 = cc/min for gasoline, SG ~0.72). Because BSFC rises with boost and richer tuning (~0.45-0.50 NA to ~0.55-0.65 boosted), the same injectors support meaningfully less power once boost richens the tune; the customary maximum duty cycle is 80% (headroom above that risks a lean fuel cut at redline). It assumes evenly-distributed port injection with one injector per cylinder, and does not cover a return-versus-returnless fuel system, the rail pressure that sets the static flow, or direct injection. A tuning aid; the engine's measured fueling and the tuner's judgment govern.",
+    assumptions: [
+      { name: "Power capacity", value: "hp_max = injector lb/h x n_cyl x duty / BSFC", source: "engine-tuning practice" },
+      { name: "BSFC", value: "~0.50 naturally-aspirated gas, 0.55-0.65 boosted; entered by the user", source: "tuning references" },
+      { name: "Conversion", value: "lb/h x 10.5 = cc/min for gasoline (SG ~0.72); 80% max duty", source: "unit conversion" },
+    ],
+  },
   "mean-piston-speed": {
     formula: "mps_fpm = stroke_in x RPM / 6 (= 2 x stroke x RPM); mps_ms = mps_fpm x 0.00508; regime by ft/min band.",
     edition: "The mean-piston-speed relation MPS = 2 x stroke x RPM and the practical rpm-limit bands, as compiled in the engine-building references, by name.",

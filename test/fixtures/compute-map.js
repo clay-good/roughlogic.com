@@ -897,6 +897,7 @@ export const COMPUTE_MAP = {
   "buffer-tank-loop-credit": { module: "../../calc-hvacsystems.js", fn: "computeBufferTankLoopCredit" },
   // spec-v323..v325 engine-build performance batch (3 tiles)
   "injector-size": { module: "../../calc-mechanic.js", fn: "computeInjectorSize" },
+  "injector-max-hp": { module: "../../calc-mechanic.js", fn: "computeInjectorMaxHp" },
   "mean-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMeanPistonSpeed" },
   "max-rpm-from-piston-speed": { module: "../../calc-mechanic.js", fn: "computeMaxRpmFromPistonSpeed" },
   "trap-speed-horsepower": { module: "../../calc-mechanic.js", fn: "computeTrapSpeedHorsepower" },

@@ -28317,6 +28317,36 @@
       "kind": "question"
     },
     {
+      "term": "injector max hp",
+      "target": "injector-max-hp",
+      "kind": "industry"
+    },
+    {
+      "term": "injector power capacity",
+      "target": "injector-max-hp",
+      "kind": "industry"
+    },
+    {
+      "term": "max hp for injectors",
+      "target": "injector-max-hp",
+      "kind": "redirect"
+    },
+    {
+      "term": "how much power can my injectors support",
+      "target": "injector-max-hp",
+      "kind": "question"
+    },
+    {
+      "term": "will my injectors support",
+      "target": "injector-max-hp",
+      "kind": "question"
+    },
+    {
+      "term": "hp from injector size",
+      "target": "injector-max-hp",
+      "kind": "question"
+    },
+    {
       "term": "how far apart can stitch welds be",
       "target": "intermittent-fillet-weld",
       "kind": "question"
