@@ -37772,6 +37772,34 @@
    }
   },
   {
+   "tile_id": "sprinkler-protection-area-for-supply",
+   "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
+   "source_title": "max area = (supply - hose) / density; inverse of the system demand",
+   "source_edition_or_year": "spec-v718 worked example (machine-verified; inverse of spec-v249)",
+   "source_section_or_page": "550 gpm supply, 250 gpm hose, 0.20 gpm/ft^2 -> 1,500 ft^2 max design area",
+   "verified_by": "rl",
+   "verified_on": "2026-07-14",
+   "inputs": {
+    "available_supply_gpm": 550,
+    "density": 0.2,
+    "hose_gpm": 250
+   },
+   "outputs": {
+    "max_design_area_ft2": {
+     "value": 1500.0,
+     "tolerance": {
+      "abs": 0.01
+     }
+    },
+    "sprinkler_gpm": {
+     "value": 300.0,
+     "tolerance": {
+      "abs": 0.001
+     }
+    }
+   }
+  },
+  {
    "tile_id": "sprinkler-system-demand",
    "source_publisher": "NFPA 13 (Standard for the Installation of Sprinkler Systems)",
    "source_title": "cross-check: Light Hazard office 0.10 / 1,500 / 100 gpm / 30 min -> 250 gpm, 7,500 gal (6x less stored supply)",

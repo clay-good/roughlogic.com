@@ -1995,6 +1995,7 @@ cross-check.
 | calc-firesprinkler.js | `computeFirePumpCurve` | `{ rated_gpm = 0, rated_psi = 0, churn_psi = 0, overload_psi = 0 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerHeadLayout` | `{ room_length = 0, room_width = 0, area_per_head = 130, max_spacing = 15 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerPressureDemand` | `{ q_head_gpm = 0, k_factor = 5.6, q_total_gpm = 0, pipe_id_in = 0, c_factor =...` | _ | _ | _ |
+| calc-firesprinkler.js | `computeSprinklerProtectionAreaForSupply` | `{ available_supply_gpm = 0, density = 0.20, hose_gpm = 250 } = {}` | _ | _ | _ |
 | calc-firesprinkler.js | `computeSprinklerSystemDemand` | `{ density = 0.20, design_area = 1500, hose_gpm = 250, duration_min = 90 } = {}` | _ | _ | _ |
 | calc-gas.js | `computeGasAltitudeDerate` | `{ nameplate_input_btuh = 0, elevation_ft = 0, derate_pct_per_1000 = 4, thresh...` | _ | _ | _ |
 | calc-gas.js | `computeGasFuelConversion` | `{ appliance_input_btuh = 0, hv_from = 1030, hv_to = 2500, sg_from = 0.60, sg_...` | _ | _ | _ |
@@ -2827,7 +2828,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 1413.
+Row count: 1414.
 
 <!-- END function-corpus-v14 -->
 
@@ -3606,7 +3607,7 @@ per spec-v14 §13.1 second paragraph.
 | `wood-screw-withdrawal` | Wood Screw Withdrawal Design Value (NDS 12.2.2) | NDS 2018 12.2.2; spec-v334 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `wood-tension-member` | Wood Tension Member Parallel to Grain (NDS 3.8) | NDS 2018 3.8.1; spec-v291 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group F Fire-ground (41 tiles)
+### Group F Fire-ground (42 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -3643,6 +3644,7 @@ per spec-v14 §13.1 second paragraph.
 | `sprinkler-head-layout` | Sprinkler Head Count and Spacing (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v250 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `sprinkler-k-factor` | Sprinkler K-Factor Solver | NFPA 13 (sprinkler discharge relation); K 5.6 @ 7 psi -> Q = 5.6 * sqrt(7) = 14.816 gpm | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-pressure-demand` | Sprinkler Pressure Demand at the Base of Riser (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v479 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
+| `sprinkler-protection-area-for-supply` | Max Sprinkler Design Area for a Water Supply (NFPA 13) | NFPA 13 (Standard for the Installatio...; 550 gpm supply, 250 gpm hose, 0.20 gpm/ft^2 -> 1,500 ft^2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `sprinkler-system-demand` | Sprinkler System Demand and Water Supply (NFPA 13) | NFPA 13 (Standard for the Installatio...; spec-v249 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `standpipe-friction` | Standpipe Friction Loss | NFPA 14 (2024) standpipe hydraulics; 200 ft riser / 1 outlet @ 250 gpm / 100 ft 2.5 in outlet ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `standpipe-pdp` | Standpipe Pump Discharge Pressure (NFPA 14) | NFPA 14 / National Fire Academy; PDP = 100 + 8.46 supply FL + 25 appliance + 47.74 elevati... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -4179,6 +4181,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-diameter-for-wll` | Wire-Rope Diameter for a Required WLL | Wire Rope Users Manual rule-of-thumb ...; 5 ton WLL, cf 46, DF 5 -> 0.737 in exact, next standard 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-Tile count: 1166. Fixture-covered or reference-cadence: 1166 / 1166.
+Tile count: 1167. Fixture-covered or reference-cadence: 1167 / 1167.
 
 <!-- END tile-index-v14 -->

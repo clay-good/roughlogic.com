@@ -1185,6 +1185,7 @@ const RELATED = {
   // spec-v248..v250 fire-sprinkler system-design trio (Group F, calc-firesprinkler.js)
   "fire-pump-curve": ["pdp","standpipe-pdp","sprinkler-system-demand"],
   "sprinkler-system-demand": ["sprinkler-density","fire-pump-curve","sprinkler-head-layout"],
+  "sprinkler-protection-area-for-supply": ["sprinkler-system-demand","fire-pump-curve","sprinkler-density","sprinkler-head-layout"],
   "sprinkler-head-layout": ["sprinkler-system-demand","sprinkler-density","fire-pump-curve"],
   "sprinkler-pressure-demand": ["sprinkler-system-demand","sprinkler-k-factor","fire-pump-curve"],
   // spec-v218..v220 residential air-tightness and ventilation batch (Group C)

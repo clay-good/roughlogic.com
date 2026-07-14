@@ -1155,6 +1155,7 @@ export const COMPUTE_MAP = {
   // spec-v248..v250 fire-sprinkler system-design trio (3 tiles, new calc-firesprinkler.js)
   "fire-pump-curve": { module: "../../calc-firesprinkler.js", fn: "computeFirePumpCurve" },
   "sprinkler-system-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerSystemDemand" },
+  "sprinkler-protection-area-for-supply": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerProtectionAreaForSupply" },
   "sprinkler-head-layout": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerHeadLayout" },
   "sprinkler-pressure-demand": { module: "../../calc-firesprinkler.js", fn: "computeSprinklerPressureDemand" },
   "wood-emc": { module: "../../calc-restoration.js", fn: "computeWoodEmc" },

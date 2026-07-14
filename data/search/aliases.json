@@ -26187,6 +26187,31 @@
       "kind": "question"
     },
     {
+      "term": "max sprinkler area for my water supply",
+      "target": "sprinkler-protection-area-for-supply",
+      "kind": "question"
+    },
+    {
+      "term": "how much area can my fire pump protect",
+      "target": "sprinkler-protection-area-for-supply",
+      "kind": "question"
+    },
+    {
+      "term": "design area from available gpm",
+      "target": "sprinkler-protection-area-for-supply",
+      "kind": "question"
+    },
+    {
+      "term": "sprinkler coverage for water supply",
+      "target": "sprinkler-protection-area-for-supply",
+      "kind": "question"
+    },
+    {
+      "term": "biggest sprinkler design area for supply",
+      "target": "sprinkler-protection-area-for-supply",
+      "kind": "question"
+    },
+    {
       "term": "how much lateral load can one bolt carry in wood",
       "target": "wood-bolt-connection",
       "kind": "question"

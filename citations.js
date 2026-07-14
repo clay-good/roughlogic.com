@@ -12690,6 +12690,18 @@ export const CITATIONS = {
       { name: "Ordinary occupancies", value: "storage and special occupancies (ESFR, high-piled, in-rack) use their own density / area / duration criteria, not these defaults", source: "NFPA 13 (2022)" },
     ],
   },
+  "sprinkler-protection-area-for-supply": {
+    formula: "sprinkler_gpm = available_supply_gpm - hose_gpm; max_design_area_ft2 = sprinkler_gpm / density. The NFPA 13 area/density demand solved for the area.",
+    edition: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022, by name, solved for the design area.",
+    freeAccess: "NFPA 13 is viewable free of charge through NFPA's online free-access reader; the arithmetic is public.",
+    governance: GOVERNANCE.general,
+    editionNote: "The inverse of sprinkler-system-demand: with the hose-stream allowance taken off the top, the remaining supply divided by the design density is the largest hydraulic design area the water supply can serve. A lower density (a lighter hazard) or a smaller hose allowance lets the same supply cover more area. This is the area/density (pipe-schedule-style) screen - a full hydraulic calculation to the most-remote area, at the flowing pressure the supply can deliver including friction and elevation, is the governing analysis and is separate. A design aid, not a stamped hydraulic submittal; a qualified fire-protection engineer and the AHJ govern.",
+    assumptions: [
+      { name: "Hose taken off the top", value: "sprinkler flow = supply - hose; the remainder / density is the coverable area", source: "NFPA 13 (2022)" },
+      { name: "Screening demand", value: "the area/density product is the pipe-schedule-style screen; the governing area comes from a full most-remote-area hydraulic calculation at the supply's flowing pressure", source: "NFPA 13 (2022)" },
+      { name: "Density from hazard", value: "the design density comes from the applicable NFPA 13 density-area curve for the actual commodity and arrangement", source: "NFPA 13 (2022)" },
+    ],
+  },
   "sprinkler-head-layout": {
     formula: "spacing = min(max_spacing, sqrt(area_per_head)); heads_per_line = ceil(length / spacing); lines = ceil(width / spacing); total = heads_per_line x lines; achieved = room_area / total; wall_max = spacing / 2.",
     edition: "NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022, by name; the protection-area and linear-spacing caps by hazard class for standard-spray upright / pendent heads.",

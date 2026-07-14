@@ -14087,6 +14087,34 @@ test("bounds: spec-v249 computeSprinklerSystemDemand pins demand/total/volume fo
   assert.ok("error" in _v249({ density: Infinity, design_area: 1500, hose_gpm: 250, duration_min: 90 }));
 });
 
+import { computeSprinklerProtectionAreaForSupply as _v718 } from "../../calc-firesprinkler.js";
+test("bounds: spec-v718 computeSprinklerProtectionAreaForSupply pins area = (supply-hose)/density, round-trips through computeSprinklerSystemDemand, and error seams", () => {
+  const r = _v718({ available_supply_gpm: 550, density: 0.20, hose_gpm: 250 });
+  assert.ok(!r.error, JSON.stringify(r));
+  assert.ok(Math.abs(r.max_design_area_ft2 - 1500) < 1e-9, `area identity: ${r.max_design_area_ft2}`);
+  assert.ok(Math.abs(r.sprinkler_gpm - 300) < 1e-9, `sprinkler gpm: ${r.sprinkler_gpm}`);
+  // Round-trip: at the max area the forward tile's total demand equals the available supply.
+  for (const available_supply_gpm of [400, 550, 1200]) {
+    for (const density of [0.10, 0.20, 0.30]) {
+      for (const hose_gpm of [0, 100, 250]) {
+        const m = _v718({ available_supply_gpm, density, hose_gpm });
+        assert.ok(!m.error, `sweep supply=${available_supply_gpm} d=${density} hose=${hose_gpm}: ${JSON.stringify(m)}`);
+        assertFinite(m.max_design_area_ft2, "area"); assert.ok(m.max_design_area_ft2 > 0, "area positive");
+        const back = _v249({ density, design_area: m.max_design_area_ft2, hose_gpm, duration_min: 90 });
+        assert.ok(Math.abs(back.total_gpm - available_supply_gpm) < 1e-6, `round-trip supply=${available_supply_gpm} d=${density} hose=${hose_gpm}: ${back.total_gpm}`);
+      }
+    }
+  }
+  // A lower density (lighter hazard) covers more area for the same supply.
+  assert.ok(_v718({ available_supply_gpm: 550, density: 0.10, hose_gpm: 250 }).max_design_area_ft2 > r.max_design_area_ft2);
+  // Error seams: non-positive supply, density, hose >= supply (no flow left), negative hose, non-finite.
+  assert.ok("error" in _v718({ available_supply_gpm: 0, density: 0.20, hose_gpm: 250 }));
+  assert.ok("error" in _v718({ available_supply_gpm: 550, density: 0, hose_gpm: 250 }));
+  assert.ok("error" in _v718({ available_supply_gpm: 250, density: 0.20, hose_gpm: 250 }));
+  assert.ok("error" in _v718({ available_supply_gpm: 550, density: 0.20, hose_gpm: -1 }));
+  assert.ok("error" in _v718({ available_supply_gpm: Infinity, density: 0.20, hose_gpm: 250 }));
+});
+
 test("bounds: spec-v250 computeSprinklerHeadLayout pins the binding-cap flip, the coverage flag, and error seams", () => {
   const r = _v250({ room_length: 40, room_width: 30, area_per_head: 130, max_spacing: 15 });
   assert.ok(Math.abs(r.spacing - 11.40175425099138) < 1e-9); // area cap binds: sqrt(130) < 15

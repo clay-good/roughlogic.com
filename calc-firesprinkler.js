@@ -155,6 +155,45 @@ FIRESPRINKLER_RENDERERS["sprinkler-system-demand"] = _simpleRenderer({
   compute: computeSprinklerSystemDemand,
 });
 
+// sprinkler-protection-area-for-supply: inverse of sprinkler-system-demand. The
+// forward tile gives the demand from a design area; given the water supply on
+// hand, the largest design area it can protect at a density is the inverse. From
+// total = density x area + hose, the sprinkler flow is supply - hose, so
+// max_area = (supply - hose) / density.
+// dims: in { available_supply_gpm: L^3 T^-1, density: L T^-1, hose_gpm: L^3 T^-1 } out: { max_design_area_ft2: L^2, sprinkler_gpm: L^3 T^-1 }
+export function computeSprinklerProtectionAreaForSupply({ available_supply_gpm = 0, density = 0.20, hose_gpm = 250 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const supply = Number(available_supply_gpm) || 0;
+  const dens = Number(density) || 0;
+  const hose = Number(hose_gpm);
+  if (!(supply > 0)) return { error: "Available water supply must be positive (gpm)." };
+  if (!(dens > 0)) return { error: "Design density must be positive (gpm/ft^2)." };
+  if (!(hose >= 0)) return { error: "Hose allowance cannot be negative (gpm)." };
+  const sprinkler_gpm = supply - hose;
+  if (!(sprinkler_gpm > 0)) return { error: "The hose allowance (" + hose.toFixed(0) + " gpm) meets or exceeds the supply; no flow is left for sprinklers." };
+  const max_design_area_ft2 = sprinkler_gpm / dens;
+  return {
+    max_design_area_ft2, sprinkler_gpm,
+    note: "NFPA 13 area/density demand solved for the area: with the hose-stream allowance taken off the top, the remaining supply divided by the design density is the largest hydraulic design area the water supply can serve. A lower density (a lighter hazard) or a smaller hose allowance lets the same supply cover more area. This is the area/density (pipe-schedule-style) screen -- a full hydraulic calculation to the most-remote area including friction and elevation, at the flowing pressure the supply can deliver, is the governing analysis and is separate. A design aid, not a stamped hydraulic submittal; a qualified fire-protection engineer and the AHJ govern.",
+  };
+}
+export const sprinklerProtectionAreaForSupplyExample = { inputs: { available_supply_gpm: 550, density: 0.20, hose_gpm: 250 } };
+FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRenderer({
+  citation: "Citation: NFPA 13 (2022) area/density demand solved for the area: sprinkler flow = supply - hose allowance, max design area = sprinkler flow / density. The area/density (pipe-schedule-style) screen; a full hydraulic calculation to the most-remote area at the supply's flowing pressure governs and is separate. A design aid; a fire-protection engineer and the AHJ govern.",
+  example: sprinklerProtectionAreaForSupplyExample.inputs,
+  fields: [
+    { key: "available_supply_gpm", label: "Available water supply (gpm)", kind: "number", default: 550 },
+    { key: "density", label: "Design density (gpm/ft^2)", kind: "number", default: 0.20 },
+    { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
+  ],
+  outputs: [
+    { key: "area", id: "spa-out-area", label: "Max hydraulic design area", value: (r) => fmt(r.max_design_area_ft2, 0) + " ft^2" },
+    { key: "sg", id: "spa-out-sg", label: "Sprinkler flow available", value: (r) => fmt(r.sprinkler_gpm, 0) + " gpm" },
+    { key: "n", id: "spa-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSprinklerProtectionAreaForSupply,
+});
+
 // ===================== spec-v250: sprinkler head count and spacing =====================
 
 // dims: in { room_length: L, room_width: L, area_per_head: L^2, max_spacing: L } out: { spacing: L, heads_per_line: dimensionless, num_lines: dimensionless, total_heads: dimensionless, room_area: L^2, achieved_area_per_head: L^2, max_wall_distance: L }
